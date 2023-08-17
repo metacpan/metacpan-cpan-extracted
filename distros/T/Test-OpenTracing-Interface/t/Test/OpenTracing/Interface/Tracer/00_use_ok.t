@@ -1,4 +1,4 @@
-use Test::Most;
+use Test::More;
 
 BEGIN {
     use_ok( 'Test::OpenTracing::Interface::Tracer' )

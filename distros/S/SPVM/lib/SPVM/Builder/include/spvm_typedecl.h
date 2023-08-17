@@ -7,6 +7,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// spvm_class_file.h
+struct spvm_class_file;
+typedef struct spvm_class_file SPVM_CLASS_FILE;
+
+// spvm_runtime_arg.h
+struct spvm_runtime_arg;
+typedef struct spvm_runtime_arg SPVM_RUNTIME_ARG;
+
 // spvm_precompile.h
 struct spvm_precompile;
 typedef struct spvm_precompile SPVM_PRECOMPILE;
@@ -19,9 +27,9 @@ typedef struct spvm_runtime_basic_type SPVM_RUNTIME_BASIC_TYPE;
 struct spvm_runtime_type;
 typedef struct spvm_runtime_type SPVM_RUNTIME_TYPE;
 
-// spvm_runtime_constant_string.h
-struct spvm_runtime_constant_string;
-typedef struct spvm_runtime_constant_string SPVM_RUNTIME_CONSTANT_STRING;
+// spvm_runtime_string.h
+struct spvm_runtime_string;
+typedef struct spvm_runtime_string SPVM_RUNTIME_STRING;
 
 // spvm_runtime_field.h
 struct spvm_runtime_field;
@@ -39,9 +47,9 @@ typedef struct spvm_runtime_class_var SPVM_RUNTIME_CLASS_VAR;
 struct spvm_runtime_class;
 typedef struct spvm_runtime_class SPVM_RUNTIME_CLASS;
 
-// spvm_constant_string.h
-struct spvm_constant_string;
-typedef struct spvm_constant_string SPVM_CONSTANT_STRING;
+// spvm_string.h
+struct spvm_string;
+typedef struct spvm_string SPVM_STRING;
 
 // spvm_interface.h
 struct spvm_interface;
@@ -81,9 +89,9 @@ typedef struct spvm_case_info SPVM_CASE_INFO;
 struct spvm_basic_type;
 typedef struct spvm_basic_type SPVM_BASIC_TYPE;
 
-// spvm_opcode_array.h
-struct spvm_opcode_array;
-typedef struct spvm_opcode_array SPVM_OPCODE_ARRAY;
+// spvm_opcode_list.h
+struct spvm_opcode_list;
+typedef struct spvm_opcode_list SPVM_OPCODE_LIST;
 
 // spvm_opcode.h
 struct spvm_opcode;
@@ -140,10 +148,6 @@ typedef struct spvm_dumper SPVM_DUMPER;
 // spvm_assign.h
 struct spvm_assign;
 typedef struct spvm_assign SPVM_ASSIGN;
-
-// spvm_class.h
-struct spvm_class;
-typedef struct spvm_class SPVM_CLASS;
 
 // spvm_field_access.h
 struct spvm_field_access;

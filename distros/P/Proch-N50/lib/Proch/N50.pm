@@ -4,7 +4,7 @@ package Proch::N50;
 use 5.012;
 use warnings;
 my  $opt_digits = 2;
-$Proch::N50::VERSION = '1.5.6';
+$Proch::N50::VERSION = '1.5.8';
 use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
@@ -28,20 +28,18 @@ sub getStats {
     $answer->{N50}    = undef;
 
     # Check file existence
-# uncoverable condition right
+    # uncoverable condition right
     if ( !-e "$file" and $file ne '-' ) {
         $answer->{status}  = 0;
         $answer->{message} = "Unable to find <$file>";
     }
-
-
 
     # Return failed status if file not found or not readable
     if ( $answer->{status} == 0 ) {
         return $answer;
     }
 
-    ##my @aux = undef;
+    # my @aux = undef;
     my $Reader;
     if ($file ne '-') {
        $Reader = FASTX::Reader->new({ filename => "$file" });
@@ -189,7 +187,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 1.5.6
+version 1.5.8
 
 =head1 SYNOPSIS
 
@@ -359,7 +357,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
+This software is Copyright (c) 2018-2023 by Andrea Telatin.
 
 This is free software, licensed under:
 

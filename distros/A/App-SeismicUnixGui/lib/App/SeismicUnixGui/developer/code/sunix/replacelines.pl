@@ -96,7 +96,7 @@ foreach my $subdir (@directories) {
 		open( OUT, ">$inbound_prog_spec" ) or die("File $inbound_prog_spec not found");
 		print("writing our $inbound_prog_spec\n");
 		for ( my $i = 0; $i < $number_of_lines; $i++ ) {
-			printf OUT $line[$i];
+			print OUT $line[$i];
 		}
 		close(OUT);
 	}    # for each file

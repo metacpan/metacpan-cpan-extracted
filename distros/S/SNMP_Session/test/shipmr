@@ -1,0 +1,119 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use BER;
+use SNMP_Session;
+use Socket;
+
+sub get_table_entry ($$$ );
+
+my $version = '2c';
+my $port = 161;
+my $debug = 0;
+
+while (defined $ARGV[0] && $ARGV[0] =~ /^-/) {
+    if ($ARGV[0] =~ /^-v/) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] eq '1') {
+	    $version = '1';
+	} elsif ($ARGV[0] eq '2c') {
+	    $version = '2c';
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] =~ /^-p/) {
+	if ($ARGV[0] eq '-p') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] =~ /^[0-9]+$/) {
+	    $port = $ARGV[0];
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] eq '-h') {
+	usage (0);
+	exit 0;
+    } else {
+	usage (1);
+    }
+    shift @ARGV;
+}
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || "public";
+
+my $source = '130.59.4.2';
+my $group = '233.2.47.1';
+my $source_mask = '255.255.255.255';
+my $index = $group.".".$source.".".$source_mask;
+usage (1) if $#ARGV >= $[;
+
+
+my @ipMRouteTableOIDs = ([1,3,6,1,3,60,1,1,2,1,4],
+			 [1,3,6,1,3,60,1,1,2,1,5],
+			 [1,3,6,1,3,60,1,1,2,1,6],
+			 [1,3,6,1,3,60,1,1,2,1,7],
+			 [1,3,6,1,3,60,1,1,2,1,8],
+			 [1,3,6,1,3,60,1,1,2,1,9],
+			 [1,3,6,1,3,60,1,1,2,1,10],
+			 [1,3,6,1,3,60,1,1,2,1,11]);
+
+&print_route_at_router ($host, $community);
+
+my %router_seen = ();
+
+sub print_route_at_router {
+    my ($host, $community) = @_;
+    return if $router_seen{$host};
+    ++$router_seen{$host};
+    my $session =
+	($version eq '1' ? SNMPv1_Session->open ($host, $community, $port)
+	 : $version eq '2c' ? SNMPv2c_Session->open ($host, $community, $port)
+	 : die "Unknown SNMP version $version")
+	    || die "Opening SNMP_Session";
+    $session->debug (1) if $debug;
+    my ($upstream_neighbor, $in_if_index, $up_time, $expiry_time, $pkts, $different_in_if_packets, $octets, $protocol)
+	= get_table_entry ($session, \@ipMRouteTableOIDs, $index);
+    return undef unless defined $upstream_neighbor;
+    my $upstream_name = gethostbyaddr(pack ("C4",split ('\.',$upstream_neighbor)),
+				      AF_INET) || $upstream_neighbor;
+    print "Router: $host\n";
+    print "  upstream neighbor: $upstream_neighbor ($upstream_name)\n";
+    print "  in-interface: $in_if_index\n";
+    print_route_at_router ($upstream_name, $community)
+	unless $upstream_neighbor eq '0.0.0.0';
+}
+
+sub get_table_entry ($$$ ) {
+    my ($session, $columns, $index) = @_;
+    my @result;
+
+    if ($session->get_request_response (map { encode_oid (@{$_},split ('\.',$index)) } (@{$columns}))) {
+	my $response = $session->pdu_buffer;
+	my ($bindings) = $session->decode_get_response ($response);
+	my ($binding, $oid, $value);
+
+	while ($bindings ne '') {
+	    ($binding,$bindings) = decode_sequence ($bindings);
+	    ($oid,$value) = decode_by_template ($binding, "%O%@");
+	    push @result, pretty_print ($value);
+	}
+    } else {
+	warn "SNMP problem: $SNMP_Session::errmsg\n";
+    }
+    @result;
+}
+
+#foreach my $oid (@ipMRouteTableOIDs) {
+#    warn "OID: $oid";
+#}
+#system "snmpget $host ipMRouteTable.ipMRouteEntry.ipMRouteInIfIndex.$index";
+1;

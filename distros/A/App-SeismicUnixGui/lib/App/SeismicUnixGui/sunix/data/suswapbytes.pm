@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::data::suswapbytes;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

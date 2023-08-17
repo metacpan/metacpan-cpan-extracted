@@ -2,12 +2,6 @@
 use strict;
 use Test::More;
 
-BEGIN {
-    if( $^O ne 'MSWin32' ) {
-        plan skip_all => "This module only works on Windows";
-        exit;
-    };
-}
 # Check that MANIFEST and MANIFEST.skip are sane :
 
 use File::Find;

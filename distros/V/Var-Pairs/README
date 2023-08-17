@@ -1,4 +1,4 @@
-Var::Pairs version 0.004001
+Var::Pairs version 0.004002
 
 This module exports a small number of subroutines that
 add some Perl 6 conveniences to Perl 5. Specifically,

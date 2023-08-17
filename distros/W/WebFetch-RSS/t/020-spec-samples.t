@@ -13,7 +13,7 @@ use File::Basename qw(basename dirname);
 use File::Compare;
 use Try::Tiny;
 use YAML::XS;
-use WebFetch "0.15.5";
+use WebFetch v0.15.5;
 use WebFetch::Input::RSS;
 use WebFetch::RSS;
 use WebFetch::Output::Capture;
@@ -28,9 +28,9 @@ Readonly::Scalar my $debug_mode      => ( exists $ENV{WEBFETCH_TEST_DEBUG} and $
 Readonly::Scalar my $base_dir        => dirname($FindBin::Bin);
 Readonly::Scalar my $input_dir       => $base_dir . "/t/test-inputs/020-spec-samples";
 Readonly::Scalar my $tmpdir_template => "WebFetch-XXXXXXXXXX";
-Readonly::Array my @rss_versions     => qw(0.9 0.91 1.0 2.0);
-Readonly::Array my @test_classes     => qw(WebFetch::RSS WebFetch::Input::RSS);
-Readonly::Array my @test_files       => qw(
+Readonly::Array my @rss_versions => qw(0.9 0.91 1.0 2.0);
+Readonly::Array my @test_classes => qw(WebFetch::RSS WebFetch::Input::RSS);
+Readonly::Array my @test_files => qw(
     00-notfound-skip.xml rss-0.91-complete.xml rss-0.91-from-2.0-spec.xml rss-0.91-simple.xml
     rss-0.92-from-2.0-spec.xml rss-1.0-modules.xml rss-1.0-simple.xml rss-2.0-sample.xml
 );

@@ -1,0 +1,85 @@
+{
+   "abstract" : "A module to interconvert common data models for phenotypic data",
+   "author" : [
+      "Manuel Rueda <mrueda@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Convert-Pheno",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "docs",
+         "t",
+         "share/api"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.70",
+            "File::ShareDir::Install" : "0.14"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.72",
+            "DBI" : "1.643",
+            "File::ShareDir::ProjectDistDir" : "1.000009",
+            "JSON::Validator" : "5.14",
+            "JSON::XS" : "4.03",
+            "Mojolicious" : "9.33",
+            "Moo" : "2.005005",
+            "Path::Tiny" : "0.144",
+            "PerlIO::gzip" : "0.20",
+            "Sort::Naturally" : "1.03",
+            "Term::ANSIColor" : "5.01",
+            "Test::Deep" : "1.204",
+            "Test::Exception" : "0.43",
+            "Test::Warn" : "0.37",
+            "Text::CSV_XS" : "1.50",
+            "Text::Similarity" : "0.13",
+            "Types::Standard" : "2.004000",
+            "XML::Fast" : "0.17",
+            "YAML::XS" : "0.88",
+            "perl" : "5.0261"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno/issues"
+      },
+      "homepage" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git",
+         "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.10;
+package Commandable::Finder 0.11;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,36 @@ require Commandable::Output;
 =head1 NAME
 
 C<Commandable::Finder> - an interface for discovery of L<Commandable::Command>s
+
+=head1 SYNOPSIS
+
+   use Commandable::Finder::...;
+
+   my $finder = Commandable::Finder::...->new(
+      ...
+   );
+
+   $finder->find_and_invoke( Commandable::Invocation->new( $text ) );
+
+=head1 DESCRIPTION
+
+This base class is common to the various finder subclasses:
+
+=over 4
+
+=item *
+
+L<Commandable::Finder::SubAttributes>
+
+=item *
+
+L<Commandable::Finder::MethodAttributes>
+
+=item *
+
+L<Commandable::Finder::Packages>
+
+=back
 
 =head1 METHODS
 
@@ -35,6 +65,18 @@ The following configuration options are recognised:
 If enabled, the L</find_and_invoke> method will permit multiple command
 invocations within a single call.
 
+=head3 require_order
+
+If enabled, stop processing options when the first non-option argument
+is seen.
+
+=head3 bundling
+
+If enabled, short (single-letter) options of simple boolean type can be
+combined into a single C<-abc...> argument. Incrementable options can be
+specified multiple times (as common with things like C<-vvv> for
+C<--verbose 3>).
+
 =cut
 
 sub configure
@@ -43,7 +85,7 @@ sub configure
    my %conf = @_;
 
    exists $conf{$_} and $self->{config}{$_} = delete $conf{$_}
-      for qw( allow_multiple_commands );
+      for qw( allow_multiple_commands require_order bundling );
 
    keys %conf and croak "Unrecognised ->configure params: " . join( ", ", sort keys %conf );
 
@@ -111,6 +153,23 @@ sub find_and_invoke
    return $result;
 }
 
+=head2 find_and_invoke_list
+
+   $result = $finder->find_and_invoke_list( @tokens )
+
+A further convenience around creating a L<Commandable::Invocation> from the
+given list of values and using that to invoke a command.
+
+=cut
+
+sub find_and_invoke_list
+{
+   my $self = shift;
+
+   require Commandable::Invocation;
+   return $self->find_and_invoke( Commandable::Invocation->new_from_tokens( @_ ) );
+}
+
 =head2 find_and_invoke_ARGV
 
    $result = $finder->find_and_invoke_ARGV()
@@ -126,10 +185,7 @@ wrapper script to be created in a single line of code:
 
 sub find_and_invoke_ARGV
 {
-   my $self = shift;
-
-   require Commandable::Invocation;
-   return $self->find_and_invoke( Commandable::Invocation->new_from_tokens( @ARGV ) );
+   shift->find_and_invoke_list( @ARGV );
 }
 
 =head1 BUILTIN COMMANDS
@@ -254,10 +310,11 @@ sub builtin_command_helpcmd
 
          my $default = $optspec->default;
          my $value   = $optspec->mode eq "value" ? " <value>" : "";
+         my $no      = $optspec->negatable       ? "[no-]"    : "";
 
          Commandable::Output->printf( "    %s\n",
             _join( ", ", map {
-               Commandable::Output->format_note( length $_ > 1 ? "--$_$value" : "-$_$value", 1 )
+               Commandable::Output->format_note( length $_ > 1 ? "--$no$_$value" : "-$_$value", 1 )
             } $optspec->names )
          );
          Commandable::Output->printf( "      %s%s\n",

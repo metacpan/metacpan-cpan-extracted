@@ -1,5 +1,5 @@
 This archive contains the distribution Catalyst-Plugin-URI,
-version 0.005:
+version 0.006:
 
   Sugar and strong errors for $c->uri_for
 

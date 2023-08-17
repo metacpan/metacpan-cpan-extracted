@@ -4,7 +4,7 @@
       "Graham TerMarsch <cpan@howlingfrog.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,8 @@
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.12",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -75,16 +76,16 @@
       "bugtracker" : {
          "web" : "https://github.com/bleargh45/Dist-Zilla-Plugin-GitHub-RequireGreenBuild/issues"
       },
-      "homepage" : "http://metacpan.org/release/Dist-Zilla-Plugin-GitHub-RequireGreenBuild/",
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-GitHub-RequireGreenBuild/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/bleargh45/Dist-Zilla-Plugin-GitHub-RequireGreenBuild.git",
          "web" : "https://github.com/bleargh45/Dist-Zilla-Plugin-GitHub-RequireGreenBuild"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

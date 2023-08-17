@@ -1,5 +1,7 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/ca.crt
 examples/ca.key
 examples/client.crt
@@ -27,6 +29,7 @@ t/03post.t
 t/04-bumpy-life.t
 t/05server-header.t
 t/06harakiri.t
+t/06non_harakiri.t
 t/07remote_port.t
 t/08chunked_req.t
 t/09chunked_zero_length.t
@@ -34,6 +37,7 @@ t/10unix_domain_socket.t
 t/50server.t
 t/60ssl.t
 t/61ssl_largebody.t
+t/62ssl_client_cert.t
 xt/check_changes.t
 xt/consistent_version_numbers.t
 xt/copyright.t
@@ -46,7 +50,7 @@ xt/eol.t
 xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
-xt/pod_coverage.t
+xt/perlcritic.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t

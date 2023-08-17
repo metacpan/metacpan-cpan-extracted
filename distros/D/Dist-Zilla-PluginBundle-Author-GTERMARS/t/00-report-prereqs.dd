@@ -17,7 +17,8 @@ do { my $x = {
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Synopsis' => '0'
+                                      'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
@@ -25,6 +26,7 @@ do { my $x = {
                                       'Dist::Zilla' => '6.005',
                                       'Dist::Zilla::Plugin::Bootstrap::lib' => '1.001002',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
+                                      'Dist::Zilla::Plugin::CheckIssues' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
                                       'Dist::Zilla::Plugin::EnsureChangesHasContent' => '0',
                                       'Dist::Zilla::Plugin::EnsureMinimumPerl' => '0',

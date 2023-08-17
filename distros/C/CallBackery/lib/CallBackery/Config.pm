@@ -18,7 +18,7 @@ CallBackery gets much of its configuration from this config file.
 
 =cut
 
-use Mojo::Base -base,-async_await;
+use Mojo::Base -base,-async_await, -signatures;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
 use Config::Grammar::Dynamic;
@@ -38,8 +38,16 @@ the name of the config file
 
 has file => sub { croak "the file parameter is mandatory" };
 
-has secretFile => sub {
-    shift->file.'.secret';
+has secretFile => sub ($self) {
+    my $secretFile = $self->file.'.secret';
+    if (not -f $secretFile){
+        open my $rand, '>', $secretFile;
+        chmod 0600,$secretFile;
+        print $rand sprintf('%x%x',int(rand()*1e14),int(rand()*1e14));
+        close $rand;
+        chmod 0400,$secretFile;
+    }
+    return $secretFile;
 };
 
 has app => sub { croak "the app parameter is mandatory" };
@@ -137,8 +145,9 @@ sub loadAndNewPlugin {
     my $module;
     my $ok;
     for my $path (@{$self->pluginPath}) {
+        #$self->log->debug("looking for $plugin in $path");
         if (my $e = load_class "${path}::$plugin") {
-            die mkerror(3894,"Exception: $e") if ref $e;
+            die mkerror(3894,"Loading ${path}::$plugin: $e") if ref $e;
         } else {
             return "${path}::${plugin}"->new();
         }
@@ -554,12 +563,14 @@ sub restoreConfigBlob {
         for ($member->fileName){
             /^\{DATABASE\}$/ && do {
                 $self->log->warn("Restoring Database!");
+                $self->app->database->mojoSqlDb->disconnect;
                 unlink glob $cfg->{BACKEND}{cfg_db}.'*';
                 $member->extractToFileNamed($cfg->{BACKEND}{cfg_db});
                 last;
             };
             /^\{DATABASEDUMP\}$/ && do {
                 $self->log->warn("Restoring Database Dump!");
+                $self->app->database->mojoSqlDb->disconnect;
                 unlink glob $cfg->{BACKEND}{cfg_db}.'*';
                 open my $sqlite, '|-', '/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
                 my $sql = $member->contents();

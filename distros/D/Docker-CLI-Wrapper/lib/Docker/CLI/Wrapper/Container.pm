@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper::Container;
-$Docker::CLI::Wrapper::Container::VERSION = '0.0.6';
+$Docker::CLI::Wrapper::Container::VERSION = '0.0.7';
 use strict;
 use warnings;
 use 5.014;
@@ -80,7 +80,7 @@ Docker::CLI::Wrapper::Container - manage a container.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

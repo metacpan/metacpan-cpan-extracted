@@ -314,6 +314,7 @@ Files: Changes
  t/fedora.t
  t/flaws.t
  t/grant.t
+ t/lib/Test2/Require/TestCorpus.pm
  t/lib/Test2/ScanCode.pm
  t/lib/Uncruft.pm
  t/license.t
@@ -326,8 +327,8 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/lib/Test2/Require/TestCorpus.pm
-Copyright: Copyright 2021 Jonas Smedegaard.
+Files: t/grant/LGPL/Model.pm
+Copyright: Copyright 2016 Jonas Smedegaard.
 License: AGPL_3
 
 Files: t/devscripts/artistic-2-0-modules.pm
@@ -337,10 +338,6 @@ License: Artistic-2.0
 Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: t/grant/LGPL/Model.pm
-Copyright: Copyright 2016 Jonas Smedegaard.
-License: AGPL_3
 
 License: AGPL_3
  This software is Copyright (c) 2023 by Jonas Smedegaard.

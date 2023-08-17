@@ -1,0 +1,7 @@
+severity = 4
+theme    = core
+exclude  = Subroutines::ProhibitSubroutinePrototypes TestingAndDebugging::RequireUseStrict TestingAndDebugging::RequireUseWarnings
+verbose  = [%p] %m at %f line %l.\n
+
+[Subroutines::ProhibitBuiltinHomonyms]
+allow = delete reset shutdown

@@ -1,7 +1,7 @@
 package PICA::Writer::Import;
 use v5.14.1;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use charnames qw(:full);
 
@@ -48,9 +48,9 @@ PICA::Writer::Import - PICA Import format serializer
 
 =head2 DESCRIPTION
 
-Serializes PICA+ records in PICA Import format (based on CBS normalized file
-format, see L<https://format.gbv.de/pica/import>).
+Serializes PICA+ records in PICA Import format (also known as "normalized title
+format", see L<https://format.gbv.de/pica/import>).
 
-Parser of PICA Import format has not been implemented yet.
+See L<PICA::Parser::Import> for corresponding parser.
 
 =cut

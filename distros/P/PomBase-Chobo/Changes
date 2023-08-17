@@ -1,5 +1,8 @@
 Revision history for PomBase-Chobo
 
+0.039     2023-06-17 22:14:38
+          Parse and store dbxrefs from the xref: lines
+
 0.038     2023-02-21 17:54:07
           Fix handling of UTF-8 encoded OBO files
 

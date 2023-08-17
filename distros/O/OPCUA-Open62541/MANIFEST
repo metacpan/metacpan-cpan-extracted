@@ -30,6 +30,7 @@ script/patch-tools_generate_datatypes_py
 t/client-browse-async.t
 t/client-browse.t
 t/client-browsenext-async.t
+t/client-config-applicationuri.t
 t/client-config-context.t
 t/client-config-default.t
 t/client-config-encryption.t
@@ -68,9 +69,12 @@ t/server-browse.t
 t/server-buildinfo.t
 t/server-client-matrix.t
 t/server-client-variable.t
+t/server-config-accesscontrol.t
+t/server-config-cutomhostname.t
 t/server-config-default.t
 t/server-config-minimal.t
 t/server-config-readonly.t
+t/server-config-setlogincheck.t
 t/server-config.t
 t/server-context.t
 t/server-delete-nodes.t
@@ -90,6 +94,7 @@ t/test-client.t
 t/test-server-runtimeaction.t
 t/test-server-singlestep.t
 t/test-server.t
+t/trust-list.t
 t/typemap.t
 t/types.t
 t/unicode.t

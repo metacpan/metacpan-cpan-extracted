@@ -39,7 +39,7 @@ mv-to-from - Rename a file, with reversed order of arguments
 
 =head1 VERSION
 
-This document describes version 0.010 of mv-to-from (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
+This document describes version 0.011 of mv-to-from (from Perl distribution App-FileRenameUtils), released on 2023-05-24.
 
 =head1 SYNOPSIS
 

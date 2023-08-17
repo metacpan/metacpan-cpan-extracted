@@ -3,8 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Object::Pad::FieldAttr::Final" );
+require Object::Pad::FieldAttr::Final;
 
+pass( 'Modules loaded' );
 done_testing;

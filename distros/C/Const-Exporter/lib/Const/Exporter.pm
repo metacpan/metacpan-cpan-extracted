@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.2.2';
+our $VERSION = 'v1.2.3';
 
 use Carp;
 use Const::Fast;
@@ -243,7 +243,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.2.2
+version v1.2.3
 
 =head1 SYNOPSIS
 
@@ -511,6 +511,12 @@ e.g.
 
 =for readme continue
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.10.1 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 See L<Exporter> for a discussion of export tags.
@@ -578,7 +584,7 @@ B. Estrade <estrabd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2022 by Robert Rothenberg.
+This software is Copyright (c) 2014-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

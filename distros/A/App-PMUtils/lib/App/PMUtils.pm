@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-28'; # DATE
+our $DATE = '2023-05-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.743'; # VERSION
+our $VERSION = '0.744'; # VERSION
 
 our %SPEC;
 
@@ -318,7 +318,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.743 of App::PMUtils (from Perl distribution App-PMUtils), released on 2023-01-28.
+This document describes version 0.744 of App::PMUtils (from Perl distribution App-PMUtils), released on 2023-05-12.
 
 =head1 SYNOPSIS
 
@@ -327,67 +327,67 @@ modules:
 
 =over
 
-=item * L<cpanm-this-mod>
+=item 1. L<cpanm-this-mod>
 
-=item * L<module-dir>
+=item 2. L<module-dir>
 
-=item * L<pmabstract>
+=item 3. L<pmabstract>
 
-=item * L<pmbin>
+=item 4. L<pmbin>
 
-=item * L<pmcat>
+=item 5. L<pmcat>
 
-=item * L<pmchkver>
+=item 6. L<pmchkver>
 
-=item * L<pmcore>
+=item 7. L<pmcore>
 
-=item * L<pmcost>
+=item 8. L<pmcost>
 
-=item * L<pmdir>
+=item 9. L<pmdir>
 
-=item * L<pmdoc>
+=item 10. L<pmdoc>
 
-=item * L<pmedit>
+=item 11. L<pmedit>
 
-=item * L<pmgrep>
+=item 12. L<pmgrep>
 
-=item * L<pmhtml>
+=item 13. L<pmhtml>
 
-=item * L<pminfo>
+=item 14. L<pminfo>
 
-=item * L<pmlatest>
+=item 15. L<pmlatest>
 
-=item * L<pmless>
+=item 16. L<pmless>
 
-=item * L<pmlines>
+=item 17. L<pmlines>
 
-=item * L<pmlist>
+=item 18. L<pmlist>
 
-=item * L<pmman>
+=item 19. L<pmman>
 
-=item * L<pmminversion>
+=item 20. L<pmminversion>
 
-=item * L<pmpath>
+=item 21. L<pmpath>
 
-=item * L<pmstripper>
+=item 22. L<pmstripper>
 
-=item * L<pmuninst>
+=item 23. L<pmuninst>
 
-=item * L<pmunlink>
+=item 24. L<pmunlink>
 
-=item * L<pmversion>
+=item 25. L<pmversion>
 
-=item * L<pmxs>
+=item 26. L<pmxs>
 
-=item * L<podlist>
+=item 27. L<podlist>
 
-=item * L<podpath>
+=item 28. L<podpath>
 
-=item * L<pwd2mod>
+=item 29. L<pwd2mod>
 
-=item * L<rel2mod>
+=item 30. L<rel2mod>
 
-=item * L<update-this-mod>
+=item 31. L<update-this-mod>
 
 =back
 

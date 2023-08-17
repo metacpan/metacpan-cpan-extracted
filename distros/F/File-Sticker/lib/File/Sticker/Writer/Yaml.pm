@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Yaml;
-$File::Sticker::Writer::Yaml::VERSION = '3.0008';
+$File::Sticker::Writer::Yaml::VERSION = '3.0101';
 =head1 NAME
 
 File::Sticker::Writer::Yaml - write and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 3.0008
+version 3.0101
 
 =head1 SYNOPSIS
 

@@ -102,6 +102,9 @@ t/testdata/test-txdcolumns1.dat
 t/testdata/test-txdcolumns2.dat
 t/testdata/test-txdcolumns3.dat
 t/testdata/test-txdcontract1.dat
+t/testdata/test-txdcontract2.dat
+t/testdata/test-txdcontract3.dat
+t/testdata/test-txdcontract4.dat
 t/testdata/test-txdmean1.dat
 t/testdata/test-txdnorm1.dat
 t/testdata/test-txdrows1.dat

@@ -11,12 +11,17 @@ requires "IO::Tee" => "0";
 requires "Log::Log4perl" => "0";
 requires "Net::DNS" => "0";
 requires "Net::IP::XS" => "0";
+requires "Number::Bytes::Human" => "0";
 requires "PadWalker" => "0";
 requires "Path::Tiny" => "0";
+requires "Rex" => "0";
 requires "SQL::Abstract" => "0";
+requires "Syntax::Keyword::Match" => "0";
+requires "Syntax::Operator::In" => "0";
 requires "System::Command" => "0";
 requires "URI" => "0";
 requires "XML::RSS" => "0";
+requires "YAML::XS" => "0";
 requires "perl" => "v5.37.9";
 
 on 'configure' => sub {

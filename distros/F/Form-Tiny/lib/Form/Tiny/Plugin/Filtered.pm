@@ -1,5 +1,5 @@
 package Form::Tiny::Plugin::Filtered;
-$Form::Tiny::Plugin::Filtered::VERSION = '2.17';
+$Form::Tiny::Plugin::Filtered::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;

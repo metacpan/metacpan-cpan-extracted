@@ -1,5 +1,11 @@
 Revision history for Acme::Glue
 
+2023.08
+    - soundex "joke" snippet, thanks to MIKESTOK
+
+2023.07
+    - a count of perl5 LOC as of the 5.38 release
+
 2022.11
     - a perl quine
 

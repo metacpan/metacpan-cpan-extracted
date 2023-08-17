@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Zip 0.05;
+package Syntax::Operator::Zip 0.06;
 
 use v5.14;
 use warnings;
@@ -19,7 +19,7 @@ C<Syntax::Operator::Zip> - infix operator to compose two lists together
 
 =head1 SYNOPSIS
 
-On a suitably-patched perl:
+On Perl v5.38 or later:
 
    use Syntax::Operator::Zip;
 
@@ -28,7 +28,7 @@ On a suitably-patched perl:
       say "Value $x is associated with value $y";
    }
 
-Or, on a standard perl:
+Or on Perl v5.14 or later:
 
    use v5.14;
    use Syntax::Operator::Zip qw( zip );
@@ -44,29 +44,64 @@ This module provides infix operators that compose two lists of elements by
 associating successive elements from the left and right-hand lists together,
 forming a new list.
 
+Support for custom infix operators was added in the Perl 5.37.x development
+cycle and is available from development release v5.37.7 onwards, and therefore
+in Perl v5.38 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail.
+
+While Perl versions before this do not support custom infix operators, they
+can still be used via C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>.
+Custom keywords which attempt to parse operator syntax may be able to use
+these.
+
+Additionally, earlier versions of perl can still use the function-like
+wrapper versions of these operators. Even though the syntax appears like a
+regular function call, the code is compiled internally into the same more
+efficient operator internally, so will run without the function-call overhead
+of a regular function.
+
 =cut
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my $caller = caller;
 
-   @syms or @syms = qw( Z );
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( 1, @_ ) }
+sub unimport_into { shift->apply( 0, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $on, $caller, @syms ) = @_;
+
+   @syms or @syms = qw( Z M );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Operator::Zip/Z"}++ if delete $syms{Z};
+   foreach (qw( Z M )) {
+      next unless delete $syms{$_};
+
+      $on ? $^H{"Syntax::Operator::Zip/$_"}++
+          : delete $^H{"Syntax::Operator::Zip/$_"};
+   }
 
    foreach (qw( zip mesh )) {
+      next unless delete $syms{$_};
+
       no strict 'refs';
-      *{"${caller}::$_"} = \&{$_} if delete $syms{$_};
+      $on ? *{"${caller}::$_"} = \&{$_}
+          : warn "TODO: implement unimport of package symbol";
    }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

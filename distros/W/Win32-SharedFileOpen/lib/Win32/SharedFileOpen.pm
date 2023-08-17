@@ -121,7 +121,7 @@ BEGIN {
 
     Exporter::export_ok_tags(qw(retry));
     
-    $VERSION = '4.04';
+    $VERSION = '4.06';
 
     # Get the ERROR_SHARING_VIOLATION constant loaded now, otherwise loading it
     # later the first time that we test for an error can actually interfere with
@@ -1609,7 +1609,8 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, 2013-2015, 2018, 2020 Steve Hay.  All rights reserved.
+Copyright (C) 2001-2008, 2013-2015, 2018, 2020, 2023 Steve Hay.  All rights
+reserved.
 
 =head1 LICENCE
 
@@ -1619,11 +1620,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 4.04
+Version 4.06
 
 =head1 DATE
 
-25 Nov 2020
+12 Aug 2023
 
 =head1 HISTORY
 

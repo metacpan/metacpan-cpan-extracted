@@ -1,6 +1,20 @@
 Tk::CodeText module changes log
 
+04 june 2023
+	Update to version 0.42. 
+	Fixed documentation typos and errors.
+	Fixed testing.
+
+01 june 2023
+	Update to version 0.41. 
+	Moved internal MyKamelon to it's own pm, so metacpan does not have problems with it.
+
+01 june 2023
+	Update to version 0.40.
+	Made a rewrite from scratch. See Readme.md.
+
 27 march 2004
+	update to version 0.3.4
 	removed -headerbackground bug from RulesEditor
 	renamed test.pl to demo.pl so testing without a connection to an
 	X-server will not fail.

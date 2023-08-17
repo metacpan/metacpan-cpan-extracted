@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::transform::succwt;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUCCWT - Complex continuous wavelet transform of seismic traces	
+ PERL PROGRAM NAME:  SUCCWT - Complex continuous wavelet transform of seismic traces	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

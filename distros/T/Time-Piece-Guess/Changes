@@ -1,5 +1,11 @@
 Revision history for Time-Piece-Guess
 
+0.1.1   2023-08-01/00:30
+        -Add in error handling for Time::Piece when %z only has hours
+
+0.1.0   2023-07-28/23:30
+        -add special support for object generation
+
 0.0.3   2023-03-14/14:30
         -minor doc tweaks
 

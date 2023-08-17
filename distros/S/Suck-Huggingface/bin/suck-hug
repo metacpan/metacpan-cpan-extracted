@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+# Copyright (C) 2017-2023 TTK Ciar
+# Available for unlimited distribution and use.
+# The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
+
+use strict;
+use warnings;
+use v5.10;  # provides "say" and "state"
+
+use lib "./lib";
+use Suck::Huggingface;
+
+my @DOCS;
+my %OPT = (v => 1);
+my %CONFIG;
+foreach my $arg (@ARGV) {
+    if    ($arg =~ /^\-+(.+?)\=(.*)/) { $OPT{$1} = $2; }
+    elsif ($arg =~ /^\-+(v+)$/      ) { $OPT{v}  = length($1) + 1; }
+    elsif ($arg =~ /^\-+q$/         ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+quiet$/     ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+(.+)/       ) { $OPT{$1} = -1; }
+    else { push (@DOCS, $arg); }
+}
+
+exit(main(\@DOCS, \%OPT));
+
+sub main {
+  my ($docs_ar, $opt_hr) = @_;
+
+  return usage() if (opt('h') || opt('help') || !@$docs_ar);
+
+  my $shug = Suck::Huggingface->new(%$opt_hr);
+  my $n_err = 0;
+  my $n_ok  = 0;
+  $| = 1;
+  my @ordered_docs = @$docs_ar;
+  if (opt('sort')) { 
+    @ordered_docs = sort { model_size_est($a) <=> model_size_est($b) } @$docs_ar;
+  }
+  for my $repo_url (@$docs_ar) {
+    print "sucking $repo_url .. " if (opt('v'));
+    my ($ok, @errs) = $shug->suck($repo_url);
+    if (is_ok($ok)) {
+      my ($n_dl, $sz) = @errs;
+      print "done with $n_dl file downloads, $sz bytes\n" if (opt('v'));
+      $n_ok++;
+    } else {
+      my $what = $errs[0];
+      print "ERROR: $what, see log for details\n" if (opt('v'));
+      $n_err++;
+    }
+  }
+
+  print "finished with $n_ok successes and $n_err errors\n" if (opt('v'));
+  return $n_err ? 1 : 0;
+}
+
+sub model_size_est {
+  my ($f) = @_;
+  # zzapp -- this is pretty stupid, and I should make it smarter.
+  return 12500000 unless ($f =~ /(\d+\.?\d*)([kmbt])/i);  # 12.5b is sane'ish default
+  my ($v, $u) = ($1, lc $2);
+  $v *= 1000 if ($u eq 'm');
+  $v *= 1000000 if ($u eq 'b');
+  $v *= 1000000000 if ($u eq 't');
+  return $v;
+}
+
+sub opt {
+  my ($name, $default_value, $alt_hr) = @_;
+  $alt_hr //= {};
+  return $OPT{$name} // $CONFIG{$name} // $alt_hr->{$name} // $default_value;
+}
+
+sub is_ok {
+  my ($mode) = @_;
+  return 1 if ($mode eq 'OK');
+  return 1 if ($mode eq 'WARNING');
+  return 1 if ($mode eq 'INFO');
+  return 0;
+}
+
+sub usage {
+  print join("\n", (
+    "usage: $0 [options] https://huggingface.co/bigscience/bloom [more urls ...]",
+    "Will clone repos and download files too big to be included in repo",
+    "General options:",
+    "  -h, --help       Show this usage and exit",
+    "  --exclude=xx,yy  Do not download external files with xx or yy in their name",
+    "  --rate-limit=#[KMG]  Set rate limiting for wget (default: unlimited)",
+    "  --too_big=###    Examine files smaller than this for download, bytes (default: 300)",
+    "  --retries=###    How many times to retry failed wget (default: 1000)",
+    "  --sort           Order downloads by size; download smallest first.",
+    "  --username=XXX   If Huggingface requires auth, use XXX for username.",
+    "  --password=YYY   If Huggingface requires auth, use YYY for password.",
+    "  -q               Suppress output",
+    "  -v               More verbose output",
+    "Logging options:",
+    "  --log-dir=PATH   Write logfile in this directory (default: /var/tmp)",
+    "  --logfile=PNAME  Write logfile to this exact pathname (overrides --log-dir)",
+    "  --log-level=#    Set higher for more debug logging (default: 3, max: 7)",
+    "      level 0: only log CRITICAL records",
+    "      level 1: log CRITICAL, ERROR",
+    "      level 2: log CRITICAL, ERROR, WARNING",
+    "      level 3: log CRITICAL, ERROR, WARNING, INFO",
+    "      level 4+ log CRITICAL, ERROR, WARNING, INFO, DEBUG (many debug levels)",
+    "  --no-log         Suppress logging",
+    "  --no-logfile     Do not write log to file, can still show to stderr/stdout",
+    "  --show-log       Display log messages to stderr",
+    "  --show-log-to-stdout  Display log messages to stdout",
+  )),"\n";
+  return 1;
+}
+exclude rate-limit username password retries

@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.30.0
+        v0.31.1
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -435,6 +435,53 @@ METHODS
 
     *message*
         The error message.
+
+    *want*
+        An array reference of data types that you allow this method to
+        return when such data type is expected by the original caller.
+
+        Supported data types are: "ARRAY", "CODE", "GLOB", "HASH", "OBJECT",
+        "SCALAR"
+
+        Note that, actually, the data type you provide is case insensitive.
+
+        For example, you have a method that returns an array, but an error
+        occurs, and it returns "undef" instead:
+
+            sub your_method
+            {
+                my $self = shift( @_ );
+                return( $self->error( "Something is wrong" ) ) if( $self->something_is_missing );
+                return( $self->{array} );
+            }
+
+            my $array = $obj->your_method; # array is undef
+
+        If the user does:
+
+            $obj->your_method->[0]; # perl error occurs
+
+        This would trigger a perl error "Can't use an undefined value as an
+        ARRAY reference", which may be fine if this is what you want, but if
+        you want instead to ensure the user does not get an error, but
+        instead an empty array, in your method "your_method", you could
+        write this "your_method" this way instead, passing the "want"
+        parameter:
+
+            sub your_method
+            {
+                my $self = shift( @_ );
+                return( $self->error( { message => "Something is wrong", want => [qw( array )] ) ) if( $self->something_is_missing );
+                return( $self->{array} );
+            }
+
+        Then, if the user calls this method in array context and an error
+        occurs, it would now return instead an empty array.
+
+            my $array = $obj->your_method->[0]; # undef
+
+        Note that, by default, the "object" call context is always
+        activated, so you do not have to specify it.
 
     Note also that by calling "error" it will not clear the current error.
     For that you have to call "clear_error" explicitly.
@@ -833,6 +880,11 @@ METHODS
     Returns a null value based on the expectations of the caller and thus
     without breaking the caller's call flow.
 
+    You can also optionally provide an hash or hash reference containing the
+    option "type" with a value being either "ARRAY", "CODE", "HASH",
+    "OBJECT" or "SCALARREF" to force "new_null" to return the corresponding
+    data without using the caller's context.
+
     If the caller wants an hash reference, it returns an empty hash
     reference.
 
@@ -854,7 +906,7 @@ METHODS
 
         my $val = $object->return_false->[0];
     
-        sub return_false{ return }
+        sub return_false { return }
 
     The above would trigger an error that the value returned by
     "return_false" is not an array reference. Instead of checking on the
@@ -1225,6 +1277,14 @@ SUPPORT METHODS
         EOT
 
   __instantiate_object
+        my $o = $self->__instantiate_object( 'emails', 'Some::Module', @_ );
+        # or, with a callback
+        my $o = $self->__instantiate_object({ field => 'emails', callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->parse_bare_address( $args->[0] ) );
+        }}, 'Email::Address::XS', @_ );
+
     Provided with an object property name, and a class/package name, this
     will attempt to load the module if it is not already loaded. It does so
     using "load_class" in Class::Load. Once loaded, it will init an object
@@ -1232,6 +1292,24 @@ SUPPORT METHODS
     instantiated upon success or undef and sets an "error"
 
     This is a support method used by "_instantiate_object"
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
 
   _instantiate_object
     This does the same thing as "__instantiate_object" and the purpose is
@@ -1267,6 +1345,22 @@ SUPPORT METHODS
         {
             # ...
         }
+
+  _can_overload
+        my $rv = $self->_can_overload( undef, '""' ); # false
+        my $rv = $self->_can_overload( '', '""' ); # false
+        my $rv = $self->_can_overload( $some_object_not_overloaded, '""' ); # false
+        # In this example, it would return false, because, although it is an overloaded value provided, that object has no support for the operators specified.
+        my $rv = $self->_can_overload( $some_object_overloaded, '""' ); # false
+        my $rv = $self->_can_overload( $some_good_object_overloaded, '""' ); # true
+        my $rv = $self->_can_overload( $some_good_object_overloaded, [ '""', 'bool' ] ); # true
+
+    Provided with some value and a string representing an operator, or an
+    array reference of operators, and this will return true if the value is
+    an object that has the specified operator, or operators in case of an
+    array reference of operators provided, overloaded.
+
+    It returns false otherwise.
 
   _get_args_as_array
     Provided with arguments and this support method will return the
@@ -1355,10 +1449,10 @@ SUPPORT METHODS
     This will return a Devel::StackTrace object initiated with the following
     options set:
 
-    *indent* 1
+    "indent" 1
         This will set an initial indent tab
 
-    *skip_frames* 1
+    "skip_frames" 1
         This is set to 1 so this very method is not included in the frames
         stack
 
@@ -1415,19 +1509,6 @@ SUPPORT METHODS
             # Do something
         }
 
-  _is_class_loadable
-    Takes a module name and an optional version number and this will check
-    if the module exist and can be loaded by looking at the @INC and using
-    version to compare required version and existing version.
-
-    It returns true if the module can be loaded or false otherwise.
-
-  _is_class_loaded
-    Provided with a class/package name, this returns true if the module is
-    already loaded or false otherwise.
-
-    It performs this test by checking if the module is already in %INC.
-
   _is_array
     Provided with some data, this checks if the data is of type array, even
     if it is an object.
@@ -1456,6 +1537,19 @@ SUPPORT METHODS
     It would rather return the module package name: "My::Module"
 
   _is_class_loadable
+    Takes a module name and an optional version number and this will check
+    if the module exist and can be loaded by looking at the @INC and using
+    version to compare required version and existing version.
+
+    It returns true if the module can be loaded or false otherwise.
+
+  _is_class_loaded
+    Provided with a class/package name, this returns true if the module is
+    already loaded or false otherwise.
+
+    It performs this test by checking if the module is already in %INC.
+
+  _is_class_loadable
     Provided with a package name, a.k.a. a class, and an optional version
     and this will endeavour to check if that class is installed and if a
     version is provided, if it is greater or equal to the version provided.
@@ -1481,6 +1575,14 @@ SUPPORT METHODS
     it is a "CODE", such as a subroutine reference or an anonymous
     subroutine, or false otherwise.
 
+  _is_empty
+    This checks if a value was provided, and if it is defined, or if it has
+    a positive length, or is a scalar object that has the method "defined",
+    which returns false.
+
+    Based on those checks, it returns true (1) if it appears the value is
+    undefined or empty, and false (0) otherwise.
+
   _is_glob
     Provided with some value, possibly, undefined, and this returns true if
     it is a filehandle, or false otherwise.
@@ -1504,6 +1606,10 @@ SUPPORT METHODS
   _is_object
     Provided with some data, this checks if the data is an object. It uses
     "blessed" in Scalar::Util to achieve that purpose.
+
+  _is_overloaded
+    Provided with some value, presumably an object, and this will return
+    true if it is overloaded in some way, or false if it is not.
 
   _is_scalar
     Provided with some data, this checks if the data is of type scalar
@@ -1575,6 +1681,14 @@ SUPPORT METHODS
     module object is based on a file handle for example. This permits
     Module::Generic to work no matter what is the underlying data type
     blessed into an object.
+
+  _on_error
+    Sets or gets a code reference, acting as a callback that will be
+    triggered upon call to "error" or "pass_error" with an error.
+
+        return( $self->error( "Oops" ) ) if( $something_bad_happened );
+        # or
+        return( $self->pass_error( $another_error_object ) ) if( $something_bad_happened );
 
   _parse_timestamp
     Provided with a string representing a date or datetime, and this will
@@ -1693,12 +1807,16 @@ SUPPORT METHODS
 
     This hash reference can contain the following properties:
 
+    callbacks
+        An hash reference of operation type "add" (or "set")) to callback
+        subroutine name or code reference pairs.
+
     field
         The object property name
 
-    callbacks
-        An hash reference of operation type ("add" or "remove") to callback
-        subroutine name or code reference pairs.
+    wantlist
+        Boolean. If true, then it will return a list in list context instead
+        of the array object.
 
     For example:
 
@@ -1706,8 +1824,7 @@ SUPPORT METHODS
             field => 'children',
             callbacks => 
             {
-                add => '_some_add_callback',
-                remove => 'som_remove_callback',
+                set => '_some_add_callback',
             },
         }), @_ ); }
 
@@ -1749,7 +1866,7 @@ SUPPORT METHODS
         The object property name
 
     callbacks
-        An hash reference of operation type ("add" or "remove") to callback
+        An hash reference of operation type "add" (or "set") to callback
         subroutine name or code reference pairs.
 
     For example:
@@ -1758,8 +1875,7 @@ SUPPORT METHODS
             field => 'is_valid',
             callbacks => 
             {
-                add => '_some_add_callback',
-                remove => 'som_remove_callback',
+                set => '_some_add_callback',
             },
         }), @_ ); }
 
@@ -2011,6 +2127,8 @@ SUPPORT METHODS
             return( shift->_set_get_class( 'setup',
             {
             name => { type => 'scalar' },
+            # or being lazy:
+            # name => 'scalar',
             age => { type => 'number' },
             metadata => { type => 'hash' },
             rgb => { type => 'array' },
@@ -2069,6 +2187,13 @@ SUPPORT METHODS
 
     And this would store an array reference containing 2 objects with the
     above data.
+
+  _set_get_class_array_object
+    Same as "=head2 _set_get_class_array", but this returns an array object
+    instead of just a perl array.
+
+    When called in list context, it will return its values as a list,
+    otherwise it will return an array object
 
   _set_get_code
     Provided with an object property name and some code reference and this
@@ -2227,7 +2352,7 @@ SUPPORT METHODS
 
     *   "callbacks"
 
-        An hash reference of operation type ("add" or "remove") to callback
+        An hash reference of operation type "add" (or "set") to callback
         subroutine name or code reference pairs.
 
     *   "field"
@@ -2246,8 +2371,7 @@ SUPPORT METHODS
             field => 'length',
             callbacks => 
             {
-                add => '_some_add_callback',
-                remove => 'som_remove_callback',
+                set => '_some_add_callback',
             },
         }), @_ ); }
 
@@ -2261,6 +2385,16 @@ SUPPORT METHODS
   _set_get_object
         sub myobject { return( shift->_set_get_object({ field => 'myobject', no_init => 1 }, My::Class, @_ ) ); }
 
+        sub myobject { return( shift->_set_get_object({
+            field => 'myobject',
+            no_init => 1,
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+        }, My::Class, @_ ) ); }
+
         sub myobject { return( shift->_set_get_object( 'myobject', My::Class, @_ ) ); }
 
     Provided with an object property name, a class/package name and some
@@ -2270,10 +2404,24 @@ SUPPORT METHODS
     The property name can also be an hash reference that will be used to
     provide more granular settings:
 
-    "field"
+    *   "callback"
+
+        A callback code reference that will be passed the module class name
+        and the arguments as an array reference.
+
+        This is used to instantiate the module object in a particular way
+        and/or to have finer control about object instantiation.
+
+        Any fatal error during object instantiation is caught and an error
+        would be set and "undef" would be returned in scalar context, or an
+        empty list in list context.
+
+    *   "field"
+
         The actual property name
 
-    "no_init"
+    *   "no_init"
+
         Boolean that, when set, instruct to not instantiate a class object
         if one is not instantiated yet.
 
@@ -2293,25 +2441,130 @@ SUPPORT METHODS
         $o->my_property = $my_object;
 
   _set_get_object_without_init
-    Sets or gets an object, but countrary to "_set_get_object" this method
-    will not try to instantiate the object.
+        sub mymethod { return( shift->_set_get_object_without_init( 'mymethod', 'Some::Module', @_ ) ); }
+        # or
+        sub mymethod { return( shift->_set_get_object_without_init({
+            field => 'mymethod',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+        }, 'Some::Module', @_ ) ); }
+        # then
+        my $this = $obj->mymethod; # possibly undef if it was never instantiated
+        # return the C<Some::Module> object after having instantiated it
+        my $this = $obj->mymethod( some => parameters );
+
+    Sets or gets an object, but contrary to "_set_get_object" this method
+    will not try to instantiate the object, unless of course you pass it
+    some values.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+        Whatever this returns will set the value for this object property.
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
 
   _set_get_object_array2
+        sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
+        # or
+        sub mymethod { return( shift->_set_get_object_array2({
+            field => 'mymethod',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+        }, 'Some::Module', @_ ) ); }
+
     Provided with an object property name, a class/package name and some
     array reference itself containing array references each containing hash
     references or objects, and this will create an array of array of
     objects.
 
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
   _set_get_object_array
+        sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
+        # or
+        sub mymethod { return( shift->_set_get_object_array({
+            field => 'mymethod',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+        }, 'Some::Module', @_ ) ); }
+
     Provided with an object property name and a class/package name and
     similar to "_set_get_object_array2" this will create an array reference
     of objects.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
+        sub emails { return( shift->_set_get_object_array({
+            field => 'emails',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->parse_bare_address( $args->[0] ) );
+            },
+        }, 'Email::Address::XS', @_ ) ); }
 
   _set_get_object_array_object
     Provided with an object property name, a class/package name and some
     data and this will create an array of object similar to
     "_set_get_object_array", except the array produced is a
     Module::Generic::Array
+
+    This method accepts the same arguments as "_set_get_object_array"
 
   _set_get_object_variant
     Provided with an object property name, a class/package name and some
@@ -2322,6 +2575,33 @@ SUPPORT METHODS
 
     This means the value stored for the object property will vary between an
     hash or array reference.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
+        sub emails { return( shift->_set_get_object_variant({
+            field => 'emails',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->parse_bare_address( $args->[0] ) );
+            },
+        }, 'Email::Address::XS', @_ ) ); }
 
   _set_get_scalar
         sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
@@ -2366,7 +2646,7 @@ SUPPORT METHODS
         The object property name
 
     callbacks
-        An hash reference of operation type ("add" or "remove") to callback
+        An hash reference of operation type "add" (or "set") to callback
         subroutine name or code reference pairs.
 
     For example:
@@ -2375,8 +2655,7 @@ SUPPORT METHODS
             field => 'name',
             callbacks => 
             {
-                add => '_some_add_callback',
-                remove => 'som_remove_callback',
+                set => '_some_add_callback',
             },
         }), @_ ); }
 

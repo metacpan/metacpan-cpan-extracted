@@ -68,7 +68,6 @@ sub add_change
 sub as_string
 {
     my $self = shift( @_ );
-    $self->message( 5, "Is reset set ? ", ( exists( $self->{_reset} ) ? 'yes' : 'no' ), " and what is cache value '", ( $self->{_cache_value} // '' ), "' and raw cache '", ( $self->{raw} // '' ), "'" );
     if( !exists( $self->{_reset} ) || 
         !defined( $self->{_reset} ) ||
         !CORE::length( $self->{_reset} ) )
@@ -88,11 +87,9 @@ sub as_string
         my $lines = $self->new_array( $cache->scalar );
         $self->elements->foreach(sub
         {
-            $self->message( 4, "Calling as_string on $_" );
             my $this = $_->as_string;
             if( defined( $this ) )
             {
-                $self->message( 4, "Adding string '$this' to new lines" );
                 $lines->push( $this->scalar );
             }
         });
@@ -108,11 +105,9 @@ sub as_string
     $lines->push( $grp_str->scalar );
     $self->changes->foreach(sub
     {
-        $self->message( 4, "Calling as_string on $_" );
         my $this = $_->as_string;
         if( defined( $this ) )
         {
-            $self->message( 4, "Adding string '$this' to new lines" );
             $lines->push( $this->scalar );
         }
     });
@@ -147,7 +142,6 @@ sub delete_change
         if( !defined( $pos ) )
         {
             $self->_load_class( 'overload' );
-            $self->message( 4, "No change object found for object $change (", overload::StrVal( $change ), ")" );
             return( '' );
         }
         $elements->delete( $pos, 1 );
@@ -165,7 +159,6 @@ sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
 sub freeze
 {
     my $self = shift( @_ );
-    $self->message( 5, "Removing the reset marker -> '", ( $self->{_reset} // '' ), "'" );
     CORE::delete( @$self{qw( _reset )} );
     $self->elements->foreach(sub
     {

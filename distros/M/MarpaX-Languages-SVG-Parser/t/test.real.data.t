@@ -7,9 +7,11 @@ use File::Slurper 'read_text';
 use File::Spec;
 use File::Temp;
 
-use Path::Tiny; # For slurp_utf8.
+use Path::Tiny; # For spew_utf8.
 
 use Test::More;
+
+use Unicode::UTF8; # Used by spew_utf8() for big speedup.
 
 # ------------------------------------------------
 
@@ -37,7 +39,7 @@ sub process
 
 	my(@result)  = `$^X @params`;
 
-	path($out_file_name) -> spew(@result);
+	path($out_file_name) -> spew_utf8(@result);
 
 	is
 	(

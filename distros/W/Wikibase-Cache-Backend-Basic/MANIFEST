@@ -1,5 +1,6 @@
 Basic.pm
 Changes
+examples/p31_label_and_description.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -17,6 +18,7 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/data/example.txt
 t/Wikibase-Cache-Backend-Basic/01-use.t
 t/Wikibase-Cache-Backend-Basic/02-version.t
 t/Wikibase-Cache-Backend-Basic/03-new.t

@@ -15,7 +15,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -25,6 +25,7 @@ sub parameters {
 
     return (
             template_file => '',
+            exclude_index => 0,
             web_extension => 'html',
             configuration_file => 'followme.cfg',
             template_directory => '_templates',
@@ -76,7 +77,8 @@ sub find_prototype {
             $uplevel -= 1;
         } else {
             my $pattern = "*.$self->{web_extension}";
-            my $file = fio_most_recent_file($dir, $pattern);
+            my $file = fio_most_recent_file($dir, $pattern, 
+                                            $self->{exclude_index});
             return $file if $file;
         }
 
@@ -258,6 +260,11 @@ class based on it:
 =item template_file
 
 The name of the template file used by this module.
+
+=item exclude_index
+
+Do not include index file when searching for the file most recently changed
+in a directory.
 
 =item web_extension
 

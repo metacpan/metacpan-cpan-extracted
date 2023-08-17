@@ -208,7 +208,7 @@ my $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /Af49573f11706b4/, "Successfully Decrypted 3DES RSA-OAEP-MGF1P SAML2 Assertion");
+like($decrypter->decrypt($xml), qr/Af49573f11706b4/, "Successfully Decrypted 3DES RSA-OAEP-MGF1P SAML2 Assertion");
 
 $base64 = <<'SAMLAES128_RSA-OAEP-MGF1P';
 PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0
@@ -414,7 +414,7 @@ $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /Ac43ac806fc1e00b9f95/, "Successfully Decrypted AES128 RSA-OAEP-MGF1P Assertion");
+like($decrypter->decrypt($xml), qr/Ac43ac806fc1e00b9f95/, "Successfully Decrypted AES128 RSA-OAEP-MGF1P Assertion");
 
 
 $base64 = <<'SAMLAES196_RSA-OAEP-MGF1P';
@@ -621,7 +621,7 @@ $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /NETSAML2_70fbdf22f456/, "Successfully Decrypted AES196 RSA-OAEP-MGF1P SAML2 Assertion");
+like($decrypter->decrypt($xml), qr/NETSAML2_70fbdf22f456/, "Successfully Decrypted AES196 RSA-OAEP-MGF1P SAML2 Assertion");
 
 $base64 = <<'SAMLAES256_RSA-OAEP-MGF1P';
 PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0
@@ -826,6 +826,6 @@ $decrypter = XML::Enc->new(
         no_xml_declaration  => 1
     }
 );
-ok($decrypter->decrypt($xml) =~ /A835657d0615aa0bfa/, "Successfully Decrypted AES256 RSA-OAEP-MGF1P SAML2 Assertion");
+like($decrypter->decrypt($xml), qr/A835657d0615aa0bfa/, "Successfully Decrypted AES256 RSA-OAEP-MGF1P SAML2 Assertion");
 
 done_testing;

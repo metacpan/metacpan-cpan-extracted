@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the copy options.',
                                   class => 'CopyOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,35 +128,35 @@ __PACKAGE__->method_documentation({
      'column_character_width' => {
      	datatype => 'boolean',
      	base_name => 'ColumnCharacterWidth',
-     	description => '',
+     	description => 'Indicates whether copying column width in unit of characters.',
      	format => '',
      	read_only => '',
      		},
      'copy_invalid_formulas_as_values' => {
      	datatype => 'boolean',
      	base_name => 'CopyInvalidFormulasAsValues',
-     	description => '',
+     	description => 'If the formula is not valid for the dest destination, only copy values.',
      	format => '',
      	read_only => '',
      		},
      'copy_names' => {
      	datatype => 'boolean',
      	base_name => 'CopyNames',
-     	description => '',
+     	description => 'Indicates whether copying the names.',
      	format => '',
      	read_only => '',
      		},
      'extend_to_adjacent_range' => {
      	datatype => 'boolean',
      	base_name => 'ExtendToAdjacentRange',
-     	description => '',
+     	description => 'Indicates whether extend ranges when copying the range to adjacent range.',
      	format => '',
      	read_only => '',
      		},
      'refer_to_destination_sheet' => {
      	datatype => 'boolean',
      	base_name => 'ReferToDestinationSheet',
-     	description => '',
+     	description => 'When copying the range in the same file and the chart refers to the source sheet,  False means the copied chart`s data source will not be changed. True means the  copied chart`s data source refers to the destination sheet.            ',
      	format => '',
      	read_only => '',
      		},

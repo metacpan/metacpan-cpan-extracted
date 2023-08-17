@@ -28,7 +28,7 @@ alarm 120;    # It would be nice if we did this a better way, since
 # Test with OO model
 #
 {
-    use Parallel::WorkUnit qw(start);
+    use Parallel::WorkUnit;
     my $wu = Parallel::WorkUnit->new();
     ok( defined($wu), "Constructer returned object" );
 

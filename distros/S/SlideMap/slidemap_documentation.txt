@@ -4,7 +4,7 @@
 # All rights reserved.
 ####################################################################
 
-SlideMap.pm	v.1.2	Author: Joseph A. White		Feb 7, 2002
+SlideMap.pm	v.1.4	Author: Joseph A. White		Aug 14, 2023
 
 Although the author has attempted to keep this document up to date, it 
 may refer to a previous version; check the version listed above.  The 
@@ -291,4 +291,4 @@ $sm->showConvertWell;
 $sm->showConvertSpot;
 
 
-Joseph A. White;	jwhite@tigr.org		Version 1.2		Feb. 7, 2002
+Joseph A. White;	jwhite25@verizon.net		Version 1.4		Aug 14, 2023

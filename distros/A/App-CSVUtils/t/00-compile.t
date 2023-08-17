@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 111 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 115 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -26,6 +26,7 @@ my @module_files = (
     'App/CSVUtils/csv_delete_fields.pm',
     'App/CSVUtils/csv_dump.pm',
     'App/CSVUtils/csv_each_row.pm',
+    'App/CSVUtils/csv_fill_cells.pm',
     'App/CSVUtils/csv_fill_template.pm',
     'App/CSVUtils/csv_find_values.pm',
     'App/CSVUtils/csv_freqtable.pm',
@@ -40,6 +41,7 @@ my @module_files = (
     'App/CSVUtils/csv_map.pm',
     'App/CSVUtils/csv_munge_field.pm',
     'App/CSVUtils/csv_munge_rows.pm',
+    'App/CSVUtils/csv_pick_cells.pm',
     'App/CSVUtils/csv_pick_fields.pm',
     'App/CSVUtils/csv_pick_rows.pm',
     'App/CSVUtils/csv_quote.pm',
@@ -77,6 +79,7 @@ my @scripts = (
     'script/csv-delete-fields',
     'script/csv-dump',
     'script/csv-each-row',
+    'script/csv-fill-cells',
     'script/csv-fill-template',
     'script/csv-find-values',
     'script/csv-freqtable',
@@ -92,6 +95,7 @@ my @scripts = (
     'script/csv-munge-field',
     'script/csv-munge-rows',
     'script/csv-pick',
+    'script/csv-pick-cells',
     'script/csv-pick-fields',
     'script/csv-pick-rows',
     'script/csv-quote',

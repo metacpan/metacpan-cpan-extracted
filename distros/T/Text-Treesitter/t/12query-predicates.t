@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
@@ -33,32 +33,105 @@ $p->set_language( $lang );
 my $querysrc = read_text TREE_SITTER_LANGUAGE_FOURFUNC_DIR . "/queries/zero.scm";
 my $query = Text::Treesitter::Query->new( $lang, $querysrc );
 
-my $source = "123 + 0";
+my $source = "123 + 4 * 0";
 
 my $tree = $p->parse_string( $source );
 my $root = $tree->root_node;
 
 my $qc = Text::Treesitter::QueryCursor->new;
-isa_ok( $qc, "Text::Treesitter::QueryCursor", '$qc' );
+isa_ok( $qc, [ "Text::Treesitter::QueryCursor" ], '$qc' );
 
-$qc->exec( $query, $root );
+# next_match
+{
+   $qc->exec( $query, $root );
 
-my @matches;
-while( my $match = $qc->next_match ) {
-   next unless $query->test_predicates_for_match( $tree, $match );
+   my @matches;
+   while( my $match = $qc->next_match ) {
+      next unless $query->test_predicates_for_match( $match );
 
-   foreach my $capture ( $match->captures ) {
-      my $node = $capture->node;
-      my $substr = substr( $source, $node->start_byte, $node->end_byte - $node->start_byte );
+      foreach my $capture ( $match->captures ) {
+         my $node = $capture->node;
+         my $substr = substr( $source, $node->start_byte, $node->end_byte - $node->start_byte );
 
-      my $capturename = $query->capture_name_for_id( $capture->capture_id );
+         my $capturename = $query->capture_name_for_id( $capture->capture_id );
 
-      push @matches, [ $capturename, $substr ];
+         push @matches, [ $capturename, $substr ];
+      }
    }
+
+   is( \@matches,
+      [ [ number => "0" ], [ zero => "0" ] ],
+      'QueryCursor contained the right matches and captures' );
 }
 
-is_deeply( \@matches,
-   [ [ number => "0" ], [ zero => "0" ] ],
-   'QueryCursor contained the right matches and captures' );
+# next_match_captures
+{
+   $qc->exec( $query, $root );
+
+   my @captures;
+   while( my $captures = $qc->next_match_captures ) {
+      push @captures, $captures;
+   }
+
+   is( \@captures,
+      [ { number => check_isa("Text::Treesitter::Node"), zero => check_isa("Text::Treesitter::Node") } ],
+      'QueryCursor yields captures from ->next_match_captures' );
+}
+
+# next_match_captures multi
+{
+   $qc->exec( $query, $root );
+
+   my @captures;
+   while( my $captures = $qc->next_match_captures( multi => 1 ) ) {
+      push @captures, $captures;
+   }
+
+   is( \@captures,
+      [ { number => [ check_isa("Text::Treesitter::Node") ], zero => [ check_isa("Text::Treesitter::Node") ] } ],
+      'QueryCursor yields captures from ->next_match_captures' );
+}
+
+{
+   my $query = Text::Treesitter::Query->new( $lang, '((expr) @expr (#has-parent? @expr expr))' );
+
+   $qc->exec( $query, $root );
+
+   my @matches;
+   while( my $match = $qc->next_match ) {
+      next unless $query->test_predicates_for_match( $match );
+
+      push @matches, {};
+
+      foreach my $capture ( $match->captures ) {
+         $matches[-1]{ $query->capture_name_for_id( $capture->capture_id ) } = $capture->node->debug_sprintf;
+      }
+   }
+
+   is( \@matches,
+      [ { expr => q[(expr (number) operator: "*" (number))] } ],
+      'query with #has-parent? predicate' );
+}
+
+{
+   my $query = Text::Treesitter::Query->new( $lang, '((expr) @expr (#has-ancestor? @expr expr))' );
+
+   $qc->exec( $query, $root );
+
+   my @matches;
+   while( my $match = $qc->next_match ) {
+      next unless $query->test_predicates_for_match( $match );
+
+      push @matches, {};
+
+      foreach my $capture ( $match->captures ) {
+         $matches[-1]{ $query->capture_name_for_id( $capture->capture_id ) } = $capture->node->debug_sprintf;
+      }
+   }
+
+   is( \@matches,
+      [ { expr => q[(expr (number) operator: "*" (number))] } ],
+      'query with #has-parent? predicate' );
+}
 
 done_testing;

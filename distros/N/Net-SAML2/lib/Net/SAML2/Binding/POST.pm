@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use Moose;
 use Carp qw(croak);
 
-# ABSTRACT: Net::SAML2::Binding::POST - HTTP POST binding for SAML
+# ABSTRACT: HTTP POST binding for SAML
 
 
 use Net::SAML2::XML::Sig;
@@ -96,11 +96,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Binding::POST - Net::SAML2::Binding::POST - HTTP POST binding for SAML
+Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More;
 use XML::Enc;
+use Test::Lib;
+use Test::XML::Enc;
 use MIME::Base64 qw/decode_base64/;
-use File::Which;
 use File::Slurper qw/read_text/;
+
+my $xmlsec = get_xmlsec_features();
+my $lax_key_search = $xmlsec->{lax_key_search} ? '--lax-key-search' :  '';
 
 my $xml = <<'ENDXML';
 <?xml version="1.0" encoding="UTF-8"?>
@@ -52,7 +56,7 @@ my $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /4019 2445 0277 5567/, "Successfully Decrypted xmlsec1 xml using OAEPparams");
+like($decrypter->decrypt($xml), qr/4019 2445 0277 5567/, "Successfully Decrypted xmlsec1 xml using OAEPparams");
 
 $xml = <<'XML';
 <?xml version="1.0"?>
@@ -71,9 +75,22 @@ my $encrypter = XML::Enc->new(
 );
 
 my $encrypted = $encrypter->encrypt($xml);
-ok($encrypted =~ /CipherData/, "Successfully Encrypted with XML::Enc using OAEPparams");
+like($encrypted, qr/CipherData/, "Successfully Encrypted with XML::Enc using OAEPparams");
 
-ok($encrypter->decrypt($encrypted) =~ /<bar>123<\/bar>/, "Successfully Decrypted with XML::Enc using OAEPparams");
+like($encrypter->decrypt($encrypted), qr/<bar>123<\/bar>/, "Successfully Decrypted with XML::Enc using OAEPparams");
+
+SKIP: {
+    skip "xmlsec1 not installed", 2 unless $xmlsec->{installed};
+
+    ok( open ENCRYPTED, '>', 'encrypted.xml' );
+    print ENCRYPTED $encrypted;
+    close ENCRYPTED;
+
+    # Decrypt using xmlsec
+    my $encrypt_response = `xmlsec1 decrypt $lax_key_search --privkey-pem t/sign-private.pem encrypted.xml 2>&1`;
+    is($? >> 8, 0, "xmlsec1 decrypted oaep_params encrypted XML");
+    unlink 'encrypted.xml';
+}
 
 $decrypter = XML::Enc->new(
     {
@@ -89,7 +106,7 @@ my $ret;
 eval {
     $ret = $decrypter->decrypt($encrypted);
 };
-ok($@ =~ /FATAL: rsa_decrypt_key_ex/,"XML::Enc Unable to decrypt if XML includes incorrect OAEPparams");
-ok(!$ret);
+
+like($ret, qr/MTIzNzg5Cg==/, "Not decrypted due to invalid oaep_params params");
 
 done_testing;

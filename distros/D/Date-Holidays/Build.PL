@@ -8,63 +8,64 @@ use Module::Build 0.30;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.30"
+    "Module::Build" => "0.4234"
   },
   "configure_requires" => {
     "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.30"
+    "Module::Build" => "0.4234"
   },
   "dist_abstract" => "Date::Holidays::* adapter and aggregator for all your holiday needs",
   "dist_author" => [
     "Jonas B. <jonasbn\@cpan.org>"
   ],
   "dist_name" => "Date-Holidays",
-  "dist_version" => "1.34",
+  "dist_version" => "1.35",
   "license" => "artistic_2",
   "module_name" => "Date::Holidays",
   "recursive_test_files" => 1,
   "requires" => {
-    "Carp" => 0,
-    "DateTime" => 0,
-    "Env" => 0,
-    "File::Slurp" => 0,
-    "JSON" => 0,
-    "Locale::Country" => 0,
-    "Module::Load" => 0,
-    "Scalar::Util" => 0,
-    "Try::Tiny" => 0
+    "Carp" => "1.5",
+    "DateTime" => "1.59",
+    "Env" => "1.04",
+    "File::Slurp" => "9999.32",
+    "JSON" => "4.1",
+    "Locale::Country" => "3.74",
+    "Module::Load" => "0.36",
+    "Scalar::Util" => "1.63",
+    "Try::Tiny" => "0.31",
+    "perl" => "5.006"
   },
   "test_requires" => {
     "File::Spec" => 0,
-    "FindBin" => 0,
+    "FindBin" => "1.53",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::Class" => 0,
-    "Test::Fatal" => 0,
-    "Test::Kwalitee" => "1.21",
+    "Pod::Coverage::TrustPod" => "0.100006",
+    "Test::Class" => "0.52",
+    "Test::Fatal" => "0.017",
+    "Test::Kwalitee" => "1.28",
     "Test::MockModule" => "0.13",
-    "Test::More" => 0,
-    "Test::Pod" => 0,
-    "Test::Pod::Coverage" => 0
+    "Test::More" => "1.302195",
+    "Test::Pod" => "1.52",
+    "Test::Pod::Coverage" => "1.1"
   }
 );
 
 
 my %fallback_build_requires = (
   "File::Spec" => 0,
-  "FindBin" => 0,
+  "FindBin" => "1.53",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Build" => "0.30",
-  "Pod::Coverage::TrustPod" => 0,
-  "Test::Class" => 0,
-  "Test::Fatal" => 0,
-  "Test::Kwalitee" => "1.21",
+  "Module::Build" => "0.4234",
+  "Pod::Coverage::TrustPod" => "0.100006",
+  "Test::Class" => "0.52",
+  "Test::Fatal" => "0.017",
+  "Test::Kwalitee" => "1.28",
   "Test::MockModule" => "0.13",
-  "Test::More" => 0,
-  "Test::Pod" => 0,
-  "Test::Pod::Coverage" => 0
+  "Test::More" => "1.302195",
+  "Test::Pod" => "1.52",
+  "Test::Pod::Coverage" => "1.1"
 );
 
 

@@ -30,7 +30,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.35'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -88,7 +88,7 @@ requires:
   Algorithm::Backoff::Exponential: '0.006'
   Clone: '0'
   Config::GitLike: '1.15'
-  DBI: '0'
+  DBI: '1.631'
   DateTime: '1.04'
   DateTime::TimeZone: '0'
   Devel::StackTrace: '1.30'
@@ -138,7 +138,6 @@ requires:
   URI::db: '0.20'
   User::pwent: '0'
   constant: '0'
-  if: '0'
   namespace::autoclean: '0.16'
   overload: '0'
   parent: '0'
@@ -150,7 +149,7 @@ resources:
   bugtracker: https://github.com/sqitchers/sqitch/issues/
   homepage: https://sqitch.org/
   repository: https://github.com/sqitchers/sqitch/
-version: v1.3.1
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: v1.4.0
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

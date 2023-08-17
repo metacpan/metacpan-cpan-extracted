@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -90,7 +90,7 @@ sub do_test_req
 
    my %h = map { $_ => $response->header( $_ ) } $response->header_field_names;
 
-   is_deeply( \%h, $args{expect_res_headers}, "Result headers for $name" );
+   is( \%h, $args{expect_res_headers}, "Result headers for $name" );
 }
 
 my $req;

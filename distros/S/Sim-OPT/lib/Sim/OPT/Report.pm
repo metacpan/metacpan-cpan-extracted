@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2023 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ no warnings;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.093';
+$VERSION = '0.111';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -69,7 +69,7 @@ sub newretrieve
 
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
-  say $tee "\n#Now in Sim::OPT::Report::newretrieve\n";
+  say $tee "\n#Now in Sim::OPT::Report::newretrieve.\n";
 
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
@@ -91,12 +91,12 @@ sub newretrieve
 
   my %dt = %{ $_[0] };
 
-  my %dirfiles = %{ $dt{dirfiles} }; #say $tee "HERE IN OPT SUB CALLBLOCK \%dirfiles: " . dump( \%dirfiles );
-  my $resfile = $dt{resfile}; #say $tee "HERE IN OPT SUB CALLBLOCK \$resfile: " . dump( $resfile );
-  my $flfile = $dt{flfile}; #say $tee "HERE IN OPT SUB CALLBLOCK \$flfile: " . dump( $flfile );
-  my %vehicles = %{ $dt{vehicles} }; #say $tee "HERE IN OPT SUB CALLBLOCK \%vehicles: " . dump( \%vehicles );
-  my $precious = $dt{precious}; #say $tee "HERE IN OPT SUB CALLBLOCK \$precious: " . dump( $precious );
-  my %inst = %{ $dt{inst} }; #say $tee "1 HERE IN OPT SUB CALLBLOCK \%inst: " . dump( \%inst );
+  my %dirfiles = %{ $dt{dirfiles} }; 
+  my $resfile = $dt{resfile}; 
+  my $flfile = $dt{flfile};
+  my %vehicles = %{ $dt{vehicles} }; 
+  my $precious = $dt{precious};
+  my %inst = %{ $dt{inst} }; 
   my %dowhat = %{ $dt{dowhat} };
   #my $csim = $dt{csim};
   my $postprocessga = $dt{postprocessga};
@@ -105,7 +105,7 @@ sub newretrieve
   #%inst = %{ Sim::OPT::washhash( \%inst ) }; say $tee "3 HERE IN OPT SUB CALLBLOCK \%onst: " . dump( \%onst );
   $inst_ref = Sim::OPT::filterinsts_wnames( \@{ $dirfiles{dones} } , \%inst );
   %inst = %{ $inst_ref }; # REASSIGNMENT!!!!!!
-  #say $tee "1 HERE IN OPT SUB CALLBLOCK AFTER  \%inst: " . dump( \%inst );
+
 
 
   my @simcases = @{ $dirfiles{simcases} }; ######
@@ -135,37 +135,37 @@ sub newretrieve
 
   my %d = %{ $dt{instance} };
 
-  my $countinstance = $d{instn}; #say $tee "HERE IN REPORT \$countinstance: " . dump( $countinstance );
+  my $countinstance = $d{instn}; #say $tee "HERE IN NEWRETRIEVE \$countinstance: " . dump( $countinstance );
 
-  my $countcase = $d{countcase}; #say $tee "HERE IN REPORT \$countcase: " . dump( $countcase );
-  my $countblock = $d{countblock}; #say $tee "HERE IN REPORT \$countblock: " . dump( $countblock );
-  my %datastruc = %{ $d{datastruc} }; #say $tee "HERE IN REPORT \%datastruc: " . dump( \%datastruc );
+  my $countcase = $d{countcase}; #say $tee "HERE IN NEWRETRIEVE \$countcase: " . dump( $countcase );
+  my $countblock = $d{countblock}; #say $tee "HERE IN NEWRETRIEVE \$countblock: " . dump( $countblock );
+  my %datastruc = %{ $d{datastruc} }; #say $tee "HERE IN NEWRETRIEVE \%datastruc: " . dump( \%datastruc );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "HERE IN REPORT \@varnumbers: " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "HERE IN NEWRETRIEVE \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = Sim::OPT::washn( @miditers ); #say $tee "HERE IN REPORT \@miditers: " . dump( @miditers );
-  my @sweeps = @{ $d{sweeps} }; #say $tee "HERE IN REPORT \@sweeps: " . dump( @sweeps );
+  @miditers = Sim::OPT::washn( @miditers ); #say $tee "HERE IN NEWRETRIEVE \@miditers: " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; #say $tee "HERE IN NEWRETRIEVE \@sweeps: " . dump( @sweeps );
 
-  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #say $tee "HERE IN REPORT \$direction: " . dump( $direction );
-  my $precomputed = $dowhat{precomputed}; #say $tee "HERE IN REPORT \$precomputed: " . dump( $precomputed );
-  my @takecolumns = @{ $dowhat{takecolumns} }; #say $tee "HERE IN REPORT \@takecolumns: " . dump( @takecolumns );
+  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #say $tee "HERE IN NEWRETRIEVE \$direction: " . dump( $direction );
+  my $precomputed = $dowhat{precomputed}; #say $tee "HERE IN NEWRETRIEVE \$precomputed: " . dump( $precomputed );
+  my @takecolumns = @{ $dowhat{takecolumns} }; #say $tee "HERE IN NEWRETRIEVE \@takecolumns: " . dump( @takecolumns );
 
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
   my %notecases;
 
-  my @winneritems = @{ $d{winneritems} }; #say $tee "HERE IN REPORT \@winneritems: " . dump( @winneritems );
-  my $countvar = $d{countvar}; #say $tee "HERE IN REPORT \$countvar: " . dump( $countvar );
-  my $countstep = $d{countstep}; #say $tee "HERE IN REPORT \$countstep: " . dump( $countstep );
+  my @winneritems = @{ $d{winneritems} }; #say $tee "HERE IN NEWRETRIEVE \@winneritems: " . dump( @winneritems );
+  my $countvar = $d{countvar}; #say $tee "HERE IN NEWRETRIEVE \$countvar: " . dump( $countvar );
+  my $countstep = $d{countstep}; #say $tee "HERE IN NEWRETRIEVE \$countstep: " . dump( $countstep );
 
-  my %to = %{ $d{to} }; #say $tee "HERE IN REPORT \%to: " . dump( %to );
+  my %to = %{ $d{to} }; #say $tee "HERE IN NEWRETRIEVE \%to: " . dump( %to );
   my $thisto = $to{to}; #say $tee "\$thisto: $thisto";
 
   my $cleanto = $inst{$thisto}; #say $tee "\$cleanto: $cleanto";
 
   my $origin = $d{origin};
-  my $from = $origin; #say $tee "HERE IN REPORT \$from: " . dump( $from );
+  my $from = $origin; #say $tee "HERE IN NEWRETRIEVE \$from: " . dump( $from );
   my $is = $d{is};
 
   my $fire = $d{fire};
@@ -179,10 +179,12 @@ sub newretrieve
   my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
 
   my $shortresfile = $resfile;
-  $shortresfile =~ s/$thisto\/tmp\///; #say $tee "IN RETRIEVE: \$shortresfile: $shortresfile, \$resfile: $resfile, \$to: $to, \$thisto: $thisto, \$cleanto: $cleanto";
+  $shortresfile =~ s/$thisto// ; 
+  $shortresfile =~ s/\/cfg\///; 
+  #say $tee "IN RETRIEVE: \$shortresfile: $shortresfile, \$resfile: $resfile, \$to: $to, \$thisto: $thisto, \$cleanto: $cleanto";
 
   my $shortflfile = $flfile;
-  $shortflfile =~ s/$thisto\/tmp\///; #say $tee "IN RETRIEVE: \$shortflfile: $shortflfile, \$flfile: $flfile";
+  $shortflfile =~ s/$thisto\/cfg\///; #say $tee "IN RETRIEVE: \$shortflfile: $shortflfile, \$flfile: $flfile";
 
   #say $tee "RELAUNCHED IN RETRIEVE WITH INST " . dump( %inst );
 
@@ -198,9 +200,47 @@ sub newretrieve
       {
         my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile ) = @_;
 
-        my $printthis =
+#        my $printthis =
+#"cd $thisto/cfg
+#res -file $resfile -mode script<<YYY
+#
+#3
+#$retrdata[0]
+#$retrdata[1]
+#$retrdata[2]
+#c
+#g
+#a
+#a
+#-
+#b
+#a
+#-
+#b
+#e
+#-
+#b
+#f
+#-
+#>
+#$retfile
+#$retfile
+#!
+#-
+#-
+#-
+#-
+#-
+#-
+#-
+#-
+#YYY
+#";
+
+
+my $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<YYY
+res -file $resfile -mode script<<YYY
 
 3
 $retrdata[0]
@@ -208,15 +248,11 @@ $retrdata[1]
 $retrdata[2]
 c
 g
-a
-a
-b
-a
 b
 e
-b
-f
+-
 >
+$retfile
 $retfile
 !
 -
@@ -229,12 +265,30 @@ $retfile
 -
 YYY
 ";
+
         if ( ( $exeonfiles eq "y" ) or ( $dowhat{newretrieve} eq "y" ) )
         {
           say $tee "#Retrieving temperature results.";
           print `$printthis`;
           say $tee "$printthis";
         }
+        
+        my $olddest =  "$retfile" . ".old";
+        `mv -f $retfile $olddest`;
+        
+        open (OLDDEST, "$olddest" ) or die;
+        my @oldlines = <OLDDEST>;
+        close OLDDEST;
+        
+        open(NEWDEST, ">$retfile") or die;
+        
+        foreach my $line ( @oldlines )
+        {
+          chomp $line;
+          print NEWDEST "$line,";
+        }
+        close NEWDEST;
+     
         #print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n $printthis";
 
@@ -250,7 +304,7 @@ YYY
         {
           my $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<ZZZ
+res -file $resfile -mode script<<ZZZ
 
 3
 $retrdata[0]
@@ -291,7 +345,7 @@ ZZZ
 
     sub retrieve_stats_results
     {
-      my ( $result, $shortresfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
+      my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
 
       my @retrdata = @$retrdata_ref;
       my $printthis;
@@ -302,7 +356,7 @@ ZZZ
         {
           $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -331,7 +385,7 @@ TTT
         {
           $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -379,7 +433,7 @@ TTT
         {
           $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -416,7 +470,7 @@ TTT
         elsif ( $themereport eq "radabs" )
         {
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -456,7 +510,7 @@ TTT
         {
           $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -494,7 +548,7 @@ TTT
         {
           $printthis =
 "cd $thisto/cfg
-res -file ../tmp/$shortresfile -mode script<<TTT
+res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -531,7 +585,7 @@ TTT
         elsif ( $themereport eq "restemp" )
         {
           $printthis =
-"res -file ../tmp/$shortresfile -mode script<<TTT
+"res -file $resfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -806,7 +860,15 @@ TTT
 
   if ( $dowhat{neweraseres} eq "y" )
   {
-    `rm -f $resfile` ;
+    if ( -e $resfile )
+    {
+      `rm -f $resfile` ;
+      say $tee "rm -f $resfile";
+    }
+  }
+  
+  if ( $dowhat{newerasefl} eq "y" )
+  {
     if ( -e $flfile )
     {
       `rm -f $flfile` ;
@@ -863,7 +925,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my %dt = %{ $_[0] };
 
   my %dirfiles = %{ $dt{dirfiles} };
-  my $resfile = $dt{resfile}; say $tee "BEGINNING REPORT: RESFILE $resfile";
+  my $resfile = $dt{resfile}; #say $tee "BEGINNING REPORT: RESFILE $resfile";
   my $flfile = $dt{flfile};
   my %vehicles = %{ $dt{vehicles} };
   my $precious = $dt{precious};
@@ -953,7 +1015,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
   my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
-  #say $tee "HERE IN REPORT \@_: " . dump( @_ );
+  #say $tee "HERE IN NEWREPORT \@_: " . dump( @_ );
 
   my ( @repfilemem, @linecontent, @convey );
   $" = " ";
@@ -987,12 +1049,14 @@ sub newreport # This function retrieves the results of interest from the texts f
   }
   my $signalnewinstance = 1;
 
-  #say $tee "RELAUNCHED IN REPORT WITH INST " . dump( %inst );
-  #say $tee "LOOKING FOR $repfile";
+  #say $tee "RELAUNCHED IN NEWREPORT WITH INST " . dump( %inst );
+  #say $tee "PROBING THE EXISTANCE OF $repfile";
 
   #say $tee "FIRE: $file";
+  
+  
 
-  if ( ( ( $fire eq "yes" ) or ( $dowhat{reportbasics} eq "yes" ) ) and ( $precomputed eq "" ) )
+  if ( ( ( $fire eq "yes" ) or ( $dowhat{reportbasics} eq "y" ) ) and ( $precomputed eq "" ) )
   {
     my @hfiles = @{ $dowhat{helperfiles} };
     my @hpatterns = @{ $dowhat{helperpatterns} };
@@ -1002,25 +1066,27 @@ sub newreport # This function retrieves the results of interest from the texts f
     {
       my $hpattern = $hpatterns[$c];
       $hfile = "$resfile" . "-$hfile";
-      #say $tee "\$hfile $hfile";
+      #say $tee "CHECKING \$hfile $hfile";
 
       open( HFILE, "$hfile" ) or die;
       my @lines = <HFILE>;
       close HFILE;
-      #say $tee "HPATTERN $hpattern";
+      #say $tee "CHECKING HPATTERN $hpattern";
       foreach my $line ( @lines )
       {
         chomp $line;
         $line =~ s/^(\s+)//;
-       $line =~ s/^ +//;
+        $line =~ s/^ +//;
+        
+        ###if ( $line =~ /$hpattern/ ) ###CHANGED
         if ( $line =~ /^$hpattern/ )
-        {
-          chomp $line;
+        { #say $tee "CHECK LINE-$line";
+          chomp $line; 
+	  
           $line =~ s/:\s/:/g;
           $line =~ s/(\s+)/ /g;
-          $line =~ s/ /,/g; #say $tee "LINE-$line";
-
-          $result = $result . "$line,"; #say $tee "\$result-$result";
+          $line =~ s/ /,/g; #say $tee "CHECK TREATEDLINE-$line";
+          $result = $result . "$line,"; #say $tee "CHECK \$result-$result";
         }
       }
       $c++;
@@ -1032,7 +1098,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     {
       open( REPFILE, ">$repfile" );
     }
-    elsif ( $dowhat{reportbasics} eq "yes" )
+    elsif ( $dowhat{reportbasics} eq "y" )
     {
       open( REPFILE, ">>$repfile" );
     }
@@ -1058,7 +1124,7 @@ sub newreport # This function retrieves the results of interest from the texts f
         foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
         {
           %retitem = %$ret_ref;
-          my $retfile = $retitem{retfile}; say $tee "IN REPORT 1 \$retfile $retfile";
+          my $retfile = $retitem{retfile}; say $tee "IN NEWREPORT 1 \$retfile $retfile";
           my $reporttitle = $retitem{reporttitle};
           my $themereport = $retitem{themereport};
           my $semaphorego = $retitem{semaphorego};
@@ -1082,7 +1148,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
           if ( -e $retfile )
           { say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
-            say $tee "IN REPORT 2 \$retfile $retfile";
+            say $tee "IN NEWREPORT 2 \$retfile $retfile";
             open( RETFILE, "$retfile" ) or die( "$!" );
             my @lines = <RETFILE>;
             close RETFILE;
@@ -1092,11 +1158,35 @@ sub newreport # This function retrieves the results of interest from the texts f
             my $foundhit = 0;
             my $countlin = 0;
             my $countli = 0;
+	    
+	    if ( $dowhat{simplifiedreport} eq "y" )
+            {
+	      say $tee "EXECUTING ON simplifiedreport. Now looking for _ $textpattern _ in $retfile.";
+	    }
 
             foreach my $line ( @lines )
             {
-              chomp $line;
-              $line =~ s/^(\s+)//;
+              chomp $line;     
+
+              if ( $dowhat{simplifiedreport} eq "y" )
+              {
+                my $thisline = $line;
+                $thisline =~ s/^(\s+)//;
+                $thisline =~ s/(^ +)//;
+
+                if ( $thisline =~ /^$textpattern/ )
+                {
+	          chomp $thisline;
+                  
+                  $thisline =~ s/:\s/:/g;
+                  $thisline =~ s/(\s+)/ /g;
+                  $thisline =~ s/ /,/g;
+		  print REPFILE "$thisto,$thisline,";
+		  print $tee "SIMPLIFIEDREPORT: $thisto,$thisline,";
+		}
+              }
+	      
+	      $line =~ s/^(\s+)//;
               $line =~ s/:\s/:/g;
               $line =~ s/(\s+)/ /g;
               my @elts = split( " ", $line );
@@ -1137,9 +1227,9 @@ sub newreport # This function retrieves the results of interest from the texts f
 
               if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
-                  #chomp( $line )
+                  chomp( $line );
                   if ( $foundhit == 0 )
                   {
                     unless ( $reportstrategy eq "new" )
@@ -1167,7 +1257,7 @@ sub newreport # This function retrieves the results of interest from the texts f
               }
               else
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   $signalhit++;
                 }
@@ -1246,6 +1336,7 @@ sub newreport # This function retrieves the results of interest from the texts f
                   }
                 }
               }
+
               $countline++;
             }
           }
@@ -1253,7 +1344,6 @@ sub newreport # This function retrieves the results of interest from the texts f
           {
             open ( NOTFOUND, ">./notfound.txt" ) or die $! ;
             say NOTFOUND $retfile;
-
           }
         }
       }
@@ -1301,10 +1391,10 @@ sub newreport # This function retrieves the results of interest from the texts f
   } #END NEW. TAKE CARE.
   elsif ( $precomputed ne "" ) ############################NEW. END. TAKE CARE.
   {
-  	my @precomputeds;
-	  open ( PRECOMPUTED, "$precomputed" ) or die;
-	  @precomputeds = <PRECOMPUTED>;
-	  close PRECOMPUTED;
+    my @precomputeds;
+    open ( PRECOMPUTED, "$precomputed" ) or die;
+    @precomputeds = <PRECOMPUTED>;
+    close PRECOMPUTED;
 
     my $touse = $is; ### TAKE CARE!
 

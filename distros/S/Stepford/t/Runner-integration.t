@@ -30,7 +30,7 @@ sub _test_final_step_dependencies {
 
     is(
         $combined_file->stat->mtime,
-        $t2, "combined file > updated files => no build, jobs=$jobs"
+        $t2, "combined file > updated files => no build, jobs=$jobs",
     );
 
     my $t3 = $t1 - 1000;
@@ -40,7 +40,7 @@ sub _test_final_step_dependencies {
 
     isnt(
         $combined_file->stat->mtime,
-        $t3, "combined file < updated files => build, jobs=$jobs"
+        $t3, "combined file < updated files => build, jobs=$jobs",
     );
 }
 

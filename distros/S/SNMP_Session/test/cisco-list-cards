@@ -1,0 +1,258 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use SNMP_Session;
+use BER;
+
+my %pretty_card_type =
+(
+    1 => 'unknown', 2 => 'csc1', 3 => 'csc2', 4 => 'csc3',
+    5 => 'csc4', 6 => 'rp', 7 => 'cpu-igs', 8 => 'cpu-2500',
+    9 => 'cpu-3000', 10 => 'cpu-3100', 11 => 'cpu-accessPro',
+    12 => 'cpu-4000', 13 => 'cpu-4000m', 14 => 'cpu-4500',
+    15 => 'rsp1', 16 => 'rsp2', 17 => 'cpu-4500m', 18 => 'cpu-1003',
+    19 => 'cpu-4700', 20 => 'csc-m', 21 => 'csc-mt', 22 => 'csc-mc',
+    23 => 'csc-mcplus', 24 => 'csc-envm', 25 => 'chassisInterface',
+    26 => 'cpu-4700S', 27 => 'cpu-7200-npe100', 28 => 'rsp7000',
+    29 => 'chassisInterface7000', 30 => 'rsp4', 31 => 'cpu-3600',
+    32 => 'cpu-as5200', 33 => 'c7200-io1fe', 34 => 'cpu-4700m',
+    35 => 'cpu-1600', 36 => 'c7200-io', 37 => 'cpu-1503',
+    38 => 'cpu-1502', 39 => 'cpu-as5300', 40 => 'csc-16',
+    41 => 'csc-p', 50 => 'csc-a', 51 => 'csc-e1', 52 => 'csc-e2',
+    53 => 'csc-y', 54 => 'csc-s', 55 => 'csc-t', 80 => 'csc-r',
+    81 => 'csc-r16', 82 => 'csc-r16m', 83 => 'csc-1r', 84 => 'csc-2r',
+    56 => 'sci4s', 57 => 'sci2s2t', 58 => 'sci4t', 59 => 'mci1t',
+    60 => 'mci2t', 61 => 'mci1s', 62 => 'mci1s1t', 63 => 'mci2s',
+    64 => 'mci1e', 65 => 'mci1e1t', 66 => 'mci1e2t', 67 => 'mci1e1s',
+    68 => 'mci1e1s1t', 69 => 'mci1e2s', 70 => 'mci2e',
+    71 => 'mci2e1t', 72 => 'mci2e2t', 73 => 'mci2e1s',
+    74 => 'mci2e1s1t', 75 => 'mci2e2s', 100 => 'csc-cctl1',
+    101 => 'csc-cctl2', 110 => 'csc-mec2', 111 => 'csc-mec4',
+    112 => 'csc-mec6', 113 => 'csc-fci', 114 => 'csc-fcit',
+    115 => 'csc-hsci', 116 => 'csc-ctr', 121 => 'cpu-7200-npe150',
+    122 => 'cpu-7200-npe200', 123 => 'cpu-wsx5302', 124 => 'gsr-rp',
+    126 => 'cpu-3810', 127 => 'cpu-2600', 150 => 'sp', 151 => 'eip',
+    152 => 'fip', 153 => 'hip', 154 => 'sip', 155 => 'trip',
+    156 => 'fsip', 157 => 'aip', 158 => 'mip', 159 => 'ssp',
+    160 => 'cip', 161 => 'srs-fip', 162 => 'srs-trip', 163 => 'feip',
+    164 => 'vip', 165 => 'vip2', 166 => 'ssip', 167 => 'smip',
+    168 => 'posip', 169 => 'feip-tx', 170 => 'feip-fx',
+    178 => 'cbrt1', 179 => 'cbr120e1', 180 => 'cbr75e',
+    181 => 'vip2-50', 182 => 'feip2', 183 => 'acip',
+    200 => 'npm-4000-fddi-sas', 201 => 'npm-4000-fddi-das',
+    202 => 'npm-4000-1e', 203 => 'npm-4000-1r', 204 => 'npm-4000-2s',
+    205 => 'npm-4000-2e1', 206 => 'npm-4000-2e',
+    207 => 'npm-4000-2r1', 208 => 'npm-4000-2r', 209 => 'npm-4000-4t',
+    210 => 'npm-4000-4b', 211 => 'npm-4000-8b', 212 => 'npm-4000-ct1',
+    213 => 'npm-4000-ce1', 214 => 'npm-4000-1a',
+    215 => 'npm-4000-6e-pci', 217 => 'npm-4000-1fe',
+    218 => 'npm-4000-1hssi', 230 => 'pa-1fe', 231 => 'pa-8e',
+    232 => 'pa-4e', 233 => 'pa-5e', 234 => 'pa-4t', 235 => 'pa-4r',
+    236 => 'pa-fddi', 237 => 'sa-encryption', 238 => 'pa-ah1t',
+    239 => 'pa-ah2t', 241 => 'pa-a8t-v35', 242 => 'pa-1fe-tx-isl',
+    243 => 'pa-1fe-fx-isl', 244 => 'pa-1fe-tx-nisl',
+    245 => 'sa-compression', 246 => 'pa-atm-lite-1', 247 => 'pa-ct3',
+    248 => 'pa-oc3sm-mux-cbrt1', 249 => 'pa-oc3sm-mux-cbr120e1',
+    254 => 'pa-ds3-mux-cbrt1', 255 => 'pa-e3-mux-cbr120e1',
+    257 => 'pa-8b-st', 258 => 'pa-4b-u', 259 => 'pa-fddi-fd',
+    260 => 'pm-cpm-1e2w', 261 => 'pm-cpm-2e2w',
+    262 => 'pm-cpm-1e1r2w', 263 => 'pm-ct1-csu', 264 => 'pm-2ct1-csu',
+    265 => 'pm-ct1-dsx1', 266 => 'pm-2ct1-dsx1',
+    267 => 'pm-ce1-balanced', 268 => 'pm-2ce1-balanced',
+    269 => 'pm-ce1-unbalanced', 270 => 'pm-2ce1-unbalanced',
+    271 => 'pm-4b-u', 272 => 'pm-4b-st', 273 => 'pm-8b-u',
+    274 => 'pm-8b-st', 275 => 'pm-4as', 276 => 'pm-8as',
+    277 => 'pm-4e', 278 => 'pm-1e', 280 => 'pm-m4t', 281 => 'pm-16a',
+    282 => 'pm-32a', 283 => 'pm-c3600-1fe-tx',
+    284 => 'pm-c3600-compression', 285 => 'pm-dmodem',
+    288 => 'pm-c3600-1fe-fx', 290 => 'as5200-carrier',
+    291 => 'as5200-2ct1', 292 => 'as5200-2ce1',
+    310 => 'pm-as5xxx-12m', 330 => 'wm-c2500-5in1',
+    331 => 'wm-c2500-t1-csudsu', 332 => 'wm-c2500-sw56-2wire-csudsu',
+    333 => 'wm-c2500-sw56-4wire-csudsu', 334 => 'wm-c2500-bri',
+    335 => 'wm-c2500-bri-nt1', 360 => 'wic-serial-1t',
+    364 => 'wic-s-t-3420', 365 => 'wic-s-t-2186', 366 => 'wic-u-3420',
+    367 => 'wic-u-2091', 368 => 'wic-u-2091-2081', 400 => 'pa-jt2',
+    401 => 'pa-posdw', 402 => 'pa-4me1-bal', 406 => 'pa-atmdx-ds3',
+    407 => 'pa-atmdx-e3', 408 => 'pa-atmdx-sml-oc3',
+    409 => 'pa-atmdx-smi-oc3', 410 => 'pa-atmdx-mm-oc3',
+    414 => 'pa-a8t-x21', 415 => 'pa-a8t-rs232',
+    416 => 'pa-4me1-unbal', 417 => 'pa-4r-fdx',
+    424 => 'pa-1fe-fx-nisl', 435 => 'mc3810-dcm',
+    436 => 'mc3810-mfm-e1balanced-bri',
+    437 => 'mc3810-mfm-e1unbalanced-bri',
+    438 => 'mc3810-mfm-e1-unbalanced', 439 => 'mc3810-mfm-dsx1-bri',
+    440 => 'mc3810-mfm-dsx1-csu', 441 => 'mc3810-vcm',
+    442 => 'mc3810-avm', 443 => 'mc3810-avm-fxs',
+    444 => 'mc3810-avm-fxo', 445 => 'mc3810-avm-em',
+    480 => 'as5300-4ct1', 481 => 'as5300-4ce1',
+    482 => 'as5300-carrier', 500 => 'vic-em', 501 => 'vic-fxo',
+    502 => 'vic-fxs', 503 => 'vpm-2v', 504 => 'vpm-4v',
+    530 => 'pos-qoc3-mm', 531 => 'pos-qoc3-sm', 532 => 'pos-oc12-mm',
+    533 => 'pos-oc12-sm', 534 => 'atm-oc12-mm', 535 => 'atm-oc12-sm',
+    536 => 'pos-oc48-mm-l', 537 => 'pos-oc48-sm-l', 538 => 'gsr-sfc',
+    539 => 'gsr-csc', 540 => 'gsr-csc4', 541 => 'gsr-csc8',
+    542 => 'gsr-sfc8', 545 => 'gsr-oc12chds3-mm',
+    546 => 'gsr-oc12chds3-sm', 605 => 'pm-atm25',
+);
+
+my $ciscoLS1010 = [1,3,6,1,4,1,9,1,107];
+
+my $sysObjectID_0 = [1,3,6,1,2,1,1,2,0];
+
+my $cardType = [1,3,6,1,4,1,9,3,6,11,1,2];
+my $cardDescr = [1,3,6,1,4,1,9,3,6,11,1,3];
+my $cardSerial = [1,3,6,1,4,1,9,3,6,11,1,4];
+my $cardHwVersion = [1,3,6,1,4,1,9,3,6,11,1,5];
+my $cardSwVersion = [1,3,6,1,4,1,9,3,6,11,1,6];
+my $cardSlotNumber = [1,3,6,1,4,1,9,3,6,11,1,7];
+my $cardContainedByIndex = [1,3,6,1,4,1,9,3,6,11,1,8];
+my $cardOperStatus = [1,3,6,1,4,1,9,3,6,11,1,9];
+my $cardSlots = [1,3,6,1,4,1,9,3,6,11,1,10];
+
+my $host = shift @ARGV || die "Usage: $0 host [community]";
+my $community = shift @ARGV || 'public';
+
+my $session = SNMP_Session->open ($host, $community, 161)
+    || die "open SNMP session to $community\@$host: $!";
+$session->map_table ([$cardContainedByIndex,$cardType,$cardDescr,
+		      $cardSerial,$cardHwVersion,$cardSwVersion,
+		      $cardSlotNumber,$cardOperStatus,$cardSlots],
+		     sub () {
+			 my ($index, $contained_by,
+			     $type, $descr, $serial,
+			     $hw_version, $sw_version,
+			     $slot_number, $oper_status, $slots) = @_;
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($contained_by, $type, $descr, $serial,
+				$hw_version, $sw_version,
+				$slot_number, $oper_status, $slots));
+			 note_card ($index, $contained_by, $type,
+				    $descr, $serial,
+				    $hw_version, $sw_version,
+				    $slot_number, $oper_status, $slots);
+		     });
+$session->close
+    || warn "close SNMP session: $!";
+
+list_cards ();
+1;
+
+my %all_cards;
+my @top_level_cards;
+
+sub card_index ($) { defined $_[1] ? $_[0]->{idx} = $_[1] : $_[0]->{idx}; }
+sub card_type ($) { defined $_[1] ? $_[0]->{type} = $_[1] : $_[0]->{type}; }
+sub card_parent ($) { defined $_[1] ? $_[0]->{parent} = $_[1] : $_[0]->{parent}; }
+sub card_descr ($) { defined $_[1] ? $_[0]->{descr} = $_[1] : $_[0]->{descr}; }
+sub card_children ($) { defined $_[1] ? $_[0]->{children} = $_[1] : $_[0]->{children}; }
+
+sub make_card ($$@) {
+    my ($index, $parent,
+	$type, $descr,
+	$serial, $hw_version,
+	$sw_version, $slot_number,
+	$oper_status, $slots) = @_;
+    {
+	idx => $index,
+	parent => $parent,
+	type => $type,
+	descr => $descr,
+	serial => $serial,
+	hw_version => $hw_version,
+	sw_version => $sw_version,
+	slot_number => $slot_number,
+	oper_status => $oper_status,
+	slots => $slots,
+	children => [],
+    };
+}
+
+sub note_card ($$@) {
+    my ($index, $parent, @other_args) = @_;
+    my $card = make_card ($index, $parent, @other_args);
+    $all_cards{$index} = $card;
+    if ($parent) {
+	my $parent_card = $all_cards{$parent};
+	die "Parent card $parent not found"
+	    unless defined $parent_card;
+	push @{(card_children ($parent_card))}, $card;
+    } else {
+	push @top_level_cards, $card;
+    }
+    $card;
+}
+
+sub list_cards () {
+    print_cards_table_header ();
+    list_cards_with_children ('', @top_level_cards);
+}
+
+sub list_cards_with_children ($@) {
+    my ($indent, @cards) = @_;
+    foreach my $card (sort { $a->{slot_number} cmp $b->{slot_number} }
+		      @cards) {
+	my $index = card_index ($card);
+	my $type = card_type ($card);
+##	  my $pretty_type = ($pretty_card_type{$type}
+##			     || $type);
+	printf STDOUT ("%-48s %-4s %8d %4s %5s %2s %2s\n",
+		       $indent.card_descr ($card),
+		       pretty_card_oper_status ($card->{oper_status}),
+		       $card->{serial},
+		       $card->{hw_version},
+		       ($card->{sw_version} eq 'not available' 
+			? 'n/a' : $card->{sw_version}),
+		       pretty_card_slot_number ($card->{slot_number}),
+		       pretty_card_nslots ($card->{slots}));
+	list_cards_with_children ($indent.'  ',@{card_children $card});
+    }
+}
+
+sub print_cards_table_header () {
+    printf STDOUT ("%-48s %-4s %8s %4s %5s %2s %2s\n",
+		   "description",
+		   "stat",
+		   "serial",
+		   "hw",
+		   "sw",
+		   "sl",
+		   "#s");
+    print STDOUT (("=" x 79),"\n");
+}
+
+sub pretty_card_slot_number ($) {
+    my ($slot_number) = @_;
+    if ($slot_number == -1) {
+	return "";
+    } else {
+	return $slot_number;
+    }
+}
+
+sub pretty_card_nslots ($) {
+    my ($nslots) = @_;
+    if ($nslots == -1) {
+	return "?";
+    } elsif ($nslots == 0) {
+	return "";
+    } else {
+	return $nslots;
+    }
+}
+
+sub pretty_card_oper_status ($) {
+    my ($oper_status) = @_;
+    if ($oper_status == 1) {
+	return "-";
+    } elsif ($oper_status == 2) {
+	return "up";
+    } elsif ($oper_status == 3) {
+	return "down";
+    } elsif ($oper_status == 4) {
+	return "stby";
+    } else {
+	return "ILLEGAL".$oper_status;
+    }
+}

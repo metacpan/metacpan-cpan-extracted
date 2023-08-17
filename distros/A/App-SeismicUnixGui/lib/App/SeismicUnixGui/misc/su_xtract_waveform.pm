@@ -7,7 +7,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS
 
-  PACKAGE NAME: xract_waveform.pl
+  PERL PROGRAM NAME: xract_waveform.pl
   Purpose: Simple viewing of an su file 
            to extract waveforms  
   AUTHOR:  Juan M. Lorenzo

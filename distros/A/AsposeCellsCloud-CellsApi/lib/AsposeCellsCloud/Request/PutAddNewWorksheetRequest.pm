@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PutAddNewWorksheetRequest.name :   ,
-# PutAddNewWorksheetRequest.sheetName :   ,
-# PutAddNewWorksheetRequest.position :   ,
-# PutAddNewWorksheetRequest.sheettype :   ,
-# PutAddNewWorksheetRequest.folder :   ,
-# PutAddNewWorksheetRequest.storageName :    
+# PutAddNewWorksheetRequest.name : The workbook name.  ,
+# PutAddNewWorksheetRequest.sheetName : The new sheet name.  ,
+# PutAddNewWorksheetRequest.position : The new sheet position.  ,
+# PutAddNewWorksheetRequest.sheettype : Specifies the worksheet type(VB/Worksheet/Chart/BIFF4Macro/InternationalMacro/Other/Dialog).  ,
+# PutAddNewWorksheetRequest.folder : Original workbook folder.  ,
+# PutAddNewWorksheetRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_add_new_worksheet' } = { 
-    	summary => '',
+    	summary => 'Adds new worksheet in workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The new sheet name.',
      	format => '',
      	read_only => '',
      		},
      'position' => {
      	datatype => 'int',
      	base_name => 'position',
-     	description => '',
+     	description => 'The new sheet position.',
      	format => '',
      	read_only => '',
      		},
      'sheettype' => {
      	datatype => 'string',
      	base_name => 'sheettype',
-     	description => '',
+     	description => 'Specifies the worksheet type(VB/Worksheet/Chart/BIFF4Macro/InternationalMacro/Other/Dialog).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

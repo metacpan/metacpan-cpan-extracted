@@ -76,5 +76,3 @@ There are no priorities. Listeners are called in order of storing. By default li
 # Safe iteration
 
 You can do anything  in listeners, e.g. remove itself from the callback dispatcher to prevent it from calling next time an event occurs. Also you can remove any other listeners. Special class called owning_list is used to store listeners. It guarantees that iterators are valid after removing any elements.
-
-

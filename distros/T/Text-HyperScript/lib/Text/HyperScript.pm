@@ -4,7 +4,7 @@ use warnings;
 
 package Text::HyperScript;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 use Exporter::Lite;
 
@@ -164,7 +164,7 @@ package Text::HyperScript;
 
 =head1 NAME
 
-Text::HyperScript - The HyperScript like library for Perl.
+Text::HyperScript - Let's write html/xml templates as perl code!
 
 =head1 SYNOPSIS
 
@@ -196,158 +196,162 @@ Text::HyperScript - The HyperScript like library for Perl.
 
 =head1 DESCRIPTION
 
-This module is a html/xml string generator like as hyperscirpt.
+This module is a html/xml tags generator like as hyperscript-ish style.
 
-The name of this module contains B<HyperScript>,
-but this module features isn't same of another language or original implementation.
+=head1 FEATURES
 
-This module has submodule for some tagset:
+=over
+
+=item All html/xml tags write as perl code!
+
+We're able to write html/xml templates witout raw markup.
+
+=item Generates automatic escaped html/xml tags
+
+This module generates automatic escaped html/xml tags by default.
+
+Like this:
+
+    use feature qw(say);
+    
+    say h('p', 'hello, <script>alert("XSS!")</script>')
+    # => <p>hello, &lt;scrip&gt;alert("XSS!")&lt;/script&gt;</p>
+
+=item Includes shorthand for multiple class name and prefixed attributes
+
+This module has shorthand multiple class name, and data or aria and others prefixed attributes.
+
+For examples:
+
+    use feature qw(say);
+    
+    say h('h1', { class => [qw/ C B A /] }, 'msg');
+    # => <h1 class="A B C">msg</h1>
+    
+    say h('button', { data => { click => '1' } }, 'label');
+    # => <button data-click="1">label</button>
+    
+    say h('a', { href => '#', aria => {label => 'label' } }, 'link');
+    # => <a aria-label="label" href="#">link</a>
+
+=item Enable to generate empty and empty content tags
+
+This module supports empty element and empty content tags.
+
+Like that:
+
+    use feature qw(say);
+    
+    say h('hr'); # empty tag
+    # => <hr />
+    
+    say h('script', '') # empty content tag
+    # => <script></script>
+
+=back
+
+=head1 TAGSETS
+
+This modules includes shorthand modules for writes tag name as subroutine.
+
+Currently Supported:
 
 HTML5: L<Text::HyperScript::HTML5>
 
-=head1 FUNCTIONS
-
-=head2 h
-
-This function makes html/xml text by perl code. 
-
-This function is complex. but it's powerful.
-
-B<Arguments>:
-
-    h($tag, [ \%attrs, $content, ...])
-
-=over
-
-=item C<$tag>
-
-Tag name of element.
-
-This value should be C<Str> value.
-
-=item C<\%attrs> 
-
-Attributes of element.
-
-Result of attributes sorted by alphabetical according.
-
-You could pass to theses types as attribute values:
-
-=over
-
-=item C<Str>
-
-If you passed to this type, attribute value became a C<Str> value.
-
-For example:
-
-    h('hr', { id => 'id' }); # => '<hr id="id" />'
-
-=item C<Text::HyperScript::Boolean>
-
-If you passed to this type, attribute value became a value-less attribute.
-
-For example:
-
-    # `true()` returns Text::HyperScript::Boolean value as !!1 (true)
-    h('script', { crossorigin => true }); # => '<script crossorigin></script>'
-
-=item C<ArrayRef[Str]>
-
-If you passed to this type, attribute value became a B<sorted> (alphabetical according),
-delimited by whitespace C<Str> value,
-
-For example:
-
-    h('hr', { class => [qw( foo bar baz )] });
-    # => '<hr class="bar baz foo">'
-
-=item C<HashRef[ Str | ArrayRef[Str] | Text::HyperScript::Boolean ]>
-
-This type is a shorthand of prefixed attributes.
-
-For example:
-
-    h('hr', { data => { id => 'foo', flags => [qw(bar baz)], enabled => true } });
-    # => '<hr data-enabled data-flags="bar baz" data-id="foo" />'
-
-=back
-
-=item C<$contnet>
-
-Contents of element.
-
-You could pass to these types:
-
-=over
-
-=item C<Str>
-
-Plain text as content.
-
-This value always applied html/xml escape.
-
-=item C<Text::HyperScript::NodeString>
-
-Raw html/xml string as content.
-
-B<This value does not applied html/xml escape>,
-B<you should not use this type for untrusted text>.
-
-=item C<ArrayRef[ Str | Text::HyperScript::NodeString ]>
-
-The ArrayRef of C<$content>.
-
-This type value is flatten of other C<$content> value.
-
-=back
-
-=back
+=head1 MODULE FUNCTIONS
 
 =head2 text
 
-This function returns a html/xml escaped text.
-
-If you use untrusted stirng for display,
-you should use this function for wrapping untrusted content.
+This function generates html/xml escaped text.
 
 =head2 raw
 
-This function makes a instance of C<Text::HyperScript::NodeString>.
+This function generates raw text B<without html/xml escape>.
 
-Instance of C<Text::HyperScript::NodeString> has C<to_string> method,
-that return text with html/xml markup.
+This function B<should be used for display trusted text content>.
 
-The value of C<Text::HyperScript::NodeString> always does not escaped,
-you should not use this function for display untrusted content. 
-Please use C<text> instead of this function.
+=head2 true / false (constants)
 
-=head2 true / false
+This constants use for value-less attributes.
 
-This functions makes instance of C<Text::HyperScript::Boolean> value.
+For examples, if we'd like to use C<crossorigin> attriute on C<script> tag,
+we're able to use these contants like this:
 
-Instance of C<Text::HyperScript::Boolean> has two method like as C<is_true> and C<is_false>,
-these method returns that value pointed C<true> or C<false> values.
+    use feature qw(say);
 
-Usage of these functions for make html5 value-less attribute.
+    say h('scirpt', { crossorigin => true }, '')
+    # => <scritp crossorigin></script>
+
+C<false> constants exists for override value-less attributes.
+If set C<false> to value-less attribute, that attribute ignored.
+
+=head2 h
+
+This function makes html/xml text from perl code.
+
+The first argument is tag name, and after argument could be passed these values as repeatable.
+
+NOTICE:
+
+The all element attributes sorted by ascendant.
+
+This behaviour is intentional for same result of reproducible output.
+
+=over
+
+=item $text : Str
+
+The text string uses as a element content.
 
 For example:
 
-    h('script', { crossorigin => true }, ''); # => '<script crossorigin></script>'
+    use feature qw(say);
 
-=head1 QUESTION AND ANSWERS
+    say h('p', 'hi,') # <- 'hi,' is a plain text string
+    # => <p>hi,</p>
 
-=head2 How do I get element of empty content like as `script`?
+=item \%attributes : HashRef[Str | ArrayRef[Str] | HashRef[Str] ]
 
-This case you chould gets element string by pass to empty string.
+The element attributes could be defined by these styles:
 
-For example:
+=over
 
-    h('script', ''); # <script></script>
+=item \%attributes contains Str
 
-=head2 Why all attributes and attribute values sorted by alphabetical according?
+In this case, Str value uses for single value of attribute.
 
-This reason that gets same result on randomized orderd hash keys. 
+    use feature qw(say);
+    
+    say h('p', { id => 'msg' }, 'hi,')
+    # => <p id="msg">hi,</p>
+
+=item \%attributes contains ArrayRef[Str]
+
+If attribute is ArrayRef[Str], these Str values joined by whitespace and sorted ascendant.
+
+    use feature qw(say);
+    
+    say h('p', { class => [qw/ foo bar baz /] }, 'hi,')
+    # => <p class="bar baz foo">hi,</p>
+
+=item HashRef[Str]
+
+If attribute is HashRef[Str], this code means shorthand for prefixed attribute.
+
+    use feature qw(say);
+
+    say h('p', { data => { label => 'foo' } }, 'hi,')
+    # => <p data-label="foo"></p>
+
+=back
+
+=item \@nested : ArrayRef
+
+The all ArrayRef passed to C<h> function is flatten by internally.
+
+This ArrayRef supported all content type of C<h> function.
+
+=back
 
 =head1 LICENSE
 
@@ -359,9 +363,5 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 OKAMURA Naoki a.k.a nyarla: E<lt>nyarla@kalaclista.comE<gt>
-
-=head1 SEE ALSO
-
-L<Text::HyperScript::HTML5>
 
 =cut

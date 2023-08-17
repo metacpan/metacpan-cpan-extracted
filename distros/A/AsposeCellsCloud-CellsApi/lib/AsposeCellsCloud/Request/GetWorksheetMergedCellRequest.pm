@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetMergedCellRequest.name :   ,
-# GetWorksheetMergedCellRequest.sheetName :   ,
-# GetWorksheetMergedCellRequest.mergedCellIndex :   ,
-# GetWorksheetMergedCellRequest.folder :   ,
-# GetWorksheetMergedCellRequest.storageName :    
+# GetWorksheetMergedCellRequest.name : The workbook name.  ,
+# GetWorksheetMergedCellRequest.sheetName : Worksheet name.  ,
+# GetWorksheetMergedCellRequest.mergedCellIndex : Merged cell index.  ,
+# GetWorksheetMergedCellRequest.folder : Original workbook folder.  ,
+# GetWorksheetMergedCellRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_merged_cell' } = { 
-    	summary => '',
+    	summary => 'Gets merged cell description by its index in worksheet.',
         params => $params,
         returns => 'MergedCellResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'merged_cell_index' => {
      	datatype => 'int',
      	base_name => 'mergedCellIndex',
-     	description => '',
+     	description => 'Merged cell index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

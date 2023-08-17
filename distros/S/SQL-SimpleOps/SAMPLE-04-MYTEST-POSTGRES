@@ -1,5 +1,12 @@
 # Tue Sep 20 19:21:42 -03 2022
 
+#
+### PRE-CREATE DATABASE MODE
+#
+
+## common error: 099S [open] connection to server at "localhost" (::1), port 5432 failed:
+## see: /var/lib/pgsql/data/pg_hba.conf
+
 # export SQL_SIMPLE_DB_SHOW_CONTENTS=""
 
 # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=""

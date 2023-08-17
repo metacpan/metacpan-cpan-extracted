@@ -9,16 +9,16 @@ use Plack::Util;
 use HTTP::Request::Common;
 use HTTP::Response;
 use Plack::Test;
-use Test::More tests => 3;
+use Test2::V0;
 
 my $handler = builder {
 	enable 'Plack::Middleware::MCCS',
 		path => qr{^/style\.[^.]+$},
-		root => 't/rootdir';
+		root => 't/rootdir/example1.com';
 
 	enable 'Plack::Middleware::MCCS',
 		path => sub { s!^/rootdir!!},
-		root => 't/rootdir';
+		root => 't/rootdir/example1.com';
 
 	sub {
 		[200, ['Content-Type' => 'text/plain', 'Content-Length' => 2], ['ok']]

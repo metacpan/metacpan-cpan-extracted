@@ -1,0 +1,36 @@
+Changes.md
+lib/Resource/Silo.pm
+lib/Resource/Silo/Container.pm
+lib/Resource/Silo/Metadata.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/001-load.t
+t/201-basic-example.t
+t/202-resource-mocked.t
+t/203-resource-with-arg.t
+t/204-fork.t
+t/205-lock-override.t
+t/206-shutdown.t
+t/207-fresh.t
+t/208-ignore-cache.t
+t/210-separation.t
+t/211-preload.t
+t/212-destroy.t
+t/213-override-cleans-cache.t
+t/214-dependencies.t
+t/215-class-init.t
+t/215-class-init.t.lib/My/Resource.pm
+t/216-meta.t
+t/401-circular.t
+t/402-croak-in-init.t
+t/403-bad-resource-dsl.t
+t/404-bad-use-argument.t
+t/405-bad-usage.t
+t/501-compat-moo.t
+xt/pod-coverage.t
+xt/pod-spelling.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

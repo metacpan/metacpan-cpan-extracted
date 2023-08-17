@@ -19,7 +19,7 @@ use XML::Simple; ## no critic (DiscouragedModules)
 
 use parent qw(Class::Accessor::Fast);
 
-our $VERSION = '0.63'; ## no critic (RequireInterpolation)
+our $VERSION = '0.64'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(
@@ -1077,7 +1077,7 @@ sub get_location_constraint {
     return $lc;
   }
 
-  $lc = $xpc->{content};
+  $lc = $xpc;
 
   if ( defined $lc && $lc eq $EMPTY ) {
     $lc = undef;

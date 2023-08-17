@@ -1,3 +1,6 @@
+0.05 2023-07-21
+    * Various test suite updates, no code changes, no need to upgrade
+
 0.04 2022-09-14
     * Fix package syntax to be compatible with 5.012
       Reported by BINGOS, thanks

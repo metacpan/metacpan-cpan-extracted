@@ -2,7 +2,7 @@
 
 #define TEST(name) TEST_CASE("strptime: " name, "[strptime]")
 
-static void test (string name, string_view str, string_view format,  string_view expected, string_view tz = "") {
+static void test (std::string name, string_view str, string_view format,  string_view expected, string_view tz = "") {
     SECTION(name) {
         TimezoneSP zone;
         if (!tz.empty()) {zone = tzget(tz) ; }
@@ -14,7 +14,7 @@ static void test (string name, string_view str, string_view format,  string_view
     }
 }
 
-static void test_err(string name, string_view str, string_view format) {
+static void test_err(std::string name, string_view str, string_view format) {
     SECTION(name) {
         auto d = Date::strptime(str, format);
         CHECK(d.error());

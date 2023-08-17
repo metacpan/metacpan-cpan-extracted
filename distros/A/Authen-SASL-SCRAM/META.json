@@ -1,0 +1,71 @@
+{
+   "abstract" : "SCRAM-SHA-1/256/512 support for Authen::SASL",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Authen-SASL-SCRAM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.16",
+            "Authen::SCRAM" : "0.011",
+            "Feature::Compat::Try" : "0.04",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::SASL::Perl::SCRAM_SHA_1" : {
+         "file" : "lib/Authen/SASL/Perl/SCRAM_SHA_1.pm",
+         "version" : "0.04"
+      },
+      "Authen::SASL::Perl::SCRAM_SHA_256" : {
+         "file" : "lib/Authen/SASL/Perl/SCRAM_SHA_256.pm",
+         "version" : "0.04"
+      },
+      "Authen::SASL::Perl::SCRAM_SHA_512" : {
+         "file" : "lib/Authen/SASL/Perl/SCRAM_SHA_512.pm",
+         "version" : "0.04"
+      },
+      "Authen::SASL::SCRAM" : {
+         "file" : "lib/Authen/SASL/SCRAM.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ehuelsmann/authen-sasl-scram/issues"
+      },
+      "homepage" : "https://github.com/ehuelsmann/authen-sasl-scram",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ehuelsmann/authen-sasl-scram.git",
+         "web" : "https://github.com/ehuelsmann/authen-sasl-scram"
+      }
+   },
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

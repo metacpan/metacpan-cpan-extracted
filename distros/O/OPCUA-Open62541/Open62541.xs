@@ -25,7 +25,12 @@
 #include <open62541/client_highlevel.h>
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
+#include <open62541/plugin/pki.h>
 #include <open62541/plugin/pki_default.h>
+#include <open62541/plugin/accesscontrol_default.h>
+
+#include <pwd.h>
+#include <unistd.h>
 
 //#define DEBUG
 #ifdef DEBUG
@@ -551,6 +556,48 @@ unpack_UA_ByteString(UA_ByteString *out, SV *in)
 	}
 }
 
+static void
+unpack_UA_ByteString_List(UA_ByteString **outList, size_t *outSize, SV *in)
+{
+	dTHX;
+	AV *		av;
+	SV *		sv;
+	SV **		svp;
+	UA_ByteString *	bs;
+	size_t		i;
+
+	*outList = NULL;
+	*outSize = 0;
+
+	if (SvOK(in)) {
+		if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVAV) {
+			CROAK("Not an ARRAY reference with ByteString list");
+		}
+		av = (AV*)SvRV(in);
+		*outSize = av_top_index(av) + 1;
+	}
+
+	if (*outSize > 0) {
+		if ((*outSize >= MUL_NO_OVERFLOW ||
+		    sizeof(UA_ByteString) >= MUL_NO_OVERFLOW) &&
+		    SIZE_MAX / *outSize < sizeof(UA_ByteString)) {
+			CROAK("ByteString list too big");
+		}
+		sv = sv_2mortal(newSV(*outSize * sizeof(UA_ByteString)));
+		*outList = (UA_ByteString *)SvPVX(sv);
+
+		for (i = 0, bs = *outList; i < *outSize; i++, bs++) {
+			svp = av_fetch(av, i, 0);
+
+			if (svp == NULL || !SvOK(*svp)) {
+				UA_ByteString_init(bs);
+			} else {
+				bs->data = SvPV(*svp, bs->length);
+			}
+		}
+	}
+}
+
 /* 6.1.17 XmlElement, types.h */
 
 static void
@@ -573,6 +620,7 @@ pack_UA_NodeId(SV *out, const UA_NodeId *in)
 	dTHX;
 	SV *sv;
 	UA_Int32 type;
+	UA_String print;
 	HV *hv;
 
 	hv = newHV();
@@ -605,6 +653,18 @@ pack_UA_NodeId(SV *out, const UA_NodeId *in)
 		break;
 	default:
 		CROAK("NodeId_identifierType %d unknown", in->identifierType);
+	}
+
+	/*
+	 * For convenience add printable string based on XML encoding format.
+	 * https://reference.opcfoundation.org/Core/Part6/v105/docs/5.3.1.10
+	 */
+	UA_String_init(&print);
+	if (UA_NodeId_print(in, &print) == UA_STATUSCODE_GOOD) {
+		sv = newSV(0);
+		hv_stores(hv, "NodeId_print", sv);
+		pack_UA_String(sv, &print);
+		UA_String_clear(&print);
 	}
 }
 
@@ -2528,6 +2588,165 @@ loggerClearCallback(void *context)
 	LEAVE;
 }
 
+/*
+ * CertificateVerification new and delete should be defined in open62541,
+ * but is missing there.
+ */
+
+static UA_CertificateVerification *
+UA_CertificateVerification_new(void)
+{
+	UA_CertificateVerification *verifyX509;
+
+	verifyX509 = UA_calloc(1, sizeof(*verifyX509));
+	return verifyX509;
+}
+
+static void
+UA_CertificateVerification_delete(UA_CertificateVerification *verifyX509)
+{
+	if (verifyX509->clear)
+		(*verifyX509->clear)(verifyX509);
+	UA_free(verifyX509);
+}
+
+static void
+UA_UsernamePasswordLogin_init(UA_UsernamePasswordLogin *upl)
+{
+	UA_String_init(&upl->username);
+	UA_String_init(&upl->password);
+}
+
+static void
+unpack_UA_UsernamePasswordLogin(UA_UsernamePasswordLogin *out, SV *in)
+{
+	dTHX;
+	SV **svp;
+	HV *hv;
+
+	SvGETMAGIC(in);
+	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV)
+		CROAK("Not a HASH reference");
+	UA_UsernamePasswordLogin_init(out);
+	hv = (HV*)SvRV(in);
+
+	svp = hv_fetchs(hv, "UsernamePasswordLogin_username", 0);
+	if (svp == NULL)
+		CROAK("No UsernamePasswordLogin_username in HASH");
+	if (!SvOK(*svp)) {
+		UA_String_init(&out->username);
+	} else {
+		out->username.data = SvPV(*svp, out->username.length);
+	}
+
+	svp = hv_fetchs(hv, "UsernamePasswordLogin_password", 0);
+	if (svp == NULL)
+		CROAK("No UsernamePasswordLogin_password in HASH");
+	if (!SvOK(*svp)) {
+		UA_String_init(&out->password);
+	} else {
+		out->password.data = SvPV(*svp, out->password.length);
+	}
+}
+
+static void
+unpack_UA_UsernamePasswordLogin_List(UA_UsernamePasswordLogin **outList,
+    size_t *outSize, SV *in)
+{
+	dTHX;
+	AV *				av;
+	SV *				sv;
+	SV **				svp;
+	UA_UsernamePasswordLogin *	upl;
+	size_t	i;
+
+	*outList = NULL;
+	*outSize = 0;
+
+	if (SvOK(in)) {
+		if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVAV) {
+			CROAK("Not an ARRAY reference with "
+			    "UsernamePasswordLogin list");
+		}
+		av = (AV*)SvRV(in);
+		*outSize = av_top_index(av) + 1;
+	}
+
+	if (*outSize > 0) {
+		if ((*outSize >= MUL_NO_OVERFLOW ||
+		    sizeof(UA_UsernamePasswordLogin) >= MUL_NO_OVERFLOW) &&
+		    SIZE_MAX / *outSize < sizeof(UA_UsernamePasswordLogin)) {
+			CROAK("UsernamePasswordLogin list too big");
+		}
+		sv = sv_2mortal(
+		    newSV(*outSize * sizeof(UA_UsernamePasswordLogin)));
+		*outList = (UA_UsernamePasswordLogin *)SvPVX(sv);
+
+		for (i = 0, upl = *outList; i < *outSize; i++, upl++) {
+			svp = av_fetch(av, i, 0);
+
+			if (svp == NULL || !SvOK(*svp)) {
+				UA_UsernamePasswordLogin_init(upl);
+			} else {
+				unpack_UA_UsernamePasswordLogin(upl, *svp);
+			}
+		}
+	}
+}
+
+#ifdef HAVE_UA_ACCESSCONTROL_SETCALLBACK
+
+#ifdef HAVE_CRYPT_CHECKPASS
+
+static UA_StatusCode
+loginCryptCheckpassCallback(const UA_String *userName, const UA_ByteString
+    *password, size_t loginSize, const UA_UsernamePasswordLogin *loginList,
+    void *loginContext)
+{
+	char *pass;
+	size_t i;
+	int userok = 0, passok = 0;
+
+	/* UA_ByteString has no terminating NUL byte */
+	pass = UA_malloc(password->length + 1);
+	if (pass == NULL)
+		return UA_STATUSCODE_BADOUTOFMEMORY;
+	memcpy(pass, password->data, password->length);
+	pass[password->length] = '\0';
+
+	/* Always run though full loop to avoid timing attack. */
+	for (i = 0; i < loginSize; i++, loginList++) {
+		char hash[_PASSWORD_LEN + 1];
+		size_t hashlen;
+
+		if (userName->length == loginList->username.length &&
+		    timingsafe_bcmp(userName->data, loginList->username.data,
+		    userName->length) == 0)
+			userok = 1;
+		else
+			continue;
+
+		/* UA_String has no terminating NUL byte */
+		hashlen = loginList->password.length < _PASSWORD_LEN ?
+		    loginList->password.length : _PASSWORD_LEN;
+		memcpy(hash, loginList->password.data, hashlen);
+		hash[hashlen] = '\0';
+
+		if (crypt_checkpass(pass, hash) == 0)
+			passok = 1;
+	}
+	/* Do some work if user does not match to avoid user guessing. */
+	if (!userok)
+		crypt_checkpass(pass, NULL);
+
+	UA_free(pass);
+	return passok ? UA_STATUSCODE_GOOD : UA_STATUSCODE_BADUSERACCESSDENIED;
+}
+
+#endif /* HAVE_CRYPT_CHECKPASS */
+
+#endif /* HAVE_UA_ACCESSCONTROL_SETCALLBACK */
+
 /*#########################################################################*/
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541
 
@@ -3055,7 +3274,9 @@ UA_Server_setAdminSessionContext(server, context)
 # 11.9 Node Addition and Deletion
 
 UA_StatusCode
-UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
+UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, typeDefinition, attr, nodeContext, \
+    outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3076,7 +3297,9 @@ UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	RETVAL
 
 UA_StatusCode
-UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
+UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, typeDefinition, attr, nodeContext, \
+    outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3097,7 +3320,9 @@ UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenc
 	RETVAL
 
 UA_StatusCode
-UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
+UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, typeDefinition, attr, nodeContext, \
+    outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3118,7 +3343,8 @@ UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeI
 	RETVAL
 
 UA_StatusCode
-UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
+UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3138,7 +3364,8 @@ UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceT
 	RETVAL
 
 UA_StatusCode
-UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
+UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3158,7 +3385,8 @@ UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId,
 	RETVAL
 
 UA_StatusCode
-UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
+UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3178,7 +3406,8 @@ UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referen
 	RETVAL
 
 UA_StatusCode
-UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
+UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, \
+    referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		requestedNewNodeId
 	OPCUA_Open62541_NodeId		parentNodeId
@@ -3224,7 +3453,8 @@ UA_Server_addReference(server, sourceId, refTypeId, targetId, isForward)
 	RETVAL
 
 UA_StatusCode
-UA_Server_deleteReference(server, sourceNodeId, referenceTypeId, isForward, targetNodeId, deleteBidirectional)
+UA_Server_deleteReference(server, sourceNodeId, referenceTypeId, isForward, \
+    targetNodeId, deleteBidirectional)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		sourceNodeId
 	OPCUA_Open62541_NodeId		referenceTypeId
@@ -3293,7 +3523,9 @@ UA_ServerConfig_setMinimal(config, portNumber, certificate)
 #ifdef UA_ENABLE_ENCRYPTION
 
 UA_StatusCode
-UA_ServerConfig_setDefaultWithSecurityPolicies(conf, portNumber, certificate, privateKey, trustListRAV = &PL_sv_undef, issuerListRAV = &PL_sv_undef, revocationListRAV = &PL_sv_undef)
+UA_ServerConfig_setDefaultWithSecurityPolicies(conf, portNumber, certificate, \
+    privateKey, trustListRAV = &PL_sv_undef, issuerListRAV = &PL_sv_undef, \
+    revocationListRAV = &PL_sv_undef)
 	OPCUA_Open62541_ServerConfig	conf
 	UA_UInt16			portNumber
 	OPCUA_Open62541_ByteString	certificate
@@ -3304,136 +3536,128 @@ UA_ServerConfig_setDefaultWithSecurityPolicies(conf, portNumber, certificate, pr
     PREINIT:
 	UA_ByteString *			trustList;
 	size_t				trustListSize;
-	AV *				trustListAV;
-	SV *				trustListSV;
 	UA_ByteString *			issuerList;
 	size_t				issuerListSize;
-	AV *				issuerListAV;
-	SV *				issuerListSV;
 	UA_ByteString *			revocationList;
 	size_t				revocationListSize;
-	AV *				revocationListAV;
-	SV *				revocationListSV;
-	size_t				i;
-	SV **				item;
     CODE:
-	trustList = NULL;
-	trustListSize = 0;
-	issuerList = NULL;
-	issuerListSize = 0;
-	revocationList = NULL;
-	revocationListSize = 0;
+	unpack_UA_ByteString_List(&trustList, &trustListSize, trustListRAV);
+	unpack_UA_ByteString_List(&issuerList, &issuerListSize, issuerListRAV);
+	unpack_UA_ByteString_List(&revocationList, &revocationListSize,
+	    revocationListRAV);
 
-	if (SvOK(trustListRAV)) {
-		if (!SvROK(trustListRAV) || SvTYPE(SvRV(trustListRAV)) != SVt_PVAV)
-			CROAK("Not an ARRAY reference for trustList");
-
-		trustListAV = (AV*)SvRV(trustListRAV);
-		trustListSize = av_top_index(trustListAV) + 1;
-	}
-	if (SvOK(issuerListRAV)) {
-		if (!SvROK(issuerListRAV) || SvTYPE(SvRV(issuerListRAV)) != SVt_PVAV)
-			CROAK("Not an ARRAY reference for issuerList");
-
-		issuerListAV = (AV*)SvRV(issuerListRAV);
-		issuerListSize = av_top_index(issuerListAV) + 1;
-	}
-	if (SvOK(revocationListRAV)) {
-		if (!SvROK(revocationListRAV)
-		    || SvTYPE(SvRV(revocationListRAV)) != SVt_PVAV)
-			CROAK("Not an ARRAY reference for revocationList");
-
-		revocationListAV = (AV*)SvRV(revocationListRAV);
-		revocationListSize = av_top_index(revocationListAV) + 1;
-	}
-
-	if (trustListSize > 0) {
-		if ((trustListSize >= MUL_NO_OVERFLOW
-		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
-		    && SIZE_MAX / trustListSize < sizeof(UA_ByteString))
-			CROAK("trustList too big");
-
-		trustListSV = sv_2mortal(newSV(trustListSize * sizeof(UA_ByteString)));
-		trustList = (UA_ByteString*)SvPVX(trustListSV);
-
-		for (i = 0; i < trustListSize; i++) {
-			item = av_fetch(trustListAV, i, 0);
-
-			if (item == NULL || !SvOK(*item)) {
-				UA_ByteString_init(&trustList[i]);
-			} else {
-				trustList[i].data = SvPV(*item, trustList[i].length);
-			}
-		}
-	}
-	if (issuerListSize > 0) {
-		if ((issuerListSize >= MUL_NO_OVERFLOW
-		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
-		    && SIZE_MAX / issuerListSize < sizeof(UA_ByteString))
-			CROAK("issuerList too big");
-
-		issuerListSV = sv_2mortal(newSV(issuerListSize * sizeof(UA_ByteString)));
-		issuerList = (UA_ByteString*)SvPVX(issuerListSV);
-
-		for (i = 0; i < issuerListSize; i++) {
-			item = av_fetch(issuerListAV, i, 0);
-
-			if (item == NULL || !SvOK(*item)) {
-				UA_ByteString_init(&issuerList[i]);
-			} else {
-				issuerList[i].data = SvPV(*item, issuerList[i].length);
-			}
-		}
-	}
-	if (revocationListSize > 0) {
-		if ((revocationListSize >= MUL_NO_OVERFLOW
-		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
-		    && SIZE_MAX / revocationListSize < sizeof(UA_ByteString))
-			CROAK("revocationList too big");
-
-		revocationListSV = sv_2mortal(newSV(revocationListSize * sizeof(UA_ByteString)));
-		revocationList = (UA_ByteString*)SvPVX(revocationListSV);
-
-		for (i = 0; i < revocationListSize; i++) {
-			item = av_fetch(revocationListAV, i, 0);
-
-			if (item == NULL || !SvOK(*item)) {
-				UA_ByteString_init(&revocationList[i]);
-			} else {
-				revocationList[i].data = SvPV(*item, revocationList[i].length);
-			}
-		}
-	}
-
-	RETVAL = UA_ServerConfig_setDefaultWithSecurityPolicies(conf->svc_serverconfig,
-	    portNumber, certificate, privateKey, trustList, trustListSize,
-	    issuerList, issuerListSize, revocationList, revocationListSize);
+	RETVAL = UA_ServerConfig_setDefaultWithSecurityPolicies(
+	    conf->svc_serverconfig, portNumber, certificate, privateKey,
+	    trustList, trustListSize, issuerList, issuerListSize,
+	    revocationList, revocationListSize);
 
 	/* accept all certificates as fallback ? */
 	if (trustList == NULL && issuerList == NULL && revocationList == NULL) {
-		UA_CertificateVerification_AcceptAll(&conf->svc_serverconfig->certificateVerification);
+		UA_CertificateVerification_AcceptAll(
+		    &conf->svc_serverconfig->certificateVerification);
 	}
     OUTPUT:
 	RETVAL
 
 #endif /* UA_ENABLE_ENCRYPTION */
 
+UA_StatusCode
+UA_ServerConfig_setAccessControl_default(config, allowAnonymous, \
+    optVerifyX509, optUserTokenPolicyUri, usernamePasswordLogin)
+	OPCUA_Open62541_ServerConfig		config
+	UA_Boolean				allowAnonymous
+	OPCUA_Open62541_CertificateVerification	optVerifyX509
+	OPCUA_Open62541_ByteString		optUserTokenPolicyUri
+	SV *					usernamePasswordLogin
+    PREINIT:
+	UA_UsernamePasswordLogin *		loginList;
+	size_t					loginSize;
+    CODE:
+	if (optVerifyX509 && optUserTokenPolicyUri == NULL)
+		CROAK("VerifyX509 needs userTokenPolicyUri");
+	unpack_UA_UsernamePasswordLogin_List(&loginList, &loginSize,
+	    usernamePasswordLogin);
+	if (loginSize > 0 && optUserTokenPolicyUri == NULL)
+		CROAK("UsernamePasswordLogin needs userTokenPolicyUri");
+	RETVAL = UA_AccessControl_default(config->svc_serverconfig,
+	    allowAnonymous, optVerifyX509, optUserTokenPolicyUri,
+	   loginSize, loginList);
+    OUTPUT:
+	RETVAL
+
+#ifdef HAVE_UA_ACCESSCONTROL_SETCALLBACK
+
+UA_StatusCode
+UA_ServerConfig_setAccessControl_loginCheck(config, check)
+	OPCUA_Open62541_ServerConfig	config
+	SV *				check;
+    CODE:
+	if (!SvOK(check)) {
+		RETVAL = UA_AccessControl_setCallback(config->svc_serverconfig,
+		    NULL, NULL);
+#ifdef HAVE_CRYPT_CHECKPASS
+	} else if (strcmp(SvPV_nolen(check), "crypt_checkpass") == 0) {
+		RETVAL = UA_AccessControl_setCallback(config->svc_serverconfig,
+		    loginCryptCheckpassCallback, NULL);
+#endif /* HAVE_CRYPT_CHECKPASS */
+	} else {
+		/* TODO: implement pure Perl callback */
+		RETVAL = UA_STATUSCODE_BADINVALIDARGUMENT;
+	}
+    OUTPUT:
+	RETVAL
+
+#endif /* HAVE_UA_ACCESSCONTROL_SETCALLBACK */
+
+#ifdef HAVE_CRYPT_CHECKPASS
+
+SV *
+UA_ServerConfig_AccessControl_CryptNewhash(config, password, \
+    pref = &PL_sv_undef)
+	OPCUA_Open62541_ServerConfig	config
+	SV *				password
+	SV *				pref
+    PREINIT:
+	const char *passstr;
+	const char *prefstr = NULL;
+	char hash[_PASSWORD_LEN + 1];
+    CODE:
+	(void)config;
+	if (!SvOK(password))
+		CROAK("Undef password");
+	passstr = SvPV_nolen(password);
+	if (SvOK(pref))
+		prefstr = SvPV_nolen(pref);
+	if (crypt_newhash(passstr, prefstr, hash, _PASSWORD_LEN) != 0)
+		CROAKE("crypt_newhash");
+	RETVAL = newSVpv(hash, 0);
+    OUTPUT:
+	RETVAL
+
+#endif /* HAVE_CRYPT_CHECKPASS */
+
 #ifdef HAVE_UA_SERVERCONFIG_CUSTOMHOSTNAME
+
+SV *
+UA_ServerConfig_getCustomHostname(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = sv_2mortal(newSV(0));
+	pack_UA_String(RETVAL, &config->svc_serverconfig->customHostname);
+	SvREFCNT_inc_NN(RETVAL);
+    OUTPUT:
+	RETVAL
 
 void
 UA_ServerConfig_setCustomHostname(config, customHostname)
 	OPCUA_Open62541_ServerConfig	config
-	OPCUA_Open62541_String		customHostname
-    PREINIT:
-	UA_StatusCode		sc;
+	SV *				customHostname
     CODE:
 	UA_String_clear(&config->svc_serverconfig->customHostname);
-	sc = UA_String_copy(customHostname,
-	    &config->svc_serverconfig->customHostname);
-	if (sc != UA_STATUSCODE_GOOD)
-		CROAKS(sc, "UA_String_copy");
+	unpack_UA_String(&config->svc_serverconfig->customHostname,
+	    customHostname);
 
-#endif
+#endif /* HAVE_UA_SERVERCONFIG_CUSTOMHOSTNAME */
 
 #ifdef HAVE_UA_SERVERCONFIG_SERVERURLS
 
@@ -3688,7 +3912,8 @@ UA_UInt32
 UA_ServerConfig_getMaxNodesPerTranslateBrowsePathsToNodeIds(config)
 	OPCUA_Open62541_ServerConfig	config
     CODE:
-	RETVAL = config->svc_serverconfig->maxNodesPerTranslateBrowsePathsToNodeIds;
+	RETVAL =
+	    config->svc_serverconfig->maxNodesPerTranslateBrowsePathsToNodeIds;
     OUTPUT:
 	RETVAL
 
@@ -3759,7 +3984,8 @@ UA_ServerConfig_getMaxSubscriptionsPerSession(config)
 	RETVAL
 
 void
-UA_ServerConfig_setMaxSubscriptionsPerSession(config, maxSubscriptionsPerSession)
+UA_ServerConfig_setMaxSubscriptionsPerSession(config, \
+    maxSubscriptionsPerSession)
 	OPCUA_Open62541_ServerConfig	config
 	UA_UInt32			maxSubscriptionsPerSession
     CODE:
@@ -3775,7 +4001,8 @@ UA_ServerConfig_getMaxNotificationsPerPublish(config)
 	RETVAL
 
 void
-UA_ServerConfig_setMaxNotificationsPerPublish(config, maxNotificationsPerPublish)
+UA_ServerConfig_setMaxNotificationsPerPublish(config, \
+    maxNotificationsPerPublish)
 	OPCUA_Open62541_ServerConfig	config
 	UA_UInt32			maxNotificationsPerPublish
     CODE:
@@ -3807,11 +4034,13 @@ UA_ServerConfig_getMaxRetransmissionQueueSize(config)
 	RETVAL
 
 void
-UA_ServerConfig_setMaxRetransmissionQueueSize(config, maxRetransmissionQueueSize)
+UA_ServerConfig_setMaxRetransmissionQueueSize(config, \
+    maxRetransmissionQueueSize)
 	OPCUA_Open62541_ServerConfig	config
 	UA_UInt32			maxRetransmissionQueueSize
     CODE:
-	config->svc_serverconfig->maxRetransmissionQueueSize = maxRetransmissionQueueSize;
+	config->svc_serverconfig->maxRetransmissionQueueSize =
+	    maxRetransmissionQueueSize;
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS_EVENTS
 
@@ -3840,96 +4069,106 @@ UA_ServerConfig_setUserRightsMaskReadonly(config, readonly);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				readonly
     CODE:
-	if (SvTRUE(readonly))
+	if (SvTRUE(readonly)) {
 		config->svc_serverconfig->accessControl.getUserRightsMask =
 		    getUserRightsMask_readonly;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.getUserRightsMask =
 		    getUserRightsMask_default;
+	}
 
 void
 UA_ServerConfig_setUserAccessLevelReadonly(config, readonly);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				readonly
     CODE:
-	if (SvTRUE(readonly))
+	if (SvTRUE(readonly)) {
 		config->svc_serverconfig->accessControl.getUserAccessLevel =
 		    getUserAccessLevel_readonly;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.getUserAccessLevel =
 		    getUserAccessLevel_default;
+	}
 
 void
 UA_ServerConfig_disableUserExecutable(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
+	if (SvTRUE(disable)) {
 		config->svc_serverconfig->accessControl.getUserExecutable =
 		    getUserExecutable_false;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.getUserExecutable =
 		    getUserExecutable_default;
+	}
 
 void
 UA_ServerConfig_disableUserExecutableOnObject(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
-		config->svc_serverconfig->accessControl.getUserExecutableOnObject =
+	if (SvTRUE(disable)) {
+		config->svc_serverconfig->accessControl.
+		    getUserExecutableOnObject =
 		    getUserExecutableOnObject_false;
-	else
-		config->svc_serverconfig->accessControl.getUserExecutableOnObject =
+	} else {
+		config->svc_serverconfig->accessControl.
+		    getUserExecutableOnObject =
 		    getUserExecutableOnObject_default;
+	}
 
 void
 UA_ServerConfig_disableAddNode(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
+	if (SvTRUE(disable)) {
 		config->svc_serverconfig->accessControl.allowAddNode =
 		    allowAddNode_false;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.allowAddNode =
 		    allowAddNode_default;
+	}
 
 void
 UA_ServerConfig_disableAddReference(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
+	if (SvTRUE(disable)) {
 		config->svc_serverconfig->accessControl.allowAddReference =
 		    allowAddReference_false;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.allowAddReference =
 		    allowAddReference_default;
+	}
 
 void
 UA_ServerConfig_disableDeleteNode(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
+	if (SvTRUE(disable)) {
 		config->svc_serverconfig->accessControl.allowDeleteNode =
 		    allowDeleteNode_false;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.allowDeleteNode =
 		    allowDeleteNode_default;
+	}
 
 void
 UA_ServerConfig_disableDeleteReference(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
+	if (SvTRUE(disable)) {
 		config->svc_serverconfig->accessControl.allowDeleteReference =
 		    allowDeleteReference_false;
-	else
+	} else {
 		config->svc_serverconfig->accessControl.allowDeleteReference =
 		    allowDeleteReference_default;
+	}
 
 #ifdef UA_ENABLE_HISTORIZING
 
@@ -3938,24 +4177,30 @@ UA_ServerConfig_disableHistoryUpdateUpdateData(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
-		config->svc_serverconfig->accessControl.allowHistoryUpdateUpdateData =
+	if (SvTRUE(disable)) {
+		config->svc_serverconfig->accessControl.
+		    allowHistoryUpdateUpdateData =
 		    allowHistoryUpdateUpdateData_false;
-	else
-		config->svc_serverconfig->accessControl.allowHistoryUpdateUpdateData =
+	} else {
+		config->svc_serverconfig->accessControl.
+		    allowHistoryUpdateUpdateData =
 		    allowHistoryUpdateUpdateData_default;
+	}
 
 void
 UA_ServerConfig_disableHistoryUpdateDeleteRawModified(config, disable);
 	OPCUA_Open62541_ServerConfig	config
 	SV *				disable
     CODE:
-	if (SvTRUE(disable))
-		config->svc_serverconfig->accessControl.allowHistoryUpdateDeleteRawModified =
+	if (SvTRUE(disable)) {
+		config->svc_serverconfig->accessControl.
+		    allowHistoryUpdateDeleteRawModified =
 		    allowHistoryUpdateDeleteRawModified_false;
-	else
-		config->svc_serverconfig->accessControl.allowHistoryUpdateDeleteRawModified =
+	} else {
+		config->svc_serverconfig->accessControl.
+		    allowHistoryUpdateDeleteRawModified =
 		    allowHistoryUpdateDeleteRawModified_default;
+	}
 
 #endif /* UA_ENABLE_HISTORIZING */
 
@@ -4138,7 +4383,8 @@ UA_Client_sendAsyncBrowseRequest(client, request, callback, data, outoptReqId)
 	RETVAL
 
 UA_StatusCode
-UA_Client_sendAsyncBrowseNextRequest(client, request, callback, data, outoptReqId)
+UA_Client_sendAsyncBrowseNextRequest(client, request, callback, data, \
+    outoptReqId)
 	OPCUA_Open62541_Client		client
 	OPCUA_Open62541_BrowseNextRequest	request
 	SV *				callback
@@ -4242,7 +4488,8 @@ UA_Client_CreateSubscriptionRequest_default(class)
 	RETVAL
 
 UA_CreateSubscriptionResponse
-UA_Client_Subscriptions_create(client, request, subscriptionContext, statusChangeCallback, deleteCallback)
+UA_Client_Subscriptions_create(client, request, subscriptionContext, \
+    statusChangeCallback, deleteCallback)
 	OPCUA_Open62541_Client				client
 	OPCUA_Open62541_CreateSubscriptionRequest	request
 	SV *						subscriptionContext
@@ -4311,7 +4558,8 @@ UA_Client_Subscriptions_deleteSingle(client, subscriptionId)
 	OPCUA_Open62541_Client	client
 	UA_UInt32		subscriptionId
     CODE:
-	RETVAL = UA_Client_Subscriptions_deleteSingle(client->cl_client, subscriptionId);
+	RETVAL = UA_Client_Subscriptions_deleteSingle(client->cl_client,
+	    subscriptionId);
     OUTPUT:
 	RETVAL
 
@@ -4320,7 +4568,8 @@ UA_Client_Subscriptions_setPublishingMode(client, request)
 	OPCUA_Open62541_Client				client
 	OPCUA_Open62541_SetPublishingModeRequest	request
     CODE:
-	RETVAL = UA_Client_Subscriptions_setPublishingMode(client->cl_client, *request);
+	RETVAL = UA_Client_Subscriptions_setPublishingMode(client->cl_client,
+	    *request);
     OUTPUT:
 	RETVAL
 
@@ -4346,7 +4595,8 @@ UA_Client_MonitoredItemCreateRequest_default(class, nodeId)
 	RETVAL
 
 UA_CreateMonitoredItemsResponse
-UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callbacksSV, deleteCallbacksSV)
+UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, \
+    callbacksSV, deleteCallbacksSV)
 	OPCUA_Open62541_Client				client
 	OPCUA_Open62541_CreateMonitoredItemsRequest	request
 	SV *						contextsSV
@@ -4384,9 +4634,9 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 	}
 	if (SvOK(callbacksSV)) {
 		if (!SvROK(callbacksSV) ||
-		    SvTYPE(SvRV(callbacksSV)) != SVt_PVAV)
+		    SvTYPE(SvRV(callbacksSV)) != SVt_PVAV) {
 			CROAK("Not an ARRAY reference for callbacks");
-
+		}
 		callbacksAV = (AV*)SvRV(callbacksSV);
 
 		top = av_top_index(callbacksAV);
@@ -4399,9 +4649,9 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 	}
 	if (SvOK(deleteCallbacksSV)) {
 		if (!SvROK(deleteCallbacksSV) ||
-		    SvTYPE(SvRV(deleteCallbacksSV)) != SVt_PVAV)
+		    SvTYPE(SvRV(deleteCallbacksSV)) != SVt_PVAV) {
 			CROAK("Not an ARRAY reference for deleteCallbacks");
-
+		}
 		deleteCallbacksAV = (AV*)SvRV(deleteCallbacksSV);
 
 		top = av_top_index(deleteCallbacksAV);
@@ -4494,7 +4744,8 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 	RETVAL
 
 UA_MonitoredItemCreateResult
-UA_Client_MonitoredItems_createDataChange(client, subscriptionId, timestampsToReturn, item, context, callback, deleteCallback)
+UA_Client_MonitoredItems_createDataChange(client, subscriptionId, \
+    timestampsToReturn, item, context, callback, deleteCallback)
 	OPCUA_Open62541_Client				client
 	UA_UInt32					subscriptionId
 	UA_TimestampsToReturn				timestampsToReturn
@@ -4601,7 +4852,8 @@ UA_ClientConfig_setDefault(config)
 #ifdef UA_ENABLE_ENCRYPTION
 
 UA_StatusCode
-UA_ClientConfig_setDefaultEncryption(config, localCertificate, privateKey, trustListRAV = &PL_sv_undef, revocationListRAV = &PL_sv_undef)
+UA_ClientConfig_setDefaultEncryption(config, localCertificate, privateKey, \
+    trustListRAV = &PL_sv_undef, revocationListRAV = &PL_sv_undef)
 	OPCUA_Open62541_ClientConfig	config
 	OPCUA_Open62541_ByteString	localCertificate
 	OPCUA_Open62541_ByteString	privateKey
@@ -4610,74 +4862,12 @@ UA_ClientConfig_setDefaultEncryption(config, localCertificate, privateKey, trust
     PREINIT:
 	UA_ByteString *			trustList;
 	size_t				trustListSize;
-	AV *				trustListAV;
-	SV *				trustListSV;
 	UA_ByteString *			revocationList;
 	size_t				revocationListSize;
-	AV *				revocationListAV;
-	SV *				revocationListSV;
-	size_t				i;
-	SV **				item;
     CODE:
-	trustList = NULL;
-	trustListSize = 0;
-	revocationList = NULL;
-	revocationListSize = 0;
-
-	if (SvOK(trustListRAV)) {
-		if (!SvROK(trustListRAV) || SvTYPE(SvRV(trustListRAV)) != SVt_PVAV)
-			CROAK("Not an ARRAY reference for trustList");
-
-		trustListAV = (AV*)SvRV(trustListRAV);
-		trustListSize = av_top_index(trustListAV) + 1;
-	}
-	if (SvOK(revocationListRAV)) {
-		if (!SvROK(revocationListRAV)
-		    || SvTYPE(SvRV(revocationListRAV)) != SVt_PVAV)
-			CROAK("Not an ARRAY reference for revocationList");
-
-		revocationListAV = (AV*)SvRV(revocationListRAV);
-		revocationListSize = av_top_index(revocationListAV) + 1;
-	}
-
-	if (trustListSize > 0) {
-		if ((trustListSize >= MUL_NO_OVERFLOW
-		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
-		    && SIZE_MAX / trustListSize < sizeof(UA_ByteString))
-			CROAK("trustList too big");
-
-		trustListSV = sv_2mortal(newSV(trustListSize * sizeof(UA_ByteString)));
-		trustList = (UA_ByteString*)SvPVX(trustListSV);
-
-		for (i = 0; i < trustListSize; i++) {
-			item = av_fetch(trustListAV, i, 0);
-
-			if (item == NULL || !SvOK(*item)) {
-				UA_ByteString_init(&trustList[i]);
-			} else {
-				trustList[i].data = SvPV(*item, trustList[i].length);
-			}
-		}
-	}
-	if (revocationListSize > 0) {
-		if ((revocationListSize >= MUL_NO_OVERFLOW
-		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
-		    && SIZE_MAX / revocationListSize < sizeof(UA_ByteString))
-			CROAK("revocationList too big");
-
-		revocationListSV = sv_2mortal(newSV(revocationListSize * sizeof(UA_ByteString)));
-		revocationList = (UA_ByteString*)SvPVX(revocationListSV);
-
-		for (i = 0; i < revocationListSize; i++) {
-			item = av_fetch(revocationListAV, i, 0);
-
-			if (item == NULL || !SvOK(*item)) {
-				UA_ByteString_init(&revocationList[i]);
-			} else {
-				revocationList[i].data = SvPV(*item, revocationList[i].length);
-			}
-		}
-	}
+	unpack_UA_ByteString_List(&trustList, &trustListSize, trustListRAV);
+	unpack_UA_ByteString_List(&revocationList, &revocationListSize,
+	    revocationListRAV);
 
 	RETVAL = UA_ClientConfig_setDefaultEncryption(config->clc_clientconfig,
 	    *localCertificate, *privateKey, trustList, trustListSize,
@@ -4748,7 +4938,8 @@ UA_MessageSecurityMode
 UA_ClientConfig_getSecurityMode(config)
 	OPCUA_Open62541_ClientConfig	config
     CODE:
-	UA_MessageSecurityMode_copy(&config->clc_clientconfig->securityMode, &RETVAL);
+	UA_MessageSecurityMode_copy(&config->clc_clientconfig->securityMode,
+	    &RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -4758,7 +4949,31 @@ UA_ClientConfig_setSecurityMode(config, securityMode)
 	OPCUA_Open62541_MessageSecurityMode	securityMode
     CODE:
 	UA_MessageSecurityMode_clear(&config->clc_clientconfig->securityMode);
-	UA_MessageSecurityMode_copy(securityMode, &config->clc_clientconfig->securityMode);
+	UA_MessageSecurityMode_copy(securityMode,
+	    &config->clc_clientconfig->securityMode);
+
+#ifdef HAVE_UA_CLIENTCONFIG_APPLICATIONURI
+
+SV *
+UA_ClientConfig_getApplicationUri(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	RETVAL = sv_2mortal(newSV(0));
+	pack_UA_String(RETVAL, &config->clc_clientconfig->applicationUri);
+	SvREFCNT_inc_NN(RETVAL);
+    OUTPUT:
+	RETVAL
+
+void
+UA_ClientConfig_setApplicationUri(config, applicationUri)
+	OPCUA_Open62541_ClientConfig	config
+	SV *				applicationUri
+    CODE:
+	UA_String_clear(&config->clc_clientconfig->applicationUri);
+	unpack_UA_String(&config->clc_clientconfig->applicationUri,
+	    applicationUri);
+
+#endif /* HAVE_UA_CLIENTCONFIG_APPLICATIONURI */
 
 UA_ApplicationDescription
 UA_ClientConfig_getClientDescription(config)
@@ -4936,3 +5151,47 @@ UA_Logger_logFatal(logger, category, msg, ...)
 	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
 	    &ST(3), items - 3, NULL);
 	UA_LOG_FATAL(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+#############################################################################
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::CertificateVerification	PREFIX = UA_CertificateVerification_
+
+OPCUA_Open62541_CertificateVerification
+UA_CertificateVerification_new(class)
+	char *				class
+    INIT:
+	if (strcmp(class, "OPCUA::Open62541::CertificateVerification") != 0)
+		CROAK("Class '%s' is not "
+		    "OPCUA::Open62541::CertificateVerification", class);
+    CODE:
+	RETVAL = UA_CertificateVerification_new();
+	if (RETVAL == NULL)
+		CROAKE("UA_CertificateVerification_new");
+	DPRINTF("class %s, verifyX509 %p", class, RETVAL);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_CertificateVerification_Trustlist(verifyX509, trustListRAV, issuerListRAV, \
+    revocationListRAV)
+	OPCUA_Open62541_CertificateVerification	verifyX509
+	SV *					trustListRAV
+	SV *					issuerListRAV
+	SV *					revocationListRAV
+    PREINIT:
+	UA_ByteString *				trustList;
+	size_t					trustListSize;
+	UA_ByteString *				issuerList;
+	size_t					issuerListSize;
+	UA_ByteString *				revocationList;
+	size_t					revocationListSize;
+    CODE:
+	unpack_UA_ByteString_List(&trustList, &trustListSize, trustListRAV);
+	unpack_UA_ByteString_List(&issuerList, &issuerListSize, issuerListRAV);
+	unpack_UA_ByteString_List(&revocationList, &revocationListSize,
+	    revocationListRAV);
+
+	RETVAL = UA_CertificateVerification_Trustlist(verifyX509, trustList,
+	    trustListSize, issuerList, issuerListSize, revocationList,
+	    revocationListSize);
+    OUTPUT:
+	RETVAL

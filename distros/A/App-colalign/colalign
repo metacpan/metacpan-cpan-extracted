@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+#use 5.001 ; 
+use strict ; 
+use warnings ; 
+use feature qw[ say ] ; 
+use App::colalign ; # $App::colalign::VERSIONを利用するため。開発中は、既にインストール済みのものを使ってしまうので、意図しにくい動作になるだろう。
+use Getopt::Std ; 
+use List::Util qw[ minstr maxstr all any min max ] ;
+use Term::ANSIColor qw [ :constants ] ; ${Term::ANSIColor::AUTORESET} = 1 ; 
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+my $time_start ;# = [ gettimeofday ] ; 
+BEGIN { $time_start = [ gettimeofday ] }; # BEGIN UNITCHECK CHECK INIT  # 動作時間の正確測定のためBEGINで囲んだ。
+
+getopts 'a:c:i:I:C:1:' , \my%o ; 
+$o{a} ||= 1 ;    # 最低限、何個の列が、出力行に入るか。
+$o{c} //= '#n#'; # 余分な改行文字を、どんな文字列に置き換えるか。　
+$o{i} //= "\t" ; # 入力の列の区切り文字
+$o{I} //= '#t#' ; # 余分な列区切り文字を、どんな文字列に置き換えるか。
+# $o{C} ;  # もしも列の数が多すぎる場合に、何列目に余分な列を連結させるか(列の順番は変えない)。
+
+my $o1 = $o{1} // '' ; # やや人工的な対策
+my $L = 0 ; # 出力行数
+my @mL = () ; # 変更した出力は第何行目であったか。
+my @F ; # 仮容器。各行を読んだ時の、ばらばらにしたフィールド
+my @G ; # 本容器。まだ出力していないフィールド ; 
+my $bk ; # 空行フラグ
+
+LOOP : 
+while ( <> ) { 
+  chomp ; 
+  @F = split /$o{i}/o , $_ , -1 ; # 空行が来た場合のことは、まだ考えていない。(!) 
+  do { $bk = 1 ; next } if @F == 0 ;  # 空行の処理が2箇所に分かれてトリッキー(#1)。
+  next if @F == 1 && exists $o{1} && $F[0] =~ m/$o1/o ; # 1列しかない場合、ヒットしてしまったら出力処理。
+  next if @G == $o{a} && @F >= 2 ;  # @G == $o{a} が成り立っていた場合を想定している。
+  if ( @G ) { splice @G , -1 , 1 , "$G[$#G]$o{c}$F[0]" , @F[1..$#F] ; push @mL , $L+1 } else { @G = @F } # ここでは@Gを@Fと結合。
+  @F = () ; # 本容器に格納作業したので、仮容器は空に。
+  goto LOOP if @G <= $o{a} ; # -a で指定した数に満たない場合でも、丁度一致した場合(次行が1列で無いかを見る)もcontinueブロックを実行せずにwhileの先頭へ。
+} continue { 
+  do { $L ++ ; say join "\t", @G } ;  # ひとまず、出すべきものを出力。
+  do { $L ++ ; say '' ; $bk = 0 } if $bk ; # 空行の処理が2箇所に分かれてトリッキー(#2)。
+  do { @G = @F ; @F = () } ; # 仮容器から本容器へ。
+}
+do { $L ++ ; say join "\t", @G }  if @G ; 
+
+END {
+  my $time_elapsed = sprintf '%.4f', tv_interval ( $time_start , [ gettimeofday ] ) ;
+  my $end ;
+  $end = do { $. //= 0 ; "$. lines read. $L lines output. " } ;
+  $end .= "${time_elapsed}s. ($0)" ; 
+  say STDERR BOLD FAINT ITALIC $end ; 
+  my ($mL1, $mL2) = ( (min @mL) , (max @mL) ) ;
+  say STDERR BOLD FAINT ITALIC "Modified output lines : " . scalar @mL , " ($mL1-$mL2)" ; 
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 -a NUM [FILE]
+
+  TSV形式にして、NUM列に満たない行があった場合に、余分な改行文字があったと見做して、
+  その改行文字を適当な文字列に置き換えて、複数の列を1行にまとめる。
+    さらに、NUM列を超える列があった場合は、-C 3 のような指定で、この場合は、3列に余分な列が
+  まとまるようにして、全行が、NUM列になるように調整する。
+     最後に2次情報として、標準エラー出力に、出力の何行目が変更されたかを表示する。
+      (入力の何行目が変更されたかについては、未実装。)
+  なお、空行が来た場合には、一旦それまでの出力処理を済ませて、空行を出力する。
+
+オプション: (Nは正の整数である。REGEXは正規表現である。strは文字列である。)
+
+  -a N : 各行が最低限持つべき列数を指定する。 
+  -c str : 余分に発生した改行文字を置換する文字列を指定する。未指定なら "#n#" となる。
+  -i str : 入力の列の区切り文字を指定する。未指定なら "\t" (タブ文字)となる。
+  -1 REGEX : 入力に1列だけの行があって、正規表現REGEXにヒットすればその行はさらに次の行に連結。そうでないなら前の行に連結。
+
+  [未実装→] -C N : もしも列の数が多すぎる場合(-aで指定した数よりも)、(1始まり)左からN行目に余分な列を吸収する[実験的]
+  [未実装→] -C l : もしも列の数が多すぎる場合に、その行で、どこか連結して発生するフィールド文字列が最も長くなるようにする。
+  [未実装→] -I str  : -C の指定がある場合に、列区切り文字を 文字列 str に置換する。未指定なら "#t#" になる。
+
+  #-C N[,N].. : 
+
+  --help : このヘルプを表示。
+
+このコマンドの動作について: 
+ 
+ 1. 入力を逐次1行ずつ読む。列数が足りなかったから、足りるまで読んで連結する。
+ 2. 丁度NUM列に達しても、その次の行が1個のみの列の場合 : 
+          オプションの -1 REGEX (正規表現)の指定にその1個の列が一致しなければ、連結。
+          それ以外なら、そのNUM列に達した行を出力して、新たにその1列の行の処理に進む。
+ 3. 以上が済んだら、入力が続く限り、1.に戻る。
+ 
+ただし、オプション -Cの指定がある場合は、上記で作られた行に対して、NUM列を超える列を
+どこか途中で連結することで、列数を減らして、NUM列になるようにする。
+
+  The command line `perldoc App::colalign' shows the English help of `colalign' command.
+
+利用の仕方 : 
+   元のファイルに対して、まず、どの文字列で、余分な改行文字を置換するか決める。 
+   そして、その文字列が 処理対象となるファイルに対して grep を試して、無いことを確かめる。
+
+ 開発上のメモ: 
+   * 10年くらい前から作ろうと思っていたが、ふと思い立って2023年8月に作成。
+
+=cut

@@ -1,11 +1,11 @@
 package Perl::Metrics::Simple::Output;
 
-our $VERSION = 'v1.0.1';
-
 use strict;
 use warnings;
 
 use Carp qw();
+
+our $VERSION = 'v1.0.3';
 
 sub new {
     my ( $class, $analysis ) = @_;
@@ -13,7 +13,7 @@ sub new {
     if ((! ref $analysis) && ($analysis->isa('Perl::Metrics::Simple::Analysis')) ) {
         Carp::confess('Did not pass a Perl::Metrics::Simple::Analysis object.');
     }
-    
+
     my $self = bless {
         _analysis => $analysis,
     }, $class;
@@ -37,7 +37,7 @@ sub make_list_of_subs {
 
     my @main_from_each_file
         = map { $_->{main_stats} } @{ $analysis->file_stats() };
-    my @sorted_all_subs = sort { $b->{'mccabe_complexity'} <=> $a->{'mccabe_complexity'} } ( @{ $analysis->subs() }, @main_from_each_file );
+    my @sorted_all_subs = reverse sort { $a->{'mccabe_complexity'} <=> $b->{'mccabe_complexity'} } ( @{ $analysis->subs() }, @main_from_each_file );
 
     return [ \@main_from_each_file, \@sorted_all_subs ];
 }

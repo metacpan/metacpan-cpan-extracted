@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
@@ -49,7 +49,7 @@ Data::Sah::Filter::perl::Str::oneline - Replace newlines with spaces
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Str::oneline (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Str::oneline (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -78,10 +78,6 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Str::oneline (
  "a\nb" # valid, becomes "a b"
  "a\n\n\nb\n" # valid, becomes "a   b "
 
-=head1 DESCRIPTION
-
-L<Data::Sah::Filter::perl::Str::wrap>
-
 =for Pod::Coverage ^(meta|filter)$
 
 =head1 HOMEPAGE
@@ -91,6 +87,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-F
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Filter>.
+
+=head1 SEE ALSO
+
+L<Data::Sah::Filter::perl::Str::wrap>
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::immodpg_config;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: immodpg_config.pm 
+ PERL PERL PROGRAM NAME: immodpg_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: Feb 24 2020
  DESCRIPTION: interactive raytraced modeling

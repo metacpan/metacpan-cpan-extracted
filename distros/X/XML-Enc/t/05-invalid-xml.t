@@ -48,7 +48,7 @@ my $ret;
 eval {
     $ret = $decrypter->decrypt($xml);
 };
-ok($@ =~ /Opening and ending tag mismatch/,"Invalid XML");
+like($@, qr/Opening and ending tag mismatch/,"Invalid XML");
 ok(!$ret);
 done_testing;
 exit;
@@ -96,7 +96,7 @@ eval {
     $ret = $decrypter->decrypt($xml);
 };
 
-ok($@ =~ /Opening and ending tag mismatch/,"Invalid XML");
+like($@, qr/Opening and ending tag mismatch/,"Invalid XML");
 ok(!$ret);
 
 done_testing;

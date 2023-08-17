@@ -51,11 +51,8 @@ use 5.006;
 use strict;
 use SMS::Send::Driver ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '0.06';
-	@ISA     = 'SMS::Send::Driver';
-}
+our $VERSION = '1.07';
+our @ISA = 'SMS::Send::Driver';
 
 
 

@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::PerlStruct;
-$WebFetch::Input::PerlStruct::VERSION = '0.15.5';
+$WebFetch::Input::PerlStruct::VERSION = '0.15.9';
 use base "WebFetch";
 
 # define exceptions/errors
@@ -77,7 +77,7 @@ WebFetch::Input::PerlStruct - accept a Perl structure with pre-parsed news into 
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

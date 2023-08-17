@@ -1,4 +1,11 @@
-1.0.8   2017-03-10 (PERLANCAR)
+1.0.9   2023-05-15  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Mention/link to DefHash.
+
+
+1.0.8   2017-03-10  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -6,14 +13,14 @@
 	  Sah::Schema::tabledef::*.
 
 
-1.0.7   2016-03-08 (PERLANCAR)
+1.0.7   2016-03-08  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [dist] Use Pod::Weaver::Plugin::Sah::Schema.
 
 
-1.0.6   2015-09-06 (PERLANCAR)
+1.0.6   2015-09-06  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -22,31 +29,31 @@
 	  requirement.
 
 
-1.0.5   2014-09-20 (PERLANCAR)
+1.0.5   2014-09-20  Released-By: PERLANCAR
 
 	- Add field spec property: unique.
 
 
-1.0.4   2014-06-29 (SHARYANTO)
+1.0.4   2014-06-29  Released-By: SHARYANTO
 
         - Introduce field property 'include_by_default'.
 
 
-1.0.3   2014-04-27 (SHARYANTO)
+1.0.3   2014-04-27  Released-By: SHARYANTO
 
         - No spec changes.
 
         - Rename dist SHARYANTO-TableSpec -> TableDef.
 
 
-1.0.2   2014-04-27 (SHARYANTO)
+1.0.2   2014-04-27  Released-By: SHARYANTO
 
         - No spec changes.
 
         - Add Sah::Schema::TableSpec.
 
 
-1.0.1   2014-03-27 (SHARYANTO)
+1.0.1   2014-03-27  Released-By: SHARYANTO
 
         - Add property 'req'.
 
@@ -56,6 +63,6 @@
           function argument specification (see 'Rinci::function').
 
 
-1.0.0   2014-03-27 (SHARYANTO)
+1.0.0   2014-03-27  Released-By: SHARYANTO
 
         - First version.

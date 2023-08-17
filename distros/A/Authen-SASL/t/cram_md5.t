@@ -4,7 +4,7 @@ BEGIN {
   eval { require Digest::HMAC_MD5 }
 }
 
-use Test::More ($Digest::HMAC_MD5::VERSION ? (tests => 5) : (skip_all => 'Need Digest::HMAC_MD5'));
+use Test::More ($Digest::HMAC_MD5::VERSION ? (tests => 6) : (skip_all => 'Need Digest::HMAC_MD5'));
 
 use Authen::SASL qw(Perl);
 
@@ -29,4 +29,13 @@ is($conn->client_start, '', 'client_start');
 
 is($conn->client_step("xyz"), 'gbarr 36c931fe47f3fe9c7adbf810b3c7c4ad', 'client_step');
 
+$sasl = Authen::SASL->new(
+  mechanism => 'CRAM-MD5',
+  callback => {
+    pass => 'fred',
+    authname => 'none'
+  },
+);
+$conn = $sasl->client_new("ldap","localhost", "noplaintext noanonymous");
+is($conn->client_step("xyz"), ' 36c931fe47f3fe9c7adbf810b3c7c4ad', 'client_step no user');
 

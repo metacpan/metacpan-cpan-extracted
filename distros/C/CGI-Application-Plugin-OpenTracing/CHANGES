@@ -1,6 +1,16 @@
 CHANGE LOG
 ==========
 
+
+2023-14-06 - v0.104.0
+---------------------
+
+Refactor the code to use a `CGI::Application::Plugin::OpenTracing` object
+Only set TRC_ACTIVE_SCOPE and CGI_REQUEST spans their errors, skip inbetween
+Set `http.status_message`
+Improve tests
+
+
 2020-11-10 - v0.103.3
 ---------------------
 

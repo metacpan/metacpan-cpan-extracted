@@ -1,5 +1,14 @@
 # Changes for App-HTTPThis
 
+0.009 Wed Jun 21 17:15:00 UTC 2023
+     * Add missing prereq
+
+0.008 Wed Jun 21 17:05:00 UTC 2023
+     * Add support for a config file
+
+0.007 Mon Jun 05 16:15:00 UTC 2023
+     * Add --pretty option for nicer directory listings
+
 0.006 Thu May 25 17:35:00 UTC 2023
      * Add bugtracker URL
 

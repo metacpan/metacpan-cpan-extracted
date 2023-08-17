@@ -7,10 +7,6 @@ package Graphics::Toolkit::Color::Constant;
 use Carp;
 use Graphics::Toolkit::Color::Value ':all';
 
-use Exporter 'import';
-our @EXPORT_OK = qw/rgb_from_name hsl_from_name name_from_rgb name_from_hsl/;
-our %EXPORT_TAGS = (all => [@EXPORT_OK]);
-
 our %rgbhsl_from_name = (                                       # 2.6 MB
 # http://en.wikipedia.org/wiki/Web_colors#X11_color_names
     'white'               => [ 255, 255, 255,   0,   0, 100 ],
@@ -753,18 +749,18 @@ sub hsl_from_name {
     @{$rgbhsl_from_name{$name}}[3..5] if name_taken( $name );
 }
 
-sub name_from_rgb { 
+sub name_from_rgb {
     my (@rgb) = @_;
     @rgb  = @{$rgb[0]} if (ref $rgb[0] eq 'ARRAY');
-    check_rgb( @rgb ) and return; # return if sub did carp
+    Graphics::Toolkit::Color::Value::RGB::check( @rgb ) and return; # return if sub did carp
     my @names = _names_from_rgb( @rgb );
     wantarray ? @names : $names[0];
 }
 
-sub name_from_hsl { 
+sub name_from_hsl {
     my (@hsl) = @_;
     @hsl  = @{$hsl[0]} if (ref $hsl[0] eq 'ARRAY');
-    check_hsl( @hsl ) and return;
+    Graphics::Toolkit::Color::Value::HSL::check( @hsl ) and return;
     my @names = _names_from_hsl( @hsl );
     wantarray ? @names : $names[0];
 }
@@ -778,7 +774,7 @@ sub names_in_hsl_range { # @center, (@d | $d) --> @names
         if ref $hsl_center ne 'ARRAY' or @$hsl_center != 3;
     return carp 'second argument has to be a integer < 180 or array ref with 3 integer'
         unless (ref $radius eq 'ARRAY' and @$radius == 3) or (defined $radius and not ref $radius);
-    check_hsl( @$hsl_center ) and return;
+    Graphics::Toolkit::Color::Value::HSL::check( @$hsl_center ) and return;
 
     my @hsl_delta = ref $radius ? @$radius : ($radius, $radius, $radius);
     $hsl_delta[$_] = int abs $hsl_delta[$_] for 0 ..2;
@@ -805,7 +801,7 @@ sub names_in_hsl_range { # @center, (@d | $d) --> @names
              }
         }
     }
-    @names = grep {distance_hsl( $hsl_center ,[hsl_from_name($_)] ) <= $radius} @names if not ref $radius;
+    @names = grep {Graphics::Toolkit::Color::Value::distance( $hsl_center ,[hsl_from_name($_)], 'HSL' ) <= $radius} @names if not ref $radius;
     @names;
 }
 
@@ -813,16 +809,16 @@ sub add_rgb {
     my ($name, @rgb) = @_;
     @rgb  = @{$rgb[0]} if (ref $rgb[0] eq 'ARRAY');
     return carp "missing first argument: color name" unless defined $name and $name;
-    check_rgb( @rgb ) and return;
-    _add_color( $name, @rgb, hsl_from_rgb( @rgb ) );
+    Graphics::Toolkit::Color::Value::RGB::check( @rgb ) and return;
+    _add_color( $name, @rgb, Graphics::Toolkit::Color::Value::HSL::from_rgb( @rgb ) );
 }
 
 sub add_hsl {
     my ($name, @hsl) = @_;
     @hsl  = @{$hsl[0]} if (ref $hsl[0] eq 'ARRAY');
     return carp "missing first argument: color name" unless defined $name and $name;
-    check_hsl( @hsl ) and return;
-    _add_color( $name, rgb_from_hsl( @hsl ), @hsl );
+    Graphics::Toolkit::Color::Value::HSL::check( @hsl ) and return;
+    _add_color( $name, Graphics::Toolkit::Color::Value::HSL::to_rgb( @hsl ), @hsl );
 }
 
 sub _add_color {
@@ -841,14 +837,14 @@ sub _clean_name {
 }
 
 sub _names_from_rgb { # each of AoAoA cells (if exists) contains name or array with names (shortes first)
-    return '' unless exists $name_from_rgb[ $_[0] ] 
+    return '' unless exists $name_from_rgb[ $_[0] ]
               and exists $name_from_rgb[ $_[0] ][ $_[1] ] and exists $name_from_rgb[ $_[0] ][ $_[1] ][ $_[2] ];
     my $cell = $name_from_rgb[ $_[0] ][ $_[1] ][ $_[2] ];
     ref $cell ? @$cell : $cell;
 }
 
-sub _names_from_hsl { 
-    return '' unless exists $name_from_hsl[ $_[0] ] 
+sub _names_from_hsl {
+    return '' unless exists $name_from_hsl[ $_[0] ]
               and exists $name_from_hsl[ $_[0] ][ $_[1] ] and exists $name_from_hsl[ $_[0] ][ $_[1] ][ $_[2] ];
     my $cell = $name_from_hsl[ $_[0] ][ $_[1] ][ $_[2] ];
     ref $cell ? @$cell : $cell;
@@ -862,20 +858,20 @@ sub _add_color_to_reverse_search { #     my ($name, @rgb, @hsl) = @_;
             if (length $name < length $cell->[0] ) { unshift @$cell, $name }
             else                                   { push @$cell, $name    }
         } else {
-            $name_from_rgb[ $_[1] ][ $_[2] ][ $_[3] ] = 
-                (length $name < length $cell) ? [ $name, $cell ] 
+            $name_from_rgb[ $_[1] ][ $_[2] ][ $_[3] ] =
+                (length $name < length $cell) ? [ $name, $cell ]
                                               : [ $cell, $name ] ;
         }
     } else { $name_from_rgb[ $_[1] ][ $_[2] ][ $_[3] ] = $name  }
-    
+
     $cell = $name_from_hsl[ $_[4] ][ $_[5] ][ $_[6] ];
     if (defined $cell) {
         if (ref $cell) {
             if (length $name < length $cell->[0] ) { unshift @$cell, $name }
             else                                   { push @$cell, $name    }
         } else {
-            $name_from_hsl[ $_[4] ][ $_[5] ][ $_[6] ] = 
-                (length $name < length $cell) ? [ $name, $cell ] 
+            $name_from_hsl[ $_[4] ][ $_[5] ][ $_[6] ] =
+                (length $name < length $cell) ? [ $name, $cell ]
                                               : [ $cell, $name ] ;
         }
     } else { $name_from_hsl[ $_[4] ][ $_[5] ][ $_[6] ] = $name  }
@@ -891,36 +887,36 @@ __END__
 
 Graphics::Toolkit::Color::Constant - access values of color constants
 
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
     use Graphics::Toolkit::Color::Constant qw/:all/;
-    my @names = Graphics:..:Constant::all_names();
+    my @names = Graphics::Color::Constant::all_names();
     my @rgb  = rgb_from_name('darkblue');
     my @hsl  = hsl_from_name('darkblue');
-    
+
     Graphics::Toolkit::Color::Value::add_rgb('lucky', [0, 100, 50]);
 
 =head1 DESCRIPTION
 
-RGB and HSL values of named colors from the X11, HTML(CSS), SVG standard 
+RGB and HSL values of named colors from the X11, HTML(CSS), SVG standard
 and Pantone report. Allows also nearby search, reverse search and storage
-(not permanent) of additional names. One color may have multiple names. 
+(not permanent) of additional names. One color may have multiple names.
 Own colors can be (none permanently) stored for later reference by name.
-For this a name has to be chosen, that is not already taken. The 
-corresponding color may be defined by an RGB or HSL triplet. 
+For this a name has to be chosen, that is not already taken. The
+corresponding color may be defined by an RGB or HSL triplet.
 
-No so symbol is imported by default. The sub symbols: C<rgb_from_name>,
-C<hsl_from_name>, C<name_from_rgb>, C<name_from_hsl> may be importad
+No symbol is imported by default. The sub symbols: C<rgb_from_name>,
+C<hsl_from_name>, C<name_from_rgb>, C<name_from_hsl> may be imported
 individually or by:
- 
+
     use Graphics::Toolkit::Color::Constant qw/:all/;
-  
+
 
 =head1 ROUTINES
 
 =head2 rgb_from_name
 
-Red, Green and Blue value of the named color. 
+Red, Green and Blue value of the named color.
 These values are integer in 0 .. 255.
 
     my @rgb = Graphics::Toolkit::Color::Constant::rgb_from_name('darkblue');
@@ -929,7 +925,7 @@ These values are integer in 0 .. 255.
 
 =head2 hsl_from_name
 
-Hue, saturation and lightness of the named color. 
+Hue, saturation and lightness of the named color.
 These are integer between 0 .. 359 (hue) or 100 (sat. & light.).
 A hue of 360 and 0 (degree in a cylindrical coordinate system) is
 considered to be the same, this modul deals only with the ladder.
@@ -938,7 +934,7 @@ considered to be the same, this modul deals only with the ladder.
 
 =head2 name_from_rgb
 
-Returns name of color with given rgb value triplet. 
+Returns name of color with given rgb value triplet.
 Returns empty string if color is not stored. When several names define
 given color, the shortest name will be selected in scalar context.
 In array context all names are given.
@@ -948,7 +944,7 @@ In array context all names are given.
 
 =head2 name_from_hsl
 
-Returns name of color with given hsl value triplet. 
+Returns name of color with given hsl value triplet.
 Returns empty string if color is not stored. When several names define
 given color, the shortest name will be selected in scalar context.
 In array context all names are given.
@@ -959,7 +955,7 @@ In array context all names are given.
 
 =head2  names_in_hsl_range
 
-Color names in selected neighbourhood of hsl color space, that look similar. 
+Color names in selected neighbourhood of hsl color space, that look similar.
 It requires two arguments. The first one is an array containing three
 values (hue, saturation and lightness), that define the center of the
 neighbourhood (searched area).
@@ -980,7 +976,7 @@ The results contains only one name per color (the shortest).
 
     # all bright red'ish clors
     my @names = Graphics::Toolkit::Color::Constant::names_in_hsl_range([0, 90, 50], 5);
-    # approximates to : 
+    # approximates to :
     my @names = Graphics::Toolkit::Color::Constant::names_in_hsl_range([0, 90, 50],[ 3, 3, 3]);
 
 
@@ -1010,26 +1006,26 @@ Arguments are name, hue, saturation and lightness value (see hsl).
 
 =head2 NAMES
 
-white, black, red, green, blue, yellow, purple, pink, peach, plum, mauve, brown, grey  
+white, black, red, green, blue, yellow, purple, pink, peach, plum, mauve, brown, grey
 
-aliceblue, antiquewhite, antiquewhite1, antiquewhite2, antiquewhite3, 
+aliceblue, antiquewhite, antiquewhite1, antiquewhite2, antiquewhite3,
 antiquewhite4, aqua, aquamarine, aquamarine1, aquamarine2, aquamarine3,
 aquamarine4, azure, azure1, azure2, azure3, azure4, beige, bisque, bisque1,
 bisque2, bisque3, bisque4, blanchedalmond, blue1, blue2, blue3, blue4,
-blueviolet, brown1, brown2, brown3, brown4, burlywood, burlywood1, 
+blueviolet, brown1, brown2, brown3, brown4, burlywood, burlywood1,
 burlywood2, burlywood3, burlywood4, cadetblue, cadetblue1, cadetblue2,
 cadetblue3, cadetblue4, chartreuse, chartreuse1, chartreuse2, chartreuse3,
 chartreuse4, chocolate, chocolate1, chocolate2, chocolate3, chocolate4,
 coral, coral1, coral2, coral3, coral4, cornflowerblue, cornsilk, cornsilk1,
 cornsilk2, cornsilk3, cornsilk4, crimson, cyan, cyan1, cyan2, cyan3, cyan4,
-darkblue, darkcyan, darkgoldenrod, darkgoldenrod1, darkgoldenrod2, 
+darkblue, darkcyan, darkgoldenrod, darkgoldenrod1, darkgoldenrod2,
 darkgoldenrod3, darkgoldenrod4, darkgray, darkgreen, darkkhaki, darkmagenta,
-darkolivegreen, darkolivegreen1, darkolivegreen2, darkolivegreen3, 
-darkolivegreen4, darkorange, darkorange1, darkorange2, darkorange3, 
-darkorange4, darkorchid, darkorchid1, darkorchid2, darkorchid3, 
-darkorchid4, darkred, darksalmon, darkseagreen, darkseagreen1, 
+darkolivegreen, darkolivegreen1, darkolivegreen2, darkolivegreen3,
+darkolivegreen4, darkorange, darkorange1, darkorange2, darkorange3,
+darkorange4, darkorchid, darkorchid1, darkorchid2, darkorchid3,
+darkorchid4, darkred, darksalmon, darkseagreen, darkseagreen1,
 darkseagreen2, darkseagreen3, darkseagreen4, darkslateblue, darkslategray,
-darkslategray1, darkslategray2, darkslategray3, darkslategray4, 
+darkslategray1, darkslategray2, darkslategray3, darkslategray4,
 darkturquoise, darkviolet, deeppink, deeppink1, deeppink2, deeppink3,
 deeppink4, deepskyblue, deepskyblue1, deepskyblue2,  deepskyblue3,
 deepskyblue4, dimgray, dodgerblue, dodgerblue1, dodgerblue2, dodgerblue3,
@@ -1051,14 +1047,14 @@ green1, green2, green3, green4, greenyellow, grey1, grey2, grey3, grey4,
 honeydew, honeydew1, honeydew2, honeydew3, honeydew4, hotpink, hotpink1,
 hotpink2, hotpink3, hotpink4, indianred, indianred1, indianred2, indianred3,
 indianred4, indigo, ivory, ivory1, ivory2, ivory3, ivory4, khaki, khaki1,
-khaki2, khaki3, khaki4, lavender, lavenderblush,  lavenderblush1, 
+khaki2, khaki3, khaki4, lavender, lavenderblush,  lavenderblush1,
 lavenderblush2, lavenderblush3, lavenderblush4, lawngreen, lemonchiffon,
 lemonchiffon1, lemonchiffon2, lemonchiffon3, lemonchiffon4, light,
 lightblue, lightblue1, lightblue2, lightblue3,lightblue4, lightcoral,
 lightcyan, lightcyan1, lightcyan2, lightcyan3, lightcyan4, lightgoldenrod,
 lightgoldenrod1, lightgoldenrod2, lightgoldenrod3, lightgoldenrod4,
 lightgray, lightgreen, lightpink, lightpink1, lightpink2, lightpink3,
-lightpink4, lightpurple, lightsalmon, lightsalmon1, lightsalmon2, 
+lightpink4, lightpurple, lightsalmon, lightsalmon1, lightsalmon2,
 lightsalmon3, lightsalmon4, lightseagreen, lightskyblue, lightskyblue1,
 lightskyblue2, lightskyblue3, lightskyblue4, lightslateblue, lightslategray,
 lightsteelblue, lightsteelblue1, lightsteelblue2, lightsteelblue3,
@@ -1070,7 +1066,7 @@ mediumorchid3, mediumorchid4, mediumpurple, mediumpurple1, mediumpurple2,
 mediumpurple3, mediumpurple4, mediumseagreen, mediumslateblue,
 mediumspringgreen, mediumturquoise, mediumvioletred, midnightblue,
 mintcream, mistyrose, mistyrose1, mistyrose2, mistyrose3, mistyrose4,
-moccasin, navajowhite, navajowhite1, navajowhite2, navajowhite3, 
+moccasin, navajowhite, navajowhite1, navajowhite2, navajowhite3,
 navajowhite4, navy, navyblue, oldlace, olive, olivedrab, olivedrab1,
 olivedrab2, olivedrab3, olivedrab4, orange, orange1, orange2, orange3,
 orange4, orangered, orangered1, orangered2, orangered3, orangered4,
@@ -1081,7 +1077,7 @@ palevioletred, palevioletred1, palevioletred2, palevioletred3,
 palevioletred4, papayawhip, peachpuff, peachpuff1, peachpuff2, peachpuff3,
 peachpuff4, peru, pink1, pink2, pink3, pink4, plum1, plum2, plum3, plum4,
 powderblue, purple1, purple2, purple3, purple4, rebeccapurple, red1, red2,
-red3, red4, rosybrown, rosybrown1, rosybrown2, rosybrown3, rosybrown4,  
+red3, red4, rosybrown, rosybrown1, rosybrown2, rosybrown3, rosybrown4,
 royalblue, royalblue1, royalblue2, royalblue3, royalblue4, saddlebrown,
 salmon, salmon1, salmon2, salmon3, salmon4, sandybrown, seagreen,
 seagreen1, seagreen2, seagreen3, seagreen4, seashell, seashell1, seashell2,
@@ -1089,15 +1085,15 @@ seashell3, seashell4, sienna, sienna1, sienna2, sienna3, sienna4, silver,
 skyblue, skyblue1, skyblue2, skyblue3, skyblue4, slateblue, slateblue1,
 slateblue2, slateblue3, slateblue4, slategray, slategray1, slategray2,
 slategray3, slategray4, snow, snow1, snow2, snow3, snow4, springgreen,
-springgreen1, springgreen2, springgreen3, springgreen4, steelblue, 
+springgreen1, springgreen2, springgreen3, springgreen4, steelblue,
 steelblue1, steelblue2, steelblue3, steelblue4, tan, tan1, tan2, tan3,
 tan4, teal, thistle, thistle1, thistle2, thistle3, thistle4, tomato,
-tomato1, tomato2, tomato3, tomato4, turquoise, turquoise1, turquoise2, 
-turquoise3, turquoise4, violet, violetred, violetred1, violetred2, 
+tomato1, tomato2, tomato3, tomato4, turquoise, turquoise1, turquoise2,
+turquoise3, turquoise4, violet, violetred, violetred1, violetred2,
 violetred3, violetred4, wheat, wheat1, wheat2, wheat3, wheat4, whitesmoke,
 yellow1, yellow2, yellow3, yellow4, yellowgreen
 
-marsala, radiandorchid, emerald, tangerinetango, honeysucle, turquoise, 
+marsala, radiandorchid, emerald, tangerinetango, honeysucle, turquoise,
 mimosa, blueizis, chilipepper, sanddollar, blueturquoise, tigerlily,
 aquasky, truered, fuchsiarose, ceruleanblue, rosequartz, peachecho,
 serenity, snorkelblue, limpetshell, lilacgrey, icedcoffee, fiesta,
@@ -1106,15 +1102,15 @@ warmtaupe, dustycedar, lushmeadow, spicymustard, pottersclay, bodacious,
 greenery, niagara, primroseyellow, lapisblue, flame, islandparadise,
 paledogwood, pinkyarrow, kale, hazelnut, grenadine, balletslipper,
 butterum, navypeony, neutralgray, shadedspruce, goldenlime, marina,
-autumnmaple, meadowlark, cherrytomato, littleboyblue, chilioil, 
-pinklavender, bloomingdahlia, arcadia, ultraviolet, emperador, 
+autumnmaple, meadowlark, cherrytomato, littleboyblue, chilioil,
+pinklavender, bloomingdahlia, arcadia, ultraviolet, emperador,
 almostmauve, springcrocus, sailorblue, harbormist, warmsand, coconutmilk,
 redpear, valiantpoppy, nebulasblue,  ceylonyellow, martiniolive,
-russetorange, crocuspetal, limelight, quetzalgreen, sargassosea, tofu, 
-almondbuff, quietgray, meerkat, fiesta, jesterred, turmeric, livingcoral, 
-pinkpeacock, pepperstem, aspengold, princessblue, toffee, mangomojito, 
-terrariummoss, sweetlilac, soybean, eclipse, sweetcorn, browngranite, 
-chilipepper, bikingred, peachpink, rockyroad, fruitdove, sugaralmond, 
+russetorange, crocuspetal, limelight, quetzalgreen, sargassosea, tofu,
+almondbuff, quietgray, meerkat, fiesta, jesterred, turmeric, livingcoral,
+pinkpeacock, pepperstem, aspengold, princessblue, toffee, mangomojito,
+terrariummoss, sweetlilac, soybean, eclipse, sweetcorn, browngranite,
+chilipepper, bikingred, peachpink, rockyroad, fruitdove, sugaralmond,
 darkcheddar, galaxyblue, bluestone, orangetiger, eden, vanillacustard,
 eveningblue, paloma, guacamole, flamescarlet, saffron, biscaygreen, chive,
 fadeddenim,   orangepeel, mosaicblue, sunlight, coralpink, grapecompote,
@@ -1133,13 +1129,15 @@ inkwell, ultimategray, buttercream, desertmist, willow
 
 =head1 SEE ALSO
 
+L<Color::Library>
+
 L<Graphics::ColorNamesLite::All>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2022 Herbert Breunung.
+Copyright 2022-23 Herbert Breunung.
 
-This program is free software; you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it
 under same terms as Perl itself.
 
 =head1 AUTHOR

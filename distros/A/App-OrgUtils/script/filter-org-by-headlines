@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-06'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.485'; # VERSION
+our $VERSION = '0.486'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FilterOrgByHeadlines/filter_org_by_headlines",
@@ -38,7 +38,7 @@ filter-org-by-headlines - Filter Org by headlines
 
 =head1 VERSION
 
-This document describes version 0.485 of filter-org-by-headlines (from Perl distribution App-OrgUtils), released on 2023-04-06.
+This document describes version 0.486 of filter-org-by-headlines (from Perl distribution App-OrgUtils), released on 2023-07-12.
 
 =head1 SYNOPSIS
 

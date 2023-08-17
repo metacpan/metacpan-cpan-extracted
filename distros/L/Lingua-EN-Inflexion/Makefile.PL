@@ -14,6 +14,7 @@ WriteMakefile(
         'Test::More'             => 0,
         'Lingua::EN::Nums2Words' => 1.16,
         'Lingua::EN::Words2Nums' => 0,
+        'match::smart'           => 0.010,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Lingua-EN-Inflexion-*' },

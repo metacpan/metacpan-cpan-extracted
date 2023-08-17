@@ -27,7 +27,7 @@ GOOGLE: {
 
 		if($@) {
 			diag('Geo::GeoNames not installed - skipping tests');
-			skip 'Geo::GeoNames not installed', 19;
+			skip('Geo::GeoNames not installed', 19);
 		} else {
 			diag("Using Geo::GeoNames $Geo::GeoNames::VERSION");
 		}
@@ -37,10 +37,10 @@ GOOGLE: {
 
 			my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
 			ok(defined($location));
-			ok(ref($location) eq 'HASH');
+			cmp_ok(ref($location), 'eq', 'HASH', 'Location is a hash');
 			delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 			delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
-			is(ref($location->{'geocoder'}), 'Geo::GeoNames', 'Verify Google encoder is used');
+			is(ref($location->{'geocoder'}), 'Geo::GeoNames', 'Verify Geonames encoder is used');
 
 			$location = $geocoderlist->geocode('Silver Spring, MD, USA');
 			ok(defined($location));
@@ -54,7 +54,7 @@ GOOGLE: {
 
 			$location = $geocoderlist->geocode({ location => 'Rochester, Kent, England' });
 			ok(defined($location));
-			ok(ref($location) eq 'HASH');
+			cmp_ok(ref($location), 'eq', 'HASH', 'Location is a hash');
 			delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
 			delta_within($location->{geometry}{location}{lng}, 0.5067, 1e-1);
 

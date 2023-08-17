@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostUngroupWorksheetColumnsRequest.name :   ,
-# PostUngroupWorksheetColumnsRequest.sheetName :   ,
-# PostUngroupWorksheetColumnsRequest.firstIndex :   ,
-# PostUngroupWorksheetColumnsRequest.lastIndex :   ,
-# PostUngroupWorksheetColumnsRequest.folder :   ,
-# PostUngroupWorksheetColumnsRequest.storageName :    
+# PostUngroupWorksheetColumnsRequest.name : The workbook name.  ,
+# PostUngroupWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostUngroupWorksheetColumnsRequest.firstIndex : The first column index to be operated.  ,
+# PostUngroupWorksheetColumnsRequest.lastIndex : The last column index to be operated.  ,
+# PostUngroupWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PostUngroupWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_ungroup_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Ungroup worksheet columns.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'first_index' => {
      	datatype => 'int',
      	base_name => 'firstIndex',
-     	description => '',
+     	description => 'The first column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'last_index' => {
      	datatype => 'int',
      	base_name => 'lastIndex',
-     	description => '',
+     	description => 'The last column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

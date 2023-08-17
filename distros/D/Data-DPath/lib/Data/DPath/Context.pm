@@ -1,7 +1,7 @@
 package Data::DPath::Context;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a current context that enables incremental searches
-$Data::DPath::Context::VERSION = '0.58';
+$Data::DPath::Context::VERSION = '0.59';
 use strict;
 use warnings;
 
@@ -28,7 +28,6 @@ BEGIN {
 
         $COMPARTMENT = Safe->new;
         $COMPARTMENT->permit(qw":base_core");
-        $COMPARTMENT->reval( 'no warnings;' ); # just so warnings is loaded
         if ($] >= 5.010) {
             $COMPARTMENT->deny(qw":load");
         } else {
@@ -209,7 +208,7 @@ sub _filter_points_eval
                                                        # on later Perls, ^W doesn't do the whole trick, so explicitly turn
                                                        # all warnings off.  need to do this in a BEGIN, as some warnings
                                                        # are compile time only.
-                                                       $res = $COMPARTMENT->reval('BEGIN{ warnings->unimport}; local $^W;'.$filter);
+                                                       $res = $COMPARTMENT->reval('BEGIN{ ${^WARNING_BITS} = "" }; local $^W;'.$filter);
                                                } else {
                                                        # 'uninitialized' values are the norm
                                                        no warnings 'uninitialized';
@@ -609,7 +608,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Steffen Schwigon.
+This software is copyright (c) 2023 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

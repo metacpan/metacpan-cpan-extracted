@@ -11,7 +11,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Scalar our $NUMBER_OF_BOXES => 7;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -65,6 +65,20 @@ sub new {
 	return $self;
 }
 
+sub _css_class {
+	my ($self, $suffix) = @_;
+
+	return $self->{'css_pager'}.'-'.$suffix;
+}
+
+sub _css_colors_optional {
+	my ($self, $css_color, $css_key) = @_;
+
+	return defined $self->{'css_colors'}->{$css_color}
+		? (['d', $css_key, $self->{'css_colors'}->{$css_color}])
+		: ();
+}
+
 sub _process {
 	my ($self, $pages_hr) = @_;
 
@@ -109,7 +123,7 @@ sub _process {
 
 			$self->{'tags'}->put(
 				['b', 'a'],
-				['a', 'href', $self->{'url_page_cb'}->(1)],
+				['a', 'href', $self->{'url_page_cb'}->(1, $pages_hr)],
 				['d', 1],
 				['e', 'a'],
 
@@ -143,7 +157,7 @@ sub _process {
 			} else {
 				$self->{'tags'}->put(
 					['b', 'a'],
-					['a', 'href', $self->{'url_page_cb'}->($button_num)],
+					['a', 'href', $self->{'url_page_cb'}->($button_num, $pages_hr)],
 					['d', $button_num],
 					['e', 'a'],
 				);
@@ -158,7 +172,7 @@ sub _process {
 				['e', 'span'],
 
 				['b', 'a'],
-				['a', 'href', $self->{'url_page_cb'}->($pages_hr->{'pages_num'})],
+				['a', 'href', $self->{'url_page_cb'}->($pages_hr->{'pages_num'}, $pages_hr)],
 				['d', $pages_hr->{'pages_num'}],
 				['e', 'a'],
 			);
@@ -188,7 +202,7 @@ sub _process {
 			$prev ? (
 				['b', 'a'],
 				['a', 'class', $self->_css_class('prev')],
-				['a', 'href', $self->{'url_page_cb'}->($prev)],
+				['a', 'href', $self->{'url_page_cb'}->($prev, $pages_hr)],
 				['d', decode_utf8('←')],
 				['e', 'a'],
 			) : (
@@ -202,7 +216,7 @@ sub _process {
 			$next ? (
 				['b', 'a'],
 				['a', 'class', $self->_css_class('next')],
-				['a', 'href', $self->{'url_page_cb'}->($next)],
+				['a', 'href', $self->{'url_page_cb'}->($next, $pages_hr)],
 				['d', decode_utf8('→')],
 				['e', 'a'],
 			) : (
@@ -288,20 +302,6 @@ sub _process_css {
 	return;
 }
 
-sub _css_class {
-	my ($self, $suffix) = @_;
-
-	return $self->{'css_pager'}.'-'.$suffix;
-}
-
-sub _css_colors_optional {
-	my ($self, $css_color, $css_key) = @_;
-
-	return defined $self->{'css_colors'}->{$css_color}
-		? (['d', $css_key, $self->{'css_colors'}->{$css_color}])
-		: ();
-}
-
 1;
 
 __END__
@@ -319,7 +319,7 @@ Tags::HTML::Pager - Tags helper for pager.
  use Tags::HTML::Pager;
 
  my $obj = Tags::HTML::Pager->new(%params);
- $obj->process($pager_hr);
+ $obj->process($pages_hr);
  $obj->process_css;
 
 =head1 METHODS
@@ -377,7 +377,19 @@ Default value is 1.
 
 Callback for creating of url for view page.
 
-Input argument is page variable with number of page.
+Input arguments are:
+
+=over
+
+=item * C<$page_number>
+
+Page variable with number of page.
+
+=item * C<$pages_hr>
+
+Reference to array which is going to L</process>.
+
+=back
 
 It's required parameter.
 
@@ -391,7 +403,7 @@ Default value is undef.
 
 =head2 C<process>
 
- $obj->process($pager_hr);
+ $obj->process($pages_hr);
 
 Process Tags structure for output with pager.
 
@@ -531,12 +543,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

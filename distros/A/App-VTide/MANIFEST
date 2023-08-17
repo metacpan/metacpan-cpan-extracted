@@ -24,6 +24,7 @@ lib/App/VTide/Sessions.pm
 lib/App/VTide/Config.pm
 lib/App/VTide/Configuration.pod
 lib/App/VTide/Hooks.pm
+lib/App/VTide/Sessions.pm
 LICENSE
 MANIFEST
 META.json

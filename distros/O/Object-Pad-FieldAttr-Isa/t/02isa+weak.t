@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000147;  # is_oneref
 
 use Object::Pad;
 use Object::Pad::FieldAttr::Isa;
@@ -12,7 +11,7 @@ use Object::Pad::FieldAttr::Isa;
 my $arr = [];
 
 class WithWeak {
-   has $slot :writer :param :weak :Isa(ARRAY);
+   field $slot :writer :param :weak :Isa(ARRAY);
 }
 
 is_oneref( $arr, '$arr has one reference before we start' );

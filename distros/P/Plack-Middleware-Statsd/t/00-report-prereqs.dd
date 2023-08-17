@@ -30,11 +30,11 @@ do { my $x = {
                                         'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
-                                      'Feature::Compat::Try' => '0',
                                       'List::Util' => '0',
                                       'Plack::Middleware' => '0',
                                       'Ref::Util' => '0',
                                       'Time::HiRes' => '0',
+                                      'Try::Tiny' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.14.0',
                                       'warnings' => '0'

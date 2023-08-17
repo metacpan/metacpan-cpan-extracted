@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Acme::Bleach" : "0",
             "Carp" : "1.2",
             "File::Basename" : "0",
             "FindBin" : "1.3",
@@ -34,16 +35,17 @@
    "provides" : {
       "Acme::Cavaspazi" : {
          "file" : "lib/Acme/Cavaspazi.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "https://metacpan.org/pod/Acme::Cavaspazi",
       "repository" : {
-         "url" : "https://github.com/telatin/FASTX-Reader"
+         "url" : "https://github.com/telatin/Acme-Cavaspazi"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

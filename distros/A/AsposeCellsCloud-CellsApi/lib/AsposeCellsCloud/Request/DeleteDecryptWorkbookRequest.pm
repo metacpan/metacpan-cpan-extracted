@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# DeleteDecryptWorkbookRequest.name :   ,
-# DeleteDecryptWorkbookRequest.encryption :   ,
-# DeleteDecryptWorkbookRequest.folder :   ,
-# DeleteDecryptWorkbookRequest.storageName :    
+# DeleteDecryptWorkbookRequest.name : The workbook name.  ,
+# DeleteDecryptWorkbookRequest.encryption : Encryption settings, only password can be specified.  ,
+# DeleteDecryptWorkbookRequest.folder : Original workbook folder.  ,
+# DeleteDecryptWorkbookRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_decrypt_workbook' } = { 
-    	summary => '',
+    	summary => 'Decrypts workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'encryption' => {
      	datatype => 'WorkbookEncryptionRequest',
      	base_name => 'encryption',
-     	description => '',
+     	description => 'Encryption settings, only password can be specified.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

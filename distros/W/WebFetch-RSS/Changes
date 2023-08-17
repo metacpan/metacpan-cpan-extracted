@@ -1,5 +1,17 @@
 Revision history for WebFetch::Input::RSS
 
+0.3.2 2023-07-30T23:56:13-07:00 America/Los_Angeles
+ [REVISION]
+ - undo minimum Perl 5.10: conditionally use 'version' on older Perls
+
+0.3.1 2023-07-24T09:13:08-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - update version numbers in 'use' statements to v-notation due to
+   incompatible change in 5.39.1 import()
+
+ [REVISION]
+ - minimum Perl version to 5.10 for version object dependency
+
 0.3.0 2022-10-25T23:42:57-07:00 America/Los_Angeles
  [MINOR]
  - renamed WebFetch::Input::RSS to WebFetch::RSS since the code reorg is

@@ -6,6 +6,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+TODO
 bin/storage-merge-dots
 bin/storage2dot
 data/Makefile
@@ -15,9 +16,6 @@ data/aya.ref.dot
 data/dahu-node.rawcmd
 data/dahu-node.ref.data
 data/dahu-node.ref.dot
-data/di138099su.rawcmd
-data/di138099su.ref.data
-data/di138099su.ref.dot
 data/ge91097.rawcmd
 data/ge91097.ref.data
 data/ge91097.ref.dot

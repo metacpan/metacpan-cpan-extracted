@@ -109,6 +109,16 @@ sub data {
   return ${"${name}::META"};
 }
 
+sub emit {
+  my ($self, $hook, @args) = @_;
+
+  my $name = $self->{name};
+
+  $hook = uc $hook;
+
+  return $name->$hook(@args);
+}
+
 sub find {
   my ($self, $type, $name) = @_;
 
@@ -621,6 +631,31 @@ I<Since C<1.00>>
   #     ]
   #   }
   # }
+
+=back
+
+=cut
+
+=head2 emit
+
+  emit(Str $name, Any @args) (Any)
+
+The emit method invokes the lifecycle hook specified on the underlying package
+and returns the result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item emit example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $result = $meta->emit('attr', 'mname');
+
+  # "User"
 
 =back
 

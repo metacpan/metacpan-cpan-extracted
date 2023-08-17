@@ -23,14 +23,14 @@ my $test_dir = catdir(@path, 'test');
 my $local_dir = catdir(@path, 'test', 'here');
 my $remote_dir = catdir(@path, 'test', 'there');
 
-rmtree($test_dir) if -e $test_dir;
+rmtree($test_dir, 0, 1) if -e $test_dir;
 
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+mkdir($test_dir) unless -e $test_dir;
+ 
 mkdir $local_dir or die $!;
-chmod 0755, $local_dir;
+  
 mkdir $remote_dir or die $!;
-chmod 0755, $remote_dir;
+  
 
 chdir $local_dir or die $!;
 

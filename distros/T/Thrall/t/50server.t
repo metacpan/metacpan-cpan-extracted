@@ -5,14 +5,8 @@ use warnings;
 
 BEGIN { delete $ENV{http_proxy} }
 
-# workaround for HTTP::Tiny + Test::TCP
-BEGIN { $INC{'threads.pm'} = 0 }
-sub threads::tid { }
-use HTTP::Tiny;
+use LWP::UserAgent;
 use Test::TCP;
-BEGIN { delete $INC{'threads.pm'} }
-BEGIN { $SIG{__WARN__} = sub { warn @_ if not $_[0] =~ /^Subroutine tid redefined/ } }
-
 use Test::More;
 
 use Thrall::Server;
@@ -22,8 +16,8 @@ if ($^O eq 'MSWin32' and $] >= 5.016 and $] < 5.019005 and not $ENV{PERL_TEST_BR
     exit 0;
 }
 
-if ($^O eq 'cygwin' and not $ENV{PERL_TEST_BROKEN}) {
-    plan skip_all => 'Broken on cygwin';
+if ($^O eq 'cygwin' and not eval { require Win32::Process; }) {
+    plan skip_all => 'Win32::Process required';
     exit 0;
 }
 
@@ -31,21 +25,28 @@ test_tcp(
     client => sub {
         my $port = shift;
         sleep 1;
-        my $ua = HTTP::Tiny->new;
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(10);
         my $res = $ua->get("http://127.0.0.1:$port/");
-        ok $res->{success};
-        like $res->{headers}{server}, qr/Thrall/;
-        like $res->{content}, qr/Hello/;
+
+        ok $res->is_success, 'is_success';
+        is $res->code, '200', 'code';
+        is $res->message, 'OK', 'message';
+        like $res->header('server'), qr/Thrall/, 'server in headers';
+        like $res->content, qr/Hello/, 'content';
+
         sleep 1;
     },
     server => sub {
         my $port = shift;
         Thrall::Server->new(
-            quiet    => 1,
-            host     => '127.0.0.1',
-            port     => $port,
+            quiet => 1,
+            host  => '127.0.0.1',
+            port  => $port,
+            ipv6  => 0,
         )->run(
-            sub { [ 200, [], ["Hello world\n"] ] },
+            sub { [200, [], ["Hello world\n"]] },
         );
     }
 );

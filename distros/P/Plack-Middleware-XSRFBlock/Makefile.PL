@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.012;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-Middleware-XSRFBlock",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Plack::Middleware::XSRFBlock",
   "PREREQ_PM" => {
     "Digest::HMAC_SHA1" => 0,
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.0.17",
+  "VERSION" => "0.0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }

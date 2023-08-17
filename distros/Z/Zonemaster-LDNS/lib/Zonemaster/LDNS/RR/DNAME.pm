@@ -17,6 +17,10 @@ A subclass of L<Zonemaster::LDNS::RR>, so it has all the methods of that class a
 
 =head1 METHODS
 
-No RDATA methods implemented yet.
+=over
 
-=cut
+=item dname()
+
+Returns the delegation name, i.e. the <target> field from the RDATA of a DNAME record.
+
+=back

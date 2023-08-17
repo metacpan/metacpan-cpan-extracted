@@ -11,7 +11,7 @@ require Exporter;
 use base qw/Exporter/;
 our @EXPORT_OK = qw/__lock __store __retrieve/;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use Fcntl qw(:DEFAULT :flock);
 use Storable;

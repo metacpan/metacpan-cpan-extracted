@@ -13,7 +13,7 @@ on test => sub {
     requires 'Capture::Tiny';
     requires 'Try::Tiny';
     requires 'CGI';
-    requires 'Switch';
+    requires 'Filter::Util::Call';
     requires 'Sub::Identify';
 };
 

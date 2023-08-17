@@ -8,9 +8,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-28'; # DATE
+our $DATE = '2023-07-13'; # DATE
 our $DIST = 'Debian-Releases-PERLANCAR'; # DIST
-our $VERSION = '20221228.0'; # VERSION
+our $VERSION = '20230713.0'; # VERSION
 
 our @EXPORT_OK = qw(
                        list_debian_releases
@@ -319,6 +319,23 @@ our $data = do {
      ruby_version         => undef,
      version              => 11,
    },
+   {
+     apache_httpd_version => "2.4.57",
+     bash_version         => "5.2.15",
+     code_name            => "bookworm",
+     eoldate              => undef,
+     linux_version        => "6.1.27",
+     mariadb_version      => "10.11.3",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.36.0",
+     php_version          => "8.2.5",
+     postgresql_version   => 15.3,
+     python_version       => "3.11.2",
+     reldate              => "2023-06-10",
+     ruby_version         => undef,
+     version              => 12,
+   },
  ]
 };
 
@@ -345,7 +362,7 @@ Debian::Releases::PERLANCAR - List Debian releases
 
 =head1 VERSION
 
-This document describes version 20221228.0 of Debian::Releases::PERLANCAR (from Perl distribution Debian-Releases-PERLANCAR), released on 2022-12-28.
+This document describes version 20230713.0 of Debian::Releases::PERLANCAR (from Perl distribution Debian-Releases-PERLANCAR), released on 2023-07-13.
 
 =head1 SYNOPSIS
 
@@ -1132,7 +1149,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

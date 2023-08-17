@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use autodie;
 
 use Cwd qw( getcwd abs_path );
 use File::Path qw( make_path );
@@ -63,7 +62,7 @@ subtest 'none' => sub {
     touch_file "$tmpdir/bar.txt";
 
     my @events = fetch_events($fs, $fh);
-    is scalar(@events), 1, "one event, because it's coalesced";
+    is scalar(@events), 2;
     like $events[0]->path, qr/^\Q$tmp_abs/;
 };
 

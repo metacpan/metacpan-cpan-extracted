@@ -1,3 +1,11 @@
+0.010 2023-07-21 17:33:29-0400
+
+  Build changes
+
+   - Apply patches from upstream libzmq that are needed to support various
+     newer compilers until there is a new upstream release.
+     See <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/pull/16>.
+
 0.009 2022-09-14 15:26:40-0400
 
   Build changes

@@ -1,0 +1,12 @@
+Changes
+flower.xpm
+lib/Tk/YADialog.pm
+lib/Tk/YAMessage.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/01-Tk-YADialog.t
+t/02-Tk-YAMessage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Structured;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message::Field::Full';
 
@@ -70,9 +70,12 @@ sub attrPairs() { map +($_->name, $_->value), shift->attributes }
 sub parse($)
 {   my ($self, $string) = @_;
 
-    # remove FWS, even within quoted strings
-    $string =~ s/\r?\n\s?/ /gs;
-	$string =~ s/ +$//;
+    for($string)
+    {   # remove FWS, even within quoted strings
+        s/\r?\n(\s)/$1/gs;
+        s/\r?\n/ /gs;
+	    s/\s+$//;
+    }
 
     my $datum = '';
     while(length $string && substr($string, 0, 1) ne ';')

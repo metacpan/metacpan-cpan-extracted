@@ -1,0 +1,114 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use SNMP_Session "0.58";
+use BER;
+use Socket;
+
+my $mrouters =
+[
+ 'public@it-ws.ten-34.net:9161',
+ 'public@de-ws.ten-34.net',
+ 'public@ch-ws.ten-34.net',
+ 'public@at-ws.ten-34.net',
+ 'public@uk-ws.ten-34.net',
+ ];
+
+## Define this if you want WorkDir set in the generated configuration
+## file.
+##
+#my $work_dir = '/var/tmp/mrtg';
+
+## Define this if you want IconDir set in the generated configuration
+## file.
+##
+#my $icon_dir = '/lan/stat';
+
+## Define this if you want Directory[] set in each target.
+##
+#my $directory = 'ten-34/ipmcast';
+
+## An absolute maximum for traffic rates over tunnels, in Bytes per
+## second.  You probably don't need to change this.
+##
+my $abs_max = '100000000';
+
+my $dvmrpInterfaceType = [1,3,6,1,3,62,1,1,3,1,2];
+my $dvmrpInterfaceRemoteAddress = [1,3,6,1,3,62,1,1,3,1,5];
+my $dvmrpInterfaceMetric = [1,3,6,1,3,62,1,1,3,1,7];
+my $dvmrpInterfaceRateLimit = [1,3,6,1,3,62,1,1,3,1,8];
+my $dvmrpInterfaceInOctets = [1,3,6,1,3,62,1,1,3,1,11];
+my $dvmrpInterfaceOutOctets = [1,3,6,1,3,62,1,1,3,1,12];
+
+## Print head of configuration file
+print "WorkDir: $work_dir\n" if defined $work_dir;
+print "IconDir: $icon_dir\n" if defined $icon_dir;
+print "WriteExpires: Yes\nWeekformat[^]: V\nWithPeak[_]: wmy\n";
+
+foreach my $target (@{$mrouters}) {
+    my $session;
+    my $abs_max_bytes = $abs_max >> 3;
+    my ($community, $mrouter, $port);
+
+    if ($target =~ /^(.*)@(.*):([0-9]+)$/) {
+	$community = $1; $mrouter = $2; $port = $3;
+    } elsif ($target =~ /^(.*)@(.*)$/) {
+	$community = $1; $mrouter = $2; $port = 161;
+    } else {
+	warn "Malformed target $target\n";
+	next;
+    }
+    $session = SNMP_Session->open ($mrouter, $community, $port)
+	|| (warn ("Opening SNMP session to $mrouter\n"), next);
+
+    my $snmp_target = $community.'@'.$mrouter;
+    $snmp_target .= ":".$port
+	unless $port == 161;
+    print "\n\nTarget[$mrouter-mroutes]:
+    1.3.6.1.3.62.1.1.9.0&1.3.6.1.3.62.1.1.10.0:$snmp_target\n";
+    print "Directory[$mrouter-mroutes]: $directory\n"
+	if defined $directory;
+    print <<EOM
+MaxBytes[$mrouter-mroutes]: 8000
+AbsMax[$mrouter-mroutes]: 100000
+Options[$mrouter-mroutes]: growright,gauge,nopercent
+ShortLegend[$mrouter-mroutes]: routes
+YLegend[$mrouter-mroutes]: # of routes
+Title[$mrouter-mroutes]: Multicast routes on $mrouter
+PageTop[$mrouter-mroutes]: <hr><H3>Multicast routes on $mrouter</H3>
+Legend1[$mrouter-mroutes]: # reachable DVMRP routes
+Legend2[$mrouter-mroutes]: # DVMRP routing table entries
+Legend3[$mrouter-mroutes]: max # reachable routes
+Legend4[$mrouter-mroutes]: max # routing table entries
+LegendI[$mrouter-mroutes]: &nbsp;reachable
+LegendO[$mrouter-mroutes]: &nbsp;total
+EOM
+    eval {
+	$session->map_table
+	([$dvmrpInterfaceType, $dvmrpInterfaceRemoteAddress,
+	  $dvmrpInterfaceMetric, $dvmrpInterfaceRateLimit], sub
+	 { 
+	     my ($index, $type, $peer_addr, $metric, $rate_limit) = @_;
+	     grep (defined $_ && ($_=pretty_print $_),
+		   ($type, $peer_addr, $metric, $rate_limit));
+	     my $rate_limit_bytes = $rate_limit * 1000 >> 3;
+	     ## ignore interfaces other than tunnels for now
+	     return unless $type == 1;
+	     my $peer_name = gethostbyaddr(pack ("C4",split ('\.',$peer_addr)),
+					   AF_INET)
+		 || $peer_addr;
+	     my $graph_name = $mrouter.'-'.$peer_name;
+		 print <<EOM;
+
+Target[$graph_name]: 1.3.6.1.3.62.1.1.3.1.11.$index&1.3.6.1.3.62.1.1.3.1.12.$index:$snmp_target
+PageTop[$graph_name]: <hr><H3>Tunnel $mrouter -> $peer_name (metric $metric)</H3>
+Options[$graph_name]: growright,bits
+MaxBytes[$graph_name]: $rate_limit_bytes
+AbsMax[$graph_name]: $abs_max_bytes
+Title[$graph_name]: Mbone Tunnel from $mrouter to $peer_name
+EOM
+    print "Directory[$graph_name]: $directory\n"
+	if $directory;
+	 }) };
+    $session->close ();
+}

@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.8';
+$VERSION = '0.0.9';
 
 1;
 
@@ -24,14 +24,14 @@ C<Bundle::DadaMailXXL> will pull modules listed in C<Bundle::DadaMail::IncludedI
 
 =head1 See Also
 
-L<http://dadamailproject.com>
+L<https://dadamailproject.com>
 
 L<https://github.com/justingit/Bundle-DadaMailXXL>
 
 
 =head1 CONTENTS
 
-AWS:Signature4 - used for Amazon SES 
+AWS::Signature4 - used for Amazon SES 
 
 CSS::Inliner - Used in inlining CSS in HTML email messages. Important for making sure HTML messages look correctly in most all readers.
 

@@ -1,5 +1,3 @@
-# $Id: AuthMgr.pm,v 1.7 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::AuthMgr;
 use strict;
 use warnings;
@@ -60,7 +58,10 @@ sub init {
         unless $packet->type == SSH2_MSG_SERVICE_ACCEPT;
     $ssh->debug("Service accepted: " . $packet->get_str . ".");
 
-    $amgr->{agent} = Net::SSH::Perl::Agent->new(2);
+    if (!$ssh->config->get('identities_only')) {
+    	$amgr->{agent} = Net::SSH::Perl::Agent->new(2);
+    }
+
     $amgr->{service} = "ssh-connection";
 
     $amgr->send_auth_none;

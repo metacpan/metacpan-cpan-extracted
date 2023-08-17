@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -35,8 +39,9 @@
             "Digest::SHA" : "5.00",
             "Math::BigInt" : "1.80",
             "Socket" : "1.50",
+            "YAML::PP" : "0.03",
             "bytes" : "1.00",
-            "perl" : "5.010001"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -48,15 +53,23 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jhthorsen/docsis-configfile/issues"
+         "web" : "https://github.com/jhthorsen/docsis::configfile/issues"
       },
-      "homepage" : "https://github.com/jhthorsen/docsis-configfile",
+      "homepage" : "https://github.com/jhthorsen/docsis::configfile",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jhthorsen/docsis-configfile.git",
-         "web" : "https://github.com/jhthorsen/docsis-configfile"
+         "url" : "https://github.com/jhthorsen/docsis::configfile.git",
+         "web" : "https://github.com/jhthorsen/docsis::configfile"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.76",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,4 +1,11 @@
 Revision history for Object-Pad-Keyword-Accessor
 
+0.02    2023-07-19
+        [CHANGES]
+         * Back-compat to perl v5.22+ by providing a `newSVsv_nomg()` wrapper
+         * Swap all of the unit tests from `Test::More` to `Test2::V0`
+         * Remember to implement `no ...` to disable the syntax
+         * Updates for XPK v0.35: Renamed container macros `XPK_PARENS` etc
+
 0.01    2022-12-03
         First version, released on an unsuspecting world.

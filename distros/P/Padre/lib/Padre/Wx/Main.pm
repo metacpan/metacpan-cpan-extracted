@@ -60,7 +60,7 @@ use Padre::Wx::Role::Timer    ();
 use Padre::Wx::Role::Idle     ();
 use Padre::Locale::T;
 use Padre::Logger;
-our $VERSION    = '1.00';
+our $VERSION    = '1.02';
 our $COMPATIBLE = '0.91';
 our @ISA        = qw{
 	Padre::Wx::Role::Conduit
@@ -5561,7 +5561,7 @@ sub on_prev_pane {
 
     $main->on_join_lines;
 
-Join current line with next one (à la B<vi> with C<Ctrl+J>). No return value.
+Join current line with next one (a la B<vi> with C<Ctrl+J>). No return value.
 
 =cut
 
@@ -6937,7 +6937,7 @@ sub backup {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
@@ -6947,7 +6947,7 @@ LICENSE file included with this module.
 
 =cut
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

@@ -4,7 +4,7 @@
       "Graham Bell <graham.s.bell@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "gpl_3"
    ],
@@ -35,23 +35,23 @@
    "provides" : {
       "Alien::Taco" : {
          "file" : "lib/Alien/Taco.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Alien::Taco::Object" : {
          "file" : "lib/Alien/Taco/Object.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Alien::Taco::Server" : {
          "file" : "lib/Alien/Taco/Server.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Alien::Taco::Transport" : {
          "file" : "lib/Alien/Taco/Transport.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Alien::Taco::Util" : {
          "file" : "lib/Alien/Taco/Util.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "http://opensource.org/licenses/gpl-3.0.html"
       ]
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

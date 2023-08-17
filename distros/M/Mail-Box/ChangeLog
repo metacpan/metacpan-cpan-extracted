@@ -1,6 +1,11 @@
 
 ===== ChangeLog of distribution Mail-Box version 3.*
 
+version 3.010: Tue 18 Jul 09:24:24 CEST 2023
+
+	Fixes:
+	- upgrade tests to match Mail::Message 3.013
+
 version 3.009: Tue 18 Aug 09:49:44 CEST 2020
 
 	Improvements:

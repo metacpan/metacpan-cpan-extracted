@@ -11,11 +11,9 @@ SUBROUTINES
              Output affects $Error::Pure::Output::JSON::PRETTY variable.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::JSON qw(err);
 
      # Error.
@@ -25,11 +23,9 @@ EXAMPLE1
      # [{"msg":["1"],"stack":[{"sub":"err","prog":"example1.pl","args":"(1)","class":"main","line":11}]}]
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::JSON qw(err);
 
      # Error.
@@ -39,11 +35,9 @@ EXAMPLE2
      # [{"msg":["1","2","3"],"stack":[{"sub":"err","prog":"example2.pl","args":"(1, 2, 3)","class":"main","line":11}]}]
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Output::JSON;
      use Error::Pure::JSON qw(err);
 
@@ -80,17 +74,18 @@ SEE ALSO
         Install the Error::Pure modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-JSON>
+    <https://github.com/michal-josef-spacek/Error-Pure-JSON>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2013-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

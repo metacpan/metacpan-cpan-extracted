@@ -22,9 +22,14 @@ my $s = $driver->session;  # only for autocommit transactions
 # https://metacpan.org/pod/Cpanel::JSON::XS#JSON-%3E-PERL
 # https://metacpan.org/pod/Mojo::JSON::MaybeXS#Upgraded-Numbers
 
-use Test::More 0.96 tests => 4 + 5 + 3 + 2;
+use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warnings);
+use Test::Warnings 0.010 qw(warnings :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
+
+plan tests => 4 + 5 + 3 + 1 + $no_warnings;
+
 use JSON::PP ();
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
@@ -145,8 +150,10 @@ subtest 'Structural types: node meta data and props' => sub {
 	ok defined($id = $r0->get('id(n1)')), 'get node 1 id';
 	is ref $n1, 'Neo4j::Driver::Type::Node', 'node 1 blessed';
 	is ref $n2, 'Neo4j::Driver::Type::Node', 'node 2 blessed';
+	{ no warnings 'deprecated';  # id()
 	is $n1->id, $id, 'node 1 id matches';
 	isnt $n2->id, $n1->id, 'node 2 id distinct';
+	}
 	is $n1->get('test'), 'node1', 'node 1 get';
 	is $n2->properties->{test}, 'node2', 'node 2 properties';
 	ok grep(m/^Test$/, $n1->labels), 'node 1 label';
@@ -166,12 +173,14 @@ subtest 'Structural types: relation meta data and props' => sub {
 	ok my $e2 = $r0->get('e2'), 'get rel 2';
 	is ref $e1, 'Neo4j::Driver::Type::Relationship', 'rel 1 blessed';
 	is ref $e2, 'Neo4j::Driver::Type::Relationship', 'rel 2 blessed';
+	{ no warnings 'deprecated';  # id()
 	is $e1->id, $r0->get('id(e1)'), 'rel 1 id matches';
 	isnt $e2->id, $e1->id, 'rel 2 id distinct';
 	is $e1->properties->{test}, 'rel1', 'rel 1 properties';
 	is $e2->get('test'), 'rel2', 'rel 2 get';
 	is $e1->start_id, $n1->id, 'rel 1 start id';
 	is $e2->end_id, $n2->id, 'rel 2 end id';
+	}
 	is $e1->type, 'TEST', 'rel 1 type';
 };
 
@@ -191,9 +200,11 @@ subtest 'Structural types: path accessors' => sub {
 		is scalar @all, 5, 'element count';
 		is ref $_, 'Neo4j::Driver::Type::Node', 'node blessed' for @nodes;
 		is ref $_, 'Neo4j::Driver::Type::Relationship', 'rel blessed' for @rels;
+		{ no warnings 'deprecated';  # id()
 		is $nodes[0]->id, $nodes[2]->id, 'path circular';
 		isnt $nodes[0]->id, $nodes[1]->id, 'nodes distinct';
 		isnt $rels[0]->id, $rels[1]->id, 'rels distinct';
+		}
 		my @all_exp = ($nodes[0], $rels[0], $nodes[1], $rels[1], $nodes[2]);
 		is_deeply \@all, \@all_exp, 'elements in path sequence';
 	}
@@ -268,9 +279,11 @@ END
 	is ref $a2, 'Neo4j::Driver::Type::Node', 'map: blessed node "a"';
 	is ref $b2, 'Neo4j::Driver::Type::Node', 'map: blessed node "b"';
 	is ref $p2, 'Neo4j::Driver::Type::Path', 'map: blessed path "p"';
+	{ no warnings 'deprecated';  # id()
 	lives_and { is $a1->id, $a2->id } 'node "a": id match';
 	lives_and { is $b1->id, $b2->id } 'node "b": id match';
 	lives_and { isnt $a1->id, $b1->id } 'nodes "a"/"b" distinct';
+	}
 };
 
 

@@ -7,7 +7,7 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -287,6 +287,16 @@ L<Class::Utils>,
 L<Error::Pure>,
 L<Tags::HTML>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<Tags::HTML::Login::Access>
+
+Tags helper for login access.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/Tags-HTML-Login-Button>
@@ -305,6 +315,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

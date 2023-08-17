@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::nowsp;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: nowsp canonicalization
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -57,7 +57,7 @@ Mail::DKIM::Canonicalization::nowsp - nowsp canonicalization
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 AUTHORS
 

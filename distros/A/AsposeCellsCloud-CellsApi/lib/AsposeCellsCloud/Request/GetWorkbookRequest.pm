@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# GetWorkbookRequest.name :   ,
-# GetWorkbookRequest.format :   ,
-# GetWorkbookRequest.password :   ,
-# GetWorkbookRequest.isAutoFit :   ,
-# GetWorkbookRequest.onlySaveTable :   ,
-# GetWorkbookRequest.folder :   ,
-# GetWorkbookRequest.outPath :   ,
-# GetWorkbookRequest.storageName :   ,
-# GetWorkbookRequest.outStorageName :   ,
+# GetWorkbookRequest.name : The workbook name.  ,
+# GetWorkbookRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# GetWorkbookRequest.password : The excel password.  ,
+# GetWorkbookRequest.isAutoFit : Specifies whether set workbook rows to be autofit.  ,
+# GetWorkbookRequest.onlySaveTable : Specifies whether only save table data.Only use pdf to excel.  ,
+# GetWorkbookRequest.folder : Original workbook folder.  ,
+# GetWorkbookRequest.outPath : Path to save result  ,
+# GetWorkbookRequest.storageName : Storage name.  ,
+# GetWorkbookRequest.outStorageName : Storage name.  ,
 # GetWorkbookRequest.checkExcelRestriction :    
 
 {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook' } = { 
-    	summary => '',
+    	summary => 'Exports workbook to some format.',
         params => $params,
         returns => 'string',
     };
@@ -158,63 +158,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The excel password.',
      	format => '',
      	read_only => '',
      		},
      'is_auto_fit' => {
      	datatype => 'string',
      	base_name => 'isAutoFit',
-     	description => '',
+     	description => 'Specifies whether set workbook rows to be autofit.',
      	format => '',
      	read_only => '',
      		},
      'only_save_table' => {
      	datatype => 'string',
      	base_name => 'onlySaveTable',
-     	description => '',
+     	description => 'Specifies whether only save table data.Only use pdf to excel.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => '',
+     	description => 'Path to save result',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

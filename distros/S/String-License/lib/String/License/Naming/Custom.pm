@@ -1,8 +1,10 @@
-use Feature::Compat::Class 0.04;
-
-use v5.12;
+use v5.20;
 use utf8;
 use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use Feature::Compat::Class 0.04;
 
 =head1 NAME
 
@@ -10,7 +12,7 @@ String::License::Naming - names of licenses and license naming schemes
 
 =head1 VERSION
 
-Version v0.0.5
+Version v0.0.9
 
 =head1 SYNOPSIS
 
@@ -50,16 +52,16 @@ or as fallback by an internal name.
 
 =cut
 
-package String::License::Naming::Custom v0.0.5;
+package String::License::Naming::Custom v0.0.9;
 
-use Carp            qw(croak);
-use Log::Any        ();
-use List::SomeUtils qw(uniq);
+use Carp       qw(croak);
+use Log::Any   ();
+use List::Util qw(uniq);
 use Regexp::Pattern::License 3.4.0;
 
 use namespace::clean;
 
-class String::License::Naming::Custom :isa(String::License::Naming);
+class String::License::Naming::Custom : isa(String::License::Naming);
 
 field $log;
 
@@ -93,7 +95,7 @@ presented by a semi-stable internal potentially multi-word description.
 
 =cut
 
-field $schemes :param = undef;
+field $schemes : param = undef;
 
 # TODO: maybe support seeding explicit keys
 field $keys;
@@ -135,14 +137,8 @@ Returns array of schemes in use after addition.
 
 =cut
 
-method add_scheme
+method add_scheme ($new_scheme)
 {
-	my ($new_scheme) = @_;
-	croak $log->fatal("no new scheme provided")
-		unless $new_scheme;
-	$log->warn("excess arguments beyond new scheme ignored")
-		if @_ > 1;
-
 	if ( grep { $_ eq $new_scheme } @$schemes ) {
 		$log->warn("already included scheme $new_scheme not added");
 		return @$schemes;
@@ -160,7 +156,7 @@ Returns a list of license naming schemes in use.
 
 =cut
 
-method list_schemes
+method list_schemes ()
 {
 	return @$schemes;
 }
@@ -171,12 +167,14 @@ Returns a list of all license naming schemes available.
 
 =cut
 
-method list_available_schemes
+method list_available_schemes ()
 {
-	my $_prop = '(?:[a-z][a-z0-9_]*)';
-	my $_any  = '[a-z0-9_.()]';
+	my ( $_prop, $_any, @result );
 
-	my @result = uniq sort
+	$_prop = '(?:[a-z][a-z0-9_]*)';
+	$_any  = '[a-z0-9_.()]';
+
+	@result = uniq sort
 		map  {/^(?:name|caption)\.alt\.org\.($_prop)$_any*/}
 		map  { keys %{ $Regexp::Pattern::License::RE{$_} } }
 		grep {/^[a-z]/} keys %Regexp::Pattern::License::RE;
@@ -191,7 +189,7 @@ each labeled by shortname according to current set of schemes.
 
 =cut
 
-method list_licenses
+method list_licenses ()
 {
 	return String::License::Naming::resolve_shortnames( $keys, $schemes );
 }

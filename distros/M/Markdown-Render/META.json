@@ -4,7 +4,7 @@
       "BIGFOOT <bigfoot@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,10 +37,10 @@
             "Class::Accessor::Fast" : "0.51",
             "Config::Tiny" : "2.28",
             "Date::Format" : "2.24",
-            "HTTP::Request" : "6.37",
-            "IO::Scalar" : "2.111",
-            "JSON" : "4.07",
-            "LWP::UserAgent" : "6.67",
+            "HTTP::Request" : "6.00",
+            "IO::Scalar" : "2.113",
+            "JSON" : "4.03",
+            "LWP::UserAgent" : "6.36",
             "Readonly" : "2.05",
             "perl" : "5.016"
          }
@@ -52,10 +52,10 @@
    "provides" : {
       "Markdown::Render" : {
          "file" : "lib/Markdown/Render.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,14 +1,14 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2023 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Box::Net';
 
@@ -50,8 +50,7 @@ sub init($)
 
     my $access    = $args->{access} ||= 'r';
     my $writeable = $access =~ m/w|a/;
-    my $ch        = $self->{MBI_c_head}
-      = $args->{cache_head} || ($writeable ? 'NO' : 'DELAY');
+    my $ch        = $self->{MBI_c_head} = $args->{cache_head} || ($writeable ? 'NO' : 'DELAY');
 
     $args->{head_type}    ||= 'Mail::Box::IMAP4::Head'
         if $ch eq 'NO' || $ch eq 'PARTIAL';
@@ -59,13 +58,17 @@ sub init($)
     $args->{body_type}    ||= 'Mail::Message::Body::Lines';
 	$args->{message_type} ||= 'Mail::Box::IMAP4::Message';
 
+    if(my $client = $args->{imap_client}) {
+       $args->{server_name} = $client->PeerAddr;
+       $args->{server_port} = $client->PeerPort;
+       $args->{username}    = $client->User;
+    }
+
     $self->SUPER::init($args);
 
     $self->{MBI_domain}   = $args->{domain};
-    $self->{MBI_c_labels}
-      = $args->{cache_labels} || ($writeable ? 'NO' : 'DELAY');
-    $self->{MBI_c_body}
-      = $args->{cache_body}   || ($writeable ? 'NO' : 'DELAY');
+    $self->{MBI_c_labels} = $args->{cache_labels} || ($writeable ? 'NO' : 'DELAY');
+    $self->{MBI_c_body}   = $args->{cache_body}   || ($writeable ? 'NO' : 'DELAY');
 
 
     my $transport = $args->{transporter} || 'Mail::Transport::IMAP4';

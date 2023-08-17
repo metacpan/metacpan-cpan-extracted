@@ -1,3 +1,16 @@
+
+0.17   2023-08-11
+       - Allow logging to be timestamped
+       - Add support for Pherkin 0.86+ style tags (meaning: starting with '@')
+       - Depend on the same YAML parser as Pherkin again (YAML)
+       - Auto-update $VERSION and '=head1 VERSION' during release
+
+0.16   2023-07-24
+       - Use 'field' instead of 'labeled' to find form elements for input,
+         making sure that elements can be found by 'id', 'name' or 'title'
+         attributes as well as based on the content of an associated LABEL
+         tag
+
 0.15   2020-11-22
        - Fix uninitialized variable warning in input step "I enter X into Y"
        - Remove duplicated preamble in 'widget_steps.pl' step file

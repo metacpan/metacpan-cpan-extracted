@@ -1,8 +1,8 @@
 Name:           perl-RPM-Query
-Version:        0.01
+Version:        0.02
 Release:        1%{?dist}
 Summary:        Perl object overlay of the RPM query command
-License:        CHECK(Distributable)
+License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/RPM-Query/
 Source0:        http://www.cpan.org/modules/by-module/RPM/RPM-Query-%{version}.tar.gz

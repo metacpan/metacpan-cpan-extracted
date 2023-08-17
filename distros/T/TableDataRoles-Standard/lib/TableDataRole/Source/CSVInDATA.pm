@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 with 'TableDataRole::Source::CSVInFile';
@@ -41,7 +41,7 @@ TableDataRole::Source::CSVInDATA - Role to access table data from CSV in DATA se
 
 =head1 VERSION
 
-This document describes version 0.015 of TableDataRole::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableDataRole::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 DESCRIPTION
 

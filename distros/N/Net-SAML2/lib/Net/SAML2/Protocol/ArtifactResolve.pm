@@ -1,13 +1,13 @@
 package Net::SAML2::Protocol::ArtifactResolve;
 use Moose;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use URN::OASIS::SAML2 qw(:urn);
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
-# ABSTRACT: Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
+# ABSTRACT: ArtifactResolve protocol class
 
 
 
@@ -61,11 +61,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Protocol::ArtifactResolve - Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
+Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

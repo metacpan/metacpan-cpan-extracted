@@ -1,0 +1,62 @@
+{
+   "abstract" : "A L\u00d6VE2D game development command-line interface.",
+   "author" : [
+      "Nobunaga <nobunaga@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Loverl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Config::INI::Reader" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Setup" : "0",
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "FindBin" : "0",
+            "Git::Repository" : "0",
+            "Moose" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "perl" : "v5.36.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/iamllcoolray/loverl-cli.git",
+         "web" : "https://github.com/iamllcoolray/loverl-cli"
+      }
+   },
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_spdx_expression" : "MIT"
+}
+

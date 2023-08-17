@@ -1,0 +1,234 @@
+#!/usr/local/bin/perl -w
+##
+## cricket-genconf-sensor
+##
+## Generate Cricket configuration for sensor monitoring
+##
+## Author:        Simon Leinen  <simon@limmat.switch.ch>
+## Date created:  21-Dec-2006
+##
+## This script generates Cricket configuration files for
+## SNMP-monitorable sensors in a set of routers.  It does this on the
+## basis of a RANCID configuration file repository.  For each router
+## in that directory that seems to have monitorable sensors, the
+## script calls the `entls' script to generate Cricket configuration.
+##
+## The script puts newly generated configuration files into a
+## temporary directory, and then installs some "safe" configuration
+## changes by itself.  For other configuration changes, the user is
+## presented with "diff" output and has to decide how to apply them.
+
+use strict;
+use warnings;
+
+use Cisco::Abbrev;
+
+my $COMMUNITY = 'your-secret-community-string';
+
+my $testing = 0;
+
+### Prototypes
+sub read_router_configurations ($ );
+sub has_sensors_p ($ );
+sub postprocess_router_config ($$);
+sub maybe_install_new_configuration ($ );
+sub install_new_configuration ($ );
+
+my $rancid_directory = '/usr/local/rancid/backbone/configs';
+
+my @routers = read_router_configurations ($rancid_directory);
+
+my $cricket_config_dir = '/home/cricket/cricket-config';
+my $old_config_dir = $cricket_config_dir.'/'.'transceiver-monitoring';
+
+-d $old_config_dir or die "cannot find existing configuration $old_config_dir";
+
+my $new_config_dir = '/tmp'.'/foo/';
+-d $new_config_dir
+    or mkdir $new_config_dir
+    or die "Cannot create $new_config_dir: $!";
+
+my (@unchanged, @installed, @unresolved);
+foreach my $router (@routers) {
+    my $routername = $router->{name};
+    ## For testing, only look at one router
+    next if $testing and $routername ne 'swiix2';
+    next unless has_sensors_p ($router);
+    my $rdir = $new_config_dir.'/'.$routername;
+    -d $rdir or mkdir $rdir or die "cannot create directory $rdir: $!";
+    my $retval = system ('perl -Ilib test/entls -t '.$COMMUNITY."@'
+			 .$routername.':::::2:v4only > '
+			 .$rdir.'/'.$routername);
+    if ($retval) {
+	warn "failed to generate configuration for $routername";
+    } else {
+	postprocess_router_config ($rdir.'/'.$routername, $router);
+	maybe_install_new_configuration ($router);
+    }
+}
+print "Unchanged: ",join (", ", map { $_->{name} } @unchanged),"\n";
+print "Installed: ",join (", ", map { $_->{name} } @installed),"\n";
+print "Unresolved: ",join (", ", map { $_->{name} } @unresolved),"\n";
+1;
+
+sub postprocess_router_config ($$) {
+    my ($file, $router) = @_;
+    my ($pre, $sd, $post, $long, $desc);
+    open IN, $file or die "Cannot open configuration file $file: $!";
+    open OUT, ">$file.post" or die "Cannot open configuration file $file.post: $!";
+    while (<IN>) {
+	if (/^(\s*display-name\s*=\s*")(.*)("\s*)$/) {
+	} elsif (/^(\s*long-desc\s*=\s*")(.*)("\s*)$/) {
+	} elsif (/^(\s*short-desc\s*=\s*")(.*)("\s*)$/) {
+	    ($pre, $sd, $post) = ($1, $2, $3);
+	    $sd =~ s/^transceiver //i;
+	    $long = cisco_long_int ($sd);
+	    $sd = $long if defined $long;
+	    if (defined $long) {
+		$desc = $long;
+		$sd = $desc = $router->{ifdesc}->{$long}
+		if exists $router->{ifdesc}->{$long};
+	    } else {
+		$long = $desc = $sd;
+	    }
+	    chomp $post;
+	    print OUT "$pre$sd$post\n";
+	    print OUT "\tlong-desc\t = \"<h3>$long - $desc</h3>\"\n";
+	    print OUT "\tdisplay-name\t = \"%router% - $long\"\n";
+	} else {
+	    print OUT $_;
+	}
+    }
+    close IN or die "Cannot close configuration file $file: $!";
+    close OUT or die "Cannot close configuration file $file.post: $!";
+    rename $file, "$file.pre" or unlink $file;
+    rename "$file.post", $file or rename "$file.pre", $file;
+    unlink "$file.pre";
+    return 1;
+}
+
+sub read_router_configurations ($ ) {
+    my ($dir) = @_;
+    my @routers = ();
+    opendir CONFIG, $dir
+	or die "open directory $dir: $!";
+    foreach my $file (readdir CONFIG) {
+	next if $testing and $file ne 'swiix2';
+	next unless -f $dir.'/'.$file;
+	push @routers, { name => $file };
+    }
+    closedir CONFIG
+	or die "close directory $dir: $!";
+    @routers;
+}
+
+sub has_sensors_p ($ ) {
+    my ($router) = @_;
+    my $routername = $router->{name};
+    my $have_sensor_p = 0;
+    my ($ifname, %ifdesc);
+    open (CONFIG, $rancid_directory.'/'.$routername)
+	or die "open configuration file for $routername: $!";
+    while (<CONFIG>) {
+	if (/Receive Power Sensor/) {
+	    $have_sensor_p = 1;
+	} elsif (/^interface (.*)/) {
+	    $ifname = $1;
+	} elsif (/^ description (.*)$/
+		 and defined $ifname) {
+	    $ifdesc{$ifname} = $1;
+	} elsif (/^ /) {
+	} else {
+	    $ifname = undef;
+	}
+    }
+    close CONFIG or die "close configuration file for $routername: $!";
+    ## foreach my $ifname (sort keys %ifdesc) {
+    ## 	printf "%-20s %s\n", $ifname, $ifdesc{$ifname};
+    ## }
+    $router->{ifdesc} = \%ifdesc;
+    return $have_sensor_p;
+}
+
+## maybe_install_new_configuration ROUTER
+##
+## Check whether the newly generated Cricket configuration file for
+## router ROUTER has to/can be installed.
+##
+## If the file doesn't exist in the current configuration, we can
+## safely install the new one.
+##
+## If the newly generated file is identical to the old one, we don't
+## have to do anything.
+##
+## The the newly generated file differs from the old one, we output
+## the diff and don't install anything.
+##
+## TODO: Apply the diffs.  This is not totally trivial, however.  As
+## long as the diff consists in only added lines, the new file can be
+## safely installed over the current one.  But when configuration is
+## lost (i.e. sensors are removed), we should deactivate the lost
+## targets using "collect = 0", rather than removing them entirely, to
+## make sure that history is kept.
+##
+## There is an additional case, namely that a file exists in the
+## current configuration that was not generated in the new run.  We
+## don't handle this situation currently.
+##
+## TODO: Check the existing configuration for files that were lost in
+## the new generation run, and deactivate collection in these files.
+##
+## Actual installation of configurations is performed by
+## install_new_configuration().
+##
+sub maybe_install_new_configuration ($ ) {
+    my ($router) = @_;
+    my $routername = $router->{name};
+    my $old_file = $old_config_dir.'/'.$routername.'/'.$routername;
+    my $new_file = $new_config_dir.'/'.$routername.'/'.$routername;
+
+    if (! -f $old_file) {
+	print "NEW: $routername\n";
+	if (install_new_configuration ($router)) {
+	    push @installed, $router;
+	} else {
+	    push @unresolved, $router;
+	}
+    } else {
+	my $retval = system ("diff", "-uw", $old_file, $new_file);
+	if ($retval) {
+	    ##warn "TESTING:\n";
+	    ##$retval = system "diff -w $old_file $new_file | egrep -v '\^>'";
+	    ##warn "TESTING END: $retval\n";
+	    print "DIFFER: $routername\n";
+	    push @unresolved, $router;
+	} else {
+	    push @unchanged, $router;
+	    unlink $new_file;
+	}
+    }
+}
+
+## install_new_configuration ROUTER
+##
+## Install the newly generated configuration file for router ROUTER in
+## the active directory tree.  The containing directory is created if
+## needed.
+##
+sub install_new_configuration ($ ) {
+    my ($router) = @_;
+    my $routername = $router->{name};
+    my $old_file = $old_config_dir.'/'.$routername.'/'.$routername;
+    my $new_file = $new_config_dir.'/'.$routername.'/'.$routername;
+    my $old_dir = $old_config_dir.'/'.$routername;
+
+    unless (-d $old_dir || mkdir $old_dir) {
+	warn "Cannot create $old_dir: $!";
+	return undef;
+    }
+    if (system ("mv", $new_file, $old_file)) {
+	warn "Failed to move $new_file to $old_file";
+	return undef;
+    }
+    return 1;
+}

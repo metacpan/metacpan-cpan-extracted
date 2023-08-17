@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.36
+version 0.40
 
 =head1 OVERVIEW
 
@@ -274,7 +274,7 @@ option internally, so it will remain available for the time being.
 
  use Local::MyBolt;
  $driver->config(uri => 'bolt://...');
- $driver->{net_module} = 'Local::MyBolt';  # private API
+ $driver->{config}{net_module} = 'Local::MyBolt';  # private API
 
 The module name provided will be used in place of
 L<Neo4j::Bolt> and will have to match its API I<exactly.>

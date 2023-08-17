@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutWorkbookBackgroundRequest.name :   ,
-# PutWorkbookBackgroundRequest.picPath :   ,
-# PutWorkbookBackgroundRequest.folder :   ,
-# PutWorkbookBackgroundRequest.storageName :   ,
+# PutWorkbookBackgroundRequest.name : The workbook name.  ,
+# PutWorkbookBackgroundRequest.picPath : picture full path.  ,
+# PutWorkbookBackgroundRequest.folder : Original workbook folder.  ,
+# PutWorkbookBackgroundRequest.storageName : Storage name.  ,
 # PutWorkbookBackgroundRequest.File : File to upload   
 
 {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_workbook_background' } = { 
-    	summary => '',
+    	summary => 'Set workbook background.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -138,28 +138,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'pic_path' => {
      	datatype => 'string',
      	base_name => 'picPath',
-     	description => '',
+     	description => 'picture full path.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

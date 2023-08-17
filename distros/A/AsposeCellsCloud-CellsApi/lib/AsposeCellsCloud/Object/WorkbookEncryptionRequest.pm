@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Used by workbook encryption/decryption requests.',
                                   class => 'WorkbookEncryptionRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'encryption_type' => {
      	datatype => 'string',
      	base_name => 'EncryptionType',
-     	description => '',
+     	description => 'Workbook encription type.',
      	format => '',
      	read_only => '',
      		},
      'key_length' => {
      	datatype => 'int',
      	base_name => 'KeyLength',
-     	description => '',
+     	description => 'Encription key length.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'Password',
-     	description => '',
+     	description => 'Encription password.',
      	format => '',
      	read_only => '',
      		},    

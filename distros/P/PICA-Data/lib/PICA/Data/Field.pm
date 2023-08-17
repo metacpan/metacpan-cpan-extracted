@@ -1,7 +1,7 @@
 package PICA::Data::Field;
 use v5.14.1;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use Carp qw(croak);
 use Hash::MultiValue;
@@ -140,7 +140,7 @@ sub equal {
 }
 
 sub clone {
-    bless $_[0]->TO_JSON, 'PICA::Data::Field';
+    bless TO_JSON($_[0]), 'PICA::Data::Field';
 }
 
 sub TO_JSON {

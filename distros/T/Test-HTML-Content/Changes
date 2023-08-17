@@ -1,6 +1,19 @@
 Revision history for Perl extension Test::HTML::Content.
 
-0.09 20130206
+0.12 2023-07-23
+    - Fix test output/diagnostics between XML::LibXML and XML::Parser
+
+0.11 2023-07-21
+    - Various test suite updates, no code changes, no need to upgrade
+
+0.10 2023-01-20
+    - Add a XML::LibXML version number if we find it installed
+      This is to hunt down spurious test failures with an unknown version
+      of XML::LibXML
+    - Upgrade package/distribution infrastructure
+    - No code changes, no need to upgrade
+
+0.09 2013-02-06
   - Apply patch from RT 70099, by gregor herrmann and dom
     This fixes bugs in the test suite
       <http://bugs.debian.org/cgi-bin /bugreport.cgi?bug=636520>
@@ -8,33 +21,33 @@ Revision history for Perl extension Test::HTML::Content.
   - Apply patch from RT 42072 by gyles19@visi.com
     This fixes the crash when using XML::XPath instead of XML::LibXML
 
-0.08 20081112
+0.08 2008-11-12
     ???
 
-0.07 20031230
+0.07 2003-12-30
   - Fixed test bug reported by Kate Pugh (KAKE):
     t/09-errors.xpath.t was missing a SKIP: label
   - still no resolution on the other reported errors, as XML::XPath "works"
     on my Win32 machine, but dosen't work elsewhere :-(
-    
+
     Most of the failures seem to be failures due to different text output
     of the tests:
-    
+
     # #   <p foo="bar" />
     vs.
     # #   <p foo="bar"/>
 
     but as I can't replicate them here, it's hard to fix those :-(
 
-0.08 20081112
+0.08 2008-11-12
   + Added $parsing_method to allow XML to be tested as well.
 
-0.06 20031222
+0.06 2003-12-22
   - Fixed tests against XML::XPath
   - added another test testing the internal abstraction
     API and differences between XML::XPath and XML::LibXML
 
-0.05 20031204
+0.05 2003-12-04
   - Added XPath functionality (xpath_ok, no_xpath, xpath_count)
   - Added fallback to old functionality if neither XML::LibXML nor
     XML::XPath are available

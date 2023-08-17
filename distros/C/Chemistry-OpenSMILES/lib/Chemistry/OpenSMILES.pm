@@ -5,25 +5,29 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.8.5'; # VERSION
+our $VERSION = '0.8.6'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw(
+    %bond_order_to_symbol
+    %bond_symbol_to_order
     clean_chiral_centers
     is_aromatic
     is_chiral
     is_cis_trans_bond
     is_double_bond
+    is_ring_atom
     is_ring_bond
     is_single_bond
+    is_triple_bond
     mirror
     %normal_valence
     toggle_cistrans
 );
 
 use Graph::Traversal::BFS;
-use List::Util qw(any);
+use List::Util qw( any none );
 
 sub is_chiral($);
 sub is_chiral_tetrahedral($);
@@ -44,12 +48,27 @@ our %normal_valence = (
     c  => [ 3 ], # Not from OpenSMILES specification
 );
 
+our %bond_order_to_symbol = (
+    1   => '-',
+    1.5 => ':',
+    2   => '=',
+    3   => '#',
+    4   => '$',
+);
+
+our %bond_symbol_to_order = (
+    '-' => 1,
+    ':' => 1.5,
+    '=' => 2,
+    '#' => 3,
+    '$' => 4,
+);
+
 # Removes chiral setting from tetrahedral chiral centers with less than
 # four distinct neighbours. Only tetrahedral chiral centers with four atoms
 # are affected, thus three-atom centers (implying lone pairs) are left
 # untouched. Returns the affected atoms.
 #
-# CAVEAT: disregards anomers
 # TODO: check other chiral centers
 sub clean_chiral_centers($$)
 {
@@ -58,6 +77,8 @@ sub clean_chiral_centers($$)
     my @affected;
     for my $atom ($moiety->vertices) {
         next unless is_chiral_tetrahedral( $atom );
+        # Anomers must not loose chirality settings
+        next if is_ring_atom( $moiety, $atom, scalar $moiety->edges );
 
         my $hcount = exists $atom->{hcount} ? $atom->{hcount} : 0;
         next if $moiety->degree($atom) + $hcount != 4;
@@ -113,17 +134,40 @@ sub is_double_bond
            $moiety->get_edge_attribute( $a, $b, 'bond' ) eq '=';
 }
 
+# An atom is deemed to be a ring atom if any of its bonds is a ring bond.
+sub is_ring_atom
+{
+    my( $moiety, $atom, $max_length ) = @_;
+    return '' unless $moiety->degree( $atom ) > 1;
+    return any { is_ring_bond( $moiety, $atom, $_, $max_length ) }
+               $moiety->neighbours( $atom );
+}
+
 # A bond is deemed to be a ring bond if there is an alternative path
 # joining its atoms not including the bond in consideration and this
 # alternative path is not longer than 7 bonds. This is based on
 # O'Boyle (2012) saying that Open Babel SMILES writer does not output
 # cis/trans markers for double bonds in rings of size 8 or less due to
 # them implicilty being cis bonds.
+#
+# If maximum ring size is given negative, ring size is not limited.
 sub is_ring_bond
 {
     my( $moiety, $a, $b, $max_length ) = @_;
-
     $max_length = 7 unless $max_length;
+
+    # A couple of shortcuts to reduce the complexity
+    return '' if any { $moiety->degree( $_ ) == 1 } ( $a, $b );
+    return '' if scalar( $moiety->vertices ) > scalar( $moiety->edges );
+
+    if( $max_length < 0 ) {
+        # Due to the issue in Graph, bridges() returns strings instead of real objects.
+        # Graph issue: https://github.com/graphviz-perl/Graph/issues/29
+        my %vertices_by_name = map { $_ => $_ } $moiety->vertices;
+        return none { ( $_->[0] == $a && $_->[1] == $b ) ||
+                      ( $_->[0] == $b && $_->[1] == $a ) }
+               map  { [ map { $vertices_by_name{$_} } @$_ ] } $moiety->bridges;
+    }
 
     my $copy = $moiety->copy;
     $copy->delete_edge( $a, $b );
@@ -133,7 +177,7 @@ sub is_ring_bond
         # Record number of bonds between $a and any other vertex
         my( $u, $v ) = @_;
         my @seen = grep { exists $distance{$_} } ( $u, $v );
-        return if @seen != 1; # Can this be 0?
+        return '' if @seen != 1; # Can this be 0?
 
         my $seen = shift @seen;
         my( $unseen ) = grep { !exists $distance{$_} } ( $u, $v );
@@ -158,6 +202,13 @@ sub is_single_bond
     my( $moiety, $a, $b ) = @_;
     return !$moiety->has_edge_attribute( $a, $b, 'bond' ) ||
             $moiety->get_edge_attribute( $a, $b, 'bond' ) eq '-';
+}
+
+sub is_triple_bond
+{
+    my( $moiety, $a, $b ) = @_;
+    return $moiety->has_edge_attribute( $a, $b, 'bond' ) &&
+           $moiety->get_edge_attribute( $a, $b, 'bond' ) eq '#';
 }
 
 sub mirror($)
@@ -199,9 +250,8 @@ sub _validate($@)
             } elsif( $moiety->degree($atom) == 4 && $color_sub ) {
                 my %colors = map { ($color_sub->( $_ ) => 1) }
                                  $moiety->neighbours($atom);
-                if( scalar keys %colors != 4 ) {
-                    # FIXME: anomers are false-positives, see COD entry
-                    # 7111036
+                if( scalar keys %colors != 4 &&
+                    !is_ring_atom( $moiety, $atom, scalar $moiety->edges ) ) {
                     warn sprintf 'tetrahedral chiral setting for %s(%d) ' .
                                  'is not needed as not all 4 neighbours ' .
                                  'are distinct' . "\n",

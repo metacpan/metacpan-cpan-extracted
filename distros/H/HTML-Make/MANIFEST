@@ -1,4 +1,9 @@
 Changes
+examples/add-class.pl
+examples/add-comment.pl
+examples/add-text-html.pl
+examples/add-text.pl
+examples/attr.pl
 examples/json-to-html.pl
 examples/li-class-beano.pl
 examples/link-example.pl
@@ -9,16 +14,23 @@ examples/push-li-to-tr.pl
 examples/push-new.pl
 examples/synopsis.pl
 examples/table.pl
+go/go.mod
+go/makehtml.go
 lib/HTML/Make.pm
 lib/HTML/Make.pod
 lib/HTML/Make/info.json
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+modules.pl
 README
+see-also-info.json
 t/add-class.t
+t/branches.t
 t/children.t
+t/empty-text.t
 t/examples.t
+t/HMT.pm
 t/href.t
 t/html-doctype.t
 t/HTML-Make.t

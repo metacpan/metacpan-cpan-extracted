@@ -3,8 +3,8 @@ This version of ShellScript-Env isn't compatible with Version 0.0.
 This is a program that allows one to create simple Bourne and C Shell
 that set environmental labels.  The program:
 
-#/usr/local/bin
-use Env::paths;
+#!/usr/bin/perl
+use ShellScript::Env;
 my $local = new ShellScript::Env("/usr/local/opt/egcs");
 $local->set_path('PATH', 'bin', '$PATH');
 $local->set_path('MANPATH', 'man', '$MANPATH');

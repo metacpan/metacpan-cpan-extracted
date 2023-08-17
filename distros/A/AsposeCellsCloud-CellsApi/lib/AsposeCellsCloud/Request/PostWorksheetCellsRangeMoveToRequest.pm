@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeMoveToRequest.name :   ,
-# PostWorksheetCellsRangeMoveToRequest.sheetName :   ,
-# PostWorksheetCellsRangeMoveToRequest.range :   ,
-# PostWorksheetCellsRangeMoveToRequest.destRow :   ,
-# PostWorksheetCellsRangeMoveToRequest.destColumn :   ,
-# PostWorksheetCellsRangeMoveToRequest.folder :   ,
-# PostWorksheetCellsRangeMoveToRequest.storageName :    
+# PostWorksheetCellsRangeMoveToRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeMoveToRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangeMoveToRequest.range : range in worksheet   ,
+# PostWorksheetCellsRangeMoveToRequest.destRow : The start row of the dest range.  ,
+# PostWorksheetCellsRangeMoveToRequest.destColumn : The start column of the dest range.  ,
+# PostWorksheetCellsRangeMoveToRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangeMoveToRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_move_to' } = { 
-    	summary => '',
+    	summary => 'Moves the current range to the dest range.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -147,49 +147,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'Range',
      	base_name => 'range',
-     	description => '',
+     	description => 'range in worksheet ',
      	format => '',
      	read_only => '',
      		},
      'dest_row' => {
      	datatype => 'int',
      	base_name => 'destRow',
-     	description => '',
+     	description => 'The start row of the dest range.',
      	format => '',
      	read_only => '',
      		},
      'dest_column' => {
      	datatype => 'int',
      	base_name => 'destColumn',
-     	description => '',
+     	description => 'The start column of the dest range.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

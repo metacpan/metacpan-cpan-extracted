@@ -1,15 +1,20 @@
-Axis.pm
-Dial.pm
+Changes
+demos/tiedlistbox
+lib/Tk/Axis.pm
+lib/Tk/Dial.pm
+lib/Tk/OlWm.pm
+lib/Tk/TiedListbox.pm
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-Makefile.PL
-OlWm.pm
+MYMETA.json
+MYMETA.yml
 README
-TODO
-TiedListbox.pm
-demos/tiedlistbox
-t/00basic.t
+README.md
 t/axis.t
 t/dial.t
 t/olwm.t
 t/tiedlistbox.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

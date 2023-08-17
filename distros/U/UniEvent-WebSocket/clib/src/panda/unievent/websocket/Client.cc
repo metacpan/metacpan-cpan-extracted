@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "panda/protocol/websocket/HeaderValueParamsParser.h"
 #include <panda/encode/base16.h>
 
 namespace panda { namespace unievent { namespace websocket {
@@ -63,6 +64,7 @@ void Client::do_close (uint16_t code, const string& payload) {
 
 void Client::call_on_connect(const ConnectResponseSP &response) {
     panda_log_notice("websocket::Client::on_connect " << response->error());
+    panda_log_info("Extensions:\n" << protocol::websocket::compile_header_value(response->ws_extensions()));
     if (connect_request->_timer) {
         connect_request->_timer->pause();
         connect_request->_timer->event.remove_all();

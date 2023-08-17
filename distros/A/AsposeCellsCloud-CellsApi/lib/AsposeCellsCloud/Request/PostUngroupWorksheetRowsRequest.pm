@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostUngroupWorksheetRowsRequest.name :   ,
-# PostUngroupWorksheetRowsRequest.sheetName :   ,
-# PostUngroupWorksheetRowsRequest.firstIndex :   ,
-# PostUngroupWorksheetRowsRequest.lastIndex :   ,
-# PostUngroupWorksheetRowsRequest.isAll :   ,
-# PostUngroupWorksheetRowsRequest.folder :   ,
-# PostUngroupWorksheetRowsRequest.storageName :    
+# PostUngroupWorksheetRowsRequest.name : The workbook name.  ,
+# PostUngroupWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# PostUngroupWorksheetRowsRequest.firstIndex : The first row index to be operated.  ,
+# PostUngroupWorksheetRowsRequest.lastIndex : The last row index to be operated.  ,
+# PostUngroupWorksheetRowsRequest.isAll : Is all row to be operated  ,
+# PostUngroupWorksheetRowsRequest.folder : Original workbook folder.  ,
+# PostUngroupWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_ungroup_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Ungroup rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'first_index' => {
      	datatype => 'int',
      	base_name => 'firstIndex',
-     	description => '',
+     	description => 'The first row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'last_index' => {
      	datatype => 'int',
      	base_name => 'lastIndex',
-     	description => '',
+     	description => 'The last row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'is_all' => {
      	datatype => 'string',
      	base_name => 'isAll',
-     	description => '',
+     	description => 'Is all row to be operated',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

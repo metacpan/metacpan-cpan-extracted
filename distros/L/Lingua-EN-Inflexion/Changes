@@ -191,3 +191,8 @@ Revision history for Lingua-EN-Inflexion
 
     * Laid groundwork (mostly testing) for further significant improvements
       in version 0.003
+
+
+0.002008  Tue Jul  4 21:32:00 2023
+
+    * Removed all smartmatching and given/when constructs for compatibility with Perl 5.38+

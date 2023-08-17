@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutDocumentProtectFromChangesRequest.name :   ,
-# PutDocumentProtectFromChangesRequest.password :   ,
-# PutDocumentProtectFromChangesRequest.folder :   ,
-# PutDocumentProtectFromChangesRequest.storageName :    
+# PutDocumentProtectFromChangesRequest.name : The workbook name.  ,
+# PutDocumentProtectFromChangesRequest.password : Modification password.  ,
+# PutDocumentProtectFromChangesRequest.folder : Original workbook folder.  ,
+# PutDocumentProtectFromChangesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_document_protect_from_changes' } = { 
-    	summary => '',
+    	summary => 'Protects document from changes.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'PasswordRequest',
      	base_name => 'password',
-     	description => '',
+     	description => 'Modification password.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

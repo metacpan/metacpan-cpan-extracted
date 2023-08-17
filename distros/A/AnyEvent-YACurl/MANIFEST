@@ -4,14 +4,10 @@ Makefile.PL
 README
 YACurl.xs
 constants.inc
-curlopt-blob.inc
-curlopt-long.inc
-curlopt-off-t.inc
-curlopt-slist.inc
-curlopt-str.inc
 lib/AnyEvent/YACurl.pm
 libcurl-symbols.h
 ppport.h
+sync-curlopt.pl
 t/AnyEvent-YACurl.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

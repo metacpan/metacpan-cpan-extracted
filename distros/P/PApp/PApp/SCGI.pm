@@ -116,7 +116,9 @@ sub handle($) {
 
    my %hdr = split /\x00/, $rbuf;
 
-   $hdr{DOCUMENT_URI} =~ $PREFIXMATCH;
+   $hdr{DOCUMENT_URI} =~ $PREFIXMATCH
+      or return _error $fh, "no app mounted on $hdr{DOCUMENT_URI}";
+
    $hdr{SCRIPT_NAME} = $1;
    $hdr{PATH_INFO} = $2;
 

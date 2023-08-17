@@ -48,5 +48,5 @@ resources:
   MailingList: mailto:par@perl.org
   bugtracker: https://github.com/rschupp/PAR-Packer/issues
   repository: git://github.com/rschupp/PAR-Packer.git
-version: '1.057'
+version: '1.059'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -12,19 +12,43 @@
 #include <catch2/interfaces/catch_interfaces_config.hpp>
 #include <catch2/internal/catch_unique_ptr.hpp>
 #include <catch2/internal/catch_optional.hpp>
+#include <catch2/internal/catch_stringref.hpp>
 #include <catch2/internal/catch_random_seed_generation.hpp>
+#include <catch2/internal/catch_reporter_spec_parser.hpp>
 
-#include <vector>
+#include <chrono>
+#include <map>
 #include <string>
+#include <vector>
 
 namespace Catch {
 
-    struct IStream;
+    class IStream;
+
+    /**
+     * `ReporterSpec` but with the defaults filled in.
+     *
+     * Like `ReporterSpec`, the semantics are unchecked.
+     */
+    struct ProcessedReporterSpec {
+        std::string name;
+        std::string outputFilename;
+        ColourMode colourMode;
+        std::map<std::string, std::string> customOptions;
+        friend bool operator==( ProcessedReporterSpec const& lhs,
+                                ProcessedReporterSpec const& rhs );
+        friend bool operator!=( ProcessedReporterSpec const& lhs,
+                                ProcessedReporterSpec const& rhs ) {
+            return !( lhs == rhs );
+        }
+    };
 
     struct ConfigData {
+
         bool listTests = false;
         bool listTags = false;
         bool listReporters = false;
+        bool listListeners = false;
 
         bool showSuccessfulTests = false;
         bool shouldDebugBreak = false;
@@ -33,6 +57,7 @@ namespace Catch {
         bool showInvisibles = false;
         bool filenamesAsTags = false;
         bool libIdentify = false;
+        bool allowZeroTests = false;
 
         int abortAfter = -1;
         uint32_t rngSeed = generateRandomSeed(GenerateFrom::Default);
@@ -40,6 +65,7 @@ namespace Catch {
         unsigned int shardCount = 1;
         unsigned int shardIndex = 0;
 
+        bool skipBenchmarks = false;
         bool benchmarkNoAnalysis = false;
         unsigned int benchmarkSamples = 100;
         double benchmarkConfidenceInterval = 0.95;
@@ -51,17 +77,13 @@ namespace Catch {
         ShowDurations showDurations = ShowDurations::DefaultForReporter;
         double minDuration = -1;
         TestRunOrder runOrder = TestRunOrder::Declared;
-        UseColour useColour = UseColour::Auto;
+        ColourMode defaultColourMode = ColourMode::PlatformDefault;
         WaitForKeypress::When waitForKeypress = WaitForKeypress::Never;
 
-        std::string outputFilename;
+        std::string defaultOutputFilename;
         std::string name;
         std::string processName;
-#ifndef CATCH_CONFIG_DEFAULT_REPORTER
-#define CATCH_CONFIG_DEFAULT_REPORTER "console"
-#endif
-        std::string reporterName = CATCH_CONFIG_DEFAULT_REPORTER;
-#undef CATCH_CONFIG_DEFAULT_REPORTER
+        std::vector<ReporterSpec> reporterSpecifications;
 
         std::vector<std::string> testsOrTags;
         std::vector<std::string> sectionsToRun;
@@ -75,13 +97,14 @@ namespace Catch {
         Config( ConfigData const& data );
         ~Config() override; // = default in the cpp file
 
-        std::string const& getFilename() const;
-
         bool listTests() const;
         bool listTags() const;
         bool listReporters() const;
+        bool listListeners() const;
 
-        std::string const& getReporterName() const;
+        std::vector<ReporterSpec> const& getReporterSpecs() const;
+        std::vector<ProcessedReporterSpec> const&
+        getProcessedReporterSpecs() const;
 
         std::vector<std::string> const& getTestsOrTags() const override;
         std::vector<std::string> const& getSectionsToRun() const override;
@@ -93,36 +116,38 @@ namespace Catch {
 
         // IConfig interface
         bool allowThrows() const override;
-        std::ostream& stream() const override;
         StringRef name() const override;
         bool includeSuccessfulResults() const override;
         bool warnAboutMissingAssertions() const override;
-        bool warnAboutNoTests() const override;
+        bool warnAboutUnmatchedTestSpecs() const override;
+        bool zeroTestsCountAsSuccess() const override;
         ShowDurations showDurations() const override;
         double minDuration() const override;
         TestRunOrder runOrder() const override;
         uint32_t rngSeed() const override;
         unsigned int shardCount() const override;
         unsigned int shardIndex() const override;
-        UseColour useColour() const override;
+        ColourMode defaultColourMode() const override;
         bool shouldDebugBreak() const override;
         int abortAfter() const override;
         bool showInvisibles() const override;
         Verbosity verbosity() const override;
+        bool skipBenchmarks() const override;
         bool benchmarkNoAnalysis() const override;
-        int benchmarkSamples() const override;
+        unsigned int benchmarkSamples() const override;
         double benchmarkConfidenceInterval() const override;
         unsigned int benchmarkResamples() const override;
         std::chrono::milliseconds benchmarkWarmupTime() const override;
 
     private:
-        ConfigData m_data;
+        // Reads Bazel env vars and applies them to the config
+        void readBazelEnvVars();
 
-        Detail::unique_ptr<IStream const> m_stream;
+        ConfigData m_data;
+        std::vector<ProcessedReporterSpec> m_processedReporterSpecs;
         TestSpec m_testSpec;
         bool m_hasTestFilters = false;
     };
-
 } // end namespace Catch
 
 #endif // CATCH_CONFIG_HPP_INCLUDED

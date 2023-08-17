@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -61,7 +61,7 @@ $loop->add( $http );
 
    my $response = wait_for_future( $future )->get;
 
-   isa_ok( $response, "HTTP::Response", '$future->get for request' );
+   isa_ok( $response, [ "HTTP::Response" ], '$future->get for request' );
 
    is( $response->code, 200, '$response->code for request' );
 }
@@ -102,7 +102,7 @@ $loop->add( $http );
 
    my $response = wait_for_future( $future )->get;
 
-   isa_ok( $response, "HTTP::Response", '$future->get for uri' );
+   isa_ok( $response, [ "HTTP::Response" ], '$future->get for uri' );
 
    is( $response->code, 200, '$response->code for uri' );
 }

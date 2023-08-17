@@ -447,11 +447,11 @@ sub emit_converter {
     say "    return \$${name}_of->{lc \$word}  if exists \$${name}_of->{lc \$word};";
     say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{tc \$word};";
     say "    return \$word                     if is_$type(\$word);";
-    say '    given ($word) {';
+    say '    for ($word) {';
 
     # Generate each alternative replacement pattern...
     for my $replacement_ref ( @{$replacement_suffixes} ) {
-        say '        when (m{' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
+        say '        if (m{' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
     }
 
     # Subroutine defaults to failure...
@@ -474,17 +474,17 @@ sub emit_recognizer {
         say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
         say "    return 0 if exists \$is_${compl_name}\->{tc \$word};";
     }
-    say '    given ($word) {';
+    say '    for ($word) {';
 
     # Generate each alternative replacement pattern...
     for my $replacement_ref ( @replacement_suffixes ) {
         next if !$replacement_ref->{is};
-        say '        when (m{\A' . $replacement_ref->{is} . '$}i) { return 1 }';
+        say '        if (m{\A' . $replacement_ref->{is} . '$}i) { return 1 }';
     }
 
     # Subroutine defaults to failure...
     if ($name eq 'singular') {
-        say '        default { return !is_plural($word); }';
+        say '        return !is_plural($word);';
     }
     else {
         say '        default { return 0; }';

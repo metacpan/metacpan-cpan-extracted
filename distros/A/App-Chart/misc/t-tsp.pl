@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2015, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2023 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -23,10 +23,78 @@ use Data::Dumper;
 use File::Slurp 'slurp';
 use App::Chart::Suffix::TSP;
 use List::Util;
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+
+{
+  my $url;
+  $url = 'https://www.tsp.gov/data/fund-price-history.csv?startdate=2023-02-01&enddate=2023-02-07&Lfunds=1&InvFunds=1&download=1';
+  $url = 'https://www.tsp.gov/data/fund-price-history.csv?startdate=2023-01-30&enddate=2023-02-03';
+  
+  $App::Chart::option{'verbose'} = 2;
+  my $resp = App::Chart::Download->get
+    ($url,
+     user_agent => App::Chart::Suffix::TSP::TSP_USER_AGENT,
+     referer => 'https://www.tsp.gov/share-price-history/');
+  my $content = $resp->decoded_content (charset => 'none');
+  ### $content
+
+  my $h = App::Chart::Suffix::TSP::parse($resp);
+  print "h= ",Dumper($h);
+
+  exit 0;
+}
+{
+  # my $content = slurp ($ENV{'HOME'}.'/chart/samples/tsp/share-prices.html');
+  # my $content = slurp ("$ENV{HOME}/chart/samples/tsp/sharePriceHistory.shtml.2");
+  # my $content = slurp ("$ENV{HOME}/chart/samples/tsp/shareprices.csv");
+  my $content = slurp ("$ENV{HOME}/chart/samples/tsp/share-price-history--trim.csv");
+
+  my $resp = HTTP::Response->new (200, 'OK',
+                                  ['Content-Type', 'text/html'],
+                                  $content);
+  my $symbol_list = ['C.TSP','S.TSP','L2060.TSP'];
+  my $h = App::Chart::Suffix::TSP::parse($resp, $symbol_list);
+  print "h= ",Dumper($h);
+  App::Chart::Download::crunch_h ($h);
+  print "h= ",Dumper($h);
+
+  #   App::Chart::Download::write_daily_group ($h);
+  exit 0;
+}
+{
+  # dates and url as from Finance::Quote::TSP
+  my $startdate = POSIX::strftime("%Y-%m-%d", localtime (time - 7*24*3600));
+  my $enddate   = POSIX::strftime("%Y-%m-%d", localtime time);
+
+  my $url   = "?startdate=$startdate&enddate=$enddate&Lfunds=1&InvFunds=1&download=1";
+  ### $startdate
+  ### $enddate
+  ### $url
+  exit 0;
+}
+
+{
+  # https://www.tsp.gov/share-price-history/
+
+  # https://www.tsp.gov/data/fund-price-history.csv?startdate=2020-03-02&enddate=2023-02-07&Lfunds=1&InvFunds=1&download=1
+
+  # Finance::Quote::TSP uses:
+  # https://www.tsp.gov/data/fund-price-history.csv
+  # https://www.tsp.gov/data/fund-price-history.csv?startdate=2023-01-01&enddate=2023-02-01&Lfunds=1&InvFunds=1&download=1
+  # https://www.tsp.gov/assets/js/share-price-history.js
+
+  # no work:
+  #
+  # https://www.tsp.gov/data/fund-price-history.csv?startdate=$2023-01-01&enddate=2023-02-01&Lfunds=0&InvFunds=C&download=1
+  #
+  # https://www.tsp.gov/data/fund-price-history.csv?startdate=$2023-01-01&enddate=2023-02-01&L_2065=1&download=1
+
+  ;
+}
 {
   require App::Chart::Download;
   my $hi_tdate = App::Chart::Download::tdate_today();
@@ -39,20 +107,6 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  # my $content = slurp ($ENV{'HOME'}.'/chart/samples/tsp/share-prices.html');
-  # my $content = slurp ("$ENV{HOME}/chart/samples/tsp/sharePriceHistory.shtml.2");
-  my $content = slurp ("$ENV{HOME}/chart/samples/tsp/shareprices.csv");
-  my $resp = HTTP::Response->new (200, 'OK',
-                                  ['Content-Type', 'text/html'], $content);
-  my $h = App::Chart::Suffix::TSP::parse($resp);
-  print "h= ",Dumper($h);
-   App::Chart::Download::crunch_h ($h);
-  print "h= ",Dumper($h);
-
-#   App::Chart::Download::write_daily_group ($h);
-  exit 0;
-}
 {
   print App::Chart::Suffix::TSP::symbol_to_name('G.TSP'),"\n";
   print App::Chart::Suffix::TSP::symbol_to_name('LINCOME.TSP'),"\n";

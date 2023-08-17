@@ -1,9 +1,35 @@
 package Plack::Handler::Thrall;
 
+=head1 NAME
+
+Plack::Handler::Thrall - Plack adapter for Thrall
+
+=head1 SYNOPSIS
+
+=for markdown ```perl
+
+    use Plack::Loader;
+
+    my $loader = Plack::Loader->load('Thrall', port => 80);
+    $loader->run(sub { [200, ['Content-Type', 'text/plain'], ['PSGI app']] });
+
+=for markdown ```
+
+=head1 DESCRIPTION
+
+This is a stub module that allows Thrall to be loaded up under L<plackup>
+and other L<Plack> tools. Set C<$ENV{PLACK_SERVER}> to C<'Thrall'> or use
+the -s parameter to L<plackup> to use Thrall under L<Plack>.
+
+See L<plackup> and L<thrall> (lower case) for available command line
+options.
+
+=cut
+
 use strict;
 use warnings;
 
-our $VERSION = '0.0305';
+our $VERSION = '0.0405';
 
 use base qw(Thrall::Server);
 
@@ -31,7 +57,7 @@ sub new {
     # instantiate and set the variables
     my $self = $class->SUPER::new(%args);
 
-    $self->{is_multithread}  = Plack::Util::TRUE;
+    $self->{is_multithread} = Plack::Util::TRUE;
     $self->{is_multiprocess} = Plack::Util::FALSE;
 
     $self->{max_workers} = $max_workers;
@@ -45,7 +71,7 @@ sub new {
 }
 
 sub run {
-    my($self, $app) = @_;
+    my ($self, $app) = @_;
 
     $self->_daemonize();
 
@@ -87,13 +113,12 @@ sub run {
             warn "*** running ", scalar threads->list, " threads" if DEBUG;
             foreach my $thr (threads->list(threads::joinable)) {
                 warn "*** wait for thread ", $thr->tid if DEBUG;
-                eval {
-                    $thr->detach;
-                };
+                eval { $thr->detach; };
                 warn $@ if $@;
                 $self->_create_thread($app);
                 $self->_sleep($self->{spawn_interval});
             }
+
             # slow down main thread
             $self->_sleep($self->{main_thread_delay});
         }
@@ -103,6 +128,7 @@ sub run {
         warn "*** stopping main thread ", threads->tid if DEBUG;
         exit 0;
     } else {
+
         # run directly, mainly for debugging
         local $SIG{$sigint} = local $SIG{TERM} = sub {
             my ($sig) = @_;
@@ -117,3 +143,21 @@ sub run {
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<thrall>,
+L<Thrall>,
+L<Plack>,
+L<Plack::Runner>.
+
+=head1 LICENSE
+
+Copyright (c) 2013-2016, 2023 Piotr Roszatycki <dexter@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+
+See L<http://dev.perl.org/licenses/artistic.html>

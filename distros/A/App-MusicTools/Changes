@@ -13,5 +13,3 @@
    Music::PitchNum::German output. Also, ensure script headers reference the
    module that installs them.
  * 1.19 - reworked ly-fu: add --show-code option, better output, etc.
-
-Otherwise, see the git repository.

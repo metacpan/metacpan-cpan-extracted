@@ -4,15 +4,19 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_code check_length check_number check_required);
+use Mo::utils qw(check_code check_isa check_length check_number check_required);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has author => (
 	is => 'ro',
 );
 
 has comment => (
+	is => 'ro',
+);
+
+has dt_created => (
 	is => 'ro',
 );
 
@@ -48,6 +52,9 @@ sub BUILD {
 
 	# Check comment.
 	check_length($self, 'comment', 1000);
+
+	# Check date created.
+	check_isa($self, 'dt_created', 'DateTime');
 
 	# Check height.
 	check_number($self, 'height');
@@ -89,6 +96,7 @@ Data::Image - Data object for image.
  my $obj = Data::Image->new(%params);
  my $author = $obj->author;
  my $comment = $obj->comment;
+ my $dt_created = $obj->dt_created;
  my $height = $obj->height;
  my $id = $obj->id;
  my $size = $obj->size;
@@ -119,6 +127,12 @@ Default value is undef.
 Image comment.
 It's optional.
 Default value is undef.
+
+=item * C<dt_created>
+
+Date and time the image was created.
+Value must be L<DateTime> object.
+It's optional.
 
 =item * C<height>
 
@@ -174,6 +188,14 @@ Get image comment.
 
 Returns string.
 
+=head2 C<dt_created>
+
+ my $dt_created = $obj->dt_created;
+
+Get date and time the image was created.
+
+Returns L<DateTime> object.
+
 =head2 C<height>
 
  my $height = $obj->height;
@@ -222,6 +244,30 @@ Get image width.
 
 Returns number.
 
+=head1 ERRORS
+
+ new():
+         From Mo::utils:
+                 Parameter 'author' has length greater than '255'.
+                         Value: %s
+                 Parameter 'comment' has length greater than '1000'.
+                         Value: %s
+                 Parameter 'dt_created' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'height' must a number.
+                         Value: %s
+                 Parameter 'id' must a number.
+                         Value: %s
+                 Parameter 'size' must a number.
+                         Value: %s
+                 Parameter 'url' has length greater than '255'.
+                         Value: %s
+                 Parameter 'url_cb' must be a code.
+                         Value: %s
+                 Parameter 'width' must a number.
+                         Value: %s
+
 =head1 EXAMPLE
 
 =for comment filename=create_and_print_image.pl
@@ -230,10 +276,16 @@ Returns number.
  use warnings;
 
  use Data::Image;
+ use DateTime;
 
  my $obj = Data::Image->new(
          'author' => 'Zuzana Zonova',
          'comment' => 'Michal from Czechia',
+         'dt_created' => DateTime->new(
+                 'day' => 1,
+                 'month' => 1,
+                 'year' => 2022,
+         ),
          'height' => 2730,
          'size' => 1040304,
          'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
@@ -247,6 +299,7 @@ Returns number.
  print 'Size: '.$obj->size."\n";
  print 'URL: '.$obj->url."\n";
  print 'Width: '.$obj->width."\n";
+ print 'Date and time the image was created: '.$obj->dt_created."\n";
 
  # Output:
  # Author: Zuzana Zonova
@@ -255,6 +308,7 @@ Returns number.
  # Size: 1040304
  # URL: https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
  # Width: 4096
+ # Date and time the photo was created: 2022-01-01T00:00:00
 
 =head1 DEPENDENCIES
 
@@ -283,12 +337,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

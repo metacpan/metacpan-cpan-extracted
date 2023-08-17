@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeMergeRequest.name :   ,
-# PostWorksheetCellsRangeMergeRequest.sheetName :   ,
-# PostWorksheetCellsRangeMergeRequest.range :   ,
-# PostWorksheetCellsRangeMergeRequest.folder :   ,
-# PostWorksheetCellsRangeMergeRequest.storageName :    
+# PostWorksheetCellsRangeMergeRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeMergeRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangeMergeRequest.range : range description.  ,
+# PostWorksheetCellsRangeMergeRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangeMergeRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_merge' } = { 
-    	summary => '',
+    	summary => 'Combines a range of cells into a single cell. ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'Range',
      	base_name => 'range',
-     	description => '',
+     	description => 'range description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

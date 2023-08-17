@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-FLORA
 
+0.18  Sun 30 Jul 2023 14:44:19 PDT
+  * removed [Test::NewVersion], which has fallen into disrepair
+
 0.17  Tue  2 Feb 2016 18:47:59 PST
   * re-release using latest version of self, to eliminate UNKNOWN results from
     cpantesters

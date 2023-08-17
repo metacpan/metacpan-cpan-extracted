@@ -3,9 +3,13 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use File::Object;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Wikibase::Cache::Backend::Basic;
+
+# Test dir.
+my $data_dir = File::Object->new->up->dir('data');
 
 # Test.
 my $obj = Wikibase::Cache::Backend::Basic->new;
@@ -26,3 +30,12 @@ eval {
 };
 is($EVAL_ERROR, "Type 'bad' isn't supported.\n", "Type 'bad' isn't supported.");
 clean();
+
+# Test.
+open my $fh, '<', $data_dir->file('example.txt')->s;
+$obj = Wikibase::Cache::Backend::Basic->new(
+	'data_fh' => $fh,
+);
+$ret = $obj->get('label', 'P31');
+is($ret, 'foo', 'Get label for P31 in test mapping file (foo).');
+close $fh;

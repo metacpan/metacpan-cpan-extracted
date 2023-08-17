@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181421;
+our $VERSION = 1.20230614174404;
 
 my $formatters = [
                 {
@@ -115,11 +115,10 @@ my $validators = {
                 [89][0-6]
               )\\d|
               4(?:
-                2[2-469]|
+                2[29]|
                 39|
-                46|
-                6[25]|
-                7[0-3]|
+                62|
+                7[0-2]|
                 83
               )|
               6
@@ -131,11 +130,9 @@ my $validators = {
               )|
               4(?:
                 0\\d|
-                2[246]|
+                [26]2|
                 39|
-                46|
-                62|
-                7[0-3]|
+                7[0-2]|
                 83
               )|
               51\\d\\d
@@ -143,7 +140,7 @@ my $validators = {
             4(?:
               2(?:
                 2\\d\\d|
-                48[0-3]
+                48[013]
               )|
               3(?:
                 20\\d|
@@ -165,14 +162,14 @@ my $validators = {
                 124|
                 [56]2\\d
               )\\d|
-              247[23]|
+              2472|
               3(?:
                 20\\d|
                 470
               )|
               4(?:
                 2[04]\\d|
-                47[23]
+                472
               )|
               7(?:
                 (?:
@@ -181,8 +178,7 @@ my $validators = {
                 )\\d|
                 4(?:
                   39|
-                  60|
-                  7[013]
+                  [67]0
                 )
               )
             )
@@ -190,10 +186,10 @@ my $validators = {
           5(?:
             2(?:
               2\\d{5,6}|
-              47[023]\\d{4}
+              47[02]\\d{4}
             )|
             (?:
-              347[23]|
+              3472|
               4(?:
                 2(?:
                   1|
@@ -208,7 +204,7 @@ my $validators = {
               )|
               7(?:
                 20\\d|
-                48[0-2]
+                48[01]
               )|
               8(?:
                 20\\d|
@@ -216,7 +212,7 @@ my $validators = {
               )|
               9(?:
                 20\\d|
-                47[01]
+                470
               )
             )\\d{4}
           )|
@@ -263,10 +259,15 @@ my $validators = {
               )|
               4[24-7]|
               5(?:
-                2\\d|
-                4[1-9]|
-                51
-              )\\d|
+                (?:
+                  2\\d|
+                  51
+                )\\d|
+                4(?:
+                  [1-35-9]\\d|
+                  4[0-57-9]
+                )
+              )|
               6[23]
             )\\d{4}
           )|
@@ -335,11 +336,10 @@ my $validators = {
                 [89][0-6]
               )\\d|
               4(?:
-                2[2-469]|
+                2[29]|
                 39|
-                46|
-                6[25]|
-                7[0-3]|
+                62|
+                7[0-2]|
                 83
               )|
               6
@@ -351,11 +351,9 @@ my $validators = {
               )|
               4(?:
                 0\\d|
-                2[246]|
+                [26]2|
                 39|
-                46|
-                62|
-                7[0-3]|
+                7[0-2]|
                 83
               )|
               51\\d\\d
@@ -363,7 +361,7 @@ my $validators = {
             4(?:
               2(?:
                 2\\d\\d|
-                48[0-3]
+                48[013]
               )|
               3(?:
                 20\\d|
@@ -385,14 +383,14 @@ my $validators = {
                 124|
                 [56]2\\d
               )\\d|
-              247[23]|
+              2472|
               3(?:
                 20\\d|
                 470
               )|
               4(?:
                 2[04]\\d|
-                47[23]
+                472
               )|
               7(?:
                 (?:
@@ -401,8 +399,7 @@ my $validators = {
                 )\\d|
                 4(?:
                   39|
-                  60|
-                  7[013]
+                  [67]0
                 )
               )
             )
@@ -410,10 +407,10 @@ my $validators = {
           5(?:
             2(?:
               2\\d{5,6}|
-              47[023]\\d{4}
+              47[02]\\d{4}
             )|
             (?:
-              347[23]|
+              3472|
               4(?:
                 2(?:
                   1|
@@ -428,7 +425,7 @@ my $validators = {
               )|
               7(?:
                 20\\d|
-                48[0-2]
+                48[01]
               )|
               8(?:
                 20\\d|
@@ -436,7 +433,7 @@ my $validators = {
               )|
               9(?:
                 20\\d|
-                47[01]
+                470
               )
             )\\d{4}
           )|
@@ -483,10 +480,15 @@ my $validators = {
               )|
               4[24-7]|
               5(?:
-                2\\d|
-                4[1-9]|
-                51
-              )\\d|
+                (?:
+                  2\\d|
+                  51
+                )\\d|
+                4(?:
+                  [1-35-9]\\d|
+                  4[0-57-9]
+                )
+              )|
               6[23]
             )\\d{4}
           )|
@@ -561,16 +563,13 @@ my $validators = {
                 )|
                 (?:
                   6\\d|
+                  8[89]|
                   9[4-8]
                 )\\d|
                 7(?:
                   3|
                   40|
                   [5-9]\\d
-                )|
-                8(?:
-                  78|
-                  [89]\\d
                 )
               )\\d|
               4(?:
@@ -594,7 +593,7 @@ my $validators = {
                 'specialrate' => '',
                 'toll_free' => '
           80080(?:
-            [01][1-9]|
+            0[1-9]|
             2\\d
           )\\d{3}
         ',
@@ -604,151 +603,146 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"951465", "Yangon",
-"9554470", "Taungoo",
-"9567470", "Naypyitaw",
-"952424", "Mandalay",
-"952462", "Mandalay",
-"9575470", "Shwebo",
-"955645", "Tandar",
-"9557482", "Mon",
-"9564472", "Meiktila",
-"954353", "Buthidaung",
-"9571483", "Monywa",
-"9542481", "Pathein",
-"9543202", "Rakhine",
-"9553473", "Pyay",
-"951429", "Yangon",
-"9542480", "Pathein",
-"95522221", "Bago",
-"9570470", "Hakha",
-"951472", "Yangon",
-"956124623", "Chauk",
-"95522224", "Bago",
-"95522230", "Oathar\ Myothit",
-"951685", "Bayintnaung",
-"9562472", "Pakokku",
-"95712032", "Ohbotaung",
-"9552470", "Bago",
-"9543483", "Sittwe\/Thandwe",
-"95812823", "Moenae",
-"952483", "Mandalay",
-"9567471", "Naypyitaw",
-"958546", "Pyinoolwin",
-"952422", "Mandalay",
-"956260", "Kanma",
-"95812822", "Moenae",
-"958542", "Pyinoolwin",
-"958547", "Pyinoolwin",
-"95812824", "Moenae",
-"9567473", "Naypyitaw",
-"955620", "Mandalay",
-"952426", "Mandalay",
-"958548", "Pyinoolwin",
-"951550", "Bahan",
-"95812821", "Moenae",
-"951439", "Yangon",
-"956124643", "Bagan",
-"952470", "Yangon",
-"95522222", "Bago",
-"9581470", "Taunggyi",
-"9571470", "Monywa",
-"956320", "Magway",
-"95522223", "Bago",
-"951680", "Bayintnaung",
+$areanames{en} = {"9558470", "Hpa\-An",
 "958528", "Pyinoolwin",
-"952446", "Mandalay",
-"958522", "Pyinoolwin",
-"956323", "Magway",
-"9581471", "Shan\ \(South\)",
-"951683", "Bayintnaung",
-"9542483", "Ayeyarwaddy\/Pathein",
-"9582490", "Shan\ \(North\)",
-"9567550", "Naypyidaw",
-"952473", "Mandalay",
-"951551", "Bahan",
-"952471", "Mandalay",
-"9567439", "Naypyidaw",
-"951553", "Bahan",
-"9558472", "Hpa\-An",
-"9543470", "Sittwe",
-"9552473", "Bago",
-"951681", "Bayintnaung",
-"958551", "Yangon",
-"951423", "Yangon",
-"9567460", "Naypyitaw",
-"958544", "Pyinoolwin",
-"958635", "Sintkuu",
-"958620", "Mogoke",
-"9543565", "Palatwa",
-"951424", "Yangon",
-"9552472", "Bago",
-"956525", "Ngape",
-"958543", "Pyinoolwin",
-"9559470", "Dawei",
-"958149", "Sesin",
-"951462", "Yangon",
-"9557481", "Mawlamyine",
-"956940", "Sinpaungwae",
-"958639", "Letpanhla",
-"9556483", "Thanlyin",
-"956124622", "Chauk",
-"9542482", "Ayeyarwaddy",
-"958541", "Pyinoolwin",
-"956324", "Magway",
-"958131", "Loilem",
-"951684", "Bayintnaung",
-"9582320", "Manton",
-"951682", "Bayintnaung",
-"951687", "Bayintnaung",
-"951688", "Bayintnaung",
-"958621", "Mogoke",
-"9583470", "Loikaw",
-"958523", "Pyinoolwin",
-"952472", "Mandalay",
-"9557480", "Mawlamyine\/Thanbyuzayat",
-"956124644", "Bagan",
-"951483", "Yangon",
-"9559471", "Tanintharyi",
-"95812820", "Moenae",
 "955851", "Myawaddy",
+"9581471", "Shan\ \(South\)",
+"958546", "Pyinoolwin",
+"9545470", "Pyapon",
+"95812822", "Moenae",
+"951424", "Yangon",
+"952424", "Mandalay",
+"9582490", "Shan\ \(North\)",
+"952483", "Mandalay",
+"9556483", "Thanlyin",
+"951483", "Yangon",
+"951551", "Bahan",
+"951550", "Bahan",
+"9543565", "Palatwa",
+"958529", "Padaythar\ Myothit",
 "951552", "Bahan",
-"951422", "Yangon",
-"958521", "Pyinoolwin",
-"958130", "Pinlon",
-"956124621", "Chauk",
-"956124620", "Chauk",
+"9542483", "Ayeyarwaddy\/Pathein",
+"95812824", "Moenae",
+"951684", "Bayintnaung",
+"9543470", "Sittwe",
+"958620", "Mogoke",
+"958541", "Pyinoolwin",
+"9564472", "Meiktila",
+"958621", "Mogoke",
+"9585440", "Pyinoolwin",
 "958540", "Ohn\ Chaw",
-"951426", "Yangon",
-"9574470", "Myitkyinar\/Bahmaw",
-"9558470", "Hpa\-An",
-"956124641", "Bagan",
-"956124640", "Bagan",
-"958545", "Pyinoolwin",
-"9563470", "Magway",
+"958542", "Pyinoolwin",
+"9567460", "Naypyitaw",
+"956323", "Magway",
+"9585448", "Pyinoolwin",
+"95812820", "Moenae",
+"951422", "Yangon",
+"956525", "Ngape",
+"952422", "Mandalay",
+"9542481", "Pathein",
+"956124622", "Chauk",
+"9582320", "Manton",
+"956124643", "Bagan",
+"951686", "Bayintnaung",
+"95812821", "Moenae",
+"9569200", "Aunglan",
+"9554470", "Taungoo",
+"958630", "Thabeikkyin",
+"951681", "Bayintnaung",
+"951465", "Yangon",
+"956124642", "Bagan",
+"951680", "Bayintnaung",
+"951682", "Bayintnaung",
+"9567439", "Naypyidaw",
+"9585447", "Pyinoolwin",
+"9571483", "Monywa",
 "958141", "Naungtayar",
+"9557480", "Mawlamyine\/Thanbyuzayat",
+"9567550", "Naypyidaw",
+"958523", "Pyinoolwin",
+"951426", "Yangon",
+"9552472", "Bago",
+"952426", "Mandalay",
+"951470", "Yangon",
+"952471", "Mandalay",
+"95522223", "Bago",
+"951471", "Yangon",
+"952470", "Yangon",
+"952472", "Mandalay",
+"9585445", "Pyinoolwin",
+"956124623", "Chauk",
+"951472", "Yangon",
+"9585444", "Pyinoolwin",
+"951683", "Bayintnaung",
+"956124640", "Bagan",
+"95522224", "Bago",
+"956124644", "Bagan",
+"956124641", "Bagan",
+"958521", "Pyinoolwin",
+"9585441", "Pyinoolwin",
+"958522", "Pyinoolwin",
+"958635", "Sintkuu",
+"9552470", "Bago",
+"958238", "Tantyan",
+"956260", "Kanma",
+"9561200", "Chauk",
+"9581470", "Taunggyi",
+"958131", "Loilem",
+"956124621", "Chauk",
+"956320", "Magway",
+"958548", "Pyinoolwin",
+"955620", "Mandalay",
 "9553472", "Pyay",
+"951423", "Yangon",
+"958130", "Pinlon",
+"951439", "Yangon",
 "952439", "Mandalay",
 "956124624", "Chauk",
-"951470", "Yangon",
-"951686", "Bayintnaung",
-"958549", "Pyinoolwin",
-"9545470", "Pyapon",
-"9562473", "Magway",
-"951446", "Yangon",
+"952462", "Mandalay",
+"956124620", "Chauk",
+"95522222", "Bago",
+"95712032", "Ohbotaung",
+"951462", "Yangon",
+"951685", "Bayintnaung",
 "9522000", "Mingalar\ Mandalay",
-"956124642", "Bagan",
-"9564473", "Mandalay",
 "95642487", "Shawpin",
+"956940", "Sinpaungwae",
+"958547", "Pyinoolwin",
+"958549", "Pyinoolwin",
+"9571470", "Monywa",
+"9585449", "Pyinoolwin",
+"95522230", "Oathar\ Myothit",
+"9563470", "Magway",
+"951429", "Yangon",
+"955645", "Tandar",
+"9557481", "Mawlamyine",
 "95256", "Amarapura",
-"951473", "Yangon",
-"958238", "Tantyan",
-"9561200", "Chauk",
-"951471", "Yangon",
+"954353", "Buthidaung",
+"9585442", "Pyinoolwin",
+"958543", "Pyinoolwin",
+"9583470", "Loikaw",
+"9574470", "Myitkyinar\/Bahmaw",
+"958639", "Letpanhla",
+"95812823", "Moenae",
+"9558472", "Hpa\-An",
+"958149", "Sesin",
+"9570470", "Hakha",
+"9575470", "Shwebo",
+"951687", "Bayintnaung",
+"9543202", "Rakhine",
+"9542480", "Pathein",
+"956324", "Magway",
+"9567470", "Naypyitaw",
+"951688", "Bayintnaung",
+"9543483", "Sittwe\/Thandwe",
+"9559470", "Dawei",
+"95522221", "Bago",
+"951553", "Bahan",
+"958551", "Yangon",
+"958545", "Pyinoolwin",
 "958625", "Kyatpyin",
-"958630", "Thabeikkyin",
-"958529", "Padaythar\ Myothit",
-"9569200", "Aunglan",};
+"9562472", "Pakokku",
+"9585443", "Pyinoolwin",};
 
     sub new {
       my $class = shift;

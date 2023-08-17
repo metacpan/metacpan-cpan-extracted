@@ -21,7 +21,7 @@ name: Acme-CPANModules-TextTable
 provides:
   Acme::CPANModules::TextTable:
     file: lib/Acme/CPANModules/TextTable.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Text::ANSITable: '0.602'
   Text::ASCIITable: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-TextTable
   homepage: https://metacpan.org/release/Acme-CPANModules-TextTable
   repository: git://github.com/perlancar/perl-Acme-CPANModules-TextTable.git
-version: '0.014'
+version: '0.015'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -238,7 +238,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -350,7 +350,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

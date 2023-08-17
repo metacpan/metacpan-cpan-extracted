@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::Request;
+package Net::Async::HTTP::Server::Request 0.14;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.13';
 
 use Carp;
 

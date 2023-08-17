@@ -12,47 +12,7 @@
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
 
-/* Wrappers between OP * and B::OP-blessed SVs */
-#define newSVop(o)  S_newSVop(aTHX_ o)
-static SV *S_newSVop(pTHX_ OP *o)
-{
-  SV *ret = newSV(0);
-
-  const char *opclassname;
-  switch(op_class(o)) {
-    case OPclass_BASEOP:   opclassname = "B::OP";       break;
-    case OPclass_UNOP:     opclassname = "B::UNOP";     break;
-    case OPclass_BINOP:    opclassname = "B::BINOP";    break;
-    case OPclass_LOGOP:    opclassname = "B::LOGOP";    break;
-    case OPclass_LISTOP:   opclassname = "B::LISTOP";   break;
-    case OPclass_PMOP:     opclassname = "B::PMOP";     break;
-    case OPclass_SVOP:     opclassname = "B::SVOP";     break;
-    case OPclass_PADOP:    opclassname = "B::PADOP";    break;
-    case OPclass_PVOP:     opclassname = "B::PVOP";     break;
-    case OPclass_LOOP:     opclassname = "B::LOOP";     break;
-    case OPclass_COP:      opclassname = "B::COP";      break;
-    case OPclass_METHOP:   opclassname = "B::METHOP";   break;
-    case OPclass_UNOP_AUX: opclassname = "B::UNOP_AUX"; break;
-    default:
-      croak("TODO: handle opclass=%d\n", op_class(o));
-  }
-
-  sv_setiv(newSVrv(ret, opclassname), PTR2IV(o));
-  return ret;
-}
-
-#define SvOPo(sv)  S_SvOPo(aTHX_ sv)
-static OP *S_SvOPo(pTHX_ SV *sv)
-{
-  if(!SvOK(sv))
-    croak("Expected a B::OP instance, found <undef>");
-  if(!SvROK(sv) || !sv_derived_from(sv, "B::OP"))
-    croak("Expected a B::OP instance, found %" SVf, SVfARG(sv));
-
-  return NUM2PTR(OP *, SvIV(SvRV(sv)));
-}
-
-#define maySvOPo(sv)  (sv && SvOK(sv) ? SvOPo(sv) : NULL)
+#include "newSVop.c.inc"
 
 struct XPKFPHookdata {
   /* Phase callbacks */
@@ -191,20 +151,6 @@ static int cb_build(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, v
   return ret;
 }
 
-#define ENTER_and_setup_pad(name)  S_ENTER_and_setup_pad(aTHX_ name)
-static void S_ENTER_and_setup_pad(pTHX_ const char *name)
-{
-  if(!PL_compcv)
-    croak("Cannot call %s while not compiling a subroutine", name);
-
-  ENTER;
-
-  PAD_SET_CUR(CvPADLIST(PL_compcv), 1);
-
-  SAVESPTR(PL_comppad_name);
-  PL_comppad_name = PadlistNAMES(CvPADLIST(PL_compcv));
-}
-
 static void S_setup_constants(pTHX)
 {
   HV *stash;
@@ -220,24 +166,10 @@ static void S_setup_constants(pTHX)
   DO_CONSTANT(KEYWORD_PLUGIN_EXPR);
   DO_CONSTANT(KEYWORD_PLUGIN_STMT);
 
-  DO_CONSTANT(G_SCALAR);
-  DO_CONSTANT(G_LIST);
-  DO_CONSTANT(G_VOID);
-
-  DO_CONSTANT(OPf_WANT);
-  DO_CONSTANT(OPf_WANT_VOID);
-  DO_CONSTANT(OPf_WANT_SCALAR);
-  DO_CONSTANT(OPf_WANT_LIST);
-  DO_CONSTANT(OPf_KIDS);
-  DO_CONSTANT(OPf_PARENS);
-  DO_CONSTANT(OPf_REF);
-  DO_CONSTANT(OPf_MOD);
-  DO_CONSTANT(OPf_STACKED);
-  DO_CONSTANT(OPf_SPECIAL);
-
   DO_CONSTANT(XPK_FLAG_EXPR);
   DO_CONSTANT(XPK_FLAG_STMT);
   DO_CONSTANT(XPK_FLAG_AUTOSEMI);
+  DO_CONSTANT(XPK_FLAG_BLOCKSCOPE);
 
   DO_CONSTANT(XPK_LEXVAR_SCALAR);
   DO_CONSTANT(XPK_LEXVAR_ARRAY);
@@ -294,6 +226,7 @@ SV *to_array(SV *self)
     else if(strEQ(type, "XPK_COMMA"))           piece = (struct XSParseKeywordPieceType)XPK_COMMA;
     else if(strEQ(type, "XPK_COLON"))           piece = (struct XSParseKeywordPieceType)XPK_COLON;
     else if(strEQ(type, "XPK_EQUALS"))          piece = (struct XSParseKeywordPieceType)XPK_EQUALS;
+    else if(strEQ(type, "XPK_INTRO_MY"))        piece = (struct XSParseKeywordPieceType)XPK_INTRO_MY;
     /* Single-SV parametric */
     else if(strEQ(type, "XPK_LEXVARNAME"))
       piece = (struct XSParseKeywordPieceType)XPK_LEXVARNAME(SvUV(svp[1]));
@@ -324,24 +257,24 @@ SV *to_array(SV *self)
       piece = (struct XSParseKeywordPieceType)XPK_CHOICE_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
-    else if(strEQ(type, "XPK_PARENSCOPE"))
-      piece = (struct XSParseKeywordPieceType)XPK_PARENSCOPE_pieces(
+    else if(strEQ(type, "XPK_PARENS"))
+      piece = (struct XSParseKeywordPieceType)XPK_PARENS_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
-    else if(strEQ(type, "XPK_ARGSCOPE"))
-      piece = (struct XSParseKeywordPieceType)XPK_ARGSCOPE_pieces(
+    else if(strEQ(type, "XPK_ARGS"))
+      piece = (struct XSParseKeywordPieceType)XPK_ARGS_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
-    else if(strEQ(type, "XPK_BRACKETSCOPE"))
-      piece = (struct XSParseKeywordPieceType)XPK_BRACKETSCOPE_pieces(
+    else if(strEQ(type, "XPK_BRACKETS"))
+      piece = (struct XSParseKeywordPieceType)XPK_BRACKETS_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
-    else if(strEQ(type, "XPK_BRACESCOPE"))
-      piece = (struct XSParseKeywordPieceType)XPK_BRACESCOPE_pieces(
+    else if(strEQ(type, "XPK_BRACES"))
+      piece = (struct XSParseKeywordPieceType)XPK_BRACES_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
-    else if(strEQ(type, "XPK_CHEVRONSCOPE"))
-      piece = (struct XSParseKeywordPieceType)XPK_CHEVRONSCOPE_pieces(
+    else if(strEQ(type, "XPK_CHEVRONS"))
+      piece = (struct XSParseKeywordPieceType)XPK_CHEVRONS_pieces(
         make_pieces_array(AV_FROM_REF(svp[1]))
       );
     else
@@ -352,141 +285,6 @@ SV *to_array(SV *self)
     RETVAL
 
 MODULE = XS::Parse::Keyword::FromPerl    PACKAGE = XS::Parse::Keyword::FromPerl
-
-I32 opcode(const char *opname)
-  CODE:
-    for(RETVAL = 0; RETVAL < OP_max; RETVAL++)
-      if(strEQ(opname, PL_op_name[RETVAL]))
-        goto found;
-    croak("Unrecognised opcode(\"%s\")", opname);
-found:
-    ;
-  OUTPUT:
-    RETVAL
-
-SV *
-op_contextualize(SV *o, I32 context)
-  CODE:
-    ENTER_and_setup_pad("op_contextualize");
-    RETVAL = newSVop(op_contextualize(SvOPo(o), context));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-op_scope(SV *o)
-  CODE:
-    ENTER_and_setup_pad("op_scope");
-    RETVAL = newSVop(op_scope(SvOPo(o)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newOP(I32 type, I32 flags)
-  CODE:
-    ENTER_and_setup_pad("newOP");
-    RETVAL = newSVop(newOP(type, flags));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newASSIGNOP(I32 flags, SV *left, I32 optype, SV *right)
-  CODE:
-    ENTER_and_setup_pad("newASSIGNOP");
-    RETVAL = newSVop(newASSIGNOP(flags, SvOPo(left), optype, SvOPo(right)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newBINOP(I32 type, I32 flags, SV *first, SV *last)
-  CODE:
-    ENTER_and_setup_pad("newBINOP");
-    RETVAL = newSVop(newBINOP(type, flags, SvOPo(first), SvOPo(last)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newCONDOP(I32 flags, SV *first, SV *trueop, SV *falseop)
-  CODE:
-    ENTER_and_setup_pad("newCONDOP");
-    RETVAL = newSVop(newCONDOP(flags, SvOPo(first), SvOPo(trueop), SvOPo(falseop)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newFOROP(I32 flags, SV *sv, SV *expr, SV *block, SV *cont)
-  CODE:
-    ENTER_and_setup_pad("newFOROP");
-    RETVAL = newSVop(newFOROP(flags, maySvOPo(sv), SvOPo(expr), SvOPo(block), maySvOPo(cont)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newGVOP(I32 type, I32 flags, SV *gv)
-  CODE:
-    if(!SvROK(gv) || SvTYPE(SvRV(gv)) != SVt_PVGV)
-      croak("Expected a GLOB ref to newGVOP");
-    ENTER_and_setup_pad("newGVOP");
-    RETVAL = newSVop(newGVOP(type, flags, (GV *)SvRV(gv)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newLISTOP(I32 type, I32 flags, ...)
-  CODE:
-    ENTER_and_setup_pad("newLISTOP");
-    OP *o = newLISTOP(OP_LIST, 0, NULL, NULL);
-    for(U32 i = 2; i < items; i++)
-      o = op_append_elem(OP_LIST, o, SvOPo(ST(i)));
-    if(type != OP_LIST)
-      o = op_convert_list(type, flags, o);
-    RETVAL = newSVop(o);
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newLOGOP(I32 type, I32 flags, SV *first, SV *other)
-  CODE:
-    ENTER_and_setup_pad("newLOGOP");
-    RETVAL = newSVop(newLOGOP(type, flags, SvOPo(first), SvOPo(other)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newPADxVOP(I32 type, I32 flags, U32 padoffset)
-  CODE:
-    ENTER_and_setup_pad("newPADxVOP");
-    RETVAL = newSVop(newPADxVOP(type, flags, padoffset));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newSVOP(I32 type, I32 flags, SV *sv)
-  CODE:
-    ENTER_and_setup_pad("newSVOP");
-    RETVAL = newSVop(newSVOP(type, flags, newSVsv(sv)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
-
-SV *
-newUNOP(I32 type, I32 flags, SV *first)
-  CODE:
-    ENTER_and_setup_pad("newUNOP");
-    RETVAL = newSVop(newUNOP(type, flags, SvOPo(first)));
-    LEAVE;
-  OUTPUT:
-    RETVAL
 
 void
 register_xs_parse_keyword(const char *name, ...)
@@ -581,6 +379,6 @@ register_xs_parse_keyword(const char *name, ...)
     register_xs_parse_keyword(savepv(name), hooksptr, dataptr);
 
 BOOT:
-  boot_xs_parse_keyword(0.33);
+  boot_xs_parse_keyword(0.35);
 
   S_setup_constants(aTHX);

@@ -1,5 +1,55 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.23 -- Sun Aug 13 14:39:03 ADT 2023
+
+        [Significant updates since 0.20]
+        - First release with new maintainer TIMLEGGE
+        - Support openssl greater than 1.0 without warnings
+        - Fix builds on Solaris, windows and most bsds
+        - Several bugfixes from the issues list
+        - Missed indexing in 0.22 provides was not in META
+
+        [Change Log]
+        - aff07b2 Move pm file to allow indexing to work properly
+        - eb0c2e4 v0.22
+
+0.22 -- Sat Aug 12 09:45:26 ADT 2023
+
+        [Significant updates since 0.20]
+        - First release with new maintainer TIMLEGGE
+        - Support openssl greater than 1.0 without warnings
+        - Fix builds on Solaris, windows and most bsds
+        - Several bugfixes from the issues list
+
+        [Change Log]
+        - 52d9525 Add Dist::Zilla support for making releases
+        - 4b09efa Increment version for next release
+        - b34afb7 CHanges updated for 0.21
+
+0.21  Sun 06 Aug 11:04:29 AM ADT 2023
+
+        - First release with new maintainer TIMLEGGE
+        - The following commits were added to 0.20 (27c5490 Initial commit)
+        - 61f9315 Increment Version for upcoming release
+        - 002eac3 Update repo in META files
+        - fcd0063 Add cpanfile, better README.md and remove default XS module generated README
+        - bc9707b Fixes #111030 - Memory leak in parse_name
+        - fc7103f Support multiple openssl versions without deprecated warnings
+        - 998ffa5 Fixes 120727 Error in synopsis
+        - f4b7c6f Remove exec bit from files
+        - 08276f2 Add some githoub actions to test builds
+        - 27e4d6e Sample fixes for Makefile.PL for solaris
+        - bf4c941 Another SvPV returns char * not unsigned char *
+        - 01414b7 Update to a newer ppport.h
+        - 1553f36 add_ext and add_ext_raw requires STACK_OF(X509_EXTENSION) not STACK_OF(X509_REQUEST)
+        - 84bf9ab X509_NAME_add_entry_by_txt second parameter is const char
+        - 35e1db5 Possible fix for solaris compiler token error
+        - bf7cae7 SvPV returns char pointer not unsigned char pointer
+        - 27c5490 Initial commit
+
+0.20  Mon Jul 17 12:26:03 PM PDT 2023
+        - Fix #148807 (thanks Michal Josef Špaček)
+
 0.19  Mon Mar 28 16:37:16 PDT 2022
         - Fix #120728 (thanks Michal Josef Špaček)
 

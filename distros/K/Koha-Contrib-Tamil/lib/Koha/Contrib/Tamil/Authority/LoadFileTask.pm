@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Authority::LoadFileTask;
 # ABSTRACT: Task loading authorities into a Koha instance
-$Koha::Contrib::Tamil::Authority::LoadFileTask::VERSION = '0.071';
+$Koha::Contrib::Tamil::Authority::LoadFileTask::VERSION = '0.072';
 use Moose;
 
 extends 'Koha::Contrib::Tamil::Authority::Task';
@@ -27,7 +27,7 @@ has doit => (is=> 'rw', isa => 'Bool', default => 0);
 
 use Carp;
 use C4::Context;
-use C4::AuthoritiesMarc;
+use C4::AuthoritiesMarc qw(AddAuthority);
 use List::Util qw( first );
 
 
@@ -145,7 +145,7 @@ Koha::Contrib::Tamil::Authority::LoadFileTask - Task loading authorities into a 
 
 =head1 VERSION
 
-version 0.071
+version 0.072
 
 =head1 AUTHOR
 
@@ -153,7 +153,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Démians.
+This software is Copyright (c) 2023 by Fréderic Démians.
 
 This is free software, licensed under:
 

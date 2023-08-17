@@ -4,7 +4,7 @@
       "Dave Cross <dave@mag-sol.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -39,15 +39,23 @@
    "provides" : {
       "Calendar::Simple" : {
          "file" : "lib/Calendar/Simple.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/calendar-simple/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/calendar-simple.git",
+         "web" : "https://github.com/davorg/calendar-simple"
+      }
    },
-   "version" : "v2.0.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

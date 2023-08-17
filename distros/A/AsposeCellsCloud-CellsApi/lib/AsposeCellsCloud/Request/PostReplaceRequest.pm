@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_replace' } = { 
-    	summary => '',
+    	summary => 'Use new text to replace specify the text from excel files.',
         params => $params,
         returns => 'FilesResult',
     };

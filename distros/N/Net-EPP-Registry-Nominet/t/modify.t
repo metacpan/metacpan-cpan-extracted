@@ -11,13 +11,13 @@
 #===============================================================================
 
 use strict;
-use warnings;
+use warnings FATAL => 'recursion';
 use utf8;
 
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 35;
+	plan tests => 37;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
@@ -45,8 +45,7 @@ my $baddomainname = "nominet.org.uk";       # not valid
 
 my $changes = {
 	'add' => { 'ns' => ["ns1.caliban-$tag.lea.sch.uk", "ns1.macduff-$tag.co.uk"] },
-	'rem' => { 'ns' => ["ns1.ganymede-$tag.net.uk"] },
-	'chg' => {}
+	'rem' => { 'ns' => ["ns1.ganymede-$tag.net.uk"] }
 };
 
 ok ($epp->modify_domain ($okdomainname, $changes),
@@ -58,7 +57,6 @@ is ($info->{ns}->[1], "ns1.macduff-$tag.co.uk.",      "Nameserver 1 changed");
 $changes = {
 	'add' => {},
 	'rem' => {},
-	'chg' => {},
 	'auto-bill'  => 7,
 	'auto-period'  => 5,
 	'notes'      => ['This is the first note.', 'Here is another note.']
@@ -196,6 +194,15 @@ $cont->{postalInfo}->{loc}->{addr} = {
 };
 ok ($epp->modify_contact ($dominfo->{registrant}, $cont),
 	"Modify utf8 contact");
+
+# Change contact/registrant ID
+
+my $oldid = $dominfo->{registrant};
+my $newid = substr ('nc' . time . $tag, 0, 16);
+$cont = {'new-id' => $newid};
+ok ($epp->modify_contact ($oldid, $cont), 'Modify contact ID');
+my $newinfo = $epp->contact_info ($newid);
+is ($newinfo->{id}, $newid, 'New ID is the one provided');
 
 # Change disclosure levels for a contact
 # Create a new contact for this first

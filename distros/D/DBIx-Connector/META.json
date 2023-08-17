@@ -43,7 +43,7 @@
          "web" : "https://github.com/ap/DBIx-Connector/issues"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
@@ -51,7 +51,7 @@
          "web" : "https://github.com/ap/DBIx-Connector"
       }
    },
-   "version" : "0.58",
+   "version" : "0.59",
    "x_copyright" : {
       "holder" : "David E. Wheeler",
       "year" : 2016

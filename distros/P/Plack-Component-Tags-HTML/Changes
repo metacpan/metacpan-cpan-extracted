@@ -1,3 +1,10 @@
+0.15 2023-06-20T10:33:58+02:00
+ - Fix test dependencies.
+
+0.14 2023-06-18T22:50:19+02:00
+ - Add tests for bad and explicit parameter 'tags' values.
+ - Pass $env variable to _css(), _tags_middle() and _cleanup() methods.
+
 0.13 2023-05-29T16:49:03+02:00
  - Move defaults to _prepare_app() directly. Possible to rewrite/place in
    module, which inherits this.

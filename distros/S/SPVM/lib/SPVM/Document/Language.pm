@@ -239,13 +239,14 @@ The list of keywords:
   alias
   allow
   as
+  basic_type_id
   break
   byte
   can
   case
   cmp
   class
-  class_id
+  compile_type_name
   copy
   default
   die
@@ -257,9 +258,8 @@ The list of keywords:
   else
   enum
   eq
-  error
-  error_code
   eval
+  eval_error_id
   extends
   for
   float
@@ -272,11 +272,13 @@ The list of keywords:
   int
   interface_t
   isa
+  isa_error
   isweak
   is_compile_type
   is_type
+  is_error
   is_read_only
-  items
+  args_width
   last
   length
   lt
@@ -301,8 +303,6 @@ The list of keywords:
   public
   precompile
   pointer
-  ref
-  refcnt
   remui
   remul
   return
@@ -311,13 +311,13 @@ The list of keywords:
   rw
   ro
   say
-  set_error_code
   static
   switch
   string
   short
   scalar
   true
+  type_name
   undef
   unless
   unweaken
@@ -330,7 +330,7 @@ The list of keywords:
   wo
   INIT
   __END__
-  __CLASS__
+  __PACKAGE__
   __FILE__
   __LINE__
 
@@ -1232,31 +1232,31 @@ The SPVM language is assumed to be parsed by yacc/bison.
 The definition of syntax parsing of SPVM language. This is written by yacc/bison syntax.
 
   %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
-  %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE ERROR_CODE ERROR ITEMS VERSION_DECL
+  %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE EVAL_ERROR_ID ARGS_WIDTH VERSION_DECL
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
   %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-  %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID EXTENDS SUPER
+  %token <opval> FATCAMMA RW RO WO INIT NEW OF BASIC_TYPE_ID EXTENDS SUPER
   %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
-  %type <opval> opt_classes classes class class_block version_decl
-  %type <opval> opt_declarations declarations declaration
+  %type <opval> opt_modules modules module module_block version_decl
+  %type <opval> opt_definitions definitions definition
   %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-  %type <opval> method anon_method opt_args args arg has use require alias our
+  %type <opval> method anon_method opt_args args arg has use require alias our anon_method_has_list anon_method_has
   %type <opval> opt_attributes attributes
   %type <opval> opt_statements statements statement if_statement else_statement
   %type <opval> for_statement while_statement foreach_statement
   %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
   %type <opval> block eval_block init_block switch_block if_require_statement
-  %type <opval> unary_operator binary_operator comparison_operator isa is_type is_compile_type
-  %type <opval> call_method opt_vaarg
+  %type <opval> unary_operator binary_operator comparison_operator isa isa_error is_type is_error is_compile_type
+  %type <opval> call_method
   %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
   %type <opval> assign inc dec allow can
   %type <opval> new array_init die warn opt_extends
   %type <opval> var_decl var interface union_type
   %type <opval> operator opt_operators operators opt_operator logical_operator void_return_operator
-  %type <opval> field_name method_name class_name class_alias_name is_read_only
-  %type <opval> type qualified_type basic_type array_type
+  %type <opval> field_name method_name alias_name is_read_only
+  %type <opval> type qualified_type basic_type array_type module_type
   %type <opval> array_type_with_length ref_type  return_type type_comment opt_type_comment
   %right <opval> ASSIGN SPECIAL_ASSIGN
   %left <opval> LOGICAL_OR
@@ -1264,57 +1264,57 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %left <opval> BIT_OR BIT_XOR
   %left <opval> BIT_AND
   %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
+  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA ISA_ERROR IS_TYPE IS_ERROR IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
   %left <opval> SHIFT
   %left <opval> '+' '-' '.'
   %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
+  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT TYPE_NAME COMPILE_TYPE_NAME DUMP NEW_STRING_LEN IS_READ_ONLY COPY
   %nonassoc <opval> INC DEC
   %left <opval> ARROW
 
   grammar
-    : opt_classes
+    : opt_modules
 
-  opt_classes
+  opt_modules
     : /* Empty */
-    | classes
+    | modules
 
-  classes
-    : classes class
-    | class
+  modules
+    : modules module
+    | module
 
-  class
-    : CLASS basic_type opt_extends class_block END_OF_FILE
-    | CLASS basic_type opt_extends ':' opt_attributes class_block END_OF_FILE
-    | CLASS basic_type opt_extends ';' END_OF_FILE
-    | CLASS basic_type opt_extends ':' opt_attributes ';' END_OF_FILE
+  module
+    : CLASS module_type opt_extends module_block END_OF_FILE
+    | CLASS module_type opt_extends ':' opt_attributes module_block END_OF_FILE
+    | CLASS module_type opt_extends ';' END_OF_FILE
+    | CLASS module_type opt_extends ':' opt_attributes ';' END_OF_FILE
 
   opt_extends
     : /* Empty */
-    | EXTENDS class_name
+    | EXTENDS basic_type
 
-  class_block
-    : '{' opt_declarations '}'
+  module_block
+    : '{' opt_definitions '}'
 
-  opt_declarations
+  opt_definitions
     : /* Empty */
-    | declarations
+    | definitions
 
-  declarations
-    : declarations declaration
-    | declaration
+  definitions
+    : definitions definition
+    | definition
 
-  declaration
+  definition
     : version_decl
-    | has
-    | method
-    | enumeration
-    | our
     | use
+    | alias
     | allow
     | interface
     | init_block
-    | alias
+    | enumeration
+    | our
+    | has ';'
+    | method
 
   init_block
     : INIT block
@@ -1323,20 +1323,20 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : VERSION_DECL CONSTANT ';'
 
   use
-    : USE class_name ';'
-    | USE class_name AS class_alias_name ';'
+    : USE basic_type ';'
+    | USE basic_type AS alias_name ';'
 
   require
-    : REQUIRE class_name
+    : REQUIRE basic_type
 
   alias
-    : ALIAS class_name AS class_alias_name ';'
+    : ALIAS basic_type AS alias_name ';'
 
   allow
-    : ALLOW class_name ';'
+    : ALLOW basic_type ';'
 
   interface
-    : INTERFACE class_name ';'
+    : INTERFACE basic_type ';'
 
   enumeration
     : opt_attributes ENUM enumeration_block
@@ -1361,17 +1361,17 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : OUR VAR_NAME ':' opt_attributes qualified_type opt_type_comment ';'
 
   has
-    : HAS field_name ':' opt_attributes qualified_type opt_type_comment ';'
+    : HAS field_name ':' opt_attributes qualified_type opt_type_comment
 
   method
-    : opt_attributes METHOD method_name ':' return_type '(' opt_args opt_vaarg')' block
-    | opt_attributes METHOD method_name ':' return_type '(' opt_args opt_vaarg')' ';'
-    | opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
-    | opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg ')' ';'
+    : opt_attributes METHOD method_name ':' return_type '(' opt_args ')' block
+    | opt_attributes METHOD method_name ':' return_type '(' opt_args ')' ';'
+    | opt_attributes METHOD ':' return_type '(' opt_args ')' block
+    | opt_attributes METHOD ':' return_type '(' opt_args ')' ';'
 
   anon_method
-    : opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
-    | '[' args ']' opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
+    : opt_attributes METHOD ':' return_type '(' opt_args ')' block
+    | '[' anon_method_has_list ']' opt_attributes METHOD ':' return_type '(' opt_args ')' block
 
   opt_args
     : /* Empty */
@@ -1384,11 +1384,16 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
 
   arg
     : var ':' qualified_type opt_type_comment
-    | var ASSIGN operator ':' qualified_type opt_type_comment
+    | var ':' qualified_type opt_type_comment ASSIGN operator
 
-  opt_vaarg
-    : /* Empty */
-    | DOT3
+  anon_method_has_list
+    : anon_method_has_list ',' anon_method_has
+    | anon_method_has_list ','
+    | anon_method_has
+
+  anon_method_has
+    : has ASSIGN operator
+    | has
 
   opt_attributes
     : /* Empty */
@@ -1430,6 +1435,8 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   die
     : DIE operator
     | DIE
+    | DIE type operator
+    | DIE type
 
   void_return_operator
     : warn
@@ -1526,18 +1533,18 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | isweak_field
     | comparison_operator
     | isa
+    | isa_error
     | is_type
+    | is_error
     | is_compile_type
     | TRUE
     | FALSE
     | is_read_only
     | can
     | logical_operator
-    | CLASS_ID class_name
-    | ERROR_CODE
-    | SET_ERROR_CODE operator
-    | ERROR
-    | ITEMS
+    | BASIC_TYPE_ID type
+    | EVAL_ERROR_ID
+    | ARGS_WIDTH
 
   operators
     : operators ',' operator
@@ -1549,7 +1556,8 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | '-' operator %prec MINUS
     | BIT_NOT operator
     | REFCNT operator
-    | REFOP operator
+    | TYPE_NAME operator
+    | COMPILE_TYPE_NAME operator
     | STRING_LENGTH operator
     | DUMP operator
     | DEREF var
@@ -1603,8 +1611,14 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   isa
     : operator ISA type
 
+  isa_error
+    : operator ISA_ERROR type
+
   is_type
     : operator IS_TYPE type
+
+  is_error
+    : operator IS_ERROR type
 
   is_compile_type
     : operator IS_COMPILE_TYPE type
@@ -1632,19 +1646,19 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : '(' qualified_type ')' operator %prec CONVERT
     | operator ARROW '(' qualified_type ')' %prec CONVERT
 
+  call_method
+    : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
+    | CURRENT_CLASS SYMBOL_NAME
+    | basic_type ARROW method_name '(' opt_operators  ')'
+    | basic_type ARROW method_name
+    | operator ARROW method_name '(' opt_operators ')'
+    | operator ARROW method_name
+    | operator ARROW '(' opt_operators ')'
+
   array_access
     : operator ARROW '[' operator ']'
     | array_access '[' operator ']'
     | field_access '[' operator ']'
-
-  call_method
-    : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
-    | CURRENT_CLASS SYMBOL_NAME
-    | class_name ARROW method_name '(' opt_operators  ')'
-    | class_name ARROW method_name
-    | operator ARROW method_name '(' opt_operators ')'
-    | operator ARROW method_name
-    | operator ARROW '(' opt_operators ')'
 
   field_access
     : operator ARROW '{' field_name '}'
@@ -1685,6 +1699,9 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : basic_type
     | array_type
     | ref_type
+
+  module_type
+    : basic_type
 
   basic_type
     : SYMBOL_NAME
@@ -1729,10 +1746,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   method_name
     : SYMBOL_NAME
 
-  class_name
-    : SYMBOL_NAME
-
-  class_alias_name
+  alias_name
     : SYMBOL_NAME
 
 =head2 Syntax Parsing Token
@@ -1764,6 +1778,9 @@ The list of syntax parsing tokens:
     <td>BIT_AND</td><td>&</td>
   </tr>
   <tr>
+    <td>BASIC_TYPE_ID</td><td>basic_type_id</td>
+  </tr>
+  <tr>
     <td>BIT_NOT</td><td>~</td>
   </tr>
   <tr>
@@ -1785,10 +1802,10 @@ The list of syntax parsing tokens:
     <td>CLASS</td><td>class</td>
   </tr>
   <tr>
-    <td>CLASS_ID</td><td>class_id</td>
+    <td>VAR_NAME</td><td>A variable name</td>
   </tr>
   <tr>
-    <td>VAR_NAME</td><td>A variable name</td>
+    <td>COMPILE_TYPE_NAME</td><td>compile_type_name</td>
   </tr>
   <tr>
     <td>CONSTANT</td><td>Literal</td>
@@ -1803,7 +1820,7 @@ The list of syntax parsing tokens:
     <td>CURRENT_CLASS</td><td>&</td>
   </tr>
   <tr>
-    <td>CURRENT_CLASS_NAME</td><td>__CLASS__</td>
+    <td>CURRENT_CLASS_NAME</td><td>__PACKAGE__</td>
   </tr>
   <tr>
     <td>DEC</td><td>--</td>
@@ -1830,9 +1847,6 @@ The list of syntax parsing tokens:
     <td>DIVIDE_UNSIGNED_LONG</td><td>divul</td>
   </tr>
   <tr>
-    <td>DOT3</td><td>...</td>
-  </tr>
-  <tr>
     <td>DOUBLE</td><td>double</td>
   </tr>
   <tr>
@@ -1851,16 +1865,10 @@ The list of syntax parsing tokens:
     <td>ENUM</td><td>enum</td>
   </tr>
   <tr>
-    <td>ERROR</td><td>error</td>
-  </tr>
-  <tr>
-    <td>ERROR_CODE</td><td>error_code</td>
+    <td>EVAL_ERROR_ID</td><td>eval_error_id</td>
   </tr>
   <tr>
     <td>EXTENDS</td><td>extends</td>
-  </tr>
-  <tr>
-    <td>SET_ERROR_CODE</td><td>set_error_code</td>
   </tr>
   <tr>
     <td>EVAL</td><td>eval</td>
@@ -1995,10 +2003,7 @@ The list of syntax parsing tokens:
     <td>REF</td><td>\</td>
   </tr>
   <tr>
-    <td>REFCNT</td><td>refcnt</td>
-  </tr>
-  <tr>
-    <td>REFOP</td><td>ref</td>
+    <td>TYPE_NAME</td><td>type_name</td>
   </tr>
   <tr>
     <td>REMAINDER</td><td>%</td>
@@ -2127,11 +2132,11 @@ The bottom is the highest precidence and the top is the lowest precidence.
   %left <opval> BIT_OR BIT_XOR
   %left <opval> BIT_AND
   %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
+  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA ISA_ERROR IS_TYPE IS_ERROR IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
   %left <opval> SHIFT
   %left <opval> '+' '-' '.'
   %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
+  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT TYPE_NAME COMPILE_TYPE_NAME DUMP NEW_STRING_LEN IS_READ_ONLY COPY
   %nonassoc <opval> INC DEC
   %left <opval> ARROW
 
@@ -2169,7 +2174,7 @@ Examples:
   
   }
 
-L<Class attributes|/"Class Attribute"> can be written after C<:>.
+L<Class attributes|/"Class Attribute"> are written after C<:>.
 
   class CLASS_NAME : CLASS_ATTRIBUTE {
   
@@ -2190,59 +2195,21 @@ Examples:
   
   }
 
-In a class block, L<loading classes|/"Loading Class">, L<class variables|/"Class Variable">, L<fields|/"Field Definition">, L<enumerations|/"Enumeration Definition">, L<methods|/"Method Definition">, L<allow statements|/"Allowing Private Access">, L<interface guarantees|/"Interface Guarantee"> and a L<INIT block|/"INIT Block"> can be defined.
-
-  class Foo {
-    
-    # allow statements
-    allow Bar;
-    
-    # INIT block
-    INIT {
-      # ...
-    }
-    
-    # Loading classes
-    use Point;
-    
-    # Interface guarantees
-    interface Stringable;
-    
-    # Class variables
-    our $VAR : int;
-    
-    # Fields
-    has var : int;
-    
-    # Enumerations
-    enum {
-      CONST_VAL1,
-      CONST_VAL2,
-    }
-    
-    # Methods
-    method foo : int ($num : int) {
-      # ...
-    }
-  }
-
 If more than one class is defined in a class file, a compilation error occurs.
 
 =head2 Version Declaration
 
-The C<version> keyword declares the version of the class.
+The C<version> keyword declares the version string of a module.
 
   version VERSION_STRING;
 
 The operand VERSION_STRING is a version string.
 
-The version string is a version of a class such as C<"1.001003">.
-
-If the version has already been declared, a compilation error occurs.
+If the version string has already been declared, a compilation error occurs.
 
 A version string is the string type.
 
-This is composed of numbers C<0-9>, C<.> and C<_>. 
+It is composed of numbers C<0-9>, C<.>. 
 
 The following checks are performed.
 
@@ -2254,9 +2221,13 @@ A version string must begin with a number. Otherwise a compilation error occurs.
 
 A version string must end with a number. Otherwise a compilation error occurs.
 
+The number of C<.> in a version string must be less than or equal to 1. Otherwise a compilation error occurs.
+
 The length of characters after C<.> in a version string must be divisible by 3. Otherwise a compilation error occurs.
 
-The version string is saved to the version information of the class.
+A version number must be able to be parsed by the C<strtod> C function. Otherwise a compilation error occurs.
+
+The version string is saved to the version information of the module.
 
 Examples:
   
@@ -2276,23 +2247,17 @@ Examples:
     version "10.001003";
   }
   
-  class Foo {
-    version "1.001003_001";
-  }
-
 =head3 Version String
 
-The version string is a string that is parsed by the L<version declaration|/"Version Declaration">.
+The version string is the string represented version of a module.
 
-This is used as the version string of the SPVM language.
+It is declared by the L<version declaration|/"Version Declaration">.
 
 =head2 Version Number
 
-The version number is a floating point number created by the following steps.
+The version number is a floating point number created by the following way.
 
-1. C<_> is removed from a L<version string/"Version Declaration">.
-
-2. The string is converted to a floating point number by the C<strtod> C function.
+A L<version string/"Version Declaration"> is converted to a floating point number by the C<strtod> C function.
 
 =head2 Class Attribute
 
@@ -2314,7 +2279,7 @@ The list of class attributes.
       <b>public</b>
     </td>
     <td>
-      This class is public. In other classes, this class can be used as the C<OPERAND> of <a href="#Creating-Object">new operator</a>.
+      This class is public. In other classes, this class can be used as the OPERAND of <a href="#Creating-Object">new operator</a>.
     </td>
   </tr>
   <tr>
@@ -2322,7 +2287,7 @@ The list of class attributes.
       <b>private</b>
     </td>
     <td>
-      This class is private. In other classes, this class cannot be used as the C<OPERAND> of <a href="#Creating-Object">new operator</a>. This is default.
+      This class is private. In other classes, this class cannot be used as the OPERAND of <a href="#Creating-Object">new operator</a>. This is default.
     </td>
   </tr>
   <tr>
@@ -2330,7 +2295,7 @@ The list of class attributes.
       <b>protected</b>
     </td>
     <td>
-      This class is protected. In other classes except for the child classes, this class cannot be used as the C<OPERAND> of <a href="#Creating-Object">new operator</a>.
+      This class is protected. In other classes except for the child classes, this class cannot be used as the OPERAND of <a href="#Creating-Object">new operator</a>.
     </td>
   </tr>
   <tr>
@@ -2406,19 +2371,19 @@ Examples:
 
 The child class inherits the destructor of the parent class if the destructor of the current class doesn't eixst.
 
-=head2 Allowing Private Access
+=head2 allow Statement
 
 Private methods, private fields, and private class variables cannot be accessed except from the current class.
 
-A private class cannot be the C<OPERAND> of the L<new operator|/"Creating Object"> except from the current class.
+A private class cannot be the OPERAND of the L<new operator|/"Creating Object"> except from the current class.
 
-The C<allow> syntax allows the private access from the other classes.
+The C<allow> statemenet allows the private access from the other classes.
 
   allow CLASS_NAME;
 
-The C<allow> syntax must be defined directory under the L<class definition|/"Class Definition">.
+The C<allow> statemenet must be defined directory under the L<class definition|/"Class Definition">.
   
-The class that is the C<OPERAND> of the C<allow> syntax is loaded by the same way as the L<use syntax|/"Loading Class">.
+The class that is the OPERAND of the C<allow> statemenet is loaded by the same way as the L<use statement|/"use Statement">.
 
 Examples:
 
@@ -2427,27 +2392,39 @@ Examples:
     allow Bar;
   }
 
-=head2 Interface Guarantee
+=head2 interface Statement
 
-The C<interface> syntax guarantees that the class has the required method defined in the L<interface|/"Interface">.
+The C<interface> statement guarantees the following things.
 
   interface INTERFACE_NAME;
 
-The C<interface> syntax must be defined directory under the L<class definition|/"Class Definition">.
+1. If the class has methods that are definied the the L<interface|/"Interface Definition">, each method must have the L<Method Compatibility|method compatibility> of each interface method in the L<interface definition|/"Interface Definition">.
 
-If the required method of the interface is not defined in the current class, a compilation error occurs.
+2. The class must have methods that defined as required interface methods in the the L<interface|/"Interface Definition">.
 
-If a method defined in the interface is defined, the method must have the same type of arguments as the method defined in the interface, and the return value must be able to be assigned without an implicite conversion to the method defined in the interface. Otherwise a compilation error occurs.
-
-The current class B<is expected to> have all methods defined in the interface.
+If not, a compilation error occurs.
 
 Examples:
 
-  # Interface guarantee
-  class Foo {
+  class Point {
     interface Stringable;
-    interface Cloneable;
+    
+    method to_string : string () {
+      my $x = $self->x;
+      my $y = $self->y;
+      
+      my $string = "($x,$y)";
+      
+      return $string;
+    }
   }
+  
+  my $stringable = (Stringable)Point->new(1, 2);
+  my $string = $stringable->to_string;
+
+=head2 Method Compatibility
+
+(TODO)
 
 =head2 Anon Class
 
@@ -2514,7 +2491,7 @@ Examples:
     
     has z : rw protected int;
     
-    static method new : Point3D ($x = 0 : int, $y = 0 : int, $z = 0 : int) {
+    static method new : Point3D ($x : int = 0, $y : int = 0, $z : int = 0) {
       my $self = new Point3D;
       
       $self->{x} = $x;
@@ -2548,25 +2525,59 @@ Examples:
 
 =head1 Interface
 
-Explains interfaces.
+The interface syntax is described.
 
 =head2 Interface Definition
 
-A interface is defined using a L<class definition|/"Class Definition"> with a L<class attribute/"Class Attribute"> C<interface_t>.
+An interface is defined using a L<class definition|/"Class Definition"> with a L<class attribute/"Class Attribute"> C<interface_t>.
 
   class Stringable: interface_t {
     required method to_string : string ();
     method foo : int ($num : long);
   }
 
-A interface must have only one required method. The required method is the method that has the L<method attribute|/"Method Attributes"> C<required>.
+An interface can have interface methods. An interface method does not need its method block.
+
+An interface can have required interface methods by using the L<method attribute|/"Method Attributes"> C<required>.
 
 The type of the interface is the L<interface type|/"Interface Type">.
 
-The class that has L<interface Guarantees|/"Interface Guarantee"> must have the required method that is declared in the interface. Otherwise a compilation error occurs.
+An interface cannnot have L<field definitions|/"Field Definition">. If so, an compilation error occurs.
+
+An interface cannnot have L<class variable definitions|/"Class Variable Definition">. If so, an compilation error occurs.
+
+An interface can have L<interface statements|/"interface Statement">.
+
+  class TestCase::Pointable : interface_t {
+    interface Stringable;
+    
+    method x : int ();
+    method y : int();
+    method to_string : string ();
+  }
+
+An interface method can have its method block.
+
+  class Stringable: interface_t {
+    method to_string : string ();
+    method call_to_string : string () {
+      return "foo " . $self->to_string;
+    }
+  }
+
+This method is only called by the static instance method call.
+
+  $self->Stringable::call_to_string;
+
+=head1 Duck Typing
+
+The duck typing is supported.
+
+  class Stringable: interface_t {
+    method to_string : string ();
+  }
 
   class Point {
-    interface Stringable;
     
     method to_string : string () {
       my $x = $self->x;
@@ -2581,36 +2592,8 @@ The class that has L<interface Guarantees|/"Interface Guarantee"> must have the 
   my $stringable = (Stringable)Point->new(1, 2);
   my $string = $stringable->to_string;
 
-A interface cannnot have L<field definitions|/"Field Definition">.
-
-A interface cannnot have L<class variable definitions|/"Class Variable Definition">.
-
-A interface can have L<interface Guarantees|/"Interface Guarantee">.
-
-  class TestCase::Pointable : interface_t {
-    interface Stringable;
-    
-    required method x : int ();
-    method y : int();
-    method to_string : string ();
-  }
-
-If the interface definition is invalid, a compilation error occurs.
-
-C<new> operator cannnot create the objects from interfaces.
-
-The interface can have the method implementation.
-
-  class Stringable: interface_t {
-    required method to_string : string ();
-    method call_to_string : string () {
-      return "foo " . $self->to_string;
-    }
-  }
-
-This method is called by the static instance method call.
-
-  $self->Stringable::call_to_string;
+The Point class have no interfaces, but A object of the Point class can be assigned to a Stringable interface
+because the to_string method in the Point class has the method compatibility of the to_string method in the Strigable interface.
 
 =head2 Class File Name
 
@@ -2622,26 +2605,25 @@ Change C<::> to C</>. Add ".spvm" at the end.
   SPVM/Foo/Bar.spvm
   SPVM/Foo/Bar/Baz.spvm
 
-=head2 Loading Class
+=head2 use Statement
 
-The C<use> syntax loads a class.
-  
-  # Load a class
+The C<use> statemenet loads a class.
+
   use Foo;
 
 If the class does not exist, a compilation error occurs.
 
 Classes are loaded at compile-time.
 
-C<use> syntax must be defined directly under the L<class definition|/"Class Definition">.
+The C<use> statemenet must be defined directly under the L<class definition|/"Class Definition">.
 
   class Foo {
     use Foo;
   }
 
-=head2 Class Alias
+=head2 alias Statement
 
-The C<alias> keyword creates a alias name for a class name.
+The C<alias> statemenet creates an alias name for a class name.
   
   # Create alias
   alias Foo::Bar as FB;
@@ -2657,13 +2639,13 @@ C<alias> syntax must be defined directly under the L<class definition|/"Class De
     alias Foo::Bar as FB;
   }
 
-You can create an alias at the same time as loading a class by C<use>.
+You can create an alias at the same time as loading a class by the C<use> statement.
   
   use Foo::Bar as FB;
 
-=head2 Load Class Selective
+=head2 require Statement
 
-In SPVM, there is an if require Statement that loads a class only if it exists in the class path, and if it does not exist, the block does not exist.
+If the C<require> statement that loads a class only if it exists in the class path, and if it does not exist, the block does not exist.
 
 It was designed to implement a part of features of "#ifdef" in the C language.
 
@@ -2937,7 +2919,7 @@ The field definition needs the L<type|/"Type">. The type must be a L<numeric typ
 
 The field names must follows the rule of the L<field name|/"Field Name">. Otherwise a compilation error occurs.
 
-Field names cannot be duplicated. If it cannot, a compilation error occurs.
+Field names cannot be duplicated. If so, a compilation error occurs.
 
 L<Field attributes|/"Field Attribute"> can be specified.
 
@@ -3125,46 +3107,22 @@ A method can have L<method attributes|/"Method Attributes">.
 
 A method has L</"Method Block"> except for the case that the method has the C<native> L<method attributes|/"Method Attributes">. 
 
-=head3 Variable Length Arguments
-
-... after the type of the argument indicates the argument is a variable length argument. Only the last argument can become a variable length argument.
-
-  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2...) {
-  
-  }
-
-The type of the variable length argument must be the L<array type|/"Array Type">.
-
-A variable length argument can recieve multiple values.
-
-  # Definition of variable length argument 
-  static method sprintf : string ($format : string, $values : object[]...) {
-  
-  }
-  
-  # Pass multiple values to the a variable length argument
-  sprintf("Value %d %f", 1, 2.0);
-
-A variable length argument can recieve an array.
-
-  # Pass array to a variable lenght argument
-  sprintf("Value  %d %f", [(object)1, 2.0]);
-
-If you want to treat the value as an individual element, cast it to type other than the L<array type|/"Array Type">..
-
-  sprintf("aaa %p", (object)[(object)1, 2.0]);
-
 =head3 Optional Argument
 
 The optional argument is the syntax to specify optional arguments.
 
+  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2 = DEFAULT_VALUE) {
+  
+  }
+  
+  # Deprecated
   static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 = DEFAULT_VALUE : ARG_TYPE2) {
   
   }
 
 Examples:
 
-  static method substr ($string : string, $offset : int, $length = -1 : int) {
+  static method substr ($string : string, $offset : int, $length : int = -1) {
     # ...
   }
   
@@ -3758,14 +3716,39 @@ The L<return statement|/"return Statement"> cannot be written in C<INIT> block.
 
 If a C<INIT> block is not defined in a class, a default empty C<INIT> block is defined.
 
-The execution order of C<INIT> blocks is not guaranteed, so before using a class in a C<INIT> block, the C<INIT> block of a using class should be called.
+An C<INIT> block is editted.
 
-  INIT {
-    Point->INIT;
-    $POINT = Point->new(1, 2);
+If a parent class exists, the INIT block of the parent class is called at the beginning of the INIT block.
+
+If classes are used by the L<use statement|/"use Statement">, the L<interface statement|/"interface Statement">, and the L<allow statement|/"allow Statement">, The INIT blocks in the classes are called in order after the above calling.
+  
+  # Before Editting
+  class MyClass extends ParentClass {
+    use Foo;
+    use Bar;
+    
+    INIT {
+      $POINT = Point->new(1, 2);
+    }
   }
 
-For this reason, The C<INIT> block should be implemented so that it may be called multiple times.
+  # After Editting
+  class MyClass extends ParentClass {
+    use Point;
+    use Fn;
+    
+    INIT {
+      ParentClass->INIT;
+      Point->INIT;
+      Fn->INIT;
+      
+      $POINT = Point->new(1, 2);
+    }
+  }
+
+An C<INIT> block is automatically called only once.
+
+The execution order of C<INIT> blocks is not guaranteed. The INIT blocks in the L<default loaded class/"Default Loaded Classes"> are called before INIT blocks of user defined classes.
 
 Examples:
 
@@ -3781,7 +3764,6 @@ Examples:
       $NUM = 3;
       $STRING = "abc";
       
-      Point->INIT;
       $POINT = Point->new(1, 2);
     }
   }
@@ -4421,7 +4403,7 @@ The undef type is the type of L<undef|/"Undefined Value"> value.
 The interface type is a type that is defined using a C<class> keyword and a L<class attribute|/"Class Attribute"> C<interface_t>.
 
   class Stringable : interface_t {
-    required method to_string : string ();
+    method to_string : string ();
   }
 
 See also L</"Interface">.
@@ -5240,16 +5222,16 @@ Otherwise, the assignability is false.
 
 <table>
   <tr><th>Assignability</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</a></th></tr>
-  <tr><td>True</td><td>X[]...[]</td><td>X[]...[]</td><td>None</td></tr>
+  <tr><td>True</td><td>X[]..[]</td><td>X[]..[]</td><td>None</td></tr>
   <tr><td>True</td><td>object[]</td><td>undef</td><td>None</td></tr>
-  <tr><td>True</td><td>SUPER_CLASS_X[]...[]</td><td>CLASS_Y[]...[]</td><td>None</td></tr>
-  <tr><td>True</td><td>INTERFACE_X[]...[]</td><td>INTERFACE_HAVING_Y[]...[]</td><td>None</td></tr>
+  <tr><td>True</td><td>SUPER_CLASS_X[]..[]</td><td>CLASS_Y[]..[]</td><td>None</td></tr>
+  <tr><td>True</td><td>INTERFACE_X[]..[]</td><td>INTERFACE_HAVING_Y[]..[]</td><td>None</td></tr>
   <tr><td>False</td><td>object[]</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
 
-(C<[]...[]> means two or more C<[]>)
+(C<[]..[]> means two or more C<[]>)
 
 Examples:
 
@@ -5880,19 +5862,19 @@ Otherwise, the castability is false.
 
 <table>
   <tr><th>Castability</th><th>To</th><th>From</th><th><a href="#Type-Conversion">Conversion or Type Checking</a></th></tr>
-  <tr><td>True</td><td>ANY_X[]...[]</td><td>ANY_X[]...[]</td><td>None</td></tr>
-  <tr><td>True</td><td>ANY_X[]...[]</td><td>object</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
-  <tr><td>True</td><td>ANY_X[]...[]</td><td>object[]</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
-  <tr><td>True</td><td>ANY_X[]...[]</td><td>undef</td><td>None</td></tr>
-  <tr><td>True</td><td>SUPER_CLASS_X[]...[]</td><td>CLASS_Y[]...[]</td><td>None</td></tr>
-  <tr><td>True</td><td>CLASS_X[]...[]</td><td>SUPER_CLASS_Y[]...[]</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
-  <tr><td>True</td><td>INTERFACE_X[]...[]</td><td>INTERFACE_HAVING_Y[]...[]</td><td>None</td></tr>
+  <tr><td>True</td><td>ANY_X[]..[]</td><td>ANY_X[]..[]</td><td>None</td></tr>
+  <tr><td>True</td><td>ANY_X[]..[]</td><td>object</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
+  <tr><td>True</td><td>ANY_X[]..[]</td><td>object[]</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
+  <tr><td>True</td><td>ANY_X[]..[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>True</td><td>SUPER_CLASS_X[]..[]</td><td>CLASS_Y[]..[]</td><td>None</td></tr>
+  <tr><td>True</td><td>CLASS_X[]..[]</td><td>SUPER_CLASS_Y[]..[]</td><td><a href="#Runtime-Type-Checking">Runtime type checking</a></td></tr>
+  <tr><td>True</td><td>INTERFACE_X[]..[]</td><td>INTERFACE_HAVING_Y[]..[]</td><td>None</td></tr>
   <tr><td>False</td><td>object[]</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
 
-(C<[]...[]> means two or more C<[]>)
+(C<[]..[]> means two or more C<[]>)
 
 Examples:
 
@@ -6035,7 +6017,7 @@ B<long to double:>
   int64_t from = VALUE;
   double to = (double)from;
 
-The numeric widening conversion is performed in some of the L<type casts|/"Type Cast">, the index of the L<array access|/"The array Access">, the length of the L<creating array|/"Creating Array">, the C<OPERAND> of the L<unary plus operator|/"Unary Plus Operator">, the C<OPERAND> of the L<unary minus operator|/"Unary Minus Operator">, and the left and right operands of the L<shift operators|"Shift Operator">.
+The numeric widening conversion is performed in some of the L<type casts|/"Type Cast">, the index of the L<array access|/"The array Access">, the length of the L<creating array|/"Creating Array">, the OPERAND of the L<unary plus operator|/"Unary Plus Operator">, the OPERAND of the L<unary minus operator|/"Unary Minus Operator">, and the left and right operands of the L<shift operators|"Shift Operator">.
 
 =head2 Numeric Narrowing Conversion
 
@@ -6130,11 +6112,11 @@ The binary numeric conversion is a L<type conversion|/"Type Conversion"> to upgr
 
 The following rules apply in order.
 
-1. If the left operand or the right operand is the L<double type|/"double Type">, the C<OPERAND> of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
+1. If the left operand or the right operand is the L<double type|/"double Type">, the OPERAND of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
 
-2. If the left operand or the right operand is the L<float type|/"float Type">, the C<OPERAND> of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
+2. If the left operand or the right operand is the L<float type|/"float Type">, the OPERAND of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
 
-3. If the left operand or the right operand is the L<long type|/"long Type">, the C<OPERAND> of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
+3. If the left operand or the right operand is the L<long type|/"long Type">, the OPERAND of the small type is converted to the big type using the L<numeric widening conversion|/"Numeric Widening Conversion">.
 
 4, Otherwise, both the left operand and the right operand are converted to the L<int type|/"int Type"> using the L<numeric widening conversion|/"Numeric Widening Conversion">.
 
@@ -6203,7 +6185,7 @@ The unboxing conversion is a L<type coversion|/"Type Conversion"> to convert the
 
 The boolean conversion is a L<type conversion|/"Type Conversion"> that is performed on the L<conditional operand|/"Conditional Operand">.
 
-The type of the C<OPERAND> of the boolean conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
+The type of the OPERAND of the boolean conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
 
 The boolean conversion returns the following value corresponding to the type of the condional operand.
 
@@ -6215,9 +6197,9 @@ If the type is the value returned by the L<TRUE method of Bool|SPVM::Bool|/"TRUE
 
 If the type is the value returned by the L<FALSE method of Bool|SPVM::Bool|/"FALSE">, return 0.
 
-If the type is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
+If the type is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the OPERAND.
 
-And the following operation in the C language is performed on the C<OPERAND> .
+And the following operation in the C language is performed on the OPERAND .
 
   !!OPERAND
 
@@ -6353,16 +6335,16 @@ If the type of distribution is an L<interface type|/"Interface Type">, an L<inte
   <tr><td>True</td><td>object[]</td><td>OBJECT_ARRAY_Y</td></tr>
   <tr><td>True</td><td>SUPER_CLASS_X</td><td>CLASS_Y</td></tr>
   <tr><td>True</td><td>SUPER_CLASS_X[]</td><td>CLASS_Y[]</td></tr>
-  <tr><td>True</td><td>SUPER_CLASS_X[]...[]</td><td>CLASS_Y[]...[]</td></tr>
+  <tr><td>True</td><td>SUPER_CLASS_X[]..[]</td><td>CLASS_Y[]..[]</td></tr>
   <tr><td>True</td><td>INTERFACE_X</td><td>INTERFACE_HAVING_Y</td></tr>
   <tr><td>True</td><td>INTERFACE_X[]</td><td>INTERFACE_HAVING_Y[]</td></tr>
-  <tr><td>True</td><td>INTERFACE_X[]...[]</td><td>INTERFACE_HAVING_Y[]...[]</td></tr>
+  <tr><td>True</td><td>INTERFACE_X[]..[]</td><td>INTERFACE_HAVING_Y[]..[]</td></tr>
   <tr><td>False</td><td>OBJECT_X</td><td>OTHER</td></tr>
 </table>
 
 =end html
 
-(C<[]...[]> means two or more C<[]>)
+(C<[]..[]> means two or more C<[]>)
 
 =head1 Type Comment
 
@@ -6611,7 +6593,7 @@ The value of the L<case statement|/"case Statement"> must be one of the L<charac
 
 If it is a L<character literal|/"Character Literal">, the value is converted to the L<int type|/"int Type"> at compile-time.
 
-The values of the case statements cannnot be duplicated. If it cannot, a compilation error occurs.
+The values of the case statements cannnot be duplicated. If so, a compilation error occurs.
 
 If the condition matches the value of a C<case> statement, the program jumps to the beginning of the L<case block|/"case Block">.
 
@@ -6898,38 +6880,36 @@ The C<return> statement is a L<statement|/"Statement"> to return a value.
   // non-void
   return OPERAND;
 
-If the return type of the current L<method|/"Method Definition"> is the L<void type|/"void Type">, the C<OPERAND> cannnot exist. If it cannot, a compilation error occurs.
+If the return type of the current L<method|/"Method Definition"> is the L<void type|/"void Type">, the OPERAND cannnot exist. If so, a compilation error occurs.
 
-If the return type of the current L<method|/"Method Definition"> is the non-void type, the C<OPERAND> must exist. Otherwise a compilation error occurs.
+If the return type of the current L<method|/"Method Definition"> is the non-void type, the OPERAND must exist. Otherwise a compilation error occurs.
 
-The type of the C<OPERAND> must be able to L<assign|/"Assignability"> to the return type of the current method. Otherwise a compilation error occurs.
+The type of the OPERAND must be able to L<assign|/"Assignability"> to the return type of the current method. Otherwise a compilation error occurs.
 
 =head2 die Statement
 
 The C<die> statement throws an L<exception|/"Throwing Exception">.
 
   die OPERAND;
+  die;
 
-The operand must be the L<string type|/"string Type">. If not a compilation error occurs.
+The OPERAND is an error message. The error message is set to the L<exception variable|/"Exception Variable"> C<$@>.
+
+If an exception is thrown, the program prints the error message to the standard error with the stack traces and finishes with error ID 255.
+
+The operand must be the L<string type|/"string Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
+
+If the OPERAND is omitted or the value of the OPERAND is L<undef|/"Undefined Value">, The OPERAND is set to the string C<"Error">.
 
 The return type is the L<void type|/"void Type">.
 
-You can specify the error message to the C<OPERAND>.
-
-  # Throw an exception
-  die "Error";
-
-The error message is set to the L<exception variable|/"Exception Variable"> C<$@>.
-
-If an exception is thrown, the program prints the error message to the standard error with the stack traces and finishes with error code 255.
-
-The stack traces constain the class names, the method names, the file names and the line numbers.
+The following one is an example of a stack trace. Each line of the stack trace constains the class name, the method name, the file name and the line number of the caller.
 
   Error
-  from TestCase::Minimal->sum2 at SPVM/TestCase/Minimal.spvm line 1640
-  from TestCase->main at SPVM/TestCase.spvm line 1198
+    TestCase::Minimal->sum2 at SPVM/TestCase/Minimal.spvm line 1640
+    TestCase->main at SPVM/TestCase.spvm line 1198
 
-The exception can be catched using an L<eval block|/"Exception Catching">.
+The exception can be caught by the L<eval block|/"Exception Catching">.
 
 Examples:
   
@@ -6976,15 +6956,15 @@ An operator performs an operation that process something and returns a value.
 
   +OPERAND
 
-The unary plus operator C<+> returns the value of the C<OPERAND>.
+The unary plus operator C<+> returns the value of the OPERAND.
 
 Compilation Errors:
 
-The C<OPERAND> must be a L<numeric type|/"Numeric Type">.
+The OPERAND must be a L<numeric type|/"Numeric Type">.
 
 Type Conversion:
 
-If the C<OPERAND> is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
+If the OPERAND is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the OPERAND.
 
 Return Type and Operand Types:
   
@@ -7004,15 +6984,15 @@ Examples:
 
   -OPERAND
 
-The unary minus operator - returns the negative value of the C<OPERAND>.
+The unary minus operator - returns the negative value of the OPERAND.
 
 Compilation Errors:
 
-The C<OPERAND> must be a L<numeric type|/"Numeric Type">.
+The OPERAND must be a L<numeric type|/"Numeric Type">.
 
 Type Conversion:
 
-If the C<OPERAND> is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
+If the OPERAND is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the OPERAND.
 
 Return Type and Operand Types:
   
@@ -7186,18 +7166,18 @@ Increment operators are the L<pre-increment operator|/"Pre-Increment Operator"> 
 
 =head3 Pre-Increment Operator
 
-The pre-increment operator adds 1 to the value of the C<OPERAND> and returns the value after the incrementation.
+The pre-increment operator adds 1 to the value of the OPERAND and returns the value after the incrementation.
   
   # Pre-increment operator
   ++OPERAND
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
+The type of the OPERAND must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The pre-increment operator performs the same operation as the following.
 
   (OPERAND = (TYPE_OF_OPERAND)(OPERAND + 1))
 
-For example, if the type of the C<OPERAND> is the L<byte type|/"byte Type">, the following operation is performed.
+For example, if the type of the OPERAND is the L<byte type|/"byte Type">, the following operation is performed.
 
   ($num = (byte)($num + 1))
 
@@ -7220,18 +7200,18 @@ Examples:
 
 =head3 Post-Increment Operator
 
-The post-increment operator adds 1 to the value of the C<OPERAND> and returns the value before the incrementation.
+The post-increment operator adds 1 to the value of the OPERAND and returns the value before the incrementation.
   
   # Post-increment operator
   OPERAND++
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
+The type of the OPERAND must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The post-increment operator performs the same operation as the following.
 
   (my TMP_VARIABLE = OPERAND, OPERAND = (TYPE_OF_OPERAND)(OPERAND + 1), TMP_VARIABLE)
 
-For example, if the type of the C<OPERAND> is the L<byte type|/"byte Type">, the following operation is performed.
+For example, if the type of the OPERAND is the L<byte type|/"byte Type">, the following operation is performed.
 
   (my $tmp = $num, $num = (byte)($num + 1), $tmp)
 
@@ -7258,18 +7238,18 @@ Decrement operators are the L<pre-decrement operator|/"Pre-Decrement Operator"> 
 
 =head3 Pre-Decrement Operator
 
-The pre-decrement operator subtracts 1 to the value of the C<OPERAND> and returns the value after the decrementation.
+The pre-decrement operator subtracts 1 to the value of the OPERAND and returns the value after the decrementation.
   
   # Pre-decrement operator
   --OPERAND
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access">, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
+The type of the OPERAND must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access">, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The pre-decrement operator performs the same operation as the following.
 
   (OPERAND = (TYPE_OF_OPERAND)(OPERAND - 1))
 
-For example, if the type of the C<OPERAND> is the L<byte type|/"byte Type">, the following operation is performed.
+For example, if the type of the OPERAND is the L<byte type|/"byte Type">, the following operation is performed.
 
   ($num = (byte)($num - 1))
 
@@ -7292,18 +7272,18 @@ Examples:
 
 =head3 Post-Decrement Operator
 
-The post-decrement operator subtracts 1 to the value of the C<OPERAND> and returns the value before the decrementation.
+The post-decrement operator subtracts 1 to the value of the OPERAND and returns the value before the decrementation.
   
   # Post-decrement operator
   OPERAND--
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
+The type of the OPERAND must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The post-decrement operator performs the same operation as the following.
 
   (my TMP_VARIABLE = OPERAND, OPERAND = (TYPE_OF_OPERAND)(OPERAND - 1), TMP_VARIABLE)
 
-For example, if the type of the C<OPERAND> is the L<byte type|/"byte Type">, the following operation is performed.
+For example, if the type of the OPERAND is the L<byte type|/"byte Type">, the following operation is performed.
 
   (my $tmp = $num, $num = (byte)($num - 1), $tmp)
 
@@ -7382,7 +7362,7 @@ The bit NOT operator C<~> is an L<operator|/"Operator"> to perform the bit NOT o
 
   ~OPERAND
 
-The type of the C<OPERAND> must is an L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
+The type of the OPERAND must is an L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion|/"Numeric Widening Conversion"> is performed.
 
@@ -7703,6 +7683,32 @@ Examples:
     
   }
 
+=head2 isa_error Operator
+
+The C<isa_error> operator checks whether the basic type id given by the left operand can be assigned to the right type.
+
+  LEFT_OPERAND isa RIGHT_TYPE
+
+The return type is L<int type|/"int Type">.
+
+If the assignability is true, returns 1. Otherwise returns 0.
+
+Compilation Errors:
+
+The left operand of the isa_error operator must be an integer type within int. Otherwise a compilation error occurs.
+
+The right operand of the isa_error operator must be a class type. Otherwise a compilation error occurs.
+
+Examples:
+
+  if (eval_error_id isa_error Error) {
+    
+  }
+  
+  if (eval_error_id isa_error Error::System) {
+    
+  }
+  
 =head2 is_type Operator
 
 The C<is_type> operator is a L<comparison operator|/"Comparison Operator"> to check whether the type of the instance of the left operand is the right type.
@@ -7717,11 +7723,11 @@ The left operand of the is_type operator must be an object type. Otherwise a com
 
 The right type of the is_type operator must be an object type. Otherwise a compilation error occurs.
 
-The right type of the is_type operator cannnot be the any object type. If it cannot, a compilation error occurs.
+The right type of the is_type operator cannnot be the any object type. If so, a compilation error occurs.
 
-The right type of the is_type operator cannnot be the any object array type. If it cannot, a compilation error occurs.
+The right type of the is_type operator cannnot be the any object array type. If so, a compilation error occurs.
 
-The right type of the is_type operator cannnot be an interface type. If it cannot, a compilation error occurs.
+The right type of the is_type operator cannnot be an interface type. If so, a compilation error occurs.
 
 Examples:
 
@@ -7737,6 +7743,32 @@ Examples:
     
   }
 
+=head2 is_error Operator
+
+The C<is_error> operator checks whether the basic type id given by the left operand is the basic type of the right type.
+
+  LEFT_OPERAND isa RIGHT_TYPE
+
+The return type is L<int type|/"int Type">.
+
+If it is ok, returns 1. Otherwise returns 0.
+
+Compilation Errors:
+
+The left operand of the is_error operator must be an integer type within int. Otherwise a compilation error occurs.
+
+The right operand of the is_error operator must be a class type. Otherwise a compilation error occurs.
+
+Examples:
+
+  if (eval_error_id is_error Error) {
+    
+  }
+  
+  if (eval_error_id is_error Error::System) {
+    
+  }
+  
 =head2 is_compile_type Operator
 
 The C<is_compile_type> operator is a L<comparison operator|/"Comparison Operator"> to check whether the compilation-time type of the left operand is the right type.
@@ -7770,23 +7802,37 @@ Examples:
     }
   }
   
-=head2 ref Operator
+=head2 type_name Operator
 
-The C<ref> operator is an L<operator|/"Operator"> to get the type name of the object.
+The C<type_name> operator returns the type name of the object.
 
-  ref OPERAND
+  type_name OPERAND
 
-If the C<OPERAND> is defined, it returns the type name of the object. If not, return L<undef|/"Undefined Value">.
+If the OPERAND is defined, returns the type name of the object. Otherwise returns L<undef|/"Undefined Value">.
 
 The return type is the L<string type|/"string Type">.
 
-If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error occurs.
+If the OPERAND is not an L<object type|/"Object Type">, a compilation error occurs.
 
 Examples:
   
   # "Point"
   my $poitn = Point->new;
-  my $type_name = ref $point;
+  my $type_name = type_name $point;
+
+=head2 compile_type_name Operator
+
+The C<compile_type_name> operator returns the type name at compilation time.
+
+  type_name OPERAND
+
+The return type is the L<string type|/"string Type">.
+
+Examples:
+  
+  # int
+  my $num = 1;
+  my $compile_type_name = compile_type_name $num;
 
 =head2 dump Operator
 
@@ -7798,7 +7844,7 @@ It returns the string representation of the object.
 
 The return type is the L<string type|/"string Type">.
 
-If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error occurs.
+If the OPERAND is not an L<object type|/"Object Type">, a compilation error occurs.
 
 The string representation may be changed from SPVM version to version. Please don't use C<dump> operator for the purpose of the data serialization.
 
@@ -7842,7 +7888,7 @@ The logical NOT operator C<!> is a L<logical operator|/"Logical Operator"> to pe
 
 The return type of the logical NOT operator is the L<int type|/"int Type">.
 
-Thg logical NOT operator performs the L<boolean conversion|/"Boolean Conversion"> to the C<OPERAND>. If the evaluated value is 0, returns 1. Otherwise return 0.
+Thg logical NOT operator performs the L<boolean conversion|/"Boolean Conversion"> to the OPERAND. If the evaluated value is 0, returns 1. Otherwise return 0.
 
 =head2 String Concatenation Operator
 
@@ -7852,7 +7898,7 @@ String concatenation operator . is an L<operator|/"Operator"> to concat two stri
 
 The left operand and the right operand must be a L<string type|/"string Type">, L</"byte[] Type">, or L<numeric type|/"Numeric Type">. Otherwise a compilation error occurs.
 
-If the type of the C<OPERAND> is numeric type, a L<numeric-to-string conversion|/"Numeric-to-String Conversion"> is performed.
+If the type of the OPERAND is numeric type, a L<numeric-to-string conversion|/"Numeric-to-String Conversion"> is performed.
 
 The return type is a L<string type|/"string Type">.
 
@@ -8009,17 +8055,17 @@ The C<new_string_len> operator is an L<operator|/"Operator"> to create a L<strin
 
   new_string_len OPERAND
 
-The type of the C<OPERAND> must be an L<integer type within int|/"Integer Type Within int">. Otherwise a compilation error occurs.
+The type of the OPERAND must be an L<integer type within int|/"Integer Type Within int">. Otherwise a compilation error occurs.
 
-The L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
+The L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the OPERAND.
 
-The C<new_string_len> operator returns a new string that length is the length specified by the C<OPERAND> and all characters are C<\0>.
+The C<new_string_len> operator returns a new string that length is the length specified by the OPERAND and all characters are C<\0>.
 
 The character just after the last character is C<\0>. The string created by the new_string_len operator can be used as the C language string ending with C<\0>.
 
 The return type is the L<string type|/"string Type">.
 
-The length specified by the C<OPERAND> must be greater than or equal to 0. Otherwise an exception is thrown.
+The length specified by the OPERAND must be greater than or equal to 0. Otherwise an exception is thrown.
 
 Examples:
   
@@ -8074,7 +8120,7 @@ The string length operator C<length> is an L<operator|/"Operator"> to get the le
 
 The returned length is the byte size. Note that the length is not the count of UTF-8 characters.
 
-The type of the C<OPERAND> must be the L<string type|/"string Type">. Otherwise a compilation error occurs.
+The type of the OPERAND must be the L<string type|/"string Type">. Otherwise a compilation error occurs.
 
 The return type is the L<int type|/"int Type">.
 
@@ -8090,7 +8136,7 @@ Examples:
 
 =head2 scalar Operator
 
-The C<scalar> operator is an L<Operator|/"Operator"> that returns the value of the C<OPERAND>.
+The C<scalar> operator is an L<Operator|/"Operator"> that returns the value of the OPERAND.
 
   scalar OPERAND
 
@@ -8474,9 +8520,9 @@ Examples:
 Multi dimensional arrays can be created using the L<new operator|/"new Operator">.
 
   new BasicType[][LENGTH]
-  new BasicType[]...[][LENGTH]
+  new BasicType[]..[][LENGTH]
 
-(C<[]...[]> means two or more C<[]>)
+(C<[]..[]> means two or more C<[]>)
 
 Examples:
 
@@ -8549,7 +8595,7 @@ The reference operator C<\> is the L<operator|/"Operator"> to create a L<referen
 
 The operand must be a L<local variable|/"Local Variable"> that type is a L<numeric type|/"Numeric Type"> or a L<multi-numeric type|/"Multi-Numeric Type">. Otherwise a compilation error occurs.
 
-The return type is the L<reference type|/"Reference Type"> of the C<OPERAND>.
+The return type is the L<reference type|/"Reference Type"> of the OPERAND.
 
 Examples:
   
@@ -8654,16 +8700,16 @@ Examples:
 
 =head2 Getting Current Class Name
 
-The getting current class name C<__CLASS__> is an L<operator|/"Operator"> to get the current class name.
+The C<__PACKAGE__> operator gets the current class name.
 
-  __CLASS__
+  __PACKAGE__
 
 Examples:
 
   class Foo::Bar {
     static method baz : void () {
       # Foo::Bar
-      my $class_name = __CLASS__;
+      my $current_basic_type_name = __PACKAGE__;
     }
   }
 
@@ -8754,15 +8800,16 @@ The above example is the same as the following codes.
     }
   }
 
-=head3 Capture
+=head3 Anon Method Field Definition
 
-The capture is a syntax to use externally defined L<local variables|/"Local Variable"> in an L<anon method|/"Anon Method">.
+The anon method field definition is the syntax to define the field of the anon class of the anon method.
 
-  # Capture
-  [VAR1 : TYPE1, VAR2 : TYPE2, ...] method : TYPE  (VAR1 : TYPE1, VAR2 : TYPE2, ...) {
+  # Anon method field definitions
+  [has FIELD_NAME : TYPE1, has FIELD_NAME : TYPE2, ...] ANON_METHOD_DEFINITION
   
-  };
-
+  # Anon method field definitions with field default values
+  [has FIELD_NAME : TYPE1 = OPERAND1, has FIELD_NAME : TYPE2 = OPERAND2, ...] ANON_METHOD_DEFINITION
+  
 Examples:
 
   class Foo::Bar {
@@ -8772,14 +8819,15 @@ Examples:
       my $bar = 5L;
       
       # Capture
-      my $comparator = (Comparator)[$foo : int, $bar : long] method : int ($x1 : object, $x2 : object) {
+      my $comparator = (Comparator)[has foo : int = $foo, has bar : long = $bar] method : int ($x1 : object, $x2 : object) {
+        my $foo = $self->{foo};
+        my $bar = $self->{bar};
+        
         print "$foo\n";
         print "$bar\n";
       };
     }
   }
-
-Externally defined local variables are implemented as L<fields|/"Field"> of the anon class internally.
 
 The above example is the same as the following codes.
 
@@ -8790,10 +8838,10 @@ The above example is the same as the following codes.
       my $foo = 1;
       my $bar = 5L;
       
-      # Capture
       my $anon = new Foo::Bar::anon::5::61;
       $anon->{foo} = $foo;
       $anon->{bar} = $bar;
+      
       my $comparator = (Comparator)$anon;
     }
   }
@@ -8804,46 +8852,39 @@ The above example is the same as the following codes.
     has bar : public long;
     
     method : int ($x1 : object, $x2 : object) {
-      print "$self->{foo}\n";
-      print "$self->{bar}\n";
+      my $foo = $self->{foo};
+      my $bar = $self->{bar};
+      
+      print "$foo\n";
+      print "$bar\n";
     }
   }
 
-=head2 class_id Operator
+=head2 basic_type_id Operator
 
-The C<class_id> operator is an L<operator|/"Operator"> to get the class id from a class name.
+The C<basic_type_id> operator gets the basic type id from a type.
 
-  class_id CLASS_NAME
+  basic_type_id TYPE
 
-The class name must be an existing class. Otherwise a compilation error occur.
-
-The return value is the class id.
+The return value is the basic type id.
 
 The return type is the L<int type|/"int Type">.
 
-=head2 error_code Operator
+Examples:
 
-The C<error_code> is an L<operator|/"Operator"> to get the value of the error code.
+  my $basic_type_id = basic_type_id int;
+  
+  my $basic_type_id = basic_type_id int[];
+  
+  my $error_basic_type_id = basic_type_id Error;
+  
+=head2 eval_error_id Operator
 
-  error_code
+The C<eval_error_id> operatoer gets the error ID of the exception caught by an eval block.
 
-=head2 set_error_code Operator
-
-The C<set_error_code> operator is an L<operator|/"Operator"> to set the value of the error code.
-
-  set_error_code OPERAND
-
-The type of the C<OPERAND> must be the L<int type|/"int Type">.
-
-=head2 error Operator
-
-The C<error> operatoer is an L<operator|/"Operator"> to get the current error code.
-
-  error
+  eval_error_id
 
 This value is set to 0 at the beginning of the L<eval block|eval Block>.
-
-If A L<exception|/"Exception"> is catched, the current error code is set to the value of L<error_code|/"error_code">.
 
 =head2 Type Cast
 
@@ -8903,13 +8944,13 @@ The C<warn> operator prints a message to the standard error.
 
 The OPERNAD must be the L<string Type|/"string Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
 
-If the OPERAND is omitted or the value of the OPERAND is L<undef|/"Undefined Value">, The OPERAND is set to the string C<"Warned.">.
+If the OPERAND is omitted or the value of the OPERAND is L<undef|/"Undefined Value">, The OPERAND is set to the string C<"Warning">.
 
 The return type is the L<void type|/"void Type">.
 
 If the end character of the OPERNAD is C<\n>, the C<warn> operator prints the OPERNAD itself.
 
-If not, the current file name and the current line number by the format C<"\n  at $file_name line $line\n"> are added to the end of the OPERNAD.
+Otherwise the current file name and the current line number by the format C<"\n  at $file_name line $line\n"> are added to the end of the OPERNAD.
 
 The buffer of the standard error is flushed after the printing.
 
@@ -8927,7 +8968,7 @@ The oeprand must be a L<string type|/"string Type">.
 
 The return type is the L<void type|/"void Type">.
 
-If the value of the C<OPERAND> is an L<undef|/"Undefined Value">, print nothing.
+If the value of the OPERAND is an L<undef|/"Undefined Value">, print nothing.
 
 =head2 say Operator
 
@@ -8939,7 +8980,7 @@ The oeprand must be a L<string type|/"string Type">.
 
 The return type is the L<void type|/"void Type">.
 
-If the value of the C<OPERAND> is an L<undef|/"Undefined Value">, print C<\n>.
+If the value of the OPERAND is an L<undef|/"Undefined Value">, print C<\n>.
 
 =head2 make_read_only Operator
 
@@ -9046,11 +9087,11 @@ A instance method can be called statically by specifing the calss name.
 
   $point3d->Point::clear;
 
-=head2 items Operator
+=head2 args_width Operator
 
-The C<items> operator gets the stack length of the arguments passed to the method.
+The C<args_width> operator gets the stack length of the arguments passed to the method.
 
-  items
+  args_width
 
 Note that the stack length of the arguments is different from the length of the arguments.
 
@@ -9060,10 +9101,10 @@ If an argument is a multi-numeric type, the stack length of the argument becomes
 
 Examples:
   
-  static method my_static_method : int ($args : int, $bar = 0 : int) {
-    my $items = items;
+  static method my_static_method : int ($args : int, $bar : int = 0) {
+    my $args_width = args_width;
     
-    return $items;
+    return $args_width;
   };
   
   # 1
@@ -9072,10 +9113,10 @@ Examples:
   # 2
   &my_static_method(1, 2);
   
-  static method my_instance_method : int ($args : int, $bar = 0 : int) {
-    my $items = items;
+  static method my_instance_method : int ($args : int, $bar : int = 0) {
+    my $args_width = args_width;
     
-    return $items;
+    return $args_width;
   };
   
   # 2 (1 + the invocant)
@@ -9084,10 +9125,10 @@ Examples:
   # 3 (2 + the invocant)
   &my_instance_method(1, 2);
 
-  static method my_mulnum_method : int ($z : Complex_2d, $bar = 0 : int) {
-    my $items = items;
+  static method my_mulnum_method : int ($z : Complex_2d, $bar : int = 0) {
+    my $args_width = args_width;
     
-    return $items;
+    return $args_width;
   };
 
   # 2 (The length of the fields of Complex_2d)

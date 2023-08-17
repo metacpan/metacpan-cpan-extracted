@@ -1,4 +1,5 @@
 #include "../test.h"
+#include <string>
 
 #define TEST(name) TEST_CASE("time-tz: " name, "[time-tz]")
 
@@ -32,7 +33,7 @@ TEST("available timezones(system)") {
 
 TEST("rule parsing") {
     auto wrong = [](string_view zone) {
-        SECTION(string("check bad virtual zone: ") + zone) {
+        SECTION("check bad virtual zone: " + std::string(zone.data(), zone.size())) {
             CHECK(tzget(zone)->name == "GMT0");
         }
     };
@@ -64,7 +65,7 @@ TEST("rule parsing") {
     };
 
     auto check = [&check_tzrulezone](string_view zname, int hasdst = -1, const CheckTzRule& outer = {}, const CheckTzRule& inner = {}) {
-        SECTION(string("check virtual zone: ") + zname) {
+        SECTION("check virtual zone: " + std::string(zname.data(), zname.size())) {
             auto zone = tzget(zname);
             CHECK(zone->name == zname);
             CHECK(!zone->is_local);
@@ -138,7 +139,7 @@ TEST("tzset") {
     CHECK(tzlocal()->name == "America/New_York");
 }
 
-#ifndef TEST_NO_SETENV 
+#ifndef TEST_NO_SETENV
     TEST("tzset via ENV{TZ}") {
         setenv("TZ", "Europe/Moscow", 1);
         panda::time::tzset();

@@ -1,0 +1,27 @@
+Revision history for Loverl
+
+0.005     2023-08-04 13:24:12-04:00 America/New_York
+
+    - Minor documentation changes
+    - Rename LOVE2DGame.love => Game.love
+    - Force user permission when re-running build command
+    - Cleaned Directory code
+
+0.004     2023-08-03 12:19:54-04:00 America/New_York
+
+    - Simplified build logic
+    - Fixed build bug
+
+0.003     2023-08-03 00:56:38-04:00 America/New_York
+
+0.002     2023-08-02 22:57:33-04:00 America/New_York
+
+    - Check to see if LÖVE2DGame.love exists, removes file to create a new one
+    - Updated documentation
+
+0.001     2023-08-02 21:31:18-04:00 America/New_York
+
+    - Initialized Loverl command-line interface
+    - Users can create a new LÖVE2D project
+    - Users can run the love application to play their game
+    - Users can build a *.love file to prepare for platform releases

@@ -18,7 +18,7 @@ use Types::Common 2.000000 qw/ ArrayRef is_ArrayRef Bool HashRef IntRange Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 has _base_policy => (
@@ -170,7 +170,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,7 @@ version v0.3.1
 
   $csp->reset;
 
-  $h->amend(
+  $csp->amend(
     "+script-src" => "https://captcha.example.com",
     "+style-src"  => "https://captcha.example.com",
   );

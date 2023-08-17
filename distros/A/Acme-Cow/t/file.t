@@ -10,7 +10,7 @@ BEGIN { plan test => 16; }
 
 my $rcs_id = '$Id: file.t,v 1.1 2001/09/10 22:32:08 tony Exp $';
 
-use Acme::Cow qw(compare_bubbles);
+use Acme::Cow;
 ok(1);
 
 sub compare_bubbles

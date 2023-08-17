@@ -9,11 +9,13 @@ plan tests => 1;
 
 my $count = 0;
 my $simpl = PDL::Opt::Simplex::Simple->new(
-	reduce_search => 1, # <<<
         vars => {
                 x => 30
 	},
-	ssize => 3,
+	opts => {
+		ssize => 3,
+		reduce_search => 1, # <<<
+	},
 	max_iter => 100,
 	tolerance => 1e-6,
         f => sub {

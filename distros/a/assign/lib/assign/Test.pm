@@ -1,8 +1,9 @@
 use strict; use warnings;
 package
 assign::Test;
+use XXX;
 
-use assign::0();
+use assign::0;
 use Test::More;
 use Capture::Tiny;
 use XXX;
@@ -32,9 +33,8 @@ sub test {
         defined $ENV{ONLY} and
         $ENV{ONLY} != ++$test_count;
 
-    $assign::assign_class = 'assign::0';
-    $assign::var_prefix = '_';
-    $assign::var_id = 0;
+    $assign::0::var_prefix = '_';
+    $assign::0::var_id = 0;
 
     my ($spec, $label) = @_;
 
@@ -42,7 +42,7 @@ sub test {
         or die "Invalid spec for 'test()'";
     my ($perl, $want) = ($1, $2);
 
-    my $got = assign->new(code => $perl)->transform;
+    my $got = assign::0->new(code => $perl)->transform;
 
     is $got, $want, $label;
 }

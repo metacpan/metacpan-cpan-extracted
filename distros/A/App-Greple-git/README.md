@@ -9,7 +9,7 @@ git - Greple git module
 
 # DESCRIPTION
 
-App::Greple::git is a greple module to handle git output.
+App::Greple::git is a greple module to support git command
 
 # OPTIONS
 
@@ -44,6 +44,14 @@ App::Greple::git is a greple module to handle git output.
     follows:
 
         option --color-header-by-author --color-header-by-field Author
+
+- **--only-git-files**
+
+    Only files under git control from a given file are processed, all
+    other files are ignored.  This option is intended to be used in
+    combination with **--glob** or other options that allow many files to
+    be processed at once.  To target all files under git control, use the
+    **--git** option in the **-Mdig** module.
 
 # ENVIRONMENT
 

@@ -10,6 +10,7 @@ lib/Mnet/Dump.pm
 lib/Mnet/Expect.pm
 lib/Mnet/Expect/Cli.pm
 lib/Mnet/Expect/Cli/Ios.pm
+lib/Mnet/IP.pm
 lib/Mnet/Log.pm
 lib/Mnet/Log/Conditional.pm
 lib/Mnet/Log/Test.pm
@@ -34,6 +35,7 @@ t/Expect_Cli_Ios.t
 t/Expect_Cli_command.t
 t/Expect_Cli_command_prompts.t
 t/Expect_Cli_record.t
+t/IP.t
 t/Log.t
 t/Log_Conditional.t
 t/Log_debug.t

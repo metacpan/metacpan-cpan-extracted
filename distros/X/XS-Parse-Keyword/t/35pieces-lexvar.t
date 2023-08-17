@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib "t";
 use testcase "t::pieces";
@@ -35,6 +35,14 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
 
    my $ret2 = piecelexvar $scalar;
    is( $ret2, $ret, 'result of piecelexvar matches previous' );
+}
+
+# intro_my()
+{
+   my $one = "outside";
+   my $ret = piecelexvarmyintro $one in $one + 2;
+   is( $ret, 3, 'result of piecelexvarmyintro' );
+   is( $one, "outside", 'lexvar inside does not leak out' );
 }
 
 done_testing;

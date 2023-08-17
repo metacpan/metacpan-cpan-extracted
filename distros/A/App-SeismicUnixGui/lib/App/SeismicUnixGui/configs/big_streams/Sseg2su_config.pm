@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::Sseg2su_config;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: Sseg2su_config.pm 
+ PERL PERL PROGRAM NAME: Sseg2su_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: July 29 2016 
  		April 4, 2018 V 1.0.2

@@ -1,3 +1,9 @@
+Travel::Status::DE::VRR 1.21 - Sat Jul 22 2023
+
+    * Add service VRR3
+    * Update service URLs for VVO, VRN
+    * Remove discontinued services SVV, TLEM, VBL, Verbundlinie, VOR
+
 Travel::Status::DE::VRR 1.20 - Sun Mar 28 2021
 
     * efa-m, EFA: Accept "stopID" stop type

@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+my $USAGE = "usage: pds_from_lambda [-D database] [file]...\n";
+
+my $db = undef;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                     if '-' eq $opt;
+    $db = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db = $1,           next if $opt =~ /^D(.+)/s;
+    die $USAGE;
+}
+
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
+
+my $errors = 0;
+
+while (<<>>) {
+    s/^\s+//;
+    my @olt = split /\s+/;
+    next if !@olt;
+
+    die "lines with two or three integers separated by whitespace expected\n"
+        if @olt < 2 || @olt > 3 || grep { !/^(?:0|[1-9][0-9]*)\z/ } @olt;
+
+    my $ds = eval { Math::DifferenceSet::Planar->from_lambda(@olt) };
+    if (!defined $ds) {
+        my $msg = $@;
+        $msg =~ s/ at .*/\n/s;
+        warn $msg;
+        ++$errors;
+        next;
+    }
+
+    my @elems = $ds->elements_sorted;
+    print "@elems\n";
+}
+
+exit 1 if $errors;
+
+__END__
+
+=head1 NAME
+
+pds_from_lambda - generate planar difference sets from fingerprints
+
+=head1 SYNOPSIS
+
+  pds_from_lambda [-D database] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference set fingerprints, one per
+line, as order, lambda and optional theta values separated by whitespace,
+generates the difference sets identified by these values, and writes
+their elements to standard output.  Cf. L<Math::DifferenceSet::Planar> for
+the definition of these values, and the example program F<pds_identify>
+for the reverse operation.
+
+With option B<-D> and a database parameter, standard reference sets are
+taken from that database rather than the default one.
+
+The program will fail with an error message if an input line is not
+syntactically correct. It will write error messages to standard error
+and report a non-zero exit status but continue parsing its input if
+orders are outside the bounds of available standard reference sets or
+lambda or theta values are impossible.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

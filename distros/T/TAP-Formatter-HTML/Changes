@@ -3,6 +3,18 @@ Revision history for 'TAP-Formatter-HTML' Perl module
 
 All changes by Steve Purkis, unless otherwise noted.
 
+0.13
+    +	fix calculating todo_passed tests, GH#7 (tu-maurice)
+    +	applied several tweaks from RT and Github:
+        RT#132072: more international ISO8601-like date format (Slaven Rezić)
+        RT#91317:  synopsis of main module and plugin (Slaven Rezić)
+        RT#89216:  typo fix (dsteinbrunner)
+        GH#2:      gitignore (Gábor Szabó)
+        GH#4:      fix double include of css and javascript (Christopher Rasch-Olsen Raa)
+
+0.12
+    +	intermediate upload with incomplete changelog
+
 0.11
     +	fixed RT #81922: tests no longer hang on Win32.  Didn't get to the bottom
         of the issue (likely IPC::Open3 & redirecting STDOUT not playing nicely),

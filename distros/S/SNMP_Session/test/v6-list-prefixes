@@ -1,0 +1,13 @@
+#!/usr/local/bin/perl -w
+
+use SNMP_util;
+
+snmpmapOID (
+	    "cIpv6InterfaceEffectiveMtu", "1.3.6.1.4.1.9.10.86.1.2.3.1.2",
+	    "cIpv6InterfaceReasmMaxSize", "1.3.6.1.4.1.9.10.86.1.2.3.1.3",
+	    "cIpv6InterfaceIdentifier", "1.3.6.1.4.1.9.10.86.1.2.3.1.4",
+	    "cIpv6InterfaceIdentifierLength", "1.3.6.1.4.1.9.10.86.1.2.3.1.5",
+	    "cIpv6InterfacePhysicalAddress", "1.3.6.1.4.1.9.10.86.1.2.3.1.6",
+	    );
+
+1;

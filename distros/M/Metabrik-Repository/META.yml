@@ -347,7 +347,7 @@ provides:
     file: lib/Metabrik/Remote/Wmi.pm
   Metabrik::Repository:
     file: lib/Metabrik/Repository.pm
-    version: '1.43'
+    version: '1.44'
   Metabrik::Server::Dns:
     file: lib/Metabrik/Server/Dns.pm
   Metabrik::Server::Elasticsearch:
@@ -539,5 +539,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '1.43'
+version: '1.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

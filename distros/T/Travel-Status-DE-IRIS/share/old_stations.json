@@ -198,6 +198,15 @@
       "name" : "Blumenberg"
    },
    {
+      "ds100" : "OTBOH",
+      "eva" : 5400511,
+      "latlong" : [
+         50.672373,
+         13.878662
+      ],
+      "name" : "Bohosudov"
+   },
+   {
       "ds100" : "XIBD",
       "eva" : 8300136,
       "latlong" : [
@@ -250,6 +259,15 @@
          16.615733
       ],
       "name" : "Brno dolni nadrazi"
+   },
+   {
+      "ds100" : "XTBK",
+      "eva" : 5400210,
+      "latlong" : [
+         49.23098,
+         16.596694
+      ],
+      "name" : "Brno-Kralovo Pole"
    },
    {
       "ds100" : "XEBU",
@@ -648,6 +666,15 @@
       "name" : "Laußig(Düben)"
    },
    {
+      "ds100" : "XILVM",
+      "eva" : 8300606,
+      "latlong" : [
+         45.903146,
+         8.624521
+      ],
+      "name" : "Laveno Mombello"
+   },
+   {
       "ds100" : "XILI",
       "eva" : 8300157,
       "latlong" : [
@@ -972,6 +999,15 @@
       "name" : "Oswiecim"
    },
    {
+      "ds100" : "WPE",
+      "eva" : 8012627,
+      "latlong" : [
+         53.239977,
+         14.252349
+      ],
+      "name" : "Petershagen(Uckerm)"
+   },
+   {
       "ds100" : "MPFT",
       "eva" : 8026355,
       "latlong" : [
@@ -1008,6 +1044,15 @@
       "name" : "Plauen(V) unt Bf"
    },
    {
+      "ds100" : "APSH",
+      "eva" : 8007318,
+      "latlong" : [
+         54.364899,
+         10.291408
+      ],
+      "name" : "Probsteierhagen"
+   },
+   {
       "ds100" : "ERAE",
       "eva" : 8004918,
       "latlong" : [
@@ -1024,15 +1069,6 @@
          7.036514
       ],
       "name" : "Rech"
-   },
-   {
-      "ds100" : "PIQEP",
-      "eva" : 8309660,
-      "latlong" : [
-         45.521132,
-         9.088571
-      ],
-      "name" : "Rho-Fiera Milano"
    },
    {
       "ds100" : "WRIW",
@@ -1161,6 +1197,15 @@
       "name" : "Schweta Gasth"
    },
    {
+      "ds100" : "ASCK",
+      "eva" : 8007314,
+      "latlong" : [
+         54.332691,
+         10.229356
+      ],
+      "name" : "Schönkirchen Bf"
+   },
+   {
       "ds100" : "XJSI",
       "eva" : 7200140,
       "latlong" : [
@@ -1269,15 +1314,6 @@
       "name" : "Terespol"
    },
    {
-      "ds100" : "NTFB",
-      "eva" : 8026544,
-      "latlong" : [
-         48.61502,
-         13.42308
-      ],
-      "name" : "Tiefenbach(b Passau)"
-   },
-   {
       "ds100" : "XDTP",
       "eva" : 8602588,
       "latlong" : [
@@ -1359,6 +1395,15 @@
       "name" : "Vercelli"
    },
    {
+      "ds100" : "XDVSJ",
+      "eva" : 8602825,
+      "latlong" : [
+         55.549623,
+         12.024286
+      ],
+      "name" : "Viby Sjaelland st"
+   },
+   {
       "ds100" : "XIVOG",
       "eva" : 8300492,
       "latlong" : [
@@ -1386,6 +1431,15 @@
       "name" : "Wachenheim-Mölsheim"
    },
    {
+      "ds100" : "AWGR",
+      "eva" : 8007596,
+      "latlong" : [
+         54.662747,
+         9.793359
+      ],
+      "name" : "Wagersrott"
+   },
+   {
       "ds100" : "EWGO",
       "eva" : 8070571,
       "latlong" : [
@@ -1407,8 +1461,8 @@
       "ds100" : "FSY",
       "eva" : 8005762,
       "latlong" : [
-         51.282472,
-         8.629398
+         51.282462,
+         8.630247
       ],
       "name" : "Willingen-Stryck"
    },

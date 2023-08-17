@@ -834,7 +834,7 @@ sub set_cat_su {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -961,7 +961,7 @@ sub set_cat_txt {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -1147,7 +1147,7 @@ sub set_data {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: set_data.pm
+PERL PROGRAM NAME: set_data.pm
 
 AUTHOR:  
 
@@ -1369,7 +1369,7 @@ sub set_filter {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: set_filter.pm
+PERL PROGRAM NAME: set_filter.pm
 
 AUTHOR:  
 
@@ -1696,7 +1696,7 @@ sub set_loaded_geometry_headers {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -2240,7 +2240,7 @@ sub set_tracl_order {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -2430,7 +2430,7 @@ sub set_suxcor {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: set_suxcor.pm
+PERL PROGRAM NAME: set_suxcor.pm
 
 AUTHOR:  
 

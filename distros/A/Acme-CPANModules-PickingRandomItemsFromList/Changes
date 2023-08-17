@@ -1,3 +1,24 @@
+0.005   2023-06-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract to follow the 'List of modules ...' convention.
+
+
+0.004   2023-06-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention related list: Acme::CPANModules::Sampling.
+
+
+0.003   2023-06-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Reorganize description, add entries
+          (Array::Sample::WeightedRandom, Random::Skew,
+          Data::Random::Weighted).
+
+
 0.002   2021-09-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Mention List::Util::sample().

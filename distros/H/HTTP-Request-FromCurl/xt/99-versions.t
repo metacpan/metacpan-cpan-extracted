@@ -42,7 +42,10 @@ sub check {
       # only look at perl scripts, not sh scripts
       return if (m{blib/script/}xms && $content !~ m/\A \#![^\r\n]+?perl/xms);
 
-      my @version_lines = $content =~ m/ ( [^\n]* \$VERSION \s* = [^=] [^\n]* ) /gxms;
+      # what my version numbers look like
+      my $version = qr/\d+\.\d+/;
+      my @version_lines = grep { defined }
+                          $content =~ m/ [^\n]* \$VERSION \s* = \s* ["']($version)['"] | package \s+ \S+ \s+ ($version) \s* ; /gxms;
       if (@version_lines == 0) {
             fail($_);
       }

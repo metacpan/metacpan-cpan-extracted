@@ -1,6 +1,7 @@
 use strict; use warnings;
 package YAMLScript::Test;
 
+use YAMLScript::Main;
 use Lingy::Test;
 
 use base 'Exporter';
@@ -9,12 +10,10 @@ use Test::More;
 use YAML::PP;
 
 use Lingy::Printer;
-use Lingy::Common;
 
-use YAMLScript::Reader;
+use YAMLScript::Common;
 use YAMLScript::RT;
-
-our $rt = YAMLScript::RT->init;
+use YAMLScript::Reader;
 
 my $reader = YAMLScript::Reader->new;
 
@@ -84,7 +83,7 @@ sub test_eval {
 
         my $got = eval {
             local $YAMLScript::Reader::read_ys = 1;
-            join("\n", $rt->rep($input));
+            join("\n", RT->rep($input));
         };
         $got = $@ if $@;
         chomp $got;
@@ -112,11 +111,21 @@ sub test_ys_to_ly {
 
         $label //= "'${\fmt($ys)}' -> '${\fmt($ly)}'";
 
-        my $ast = $reader->read_ys("$ys\n");
-        my $got = Lingy::Printer::pr_str($ast);
+        my $got;
+        eval {
+            my $ast = $reader->read_ys("$ys\n");
+            $got = Lingy::Printer->pr_str($ast);
+        };
+        $got = $@ if $@;
 
+        my $want = $ly;
         $label = label($label, $got, $ly);
-        is $got, $ly, $label;
+
+        if ($want =~ s{^/(.*)/$}{$1}) {
+            like $got, qr/$want/, $label;
+        } else {
+            is $got, $ly, $label;
+        }
     }, @_;
 }
 

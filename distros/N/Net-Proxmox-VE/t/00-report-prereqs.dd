@@ -28,7 +28,8 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
-                                      'Test::Portability::Files' => '0'
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
@@ -36,7 +37,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'HTTP::Headers' => '0',
                                       'HTTP::Request::Common' => '0',
-                                      'JSON' => '0',
+                                      'JSON::MaybeXS' => '0',
                                       'LWP::Protocol::https' => '0',
                                       'LWP::UserAgent' => '0',
                                       'parent' => '0',
@@ -55,9 +56,11 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IO::Socket::SSL' => '0',
                                    'IPC::Open3' => '0',
-                                   'JSON' => '0',
+                                   'JSON::MaybeXS' => '0',
+                                   'Test::CPAN::Meta' => '0',
                                    'Test::More' => '0',
-                                   'Test::Trap' => '0'
+                                   'Test::Trap' => '0',
+                                   'Test::Vars' => '0'
                                  }
                  }
      };

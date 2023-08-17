@@ -1,0 +1,24 @@
+
+These are just my notes on how to build and release.
+
+URL: https://metacpan.org/dist/SVN-Rami/view/bin/rami
+
+
+Test:
+  perl -Ilib bin/rami
+  perl -Ilib bin/rami -c 84987
+  perl -Ilib bin/rami --version
+
+Convert pod to HTML (just to preview before publishing):
+  perl -e 'use Pod::Html; pod2html("--infile=C:/Dev/rami-dist/lib/SVN/Rami.pm","--outfile=pm.html");'
+  perl -e 'use Pod::Html; pod2html("--infile=C:/Dev/rami-dist/bin/rami","--outfile=rami.html");'
+
+rm SVN-Rami-*.tar.gz  *.html
+perl Makefile.PL
+make manifest
+make
+make install
+make dist
+Upload to: https://pause.perl.org/pause/authenquery?ACTION=add_uri
+
+Also see: https://new.perl.com/article/how-to-upload-a-script-to-cpan/

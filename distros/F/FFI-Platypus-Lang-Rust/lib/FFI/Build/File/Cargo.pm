@@ -16,7 +16,7 @@ use constant default_suffix => '.toml';
 use constant default_encoding => ':utf8';
 
 # ABSTRACT
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub accept_suffix
@@ -137,7 +137,7 @@ FFI::Build::File::Cargo
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

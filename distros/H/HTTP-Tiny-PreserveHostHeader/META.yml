@@ -1,0 +1,30 @@
+---
+abstract: 'Preserve Host header on requests'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Tiny-PreserveHostHeader
+provides:
+  HTTP::Tiny::PreserveHostHeader:
+    file: lib/HTTP/Tiny/PreserveHostHeader.pm
+    version: '0.0104'
+requires:
+  HTTP::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://github.com/dex4er/perl-HTTP-Tiny-PreserveHostHeader/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-HTTP-Tiny-PreserveHostHeader
+version: '0.0104'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

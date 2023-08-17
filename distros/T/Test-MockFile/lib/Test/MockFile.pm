@@ -47,11 +47,11 @@ files without touching the file system.
 
 =head1 VERSION
 
-Version 0.035
+Version 0.036
 
 =cut
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 our %files_being_mocked;
 
@@ -452,7 +452,11 @@ Apply a rule to one or more files.
 =cut
 
 sub add_strict_rule_for_command {
-    my ( $command_rule, $action ) = @_;
+    my ( $command_rule, $action, $extra ) = @_;
+
+    if ($extra) {
+        die q[Syntax not supported (extra arg) for 'add_strict_rule_for_command', please consider using 'add_strict_rule' instead.];
+    }
 
     return add_strict_rule( $command_rule, undef, $action );
 }
@@ -525,7 +529,7 @@ sub _strict_mode_violation {
     # we don't need to check if it's a violation since something else should
     # have opened it first. open and sysopen, though, require special care.
     #
-    if (UNIVERSAL::isa( $filename, 'GLOB' )) {
+    if ( UNIVERSAL::isa( $filename, 'GLOB' ) ) {
         return if $command ne 'open' && $command ne 'sysopen';
     }
 

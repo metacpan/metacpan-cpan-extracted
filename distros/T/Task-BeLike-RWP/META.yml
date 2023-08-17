@@ -23,18 +23,23 @@ requires:
   Log::Log4perl: '0'
   Net::DNS: '0'
   Net::IP::XS: '0'
+  Number::Bytes::Human: '0'
   PadWalker: '0'
   Path::Tiny: '0'
+  Rex: '0'
   SQL::Abstract: '0'
+  Syntax::Keyword::Match: '0'
+  Syntax::Operator::In: '0'
   System::Command: '0'
   URI: '0'
   XML::RSS: '0'
+  YAML::XS: '0'
   perl: v5.37.9
 resources:
-  bugtracker: https://github.com/rwp0/Task-BeLike-RWP/issues
-  homepage: https://github.com/rwp0/Task-BeLike-RWP
-  repository: https://github.com/rwp0/Task-BeLike-RWP.git
-version: '0.230470'
-x_generated_by_perl: v5.37.9
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  bugtracker: https://github.com/rwp-cpan/Task-BeLike-RWP/issues
+  homepage: https://github.com/rwp-cpan/Task-BeLike-RWP
+  repository: https://github.com/rwp-cpan/Task-BeLike-RWP.git
+version: '0.231770'
+x_generated_by_perl: v5.37.12
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

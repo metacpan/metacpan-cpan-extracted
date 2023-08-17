@@ -1,5 +1,17 @@
 Revision history for Types-SQL
 
+v0.7.0    2023-06-02 17:29:04+01:00 Europe/London
+  [Incompatible Changes]
+  - Upgraded the minimum Perl version to v5.14.
+
+  [Bug Fixes]
+  - Improved regular expressions to only match ASCII digits.
+
+  [Documentation]
+  - Documented support policy for older Perls.
+
+  - Bump copyright year.
+
 v0.6.1    2022-09-04 15:58:06+01:00 Europe/London
   [Other]
   - Specify minimum version of Exporter.

@@ -25,11 +25,12 @@ requires:
   Moo: '2'
   Pod::Usage: '0'
   Text::Table: '0'
+  YAML: '0'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/Corion/WWW-Twitch/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/WWW-Twitch.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

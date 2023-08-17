@@ -14,6 +14,7 @@ use IPC::Cmd qw(run);
 use File::Copy "cp";
 use Sys::Syslog;
 use JSON;
+use Time::Piece;
 
 =head1 NAME
 
@@ -21,11 +22,11 @@ Virani - PCAP retrieval for a FPC setup writing to PCAP files.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 1.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '1.1.0';
 
 =head1 SYNOPSIS
 
@@ -73,7 +74,7 @@ sub new_from_conf {
 	}
 
 	return Virani->new( %{$toml} );
-}
+} ## end sub new_from_conf
 
 =head2 new
 
@@ -102,12 +103,19 @@ Initiates the object.
     - verbose_to_syslog :: Send verbose items to syslog. This is used by mojo-virani.
         Default :: 0
 
+    - pcap_glob :: The glob to use for matching files.
+        Default :: *.pcap*
+
+    - ts_is_unixtime :: The timestamp is unixtime and does not requires additional processing.
+        Default :: 1
+
     - verbose :: Print verbose info.
         Default :: 1
 
-    - type :: Either tcpdump or tshark, which to use for filtering PCAP files in the
+    - type :: Either tcpdump, tshark, or bpf2tshark, which to use for filtering PCAP files in the
               specified time slot. tcpdump is faster, but in general will not nicely handles
-              some VLAN types. For that tshark is needed, but it is signfigantly slower.
+              some VLAN types. For that tshark is needed, but it is signfigantly slower. bpf2tshark
+              is handled via Virani->bpf2tshark and that should be seen for more info on that.
         Default :: tcpdump
 
     - padding :: How many seconds to add to the start and end time stamps to ensure the specified
@@ -127,6 +135,8 @@ For sets, the following keys are usable, of which only path is required.
 
     - type :: The default filter type to use with this set.
 
+    - ts_is_unixtime :: The timestamp is unixtime and does not requires additional processing.
+
 =cut
 
 sub new {
@@ -144,6 +154,8 @@ sub new {
 		verbose           => 1,
 		type              => 'tcpdump',
 		padding           => 5,
+		ts_is_unixtime    => 1,
+		pcap_glob         => '*.pcap*',
 		sets              => {
 			default => {
 				path => '/var/log/daemonlogger',
@@ -155,21 +167,22 @@ sub new {
 
 	if ( defined( $opts{allowed_subnets} ) && ref( $opts{allowed_subnets} ) eq 'ARRAY' ) {
 		$self->{allowed_subnets} = $opts{allowed_subnets};
-	}
-	elsif ( defined( $opts{allowed_subnets} ) && ref( $opts{allowed_subnets} ) ne 'ARRAY' ) {
+	} elsif ( defined( $opts{allowed_subnets} ) && ref( $opts{allowed_subnets} ) ne 'ARRAY' ) {
 		die("$opts{allowed_subnets} defined, but not a array");
 	}
 
 	if ( defined( $opts{sets} ) && ref( $opts{sets} ) eq 'HASH' ) {
 		$self->{sets} = $opts{sets};
-	}
-	elsif ( defined( $opts{sets} ) && ref( $opts{allowed_subnets} ) ne 'HASH' ) {
+	} elsif ( defined( $opts{sets} ) && ref( $opts{allowed_subnets} ) ne 'HASH' ) {
 		die("$opts{sets} defined, but not a hash");
 	}
 
 	# real in basic values
-	my @real_in
-		= ( 'apikey', 'default_set', 'cache', 'default_max_time', 'verbose_to_syslog', 'verbose', 'auth_by_IP_only' );
+	my @real_in = (
+		'apikey',           'default_set',       'cache',     'padding',
+		'default_max_time', 'verbose_to_syslog', 'verbose',   'auth_by_IP_only',
+		'type',             'ts_is_unixtime',    'pcap_glob', 'default_regex'
+	);
 	for my $key (@real_in) {
 		if ( defined( $opts{$key} ) ) {
 			$self->{$key} = $opts{$key};
@@ -177,7 +190,258 @@ sub new {
 	}
 
 	return $self;
-}
+} ## end sub new
+
+=head2 bpf2tshark
+
+Does a quick and dumb conversion of a BPF filter to tshark.
+
+    my $tshark=$virani->bpf2tshark($bpf);
+
+
+
+    ()  ->  ()
+    not ()  ->  !()
+
+    icmp -> icmp
+    tcp -> tcp
+    udp -> udp
+
+    port $port -> ( tcp.port == $port or udp.port == $port )
+    not port $port -> ( tcp.port != $port or udp.port != $port )
+
+    dst port $port -> ( tcp.dstport == $port or udp.dstport == $port )
+    not dst port $port -> ( tcp.dstport != $port or udp.dstport != $port )
+
+    src port $port -> ( tcp.srcport == $port or udp.srcport == $port )
+    not src port $port -> ( tcp.srcport != $port or udp.srcport != $port )
+
+    host $host -> ip.addr == $host
+    not host $host -> ip.addr != $host
+
+    dst host $host -> ip.dst == $host
+    not dst host $host -> ip.dst != $host
+
+    src host $host -> ip.src == $host
+    not src host $host -> ip.src != $host
+
+    dst $host -> ip.dst == $host
+    not host $host -> ip.dst != $host
+
+    src src $host -> ip.src == $host
+    not src $host -> ip.src != $host
+
+=cut
+
+sub bpf2tshark {
+	my $self = $_[0];
+	my $bpf  = $_[1];
+
+	if ( !defined($bpf) ) {
+		return '';
+	}
+
+	# make sure that () have spaces on either side
+	$bpf =~ s/\(/\ \(\ /g;
+	$bpf =~ s/\)/\ \)\ /g;
+
+	my @bpf_split = split( /[\ \t]+/, $bpf );
+	my @tshark_args;
+	my @previous;
+	my $not = 0;
+	foreach my $item (@bpf_split) {
+
+		# sets the equality operator based of if not is true or not
+		my $equality = '==';
+		if ($not) {
+			$equality = '!=';
+		}
+
+		# tcp/udp/icmp
+		if ( $item eq 'tcp' || $item eq 'udp' || $item eq 'icmp' ) {
+			push( @tshark_args, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# handle negation
+		elsif ( $item eq 'not' ) {
+			$not = 1;
+		}
+
+		# handles closing )
+		elsif ( $item eq ')' ) {
+			$not = 0;
+			push( @tshark_args, ')' );
+			@previous = ();
+		}
+
+		# handles opening (
+		elsif ( $item eq ')' ) {
+			if ($not) {
+				push( @tshark_args, '!(' );
+			} else {
+				push( @tshark_args, '(' );
+			}
+			$not      = 0;
+			@previous = ();
+		}
+
+		# and/or
+		elsif ( $item eq 'or' || $item eq 'and' ) {
+			# make sure we not add it twice
+			if ( $tshark_args[$#tshark_args] ne 'and' && $tshark_args[$#tshark_args] ne 'or' ) {
+				push( @tshark_args, $item );
+			}
+			$not      = 0;
+			@previous = ();
+		}
+
+		# start of src/dst
+		elsif ( !defined( $previous[0] ) && ( $item eq 'src' || $item eq 'dst' ) ) {
+			push( @previous, $item );
+		}
+
+		# start of ether
+		elsif ( !defined( $previous[0] ) && $item eq 'ether' ) {
+			push( @previous, $item );
+		}
+
+		# adding src/dst/host to ether
+		elsif (defined( $previous[0] )
+			&& $previous[0] eq 'ether'
+			&& ( $item eq 'src' || $item eq 'dst' || $item eq 'host' ) )
+		{
+			push( @previous, $item );
+		}
+
+		# generic host/port
+		elsif ( !defined( $previous[0] ) && ( $item eq 'port' || $item eq 'host' ) ) {
+			push( @previous, $item );
+		}
+
+		# adding host/port to src/dst
+		elsif (defined( $previous[0] )
+			&& ( $previous[0] eq 'src' || $previous[0] eq 'dst' )
+			&& ( $item eq 'host' || $item eq 'port' ) )
+		{
+			push( @previous, $item );
+		}
+
+		# add ether src $ether
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'ether'
+			&& $previous[1] eq 'src' )
+		{
+			push( @tshark_args, 'etc.src', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add ether src $ether
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'ether'
+			&& $previous[1] eq 'dst' )
+		{
+			push( @tshark_args, 'etc.dst', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add ether host $ether
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'ether'
+			&& $previous[1] eq 'host' )
+		{
+			push( @tshark_args, 'etc.addr', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add src port $port
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'src'
+			&& $previous[1] eq 'port' )
+		{
+			push( @tshark_args, '(', 'tcp.srcport', $equality, $item, 'or', 'udp.srcport', $equality, $item, ')' );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add dst port $port
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'dst'
+			&& $previous[1] eq 'port' )
+		{
+			push( @tshark_args, '(', 'tcp.dstport', $equality, $item, 'or', 'udp.dstport', $equality, $item, ')' );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add src host $host
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'src'
+			&& $previous[1] eq 'host' )
+		{
+			push( @tshark_args, 'ip.src', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add dst host $host
+		elsif (defined( $previous[0] )
+			&& defined( $previous[1] )
+			&& $previous[0] eq 'dst'
+			&& $previous[1] eq 'host' )
+		{
+			push( @tshark_args, 'ip.dst', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add port $port
+		elsif ( defined( $previous[0] ) && !defined( $previous[1] ) && $previous[0] eq 'port' ) {
+			push( @tshark_args, '(', 'tcp.port', $equality, $item, 'or', 'udp.port', $equality, $item, ')' );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add host $host
+		elsif ( defined( $previous[0] ) && !defined( $previous[1] ) && $previous[0] eq 'host' ) {
+			push( @tshark_args, 'ip.addr', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add src $host
+		elsif ( defined( $previous[0] ) && !defined( $previous[1] ) && $previous[0] eq 'src' ) {
+			push( @tshark_args, 'ip.src', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# add dst $host
+		elsif ( defined( $previous[0] ) && !defined( $previous[1] ) && $previous[0] eq 'dst' ) {
+			push( @tshark_args, 'ip.dst', $equality, $item );
+			$not      = 0;
+			@previous = ();
+		}
+
+		# if anything else is found, skip it
+		else {
+			$not      = 0;
+			@previous = ();
+		}
+	} ## end foreach my $item (@bpf_split)
+
+	return join( ' ', @tshark_args );
+} ## end sub bpf2tshark
 
 =head2 filter_clean
 
@@ -216,7 +480,7 @@ sub filter_clean {
 	$string =~ s/\s\s+/ /g;
 
 	return $string;
-}
+} ## end sub filter_clean
 
 =head1 check_apikey
 
@@ -253,7 +517,7 @@ sub check_apikey {
 	}
 
 	return 1;
-}
+} ## end sub check_apikey
 
 =head1 check_remote_ip
 
@@ -282,8 +546,7 @@ sub check_remote_ip {
 	eval { $allowed_subnets = subnet_matcher( @{ $self->{allowed_subnets} } ); };
 	if ($@) {
 		die( 'Failed it init subnet matcher... ' . $@ );
-	}
-	elsif ( !defined($allowed_subnets) ) {
+	} elsif ( !defined($allowed_subnets) ) {
 		die('Failed it init subnet matcher... sub_matcher returned undef');
 	}
 
@@ -292,7 +555,7 @@ sub check_remote_ip {
 	}
 
 	return 0;
-}
+} ## end sub check_remote_ip
 
 =head1 check_type
 
@@ -314,12 +577,12 @@ sub check_type {
 		return 0;
 	}
 
-	if ( $type ne 'tshark' && $type ne 'tcpdump' ) {
+	if ( $type ne 'tshark' && $type ne 'tcpdump' && $type ne 'bpf2tshark' ) {
 		return 0;
 	}
 
 	return 1;
-}
+} ## end sub check_type
 
 =head2 get_default_set
 
@@ -367,17 +630,13 @@ sub get_cache_file {
 	# basic sanity checking
 	if ( !defined( $opts{start} ) ) {
 		die('$opts{start} not defined');
-	}
-	elsif ( !defined( $opts{end} ) ) {
+	} elsif ( !defined( $opts{end} ) ) {
 		die('$opts{start} not defined');
-	}
-	elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
 		die('$opts{start} is not a Time::Piece object');
-	}
-	elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
 		die('$opts{end} is not a Time::Piece object');
-	}
-	elsif ( defined( $opts{padding} ) && $opts{padding} !~ /^\d+/ ) {
+	} elsif ( defined( $opts{padding} ) && $opts{padding} !~ /^\d+/ ) {
 		die('$opts{padding} is not numeric');
 	}
 
@@ -392,11 +651,9 @@ sub get_cache_file {
 	# make sure the set exists
 	if ( !defined( $self->{sets}->{ $opts{set} } ) ) {
 		die( 'The set "' . $opts{set} . '" is not defined' );
-	}
-	elsif ( !defined( $self->{sets}->{ $opts{set} }{path} ) ) {
+	} elsif ( !defined( $self->{sets}->{ $opts{set} }{path} ) ) {
 		die( 'The path for set "' . $opts{set} . '" is not defined' );
-	}
-	elsif ( !-d $self->{sets}->{ $opts{set} }{path} ) {
+	} elsif ( !-d $self->{sets}->{ $opts{set} }{path} ) {
 		die(      'The path for set "'
 				. $opts{set} . '", "'
 				. $self->{sets}->{ $opts{set} }{path}
@@ -430,12 +687,10 @@ sub get_cache_file {
 		# figure what what to use as the cache file
 		if ( $opts{no_cache} ) {
 			$cache_file = $opts{file};
-		}
-		elsif ( $opts{auto_no_cache} && ( !-d $self->{cache} || !-w $self->{cache} ) ) {
+		} elsif ( $opts{auto_no_cache} && ( !-d $self->{cache} || !-w $self->{cache} ) ) {
 			$cache_file = $opts{file};
 
-		}
-		elsif ( $opts{auto_no_cache} && ( -d $self->{cache} || -w $self->{cache} ) ) {
+		} elsif ( $opts{auto_no_cache} && ( -d $self->{cache} || -w $self->{cache} ) ) {
 			$cache_file
 				= $self->{cache} . '/'
 				. $opts{set} . '-'
@@ -443,19 +698,16 @@ sub get_cache_file {
 				. $opts{start}->epoch . '-'
 				. $opts{end}->epoch . "-"
 				. lc( md5_hex( $opts{filter} ) );
-		}
-		elsif ( !$opts{auto_no_cache} && ( !-d $self->{cache} || !-w $self->{cache} ) ) {
+		} elsif ( !$opts{auto_no_cache} && ( !-d $self->{cache} || !-w $self->{cache} ) ) {
 			die(      '$opts{auto_no_cache} is false and $opts{no_cache} is false, but the cache dir "'
 					. $self->{dir}
 					. '" does not exist, is not a dir, or is not writable' );
 		}
-	}
-	else {
+	} else {
 		# make sure the cache is usable
 		if ( !-d $self->{cache} ) {
 			die( 'Cache dir,"' . $self->{cache} . '", does not exist or is not a dir' );
-		}
-		elsif ( !-w $self->{cache} ) {
+		} elsif ( !-w $self->{cache} ) {
 			die( 'Cache dir,"' . $self->{cache} . '", is not writable' );
 		}
 
@@ -466,10 +718,10 @@ sub get_cache_file {
 			. $opts{type} . '-'
 			. $opts{end}->epoch . "-"
 			. lc( md5_hex( $opts{filter} ) );
-	}
+	} ## end else [ if ( defined( $opts{file} ) ) ]
 
 	return $cache_file;
-}
+} ## end sub get_cache_file
 
 =head2 get_pcap_local
 
@@ -488,7 +740,7 @@ Generates a PCAP locally and returns the path to it.
         - Default :: ''
 
     - set :: The PCAP set to use. Will use what ever the default is set to if undef or blank.
-        - Default :: $viarni->get_default_set
+        - Default :: $virani->get_default_set
 
     - file :: The file to output to. If undef it just returns the path to
               the cache file.
@@ -510,6 +762,10 @@ The return is a hash reference that includes the following keys.
     - pcaps :: A array of PCAPs used.
 
     - pcap_count :: A count of used PCAPs.
+
+    - pcap_glob :: The value of pcap_glob used.
+
+    - ts_is_unixtime :: The value of ts_is_unixtime used.
 
     - failed :: A hash of PCAPs that failed. PCAP path as key and value being the reason.
 
@@ -542,10 +798,31 @@ The return is a hash reference that includes the following keys.
 
     - using_cache :: If the cache was used or not.
 
+    - req_start :: Timestamp of when the it started. In the format
+                   %Y-%m-%dT%H:%M:%S%z
+
+    - req_start_s :: Same as req_start, but unixtime.
+
+    - req_end :: Timestamp of when the it finished. In the format
+                 %Y-%m-%dT%H:%M:%S%z
+
+    - req_end_s :: Same as req_end, but unixtime.
+
+    - req_time :: Number of seconds it took.
+
 =cut
 
 sub get_pcap_local {
 	my ( $self, %opts ) = @_;
+
+	# start of the request
+	my $req_start = localtime;
+
+	# if set is undef or blank, use the default
+	if ( !defined( $opts{set} ) || $opts{set} eq '' ) {
+		$opts{set} = $self->get_default_set;
+	}
+	$self->verbose( 'info', 'Set: ' . $opts{set} );
 
 	# make sure we have something for type and check to make sure it is sane
 	if ( !defined( $opts{type} ) ) {
@@ -555,48 +832,60 @@ sub get_pcap_local {
 		}
 	}
 
+	# figure out what to use for $ts_is_unixtime
+	my $ts_is_unixtime;
+	if ( defined( $self->{sets}{ $opts{set} }{ts_is_unixtime} ) ) {
+		$ts_is_unixtime = $self->{sets}{ $opts{set} }{ts_is_unixtime};
+	} else {
+		$ts_is_unixtime = $self->{ts_is_unixtime};
+	}
+
+	# figure out what to use for $pcap_glob
+	my $pcap_glob;
+	if ( defined( $self->{sets}{ $opts{set} }{pcap_glob} ) ) {
+		$pcap_glob = $self->{sets}{ $opts{set} }{pcap_glob};
+	} else {
+		$pcap_glob = $self->{pcap_glob};
+	}
+	$self->verbose( 'info', 'PCAP Glob: ' . $pcap_glob );
+
 	# check it here incase the config includes something off
 	if ( !$self->check_type( $opts{type} ) ) {
 		die( 'type "' . $opts{type} . '" is not a supported type, tcpdump or tshark,' );
 	}
+	$self->verbose( 'info', 'Type: ' . $opts{type} );
 
 	# basic sanity checking
 	if ( !defined( $opts{start} ) ) {
 		die('$opts{start} not defined');
-	}
-	elsif ( !defined( $opts{end} ) ) {
+	} elsif ( !defined( $opts{end} ) ) {
 		die('$opts{start} not defined');
-	}
-	elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
 		die('$opts{start} is not a Time::Piece object');
-	}
-	elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
 		die('$opts{end} is not a Time::Piece object');
-	}
-	elsif ( defined( $opts{padding} ) && $opts{padding} !~ /^\d+/ ) {
+	} elsif ( defined( $opts{padding} ) && $opts{padding} !~ /^\d+$/ ) {
 		die('$opts{padding} is not numeric');
 	}
+	$self->verbose( 'info', 'Start: ' . $opts{start}->strftime('%Y-%m-%dT%H:%M:%S%z') . ', ' . $opts{start}->epoch );
+	$self->verbose( 'info', 'End: ' . $opts{end}->strftime('%Y-%m-%dT%H:%M:%S%z') . ', ' . $opts{end}->epoch );
 
 	if ( !defined( $opts{auto_no_cache} ) ) {
 		$opts{auto_no_cache} = 1;
 	}
+	$self->verbose( 'info', 'auto_no_cache: ' . $opts{auto_no_cache} );
 
-	if (!defined($opts{no_cache})) {
-		$opts{no_cache}=0;
+	if ( !defined( $opts{no_cache} ) ) {
+		$opts{no_cache} = 0;
 	}
-
-	if ( !defined( $opts{set} ) || $opts{set} eq '' ) {
-		$opts{set} = $self->get_default_set;
-	}
+	$self->verbose( 'info', 'no_cache: ' . $opts{no_cache} );
 
 	# make sure the set exists
 	if ( !defined( $self->{sets}->{ $opts{set} } ) ) {
 		die( 'The set "' . $opts{set} . '" is not defined' );
-	}
-	elsif ( !defined( $self->{sets}->{ $opts{set} }{path} ) ) {
+	} elsif ( !defined( $self->{sets}->{ $opts{set} }{path} ) ) {
 		die( 'The path for set "' . $opts{set} . '" is not defined' );
-	}
-	elsif ( !-d $self->{sets}->{ $opts{set} }{path} ) {
+	} elsif ( !-d $self->{sets}->{ $opts{set} }{path} ) {
 		die(      'The path for set "'
 				. $opts{set} . '", "'
 				. $self->{sets}->{ $opts{set} }{path}
@@ -613,6 +902,7 @@ sub get_pcap_local {
 
 	# clean the filter
 	$opts{filter} = $self->filter_clean( $opts{filter} );
+	$self->verbose( 'info', 'Filter: ' . $opts{filter} );
 
 	# get the cache file to use
 	my $cache_file;
@@ -622,28 +912,24 @@ sub get_pcap_local {
 	}
 
 	# if applicable return the cache file
-	my $return_cache=0;
-	if (
-		defined( $opts{file} )
+	my $return_cache = 0;
+	if (   defined( $opts{file} )
 		&& $opts{file} ne $cache_file
 		&& !$opts{no_cache}
 		&& -f $cache_file
-		&& -f $cache_file . '.json'
-
-		)
+		&& -f $cache_file . '.json' )
 	{
-		$return_cache=1;
-	}
-	elsif ( !defined( $opts{file} ) && !$opts{no_cache} && -f $cache_file && -f $cache_file . '.json' ) {
-		$return_cache=1;
+		$return_cache = 1;
+	} elsif ( !defined( $opts{file} ) && !$opts{no_cache} && -f $cache_file && -f $cache_file . '.json' ) {
+		$return_cache = 1;
 	}
 	if ($return_cache) {
-		my $cache_message='Already cached... "' . $cache_file . '"';
-		if (defined($opts{file}) && $opts{file} ne $cache_file ) {
-			$cache_message=$cache_message.' -> "' . $opts{file} . '"';
+		my $cache_message = 'Already cached... "' . $cache_file . '"';
+		if ( defined( $opts{file} ) && $opts{file} ne $cache_file ) {
+			$cache_message = $cache_message . ' -> "' . $opts{file} . '"';
 		}
-		$self->verbose( 'info',  $cache_message);
-		if (defined($opts{file})) {
+		$self->verbose( 'info', $cache_message );
+		if ( defined( $opts{file} ) && $opts{file} ne $cache_file ) {
 			cp( $cache_file, $opts{file} );
 		}
 		my $to_return;
@@ -656,7 +942,7 @@ sub get_pcap_local {
 		}
 		$to_return->{using_cache} = 1;
 		return $to_return;
-	}
+	} ## end if ($return_cache)
 
 	# check it here incase the config includes something off
 	if ( $opts{padding} !~ /^[0-9]+$/ ) {
@@ -666,6 +952,8 @@ sub get_pcap_local {
 	# set the padding
 	my $start = $opts{start} - $opts{padding};
 	my $end   = $opts{end} + $opts{padding};
+	$self->verbose( 'info', 'Padded Start: ' . $start->strftime('%Y-%m-%dT%H:%M:%S%z') . ', ' . $start->epoch );
+	$self->verbose( 'info', 'Padded End: ' . $end->strftime('%Y-%m-%dT%H:%M:%S%z') . ', ' . $end->epoch );
 
 	# get the set
 	my $set_path = $self->get_set_path( $opts{set} );
@@ -674,50 +962,62 @@ sub get_pcap_local {
 	}
 
 	# get the pcaps
-	my @pcaps = File::Find::Rule->file()->name("*.pcap*")->in($set_path);
+	my @pcaps = File::Find::Rule->file()->name($pcap_glob)->in($set_path);
 
 	# get the ts_regexp to use
 	my $ts_regexp;
 	if ( defined( $self->{sets}{ $opts{set} }{regex} ) ) {
 		$ts_regexp = $self->{sets}{ $opts{set} }{regex};
-	}
-	else {
+	} else {
 		$ts_regexp = $self->{default_regex};
 	}
+	$self->verbose( 'info', 'Timestamp Regexp: ' . $ts_regexp );
 
 	my $to_check = File::Find::IncludesTimeRange->find(
-		items => \@pcaps,
-		start => $start,
-		end   => $end,
-		regex => $ts_regexp,
+		items          => \@pcaps,
+		start          => $start,
+		end            => $end,
+		regex          => $ts_regexp,
+		ts_is_unixtime => $ts_is_unixtime,
 	);
 
-	# The path to return.
+	# The return hash and what will be used for the cache JSON
+	# req_end stuff set later
 	my $to_return = {
-		pcaps         => $to_check,
-		pcap_count    => 0,
-		failed        => {},
-		failed_count  => 0,
-		success_count => 0,
-		path          => $cache_file,
-		filter        => $opts{filter},
-		total_size    => 0,
-		failed_size   => 0,
-		success_size  => 0,
-		tmp_size      => 0,
-		final_size    => 0,
-		type          => $opts{type},
-		padding       => $opts{padding},
-		start_s       => $opts{start}->epoch,
-		start         => $opts{start}->strftime('%Y-%m-%dT%H:%M:%S%z'),
-		end_s         => => $opts{end}->epoch,
-		end           => $opts{end}->strftime('%Y-%m-%dT%H:%M:%S%z'),
+		pcaps          => $to_check,
+		pcap_glob      => $pcap_glob,
+		pcap_count     => 0,
+		failed         => {},
+		failed_count   => 0,
+		success_count  => 0,
+		path           => $cache_file,
+		filter         => $opts{filter},
+		total_size     => 0,
+		failed_size    => 0,
+		success_size   => 0,
+		tmp_size       => 0,
+		final_size     => 0,
+		type           => $opts{type},
+		padding        => $opts{padding},
+		start_s        => $opts{start}->epoch,
+		start          => $opts{start}->strftime('%Y-%m-%dT%H:%M:%S%z'),
+		end_s          => $opts{end}->epoch,
+		end            => $opts{end}->strftime('%Y-%m-%dT%H:%M:%S%z'),
+		req_start      => $req_start->strftime('%Y-%m-%dT%H:%M:%S%z'),
+		req_start_s    => $req_start->epoch,
+		ts_is_unixtime => $ts_is_unixtime,
 	};
-
-	$self->verbose( 'info', 'Filter: ' . $opts{filter} );
 
 	# used for tracking the files to cleanup
 	my @tmp_files;
+
+	# puts together the tshark filter if needed
+	my $tshark_filter = $opts{filter};
+	if ( $opts{type} eq 'bpf2tshark' ) {
+		$tshark_filter = $self->bpf2tshark( $opts{filter} );
+		$to_return->{filter_translated} = $tshark_filter;
+		$self->verbose( 'info', 'Translated Filter ' . $tshark_filter );
+	}
 
 	# the merge command
 	my $to_merge = [ 'mergecap', '-w', $cache_file ];
@@ -738,10 +1038,9 @@ sub get_pcap_local {
 				command => [ 'tcpdump', '-r', $pcap, '-w', $tmp_file, $opts{filter} ],
 				verbose => 0
 			);
-		}
-		else {
+		} else {
 			( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) = run(
-				command => [ 'tshark', '-r', $pcap, '-w', $tmp_file, $opts{filter} ],
+				command => [ 'tshark', '-r', $pcap, '-w', $tmp_file, $tshark_filter ],
 				verbose => 0
 			);
 		}
@@ -756,8 +1055,7 @@ sub get_pcap_local {
 				= stat($tmp_file);
 			$to_return->{tmp_size} += $size;
 
-		}
-		else {
+		} else {
 			$to_return->{failed}{$pcap} = $error_message;
 			$to_return->{failed_count}++;
 			$to_return->{failed_size} += $size;
@@ -768,7 +1066,7 @@ sub get_pcap_local {
 		}
 
 		$to_return->{pcap_count}++;
-	}
+	} ## end foreach my $pcap ( @{$to_check} )
 
 	# only try merging if we had more than one success
 	if ( $to_return->{success_count} > 0 ) {
@@ -781,13 +1079,11 @@ sub get_pcap_local {
 		);
 		if ($success) {
 			$self->verbose( 'info', "PCAPs merged into " . $cache_file );
-		}
-		else {
+		} else {
 			# if verbose print different messages if mergecap generated a ouput file or not when it fialed
 			if ( -f $cache_file ) {
 				$self->verbose( 'warning', "PCAPs partially(output file generated) failed " . $error_message );
-			}
-			else {
+			} else {
 				$self->verbose( 'err', "PCAPs merge completely(output file not generated) failed " . $error_message );
 			}
 		}
@@ -804,8 +1100,7 @@ sub get_pcap_local {
 			$to_return->{final_size} = $size;
 		}
 
-	}
-	else {
+	} else {
 		$self->verbose( 'err', "No PCAPs to merge" );
 	}
 
@@ -821,6 +1116,12 @@ sub get_pcap_local {
 			. " final_size="
 			. $to_return->{final_size} );
 
+	# finalize info on how long the request took
+	my $req_end = localtime;
+	$to_return->{req_end}   = $req_end->strftime('%Y-%m-%dT%H:%M:%S%z');
+	$to_return->{req_end_s} = $req_end->epoch;
+	$to_return->{req_time}  = $req_end->epoch - $req_start->epoch;
+
 	$self->verbose( 'info', 'Creating metadata JSON at "' . $cache_file . '.json" ' );
 	my $json     = JSON->new->allow_nonref->pretty->canonical(1);
 	my $raw_json = $json->encode($to_return);
@@ -835,7 +1136,7 @@ sub get_pcap_local {
 	$to_return->{using_cache} = 0;
 
 	return $to_return;
-}
+} ## end sub get_pcap_local
 
 =head2 get_set_path
 
@@ -845,7 +1146,7 @@ If no set is given, the default is used.
 
 Will return undef if the set does not exist or if the set does not have a path defined.
 
-    my $path=$viarni->get_set_path($set);
+    my $path=$virani->get_set_path($set);
 
 =cut
 
@@ -865,7 +1166,7 @@ sub get_set_path {
 	}
 
 	return $self->{sets}{$set}{path};
-}
+} ## end sub get_set_path
 
 =head2 set_verbose
 
@@ -890,10 +1191,10 @@ sub set_verbose {
 Set if it should be verbose or not.
 
     # send verbose messages to syslog
-    $viarni->set_verbose_to_syslog(1);
+    $virani->set_verbose_to_syslog(1);
 
     # do not send verbose messages to syslog
-    $viarni->set_verbose_to_syslog(0);
+    $virani->set_verbose_to_syslog(0);
 
 =cut
 
@@ -933,17 +1234,16 @@ sub verbose {
 
 	if ( $self->{verbose} ) {
 		if ( $self->{verbose_to_syslog} ) {
-			openlog( 'viarni', undef, 'daemon' );
+			openlog( 'virani', undef, 'daemon' );
 			syslog( $level, $string );
 			closelog();
-		}
-		else {
+		} else {
 			print $string. "\n";
 		}
 	}
 
 	return;
-}
+} ## end sub verbose
 
 =head2 CONFIG
 
@@ -961,11 +1261,17 @@ With daemonlogger setup along the lines of like below...
 The following can be made available via mojo-varini or locally via varini with the set name of
 default as below.
 
-    default_set='default'
     allowed_subnets=["192.168.14.0/23", "127.0.0.1/8"]
     [sets.default]
     path='/var/log/daemonlogger'
-    regex='(?<timestamp>\d\d\d\d\d\d+)(\.pcap|(?<subsec>\.\d+)\.pcap)$'
+
+If you want to use 'init/freebsd' to start mojo-virani, you just need to copy it
+it to '/usr/local/etc/rc.d/virani' and add the following or the like to '/etc/rc.conf'.
+
+    virani_enable="YES"
+    virani_flags="daemon -m production -l http://127.0.0.1:8080 -l http://192.168.14.1:8080"
+
+See the script for information on the various possible config args for it.
 
 =head1 AUTHOR
 

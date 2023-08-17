@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.40 2023-06-08
+
+  - Coupure des lignes longues des logs pour les MTA restrictifs.
+
 2.39 2022-10-17
 
   - Compatibilité Koha 22.05

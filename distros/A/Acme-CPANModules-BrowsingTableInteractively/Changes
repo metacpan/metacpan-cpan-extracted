@@ -1,3 +1,16 @@
+0.009   2023-06-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: App::SQLiteUtils and "entries": sqlite frontends &
+          spreadsheets.
+
+
+0.008   2023-06-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention related list: Acme::CPANModules::TextTable.
+
+
 0.007   2022-04-15  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

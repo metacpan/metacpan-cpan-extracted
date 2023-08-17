@@ -58,7 +58,7 @@ requires:
 resources:
   bugtracker: https://github.com/zeromq/perlzmq/issues
   repository: git://github.com/zeromq/perlzmq.git
-version: '1.18'
+version: '1.19'
 x_contributors:
   - 'Dave Lambley <github@davel.me.uk>'
   - 'Graham Ollis <perl@wdlabs.com>'

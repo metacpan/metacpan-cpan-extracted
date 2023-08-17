@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "App::HTTPThis",
   "PREREQ_PM" => {
+    "Config::Tiny" => 0,
     "Getopt::Long" => 0,
     "Plack::App::DirectoryIndex" => 0,
     "Plack::Runner" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Config::Tiny" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => 0,
   "IO::Handle" => 0,

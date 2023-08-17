@@ -3,19 +3,19 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::FieldAttr::Isa;
 
 class Point {
-   has $x :param :reader;
-   has $y :param :reader;
+   field $x :param :reader;
+   field $y :param :reader;
 }
 
 class Rectangle {
-   has $start :Isa(Point) :param :reader :writer;
-   has $end   :Isa(Point) :param :reader :writer;
+   field $start :Isa(Point) :param :reader :writer;
+   field $end   :Isa(Point) :param :reader :writer;
 }
 
 {

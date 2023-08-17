@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple HTTP replies.",
+   "author" : [
+      "Bjoern Hee <github@spredehagl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SPRAGL-Cgi_reply",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "JSON" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SPRAGL::Cgi_reply" : {
+         "file" : "lib/SPRAGL/Cgi_reply.pm",
+         "version" : "1.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/spragl/Cgi_reply/issues"
+      },
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/spragl/Cgi_reply"
+      }
+   },
+   "version" : "1.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

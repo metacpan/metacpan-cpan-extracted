@@ -1,7 +1,7 @@
 {
    "abstract" : "a small gemini client",
    "author" : [
-      "Jeremy Mates <jeremy.mates@gmail.com>"
+      "Jeremy Mates <jmates@thrig.me>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Module::Build version 0.4234",
@@ -23,10 +23,12 @@
          "requires" : {
             "Carp" : "0",
             "Cpanel::JSON::XS" : "0",
+            "Digest::SHA" : "0",
             "File::Path" : "0",
             "File::Slurper" : "0",
             "File::Spec" : "0",
-            "IO::Socket::SSL" : "1.985",
+            "IO::Socket::IP" : "0",
+            "IO::Socket::SSL" : "0",
             "Net::SSLeay" : "0",
             "Parse::MIME" : "0",
             "URI" : "0",
@@ -35,6 +37,10 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
+            "IO::Socket::IP" : "0",
+            "IO::Socket::SSL" : "0",
+            "Parse::MIME" : "0",
             "Test2::Tools::Command" : "0.11",
             "Test2::V0" : "0.000060",
             "perl" : "v5.8.0"
@@ -44,11 +50,11 @@
    "provides" : {
       "Net::Gemini" : {
          "file" : "lib/Net/Gemini.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "Net::Gemini::Server" : {
          "file" : "lib/Net/Gemini/Server.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "URI::gemini" : {
          "file" : "lib/Net/Gemini.pm"
@@ -63,6 +69,6 @@
          "url" : "https://thrig.me/src/Net-Gemini.git"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -10,9 +10,9 @@ Gzip::Zopfli - Zopfli deflate/gzip compression library
 =head1 SYNOPSIS
 
     
-    use Gzip::Zopfli 'ZopfliCompress';
+    use Gzip::Zopfli 'zopfli_compress';
     my $in = 'something' x 1000;
-    my $out = ZopfliCompress ($in);
+    my $out = zopfli_compress ($in);
     print length ($out), ' ', length ($in), "\n";
     
 
@@ -22,13 +22,13 @@ produces output
     62 9000
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Zopfli-0.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Zopfli-0.02/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.01 of Gzip-Zopfli
-corresponding to L<git commit ce701626022c4d9693449a17320e490adb09ffdb|https://github.com/benkasminbullock/gzip-zopfli/commit/ce701626022c4d9693449a17320e490adb09ffdb> released on Mon Mar 1 10:35:58 2021 +0900.
+This documents version 0.02 of Gzip-Zopfli
+corresponding to L<git commit 676163dc6d271a6f3682cf586ad342bbc1a42fd4|https://github.com/benkasminbullock/gzip-zopfli/commit/676163dc6d271a6f3682cf586ad342bbc1a42fd4> released on Thu Jul 27 13:00:41 2023 +0900.
 
 This distribution also contains the source code of the Zopfli library
 version 1.0.3. See L</COPYRIGHT & LICENCE> for the
@@ -128,13 +128,13 @@ See L<https://github.com/google/zopfli>
 
 Interface to the Zlib compression library.
 
-=item L<Gzip::Libdeflate>
-
-Gzip compression and decompression with the new libdeflate library.
-
 =item L<Gzip::Faster>
 
 Alternative interface to zlib.
+
+=item L<Gzip::Libdeflate>
+
+Gzip compression and decompression with the new libdeflate library.
 
 =back
 
@@ -159,7 +159,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2021
+2021-2023
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

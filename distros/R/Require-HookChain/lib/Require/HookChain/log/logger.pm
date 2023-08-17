@@ -8,9 +8,9 @@ package Require::HookChain::log::logger;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-07-23'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::log::logger - Log a message to Log::ger
 
 =head1 VERSION
 
-This document describes version 0.011 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.015 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2023-07-23.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Object-Pad-FieldAttr-Trigger
 
+0.07    2023-08-10
+        [CHANGES]
+         * Swap all of the unit tests from `Test::More` to `Test2::V0`
+         * Remember to implement `no ...` to disable the syntax
+         * Switch to using `field` of Object::Pad v0.66
+
 0.06    2022-02-01
         [CHANGES]
          * Renamed from Object-Pad-SlotAttr-Trigger

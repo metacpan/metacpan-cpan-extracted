@@ -1,5 +1,5 @@
 package Finance::Bank::SentinelBenefits::Csv401kConverter::LineParser;
-$Finance::Bank::SentinelBenefits::Csv401kConverter::LineParser::VERSION = '1.0';
+$Finance::Bank::SentinelBenefits::Csv401kConverter::LineParser::VERSION = '1.3';
 use Modern::Perl;
 =head1 NAME
 
@@ -8,28 +8,44 @@ CSV lines into standardized Line objects
 
 =head1 VERSION
 
-version 1.0
+version 1.3
 
 =head1 SYNOPSIS
+
+
 
 This class takes raw lines from the Sentinel website's CSV files and a map
 of security names to symbols, and returns parsed C<Finance::Bank::SentinelBenefits::Csv401kConverter::Line>
 objects
 
-=cut
+
+
+=cut 
 
 use Moose;
 
 use Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap;
 use Finance::Bank::SentinelBenefits::Csv401kConverter::Line;
 
+
+=head1 CONSTANTS
+
+=head2 NUMBER_OF_FIELDS
+
+Number of fields in the Sentinel file
+
+=cut
 use constant {
     NUMBER_OF_FIELDS => 7,
 };
 
 =head1 Constructor
 
+
+
 =head2 new()
+
+
 
     my $f = Finance::Bank::SentinelBenefits::Csv401kConverter::LineParser->new( {
         symbol_map => $symbol_map,
@@ -37,14 +53,22 @@ use constant {
 
 Construct a new LineParser with the given symbol map
 
+
+
 =head1 Accessors
 
+
+
 =head2 $p->symbol_map()
+
+
 
 Accesses the passed in symbol map.  This is only really for internal
 use, as the symbol map is immutable.
 
-=cut
+
+
+=cut 
 
 has 'symbol_map' => (
     is       => 'ro',
@@ -54,15 +78,25 @@ has 'symbol_map' => (
 
 =head1 Methods
 
+
+
 =head2 $f->parse_line($line);
+
+
 
 This method takes the line to be parsed as an argument.
 
+
+
 If it is a valid security line, it returns a C<Finance::Bank::SentinelBenefits::Csv401kConverter::Line>.
+
+
 
 If it is not a valid security line, it returns C<undef>.
 
-=cut
+
+
+=cut 
 
 sub parse_line {
     my $self = shift;
@@ -101,18 +135,22 @@ no Moose;
 
 __PACKAGE__->meta->make_immutable;
 
-# Copyright 2009-2011 David Solimano
-# This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+=head1 LICENSE AND COPYRIGHT
+Copyright 2009-2023 David Solimano
+This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>.
+Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>
+
+=cut

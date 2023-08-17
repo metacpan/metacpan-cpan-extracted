@@ -1,0 +1,75 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+YAML::PP::YAMLScript - YAML Load YAMLScript Code as Data
+
+=head1 SYNOPSIS
+
+File C<data.yaml>:
+
+    --- !yamlscript
+    array =:
+      vec: (1 .. 3)
+    hash-map: ."foo" array
+
+Run this Perl:
+
+    use YAML::PP::YAMLScript;
+    my $ypp = YAML::PP::YAMLScript->new;
+    my $data = $ypp->load_file('data.yaml');
+    print $ypp->dump_string($data);
+
+Output:
+
+    ---
+    foo:
+    - 1
+    - 2
+    - 3
+
+=head1 DESCRIPTION
+
+This module lets you use YAML files that are completely programmatic. The YAML files are actually YAMLScript programs that run to produce the desired data.
+
+YAML::PP::YAMLScript is a subclass of YAML::PP that lets you load YAML files written in YAMLScript with the command:
+
+    my $hash = YAML::PP::YAMLScript->new->load_file('foo.yaml');
+
+The file should start with the tag C<!yamlscript>.
+
+When loaded, the YAMLScript program in the file will run and should produce a YAMLScript HashMap value.
+
+The resulting value will be returned as a Perl hashref.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<YAMLScript|https://metacpan.org/pod/YAMLScript>
+
+=item * L<Lingy|https://metacpan.org/pod/Lingy>
+
+=item * L<YAML::PP|https://metacpan.org/pod/YAML::PP>
+
+=back
+
+=head1 AUTHORS
+
+=over
+
+=item * Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2023 by Ingy döt Net
+
+This is free software, licensed under:
+
+The MIT (X11) License
+
+=cut

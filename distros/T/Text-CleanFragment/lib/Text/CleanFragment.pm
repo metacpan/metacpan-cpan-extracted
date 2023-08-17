@@ -3,7 +3,7 @@ use strict;
 use Exporter qw'import';
 use Text::Unidecode;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT = (qw(clean_fragment));
 
 =head1 NAME
@@ -113,6 +113,11 @@ sub clean_fragment {
 
 __END__
 
+=head1 SEE ALSO
+
+L<Mojo::Util> - the C<slugify> subroutine does something comparable but
+does not squish repeating characters and removes dashes.
+
 =head1 REPOSITORY
 
 The public repository of this module is
@@ -135,7 +140,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2012-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2012-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

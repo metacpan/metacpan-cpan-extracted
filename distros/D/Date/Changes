@@ -1,4 +1,6 @@
-5.2.11   xx.xx.2021
+5.2.12   20.07.2023
+           - upgrade tests for catch-v3
+5.2.11   10.02.2022
            - support fucking perl's substr'ed string (PVLV) in constructors, perl's SvOK always returns false
              for such strings unless SvGETMAGIC called. This fucking and inconsistent language must DIE!
            - tzparse: fix reading of misaligned integers

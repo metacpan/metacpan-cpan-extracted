@@ -1,33 +1,43 @@
 Revision history for Perl extension File-Globstar.
 
-0.6  2019-05-25
-    - enable coveralls.io
-    - removed unused code
-    - issues fixed:
-      * https://github.com/gflohr/File-Globstar/pull/2
-      * https://github.com/gflohr/File-Globstar/issues/5
-        (https://github.com/gflohr/File-Globstar/pull/6)
+v1.0.0  2023-07-12
+	- bumped version to 1.x because the module seems to be mature by now
+	- use GitHub actions for continuous integration
+	- handle periods/dots in directory names correctly (thanks to Ben Martin)
+	- issues fixed:
+	  * https://github.com/gflohr/File-Globstar/issues/7
+	  * https://github.com/gflohr/File-Globstar/issues/8
+	  * https://github.com/gflohr/File-Globstar/issues/9
+	  * https://github.com/gflohr/File-Globstar/issues/10
 
-0.5  2017-12-03
-    - removed Pod::Coverage::TrustPod and Test::Perl::Critic as test
-      requirements as they are only needed for author tests
+0.6 2019-05-25
+	- enable coveralls.io
+	- removed unused code
+	- issues fixed:
+	  * https://github.com/gflohr/File-Globstar/pull/2
+	  * https://github.com/gflohr/File-Globstar/issues/5
+	    (https://github.com/gflohr/File-Globstar/pull/6)
 
-0.4  2017-12-02
-    - "/**" is not truly optional
-    - trailing "dir/**" not matches "dir/inside" and "dir/" and "dir"; this
-      is intentionally different from git's behavior
+0.5 2017-12-03
+	- removed Pod::Coverage::TrustPod and Test::Perl::Critic as test
+	  requirements as they are only needed for author tests
+
+0.4 2017-12-02
+	- "/**" is not truly optional
+	- trailing "dir/**" not matches "dir/inside" and "dir/" and "dir"; this
+	  is intentionally different from git's behavior
 
 0.3  2017-11-08
-    - do not use "package" with version (breaks older Perls)
-    - run author tests on Travis CI
+	- do not use "package" with version (breaks older Perls)
+	- run author tests on Travis CI
 
 0.2  2017-11-05
-    - new function pnmatchstar()
-    - minor bug fixes for edge cases
-    - German translation
-    - Bulgarian translation
-    - Auto generate META.json using dzil plugin [MetaJSON]
-      (https://github.com/gflohr/File-Globstar/pull/1)
+	- new function pnmatchstar()
+	- minor bug fixes for edge cases
+	- German translation
+	- Bulgarian translation
+	- Auto generate META.json using dzil plugin [MetaJSON]
+	  (https://github.com/gflohr/File-Globstar/pull/1)
 
 0.1 2017-10-31
-    - Initial release
+	- Initial release

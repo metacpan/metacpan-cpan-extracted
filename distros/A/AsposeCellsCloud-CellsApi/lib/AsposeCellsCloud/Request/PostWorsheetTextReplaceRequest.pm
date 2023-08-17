@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorsheetTextReplaceRequest.name :   ,
-# PostWorsheetTextReplaceRequest.sheetName :   ,
-# PostWorsheetTextReplaceRequest.oldValue :   ,
-# PostWorsheetTextReplaceRequest.newValue :   ,
-# PostWorsheetTextReplaceRequest.folder :   ,
-# PostWorsheetTextReplaceRequest.storageName :    
+# PostWorsheetTextReplaceRequest.name : The workbook name.  ,
+# PostWorsheetTextReplaceRequest.sheetName : Worksheet name.  ,
+# PostWorsheetTextReplaceRequest.oldValue : The old text to replace.  ,
+# PostWorsheetTextReplaceRequest.newValue : The new text to replace by.  ,
+# PostWorsheetTextReplaceRequest.folder : Original workbook folder.  ,
+# PostWorsheetTextReplaceRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worsheet_text_replace' } = { 
-    	summary => '',
+    	summary => 'Replaces text in worksheet.',
         params => $params,
         returns => 'WorksheetReplaceResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'old_value' => {
      	datatype => 'string',
      	base_name => 'oldValue',
-     	description => '',
+     	description => 'The old text to replace.',
      	format => '',
      	read_only => '',
      		},
      'new_value' => {
      	datatype => 'string',
      	base_name => 'newValue',
-     	description => '',
+     	description => 'The new text to replace by.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

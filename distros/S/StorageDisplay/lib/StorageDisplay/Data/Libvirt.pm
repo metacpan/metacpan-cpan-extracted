@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Libvirt;
 # ABSTRACT: Handle Libvirt data for StorageDisplay
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -353,7 +353,7 @@ StorageDisplay::Data::Libvirt - Handle Libvirt data for StorageDisplay
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

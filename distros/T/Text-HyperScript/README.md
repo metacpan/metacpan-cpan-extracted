@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/nyarla/p5-Text-HyperScript/actions/workflows/test.yml/badge.svg)](https://github.com/nyarla/p5-Text-HyperScript/actions)
 # NAME
 
-Text::HyperScript - The HyperScript like library for Perl.
+Text::HyperScript - Let's write html/xml templates as perl code!
 
 # SYNOPSIS
 
@@ -33,146 +33,150 @@ Text::HyperScript - The HyperScript like library for Perl.
 
 # DESCRIPTION
 
-This module is a html/xml string generator like as hyperscirpt.
+This module is a html/xml tags generator like as hyperscript-ish style.
 
-The name of this module contains **HyperScript**,
-but this module features isn't same of another language or original implementation.
+# FEATURES
 
-This module has submodule for some tagset:
+- All html/xml tags write as perl code!
+
+    We're able to write html/xml templates witout raw markup.
+
+- Generates automatic escaped html/xml tags
+
+    This module generates automatic escaped html/xml tags by default.
+
+    Like this:
+
+        use feature qw(say);
+        
+        say h('p', 'hello, <script>alert("XSS!")</script>')
+        # => <p>hello, &lt;scrip&gt;alert("XSS!")&lt;/script&gt;</p>
+
+- Includes shorthand for multiple class name and prefixed attributes
+
+    This module has shorthand multiple class name, and data or aria and others prefixed attributes.
+
+    For examples:
+
+        use feature qw(say);
+        
+        say h('h1', { class => [qw/ C B A /] }, 'msg');
+        # => <h1 class="A B C">msg</h1>
+        
+        say h('button', { data => { click => '1' } }, 'label');
+        # => <button data-click="1">label</button>
+        
+        say h('a', { href => '#', aria => {label => 'label' } }, 'link');
+        # => <a aria-label="label" href="#">link</a>
+
+- Enable to generate empty and empty content tags
+
+    This module supports empty element and empty content tags.
+
+    Like that:
+
+        use feature qw(say);
+        
+        say h('hr'); # empty tag
+        # => <hr />
+        
+        say h('script', '') # empty content tag
+        # => <script></script>
+
+# TAGSETS
+
+This modules includes shorthand modules for writes tag name as subroutine.
+
+Currently Supported:
 
 HTML5: [Text::HyperScript::HTML5](https://metacpan.org/pod/Text%3A%3AHyperScript%3A%3AHTML5)
 
-# FUNCTIONS
-
-## h
-
-This function makes html/xml text by perl code. 
-
-This function is complex. but it's powerful.
-
-**Arguments**:
-
-    h($tag, [ \%attrs, $content, ...])
-
-- `$tag`
-
-    Tag name of element.
-
-    This value should be `Str` value.
-
-- `\%attrs` 
-
-    Attributes of element.
-
-    Result of attributes sorted by alphabetical according.
-
-    You could pass to theses types as attribute values:
-
-    - `Str`
-
-        If you passed to this type, attribute value became a `Str` value.
-
-        For example:
-
-            h('hr', { id => 'id' }); # => '<hr id="id" />'
-
-    - `Text::HyperScript::Boolean`
-
-        If you passed to this type, attribute value became a value-less attribute.
-
-        For example:
-
-            # `true()` returns Text::HyperScript::Boolean value as !!1 (true)
-            h('script', { crossorigin => true }); # => '<script crossorigin></script>'
-
-    - `ArrayRef[Str]`
-
-        If you passed to this type, attribute value became a **sorted** (alphabetical according),
-        delimited by whitespace `Str` value,
-
-        For example:
-
-            h('hr', { class => [qw( foo bar baz )] });
-            # => '<hr class="bar baz foo">'
-
-    - `HashRef[ Str | ArrayRef[Str] | Text::HyperScript::Boolean ]`
-
-        This type is a shorthand of prefixed attributes.
-
-        For example:
-
-            h('hr', { data => { id => 'foo', flags => [qw(bar baz)], enabled => true } });
-            # => '<hr data-enabled data-flags="bar baz" data-id="foo" />'
-
-- `$contnet`
-
-    Contents of element.
-
-    You could pass to these types:
-
-    - `Str`
-
-        Plain text as content.
-
-        This value always applied html/xml escape.
-
-    - `Text::HyperScript::NodeString`
-
-        Raw html/xml string as content.
-
-        **This value does not applied html/xml escape**,
-        **you should not use this type for untrusted text**.
-
-    - `ArrayRef[ Str | Text::HyperScript::NodeString ]`
-
-        The ArrayRef of `$content`.
-
-        This type value is flatten of other `$content` value.
+# MODULE FUNCTIONS
 
 ## text
 
-This function returns a html/xml escaped text.
-
-If you use untrusted stirng for display,
-you should use this function for wrapping untrusted content.
+This function generates html/xml escaped text.
 
 ## raw
 
-This function makes a instance of `Text::HyperScript::NodeString`.
+This function generates raw text **without html/xml escape**.
 
-Instance of `Text::HyperScript::NodeString` has `to_string` method,
-that return text with html/xml markup.
+This function **should be used for display trusted text content**.
 
-The value of `Text::HyperScript::NodeString` always does not escaped,
-you should not use this function for display untrusted content. 
-Please use `text` instead of this function.
+## true / false (constants)
 
-## true / false
+This constants use for value-less attributes.
 
-This functions makes instance of `Text::HyperScript::Boolean` value.
+For examples, if we'd like to use `crossorigin` attriute on `script` tag,
+we're able to use these contants like this:
 
-Instance of `Text::HyperScript::Boolean` has two method like as `is_true` and `is_false`,
-these method returns that value pointed `true` or `false` values.
+    use feature qw(say);
 
-Usage of these functions for make html5 value-less attribute.
+    say h('scirpt', { crossorigin => true }, '')
+    # => <scritp crossorigin></script>
 
-For example:
+`false` constants exists for override value-less attributes.
+If set `false` to value-less attribute, that attribute ignored.
 
-    h('script', { crossorigin => true }, ''); # => '<script crossorigin></script>'
+## h
 
-# QUESTION AND ANSWERS
+This function makes html/xml text from perl code.
 
-## How do I get element of empty content like as \`script\`?
+The first argument is tag name, and after argument could be passed these values as repeatable.
 
-This case you chould gets element string by pass to empty string.
+NOTICE:
 
-For example:
+The all element attributes sorted by ascendant.
 
-    h('script', ''); # <script></script>
+This behaviour is intentional for same result of reproducible output.
 
-## Why all attributes and attribute values sorted by alphabetical according?
+- $text : Str
 
-This reason that gets same result on randomized orderd hash keys. 
+    The text string uses as a element content.
+
+    For example:
+
+        use feature qw(say);
+
+        say h('p', 'hi,') # <- 'hi,' is a plain text string
+        # => <p>hi,</p>
+
+- \\%attributes : HashRef\[Str | ArrayRef\[Str\] | HashRef\[Str\] \]
+
+    The element attributes could be defined by these styles:
+
+    - \\%attributes contains Str
+
+        In this case, Str value uses for single value of attribute.
+
+            use feature qw(say);
+            
+            say h('p', { id => 'msg' }, 'hi,')
+            # => <p id="msg">hi,</p>
+
+    - \\%attributes contains ArrayRef\[Str\]
+
+        If attribute is ArrayRef\[Str\], these Str values joined by whitespace and sorted ascendant.
+
+            use feature qw(say);
+            
+            say h('p', { class => [qw/ foo bar baz /] }, 'hi,')
+            # => <p class="bar baz foo">hi,</p>
+
+    - HashRef\[Str\]
+
+        If attribute is HashRef\[Str\], this code means shorthand for prefixed attribute.
+
+            use feature qw(say);
+
+            say h('p', { data => { label => 'foo' } }, 'hi,')
+            # => <p data-label="foo"></p>
+
+- \\@nested : ArrayRef
+
+    The all ArrayRef passed to `h` function is flatten by internally.
+
+    This ArrayRef supported all content type of `h` function.
 
 # LICENSE
 
@@ -184,7 +188,3 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 OKAMURA Naoki a.k.a nyarla: <nyarla@kalaclista.com>
-
-# SEE ALSO
-
-[Text::HyperScript::HTML5](https://metacpan.org/pod/Text%3A%3AHyperScript%3A%3AHTML5)

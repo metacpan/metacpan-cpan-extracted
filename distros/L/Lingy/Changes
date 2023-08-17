@@ -1,3 +1,105 @@
+0.1.19 Tue Jul 25 08:20:23 AM PDT 2023
+ - Add initial nREPL server support
+ - Add Peter Strömberg to authors
+ - Don't run GHA tests twice for PRs pushed here
+ - Make Term::ReadLine::Gnu an optional dependency
+
+0.1.17 Tue Jul 11 07:49:54 AM EDT 2023
+ - Add merge (and conj for hashmap) to core
+ - Add unboxing to HashMap and Vector
+ - Support LINGY_CLOJURE_JAR for using repl with clojure
+ - Support boxing hashes and arrays
+ - Set *file* to an absolute file path
+ - A few small fixes
+
+0.1.16 Fri Jul  7 10:51:07 AM EDT 2023
+ - Small doc changes
+ - Support multiline entries in REPL and history
+
+0.1.15 Tue Jun 27 06:01:17 PM EDT 2023
+ - Refactor RT in Common for subclassing
+
+0.1.14 Sun Jun 25 08:51:44 PM EDT 2023
+ - Make Lingy::HashMap subclass immutable::map
+
+0.1.12 Thu Jun 22 07:46:05 PM EDT 2023
+ - Add support for HashSet type
+ - Add more legal regex escape sequences
+ - Add reader support for vars
+ - Refactor some RT function names
+ - Fix and test with-meta
+ - Fix method calls to Perl classes
+ - Add 'time' macro to time expr evals
+ - Add
+ - Make bin/lingy smarter about multiples
+ - Add support for `#?` reader conditionals
+ - Get rid of non Clojure var *ARGV* (for now)
+ - Update docs with "Differences from Clojure" section
+ - Refactor map creation in reader
+ - iAdd a couple tests
+ - Implement Lingy.pm to use Lingy from Perl
+ - Add doc for Lingy<->Perl interop
+ - Start using Clojure source code in Lingy
+ - Bash change to appease shellcheck
+ - Fix file path conversion bug when loading clojure.core
+ - Fix regex in DistTestFixer
+ - Add lingy.string library (akin to clojure.string)
+ - Add a 'binding' function (not quite accurate)
+
+0.1.11 Thu Jun  8 08:05:32 AM PDT 2023
+ - Error on unsupported escape characters
+ - Take 'Error:' prefix out of error messages
+ - Throw any errors from a perl eval
+ - Return after printing unknown internal value
+ - Add regexp escaping
+ - Move all Lingy/Lang/*.pm to Lingy/*.pm
+ - Refactor = and == to be more correct
+ - Rename Lingy::Eval to Lingy::Evaluator
+ - Keep refers pairs in namespace proper
+ - Overall refactor and code cleanup
+
+0.1.10 Sun Jun  4 01:58:29 PM PDT 2023
+ - Remove Docker stuffs
+ - Switch from Tie::IxHash to Tie::Ordered
+ - Unbox booleans
+ - Define a 'perl' core function
+ - Fix bug printing namespace symbol mapping keys
+ - Add applyTo function to RT
+
+0.1.9 Sat Jun  3 03:23:11 PM PDT 2023
+ - Improve Perl interop
+ - Update --help usage text
+ - Refactor Lingy::Main to better be subclassed
+ - Fix import of lingy.lang.Foo modules
+ - Major refactoring of namespacing
+ - Convert lib/Lingy/Util.pm to lib/Lingy/devel.ly
+ - Move Lingy::CLI to Lingy::Main
+ - Move code from Lingy::Main in Lingy::Lang::RT
+ - Rename Lingy/Lang/Function.pm to Fn.pm
+ - Add 'declare' to core
+ - Refactor all core foo? functions to use instance?
+ - wip Refactor and test instance creation and checking
+ - wip - interop
+ - wip - Add 'new' special form
+ - Add tests to test/55-require.t
+ - Macroexpand (Foo. 42) to (. Foo new 42)
+ - Add 'doto' macro to core.ly
+ - Change --clojure to --clj
+ - Refactor assoc to use recursive Lingy function
+ - Make 'import*' be a special form
+ - Make 'throw' be a special form (to match Clojure)
+ - Add support for 'special-symbol?' function
+ - Add support for anonymous lambda function reader macro
+ - Add `lingy --version` support
+ - Fixes for hash-map creation and assoc
+ - Error on duplicate hash keys
+ - Rework bin/lingy script
+ - Rename Lingy::RT to Lingy::Main
+ - Refactor most tests to be written in YAML
+ - Get *lingy-version* info from $Lingy::VERSION
+ - Replace def! with def
+ - Fixes to get clojure-repl-on to work in YAMLScript
+
 0.1.8 Sat May 27 11:27:53 PM PDT 2023
  - Update Meta yaml
  - Add test_list to Lingy::Test for YAML test specs

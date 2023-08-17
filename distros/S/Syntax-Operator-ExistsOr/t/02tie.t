@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::ExistsOr;
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
@@ -42,7 +42,7 @@ tie %hash, "TiedHv";
 
    $hash{THEKEY} existsor 1;
 
-   is_deeply( \%counts, { EXISTS => 1, FETCH => 1 }, 'existsor invoked some magic??' );
+   is( \%counts, { EXISTS => 1, FETCH => 1 }, 'existsor invoked some magic??' );
 }
 
 done_testing;

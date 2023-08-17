@@ -11,6 +11,7 @@ my @files = (
     'lib/App/ElasticSearch/Utilities/Aggregations.pm',
     'lib/App/ElasticSearch/Utilities/Connection.pm',
     'lib/App/ElasticSearch/Utilities/HTTPRequest.pm',
+    'lib/App/ElasticSearch/Utilities/Metrics.pm',
     'lib/App/ElasticSearch/Utilities/Query.pm',
     'lib/App/ElasticSearch/Utilities/QueryString.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/AutoEscape.pm',
@@ -31,6 +32,8 @@ my @files = (
     'scripts/es-daily-index-maintenance.pl',
     'scripts/es-graphite-dynamic.pl',
     'scripts/es-index-blocks.pl',
+    'scripts/es-index-fields.pl',
+    'scripts/es-index-scan.pl',
     'scripts/es-nodes.pl',
     'scripts/es-open.pl',
     'scripts/es-search.pl',
@@ -41,7 +44,8 @@ my @files = (
     't/01-querystring.t',
     't/02-index-data.t',
     't/03-hash-flattening.t',
-    't/04-aggregate.t'
+    't/04-aggregate-expand.t',
+    't/05-aggregate-flatten.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

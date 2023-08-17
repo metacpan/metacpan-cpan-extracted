@@ -56,11 +56,11 @@ subtest 'Module without a version' => sub {
     $tzil->build;
 
     my ( $success, $error_message, $stdout, $stderr )
-        = run_tests( $tzil, 'xt/release/has-version.t' );
+        = run_tests( $tzil, 'xt/author/has-version.t' );
 
     ok !$success, "Version test did not succeed";
     is $error_message,
-        qq['$^X -Ilib xt/release/has-version.t' exited with value 1],
+        qq['$^X -Ilib xt/author/has-version.t' exited with value 1],
         "Correct error message for failing test";
 
     like $stdout, qr/\Qok 1 - lib\/HasVersion.pm has version/,
@@ -100,7 +100,7 @@ subtest 'Module without a version' => sub {
     $tzil->build;
 
     my ( $success, $error_message, $stdout, $stderr )
-        = run_tests( $tzil, 'xt/release/has-version.t' );
+        = run_tests( $tzil, 'xt/author/has-version.t' );
 
     ok $success,        "Version test succeeded";
     ok !$error_message, "No error with a success";

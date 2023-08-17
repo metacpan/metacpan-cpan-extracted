@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -43,6 +43,7 @@ _
             cmdline_aliases => {k=>{}},
         },
         %App::CSVUtils::argspecopt_hash,
+        %App::CSVUtils::argspecopt_with_data_rows,
     },
     add_args_rels => {
         'req_one&' => [ ['field', 'key'] ],
@@ -87,10 +88,29 @@ _
         $r->{freqtable} //= {};
         $r->{field_idx} = $field_idx;
         $r->{code} = undef;
+        $r->{has_added_field} = 0;
+        $r->{freq_field} = undef;
+        $r->{input_rows} = [];
     },
 
     on_input_data_row => sub {
         my $r = shift;
+
+        # add freq field
+        if ($r->{util_args}{with_data_rows} && !$r->{has_added_field}++) {
+            my $i = 1;
+            while (1) {
+                my $field = "freq" . ($i>1 ? $i : "");
+                unless (defined $r->{input_fields_idx}{$field}) {
+                    $r->{input_fields_idx}{$field} = @{ $r->{input_fields} };
+                    push @{ $r->{input_fields} }, $field;
+                    $r->{freq_field} = $field;
+                    push @{ $r->{input_row} }, undef;
+                    last;
+                }
+                $i++;
+            }
+        }
 
         my $field_val;
         if ($r->{util_args}{key}) {
@@ -107,18 +127,49 @@ _
         }
 
         $r->{freqtable}{$field_val}++;
+
+        if ($r->{util_args}{with_data_rows}) {
+            # we first put the field val, later we will fill the freq
+            if ($r->{wants_input_row_as_hashref}) {
+                $r->{input_row}{ $r->{freq_field} } = $field_val;
+            } else {
+                $r->{input_row}[-1] = $field_val;
+            }
+            push @{ $r->{input_rows} }, $r->{input_row};
+        }
     },
 
-    writes_csv => 0,
+    writes_csv => 1,
+
+    after_close_input_files => sub {
+        my $r = shift;
+
+        if ($r->{util_args}{with_data_rows}) {
+            for my $row (@{ $r->{input_rows} }) {
+                if ($r->{wants_input_row_as_hashref}) {
+                    my $field_val = $row->{ $r->{freq_field} };
+                    $row->{ $r->{freq_field} } = $r->{freqtable}{ $field_val };
+                } else {
+                    my $field_val = $row->[-1];
+                    $row->[-1] = $r->{freqtable}{ $field_val };
+                }
+                $r->{code_print_row}->($row);
+            }
+        }
+    },
 
     on_end => sub {
         my $r = shift;
 
-        my @freqtable;
-        for (sort { $r->{freqtable}{$b} <=> $r->{freqtable}{$a} } keys %{$r->{freqtable}}) {
-            push @freqtable, [$_, $r->{freqtable}{$_}];
+        if ($r->{util_args}{with_data_rows}) {
+            $r->{result} = [200];
+        } else {
+            my @freqtable;
+            for (sort { $r->{freqtable}{$b} <=> $r->{freqtable}{$a} } keys %{$r->{freqtable}}) {
+                push @freqtable, [$_, $r->{freqtable}{$_}];
+            }
+            $r->{result} = [200, "OK", \@freqtable, {'table.fields'=>['value','freq']}];
         }
-        $r->{result} = [200, "OK", \@freqtable, {'table.fields'=>['value','freq']}];
     },
 );
 
@@ -137,7 +188,7 @@ App::CSVUtils::csv_freqtable - Output a frequency table of values of a specified
 
 =head1 VERSION
 
-This document describes version 1.024 of App::CSVUtils::csv_freqtable (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of App::CSVUtils::csv_freqtable (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 FUNCTIONS
 
@@ -189,6 +240,40 @@ Provide row in $_ as hashref instead of arrayref.
 =item * B<ignore_case> => I<true>
 
 Ignore case.
+
+=item * B<inplace> => I<true>
+
+Output to the same file as input.
+
+Normally, you output to a different file than input. If you try to output to the
+same file (C<-o INPUT.csv -O>) you will clobber the input file; thus the utility
+prevents you from doing it. However, with this C<--inplace> option, you can
+output to the same file. Like perl's C<-i> option, this will first output to a
+temporary file in the same directory as the input file then rename to the final
+file at the end. You cannot specify output file (C<-o>) when using this option,
+but you can specify backup extension with C<-b> option.
+
+Some caveats:
+
+=over
+
+=item * if input file is a symbolic link, it will be replaced with a regular file;
+
+=item * renaming (implemented using C<rename()>) can fail if input filename is too long;
+
+=item * value specified in C<-b> is currently not checked for acceptable characters;
+
+=item * things can also fail if permissions are restrictive;
+
+=back
+
+=item * B<inplace_backup_ext> => I<str> (default: "")
+
+Extension to add for backup of input file.
+
+In inplace mode (C<--inplace>), if this option is set to a non-empty string, will
+rename the input file using this extension as a backup. The old existing backup
+will be overwritten, if any.
 
 =item * B<input_escape_char> => I<str>
 
@@ -242,6 +327,91 @@ If specified, then will compute field using Perl code.
 
 The code will receive the row (arrayref, or if -H is specified, hashref) as the
 argument. It should return the computed field (str).
+
+=item * B<output_always_quote> => I<bool> (default: 0)
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_filename> => I<filename>
+
+Output filename.
+
+Use C<-> to output to stdout (the default if you don't specify this option).
+
+Encoding of output file is assumed to be UTF-8.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_quote_empty> => I<bool> (default: 0)
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--input-tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<overwrite> => I<bool>
+
+Whether to override existing output file.
+
+=item * B<with_data_rows> => I<bool>
+
+Whether to also output data rows.
 
 
 =back

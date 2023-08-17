@@ -6,7 +6,7 @@ use warnings;
 use Error::Pure qw(err);
 use List::Util qw(none);
 use Mo qw(build default is);
-use Mo::utils qw(check_bool check_required);
+use Mo::utils qw(check_array check_bool check_required);
 use Readonly;
 
 Readonly::Array our @DATA_TYPES => qw(plain tags);
@@ -18,7 +18,7 @@ Readonly::Array our @ENCTYPES => (
 Readonly::Array our @FORM_METHODS => qw(get post);
 Readonly::Array our @TYPES => qw(button reset submit);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has autofocus => (
 	ro => 1,
@@ -88,6 +88,25 @@ sub BUILD {
 	}
 	if (none { $self->{'data_type'} eq $_ } @DATA_TYPES) {
 		err "Parameter 'data_type' has bad value.";
+	}
+
+	# Check data based on type.
+	check_array($self, 'data');
+	foreach my $data_item (@{$self->{'data'}}) {
+		# Plain mode
+		if ($self->{'data_type'} eq 'plain') {
+			if (ref $data_item ne '') {
+				err "Parameter 'data' in 'plain' mode must contain ".
+					'reference to array with scalars.';
+			}
+		# Tags mode.
+		} else {
+			if (ref $data_item ne 'ARRAY') {
+				err "Parameter 'data' in 'tags' mode must contain ".
+					"reference to array with references ".
+					'to array with Tags structure.';
+			}
+		}
 	}
 
 	# Check disabled.
@@ -367,6 +386,11 @@ Returns string.
  new():
          Parameter 'autofocus' must be a bool (0/1).
                 Value: %s
+         Parameter 'data' must be a array.
+                Value: %s
+                Reference: %s
+         Parameter 'data' in 'plain' mode must contain reference to array with scalars.
+         Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
          Parameter 'data_type' has bad value.
          Parameter 'disabled' must be a bool (0/1).
                 Value: %s
@@ -486,12 +510,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

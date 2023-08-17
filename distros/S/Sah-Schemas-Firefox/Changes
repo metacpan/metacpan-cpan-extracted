@@ -1,3 +1,33 @@
+0.008   2023-06-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add description to the schemas.
+
+
+0.007   2023-06-13  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [schema firefox::local_profile_name::default_first Tweak wording
+          in example's summary for clarity.
+
+
+0.006   2023-04-17  Released-By: PERLANCAR; Urgency: low
+
+        - Remove schema's extras part.
+
+
+0.005   2023-04-17  Released-By: PERLANCAR; Urgency: low
+
+        - [ux] Tweak error message to make it more helpful.
+
+
+0.004   2023-04-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: Firefox::local_profile_name::default_first.
+
+
 0.003   2021-07-19  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

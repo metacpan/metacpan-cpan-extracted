@@ -83,6 +83,12 @@ has 'perlinc' =>
     is  => 'rw',
     ) ;
 
+has 'use_taint_for_syntax_check' =>
+    (
+    isa => 'Maybe[Bool]',
+    is  => 'rw'
+    ) ;
+
 has 'show_local_vars' =>
     (
     isa => 'Maybe[Bool]',
@@ -203,9 +209,9 @@ sub uri_client2server
 
 sub file_server2client
     {
-    my ($self, $fn) = @_ ;
+    my ($self, $fn, $map) = @_ ;
 
-    my $map = $self -> path_map ;
+    $map ||= $self -> path_map ;
     return $fn if (!$map) ;
 
     foreach my $m (@$map)
@@ -221,9 +227,9 @@ sub file_server2client
 
 sub file_client2server
     {
-    my ($self, $fn) = @_ ;
+    my ($self, $fn, $map) = @_ ;
 
-    my $map = $self -> path_map ;
+    $map ||= $self -> path_map ;
     return $fn if (!$map) ;
 
     $fn =~ s/\\/\//g ;
@@ -235,25 +241,6 @@ sub file_client2server
         }
 
     return $fn ;
-    }
-
-# ---------------------------------------------------------------------------
-
-sub add_path_mapping
-    {
-    my ($self, $fn_server, $fn_client) = @_ ;
-    my $map = $self -> path_map ;
-    $map = $self -> path_map ([]) if (!$map) ;
-
-
-    foreach my $m (@$map)
-        {
-        #print STDERR "add file_server2client $m->[2] -> $m->[3]\n" ;
-        return if ($fn_server eq $m->[2]) ;
-        }
-
-    unshift @$map, ['file://' . $fn_server, 'file://' . $fn_client, $fn_server, $fn_client] ;
-    return  ;
     }
 
 # ---------------------------------------------------------------------------
@@ -284,7 +271,7 @@ sub add_diagnostic_messages
     $files -> {$uri}{messages_version}  = $version if (defined ($version));
 
     # make sure all old messages associated with this uri are cleaned up
-    my %diags = ( map { $_ => [] } @{$files -> {$uri}{diags} || ['-'] } ) ;
+    my %diags = ( map { $_ => [] } @{$files -> {$uri}{diags} } ) ;
     foreach my $src (keys %{$files -> {$uri}{messages}})
         {
         my $msgs = $files -> {$uri}{messages}{$src} ;
@@ -357,21 +344,18 @@ sub add_diagnostic_messages
 
     foreach my $filename (keys %diags)
         {
-        foreach my $filename (keys %diags)
+        my $fnuri = !$filename || $filename eq '-'?$uri:$self -> uri_server2client ('file://' . $filename) ;
+        my $result =
             {
-            my $fnuri = !$filename || $filename eq '-'?$uri:$self -> uri_server2client ('file://' . $filename) ;
-            my $result =
+            method => 'textDocument/publishDiagnostics',
+            params =>
                 {
-                method => 'textDocument/publishDiagnostics',
-                params =>
-                    {
-                    uri => $fnuri,
-                    diagnostics => $diags{$filename},
-                    },
-                } ;
+                uri => $fnuri,
+                diagnostics => $diags{$filename},
+                },
+            } ;
 
-            $server -> send_notification ($result) ;
-            }
+        $server -> send_notification ($result) ;
         }
     }
 

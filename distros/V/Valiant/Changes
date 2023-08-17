@@ -1,5 +1,42 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002001 2023 August 11
+          - HTML Form helper sets tunneled method info as a data attribute.
+          - The DBIC Resultset SetSize validator now distinguished between
+            empty and blank correctly.  This fix allows you to more properly
+            exclude the validation in the correct condition.
+          - Improvements to the example code
+          - Incremented revision information to indicate I consider the code
+            to be pretty stable and contains at least 80% of the features I
+            intend for this code.  I've been able to use it on commercial 
+            projects without issue.  I do not intend to make breaking changes
+            unless its absolutely necessary to fix major security issues or
+            to move the code forward.
+
+0.001026 2023 August 03
+          - Minor fixes to HTML Builder
+
+0.001025 2023 August 02
+          - Make sure we don't insert or update a DBIC row that has
+            been marked for delete
+
+0.001024 2023 July 14
+          - fix goofs in previous release to get tests passing
+
+0.001023 2023 July 12
+          - Adding documentation around the formbuilder theming function.
+          - Changes the way nested validation errors are structured to make
+            it easier to link errors to form elements or JSON paths.
+          - Radio and checkbox collections have better default labeling and
+            clarified translation lookup
+          - Tons of HTML form generation bug fixes including improvements to
+            how we handle complex form elements like the checkbox collection. 
+          - FormBuilder and many other parts of the HTML generation framework
+            work properly in the absense of a model.  also its easier to include
+            bits of data from alternative models in a form.
+          - lots of improvements to the example application include a start
+            on showing how we can integrate javascript on the front end.
+
 0.001022 2023 April 18
           - Improved some error reporting and messaging
           - Catalyst View can now import methods from the controller and context

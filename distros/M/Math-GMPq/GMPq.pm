@@ -80,7 +80,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.53';
+    our $VERSION = '0.55';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -88,6 +88,13 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     %Math::GMPq::EXPORT_TAGS =(mpq => \@tagged);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
+
+    $Math::GMPq::RETYPE = 0; # set to 1 to enable a Math::GMPq object to be coerced to
+                             # a Math::MPFR object in certain overloaded operations.
+                             # (See the 'OPERATOR OVERLOADING' section of the POD
+                             # documentation for details.)
+                             # With this variable set to 0, these "certain overloaded
+                             # operations" alluded to will throw a fatal error.
 
 sub new {
 

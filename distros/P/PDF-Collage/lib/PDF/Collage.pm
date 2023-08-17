@@ -3,12 +3,13 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.002' }
 
 use Carp;
 use English                           qw< -no_match_vars >;
 use JSON::PP                          qw< decode_json >;
-use Data::Resolver                    qw< file_to_data generate >;
+use Scalar::Util                      qw< blessed >;
+use Data::Resolver                    qw< file_to_data >;
 use PDF::Collage::Template            ();
 use PDF::Collage::TemplatesCollection ();
 
@@ -31,9 +32,9 @@ sub collage ($input, @args) {
    return collage_from_definition($args{definition})
      if defined $args{definition};
    if (defined(my $auto = $args{auto})) {
-      my $ar = ref($auto);
-      return collage_from_resolver($auto) if $ar eq 'CODE';
+      return collage_from_resolver($auto) if blessed($auto);
 
+      my $ar = ref($auto);
       if ($ar eq '' && $auto =~ m{\A [\[\{]}mxs) {
          $auto = decode_json($auto);
          $ar   = ref($auto);
@@ -67,30 +68,18 @@ sub collage_from_definition ($def) {
    return PDF::Collage::Template->new($def->%*);
 }
 
-sub collage_from_dir ($path, %args) {
-   my $resolver = generate(
-      {
-         %args,
-         root     => $path,
-         -factory => 'resolver_from_dir',
-      }
-   );
-   return collage_from_resolver($resolver);
-} ## end sub collage_from_dir
+sub collage_from_dir ($path) {
+   return collage_from_resolver(
+      {class => 'Data::Resolver::FromDir', root => $path});
+}
 
 sub collage_from_resolver ($resolver) {
    return PDF::Collage::TemplatesCollection->new(resolver => $resolver);
 }
 
-sub collage_from_tar ($path, %args) {
-   my $resolver = generate(
-      {
-         %args,
-         archive  => $path,
-         -factory => 'resolver_from_tar',
-      }
-   );
-   return collage_from_resolver($resolver);
-} ## end sub collage_from_dir
+sub collage_from_tar ($path) {
+   return collage_from_resolver(
+      {class => 'Data::Resolver::FromTar', root => $path});
+}
 
 1;

@@ -35,7 +35,7 @@
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
-<p>(c) 1996-2019, Jim Turner, <code>&lt;https://metacpan.org/author/TURNERJW&gt;</code>.</p>
+<p>(c) 1996-2023, Jim Turner, <code>&lt;https://metacpan.org/author/TURNERJW&gt;</code>.</p>
 
 <h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
 
@@ -43,7 +43,7 @@
 
 <h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
 
-<p>Copyright (c) 1996-2019 Jim Turner <code>&lt;mailto:turnerjw784@yahoo.com&gt;</code>. All rights reserved.</p>
+<p>Copyright (c) 1996-2023 Jim Turner <code>&lt;mailto:turnerjw784@yahoo.com&gt;</code>. All rights reserved.</p>
 
 <p>Tk::JFileDialog is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.</p>
 
@@ -53,69 +53,69 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>        my $getFileDialog = $main-&gt;JFileDialog(
-                        -Title =&gt;&#39;Please select a file:&#39;,
-        );
-        my $filename = $getFileDialog-&gt;Show();
-        if (defined $filename) {
-                print &quot;..User entered file name=$filename=.\n&quot;;
-        }</code></pre>
+<pre><code>my $getFileDialog = $main-&gt;JFileDialog(
+                -Title =&gt;&#39;Please select a file:&#39;,
+);
+my $filename = $getFileDialog-&gt;Show();
+if (defined $filename) {
+        print &quot;..User entered file name=$filename=.\n&quot;;
+}</code></pre>
 
 <h1 id="EXAMPLE">EXAMPLE</h1>
 
 <p>The following code creates a JFileDialog and calls it. Note that perl5.002gamma is required.</p>
 
-<pre><code>        #!/usr/bin/perl
+<pre><code>#!/usr/bin/perl
 
-        use strict;
-        use warnings;
-        use Tk;
-        use Tk::JFileDialog;
+use strict;
+use warnings;
+use Tk;
+use Tk::JFileDialog;
 
-        my $main = MainWindow-&gt;new;
-        my $Horiz = 1;
-        my $fname;
+my $main = MainWindow-&gt;new;
+my $Horiz = 1;
+my $fname;
 
-        my $LoadDialog = $main-&gt;JFileDialog(-Title =&gt;&#39;This is my title&#39;,
-                -Create =&gt; 0
-        );
+my $LoadDialog = $main-&gt;JFileDialog(-Title =&gt;&#39;This is my title&#39;,
+        -Create =&gt; 0
+);
 
-        $LoadDialog-&gt;configure(-FPat =&gt; &#39;*pl&#39;,
-                -ShowAll =&gt; 0
-        );
+$LoadDialog-&gt;configure(-FPat =&gt; &#39;*.pl&#39;,
+        -ShowAll =&gt; 0
+);
 
-        $main-&gt;Entry(-textvariable =&gt; \$fname)
-                -&gt;pack(-expand =&gt; 1,
-                -fill =&gt; &#39;x&#39;
-        )-&gt;pack;
+$main-&gt;Entry(-textvariable =&gt; \$fname, -width =&gt; 30)
+        -&gt;pack(-expand =&gt; 1,
+        -fill =&gt; &#39;x&#39;
+)-&gt;pack;
 
-        $main-&gt;Button(-text =&gt; &#39;Kick me!&#39;,
-                -command =&gt; sub {
-                        $fname = $LoadDialog-&gt;Show(-Horiz =&gt; $Horiz);
-                        if (!defined($fname)) {
-                                $fname = &quot;Fine,Cancel, but no ShowDirList anymore!!!&quot;;
-                                $LoadDialog-&gt;configure(-ShowDirList =&gt; 0);
-                        }
+$main-&gt;Button(-text =&gt; &#39;Kick me!&#39;,
+        -command =&gt; sub {
+                $fname = $LoadDialog-&gt;Show(-Horiz =&gt; $Horiz);
+                if (!defined($fname)) {
+                        $fname = &quot;Fine,Cancel, but no Dir. List anymore!!!&quot;;
+                        $LoadDialog-&gt;configure(-ShowDirList =&gt; 0);
                 }
-        )-&gt;pack(-expand =&gt; 1,   -fill =&gt; &#39;x&#39;);
+        }
+)-&gt;pack(-expand =&gt; 1,   -fill =&gt; &#39;x&#39;);
 
-        $main-&gt;Checkbutton(-text =&gt; &#39;Horizontal&#39;,
-                -variable =&gt; \$Horiz)
-                -&gt;pack(-expand =&gt; 1,
-                -fill =&gt; &#39;x&#39;
-        )-&gt;pack;
+$main-&gt;Checkbutton(-text =&gt; &#39;Horizontal&#39;,
+        -variable =&gt; \$Horiz)
+        -&gt;pack(-expand =&gt; 1,
+        -fill =&gt; &#39;x&#39;
+)-&gt;pack;
 
-        $main-&gt;Button(-text =&gt; &#39;Exit&#39;,
-                -command =&gt; sub {
-                        $main-&gt;destroy;
-                }
-        )-&gt;pack(-expand =&gt; 1,   -fill =&gt; &#39;x&#39;);
+$main-&gt;Button(-text =&gt; &#39;Exit&#39;,
+        -command =&gt; sub {
+                $main-&gt;destroy;
+        }
+)-&gt;pack(-expand =&gt; 1,   -fill =&gt; &#39;x&#39;);
 
-        MainLoop;
+MainLoop;
 
-        print &quot;Exit Stage right!\n&quot;;
+print &quot;Exiting!\n&quot;;
 
-        exit(0);</code></pre>
+exit(0);</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -132,31 +132,41 @@
 <dt id="Create"><b>-Create</b></dt>
 <dd>
 
-<p>Enable the user to specify a file that does not exist. If <i>0</i> (not enabled), and the user specifies a non-existent file, a dialog box will be shown informing the user of the error (This Dialog Box is configurable via the <b>EDlg*</b> switches, described below). If set to <i>-1</i>, user can not create a new file nor type in a name, only select from the list. Default: <i>1</i> (enable user to enter a &quot;new&quot; (non-existant) file name).</p>
+<p>Enable the user to specify a file that does not exist. If <i>0</i> (not enabled), and the user specifies a non-existent file, a dialog box will be shown informing the user of the error (This Dialog Box is configurable via the <b>EDlg*</b> switches, described below). If set to <i>-1</i>, user can not create a new file nor type in a name, only select from the list.</p>
+
+<p>Default: <i>1</i> (enable user to enter a &quot;new&quot; (non-existant) file name).</p>
 
 </dd>
 <dt id="DisableFPat"><b>-DisableFPat</b></dt>
 <dd>
 
-<p>Disables the ability of the user to change the file selection pattern (the user is by default allowed to change the status). Default: <i>FALSE</i> (enable user to change the file selection pattern).</p>
+<p>Disables the ability of the user to change the file selection pattern (the user is by default allowed to change the status).</p>
+
+<p>Default: <i>FALSE</i> (enable user to change the file selection pattern).</p>
 
 </dd>
 <dt id="DisableShowAll"><b>-DisableShowAll</b></dt>
 <dd>
 
-<p>Disables the ability of the user to change the status of the ShowAll flag (the user is by default allowed to change the status). Default: <i>FALSE</i> (enable user to toggle showing of hidden files and directories).</p>
+<p>Disables the ability of the user to change the status of the ShowAll flag (the user is by default allowed to change the status).</p>
+
+<p>Default: <i>FALSE</i> (enable user to toggle showing of hidden files and directories).</p>
 
 </dd>
 <dt id="File"><b>-File</b></dt>
 <dd>
 
-<p>The default file name. If specified and the file exists in the currently-selected path, it will be highlighted and selected; and pressing the [Reset] button will reset the selected file to be this one. Default: none (no default file name is initially shown).</p>
+<p>The default file name. If specified and the file exists in the currently-selected path, it will be highlighted and selected; and pressing the [Reset] button will reset the selected file to be this one.</p>
+
+<p>Default: <i>none</i> (no default file name is initially shown).</p>
 
 </dd>
 <dt id="FNameList"><b>-FNameList</b></dt>
 <dd>
 
-<p>Optional reference to a list of specific file names to be displayed in the file list. User can be forced to select a file from this specific list by further constraints such as <b>-DisableFPat</b> =&gt; 1, <b>-Create</b> =&gt; -1, <b>-SelDir</b> =&gt; -1, and <b>-DisableShowAll</b> =&gt; 1. The list can contain any combination of file names (ie. <i>&quot;file.ext&quot;</i>, absolute paths, ie. <i>&quot;/home/user/file.ext&quot;</i>, or relative paths, ie. <i>&quot;user/file.ext&quot;</i> or I&quot;&lt;c:file.ext&gt;. The files will be compared against the current path and, if matching (and existing, if <b>-Create</b> &lt; 1), will be shown in the drop-down list. Default: none (show all files otherwise matching any other filters found in the current path.</p>
+<p>Optional reference to a list of specific file names to be displayed in the file list. User can be forced to select a file from this specific list by further constraints such as <b>-DisableFPat</b> =&gt; 1, <b>-Create</b> =&gt; -1, <b>-SelDir</b> =&gt; -1, and <b>-DisableShowAll</b> =&gt; 1. The list can contain any combination of file names (ie. <i>&quot;file.ext&quot;</i>, absolute paths, ie. <i>&quot;/home/user/file.ext&quot;</i>, or relative paths, ie. <i>&quot;user/file.ext&quot;</i> or I&quot;&lt;c:file.ext&gt;. The files will be compared against the current path and, if matching (and existing, if <b>-Create</b> &lt; 1), will be shown in the drop-down list.</p>
+
+<p>Default: <i>none</i> (show all files otherwise matching any other filters found in the current path.</p>
 
 <p>NOTE: File-names are case-sensitive and paths should be forward slashes (&quot;/&quot;), even on M$-Windows.</p>
 
@@ -164,13 +174,21 @@
 <dt id="FPat"><b>-FPat</b></dt>
 <dd>
 
-<p>Sets the default file selection pattern. Only files matching this pattern will be displayed in the File List Box. It can also be multiple extensions separated by the pipe symbol (&quot;|&quot;), ie. &quot;*.jpg|*.gif|*.png&quot;. Default: <i>&#39;&#39;</i> (*).</p>
+<p>Sets the default file selection pattern. Only files matching this pattern will be displayed in the File List Box. It can also be multiple extensions separated by the pipe symbol (&quot;|&quot;), ie. &quot;*.jpg|*.gif|*.png&quot;.</p>
+
+<p>NOTE: The &quot;pattern&quot; is a psuedo-regex that gets converted into a Perl regex, but &quot;*&quot; is converted into &quot;.*&quot;, &quot;.&quot; is converted into &quot;\.&quot; (match literal <i>dot</i>, &quot;\.&quot; is converted to &quot;.&quot;, and &quot;|&quot; used in a pattern must be escaped (&quot;\|&quot;) as &quot;|&quot; is the separator character in pattern lists!</p>
+
+<p>Default: <i>&#39;&#39;</i> (*).</p>
 
 </dd>
 <dt id="FPatList"><b>-FPatList</b></dt>
 <dd>
 
-<p>Specifies a reference to a list of valid file extensions composing the drop-down list for the &quot;Filter&quot; field for selecting a file selection pattern. Default is empty. Example: <b>-FPatList</b> =&gt; [&#39;*.jpg|*.gif|*.png&#39;, &#39;*.pl|*.pm&#39;, &#39;*.exe&#39;]. NOTE: If <b>-Fpat</b> is also specified, but is NOT in the <b>-FPatList</b> list, it will automatically be appended to the top of the list.</p>
+<p>Specifies a reference to a list of valid file extensions composing the drop-down list for the &quot;Filter&quot; field for selecting a file selection pattern.</p>
+
+<p>Default: <i>empty (&#39;&#39;)</i>.</p>
+
+<p>Example: <b>-FPatList</b> =&gt; [&#39;*.jpg|*.gif|*.png&#39;, &#39;*.pl|*.pm&#39;, &#39;*.exe&#39;]. NOTE: If <b>-Fpat</b> is also specified, but is NOT in the <b>-FPatList</b> list, it will automatically be appended to the top of the list.</p>
 
 </dd>
 <dt id="FPatOnly"><b>-FPatOnly</b></dt>
@@ -182,19 +200,25 @@
 <dt id="Geometry"><b>-Geometry</b></dt>
 <dd>
 
-<p>Sets the geometry of the File Dialog. Setting the size is a dangerous thing to do. If not configured, or set to &#39;&#39;, the File Dialog will be centered. Default: undef (window-manager sets the popup window&#39;s geometry).</p>
+<p>Sets the geometry of the File Dialog. Setting the size is a dangerous thing to do. If not configured, or set to &#39;&#39;, the File Dialog will be centered.</p>
+
+<p>Default: <i>undef</i> (window-manager sets the popup window&#39;s geometry).</p>
 
 </dd>
 <dt id="Grab"><b>-Grab</b></dt>
 <dd>
 
-<p>Enables the File Dialog to do an application Grab when displayed. Default: 1 (file dialog will grab focus and be &quot;modal&quot;).</p>
+<p>Enables the File Dialog to do an application Grab when displayed.</p>
+
+<p>Default: <i>1</i> (file dialog will grab focus and be &quot;modal&quot;).</p>
 
 </dd>
 <dt id="HistDeleteOk"><b>-HistDeleteOk</b></dt>
 <dd>
 
-<p>If set, allows user to delete items from the history dropdown list and thus the history file. Default 0 (do not allow user to remove items in history).</p>
+<p>If set, allows user to delete items from the history dropdown list and thus the history file.</p>
+
+<p>Default: <i>0</i> (false)&gt; (do not allow user to remove items in history).</p>
 
 <p>NOTE: requires Tk::JBrowseEntry v5.0 or later to work.</p>
 
@@ -202,7 +226,9 @@
 <dt id="HistFile"><b>-HistFile</b></dt>
 <dd>
 
-<p>Enables the keeping of a history of the previous files / directories selected. The file specified must be writable. If specified, a history of up to &quot;-History&quot; number of files will be kept and will be displayed in a &quot;JBrowseEntry&quot; combo-box permitting user selection. Default: <i>undef</i> (no history file or drop-down).</p>
+<p>Enables the keeping of a history of the previous files / directories selected. The file specified must be writable. If specified, a history of up to &quot;-History&quot; number of files will be kept and will be displayed in a &quot;JBrowseEntry&quot; combo-box permitting user selection.</p>
+
+<p>Default: <i>undef</i> (no history file or drop-down).</p>
 
 </dd>
 <dt id="History"><b>-History</b></dt>
@@ -214,25 +240,33 @@
 <dt id="HistUsePath"><b>-HistUsePath</b></dt>
 <dd>
 
-<p>If set, the path is set to that of the last file selected from the history. If set to something other than 1 or 0, a checkbox will appear to the right of the history dropdown labeled &quot;Keep Path&quot; to allow user to control this. If set to a string, then that will be used for the checkbox label in lieu of &quot;Keep Path&quot;. Default: <i>undef</i> (not set).</p>
+<p>If set, the path is set to that of the last file selected from the history. If set to something other than 1 or 0, a checkbox will appear to the right of the history dropdown labeled &quot;Keep Path&quot; to allow user to control this. If set to a string, then that will be used for the checkbox label in lieu of &quot;Keep Path&quot;.</p>
+
+<p>Default: <i>undef</i> (not set).</p>
 
 </dd>
 <dt id="HistUsePathButton"><b>-HistUsePathButton</b></dt>
 <dd>
 
-<p>Set (check or uncheck) the &quot;Keep Path&quot; checkbox created if &quot;-HistUsePath&quot; option is set, otherwise, ignored. The state of this button can also be fetched by calling the <b>getHistUsePathButton()</b> method, which returns 1 or 0. Default: <i>FALSE</i> (unchecked).</p>
+<p>Set (check or uncheck) the &quot;Keep Path&quot; checkbox created if &quot;-HistUsePath&quot; option is set, otherwise, ignored. The state of this button can also be fetched by calling the <b>getHistUsePathButton()</b> method, which returns 1 or 0.</p>
+
+<p>Default: <i>0 (false)</i> (unchecked).</p>
 
 </dd>
 <dt id="Horiz"><b>-Horiz</b></dt>
 <dd>
 
-<p><i>TRUE</i> sets the File List box to be to the right of the Directory List Box. If 0, the File List box will be below the Directory List box. Default: <i>TRUE</i> (display the listboxes side-by-side).</p>
+<p><i>TRUE</i> sets the File List box to be to the right of the Directory List Box. If 0, the File List box will be below the Directory List box.</p>
+
+<p>Default: <i>true</i> (display the listboxes side-by-side).</p>
 
 </dd>
 <dt id="maxwidth"><b>-maxwidth</b></dt>
 <dd>
 
-<p>Specifies the maximum width in avg. characters the width of the text entry fields are allowed to expand to. Default: <i>60</i> (characters).</p>
+<p>Specifies the maximum width in avg. characters the width of the text entry fields are allowed to expand to.</p>
+
+<p>Default: <i>60</i> (characters).</p>
 
 </dd>
 <dt id="nonLatinFilenames"><b>-nonLatinFilenames</b></dt>
@@ -240,7 +274,9 @@
 
 <p><b>NEW</b> with Version 2.11+:</p>
 
-<p>If set, allows for handling of non-Latin / unicode file-names that Perl doesn&#39;t, by default, seem to handle properly as of 5.28.1, as it wants to convert them to utf-8 internally, but then fails to find / match them with the underling file-system names (they likely won&#39;t show up in the file / directory lists). Default: <i>0</i> (unset - only handle normal (ANSI chars &lt; 128) characters in file-names, as was the case pre-v2.11).</p>
+<p>If set, allows for handling of non-Latin / unicode file-names that Perl doesn&#39;t, by default, seem to handle properly as of 5.28.1, as it wants to convert them to utf-8 internally, but then fails to find / match them with the underling file-system names (they likely won&#39;t show up in the file / directory lists).</p>
+
+<p>Default: <i>0</i> (unset - only handle normal (ANSI chars &lt; 128) characters in file-names, as was the case pre-v2.11).</p>
 
 <p>This was added due to Perl&#39;s current failure to convert it&#39;s UTF-8 strings back to ASCII bytes when interfacing with the underlying file-system via system calls, such as open() and the standard file-test operators, such as &quot;-f&quot;, etc, if the string has been manipulated within Perl code and Perl has set it&#39;s internal UTF-8 flag for the string, see cpan bug# 128958.</p>
 
@@ -268,47 +304,65 @@
 <dt id="QuickSelect"><b>-QuickSelect</b></dt>
 <dd>
 
-<p>If set to 0, user must invoke the &quot;OK&quot; button to complete selection from the listbox. If 1 or 2, double-clicking or single-clicking (respectively) an item in the file list automatically completes the selection. NOTE: If set to 2 (single-click) and <i>-SelectMode</i> is &quot;multiple&quot; or &quot;extended&quot; then it will be forced to 1 (double-click), since single-click will just add the file to the list to be selected. This also affects the history and favorite path dropdown lists. If 1 or 2, clicking an item from these lists invokes selection. Default: <i>1</i>.</p>
+<p>If set to 0, user must invoke the &quot;OK&quot; button to complete selection from the listbox. If 1 or 2, double-clicking or single-clicking (respectively) an item in the file list automatically completes the selection.</p>
+
+<p>NOTE: If set to 2 (single-click) and <i>-SelectMode</i> is &quot;multiple&quot; or &quot;extended&quot; then it will be forced to 1 (double-click), since single-click will just add the file to the list to be selected. This also affects the history and favorite path dropdown lists. If 1 or 2, clicking an item from these lists invokes selection.</p>
+
+<p>Default: <i>1</i>.</p>
 
 </dd>
 <dt id="SelDir"><b>-SelDir</b></dt>
 <dd>
 
-<p>If 1 or 2, enables selection of a directory rather than a file, and disables the actions of the File List Box. Setting to 2 allows selection of either a file OR a directory. If -1, the directory listbox, etc. are disabled and the user is forced to select file(s) from the initially-specified path. NOTE: This will NOT prevent the user from typing an alternate path in front of the file name entered, so the application must still verify the path returned and handle as desired, ie. display an error dialog and force them to reenter, strip the path, etc. Default: <i>0</i> (only file(s) may be selected).</p>
+<p>If 1 or 2, enables selection of a directory rather than a file, and disables the actions of the File List Box. Setting to 2 allows selection of either a file OR a directory. If -1, the directory listbox, etc. are disabled and the user is forced to select file(s) from the initially-specified path.</p>
+
+<p>NOTE: This will NOT prevent the user from typing an alternate path in front of the file name entered, so the application must still verify the path returned and handle as desired, ie. display an error dialog and force them to reenter, strip the path, etc.</p>
+
+<p>Default: <i>0</i> (only file(s) may be selected).</p>
 
 </dd>
 <dt id="SelectMode"><b>-SelectMode</b></dt>
 <dd>
 
-<p>Sets the selectmode of the File Dialog. If not configured it will be defaulted to &#39;browse&#39; (single). If set to &#39;multiple&#39; or &#39;extended&#39;, then the user may select more than one file and a comma-delimited list of all selected files is returned. Otherwise, only a single file may be selected. Default: <i>&#39;browse&#39;</i> (selecting only a single file from the list allowed).</p>
+<p>Sets the selectmode of the File Dialog. If not configured it will be defaulted to &#39;browse&#39; (single). If set to &#39;multiple&#39; or &#39;extended&#39;, then the user may select more than one file and a comma-delimited list of all selected files is returned. Otherwise, only a single file may be selected.</p>
+
+<p>Default: <i>&#39;browse&#39;</i> (selecting only a single file from the list allowed).</p>
 
 </dd>
 <dt id="SelHook"><b>-SelHook</b></dt>
 <dd>
 
-<p>SelHook is configured with a reference to a routine that will be called when a file is chosen. The file is called with a sole parameter of the full path and file name of the file chosen. If the Create flag is disabled (and the user is not allowed to specify new files), the file will be known to exist at the time that SelHook is called. Note that SelHook will also be called with directories if the SelDir Flag is enabled, and that the JFileDialog box will still be displayed. The JFileDialog box should <b>not</b> be destroyed from within the SelHook routine, although it may generally be configured.</p>
+<p>SelHook is configured with a reference to a routine that will be called when a fileis chosen. The function is called with a sole parameter of the full path and file name of the file chosen. If the Create flag is disabled (and the user is not allowedto specify new files), the file will be known to exist at the time that SelHook is called. Note that SelHook will also be called with directories if the SelDir Flag is enabled, and that the JFileDialog box will still be displayed. The JFileDialog box should <b>not</b> be destroyed from within the SelHook routine, although it may generally be configured.</p>
 
 <p>SelHook routines return 0 to reject the selection and allow the user to reselect, and any other value to accept the selection. If a SelHook routine returns non-zero, the JFileDialog will immediately be withdrawn, and the file will be returned to the caller.</p>
 
-<p>There may be only one SelHook routine active at any time. Configuring the SelHook routine replaces any existing SelHook routine. Configuring the SelHook routine with 0 removes the SelHook routine. Default: <i>undef</i> (no callback function).</p>
+<p>There may be only one SelHook routine active at any time. Configuring the SelHook routine replaces any existing SelHook routine. Configuring the SelHook routine with 0 removes the SelHook routine.</p>
+
+<p>Default: <i>undef</i> (no callback function).</p>
 
 </dd>
 <dt id="ShowAll"><b>-ShowAll</b></dt>
 <dd>
 
-<p>Determines whether hidden files and directories (.* and those with the M$-Windows &quot;hidden&quot; attribute set, on Windows) are displayed in the File and Directory Listboxes. The Show All Checkbox reflects the setting of this switch. Default: <i>0</i> (do not show hidden files or directories).</p>
+<p>Determines whether hidden files and directories (.* and those with the M$-Windows &quot;hidden&quot; attribute set, on Windows) are displayed in the File and Directory Listboxes. The Show All Checkbox reflects the setting of this switch.</p>
+
+<p>Default: <i>0</i> (do not show hidden files or directories).</p>
 
 </dd>
 <dt id="ShowDirList"><b>-ShowDirList</b></dt>
 <dd>
 
-<p>Enable the user to change directories. If disabled, the directory list box will not be shown. Generally, <i>-SelDir</i> should also be set to -1, otherwise, user can still change directories by typing them in. Default: <i>TRUE</i> (enable).</p>
+<p>Enable the user to change directories. If disabled, the directory list box will not be shown. Generally, <i>-SelDir</i> should also be set to -1, otherwise, user can still change directories by typing them in.</p>
+
+<p>Default: <i>true</i> (enable).</p>
 
 </dd>
 <dt id="ShowFileList"><b>-ShowFileList</b></dt>
 <dd>
 
-<p>Enable the user to select file(s) from a list. If disabled, the file list box will not be shown. Generally, <i>-SelDir</i> should also be set to 1, otherwise, user can still select files by typing them in. Default: <i>TRUE</i> (enable).</p>
+<p>Enable the user to select file(s) from a list. If disabled, the file list box will not be shown. Generally, <i>-SelDir</i> should also be set to 1, otherwise, user can still select files by typing them in.</p>
+
+<p>Default: <i>true</i> (enable).</p>
 
 </dd>
 <dt id="Title"><b>-Title</b></dt>
@@ -328,85 +382,113 @@
 <dt id="CancelButtonLabel"><b>-CancelButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Cancel button. Default: <i>&#39;Cancel&#39;</i>.</p>
+<p>The text for the Cancel button.</p>
+
+<p>Default: <i>&#39;Cancel&#39;</i>.</p>
 
 </dd>
 <dt id="CdoutButtonLabel"><b>-CdoutButtonLabel</b></dt>
 <dd>
 
-<p>The text for the JFM4 Filemanager &quot;Current&quot; Directory button. Default: <i>&#39;C~dout&#39;</i>.</p>
+<p>The text for the JFM4 Filemanager &quot;Current&quot; Directory button.</p>
+
+<p>Default: <i>&#39;C~dout&#39;</i>.</p>
 
 </dd>
 <dt id="CWDButtonLabel"><b>-CWDButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Cdout Directory button. Default: <i>&#39;C~WD&#39;</i>.</p>
+<p>The text for the Cdout Directory button.</p>
+
+<p>Default: <i>&#39;C~WD&#39;</i>.</p>
 
 </dd>
 <dt id="DirLBCaption"><b>-DirLBCaption</b></dt>
 <dd>
 
-<p>The Caption above the Directory List Box. Default: <i>&#39;Folders:&#39;</i> on Windows sytems, <i>&#39;Directories:&#39;</i> on all others.</p>
+<p>The Caption above the Directory List Box.</p>
+
+<p>Default: <i>&#39;Folders:&#39;</i> on Windows sytems, <i>&#39;Directories:&#39;</i> on all others.</p>
 
 </dd>
 <dt id="FileEntryLabel"><b>-FileEntryLabel</b></dt>
 <dd>
 
-<p>The label to the left of the File Entry. Default: <i>&#39;File:&#39;</i>.</p>
+<p>The label to the left of the File Entry.</p>
+
+<p>Default: <i>&#39;File:&#39;</i>.</p>
 
 </dd>
 <dt id="FltEntryLabel"><b>-FltEntryLabel</b></dt>
 <dd>
 
-<p>The label to the left of the Filter entry. Default: <i>&#39;Filter:&#39;</i>.</p>
+<p>The label to the left of the Filter entry.</p>
+
+<p>Default: <i>&#39;Filter:&#39;</i>.</p>
 
 </dd>
 <dt id="FileLBCaption"><b>-FileLBCaption</b></dt>
 <dd>
 
-<p>The Caption above the File List Box. Default: <i>&#39;Files&#39;</i>.</p>
+<p>The Caption above the File List Box.</p>
+
+<p>Default: <i>&#39;Files&#39;</i>.</p>
 
 </dd>
 <dt id="HomeButtonLabel"><b>-HomeButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Home directory button. Default: <i>&#39;Home&#39;</i>.</p>
+<p>The text for the Home directory button.</p>
+
+<p>Default: <i>&#39;Home&#39;</i>.</p>
 
 </dd>
 <dt id="OKButtonLabel"><b>-OKButtonLabel</b></dt>
 <dd>
 
-<p>The text for the OK button. Default: <i>&#39;Ok&#39;</i>.</p>
+<p>The text for the OK button.</p>
+
+<p>Default: <i>&#39;Ok&#39;</i>.</p>
 
 </dd>
 <dt id="PathEntryLabel"><b>-PathEntryLabel</b></dt>
 <dd>
 
-<p>The label to the left of the Path Entry. Default: <i>&#39;Path:&#39;</i>.</p>
+<p>The label to the left of the Path Entry.</p>
+
+<p>Default: <i>&#39;Path:&#39;</i>.</p>
 
 </dd>
 <dt id="RescanButtonLabel"><b>-RescanButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Rescan button. Default: <i>&#39;Refresh&#39;</i>.</p>
+<p>The text for the Rescan button.</p>
+
+<p>Default: <i>&#39;Refresh&#39;</i>.</p>
 
 </dd>
 <dt id="ResetButtonLabel"><b>-ResetButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Reset button. Default: <i>&#39;Re~set&#39;</i>.</p>
+<p>The text for the Reset button.</p>
+
+<p>Default: <i>&#39;Re~set&#39;</i>.</p>
 
 </dd>
 <dt id="ShowAllLabel"><b>-ShowAllLabel</b></dt>
 <dd>
 
-<p>The text of the Show All Checkbutton. Default: <i>&#39;Show All&#39;</i>.</p>
+<p>The text of the Show All Checkbutton.</p>
+
+<p>Default: <i>&#39;Show All&#39;</i>.</p>
 
 </dd>
 <dt id="SortButton"><b>-SortButton</b></dt>
 <dd>
 
-<p>Whether or not to display a checkbox to change file box list sort order. Default: <i>TRUE</i> (show).</p>
+<p>Whether or not to display a checkbox to change file box list sort order.</p>
+
+<p>Default: <i>TRUE</i> (show).</p>
 
 </dd>
 <dt id="SortButtonLabel"><b>-SortButtonLabel</b></dt>
@@ -418,7 +500,9 @@
 <dt id="SortOrder"><b>-SortOrder</b></dt>
 <dd>
 
-<p>Order to display files in the file list box (&#39;Name&#39; or &#39;Date&#39;) Default: <i>Name</i>. If <i>&#39;Date&#39;</i>, then the day and time is displayed in the box before the name, (but not included when selected)</p>
+<p>Order to display files in the file list box (&#39;Name&#39; or &#39;Date&#39;) If <i>&#39;Date&#39;</i>, then the day and time is displayed in the box before the name, (but not included when selected)</p>
+
+<p>Default: <i>Name</i>.</p>
 
 </dd>
 </dl>
@@ -432,13 +516,17 @@
 <dt id="EDlgText"><b>-EDlgText</b></dt>
 <dd>
 
-<p>DEPRECIATED (now ignored)! - The message of the Error Dialog Box. The variables $path, $file, and $filename (the full path and filename of the selected file) are available. Default: <i>&quot;You must specify an existing file.\n(\$filename not found)&quot;</i>.</p>
+<p>DEPRECIATED (now ignored)! - The message of the Error Dialog Box. The variables $path, $file, and $filename (the full path and filename of the selected file) are available.</p>
+
+<p>Default: <i>&quot;You must specify an existing file.\n($filename not found)&quot;</i>.</p>
 
 </dd>
 <dt id="EDlgTitle"><b>-EDlgTitle</b></dt>
 <dd>
 
-<p>The title of the Error Dialog Box. Default: <i>&#39;Incorrect entry or selection!&#39;</i>.</p>
+<p>The title of the Error Dialog Box.</p>
+
+<p>Default: <i>&#39;Incorrect entry or selection!&#39;</i>.</p>
 
 </dd>
 </dl>
@@ -454,32 +542,36 @@
 
 <p>Displays the file dialog box for the user to operate. Additional configuration items may be passed in at Show-time In other words, this code snippet: Returns nothing.</p>
 
-<pre><code>        $fd-&gt;Show(-Title =&gt; &#39;Ooooh, Preeeeeety!&#39;);</code></pre>
+<pre><code>$fd-&gt;Show(-Title =&gt; &#39;Ooooh, Preeeeeety!&#39;);</code></pre>
 
 <p>is the same as this code snippet:</p>
 
-<pre><code>        $fd-&gt;configure(-Title =&gt; &#39;Ooooh, Preeeeeety!&#39;);
+<pre><code>$fd-&gt;configure(-Title =&gt; &#39;Ooooh, Preeeeeety!&#39;);
 
-        $fd-&gt;Show;</code></pre>
+$fd-&gt;Show;</code></pre>
 
 </dd>
 <dt id="getHistUsePathButton"><b>getHistUsePathButton()</b></dt>
 <dd>
 
-<p>Fetches the value of the &quot;Keep Path&quot; checkbox created by setting the <b>-HistUsePath</b> option. The checkbox can be set initially by the <b>-HistUsePathButton</b>. The purpose of this allows an application to &quot;remember&quot; the user&#39;s last choice for this checkbox the next time he invokes the JFileDialog widget by fetching it&#39;s status via this function after the JFileDialog widget is closed when the user last selected a file, etc., then using that variable as the <i>HistUsePathButton</i> argument when JFileDialog is opened again within the application. Returns integer (1 or 0).</p>
+<p>Fetches the value of the &quot;Keep Path&quot; checkbox created by setting the <b>-HistUsePath</b> option. The checkbox can be set initially by the <b>-HistUsePathButton</b>. The purpose of this allows an application to &quot;remember&quot; the user&#39;s last choice for this checkbox the next time he invokes the JFileDialog widget by fetching it&#39;s status via this function after the JFileDialog widget is closed when the user last selected a file, etc., then using that variable as the <i>HistUsePathButton</i> argument when JFileDialog is opened again within the application.</p>
+
+<p>Returns integer (1 or 0).</p>
 
 </dd>
 <dt id="getLastPath"><b>getLastPath()</b></dt>
 <dd>
 
-<p>Fetches the current path as it was when the JFileDialog wiget last closed. The purpose of this allows an application to &quot;remember&quot; the path the previous user selected from the next time he invokes the JFileDialog widget by fetching it&#39;s status via this function after the JFileDialog widget is closed when the user last selected a file, etc., then using that variable as the <i>-Path</i> argument when JFileDialog is opened again within the application. Returns <i>string</i> (last path user selected, if known, otherwise the path specified by <b>-Path</b>, if specified, or the current working directory).</p>
+<p>Fetches the current path as it was when the JFileDialog wiget last closed. The purpose of this allows an application to &quot;remember&quot; the path the previous user selected from the next time he invokes the JFileDialog widget by fetching it&#39;s status via this function after the JFileDialog widget is closed when the user last selected a file, etc., then using that variable as the <i>-Path</i> argument when JFileDialog is opened again within the application.</p>
+
+<p>Returns <i>string</i> (last path user selected, if known, otherwise the path specified by <b>-Path</b>, if specified, or the current working directory).</p>
 
 </dd>
 </dl>
 
 <h1 id="DEPENDS">DEPENDS</h1>
 
-<p>Cwd, <a>File::Glob</a>, <a>Tk</a>, <a>Tk::Dialog</a> <a>Tk::JBrowseEntry</a></p>
+<p>Cwd, <a>File::Glob</a>, <a>Tk</a>, <a>Tk::Dialog</a> (or <a>Tk::JDialog</a> if installed), <a>Tk::JBrowseEntry</a></p>
 
 
 </body>

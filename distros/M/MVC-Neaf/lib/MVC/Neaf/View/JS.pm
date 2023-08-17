@@ -3,7 +3,7 @@ package MVC::Neaf::View::JS;
 use strict;
 use warnings;
 
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -56,7 +56,7 @@ my $jsonp_re = qr/^$js_id_re(?:\.$js_id_re)*$/;
 =cut
 
 my %new_keys;
-$new_keys{$_}++ for qw(want_pretty want_sorted preserve_dash);
+$new_keys{$_}++ for qw( neaf_base_dir preserve_dash want_pretty want_sorted );
 sub new {
     my ($class, %opt) = @_;
 
@@ -116,7 +116,7 @@ sub render {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

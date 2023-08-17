@@ -111,7 +111,7 @@ Features of PApp / Advantages over other solutions
     fly.
 
     I18n is as easy as writing "__"Translate this"" (the tagging syntax is a
-    reminiscent of the widely used "_("message")"-syntax of C) in your
+    reminiscent of the widely used _("message")-syntax of C) in your
     documents or program.
 
   Unicode / Multi-charset ability

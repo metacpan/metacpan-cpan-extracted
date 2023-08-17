@@ -23,5 +23,7 @@ README
 SIGNATURE
 t/App-Wikidata-Print/01-use.t
 t/App-Wikidata-Print/02-version.t
+t/App-Wikidata-Print/03-new.t
+t/App-Wikidata-Print/04-run.t
 xt/App-Wikidata-Print/01-pod_coverage.t
 xt/App-Wikidata-Print/02-pod.t

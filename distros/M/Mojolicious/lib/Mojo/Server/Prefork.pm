@@ -110,7 +110,7 @@ sub _manage {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting") and $w->{graceful} = $time
+    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting (see FAQ for more)") and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
@@ -181,7 +181,10 @@ sub _wait {
   while ($chunk =~ /(\d+):(\d)\n/g) {
     next unless my $w = $self->{pool}{$1};
     @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
-    $w->{graceful} ||= $time if $2;
+    if ($2) {
+      $w->{graceful} ||= $time;
+      $w->{quit}++;
+    }
   }
 }
 

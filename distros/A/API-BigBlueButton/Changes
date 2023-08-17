@@ -1,5 +1,14 @@
 Revision history for Perl extension API-BigBlueButton
 
+0.015 2023-08-03T18:30:09Z
+
+    - fixed buildig for perl-5.39, removed mentioning particular version of LWP
+
+0.014 2015-01-28T21:58:00Z
+
+    - description of additional dependencies
+    - added new tests
+
 0.013 2014-05-07T16:13:27Z
 
     - small fix in synopsis

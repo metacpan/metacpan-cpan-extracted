@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '20190227';
+our $VERSION = '20230619';
 
 use RDF::NS;
 use Scalar::Util qw(blessed);
@@ -71,7 +71,7 @@ RDF::SN - Short names for URIs with prefixes from prefix.cc
 =head1 SYNOPSIS
 
   use RDF::SN;
-  $abbrev = RDF::SN->new('20190227');
+  $abbrev = RDF::SN->new('20230619');
   $abbrev->qname('http://www.w3.org/2000/01/rdf-schema#type'); # rdfs:type
 
 =head1 DESCRIPTION

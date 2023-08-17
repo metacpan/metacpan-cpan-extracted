@@ -10,12 +10,12 @@ use Carp;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(web_has_variables web_match_tags web_parse_sections 
+our @EXPORT = qw(web_has_variables web_is_tag web_match_tags web_parse_sections 
+                 web_same_tag web_substitute_sections web_substitute_tags 
                  web_parse_tag web_only_tags web_only_text web_split_at_tags 
-                 web_substitute_sections web_substitute_tags 
                  web_titled_sections);
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 #----------------------------------------------------------------------
 # Extract a list of parsed tags from a text
@@ -33,11 +33,14 @@ sub web_extract_tags {
 sub web_has_variables {
     my ($text, @search_variables) = @_;
 
-    my @template_variables = $text =~ /([\$\@]\w+)/g; 
-    my %template_variables = map {$_ => 1} @template_variables;
+    my %template_variables;
+    foreach my $var ($text =~ /([\$\@]\w+)/g) {
+        $var =~ s/_by_\w+$//;
+        $template_variables{$var} = 1;
+    }
 
-    for my $variable (@search_variables) {
-        return 1 if $template_variables{$variable};
+    for my $var (@search_variables) {
+        return 1 if $template_variables{$var};
     }
 
     return 0;

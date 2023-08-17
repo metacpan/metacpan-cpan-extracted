@@ -1,4 +1,10 @@
 Revision history for Perl extension Spreadsheet::SimpleExcel.
+=============================================================
+
+1.93  2023-06-05 11:30:00
+
+      * Add support for XLSX files
+      * Improved test coverage
 
 1.92  2015-01-19
 

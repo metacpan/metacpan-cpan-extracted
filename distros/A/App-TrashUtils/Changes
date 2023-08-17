@@ -1,0 +1,9 @@
+0.002   2023-08-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion of trashed filenames to trash-rm, trash-list,
+          trash-restore.
+
+
+0.001   2023-07-31  Released-By: PERLANCAR
+
+        - First release.

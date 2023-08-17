@@ -1,5 +1,5 @@
 package Telegram::Bot;
-$Telegram::Bot::VERSION = '0.021';
+$Telegram::Bot::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ Telegram::Bot - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -76,13 +76,23 @@ the C<'/setprivacy'> command on Telegram's C<@botfather> interface to change the
 This distribution's C<ex/> directory contains some complete examples that may be
 instructive to look at.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Justin Hawkins <justin@eatmorecode.com>
 
+=item *
+
+James Green <jkg@earth.li>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Justin Hawkins.
+This software is copyright (c) 2023 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

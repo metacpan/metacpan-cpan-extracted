@@ -7,7 +7,7 @@ use Mojo::JSON 'decode_json', 'encode_json';
 use Net::Protocol::OBSRemote;
 use Future::Mojo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Filter::signatures;
 use feature 'signatures';
@@ -241,7 +241,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2021-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2021-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -1,5 +1,5 @@
 #!/bin/false
-#
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Cluster
 # ABSTRACT: Functions for the 'cluster' portion of the API
 
@@ -7,8 +7,10 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Cluster;
-$Net::Proxmox::VE::Cluster::VERSION = '0.36';
+$Net::Proxmox::VE::Cluster::VERSION = '0.37';
 use parent 'Exporter';
+
+use Carp qw( croak );
 
 our @EXPORT  =
   qw(
@@ -63,16 +65,16 @@ sub create_cluster_backup {
 
     my @p = @_;
 
-    die 'No arguments for create_cluster_backup()' unless @p;
+    croak 'No arguments for create_cluster_backup()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_cluster_backup()'
+        croak 'Single argument not a hash for create_cluster_backup()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_cluster_backup()'
+        croak 'Odd number of arguments for create_cluster_backup()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -86,8 +88,8 @@ sub get_cluster_backup {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for get_cluster_backup()';
-    die 'id must be a scalar for get_cluster_backup()' if ref $a;
+    my $a = shift or croak 'No id for get_cluster_backup()';
+    croak 'id must be a scalar for get_cluster_backup()' if ref $a;
 
     return $self->get( $base, $a )
 
@@ -98,21 +100,21 @@ sub update_cluster_backup {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for update_cluster_backup()';
-    die 'id must be a scalar for update_cluster_backup()' if ref $a;
+    my $a = shift or croak 'No id for update_cluster_backup()';
+    croak 'id must be a scalar for update_cluster_backup()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_cluster_backup()' unless @p;
+    croak 'No arguments for update_cluster_backup()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_cluster_backup()'
+        croak 'Single argument not a hash for update_cluster_backup()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_cluster_backup()'
+        croak 'Odd number of arguments for update_cluster_backup()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -126,8 +128,8 @@ sub delete_cluster_backup {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for delete_cluster_backup()';
-    die 'id must be a scalar for delete_cluster_backup()' if ref $a;
+    my $a = shift or croak 'No id for delete_cluster_backup()';
+    croak 'id must be a scalar for delete_cluster_backup()' if ref $a;
 
     return $self->delete( $base, $a )
 
@@ -194,16 +196,16 @@ sub create_cluster_ha_groups {
 
     my @p = @_;
 
-    die 'No arguments for create_cluster_ha_groups()' unless @p;
+    croak 'No arguments for create_cluster_ha_groups()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_cluster_ha_groups()'
+        croak 'Single argument not a hash for create_cluster_ha_groups()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_cluster_ha_groups()'
+        croak 'Odd number of arguments for create_cluster_ha_groups()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -217,8 +219,8 @@ sub get_cluster_ha_groups {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for get_cluster_ha_groups()';
-    die 'id must be a scalar for get_cluster_ha_groups()' if ref $a;
+    my $a = shift or croak 'No id for get_cluster_ha_groups()';
+    croak 'id must be a scalar for get_cluster_ha_groups()' if ref $a;
 
     return $self->get( $base, 'ha', 'groups', $a )
 
@@ -230,21 +232,21 @@ sub update_cluster_ha_groups {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for update_cluster_ha_groups()';
-    die 'id must be a scalar for update_cluster_ha_groups()' if ref $a;
+    my $a = shift or croak 'No id for update_cluster_ha_groups()';
+    croak 'id must be a scalar for update_cluster_ha_groups()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_cluster_ha_groups()' unless @p;
+    croak 'No arguments for update_cluster_ha_groups()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_cluster_ha_groups()'
+        croak 'Single argument not a hash for update_cluster_ha_groups()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_cluster_ha_groups()'
+        croak 'Odd number of arguments for update_cluster_ha_groups()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -258,8 +260,8 @@ sub delete_cluster_ha_group {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No id for delete_cluster_ha_group()';
-    die 'id must be a scalar for delete_cluster_ha_group()' if ref $a;
+    my $a = shift or croak 'No id for delete_cluster_ha_group()';
+    croak 'id must be a scalar for delete_cluster_ha_group()' if ref $a;
 
     return $self->delete( $base, 'ha', 'groups', $a )
 
@@ -272,16 +274,16 @@ sub get_cluster_log {
 
     my @p = @_;
 
-    die 'No arguments for get_cluster_log()' unless @p;
+    croak 'No arguments for get_cluster_log()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for get_cluster_log()'
+        croak 'Single argument not a hash for get_cluster_log()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for get_cluster_log()'
+        croak 'Odd number of arguments for get_cluster_log()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -306,16 +308,16 @@ sub update_cluster_options {
 
     my @p = @_;
 
-    die 'No arguments for update_cluster_options()' unless @p;
+    croak 'No arguments for update_cluster_options()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_cluster_options()'
+        croak 'Single argument not a hash for update_cluster_options()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_cluster_options()'
+        croak 'Odd number of arguments for update_cluster_options()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -332,16 +334,16 @@ sub get_cluster_resources {
 
     my @p = @_;
 
-    die 'No arguments for get_cluster_resources()' unless @p;
+    croak 'No arguments for get_cluster_resources()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for get_cluster_resources()'
+        croak 'Single argument not a hash for get_cluster_resources()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for get_cluster_resources()'
+        croak 'Odd number of arguments for get_cluster_resources()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -372,6 +374,8 @@ sub get_cluster_tasks {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -382,7 +386,7 @@ Net::Proxmox::VE::Cluster - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -852,14 +856,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

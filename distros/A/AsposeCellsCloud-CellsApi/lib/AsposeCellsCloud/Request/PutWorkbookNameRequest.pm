@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutWorkbookNameRequest.name :   ,
+# PutWorkbookNameRequest.name : The workbook name.  ,
 # PutWorkbookNameRequest.newName :   ,
-# PutWorkbookNameRequest.folder :   ,
-# PutWorkbookNameRequest.storageName :    
+# PutWorkbookNameRequest.folder : Original workbook folder.  ,
+# PutWorkbookNameRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_workbook_name' } = { 
-    	summary => '',
+    	summary => 'Defines a new name in workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
@@ -144,14 +144,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

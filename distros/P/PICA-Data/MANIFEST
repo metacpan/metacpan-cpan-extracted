@@ -13,6 +13,7 @@ lib/PICA/Data/Field.pm
 lib/PICA/Error.pm
 lib/PICA/Parser/Base.pm
 lib/PICA/Parser/Binary.pm
+lib/PICA/Parser/Import.pm
 lib/PICA/Parser/JSON.pm
 lib/PICA/Parser/PIXML.pm
 lib/PICA/Parser/PPXML.pm
@@ -59,6 +60,7 @@ t/files/bgb.example
 t/files/dump.dat
 t/files/filter-test.pp
 t/files/pica.binary
+t/files/pica.import
 t/files/pica.json
 t/files/pica.pixml
 t/files/pica.plain

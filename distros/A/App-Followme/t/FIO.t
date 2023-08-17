@@ -38,18 +38,15 @@ eval "use App::Followme::Web";
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir) if -e $test_dir;
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+rmtree($test_dir, 0, 1) if -e $test_dir;
+mkdir($test_dir) unless -e $test_dir;
 chdir $test_dir or die $!;
 
 my $sub_one = catdir($test_dir, 'sub-one');
-mkdir $sub_one or die $!;
-chmod 0755, $sub_one;
+mkdir $sub_one unless -e $sub_one;
 
 my $sub_two = catdir($test_dir, 'sub-two');
-mkdir $sub_two or die $!;
-chmod 0755, $sub_two;
+mkdir $sub_two unless -e $sub_two;
 
 #----------------------------------------------------------------------
 # Test same file

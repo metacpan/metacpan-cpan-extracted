@@ -7,7 +7,7 @@ package Rex::Profiler;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use Time::HiRes qw(gettimeofday tv_interval);
 

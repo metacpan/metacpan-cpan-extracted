@@ -1,5 +1,3 @@
-# $Id: SSH2.pm,v 1.47 2009/01/26 01:50:38 turnstep Exp $
-
 package Net::SSH::Perl::SSH2;
 use strict;
 use warnings;
@@ -9,7 +7,7 @@ use Net::SSH::Perl::ChannelMgr;
 use Net::SSH::Perl::Packet;
 use Net::SSH::Perl::Buffer;
 use Net::SSH::Perl::Constants qw( :protocol :msg2 :hosts
-                                  CHAN_INPUT_CLOSED CHAN_INPUT_WAIT_DRAIN 
+                                  CHAN_INPUT_CLOSED CHAN_INPUT_WAIT_DRAIN
                                   KEX_DEFAULT_PK_ALG );
 use Net::SSH::Perl::Cipher;
 use Net::SSH::Perl::AuthMgr;
@@ -73,7 +71,7 @@ sub _proto_init {
     }
     unless (my $if = $config->get('identity_files')) {
         defined $home or croak "Cannot determine home directory, please set the environment variable HOME";
-        $config->set('identity_files', [ catfile($home, '.ssh', 'id_ed25519'), 
+        $config->set('identity_files', [ catfile($home, '.ssh', 'id_ed25519'),
             catfile($home, '.ssh', 'id_rsa'), catfile($home, '.ssh', 'id_ecdsa') ]);
     }
 
@@ -133,7 +131,7 @@ sub client_input_hostkeys {
         }
 
         my @allowed_key_types = split(',',
-            $ssh->config->get('host_key_algorithms') || 
+            $ssh->config->get('host_key_algorithms') ||
             KEX_DEFAULT_PK_ALG);
         my $key_type = $key->ssh_name;
         $ssh->debug("Received $key_type key: " . $key->fingerprint($fp_hash));
@@ -162,7 +160,7 @@ sub client_input_hostkeys {
         $port = $serv[2];
     }
     my $u_hostfile = $ssh->{config}->get('user_known_hosts');
-    my %known_keys = map { $_->fingerprint($fp_hash) => $_ } 
+    my %known_keys = map { $_->fingerprint($fp_hash) => $_ }
        _all_keys_for_host($host, $port, $u_hostfile);
 
     my $retained = 0;
@@ -221,7 +219,7 @@ sub client_input_hostkeys {
                     "private " . $ssh->ssh_name . " host key");
                 next;
             }
-            $ssh->debug('Learned new hostkey: ' . $key->ssh_name . ' ' . 
+            $ssh->debug('Learned new hostkey: ' . $key->ssh_name . ' ' .
                 $key->fingerprint($fp_hash));
             push @verified_keys, $key;
         }

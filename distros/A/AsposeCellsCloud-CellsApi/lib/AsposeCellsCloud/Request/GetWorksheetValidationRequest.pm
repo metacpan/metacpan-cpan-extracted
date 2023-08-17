@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetValidationRequest.name :   ,
-# GetWorksheetValidationRequest.sheetName :   ,
-# GetWorksheetValidationRequest.validationIndex :   ,
-# GetWorksheetValidationRequest.folder :   ,
-# GetWorksheetValidationRequest.storageName :    
+# GetWorksheetValidationRequest.name : The workbook name.  ,
+# GetWorksheetValidationRequest.sheetName : The worksheet name.  ,
+# GetWorksheetValidationRequest.validationIndex : The validation index.  ,
+# GetWorksheetValidationRequest.folder : Original workbook folder.  ,
+# GetWorksheetValidationRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_validation' } = { 
-    	summary => '',
+    	summary => 'Gets a validation by index in worksheet.',
         params => $params,
         returns => 'ValidationResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'validation_index' => {
      	datatype => 'int',
      	base_name => 'validationIndex',
-     	description => '',
+     	description => 'The validation index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

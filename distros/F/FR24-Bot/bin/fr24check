@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+#ABSTRACT: Developer's utility
+#PODNAME: fr24check
+
+use 5.018;
+use utf8;
+use open qw( :encoding(UTF-8) :std );
+use FindBin qw($RealBin);
+if (-e "$RealBin/../dist.ini") {
+    use lib "$RealBin/../lib";
+}
+use WWW::Telegram::BotAPI;
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+use JSON::PP;
+use Getopt::Long;
+use FR24::Bot;
+use FR24::Utils;
+
+our $conf;
+my $width = 60;
+my $opt_config = "$ENV{HOME}/.config/fr24-bot.ini";
+my $opt_verbose;
+my $opt_debug;
+my $opt_token;
+my $opt_ip;
+my $opt_port;
+my $opt_test;
+GetOptions(
+ 'a|api-key=s' => \$opt_token,
+ 'i|ip=s'      => \$opt_ip,
+ 'p|port=i'    => \$opt_port,
+ 'c|config=s'  => \$opt_config,
+ 'verbose'     => \$opt_verbose,
+ 'debug'       => \$opt_debug,
+ 'test'        => \$opt_test,
+ 'version'     => sub { say basename($0). " " . $FR24::Utils::VERSION; exit 0;},
+);
+
+$opt_verbose = 1 if $opt_debug;
+
+# Load config
+if ( defined $opt_config and -e $opt_config ) {
+    say STDERR "Reading config from $opt_config" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig($opt_config);
+
+} elsif ( -e "$ENV{HOME}/.config/fr24-bot.ini" ) {
+  	say STDERR "Reading config from ~/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$ENV{HOME}/.config/fr24-bot.ini");
+} elsif ( -e "$RealBin/.config/fr24-bot.ini" ) {
+    say STDERR "Reading config from $RealBin/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$RealBin/.config/fr24-bot.ini");
+}
+ 
+
+# If API KEY is provided in the command line, use it
+if ( defined $opt_token and $opt_token ne 'default' ) {
+    say STDERR "Using token from command line" if ($opt_verbose);
+    $conf->{telegram}->{apikey} = $opt_token;
+} elsif ( defined $conf->{telegram}->{apikey}) {
+    say STDERR "Using token from config file" if ($opt_verbose);
+    $opt_token = $conf->{telegram}->{apikey};
+} else {
+    say STDERR Dumper $conf if ($opt_verbose);
+    die "APIKey file not found. Can be in:\n - $ENV{HOME}/.config/fr24-bot.ini\n - $RealBin/.config/fr24-bot.ini\n - --token TOKEN\n";
+}
+
+# If API KEY is provided in the command line, use it
+if ( defined $opt_port and $opt_port ne 'default' ) {
+    say STDERR "Using port from command line" if ($opt_verbose);
+    $conf->{server}->{port} = $opt_port;
+} elsif ( defined $conf->{server}->{port}) {
+    say STDERR "Using port from config file" if ($opt_verbose);
+    $opt_port = $conf->{server}->{port};
+} else {
+    say STDERR Dumper $conf if ($opt_verbose);
+    die "Port not found\n";
+}
+
+die "ERROR: No API key provided\n" unless defined $opt_token;
+
+
+my $bot = FR24::Bot->new(
+    -conf => $conf,
+    -name => "fr24-bot",
+    -test => $opt_test,
+);
+$bot->update();
+say STDERR "Last upd:   ", $bot->{last_updated};
+say STDERR "Last URL:   ", $bot->{last_url};
+say STDERR "Bot name:   ", $bot->{name};
+say STDERR "Bot API:    ", $bot->{apikey};
+say STDERR "Bot IP:     ", $bot->{ip} , ":" , $bot->{port};
+say STDERR "Total:      ", $bot->{total};
+print STDERR "Flights:    ";
+my $c = 0;
+for my $f (sort keys %{$bot->{flights}}) {
+    print STDERR $bot->{flights}{$f}->{callsign}, ", " if ($c < 8 and length $bot->{flights}{$f}->{callsign}  > 1);
+    $c++ if length $bot->{flights}{$f}->{callsign} > 1;
+}
+say STDERR $c ? "..." : "n/a";
+# Check if ARGV[0] is present in self->content
+if (defined $ARGV[0]) {
+    say STDERR "User query: ", $ARGV[0];
+    say STDERR Dumper $bot->{flights};
+}
+
+if (not $opt_test) {
+    my $errors  = 0;
+    # Check flight callsigns, error if they contain 000
+    for my $f (sort keys %{$bot->{flights}}) {
+        if ($bot->{flights}{$f}->{callsign} =~ /000/) {
+            $errors++;
+        }
+    }
+    say STDERR "**TEST MODE ERROR**:     ", $errors if ($errors);
+}
+# Print $bot as JSON pretty
+say Dumper $bot if ($opt_debug);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fr24check - Developer's utility
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 SYNOPSIS
+
+    fr24test -a APIKEY -i IP -p PORT
+
+=head1 DESCRIPTION
+
+An test script for L<FR24::Bot>.
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

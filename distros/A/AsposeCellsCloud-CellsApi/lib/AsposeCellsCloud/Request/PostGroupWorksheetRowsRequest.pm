@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostGroupWorksheetRowsRequest.name :   ,
-# PostGroupWorksheetRowsRequest.sheetName :   ,
-# PostGroupWorksheetRowsRequest.firstIndex :   ,
-# PostGroupWorksheetRowsRequest.lastIndex :   ,
-# PostGroupWorksheetRowsRequest.hide :   ,
-# PostGroupWorksheetRowsRequest.folder :   ,
-# PostGroupWorksheetRowsRequest.storageName :    
+# PostGroupWorksheetRowsRequest.name : The workbook name.  ,
+# PostGroupWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# PostGroupWorksheetRowsRequest.firstIndex : The first row index to be operated.  ,
+# PostGroupWorksheetRowsRequest.lastIndex : The last row index to be operated.  ,
+# PostGroupWorksheetRowsRequest.hide : rows visible state  ,
+# PostGroupWorksheetRowsRequest.folder : Original workbook folder.  ,
+# PostGroupWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_group_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Group rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'first_index' => {
      	datatype => 'int',
      	base_name => 'firstIndex',
-     	description => '',
+     	description => 'The first row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'last_index' => {
      	datatype => 'int',
      	base_name => 'lastIndex',
-     	description => '',
+     	description => 'The last row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'hide' => {
      	datatype => 'string',
      	base_name => 'hide',
-     	description => '',
+     	description => 'rows visible state',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

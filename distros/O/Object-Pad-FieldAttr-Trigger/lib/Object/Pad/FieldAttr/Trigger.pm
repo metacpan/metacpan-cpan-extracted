@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Trigger 0.06;
+package Object::Pad::FieldAttr::Trigger 0.07;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.50;
+use Object::Pad 0.66;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -23,7 +23,7 @@ C<Object::Pad::FieldAttr::Trigger> - invoke an instance method after a C<:writer
    use Object::Pad::FieldAttr::Trigger;
 
    class Label {
-      has $title :param :reader :writer :Trigger(redraw);
+      field $title :param :reader :writer :Trigger(redraw);
 
       method redraw {
          ...
@@ -49,7 +49,7 @@ future. As a result, this module should be considered equally experimental.
 
 =head2 :Trigger
 
-   has $field :writer :Trigger(NAME) ...;
+   field $name :writer :Trigger(NAME) ...;
 
 Declares that the accessor method generated for the field by the C<:writer>
 attribute will invoke the method named by the C<:Trigger> attribute, after the
@@ -65,6 +65,11 @@ class itself.
 sub import
 {
    $^H{"Object::Pad::FieldAttr::Trigger/Trigger"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::FieldAttr::Trigger/Trigger"};
 }
 
 =head1 AUTHOR

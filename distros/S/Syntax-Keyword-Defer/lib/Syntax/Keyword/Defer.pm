@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Defer 0.08;
+package Syntax::Keyword::Defer 0.09;
 
 use v5.14;
 use warnings;
@@ -177,17 +177,28 @@ sub import
    $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
    my $pkg = shift;
-   my ( $caller, @syms ) = @_;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport_into { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $cb, $caller, @syms ) = @_;
 
    @syms or @syms = qw( defer );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Keyword::Defer/defer"}++   if delete $syms{defer};
+   $cb->( "Syntax::Keyword::Defer/defer" ) if delete $syms{defer};
 
-   croak "'FINALLY' has now been removed; use 'defer' instead" and $^H{"Syntax::Keyword::Defer/finally"}++
+   croak "'FINALLY' has now been removed; use 'defer' instead" and $cb->( "Syntax::Keyword::Defer/finally" )
       if delete $syms{finally};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

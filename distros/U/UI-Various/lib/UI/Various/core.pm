@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use UI::Various::language::en;
 
@@ -186,8 +186,7 @@ Otherwise this method just exports the core functions to our other modules.
 	    {
 		# needed for the "require" in other modules' "testpodcoverage",
 		# in addition it sometimes is counted by coverage without being
-		# run at all (that's what the 'not' is for):
-		# uncoverable not statement
+		# run at all:
 		$rh_options->{use} = [];
 	    }
 	}
@@ -393,7 +392,6 @@ get or set currently used handling of output>
 			# errors can't use standard messaging here (like
 			# above we have a paradox; the statement is covered
 			# while the branch is not):
-			# uncoverable not statement
 			print "\n***** can't redirect STDERR: $! *****\n";
 		    }
 		    binmode(STDERR, ':utf8');

@@ -80,10 +80,15 @@ Works with RT 4.2 or greater
         cd /opt/rt4 # Your location may be different
         patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4.2-add-callbacks-to-extend-customfields-capabilities.patch
 
-    For RT 5.0.0 or greater, apply the included patch:
+    For RT 5.0.0 to 5.0.3, apply the included patch:
 
         cd /opt/rt5 # Your location may be different
         patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/5.0-add-callbacks-to-extend-customfields-capabilities.patch
+
+    For RT 5.0.4 or greater, apply the included patch:
+
+        cd /opt/rt5 # Your location may be different
+        patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/5.0.4-add-callbacks-to-extend-customfields-capabilities.patch
 
 - Edit your `/opt/rt5/etc/RT_SiteConfig.pm`
 
@@ -212,7 +217,7 @@ or via the web at
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2017-2023 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

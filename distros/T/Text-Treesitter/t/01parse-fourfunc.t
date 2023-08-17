@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
@@ -22,24 +22,24 @@ unless( -f TREE_SITTER_LANGUAGE_FOURFUNC ) {
 }
 
 my $p = Text::Treesitter::Parser->new;
-isa_ok( $p, "Text::Treesitter::Parser", '$p' );
+isa_ok( $p, [ "Text::Treesitter::Parser" ], '$p' );
 
 my $lang = Text::Treesitter::Language::load( TREE_SITTER_LANGUAGE_FOURFUNC, "fourfunc" );
-isa_ok( $lang, "Text::Treesitter::Language", '$lang' );
+isa_ok( $lang, [ "Text::Treesitter::Language" ], '$lang' );
 
 ok( $p->set_language( $lang ), '$p->set_language accepts language' ) or
-   BAIL_OUT "Unable to set language";
+   bail_out( "Unable to set language" );
 
 use constant SOURCE => <<'EOF';
 1 + 2
 EOF
 my $tree = $p->parse_string( SOURCE );
-isa_ok( $tree, "Text::Treesitter::Tree", '$tree' );
+isa_ok( $tree, [ "Text::Treesitter::Tree" ], '$tree' );
 
 is( $tree->text, SOURCE, '$tree->text' );
 
 my $root = $tree->root_node;
-isa_ok( $root, "Text::Treesitter::Node", '$root' );
+isa_ok( $root, [ "Text::Treesitter::Node" ], '$root' );
 
 is( $root->tree, $tree, '$root->tree is $tree' );
 
@@ -53,15 +53,23 @@ ok( $root->is_named,                  '$root->is_named' );
 
 ok( !$root->has_error, '$root has no errors' );
 
-is_deeply( [ $root->start_point ], [ 0, 0 ], '$root->start_point' );
-is_deeply( [ $root->end_point   ], [ 1, 0 ], '$root->end_point' );
+is( [ $root->start_point ], [ 0, 0 ], '$root->start_point' );
+is( [ $root->end_point   ], [ 1, 0 ], '$root->end_point' );
 
-is( $root->child_count, 3, '$root->child_count' );
+is( $root->child_count, 1, '$root->child_count' );
 
-my @nodes = $root->child_nodes;
+is( $root->parent, undef, '$root->parent' );
+
+my $exprnode = ( $root->child_nodes )[0];
+
+is( $exprnode->child_count, 3, '$exprnode->child_count' );
+
+is( $exprnode->parent, $root, '$exprnode->parent' );
+
+my @nodes = $exprnode->child_nodes;
 is( scalar @nodes, 3, '$root->child_nodes returned 3 nodes' );
 
-isa_ok( $nodes[0], "Text::Treesitter::Node", '$nodes[0]' );
+isa_ok( $nodes[0], [ "Text::Treesitter::Node" ], '$nodes[0]' );
 
 is( $nodes[0]->type, "number", '$nodes[0]->type' );
 is( $nodes[0]->text, "1",      '$nodes[0]->text' );
@@ -71,5 +79,8 @@ is( $nodes[1]->text, "+",      '$nodes[1]->text' );
 
 is( $nodes[2]->type, "number", '$nodes[2]->type' );
 is( $nodes[2]->text, "2",      '$nodes[2]->text' );
+
+is( $root->debug_sprintf, '(fourfunc (expr (number) operator: "+" (number)))',
+   '$root->debug_sprintf' );
 
 done_testing;

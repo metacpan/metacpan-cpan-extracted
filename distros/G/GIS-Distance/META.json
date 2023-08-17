@@ -4,7 +4,7 @@
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -68,47 +68,47 @@
    "provides" : {
       "GIS::Distance" : {
          "file" : "lib/GIS/Distance.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::ALT" : {
          "file" : "lib/GIS/Distance/ALT.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Constants" : {
          "file" : "lib/GIS/Distance/Constants.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Cosine" : {
          "file" : "lib/GIS/Distance/Cosine.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Formula" : {
          "file" : "lib/GIS/Distance/Formula.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::GreatCircle" : {
          "file" : "lib/GIS/Distance/GreatCircle.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Haversine" : {
          "file" : "lib/GIS/Distance/Haversine.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::MathTrig" : {
          "file" : "lib/GIS/Distance/MathTrig.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Null" : {
          "file" : "lib/GIS/Distance/Null.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Polar" : {
          "file" : "lib/GIS/Distance/Polar.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "GIS::Distance::Vincenty" : {
          "file" : "lib/GIS/Distance/Vincenty.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -118,15 +118,17 @@
       },
       "homepage" : "https://github.com/bluefeet/GIS-Distance",
       "repository" : {
-         "url" : "git://github.com/bluefeet/GIS-Distance.git",
+         "type" : "git",
+         "url" : "https://github.com/bluefeet/GIS-Distance.git",
          "web" : "https://github.com/bluefeet/GIS-Distance"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
+      "Florian Schlichting <fsfs@debian.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

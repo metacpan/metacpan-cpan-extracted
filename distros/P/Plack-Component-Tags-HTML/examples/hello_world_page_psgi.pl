@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 sub _tags_middle {
-        my $self = shift;
+        my ($self, $env) = @_;
 
         $self->{'tags'}->put(
                 ['d', 'Hello world'],

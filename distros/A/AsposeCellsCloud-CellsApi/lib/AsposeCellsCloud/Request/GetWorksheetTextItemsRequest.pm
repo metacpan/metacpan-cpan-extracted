@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetTextItemsRequest.name :   ,
-# GetWorksheetTextItemsRequest.sheetName :   ,
-# GetWorksheetTextItemsRequest.folder :   ,
-# GetWorksheetTextItemsRequest.storageName :    
+# GetWorksheetTextItemsRequest.name : Workbook name.  ,
+# GetWorksheetTextItemsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetTextItemsRequest.folder : The workbook`s folder.  ,
+# GetWorksheetTextItemsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_text_items' } = { 
-    	summary => '',
+    	summary => 'Get text items in worksheet.',
         params => $params,
         returns => 'TextItemsResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'Workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The workbook`s folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

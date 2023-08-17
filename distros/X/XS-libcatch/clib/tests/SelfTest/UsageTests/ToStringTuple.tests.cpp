@@ -1,3 +1,11 @@
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
 #define CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER
 #include <catch2/catch_test_macros.hpp>
 
@@ -38,8 +46,7 @@ TEST_CASE( "tuple<tuple<int>,tuple<>,float>", "[toString][tuple]" )
     CHECK( "{ { 42 }, { }, 1.2f }" == ::Catch::Detail::stringify(value) );
 }
 
-TEST_CASE( "tuple<nullptr,int,const char *>", "[toString][tuple]" )
-{
+TEST_CASE( "tuple<nullptr,int,const char *>", "[approvals][toString][tuple]" ) {
     typedef std::tuple<std::nullptr_t,int,const char *> type;
     type value { nullptr, 42, "Catch me" };
     CHECK( "{ nullptr, 42, \"Catch me\" }" == ::Catch::Detail::stringify(value) );

@@ -78,32 +78,32 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   else {
     // byte[]
-    if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE,  1)) {
+    if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE),  1)) {
       int8_t* request_arg_ref = env->get_elems_byte(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
     // short[]
-    else if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT,  1)) {
+    else if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT),  1)) {
       int16_t* request_arg_ref = env->get_elems_short(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
     // int[]
-    else if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_INT,  1)) {
+    else if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_INT),  1)) {
       int32_t* request_arg_ref = env->get_elems_int(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
     // long[]
-    else if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG,  1)) {
+    else if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG),  1)) {
       int64_t* request_arg_ref = env->get_elems_long(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
     // float[]
-    else if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT,  1)) {
+    else if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT),  1)) {
       float* request_arg_ref = env->get_elems_float(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
     // double[]
-    else if (env->is_type(env, stack, obj_request_arg_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE,  1)) {
+    else if (env->is_type(env, stack, obj_request_arg_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE),  1)) {
       double* request_arg_ref = env->get_elems_double(env, stack, obj_request_arg_ref);
       ret = ioctl(fd, request, &request_arg_ref);
     }
@@ -119,7 +119,7 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (ret == -1) {
     env->die(env, stack, "[System Error]ioctl failed: %s", socket_strerror(env, stack, socket_errno(), 0), __func__, FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+    return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
   stack[0].ival = ret;

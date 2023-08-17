@@ -1,0 +1,12 @@
+
+## INSTALL
+
+cpanm App::quantile
+
+plenv rehash  # To reset the hash table of the shell to run commands when `plenv' is installed. 
+
+
+## UNINSTALL 
+
+cpanm -U App::quantile
+

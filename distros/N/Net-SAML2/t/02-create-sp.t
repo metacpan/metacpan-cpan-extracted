@@ -12,8 +12,11 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         slo_url_soap           => '/slo-soap',
     );
 
+    my $xml = $sp->metadata;
+    like($xml, qr/^\<\?xml version="1.0" encoding="UTF-8"\?\>/, "Have XML version declaration");
+
     my $xpath = get_xpath(
-        $sp->metadata,
+        $xml,
         md => URN_METADATA,
         ds => URN_SIGNATURE,
     );
@@ -68,12 +71,27 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
 
 
     get_single_node_ok($xpath, '//ds:Signature');
+
+    is(
+        'e73560b0e23602121aedc55bcb1ca637',
+        $sp->key_name('signing'),
+        "Got a key name for the signing key"
+    );
+    is(
+        undef,
+        $sp->key_name('encryption'),
+        "... and there is no encryption key name"
+    );
+
 }
 
 {
     my $sp    = net_saml2_sp(sign_metadata => 0);
+    my $xml = $sp->metadata;
+    like($xml, qr/^\<\?xml version="1.0" encoding="UTF-8"\?\>/, "Have XML version declaration");
+
     my $xpath = get_xpath(
-        $sp->metadata,
+        $xml,
         md => URN_METADATA,
         ds => URN_SIGNATURE,
     );
@@ -222,6 +240,17 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
     is($kd->getAttribute('use'),
         "encryption", "Key descriptor is there for encryption");
 
+    is(
+        'e73560b0e23602121aedc55bcb1ca637',
+        $sp->key_name('signing'),
+        "Got a key name for the signing key"
+    );
+    is(
+        'e73560b0e23602121aedc55bcb1ca637',
+        $sp->key_name('encryption'),
+        "... and we also have a encryption key name"
+    );
+
 }
 
 {
@@ -304,30 +333,38 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
 
     }
 
-    throws_ok(
-        sub {
-            my $sp = net_saml2_sp(
-                single_logout_service => [
-                ],
-                assertion_consumer_service => [
-                ],
-            );
-        },
-        qr/You don't have any Single Logout Services configured/,
-        "Needs at least one SLO",
-    );
+    {
+        my $sp = net_saml2_sp(
+            single_logout_service => [],
+        );
+
+        my $xpath = get_xpath(
+            $sp->metadata,
+            md => URN_METADATA,
+            ds => URN_SIGNATURE,
+        );
+
+        my $nodes = $xpath->findnodes('//md:SingleLogoutService');
+        is($nodes->size, 0, "No single logout service generated");
+
+        $sp = net_saml2_sp();
+
+        $xpath = get_xpath(
+            $sp->metadata,
+            md => URN_METADATA,
+            ds => URN_SIGNATURE,
+        );
+
+        $nodes = $xpath->findnodes('//md:SingleLogoutService');
+        is($nodes->size, 0, "No single logout service generated without arguments");
+
+    }
 
     throws_ok(
         sub {
             my $sp = net_saml2_sp(
-                single_logout_service => [
-                    {
-                        Binding => 'foo',
-                        Location => 'bar',
-                    }
-                ],
-                assertion_consumer_service => [
-                ],
+                single_logout_service => [],
+                assertion_consumer_service => [],
             );
         },
         qr/You don't have any Assertion Consumer Services configured/,

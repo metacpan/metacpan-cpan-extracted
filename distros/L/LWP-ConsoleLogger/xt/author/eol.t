@@ -15,6 +15,7 @@ my @files = (
     't/LWP/ConsoleLogger.t',
     't/LWP/ConsoleLogger/Easy.t',
     't/LWP/ConsoleLogger/Everywhere.t',
+    't/LWP/ConsoleLogger/environment-variable-log-file.t',
     't/LWP/ConsoleLogger/post-with-json.t',
     't/LWP/ConsoleLogger/post.t',
     't/pretty.t',

@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Reporter';
 
@@ -441,7 +441,7 @@ sub fold($$;$)
     my $wrap  = shift || $default_wrap_length;
     defined $line or $line = '';
 
-    $line    =~ s/\n\s/ /gms;            # Remove accidental folding
+    $line    =~ s/\n(\s)/$1/gms;            # Remove accidental folding
     return " \n" unless CORE::length($line);  # empty field
 
     my @folded;
@@ -473,9 +473,10 @@ sub fold($$;$)
 sub unfold($)
 {   my $string = $_[1];
     for($string)
-    {   s/\r?\n\s?/ /gs;  # remove FWS
-        s/^ +//;
-        s/ +$//;
+    {   s/\r?\n(\s)/$1/gs;  # remove FWS
+        s/\r?\n/ /gs;
+        s/^\s+//;
+        s/\s+$//;
     }
     $string;
 }

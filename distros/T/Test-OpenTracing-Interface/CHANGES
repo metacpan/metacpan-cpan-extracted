@@ -1,6 +1,12 @@
 CHANGE LOG
 ==========
 
+2023-07-14   v0.23.1
+--------------------
+
+Fix dependencies because of toolchain disruptions
+Add GitHub workflows (including fixes related to above mentioned disruptions)
+
 2020-06-16   v0.23.0
 --------------------
 

@@ -74,7 +74,7 @@
 
 	Note on db option.  The following are equivalent:
 	... | sufft | suamp | suop op=norm | suop op=slog10 |\
-		sugain scale=20| suxgraph style=normal
+		sugain scale equals 20| suxgraph style=normal
 
 	... | sufft | suamp | suop op=db | suxgraph style=normal
 

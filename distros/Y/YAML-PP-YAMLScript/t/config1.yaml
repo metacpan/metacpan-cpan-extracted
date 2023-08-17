@@ -1,0 +1,28 @@
+--- !yamlscript
+
+import: YAML::PP
+ypp =: YAML::PP->new()
+
+yaml-file =: "$(dirname *file*)/config1-defaults.yaml"
+
+defaults =:
+  ypp->load_file(yaml-file)
+
+entries =: !
+  - size: 43
+
+  - color: pink
+    fast: true
+    cool: [1, 2, 3]
+
+  - {}
+
+  - fast: true
+    other: stuff
+
+hash-map:
+- "entries"
+- vec:
+    map:
+    - fn (m): merge(defaults m)
+    - entries

@@ -10,14 +10,14 @@ $test_1_simple_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.3',
+                             'version' => '0.4',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
             'error' => undef,
-            'version' => '0.3',
+            'version' => '0.4',
             'parser' => 'Spreadsheet::ReadGnumeric'
           },
           {
@@ -601,7 +601,7 @@ $test_1_simple_no_rc_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.3',
+                             'version' => '0.4',
                              'type' => 'gnumeric'
                            }
                          ],
@@ -609,7 +609,7 @@ $test_1_simple_no_rc_expected
             'type' => 'gnumeric',
             'error' => undef,
             'sheets' => 3,
-            'version' => '0.3'
+            'version' => '0.4'
           },
           {
             'label' => 'Sheet1',
@@ -808,13 +808,13 @@ $test_1_simple_no_cells_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.3',
+                             'version' => '0.4',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
-            'version' => '0.3',
+            'version' => '0.4',
             'error' => undef,
             'parser' => 'Spreadsheet::ReadGnumeric'
           },

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::FieldAttr::LazyInit;
@@ -12,7 +12,7 @@ my $init_called;
 
 class Example
 {
-   has $value :param :reader :writer :LazyInit(_make_value);
+   field $value :param :reader :writer :LazyInit(_make_value);
 
    method _make_value { $init_called++; return 1234 };
 

@@ -1,6 +1,6 @@
 package Lab::Instrument::TDS2024B;
 #ABSTRACT: Tektronix TDS2024B digital oscilloscope
-$Lab::Instrument::TDS2024B::VERSION = '3.872';
+$Lab::Instrument::TDS2024B::VERSION = '3.881';
 use v5.20;
 
 use strict;
@@ -5056,7 +5056,7 @@ Lab::Instrument::TDS2024B - Tektronix TDS2024B digital oscilloscope
 
 =head1 VERSION
 
-version 3.872
+version 3.881
 
 =head1 SYNOPSIS
 

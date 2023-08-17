@@ -4,20 +4,20 @@ author:
   - 'Gabor Szabo'
 build_requires:
   ExtUtils::MakeMaker: 6.59
-  Locale::Msgfmt: 0.15
-  Test::Exception: 0.27
-  Test::MockObject: 1.09
-  Test::More: 0.98
-  Test::NoWarnings: 1.04
-  Test::Script: 1.07
-  Test::Warn: 0.24
+  Locale::Msgfmt: '0.15'
+  Test::Exception: '0.27'
+  Test::MockObject: '1.09'
+  Test::More: '0.98'
+  Test::NoWarnings: '1.04'
+  Test::Script: '1.07'
+  Test::Warn: '0.24'
 configure_requires:
-  Alien::wxWidgets: 0.62
-  ExtUtils::Embed: 1.250601
+  Alien::wxWidgets: '0.62'
+  ExtUtils::Embed: '1.250601'
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.19'
 keywords:
   - auto-completion
   - code
@@ -63,141 +63,991 @@ no_index:
     - share
     - t
     - xt
+provides:
+  Padre:
+    file: lib/Padre.pm
+    version: '1.02'
+  Padre::Autosave:
+    file: lib/Padre/Autosave.pm
+    version: '1.02'
+  Padre::Breakpoints:
+    file: lib/Padre/Breakpoints.pm
+    version: '1.02'
+  Padre::Browser:
+    file: lib/Padre/Browser.pm
+    version: '1.02'
+  Padre::Browser::Document:
+    file: lib/Padre/Browser/Document.pm
+    version: '1.02'
+  Padre::Browser::POD:
+    file: lib/Padre/Browser/POD.pm
+    version: '1.02'
+  Padre::Browser::PseudoPerldoc:
+    file: lib/Padre/Browser/PseudoPerldoc.pm
+    version: '1.02'
+  Padre::CPAN:
+    file: lib/Padre/CPAN.pm
+    version: '1.02'
+  Padre::Cache:
+    file: lib/Padre/Cache.pm
+    version: '1.02'
+  Padre::Command:
+    file: lib/Padre/Command.pm
+    version: '1.02'
+  Padre::Comment:
+    file: lib/Padre/Comment.pm
+    version: '1.02'
+  Padre::Config:
+    file: lib/Padre/Config.pm
+    version: '1.02'
+  Padre::Config::Apply:
+    file: lib/Padre/Config/Apply.pm
+    version: '1.02'
+  Padre::Config::Host:
+    file: lib/Padre/Config/Host.pm
+    version: '1.02'
+  Padre::Config::Human:
+    file: lib/Padre/Config/Human.pm
+    version: '1.02'
+  Padre::Config::Patch:
+    file: lib/Padre/Config/Patch.pm
+    version: '1.02'
+  Padre::Config::Project:
+    file: lib/Padre/Config/Project.pm
+    version: '1.02'
+  Padre::Config::Setting:
+    file: lib/Padre/Config/Setting.pm
+    version: '1.02'
+  Padre::Constant:
+    file: lib/Padre/Constant.pm
+    version: '1.02'
+  Padre::Current:
+    file: lib/Padre/Current.pm
+    version: '1.02'
+  Padre::DB:
+    file: lib/Padre/DB.pm
+    version: '1.02'
+  Padre::DB::Bookmark:
+    file: lib/Padre/DB/Bookmark.pm
+    version: '1.02'
+  Padre::DB::History:
+    file: lib/Padre/DB/History.pm
+    version: '1.02'
+  Padre::DB::HostConfig:
+    file: lib/Padre/DB/HostConfig.pm
+    version: '1.02'
+  Padre::DB::LastPositionInFile:
+    file: lib/Padre/DB/LastPositionInFile.pm
+    version: '1.02'
+  Padre::DB::RecentlyUsed:
+    file: lib/Padre/DB/RecentlyUsed.pm
+    version: '1.02'
+  Padre::DB::Session:
+    file: lib/Padre/DB/Session.pm
+    version: '1.02'
+  Padre::DB::SessionFile:
+    file: lib/Padre/DB/SessionFile.pm
+    version: '1.02'
+  Padre::DB::Timeline:
+    file: lib/Padre/DB/Timeline.pm
+    version: '1.02'
+  Padre::Delta:
+    file: lib/Padre/Delta.pm
+    version: '1.02'
+  Padre::Desktop:
+    file: lib/Padre/Desktop.pm
+    version: '1.02'
+  Padre::Document:
+    file: lib/Padre/Document.pm
+    version: '1.02'
+  Padre::Document::CSharp:
+    file: lib/Padre/Document/CSharp.pm
+    version: '1.02'
+  Padre::Document::CSharp::FunctionList:
+    file: lib/Padre/Document/CSharp/FunctionList.pm
+    version: '1.02'
+  Padre::Document::Java:
+    file: lib/Padre/Document/Java.pm
+    version: '1.02'
+  Padre::Document::Java::FunctionList:
+    file: lib/Padre/Document/Java/FunctionList.pm
+    version: '1.02'
+  Padre::Document::Patch:
+    file: lib/Padre/Document/Patch.pm
+    version: '1.02'
+  Padre::Document::Perl:
+    file: lib/Padre/Document/Perl.pm
+    version: '1.02'
+  Padre::Document::Perl::Autocomplete:
+    file: lib/Padre/Document/Perl/Autocomplete.pm
+    version: '1.02'
+  Padre::Document::Perl::Beginner:
+    file: lib/Padre/Document/Perl/Beginner.pm
+    version: '1.02'
+  Padre::Document::Perl::FunctionList:
+    file: lib/Padre/Document/Perl/FunctionList.pm
+    version: '1.02'
+  Padre::Document::Perl::Help:
+    file: lib/Padre/Document/Perl/Help.pm
+    version: '1.02'
+  Padre::Document::Perl::Lexer:
+    file: lib/Padre/Document/Perl/Lexer.pm
+    version: '1.02'
+  Padre::Document::Perl::Outline:
+    file: lib/Padre/Document/Perl/Outline.pm
+    version: '1.02'
+  Padre::Document::Perl::PPILexer:
+    file: lib/Padre/Document/Perl/PPILexer.pm
+    version: '1.02'
+  Padre::Document::Perl::QuickFix:
+    file: lib/Padre/Document/Perl/QuickFix.pm
+    version: '1.02'
+  Padre::Document::Perl::QuickFix::IncludeModule:
+    file: lib/Padre/Document/Perl/QuickFix/IncludeModule.pm
+    version: '1.02'
+  Padre::Document::Perl::QuickFix::StrictWarnings:
+    file: lib/Padre/Document/Perl/QuickFix/StrictWarnings.pm
+    version: '1.02'
+  Padre::Document::Perl::Starter:
+    file: lib/Padre/Document/Perl/Starter.pm
+    version: '1.02'
+  Padre::Document::Perl::Starter::Style:
+    file: lib/Padre/Document/Perl/Starter/Style.pm
+    version: '1.02'
+  Padre::Document::Perl::Syntax:
+    file: lib/Padre/Document/Perl/Syntax.pm
+    version: '1.02'
+  Padre::Document::Python:
+    file: lib/Padre/Document/Python.pm
+    version: '1.02'
+  Padre::Document::Python::FunctionList:
+    file: lib/Padre/Document/Python/FunctionList.pm
+    version: '1.02'
+  Padre::Document::Ruby:
+    file: lib/Padre/Document/Ruby.pm
+    version: '1.02'
+  Padre::Document::Ruby::FunctionList:
+    file: lib/Padre/Document/Ruby/FunctionList.pm
+    version: '1.02'
+  Padre::Feature:
+    file: lib/Padre/Feature.pm
+    version: '1.02'
+  Padre::File:
+    file: lib/Padre/File.pm
+    version: '1.02'
+  Padre::File::FTP:
+    file: lib/Padre/File/FTP.pm
+    version: '1.02'
+  Padre::File::HTTP:
+    file: lib/Padre/File/HTTP.pm
+    version: '1.02'
+  Padre::File::Local:
+    file: lib/Padre/File/Local.pm
+    version: '1.02'
+  Padre::Help:
+    file: lib/Padre/Help.pm
+    version: '1.02'
+  Padre::Locale:
+    file: lib/Padre/Locale.pm
+    version: '1.02'
+  Padre::Locale::Format:
+    file: lib/Padre/Locale/Format.pm
+    version: '1.02'
+  Padre::Locale::T:
+    file: lib/Padre/Locale/T.pm
+    version: '1.02'
+  Padre::Lock:
+    file: lib/Padre/Lock.pm
+    version: '1.02'
+  Padre::Locker:
+    file: lib/Padre/Locker.pm
+    version: '1.02'
+  Padre::Logger:
+    file: lib/Padre/Logger.pm
+    version: '1.02'
+  Padre::MIME:
+    file: lib/Padre/MIME.pm
+    version: '1.02'
+  Padre::PPI:
+    file: lib/Padre/PPI.pm
+    version: '1.02'
+  Padre::PPI::EndifyPod:
+    file: lib/Padre/PPI/EndifyPod.pm
+    version: '1.02'
+  Padre::PPI::Transform:
+    file: lib/Padre/PPI/Transform.pm
+    version: '1.02'
+  Padre::PPI::UpdateCopyright:
+    file: lib/Padre/PPI/UpdateCopyright.pm
+    version: '1.02'
+  Padre::Perl:
+    file: lib/Padre/Perl.pm
+    version: '1.02'
+  Padre::Plugin:
+    file: lib/Padre/Plugin.pm
+    version: '1.02'
+  Padre::Plugin::Devel:
+    file: lib/Padre/Plugin/Devel.pm
+    version: '1.02'
+  Padre::Plugin::My:
+    file: lib/Padre/Plugin/My.pm
+    version: '1.02'
+  Padre::Plugin::PopularityContest:
+    file: lib/Padre/Plugin/PopularityContest.pm
+    version: '1.02'
+  Padre::Plugin::PopularityContest::Ping:
+    file: lib/Padre/Plugin/PopularityContest/Ping.pm
+    version: '1.02'
+  Padre::PluginBuilder:
+    file: lib/Padre/PluginBuilder.pm
+    version: '1.02'
+  Padre::PluginHandle:
+    file: lib/Padre/PluginHandle.pm
+    version: '1.02'
+  Padre::PluginManager:
+    file: lib/Padre/PluginManager.pm
+    version: '1.02'
+  Padre::Pod2HTML:
+    file: lib/Padre/Pod2HTML.pm
+    version: '1.02'
+  Padre::Portable:
+    file: lib/Padre/Portable.pm
+    version: '1.02'
+  Padre::Project:
+    file: lib/Padre/Project.pm
+    version: '1.02'
+  Padre::Project::Null:
+    file: lib/Padre/Project/Null.pm
+    version: '1.02'
+  Padre::Project::Perl:
+    file: lib/Padre/Project/Perl.pm
+    version: '1.02'
+  Padre::Project::Perl::DZ:
+    file: lib/Padre/Project/Perl/DZ.pm
+    version: '1.02'
+  Padre::Project::Perl::EUMM:
+    file: lib/Padre/Project/Perl/EUMM.pm
+    version: '1.02'
+  Padre::Project::Perl::MB:
+    file: lib/Padre/Project/Perl/MB.pm
+    version: '1.02'
+  Padre::Project::Perl::MI:
+    file: lib/Padre/Project/Perl/MI.pm
+    version: '1.02'
+  Padre::Project::Perl::Temp:
+    file: lib/Padre/Project/Perl/Temp.pm
+    version: '1.02'
+  Padre::Project::Temp:
+    file: lib/Padre/Project/Temp.pm
+    version: '1.02'
+  Padre::ProjectManager:
+    file: lib/Padre/ProjectManager.pm
+    version: '1.02'
+  Padre::QuickFix:
+    file: lib/Padre/QuickFix.pm
+    version: '1.02'
+  Padre::Role::PubSub:
+    file: lib/Padre/Role/PubSub.pm
+    version: '1.02'
+  Padre::Role::Task:
+    file: lib/Padre/Role/Task.pm
+    version: '1.02'
+  Padre::SLOC:
+    file: lib/Padre/SLOC.pm
+    version: '1.02'
+  Padre::SVN:
+    file: lib/Padre/SVN.pm
+    version: '1.02'
+  Padre::Search:
+    file: lib/Padre/Search.pm
+    version: '1.02'
+  Padre::ServerManager:
+    file: lib/Padre/ServerManager.pm
+    version: '1.02'
+  Padre::Startup:
+    file: lib/Padre/Startup.pm
+    version: '1.02'
+  Padre::Sync:
+    file: lib/Padre/Sync.pm
+    version: '1.02'
+  Padre::Task:
+    file: lib/Padre/Task.pm
+    version: '1.02'
+  Padre::Task::Addition:
+    file: lib/Padre/Task/Addition.pm
+    version: '1.02'
+  Padre::Task::BackupUnsaved:
+    file: lib/Padre/Task/BackupUnsaved.pm
+    version: '1.02'
+  Padre::Task::Browser:
+    file: lib/Padre/Task/Browser.pm
+    version: '1.02'
+  Padre::Task::CPAN:
+    file: lib/Padre/Task/CPAN.pm
+    version: '1.02'
+  Padre::Task::Diff:
+    file: lib/Padre/Task/Diff.pm
+    version: '1.02'
+  Padre::Task::Eval:
+    file: lib/Padre/Task/Eval.pm
+    version: '1.02'
+  Padre::Task::File:
+    file: lib/Padre/Task/File.pm
+    version: '1.02'
+  Padre::Task::FindInFiles:
+    file: lib/Padre/Task/FindInFiles.pm
+    version: '1.02'
+  Padre::Task::FindUnmatchedBrace:
+    file: lib/Padre/Task/FindUnmatchedBrace.pm
+    version: '1.02'
+  Padre::Task::FindVariableDeclaration:
+    file: lib/Padre/Task/FindVariableDeclaration.pm
+    version: '1.02'
+  Padre::Task::FunctionList:
+    file: lib/Padre/Task/FunctionList.pm
+    version: '1.02'
+  Padre::Task::IntroduceTemporaryVariable:
+    file: lib/Padre/Task/IntroduceTemporaryVariable.pm
+    version: '1.02'
+  Padre::Task::LWP:
+    file: lib/Padre/Task/LWP.pm
+    version: '1.02'
+  Padre::Task::LaunchDefaultBrowser:
+    file: lib/Padre/Task/LaunchDefaultBrowser.pm
+    version: '1.02'
+  Padre::Task::LexicalReplaceVariable:
+    file: lib/Padre/Task/LexicalReplaceVariable.pm
+    version: '1.02'
+  Padre::Task::OpenResource:
+    file: lib/Padre/Task/OpenResource.pm
+    version: '1.02'
+  Padre::Task::Outline:
+    file: lib/Padre/Task/Outline.pm
+    version: '1.02'
+  Padre::Task::PPI:
+    file: lib/Padre/Task/PPI.pm
+    version: '1.02'
+  Padre::Task::Pod2HTML:
+    file: lib/Padre/Task/Pod2HTML.pm
+    version: '1.02'
+  Padre::Task::RecentFiles:
+    file: lib/Padre/Task/RecentFiles.pm
+    version: '1.02'
+  Padre::Task::ReplaceInFiles:
+    file: lib/Padre/Task/ReplaceInFiles.pm
+    version: '1.02'
+  Padre::Task::Run:
+    file: lib/Padre/Task/Run.pm
+    version: '1.02'
+  Padre::Task::SLOC:
+    file: lib/Padre/Task/SLOC.pm
+    version: '1.02'
+  Padre::Task::Syntax:
+    file: lib/Padre/Task/Syntax.pm
+    version: '1.02'
+  Padre::Task::Transform:
+    file: lib/Padre/Task/Transform.pm
+    version: '1.02'
+  Padre::Task::VCS:
+    file: lib/Padre/Task/VCS.pm
+    version: '1.02'
+  Padre::TaskHandle:
+    file: lib/Padre/TaskHandle.pm
+    version: '1.02'
+  Padre::TaskManager:
+    file: lib/Padre/TaskManager.pm
+    version: '1.02'
+  Padre::TaskQueue:
+    file: lib/Padre/TaskQueue.pm
+    version: '1.02'
+  Padre::TaskWorker:
+    file: lib/Padre/TaskWorker.pm
+    version: '1.02'
+  Padre::Template:
+    file: lib/Padre/Template.pm
+    version: '1.02'
+  Padre::Test:
+    file: lib/Padre/Test.pm
+    version: '1.02'
+  Padre::Transform:
+    file: lib/Padre/Transform.pm
+    version: '1.02'
+  Padre::Unload:
+    file: lib/Padre/Unload.pm
+    version: '1.02'
+  Padre::Util:
+    file: lib/Padre/Util.pm
+    version: '1.02'
+  Padre::Util::CommandLine:
+    file: lib/Padre/Util/CommandLine.pm
+    version: '1.02'
+  Padre::Util::FileBrowser:
+    file: lib/Padre/Util/FileBrowser.pm
+    version: '1.02'
+  Padre::Util::SVN:
+    file: lib/Padre/Util/SVN.pm
+    version: '1.02'
+  Padre::Util::Win32:
+    file: lib/Padre/Util/Win32.pm
+    version: '1.02'
+  Padre::Wx:
+    file: lib/Padre/Wx.pm
+    version: '1.02'
+  Padre::Wx::Action:
+    file: lib/Padre/Wx/Action.pm
+    version: '1.02'
+  Padre::Wx::ActionLibrary:
+    file: lib/Padre/Wx/ActionLibrary.pm
+    version: '1.02'
+  Padre::Wx::ActionQueue:
+    file: lib/Padre/Wx/ActionQueue.pm
+    version: '1.02'
+  Padre::Wx::App:
+    file: lib/Padre/Wx/App.pm
+    version: '1.02'
+  Padre::Wx::AuiManager:
+    file: lib/Padre/Wx/AuiManager.pm
+    version: '1.02'
+  Padre::Wx::Bottom:
+    file: lib/Padre/Wx/Bottom.pm
+    version: '1.02'
+  Padre::Wx::Browser:
+    file: lib/Padre/Wx/Browser.pm
+    version: '1.02'
+  Padre::Wx::CPAN:
+    file: lib/Padre/Wx/CPAN.pm
+    version: '1.02'
+  Padre::Wx::CPAN::Listview:
+    file: lib/Padre/Wx/CPAN/Listview.pm
+    version: '1.02'
+  Padre::Wx::Choice::Files:
+    file: lib/Padre/Wx/Choice/Files.pm
+    version: '1.02'
+  Padre::Wx::Choice::Theme:
+    file: lib/Padre/Wx/Choice/Theme.pm
+    version: '1.02'
+  Padre::Wx::ComboBox::FindTerm:
+    file: lib/Padre/Wx/ComboBox/FindTerm.pm
+    version: '1.02'
+  Padre::Wx::ComboBox::History:
+    file: lib/Padre/Wx/ComboBox/History.pm
+    version: '1.02'
+  Padre::Wx::Command:
+    file: lib/Padre/Wx/Command.pm
+    version: '1.02'
+  Padre::Wx::Constant:
+    file: lib/Padre/Wx/Constant.pm
+    version: '1.02'
+  Padre::Wx::Dialog::About:
+    file: lib/Padre/Wx/Dialog/About.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Advanced:
+    file: lib/Padre/Wx/Dialog/Advanced.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Bookmarks:
+    file: lib/Padre/Wx/Dialog/Bookmarks.pm
+    version: '1.02'
+  Padre::Wx::Dialog::DebugOptions:
+    file: lib/Padre/Wx/Dialog/DebugOptions.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Diff:
+    file: lib/Padre/Wx/Dialog/Diff.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Document:
+    file: lib/Padre/Wx/Dialog/Document.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Expression:
+    file: lib/Padre/Wx/Dialog/Expression.pm
+    version: '1.02'
+  Padre::Wx::Dialog::FilterTool:
+    file: lib/Padre/Wx/Dialog/FilterTool.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Find:
+    file: lib/Padre/Wx/Dialog/Find.pm
+    version: '1.02'
+  Padre::Wx::Dialog::FindInFiles:
+    file: lib/Padre/Wx/Dialog/FindInFiles.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Form:
+    file: lib/Padre/Wx/Dialog/Form.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Goto:
+    file: lib/Padre/Wx/Dialog/Goto.pm
+    version: '1.02'
+  Padre::Wx::Dialog::HelpSearch:
+    file: lib/Padre/Wx/Dialog/HelpSearch.pm
+    version: '1.02'
+  Padre::Wx::Dialog::ModuleStarter:
+    file: lib/Padre/Wx/Dialog/ModuleStarter.pm
+    version: '1.02'
+  Padre::Wx::Dialog::OpenResource:
+    file: lib/Padre/Wx/Dialog/OpenResource.pm
+    version: '1.02'
+  Padre::Wx::Dialog::OpenURL:
+    file: lib/Padre/Wx/Dialog/OpenURL.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Patch:
+    file: lib/Padre/Wx/Dialog/Patch.pm
+    version: '1.02'
+  Padre::Wx::Dialog::PerlFilter:
+    file: lib/Padre/Wx/Dialog/PerlFilter.pm
+    version: '1.02'
+  Padre::Wx::Dialog::PluginManager:
+    file: lib/Padre/Wx/Dialog/PluginManager.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Positions:
+    file: lib/Padre/Wx/Dialog/Positions.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Preferences:
+    file: lib/Padre/Wx/Dialog/Preferences.pm
+    version: '1.02'
+  Padre::Wx::Dialog::QuickMenuAccess:
+    file: lib/Padre/Wx/Dialog/QuickMenuAccess.pm
+    version: '1.02'
+  Padre::Wx::Dialog::RefactorSelectFunction:
+    file: lib/Padre/Wx/Dialog/RefactorSelectFunction.pm
+    version: '1.02'
+  Padre::Wx::Dialog::RegexEditor:
+    file: lib/Padre/Wx/Dialog/RegexEditor.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Replace:
+    file: lib/Padre/Wx/Dialog/Replace.pm
+    version: '1.02'
+  Padre::Wx::Dialog::ReplaceInFiles:
+    file: lib/Padre/Wx/Dialog/ReplaceInFiles.pm
+    version: '1.02'
+  Padre::Wx::Dialog::SLOC:
+    file: lib/Padre/Wx/Dialog/SLOC.pm
+    version: '1.02'
+  Padre::Wx::Dialog::SessionManager:
+    file: lib/Padre/Wx/Dialog/SessionManager.pm
+    version: '1.02'
+  Padre::Wx::Dialog::SessionManager2:
+    file: lib/Padre/Wx/Dialog/SessionManager2.pm
+    version: '1.02'
+  Padre::Wx::Dialog::SessionSave:
+    file: lib/Padre/Wx/Dialog/SessionSave.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Shortcut:
+    file: lib/Padre/Wx/Dialog/Shortcut.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Snippet:
+    file: lib/Padre/Wx/Dialog/Snippet.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Special:
+    file: lib/Padre/Wx/Dialog/Special.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Sync:
+    file: lib/Padre/Wx/Dialog/Sync.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Text:
+    file: lib/Padre/Wx/Dialog/Text.pm
+    version: '1.02'
+  Padre::Wx::Dialog::Warning:
+    file: lib/Padre/Wx/Dialog/Warning.pm
+    version: '1.02'
+  Padre::Wx::Dialog::WhereFrom:
+    file: lib/Padre/Wx/Dialog/WhereFrom.pm
+    version: '1.02'
+  Padre::Wx::Dialog::WindowList:
+    file: lib/Padre/Wx/Dialog/WindowList.pm
+    version: '1.02'
+  Padre::Wx::Diff:
+    file: lib/Padre/Wx/Diff.pm
+    version: '1.02'
+  Padre::Wx::Diff2:
+    file: lib/Padre/Wx/Diff2.pm
+    version: '1.02'
+  Padre::Wx::Directory:
+    file: lib/Padre/Wx/Directory.pm
+    version: '1.02'
+  Padre::Wx::Directory::Browse:
+    file: lib/Padre/Wx/Directory/Browse.pm
+    version: '1.02'
+  Padre::Wx::Directory::Path:
+    file: lib/Padre/Wx/Directory/Path.pm
+    version: '1.02'
+  Padre::Wx::Directory::Search:
+    file: lib/Padre/Wx/Directory/Search.pm
+    version: '1.02'
+  Padre::Wx::Directory::TreeCtrl:
+    file: lib/Padre/Wx/Directory/TreeCtrl.pm
+    version: '1.02'
+  Padre::Wx::Display:
+    file: lib/Padre/Wx/Display.pm
+    version: '1.02'
+  Padre::Wx::Editor:
+    file: lib/Padre/Wx/Editor.pm
+    version: '1.02'
+  Padre::Wx::Editor::Lock:
+    file: lib/Padre/Wx/Editor/Lock.pm
+    version: '1.02'
+  Padre::Wx::Editor::Menu:
+    file: lib/Padre/Wx/Editor/Menu.pm
+    version: '1.02'
+  Padre::Wx::FBP::About:
+    file: lib/Padre/Wx/FBP/About.pm
+    version: '1.02'
+  Padre::Wx::FBP::Bookmarks:
+    file: lib/Padre/Wx/FBP/Bookmarks.pm
+    version: '1.02'
+  Padre::Wx::FBP::Breakpoints:
+    file: lib/Padre/Wx/FBP/Breakpoints.pm
+    version: '1.02'
+  Padre::Wx::FBP::CPAN:
+    file: lib/Padre/Wx/FBP/CPAN.pm
+    version: '1.02'
+  Padre::Wx::FBP::DebugOptions:
+    file: lib/Padre/Wx/FBP/DebugOptions.pm
+    version: '1.02'
+  Padre::Wx::FBP::DebugOutput:
+    file: lib/Padre/Wx/FBP/DebugOutput.pm
+    version: '1.02'
+  Padre::Wx::FBP::Debugger:
+    file: lib/Padre/Wx/FBP/Debugger.pm
+    version: '1.02'
+  Padre::Wx::FBP::Diff:
+    file: lib/Padre/Wx/FBP/Diff.pm
+    version: '1.02'
+  Padre::Wx::FBP::Document:
+    file: lib/Padre/Wx/FBP/Document.pm
+    version: '1.02'
+  Padre::Wx::FBP::Expression:
+    file: lib/Padre/Wx/FBP/Expression.pm
+    version: '1.02'
+  Padre::Wx::FBP::Find:
+    file: lib/Padre/Wx/FBP/Find.pm
+    version: '1.02'
+  Padre::Wx::FBP::FindFast:
+    file: lib/Padre/Wx/FBP/FindFast.pm
+    version: '1.02'
+  Padre::Wx::FBP::FindInFiles:
+    file: lib/Padre/Wx/FBP/FindInFiles.pm
+    version: '1.02'
+  Padre::Wx::FBP::FoundInFiles:
+    file: lib/Padre/Wx/FBP/FoundInFiles.pm
+    version: '1.02'
+  Padre::Wx::FBP::ModuleStarter:
+    file: lib/Padre/Wx/FBP/ModuleStarter.pm
+    version: '1.02'
+  Padre::Wx::FBP::Outline:
+    file: lib/Padre/Wx/FBP/Outline.pm
+    version: '1.02'
+  Padre::Wx::FBP::POD:
+    file: lib/Padre/Wx/FBP/POD.pm
+    version: '1.02'
+  Padre::Wx::FBP::Patch:
+    file: lib/Padre/Wx/FBP/Patch.pm
+    version: '1.02'
+  Padre::Wx::FBP::PluginManager:
+    file: lib/Padre/Wx/FBP/PluginManager.pm
+    version: '1.02'
+  Padre::Wx::FBP::Preferences:
+    file: lib/Padre/Wx/FBP/Preferences.pm
+    version: '1.02'
+  Padre::Wx::FBP::Replace:
+    file: lib/Padre/Wx/FBP/Replace.pm
+    version: '1.02'
+  Padre::Wx::FBP::ReplaceInFiles:
+    file: lib/Padre/Wx/FBP/ReplaceInFiles.pm
+    version: '1.02'
+  Padre::Wx::FBP::SLOC:
+    file: lib/Padre/Wx/FBP/SLOC.pm
+    version: '1.02'
+  Padre::Wx::FBP::SessionManager:
+    file: lib/Padre/Wx/FBP/SessionManager.pm
+    version: '1.02'
+  Padre::Wx::FBP::Snippet:
+    file: lib/Padre/Wx/FBP/Snippet.pm
+    version: '1.02'
+  Padre::Wx::FBP::Special:
+    file: lib/Padre/Wx/FBP/Special.pm
+    version: '1.02'
+  Padre::Wx::FBP::Sync:
+    file: lib/Padre/Wx/FBP/Sync.pm
+    version: '1.02'
+  Padre::Wx::FBP::Syntax:
+    file: lib/Padre/Wx/FBP/Syntax.pm
+    version: '1.02'
+  Padre::Wx::FBP::TaskList:
+    file: lib/Padre/Wx/FBP/TaskList.pm
+    version: '1.02'
+  Padre::Wx::FBP::Text:
+    file: lib/Padre/Wx/FBP/Text.pm
+    version: '1.02'
+  Padre::Wx::FBP::VCS:
+    file: lib/Padre/Wx/FBP/VCS.pm
+    version: '1.02'
+  Padre::Wx::FBP::WhereFrom:
+    file: lib/Padre/Wx/FBP/WhereFrom.pm
+    version: '1.02'
+  Padre::Wx::FileDropTarget:
+    file: lib/Padre/Wx/FileDropTarget.pm
+    version: '1.02'
+  Padre::Wx::Frame::HTML:
+    file: lib/Padre/Wx/Frame/HTML.pm
+    version: '1.02'
+  Padre::Wx::Frame::Null:
+    file: lib/Padre/Wx/Frame/Null.pm
+    version: '1.02'
+  Padre::Wx::Frame::POD:
+    file: lib/Padre/Wx/Frame/POD.pm
+    version: '1.02'
+  Padre::Wx::FunctionList:
+    file: lib/Padre/Wx/FunctionList.pm
+    version: '1.02'
+  Padre::Wx::HtmlWindow:
+    file: lib/Padre/Wx/HtmlWindow.pm
+    version: '1.02'
+  Padre::Wx::Icon:
+    file: lib/Padre/Wx/Icon.pm
+    version: '1.02'
+  Padre::Wx::Left:
+    file: lib/Padre/Wx/Left.pm
+    version: '1.02'
+  Padre::Wx::ListView:
+    file: lib/Padre/Wx/ListView.pm
+    version: '1.02'
+  Padre::Wx::Main:
+    file: lib/Padre/Wx/Main.pm
+    version: '1.02'
+  Padre::Wx::Menu:
+    file: lib/Padre/Wx/Menu.pm
+    version: '1.02'
+  Padre::Wx::Menu::Debug:
+    file: lib/Padre/Wx/Menu/Debug.pm
+    version: '1.02'
+  Padre::Wx::Menu::Edit:
+    file: lib/Padre/Wx/Menu/Edit.pm
+    version: '1.02'
+  Padre::Wx::Menu::File:
+    file: lib/Padre/Wx/Menu/File.pm
+    version: '1.02'
+  Padre::Wx::Menu::Help:
+    file: lib/Padre/Wx/Menu/Help.pm
+    version: '1.02'
+  Padre::Wx::Menu::Perl:
+    file: lib/Padre/Wx/Menu/Perl.pm
+    version: '1.02'
+  Padre::Wx::Menu::Refactor:
+    file: lib/Padre/Wx/Menu/Refactor.pm
+    version: '1.02'
+  Padre::Wx::Menu::Run:
+    file: lib/Padre/Wx/Menu/Run.pm
+    version: '1.02'
+  Padre::Wx::Menu::Search:
+    file: lib/Padre/Wx/Menu/Search.pm
+    version: '1.02'
+  Padre::Wx::Menu::Tools:
+    file: lib/Padre/Wx/Menu/Tools.pm
+    version: '1.02'
+  Padre::Wx::Menu::View:
+    file: lib/Padre/Wx/Menu/View.pm
+    version: '1.02'
+  Padre::Wx::Menu::Window:
+    file: lib/Padre/Wx/Menu/Window.pm
+    version: '1.02'
+  Padre::Wx::Menubar:
+    file: lib/Padre/Wx/Menubar.pm
+    version: '1.02'
+  Padre::Wx::Notebook:
+    file: lib/Padre/Wx/Notebook.pm
+    version: '1.02'
+  Padre::Wx::Nth:
+    file: lib/Padre/Wx/Nth.pm
+    version: '1.02'
+  Padre::Wx::Outline:
+    file: lib/Padre/Wx/Outline.pm
+    version: '1.02'
+  Padre::Wx::Output:
+    file: lib/Padre/Wx/Output.pm
+    version: '1.02'
+  Padre::Wx::Panel::Breakpoints:
+    file: lib/Padre/Wx/Panel/Breakpoints.pm
+    version: '1.02'
+  Padre::Wx::Panel::DebugOutput:
+    file: lib/Padre/Wx/Panel/DebugOutput.pm
+    version: '1.02'
+  Padre::Wx::Panel::Debugger:
+    file: lib/Padre/Wx/Panel/Debugger.pm
+    version: '1.02'
+  Padre::Wx::Panel::FindFast:
+    file: lib/Padre/Wx/Panel/FindFast.pm
+    version: '1.02'
+  Padre::Wx::Panel::FoundInFiles:
+    file: lib/Padre/Wx/Panel/FoundInFiles.pm
+    version: '1.02'
+  Padre::Wx::Panel::TaskList:
+    file: lib/Padre/Wx/Panel/TaskList.pm
+    version: '1.02'
+  Padre::Wx::Popup:
+    file: lib/Padre/Wx/Popup.pm
+    version: '1.02'
+  Padre::Wx::Printout:
+    file: lib/Padre/Wx/Printout.pm
+    version: '1.02'
+  Padre::Wx::Progress:
+    file: lib/Padre/Wx/Progress.pm
+    version: '1.02'
+  Padre::Wx::ReplaceInFiles:
+    file: lib/Padre/Wx/ReplaceInFiles.pm
+    version: '1.02'
+  Padre::Wx::Right:
+    file: lib/Padre/Wx/Right.pm
+    version: '1.02'
+  Padre::Wx::Role::Conduit:
+    file: lib/Padre/Wx/Role/Conduit.pm
+    version: '1.02'
+  Padre::Wx::Role::Config:
+    file: lib/Padre/Wx/Role/Config.pm
+    version: '1.02'
+  Padre::Wx::Role::Context:
+    file: lib/Padre/Wx/Role/Context.pm
+    version: '1.02'
+  Padre::Wx::Role::Dialog:
+    file: lib/Padre/Wx/Role/Dialog.pm
+    version: '1.02'
+  Padre::Wx::Role::Idle:
+    file: lib/Padre/Wx/Role/Idle.pm
+    version: '1.02'
+  Padre::Wx::Role::Main:
+    file: lib/Padre/Wx/Role/Main.pm
+    version: '1.02'
+  Padre::Wx::Role::Timer:
+    file: lib/Padre/Wx/Role/Timer.pm
+    version: '1.02'
+  Padre::Wx::Role::View:
+    file: lib/Padre/Wx/Role/View.pm
+    version: '1.02'
+  Padre::Wx::Scintilla:
+    file: lib/Padre/Wx/Scintilla.pm
+    version: '1.02'
+  Padre::Wx::ScrollLock:
+    file: lib/Padre/Wx/ScrollLock.pm
+    version: '1.02'
+  Padre::Wx::SelectionLock:
+    file: lib/Padre/Wx/SelectionLock.pm
+    version: '1.02'
+  Padre::Wx::StatusBar:
+    file: lib/Padre/Wx/StatusBar.pm
+    version: '1.02'
+  Padre::Wx::Style:
+    file: lib/Padre/Wx/Style.pm
+    version: '1.02'
+  Padre::Wx::Syntax:
+    file: lib/Padre/Wx/Syntax.pm
+    version: '1.02'
+  Padre::Wx::TaskList:
+    file: lib/Padre/Wx/TaskList.pm
+    version: '1.02'
+  Padre::Wx::TextEntryDialog::History:
+    file: lib/Padre/Wx/TextEntryDialog/History.pm
+    version: '1.02'
+  Padre::Wx::Theme:
+    file: lib/Padre/Wx/Theme.pm
+    version: '1.02'
+  Padre::Wx::ToolBar:
+    file: lib/Padre/Wx/ToolBar.pm
+    version: '1.02'
+  Padre::Wx::TreeCtrl:
+    file: lib/Padre/Wx/TreeCtrl.pm
+    version: '1.02'
+  Padre::Wx::Util:
+    file: lib/Padre/Wx/Util.pm
+    version: '1.02'
+  Padre::Wx::VCS:
+    file: lib/Padre/Wx/VCS.pm
+    version: '1.02'
 requires:
-  Algorithm::Diff: 1.19
-  App::cpanminus: 0.9923
+  Algorithm::Diff: '1.19'
+  App::cpanminus: '0.9923'
   B::Deparse: 0
-  CGI: 3.47
-  Capture::Tiny: 0.06
-  Class::Adapter: 1.05
-  Class::Inspector: 1.22
-  Class::XSAccessor: 1.13
-  Cwd: 3.2701
-  DBD::SQLite: 1.35
-  DBI: 1.58
-  Data::Dumper: 2.101
-  Debug::Client: 0.29
-  Devel::Dumpvar: 0.04
-  Devel::Refactor: 0.05
-  Encode: 2.26
-  ExtUtils::MakeMaker: 6.56
-  ExtUtils::Manifest: 1.56
+  CGI: '3.47'
+  Capture::Tiny: '0.06'
+  Class::Adapter: '1.05'
+  Class::Inspector: '1.22'
+  Class::XSAccessor: '1.13'
+  Cwd: '3.2701'
+  DBD::SQLite: '1.35'
+  DBI: '1.58'
+  Data::Dumper: '2.101'
+  Debug::Client: '0.29'
+  Devel::Dumpvar: '0.04'
+  Devel::Refactor: '0.05'
+  Encode: '2.26'
+  ExtUtils::MakeMaker: '6.56'
+  ExtUtils::Manifest: '1.56'
   File::Basename: 0
-  File::Copy::Recursive: 0.37
-  File::Find::Rule: 0.30
+  File::Copy::Recursive: '0.37'
+  File::Find::Rule: '0.30'
   File::Glob: 0
-  File::HomeDir: 0.91
-  File::Path: 2.08
-  File::Remove: 1.40
-  File::ShareDir: 1.00
-  File::Spec: 3.2701
-  File::Spec::Functions: 3.2701
-  File::Temp: 0.20
-  File::Which: 1.08
-  File::pushd: 1.00
+  File::HomeDir: '0.91'
+  File::Path: '2.08'
+  File::Remove: '1.40'
+  File::ShareDir: '1.00'
+  File::Spec: '3.2701'
+  File::Spec::Functions: '3.2701'
+  File::Temp: '0.20'
+  File::Which: '1.08'
+  File::pushd: '1.00'
   FindBin: 0
   Getopt::Long: 0
-  HTML::Entities: 3.57
-  HTML::Parser: 3.58
-  IO::Scalar: 2.110
-  IO::Socket: 1.30
-  IO::String: 1.08
+  HTML::Entities: '3.57'
+  HTML::Parser: '3.58'
+  IO::Scalar: '2.110'
+  IO::Socket: '1.30'
+  IO::String: '1.08'
   IPC::Open2: 0
   IPC::Open3: 0
-  IPC::Run: 0.83
-  JSON::XS: 2.29
-  LWP: 5.815
-  LWP::UserAgent: 5.815
-  List::MoreUtils: 0.22
-  List::Util: 1.18
-  Module::Build: 0.3603
-  Module::CoreList: 2.22
-  Module::Manifest: 0.07
-  Module::Starter: 1.60
-  ORLite: 1.98
-  ORLite::Migrate: 1.10
-  POD2::Base: 0.043
+  IPC::Run: '0.83'
+  JSON::XS: '2.29'
+  LWP: '5.815'
+  LWP::UserAgent: '5.815'
+  List::MoreUtils: '0.22'
+  List::Util: '1.18'
+  Module::Build: '0.3603'
+  Module::CoreList: '2.22'
+  Module::Manifest: '0.07'
+  Module::Starter: '1.60'
+  ORLite: '1.98'
+  ORLite::Migrate: '1.10'
+  POD2::Base: '0.043'
   POSIX: 0
-  PPI: 1.215
-  PPIx::EditorTools: 0.18
-  PPIx::Regexp: 0.011
-  Params::Util: 0.33
-  Parse::ErrorString::Perl: 0.18
-  Parse::ExuberantCTags: 1.00
-  Pod::Abstract: 0.16
+  PPI: '1.218'
+  PPIx::EditorTools: '0.18'
+  PPIx::Regexp: '0.011'
+  Params::Util: '0.33'
+  Parse::ErrorString::Perl: '0.18'
+  Parse::ExuberantCTags: '1.00'
+  Parse::Functions: '0.01'
+  Pod::Abstract: '0.16'
   Pod::Functions: 0
-  Pod::POM: 0.17
-  Pod::Perldoc: 3.15
-  Pod::Simple: 3.07
-  Pod::Simple::XHTML: 3.04
-  Probe::Perl: 0.01
-  Sort::Versions: 1.5
-  Storable: 2.16
-  Template::Tiny: 0.11
+  Pod::POM: '0.17'
+  Pod::Perldoc: '3.23'
+  Pod::Simple: '3.07'
+  Pod::Simple::XHTML: '3.04'
+  Probe::Perl: '0.01'
+  Sort::Versions: '1.5'
+  Storable: '2.16'
+  Template::Tiny: '0.11'
   Term::ReadLine: 0
-  Text::Balanced: 2.01
-  Text::Diff: 1.41
-  Text::FindIndent: 0.10
-  Text::Patch: 1.8
-  Time::HiRes: 1.9718
+  Text::Balanced: '2.01'
+  Text::Diff: '1.41'
+  Text::FindIndent: '0.10'
+  Text::Patch: '1.8'
+  Time::HiRes: '1.9718'
   URI: 0
-  Wx: 0.9916
-  Wx::Perl::ProcessStream: 0.32
-  Wx::Scintilla: 0.39
-  YAML::Tiny: 1.32
-  perl: 5.011000
-  threads: 1.71
-  threads::shared: 1.33
-  version: 0.80
+  Wx: '0.9916'
+  Wx::Perl::ProcessStream: '0.32'
+  Wx::Scintilla: '0.39'
+  YAML::Tiny: '1.32'
+  perl: '5.011000'
+  threads: '1.71'
+  threads::shared: '1.33'
+  version: '0.80'
 resources:
   bugtracker: http://padre.perlide.org/trac/
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
-  repository: http://svn.perlide.org/padre/trunk/Padre/
-version: 1.00
-x_contributors:
-  - 'Aaron Trevena (TEEJAY)'
-  - 'Adam Kennedy (ADAMK) <adamk@cpan.org>'
-  - 'Ahmad Zawawi أحمد محمد زواوي (AZAWAWI)'
-  - 'Andrew Shitov'
-  - 'Alexandr Ciornii (CHORNY)'
-  - 'Amir E. Aharoni - אמיר א. אהרוני'
-  - 'Blake Willmarth (BLAKEW)'
-  - 'BlueT - Matthew Lien - 練喆明 (BLUET) <bluet@cpan.org>'
-  - 'Breno G. de Oliveira (GARU)'
-  - 'Brian Cassidy (BRICAS)'
-  - 'Burak Gürsoy (BURAK) <burak@cpan.org>'
-  - 'Cezary Morga (THEREK) <cm@therek.net>'
-  - 'Chris Dolan (CHRISDOLAN)'
-  - 'Claudio Ramirez (NXADM) <nxadm@cpan.org>'
-  - 'Dirk De Nijs (ddn123456)'
-  - 'Enrique Nell (ENELL)'
-  - 'Fayland Lam (FAYLAND) <fayland@gmail.com>'
-  - 'Gabriel Vieira (GABRIELMAD)'
-  - 'Gábor Szabó - גאבור סבו (SZABGAB) <szabgab@cpan.org>'
-  - 'György Pásztor (GYU)'
-  - 'Heiko Jansen (HJANSEN) <heiko_jansen@web.de>'
-  - 'Jérôme Quelin (JQUELIN) <jquelin@cpan.org>'
-  - 'Kaare Rasmussen (KAARE) <kaare@cpan.org>'
-  - 'Keedi Kim - 김도형 (KEEDI)'
-  - 'Kenichi Ishigaki - 石垣憲一 (ISHIGAKI) <ishigaki@cpan.org>'
-  - 'Kevin Dawson (BOWTIE) <bowtie@cpan.org>'
-  - 'Kjetil Skotheim (KJETIL)'
-  - 'Marcela Mašláňová (mmaslano)'
-  - 'Marek Roszkowski (EviL) <evil@evil.devil.is-my.name>'
-  - 'Mark Grimes <mgrimes@cpan.org>'
-  - 'Max Maischein (CORION)'
-  - 'Olivier MenguE<eacute> (DOLMEN)'
-  - 'Omer Zak  - עומר זק'
-  - 'Paco Alguacil (PacoLinux)'
-  - 'Patrick Donelan (PDONELAN) <pat@patspam.com>'
-  - 'Paweł Murias (PMURIAS)'
-  - 'Petar Shangov (PSHANGOV)'
-  - 'Peter Lavender (PLAVEN)'
-  - 'Ryan Niebur (RSN) <rsn@cpan.org>'
-  - 'Sebastian Willing (SEWI)'
-  - 'Shlomi Fish  - שלומי פיש (SHLOMIF)'
-  - 'Simone Blandino (SBLANDIN)'
-  - 'Steffen Müller (TSEE) <smueller@cpan.org>'
-  - 'Zeno Gantner (ZENOG)'
-  - 'Chuanren Wu'
+  repository: https://github.com/PadreIDE/Padre/
+version: '1.02'

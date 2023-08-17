@@ -1,5 +1,9 @@
 Revision history for HTTP-CSPHeader
 
+v0.3.2    2023-06-14 15:32:22+01:00 Europe/London
+  [Documentation]
+  - Fixed typo in SYNOPSIS.
+
 v0.3.1    2023-05-11 10:48:19+01:00 Europe/London
   [Bug Fixes]
   - Rebuild distribution with fixed SIGNATURE.

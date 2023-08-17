@@ -73,7 +73,6 @@ OPCUA_Open62541_ReadRequest			T_PTROBJ_PACKED
 OPCUA_Open62541_ReadValueId			T_PTROBJ_PACKED
 OPCUA_Open62541_ReferenceTypeAttributes		T_PTROBJ_PACKED
 OPCUA_Open62541_SetPublishingModeRequest	T_PTROBJ_PACKED
-OPCUA_Open62541_String				T_PTROBJ_PACKED
 OPCUA_Open62541_VariableAttributes		T_PTROBJ_PACKED
 OPCUA_Open62541_VariableTypeAttributes		T_PTROBJ_PACKED
 OPCUA_Open62541_Variant				T_PTROBJ_PACKED
@@ -82,6 +81,7 @@ OPCUA_Open62541_WriteValue			T_PTROBJ_PACKED
 # special objects, not converted to hashes
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
+OPCUA_Open62541_CertificateVerification	T_PTROBJ_SPECIAL
 OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_Logger			T_PTROBJ_SPECIAL
@@ -111,10 +111,10 @@ T_PTROBJ_PACKED
 		 */
 		$var = INT2PTR($type, SvIV(SvRV($arg)));
 	} else if (!SvOK($arg)) {
-		if (!(${my $outopt=(${var}=~/^out/)?1:0; \$outopt})) {
+		if (!(${my $outopt=(${var}=~/^(out|opt)/)?1:0; \$outopt})) {
 			CROAK(\"Parameter %s is undefined\", \"$var\");
 		}
-		if (!(${my $outopt=(${var}=~/^outopt/)?1:0; \$outopt})) {
+		if (!(${my $outopt=(${var}=~/^(outopt|opt)/)?1:0; \$outopt})) {
 			CROAK(\"Output parameter %s is undefined\", \"$var\");
 		}
 		/*
@@ -128,7 +128,7 @@ T_PTROBJ_PACKED
 		 * cope with the NULL pointer.
 		 */
 		$var = NULL;
-		if (!(${my $outopt=(${var}=~/^outopt/)?1:0; \$outopt})) {
+		if (!(${my $outopt=(${var}=~/^(outopt|opt)/)?1:0; \$outopt})) {
 			/* cppcheck does not detect the if before the = NULL */
 			abort(); /* NOTREACHED */
 		}
@@ -212,7 +212,17 @@ T_PTROBJ_SPECIAL
 		 */
 		$var = INT2PTR($type, SvIV(SvRV($arg)));
 	} else if (!SvOK($arg)) {
-		CROAK(\"Parameter %s is undefined\", \"$var\");
+		if (!(${my $opt=(${var}=~/^opt/)?1:0; \$opt})) {
+			CROAK(\"Parameter %s is undefined\", \"$var\");
+		}
+		/*
+		 * undef
+		 *
+		 * This is needed for passing optional parameter.
+		 * Note that the code using this feature should
+		 * cope with the NULL pointer.
+		 */
+		$var = NULL;
 	} else if (SvROK($arg) && sv_derived_from($arg,
 	    \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
 		/*

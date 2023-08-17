@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
             "DBI" : "0",
             "Getopt::Long" : "2.36",
             "Module::Load" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,7 +62,7 @@
          "web" : "https://github.com/Corion/DBIx-RunSQL"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

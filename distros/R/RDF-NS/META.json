@@ -1,16 +1,16 @@
 {
-   "abstract" : "Just use popular RDF namespace prefixes from prefix.cc",
+   "abstract" : "quickly get common URI namespaces",
    "author" : [
-      "Jakob Voß"
+      "- by Jakob Voß."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "RDF-NS",
    "no_index" : {
@@ -20,19 +20,24 @@
          "inc",
          "share",
          "eg",
-         "examples"
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -40,6 +45,28 @@
             "File::ShareDir" : "1.00",
             "perl" : "v5.12.0"
          }
+      }
+   },
+   "provides" : {
+      "App::rdfns" : {
+         "file" : "lib/App/rdfns.pm",
+         "version" : "20230619"
+      },
+      "RDF::NS" : {
+         "file" : "lib/RDF/NS.pm",
+         "version" : "20230619"
+      },
+      "RDF::NS::Trine" : {
+         "file" : "lib/RDF/NS/Trine.pm",
+         "version" : "20230619"
+      },
+      "RDF::NS::URIS" : {
+         "file" : "lib/RDF/NS/URIS.pm",
+         "version" : "20230619"
+      },
+      "RDF::SN" : {
+         "file" : "lib/RDF/SN.pm",
+         "version" : "20230619"
       }
    },
    "release_status" : "stable",
@@ -54,13 +81,14 @@
          "web" : "https://github.com/nichtich/RDF-NS"
       }
    },
-   "version" : "20190227",
+   "version" : "20230619",
    "x_contributors" : [
       "Andreas Koenig <andk@cpan.org>",
-      "Jakob Voss <jakob@nichtich.de>",
       "Jakob Voss <voss@gbv.de>",
+      "Jakob Voß <jakob@nichtich.de>",
       "Kjetil Kjernsmo <kjetil@kjernsmo.net>",
       "Sergey Romanov <complefor@rambler.ru>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
 }
-

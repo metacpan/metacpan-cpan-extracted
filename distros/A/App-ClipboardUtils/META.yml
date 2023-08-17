@@ -19,9 +19,11 @@ name: App-ClipboardUtils
 provides:
   App::ClipboardUtils:
     file: lib/App/ClipboardUtils.pm
-    version: '0.006'
+    version: '0.007'
 requires:
-  Clipboard::Any: '0.008'
+  Clipboard::Any: '0.011'
+  Data::Sah::Compiler::perl::TH::bool: '0.914'
+  Data::Sah::Compiler::perl::TH::int: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
@@ -31,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ClipboardUtils
   homepage: https://metacpan.org/release/App-ClipboardUtils
   repository: git://github.com/perlancar/perl-App-ClipboardUtils.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -66,12 +68,16 @@ x_Dist_Zilla:
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript get-clipboard-history-item'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-clipboard-history'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.02'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -241,7 +247,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -353,7 +359,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

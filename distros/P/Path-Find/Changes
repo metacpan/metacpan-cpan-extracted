@@ -1,0 +1,10 @@
+Revision history for Perl extension Path::Find.
+
+
+0.02  Fri Jul  7 15:34 2023
+    - Forgot HONK.T
+
+0.01  Mon Jun 19 15:40 2023
+	- original version; created by h2xs 1.23 with options
+		-b5.004.05 -AXc --use-new-tests --skip-exporter --skip-autoloader Path::Find
+

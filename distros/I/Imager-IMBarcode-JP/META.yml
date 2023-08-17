@@ -8,7 +8,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,15 +27,15 @@ no_index:
 provides:
   Imager::IMBarcode::JP:
     file: lib/Imager/IMBarcode/JP.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Imager: '0'
   Mouse: '0'
 resources:
   bugtracker: https://github.com/nipotan/Imager-IMBarcode-JP/issues
   homepage: https://github.com/nipotan/Imager-IMBarcode-JP
-  repository: git://github.com/nipotan/Imager-IMBarcode-JP.git
-version: '0.01'
+  repository: https://github.com/nipotan/Imager-IMBarcode-JP.git
+version: '0.02'
 x_authority: cpan:TANIGUCHI
 x_contributors:
   - 'nipotan <nipotan@gmail.com>'

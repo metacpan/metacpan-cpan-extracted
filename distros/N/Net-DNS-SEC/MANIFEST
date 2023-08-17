@@ -32,5 +32,6 @@ t/51-ECDSA-P256.t
 t/52-ECDSA-P384.t
 t/61-Ed25519.t
 t/62-Ed448.t
+t/TestToolkit.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

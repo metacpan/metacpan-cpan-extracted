@@ -7,6 +7,9 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.74  2023-06-07  sbeck
+  -  NEW CODE(s)
+
 3.73  2023-03-06  sbeck
   -  NEW CODE(s)
   -  Fixed a problem with test failing on windows

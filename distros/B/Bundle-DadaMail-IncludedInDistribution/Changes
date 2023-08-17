@@ -1,5 +1,4 @@
 Revision history for Bundle-DadaMail-IncludedInDistribution
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.03 Text::Abbrev added, Data::Pageset added - but this time: correctly. 
 

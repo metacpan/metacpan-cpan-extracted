@@ -17,34 +17,43 @@ BEGIN{
      [ 100,       200       ],
    ]
   );
-  
+
   $withARGV_path = create_testdata(
-   name => "tdata1",
+   name => "withARGV",
    rows => [
      [ "TitleA", "ARGV" ],
      [ 100,      200      ],
    ]
   );
 
-  $opthash_comma = $debug ? ' {debug => 1},' : '';
+  #$opthash_comma = $debug ? ' {debug => 1},' : '';
+  ## ALWAYS SPEW DEBUG MSGS until we figure out the unexpected "success" on MSWin
+  $opthash_comma = ' {debug => 1},';
 }
 
 # Still in package main
 
 { my ($out, $err) = capture {
     run_perlscript('-wE', '
-       package Foo::Clash1; 
+       package Foo::Clash1;
        sub TitleA { 42 };
        use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::tdata1_path->stringify).';
+       apply {
+         print "Visiting rx $rx TitleA=$TitleA\n";
+       };
        ');
   };
-  like($err, qr/TitleA.*clash.*Existing.*sub/s, "Detect clash with sub name");
-  is($out, "", "Clash diags on stderr, not stdout");
+  # All {debug} messages go to stderr
+  note "Err:$err\nOut:$out\n"; # if $debug;
+  like($err, qr/TitleA.*clash.*Existing.*sub/s, "Detect clash with sub name",
+       dvis 'ERR:$err\nOUT:$out\n');
+  is($out, "", "Clash diags on stderr, not stdout",
+       dvis 'ERR:$err\nOUT:$out\n');
 }
 
 { my ($out, $err) = capture {
     run_perlscript('-wE', '
-       package Foo::Clash1; 
+       package Foo::Clash1;
        use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withARGV_path->stringify).';
        ');
   };

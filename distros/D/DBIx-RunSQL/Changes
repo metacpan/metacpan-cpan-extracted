@@ -1,8 +1,14 @@
+0.24 2023-06-09
+    * We don't support 5.8.x due to use of //
+
+0.23 2023-06-08
+    * Add "rotate" option to rotate the output by 90°
+    * Add "null" option for custom strings for NULL values (instead of blank)
+
 0.22 2021-05-03
     * Allow pass-through of DBI database options for ->create()
     * Move URLs to https://
     * Documentation updates
-
 
 0.21 2019-03-09
     * Use Module::Load to load renderers

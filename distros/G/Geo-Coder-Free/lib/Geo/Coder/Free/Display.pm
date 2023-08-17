@@ -205,6 +205,7 @@ sub get_template_path {
 
 		$self->_debug({ message => 'Requested language: ' . $lingua->requested_language() });
 
+		# FIXME: look for lower priority languages if the highest isn't found
 		my $candidate;
 		if($lingua->sublanguage_code_alpha2()) {
 			$candidate = "$dir/" . $lingua->code_alpha2() . '/' . $lingua->sublanguage_code_alpha2();
@@ -311,12 +312,6 @@ sub html {
 		require Template;
 		Template->import();
 
-		my $template = Template->new({
-			INTERPOLATE => 1,
-			POST_CHOMP => 1,
-			ABSOLUTE => 1,
-		});
-
 		my $info = $self->{_info};
 
 		# The values in config are defaults which can be overridden by
@@ -344,11 +339,18 @@ sub html {
 		$vals->{info} = $info;
 		$vals->{as_string} = $info->as_string();
 
-		$template->process($filename, $vals, \$rc) ||
+		my $template = Template->new({
+			INTERPOLATE => 1,
+			POST_CHOMP => 1,
+			ABSOLUTE => 1,
+		});
+
+		if(!$template->process($filename, $vals, \$rc)) {
 			if(my $err = $template->error()) {
                                 die $err;
                         }
                         die "Unknown error in template: $filename";
+                }
 	} elsif($filename =~ /\.(html?|txt)$/) {
 		open(my $fin, '<', $filename) || die "$filename: $!";
 

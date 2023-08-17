@@ -135,21 +135,21 @@ __PACKAGE__->method_documentation({
      'cached_file_folder' => {
      	datatype => 'string',
      	base_name => 'CachedFileFolder',
-     	description => '',
+     	description => 'The cached file folder is used to store some large data.',
      	format => '',
      	read_only => '',
      		},
      'clear_data' => {
      	datatype => 'boolean',
      	base_name => 'ClearData',
-     	description => '',
+     	description => 'Make the workbook empty after saving the file.',
      	format => '',
      	read_only => '',
      		},
      'create_directory' => {
      	datatype => 'boolean',
      	base_name => 'CreateDirectory',
-     	description => '',
+     	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.            ',
      	format => '',
      	read_only => '',
      		},
@@ -177,7 +177,7 @@ __PACKAGE__->method_documentation({
      'validate_merged_areas' => {
      	datatype => 'boolean',
      	base_name => 'ValidateMergedAreas',
-     	description => '',
+     	description => 'Indicates whether validate merged areas before saving the file.The default value is false.            ',
      	format => '',
      	read_only => '',
      		},    

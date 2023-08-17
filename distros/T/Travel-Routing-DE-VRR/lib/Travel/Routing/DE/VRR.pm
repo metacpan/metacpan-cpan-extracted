@@ -6,7 +6,7 @@ use 5.010;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = '2.19';
+our $VERSION = '2.21';
 
 use parent 'Travel::Routing::DE::EFA';
 
@@ -49,7 +49,7 @@ Travel::Routing::DE::VRR - unofficial interface to the efa.vrr.de German itinera
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ None known.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2009-2021 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

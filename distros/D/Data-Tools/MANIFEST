@@ -5,6 +5,7 @@ README
 Makefile.PL
 lib/Data/Tools.pm
 lib/Data/Tools/Socket.pm
+lib/Data/Tools/Socket/Protocols.pm
 lib/Data/Tools/Time.pm
 lib/Data/Tools/Math.pm
 lib/Data/Tools/CSV.pm

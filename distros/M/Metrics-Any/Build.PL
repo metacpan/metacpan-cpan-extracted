@@ -11,8 +11,7 @@ my $build = Module::Build->new(
       'List::Util' => '1.29', # core since 5.20
    },
    test_requires => {
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

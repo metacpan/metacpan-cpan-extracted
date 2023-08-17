@@ -12,12 +12,40 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Math-Currency
+provides:
+  Math::Currency:
+    file: lib/Math/Currency.pm
+    version: '0.53'
+  Math::Currency::EUR:
+    file: lib/Math/Currency/EUR.pm
+    version: '0.53'
+  Math::Currency::GBP:
+    file: lib/Math/Currency/GBP.pm
+    version: '0.53'
+  Math::Currency::JPY:
+    file: lib/Math/Currency/JPY.pm
+    version: '0.53'
+  Math::Currency::USD:
+    file: lib/Math/Currency/USD.pm
+    version: '0.53'
+  Math::Currency::de_DE:
+    file: lib/Math/Currency/de_DE.pm
+    version: '0.53'
+  Math::Currency::en_GB:
+    file: lib/Math/Currency/en_GB.pm
+    version: '0.53'
+  Math::Currency::en_US:
+    file: lib/Math/Currency/en_US.pm
+    version: '0.53'
+  Math::Currency::ja_JP:
+    file: lib/Math/Currency/ja_JP.pm
+    version: '0.53'
 requires:
   Encode: '0'
   Encode::Locale: '0'
@@ -32,8 +60,10 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Currency
-  homepage: http://search.cpan.org/dist/Math-Currency/
-  repository: git://github.com/mschout/perl-math-currency.git
-version: '0.52'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  bugtracker: https://github.com/mschout/perl-math-currency/issues
+  homepage: https://github.com/mschout/perl-math-currency
+  repository: https://github.com/mschout/perl-math-currency.git
+version: '0.53'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

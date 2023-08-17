@@ -60,10 +60,10 @@ sub new {
 
 # Run Operation Request
 # PutConvertWorkbookRequest.File : File to upload  ,
-# PutConvertWorkbookRequest.format :   ,
-# PutConvertWorkbookRequest.password :   ,
-# PutConvertWorkbookRequest.outPath :   ,
-# PutConvertWorkbookRequest.storageName :   ,
+# PutConvertWorkbookRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# PutConvertWorkbookRequest.password : The workbook password.  ,
+# PutConvertWorkbookRequest.outPath : Path to save result  ,
+# PutConvertWorkbookRequest.storageName : Storage name.  ,
 # PutConvertWorkbookRequest.checkExcelRestriction :   ,
 # PutConvertWorkbookRequest.streamFormat :    
 
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_convert_workbook' } = { 
-    	summary => '',
+    	summary => 'Converts workbook from request content to some format.',
         params => $params,
         returns => 'string',
     };
@@ -155,28 +155,28 @@ __PACKAGE__->method_documentation({
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The workbook password.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => '',
+     	description => 'Path to save result',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::suztot;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

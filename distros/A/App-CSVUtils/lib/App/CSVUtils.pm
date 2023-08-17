@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -1155,6 +1155,11 @@ following keys will also be available (in `on_input_header_row` and
 
 - `input_parser`, a <pm:Text::CSV_XS> instance for input parsing.
 
+- `input_fields`, array of str. Input CSV's field names.
+
+- `input_fields_idx`, hash with field name as keys and field index (0-based
+  integer) as values.
+
 - `input_filenames`, array of str.
 
 - `input_filename`, str. The name of the current input file being read (`-` if
@@ -1194,6 +1199,14 @@ If you are outputting CSV (`writes_csv` gen argument set to true), the following
 keys will be available:
 
 - `output_emitter`, a <pm:Text::CSV_XS> instance for output.
+
+- `output_fields`, array of str. Should be set to list of output field names. If
+  unset, will be set to be the same as `input_fields`.
+
+- `output_fields_idx`, hash with field names as keys and field indexes (0-based
+  integer) as values. Normally you do not need to set this manually; you just
+  need to set `output_fields` and this hash will be computed automatically for
+  you just before the first output row is outputted.
 
 - `output_filenames`, array of str.
 
@@ -1972,7 +1985,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.024 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 DESCRIPTION
 
@@ -2006,97 +2019,101 @@ This distribution contains the following CLI utilities:
 
 =item 13. L<csv-each-row>
 
-=item 14. L<csv-fill-template>
+=item 14. L<csv-fill-cells>
 
-=item 15. L<csv-find-values>
+=item 15. L<csv-fill-template>
 
-=item 16. L<csv-freqtable>
+=item 16. L<csv-find-values>
 
-=item 17. L<csv-gen>
+=item 17. L<csv-freqtable>
 
-=item 18. L<csv-get-cells>
+=item 18. L<csv-gen>
 
-=item 19. L<csv-grep>
+=item 19. L<csv-get-cells>
 
-=item 20. L<csv-info>
+=item 20. L<csv-grep>
 
-=item 21. L<csv-intrange>
+=item 21. L<csv-info>
 
-=item 22. L<csv-list-field-names>
+=item 22. L<csv-intrange>
 
-=item 23. L<csv-lookup-fields>
+=item 23. L<csv-list-field-names>
 
-=item 24. L<csv-ltrim>
+=item 24. L<csv-lookup-fields>
 
-=item 25. L<csv-map>
+=item 25. L<csv-ltrim>
 
-=item 26. L<csv-munge-field>
+=item 26. L<csv-map>
 
-=item 27. L<csv-munge-rows>
+=item 27. L<csv-munge-field>
 
-=item 28. L<csv-pick>
+=item 28. L<csv-munge-rows>
 
-=item 29. L<csv-pick-fields>
+=item 29. L<csv-pick>
 
-=item 30. L<csv-pick-rows>
+=item 30. L<csv-pick-cells>
 
-=item 31. L<csv-quote>
+=item 31. L<csv-pick-fields>
 
-=item 32. L<csv-replace-newline>
+=item 32. L<csv-pick-rows>
 
-=item 33. L<csv-rtrim>
+=item 33. L<csv-quote>
 
-=item 34. L<csv-select-fields>
+=item 34. L<csv-replace-newline>
 
-=item 35. L<csv-select-rows>
+=item 35. L<csv-rtrim>
 
-=item 36. L<csv-setop>
+=item 36. L<csv-select-fields>
 
-=item 37. L<csv-shuf>
+=item 37. L<csv-select-rows>
 
-=item 38. L<csv-shuf-fields>
+=item 38. L<csv-setop>
 
-=item 39. L<csv-shuf-rows>
+=item 39. L<csv-shuf>
 
-=item 40. L<csv-sort>
+=item 40. L<csv-shuf-fields>
 
-=item 41. L<csv-sort-fields>
+=item 41. L<csv-shuf-rows>
 
-=item 42. L<csv-sort-rows>
+=item 42. L<csv-sort>
 
-=item 43. L<csv-sorted>
+=item 43. L<csv-sort-fields>
 
-=item 44. L<csv-sorted-fields>
+=item 44. L<csv-sort-rows>
 
-=item 45. L<csv-sorted-rows>
+=item 45. L<csv-sorted>
 
-=item 46. L<csv-split>
+=item 46. L<csv-sorted-fields>
 
-=item 47. L<csv-sum>
+=item 47. L<csv-sorted-rows>
 
-=item 48. L<csv-transpose>
+=item 48. L<csv-split>
 
-=item 49. L<csv-trim>
+=item 49. L<csv-sum>
 
-=item 50. L<csv-uniq>
+=item 50. L<csv-transpose>
 
-=item 51. L<csv-unquote>
+=item 51. L<csv-trim>
 
-=item 52. L<csv2ltsv>
+=item 52. L<csv-uniq>
 
-=item 53. L<csv2paras>
+=item 53. L<csv-unquote>
 
-=item 54. L<csv2td>
+=item 54. L<csv2ltsv>
 
-=item 55. L<csv2tsv>
+=item 55. L<csv2paras>
 
-=item 56. L<csv2vcf>
+=item 56. L<csv2td>
 
-=item 57. L<list-csvutils>
+=item 57. L<csv2tsv>
 
-=item 58. L<paras2csv>
+=item 58. L<csv2vcf>
 
-=item 59. L<tsv2csv>
+=item 59. L<list-csvutils>
+
+=item 60. L<paras2csv>
+
+=item 61. L<tsv2csv>
 
 =back
 
@@ -2254,6 +2271,11 @@ C<on_input_data_row> hooks):
 
 =item * C<input_parser>, a L<Text::CSV_XS> instance for input parsing.
 
+=item * C<input_fields>, array of str. Input CSV's field names.
+
+=item * C<input_fields_idx>, hash with field name as keys and field index (0-based
+integer) as values.
+
 =item * C<input_filenames>, array of str.
 
 =item * C<input_filename>, str. The name of the current input file being read (C<-> if
@@ -2297,6 +2319,14 @@ keys will be available:
 =over
 
 =item * C<output_emitter>, a L<Text::CSV_XS> instance for output.
+
+=item * C<output_fields>, array of str. Should be set to list of output field names. If
+unset, will be set to be the same as C<input_fields>.
+
+=item * C<output_fields_idx>, hash with field names as keys and field indexes (0-based
+integer) as values. Normally you do not need to set this manually; you just
+need to set C<output_fields> and this hash will be computed automatically for
+you just before the first output row is outputted.
 
 =item * C<output_filenames>, array of str.
 

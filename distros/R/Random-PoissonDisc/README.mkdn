@@ -25,7 +25,7 @@ results in aesthetic so called "blue noise".
 
 The algorithm was adapted from a sketch
 by Robert Bridson
-in [http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf](http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf).
+in [https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf](https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf).
 
 # DATA REPRESENTATION
 
@@ -56,7 +56,7 @@ Acceptable options are:
     range \[0, 100).
 
 - ` candidates ` - Number of candidates to inspect before deciding that no
-ew neighbours can be placed around a point.
+new neighbours can be placed around a point.
 
     Default is 30.
 
@@ -130,7 +130,7 @@ angle
 and returns a unit vector pointing in
 that direction
 
-The algorithm used is outlined in 
+The algorithm used is outlined in
 Knuth, \_The Art of Computer Programming\_, vol. 2,
 3rd. ed., section 3.4.1.E.6.
 but has not been verified formally or mathematically
@@ -143,13 +143,13 @@ vector library.
 
 # REPOSITORY
 
-The public repository of this module is 
-[http://github.com/Corion/random-poissondisc](http://github.com/Corion/random-poissondisc).
+The public repository of this module is
+[https://github.com/Corion/random-poissondisc](https://github.com/Corion/random-poissondisc).
 
 # SUPPORT
 
 The public support forum of this module is
-[http://perlmonks.org/](http://perlmonks.org/).
+[https://perlmonks.org/](https://perlmonks.org/).
 
 # BUG TRACKER
 
@@ -163,7 +163,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2011 by Max Maischein `corion@cpan.org`.
+Copyright 2011-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

@@ -1,5 +1,3 @@
-# $Id: DES.pm,v 1.7 2001/05/02 21:59:33 btrott Exp $
-
 package Net::SSH::Perl::Cipher::DES;
 
 use strict;

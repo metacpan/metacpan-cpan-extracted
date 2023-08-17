@@ -16,20 +16,25 @@ use App::VTide::Config;
 use Path::Tiny;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.20');
+our $VERSION = version->new('1.0.4');
+
+our $global_file = path $ENV{HOME}, '.vtide/sessions.yml';
+our $local_file  = path( $ENV{VTIDE_DIR} || $ENV{TMP} || $ENV{TMPDIR} || '.',
+    '.vtide/sessions.yml' );
 
 has sessions_file => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
+        my ($self) = @_;
         if ( $ENV{VTIDE_DIR} && -d $ENV{VTIDE_DIR} ) {
-            mkdir path $ENV{VTIDE_DIR}, '.vtide'
-              if !-d path $ENV{VTIDE_DIR}, '.vtide';
-            return path $ENV{VTIDE_DIR}, '.vtide/sessions.yml';
+            mkdir $local_file->parent
+                if !-d $local_file->parent;
+            return $local_file;
         }
 
-        mkdir path $ENV{HOME}, '.vtide' if !-d path $ENV{HOME}, '.vtide';
-        return path $ENV{HOME}, '.vtide/sessions.yml';
+        mkdir $global_file->parent if !-d $global_file->parent;
+        return $global_file;
     },
 );
 
@@ -46,6 +51,14 @@ has sessions => (
         return {};
     }
 );
+
+sub get_session {
+    my ( $self, $session ) = @_;
+    if ( !$self->sessions->{$session} ) {
+        $self->sessions->{$session} = [];
+    }
+    return $self->sessions->{$session};
+}
 
 sub add_session {
     my ( $self, @session ) = @_;
@@ -71,7 +84,7 @@ App::VTide::Sessions - Manage start and edit session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Sessions version 0.1.20
+This documentation refers to App::VTide::Sessions version 1.0.4
 
 =head1 SYNOPSIS
 

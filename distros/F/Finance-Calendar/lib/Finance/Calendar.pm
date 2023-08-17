@@ -59,7 +59,7 @@ This class is responsible for providing trading times or holidays related inform
 
 use Moose;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use List::Util qw(min max first);
 use Date::Utility;
@@ -789,11 +789,22 @@ sub next_open_at {
     # exchange is closed for trading breaks, will open again
     unless ($market_opens->{open}) {
         my $trading_breaks = $self->trading_breaks($exchange, $date);
+
         foreach my $break ($trading_breaks->@*) {
             my ($close, $open) = $break->@*;
+
+            # Between trading brakes
             if ($date->is_after($close) and $date->is_before($open)) {
                 return $open;
+            } elsif ($date->is_before($close) and $date->is_after($date->truncate_to_day)) {    # Between midnight and first opening
+                return $self->opening_on($exchange, $date);
             }
+        }
+
+        # When there is no trading break but opens on same day
+        if (!@$trading_breaks) {
+            my $opening_late = $self->opening_on($exchange, $date);
+            return $opening_late;
         }
     }
 

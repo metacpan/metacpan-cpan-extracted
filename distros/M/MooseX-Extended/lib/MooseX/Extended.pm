@@ -26,7 +26,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 sub import {
     my ( $class, %args ) = @_;
@@ -120,7 +120,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -458,30 +458,7 @@ useful to be able to define an C<init_arg> for unit testing.)
 
 =head1 BUGS AND LIMITATIONS
 
-You cannot (at this time) use C<multi> subs with the debugger. This is due to
-a bug in L<Syntax::Keyword::MultiSub> that should be fixed in the next release
-of that module.
-
-If you must have multisubs and the debugger, the follow patch to
-L<Syntax::Keyword::MultiSub> fixes the issue:
-
-    --- old/lib/Syntax/Keyword/MultiSub.xs  2021-12-16 10:59:30 +0000
-    +++ new/lib/Syntax/Keyword/MultiSub.xs  2022-08-12 10:23:06 +0000
-    @@ -129,6 +129,7 @@
-     redo:
-         switch(o->op_type) {
-           case OP_NEXTSTATE:
-    +      case OP_DBSTATE:
-             o = o->op_next;
-             goto redo;
-
-See also:
-
-=over 4
-
-=item * L<The github issue|https://github.com/Ovid/moosex-extended/issues/45>
-
-=back
+None known at this time.
 
 =head1 MANUAL
 

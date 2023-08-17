@@ -1,0 +1,54 @@
+{
+   "abstract" : "A simple log filter",
+   "author" : [
+      "Kawamura Shingo <pannakoota@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LogFilter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0.13"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.116",
+            "File::ShareDir::Install" : "0.13",
+            "File::Spec" : "0",
+            "File::Tail" : "0",
+            "IO::File" : "0",
+            "perl" : "5.026"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kawamurashingo/LogFilter.git",
+         "web" : "https://github.com/kawamurashingo/LogFilter.git"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -26,20 +26,19 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008008"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000148"
          }
       }
    },
    "provides" : {
       "Sentinel" : {
          "file" : "lib/Sentinel.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -48,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

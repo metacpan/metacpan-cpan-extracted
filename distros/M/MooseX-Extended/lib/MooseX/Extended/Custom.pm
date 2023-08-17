@@ -13,7 +13,7 @@ use MooseX::Extended::Core qw(
 use MooseX::Extended ();
 use namespace::autoclean;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 sub import {
     my @caller       = caller(0);
@@ -50,7 +50,7 @@ MooseX::Extended::Custom - Build a custom Moose, just for you.
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

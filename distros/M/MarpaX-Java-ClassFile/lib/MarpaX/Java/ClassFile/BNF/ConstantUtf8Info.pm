@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a CONSTANT_Utf8_info
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -60,7 +60,7 @@ MarpaX::Java::ClassFile::BNF::ConstantUtf8Info - Parsing of a CONSTANT_Utf8_info
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

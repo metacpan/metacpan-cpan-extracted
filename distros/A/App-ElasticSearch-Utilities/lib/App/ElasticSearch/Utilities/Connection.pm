@@ -2,10 +2,10 @@ package App::ElasticSearch::Utilities::Connection;
 # ABSTRACT: Abstract the connection element
 
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -242,7 +242,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 SYNOPSIS
 

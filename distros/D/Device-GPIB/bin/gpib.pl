@@ -16,6 +16,7 @@ my @options =
      'port=s',              # port[:baud:databits:parity:stopbits:handshake]
      'address=n',           # GPIB Address of the device
      'debug',               # Show debugging info like bytes in and out
+     'noclear',             # Do not clear device first: some devices take a long time to do that
      'spoll',               # Spoll the device and print the results
      'trigger',             # Send a GET trigger to this device
      'file=s@'              # File(s) to read commands from
@@ -36,7 +37,11 @@ exit unless $d;
 my $gpib = Device::GPIB::Generic->new($d, $address);
 exit unless $gpib;
 
-$d->clr();
+#$d->rst();
+#$d->read_tmo_ms(1000);
+
+# On some devices clr will reset everything :-)
+$d->clr() unless defined $main::opt_noclear;
 
 $gpib->executeCommandsFromFiles(@main::opt_file);
 $gpib->executeCommands(@ARGV);
@@ -45,7 +50,6 @@ if (defined $main::opt_trigger)
 {
     $gpib->trigger();
 }
-
 
 if (defined $main::opt_spoll)
 {
@@ -68,6 +72,7 @@ sub usage
           [-file filename [-file filename]]          Send commands from file. Results of queries are printed
           \"commandstring;commandstring;...\"        Sends the commands to the device. 
 	  \"commandstring;querystring?\"             Sends the optional commands and the query, prints the result of the query
-\n";
+          -debug
+	  -verbose\n";
     exit;
 }

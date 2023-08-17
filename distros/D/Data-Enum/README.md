@@ -4,7 +4,7 @@ Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.2.6
+version v0.2.7
 
 # SYNOPSIS
 
@@ -125,6 +125,12 @@ This method adds support for [match::simple](https://metacpan.org/pod/match%3A%3
 The overheard of creating a new class instance and resolving methods may actually take more time than comparing simple
 strings.  When using this in production code, you may want to benchmark performance.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.10 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 # SEE ALSO
 
 [Class::Enum](https://metacpan.org/pod/Class%3A%3AEnum)
@@ -157,7 +163,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2022 by Robert Rothenberg.
+This software is Copyright (c) 2021-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

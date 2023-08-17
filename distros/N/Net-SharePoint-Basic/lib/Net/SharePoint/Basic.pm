@@ -7,7 +7,6 @@ use 5.10.1;
 use strict;
 use warnings FATAL => 'all';
 use utf8;
-use experimental qw(smartmatch);
 
 use Carp qw(carp croak confess cluck longmess shortmess);
 use File::Basename;
@@ -36,11 +35,11 @@ Net::SharePoint::Basic - Basic interface to Microsoft SharePoint REST API
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 our %PATTERNS = (
 	payload => "grant_type=client_credentials&client_id=%1\$s\@%3\$s&client_secret=%2\$s&resource=%4\$s/%5\$s\@%3\$s&scope=%4\$s/%5\$s\@%3\$s",
@@ -660,12 +659,9 @@ sub get_chunk_pattern ($$) {
 	my $chunk_n      = shift;
 	my $total_chunks = shift;
 
-	my $pattern;
-	for ($chunk_n) {
-		when (0)             { $pattern = 'start';    }
-		when ($total_chunks) { $pattern = 'finish';   }
-		default              { $pattern = 'continue'; }
-	}
+	my $pattern = $chunk_n == $total_chunks 
+		? 'finish' : $chunk_n == 0
+                ? 'start' : 'continue';
 
 	$PATTERNS{chunk}->{$pattern};
 }

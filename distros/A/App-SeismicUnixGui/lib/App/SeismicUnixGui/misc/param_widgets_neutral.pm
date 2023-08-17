@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::param_widgets_neutral;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: param_widgets_neutral
+ PERL PROGRAM NAME: param_widgets_neutral
  AUTHOR:  Juan Lorenzo
 
 =head2 CHANGES and their DATES

@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-    On a suitably-patched perl:
+    On Perl v5.38 or later:
 
        use Syntax::Operator::Zip;
     
@@ -13,7 +13,7 @@ SYNOPSIS
           say "Value $x is associated with value $y";
        }
 
-    Or, on a standard perl:
+    Or on Perl v5.14 or later:
 
        use v5.14;
        use Syntax::Operator::Zip qw( zip );
@@ -28,6 +28,22 @@ DESCRIPTION
     This module provides infix operators that compose two lists of elements
     by associating successive elements from the left and right-hand lists
     together, forming a new list.
+
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+    While Perl versions before this do not support custom infix operators,
+    they can still be used via XS::Parse::Infix and hence
+    XS::Parse::Keyword. Custom keywords which attempt to parse operator
+    syntax may be able to use these.
+
+    Additionally, earlier versions of perl can still use the function-like
+    wrapper versions of these operators. Even though the syntax appears
+    like a regular function call, the code is compiled internally into the
+    same more efficient operator internally, so will run without the
+    function-call overhead of a regular function.
 
 OPERATORS
 

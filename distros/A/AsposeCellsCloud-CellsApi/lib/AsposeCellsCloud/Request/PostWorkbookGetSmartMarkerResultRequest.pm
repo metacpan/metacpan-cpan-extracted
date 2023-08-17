@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookGetSmartMarkerResultRequest.name :   ,
-# PostWorkbookGetSmartMarkerResultRequest.xmlFile :   ,
-# PostWorkbookGetSmartMarkerResultRequest.folder :   ,
-# PostWorkbookGetSmartMarkerResultRequest.outPath :   ,
-# PostWorkbookGetSmartMarkerResultRequest.storageName :   ,
-# PostWorkbookGetSmartMarkerResultRequest.outStorageName :    
+# PostWorkbookGetSmartMarkerResultRequest.name : The workbook name.  ,
+# PostWorkbookGetSmartMarkerResultRequest.xmlFile : The xml file full path, if empty the data is read from request body.  ,
+# PostWorkbookGetSmartMarkerResultRequest.folder : Original workbook folder.  ,
+# PostWorkbookGetSmartMarkerResultRequest.outPath : Path to save result  ,
+# PostWorkbookGetSmartMarkerResultRequest.storageName : Storage name.  ,
+# PostWorkbookGetSmartMarkerResultRequest.outStorageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_get_smart_marker_result' } = { 
-    	summary => '',
+    	summary => 'Smart marker processing result.',
         params => $params,
         returns => 'string',
     };
@@ -138,42 +138,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'xml_file' => {
      	datatype => 'string',
      	base_name => 'xmlFile',
-     	description => '',
+     	description => 'The xml file full path, if empty the data is read from request body.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => '',
+     	description => 'Path to save result',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

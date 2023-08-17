@@ -16,23 +16,25 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "File::Copy" : "0",
             "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Basename" : "0",
+            "Getopt::Std" : "0",
             "Time::HiRes" : "0"
          }
       }
    },
    "provides" : {
-      "Config" : {
-         "file" : "lib/Sys/Tlock/Config.pm"
-      },
       "Sys::Tlock" : {
          "file" : "lib/Sys/Tlock.pm",
-         "version" : "0.12"
+         "version" : "1.1"
+      },
+      "Sys::Tlock::Config" : {
+         "file" : "lib/Sys/Tlock/Config.pm"
       }
    },
    "release_status" : "stable",
@@ -47,6 +49,6 @@
          "url" : "https://github.com/spragl/Tlock"
       }
    },
-   "version" : "0.12",
+   "version" : "1.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

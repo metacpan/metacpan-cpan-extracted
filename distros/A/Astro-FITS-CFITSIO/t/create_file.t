@@ -15,18 +15,18 @@ subtest 'ffopen' => sub {
 
 subtest 'create file' => sub {
 
-    my $fptr;
-
-    subtest 'ffinit' => sub {
-        ffinit( $fptr, '!testprog.fit', my $status = 0 );
-        is( $status, 0, 'status' );
-    };
-
     subtest 'create_file' => sub {
         my $fptr = Astro::FITS::CFITSIO::create_file( '!testprog.fit', my $status = 0 );
         is( $status, 0, 'status' );
         $fptr->delete_file( $status );
         is( $status, 252 );    # file is incomplete, so CFITSIO is unhappy
+    };
+
+    my $fptr;
+
+    subtest 'ffinit' => sub {
+        ffinit( $fptr, '!testprog.fit', my $status = 0 );
+        is( $status, 0, 'status' );
     };
 
     subtest 'ffflnm' => sub {

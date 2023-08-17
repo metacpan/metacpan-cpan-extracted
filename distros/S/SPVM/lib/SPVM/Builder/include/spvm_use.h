@@ -8,8 +8,8 @@
 
 struct spvm_use {
   SPVM_OP* op_use;
-  const char* class_name;
-  const char* class_alias_name;
+  SPVM_OP* op_type;
+  const char* alias_name;
   const char* file;
   int8_t is_require;
 };

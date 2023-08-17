@@ -38,9 +38,10 @@ exit main();
 
 sub main{
   my $settings={};
-  GetOptions($settings,qw(help file-of-files outtree=s outmatrix=s tempdir=s numcpus=i genomesize=i mindepth|min-depth=i truncLength=i kmerlength=i sort-order=s sketch-size=i citation version save-sketches:s seed=i)) or die $!;
+  GetOptions($settings,qw(help sigfigs|significant-digits=i file-of-files outtree=s outmatrix=s tempdir=s numcpus=i genomesize=i mindepth|min-depth=i truncLength=i kmerlength=i sort-order=s sketch-size=i citation version save-sketches:s seed=i)) or die $!;
   $$settings{numcpus}||=1;
   $$settings{truncLength}||=250;  # how long a genome name is
+  $$settings{sigfigs} ||= 10;
   $$settings{tempdir}||=tempdir("MASHTREE.XXXXXX",CLEANUP=>1,TMPDIR=>1);
   $$settings{'sort-order'}||="ABC";
 
@@ -187,6 +188,9 @@ sub sketchAll{
   # Initiate the threads
   my @thr;
   for(0..$$settings{numthreads}-1){
+    # If there are more threads than samples, then we need to set the number in this thread to empty array
+    $threadArr[$_] //= [];
+
     $thr[$_]=threads->new(\&mashSketch,$sketchDir,$threadArr[$_],$settings);
   }
 
@@ -362,8 +366,8 @@ sub mashDistance{
   close $mshListFh;
 
   # Instatiate the database and create the table before the threads get to it
-  my $mashtreeDbFilename="$outdir/distances.sqlite";
-  my $mashtreeDb=Mashtree::Db->new($mashtreeDbFilename);
+  my $mashtreeDbFilename="$outdir/distances.db.tsv";
+  my $mashtreeDb=Mashtree::Db->new($mashtreeDbFilename,{significant_figures=>$$settings{sigfigs}});
 
   # Make an array of distance files for each thread.
   # Because distance files take about the same amount
@@ -510,6 +514,7 @@ sub usage{
 
   TREE OPTIONS
   --truncLength        250  How many characters to keep in a filename
+  --sigfigs            10   How many decimal places to use in mash distances 
   --sort-order         ABC  For neighbor-joining, the sort order can
                             make a difference. Options include:
                             ABC (alphabetical), random, input-order

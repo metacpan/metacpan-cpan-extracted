@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 
 #include <catch2/internal/catch_stringref.hpp>
 
+#include <cstdint>
 #include <string>
 #include <iosfwd>
 #include <vector>
@@ -43,16 +44,17 @@ namespace Catch {
      *
      * **Important:** The provided string must outlive the instance
      */
-    struct pluralise {
-        pluralise(std::size_t count, StringRef label):
+    class pluralise {
+        std::uint64_t m_count;
+        StringRef m_label;
+
+    public:
+        constexpr pluralise(std::uint64_t count, StringRef label):
             m_count(count),
             m_label(label)
         {}
 
         friend std::ostream& operator << ( std::ostream& os, pluralise const& pluraliser );
-
-        std::size_t m_count;
-        StringRef m_label;
     };
 }
 

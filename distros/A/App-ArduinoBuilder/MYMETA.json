@@ -4,7 +4,7 @@
       "Mathias Kende <mathias@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "arduino",
       "embedded",
@@ -81,6 +81,6 @@
          "web" : "https://github.com/mkende/arduino_builder"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

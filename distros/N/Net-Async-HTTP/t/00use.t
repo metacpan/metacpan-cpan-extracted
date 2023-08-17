@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Net::Async::HTTP" );
+require Net::Async::HTTP;
 
+pass( "Modules loaded" );
 done_testing;

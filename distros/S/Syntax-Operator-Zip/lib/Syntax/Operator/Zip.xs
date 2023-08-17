@@ -151,7 +151,7 @@ struct XSParseInfixHooks infix_mesh = {
   .cls       = XPI_CLS_ADD_MISC,
   .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
-  .permit_hintkey = "Syntax::Operator::Zip/Z",
+  .permit_hintkey = "Syntax::Operator::Zip/M",
 
   .wrapper_func_name = "Syntax::Operator::Zip::mesh",
 

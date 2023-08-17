@@ -44,12 +44,10 @@ our $RunCount = 0;
 sub run {
     my $self = shift;
 
-    $self->combined_file->spew(
-        [
-            map { $_->slurp } $self->a1_file_updated,
-            $self->a2_file_updated
-        ]
-    );
+    $self->combined_file->spew( [
+        map { $_->slurp } $self->a1_file_updated,
+        $self->a2_file_updated,
+    ] );
 }
 
 after run => sub { $RunCount++ };

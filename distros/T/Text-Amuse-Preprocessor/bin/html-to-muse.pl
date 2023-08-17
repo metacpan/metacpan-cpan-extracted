@@ -89,7 +89,7 @@ foreach my $f (@ARGV) {
 sub process_target {
     my $f = shift;
     if (-f $f) {
-        print html_file_to_muse($f);
+        print html_file_to_muse($f, { lang => $lang });
     }
     else {
         my $fh = File::Temp->newdir;
@@ -97,7 +97,7 @@ sub process_target {
         my $ua = LWP::UserAgent->new;
         my $res = $ua->mirror($f, $target);
         if ($res->is_success) {
-            print html_file_to_muse($target);
+            print html_file_to_muse($target, { lang => $lang });
         }
         else {
             warn $res->status_line . "\n";

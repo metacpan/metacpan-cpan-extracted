@@ -135,7 +135,7 @@ use Padre::MIME             ();
 use Padre::File             ();
 use Padre::Logger;
 
-our $VERSION    = '1.00';
+our $VERSION    = '1.02';
 our $COMPATIBLE = '0.91';
 
 
@@ -251,7 +251,7 @@ sub new {
 				my $ret = Wx::MessageBox(
 					sprintf(
 						Wx::gettext(
-							"The file %s you are trying to open is %s bytes large. It is over the arbitrary file size limit of Padre which is currently %s. Opening this file may reduce performance. Do you still want to open the file?"
+							"The file %s you are trying to open is %s bytes large. Opening files larger than %s may reduce performance. Continue?"
 						),
 						$self->{file}->{filename},
 						_commafy( -s $self->{file}->{filename} ),
@@ -1568,7 +1568,7 @@ sub _commafy {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

@@ -29,7 +29,7 @@ package Rex::Commands::SimpleCheck;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use IO::Socket;
 

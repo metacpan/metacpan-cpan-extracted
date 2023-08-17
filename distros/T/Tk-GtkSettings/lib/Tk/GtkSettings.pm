@@ -9,7 +9,8 @@ Tk::GtkSettings - Give Tk applications the looks of Gtk applications
 use strict;
 use warnings;
 use File::Basename;
-our $VERSION = '0.04';
+use Config;
+our $VERSION = '0.06';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -154,7 +155,6 @@ my @basegtkeys = qw(
 );
 
 my @contentwidgets = qw(
-	CodeText
 	Entry
 	FloatEntry
 	PodText
@@ -163,12 +163,14 @@ my @contentwidgets = qw(
 	TextUndo
 	TextEditor
 	ROText
+	XText
 );
 
 my @listwidgets = qw(
 	Dirlist
 	DirTree
 	HList
+	ITree
 	IconList
 	Listbox
 	Tlist
@@ -201,8 +203,7 @@ my %listoptions = qw(
 	highlightColor			theme_bg_color
 );
 
-
-appName(basename($0));
+appName($0);
 
 =head1 SYNOPSIS
 
@@ -336,6 +337,7 @@ Exported by default.
 =cut
 
 sub applyGtkSettings {
+	return unless platformPermitted;
 	initDefaults;
 	export2xrdb;
 }
@@ -355,6 +357,8 @@ apply your Gtk settings to all your perl/Tk applications.
 sub appName {
 	if (@_ ) {
 		$app_name = shift;
+		$app_name = basename($app_name); #remove leading folders
+		$app_name =~ s/\.[^.]+$//; #remove extension
 		$marker = "!$app_name Tk::GtkSettings section\n";
 	}
 	return $app_name
@@ -381,7 +385,7 @@ sub convertColorCode {
 	}
 }
 
-=item B<decodeFont(I<$gtkfontstring>)
+=item B<decodeFont>(I<$gtkfontstring>)
 
 =over 4
 
@@ -391,7 +395,6 @@ Converts the font string in gtk to something Tk can handle
 
 =cut
 
-# {Khmer OS Battambang} -12 bold italic
 sub decodeFont {
 	my $rawfont = shift;
 	my $family = '';
@@ -429,8 +432,6 @@ will create it. if $removeflag is true it will not export but remove the section
 
 sub export2file {
 	my ($file, $remove) = @_;
-	return if $no_gtk;
-	return unless platformPermitted;
 	$remove = 0 unless defined $remove;
 	my $out = "";
 	my $found = 0;
@@ -844,10 +845,11 @@ Initializes some sensible defaults. Also does a full reset and loads Gtk configu
 =cut
 
 sub initDefaults {
+	return unless platformPermitted;
 	resetAll;
 	loadGtkInfo;
-	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 20));
-	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 20));
+	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
+	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
 	for (keys %mainoptions) {
 		groupOption('main', $_, $mainoptions{$_})
 	}
@@ -857,6 +859,7 @@ sub initDefaults {
 	my @lw = @listwidgets;
 	my %lo = %listoptions;
 	groupAdd('list', \@lw, \%lo);
+	groupAdd('menu', ['Menu', 'NoteBook'], {borderWidth => 1});
 }
 
 =item B<hex2rgb>(I<$hex_color>)
@@ -909,6 +912,7 @@ Empties the Gtk hash and (re)loads the Gtk configuration files.
 =cut
 
 sub loadGtkInfo {
+	return unless platformPermitted;
 	%gtksettings = ();
 	my $cf = $gtkpath . "colors.css";
 	if (open(OFILE, "<", $cf)) {
@@ -960,7 +964,7 @@ Returns true if you are not on Windows or Mac.
 
 sub platformPermitted {
 	my $platform = $^O;
-	return 0 if (($^O eq 'MSWin32') or ($^O eq 'darwin'));
+	return 0 if (($Config{osname} eq 'MSWin32') or ($Config{osname} eq 'darwin'));
 	return 1
 }
 
@@ -1079,18 +1083,15 @@ sub _truncate {
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022 by Hans Jeuken
+Copyright 2022 - 2023 by Hans Jeuken
 
-GPL v3.0 or same as Perl, in your option.
+Same as Perl, in your option.
 
 =head1 AUTHOR
 
 Hans Jeuken (jeuken dot hans at gmail dot com)
 
 =head1 BUGS AND CAVEATS
-
-Exporting to xrdb will not work if the name of your executable/script contains
-an extension (.pl). This is a limitation of xrdb.
 
 If you find any bugs, please contact the author.
 

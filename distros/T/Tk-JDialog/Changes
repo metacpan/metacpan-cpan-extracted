@@ -9,3 +9,8 @@ Revision history for Tk-JDialog
         defined. - NOT RELEASED.
 1.11    2016/01/20
         Eliminate run-time warning message when no -escape_button is defined.
+1.20    2023/06/17
+        * Add effort to make the popup dialog window transient (for window-
+        managers).
+        * Modernize default -font values, including M$-Windows version.
+        * Minor code cleanups.

@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.023'; # VERSION
+our $VERSION = '3.024'; # VERSION
 
 =encoding utf8
 
@@ -376,11 +376,7 @@ async sub apply_slots_from_instance {
 
     my @nodes;
     for my $slot_data (nsort_by { $_->[0] } $slots->@*) {
-        my $node = Net::Async::Redis::Cluster::Node->from_arrayref(
-            $slot_data,
-            cluster => $self,
-            $self->node_config
-        );
+        my $node = $self->instantiate_node($slot_data);
         $log->tracef(
             'Node %s (%s) handles slots %d-%d and has %d replica(s) - %s',
             $node->id,
@@ -395,6 +391,15 @@ async sub apply_slots_from_instance {
     }
 
     $self->replace_nodes(\@nodes);
+}
+
+sub instantiate_node {
+    my ($self, $slot_data) = @_;
+    return Net::Async::Redis::Cluster::Node->from_arrayref(
+        $slot_data,
+        cluster => $self,
+        $self->node_config
+    )
 }
 
 =head2 execute_command

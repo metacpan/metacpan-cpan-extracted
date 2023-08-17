@@ -1,0 +1,542 @@
+=head1 NAME
+
+HTTP::State - Fast RFC6265bis-draft + CHIPS Cookie Jar
+
+=head1 SYNOPSIS
+
+
+  use HTTP::State ":flags";
+   
+  # Create a jar. Default flags for compatibility API.
+  #
+  my $jar=HTTP::State->new(default_flags=>FLAG_TYPE_HTTP|FLAG_TOP_LEVEL|...);
+
+  # Requested URL
+  #
+  my $request_url="http://test.example.com";
+  
+  # First party site of the request ( for CHIPS )
+  #
+  my $partition_key= "https://first.party.com";
+
+  # User agent indicates the context of the request using flags
+  #
+  my $flags=FLAGS_TYPE_HTTP|FLAGS_TOP_LEVEL|...;
+
+
+
+  # Retrieve encoded cookies name/values applicable for the request.
+  #
+  my $cookie_header = $jar->retrieve_cookies($request_url, $partition_key, $flags);
+  
+  #       ++ OR ++
+
+  # use the  HTTP::CookieJar compatible API, jar's default flags
+  #
+  my $cookie_header = $jar->cookie_header($request_url);
+
+
+
+
+  # Do a request...
+  #
+  my $response=user_agent->get(cookie_header=>$cookie_header);
+
+
+
+
+  # Store the  Set-Cookies in the jar for the request url
+  #
+  $jar->store_cookies($request_url, $partition_key, $flags, $response->header->{Set_Cookie});
+
+  #     ++ OR ++
+
+  # use the HTTP::CookieJar compatible API, using the default flags
+  $jar->add($request_url, $response->header->{Set_Cookie});
+
+
+=head1 DESCRIPTION
+
+Web browsers are constantly improving privacy and limiting the tracking ability
+of cookies. This module implements a cookie jar providing the same up to date
+thinking to Perl user-agents. 
+
+The algorithm implemented is derived from B<RFC6265bis-draft-12> and B<Cookies
+Having Independent Partitioned State (CHIPS)>. These are not finalised
+standards, so it is to be expected this module may change behaviour to keep up
+to date.
+
+To aid adoption, this module will work as a drop in alternative for
+L<HTTP::CookieJar>.  A compatible API has been implemented to allow existing
+user agents to benefit from the performance gains in particular.
+
+However long term, user agents would need to be modified, or at least wrapped
+in order to take full advantage of this module. Not only are there differences
+in the general API compared to popular cookie jars, but conceptually the notion
+of 'browsing context', and 'first-party/third-party' need to be implemented.
+
+Finally, for explicit encoding and decoding of cookie strings (not via a cookie
+jar), please see the companion L<HTTP::State::Cookie> module. This is used
+internally for encoding and decoding cookies.
+
+=head2 Summary of RFC6265bis and CHIPS
+
+At the time of writing RFC6265bis-draft is a version '12'. As the RFC
+progresses this module will be updated accordingly. The highlight take away
+feature implemented/utilized in this module are:
+
+=over
+
+=item Public suffix checking
+
+Cookies are tested for public suffixes  (ie .com, .org, .com.au) and rejected
+if the cookie domain is not below such a level. This prevents a trackers and
+information leakage at a basic level.
+
+=item Prefix cookie name processing
+
+Cookies names prefixed with __Host- and __Secure- are subject to addition
+requirements before being stored.
+
+=item Reduced pper limit of expiry dates
+
+Cookies expire 400 days (or user defined) in the future, instead of potentially
+years.
+
+=item Browsing Context
+
+User agents should be performing additional book keeping and testing of what is
+a 'same site' request, top level navigation, reloading, document etc to fully
+utilise the additional functionality available in this module.
+
+While these tests/conditions are specified in RFC6265bis-draft, it is not in
+the scope of this module and needs to be implemented in a user-agent.  The
+results of such tests are represented as bit fields, which are used to guide
+the store/retrieve algorithm accordingly within this module:
+
+=over
+
+=item samesite/crosssite
+
+=item API/HTTP
+
+=item safe/unsafe method
+
+=item top/nontop level navigation
+
+=back
+
+
+=item Partitioning (CHIPS)
+
+Cookies Having Independent Partitioned State (CHIPS), effectively gives each
+first party site it's own cookie jar. Third party cookies set from resources
+requested by the first party site are stored in this 'partitioned cookie jar'.
+
+These cannot be used by another first party site requesting resources from the
+same third party site.  Hence limiting tracking. 
+
+=back
+
+=head2 COMPATIBILITY
+
+A compatibility interface matching that of  L<HTTP::CookieJar> is available to
+aid in adoption.
+
+In theory, this should allow user-agents like L<HTTP::Tiny> and L<Furl> for
+example to benefit from performance and security improvements with limited
+changes to existing code.
+
+To work around the lack of same site / browsing context / partitioning support
+in the L<HTTP::CookieJar> API, the compatibility API utilises the current
+values of the 'default flags' for the cookie jar and disables partitioning by
+default
+
+
+=head1 API
+
+=head2 User Agent Context Flags
+
+Flags are implemented as constants and can be exported using the  ":flags" tag
+at import:
+
+  use HTTP::State ":flags";
+
+They are a space efficient method of describing the intent and context of a
+request initiated by a user-agent. Multiple flags are ORed together into a bit
+field. This bit field is required for storing and retrieval of cookies
+throughout this API.
+
+As mentioned previously, the user-agent or other external code is responsible
+for performing tests on the context.  The flags are for conveying the results
+to the cookie jar.
+
+=head3 FLAG_SAME_SITE
+
+When this flag is set, a request is considered "same-site". When unset, request
+is considered "cross-site".
+
+A same site request is one which loads resources for a document from the same
+host and scheme as the current 'document' for example.
+
+=head3 FLAG_TYPE_HTTP
+
+When this flag is set, request is considered "HTTP". When unset, request is
+considered "non-HTTP".
+
+In a browser this represents if a request for a resource was initiated by from
+a html document (HTTP) or from javascript (non-HTTP).
+
+=head3 FLAG_SAFE_METH
+
+When this flag is set, request is considered "safe". When unset, request is
+considered "unsafe".
+
+POST and PUT methods in HTTP are considered unsafe.
+
+=head3 FLAG_TOP_LEVEL
+
+When this flag is set, request is considered "top level". When unset, request
+is considered "not-top-level".
+
+Top level requests include manually typing in a URL and navigating to it and 
+
+
+=head2 Creating a cookie jar
+
+=head3 new
+
+  my $jar=HTTP::State->new(...);
+
+Creates a new cookie jar object. Optional named arguments can be provided:
+
+=over
+
+=item default_flags
+
+  my $jar=HTTP::State->new(default_flags=>flags);
+
+Sets the default flags used for storing and retrieving cookies, when no defined
+value is provided via C<retrieve_cookies> and C<store_cookies>
+
+It is also the value used in the compatibility API.
+
+Default is all flags on
+
+(FLAG_TYPE_HTTP|FLAG_TOP_LEVEL|FLAG_SAME_SITE|FLAG_SAFE_METH).
+
+=item enable_partition
+
+  my $jar=HTTP::State->new(enable_partition=>...);
+
+Enables partition support for partition cookies.  When enabled, cookies are
+stored in relevant partitions.
+
+The default value is false (off)
+
+=item retrieve_sort
+
+  my $jar=HTTP::State->new(retrieve_sort=>1||0);
+
+A boolean enabling sorting of retrieved cookies by path length and creation
+time.
+
+Default is false (no sorting).
+
+=item max_expiry
+
+  my $jar=HTTP::State->new(max_expiry=>seconds);
+
+The upper limit in duration a cookie can be valid for.  Value is in seconds.
+
+Default is 400 days (400 * 24 * 3600)
+
+=item lax_allowing_unsafe
+
+  my $jar=HTTP::State->new(lax_allowing_unsafe=>1||0)
+
+A boolean enabling retrieval of cookies for unsafe methods  and default same
+site, as long as cookie is no older than C<lax_allow_unsafe_timeout>
+
+The default value is false.
+
+
+=item lax_allowing_unsafe_timeout
+
+  my $jar=HTTP::State->new(lax_allowing_unsafe_timeout=>seconds)
+
+The timeout value (age) to use when testing the C<lax_allow_unsafe_timeout>.
+
+The default value is 120 seconds
+
+
+=item public_suffix_sub
+
+  my $jar=HTTP::State->new(public_suffix_sub=>sub {...});
+
+A code reference which performs public suffix lookup on a URI.  The code ref
+must take a domain name as an argument and return a suffix or empty string
+string if no suffix exists.
+
+If this option is not provided, a reference to  the C<public_suffix> routine
+from L<Mozilla::PublicSuffix> is used.
+
+=back
+
+
+=head2 Storing and Retrieving
+
+For new code, these methods are preferred over the compatibility API, to make
+better use of 'browsing context'.
+
+
+=head3 store_cookies
+
+  $jar->store_cookies($request_uri, $partition, $flags, $string_or_struct, ...);
+
+Takes a C<$request_url> , browsing context C<$flags> and one or more Set-Cookie
+header string values B<or> cookie structures. Stores them in the cookie jar as per
+the 'storage model' of RFC6265bis-draft.
+
+The exact processing of the cookies is subject to the C<$flags> bit field,
+which is a combination of the 'context flags'. If set to C<undef> the current
+default bit flags for the cookie jar will be used.
+
+The C<$partition> argument, is the partition hey scheme://host) of the first
+party site. Cookies are stored to this partition if the jar was instantiated
+with the C<enable_partition> option.
+
+This method in intended to be called from a user-agent on receipt of a HTTP
+response.
+
+=head3 retrieve_cookies
+
+  $jar->retrieve_cookies($request_url, $partition, $flags); 
+
+Retrieves cookies from a jar, for the specified C<$request_url> according to
+RFC6265bis-draft 'cookie retrieval'. The cookies are encodes them into a string
+suitable for use in a Cookie header in a HTTP request.
+
+The exact processing of the cookies is subject to the C<$flags> bit field,
+which is a combination of the 'context flags'. If set to C<undef> the current
+default bit flags for the cookie jar will be used.
+
+The C<$partition> argument, is the name (scheme://host) of the first party
+site, which is used as a partition key. Cookies are only retrieved from this
+partition if the jar was instantiated with the C<enable_partition> option.
+
+This method in intended to be called from a user-agent in generation of a HTTP
+request.
+
+
+
+
+=head2 Auxillary
+
+=head3 get_cookies
+
+  $jar->get_cookies($request_url);
+  $jar->get_cookies($request_url, $partition, $flags); 
+
+Takes the same arguments as C<retrieve_cookies> and matches the same cookies.
+Returns a copied list of the matched cookie structures instead of a encoded
+string.
+
+=head3 get_kv_cookies
+
+  $jar->get_kv_cookies($request_url);
+  $jar->get_kv_cookies($request_url, $same_site_status, $type, $safe);
+
+Takes the same arguments as C<retrieve_cookies> and matches the same cookies.
+Returns a list of key value pairs, of names and values.
+
+
+
+=head2 HTTP::CookieJar Compatibility Interface
+
+These methods of the same name an intent as those found in L<HTTP::CookieJar>.
+There are most certainly minor differences, but should allow a L<HTTP::State>
+cookie jar to be a drop in replacement in most circumstances a
+L<HTTP::CookieJar> is used. 
+
+
+=head3 add
+
+    $jar->add($url, $set_cookie_string);
+
+Adds a cookie (as a Set_Cookie value string C<$set_cookie_string>) to the
+cookie jar for the request URL C<$url>. 
+
+B<Note on SAME SITE:> It is a compatibility wrapper around C<store_cookies>
+utilising the default flags for the jar as no flags for same site support can
+be supplied directly.
+
+Please refer to the L<HTTP::CookieJar> for further information.
+
+
+=head3 clear
+
+  $jar->clear;
+
+Removes all cookies from the jar
+
+=head3 cookies_for
+
+  $jar->cookies_for($url);
+  $jar->cookies_for($url);
+
+Returns a list of hash refs representing a set cookie for a target C<$url>. The
+elements of each hash are named as per L<HTTP::CookieJar>. Additional elements
+could also exist (ie samesite)
+
+Please refer to the L<HTTP::CookieJar> for further information.
+
+=head3 cookie_header
+
+  $jar->cookie_header($url)
+
+Retrieves any applicable cookies for the target C<$url>, and encodes into a
+Cookie header string value.
+
+B<Note on SAME SITE:> It is a compatibility wrapper around
+C<retrieve_cookies> utilising the default flags for the jar, as no flags
+for same site support can be supplied directly.
+
+Please refer to the L<HTTP::CookieJar> for further information.
+
+
+=head3 dump_cookies
+
+  $jar->dump_cookies;
+  $jar->dump_cookies({persistent => 1});
+
+
+Returns a list of strings encoded as Set Cookie values, but with additional
+internal information.  The C<{persistent =E<gt> 1}> parameter forces only
+persistent cookies to be processed, ignoring session cookies.  
+
+Adjusts the creation and last access times to be relative to epoch in the local
+time, instead of GMT for interoperability with L<HTTP::CookieJar>. 
+
+Partitioned cookies are also included in the dump, with the partition key
+stored, for later loading.
+
+=head3 load_cookies
+
+  $jar->load_cookies(@cookies)
+
+Takes a list of Set-Cookie type strings written out previous with
+C<dump_cookies> and injects them into the cookie jar.
+
+Decodes the creation time and last access time expected in local timezone
+seconds. 
+
+Please refer to the L<HTTP::CookieJar> for further information.
+
+Partitioned cookies store the partition key in the Partitioned attribute. If
+this is present cookies are loaded into the specified partition.
+
+
+=head1 PERFORMANCE
+
+=head2 Cookie Retrieval
+
+Relative performance of retrieving cookies for a request to a single host:
+
+1 cookie:
+
+                     Rate http_cookiejar  protocol_http     http_state
+  http_cookiejar 165217/s             --           -31%           -41%
+  protocol_http  238602/s            44%             --           -15%
+  http_state     279272/s            69%            17%             --
+
+
+5 cookies:
+
+                    Rate http_cookiejar     http_state  protocol_http
+  http_cookiejar  5582/s             --           -80%           -81%
+  http_state     27568/s           394%             --            -8%
+  protocol_http  29824/s           434%             8%             --
+
+50 cookies:
+
+                    Rate http_cookiejar     http_state  protocol_http
+  http_cookiejar 100.0/s             --           -97%           -97%
+  http_state      2973/s          2873%             --            -8%
+  protocol_http   3228/s          3128%             9%             --
+
+100 cookies:
+
+                   Rate http_cookiejar     http_state  protocol_http
+  http_cookiejar 23.1/s             --           -98%           -98%
+  http_state     1370/s          5835%             --            -5%
+  protocol_http  1436/s          6121%             5%             --
+
+1000 cookies:
+
+                    Rate http_cookiejar  protocol_http     http_state
+  http_cookiejar 0.233/s             --           -99%          -100%
+  protocol_http   43.8/s         18738%             --           -76%
+  http_state       179/s         76975%           309%             --
+
+
+=head1 COMPARISON TO OTHER MODULES
+
+L<Protocol::HTTP::CookieJar> is a very fast cookie jar module, also
+implementing RFC6265bis-draft. 
+
+However, it's API is targeted towards its related HTTP client, doesn't support
+CHIPS/partitioning and requires a large number of XS modules
+
+
+L<HTTP::CookieJar> is the cookie jar expected by many user agents.  While it
+has public suffix support, it doesn't provide samesite processing or the
+additional conditions of RFC6265bis-draft or CHIPS/paritioning. It is also
+quite slow in comparison to this module.
+
+=head1 SEE ALSO
+
+The main resources used in implementing this module:
+
+=over
+
+=item L<https://github.com/privacycg/CHIPS#opt-in-partitioned-cookies>
+
+=item L<https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis>
+
+=item L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies>
+
+=back
+
+=head1 TODO
+
+=over
+
+=item Create LWP adaptor
+
+=item Mojo User Agnet adaptor
+
+=item More tests
+
+=back
+
+=head1 REPOSITORTY and BUGS
+
+Please report any bugs via git hub:
+L<http://github.com/drclaw1394/perl-http-state>
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Ruben Westerberg
+
+Licensed under MIT
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.

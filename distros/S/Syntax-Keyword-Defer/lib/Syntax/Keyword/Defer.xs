@@ -18,6 +18,9 @@
 #  include "cx_pusheval.c.inc"
 #endif
 
+// Need to hide core perl's one for now so we get our label-capable version
+#undef forbid_outofblock_ops
+
 #include "perl-additions.c.inc"
 #include "forbid_outofblock_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"

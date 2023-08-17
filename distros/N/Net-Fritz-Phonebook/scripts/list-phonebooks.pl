@@ -3,6 +3,8 @@ use strict;
 use Net::Fritz::Box;
 use Net::Fritz::Phonebook;
 
+our $VERSION = '0.05';
+
 use Getopt::Long;
 GetOptions(
     'h|host:s' => \my $host,

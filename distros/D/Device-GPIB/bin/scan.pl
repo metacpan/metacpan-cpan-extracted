@@ -2,7 +2,7 @@
 #
 # scan.pl
 #
-# Scan the GPIB bus for devices and print the address and ID of each one founf
+# Scan the GPIB bus for devices and print the address and ID of each one found
 
 use strict;
 use Device::GPIB::Controller;
@@ -46,8 +46,14 @@ for (my $address = $start; $address <= $end; $address++)
     print "Trying GPIB $address\n" if $verbose;
     $gpib->setAddress($address);
     my $id = $gpib->sendAndRead('ID?');
-    next unless defined $id;
-    print "$address: $id\n";
+    if (defined $id)
+    {
+	print "$address: $id\n";
+    }
+    else
+    {
+	print "not present\n" if $verbose;
+    }
 }
 
 sub usage

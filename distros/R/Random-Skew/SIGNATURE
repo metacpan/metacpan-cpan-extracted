@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 03980787449ddf1ef0c748ac514fe7fe779dad6aadc3eae605e092f0a8fb4036 Changes
+SHA256 70b57fd372f43034ce1b32ff61d332426d8adbf702ddd07a9643ed21dd294bcc MANIFEST
+SHA256 5a1a2994f7504a85af1c71b5c24ac0961fa567e8b844fbec8773fc650789a1b5 MANIFEST.SKIP
+SHA256 b987ecb6186de4c32f803b74022df859debd2e7aea97784dcb32ca37442e7b94 META.json
+SHA256 5a2ec05390d02f75832f216e6ce4bec637541b8e5bdb495bed5e8d545f4abe83 META.yml
+SHA256 62aede1629e4ce8dd5d1be8297f114a649d2eeb8314bfe825d8ec26f314f6e73 Makefile.PL
+SHA256 39d538c0d8b293a1b4a1e6a9c43f7321429adba448899ed3c10a52b336c966c8 README
+SHA256 727e373ec7e63554b3f123e408180b4c61f6134af7e32d8bcf901a3bc8111ee3 examples/college-majors.pl
+SHA256 1473602f810dc9688d34f06ace2008cd4277bb3b581b024d6f5ce7c7336d9679 examples/country-city.pl
+SHA256 aa1cf733009852646247f6a8a40b4032025597cbc1358264a82a06de47777268 examples/wide-range.pl
+SHA256 912936b30c86ba63059718469c4c36c52b02cb5361f44bcea3c70a6aef2b28b6 lib/Random/Skew.pm
+SHA256 00da06172caa3d2593661577792f0a1f43e6b6ec56aa485ff9808c376d12a4bc t/00-pod.t
+SHA256 7fea73545bb41e56a659eb7c2b30f348c7d87e81b155a7b794acbcf140bf10eb t/01-use.t
+SHA256 9485eddb5f165f64e2215cc05cc48845bcaede34c40b812d6dd23b4fef3c2401 t/02-version.t
+SHA256 2bd1194e10354ccfc2185108b979128c55022c9751003b4ea49115e9ea1f9f99 t/03-usage.t
+SHA256 a5e80610a5c6b5508623e753c5b224808fe982045778f80caac2523a0d3b8302 t/04-grain.t
+SHA256 6381de4286766be4e19263c0f5ba3a45159c98e346b4d9d64130009434f0c04b t/05-rounding.t
+SHA256 51d9dbeeb5135eed78a0441cb4096e0bfc2a616f26fdd1700ea9a3c0ffc7b4ad t/06-wide-set.t
+SHA256 c5369a1513c2b05d383f1a3cbf7f9ff737dbf849c3807ad5b57370a5e6cbcbbe t/07-deep-set.t
+SHA256 a43db06156fa0cb2fe212916b2ac20bda0051f636a9bfa8fe528ee3edf6e7fc9 t/08-multi.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCgAdFiEEHkZZO2gGEmZE7J5SmDwqut7f7B4FAmSyJrAACgkQmDwqut7f
+7B5Kywv/Wpx6sKLO4mM4lpaP3DWGjXTkWzp7KaouLcff71ZdtMhMNQ+wYXOgWPas
+YC2OreJ3yHnN7Me34csgMvhVt3vfF2ZLW+fHyllprnEynHc3s4UQREe8CyPkWvSB
+llaXsYyJSKY6MLoUZMs6meZm5p+yEWUD+4/em7A93Suq2Joj9p9TbfO4apLh1PN4
+LWQI5eK40pi2Zh8MJWEqJXR/IF1HI4UfqzXMT6iI7QvTr+sfwqGYGDTxP+JZxM+z
+hw5aq9Q/M1fxJ13L0e73Kh09cEIPKgK4qb09zfM3M7jSk1zklQXPyLEVa6IIWfHY
+gDPyQQh1exnqdNXshIrmkaVbDk+g3zhcglgRvP7Uk0Dme4bH5u32IwVAW3fdrDC/
+zEbUahPXJsijZgVFEEWgw6L7NEq5C3fYg/666mKZqLsQgOHdGHr2w9Xchp1le/A2
+n9UL2EtLpu2Yv3WvDsJkD2b4VNDSNpA+ni7nb68FAutPC47BXqygZvuN173gX8v2
+7ekwO0Xm
+=uwlx
+-----END PGP SIGNATURE-----

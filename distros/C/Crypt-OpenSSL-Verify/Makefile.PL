@@ -10,29 +10,16 @@ use ExtUtils::MakeMaker;
 
 use Config;
 use File::Spec;
-
+use Crypt::OpenSSL::Guess;
 my %args;
 
-if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl\@1.1 2>@{[File::Spec->devnull]}`) {
-  chomp $prefix;
-  $args{INC} = "-I$prefix/include";
-  $args{LIBS} = ["-L$prefix/lib -lcrypto -lssl"];
-} else {
-  $args{INC} = '-I/usr/local/opt/openssl/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
-  $args{LIBS} = ['-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl'];
-}
+my ($major, $minor, $patch) = openssl_version();
+print "Installed OpenSSL: $major.$minor.$patch\n";
 
-if ($^O eq 'MSWin32') {
-  if (my $libs = `pkg-config --libs libcrypto 2>nul`) {
-    # strawberry perl has pkg-config
-    $args{LIBS} = [ $libs ];
-  } else {
-    $args{LIBS} = ['-llibeay32'] if $Config{cc} =~ /cl/; # msvc with ActivePerl
-    $args{LIBS} = ['-leay32']    if $Config{gccversion}; # gcc
-  }
-}
+$args{INC} =  openssl_inc_paths();
+$args{LIBS} = [openssl_lib_paths() . ' -lssl -lcrypto'];
 
-my $cc_option_flags = ' -DOPENSSL_API_COMPAT=0x10100000L';
+my $cc_option_flags = $major ge 3 ? ' -DOPENSSL_API_COMPAT=30000' : ' -DOPENSSL_API_COMPAT=10100';
 
 if ($Config::Config{cc} =~ /gcc/i) {
   $cc_option_flags .= $ENV{AUTHOR_TESTING} ? ' -Wall -Werror' : ' -Wall';
@@ -41,7 +28,10 @@ if ($Config::Config{cc} =~ /gcc/i) {
 }
 
 if ($Config{gccversion} =~ /llvm/i) {
-  if ( $^O eq 'darwin' && $Config{gccversion} =~ /LLVM 12.0.5/) {
+  if ( $^O eq 'darwin' && (
+    $Config{gccversion} =~ /LLVM 1[2-9].\d.[5-9]/ ||
+    $Config{gccversion} =~ /LLVM 1[3-9]/ ))
+  {
     $cc_option_flags .= ' -Wno-deprecated-declarations -Wno-compound-token-split-by-macro';
   } else {
     $cc_option_flags .= ' -Wno-deprecated-declarations';
@@ -66,6 +56,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "OpenSSL Verify certificate verification in XS.",
   "AUTHOR" => "Timothy Legge <timlegge\@cpan.org>, Wesley Schwengle <waterkip\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
+    "Crypt::OpenSSL::Guess" => 0,
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Crypt-OpenSSL-Verify",
@@ -79,7 +70,7 @@ my %WriteMakefileArgs = (
     "File::Slurper" => "0.012",
     "Test::Exception" => 0
   },
-  "VERSION" => "0.35",
+  "VERSION" => "0.36",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }

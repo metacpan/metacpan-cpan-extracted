@@ -18,11 +18,14 @@ my $s = $driver->session;  # only for autocommit transactions
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
+
 use URI;
 my $undo_id;
 
-plan tests => 6 + 4;
+plan tests => 6 + 3 + $no_warnings;
 
 
 my ($q, $r);
@@ -74,21 +77,20 @@ subtest 'query error handling' => sub {
 
 subtest 'transaction status on error (HTTP)' => sub {
 	plan skip_all => '(currently testing Bolt)' if $Neo4j_Test::bolt;
-	plan skip_all => 'requires REST::Client with AND without Sim';  # TODO
 	plan tests => 5;
 	my $session = $driver->session; 
-	my $good_uri = $session->{net}->{http_agent}->{client}->getHost;
+	my $good_uri = $session->{net}->{http_agent}->{uri_base} // $driver->config('uri');
 	my $bad_uri = URI->new($good_uri);
 	$bad_uri->userinfo("no\tuser:no\tpass");
 	my $t = $session->begin_transaction;
-	$session->{net}->{http_agent}->{client}->setHost("$bad_uri") unless $Neo4j_Test::sim;
-	$session->{net}->{http_agent}->{client}->{auth} = 0 if $Neo4j_Test::sim;
+	$session->{net}->{http_agent}->{uri_base} = $bad_uri unless $Neo4j_Test::sim;
+	$session->{net}->{http_agent}->{auth} = 0 if $Neo4j_Test::sim;
 	throws_ok { $t->run('RETURN "Ugly"') } qr/Unauthorized/i, 'HTTP network error';
 	ok $t->is_open, 'network error keeps open';  # see neo4j #12651
 	ok $t->{unused}, 'network error keeps unused';
-	$session->{net}->{http_agent}->{client}->setHost("$good_uri") unless $Neo4j_Test::sim;
-	$session->{net}->{http_agent}->{client}->{auth} = 1 if $Neo4j_Test::sim;
-	throws_ok { $t->run('praise be to the dartmakers.') } qr/syntax/i, 'Neo4j server error';
+	$session->{net}->{http_agent}->{uri_base} = $good_uri unless $Neo4j_Test::sim;
+	$session->{net}->{http_agent}->{auth} = 1 if $Neo4j_Test::sim;
+	throws_ok { $t->run(' iced manifolds.') } qr/syntax/i, 'Neo4j server error';
 	ok ! $t->is_open, 'server error closes';
 };
 

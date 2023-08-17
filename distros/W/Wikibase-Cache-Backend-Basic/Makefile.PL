@@ -19,6 +19,7 @@ perl_version 5.006002;
 readme_from 'Basic.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
+requires 'Data::Handle' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Text::DSV' => 0;
 requires 'Wikibase::Cache::Backend' => 0.03;
@@ -27,10 +28,11 @@ resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-Cache-B
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-Cache-Backend-Basic';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
+test_requires 'File::Object' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

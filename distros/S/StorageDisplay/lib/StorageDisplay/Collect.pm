@@ -18,7 +18,7 @@ package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data.
 # No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 
 sub collectors {
@@ -2059,7 +2059,7 @@ StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 Main class, allows one to register collectors and run them
 (through the collect method)

@@ -87,7 +87,7 @@ sub is
     my $self = shift( @_ );
     my( $what, $expect ) = @_;
     return( $self->success ) if( $what eq $expect );
-    return( $self->reply( "failed\nI was expecting \"$expect\", but got \"$what\"." ) );
+    return( $self->reply( Apache2::Const::HTTP_EXPECTATION_FAILED => "failed\nI was expecting \"$expect\", but got \"$what\"." ) );
 }
 
 sub jar { return( shift->{jar} ); }

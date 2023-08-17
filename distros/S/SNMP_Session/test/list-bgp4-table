@@ -1,0 +1,84 @@
+#!/usr/local/bin/perl -w
+
+require 5.002;
+use strict;
+use SNMP_Session "0.59";
+use BER;
+use Socket;
+use Getopt::Long;
+
+sub usage ();
+
+my $snmp_version = '2';
+
+GetOptions ("version=i" => \$snmp_version);
+
+my $bgp4PathAttrASPathSegment = [1,3,6,1,2,1,15,6,1,5];
+
+my $hostname = $ARGV[0] || usage ();
+my $community = $ARGV[1] || "public";
+
+my $session;
+
+die "Couldn't open SNMP session to $hostname"
+    unless ($session =
+	    ($snmp_version eq '1' ? SNMP_Session->open ($hostname, $community, 161)
+	     : SNMPv2c_Session->open ($hostname, $community, 161)));
+$session->map_table ([$bgp4PathAttrASPathSegment],
+		     sub () {
+			 my ($index, $as_path_segment) = @_;
+			 my ($dest_net, $preflen, $peer)
+			     = ($index =~ /([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/);
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($as_path_segment));
+			 printf "%-18s %-15s %s\n",
+			 $dest_net."/".$preflen, $peer, pretty_as_path ($as_path_segment);
+		     });
+$session->close ();
+
+1;
+
+sub pretty_addr ($ ) {
+    my ($addr) = @_;
+    my ($hostname,$aliases,$addrtype,$length,@addrs)
+	= gethostbyaddr (inet_aton ($addr), AF_INET);
+    $hostname ? $hostname." [".$addr."]" : $addr;
+}
+
+sub hostname ($ ) {
+    my ($addr) = @_;
+    my ($hostname,$aliases,$addrtype,$length,@addrs)
+	= gethostbyaddr (inet_aton ($addr), AF_INET);
+    $hostname || "[".$addr."]";
+}
+
+sub pretty_as_path ($ ) {
+    my ($aps) = @_;
+    my $start = 0;
+    my $result = '';
+    while (length ($aps) > $start) {
+	my ($type,$length) = unpack ("CC", substr ($aps, $start, 2));
+	$start += 2;
+	my ($pretty_ases, $next_start) = pretty_ases ($length, $aps, $start);
+	$result .= ($type == 1 ? "SET " : $type == 2 ? "" : "type $type??")
+	    .$pretty_ases;
+	$start = $next_start;
+    }
+    $result;
+}
+
+sub pretty_ases ($$$ ) {
+    my ($length, $aps, $start) = @_;
+    my $result = undef;
+    return ('',0) if $length == 0;
+    while ($length-- > 0) {
+	my $as = unpack ("S", substr ($aps, $start, 2));
+	$start += 2;
+	$result = defined $result ? $result." ".$as : $as;
+    }
+    ($result, $start);
+}
+
+sub usage () {
+  die "usage: $0 host [community]";
+}

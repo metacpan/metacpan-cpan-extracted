@@ -1,5 +1,8 @@
 Release history for Catalyst-Plugin-CachedUriForAction
 
+1.004 Sat 12 Aug 2023
+	- Plugin style switch from inheritance-based to a role
+
 1.003 Tue 09 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl

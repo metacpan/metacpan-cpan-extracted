@@ -66,7 +66,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.210';
+our $VERSION = '1.211';
 
 use Quiq::Storable;
 
@@ -178,7 +178,7 @@ Liefere das für die Cachedatei definierte Timeout.
 
 =head1 VERSION
 
-1.210
+1.211
 
 =head1 AUTHOR
 

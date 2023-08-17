@@ -25,8 +25,9 @@
       "runtime" : {
          "requires" : {
             "Catalyst" : "5.90090",
+            "Class::MOP::Class" : "0",
+            "Moose::Role" : "0",
             "URI::Encode::XS" : "0.11",
-            "mro" : "0",
             "perl" : "5.008005"
          }
       },
@@ -43,7 +44,7 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-CachedUriForAction"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
@@ -51,10 +52,10 @@
          "web" : "https://github.com/ap/Catalyst-Plugin-CachedUriForAction"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
-      "year" : 2021
+      "year" : 2023
    },
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

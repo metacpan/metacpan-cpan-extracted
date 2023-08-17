@@ -25,8 +25,8 @@ Filter::signatures - very simplistic signatures for Perl < 5.20
 
 # DESCRIPTION
 
-This module implements a backwards compatibility shim for formal Perl subroutine
-signatures that were introduced to the Perl core with Perl 5.20.
+This module implements a backwards compatibility shim for formal Perl
+subroutine signatures that were introduced to the Perl core with Perl 5.20.
 
 # CAVEATS
 
@@ -39,13 +39,13 @@ The module also implements default values for unnamed parameters by
 splitting the formal parameters on `/,/` and assigning the values
 if `@_` contains fewer elements than expected. Function calls
 as default values may work by accident. Commas within default values happen
-to work due to the design of [Filter::Simple](https://metacpan.org/pod/Filter::Simple), which removes them for
+to work due to the design of [Filter::Simple](https://metacpan.org/pod/Filter%3A%3ASimple), which removes them for
 the application of this filter.
 
 ## Syntax peculiarities
 
-Note that this module inherits all the bugs of [Filter::Simple](https://metacpan.org/pod/Filter::Simple) and potentially
-adds some of its own.
+Note that this module inherits all the bugs of [Filter::Simple](https://metacpan.org/pod/Filter%3A%3ASimple) and
+potentially adds some of its own.
 
 ### Slashes
 
@@ -103,8 +103,8 @@ better approach is to upgrade to Perl 5.20 or higher.
 
 To keep the argument parser simple, the parsing of regular expressions has been
 omitted. For Perl below 5.10, you cannot use regular expressions as default
-expressions. For higher Perl versions, this means that parentheses, curly braces
-and commas need to be explicitly escaped with a backslash when used as
+expressions. For higher Perl versions, this means that parentheses, curly
+braces and commas need to be explicitly escaped with a backslash when used as
 default expressions:
 
     sub foo( $x = /,/ ) { # WRONG!
@@ -131,7 +131,7 @@ may also go out of sync with the original document.
 
 ## `eval`
 
-[Filter::Simple](https://metacpan.org/pod/Filter::Simple) does not trigger when using
+[Filter::Simple](https://metacpan.org/pod/Filter%3A%3ASimple) does not trigger when using
 code such as
 
     eval <<'PERL';
@@ -176,19 +176,19 @@ rest are welcome.
 
 ["Signatures" in perlsub](https://metacpan.org/pod/perlsub#Signatures)
 
-[App::sigfix](https://metacpan.org/pod/App::sigfix), which transforms your source code directly between
+[App::sigfix](https://metacpan.org/pod/App%3A%3Asigfix), which transforms your source code directly between
 the different notations without employing a source filter
 
 [signatures](https://metacpan.org/pod/signatures) - a module that doesn't use a source filter but optree
 modification instead
 
-[Sub::Signatures](https://metacpan.org/pod/Sub::Signatures) - uses signatures to dispatch to different subroutines
+[Sub::Signatures](https://metacpan.org/pod/Sub%3A%3ASignatures) - uses signatures to dispatch to different subroutines
 based on which subroutine matches the signature
 
-[Method::Signatures](https://metacpan.org/pod/Method::Signatures) - this module implements subroutine signatures
-closer to Perl 6, but requires [PPI](https://metacpan.org/pod/PPI) and [Devel::Declare](https://metacpan.org/pod/Devel::Declare)
+[Method::Signatures](https://metacpan.org/pod/Method%3A%3ASignatures) - this module implements subroutine signatures
+closer to Perl 6, but requires [PPI](https://metacpan.org/pod/PPI) and [Devel::Declare](https://metacpan.org/pod/Devel%3A%3ADeclare)
 
-[Function::Parameters](https://metacpan.org/pod/Function::Parameters) - adds two new keywords for declaring subroutines and
+[Function::Parameters](https://metacpan.org/pod/Function%3A%3AParameters) - adds two new keywords for declaring subroutines and
 parses their signatures. It supports more features than core Perl, closer to
 Perl 6, but requires a C compiler and Perl 5.14+.
 
@@ -206,7 +206,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures](https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures)
-or via mail to [filter-signatures-Bugs@rt.cpan.org](https://metacpan.org/pod/filter-signatures-Bugs@rt.cpan.org).
+or via mail to [filter-signatures-Bugs@rt.cpan.org](https://metacpan.org/pod/filter-signatures-Bugs%40rt.cpan.org).
 
 # AUTHOR
 
@@ -214,7 +214,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2020 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

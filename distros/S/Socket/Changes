@@ -1,5 +1,14 @@
 Revision history for Socket
 
+2.037   2023-06-06
+        [CHANGES]
+         * Convert hard tabs to spaces in source files
+         * Add `use VERSION` everywhere
+         * Fix indentation for consistency
+
+        [BUGFIXES]
+         * Fix compiler warnings on MSWin32 (RT148275)
+
 2.036   2022-08-19
         [BUGFIXES]
          * Avoid putting macros inside arguments to other macros, as it annoys

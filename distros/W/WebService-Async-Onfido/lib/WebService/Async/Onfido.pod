@@ -18,6 +18,22 @@ WebService::Async::Onfido - unofficial support for the Onfido identity verificat
 
 =head1 DESCRIPTION
 
+=head2 hook
+
+Executes a hook, if specified at configure time.
+
+Takes the following:
+
+=over 4
+
+=item * C<$hook> - the hook to execute
+
+=item * C<$data> - data to pass to the sub
+
+=back
+
+It returns C<undef>
+
 =head2 applicant_list
 
 Retrieves a list of all known applicants.

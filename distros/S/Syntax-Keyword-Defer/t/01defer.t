@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Defer;
 
@@ -233,6 +233,14 @@ use Syntax::Keyword::Defer;
 
    is($x, "a", 'defer block still runs during exception unwind');
    is($e, "Oopsie\n", 'Thrown exception still occurs after defer');
+}
+
+{
+   no Syntax::Keyword::Defer;
+
+   sub defer { return "normal function" }
+
+   is( defer, "normal function", 'defer() parses as a normal function call' );
 }
 
 done_testing;

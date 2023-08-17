@@ -1,14 +1,14 @@
 package IPC::System::Options;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
-our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.340'; # VERSION
-
 use strict 'subs', 'vars';
 use warnings;
 
 use Proc::ChildError qw(explain_child_error);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-05-24'; # DATE
+our $DIST = 'IPC-System-Options'; # DIST
+our $VERSION = '0.341'; # VERSION
 
 my $log;
 our %Global_Opts;
@@ -300,35 +300,6 @@ sub _system_or_readpipe_or_run_or_start {
             $opts->{capture_stdout} = undef if $capture_stdout_was_false;
         }
 
-        # log output
-        if ($opts->{log}) {
-            my $res_show;
-            if (defined $opts->{max_log_output}) {
-                $res_show = '';
-                if ($wa) {
-                    for (@$res) {
-                        if (length($res_show) + length($_) >=
-                                $opts->{max_log_output}) {
-                            $res_show .= substr(
-                                $_,0,$opts->{max_log_output}-length($res_show));
-                            last;
-                        } else {
-                            $res_show .= $_;
-                        }
-                    }
-                } else {
-                    if (length($res) > $opts->{max_log_output}) {
-                        $res_show = substr($res, 0, $opts->{max_log_output});
-                    }
-                }
-            }
-            log_trace("result of readpipe(): %s (%d bytes)",
-                      defined($res_show) ? $res_show : $res,
-                      defined($res_show) ?
-                          $opts->{max_log_output} : length($res))
-                if $exit_code_is_success;
-        }
-
     } elsif ($which eq 'run' || $which eq 'start') {
 
         if ($opts->{log} || $opts->{dry_run}) {
@@ -394,6 +365,35 @@ sub _system_or_readpipe_or_run_or_start {
         }
 
     } # which
+
+    # log output
+    if ($opts->{log}) {
+        my $res_show;
+        if (defined $opts->{max_log_output}) {
+            $res_show = '';
+            if ($wa) {
+                for (@$res) {
+                    if (length($res_show) + length($_) >=
+                        $opts->{max_log_output}) {
+                        $res_show .= substr(
+                            $_,0,$opts->{max_log_output}-length($res_show));
+                        last;
+                    } else {
+                        $res_show .= $_;
+                    }
+                }
+            } else {
+                if (length($res) > $opts->{max_log_output}) {
+                    $res_show = substr($res, 0, $opts->{max_log_output});
+                }
+            }
+        }
+        log_trace("result of $which(): %s (%d bytes)",
+                  defined($res_show) ? $res_show : $res,
+                      defined($res_show) ?
+                  $opts->{max_log_output} : length($res))
+            if $exit_code_is_success;
+    } # end of log output
 
     # restore ENV
     if (%save_env) {
@@ -484,7 +484,7 @@ IPC::System::Options - Perl's system(), readpipe()/qx, IPC::Run's run(), start()
 
 =head1 VERSION
 
-This document describes version 0.340 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2021-01-31.
+This document describes version 0.341 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2023-05-24.
 
 =head1 SYNOPSIS
 
@@ -849,14 +849,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/IPC-System
 
 Source repository is at L<https://github.com/perlancar/perl-IPC-System-Options>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<IPC::System::Simple> also provides wrapper for C<system()> and C<readpipe()>
@@ -871,11 +863,37 @@ and screensaver or power management.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,3 +1,10 @@
+0.42 Tue Jun 27 10:15:13 AM EDT 2023
+ - Switch from YAML::XS to YAML::PP
+
+0.41 Tue Jun 27 09:48:50 AM EDT 2023
+ - Add option to align content at top of slides
+ - Remove Travis
+
 0.37 Mon Sep  8 16:40:13 PDT 2014
  - All any extension. Fixes issue/14.
 
@@ -21,7 +28,7 @@
  - Try new travis excludes
  - Use manual VERSION
 
-0.30 Sat Jun 14 14:26:02 PDT 2014
+0.3 Sat Jun 14 14:26:02 PDT 2014
  - Update to Zilla::Dist
 
 0.29 Wed Jun 12 09:29:51 PDT 2013
@@ -52,7 +59,7 @@
 0.21 Sat Apr 10 11:02:45 PDT 2010
  - 0.20 botched getting to CPAN
 
-0.20 Thu Apr  8 16:22:55 PDT 2010
+0.2 Thu Apr  8 16:22:55 PDT 2010
  - 0.19 botched getting to CPAN
 
 0.19 Thu Apr  8 09:58:43 PDT 2010
@@ -92,6 +99,5 @@
 0.11 Thu May 15 15:30:18 JST 2008
  - Move Vroom.pm to Vroom::Vroom
 
-0.10 Sun Apr 13 15:34:56 CST 2008
+0.1 Sun Apr 13 15:34:56 CST 2008
  - Initial Release
-

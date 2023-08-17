@@ -1,5 +1,3 @@
-# $Id: SSH1Misc.pm,v 1.1 2001/04/09 19:38:34 btrott Exp $
-
 package Net::SSH::Perl::Util::SSH1Misc;
 use strict;
 use warnings;

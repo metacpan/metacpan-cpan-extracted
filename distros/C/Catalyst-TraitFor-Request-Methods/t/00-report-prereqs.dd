@@ -43,6 +43,7 @@ do { my $x = {
                                    'HTTP::Request::Common' => '0',
                                    'Module::Metadata' => '0',
                                    'Moose' => '0',
+                                   'Plack::Middleware::MethodOverride' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'lib' => '0',

@@ -38,7 +38,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.038'; # VERSION
+our $VERSION = '0.039'; # VERSION
 
 use Mouse;
 
@@ -151,6 +151,17 @@ sub add
         die qq(can't parse dbxref from "def:" line: $def_dbxref);
       }
     } @{$def->{dbxrefs}};
+
+    map {
+      my $xref = $_;
+
+      if ($xref =~ /^(.+?):(.*)/) {
+        my ($def_db_name, $def_accession) = ($1, $2);
+        $self->terms_by_db_name()->{$def_db_name}->{$def_accession} = $term;
+      } else {
+        die qq(can't parse "xref:" line: $xref);
+      }
+    } $term->xrefs();
 
     my $name = $term->{name};
 

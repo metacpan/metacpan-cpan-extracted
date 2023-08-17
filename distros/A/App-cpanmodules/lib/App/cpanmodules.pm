@@ -1,13 +1,13 @@
 package App::cpanmodules;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-25'; # DATE
-our $DIST = 'App-cpanmodules'; # DIST
-our $VERSION = '0.006'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-06-17'; # DATE
+our $DIST = 'App-cpanmodules'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -244,7 +244,7 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.006 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2020-03-25.
+This document describes version 0.007 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2023-06-17.
 
 =head1 SYNOPSIS
 
@@ -264,7 +264,7 @@ generated POD's Description.
 
 Usage:
 
- get_acmemod(%args) -> [status, msg, payload, meta]
+ get_acmemod(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get contents of an Acme::CPANModules module.
 
@@ -276,17 +276,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<module>* => I<perl::modname>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -296,7 +298,7 @@ Return value:  (any)
 
 Usage:
 
- list_acmemods(%args) -> [status, msg, payload, meta]
+ list_acmemods(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all installed Acme::CPANModules modules.
 
@@ -308,21 +310,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<mentions> => I<perl::modname>
 
+(No description)
+
 =item * B<module> => I<perl::modname>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -332,7 +340,7 @@ Return value:  (any)
 
 Usage:
 
- list_entries(%args) -> [status, msg, payload, meta]
+ list_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List entries from an Acme::CPANModules module.
 
@@ -344,7 +352,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<module>* => I<perl::modname>
+
+(No description)
 
 =item * B<with_attrs> => I<array[str]>
 
@@ -355,12 +367,12 @@ Include additional attributes from each entry.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -370,7 +382,7 @@ Return value:  (any)
 
 Usage:
 
- view_acmemod(%args) -> [status, msg, payload, meta]
+ view_acmemod(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 View an Acme::CPANModules module as rendered POD.
 
@@ -382,17 +394,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<module>* => I<perl::modname>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -403,14 +417,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-cpanmo
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-cpanmodules>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanmodules>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -423,15 +429,43 @@ L<App::lcpan::CmdBundle::cpanmodules>) to query Acme::CPANModules modules.
 
 L<App::CPANAuthorsUtils> for L<Acme::CPANAuthors>
 
+L<TableData::Acme::CPANModules>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanmodules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

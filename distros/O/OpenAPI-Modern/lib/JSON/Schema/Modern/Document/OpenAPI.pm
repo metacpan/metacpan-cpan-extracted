@@ -5,12 +5,13 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.044';
+our $VERSION = '0.046';
 
 use 5.020;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -19,11 +20,11 @@ use JSON::Schema::Modern::Utilities 0.525 qw(E canonical_uri jsonp);
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
-use List::Util qw(any pairs);
+use List::Util 'pairs';
 use Ref::Util 'is_plain_hashref';
 use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
-use Types::Standard qw(InstanceOf HashRef Str);
+use Types::Standard qw(InstanceOf HashRef Str Enum);
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
@@ -55,6 +56,22 @@ has json_schema_dialect => (
   is => 'rwp',
   isa => InstanceOf['Mojo::URL'],
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+);
+
+my $reffable_entities = Enum[qw(response parameter example request-body header security-scheme link callbacks path-item)];
+
+# json pointer => entity name
+has entities => (
+  is => 'bare',
+  isa => HashRef[$reffable_entities],
+   handles_via => 'Hash',
+   handles => {
+     _add_entity_location => 'set',
+     get_entity_at_location => 'get',
+  },
+  lazy => 1,
+  default => sub { {} },
+
 );
 
 # operationId => document path
@@ -152,14 +169,20 @@ sub traverse ($self, $evaluator) {
   my $result = $self->evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
+      short_circuit => 1,
       callbacks => {
         '$dynamicRef' => sub ($, $schema, $state) {
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
           return 1;
         },
         '$ref' => sub ($data, $schema, $state) {
+          my ($entity) = ($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)?$});
+          $self->_add_entity_location($state->{data_path}, $entity)
+            if $entity and $reffable_entities->check($entity);
+
           push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
             if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
+
           return 1;
         },
       },
@@ -189,13 +212,19 @@ sub traverse ($self, $evaluator) {
 
   return $state if $state->{errors}->@*;
 
+  # disregard paths that are not the root of each embedded subschema.
+  # Because the callbacks are executed after the keyword has (recursively) finished evaluating,
+  # for each nested schema group. the schema paths appear longest first, with the parent schema
+  # appearing last. Therefore we can whittle down to the parent schema for each group by iterating
+  # through the full list in reverse, and checking if it is a child of the last path we chose to save.
   my @real_json_schema_paths;
-  foreach my $path (sort @json_schema_paths) {
-    # disregard paths that are not the root of each embedded subschema.
-    next if any { $path =~ m{^\Q$_\E(?:/|\z)} } @real_json_schema_paths;
+  for (my $idx = $#json_schema_paths; $idx >= 0; --$idx) {
+    next if $idx != $#json_schema_paths
+      and substr($json_schema_paths[$idx], 0, length($real_json_schema_paths[-1])+1)
+        eq $real_json_schema_paths[-1].'/';
 
-    unshift @real_json_schema_paths, $path;
-    $self->_traverse_schema($self->get($path), { %$state, schema_path => $path });
+    push @real_json_schema_paths, $json_schema_paths[$idx];
+    $self->_traverse_schema($self->get($json_schema_paths[$idx]), { %$state, schema_path => $json_schema_paths[$idx] });
   }
 
   foreach my $pair (@operation_paths) {
@@ -277,7 +306,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 SYNOPSIS
 

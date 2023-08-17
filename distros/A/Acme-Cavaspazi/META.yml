@@ -15,8 +15,9 @@ name: Acme-Cavaspazi
 provides:
   Acme::Cavaspazi:
     file: lib/Acme/Cavaspazi.pm
-    version: v1.0.1
+    version: v1.0.3
 requires:
+  Acme::Bleach: '0'
   Carp: '1.2'
   File::Basename: '0'
   FindBin: '1.3'
@@ -25,6 +26,7 @@ requires:
   Pod::Usage: '0'
   perl: '5.012'
 resources:
-  repository: https://github.com/telatin/FASTX-Reader
-version: 1.0.1
+  homepage: https://metacpan.org/pod/Acme::Cavaspazi
+  repository: https://github.com/telatin/Acme-Cavaspazi
+version: 1.0.3
 x_serialization_backend: 'YAML::Tiny version 1.70'

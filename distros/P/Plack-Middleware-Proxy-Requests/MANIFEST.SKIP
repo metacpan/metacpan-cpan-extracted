@@ -55,11 +55,26 @@
 \bDebian_CPANTS.txt$
 -stamp$
 
-# Avoid Eclipse files
-.includepath
-.project
+# Avoid editors files
+^.cproject\b
+^.includepath\b
+^.project\b
+^.settings\b
+^.vscode\b
 
 # Avoid distdir
 \d+\.\d+\b
 ^MYMETA.yml$
 ^MYMETA\.json$
+
+# Avoid compiler artefacts
+\bcompilet
+\btest-
+\.exe$
+\.o$
+
+# Avoid dot files
+^\.(?!perlcritic)
+
+# Avoid cpm
+^local\b

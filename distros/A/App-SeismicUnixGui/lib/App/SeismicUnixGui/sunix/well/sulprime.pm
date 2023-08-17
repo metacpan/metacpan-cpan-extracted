@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::well::sulprime;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

@@ -1,0 +1,7 @@
+Algorithm-Line-Lerp - 2D grid line drawing via linear interpolation
+
+this module can be installed using cpanm:
+
+  cpanm Algorithm::Line::Lerp
+
+run perldoc(1) on Algorithm::Line::Lerp for documentation

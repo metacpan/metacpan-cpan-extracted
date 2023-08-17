@@ -20,7 +20,7 @@ class Hash {
   }
   private static method _MAX_LOAD_FACTOR : double () { return 0.75; }
 
-  precompile static method new : Hash ($key_values = undef : object[]) {
+  precompile static method new : Hash ($key_values : object[] = undef) {
     my $self = new Hash;
     
     my $default_capacity = 32;
@@ -152,6 +152,16 @@ class Hash {
     return $keys;
   }
 
+  precompile method has_keys : int () {
+    
+    my $has_keys = 0;
+    if ($self->{count} > 0) {
+      $has_keys = 1;
+    }
+    
+    return $has_keys;
+  }
+
   precompile method values : object[] () {
     my $retval = new object[$self->{count}];
     # iterate entries
@@ -175,7 +185,7 @@ class Hash {
     return $ret;
   }
 
-  precompile method to_array : object[] ($sort = 0 : int) {
+  precompile method to_array : object[] ($sort : int = 0) {
     my $keys = $self->keys;
     my $keys_length = @$keys;
     

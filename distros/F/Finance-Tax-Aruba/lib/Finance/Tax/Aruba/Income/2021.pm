@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2021;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use Moose;
 use namespace::autoclean;
 
@@ -9,51 +9,8 @@ with qw(
     Finance::Tax::Aruba::Role::Income::TaxYear
 );
 
-has '+wervingskosten_max' => (
-    default  => 1500,
-);
-
-has '+wervingskosten_percentage' => (
-    default  => 3,
-);
-
-has '+aov_max' => (
-    default  => 85_000,
-);
-
-has '+azv_max' => (
-    default  => 85_000,
-);
-
 has '+taxfree_max' => (
     default  => 28_861,
-);
-
-has '+aov_percentage_employer' => (
-    default  => 10.5,
-);
-
-has '+aov_percentage_employee' => (
-    default  => 5,
-);
-
-has '+azv_max' => (
-    default  => 85_000,
-);
-
-has '+azv_percentage_employee' => (
-    default  => 1.6,
-);
-
-has '+azv_percentage_employer' => (
-    default  => 8.9,
-);
-
-has tax_bracket => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
-    builder => '_get_tax_bracket',
 );
 
 sub _build_tax_bracket {
@@ -103,7 +60,7 @@ Finance::Tax::Aruba::Income::2021 - Income tax calculator for the year 2021
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

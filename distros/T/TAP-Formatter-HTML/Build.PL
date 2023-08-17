@@ -37,6 +37,11 @@ my $build = Module::Build->new
 			  'Test::More'    => '0.01',
 			  'Module::Build' => '0.20',
 		         },
+	meta_merge => {
+		resources => {
+			repository => 'https://github.com/spurkis/TAP-Formatter-HTML'
+		}
+	},
   );
 
 $build->add_build_element("tt2");

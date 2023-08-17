@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::header::sushw;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUSHW - Set one or more Header Words using trace number, mod and	
+ PERL PROGRAM NAME:  SUSHW - Set one or more Header Words using trace number, mod and	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

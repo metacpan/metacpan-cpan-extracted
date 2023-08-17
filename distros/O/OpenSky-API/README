@@ -2,7 +2,7 @@ NAME
     OpenSky::API - Perl interface to the OpenSky Network API
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
         use OpenSky::API;
@@ -18,6 +18,11 @@ SYNOPSIS
         }
 
 DESCRIPTION
+    WARNING: This module is deprecated in favor of WebService::OpenSky. This
+    was an experiment to see how easy it would be to create this module
+    using Github Copilot. It was a fun experiment, but there were some
+    design flaws. Those are largely fixed in WebService::OpenSky.
+
     This is a Perl interface to the OpenSky Network API. It provides a
     simple, object-oriented interface, but also allows you to fetch raw
     results for performance.

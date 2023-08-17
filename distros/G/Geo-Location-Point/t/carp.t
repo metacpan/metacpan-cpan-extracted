@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::Carp;
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 use Geo::Location::Point;
 
 CARP: {
@@ -15,5 +15,11 @@ CARP: {
 		ok(!defined(Geo::Location::Point->new(lat => 0)))
 	}, qr/longitude not given/);
 
-	ok(defined(Geo::Location::Point->new(lat => 0, long => 0)));
+	my $point = new_ok('Geo::Location::Point' => [
+		lat => 0, long => 0
+	]);
+
+	does_carp_that_matches(sub {
+		$point->distance()
+	}, qr/Usage/);
 }

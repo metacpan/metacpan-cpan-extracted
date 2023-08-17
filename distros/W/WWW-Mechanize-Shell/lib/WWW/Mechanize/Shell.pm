@@ -15,7 +15,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 use B::Deparse;
 
-our $VERSION = '0.59';
+our $VERSION = '0.62';
 our @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1834,7 +1834,7 @@ sub shell {
   use WWW::Mechanize::FormFiller;
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
-  our $VERSION = '0.59';
+  our $VERSION = '0.62';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -2090,7 +2090,7 @@ L<http://perlmonks.org/>.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002-2020 Max Maischein
+Copyright (C) 2002-2023 Max Maischein
 
 =head1 AUTHOR
 

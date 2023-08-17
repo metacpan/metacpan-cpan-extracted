@@ -153,6 +153,7 @@ my $response = sub {
 
 # Analysis API
 get '/' => $response;
+get '/matomo.php' => $response;
 get '/piwik.php' => $response;
 
 

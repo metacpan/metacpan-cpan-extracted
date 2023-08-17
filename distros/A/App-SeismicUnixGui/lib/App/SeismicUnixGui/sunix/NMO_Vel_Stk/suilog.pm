@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::suilog;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

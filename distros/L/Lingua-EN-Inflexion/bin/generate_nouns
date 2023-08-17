@@ -328,12 +328,12 @@ sub emit_converter {
     say "    return \$${name}_of->{lc \$word}  if exists \$${name}_of->{lc \$word};";
     say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{tc \$word};";
     say "    return \$word                     if is_$type(\$word)$plus_extra_check;";
-    say '    given ($word) {';
+    say '    for ($word) {';
 
     # Generate each alternative replacement pattern...
     my %generated;
     for my $replacement_ref ( @{$replacement_suffixes} ) {
-        my $recognizer = '        when (m{\A' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
+        my $recognizer = '        if (m{\A' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
         next if $generated{$recognizer}++;
         say $recognizer;
     }
@@ -361,9 +361,9 @@ sub emit_recognizer {
     say "    return 0 if exists \$is_${compl_name}\->{\$word};";
     say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
     say "    return 0 if exists \$is_${compl_name}\->{tc \$word};";
-    say '    given ($word) {';
-    say "        when (m{'\$})  { return $final_apost{$name} }";
-    say "        when (m{'s\$}) { return $final_apost_s{$name} }";
+    say '    for ($word) {';
+    say "        if (m{'\$})  { return $final_apost{$name} }";
+    say "        if (m{'s\$}) { return $final_apost_s{$name} }";
 
     # Generate each alternative success pattern...
     my %generated;
@@ -372,7 +372,7 @@ sub emit_recognizer {
         next if $replacement_ref->{tag} eq 'nonindicative';
 
         # Otherwise, use them...
-        my $recognizer = '        when (m{\A' . $replacement_ref->{from}
+        my $recognizer = '        if (m{\A' . $replacement_ref->{from}
                        . '$}i) { '.($replacement_ref->{conditional}//q{}).'return 1 }';
         next if $generated{$recognizer}++;
         say $recognizer;

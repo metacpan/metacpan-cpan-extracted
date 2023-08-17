@@ -44,7 +44,7 @@ BEGIN {
         caption col colgroup table tbody td tfoot
         th thead tr_
 
-        buttom datalist fieldset form input
+        button datalist fieldset form input
         label legend meter optgroup option
         output progress select_ textarea
 
@@ -72,7 +72,7 @@ BEGIN {
 
 =head1 NAME
 
-Text::HyperScript::HTML5 - The html5 tagset for L<Text::HyperScript>.
+Text::HyperScript::HTML5 - The shorthands for html5 tags by L<Text::HyperScript>.
 
 =head1 SYNOPSIS
 
@@ -124,16 +124,19 @@ Text::HyperScript::HTML5 - The html5 tagset for L<Text::HyperScript>.
 
 =head1 GLOBAL VARIABLES
 
-=head2 $h : CodeRef of Text::HyperScript::h
+=head2 $Text::HyperScript::HTML5::h : CodeRef (default is \&Text::HyperScript::h)
 
-This variable exist for extends or replace hyperscript functions.
+This variable exists for replacing tag generator.
 
-You could use your C<h> function instead of default C<h> function.
+Default value is CodeRef of L<Text::HyperScript>'s C<h> subroutine.
 
-=head1 NOTE
+You could be replacing C<h> subroutine to another ones by this variable.
 
-some tags added C<_> suffix,
-these name is conflict to perl builtin functions.
+=head1 NOTICE
+
+Some shorthands have C<_> suffix.
+
+This reason is prevent conflict to between of built-in subroutines.
 
 =head1 LICENSE
 

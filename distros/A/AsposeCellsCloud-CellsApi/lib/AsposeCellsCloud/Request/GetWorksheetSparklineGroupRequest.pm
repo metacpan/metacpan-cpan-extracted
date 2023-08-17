@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetSparklineGroupRequest.name :   ,
-# GetWorksheetSparklineGroupRequest.sheetName :   ,
-# GetWorksheetSparklineGroupRequest.sparklineIndex :   ,
-# GetWorksheetSparklineGroupRequest.folder :   ,
-# GetWorksheetSparklineGroupRequest.storageName :    
+# GetWorksheetSparklineGroupRequest.name : The workbook name.  ,
+# GetWorksheetSparklineGroupRequest.sheetName : The worksheet name.  ,
+# GetWorksheetSparklineGroupRequest.sparklineIndex : The zero based index of the element.  ,
+# GetWorksheetSparklineGroupRequest.folder : Original workbook folder.  ,
+# GetWorksheetSparklineGroupRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_sparkline_group' } = { 
-    	summary => '',
+    	summary => 'Get worksheet sparkline group description.',
         params => $params,
         returns => 'SparklineGroupResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'sparkline_index' => {
      	datatype => 'int',
      	base_name => 'sparklineIndex',
-     	description => '',
+     	description => 'The zero based index of the element.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

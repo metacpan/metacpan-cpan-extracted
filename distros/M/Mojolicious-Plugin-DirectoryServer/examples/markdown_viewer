@@ -3,14 +3,14 @@ use Mojolicious::Lite;
 use Text::Markdown qw/markdown/;
 use Encode qw/encode_utf8 decode_utf8/;
 
-plugin 'Directory', {
+plugin 'DirectoryServer', {
     auto_index => 0, # disabled directory index
     dir_index  => 'index.md',
-    root       => app->home->rel_dir('documents'),
+    root       => app->home->rel_file('documents'),
     handler    => sub {
         my ( $c, $path ) = @_;
         return unless $path =~ /\.(md|mkdn)$/;
-        my $markdown = Mojo::Util::slurp($path);
+        my $markdown = Mojo::File::slurp($path);
         my $html = markdown( decode_utf8 $markdown );
         $c->render( template => 'markdown', html => $html );
     },

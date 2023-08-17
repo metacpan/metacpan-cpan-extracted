@@ -1,22 +1,22 @@
 NAME
 
-    starlight - a light and pure-Perl PSGI/Plack HTTP server with pre-forks
+    starlight - Light and pure-Perl PSGI/Plack HTTP server with pre-forks
 
 SYNOPSIS
 
-      $ starlight --workers=20 --max-reqs-per-child=100 app.psgi
+        $ starlight --max-workers=20 --max-reqs-per-child=100 app.psgi
     
-      $ starlight --port=80 --ipv6=1 app.psgi
+        $ starlight --port=80 --ipv6=1 app.psgi
     
-      $ starlight --port=443 --ssl=1 --ssl-key-file=file.key
-                  --ssl-cert-file=file.crt app.psgi
+        $ starlight --port=443 --ssl=1 --ssl-key-file=file.key
+                    --ssl-cert-file=file.crt app.psgi
     
-      $ starlight --socket=/tmp/starlight.sock app.psgi
+        $ starlight --socket=/tmp/starlight.sock app.psgi
 
 DESCRIPTION
 
     Starlight is a standalone HTTP/1.1 server with keep-alive support. It
-    uses pre-forking. It is pure-Perl implementation which doesn't require
+    uses pre-forking. It is a pure-Perl implementation that doesn't require
     any XS package.
 
     Starlight was started as a fork of Thrall server which is a fork of
@@ -37,7 +37,7 @@ LIMITATIONS
     internally. See perlfork (MSWin32) and perlcygwin (cygwin) for details
     and limitations.
 
-    It might be better option to use on this system the server with
+    It might be a better option to use on this system the server with
     explicit threads implementation, i.e. Thrall.
 
     For Cygwin the perl-libwin32 package is highly recommended, because of
@@ -51,10 +51,10 @@ BUGS
     There is a problem with Perl threads implementation which occurs on
     Windows systems (MSWin32). Cygwin version seems to be correct.
 
-    Some requests can fail with message:
+    Some requests can fail with the message:
 
-      failed to set socket to nonblocking mode:An operation was attempted on
-      something that is not a socket.
+      failed to set socket to nonblocking mode:An operation was attempted
+      on something that is not a socket.
 
     or
 
@@ -66,17 +66,34 @@ BUGS
     https://github.com/dex4er/Thrall/issues/5 for more information about
     this issue.
 
-    The server fails when worker process calls "exit" in perlfunc function:
+    The server fails when a worker process calls "exit" in perlfunc
+    function:
 
       Attempt to free unreferenced scalar: SV 0x293a76c, Perl interpreter:
       0x22dcc0c at lib/Plack/Handler/Starlight.pm line 140.
 
-    It means that Harakiri mode can't work and the server have to be
-    started with --max-reqs-per-child=inf option.
+    It means that Harakiri mode can't work and the server has to be started
+    with --max-reqs-per-child=inf option.
 
     See https://rt.perl.org/Public/Bug/Display.html?id=40565 and
     https://github.com/dex4er/Starlight/issues/1 for more information about
     this issue.
+
+ MacOS
+
+    MacOS High Sierra and newer shows error:
+
+      objc[12345]: +[__NSCFConstantString initialize] may have been in
+      progress in another thread when fork() was called. objc[12345]:
+      +[__NSCFConstantString initialize] may have been in progress in
+      another thread when fork() was called. We cannot safely call it or
+      ignore it in the fork() child process. Crashing instead. Set a
+      breakpoint on objc_initializeAfterForkError to debug.
+
+    This error is caused by an added security to restrict multithreading.
+
+    To override the limitation, run export
+    OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES before using this server.
 
  Reporting
 
@@ -113,7 +130,7 @@ AUTHORS
 
 LICENSE
 
-    Copyright (c) 2013-2016, 2020 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2013-2016, 2020, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

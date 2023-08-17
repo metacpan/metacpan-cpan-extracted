@@ -58,6 +58,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.035",
+   "version" : "0.036",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

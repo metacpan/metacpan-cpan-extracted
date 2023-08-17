@@ -5,8 +5,44 @@ Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
 Limitations to be fixed:
-  - when lines are over 997 chars, then the transfer-encoding should
-	automatically change from 'none' into 'quoted-printable' or 'base64'
+	- when lines are over 997 chars, then the transfer-encoding should
+	 automatically change from 'none' into 'quoted-printable' or 'base64'
+
+version 3.013: Sat 24 Jun 17:25:11 CEST 2023
+
+	Changes:
+	- In header lines, leave the actual white-space related to FWS
+	  intact.  You may want to add s/\t/ / before you print a header.
+	  GitHub#7 [Jacob Balazer]
+	- When the comment in an address has no closing ')', do consume
+	  the whole remaining line, not fail parsing.
+	  GitHub#6 [Jacob Balazer]
+	- When the charset of a ::Body is not specified, a real attempt is
+	  made to autodetect the best setting.  For reading, constructing,
+	  and writing bodies.  GitHub#12 [Jacob Balazer]
+	  ** This may change the output of your regression tests: previously,
+	  the default interpretation was 'us-ascii' for reading and 'utf-8'
+	  for writing.
+
+	Fixes:
+	- ::Field::Full consumePhrase() should take minimal encoded
+	  phrase [Jonas Ryssel]
+	- ::Field::Address overloaded cmp() used 'eq' where it should
+	  have been 'cmp'
+	- partNumber when the multipart parent is a nested [Geoffrey Bennett]
+	- ::Body::Multipart, even when there is only a single \n after the
+	  trailing boundery, then there is a epilogue.
+	  github issue #16 [Jacob Balazer]
+
+	Improvements:
+	- run regression-tests with MIME::Entity on devel system.
+	- ::Body->decode autodects missing charset.
+	- The ability to set the charset detector via ::Body::Encode
+	  method charsetDetectAlgorithm()
+	- New release of User::Identity
+	- When the message/rfc822 and has Content-Transfer-Encoding, then do
+	  not parse it as "nested" but as normal part.
+	  github issue #17 [Todd Richmond]
 
 version 3.012: Fri 11 Feb 11:34:31 CET 2022
 

@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_import' } = { 
-    	summary => '',
+    	summary => 'Import data into excel file.',
         params => $params,
         returns => 'FilesResult',
     };

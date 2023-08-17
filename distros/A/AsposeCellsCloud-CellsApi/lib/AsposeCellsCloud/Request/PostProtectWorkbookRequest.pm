@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostProtectWorkbookRequest.name :   ,
-# PostProtectWorkbookRequest.protection :   ,
-# PostProtectWorkbookRequest.folder :   ,
-# PostProtectWorkbookRequest.storageName :    
+# PostProtectWorkbookRequest.name : The workbook name.  ,
+# PostProtectWorkbookRequest.protection : The protection settings.  ,
+# PostProtectWorkbookRequest.folder : Original workbook folder.  ,
+# PostProtectWorkbookRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_protect_workbook' } = { 
-    	summary => '',
+    	summary => 'Protects workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'protection' => {
      	datatype => 'WorkbookProtectionRequest',
      	base_name => 'protection',
-     	description => '',
+     	description => 'The protection settings.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -17,3 +17,4 @@ t/01_hello.t
 t/02_world.t
 t/03_cava.t
 t/04_spazi.t
+t/05_bin.t

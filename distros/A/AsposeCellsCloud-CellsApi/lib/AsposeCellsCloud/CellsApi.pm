@@ -14132,131 +14132,6 @@ sub cells_page_setup_post_page_setup {
     my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
-#
-# cells_picture_get_extract_barcodes
-#
-# Get chart area border info.
-# 
-# @param string $name Workbook name. (required)
-# @param string $sheet_name Worksheet name. (required)
-# @param int $picture_index The picture index. (required)
-# @param string $folder Workbook folder. (optional)
-# @param string $storage_name storage name. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Workbook name.',
-        required => '1',
-    },
-    'sheet_name' => {
-        data_type => 'string',
-        description => 'Worksheet name.',
-        required => '1',
-    },
-    'picture_index' => {
-        data_type => 'int',
-        description => 'The picture index.',
-        required => '1',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Workbook folder.',
-        required => '0',
-    },
-    'storage_name' => {
-        data_type => 'string',
-        description => 'storage name.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'cells_picture_get_extract_barcodes' } = { 
-    	summary => 'Get chart area border info.',
-        params => $params,
-        returns => 'BarcodeResponseList',
-        };
-}
-# @return BarcodeResponseList
-#
-sub cells_picture_get_extract_barcodes {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling cells_picture_get_extract_barcodes");
-    }
-
-    # verify the required parameter 'sheet_name' is set
-    unless (exists $args{'sheet_name'}) {
-      croak("Missing the required parameter 'sheet_name' when calling cells_picture_get_extract_barcodes");
-    }
-
-    # verify the required parameter 'picture_index' is set
-    unless (exists $args{'picture_index'}) {
-      croak("Missing the required parameter 'picture_index' when calling cells_picture_get_extract_barcodes");
-    }
-
-    # parse inputs
-    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/pictures/{pictureIndex}/recognize';
-
-    my $_method = 'GET';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if ( exists $args{'storage_name'}) {
-        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'sheet_name'}) {
-        my $_base_variable = "{" . "sheetName" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'picture_index'}) {
-        my $_base_variable = "{" . "pictureIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'picture_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    $self->{api_client}->check_access_token();
-    my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw()];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('BarcodeResponseList', $response);
-    return $_response_object;
-}
 
 #
 # cells_pictures_delete_worksheet_picture
@@ -36237,45 +36112,146 @@ sub post_batch_convert{
     return $_response_object;
 
 }
-
 #
-# GetExtractBarcodesRequest
+# PostBatchProtectRequest
 #
 # 
 # 
-# @name  string (required)    
-# @sheetName  string (required)    
-# @pictureIndex  int (required)    
-# @folder  string     
-# @storageName  string      
+# @batchProtectRequest  BatchProtectRequest (required)     
 #
 {
     my $params = {
        'request' =>{
-            data_type => 'GetExtractBarcodesRequest',
-            description => 'GetExtractBarcodes Request.',
+            data_type => 'PostBatchProtectRequest',
+            description => 'PostBatchProtect Request.',
             required => '0',
        }
     };
-    __PACKAGE__->method_documentation->{ 'get_extract_barcodes' } = { 
+    __PACKAGE__->method_documentation->{ 'post_batch_protect' } = { 
     	summary => '',
         params => $params,
-        returns => 'BarcodeResponseList',
+        returns => 'string',
     };
 }
 #
-# @return BarcodeResponseList
+# @return string
 #
-sub get_extract_barcodes{
+sub post_batch_protect{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('BarcodeResponseList', $response);
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
 }
+
+#
+# PostBatchLockRequest
+#
+# 
+# 
+# @batchLockRequest  BatchLockRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostBatchLockRequest',
+            description => 'PostBatchLock Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_batch_lock' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_batch_lock{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostBatchUnlockRequest
+#
+# 
+# 
+# @batchLockRequest  BatchLockRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostBatchUnlockRequest',
+            description => 'PostBatchUnlock Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_batch_unlock' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_batch_unlock{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# PostBatchSplitRequest
+#
+# 
+# 
+# @batchSplitRequest  BatchSplitRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostBatchSplitRequest',
+            description => 'PostBatchSplit Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_batch_split' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_batch_split{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
 
 #
 # PostClearContentsRequest
@@ -41212,6 +41188,42 @@ sub post_clear_objects{
 # @return FilesResult
 #
 sub post_reverse{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostRepairRequest
+#
+# 
+# 
+# @File  string (required)  File to upload  
+# @format  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRepairRequest',
+            description => 'PostRepair Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_repair' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_repair{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -48309,7 +48321,6 @@ sub upload_file{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     if(defined( $request)){
-        print("upload_file\n");
         my $response = $request->run_http_request('client' => $self->{api_client} );
         if (!$response) {
             return;

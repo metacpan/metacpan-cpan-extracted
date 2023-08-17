@@ -8,32 +8,36 @@
 
 // Runtime method information
 struct spvm_runtime_method {
-  int32_t args_base_id;
+  void* native_address;
+  void* precompile_address;
+  const char* name;
+  SPVM_OPCODE* opcodes;
+  SPVM_RUNTIME_BASIC_TYPE* current_basic_type;
+  SPVM_RUNTIME_BASIC_TYPE* return_basic_type;
+  SPVM_RUNTIME_ARG* args;
+  int32_t index;
   int32_t args_length;
   int32_t required_args_length;
-  int32_t opcodes_base_id;
   int32_t opcodes_length;
-  int32_t id;
-  int32_t name_id;
-  int32_t class_id;
-  int32_t call_stack_byte_vars_length;
-  int32_t call_stack_short_vars_length;
-  int32_t call_stack_int_vars_length;
-  int32_t call_stack_long_vars_length;
-  int32_t call_stack_float_vars_length;
-  int32_t call_stack_double_vars_length;
-  int32_t call_stack_object_vars_length;
-  int32_t call_stack_ref_vars_length;
+  int32_t byte_vars_width;
+  int32_t short_vars_width;
+  int32_t int_vars_width;
+  int32_t long_vars_width;
+  int32_t float_vars_width;
+  int32_t double_vars_width;
+  int32_t object_vars_width;
+  int32_t ref_vars_width;
   int32_t mortal_stack_length;
-  int32_t return_type_id;
+  int32_t return_type_dimension;
+  int32_t return_type_flag;
   int8_t is_class_method;
-  int8_t is_init;
   int8_t is_anon;
+  int8_t is_enum;
   int8_t is_precompile;
   int8_t is_native;
+  int8_t is_init;
   int8_t is_destructor;
   int8_t is_required;
-  int8_t is_enum;
 };
 
 #endif

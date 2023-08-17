@@ -1,0 +1,89 @@
+NAME
+
+    Log::Any::Adapter::Log4perlTiny - Log::Any adapter for
+    Log::Log4perl::Tiny
+
+VERSION
+
+    This document describes Log::Any::Adapter::Log4perlTiny version 0.001.
+
+SYNOPSIS
+
+       use Log::Log4perl::Tiny qw< LOGLEVEL >;
+       use Log::Any::Adapter 'Log4perlTiny';
+    
+       LOGLEVEL('DEBUG');
+
+DESCRIPTION
+
+    This Log::Any adapter uses Log::Log4perl::Tiny under the hood. It does
+    not need to be initialized as it comes with some sensible defaults;
+    users might anyway be interested into setting a different log level
+    dinamically, so importing LOGLEVEL might be beneficial.
+
+INTERFACE
+
+    Methods for checking the activity of levels are generated dynamically;
+    as of the generation of this module, they are:
+
+    is_alert
+
+    is_critical
+
+    is_debug
+
+    is_emergency
+
+    is_error
+
+    is_info
+
+    is_notice
+
+    is_trace
+
+    is_warning
+
+    In addition, the method in the following sub-section is available.
+
+ structured
+
+       $object->structured($level, $category, @stuff);
+
+    The provided $level is mapped onto one of the available ones; unknown
+    levels are mapped onto FATAL (this might be the case if Log::Any
+    introduces any new levels in the future).
+
+    The $category is ignored, as there is a single instance.
+
+    The @stuff is passed onto to Log::Log4perl::Tiny.
+
+BUGS AND LIMITATIONS
+
+    Report bugs through Codeberg (patches welcome) at
+    https://codeberg.org/polettix/Log-Any-Adapter-Log4perlTiny.
+
+SEE ALSO
+
+    Log::Any, Log::Any::Adapter and Log::Log4perl::Tiny.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

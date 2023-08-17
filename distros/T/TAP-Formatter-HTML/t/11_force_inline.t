@@ -4,7 +4,7 @@ use warnings;
 use lib 'lib';
 use lib 't/lib';
 
-use Test::More 'no_plan';
+use Test::More tests => 8;
 use FileTempTFH;
 
 use TAP::Harness;
@@ -26,3 +26,5 @@ ok( $html =~ qr|default javascript for report|, 'html contains default js' );
 ok( $html =~ qr|default stylesheet for report body|, 'html contains default css body' );
 ok( $html =~ qr|default stylesheet for report page layout|, 'html contains default css page' );
 
+ok( $html !~ qr|href=".+/TAP/Formatter/HTML/default_report\.css"|, 'html does not contain links to css files' );
+ok( $html !~ qr|src=".+/TAP/Formatter/HTML/jquery-1\.4\.2\.min\.js"|, 'html does not contain links to js files' );

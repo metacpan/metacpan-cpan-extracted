@@ -1,5 +1,18 @@
 Revision history for Syntax-Operator-In
 
+0.06    2023-07-21
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Adjusted documentation for release of Perl v5.38
+         * Remember to implement `no Syntax::Operator::*` to disable the syntax
+
+0.05    2022-12-25
+        [CHANGES]
+         * Neater compiletime error reporting of recognised but invalid
+           operator names
+         * Document that PL_infix_plugin now works on development perl version
+           v5.37.7
+
 0.04    2022-11-25
         [CHANGES]
          * Accept in:OP notation as well, as it may overall be neater and

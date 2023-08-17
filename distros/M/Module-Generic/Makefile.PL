@@ -38,7 +38,9 @@ WriteMakefile(
         # Same as File::Copy, this is a core module
         'File::DosGlob' => 0,
         'File::Glob'    => 0,
-        'File::MMagic::XS' => '0.09008',
+        # Only load it, if it exists
+        # 'File::MMagic::XS' => '0.09008',
+        'File::MMagic' => '1.30',
         'File::Spec'    => '3.73',
         'IO::Dir'       => '1.41',
         'IO::File'      => '1.41',

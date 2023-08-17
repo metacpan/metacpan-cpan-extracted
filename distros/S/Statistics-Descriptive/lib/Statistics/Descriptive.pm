@@ -1,5 +1,5 @@
 package Statistics::Descriptive;
-$Statistics::Descriptive::VERSION = '3.0800';
+$Statistics::Descriptive::VERSION = '3.0801';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0800
+version 3.0801
 
 =head1 SYNOPSIS
 
@@ -240,7 +240,7 @@ might be useful for complex filters where statistics property are needed (again 
 =item $stat->set_smoother({ method => 'exponential', coeff => 0, });
 
 Set the method used to smooth the data and the smoothing coefficient.
-See C<Statistics::Smoother> for more details.
+See C<Statistics::Descriptive::Smoother> for more details.
 
 =item $stat->get_smoothed_data();
 

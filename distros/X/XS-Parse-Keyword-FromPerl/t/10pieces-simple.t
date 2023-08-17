@@ -6,12 +6,14 @@ use warnings;
 use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
-   opcode
    KEYWORD_PLUGIN_EXPR KEYWORD_PLUGIN_STMT
-   newSVOP
    XPK_IDENT XPK_IDENT_OPT XPK_PACKAGENAME XPK_COMMA XPK_VSTRING
    XPK_LEXVARNAME XPK_LEXVAR_SCALAR XPK_KEYWORD
    register_xs_parse_keyword
+);
+use Optree::Generate qw(
+   opcode
+   newSVOP
 );
 
 use constant {

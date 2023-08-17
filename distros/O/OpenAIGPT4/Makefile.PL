@@ -7,7 +7,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/OpenAIGPT4.pm',
     LICENSE             => 'artistic_2',
     PREREQ_PM           => {
-        'perl'                => '5.032',
+        'perl'                => '5.026',
         'LWP::UserAgent'     => 0,
         'HTTP::Request::Common' => 0,
         'LWP::Protocol::https' => 0,

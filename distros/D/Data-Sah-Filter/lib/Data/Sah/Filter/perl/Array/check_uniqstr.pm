@@ -5,14 +5,14 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
         v => 1,
-        summary => 'Check that an array has unique elements, using List::Util\'s uniqstr()',
+        summary => 'Check that an array has unique elements, using List::Util\'s uniqstr() (synonym for uniq())',
         target_type => 'array',
         might_fail => 1,
         args => {
@@ -48,12 +48,12 @@ sub filter {
     my $gen_args = $fargs{args} // {};
     my $res = {};
 
-    $res->{modules}{'List::Util'} = 1.54;
+    $res->{modules}{'List::Util::Uniq'} = "0.005";
+    $res->{modules}{'Data::Dmp'} = "0.242";
     $res->{expr_filter} = join(
         "",
-        # TODO: [ux] report the duplicate element(s) in error message
-        "do { my \$orig = $dt; \$tmp=".($gen_args->{ci} ? "[map {lc} \@\$orig]":"$dt")."; my \@uniq = List::Util::uniq(\@\$tmp); ",
-        ($gen_args->{reverse} ? "@\$tmp != \@uniq ? [undef,\$orig] : [\"Array does not have duplicate string(s)\"]" : "@\$tmp == \@uniq ? [undef,\$orig] : [\"Array has duplicate string(s)\"]"),
+        "do { my \$orig = $dt; \$tmp=".($gen_args->{ci} ? "[map {lc} \@\$orig]":"$dt")."; my \@dupes = List::Util::Uniq::uniqstr( List::Util::Uniq::dupestr(\@\$tmp) ); ",
+        ($gen_args->{reverse} ? "\@dupes ? [undef,\$orig] : [\"Array does not have duplicate string(s)\"]" : "!\@dupes ? [undef,\$orig] : [\"Array has duplicate string(s): \".join(', ', map { Data::Dmp::dmp(\$_) } \@dupes)]"),
          "}",
     );
 
@@ -61,7 +61,7 @@ sub filter {
 }
 
 1;
-# ABSTRACT: Check that an array has unique elements, using List::Util's uniqstr()
+# ABSTRACT: Check that an array has unique elements, using List::Util's uniqstr() (synonym for uniq())
 
 __END__
 
@@ -71,11 +71,11 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Filter::perl::Array::check_uniqstr - Check that an array has unique elements, using List::Util's uniqstr()
+Data::Sah::Filter::perl::Array::check_uniqstr - Check that an array has unique elements, using List::Util's uniqstr() (synonym for uniq())
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_uniqstr (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Array::check_uniqstr (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -103,9 +103,9 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_u
 
  [] # valid, unchanged
  ["a","b"] # valid, unchanged
- ["a","b","a"] # INVALID (Array has duplicate string(s)), becomes undef
+ ["a","b","a"] # INVALID (Array has duplicate string(s): "a"), becomes undef
  ["a","b","A"] # valid, unchanged
- ["a","b","A"] # filtered with args {ci=>1}, INVALID (Array has duplicate string(s)), becomes undef
+ ["a","b","A"] # filtered with args {ci=>1}, INVALID (Array has duplicate string(s): "a"), becomes undef
  [] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate string(s)), becomes undef
  ["a","b"] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate string(s)), becomes undef
  ["a","b","a"] # filtered with args {reverse=>1}, valid, unchanged

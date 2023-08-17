@@ -220,9 +220,9 @@ Algorithm::LibLinear::FeatureScaling
 
 Support vector classification is actually just a calculation of inner product of feature vector and normal vector of separation hyperplane. If some elements in feature vectors have greater dynamic range than others, they can have stronger influence on the final calculation result.
 
-For example, consider a normal vector to be C<{ 1 1 1 }> and feature vectors to be classified are C<{ -2 10 5 }>, C<{ 5 -50 0 }> and C<{ 10 100 10 }>. Inner products of these normal vector and feature vectors are 13, -45 and 120 respectively. Obviously 2nd elements of the feature vectors have wider dynamic range than 1st and 3rd ones and dominate calculation result.
+For example, consider a normal vector to be C<{ 1 1 1 }> and feature vectors to be classified are C<{ -2 10 5 }>, C<{ 5 -50 0 }> and C<{ 10 100 10 }>. Inner products of these normal vector and feature vectors are 13, -45 and 120 respectively. Obviously 2nd element of the feature vectors have wider dynamic range than others and dominate calculation result.
 
-To avoid such a problem, scaling elements of vectors to make they have same dynamic range is very important. This module provides such vector scaling functionality. If you are familiar with the LIBSVM distribution, you can see this is a library version of C<svm-scale> command written in Perl.
+To avoid such a problem, normalizing range of elements of feature vectors is very important. This module provides such vector scaling functionality. You can see this is a library version of LIBLINEAR's C<svm-scale> command.
 
 =head1 METHODS
 
@@ -242,8 +242,8 @@ Pre-calculated dynamic ranges of each vector element. Its structure is like:
 
   my @min_max_values = (
     [ -10, 10 ],  # Dynamic range of 1st elements of vectors.
-    [ 0, 1 ],     # 2nd
-    [ -1, 1 ],    # 3rd
+    [ 0, 1 ],     # 2nd.
+    [ -1, 1 ],    # 3rd.
     ...
   );
 
@@ -251,7 +251,7 @@ Pre-calculated dynamic ranges of each vector element. Its structure is like:
 
 =item upper_bound
 
-The lower/upper limits of dynamic range for each element. Default values are 0.0 and 1.0 respectively.
+The min/max values of elements to be scaled (inclusive). Default values are 0.0 and 1.0 respectively.
 
 =back
 
@@ -263,7 +263,7 @@ Please note that this method can parse only a subset of C<svm-scale>'s file form
 
 =head2 as_string
 
-Dump the scaling parameter as C<svm-scale>'s format.
+Dumps the scaling parameter as C<svm-scale>'s format.
 
 =head2 save(filename => $path | fh => \*FH)
 

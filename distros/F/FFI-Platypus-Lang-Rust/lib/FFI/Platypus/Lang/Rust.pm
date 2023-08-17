@@ -8,7 +8,7 @@ use File::Spec;
 use Env qw( @PATH );
 
 # ABSTRACT: Documentation and tools for using Platypus with the Rust programming language
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub native_type_map
@@ -47,7 +47,7 @@ FFI::Platypus::Lang::Rust - Documentation and tools for using Platypus with the 
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -161,9 +161,10 @@ a non-Rust language like Perl.
  #![crate_type = "cdylib"]
  
  use std::ffi::CStr;
+ use std::os::raw::c_char;
  
  #[no_mangle]
- pub extern "C" fn how_many_characters(s: *const i8) -> isize {
+ pub extern "C" fn how_many_characters(s: *const c_char) -> isize {
      if s.is_null() {
          return -1;
      }
@@ -250,9 +251,10 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/string_arguments/>)
  
  use std::ffi::CString;
  use std::iter;
+ use std::os::raw::c_char;
  
  #[no_mangle]
- pub extern "C" fn theme_song_generate(length: u8) -> *mut i8 {
+ pub extern "C" fn theme_song_generate(length: u8) -> *mut c_char {
      let mut song = String::from("💣 ");
      song.extend(iter::repeat("na ").take(length as usize));
      song.push_str("Batman! 💣");
@@ -262,7 +264,7 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/string_arguments/>)
  }
  
  #[no_mangle]
- pub extern "C" fn theme_song_free(s: *mut i8) {
+ pub extern "C" fn theme_song_free(s: *mut c_char) {
      if s.is_null() {
          return;
      }
@@ -330,9 +332,10 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/string_return/>)
  use std::cell::RefCell;
  use std::ffi::CString;
  use std::iter;
+ use std::os::raw::c_char;
  
  #[no_mangle]
- pub extern "C" fn theme_song_generate(length: u8) -> *const i8 {
+ pub extern "C" fn theme_song_generate(length: u8) -> *const c_char {
      thread_local! {
          static KEEP: RefCell<Option<CString>> = RefCell::new(None);
      }
@@ -440,8 +443,9 @@ error messages.
  #![crate_type = "cdylib"]
  
  use std::ffi::CString;
+ use std::os::raw::c_char;
  
- type PerlLog = extern "C" fn(line: *const i8);
+ type PerlLog = extern "C" fn(line: *const c_char);
  
  #[no_mangle]
  pub extern "C" fn rust_log(logf: PerlLog) {
@@ -659,6 +663,7 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/tuples/>)
  use std::ffi::c_void;
  use std::ffi::CStr;
  use std::ffi::CString;
+ use std::os::raw::c_char;
  
  struct Person {
      name: String,
@@ -690,8 +695,8 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/tuples/>)
  
  #[no_mangle]
  pub extern "C" fn person_new(
-     _class: *const i8,
-     name: *const i8,
+     _class: *const c_char,
+     name: *const c_char,
      lucky_number: i32,
  ) -> *mut CPerson {
      let name = unsafe { CStr::from_ptr(name) };
@@ -700,7 +705,7 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/tuples/>)
  }
  
  #[no_mangle]
- pub extern "C" fn person_name(p: *mut CPerson) -> *const i8 {
+ pub extern "C" fn person_name(p: *mut CPerson) -> *const c_char {
      thread_local!(
          static KEEP: RefCell<Option<CString>> = RefCell::new(None);
      );
@@ -715,7 +720,7 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/tuples/>)
  }
  
  #[no_mangle]
- pub extern "C" fn person_rename(p: *mut CPerson, new: *const i8) {
+ pub extern "C" fn person_rename(p: *mut CPerson, new: *const c_char) {
      let new = unsafe { CStr::from_ptr(new) };
      let p = unsafe { &mut *(p as *mut Person) };
      if let Ok(new) = new.to_str() {

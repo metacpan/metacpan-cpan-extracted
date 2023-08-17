@@ -26,6 +26,7 @@ my %params = (
         RECURSIVE_TEST_FILES => 1,
         CLIB                 => {
             DIR          => 'clib',
+            CMAKE_OPTIONS => qq{-DPANDA_DATE_TESTS=ON},
             CMAKE_TARGET => "${cmake_tests}",
             FILE         => "lib${cmake_tests}.a",
         },

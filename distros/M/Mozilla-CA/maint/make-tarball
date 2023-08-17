@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# This will create reproducible tar archives cross platform
+
+use Archive::Tar ();
+use Archive::Tar::File ();
+use Archive::Tar::Constant qw(
+    DIR
+    FILE
+);
+use File::Find ();
+use Getopt::Long qw(:config gnu_getopt);
+
+if ($ARGV[0] =~ m/^[DdcvzthxIC]+[fT]?$/) {
+    $ARGV[0] = "-$ARGV[0]";
+}
+
+GetOptions(
+    'c'             => \my $create,
+    'v'             => \my $verbose,
+    'f=s'           => \my $tar_file,
+    'git-time'      => \my $git_time,
+    'mtime=s'       => \my $mtime,
+) or die "Error in command line arguments.\n";
+
+die "Only supports tar creation.\n"
+    if !$create;
+die "tar file must be specified.\n"
+    if !$tar_file;
+
+if ($git_time) {
+    die "git-time and mtime options are mutually exclusive.\n"
+        if defined $mtime;
+    $mtime = `git log -1 --date=raw --format=%ct`;
+}
+elsif (defined $mtime) {
+    die "mtime must be epoch time!"
+        if $mtime =~ /[^0-9]/;
+}
+else {
+    $mtime = time;
+}
+
+my @to_add = @ARGV;
+
+s{/\z}{}
+    for @to_add;
+
+my $tar = Archive::Tar->new;
+File::Find::find({
+    no_chdir => 1,
+    preprocess => sub { sort @_ },
+    wanted => sub {
+        my $path = $_;
+        my $is_dir = -d $path;
+        my $opts = {
+            mode    => -x $path ? 0755 : 0644,
+            uid     => 0,
+            gid     => 0,
+            uname   => 'root',
+            gname   => 'root',
+            mtime   => $mtime,
+            type    => $is_dir ? DIR : FILE,
+        };
+        my $data = '';
+        if (!$is_dir) {
+            open my $fh, '<', $path
+                or die "can't read $path: $!";
+            $data = do { local $/; <$fh> };
+            close $fh;
+        }
+        $tar->add_data($path, $data, $opts);
+        if ($verbose) {
+            printf "a %s\n", $path;
+        }
+    },
+}, @to_add);
+
+$tar->write($tar_file);
+utime $mtime, $mtime, $tar_file;

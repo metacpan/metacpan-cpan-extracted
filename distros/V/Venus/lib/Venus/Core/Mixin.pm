@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+no warnings 'once';
+
 use base 'Venus::Core';
 
 # METHODS
@@ -46,10 +48,28 @@ sub does {
   return $self->DOES(@args);
 }
 
+sub import {
+  my ($self) = @_;
+
+  require Venus;
+
+  @_ = ("${self} cannot be used via the \"use\" declaration");
+
+  goto \&Venus::fault;
+}
+
 sub meta {
   my ($self) = @_;
 
   return $self->META;
+}
+
+sub unimport {
+  my ($self, @args) = @_;
+
+  my $target = caller;
+
+  return $self->UNIMPORT($target, @args);
 }
 
 1;
@@ -143,6 +163,30 @@ I<Since C<1.02>>
 
 =cut
 
+=head2 import
+
+  import(Any @args) (Any)
+
+The import method throws a fatal exception whenever the L<perlfunc/use>
+declaration is used with mixins as they are meant to be consumed via the
+C<mixin> keyword function.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item import example 1
+
+  package main;
+
+  use Person;
+
+  # Exception! (isa Venus::Fault)
+
+=back
+
+=cut
+
 =head2 meta
 
   meta() (Meta)
@@ -166,6 +210,29 @@ I<Since C<1.02>>
   my $meta = Person->meta;
 
   # bless({...}, 'Venus::Meta')
+
+=back
+
+=cut
+
+=head2 unimport
+
+  unimport(Any @args) (Any)
+
+The unimport method invokes the C<UNIMPORT> lifecycle hook and is invoked
+whenever the L<perlfunc/no> declaration is used.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item unimport example 1
+
+  package main;
+
+  no Person;
+
+  # ()
 
 =back
 

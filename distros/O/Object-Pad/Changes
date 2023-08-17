@@ -1,5 +1,30 @@
 Revision history for Object-Pad
 
+0.801   2023-08-10
+        [CHANGES]
+         * Warn at compiletime if `ADJUST` blocks perform out-of-block control
+           flow. This warning will become a compiletime error in a later
+           version
+         * Added `mop_class_get_attribute()` and
+           `mop_class_get_attribute_values()` to C-level API
+         * Removed the old `ClassHook->hookdata` and `FieldHook->hookdata`
+           variable aliases
+
+        [BUGFIXES]
+         * A better `sub VERSION` that works as a more transparent wrapper
+           (RT149357)
+
+0.800   2023-08-09
+        [CHANGES]
+         * Switched to three-digit version numbering
+         * Removed experimental warnings from non-constant field initialiser
+           expressions
+         * Emit deprecation warnings at compiletime from `has` keyword
+         * Expanded documentation about the implied pragmata changes, which
+           will likely be removed entirely in a later version.
+         * Emit a warning if implied strict/warnings was enabled, conditional
+           on `use Object::Pad` with this version number or later.
+
 0.79    2023-05-09
         [CHANGES]
          * Swap all unit tests from `Test::More` to `Test2::V0`

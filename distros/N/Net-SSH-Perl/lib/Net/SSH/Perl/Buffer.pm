@@ -1,5 +1,3 @@
-# $Id: Buffer.pm,v 1.14 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::Buffer;
 use strict;
 use warnings;

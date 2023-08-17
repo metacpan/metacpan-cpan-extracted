@@ -26,7 +26,7 @@ sub new
 		'touchhead',1,'','touch the header (otherwise just copy)',
 		'newhead',0,'n','make completely new header',
 		'comment',[],'C','comment to include between file title and column titles, lines in array',
-		'headlines',undef,'H','use this fixed number of lines as header',
+		'headlines',undef,'H','use this fixed number of lines as header (overriding any heuristics)',
 		'delaftercom',0,'D','delete any comment lines after data',
 		'lhex','','L','regex for last header line (alternative to fdex)',
 		'fdex','','F','regex for first data line (alterative to lhex)',
@@ -36,7 +36,8 @@ sub new
 		'origin',0,'o','create Origin-friendly format with tab separation and coltitles as only header line and NO comment character, triggers also quote=0 and delaftercom=1',
 		'data',1,'','include the data in printout',
 		'head',1,'','include the header in printout',
-		'history',0,'','keep old title(s) lines as historic comments (writing new overall title before, new column titles below), otherwise replace them'
+		'history',0,'','keep old title(s) lines as historic comments (writing new overall title before, new column titles below), otherwise replace them',
+		'index',0,'x','Add a dataset index as first column (maybe just to make other tools happy so with the data lines not starting with text). You can influence the column name via modtitles.'
 	);
 
 	return $class->SUPER::new
@@ -100,23 +101,30 @@ sub process_line
 	if(!$self->{state}{data})
 	{
 		#maybe still in header
-		my $is_data = $self->{lasthead} ? 1 : $c->line_check($_[0]);
-		# Behaviour when both expressions are specified:
-		# The first one that triggers defines beginning of data part.
-		# An idea would be to intentionally skip a part between.
-		# Think about that ...
-		if(!$self->{lasthead} and defined $self->{lhex})
+		++$self->{l};
+		my $is_data = 0;
+		if(defined $param->{headlines} and $self->{l} > $param->{headlines})
 		{
-			$is_data = 0;
-			$self->{lasthead} = $_[0] =~ $self->{lhex};
-		}
-		if(defined $self->{fdex})
-		{
-			# possibly overriding line_check
-			$is_data = $_[0] =~ $self->{fdex};
+			$is_data = 1;
+		} else {
+			$is_data = $self->{lasthead} ? 1 : $c->line_check($_[0]);
+			# Behaviour when both expressions are specified:
+			# The first one that triggers defines beginning of data part.
+			# An idea would be to intentionally skip a part between.
+			# Think about that ...
+			if(!$self->{lasthead} and defined $self->{lhex})
+			{
+				$is_data = 0;
+				$self->{lasthead} = $_[0] =~ $self->{lhex};
+			}
+			if(defined $self->{fdex})
+			{
+				# possibly overriding line_check
+				$is_data = $_[0] =~ $self->{fdex};
+			}
 		}
 		# End header on specified number of lines or when thinking that data was found.
-		if( (!defined $param->{headlines} and $is_data) or (defined $param->{headlines} and ++$self->{l} > $param->{headlines}) )
+		if($is_data)
 		{
 			#first data line found
 			$self->{state}{data} = 1;
@@ -151,12 +159,18 @@ sub process_line
 				}
 				elsif($param->{touchdata})
 				{
-					$_[0] = ${$c->data_line($c->line_data($_[0]))};
+					my $d = $c->line_data($_[0]);
+					unshift(@{$d}, ++$self->{index})
+						if $param->{index};
+					$_[0] = ${$c->data_line($d)};
 				}
 			}
 			elsif($c->line_check($_,1))
 			{
-				$_[0] = ${$c->data_line($c->line_data($_[0]))}
+				my $d = $c->line_data($_[0]);
+				unshift(@{$d}, ++$self->{index})
+					if $param->{index};
+				$_[0] = ${$c->data_line($d)}
 					if($param->{touchdata});
 			}
 			else{ $_[0] = ''; }
@@ -205,6 +219,8 @@ sub header_workout
 
 	$c->{title} = $self->{title} if defined $self->{title};
 	$c->{titles} = $self->{titles} if @{$self->{titles}};
+	unshift(@{$c->{titles}}, 'index')
+		if($param->{index} and defined $c->{titles} and @{$c->{titles}});
 	mod_titles($c->{titles}, $self->{param}{modtitles});
 	my $pre = '';
 	if($param->{origin})

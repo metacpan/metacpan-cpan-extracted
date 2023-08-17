@@ -1,0 +1,60 @@
+Random-Skew version 0.01
+========================
+
+Generate random data with skewed likelihood, without consuming
+all your RAM with a ridiculously huge array.
+
+  use Random::Skew;
+  Random::Skew::GRAIN( 72 ); # or whatever
+  my $rs = Random::Skew->new(
+    abundance => 1_000_000,
+    plenty    =>    56_789,
+    some      =>     1_234,
+    scarce    =>        57,
+    rare      =>        11,
+    unheardof =>         3,
+  );
+
+  while ( ... ) {
+      my $item = $rs->item;
+      ...
+  }
+
+To see what freqeuncy your returned values tend to be:
+  my %v;
+  my $ct = 1_000_000; # or higher, why not?
+  $v{ $rs->item }++ while $ct-- > 0;
+  print map { "$_\t$v{$_}\n" }
+        sort {$v{$b} <=> $v{$a}}
+        keys %v;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl. :)
+  ExtUtils::MakeMaker
+  Test::NoWarnings
+
+
+See Random::Skew::Test for fine-tuning Random::Skew::GRAIN() if
+you need more control over any rounding snags. There's also
+Random::Skew::ROUNDING() which might help a bit as well.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2023 by Will Trillich <will+rs@serensoft.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.1 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -2,7 +2,7 @@ package Geo::Coder::Abbreviations;
 
 use warnings;
 use strict;
-use JSON;
+use JSON::MaybeXS;
 use LWP::Simple::WithCache;
 
 =head1 NAME
@@ -11,13 +11,15 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
 our %abbreviations;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
+
 # This is giving 404 errors at the moment
+#	https://github.com/mapbox/mapbox-java/issues/1460
 # our location = 'https://raw.githubusercontent.com/mapbox/geocoder-abbreviations/master/tokens/en.json';
 use constant LOCATION => 'https://raw.githubusercontent.com/allison-strandberg/geocoder-abbreviations/master/tokens/en.json';
 
@@ -42,7 +44,18 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	if(!defined($class)) {
+		# Using CGI::Info->new(), not CGI::Info::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		# return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class} }, ref($class);
+	}
 
 	unless(scalar keys(%abbreviations)) {
 		if(eval { require HTTP::Cache::Transparent; }) {
@@ -81,9 +94,9 @@ sub new {
 				}
 			}
 			%rc;
-		} @{JSON->new()->utf8()->decode($data)};
+		} @{JSON::MaybeXS->new()->utf8()->decode($data)};
 
-		# %abbreviations = map { (defined($_->{'type'}) && ($_->{'type'} eq 'way')) ? (uc($_->{'full'}) => uc($_->{'canonical'})) : () } @{JSON->new()->utf8()->decode($data)};
+		# %abbreviations = map { (defined($_->{'type'}) && ($_->{'type'} eq 'way')) ? (uc($_->{'full'}) => uc($_->{'canonical'})) : () } @{JSON::MaybeXS->new()->utf8()->decode($data)};
 	}
 
 	return bless {
@@ -138,21 +151,17 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Abbreviations>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Geo-Coder-Abbreviations>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Geo-Coder-Abbreviations/>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

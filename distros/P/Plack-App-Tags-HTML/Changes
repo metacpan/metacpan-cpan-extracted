@@ -1,3 +1,11 @@
+0.14 2023-08-02T09:08:49+02:00
+ - Add data_prepare() accessor for data initialization in prepare phase.
+
+0.13 2023-07-18T15:25:37+02:00
+ - Add tests for 'data' parameter.
+ - Improve links in doc.
+ - Update to Plack::Component::Tags::HTML@0.15.
+
 0.12 2023-05-29T16:31:45+02:00
  - Place explicitly inherited _prepare_app(). There will be content in
    future.

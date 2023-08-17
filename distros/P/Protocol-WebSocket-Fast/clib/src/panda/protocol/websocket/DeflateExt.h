@@ -22,6 +22,7 @@ struct DeflateExt {
         int compression_level = Z_DEFAULT_COMPRESSION;
         int strategy = Z_DEFAULT_STRATEGY;
         size_t compression_threshold = 1410;  // try to fit into TCP frame
+        bool default_compress_binary = false;
     };
 
     struct EffectiveConfig {

@@ -2,26 +2,25 @@ use Lingy::Test;
 
 use lib './test/lib';
 
-test "(require 'test.lang)", 'nil';
-test "(test.lang/foo)", '"called test.lang/foo"';
-test "(ns-name 'test.lang)", "test.lang";
+tests <<'...';
+- [ (ns-name *ns*), user ]
 
-test "(ns-name *ns*)", 'user';
+- [ (require 'test.lingy), nil ]
+- [ (test.lingy/foo), '"called test.lingy/foo"' ]
 
-test "(require 'test.lingy)", 'nil';
-test "(test.lingy/foo)", '"called test.lingy/foo"';
+- [ (ns-name *ns*), user ]
 
-test "(ns-name *ns*)", 'user';
+- - (foo)
+  - "Unable to resolve symbol: 'foo' in this context"
+- [ (refer 'test.lingy), nil ]
+- [ (foo), '"called test.lingy/foo"' ]
 
-test "(foo)", "Unable to resolve symbol: 'foo' in this context";
-test "(refer 'test.lingy)", 'nil';
-test "(foo)", '"called test.lingy/foo"';
+- [ (require 'x.y.z), "Can't find library for (require 'x.y.z)" ]
+- [ (refer 'x.y.z), "No namespace: 'x.y.z'" ]
 
-test "(require 'x.y.z)", "Can't find library for (require 'x.y.z)";
-test "(refer 'x.y.z)", "No namespace: 'x.y.z'";
-
-test "(require 'Foo.Class)", "Can't require Foo.Class. Foo::Class is not a Lingy::Namespace.";
-
-test "(require 'Foo.Bar)", 'nil';
-test "(Foo.Bar/bar)", '43';
-test "(Foo.Bar/foo)", '123';
+- [ (require 'Foo.Bar), nil ]
+- [ (find-ns 'Foo.Bar), '#<Namespace Foo.Bar>' ]
+- [ (Foo.Bar/bar), 43 ]
+- [ (. Foo.BarClass foo), 43 ]
+- [ (Foo.BarClass/foo), 43 ]
+...

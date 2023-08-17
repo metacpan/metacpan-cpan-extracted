@@ -4,17 +4,54 @@ use base qw(Plack::Component::Tags::HTML);
 use strict;
 use warnings;
 
-use Plack::Util::Accessor qw(generator register_link title);
+use Plack::Request;
+use Plack::Response;
+use Plack::Session;
+use Plack::Util::Accessor qw(generator login_cb logo_image_url message_cb redirect_login redirect_error
+	register_link title);
 use Tags::HTML::Container;
 use Tags::HTML::Login::Access;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub _css {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	$self->{'_container'}->process_css;
-	$self->{'_login_access'}->process_css;
+	$self->{'_login_access'}->process_css({
+		'error' => 'red',
+		'info' => 'blue',
+	});
+
+	return;
+}
+
+sub _login_check {
+	my ($self, $env, $body_parameters_hr) = @_;
+
+	if (! exists $body_parameters_hr->{'login'}
+		|| $body_parameters_hr->{'login'} ne 'login') {
+
+		$self->_message($env, 'error', 'There is no login POST.');
+		return 0;
+	}
+	if (! defined $body_parameters_hr->{'username'} || ! $body_parameters_hr->{'username'}) {
+		$self->_message($env, 'error', "Missing username.");
+		return 0;
+	}
+	if (! defined $body_parameters_hr->{'password'} || ! $body_parameters_hr->{'password'}) {
+		$self->_message($env, 'error', "Missing password.");
+		return 0;
+	}
+
+	return 1;
+}
+sub _message {
+	my ($self, $env, $message_type, $message) = @_;
+
+	if (defined $self->message_cb) {
+		$self->message_cb->($env, $message_type, $message);
+	}
 
 	return;
 }
@@ -43,22 +80,55 @@ sub _prepare_app {
 	# Tags helper for login button.
 	$self->{'_login_access'} = Tags::HTML::Login::Access->new(
 		%p,
+		'logo_image_url' => $self->logo_image_url,
 		'register_url' => $self->register_link,
 	);
 
-	$self->{'_container'} = Tags::HTML::Container->new(
-		%p,
-	);
+	$self->{'_container'} = Tags::HTML::Container->new(%p);
+
+	return;
+}
+
+sub _process_actions {
+	my ($self, $env) = @_;
+
+	if (defined $self->login_cb && $env->{'REQUEST_METHOD'} eq 'POST') {
+		my $req = Plack::Request->new($env);
+		my $body_params_hr = $req->body_parameters;
+		my ($status, $messages_ar) = $self->_login_check($env, $body_params_hr);
+		my $res = Plack::Response->new;
+		if ($status) {
+			if ($self->login_cb->($env, $body_params_hr->{'username'},
+				$body_params_hr->{'password'})) {
+
+				$self->_message($env, 'info',
+					"User '$body_params_hr->{'username'}' is logged.");
+				$res->redirect($self->redirect_login);
+			} else {
+				$self->_message($env, 'error', 'Bad login.');
+				$res->redirect($self->redirect_error);
+			}
+		} else {
+			$res->redirect($self->redirect_error);
+		}
+		$self->psgi_app($res->finalize);
+	}
 
 	return;
 }
 
 sub _tags_middle {
-	my $self = shift;
+	my ($self, $env) = @_;
 
+	my $messages_ar = [];
+	if (exists $env->{'psgix.session'}) {
+		my $session = Plack::Session->new($env);
+		$messages_ar = $session->get('messages');
+		$session->set('messages', []);
+	}
 	$self->{'_container'}->process(
 		sub {
-			$self->{'_login_access'}->process;
+			$self->{'_login_access'}->process($messages_ar);
 		},
 	);
 
@@ -97,11 +167,58 @@ Returns instance of object.
 
 =over 8
 
+=item * C<author>
+
+Author string to HTML head.
+
+Default value is undef.
+
+=item * C<content_type>
+
+Content type for output.
+
+Default value is 'text/html; charset=__ENCODING__'.
+
 =item * C<css>
 
 Instance of CSS::Struct::Output object.
 
 Default value is CSS::Struct::Output::Raw instance.
+
+=item * C<css_init>
+
+Reference to array with CSS::Struct structure.
+
+Default value is CSS initialization from Tags::HTML::Page::Begin like
+
+ * {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+ }
+
+=item * C<encoding>
+
+Set encoding for output.
+
+Default value is 'utf-8'.
+
+=item * C<favicon>
+
+Link to favicon.
+
+Default value is undef.
+
+=item * C<flag_begin>
+
+Flag that means begin of html writing via L<Tags::HTML::Page::Begin>.
+
+Default value is 1.
+
+=item * C<flag_end>
+
+Flag that means end of html writing via L<Tags::HTML::Page::End>.
+Default value is 1.
 
 =item * C<generator>
 
@@ -109,11 +226,82 @@ HTML generator string.
 
 Default value is 'Plack::App::Login; Version: __VERSION__'.
 
+=item * C<login_cb>
+
+Callback for main login.
+Arguments for callback are: C<$env>, C<username> and C<$password>.
+Returns 0/1 for (un)successful login.
+
+Default value is undef.
+
+=item * C<logo_image_url>
+
+URL to logo image.
+
+Default value is undef.
+
+=item * C<message_cb>
+
+Callback to process message from application.
+Arguments for callback are: C<$env>, C<$message_type> and C<$message>.
+Returns undef.
+
+Default value is undef.
+
+=item * C<psgi_app>
+
+PSGI application to run instead of normal process.
+Intent of this is change application in C<_process_actions> method.
+
+Default value is undef.
+
+=item * C<redirect_login>
+
+Redirect URL after successful login.
+
+Default value is undef.
+
+=item * C<redirect_error>
+
+Redirect URL after error in login.
+
+Default value is undef.
+
+=item * C<register_link>
+
+URL to registering page.
+
+Default value is undef.
+
+=item * C<script_js>
+
+Reference to array with Javascript code strings.
+
+Default value is [].
+
+=item * C<script_js_src>
+
+Reference to array with Javascript URLs.
+
+Default value is [].
+
+=item * C<status_code>
+
+HTTP status code.
+
+Default value is 200.
+
 =item * C<tags>
 
 Instance of Tags::Output object.
 
-Default value is Tags::Output::Raw->new('xml' => 1) instance.
+Default value is
+
+ Tags::Output::Raw->new(
+         'xml' => 1,
+         'no_simple' => ['script', 'textarea'],
+         'preserved' => ['pre', 'style'],
+ );
 
 =item * C<title>
 
@@ -266,8 +454,12 @@ Returns Plack::Component object.
 
 =head1 DEPENDENCIES
 
-L<Plack::Util::Accessor>,
 L<Plack::Component::Tags::HTML>,
+L<Plack::Request>,
+L<Plack::Response>,
+L<Plack::Session>,
+L<Plack::Util::Accessor>,
+L<Tags::HTML::Container>,
 L<Tags::HTML::Login::Password>.
 
 =head1 SEE ALSO
@@ -298,6 +490,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

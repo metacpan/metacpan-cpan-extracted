@@ -10,6 +10,7 @@ builder/dod-check.pl
 builder/dod-check.sh
 builder/language-XX.pm
 builder/syntax-check.sh
+builder/tests.re
 builder/update-language.pl
 cpanfile
 examples/README.md

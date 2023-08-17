@@ -37,7 +37,7 @@ sub new
 		,'end', -1, 'e',
 			'end of section (when negative: until end; above all other criteria)'
 		,'reduce', '1', 'r',
-			'Redunce row count by a certain factor: Only include every ...th one. A value of 2 means rows 1,3,5... , a value of 10 means rows 1,11,21... (from the input).'
+			'Reduce row count by a certain factor: Only include every ...th one. A value of 2 means rows 1,3,5... , a value of 10 means rows 1,11,21... (from the input).'
 		,'justmatch',1,'j',
 			'if an expression to match is given, select what to print out: 0 means all matches including header, >0 means just the first n matches, <0 means all matches, but no header'
 		,'verbose',0,'v',
@@ -80,7 +80,7 @@ sub preinit
 	if(defined $self->{match})
 	{
 		$self->{matchfun} = expression_function($self->{match}, $p->{verbose});
-		return print STDERR "Error creating function for matching.\n" unless defined $self->{matchfun};
+		return print STDERR "Error creating function for matching ($!).\n" unless defined $self->{matchfun};
 		$self->{matchnohead} = $p->{justmatch} != 0;
 	}
 	$self->{ranges} = [];

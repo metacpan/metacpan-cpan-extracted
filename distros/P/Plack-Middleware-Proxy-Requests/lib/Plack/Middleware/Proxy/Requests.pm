@@ -6,25 +6,33 @@ Plack::Middleware::Proxy::Requests - Forward proxy server
 
 =head1 SYNOPSIS
 
-  # In app.psgi
-  use Plack::Builder;
-  use Plack::App::Proxy;
+=for markdown ```perl
 
-  builder {
-      enable "Proxy::Connect";
-      enable "Proxy::AddVia";
-      enable "Proxy::Requests";
-      Plack::App::Proxy->new->to_app;
-  };
+    # In app.psgi
+    use Plack::Builder;
+    use Plack::App::Proxy;
 
-  # From shell
-  plackup -s Twiggy -E Proxy -e 'enable q{AccessLog}' app.psgi
+    builder {
+        enable "Proxy::Connect";
+        enable "Proxy::AddVia";
+        enable "Proxy::Requests";
+        Plack::App::Proxy->new->to_app;
+    };
 
-  # or
-  twiggy -MPlack::App::Proxy \
-         -e 'enable q{AccessLog}; enable q{Proxy::Connect}; \
-             enable q{Proxy::AddVia}; enable q{Proxy::Requests}; \
-             Plack::App::Proxy->new->to_app'
+=for markdown ```
+
+=for markdown ```sh
+
+    # From shell
+    plackup -s Twiggy -E Proxy -e 'enable q{AccessLog}' app.psgi
+
+    # or
+    twiggy -MPlack::App::Proxy \
+            -e 'enable q{AccessLog}; enable q{Proxy::Connect}; \
+                enable q{Proxy::AddVia}; enable q{Proxy::Requests}; \
+                Plack::App::Proxy->new->to_app'
+
+=for markdown ```
 
 =head1 DESCRIPTION
 
@@ -37,28 +45,25 @@ The HTTP responses from the Internet might be invalid. In that case it
 is required to run the server without L<Plack::Middleware::Lint> module.
 This module is started by default and disabled if C<-E> or
 C<--no-default-middleware> option is used when starting L<plackup>
-script. Note that this disable also L<Plack::Middleware::AccessLog> so
-it have to be enabled explicitly if needed.
+script. Note that this disables also L<Plack::Middleware::AccessLog> so
+it has to be enabled explicitly if needed.
 
 The default server L<Plack::Server::PSGI> alias C<Standalone> can hang
-up on stalled connection. It is better to run proxy server with
+up on the stalled connection. It is better to run a proxy server with
 L<Starlet>, L<Starman> or L<Twiggy>.
 
 =for readme stop
 
 =cut
 
-
 use 5.006;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0102';
-
+our $VERSION = '0.0104';
 
 use parent qw(Plack::Middleware);
-
 
 sub call {
     my ($self, $env) = @_;
@@ -66,11 +71,11 @@ sub call {
     $env->{'plack.proxy.url'} = $env->{REQUEST_URI};
 
     return $self->app->($env);
-};
-
+}
 
 1;
 
+__END__
 
 =for readme continue
 
@@ -93,7 +98,7 @@ Piotr Roszatycki <dexter@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c) 2012-2013 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2012-2013, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

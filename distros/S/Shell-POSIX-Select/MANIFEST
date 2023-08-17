@@ -5,6 +5,7 @@ browse_records.plx.PL
 Changes
 Compile_Bugs/dual_select
 Compile_Bugs/require
+Compile_Bugs/rt53556.pl
 delete_file.0
 delete_file.plx.PL
 inc/Module/Install.pm

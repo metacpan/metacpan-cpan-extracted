@@ -1,9 +1,39 @@
 ==================================================
-Changes from 2022-04-14 00:00:00 +0000 to present.
+Changes from 2022-07-12 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 2.04 at 2023-04-14 17:25:36 +0000
+version 2.05 at 2023-07-12 14:39:38 +0000
+-----------------------------------------
+
+  Change: a9f20e8c4331999ca2a77402b07483d9c76f8a26
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-07-12 16:39:32 +0000
+
+    New release 
+
+  Change: e3317bf46499b3bb3d13689e3ac9f08b959b71aa
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-07-12 16:39:32 +0000
+
+    Update tests
+
+    remove di138099su, too old software (lsblk, findmnt), too difficult
+    to support 
+
+  Change: ff7c721ace4395710460d19d7d88abd859f8d316
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-07-12 16:39:32 +0000
+
+    Rewrite FS layout
+
+    - do not show no-block FS by default - use the hierarchical layout
+    for FS by default
+
+    This would need program options 
+
+-----------------------------------------
+version 2.04 at 2023-04-14 17:25:28 +0000
 -----------------------------------------
 
   Change: 262e765ab3c875d3d3b01c7a2da05655c638c5cc

@@ -68,6 +68,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/rose-html-objects"
    },
-   "version" : "0.624",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.626",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

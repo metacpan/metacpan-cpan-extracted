@@ -113,12 +113,14 @@ is( length( $tif->ReadEncodedStrip( 1, 8190 ) ),
 
 is( length( $tif->ReadRawStrip( 1, 20 ) ), 20, 'ReadRawStrip' );
 
+my $position_defined = defined $tif->GetField(TIFFTAG_XPOSITION) &&
+    defined $tif->GetField(TIFFTAG_YPOSITION);
 my $filename = File::Spec->catfile( $directory, 'out.txt' );
 open my $fh, '>', $filename;
 $tif->PrintDirectory( $fh, 0 );
 $tif->Close;
 close $fh;
-is( -s $filename, 449, 'PrintDirectory' );
+is( -s $filename, $position_defined ? 466 : 449, 'PrintDirectory' );
 unlink $filename;
 
 #########################
@@ -136,12 +138,15 @@ SKIP: {
             TIFFTAG_PAGENUMBER,      TIFFTAG_PHOTOMETRIC,
             TIFFTAG_ROWSPERSTRIP,    TIFFTAG_FILLORDER,
             TIFFTAG_RESOLUTIONUNIT,  TIFFTAG_XRESOLUTION,
-            TIFFTAG_YRESOLUTION
+            TIFFTAG_YRESOLUTION,     TIFFTAG_XPOSITION,
+            TIFFTAG_YPOSITION
         )
       )
     {
         my @values = $tif->GetField($tag);
-        $out->SetField( $tag, @values );
+        if (@values) {
+            $out->SetField( $tag, @values );
+        }
     }
 
     my $stripsize = $tif->StripSize;

@@ -1,5 +1,3 @@
-# $id: dh.pm,v 1.19 2009/01/26 01:00:25 turnstep exp $
-
 package Net::SSH::Perl::Kex::DH;
 use strict;
 use warnings;
@@ -50,7 +48,7 @@ sub exchange {
     my $dh_server_pub = $packet->get_mp_int;
     my $signature = $packet->get_str;
 
-    my $dh_server_pub_key = Crypt::PK::DH->new;   
+    my $dh_server_pub_key = Crypt::PK::DH->new;
     # create public key object (which will also check the public key for validity)
     $dh_server_pub_key->import_key_raw($dh_server_pub, 'public', $dh->params2hash);
 
@@ -118,9 +116,9 @@ __END__
 Net::SSH::Perl::Kex::DH - Diffie-Hellman Group Agnostic Key Exchange
 
 =head1 SYNOPSIS
-	
+
     # This class should not be used directly, but rather as a base for DH1,
-    # DH14SHA1, DH16SHA512, etc 
+    # DH14SHA1, DH16SHA512, etc
 
     use Net::SSH::Perl::Kex::DH;
     use base qw( Net::SSH::Perl::Kex::DH );

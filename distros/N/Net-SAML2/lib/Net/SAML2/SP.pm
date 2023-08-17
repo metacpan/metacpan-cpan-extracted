@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use Moose;
 
@@ -20,14 +20,14 @@ use Net::SAML2::Util ();
 use URN::OASIS::SAML2 qw(:bindings :urn);
 use XML::Generator;
 
-# ABSTRACT: Net::SAML2::SP - SAML Service Provider object
+# ABSTRACT: SAML Service Provider object
 
 
 
 
 has 'url'    => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'id'     => (isa => 'Str', is => 'ro', required => 1);
-has 'cert'   => (isa => 'Str', is => 'ro', required => 1);
+has 'cert'   => (isa => 'Str', is => 'ro', required => 1, predicate => 'has_cert');
 has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Str', is => 'rw', required => 0, predicate => 'has_cacert');
 
@@ -96,10 +96,6 @@ around BUILDARGS => sub {
         $args{single_logout_service} = \@slo;
     }
 
-    if (!@{$args{single_logout_service}}) {
-      croak("You don't have any Single Logout Services configured!");
-    }
-
     if (!$args{assertion_consumer_service}) {
         #warn "Deprecation warning, please upgrade your code to use ..";
         my @acs;
@@ -148,6 +144,7 @@ around BUILDARGS => sub {
 sub _build_encryption_key_text {
     my ($self) = @_;
 
+    return '' unless $self->has_encryption_key;
     my $cert = Crypt::OpenSSL::X509->new_from_file($self->encryption_key);
     my $text = $cert->as_string;
     $text =~ s/-----[^-]*-----//gm;
@@ -157,6 +154,7 @@ sub _build_encryption_key_text {
 sub _build_cert_text {
     my ($self) = @_;
 
+    return '' unless $self->has_cert;
     my $cert = Crypt::OpenSSL::X509->new_from_file($self->cert);
     my $text = $cert->as_string;
     $text =~ s/-----[^-]*-----//gm;
@@ -331,14 +329,14 @@ my $ds = ['ds' => URN_SIGNATURE];
 sub generate_metadata {
     my $self = shift;
 
-    my $x = XML::Generator->new(':pretty', conformance => 'loose');
+    my $x = XML::Generator->new(conformance => 'loose', xml => { version => "1.0", encoding => 'UTF-8' });
 
     my $error_uri = $self->error_url;
     if (!$error_uri->scheme) {
         $error_uri = $self->url . $self->error_url;
     }
 
-    return $x->EntityDescriptor(
+    return $x->xml( $x->EntityDescriptor(
         $md,
         {
             entityID => $self->id,
@@ -383,7 +381,7 @@ sub generate_metadata {
             $x->Company($md, $self->org_display_name,),
             $x->EmailAddress($md, $self->org_contact,),
         )
-    );
+    ));
 }
 
 sub _generate_key_descriptors {
@@ -404,9 +402,18 @@ sub _generate_key_descriptors {
         $x->KeyInfo(
             $ds,
             $x->X509Data($ds, $x->X509Certificate($ds, $key)),
-            $x->KeyName($ds, Digest::MD5::md5_hex($key)),
+            $x->KeyName($ds, $self->key_name($use)),
         ),
     );
+}
+
+
+sub key_name {
+    my $self = shift;
+    my $use  = shift;
+    my $key = $use eq 'signing' ? $self->_cert_text : $self->_encryption_key_text;
+    return unless $key;
+    return Digest::MD5::md5_hex($key);
 }
 
 sub _generate_single_logout_service {
@@ -461,11 +468,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
+Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 
@@ -687,6 +694,10 @@ Returns the Net::SAML2 unique ID from Net::SAML2::Util::generate_id.
 =head2 generate_metadata( )
 
 Generate the metadata XML document for this SP.
+
+=head2 key_name($type)
+
+Get the key name for either the C<signing> or C<encryption> key
 
 =head2 metadata( )
 

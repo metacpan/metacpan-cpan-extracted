@@ -221,14 +221,11 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
   av_push(fieldmeta->hooks, (SV *)hook);
 }
 
-struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name)
+static FieldAttributeRegistration *get_active_registration(pTHX_ const char *name)
 {
   COPHH *cophh = CopHINTHASH_get(PL_curcop);
 
-  /* First, work out what hookfuncs the name maps to */
-
-  FieldAttributeRegistration *reg;
-  for(reg = fieldattrs; reg; reg = reg->next) {
+  for(FieldAttributeRegistration *reg = fieldattrs; reg; reg = reg->next) {
     if(!strEQ(name, reg->name))
       continue;
 
@@ -236,8 +233,16 @@ struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, 
         !cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
       continue;
 
-    break;
+    return reg;
   }
+
+  return NULL;
+}
+
+struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name)
+{
+  /* First, work out what hookfuncs the name maps to */
+  FieldAttributeRegistration *reg = get_active_registration(aTHX_ name);
 
   if(!reg)
     return NULL;
@@ -260,21 +265,8 @@ struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, 
 
 AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const char *name)
 {
-  COPHH *cophh = CopHINTHASH_get(PL_curcop);
-
   /* First, work out what hookfuncs the name maps to */
-
-  FieldAttributeRegistration *reg;
-  for(reg = fieldattrs; reg; reg = reg->next) {
-    if(!strEQ(name, reg->name))
-      continue;
-
-    if(reg->funcs->permit_hintkey &&
-        !cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
-      continue;
-
-    break;
-  }
+  FieldAttributeRegistration *reg = get_active_registration(aTHX_ name);
 
   if(!reg)
     return NULL;

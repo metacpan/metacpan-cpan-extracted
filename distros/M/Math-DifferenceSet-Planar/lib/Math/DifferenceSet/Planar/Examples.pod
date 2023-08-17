@@ -1,0 +1,198 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::DifferenceSet::Planar::Examples - overview of M::DS:P example scripts
+
+=head1 DESCRIPTION
+
+The F<examples> directory of the Math-DifferenceSet-Planar distribution
+currently contains the scripts listed below.  Filters, i.e. scripts that
+process sets provided as input, are marked [F].  Scripts with no input
+besides command line parameters are marked [P].
+
+=over 4
+
+=item A333852.pl
+
+[P] Generate terms of OEIS A333852.
+
+=item A353077.pl
+
+[P] Generate terms of OEIS A353077.
+
+=item numlist_sort
+
+[F] Sort a list of lists of integer numbers.
+
+=item pds_canonize
+
+[F] Translate planar difference sets into one of the canonical forms.
+
+=item pds_databases
+
+[P] Show available planar difference set databases.
+
+=item pds_enumerate
+
+[F] Enumerate all the translates of planar difference sets.
+
+=item pds_find_delta
+
+[F] Find pairs of difference set elements with given difference.
+
+=item pds_find_space
+
+[P] Find generators of difference set spaces.
+
+=item pds_find_std_ref
+
+[F] Find standard reference sets from arbitrary planar difference sets.
+
+=item pds_from_lambda
+
+[F] Generate planar difference sets from order/lambda/theta fingerprints.
+
+=item pds_identify
+
+[F] Display order/lambda/theta fingerprints of planar difference sets.
+
+=item pds_info
+
+[F] Display various information about planar difference sets.
+
+=item pds_iterate
+
+[P] Dump stored sample planar difference sets for ranges of orders.
+
+=item pds_iterate_properties
+
+[P] Display properties of stored planar difference sets for ranges of orders.
+
+=item pds_iterate_spaces
+
+[P] Display stored rotator space data.
+
+=item pds_linear_maps
+
+[F] Find linear mapping functions between planar difference sets.
+
+=item pds_main_elements
+
+[F] Print main elements of planar difference set planes.
+
+=item pds_multipliers
+
+[P] Show planar difference set multipliers of a given order.
+
+=item pds_multiply
+
+[F] Multiply planar difference sets by a factor.
+
+=item pds_optable
+
+[F] Print difference tables for planar difference sets.
+
+=item pds_planes
+
+[P/F] Enumerate planar difference set planes of a given order or sample sets.
+
+=item pds_randomize
+
+[F] Generate random planar difference sets of same size from given sets.
+
+=item pds_rotators
+
+[P] Enumerate planar difference set rotators of a given order.
+
+=item pds_sample
+
+[P] Print a planar difference set of a given order.
+
+=item pds_sort_elements
+
+[F] Numerically sort planar difference set elements.
+
+=item pds_translate
+
+[F] Translate planar difference sets.
+
+=item pds_verify
+
+[F] Verify lists of integers as planar difference sets.
+
+=item random_pds
+
+[P] Generate a random planar difference set.
+
+=back
+
+=head1 HISTORY
+
+Some examples from earlier releases have been moved from separate scripts
+into more general scripts with parameters, particularly where canonization
+variants had been the distinctive feature.  Others have been dropped
+for being deprecated or lacking relevance.  We list all such changes here.
+
+=over 4
+
+=item A333852-essential.pl
+
+Dropped for being too similar to A353077.pl.
+
+=item pds_check
+
+Dropped with deprecated method check_elements.
+
+=item pds_eta
+
+Now part of pds_info.
+
+=item pds_gap_canonize
+
+Now part of pds_canonize.
+
+=item pds_largest_gap
+
+Now part of pds_info.
+
+=item pds_peak_elements
+
+Now part of pds_info.
+
+=item pds_spaces
+
+Renamed to pds_iterate_spaces for consistency.
+
+=item pds_statistic
+
+Renamed to pds_iterate_properties for consistency.
+
+=item pds_zeta
+
+Now part of pds_info.
+
+=item pds_zeta_canonize
+
+Now part of pds_canonize.
+
+=back
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

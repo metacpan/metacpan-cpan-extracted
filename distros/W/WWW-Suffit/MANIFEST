@@ -1,0 +1,27 @@
+# MANIFEST Fri 21 Jul 2023 12:20:11 MSK
+
+# General
+Changes                                  Changes list
+INSTALL.md                               Installation instructions
+LICENSE                                  License file
+Makefile.PL                              Makefile builder
+MANIFEST                                 This file
+README.md                                !!! README FIRST !!!
+TODO                                     TO DO
+
+# Libs
+lib/WWW/Suffit.pm                        Main library
+lib/WWW/Suffit/Const.pm                  Constants
+lib/WWW/Suffit/RSA.pm                    RSA cryptography class
+lib/WWW/Suffit/Util.pm                   Utilities
+
+# Tests
+t/00-fixme.t                             FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                      POD::Coverage testing
+t/00-pod.t                               Checking all POD documents
+t/00-trailingspace.t                     Style test: TrailingSpace
+t/01-use.t                               Test script
+t/02-util.t                              Utilities
+t/03-rsa.t                               RSA test
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

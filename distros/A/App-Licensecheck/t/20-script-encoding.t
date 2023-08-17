@@ -1,6 +1,9 @@
 use Test2::V0 -no_pragmas => 1;
 use Test2::Tools::Command;
 
+use lib 't/lib';
+use Test2::Require::WorkingUtf8;
+
 use warnings;
 use strict;
 
@@ -12,6 +15,8 @@ if ( $Encode::Locale::ENCODING_LOCALE ne 'UTF-8' ) {
 	skip_all
 		"locale encoding is $Encode::Locale::ENCODING_LOCALE - we need UTF-8";
 }
+
+# TODO: expect only "resolved", and require String::License v0.0.6
 
 plan 13;
 
@@ -48,20 +53,23 @@ subtest 'Latin-1 in UTF-8 parsed as UTF-8 returns chars' => sub {
 	command {
 		args   => [qw(--encoding utf8 t/encoding/copr-utf8.h)],
 		stdout => $basic,
-		stderr => qr/ as utf8\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as utf8\nheader end matches file size\n(?:collected|resolved)/,
 	};
 };
 subtest 'Latin-1 in UTF-8 parsed by default returns mojibake' => sub {
 	command {
 		args   => [qw(t/encoding/copr-utf8.h)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(t/encoding/copr-utf8.h)],
 		stdout => $basic_utf8_as_latin1,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
@@ -69,13 +77,15 @@ subtest 'Latin-1 in UTF-8 parsed by guessing returns chars' => sub {
 	command {
 		args   => [qw(--encoding Guess t/encoding/copr-utf8.h)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(--encoding Guess t/encoding/copr-utf8.h)],
 		stdout => $basic_utf8_as_latin1,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
@@ -83,27 +93,31 @@ subtest 'Latin-1 in UTF-8 parsed as ISO 8859-1 returns mojibake' => sub {
 	command {
 		args   => [qw(--encoding iso-8859-1 t/encoding/copr-utf8.h)],
 		stdout => $basic_utf8_as_latin1,
-		stderr => qr/ as iso-8859-1\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as iso-8859-1\nheader end matches file size\n(?:collected|resolved)/,
 	};
 };
 subtest 'Latin-1 in ISO 8859-1 parsed as ISO 8859-1 returns chars' => sub {
 	command {
 		args   => [qw(--encoding iso-8859-1 t/encoding/copr-iso8859.h)],
 		stdout => $extended,
-		stderr => qr/ as iso-8859-1\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as iso-8859-1\nheader end matches file size\n(?:collected|resolved)/,
 	};
 };
 subtest 'Latin-1 in ISO 8859-1 parsed by default returns chars' => sub {
 	command {
 		args   => [qw(t/encoding/copr-iso8859.h)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(t/encoding/copr-iso8859.h)],
 		stdout => $extended,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
@@ -111,42 +125,47 @@ subtest 'Latin-1 in ISO 8859-1 parsed by guessing returns chars' => sub {
 	command {
 		args   => [qw(--encoding Guess t/encoding/copr-iso8859.h)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(--encoding Guess t/encoding/copr-iso8859.h)],
 		stdout => $extended,
-		stderr => qr/ as raw bytes\nheader end matches file size\ncollected/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
-subtest 'Latin-1 in ISO 8859-1 parsed as UTF-8 returns mojibake and warns' =>
+subtest 'Latin-1 in ISO 8859-1 parsed as UTF-8 returns chars and warns' =>
 	sub {
 	command {
 		args   => [qw(--encoding utf8 t/encoding/copr-iso8859.h)],
 		stdout => $extended,
-		stderr => qr/ as utf8\nfailed decoding/,
+		stderr => qr/failed decoding/,
 	};
 	};
 subtest 'CJK in EUC-JP parsed as EUC-JP returns chars' => sub {
 	command {
 		args   => [qw(--encoding euc-jp t/encoding/README.gs550j)],
 		stdout => $japanese,
-		stderr => qr/ as euc-jp\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as euc-jp\nheader end matches file size\n(?:collected|resolved)/,
 	};
 };
 subtest 'CJK in EUC-JP parsed by default returns mojibake and warns' => sub {
 	command {
 		args   => [qw(t/encoding/README.gs550j)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(t/encoding/README.gs550j)],
 		stdout => $japanese_ujis_as_latin1,
-		stderr => qr/ as raw bytes\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
@@ -154,13 +173,15 @@ subtest 'CJK in EUC-JP parsed by guessing returns mojibake' => sub {
 	command {
 		args   => [qw(--encoding Guess t/encoding/README.gs550j)],
 		stdout => qr//,
-		stderr => qr/ as raw bytes\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	my $todo = todo 'String::Copyright documented to accept only strings';
 	command {
 		args   => [qw(--encoding Guess t/encoding/README.gs550j)],
 		stdout => $japanese_ujis_as_latin1,
-		stderr => qr/ as raw bytes\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as raw bytes\nheader end matches file size\n(?:collected|resolved)/,
 	};
 	$todo = undef;
 };
@@ -168,14 +189,15 @@ subtest 'CJK in EUC-JP parsed as ISO 8859-1 returns mojibake' => sub {
 	command {
 		args   => [qw(--encoding iso-8859-1 t/encoding/README.gs550j)],
 		stdout => $japanese_ujis_as_latin1,
-		stderr => qr/ as iso-8859-1\nheader end matches file size\nresolved/,
+		stderr =>
+			qr/ as iso-8859-1\nheader end matches file size\n(?:collected|resolved)/,
 	};
 };
 subtest 'CJK in EUC-JP parsed as UTF-8 returns mojibake and warns' => sub {
 	command {
 		args   => [qw(--encoding utf8 t/encoding/README.gs550j)],
 		stdout => $japanese_ujis_raw,
-		stderr => qr/ as utf8\nfailed decoding/,
+		stderr => qr/failed decoding/,
 	};
 };
 

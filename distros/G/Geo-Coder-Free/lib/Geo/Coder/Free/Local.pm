@@ -21,11 +21,11 @@ L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>.
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -207,6 +207,7 @@ sub geocode {
 			$addr{'number'} = $c{'property_identifier'};
 			$addr{'city'} = $c{'suburb'};
 			# ::diag(Data::Dumper->new([\%addr])->Dump());
+			# print Data::Dumper->new([\%addr])->Dump(), "\n";
 			if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 				return $rc;
 			}
@@ -214,6 +215,21 @@ sub geocode {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
+			}
+
+			# Decide if it's worth continuing to search
+			my $found = 0;
+			foreach my $row(@{$self->{'data'}}) {
+				if((uc($row->{'state'}) eq uc($addr{'state'})) &&
+				   (uc($row->{'country'}) eq uc($addr{'country'}))) {
+					$found = 1;
+					last;
+				}
+			}
+			if(!$found) {
+				# Nothing at all in this state/country,
+				#	so let's give up looking
+				return;
 			}
 		}
 	}
@@ -335,6 +351,14 @@ sub geocode {
 				}
 			}
 		}
+	}
+
+	if(($location =~ /.+,.+,.*England$/) &&
+	   ($location !~ /.+,.+,.+,.*England$/)) {
+		# Simple "Town, County, England"
+		# If we're here, it's not going to be found because the
+		# above parsers will have worked
+		return;
 	}
 
 	# Finally try libpostal,
@@ -659,10 +683,11 @@ __DATA__
 "DOWNS PARK",,"CHESAPEAKE BAY DRIVE","PASADENA","ANNE ARUNDEL","MD","US",39.110711,-76.434062
 "",1559,"GUERDON CT","PASADENA","ANNE ARUNDEL","MD","US",39.102637,-76.456384
 "ARCOLA HEALTH AND REHABILITATION CENTER",901,"ARCOLA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.036439,-77.025502
-"ADVENTIST HOSPITAL",11886,"HEALING WAY","SILVER SPRING","MONTGOMERY","MD","US",39.049570,-76.956882
 "",9904,"GARDINER AVE","SILVER SPRING","MONTGOMERY","MD","US",39.017633,-77.049551
-"",2232,"HILDAROSE DR","SILVER SPRING","MONTGOMERY","MD","US",39.019385,-77.049779,
 "FOREST GLEN MEDICAL CENTER",9801,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.016042,-77.042148
+"",10009,"GREELEY AVE","SILVER SPRING","MONTGOMERY","MD","US",39.019575,-77.047453
+"ADVENTIST HOSPITAL",11886,"HEALING WAY","SILVER SPRING","MONTGOMERY","MD","US",39.049570,-76.956882
+"",2232,"HILDAROSE DR","SILVER SPRING","MONTGOMERY","MD","US",39.019385,-77.049779,
 "LA CASITA PUPESERIA AND MARKET",8214,"PINEY BRANCH RD","SILVER SPRING","MONTGOMERY","MD","US",38.993369,-77.009501
 "NOAA LIBRARY",1315,"EAST-WEST HIGHWAY","SILVER SPRING","MONTGOMERY","MD","US",38.991667,-77.030473
 "SNIDERS",1936,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.0088797,-77.04162824
@@ -675,7 +700,8 @@ __DATA__
 "",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
 "BP",2601,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857
 "OMEGA STUDIOS",12412,,"ROCKVILLE","MONTGOMERY","MD","US",39.06412645,-77.11252263
-"NASA",,"","GREENBELT","PRINCE GEORGES","MD","US",38.996764,-76.849323
+"",10424,"43RD AVE","BELTSVILLE","PRINCE GEORGE","MD","US",39.033075,-76.923859
+"NASA",,"TIROS RD","GREENBELT","PRINCE GEORGE","MD","US",38.996764,-76.849323
 "",7001,"CRADLEROCK FARM COURT","COLUMBIA","HOWARD","MD","US",39.190009,-76.841152
 "BANGOR AIRPORT",,"GODFREY BOULEVARD","BANGOR","PENOBSCOT","ME","US",44.406700,-68.597114
 "",86,"ALLEN POINT LANE","BLUE HILLS","HANCOCK","ME","US",44.35378018,-68.57383976

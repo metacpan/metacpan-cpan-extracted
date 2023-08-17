@@ -132,7 +132,7 @@ WriteMakefile(
   H => [@header_files],
   OBJECT => '$(O_FILES)', # link all the C files too
   INC => $inc,
-  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
+  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t'},
   clean => {FILES => "SPVM.o lib/SPVM/Builder/src/*.o .spvm_build t/.spvm_build t/02_vm/.spvm_build t/03_precompile t/test_files_tmp t/*/test_files_tmp t/exe/.spvm_build"},
   DEFINE => "@defines -o \$@",
   META_MERGE => {
@@ -175,10 +175,18 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Hash');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Format');
     
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Compiler');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Runtime');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Env');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Stack');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Compiler');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::ClassFile');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Runtime');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Env');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Stack');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::BasicType');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::ClassVar');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Field');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Method');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Arg');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::MethodCall');
     
     # Build precompile
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Fn');

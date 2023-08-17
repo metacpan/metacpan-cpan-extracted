@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'File upload result',
                                   class => 'FilesUploadResult',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'uploaded' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'Uploaded',
-     	description => '',
+     	description => 'List of uploaded file names',
      	format => '',
      	read_only => '',
      		},
      'errors' => {
      	datatype => 'ARRAY[Error]',
      	base_name => 'Errors',
-     	description => '',
+     	description => 'List of errors.',
      	format => '',
      	read_only => '',
      		},    

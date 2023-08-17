@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/PM/Packages.pm
+t/hidden.t
+t/one.t 
+t/PM-Packages.t
+t/simple.t
+t/two.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 X11-Xlib
-=====================
+========
 
-This module provide low-level access to X11 libary functions.
+This module provides low-level and high-level access to X11 libary functions.
 
 This includes access to some X11 extensions like the X11 test library (Xtst).
 
@@ -32,7 +32,7 @@ COPYRIGHT AND LICENSE
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2021 by Michael Conrad
+Copyright (C) 2017-2023 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

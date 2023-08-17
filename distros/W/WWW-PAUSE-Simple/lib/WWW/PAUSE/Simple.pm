@@ -21,9 +21,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-03'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'WWW-PAUSE-Simple'; # DIST
-our $VERSION = '0.455'; # VERSION
+our $VERSION = '0.456'; # VERSION
 
 our %SPEC;
 my $access_log = Log::ger->get_logger(category => "_access");
@@ -314,11 +314,11 @@ sub upload_files {
             }
 
             if ($args{-dry_run}) {
-                log_trace("[dry-run] (%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
+                log_trace("[dry-run] (%d/%d) Uploading %s ...", $i+1, scalar(@$files), $file);
                 goto DELAY;
             }
 
-            log_trace("(%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
+            log_trace("(%d/%d) Uploading %s ...", $i+1, scalar(@$files), $file);
             my $httpres = _request(
                 note => "upload $file",
                 %args,
@@ -534,7 +534,6 @@ _
 };
 sub list_dists {
     require List::MoreUtils;
-    use experimental 'smartmatch';
 
     my %args  = @_;
 
@@ -601,7 +600,7 @@ sub list_dists {
         for my $distrec (@old_distrecs) {
             log_trace "Distribution %s: Keeping these newest versions: %s", $distrec->{name}, $dist_versions{$distrec->{name}}
                 unless $dist_seen{$distrec->{name}};
-            if ($distrec->{version} ~~ @{ $dist_versions{$distrec->{name}} }) {
+            if (grep { $_ eq $distrec->{version} } @{ $dist_versions{$distrec->{name}} }) {
                 push @distrecs, $distrec;
             } else {
                 push @old_files, $distrec->{file};
@@ -698,7 +697,6 @@ sub delete_old_releases {
 }
 
 sub _delete_or_undelete_or_reindex_files {
-    use experimental 'smartmatch';
     require Regexp::Wildcards;
     require String::Wildcard::Bash;
 
@@ -752,7 +750,7 @@ sub _delete_or_undelete_or_reindex_files {
                 my $re = Regexp::Wildcards->new(type=>'unix')->convert($file);
                 $re = qr/\A($re)\z/;
                 for my $f (@{$listres->[2]}) {
-                    push @files, $f if $f =~ $re && !($f ~~ @files);
+                    push @files, $f if $f =~ $re && !(grep { $_ eq $f } @files);
                 }
             } else {
                 push @files, $file;
@@ -1009,7 +1007,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.455 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2022-11-03.
+This document describes version 0.456 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2023-07-12.
 
 =head1 SYNOPSIS
 
@@ -1694,7 +1692,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

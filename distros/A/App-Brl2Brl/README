@@ -1,0 +1,53 @@
+App-Brl2Brl
+
+This package contains the Perl module App::Brl2Brl and the command
+line script brl2brl.
+
+Version 0.03
+
+Use case
+
+Convert between braille character sets. If you for instance have
+multiple braille printers with different characet set, you can use
+this script to convert the data you want to print accordingly. The
+respective display tables have to be present in a directory, and they
+must have the format of Liblouis display tables (*.dis).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Brl2Brl
+    perldoc brl2brl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Brl2Brl
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/App-Brl2Brl
+
+    Search CPAN
+        https://metacpan.org/release/App-Brl2Brl
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Lars Bjørndal.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

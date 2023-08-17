@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "PerlIO::gzip" => "0.20",
     "XML::Parser::Lite" => "0.722"
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -5,14 +5,15 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::PP: '2.27203'
+  Object::Pad: '0.78'
   PDF::API2: '2.043'
   Storable: '3.08'
   String::Interpolate::Named: '1.01'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.5503'
+  ExtUtils::MakeMaker: '7.24'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,36 +23,45 @@ no_index:
   directory:
     - t
     - inc
-    - lib/App/Music/ChordPro/Output
-    - lib/App/Music/ChordPro/Wx
+    - lib/ChordPro/Chords
+    - lib/ChordPro/Config
+    - lib/ChordPro/Delegate
+    - lib/ChordPro/Output
+    - lib/ChordPro/Wx
+    - lib/ChordPro/res
+    - pp
   file:
-    - lib/App/Music/ChordPro/Songbook.pm
-    - lib/App/Music/ChordPro/Chords.pm
-    - lib/App/Music/ChordPro/Version.pm
-    - lib/App/Music/ChordPro/Wx.pm
+    - lib/ChordPro/Songbook.pm
+    - lib/ChordPro/Chords.pm
+    - lib/ChordPro/Testing.pm
+    - lib/ChordPro/Utils.pm
+    - lib/ChordPro/Version.pm
+    - lib/ChordPro/Wx.pm
 provides:
   App::Music::ChordPro:
-    file: lib/App/Music/ChordPro.pm
-    version: '6.000'
+    file: lib/ChordPro.pm
+    version: '6.020'
   chordpro:
     file: script/chordpro
-    version: '6.000'
+    version: '6.020'
 requires:
   App::Packager: '1.43'
   File::HomeDir: '1.004'
   File::LoadLines: '1.021'
   Image::Info: '1.41'
   JSON::PP: '2.27203'
-  List::Util: '1.33'
+  List::Util: '1.46'
+  Object::Pad: '0.78'
   PDF::API2: '2.043'
+  Pod::Usage: '2.03'
   Storable: '3.08'
   String::Interpolate::Named: '1.03'
-  Text::Layout: '0.03'
-  perl: '5.010001'
+  Text::Layout: '0.031'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/sciurius/chordpro/issues
-  homepage: http://www.chordpro.org
-  license: http://dev.perl.org/licenses/
+  homepage: https://www.chordpro.org
+  license: https://dev.perl.org/licenses/
   repository: https://github.com/sciurius/chordpro
-version: '6.000'
+version: '6.020'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

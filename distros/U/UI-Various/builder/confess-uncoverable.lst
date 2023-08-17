@@ -11,14 +11,8 @@ lib/UI/Various/core.pm:	    # uncoverable branch true
 lib/UI/Various/core.pm:	    # uncoverable condition false
 lib/UI/Various/core.pm-	    unless (defined(caller(4))  and  (caller(4))[0]  eq  'Pod::Coverage')
 --
-lib/UI/Various/core.pm:		# uncoverable not statement
-lib/UI/Various/core.pm-		$rh_options->{use} = [];
---
 lib/UI/Various/core.pm:		    # uncoverable branch true
 lib/UI/Various/core.pm-		    if ($rc == 0)
---
-lib/UI/Various/core.pm:			# uncoverable not statement
-lib/UI/Various/core.pm-			print "\n***** can't redirect STDERR: $! *****\n";
 --
 lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition false
 lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition right

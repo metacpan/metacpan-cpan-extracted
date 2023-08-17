@@ -1,3 +1,1 @@
-/tmp;TMP
-/usr/local/bin;Local Bin
-/etc
+/home/turnerjw/Backups/

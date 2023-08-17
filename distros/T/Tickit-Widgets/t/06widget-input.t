@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148;
 
 use Tickit::Test;
 
@@ -28,11 +27,11 @@ ok( $term->cursorvis, 'Cursor visible on window' );
 
 presskey( text => "A" );
 
-is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
+is( \@key_events, [ [ text => "A" ] ], 'on_key A' );
 
 pressmouse( press => 1, 4, 3 );
 
-is_deeply( \@mouse_events, [ [ press => 1, 4, 3 ] ], 'on_mouse abs@3,4' );
+is( \@mouse_events, [ [ press => 1, 4, 3 ] ], 'on_mouse abs@3,4' );
 
 presskey( key => "Enter" );
 

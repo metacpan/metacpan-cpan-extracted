@@ -1,0 +1,11 @@
+.perltidyrc
+lib/Mojo/CouchDB.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+README
+README.md
+t/01-local-integration.t
+t/02-promises.t

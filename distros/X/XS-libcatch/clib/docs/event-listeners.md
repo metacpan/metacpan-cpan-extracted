@@ -19,7 +19,7 @@ about it and instantiates it before running tests.
 Example event listener:
 ```cpp
 #include <catch2/reporters/catch_reporter_event_listener.hpp>
-#include <catch2/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
 
 class testRunListener : public Catch::EventListenerBase {
 public:
@@ -33,7 +33,7 @@ public:
 CATCH_REGISTER_LISTENER(testRunListener)
 ```
 
-_Note that you should not use any assertion macros within a Listener!_ 
+_Note that you should not use any assertion macros within a Listener!_
 
 [You can find the list of events that the listeners can react to on its
 own page](reporter-events.md#top).

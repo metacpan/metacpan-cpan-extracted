@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Output::Dump;
-$WebFetch::Output::Dump::VERSION = '0.15.5';
+$WebFetch::Output::Dump::VERSION = '0.15.9';
 use base "WebFetch";
 
 use Data::Dumper;
@@ -48,7 +48,7 @@ WebFetch::Output::Dump - save WebFetch data in a Perl structure dump
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

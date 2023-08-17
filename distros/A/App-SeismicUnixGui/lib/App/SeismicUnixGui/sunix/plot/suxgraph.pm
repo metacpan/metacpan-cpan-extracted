@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::suxgraph;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME: suxgraph.pm 							
+ PERL PROGRAM NAME: suxgraph.pm 							
 
  AUTHOR: Juan Lorenzo
  DATE:  Jan 25, 2018 

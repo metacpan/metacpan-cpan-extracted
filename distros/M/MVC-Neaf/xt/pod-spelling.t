@@ -1,11 +1,28 @@
 #!perl
 
+=head1 DESCRIPTION
+
+Check POD spelling via Lingua::Ispell.
+
+This requires installation of Lingua::Ispell, ispell itself,
+and American English dictionary.
+
+=cut
+
 use strict;
 use warnings;
 
 use Test::More;
 use File::Basename qw(dirname);
 use Test::Pod 1.22;
+
+BEGIN {
+    eval { require Lingua::Ispell; 1 } or do {
+        plan tests => 1;
+        fail "Can't find Lingua::Ispell (or ispell itself), aborting";
+        exit 1;
+    };
+};
 BEGIN {
     local $SIG{__WARN__} = sub {};
     require Test::Pod::Spelling;

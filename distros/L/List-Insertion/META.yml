@@ -22,6 +22,6 @@ requires:
   Template::Plex: v0.5.0
   perl: '5.024000'
 resources:
-  repository: git://github.com/drclaw1394/perl5-list-insertion.git
-version: v0.1.0
+  repository: git://github.com/drclaw1394/perl-list-insertion.git
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

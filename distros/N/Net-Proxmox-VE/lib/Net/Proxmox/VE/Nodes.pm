@@ -1,4 +1,5 @@
 #!/bin/false
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Nodes
 # ABSTRACT: Functions for the 'nodes' portion of the API
 
@@ -6,8 +7,10 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Nodes;
-$Net::Proxmox::VE::Nodes::VERSION = '0.36';
+$Net::Proxmox::VE::Nodes::VERSION = '0.37';
 use parent 'Exporter';
+
+use Carp qw( croak );
 
 our @EXPORT  = qw( nodes );
 
@@ -27,8 +30,8 @@ sub get_nodes {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes()';
-    die 'node must be a scalar for get_nodes()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes()';
+    croak 'node must be a scalar for get_nodes()' if ref $a;
 
     return $self->get( $base, $a )
 
@@ -39,8 +42,8 @@ sub get_nodes_aplinfo {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_aplinfo()';
-    die 'node must be a scalar for get_nodes_aplinfo()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_aplinfo()';
+    croak 'node must be a scalar for get_nodes_aplinfo()' if ref $a;
 
     return $self->get( $base, $a, 'aplinfo' )
 
@@ -51,21 +54,21 @@ sub create_nodes_aplinfo {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_aplinfo()';
-    die 'node must be a scalar for create_nodes_aplinfo()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_aplinfo()';
+    croak 'node must be a scalar for create_nodes_aplinfo()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_aplinfo()' unless @p;
+    croak 'No arguments for create_nodes_aplinfo()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_aplinfo()'
+        croak 'Single argument not a hash for create_nodes_aplinfo()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_aplinfo()'
+        croak 'Odd number of arguments for create_nodes_aplinfo()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -79,8 +82,8 @@ sub get_nodes_dns {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_dns()';
-    die 'node must be a scalar for get_nodes_dns()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_dns()';
+    croak 'node must be a scalar for get_nodes_dns()' if ref $a;
 
     return $self->get( $base, $a, 'dns' )
 
@@ -91,21 +94,21 @@ sub update_nodes_dns {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for update_nodes_dns()';
-    die 'node must be a scalar for update_nodes_dns()' if ref $a;
+    my $a = shift or croak 'No node for update_nodes_dns()';
+    croak 'node must be a scalar for update_nodes_dns()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_nodes_dns()' unless @p;
+    croak 'No arguments for update_nodes_dns()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_nodes_dns()'
+        croak 'Single argument not a hash for update_nodes_dns()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_nodes_dns()'
+        croak 'Odd number of arguments for update_nodes_dns()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -119,21 +122,21 @@ sub get_nodes_rrd {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_rrd()';
-    die 'node must be a scalar for get_nodes_rrd()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_rrd()';
+    croak 'node must be a scalar for get_nodes_rrd()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for get_nodes_rrd()' unless @p;
+    croak 'No arguments for get_nodes_rrd()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for get_nodes_rrd()'
+        croak 'Single argument not a hash for get_nodes_rrd()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for get_nodes_rrd()'
+        croak 'Odd number of arguments for get_nodes_rrd()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -147,21 +150,21 @@ sub get_nodes_rrddata {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_rrddata()';
-    die 'node must be a scalar for get_nodes_rrddata()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_rrddata()';
+    croak 'node must be a scalar for get_nodes_rrddata()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for get_nodes_rrddata()' unless @p;
+    croak 'No arguments for get_nodes_rrddata()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for get_nodes_rrddata()'
+        croak 'Single argument not a hash for get_nodes_rrddata()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for get_nodes_rrddata()'
+        croak 'Odd number of arguments for get_nodes_rrddata()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -175,8 +178,8 @@ sub get_nodes_status {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_status()';
-    die 'node must be a scalar for get_nodes_status()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_status()';
+    croak 'node must be a scalar for get_nodes_status()' if ref $a;
 
     return $self->get( $base, $a, 'status' )
 
@@ -188,21 +191,21 @@ sub update_nodes_status {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for update_nodes_status()';
-    die 'node must be a scalar for update_nodes_status()' if ref $a;
+    my $a = shift or croak 'No node for update_nodes_status()';
+    croak 'node must be a scalar for update_nodes_status()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_nodes_status()' unless @p;
+    croak 'No arguments for update_nodes_status()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_nodes_status()'
+        croak 'Single argument not a hash for update_nodes_status()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_nodes_status()'
+        croak 'Odd number of arguments for update_nodes_status()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -217,8 +220,8 @@ sub get_nodes_subscription {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_subscription()';
-    die 'node must be a scalar for get_nodes_subscription()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_subscription()';
+    croak 'node must be a scalar for get_nodes_subscription()' if ref $a;
 
     return $self->get( $base, $a, 'subscription' )
 
@@ -229,21 +232,21 @@ sub create_nodes_subscription {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_subscription()';
-    die 'node must be a scalar for create_nodes_subscription()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_subscription()';
+    croak 'node must be a scalar for create_nodes_subscription()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_subscription()' unless @p;
+    croak 'No arguments for create_nodes_subscription()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_subscription()'
+        croak 'Single argument not a hash for create_nodes_subscription()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_subscription()'
+        croak 'Odd number of arguments for create_nodes_subscription()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -257,21 +260,21 @@ sub update_nodes_subscription_key {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for update_nodes_subscription_key()';
-    die 'node must be a scalar for update_nodes_subscription_key()' if ref $a;
+    my $a = shift or croak 'No node for update_nodes_subscription_key()';
+    croak 'node must be a scalar for update_nodes_subscription_key()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_nodes_subscription_key()' unless @p;
+    croak 'No arguments for update_nodes_subscription_key()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_nodes_subscription_key()'
+        croak 'Single argument not a hash for update_nodes_subscription_key()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_nodes_subscription_key()'
+        croak 'Odd number of arguments for update_nodes_subscription_key()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -285,21 +288,21 @@ sub get_nodes_syslog {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_syslog()';
-    die 'node must be a scalar for get_nodes_syslog()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_syslog()';
+    croak 'node must be a scalar for get_nodes_syslog()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for get_nodes_syslog()' unless @p;
+    croak 'No arguments for get_nodes_syslog()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for get_nodes_syslog()'
+        croak 'Single argument not a hash for get_nodes_syslog()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for get_nodes_syslog()'
+        croak 'Odd number of arguments for get_nodes_syslog()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -313,8 +316,8 @@ sub get_nodes_time {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_time()';
-    die 'node must be a scalar for get_nodes_time()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_time()';
+    croak 'node must be a scalar for get_nodes_time()' if ref $a;
 
     return $self->get( $base, $a, 'time' )
 
@@ -325,21 +328,21 @@ sub update_nodes_time {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for update_nodes_time()';
-    die 'node must be a scalar for update_nodes_time()' if ref $a;
+    my $a = shift or croak 'No node for update_nodes_time()';
+    croak 'node must be a scalar for update_nodes_time()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for update_nodes_time()' unless @p;
+    croak 'No arguments for update_nodes_time()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_nodes_time()'
+        croak 'Single argument not a hash for update_nodes_time()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_nodes_time()'
+        croak 'Odd number of arguments for update_nodes_time()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -353,8 +356,8 @@ sub get_nodes_ubcfailcnt {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_ubcfailcnt()';
-    die 'node must be a scalar for get_nodes_ubcfailcnt()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_ubcfailcnt()';
+    croak 'node must be a scalar for get_nodes_ubcfailcnt()' if ref $a;
 
     return $self->get( $base, $a, 'ubcfailcnt' )
 
@@ -365,8 +368,8 @@ sub get_nodes_version {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_version()';
-    die 'node must be a scalar for get_nodes_version()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_version()';
+    croak 'node must be a scalar for get_nodes_version()' if ref $a;
 
     return $self->get( $base, $a, 'version' )
 
@@ -377,8 +380,8 @@ sub create_nodes_vncshell {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_vncshell()';
-    die 'node must be a scalar for create_nodes_vncshell()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_vncshell()';
+    croak 'node must be a scalar for create_nodes_vncshell()' if ref $a;
 
     return $self->post( $base, $a, 'vncshell' )
 
@@ -389,21 +392,21 @@ sub create_nodes_vzdump {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_vzdump()';
-    die 'node must be a scalar for create_nodes_vzdump()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_vzdump()';
+    croak 'node must be a scalar for create_nodes_vzdump()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_vzdump()' unless @p;
+    croak 'No arguments for create_nodes_vzdump()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_vzdump()'
+        croak 'Single argument not a hash for create_nodes_vzdump()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_vzdump()'
+        croak 'Odd number of arguments for create_nodes_vzdump()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -417,21 +420,21 @@ sub nodes_network {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for nodes_network()';
-    die 'node must be a scalar for nodes_network()' if ref $a;
+    my $a = shift or croak 'No node for nodes_network()';
+    croak 'node must be a scalar for nodes_network()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for nodes_network()' unless @p;
+    croak 'No arguments for nodes_network()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for nodes_network()'
+        croak 'Single argument not a hash for nodes_network()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for nodes_network()'
+        croak 'Odd number of arguments for nodes_network()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -445,21 +448,21 @@ sub create_nodes_network {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_network()';
-    die 'node must be a scalar for create_nodes_network()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_network()';
+    croak 'node must be a scalar for create_nodes_network()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_network()' unless @p;
+    croak 'No arguments for create_nodes_network()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_network()'
+        croak 'Single argument not a hash for create_nodes_network()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_network()'
+        croak 'Odd number of arguments for create_nodes_network()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -473,8 +476,8 @@ sub revert_nodes_network {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for revert_nodes_network()';
-    die 'node must be a scalar for revert_nodes_network()' if ref $a;
+    my $a = shift or croak 'No node for revert_nodes_network()';
+    croak 'node must be a scalar for revert_nodes_network()' if ref $a;
 
     return $self->delete( $base, $a )
 
@@ -486,11 +489,11 @@ sub get_nodes_network_iface {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_network_iface()';
-    my $b = shift or die 'No iface for get_nodes_network_iface()';
+    my $a = shift or croak 'No node for get_nodes_network_iface()';
+    my $b = shift or croak 'No iface for get_nodes_network_iface()';
 
-    die 'node must be a scalar for get_nodes_network_iface()' if ref $a;
-    die 'iface must be a scalar for get_nodes_network_iface()' if ref $b;
+    croak 'node must be a scalar for get_nodes_network_iface()' if ref $a;
+    croak 'iface must be a scalar for get_nodes_network_iface()' if ref $b;
 
     return $self->get( $base, $a, 'network', $b )
 
@@ -501,24 +504,24 @@ sub update_nodes_network_iface {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for update_nodes_network_iface()';
-    my $b = shift or die 'No iface for update_nodes_network_iface()';
+    my $a = shift or croak 'No node for update_nodes_network_iface()';
+    my $b = shift or croak 'No iface for update_nodes_network_iface()';
 
-    die 'node must be a scalar for update_nodes_network_iface()' if ref $a;
-    die 'iface must be a scalar for update_nodes_network_iface()' if ref $b;
+    croak 'node must be a scalar for update_nodes_network_iface()' if ref $a;
+    croak 'iface must be a scalar for update_nodes_network_iface()' if ref $b;
 
     my @p = @_;
 
-    die 'No arguments for update_nodes_network_iface()' unless @p;
+    croak 'No arguments for update_nodes_network_iface()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_nodes_network_iface()'
+        croak 'Single argument not a hash for update_nodes_network_iface()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_nodes_network_iface()'
+        croak 'Odd number of arguments for update_nodes_network_iface()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -532,11 +535,11 @@ sub delete_nodes_network_iface {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for delete_nodes_network_iface()';
-    my $b = shift or die 'No iface for delete_nodes_network_iface()';
+    my $a = shift or croak 'No node for delete_nodes_network_iface()';
+    my $b = shift or croak 'No iface for delete_nodes_network_iface()';
 
-    die 'node must be a scalar for delete_nodes_network_iface()' if ref $a;
-    die 'iface must be a scalar for delete_nodes_network_iface()' if ref $b;
+    croak 'node must be a scalar for delete_nodes_network_iface()' if ref $a;
+    croak 'iface must be a scalar for delete_nodes_network_iface()' if ref $b;
 
     return $self->get( $base, $a, 'network', $b )
 
@@ -547,8 +550,8 @@ sub nodes_openvz {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for nodes_openvz()';
-    die 'node must be a scalar for nodes_openvz()' if ref $a;
+    my $a = shift or croak 'No node for nodes_openvz()';
+    croak 'node must be a scalar for nodes_openvz()' if ref $a;
 
     return $self->get( $base, $a, 'openvz')
 
@@ -559,21 +562,21 @@ sub create_nodes_openvz {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_openvz()';
-    die 'node must be a scalar for create_nodes_openvz()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_openvz()';
+    croak 'node must be a scalar for create_nodes_openvz()' if ref $a;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_openvz()' unless @p;
+    croak 'No arguments for create_nodes_openvz()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_openvz()'
+        croak 'Single argument not a hash for create_nodes_openvz()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_openvz()'
+        croak 'Odd number of arguments for create_nodes_openvz()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -587,11 +590,11 @@ sub get_nodes_openvz {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_openvz()';
-    die 'node must be a scalar for get_nodes_openvz()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_openvz()';
+    croak 'node must be a scalar for get_nodes_openvz()' if ref $a;
 
-    my $b = shift or die 'No node for get_nodes_openvz()';
-    die 'node must be a scalar for get_nodes_openvz()' if ref $b;
+    my $b = shift or croak 'No node for get_nodes_openvz()';
+    croak 'node must be a scalar for get_nodes_openvz()' if ref $b;
 
     return $self->get( $base, $a, 'openvz', $b )
 
@@ -602,11 +605,11 @@ sub delete_nodes_openvz {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for delete_nodes_openvz()';
-    die 'node must be a scalar for delete_nodes_openvz()' if ref $a;
+    my $a = shift or croak 'No node for delete_nodes_openvz()';
+    croak 'node must be a scalar for delete_nodes_openvz()' if ref $a;
 
-    my $b = shift or die 'No node for delete_nodes_openvz()';
-    die 'node must be a scalar for delete_nodes_openvz()' if ref $b;
+    my $b = shift or croak 'No node for delete_nodes_openvz()';
+    croak 'node must be a scalar for delete_nodes_openvz()' if ref $b;
 
     return $self->delete( $base, $a, 'openvz', $b )
 
@@ -617,11 +620,11 @@ sub get_nodes_openvz_status {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_openvz_status()';
-    die 'node must be a scalar for get_nodes_openvz_status()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_openvz_status()';
+    croak 'node must be a scalar for get_nodes_openvz_status()' if ref $a;
 
-    my $b = shift or die 'No node for get_nodes_openvz_status()';
-    die 'node must be a scalar for get_nodes_openvz_status()' if ref $b;
+    my $b = shift or croak 'No node for get_nodes_openvz_status()';
+    croak 'node must be a scalar for get_nodes_openvz_status()' if ref $b;
 
     return $self->get( $base, $a, 'openvz', $b, 'status' )
 
@@ -632,11 +635,11 @@ sub get_nodes_openvz_status_current {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_openvz_status_current()';
-    die 'node must be a scalar for get_nodes_openvz_status_current()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_openvz_status_current()';
+    croak 'node must be a scalar for get_nodes_openvz_status_current()' if ref $a;
 
-    my $b = shift or die 'No node for get_nodes_openvz_status_current()';
-    die 'node must be a scalar for get_nodes_openvz_status_current()' if ref $b;
+    my $b = shift or croak 'No node for get_nodes_openvz_status_current()';
+    croak 'node must be a scalar for get_nodes_openvz_status_current()' if ref $b;
 
     return $self->get( $base, $a, 'openvz', $b, 'status', 'current' )
 
@@ -647,11 +650,11 @@ sub create_nodes_openvz_status_mount {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_openvz_status_mount()';
-    die 'node must be a scalar for create_nodes_openvz_status_mount()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_openvz_status_mount()';
+    croak 'node must be a scalar for create_nodes_openvz_status_mount()' if ref $a;
 
-    my $b = shift or die 'No node for create_nodes_openvz_status_mount()';
-    die 'node must be a scalar for create_nodes_openvz_status_mount()' if ref $b;
+    my $b = shift or croak 'No node for create_nodes_openvz_status_mount()';
+    croak 'node must be a scalar for create_nodes_openvz_status_mount()' if ref $b;
 
     return $self->post( $base, $a, 'openvz', $b, 'status', 'mount' )
 
@@ -662,24 +665,24 @@ sub create_nodes_openvz_status_shutdown {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_openvz_status_shutdown()';
-    die 'node must be a scalar for create_nodes_openvz_status_shutdown()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_openvz_status_shutdown()';
+    croak 'node must be a scalar for create_nodes_openvz_status_shutdown()' if ref $a;
 
-    my $b = shift or die 'No node for create_nodes_openvz_status_shutdown()';
-    die 'node must be a scalar for create_nodes_openvz_status_shutdown()' if ref $b;
+    my $b = shift or croak 'No node for create_nodes_openvz_status_shutdown()';
+    croak 'node must be a scalar for create_nodes_openvz_status_shutdown()' if ref $b;
 
     my @p = @_;
 
-    die 'No arguments for create_nodes_openvz_status_shutdown()' unless @p;
+    croak 'No arguments for create_nodes_openvz_status_shutdown()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_nodes_openvz_status_shutdown()'
+        croak 'Single argument not a hash for create_nodes_openvz_status_shutdown()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_nodes_openvz_status_shutdown()'
+        croak 'Odd number of arguments for create_nodes_openvz_status_shutdown()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -693,11 +696,11 @@ sub create_nodes_openvz_status_start {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_openvz_status_start()';
-    die 'node must be a scalar for create_nodes_openvz_status_start()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_openvz_status_start()';
+    croak 'node must be a scalar for create_nodes_openvz_status_start()' if ref $a;
 
-    my $b = shift or die 'No node for create_nodes_openvz_status_start()';
-    die 'node must be a scalar for create_nodes_openvz_status_start()' if ref $b;
+    my $b = shift or croak 'No node for create_nodes_openvz_status_start()';
+    croak 'node must be a scalar for create_nodes_openvz_status_start()' if ref $b;
 
     return $self->post( $base, $a, 'openvz', $b, 'status', 'start' )
 
@@ -708,11 +711,11 @@ sub create_nodes_openvz_status_stop {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for create_nodes_openvz_status_stop()';
-    die 'node must be a scalar for create_nodes_openvz_status_stop()' if ref $a;
+    my $a = shift or croak 'No node for create_nodes_openvz_status_stop()';
+    croak 'node must be a scalar for create_nodes_openvz_status_stop()' if ref $a;
 
-    my $b = shift or die 'No node for create_nodes_openvz_status_stop()';
-    die 'node must be a scalar for create_nodes_openvz_status_stop()' if ref $b;
+    my $b = shift or croak 'No node for create_nodes_openvz_status_stop()';
+    croak 'node must be a scalar for create_nodes_openvz_status_stop()' if ref $b;
 
     return $self->post( $base, $a, 'openvz', $b, 'status', 'start' )
 
@@ -723,11 +726,11 @@ sub get_nodes_openvz_status_ubc {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_openvz_status_ubc()';
-    die 'node must be a scalar for get_nodes_openvz_status_ubc()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_openvz_status_ubc()';
+    croak 'node must be a scalar for get_nodes_openvz_status_ubc()' if ref $a;
 
-    my $b = shift or die 'No node for get_nodes_openvz_status_ubc()';
-    die 'node must be a scalar for get_nodes_openvz_status_ubc()' if ref $b;
+    my $b = shift or croak 'No node for get_nodes_openvz_status_ubc()';
+    croak 'node must be a scalar for get_nodes_openvz_status_ubc()' if ref $b;
 
     return $self->post( $base, $a, 'openvz', $b, 'status', 'ubc' )
 
@@ -738,11 +741,11 @@ sub get_nodes_openvz_status_umount {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No node for get_nodes_openvz_status_umount()';
-    die 'node must be a scalar for get_nodes_openvz_status_umount()' if ref $a;
+    my $a = shift or croak 'No node for get_nodes_openvz_status_umount()';
+    croak 'node must be a scalar for get_nodes_openvz_status_umount()' if ref $a;
 
-    my $b = shift or die 'No node for get_nodes_openvz_status_umount()';
-    die 'node must be a scalar for get_nodes_openvz_status_umount()' if ref $b;
+    my $b = shift or croak 'No node for get_nodes_openvz_status_umount()';
+    croak 'node must be a scalar for get_nodes_openvz_status_umount()' if ref $b;
 
     return $self->post( $base, $a, 'openvz', $b, 'status', 'umount' )
 
@@ -750,6 +753,8 @@ sub get_nodes_openvz_status_umount {
 
 
 1;
+
+__END__
 
 =pod
 
@@ -761,7 +766,7 @@ Net::Proxmox::VE::Nodes - Functions for the 'nodes' portion of the API
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -1553,14 +1558,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

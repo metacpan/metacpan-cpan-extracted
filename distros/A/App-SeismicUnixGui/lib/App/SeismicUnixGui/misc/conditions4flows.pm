@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::conditions4flows;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: conditions4flows.pm
+ PERL PERL PROGRAM NAME: conditions4flows.pm
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 16 2018 
 

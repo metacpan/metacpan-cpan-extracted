@@ -23,13 +23,21 @@ BEGIN {
 
 	if(scalar(@needfull)) {
 		my $list = join(' ', @needfull);
-		if($ENV{'AUTOMATED_TESTING'} && !defined($ENV{'TRAVIS_PERL_VERSION'})) {
-			die "You need $list to test this package";
+		if($ENV{'AUTOMATED_TESTING'} &&
+		  !defined($ENV{'TRAVIS_PERL_VERSION'}) &&
+		  !defined($ENV{'GITHUB_ACTION'})) {
+			print STDERR "NA: You need $list to test this package\n";
+			exit(0);
 		}
 		print "Installing $list\n";
 		# system("cpan -i $list");
 		system('perl -MCPAN -e \'CPAN::Shell->install("' . join('", "', @needfull) . '")\'');
 	}
+}
+
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'TRAVIS_PERL_VERSION'})) {
+	# Prevent downloading and installing stuff
+	$ENV{'AUTOMATED_TESTING'} = 1;
 }
 
 foreach my $module(@needfull) {
@@ -177,12 +185,26 @@ foreach my $url(keys %urls) {
 
 if(!(-r 'downloads/allCountries.txt')) {
 	my $zip = 'downloads/allCountries.zip';
-	system("unzip $zip");
-	rename 'allCountries.txt', 'downloads/allCountries.txt';
-	# Save disc space, but prevent more than one download
-	# if(open(my $fout, '>', $zip)) {
-		# close($fout);
-	# }
+	eval 'require IO::Uncompress::Unzip';
+	if($@) {
+		system("unzip $zip") or die "unzip $zip failed";
+		rename 'allCountries.txt', 'downloads/allCountries.txt';
+		# Save disc space, but prevent more than one download
+		# if(open(my $fout, '>', $zip)) {
+			# close($fout);
+		# }
+	} elsif(open(my $fout, '>', 'downloads/allCountries.txt')) {
+		IO::Uncompress::Unzip->import();
+		my $fin = IO::Uncompress::Unzip->new($zip);
+		do {
+			if($fin->getHeaderInfo->{'Name'} eq 'allCountries.txt') {
+				while(my $line = $fin->getline()) {
+					print $fout $line;
+				}
+				# last; # Gives syntax error that it's not in a loop :-(
+			}
+		} while($fin->nextStream());
+	}
 	truncate $zip, 0;
 }
 

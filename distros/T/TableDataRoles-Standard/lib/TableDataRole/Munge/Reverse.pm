@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 with 'TableDataRole::Source::AOA';
@@ -20,10 +20,11 @@ sub new {
     my ($class, %args) = @_;
 
     my $tabledata = delete $args{tabledata} or die "Please specify 'tabledata' argument";
+    my $load = delete($args{load}) // 1;
     die "Unknown argument(s): ". join(", ", sort keys %args)
         if keys %args;
     my $td = Module::Load::Util::instantiate_class_with_optional_args(
-        {ns_prefix=>"TableData"}, $tabledata);
+        {load=>$load, ns_prefix=>"TableData"}, $tabledata);
     my @rows = reverse $td->get_all_rows_arrayref;
     my $column_names = $td->get_column_names;
     TableDataRole::Source::AOA->new(
@@ -47,7 +48,7 @@ TableDataRole::Munge::Reverse - Reverse the rows of another tabledata
 
 =head1 VERSION
 
-This document describes version 0.015 of TableDataRole::Munge::Reverse (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableDataRole::Munge::Reverse (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 SYNOPSIS
 
@@ -104,6 +105,10 @@ Constructor. Known arguments:
 Required. Name of tabledata module (without the C<TableData::> prefix), with
 optional arguments. See
 L<Module::Load::Util/instantiate_class_with_optional_args> for more details.
+
+=item * load
+
+Passed to L<Module::Load::Util>'s C<instantiate_class_with_optional_args>.
 
 =back
 

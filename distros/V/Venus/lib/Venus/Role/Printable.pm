@@ -27,6 +27,22 @@ sub print {
   return $self->printer($self->dump(@args));
 }
 
+sub print_json {
+  my ($self, $method, @args) = @_;
+
+  require Venus::Json;
+
+  my $value = $method ? scalar($self->$method(@args)) : $self;
+
+  require Scalar::Util;
+
+  if (Scalar::Util::blessed($value)) {
+    $value = $value->value if $value->isa('Venus::Kind');
+  }
+
+  return $self->printer(Venus::Json->new($value)->encode);
+}
+
 sub print_pretty {
   my ($self, @args) = @_;
 
@@ -41,6 +57,22 @@ sub print_string {
   return $self->printer($method ? scalar($self->$method(@args)) : $self);
 }
 
+sub print_yaml {
+  my ($self, $method, @args) = @_;
+
+  require Venus::Yaml;
+
+  my $value = $method ? scalar($self->$method(@args)) : $self;
+
+  require Scalar::Util;
+
+  if (Scalar::Util::blessed($value)) {
+    $value = $value->value if $value->isa('Venus::Kind');
+  }
+
+  return $self->printer(Venus::Yaml->new($value)->encode);
+}
+
 sub printer {
   my ($self, @args) = @_;
 
@@ -51,6 +83,22 @@ sub say {
   my ($self, @args) = @_;
 
   return $self->printer($self->dump(@args), "\n");
+}
+
+sub say_json {
+  my ($self, $method, @args) = @_;
+
+  require Venus::Json;
+
+  my $value = $method ? scalar($self->$method(@args)) : $self;
+
+  require Scalar::Util;
+
+  if (Scalar::Util::blessed($value)) {
+    $value = $value->value if $value->isa('Venus::Kind');
+  }
+
+  return $self->printer(Venus::Json->new($value)->encode, "\n");
 }
 
 sub say_pretty {
@@ -67,17 +115,37 @@ sub say_string {
   return $self->printer(($method ? scalar($self->$method(@args)) : $self), "\n");
 }
 
+sub say_yaml {
+  my ($self, $method, @args) = @_;
+
+  require Venus::Yaml;
+
+  my $value = $method ? scalar($self->$method(@args)) : $self;
+
+  require Scalar::Util;
+
+  if (Scalar::Util::blessed($value)) {
+    $value = $value->value if $value->isa('Venus::Kind');
+  }
+
+  return $self->printer(Venus::Yaml->new($value)->encode, "\n");
+}
+
 # EXPORTS
 
 sub EXPORT {
   [
     'print',
+    'print_json',
     'print_pretty',
     'print_string',
+    'print_yaml',
     'printer',
     'say',
+    'say_json',
     'say_pretty',
     'say_string',
+    'say_yaml',
   ]
 }
 
@@ -179,6 +247,46 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 print_json
+
+  print_json(Str | CodeRef $method, Any @args) (Any)
+
+The print_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item print_json example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json;
+
+  # "{\"test\": 123}"
+
+=back
+
+=over 4
+
+=item print_json example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json('execute');
+
+  # "[{\"test\": 123}]"
+
+=back
+
+=cut
+
 =head2 print_pretty
 
   print_pretty(Any @data) (Any)
@@ -255,6 +363,46 @@ I<Since C<0.09>>
 
 =cut
 
+=head2 print_yaml
+
+  print_yaml(Str | CodeRef $method, Any @args) (Any)
+
+The print_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item print_yaml example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml;
+
+  # "---\ntest: 123"
+
+=back
+
+=over 4
+
+=item print_yaml example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml('execute');
+
+  # "---\n- test: 123"
+
+=back
+
+=cut
+
 =head2 say
 
   say(Any @data) (Any)
@@ -293,6 +441,46 @@ I<Since C<0.01>>
   # [bless({test => 123}, 'Example'),1,2,3]\n
 
   # 1
+
+=back
+
+=cut
+
+=head2 say_json
+
+  say_json(Str | CodeRef $method, Any @args) (Any)
+
+The say_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item say_json example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json;
+
+  # "{\"test\": 123}\n"
+
+=back
+
+=over 4
+
+=item say_json example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json('execute');
+
+  # "[{\"test\": 123}]\n"
 
 =back
 
@@ -370,6 +558,46 @@ I<Since C<0.09>>
   # "Example\n"
 
   # 1
+
+=back
+
+=cut
+
+=head2 say_yaml
+
+  say_yaml(Str | CodeRef $method, Any @args) (Any)
+
+The say_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item say_yaml example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml;
+
+  # "---\ntest: 123\n"
+
+=back
+
+=over 4
+
+=item say_yaml example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml('execute');
+
+  # "---\n- test: 123\n"
 
 =back
 

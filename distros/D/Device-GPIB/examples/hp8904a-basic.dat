@@ -1,0 +1,11 @@
+# GPIB commands for HP8904A
+# Basic setup of channel A to non-float, 1000.1Hz, 1.25V, 90 deg phase, ramp, per Figure 3-8
+# perl -I lib bin/gpib.pl -address 26 -noclear -debug -file examples/hp8904a-basic.dat 
+# 
+PS
+GM0
+FC1OF
+FRA1000.1HZ
+APA1.25VL
+PHA90DG
+WFARA

@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our @month_names = (
 	'january',
@@ -43,8 +43,8 @@ our @day_names = (
 );
 
 our @ordinal_number = ('st', 'nd', 'rd', 'th');
-our @short_month_names = map { _shortenize($_) } @month_names;
-our @short_day_names = map { _shortenize($_) } @day_names;
+our @short_month_names = map { _shorten($_) } @month_names;
+our @short_day_names = map { _shorten($_) } @day_names;
 
 our $d = join('|', @day_names);
 our $sd = join('|', @short_day_names);
@@ -52,7 +52,7 @@ our $o = join('|', @ordinal_number);
 our $m = join('|', @month_names);
 our $sm = join('|', @short_month_names);
 
-sub _shortenize {
+sub _shorten {
 	return substr(shift, 0, 3);
 };
 
@@ -78,7 +78,7 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	if(!defined($class)) {
-		# Using DateTime::Format->new(), not DateTime::Format()
+		# Using DateTime::Format::Text::new(), not DateTime::Format::Text->new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
 
@@ -121,7 +121,14 @@ arbitrary text.
 
 Can be called as a class or object method.
 
-When called in an array context, returns an array containing all of the matches
+When called in an array context, returns an array containing all of the matches.
+
+If the given test is an object, it's sent the message as_string() and that is parsed
+
+    use Class::Simple;
+    my $foo = Class::Simple->new();
+    $foo->as_string('25/12/2022');
+    my $dt = $dft->parse($foo);
 
 =cut
 
@@ -132,8 +139,10 @@ sub parse {
 	if(!ref($self)) {
 		if(scalar(@_)) {
 			return(__PACKAGE__->new()->parse(@_));
+		} elsif(!defined($self)) {
+			# DateTime::Format::Text->parse()
+			Carp::croak('Usage: ', __PACKAGE__, '::parse(string => $string)');
 		} elsif($self eq __PACKAGE__) {
-			# Date::Time::Format->parse()
 			Carp::croak('Usage: ', $self, '::parse(string => $string)');
 		}
 		return(__PACKAGE__->new()->parse($self));
@@ -141,6 +150,7 @@ sub parse {
 		return(__PACKAGE__->new()->parse($self));
 	} elsif(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: ', __PACKAGE__, '::parse(string => $string)');
 	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
@@ -161,9 +171,9 @@ sub parse {
 
 			# Ensure that the result includes the dates in the
 			# same order that they are in the string
-			while($string =~ /([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/g) {
+			while($string =~ /(^|\D)([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/g) {
 				# Match dates: 01/01/2012 or 30-12-11 or 1 2 1985
-				$rc[pos $string] = $self->parse("$1 $2 $3");
+				$rc[pos $string] = $self->parse("$2 $3 $4");
 			}
 			while($string =~ /($d|$sd)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]*($m|$sm)[\s,\-\/]+(\d{4})/ig) {
 				#  Match dates: Sunday 1st March 2015; Sunday, 1 March 2015; Sun 1 Mar 2015; Sun-1-March-2015
@@ -187,11 +197,11 @@ sub parse {
 		my $month;
 		my $year;
 
-		if($string =~ /([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/) {
+		if($string =~ /(^|\D)([0-9]?[0-9])[\.\-\/ ]+?([0-1]?[0-9])[\.\-\/ ]+?([0-9]{2,4})/) {
 			# Match dates: 01/01/2012 or 30-12-11 or 1 2 1985
-			$day = $1;
-			$month = $2;
-			$year = $3;
+			$day = $2;
+			$month = $3;
+			$year = $4;
 		} elsif($string =~ /($d|$sd)[\s,\-_\/]*?(\d?\d)[,\-\/]*($o)?[\s,\-\/]*($m|$sm)[\s,\-\/]+(\d{4})/i) {
 			#  Match dates: Sunday 1st March 2015; Sunday, 1 March 2015; Sun 1 Mar 2015; Sun-1-March-2015
 			$day //= $2;
@@ -208,18 +218,14 @@ sub parse {
 			# $year = $3;
 		}
 
-		if(!defined($month)) {
+		if((!defined($month)) && ($string =~ /($m|$sm)/i)) {
 			#  Match month name
-			if($string =~ /($m|$sm)/i) {
-				$month = $1;
-			}
+			$month = $1;
 		}
 
-		if(!defined($year)) {
+		if((!defined($year)) && ($string =~ /(\d{4})/)) {
 			# Match Year if not already set
-			if($string =~ /(\d{4})/) {
-				$year = $1;
-			}
+			$year = $1;
 		}
 
 		# We've managed to dig out a month and year, is there anything that looks like a day?
@@ -231,8 +237,10 @@ sub parse {
 				$day = $1;
 			} elsif($string =~ /^(\d{1,2})\s+($m|$sm)\s/i) {
 				$day = $1;
-			} elsif($string =~ /\s(\d{1,2})th\s/) {
-				$day = $1;
+			} elsif($string =~ /($m|$sm)\s+(the\s+)?(\d{1,2})th\s/i) {
+				$day = $3;
+			} elsif($string =~ /($m|$sm)\s+the\s+(\d{1,2})th\s/) {
+				$day = $2;
 			} elsif($string =~ /\s1st\s/i) {
 				$day = 1;
 			} elsif($string =~ /\s2nd\s/i) {
@@ -251,6 +259,8 @@ sub parse {
 						return DateTime->new(day => $day, month => $i + 1, year => $year);
 					}
 				}
+				Carp::croak(__PACKAGE__, ": unknown month $month");
+				return;
 			} else {
 				return DateTime->new(day => $day, month => $month, year => $year);
 			}

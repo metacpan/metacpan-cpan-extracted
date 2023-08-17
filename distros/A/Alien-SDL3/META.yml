@@ -1,0 +1,53 @@
+---
+X_No_Archive: Yes
+abstract: 'Build and install SDL3'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Alien::cmake3: '0'
+  Archive::Extract: '0.88'
+  Archive::Tar: '3.02'
+  Compress::Zlib: '2.204'
+  Devel::CheckBin: '0'
+  ExtUtils::CBuilder: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '1.42'
+  IO::Zlib: '1.14'
+  Module::Build: '0.4005'
+  Net::SSLeay: '1.49'
+  Path::Tiny: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SDL3
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Alien::SDL3:
+    file: lib/Alien/SDL3.pm
+    version: '0.04'
+requires:
+  File::ShareDir: '0'
+  Path::Tiny: '0'
+  perl: '5.024000'
+resources:
+  bugtracker: https://github.com/sanko/Alien-SDL3.pm/issues
+  homepage: https://github.com/sanko/Alien-SDL3.pm
+  repository: https://github.com/sanko/Alien-SDL3.pm.git
+version: '0.04'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

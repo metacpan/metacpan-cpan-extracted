@@ -81,7 +81,6 @@ use Lingua::EN::AddressParse;
 use Locale::SubCountry;
 use Text::CSV;
 use Try::Tiny;
-use XML::LibXML::Reader;
 
 use	constant	AIO_READAHEAD_SIZE => 1048576;	# 1MB
 
@@ -394,17 +393,6 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 21122
 		}, {
-			'NAME' => 'ADVENTIST HOSPITAL',
-			'LAT' => 39.049570,
-			'LON' => -76.956882,
-			'NUMBER' => 11886,
-			'STREET' => 'HEALING WAY',
-			'CITY' => 'SILVER SPRING',
-			'COUNTY' => 'MONTGOMERY',
-			'STATE' => 'MD',
-			'COUNTRY' => 'US',
-			'POSTCODE' => 20904,
-		}, {
 			'LAT' => 39.017633,
 			'LON' => -77.049551,
 			'NUMBER' => 9904,
@@ -425,6 +413,27 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20902,
+		}, {
+			'LAT' => 39.019575,
+			'LON' => -77.047453,
+			'NUMBER' => 10009,
+			'STREET' => 'GREELEY AVE',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20902
+		}, {
+			'NAME' => 'ADVENTIST HOSPITAL',
+			'LAT' => 39.049570,
+			'LON' => -76.956882,
+			'NUMBER' => 11886,
+			'STREET' => 'HEALING WAY',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20904,
 		}, {
 			'LAT' => 39.019385,
 			'LON' => -77.049779,
@@ -573,12 +582,22 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20852
 		}, {
+			'LAT' => 39.033075,
+			'LON' => -76.923859,
+			'NUMBER' => 10424,
+			'STREET' => '43RD AVE',
+			'CITY' => 'BELTSVILLE',
+			'COUNTY' => 'PRINCE GEORGE',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20705
+		}, {
 			'LAT' => 38.996764,
 			'LON' => -76.849323,
 			'NAME' => 'NASA',
-			'STREET' => '',
+			'STREET' => 'TIROS RD',
 			'CITY' => 'GREENBELT',
-			'COUNTY' => 'PRINCE GEORGES',
+			'COUNTY' => 'PRINCE GEORGE',
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20771
@@ -961,7 +980,8 @@ my %known_places = (	# Places I've checked with my GPS
 BEGIN {
 	$SIG{__WARN__} = sub {
 		my $warning = shift;
-		if($warning =~ /^Use of uninitialized value/) {
+		if(($warning =~ /^Use of uninitialized value/) ||
+		   ($warning =~ /isn't numeric in numeric eq /i)) {
 			die $warning;
 		}
 	};
@@ -1767,6 +1787,9 @@ if(my $osm = $ENV{'OSM_HOME'}) {
 	my @files = ('north-america-latest.osm.bz2', 'europe-latest.osm.bz2', 'australia-oceania-latest.osm.bz2');
 
 	foreach my $file(@files) {
+		require XML::LibXML::Reader;
+		XML::LibXML::Reader->import();
+
 		my $filename = File::Spec->catfile($osm, $file);
 
 		$| = 1;
@@ -2390,7 +2413,7 @@ sub insert {
 	# print Data::Dumper->new([$columns])->Dump() if($columns{'NAME'} && (uc($columns{'NAME'}) eq 'EL PAPI STREET TACOS'));
 	# {
 		# my @call_details = caller(0);
-		# print "line " . $call_details[2], "\n";
+		# print "line ", $call_details[2], "\n";
 		# print Data::Dumper->new([\%columns])->Dump();
 	# }
 
@@ -2431,7 +2454,7 @@ sub insert {
 	# $sth->execute();
 	# while(my $href = $sth->fetchrow_hashref()) {
 		# my @call_details = caller(0);
-		# print "line " . $call_details[2], "\n";
+		# print "line ", $call_details[2], "\n";
 		# print Data::Dumper->new([\%columns])->Dump();
 		# print Data::Dumper->new([$href])->Dump();
 	# }
@@ -2747,7 +2770,7 @@ sub get_wof {
 	return if($id < 0);
 	if($l1_cache{$id}) {
 		# my @call_details = caller(0);
-		# print "get_wof: stored $l1_cache{$id} at line " . $call_details[2], "\n" if(DEBUG&DEBUG_ALL);
+		# print "get_wof: stored $l1_cache{$id} at line ", $call_details[2], "\n" if(DEBUG&DEBUG_ALL);
 		return $l1_cache{$id};
 	}
 	if(scalar(keys %l1_cache) >= 50) {

@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -30,7 +31,6 @@ my $build = Module::Build->new(
       $HAVE_FEATURE_CLASS ? %REQUIRES_PERL : %REQUIRES_OP,
    },
    test_requires => {
-      'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

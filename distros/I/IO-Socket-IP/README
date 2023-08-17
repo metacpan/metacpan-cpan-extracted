@@ -4,19 +4,19 @@ NAME
 
 SYNOPSIS
 
-     use IO::Socket::IP;
+       use IO::Socket::IP;
     
-     my $sock = IO::Socket::IP->new(
-        PeerHost => "www.google.com",
-        PeerPort => "http",
-        Type     => SOCK_STREAM,
-     ) or die "Cannot construct socket - $@";
+       my $sock = IO::Socket::IP->new(
+          PeerHost => "www.google.com",
+          PeerPort => "http",
+          Type     => SOCK_STREAM,
+       ) or die "Cannot construct socket - $IO::Socket::errstr";
     
-     my $familyname = ( $sock->sockdomain == PF_INET6 ) ? "IPv6" :
-                      ( $sock->sockdomain == PF_INET  ) ? "IPv4" :
-                                                          "unknown";
+       my $familyname = ( $sock->sockdomain == PF_INET6 ) ? "IPv6" :
+                        ( $sock->sockdomain == PF_INET  ) ? "IPv4" :
+                                                            "unknown";
     
-     printf "Connected to google via %s\n", $familyname;
+       printf "Connected to google via %s\n", $familyname;
 
 DESCRIPTION
 
@@ -42,15 +42,15 @@ REPLACING IO::Socket DEFAULT BEHAVIOUR
     IO::Socket constructor with either PF_INET or PF_INET6 as the Domain
     parameter will yield an IO::Socket::IP object.
 
-     use IO::Socket::IP -register;
+       use IO::Socket::IP -register;
     
-     my $sock = IO::Socket->new(
-        Domain    => PF_INET6,
-        LocalHost => "::1",
-        Listen    => 1,
-     ) or die "Cannot create socket - $@\n";
+       my $sock = IO::Socket->new(
+          Domain    => PF_INET6,
+          LocalHost => "::1",
+          Listen    => 1,
+       ) or die "Cannot create socket - $IO::Socket::errstr\n";
     
-     print "Created a socket of type " . ref($sock) . "\n";
+       print "Created a socket of type " . ref($sock) . "\n";
 
     Note that -register is a global setting that applies to the entire
     program; it cannot be applied only for certain callers, removed, or
@@ -171,10 +171,10 @@ CONSTRUCTORS
       For example, both options given below are equivalent to setting
       ReuseAddr.
 
-       Sockopts => [
-          [ SOL_SOCKET, SO_REUSEADDR ],
-          [ SOL_SOCKET, SO_REUSEADDR, pack( "i", 1 ) ],
-       ]
+         Sockopts => [
+            [ SOL_SOCKET, SO_REUSEADDR ],
+            [ SOL_SOCKET, SO_REUSEADDR, pack( "i", 1 ) ],
+         ]
 
     V6Only => BOOL
 
@@ -193,12 +193,12 @@ CONSTRUCTORS
       disable it. To determine whether it is possible to disable, you may
       use the class method
 
-       if( IO::Socket::IP->CAN_DISABLE_V6ONLY ) {
-          ...
-       }
-       else {
-          ...
-       }
+         if( IO::Socket::IP->CAN_DISABLE_V6ONLY ) {
+            ...
+         }
+         else {
+            ...
+         }
 
       If your platform does not support disabling this option but you still
       want to listen for both AF_INET and AF_INET6 connections you will
@@ -232,7 +232,7 @@ CONSTRUCTORS
       timeout does not apply to the initial hostname resolve operation, if
       connecting by hostname.
 
-      This behviour is copied inspired by IO::Socket::INET; for more fine
+      This behaviour is copied inspired by IO::Socket::INET; for more fine
       grained control over connection timeouts, consider performing a
       nonblocking connect directly.
 
@@ -247,9 +247,9 @@ CONSTRUCTORS
     with the AI_ADDRCONFIG flag, no host name, and a service name of "0",
     and uses the family of the first returned result.
 
-    If the constructor fails, it will set $@ to an appropriate error
-    message; this may be from $! or it may be some other string; not every
-    failure necessarily has an associated errno value.
+    If the constructor fails, it will set $IO::Socket::errstr and $@ to an
+    appropriate error message; this may be from $! or it may be some other
+    string; not every failure necessarily has an associated errno value.
 
  new (one arg)
 
@@ -406,28 +406,28 @@ NON-BLOCKING
     This can be achieved by using Net::LibAsyncNS, or the getaddrinfo(3)
     function can be called in a child process.
 
-     use IO::Socket::IP;
-     use Errno qw( EINPROGRESS EWOULDBLOCK );
+       use IO::Socket::IP;
+       use Errno qw( EINPROGRESS EWOULDBLOCK );
     
-     my @peeraddrinfo = ... # Caller must obtain the getaddinfo result here
+       my @peeraddrinfo = ... # Caller must obtain the getaddinfo result here
     
-     my $socket = IO::Socket::IP->new(
-        PeerAddrInfo => \@peeraddrinfo,
-        Blocking     => 0,
-     ) or die "Cannot construct socket - $@";
+       my $socket = IO::Socket::IP->new(
+          PeerAddrInfo => \@peeraddrinfo,
+          Blocking     => 0,
+       ) or die "Cannot construct socket - $@";
     
-     while( !$socket->connect and ( $! == EINPROGRESS || $! == EWOULDBLOCK ) ) {
-        my $wvec = '';
-        vec( $wvec, fileno $socket, 1 ) = 1;
-        my $evec = '';
-        vec( $evec, fileno $socket, 1 ) = 1;
+       while( !$socket->connect and ( $! == EINPROGRESS || $! == EWOULDBLOCK ) ) {
+          my $wvec = '';
+          vec( $wvec, fileno $socket, 1 ) = 1;
+          my $evec = '';
+          vec( $evec, fileno $socket, 1 ) = 1;
     
-        select( undef, $wvec, $evec, undef ) or die "Cannot select - $!";
-     }
+          select( undef, $wvec, $evec, undef ) or die "Cannot select - $!";
+       }
     
-     die "Cannot connect - $!" if $!;
+       die "Cannot connect - $!" if $!;
     
-     ...
+       ...
 
     The example above uses select(), but any similar mechanism should work
     analogously. IO::Socket::IP takes care when creating new socket
@@ -450,9 +450,9 @@ PeerHost AND LocalHost PARSING
     The value of the ...Host argument will be split to give both the
     hostname and port (or service name):
 
-     hostname.example.org:http    # Host name
-     192.0.2.1:80                 # IPv4 address
-     [2001:db8::1]:80             # IPv6 address
+       hostname.example.org:http    # Host name
+       192.0.2.1:80                 # IPv4 address
+       [2001:db8::1]:80             # IPv6 address
 
     In each case, the port or service name (e.g. 80) is passed as the
     LocalService or PeerService argument.
@@ -461,7 +461,7 @@ PeerHost AND LocalHost PARSING
     be either a service name, a decimal number, or a string containing both
     a service name and number, in a form such as
 
-     http(80)
+       http(80)
 
     In this case, the name (http) will be tried first, but if the resolver
     does not understand it then the port number (80) will be used instead.
@@ -479,17 +479,17 @@ PeerHost AND LocalHost PARSING
     description if it could be parsed, or the given address and undef if it
     was not recognised.
 
-     IO::Socket::IP->split_addr( "hostname:http" )
-                                  # ( "hostname",  "http" )
+       IO::Socket::IP->split_addr( "hostname:http" )
+                                    # ( "hostname",  "http" )
     
-     IO::Socket::IP->split_addr( "192.0.2.1:80" )
-                                  # ( "192.0.2.1", "80"   )
+       IO::Socket::IP->split_addr( "192.0.2.1:80" )
+                                    # ( "192.0.2.1", "80"   )
     
-     IO::Socket::IP->split_addr( "[2001:db8::1]:80" )
-                                  # ( "2001:db8::1", "80" )
+       IO::Socket::IP->split_addr( "[2001:db8::1]:80" )
+                                    # ( "2001:db8::1", "80" )
     
-     IO::Socket::IP->split_addr( "something.else" )
-                                  # ( "something.else", undef )
+       IO::Socket::IP->split_addr( "something.else" )
+                                    # ( "something.else", undef )
 
  join_addr
 
@@ -503,7 +503,7 @@ PeerHost AND LocalHost PARSING
     This can be especially useful when combined with the sockhost_service
     or peerhost_service methods.
 
-     say "Connected to ", IO::Socket::IP->join_addr( $sock->peerhost_service );
+       say "Connected to ", IO::Socket::IP->join_addr( $sock->peerhost_service );
 
 IO::Socket::INET INCOMPATIBILITES
 
@@ -536,12 +536,12 @@ IO::Socket::INET INCOMPATIBILITES
       blocking connect, then afterwards turn the socket into nonblocking
       mode.
 
-       my $sock = IO::Socket::IP->new(
-          PeerHost => $peer,
-          Timeout => 20,
-       ) or die "Cannot connect - $@";
+         my $sock = IO::Socket::IP->new(
+            PeerHost => $peer,
+            Timeout => 20,
+         ) or die "Cannot connect - $@";
       
-       $sock->blocking( 0 );
+         $sock->blocking( 0 );
 
       This code will behave identically under both IO::Socket::INET and
       IO::Socket::IP.

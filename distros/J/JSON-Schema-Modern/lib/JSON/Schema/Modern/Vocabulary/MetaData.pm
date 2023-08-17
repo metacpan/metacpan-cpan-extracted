@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.566';
+our $VERSION = '0.569';
 
 use 5.020;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -43,35 +44,35 @@ sub _eval_keyword_title ($self, $data, $schema, $state) {
   annotate_self($state, $schema);
 }
 
-sub _traverse_keyword_description { shift->_traverse_keyword_title(@_) }
+sub _traverse_keyword_description { goto \&_traverse_keyword_title }
 
-sub _eval_keyword_description { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_description { goto \&_eval_keyword_title }
 
 sub _traverse_keyword_default { 1 }
 
-sub _eval_keyword_default { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_default { goto \&_eval_keyword_title }
 
 sub _traverse_keyword_deprecated ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'boolean');
   return 1;
 }
 
-sub _eval_keyword_deprecated { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_deprecated { goto \&_eval_keyword_title }
 
-sub _traverse_keyword_readOnly { shift->_traverse_keyword_deprecated(@_) }
+sub _traverse_keyword_readOnly { goto \&_traverse_keyword_deprecated }
 
-sub _eval_keyword_readOnly { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_readOnly { goto \&_eval_keyword_title }
 
-sub _traverse_keyword_writeOnly { shift->_traverse_keyword_deprecated(@_) }
+sub _traverse_keyword_writeOnly { goto \&_traverse_keyword_deprecated }
 
-sub _eval_keyword_writeOnly { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_writeOnly { goto \&_eval_keyword_title }
 
 sub _traverse_keyword_examples ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
   return 1;
 }
 
-sub _eval_keyword_examples { shift->_eval_keyword_title(@_) }
+sub _eval_keyword_examples { goto \&_eval_keyword_title }
 
 1;
 
@@ -87,7 +88,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.566
+version 0.569
 
 =head1 DESCRIPTION
 

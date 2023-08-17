@@ -2,13 +2,14 @@ package Lexical::Failure;
 
 use 5.014; use warnings;
 no if $] >= 5.018, 'warnings', "experimental";
-use Scope::Upper qw< want_at unwind uplevel UP SUB CALLER >;
+use Scope::Upper qw< want_at unwind uplevel CALLER UP SUB >;
 use Carp qw< carp croak confess cluck >;
 use Keyword::Simple;
+use Attribute::Handlers;
 
 use Lexical::Failure::Objects;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.001001';
 
 # Be invisible to Carp...
 our @CARP_NOT = __PACKAGE__;
@@ -19,16 +20,18 @@ my $HINTS = 10;
 # How to fail...
 my %STD_FAILURE_HANDLERS = (
     'die'     => sub { _uplevel_die(@_);                      },
-    'croak'   => sub { uplevel { croak(@_)   } @_, CALLER(2); },
-    'confess' => sub { uplevel { confess(@_) } @_, CALLER(2); },
+    'croak'   => sub { package # Hide this from CPAN indexer
+                       Carp; uplevel { croak(@_)   } @_, CALLER($Lexical::Failure::uplevel); },
+    'confess' => sub { package # Hide this from CPAN indexer
+                       Carp; uplevel { confess(@_) } @_, CALLER($Lexical::Failure::uplevel); },
     'null'    => sub { return;                                },
     'undef'   => sub { return undef;                          },
 
     'failobj' => sub {
-        uplevel { croak(@_)   } @_, CALLER(2) if !defined wantarray;
+        uplevel { croak(@_)   } @_, CALLER($Lexical::Failure::uplevel) if !defined wantarray;
         return Lexical::Failure::Objects->new(
                     msg => (@_==1 ? $_[0] : "@_"),
-                    context => [caller 2],
+                    context => [caller $Lexical::Failure::uplevel],
                );
     },
 );
@@ -151,34 +154,38 @@ sub ON_FAILURE {
     my $valid_handlers_ref = $VALID_FAILURE_HANDLERS_FOR_SCOPE[$handlers_scope_ID];
 
     # Translate failure handlers (if necessary)...
-    given (ref $handler) {
+    for my $type (ref $handler) {
         # Find handler for symbolic failure modes ('die', 'confess', etc.)...
-        when (q{}) {
+        if ($type eq q{}) {
             croak "Unknown failure handler: '$handler'"
                 if !exists $valid_handlers_ref->{$handler};
             $handler = $valid_handlers_ref->{$handler};
+            last;
         }
 
         my $target_var = $handler;
         # _check_scoping_of($target_var); # Experimentally removed (may not be necessary)
 
         # Scalars are simply assigned to...
-        when ('SCALAR') {
-            $handler = sub { ${$target_var} = [@_]; return; }
+        if ($type eq 'SCALAR') {
+            $handler = sub { ${$target_var} = [@_]; return; };
+            last;
         }
 
         # Arrays are simply pushed onto...
-        when ('ARRAY') {
-            $handler = sub { push @{$target_var}, [@_]; return; }
+        if ($type eq 'ARRAY') {
+            $handler = sub { push @{$target_var}, [@_]; return; };
+            last;
         }
 
         # Hashes are simply added to...
-        when ('HASH') {
+        if ($type eq 'HASH') {
             $handler = sub {
                 my $caller_sub = (caller 2)[3];
                 $target_var->{$caller_sub} = [@_];
                 return;
-            }
+            };
+            last;
         }
     }
 
@@ -196,70 +203,26 @@ sub fail {
 
     # Find the requested lexical handler...
     my $caller       = caller;
-    my $fail_handler = _find_callers_handler($caller);
+    my ($fail_handler, $uplevel) = _find_callers_handler($caller);
 
     # Determine original context of sub that's failing...
-    my $context = want_at(UP SUB);
+    my $context = want_at(CALLER($uplevel-1));
 
     # Ignore this code when croaking/carping from a handler
     package
-    Carp;
-    use Scope::Upper qw< unwind UP SUB>;
+    Carp; # Hide this from CPAN indexer
+    use Scope::Upper qw< unwind CALLER UP SUB>;
 
     # Simulate a return...
-    unwind +( !defined $context ?    do{ $fail_handler->(@msg); undef; }
-            :        ! $context ? scalar $fail_handler->(@msg)
-            :                            $fail_handler->(@msg)
-            ) => UP SUB;
+    unwind +( do { 
+                local $Lexical::Failure::uplevel = $uplevel;
+                  !defined $context ?    do{ $fail_handler->(@msg); undef; }
+                :        ! $context ? scalar $fail_handler->(@msg)
+                :                            $fail_handler->(@msg)
+              }
+            ) => CALLER($uplevel-1);
 }
 
-# (Experimentally remove these checks as they may not be necessary...or reliable)
-#
-#sub _check_scoping_of {
-#    my ($target_var) = @_;
-#
-#    # Is this something we can check???
-#    my $var_type = ref $target_var;
-#    return if $var_type !~ m{\A (?: SCALAR | ARRAY | HASH  ) \z}x;
-#
-#    # Look up the potential variables it could be...
-#    use PadWalker qw< peek_my peek_our var_name >;
-#    my %vars = ( %{peek_our(3)}, %{peek_my(3)} );
-#
-#    # If it isn't any of them, warn us...
-#    if (!grep { $vars{$_} == $target_var } keys %vars) {
-#        return if _is_package_var($target_var);
-#
-#        cluck 'Lexical ' . lc($var_type) . ' used as failure handler may not stay shared at runtime';
-#    }
-#}
-#
-#sub _is_package_var {
-#    my ($target_ref) = @_;
-#
-#    my @packages = ('main');
-#    my %seen;
-#
-#    while (my $package = shift @packages) {
-#        no strict;
-#        while (($name, $entry) = each(%{*{"$package\::"}})) {
-#            local(*ENTRY) = $entry // next;
-#
-#            # Check for match...
-#            return 1 if defined *ENTRY{SCALAR} && *ENTRY{SCALAR} == $target_ref
-#                     || defined *ENTRY{ARRAY}  && *ENTRY{ARRAY}  == $target_ref
-#                     || defined *ENTRY{HASH}   && *ENTRY{HASH}   == $target_ref;
-#
-#            # Check down tree...
-#            if (defined *ENTRY{HASH} && $name =~ m{ (?<child> .* ) :: \z }xms) {
-#                next if $seen{$+{child}}++;
-#                push @packages, $+{child};
-#            }
-#        }
-#    }
-#
-#    return 0;
-#}
 
 # Locate hints hash of first scope outside caller (if any)...
 sub _find_callers_handler {
@@ -283,12 +246,12 @@ sub _find_callers_handler {
             my $target_scope_ID
                 = $uplevel_caller[10]{"Lexical::Failure::scope_ID::$immediate_caller_package"}
                 // $default_scope_ID;
-            return $ACTIVE_FAILURE_HANDLER_FOR_SCOPE[ $target_scope_ID ];
+            return $ACTIVE_FAILURE_HANDLER_FOR_SCOPE[ $target_scope_ID ], $uplevel;
         }
     }
 
     # If no such uplevel context, return a "null" hints hash...
-    return $ACTIVE_FAILURE_HANDLER_FOR_SCOPE[ $default_scope_ID ];
+    return $ACTIVE_FAILURE_HANDLER_FOR_SCOPE[ $default_scope_ID ], 0;
 }
 
 
@@ -319,7 +282,7 @@ Lexical::Failure - User-selectable lexically-scoped failure signaling
 
 =head1 VERSION
 
-This document describes Lexical::Failure version 0.000007
+This document describes Lexical::Failure version 0.001001
 
 
 =head1 SYNOPSIS
@@ -435,13 +398,17 @@ in place of C<return>, C<return undef>, C<die>, C<croak>, C<confess>,
 or any other mechanism by which you would normally indicate
 failure.
 
-You can call C<fail> with any number of arguments, including 
-none, and these will be passed to whichever failure handler
-the client code eventually selects (see below).
+You can call C<fail> with any number of arguments, including none, and
+these will be passed to whichever failure handler the client code
+eventually selects (see below).
 
-Note that C<fail> is a keyword, not a subroutine
-(that is, it's like C<return> itself, and not something
-you can call as part of a larger expression).
+Note that C<fail> is a keyword, not a subroutine (that is, it's like
+C<return> itself, and not something you can call as part of a larger
+expression).
+
+Note too that, as failure handlers operate at the interface level of a
+module, calling C<fail> in a nested call within the package signals the
+failure from the package boundary (i.e. like C<croak> and C<carp> do).
 
 
 =head2 Specifying a lexically scoped failure handler with C<ON_FAILURE>
@@ -956,8 +923,7 @@ Lexical::Failure requires no configuration files or environment variables.
 
 Requires the modules:
 L<Scope::Upper>,
-L<Keyword::Simple>,
-L<PadWalker>, and
+L<Keyword::Simple>, and
 L<Test::Effects>.
 
 Also requires the L<Lexical::Failure::Objects> helper module

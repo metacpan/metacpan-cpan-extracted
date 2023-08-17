@@ -1,0 +1,62 @@
+---
+abstract: 'Serve a specific static file'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Catalyst: '5'
+  Catalyst::Controller: '0'
+  Catalyst::Test: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  Module::Metadata: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::ConditionalGET: '0'
+  Plack::Middleware::MethodOverride: '0'
+  Plack::Middleware::XSendfile: '0'
+  Test::Log::Dispatch: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Catalyst
+  - static
+  - file
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Static-File
+provides:
+  Catalyst::Plugin::Static::File:
+    file: lib/Catalyst/Plugin/Static/File.pm
+    version: v0.2.1
+requires:
+  Catalyst: '5'
+  File::Spec: '0'
+  File::stat: '0'
+  IO::File: '0'
+  Moose::Role: '0'
+  Plack::MIME: '0'
+  Plack::Util: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/robrwo/Catalyst-Plugin-Static-File/issues
+  repository: git://github.com/robrwo/Catalyst-Plugin-Static-File.git
+version: v0.2.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

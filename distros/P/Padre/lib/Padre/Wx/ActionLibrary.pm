@@ -20,7 +20,7 @@ use Padre::Wx::Action  ();
 use Padre::Locale::T;
 use Padre::Logger;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 
 
@@ -2278,7 +2278,7 @@ sub init {
 		label      => _T('Plug-in &List (CPAN)'),
 		comment    => _T('Open browser to a CPAN search showing the Padre::Plugin packages'),
 		menu_event => sub {
-			Padre::Wx::launch_browser('http://cpan.uwinnipeg.ca/search?query=Padre%3A%3APlugin%3A%3A&mode=dist');
+			Padre::Wx::launch_browser('https://metacpan.org/search?q=Padre%3A%3APlugin%3A%3A&mode=dist');
 		},
 	);
 
@@ -2597,7 +2597,7 @@ sub init {
 		label      => _T('Visit Perl Websites...'),
 		comment    => _T('Open interesting and helpful Perl websites in your default web browser'),
 		menu_event => sub {
-			Padre::Wx::launch_browser( 'http://padre.perlide.org/perl.html?padre=' . $VERSION );
+			Padre::Wx::launch_browser( 'https://github.com/PadreIDE/Padre/wiki/Perl-help-sites-and-tutorials' );
 		},
 	);
 
@@ -2608,7 +2608,7 @@ sub init {
 		label      => _T('Report a New &Bug'),
 		comment    => _T('Send a bug report to the Padre developer team'),
 		menu_event => sub {
-			Padre::Wx::launch_browser('http://padre.perlide.org/trac/wiki/Tickets');
+			Padre::Wx::launch_browser('https://github.com/PadreIDE/Padre/issues');
 		},
 	);
 	Padre::Wx::Action->new(
@@ -2616,7 +2616,7 @@ sub init {
 		label      => _T('View All &Open Bugs'),
 		comment    => _T('View all known and currently unsolved bugs in Padre'),
 		menu_event => sub {
-			Padre::Wx::launch_browser('http://padre.perlide.org/trac/report/1');
+			Padre::Wx::launch_browser('https://github.com/PadreIDE/Padre/issues?q=is%3Aopen+is%3Aissue');
 		},
 	);
 
@@ -2645,7 +2645,7 @@ sub init {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

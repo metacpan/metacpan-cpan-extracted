@@ -11,7 +11,9 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/alias.t'
+    't/alias.t',
+    't/lib/My/Failures.pm',
+    't/namespace.t'
 );
 
 notabs_ok($_) foreach @files;

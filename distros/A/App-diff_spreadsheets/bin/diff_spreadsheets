@@ -5,15 +5,15 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all'; use 5.010;
 
-our $VERSION = '1.008'; # VERSION
-our $DATE = '2023-05-31'; # DATE
+our $VERSION = '1.017'; # VERSION
+our $DATE = '2023-07-03'; # DATE
 
-######################################################################
-# POD HAS BEEN MOVED TO THE STUB LIBRARY App::diff_spreadsheets.pm
-######################################################################
+#use 5.12; # for unicode_strings
+use v5.18; # for lexical_subs
 
 use strict; use warnings;
 use feature qw(switch state say lexical_subs fc);
+use feature qw(unicode_strings unicode_eval evalbytes);
 no warnings "experimental::lexical_subs";
 
 use Carp; $Carp::MaxArgNums = 0;
@@ -22,19 +22,21 @@ use File::Basename qw(basename dirname fileparse);
 use File::Path qw(make_path remove_tree);
 use File::Temp qw(tempfile tempdir);
 use File::Copy ();
-use File::Spec::Functions qw(canonpath catfile catdir splitpath splitdir rootdir tmpdir);
+use File::Spec;
+use File::Spec::Functions qw(canonpath catfile catdir rootdir tmpdir);
 use FindBin qw/$Bin $Script/;
 use Getopt::Long qw/GetOptions/;
 use Guard qw(guard scope_guard);
 use List::Util qw/min max any first/;
 use List::MoreUtils qw/indexes/;
 use Scalar::Util qw/openhandle/;
-use Pod::Find qw/pod_where/;
 use Pod::Usage qw/pod2usage/;
 use Spreadsheet::Edit qw(title2ident);
 use Spreadsheet::Edit::IO qw/convert_spreadsheet
              sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
 use Term::ReadKey ();
+use Encode 3.00 qw/decode/; # for ONLY_PRAGMA_WARNINGS
+require PerlIO;
 sub oops(@) { unshift @_, "oops "; require Carp; goto &Carp::confess; }
 #$SIG{__WARN__} = sub{ Carp::cluck @_ };
 
@@ -44,57 +46,50 @@ sub main::Differ::compile_if_regex(@); #forward
 sub sanitize_filename(_) { local $_ = shift; s/[^-._[:word:]]/_/g; s/_$//; $_ }
 
 use utf8;
+
+my ($visible_space, $RArrow);
+
+# By default set output encoding to match the user's terminal/locale,
+# and suppress the "...does not mapt to..." warnings if unsupported characters
+# are displayed e.g. in spreadsheet data diff displays (\x{hex} escapes will
+# be displayed for un-encodeable characters).
+# May be overridden by the --output-encoding option!
+
+# https://rt.cpan.org/Public/Bug/Display.html?id=88592
+$PerlIO::encoding::fallback |= Encode::ONLY_PRAGMA_WARNINGS;
+no warnings 'utf8';
 use open ':std', ':locale';
+
 select STDERR; $| = 1; select STDOUT; $| = 1;
 
-use Encode qw/decode/;
-require PerlIO;
-my ($stdout_encoding) = map{ /encoding\((.+)\)/ ? ($1) : () }
-                        PerlIO::get_layers(*STDOUT);
-sub decoded_readlink(_) {
-  my $r = readlink(shift);
-  defined($r) && defined($stdout_encoding)
-    ? decode($stdout_encoding, $r) : $r
+my $stdout_encoding;
+sub decode_foruser($) {
+  my $octets = shift;
+  $stdout_encoding
+    ? decode($stdout_encoding, $octets, Encode::FB_DEFAULT|Encode::LEAVE_SRC)
+    : $octets
+}
+sub encode_foruser($) {
+  my $chars = shift;
+  $stdout_encoding
+    ? encode($stdout_encoding, $chars, Encode::FB_DEFAULT|Encode::LEAVE_SRC)
+    : $chars
 }
 
 #-------- Get Arguments ---------------
 sub call_pod2usage {
   confess "bug" if (scalar(@_) % 2) != 0;
   my %opts = @_;
-  if (! $opts{-msg}) {
-    if (my $podpath = pod_where({-inc => 1},"App::diff_spreadsheets")) {
-      $opts{-input} = $podpath;
-    } else {
-      warn "Could not find App::diff_spreadsheets in \@INC\n",
-           "\@INC:\n", join("\n   ",@INC), "\n";
-    }
-  }
+#  if (! $opts{-msg}) {
+#    if (my $podpath = pod_where({-inc => 1},"App::diff_spreadsheets")) {
+#      $opts{-input} = $podpath;
+#    } else {
+#      warn "Could not find App::diff_spreadsheets in \@INC\n",
+#           "\@INC:\n", join("\n   ",@INC), "\n";
+#    }
+#  }
   pod2usage(\%opts);
 }
-
-=head1 SYNOPSYS
-
-Documentation is not here in the executable script!
-
-If you are seeing this, most likely you ran `perldoc diff_spreadsheets`
-or something equivalent.
-To see the documentation, please run
-
-=over
-
-B<diff_spreadsheets -h>
-
-=back
-
-or
-
-=over
-
-B<perldoc [options] App::diff_spreadsheets>
-
-=back
-
-=cut
 
 sub badargs_exit(@) {
   call_pod2usage(-output => \*STDERR, -exitval => 2, @_);
@@ -106,21 +101,31 @@ sub badargs_exit(@) {
 #my $rightarrow = '->';
 #my $rightarrow = "\N{RIGHTWARDS ARROW}\N{THIN SPACE}";
 #my $rightarrow = "\N{RIGHTWARDS ARROW}\N{NARROW NO-BREAK SPACE}";
-my $rightarrow = "\N{RIGHTWARDS ARROW}\N{HAIR SPACE}";
+#my $rightarrow = "\N{RIGHTWARDS ARROW}\N{HAIR SPACE}";
+
+sub _get_terminal_width() {  # returns undef if unknowable
+  if (u($ENV{COLUMNS}) =~ /^[1-9]\d*$/) {
+    return $ENV{COLUMNS}; # overrides actual terminal width
+  } else {
+    local *_; # Try to avoid clobbering special filehandle "_"
+    # This does not actualy work; https://github.com/Perl/perl5/issues/19142
+
+    my $fh = -t STDERR ? *STDERR : 
+             -t STDOUT ? *STDOUT :
+             -t STDIN  ? *STDIN  :
+        do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh} ;
+    my $wmsg = ""; # Suppress hard-coded "didn't work" from Term::ReadKey
+                   #  or "stty: standard input: Not a tty" etc.
+    my ($width, $height) = do {
+      local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
+      $fh ? Term::ReadKey::GetTerminalSize($fh) : ()
+    };
+    return $width; # possibly undef
+  }
+}
 
 # 0 or undef to not wrap long lines
-my $maxwidth = do{
-  u($ENV{COLUMNS}) =~ /^[1-9]\d*$/
-  ? # Overrides actual terminal width; needed for testing
-    $ENV{COLUMNS}
-  : do{
-      my $wmsg = ""; # Suppress hard-coded "didn't work" from Term::ReadKey
-      local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
-      my ($width, $height) = Term::ReadKey::GetTerminalSize(*STDOUT);
-      warn $wmsg if $wmsg && $wmsg !~ /did.*n.*work/i;
-      $width // 80
-    }
-};
+my $maxwidth = _get_terminal_width // 80;
 
 my %opts = (
   sort_rows       => 1,
@@ -132,6 +137,8 @@ my %opts = (
 my $method = "native";
 my @diff_opts;
 my $help;
+
+### MAIN ###
 
 badargs_exit(-msg => "Usage: $Script file1 file2\n   -h for help") if @ARGV==0;
 Getopt::Long::Configure ("default", "gnu_getopt", "auto_version");
@@ -169,15 +176,15 @@ GetOptions(
    "l|paginate"                => sub{ push @diff_opts, "-$_[0]"; },
    "m|method=s"                => \$method,
    "n|rcs"                     => sub{ push @diff_opts, "-$_[0]"; },
+   "output-encoding=s"         => sub{ $opts{output_encoding} = $_[1] },
    "p|show-c-function"         => sub{ push @diff_opts, "-$_[0]"; },
-   "quiet"                     => sub{ $opts{quiet} = $_[1] },
+   "quiet|silent"              => sub{ $opts{silent} = $_[1] },
    "quote-char=s"              => sub{ $opts{quote_char} = $_[1] },
    "q|brief"                   => sub{ push @diff_opts, "-$_[0]"; },
    "sep-char=s"                => sub{ $opts{sep_char} = $_[1] },
    "setup-code=s"              => sub{ $opts{setup_code} = $_[1] },
    "sheets=s"                  => sub{ push @{$opts{sheet_names}}, $_[1] },
    "show-empties"              => sub{ $opts{show_empties} = $_[1] },
-   "silent"                    => sub{ $opts{silent} = $_[1] },
    "sort-rows!"                => sub{ $opts{sort_rows} = $_[1] }, # allow --no-sort
    "speed-large-files"         => sub{ push @diff_opts, "-$_[0]"; },
    "strip-trailing-cr"         => sub{ push @diff_opts, "-$_[0]"; },
@@ -212,6 +219,20 @@ foreach my $key (qw/columns id_columns always_show_columns sheet_names/) {
 }
 $opts{verbose} //= $opts{debug};
 
+if ($opts{output_encoding}) {
+  my $crlf = grep(/crlf/, PerlIO::get_layers(*STDOUT)) ? ":crlf" : "";
+  my $arg = ":raw${crlf}:encoding($opts{output_encoding})";
+  warn ">binmode STDOUT/ERR '$arg'\n" if $opts{debug};
+  binmode(\*STDOUT, $arg) or die "binmode $arg : $!";
+  binmode(\*STDERR, $arg) or die "binmode $arg : $!";
+}
+($stdout_encoding) = map{ /encoding\((.+)\)/ ? ($1) : () }
+                     PerlIO::get_layers(*STDOUT);
+
+($visible_space, $RArrow) =
+    ($stdout_encoding =~ /utf/i) 
+      ? ("\N{MIDDLE DOT}", "\N{RIGHTWARDS ARROW}\N{HAIR SPACE}")
+      : (".",              "-->") ;
 
 our ($hash_func_code, $hashid_func_code, $setup_code_code);
 foreach my $argname (qw(hashid-func hash-func setup-code)) {
@@ -233,7 +254,7 @@ $opts{origpath1} = $ARGV[0];
 $opts{origpath2} = $ARGV[1];
 
 if ($opts{keep_temps}) {
-  my $dir = File::Spec->catfile(tmpdir(), "dstmp");  # /tmp/dstmp
+  my $dir = catfile(tmpdir(), "dstmp");  # /tmp/dstmp
   remove_tree($dir);
   mkdir $dir or die "mkdir $dir : $!";
   warn "> Created ",qsh($dir),"\n";
@@ -253,13 +274,15 @@ foreach my $N (1,2) {
         "  ", qsh($origpath), "\n"
       if $opts{sheet_names};
   }
-  #my $dir = File::Spec->catdir($opts{tempdir},title2ident($origpath));
-  my $dir = File::Spec->catdir($opts{tempdir},"«INFILE$N»");
+  #my $dir = catdir($opts{tempdir},title2ident($origpath));#unique??
+  my $dir = catdir($opts{tempdir},"--INFILE$N--");
   remove_tree $dir; make_path $dir || die;
   my $h = convert_spreadsheet($origpath, cvt_to=>"csv",
                                          allsheets => !$sheet_from_path,
                                          outpath => $dir,
-                                         debug => $opts{debug},
+                                         silent  => $opts{silent},
+                                         verbose => $opts{debug},
+                                         debug   => $opts{debug},
                              );
   $opts{cvt_from} = $h->{cvt_from};
   if ($h->{cvt_from} =~ /csv/i && !openhandle($origpath)) {
@@ -268,13 +291,13 @@ foreach my $N (1,2) {
     $opts{"csvpaths$N"} = [ $origpath ];
   } else {
     opendir(my $dh, $dir) or die "$dir : $!\n", dvis('$h');
-    my @csvpaths = sort map{ File::Spec->catdir($dir,$_) }
+    my @csvpaths = sort map{ catdir($dir,$_) }
                         File::Spec->no_upwards(readdir $dh) ;
     if (0 and @csvpaths == 1) { ## FIXME WHY IS THIS DISABLED ???
                                 ##Answer: Because we want to see the sheetname even if user did not specify it
       # Only one sheet in this file: Rename the csv to just show the
       # spreadsheet file name without a redundant [sheetname] suffix.
-      my $new_tmpfname = File::Spec->catdir($dir, basename($origpath)).".csv";
+      my $new_tmpfname = catdir($dir, basename($origpath)).".csv";
       rename $csvpaths[0], $new_tmpfname or die;
       $opts{"csvpaths$N"} = [ $new_tmpfname ];
     } else {
@@ -298,8 +321,8 @@ my $onlyone = @{ $opts{"csvpaths1"} } == 1 && @{ $opts{"csvpaths2"} } == 1;
 # same-named sheets.
 
 my $status = 0;
-$opts{sheetname_header} = "";
-my @pairs;  # { n1 n2 label1 label2 sheetname_header }
+$opts{sheetname_str} = "";
+my @pairs;  # { n1 n2 label1 label2 sheetname_str }
 if (@{$opts{sheet_names}//[]}) {
   # Sheet names were specified; corresponding sheets might have different
   # names if the user specified a regex.
@@ -317,17 +340,16 @@ if (@{$opts{sheet_names}//[]}) {
       die "'$spec' matches multiple sheet names in $opts{origpath2}\n"
         if @names2 > 1;
       push @pairs, { n1 => $names1[0], n2 => $names2[0],
-                     sheetname_header => $names1[0] eq $names2[0]
-                                 ? "*** sheet ".qsh($names1[0])." ***\n"
-                                 : "*** sheet ".qsh($names1[0])."/".qsh($names2[0])." ***\n"
+                     sheetname_str => $names1[0] eq $names2[0]
+                                 ? vis($names1[0])
+                                 : vis($names1[0])."/".vis($names2[0])
                    };
     } else {
       die "sheet '$spec' does not exist in $opts{origpath1}\n"
         unless $opts{sheet2csvpath1}{$spec};
       die "sheet '$spec' does not exist in $opts{origpath2}\n"
         unless $opts{sheet2csvpath2}{$spec};
-      push @pairs, { n1 => $spec, n2 => $spec,
-                     sheetname_header => "*** sheet ".qsh($spec)." ***\n" };
+      push @pairs, { n1 => $spec, n2 => $spec, sheetname_str => vis($spec) };
     }
   }
 }
@@ -349,8 +371,7 @@ else {
       $status = max($status, 2);
       next;
     }
-    push @pairs, { n1 => $name, n2 => $name,
-                   sheetname_header => "*** ".qsh($name)." ***\n" };
+    push @pairs, { n1 => $name, n2 => $name, sheetname_str => vis($name) };
   }
   foreach my $name (sort keys %{ $opts{sheet2csvpath2} }) {
     unless ($opts{sheet2csvpath1}{$name}) {
@@ -362,8 +383,8 @@ else {
 }
 
 foreach my $h (@pairs) {
-  my ($name1, $name2, $label1, $label2, $sheetname_header)
-              = @$h{qw/n1 n2 label1 label2 sheetname_header/};
+  my ($name1, $name2, $label1, $label2, $sheetname_str)
+              = @$h{qw/n1 n2 label1 label2 sheetname_str/};
   # If no labels provided, default to "/path/to/file.xls[sheetname]"
   $label1 //= form_spec_with_sheetname($opts{origpath1}, $name1);
   $label2 //= form_spec_with_sheetname($opts{origpath2}, $name2);
@@ -372,7 +393,7 @@ foreach my $h (@pairs) {
   $opts{path2} = $opts{sheet2csvpath2}{$name2} // die;
   $opts{label1} = $label1;
   $opts{label2} = $label2;
-  $opts{sheetname_header} = $sheetname_header // "";
+  $opts{sheetname_str} = $sheetname_str // "";
   $status = max($status, &process_pair);
 }
 
@@ -381,17 +402,17 @@ exit $status;
 sub process_pair {
   # N.B. %opts includes "origpathN" and "pathN" (the latter refers to a csv),
   # "sheetnameN", and "labelN".
-  # "sheetname_header" is "" or "title...\n" to print before the first diff.
+  # "sheetname_str" is "" or "title...\n" to print before the first diff.
   # ---- Read data into memory, delete ignored columns, etc. ----
   my $obj = main::Differ->new( %opts );
 
   # Set data_source() to a unique human-readable representation of each
   # sheet.   This is the caller-specified $opts{nameN}, typically
-  # "/path/to/file.xls[sheetname]" or just "/path/to/file",
-  # modified to omit the common ancestor directory parts.
+  # "path/to/file.xls[sheetname]" or just "path/to/file",
+  # omitting any common ancestor directory parts.
   my @splits;
   for my $N (1, 2) {
-    push @splits, [ splitpath($obj->{"label$N"} // oops) ]; # [volume,dirs,fname]
+    push @splits, [ File::Spec->splitpath($obj->{"label$N"} // oops) ]; # [volume,dirs,fname]
   }
   if ($splits[0]->[0] eq $splits[1]->[0]) { # same volume
     $splits[0]->[0] = $splits[1]->[0] = "";
@@ -423,6 +444,7 @@ sub process_pair {
     }
     warn "> Paired sheets contain identical data, skipping fancier algos\n"
       if $opts{debug};
+warn dvis '## $rows1\n   $rows2\n' if $opts{debug};
     return 0
   }
 
@@ -472,7 +494,7 @@ use File::Temp qw(tempfile tempdir);
 use List::Util qw(first any min max any sum0);
 use File::Basename qw(basename dirname fileparse);
 use File::Path qw(make_path remove_tree);
-use File::Spec::Functions qw(canonpath catfile catdir splitpath splitdir rootdir tmpdir);
+use File::Spec::Functions qw(canonpath catfile catdir rootdir tmpdir);
 use List::Util qw(min max any first);
 use Spreadsheet::Edit qw(:DEFAULT logmsg cx2let let2cx);
 use Data::Dumper::Interp;
@@ -538,9 +560,6 @@ sub __truncate($$) {
   $changed
 }
 
-#use constant VISIBLE_SPACE => "\N{SYMBOL FOR SPACE}";
-use constant VISIBLE_SPACE => "\N{MIDDLE DOT}";
-
 sub __visualize($) {
   local $_ = shift;
   s/\n/\\n/sg;
@@ -550,13 +569,13 @@ sub __visualize($) {
     s/^( +)//;
   } else {
     # make leading spaces visible
-    s/^( +)/VISIBLE_SPACE x length($1)/e;
+    s/^( +)/$visible_space x length($1)/e;
   }
   if ($opts{ign_trailing_spaces}) {
     s/( +)$//;
   } else {
     # make trailing spaces visible
-    s/( +)$/VISIBLE_SPACE x length($1)/e;
+    s/( +)$/$visible_space x length($1)/e;
   }
   $_
 }
@@ -607,7 +626,9 @@ sub new {
                            quote_char   => $hash{quote_char},
                            sep_char     => $hash{sep_char},
                            encoding     => $hash{encoding},
-                           silent       => $hash{silent},
+                           silent  => $hash{silent},
+                           verbose => $hash{debug},
+                           debug   => $hash{debug},
                            (defined($title_row_spec)
                              ? $title_row_spec == 0
                                ? (title_rx => undef)
@@ -887,14 +908,17 @@ sub _pairup_columns {
       my $t = $title;
       {                last if $level==0;
         $t = fc($t);   last if $level==1;
-        $t =~ s/[_. ]|${\VISIBLE_SPACE}/-/g;
+        $t =~ s/[_. ]|\Q${visible_space}\E/-/g;
                        last if $level==2;
-        ($t = fc $title) =~ s/\s+|${\VISIBLE_SPACE}//sg;
+        ($t = fc $title) =~ s/\s+|\Q${visible_space}\E//sg;
                        last if $level==3;
         $t =~ s/\W//g; last if $level==4;
         oops
       }
-      $hash->{$t} = $cx unless exists $hash->{$t};
+      unless(exists $hash->{$t}) {
+        $hash->{$t} = $cx;
+        #warn dvis '## $level $title -> $t\n';
+      }
     }
   }
 
@@ -911,7 +935,8 @@ sub _pairup_columns {
       if (defined(my $cx2 = delete $hash2->{$ft})) { # "matching" titles
         oops(dvis '$cx1 $cx2 $ft\n$hash1\n$hash2\%cx1found\n%cx2found')
           if $cx2found{$cx2};
-        $cx1found{$cx1} = $cx2found{$cx2} = 1;
+        #$cx1found{$cx1} = $cx2found{$cx2} = 1;
+        $cx1found{$cx1} = $cx2found{$cx2} = "1,2:$cx1-$cx2";
         delete $hash1->{$ft};
         push @corresp_cxlist1, $cx1;
         push @corresp_cxlist2, $cx2;
@@ -922,9 +947,10 @@ sub _pairup_columns {
     while (my ($ft,$cx2) = each %$hash2) {
       next if $cx2found{$cx2};
       if (defined(my $cx1 = delete $hash1->{$ft})) {
-        oops(dvis '$cx2 $cx1 $ft\n$hash2\n$hash1\%cx2found\n%cx1found')
+        oops(dvis '$level $cx2 $cx1 $ft\n$hash2\n$hash1\n%cx2found\n%cx1found\n$title_row1->[$cx1] $title_row2->[$cx2]')
           if $cx1found{$cx1};
-        $cx2found{$cx2} = $cx1found{$cx1} = 2;
+        #$cx2found{$cx2} = $cx1found{$cx1} = 2;
+        $cx1found{$cx1} = $cx2found{$cx2} = "2,1:$cx2-$cx1";
         delete $hash2->{$ft};
         push @corresp_cxlist1, $cx1;
         push @corresp_cxlist2, $cx2;
@@ -1135,7 +1161,13 @@ sub compare_native {
   my $changed = $self->_native_output(\@cxlist1, \@cxlist2, $diff, 1);
 
   if ($changed) {
-    print $self->{sheetname_header};  # possibly ""
+    if ($self->{sheetname_str} ne "") {
+      my $wid = length($self->{sheetname_str});
+      my $sep = "*" x (10 + $wid + 4);
+      print "\n$sep\n";
+      print "*** SHEET ",$self->{sheetname_str}, " ***\n";
+      print "$sep\n";
+    }
     $diff->Reset;
     my $changed2 = $self->_native_output(\@cxlist1, \@cxlist2, $diff, 0);
     oops if $changed2 != $changed;
@@ -1224,17 +1256,17 @@ sub show_cell {
       my $s = sprintf "%*s: '%s'", $twidth, $title, $v1str;
       if ($v2_nl==1
           && (!$maxwidth
-              || length($s)+4+length($rightarrow)+length($v2str) <= $maxwidth)
+              || length($s)+4+length($RArrow)+length($v2str) <= $maxwidth)
          ) {
         # COL TITLE: 'old text' -> 'new text' (on one line)
-        $s .= " $rightarrow '$v2str'";
+        $s .= " $RArrow '$v2str'";
 #$s .= "\n<<<". dvis '$v1 $v2 $v1str $v2str>>>';
       }
       else {
         #  COL TITLE: 'old text'
         #          -> 'new text'
-        $s .= sprintf "\n%*s $rightarrow '%s'",
-                      $twidth-length($rightarrow), "",
+        $s .= sprintf "\n%*s $RArrow '%s'",
+                      $twidth-length($RArrow), "",
                       $v2str;
       }
       print $s, "\n";
@@ -1384,8 +1416,8 @@ sub compare_using_diff {
 #  # With standard diff, we have no way to suppress the header if there are
 #  # no diffs, so always print it (it will be "" if no header is ever
 #  # appropraite).
-#  confess "bug" unless defined $self->{sheetname_header};
-#  print $self->{sheetname_header};
+#  confess "bug" unless defined $self->{sheetname_str};
+#  print $self->{sheetname_str};
 
   # Write the possibly-edited-for-visibiliity data to temp .csv files,
   # and create symlinks to these csv files for using human-friendly names
@@ -1396,7 +1428,7 @@ sub compare_using_diff {
   my $tdirdepth = 0;
   foreach my $N (1,2) {
     my $sh = $self->{"sheet$N"};
-    ($self->{"linkrpath$N"} = $sh->data_source()) =~ s/^${ \rootdir() }//;
+    ($self->{"linkrpath$N"} = $sh->data_source()) =~ s/^\Q${ \rootdir() }\E//;
     my @dotdots = $self->{"linkrpath$N"} =~ /(?:^|\/)\.\.(?=$|\/)/g;
     $tdirdepth = max($tdirdepth, $#dotdots+1);
     #FIXME: Is the +1 needed?   Verify with actual cases!
@@ -1408,13 +1440,13 @@ sub compare_using_diff {
   make_path($tdir);
 
   foreach my $N (1,2) {
-    $self->{"tmpcsv$N"} = catfile($tdir, "«TEMPCSV$N».csv");
+    $self->{"tmpcsv$N"} = catfile($tdir, "TEMPCSV$N$.csv");
     $self->{"sheet$N"}->write_csv( $self->{"tmpcsv$N"} );
   }
 
   foreach my $N (1,2) {
     my $sh = $self->{"sheet$N"};
-    (my $rpath = $sh->data_source()) =~ s/^${ \rootdir() }//;
+    (my $rpath = $sh->data_source()) =~ s/^\Q${ \rootdir() }\E//;
     $self->{"linkrpath$N"} = $rpath;
     $self->{"link$N"} = canonpath(
             catfile(catdir($tdir,dirname($rpath)), basename($rpath)) );
@@ -1423,12 +1455,11 @@ sub compare_using_diff {
          " linkpath$N = ",qsh($self->{"linkrpath$N"}), "\n" if $self->{debug};
     make_path( dirname($self->{"link$N"}) );
     # Arrgh! git diff never follows symlinks
-    if ($cmd->[0] =~ /git/) {
+    # Also some platforms so not implement symlink
+    if ($cmd->[0] =~ /git/
+        || ! eval{ symlink $self->{"tmpcsv$N"}, $self->{"link$N"} }) {
       File::Copy::copy($self->{"tmpcsv$N"}, $self->{"link$N"})
         or die "copy ",$self->{"tmpcsv$N"}," ",$self->{"link$N"}," : $!";
-    } else {
-      symlink $self->{"tmpcsv$N"}, $self->{"link$N"}
-        or die "symlink ",$self->{"tmpcsv$N"}," ",$self->{"link$N"}," : $!";
     }
   }
 
@@ -1439,9 +1470,9 @@ sub compare_using_diff {
     chdir $tdir or die "chdir $tdir : $!";
     warn "> ",join(" ",map{qsh} @cmd),"\n" if $self->{verbose};
     if ($self->{debug}) {
-      warn ">    : ",qsh($cmd[-2])," -> ",main::decoded_readlink($cmd[-2]),"\n"
+      warn ">    : ",qsh($cmd[-2])," -> ",main::decode_foruser(readlink $cmd[-2]),"\n"
         if -l $cmd[-2];
-      warn ">    : ",qsh($cmd[-1])," -> ",main::decoded_readlink($cmd[-1]),"\n"
+      warn ">    : ",qsh($cmd[-1])," -> ",main::decode_foruser(readlink $cmd[-1]),"\n"
         if -l $cmd[-1];
       warn "> @cmd\n";
     }
@@ -1454,4 +1485,218 @@ sub compare_using_diff {
 
 sub exit_status { $_[0]->{exit_status} }
 
-#(end)
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+diff_spreadsheets - show differences between spreadsheets/csvs readably
+
+=head1 SYNOPSIS
+
+diff_spreadsheets [OPTIONS] file1.csv file2.xlsx!Sheet1 
+
+diff_spreadsheets [OPTIONS] file1.xls file2.ods  # all coresponding sheets
+
+=head1 DESCRIPTION
+
+CSV files may be always used.  Spreadsheets may be used if 
+Libre Office 7.2 or later is installed.
+
+If each input has only one sheet then they are compared regardless
+of sheet names.  Each file could be a .CSV, a spreadsheet workbook
+containing a single sheet, or a multi-sheet workbook with a
+sheet name specified (using the syntax shown).
+
+Otherwise, I<every> sheet contained in each workbook is comapred with the
+same-named sheet in the other file, warning about any un-paired sheets.
+
+Tabs, newlines, etc. and non-printable characters are replaced with
+escapes like "\t" or "\n" for human consumption.
+
+=head1 OPTIONS
+
+=head2 -m --method [native | diff | tkdiff | git]
+
+I<native> (the default) shows only the changed I<cells> in rows which
+differ.   Corresponding columns are identified by title,
+and need not be in the same order 
+(see also C<--id-columns>).
+
+I<diff>, I<tkdiff>, or I<git> run an external tool on
+temporary text (CSV) files created from the inputs, in which ignored columns
+have been removed and non-graphic characters changed to escapes.
+
+Most diff(1) options are accepted and passed through, but are not
+documented here.
+
+I<git> uses C<git diff> to, by default, color-code changed words;
+most git(1) diff options are passed through.
+
+=head2 --title-row [ROWNUMBER]
+
+The row number containing column titles (first==1).
+Auto-detected by default if the choice is obvious.
+Specify zero if there are no titles.
+
+=head2 --columns COLSPEC[,COLSPEC ...]
+
+=head2 --columns -COLSPEC[,-COLSPEC ...]
+
+Ignore differences in certain columns.
+
+In the first form (not negated), the specified columns are used for
+comparisons and others are ignored when deciding if a row changed.
+When negated ("-" prefix) the specified columns are ignored.
+
+I<COLSPEC> may be a column title, a /regex/ or m{regex} matching 
+one or more titles, a column letter code (A, B, etc.), or an identifer
+as described in L<Spreadsheet::Edit>.
+
+=head2 --id-columns COLSPEC[,COLSPEC ...] 
+
+Specify columns which together uniquely B<identify records> (i.e. rows).
+
+Before running any "diff" operation, the data rows in each file are
+sorted on the specified columns (comparison is alphabetic), so
+that corresponding rows are in the same relative vertical position
+in each file.  This makes it more likely that a change 
+is detected as a CHANGE and not as confusing separate DELETE and INSERT.
+
+B<C<--no-sort-rows>> disables this sorting so you can pre-sort the
+data yourself (for example, if "id columns" should be sorted
+numerically).
+
+When using the default "native" diff algorithm, the I<original>
+row numbers in each file are displayed in the results, hiding
+the effects of sorting.
+
+The "native" algorithm always displays the values of the "id" columns
+in changed rows.
+
+=head2 The following options apply only to the 'native' method:
+
+
+=head2 --always-show COLSPEC[,COLSPEC ...]
+
+When a changed row is displayed the changed cells are shown
+plus all cells implied by C<--id-columns> whether changed or not.
+
+The C<--always-show> option supplies an alternative set of columns
+to always show instead of those given by C<--id-columns>.  The input
+data is still sorted using C<--id-columns>.
+
+=head2 Gory internals of the native diff method
+
+The Diff algorithm is first applied using I<only> the C<id-column>s;
+matching rows are assumed to correspond, and the other columns are
+then compared and a "change" is reported if there are differences.
+If --id-columns is not used, the Diff algorithm is applied using all
+columns, and can get temporarily out of sync;
+if a row was inserted or deleted adjacent to other rows
+which were merely changed,
+the result can be a string of "changed" reports which
+actually describe pairs of unrelated records.
+
+For even more control, see the B<--hashid-func> option.
+
+=head2 --hashid-func PERLCODE
+
+=head2 --hash-func PERLCODE
+
+These options allow arbitrary filtering of row data before use.
+PERLCODE must be an anonymous C<sub> declaration which is called with
+two arguments for each row:
+
+  ([cells], $row_index)
+
+and must return a string representing those values, or undef
+to ignore the row.
+
+Both default to
+
+  sub { join ",", @{$_[0]} }  # concatenate all cells separated by commas
+
+During the Diff algorithm, I<hashid-func> is used to identify
+pairs of rows which represent the same data record,
+and then I<hash-func> is used to determine if a pair has
+reportable changes.
+
+Specifically: I<hashid-func> is called for each row
+passing only values from C<--id-column> (or if
+not specified then all columns).  
+If undef is returned then that row is ignored.  
+
+If the B<same> string is returned for a pair of
+rows from the two files then any reportable differences are shown
+as a "change" to the record. I<hash-func> is later called to determine
+if there are reportable changes.  
+
+If a B<unique> string is returned by I<hashid_func>,
+i.e. there is no corresponding row in the other file, then that row
+will be reported as "deleted" or "inserted" and I<hash-func> is not
+used for that row.
+
+When I<hash-func> is called it is passed I<all> cells in a row (or those
+specified with C<--columns>).  If the result is different for
+corresponding rows then a "change" is reported.
+
+B<Argument order:>
+When called with a row from the first file, cell values are passed in their natural order;
+when called with a row from the second file, 
+columns which also exist in the first file are passed first, 
+I<in the order they appear in the first file>, 
+followed by any columns which exist only in the second file.
+
+If there are no titles then all columns are passed in their natural order.
+
+=for notnow =head2 --setup-code PERLCODE
+=for notnow 
+=for notnow Allows arbitrary initialization, possibly editing the data in memory
+=for notnow or declaring global variables (with C<our>) to be later used by
+=for notnow C<--hashid-func> or C<--hash-func> subs.
+=for notnow 
+=for notnow The setup sub is called with parameters
+=for notnow ($sheet1, $sheet2, \@idcxlist1, \@idcxlist2);
+
+The user-defined PERLCODE subs are compiled into the same package.
+
+=head2 --quote-char CHARACTER   (default is ")
+
+=head2 --sep-char CHARACTER     (default is ,)
+
+=head2 --encoding ENCODING      (default is UTF-8)
+
+Used when reading CSV files (see L<Text::CSV>).  The same options are
+applied to both input files.
+
+=head2 --quiet
+
+=head2 --verbose
+
+=head2 --debug
+
+=head2 --keep-temps
+
+=head2 -h --help
+
+Probably what you expect.
+
+=head1 SEE ALSO
+
+L<Spreadsheet::Edit>, L<Sreadsheet::Edit::IO>
+
+=head1 AUTHOR
+
+Jim Avera (jim.avera  gmail)
+
+=head1 LICENSE
+
+CC0 1.0 / Public Domain
+
+=cut
+
+#end

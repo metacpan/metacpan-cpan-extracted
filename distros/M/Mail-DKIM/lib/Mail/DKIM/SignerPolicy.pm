@@ -1,7 +1,7 @@
 package Mail::DKIM::SignerPolicy;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: determines signing parameters for a message
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -24,7 +24,7 @@ Mail::DKIM::SignerPolicy - determines signing parameters for a message
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 DESCRIPTION
 

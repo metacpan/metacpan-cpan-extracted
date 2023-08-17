@@ -10,7 +10,7 @@ use Capture::Tiny qw/capture/;
 package Inner;
 our @ISA = ('Outer');
 use Data::Dumper::Interp;
-use Spreadsheet::Edit::Log qw/fmt_call log_call 
+use Spreadsheet::Edit::Log qw/fmt_call log_call
                               nearest_call abbrev_call_fn_ln_subname/;
 
 sub new { my $class=shift; bless {color => $_[0]}, $class }
@@ -60,13 +60,13 @@ sub checklog(&$;$$) {
   my ($file, $lno) = (caller(0))[1,2];
   $file = basename($file);
   my $exphead = $nohead ? "" : ">[${file}:${lno}] ";
-  my $exp = ref($exptail) ? qr/\A\Q$exphead\E$exptail\n\z/ 
+  my $exp = ref($exptail) ? qr/\A\Q$exphead\E$exptail\n\z/
                           : $exphead.$exptail."\n";
   chomp( $test_label ||= $exp );
   my ($out, $err) = capture { $code->() };
   @_ = ($err, $exp, $test_label);
   unless ($out eq "") {
-    &Test2::V0::like; 
+    &Test2::V0::like;
     warn "STDOUT was not empty:\n$out";
     @_ = (0, "STDOUT should be empty");
     goto &Test2::V0::ok;

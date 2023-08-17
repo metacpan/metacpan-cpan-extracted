@@ -16,13 +16,13 @@ my $infostring = "integrate a given ordinary differential equation system along 
 Usage:
 	pipe | txdodeint [parameters] [<ode> [<initval> [initval ...]]] | pipe
 
-The first fixed parameter is the column to use as time coordinate for which
+By default, the first column in the data is used as time coordinate for which
 the expression(s) of the ODE are defined. The derivative can be a
 system of ODEs. The time derivative values shall be stored in the array members
 D0 .. Dn, with the current corresponding variable values available in V0 .. Vn
 and the corresponding values of the (interpolated) auxilliary timeseries
 from the piped data in [1] .. [m]. There are also the auxillary array values
-A0 .. Ak (to be used at your leasure to store/load values) and the constants
+A0 .. Ak (to be used at your leisure to store/load values) and the constants
 C0 .. Cl (initialised from program parameters).
 
 For convenience, the basic setup of time column, ODE, and intial values can

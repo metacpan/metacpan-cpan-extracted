@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutInsertWorksheetRowRequest.name :   ,
-# PutInsertWorksheetRowRequest.sheetName :   ,
-# PutInsertWorksheetRowRequest.rowIndex :   ,
-# PutInsertWorksheetRowRequest.folder :   ,
-# PutInsertWorksheetRowRequest.storageName :    
+# PutInsertWorksheetRowRequest.name : The workbook name.  ,
+# PutInsertWorksheetRowRequest.sheetName : The worksheet name.  ,
+# PutInsertWorksheetRowRequest.rowIndex : The new row index.  ,
+# PutInsertWorksheetRowRequest.folder : Original workbook folder.  ,
+# PutInsertWorksheetRowRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_insert_worksheet_row' } = { 
-    	summary => '',
+    	summary => 'Inserts new row in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'row_index' => {
      	datatype => 'int',
      	base_name => 'rowIndex',
-     	description => '',
+     	description => 'The new row index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -3,7 +3,7 @@ use Test2::V0 -target => 'Webservice::Judobase';
 my $api  = $CLASS->new();
 my $list = $api->country->get_list;
 
-is scalar @$list, 243, 'Number of countries';
+is scalar @$list, 244, 'Number of countries (Currently 244)';
 
 is $list->[0],
     {

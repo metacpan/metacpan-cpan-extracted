@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
+use std::os::raw::c_char;
 
 struct Color {
     name: String,
@@ -44,7 +45,7 @@ thread_local!(
 );
 
 #[no_mangle]
-pub extern "C" fn color_new(name: *const i8, red: u8, green: u8, blue: u8) -> u32 {
+pub extern "C" fn color_new(name: *const c_char, red: u8, green: u8, blue: u8) -> u32 {
     let name = unsafe { CStr::from_ptr(name) };
     let color = Color::new(name.to_str().unwrap(), red, green, blue);
 
@@ -63,7 +64,7 @@ pub extern "C" fn color_new(name: *const i8, red: u8, green: u8, blue: u8) -> u3
 }
 
 #[no_mangle]
-pub extern "C" fn color_name(index: u32) -> *const i8 {
+pub extern "C" fn color_name(index: u32) -> *const c_char {
     thread_local!(
         static KEEP: RefCell<Option<CString>> = RefCell::new(None);
     );

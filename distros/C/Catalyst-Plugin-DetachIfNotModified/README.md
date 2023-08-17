@@ -4,7 +4,7 @@ Catalyst::Plugin::DetachIfNotModified - Short-circuit requests with If-Modified-
 
 # VERSION
 
-version v0.2.1
+version v0.3.1
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ not need to.
 
 This can improve the performance of your website.
 
-This should be used with [Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack::Middleware::ConditionalGET).
+This should be used with [Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AConditionalGET).
 
 # METHODS
 
@@ -73,13 +73,23 @@ removed from that collection, then the maximum timestamp won't be
 affected, and the result is that an outdated web page may be cached by
 user agents.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.3.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on earlier Perls, please use one of the v0.2.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 # SEE ALSO
 
 [Catalyst](https://metacpan.org/pod/Catalyst)
 
-[Catalyst::Plugin::Cache::HTTP::Preempt](https://metacpan.org/pod/Catalyst::Plugin::Cache::HTTP::Preempt)
+[Catalyst::Plugin::Cache::HTTP::Preempt](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ACache%3A%3AHTTP%3A%3APreempt)
 
-[Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack::Middleware::ConditionalGET)
+[Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AConditionalGET)
 
 [RFC 7232 Section 3.3](https://tools.ietf.org/html/rfc7232#section-3.3)
 
@@ -106,7 +116,7 @@ This module is based on code created for Science Photo Library
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

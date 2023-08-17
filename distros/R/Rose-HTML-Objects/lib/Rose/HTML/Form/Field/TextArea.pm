@@ -8,12 +8,7 @@ use Rose::HTML::Object::Errors qw(:string);
 
 use base 'Rose::HTML::Form::Field';
 
-our $VERSION = '0.606';
-
-use Rose::Object::MakeMethods::Generic
-(
-  scalar => 'maxlength',
-);
+our $VERSION = '0.625';
 
 __PACKAGE__->add_valid_html_attrs
 (
@@ -23,6 +18,8 @@ __PACKAGE__->add_valid_html_attrs
   'readonly',    # (readonly)     #IMPLIED
   'onselect',    # %Script;       #IMPLIED  -- some text was selected --
   'onchange',    # %Script;       #IMPLIED  -- the element value was changed --
+  'minlength',
+  'maxlength',
 );
 
 __PACKAGE__->add_required_html_attrs(

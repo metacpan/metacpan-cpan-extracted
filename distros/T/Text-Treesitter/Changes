@@ -1,5 +1,45 @@
 Revision history for Text-Treesitter
 
+0.10    2023-08-11
+        [CHANGES]
+         * Added `$ts->parse_string_range` for substring parsing
+         * Added `$qc->next_match_captures` to simplify common usage patterns
+         * `$query->test_predicates_for_match` no longer needs the `$tree`
+           argument
+         * Don't require that callers include the `queries/` part of query
+           file path when calling `->query_file_path`.
+         * Silently ignore any query predicates whose names don't end with
+           '?', so as to skip the directives used by nvim
+         * Optionally interpret injections.scm in examples/highlight.pl
+
+0.09    2023-08-09
+        [CHANGES]
+         * Added `$ts->query_file_path`
+         * Added `$node->debug_sprintf`
+         * Implement the nvim-inspired `#has-parent?` and `#has-ancestor?`
+           query predicates
+         * Optionally interpret fold.scm in examples/highlight.pl
+
+        [BUGFIXES]
+         * Query all the field names of the language indexed from 1
+         * Fix `$node->parent` to return undef when called on the root node
+
+0.08    2023-07-17
+        [CHANGES]
+         * Added SYNOPSIS example documentation to each module
+
+0.07    2023-06-07
+        [CHANGES]
+         * Added `$node->child_by_field_name` and `->try_child_by_field_name`
+           accessors
+         * Swap all unit tests to Test2::V0
+
+        [BUGFIXES]
+         * Make sure that `$querycursor->next_match` remembers to load
+           Text::Treesitter::QueryMatch (RT148270)
+         * Wrap QueryCursor and QueryMatch objects so that capture nodes are
+           fully wrapped with access to the tree itself (RT148269)
+
 0.06    2023-01-19
         [CHANGES]
          * Handle query predicates

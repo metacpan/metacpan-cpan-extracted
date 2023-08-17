@@ -8,7 +8,8 @@ use App::ArduinoBuilder::CommandRunner;
 use App::ArduinoBuilder::Config 'get_os_name';
 use App::ArduinoBuilder::DepCheck 'check_dep';
 use App::ArduinoBuilder::FilePath 'find_all_files_with_extensions';
-use App::ArduinoBuilder::Logger ':all_logger';
+use App::ArduinoBuilder::Logger;
+use App::ArduinoBuilder::System 'execute_cmd';
 use File::Path 'make_path';
 use File::Spec::Functions 'catfile';
 
@@ -17,13 +18,6 @@ my @supported_source_extensions = qw(c cpp S ino);
 sub new {
   my ($class, $config) = @_;
   return bless {config => $config}, $class;
-}
-
-sub _execute {
-  my ($cmd) = @_;
-  log_cmd $cmd;
-  system($cmd) and fatal "Can’t execute the following command: $!\n\t${cmd}";
-  return 1;
 }
 
 sub _run_recipe_pattern {
@@ -39,9 +33,14 @@ sub _run_recipe_pattern {
   }
   debug "Running %d hook%s for '${recipe_name}", $nb_recipes, ($nb_recipes > 1 ? 's' : '') if $is_hook && $nb_recipes;
   for my $k (sort $recipes->keys()) {
-    fatal "Invalid recipe name: recipe.${recipe_name}.${k}" unless $k =~ m/^(?:\d+\.)?pattern$/ || $options{is_objcopy};
-    fatal "Invalid objcopy recipe name: recipe.${recipe_name}.${k}" if $options{is_objcopy} && $k !~ m/^\w+\.(?:\d+\.)?pattern$/;
-    _execute($recipes->get($k, base => $this->{config}, %options));
+    if ($options{is_objcopy}) {
+      fatal "Invalid objcopy recipe name: recipe.${recipe_name}.${k}" unless $k =~ m/^\w+\.(?:\d+\.)?pattern$/;
+    } elsif ($options{is_size}) {
+     next unless $k =~ m/^(?:\d+\.)?pattern$/;
+    } else {
+      fatal "Invalid recipe name: recipe.${recipe_name}.${k}" unless $k =~ m/^(?:\d+\.)?pattern$/;
+    }
+    execute_cmd($recipes->get($k, base => $this->{config}, %options), %options);
   }
   return;
 }
@@ -78,7 +77,7 @@ sub _ino_to_cpp {
     # It’s weird but this is not a "pattern" recipe. Why?
     $recipe = $this->{config}->get('recipe.preproc.macros', with => {source_file => "${target}.cpp-pre", preprocessed_file_path => "${target}.cpp"});
   }
-  _execute($recipe);
+  execute_cmd($recipe);
 
   # TODO: there is a step in the real Arduino tool that is badly documented but which uses ctags to extract the
   # prototype of the functions in the .ino files (and adds them at the beginning of the C++ file), so that the
@@ -135,9 +134,8 @@ package ObjectNameBuilder {
 sub build_archive {
   my ($this, $source_dirs, $target_dir, $archive, $force) = @_;
   make_path($target_dir);
-  my $did_something = 0;
   my $obj_name = ObjectNameBuilder->new($target_dir);
-  my @objects;
+  my @tasks;
   for my $d (@{$source_dirs}) {
     # BUG: There is still a bug here (and in build_object_files) which is that if a file is removed
     # from the sources and there is another file with the same basename, we will do weird things
@@ -146,19 +144,26 @@ sub build_archive {
     my @sources = sort (find_all_files_with_extensions($d, [@supported_source_extensions]));
     for my $s (@sources) {
       my $object_file = $obj_name->object_for($s);
-      if ($force || check_dep($s, $object_file)) {
-        push @objects, $object_file;
-        $did_something = 1;
-        default_runner()->execute(
-          sub {
-            $this->build_file($s, $object_file);
-          });
-      }
+      # This line can be commented and the one inside the sub-task can be
+      # uncommented to execute the dependency check inside the forked process.
+      # However this does not seem to improve the execution speed.
+      next unless $force || check_dep($s, $object_file);
+      push @tasks, default_runner()->execute(
+        sub {
+          # return unless $force || check_dep($s, $object_file);
+          $this->build_file($s, $object_file);
+          return $object_file;
+        });
     }
   }
   default_runner->wait();
-  for my $o (@objects) {
-    $this->_add_to_archive($o, $archive);
+  my $did_something;
+  for my $t (@tasks) {
+    my $o = $t->data();
+    if ($o) {
+      $this->_add_to_archive($o, $archive);
+      $did_something = 1;
+    }
   }
   return $did_something;
 }
@@ -170,25 +175,71 @@ sub build_object_files {
   my ($this, $source_dir, $target_dir, $excluded_dirs, $force, $no_recurse) = @_;
   make_path($target_dir);
   my @sources = sort (find_all_files_with_extensions($source_dir, [@supported_source_extensions], $excluded_dirs, $no_recurse));
-  my $did_something = 0;
   my $obj_name = ObjectNameBuilder->new($target_dir);
+  my @tasks;
   for my $s (@sources) {
     my $object_file = $obj_name->object_for($s);
-    if ($force || check_dep($s, $object_file)) {
-      $did_something = 1;
-      default_runner()->execute(
-        sub {
-          $this->build_file($s, $object_file);
-        });
-    }
+    next unless $force || check_dep($s, $object_file);
+    push @tasks, default_runner()->execute(
+      sub {
+        # return unless $force || check_dep($s, $object_file);
+        $this->build_file($s, $object_file);
+        return 1;
+      });
   }
   default_runner->wait();
-  return $did_something;
+  for my $t (@tasks) {
+    my $o = $t->data();
+    if ($o) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 sub link_executable {
   my ($this, $object_files, $archive) = @_;
   $this->_run_recipe_pattern('c.combine', with => {object_files => '"'.join('" "', @{$object_files}).'"', archive_file => $archive, archive_file_path => catfile($this->{config}->get('build.path'), $archive)});
+  return;
+}
+
+sub compute_binary_size {
+  my ($this) = @_;
+  my $output;
+  $this->_run_recipe_pattern('size', capture_output => \$output, is_size => 1);
+  # TODO: There is a variant using the 'advanced_size' recipe that can be
+  # implemented for more complex scenario and that we are not yet supporting.
+
+  my $bin_size_re = $this->{config}->get('recipe.size.regex', default => undef);
+  if ($bin_size_re) {
+    my $bin_size = 0;
+    while ($output =~ m/${bin_size_re}/mg) {
+      $bin_size += $1;
+    }
+    my $max_bin_size = $this->{config}->get('upload.maximum_size', default => undef);
+    if ($max_bin_size) {
+      info '  Sketch uses %d bytes (%d%%) of program space. Maximum is %d bytes.', $bin_size, ($bin_size * 100 / $max_bin_size), $max_bin_size;
+      fatal 'Sketch is too large' if $bin_size > $max_bin_size;
+    } else {
+      info '  Sketch uses %d bytes of program space.', $bin_size;
+    }
+  }
+
+  my $data_size_re =$this->{config}->get('recipe.size.regex.data', default => undef);
+  if ($data_size_re) {
+    my $data_size = 0;
+    while ($output =~ m/${data_size_re}/mg) {
+      $data_size += $1;
+    }
+    my $max_data_size = $this->{config}->get('upload.maximum_data_size', default => undef);
+    if ($max_data_size) {
+      info '  Global varables use %d bytes (%d%%) of dynamic memory, leaving %d bytes for local variables. Maximum is %d bytes.', $data_size, ($data_size * 100 / $max_data_size), ($max_data_size - $data_size), $max_data_size;
+      fatal 'Too much memory used' if $data_size > $max_data_size;
+    } else {
+      info '  Global varables use %d bytes of dynamic memory.', $data_size;
+    }
+  }
+
   return;
 }
 

@@ -21,8 +21,8 @@ DESCRIPTION
         use_MakeMaker = 0 ; If using e.g. MakeMaker::Awesome instead
         use_TestCompile = 0 ; I have my own compile tests here..
         ;; cpan:YOUR_CPAN_ID is the default authority, read from "dzil setup" entry for PAUSE
-        authority = cpan:AVAR
-        ; no_Authority = 1 ; If you don't want to use the authority module
+        ; authority = cpan:AVAR
+        no_Authority = 0 ; If want to use the authority module (previously the default)
         ;; if you want to install your dist after release (set $ENV{PERL_CPANM_OPTS} if you need --sudo or --mirror etc.)
         ;; default is OFF
         install_command = cpanm .
@@ -92,7 +92,7 @@ AUTHOR
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+    Copyright 2023 Ævar Arnfjörð Bjarmason <avar@cpan.org>
 
     This program is free software, you can redistribute it and/or modify it
     under the same terms as Perl itself.

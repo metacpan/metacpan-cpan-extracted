@@ -1,5 +1,9 @@
 Revision history for PICA::Data
 
+2.10 2023-08-09T14:01:25Z
+    - Add PICA Import format parser (#129)
+    - Add parser counter (method: count)
+
 2.09 2023-04-14T07:03:05Z
     - Remove duplicate fields from patches
     - Add field methods clone and equal

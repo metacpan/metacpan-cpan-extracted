@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iShow_picks;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iShow_picks.pm
+ PERL PROGRAM NAME: iShow_picks.pm
  AUTHOR: Juan Lorenzo
 
  DESCRIPTION:

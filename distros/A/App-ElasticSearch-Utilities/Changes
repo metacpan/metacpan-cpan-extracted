@@ -1,9 +1,43 @@
 ==================================================
-Changes from 2021-04-12 00:00:00 +0000 to present.
+Changes from 2021-07-20 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.5 at 2023-04-12 23:55:28 +0000
+version 8.6 at 2023-07-20 20:26:02 +0000
+----------------------------------------
+
+  Change: 69b286e396cc816a60053c94df43713ea390d24a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-07-20 08:53:17 +0000
+
+    Preparing 8.6 Release
+
+    * Add `App::ElasticSearch::Utilities::Metrics`
+
+    * Convert es-graphite-dynamic.pl to use
+    App::ElasticSearch::Utilities::Metrics * Updates for
+    `App::ElasticSearch::Utilities::Aggregations`:
+
+    * Adding tests for the `es_flatten_aggs()` function
+
+    * For aggs with `key_as_string`, don't lose data by adding `$field.raw` as
+    the `key` value * New Utilities:
+
+    * `es-index-fields.pl` shows storage details about the fields in indexes
+
+    * `es-index-scan.pl` scans indexes for potential issues * Updates for
+    `App::ElasticSearch::Utilities`
+
+    * `es_index_strip_date()` - Add a fall back parser for date patterns in
+    index names
+
+    * **(new)** `es_human_count()` to transform 10_000 into "10 thousand"
+
+    * **(new)** `es_human_size()` to transform 10_000 into "10 Kb" * Require
+    Perl 5.16+, and test on 5.38 
+
+----------------------------------------
+version 8.5 at 2023-04-12 23:51:37 +0000
 ----------------------------------------
 
   Change: 52766654c246913695280adfc9fd74247543d4f4
@@ -454,5 +488,5 @@ version 7.9 at 2021-07-30 18:19:09 +0000
     Fix warnings when we encounter an unallocated shard 
 
 =================================================
-Plus 85 releases after 2021-04-12 00:00:00 +0000.
+Plus 85 releases after 2021-07-20 00:00:00 +0000.
 =================================================

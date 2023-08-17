@@ -34,7 +34,7 @@ sub generate_pod {
         }
         $pod .= "\n=back\n\n";
         print "$pod";
-        
+
     }
     elsif ($method eq 'GET') {
         $pod .= "\n=head2 $conf->{name}\n\n";
@@ -118,7 +118,7 @@ for my $item (@{$tree}) {
 #            for my $gchild (@{$child->{children}}) {
 #                for my $hash (keys %{$gchild}) {
 #                    #print Dumper $gchild;
-#                    for my $type (keys %{$gchild->{'info'}}){ 
+#                    for my $type (keys %{$gchild->{'info'}}){
 #                        print "DEBUG: $type\n";
 #                        generate_method($type, $gchild->{'info'}->{$type});
 #                    }
@@ -162,4 +162,4 @@ Backup\' permission and the VM already exists. If you create disks you need \'Da
 
 #print Dumper $tree;
 
-=cut 
+=cut

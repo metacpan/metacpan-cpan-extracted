@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+
+use v5.36;
+use App::perl::distrolint;
+
+my $linter = App::perl::distrolint->new;
+
+exit $linter->run( @ARGV );
+
+=head1 NAME
+
+F<perl-distrolint> - distribution-wide linting tools for Perl distributions
+
+=head1 SYNOPSIS
+
+   $ perl-distrolint
+
+=head1 DESCRIPTION
+
+This application applies various code-linting tests across the source code for
+an entire Perl distribution. The individual checks performed are described
+more in the various C<App::perl::distrolint::Check::*> modules.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

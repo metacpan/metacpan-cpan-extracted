@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2022/07/06
+## Modified 2023/06/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Text::Wrap ();
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     use open ':std' => ':utf8';
 };
 
@@ -70,8 +70,8 @@ sub add_reference
     if( @_ )
     {
         ## If there is any existing value, convert it to array
-        $self->{file} = [$self->{file}] if( length( $self->{file} ) && !ref( $self->{file} ) );
-        $self->{line} = [$self->{line}] if( length( $self->{line} ) && !ref( $self->{line} ) );
+        $self->{file} = [$self->{file}] if( length( $self->{file} ) && $self->_is_array( $self->{file} ) );
+        $self->{line} = [$self->{line}] if( length( $self->{line} ) && $self->_is_array( $self->{line} ) );
         if( $self->_is_array( $_[0] ) )
         {
             push( @{$self->{file}}, $_[0]->[0] );
@@ -317,8 +317,8 @@ sub reference
         }
     }
     return( '' ) if( !length( $self->{file} ) || !length( $self->{line} ) );
-    return( '' ) if( ref( $self->{file} ) && !scalar( @{$self->{file}} ) );
-    if( ref( $self->{file} ) )
+    return( '' ) if( $self->_is_array( $self->{file} ) && !scalar( @{$self->{file}} ) );
+    if( $self->_is_array( $self->{file} ) )
     {
         my @temp = ();
         for( my $i = 0; $i < scalar( @{$self->{file}} ); $i++ )
@@ -438,7 +438,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

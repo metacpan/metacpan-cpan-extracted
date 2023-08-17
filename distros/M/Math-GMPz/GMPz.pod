@@ -647,6 +647,8 @@
    $si = Rmpz_cmp_IV($op, $iv); # $iv is an IV
    $si = Rmpz_cmp_si($op, $si);
    $si = Rmpz_cmp_ui($op, $ui);
+   $si = Rmpz_cmp_sj($op, $si); # Available if longsize < ivsize
+   $si = Rmpz_cmp_uj($op, $ui); # Available if longsize < ivsize
     Compare 1st and 2nd args.  Return a positive value if
     1st arg > 2nd arg, zero if 1st arg = 2nd arg, or a
     negative value if 1st arg < 2nd arg.
@@ -654,6 +656,8 @@
     actual value held in the double/NV - not to the truncated
     integer value. Comparison to an Inf is allowed, but
     comparison to a NaN is a fatal error.
+    Rmpz_cmp_sj and Rmpz_cmp_uj do not have gmp library counterparts
+    and are available only on perls where ivsize > longsize.
 
     NOTE:
          Rmpz_cmp_IV() requires that the 2nd argument has its IOK
@@ -1088,9 +1092,10 @@
           read it thoroughly, including the documentation regarding
           'copy constructors'.
 
-    The "power" operators ('**' and '**=') overload accept only +ve
-    integers (ie +IV or UV). Values that are too large to fit into
-    a C 'unsigned long int' will be silently truncated.
+    The "power" operators ('**' and '**=') do not accept perl scalars
+    that are either NVs (floating point types) or -ve IVs (integers).
+    Values that are too large to fit into a C 'unsigned long int'
+    will be silently truncated.
 
     Division uses 'tdiv' (see 'Integer Division', above).
     Check that '~', '%', and '%=' are working as you expect
@@ -1100,14 +1105,27 @@
     have been blessed into some package other than 'Math::BigInt',
    'Math::GMPz', 'Math::GMPq' (limited operations), or 'Math::MPFR'
     (limited operations) will not work.
-    Math::MPFR objects can be used only with '+', '-', '*', '/'
-    and '**' operators, and will work only if Math::MPFR is at
-    version 3.13 or later - in which case the operation will
-    return a Math::MPFR object.
-    Math::GMPq objects can be used only with the comparison operators
+
+    Math::MPFR objects can be used  with '+', '-', '*', '/' and '**'
+    operators - in which case the operation will return a Math::MPFR
+    object.
+    If $Math::GMPz::RETYPE is set to 1, then Math::MPFR objects can
+    also be used with '+=', '*=', '-=', '/=' and '**=' operators.
+    In such instances, the Math::GMPz object is set ("retyped") to a
+    Math::MPFR object that contains the result of the operation,
+    subject to the precision of the Math::MPFR object and the
+    default rounding mode being used.
+
+    Math::GMPq objects can be used with the comparison operators
     ( == != < <= > >= <=> ) and also, iff Math-GMPq-0.43 or later is
     installed, with '+', '-', '/', and '*' operators (in which case
     a Math::GMPq object is returned).
+    If $Math::GMPz::RETYPE is set to 1, then Math::GMPq objects can
+    also be used with '+=', '*=', '-=', and '/=' and operators.
+    In such instances, the Math::GMPz object is set "retyped" to a
+    Math::GMPq object containing the exact result of the operation.
+
+    NOTE: $Math::GMPz::RETYPE is initially set to 0 (false).
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is

@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a const_value_index
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -56,7 +56,7 @@ MarpaX::Java::ClassFile::BNF::ConstValueIndex - Parsing of a const_value_index
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

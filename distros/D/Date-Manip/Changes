@@ -15,6 +15,13 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.92  2023-06-07
+  -  Time zone fixes
+         Newest zoneinfo data (tzdata 2023c).
+
+  -  Documentation fixes
+         Typo fix. Reported by Derek Terveer
+
 6.91  2023-03-01
   -  Fixed bug where timezone alias wasn't handled
          On linux systems configured to be in a timezone that is an alias,

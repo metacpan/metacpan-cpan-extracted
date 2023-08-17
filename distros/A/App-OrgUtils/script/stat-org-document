@@ -10,9 +10,9 @@ use List::Util qw(sum);
 use Org::Parser;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-06'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.485'; # VERSION
+our $VERSION = '0.486'; # VERSION
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
@@ -21,7 +21,7 @@ my $doc = Org::Parser->new->parse($input);
 
 my %stats = (
     num_objects => 0,
-    input_size_in_lines      => ~~@$input,
+    input_size_in_lines      => scalar(@$input),
     input_size_in_characters => sum(map {length} @$input),
     tree_depth => 0,
 );
@@ -72,7 +72,7 @@ stat-org-document - Print statistics of an Org document
 
 =head1 VERSION
 
-This document describes version 0.485 of stat-org-document (from Perl distribution App-OrgUtils), released on 2023-04-06.
+This document describes version 0.486 of stat-org-document (from Perl distribution App-OrgUtils), released on 2023-07-12.
 
 =head1 SYNOPSIS
 

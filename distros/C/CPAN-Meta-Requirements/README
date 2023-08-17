@@ -2,7 +2,7 @@ NAME
     CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 VERSION
-    version 2.142
+    version 2.143
 
 SYNOPSIS
       use CPAN::Meta::Requirements;
@@ -254,6 +254,8 @@ CONTRIBUTORS
     *   Karen Etheridge <ether@cpan.org>
 
     *   Leon Timmermans <fawaka@gmail.com>
+
+    *   Paul Howarth <paul@city-fan.org>
 
     *   Ricardo Signes <rjbs@semiotic.systems>
 

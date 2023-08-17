@@ -1,9 +1,9 @@
-.travis.yml
 Build.PL
 Changes
 COPYRIGHT
 lib/Apache/Session/Browseable.pm
 lib/Apache/Session/Browseable/_common.pm
+lib/Apache/Session/Browseable/Cassandra.pm
 lib/Apache/Session/Browseable/DBI.pm
 lib/Apache/Session/Browseable/File.pm
 lib/Apache/Session/Browseable/Informix.pm
@@ -16,6 +16,7 @@ lib/Apache/Session/Browseable/PgJSON.pm
 lib/Apache/Session/Browseable/Postgres.pm
 lib/Apache/Session/Browseable/Redis.pm
 lib/Apache/Session/Browseable/SQLite.pm
+lib/Apache/Session/Browseable/Store/Cassandra.pm
 lib/Apache/Session/Browseable/Store/DBI.pm
 lib/Apache/Session/Browseable/Store/File.pm
 lib/Apache/Session/Browseable/Store/Informix.pm
@@ -36,6 +37,7 @@ META.json
 META.yml			Module meta-data (added by MakeMaker)
 README.md
 rpm/Apache-Session-Browseable.spec
+t/Apache-Session-Browseable-Cassandra.t
 t/Apache-Session-Browseable-common.t
 t/Apache-Session-Browseable-DBI.t
 t/Apache-Session-Browseable-File.t

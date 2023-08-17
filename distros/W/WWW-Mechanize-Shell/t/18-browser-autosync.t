@@ -25,6 +25,8 @@ BEGIN {
 };
 use WWW::Mechanize::Shell;
 
+delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
+
 my $browser_synced;
 { no warnings 'redefine';
   *WWW::Mechanize::Shell::sync_browser = sub {

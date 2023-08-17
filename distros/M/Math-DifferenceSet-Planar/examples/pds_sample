@@ -2,43 +2,89 @@
 
 use strict;
 use warnings;
-use Math::DifferenceSet::Planar;
+use Math::Prime::Util qw(gcd urandomm);
+use Math::DifferenceSet::Planar 1.000;
 
 use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
-if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
-    die "usage: pds_sample (p n|q)\n";
+my $USAGE = "usage: pds_sample [-s|-l|-g|-z|-r] [-D database] (p n|order)\n";
+
+my $type = 'new';
+my $db   = undef;
+my $rand = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    $type = 'std_reference',  next if 's' eq $opt || 'z' eq $opt;
+    $type = 'lex_reference',  next if 'l' eq $opt;
+    $type = 'gap_reference',  next if 'g' eq $opt;
+    $type = 'new', $rand = 1, next if 'r' eq $opt;
+    $db   = shift(@ARGV),     next if 'D' eq $opt && @ARGV;
+    $db   = $1,               next if $opt =~ /^D(.+)s/;
+    die $USAGE;
 }
+$rand &&= $type eq 'new';
+die $USAGE if !@ARGV || 2 < @ARGV || grep { !/^[1-9][0-9]*\z/ } @ARGV;
+
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
 
 if (!PDS->available(@ARGV)) {
     my $order = join q[^], @ARGV;
     die "$order: no set of this order available\n";
 }
 
-my $s = PDS->new(@ARGV);
-my @e = $s->elements;
+my $s = PDS->$type(@ARGV);
+if (!defined $s) {
+    my $order = join q[^], @ARGV;
+    $type =~ tr/_/ /;
+    die "$order: no $type set of this order available\n";
+}
+if ($rand) {
+    my $modulus = $s->modulus;
+    my $factor  = 1 + urandomm($modulus - 1);
+    while (gcd($factor, $modulus) != 1) {
+        $factor = 1 + urandomm($modulus - 1);
+    }
+    my $delta = urandomm($modulus);
+    $s = $s->multiply($factor)->translate($delta);
+}
+my @e = $s->elements_sorted;
 print "@e\n";
 
 __END__
+
 =head1 NAME
 
 pds_sample - print a planar difference set sample of a given order
 
 =head1 SYNOPSIS
 
-  pds_sample p n
-  pds_sample order
+  pds_sample [-s|-l|-g|-z|-r] [-D database] p n
+  pds_sample [-s|-l|-g|-z|-r] [-D database] order
 
 =head1 DESCRIPTION
 
-This example program writes one planar difference set of a given order
-to standard output.  The order can be specified as a prime number and
-an exponent, or as a prime power.  The output will be a line with one
-representative difference set of the given order.  If the order is not
-a prime power or exceeds an implementation specific size restriction,
+This example program writes one planar difference set of a given type and
+order to standard output.  The order can be specified as a prime number
+and an exponent, or as a prime power.  The output will be a line with
+one representative difference set of the given order.  If the order is
+not a prime power or exceeds an implementation specific size restriction,
 the program fails with an error message.
+
+Option C<-s> chooses the standard reference set.
+
+Option C<-l> chooses the lexically minimal reference set.
+
+Option C<-g> chooses the big-to-small lexically minimal reference set.
+
+Option C<-z> chooses the lexically minimal zeta-canonical reference set.
+Currently, the standard reference set is the same set.
+
+Option C<-r> chooses a random set.
+
+Parameter C<-D> specifies an alternate sample database.
 
 =head1 AUTHOR
 
@@ -46,7 +92,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2020-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

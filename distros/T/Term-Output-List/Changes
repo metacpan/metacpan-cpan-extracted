@@ -1,0 +1,8 @@
+0.03 2023-08-05
+    * Support Windows
+
+0.02 2023-07-23
+    * Use Perl 5.20 for signatures
+
+0.01 2023-07-21
+    * Released on an unsuspecting world

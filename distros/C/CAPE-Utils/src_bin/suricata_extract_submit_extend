@@ -2,16 +2,79 @@
 
 =head1 NAME
 
-suricata_extract_submit_extend - Provides LibreNMS style SNMP extend for 
+suricata_extract_submit_extend - Provides a LibreNMS style SNMP extend for suricata_extract_submit stats
 
 =head1 SYNOPSIS
 
 extend suricata-extract /usr/local/bin/suricata_extract_submit_extend
 
-=head1 DESCRIPTION
+=head1 SWITCHES
 
-Ihe cache file is not in the default location, it may be specified via
-the option '-c'.
+=head2 -Z
+
+Do not use conditional GZip+BASE64 compression.
+
+=head2 -c <stats file>
+
+The stats file created by suricata_extract_submit.
+
+Default :: /var/cache/suricata_extract_submit_stats.json
+
+=head2 -d <stats dir>
+
+The stats used by suricata_extract_submit.
+
+Default :: /var/cache/suricata_extract_submit_stats
+
+=head2 -r <seconds>
+
+The number of seconds to look back buy for generating stats.
+
+Default :: 300
+
+=head1 Generated JSON
+
+The generated JSON is a standard LibreNMS style return. For more
+information on that see L<https://docs.librenms.org/Developing/Application-Notes/>.
+
+All stat keys come in counter and gauge variety. The gauge variety has '_delta' appended
+to the name and a count of just those items for the time period in question.
+
+General Data Keys...
+
+    - timestamp :: Epoch time it was generated at.
+
+    - last_errors :: A array containing encounted errors.
+
+Stat Keys...
+
+    - errors :: Number of general errors encounted.
+
+    - ignored_host :: Files skipped as the host in question is set to be ignored.
+
+    - ignored_ip :: Files skipped as either the src or dest IP/subnet is set to be ignored.
+
+    - ignored_ip_dest :: Files skipped as either the dest IP/subnet is set to be ignored.
+
+    - ignored_ip_src :: Files skipped as either the src IP/subnet is set to be ignored.
+
+    - sub :: Files submitted.
+
+    - sub_2xx :: Submissions with a 2xx HTTP status code result.
+
+    - sub_3xx :: Submissions with a 3xx HTTP status code result.
+
+    - sub_4xx :: Submissions with a 4xx HTTP status code result.
+
+    - sub_5xx :: Submissions with a 5xx HTTP status code result.
+
+    - sub_fail :: Submissions that have failed.
+
+    - sub_size :: Total size of submissions in bytes.
+
+    - truncated :: Files which are truncated as Suricata did not have all the packets.
+
+    - zero_sized :: Files which are zero in size and thus ignored.
 
 =cut
 
@@ -85,7 +148,7 @@ my $to_return = {
 my @to_delta = (
 	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
 	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
-	'truncated'
+	'truncated', 'sub_size'
 );
 
 # if todays file exists or not

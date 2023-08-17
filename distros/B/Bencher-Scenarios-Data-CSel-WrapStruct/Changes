@@ -1,0 +1,25 @@
+0.004   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Bencher-Scenarios-{DataCSelWrapStruct,Data-CSel-WrapStruct}.
+
+
+0.003   2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.002   2016-08-26  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [doc] Show result and argument size in sample benchmark result.
+
+
+0.001   2016-08-26  Released-By: PERLANCAR
+
+        - First release.

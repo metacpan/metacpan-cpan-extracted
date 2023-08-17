@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetOleObjectRequest.name :   ,
-# PutWorksheetOleObjectRequest.sheetName :   ,
-# PutWorksheetOleObjectRequest.upperLeftRow :   ,
-# PutWorksheetOleObjectRequest.upperLeftColumn :   ,
-# PutWorksheetOleObjectRequest.height :   ,
-# PutWorksheetOleObjectRequest.width :   ,
-# PutWorksheetOleObjectRequest.oleFile :   ,
-# PutWorksheetOleObjectRequest.imageFile :   ,
-# PutWorksheetOleObjectRequest.folder :   ,
-# PutWorksheetOleObjectRequest.storageName :    
+# PutWorksheetOleObjectRequest.name : The workbook name.  ,
+# PutWorksheetOleObjectRequest.sheetName : The worsheet name.  ,
+# PutWorksheetOleObjectRequest.upperLeftRow : Upper left row index  ,
+# PutWorksheetOleObjectRequest.upperLeftColumn : Upper left column index  ,
+# PutWorksheetOleObjectRequest.height : Height of oleObject, in unit of pixel  ,
+# PutWorksheetOleObjectRequest.width : Width of oleObject, in unit of pixel  ,
+# PutWorksheetOleObjectRequest.oleFile : OLE filename(full file name).  ,
+# PutWorksheetOleObjectRequest.imageFile : Image filename(full file name).  ,
+# PutWorksheetOleObjectRequest.folder : Original workbook folder.  ,
+# PutWorksheetOleObjectRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_ole_object' } = { 
-    	summary => '',
+    	summary => 'Add an OLE object in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -160,70 +160,70 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worsheet name.',
      	format => '',
      	read_only => '',
      		},
      'upper_left_row' => {
      	datatype => 'int',
      	base_name => 'upperLeftRow',
-     	description => '',
+     	description => 'Upper left row index',
      	format => '',
      	read_only => '',
      		},
      'upper_left_column' => {
      	datatype => 'int',
      	base_name => 'upperLeftColumn',
-     	description => '',
+     	description => 'Upper left column index',
      	format => '',
      	read_only => '',
      		},
      'height' => {
      	datatype => 'int',
      	base_name => 'height',
-     	description => '',
+     	description => 'Height of oleObject, in unit of pixel',
      	format => '',
      	read_only => '',
      		},
      'width' => {
      	datatype => 'int',
      	base_name => 'width',
-     	description => '',
+     	description => 'Width of oleObject, in unit of pixel',
      	format => '',
      	read_only => '',
      		},
      'ole_file' => {
      	datatype => 'string',
      	base_name => 'oleFile',
-     	description => '',
+     	description => 'OLE filename(full file name).',
      	format => '',
      	read_only => '',
      		},
      'image_file' => {
      	datatype => 'string',
      	base_name => 'imageFile',
-     	description => '',
+     	description => 'Image filename(full file name).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,3 +1,6 @@
+0.1.0 Fri Jul  7 12:45:30 PM EDT 2023
+ - Updates for YAMLScript API changes
+
 0.0.4 Mon 25 Jul 2022 08:57:30 AM PDT
  - Refactor code into YAMLScript
  - Bump dep to Test::More::YAMLScript => 0.0.4

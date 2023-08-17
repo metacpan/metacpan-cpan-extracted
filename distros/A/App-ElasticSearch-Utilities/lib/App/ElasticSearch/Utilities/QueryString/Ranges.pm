@@ -1,10 +1,10 @@
 package App::ElasticSearch::Utilities::QueryString::Ranges;
 # ABSTRACT: Implement parsing comparison operators to Equivalent Lucene syntax
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -62,7 +62,7 @@ App::ElasticSearch::Utilities::QueryString::Ranges - Implement parsing compariso
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 SYNOPSIS
 

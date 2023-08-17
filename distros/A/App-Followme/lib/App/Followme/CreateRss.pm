@@ -14,7 +14,7 @@ use MIME::Base64 qw(encode_base64);
 use App::Followme::FIO;
 use App::Followme::NestedText;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -57,7 +57,8 @@ sub build_rss {
     delete $channel{guid};
 
     my @items;
-    my $files = $self->{data}->build('top_files', $index_file);
+    my $files = $self->{data}->build('top_files_by_mdate_reversed', 
+                                     $index_file);
 
     foreach my $file (@$files) {
         push(@items, $self->file_info($file));
@@ -98,6 +99,7 @@ sub file_info {
 sub setup {
     my ($self) = @_;
 
+    $self->{extension} = $self->{web_extension};
     $self->{data}{date_format} ||= 'Day, dd Mon yyyy';
     $self->{data}{exclude_index} = 1;
     return;

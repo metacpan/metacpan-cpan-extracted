@@ -164,6 +164,11 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
 #endif
 
+#ifndef CXp_EVALBLOCK
+/* before perl 5.34 this was called CXp_TRYBLOCK */
+#  define CXp_EVALBLOCK CXp_TRYBLOCK
+#endif
+
 #if !HAVE_PERL_VERSION(5, 26, 0)
 #  define sv_set_undef(sv)  sv_setsv(sv, &PL_sv_undef)
 #endif
@@ -193,13 +198,25 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 }
 #endif
 
-#ifdef PERL_USE_GCC_BRACE_GROUPS
-#  define xV_FROM_REF(XV, ref)  \
+#ifndef xV_FROM_REF
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define xV_FROM_REF(XV, ref)  \
   ({ SV *_ref = ref; assert(SvROK(_ref)); assert(SvTYPE(SvRV(_ref)) == SVt_PV ## XV); (XV *)(SvRV(_ref)); })
-#else
-#  define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#  else
+#    define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#  endif
+
+#  define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
+#  define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
+#  define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
 #endif
 
-#define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
-#define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
-#define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#ifndef newPADxVOP
+#  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)
+static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
+{
+  OP *op = newOP(type, flags);
+  op->op_targ = padix;
+  return op;
+}
+#endif

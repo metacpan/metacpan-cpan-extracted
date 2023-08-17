@@ -10,7 +10,7 @@ CSS::Packer - Another CSS minifier
 
 # VERSION
 
-Version 2.07
+Version 2.09
 
 # DESCRIPTION
 
@@ -113,5 +113,5 @@ under the same terms as Perl itself.
 
 # SEE ALSO
 
-[CSS::Minifier](https://metacpan.org/pod/CSS::Minifier),
-[CSS::Minifier::XS](https://metacpan.org/pod/CSS::Minifier::XS)
+[CSS::Minifier](https://metacpan.org/pod/CSS%3A%3AMinifier),
+[CSS::Minifier::XS](https://metacpan.org/pod/CSS%3A%3AMinifier%3A%3AXS)

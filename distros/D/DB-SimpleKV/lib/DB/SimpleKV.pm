@@ -12,11 +12,11 @@ DB::SimpleKV - Simple k/v interface to text configuration file
 
 =head1 VERSION
 
-Version 0.15
+Version 0.18
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 sub new {
   my $class = shift;
@@ -88,7 +88,7 @@ sub save {
 
 This module is mainly used to manipulate a configuration file like Postfix's main.cf.
 
-If you find any issues in using the module, please don't hesitate to email me: opensoft [at] posthub.me
+If you find any issues in using the module, please don't hesitate to email me: pyh@gmx.fr
 
 It creates the default db file "/tmp/simplekv.db" if you don't specify the file path.
 

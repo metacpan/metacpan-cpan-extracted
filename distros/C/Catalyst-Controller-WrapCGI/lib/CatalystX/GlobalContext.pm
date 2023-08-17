@@ -1,6 +1,6 @@
 package CatalystX::GlobalContext;
 our $AUTHORITY = 'cpan:RKITOVER';
-$CatalystX::GlobalContext::VERSION = '0.038';
+$CatalystX::GlobalContext::VERSION = '0.039';
 use strict;
 use warnings;
 use parent 'Exporter';

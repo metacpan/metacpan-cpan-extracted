@@ -27,6 +27,33 @@ sub skippable {
 
 
 my %tests = (
+    '5.038' => [
+        [ 'unicode15.0',
+          '"\N{MOOSE}" eq "\N{U+1FACE}"', 1 ],
+        [ '^HOOK',
+          'my $x;'
+          . 'local ${^HOOK}{require__before} = sub { $x = 2 };'
+          . 'require warnings; $x',
+          2 ],
+        [ 'signature-default-operator',
+          'use feature "signatures";'
+          . 'sub test_signature($x //= 3) { $x }'
+          . 'test_signature(undef)',
+          3 ],
+        [ 'INCDIR',
+          'my $x; { package My::INCDIR; sub new { bless {}, shift }'
+          . 'sub INCDIR { $x = 4; } }'
+          . 'local @INC = My::INCDIR->new;'
+          . 'eval { require My::Nonexistent }; $x',
+          4 ],
+        [ '*{}',
+          'my $x; "a" =~ /(?(*{ $x = 5 })a|b)/; $x', 5 ],
+        [ 'REG_INF_I32_MAX',
+          '"a" =~ /a{1,2000000000}/', 1 ],
+        [ '^LAST_SUCCESSFUL_PATTERN',
+          '"a" =~ /[ab]/; "c" =~ /x/; "xbx" =~ /x${^LAST_SUCCESSFUL_PATTERN}x/',
+          1 ]
+    ],
     '5.036' => [
         [ 'unicode14.0',
           '"\N{MELTING FACE}" eq "\N{U+1FAE0}"', 1 ]

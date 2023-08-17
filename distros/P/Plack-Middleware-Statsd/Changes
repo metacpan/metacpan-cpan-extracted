@@ -1,5 +1,16 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.6.3    2023-06-15 19:45:18+01:00 Europe/London
+  [Enhancements]
+  - Revert to using Try::Tiny instead of Feature::Compat::Try, since the former is already used by Plack.
+
+  [Documentation]
+  - Reformated KNOWN ISSUES section.
+
+  - Clarified support policy for older Perl versions.
+
+  - Bumped copyright year.
+
 v0.6.2    2022-12-11 16:07:04+00:00 Europe/London
   [Enhancements]
   - Simplified code for tracking Content-Type headers.

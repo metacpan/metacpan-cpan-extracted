@@ -27,12 +27,12 @@ sub new {
 
 
 sub search_and_replace {
-    my ( $sf, $sql, $bu_insert_into_args, $filter_str, $back  ) = @_;
+    my ( $sf, $sql, $bu_insert_args, $filter_str, $back  ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $aoa = $sql->{insert_into_args};
+    my $aoa = $sql->{insert_args};
     my $is_empty = $cf->__search_empty_cols( $aoa );
     my $header = $cf->__prepare_header( $aoa, $is_empty );
     my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
@@ -40,7 +40,7 @@ sub search_and_replace {
     my $used_names = [];
     $sf->{s_back} = $back;
     my @bu;
-    my ( $hidden, $add ) = ( 'Your choice:', '  ADD search & replace' );
+    my ( $hidden, $add ) = ( 'Your choice:', '  NEW' );
     my $available = [ sort { $a cmp $b } keys %$saved  ];
 
     ADD_SEARCH_AND_REPLACE: while ( 1 ) {
@@ -73,7 +73,6 @@ sub search_and_replace {
                 ( $used_names, $all_sr_groups ) = @{pop @bu};
                 next ADD_SEARCH_AND_REPLACE;
             }
-            $sql->{insert_into_args} = [ map { [ @$_ ] } @{$bu_insert_into_args} ];
             return;
         }
         my $choice = $menu->[$idx];
@@ -87,44 +86,41 @@ sub search_and_replace {
             if ( ! @$all_sr_groups ) {
                 return;
             }
-
-            APPLY_TO_COS: while ( 1 ) {
-                my $ok = $sf->__apply_to_cols( $sql, \@tmp_info, $header, $all_sr_groups );
-                if ( ! $ok ) {
-                    $sql->{insert_into_args} = [ map { [ @$_ ] } @{$bu_insert_into_args} ];
-                    next ADD_SEARCH_AND_REPLACE;
-                }
-                my $header_changed = 0;
+            my $col_idxs = $sf->__get_col_idxs( $sql, \@tmp_info, $header, $all_sr_groups );
+            if ( ! defined $col_idxs ) {
+                next ADD_SEARCH_AND_REPLACE;
+            }
+            $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups ); # modifies $aoa
+            $sql->{insert_args} = $aoa;
+            my $header_changed = 0;
+            if ( $sf->{d}{stmt_types}[0] =~ /^Create_table\z/i ) {
                 for my $i ( 0 .. $#$header ) {
-                    if ( $header->[$i] ne $sql->{insert_into_args}[0][$i] ) {
+                    if ( $header->[$i] ne $sql->{insert_args}[0][$i] ) {
                         $header_changed = 1;
                         last;
                     }
                 }
-                if ( $header_changed ) {
-                    my ( $yes, $no ) = ( 'Yes', 'No' );
-                    my $menu = [ undef, $yes, $no ];
-                    my @tmp_info_addition = ( 'Header: ' . join( ', ', @{$sql->{insert_into_args}[0]} ), ' ' );
-                    push @tmp_info, @tmp_info_addition;
-                    my $info = $cf->__get_filter_info( $sql, join( "\n", @tmp_info ) );
-                    # Choose
-                    my $idx = $tc->choose(
-                        $menu,
-                        { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Restore header?', default => 0, index => 1, undef => $sf->{s_back} }
-                    );
-                    if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                        my $pop_count = @tmp_info_addition;
-                        splice @tmp_info, -$pop_count;
-                        $sql->{insert_into_args} = [ map { [ @$_ ] } @{$bu_insert_into_args} ];
-                        next APPLY_TO_COS;
-                    }
-                    my $choice = $menu->[$idx];
-                    if ( $choice eq $yes ) {
-                        $sql->{insert_into_args}[0] = $header;
-                    }
-                }
-                return 1;
             }
+            if ( $header_changed ) {
+                my ( $yes, $no ) = ( 'Yes', 'No' );
+                my $menu = [ undef, $yes, $no ];
+                my @tmp_info_addition = ( 'Header: ' . join( ', ', @{$sql->{insert_args}[0]} ), ' ' );
+                my $info = $cf->__get_filter_info( $sql, join( "\n", @tmp_info, @tmp_info_addition ) );
+                # Choose
+                my $idx = $tc->choose(
+                    $menu,
+                    { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Restore header?', index => 1, undef => $sf->{s_back} }
+                );
+                if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                    $sql->{insert_args} = [ map { [ @$_ ] } @{$bu_insert_args} ];
+                    return;
+                }
+                my $choice = $menu->[$idx];
+                if ( $choice eq $yes ) {
+                    $sql->{insert_args}[0] = $header;
+                }
+            }
+            return 1;
         }
         elsif ( $choice eq $add ) {
             my $prompt = 'Build s///;';
@@ -145,7 +141,7 @@ sub search_and_replace {
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm},
+                    { info => $info, prompt => $prompt, confirm => $sf->{i}{confirm},
                       back => $back, skip_items => $skip_regex }
                 );
                 if ( ! defined $form ) {
@@ -187,11 +183,10 @@ sub __filter_modifiers {
 }
 
 
-sub __apply_to_cols {
+sub __get_col_idxs {
     my ( $sf, $sql, $tmp_info, $header, $all_sr_groups ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $aoa = $sql->{insert_into_args};
     my $info = $cf->__get_filter_info( $sql, join( "\n", @$tmp_info ) );
     # Choose
     my $col_idxs = $tu->choose_a_subset(
@@ -203,9 +198,7 @@ sub __apply_to_cols {
     if ( ! defined $col_idxs ) {
         return;
     }
-    $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups );
-    $sql->{insert_into_args} = $aoa;
-    return 1;
+    return $col_idxs;
 }
 
 sub __execute_substitutions {
@@ -303,7 +296,7 @@ sub __history {
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { prompt => 'Add s_&_r:', auto_up => 2, clear_screen => 1, info => $top,
+                    { prompt => 'Add s_&_r:', clear_screen => 1, info => $top,
                       skip_items => $skip_regex,
                       confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                 );
@@ -388,8 +381,7 @@ sub __history {
                     # Fill_form
                     my $form = $tf->fill_form(
                         $fields,
-                        { prompt => "Edit \"$name\":", auto_up => 2, clear_screen => 1, info => $info,
-                          skip_items => $skip_regex,
+                        { prompt => "Edit \"$name\":", clear_screen => 1, info => $info, skip_items => $skip_regex,
                           confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                     );
                     if ( ! defined $form ) {
@@ -493,7 +485,7 @@ sub __get_entry_name {
         # Readline
         my $new_name = $tr->readline(
             $prompt,
-            { info => $info, default => $name_default }
+            { info => $info, default => $name_default, history => [] }
         );
         if ( ! defined $new_name || ! length $new_name ) {
             return;

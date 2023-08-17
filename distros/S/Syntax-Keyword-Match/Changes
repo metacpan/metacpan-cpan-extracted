@@ -1,5 +1,25 @@
 Revision history for Syntax-Keyword-Match
 
+0.13    2023-07-20
+        [CHANGES]
+         * Provide new `case if` syntax (RT148939)
+         * Remember to implement `no Syntax::Keyword::Match` to disable the
+           syntax
+
+        [BUGFIXES]
+         * Ensure that new lexical variables introduced in the expression
+           correctly go out of scope at the end of the `match` block
+
+0.12    2023-06-19
+        [BUGFIXES]
+         * Ensure that the temporary topic variable gets cleared at the end of
+           match/case block
+
+0.11    2023-06-12
+        [CHANGES]
+         * Support `isa` as a comparison operator even on perls before 5.32
+         * Swap all of the unit tests from Test::More to Test2::V0
+
 0.10    2022-12-25
         [CHANGES]
          * General code neatening of internals

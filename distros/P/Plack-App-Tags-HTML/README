@@ -39,14 +39,25 @@ METHODS
     *       "data_css"
 
             Reference to array with structure for input argument of
-            "Tags::HTML::process_css()".
+            Tags::HTML::process_css().
 
             Default value is undef.
 
     *       "data_init"
 
             Reference to array with structure for input argument of
-            "Tags::HTML::init()".
+            Tags::HTML::init().
+
+            This structure is used in init phase of each web app call.
+
+            Default value is undef.
+
+    *       "data_prepare"
+
+            Reference to array with structure for input argument of
+            Tags::HTML::init().
+
+            This structure is used in init phase of preparation of web app.
 
             Default value is undef.
 
@@ -168,5 +179,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.14
 

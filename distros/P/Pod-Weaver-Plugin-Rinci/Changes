@@ -1,3 +1,8 @@
+0.786   2023-04-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] By default exclude processing Sah::SchemaR::.* modules.
+
+
 0.785   2023-03-02  Released-By: PERLANCAR; Urgency: medium
 
         - Make this module fail less: 1) avoid force-reloading Dist::Zilla

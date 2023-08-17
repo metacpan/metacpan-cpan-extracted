@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostUpdateWorksheetCellStyleRequest.name :   ,
-# PostUpdateWorksheetCellStyleRequest.sheetName :   ,
-# PostUpdateWorksheetCellStyleRequest.cellName :   ,
-# PostUpdateWorksheetCellStyleRequest.style :   ,
-# PostUpdateWorksheetCellStyleRequest.folder :   ,
-# PostUpdateWorksheetCellStyleRequest.storageName :    
+# PostUpdateWorksheetCellStyleRequest.name : The workbook name.  ,
+# PostUpdateWorksheetCellStyleRequest.sheetName : The worksheet name.  ,
+# PostUpdateWorksheetCellStyleRequest.cellName : The cell name.  ,
+# PostUpdateWorksheetCellStyleRequest.style : Style with update style settings.  ,
+# PostUpdateWorksheetCellStyleRequest.folder : Original workbook folder.  ,
+# PostUpdateWorksheetCellStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_update_worksheet_cell_style' } = { 
-    	summary => '',
+    	summary => 'Sets cell`s style by cell name in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'cellName',
-     	description => '',
+     	description => 'The cell name.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'style',
-     	description => '',
+     	description => 'Style with update style settings.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

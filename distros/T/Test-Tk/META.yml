@@ -18,9 +18,10 @@ no_index:
     - t
     - inc
 requires:
+  Test::Deep: '0'
   Test::More: '0'
   Tk: '0'
 resources:
   repository: git://github.com/haje61/Test-Tk.git
-version: '2.02'
+version: '3.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

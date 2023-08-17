@@ -2,74 +2,44 @@ NAME
     App::PMUtils - Command-line utilities related to Perl modules
 
 VERSION
-    This document describes version 0.743 of App::PMUtils (from Perl
-    distribution App-PMUtils), released on 2023-01-28.
+    This document describes version 0.744 of App::PMUtils (from Perl
+    distribution App-PMUtils), released on 2023-05-12.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to Perl modules:
 
-    *   cpanm-this-mod
-
-    *   module-dir
-
-    *   pmabstract
-
-    *   pmbin
-
-    *   pmcat
-
-    *   pmchkver
-
-    *   pmcore
-
-    *   pmcost
-
-    *   pmdir
-
-    *   pmdoc
-
-    *   pmedit
-
-    *   pmgrep
-
-    *   pmhtml
-
-    *   pminfo
-
-    *   pmlatest
-
-    *   pmless
-
-    *   pmlines
-
-    *   pmlist
-
-    *   pmman
-
-    *   pmminversion
-
-    *   pmpath
-
-    *   pmstripper
-
-    *   pmuninst
-
-    *   pmunlink
-
-    *   pmversion
-
-    *   pmxs
-
-    *   podlist
-
-    *   podpath
-
-    *   pwd2mod
-
-    *   rel2mod
-
-    *   update-this-mod
+    1. cpanm-this-mod
+    2. module-dir
+    3. pmabstract
+    4. pmbin
+    5. pmcat
+    6. pmchkver
+    7. pmcore
+    8. pmcost
+    9. pmdir
+    10. pmdoc
+    11. pmedit
+    12. pmgrep
+    13. pmhtml
+    14. pminfo
+    15. pmlatest
+    16. pmless
+    17. pmlines
+    18. pmlist
+    19. pmman
+    20. pmminversion
+    21. pmpath
+    22. pmstripper
+    23. pmuninst
+    24. pmunlink
+    25. pmversion
+    26. pmxs
+    27. podlist
+    28. podpath
+    29. pwd2mod
+    30. rel2mod
+    31. update-this-mod
 
     The main purpose of these utilities is tab completion.
 

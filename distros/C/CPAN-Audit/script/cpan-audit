@@ -7,7 +7,7 @@ use IO::Interactive qw(is_interactive);
 
 use CPAN::Audit;
 
-our $VERSION = "1.301";
+our $VERSION = "1.401";
 
 __PACKAGE__->run( @ARGV ) unless caller;
 
@@ -112,7 +112,7 @@ sub format_text {
 }
 
 sub output_version {
-	my( $exit_code ) = @_;
+	my( $class, $exit_code ) = @_;
 	print "$0 version $VERSION using:\n\tCPAN::Audit     @{[ CPAN::Audit->VERSION ]}\n\tCPAN::Audit::DB @{[ CPAN::Audit::DB->VERSION ]}\n";
 	exit($exit_code);
 }
@@ -195,6 +195,7 @@ sub process_options {
 		'version'         => \$params{version},
 		'exclude=s@'      => \$params{exclude},
 		'exclude-file=s@' => \$params{exclude_file},
+		'modules=s@'      => \$params{modules},
 		};
 
 	my $ret = Getopt::Long::GetOptionsFromArray( $args, $options, %$params )
@@ -209,7 +210,7 @@ sub usage {
 	require Pod::Usage;
 	require FindBin;
 
-	my( $exit_code ) = @_;
+	my( $class, $exit_code ) = @_;
 	no warnings qw(once);
 	Pod::Usage::pod2usage( -input => $FindBin::Bin . "/" . $FindBin::Script );
 	exit( $exit_code );
@@ -228,6 +229,7 @@ cpan-audit [command] [options]
 Commands:
 
     module         [version range]    audit module with optional version range (all by default)
+    modules        [version range]    audit module list with optional version range (all by default)
     dist|release   [version range]    audit distribution with optional version range (all by default)
     deps           [directory]        audit dependencies from the directory (. by default)
     installed                         audit all installed modules
@@ -255,6 +257,8 @@ Examples:
     cpan-audit dist Catalyst-Runtime '>5.48'
 
     cpan-audit module Catalyst 7.0
+
+    cpan-audit modules "Catalyst;7.0" "Mojolicious;>8.40,<9.20"
 
     cpan-audit deps .
     cpan-audit deps /path/to/distribution
@@ -309,6 +313,104 @@ Parses F<cpanfile> taking into account the required versions.
 It is assumed that if the required version of the module is less than
 a version of a release with a known vulnerability fix, then the module
 is considered affected.
+
+=head2 JSON data
+
+If you request JSON output, the data looks like
+
+    {
+      "meta" : {
+          ... meta information ...
+      "dists": {
+        "<distribution1>": {
+          ... distribution info ...
+        }
+      }
+      "errors" : [
+        ... list of errors - if any ...
+      ]
+    }
+
+=head3 Meta information
+
+The meta data contains information about the run of C<cpan-audit>.
+
+    {
+      "args": [
+        "Mojo::File",
+        "Mojo::UserAgent",
+        "LWP::UserAgent"
+      ],
+      "cpan_audit": {
+        "version": "20230601.002"
+      },
+      "total_advisories": 19,
+      "command": "modules"
+    }
+
+These information are shown
+
+=over 4
+
+=item * cpan_audit
+
+The version of C<cpan_audit> that is used for the audit
+
+=item * command
+
+The command of C<cpan_audit> that was run
+
+=item * args
+
+Arguments for the command
+
+=item * total_advisories
+
+Number of found advisories
+
+=back
+
+=head3 Distribtion information
+
+For each distribution where at least one advisory was found, the JSON
+looks like:
+
+    "Dist-Name": {
+      "queried_modules": [
+        "Queried::Namespace"
+      ],
+      "version": "Any",
+      "advisories": [
+        {
+          ... advisory data as in the audit database ...
+        },
+	  ... more advisories ...
+      ]
+    },
+
+The advisory data is basically the data from the database. So this depends
+on what is known for the given advisory.
+
+The distribution information contains:
+
+=over 4
+
+=item * version
+
+The version (range) that is checked for advisories. If there's no
+version specified, all versions are checked and the version is report
+as "Any".
+
+=item * queried_modules
+
+The actual namespaces queried, either from the command line or another
+source, such as a F<cpanfile>.
+
+=item * advisories
+
+A list of all vulnerabilities found for the version range
+
+=back
 
 =head2 Exit values
 

@@ -3,7 +3,8 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+use Test::Builder;
 
 use Syntax::Keyword::Defer;
 

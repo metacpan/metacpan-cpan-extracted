@@ -8,6 +8,7 @@ build_requires:
   Data::Compare: '0'
   Encode: '0'
   English: '0'
+  Env: '0'
   File::Basename: '0'
   File::Path: '0'
   File::Spec: '0'
@@ -17,6 +18,7 @@ build_requires:
   Getopt::Long: '0'
   Guard: '0'
   Import::Into: '0'
+  JSON: '0'
   Math::BigFloat: '1.999837'
   Math::BigInt: '1.999837'
   Math::BigRat: '0.2624'
@@ -40,7 +42,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -49,8 +51,9 @@ name: Data-Dumper-Interp
 requires:
   Carp: '0'
   Data::Dumper: '0'
-  Data::Visitor: '0'
-  Exporter: '0'
+  Data::Structure::Util: '0'
+  Data::Visitor: '0.32'
+  Exporter: '5.57'
   List::Util: '1.33'
   Moose: '0'
   POSIX: '0'
@@ -68,7 +71,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '5.023'
-x_generated_by_perl: v5.34.0
+version: '6.002'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

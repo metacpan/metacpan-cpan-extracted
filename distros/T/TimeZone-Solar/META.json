@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "DateTime::TimeZone" : "0",
+            "DateTime::TimeZone" : "v0.80.0",
             "Modern::Perl" : "0",
             "Readonly" : "0",
             "Try::Tiny" : "0",
@@ -67,8 +67,8 @@
          "web" : "https://github.com/ikluft/LongitudeTZ"
       }
    },
-   "version" : "0.2.1",
-   "x_generated_by_perl" : "v5.36.0",
+   "version" : "0.2.2",
+   "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

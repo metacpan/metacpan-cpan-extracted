@@ -1,7 +1,12 @@
-/*
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
+#include <helpers/type_with_lit_0_comparisons.hpp>
 
 #include <type_traits>
 
@@ -23,7 +28,7 @@ namespace bar {
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #endif
-std::ostream& operator<<(std::ostream& out, foo::helper_1403 const&) {
+static std::ostream& operator<<(std::ostream& out, foo::helper_1403 const&) {
     return out << "[1403 helper]";
 }
 ///////////////////////////////
@@ -46,7 +51,7 @@ struct logic_t {
 };
 
 
-void throws_int(bool b) {
+static void throws_int(bool b) {
     if (b) {
         throw 1;
     }
@@ -66,7 +71,7 @@ bool templated_tests(T t) {
 
 struct A {};
 
-std::ostream &operator<<(std::ostream &o, const A &) { return o << 0; }
+static std::ostream &operator<<(std::ostream &o, const A &) { return o << 0; }
 
 struct B : private A {
     bool operator==(int) const { return true; }
@@ -306,4 +311,45 @@ TEST_CASE("ADL universal operators don't hijack expression deconstruction", "[co
     REQUIRE(0 | adl::always_true{});
     REQUIRE(0 & adl::always_true{});
     REQUIRE(0 ^ adl::always_true{});
+}
+
+TEST_CASE( "#2555 - types that can only be compared with 0 literal (not int/long) are supported", "[compilation][approvals]" ) {
+    REQUIRE( TypeWithLit0Comparisons{} < 0 );
+    REQUIRE_FALSE( 0 < TypeWithLit0Comparisons{} );
+    REQUIRE( TypeWithLit0Comparisons{} <= 0 );
+    REQUIRE_FALSE( 0 > TypeWithLit0Comparisons{} );
+
+    REQUIRE( TypeWithLit0Comparisons{} > 0 );
+    REQUIRE_FALSE( 0 > TypeWithLit0Comparisons{} );
+    REQUIRE( TypeWithLit0Comparisons{} >= 0 );
+    REQUIRE_FALSE( 0 >= TypeWithLit0Comparisons{} );
+
+    REQUIRE( TypeWithLit0Comparisons{} == 0 );
+    REQUIRE_FALSE( 0 == TypeWithLit0Comparisons{} );
+    REQUIRE( TypeWithLit0Comparisons{} != 0 );
+    REQUIRE_FALSE( 0 != TypeWithLit0Comparisons{} );
+}
+
+namespace {
+    struct MultipleImplicitConstructors {
+        MultipleImplicitConstructors( double ) {}
+        MultipleImplicitConstructors( int64_t ) {}
+        bool operator==( MultipleImplicitConstructors ) const { return true; }
+        bool operator!=( MultipleImplicitConstructors ) const { return true; }
+        bool operator<( MultipleImplicitConstructors ) const { return true; }
+        bool operator<=( MultipleImplicitConstructors ) const { return true; }
+        bool operator>( MultipleImplicitConstructors ) const { return true; }
+        bool operator>=( MultipleImplicitConstructors ) const { return true; }
+    };
+}
+TEST_CASE("#2571 - tests compile types that have multiple implicit constructors from lit 0",
+          "[compilation][approvals]") {
+    MultipleImplicitConstructors mic1( 0.0 );
+    MultipleImplicitConstructors mic2( 0.0 );
+    REQUIRE( mic1 == mic2 );
+    REQUIRE( mic1 != mic2 );
+    REQUIRE( mic1 < mic2 );
+    REQUIRE( mic1 <= mic2 );
+    REQUIRE( mic1 > mic2 );
+    REQUIRE( mic1 >= mic2 );
 }

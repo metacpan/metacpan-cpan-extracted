@@ -7,7 +7,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 # VERSION
 
-0.13
+0.16
 
 # SYNOPSIS
 
@@ -22,6 +22,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
               # write screenshots to img/
               screenshots_dir: img
               screenshot_events:
+              timestamps: 0
               # generate screenshots before every step
               pre_step: 1
               # and at the end of every scenario

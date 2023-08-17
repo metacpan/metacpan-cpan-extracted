@@ -35,12 +35,14 @@ Internal
 Joaquín
 José
 Kevin
+Logan
 LoggerWithMoniker
 MAXMIND
 MAXMIND's
 Mark
 MaxMind
 MaxMind's
+Nick
 Olaf
 Oschwald
 Oschwald's
@@ -78,6 +80,7 @@ mfowler
 moniker
 namespace
 namespaces
+nlogan
 oalders
 phair
 prepends

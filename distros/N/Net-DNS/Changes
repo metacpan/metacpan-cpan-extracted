@@ -1,4 +1,10 @@
-$Id: Changes 1922 2023-05-08 18:46:00Z willem $                       -*-text-*-
+$Id: Changes 1929 2023-06-01 11:40:49Z willem $                       -*-text-*-
+
+
+**** 1.39 Jun 1, 2023
+
+Fix rt.cpan.org #148340
+	udpsize uninitialized value
 
 
 **** 1.38 May 9, 2023

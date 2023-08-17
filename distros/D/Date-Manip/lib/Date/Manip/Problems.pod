@@ -225,12 +225,6 @@ of the complaints.  If not, people are always welcome to stick with
 the 5.xx release. I will continue to support the 5.xx releases for a
 couple years (though I do NOT plan to add functionality to it).
 
-These complaints come both from both the CPAN ratings site:
-
-   http://cpanratings.perl.org/dist/Date-Manip
-
-and from personal email.
-
 =over 4
 
 =item B<Requires perl 5.10>

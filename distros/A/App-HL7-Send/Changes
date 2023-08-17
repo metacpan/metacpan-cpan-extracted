@@ -1,3 +1,8 @@
+0.05 2023-06-22T10:32:22+02:00
+ - Fix test of run on Windows.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.04 2022-10-19T09:21:05+02:00
  - Rename example to better name.
  - Rewrite bugtracker to github.

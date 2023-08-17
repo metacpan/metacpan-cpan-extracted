@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-# inserted by Dist::Zilla::Plugin::FFI::CheckLib 1.05
+# inserted by Dist::Zilla::Plugin::FFI::CheckLib 1.07
 use FFI::CheckLib;
 check_lib_or_exit(
   alien => 'Alien::ZMQ::latest',
@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "locale" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.18",
+  "VERSION" => "1.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -124,7 +124,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 if (isnt_os('MSWin32')) {
 test_requires('Sys::SigAction', '0')
 }
@@ -140,7 +140,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;

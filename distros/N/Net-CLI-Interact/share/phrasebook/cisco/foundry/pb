@@ -14,7 +14,7 @@ prompt user
     match /Login Name: ?$/
 
 prompt pass
-    match /Password: ?$/
+    match /[Pp]assword: ?$/
 
 macro begin_configure
     send configure terminal

@@ -1,5 +1,14 @@
 Revision history for Perl extension Data::Tools
 
+
+1.41 2023-08-11
+
+    - added new plain hash key=value protocol to Data::Tools::Socket::Protocols.
+
+1.40 2023-07-08
+
+    - added Data::Tools::Socket::Protocols
+
 1.30 2022-05-18
 
     Data::Tools::CSV

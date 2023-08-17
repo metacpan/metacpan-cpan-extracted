@@ -1,0 +1,33 @@
+Revision history for Perl extension Random::Skew.
+
+0.09
+    - Test::NoWarnings 'had_no_warnings' throws a false error on windows (test-count off by 1)
+    - Sayonara Test::NoWarnings, buh bye
+
+0.08
+    - giving up tryna figure out how to get Error::Pure::Utils as optional
+    - no more reliance on Error::Pure::Utils at all
+
+0.07 Thu 06 Jul 2023 01:53:43 PM CDT
+    - stray files mentioned in MANIFEST, fixed
+
+0.06 Mon 26 Jun 2023 04:52:57 PM CDT
+    - better ordering for examples/wide-range.pl output
+    - cleaned up some documentation snags
+    - prereq for build_requires in META.*: Error::Pure::Utils, Test::NoWarnings
+
+0.05 Mon 26 Jun 2023 04:29:29 PM CDT
+    - cpan tester fixes (pod)
+
+0.04 Tue 20 Jun 2023 06:33:43 PM CDT
+    - Metadata fixes: Changes, MANIFEST, MANIFEST.SKIP, etc
+
+0.03 Tue 20 Jun 2023 01:24:56 PM CDT
+    - less strictness on perl version
+
+0.02  Mon 19 Jun 2023 05:25:10 PM CDT
+    - including 'examples' directory
+
+0.01  Mon Mar 14 14:49:10 2022
+	- original version; created by h2xs 1.23 with options
+		-X Random::Skew

@@ -1,16 +1,17 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
 #ifndef CATCH_XMLWRITER_HPP_INCLUDED
 #define CATCH_XMLWRITER_HPP_INCLUDED
 
-#include <catch2/internal/catch_stream.hpp>
+#include <catch2/internal/catch_reusable_string_stream.hpp>
 #include <catch2/internal/catch_stringref.hpp>
 
+#include <iosfwd>
 #include <vector>
 
 namespace Catch {
@@ -77,11 +78,11 @@ namespace Catch {
             }
 
         private:
-            mutable XmlWriter* m_writer = nullptr;
+            XmlWriter* m_writer = nullptr;
             XmlFormatting m_fmt;
         };
 
-        XmlWriter( std::ostream& os = Catch::cout() );
+        XmlWriter( std::ostream& os );
         ~XmlWriter();
 
         XmlWriter( XmlWriter const& ) = delete;

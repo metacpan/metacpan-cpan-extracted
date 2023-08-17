@@ -1,12 +1,26 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+if (NOT DEFINED ${PROJECT_NAME})
+    set(NOT_SUBPROJECT ON)
+else()
+    set(NOT_SUBPROJECT OFF)
+endif()
+
 PROJECT(panda-lib LANGUAGES CXX)
 
 set(LIB_TYPE STATIC)
-option(PANDALIB_BUILD_TESTS OFF)
-if (${PANDALIB_BUILD_TESTS})
+
+option(PANDALIB_TESTS OFF)
+option(PANDALIB_TESTS_IN_ALL ${NOT_SUBPROJECT})
+
+if (${PANDALIB_TESTS_IN_ALL})
     set(EXCLUDE_TEST)
 else()
     set(EXCLUDE_TEST EXCLUDE_FROM_ALL)
+endif()
+
+if (PANDALIB_FETCH_DEPS)
+    include(FetchDeps.cmake)
 endif()
 
 file(GLOB_RECURSE libPandaSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cc")
@@ -60,6 +74,8 @@ endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC ${panda-lib-libraries})
 
 ########################tests#######################################
+if (${PANDALIB_TESTS})
+
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
 
 add_library(${PROJECT_NAME}-tests STATIC EXCLUDE_FROM_ALL ${testSource})
@@ -75,6 +91,8 @@ add_executable(MyTest ${EXCLUDE_TEST} ${testSource})
 target_link_libraries(MyTest ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
 add_test(${PROJECT_NAME} MyTest)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS MyTest)
+
+endif()
 
 ########################install#####################################
 install(DIRECTORY src/ DESTINATION include FILES_MATCHING PATTERN "*.h")

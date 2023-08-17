@@ -14,7 +14,9 @@ BEGIN
     use ok( 'Module::Generic::SharedMem' ) || bail_out( "Unable to load Module::Generic::SharedMem" );
     use ok( 'Module::Generic::SharedMemXS' ) || bail_out( "Unable to load Module::Generic::SharedMemXS" );
     our $IS_SUPPORTED = 1;
-    if( !Module::Generic::SharedMem->supported )
+    if( !Module::Generic::SharedMem->supported ||
+        # Some smokers do not have share memory, so running this test is useless
+        ( $ENV{PERL_CR_SMOKER_CURRENT} && $Config{osname} eq 'freebsd' ) )
     {
         # plan skip_all => 'IPC::SysV not supported on this system';
         $IS_SUPPORTED = 0;

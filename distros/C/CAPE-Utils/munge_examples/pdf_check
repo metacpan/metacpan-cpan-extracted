@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+my @adobe_paths = (
+	'C:\Program Files (x86)\Common Files\Adobe\ARM\1.0\AdobeARM.exe',
+	'C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe',
+	'C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\Reader_sl.exe'
+);
+
+if (   defined( $report->{info} )
+	&& defined( $report->{info}{category} )
+	&& $report->{info}{category} eq 'file'
+	&& defined( $report->{info} )
+	&& defined( $report->{info} )
+	&& defined( $report->{info}{package} )
+	&& $report->{info}{package} eq 'pdf' )
+{
+	# for saving the adbobe PIDs
+	$all_scratch{adobe_pids} = {};
+
+	# go through check proc dump and see if the path matches the expected
+	my $int = 0;
+	while ( defined( $report->{procdump}[$int] ) ) {
+		foreach my $adobe_path (@adobe_paths) {
+			if ( $report->{procdump}[$int]{process_path} eq $adobe_path ) {
+				$all_scratch{adobe_pids}{ $report->{procdump}[$int]{pid} } = $report->{procdump}[$int]{pid};
+			}
+		}
+		$int++;
+	}
+
+	print "Looks like a PDF... munging... Adobe PIDs=" . join( ',', keys( %{ $all_scratch{adobe_pids} } ) ) . "\n";
+	$munge_it = 1;
+} ## end if ( defined( $report->{info} ) && defined...)

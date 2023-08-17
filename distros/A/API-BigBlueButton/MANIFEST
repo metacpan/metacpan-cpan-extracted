@@ -8,6 +8,8 @@ lib/API/BigBlueButton.pm
 lib/API/BigBlueButton/Requests.pm
 lib/API/BigBlueButton/Response.pm
 minil.toml
-t/00_compile.t
+t/001_compile.t
+t/002_bigbluebutton.t
+t/003_bigbluebutton_requests.t
 META.yml
 MANIFEST

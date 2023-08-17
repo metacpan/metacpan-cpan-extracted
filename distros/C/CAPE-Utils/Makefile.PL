@@ -13,7 +13,8 @@ my %WriteMakefileArgs = (
 	INST_SCRIPT      => 'bin',
 	EXE_FILES        => [
 		'src_bin/cape_utils',              'src_bin/mojo_cape_submit',
-		'src_bin/suricata_extract_submit', 'src_bin/suricata_extract_submit_extend'
+		'src_bin/suricata_extract_submit', 'src_bin/suricata_extract_submit_extend',
+		'src_bin/mojo_cape_submit_extend'
 	],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
@@ -28,9 +29,9 @@ my %WriteMakefileArgs = (
 		'File::Slurp'           => '0',
 		'Config::Tiny'          => '2.28',
 		'Text::ANSITable'       => '0.608',
-		'YAML'                  => 0,
-		'IPC::Cmd'              => 0,
-		'File::Spec'            => 0,
+		'YAML'                  => '0',
+		'IPC::Cmd'              => '0',
+		'File::Spec'            => '0',
 		'Net::Subnet'           => '0',
 		'Mojolicious::Lite'     => '0',
 		'Crypt::Digest::SHA256' => '0',
@@ -49,6 +50,8 @@ my %WriteMakefileArgs = (
 		'Gzip::Faster'          => '0',
 		'MIME::Base64'          => '0',
 		'File::ReadBackwards'   => '0',
+		'Proc::PID::File'       => '1.29',
+		'Statistics::Lite'      => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'CAPE-Utils-*' },

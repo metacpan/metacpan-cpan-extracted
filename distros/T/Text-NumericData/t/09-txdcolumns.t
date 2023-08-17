@@ -16,6 +16,7 @@ ok( txdtest([@defcon, '--lineend=UNIX', 'z','x'], 'test1.dat', 'test-txdcolumns3
 sub txdtest
 {
 	my ($args, $infile, $reffile) = @_;
+	my @argscopy = @{$args};
 	my $outstr;
 	open(my $in, '<', "$prefix/$infile") or die "cannot open input $infile\n";
 	open(my $out, '>', \$outstr);
@@ -24,5 +25,18 @@ sub txdtest
 	close($in);
 
 	open($out, '<', \$outstr);
-	return compare($out, "$prefix/$reffile") == 0;
+	if(compare($out, "$prefix/$reffile") == 0)
+	{
+		return 1;
+	} else
+	{
+		print STDERR "Comparison failed.\n";
+		print STDERR "ARGS: ".join(' ',(map {"'$_'"} @argscopy))."\n";
+		print STDERR "REFERENCE:\n";
+		open(my $ref, '<', "$prefix/$reffile");
+		while(<$ref>){ print STDERR; }
+		close($ref);
+		print STDERR "END.\nOUTPUT:\n".$outstr."END.\n";
+		return 0;
+	}
 }

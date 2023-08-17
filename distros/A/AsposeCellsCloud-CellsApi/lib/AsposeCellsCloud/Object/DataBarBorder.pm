@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'color' => {
      	datatype => 'Color',
      	base_name => 'Color',
-     	description => '',
+     	description => 'Gets or sets the border`s color of data bars specified by a conditional formatting rule.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'Type',
-     	description => '',
+     	description => 'Gets or sets the border`s type of data bars specified by a conditional formatting rule.',
      	format => '',
      	read_only => '',
      		},    

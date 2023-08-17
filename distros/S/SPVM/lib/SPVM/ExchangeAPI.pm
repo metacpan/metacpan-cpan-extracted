@@ -69,7 +69,7 @@ sub new_object_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension == 1) {
@@ -89,7 +89,7 @@ sub new_object_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension == 1) {
@@ -151,7 +151,7 @@ sub new_mulnum_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension == 1) {
@@ -171,7 +171,7 @@ sub new_mulnum_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension == 1) {
@@ -191,7 +191,7 @@ sub new_mulnum_array_from_bin {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension == 1) {
@@ -210,7 +210,7 @@ sub new_muldim_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension >= 2 && $type_dimension <= 255) {
@@ -230,7 +230,7 @@ sub new_muldim_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the basic type name could not be extracted";
+    confess "The type name \$type_name was parsed, but the class name could not be extracted";
   }
   
   unless ($type_dimension >= 2 && $type_dimension <= 255) {
@@ -245,9 +245,9 @@ sub new_muldim_array_len {
 }
 
 sub class {
-  my ($self, $class_name) = @_;
+  my ($self, $basic_type_name) = @_;
   
-  my $class = SPVM::ExchangeAPI::Class->__new(__class_name => $class_name, __api => $self);
+  my $class = SPVM::ExchangeAPI::Class->__new(__name => $basic_type_name, __api => $self);
   
   return $class;
 }
@@ -255,7 +255,7 @@ sub class {
 sub new_error {
   my ($self) = @_;
   
-  my $error = SPVM::ExchangeAPI::Error->new(code => 0);
+  my $error = SPVM::ExchangeAPI::Error->new(id => 0);
   
   return $error;
 }
@@ -348,13 +348,13 @@ Options:
 
 An execution environment.
 
-C<env> must be a L<SPVM::Bulder::Env> or L<SPVM::BlessedObject::Class> object of the L<Env|SPVM::Env> class.
+C<env> must be a L<SPVM::Bulder::Env> or L<SPVM::BlessedObject::Class> object of the L<Native::Env|SPVM::Native::Env> class.
   
 =item C<stack>
 
 An call stack.
 
-C<stack> must be a L<SPVM::Bulder::Stack> or L<SPVM::BlessedObject::Class> object of the L<Stack|SPVM::Stack> class.
+C<stack> must be a L<SPVM::Bulder::Stack> or L<SPVM::BlessedObject::Class> object of the L<Native::Stack|SPVM::Native::Stack> class.
 
 =back
 
@@ -791,7 +791,7 @@ If the $array is a L<SPVM::BlessedObject::Array> object, returns itself.
 
 Exceptions:
 
-If the type name $type_name was parsed, but the basic type name could not be extracted, an exception is thrown.
+If the type name $type_name was parsed, but the class name could not be extracted, an exception is thrown.
 
 The $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
@@ -817,7 +817,7 @@ Creates a SPVM object array(1-dimensional) with the type name $type_name and the
 
 Exceptions:
 
-If the type name $type_name was parsed, but the basic type name could not be extracted, an exception is thrown.
+If the type name $type_name was parsed, but the class name could not be extracted, an exception is thrown.
 
 The $length must be greater than or equal to 0. Otherwise an exception is thrown.
 
@@ -888,7 +888,7 @@ Each value of the hash reference is coverted by the conversion of L</"byte Type 
 
 Exceptions:
 
-If the type name $type_name was parsed, but the basic type name could not be extracted, an exception is thrown.
+If the type name $type_name was parsed, but the class name could not be extracted, an exception is thrown.
 
 All fields of the element type of the $type_name must be defined. Otherwise an exception is thrown.
 
@@ -1081,9 +1081,9 @@ Examples:
 
 =head2 class
 
-  my $class = $api->class($class_name);
+  my $class = $api->class($basic_type_name);
 
-Creates a new L<SPVM::ExchangeAPI::Class> object with the class name $class_name, and returns it.
+Creates a new L<SPVM::ExchangeAPI::Class> object with the class name $basic_type_name, and returns it.
 
 Examples:
   
@@ -1106,7 +1106,7 @@ The $object must be a SPVM::BlessedObject object. Otherwise an exception is thro
 
 Creates a new L<SPVM::ExchangeAPI::Error> object, and returns it.
 
-The error code is set to 0.
+The error id is set to 0.
 
 =head2 call_method
   

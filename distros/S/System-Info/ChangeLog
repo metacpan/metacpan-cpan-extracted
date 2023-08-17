@@ -1,18 +1,27 @@
+0.064	- 2023-07-31,  H.Merijn Brand
+    * Refine requirements based on CVE's
+    * Filter undefined values in CPU info (issue#9)
+    * Add Ubuntu 23.04
+    * Add Rockylinux 8.8
+    * Add Synology DSM 7.2
+    * Add Raspbian 11.6
+    * Use newest Module::Release
+
 0.063	- 2023-01-06,  H.Merijn Brand
-    * Add openSUSE Leap-15.3
-    * Check DSM-7.0.1 update 2
+    * Add openSUSE Leap 15.3
+    * Check DSM 7.0.1 update 2
     * Add openSUSE Leap 15.4 Beta
     * Add Sys::OsRelease to SEE ALSO
-    * Add DSM-7.1
-    * Add Rocky-8.6
-    * Add Rocky-9.0
-    * Add OmniOS-11-151042
-    * Add Rocky-8.7
+    * Add Synology DSM 7.1
+    * Add Rockylinux 8.6
+    * Add Rockylinux 9.0
+    * Add OmniOS 11-151042
+    * Add Rockylinux 8.7
     * It's 2023
 
 0.062	- 2022-01-01,  H.Merijn Brand
-    * Add Rocky-8.5
-    * Add Synology DSM-7.0
+    * Add Rockylinux 8.5
+    * Add Synology DSM 7.0
     * It's 2022
 
 0.061	- 2021-08-10,  H.Merijn Brand
@@ -25,16 +34,16 @@
     * Switch Test::NoWarnings → Test::Warnings
     * Get more info on Darwin
     * Add Raspbian 10.9
-    * Add Rocky Linux 8.3 RC1
+    * Add Rockylinux 8.3 RC1
     * Add CentOS 8.3
     * Add CentOS 8 Stream
-    * Add Rocky Linux 8.4
+    * Add Rockylinux 8.4
     * Mac M1 does not show CPU speed: suppress warnings (issue#7)
 
 0.060	- 2020-12-21,  H.Merijn Brand
     * Use sysctl on Darwin
     * Compare to Devel::Platform::Info
-    * Add CentOS-7.7
+    * Add CentOS 7.7
     * Add openSUSE Leap 15.1
     * Add Oracle Linux 7.7
     * Add CentOS 8.1
@@ -42,7 +51,7 @@
     * Add Oracle Linux 7.8
     * Prevent false negative CPANTESTERS fail reports
     * Add CentOS 8.2
-    * Add openSUSE-15.2
+    * Add openSUSE 15.2
     * Add CentOS 7.8
     * Add CentOS 7.9
     * Add Oracle Linux 7.9
@@ -50,9 +59,9 @@
 
 0.059	- 2019-07-11,  H.Merijn Brand
     * Add CentOS 7.5
-    * Add DSM-6.2
-    * Add openSUSE-42.3
-    * Add openSUSE-15.0
+    * Add Synology DSM 6.2
+    * Add openSUSE 42.3
+    * Add openSUSE 15.0
     * Add Mac::OSVersion to Darwin's SEE ALSO
     * It's 2019
     * Add Oracle Linux 7.6
@@ -81,10 +90,10 @@
 0.056	- 2017-09-22,  H.Merijn Brand
     * Use Darwin info internally lowercase (RT#97441 from Test::Smoke)
     * Add arm for aarch64 (RT#119691)
-    * Add info for Ubuntu-16.04
+    * Add info for Ubuntu 16.04
     * Use lsb_release (command) as fallback
-    * Add fedora-27
-    * Add tests for Raspbian-9
+    * Add fedora 27
+    * Add tests for Raspbian 9
     * Fix cpu test for armv6 with new cpuinfo format
     * Add s390x support (RT#122772)
 
@@ -95,7 +104,7 @@
 
 0.054	- 2017-03-21,  H.Merijn Brand
     * It's 2017
-    * Add DSM-6.1
+    * Add Synology DSM 6.1
     * Add OpenSUSE 42.2
     * Improve /pro/cpuinfo parsing (RT#120559)
     * Add CentOS 7.3
@@ -103,20 +112,20 @@
 
 0.053	- 2016-09-19,  H.Merijn Brand
     * Add tests for NixOS 16.09
-    * Add tests for Fedora-23
-    * Add tests for OpenELEC-6.95.3 (7-beta)
-    * Add tests for Fedora-14
-    * Add tests for Raspbian-8
+    * Add tests for Fedora 23
+    * Add tests for OpenELEC 6.95.3 (7-beta)
+    * Add tests for Fedora 14
+    * Add tests for Raspbian 8
     * Add tests for opensuse Tumbleweed
     * Use DISTRIB_RELEASE
     * Use VERSION_ID (Tumbleweed)
 
 0.052	- 2016-07-11,  H.Merijn Brand
     * 0.051 had a version mismatch in the dist file
-    * Add tests for CentOS-7.2
+    * Add tests for CentOS 7.2
 
 0.051	- 2016-05-12,  H.Merijn Brand
-    * Add DSM-6.0
+    * Add Synology DSM 6.0
     * Test with perl 5.24.0
 
 0.050	- 2016-04-28,  H.Merijn Brand

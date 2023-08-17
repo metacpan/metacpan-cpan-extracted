@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetOleObjectRequest.name :   ,
-# DeleteWorksheetOleObjectRequest.sheetName :   ,
-# DeleteWorksheetOleObjectRequest.oleObjectIndex :   ,
-# DeleteWorksheetOleObjectRequest.folder :   ,
-# DeleteWorksheetOleObjectRequest.storageName :    
+# DeleteWorksheetOleObjectRequest.name : The workbook name.  ,
+# DeleteWorksheetOleObjectRequest.sheetName : The worsheet name.  ,
+# DeleteWorksheetOleObjectRequest.oleObjectIndex : Ole object index.  ,
+# DeleteWorksheetOleObjectRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetOleObjectRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_ole_object' } = { 
-    	summary => '',
+    	summary => 'Deletes an OLE object in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worsheet name.',
      	format => '',
      	read_only => '',
      		},
      'ole_object_index' => {
      	datatype => 'int',
      	base_name => 'oleObjectIndex',
-     	description => '',
+     	description => 'Ole object index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

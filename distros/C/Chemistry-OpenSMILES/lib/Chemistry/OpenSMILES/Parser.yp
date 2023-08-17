@@ -6,20 +6,14 @@ use warnings;
 use 5.0100;
 
 use Chemistry::OpenSMILES qw(
+    %bond_symbol_to_order
     is_aromatic
     is_chiral
     %normal_valence
     toggle_cistrans
 );
 use Graph::Undirected;
-use List::Util qw(any sum);
-
-my %bond_order = (
-    '-' => 1,
-    '=' => 2,
-    '#' => 3,
-    '$' => 4,
-);
+use List::Util qw( any sum );
 
 %}
 
@@ -314,7 +308,7 @@ sub parse
                 # Promote implicit hydrogen atoms into explicit ones
                 if( !exists $atom->{hcount} ) {
                     next if !exists $normal_valence{$atom->{symbol}};
-                    my $degree = sum map { exists $bond_order{$_} ? $bond_order{$_} : 1 }
+                    my $degree = sum map { $_ ne ':' && exists $bond_symbol_to_order{$_} ? $bond_symbol_to_order{$_} : 1 }
                                      map { $graph->has_edge_attribute( $atom, $_, 'bond' )
                                             ? $graph->get_edge_attribute( $atom, $_, 'bond' )
                                             : '-' }

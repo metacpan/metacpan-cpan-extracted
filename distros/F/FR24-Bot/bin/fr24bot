@@ -1,0 +1,429 @@
+#!/usr/bin/env perl
+#ABSTRACT: A Telegram bot for Flightradar24 antennas
+#PODNAME: fr24bot
+
+use 5.018;
+use utf8;
+use open qw( :encoding(UTF-8) :std );
+use FindBin qw($RealBin);
+if (-e "$RealBin/../dist.ini") {
+    use lib "$RealBin/../lib";
+}
+use WWW::Telegram::BotAPI;
+use Data::Dumper;
+use Term::ANSIColor;
+use JSON::PP;
+use Getopt::Long;
+use Time::HiRes qw(gettimeofday tv_interval);
+use FR24::Bot;
+use FR24::Utils;
+our $conf;
+my $time_start = [gettimeofday];
+my $opt_verbose;
+my $opt_debug;
+my $opt_token;
+my $opt_ip;
+my $opt_test;
+my $opt_refresh = 30;
+my $opt_config = "$ENV{HOME}/.config/fr24-bot.ini";
+GetOptions(
+ 'a|api-key=s' => \$opt_token,
+ 'i|ip=s'      => \$opt_ip,
+ 'c|config=s'  => \$opt_config,
+ 'r|refresh=i' => \$opt_refresh,
+ 'verbose'     => \$opt_verbose,
+ 'debug'       => \$opt_debug,
+ 'test'        => \$opt_test,
+ 'version'     => sub { say basename($0). " " . $FR24::Utils::VERSION; exit 0;},
+);
+
+$opt_verbose = 1 if $opt_debug;
+
+# Load config
+if ( defined $opt_config and -e $opt_config ) {
+    say STDERR "Reading config from $opt_config" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig($opt_config);
+
+} elsif ( -e "$ENV{HOME}/.config/fr24-bot.ini" ) {
+  	say STDERR "Reading config from ~/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$ENV{HOME}/.config/fr24-bot.ini");
+} elsif ( -e "$RealBin/.config/fr24-bot.ini" ) {
+    say STDERR "Reading config from $RealBin/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$RealBin/.config/fr24-bot.ini");
+}
+ 
+
+# If API KEY is provided in the command line, use it
+if ( defined $opt_token and $opt_token ne 'default' ) {
+    say STDERR "Using token from command line" if ($opt_verbose);
+    $conf->{telegram}->{apikey} = $opt_token;
+} elsif ( defined $conf->{telegram}->{apikey}) {
+    say STDERR "Using token from config file" if ($opt_verbose);
+    $opt_token = $conf->{telegram}->{apikey};
+} else {
+    say STDERR Dumper $conf if ($opt_verbose);
+    die "APIKey file not found. Can be in:\n - $ENV{HOME}/.config/fr24-bot.ini\n - $RealBin/.config/fr24-bot.ini\n - --token TOKEN\n";
+}
+
+
+die "ERROR: No API key provided\n" unless defined $opt_token;
+my $api = WWW::Telegram::BotAPI->new( token => $opt_token );
+
+# Bump up the timeout when Mojo::UserAgent is used (LWP::UserAgent uses 180s by default)
+$api->agent->can("inactivity_timeout") and $api->agent->inactivity_timeout(45);
+my $me = $api->getMe or die;
+my ( $offset, $updates ) = 0;
+ 
+my $bot = FR24::Bot->new(
+    -conf => $conf,
+    -name => "fr24-bot",
+    -test => $opt_test,
+    -refresh => $opt_refresh,
+);
+my $commands = {
+
+
+
+    "about" => sub {
+        
+        my $self = shift;
+        say STDERR Dumper $self;
+        # Requires and argument
+        my $flight_id = shift;
+        my $message = "[$flight_id](https://www.flightradar24.com/$flight_id)";
+       
+        +{
+            method     => "sendMessage",
+            parse_mode => "Markdown",
+            text       => $message,
+        };
+    },
+    "tot" => sub {
+        eval {
+            $bot->update();
+        };
+        my $message = "Total flights: *" . $bot->{total} . "*";
+
+        +{
+            method     => "sendMessage",
+            parse_mode => "Markdown",
+            text       => $message,
+        };
+    },
+
+    "list" => sub {
+        eval {
+            $bot->update();
+        };
+        
+        my $message = "Seen flights: ";
+        my $untracked = 0;
+        for my $f (sort keys %{ $bot->{flights} }) {
+            if (length $bot->{flights}{$f}->{callsign} > 0) {
+                $message .= $bot->{flights}{$f}->{callsign} . ", " 
+            } else {
+                $untracked += 1;
+            }
+        }
+        $message .= " and $untracked untracked.";
+
+        +{
+            method     => "sendMessage",
+            parse_mode => "Markdown",
+            text       => $message,
+        };
+    },
+    "temp" => sub {
+        my $s = getStatus();
+
+        #sprintf "The device is ready.\n $emoji{temp} %s degrees.\nStay warm %s!", sprintf("%.1f", $s->{status}->{temperature}), shift->{from}{username};
+        print "The device is ready.\n %s degrees.\nStay warm %s!",
+          sprintf( "%.1f", $s->{status}->{temp} ),
+          shift->{from}{username};
+    },
+
+    "status" => sub {
+        my $s     = getStatus();
+        my $relay = " not active";
+
+        $relay = "heater is active now"
+          if ( $s->{status}->{heater_active} eq 'ON' );
+
+        my $output =
+          sprintf " *%s°C* \n*Load*: %s%%\n",
+          sprintf( "%.1f", $s->{status}->{temp} ),
+          sprintf( "%.1f", $s->{status}->{load} );
+
+        
+        +{
+            method     => "sendMessage",
+            parse_mode => "Markdown",
+            text       => $output,
+        };
+    },
+
+    "_unknown" => "Unknown command :( Try /help"
+};
+
+# Generate the command list dynamically.
+$commands->{help} =
+  "Hello, this is your frienly lab technician, Giovanni! Try /" . join " - /",
+  grep !/^_/, keys %$commands;
+
+# Special message type handling
+my $message_types = {
+
+    # Receive contacts!
+    "contact" => sub {
+        my $contact = shift->{contact};
+        +{
+            method     => "sendMessage",
+            parse_mode => "Markdown",
+            text       => sprintf(
+                "Here's some information about this contact.\n"
+                  . "- Name: *%s*\n- Surname: *%s*\n"
+                  . "- Phone number: *%s*\n- Telegram UID: *%s*",
+                $contact->{first_name},   $contact->{last_name} || "?",
+                $contact->{phone_number}, $contact->{user_id}   || "?"
+            )
+        };
+    }
+};
+
+verbose("Hello! I am ". $me->{result}{username} . ". Starting..." );
+deb("Debug=$opt_debug;Verbose=$opt_verbose;");
+my $clock_tick = 0;
+
+while (1) {
+    my $time_cycle = [gettimeofday];
+    $clock_tick++;
+    $updates = $api->getUpdates(
+        {
+            timeout => 30,    # Use long polling
+            $offset ? ( offset => $offset ) : ()
+        }
+    );
+    if ($opt_debug) {
+        my $time_now = [gettimeofday];
+        my $since_start_diff = tv_interval($time_start, $time_now);
+        my $cycle_diff = tv_interval($time_cycle, $time_now);
+        printf STDERR "  [$clock_tick] Cycle %d: %0.3f s (since start: %0.3f s)\n", $clock_tick, $cycle_diff, $since_start_diff;
+    }
+    unless ( $updates and ref $updates eq "HASH" and $updates->{ok} ) {
+        warn "WARNING: getUpdates returned a false value - trying again...";
+        next;
+    }
+    for my $u ( @{ $updates->{result} } ) {
+        deb("  for u in updates: $u->{update_id}");
+
+        if ($opt_verbose) {
+            print STDERR color('bold magenta'), "== REQUEST ==", color('reset'),
+              "\n";
+            print STDERR color('magenta'),  Dumper $u;
+            print STDERR color('reset'), "\n";
+        }
+        # Sender iD
+        my $from_id = $u->{message}{from}{id};
+        if (FR24::Utils::authorized($conf, $from_id)) {
+            print STDERR color('bold green'), "AUTHORIZED\n", color('reset');
+        } else {
+            $api->sendMessage(
+                {
+                    chat_id => $u->{message}{chat}{id},
+                    text => "Hello! This is a private bot. You are not authorized to use it.",
+                }
+            );
+            print STDERR color('bold red'), "UNAUTHORIZED\n", color('reset');
+            print "ACCESS_ATTEMPT: $from_id\n";
+            next;
+        }
+        $offset = $u->{update_id} + 1 if $u->{update_id} >= $offset;
+
+        if ( my $text = $u->{message}{text} ) {    
+            # Text message (i.e. not a photo / sticker)
+
+            printf "START. Incoming text message from \@%s\n",    $u->{message}{from}{username};
+            printf "       Text: %s\n", $text;
+
+            if ( $text !~ m!^/[^_].! ) {
+
+                # Not a command
+                print STDERR color('red'), "Not a command\n", color('reset');
+                next;
+            }
+
+            my ( $cmd, @params ) = split / /, $text;
+            
+            deb(qq(cmd="$cmd"));
+            deb("params=".join(',', @params));
+            my $res = $commands->{ substr( $cmd, 1 ) } || $commands->{_unknown};
+            deb("ref=" . ref $res);
+
+            # Pass to the subroutine the message object, and the parameters passed to the cmd.
+            # ref $res == CODE --> valid command
+            $res = $res->( $u->{message}, @params ) if ref $res eq "CODE";
+
+
+            say STDERR color('blue'), Dumper $res;
+            say STDERR color('reset');
+            next unless $res;
+
+
+            my $method = ref $res
+              && $res->{method} ? delete $res->{method} : "sendMessage";
+            $api->$method(
+                {
+                    chat_id => $u->{message}{chat}{id},
+                    ref $res ? %$res : ( text => $res )
+                }
+            );
+            print "END.   Reply sent chat_id:", $u->{message}{chat}{id}, ".\n";
+        }
+
+        # Handle other message types.
+        for my $type ( keys %{ $u->{message} || {} } ) {
+            next
+              unless exists $message_types->{$type}
+              and ref( my $res = $message_types->{$type}->( $u->{message} ) );
+            my $method = delete( $res->{method} ) || "sendMessage";
+            $api->$method(
+                {
+                    chat_id => $u->{message}{chat}{id},
+                    %$res
+                }
+            );
+        }
+    }
+}
+ 
+
+sub checkProcess {
+
+    # Check if <FR24.py> heating is on
+    my $cmd = 'ps aux';
+    my @out = `$cmd 2>/dev/null`;
+    foreach my $line (@out) {
+        if ( $line =~ /FR24\.py/ and $line =~ /-a start/ ) {
+            return 1;
+        }
+    }
+    return 0;
+}
+ 
+
+sub lockfile_age {
+    my $file = "$ENV{HOME}/.FR24.lock";
+    if ( -e $file ) {
+        my $created = ( stat($file) )[9];
+        my $secs    = time - $created;
+        return formatsec($secs);
+    }
+    else {
+        return '';
+    }
+}
+
+sub formatsec {
+    my $time = shift;
+    my $days = int( $time / 86400 );
+    $time -= ( $days * 86400 );
+    my $hours = int( $time / 3600 );
+    $time -= ( $hours * 3600 );
+    my $minutes = int( $time / 60 );
+    my $seconds = $time % 60;
+
+    $days    = $days < 1    ? '' : $days . 'd ';
+    $hours   = $hours < 1   ? '' : $hours . 'h ';
+    $minutes = $minutes < 1 ? '' : $minutes . 'm ';
+    $time = $days . $hours . $minutes . $seconds . 's';
+    return $time;
+}
+
+sub getStatus {
+
+    my $result->{status};
+    # Placeholder 
+    my $date_cmd = 'date +"%d/%m/%Y %H:%M:%S"';
+    my $load_cmd = 'uptime | sed "s/.*: //;s/,.*//;s/  / /g"';
+    my $temp_cmd = 'cat /sys/class/thermal/thermal_zone0/temp';
+
+    my $date = `$date_cmd`;
+    my $load = `$load_cmd`;
+    my $temp = `$temp_cmd`;
+    my $temp_C = sprintf("%.1f", $temp / 1000);
+    chomp($date);
+    chomp($load);
+    chomp($temp);
+    $result->{status}->{date} = $date;
+    $result->{status}->{load} = $load;
+    $result->{status}->{temp} = $temp_C;
+    return $result;
+}
+
+sub getTempHist {
+    return undef;
+}
+
+ 
+
+sub simple_disk_free {
+    my $nice_output = '';
+    my @lines       = `df | grep dev.[sdv]`;
+    foreach my $line (@lines) {
+        my ( $volume, $size, $used, $avail ) = split /\s+/, $line;
+        next unless ($size);
+        verbose(" [DISK] $volume $used/$size (avail: $avail)\n");
+        my $ratio = sprintf( "%.1f", 100 * $used / $size );
+        my $free = sprintf( "%.1f", $avail / ( 1000 * 1000 ) ) . 'Gb';
+        $nice_output .= "*$volume* ($ratio\% full): $free free\n";
+    }
+
+    return $nice_output || 'Nothing to show';
+}
+
+sub verbose {
+    return undef if ( not $opt_verbose );
+    print STDERR color('cyan'), '[#] ', color('reset'), $_[0], "\n";
+
+}
+
+sub deb {
+    return undef if ( not $opt_debug );
+    print STDERR color('yellow'), '[~] ', color('reset'), $_[0], "\n";
+    return 0;
+    
+}
+
+sub deb_warn {
+    return undef if ( not defined $opt_debug );
+    print STDERR  color('yellow'), $_[0], color('reset'), "\n";
+
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fr24bot - A Telegram bot for Flightradar24 antennas
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

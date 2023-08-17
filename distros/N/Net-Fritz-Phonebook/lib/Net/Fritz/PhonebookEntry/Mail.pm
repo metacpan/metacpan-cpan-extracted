@@ -5,10 +5,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-use Data::Dumper;
-
-use vars '$VERSION';
-$VERSION = '0.05';
+our $VERSION = '0.07';
 
 has entry => (
     is => 'ro',
@@ -46,7 +43,7 @@ sub build_structure( $self ) {
 
 =head1 SEE ALSO
 
-L<https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/X_contactSCPD.pdf>
+L<https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/x_contactSCPD.pdf>
 
 =cut
 
@@ -72,7 +69,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2017-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

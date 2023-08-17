@@ -6,9 +6,9 @@ Date::Manip::Offset::off355;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Dec  2 12:33:24 EST 2022
-#    Data version: tzdata2022g
-#    Code version: tzcode2022g
+#    Generated on: Wed Jun  7 12:25:40 EDT 2023
+#    Data version: tzdata2023c
+#    Code version: tzcode2023c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.91';
+$VERSION='6.92';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -40,16 +40,15 @@ $Offset        = '-07:00:00';
       'america/hermosillo',
       'america/mazatlan',
       'america/boise',
-      'america/yellowknife',
       'america/dawson_creek',
       'america/inuvik',
       'america/fort_nelson',
       'america/dawson',
       'america/whitehorse',
-      'america/chihuahua',
-      'america/ojinaga',
       'etc/gmt-7',
       'g',
+      'america/chihuahua',
+      'america/ojinaga',
       'america/north_dakota/beulah',
       'america/bahia_banderas',
       'america/north_dakota/new_salem',

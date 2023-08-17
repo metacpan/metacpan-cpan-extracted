@@ -3,6 +3,7 @@ package App::Test::DWG::LibreDWG::JSON;
 use strict;
 use warnings;
 
+use CAD::AutoCAD::Detect qw(detect_dwg_file);
 use Capture::Tiny qw(capture);
 use File::Copy;
 use File::Path qw(mkpath);
@@ -12,10 +13,32 @@ use Getopt::Std;
 use IO::Barf qw(barf);
 use Readonly;
 
+Readonly::Hash our %REL => (
+	'MC0.0' => 'r1.1',
+	'AC1.2' => 'r1.2',
+	'AC1.40' => 'r1.4',
+	'AC1.50' => 'r2.0',
+	'AC2.10' => 'r2.10',
+	'AC1001' => 'r2.4',
+	'AC1002' => 'r2.5',
+	'AC1003' => 'r2.6',
+	'AC1004' => 'r9',
+	'AC1006' => 'r10',
+	'AC1009' => 'r11',
+	'AC1012' => 'r13',
+	'AC1013' => 'r13c3',
+	'AC1014' => 'r14',
+	'AC1015' => 'r2000',
+	'AC1018' => 'r2004',
+	'AC1021' => 'r2007',
+	'AC1024' => 'r2010',
+	'AC1027' => 'r2013',
+	'AC1032' => 'r2018',
+);
 Readonly::Scalar our $DR => 'dwgread';
 Readonly::Scalar our $DW => 'dwgwrite';
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -64,6 +87,14 @@ sub run {
 	my $dwg_file_first = catfile($tmp_dir, 'first.dwg');
 	copy($self->{'_dwg_file'}, $dwg_file_first);
 
+	# Get magic string.
+	my $magic = detect_dwg_file($dwg_file_first);
+	if (! exists $REL{$magic}) {
+		print STDERR "dwgwrite for magic '$magic' doesn't supported.\n";
+		return 1;
+	}
+	my $dwgwrite_version = $REL{$magic};
+
 	# Verbose level.
 	my $v = '-v'.$self->{'_opts'}->{'v'};
 
@@ -76,7 +107,7 @@ sub run {
 
 	# Convert JSON to dwg file.
 	my $dwg_file_second = catfile($tmp_dir, 'second.dwg');
-	my $json_to_dwg_first = "$DW $v -o $dwg_file_second $json_file_first";
+	my $json_to_dwg_first = "$DW --as $dwgwrite_version $v -o $dwg_file_second $json_file_first";
 	if ($self->_exec($json_to_dwg_first, 'json_to_dwg')) {
 		return 1;
 	}
@@ -134,7 +165,7 @@ __END__
 
 =head1 NAME
 
-App::Test::DWG::LibreDWG::JSON - Base class for cpan-search script.
+App::Test::DWG::LibreDWG::JSON - Base class for test-dwg-libredwg-json script.
 
 =head1 SYNOPSIS
 
@@ -163,24 +194,48 @@ Returns 1 for error, 0 for success.
 
 =head1 EXAMPLE
 
-=for comment filename=test_dwg_file.pl
+=for comment filename=test_dwg_file_without_issue.pl
 
  use strict;
  use warnings;
 
  use App::Test::DWG::LibreDWG::JSON;
+ use File::Temp qw(tempfile);
+ use IO::Barf qw(barf);
+ use MIME::Base64;
+
+ my $dwg_in_base64 = <<'END';
+ QUMxLjQwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgIAAAAAAAAAAAAAAAAAAAAAAAAA
+ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAChA
+ AAAAAAAAIkAAAAAAAAAYQKEoVK4NihJAAAAAAAAAAAChKFSuDYoiQAAAAAAAAAAA8D8AAAAAAAAA
+ AAAAAAABAAEAmJmZmZmZyT+YmZmZmZmpPwEADwAAAA8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A
+ /wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/
+ AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A
+ /wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/
+ AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A
+ AAAAAAAAAAAffplKebb0PwIABAABAAEAAAAAAAAAAAAAAAAAAAAAANA/mJmZmZmZuT8AAAAAAAAA
+ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+ AAAAAAAAAAAAAAAAAA==
+ END
+
+ my (undef, $tmp_file) = tempfile();
+ barf($tmp_file, decode_base64($dwg_in_base64));
 
  # Arguments.
  @ARGV = (
          '-v9',
-         'TODO_DWG_FILE',
+         $tmp_file,
  );
 
  # Run.
- exit App::Test::DWG::LibreDWG::JSON->new->run;
+ my $exit_code = App::Test::DWG::LibreDWG::JSON->new->run;
+
+ # Print out.
+ print "Exit code: $exit_code\n";
 
  # Output like:
- # TODO
+ # Exit code: 0
 
 =head1 DEPENDENCIES
 
@@ -211,6 +266,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

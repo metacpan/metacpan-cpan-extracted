@@ -2,7 +2,7 @@ package Filter::signatures;
 use strict;
 use Filter::Simple;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 =head1 NAME
 
@@ -27,8 +27,8 @@ Filter::signatures - very simplistic signatures for Perl < 5.20
 
 =head1 DESCRIPTION
 
-This module implements a backwards compatibility shim for formal Perl subroutine
-signatures that were introduced to the Perl core with Perl 5.20.
+This module implements a backwards compatibility shim for formal Perl
+subroutine signatures that were introduced to the Perl core with Perl 5.20.
 
 =head1 CAVEATS
 
@@ -46,8 +46,8 @@ the application of this filter.
 
 =head2 Syntax peculiarities
 
-Note that this module inherits all the bugs of L<Filter::Simple> and potentially
-adds some of its own.
+Note that this module inherits all the bugs of L<Filter::Simple> and
+potentially adds some of its own.
 
 =head3 Slashes
 
@@ -105,8 +105,8 @@ better approach is to upgrade to Perl 5.20 or higher.
 
 To keep the argument parser simple, the parsing of regular expressions has been
 omitted. For Perl below 5.10, you cannot use regular expressions as default
-expressions. For higher Perl versions, this means that parentheses, curly braces
-and commas need to be explicitly escaped with a backslash when used as
+expressions. For higher Perl versions, this means that parentheses, curly
+braces and commas need to be explicitly escaped with a backslash when used as
 default expressions:
 
     sub foo( $x = /,/ ) { # WRONG!
@@ -224,9 +224,15 @@ sub parse_argument_list {
             $args[$_] =~ s/\n/ /g;
 
             # Named argument with default
-            if( $args[$_] =~ /^\s*([\$\%\@]\s*\w+)\s*=/ ) {
+            if( $args[$_] =~ m!^\s*([\$\%\@]\s*\w+)\s*(//=|\|\|=|=)\s*(.*)$! ) {
                 my $named = "$1";
-                push @defaults, "$args[$_] if \@_ <= $_;";
+                my $op = "$2";
+                my $val = "$3";
+                if( $op eq '=' ) {
+                    push @defaults, "$named $op $val if \@_ <= $_;";
+                } else {
+                    push @defaults, "$named $op $val;";
+                }
                 $args[$_] = $named;
 
             # Named argument
@@ -455,7 +461,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

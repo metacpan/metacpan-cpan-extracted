@@ -10,7 +10,7 @@ use Rex::Helper::Run;
 use Rex::Interface::Exec;
 use Net::OpenSSH::ShellQuoter;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 sub new {
   my $that  = shift;
@@ -62,7 +62,7 @@ sub update {
   my ( $self, $pkg, $option ) = @_;
 
   my $version = $option->{'version'} || '';
-  my $env     = $option->{'env'}     || ();
+  my $env     = $option->{'env'}     || {};
 
   Rex::Logger::debug( "Installing $pkg" . ( $version ? "-$version" : "" ) );
   my $cmd;

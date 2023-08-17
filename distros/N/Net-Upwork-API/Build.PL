@@ -25,7 +25,7 @@ my $builder = Module::Build->new(
     module_name         => 'Net::Upwork::API',
     license             => 'apache',
     dist_author         => 'Maksym Novozhylov <mnovozhilov@upwork.com>',
-    dist_version	=> '2.1.4',
+    dist_version	=> '2.2.0',
     dist_abstract       => 'Perl bindings for Upwork API (OAuth2)',
     build_requires => {
         'Test::More' => '0.66',
@@ -34,7 +34,7 @@ my $builder = Module::Build->new(
     requires => {
 	'perl' => '5.8.8',
 	'IO::Socket::SSL' => '1.965',
-        'Net::OAuth2' => '0.63',
+        'Net::OAuth2' => '0.67',
     },    
     meta_merge => { keywords => [qw( upwork oauth2 )], },
     meta_add   => {

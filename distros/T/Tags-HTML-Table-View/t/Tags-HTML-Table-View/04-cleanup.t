@@ -29,13 +29,6 @@ $obj->process;
 my $ret_ar = $tags->flush(1);
 is_deeply(
 	$ret_ar,
-	# XXX Bad output.
-	[
-		['b', 'table'],
-		['a', 'class', 'table'],
-		['b', 'tr'],
-		['e', 'tr'],
-		['e', 'table'],
-	],
+	[],
 	'Process again and test that data was cleaned.',
 );

@@ -1,0 +1,53 @@
+From 1ad9da675dedf22cddc4142b0ec1341722791c1a Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Tue, 9 May 2023 10:12:25 +0200
+Subject: [PATCH] Add callback to allow extensions to process a custom field
+ when created or updated
+
+---
+ share/html/Admin/CustomFields/Modify.html             | 3 +++
+ share/html/Admin/Queues/Modify.html                   | 1 +
+ share/html/Articles/Article/Elements/EditCustomFields | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/share/html/Admin/CustomFields/Modify.html b/share/html/Admin/CustomFields/Modify.html
+index beee4675a..26099c22f 100644
+--- a/share/html/Admin/CustomFields/Modify.html
++++ b/share/html/Admin/CustomFields/Modify.html
+@@ -442,6 +442,9 @@ if ( $ARGS{'Update'} && $id ne 'new' ) {
+         push (@results, $msg);
+     }
+ 
++    # Add oportunity for extensions to do something
++    $m->callback(CallbackName => 'Massage', CustomField => $CustomFieldObj, Results => \@results, ARGSRef => \%ARGS);
++
+     # Update any existing values
+     my $values = $CustomFieldObj->ValuesObj;
+     while ( my $value = $values->Next ) {
+diff --git a/share/html/Admin/Queues/Modify.html b/share/html/Admin/Queues/Modify.html
+index f47410290..35522ba9e 100644
+--- a/share/html/Admin/Queues/Modify.html
++++ b/share/html/Admin/Queues/Modify.html
+@@ -121,6 +121,7 @@
+       <& /Elements/EditCustomField, CustomField => $CF,
+                                     Object => $QueueObj, &>
+ </&>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CF, Object => $QueueObj);
+ % }
+ 
+ % if ( RT->Config->Get('Crypt')->{'Enable'} ) {
+diff --git a/share/html/Articles/Article/Elements/EditCustomFields b/share/html/Articles/Article/Elements/EditCustomFields
+index 5c8b7a068..bab37b5bd 100644
+--- a/share/html/Articles/Article/Elements/EditCustomFields
++++ b/share/html/Articles/Article/Elements/EditCustomFields
+@@ -56,6 +56,7 @@
+       Cols => 70
+     &>
+   </&>
++  $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CustomField, Object => $ArticleObj);
+ % }
+ <%INIT>
+ my $CustomFields;
+-- 
+2.30.2
+

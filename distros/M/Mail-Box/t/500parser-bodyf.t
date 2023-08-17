@@ -22,7 +22,7 @@ my $trusted = $Mail::Message::crlf_platform;
 ### First carefully read the first message
 ###
 
-my $parser = Mail::Box::Parser::Perl->new(filename => $src, trusted =>$trusted);
+my $parser = Mail::Box::Parser::Perl->new(filename => $src, trusted =>$trusted );
 ok(defined $parser,                "creation of parser");
 
 $parser->pushSeparator('From ');
@@ -68,12 +68,12 @@ cmp_ok(@lines, "==", $lines,         "lines of body");
 my @msgs;
 
 push @msgs,  # first message already read.
- { fields => scalar $head->names
- , lines  => $hard_coded_lines_msg0
- , size   => $hard_coded_length_msg0
- , sep    => $sep
- , subject=> $head->get('subject')
- };
+ +{ fields => scalar $head->names
+  , lines  => $hard_coded_lines_msg0
+  , size   => $hard_coded_length_msg0
+  , sep    => $sep
+  , subject=> $head->get('subject')
+  };
 
 while(1)
 {   my ($where, $sep) = $parser->readSeparator;

@@ -126,7 +126,7 @@ DEPENDENCIES
 
 SEE ALSO
     Wikidata::Reconcilation::Periodical
-        TODO
+        Wikidata reconcilation class for periodical.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Wikibase-Reconcilation>
@@ -142,5 +142,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -4,13 +4,13 @@
       "Thomas Orgis <thomas@orgis.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-NumericData",
    "prereqs" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "Text::NumericData" : {
          "file" : "lib/Text/NumericData.pm",
-         "version" : "2.003003"
+         "version" : "2.004001"
       },
       "Text::NumericData::App" : {
          "file" : "lib/Text/NumericData/App.pm",
@@ -139,6 +139,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.003003",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.004001",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

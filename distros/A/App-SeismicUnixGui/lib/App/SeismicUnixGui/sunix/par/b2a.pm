@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::par::b2a;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  B2A - convert binary floats to ascii				
+ PERL PROGRAM NAME:  B2A - convert binary floats to ascii				
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

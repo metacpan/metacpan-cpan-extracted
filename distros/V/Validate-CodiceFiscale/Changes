@@ -1,2 +1,13 @@
+0.004  2023-08-10 07:53:31 CEST
+   - Release after 58 PASSes on CPAN Testers (thanks!)
+
+0.003002  2023-08-08 22:13:54 CEST
+   - Switch from timegm_modern back to timegm for version compatibility
+
+0.003001  2023-08-06 22:26:59 CEST
+   - Add decode_cf()
+   - Add decoding and checks on places based on their codes and validity
+   - Rename birthdate to date and birthplace to place
+
 0.001  2023-03-18 21:29:59 CET
    - Initial release

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -95,9 +95,9 @@ is_display( [ [TEXT("( )",fg=>15,b=>1), BLANK(2), TEXT("First radio")],
       style => { fg => 3, u => 1 },
    );
 
-   is_deeply( { $button->pen->getattrs },
-              { fg => 3, u => 1 },
-              'Constructor pen attributes still sets widget pen' );
+   is( { $button->pen->getattrs },
+       { fg => 3, u => 1 },
+       'Constructor pen attributes still sets widget pen' );
 }
 
 done_testing;

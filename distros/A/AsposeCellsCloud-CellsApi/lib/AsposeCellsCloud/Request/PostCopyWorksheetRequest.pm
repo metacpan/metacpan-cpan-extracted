@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostCopyWorksheetRequest.name :   ,
-# PostCopyWorksheetRequest.sheetName :   ,
-# PostCopyWorksheetRequest.sourceSheet :   ,
-# PostCopyWorksheetRequest.options :   ,
-# PostCopyWorksheetRequest.sourceWorkbook :   ,
-# PostCopyWorksheetRequest.sourceFolder :   ,
-# PostCopyWorksheetRequest.folder :   ,
-# PostCopyWorksheetRequest.storageName :    
+# PostCopyWorksheetRequest.name : The workbook name.  ,
+# PostCopyWorksheetRequest.sheetName : The worksheet name.  ,
+# PostCopyWorksheetRequest.sourceSheet : Source worksheet.  ,
+# PostCopyWorksheetRequest.options : Represents the copy options.  ,
+# PostCopyWorksheetRequest.sourceWorkbook : source Workbook.  ,
+# PostCopyWorksheetRequest.sourceFolder : Original workbook folder.  ,
+# PostCopyWorksheetRequest.folder : Original workbook folder.  ,
+# PostCopyWorksheetRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_copy_worksheet' } = { 
-    	summary => '',
+    	summary => 'Copies contents and formats from another worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -152,56 +152,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'source_sheet' => {
      	datatype => 'string',
      	base_name => 'sourceSheet',
-     	description => '',
+     	description => 'Source worksheet.',
      	format => '',
      	read_only => '',
      		},
      'options' => {
      	datatype => 'CopyOptions',
      	base_name => 'options',
-     	description => '',
+     	description => 'Represents the copy options.',
      	format => '',
      	read_only => '',
      		},
      'source_workbook' => {
      	datatype => 'string',
      	base_name => 'sourceWorkbook',
-     	description => '',
+     	description => 'source Workbook.',
      	format => '',
      	read_only => '',
      		},
      'source_folder' => {
      	datatype => 'string',
      	base_name => 'sourceFolder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

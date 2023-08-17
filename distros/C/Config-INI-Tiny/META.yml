@@ -20,9 +20,9 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-INI-Tiny
-  license: http://dev.perl.org/licenses/
+  license: https://dev.perl.org/licenses/
   repository: https://github.com/ap/Config-INI-Tiny.git
-version: '0.105'
+version: '0.106'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2021

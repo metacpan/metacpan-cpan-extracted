@@ -7,7 +7,7 @@ package Comics::Plugin::CSectionComicsBonus;
 
 use parent qw(Comics::Fetcher::Cascade);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our $name    = "C-Section Comics";
 
@@ -27,7 +27,7 @@ our $name    = "C-Section Comics";
 
 # Retrieve from the archives page instead.
 
-our $url     = "http://www.csectioncomics.com/";
+our $url     = "https://www.csectioncomics.com/";
 our @patterns =
   (   qr{ <a \s+
            href="?(?<url>https?://www.csectioncomics.com/archives)"?>
@@ -41,7 +41,7 @@ our @patterns =
         }six,
       qr{ <div \s+ id="?bonus-comic"? \s+ style="?display:none"?> \s*
 	  <img \s+
-	   src="?(?<url>https?://.*?.csectioncomics.com/csectioncomics/
+	   src="?(?<url>https?://.*?.csectioncomics.com/
 		       wp-content/uploads/\d+/\d+/
 		       (?<image>.*?\.\w+))"? \s+
 	   alt(?:="(?<alt>.*?)" \s+)?

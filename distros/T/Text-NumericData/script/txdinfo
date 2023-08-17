@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use strict;
+
 # Integration into the usual framework is not so straightforward here.
 # This tool optionally operates on a given list of file names instead of data
 # from a pipe.
@@ -28,6 +30,7 @@ my @pars =
 , 'black',  $default->{black}, 'B', $help->{black}
 , 'findcol','','c','find a column by name'
 , 'cols',0,'','print number of columns only'
+, 'rows',0,'','print number of rows only'
 , 'coltitles',0,'','extract the column title line'
 , 'coltitle',0,'','print title of specified column'
 );
@@ -38,7 +41,7 @@ $param = Config::Param::get(
   info=>$infostring
 , version=>$Text::NumericData::version,
 , author=>'Thomas Orgis <thomas@orgis.org>'
-, copyright=>'Copyright (c) 2005-2013 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
+, copyright=>'Copyright (c) 2005-2020 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
 },\@pars);
 
 if($param->{black}){ $param->{strict} = 0; }
@@ -49,6 +52,8 @@ my $data = 0;
 my $justhead = ($param->{fincdol} ne '' or $param->{coltitles} or $param->{coltitle});
 my $c;
 my $i;
+my $cols;
+my $rows;
 my @values;
 
 sub Init
@@ -62,6 +67,7 @@ sub Init
 		,'black',  $param->{black}
 	});
 	$i = 0;
+	$rows = 0;
 	@values = ();
 	$cols = 0;
 }
@@ -89,13 +95,19 @@ else
 
 sub line
 {
-	++$i;		
+	++$i;
 	if(!$data and $c->line_check(\$_[0])){$data = $i;}
 
 	if($data)
 	{
-		my $d = $c->line_data(\$_[0]);
-		push(@values, $#{$d}+1) if(defined $d and @{$d});
+		if($param->{rows})
+		{
+			++$rows;
+		} else
+		{
+			my $d = $c->line_data(\$_[0]);
+			push(@values, $#{$d}+1) if(defined $d and @{$d});
+		}
 	}
 	$_[0] = '';
 }
@@ -129,7 +141,7 @@ sub Result
 		return;
 	}
 
-	my $mic = @{$txd->{titles}};
+	my $mic = @{$c->{titles}};
 	my $mac = $mic;
 	if($data)
 	{
@@ -141,6 +153,12 @@ sub Result
 	if($param->{cols})
 	{
 		print "$mac\n";
+		return;
+	}
+
+	if($param->{rows})
+	{
+		print "$rows\n";
 		return;
 	}
 

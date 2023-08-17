@@ -6,20 +6,110 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
 
 =head1 SYNOPSIS
 
-  # Tries to automatically determine, which class and method are to be tested,
-  # does not create a temporary directory:
+  # Tries to automatically determine, which class / module and method / subroutine are to be tested,
+  # creates neither a temporary directory, nor a temporary file:
   use Test::Expander;
 
-  # Tries to automatically determine, which class and method are to be tested,
-  # does not create a temporary directory,
-  # passes the option '-srand' to Test::V0 changing the random seed to the current time in seconds:
+  # Tries to automatically determine, which class / module and method / subroutine are to be tested,
+  # creates both a temporary directory and a temporary file preventing their removal after execution:
+  use Test::Expander -tempdir => { CLEANUP => 0 }, -tempfile => { UNLINK => 0 };
+
+  # Tries to automatically determine, which class / module and method / subroutine are to be tested,
+  # creates neither a temporary directory, nor a temporary file,
+  # passes the option '-srand' to Test2::V0 changing the random seed to the current time in seconds:
   use Test::Expander -srand => time;
 
-  # Tries to automatically determine method, class is supplied explicitly,
-  # a temporary directory is created with a name corresponing to the supplied template:
+  # Class is supplied explicitly, tries to automatically determine method / subroutine to be tested,
+  # creates a temporary directory with name corresponing to the template supplied, does not create temporary file:
   use Test::Expander -target => 'My::Class', -tempdir => { TEMPLATE => 'my_dir.XXXXXXXX' };
 
+  # Does not try to determine, which class / module and method / subroutine are to be tested,
+  # creates neither a temporary directory, nor a temporary file:
+  use Test::Expander -target => undef;
+
+  # Tries to automatically determine, which class / module is to be tested,
+  # does not determine method / subroutine to be tested,
+  # creates neither a temporary directory, nor a temporary file:
+  use Test::Expander -method => undef;
+
+  # Tries to automatically determine, which class / module is to be tested,
+  # does not create temporary file, creates a temporary directory and
+  # adds directories 'dir0' and 'dir1' located therein on top of the directory list used by the Perl interpreter
+  # for search of modules to be loaded. In other words, "unshifts" these directories to the @INC array:
+  # PLEASE CONSIDER THE SINGLE QUOTES APPLIED BELOW!
+  use Test::Expander
+    -lib => [
+      'path( $TEMP_DIR )->child( qw( dir0 ) )->stringify',
+      'path( $TEMP_DIR )->child( qw( dir1 ) )->stringify',
+    ],
+    -tempdir => {};
+
+  # Override the builtin 'close' in the name space of explicitly supplied class / module to be tested:
+  my $close_success;
+  use Test::Expander
+    -builtins => { close => sub { $close_success ? CORE::close( shift ) : 0 } },
+    -target   => 'My::Class';
+
 =head1 DESCRIPTION
+
+The primary objective of B<Test::Expander> is to provide additional convenience while testing based on
+L<Test2::V0|https://metacpan.org/pod/Test2::V0> considering boilerplate aspects that seem to be important
+(to the author) in notable number of cases.
+These are among other things:
+
+=over 2
+
+=item
+
+Repeated application of class / module and / or method / function to be tested.
+This, of course, can be stored in additional variables declared somewhere at the very beginning of test.
+
+Doing so, any refactoring including renaming of this class and / or method leads to the necessity to find and then
+to update all test files containing these names.
+
+If, however, both of these values can be determined from the path and base name of the current test file and saved
+in the exported read-only variables B<$CLASS> and B<$METHOD>, the only effort necessary in case of such renaming is
+a single change of path and / or base name of the corresponding test file.
+
+An additional benefit of suggested approach is a better readability of tests, where chunks like
+
+  Foo::Bar->baz( $arg0, $arg1 )
+
+now look like
+
+  $CLASS->$METHOD( $arg0, $arg1 )
+
+and hence clearly manifest that this chunk is about the testee.
+
+=item
+
+The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the usage of
+modules L<File::Temp::tempdir|https://metacpan.org/pod/File::Temp> or L<Path::Tiny|https://metacpan.org/pod/Path::Tiny>
+providing the methods / funtions B<tempdir> and B<tempfile>.
+
+This, however, can significantly be simplified (and the size of test file can be reduced) requesting such introduction
+via the options supported by B<Test::Expander>:
+
+  use Test::Expander -tempdir => {}, -tempfile => {};
+
+=item
+
+Another fuctionality frequently used in tests relates to the work with files and directories:
+reading, writing, creation, etc. Because almost all features required in such cases are provided by
+L<Path::Tiny|https://metacpan.org/pod/Path::Tiny>, some functions of this module is also exported from
+B<Test::Expander>.
+
+=item
+
+Last but not least. To provide a really environment-independent testing, we might need a possibility to run our tests in
+a clean environment, where only explicitly mentioned environment variables are set and environment variables from the
+"outside world" cannot affect the execution of tests.
+This can also be achieved manually by manipulation of B<%ENV> hash at the very beginning of tests.
+However, even ignoring the test code inflation, this might be (in fact - is) necessary in many tests belonging to one
+and the same module, so that a possibility to outsource the definition of test environment provided by B<Test::Expander>
+makes tests smaller, more maintainable, and much more reliable.
+
+=back
 
 B<Test::Expander> combines all advanced possibilities provided by L<Test2::V0|https://metacpan.org/pod/Test2::V0>
 with some specific functions only available in the older module L<Test::More|https://metacpan.org/pod/Test::More>
@@ -27,32 +117,66 @@ with some specific functions only available in the older module L<Test::More|htt
 L<Test2::V0|https://metacpan.org/pod/Test2::V0>-based ones) and handy functions from some other modules
 often used in test suites.
 
-Furthermore, this module provides a recognition of the class to be tested (see variable B<$CLASS> below) so that
-in contrast to L<Test2::V0|https://metacpan.org/pod/Test2::V0> you do not need to specify this explicitly
-if the path to the test file is in accordance with the name of class to be tested i.e.
-file B<t/Foo/Bar/baz.t> -E<gt> class B<Foo::Bar>.
+Furthermore, this module allows to automatically recognize the class / module to be tested
+(see variable B<$CLASS> below) so that in contrast to L<Test2::V0|https://metacpan.org/pod/Test2::V0>
+you do not need to specify this explicitly if the path to the test file is in accordance with the name
+of class / module to be tested i.e. file B<t/Foo/Bar/baz.t> corresponds to class / module B<Foo::Bar>.
+
+If such automated recognition is not intended, this can be deactivated by explicitly supplied
+undefined class / module name along with the option B<-target>.
 
 A similar recognition is provided in regard to the method / subroutine to be tested
-(see variables B<$METHOD> and B<METHOD_REF> below) if the base name (without extension) of test file is
-identical with the name of this method / subroutine i.e. file B<t/Foo/Bar/baz.t> -E<gt> method B<Foo::Bar::bar>.
+(see variables B<$METHOD> and B<$METHOD_REF> below) if the base name (without extension) of test file is
+identical with the name of this method / subroutine i.e. file B<t/Foo/Bar/baz.t>
+corresponds to method / subroutine B<Foo::Bar::bar>.
 
 Finally, a configurable setting of specific environment variables is provided so that
 there is no need to hard-code this in the test itself.
 
-For the time being the following options are accepted by B<Test::Expander>:
+The following options are accepted:
 
 =over 2
 
 =item
 
-Options specific for this module only:
+Options specific for this module only are always expected to have values and their meaning is:
 
 =over 2
 
 =item
 
-B<-target> - identical to the same-named option of L<Test2::V0|https://metacpan.org/pod/Test2::V0> and
-has the same purpose namely the explicit definition of the class to be tested as the value;
+B<-builtins> - override builtins in the name space of class / module to be tested.
+The expected value is a hash reference, where keys are the names of builtins and
+the values are code references overriding default behavior.
+
+=item
+
+B<-lib> - prepend directory list used by the Perl interpreter for search of modules to be loaded
+(i.e. the B<@INC> array) with values supplied in form of array reference.
+Each element of this array is evaluated using L<string eval|https://perldoc.perl.org/functions/eval> so that
+any valid expression evaluated to string is supported if it is based on modules used by B<Test::Expander> or
+any module loaded before.
+
+Among other things this provides a possibility to temporary expand the module search path by directories located
+in the temporary directory if the latter is defined with the option B<-tempdir> (see below).
+
+B<-lib> is interpreted as the very last option, that's why the variables defined by B<Test::Expander> for export
+e.g. B<$TEMP_DIR> can be used in the expressions determining such directories (see B<SYNOPSYS> above).
+
+=item
+
+B<-method> - prevent any attempt to automatically determine method / subroutine to be tested.
+If the value supplied along with this option is defined and found in the class / module to be test
+(see B<-target> below), this will be considered such method / subroutine so that the variables
+B<$METHOD> and B<$METHOD_REF> (see description of exported variables below) will be imported and accessible in test.
+If this value is B<undef>, these variables are not imported.
+
+=item
+
+B<-target> - identical to the same-named option of L<Test2::V0|https://metacpan.org/pod/Test2::V0> and, if contains
+a defined value, has the same purpose namely the explicit definition of the class / module to be tested as the value.
+However, if its value is B<undef>, this is not passed through to L<Test2::V0|https://metacpan.org/pod/Test2::V0> so that
+no class / module will be loaded and the variable B<$CLASS> will not be imported at all.
 
 =item
 
@@ -75,47 +199,42 @@ required, simply pass the empty hash reference as the option value.
 All other valid options (i.e. arguments starting with the dash sign B<->) are forwarded to
 L<Test2::V0|https://metacpan.org/pod/Test2::V0> along with their values.
 
+Options without values are not supported; in case of their passing an exception is raised.
+
 =item
 
 If an argument cannot be recognized as an option, an exception is raised.
 
 =back
 
-B<Test::Expander> needs to be the very first module in your test file.
-
-The only exception currently known is the case, when some actions performed on the module level
-(e.g. determination of constants) rely upon results of other actions (e.g. mocking of built-ins).
-
-To explain this let us assume that your test file should mock the built-in B<close>
-to verify if the testee properly reacts both on its success and failure.
-For this purpose a reasonable implementation might look as follows:
-
-  my $closeSuccess = 1;
-  BEGIN {
-    *CORE::GLOBAL::close = sub (*) { return $closeSuccess ? CORE::close($_[0]) : 0 }
-  }
-
-  use Test::Expander;
-
-The automated recognition of name of class to be tested can only work if the test file is located in the corresponding
-subdirectory. For instance, if the class to be tested is I<Foo::Bar::Baz>, then the folder with test files
-related to this class should be B<t/>I<Foo>B</>I<Bar>B</>I<Baz> or B<xt/>I<Foo>B</>I<Bar>B</>I<Baz>
+The automated recognition of name of class / module to be tested can only work
+if the test file is located in the corresponding subdirectory.
+For instance, if the class / module to be tested is I<Foo::Bar::Baz>, then the folder with test files
+related to this class / module should be B<t/>I<Foo>B</>I<Bar>B</>I<Baz> or B<xt/>I<Foo>B</>I<Bar>B</>I<Baz>
 (the name of the top-level directory in this relative name - B<t>, or B<xt>, or B<my_test> is not important) -
 otherwise the module name cannot be put into the exported variable B<$CLASS> and, if you want to use this variable,
 should be supplied as the value of B<-target>:
 
   use Test::Expander -target => 'Foo::Bar::Baz';
 
+This recognition can explicitly be deactivated if the value of B<-target> is B<undef>, so that no class / module
+will be loaded and, correspondingly, the variables B<$CLASS>, B<$METHOD>, and B<$METHOD_REF> will not be exported.
+
 Furthermore, the automated recognition of the name of the method / subroutine to be tested only works if the file
-containing the class mentioned above exists and if this class has the method / subroutine with the same name as the test
-file base name without the extension.
+containing the class / module mentioned above exists and if this class / module has the method / subroutine
+with the same name as the test file base name without the extension.
 If this is the case, the exported variables B<$METHOD> and B<$METHOD_REF> contain the name of method / subroutine
-to be tested and its reference, correspondingly, otherwise both variables are undefined.
+to be tested and its reference, correspondingly, otherwise both variables are neither evaluated nor exported.
+
+Also in this case evaluation and export of the variables B<$METHOD> and B<$METHOD_REF> can be prevented
+by passing of B<undef> as value of the option B<-method>:
+
+  use Test::Expander -target => undef;
 
 Finally, B<Test::Expander> supports testing inside of a clean environment containing only some clearly
 specified environment variables required for the particular test.
 Names and values of these environment variables should be configured in files,
-the names of which are identical with paths to single class levels or the method to be tested,
+which names are identical with paths to single class / module levels or the method / subroutine to be tested,
 and the extension is always B<.env>.
 For instance, if the test file name is B<t/Foo/Bar/Baz/myMethod.t>, the following approach is applied:
 
@@ -161,9 +280,9 @@ if such files don't exist, the B<%ENV> hash remains unchanged;
 
 =item
 
-otherwise, if at least one of such files exists, those elements of B<%ENV> are kept,
+otherwise, if at least one of such files exists, those elements of the B<%ENV> hash are kept,
 which names are equal to names found in lines of B<.env> file without values.
-All remaining elements of the B<%ENV> gets emptied (without localization) and
+All remaining elements of the B<%ENV> hash gets emptied (without localization) and
 
 =over 2
 
@@ -178,7 +297,48 @@ and at least one non-blank character representing the first character of environ
 in all other lines the value of the environment variable is everything from the first non-blank
 character after the equal sign until end of the line;
 if this value is omitted, the corresponding environment variable remains unchanged as it originally was in the B<%ENV>
-(if it existed there, of course);
+hash (if it existed there, of course);
+
+=item
+
+the cascading definition of environment variables can be used, which means that
+
+=over 2
+
+=item
+
+during the evaluation of current line environment variables defined in the same file above can be applied.
+For example if such B<.env> file contains
+
+  VAR1 = 'ABC'
+  VAR2 = lc( $ENV{ VAR1 } )
+
+and neither B<VAR1> nor B<VAR2> will be overwritten during the evaluation of subsequent lines in the same or other
+B<.env> files, the B<%ENV> hash will contain at least the following entries:
+
+  VAR1 => 'ABC'
+  VAR2 => 'abc'
+
+=item
+
+during the evaluation of current line also environment variables defined in a higher-level B<.env> file can be used.
+For example if B<t/Foo/Bar/Baz.env> contains
+
+  VAR0 = 'XYZ '
+
+and B<t/Foo/Bar/Baz/myMethod.env> contains
+
+  VAR1 = 'ABC'
+  VAR2 = lc( $ENV{ VAR0 } . $ENV{ VAR1 } )
+
+and neither B<VAR0>, nor B<VAR1>, nor B<VAR2> will be overwritten during the evaluation of subsequent lines in the same
+or other B<.env> files, the B<%ENV> hash will contain at least the following entries:
+
+  VAR0 => 'XYZ '
+  VAR1 => 'ABC'
+  VAR2 => 'xyz abc'
+
+=back
 
 =item
 
@@ -217,7 +377,7 @@ directory / file are created after B<use Test::Expander> and that their names ar
 B<$TEMP_DIR> / B<$TEMP_FILE>, correspondingly.
 Both temporary directory and file are removed by default after execution.
 
-All functions provided by this module are exported by default. These and the exported variables are:
+The following functions provided by this module are exported by default:
 
 =over 2
 
@@ -227,15 +387,7 @@ all functions exported by default from L<Test2::V0|https://metacpan.org/pod/Test
 
 =item
 
-all functions exported by default from L<Test::Files|https://metacpan.org/pod/Test::Files>,
-
-=item
-
-all functions exported by default from L<Test::Output|https://metacpan.org/pod/Test::Output>,
-
-=item
-
-all functions exported by default from L<Test::Warn|https://metacpan.org/pod/Test::Warn>,
+all functions exported by default from L<Test2::Tools::Explain|https://metacpan.org/pod/Test2::Tools::Explain>,
 
 =item
 
@@ -262,7 +414,7 @@ require_ok,
 
 =item
 
-use_ok,
+use_ok.
 
 =back
 
@@ -279,15 +431,23 @@ dies_ok,
 
 =item
 
-explain,
-
-=item
-
 lives_ok,
 
 =item
 
-throws_ok,
+throws_ok.
+
+=back
+
+some functions exported by default from L<Test2::Tools::Explain|https://metacpan.org/pod/Test2::Tools::Explain>
+and often used in older tests but not supported by
+L<Test2::Tools::Explain|https://metacpan.org/pod/Test2::Tools::Explain>:
+
+=over 2
+
+=item
+
+explain.
 
 =back
 
@@ -299,7 +459,7 @@ function exported by default from L<Const::Fast|https://metacpan.org/pod/Const::
 
 =item
 
-const,
+const.
 
 =back
 
@@ -335,32 +495,108 @@ path,
 
 =back
 
-=item
+=back
 
-variable B<$CLASS> containing the name of the class to be tested,
+The following variables can be set and exported:
 
-=item
-
-variable B<$METHOD> containing the name of the method to be tested,
+=over 2
 
 =item
 
-variable B<$METHOD_REF> containing the reference to the subroutine to be tested.
+variable B<$CLASS> containing the name of the class / module to be tested
+if the class / module recognition is not disable and possible,
+
+=item
+
+variable B<$METHOD> containing the name of the method / subroutine to be tested
+if the method / subroutine recognition is not disable and possible,
+
+=item
+
+variable B<$METHOD_REF> containing the reference to the subroutine to be tested
+if the method / subroutine recognition is not disable and possible,
 
 =item
 
 variable B<$TEMP_DIR> containing the name of a temporary directory created at compile time
-if the option B<-tempdir> was supplied.
+if the option B<-tempdir> is supplied,
 
 =item
 
 variable B<$TEMP_FILE> containing the name of a temporary file created at compile time
-if the option B<-tempfile> was supplied.
+if the option B<-tempfile> is supplied.
+
+=item
+
+variable B<$TEST_FILE> containing the absolute name of the current test file (if any).
+In fact its content is identical with the content of special token
+L<__FILE__|https://perldoc.perl.org/functions/__FILE__>, but only in the test file itself!
+If, however, you need the test file name in a test submodule or in a B<.env> file belonging to this test,
+L<__FILE__|https://perldoc.perl.org/functions/__FILE__> can no longer be applied - whereas B<$TEST_FILE> is there.
 
 =back
 
-All variables mentioned above are read-only if they are defined after B<use Test::Expander ...>.
+All variables mentioned above are read-only after their export.
 In this case they are logged to STDOUT using L<note|https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS>.
+
+=head1 CAVEATS
+
+=over 2
+
+=item
+
+B<Test::Expander> is recommended to be the very first module in your test file.
+
+The known exceptions are:
+
+=over 2
+
+=item 1
+
+When another module is used, which in turn is based on L<Test::Builder|https://metacpan.org/pod/Test::Builder> e.g.
+L<Test::Output|https://metacpan.org/pod/Test::Output>:
+
+  use Test::Output;
+  use Test::Expander;
+
+=item 2
+
+When some actions performed on the module level (e.g. determination of constants)
+rely upon results of other actions (e.g. mocking of built-ins).
+
+To explain this let us assume that your test file should globally mock the built-in B<close>
+(if this is only required in the name space of class / module to be tested,
+the option B<-builtin> should be used instead!)
+to verify if the testee properly reacts both on its success and failure.
+For this purpose a reasonable implementation might look as follows:
+
+  my $close_success;
+  BEGIN {
+    *CORE::GLOBAL::close = sub (*) { $close_success ? CORE::close( shift ) : 0 }
+  }
+
+  use Test::Expander;
+
+=back
+
+=item
+
+Array elements of the value supplied along with the option B<-lib> are evaluated using
+L<string eval|https://perldoc.perl.org/functions/eval> so that constant strings would need duplicated quotes e.g.
+
+  use Test::Expander -lib => [ q('my_test_lib') ];
+
+=item
+
+If the value to be assigned to an environment variable after evaluation of an B<.env> file is undefined,
+such assignment is skipped.
+
+=item
+
+If B<Test::Expander> is used in one-line mode (with the B<-e> option),
+the variable B<$TEST_FILE> is unset and not exported.
+
+=back
 
 =head1 AUTHOR
 
@@ -373,7 +609,7 @@ L<https://github.com/jsf116/Test-Expander/issues>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2021-2022 Jurij Fajnberg
+Copyright (c) 2021-2023 Jurij Fajnberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

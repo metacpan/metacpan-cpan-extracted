@@ -36,7 +36,7 @@ expected_cache_cb_args({key  => 'null.pl',
 my $rv1 = scan_deps(files => \@roots1,
                     cache_cb => \&cache_cb
                 );
-compare_scandeps_rvs($rv1, $expected_rv1, \@roots1);
+compare_rv($rv1, $expected_rv1, \@roots1);
 
 ### check if we can use M::SD::Cache
 my $skip_cache_tests = 1;
@@ -85,7 +85,7 @@ for my $t(qw/write_cache use_cache/){
                          cache_file => $cache_file,
                          recurse => 1,
                      );
-     compare_scandeps_rvs($rv2, $expected_rv2, \@roots2);
+     compare_rv($rv2, $expected_rv2, \@roots2);
    
      ##############################################################
      # Static dependency check of the following dependency tree
@@ -170,7 +170,7 @@ for my $t(qw/write_cache use_cache/){
      my $rv3 = scan_deps(cache_file => $cache_file,
                          recurse => 1,
                          files => \@roots3);
-     compare_scandeps_rvs($rv3, $expected_rv3, \@roots3);
+     compare_rv($rv3, $expected_rv3, \@roots3);
    
 
      ##############################################################
@@ -241,7 +241,7 @@ for my $t(qw/write_cache use_cache/){
      my $rv4 = scan_deps(cache_file => $cache_file,
                          recurse => 1,
                          files => \@roots4);
-     compare_scandeps_rvs($rv4, $expected_rv4, \@roots4);
+     compare_rv($rv4, $expected_rv4, \@roots4);
 
 
      ##############################################################
@@ -279,7 +279,7 @@ for my $t(qw/write_cache use_cache/){
      my $rv5 = scan_deps(cache_file => $cache_file,
                          recurse => 1,
                          files => \@roots5);
-     compare_scandeps_rvs($rv5, $expected_rv5, \@roots5);
+     compare_rv($rv5, $expected_rv5, \@roots5);
 
 
    }  ### SKIP block wrapping M::SD::Cache tests

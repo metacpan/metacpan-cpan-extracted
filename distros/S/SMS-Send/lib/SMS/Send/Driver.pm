@@ -30,10 +30,7 @@ use 5.006;
 use strict;
 use Carp ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '0.06';
-}
+our $VERSION = '1.07';
 
 =pod
 

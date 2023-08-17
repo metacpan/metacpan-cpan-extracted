@@ -1,1 +1,4 @@
 name = "MooseX-Types-Data-Serializer"
+authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"
+license = "perl_5"

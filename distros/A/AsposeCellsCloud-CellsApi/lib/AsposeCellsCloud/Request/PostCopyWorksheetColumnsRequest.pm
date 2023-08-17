@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostCopyWorksheetColumnsRequest.name :   ,
-# PostCopyWorksheetColumnsRequest.sheetName :   ,
-# PostCopyWorksheetColumnsRequest.sourceColumnIndex :   ,
-# PostCopyWorksheetColumnsRequest.destinationColumnIndex :   ,
-# PostCopyWorksheetColumnsRequest.columnNumber :   ,
-# PostCopyWorksheetColumnsRequest.worksheet :   ,
-# PostCopyWorksheetColumnsRequest.folder :   ,
-# PostCopyWorksheetColumnsRequest.storageName :    
+# PostCopyWorksheetColumnsRequest.name : The workbook name.  ,
+# PostCopyWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostCopyWorksheetColumnsRequest.sourceColumnIndex : Source column index  ,
+# PostCopyWorksheetColumnsRequest.destinationColumnIndex : Destination column index  ,
+# PostCopyWorksheetColumnsRequest.columnNumber : The copied column number  ,
+# PostCopyWorksheetColumnsRequest.worksheet : The destination worksheet name.  ,
+# PostCopyWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PostCopyWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_copy_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Copy data to destination columns from source columns in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'source_column_index' => {
      	datatype => 'int',
      	base_name => 'sourceColumnIndex',
-     	description => '',
+     	description => 'Source column index',
      	format => '',
      	read_only => '',
      		},
      'destination_column_index' => {
      	datatype => 'int',
      	base_name => 'destinationColumnIndex',
-     	description => '',
+     	description => 'Destination column index',
      	format => '',
      	read_only => '',
      		},
      'column_number' => {
      	datatype => 'int',
      	base_name => 'columnNumber',
-     	description => '',
+     	description => 'The copied column number',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'worksheet',
-     	description => '',
+     	description => 'The destination worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

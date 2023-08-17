@@ -12,7 +12,7 @@
                                            |_|                         
 
 
-This is the README for Lingua::JA::Name::Splitter version 0.09.
+This is the README for Lingua::JA::Name::Splitter version 0.12.
 
 Lingua::JA::Name::Splitter is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -40,12 +40,11 @@ and family names.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Lingua::JA::Name::Splitter
     * http://metacpan.org/release/Lingua-JA-Name-Splitter
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -67,10 +66,10 @@ If you have the App::cpanminus installer, you may prefer
     cpanm Lingua::JA::Name::Splitter
 
 To install the module from the source file,
-Lingua-JA-Name-Splitter-0.09.tar.gz, follow this sequence of commands:
+Lingua-JA-Name-Splitter-0.12.tar.gz, follow this sequence of commands:
 
-    tar xfz Lingua-JA-Name-Splitter-0.09.tar.gz
-    cd Lingua-JA-Name-Splitter-0.09
+    tar xfz Lingua-JA-Name-Splitter-0.12.tar.gz
+    cd Lingua-JA-Name-Splitter-0.12
     perl Makefile.PL
     make
     make install
@@ -95,6 +94,6 @@ the public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sat Jul 29 12:59:48 2017.
+This README was written on Thu Jul 13 17:04:39 2023.
 
 -----------------------------------------------------------------------------

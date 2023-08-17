@@ -88,7 +88,7 @@ my @tags = qw(
 
 %Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
 
-$Math::FakeDD::VERSION =  '0.07';
+$Math::FakeDD::VERSION =  '0.08';
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -1158,12 +1158,19 @@ sub dd_neq {
 
 sub dd_numify {
   # Mainly for '0+' overloading.
+  # So far, I've only ever seen '0+' overloading get invoked
+  # by Test::More if (and only if) a test performing a
+  # comparisons that involved a Math::FakeDD object failed.
+
   die "Argument passed to dd_numify must ge a Math::FakeDD object"
     unless ref($_[0]) eq 'Math::FakeDD';
 
   my $arg = shift;
-  return $arg->{msd} + $arg->{lsd}; # Information might be lost if
+  #return $arg->{msd} + $arg->{lsd}; # Information might be lost if
                                     # NV type is not DoubleDouble.
+  #print "### dd_numify called ###\n";
+
+  return dd2mpfr($arg); # A better choice ??
 }
 
 sub dd_pi {

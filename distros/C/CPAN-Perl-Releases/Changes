@@ -1,6 +1,64 @@
 ==================================================
-Changes from 2018-04-24 00:00:00 +0000 to present.
+Changes from 2018-07-21 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------------
+version 5.20230720 at 2023-07-20 20:11:27 +0000
+-----------------------------------------------
+
+  Change: f49c489f92c224ad67fabe4922e906d30e93b60a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-20 21:11:27 +0000
+
+    Updated for v5.39.1 
+
+-----------------------------------------------
+version 5.20230703 at 2023-07-02 23:53:11 +0000
+-----------------------------------------------
+
+  Change: bfcaedc47ff3b2eb41b8937c90d88f8d6e1f6978
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-03 00:53:11 +0000
+
+    Updated for v5.38.0 
+
+-----------------------------------------------
+version 5.20230623 at 2023-06-23 21:52:24 +0000
+-----------------------------------------------
+
+  Change: b89377d4677c288d0b76ed06e27ba649d1b21f74
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-06-23 22:52:24 +0000
+
+    Updated for v5.38.0-RC2 
+
+  Change: 488c1baf27c61a77e2af01f2205fa3230e8ac4da
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-06-16 09:15:45 +0000
+
+    Deal with pumpkins who have deleted dev releases
+
+    Special case SHAY who has only removed tar.bz2 tarballs for releases
+    below v5.28.0 
+
+-----------------------------------------------
+version 5.20230616 at 2023-06-16 08:11:37 +0000
+-----------------------------------------------
+
+  Change: 0843bf23082ec504703d9eca46a91e8f95844bac
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-06-16 09:11:37 +0000
+
+    Deal with pumpkins who have deleted dev releases
+
+    Special case SHAY who has only removed tar.bz2 tarballs for releases
+    below v5.28.0 
+
+  Change: 988dccbcba9978c46964bc31e46173e38638cb6a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-06-16 08:46:20 +0000
+
+    Updated for v5.38.0-RC1 
 
 -----------------------------------------------
 version 5.20230423 at 2023-04-23 16:31:11 +0000
@@ -878,76 +936,6 @@ version 3.72 at 2018-07-27 08:47:42 +0000
 
     Remove s.c.o link from POD 
 
------------------------------------------
-version 3.70 at 2018-07-20 15:43:02 +0000
------------------------------------------
-
-  Change: 3f7ac83c576223149a15803c0778b3bd7679eb51
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-07-20 16:43:02 +0000
-
-    Updated for v5.29.1 
-
------------------------------------------
-version 3.68 at 2018-06-27 00:55:44 +0000
------------------------------------------
-
-  Change: 56da5405ec89c9b7690bdf8325f7373af97cd2d7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-27 01:55:44 +0000
-
-    Updated for v5.29.0 
-
------------------------------------------
-version 3.66 at 2018-06-23 08:49:18 +0000
------------------------------------------
-
-  Change: 71317c12d5690ebf283bf2cd8a8950df1ea5b5a4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-23 09:49:18 +0000
-
-    Updated for v5.28.0 
-
------------------------------------------
-version 3.64 at 2018-06-19 20:54:52 +0000
------------------------------------------
-
-  Change: 7e9a12d611aa91158c9c110bacdd85b51ee52cb4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-19 21:54:52 +0000
-
-    Updated for v5.28.0-RC4 
-
------------------------------------------
-version 3.62 at 2018-06-19 07:06:23 +0000
------------------------------------------
-
-  Change: 153ed06e1ee8e997b6bc193627be6f800f40b96f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-19 08:06:23 +0000
-
-    Updated for v5.28.0-RC3 
-
------------------------------------------
-version 3.60 at 2018-06-06 12:48:04 +0000
------------------------------------------
-
-  Change: 248af7199e59ead2ba910b9b2741d11356f69e9c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-06 13:48:04 +0000
-
-    Added v5.28.0-RC2 
-
------------------------------------------
-version 3.58 at 2018-05-21 13:21:57 +0000
------------------------------------------
-
-  Change: 9c2d1a38ad555ec8f3bf1afacb5da13ccd8387d2
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-05-21 14:21:57 +0000
-
-    Updated for v5.28.0-RC1 
-
 ==================================================
-Plus 176 releases after 2018-04-24 00:00:00 +0000.
+Plus 183 releases after 2018-07-21 00:00:00 +0000.
 ==================================================

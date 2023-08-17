@@ -1,5 +1,17 @@
 Revision history for Perl module DB::Object
 
+v0.11.6 2023-06-21T16:46:21+0900
+    - More correction to SQLite test unit
+
+v0.11.5 2023-06-20T08:07:40+0900
+    - Minor correction to SQLite test unit
+
+v0.11.4 2023-06-12T14:42:28+0900
+    - Added missing overloaded operator in DB::Object::Fields::Field
+    - Added ~~ overloaded operator in DB::Object::Fields::Field
+    - Updated method _where_having() in DB::Object::Query to allow for litteral condition to be provided as scalar reference
+    - Added documentation for DB::Object::ALL, DB::Object::ANY and DB::Object::Expression
+
 v0.11.3 2023-05-02T19:08:40+0900
     - Added ANY and ALL array operator
 

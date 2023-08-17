@@ -1,13 +1,12 @@
-use strict;
-use warnings;
 package Net::SAML2::Protocol::AuthnRequest;
-our $VERSION = '0.69'; # VERSION
-
 use Moose;
-use MooseX::Types::URI qw/ Uri /;
+
+our $VERSION = '0.73'; # VERSION
+use MooseX::Types::URI            qw/ Uri /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
-use XML::Writer 0.625;
-use List::Util qw(any);
+use XML::Generator;
+use List::Util        qw(any);
+use URN::OASIS::SAML2 qw(:urn BINDING_HTTP_POST);
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -35,47 +34,46 @@ has 'nameid_allow_create' => (
 );
 
 has 'assertion_url' => (
-    isa    => Uri,
-    is     => 'rw',
-    coerce => 1,
+    isa       => Uri,
+    is        => 'rw',
+    coerce    => 1,
     predicate => 'has_assertion_url',
 );
 
 has 'assertion_index' => (
-    isa => 'Int',
-    is  => 'rw',
+    isa       => 'Int',
+    is        => 'rw',
     predicate => 'has_assertion_index',
 );
 
 has 'attribute_index' => (
-    isa => 'Int',
-    is  => 'rw',
+    isa       => 'Int',
+    is        => 'rw',
     predicate => 'has_attribute_index',
 );
 
 has 'protocol_binding' => (
-    isa    => Uri,
-    is     => 'rw',
-    coerce => 1,
+    isa       => Uri,
+    is        => 'rw',
+    coerce    => 1,
     predicate => 'has_protocol_binding',
 );
 has 'provider_name' => (
-    isa => 'Str',
-    is  => 'rw',
+    isa       => 'Str',
+    is        => 'rw',
     predicate => 'has_provider_name',
 );
 
-# RequestedAuthnContext:
 has 'AuthnContextClassRef' => (
-    isa => 'ArrayRef[Str]',
-    is => 'rw',
-    default => sub {[]}
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] }
 );
 
 has 'AuthnContextDeclRef' => (
-    isa => 'ArrayRef[Str]',
-    is => 'rw',
-    default => sub {[]}
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] }
 );
 
 has 'RequestedAuthnContext_Comparison' => (
@@ -85,17 +83,21 @@ has 'RequestedAuthnContext_Comparison' => (
 );
 
 has 'force_authn' => (
-    isa     => 'Bool',
-    is      => 'ro',
-    required => 0,
+    isa       => 'Bool',
+    is        => 'ro',
     predicate => 'has_force_authn',
 );
 
 has 'is_passive' => (
-    isa     => 'Bool',
-    is      => 'ro',
-    required => 0,
+    isa       => 'Bool',
+    is        => 'ro',
     predicate => 'has_is_passive',
+);
+
+has identity_providers => (
+    isa       => 'ArrayRef[Str]',
+    is        => 'ro',
+    predicate => 'has_identity_providers',
 );
 
 around BUILDARGS => sub {
@@ -111,20 +113,13 @@ around BUILDARGS => sub {
 };
 
 
-my $saml  = 'urn:oasis:names:tc:SAML:2.0:assertion';
-my $samlp = 'urn:oasis:names:tc:SAML:2.0:protocol';
+my $samlp = ['samlp' => URN_PROTOCOL];
+my $saml  = ['saml' => URN_ASSERTION];
 
 sub as_xml {
     my ($self) = @_;
-    my $x = XML::Writer->new(
-        OUTPUT => 'self',
-        NAMESPACES => 1,
-        FORCED_NS_DECLS => [$saml, $samlp],
-        PREFIX_MAP => {
-            $saml => 'saml2',
-            $samlp => 'saml2p'
-        }
-    );
+
+    my $x = XML::Generator->new(':std');
 
     my %req_atts = (
         ID           => $self->id,
@@ -134,9 +129,8 @@ sub as_xml {
 
     my %issuer_attrs = ();
 
-    my %protocol_bindings = (
-        'HTTP-POST' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
-    );
+    my %protocol_bindings
+        = ('HTTP-POST' => BINDING_HTTP_POST);
 
     my %att_map = (
         'assertion_url'        => 'AssertionConsumerServiceURL',
@@ -154,82 +148,95 @@ sub as_xml {
     my @opts = qw(
         assertion_url assertion_index protocol_binding
         attribute_index provider_name destination
-        issuer_namequalifier issuer_format force_authn
-        is_passive
+        force_authn is_passive
     );
 
     foreach my $opt (@opts) {
         my $predicate = 'has_' . $opt;
-        next unless $self->$predicate;
+        next if !$self->can($predicate) || !$self->$predicate;
 
         my $val = $self->$opt;
         if ($opt eq 'protocol_binding') {
             $req_atts{ $att_map{$opt} } = $protocol_bindings{$val};
         }
-        elsif (any { $opt eq $_ } qw(issuer_namequalifier issuer_format)) {
-            $issuer_attrs{ $att_map{$opt} } = $val;
-        }
         elsif (any { $opt eq $_ } qw(force_authn is_passive)) {
-            $req_atts{ $att_map{$opt} } = ( $val ? 'true' : 'false' );
+            $req_atts{ $att_map{$opt} } = ($val ? 'true' : 'false');
         }
         else {
             $req_atts{ $att_map{$opt} } = $val;
         }
     }
 
-    $x->startTag([$samlp, 'AuthnRequest'], %req_atts);
-    $x->dataElement([$saml, 'Issuer'], $self->issuer, %issuer_attrs);
+    foreach my $opt (qw(issuer_namequalifier issuer_format)) {
+        my $predicate = 'has_' . $opt;
+        next if !$self->can($predicate) || !$self->$predicate;
 
-    $self->_set_name_id($x);
-    $self->_set_name_policy_format($x);
-    $self->_set_requested_authn_context($x);
+        my $val = $self->$opt;
+        $issuer_attrs{ $att_map{$opt} } = $val;
+    }
 
-    $x->endTag();
-    $x->end();
+    return $x->AuthnRequest($samlp,
+        \%req_atts,
+        $x->Issuer($saml, \%issuer_attrs, $self->issuer),
+        $self->_set_name_id($x),
+        $self->_set_name_policy_format($x),
+        $self->_set_requested_authn_context($x),
+        $self->_set_scoping($x),
+    );
+
+}
+
+sub _set_scoping {
+    my $self = shift;
+    return unless $self->has_identity_providers;
+    my $x = shift;
+
+    my @providers = map { $x->IDPEntry($samlp, { ProviderID => $_ }) }
+        @{ $self->identity_providers };
+    return $x->Scoping($samlp, $x->IDPList($samlp, @providers));
 }
 
 sub _set_name_id {
-    my ($self, $x) = @_;
-    return if !$self->has_nameid;
-    $x->startTag([$saml, 'Subject']);
-    $x->dataElement([$saml, 'NameID'], undef, NameQualifier => $self->nameid);
-    $x->endTag();
-    return;
+    my $self = shift;
+    return unless $self->has_nameid;
+    my $x = shift;
+    return $x->Subject($saml, $x->NameID($saml, {NameQualifier => $self->nameid}));
 }
 
 sub _set_name_policy_format {
-    my ($self, $x) = @_;
-    return if !$self->has_nameidpolicy_format;
-
-    $x->dataElement([$samlp, 'NameIDPolicy'],
-        undef,
-        Format => $self->nameidpolicy_format,
-        $self->has_nameid_allow_create
+    my $self = shift;
+    return unless $self->has_nameidpolicy_format;
+    my $x = shift;
+    return $x->NameIDPolicy(
+        $samlp,
+        {
+            Format => $self->nameidpolicy_format,
+            $self->has_nameid_allow_create
             ? (AllowCreate => $self->nameid_allow_create)
             : (),
+        }
     );
-    return;
+
 }
 
 sub _set_requested_authn_context {
-    my  ($self, $x) = @_;
+    my ($self, $x) = @_;
 
-    if (!@{ $self->AuthnContextClassRef } && !@{ $self->AuthnContextDeclRef })
-    {
-        return;
-    }
+    return
+        if !@{ $self->AuthnContextClassRef }
+        && !@{ $self->AuthnContextDeclRef };
 
-    $x->startTag([$samlp, 'RequestedAuthnContext'],
-        Comparison => $self->RequestedAuthnContext_Comparison);
+    my @class = map { $x->AuthnContextClassRef($saml, undef, $_) }
+        @{ $self->AuthnContextClassRef };
 
-    foreach my $ref (@{ $self->AuthnContextClassRef }) {
-        $x->dataElement([$saml, 'AuthnContextClassRef'], $ref);
-    }
-    foreach my $ref (@{ $self->AuthnContextDeclRef }) {
-        $x->dataElement([$saml, 'AuthnContextDeclRef'], $ref);
-    }
+    my @decl = map { $x->AuthnContextDeclRef($saml, undef, $_) }
+        @{ $self->AuthnContextDeclRef };
 
-    $x->endTag();
+    return $x->RequestedAuthnContext(
+        $samlp,
+        { Comparison => $self->RequestedAuthnContext_Comparison },
+        @class, @decl
+    );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -246,7 +253,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 
@@ -287,7 +294,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 Constructor. Creates an instance of the AuthnRequest object.
 
 Important Note: Best practice is to always do this first.  While it is possible
-to call as_xml() first you do not have to set the id as it will be set for you
+to call C<as_xml()> first you do not have to set the id as it will be set for you
 automatically.
 
 However tracking the id is important for security to ensure that the response
@@ -297,19 +304,25 @@ Arguments:
 
 =over
 
-=item B<nameidpolicy_format>
+=item nameidpolicy_format
 
 Format attribute for NameIDPolicy
 
-=item B<AuthnContextClassRef>, B<AuthnContextDeclRef>
+=item AuthnContextClassRef, <AuthnContextDeclRef
 
-Each one is an arrayref containing values for AuthnContextClassRef and AuthnContextDeclRef.
-If any is populated, the RequestedAuthnContext will be included in the request.
+Each one is an arrayref containing values for AuthnContextClassRef and
+AuthnContextDeclRef.  If any is populated, the RequestedAuthnContext will be
+included in the request.
 
-=item B<RequestedAuthnContext_Comparison>
+=item RequestedAuthnContext_Comparison
 
-Value for the I<Comparison> attribute in case I<RequestedAuthnContext> is included
-(see above). Default value is I<exact>.
+Value for the I<Comparison> attribute in case I<RequestedAuthnContext> is
+included (see above). Default value is I<exact>.
+
+=item identity_providers
+
+An arrayref of Identity providers, if used the Scoping element is added to the
+XML
 
 =back
 

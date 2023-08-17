@@ -1998,6 +1998,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     one greater than the actual number of those significand digits.
     If a second arg is supplied && $op is Inf or NaN or Zero, then
     the returned value will be zero.
+    NOTE:
+    https://www.exploringbinary.com/maximum-number-of-decimal-digits-in-binary-floating-point-numbers/
+    explains that the maximum number of significant digits returned
+    for a double precision value will be 767:
+    1074 + floor(log10(2**53-1) / 2**1074))+1 = 767
 
    $bool = check_exact_decimal($str, $op);
     Can be used to verify the string returned by decimalize().

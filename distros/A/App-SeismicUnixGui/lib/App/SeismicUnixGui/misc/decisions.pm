@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::decisions;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: decisions.pm 
+ PERL PERL PROGRAM NAME: decisions.pm 
  AUTHOR: Juan Lorenzo
  DATE: June 22 2017 
 

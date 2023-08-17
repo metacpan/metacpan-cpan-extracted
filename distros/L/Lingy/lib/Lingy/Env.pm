@@ -3,8 +3,6 @@ package Lingy::Env;
 
 use Lingy::Common;
 
-sub space { shift->{space} }
-
 sub new {
     my ($class, %args) = @_;
     my $self = bless {
@@ -33,40 +31,36 @@ sub set {
     $space->{$symbol} = $value;
     return ref($space) eq 'HASH'
         ? $symbol
-        : symbol($space->NAME . "/$symbol");
-}
-
-sub ns_set {
-    my ($self, $symbol, $value) = @_;
-    my $space = Lingy::RT::NS();
-    $space->{$symbol} = $value;
-    return ref($space) eq 'HASH'
-        ? $symbol
-        : symbol($space->NAME . "/$symbol");
+        : symbol($space->_name . "/$symbol");
 }
 
 sub get {
     my ($self, $symbol, $optional) = @_;
 
+    # XXX Temporary hack until Vars
+    if ("$symbol" eq '*ns*') {
+        return RT->current_ns;
+    }
+
     return $self->get_qualified($symbol, $optional)
         if $symbol =~ m{./.};
 
     while ($self) {
-        my $ns = $self->space;
-        if (defined(my $value = _referred($ns, $symbol))) {
+        my $space = $self->{space};
+        if (defined(my $value = $space->{$symbol})) {
             return $value;
         }
         $self = $self->{outer};
     }
 
-    if (my $class = $Lingy::RT::class{"$symbol"}) {
+    if (my $class = RT->current_ns->{"$symbol"}) {
         return $class;
-    }
-    if ($symbol =~ /\w\.\w/) {
-        err "Class not found: '$symbol'";
     }
 
     return if $optional;
+
+    err "Class not found: '$symbol'"
+        if $symbol =~ /\w\.\w/;
 
     err "Unable to resolve symbol: '$symbol' in this context";
 }
@@ -78,39 +72,25 @@ sub get_qualified {
     my $space_name = $1;
     my $symbol_name = $2;
 
-    if (my $class = $Lingy::RT::class{$space_name}) {
+    if (my $ns = RT->core_ns) {
+        if (my $class = RT->core_ns->{$space_name}) {
+            return \&{"${class}::$symbol_name"};
+        }
+    }
+    if (my $class = RT->current_ns->{$space_name}) {
         return \&{"${class}::$symbol_name"};
     }
 
-    my $ns = $Lingy::RT::ns{$space_name}
+    my $ns = RT->namespaces->{$space_name}
         or err "No such namespace: '$space_name'";
 
-    if (defined(my $value = _referred($ns, $symbol_name))) {
+    if (defined(my $value = $ns->{$symbol_name})) {
         return $value;
     }
 
     return if $optional;
 
     err "Unable to resolve symbol: '$symbol' in this context";
-}
-
-sub _referred {
-    my ($ns, $symbol) = @_;
-    if (defined(my $value = $ns->{$symbol})) {
-        return $value;
-    }
-    if (ref($ns) ne 'HASH') {
-        if (my $refer_ns_map = $Lingy::RT::refer{$ns->NAME}) {
-            if (my $refer_ns_name = $refer_ns_map->{$symbol}) {
-                if (my $refer_ns = $Lingy::RT::ns{$refer_ns_name}) {
-                    if (defined(my $value = $refer_ns->{$symbol})) {
-                        return $value;
-                    }
-                }
-            }
-        }
-    }
-    return;
 }
 
 1;

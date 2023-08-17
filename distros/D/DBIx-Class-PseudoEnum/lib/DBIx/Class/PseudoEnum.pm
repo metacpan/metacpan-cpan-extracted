@@ -1,6 +1,7 @@
 package DBIx::Class::PseudoEnum;
-use Modern::Perl;
-our $VERSION = '1.0002'; # VERSION
+use strict;
+use warnings;
+our $VERSION = '1.0003'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: Schema-based enumerations independent of database
 use Carp;
@@ -46,8 +47,8 @@ sub insert {
       # parts of the schema, if they're not allowed.
       next if !defined $data{$data_key};
       if ( !grep { $_ eq $data{$data_key} } @{ $info->{$data_key} } ) {
-         croak
-             "You have attempted to assign a value to $data_key that is not valid: $data{$data_key}";
+         $self->throw_exception(
+             "You have attempted to assign a value to $data_key that is not valid: $data{$data_key}");
       }
    }
    return $self->next::method(@_);
@@ -57,9 +58,12 @@ sub set_column {
    my ($self, $column_name, $value) = @_;
 
    my $values = $self->source_info()->{enumerations}->{$column_name};
-   if (defined $value &&!grep { $value eq $_ } @$values) {
-      croak
-         "You have attempted to assign a value to $column_name that is not valid: $value";
+   # $self->discard_changes();  # But I don't really wanna do this.
+   # TODO *if* we have dirty columns, and *if* a column is enumerated, we need to check here,
+   # and...I dunno, put in the old value from storage?
+   if (defined $values && defined $value && !grep { $value eq $_ } @$values) {
+      $self->throw_exception(
+         "You have attempted to assign a value to $column_name that is not valid: $value");
    }
    return shift->next::method(@_);
 }
@@ -110,7 +114,7 @@ DBIx::Class::PseudoEnum - Schema-based enumerations independent of database
 
 =head1 VERSION
 
-version 1.0002
+version 1.0003
 
 =head1 SYNOPSIS
 
@@ -240,6 +244,15 @@ the table, it B<will not> complain about already-existing invalid values in enum
 You will not, of course, be able to test for those values, nor set any other record to that
 value, unless you enumerate it.  
 
+=item B<Error handling>
+
+If you've got a Row result, and try to update an enumerated field with an invalid value, it'll croak.
+That's probably what you want, but if you have that in, for instance, a L<Try::Tiny> block, you
+then have a "dirty" column for your enumerated column, and the next update may mess with you by
+going ahead and *doing the update to the invalid value*.  You can do $result->discard_changes, and not
+have to reload your object.  This isn't a bug, precisely, but it is a known quirk, one that I'd like
+to eradicate.
+
 =back
 
 =head1 ROADMAP
@@ -276,7 +289,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2023 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use Test::More;
 
 use Net::DNS::Resolver::Unbound;
 
-plan tests => 14;
+plan tests => 12;
 
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
@@ -24,8 +24,7 @@ for ( my $handle = Net::DNS::Resolver::libunbound::emulate_wait($id) ) {
 	ok( $handle->waiting(),		'handle->waiting' );
 	ok( $resolver->bgbusy($handle), 'bgbusy' );
 	ok( !$handle->err(),		'no handle->err' );
-	is( $handle->query_id(), $id,	'handle->query_id' );
-	is( $handle->result(),	 undef, 'no handle->result' );
+	ok( !$handle->result(),		'no handle->result' );
 }
 
 
@@ -33,10 +32,10 @@ for ( my $handle = Net::DNS::Resolver::libunbound::emulate_callback( $id, $err )
 	ok( !$handle->waiting(),	 'not handle->waiting' );
 	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
 	ok( $handle->err(),		 'handle->err' );
-	is( $handle->query_id(),	$id,   'handle->query_id' );
-	is( $handle->result(),		undef, 'no handle->result' );
+	ok( !$handle->result(),		 'no handle->result' );
 	is( $resolver->bgread($handle), undef, 'undefined bgread' );
-	like( $resolver->errorstring(), "/$err/", 'unknown error' );
+	my $errorstring = $resolver->errorstring;
+	like( $errorstring, "/$err/", "errorstring: [$errorstring]" );
 }
 
 

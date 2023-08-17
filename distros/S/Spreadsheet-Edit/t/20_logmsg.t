@@ -84,48 +84,48 @@ sub run_tests(@) {
     if ($imp_sheet) {
       # diag "### asheet=", u($asheet), "  outerasheet=", u($outerasheet), "  curr_sheet=", u($curr_sheet), "  imp_sheet=", u($imp_sheet), "\n";
       if (defined $imp_rx) {
-        is( logmsg(@uargs), 
+        is( logmsg(@uargs),
             "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied)($tname, auto-newline)" );
-        is( logmsg(@uargs,"\n"), 
+        is( logmsg(@uargs,"\n"),
             "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied)($tname, final \\n-only arg)" );
         unless (@uargs == 0) {
-          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"), 
+          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
               "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
               "logmsg $justargs\\n ($imp_desc implied)($tname, final newline in last arg)"
             );
         }
       } else {
-        is( logmsg(@uargs), 
+        is( logmsg(@uargs),
             "($imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied, no rx)($tname, auto-newline)" );
-        is( logmsg(@uargs,"\n"), 
+        is( logmsg(@uargs,"\n"),
             "($imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied, no rx)($tname, final \\n-only arg)" );
         unless (@uargs == 0) {
-          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"), 
+          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
               "($imp_tag): $expmsg",
               "logmsg $justargs\\n ($imp_desc implied, no rx)($tname, final newline in last arg)"
             );
         }
       }
     } else {
-      is( logmsg(@uargs), $expmsg, 
+      is( logmsg(@uargs), $expmsg,
           "logmsg $justargs (no relevant sheet)($tname, auto-newline)" );
-      is( logmsg(@uargs,"\n"), $expmsg, 
+      is( logmsg(@uargs,"\n"), $expmsg,
           "logmsg $justargs (no relevant sheet)($tname, final \\n-only arg)" );
       unless (@uargs == 0) {
-        is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"), $expmsg, 
+        is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"), $expmsg,
             "logmsg $comargs\\n (no relevant sheet)($tname, final newline in last arg)" );
       }
     }
-    
+
     # Now test WITH a 'focus' arg of various sorts
     my %already_tested;
     foreach ([$sheet1, $ds1], [$curr_sheet, $cs_tag], [$asheet, $as_tag]) {
       my ($sh, $tag) = @$_;
-      next 
+      next
         if !defined($sh) or $already_tested{$sh}++;
       if (u($asheet) ne $sh) {
         # An explicitly specified sheet is different that that of
@@ -140,21 +140,21 @@ sub run_tests(@) {
               "(Row ".($oas_rx+1)." $tag): $expmsg",
               "logmsg [\$sh]$comargs (sh is outerapply)($tname)" );
         } else {
-          is( logmsg($sh, @uargs), 
-              "($tag): $expmsg", 
+          is( logmsg($sh, @uargs),
+              "($tag): $expmsg",
               "logmsg \$sh$comargs (sh != apply or outerapply)($tname)" );
-          is( logmsg([$sh], @uargs), 
-              "($tag): $expmsg", 
+          is( logmsg([$sh], @uargs),
+              "($tag): $expmsg",
               "logmsg [\$sh]$comargs (sh != apply or outerapply)($tname)" );
         }
       }
-      is( logmsg([$sh,0], @uargs), "(Row 1 $tag): $expmsg", 
+      is( logmsg([$sh,0], @uargs), "(Row 1 $tag): $expmsg",
           "logmsg [\$sh,0]$comargs ($tname)" );
-      is( logmsg([$sh,2], @uargs), "(Row 3 $tag): $expmsg", 
+      is( logmsg([$sh,2], @uargs), "(Row 3 $tag): $expmsg",
           "logmsg [\$sh,2]$comargs ($tname)" );
-      is( logmsg([$sh,-1], @uargs), "(Row 0[INVALID RX -1] $tag): $expmsg", 
+      is( logmsg([$sh,-1], @uargs), "(Row 0[INVALID RX -1] $tag): $expmsg",
           "logmsg [\$sh,-1]$comargs ($tname)" );
-      is( logmsg([$sh,999], @uargs), "(Row 1000[INVALID RX 999] $tag): $expmsg", 
+      is( logmsg([$sh,999], @uargs), "(Row 1000[INVALID RX 999] $tag): $expmsg",
           "logmsg [\$sh,999]$comargs ($tname)" );
     }
   }
@@ -165,17 +165,17 @@ run_tests tname => "outer1", curr_sheet => undef; # no current sheet
 
 sheet $sheet1;
 
-run_tests tname => "outer2", 
+run_tests tname => "outer2",
           curr_sheet => $sheet1, cs_tag => $ds1, cs_rx => undef;
           # no applys active
 
 apply_torx {
-  run_tests tname => "in apply", 
+  run_tests tname => "in apply",
             asheet => $sheet1, as_tag => $ds1, as_rx => $rx,
             curr_sheet => $sheet1, cs_tag => $ds1, cs_rx => $rx;
   my $saved_rx = $rx;
   my $saved = sheet(undef);
-  run_tests tname => "in apply", 
+  run_tests tname => "in apply",
             asheet => $sheet1, as_tag => $ds1, as_rx => $sheet1->rx()
             # no current sheet
             ;
@@ -184,7 +184,7 @@ apply_torx {
 
 apply_torx {
   my $saved = sheet($sheet2);
-  run_tests tname => "in apply but curr changed", 
+  run_tests tname => "in apply but curr changed",
             asheet => $sheet1, as_tag => $ds1, as_rx => $sheet1->rx(),
             curr_sheet => $sheet2, cs_tag => $ds2, cs_rx => undef;
   sheet($saved);
@@ -197,7 +197,7 @@ apply_torx {
   $sheet2->apply_torx(sub{
     #warn dvis '### $$sheet1->{current_rx} $$sheet2->{current_rx}';
     die "oops ".vis($sheet2->rx()) unless $sheet2->rx() == 1;
-    run_tests tname => "nested apply", 
+    run_tests tname => "nested apply",
             outerasheet => $sheet1, oas_tag => $ds1, oas_rx => $outer_rx,
             curr_sheet  => $sheet1, cs_tag  => $ds1, cs_rx  => $outer_rx,
             asheet => $sheet2, as_tag => $ds2, as_rx => $sheet2->rx() ;

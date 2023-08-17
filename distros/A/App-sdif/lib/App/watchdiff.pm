@@ -37,6 +37,7 @@ use Getopt::EX::Hashed 'has'; {
     has clear    => '    !   ' , default => 1 ;
     has silent   => ' s  !   ' , default => 0 ;
     has mark     => ' M  !   ' , default => 0 ;
+    has verbose  => ' V  !   ' , default => 0 ;
     has old      => ' O  !   ' , default => 0 ;
     has date     => ' D  !   ' , default => 1 ;
     has newline  => ' N  !   ' , default => 1 ;
@@ -108,7 +109,7 @@ sub do_loop {
     my $new = App::cdif::Command->new(@{$opt->exec});
 
     my @default_diff = (
-			qw(cdif --no-command --no-unknown),
+			qw(cdif --no-unknown),
 			map { ('--cm', "$_=$colormap{$_}") } sort keys %colormap
 		       );
 
@@ -121,6 +122,7 @@ sub do_loop {
 	      map  { $_->[1] }
 	      grep { $_->[0] }
 	      [   $opt->unit => '--unit=' . $opt->unit ],
+	      [ ! $opt->verbose => '--no-command' ],
 	      [ ! $opt->mark => '--no-mark' ],
 	      [ ! $opt->old  => '--no-old' ],
 	      [ defined $opt->context => '-U' . $opt->context ],
@@ -194,60 +196,22 @@ sub execute {
 
 =head1 NAME
 
-watchdiff - repeat command and watch a difference
-
-=head1 SYNOPSIS
-
-watchdiff option -- command
-
-Options:
-
-	-r, --refresh:1     refresh screen count (default 1)
-	-i, --interval=i    interval time in second (default 2)
-	-c, --count=i       command repeat count (default 1000)
-	-e, --exec=s        set executing commands
-	-s, --silent        do not show same result
-	-p, --plain         shortcut for --nodate --nonewline
-	--[no]date          show date at the beginning (default on)
-	--[no]newline       print newline result (default on)
-	--[no]clear         clear screen after output (default on)
-	--diff=command      diff command used to compare result
-	--unit=unit         comparison unit (word/letter/char/mecab)
+watchdiff - repeat command and watch differences
 
 =head1 VERSION
 
-Version 4.26
-
-=head1 EXAMPLES
-
-	watchdiff ifconfig -a
-
-	watchdiff df
-
-	watchdiff --silent df
-
-	watchdiff --refresh 5 --noclear df
-
-	watchdiff -sri1 -- netstat -sp icmp
-
-	watchdiff -e uptime -e iostat -e df
-
-	watchdiff -ps --diff 'sdif --no-command -U-1' netstat -S -I en0
-
-	watchdiff -pc18i10r0 date; say tea is ready
-
+Version 4.28
 
 =head1 DESCRIPTION
 
-Use C<^C> to terminate.
-
+Document is included in the executable.  Use `man watchdiff` or
+`perldoc watchdiff`.
 
 =head1 AUTHOR
 
 Kazumasa Utashiro
 
 L<https://github.com/kaz-utashiro/sdif-tools>
-
 
 =head1 LICENSE
 
@@ -256,10 +220,8 @@ Copyright 2014- Kazumasa Utashiro
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-
 =head1 SEE ALSO
 
 L<diff(1)>, L<cdif(1)>, L<sdif(1)>
-
 
 =cut

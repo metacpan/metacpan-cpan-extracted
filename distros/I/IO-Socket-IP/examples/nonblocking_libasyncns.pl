@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Errno qw( EINPROGRESS );
@@ -37,7 +37,7 @@ $err and die "getaddrinfo() - $!";
 my $socket = IO::Socket::IP->new(
    PeerAddrInfo => \@peeraddrinfo,
    Blocking     => 0,
-) or die "Cannot construct socket - $@";
+) or die "Cannot construct socket - $IO::Socket::errstr";
 
 $poll->mask( $socket => POLLOUT );
 

@@ -1,5 +1,5 @@
 package Variable::OnDestruct::Scoped;
-$Variable::OnDestruct::Scoped::VERSION = '0.001';
+$Variable::OnDestruct::Scoped::VERSION = '0.002';
 use 5.010;
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ Variable::OnDestruct::Scoped - Call a subroutine on destruction of a variable.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

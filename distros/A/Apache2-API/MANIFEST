@@ -1,0 +1,38 @@
+CHANGES
+CONTRIBUTING.md
+lib/Apache2/API.pm
+lib/Apache2/API/DateTime.pm
+lib/Apache2/API/Query.pm
+lib/Apache2/API/Request.pm
+lib/Apache2/API/Request/Params.pm
+lib/Apache2/API/Request/Upload.pm
+lib/Apache2/API/Response.pm
+lib/Apache2/API/Status.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+scripts/startup.pl
+t/00.load.t
+t/01.api.t
+t/02.datetime.t
+t/03.query.t
+t/04.status.t
+t/05.other.t
+t/90.coverage.t
+t/91.pod.t
+t/92.signature.t
+t/93.manifest.t
+t/99.kwalitee.t
+t/conf/extra.conf.in
+t/conf/options.conf.in
+t/lib/Test/Apache2/API.pm
+t/lib/Test/Apache2/API/Request.pm
+t/lib/Test/Apache2/API/Response.pm
+t/lib/Test/Apache2/Common.pm
+t/server.crt
+t/server.key
+t/TEST.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

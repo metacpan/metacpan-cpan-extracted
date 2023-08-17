@@ -35,7 +35,7 @@ do { my $x = {
                                       'Moose::Role' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.8.0'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {
@@ -51,6 +51,7 @@ do { my $x = {
                                    'HTTP::Request::Common' => '0',
                                    'Module::Metadata' => '0',
                                    'Moose' => '0',
+                                   'Plack::Middleware::MethodOverride' => '0',
                                    'Term::Size::Any' => '0',
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',

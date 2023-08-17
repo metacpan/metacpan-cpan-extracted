@@ -1,3 +1,9 @@
+1.231931  2023-07-12 13:37:42-04:00 America/Toronto
+ * Additional work to handle unused vars not functioning on 5.38
+
+1.231930  2023-07-12 11:45:15-04:00 America/Toronto
+ * Remove Test::UnusedVars due to 5.38 compatibility issues
+
 1.210880  2021-03-29 16:50:31+00:00 UTC
  * Convert README.pod to README.md
 

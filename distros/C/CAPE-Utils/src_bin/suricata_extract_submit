@@ -32,6 +32,14 @@ This requires having the file-store output configured akin to below.
 The force-hash values are optional as this script will automatically compute
 those for inclusion as well SHA256.
 
+This will use `/var/run/suricata_extract_submit.pid` as a PID file
+to ensure only a single instance is running.
+
+May be checked to see if it has hung like below. Below will alert if a PID
+file with a M time of older than 5 minutes.
+
+    /usr/local/libexec/nagios/check_file_age -i -f /var/run/suricata_extract_submit.pid
+
 =head1 CONFIGURATION
 
 The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
@@ -79,6 +87,7 @@ use POSIX 'strftime';
 use Sys::Syslog;
 use JSON;
 use Sys::Hostname;
+use Proc::PID::File;
 
 my $t          = localtime;
 my $today_name = $t->strftime('%F');
@@ -97,6 +106,17 @@ sub log_something {
 
 	print $message. "\n";
 } ## end sub log_something
+
+my $alive;
+eval { $alive = Proc::PID::File->running(); };
+if ($@) {
+	log_something( 'err', 'PID file check failed... ' . $@ );
+	exit 1;
+}
+if ($alive) {
+	log_something( 'err', 'Already running as ' . $alive );
+	exit 1;
+}
 
 log_something( 'info', 'Suricata Malware Extractor starting up..' );
 
@@ -175,6 +195,8 @@ my $stats_default = {
 	ignored_host_delta    => 0,
 	truncated             => 0,
 	truncated_delta       => 0,
+	sub_size              => 0,
+	sub_size_delta        => 0,
 };
 my $stats;
 
@@ -182,7 +204,7 @@ my $stats;
 my @to_delta = (
 	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
 	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
-	'truncated'
+	'truncated', 'sub_size',
 );
 
 # handle the stats file if it exists and is readable
@@ -328,6 +350,7 @@ foreach my $file (@files) {
 		my $data      = read_file($data_file);
 		my $data_size = length($data);
 		log_something( 'info', 'Sample Size: ' . $data_size );
+		$new_stats->{sub_size} += $data_size;
 
 		# get the timestramp and transform it into for getting the epoch
 		my $timestamp = $file_json->{timestamp};
@@ -518,7 +541,7 @@ foreach my $file (@files) {
 		} ## end if ($add_it)
 
 		# rename the JSON file so we don't process it again
-		move( $file, $file . '-processed' ) or die 'Appending "-processed" to the name of the JSON failed...' . $!;
+		move( $file, $file . '-processed' ) or die 'Appending "-processed" to the name of the JSON file...' . $!;
 		if ($@) {
 			my $error = 'Failed to rename ' . $file . ' ... ' . $@;
 			$new_stats->{errors}++;

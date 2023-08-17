@@ -2607,6 +2607,81 @@ try {1} mb::catch ($e) {1}
 END1
 try {1} catch ($e) {1}
 END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 505
+try {1} catch ($e) {1} finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 506
+mb::try {1} catch ($e) {1} finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 507
+CORE::try {1} catch ($e) {1} finally {1}
+END1
+CORE::try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 508
+try {1} CORE::catch ($e) {1} finally {1}
+END1
+try {1} CORE::catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 509
+try {1} mb::catch ($e) {1} finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 510
+try {1} catch ($e) {1} mb::finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 511
+mb::try {1} catch ($e) {1} mb::finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 512
+CORE::try {1} catch ($e) {1} mb::finally {1}
+END1
+CORE::try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 513
+try {1} CORE::catch ($e) {1} mb::finally {1}
+END1
+try {1} CORE::catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 514
+try {1} mb::catch ($e) {1} mb::finally {1}
+END1
+try {1} catch ($e) {1} finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 515
+try {1} catch ($e) {1} CORE::finally {1}
+END1
+try {1} catch ($e) {1} CORE::finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 516
+mb::try {1} catch ($e) {1} CORE::finally {1}
+END1
+try {1} catch ($e) {1} CORE::finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 517
+CORE::try {1} catch ($e) {1} CORE::finally {1}
+END1
+CORE::try {1} catch ($e) {1} CORE::finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 518
+try {1} CORE::catch ($e) {1} CORE::finally {1}
+END1
+try {1} CORE::catch ($e) {1} CORE::finally {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 519
+try {1} mb::catch ($e) {1} CORE::finally {1}
+END1
+try {1} catch ($e) {1} CORE::finally {1}
+END2
 );
 
 $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" } ok($_->()) for @test;

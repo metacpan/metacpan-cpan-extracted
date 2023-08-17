@@ -1,7 +1,7 @@
-use v5.14;
+use strict;
 use warnings
-  FATAL    => qw(all),
-  NONFATAL => qw(deprecated exec internal malloc newline portable recursion);
+  FATAL    => qw( all ),
+  NONFATAL => qw( deprecated exec internal malloc newline portable recursion );
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -21,29 +21,26 @@ WriteMakefile(
 		'File::Temp'            => 0,
 		'Importer'              => 0,
 		'PadWalker'             => 0,
-		'Path::Tiny'            => '0.122',
+		'Path::Tiny'            => '0.125',
 		'Scalar::Readonly'      => 0,
-		'Test::Files'           => 0,
-		'Test::Output'          => 0,
-		'Test::Warn'            => 0,
 		'Test2::Tools::Basic'   => 0,
 		'Test2::Tools::Explain' => 0,
 		'Test2::V0'             => 0,
 	},
 	TEST_REQUIRES    => {
-		'Clone'                 => 0,
+		'FindBin'               => 0,
 		'Test::Simple'          => 0,
 	},
 	VERSION_FROM     => 'lib/Test/Expander.pm',
 	test             => {
-		TESTS                   => 't/Test/Expander/*.t t/Test/Expander/NoCLASS/*.t',
+		TESTS                   => 't/*/*/*.t t/*/*/*/*.t',
 	},
 	META_MERGE       => {
 		'meta-spec'             => { version => 2 },
 		resources               => {
 			repository              => {
 				type                    => 'git',
-				url                     => 'https://github.com/jsf116/Test-Expander.git',
+				url                     => 'git://github.com/jsf116/Test-Expander.git',
 				web                     => 'https://github.com/jsf116/Test-Expander',
 			},
 			bugtracker              => {

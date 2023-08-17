@@ -1,4 +1,6 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
+0.38  2023-07-21
+    * Various test suite updates, no code changes, no need to upgrade
 
 0.37  2021-11-21
     * Really require XML::Twig 3.50, since that adds the no_xxe option

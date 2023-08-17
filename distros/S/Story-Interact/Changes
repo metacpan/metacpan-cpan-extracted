@@ -7,6 +7,11 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001012	2023-06-12
+
+ - Story::Interact::State's load and dump methods now compress the state
+   with Bzip2. This change should be mostly transparent.
+
 0.001011	2023-04-24
 
  - Added: An `INTERNAL_PAGE` keyword has been added to access the page's

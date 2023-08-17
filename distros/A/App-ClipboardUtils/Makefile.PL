@@ -21,12 +21,15 @@ my %WriteMakefileArgs = (
     "script/clipget",
     "script/detect-clipboard-manager",
     "script/get-clipboard-content",
+    "script/get-clipboard-history-item",
     "script/list-clipboard-history"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::ClipboardUtils",
   "PREREQ_PM" => {
-    "Clipboard::Any" => "0.008",
+    "Clipboard::Any" => "0.011",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+    "Data::Sah::Compiler::perl::TH::int" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
@@ -39,7 +42,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +50,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Clipboard::Any" => "0.008",
+  "Clipboard::Any" => "0.011",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+  "Data::Sah::Compiler::perl::TH::int" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "File::Spec" => 0,
   "IO::Handle" => 0,

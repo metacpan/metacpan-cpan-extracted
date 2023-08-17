@@ -30,6 +30,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
   Crypt::OpenSSL::RSA
+  Crypt::PK::Ed25519
   Digest::SHA
   Mail::Address (part of the MailTools package)
   MIME::Base64

@@ -1,0 +1,16 @@
+# Editor configuration, see https://editorconfig.org
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = latin1
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+
+[*.md]
+indent_size = 2
+
+[Changes]
+indent_style = tab

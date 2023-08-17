@@ -3,7 +3,7 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{0.7};
+our $VERSION = q{0.8};
 
 use Exporter qw/import/;
 our @EXPORT    = qw(try_once retry ALRM finally timeout tries);
@@ -94,7 +94,7 @@ sub finally (&;@) {
 sub _assert_timeout {
     my $timeout = shift;
     if ( int $timeout <= 0 ) {
-        die qq{timeout must be an integeger >= 1!\n};
+        die qq{timeout must be an integer >= 1!\n};
     }
 }
 
@@ -102,7 +102,7 @@ sub _assert_timeout {
 sub _assert_tries {
     my $timeout = shift;
     if ( int $timeout <= 0 ) {
-        die qq{timeout must be an integeger >= 1!\n};
+        die qq{timeout must be an integer >= 1!\n};
     }
 }
 

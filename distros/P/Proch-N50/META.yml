@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,10 +15,10 @@ name: Proch-N50
 provides:
   Proch::N50:
     file: lib/Proch/N50.pm
-    version: v1.5.6
+    version: v1.5.8
   Proch::Seqfu:
     file: lib/Proch/Seqfu.pm
-    version: v1.5.6
+    version: v1.5.8
 requires:
   FASTX::Reader: v1.8.0
   Getopt::Long: '2.39'
@@ -30,5 +30,7 @@ requires:
 resources:
   homepage: https://metacpan.org/release/Proch-N50
   repository: https://github.com/telatin/proch-n50.git
-version: 1.5.6
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: 1.5.8
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

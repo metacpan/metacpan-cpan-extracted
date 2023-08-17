@@ -1,7 +1,9 @@
+.editorconfig
 Build.PL
 Changes
 hax/newOP_CUSTOM.c.inc
 hax/OP_HELEMEXISTSOR.c.inc
+hax/perl-backcompat.c.inc
 lib/Syntax/Operator/ExistsOr.pm
 lib/Syntax/Operator/ExistsOr.xs
 LICENSE

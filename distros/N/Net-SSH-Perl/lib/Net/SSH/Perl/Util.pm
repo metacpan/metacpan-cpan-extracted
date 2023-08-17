@@ -1,5 +1,3 @@
-# $Id: Util.pm,v 1.29 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::Util;
 use strict;
 use warnings;
@@ -28,7 +26,7 @@ use vars qw( %FUNC_TO_MOD %EXPORT_TAGS );
 );
 
 %EXPORT_TAGS = (
-    hosts    => [ qw( _check_host_in_hostfile _all_keys_for_host 
+    hosts    => [ qw( _check_host_in_hostfile _all_keys_for_host
                       _add_host_to_hostfile _remove_host_from_hostfile ) ],
     rsa      => [ qw( _rsa_public_encrypt _rsa_private_decrypt
                       _respond_to_rsa_challenge ) ],

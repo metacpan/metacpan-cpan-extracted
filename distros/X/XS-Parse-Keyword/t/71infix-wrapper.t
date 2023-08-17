@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-use Test::More;
+use Test2::V0;
 
 use B qw( svref_2object walkoptree );
 
@@ -24,9 +24,9 @@ use constant REFGEN => $] >= 5.022 ? "srefgen" : "refgen";
    is( $result, 30, 'add wrapper func' );
 
    my $aref = [ t::infix::interspersefunc( "Z", "a", "b" ) ];
-   is_deeply( $aref, [qw( a Z b )], 'intersperse wrapper func' );
+   is( $aref, [qw( a Z b )], 'intersperse wrapper func' );
 
-   is_deeply( [ t::infix::addpairsfunc( [ 1, 2 ], [ 3, 4 ] ) ],
+   is( [ t::infix::addpairsfunc( [ 1, 2 ], [ 3, 4 ] ) ],
       [ 4, 6 ], 'addpairs wrapper func' );
 }
 
@@ -83,43 +83,43 @@ sub count_ops
       'callchecker generated an OP_CUSTOM call for list/list' );
    ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call for list/list' );
    is( $opcounts{rv2av}, 2, 'callchecker made two OP_RV2AV' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list' );
 
    my @padav = (1,2,3);
 
    %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@padav, \@padav ) };
    ok( !$opcounts{srefgen}, 'callchecker made no OP_SREFGEN for \@padav' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@padav' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@padav' );
 
    our @pkgav = (1,2,3);
 
    %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@pkgav, \@pkgav ) };
    ok( !$opcounts{srefgen}, 'callchecker made no OP_SREFGEN for \@pkgav' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@pkgav' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@pkgav' );
 
    # stress-test it
 
    %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@{ \@{ \@padav } }, \@{ \@{ \@padav } } ) };
    # Preserve the two sets of inner ones but remove the outer ones
    is( $opcounts{+REFGEN}, 4, 'callchecker removed one layer of OP_SREFGEN for stress-test' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on stress-test' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on stress-test' );
 
    package OneTwoThree {
       use overload '@{}' => sub { return [1, 2, 3] };
    }
 
    $code = sub { t::infix::addpairsfunc( bless( {}, "OneTwoThree" ), \@padav ) };
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on blessed object' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on blessed object' );
 
    # anonlist remains on LHS
    %opcounts = count_ops $code = sub { t::infix::addpairsfunc( [1,2,3], \@padav ) };
    ok( $opcounts{anonlist}, 'callchecker left OP_ANONLIST on LHS' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
 
    # anonlist is unwrapped on RHS
    %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@padav, [1,2,3] ) };
    ok( !$opcounts{anonlist}, 'callchecker removed OP_ANONLIST on RHS' );
-   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
+   is( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
 }
 
 # wrapper func by coderef

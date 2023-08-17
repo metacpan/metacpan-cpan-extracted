@@ -124,3 +124,8 @@ Revision history for Perl extension Tk::HListbox.
 	- Switch messaging to (and require) the Carp module.
 	- Numerous fixups to ensure compatability with Tk::Listbox.
 	- Numerous other minor code & doc. cleanups and clarifications.
+2.71   Sat Jun 24, 2023
+	- Change default -highlightthickness from HList's default of 2 pixels to 
+	  Listbox's default of 1 for more consistant appearance, particularly when 
+	  used by Tk::JBrowseEntry.
+	- Some minor doc. cleanups.

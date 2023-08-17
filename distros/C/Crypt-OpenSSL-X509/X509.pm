@@ -8,7 +8,7 @@ use base qw(Exporter);
 
 use Convert::ASN1;
 
-our $VERSION = '1.914';
+our $VERSION = '1.915';
 
 our @EXPORT_OK = qw(
   FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
@@ -409,6 +409,20 @@ Return a hash of Extensions indexed by OID or name.
 =item has_extension_oid ( OID )
 
 Return true if the certificate has the extension specified by C<OID>.
+
+=item subjectaltname ( )
+
+Uses Convert::ASN1 to extract the Subject Alternative Names from the X509 object.
+subjectaltname ( ) returns an array of "rfc822Name"s
+
+    [
+        {
+            'rfc822Name' => 'altuser@mpi-sws.org'
+        },
+        {
+            'rfc822Name' => 'user@mpi-sws.org'
+        },
+    ]
 
 =back
 

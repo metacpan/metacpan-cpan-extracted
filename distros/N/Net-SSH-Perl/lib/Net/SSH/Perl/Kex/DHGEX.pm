@@ -37,7 +37,7 @@ sub exchange {
     $packet->put_int32($kex->max_bits);
     $packet->send;
     $ssh->debug('SSH2_MSG_KEX_DH_GEX_REQUEST(' . $kex->min_bits . '<' .
-        $kex->want_bits . '<' . $kex->max_bits . ') sent'); 
+        $kex->want_bits . '<' . $kex->max_bits . ') sent');
 
     # step 2 in rfc 4419
     $ssh->debug('Sent DH Group Exchange request, waiting for reply.');

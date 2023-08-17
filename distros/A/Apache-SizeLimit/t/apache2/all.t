@@ -15,9 +15,6 @@ sub my_need {
 
     if ( $Config{'osname'} eq 'linux' ) {
         $ok = need_module('Linux::Pid');
-        if ( -e '/proc/self/smaps' ) {
-            $ok &= need_module('Linux::Smaps');
-        }
     }
     elsif ( $Config{'osname'} =~ /(bsd|aix)/i ) {
         $ok &= need_module('BSD::Resource');

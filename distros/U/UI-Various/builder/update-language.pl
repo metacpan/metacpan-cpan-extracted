@@ -65,9 +65,19 @@ use File::Find;
 #########################
 
 # paths to package, sources and language files:
-use constant ROOT_PATH => map { s|/[^/]+/[^/]+$||; $_ } abs_path($0);
-use constant LIB_PATH => ROOT_PATH . '/lib/UI';
-use constant LANG_PATH => LIB_PATH . '/Various/language/';
+use constant DIR0 => abs_path($0);
+# s/.../.../r needs Perl 5.22, so we use more complicated expressions here:
+use constant ROOT_PATH => eval{ $_ = DIR0; s|/[^/]+/[^/]+$||; $_ };
+use constant ID => eval{ $_ = ROOT_PATH; s|^.*/||; $_ };
+use constant ID_DIR => eval { $_ = ID; tr|-|/|; $_ };
+use constant LIB_PATH => ROOT_PATH . '/lib';
+use constant LANG_PATH => eval{
+    my $p;
+    find(sub{ $p = $File::Find::name if $_ eq 'en.pm'; }, LIB_PATH);
+    $p =~ s|/[^/]+$||;
+    $p
+};
+use constant SCRIPT_PATH => ROOT_PATH . '/script';
 
 #########################
 # analyse command line: #
@@ -75,7 +85,7 @@ use constant LANG_PATH => LIB_PATH . '/Various/language/';
 
 1 == @ARGV  and  $ARGV[0] =~ m/^(--check|[a-z]{2}|.+ .+)$/
     or  die "usage: $0 { --check | <iso-639-1-language-code> | <new-text> }\n";
-my $src = LANG_PATH . 'en.pm';
+my $src = LANG_PATH . '/en.pm';
 my ($check, $dst, $text) = (0);
 if ($ARGV[0] eq '--check')
 {
@@ -83,7 +93,7 @@ if ($ARGV[0] eq '--check')
 }
 elsif ($ARGV[0] =~ m/^[a-z]{2}$/)
 {
-    $dst = LANG_PATH . $ARGV[0] . '.pm';
+    $dst = LANG_PATH . '/' . $ARGV[0] . '.pm';
 }
 elsif ($ARGV[0] =~ m/^.+ .+$/)
 {
@@ -103,8 +113,11 @@ sub parse_language_source($);
 my $re_our_t	= qr/^\s*our\s+%T\s*=\s*$/;
 my $re_opening	= qr/^\s*\(\s*$/;
 my $re_comment	= qr/^(\s*#.*\S)\s*$/;
-my $re_line1	= qr/^(\s*)([a-z_0-9]+)\s*$/;
+my $re_line1	= qr/^(\s*)([a-z_0-9]+|[A-Z]{2,})\s*$/;
 my $re_line2	= qr/^(\s*=>\s*)(["'])(.*)\g2\s*,\s*(#.*)?$/;
+my $re_line2a	= qr/^(\s*=>\s*)(["'])(.*)\g2\s*(#.*)?$/;
+my $re_line2b	= qr/^(\s*\.)(["'])(.*)\g2\s*(#.*)?$/;
+my $re_line2c	= qr/^(\s*\.)(["'])(.*)\g2\s*,\s*(#.*)?$/;
 my $re_empty	= qr/^\s*$/;
 my $re_closing	= qr/^\s*\);\s*$/;
 
@@ -131,14 +144,16 @@ $errors == 0  or  die "aborting after parsing $src with $errors errors\n";
     while ($src[$src_i] !~ m/$re_closing/no)
     {
 	$_ = $src[$src_i++];
-	next if m/$re_comment/no  or  m/$re_empty/no  or  m/$re_line2/no;
+	next
+	    if  m/$re_comment/no  or  m/$re_empty/no  or  m/$re_line2/no
+	    or  m/$re_line2a/no  or  m/$re_line2b/no  or  m/$re_line2c/no;
 	m/$re_line1/o  or  die;
 	defined $keys{$2}  and  die "two definitions found for '$2'\n";
 	$keys{$2} = 0;
     }
     my $re_all_keys = "((['\"])(" . join('|', keys(%keys)) . ')\g2)';
     find(sub {
-	     return unless m/\.pm$/;
+	     return unless m/\.pm$/  or  (-x $_  and  -f $_);
 	     return if m/#/;
 	     open SOURCE, '<', $File::Find::name  or  die "can't open $_: $!\n";
 	     while (<SOURCE>)
@@ -151,7 +166,7 @@ $errors == 0  or  die "aborting after parsing $src with $errors errors\n";
 	     }
 	     close SOURCE  or  die "can't close $File::Find::name: $!\n";
 	 },
-	 LIB_PATH);
+	 LIB_PATH, (-d SCRIPT_PATH ? SCRIPT_PATH : ()));
     foreach (sort keys %keys)
     {
 	warn "'$_' is never used\n" unless $keys{$_} > 0  or  m/^zz_unit_test/;
@@ -375,8 +390,25 @@ sub parse_language_source($)
 	}
 	elsif (m/$re_line2/no)
 	{
-	    $mode == 0
+	    $mode != 1
 		and  error("value without key (after '$last_key'):\n\t|$_|");
+	    $mode = 0;
+	}
+	elsif (m/$re_line2a/no)
+	{
+	    $mode != 1
+		and  error("value without key (after '$last_key'):\n\t|$_|");
+	    $mode = 2;
+	}
+	elsif (m/$re_line2b/no)
+	{
+	    $mode < 2
+		and  error("bad continued value ('$last_key'):\n\t|$_|");
+	}
+	elsif (m/$re_line2c/no)
+	{
+	    $mode < 2
+		and  error("bad end of continued value ('$last_key'):\n\t|$_|");
 	    $mode = 0;
 	}
 	elsif (m/$re_empty/no)

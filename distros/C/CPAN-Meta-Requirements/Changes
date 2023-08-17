@@ -1,5 +1,8 @@
 Revision history for CPAN-Meta-Requirements
 
+2.143     2023-06-19 14:51:58-04:00 America/New_York
+    - Fix regression with implicit minimum value and multiple requirements
+
 2.142     2023-05-09 07:15:05-04:00 America/New_York
     - no changes since previous trial releae
     - note: this version now requires perl v5.10 rather than v5.6

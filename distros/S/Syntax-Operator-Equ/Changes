@@ -1,5 +1,11 @@
 Revision history for Syntax-Operator-Equ
 
+0.06    2023-07-07
+        [CHANGES]
+         * Added Syntax::Operator::Eqr
+         * Adjusted documentation for the release of Perl v5.38
+         * Swap all of the unit tests from Test::More to Test2::V0
+
 0.05    2022-12-25
         [CHANGES]
          * Capture t/80in+equ.t from Syntax-Operator-In

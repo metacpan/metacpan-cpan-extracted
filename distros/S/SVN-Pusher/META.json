@@ -4,7 +4,7 @@
       "(based on SVN::Push by Gerald Richter E<lt>richter@dev.ecos.deE<gt>)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
    "provides" : {
       "SVN::Pusher" : {
          "file" : "lib/SVN/Pusher.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "SVN::Pusher::CmdLine" : {
          "file" : "lib/SVN/Pusher/CmdLine.pm"
@@ -51,6 +51,6 @@
          "url" : "https://bitbucket.org/shlomif/perl-svn-pusher"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

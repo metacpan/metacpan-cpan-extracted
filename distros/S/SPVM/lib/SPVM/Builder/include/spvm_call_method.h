@@ -7,13 +7,14 @@
 #include "spvm_typedecl.h"
 
 struct spvm_call_method {
-  SPVM_OP* op_invocant;
   SPVM_OP* op_name;
   SPVM_METHOD* method;
+  const char* basic_type_name;
   int32_t args_length;
-  int8_t is_class_method_call;
+  int8_t is_class_method;
   int8_t call_super;
-  int8_t is_static_instance_method_call;
+  int8_t is_class_method_instance_method_call;
+  int8_t is_current;
 };
 
 SPVM_CALL_METHOD* SPVM_CALL_METHOD_new(SPVM_COMPILER* compiler);

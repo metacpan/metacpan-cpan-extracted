@@ -6,14 +6,21 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'URI/Info.pm',
     'URI/Info/Plugin/Generic.pm',
+    'URI/Info/Plugin/SearchQuery/amazon.pm',
+    'URI/Info/Plugin/SearchQuery/baidu.pm',
+    'URI/Info/Plugin/SearchQuery/blibli_com.pm',
+    'URI/Info/Plugin/SearchQuery/bukalapak_com.pm',
     'URI/Info/Plugin/SearchQuery/google.pm',
+    'URI/Info/Plugin/SearchQuery/lazada_co_id.pm',
+    'URI/Info/Plugin/SearchQuery/shopee_co_id.pm',
     'URI/Info/Plugin/SearchQuery/thepiratebay.pm',
-    'URI/Info/Plugin/SearchQuery/tokopedia.pm',
+    'URI/Info/Plugin/SearchQuery/tokopedia_com.pm',
+    'URI/Info/Plugin/SearchQuery/youtube.pm',
     'URI/Info/PluginBase.pm'
 );
 

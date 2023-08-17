@@ -15,8 +15,6 @@ around BUILDARGS => sub {
   my $options = $class->$orig(@args);
 
   return +{ %$options, inner_error=>$options->{options}{inner_error} };
-
-
 };
 
 1;

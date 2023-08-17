@@ -316,3 +316,8 @@ Revision history for Debug-Easy
 2.07    June 24, 2021
 
         Documentation changes missed in README files.  That has been corrected.
+
+2.08    July 12, 2023
+
+        Added github info and list of modules I write to the perldoc section.
+

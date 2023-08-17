@@ -1,7 +1,13 @@
 Revision history for Perl extension HTTP::Curl.
 
+1.06  2023-07-17
+	- default timeout option for Net::Curl::Multi::EV
+
+1.05  2023-07-15
+	- set timeout option to Net::Curl::Multi::EV
+
 1.04  2022-08-19
-	- do not parse responce headers two time when on_header used
+	- do not parse response headers two time when on_header used
 
 1.03  2022-08-08
 	- clone from HTTP::Any::Curl

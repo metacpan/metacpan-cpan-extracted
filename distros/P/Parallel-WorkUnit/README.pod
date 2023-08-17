@@ -8,7 +8,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.202270
+version 2.232180
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,8 @@ version 2.202270
 
   $wu->use_anyevent(1);
   $wu->async( sub { ... }, \&callback );
-  $wu->waitall();  # Not strictly necessary
+  $wu->waitall();  # Not strictly necessary, callbacks happen within event loop
+
 
   #
   # Just spawn something into another process, don't capture return
@@ -268,13 +269,22 @@ Note that the child inherits all open file descriptors.
 Not also that the child process will be part of the same process group as the
 parent process.  Additional work is required to daemonize the child.
 
+=head1 CAVEATS
+
+This module uses L<Storable> to serialize objects, except for objects
+that have a C<FREEZE> and C<THAW> method defined, in which case those
+methods are used.  As a result, it cannot serialize some objects, such
+as C<REGEXP> (sometimes), C<CODE>, or C<OBJECT> (I.E. Corinna objects
+created with the C<class> statement in Perl 5.38+), unless these
+objects also have a C<FREEZE> and C<THAW> method defined.
+
 =head1 AUTHOR
 
 Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Joelle Maslak.
+This software is copyright (c) 2015-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

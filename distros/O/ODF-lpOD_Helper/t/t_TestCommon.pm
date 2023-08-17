@@ -78,6 +78,7 @@ use Data::Dumper;
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
+use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 
 sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 
@@ -110,7 +111,7 @@ if ($nonrandom) {
     $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
     $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
     #$ENV{PERL_HASH_SEED_DEBUG} = "1";
-    $ENV{PERL5LIB} = join(":", @INC);
+    @PERL5LIB = @INC; # cf 'use Env' above
     exec $^X, $0, @orig_ARGV; # for reproducible results
   }
 }
@@ -176,10 +177,13 @@ sub string_to_tempfile($@) {
   wantarray ? ($path,$fh) : $path
 }
 
-# Run a Perl script in a sub-process.
-# Plain 'system  path/to/script.pl' does not work in a test environment
-# where the correct Perl executable is not at the front of PATH,
-# and also where -I options might have supplied library paths.
+# Run a Perl script in a sub-process. 
+#
+# LANG is unconditionally set to indicate UTF-8 stdio regardless of the
+# actual test environment (because the output will be consumed by a test
+# checker rather than actually displayed on the real STDOUT/ERR).
+#
+# Also provides -I options to mimic @INC (PERL5LIB is often not set)
 #
 # This is usually enclosed in Tiny::Capture::capture { ... }
 #    ==> IMPORTANT: Be sure STDOUT/ERR has :encoding(...) set beforehand
@@ -187,9 +191,28 @@ sub string_to_tempfile($@) {
 #        Otherwise wide chars will be corrupted
 #
 sub run_perlscript(@) {
-  my @perlargs = @_;  # might be ('-e', 'perlcode...')
+  my $tf; # keep in scope until no longer needed
+  my @perlargs = @_; 
+  @perlargs = ((map{ "-I$_" } @INC), @perlargs);
   unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
-  local $ENV{PERL5LIB} = join(":", @INC);
+  if ($^O eq "MSWin32") { 
+    for (my $ix=0; $ix <= $#perlargs; $ix++) {
+      if ($perlargs[$ix] =~ /^-w?[Ee]$/) {
+        # Passing perl code in an argument is impractical in DOS/Windows
+        $tf = Path::Tiny->tempfile("perlcode_XXXXX");
+        $tf->spew_utf8($perlargs[$ix+1]);
+        splice(@perlargs, $ix, 2, $tf->stringify);
+      }
+      for ($perlargs[$ix]) {
+        if (/^-\*[Ee]/) { oops "unhandled perl arg" }
+        s/"/\\"/g;
+        if (/[\s\/"']/) { 
+          $_ = '"' . $_ . '"';
+        }
+      }
+    }
+  }
+  local $ENV{LANG} = "C.UTF-8";
   system $^X, @perlargs;
 }
 
@@ -283,9 +306,17 @@ END{
 }
 #--------------- (end of :silent stuff) ---------------------------
 
-# N.B. package dir might have version like ".../ODF-lpOD_Helper-3.008/..."
-dirname(abs_path(__FILE__)) =~ m#.*/(\w+)-\w[-\w\.]*/# or die "Cant intuit testee module name";
-(my $testee_top_module = $1) =~ s/-/::/g;
+# Find the ancestor build or checkout directory (it contains a "lib" subdir)
+# and derive the package name from e.g. "My-Pack" or "My-Pack-1.234"
+my $testee_top_module;
+for (my $path=path(__FILE__)->absolute;  ; $path=$path->parent) {
+  if (-d $path->child("lib")) {
+    my @pieces = split /-/, $path->basename;
+    if ($pieces[-1] =~ /^\d/) { pop @pieces } # pop version
+    $testee_top_module = join('::', @pieces);
+    last;
+  }
+}
 oops unless $testee_top_module;
 
 sub verif_no_internals_mentioned($) { # croaks if references found

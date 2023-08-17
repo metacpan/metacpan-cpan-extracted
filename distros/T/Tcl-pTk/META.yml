@@ -39,5 +39,5 @@ resources:
   MailingList: mailto:tcltk@perl.org
   bugtracker: https://github.com/chrstphrchvz/perl-tcl-ptk/issues
   repository: https://github.com/chrstphrchvz/perl-tcl-ptk.git
-version: '1.10'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

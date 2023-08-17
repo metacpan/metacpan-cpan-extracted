@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::suop2;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUOP2 - do a binary operation on two data sets			
+ PERL PROGRAM NAME:  SUOP2 - do a binary operation on two data sets			
  AUTHOR: Juan Lorenzo
  DATE:   Feb. 19 2015,
  DESCRIPTION:
@@ -107,12 +107,16 @@ package App::SeismicUnixGui::sunix::statsMath::suop2;
   suop2->fileA(\$file[1]);
   suop2->fileB(\$file[2]);
   $suop[1] = suop2->Step();
+  
+  V 0.0.3 May 2023
+  You can include a list of file names
 
 =cut
 
 =head2 CHANGES and their DATES
 
 	V 0.0.2 Oct 4 2018
+	V 0.0.3 May 2023
 	
 =cut
 
@@ -122,6 +126,8 @@ our $VERSION = '0.0.1';
 my $suop2 = {
     _file1 => '',
     _file2 => '',
+    _file_list1 => '',
+    _file_list2 => '',
     _op    => '',
     _trid  => '',
     _w1    => '',
@@ -167,6 +173,8 @@ sub clear {
     $suop2->{_Output} = '';
     $suop2->{_file1}  = '';
     $suop2->{_file2}  = '';
+    $suop2->{_file_list1}  = '';
+    $suop2->{_file_list2}  = '';    
     $suop2->{_op}     = '';
     $suop2->{_trid}   = '';
     $suop2->{_w1}     = '';
@@ -265,6 +273,53 @@ sub file2 {
     }
     else {
         print("suop2, file2, second file is missing,\n");
+    }
+
+    return ();
+}
+
+=head2 subroutine file_list1 
+
+ 
+
+=cut
+
+sub file_list1 {
+
+    my ( $self, $file_list1 ) = @_;
+
+    if (length $file_list1) {
+
+        $suop2->{_file_list1} = $file_list1;
+#        $suop2->{_note}  = $suop2->{_note} . ' ' . $suop2->{_file1};
+#        $suop2->{_Step}  = $suop2->{_Step} . ' ' . $suop2->{_file1};
+
+    }
+    else {
+        print("suop2, file_list1, first file is missing,\n");
+    }
+
+    return ();
+}
+
+=head2 subroutine file_list2 
+
+
+=cut
+
+sub file_list2 {
+
+    my ( $self, $file_list2 ) = @_;
+
+    if (length $file_list2) {
+
+        $suop2->{_file_list2} = $file_list2;
+#        $suop2->{_note}  = $suop2->{_note} . ' ' . $suop2->{_file2};
+#        $suop2->{_Step}  = $suop2->{_Step} . ' ' . $suop2->{_file2};
+
+    }
+    else {
+        print("suop2, file_list2, second file is missing,\n");
     }
 
     return ();
@@ -405,7 +460,6 @@ max index = number of input variables -1
 sub get_max_index {
     my ($self) = @_;
 
-    #  index=5
     my $max_index = 5;
 
     return ($max_index);

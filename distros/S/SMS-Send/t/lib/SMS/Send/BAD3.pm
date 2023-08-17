@@ -5,7 +5,7 @@ use SMS::Send::Driver ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '0.01';
+	$VERSION = '1.07';
 	@ISA     = 'SMS::Send::Driver';
 }
 

@@ -9,13 +9,14 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   FindBin: '0'
+  HTTP::Response: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Mojolicious::Lite: '0'
-  Mojolicious::Plugin::RenderFile: '0'
+  Net::Async::HTTP::Server: '0'
   Path::Tiny: '0'
   Test::CheckDeps: '0.010'
   Test::Exception: '0'
+  Test::MockModule: '0'
   Test::More: '0.98'
   Test::NoWarnings: '0'
   URI: '0'
@@ -40,49 +41,49 @@ no_index:
 provides:
   WebService::Async::Onfido:
     file: lib/WebService/Async/Onfido.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Address:
     file: lib/WebService/Async/Onfido/Address.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Applicant:
     file: lib/WebService/Async/Onfido/Applicant.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Address:
     file: lib/WebService/Async/Onfido/Base/Address.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Applicant:
     file: lib/WebService/Async/Onfido/Base/Applicant.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Check:
     file: lib/WebService/Async/Onfido/Base/Check.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Document:
     file: lib/WebService/Async/Onfido/Base/Document.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Photo:
     file: lib/WebService/Async/Onfido/Base/Photo.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Report:
     file: lib/WebService/Async/Onfido/Base/Report.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Base::Video:
     file: lib/WebService/Async/Onfido/Base/Video.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Check:
     file: lib/WebService/Async/Onfido/Check.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Document:
     file: lib/WebService/Async/Onfido/Document.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Photo:
     file: lib/WebService/Async/Onfido/Photo.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Report:
     file: lib/WebService/Async/Onfido/Report.pm
-    version: '0.003'
+    version: '0.006'
   WebService::Async::Onfido::Video:
     file: lib/WebService/Async/Onfido/Video.pm
-    version: '0.003'
+    version: '0.006'
 requires:
   Clone: '0'
   Data::UUID: '0'
@@ -95,6 +96,7 @@ requires:
   Getopt::Long: '0'
   HTML::TreeBuilder: '0'
   HTTP::Request::Common: '0'
+  HTTP::Response: '0'
   IO::Async::Loop: '0'
   IO::Async::Notifier: '0'
   JSON::MaybeUTF8: '0'
@@ -102,8 +104,8 @@ requires:
   List::UtilsBy: '0'
   Log::Any: '0'
   Log::Any::Adapter: '0'
-  Mojolicious::Lite: '0'
   Net::Async::HTTP: '0'
+  Net::Async::HTTP::Server: '0'
   Path::Tiny: '0'
   Ryu::Async: '0'
   Scalar::Util: '0'
@@ -124,16 +126,18 @@ resources:
   bugtracker: https://github.com/binary-com/perl-WebService-Async-Onfido/issues
   homepage: https://github.com/binary-com/perl-WebService-Async-Onfido
   repository: https://github.com/binary-com/perl-WebService-Async-Onfido.git
-version: '0.003'
+version: '0.006'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
   - 'Tom Molesworth <tom@binary.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
   - 'Mohammad Reza Hamedanchi <mohammad@binary.com>'
   - 'chengyang-binary <45479072+chengyang-binary@users.noreply.github.com>'
-  - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
   - 'Arshad Munir <55420460+arshad-binary@users.noreply.github.com>'
+  - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
+  - 'felipe-deriv <64797927+felipe-deriv@users.noreply.github.com>'
   - 'chylli-deriv <chylli@binary.com>'
   - 'felipe-binary <64797927+felipe-binary@users.noreply.github.com>'
   - 'Jean-Yves Sireau <jy@binary.com>'

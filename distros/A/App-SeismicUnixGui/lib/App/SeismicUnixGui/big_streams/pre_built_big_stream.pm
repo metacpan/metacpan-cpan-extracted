@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::pre_built_big_stream;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: pre_built_superflow
+ PERL PERL PROGRAM NAME: pre_built_big_stream
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 19 2018 
 
@@ -73,7 +73,7 @@ my ($values_aref,$names_aref,$check_buttons_settings_aref);
 		to return one specific widget address at a time?
 	}	
 		foreach my $key (sort keys %$pre_built_big_stream_href) {
-         print (" pre_built_superflow,key is $key, value is $pre_built_big_stream_href->{$key}\n");
+         print (" pre_built_big_stream,key is $key, value is $pre_built_big_stream_href->{$key}\n");
       }
 	
 	104
@@ -128,11 +128,11 @@ sub set_flowNsuperflow_name_w {
 =head2 sub select
 
  Chosen big stream
- isplays the parameter names and their values
+ displays the parameter names and their values
  but does not write them to a file
    	
  foreach my $key (sort keys %$pre_built_big_stream_href) {
-         print (" pre_built_superflow,key is $key, value is $pre_built_big_stream_href->{$key}\n");
+         print (" pre_built_big_stream,key is $key, value is $pre_built_big_stream_href->{$key}\n");
  }
  
 =cut
@@ -148,26 +148,26 @@ sub select {
 
     my $prog_name_sref = $pre_built_big_stream_href->{_prog_name_sref};
 
-    # print("1. pre_built_superflow,select,prog=${$pre_built_big_stream_href->{_prog_name_sref}}\n");
+    # print("1. pre_built_big_stream,select,prog=${$pre_built_big_stream_href->{_prog_name_sref}}\n");
     my $message = $pre_built_big_stream_messages->null_button(0);
 
     # print("pre_built_big_stream,select,message_w:$pre_built_big_stream_href->{_message_w}\n");
     $message_w->delete( "1.0", 'end' );
     $message_w->insert( 'end', $message );
 
-    # print("1. pre_built_superflow,select,should be NO values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("1. pre_built_big_stream,select,should be NO values=@{$pre_built_big_stream_href->{_values_aref}}\n");
     # local location within GUI
     # gui_history->set_gui_widgets($pre_built_big_stream_href);  
     gui_history->set_hash_ref($pre_built_big_stream_href); 
     gui_history->set4start_of_superflow_select(); 
     $pre_built_big_stream_href = gui_history->get_hash_ref(); 
 
-    # print("pre_built_big_stream,select,_is_pre_built_superflow: $pre_built_big_stream_href->{_is_pre_built_superflow}\n");
+    # print("pre_built_big_stream,select,_is_pre_built_big_stream: $pre_built_big_stream_href->{_is_pre_built_superflow}\n");
     # print("pre_built_big_stream,select,_flow_type: $pre_built_big_stream_href->{_flow_type}\n");
     # set location in gui
     $whereami->set4superflow_select_button();
 
-    # print("1. pre_built_superflow,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # print("1. pre_built_big_stream,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
     $config_superflows->set_program_name($prog_name_sref); 
     $config_superflows->set_prog_name_config($prog_name_sref); 
     my $prog_name_config = $config_superflows->get_prog_name_config(); 
@@ -209,20 +209,20 @@ sub select {
     # parameter values from superflow configuration file
     $pre_built_big_stream_href->{_values_aref} = $config_superflows->get_values();
 
-    # print("2. pre_built_superflow,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
-    # print("3. pre_built_superflow,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # print("2. pre_built_big_stream,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("3. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
 
     $pre_built_big_stream_href->{_check_buttons_settings_aref} = $config_superflows->get_check_buttons_settings();
 
-    # print("1 pre_built_superflow,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
+    # print("1 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
 
     $pre_built_big_stream_href->{_superflow_first_idx} = $config_superflows->first_idx();
     $pre_built_big_stream_href->{_superflow_length}    = $config_superflows->length();
 
-    # print("4. pre_built_superflow,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # print("4. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
     # Blank out all the widget parameter names and their values
-    # print("3. pre_built_superflow,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
-    # print("3. pre_built_superflow,length,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("3. pre_built_big_stream,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("3. pre_built_big_stream,length,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
     # print("pre_built_big_stream,length = maximum default! $pre_built_big_stream_href->{_superflow_length}\n");
     my $here = $whereami->get4superflow_select_button();
     
@@ -230,10 +230,10 @@ sub select {
     #$param_widgets		->set_labels_w_aref($pre_built_big_stream_href->{_labels_w_aref} );
     #$param_widgets		->set_values_w_aref($pre_built_big_stream_href->{_values_w_aref} );
     #$param_widgets		->set_check_buttons_w_aref($pre_built_big_stream_href->{_check_buttons_w_aref} );
-    # print("5. pre_built_superflow,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # print("5. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
     $param_widgets->gui_full_clear();
 
-    # print("6. pre_built_superflow,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # print("6. pre_built_big_stream,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
     $param_widgets->range($pre_built_big_stream_href);
     $param_widgets->set_labels( $pre_built_big_stream_href->{_names_aref} );
     $param_widgets->set_values( $pre_built_big_stream_href->{_values_aref} );
@@ -244,16 +244,16 @@ sub select {
     $param_widgets->redisplay_values();
     $param_widgets->redisplay_check_buttons();
 
-    # print("2 pre_built_superflow,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
+    # print("2 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
     # put focus on first entry widget in new value and paramter list
     my @Entry_widget = @{ $param_widgets->get_values_w_aref() };
 
     # print("L_SU,flow_select,Entry_widgets@Entry_widget\n");
     $Entry_widget[0]->focus;
 
-    # print("3 pre_built_superflow,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
+    # print("3 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
     # Here is where you rebind the different buttons depending on the
-    # program name that is selected (i.e. through spec.pm)
+    # program name that is selected (i.e. through *_spec.pm)
     # send superflow names through an alias filter
     # that links their GUI name to their program name
     # e.g. iVelAnalysis (GUI) is actually IVA.pm (shortened)
@@ -269,19 +269,19 @@ sub select {
     $binding->setFileDialog_button_sub_ref($pre_built_big_stream_href_sub_ref);
     $binding->set();
 
-    # print("4 pre_built_superflow,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
+    # print("4 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
 
     # in order to export this private hash we need to send if back via a private variable
-    # values_aref that will be assigned in pre_built_superflow, get_hash_ref.
+    # values_aref that will be assigned in pre_built_big_stream, get_hash_ref.
     $values_aref = $pre_built_big_stream_href->{_values_aref};
 
-    # print("4. pre_built_superflow,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("4. pre_built_big_stream,select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
 
-    # gui_history->set_gui_widgets($pre_built_big_stream_href);      # sets 25 / given 103
-    gui_history->set_hash_ref($pre_built_big_stream_href);         # sets 49 / given 103
-    gui_history->set4end_of_superflow_select();    # sets 3; sets gui_widgets
-    $pre_built_big_stream_href = gui_history->get_hash_ref();      # returns 98 !
-                                                       # print("6. pre_built_superflow,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    # gui_history->set_gui_widgets($pre_built_big_stream_href);
+    gui_history->set_hash_ref($pre_built_big_stream_href);
+    gui_history->set4end_of_superflow_select();
+    $pre_built_big_stream_href = gui_history->get_hash_ref();     
+    # print("6. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
 
     # for export via get_hash_ref
     # $pre_built_big_stream_href_first_idx  	 			= $config_superflows->first_idx();
@@ -290,8 +290,8 @@ sub select {
     $values_aref                 = $pre_built_big_stream_href->{_values_aref};
     $check_buttons_settings_aref = $pre_built_big_stream_href->{_check_buttons_settings_aref};
 
-    # print("5 pre_built_superflow,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
-    # print("5 pre_built_superflow,superflow_select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
+    # print("5 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
+    # print("5 pre_built_big_stream,superflow_select,values=@{$pre_built_big_stream_href->{_values_aref}}\n");
 
 }
 

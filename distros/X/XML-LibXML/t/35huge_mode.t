@@ -29,23 +29,22 @@ my $benign_xml = <<'EOF';
 EOF
 
 my $evil_xml = <<'EOF';
-<?xml version="1.0"?>
-<!DOCTYPE lolz [
- <!ENTITY lol "lol">
- <!ENTITY lol1 "&lol;&lol;">
- <!ENTITY lol2 "&lol1;&lol1;">
- <!ENTITY lol3 "&lol2;&lol2;">
- <!ENTITY lol4 "&lol3;&lol3;">
- <!ENTITY lol5 "&lol4;&lol4;">
- <!ENTITY lol6 "&lol5;&lol5;">
- <!ENTITY lol7 "&lol6;&lol6;">
- <!ENTITY lol8 "&lol7;&lol7;">
- <!ENTITY lol9 "&lol8;&lol8;">
-]>
-<lolz>&lol9;</lolz>
+<!DOCTYPE root [
+  <!ENTITY ha "Ha !">
+  <!ENTITY ha2 "&ha; &ha;">
 EOF
 
-my($parser, $doc);
+foreach my $i (2 .. 47)
+{
+    $evil_xml .= sprintf(qq#  <!ENTITY ha%d "&ha%d; &ha%d;">\n#, $i+1, $i, $i);
+}
+
+$evil_xml .= <<'EOF';
+]>
+<root>&ha48;</root>
+EOF
+
+my ($parser, $doc, $err);
 
 $parser = XML::LibXML->new;
 #$parser->set_option(huge => 0);
@@ -54,18 +53,22 @@ ok(!$parser->get_option('huge'), "huge mode disabled by default");
 
 $doc = eval { $parser->parse_string($evil_xml); };
 
+$err = $@;
+
 # TEST
-isnt("$@", "", "exception thrown during parse");
+isnt("$err", "", "exception thrown during parse");
 # TEST
-like($@, qr/entity.*loop/si, "exception refers to entity reference loop");
+like($err, qr/entity/si, "exception refers to entity maximum loop (libxml2 <= 2.10) or depth (>= 2.11)");
 
 
 $parser = XML::LibXML->new;
 
 $doc = eval { $parser->parse_string($benign_xml); };
 
+$err = $@;
+
 # TEST
-is("$@", "", "no exception thrown during parse");
+is("$err", "", "no exception thrown during parse");
 
 my $body = $doc->findvalue( '/lolz' );
 # TEST

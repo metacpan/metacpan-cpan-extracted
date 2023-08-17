@@ -61,7 +61,8 @@ my $expected_request = {
 	ReadValueId_nodeId => {
 	    NodeId_identifier => NS0ID_SERVER_SERVERSTATUS_CURRENTTIME,
 	    NodeId_identifierType => 0,
-	    NodeId_namespaceIndex => 0
+	    NodeId_namespaceIndex => 0,
+	    NodeId_print => "i=".NS0ID_SERVER_SERVERSTATUS_CURRENTTIME,
 	},
 	ReadValueId_attributeId => ATTRIBUTEID_VALUE,
 	ReadValueId_dataEncoding => ignore(),

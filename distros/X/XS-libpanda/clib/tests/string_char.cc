@@ -19,3 +19,22 @@ void test_compilation_warnings () {
         in.find("zzz");
     }
 }
+
+TEST_CASE("string synopsis", "[string]") {
+    using panda::string;
+    string a = "hello, ";
+    string b("world!!!", 6);
+    string c = a + b;
+    REQUIRE(c == "hello, world!");
+
+    //CoW, no copy on assignment or substr
+    string copy = a;
+    REQUIRE(copy.data() == a.data());
+    copy[1] = 'a';
+    REQUIRE(a == "hello, ");
+    REQUIRE(copy == "hallo, ");
+
+
+    string sub = a.substr(0, 4);
+    REQUIRE(sub.data() == a.data());
+}

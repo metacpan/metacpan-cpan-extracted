@@ -1,5 +1,11 @@
 Revision history for MsOffice-Word-HTML-Writer
 
+1.10 05.08.2023
+  - new "encode_fallback" parameter
+  - save_as() can take a filehandle instead of a filename
+
+1.09 04.08.2023
+  - add a <meta http-equiv> tag in html, because the MIME Content-type header is not enough for MsWord
 
 1.08 18.03.2023
   - default charset is now utf-8 instead of iso-8859-1. When opening documents in Word

@@ -1,0 +1,98 @@
+---
+abstract: 'Perl library to work with the API for the Hetzner Cloud'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0.1'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VM-HetznerCloud
+provides:
+  VM::HetznerCloud:
+    file: lib/VM/HetznerCloud.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Actions:
+    file: lib/VM/HetznerCloud/API/Actions.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Certificates:
+    file: lib/VM/HetznerCloud/API/Certificates.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Datacenters:
+    file: lib/VM/HetznerCloud/API/Datacenters.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Firewalls:
+    file: lib/VM/HetznerCloud/API/Firewalls.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::FloatingIps:
+    file: lib/VM/HetznerCloud/API/FloatingIps.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Images:
+    file: lib/VM/HetznerCloud/API/Images.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Isos:
+    file: lib/VM/HetznerCloud/API/Isos.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::LoadBalancerTypes:
+    file: lib/VM/HetznerCloud/API/LoadBalancerTypes.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::LoadBalancers:
+    file: lib/VM/HetznerCloud/API/LoadBalancers.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Locations:
+    file: lib/VM/HetznerCloud/API/Locations.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Networks:
+    file: lib/VM/HetznerCloud/API/Networks.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::PlacementGroups:
+    file: lib/VM/HetznerCloud/API/PlacementGroups.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Pricing:
+    file: lib/VM/HetznerCloud/API/Pricing.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::PrimaryIps:
+    file: lib/VM/HetznerCloud/API/PrimaryIps.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::ServerTypes:
+    file: lib/VM/HetznerCloud/API/ServerTypes.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Servers:
+    file: lib/VM/HetznerCloud/API/Servers.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::SshKeys:
+    file: lib/VM/HetznerCloud/API/SshKeys.pm
+    version: v0.0.3
+  VM::HetznerCloud::API::Volumes:
+    file: lib/VM/HetznerCloud/API/Volumes.pm
+    version: v0.0.3
+  VM::HetznerCloud::APIBase:
+    file: lib/VM/HetznerCloud/APIBase.pm
+    version: v0.0.3
+  VM::HetznerCloud::Schema:
+    file: lib/VM/HetznerCloud/Schema.pm
+    version: v0.0.3
+requires:
+  Carp: '0'
+  JSON::Validator: '5.14'
+  Mojolicious: '9.32'
+  Moo: '2'
+  Types::Mojo: '0.06'
+  URI::Escape: '5.10'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/reneeb/VM-HetznerCloud/issues
+  homepage: https://github.com/reneeb/VM-HetznerCloud
+  repository: git://github.com/reneeb/VM-HetznerCloud.git
+version: 0.0.3
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

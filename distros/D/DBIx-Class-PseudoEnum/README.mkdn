@@ -4,7 +4,7 @@ DBIx::Class::PseudoEnum - Schema-based enumerations independent of database
 
 # VERSION
 
-version 1.0002
+version 1.0003
 
 # SYNOPSIS
 
@@ -125,6 +125,15 @@ The following limitations are (currently) present:
     You will not, of course, be able to test for those values, nor set any other record to that
     value, unless you enumerate it.  
 
+- **Error handling**
+
+    If you've got a Row result, and try to update an enumerated field with an invalid value, it'll croak.
+    That's probably what you want, but if you have that in, for instance, a [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) block, you
+    then have a "dirty" column for your enumerated column, and the next update may mess with you by
+    going ahead and \*doing the update to the invalid value\*.  You can do $result->discard\_changes, and not
+    have to reload your object.  This isn't a bug, precisely, but it is a known quirk, one that I'd like
+    to eradicate.
+
 # ROADMAP
 
 I have these features in mind, going forward.
@@ -150,7 +159,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2023 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

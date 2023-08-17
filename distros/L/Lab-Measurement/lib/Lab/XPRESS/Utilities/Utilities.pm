@@ -152,7 +152,7 @@ Lab::XPRESS::Utilities - Global utility functions for XPRESS
 
 =head1 VERSION
 
-version 3.872
+version 3.881
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -7,6 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'IO::Socket::IP',
    requires => {
+      'perl' => '5.014',
+
       'IO::Socket' => 0,
       'Socket' => '1.97',
    },

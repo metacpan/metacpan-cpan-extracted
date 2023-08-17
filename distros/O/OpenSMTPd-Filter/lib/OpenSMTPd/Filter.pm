@@ -14,7 +14,7 @@ use Carp;
 use Time::HiRes qw< time >;
 
 # ABSTRACT: Easier filters for OpenSMTPd in perl
-our $VERSION = 'v0.0.2'; # VERSION
+our $VERSION = 'v0.0.3'; # VERSION
 
 my @report_fields = qw< version timestamp subsystem event session suffix >;
 my %report_events = (
@@ -24,7 +24,12 @@ my %report_events = (
         'link-identify'   => [qw< method identity >],
         'link-tls'        => [qw< tls-string >],
         'link-disconnect' => [qw< >],
-        'link-auth'       => [qw< username result >],
+        'link-auth'       => sub {
+            my ($f, $type, $params) = @_;
+            return $params->{version} < 0.7
+                ? [qw< username result >]
+                : [qw< result username >];
+        },
         'tx-reset'        => [qw< message-id >],
         'tx-begin'        => [qw< message-id >],
         'tx-mail'         => [qw< message-id result address >],
@@ -217,7 +222,8 @@ sub _handle_report {
     my $suffix = delete $report{suffix};
 
     my %params;
-    my @fields = $self->_report_fields_for( @report{qw< subsystem event >} );
+    my @fields = $self->_report_fields_for( @report{qw< subsystem event >},
+        \%report );
     @params{@fields} = split /\|/, $suffix, @fields
         if @fields;
 
@@ -274,7 +280,8 @@ sub _handle_filter {
     $_ = defined $_ ? "'$_'" : "undef" for $subsystem, $phase, $session_id;
 
     my %params;
-    my @fields = $self->_filter_fields_for( @filter{qw< subsystem phase >} );
+    my @fields = $self->_filter_fields_for( @filter{qw< subsystem phase >},
+        \%filter );
     @params{@fields} = split /\|/, $suffix, @fields
         if defined $suffix and @fields;
 
@@ -370,10 +377,15 @@ sub _report_fields_for { shift->_fields_for( report => \%report_events, @_ ) }
 sub _filter_fields_for { shift->_fields_for( filter => \%filter_events, @_ ) }
 
 sub _fields_for {
-    my ( $self, $type, $map, $subsystem, $item ) = @_;
+    my ( $self, $type, $map, $subsystem, $item, $params ) = @_;
 
     if ( $subsystem and $item and my $items = $map->{$subsystem} ) {
-        return @{ $items->{$item} } if $items->{$item};
+        if ( my $fields = $items->{$item} ) {
+            $fields = $self->$fields( $type, $params )
+                if ref $fields eq 'CODE';
+
+            return @{$fields};
+        }
     }
 
     $_ = defined $_ ? "'$_'" : "undef" for $subsystem, $item;
@@ -405,7 +417,7 @@ OpenSMTPd::Filter - Easier filters for OpenSMTPd in perl
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
@@ -427,6 +439,8 @@ version v0.0.2
 
 This module is a helper to make writing L<OpenSMTPd|https://opensmtpd.org>
 filters in perl easier.
+
+It should support smtpd API protocol version 0.7 and earlier.
 
 =head1 METHODS
 
@@ -706,9 +720,9 @@ Events for the subsystem below may include additional fields.
 
 =over
 
-=item username
-
 =item result
+
+=item username
 
 =back
 

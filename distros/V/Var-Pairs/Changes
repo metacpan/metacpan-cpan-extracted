@@ -149,3 +149,8 @@ Revision history for Var-Pairs
 0.004001  Wed May  9 18:01:58 2018
 
     POD fix (thanks, Salvatore)
+
+
+0.004002  Tue Jul  4 21:52:33 2023
+
+    * Removed all given/when and smartmatching for compatibility with Perl 5.38+

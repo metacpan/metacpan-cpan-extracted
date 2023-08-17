@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,6 +42,7 @@ requires:
   Text::CSV: '0'
   Text::Xslate: '1.6002'
   Types::Standard: '0.026'
+  Unicode::UTF8: '0.62'
   XML::Parser: '2.44'
   open: '0'
   strict: '0'
@@ -51,5 +52,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-SVG-Parser
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/MarpaX-Languages-SVG-Parser.git
-version: '1.09'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

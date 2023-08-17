@@ -41,10 +41,10 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-If you intend to use a Prologix USB-GPIB or conpatible controller, you
+If you intend to use a Prologix USB-GPIB or compatible controller, you
 must install Device::Serial
 
-If you intend to use a LinuxGpib device, you must first install linux-gpib and its LinuxGpib perl module
+If you intend to use a LinuxGpib interface device, you must first install linux-gpib and its LinuxGpib perl binding module
 from https://sourceforge.net/projects/linux-gpib
 Follow the instructions in lib/Device/GPIB/Controllers/README.
   

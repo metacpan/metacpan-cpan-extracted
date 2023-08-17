@@ -75,26 +75,17 @@ The capacity. This is the length of the internally reserved elements to extend t
 
 The length of the list.
 
-=head2 values
-
-  has values : ro int[];
-
-The elements of the list. This is the internally used array, but it can be manipulated directly.
-
-  my $elements = $list->values;
-  $valeus->[0] = 5;
-
 =head1 Class Methods
 
 =head2 new
 
-  static method new : IntList ($array = undef : int[], $capacity = -1 : int);
+  static method new : IntList ($array : int[] = undef, $capacity : int = -1);
 
 Create a new C<IntList> object using L</"new_len">.
 
 The passed length to L</"new_len"> is the length of the array. If the array is undef, the length is 0.
 
-The elements of the array are copied to the values of the the created array.
+The elements of the array are copied to the elements of the the created array.
 
 Examples:
 
@@ -103,7 +94,7 @@ Examples:
 
 =head2 new_len
 
-  static method new_len : IntList ($length : int, $capacity = -1 : int);
+  static method new_len : IntList ($length : int, $capacity : int = -1);
 
 Creates a new C<IntList> object with the $length and the $capacity.
 
@@ -191,8 +182,6 @@ Reserves the elements with the $new_capacity.
 
 If the $new_capacity is greater than the capacity of the list, the capacity of the list is extended to the $new_capacity.
 
-Note that L</"values"> is replaced with the new values and the values of the original list are copied to the new values in the above case.
-
 Exceptions:
 
 The $new_capacity must be greater than or equal to 0.
@@ -245,7 +234,15 @@ The length of the $list must be greater than 0.
 
   method to_array : int[] ();
 
-Converts the list to an array.
+Creates a new array with the length of the list and copies all elements of the list into the new array, and returns it.
+
+=head2 get_array_unsafe
+
+  method get_array_unsafe : int[] ();
+
+Gets the internally array.
+
+This array is unsafe because it continues to point to the old array if the internal array is extended.
 
 =head2 unshift
 

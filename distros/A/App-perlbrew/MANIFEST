@@ -39,8 +39,6 @@ t/13.perl_release.t
 t/14.perl_version_parsing.t
 t/15.no-reuse-build-dir.t
 t/16.release-detail.t
-t/17.release-detail-cperl-local.t
-t/17.release-detail-cperl-remote.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
 t/19.find_similar_commands.t
@@ -64,6 +62,7 @@ t/command-install-patchperl.t
 t/command-install.t
 t/command-lib.t
 t/command-list.t
+t/command-make-shim.t
 t/current_perl.t
 t/current_shell.t
 t/do_system.t

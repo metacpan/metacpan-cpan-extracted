@@ -3,9 +3,9 @@ use FindBin qw($Bin);
 use lib $Bin;
 
 use t_Common qw/oops/; # strict, warnings, Carp etc.
-use t_TestCommon  # Test::More etc.
+use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug mycheckeq_literal expect1 mycheck 
+            bug mycheckeq_literal expect1 mycheck
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -24,7 +24,7 @@ BEGIN {
       ]
   );
 
-  #new_sheet; 
+  #new_sheet;
   options debug => $debug;
   read_spreadsheet $inpath;
   # title_rx 0;
@@ -48,7 +48,7 @@ BEGIN {
 # BUT outside BEGIN{} we just get a warning and the variable is not
 # tied, although the COLSPEC is otherwise usable.
 { our $Myvar2;
-  my @caught; 
+  my @caught;
   { local $SIG{__WARN__} = sub{ push @caught, join("",@_); };
     insert_cols '>$', "Myvar2";
   }
@@ -67,7 +67,7 @@ our $Atitle;
 # Declare a variable which should not be tied
 our $Etitle = "non-tied Etitle value";
 
-insert_cols '>$', "Etitle", "Ftitle"; 
+insert_cols '>$', "Etitle", "Ftitle";
 our $Ftitle;
 tie_column_vars 'Ftitle';
 die unless $rows[$title_rx]{Ftitle} eq "Ftitle";
@@ -101,7 +101,7 @@ apply {
   die unless $FutureB eq "B$rx";
   die unless $FutureC eq "C$rx";
   die unless $FutureD eq "D$rx";
-  
+
   eval{ my $dum = $Future4; } && die; die unless $@ =~ /Future4.*unknown/;
 
   die unless $Atitle eq "A$rx";

@@ -152,12 +152,14 @@ t/300body-file.t
 t/301body-string.t
 t/302body-lines.t
 t/303body-multip.t
+t/304body-postlude.t
 t/310encode-base64.t
 t/311encode-eight.t
 t/312encode-quoted.t
 t/313encode-seven.t
 t/314encode-charset.t
 t/315encode-body.t
+t/316encode-charset.t
 t/320bodyconv-textaf.t
 t/321bodyconv-html.t
 t/322bodyconv-htmlps.t
@@ -177,6 +179,7 @@ t/423msgconv-emabs.t
 t/500parser-field.t
 t/501parser-readmp.t
 t/502parser-nested.t
+t/503parser-unnested.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

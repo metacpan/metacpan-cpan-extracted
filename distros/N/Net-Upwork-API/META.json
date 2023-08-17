@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "1.965",
-            "Net::OAuth2" : "0.63",
+            "Net::OAuth2" : "0.67",
             "perl" : "v5.8.8"
          }
       }
@@ -40,7 +40,7 @@
    "provides" : {
       "Net::Upwork::API" : {
          "file" : "lib/Net/Upwork/API.pm",
-         "version" : "v2.1.4"
+         "version" : "v2.2.0"
       },
       "Net::Upwork::API::Client" : {
          "file" : "lib/Net/Upwork/API/Client.pm"
@@ -155,6 +155,6 @@
          "url" : "https://github.com/upwork/perl-upwork-oauth2.git"
       }
    },
-   "version" : "v2.1.4",
+   "version" : "v2.2.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

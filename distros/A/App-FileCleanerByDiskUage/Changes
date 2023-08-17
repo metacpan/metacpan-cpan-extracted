@@ -1,0 +1,7 @@
+Revision history for App-FileCleanerByDiskUage
+
+0.1.0   2023-07-31/13:45
+        - Enable -p to be used more than once.
+
+0.0.1   2023-07-27/16:00
+        - Initial release.

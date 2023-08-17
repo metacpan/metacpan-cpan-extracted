@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostCopyWorksheetRowsRequest.name :   ,
-# PostCopyWorksheetRowsRequest.sheetName :   ,
-# PostCopyWorksheetRowsRequest.sourceRowIndex :   ,
-# PostCopyWorksheetRowsRequest.destinationRowIndex :   ,
-# PostCopyWorksheetRowsRequest.rowNumber :   ,
-# PostCopyWorksheetRowsRequest.worksheet :   ,
-# PostCopyWorksheetRowsRequest.folder :   ,
-# PostCopyWorksheetRowsRequest.storageName :    
+# PostCopyWorksheetRowsRequest.name : The workbook name.  ,
+# PostCopyWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# PostCopyWorksheetRowsRequest.sourceRowIndex : Source row index  ,
+# PostCopyWorksheetRowsRequest.destinationRowIndex : Destination row index  ,
+# PostCopyWorksheetRowsRequest.rowNumber : The copied row number  ,
+# PostCopyWorksheetRowsRequest.worksheet : The worksheet name.  ,
+# PostCopyWorksheetRowsRequest.folder : Original workbook folder.  ,
+# PostCopyWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_copy_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Copies data and formats of some whole rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'source_row_index' => {
      	datatype => 'int',
      	base_name => 'sourceRowIndex',
-     	description => '',
+     	description => 'Source row index',
      	format => '',
      	read_only => '',
      		},
      'destination_row_index' => {
      	datatype => 'int',
      	base_name => 'destinationRowIndex',
-     	description => '',
+     	description => 'Destination row index',
      	format => '',
      	read_only => '',
      		},
      'row_number' => {
      	datatype => 'int',
      	base_name => 'rowNumber',
-     	description => '',
+     	description => 'The copied row number',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'worksheet',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

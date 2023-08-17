@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -24,16 +24,16 @@
             "HTTP::Request" : "0",
             "IO::Async" : "0.54",
             "IO::Async::Listener" : "0.61",
-            "Metrics::Any" : "0.05"
+            "Metrics::Any" : "0.05",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "HTTP::Response" : "0",
             "IO::Async::Test" : "0",
-            "Test::Identity" : "0",
+            "Test2::V0" : "0.000147",
             "Test::Metrics::Any" : "0",
-            "Test::More" : "0.88",
             "Test::Refcount" : "0"
          }
       }
@@ -41,23 +41,23 @@
    "provides" : {
       "Net::Async::HTTP::Server" : {
          "file" : "lib/Net/Async/HTTP/Server.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Net::Async::HTTP::Server::PSGI" : {
          "file" : "lib/Net/Async/HTTP/Server/PSGI.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Net::Async::HTTP::Server::Protocol" : {
          "file" : "lib/Net/Async/HTTP/Server/Protocol.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Net::Async::HTTP::Server::Request" : {
          "file" : "lib/Net/Async/HTTP/Server/Request.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Plack::Handler::Net::Async::HTTP::Server" : {
          "file" : "lib/Plack/Handler/Net/Async/HTTP/Server.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

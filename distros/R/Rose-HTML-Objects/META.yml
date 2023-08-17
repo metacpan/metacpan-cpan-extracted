@@ -43,5 +43,5 @@ resources:
   homepage: http://rosecode.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/siracusa/rose/tree/master/modules/Rose-HTML-Objects
-version: '0.624'
+version: '0.626'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

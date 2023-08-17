@@ -1,5 +1,12 @@
 Revision history for Syntax-Operator-Zip
 
+0.06    2023-07-21
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Adjusted documentation for release of Perl v5.38
+         * Remember to implement `no Syntax::Operator::*` to disable the syntax
+         * Give the `M` operator its own hinthash key
+
 0.05    2022-10-24
         [CHANGES]
          * Updates for XS::Parse::Infix v0.26

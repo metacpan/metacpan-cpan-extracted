@@ -1,4 +1,4 @@
-[% SET user_can_port_control = user_has_role('port_control') %]
+[% SET user_can_port_control = user_has_role('port_control', device) %]
 <table id="dp-data-table" class="table table-bordered table-striped" width="100%" cellspacing="0">
   <thead>
     <tr>
@@ -142,6 +142,14 @@
       <div class="nd_editable-cell-content">
         [% row.name | html_entity %]
       </div>
+      </td>
+      [% END %]
+
+      [% IF params.c_tags %]
+      <td>
+        [% FOREACH t IN row.filtered_tags.sort %]
+        <span class="badge badge-success">[% t | html_entity %]</span>
+        [% END %]
       </td>
       [% END %]
 
@@ -425,7 +433,7 @@
           [% END %]
         [% END %]
         [% END %]
-        [% IF user_can_port_control AND params.c_admin AND row.portctl %]
+        [% IF settings.portctl_topology AND user_can_port_control AND params.c_admin AND row.portctl %]
         <a class="nd_log-icon"
           href="[% uri_for('/admin/topology') | none %]?dev1=[% device.ip | uri %]&port1=[% row.port | uri %]">
           <i class="icon-link text-warning"

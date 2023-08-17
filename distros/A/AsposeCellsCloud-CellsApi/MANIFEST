@@ -943,6 +943,9 @@ lib/AsposeCellsCloud/Object/WorksheetReplaceResponse.pm
 lib/AsposeCellsCloud/Object/WorksheetResponse.pm
 lib/AsposeCellsCloud/Object/WorksheetsResponse.pm
 lib/AsposeCellsCloud/Object/BatchConvertRequest.pm
+lib/AsposeCellsCloud/Object/BatchLockRequest.pm
+lib/AsposeCellsCloud/Object/BatchProtectRequest.pm
+lib/AsposeCellsCloud/Object/BatchSplitRequest.pm
 lib/AsposeCellsCloud/Object/ColorFilterRequest.pm
 lib/AsposeCellsCloud/Object/ConvertParameter.pm
 lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm
@@ -1063,6 +1066,10 @@ lib/AsposeCellsCloud/Request/DeleteWorksheetFilterRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetAutoshapesRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetAutoshapeWithFormatRequest.pm
 lib/AsposeCellsCloud/Request/PostBatchConvertRequest.pm
+lib/AsposeCellsCloud/Request/PostBatchProtectRequest.pm
+lib/AsposeCellsCloud/Request/PostBatchLockRequest.pm
+lib/AsposeCellsCloud/Request/PostBatchUnlockRequest.pm
+lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm
 lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm
 lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm
 lib/AsposeCellsCloud/Request/PostClearFormatsRequest.pm
@@ -1173,6 +1180,7 @@ lib/AsposeCellsCloud/Request/PostImportRequest.pm
 lib/AsposeCellsCloud/Request/PostWatermarkRequest.pm
 lib/AsposeCellsCloud/Request/PostClearObjectsRequest.pm
 lib/AsposeCellsCloud/Request/PostReverseRequest.pm
+lib/AsposeCellsCloud/Request/PostRepairRequest.pm
 lib/AsposeCellsCloud/Request/PostRotateRequest.pm
 lib/AsposeCellsCloud/Request/PostMetadataRequest.pm
 lib/AsposeCellsCloud/Request/GetMetadataRequest.pm
@@ -1239,8 +1247,8 @@ lib/AsposeCellsCloud/Request/DeletePivotTableFieldRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableFiltersRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableFilterRequest.pm
 lib/AsposeCellsCloud/Request/GetDocumentPropertiesRequest.pm
-lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm
 lib/AsposeCellsCloud/Request/PutDocumentPropertyRequest.pm
+lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm
 lib/AsposeCellsCloud/Request/DeleteDocumentPropertyRequest.pm
 lib/AsposeCellsCloud/Request/DeleteDocumentPropertiesRequest.pm
 lib/AsposeCellsCloud/Request/PostWorksheetCellsRangesRequest.pm

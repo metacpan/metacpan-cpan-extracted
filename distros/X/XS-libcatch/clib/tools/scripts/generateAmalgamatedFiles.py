@@ -16,7 +16,7 @@ output_cpp = os.path.join(catchPath, 'extras', 'catch_amalgamated.cpp')
 copyright_lines = [
 '//              Copyright Catch2 Authors\n',
 '// Distributed under the Boost Software License, Version 1.0.\n',
-'//   (See accompanying file LICENSE_1_0.txt or copy at\n',
+'//   (See accompanying file LICENSE.txt or copy at\n',
 '//        https://www.boost.org/LICENSE_1_0.txt)\n',
 '// SPDX-License-Identifier: BSL-1.0\n',
 ]
@@ -26,7 +26,7 @@ copyright_lines = [
 file_header = '''\
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -79,6 +79,15 @@ def concatenate_file(out, filename: str, expand_headers: bool) -> int:
             # hundred thousands lines (~300k as of preview3 :-) )
             if next_header in concatenated_headers:
                 continue
+
+            # Skip including the auto-generated user config file,
+            # because it has not been generated yet at this point.
+            # The code around it should be written so that just not including
+            # it is equivalent with all-default user configuration.
+            if next_header == 'catch2/catch_user_config.hpp':
+                concatenated_headers.add(next_header)
+                continue
+
             concatenated_headers.add(next_header)
             concatenated += concatenate_file(out, os.path.join(root_path, next_header), expand_headers)
 
@@ -99,13 +108,14 @@ def generate_cpp():
     with open(output_cpp, mode='w', encoding='utf-8') as cpp:
         cpp.write(formatted_file_header(Version()))
         cpp.write('\n#include "catch_amalgamated.hpp"\n')
+        concatenate_file(cpp, os.path.join(root_path, 'catch2/internal/catch_windows_h_proxy.hpp'), False)
         for file in cpp_files:
             concatenate_file(cpp, file, False)
     print('Concatenated {} cpp files'.format(len(cpp_files)))
 
-
-generate_header()
-generate_cpp()
+if __name__ == "__main__":
+    generate_header()
+    generate_cpp()
 
 
 # Notes:

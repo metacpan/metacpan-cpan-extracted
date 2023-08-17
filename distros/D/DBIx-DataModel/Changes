@@ -1,6 +1,9 @@
 Revision history for Perl extension DBIx::DataModel.
 
-v 3.04 05.11.2022
+v3.05 26.07.2023
+  - new method $statement->nb_fetched_rows & fix buggy $statement->page_boundaries
+
+v3.04 05.11.2022
   - fix $metatable->components (was populated on both paths, which is obviously wrong)
 
 v3.03 23.07.2022

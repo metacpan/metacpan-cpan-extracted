@@ -33,6 +33,7 @@ get '/foo/bar' => sub {
     note "req_id=$id";
 
     my $file = __FILE__;
+    $file = qr/\Q$file\E/; # make sure \\ doesn't interfere with regex on windows
 
     is scalar @warn, 6, "6 warnings issued";
     like $warn[0], qr/req.*\Q$id\E.*pre_route.*mark 1\n$/, "pre_route, msg";

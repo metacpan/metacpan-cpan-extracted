@@ -9,6 +9,7 @@ with 'Valiant::Validator::Each';
 has min => (is=>'ro', required=>0, predicate=>'has_min');
 has max => (is=>'ro', required=>0, predicate=>'has_max');
 has skip_if_empty => (is=>'ro', required=>1, default=>sub {0});
+has skip_if_blank => (is=>'ro', required=>1, default=>sub {0});
 has too_few_msg => (is=>'ro', required=>1, default=>sub {_t 'too_few'});
 has too_many_msg => (is=>'ro', required=>1, default=>sub {_t 'too_many'});
 
@@ -24,6 +25,8 @@ sub normalize_shortcut {
 
 sub validate_each {
   my ($self, $record, $attribute, $value, $opts) = @_;
+
+  return if($self->skip_if_blank && !exists $value->{all_cache});
 
   # If a row is marked to be deleted then don't bother to validate it
   my @rows = grep { not $_->is_removed } @{$value->get_cache||[]};
@@ -101,9 +104,14 @@ This validator supports the following attributes:
 
 =head2 skip_if_empty
 
-Allows you to skip validations if the resultset is empty (has zero rows).  Useful if you want
-to do validations only if there are rows found, such as when you have an optional relationship.
-Defaults to false.
+Skip validations if the resultset is empty.  In this context empty means that you have zero records.
+Probably not that useful; yhou might actually want 'skip_if_blank' instead.
+
+=head2 skip_if_blank
+
+Allows you to skip validations if the resultset is blank.  In this context blank means that you
+have not prefetched the relationship or loaded it in any way.  'blank' is different from 'has none'.
+You might for example want to skip size validations if you have not prefetched the relationship. 
 
 =head2 min
 

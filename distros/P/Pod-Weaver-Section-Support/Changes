@@ -1,5 +1,10 @@
 Revision history for Pod::Weaver::Section::Support
 
+1.014 2023-07-26
+    - Remove broken links to old resources from all:
+        - https://github.com/shlomif/perl-pod-weaver-section-support/pull/4
+        - Thanks to @haarg .
+
 1.013 2020-02-07
     - Remove broken links to old resources:
         - https://github.com/shlomif/HTML-Spelling-Site/issues/2

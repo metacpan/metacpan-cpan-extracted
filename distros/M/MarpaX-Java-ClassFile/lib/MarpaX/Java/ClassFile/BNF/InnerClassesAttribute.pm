@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a InnerClasses_attribute
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -61,7 +61,7 @@ MarpaX::Java::ClassFile::BNF::InnerClassesAttribute - Parsing of a InnerClasses_
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -22,7 +22,9 @@ my $s = $driver->session;
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warnings);
+use Test::Warnings 0.010 qw(warnings :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 use Neo4j::Driver;
 use Neo4j_Test::MockHTTP;
@@ -33,7 +35,7 @@ sub response_for { $mock_plugin->response_for(undef, @_) }
 
 my ($q, $r, @a, $a);
 
-plan tests => 9 + 1;
+plan tests => 9 + $no_warnings;
 
 
 {
@@ -190,17 +192,19 @@ subtest 'multiple statements' => sub {
 		['RETURN {n}', n => 19],
 		['RETURN {n}', {n => 53}],
 	);
-	lives_ok { @a = $s->begin_transaction->_run_multiple(@q) } 'run three statements at once';
+	my $tx = $s->begin_transaction;
+	lives_ok { @a = $tx->_run_multiple(@q) } 'run three statements at once';
 	lives_and { is $a[0]->single->get, 17 } 'retrieve 1st value';
 	lives_and { is $a[1]->single->get, 19 } 'retrieve 2nd value';
 	lives_and { is $a[2]->single->get, 53 } 'retrieve 3rd value';
 	throws_ok {
-		 $r = $s->begin_transaction->_run_multiple('RETURN 42');
+		 $r = $tx->_run_multiple('RETURN 42');
 	} qr/\blist of array references\b/i, 'non-arrayref individual statement';
 	@q = ( [''], ['RETURN 23'] );
 	throws_ok {
-		@a = $s->begin_transaction->_run_multiple([''], ['RETURN 23']);
+		@a = $tx->_run_multiple([''], ['RETURN 23']);
 	} qr/\bempty statements not allowed\b/i, 'include empty statement';
+	$tx->rollback;
 	# TODO: also check statement order in summary
 };
 

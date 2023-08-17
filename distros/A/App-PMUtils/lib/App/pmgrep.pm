@@ -11,9 +11,9 @@ use AppBase::Grep;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-28'; # DATE
+our $DATE = '2023-05-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.743'; # VERSION
+our $VERSION = '0.744'; # VERSION
 
 our %SPEC;
 
@@ -146,7 +146,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.743 of App::pmgrep (from Perl distribution App-PMUtils), released on 2023-01-28.
+This document describes version 0.744 of App::pmgrep (from Perl distribution App-PMUtils), released on 2023-05-12.
 
 =head1 FUNCTIONS
 

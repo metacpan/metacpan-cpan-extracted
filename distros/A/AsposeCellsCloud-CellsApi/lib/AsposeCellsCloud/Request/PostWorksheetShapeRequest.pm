@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetShapeRequest.name :   ,
-# PostWorksheetShapeRequest.sheetName :   ,
-# PostWorksheetShapeRequest.shapeindex :   ,
-# PostWorksheetShapeRequest.dto :   ,
-# PostWorksheetShapeRequest.folder :   ,
-# PostWorksheetShapeRequest.storageName :    
+# PostWorksheetShapeRequest.name : The workbook name.  ,
+# PostWorksheetShapeRequest.sheetName : The worksheet name.  ,
+# PostWorksheetShapeRequest.shapeindex : shape index in worksheet shapes.  ,
+# PostWorksheetShapeRequest.dto : The shape description.  ,
+# PostWorksheetShapeRequest.folder : Original workbook folder.  ,
+# PostWorksheetShapeRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_shape' } = { 
-    	summary => '',
+    	summary => 'Updates a shape in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'shapeindex' => {
      	datatype => 'int',
      	base_name => 'shapeindex',
-     	description => '',
+     	description => 'shape index in worksheet shapes.',
      	format => '',
      	read_only => '',
      		},
      'dto' => {
      	datatype => 'Shape',
      	base_name => 'dto',
-     	description => '',
+     	description => 'The shape description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

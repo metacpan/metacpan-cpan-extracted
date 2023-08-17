@@ -1,6 +1,6 @@
 package Module::Build::with::XSTests;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Module::Build );

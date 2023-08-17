@@ -2,7 +2,7 @@ package Class::Measure;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =encoding utf8
 
@@ -28,7 +28,7 @@ The methods described here are available in all Class::Measure classes.
 =cut
 
 use Carp qw( croak );
-use Scalar::Util qw(looks_like_number);
+use Scalar::Util qw( blessed looks_like_number );
 
 use overload 
     '+'=>\&_ol_add, '-'=>\&_ol_sub, 
@@ -364,71 +364,55 @@ sub _find_path {
 }
 
 sub _ol_add {
-    my($one,$two,$opt) = @_;
-    if($opt){ my $tmp=$one; $one=$two; $two=$tmp; }
-    if( ref($two) and ref($one) ){
-        croak('You may only add numbers or measurements of the same class') if( ref($one) ne ref($two) );
-        $one->set_value( $one->value + $two->value($one->unit) );
-        return $one;
-    }elsif( ref $one ){
-        $one->set_value( $one->value + $two );
-        return $one;
-    }elsif( ref $two ){
-        $two->set_value( $one + $two->value );
-        return $two;
-    }
-    return;
+    my ($left, $right) = @_;
+    my $class = ref $left;
+
+    my $unit = $left->unit;
+    $left = $left->value;
+    $right = $right->value( $unit ) if blessed($right) and $right->isa($class);
+
+    return $class->new( $left + $right, $unit );
 }
 
 sub _ol_sub {
-    my($one,$two,$opt) = @_;
-    if($opt){ my $tmp=$one; $one=$two; $two=$tmp; }
-    if( ref($two) and ref($one) ){
-        croak('You may only subtract numbers or measurements of the same class') if( ref($one) ne ref($two) );
-        $one->set_value( $one->value - $two->value($one->unit) );
-        return $one;
-    }elsif( ref $one ){
-        $one->set_value( $one->value - $two );
-        return $one;
-    }elsif( ref $two ){
-        $two->set_value( $one - $two->value );
-        return $two;
-    }
-    return;
+    my ($left, $right, $reverse) = @_;
+    my $class = ref $left;
+
+    my $unit = $left->unit;
+    $left = $left->value;
+    $right = $right->value( $unit ) if blessed($right) and $right->isa($class);
+
+    ($left, $right) = ($right, $left) if $reverse;
+
+    return $class->new( $left - $right, $unit );
 }
 
 sub _ol_mult {
-    my($one,$two,$opt) = @_;
-    if($opt){ my $tmp=$one; $one=$two; $two=$tmp; }
-    if( ref($two) and ref($one) ){
-        croak('You cannot multiply two measure classes');
-    }elsif( ref $one ){
-        $one->set_value( $one->value * $two );
-        return $one;
-    }elsif( ref $two ){
-        $two->set_value( $one * $two->value );
-        return $two;
-    }
-    return;
+    my ($left, $right) = @_;
+    my $class = ref $left;
+
+    my $unit = $left->unit;
+    $left = $left->value;
+    $right = $right->value( $unit ) if blessed($right) and $right->isa($class);
+
+    return $class->new( $left * $right, $unit );
 }
 
 sub _ol_div {
-    my($one,$two,$opt) = @_;
-    if($opt){ my $tmp=$one; $one=$two; $two=$tmp; }
-    if( ref($two) and ref($one) ){
-        croak('You cannot divide one measure class by another');
-    }elsif( ref $one ){
-        $one->set_value( $one->value / $two );
-        return $one;
-    }elsif( ref $two ){
-        $two->set_value( $one / $two->value );
-        return $two;
-    }
-    return;
+    my ($left, $right, $reverse) = @_;
+    my $class = ref $left;
+
+    my $unit = $left->unit;
+    $left = $left->value;
+    $right = $right->value( $unit ) if blessed($right) and $right->isa($class);
+
+    ($left, $right) = ($right, $left) if $reverse;
+
+    return $class->new( $left / $right, $unit );
 }
 
 sub _ol_str {
-    my $self = shift;
+    my ($self) = @_;
     return $self->value;
 }
 
@@ -442,9 +426,12 @@ Class-Measure GitHub issue tracker:
 
 L<https://github.com/bluefeet/Class-Measure/issues>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
     Aran Clary Deltac <bluefeet@gmail.com>
+
+=head1 CONTRIBUTORS
+
     Roland van Ipenburg <roland@rolandvanipenburg.com>
 
 =head1 LICENSE
@@ -453,4 +440,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

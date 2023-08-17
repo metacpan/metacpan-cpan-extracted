@@ -1,4 +1,4 @@
-use Test::Most;
+use Test::More;
 
 use Test::OpenTracing::Interface::SpanContext;
 

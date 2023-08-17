@@ -13,6 +13,7 @@ my @data = (
 	[1, {nested => {second => {name => 1}}}],
 	[1, {nested_form => {optional => "yes", int => 1}}],
 	[0, {nested => "not really"}],
+	[0, {nested => ["not really"]}],
 	[0, {nested => {second => 1}}],
 	[0, {nested_form => {int => 5, nothere => 1}}],
 	[0, {int => 3, arg2 => 15}],
@@ -39,3 +40,4 @@ for my $aref (@data) {
 }
 
 done_testing();
+

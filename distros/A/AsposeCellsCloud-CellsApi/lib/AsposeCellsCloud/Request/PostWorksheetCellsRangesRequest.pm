@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangesRequest.name :   ,
-# PostWorksheetCellsRangesRequest.sheetName :   ,
-# PostWorksheetCellsRangesRequest.rangeOperate :   ,
-# PostWorksheetCellsRangesRequest.folder :   ,
-# PostWorksheetCellsRangesRequest.storageName :    
+# PostWorksheetCellsRangesRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangesRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangesRequest.rangeOperate : copydata,copystyle,copyto,copyvalue  ,
+# PostWorksheetCellsRangesRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_ranges' } = { 
-    	summary => '',
+    	summary => 'Copys content to destination range from source range in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range_operate' => {
      	datatype => 'RangeCopyRequest',
      	base_name => 'rangeOperate',
-     	description => '',
+     	description => 'copydata,copystyle,copyto,copyvalue',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

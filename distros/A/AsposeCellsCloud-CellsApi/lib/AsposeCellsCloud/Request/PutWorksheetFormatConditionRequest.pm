@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetFormatConditionRequest.name :   ,
-# PutWorksheetFormatConditionRequest.sheetName :   ,
-# PutWorksheetFormatConditionRequest.index :   ,
-# PutWorksheetFormatConditionRequest.cellArea :   ,
-# PutWorksheetFormatConditionRequest.type :   ,
-# PutWorksheetFormatConditionRequest.operatorType :   ,
-# PutWorksheetFormatConditionRequest.formula1 :   ,
-# PutWorksheetFormatConditionRequest.formula2 :   ,
-# PutWorksheetFormatConditionRequest.folder :   ,
-# PutWorksheetFormatConditionRequest.storageName :    
+# PutWorksheetFormatConditionRequest.name : The workbook name.  ,
+# PutWorksheetFormatConditionRequest.sheetName : The worksheet name.  ,
+# PutWorksheetFormatConditionRequest.index : Gets the Conditional Formatting element at the specified index.  ,
+# PutWorksheetFormatConditionRequest.cellArea : Adds a conditional formatted cell range.  ,
+# PutWorksheetFormatConditionRequest.type : Format condition type(CellValue/Expression/ColorScale/DataBar/IconSet/Top10/UniqueValues/DuplicateValues/ContainsText/NotContainsText/BeginsWith/EndsWith/ContainsBlanks/NotContainsBlanks/ContainsErrors/NotContainsErrors/TimePeriod/AboveAverage).  ,
+# PutWorksheetFormatConditionRequest.operatorType : Represents the operator type of conditional format and data validation(Between/Equal/GreaterThan/GreaterOrEqual/LessThan/None/NotBetween/NotEqual).  ,
+# PutWorksheetFormatConditionRequest.formula1 : The value or expression associated with conditional formatting.  ,
+# PutWorksheetFormatConditionRequest.formula2 : The value or expression associated with conditional formatting.  ,
+# PutWorksheetFormatConditionRequest.folder : Original workbook folder.  ,
+# PutWorksheetFormatConditionRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition' } = { 
-    	summary => '',
+    	summary => 'Adds a format condition in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -162,70 +162,70 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'Gets the Conditional Formatting element at the specified index.',
      	format => '',
      	read_only => '',
      		},
      'cell_area' => {
      	datatype => 'string',
      	base_name => 'cellArea',
-     	description => '',
+     	description => 'Adds a conditional formatted cell range.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Format condition type(CellValue/Expression/ColorScale/DataBar/IconSet/Top10/UniqueValues/DuplicateValues/ContainsText/NotContainsText/BeginsWith/EndsWith/ContainsBlanks/NotContainsBlanks/ContainsErrors/NotContainsErrors/TimePeriod/AboveAverage).',
      	format => '',
      	read_only => '',
      		},
      'operator_type' => {
      	datatype => 'string',
      	base_name => 'operatorType',
-     	description => '',
+     	description => 'Represents the operator type of conditional format and data validation(Between/Equal/GreaterThan/GreaterOrEqual/LessThan/None/NotBetween/NotEqual).',
      	format => '',
      	read_only => '',
      		},
      'formula1' => {
      	datatype => 'string',
      	base_name => 'formula1',
-     	description => '',
+     	description => 'The value or expression associated with conditional formatting.',
      	format => '',
      	read_only => '',
      		},
      'formula2' => {
      	datatype => 'string',
      	base_name => 'formula2',
-     	description => '',
+     	description => 'The value or expression associated with conditional formatting.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

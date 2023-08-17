@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
-  XS::Parse::Infix::Builder: '0.27'
+  XS::Parse::Infix::Builder: '0.28'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,15 +18,15 @@ name: Syntax-Operator-In
 provides:
   Syntax::Operator::Elem:
     file: lib/Syntax/Operator/Elem.pm
-    version: '0.04'
+    version: '0.06'
   Syntax::Operator::In:
     file: lib/Syntax/Operator/In.pm
-    version: '0.04'
+    version: '0.06'
 requires:
-  XS::Parse::Infix: '0.27'
+  XS::Parse::Infix: '0.28'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

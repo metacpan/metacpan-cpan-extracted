@@ -2,38 +2,109 @@ use strict;
 use Test::Base;
 use HTML::Selector::XPath;
 use Encode qw(decode);
+use Data::Dumper;
 
-if( ! eval { require HTML::TreeBuilder::XPath; 1 }) {
-    plan skip_all => "HTML::TreeBuilder::XPath is not installed.";
+
+my $have_treebuilder = eval {
+    require HTML::TreeBuilder::XPath;
+    diag "Using HTML::TreeBuilder::XPath $HTML::TreeBuilder::XPath::VERSION";
+    1
+};
+
+my $have_libxml = eval {
+    require XML::LibXML;
+    diag "Using XML::LibXML $XML::LibXML::VERSION";
+    1
 };
 
 filters { selector => 'chomp', expected => [ 'lines', 'array' ] };
-plan tests => 1 * blocks;
+plan tests => 4 * blocks;
 
 binmode STDOUT, ':encoding(UTF-8)'; # because our test names contain UTF-8
 binmode STDERR, ':encoding(UTF-8)'; # because our test names contain UTF-8
 # But it seems that Test::More or Test::Base or whoever mess with STDOUT/STDERR
 # on their own.
 
+sub normalize_node {
+    my( $node ) = @_;
+    $node =~ s!\s+$!!;
+
+    # LibXML gives us minimal nodes but TreeBuilder wants expanded nodes
+    $node =~ s!^<(\w+)(.*?)/>!<$1$2></$1>!;
+
+    return $node
+}
+
 run {
     my $block = shift;
-    my $tree = HTML::TreeBuilder::XPath->new;
-    my $input= decode( 'UTF-8', $block->input);
-    $tree->parse($input);
-    $tree->eof;
+    my $input= $block->input;
 
     my $sel= decode( 'UTF-8', scalar $block->selector );
     my $expr;
     if ($block->selector =~ m!^/!) {
         $expr = $sel;
     } else {
-        $expr = HTML::Selector::XPath->new($sel)->to_xpath
+        $expr = HTML::Selector::XPath->new($sel)->to_xpath;
+        $expr =  $expr;
     };
-    my @nodes = $tree->findnodes( $expr );
-    my $expected= [ map { decode( 'UTF-8', $_ )} @{ $block->expected } ];
-    my $got= [ map $_->as_XML, @nodes ];
-    is_deeply $got, $expected,
-        $sel . " -> $expr";
+
+    my $expected= [ map { my $s = decode( 'UTF-8', $_ ); $s =~ s!\s+$!!s; $s } @{ $block->expected } ];
+
+    # Check with XML::LibXML, if we have it
+    if( $have_libxml ) {
+        my $parser = XML::LibXML->new();
+        my $dom = $parser->parse_html_string( $input, { recover => 2, encoding => 'UTF-8' });
+
+        my @nodes;
+        my $ok = eval { @nodes = $dom->findnodes( $expr ); 1 };
+        my $err = $@;
+        SKIP: {
+            if( ! ok $ok, "LibXML can parse '$expr'" ) {
+                diag "Error: '$err'";
+                skip "XPath parse error", 1;
+            }
+
+            my $got= [ map { normalize_node($_->toString) } @nodes ];
+
+            is_deeply $got, $expected,
+                $sel . " -> $expr (LibXML)"
+                or diag Dumper [
+                    'Document', $dom->toString,
+                    'expected',$expected,
+                    'got', $got,
+                ];
+        }
+    } else {
+        SKIP: {
+            skip "XML::LibXML not loaded", 2;
+        }
+    }
+
+    # Check with HTML::TreeBuilder::XPath, if we have it
+    if( $have_treebuilder ) {
+        my $tree = HTML::TreeBuilder::XPath->new;
+        $tree->parse(decode('UTF-8', $input));
+        $tree->eof;
+
+        my @nodes = ();
+        my $ok = eval { @nodes = $tree->findnodes( $expr ); 1 };
+        my $err = $@;
+        SKIP: {
+            if( ! ok $ok, "TreeBuilder can parse '$expr'" ) {
+                diag "Error: '$err'";
+                skip "XPath parse error", 1;
+            }
+
+            my $got= [ map { normalize_node($_->toString) } @nodes ];
+            is_deeply $got, $expected,
+                $sel . " -> $expr (TreeBuilder)"
+                or diag Dumper $got;
+        }
+    } else {
+        SKIP: {
+            skip "HTML::TreeBuilder not loaded", 2;
+        }
+    }
 }
 
 __END__
@@ -212,7 +283,8 @@ a:not([href*="bar"])
 
 ===
 --- input
-<p>
+<span>
+<p>First stuff that is not a link</p>
 <a href="no">No</a>
 <div>Some description</div>
 <a href="foobar">Foobar</a>
@@ -220,11 +292,79 @@ a:not([href*="bar"])
 <a href="barred">Barred</a>
 <div>Some description</div>
 <a href="bar">bar</a>
-</p>
+</span>
 --- selector
-p > a:nth-of-type(3)
+span > a:first-of-type
+--- expected
+<a href="no">No</a>
+
+===
+--- input
+<span>
+<p>First stuff that is not a link</p>
+<a href="no">No</a>
+<div>Some description</div>
+<a href="foobar">Foobar</a>
+<div>Some description</div>
+<a href="barred">Barred</a>
+<div>Some description</div>
+<a href="bar">bar</a>
+<b>More stuff that is not a link</b>
+</span>
+--- selector
+span > a:last-of-type
+--- expected
+<a href="bar">bar</a>
+
+===
+--- input
+<span>
+<a href="no">No</a>
+<div>Some description</div>
+<a href="foobar">Foobar</a>
+<div>Some description</div>
+<a href="barred">Barred</a>
+<div>Some description</div>
+<a href="bar">bar</a>
+</span>
+--- selector
+span > a:nth-of-type(3)
 --- expected
 <a href="barred">Barred</a>
+
+===
+--- input
+<span>
+<a href="no">No</a>
+<div>Some description</div>
+<a href="foobar">Foobar</a>
+<div>Some description</div>
+<a href="barred">Barred</a>
+<div>Some description</div>
+<a href="bar">bar</a>
+</span>
+--- selector
+span > a:nth-of-type(n+3)
+--- expected
+<a href="barred">Barred</a>
+<a href="bar">bar</a>
+
+===
+--- input
+<span>
+<a href="no">No</a>
+<div>Some description</div>
+<a href="foobar">Foobar</a>
+<div>Some description</div>
+<a href="barred">Barred</a>
+<div>Some description</div>
+<a href="bar">bar</a>
+</span>
+--- selector
+span > a:nth-of-type(2n)
+--- expected
+<a href="foobar">Foobar</a>
+<a href="bar">bar</a>
 
 ===
 --- input
@@ -267,20 +407,21 @@ p ~ a.foo
 <a class="foo" href="Yes">Yes</a>
 <div>Some description</div>
 <p>
-<div>Another <b>two level deep description</b></div>
+<span>Another <b>two level deep description</b></span>
 </p>
 <a href="foobar">Foobar</a>
 <a href="barred">Barred</a>
 <p>
 <a class="foo" href="No">No (child, not sibling)</a>
-<div>But some description</p>
+<span>But some description</span>
+</p>
 </p>
 <div>Some description that is not output</div>
 --- selector
 p *:contains("description")
 --- expected
 <b>two level deep description</b>
-<div>But some description</div>
+<span>But some description</span>
 
 ===
 --- input
@@ -292,14 +433,14 @@ p *:contains("description")
 <a href="foobar">Foobar</a>
 <a href="barred">Barred</a>
 <p>
-<div>Some more description</div>
+<span>Some more description</span>
 <a class="foo" href="No">No (child, not sibling)</a>
 </p>
 <div>Some description that is not output</div>
 --- selector
 p > *:contains("description")
 --- expected
-<div>Some more description</div>
+<span>Some more description</span>
 ===
 --- input
 <a href="No">No (no preceding sibling)</a>
@@ -321,10 +462,13 @@ p > *:contains("description")
 <div>Some more description</div>
 ===
 --- input
+<head></head>
+<body>
 <div>Some description</div>
 <div id="empty"></div>
 <div>Another <b>two level deep description</b></div>
 <div>Some more description</div>
+</body>
 --- selector
 :empty
 --- expected
@@ -403,6 +547,38 @@ div em:nth-child(2n+1)
     <em>everywhere</em>
     <em>elsewhere</em>
     <em>nowhere</em>
+</div>
+</body></html>
+--- selector
+div em:nth-child(-n+2)
+--- expected
+<em>here</em>
+<em>there</em>
+===
+--- input
+<html><head></head><body>
+<div>
+    <em>here</em>
+    <em>there</em>
+    <em>everywhere</em>
+    <em>elsewhere</em>
+    <em>nowhere</em>
+</div>
+</body></html>
+--- selector
+div em:nth-child(-2n + 3)
+--- expected
+<em>here</em>
+<em>everywhere</em>
+===
+--- input
+<html><head></head><body>
+<div>
+    <em>here</em>
+    <em>there</em>
+    <em>everywhere</em>
+    <em>elsewhere</em>
+    <em>nowhere</em>
     <em>anywhere</em>
 </div>
 </body></html>
@@ -427,6 +603,39 @@ div em:nth-last-child(3n)
 div em:nth-last-child(2n+1)
 --- expected
 <em>here</em>
+<em>everywhere</em>
+<em>nowhere</em>
+===
+--- input
+<html><head></head><body>
+<div>
+    <em>here</em>
+    <em>there</em>
+    <em>everywhere</em>
+    <em>elsewhere</em>
+    <em>nowhere</em>
+</div>
+</body></html>
+--- selector
+div em:nth-last-child(-n + 3)
+--- expected
+<em>everywhere</em>
+<em>elsewhere</em>
+<em>nowhere</em>
+===
+--- input
+<html><head></head><body>
+<div>
+    <em>here</em>
+    <em>there</em>
+    <em>everywhere</em>
+    <em>elsewhere</em>
+    <em>nowhere</em>
+</div>
+</body></html>
+--- selector
+div em:nth-last-child(-2n + 3)
+--- expected
 <em>everywhere</em>
 <em>nowhere</em>
 ===

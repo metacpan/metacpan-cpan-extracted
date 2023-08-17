@@ -23,6 +23,7 @@ lib/Mail/DKIM/ARC/Signer.pm
 lib/Mail/DKIM/ARC/Verifier.pm
 lib/Mail/DKIM/Algorithm/Base.pm
 lib/Mail/DKIM/Algorithm/dk_rsa_sha1.pm
+lib/Mail/DKIM/Algorithm/ed25519_sha256.pm
 lib/Mail/DKIM/Algorithm/rsa_sha1.pm
 lib/Mail/DKIM/Algorithm/rsa_sha256.pm
 lib/Mail/DKIM/AuthorDomainPolicy.pm
@@ -82,6 +83,11 @@ t/corpus/bad_dk_5.txt
 t/corpus/bad_ietf01_1.txt
 t/corpus/bad_ietf01_2.txt
 t/corpus/bad_ietf01_3.txt
+t/corpus/badkey1_ed25519.txt
+t/corpus/badkey2_ed25519.txt
+t/corpus/badkey3_ed25519.txt
+t/corpus/badkey4_ed25519.txt
+t/corpus/badkey5_ed25519.txt
 t/corpus/badkey_1.txt
 t/corpus/badkey_10.txt
 t/corpus/badkey_11.txt
@@ -127,6 +133,7 @@ t/corpus/goodkey_1.txt
 t/corpus/goodkey_2.txt
 t/corpus/goodkey_3.txt
 t/corpus/goodkey_4.txt
+t/corpus/goodkey_ed25519.txt
 t/corpus/ignore_1.txt
 t/corpus/ignore_2.txt
 t/corpus/ignore_3.txt
@@ -155,6 +162,7 @@ t/signer_dk.t
 t/signer_expiration.t
 t/signer_policy.t
 t/simple_canonicalization.t
+t/test.ed.key
 t/test.key
 t/test5.txt
 t/textwrap.t

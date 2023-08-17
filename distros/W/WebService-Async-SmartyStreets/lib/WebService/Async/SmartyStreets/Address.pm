@@ -3,7 +3,7 @@ package WebService::Async::SmartyStreets::Address;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';    # VERSION
+our $VERSION = '0.002';    # VERSION
 
 =head1 NAME
 
@@ -171,6 +171,7 @@ sub accuracy_at_least {
     my ($self, $target) = @_;
     $target = 'thoroughfare' if $target eq 'street';
     return 0 unless $self->status_at_least('partial');
+    return 0 unless $self->address_precision;
     my $target_level = $accuracy_level{$target}                  // die 'unknown target accuracy ' . $target;
     my $actual_level = $accuracy_level{$self->address_precision} // die 'unknown accuracy ' . $self->address_precision;
     return $actual_level >= $target_level;

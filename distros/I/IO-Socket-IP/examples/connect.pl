@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Poll;
@@ -20,7 +20,7 @@ my $socket = IO::Socket::IP->new(
    PeerService => $service,
    Type        => SOCK_STREAM,
    Timeout     => $TIMEOUT,
-) or die "Cannot connect to $host:$service - $@";
+) or die "Cannot connect to $host:$service - $IO::Socket::errstr";
 
 printf STDERR "Connected to %s:%s\n", $socket->peerhost_service;
 

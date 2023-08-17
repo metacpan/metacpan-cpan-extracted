@@ -1,4 +1,4 @@
-Neo4j::Driver 0.36
+Neo4j::Driver 0.40
 
 This software is a community driver for the Neo4j <https://neo4j.com/> graph
 database server. It is designed to follow the Neo4j Driver API, allowing
@@ -21,7 +21,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Neo4j-Driver-0.36.tar.gz
+  cpanm Neo4j-Driver-0.40.tar.gz
 
 You can also install the module manually by following these steps:
 

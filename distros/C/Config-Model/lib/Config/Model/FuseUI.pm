@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::FuseUI 2.152;
+package Config::Model::FuseUI 2.153;
 
 # there's no Singleton with Mouse
 use Mouse;
@@ -161,11 +161,6 @@ sub read {
     return -ENOENT() unless defined $obj;
     return -EISDIR() unless ( $type eq 'leaf' or $type eq 'check_list' );
     my $v = fetch_as_line($obj);
-
-    if ( not defined $v ) {
-        return -EINVAL() if $off > 0;
-        return '';
-    }
 
     return -EINVAL() if $off > length($v);
     return 0 if $off == length($v);
@@ -325,7 +320,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.152
+version 2.153
 
 =head1 SYNOPSIS
 

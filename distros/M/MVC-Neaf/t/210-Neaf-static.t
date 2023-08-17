@@ -4,12 +4,19 @@ use strict;
 use warnings;
 use Test::More;
 use FindBin qw($Bin);
+use Cwd qw(cwd);
 use File::Basename qw(basename);
 
 use MVC::Neaf;
 
+my $restore_dir = cwd();
+END { chdir $restore_dir };
+
 neaf->static( t => $Bin, buffer => 1024*1024, cache_ttl => 100500 );
 neaf->static( t2 => $Bin, buffer => 32, cache_ttl => 100500 );
+neaf static => local => '.';
+
+chdir '/';
 
 my $sample = basename( __FILE__ ).".png";
 
@@ -23,33 +30,44 @@ my $real_content = do {
 die "Failed to fetch sample content from $sample: $!"
     unless $real_content;
 
-my ($status, $head, $content) = neaf->run_test( "/t/$sample" );
+subtest 'Content found' => sub {
+    my ($status, $head, $content) = neaf->run_test( "/t/$sample" );
 
-note explain $head;
+    note explain $head;
 
-is ($status, 200, "Found self");
-is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
-is ($head->header( 'Content-Length' ), length $content, "Length");
-like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
-ok ($content eq $real_content, "Content matches sample");
+    is ($status, 200, "Found self");
+    is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
+    is ($head->header( 'Content-Length' ), length $content, "Length");
+    like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
+    ok ($content eq $real_content, "Content matches sample");
+};
 
-note "Testing cache now";
-   ($status, $head, $content) = neaf->run_test( "/t/$sample" );
+subtest "Testing cache now" => sub {
+    my ($status, $head, $content) = neaf->run_test( "/t/$sample" );
 
-is ($status, 200, "Found self");
-is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
-is ($head->header( 'Content-Length' ), length $content, "Length");
-like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
+    is ($status, 200, "Found self");
+    is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
+    is ($head->header( 'Content-Length' ), length $content, "Length");
+    like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
 
-ok ($content eq $real_content, "Content not changed");
+    ok ($content eq $real_content, "Content not changed");
+};
 
-note "Testing multipart file";
-   ($status, $head, $content) = neaf->run_test( "/t2/$sample" );
+subtest "Testing multipart file" => sub {
+    my ($status, $head, $content) = neaf->run_test( "/t2/$sample" );
 
-is ($status, 200, "Found self");
-is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
-is ($head->header( 'Content-Length' ), length $content, "Length");
-like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
+    is ($status, 200, "Found self");
+    is ($head->header( 'Content-Type' ), 'image/png', "Served as image");
+    is ($head->header( 'Content-Length' ), length $content, "Length");
+    like( $head->header( 'Expires' ), qr#\w\w\w, \d.*GMT#, "expire date present");
 
-ok ($content eq $real_content, "Content not changed");
+    ok ($content eq $real_content, "Content not changed");
+};
+
+subtest "Relative path" => sub {
+    my ($status, $head, $content) = neaf->run_test( "/local/$sample" );
+    is ($status, 200, "Found self");
+    ok ($content eq $real_content, "Content not changed");
+};
+
 done_testing;

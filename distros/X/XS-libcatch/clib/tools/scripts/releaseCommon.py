@@ -1,10 +1,6 @@
-from  __future__ import  print_function
-
 import os
-import sys
 import re
 import string
-import glob
 import fnmatch
 
 from scriptCommon import catchPath
@@ -15,6 +11,7 @@ versionPath = os.path.join( rootPath, "catch_version.cpp" )
 definePath = os.path.join(rootPath, 'catch_version_macros.hpp')
 readmePath = os.path.join( catchPath, "README.md" )
 cmakePath = os.path.join(catchPath, 'CMakeLists.txt')
+mesonPath = os.path.join(catchPath, 'meson.build')
 
 class Version:
     def __init__(self):
@@ -78,33 +75,23 @@ class Version:
         for line in lines:
             f.write( line + "\n" )
 
-def updateReadmeFile(version):
-    import updateWandbox
-
-    downloadParser = re.compile( r'<a href=\"https://github.com/catchorg/Catch2/releases/download/v\d+\.\d+\.\d+/catch.hpp\">' )
-    success, wandboxLink = updateWandbox.uploadFiles()
-    if not success:
-        print('Error when uploading to wandbox: {}'.format(wandboxLink))
-        exit(1)
-    f = open( readmePath, 'r' )
-    lines = []
-    for line in f:
-        lines.append( line.rstrip() )
-    f.close()
-    f = open( readmePath, 'w' )
-    for line in lines:
-        line = downloadParser.sub( r'<a href="https://github.com/catchorg/Catch2/releases/download/v{0}/catch.hpp">'.format(version.getVersionString()) , line)
-        if '[![Try online](https://img.shields.io/badge/try-online-blue.svg)]' in line:
-            line = '[![Try online](https://img.shields.io/badge/try-online-blue.svg)]({0})'.format(wandboxLink)
-        f.write( line + "\n" )
-
 
 def updateCmakeFile(version):
     with open(cmakePath, 'rb') as file:
         lines = file.readlines()
-    replacementRegex = re.compile(b'project\\(Catch2 LANGUAGES CXX VERSION \\d+\\.\\d+\\.\\d+\\)')
-    replacement = 'project(Catch2 LANGUAGES CXX VERSION {0})'.format(version.getVersionString()).encode('ascii')
+    replacementRegex = re.compile(b'''VERSION (\\d+.\\d+.\\d+) # CML version placeholder, don't delete''')
+    replacement = '''VERSION {0} # CML version placeholder, don't delete'''.format(version.getVersionString()).encode('ascii')
     with open(cmakePath, 'wb') as file:
+        for line in lines:
+            file.write(replacementRegex.sub(replacement, line))
+
+
+def updateMesonFile(version):
+    with open(mesonPath, 'rb') as file:
+        lines = file.readlines()
+    replacementRegex = re.compile(b'''version\s*:\s*'(\\d+.\\d+.\\d+)', # CML version placeholder, don't delete''')
+    replacement = '''version: '{0}', # CML version placeholder, don't delete'''.format(version.getVersionString()).encode('ascii')
+    with open(mesonPath, 'wb') as file:
         for line in lines:
             file.write(replacementRegex.sub(replacement, line))
 
@@ -144,23 +131,13 @@ def updateDocumentationVersionPlaceholders(version):
 
 
 def performUpdates(version):
-    # First update version file, so we can regenerate single header and
-    # have it ready for upload to wandbox, when updating readme
     version.updateVersionFile()
     updateVersionDefine(version)
 
-    # import generateSingleHeader
-    # generateSingleHeader.generate(version)
+    import generateAmalgamatedFiles
+    generateAmalgamatedFiles.generate_header()
+    generateAmalgamatedFiles.generate_cpp()
 
-    # # Then copy the reporters to single include folder to keep them in sync
-    # # We probably should have some kind of convention to select which reporters need to be copied automagically,
-    # # but this works for now
-    # import shutil
-    # for rep in ('automake', 'tap', 'teamcity', 'sonarqube'):
-    #     sourceFile = os.path.join(catchPath, 'include/reporters/catch_reporter_{}.hpp'.format(rep))
-    #     destFile = os.path.join(catchPath, 'single_include', 'catch2', 'catch_reporter_{}.hpp'.format(rep))
-    #     shutil.copyfile(sourceFile, destFile)
-
-    # updateReadmeFile(version)
     updateCmakeFile(version)
+    updateMesonFile(version)
     updateDocumentationVersionPlaceholders(version)

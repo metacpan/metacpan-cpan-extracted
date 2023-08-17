@@ -2,9 +2,9 @@
 package TableData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-29'; # DATE
+our $DATE = '2023-04-19'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.2.2'; # VERSION
+our $VERSION = '0.2.3'; # VERSION
 
 1;
 # ABSTRACT: Specification for TableData::*, modules that contains table data
@@ -25,7 +25,7 @@ TableData - Specification for TableData::*, modules that contains table data
 
 =head1 VERSION
 
-This document describes version 0.2.2 of TableData (from Perl distribution TableData), released on 2022-11-29.
+This document describes version 0.2.3 of TableData (from Perl distribution TableData), released on 2023-04-19.
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,56 @@ C<TableData::People::AcmeInc>.
 More specific subnamespaces for more specific types of table data are described
 in entries below.
 
+=head2 TableData::Calendar::*
+
+For calendar-related data.
+
+=head2 TableData::Calendar::Date::*
+
+For table containing calendar dates.
+
+Examples:
+
+C<TableData::Calendar::Date::Holiday::ID> contains holiday dates for Indonesia.
+
+C<TableData::Calendar::Date::Holiday::AU::TAS> contains holiday dates for
+Tasmania, Australia.
+
+=head2 TableData::Lingua::*
+
+For human-language-related data.
+
+=head2 TableData::Lingua::Dict::*
+
+For dictionaries.
+
+For monolingual language dictionaries, a 2-letter ISO language code should be
+added as subnamespace prefix. For bilingual dictionaries, a
+C<LANGCODE1_LANGCODE2> should be added as subnamespace prefix.
+
+All C<TableData::Lingua::Dict::*> modules should contain the columns C<entry>
+and C<description>.
+
+Examples: L<TableData::Lingua::Dict::Foldoc>,
+L<TableData::Lingua::Dict::ID::KBBI>,
+L<TableData::Lingua::Dict::ZH::Proverb::StarDict>,
+L<TableData::Lingua::Dict::FR_EN::FreeDict>.
+
+=head2 TableData::Lingua::Word::*
+
+For tables that contain word list. This is now preferred namespace to
+L<WordList>, and an alternative for C<ArrayData::Lingua::Word::> namespace.
+
+All C<TableData::Lingua::Word::*> modules should contain the column C<word> so
+they are usable from applications like word games.
+
+A 2-letter ISO language code should be added as subnamespace prefix whenever
+applicable.
+
+Example: L<TableData::Lingua::Word::EN::Adjective::TalkEnglish> (list of top
+adjectives from talkenglish.com website, along with some other data like
+frequency).
+
 =head2 TableData::Locale::*
 
 For locale-related data.
@@ -79,30 +129,6 @@ For locale-related data.
 Examples: C<TableData::Locale::Country> (list of countries in the world),
 L<TableData::Locale::US::State> (list of US states),
 C<TableData::Locale::ID::Province> (list of Indonesian provinces).
-
-=head2 TableData::Lingua::*
-
-For human-language-related data
-
-Examples: L<TableData::Lingua::Word::EN::Adjective::TalkEnglish> (list of top
-adjectives from talkenglish.com website, along with some other data like
-frequency). More specific C<TableData::Lingua::*> subnamespaces are described in entries below.
-
-=head2 TableData::Lingua::Word::*
-
-All C<TableData::Lingua::Word::*> modules should contain the column C<word> so
-they are usable from applications like word games.
-
-=head2 TableData::Lingua::Dict::*
-
-For dictionaries.
-
-Examples: L<TableData::Lingua::Dict::ID::KBBI>,
-L<TableData::Lingua::Dict::ZH::Proverb::StarDict>,
-L<TableData::Lingua::Dict::FR_EN::FreeDict>.
-
-All C<TableData::Lingua::Dict::*> modules should contain the columns C<entry>
-and C<description>.
 
 =head2 TableDataRole::*
 
@@ -184,7 +210,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,25 +3,26 @@ abstract: 'Concise, expressive creation of Class::Meta classes'
 author:
   - 'David E. Wheeler <david@justatheory.com>'
 build_requires:
-  Module::Build: 0.2701
-  Test::More: 0.17
+  Module::Build: '0.2701'
+  Test::More: '0.17'
 configure_requires:
-  Module::Build: 0.2701
+  Module::Build: '0.2701'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Class-Meta-Express
 provides:
   Class::Meta::Express:
     file: lib/Class/Meta/Express.pm
-    version: 0.13
+    version: '0.14'
 recommends:
-  Test::Pod: 1.41
+  Test::Pod: '1.41'
 requires:
-  Class::Meta: 0.60
+  Class::Meta: '0.60'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.13
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

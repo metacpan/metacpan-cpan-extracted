@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd qw(abs_path getcwd);
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Output;
 use Test::Warn;
 
@@ -117,6 +117,9 @@ $fs->{directory} = '/';
 is($fs->symlinks, 1, 'symlinks is set');
 $fs->_cd('dev');
 is($fs->{directory}, '/dev', 'path in root directory starts with 1 slash');
+$fs->{directory} = '/non-existing';
+my @files = $fs->_cd('something');
+is_deeply(\@files, [], 'sub-directory of non-existing root works correct');
 
 ####################################
 # test selection of multiple Perl scripts as input files:
@@ -148,13 +151,12 @@ my $re_pl_whole_output_t =
     "      functions\n\n\n\n";
 my $re_list_output_t =
     "      1-1/1\n" .
-    "<1>   functions\n\n\n\n\n\n\n\n";
-my $re_basic_pl_output_short =
+    "<1>   functions\n\n\n\n";
+my $re_basic_pl_output =
     "[ <1-3>*]+ call_with_stdin\\.pl\n" .
     "[ <1-3>*]+ run_in_fork\\.pl\n" .
     "[ <1-3>*]+ sub_perl\\.pl\n" .
     "\n\n\n";
-my $re_basic_pl_output = $re_basic_pl_output_short . "\n\n";
 $re_output =
     $re_whole_output . "2\n" .
     "<1> all files\n<2> PL scripts\n" . $re_output_select_option . "2\n" .
@@ -167,7 +169,7 @@ $re_output =
     "      1-3/3\n" . $re_basic_pl_output . $re_output_select_list . "0\n" .
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "/functions\n    \n" .
     "<2> \\[ PL scripts \\]\n" .
-    "<3>   1-3/3\n" . $re_basic_pl_output_short .
+    "<3>   1-3/3\n" . $re_basic_pl_output .
     $re_output_select_box . "0\n";
 stdout_like
 {   _call_with_stdin($selection, sub {   $fs->_process();   });   }
@@ -208,7 +210,7 @@ $re_output =
     "<1> all files\n<2> text files\n" . $re_output_select_option . "2\n" .
     $re_txt_whole_output_t . "<4> *\n" . $re_output_select_box . "3\n" .
     $re_list_output_t . $re_output_select_list . "1\n" .
-    "      0/0\n\n\n\n\n\n\n\n\n" . $re_output_select_list . "0\n" .
+    "      0/0\n\n\n\n" . $re_output_select_list . "0\n" .
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "/functions\n    \n" .
     "<2> \\[ text files \\]\n" .
     "      0/0\n\n\n\n" .
@@ -294,6 +296,7 @@ $main->remove($fs);
 # triggering remaining missing coverage:
 SKIP:
 {
+    $^O =~ m/^(?:cygwin)$/  and  skip "'forbidden' test doesn't work on $^O", 1;
     mkdir($forbidden_dir, 0)  or
 	skip "can't check \"forbidden\" directory - mkdir failed", 1;
     $fs->_cd('forbidden');

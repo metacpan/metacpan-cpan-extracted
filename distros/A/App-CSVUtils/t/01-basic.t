@@ -21,6 +21,7 @@ write_text("$dir/4.csv", qq(f1,F3,f2\n1,2,3\n4,5,6\n));
 write_text("$dir/5.csv", qq(f1\n1\n2\n3\n4\n5\n6\n));
 write_text("$dir/no-rows.csv", qq(f1,f2,f3\n));
 write_text("$dir/no-header-1.csv", "1,2,3\n4,5,6\n7,8,9\n");
+write_text("$dir/6.csv", qq(f1\n1\n2\n3\n4\n5\n6\n7\n8\n9\n));
 
 write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
 
@@ -586,6 +587,58 @@ subtest "csv_csv, opt: --inplace" => sub {
 
     # TODO: test with util that reads multiple csv
     # TODO: test with util that writes multiple csv
+};
+
+subtest "csv_fill_cells" => sub {
+    require App::CSVUtils::csv_fill_cells;
+
+    my ($res, $stdout);
+
+    # layout=left_to_right_then_top_to_bottom
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3) };
+    is($stdout, "field0,field1,field2\n1,2,3\n4,5,6\n7,8,9\n");
+
+    # layout=left_to_right_then_bottom_to_top
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"left_to_right_then_bottom_to_top") };
+    is($stdout, "field0,field1,field2\n7,8,9\n4,5,6\n1,2,3\n");
+
+    # layout=right_to_left_then_top_to_bottom
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"right_to_left_then_top_to_bottom") };
+    is($stdout, "field0,field1,field2\n3,2,1\n6,5,4\n9,8,7\n");
+
+    # layout=right_to_left_then_bottom_to_top
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"right_to_left_then_bottom_to_top") };
+    is($stdout, "field0,field1,field2\n9,8,7\n6,5,4\n3,2,1\n");
+
+    # layout=top_to_bottom_then_left_to_right
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"top_to_bottom_then_left_to_right") };
+    is($stdout, "field0,field1,field2\n1,4,7\n2,5,8\n3,6,9\n");
+
+    # layout=top_to_bottom_then_right_to_left
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"top_to_bottom_then_right_to_left") };
+    is($stdout, "field0,field1,field2\n7,4,1\n8,5,2\n9,6,3\n");
+
+    # layout=bottom_to_top_then_left_to_right
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"bottom_to_top_then_left_to_right") };
+    is($stdout, "field0,field1,field2\n3,6,9\n2,5,8\n1,4,7\n");
+
+    # layout=bottom_to_top_then_right_to_left
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3, layout=>"bottom_to_top_then_right_to_left") };
+    is($stdout, "field0,field1,field2\n9,6,3\n8,5,2\n7,4,1\n");
+
+    # opt:filter
+    $stdout = capture_stdout { $res = App::CSVUtils::csv_fill_cells::csv_fill_cells(
+        input_filename=>"$dir/6.csv", num_rows=>3, num_fields=>3,
+        filter=>sub { my ($r,$y,$x)=@_; return 0 if $y>=2 && $y<=3 && $x==1; 1 }) };
+    is($stdout, "field0,field1,field2\n1,2,3\n4,,5\n6,,7\n");
+
 };
 
 done_testing;

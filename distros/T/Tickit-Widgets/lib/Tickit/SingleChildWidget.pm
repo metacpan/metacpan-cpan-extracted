@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::SingleChildWidget 0.57;
+package Tickit::SingleChildWidget 0.58;
 class Tickit::SingleChildWidget
    :isa(Tickit::ContainerWidget)
    :does(Tickit::WidgetRole::SingleChildContainer);

@@ -1,0 +1,40 @@
+CXC::Form::Tiny::Plugin::OptArgs2
+
+"CXC::Form::Tiny::Plugin::OptArgs2" is a Form::Tiny plugin which make it
+easier to use Form::Tiny to validate command line options and arguments
+parsed by OptArgs2.
+
+It provides two new keywords to be used alongside Form::Tiny's
+"form_field" keyword which provide OptArgs2 option and argument
+specifications and link them to Form::Tiny fields.
+
+It adds a method to the form's class which returns the OptArgs2
+compatible "optargs" specification and another which sets the form's
+input from the output of OptArgs2's "optargs" and "class_optargs"
+functions.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

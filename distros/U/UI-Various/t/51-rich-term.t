@@ -86,9 +86,11 @@ $_ = _sub_perl('BEGIN { $ENV{PERL_RL} = "Gnu"; }
 		use Term::ReadLine;
 		open IN, "' . $tty . '"  or  die "IN: $!";
 		open OUT, "' . $tty . '"  or  die "OUT: $!";
-		my $term = Term::ReadLine->new("T41", *IN, *OUT);
+		my $term = Term::ReadLine->new("T51", *IN, *OUT);
 		use UI::Various({use => ["RichTerm"]});
 		use UI::Various::Main;
+		# Term::ReadLine::Gnu >= 1.46 needs a reset for this test:
+		$Term::ReadLine::Gnu::has_been_initialized = 0;
 		my $main = UI::Various::Main->new();
 		print(	$main->{_rl}->ReadLine, ": ",
 			$main->width, "x", $main->height, "\n");

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-04-13'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TextWrapUtils/textunwrap",
@@ -40,7 +40,7 @@ textunwrap - Unwrap (unfold) multiline paragraphs to single-line ones
 
 =head1 VERSION
 
-This document describes version 0.006 of textunwrap (from Perl distribution App-TextWrapUtils), released on 2023-03-10.
+This document describes version 0.007 of textunwrap (from Perl distribution App-TextWrapUtils), released on 2023-04-13.
 
 =head1 SYNOPSIS
 

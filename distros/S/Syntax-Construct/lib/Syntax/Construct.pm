@@ -4,10 +4,15 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 
 my %introduces = do { no warnings 'qw';
-                 ( '5.036' => [qw[
+                 ( '5.038' => [qw[
+                                 unicode15.0 ^HOOK signature-default-operator
+                                 INCDIR *{} REG_INF_I32_MAX
+                                 ^LAST_SUCCESSFUL_PATTERN
+                             ]],
+                   '5.036' => [qw[
                                  unicode14.0
                              ]],
                    '5.034' => [qw[
@@ -168,6 +173,9 @@ my %alias = (
     # 5.034
     'empty-left-quantifier' => '{,n}',
     'octal-literals' => '0o',
+    # 5.038
+    'keyword-hook' => '^HOOK',
+    'optimistic-eval' => '*{}',
 );
 
 my %_introduced = map {
@@ -276,7 +284,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.032
+Version 1.033
 
 =head1 SYNOPSIS
 
@@ -896,6 +904,40 @@ L<perl5340delta/Blanks freely allowed within but adjacent to curly braces>
 
 L<perl5360delta/Unicode 14.0 is supported>
 
+=head2 5.038
+
+=head3 unicode15.0
+
+L<perldelta/Unicode 15.0 is supported>
+
+=head3 ^HOOK
+
+L<perldelta/%{^HOOK} API introduced>
+
+Alias: keyword-hook
+
+=head3 signature-default-operator
+
+L<perldelta/Defined-or and logical-or assignment default expressions in signatures>
+
+=head3 INCDIR
+
+L<perldelta/@INC Hook Enhancements and $INC and INCDIR>
+
+=head3 *{}
+
+L<perldelta/Optimistic Eval in Patterns>
+
+Alias: optimistic-eval
+
+=head3 REG_INF_I32_MAX
+
+L<perldelta/REG_INF has been raised from 65,536 to 2,147,483,647>
+
+=head3 ^LAST_SUCCESSFUL_PATTERN
+
+L<perldelta/New regexp variable ${^LAST_SUCCESSFUL_PATTERN}>
+
 =for completeness
 =head2 old
 
@@ -976,10 +1018,6 @@ Feel free to report issues and submit pull requests.
 =item * MetaCPAN, Open Source Search Engine for CPAN
 
 L<https://metacpan.org/pod/Syntax::Construct>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Syntax-Construct>
 
 =item * Search CPAN
 

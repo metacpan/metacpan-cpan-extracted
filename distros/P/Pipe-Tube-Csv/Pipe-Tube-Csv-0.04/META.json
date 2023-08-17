@@ -1,0 +1,56 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Gabor Szabo <gabor@szabgab.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pipe-Tube-Csv",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.00"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pipe" : "0.03",
+            "Test::More" : "0.47",
+            "Text::CSV" : "1.21"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/Pipe-Tube-Csv/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/szabgab/Pipe-Tube-Csv.git",
+         "web" : "https://github.com/szabgab/Pipe-Tube-Csv"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

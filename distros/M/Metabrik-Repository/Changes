@@ -1,5 +1,9 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.44.0 Fri 11 Aug 17:16:42 CEST 2023
+   - update: client::kafka to better handle send errors with message is larger than allowed size
+   - new: file::json to add use_utf8 Attribute (default to 1) to allow reading of UTF-8 files
+
 1.43.0 Sat 22 Oct 09:22:18 CEST 2022
    - update: add api::geonames to MANIFEST
 

@@ -46,7 +46,6 @@ sub join_tables {
     else {
         $tables = [ @{$sf->{d}{user_table_keys}} ];
     }
-    ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $join = {};
 
     MASTER: while ( 1 ) {
@@ -92,15 +91,14 @@ sub join_tables {
             $qt_master = $ax->quote_table( $sf->{d}{tables_info}{$master} );
         }
         push @{$join->{used_tables}}, $master;
-        $join->{default_alias} = 'A';
+        $join->{default_alias} = 'a';
         # Alias
         my $master_alias = $ax->alias( $join, 'join', $qt_master, $join->{default_alias} );
         push @{$join->{aliases}}, [ $master, $master_alias ];
         $join->{stmt} .= " " . $qt_master;
-        $join->{stmt} .= " AS " . $ax->prepare_identifier( $master_alias );
-        if ( $master_from_subquery ) {
-            $sf->{d}{col_names}{$master} = $ax->column_names( $qt_master . " AS " . $ax->prepare_identifier( $master_alias ) );
-        }
+        $join->{stmt} .= $sf->{i}{" AS "} . $ax->prepare_identifier( $master_alias );
+        $sf->{d}{col_names}{$master} //= $ax->column_names( $qt_master . $sf->{i}{" AS "} . $ax->prepare_identifier( $master_alias ) ); ##
+
         my @bu;
 
         JOIN: while ( 1 ) {
@@ -137,9 +135,9 @@ sub join_tables {
         last MASTER;
     }
 
-    my $aliases_by_tables = {};
+    my $aliases_hash = {};
     for my $ref ( @{$join->{aliases}} ) {
-        push @{$aliases_by_tables->{$ref->[0]}}, $ref->[1];
+        push @{$aliases_hash->{$ref->[0]}}, $ref->[1];
     }
     my %col_names;
     for my $table ( @{$join->{used_tables}} ) {
@@ -148,8 +146,9 @@ sub join_tables {
         }
     }
     my $qt_columns = [];
+    my $qt_aliases = {};
     for my $table ( @{$join->{used_tables}} ) {
-        for my $alias ( @{$aliases_by_tables->{$table}} ) {
+        for my $alias ( @{$aliases_hash->{$table}} ) {
             for my $col ( @{$sf->{d}{col_names}{$table}} ) {
                 my $col_qt = $ax->prepare_identifier( $alias, $col );
                 if ( any { $_ eq $col_qt } @$qt_columns ) {
@@ -158,16 +157,14 @@ sub join_tables {
                 if ( $col_names{$col} > 1 ) {
                     #$col_names{$col}--; ##
                     #next;
-                    push @$qt_columns, $col_qt . ' AS ' . $ax->prepare_identifier( $alias . '_' . $col );
+                    $qt_aliases->{$col_qt} = $ax->prepare_identifier( $alias . '_' . $col );
                 }
-                else {
-                    push @$qt_columns, $col_qt;
-                }
+                push @$qt_columns, $col_qt;
             }
         }
     }
-    my ( $qt_table ) = $join->{stmt} =~ /^SELECT\s\*\sFROM\s(.*)\z/;
-    return $qt_table, $qt_columns;
+    my $qt_table = $join->{stmt} =~ s/^SELECT\s\*\sFROM\s//r;
+    return $qt_table, $qt_columns, $qt_aliases;
 }
 
 
@@ -233,11 +230,9 @@ sub __add_slave_with_join_condition {
         # Alias
         my $slave_alias = $ax->alias( $join, 'join', $qt_slave, ++$join->{default_alias} );
         $join->{stmt} .= " " . $qt_slave;
-        $join->{stmt} .= " AS " . $ax->prepare_identifier( $slave_alias );
+        $join->{stmt} .= $sf->{i}{" AS "} . $ax->prepare_identifier( $slave_alias );
         push @{$join->{aliases}}, [ $slave, $slave_alias ];
-        if ( $slave_from_subquery ) {
-            $sf->{d}{col_names}{$slave} = $ax->column_names( $qt_slave . " AS " . $ax->prepare_identifier( $slave_alias ) );
-        }
+        $sf->{d}{col_names}{$slave} //= $ax->column_names( $qt_slave . $sf->{i}{" AS "} . $ax->prepare_identifier( $slave_alias ) ); ##
         if ( $join_type ne 'CROSS JOIN' ) {
             my $ok = $sf->__add_join_condition( $join, $tables, $slave, $slave_alias );
             if ( ! $ok ) {
@@ -255,13 +250,13 @@ sub __add_join_condition {
     my ( $sf, $join, $tables, $slave, $slave_alias ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $aliases_by_tables = {};
+    my $aliases_hash = {};
     for my $ref ( @{$join->{aliases}} ) {
-        push @{$aliases_by_tables->{$ref->[0]}}, $ref->[1];
+        push @{$aliases_hash->{$ref->[0]}}, $ref->[1];
     }
     my %avail_pk_cols;
     for my $used_table ( @{$join->{used_tables}} ) {
-        for my $alias ( @{$aliases_by_tables->{$used_table}} ) {
+        for my $alias ( @{$aliases_hash->{$used_table}} ) {
             if ( $used_table eq $slave && $alias eq $slave_alias ) {
                 next;
             }
@@ -310,9 +305,9 @@ sub __add_join_condition {
                 my $info = $ax->get_sql_info( $join );
                 my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
                 # Readline
-                $condition = $tr->readline(
+                $condition = $tr->readline( # conditions are boolean expressions
                     'Edit: ',
-                    { info => $info, default => $condition, show_context => 1 }
+                    { info => $info, default => $condition, show_context => 1, history => [] }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $condition ) {

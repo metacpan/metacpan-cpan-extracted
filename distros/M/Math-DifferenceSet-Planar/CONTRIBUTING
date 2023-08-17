@@ -28,13 +28,13 @@ over-all presentation that makes it useful for experts and informative
 for anybody interested in the field.  Thirdly, it should be easy to
 integrate correctly and efficiently with other software.
 
-Topics of interest
+Topics of Interest
 ------------------
 
 Planar difference sets are special entities described in the theory
 of difference sets, which is a part of design theory, which in turn
 is related to algebra, geometry, and combinatorics.  They are also
-the essence of desarguesian finite projective planes (unlike other
+the essence of Desarguesian finite projective planes (unlike other
 difference sets).
 
 Possible improvements of the software may support interoperability with
@@ -56,15 +56,24 @@ distributing ever larger databases for local use.
 
 As it can be expected that downloading sets will always be faster than
 generating them, a non-programmer contribution could be to host a large
-database of sample sets.  Especially helpful would be a solution that
-even allows to submit more data.  The author already has collected sets
-with orders up to seven figures.  Extending this to a list covering
-all orders up to, say, 2 ** 21 would require thousands of CPU years,
+database of sample sets.  Especially helpful would be a solution that even
+allows to submit more data.  The author so far has collected and published
+sets with all orders up to 2 ** 17 and some single examples close to
+2 ** 21.  Extending this list would require massive computing power
 and be conceivable as a project for distributed computation.  Not much
 scientific merit, alas, is going to be earned for such an effort, as the
 existence as well as most of the "interesting" properties of these sets
 are already known facts.  Future applications of planar difference sets,
 however, might benefit from larger sample sets than currently available.
+
+On the other hand, the data already present requires double- and perhaps
+triple-checking before it can be regarded as scientifically acceptable.
+For each order, we used Singer's construction to generate a sample set,
+wich is provably valid, and iterated through its multiples to find
+reference sets with their respective optimality properties.
+
+Better scripts to generate the data should be included in the examples
+collection to aid verification and extension.
 
 The documentation, finally, could include more literature, or be clearer
 or better formatted.  We might create POD, HTML, and PDF from a common
@@ -80,6 +89,38 @@ widely believed to be true but withstanding rigorous proof so far.
 This could be taken as signs of imminent breakthrough discoveries, or,
 at least, important puzzle pieces still missing.
 
+Git Repositories
+----------------
+
+The Math-DifferenceSet-Planar project is maintained in these git
+repositories:
+
+* perl-Math-DifferenceSet-Planar
+
+  The base library with everything needed to create its CPAN distribution.
+  Also the place where changes and new features are discussed.
+
+* perl-Math-DifferenceSet-Planar-Data-M
+
+  An extension that deploys a somewhat larger database of precomputed
+  data to a place where it will be found by the base library.
+
+* perl-Math-DifferenceSet-Planar-Data-L
+
+  An extension that deploys a significantly larger database of precomputed
+  data to a place where it will be found by the base library.  It covers
+  all orders that can be handled with 32-bit integer arithmetic.
+
+* perl-Math-DifferenceSet-Planar-Data-XL
+
+  An extension that deploys the largest currently available database of
+  precomputed data to a place where it will be found by the base library.
+
+Users of the Module Math::DifferenceSet::Planar will need the base library
+and optionally one of the M/L/XL data extensions.  The data extensions are
+not intended to be uploaded to CPAN, to save bandwitdth and storage space.
+Maintainers will need the git repositories.
+
 Development Platform
 --------------------
 
@@ -90,62 +131,33 @@ distribution builder like Dist::Zilla may be performed in the future.
 The git repository contains these files the CPAN release does not:
 
 .gitignore
+compute/extra_large_sample.gp
+compute/prime_order_samples.gp
 maint/create_cpan_db
 maint/create_extra_db
-maint/create_large_db
+maint/create_larger_dbs
 maint/create_test_db
-maint/dump_pds
+maint/dump_pds_old
+maint/dump_spaces
 maint/fill_pds
+maint/fill_spaces
 maint/make_pod
+maint/template-1.1.pod
+maint/template-2.0.pod
 maint/template.pod
 
-To create the databases in the share and t/db directories of the CPAN
-distribution, as well as some larger databases not for CPAN, you also
-need these files:
+The dump scripts generate text representations of the database contents,
+while the fill scripts generate database contents from plaintext input.
+Only the databases are included in repositories as they are more terse.
 
-data/extra_2096993.txt
-data/pdm_00002-04096.txt
-data/pdm_04099-10993.txt.bz2
-data/pdx_000002-004096.txt.bz2
-data/pdx_004099-008192.txt.bz2
-data/pdx_008209-012289.txt.bz2
-data/pdx_012301-016384.txt.bz2
-data/pdx_016411-020483.txt.bz2
-data/pdx_020507-024571.txt.bz2
-data/pdx_024593-028669.txt.bz2
-data/pdx_028687-032771.txt.bz2
-data/pdx_032779-036871.txt.bz2
-data/pdx_036877-040961.txt.bz2
-data/pdx_040973-045061.txt.bz2
-data/pdx_045077-049157.txt.bz2
-data/pdx_049169-053239.txt.bz2
-data/pdx_053267-057349.txt.bz2
-data/pdx_057367-061441.txt.bz2
-data/pdx_061463-065551.txt.bz2
-data/pdx_065557-069623.txt.bz2
-data/pdx_069653-073727.txt.bz2
-data/pdx_073751-077839.txt.bz2
-data/pdx_077849-081937.txt.bz2
-data/pdx_081943-086029.txt.bz2
-data/pdx_086069-090127.txt.bz2
-data/pdx_090149-094229.txt.bz2
-data/pdx_094249-098327.txt.bz2
-data/pdx_098347-102409.txt.bz2
-data/pdx_102433-106501.txt.bz2
-data/pdx_106531-110609.txt.bz2
-data/pdx_110623-114713.txt.bz2
-data/pdx_114743-118801.txt.bz2
-data/pdx_118819-122891.txt.bz2
-data/pdx_122921-126989.txt.bz2
-data/pdx_127031-131101.txt.bz2
+As the database schema has changed with release 1.000 of the library,
+we have included a script to dump the contents of an old-style database
+that might be handy for a migration.  Dumping new-style databases is
+already covered in the pds_iterate_* example scripts.
 
-These text representations of planar difference sets are distributed
-separately in order not to bloat the software repository.  They occupy
-3.6 GB of storage.  A download location is yet to be determined.
-Please contact the author if you urgently need the data or want to help.
-
-For convenience, a subset sufficient to create the CPAN release is
-included in the git repository.
+The compute folder contains helper scripts in other languages to
+generate data from scratch.  Ultimately, the library should become
+capable of self-reproducing.
 
 Author's Note
 -------------
@@ -153,4 +165,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, August 17, 2022.
+Martin Becker, July 8, 2023.

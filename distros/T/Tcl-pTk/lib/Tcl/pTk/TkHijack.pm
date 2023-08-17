@@ -3,7 +3,7 @@ use Tcl::pTk ( qw/ MainLoop DoOneEvent tkinit update Ev Exists /); # Don't impor
 
 package Tcl::pTk::TkHijack;
 
-our ($VERSION) = ('1.10');
+our ($VERSION) = ('1.11');
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Tcl::pTk::TkHijack -  Run Existing Perl/tk Scripts with Tcl::pTk
 
         # Run a existing perl/tk script 'tkscript.pl' with Tcl::pTk
         perl -MTcl::pTk::TkHijack tkscript.pl
-        
+
         # Alternatively, you can just put 'use Tcl::pTk::TkHijack' at the
         #  top of the 'tkscript.pl' file and just run it like normal
 
@@ -54,7 +54,7 @@ our($debug, $translateList, $packageAliases, $aliasesMade);
 unshift @INC, \&TkHijack;
 
 
-######### Package Globals ####    
+######### Package Globals ####
 $debug = 1;
 
 
@@ -63,7 +63,7 @@ $debug = 1;
 #   in the main Tcl::pTk package.
 #  This list is used for mapping "use" statements, for example if
 #    "use Tk::Tree" is encountered, the file "Tcl/pTk/Tree.pm" is loaded instead
-$translateList = { 
+$translateList = {
         'Tk.pm'         =>  '',
         'Tk/Tree.pm'    =>  'Tcl/pTk/Tree.pm',
         'Tk/Balloon.pm'    =>  '',
@@ -121,8 +121,9 @@ $translateList = {
 #     The aliases below will essentially translate to code to mean:
 #       use base(qw/ Tcl::pTk::Frame /);
 #       Construct Tcl::pTk::Widget 'SlideSwitch'
-#       
+#
 $packageAliases = {
+        'Tk::widgets' => 'Tcl::pTk::widgets',
         'Tk::Frame' => 'Tcl::pTk::Frame',
         'Tk::Toplevel' => 'Tcl::pTk::Toplevel',
         'Tk::MainWindow' => 'Tcl::pTk::MainWindow',
@@ -143,7 +144,7 @@ $packageAliases = {
         'Tk::TableMatrix::Spreadsheet'=> 'Tcl::pTk::TableMatrix::Spreadsheet',
         'Tk::TableMatrix::SpreadsheetHideRows'=> 'Tcl::pTk::TableMatrix::SpreadsheetHideRows',
 };
-  
+
 ######### End of Package Globals ###########
 # Alias Packages
 aliasPackages($packageAliases);
@@ -159,31 +160,31 @@ sub TkHijack {
     my ($coderef, $module) = @_;  # $coderef is to myself
     #print "TkHijack encoutering $module\n";
     return undef unless $module =~ m!^Tk(/|\.pm$)!;
-    
+
     #print "TkHijack $module\n";
 
     my ($package, $callerfile, $callerline) = caller;
     #print "TkHijack package/callerFile/callerline = $package $callerfile $callerline\n";
-    
+
     my $mapped = $translateList->{$module};
-    
+
     if( defined($mapped) && !$mapped){ # Module exists in translateList, but no mapped file
             my $fakefile;
             open(my $fh, '<', \$fakefile) || die "oops"; # open a file "in-memory"
-        
+
             $module =~ s!/!::!g;
             $module =~ s/\.pm$//;
-        
+
             # Make Version if importing Tk (needed for some scripts to work right)
             my $versionText = "\n";
             my $requireText = "\n"; #  if Tk module, set export of Ev subs
             if( $module eq 'Tk' ){
-                    
+
                     $requireText = "use Exporter 'import';\n";
                     $requireText .= '@EXPORT_OK = (qw/ Ev catch/);'."\n";
-                    
+
                     $versionText = '$Tk::VERSION = 805.001;'."\n";
-                    
+
                     # Redefine common Tk subs/variables to Tcl::pTk equivalents
                     no warnings;
                     *Tk::MainLoop = \&Tcl::pTk::MainLoop;
@@ -200,11 +201,11 @@ sub TkHijack {
                     *Tk::ACTIVE_BG = \&Tcl::pTk::ACTIVE_BG;
                     *Tk::NORMAL_BG = \&Tcl::pTk::NORMAL_BG;
                     *Tk::SELECT_BG = \&Tcl::pTk::SELECT_BG;
-                    
-                    
+
+
             }
-        
-        
+
+
             $fakefile = <<EOS;
         package $module;
         $requireText
@@ -230,12 +231,12 @@ EOS
         use $usefile;
         1;
 EOS
-             return $fh;       
+             return $fh;
     }
     else{
             #warn("Warning No Tcl::pTk Equivalent to $module from $callerfile line $callerline, loading anyway...\n") if $debug;
     }
-            
+
 }
 
 ############## Sub To Alias Packages ########

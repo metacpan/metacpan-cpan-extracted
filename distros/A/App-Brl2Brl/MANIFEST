@@ -1,8 +1,39 @@
+Changes
 lib/App/Brl2Brl.pm
-LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README.pod
+MANIFEST.SKIP
+README
 script/brl2brl
+t/00-load.t
+t/Brl2Brl.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+COPYING.LESSER
+share/bg.dis
+share/da-dk-octobraille.dis
+share/da-dk-octobraille_1993.dis
+share/de-de.dis
+share/de-eurobrl6.dis
+share/de-eurobrl6u.dis
+share/en-us-brf.dis
+share/es-new.dis
+share/es-old.dis
+share/hu-backtranslate-correction.dis
+share/nl-BE.dis
+share/no-no-braillo-047-01.dis
+share/no-no-generic.dis
+share/no-no.dis
+share/ru-brf.dis
+share/ru-letters.dis
+share/ru-unicode.dis
+share/se-se.dis
+share/text_nabcc.dis
+share/uni-text.dis
+share/unicode-without-blank.dis
+share/unicode.dis
+share/us-table.dis
+share/wordcx.dis
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostFooterRequest.name :   ,
-# PostFooterRequest.sheetName :   ,
-# PostFooterRequest.section :   ,
-# PostFooterRequest.script :   ,
-# PostFooterRequest.isFirstPage :   ,
-# PostFooterRequest.folder :   ,
-# PostFooterRequest.storageName :    
+# PostFooterRequest.name : The workbook name.  ,
+# PostFooterRequest.sheetName : The worksheet name.  ,
+# PostFooterRequest.section : 0:Left Section. 1:Center Section 2:Right Section  ,
+# PostFooterRequest.script : Header format script.  ,
+# PostFooterRequest.isFirstPage : Is first page(true/false).  ,
+# PostFooterRequest.folder : Original workbook folder.  ,
+# PostFooterRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_footer' } = { 
-    	summary => '',
+    	summary => 'Update  page footer description in worksheet. ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'section' => {
      	datatype => 'int',
      	base_name => 'section',
-     	description => '',
+     	description => '0:Left Section. 1:Center Section 2:Right Section',
      	format => '',
      	read_only => '',
      		},
      'script' => {
      	datatype => 'string',
      	base_name => 'script',
-     	description => '',
+     	description => 'Header format script.',
      	format => '',
      	read_only => '',
      		},
      'is_first_page' => {
      	datatype => 'string',
      	base_name => 'isFirstPage',
-     	description => '',
+     	description => 'Is first page(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

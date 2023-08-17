@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-use base 'SVN::Pusher';
+use parent 'SVN::Pusher';
 
 sub report
 {

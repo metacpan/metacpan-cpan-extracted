@@ -1,9 +1,8 @@
-# $Id: Config.pm 539 2013-12-09 22:28:11Z oetiker $
 package CallBackery::Model::ConfigJsonSchema;
 
 =head1 NAME
 
-CallBackery::ConfigYAML - get parse configuration file for CallBackery
+CallBackery::Model::ConfigJsonSchema - get parse configuration file for CallBackery
 
 =head1 SYNOPSIS
 
@@ -73,7 +72,7 @@ has schema => sub ($self) {
 };
 
 sub validator ($self) {
-    my $validator = JSON::Validator->new(version=>7);
+    my $validator = JSON::Validator->new();
     $validator->schema($self->schema);
     return $validator;
 }
@@ -112,7 +111,7 @@ sub postProcessCfg ($self) {
             $self->loadAndNewPlugin($item->{$name}{module});
         };
         if ($@){
-            warn "Failed to load Plugin $_[0]: $@";
+            warn "Failed to load Plugin $name: $@";
             next;
         }
         $obj->config($item->{$name});
@@ -175,7 +174,7 @@ __DATA__
 @@ config-schema.yaml
 
 $id: https://callbackery.org/config-schema.yaml
-$schema: http://json-schema.org/draft-07/schema#
+$schema: http://json-schema.org/draft2019/schema#
 definitions:
   plugin:
     type: object
@@ -189,6 +188,11 @@ definitions:
         type: object
 
 type: object
+additionalProperties: false
+required:
+  - BACKEND
+  - FRONTEND
+  - PLUGIN
 properties:
   BACKEND:
     type: object
@@ -220,8 +224,7 @@ properties:
         format: uri
         description: link to the company homepage
       max_width:
-        type: number
-        format: integer
+        type: integer
         description: maximum content width
       company_support:
         type: string
@@ -265,22 +268,23 @@ properties:
       passwordreset_popup:
         $ref: "#/definitions/plugin"
 
-    PLUGIN:
-      type: array
-      items:
+  PLUGIN:
+    type: array
+    items:
+        type: object
         maxProperties: 1
         minProperties: 1
         patternProperty:
-          ^\S+$:
-              type: object
-              required:
-              - module
-              properties:
+            ^\S+$:
+                type: object
+                required:
+                - module
+                properties:
                 module:
-                  type: string
+                    type: string
                 unlisted:
-                  description: do not add this plugin to the plugin list.
-                  type: boolean
+                    description: do not add this plugin to the plugin list.
+                    type: boolean
 
 
 

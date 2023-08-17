@@ -76,7 +76,7 @@ sub copy {
 sub import_error {
   my ($self, $error, $options) = @_;
   $self->errors->push(
-    Valiant::NestedError->new(
+    my $nested_err = Valiant::NestedError->new(
       inner_error => $error,
       object => $error->object,
       attribute => $error->attribute,
@@ -213,16 +213,16 @@ sub to_hash {
 }
 
 sub as_json {
-  my ($self, %options) = @_;
-  return $self->to_hash(exists $options{full_messages});
+  my ($self, @args) = @_;
+  return $self->to_hash(@args);
 }
 
-sub TO_JSON { shift->as_json(@_) }
+sub TO_JSON { shift->as_json(1) }
 
 # Adds +message+ to the error messages and used validator type to +details+ on +attribute+.
 # More than one error can be added to the same +attribute+.
 sub add {
-  my ($self, $attribute, $type, $options) = @_;
+  my ($self, $attribute, $type, $options) = @_; 
   unless(defined($type)) {
     $type = $self->i18n->make_tag('invalid');
   }
@@ -243,6 +243,7 @@ sub add {
 
 sub build_error {
   my ($self, $attribute, $type, $options) = @_;
+
   return my $error = $self->error_class
     ->new(
       object => $self->object,

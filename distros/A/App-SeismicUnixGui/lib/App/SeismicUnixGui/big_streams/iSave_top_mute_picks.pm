@@ -50,6 +50,8 @@ use aliased 'App::SeismicUnixGui::misc::message';
 use aliased 'App::SeismicUnixGui::misc::flow';
 use aliased 'App::SeismicUnixGui::sunix::shell::cp';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
+use App::SeismicUnixGui::misc::SeismicUnix qw($itemp_top_mute_picks_sorted_par_
+  $itop_mute_file_list $itop_mute_par_ $suffix_txt);
 
 =head2
 
@@ -78,22 +80,22 @@ my ( @flow, @cp, @items );
 =cut
 
 my $iSave_top_mute_picks = {
-    _gather_num    => '',
-    _gather_type   => '',
-    _gather_header => '',
-    _file_in       => '',
-    _inbound       => '',
-    _outbound      => ''
+	_gather_num          => '',
+	_gather_type         => '',
+	_gather_header       => '',
+	_file_in             => '',
+	_inbound             => '',
+	_itop_mute_file_list => $itop_mute_file_list,
+	_outbound            => ''
 };
 
 =head2
 
- Import file-name  and directory definitions
+ Import directory definitions
 
 =cut 
 
-use App::SeismicUnixGui::misc::SeismicUnix qw($itemp_top_mute_picks_sorted_par_ $itop_mute_par_);
-my ($PL_SEISMIC) = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine clear
 
@@ -102,11 +104,12 @@ my ($PL_SEISMIC) = $Project->PL_SEISMIC();
 =cut 
 
 sub clear {
-    $iSave_top_mute_picks->{_gather_num}    = '';
-    $iSave_top_mute_picks->{_gather_type}   = '';
-    $iSave_top_mute_picks->{_gather_header} = '';
-    $iSave_top_mute_picks->{_inbound}       = '';
-    $iSave_top_mute_picks->{_outbound}      = '';
+	$iSave_top_mute_picks->{_gather_num}          = '';
+	$iSave_top_mute_picks->{_gather_type}         = '';
+	$iSave_top_mute_picks->{_gather_header}       = '';
+	$iSave_top_mute_picks->{_inbound}             = '';
+	$iSave_top_mute_picks->{_itop_mute_file_list} = '';
+	$iSave_top_mute_picks->{_outbound}            = '';
 }
 
 =head2 subroutine file_in
@@ -117,10 +120,10 @@ sub clear {
 =cut
 
 sub file_in {
-    my ( $variable, $file_in ) = @_;
-    $iSave_top_mute_picks->{_file_in} = $file_in if defined($file_in);
+	my ( $variable, $file_in ) = @_;
+	$iSave_top_mute_picks->{_file_in} = $file_in if defined($file_in);
 
-    #print("file name is $iSave_top_mute_picks->{_file_in} \n\n");
+	#print("file name is $iSave_top_mute_picks->{_file_in} \n\n");
 
 }
 
@@ -131,9 +134,9 @@ sub file_in {
 =cut
 
 sub gather_num {
-    my ( $variable, $gather_num ) = @_;
-    $iSave_top_mute_picks->{_gather_num} = $gather_num
-      if defined($gather_num);
+	my ( $variable, $gather_num ) = @_;
+	$iSave_top_mute_picks->{_gather_num} = $gather_num
+	  if defined($gather_num);
 }
 
 =head2 subroutine gather_type
@@ -143,9 +146,9 @@ sub gather_num {
 =cut
 
 sub gather_type {
-    my ( $variable, $gather_type ) = @_;
-    $iSave_top_mute_picks->{_gather_type} = $gather_type
-      if defined($gather_type);
+	my ( $variable, $gather_type ) = @_;
+	$iSave_top_mute_picks->{_gather_type} = $gather_type
+	  if defined($gather_type);
 }
 
 =head2 subroutine gather_header
@@ -155,9 +158,9 @@ sub gather_type {
 =cut
 
 sub gather_header {
-    my ( $variable, $gather_header ) = @_;
-    $iSave_top_mute_picks->{_gather_header} = $gather_header
-      if defined($gather_header);
+	my ( $variable, $gather_header ) = @_;
+	$iSave_top_mute_picks->{_gather_header} = $gather_header
+	  if defined($gather_header);
 }
 
 =head2 sub calc
@@ -167,26 +170,39 @@ sub gather_header {
 =cut
 
 sub calc {    #
-    my $suffix;
+	my $suffix;
 
-    $suffix = '_'
-      . $iSave_top_mute_picks->{_gather_header}
-      . $iSave_top_mute_picks->{_gather_num};
+	$suffix = '_'
+	  . $iSave_top_mute_picks->{_gather_header}
+	  . $iSave_top_mute_picks->{_gather_num};
 
-    $iSave_top_mute_picks->{_inbound} =
-        $PL_SEISMIC . '/'
-      . $itemp_top_mute_picks_sorted_par_
-      . $iSave_top_mute_picks->{_file_in};
+	$iSave_top_mute_picks->{_inbound} =
+		$DATA_SEISMIC_TXT . '/'
+	  . $itemp_top_mute_picks_sorted_par_
+	  . $iSave_top_mute_picks->{_file_in};
 
-    $iSave_top_mute_picks->{_outbound} =
-        $PL_SEISMIC . '/'
-      . $itop_mute_par_
-      . $iSave_top_mute_picks->{_file_in}
-      . $suffix;
+	$iSave_top_mute_picks->{_outbound} =
+		$DATA_SEISMIC_TXT . '/'
+	  . $itop_mute_par_
+	  . $iSave_top_mute_picks->{_file_in}
+	  . $suffix;
 
-    $cp->from( $iSave_top_mute_picks->{_inbound} );
-    $cp->to( $iSave_top_mute_picks->{_outbound} );
-    $cp[1] = $cp->Step();
+	$cp->from( $iSave_top_mute_picks->{_inbound} );
+	$cp->to( $iSave_top_mute_picks->{_outbound} );
+	$cp[1] = $cp->Step();
+
+=head2
+
+    append file name to an output list
+    itop_mute_file_list
+    
+=cut
+
+	my $append = ("echo $itop_mute_par_$iSave_top_mute_picks->{_file_in}$suffix >>\\
+	$DATA_SEISMIC_TXT/$itop_mute_file_list$suffix_txt");
+        
+	system($append);
+	print("$append\n");
 
 =head2
 
@@ -194,8 +210,8 @@ sub calc {    #
 
 =cut 
 
-    @items = ( $cp[1] );
-    $flow[1] = $run->modules( \@items );
+	@items = ( $cp[1] );
+	$flow[1] = $run->modules( \@items );
 
 =head2
 
@@ -203,7 +219,7 @@ sub calc {    #
 
 =cut 
 
-    $run->flow( \$flow[1] );
+	$run->flow( \$flow[1] );
 
 =head2
 
@@ -211,8 +227,8 @@ sub calc {    #
 
 =cut
 
-    # print  "$flow[1]\n";
-    #$log->file($flow[1]);
+	# print  "$flow[1]\n";
+	#$log->file($flow[1]);
 
 }    # end calc subroutine
 1;

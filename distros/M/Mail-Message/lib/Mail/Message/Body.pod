@@ -129,7 +129,7 @@ got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body">
 
  -Option           --Defined in     --Default
   based_on                            undef
-  charset                             'PERL' or <undef>
+  charset                             'PERL'
   checked                             <false>
   content_id                          undef
   data                                undef
@@ -152,18 +152,17 @@ got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body">
 The information about encodings must be taken from the specified BODY,
 unless specified differently.
 
-=item charset => CHARSET|'PERL'
+=item charset => CHARSET|'PERL'|<undef>
 
 Defines the character-set which is used in the data.  Only useful in
 combination with a C<mime_type> which refers to C<text> in any shape,
 which does not contain an explicit charset already.  This field is
 case-insensitive.
 
-When a known CHARSET is provided and the mime type says "text", then the
-data is expected to be bytes in that particular encoding (see Encode).
-When 'PERL' is given, then then the data is in Perl's internal encoding
-(either latin1 or utf8, you shouldn't know!) More details in
-L</Character encoding PERL>
+When a known CHARSET is provided and the mime-type says "text", then the
+data is expected to be raw octets in that particular encoding (see Encode).
+When 'PERL' is given, then then the data is in Perl's internal encoding;
+either cp1252 or utf8.  More details in L</Character encoding PERL>
 
 =item checked => BOOLEAN
 
@@ -301,6 +300,14 @@ example:
 
 Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
+=item $obj-E<gt>B<charsetDetect>(%options)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item Mail::Message::Body-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
 =item $obj-E<gt>B<check>()
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
@@ -317,7 +324,7 @@ object may be the object where this is called on, but may also be a new
 body of any type.
 
  my $dec = $body->decoded;
- 
+
 is equivalent with
 
  my $dec = $body->encode
@@ -342,7 +349,7 @@ what is produced.  This C<$dec> body is B<not related to a header>.
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
-=item $obj-E<gt>B<encoded>()
+=item $obj-E<gt>B<encoded>(%options)
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
@@ -489,7 +496,7 @@ want to call L<Mail::Message::decoded()|Mail::Message/"The body"> first.
 
 Returns the transfer-encoding of the data within this body as
 L<Mail::Message::Field|Mail::Message::Field> (which stringifies to its content).  If it
-needs to be changed, call the L<encode()|Mail::Message::Body::Encode/"Constructing a body"> or L<decoded()|Mail::Message::Body/"Constructing a body"> method.
+needs to be changed, call the L<encode()|Mail::Message::Body::Encode/"Constructing a body"> or Mail::Message::Body subroutine ecoded method.
 When no encoding is present, the field contains the text C<none>.
 
 The optional STRING or $field enforces a new encoding to be set, without the
@@ -797,7 +804,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 A body can be contained in a message, but may also live without a message.
 In both cases it stores data, and the same questions can be asked: what
 type of data it is, how many bytes and lines, what encoding is used.  Any
-body can be encoded and decoded, returning a new body object.  However, 
+body can be encoded and decoded, returning a new body object.  However,
 bodies which are part of a message will always be in a shape that they can
 be written to a file or send to somewhere: they will be encoded if needed.
 
@@ -892,9 +899,9 @@ be in a shape that the data can be transported via SMTP.
 However, when you want to process the body data in simple Perl (or when
 you construct the body data from normal Perl strings), you need to be
 aware of Perl's internal representation of strings. That can either be
-latin1 or utf8 (not real UTF-8, but something alike, see the perlunicode
-manual page)  So, before you start using the data from an incoming message,
-do
+cp1252 (extended latin1) or utf8 (not real UTF-8, but something alike,
+see the perlunicode manual page)  So, before you start using the data
+from an incoming message, do
 
     my $body  = $msg->decoded;
     my @lines = $body->lines;
@@ -911,7 +918,60 @@ character-set explicitly.
    my $msg  = Mail::Message->buildFromBody($body);
    $msg->body($body);
    $msg->attach($body);   # etc
-   # these all will convert the charset=PERL into real utf-8
+   # these all will convert the charset=PERL into real utf-8,
+   # cp1252 or us-ascii, which depends on the characters found.
+
+=head3 Autodetection of character-set
+
+This "Body" object represents data as part of an existing message, or
+to become part of a message.  The body can be in two states:
+
+=over 4
+
+=item 1. ready to be processed textually, using Perl's string operations
+
+=item 2. raw bytes read or to be written
+
+=back
+
+In the first case, the body content has no transfer encoding on it
+(C<none>), and the character-set is C<PERL>.  In the second version,
+the body may have transfer encoding and has an (IANA listed) charset
+on it (defaults to C<us-ascii>)
+
+Using L<encode()|Mail::Message::Body::Encode/"Constructing a body"> (maybe via Mail::Message::Body subroutine decode), you can convert bodies from one
+state into a different one.  In one go, you can change the transfer-encoding,
+the character-set, or whether it is in PERL string format or raw (in bytes).
+
+[3.013] A serious problem is created when a conversion is needed, while the input
+or output character-set is not explicitly known.  The email RFCs state that
+the default is C<us-ascii>.  However, in the real world it can be anything.
+Therefore, in such situations autodetection kicks in.
+
+=over 4
+
+=item 1.
+
+When a Body is read (using L<Mail::Message::read()|Mail::Message::Construct::Read/"Constructing a message"> and friends), the
+character-set may stay undefined until transfer-decoding has been applicied.
+At that moment, (configurable auto-detection) is applied;
+
+=item 2.
+
+When a Body is created witin the program, without specific character-set,
+it will use 'PERL';
+
+=item 3.
+
+When a Body is written, the requested character-set is not specified, and the
+current character-set is C<PERL>, then auto-dectection is used.  This may
+result in C<us-ascii>, C<cp1252> and C<utf-8>;
+
+=item 4.
+
+In all other cases, the character-set is known so "easy".
+
+=back
 
 =head1 DIAGNOSTICS
 
@@ -946,12 +1006,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.012,
-built on February 11, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.013,
+built on June 24, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

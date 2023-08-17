@@ -40,11 +40,4 @@ __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
 __PACKAGE__->accept_nested_for('emails', +{allow_destroy=>1});
 __PACKAGE__->accept_nested_for('phones', +{allow_destroy=>1});
 
-sub set_from_request($self, $r) {
-  $self->set_columns_recursively($r->nested_params);
-  $self->insert_or_update;
-
-  return $self->valid;
-}
-
 1;

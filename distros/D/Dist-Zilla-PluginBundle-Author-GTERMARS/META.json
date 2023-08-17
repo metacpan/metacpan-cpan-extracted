@@ -4,7 +4,7 @@
       "Graham TerMarsch <cpan@howlingfrog.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -38,7 +38,8 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Spelling" : "0.12",
-            "Test::Synopsis" : "0"
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -46,6 +47,7 @@
             "Dist::Zilla" : "6.005",
             "Dist::Zilla::Plugin::Bootstrap::lib" : "1.001002",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
+            "Dist::Zilla::Plugin::CheckIssues" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsureMinimumPerl" : "0",
@@ -98,16 +100,16 @@
       "bugtracker" : {
          "web" : "https://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS/issues"
       },
-      "homepage" : "http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-GTERMARS/",
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-GTERMARS/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS.git",
          "web" : "https://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS"
       }
    },
-   "version" : "0.05",
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

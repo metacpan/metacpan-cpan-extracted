@@ -1,0 +1,270 @@
+NAME
+    Tags::HTML::Login::Register - Tags helper for login register.
+
+SYNOPSIS
+     use Tags::HTML::Login::Register;
+
+     my $obj = Tags::HTML::Login::Register->new(%params);
+     $obj->process($messages_ar);
+     $obj->process_css($message_types_hr);
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Login::Register->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "form_method"
+
+            Form method.
+
+            Possible values are 'post' and 'get'.
+
+            Default value is 'post'.
+
+    *       "language"
+
+            Language in ISO 639-3 code.
+
+            Default value is 'eng'.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-3 code and
+            value with hash reference with texts.
+
+            Required keys are 'login', 'password_label', 'username_label'
+            and 'submit'.
+
+            Default value is:
+
+             {
+                    'eng' => {
+                            'password1_label' => 'Password #1',
+                            'password2_label' => 'Password #2',
+                            'register' => 'Register',
+                            'username_label' => 'User name',
+                            'submit' => 'Register',
+                    },
+             }
+
+  "process"
+     $obj->process($messages_ar);
+
+    Process Tags structure for register form. Variable $message_ar is
+    reference to array with Data::Message::Simple instances.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css($message_types_hr);
+
+    Process CSS::Struct structure for register form. Variable
+    $message_types_hr is reference to hash with message type keys and CSS
+    color as value. Message types are defined in Data::Message::Simple.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+             Bad message data object.
+             Text for lang '%s' and key '%s' doesn't exist.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+             Message types must be a hash reference.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Login::Register;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Login::Register->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process login button.
+     $obj->process_css;
+     $obj->process;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .form-register {
+     #      width: ;
+     #      background-color: #f2f2f2;
+     #      padding: 20px;
+     #      border-radius: 5px;
+     #      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+     # }
+     # .form-register fieldset {
+     #      border: none;
+     #      padding: 0;
+     #      margin-bottom: 20px;
+     # }
+     # .form-register legend {
+     #      font-weight: bold;
+     #      margin-bottom: 10px;
+     # }
+     # .form-register p {
+     #      margin: 0;
+     #      padding: 10px 0;
+     # }
+     # .form-register label {
+     #      display: block;
+     #      font-weight: bold;
+     #      margin-bottom: 5px;
+     # }
+     # .form-register input[type="text"], .form-register input[type="password"] {
+     #      width: 100%;
+     #      padding: 8px;
+     #      border: 1px solid #ccc;
+     #      border-radius: 3px;
+     # }
+     # .form-register button[type="submit"] {
+     #      width: 100%;
+     #      padding: 10px;
+     #      background-color: #4CAF50;
+     #      color: #fff;
+     #      border: none;
+     #      border-radius: 3px;
+     #      cursor: pointer;
+     # }
+     # .form-register button[type="submit"]:hover {
+     #      background-color: #45a049;
+     # }
+     # 
+     # HTML
+     # <form class="form-register" method="post">
+     #   <fieldset>
+     #     <legend>
+     #       Register
+     #     </legend>
+     #     <p>
+     #       <label for="username">
+     #       </label>
+     #       User name
+     #       <input type="text" name="username" id="username" autofocus="autofocus">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <label for="password1">
+     #         Password #1
+     #       </label>
+     #       <input type="password" name="password1" id="password1">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <label for="password2">
+     #         Password #2
+     #       </label>
+     #       <input type="password" name="password2" id="password2">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <button type="submit" name="register" value="register">
+     #         Register
+     #       </button>
+     #     </p>
+     #   </fieldset>
+     # </form>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::HTML::Login::Register;
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8);
+ 
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'xml' => 1,
+             'preserved' => ['style'],
+     );
+     my $register = Tags::HTML::Login::Register->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+     $register->process_css;
+     my $app = Plack::App::Tags::HTML->new(
+             'component' => 'Tags::HTML::Container',
+             'data' => [sub {
+                     my $self = shift;
+                     $register->process;
+                     return;
+             }],
+             'css' => $css,
+             'tags' => $tags,
+             'title' => 'Register',
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output screenshot is in images/ directory.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, Readonly, Tags::HTML,
+    Tags::HTML::Messages.
+
+SEE ALSO
+    Tags::HTML::Login::Access
+        Tags helper for login access.
+
+    Tags::HTML::Login::Button
+        Tags helper for login button.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Login-Register>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.06
+

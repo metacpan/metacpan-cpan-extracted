@@ -1,0 +1,110 @@
+NAME
+
+    Object::Pad::FieldAttr::Checked - apply value constraint checks to
+    Object::Pad fields
+
+SYNOPSIS
+
+    With Types::Standard:
+
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Checked;
+       use Types::Standard qw( Num );
+    
+       class Point {
+          field $x :param :reader :Checked(Num);
+          field $y :param :reader :Checked(Num);
+       }
+    
+       Point->new( x => 123, y => "456" );         # this is fine
+    
+       Point->new( x => "hello", y => "world" );   # throws an exception
+
+    Or, standalone:
+
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Checked;
+    
+       package Numerical {
+          use Scalar::Util qw( looks_like_number );
+          sub check { looks_like_number $_[1]; }
+       }
+    
+       class Point {
+          field $x :param :reader :Checked(Numerical);
+          field $y :param :reader :Checked(Numerical);
+       }
+    
+       ...
+
+DESCRIPTION
+
+    This module provides a third-party field attribute for
+    Object::Pad-based classes, which declares that values assigned to the
+    field must conform to a given value constraint check.
+
+    WARNING The ability for Object::Pad to take third-party field
+    attributes is still new and highly experimental, and subject to much
+    API change in future. As a result, this module should be considered
+    equally experimental.
+
+    Additionally, the behaviour provided by this module should be
+    considered more of a work-in-progress stepping stone. Ideally, value
+    constraint syntax ought to be provided in a much more fundamental way
+    by native Perl syntax, allowing it to be used on my lexicals,
+    subroutine parameters, and other places as well as object fields. This
+    module is more of a placeholder to allow some part of that behaviour to
+    be specified for object fields, while not getting in the way of a more
+    general, more powerful system being added in future.
+
+FIELD ATTRIBUTES
+
+ :Checked
+
+       field $name :Checked(EXPRESSION) ...;
+
+    Declares that any value assigned to the field must conform to the
+    constraint checking object specified by the expression. Attempts to
+    assign a non-conforming value will throw an exception and the field
+    will not be modified.
+
+    At compiletime, the string given by EXPRESSION is eval()'ed in scalar
+    context, and its result is stored as part of the field's definition.
+    The value of the expression must either be an object reference, or a
+    string containing the name of a package. In either case, a method
+    called check must exist on it.
+
+    At runtime, this constraint checking value is used every time an
+    attempt is made to assign a new value to the field, whether that is
+    from :param initialisation, invoking a :writer or :mutator accessor, or
+    direct assignment into the field variable by method code within the
+    class. The checker is used as the invocant for invoking a check method,
+    and the new value for the field is passed as an argument. If the method
+    returns true, the assignment is allowed. If false, it is rejected with
+    an exception and the field itself remains unmodified.
+
+       $ok = $checker->check( $value );
+
+    As this is the interface supported by Types::Standard, any constraint
+    object provided by that module is already supported here.
+
+       use Types::Standard qw( Str Num );
+    
+       field $name :Checked(Str);
+       field $age  :Checked(Num);
+
+    (For performance reasons, the check method is actually resolved into a
+    function at compiletime when the :Checked attribute is applied, and
+    this stored value is the one that is called at assignment time. If the
+    method itself is replaced later by globref assignment or other
+    trickery, this updated value will not be used.)
+
+SEE ALSO
+
+      * Object::Pad::FieldAttr::Isa - apply class type constraints to
+      Object::Pad fields
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

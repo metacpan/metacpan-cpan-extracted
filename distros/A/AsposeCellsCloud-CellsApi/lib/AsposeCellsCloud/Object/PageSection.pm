@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'section' => {
      	datatype => 'int',
      	base_name => 'Section',
-     	description => '',
+     	description => '0,1,2  left , middle ,right',
      	format => '',
      	read_only => '',
      		},
      'context' => {
      	datatype => 'string',
      	base_name => 'Context',
-     	description => '',
+     	description => 'page context script            ',
      	format => '',
      	read_only => '',
      		},
@@ -149,14 +149,14 @@ __PACKAGE__->method_documentation({
      'fisrt_page_context' => {
      	datatype => 'string',
      	base_name => 'FisrtPageContext',
-     	description => '',
+     	description => 'fisrt page context script',
      	format => '',
      	read_only => '',
      		},
      'even_page_context' => {
      	datatype => 'string',
      	base_name => 'EvenPageContext',
-     	description => '',
+     	description => 'Even page context script',
      	format => '',
      	read_only => '',
      		},    

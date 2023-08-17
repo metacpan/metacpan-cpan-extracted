@@ -10,151 +10,27 @@ DESCRIPTION
     keywords to be added to the Perl language by writing code in Perl
     itself.
 
-    It provides a thin wrapping later over the XS functions provided by XPK
-    itself, and additionally provides some extra perl-visible functions for
-    things like optree management, which would normally be written directly
-    in C code. No real attempt is made here to provide further abstractions
-    on top of the API already provided by Perl and XPK, so users will have
-    to be familiar with the overall concepts there as well.
+    It provides a thin wrapping layer over the XS functions provided by XPK
+    itself. No real attempt is made here to provide further abstractions on
+    top of the API already provided by Perl and XPK, so users will have to
+    be familiar with the overall concepts there as well.
 
     This module is currently experimental, on top of the
     already-experimental nature of XS::Parse::Keyword itself.
 
-UTILITY FUNCTIONS
+OPTREE FUNCTIONS
 
-    The following helper functions are provided to allow Perl code to get
-    access to various parts of the C-level API that would be useful when
-    building optrees for keywords. They are not part of the
-    XS::Parse::Keyword API.
+    The Optree::Generate module contains a selection of helper functions to
+    allow Perl code to get access to various parts of the C-level API that
+    would be useful when building optrees for keywords. They used to be
+    part of this module, and so are currently re-exported for convenience,
+    but a later version of this module may start emitting warnings when
+    they are used this way, and eventually that may stop being provided at
+    all.
 
- opcode
+    Code needing these should import them directly:
 
-       $type = opcode( $opname );
-
-    Returns an opcode integer corresponding to the given op name, which
-    should be lowercase and without the leading OP_... prefix. As this
-    involves a linear search across the entire PL_op_name array you may
-    wish to perform this just once and store the result, perhaps using use
-    constant for convenience.
-
-       use constant OP_CONST => opcode("const");
-
- op_contextualize
-
-       $op = op_contextualize( $op, $context );
-
-    Applies a syntactic context to an optree representing an expression.
-    $context must be one of the exported constants G_VOID, G_SCALAR, or
-    G_LIST.
-
- op_scope
-
-       $op = op_scope( $op );
-
-    Wraps an optree with some additional ops so that a runtime dynamic
-    scope will created.
-
- new*OP
-
-    This family of functions return a new OP of the given class, for the
-    type, flags, and other arguments specified.
-
-    A suitable $type can be obtained by using the "opcode" function.
-
-    $flags contains the opflags; a bitmask of the following constants.
-
-       OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
-       OPf_KIDS
-       OPf_PARENS
-       OPf_REF
-       OPf_MOD
-       OPf_STACKED
-       OPf_SPECIAL
-
-    The op is returned as a B::OP instance or a subclass thereof.
-
-    These functions can only be called during the build phase of a keyword
-    hook, because they depend on having the correct context set by the
-    currently-compiling function.
-
-  newOP
-
-       $op = newOP( $type, $flags );
-
-    Returns a new base OP for the given type and flags.
-
-  newASSIGNOP
-
-       $op = newASSIGNOP( $flags, $left, $optype, $right );
-
-    Returns a new op representing an assignment operation from the right to
-    the left OP child of the given type. Note the odd order of arguments.
-
-  newBINOP
-
-       $op = newBINOP( $type, $flags, $first, $last );
-
-    Returns a new BINOP for the given type, flags, and first and last OP
-    child.
-
-  newCONDOP
-
-       $op = newCONDOP( $flags, $first, $trueop, $falseop );
-
-    Returns a new conditional expression op for the given condition
-    expression and true and false alternatives, all as OP instances.
-
-  newFOROP
-
-       $op = newFOROP( $flags, %svop, $expr, $block, $cont );
-
-    Returns a new optree representing a heavyweight for loop, given the
-    optional iterator SV op, the list expression, the block, and the
-    optional continue block, all as OP instances.
-
-  newGVOP
-
-       $op = newGVOP( $type, $flags, $gvref );
-
-    Returns a new SVOP for the given type, flags, and GV given by a GLOB
-    reference. The referred-to GLOB will be stored in the SVOP itself.
-
-  newLISTOP
-
-       $op = newLISTOP( $type, $flags, @children );
-
-    Returns a new LISTOP for the given type, flags, and child SVs.
-
-    Note that an arbitrary number of child SVs can be passed here. This
-    wrapper function will automatically perform the op_convert_list
-    conversion from a plain OP_LIST if required.
-
-  newLOGOP
-
-       $op = newLOGOP( $type, $flags, $first, $other );
-
-    Returns a new LOGOP for the given type, flags, and first and other OP
-    child.
-
-  newPADxVOP
-
-       $op = newPADxVOP( $type, $flags, $padoffset );
-
-    Returns a new op for the given type, flags, and pad offset. $type must
-    be one of OP_PADSV, OP_PADAV, OP_PADHV or OP_PADCV.
-
-  newSVOP
-
-       $op = newSVOP( $type, $flags, $sv );
-
-    Returns a new SVOP for the given type, flags, and SV. A copy of the
-    given scalar will be stored in the SVOP itself.
-
-  newUNOP
-
-       $op = newUNOP( $type, $flags, $first );
-
-    Returns a new UNOP for the given type, flags, and first OP child.
+       use Optree::Generate qw( opcode newUNOP ... );
 
 XPK FUNCTIONS
 
@@ -340,6 +216,11 @@ XPK FUNCTIONS
     begin with an identifier character (thus avoiding prefix-match
     problems). No value is returned.
 
+  XPK_INTRO_MY
+
+    Calls the perl intro_my() function immediately. No input is consumed
+    and no output value is generated.
+
   XPK_SEQUENCE
 
        XPK_SEQUENCE(@pieces)
@@ -387,9 +268,9 @@ XPK FUNCTIONS
     compile-time failure with the given message. This can be used as the
     final option in XPK_CHOICE to ensure a valid match.
 
-  XPK_PARENSCOPE
+  XPK_PARENS
 
-       XPK_PARENSCOPE(@pieces)
+       XPK_PARENS(@pieces)
 
     Expects to find a sequence of pieces, all surrounded by parentheses
     (round brackets, ( ... )).
@@ -397,17 +278,17 @@ XPK FUNCTIONS
     Nothing extra is returned, beyond the values from the individual
     contained pieces.
 
-  XPK_ARGSCOPE
+  XPK_ARGS
 
-       XPK_ARGSCOPE(@pieces)
+       XPK_ARGS(@pieces)
 
-    A scope similar to XPK_PARENSCOPE except that the parentheses
+    A container similar to XPK_PARENS except that the parentheses
     themselves are optional, similar to perl's parsing of calls to known
     functions.
 
-  XPK_BRACKETSCOPE
+  XPK_BRACKETS
 
-       XPK_BRACKETSCOPE(@pieces)
+       XPK_BRACKETS(@pieces)
 
     Expects to find a sequence of pieces, all surrounded by square brackets
     ([ ... ]).
@@ -415,9 +296,9 @@ XPK FUNCTIONS
     Nothing extra is returned, beyond the values from the individual
     contained pieces.
 
-  XPK_BRACESCOPE
+  XPK_BRACES
 
-       XPK_BRACESCOPE(@pieces)
+       XPK_BRACES(@pieces)
 
     Expects to find a sequence of pieces, all surrounded by braces ({ ...
     }).
@@ -425,9 +306,9 @@ XPK FUNCTIONS
     Nothing extra is returned, beyond the values from the individual
     contained pieces.
 
-  XPK_CHEVRONSCOPE
+  XPK_CHEVRONS
 
-       XPK_CHEVRONSCOPE(@pieces)
+       XPK_CHEVRONS(@pieces)
 
     Expects to find a sequence of pieces, all surrounded by chevrons (angle
     brackets, < ... >).
@@ -483,13 +364,6 @@ XPK FUNCTIONS
 
     Returns the line number of the source text on which the piece was
     started.
-
-TODO
-
-      * More new*OP() wrapper functions.
-
-      * More optree-mangling functions. At least, some way to set the TARG
-      might be handy.
 
 AUTHOR
 

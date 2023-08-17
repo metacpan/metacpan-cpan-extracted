@@ -1,0 +1,45 @@
+Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
+
+1000.001 : Bumped the version to be > 999.999 to fix a $VERSION problem
+  (see https://www.perlmonks.org/?node_id=11153160)
+3.031 : Fix date format auto-detection when importing CSV
+3.015->3.030 : Fixed various portability issues, particularly for Windows
+
+3.014 : IO::convert_spreadsheet() reworked:
+
+        Auto-detect CSV import column formats when possible to avoid
+        corruption when converted to a spreadsheet.  Mainly this is to
+        specify "text" format for things which would be spoiled if read
+        as a number e.g. zip codes with leading zeroes.  
+        Also detects MM/DD/YY vs DD/MM/YY when the DD happens to be > 12.
+
+        Import formats may be provided explicitly with option
+           col_formats => [...] 
+        The value is a list of codes for columns: "text", 
+        "MM/DD/YY", "DD/MM/YY", or undef/empty for Standard 
+        (e.g. generic number), or equivalent OO/LO Format Code numbers 
+        See https://wiki.documentfoundation.org/Documentation/DevGuide/Spreadsheet_Documents#Filter_Options_for_the_CSV_Filter
+
+        Now csv->ods->csv round trip is usually completely clean.
+
+3.010 : Clean up auto-detect of encoding and quote & separator characters
+        in csv files.   It first tries the obvious: UTF-8, '"' and ",", but
+        should now work automatically with \t separators.
+
+        Override with 
+          input_encoding => "UTF-8",  # for example
+          quote_char     => '"',
+          sep_char       => ','
+        ----
+        Support CSV transcoding e.g.
+          convert_spreadsheet( inpath => "file_in_utf16.csv", 
+                               cvt_to => "csv",
+                               output_encoding => "UTF-8" )
+
+        will auto-detect the input encoding (using BOM if present)
+        and transcode to a UTF-8 outpath.
+        ---
+        Separate and generalize the logging functions into
+        Spreadsheet::Edit::Log .
+        ---
+3.009 : Switch tests from Test::More to Test2::V0

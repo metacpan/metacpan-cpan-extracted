@@ -8,7 +8,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: oop_declare_data_out 
+ PERL PROGRAM NAME: oop_declare_data_out 
  AUTHOR: Juan Lorenzo
  DATE:   Nov 29 2017,
 

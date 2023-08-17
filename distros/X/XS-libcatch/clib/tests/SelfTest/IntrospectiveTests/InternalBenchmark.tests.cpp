@@ -1,10 +1,17 @@
-/*
- *  Created by Joachim on 16/04/2019.
- *  Adapted from donated nonius code.
- *
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+// Adapted from donated nonius code.
+
+
+#if defined( __GNUC__ ) || defined( __clang__ )
+#    pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
@@ -14,6 +21,8 @@
 #include <catch2/benchmark/detail/catch_analyse.hpp>
 #include <catch2/benchmark/detail/catch_benchmark_function.hpp>
 #include <catch2/benchmark/detail/catch_estimate_clock.hpp>
+
+#include <numeric>
 
 namespace {
     struct manual_clock {
@@ -282,8 +291,8 @@ TEST_CASE("analyse", "[approvals][benchmark]") {
     }
 
     auto analysis = Catch::Benchmark::Detail::analyse(config, env, samples.begin(), samples.end());
-    CHECK(analysis.mean.point.count() == 23);
-    CHECK(analysis.mean.lower_bound.count() < 23);
+    CHECK( analysis.mean.point.count() == 23 );
+    CHECK( analysis.mean.lower_bound.count() < 23 );
     CHECK(analysis.mean.lower_bound.count() > 22);
     CHECK(analysis.mean.upper_bound.count() > 23);
     CHECK(analysis.mean.upper_bound.count() < 24);
@@ -435,6 +444,6 @@ TEST_CASE("Failing benchmarks", "[!benchmark][.approvals]") {
 }
 
 TEST_CASE( "Failing benchmark respects should-fail",
-           "[!shouldfail][!benchmark][.approvals]" ) {
+           "[!shouldfail][!benchmark][approvals]" ) {
     BENCHMARK( "Asserting benchmark" ) { REQUIRE( 1 == 2 ); };
 }

@@ -12,10 +12,10 @@ build_requires:
   Test::More: '0.88'
   lib: '0'
   overload: '0'
-  perl: '5.006'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 1
 generated_by: 'Dist::Zilla, CPAN::Meta::Converter'
 license: open_source
@@ -35,11 +35,11 @@ requires:
   Proc::Background: '1.30'
   Scalar::Util: '0'
   parent: '0'
-  perl: '5.006'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/skirmess/Git-Background/issues
   homepage: https://github.com/skirmess/Git-Background
   repository: https://github.com/skirmess/Git-Background.git
-version: '0.006'
+version: '0.007'

@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetCommentRequest.name :   ,
-# PutWorksheetCommentRequest.sheetName :   ,
-# PutWorksheetCommentRequest.cellName :   ,
-# PutWorksheetCommentRequest.comment :   ,
-# PutWorksheetCommentRequest.folder :   ,
-# PutWorksheetCommentRequest.storageName :    
+# PutWorksheetCommentRequest.name : The workbook name.  ,
+# PutWorksheetCommentRequest.sheetName : The worksheet name.  ,
+# PutWorksheetCommentRequest.cellName : The cell name.  ,
+# PutWorksheetCommentRequest.comment : Comment object.  ,
+# PutWorksheetCommentRequest.folder : Original workbook folder.  ,
+# PutWorksheetCommentRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_comment' } = { 
-    	summary => '',
+    	summary => 'Adds cell comment in worksheet.',
         params => $params,
         returns => 'CommentResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'cellName',
-     	description => '',
+     	description => 'The cell name.',
      	format => '',
      	read_only => '',
      		},
      'comment' => {
      	datatype => 'Comment',
      	base_name => 'comment',
-     	description => '',
+     	description => 'Comment object.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

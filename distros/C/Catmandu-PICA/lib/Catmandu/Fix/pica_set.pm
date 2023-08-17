@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_set;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
@@ -40,7 +40,7 @@ sub _build_fixer {
             }
         }
         $data;
-      }
+    }
 }
 
 1;
@@ -76,7 +76,8 @@ This fix sets the value from PATH to a subfield defined through PICA_PATH.
 
 =head1 SEE ALSO
 
-See L<Catmandu::Fix::pica_add> for adding new fields and subfields to a PICA record.
+See L<Catmandu::Fix::pica_update> and L<Catmandu::Fix::pica_add> for adding new
+fields and subfields to a PICA record.
 
 See L<Catmandu::Fix::pica_map> if you want to copy values from a PICA record.
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More 0.89;
+use Digest::SHA 'sha1_hex';
 
 use lib 't/lib';
 
@@ -18,9 +19,9 @@ my $rs = $schema->resultset('Foo');
 	my $row = $rs->find({ id => $new->id });
 
 	for my $current ($new, $row) {
-		like $current->get_column('passphrase'), qr/reversed/, 'Column stored as reversed after create';
+		is $current->get_column('passphrase'), '$reversed$oom', 'Column stored as reversed after create';
 		isa_ok $current->get_inflated_column('passphrase'), 'Crypt::Passphrase::PassphraseHash';
-		like $current->get_inflated_column('passphrase')->raw_hash, qr/reversed/, 'Column stored as reversed after create';
+		is $current->get_inflated_column('passphrase')->raw_hash, '$reversed$oom', 'Column stored as reversed after create';
 
 		ok !$current->verify_passphrase('mookooh'), 'Rejects incorrect passphrase using check method';
 		ok $current->verify_passphrase('moo'), 'Accepts correct passphrase using check method';
@@ -36,7 +37,7 @@ my $rs = $schema->resultset('Foo');
 	ok !$ppr->needs_rehash, 'Password does not need rehash';
 
 	my $passphraser = $row->column_info('passphrase')->{inflate_passphrase};
-	$row->update({ passphrase => $passphraser->curry_with_hash('$reversed$oom') })->discard_changes;
+	$row->update({ passphrase => $passphraser->curry_with_hash(sha1_hex('moo')) })->discard_changes;
 	ok $row->passphrase_needs_rehash, 'Rehash is needed before verify and rehash';
 	ok $row->verify_and_rehash_password('moo'), 'Verify and rehash successful';
 	ok !$row->passphrase_needs_rehash, 'No second rehash is needed after verify and rehash';

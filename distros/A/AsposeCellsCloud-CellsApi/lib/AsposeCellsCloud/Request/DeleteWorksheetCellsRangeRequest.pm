@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetCellsRangeRequest.name :   ,
-# DeleteWorksheetCellsRangeRequest.sheetName :   ,
-# DeleteWorksheetCellsRangeRequest.range :   ,
-# DeleteWorksheetCellsRangeRequest.shift :   ,
-# DeleteWorksheetCellsRangeRequest.folder :   ,
-# DeleteWorksheetCellsRangeRequest.storageName :    
+# DeleteWorksheetCellsRangeRequest.name : The workbook name.  ,
+# DeleteWorksheetCellsRangeRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetCellsRangeRequest.range : The range object.  ,
+# DeleteWorksheetCellsRangeRequest.shift : Represent the shift options when deleting a range of cells(Down/Left/None/Right/Up).  ,
+# DeleteWorksheetCellsRangeRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetCellsRangeRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_cells_range' } = { 
-    	summary => '',
+    	summary => 'Deletes a range of cells and shift cells according to the shift option.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'string',
      	base_name => 'range',
-     	description => '',
+     	description => 'The range object.',
      	format => '',
      	read_only => '',
      		},
      'shift' => {
      	datatype => 'string',
      	base_name => 'shift',
-     	description => '',
+     	description => 'Represent the shift options when deleting a range of cells(Down/Left/None/Right/Up).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

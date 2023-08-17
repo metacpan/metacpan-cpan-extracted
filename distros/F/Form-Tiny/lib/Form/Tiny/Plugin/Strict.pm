@@ -1,10 +1,9 @@
 package Form::Tiny::Plugin::Strict;
-$Form::Tiny::Plugin::Strict::VERSION = '2.17';
+$Form::Tiny::Plugin::Strict::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;
 
-use Form::Tiny::Utils qw(try);
 use Form::Tiny::Error;
 
 use parent 'Form::Tiny::Plugin';
@@ -20,80 +19,56 @@ sub plugin
 
 use Moo::Role;
 
-use constant {
-	MARKER_NONE => '',
-	MARKER_SKIP => 'skip',
-	MARKER_ARRAY => 'array',
-	MARKER_LEAF => 'leaf',
-};
-
 requires qw(setup);
+
+# cache for the blueprint (if non-dynamic)
+has '_strict_blueprint' => (
+	is => 'rw',
+);
 
 sub _check_recursive
 {
-	my ($self, $obj, $data, $markers, $path) = @_;
-	$path //= Form::Tiny::Path->empty;
+	my ($self, $data, $blueprint) = @_;
+	return 0 unless defined $blueprint;
 
-	my $current_path = $path->join;
-	my $metadata = $markers->{$current_path} // MARKER_NONE;
+	my $ref = ref $blueprint;
 
-	return if $metadata eq MARKER_SKIP;
+	if ($ref eq 'ARRAY') {
+		return 0 unless ref $data eq 'ARRAY';
 
-	if ($metadata eq MARKER_LEAF) {
+		foreach my $value (@$data) {
+			return 0
+				unless $self->_check_recursive($value, $blueprint->[0]);
+		}
+	}
+	elsif ($ref eq 'HASH') {
+		return 0 unless ref $data eq 'HASH';
 
+		for my $key (keys %$data) {
+			return 0
+				unless $self->_check_recursive($data->{$key}, $blueprint->{$key});
+		}
+	}
+	else {
 		# we're at leaf and no error occured - we're good.
 	}
 
-	elsif ($metadata eq MARKER_ARRAY) {
-		die $current_path unless ref $data eq 'ARRAY';
-		foreach my $value (@$data) {
-			$self->_check_recursive(
-				$obj, $value, $markers,
-				$path->clone->append('ARRAY')
-			);
-		}
-	}
-
-	else {
-		# only leaves are allowed to be anything
-		# on regular elements we expect a hashref
-		die $current_path unless ref $data eq 'HASH';
-		for my $key (keys %$data) {
-			$self->_check_recursive(
-				$obj, $data->{$key}, $markers,
-				$path->clone->append(HASH => $key)
-			);
-		}
-	}
+	return 1;
 }
 
 sub _check_strict
 {
 	my ($self, $obj, $input) = @_;
 
-	my %markers;
-	foreach my $def (@{$obj->field_defs}) {
-		if ($def->is_subform) {
-			$markers{$def->name} = MARKER_SKIP;
-		}
-		else {
-			$markers{$def->name} = MARKER_LEAF;
-		}
-
-		my $path = $def->get_name_path;
-		my @path_meta = @{$path->meta};
-		for my $ind (0 .. $#path_meta) {
-			if ($path_meta[$ind] eq 'ARRAY') {
-				$markers{$path->join($ind - 1)} = MARKER_ARRAY;
-			}
-		}
+	my $blueprint = $self->_strict_blueprint;
+	if (!$blueprint) {
+		$blueprint = $self->blueprint($obj, recurse => 0);
+		$self->_strict_blueprint($blueprint)
+			unless $self->is_dynamic;
 	}
 
-	my $error = try sub {
-		$self->_check_recursive($obj, $input, \%markers);
-	};
-
-	if ($error) {
+	my $strict = $self->_check_recursive($input, $blueprint);
+	if (!$strict) {
 		$obj->add_error($self->build_error(IsntStrict =>));
 	}
 

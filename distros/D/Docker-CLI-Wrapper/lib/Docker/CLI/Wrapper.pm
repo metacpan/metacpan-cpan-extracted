@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper;
-$Docker::CLI::Wrapper::VERSION = '0.0.6';
+$Docker::CLI::Wrapper::VERSION = '0.0.7';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Docker::CLI::Wrapper - a wrapper for the CLI of docker and compatible tools.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

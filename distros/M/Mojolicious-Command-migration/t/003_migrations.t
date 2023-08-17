@@ -23,7 +23,9 @@ my $config = do 't/mysql.conf';
 remove_tree 'testtmp'   if -d 'testtmp';
 remove_tree 'testshare' if -d 'testshare';
 
-my $db = DBI->connect('dbi:mysql:'.$config->{datasource}->{database}, $config->{user}, $config->{password});
+my $db = DBI->connect('dbi:mysql:'.$config->{datasource}->{database}, $config->{user}, $config->{password}, {
+	host => $config->{datasource}->{host} || '', port => $config->{datasource}->{port},
+});
 $db->do('drop table if exists test') if @{$db->selectall_arrayref('show tables', { Slice => {} })};
 
 mkdir $_ for qw/testtmp testshare/;
@@ -156,11 +158,11 @@ ok -s $migration->paths->{db_upgrade   }."/1-2/001_auto.sql", 'upgrade mysql exi
 ok -s $migration->paths->{db_downgrade }."/2-1/001_auto.sql", 'downgrade mysql exists';
 
 $file = Mojo::Asset::File->new(path => $migration->paths->{db_upgrade}."/1-2/001_auto.sql")->slurp;
-like $file, qr/ALTER TABLE test ADD COLUMN name varchar\(255\) NOT NULL DEFAULT '' AFTER id/,
+like $file, qr/ALTER TABLE test ADD COLUMN `name` varchar\(255\) NOT NULL DEFAULT '' AFTER `id`/,
   'right mysql upgrade';
 
 $file = Mojo::Asset::File->new(path => $migration->paths->{db_downgrade}."/2-1/001_auto.sql")->slurp;
-like $file, qr/ALTER TABLE test DROP COLUMN name/,
+like $file, qr/ALTER TABLE test DROP COLUMN `name`/,
   'right mysql downgrade';
 
 $buffer = '';
@@ -369,6 +371,7 @@ $buffer = '';
 
 $db->do('alter table test add name2 varchar(255) not null default ""');
 $db->do('alter table test add name3 varchar(255) not null default ""');
+$db->do('alter table test add name4 varchar(255) not null default ""');
 
 $buffer = '';
 {
@@ -386,15 +389,44 @@ ok -s $migration->paths->{db_upgrade   }."/2-3/001_auto.sql", 'upgrade mysql exi
 ok -s $migration->paths->{db_downgrade }."/3-2/001_auto.sql", 'downgrade mysql exists';
 
 $file = Mojo::Asset::File->new(path => $migration->paths->{db_upgrade}."/2-3/001_auto.sql")->slurp;
-like $file, qr/ALTER TABLE test ADD COLUMN name2 varchar\(255\) NOT NULL DEFAULT '' AFTER name/,
+like $file, qr/ALTER TABLE test ADD COLUMN `name2` varchar\(255\) NOT NULL DEFAULT '' AFTER `name`/,
   'right mysql upgrade';
-like $file, qr/ADD COLUMN name3 varchar\(255\) NOT NULL DEFAULT '' AFTER name2/,
+like $file, qr/ADD COLUMN `name3` varchar\(255\) NOT NULL DEFAULT '' AFTER `name2`/,
+  'right mysql upgrade';
+like $file, qr/ADD COLUMN `name4` varchar\(255\) NOT NULL DEFAULT '' AFTER `name3`/,
   'right mysql upgrade';
 
 $file = Mojo::Asset::File->new(path => $migration->paths->{db_downgrade}."/3-2/001_auto.sql")->slurp;
-like $file, qr/ALTER TABLE test DROP COLUMN name2/,
+like $file, qr/ALTER TABLE test DROP COLUMN `name2`/,
   'right mysql downgrade';
-like $file, qr/DROP COLUMN name3/,
+like $file, qr/DROP COLUMN `name3`/,
+  'right mysql downgrade';
+like $file, qr/DROP COLUMN `name4`/,
+  'right mysql downgrade';
+
+$db->do('alter table test drop name4');
+
+$buffer = '';
+{
+	open my $handle, '>', \$buffer;
+	local *STDOUT = $handle;
+	$migration->run('prepare');
+}
+like $buffer, qr/Schema version: 3/,
+  'right output';
+like $buffer, qr/New schema version: 4/,
+  'right output';
+ok -s $migration->paths->{source_deploy}."/4/001_auto.yml", 'deploy _source exists';
+ok -s $migration->paths->{db_deploy    }."/4/001_auto.sql", 'deploy mysql exists';
+ok -s $migration->paths->{db_upgrade   }."/3-4/001_auto.sql", 'upgrade mysql exists';
+ok -s $migration->paths->{db_downgrade }."/4-3/001_auto.sql", 'downgrade mysql exists';
+
+$file = Mojo::Asset::File->new(path => $migration->paths->{db_upgrade}."/3-4/001_auto.sql")->slurp;
+like $file, qr/ALTER TABLE test DROP COLUMN `name4`/,
+  'right mysql upgrade';
+
+$file = Mojo::Asset::File->new(path => $migration->paths->{db_downgrade}."/4-3/001_auto.sql")->slurp;
+like $file, qr/ALTER TABLE test ADD COLUMN `name4` varchar\(255\) NOT NULL DEFAULT '' AFTER `name3`/,
   'right mysql downgrade';
 
 unlink $migration->paths->{deploy_status} if -e $migration->paths->{deploy_status};
@@ -415,17 +447,21 @@ $buffer = '';
 	local *STDOUT = $handle;
 	$migration->run('upgrade');
 }
-like $buffer, qr/Schema version: 3/,
+like $buffer, qr/Schema version: 4/,
   'right output';
 like $buffer, qr/Database version: 1/,
   'right output';
 like $buffer, qr/Upgrade to 2/,
   'right output';
-like $buffer, qr/ALTER TABLE test ADD COLUMN name/,
+like $buffer, qr/ALTER TABLE test ADD COLUMN `name`/,
   'right output';
 like $buffer, qr/Upgrade to 3/,
   'right output';
-like $buffer, qr/ALTER TABLE test ADD COLUMN name2/,
+like $buffer, qr/ALTER TABLE test ADD COLUMN `name2`/,
+  'right output';
+like $buffer, qr/Upgrade to 4/,
+  'right output';
+like $buffer, qr/ALTER TABLE test DROP COLUMN `name4`/,
   'right output';
 
 done_testing;

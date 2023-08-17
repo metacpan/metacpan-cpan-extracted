@@ -49,7 +49,7 @@ use Exporter;
 BEGIN {
    our @ISA = (PApp::Base::);
    unshift @PApp::ISA, __PACKAGE__;
-   our $VERSION = 2.2;
+   our $VERSION = 2.3;
 }
 
 =head2 Functions
@@ -199,7 +199,7 @@ use PApp::HTML ();
 use Carp ();
 
 sub warn {
-   print STDERR $_[1];
+   print STDERR "$_[1]\n";
 }
 
 sub new_from {
@@ -225,6 +225,7 @@ sub new_from {
          "Accept"		=> $env->{HTTP_ACCEPT},
          "Accept-Charset"	=> $env->{HTTP_ACCEPT_CHARSET},
          "Accept-Encoding"	=> $env->{HTTP_ACCEPT_ENCODING},
+         "Authorization"	=> $env->{HTTP_AUTHORIZATION},
          "Cookie"		=> $env->{HTTP_COOKIE},
          "Host"			=> $env->{HTTP_HOST},
          "Connection"		=> $env->{HTTP_CONNECTION},

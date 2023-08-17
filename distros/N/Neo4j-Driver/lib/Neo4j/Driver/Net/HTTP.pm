@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Network controller for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.36';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -37,18 +37,18 @@ sub new {
 	my ($class, $driver) = @_;
 	
 	$driver->{plugins}->{default_handlers}->{http_adapter_factory} //= sub {
-		my $net_module = $driver->{net_module} || 'Neo4j::Driver::Net::HTTP::LWP';
+		my $net_module = $driver->config('net_module') || 'Neo4j::Driver::Net::HTTP::LWP';
 		return $net_module->new($driver);
 	};
 	my $http_adapter = $driver->{plugins}->trigger('http_adapter_factory', $driver);
 	
 	my $self = bless {
 		events => $driver->{plugins},
-		cypher_types => $driver->{cypher_types},
+		cypher_types => $driver->config('cypher_types'),
 		server_info => $driver->{server_info},
 		http_agent => $http_adapter,
-		want_jolt => $driver->{jolt},
-		want_concurrent => $driver->{concurrent_tx} // 1,
+		want_jolt => $driver->config('jolt'),
+		want_concurrent => $driver->config('concurrent_tx') // 0,
 		active_tx => {},
 	}, $class;
 	
@@ -119,10 +119,9 @@ sub _set_database {
 sub _run {
 	my ($self, $tx, @statements) = @_;
 	
-	if ( ! $self->{want_concurrent} ) {
-		my $is_concurrent = %{$self->{active_tx}} && ! defined $tx->{commit_endpoint};
-		$is_concurrent ||= keys %{$self->{active_tx}} > 1;
-		$is_concurrent and carp "Concurrent transactions for HTTP are disabled; use multiple sessions or enable the concurrent_tx config option (this warning may become fatal in a future Neo4j::Driver version)";
+	if ( %{$self->{active_tx}} && ! $self->{want_concurrent} ) {
+		my $is_concurrent = ! defined $tx->{commit_endpoint} || keys %{$self->{active_tx}} > 1;
+		$is_concurrent and carp "Concurrent transactions for HTTP are disabled; use multiple sessions or enable the concurrent_tx config option (this warning will be fatal in Neo4j::Driver 1.xx)";
 	}
 	
 	my $json = { statements => \@statements };
@@ -177,7 +176,6 @@ sub _request {
 	$self->{http_agent}->request($method, $tx_endpoint, $json, $accept, $tx->{mode});
 	
 	my $header = $self->{http_agent}->http_header;
-	$tx->{closed} = $header->{success};  # see _parse_tx_status() and neo4j #12651
 	my $result_module = $self->{result_module_for}->{ $header->{content_type} }
 	                    // $self->_result_module_for( $header->{content_type} );
 	
@@ -186,13 +184,14 @@ sub _request {
 		http_method => $method,
 		http_path => $tx_endpoint,
 		http_header => $header,
-		error_handler => $tx->{error_handler},
 		cypher_types => $self->{cypher_types},
 		server_info => $self->{server_info},
 		statements => $json ? $json->{statements} : [],
 	});
 	
-	$self->_parse_tx_status($tx, $header, $result->_info);
+	my $info = $result->_info;
+	$self->_parse_tx_status($tx, $header, $info);
+	$tx->{error_handler}->($info->{_error}) if $info->{_error};
 	return $result;
 }
 
@@ -200,6 +199,13 @@ sub _request {
 # Update list of active transactions and update transaction endpoints.
 sub _parse_tx_status {
 	my ($self, $tx, $header, $info) = @_;
+	
+	# In case of errors, HTTP transaction status info is only reliable for
+	# server errors that aren't reported as network errors. (neo4j #12651)
+	if (my $error = $info->{_error}) {
+		return if $error->source ne 'Server';
+		do { return if $error->source eq 'Network' } while $error = $error->related;
+	}
 	
 	$tx->{unused} = 0;
 	$tx->{closed} = ! $info->{commit} || ! $info->{transaction};

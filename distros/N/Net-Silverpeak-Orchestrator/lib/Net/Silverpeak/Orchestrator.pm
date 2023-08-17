@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.006000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.007000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -181,6 +181,14 @@ sub delete_templategroup($self, $name) {
 }
 
 
+sub get_vrf_by_id ($self) {
+    my $res = $self->get("/gms/rest/vrf/config/segments");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub list_appliances($self) {
     my $res = $self->get('/gms/rest/appliance');
     $self->_error_handler($res)
@@ -191,6 +199,46 @@ sub list_appliances($self) {
 
 sub get_appliance($self, $id) {
     my $res = $self->get('/gms/rest/appliance/' . $id);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_appliance_extrainfo ($self, $id) {
+    my $res = $self->get("/gms/rest/appliance/extraInfo/$id");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_ha_groups_by_id ($self) {
+    my $res = $self->get("/gms/rest/haGroups");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_deployment ($self, $id) {
+    my $res = $self->get("/gms/rest/deployment/$id");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_interface_state ($self, $id) {
+    my $res = $self->get("/gms/rest/interfaceState/$id");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_interface_labels_by_type ($self) {
+    my $res = $self->get("/gms/rest/gms/interfaceLabels");
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -404,7 +452,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.006000
+version 0.007000
 
 =head1 SYNOPSIS
 
@@ -496,6 +544,10 @@ Returns true on success.
 
 Throws an exception on error.
 
+=head2 get_vrf_by_id
+
+Returns a hashref of VRFs indexed by their id.
+
 =head2 list_appliances
 
 Returns an arrayref of appliances.
@@ -503,6 +555,32 @@ Returns an arrayref of appliances.
 =head2 get_appliance
 
 Returns an appliance by id.
+
+=head2 get_appliance_extrainfo
+
+Takes an appliance id.
+
+Returns a hashref with additional infos about the appliance like its location.
+
+=head2 get_ha_groups_by_id
+
+Returns a hashref of HA groups indexed by their id.
+
+=head2 get_deployment
+
+Takes an appliance id.
+
+Returns a hashref containing the deployment data.
+
+=head2 get_interface_state
+
+Takes an interface id.
+
+Returns a hashref containing the interface state.
+
+=head2 get_interface_labels_by_type
+
+Returns a hashref containing the interface labels indexed by LAN/WAN and their id.
 
 =head2 list_template_applianceassociations
 

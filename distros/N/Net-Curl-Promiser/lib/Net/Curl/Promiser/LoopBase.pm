@@ -3,6 +3,8 @@ package Net::Curl::Promiser::LoopBase;
 use strict;
 use warnings;
 
+=encoding utf-8
+
 =head1 NAME
 
 Net::Curl::Promiser::LoopBase - Base class for event-loop-based implementations

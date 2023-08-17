@@ -1,0 +1,17 @@
+Revision history for Net-Cloudflare-DNS-Teal
+
+0.05    08/06/2023
+        Update some undefined cases, update example code, update comments
+
+0.04    07/06/2023
+        Restore title
+
+0.03    07/06/2023
+        Edit documentation
+
+0.02    07/06/2023
+        More doc, hit CPAN!
+
+0.01    03/06/2023
+        First version
+

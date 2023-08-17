@@ -3,17 +3,12 @@
 use strict;
 use warnings;
 
-use YAMLScript;
-
-use XXX;
+use YAMLScript::Common;
+use YAMLScript::RT;
 
 my $file = shift;
 
-my $ys = YAMLScript->new(
-    file => $file,
-    need => ['YS-TestMore'],
-);
-
-$ys->ensure_main;
-
-$ys->run;
+RT->init->rep(qq<
+  (use 'Test.More.YAMLScript)
+  (eval (read-file-ys "$file"))
+>);

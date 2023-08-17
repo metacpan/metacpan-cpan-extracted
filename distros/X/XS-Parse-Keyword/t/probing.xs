@@ -126,7 +126,7 @@ static const struct XSParseKeywordHooks hooks_parens = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_OPTIONAL( XPK_PARENSCOPE( XPK_TERMEXPR ) ),
+    XPK_OPTIONAL( XPK_PARENS( XPK_TERMEXPR ) ),
     {0}
   },
   .build = &build_constbool,
@@ -136,7 +136,7 @@ static const struct XSParseKeywordHooks hooks_brackets = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_OPTIONAL( XPK_BRACKETSCOPE( XPK_TERMEXPR ) ),
+    XPK_OPTIONAL( XPK_BRACKETS( XPK_TERMEXPR ) ),
     {0}
   },
   .build = &build_constbool,
@@ -146,7 +146,7 @@ static const struct XSParseKeywordHooks hooks_braces = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_OPTIONAL( XPK_BRACESCOPE( XPK_TERMEXPR ) ),
+    XPK_OPTIONAL( XPK_BRACES( XPK_TERMEXPR ) ),
     {0}
   },
   .build = &build_constbool,
@@ -156,7 +156,7 @@ static const struct XSParseKeywordHooks hooks_chevrons = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_OPTIONAL( XPK_CHEVRONSCOPE( XPK_IDENT ) ),
+    XPK_OPTIONAL( XPK_CHEVRONS( XPK_IDENT ) ),
     {0}
   },
   .build = &build_constbool,

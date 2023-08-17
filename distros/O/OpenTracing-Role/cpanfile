@@ -3,11 +3,13 @@ requires            "OpenTracing::Types"; # yes, it is part of Interface'
 
 requires            "Carp";
 requires            "Data::GUID";
+requires            "List::Util";
 requires            "Moo::Role";
 requires            "MooX::Enumeration";
 requires            "MooX::HandlesVia";
 requires            "MooX::ProtectedAttributes";
 requires            "MooX::Should", '>=v0.1.4';
+requires            "Ref::Util";
 requires            "Role::Declare::Should";
 requires            "Sub::Trigger::Lock";
 requires            "Time::HiRes";
@@ -18,6 +20,7 @@ requires            "Types::TypeTiny";
 
 on 'test' => sub {
     requires            "Devel::StrictMode";
+    requires            "Moo";
     requires            "Test::Deep", '>= 1.130';
     requires            "Test::Interface";
     requires            "Test::MockObject::Extends";

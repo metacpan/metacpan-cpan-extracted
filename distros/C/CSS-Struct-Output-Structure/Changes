@@ -1,3 +1,8 @@
+0.04 2023-06-22T10:39:38+02:00
+ - Rename example files to better names.
+ - Update copyright years.
+ - Update Module::Install to 1.31 version.
+
 0.03 2022-07-06T23:31:42+02:00
  - Add Error::Pure::Utils::clean() to tests for cleanup of errors stack.
  - Change reset to default which returns [].

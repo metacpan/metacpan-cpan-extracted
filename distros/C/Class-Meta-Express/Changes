@@ -1,11 +1,20 @@
 Revision history for Perl extension Class::Meta::Express.
 
+0.14  2023-08-02T01:28:30Z
+      - Better fix for failing tests on Windows, suggested by Eric Brine.
+      - Fixed broken rt.cpan.org email address.
+      - Fixed a couple of typos in the Pod. Thanks to Grzegorz Rożniecki for
+        the pull request (#1).
+      - Fixed no-op version requirement for Class::Meta thanks to Graham Knop
+        (#2).
+      - Removed the pod tests from the distribution.
+
 0.13  2011-06-20T23:09:39
       - Removed redundant bug reporting email address from the documentation.
       - Fixed failing test on Perl 5.14 on Win32.
 
 0.12  2011-06-20T00:50:10
-      - Moved repostitory to
+      - Moved repository to
         [GitHub](https://github.com/theory/class-meta-express/).
       - Switched to a "traditional" `Makefile.PL`.
 

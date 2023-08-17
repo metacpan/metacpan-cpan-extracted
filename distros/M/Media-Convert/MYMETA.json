@@ -35,7 +35,8 @@
             "Alien::ffmpeg" : "0",
             "JSON::MaybeXS" : "0",
             "Moose" : "0",
-            "MooseX::Singleton" : "0"
+            "MooseX::Singleton" : "0",
+            "SemVer" : "0"
          }
       },
       "test" : {
@@ -52,6 +53,6 @@
          "web" : "https://salsa.debian.org/wouter/media-convert"
       }
    },
-   "version" : "v1.0.4",
+   "version" : "v1.0.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

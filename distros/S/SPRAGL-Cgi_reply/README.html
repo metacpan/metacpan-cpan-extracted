@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SPRAGL::Cgi_reply - Simple HTTP replies.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</a>
+    <ul>
+      <li><a href="#OPTIONAL-NAMED-PARAMETERS">OPTIONAL NAMED PARAMETERS</a></li>
+      <li><a href="#DEPRECATED">DEPRECATED</a></li>
+    </ul>
+  </li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>SPRAGL::Cgi_reply - Simple HTTP replies.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>1.30</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use SPRAGL::Cgi_reply;
+
+    my %df = map {(/^(\S+).+\s(\d+)\%/)} grep {/\d\%/} qx[ df ];
+    reply_json \%df;</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Simple module for sending simple HTTP replies. Geared towards CGI scripts.</p>
+
+<p>CGI is simple and quick to code for, even though it is not so performant or fashionable. It nevertheless is handy when making quick and dirty web services that are not going to see a lot of load. HTTP Routing is handled by the file system. Adding or removing functionality is easy and orthogonal, like playing with Lego bricks.</p>
+
+<p>The reply methods in SPRAGL::Cgi_reply will exit when they have been called. The exit is based on &quot;die&quot;, so it is catchable.</p>
+
+<h1 id="FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</h1>
+
+<p>Loaded by default: <a href="#fail-c">fail</a>, <a href="#redirect-u">redirect</a>, <a href="#reply-s">reply</a>, <a href="#reply_file-fn">reply_file</a>, <a href="#reply_html-d">reply_html</a>, <a href="#reply_json-hr">reply_json</a>, <a href="#set_header-h">set_header</a>, <a href="#cexec">cexec</a></p>
+
+<p>Loaded on demand: <a href="#status_code">%status_code</a></p>
+
+<dl>
+
+<dt id="fail-c">fail( $c )</dt>
+<dd>
+
+<p>Replies with the given return code plus the standard return message attached to that, and then exits. It can be given a second parameter, a string, to replace the standard return message with. As in:</p>
+
+<pre><code>    fail 404 , &#39;Lost in Space.&#39;; # Instead of just &quot;fail 404;&quot;.</code></pre>
+
+</dd>
+<dt id="redirect-u">redirect( $u )</dt>
+<dd>
+
+<p>Replies with a 302 redirect to the given URI, and then exits.</p>
+
+</dd>
+<dt id="reply-s">reply( $s )</dt>
+<dd>
+
+<p>Replies with the given string as plain/text, and then exits.</p>
+
+</dd>
+<dt id="reply_file-fn">reply_file( $fn )</dt>
+<dd>
+
+<p>Replies with the file content pointed to by the given filename, and then exits.</p>
+
+</dd>
+<dt id="reply_html-d">reply_html( $d )</dt>
+<dd>
+
+<p>Replies with the given string as HTML, and then exits.</p>
+
+</dd>
+<dt id="reply_json-hr">reply_json( $hr )</dt>
+<dd>
+
+<p>Replies with the given hashref transformed into JSON, and then exits.</p>
+
+</dd>
+<dt id="set_header-h">set_header( %h )</dt>
+<dd>
+
+<p>Add and or overwrite the headers that are going to be used in a reply.</p>
+
+</dd>
+<dt id="cexec">cexec ...</dt>
+<dd>
+
+<p>CGI exec. Executes a system command, and sends a reply of your choice, in one go. Works like exec ought to in a CGI context. Calling it looks like this:</p>
+
+<pre><code>    cexec(&#39;mysqldump orders &gt; orders_backup.sql&#39;)-&gt;reply(&#39;Database backup started.&#39;);</code></pre>
+
+<p>Or like this:</p>
+
+<pre><code>    cexec(&#39;sudo postfix stop &amp;&amp; postfix start&#39;)-&gt;redirect(&#39;status.html&#39;);</code></pre>
+
+<p>You must naturally be very careful about what system commands it is possible to run from your webserver.</p>
+
+</dd>
+<dt id="status_code">%status_code</dt>
+<dd>
+
+<p>A hash that maps return codes to standard return messages.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+</dl>
+
+<h2 id="OPTIONAL-NAMED-PARAMETERS">OPTIONAL NAMED PARAMETERS</h2>
+
+<p>Optional named parameters can be given in the reply calls. If the name is &quot;redirect&quot; the reply will be like calling the redirect method. If the name is anything else, a header with that name and value will be inserted in the reply. The header will be normalized, by capitalizing words and changing underscores to dashes. The header value will be inserted raw. Be sure to adhere to RFC 8187.</p>
+
+<p>Examples:</p>
+
+<pre><code>    reply $x.&#39; seconds to go!&#39; , refresh =&gt; 5; # Inserts a &quot;Refresh: 5&quot; header.
+
+    fail 503 , &#39;We are down at the moment, please try again later&#39; , &#39;Retry-After&#39; =&gt; $t;
+
+    fail 308 , redirect =&gt; &#39;https://perlmaven.com/&#39;; # Redirecting with another code than 302.</code></pre>
+
+<h2 id="DEPRECATED">DEPRECATED</h2>
+
+<dl>
+
+<dt id="csystem-c">csystem( $c )</dt>
+<dd>
+
+<p>A CGI system command. Does pretty much what system already does, so use that instead. It is loaded by default.</p>
+
+</dd>
+</dl>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p>File::Basename</p>
+
+<p>File::Spec</p>
+
+<p>JSON</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<p>No known issues.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="https://metacpan.org/pod/SPRAGL::Cgi_read">SPRAGL::Cgi_read</a></p>
+
+<p><a href="https://metacpan.org/pod/CGI">CGI</a></p>
+
+<h1 id="LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</h1>
+
+<p>(c) 2022-2023 Bj&oslash;rn Hee</p>
+
+<p>Licensed under the Apache License, version 2.0</p>
+
+<p>https://www.apache.org/licenses/LICENSE-2.0.txt</p>
+
+
+</body>
+
+</html>
+
+

@@ -177,3 +177,16 @@ object using and then just passing it a string and getting a object back.
         print "No matching format found\n";
     }
 ```
+
+`Time::Piece::Guess->guess_to_object` also supports specials that will
+do some automated stuff prior to returning the object.
+
+```text
+# current time -/+ the specified number of seconds, minutes, hours, days, or weeks
+now[-+]\d+[mhdw]?
+
+# applying zz to the end of the date stamp will automatically append
+# the local tz offset. Similar is true for ZZ, but instead applies the
+# local TZ short name.
+2023-07-23T17:34:00zz
+```

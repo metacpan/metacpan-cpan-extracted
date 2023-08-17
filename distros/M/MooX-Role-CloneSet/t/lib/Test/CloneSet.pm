@@ -1,12 +1,16 @@
+package Test::CloneSet;
+
 use v5.12;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare("v0.1.0");
+use version; our $VERSION = version->declare("v0.1.1");
 
 use parent qw(Exporter);
 
 use Scalar::Util qw(blessed);
+
+our @EXPORT_OK = qw(&test_something);
 
 sub test_something($ $ $ $)
 {

@@ -1,3 +1,8 @@
+0.16 2023-07-21
+    * Update test suite to use Package->VERSION() for version checks, not
+      Package->import('1.23')
+      Thanks to Graham Knop
+
 0.15 2023-04-02
     * AnyEvent backend fixes, don't lose an intermediate Future anymore
     * Switch from Test::More::isn't() to Test::More::isnt()

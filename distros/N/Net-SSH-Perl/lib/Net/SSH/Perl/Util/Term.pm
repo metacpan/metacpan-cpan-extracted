@@ -1,5 +1,3 @@
-# $Id: Term.pm,v 1.4 2001/05/24 07:21:28 btrott Exp $
-
 package Net::SSH::Perl::Util::Term;
 use strict;
 use warnings;

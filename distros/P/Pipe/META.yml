@@ -3,26 +3,30 @@ abstract: 'Framework for creating pipes using iterators'
 author:
   - 'Gabor Szabo <gabor@szabgab.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.00'
+  Test::Pod::Coverage: '1.00'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Pipe
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Find::Rule: 0.33
-  File::Temp: 0
-  Test::More: 0.98
-  Test::NoWarnings: 1.04
-  Want: 0.21
+  File::Find::Rule: '0.33'
+  File::Temp: '0'
+  Test::More: '0.98'
+  Test::NoWarnings: '1.04'
+  Want: '0.21'
 resources:
-  repository: https://github.com/szabgab/Pipe
-version: 0.05
+  bugtracker: https://github.com/szabgab/Pipe/issues
+  repository: https://github.com/szabgab/Pipe.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_search' } = { 
-    	summary => '',
+    	summary => 'Search specify the text from excel files.',
         params => $params,
         returns => 'ARRAY[TextItem]',
     };

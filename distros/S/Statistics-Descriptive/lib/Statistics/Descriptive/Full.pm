@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Full;
-$Statistics::Descriptive::Full::VERSION = '3.0800';
+$Statistics::Descriptive::Full::VERSION = '3.0801';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ __PACKAGE__->_make_private_accessors(
         qw(data samples frequency geometric_mean harmonic_mean
             least_squares_fit median mode
             skewness kurtosis median_absolute_deviation
-            )
+        )
     ]
 );
 __PACKAGE__->_make_accessors( [qw(presorted _reserved _trimmed_mean_cache)] );
@@ -880,7 +880,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0800
+version 3.0801
 
 =head1 SYNOPSIS
 

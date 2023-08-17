@@ -1,0 +1,209 @@
+#!/usr/bin/perl -w
+###
+### bgpls
+###
+### Simon Leinen  <simon.leinen@switch.ch>
+###
+### Show the table of the BGP-4 peers of a router.
+###
+use strict;
+
+use SNMP_util;
+
+## Prototypes
+sub bgp_table ($ );
+sub pretty_peer_state ($$);
+sub init_mibs ();
+
+## If $external_only is non-zero, internal BGP peers will be
+## suppressed from output. 
+##
+my $external_only = 1;
+
+## if $abnormal_only is non-zero, only peerings where the operational
+## state is inconsistent with the administrative state are printed.
+##
+my $abnormal_only = 1;
+
+init_mibs ();
+foreach my $target (@ARGV) {
+    bgp_table ($target);
+}
+1;
+
+sub bgp_table ($ ) {
+    my ($target) = @_;
+    my ($local_as, $bgp_id) = snmpget ($target, 'bgpLocalAs.0', 'bgpIdentifier.0');
+    snmpmaptable ($target,
+		  sub ()
+		  {
+		      my ($index, $state, $admin_status, $bgp_version, $remote_as,
+			  $est_time) = @_;
+		      return if $external_only and $remote_as == $local_as;
+		      return if $abnormal_only and
+			  (($admin_status == 1 && $state == 1)
+			   || ($admin_status == 2 && $state == 6));
+			  
+		      printf STDOUT ("%-15s AS%-5d v%1d %s",
+				     $index, $remote_as, $bgp_version,
+				     pretty_peer_state ($state, $admin_status));
+		      if ($state == 6) {
+			  printf STDOUT ", %s", pretty_time ($est_time);
+		      }
+		      print STDOUT "\n";
+		  },
+    'bgpPeerState',
+    'bgpPeerAdminStatus',
+    'bgpPeerNegotiatedVersion',
+    'bgpPeerRemoteAs',
+    'bgpPeerFsmEstablishedTime',
+    );
+}
+
+sub pretty_peer_state ($$) {
+    my ($state, $admin_status) = @_;
+    my @pretty_peer_state
+	= qw(idle connect active opensent openconfirm established);
+    return $state.'/'.$admin_status if $state < 1;
+    return $state.'/'.$admin_status if $state > @pretty_peer_state;
+    return 'shutdown' if $state == 1 and $admin_status == 1;
+    return $pretty_peer_state[$state-1]
+	.($admin_status == 2 ? "" : "/".($admin_status == 1 ? 'stop' : $admin_status));
+};
+
+sub pretty_time ($ ) {
+    my ($secs) = @_;
+    my $result = '';
+    if ($secs > 86400) {
+	$result = sprintf ("%3dd ", int ($secs/86400)), $secs %= 86400;
+    } else { $result = "     "; }
+    if ($secs > 3600) {
+	$result .= sprintf ("%02dh", int ($secs/3600)), $secs %= 3600;
+    } else { $result .= "   "; }
+    return $result.sprintf ("%02d:%02d", int ($secs/60), $secs % 60);
+}
+
+sub init_mibs () {
+    snmpmapOID
+	(qw(
+	    bgp                                     1.3.6.1.2.1.15
+	    bgpVersion                              1.3.6.1.2.1.15.1
+	    bgpLocalAs                              1.3.6.1.2.1.15.2
+	    bgpPeerTable                            1.3.6.1.2.1.15.3
+	    bgpPeerEntry                            1.3.6.1.2.1.15.3.1
+	    bgpPeerIdentifier                       1.3.6.1.2.1.15.3.1.1
+	    bgpPeerState                            1.3.6.1.2.1.15.3.1.2
+	    bgpPeerAdminStatus                      1.3.6.1.2.1.15.3.1.3
+	    bgpPeerNegotiatedVersion                1.3.6.1.2.1.15.3.1.4
+	    bgpPeerLocalAddr                        1.3.6.1.2.1.15.3.1.5
+	    bgpPeerLocalPort                        1.3.6.1.2.1.15.3.1.6
+	    bgpPeerRemoteAddr                       1.3.6.1.2.1.15.3.1.7
+	    bgpPeerRemotePort                       1.3.6.1.2.1.15.3.1.8
+	    bgpPeerRemoteAs                         1.3.6.1.2.1.15.3.1.9
+	    bgpPeerInUpdates                        1.3.6.1.2.1.15.3.1.10
+	    bgpPeerOutUpdates                       1.3.6.1.2.1.15.3.1.11
+	    bgpPeerInTotalMessages                  1.3.6.1.2.1.15.3.1.12
+	    bgpPeerOutTotalMessages                 1.3.6.1.2.1.15.3.1.13
+	    bgpPeerLastError                        1.3.6.1.2.1.15.3.1.14
+	    bgpPeerFsmEstablishedTransitions        1.3.6.1.2.1.15.3.1.15
+	    bgpPeerFsmEstablishedTime               1.3.6.1.2.1.15.3.1.16
+	    bgpPeerConnectRetryInterval             1.3.6.1.2.1.15.3.1.17
+	    bgpPeerHoldTime                         1.3.6.1.2.1.15.3.1.18
+	    bgpPeerKeepAlive                        1.3.6.1.2.1.15.3.1.19
+	    bgpPeerHoldTimeConfigured               1.3.6.1.2.1.15.3.1.20
+	    bgpPeerKeepAliveConfigured              1.3.6.1.2.1.15.3.1.21
+	    bgpPeerMinASOriginationInterval         1.3.6.1.2.1.15.3.1.22
+	    bgpPeerMinRouteAdvertisementInterval    1.3.6.1.2.1.15.3.1.23
+	    bgpPeerInUpdateElapsedTime              1.3.6.1.2.1.15.3.1.24
+	    bgpIdentifier                           1.3.6.1.2.1.15.4
+	    bgpRcvdPathAttrTable                    1.3.6.1.2.1.15.5
+	    bgpPathAttrEntry                        1.3.6.1.2.1.15.5.1
+	    bgpPathAttrPeer                         1.3.6.1.2.1.15.5.1.1
+	    bgpPathAttrDestNetwork                  1.3.6.1.2.1.15.5.1.2
+	    bgpPathAttrOrigin                       1.3.6.1.2.1.15.5.1.3
+	    bgpPathAttrASPath                       1.3.6.1.2.1.15.5.1.4
+	    bgpPathAttrNextHop                      1.3.6.1.2.1.15.5.1.5
+	    bgpPathAttrInterASMetric                1.3.6.1.2.1.15.5.1.6
+	    bgp4PathAttrTable                       1.3.6.1.2.1.15.6
+	    bgp4PathAttrEntry                       1.3.6.1.2.1.15.6.1
+	    bgp4PathAttrPeer                        1.3.6.1.2.1.15.6.1.1
+	    bgp4PathAttrIpAddrPrefixLen             1.3.6.1.2.1.15.6.1.2
+	    bgp4PathAttrIpAddrPrefix                1.3.6.1.2.1.15.6.1.3
+	    bgp4PathAttrOrigin                      1.3.6.1.2.1.15.6.1.4
+	    bgp4PathAttrASPathSegment               1.3.6.1.2.1.15.6.1.5
+	    bgp4PathAttrNextHop                     1.3.6.1.2.1.15.6.1.6
+	    bgp4PathAttrMultiExitDisc               1.3.6.1.2.1.15.6.1.7
+	    bgp4PathAttrLocalPref                   1.3.6.1.2.1.15.6.1.8
+	    bgp4PathAttrAtomicAggregate             1.3.6.1.2.1.15.6.1.9
+	    bgp4PathAttrAggregatorAS                1.3.6.1.2.1.15.6.1.10
+	    bgp4PathAttrAggregatorAddr              1.3.6.1.2.1.15.6.1.11
+	    bgp4PathAttrCalcLocalPref               1.3.6.1.2.1.15.6.1.12
+	    bgp4PathAttrBest                        1.3.6.1.2.1.15.6.1.13
+	    bgp4PathAttrUnknown                     1.3.6.1.2.1.15.6.1.14
+	    bgpTraps                                1.3.6.1.2.1.15.7
+
+	    ciscoBgp4MIB                            1.3.6.1.4.1.9.9.187
+	    ciscoBgp4NotifyPrefix                   1.3.6.1.4.1.9.9.187.0
+	    ciscoBgp4MIBObjects                     1.3.6.1.4.1.9.9.187.1
+	    cbgpRoute                               1.3.6.1.4.1.9.9.187.1.1
+	    cbgpRouteTable                          1.3.6.1.4.1.9.9.187.1.1.1
+	    cbgpRouteEntry                          1.3.6.1.4.1.9.9.187.1.1.1.1
+	    cbgpRouteAfi                            1.3.6.1.4.1.9.9.187.1.1.1.1.1
+	    cbgpRouteSafi                           1.3.6.1.4.1.9.9.187.1.1.1.1.2
+	    cbgpRoutePeerType                       1.3.6.1.4.1.9.9.187.1.1.1.1.3
+	    cbgpRoutePeer                           1.3.6.1.4.1.9.9.187.1.1.1.1.4
+	    cbgpRouteAddrPrefix                     1.3.6.1.4.1.9.9.187.1.1.1.1.5
+	    cbgpRouteAddrPrefixLen                  1.3.6.1.4.1.9.9.187.1.1.1.1.6
+	    cbgpRouteOrigin                         1.3.6.1.4.1.9.9.187.1.1.1.1.7
+	    cbgpRouteASPathSegment                  1.3.6.1.4.1.9.9.187.1.1.1.1.8
+	    cbgpRouteNextHop                        1.3.6.1.4.1.9.9.187.1.1.1.1.9
+	    cbgpRouteMedPresent                     1.3.6.1.4.1.9.9.187.1.1.1.1.10
+	    cbgpRouteMultiExitDisc                  1.3.6.1.4.1.9.9.187.1.1.1.1.11
+	    cbgpRouteLocalPrefPresent               1.3.6.1.4.1.9.9.187.1.1.1.1.12
+	    cbgpRouteLocalPref                      1.3.6.1.4.1.9.9.187.1.1.1.1.13
+	    cbgpRouteAtomicAggregate                1.3.6.1.4.1.9.9.187.1.1.1.1.14
+	    cbgpRouteAggregatorAS                   1.3.6.1.4.1.9.9.187.1.1.1.1.15
+	    cbgpRouteAggregatorAddrType             1.3.6.1.4.1.9.9.187.1.1.1.1.16
+	    cbgpRouteAggregatorAddr                 1.3.6.1.4.1.9.9.187.1.1.1.1.17
+	    cbgpRouteBest                           1.3.6.1.4.1.9.9.187.1.1.1.1.18
+	    cbgpRouteUnknownAttr                    1.3.6.1.4.1.9.9.187.1.1.1.1.19
+	    cbgpPeer                                1.3.6.1.4.1.9.9.187.1.2
+	    cbgpPeerTable                           1.3.6.1.4.1.9.9.187.1.2.1
+	    cbgpPeerEntry                           1.3.6.1.4.1.9.9.187.1.2.1.1
+	    cbgpPeerPrefixAccepted                  1.3.6.1.4.1.9.9.187.1.2.1.1.1
+	    cbgpPeerPrefixDenied                    1.3.6.1.4.1.9.9.187.1.2.1.1.2
+	    cbgpPeerPrefixLimit                     1.3.6.1.4.1.9.9.187.1.2.1.1.3
+	    cbgpPeerPrefixAdvertised                1.3.6.1.4.1.9.9.187.1.2.1.1.4
+	    cbgpPeerPrefixSuppressed                1.3.6.1.4.1.9.9.187.1.2.1.1.5
+	    cbgpPeerPrefixWithdrawn                 1.3.6.1.4.1.9.9.187.1.2.1.1.6
+	    cbgpPeerLastErrorTxt                    1.3.6.1.4.1.9.9.187.1.2.1.1.7
+	    cbgpPeerPrevState                       1.3.6.1.4.1.9.9.187.1.2.1.1.8
+	    cbgpPeerCapsTable                       1.3.6.1.4.1.9.9.187.1.2.2
+	    cbgpPeerCapsEntry                       1.3.6.1.4.1.9.9.187.1.2.2.1
+	    cbgpPeerCapCode                         1.3.6.1.4.1.9.9.187.1.2.2.1.1
+	    cbgpPeerCapIndex                        1.3.6.1.4.1.9.9.187.1.2.2.1.2
+	    cbgpPeerCapValue                        1.3.6.1.4.1.9.9.187.1.2.2.1.3
+	    cbgpPeerAddrFamilyTable                 1.3.6.1.4.1.9.9.187.1.2.3
+	    cbgpPeerAddrFamilyEntry                 1.3.6.1.4.1.9.9.187.1.2.3.1
+	    cbgpPeerAddrFamilyAfi                   1.3.6.1.4.1.9.9.187.1.2.3.1.1
+	    cbgpPeerAddrFamilySafi                  1.3.6.1.4.1.9.9.187.1.2.3.1.2
+	    cbgpPeerAddrFamilyName                  1.3.6.1.4.1.9.9.187.1.2.3.1.3
+	    cbgpPeerAddrFamilyPrefixTable           1.3.6.1.4.1.9.9.187.1.2.4
+	    cbgpPeerAddrFamilyPrefixEntry           1.3.6.1.4.1.9.9.187.1.2.4.1
+	    cbgpPeerAcceptedPrefixes                1.3.6.1.4.1.9.9.187.1.2.4.1.1
+	    cbgpPeerDeniedPrefixes                  1.3.6.1.4.1.9.9.187.1.2.4.1.2
+	    cbgpPeerPrefixAdminLimit                1.3.6.1.4.1.9.9.187.1.2.4.1.3
+	    cbgpPeerPrefixThreshold                 1.3.6.1.4.1.9.9.187.1.2.4.1.4
+	    cbgpPeerPrefixClearThreshold            1.3.6.1.4.1.9.9.187.1.2.4.1.5
+	    cbgpPeerAdvertisedPrefixes              1.3.6.1.4.1.9.9.187.1.2.4.1.6
+	    cbgpPeerSuppressedPrefixes              1.3.6.1.4.1.9.9.187.1.2.4.1.7
+	    cbgpPeerWithdrawnPrefixes               1.3.6.1.4.1.9.9.187.1.2.4.1.8
+	    ciscoBgp4NotificationPrefix             1.3.6.1.4.1.9.9.187.2
+	    ciscoBgp4MIBConformance                 1.3.6.1.4.1.9.9.187.3
+	    ciscoBgp4MIBCompliances                 1.3.6.1.4.1.9.9.187.3.1
+	    ciscoBgp4MIBGroups                      1.3.6.1.4.1.9.9.187.3.2
+	    ciscoBgp4RouteGroup                     1.3.6.1.4.1.9.9.187.3.2.1
+	    ciscoBgp4PeerGroup                      1.3.6.1.4.1.9.9.187.3.2.2
+	    ciscoBgp4PeerGroup1                     1.3.6.1.4.1.9.9.187.3.2.4
+	    ));
+}

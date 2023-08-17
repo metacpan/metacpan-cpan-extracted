@@ -1,5 +1,7 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/proxy.psgi
 lib/Plack/Middleware/Proxy/Connect/IO.pm
 MANIFEST			This list of files
@@ -14,6 +16,7 @@ xt/copyright.t
 xt/cover.pl
 xt/cpan_changes.t
 xt/cpan_meta.t
+xt/cpanm.txt
 xt/dist_manifest.t
 xt/distribution.t
 xt/eol.t
@@ -21,7 +24,6 @@ xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
 xt/perlcritic.t
-xt/perlcriticrc
 xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
@@ -32,4 +34,3 @@ Makefile.PL
 LICENSE
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

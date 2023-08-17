@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2015-2022 Joelle Maslak
+# Copyright (C) 2015-2023 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Crypt::EAMessage;
-$Crypt::EAMessage::VERSION = '1.220391';
+$Crypt::EAMessage::VERSION = '1.232011';
 use v5.22;
 
 # ABSTRACT: Simple-to-use Abstraction of Encrypted Authenticated Messages
@@ -24,8 +24,8 @@ no warnings "experimental::signatures";
 
 use Bytes::Random::Secure;
 use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
-use MIME::Base64 qw(encode_base64 decode_base64);
-use Storable qw(nfreeze thaw);
+use MIME::Base64        qw(encode_base64 decode_base64);
+use Storable            qw(nfreeze thaw);
 
 use namespace::autoclean;
 
@@ -117,6 +117,12 @@ sub encrypt_auth_ascii ( $self, $input, $eol = undef ) {
 
 sub _encrypt_auth_internal ( $self, $input, $opts = {} ) {
     state $random = Bytes::Random::Secure->new( Bits => 1024, NonBlocking => 1 );
+
+    if ( defined Scalar::Util::reftype($input) ) {
+        if ( Scalar::Util::reftype($input) eq "OBJECT" ) {
+            die("Cannot encrypt a perl class (new style) object");
+        }
+    }
 
     for my $opt ( sort keys %$opts ) {
         if ( $opt eq 'text' ) { next; }
@@ -237,7 +243,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.220391
+version 1.232011
 
 =head1 SYNOPSIS
 
@@ -256,7 +262,8 @@ version 1.220391
 
 This module provides an easy-to-use method to create encrypted and
 authenticated messages from arbitrary Perl objects (anything compatible
-with L<Storable>).
+with L<Storable>). Note that Perl 5.38+ Corinna class objects are not
+serializable with L<Storable>.
 
 While there are many modules that encrypt text, there are many less that
 provide encryption and authentication without a complex interface.  This

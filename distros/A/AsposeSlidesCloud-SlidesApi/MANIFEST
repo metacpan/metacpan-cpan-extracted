@@ -238,6 +238,9 @@ lib/AsposeSlidesCloud/Object/TiffExportOptions.pm
 lib/AsposeSlidesCloud/Object/TintEffect.pm
 lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm
+lib/AsposeSlidesCloud/Object/VbaModule.pm
+lib/AsposeSlidesCloud/Object/VbaProject.pm
+lib/AsposeSlidesCloud/Object/VbaReference.pm
 lib/AsposeSlidesCloud/Object/VideoExportOptions.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/ViewProperties.pm

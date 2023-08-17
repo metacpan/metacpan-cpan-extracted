@@ -1,0 +1,490 @@
+#!/usr/bin/env perl
+#ABSTRACT: List your jobs (or others), and delete them if you wish
+#PODNAME: lsjobs
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+use File::Basename;
+use Text::ASCIITable;
+$Data::Dumper::Sortkeys = 1;
+
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib"  if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+} 
+
+use NBI::Slurm;
+use Cwd;
+
+
+
+
+my $current_slurm_jobid = $ENV{SLURM_JOBID} // -1;
+my $unix_username = $ENV{USER};
+my $user_home_dir = $ENV{HOME};
+
+my $opt_user = $unix_username;
+my $opt_status = '.+';
+my $opt_running_bool = 0;
+my $opt_pending_bool = 0;
+my $opt_delete_bool = 0;
+my $opt_verbose_bool = 0;
+my $opt_queue = '.+';
+my $opt_name = '.+';
+my $opt_tab = 0;
+GetOptions(
+    'u|user=s'  => \$opt_user,
+    'n|name=s'  => \$opt_name,
+    's|status=s'=> \$opt_status,
+    'r|running' => \$opt_running_bool,
+    'd|delete'  => \$opt_delete_bool,
+    't|tab'     => \$opt_tab,
+    'verbose'   => \$opt_verbose_bool,
+    'version'   => sub { say "lsjobs v", $NBI::Slurm::VERSION; exit },
+    'help'      => sub { usage() },
+);
+
+if (not NBI::Slurm::has_squeue()) {
+
+    say STDERR RED, "Error:", RESET, " squeue not found in PATH. Are you in the cluster?";
+    exit 1;
+}
+my $jobs = getjobs();
+my @ids = ();
+for my $positional (@ARGV) {
+    if ($positional =~ /^(\d+)$/) {
+        push(@ids, $1);
+    } else {
+        if ($opt_name eq '.+') {
+            $opt_name = $positional;
+        } else {
+            say STDERR "Error: unknown positional argument: $positional";
+            usage();
+        }
+    }
+}
+
+if ($opt_user eq 'ALL' or $opt_user eq 'all') {
+    $opt_user = '.+';
+}
+if ($opt_verbose_bool) {
+    say STDERR "User: $opt_user";
+    say STDERR "Jobs: ", scalar(keys %{$jobs});
+}
+
+my $selected_jobs = {};
+my $selected_arrays = [['JobID', 'User', 'Queue', 'Name', 'State', 'Time', 'TotalTime', 'NodeList', 'CPUS', 'Memory', 'Reason'],
+                       ['-----', '----', '-----', '----', '-----', '----', '---------', '--------', '----', '------', '------']];
+
+if ($opt_tab) {
+    # Remove separator line, add "#"
+    $selected_arrays->[0]->[0] = "#" . $selected_arrays->[0]->[0];
+    $selected_arrays = [ $selected_arrays->[0] ];
+}
+
+for my $job (sort keys %{$jobs}) {
+    # Check user (full match)
+    if ($jobs->{$job}->{USER} !~ /^$opt_user$/) {
+        next;
+    }
+    # Check queue (partial match ok)
+    if ($jobs->{$job}->{PARTITION} !~ /$opt_queue/) {
+        next;
+    }
+
+    # Check name
+    if ($jobs->{$job}->{NAME} !~ /$opt_name/) {
+        next;
+    }
+    # Check status
+    if ($opt_pending_bool  and $jobs->{$job}->{STATE} ne 'PENDING') {
+        next;
+    }
+    if ($opt_running_bool  and $jobs->{$job}->{STATE} ne 'RUNNING') {
+        next;
+    }
+    if (scalar @ids > 0 and not grep {$_ eq $job} @ids) {
+        next;
+    }
+    my $array = [$jobs->{$job}->{JOBID},
+                 $jobs->{$job}->{USER},
+                 $jobs->{$job}->{PARTITION},
+                 $jobs->{$job}->{NAME},
+                 $opt_tab ? $jobs->{$job}->{STATE} : state_string($jobs->{$job}->{STATE}),
+                 $jobs->{$job}->{TIME},
+                 $jobs->{$job}->{TIME_LIMIT},
+                 $jobs->{$job}->{NODELIST},
+                 $jobs->{$job}->{"CPUS"},
+                 $jobs->{$job}->{"MIN_MEMORY"},
+                 $opt_tab ? $jobs->{$job}->{"REASON"}  :  reason_string($jobs->{$job}->{"REASON"})
+                 ];
+    push(@{$selected_arrays}, $array); 
+
+
+}
+if ($opt_tab) {
+    for my $array (@{$selected_arrays}) {
+        say join("\t", @{$array});
+    }
+} else {
+    # Render default table
+    render_table(@{$selected_arrays});
+    print RESET, "\n";
+
+}
+
+## Print single job
+if ($opt_verbose_bool and scalar @{$selected_arrays} == 3) {
+    my $job = extractJobByID($jobs, $selected_arrays->[2]->[0]);
+    for my $key (sort keys %{$job}) {
+        # Filter useless values
+        if ($job->{$key} =~ /^$/ or $job->{$key} =~ /^(\(null\)|\*)$/) {
+            next;
+        }
+        if ($key =~/(S_C_T|USER|ACCOUNT)/) {
+            next;
+        }
+        say YELLOW, sprintf("%-20s", $key), RESET, $job->{$key};
+    }
+}   
+
+my @selected_ids = joblist_to_ids(@{$selected_arrays});
+
+
+if ($opt_delete_bool and (scalar @selected_ids)) {
+    say RED "\nDELETE JOBS:", RESET;
+    if (prompt("Delete " . scalar(@selected_ids) . " jobs?", 'n') =~ /^(y|Y|yes|YES)$/) {
+        my $command = "scancel " . join(" ", @selected_ids);
+        system($command);
+        if ($? == -1) {
+            say RED, "ERROR", RESET ": Failed to delete: $!\n";
+        }
+    } 
+
+} elsif ($opt_delete_bool) {
+    say STDERR "No jobs selected for deletion";
+}
+
+sub state_string {
+    my $s = shift;
+    my $c = RESET;
+    if ($s =~/^R/) {
+        $c = GREEN . ON_BLACK;
+    } elsif ($s =~/^P/) {
+        $c = YELLOW . ON_BLACK;
+    } else {
+        $c = RED . ON_BLACK;
+    }
+    return $c . $s . WHITE .  ON_BLACK;
+}
+sub reason_string {
+
+
+    my $s = shift;
+    my $c = RESET;
+    if ($s =~/^None/) {
+        $c = BLUE . ON_BLACK;
+    } elsif ($s =~/^Priority/) {
+        $c = YELLOW . ON_BLACK;
+    } elsif ($s =~/^Bad/) {
+        $c = WHITE . ON_RED;
+    } else {
+        $c = RED . ON_BLACK;
+    }
+    return $c . $s . RESET . ON_BLACK;
+
+}
+sub joblist_to_ids {
+    # Receive a list of lists (all same length) and returns a list of jobids
+    my @rows = @_;
+    my @ids = ();
+    # remove first two rows
+    
+    for my $row (@rows) {
+        # Skip non numeric values
+        
+        next if ($row->[0] !~ /^\d+$/);
+
+        push @ids, $row->[0];
+        
+       
+    }
+
+    return @ids;
+    
+}
+sub short_job {
+    # Print a line of minimal information about a job
+    my $line_width = get_terminal_width();
+    my $job = shift;
+    my $jobid = $job->{JOBID};
+    my $name = $job->{NAME};
+    my $state = $job->{STATE};
+    my $user = $job->{USER};
+    my $queue = $job->{PARTITION};
+    my $time = $job->{TIME};
+    # Return a string sorther than $line_width
+    my $line = sprintf("%-10s %-10s %-10s %-10s %-10s %-10s", $jobid, $name, $state, $user, $queue, $time);
+    return $line;
+}
+
+sub render_table {
+    # Receive a list of lists (all same length) and print a table not larger than $line_width
+    
+    # @_ is an array of array references
+    my @rows = @_;
+    my $n_cols = scalar(@{$rows[0]});
+    my $line_width = get_terminal_width() - $n_cols - 1;
+    # For each column, evaluate the maximum string contained in that column
+    my @max_widths = ();
+    for my $col (0..$n_cols-1) {
+        my $max_width = 0;
+        for my $row (@rows) {
+            my $width = ascii_len($row->[$col]);
+            $max_width = $width if ($width > $max_width);
+        }
+        push(@max_widths, $max_width);
+    }
+    # Now print the table
+    for my $row (@rows) {
+        my $line = WHITE . ON_BLACK;
+        for my $col (0..$n_cols-1) {
+            my $width = $max_widths[$col];
+            my $cell = $row->[$col];
+            my $stripped = $cell;
+            $stripped  =~  s/\e\[[0-9;]*m//g;
+            my $tmpline .= sprintf("|%-${width}s ", $stripped);
+            # In tmpline replace $stripped with $cell, without using regex
+            my $index = index($tmpline, $stripped);
+            substr($tmpline, $index, length($stripped), $cell);
+            $line .= $tmpline;
+        }
+        say $line, "|";
+    }
+    print RESET;
+}
+
+sub ascii_len {
+    my $string = shift;
+    # Return legnth excluding ANSI escape sequences
+    $string =~ s/\e\[[0-9;]*m//g;
+    return length($string);
+}
+
+sub extractJobByID {
+    my ($jobs, $id) = @_;
+    my $job = {};
+    for my $jobid (keys %{$jobs}) {
+        if ($jobid eq $id) {
+            $job = $jobs->{$jobid};
+            last;
+        }
+    }
+    return $job;
+}
+sub getjobs {
+    # Create an anonymous hash, and return it
+    my $jobs = {};
+    my $cmd = q(squeue --format='%all');
+    my @output = `$cmd`;
+    my $c = 0;
+    my @header = ();
+    for my $line (@output) {
+        chomp $line;
+
+        my @fields = split(/\|/, $line);
+        $c++;
+        if ($c == 1 ) {
+            # Field names
+            for my $field (@fields) {
+                push(@header, stripchars($field));
+            }
+        } else {
+            # Job info
+            my $job = {};
+            if (scalar(@fields) != scalar(@header)) {
+                say STDERR "Error: number of fields in header and line do not match";
+                say STDERR "Header: ", scalar(@header);
+                say STDERR "Line: ", scalar(@fields);
+                say STDERR "Line: $line";
+                exit;
+            }
+            for my $i (0..$#header) {
+                $job->{"$header[$i]"} = $fields[$i] if (not defined $job->{"$header[$i]"});
+            }
+
+            $jobs->{$job->{JOBID}} = $job;
+            
+        }
+        
+    }
+    
+    return $jobs;
+}
+
+
+sub get_terminal_width {
+    my $terminal_width = `tput cols`;
+    chomp($terminal_width);
+    return $terminal_width > 20 ? $terminal_width : 80;
+}
+
+sub stripchars {
+    my $string = shift;
+    # replace non alphanumeric characters with _
+    $string =~ s/[^A-Za-z0-9]/_/g;
+    return $string;
+}
+
+sub prompt {
+    my ($message, $default) = @_;
+    my $prompt = "$message [$default]: ";
+    print $prompt;
+    my $answer = <STDIN>;
+    chomp $answer;
+    $answer = $default if ($answer eq '');
+    return $answer;
+}
+
+sub usage {
+    say <<END;
+  Usage: lsjobs [options] [jobid ... | pattern ]
+  ----------------------------------------------
+  Options:
+   -u, --user <username>   Show only jobs from this user [default: $unix_username]
+                           Type 'all' to show all users
+                           
+   -n, --name <pattern>    Show only jobs with this name [default: .+]
+  
+   -s, --status <pattern>  Show only jobs with this status [default: .+]
+   -r, --running           Show only running jobs
+   -p, --pending           Show only pending jobs
+   -t, --tab               Output in simple TSV format (pipe to vd for interactive table)
+
+   -d, --delete            Delete the selected jobs
+   --verbose               Show verbose output
+END
+    exit;
+
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lsjobs - List your jobs (or others), and delete them if you wish
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 SYNOPSIS
+
+  lsjobs [options] [jobid ... | pattern]
+
+=head1 DESCRIPTION
+
+This script lists the jobs and provides the option to delete them. 
+It allows filtering the jobs based on various criteria such as user, name, and status.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-u, --user <username>>
+
+Show only jobs from the specified user. Default: current user.
+
+=item B<-n, --name <pattern>>
+
+Show only jobs with the specified name pattern. Default: .+ (matches any name).
+
+=item B<-s, --status <pattern>>
+
+Show only jobs with the specified status pattern. Default: .+ (matches any status).
+
+=item B<-r, --running>
+
+Show only running jobs.
+
+=item B<-t, --tab>
+
+Output in simple TSV format (tip: pipe to C<vd> for interactive table)
+
+=item B<-d, --delete>
+
+Delete the selected jobs. This option must be used with caution, but an interactive prompt is provided
+
+=item B<--verbose>
+
+Display verbose output.
+
+If a single job is selected, for example by giving a precise ID, the full job details will be displayed.
+
+=item B<--help>
+
+Print the help message and exit.
+
+=back
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item B<jobid ... | pattern>
+
+Optional. Specify either job IDs (many) or a pattern (single) to filter the jobs based on their names.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<Example 1:>
+
+List all jobs:
+
+  lsjobs
+
+=item B<Example 2:>
+
+List jobs with the name "myjob":
+
+  lsjobs -n myjob
+
+=item B<Example 3:>
+
+List running jobs of a specific user:
+
+  lsjobs -r -u username
+
+=item B<Example 4:>
+
+Delete some of my jobs (only pending, and with name containing MEGAHIT):
+
+  lsjobs -d --pending MEGAHIT 
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -1,0 +1,255 @@
+#!/usr/bin/env perl
+#ABSTRACT: List the users with active jobs, and the number of jobs in the cluster
+#PODNAME: whojobs
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+use Cwd;
+$Data::Dumper::Sortkeys = 1;
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib"; 
+} 
+
+
+my ($opt_color, $opt_no_color, $opt_min_jobs, $opt_verbose, $opt_scramble);
+GetOptions(
+    'n|no-color' => \$opt_no_color,
+    'm|min-jobs=i' => \$opt_min_jobs,
+    'v|verbose' => \$opt_verbose,
+    's|scramble' => \$opt_scramble,
+    'version' => sub { say "whojobs v", $NBI::Slurm::VERSION; exit },
+    'h|help' => sub { usage() },
+);
+my $opt_pattern = shift;
+use NBI::Slurm;
+
+our $user_max = 14;
+my $unix_users = unix_users();
+my $slurm_users = slurm_users();
+my $all_users = {};
+
+for my $user (@{$unix_users}) {
+    $slurm_users->{$user} = 0;
+}
+my $opt_user = $ENV{USER};
+
+my $c = 0;
+my $p = 0;
+for my $user (sort {$$slurm_users{$a} <=> $$slurm_users{$b}}keys %{$slurm_users}) {
+    $c++;
+    my $star = ($user eq $opt_user) ? '*' : '';
+    if ($opt_pattern && $user !~ /$opt_pattern/i) {
+        next;
+    }
+    if ($opt_min_jobs && $slurm_users->{$user} < $opt_min_jobs) {
+        next;
+    }
+    # Dedicate 40 chars to user, 10 to jobs, 10 to star
+    if ($c % 2 == 0) {
+        if ( !$opt_no_color) {
+            print GREEN BOLD;
+        } else {
+            print RESET;
+        }
+    } else {
+        print RESET;
+    }
+    $p++;
+    my $user_string  = $opt_scramble ? scramble_string($user, [$opt_user]) : "$user";
+    
+    printf "%4s %-${user_max}s %5s %2s\n", $c, $user_string, $slurm_users->{$user}, $star;
+}
+
+# END
+
+print STDERR RESET "\n";
+if ($opt_verbose) {
+    unless ($opt_no_color) {
+        print STDERR CYAN;
+    }
+    print STDERR "Total users with jobs: ", scalar(keys %{$slurm_users}), "\n";
+    print STDERR "Total users logged:    ", scalar(@{$unix_users}), "\n";
+    print STDERR "Printed users:         $p\n", RESET;
+}
+
+END {
+    print RESET "";
+}
+sub unix_users {
+    my $cmd = "who | cut -d' ' -f1";
+    my @users  = `$cmd`;
+    chomp @users;
+    # Remove 'USER'
+    shift @users;
+    # Sort uniq
+    @users = sort { $a cmp $b } @users;
+    my %seen = ();
+    @users = grep { ! $seen{ $_ }++ } @users;
+
+    return \@users;    
+}
+sub slurm_users {
+    my $cmd = "squeue --format='%u'";
+    my @users  = `$cmd`;
+    chomp @users;
+    # Remove 'USER'
+    shift @users;
+    # Sort uniq
+    @users = sort { $a cmp $b } @users;
+    
+
+    # Return a hash user -> times seen
+    my %seen = ();
+    @users = grep { ! $seen{ $_ }++ } @users;
+    
+    return \%seen;
+}
+
+sub scramble_string {
+    # change odd chars to random chars
+    my $string = shift;
+    my $whitelist = shift;
+    return "" unless ($string);
+    my @chars = split(//, $string);
+    my $scrambled = '';
+    return $string if (grep { $string eq $_ } @{$whitelist});
+    for my $char (@chars) {
+        if (rand() > 0.5) {
+            $scrambled .= $char;
+        } else {
+            $scrambled .= chr(int(rand(26)) + 97);
+        }
+    }
+    return $scrambled;
+}
+sub get_terminal_width {
+    my $terminal_width = `tput cols`;
+    chomp($terminal_width);
+    return $terminal_width > 20 ? $terminal_width : 80;
+}
+
+sub usage {
+    print STDERR <<END;
+    -------------------------------------------------------------------------
+    whojobs - List the users with jobs, and the number of jobs in the cluster
+    -------------------------------------------------------------------------
+    Usage: whojobs [options] [pattern]
+
+    Options:
+        -n, --no-color         Do not use colors
+        -m, --min-jobs INT     Only show users with at least one job
+        -v, --verbose          Verbose output
+
+END
+
+    exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+whojobs - List the users with active jobs, and the number of jobs in the cluster
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 SYNOPSIS
+
+whojobs [options] [pattern]
+
+=head1 DESCRIPTION
+
+This script lists the users with jobs and the number of jobs they have in the cluster. 
+It provides options for filtering the output and displaying verbose information.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n, --no-color>
+
+Disable color highlighting in the output.
+
+=item B<-m, --min-jobs INT>
+
+Only show users with at least the specified number of jobs.
+
+=item B<-v, --verbose>
+
+Display verbose output, including the total number of users with jobs, the total number of logged users, and the number of users printed.
+
+=back
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item B<pattern>
+
+Optional. Specify a pattern to filter the users based on their names.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<Example 1:>
+
+List all users with jobs:
+
+  whojobs
+
+=item B<Example 2:>
+
+List users with at least 5 jobs:
+
+  whojobs -m 5
+
+=item B<Example 3:>
+
+List users whose names contain "john":
+
+  whojobs john
+
+=back
+
+=head1 OUTPUT
+
+The output is a terminal tabular list in ascending order of jobs:
+
+  1 uubse              1   
+  2 alkbdjbh           2   
+  3 clyimmj            2   
+  4 bwark              2   
+  5 aiivebrd           4   
+  6 telatina           4  *
+  7 kwdenpa           10   
+  8 modhs             12   
+  9 bnvdn             21   
+  0 ifroalxy          24   
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

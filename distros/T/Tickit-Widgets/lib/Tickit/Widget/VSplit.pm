@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.57;
 
-package Tickit::Widget::VSplit 0.37;
+package Tickit::Widget::VSplit 0.38;
 class Tickit::Widget::VSplit
    :strict(params)
    :isa(Tickit::Widget::LinearSplit);

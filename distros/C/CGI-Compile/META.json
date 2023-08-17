@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
       "develop" : {
          "requires" : {
             "CGI::Emulate::PSGI" : "0",
-            "Dist::Milla" : "v1.0.20",
+            "Dist::Milla" : "v1.0.22",
             "Dist::Zilla" : "0",
             "Dist::Zilla::PluginBundle::Milla" : "0",
             "Plack::Test" : "0",
@@ -53,8 +53,8 @@
          "requires" : {
             "CGI" : "0",
             "Capture::Tiny" : "0",
+            "Filter::Util::Call" : "0",
             "Sub::Identify" : "0",
-            "Switch" : "0",
             "Test::More" : "0",
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0",
@@ -65,17 +65,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/miyagawa/CGI-Compile/issues"
+         "web" : "https://github.com/miyagawa/cgi-compile/issues"
       },
-      "homepage" : "https://github.com/miyagawa/CGI-Compile",
+      "homepage" : "https://github.com/miyagawa/cgi-compile",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/miyagawa/CGI-Compile.git",
-         "web" : "https://github.com/miyagawa/CGI-Compile"
+         "url" : "https://github.com/miyagawa/cgi-compile.git",
+         "web" : "https://github.com/miyagawa/cgi-compile"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
       "Hans Dieter Pearcey <hdp@cpan.org>",
       "J\u00f6rn Reder <jreder@dimedis.de>",
       "kocoureasy <igor.bujna@post.cz>",
@@ -85,8 +86,8 @@
       "Rafael Kitover <rkitover@gmail.com>",
       "Torsten F\u00f6rtsch <torsten@binary.com>"
    ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

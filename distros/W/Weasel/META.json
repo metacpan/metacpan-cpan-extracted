@@ -4,7 +4,7 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,6 +49,60 @@
          }
       }
    },
+   "provides" : {
+      "Weasel" : {
+         "file" : "lib/Weasel.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Element" : {
+         "file" : "lib/Weasel/Element.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Element::Document" : {
+         "file" : "lib/Weasel/Element/Document.pm",
+         "version" : "0.31"
+      },
+      "Weasel::FindExpanders" : {
+         "file" : "lib/Weasel/FindExpanders.pm",
+         "version" : "0.31"
+      },
+      "Weasel::FindExpanders::HTML" : {
+         "file" : "lib/Weasel/FindExpanders/HTML.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Session" : {
+         "file" : "lib/Weasel/Session.pm",
+         "version" : "0.31"
+      },
+      "Weasel::WidgetHandlers" : {
+         "file" : "lib/Weasel/WidgetHandlers.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML" : {
+         "file" : "lib/Weasel/Widgets/HTML.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML::Button" : {
+         "file" : "lib/Weasel/Widgets/HTML/Button.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML::Input" : {
+         "file" : "lib/Weasel/Widgets/HTML/Input.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML::Radio" : {
+         "file" : "lib/Weasel/Widgets/HTML/Radio.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML::Select" : {
+         "file" : "lib/Weasel/Widgets/HTML/Select.pm",
+         "version" : "0.31"
+      },
+      "Weasel::Widgets::HTML::Selectable" : {
+         "file" : "lib/Weasel/Widgets/HTML/Selectable.pm",
+         "version" : "0.31"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -61,13 +115,13 @@
          "web" : "https://github.com/perl-weasel/weasel"
       }
    },
-   "version" : "0.29",
+   "version" : "0.31",
    "x_contributors" : [
       "Brock Wilcox <bwilcox@optoro.com>",
       "Yves Lavoie <ylavoie@yveslavoie.com>"
    ],
-   "x_generated_by_perl" : "v5.24.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

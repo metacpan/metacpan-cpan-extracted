@@ -1,0 +1,130 @@
+#!/usr/local/bin/perl -w
+#
+# max-list-sessions
+#
+# Use ASCEND-SESSION-MIB to print a list of active connections on an
+# Ascend dialin router such as a MAX.
+#
+# Date Created: 1998/06/29
+# Author:       Simon Leinen  <simon@switch.ch>
+# RCS $Header: /home/leinen/CVS/SNMP_Session/test/max-list-sessions,v 1.5 2000-09-24 18:54:03 leinen Exp $
+#
+use strict;
+
+use SNMP_Session "0.59";
+use BER;
+use Socket;
+
+my $host = shift @ARGV || die;
+my $community = shift @ARGV || die;
+
+my $ssnStatusIndex = [1,3,6,1,4,1,529,12,2,1,1];
+my $ssnStatusValidFlag = [1,3,6,1,4,1,529,12,2,1,2];
+my $ssnStatusUserName = [1,3,6,1,4,1,529,12,2,1,3];
+my $ssnStatusUserIPAddress = [1,3,6,1,4,1,529,12,2,1,4];
+my $ssnStatusUserSubnetMask = [1,3,6,1,4,1,529,12,2,1,5];
+my $ssnStatusCurrentService = [1,3,6,1,4,1,529,12,2,1,6];
+my $ssnStatusCallReferenceNum = [1,3,6,1,4,1,529,12,2,1,7];
+
+my $callStatusIndex = [1,3,6,1,4,1,529,11,2,1,1];
+my $callStatusValidFlag = [1,3,6,1,4,1,529,11,2,1,2];
+my $callStatusStartingTimeStamp = [1,3,6,1,4,1,529,11,2,1,3];
+my $callStatusCallReferenceNum = [1,3,6,1,4,1,529,11,2,1,4];
+my $callStatusDataRate = [1,3,6,1,4,1,529,11,2,1,5];
+my $callStatusSlotNumber = [1,3,6,1,4,1,529,11,2,1,6];
+my $callStatusSlotLineNumber = [1,3,6,1,4,1,529,11,2,1,7];
+my $callStatusSlotChannelNumber = [1,3,6,1,4,1,529,11,2,1,8];
+my $callStatusModemSlotNumber = [1,3,6,1,4,1,529,11,2,1,9];
+my $callStatusModemOnSlot = [1,3,6,1,4,1,529,11,2,1,10];
+my $callStatusIfIndex = [1,3,6,1,4,1,529,11,2,1,11];
+my $callSessionIndex = [1,3,6,1,4,1,529,11,2,1,12];
+my $callStatusType = [1,3,6,1,4,1,529,11,2,1,13];
+my $callStatusXmitRate = [1,3,6,1,4,1,529,11,2,1,14];
+my $callStatusPortType = [1,3,6,1,4,1,529,11,2,1,15];
+
+my %call_to_session = ();
+
+my $session = SNMP_Session->open ($host, $community, 161)
+  || die "Opening SNMP_Session";
+read_sessions ($session);
+read_calls ($session);
+foreach my $call_ref (sort keys %call_to_session) {
+    pretty_session ($call_to_session{$call_ref});
+}
+1;
+
+sub read_calls ($) {
+    my ($session) = @_;
+    $session->map_table ([$callStatusValidFlag,
+			  $callStatusCallReferenceNum,
+			  $callStatusDataRate],
+			 sub {
+			     my ($index, $valid, $refno, $rate) = @_;
+			     map { defined ($_) && ($_=pretty_print $_) }
+			     ($valid, $refno, $rate);
+			     return if $valid == 1;
+			     my $session = $call_to_session{$refno};
+			     return unless defined $session;
+			     $session->{'data_rate'} = $rate;
+			 });
+}
+
+sub read_sessions ($) {
+    my ($session) = @_;
+    $session->map_table ([$ssnStatusValidFlag,
+			  $ssnStatusUserName,
+			  $ssnStatusUserIPAddress, $ssnStatusUserSubnetMask,
+			  $ssnStatusCurrentService, $ssnStatusCallReferenceNum],
+			 sub {
+			     my ($index, $valid, $user, $addr, $mask,
+				 $service, $call_ref) = @_;
+			     
+			     map (defined $_ && ($_=pretty_print $_),
+				   ($valid, $user, $addr, $mask,
+				    $service, $call_ref));
+			     return if $valid == 1;	# invalid
+			     $call_to_session{$call_ref}
+			     = { 'index' => $index,
+				 'user' => $user,
+				 'addr' => $addr,
+				 'mask' => $mask,
+				 'service' => $service,
+				 'call_ref' => $call_ref,
+			     };
+			 });
+}
+
+sub pretty_session ($ ) {
+    my ($session) = @_;
+    printf STDOUT ("%2d  %-24s %-15s %-15s %6d %s\n",
+		   $session->{'index'},
+		   defined $session->{user} ? $session->{user} : '',
+		   inet_ntoa (pack ("C4",split ('\.',$session->{addr}))),
+		   inet_ntoa (pack ("C4",split ('\.',$session->{mask}))),
+		   $session->{'data_rate'},
+		   pretty_service ($session->{service}));
+}
+
+sub pretty_service ($) {
+    my ($service) = @_;
+    return
+	$service == 1 ? 'none'
+	: $service == 2 ? 'other'
+	: $service == 3 ? 'ppp'
+	: $service == 4 ? 'slip'
+	: $service == 5 ? 'mpp'
+	: $service == 6 ? 'x25'
+	: $service == 7 ? 'combinet'
+	: $service == 8 ? 'frameRelay'
+	: $service == 9 ? 'euraw'
+	: $service == 10 ? 'euui'
+	: $service == 11 ? 'telnet'
+	: $service == 12 ? 'telnetBinary'
+	: $service == 13 ? 'rawTcp'
+	: $service == 14 ? 'terminalServer'
+	: $service == 15 ? 'mp'
+	: $service == 16 ? 'virtualConnect'
+	: $service == 17 ? 'dchannelX25'
+	: $service == 18 ? 'dtpt'
+	    : 'unknown('.$service.')';
+}

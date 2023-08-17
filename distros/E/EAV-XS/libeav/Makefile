@@ -1,11 +1,12 @@
-CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic -fPIC
-CPPFLAGS = -Iinclude -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE
+CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic
+CPPFLAGS = -Iinclude -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE -fPIC
 PKG_CONFIG ?= pkg-config
 DESTDIR ?= /usr/local
 INSTALL ?= install
 PERL ?= perl
 SED ?= sed
 GCOVR ?= gcovr
+RANLIB ?= ranlib
 
 LIB_PATH = $(shell realpath . 2>/dev/null || readlink -f -- .)
 ifeq ($(LIB_PATH),)
@@ -176,12 +177,13 @@ $(BIN_TARGET_STATIC): $(LIB_TARGET)
 
 $(DLL_TARGET): $(OBJECTS)
 	# library -> shared linkage
-	$(CC) -shared -Iinclude -Wl,-soname,$(DLL_TARGET) \
-		-o $(DLL_TARGET) $(OBJECTS) $(LIBS) $(LDFLAGS)
+	$(CC) -shared $(LDFLAGS) -Iinclude -Wl,-soname,$(DLL_TARGET) \
+		-o $(DLL_TARGET) $(OBJECTS) $(LIBS)
 
 $(LIB_TARGET): $(OBJECTS)
 	# library -> static linkage
-	$(AR) rcs $@ $(OBJECTS)
+	$(AR) rc $@ $(OBJECTS)
+	$(RANLIB) $@
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -I. -o $@ -c $<

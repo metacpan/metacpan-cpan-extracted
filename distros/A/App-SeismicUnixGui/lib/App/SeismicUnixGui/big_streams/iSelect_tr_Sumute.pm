@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iSelect_tr_Sumute;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iSelect_tr_Sumute.pm
+ PERL PROGRAM NAME: iSelect_tr_Sumute.pm
  AUTHOR: Juan Lorenzo
  DATE:   January 29, 2017 
        
@@ -64,7 +64,6 @@ my $SuMessages = SuMessages->new();
 my $Project    = Project_config->new();
 
 my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
 
 =head2 Establish
  

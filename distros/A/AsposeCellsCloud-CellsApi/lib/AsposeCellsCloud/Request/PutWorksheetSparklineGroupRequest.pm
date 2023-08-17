@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetSparklineGroupRequest.name :   ,
-# PutWorksheetSparklineGroupRequest.sheetName :   ,
-# PutWorksheetSparklineGroupRequest.type :   ,
-# PutWorksheetSparklineGroupRequest.dataRange :   ,
-# PutWorksheetSparklineGroupRequest.isVertical :   ,
-# PutWorksheetSparklineGroupRequest.locationRange :   ,
-# PutWorksheetSparklineGroupRequest.folder :   ,
-# PutWorksheetSparklineGroupRequest.storageName :    
+# PutWorksheetSparklineGroupRequest.name : The workbook name.  ,
+# PutWorksheetSparklineGroupRequest.sheetName : The worksheet name.  ,
+# PutWorksheetSparklineGroupRequest.type : Represents the sparkline types(Line/Column/Stacked).  ,
+# PutWorksheetSparklineGroupRequest.dataRange : Specifies the data range of the sparkline group.  ,
+# PutWorksheetSparklineGroupRequest.isVertical : Specifies whether to plot the sparklines from the data range by row or by column.  ,
+# PutWorksheetSparklineGroupRequest.locationRange : Specifies where the sparklines to be placed.  ,
+# PutWorksheetSparklineGroupRequest.folder : Original workbook folder.  ,
+# PutWorksheetSparklineGroupRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_sparkline_group' } = { 
-    	summary => '',
+    	summary => 'Put worksheet sparkline group description.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Represents the sparkline types(Line/Column/Stacked).',
      	format => '',
      	read_only => '',
      		},
      'data_range' => {
      	datatype => 'string',
      	base_name => 'dataRange',
-     	description => '',
+     	description => 'Specifies the data range of the sparkline group.',
      	format => '',
      	read_only => '',
      		},
      'is_vertical' => {
      	datatype => 'string',
      	base_name => 'isVertical',
-     	description => '',
+     	description => 'Specifies whether to plot the sparklines from the data range by row or by column.',
      	format => '',
      	read_only => '',
      		},
      'location_range' => {
      	datatype => 'string',
      	base_name => 'locationRange',
-     	description => '',
+     	description => 'Specifies where the sparklines to be placed.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

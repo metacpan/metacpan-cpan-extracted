@@ -42,6 +42,7 @@ use aliased 'App::SeismicUnixGui::misc::Project_Variables';
 
 my $read              = readfiles->new();
 my $control           = control->new;
+my $dirs              = dirs->new();
 my $get               = L_SU_global_constants->new();
 my $global_lib        = $get->global_libs();
 my $GLOBAL_CONFIG_LIB = $global_lib->{_configs_big_streams};
@@ -55,26 +56,26 @@ my $manage_dirs_by = manage_dirs_by->new();
 my $var = $get->var();
 
 my $Project = {
-	_ref_DIR                      => '',
-	_ref_DIR_FUNCTION             => '',
-	_HOME                         => '',
-	_date                         => '',
-	_geomaps_is_selected          => '',
-	_geopsy_is_selected           => '',
-	_gmt_is_selected              => '',
-#	_gpr_is_selected              => '',
-	_grass__is_selected           => '',
-	_matlab_is_selected           => '',
-	_immodpg_is_selected          => '',
-	_r_is_selected                => '',
-	_sqlite_is_selected           => '',
-	_line                         => '',
-	_component                    => '',
-	_stage                        => '',
-	_process                      => '',
-	_PROJECT_HOME                 => '',
-	_subUser                      => '',
-#	_ANTELOPE                     => '',
+	_ref_DIR             => '',
+	_ref_DIR_FUNCTION    => '',
+	_HOME                => '',
+	_date                => '',
+	_geomaps_is_selected => '',
+	_geopsy_is_selected  => '',
+	_gmt_is_selected     => '',
+
+	#	_gpr_is_selected              => '',
+	_grass__is_selected  => '',
+	_matlab_is_selected  => '',
+	_immodpg_is_selected => '',
+	_r_is_selected       => '',
+	_sqlite_is_selected  => '',
+	_line                => '',
+	_component           => '',
+	_stage               => '',
+	_process             => '',
+	_PROJECT_HOME        => '',
+	_subUser             => '',
 	_DATA_GEOMAPS                 => '',
 	_DATA_GEOMAPS_BIN             => '',
 	_DATA_GEOMAPS_TEXT            => '',
@@ -87,7 +88,7 @@ my $Project = {
 	_PROJECT_HOME                 => '',
 	_DATA_GAMMA_WELL              => '',
 	_DATA_GAMMA_WELL_TXT          => '',
-	_DATA_GEOTECH_WELL_TXT         => '',	
+	_DATA_GEOTECH_WELL_TXT        => '',
 	_DATA_RESISTIVITY_SURFACE     => '',
 	_DATA_RESISTIVITY_SURFACE_TXT => '',
 	_DATA_RESISTIVITY_WELL        => '',
@@ -95,59 +96,59 @@ my $Project = {
 	_GMT_SEISMIC                  => '',
 	_GMT_GEOMAPS                  => '',
 	_GRASS_GEOMAPS                => '',
-#	_DATA_GPR                     => '',
-#	_DATA_GPR_SEGY                => '',
-#	_DATA_GPR_SEGY_RAW            => '',
-#	_DATA_GPR_SU                  => '',
-#	_DATA_GPR_SU_RAW              => '',
-#	_DATA_GPR_TXT                 => '',
-    _DATA_GEOTECH_WELL_TXT        => '',
-	_DATA_SEISMIC                 => '',
-	_DATA_SEISMIC_BIN             => '',
-	_DATA_SEISMIC_DAT             => '',
-	_DATA_SEISMIC_ININT           => '',
-	_DATA_SEISMIC_MATLAB          => '',
-	_DATA_SEISMIC_PASSCAL_SEGY    => '',
-	_DATA_SEISMIC_R               => '',
-	_DATA_SEISMIC_RSEIS           => '',
-	_DATA_SEISMIC_SAC             => '',
-	_DATA_SEISMIC_SEG2            => '',
-	_DATA_SEISMIC_SEGB            => '',
-	_DATA_SEISMIC_SEGD            => '',
-	_DATA_SEISMIC_SEGY            => '',
-	_DATA_SEISMIC_SEGY_RAW        => '',
-	_DATA_SEISMIC_SIERRA_SEGY     => '',
-	_DATA_SEISMIC_SU              => '',
-	_DATA_SEISMIC_SU_RAW          => '',
-	_DATA_SEISMIC_TXT             => '',
-	_DATA_SEISMIC_VEL             => '',
-	_DATA_SEISMIC_WELL            => '',
-	_DATABASE_SEISMIC_SQLITE      => '',
-	_DATA_SEISMIC_WELL_SYNSEIS    => '',
-	_DATA_WELL                    => '',
-	_FAST_TOMO                    => '',
-	_GEOPSY                       => '',
-	_GEOPSY_PARAMS                => '',
-	_GEOPSY_PICKS                 => '',
-	_GEOPSY_PICKS_RAW             => '',
-	_GEOPSY_PROFILES              => '',
-	_GEOPSY_REPORTS               => '',
-	_GEOPSY_TARGETS               => '',
-	_GIF_SEISMIC                  => '',
-	_ISOLA                        => '',
-	_JPEG                         => '',
-	_C_SEISMIC                    => '',
-	_CPP_SEISMIC                  => '',
-	_MATLAB_GEOMAPS               => '',
-	_MATLAB_WELL                  => '',
-	_MATLAB_SEISMIC               => '',
-	_IMMODPG                      => '',
-	_IMMODPG_INVISIBLE            => '',
-	_MMODPG                       => '',
-	_MOD2D_TOMO                   => '',
-	_PL_SEISMIC                   => '',
-	_PL_GEOMAPS                   => '',
-#	_PL_GPR                       => '',
+	#	_DATA_GPR                     => '',
+	#	_DATA_GPR_SEGY                => '',
+	#	_DATA_GPR_SEGY_RAW            => '',
+	#	_DATA_GPR_SU                  => '',
+	#	_DATA_GPR_SU_RAW              => '',
+	#	_DATA_GPR_TXT                 => '',
+	_DATA_GEOTECH_WELL_TXT     => '',
+	_DATA_SEISMIC              => '',
+	_DATA_SEISMIC_BIN          => '',
+	_DATA_SEISMIC_DAT          => '',
+	_DATA_SEISMIC_ININT        => '',
+	_DATA_SEISMIC_MATLAB       => '',
+	_DATA_SEISMIC_PASSCAL_SEGY => '',
+	_DATA_SEISMIC_R            => '',
+	_DATA_SEISMIC_RSEIS        => '',
+	_DATA_SEISMIC_SAC          => '',
+	_DATA_SEISMIC_SEG2         => '',
+	_DATA_SEISMIC_SEGB         => '',
+	_DATA_SEISMIC_SEGD         => '',
+	_DATA_SEISMIC_SEGY         => '',
+	_DATA_SEISMIC_SEGY_RAW     => '',
+	_DATA_SEISMIC_SIERRA_SEGY  => '',
+	_DATA_SEISMIC_SU           => '',
+	_DATA_SEISMIC_SU_RAW       => '',
+	_DATA_SEISMIC_TXT          => '',
+	_DATA_SEISMIC_VEL          => '',
+	_DATA_SEISMIC_WELL         => '',
+	_DATABASE_SEISMIC_SQLITE   => '',
+	_DATA_SEISMIC_WELL_SYNSEIS => '',
+	_DATA_WELL                 => '',
+	_FAST_TOMO                 => '',
+	_GEOPSY                    => '',
+	_GEOPSY_PARAMS             => '',
+	_GEOPSY_PICKS              => '',
+	_GEOPSY_PICKS_RAW          => '',
+	_GEOPSY_PROFILES           => '',
+	_GEOPSY_REPORTS            => '',
+	_GEOPSY_TARGETS            => '',
+	_GIF_SEISMIC               => '',
+	_ISOLA                     => '',
+	_JPEG                      => '',
+	_C_SEISMIC                 => '',
+	_CPP_SEISMIC               => '',
+	_MATLAB_GEOMAPS            => '',
+	_MATLAB_WELL               => '',
+	_MATLAB_SEISMIC            => '',
+	_IMMODPG                   => '',
+	_IMMODPG_INVISIBLE         => '',
+	_MMODPG                    => '',
+	_MOD2D_TOMO                => '',
+	_PL_SEISMIC                => '',
+	_PL_GEOMAPS                => '',
+	#	_PL_GPR                       => '',
 	_PL_RESISTIVITY_SURFACE       => '',
 	_PL_WELL                      => '',
 	_PNG                          => '',
@@ -286,7 +287,7 @@ sub _basic_dirs {
 		# copy a default Project configuration file from
 		# the GLOBAL_LIBS directory defined in
 		# L_SU_global_constants.pm
-#		print("Project_config, _basic_dirs, no configuration files exist\n");
+		#		print("Project_config, _basic_dirs, no configuration files exist\n");
 
 		use File::Copy;
 		my $ACTIVE_PROJECT = _get_ACTIVE_PROJECT();
@@ -300,6 +301,7 @@ sub _basic_dirs {
 		# make the default configuration directory for the user
 		$manage_dirs_by->make_dir($ACTIVE_PROJECT);
 		copy( $default_Project_config, $PATH_N_file );
+
 #		print(
 #"Project_config, _basic_dirs, Project.config in ~user/.L_SU/configuration/active dir. created\n"
 #		);
@@ -326,7 +328,6 @@ sub _basic_dirs {
 			  # L_SU_global_constants.pm
 		 # print ("Project_config, _basic_dirs, no configuration files exist\n");
 
-
 		use File::Copy;
 		my $ACTIVE_PROJECT = _get_ACTIVE_PROJECT();
 
@@ -348,6 +349,19 @@ sub _basic_dirs {
 	return ();
 }
 
+=head2 _set_dirs
+
+=cut
+
+sub _set_dirs {
+	my ($self) = @_;
+
+	_basic_dirs();
+	_system_dirs();
+
+	return ();
+}
+
 =head2 sub basic_dirs
 
     	e.g., $GLOBAL_CONFIG_LIB:  as /usr/local/pl/L_SU/configs/big_streams
@@ -359,7 +373,7 @@ sub basic_dirs {
 	# Find out HOME directory and configuration path for user
 	my $ACTIVE_PROJECT = _get_ACTIVE_PROJECT();
 
-#	print(" Project_config, _basic_dirs, ACTIVE_PROJECT: $ACTIVE_PROJECT\n");
+	#	print(" Project_config, _basic_dirs, ACTIVE_PROJECT: $ACTIVE_PROJECT\n");
 
 	my $prog_name        = '';
 	my $prog_name_new    = 'Project';
@@ -370,14 +384,15 @@ sub basic_dirs {
 	if ( -e $prog_name_old . '.config' ) {
 
 		$prog_name = $prog_name_old;
-#		print("Project_config,basic_dirs,using local $prog_name.config\n");
+
+		#		print("Project_config,basic_dirs,using local $prog_name.config\n");
 		$prog_name_config = $prog_name_old . '.config';
 
 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
 		  $read->configs( ( $prog_name . '.config' ) );
 		$Project->{_ref_DIR} = $ref_DIR;
 
-#	 print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+	#	 print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
 		_change_basic_dirs();
 
@@ -425,19 +440,19 @@ sub basic_dirs {
 
 sub _change_basic_dirs {
 	my ($self) = @_;
-	my $control = control->new();
 
 	my @CFG;
 	my ( $component,     $stage,        $process );
 	my ( $date,          $line,         $subUser );
 	my ( $HOME,          $PROJECT_HOME, $site, $spare_dir );
 	my ( $geomaps_logic, $geopsy_logic, $matlab_logic );
-	my ( $gmt_logic,    $grass_logic );
-	my ( $immodpg_logic, $r_logic,      $sqlite_logic, );
+	my ( $gmt_logic,     $grass_logic );
+	my ( $immodpg_logic, $r_logic, $sqlite_logic, );
 
-# TODO my ()$matlab,$fast,$immodpg,gmt);
+	# TODO my ()$matlab,$fast,$immodpg,gmt);
 
 	my $length = scalar @{ $Project->{_ref_DIR} };
+
 #print(" 5. Project_config,_change_basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 
 	for ( my $i = 0, my $j = 0 ; $i < $length ; $i++, $j = $j + 2 ) {
@@ -466,7 +481,8 @@ sub _change_basic_dirs {
 	$geomaps_logic = $control->set_str2logic( $CFG[17] );
 	$geopsy_logic  = $control->set_str2logic( $CFG[19] );
 	$gmt_logic     = $control->set_str2logic( $CFG[21] );
-#	$gpr_logic     = $control->set_str2logic( $CFG[23] );
+
+	#	$gpr_logic     = $control->set_str2logic( $CFG[23] );
 	$grass_logic   = $control->set_str2logic( $CFG[23] );
 	$matlab_logic  = $control->set_str2logic( $CFG[25] );
 	$immodpg_logic = $control->set_str2logic( $CFG[27] );
@@ -522,12 +538,6 @@ sub _change_basic_dirs {
 
 	}
 
-# assumes an up-to-date locally available
-# configuration file
-# print("Project_config, Using up-to-date locally available configuration file\n\n");
-# print("Project_config, HOME: $HOME\n\n");
-# print("Project_config, line: $line\n\n");
-
 	$Project->{_HOME}                = $HOME;
 	$Project->{_date}                = $date;
 	$Project->{_line}                = $line;
@@ -538,7 +548,8 @@ sub _change_basic_dirs {
 	$Project->{_subUser}             = $subUser;
 	$Project->{_geomaps_is_selected} = $geomaps_logic;
 	$Project->{_geopsy_is_selected}  = $geopsy_logic;
-#	$Project->{_gpr_is_selected}     = $gpr_logic;
+
+	#	$Project->{_gpr_is_selected}     = $gpr_logic;
 	$Project->{_grass_is_selected}   = $grass_logic;
 	$Project->{_gmt_is_selected}     = $gmt_logic;
 	$Project->{_matlab_is_selected}  = $matlab_logic;
@@ -551,8 +562,8 @@ sub _change_basic_dirs {
 
 =head2 DIRECTORY DEFINITIONS
 
- Be careful in changing the following order
- clean ticks if needed
+ Be careful in changing the following order.
+ Clean ticks if needed.
 
 =cut
 
@@ -570,16 +581,14 @@ sub _system_dirs {
   # print(" Project_config, _system_dirs, Before PROJECT_HOME $PROJECT_HOME\n");
 	$PROJECT_HOME =~ s/\'//g;
 
-#  print(" Project_config, _system_dirs, After PROJECT_HOME $PROJECT_HOME\n");
+  #  print(" Project_config, _system_dirs, After PROJECT_HOME $PROJECT_HOME\n");
   # print(" Project_config, _system_dirs, Before subUser: $subUser \n");
 
-	if ($subUser) {
+	if ( length $subUser ) {
 		$subUser =~ s/\'//g;
-
 		# print(" Project_config, _system_dirs, After subUser: $subUser \n");
 	}
 	else {
-
 		# print("New L_SU project detected: Project_config, _system_dirs\n");
 	}
 
@@ -589,18 +598,19 @@ sub _system_dirs {
 	$DATE_LINE_COMPONENT_STAGE_PROCESS =~ s/\'//g;
 
 	# BASE DATA TYPES : default is SURFACE
-	my $GEOMAPS             = $PROJECT_HOME . '/geomaps';
-#	my $GEOTECH             = $PROJECT_HOME . '/geotech';
-#	my $GPR                 = $PROJECT_HOME . '/gpr';
+	my $GEOMAPS = $PROJECT_HOME . '/geomaps';
+
+	#	my $GEOTECH             = $PROJECT_HOME . '/geotech';
+	#	my $GPR                 = $PROJECT_HOME . '/gpr';
 	my $WELL                = $PROJECT_HOME . '/well';
 	my $SEISMIC             = $PROJECT_HOME . '/seismics';
 	my $GAMMA_WELL          = $WELL . '/gamma';
-	my $GEOTECH_WELL        = $WELL . '/geotech';	
+	my $GEOTECH_WELL        = $WELL . '/geotech';
 	my $RESISTIVITY_SURFACE = $PROJECT_HOME . '/' . 'resistivity_surface';
 	my $RESISTIVITY_WELL    = $WELL . '/resistivity';
 	my $SEISMIC_WELL        = $WELL . '/seismics';
 
-#	my $DATA_GPR                 = $GPR . '/data';
+	#	my $DATA_GPR                 = $GPR . '/data';
 	my $DATA_WELL                = $WELL . '/data';
 	my $DATA_SEISMIC             = $SEISMIC . '/data';
 	my $DATA_RESISTIVITY_SURFACE = $RESISTIVITY_SURFACE . '/data';    # legacy
@@ -610,16 +620,13 @@ sub _system_dirs {
 
 	# TOOL DATA TYPES
 	my $DATA_GAMMA_WELL       = $GAMMA_WELL . '/data';
-	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL.'/data';	
+	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL . '/data';
 	my $DATA_RESISTIVITY_WELL = $RESISTIVITY_WELL . '/data';
 	my $DATA_SEISMIC_WELL     = $SEISMIC_WELL . '/data';
 
 	# database
 	my $SEISMIC_SQLITE = $SEISMIC . '/sqlite';
 	my $SQLITE_SEISMIC = $SEISMIC . '/sqlite';
-
-	# SOFTWARE ANTELOPE
-#	my $ANTELOPE = $SEISMIC . '/antelope';
 
 	# DATABASES
 	my $DATABASE_SEISMIC_SQLITE =
@@ -644,36 +651,36 @@ sub _system_dirs {
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
-	  
+
 	my $GEOPSY_PARAMS =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'params';
-	  
+
 	my $GEOPSY_PICKS =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/' . 'picks';
-	  
+
 	my $GEOPSY_PICKS_RAW = $GEOPSY_PICKS . '/' . 'raw';
-	
+
 	my $GEOPSY_PROFILES =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'profiles';
-	  
+
 	my $GEOPSY_REPORTS =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'reports';
-	  
+
 	my $GEOPSY_TARGETS =
 		$SEISMIC
 	  . '/geopsy/'
@@ -682,14 +689,14 @@ sub _system_dirs {
 	  . 'targets';
 
 	# IMAGES
-#	my $IMAGES_GPR     = $GPR . '/images';
+	#	my $IMAGES_GPR     = $GPR . '/images';
 	my $IMAGES_SEISMIC = $SEISMIC . '/images';
 	my $IMAGES_WELL    = $WELL . '/images';
 
-#	my $GIF_GPR =
-#		$IMAGES_GPR . '/' . 'gif' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+	#	my $GIF_GPR =
+	#		$IMAGES_GPR . '/' . 'gif' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 	my $GIF_SEISMIC =
 		$IMAGES_SEISMIC . '/' . 'gif' . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
@@ -700,11 +707,11 @@ sub _system_dirs {
 		$IMAGES_SEISMIC . '/' . 'jpeg/' . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
-	  
-#	my $JPEG_GPR =
-#		$IMAGES_GPR . '/' . 'jpeg/' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+
+	#	my $JPEG_GPR =
+	#		$IMAGES_GPR . '/' . 'jpeg/' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	# PNG IMAGE STORAGE DIRECTORY
 	my $PNG =
@@ -712,15 +719,15 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
-#	my $PNG_GPR =
-#		$IMAGES_GPR . '/' . 'png' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
-#
-#	my $PS_GPR =
-#		$IMAGES_GPR . '/' . 'ps' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+	#	my $PNG_GPR =
+	#		$IMAGES_GPR . '/' . 'png' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
+	#
+	#	my $PS_GPR =
+	#		$IMAGES_GPR . '/' . 'ps' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	my $PS_SEISMIC =
 		$IMAGES_SEISMIC . '/' . 'ps' . '/'
@@ -795,9 +802,9 @@ sub _system_dirs {
 	# FAST DIRECTORY for 2D RAYTRACING
 	my $MOD2D_TOMO = $SEISMIC . '/fast_tomo/All/mod2d';
 
-#	# PERL DIRECTOIES
-#	my $PL_GPR =
-#	  $GPR . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	#	# PERL DIRECTOIES
+	#	my $PL_GPR =
+	#	  $GPR . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 
 	my $PL_RESISTIVITY_SURFACE =
 		$RESISTIVITY_SURFACE . '/pl/'
@@ -836,9 +843,9 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
-#	# SH DIRECTORY FOR GPR
-#	my $SH_GPR =
-#	  $GPR . '/sh/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	#	# SH DIRECTORY FOR GPR
+	#	my $SH_GPR =
+	#	  $GPR . '/sh/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 
 	# SH DIRECTORY
 	my $SH_SEISMIC =
@@ -861,43 +868,42 @@ sub _system_dirs {
 		$DATA_GAMMA_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
-	  
+
 	# GEOTECH WELL DATA in TXT format
 	my $DATA_GEOTECH_WELL_TXT =
 		$DATA_GEOTECH_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
-	  . $subUser;	  
-	  
+	  . $subUser;
 
-#	# GPR DIRECTORY
-#	my $DATA_GPR_SEGY =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
-#	  . $subUser;
+	#	# GPR DIRECTORY
+	#	my $DATA_GPR_SEGY =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
+	#	  . $subUser;
 
-#	# GPR DIRECTORY
-#	my $DATA_GPR_SEGY_RAW =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
-#	  . $subUser . '/' . 'raw';
-#
-#	# GPR DIRECTORY
-#	my $DATA_GPR_SU =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
-#	  . $subUser;
+	#	# GPR DIRECTORY
+	#	my $DATA_GPR_SEGY_RAW =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
+	#	  . $subUser . '/' . 'raw';
+	#
+	#	# GPR DIRECTORY
+	#	my $DATA_GPR_SU =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
+	#	  . $subUser;
 
 	# GPR DIRECTORY
-#	my $DATA_GPR_SU_RAW =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
-#	  . $subUser . '/' . 'raw';
+	#	my $DATA_GPR_SU_RAW =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
+	#	  . $subUser . '/' . 'raw';
 
-#	# GPR DIRECTORY
-#	my $DATA_GPR_TXT =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
-#	  . $subUser;
+	#	# GPR DIRECTORY
+	#	my $DATA_GPR_TXT =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
+	#	  . $subUser;
 
 	# SEISMIC DIRECTORY
 	my $DATA_SEISMIC_BIN =
@@ -988,11 +994,11 @@ sub _system_dirs {
 	# SEGY DIRECTORY
 	my $DATA_SEISMIC_SEGY =
 		$DATA_SEISMIC . '/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'. 'segy' . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . 'segy' . '/'
 	  . $subUser;
 
 	# SEGY DIRECTORY
-	my $DATA_SEISMIC_SEGY_RAW = $DATA_SEISMIC_SEGY . '/'. 'raw';
+	my $DATA_SEISMIC_SEGY_RAW = $DATA_SEISMIC_SEGY . '/' . 'raw';
 
 	# SEISMIC VELOCITY DIRECTORY
 	my $DATA_SEISMIC_VEL =
@@ -1092,7 +1098,6 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
-	#	$Project->{_ANTELOPE}            = $ANTELOPE;
 	$Project->{_DATA_GEOMAPS}        = $DATA_GEOMAPS;
 	$Project->{_DATA_GEOMAPS_BIN}    = $DATA_GEOMAPS_BIN;
 	$Project->{_DATA_GEOMAPS_TOPO}   = $DATA_GEOMAPS_TOPO;
@@ -1111,7 +1116,7 @@ sub _system_dirs {
 
 	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;
 	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;
-	
+
 	# $Project->{_DATA_RESISTIVITY_}		= $DATA_RESISTIVITY;
 	# $Project->{_DATA_RESISTIVITY_TXT}		= $DATA_RESISTIVITY_TXT;
 	$Project->{_DATA_RESISTIVITY_SURFACE}     = $DATA_RESISTIVITY_SURFACE;
@@ -1119,12 +1124,12 @@ sub _system_dirs {
 	$Project->{_DATA_RESISTIVITY_WELL}        = $DATA_RESISTIVITY_WELL;
 	$Project->{_DATA_RESISTIVITY_WELL_TXT}    = $DATA_RESISTIVITY_WELL_TXT;
 
-#	$Project->{_DATA_GPR}          = $DATA_GPR;
-#	$Project->{_DATA_GPR_SEGY}     = $DATA_GPR_SEGY;
-#	$Project->{_DATA_GPR_SEGY_RAW} = $DATA_GPR_SEGY_RAW;
-#	$Project->{_DATA_GPR_SU}       = $DATA_GPR_SU;
-#	$Project->{_DATA_GPR_SU_RAW}   = $DATA_GPR_SU_RAW;
-#	$Project->{_DATA_GPR_TXT}      = $DATA_GPR_TXT;
+	#	$Project->{_DATA_GPR}          = $DATA_GPR;
+	#	$Project->{_DATA_GPR_SEGY}     = $DATA_GPR_SEGY;
+	#	$Project->{_DATA_GPR_SEGY_RAW} = $DATA_GPR_SEGY_RAW;
+	#	$Project->{_DATA_GPR_SU}       = $DATA_GPR_SU;
+	#	$Project->{_DATA_GPR_SU_RAW}   = $DATA_GPR_SU_RAW;
+	#	$Project->{_DATA_GPR_TXT}      = $DATA_GPR_TXT;
 
 	$Project->{_DATA_SEISMIC_BIN}          = $DATA_SEISMIC_BIN;
 	$Project->{_DATA_SEISMIC_DAT}          = $DATA_SEISMIC_DAT;
@@ -1162,28 +1167,30 @@ sub _system_dirs {
 	$Project->{_GEOPSY_PROFILES}           = $GEOPSY_PROFILES;
 	$Project->{_GEOPSY_REPORTS}            = $GEOPSY_REPORTS;
 	$Project->{_GEOPSY_TARGETS}            = $GEOPSY_TARGETS;
-#	$Project->{_GIF_GPR}                   = $GIF_GPR;
-	$Project->{_GIF_SEISMIC}               = $GIF_SEISMIC;
-	$Project->{_IMMODPG}                   = $IMMODPG;
-	$Project->{_IMMODPG_INVISIBLE}         = $IMMODPG_INVISIBLE;
-	$Project->{_ISOLA}                     = $ISOLA;
-	$Project->{_JPEG}                      = $JPEG;
-	$Project->{_C_SEISMIC}                 = $C_SEISMIC;
-	$Project->{_CPP_SEISMIC}               = $CPP_SEISMIC;
-	$Project->{_MATLAB_GEOMAPS}            = $MATLAB_GEOMAPS;
-	$Project->{_MATLAB_WELL}               = $MATLAB_WELL;
-	$Project->{_MATLAB_SEISMIC}            = $MATLAB_SEISMIC;
-	$Project->{_MMODPG}                    = $MMODPG;
-	$Project->{_MOD2D_TOMO}                = $MOD2D_TOMO;
 
-#	$Project->{_PL_GPR} = $PL_GPR;
+	#	$Project->{_GIF_GPR}                   = $GIF_GPR;
+	$Project->{_GIF_SEISMIC}       = $GIF_SEISMIC;
+	$Project->{_IMMODPG}           = $IMMODPG;
+	$Project->{_IMMODPG_INVISIBLE} = $IMMODPG_INVISIBLE;
+	$Project->{_ISOLA}             = $ISOLA;
+	$Project->{_JPEG}              = $JPEG;
+	$Project->{_C_SEISMIC}         = $C_SEISMIC;
+	$Project->{_CPP_SEISMIC}       = $CPP_SEISMIC;
+	$Project->{_MATLAB_GEOMAPS}    = $MATLAB_GEOMAPS;
+	$Project->{_MATLAB_WELL}       = $MATLAB_WELL;
+	$Project->{_MATLAB_SEISMIC}    = $MATLAB_SEISMIC;
+	$Project->{_MMODPG}            = $MMODPG;
+	$Project->{_MOD2D_TOMO}        = $MOD2D_TOMO;
+
+	#	$Project->{_PL_GPR} = $PL_GPR;
 
 	# print("Project_config,_system_dirs,PL_SEISMIC = $PL_SEISMIC\n");
 	$Project->{_PL_GEOMAPS} = $PL_GEOMAPS;
 	$Project->{_PL_WELL}    = $PL_WELL;
 
-	$Project->{_PNG}                    = $PNG;
-#	$Project->{_PS_GPR}                 = $PS_GPR;
+	$Project->{_PNG} = $PNG;
+
+	#	$Project->{_PS_GPR}                 = $PS_GPR;
 	$Project->{_PL_RESISTIVITY_SURFACE} = $PL_RESISTIVITY_SURFACE;
 	$Project->{_PL_SEISMIC}             = $PL_SEISMIC;
 	$Project->{_RESISTIVITY_SURFACE}    = $RESISTIVITY_SURFACE;
@@ -1212,7 +1219,7 @@ sub _system_dirs {
 =cut
 
 sub system_dirs {
-	
+
 	my ($self) = @_;
 
 	my $HOME         = $Project->{_HOME};
@@ -1229,8 +1236,8 @@ sub system_dirs {
 	  $date . '/' . $line . '/' . $component . '/' . $stage . '/' . $process;
 
 	# GPR DATA
-#	my $GPR      = $PROJECT_HOME . '/gpr';
-#	my $DATA_GPR = $GPR . '/data';
+	#	my $GPR      = $PROJECT_HOME . '/gpr';
+	#	my $DATA_GPR = $GPR . '/data';
 
 	# GEOGRAPHIC DATA
 	my $GEOMAPS      = $PROJECT_HOME . '/geomaps';
@@ -1264,7 +1271,7 @@ sub system_dirs {
 	my $RESISTIVITY_WELL = $WELL . '/resistivity';
 
 	my $DATA_GAMMA_WELL       = $GAMMA_WELL . '/data';
-	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL . '/data';	
+	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL . '/data';
 	my $DATA_RESISTIVITY_WELL = $RESISTIVITY_WELL . '/data';
 	my $DATA_SEISMIC_WELL     = $SEISMIC_WELL . '/data';
 
@@ -1308,30 +1315,29 @@ sub system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'params';
-	  
+
 	my $GEOPSY_PICKS =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/' . 'picks';
-	  
-	my $GEOPSY_PICKS_RAW =
-		$GEOPSY_PICKS . '/' . 'raw';
-	  
+
+	my $GEOPSY_PICKS_RAW = $GEOPSY_PICKS . '/' . 'raw';
+
 	my $GEOPSY_PROFILES =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'profiles';
-	  
+
 	my $GEOPSY_REPORTS =
 		$SEISMIC
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'reports';
-	  
+
 	my $GEOPSY_TARGETS =
 		$SEISMIC
 	  . '/geopsy/'
@@ -1341,13 +1347,14 @@ sub system_dirs {
 
 	# IMAGES
 	my $IMAGES_SEISMIC = $SEISMIC . '/images';
-#	my $IMAGES_GPR     = $GPR . '/images';
-	my $IMAGES_WELL    = $WELL . '/images';
 
-#	my $GIF_GPR =
-#		$IMAGES_GPR . '/gif' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+	#	my $IMAGES_GPR     = $GPR . '/images';
+	my $IMAGES_WELL = $WELL . '/images';
+
+	#	my $GIF_GPR =
+	#		$IMAGES_GPR . '/gif' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	my $GIF_SEISMIC =
 		$IMAGES_SEISMIC . '/gif' . '/'
@@ -1360,20 +1367,19 @@ sub system_dirs {
 	  . '/jpeg/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
-	  
+
 	# LIBRE IMPRESS SEISMIC STORAGE DIRECTORY
 	my $LIBRE_IMPRESS_SEISMIC =
 		$IMAGES_SEISMIC
 	  . '/libre_impress/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser;	  
+	  . $subUser;
 
-#	my $JPEG_GPR =
-#		$IMAGES_GPR
-#	  . '/jpeg/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
-
+	#	my $JPEG_GPR =
+	#		$IMAGES_GPR
+	#	  . '/jpeg/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	# PNG IMAGE STORAGE DIRECTORY
 	my $PNG =
@@ -1381,17 +1387,17 @@ sub system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
-#	my $PNG_GPR =
-#		$IMAGES_GPR . '/png/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+	#	my $PNG_GPR =
+	#		$IMAGES_GPR . '/png/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	my $PNG_SEISMIC = $PNG;
 
-#	my $PS_GPR =
-#		$IMAGES_GPR . '/' . 'ps' . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-#	  . $subUser;
+	#	my $PS_GPR =
+	#		$IMAGES_GPR . '/' . 'ps' . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	#	  . $subUser;
 
 	my $PS_SEISMIC =
 		$IMAGES_SEISMIC . '/' . 'ps' . '/'
@@ -1473,8 +1479,8 @@ sub system_dirs {
 	my $MOD2D_TOMO = $SEISMIC . '/fast_tomo/All/mod2d';
 
 	# PERL DIRECTORIES
-#	my $PL_GPR =
-#	  $GPR . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	#	my $PL_GPR =
+	#	  $GPR . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 	my $PL_RESISTIVITY_SURFACE =
 		$RESISTIVITY_SURFACE . '/pl/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
@@ -1512,37 +1518,37 @@ sub system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
-#	# SH DIRECTORY
-#	my $SH_GPR =
-#	  $GPR . '/sh/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	#	# SH DIRECTORY
+	#	my $SH_GPR =
+	#	  $GPR . '/sh/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 	my $SH_SEISMIC =
 	  $SEISMIC . '/sh/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 
-#	# GPR DATA
-#	my $DATA_GPR_SEGY =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
-#	  . $subUser;
-#	  
-#	my $DATA_GPR_SEGY_RAW =
-#		$DATA_GPR_SEGY . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
-#	  . $subUser;
-#	  
-#	my $DATA_GPR_SU =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
-#	  . $subUser;
-#	  
-#	my $DATA_GPR_SU_RAW =
-#		$DATA_GPR_SU . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
-#	  . $subUser;
-#	  
-#	my $DATA_GPR_TXT =
-#		$DATA_GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
-#	  . $subUser;
+	#	# GPR DATA
+	#	my $DATA_GPR_SEGY =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
+	#	  . $subUser;
+	#
+	#	my $DATA_GPR_SEGY_RAW =
+	#		$DATA_GPR_SEGY . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/segy' . '/'
+	#	  . $subUser;
+	#
+	#	my $DATA_GPR_SU =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
+	#	  . $subUser;
+	#
+	#	my $DATA_GPR_SU_RAW =
+	#		$DATA_GPR_SU . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/su' . '/'
+	#	  . $subUser;
+	#
+	#	my $DATA_GPR_TXT =
+	#		$DATA_GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
+	#	  . $subUser;
 
 	# WELL RESITIVITY DATA in TXT format
 	my $DATA_RESISTIVITY_WELL_TXT =
@@ -1561,12 +1567,12 @@ sub system_dirs {
 		$DATA_GAMMA_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
-	  
+
 	# WELL GEOTECH DATA in TXT format
 	my $DATA_GEOTECH_WELL_TXT =
 		$DATA_GEOTECH_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
-	  . $subUser;	  
+	  . $subUser;
 
 	# SEISMIC BIN  and DAT DIRECTORY
 	my $DATA_SEISMIC_BIN =
@@ -1652,7 +1658,7 @@ sub system_dirs {
 	  . $subUser;
 
 	# SU RAW DIRECTORY
-	my $DATA_SEISMIC_SU_RAW = $DATA_SEISMIC_SU . '/' . 'raw' ;
+	my $DATA_SEISMIC_SU_RAW = $DATA_SEISMIC_SU . '/' . 'raw';
 
 	# SEGY DIRECTORY
 	my $DATA_SEISMIC_SEGY =
@@ -1661,7 +1667,7 @@ sub system_dirs {
 	  . $subUser;
 
 	# SEGY DIRECTORY
-	my $DATA_SEISMIC_SEGY_RAW = $DATA_SEISMIC_SEGY . '/' . 'raw' ;
+	my $DATA_SEISMIC_SEGY_RAW = $DATA_SEISMIC_SEGY . '/' . 'raw';
 
 	# SEISMIC VELOCITY DIRECTORY
 	my $DATA_SEISMIC_VEL =
@@ -1743,40 +1749,40 @@ sub system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/temp' . '/'
 	  . $subUser;
 
-#	# GEOMAPS IMAGES DIRECTORY
-#	my $GPR_IMAGES =
-#		$GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-#	  . '/images' . '/'
-#	  . $subUser;
+	#	# GEOMAPS IMAGES DIRECTORY
+	#	my $GPR_IMAGES =
+	#		$GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
+	#	  . '/images' . '/'
+	#	  . $subUser;
 
-#	# GPR IMAGES DIRECTORY
-#	my $GPR_IMAGES_JPEG =
-#		$GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-#	  . '/images' . '/jpeg' . '/'
-#	  . $subUser;
+	#	# GPR IMAGES DIRECTORY
+	#	my $GPR_IMAGES_JPEG =
+	#		$GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
+	#	  . '/images' . '/jpeg' . '/'
+	#	  . $subUser;
 
-#	# GPR IMAGES DIRECTORY
-#	my $GPR_IMAGES_PNG =
-#		$GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-#	  . '/images' . '/jpeg' . '/'
-#	  . $subUser;
-#
-#	# GPR IMAGES DIRECTORY
-#	my $GPR_IMAGES_TIF =
-#		$GPR . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-#	  . '/images' . '/tif' . '/'
-#	  . $subUser;
-#
-#	# GPR IMAGES DIRECTORY
-#	my $GPR_IMAGES_PS =
-#		$GEOMAPS . '/'
-#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-#	  . '/images' . '/ps' . '/'
-#	  . $subUser;
+	#	# GPR IMAGES DIRECTORY
+	#	my $GPR_IMAGES_PNG =
+	#		$GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
+	#	  . '/images' . '/jpeg' . '/'
+	#	  . $subUser;
+	#
+	#	# GPR IMAGES DIRECTORY
+	#	my $GPR_IMAGES_TIF =
+	#		$GPR . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
+	#	  . '/images' . '/tif' . '/'
+	#	  . $subUser;
+	#
+	#	# GPR IMAGES DIRECTORY
+	#	my $GPR_IMAGES_PS =
+	#		$GEOMAPS . '/'
+	#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
+	#	  . '/images' . '/ps' . '/'
+	#	  . $subUser;
 
 	# TEMPORARY SEISMIC DATA DIRECTORY
 	my $TEMP_DATA_SEISMIC =
@@ -1805,26 +1811,26 @@ sub system_dirs {
 	$Project->{_PROJECT_HOME}        = $PROJECT_HOME;
 	$Project->{_DATA_GAMMA_WELL}     = $DATA_GAMMA_WELL;
 	$Project->{_DATA_GAMMA_WELL_TXT} = $DATA_GAMMA_WELL_TXT;
-		
-	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;	
-	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;	
 
-	$Project->{_DATA_GEOMAPS}        = $DATA_GEOMAPS;
-	$Project->{_DATA_GEOMAPS_BIN}    = $DATA_GEOMAPS_BIN;
-	$Project->{_DATA_GEOMAPS_TOPO}   = $DATA_GEOMAPS_TOPO;
-	
+	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;
+	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;
+
+	$Project->{_DATA_GEOMAPS}      = $DATA_GEOMAPS;
+	$Project->{_DATA_GEOMAPS_BIN}  = $DATA_GEOMAPS_BIN;
+	$Project->{_DATA_GEOMAPS_TOPO} = $DATA_GEOMAPS_TOPO;
+
 	$Project->{_GEOMAPS_IMAGES}      = $GEOMAPS_IMAGES;
 	$Project->{_GEOMAPS_IMAGES_JPEG} = $GEOMAPS_IMAGES_JPEG;
 	$Project->{_GEOMAPS_IMAGES_PNG}  = $GEOMAPS_IMAGES_PNG;
 	$Project->{_GEOMAPS_IMAGES_TIF}  = $GEOMAPS_IMAGES_TIF;
 	$Project->{_GEOMAPS_IMAGES_PS}   = $GEOMAPS_IMAGES_PS;
-	
-#	$Project->{_DATA_GPR}          = $DATA_GPR;
-#	$Project->{_DATA_GPR_SEGY}     = $DATA_GPR_SEGY;
-#	$Project->{_DATA_GPR_SEGY_RAW} = $DATA_GPR_SEGY_RAW;
-#	$Project->{_DATA_GPR_SU}       = $DATA_GPR_SU;
-#	$Project->{_DATA_GPR_SU_RAW}   = $DATA_GPR_SU_RAW;
-#	$Project->{_DATA_GPR_TXT}      = $DATA_GPR_TXT;
+
+	#	$Project->{_DATA_GPR}          = $DATA_GPR;
+	#	$Project->{_DATA_GPR_SEGY}     = $DATA_GPR_SEGY;
+	#	$Project->{_DATA_GPR_SEGY_RAW} = $DATA_GPR_SEGY_RAW;
+	#	$Project->{_DATA_GPR_SU}       = $DATA_GPR_SU;
+	#	$Project->{_DATA_GPR_SU_RAW}   = $DATA_GPR_SU_RAW;
+	#	$Project->{_DATA_GPR_TXT}      = $DATA_GPR_TXT;
 
 	$Project->{_DATA_RESISTIVITY_SURFACE}     = $DATA_RESISTIVITY_SURFACE;
 	$Project->{_DATA_RESISTIVITY_SURFACE_TXT} = $DATA_RESISTIVITY_SURFACE_TXT;
@@ -1865,46 +1871,52 @@ sub system_dirs {
 	$Project->{_GEOPSY_PROFILES}           = $GEOPSY_PROFILES;
 	$Project->{_GEOPSY_REPORTS}            = $GEOPSY_REPORTS;
 	$Project->{_GEOPSY_TARGETS}            = $GEOPSY_TARGETS;
-#	$Project->{_GIF_GPR}                   = $GIF_GPR;
-	$Project->{_GIF_SEISMIC}               = $GIF_SEISMIC;
-#	$Project->{_GPR}                       = $GPR;
-	$Project->{_ISOLA}                     = $ISOLA;
-#	$Project->{_JPEG_GPR}                  = $JPEG_GPR;
-	$Project->{_JPEG_SEISMIC}              = $JPEG_SEISMIC;
-	$Project->{_LIBRE_IMPRESS_SEISMIC}     = $LIBRE_IMPRESS_SEISMIC;	
-	$Project->{_C_SEISMIC}                 = $C_SEISMIC;
-	$Project->{_CPP_SEISMIC}               = $CPP_SEISMIC;
-	$Project->{_MATLAB_GEOMAPS}            = $MATLAB_GEOMAPS;
-	$Project->{_MATLAB_WELL}               = $MATLAB_WELL;
-	$Project->{_MATLAB_SEISMIC}            = $MATLAB_SEISMIC;
-	$Project->{_IMMODPG}                   = $IMMODPG;
-	$Project->{_IMMODPG_INVISIBLE}         = $IMMODPG_INVISIBLE;
-	$Project->{_MOD2D_TOMO}                = $MOD2D_TOMO;
-#	$Project->{_PL_GPR}                	   = $PL_GPR;
-	$Project->{_PL_RESISTIVITY_SURFACE}    = $PL_RESISTIVITY_SURFACE;
-	$Project->{_PL_SEISMIC}                = $PL_SEISMIC;
-	$Project->{_PL_GEOMAPS}                = $PL_GEOMAPS;
-	$Project->{_PL_WELL}                   = $PL_WELL;
-	$Project->{_PNG}                       = $PNG;
-#	$Project->{_PNG_GPR}               	   = $PNG_GPR;
-	$Project->{_PNG_SEISMIC}               = $PNG_SEISMIC;
-#	$Project->{_PS_GPR}                    = $PS_GPR;
-	$Project->{_PS_SEISMIC}                = $PS_SEISMIC;
-	$Project->{_PS_WELL}                   = $PS_WELL;
-	$Project->{_RESISTIVITY_SURFACE}       = $RESISTIVITY_SURFACE;
-	$Project->{_R_GAMMA_WELL}              = $R_GAMMA_WELL;
-	$Project->{_R_RESISTIVITY_SURFACE}     = $R_RESISTIVITY_SURFACE;
-	$Project->{_R_RESISTIVITY_WELL}        = $R_RESISTIVITY_WELL;
-	$Project->{_R_SEISMIC}                 = $R_SEISMIC;
-	$Project->{_R_WELL}                    = $R_WELL;
-	$Project->{_SH_SEISMIC}                = $SH_SEISMIC;
-	$Project->{_RAYINVR}                   = $RAYINVR;
-	$Project->{_SURFACE}                   = $SURFACE;
-	$Project->{_TEMP_DATA_GEOMAPS}         = $TEMP_DATA_GEOMAPS;
-	$Project->{_TEMP_DATA_SEISMIC}         = $TEMP_DATA_SEISMIC;
-	$Project->{_TEMP_DATA_SEISMIC_SU}      = $TEMP_DATA_SEISMIC_SU;
-	$Project->{_TEMP_FAST_TOMO}            = $TEMP_FAST_TOMO;
-	$Project->{_WELL}                      = $WELL;
+
+	#	$Project->{_GIF_GPR}                   = $GIF_GPR;
+	$Project->{_GIF_SEISMIC} = $GIF_SEISMIC;
+
+	#	$Project->{_GPR}                       = $GPR;
+	$Project->{_ISOLA} = $ISOLA;
+
+	#	$Project->{_JPEG_GPR}                  = $JPEG_GPR;
+	$Project->{_JPEG_SEISMIC}          = $JPEG_SEISMIC;
+	$Project->{_LIBRE_IMPRESS_SEISMIC} = $LIBRE_IMPRESS_SEISMIC;
+	$Project->{_C_SEISMIC}             = $C_SEISMIC;
+	$Project->{_CPP_SEISMIC}           = $CPP_SEISMIC;
+	$Project->{_MATLAB_GEOMAPS}        = $MATLAB_GEOMAPS;
+	$Project->{_MATLAB_WELL}           = $MATLAB_WELL;
+	$Project->{_MATLAB_SEISMIC}        = $MATLAB_SEISMIC;
+	$Project->{_IMMODPG}               = $IMMODPG;
+	$Project->{_IMMODPG_INVISIBLE}     = $IMMODPG_INVISIBLE;
+	$Project->{_MOD2D_TOMO}            = $MOD2D_TOMO;
+
+	#	$Project->{_PL_GPR}                	   = $PL_GPR;
+	$Project->{_PL_RESISTIVITY_SURFACE} = $PL_RESISTIVITY_SURFACE;
+	$Project->{_PL_SEISMIC}             = $PL_SEISMIC;
+	$Project->{_PL_GEOMAPS}             = $PL_GEOMAPS;
+	$Project->{_PL_WELL}                = $PL_WELL;
+	$Project->{_PNG}                    = $PNG;
+
+	#	$Project->{_PNG_GPR}               	   = $PNG_GPR;
+	$Project->{_PNG_SEISMIC} = $PNG_SEISMIC;
+
+	#	$Project->{_PS_GPR}                    = $PS_GPR;
+	$Project->{_PS_SEISMIC}            = $PS_SEISMIC;
+	$Project->{_PS_WELL}               = $PS_WELL;
+	$Project->{_RESISTIVITY_SURFACE}   = $RESISTIVITY_SURFACE;
+	$Project->{_R_GAMMA_WELL}          = $R_GAMMA_WELL;
+	$Project->{_R_RESISTIVITY_SURFACE} = $R_RESISTIVITY_SURFACE;
+	$Project->{_R_RESISTIVITY_WELL}    = $R_RESISTIVITY_WELL;
+	$Project->{_R_SEISMIC}             = $R_SEISMIC;
+	$Project->{_R_WELL}                = $R_WELL;
+	$Project->{_SH_SEISMIC}            = $SH_SEISMIC;
+	$Project->{_RAYINVR}               = $RAYINVR;
+	$Project->{_SURFACE}               = $SURFACE;
+	$Project->{_TEMP_DATA_GEOMAPS}     = $TEMP_DATA_GEOMAPS;
+	$Project->{_TEMP_DATA_SEISMIC}     = $TEMP_DATA_SEISMIC;
+	$Project->{_TEMP_DATA_SEISMIC_SU}  = $TEMP_DATA_SEISMIC_SU;
+	$Project->{_TEMP_FAST_TOMO}        = $TEMP_FAST_TOMO;
+	$Project->{_WELL}                  = $WELL;
 
 	return ();
 }
@@ -1916,56 +1928,42 @@ sub date {
 	return ($date);
 }
 
-#sub ANTELOPE {
-#	_basic_dirs();
-#	_system_dirs();
-#
-#	my $ANTELOPE = $Project->{_ANTELOPE};
-#	return ($ANTELOPE);
-#}
-
 sub CPP_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $CPP_SEISMIC = $Project->{_CPP_SEISMIC};
 	return ($CPP_SEISMIC);
 }
 
 sub DATA_GAMMA_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GAMMA_WELL = $Project->{_DATA_GAMMA_WELL};
 	return ($DATA_GAMMA_WELL);
 }
 
 sub DATA_GAMMA_WELL_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GAMMA_WELL_TXT = $Project->{_DATA_GAMMA_WELL_TXT};
 	return ($DATA_GAMMA_WELL_TXT);
 }
 
 sub DATA_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GEOMAPS = $Project->{_DATA_GEOMAPS};
 	return ($DATA_GEOMAPS);
 }
 
 sub DATA_GEOMAPS_BIN {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GEOMAPS_BIN = $Project->{_DATA_GEOMAPS_BIN};
 	return ($DATA_GEOMAPS_BIN);
 }
 
 sub DATA_GEOMAPS_TEXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GEOMAPS_TEXT = $Project->{_DATA_GEOMAPS_TEXT};
 
@@ -1974,216 +1972,189 @@ sub DATA_GEOMAPS_TEXT {
 }
 
 sub DATA_GEOMAPS_TOPO {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GEOMAPS_TOPO = $Project->{_DATA_GEOMAPS_TOPO};
 	return ($DATA_GEOMAPS_TOPO);
 }
 
 sub DATA_GEOTECH_WELL_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GEOTECH_WELL_TXT = $Project->{_DATA_GEOTECH_WELL_TXT};
 	return ($DATA_GEOTECH_WELL_TXT);
 }
 
 sub DATA_GPR {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR = $Project->{_DATA_GPR};
 	return ($DATA_GPR);
 }
 
 sub DATA_GPR_SEGY {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR_SEGY = $Project->{_DATA_GPR_SEGY};
 	return ($DATA_GPR_SEGY);
 }
 
 sub DATA_GPR_SEGY_RAW {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR_SEGY_RAW = $Project->{_DATA_GPR_SEGY_RAW};
 	return ($DATA_GPR_SEGY_RAW);
 }
 
 sub DATA_GPR_SU {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR_SU = $Project->{_DATA_GPR_SU};
 	return ($DATA_GPR_SU);
 }
 
 sub DATA_GPR_SU_RAW {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR_SU_RAW = $Project->{_DATA_GPR_SU_RAW};
 	return ($DATA_GPR_SU_RAW);
 }
 
 sub DATA_GPR_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_GPR_TXT = $Project->{_DATA_GPR_TXT};
 	return ($DATA_GPR_TXT);
 }
 
 sub DATA_RESISTIVITY_SURFACE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_RESISTIVITY_SURFACE = $Project->{_DATA_RESISTIVITY_SURFACE};
 	return ($DATA_RESISTIVITY_SURFACE);
 }
 
 sub DATA_RESISTIVITY_SURFACE_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_RESISTIVITY_SURFACE_TXT =
 	  $Project->{_DATA_RESISTIVITY_SURFACE_TXT};
 	return ($DATA_RESISTIVITY_SURFACE_TXT);
 }
 
 sub DATA_RESISTIVITY_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_RESISTIVITY_WELL = $Project->{_DATA_RESISTIVITY_WELL};
 	return ($DATA_RESISTIVITY_WELL);
 }
 
 sub DATA_RESISTIVITY_WELL_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_RESISTIVITY_WELL_TXT = $Project->{_DATA_RESISTIVITY_WELL_TXT};
 	return ($DATA_RESISTIVITY_WELL_TXT);
 }
 
 sub DATA_SEISMIC_BIN {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_BIN = $Project->{_DATA_SEISMIC_BIN};
 	return ($DATA_SEISMIC_BIN);
 }
 
 sub DATA_SEISMIC_DAT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_DAT = $Project->{_DATA_SEISMIC_DAT};
 	return ($DATA_SEISMIC_DAT);
 }
 
 sub DATA_SEISMIC_ININT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_ININT = $Project->{_DATA_SEISMIC_ININT};
 	return ($DATA_SEISMIC_ININT);
 }
 
 sub DATA_SEISMIC_MATLAB {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_MATLAB = $Project->{_DATA_SEISMIC_MATLAB};
 	return ($DATA_SEISMIC_MATLAB);
 }
 
 sub GEOMAPS_IMAGES {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GEOMAPS_IMAGES = $Project->{_GEOMAPS_IMAGES};
 	return ($GEOMAPS_IMAGES);
 }
 
 sub GEOMAPS_IMAGES_JPEG {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GEOMAPS_IMAGES_JPEG = $Project->{_GEOMAPS_IMAGES_JPEG};
 	return ($GEOMAPS_IMAGES_JPEG);
 }
 
 sub GEOMAPS_IMAGES_PNG {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GEOMAPS_IMAGES_PNG = $Project->{_GEOMAPS_IMAGES_PNG};
 	return ($GEOMAPS_IMAGES_PNG);
 }
 
 sub GEOMAPS_IMAGES_TIF {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GEOMAPS_IMAGES_TIF = $Project->{_GEOMAPS_IMAGES_TIF};
 	return ($GEOMAPS_IMAGES_TIF);
 }
 
 sub GEOMAPS_IMAGES_PS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GEOMAPS_IMAGES_PS = $Project->{_GEOMAPS_IMAGES_PS};
 	return ($GEOMAPS_IMAGES_PS);
 }
 
 sub GPR {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GPR = $Project->{_GPR};
 	return ($GPR);
 }
 
 sub HOME {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $HOME = $Project->{_HOME};
 	return ($HOME);
 }
 
 sub PROJECT_HOME {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $PROJECT_HOME = $Project->{_PROJECT_HOME};
 	return ($PROJECT_HOME);
 }
 
 sub GMT_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GMT_SEISMIC = $Project->{_GMT_SEISMIC};
 	return ($GMT_SEISMIC);
 }
 
 sub GMT_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GMT_GEOMAPS = $Project->{_GMT_GEOMAPS};
 	return ($GMT_GEOMAPS);
 }
 
 sub GRASS_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $GRASS_GEOMAPS = $Project->{_GRASS_GEOMAPS};
 	return ($GRASS_GEOMAPS);
@@ -2228,96 +2199,84 @@ sub GRASS_GEOMAPS {
 #}
 
 sub DATA_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC = $Project->{_DATA_SEISMIC};
 	return ($DATA_SEISMIC);
 }
 
 sub DATA_SEISMIC_PASSCAL_SEGY {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_PASSCAL_SEGY = $Project->{_DATA_SEISMIC_PASSCAL_SEGY};
 	return ($DATA_SEISMIC_PASSCAL_SEGY);
 }
 
 sub DATA_SEISMIC_R {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_R = $Project->{_DATA_SEISMIC_R};
 	return ($DATA_SEISMIC_R);
 }
 
 sub DATA_SEISMIC_RSEIS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_RSEIS = $Project->{_DATA_SEISMIC_RSEIS};
 	return ($DATA_SEISMIC_RSEIS);
 }
 
 sub DATA_SEISMIC_SAC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SAC = $Project->{_DATA_SEISMIC_SAC};
 	return ($DATA_SEISMIC_SAC);
 }
 
 sub DATA_SEISMIC_SEG2 {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SEG2 = $Project->{_DATA_SEISMIC_SEG2};
 	return ($DATA_SEISMIC_SEG2);
 }
 
 sub DATA_SEISMIC_SEGB {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SEGB = $Project->{_DATA_SEISMIC_SEGB};
 	return ($DATA_SEISMIC_SEGB);
 }
 
 sub DATA_SEISMIC_SEGD {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SEGD = $Project->{_DATA_SEISMIC_SEGD};
 	return ($DATA_SEISMIC_SEGD);
 }
 
 sub DATA_SEISMIC_SEGY {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SEGY = $Project->{_DATA_SEISMIC_SEGY};
 	return ($DATA_SEISMIC_SEGY);
 }
 
 sub DATA_SEISMIC_SEGY_RAW {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SEGY_RAW = $Project->{_DATA_SEISMIC_SEGY_RAW};
 	return ($DATA_SEISMIC_SEGY_RAW);
 }
 
 sub DATA_SEISMIC_SIERRA_SEGY {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SIERRA_SEGY = $Project->{_DATA_SEISMIC_SIERRA_SEGY};
 	return ($DATA_SEISMIC_SIERRA_SEGY);
 }
 
 sub DATA_SEISMIC_SU {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $DATA_SEISMIC_SU = $Project->{_DATA_SEISMIC_SU};
 
@@ -2328,57 +2287,49 @@ sub DATA_SEISMIC_SU {
 }
 
 sub DATA_SEISMIC_SU_RAW {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_SEISMIC_SU_RAW = $Project->{_DATA_SEISMIC_SU_RAW};
 	return ($DATA_SEISMIC_SU_RAW);
 }
 
 sub DATA_SEISMIC_TXT {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_SEISMIC_TXT = $Project->{_DATA_SEISMIC_TXT};
 	return ($DATA_SEISMIC_TXT);
 }
 
 sub DATA_SEISMIC_VEL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_SEISMIC_VEL = $Project->{_DATA_SEISMIC_VEL};
 	return ($DATA_SEISMIC_VEL);
 }
 
 sub DATABASE_SEISMIC_SQLITE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATABASE_SEISMIC_SQLITE = $Project->{_DATABASE_SEISMIC_SQLITE};
 	return ($DATABASE_SEISMIC_SQLITE);
 }
 
 sub DATA_SEISMIC_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_SEISMIC_WELL = $Project->{_DATA_SEISMIC_WELL};
 	return ($DATA_SEISMIC_WELL);
 }
 
 sub DATA_SEISMIC_WELL_SYNSEIS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_SEISMIC_WELL_SYNSEIS = $Project->{_DATA_SEISMIC_WELL_SYNSEIS};
 	return ($DATA_SEISMIC_WELL_SYNSEIS);
 }
 
 sub DATA_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $DATA_WELL = $Project->{_DATA_WELL};
 	return ($DATA_WELL);
 }
 
 sub FAST_TOMO {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $FAST_TOMO = $Project->{_FAST_TOMO};
 
 	# This subroutine returns the value of FAST_TOMO
@@ -2387,50 +2338,43 @@ sub FAST_TOMO {
 }
 
 sub GEOPSY {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY = $Project->{_GEOPSY};
 	return ($GEOPSY);
 }
 
 sub GEOPSY_PARAMS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_PARAMS = $Project->{_GEOPSY_PARAMS};
 	return ($GEOPSY_PARAMS);
 }
 
 sub GEOPSY_PICKS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_PICKS = $Project->{_GEOPSY_PICKS};
 	return ($GEOPSY_PICKS);
 }
 
 sub GEOPSY_PICKS_RAW {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_PICKS_RAW = $Project->{_GEOPSY_PICKS_RAW};
 	return ($GEOPSY_PICKS_RAW);
 }
 
 sub GEOPSY_PROFILES {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_PROFILES = $Project->{_GEOPSY_PROFILES};
 	return ($GEOPSY_PROFILES);
 }
 
 sub GEOPSY_REPORTS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_REPORTS = $Project->{_GEOPSY_REPORTS};
 	return ($GEOPSY_REPORTS);
 }
 
 sub GEOPSY_TARGETS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GEOPSY_TARGETS = $Project->{_GEOPSY_TARGETS};
 	return ($GEOPSY_TARGETS);
 }
@@ -2443,15 +2387,13 @@ sub GEOPSY_TARGETS {
 #}
 
 sub GIF_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $GIF_SEISMIC = $Project->{_GIF_SEISMIC};
 	return ($GIF_SEISMIC);
 }
 
 sub ISOLA {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $ISOLA = $Project->{_ISOLA};
 	return ($ISOLA);
 }
@@ -2471,68 +2413,58 @@ sub ISOLA {
 #}
 
 sub JPEG_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $JPEG_SEISMIC = $Project->{_JPEG_SEISMIC};
 	return ($JPEG_SEISMIC);
 }
 
 sub LIBRE_IMPRESS_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $LIBRE_IMPRESS_SEISMIC = $Project->{_LIBRE_IMPRESS_SEISMIC};
 	return ($LIBRE_IMPRESS_SEISMIC);
 }
 
 sub C_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $C_SEISMIC = $Project->{_C_SEISMIC};
 	return ($C_SEISMIC);
 }
 
 sub MATLAB_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $MATLAB_GEOMAPS = $Project->{_MATLAB_GEOMAPS};
 	return ($MATLAB_GEOMAPS);
 }
 
 sub MATLAB_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $MATLAB_SEISMIC = $Project->{_MATLAB_SEISMIC};
 	return ($MATLAB_SEISMIC);
 }
 
 sub MATLAB_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $MATLAB_WELL = $Project->{_MATLAB_WELL};
 	return ($MATLAB_WELL);
 }
 
 sub MMODPG {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $MMODPG = $Project->{_MMODPG};
 	return ($MMODPG);
 }
 
 sub IMMODPG {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $IMMODPG = $Project->{_IMMODPG};
 
-	#	print("Project_config, IMMODPG=$IMMODPG \n");
 	return ($IMMODPG);
 }
 
 sub IMMODPG_INVISIBLE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 
 	my $IMMODPG_INVISIBLE = $Project->{_IMMODPG_INVISIBLE};
 	return ($IMMODPG_INVISIBLE);
@@ -2540,15 +2472,13 @@ sub IMMODPG_INVISIBLE {
 }
 
 sub MOD2D_TOMO {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $MOD2D_TOMO = $Project->{_MOD2D_TOMO};
 	return ($MOD2D_TOMO);
 }
 
 sub PL_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PL_GEOMAPS = $Project->{_PL_GEOMAPS};
 	return ($PL_GEOMAPS);
 }
@@ -2561,15 +2491,14 @@ sub PL_GEOMAPS {
 #}
 
 sub PL_RESISTIVITY_SURFACE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PL_RESISTIVITY_SURFACE = $Project->{_PL_RESISTIVITY_SURFACE};
 
 	#	my $PL_RESISTIVITY_SURFACE_h= $Project->{_PL_RESISTIVITY_SURFACE};
 	#	control->set_infection($PL_RESISTIVITY_SURFACE_h);
 	#	my $PL_RESISTIVITY_SURFACE = $control->get_ticksBgone;
 
-	# This subroutine returns the value of PL_RESISTIVITY_SURFACE
+# This subroutine returns the value of PL_RESISTIVITY_SURFACE
 #	print(
 #"\nProject_config, PL_RESISTIVITY_SURFACE,PL_RESISTIVITY_SURFACE: $PL_RESISTIVITY_SURFACE\n"
 #	);
@@ -2577,8 +2506,7 @@ sub PL_RESISTIVITY_SURFACE {
 }
 
 sub PL_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PL_SEISMIC_h = $Project->{_PL_SEISMIC};
 	control->set_infection($PL_SEISMIC_h);
 	my $PL_SEISMIC = $control->get_ticksBgone;
@@ -2589,15 +2517,13 @@ sub PL_SEISMIC {
 }
 
 sub PL_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PL_WELL = $Project->{_PL_WELL};
 	return ($PL_WELL);
 }
 
 sub PNG {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PNG = $Project->{_PNG};
 	return ($PNG);
 }
@@ -2610,50 +2536,43 @@ sub PNG {
 #}
 
 sub PNG_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PNG_SEISMIC = $Project->{_PNG_SEISMIC};
 	return ($PNG_SEISMIC);
 }
 
 sub RESISTIVITY_SURFACE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $RESISTIVITY_SURFACE = $Project->{_RESISTIVITY_SURFACE};
 	return ($RESISTIVITY_SURFACE);
 }
 
 sub R_GAMMA_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $R_GAMMA_WELL = $Project->{_R_GAMMA_WELL};
 	return ($R_GAMMA_WELL);
 }
 
 sub R_RESISTIVITY_SURFACE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $R_RESISTIVITY_SURFACE = $Project->{_R_RESISTIVITY_SURFACE};
 	return ($R_RESISTIVITY_SURFACE);
 }
 
 sub R_RESISTIVITY_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $R_RESISTIVITY_WELL = $Project->{_R_RESISTIVITY_WELL};
 	return ($R_RESISTIVITY_WELL);
 }
 
 sub R_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $R_SEISMIC = $Project->{_R_SEISMIC};
 	return ($R_SEISMIC);
 }
 
 sub R_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $R_WELL = $Project->{_R_WELL};
 	return ($R_WELL);
 }
@@ -2666,8 +2585,7 @@ sub R_WELL {
 #}
 
 sub SH_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $SH_SEISMIC = $Project->{_SH_SEISMIC};
 	return ($SH_SEISMIC);
 }
@@ -2680,22 +2598,19 @@ sub SH_SEISMIC {
 #}
 
 sub PS_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PS_SEISMIC = $Project->{_PS_SEISMIC};
 	return ($PS_SEISMIC);
 }
 
 sub PS_WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $PS_WELL = $Project->{_PS_WELL};
 	return ($PS_WELL);
 }
 
 sub RAYINVR {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $RAYINVR = $Project->{_RAYINVR};
 
 	# This subroutine returns the value of RAYINVR
@@ -2704,57 +2619,51 @@ sub RAYINVR {
 }
 
 sub SURFACE {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $SURFACE = $Project->{_SURFACE};
 	return ($SURFACE);
 }
 
 sub TEMP_DATA_GEOMAPS {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $TEMP_DATA_GEOMAPS = $Project->{_TEMP_DATA_GEOMAPS};
 	return ($TEMP_DATA_GEOMAPS);
 }
 
 sub TEMP_DATA_SEISMIC {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $TEMP_DATA_SEISMIC = $Project->{_TEMP_DATA_SEISMIC};
 	return ($TEMP_DATA_SEISMIC);
 }
 
 sub TEMP_DATA_SEISMIC_SU {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $TEMP_DATA_SEISMIC_SU = $Project->{_TEMP_DATA_SEISMIC_SU};
 	return ($TEMP_DATA_SEISMIC_SU);
 }
 
 sub TEMP_FAST_TOMO {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $TEMP_FAST_TOMO = $Project->{_TEMP_FAST_TOMO};
 	return ($TEMP_FAST_TOMO);
 }
 
 sub WELL {
-	_basic_dirs();
-	_system_dirs();
+	_set_dirs();
 	my $WELL = $Project->{_WELL};
 	return ($WELL);
 }
 
 =head2 Creates necessary directories
- 
 =cut
 
 sub make_local_dirs {
 
 	# Always create basic types
 	my $PROJECT_HOME = $Project->{_PROJECT_HOME};
-#    print("Project_config, make_local_dirs\n");
-#    print("Project_config, PROJECT_HOME=$PROJECT_HOME\n");
+
+	#    print("Project_config, make_local_dirs\n");
+	#    print("Project_config, PROJECT_HOME=$PROJECT_HOME\n");
 	$manage_dirs_by->make_dir($PROJECT_HOME);
 
 	# BY data type
@@ -2762,13 +2671,14 @@ sub make_local_dirs {
 	my $DATA_GEOMAPS      = $Project->{_DATA_GEOMAPS};
 	my $DATA_GEOMAPS_TEXT = $Project->{_DATA_GEOMAPS_TEXT};
 	my $DATA_GEOMAPS_TOPO = $Project->{_DATA_GEOMAPS_TOPO};
-#	my $DATA_GPR          = $Project->{_DATA_GPR};
 
-#	my $DATA_GPR_SEGY_RAW = $Project->{_DATA_GPR_SEGY_RAW};
-#	my $DATA_GPR_SEGY     = $Project->{_DATA_GPR_SEGY};
-#	my $DATA_GPR_SU       = $Project->{_DATA_GPR_SU};
-#	my $DATA_GPR_SU_RAW   = $Project->{_DATA_GPR_SU_RAW};
-#	my $DATA_GPR_TXT      = $Project->{_DATA_GPR_TXT};
+	#	my $DATA_GPR          = $Project->{_DATA_GPR};
+
+	#	my $DATA_GPR_SEGY_RAW = $Project->{_DATA_GPR_SEGY_RAW};
+	#	my $DATA_GPR_SEGY     = $Project->{_DATA_GPR_SEGY};
+	#	my $DATA_GPR_SU       = $Project->{_DATA_GPR_SU};
+	#	my $DATA_GPR_SU_RAW   = $Project->{_DATA_GPR_SU_RAW};
+	#	my $DATA_GPR_TXT      = $Project->{_DATA_GPR_TXT};
 	my $DATA_SEISMIC_MATLAB = $Project->{_DATA_SEISMIC_MATLAB};
 
 	my $GEOMAPS_IMAGES      = $Project->{_GEOMAPS_IMAGES};
@@ -2784,18 +2694,19 @@ sub make_local_dirs {
 	my $GEOPSY_PROFILES     = $Project->{_GEOPSY_PROFILES};
 	my $GEOPSY_REPORTS      = $Project->{_GEOPSY_REPORTS};
 	my $GEOPSY_TARGETS      = $Project->{_GEOPSY_TARGETS};
-#	my $GPR                 = $Project->{_GPR};
+
+	#	my $GPR                 = $Project->{_GPR};
 
 	my $GMT_GEOMAPS   = $Project->{_GMT_GEOMAPS};
 	my $GRASS_GEOMAPS = $Project->{_GRASS_GEOMAPS};
 	my $GMT_SEISMIC   = $Project->{_GMT_SEISMIC};
 
-#	# CATEGORY gpr and images
-#	my $GIF_GPR  = $Project->{_GIF_GPR};
-#	my $JPEG_GPR = $Project->{_JPEG_GPR};
-#	my $PNG_GPR  = $Project->{_PNG_GPR};
-#	my $PL_GPR   = $Project->{_PL_GPR};
-#	my $PS_GPR   = $Project->{_PS_GPR};
+	#	# CATEGORY gpr and images
+	#	my $GIF_GPR  = $Project->{_GIF_GPR};
+	#	my $JPEG_GPR = $Project->{_JPEG_GPR};
+	#	my $PNG_GPR  = $Project->{_PNG_GPR};
+	#	my $PL_GPR   = $Project->{_PL_GPR};
+	#	my $PS_GPR   = $Project->{_PS_GPR};
 
 	#$manage_dirs_by->make_dir($GEOMAPS_BIN);
 	#$manage_dirs_by->make_dir($GEOMAPS_IMAGES_TIF);
@@ -2822,8 +2733,8 @@ sub make_local_dirs {
 	# sh scripts and seismic
 	my $SH_SEISMIC = $Project->{_SH_SEISMIC};
 
-#	# sh scripts and gpr
-#	my $SH_GPR = $Project->{_SH_GPR};
+	#	# sh scripts and gpr
+	#	my $SH_GPR = $Project->{_SH_GPR};
 
 	#CATEGORY SEISMIC DATA and programming language for R
 	my $R_SEISMIC      = $Project->{_R_SEISMIC};
@@ -2862,11 +2773,11 @@ sub make_local_dirs {
 #		$manage_dirs_by->make_dir($GIF_GPR);
 #		print("manage_dirs_by, make_local_dirs: DATA_GPR_SEGY_RAW =$DATA_GPR_SEGY_RAW\n");
 ##		print("manage_dirs_by, make_local_dirs: GIF_GPR=$GIF_GPR\n");
-#		$manage_dirs_by->make_dir($JPEG_GPR);
-##		print("manage_dirs_by, make_local_dirs: JPEG_GPR=$JPEG_GPR\n");	
-#		$manage_dirs_by->make_dir($PNG_GPR);
-#		$manage_dirs_by->make_dir($PL_GPR);
-#	}
+	#		$manage_dirs_by->make_dir($JPEG_GPR);
+##		print("manage_dirs_by, make_local_dirs: JPEG_GPR=$JPEG_GPR\n");
+	#		$manage_dirs_by->make_dir($PNG_GPR);
+	#		$manage_dirs_by->make_dir($PL_GPR);
+	#	}
 
 	if ( $Project->{_grass_is_selected} ) {
 		$manage_dirs_by->make_dir($GEOMAPS_IMAGES);
@@ -2900,6 +2811,7 @@ sub make_local_dirs {
 
 	# $manage_dirs_by->make_dir($R_WELL)
 	$manage_dirs_by->make_dir($WELL);
+
 	# pl programs and wells
 	# $manage_dirs_by->make_dir($PL_WELL);
 	# matlab programs and wells
@@ -2914,18 +2826,18 @@ sub make_local_dirs {
 	my $DATA_SEISMIC = $Project->{_DATA_SEISMIC};
 
 	# CATEGORY seismics and images
-	my $PS_SEISMIC   = $Project->{_PS_SEISMIC};
-	my $GIF_SEISMIC  = $Project->{_GIF_SEISMIC};
-	my $JPEG_SEISMIC = $Project->{_JPEG_SEISMIC};
-	my $LIBRE_IMPRESS_SEISMIC = $Project->{_LIBRE_IMPRESS_SEISMIC};	
-	my $PNG_SEISMIC  = $Project->{_PNG_SEISMIC};
-	my $PL_SEISMIC   = $Project->{_PL_SEISMIC};
+	my $PS_SEISMIC            = $Project->{_PS_SEISMIC};
+	my $GIF_SEISMIC           = $Project->{_GIF_SEISMIC};
+	my $JPEG_SEISMIC          = $Project->{_JPEG_SEISMIC};
+	my $LIBRE_IMPRESS_SEISMIC = $Project->{_LIBRE_IMPRESS_SEISMIC};
+	my $PNG_SEISMIC           = $Project->{_PNG_SEISMIC};
+	my $PL_SEISMIC            = $Project->{_PL_SEISMIC};
 
 	# $manage_dirs_by->make_dir($GIF_SEISMIC);
 
 	# Always create imag efiles
 	$manage_dirs_by->make_dir($JPEG_SEISMIC);
-	$manage_dirs_by->make_dir($LIBRE_IMPRESS_SEISMIC);	
+	$manage_dirs_by->make_dir($LIBRE_IMPRESS_SEISMIC);
 	$manage_dirs_by->make_dir($PNG_SEISMIC);
 	$manage_dirs_by->make_dir($PS_SEISMIC);
 
@@ -3097,7 +3009,7 @@ sub make_local_dirs {
 
 	# CATEGORY GEOTECH well data
 	# location well
-	my $DATA_GEOTECH_WELL_TXT  = $Project->{_DATA_GEOTECH_WELL_TXT};
+	my $DATA_GEOTECH_WELL_TXT = $Project->{_DATA_GEOTECH_WELL_TXT};
 	$manage_dirs_by->make_dir($DATA_GEOTECH_WELL_TXT);
 
 	#CATEGORY GAMMA data
@@ -3163,17 +3075,13 @@ sub update_configuration_files {
 	my $ACTIVE_CONFIGURATION = $HOME . '/.L_SU/configuration/active';
 	my $inbound              = $ACTIVE_CONFIGURATION . '/Project.config';
 
-	my $readfiles = readfiles->new();
-	my $dirs      = dirs->new();
-	my $control   = control->new();
-
 	my $project = {
 		_names_aref         => '',
 		_values_aref        => '',
 		_check_buttons_aref => '',
 	};
 
-	my ( $names_aref, $values_aref ) = $readfiles->configs($inbound);
+	my ( $names_aref, $values_aref ) = $read->configs($inbound);
 
 	$project->{_names_aref}  = $names_aref;
 	$project->{_values_aref} = $values_aref;

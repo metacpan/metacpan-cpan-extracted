@@ -1,14 +1,17 @@
 bin/rami
 Changes
+compile-notes.txt
 ignore.txt
 lib/SVN/Rami.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+rami.html
 README
 README.md
 README.pod
 script/rami
+SVN-Rami-0.202.tar.gz
 t/00-load.t
 t/01-convert_branches_to_filesystem_paths.t
 t/manifest.t

@@ -4,8 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -24,8 +23,8 @@ ok( defined $widget, 'defined $widget' );
 
 is( scalar $widget->children, 2, '$widget has 2 children' );
 
-identical( $widget->top_child,    $statics[0], '$widget->top_child is $statics[0]' );
-identical( $widget->bottom_child, $statics[1], '$widget->bottom_child is $statics[1]' );
+ref_is( $widget->top_child,    $statics[0], '$widget->top_child is $statics[0]' );
+ref_is( $widget->bottom_child, $statics[1], '$widget->bottom_child is $statics[1]' );
 
 is( $widget->lines, 3, '$widget->lines is 3' );
 is( $widget->cols,  8, '$widget->cols is 8' );

@@ -12,6 +12,7 @@ lib/StreamFinder/Goodpods.pm
 lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/InternetRadio.pm
+lib/StreamFinder/LinkTV.pm
 lib/StreamFinder/Odysee.pm
 lib/StreamFinder/OnlineRadiobox.pm
 lib/StreamFinder/Podbean.pm

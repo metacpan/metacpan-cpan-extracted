@@ -438,6 +438,7 @@ t/live_show_internal_actions_warnings.t
 t/live_stats.t
 t/middleware-stash.t
 t/more-psgi-compat.t
+t/next-action.t
 t/no_test_stash_bug.t
 t/not_utf8_query_bug.t
 t/optional_apache-cgi-rewrite.pl

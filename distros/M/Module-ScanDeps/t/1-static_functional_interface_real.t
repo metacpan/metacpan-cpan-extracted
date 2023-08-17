@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib 't';
-use Test::More qw(no_plan); # no_plan because the number of objects in the dependency tree (and hence the number of tests) can change
+use Test::More tests => 2;
 use Utils;
 
 ##############################################################
@@ -18,15 +18,11 @@ BEGIN { use_ok( 'Module::ScanDeps' ); }
 # majority of files scanned aren't fixed, the checks are
 # necessarily loose.
 ##############################################################
-my $root = $0;
+my $root = "t/data/minimal.pl";
 
-my @deps = qw(
-    Carp.pm   Config.pm	  Exporter.pm 
-    Test/More.pm  strict.pm   vars.pm
-);
+my @deps = qw( Carp.pm Exporter.pm XSLoader.pm DynaLoader.pm
+               strict.pm warnings.pm Data/Dumper.pm );
 
 # Functional i/f
 my $rv = scan_deps($root);
-generic_scandeps_rv_test($rv, [$0], \@deps);
-
-__END__
+check_rv($rv, [$root], \@deps);

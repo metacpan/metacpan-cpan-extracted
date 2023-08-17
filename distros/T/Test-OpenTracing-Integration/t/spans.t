@@ -107,7 +107,7 @@ use OpenTracing::Implementation::Test;
 
     $main_scope->close();
 
-    $tracer->cmp_easy(
+    $tracer->cmp_spans(
         [
             { operation_name => 'root',   level => 0 },
             { operation_name => 'child1', level => 1 },

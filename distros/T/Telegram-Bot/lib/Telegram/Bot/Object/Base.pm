@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Base;
-$Telegram::Bot::Object::Base::VERSION = '0.021';
+$Telegram::Bot::Object::Base::VERSION = '0.023';
 # ABSTRACT: The base class for all Telegram::Bot::Object objects.
 
 
@@ -47,7 +47,6 @@ sub create_from_hash {
       # ignore fields for which we have no value in the hash
       next if (! defined $hash->{$field} );
 
-      # warn "type: $type field $field\n";
       if ($type eq 'scalar') {
         if ($obj->_field_is_array($field)) {
           # simple scalar array ref, so just copy it
@@ -80,8 +79,8 @@ sub create_from_hash {
           }
           $obj->$field(\@sub_array);
         }
-        elsif ($obj->_field_is_array_of_arrays) {
-          die "not yet implemented for scalars";
+        elsif ($obj->_field_is_array_of_arrays($field)) {
+          die "not yet implemented for objects";
         }
         else {
           $obj->$field($type->create_from_hash($hash->{$field}, $brain));
@@ -98,21 +97,50 @@ sub create_from_hash {
 sub as_hashref {
   my $self = shift;
   my $hash = {};
-  # add the simple scalar values
+
   foreach my $type ( keys %{ $self->fields }) {
     my @fields = @{ $self->fields->{$type} };
     foreach my $field (@fields) {
+
+      # add the simple scalar values
       if ($type eq 'scalar') {
-        $hash->{$field} = $self->$field;
+
+        # TODO support scalar arrays?
+        $hash->{$field} = $self->$field
+          if defined $self->$field;
       }
       else {
-        # non array types
-        $hash->{$field} = $self->$field->as_hashref
-          if (ref($self->$field) ne 'ARRAY' && defined $self->$field);
-        # array types
-        $hash->{$field} = [
-          map { $_->as_hashref } @{ $self->$field }
-        ] if (ref($self->$field) eq 'ARRAY');
+        if ($self->_field_is_array($field)) {
+
+          # skip if it's not defined, though I'm not sure if there are cases
+          # where we should be sending an empty array instead?
+          next if (! defined $self->$field);
+
+          $hash->{$field} = [
+            map { $_->as_hashref } @{ $self->$field }
+          ];
+        }
+        elsif ($self->_field_is_array_of_arrays($field)) {
+
+          next if (! defined $self->$field);
+
+          # lets not nest maps
+          my $a_of_a = [];
+          foreach my $outer ( @{ $self->$field } ) {
+            my $inner = [ map { $_->as_hashref } @$outer ];
+            push @$a_of_a, $inner;
+          }
+          $hash->{$field} = $a_of_a;
+        }
+        else {
+
+          # non array, non scalar
+          if (defined $self->$field) {
+            my $hashref = $self->$field->as_hashref;
+            $hash->{$field} = $hashref
+              unless ! $hashref;
+          }
+        }
       }
     }
   }
@@ -133,7 +161,7 @@ Telegram::Bot::Object::Base - The base class for all Telegram::Bot::Object objec
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 DESCRIPTION
 
@@ -166,13 +194,23 @@ other types, as needed.
 
 Return this object as a hashref.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Justin Hawkins <justin@eatmorecode.com>
 
+=item *
+
+James Green <jkg@earth.li>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Justin Hawkins.
+This software is copyright (c) 2023 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

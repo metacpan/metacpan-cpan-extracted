@@ -1,0 +1,21 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'rpm';
+
+share {
+	start_url 'https://ftp.osuosl.org/pub/rpm/releases/rpm-4.17.x/';
+	plugin Download => (
+		filter => qr/^rpm-.*\.tar\.bz2$/,
+		version => qr/^rpm-([0-9\.]+)/,
+		bootstrap_ssl => 1,
+	);
+
+	plugin 'Extract' => 'tar.bz2';
+	plugin 'Build::Make' => 'gmake';
+	plugin 'Build::Autoconf';
+	build [
+		'%{configure}',
+		'%{make}',
+		'%{make} install',
+	];
+};

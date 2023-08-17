@@ -1,5 +1,50 @@
 Revision history for POSIX::2008.
 
+0.20  2023-07-14
+  - t/02_fs.t: Added work-around for bugs in CORE::stat().
+  - Pimped abs().
+  - Fixed nice() error handling.
+  - Added PRIO_*, FE_*, RWF_*, SEEK_DATA and SEEK_HOLE constants.
+  - Added some non-standard open() flags.
+  - Added preadv2(), pwritev2().
+  - Added remquo().
+  - Added feclearexcept(), feraiseexcept(), fetestexcept().
+  - Added isgreaterequal(), isless(), islessequal(), islessgreater(),
+    isunordered().
+  - Added fenv_h export tag.
+  - POD improvements.
+
+0.19  2023-07-07
+  - Updated ppport.h to version 3.71
+  - Replaced av_len()+1 by av_count() in (p)readv() and (p)writev().
+  - Removed "extern int getdate_err" because it's already in time.h.
+  - Try to get a green light from dubious cpantesters reports for old Perls.
+  - Added LICENSE to WriteMakefile().
+  - Added stat_h export tag and some constants.
+  - Added exp(), isascii(), rmdir(), setsid(), sin(), ttyname().
+  - Made casin(), isalnum(), log() exportable.
+  - chdir(), chmod(), chown(), truncate() and stat() now also accept
+    a file handle or a file descriptor.
+  - Deprecated atol(), atoll(), ldiv(), fchdir(), fchmod(), fchown(), ftruncate().
+  - Pimped atoi(), div(), lround().
+  - Figure out what's available by compiling some C code.
+  - Added some tests.
+  - Small POD fixes.
+0.18  2023-06-01
+  - Updated ppport.h to version 3.68
+  - Fixed size checking in readlink().
+  - Fixed error handling of psx_fileno():
+    Check for -1 instead of < 0 to make AT_FDCWD work (which is negative).
+  - Disabled -Wdeprecated-declarations for sig*().
+  - Makefile.PL now creates const-c.inc and const-xs.inc dynamically.
+  - openat() can now optionally return a handle when AT_FDCWD is used.
+  - Added realpath().
+  - Added openat2() (non-POSIX).
+  - POD improvements.
+0.17  2021-03-09
+  - Updated ppport.h to version 3.62 (closes RT#127900)
+  - pread()/pwrite(): Use %lld in warn() format string (closes RT#127902)
+  - Some minor cosmetics.
 0.16  2017-09-15
   - Added timer_create(), timer_delete(), timer_gettime(), timer_getoverrun(), timer_settime().
   - Added close() (closes RT#123054).

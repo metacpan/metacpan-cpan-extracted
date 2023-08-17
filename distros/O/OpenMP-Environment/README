@@ -1,9 +1,9 @@
 This archive contains the distribution OpenMP-Environment,
-version 1.1.3:
+version 1.2.0:
 
   Perl extension managing OpenMP variables in C<%ENV> within a script.
 
-This software is copyright (c) 2021 by oodler577.
+This software is copyright (c) 2023 by oodler577.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

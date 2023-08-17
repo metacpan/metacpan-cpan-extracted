@@ -11,7 +11,7 @@ use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.2';
 
 
 my @METHODS = qw/ get head post put delete connect options trace patch /;
@@ -54,7 +54,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.2
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,12 @@ The request method is C<PATCH>.
 
 The request method is not recognized.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 L<Catalyst::Request>
@@ -156,7 +162,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Robert Rothenberg.
+This software is Copyright (c) 2019-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

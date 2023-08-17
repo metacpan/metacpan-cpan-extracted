@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -156,9 +156,6 @@ sub sign {
         # Get the XML note to sign base on the ID
         my $xml = $self->_get_xml_to_sign($signid);
 
-        # Set the namespace but do not apply it to the XML
-        $xml->setNamespace("http://www.w3.org/2000/09/xmldsig#", "dsig", 0);
-
         # Canonicalize the XML to http://www.w3.org/2001/10/xml-exc-c14n#
         # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
         #    <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
@@ -186,6 +183,7 @@ sub sign {
 
         # Add the Signature to the xml being signed
         $xml->appendWellBalancedChunk($signature_xml, 'UTF-8');
+        $xml->setNamespace("http://www.w3.org/2000/09/xmldsig#", "dsig", 0);
 
         # Canonicalize the SignedInfo to http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
         # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
@@ -237,7 +235,7 @@ sub sign {
 sub verify {
     my $self = shift;
     delete $self->{signer_cert};
-    my ($xml) = @_;
+    my $xml = shift;
 
     my $dom = XML::LibXML->load_xml( string => $xml );
 
@@ -248,6 +246,16 @@ sub verify {
     $self->{ parser }->registerNs('ecdsa', 'http://www.w3.org/2001/04/xmldsig-more#');
 
     my $signature_nodeset = $self->{ parser }->findnodes('//dsig:Signature');
+
+    my $key_to_verify;
+    if ($self->{id_attr}) {
+        if ($self->{ns}) {
+            foreach (keys %{$self->{ns}}) {
+                $self->{ parser }->registerNs($_, $self->{ns}{$_});
+            }
+        }
+        $key_to_verify = $self->_get_ids_to_sign();
+    }
 
     my $numsigs = $signature_nodeset->size();
     print ("NodeSet Size: $numsigs\n") if $DEBUG;
@@ -263,7 +271,12 @@ sub verify {
             'dsig:SignedInfo/dsig:Reference/@URI', $signature_node);
         $reference =~ s/#//g;
 
-        print ("   Reference URI: $reference\n") if $DEBUG;
+        print("   Reference URI: $reference\n") if $DEBUG;
+
+        if ($key_to_verify && $key_to_verify ne $reference) {
+            print ("Skipping reference URI: $reference, does not match required option\n") if $DEBUG;
+            next;
+        }
 
         # The reference ID must point to something in the document
         # if not disregard it and look for another signature
@@ -452,19 +465,13 @@ sub _get_ids_to_sign {
 
     }
 
-    my @id = $self->{parser}->findnodes('//@ID');
-    my @ids;
-    foreach (@id) {
-        my $i = $_;
-        $_ =~ m/^.*\"(.*)\".*$/;
-        $i = $1;
-        #//*[@ID='identifier_1']
-        die "You cannot sign an XML document without identifying the element to sign with an ID attribute" unless $i;
-        unshift @ids, $i;
-    }
-    return @ids;
-
-
+    my $nodes = $self->{parser}->findnodes('//@ID');
+    return $nodes->reverse->map(
+        sub {
+            my $val = $_->getValue;
+            defined($val) && length($val) && $val;
+        }
+    );
 }
 
 ##
@@ -1694,7 +1701,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.63
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -2062,8 +2069,7 @@ This software is copyright (c) 2023 by Byrne Reese, Chris Andrews and Others; in
             2016       Jeff Fearn
             2017       Mike Wisener, xmikew
             2019-2021  Timothy Legge
-            2022       Timothy Legge, Wesley Schwengle
-            2023       Timothy Legge
+            2022-2023  Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Metrics::Any '$metrics', strict => 1;
 
@@ -17,12 +16,12 @@ ok( defined $metrics, '$metrics global is defined' );
 
    $metrics->make_counter( c => );
 
-   ok( exception { $metrics->make_counter( c => ) },
+   ok( dies { $metrics->make_counter( c => ) },
       'Fails duplicate registration of counter' );
 
-   ok( !exception { $metrics->inc_counter( c => ) },
+   ok( !dies { $metrics->inc_counter( c => ) },
       'Can report to registered counter' );
-   ok( exception { $metrics->inc_counter( c2 => ) },
+   ok( dies { $metrics->inc_counter( c2 => ) },
       'Fails attempt to report to unregistered counter' );
 }
 
@@ -33,12 +32,12 @@ ok( defined $metrics, '$metrics global is defined' );
 
    $metrics->make_distribution( d => );
 
-   ok( exception { $metrics->make_distribution( d => ) },
+   ok( dies { $metrics->make_distribution( d => ) },
       'Fails registration of distribution' );
 
-   ok( !exception { $metrics->report_distribution( d => 5 ) },
+   ok( !dies { $metrics->report_distribution( d => 5 ) },
       'Can report to registered distribution' );
-   ok( exception { $metrics->report_distribution( d2 => 5 ) },
+   ok( dies { $metrics->report_distribution( d2 => 5 ) },
       'Fails attempt to report to unregistered distribution' );
 }
 
@@ -49,12 +48,12 @@ ok( defined $metrics, '$metrics global is defined' );
 
    $metrics->make_gauge( g => );
 
-   ok( exception { $metrics->make_gauge( g => ) },
+   ok( dies { $metrics->make_gauge( g => ) },
       'Fails duplicate registration of gauge' );
 
-   ok( !exception { $metrics->inc_gauge( g => ) },
+   ok( !dies { $metrics->inc_gauge( g => ) },
       'Can report to registered gauge' );
-   ok( exception { $metrics->inc_gauge( g2 => ) },
+   ok( dies { $metrics->inc_gauge( g2 => ) },
       'Fails attempt to report to unregistered gauge' );
 }
 
@@ -65,12 +64,12 @@ ok( defined $metrics, '$metrics global is defined' );
 
    $metrics->make_timer( t => );
 
-   ok( exception { $metrics->make_timer( t => ) },
+   ok( dies { $metrics->make_timer( t => ) },
       'Fails duplicate registration of timer' );
 
-   ok( !exception { $metrics->report_timer( t => ) },
+   ok( !dies { $metrics->report_timer( t => ) },
       'Can report to registered timer' );
-   ok( exception { $metrics->report_timer( t2 => ) },
+   ok( dies { $metrics->report_timer( t2 => ) },
       'Fails attempt to report to unregistered timer' );
 }
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::In;
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
@@ -32,7 +32,14 @@ ok(not("F" in:eq @AtoE), 'F is not in @AtoE');
 sub XtoZ { return "X" .. "Z" }
 ok("Y" in:eq XtoZ(), 'Y is in XtoZ()');
 
-# This is a stringy match
+# unimport
+{
+   no Syntax::Operator::In;
+
+   sub in { return "normal function" }
+
+   is( in, "normal function", 'in() parses as a normal function call' );
+}
 
 ok(!$warnings, 'no warnings');
 

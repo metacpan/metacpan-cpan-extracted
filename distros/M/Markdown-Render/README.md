@@ -18,7 +18,7 @@
 * [Rendering](#rendering)
 * [Credits](#credits)
 
-__Updated 2023-05-31__ by Rob Lauer <rlauer6@comcast.net>
+__Updated 2023-08-14__ by Rob Lauer <rlauer6@comcast.net>
 
 # README
 
@@ -29,7 +29,7 @@ dependencies that you might find useful.  See [Usage](#usage) for more
 information.
 
 The script will render your markdown as HTML using either the [GitHub
-API](https://docs.github.com/en/rest/markdown) or the Perl module [Text::Markdown](https://metacpan.org/pod/Text::Markdown)
+API](https://docs.github.com/en/rest/markdown) or the Perl module [Text::Markdown::Discount](https://metacpan.org/pod/Text::Markdown::Discount)
 
 A default stylesheet will be applied but you can provide your own
 style sheet as well.

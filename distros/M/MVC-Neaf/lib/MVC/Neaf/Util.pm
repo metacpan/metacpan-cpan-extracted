@@ -2,7 +2,7 @@ package MVC::Neaf::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -25,19 +25,54 @@ use Scalar::Util qw( openhandle );
 
 use parent qw(Exporter);
 our @EXPORT_OK = qw(
-    canonize_path check_path path_prefixes
-    run_all run_all_nodie
-    JSON encode_json decode_json encode_b64 decode_b64
-    extra_missing make_getters maybe_list http_date rex
-    supported_methods
-    data_fh
     bare_html_escape
+    caller_info
+    canonize_path
+    check_path
+    data_fh
+    decode_json
+    encode_b64 decode_b64
+    encode_json
+    extra_missing
+    http_date
+    JSON
+    make_getters
+    maybe_list
+    path_prefixes
+    rex
+    run_all
+    run_all_nodie
+    supported_methods
 );
 our @CARP_NOT;
 
 # use JSON::MaybeXS; # not now, see JSON() below
 
 # Alphabetic order, please
+
+=head2 caller_info()
+
+Returns first caller(n) that is not inside MVC::Neaf itself.
+
+This is implemented inside L<Carp::shortmess>
+but we can't rely on Carp's internals.
+
+=cut
+
+sub caller_info {
+    my $level = 0;
+    my @caller;
+    {
+        # code stolen from Carp.
+        # it's just a while(1) with fancy next/last conditionals.
+        @caller = caller($level++);
+        last unless defined $caller[0];
+        redo if $caller[0] =~ /^MVC::Neaf/;
+        redo if $caller[0]->isa('MVC::Neaf::Util::Base');
+    };
+
+    return wantarray ? @caller : \@caller;
+};
 
 =head2 canonize_path( path, want_slash )
 
@@ -358,6 +393,7 @@ sub data_fh {
 
     my $fh = do {
         no strict 'refs'; ## no critic
+        no warnings 'once'; ## no critic
         \*{ $caller[0].'::DATA' };
     };
     return unless openhandle $fh and !eof $fh;
@@ -390,7 +426,7 @@ sub bare_html_escape {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

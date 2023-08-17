@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.15
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -43,12 +43,9 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 =cut
 
 package Pherkin::Extension::Weasel;
-
+$Pherkin::Extension::Weasel::VERSION = '0.17';
 use strict;
 use warnings;
-
-our $VERSION = '0.15';
-
 
 use Digest::MD5 qw(md5_hex);
 use File::Find::Rule;
@@ -57,7 +54,7 @@ use List::Util qw(any);
 use Module::Runtime qw(use_module);
 use Template;
 use Test::BDD::Cucumber::Extension;
-use YAML::Syck qw(Load);
+use YAML qw(Load);
 
 use Weasel;
 use Weasel::Session;
@@ -77,6 +74,8 @@ has index_template => (is => 'ro', isa => 'Str',
 
 has logging_dir => (is => 'ro', isa => 'Maybe[Str]');
 
+has timestamps => (is => 'ro', isa => 'Bool', default => 0);
+
 has templates_dir => (is => 'ro', isa => 'Str',
                       default => sub {
                           my $dist = __PACKAGE__;
@@ -86,6 +85,9 @@ has templates_dir => (is => 'ro', isa => 'Str',
 
 our $tmp_disable_logging = 0;
 
+use Time::HiRes qw(time);
+use POSIX qw(strftime);
+
 sub _weasel_log_hook {
     my $self = shift;
     my ($event, $log_item, $something) = @_;
@@ -93,7 +95,14 @@ sub _weasel_log_hook {
 
     my $log = $self->_log;
     if ($log and not $tmp_disable_logging) {
+        my $timestamp = '';
+        if ( $self->timestamps ) {
+            my $t = time;
+            $timestamp = strftime "%H:%M:%S", localtime $t;
+            $timestamp .= sprintf ".%06d ", ($t-int($t))*1000000; # without rounding
+        }
         push @{$log->{step}->{logs}}, {
+            timestamp => $timestamp,
             text => $log_text
         };
     }
@@ -140,7 +149,7 @@ sub _update_index {
     my $vars = {
         features => \@yaml_snippets,
         program => {
-            version => $VERSION,
+            version => do { no strict 'refs'; ${__PACKAGE__ . '::VERSION'} },
         },
     };
     my $engine = $self->_log->{template};
@@ -279,8 +288,10 @@ sub post_feature {
 sub pre_scenario {
     my ($self, $scenario, $feature_stash, $stash) = @_;
 
-    if (grep { $_ eq 'weasel'} @{$scenario->tags}) {
-        if (any { $_ eq 'weasel-one-session' } @{$scenario->tags}
+    # Test::BDD::Cucumber versions <= 0.85 tags don't start with '@'
+    # later ones do...
+    if (grep { $_ =~ m/^\@?weasel$/ } @{$scenario->tags}) {
+        if (any { $_ =~ m/^\@?weasel-one-session$/ } @{$scenario->tags}
             and $feature_stash->{ext_wsl}) {
             $stash->{ext_wsl} = $feature_stash->{ext_wsl};
         }
@@ -288,7 +299,7 @@ sub pre_scenario {
             $stash->{ext_wsl} = $self->_weasel->session;
             $self->_weasel->session->start;
         }
-        if (any { $_ eq 'weasel-one-session' } @{$scenario->tags}) {
+        if (any { $_ =~ m/^\@?weasel-one-session$/ } @{$scenario->tags}) {
             $feature_stash->{ext_wsl} = $stash->{ext_wsl};
         }
 
@@ -327,7 +338,7 @@ sub post_scenario {
     }
 
     $stash->{ext_wsl}->stop
-        unless any { $_ eq 'weasel-one-session' } @{$scenario->tags};
+        unless any { $_ =~ m/^\@?weasel-one-session$/ } @{$scenario->tags};
 }
 
 sub pre_step {
@@ -491,7 +502,7 @@ Bugs can be filed in the GitHub issue tracker for the Weasel project:
 =head1 SOURCE
 
 The source code repository for Weasel is at
- https://github.com/perl-weasel/weasel-driver-selenium2
+ L<https://github.com/perl-weasel/weasel-driver-selenium2>
 
 =head1 SUPPORT
 
@@ -500,7 +511,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 COPYRIGHT
 
- (C) 2016-2020  Erik Huelsmann
+ (C) 2016-2023  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

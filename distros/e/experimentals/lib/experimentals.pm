@@ -1,5 +1,5 @@
 package experimentals;
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.010;
 use strict;
@@ -36,6 +36,9 @@ sub _report_experimentals {
 
 # Handle 'use experimentals'...
 sub import {
+    # Handle deprecation of smartmatching in Perl 5.38..5.40
+    warnings->unimport('deprecated::smartmatch')
+        if $] >= 5.038 && $] < 5.042;
 
     # Always enable all available features...
     feature->import(keys %FEATURES);
@@ -87,7 +90,7 @@ experimentals - Experimental features made even easier
 
 =head1 VERSION
 
-This document describes experimentals version 0.019
+This document describes experimentals version 0.020
 
 
 =head1 SYNOPSIS

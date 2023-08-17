@@ -2,7 +2,7 @@ package Archive::Dir;
 use strict;
 use Carp qw(croak);
 use Path::Class;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -70,8 +70,8 @@ the file system. It completely relies on L<Path::Class> to handle this issue.
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/archive-merged>.
+The public repository of this module is
+L<https://github.com/Corion/archive-merged>.
 
 =head1 SUPPORT
 
@@ -90,7 +90,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

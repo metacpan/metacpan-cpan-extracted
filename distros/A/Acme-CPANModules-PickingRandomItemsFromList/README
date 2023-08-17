@@ -1,34 +1,68 @@
 NAME
-    Acme::CPANModules::PickingRandomItemsFromList - Picking random items
-    from a list
+    Acme::CPANModules::PickingRandomItemsFromList - List of modules to pick
+    random items from a list
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.005 of
     Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution
-    Acme-CPANModules-PickingRandomItemsFromList), released on 2021-09-18.
+    Acme-CPANModules-PickingRandomItemsFromList), released on 2023-06-20.
 
 DESCRIPTION
     If you are picking random lines from a file, there's a separate
     CPANModules list for it: Acme::CPANModules::PickingRandomLinesFromFile.
 
+    1. Picking a single item, with equal probability
+
+    If you only want to pick a single item, with equal probability, you can
+    simply get a random element from an array using the $ary[rand @ary]
+    idiom.
+
+    2. Picking multiple items, with equal probability
+
+    2a. Picking multiple items, with equal probability, duplicates allowed
+
     If you want to allow duplicates, you can repeatedly pick random elements
     from an array using the $ary[rand @ary] idiom.
 
-    If you do not want to allow duplicates:
+    2b. Picking multiple items, with equal probability, duplicates not
+    allowed
+
+    If you do not want to allow duplicates, there are several alternatives:
 
     List::Util (from version 1.54, 2020-02-02) provides "sample()". If you
     use an older version, you can use "shuffle()" then get as many number of
-    samples as you need using slice (@shuffled[0..$num_wanted-1]) or
-    "head()".
+    samples as you need from the first elements of the array using slice
+    (@shuffled[0..$num_wanted-1]) or "head()".
 
-    List::MoreUtils provides "samples()".
+    List::MoreUtils also provides "samples()".
 
     Keywords: sample, sampling.
 
-ACME::MODULES ENTRIES
-    *   List::Util
+    3. Picking item(s), with weights
 
-    *   List::MoreUtils
+    If you want to assign different weights to different items (so one item
+    might be picked more likely), you can use one of these modules:
+
+    Array::Sample::WeightedRandom offers sampling without replacement (not
+    allowing duplicates) or with replacement (allowing duplicates).
+
+    Random::Skew.
+
+    Data::Random::Weighted currently can only pick a single item.
+
+ACME::CPANMODULES ENTRIES
+    List::Util
+        Author: PEVANS <https://metacpan.org/author/PEVANS>
+
+    List::MoreUtils
+        Author: REHSACK <https://metacpan.org/author/REHSACK>
+
+    Array::Sample::WeightedRandom
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Random::Skew
+    Data::Random::Weighted
+        Author: GEISTBERG <https://metacpan.org/author/GEISTBERG>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -77,6 +111,8 @@ SEE ALSO
     Bencher::Scenario::SamplingFromList for the benchmark, which we will
     probably include in the future.
 
+    Related lists: Acme::CPANModules::Sampling
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -95,13 +131,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

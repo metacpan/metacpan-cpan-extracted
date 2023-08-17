@@ -9,8 +9,9 @@ use Carp;
 use Contextual::Return qw< PUREBOOL BOOL SCALAR METHOD VOID LIST RETOBJ >;
 use Scalar::Util qw< openhandle looks_like_number >;
 use Symbol       qw< qualify_to_ref >;
+use match::smart qw< match >;
 
-our $VERSION = '0.004015';
+our $VERSION = '0.005001';
 
 my $fake_input;     # Flag that we're faking input from the source
 
@@ -174,60 +175,79 @@ sub prompt {
 
     # Handle menu structures...
     my $input;
-    REPROMPT_YESNO:
-    if ($opt_ref->{-menu}) {
-        # Remember top of (possibly nested) menu...
-        my @menu = ( $opt_ref->{-menu} );
-        my $top_prompt = $opt_ref->{-prompt};
-        $top_prompt =~ s{$MENU_MK}{$opt_ref->{-menu}{prompt}}xms;
-        $menu[-1]{prompt} = $top_prompt;
+    eval {
+        REPROMPT_YESNO:
+        if ($opt_ref->{-menu}) {
+            # Remember top of (possibly nested) menu...
+            my @menu = ( $opt_ref->{-menu} );
+            my $top_prompt = $opt_ref->{-prompt};
+            $top_prompt =~ s{$MENU_MK}{$opt_ref->{-menu}{prompt}}xms;
+            $menu[-1]{prompt} = $top_prompt;
 
-        MENU:
-        while (1) {
-            # Track the current level...
-            $opt_ref->{-menu_curr_level} = $menu[-1]{value_for};
+            MENU:
+            while (1) {
+                # Track the current level...
+                $opt_ref->{-menu_curr_level} = $menu[-1]{value_for};
 
-            # Show menu and retreive choice...
-            $outputter_ref->(-style => $menu[-1]{prompt});
-            my $tag = $inputter_ref->($menu[-1]{constraint});
+                # Show menu and retreive choice...
+                $outputter_ref->(-style => $menu[-1]{prompt});
+                my $tag = $inputter_ref->($menu[-1]{constraint});
 
-            # Handle a failure by exiting the loop...
-            last MENU if !defined $tag;
-            $tag =~ s{\A\s*(\S*).*}{$1}xms;
+                # Handle a failure by exiting the loop...
+                last MENU if !defined $tag;
+                $tag =~ s{\A\s*(\S*).*}{$1}xms;
 
-            # Handle <ESC> by moving up menu stack...
-            if ($tag eq $MENU_ESC) {
-                $input = undef;
-                last MENU if @menu <= 1;
-                pop @menu;
-                next MENU;
+                # Handle <ESC> by moving up menu stack...
+                if ($tag eq $MENU_ESC) {
+                    $input = undef;
+                    last MENU if @menu <= 1;
+                    pop @menu;
+                    next MENU;
+                }
+
+                # Handle defaults by selecting and ejecting...
+                if ($tag =~ /\A\R?\Z/ && exists $opt_ref->{-def}) {
+                    $input = $tag;
+                    last MENU;
+                }
+
+                # Otherwise, retrieve value for selected tag and exit if not a nested menu...
+                $input = $menu[-1]{value_for}{$tag};
+                last MENU if !ref $input;
+
+                # Otherwise, go down the menu one level...
+                push @menu,
+                    _build_menu($input,
+                                "Select from $menu[-1]{key_for}{$tag}: ",
+                                $opt_ref->{-number} || $opt_ref->{-integer}
+                    );
+                $menu[-1]{prompt} .= '> ';
             }
-
-            # Handle defaults by selecting and ejecting...
-            if ($tag =~ /\A\R?\Z/ && exists $opt_ref->{-def}) {
-                $input = $tag;
-                last MENU;
-            }
-
-            # Otherwise, retrieve value for selected tag and exit if not a nested menu...
-            $input = $menu[-1]{value_for}{$tag};
-            last MENU if !ref $input;
-
-            # Otherwise, go down the menu one level...
-            push @menu,
-                _build_menu($input,
-                             "Select from $menu[-1]{key_for}{$tag}: ",
-                             $opt_ref->{-number} || $opt_ref->{-integer}
-                );
-            $menu[-1]{prompt} .= '> ';
         }
-    }
 
-    # Otherwise, simply ask and ye shall receive...
-    else {
-        $outputter_ref->(-style => $opt_ref->{-prompt});
-        $input = $inputter_ref->();
+        # Otherwise, simply ask and ye shall receive...
+        else {
+                $outputter_ref->(-style => $opt_ref->{-prompt});
+                $input = $inputter_ref->();
+        }
+        1;
     }
+    // do {
+        # Supply the missing newline if requested...
+        $outputter_ref->(-echostyle => $opt_ref->{-return}(q{}))
+            if exists $opt_ref->{-return};
+
+        # Rethrow any other exception...
+        my $error = $@;
+        die $@ unless ref($error) eq 'IO::Prompter::Cancellation';
+
+        # Return failure on cancellation...
+        return if $opt_ref->{-verbatim};
+        return PUREBOOL { 0 }
+                   BOOL { 0 }
+                 SCALAR { ${$error}  }
+                 METHOD { defaulted => sub { 0 }, timedout  => sub { 0 } };
+    };
 
     # Provide default value if available and necessary...
     my $defaulted = 0;
@@ -242,7 +262,7 @@ sub prompt {
     }
 
     # Check for a value indicating failure...
-    if (exists $opt_ref->{-fail} && $input ~~ $opt_ref->{-fail}) {
+    if (exists $opt_ref->{-fail}   && match($input, $opt_ref->{-fail})) {
         $input = undef;
     }
 
@@ -408,7 +428,7 @@ sub _standardize_constraint {
     my @constraint_names = split /\s+/, $constraint_spec;
     my @constraints =
         map { $STD_CONSTRAINT{$_}
-              // _opt_err('invalid',-$option_type,'"pos", "neg", "even", etc.')
+              // _opt_err('invalid',-$option_type,'"pos", "neg", "even", etc.', qq{"$_"})
             } @constraint_names;
 
     return (
@@ -446,348 +466,368 @@ sub _decode_args {
             );
         }
         else {
+            state $already_wiped;
             my $redo;
-            given ($arg) {
-                # The sound of one hand clapping...
-                when (/^-_/) {
-                    $redo = 1;
-                }
-
-                # Non-chomping option...
-                when (/^-line$/) {
-                    $option{-line}++;
-                }
-                when (/^-l/) {
-                    $option{-line}++;
-                    $redo = 1;
-                }
-
-                # The -yesno variants...
-                when (/^-YesNo$/) {
-                    my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
-                    $option{-yesno} = {
-                        must => { '[YN]' => qr{\A \s* [YN] }xms },
-                        count  => $count,
-                    };
-                }
-                when (/^-YN/) {
-                    $option{-yesno} = {
-                        must => { '[YN]' => qr{\A \s* [YN] }xms },
-                        count  => 1,
-                    };
-                    $redo = 2;
-                }
-                when (/^-yesno$/) {
-                    my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
-                    $option{-yesno} = {
-                        must => { '[yn]' => qr{\A \s* [YN] }ixms },
-                        count  => $count,
-                    };
-                }
-                when (/^-yn/) {
-                    $option{-yesno} = {
-                        must => { '[yn]' => qr{\A \s* [YN] }ixms },
-                        count  => 1,
-                    };
-                    $redo = 2;
-                }
-                when (/^-Yes$/) {
-                    my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
-                    $option{-yesno} = {
-                        must => { '[Y for yes]' => qr{\A \s* (?: [^y] | \Z) }xms },
-                        count  => $count,
-                    };
-                }
-                when (/^-Y/) {
-                    $option{-yesno} = {
-                        must => { '[Y for yes]' => qr{\A \s* (?: [^y] | \Z) }xms },
-                        count  => 1,
-                    };
-                    $redo = 1;
-                }
-                when (/^-yes$/) {
-                    my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
-                    $option{-yesno} = { count  => $count };
-                }
-                when (/^-y/) {
-                    $option{-yesno} = { count  => 1 };
-                    $redo = 1;
-                }
-
-                # Load @ARGV...
-                when (/^-argv$/) {
-                    $option{-argv} = 1;
-                }
-
-                when (/^-a/) {
-                    $option{-argv} = 1;
-                    $redo = 1;
-                }
-
-                # Clear screen before prompt...
-                state $already_wiped;
-                when (/^-wipe(first)?$/) {
-                    $option{-wipe} = $1 ? !$already_wiped : 1;
-                    $already_wiped = 1;
-                }
-                when (/^-w/) {
-                    $option{-wipe} = 1;
-                    $already_wiped = 1;
-                    $redo = 1;
-                }
-
-                # Specify a failure condition...
-                when (/^-fail$/) {
-                    _opt_err('Missing', -fail, 'failure condition') if !@_;
-                    $option{-fail} = shift @_;
-                }
-
-                # Specify a file request...
-                when (/^-f(?:ilenames?)?$/) {
-                    $option{-must}{'0: be an existing file'} = sub { -e $_[0] };
-                    $option{-must}{'1: be readable'}         = sub { -r $_[0] };
-                    $option{-complete}                       = 'filenames';
-                }
-
-                # Specify prompt echoing colour/style...
-                when (/^-style/) {
-                    _opt_err('Missing -style specification') if !@_;
-                    my $style = _decode_style(shift @_);
-                    $option{-style} = _gen_wrapper_for($style);
-                }
-
-                # Specify input colour/style...
-                when (/^-echostyle/) {
-                    _opt_err('Missing -echostyle specification') if !@_;
-                    my $style = _decode_echostyle(shift @_);
-                    $option{-echostyle} = _gen_wrapper_for($style);
-                }
-
-
-                # Specify input and output filehandles...
-                when (/^-stdio$/) { $option{-in}  = *STDIN;
-                                   $option{-out} = *STDOUT;
-                                  }
-                when (/^-in$/)    { $option{-in}  = shift @_; }
-                when (/^-out$/)   { $option{-out} = shift @_; }
-
-                # Specify integer and number return value...
-                when (/^-integer$/)       {
-                    $option{-integer} = 1;
-                    if (@_ && (ref $_[0] || $_[0] =~ $STD_CONSTRAINT)) {
-                        my ($errmsg, $constraint)
-                            = _standardize_constraint('integer',shift);
-                        $option{-must}{$errmsg} = $constraint;
-                    }
-                }
-                when (/^-num(?:ber)?$/)   {
-                    $option{-number}  = 1;
-                    if (@_ && (ref $_[0] || $_[0] =~ $STD_CONSTRAINT)) {
-                        my ($errmsg, $constraint)
-                            = _standardize_constraint('number',shift);
-                        $option{-must}{$errmsg} = $constraint;
-                    }
-                }
-                when (/^-i/)              { $option{-integer} = 1; $redo = 1; }
-                when (/^-n/)              { $option{-number}  = 1; $redo = 1; }
-
-                # Specify void context is okay...
-                when (/^-void$/)          { $option{-void} = 1;               }
-
-                # Specify verbatim return value...
-                when (/^-verb(?:atim)?$/) { $option{-verbatim} = 1;           }
-                when (/^-v/)              { $option{-verbatim} = 1; $redo = 1;}
-
-                # Specify single character return...
-                when (/^-sing(?:le)?$/)   { $option{-single} = 1;             }
-                when (/^-[s1]/)           { $option{-single} = 1; $redo = 1;  }
-
-                # Specify a default...
-                when (/^-DEF(?:AULT)?/) {
-                    _opt_err('Missing', '-DEFAULT', 'string') if !@_;
-                    $option{-def} = shift @_;
-                    $option{-def_nocheck} = 1;
-                    _opt_err('Invalid', '-DEFAULT', 'string')
-                        if ref($option{-def});
-                }
-                when (/^-def(?:ault)?/) {
-                    _opt_err('Missing', '-default', 'string') if !@_;
-                    $option{-def} = shift @_;
-                    _opt_err('Invalid', '-default', 'string')
-                        if ref($option{-def});
-                }
-                when (/^-d(.+)$/)   { $option{-def} = $1; }
-
-                # Specify a timeout...
-                when (/^-t(\d+)/)   {
-                    $option{-timeout} = $1;
-                    $arg =~ s{\d+}{}xms;
-                    $redo = 1;
-                }
-                when (/^-timeout$/) {
-                    _opt_err('Missing', -timeout, 'number of seconds') if !@_;
-                    $option{-timeout} = shift @_;
-                    _opt_err('Invalid', -timeout,'number of seconds')
-                        if !looks_like_number($option{-timeout});
-                }
-
-                # Specify a set of input constraints...
-                when (/^-g.*/) {
-                    _opt_err('Missing', -guarantee, 'input restriction') if !@_;
-                    my $restriction = shift @_;
-                    my $restriction_type = ref $restriction;
-
-                    $option{-must}{'be a valid input'} = $restriction;
-
-                    # Hashes restrict input to their keys...
-                    if ($restriction_type eq 'HASH') {
-                        $restriction_type = 'ARRAY';
-                        $restriction = [ keys %{$restriction} ];
-                    }
-                    # Arrays of strings matched (and completed) char-by-char...
-                    if ($restriction_type eq 'ARRAY') {
-                        my @restrictions = @{$restriction};
-                        $option{-guarantee}
-                            = '\A(?:'
-                            . join('|', map {
-                                  join(q{}, map { "(?:\Q$_\E" } split(q{}, $_))
-                                . ')?' x length($_)
-                              } @restrictions)
-                            . ')\z'
-                            ;
-                        if ($option{-complete} == $DEFAULT_COMPLETER) {
-                            $option{-complete} = \@restrictions;
-                        }
-                    }
-                    # Regexes matched as-is...
-                    elsif ($restriction_type eq 'Regexp') {
-                        $option{-guarantee} = $restriction;
-                    }
-                    else {
-                        _opt_err( 'Invalid', -guarantee,
-                                  'array or hash reference, or regex'
-                        );
-                    }
-                }
-
-                # Specify a set of key letters...
-                when ('-keyletters_implement') {
-                    # Extract all keys and default keys...
-                    my @keys  = ($option{-prompt} =~ m{$KL_EXTRACT}gxms);
-
-                    # Convert default to a -default...
-                    my @defaults = ($option{-prompt} =~ m{$KL_DEF_EXTRACT}gxms);
-                    if (@defaults > 1) {
-                        _warn( ambiguous =>
-                            "prompt(): -keyletters found too many defaults"
-                        )
-                    }
-                    elsif (@defaults) {
-                        push @_, -default => $defaults[0];
-                    }
-
-                    # Convert key letters to a -guarantee...
-                    @keys = ( map({uc} @keys), map({lc} @keys) );
-                    if (@defaults == 1) {
-                        push @keys, q{};
-                    }
-                    push @_, -guarantee => \@keys;
-
-                }
-                when (/^-key(?:let(?:ter)?)(?:s)?/) {
-                    push @_, '-keyletters_implement';
-                }
-                when (/^-k/) {
-                    push @_, '-keyletters_implement';
-                    $redo = 1;
-                }
-
-                # Specify a set of return constraints...
-                when (/^-must$/) {
-                    _opt_err('Missing', -must, 'constraint hash') if !@_;
-                    my $must = shift @_;
-                    _opt_err('Invalid', -must, 'hash reference')
-                        if ref($must) ne 'HASH';
-                    for my $errmsg (keys %{$must}) {
-                        $option{-must}{$errmsg} = $must->{$errmsg};
-                    }
-                }
-
-                # Specify a history set...
-                when (/^-history/) {
-                    $option{-history}
-                        = @_ && $_[0] !~ /^-/ ? shift @_
-                        :                       undef;
-                    _opt_err('Invalid', -history, 'history set name')
-                        if ref($option{-history});
-                }
-                when (/^-h(.*)/)   { $option{-history} = length($1) ? $1 : undef; }
-
-                # Specify completions...
-                when (/^-comp(?:lete)?/) {
-                    _opt_err('Missing', -complete, 'completions') if !@_;
-                    my $comp_spec = shift @_;
-                    my $comp_type = ref($comp_spec) || $comp_spec || '???';
-                    if ($comp_type =~ m{\A(?: file\w* | dir\w* | ARRAY | HASH | CODE )\Z}xms) {
-                        $option{-complete} = $comp_spec;
-                    }
-                    else {
-                        _opt_err( 'Invalid', -complete,
-                                    '"filenames", "dirnames", or reference to array, hash, or subroutine');
-                    }
-                }
-
-                # Specify what to echo when a character is keyed...
-                when (/^-(echo|ret(?:urn)?)$/) {
-                    my $flag = $1 eq 'echo' ? '-echo' : '-return';
-                    if ($flag eq '-echo' && !eval { no warnings 'deprecated'; require Term::ReadKey }) {
-                        _warn( bareword => "Warning: next input will be in plaintext\n");
-                    }
-                    my $arg = @_ && $_[0] !~ /^-/ ? shift(@_)
-                            : $flag eq '-echo'    ? q{}
-                            :                       qq{\n};
-                    $option{$flag} = _gen_wrapper_for(_decode_echo($arg));
-                }
-                when (/^-e(.*)/) {
-                    if (!eval { no warnings 'deprecated'; require Term::ReadKey }) {
-                        _warn( bareword => "Warning: next input will be in plaintext\n");
-                    }
-                    my $arg = $1;
-                    $option{-echo} = _gen_wrapper_for(_decode_echo($arg));
-                }
-                when (/^-r(.+)/) {
-                    my $arg = $1;
-                    $option{-return} = _gen_wrapper_for(_decode_echo($arg));
-                }
-                when (/^-r/) {
-                    $option{-return} = sub{ "\n" };
-                }
-
-                # Explicit prompt replaces implicit prompts...
-                when (/^-prompt$/) {
-                    _opt_err('Missing', '-prompt', 'prompt string') if !@_;
-                    $option{-prompt} = shift @_;
-                    _opt_err('Invalid', '-prompt', 'string')
-                        if ref($option{-prompt});
-                }
-                when (/^-p(\S*)$/) {
-                    $option{-prompt} = $1;
-                }
-
-                # Menus inject a placeholder in the prompt string...
-                when (/^-menu$/) {
-                    _opt_err('Missing', '-menu', 'menu specification') if !@_;
-                    $option{-menu}         = ref $_[0] ? shift(@_) : \shift(@_);
-                    $option{-prompt}      .= $MENU_MK;
-                    $option{-def_nocheck}  = 1;
-                }
-
-                # Anything else of the form '-...' is a misspelt option...
-                when (/^-\w+$/) { _warn(misc => "prompt(): Unknown option $arg ignored"); }
-
-                # Anything else is part fo the prompt...
-                default       { $option{-prompt} .= $arg; }
+            # The sound of one hand clapping...
+            if ($arg =~ /^-_/) {
+                $redo = 1;
             }
+
+            # Non-chomping option...
+            elsif ($arg =~ /^-line$/) {
+                $option{-line}++;
+            }
+            elsif ($arg =~ /^-l/) {
+                $option{-line}++;
+                $redo = 1;
+            }
+
+            # The -yesno variants...
+            elsif ($arg =~ /^-YesNo$/) {
+                my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
+                $option{-yesno} = {
+                    must => { '[YN]' => qr{\A \s* [YN] }xms },
+                    count  => $count,
+                };
+            }
+            elsif ($arg =~ /^-YN/) {
+                $option{-yesno} = {
+                    must => { '[YN]' => qr{\A \s* [YN] }xms },
+                    count  => 1,
+                };
+                $redo = 2;
+            }
+            elsif ($arg =~ /^-yesno$/) {
+                my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
+                $option{-yesno} = {
+                    must => { '[yn]' => qr{\A \s* [YN] }ixms },
+                    count  => $count,
+                };
+            }
+            elsif ($arg =~ /^-yn/) {
+                $option{-yesno} = {
+                    must => { '[yn]' => qr{\A \s* [YN] }ixms },
+                    count  => 1,
+                };
+                $redo = 2;
+            }
+            elsif ($arg =~ /^-Yes$/) {
+                my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
+                $option{-yesno} = {
+                    must => { '[Y for yes]' => qr{\A \s* (?: [^y] | \Z) }xms },
+                    count  => $count,
+                };
+            }
+            elsif ($arg =~ /^-Y/) {
+                $option{-yesno} = {
+                    must => { '[Y for yes]' => qr{\A \s* (?: [^y] | \Z) }xms },
+                    count  => 1,
+                };
+                $redo = 1;
+            }
+            elsif ($arg =~ /^-yes$/) {
+                my $count = @_ && looks_like_number($_[0]) ? shift @_ : 1;
+                $option{-yesno} = { count  => $count };
+            }
+            elsif ($arg =~ /^-y/) {
+                $option{-yesno} = { count  => 1 };
+                $redo = 1;
+            }
+
+            # Load @ARGV...
+            elsif ($arg =~ /^-argv$/) {
+                $option{-argv} = 1;
+            }
+
+            elsif ($arg =~ /^-a/) {
+                $option{-argv} = 1;
+                $redo = 1;
+            }
+
+            # Clear screen before prompt...
+            elsif ($arg =~ /^-wipe(first)?$/) {
+                $option{-wipe} = $1 ? !$already_wiped : 1;
+                $already_wiped = 1;
+            }
+            elsif ($arg =~ /^-w/) {
+                $option{-wipe} = 1;
+                $already_wiped = 1;
+                $redo = 1;
+            }
+
+            # Specify a failure condition...
+            elsif ($arg =~ /^-fail$/) {
+                _opt_err('Missing', -fail, 'failure condition') if !@_;
+                $option{-fail} = shift @_;
+            }
+
+            # Specify an immediate failure condition...
+            elsif ($arg =~ /^-cancel/) {
+                _opt_err('Missing', -cancel, 'cancellation condition') if !@_;
+                $option{-cancel} = shift @_;
+            }
+
+            # Specify a file request...
+            elsif ($arg =~ /^-f(?:ilenames?)?$/) {
+                $option{-must}{'0: be an existing file'} = sub { -e $_[0] };
+                $option{-must}{'1: be readable'}         = sub { -r $_[0] };
+                $option{-complete}                       = 'filenames';
+            }
+
+            # Specify prompt echoing colour/style...
+            elsif ($arg =~ /^-style/) {
+                _opt_err('Missing -style specification') if !@_;
+                my $style = _decode_style(shift @_);
+                $option{-style} = _gen_wrapper_for($style);
+            }
+
+            # Specify input colour/style...
+            elsif ($arg =~ /^-echostyle/) {
+                _opt_err('Missing -echostyle specification') if !@_;
+                my $style = _decode_echostyle(shift @_);
+                $option{-echostyle} = _gen_wrapper_for($style);
+            }
+
+
+            # Specify input and output filehandles...
+            elsif ($arg =~ /^-stdio$/) { $option{-in}  = *STDIN;
+                                $option{-out} = *STDOUT;
+                                }
+            elsif ($arg =~ /^-in$/)    { $option{-in}  = shift @_; }
+            elsif ($arg =~ /^-out$/)   { $option{-out} = shift @_; }
+
+
+            # Specify integer and number return value...
+            elsif ($arg =~ /^-integer$/)       {
+                $option{-integer} = 1;
+                if (@_ && (ref $_[0] || $_[0] =~ $STD_CONSTRAINT)) {
+                    my ($errmsg, $constraint)
+                        = _standardize_constraint('integer',shift);
+                    $option{-must}{$errmsg} = $constraint;
+                }
+            }
+            elsif ($arg =~ /^-num(?:ber)?$/)   {
+                $option{-number}  = 1;
+                if (@_ && (ref $_[0] || $_[0] =~ $STD_CONSTRAINT)) {
+                    my ($errmsg, $constraint)
+                        = _standardize_constraint('number',shift);
+                    $option{-must}{$errmsg} = $constraint;
+                }
+            }
+            elsif ($arg =~ /^-i/)              { $option{-integer} = 1; $redo = 1; }
+            elsif ($arg =~ /^-n/)              { $option{-number}  = 1; $redo = 1; }
+
+            # Specify void context is okay...
+            elsif ($arg =~ /^-void$/)          { $option{-void} = 1;               }
+
+            # Specify verbatim return value...
+            elsif ($arg =~ /^-verb(?:atim)?$/) { $option{-verbatim} = 1;           }
+            elsif ($arg =~ /^-v/)              { $option{-verbatim} = 1; $redo = 1;}
+
+            # Specify single character return...
+            elsif ($arg =~ /^-sing(?:le)?$/)   { $option{-single} = 1;             }
+            elsif ($arg =~ /^-[s1]/)           { $option{-single} = 1; $redo = 1;  }
+
+            # Specify a default...
+            elsif ($arg =~ /^-DEF(?:AULT)?/) {
+                _opt_err('Missing', '-DEFAULT', 'string') if !@_;
+                $option{-def} = shift @_;
+                $option{-def_nocheck} = 1;
+                _opt_err('Invalid', '-DEFAULT', 'string', 'reference')
+                    if ref($option{-def});
+            }
+            elsif ($arg =~ /^-def(?:ault)?/) {
+                _opt_err('Missing', '-default', 'string') if !@_;
+                $option{-def} = shift @_;
+                _opt_err('Invalid', '-default', 'string', 'reference')
+                    if ref($option{-def});
+            }
+            elsif ($arg =~ /^-d(.+)$/)   { $option{-def} = $1; }
+
+            # Specify a timeout...
+            elsif ($arg =~ /^-t(\d+)/)   {
+                $option{-timeout} = $1;
+                $arg =~ s{\d+}{}xms;
+                $redo = 1;
+            }
+            elsif ($arg =~ /^-timeout$/) {
+                _opt_err('Missing', -timeout, 'number of seconds') if !@_;
+                $option{-timeout} = shift @_;
+                _opt_err('Invalid', -timeout,'number of seconds', qq{'$option{-timeout}'})
+                    if !looks_like_number($option{-timeout});
+            }
+
+            # Specify a set of input constraints...
+            elsif ($arg =~ /^-g.*/) {
+                _opt_err('Missing', -guarantee, 'input restriction') if !@_;
+                my $restriction = shift @_;
+                my $restriction_type = ref $restriction;
+
+                $option{-must}{'be a valid input'} = $restriction;
+
+                # Hashes restrict input to their keys...
+                if ($restriction_type eq 'HASH') {
+                    $restriction_type = 'ARRAY';
+                    $restriction = [ keys %{$restriction} ];
+                }
+                # Arrays of strings matched (and completed) char-by-char...
+                if ($restriction_type eq 'ARRAY') {
+                    my @restrictions = @{$restriction};
+                    $option{-guarantee}
+                        = '\A(?:'
+                        . join('|', map {
+                                join(q{}, map { "(?:\Q$_\E" } split(q{}, $_))
+                            . ')?' x length($_)
+                            } @restrictions)
+                        . ')\z'
+                        ;
+                    if ($option{-complete} == $DEFAULT_COMPLETER) {
+                        $option{-complete} = \@restrictions;
+                    }
+                }
+                # Regexes matched as-is...
+                elsif ($restriction_type eq 'Regexp') {
+                    $option{-guarantee} = $restriction;
+                }
+                else {
+                    _opt_err( 'Invalid', -guarantee,
+                                'array or hash reference, or regex'
+                    );
+                }
+            }
+
+            # Specify a set of key letters...
+            elsif ($arg =~ '-keyletters_implement') {
+                # Extract all keys and default keys...
+                my @keys  = ($option{-prompt} =~ m{$KL_EXTRACT}gxms);
+
+                # Convert default to a -default...
+                my @defaults = ($option{-prompt} =~ m{$KL_DEF_EXTRACT}gxms);
+                if (@defaults > 1) {
+                    _warn( ambiguous =>
+                        "prompt(): -keyletters found too many defaults"
+                    )
+                }
+                elsif (@defaults) {
+                    push @_, -default => $defaults[0];
+                }
+
+                # Convert key letters to a -guarantee...
+                @keys = ( map({uc} @keys), map({lc} @keys) );
+                if (@defaults == 1) {
+                    push @keys, q{};
+                }
+                push @_, -guarantee => \@keys;
+
+            }
+            elsif ($arg =~ /^-key(?:let(?:ter)?)(?:s)?/) {
+                push @_, '-keyletters_implement';
+            }
+            elsif ($arg =~ /^-k/) {
+                push @_, '-keyletters_implement';
+                $redo = 1;
+            }
+
+            # Specify a set of return constraints...
+            elsif ($arg =~ /^-must$/) {
+                _opt_err('Missing', -must, 'constraint hash') if !@_;
+                my $must = shift @_;
+                _opt_err('Invalid', -must, 'hash reference')
+                    if ref($must) ne 'HASH';
+                for my $errmsg (keys %{$must}) {
+                    $option{-must}{$errmsg} = $must->{$errmsg};
+                }
+            }
+
+            # Specify a history set...
+            elsif ($arg =~ /^-history/) {
+                $option{-history}
+                    = @_ && $_[0] !~ /^-/ ? shift @_
+                    :                       undef;
+                _opt_err('Invalid', -history, 'history set name', qq{'$option{-history}'})
+                    if ref($option{-history});
+            }
+            elsif ($arg =~ /^-h(.*)/)   { $option{-history} = length($1) ? $1 : undef; }
+
+            # Specify completions...
+            elsif ($arg =~ /^-comp(?:lete)?/) {
+                _opt_err('Missing', -complete, 'completions') if !@_;
+                my $comp_spec = shift @_;
+                my $comp_type = ref($comp_spec) || $comp_spec || '???';
+                if ($comp_type =~ m{\A(?: file\w* | dir\w* | ARRAY | HASH | CODE )\Z}xms) {
+                    $option{-complete} = $comp_spec;
+                }
+                else {
+                    _opt_err( 'Invalid', -complete,
+                                '"filenames", "dirnames", or reference to array, hash, or subroutine');
+                }
+            }
+
+            # Specify what to echo when a character is keyed...
+            elsif ($arg =~ /^-(echo|ret(?:urn)?)$/) {
+                my $flag = $1 eq 'echo' ? '-echo' : '-return';
+                if ($flag eq '-echo' && !eval { no warnings 'deprecated'; require Term::ReadKey }) {
+                    _warn( bareword => "Warning: next input will be in plaintext\n");
+                }
+                my $arg = @_ && $_[0] !~ /^-/ ? shift(@_)
+                        : $flag eq '-echo'    ? q{}
+                        :                       qq{\n};
+                $option{$flag} = _gen_wrapper_for(_decode_echo($arg));
+            }
+            elsif ($arg =~ /^-e(.*)/) {
+                if (!eval { no warnings 'deprecated'; require Term::ReadKey }) {
+                    _warn( bareword => "Warning: next input will be in plaintext\n");
+                }
+                my $arg = $1;
+                $option{-echo} = _gen_wrapper_for(_decode_echo($arg));
+            }
+            elsif ($arg =~ /^-r(.+)/) {
+                my $arg = $1;
+                $option{-return} = _gen_wrapper_for(_decode_echo($arg));
+            }
+            elsif ($arg =~ /^-r/) {
+                $option{-return} = sub{ "\n" };
+            }
+
+            # Specify an initial input...
+            elsif ($arg =~ /^-prefill/) {
+                _opt_err('Missing', '-prefill', 'string') if !@_;
+                $option{-prefill} = shift @_;
+                _opt_err('Invalid', '-prefill', 'string', 'reference')
+                    if ref($option{-prefill});
+            }
+
+            # Explicit prompt replaces implicit prompts...
+            elsif ($arg =~ /^-prompt$/) {
+                _opt_err('Missing', '-prompt', 'prompt string') if !@_;
+                $option{-prompt} = shift @_;
+                _opt_err('Invalid', '-prompt', 'string', 'reference')
+                    if ref($option{-prompt});
+            }
+            elsif ($arg =~ /^-p(\S*)$/) {
+                $option{-prompt} = $1;
+            }
+
+            # Menus inject a placeholder in the prompt string...
+            elsif ($arg =~ /^-menu$/) {
+                _opt_err('Missing', '-menu', 'menu specification') if !@_;
+                $option{-menu}         = ref $_[0] ? shift(@_) : \shift(@_);
+                $option{-prompt}      .= $MENU_MK;
+                $option{-def_nocheck}  = 1;
+            }
+
+            # A monitoring sub is called on every input character...
+            elsif ($arg =~ /^-monitor/) {
+                _opt_err('Missing', '-monitor', 'a monitor subref')
+                    if !@_ || ref $_[0] ne 'CODE';
+                $option{-monitor} = shift(@_);
+            }
+
+            # Anything else of the form '-...' is a misspelt option...
+            elsif ($arg =~ /^-\w+$/) { _warn(misc => "prompt(): Unknown option $arg ignored"); }
+
+            # Anything else is part fo the prompt...
+            else { $option{-prompt} .= $arg; }
 
             # Handle option bundling...
             redo DECODING if $redo && $arg =~ s{\A -.{$redo} (?=.)}{-}xms;
@@ -855,8 +895,13 @@ sub _decode_args {
 #====[ Error Handlers ]=========================================
 
 sub _opt_err {
-    my ($problem, $option, $expectation) = @_;
-    Carp::croak "prompt(): $problem value for $option (expected $expectation)";
+    my ($problem, $option, $expectation, $found) = @_;
+    if (@_ > 3) {
+        Carp::croak "prompt(): $problem value for $option (expected $expectation, but found $found)";
+    }
+    else {
+        Carp::croak "prompt(): $problem value for $option (expected $expectation)";
+    }
 }
 
 sub _warn {
@@ -939,7 +984,7 @@ sub _verify_input_constraints {
         CONSTRAINT:
         for my $msg (@constraints) {
             my $constraint = $constraint_for{$msg};
-            next CONSTRAINT if eval { no warnings; local $_ = $input; $input ~~ $constraint; };
+            next CONSTRAINT if eval { no warnings; local $_ = $input; match($input, $constraint); };
             $failed = $msg =~ m{\A [[:upper:]] }xms ? "$msg "
                     : $msg =~ m{\A \W }xms          ? $opt_ref->{-prompt}
                                                     . "$msg "
@@ -1025,6 +1070,13 @@ sub _generate_buffered_reader_from {
                     }
                 }
 
+                if (exists $opt_ref->{-cancel}) {
+                    for my $nextchar (split q{}, $input) {
+                        die bless \$input, 'IO::Prompter::Cancellation'
+                            if match($nextchar, $opt_ref->{-cancel});
+                    }
+                }
+
                 if (defined $input) {
                     _verify_input_constraints(
                         \$input, \$local_fake_input, $outputter_ref, $opt_ref, $extra_constraints
@@ -1079,9 +1131,9 @@ sub _current_completions_for {
 
     # Find candidates...
     my @candidates;
-    given (ref($completer) || $completer // q{}) {
+    for my $completer_type (ref($completer) || $completer // q{}) {
         # If completer is sub, recursively call it with input words...
-        when ('CODE') {
+        if ($completer_type eq 'CODE') {
             ($prefix, @candidates)
                 = _current_completions_for(
                     $input_text,
@@ -1092,22 +1144,22 @@ sub _current_completions_for {
         }
 
         # If completer is array, grep the appropriate elements...
-        when ('ARRAY') {
+        elsif ($completer_type eq 'ARRAY') {
             @candidates = grep { /\A\Q$lastword\E/ } @{$completer};
         }
 
         # If completer is hash, grep the appropriate keys...
-        when ('HASH') {
+        elsif ($completer_type eq 'HASH') {
             @candidates = grep { /\A\Q$lastword\E/ } keys %{$completer};
         }
 
         # If completer is 'file...', glob up the appropriate filenames...
-        when (/^file\w*$/) {
+        elsif ($completer_type eq /^file\w*$/) {
             @candidates = glob($lastword.'*');
         }
 
         # If completer is 'dir...', glob up the appropriate directories...
-        when (/^dir\w*$/) {
+        elsif ($completer_type eq /^dir\w*$/) {
             @candidates = grep {-d} glob($lastword.'*');
         }
     }
@@ -1202,16 +1254,14 @@ sub _generate_unbuffered_reader_from {
         # Set up direct reading, and prepare to clean up on abnormal exit...
         Term::ReadKey::ReadMode('raw', $in_fh);
         my $prev_SIGINT = $SIG{INT};
-        local $SIG{INT} = sub { given ($prev_SIGINT) {
-                                    when ('IGNORE')  { }
-                                    Term::ReadKey::ReadMode('restore', $in_fh);
-                                    when ('DEFAULT') { exit(1) }
-                                    when (undef)     { exit(1) }
-                                    default {
-                                        package main;
-                                        no strict 'refs';
-                                        $prev_SIGINT->()
-                                    }
+        local $SIG{INT} = sub { return if $prev_SIGINT eq 'IGNORE';
+                                Term::ReadKey::ReadMode('restore', $in_fh);
+                                exit(1) if !defined $prev_SIGINT
+                                        || $prev_SIGINT eq 'DEFAULT';
+                                {
+                                    package main;
+                                    no strict 'refs';
+                                    $prev_SIGINT->()
                                 }
                           };
 
@@ -1223,7 +1273,21 @@ sub _generate_unbuffered_reader_from {
             $orig_fake_input = $local_fake_input = $1;
         }
 
-        my $input = q{};
+        my $input = exists $opt_ref->{-prefill} ? $opt_ref->{-prefill} : q{};
+        if (exists $opt_ref->{-prefill}) {
+            if (exists $opt_ref->{-monitor}) {
+                my %opts = ( -cursor_pos => length($input),
+                             -prompt     => $opt_ref->{-prompt},
+                             -style      => $opt_ref->{-style}->(),
+                             -echostyle  => $opt_ref->{-echostyle}->(),
+                        );
+                my $input_copy = $input;
+                eval { $opt_ref->{-monitor}->($input_copy, \%opts) };
+            }
+            $outputter_ref->( -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
+            $outputter_ref->( -echostyle => join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g) );
+        }
+
         my $insert_offset = 0;
         INPUT:
         while (1) {
@@ -1233,6 +1297,12 @@ sub _generate_unbuffered_reader_from {
 
             # Get next character entered...
             my $next = Term::ReadKey::ReadKey($timeout, $in_fh);
+
+            # Check for cancellation...
+            if (exists $opt_ref->{-cancel} && match($next, $opt_ref->{-cancel})) {
+                Term::ReadKey::ReadMode('restore', $in_fh);
+                die bless \$input, 'IO::Prompter::Cancellation';
+            }
 
             # Finished with completion mode?
             if (($next//q{}) !~ m{ $COMPLETE_INIT | $COMPLETE_CYCLE }xms) {
@@ -1352,7 +1422,7 @@ sub _generate_unbuffered_reader_from {
                         # Redraw...
                         my $input_pre  = substr($input.' ',0,length($input)-$insert_offset+1);
                         my $input_post = substr($input.' ',length($input)-$insert_offset);
-                        my $display_pre 
+                        my $display_pre
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
                         my $display_post
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
@@ -1428,7 +1498,7 @@ sub _generate_unbuffered_reader_from {
                         # Try to find the key, for a menu...
                         if (exists $opt_ref->{-menu_curr_level}) {
                             for my $key ( keys %{$opt_ref->{-menu_curr_level}}) {
-                                if ($def_val ~~ $opt_ref->{-menu_curr_level}{$key}) {
+                                if (match($def_val, $opt_ref->{-menu_curr_level}{$key})) {
                                     $def_val = $key;
                                     last;
                                 }
@@ -1498,7 +1568,7 @@ sub _generate_unbuffered_reader_from {
                     if ($insert_offset || $prev_insert_offset) {
                         my $input_pre  = substr($input,0,length($input)-$prev_insert_offset);
                         my $input_post = substr($input,length($input)-$insert_offset);
-                        my $display_pre 
+                        my $display_pre
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
                         my $display_post
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
@@ -1522,6 +1592,7 @@ sub _generate_unbuffered_reader_from {
                     next INPUT;
                 }
             }
+
             if ($opt_ref->{-single} || !defined $next || $input =~ m{\Q$/\E$}) {
                 # Did we get an acceptable value?
                 if (defined $next) {
@@ -1534,8 +1605,15 @@ sub _generate_unbuffered_reader_from {
                 # Reset terminal...
                 Term::ReadKey::ReadMode('restore', $in_fh);
 
-                # Return failure if failed before input...
-                return undef if !defined $next && length($input) == 0;
+                # Return failure if failed before input or cancelled...
+                if (!defined $next && length($input) == 0
+                ||  exists $opt_ref->{-cancel} && match($next, $opt_ref->{-cancel})) {
+                    return if $opt_ref->{-verbatim};
+                    return PUREBOOL { 0 }
+                               BOOL { 0 }
+                               SCALAR { undef  }
+                               METHOD { defaulted => sub { 0 }, timedout  => sub { 0 } };
+                }
 
                 # Otherwise supply a final newline if necessary...
                 if ( $opt_ref->{-single}
@@ -1545,6 +1623,32 @@ sub _generate_unbuffered_reader_from {
                 }
 
                 return $input;
+            }
+        }
+        continue {
+            # Perform monitor (if any) and redraw prompt (if required)...
+            if ($opt_ref->{-monitor}) {
+                my %opts = ( -cursor_pos => length($input) - $insert_offset,
+                             -prompt     => $opt_ref->{-prompt},
+                             -style      => $opt_ref->{-style}->(),
+                             -echostyle  => $opt_ref->{-echostyle}->(),
+                        );
+                my $input_copy = $input;
+                my $output_pos = $outputter_ref->(-tell);
+                if (!defined eval { $opt_ref->{-monitor}->($input_copy, \%opts) }
+                ||  $output_pos != $outputter_ref->(-tell)) {
+                    my $input_pre  = substr($input.' ',0,length($input)-$insert_offset+1);
+                    my $input_post = substr($input.' ',length($input)-$insert_offset);
+                    my $display_pre
+                        = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
+                    my $display_post
+                        = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
+                    $outputter_ref->( -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
+                    $outputter_ref->( -echostyle =>
+                                    join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
+                                    . "\b" x (length($display_post)-1)
+                    );
+                }
             }
         }
     }
@@ -1559,40 +1663,36 @@ sub _build_menu {
     my %key_for;
     my @selectors;
 
-    given (ref $source_ref) {
-        when ('HASH') {
-            my @sorted_keys = sort(keys(%{$source_ref}));
-            @selectors = $is_numeric ? (1..@sorted_keys) : ('a'..'z','A'..'Z');
-            @key_for{@selectors}   = @sorted_keys;
-            @value_for{@selectors} = @{$source_ref}{@sorted_keys};
-            $source_ref = \@sorted_keys;
-            $_ = 'ARRAY';
-            continue;
-        }
-        when ('SCALAR') {
-            $source_ref = [ split "\n", ${$source_ref} ];
-            $_ = 'ARRAY';
-            continue;
-        }
-        when ('ARRAY') {
-            my @source = @{$source_ref};
-            @selectors = $is_numeric ? (1..@source) : ('a'..'z','A'..'Z');
-            if (!keys %value_for) {
-                @value_for{@selectors} = @source;
-            }
-            ITEM:
-            for my $tag (@selectors) {
-                my $item = shift(@source) // last ITEM;
-                chomp $item;
-                $prompt .= sprintf("%4s. $item\n", $tag);
-                $final = $tag;
-            }
-            if (@source) {
-                _warn( misc =>
-                    "prompt(): Too many menu items. Ignoring the final " . @source
-                );
-            }
-        }
+    my $source_type = ref $source_ref;
+    if ($source_type eq 'HASH') {
+        my @sorted_keys = sort(keys(%{$source_ref}));
+        @selectors = $is_numeric ? (1..@sorted_keys) : ('a'..'z','A'..'Z');
+        @key_for{@selectors}   = @sorted_keys;
+        @value_for{@selectors} = @{$source_ref}{@sorted_keys};
+        $source_ref = \@sorted_keys;
+    }
+    elsif ($source_type eq 'SCALAR') {
+        $source_ref = [ split "\n", ${$source_ref} ];
+    }
+
+    my @source = @{$source_ref};
+    @selectors = $is_numeric ? (1..@source) : ('a'..'z','A'..'Z');
+    if (!keys %value_for) {
+        @value_for{@selectors} = @source;
+    }
+
+    ITEM:
+    for my $tag (@selectors) {
+        my $item = shift(@source) // last ITEM;
+        chomp $item;
+        $prompt .= sprintf("%4s. $item\n", $tag);
+        $final = $tag;
+    }
+
+    if (@source) {
+        _warn( misc =>
+            "prompt(): Too many menu items. Ignoring the final " . @source
+        );
     }
 
     my $constraint = $is_numeric       ? '(?:' . join('|',@selectors) .')'
@@ -1616,7 +1716,8 @@ my %synonyms = (
     bold      => [qw<boldly strong heavy emphasis emphatic highlight highlighted fort forte>],
     dark      => [qw<darkly dim deep>],
     faint     => [qw<faintly light soft>],
-    underline => [qw<underlined underscore underscored italic italics>],
+    underline => [qw<underlined underscore underscored>],
+    italic    => [qw<italics>],
     blink     => [qw<blinking flicker flickering flash flashing>],
     reverse   => [qw<reversed inverse inverted>],
     concealed => [qw<hidden blank invisible>],
@@ -1672,7 +1773,7 @@ sub _stylize {
     }
 
     # Ignore anything unknown...
-    $spec =~ s{((?:on_)?(\S+))}{ exists $synonyms{$2} ? $1 : q{} }gxmse;
+    $spec =~ s{((?:on_)?(?:(ansi\d+|rgb\d+)|(\S+)))}{ $2 || exists $synonyms{$3} ? $1 : q{} }gxmse;
 
     # Build ANSI terminal codes around text...
     my $raw_text = join q{}, @_;
@@ -1691,6 +1792,7 @@ sub _std_printer_to {
     if (eval { require Term::ANSIColor}) {
         return sub {
             my $style = shift;
+            return tell($out_filehandle) if $style eq -tell;
             my @loc = (@_);
             s{\e}{^}gxms for @loc;
             print {$out_filehandle} _stylize($opt_ref->{$style}(@loc), @loc);
@@ -1698,7 +1800,8 @@ sub _std_printer_to {
     }
     else {
         return sub {
-            shift; # ...ignore style
+            my $style = shift;
+            return tell($out_filehandle) if $style eq -tell;
             my @loc = (@_);
             s{\e}{^}gxms for @loc;
             print {$out_filehandle} @loc;
@@ -1721,7 +1824,7 @@ IO::Prompter - Prompt for input, read it, clean it, return it.
 
 =head1 VERSION
 
-This document describes IO::Prompter version 0.004015
+This document describes IO::Prompter version 0.005001
 
 
 =head1 SYNOPSIS
@@ -1761,7 +1864,7 @@ returns an object with overloaded string and boolean conversions.
 This object B<I<always>> evaluates true in boolean contexts, unless the
 read operation actually failed. This means that the object evaluates
 true I<even when the input value is zero or
-an empty string.> See L<"Returning raw data"> to turn off this 
+an empty string.> See L<"Returning raw data"> to turn off this
 (occasionally counter-intuitive) behaviour.
 
 =back
@@ -1854,6 +1957,8 @@ or add a L<"no-op"|"Escaping otherwise magic options"> to them.
 
     -a      -argv              Prompt for @ARGV data if !@ARGV
 
+            -cancel=>SPEC      Immediately fail if input char smartmatches value
+
             -comp[lete]=>SPEC  Complete input on <TAB>, as specified
 
     -dSTR   -def[ault]=>STR    What to return if only <ENTER> typed
@@ -1865,7 +1970,7 @@ or add a L<"no-op"|"Escaping otherwise magic options"> to them.
 
   * -f      -filenames         Input should be name of a readable file
 
-            -fail=>VALUE       Return failure if input smartmatches value
+            -fail=>VALUE       Return failure if completed input smartmatches value
 
             -guar[antee]=>SPEC Only allow the specified words to be entered
 
@@ -1883,9 +1988,13 @@ or add a L<"no-op"|"Escaping otherwise magic options"> to them.
 
             -must=>HASHREF     Specify requirements/constraints on input
 
+            -monitor=>SUBREF   Specify a sub to be called on every character input
+
     -n      -num[ber][=>SPEC]  Accept only valid numbers (that smartmatch SPEC)
 
             -out=>HANDLE       Prompt to specified handle
+
+            -prefill=>STR      Start with the specified string pre-entered
 
             -prompt=>STR       Specify prompt explicitly
 
@@ -2081,9 +2190,9 @@ quite extensive. All of the following work as expected:
 
     prompt 'next:' -style=>'gules fort on a field or';
 
-However, because C<Term::ANSIColor> maps everything back to the
+However, because C<Term::ANSIColor> sometmes maps everything back to the
 standard eight ANSI text colours and seven ANSI text styles, all of the
-above will also be rendered identically. See that module's
+above may also be rendered identically. See that module's
 documentation for details.
 
 If C<Term::ANSIColor> is not available, this option is silently ignored.
@@ -2172,6 +2281,25 @@ If a time-out occurred, the return value of C<timedout()> is a string
 describing the timeout, such as:
 
     "timed out after 60 seconds"
+
+
+=head3 Prefilling the input
+
+=over
+
+=item C<< -prefill => I<STRING> >>
+
+=back
+
+Normally, the cursor is placed immediately after the prompt
+in preparation for input. Initially, of course, there is no input.
+
+However, using the C<-prefill> option it is possible to initialize
+the input buffer with an arbitrary string of text (rather than the
+usual empty string)...as if that text had already been entered.
+
+This is useful when a prompt is re-issued so as to allow the user
+to extend, truncate, or otherwise edit a previous input.
 
 
 =head3 Providing a menu of responses
@@ -2739,6 +2867,48 @@ you can just write:
     }
 
 
+=head3 Specifying when input should fail immediately
+
+=over 4
+
+C<< -cancel => I<VALUE> >>
+
+C<< -fI<STRING> >>
+
+=back
+
+If this option is specified, then each individual input character is compared
+with the associated string or value, by smartmatching during the input process.
+If any individual input character matches the string/value, C<prompt()>
+immediately returns a failure value.
+
+Note that this is not the same as the behaviour C<-fail> option. A C<-fail>
+waits for the entire input to be completed (typically for a RETURN to be entered)
+and I<then> tests for failure. A C<-cancel> tests each input character as it is
+entered and fails immediately if any input matches the cancellation condition.
+
+Do, for example, to cancel a prompt whenever an ESCAPE character is entered:
+
+    my $input = prompt '>', -cancel => "\e";
+
+Note that (as long as Term::ReadKey is available) the cancellation test
+is performed before any other internal processing, so you can set the
+cancellation criterion to be any character, including characters like CNTL-A or
+TAB, which otherwise have special meanings to C<prompt()>.
+
+Note too that the cancellation criterion is tested against each individual
+character as it is entered, B<not> against the cumulative input so far.
+If you need to cancel a call to C<prompt()> based on accumulated input,
+you need to track that yourself. For example, if your cancellation test
+is the presence of three consecutive exclamation marks:
+
+    my $input = prompt '>', -cancel => sub ($nextchar) {
+                                state $input;
+                                $input .= $nextchar;
+                                return $input =~ /!!!/;
+                            };
+
+
 =head3 Constraining what can be typed
 
 =over 4
@@ -2974,6 +3144,43 @@ the user having to also press C<< <ENTER>/<RETURN> >>:
 
 
 
+=head3 Monitoring input
+
+=over 4
+
+=item C<< -monitor => SUBREF  >>
+
+=back
+
+This option allows you to specify a subroutine that will be called
+after each character is input. This subroutine will be passed
+two arguments: a string containing the input so far, and a hash
+reference containing various options passed into the call to
+C<prompt()> (specifically: C<-prompt>, C<-style>, and C<-echostyle>).
+
+The hashref contains an extra key (C<-cursor_pos>) whose value is the
+current location of the input cursor within the string. This is
+typically one character past the end of the string, but see L<"Input editing">.
+
+The subroutine can perform any actions you choose: set variables, validate input,
+print out a response to each input character.
+
+If the subroutine prints anything out that will, of course, mess up the prompt
+and input echoing, so in that case the prompt will automatically be redrawn.
+The prompt is also redrawn if the monitor subroutine throws an exception.
+
+Monitor subroutines are useful for prvoding extra information during an
+input process. For example, when prompting for a filepath, as the path is
+being typed in you could echo all (partially) matching files
+with something like:
+
+    my $path = prompt 'File path:',
+                      -monitor => sub ($path, $opts) {
+                                     clear_screen();
+                                     say for glob("$path*");
+                                  };
+
+
 =head3 Preserving terminal newlines
 
 =over 4
@@ -3091,9 +3298,11 @@ and when the C<< <ENTER>/<RETURN> >> key is pressed, respond with:
     Calculate: _
 
 The string specified with C<-return> is also automatically echoed if the
-L<< C<-single> option|"Single-character input" >> is used. So if you
-don't want the automatic carriage return that C<-single> mode supplies,
-specify C<< -return=>"" >>.
+L<< C<-single> option|"Single-character input" >> is used, or if an
+input is cancelled via the
+L<< C<-cancel> option|"Specifying when input should fail immediately" >>.
+So if you don't want the automatic carriage return that C<-single> mode
+or C<-cancel> supplies, specify C<< -return=>"" >>.
 
 
 =head3 Single-character input
@@ -3300,7 +3509,7 @@ Here, we're using prompt simply to pause the application after the data is
 printed. It doesn't matter what the user types in; the typing itself is the
 message (and the message is "move along").
 
-In such cases, the "useless use..." warning can be suppressed using the 
+In such cases, the "useless use..." warning can be suppressed using the
 C<< -void >> option:
 
     say $data;

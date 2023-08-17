@@ -10,6 +10,7 @@ use MVC::Neaf;
 
 subtest "without magic" => sub {
     my $app = MVC::Neaf->new->magic(0);
+    ok !$app->magic, 'magic is off';
     my $psgi = $app->run;
     my @known = sort keys %{ $app->get_routes };
     is_deeply \@known, [ ], "routes NOT loaded via resources"
@@ -18,6 +19,7 @@ subtest "without magic" => sub {
 
 subtest "with magic" => sub {
     my $app = MVC::Neaf->new;
+    ok $app->magic, 'magic is on by default';
     $app->add_route( '/' => sub {
         return { -template => 'index.html', -view => 'TT' };
     } );

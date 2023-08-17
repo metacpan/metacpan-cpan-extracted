@@ -3,7 +3,7 @@ package MVC::Neaf::Route;
 use strict;
 use warnings;
 
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -109,7 +109,7 @@ sub new {
         unless UNIVERSAL::isa($opt{code}, 'CODE');
     $class->my_croak("'public' endpoint must have a 'description'")
         if $opt{public} and not $opt{description};
-    $class->_croak( "'default' must be unblessed hash" )
+    $class->my_croak( "'default' must be unblessed hash" )
         if ref $opt{default} ne 'HASH';
     $class->my_croak("'method' must be a plain scalar")
         unless $opt{method} =~ /^[A-Z0-9_]+$/;
@@ -128,7 +128,7 @@ sub new {
     # preprocess regular expression for params
     if ( my $reg = $opt{param_regex} ) {
         my %real_reg;
-        $class->_croak("param_regex must be a hash of regular expressions")
+        $class->my_croak("'param_regex' must be a hash of regular expressions")
             if ref $reg ne 'HASH' or grep { !defined $reg->{$_} } keys %$reg;
         $real_reg{$_} = qr(^$reg->{$_}$)s
             for keys %$reg;
@@ -136,12 +136,11 @@ sub new {
     };
 
     if ( $opt{cache_ttl} ) {
-        $class->_croak("cache_ttl must be a number")
+        $class->my_croak("'cache_ttl' must be a number")
             unless looks_like_number($opt{cache_ttl});
         # as required by RFC
         $opt{cache_ttl} = -100000 if $opt{cache_ttl} < 0;
         $opt{cache_ttl} = $year if $opt{cache_ttl} > $year;
-        $opt{cache_ttl} = $opt{cache_ttl};
     };
 
     return bless \%opt, $class;
@@ -178,18 +177,10 @@ Check that route is locked.
 
 =cut
 
+# TODO 0.40 a version with croak
 sub is_locked {
     my $self = shift;
     return !!$self->{lock};
-};
-
-# TODO 0.30 -> Util::Base?
-sub _can_modify {
-    my $self = shift;
-    return unless $self->{lock};
-    # oops
-
-    croak "Modification of locked ".(ref $self)." attempted";
 };
 
 =head2 add_form()
@@ -304,26 +295,13 @@ sub get_form {
     # Aggressive caching for the win
     return $self->{forms}{$name} ||= do {
         my $parent = $self->parent;
-        $self->my_croak("Failed to locate form named $name")
+        croak("Failed to locate form '$name'")
             unless $parent;
         $parent->get_form($name);
     };
 };
 
-=head2 get_view
-
-=cut
-
-sub get_view {
-    my ($self, $name) = @_;
-
-    return $self->{views}{$name} ||= do {
-        my $parent = $self->parent;
-        $self->my_croak("Failed to locate view named $name")
-            unless $parent;
-        $parent->get_view($name);
-    };
-};
+# TODO 0.40 get_view should be per-route, not global
 
 =head2 post_setup
 
@@ -401,7 +379,7 @@ make_getters( %RO_FIELDS );
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

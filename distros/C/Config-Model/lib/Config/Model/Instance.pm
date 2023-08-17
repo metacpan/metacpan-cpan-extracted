@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.152;
+package Config::Model::Instance 2.153;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -664,7 +664,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.152
+version 2.153
 
 =head1 SYNOPSIS
 

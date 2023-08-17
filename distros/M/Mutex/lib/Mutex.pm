@@ -9,7 +9,7 @@ package Mutex;
 use strict;
 use warnings;
 
-our $VERSION = '1.007';
+our $VERSION = '1.009';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -54,7 +54,7 @@ Mutex - Various locking implementations supporting processes and threads
 
 =head1 VERSION
 
-This document describes Mutex version 1.007
+This document describes Mutex version 1.009
 
 =head1 SYNOPSIS
 
@@ -209,7 +209,7 @@ Mario E. Roy, S<E<lt>marioeroy AT gmail DOT comE<gt>>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2022 by Mario E. Roy
+Copyright (C) 2017-2023 by Mario E. Roy
 
 Mutex is released under the same license as Perl.
 

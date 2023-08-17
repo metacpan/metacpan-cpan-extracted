@@ -9,12 +9,9 @@ package Text::CSV_XS;
 
 # HISTORY
 #
-# 0.24 -
-#    H.Merijn Brand (h.m.brand@xs4all.nl)
-# 0.10 - 0.23
-#    Jochen Wiedmann <joe@ispsoft.de>
-# Based on (the original) Text::CSV by:
-#    Alan Citterman <alan@mfgrtl.com>
+# 0.24 -      H.Merijn Brand <perl5@tux.freedom.nl>
+# 0.10 - 0.23 Jochen Wiedmann <joe@ispsoft.de>
+# Based on (the original) Text::CSV by Alan Citterman <alan@mfgrtl.com>
 
 require 5.006001;
 
@@ -26,7 +23,7 @@ use XSLoader;
 use Carp;
 
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
-$VERSION = "1.50";
+$VERSION = "1.51";
 @ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
@@ -51,7 +48,7 @@ sub CSV_FLAGS_IS_MISSING	{ 0x0010 }
 	CSV_TYPE_NV
 	)],
     );
-@EXPORT_OK = (qw( csv PV IV NV ), @{$EXPORT_TAGS{CONSTANTS}});
+@EXPORT_OK = (qw( csv PV IV NV ), @{$EXPORT_TAGS{'CONSTANTS'}});
 
 if ($] < 5.008002) {
     no warnings "redefine";
@@ -113,6 +110,7 @@ my %def_attr = (
     '_BOUND_COLUMNS'		=> undef,
     '_AHEAD'			=> undef,
     '_FORMULA_CB'		=> undef,
+    '_EMPTROW_CB'		=> undef,
 
     'ENCODING'			=> undef,
     );
@@ -255,8 +253,9 @@ sub new {
     $last_new_err = Text::CSV_XS->SetDiag (0);
     defined $\ && !exists $attr{'eol'} and $self->{'eol'} = $\;
     bless $self, $class;
-    defined $self->{'types'} and $self->types ($self->{'types'});
-    defined $attr_formula  and $self->{'formula'} = _supported_formula ($self, $attr_formula);
+    defined $self->{'types'}           and $self->types ($self->{'types'});
+    defined $self->{'skip_empty_rows'} and $self->{'skip_empty_rows'} = _supported_skip_empty_rows ($self, $self->{'skip_empty_rows'});
+    defined $attr_formula              and $self->{'formula'}         = _supported_formula         ($self, $attr_formula);
     $self;
     } # new
 
@@ -455,13 +454,36 @@ sub strict {
     my $self = shift;
     @_ and $self->_set_attr_X ("strict", shift);
     $self->{'strict'};
-    } # always_quote
+    } # strict
+
+sub _supported_skip_empty_rows {
+    my ($self, $f) = @_;
+    defined $f or return 0;
+    if ($self && $f && ref $f && ref $f eq "CODE") {
+	$self->{'_EMPTROW_CB'} = $f;
+	return 6;
+	}
+    $f =~ m/^(?: 0 | undef         )$/xi ? 0 :
+    $f =~ m/^(?: 1 | skip          )$/xi ? 1 :
+    $f =~ m/^(?: 2 | eof   | stop  )$/xi ? 2 :
+    $f =~ m/^(?: 3 | die           )$/xi ? 3 :
+    $f =~ m/^(?: 4 | croak         )$/xi ? 4 :
+    $f =~ m/^(?: 5 | error         )$/xi ? 5 :
+    $f =~ m/^(?: 6 | cb            )$/xi ? 6 : do {
+	$self ||= "Text::CSV_XS";
+	croak ($self->_SetDiagInfo (1500, "skip_empty_rows '$f' is not supported"));
+	};
+    } # _supported_skip_empty_rows
 
 sub skip_empty_rows {
     my $self = shift;
-    @_ and $self->_set_attr_X ("skip_empty_rows", shift);
-    $self->{'skip_empty_rows'};
-    } # always_quote
+    @_ and $self->_set_attr_N ("skip_empty_rows", _supported_skip_empty_rows ($self, shift));
+    my $ser = $self->{'skip_empty_rows'};
+    $ser == 6 or $self->{'_EMPTROW_CB'} = undef;
+    $ser <= 1 ? $ser : $ser == 2 ? "eof"   : $ser == 3 ? "die"   :
+		       $ser == 4 ? "croak" : $ser == 5 ? "error" :
+		       $self->{'_EMPTROW_CB'};
+    } # skip_empty_rows
 
 sub _SetDiagInfo {
     my ($self, $err, $msg) = @_;
@@ -496,7 +518,8 @@ sub formula {
     @_ and $self->_set_attr_N ("formula", _supported_formula ($self, shift));
     $self->{'formula'} == 6 or $self->{'_FORMULA_CB'} = undef;
     [qw( none die croak diag empty undef cb )]->[_supported_formula ($self, $self->{'formula'})];
-    } # always_quote
+    } # formula
+
 sub formula_handling {
     my $self = shift;
     $self->formula (@_);
@@ -621,7 +644,7 @@ sub status {
 sub eof {
     my $self = shift;
     return $self->{'_EOF'};
-    } # status
+    } # eof
 
 sub types {
     my $self = shift;
@@ -996,7 +1019,7 @@ sub header {
     ref $args{'munge_column_names'} eq "HASH" and
 	@hdr = map { $args{'munge_column_names'}->{$_} || $_ } @hdr;
     my %hdr; $hdr{$_}++ for @hdr;
-    exists $hdr{""} and croak ($self->SetDiag (1012));
+    exists $hdr{''} and croak ($self->SetDiag (1012));
     unless (keys %hdr == @hdr) {
 	croak ($self->_SetDiagInfo (1013, join ", " =>
 	    map { "$_ ($hdr{$_})" } grep { $hdr{$_} > 1 } keys %hdr));
@@ -1390,7 +1413,7 @@ sub csv {
 	!defined $c->{'hd_s'} &&  $c->{'attr'}{'sep'} and
 	         $c->{'hd_s'} = [ $c->{'attr'}{'sep'} ];
 	defined  $c->{'hd_s'} and $harg{'sep_set'}            = $c->{'hd_s'};
-	defined  $c->{'hd_d'} and $harg{'detect_bom'}         = $c->{'hd_b'};
+	defined  $c->{'hd_b'} and $harg{'detect_bom'}         = $c->{'hd_b'};
 	defined  $c->{'hd_m'} and $harg{'munge_column_names'} = $hdrs ? "none" : $c->{'hd_m'};
 	defined  $c->{'hd_c'} and $harg{'set_column_names'}   = $hdrs ? 0      : $c->{'hd_c'};
 	@row1 = $csv->header ($fh, \%harg);
@@ -1417,27 +1440,32 @@ sub csv {
 
     $c->{'fltr'} && grep m/\D/ => keys %{$c->{'fltr'}} and $hdrs ||= "auto";
     if (defined $hdrs) {
-	if (!ref $hdrs) {
-	    if ($hdrs eq "skip") {
-		$csv->getline ($fh); # discard;
+	if (!ref $hdrs or ref $hdrs eq "CODE") {
+	    my $h = $c->{'hd_b'}
+		? [ $csv->column_names () ]
+		:   $csv->getline ($fh);
+	    my $has_h = $h && @$h;
+
+	    if (ref $hdrs) {
+		$has_h or return;
+		my $cr = $hdrs;
+		$hdrs  = [ map {  $cr->($hdr{$_} || $_) } @{$h} ];
+		}
+	    elsif ($hdrs eq "skip") {
+		# discard;
 		}
 	    elsif ($hdrs eq "auto") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map {      $hdr{$_} || $_ } @{$h} ];
 		}
 	    elsif ($hdrs eq "lc") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map { lc ($hdr{$_} || $_) } @{$h} ];
 		}
 	    elsif ($hdrs eq "uc") {
-		my $h = $csv->getline ($fh) or return;
+		$has_h or return;
 		$hdrs = [ map { uc ($hdr{$_} || $_) } @{$h} ];
 		}
-	    }
-	elsif (ref $hdrs eq "CODE") {
-	    my $h  = $csv->getline ($fh) or return;
-	    my $cr = $hdrs;
-	    $hdrs  = [ map {  $cr->($hdr{$_} || $_) } @{$h} ];
 	    }
 	$c->{'kh'} and $hdrs and @{$c->{'kh'}} = @{$hdrs};
 	}
@@ -1470,7 +1498,7 @@ sub csv {
 	  do {
 	    my @h = $csv->column_names ($hdrs);
 	    my %h; $h{$_}++ for @h;
-	    exists $h{""} and croak ($csv->SetDiag (1012));
+	    exists $h{''} and croak ($csv->SetDiag (1012));
 	    unless (keys %h == @h) {
 		croak ($csv->_SetDiagInfo (1013, join ", " =>
 		    map { "$_ ($h{$_})" } grep { $h{$_} > 1 } keys %h));
@@ -1570,7 +1598,7 @@ Text::CSV_XS - comma-separated values manipulation routines
                 headers => "auto");   # as array of hash
 
  # Write array of arrays as csv file
- csv (in => $aoa, out => "file.csv", sep_char=> ";");
+ csv (in => $aoa, out => "file.csv", sep_char => ";");
 
  # Only show lines where "code" is odd
  csv (in => "data.csv", filter => { code => sub { $_ % 2 }});
@@ -1956,14 +1984,82 @@ of fields than the previous row will cause the parser to throw error 2014.
 X<skip_empty_rows>
 
  my $csv = Text::CSV_XS->new ({ skip_empty_rows => 1 });
-         $csv->skip_empty_rows (0);
+         $csv->skip_empty_rows ("eof");
  my $f = $csv->skip_empty_rows;
 
-If this attribute is set to C<1>,  any row that has an  L</eol> immediately
-following the start of line will be skipped.  Default behavior is to return
-one single empty field.
+This attribute defines the behavior for empty rows:  an L</eol> immediately
+following the start of line. Default behavior is to return one single empty
+field.
 
-This attribute is only used in parsing.
+This attribute is only used in parsing.  This attribute is ineffective when
+using L</parse> and L</fields>.
+
+Possible values for this attribute are
+
+=over 2
+
+=item 0 | undef
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 0 });
+ $csv->skip_empty_rows (undef);
+
+No special action is taken. The result will be one single empty field.
+
+=item 1 | "skip"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 1 });
+ $csv->skip_empty_rows ("skip");
+
+The row will be skipped.
+
+=item 2 | "eof" | "stop"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 2 });
+ $csv->skip_empty_rows ("eof");
+
+The parsing will stop as if an L</eof> was detected.
+
+=item 3 | "die"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 3 });
+ $csv->skip_empty_rows ("die");
+
+The parsing will stop.  The internal error code will be set to 2015 and the
+parser will C<die>.
+
+=item 4 | "croak"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 4 });
+ $csv->skip_empty_rows ("croak");
+
+The parsing will stop.  The internal error code will be set to 2015 and the
+parser will C<croak>.
+
+=item 5 | "error"
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 5 });
+ $csv->skip_empty_rows ("error");
+
+The parsing will fail.  The internal error code will be set to 2015.
+
+=item callback
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => sub { [] } });
+ $csv->skip_empty_rows (sub { [ 42, $., undef, "empty" ] });
+
+The callback is invoked and its result used instead.  If you want the parse
+to stop after the callback, make sure to return a false value.
+
+The returned value from the callback should be an array-ref. Any other type
+will cause the parse to stop, so these are equivalent in behavior:
+
+ csv (in => $fh, skip_empty_rows => "stop");
+ csv (in => $fh. skip_empty_rows => sub { 0; });
+
+=back
+
+Without arguments, the current value is returned: C<0>, C<1>, C<eof>, C<die>,
+C<croak> or the callback.
 
 =head3 formula_handling
 X<formula_handling>
@@ -3563,6 +3659,8 @@ When C<skip> is used, the header will not be included in the output.
 
  my $aoa = csv (in => $fh, headers => "skip");
 
+C<skip> is invalid/ignored in combinations with L<C<detect_bom>|/detect_bom>.
+
 =item auto
 X<auto>
 
@@ -4606,6 +4704,18 @@ return flags. L</getline_all> returns all rows for an open stream, but this
 will not return flags either.  L</fragment>  can reduce the  required  rows
 I<or> columns, but cannot combine them.
 
+=item provider
+
+ csv (in => $fh) vs csv (provider => sub { get_line });
+
+Whatever the attribute name might end up to be,  this should make it easier
+to add input providers for parsing.   Currently most special variations for
+the C<in> attribute are aimed at CSV generation: e.g. a callback is defined
+to return a reference to a record. This new attribute should enable passing
+data to parse, like getline.
+
+Suggested by Johan Vromans.
+
 =item Cookbook
 
 Write a document that has recipes for  most known  non-standard  (and maybe
@@ -4881,6 +4991,12 @@ X<2014>
 Inconsistent number of fields under strict parsing.
 
 =item *
+2015 "ERW - Empty row"
+X<2015>
+
+An empty row was not allowed.
+
+=item *
 2021 "EIQ - NL char inside quotes, binary off"
 X<2021>
 
@@ -5033,7 +5149,7 @@ C by implementing a simple finite-state machine.   He added variable quote,
 escape and separator characters, the binary mode and the print and getline
 methods. See F<ChangeLog> releases 0.10 through 0.23.
 
-H.Merijn Brand F<E<lt>h.m.brand@xs4all.nlE<gt>> cleaned up the code,  added
+H.Merijn Brand F<E<lt>hmbrand@cpan.orgE<gt>> cleaned up the code,  added
 the field flags methods,  wrote the major part of the test suite, completed
 the documentation,   fixed most RT bugs,  added all the allow flags and the
 L</csv> function. See ChangeLog releases 0.25 and on.

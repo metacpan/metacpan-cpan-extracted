@@ -39,6 +39,6 @@ resources:
   bugtracker: https://github.com/Corion/Spreadsheet-ReadSXC/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Spreadsheet-ReadSXC.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

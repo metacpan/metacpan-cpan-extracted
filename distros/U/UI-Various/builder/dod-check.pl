@@ -78,18 +78,37 @@ use File::Remove;
 #########################
 
 # path to package and some of its files / paths:
-use constant ROOT_PATH => map { s|/[^/]+/[^/]+$||; $_ } abs_path($0);
-use constant EGREP_CLEAN_CODE =>
+use constant DIR0 => abs_path($0);
+# s/.../.../r needs Perl 5.22, so we use more complicated expressions here:
+use constant ROOT_PATH	=> eval{ $_ = DIR0; s|/[^/]+/[^/]+$||; $_ };
+use constant MY_DIR	=> eval{ $_ = DIR0; s|^.*/([^/]+)/[^/]+$|$1|; $_ };
+use constant ID		=> eval{ $_ = ROOT_PATH; s|^.*/||; $_ };
+use constant ID_DIR	=> eval{ $_ = ID; tr|-|/|; $_ };
+use constant ID_MOD	=> eval{ $_ = ID; s|-|::|g; $_ };
+use constant CODE_DIRS => (glob("builder*"),
+			   glob("examples*"),
+			   glob("script*"),
+			   glob("lib*"),
+			   glob("t*"));
+use constant GREP_CLEAN_CODE =>
     "grep --recursive --extended-regexp --line-number '[ \t]+\$' " .
-    'examples lib t';
-use constant UNCOVERABLE => ROOT_PATH . '/builder/confess-uncoverable.lst';
-use constant FGREP_UNCOVERABLE =>
+    join(' ', CODE_DIRS);
+use constant TESTS_RE => ROOT_PATH . '/' . MY_DIR . '/tests.re';
+use constant UNCOVERABLE => ROOT_PATH . '/' . MY_DIR . '/confess-uncoverable.lst';
+use constant GREP_UNCOVERABLE =>
     ('grep', '--recursive', '--fixed-strings', '--after=1', '--include=*.pm',
      'uncoverable', 'lib');
 use constant HTML_ROOT => ROOT_PATH . '/blib/libhtml/site/lib';
 
 use constant BOLD_RED	=> "\e[1;31m";
 use constant RESET	=> "\e[0m";
+
+my $id = Cwd::getcwd();
+$id =~ s|^.*/||;
+my $id_dir = $id;
+$id_dir =~ tr|-|/|;
+my $id_mod = $id;
+$id_mod =~ s/-/::/g;
 
 ########################
 # function prototypes: #
@@ -109,7 +128,7 @@ sub check_unit_tests();
 ###############
 
 my $tests;
-BEGIN  {  $tests = 19;  }
+BEGIN  {  $tests = 15 + scalar(CODE_DIRS);  }
 use Test::More tests => $tests;
 
 my $test_default = 0 < @ARGV && $ARGV[0] =~ m/^\d+$/ ? 0 : 1;
@@ -154,7 +173,7 @@ sub skip_or_run($$$)
 skip_or_run('check clean code', '1st check code for cleanliness',
 	    sub {
 		# return code 1 == no match:
-		run_and_check('check clean code', EGREP_CLEAN_CODE, 1 << 8);
+		run_and_check('check clean code', GREP_CLEAN_CODE, 1 << 8);
 	    });
 
 skip_or_run('Build.PL', 'check this weird error',
@@ -162,27 +181,31 @@ skip_or_run('Build.PL', 'check this weird error',
 		run_and_check
 		    ('Build.PL', 'perl Build.PL', 0,
 		     'Created MYMETA.yml and MYMETA.json',
-		     "Creating new 'Build' script for 'UI-Various' version .*");
+		     "Creating new 'Build' script for '" . ID . "' version .*");
 	    });
 
 skip_or_run('build', 'repair build 1st',
 	    sub {
-		run_and_check('build', './Build', 0, 'Building UI-Various');
+		run_and_check('build', './Build', 0, 'Building ' . ID);
 	    });
 
 skip_or_run('check EN messages', 'fix EN language source 1st',
 	    sub {
 		run_and_check('check EN messages',
-			      './builder/update-language.pl --check',
+			      ROOT_PATH . '/' . MY_DIR .
+			      '/update-language.pl --check',
 			      0);
 	    });
 
 my %re_vers = (builder => '(v5\.14\.0 +\| v5\.6\.0|v5\.22\.0 +\| v5\.21\.8)',
 	       examples => '((v5\.14\.0|~) +\| (v5\.6\.0|v5.4\.5|~))',
 	       lib => '(v5\.14\.0 +\| v5\.[68]\.0)',
-	       t => '(v5\.14\.0 +\| v5\.6\.0|~ +\| (~|v5\.8\.0))');
-foreach my $dir (sort keys %re_vers)
+	       script => '(v5\.14\.0 +\| v5\.[68]\.0)',
+	       t => '(v5\.14\.0 +\| v5\.6\.0|~ +\| (~|v5\.[68]\.0))');
+foreach my $dir (CODE_DIRS)
 {
+    defined $re_vers{$dir}
+	or  die "regular expression missing for version check of $dir";
     skip_or_run('check Perl versions in ' . $dir,
 		'fix unsupported syntax / features in ' . $dir,
 		sub {
@@ -200,14 +223,14 @@ foreach my $dir (sort keys %re_vers)
 		});
 }
 
+open T, '<', TESTS_RE  or  die "can't open " . TESTS_RE . ": $!\n";
+my @re_tests = (<T>);
+close T  or  die "can't close " . TESTS_RE . ": $!\n";
 skip_or_run('tests', 'repair tests 1st',
 	    sub {
 		run_and_check('tests', './Build test', 0,
-			      '# Testing UI::Various .* Perl v5\..*',
-			      '# Tk has version [0-9.]+',
-			      '# Curses::UI has version [0-9.]+',
-			      '# Term::ReadLine has version [0-9.]+',
-			      't/\d\d-.*\.t \.+ ok *$+',
+			      '# Testing ' . ID_MOD . ' .* Perl v5\..*',
+			      @re_tests,
 			      'All tests successful\.',
 			      'Files=\d+, Tests=\d+, .*',
 			      'Result: PASS');
@@ -231,11 +254,11 @@ skip_or_run('update Minilla', 'repair Minilla configuration & prerequisites',
 		     'Creating working directory: .*',
 		     '[^C].*$+',
 		     'Created MYMETA.yml and MYMETA.json',
-		     "Creating new 'Build' script for 'UI-Various' version .*",
+		     "Creating new 'Build' script for '" . ID . "' version .*",
 		     '[^B].*$+',
-		     'Building UI-Various',
+		     'Building ' . ID,
 		     '[^t][^/].*$+',
-		     't/\d\d-.*\.t \.+ ok *$+',
+		     @re_tests,
 		     'All tests successful\.',
 		     'Files=\d+, Tests=\d+, .*',
 		     'Result: PASS',
@@ -247,7 +270,7 @@ skip_or_run('Build.PL again', 'check this even weirder error',
 		run_and_check
 		    ('Build.PL again', 'perl Build.PL', 0,
 		     'Created MYMETA.yml and MYMETA.json',
-		     "Creating new 'Build' script for 'UI-Various' version .*");
+		     "Creating new 'Build' script for '" . ID . "' version .*");
 	    });
 
 skip_or_run('cross-check uncoverable',
@@ -258,11 +281,8 @@ skip_or_run('test coverage', 'improve test coverage',
 	    sub {
 		run_and_check
 		    ('test coverage', './Build testcover', 0,
-		     '# Testing UI::Various .* Perl v5\..*',
-		     '# Tk has version 804.[0-9]{3}',
-		     '# Curses::UI has version 0.9609',
-		     '# Term::ReadLine has version 1.17',
-		     't/\d\d-.*\.t \.+ ok *$+',
+		     '# Testing ' . ID_MOD . ' .* Perl v5\..*',
+		     @re_tests,
 		     'All tests successful.',
 		     'Files=\d+, Tests=\d+, .*',
 		     'Result: PASS',
@@ -280,16 +300,18 @@ skip_or_run('test coverage', 'improve test coverage',
 
 skip_or_run('POD tests', 'fix documentation',
 	    sub {
-		run_and_check('POD tests', './Build testpod', 0,
-			      '1\.\.\d+',
-			      'ok \d+ - POD test for blib/lib/UI/Various.*$+');
+		run_and_check
+		    ('POD tests', './Build testpod', 0,
+		     '1\.\.\d+',
+		     'ok \d+ - POD test for blib/lib/' . ID_DIR . '.*$+',
+		     'ok \d+ - POD test for blib/script/.*$+');
 	    });
 
 skip_or_run('POD coverage', 'improve documentation',
 	    sub {
 		run_and_check('POD coverage', './Build testpodcoverage', 0,
 			      '1\.\.\d+',
-			      'ok \d+ - Pod coverage on UI::Various.*$+');
+			      'ok \d+ - Pod coverage on ' . ID_MOD . '.*$+');
 	    });
 
 # Module::Build::Base (0.4231) sets an incomplete (missing vendor / arch)
@@ -339,7 +361,7 @@ error output using markup specific for each message type.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 sub _error(@)
-{   print STDERR BOLD_RED, "*******\t", @_, RESET, " *******\n";   }
+{   print STDERR BOLD_RED, "*******\t", @_, ' *******', RESET, "\n";   }
 sub _warn(@)
 {   print STDERR BOLD_RED, @_, RESET, "!\n";   }
 sub _info(@)
@@ -408,8 +430,11 @@ sub run_and_check($$$@)
     0 == @re_expected_output  and  @re_expected_output = ('^$');
     subtest $description => sub{
 	my @output =
-	    # TODO: filter out temporary diagnostics of t/3?-tk-?.t:
-	    grep {!/^# UI::Various::Tk has been initialised$/}
+	    # Devel::Cover causes additional warnings for ReadLine/Gnu/XS.pm:
+	    grep {!m|^Devel::Cover: .*blib/lib/Term/ReadLine/Gnu/XS.pm |}
+	    # TODO: filter out temporary diagnostics of some tests:
+	    grep {!m/^# terminal size is \d+x\d+$/}
+	    grep {!m/^# UI::Various::Tk has been initialised$/}
 	    `$command 2>&1`;
 	is($?, $return_code, '"' . $command . '" runs without error');
 	unless ($? == $return_code)
@@ -459,7 +484,8 @@ sub run_and_check($$$@)
 	    }
 	    elsif (defined $offset  and  $offset eq '?')
 	    {
-		die 'TODO';
+		$ie++;
+		redo;
 	    }
 	    else
 	    {
@@ -494,10 +520,12 @@ whole words!) and counts and reports them.
 sub check_fixmes_todos()
 {
     my ($fixmes, $todos) = (0, 0);
+    my $my_dir = MY_DIR;
     local $_;
 
     find(sub {
 	     return unless m/\.(p[lm]|t)$/n;
+	     return if $File::Find::dir =~ m!(?:^|/)$my_dir!o;
 	     open SRC, '<', $File::Find::name  or  die "can't open $_: $!\n";
 	     while (<SRC>)
 	     {
@@ -506,9 +534,7 @@ sub check_fixmes_todos()
 	     }
 	     close SRC  or  die "can't close $File::Find::name: $!\n";
 	 },
-	 ROOT_PATH . '/examples',
-	 ROOT_PATH . '/lib',
-	 ROOT_PATH . '/t',
+	 map { $_ =  ROOT_PATH . '/' . $_ } CODE_DIRS
 	);
 
     if ($fixmes > 0  or  $todos > 0)
@@ -516,8 +542,9 @@ sub check_fixmes_todos()
 	print(STDERR
 	      "\n", 'In addition there are ', $fixmes, ' FIXMEs and ', $todos,
 	      ' TODOs left, check them in ', ROOT_PATH, " with:\n",
-	      'egrep --recursive --include=*.p[lm] --include=*.t ',
-	      "'\\<(FIXME|TODO)\\>' examples lib t\n\n");
+	      'grep --recursive --extended-regexp --include=*.p[lm] ',
+	      "--include=*.t '\\<(FIXME|TODO)\\>' ",
+	      join(' ', CODE_DIRS), "\n\n");
 	return 0;
     }
     return 1;
@@ -624,21 +651,23 @@ sub check_uncoverable()
     while (<UC>)
     {
 	s/\r//;
+	$location .= $_  unless  m/^--$/;
 	if (m/^--$/  or  eof UC)
-	{   $uncoverable{$location} = 0;   $location = '';   }
-	else
-	{   $location .= $_;   }
+	{
+	    $uncoverable{$location} = 0;   $location = '';
+	}
     }
     close UC  or  die "can't close ", UNCOVERABLE, ': ', $!, "\n";
     $location eq ''  or  die 'internal error';
 
     my $errors = 0;
     subtest 'cross-check uncoverable' => sub{
-	open UC, '-|', FGREP_UNCOVERABLE
-	    or  die "can't run ", FGREP_UNCOVERABLE, ': ', $!, "\n";
+	open UC, '-|', GREP_UNCOVERABLE
+	    or  die "can't run ", GREP_UNCOVERABLE, ': ', $!, "\n";
 	while (<UC>)
 	{
 	    s/\r//;
+	    $location .= $_  unless  m/^--$/;
 	    if (m/^--$/  or  eof UC)
 	    {
 		if ($location =~ m/ uncoverable .* # TODO/)
@@ -655,8 +684,6 @@ sub check_uncoverable()
 		}
 		$location = '';
 	    }
-	    else
-	    {   $location .= $_;   }
 	}
 	foreach (sort keys %uncoverable)
 	{
@@ -673,7 +700,7 @@ sub check_uncoverable()
 		$errors++;
 	    }
 	}
-	close UC  or  die "can't close ", FGREP_UNCOVERABLE, ': ', $!, "\n";
+	close UC  or  die "can't close ", GREP_UNCOVERABLE, ': ', $!, "\n";
     };
     return $errors == 0;
 }
@@ -742,7 +769,7 @@ sub check_unit_tests()
 
 =head1 SEE ALSO
 
-C<L<UI::Various::language::en>>
+C<L<UI::Various>>
 
 =head1 LICENSE
 

@@ -10,10 +10,11 @@ BEGIN {
 use Test::More tests => 3;
 
 require_ok( 'ORLite' );
-require_ok( 't::lib::Test' );
+use lib 't/lib';
+use_ok( 'LocalTest' );
 
 is(
 	$ORLite::VERSION,
-	$t::lib::Test::VERSION,
+	$LocalTest::VERSION,
 	'$VERSION match'
 );

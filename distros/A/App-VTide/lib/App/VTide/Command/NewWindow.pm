@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('1.0.4');
 our $NAME    = 'new-window';
 our $OPTIONS = [ 'number|n=s', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -43,7 +43,7 @@ App::VTide::Command::NewWindow - Create a new-window in a running App::VTide ses
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::NewWindow version 0.1.16
+This documentation refers to App::VTide::Command::NewWindow version 1.0.4
 
 =head1 SYNOPSIS
 

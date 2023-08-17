@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetVerticalPageBreakRequest.name :   ,
-# GetVerticalPageBreakRequest.sheetName :   ,
-# GetVerticalPageBreakRequest.index :   ,
-# GetVerticalPageBreakRequest.folder :   ,
-# GetVerticalPageBreakRequest.storageName :    
+# GetVerticalPageBreakRequest.name : The workbook name.  ,
+# GetVerticalPageBreakRequest.sheetName : The worksheet name.  ,
+# GetVerticalPageBreakRequest.index : The zero based index of the element.  ,
+# GetVerticalPageBreakRequest.folder : Original workbook folder.  ,
+# GetVerticalPageBreakRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_vertical_page_break' } = { 
-    	summary => '',
+    	summary => 'Gets a vertical page break description in worksheet.',
         params => $params,
         returns => 'VerticalPageBreakResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'The zero based index of the element.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

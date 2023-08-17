@@ -131,7 +131,7 @@ sub add_worker {
 
    print "[$$] adding worker (workers $workers, idle $idle).\n" if $VERBOSE >= 2;
 
-   my $state = "-";
+   my $state = "0";
 
    $template->fork->run ("PApp::SCGI::Worker::run", sub {
       my $fh = shift
@@ -150,7 +150,7 @@ sub add_worker {
                   undef $rw;
                   --$workers;
                   --$idle if $state eq "0";
-                  print "[$$] removing worker (workers $workers, idle $idle).\n" if $VERBOSE >= 2;
+                  print "[$$] removing worker (state $state) (workers $workers, idle $idle).\n" if $VERBOSE >= 2;
                   check;
                }
                $state = $newstate;
@@ -161,7 +161,7 @@ sub add_worker {
 
             undef $rw;
             --$workers;
-            --$idle if $state eq "1";
+            --$idle if $state eq "0";
             check;
          }
       };

@@ -3,22 +3,20 @@ package Stepford::Types::Internal;
 use strict;
 use warnings;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.006001';
 
 use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw( ArrayRef Str );
 use Moose::Util::TypeConstraints qw( enum );
 
-use MooseX::Types -declare => [
-    qw(
-        ArrayOfClassPrefixes
-        ArrayOfDependencies
-        ArrayOfSteps
-        Logger
-        PossibleClassName
-        Step
-        )
-];
+use MooseX::Types -declare => [ qw(
+    ArrayOfClassPrefixes
+    ArrayOfDependencies
+    ArrayOfSteps
+    Logger
+    PossibleClassName
+    Step
+) ];
 
 use namespace::clean;
 
@@ -66,7 +64,7 @@ Stepford::Types::Internal - Internal type definitions for Stepford
 
 =head1 VERSION
 
-version 0.006000
+version 0.006001
 
 =head1 SUPPORT
 
@@ -78,7 +76,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2023 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

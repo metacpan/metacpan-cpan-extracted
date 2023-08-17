@@ -1,0 +1,21 @@
+Revision history for Syntax-Operator-Matches
+
+0.000003    2023-08-15
+
+  - Add a `mismatches` operator.
+  - Improved documentation.
+  - Improved test suite.
+
+0.000002    2023-07-10
+
+  - If the right-hand side of the `matches` operator is a non-reference,
+    short-circuit match::simple and directly check definedness and string
+    equality.
+  - If the right-hand side of the `matches` operator is a Type::Tiny object,
+    short-circuit match::simple and directly use the Type::Tiny API.
+  - Both these changes are merely optimizations and shouldn't affect the
+    result of the operator.
+
+0.000001    2023-07-07
+
+  - First version, released on an unsuspecting world.

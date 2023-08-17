@@ -1,5 +1,8 @@
 Revision history for Test-Kit
 
+2.16    2023-07-25
+        - Add support for newer Perls and UNIVERSAL.pm (https://github.com/kaoru/Test-Kit2/pull/3)
+
 2.15    2016-06-06
         - Add back one Test-Simple 1.3 special case for strict/warnings
         - Remove Test::Aggregate tests

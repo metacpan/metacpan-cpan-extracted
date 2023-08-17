@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.04
 
 SYNOPSIS
 
@@ -38,6 +38,28 @@ CONFIG
         [SyncCPANfile]
         comment  = This is my cpanfile
         comment  = line 2
+
+ cpan_audit
+
+    When cpan_audit is enabled, the required module version is not defined
+    (or 0), and the module has vulnerabilities, the "fixed version" storied
+    in CPAN::Audit is used as a minimum version.
+
+      [SyncCPANfile]
+      cpan_audit = 1
+    
+      [Prereqs]
+      ExtUtils::MakeMaker = 0
+
+    ExtUtils::MakeMaker has a vulnerability in versions <= 7.21. As the
+    minimum version in the dist.ini is 0 and cpan_audit is enabled, the
+    cpanfile will use 7.22 as the minimum version (as of June 2023).
+
+    As this depends on the CPAN::Audit database, you should update
+    CPAN::Audit regularly.
+
+    For dependencies where a minimum version is defined and the defined
+    version is vulnerable a warning is shown.
 
 SEE ALSO
 

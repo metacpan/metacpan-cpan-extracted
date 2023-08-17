@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/GET.pl
@@ -6,11 +7,7 @@ examples/PUT.pl
 lib/Net/Async/HTTP.pm
 lib/Net/Async/HTTP/Connection.pm
 lib/Net/Async/HTTP/StallTimer.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01request.t
 t/02uri.t
@@ -36,6 +33,7 @@ t/21local-connect-ssl.t
 t/22local-connect-pipeline.t
 t/23local-connect-redir.t
 t/24local-connect-redir-ssl.t
+t/25local-connect-unix.t
 t/30timeout.t
 t/31cancel.t
 t/32remove.t
@@ -54,3 +52,7 @@ t/99pod.t
 t/privkey.pem
 t/regen-certs.sh
 t/server.pem
+README
+LICENSE
+META.yml
+META.json

@@ -672,6 +672,27 @@ sub _probe_astream_ids {
 	return \@rv;
 }
 
+=head2 audio_channel_count
+
+Returns the number of channels in the first audio stream
+
+=cut
+
+has 'audio_channel_count' => (
+	is => 'rw',
+	isa => 'Int',
+	lazy => 1,
+	builder => '_probe_audio_channel_count',
+);
+
+sub _probe_audio_channel_count {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->audio_channel_count;
+	}
+	return $self->_get_audiodata->{channels};
+}
+
 =head2 vstream_id
 
 Returns the numeric ID for the first video stream in this file. Useful

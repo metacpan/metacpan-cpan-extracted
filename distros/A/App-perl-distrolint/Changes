@@ -1,0 +1,12 @@
+Revision history for App-perl-distrolint
+
+0.02    2023-08-11
+        [CHANGES]
+         * Improved tree-walking code using newer features of
+           `Text::Treesitter`
+         * Added a POD checker
+         * Added `Test::Deep` to the list of banned test modules
+
+0.01    2023-07-19
+        First version, released on an unsuspecting world.
+

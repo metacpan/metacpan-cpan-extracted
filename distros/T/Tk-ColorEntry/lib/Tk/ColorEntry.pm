@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.05';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -83,15 +83,15 @@ sub Populate {
 	
 	my $entry = $self->Entry(
 	)->pack(
-		-side => 'left', 
+		-side => 'left',
+		-expand => 1,
 		-fill => 'x',
-		-padx => 2,
-		-pady => 2,
+# 		-pady => 2,
 	);
 	my $indicator = $self->Label->pack(
 		-side => 'left',
 		-padx => 2,
-		-pady => 2,
+# 		-pady => 2,
 	);
 	$self->Advertise('Display', $indicator);
 	$self->Advertise('Entry', $entry);
@@ -116,7 +116,7 @@ sub Populate {
 		-entryerrorcolor => ['PASSIVE', undef, undef, '#FF0000'],
 		-entryforeground => ['PASSIVE', undef, undef, $self->Subwidget('Entry')->cget('-foreground')],
 		-font => [$entry],
-		-foreground => ['SELF', 'DESCENDANTS'],
+		-foreground => [$entry],
 		-indborderwidth => [{
 			-borderwidth => $indicator,
 			-indborderwidth => $pop,
@@ -129,8 +129,10 @@ sub Populate {
 			-relief => $indicator,
 			-indrelief => $pop,
 		}, undef, undef, 'sunken'],
+		-justify => [$entry],
 		-popborderwidth => [{-borderwidth => $pop}, undef, undef, 1],
 		-poprelief => [{-relief => $pop}, undef, undef, 'raised'],
+		-state => [$entry],
 		-variable => [{-textvariable => $entry}, undef, undef, \$var],
 		-width => [$entry],
 		DEFAULT => [ $pop ],

@@ -2,28 +2,22 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.006 of App::ClipboardUtils (from Perl
-    distribution App-ClipboardUtils), released on 2022-12-08.
+    This document describes version 0.007 of App::ClipboardUtils (from Perl
+    distribution App-ClipboardUtils), released on 2023-04-13.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
     clipboard:
 
-    *   add-clipboard-content
-
-    *   clear-clipboard-content
-
-    *   clear-clipboard-history
-
-    *   clipadd
-
-    *   clipget
-
-    *   detect-clipboard-manager
-
-    *   get-clipboard-content
-
-    *   list-clipboard-history
+    1. add-clipboard-content
+    2. clear-clipboard-content
+    3. clear-clipboard-history
+    4. clipadd
+    5. clipget
+    6. detect-clipboard-manager
+    7. get-clipboard-content
+    8. get-clipboard-history-item
+    9. list-clipboard-history
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -53,7 +47,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

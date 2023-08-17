@@ -8,13 +8,13 @@ SYNOPSIS
      use base qw(Plack::Component::Tags::HTML);
 
      sub _cleanup {
-            my $self = shift;
+            my ($self, $env) = @_;
             # Cleanup about call().
             return;
      }
 
      sub _css {
-            my $self = shift;
+            my ($self, $env) = @_;
             $self->{'css'}->put(
                     # Structure defined by CSS::Struct
             );
@@ -34,7 +34,7 @@ SYNOPSIS
      }
 
      sub _tags_middle {
-            my $self = shift;
+            my ($self, $env) = @_;
             $self->{'tags'}->put(
                     # Structure defined by Tags
             );
@@ -111,10 +111,11 @@ ACCESSOR METHODS
 
 METHODS TO OVERWRITE
   "_cleanup"
-    Method to cleanup after "call()". Argument is $self only.
+    Method to cleanup after "call()". Arguments are $self and $env.
 
   "_css"
-    Method to set css via "$self->{'css'}" object. Argument is $self only.
+    Method to set css via "$self->{'css'}" object. Arguments are $self and
+    $env.
 
   "_prepare_app"
     Method to set app preparation part. Called only once on start. Argument
@@ -137,19 +138,20 @@ METHODS TO OVERWRITE
 
   "_process_actions"
     Method to set app processing part. Called in each call before creating
-    of output. Argument is $self and $env.
+    of output. Arguments are $self and $env.
 
   "_tags_middle"
-    Method to set tags via "$self->{'tags'}" object. Argument is $self only.
+    Method to set tags via "$self->{'tags'}" object. Arguments are $self and
+    $env.
 
 METHODS IMPLEMENTED
   "call"
     Inherited from Plack::Component. There is run of:
 
      $self->_process_actions($env);
-     $self->_css;
-     $self->_tags;
-     $self->_cleanup;
+     $self->_css($env);
+     $self->_tags($env);
+     $self->_cleanup($env);
 
     After it Generate and encode output from Tags to output with HTTP code.
     HTTP status code is defined by "status_code()" method and Content-Type
@@ -171,7 +173,7 @@ EXAMPLE1
      use warnings;
 
      sub _tags_middle {
-             my $self = shift;
+             my ($self, $env) = @_;
 
              $self->{'tags'}->put(
                      ['d', 'Hello world'],
@@ -217,7 +219,7 @@ EXAMPLE2
      use warnings;
 
      sub _tags_middle {
-             my $self = shift;
+             my ($self, $env) = @_;
 
              $self->{'tags'}->put(
                      ['d', 'Hello world'],
@@ -276,5 +278,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.15
 

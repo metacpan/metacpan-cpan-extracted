@@ -59,10 +59,8 @@ int32_t SPVM__Sys__Socket__AddrinfoLinkedList__to_array(SPVM_ENV* env, SPVM_VALU
     }
   }
   
-  int32_t addrinfo_basic_type_id = env->get_basic_type_id_by_name(env, stack, "Sys::Socket::Addrinfo", &e, __func__, FILE_NAME, __LINE__);
+  void* obj_addrinfos = env->new_object_array_by_name(env, stack, "Sys::Socket::Addrinfo", length, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
-  
-  void* obj_addrinfos = env->new_object_array(env, stack, addrinfo_basic_type_id, length);
   
   int32_t index = 0;
   {

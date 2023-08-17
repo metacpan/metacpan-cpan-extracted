@@ -1,0 +1,10 @@
+Revision history for Object-Pad-FieldAttr-Checked
+
+0.02    2023-08-14
+        [CHANGES]
+         * Various documentation updates and improvements; including
+           remembering to add some SYNOPSIS code
+         * Cache the `->check` method CV for improved runtime performance
+
+0.01    2023-08-14
+        First version, released on an unsuspecting world.

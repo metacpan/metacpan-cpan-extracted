@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.000;
+our $VERSION = 1.001;
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -22,7 +22,7 @@ Geo::Location::TimeZoneFinder - Map geographic coordinates to time zone names
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Get the Configured API level if it is defined",
+   "author" : [
+      "Timothy Legge <timlegge@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-OpenSSL-ConfiguredAPI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Crypt::OpenSSL::Guess" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Crypt::OpenSSL::Guess" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Crypt::OpenSSL::Guess" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::OpenSSL::ConfiguredAPI" : {
+         "file" : "lib/Crypt/OpenSSL/ConfiguredAPI.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-ConfiguredAPI/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-ConfiguredAPI.git",
+         "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-ConfiguredAPI"
+      }
+   },
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_maintainers" : [
+      "Timothy Legge <timlegge@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

@@ -1,0 +1,577 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_fill_cells/csv_fill_cells
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-25'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '1.030'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv_fill_cells/csv_fill_cells",
+    program_name => "csv-fill-cells",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Create a CSV and fill its cells from supplied values (a 1-column CSV)
+# PODNAME: csv-fill-cells
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv-fill-cells - Create a CSV and fill its cells from supplied values (a 1-column CSV)
+
+=head1 VERSION
+
+This document describes version 1.030 of csv-fill-cells (from Perl distribution App-CSVUtils), released on 2023-07-25.
+
+=head1 SYNOPSIS
+
+B<csv-fill-cells> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<csv-fill-cells> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<csv-fill-cells> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--filter|/"--filter=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--layout|/"--layout=s">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num-fields|/"--num-fields=s*">>=I<L<posint|Sah::Schema::posint>>] [B<L<--num-rows|/"--num-rows=s*">>=I<L<posint|Sah::Schema::posint>>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This utility takes values (from cells of a 1-column input CSV), creates an
+output CSV of specified size, and fills the output CSV in one of several
+possible ways ("layouts"): left-to-right first then top-to-bottom, or
+bottom-to-top then left-to-right, etc.
+
+Some illustration of the layout:
+
+ % cat 1-to-100.csv
+ num
+ 1
+ 2
+ 3
+ ...
+ 100
+ 
+ % csv-fill-cells 1-to-100.csv --num-rows 10 --num-fields 10 ; # default layout is 'left_to_right_then_top_to_bottom'
+ field0,field1,field2,field3,field4,field5,field6,field7,field8,field9
+ 1,2,3,4,5,6,7,8,9,10
+ 11,12,13,14,15,16,17,18,19,20
+ 21,22,23,24,25,26,27,28,29,30
+ ...
+ 91,92,93,94,95,96,97,98,99,100
+ 
+ % csv-fill-cells 1-to-100.csv --num-rows 10 --num-fields 10 --layout top_to_bottom_then_left_to_right
+ field0,field1,field2,field3,field4,field5,field6,field7,field8,field9
+ 1,11,21,31,41,51,61,71,81,91
+ 2,12,22,32,42,52,62,72,82,92
+ 3,13,23,33,43,53,63,73,83,93
+ ...
+ 10,20,30,40,50,60,70,80,90,100
+ 
+ % csv-fill-cells 1-to-100.csv --num-rows 10 --num-fields 10 --layout top_to_bottom_then_right_to_left
+ 91,81,71,61,51,41,31,21,11,1
+ 92,82,72,62,52,42,32,22,12,2
+ 93,83,73,63,53,43,33,23,13,3
+ ...
+ 100,90,80,70,60,50,40,30,20,10
+ 
+ % csv-fill-cells 1-to-100.csv --num-rows 10 --num-fields 10 --layout right_to_left_then_top_to_bottom
+ 10,9,8,7,6,5,4,3,2,1
+ 20,19,18,17,16,15,14,13,12,11
+ 30,29,28,27,26,25,24,23,22,21
+ ...
+ 100,99,98,97,96,95,94,93,92,91
+
+Some additional options are available, e.g.: a filter to let skip filling some
+cells.
+
+When there are more input values than can be fitted, the extra input values are
+not placed into the output CSV.
+
+When there are less input values to fill the specified number of rows, then only
+the required number of rows and/or columns will be used.
+
+Additional options planned:
+
+=over
+
+=item * what to do when there are less values to completely fill the output CSV
+(whether to always expand or expand when necessary, which is the default).
+
+=item * what to do when there are more values (extend the table or ignore the extra
+input values, which is the default).
+
+=back
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Filtering options
+
+=over
+
+=item B<--filter>=I<s>
+
+Code to filter cells to fill.
+
+Code will be compiled in the C<main> package.
+
+Code is passed C<($r, $output_row_num, $output_field_idx)> where C<$r> is the
+stash, C<$output_row_num> is a 1-based integer (first data row means 1), and
+C<$output_field_idx> is the 0-based field index (0 means the first index). Code
+is expected to return a boolean value, where true meaning the cell should be
+filied.
+
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--input-escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--input-tsv> option.
+
+
+=item B<--input-filename>=I<s>
+
+Input CSV file.
+
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--input-quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
+
+
+=item B<--input-sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+
+=item B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
+options. If one of those options is specified, then C<--input-tsv> will be
+ignored.
+
+
+=item B<--no-input-header>
+
+Specify that input CSV does not have a header row.
+
+By default, the first row of the input CSV will be assumed to contain field
+names (and the second row contains the first data row). When you declare that
+input CSV does not have header row (C<--no-input-header>), the first row of the
+CSV is assumed to contain the first data row. Fields will be named C<field1>,
+C<field2>, and so on.
+
+
+=back
+
+=head2 Layout options
+
+=over
+
+=item B<--layout>=I<s>
+
+Specify how the output CSV is to be filled.
+
+Default value:
+
+ "left_to_right_then_top_to_bottom"
+
+Valid values:
+
+ ["left_to_right_then_top_to_bottom","right_to_left_then_top_to_bottom","left_to_right_then_bottom_to_top","right_to_left_then_bottom_to_top","top_to_bottom_then_left_to_right","top_to_bottom_then_right_to_left","bottom_to_top_then_left_to_right","bottom_to_top_then_right_to_left"]
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--inplace>
+
+Output to the same file as input.
+
+Normally, you output to a different file than input. If you try to output to the
+same file (C<-o INPUT.csv -O>) you will clobber the input file; thus the utility
+prevents you from doing it. However, with this C<--inplace> option, you can
+output to the same file. Like perl's C<-i> option, this will first output to a
+temporary file in the same directory as the input file then rename to the final
+file at the end. You cannot specify output file (C<-o>) when using this option,
+but you can specify backup extension with C<-b> option.
+
+Some caveats:
+
+=over
+
+=item * if input file is a symbolic link, it will be replaced with a regular file;
+
+=item * renaming (implemented using C<rename()>) can fail if input filename is too long;
+
+=item * value specified in C<-b> is currently not checked for acceptable characters;
+
+=item * things can also fail if permissions are restrictive;
+
+=back
+
+
+=item B<--inplace-backup-ext>=I<s>, B<-b>
+
+Extension to add for backup of input file.
+
+Default value:
+
+ ""
+
+In inplace mode (C<--inplace>), if this option is set to a non-empty string, will
+rename the input file using this extension as a backup. The old existing backup
+will be overwritten, if any.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--num-fields>=I<s>*
+
+Number of fields of the output CSV.
+
+=item B<--num-rows>=I<s>*
+
+Number of rows of the output CSV.
+
+=item B<--output-always-quote>
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
+
+
+=item B<--output-escape-char>=I<s>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+
+=item B<--output-filename>=I<s>, B<-o>
+
+Output filename.
+
+Use C<-> to output to stdout (the default if you don't specify this option).
+
+Encoding of output file is assumed to be UTF-8.
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--output-header>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+
+=item B<--output-quote-char>=I<s>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+
+=item B<--output-quote-empty>
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
+
+
+=item B<--output-sep-char>=I<s>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--input-sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+
+=item B<--output-tsv>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--input-tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+
+=item B<--overwrite>, B<-O>
+
+Whether to override existing output file.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv-fill-cells csv-fill-cells
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv-fill-cells 'p/*/`csv-fill-cells`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Fill number 1..100 into a 10x10 grid
+
+ % seq 1 100 | csv-fill-cells --num-rows 10 --num-fields 10
+ field0,field1,field2,field3,field4,field5,field6,field7,field8,field9
+ 2,3,4,5,6,7,8,9,10,11
+ 12,13,14,15,16,17,18,19,20,21
+ 22,23,24,25,26,27,28,29,30,31
+ 32,33,34,35,36,37,38,39,40,41
+ 42,43,44,45,46,47,48,49,50,51
+ 52,53,54,55,56,57,58,59,60,61
+ 62,63,64,65,66,67,68,69,70,71
+ 72,73,74,75,76,77,78,79,80,81
+ 82,83,84,85,86,87,88,89,90,91
+ 92,93,94,95,96,97,98,99,100,
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

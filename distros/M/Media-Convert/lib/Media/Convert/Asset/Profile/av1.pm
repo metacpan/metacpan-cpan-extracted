@@ -36,6 +36,8 @@ sub _probe_videocodec {
 	my $codecs = Media::Convert::FfmpegInfo->instance->codecs;
 	die "av1 not supported by ffmpeg" unless exists($codecs->{av1});
 	if($codecs->{av1}{description} =~ /libsvtav1/) {
+		my $version = Media::Convert::FfmpegInfo->instance->version;
+		die "svtav1 support immature by supplied version of ffmpeg" unless $version >= "5.1.0";
 		return "libsvtav1";
 	} elsif ($codecs->{av1}{description} =~ /libaom/) {
 		print STDERR "Warning: libsvtav1 not supported by ffmpeg. Trying libaom-av1 instead, which will probably be too slow...\n";
@@ -44,6 +46,10 @@ sub _probe_videocodec {
 		print STDERR "Warning: ffmpeg supports av1, but it is neither libsvtav1 nor libaom-av1. Trying, but not sure what's going to happen...\n";
 		return "av1";
 	}
+}
+
+sub _probe_pix_fmt {
+	return "yuv420p10le";
 }
 
 sub _probe_audiocodec {
@@ -55,10 +61,23 @@ sub _probe_quality {
 }
 
 sub _probe_video_preset {
-	if(shift->video_height > 1080) {
-		return 5;
-	}
-	return 1;
+	return 4;
+}
+
+sub _probe_videobitrate {
+	return;
+}
+
+sub _probe_videominrate {
+	return;
+}
+
+sub _probe_videomaxrate {
+	return;
+}
+
+sub _probe_extra_params {
+	return { "svtav1-params" => "tune=0:film-grain=8" };
 }
 
 1;

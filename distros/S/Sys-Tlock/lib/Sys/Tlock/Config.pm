@@ -1,7 +1,7 @@
 # Sys::Tlock::Config.pm
 # Dummy module. Overwritten at install time.
 
-package Config;
+package Sys::Tlock::Config;
 use strict;
 
 our $home;

@@ -5,15 +5,14 @@ use warnings;
 
 use syntax 'maybe';
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 use Moo;
 use Types::Standard qw/HashRef Maybe Object Str Value is_Str/;
 
-use OpenTracing::AutoScope;
+use OpenTracing::GlobalTracer;
 use Scalar::Util 'blessed';
-
-
+use Carp qw/croak/ ;
 
 has 'redis' => (
     is => 'ro',
@@ -62,7 +61,7 @@ sub AUTOLOAD {
     
     my $method_wrap = sub {
         my $self = shift;
-        OpenTracing::AutoScope->start_guarded_span(
+        my $scope = _global_tracer_start_active_span(
             $operation_name,
             tags => {
                 'component'     => $component_name,
@@ -76,7 +75,30 @@ sub AUTOLOAD {
             },
         );
         
-        return $self->redis->$method_call(@_);
+        my $result;
+        my $wantarray = wantarray();
+        
+        my $ok = eval {
+            if ($wantarray) {
+                $result = [ $self->redis->$method_call(@_) ];
+            } else {
+                $result = $self->redis->$method_call(@_);
+            };
+            1;
+        };
+        my $error = $@;
+        
+        if ( $ok ) {
+            $scope->close()
+        } else {
+            $scope->get_span()->add_tags(
+                generate_error_tags( $db_statement, $error )
+            );
+            $scope->close();
+            croak $error;
+        }
+        
+        return $wantarray ? @$result : $result;
     };
     
     # Save this method for future calls
@@ -84,6 +106,38 @@ sub AUTOLOAD {
     *$AUTOLOAD = $method_wrap;
     
     goto $method_wrap;
+}
+
+
+
+sub _global_tracer_start_active_span {
+    my $operation_name = shift;
+    my @args = @_;
+    
+    return OpenTracing::GlobalTracer->get_global_tracer()->start_active_span(
+        $operation_name,
+        @args,
+    );
+}
+
+
+
+sub generate_error_tags {
+    my ( $db_statement, $error ) = @_;
+    
+    my $error_message = $error;
+    chomp $error_message;
+    
+    my $error_kind = "REDIS_EXCEPTION";
+#   my $error_kind = sprintf("REDIS_EXCEPTION_%s",
+#       $db_statement,
+#   );
+#   
+    return (
+        'error'      => 1,
+        'message'    => $error_message,
+        'error.kind' => $error_kind,
+    );
 }
 
 

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -228,7 +228,7 @@ is always the Neaf application itself (but who cares).
 =cut
 
 use Carp;
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed reftype );
 use parent qw(Exporter);
 
 our @EXPORT;
@@ -238,7 +238,12 @@ our %EXPORT_TAGS = (
     sugar => \@EXPORT_SUGAR,
 );
 
-# NOTE This is for new() only, the rest is handled by parent
+# NOTE We want MVC::Neaf->new() to create an application object.
+#      We also want to profoundly document all the methods of said.
+#      We also want `perdoc MVC::Neaf` to introduce the framework
+#          and its DSL and features.
+#      And thus we outsource our numerous helper methods to a separate class
+#          and only leave exported stuff in this file.
 use parent qw(MVC::Neaf::Route::Main);
 
 our $Inst;
@@ -402,12 +407,23 @@ See L<MVC::Neaf::Route::Main/add_route> for implementation.
 
     neaf static => '/path' => $local_path, %options;
 
-    neaf static => '/other/path' => [ "content", "content-type" ];
+    neaf static => '/other/path' => [ $content, $content_type ];
 
     $neaf->static( $req_path => $file_path, %options )
 
 Serve static content located under C<$file_path>.
 Both directories and single files may be added.
+
+Note that non-absolute local paths will be calculated relative to
+the file where static() was called, not current working directory.
+For files ending in C<.pm> and having a matching package name,
+the file name without C<.pm> suffix will be used:
+
+    # in /www/lib/perl5/My/App.pm
+    package My::App;
+    use MVC::Neaf;
+    neaf static => '/css' => './resources/css';
+        # points to /www/lib/perl5/My/App/resources/css/
 
 If an arrayref of C<[ $content, $content_type ]> is given as second argument,
 serve that content from memory instead.
@@ -458,7 +474,7 @@ This is not enforced whatsoever.
 
 =back
 
-See L<MVC::Meaf::X::Files> for implementation.
+See L<MVC::Neaf::X::Files> for implementation.
 
 File type detection is based on extentions so far, and the list is quite short.
 This MAY change in the future.
@@ -589,6 +605,11 @@ and create a new() instance.
 
 Short aliases C<JS>, C<TT>, and C<Dumper> may be used
 for corresponding C<MVC::Neaf::View::*> modules.
+
+The templates that allow for paths
+(i.e. currently just L<MVC::Neaf::View::TT>)
+will have non-absolute paths calculated relative to the file where
+static() was called, not to the current directory.
 
 =item * if coderef is given, use it as a C<render> method.
 The coderef must take 1 argument - the hash returned from application -
@@ -1020,10 +1041,11 @@ foreach (keys %ALIAS) {
         };
 
         # normal operation
-        my ($path, $handler, @args) = @_;
+        my $path = shift;
+        my $handler = ref $_[0] && reftype $_[0] eq 'CODE' ? shift : pop;
 
         return neaf()->add_route(
-            $path, $handler, @args, method => $method, caller => [caller(0)] );
+            $path, $handler, @_, method => $method, caller => [caller(0)] );
     };
 
     push @EXPORT_SUGAR, $_;
@@ -1417,7 +1439,7 @@ adding of multiple methods for the same path.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

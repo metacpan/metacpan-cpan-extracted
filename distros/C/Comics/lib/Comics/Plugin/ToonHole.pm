@@ -13,8 +13,7 @@ our $name    = "Toon Hole";
 our $url     = "https://www.toonhole.com/";
 
 our $pattern =
-  qr{ <noscript>
-      <img \s+
+  qr{ <img \s+
        width="\d+" \s+
        height="\d+" \s+
        src="(?<url>https://toonhole.com/wp-content/uploads/

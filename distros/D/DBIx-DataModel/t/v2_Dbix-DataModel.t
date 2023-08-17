@@ -299,6 +299,11 @@ sqlLike('SELECT * FROM T_Employee LIMIT ? OFFSET ?',
         [10, 20],
         'page 3 from initial request');
 
+
+
+
+
+
 # -limit 0
 HR->table('Employee')->select(
   -columns => [qw/foo bar/],
@@ -461,6 +466,24 @@ HR::Employee->fetch(1234, {-pre_exec => sub {$check_callbacks{pre} = "was called
       		 -post_exec => sub {$check_callbacks{post} = "was called"}});
 is_deeply(\%check_callbacks, {pre =>"was called", 
       			post => "was called" }, 'fetch, pre/post callbacks');
+
+
+# nb_fetched_rows
+HR->dbh->{mock_add_resultset} = [[qw/foo bar/], ([1, 2]) x 23];
+$statement = HR->table('Employee')->select(-result_as  => 'statement');
+$statement->all; # throw away the result -- this call is just to make sure the statement is finished
+is $statement->nb_fetched_rows, 23, "nb_fetched_rows";
+
+
+# page boundaries
+HR->dbh->{mock_add_resultset} = [[qw/foo bar/], ([1, 2]) x 5];
+$statement = HR->table('Employee')->select(
+  -page_size  => 10,
+  -page_index => 3,
+  -result_as  => 'statement',
+ );
+$statement->all; # throw away the result -- this call is just to make sure the statement is finished
+is_deeply [$statement->page_boundaries], [21, 25], "page boundaries";
 
 
 # -union

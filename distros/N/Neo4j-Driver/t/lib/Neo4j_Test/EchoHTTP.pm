@@ -40,6 +40,19 @@ sub _r {
 		]});
 	}
 	
+	# Simulate transaction life (required for tx functions)
+	my (%tx_info, %tx_headers);
+	if ($self->{url} !~ m</commit$>) {
+		%tx_info = (
+			commit => "http://localhost:7474/db/echo/tx/echo/commit",
+			transaction => { expires => 'Tue, 1 Jan 2999 00:00:00 GMT' },
+		);
+		%tx_headers = (
+			location => "http://localhost:7474/db/echo/tx/echo",
+			status => 201,
+		);
+	}
+	
 	my $request = $self->{request};
 	$request = $self->{req_callback}->($request) if $self->{req_callback};
 	return $self->_prep_response({ jolt => [
@@ -54,12 +67,8 @@ sub _r {
 			{ 'U' => $request },
 		] },
 		{ summary => {} },
-		{ info => {
-			# Transaction functions require the tx to remain open.
-			commit => "http://localhost:7474/db/echo/tx/echo/commit",
-			transaction => { expires => 'Tue, 1 Jan 2999 00:00:00 GMT' },
-		}},
-	]});
+		{ info => { %tx_info }},
+	], %tx_headers });
 }
 
 sub request {

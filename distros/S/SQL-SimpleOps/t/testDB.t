@@ -136,8 +136,38 @@ sub testGeneric()
 	&testGenericAutoincrementUpdate($dbh,$contents);
 	&testGenericAutoincrementDelete($dbh,$contents);
 	&testGenericMasterSlaveSelect($dbh,$contents);
+	&testGenericSpecials($dbh,$contents);
 
 	$dbh->Close();
+}
+
+################################################################################
+
+sub testGenericSpecials()
+{
+	my $dbh = shift;
+	my $contents = shift;
+	my @buffer;
+
+	note("SPC000 Merge");
+
+	$dbh->Select
+	(
+		table => "my_master",
+		fields => [ {"my_master.my_s_m_code"=>"ms"}, ],
+		buffer => \@buffer,
+	);
+	&testRC($dbh,"SPC010",$dbh);
+	ok($dbh->getRows()==10,"Aliases select-1, expected 10, found ".$dbh->getRows());
+
+	$dbh->Select
+	(
+		table => [ "my_master","my_slave" ],
+		buffer => \@buffer,
+		fields => [ {"my_master.my_s_m_code"=>"ms"}, {"my_slave.my_s_s_code"=>"ss"}, ],
+	);
+	&testRC($dbh,"SPC020",$dbh);
+	ok($dbh->getRows()==1000,"Aliases select-2, expected 1000, found ".$dbh->getRows());
 }
 
 ################################################################################
@@ -148,7 +178,7 @@ sub testGenericMasterSlaveSelect()
 	my $contents = shift;
 	my @buffer;
 
-	note("MSS010 Merge");
+	note("MSS000 Merge");
 
 	$dbh->Select
 	(

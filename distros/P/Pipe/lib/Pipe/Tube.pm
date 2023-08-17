@@ -4,7 +4,7 @@ use warnings;
 
 use Pipe;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub new {
     my ($class, $pipe, @args) = @_;

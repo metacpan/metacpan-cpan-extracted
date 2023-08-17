@@ -8,7 +8,7 @@ our @EXPORT_OK = qw/accessFlagsStringificator/;
 
 # ABSTRACT: Returns the string describing access flags
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -99,7 +99,7 @@ MarpaX::Java::ClassFile::Util::AccessFlagsStringification - Returns the string d
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

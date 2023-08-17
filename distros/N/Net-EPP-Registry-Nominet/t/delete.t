@@ -11,7 +11,7 @@
 #===============================================================================
 
 use strict;
-use warnings;
+use warnings FATAL => 'recursion';
 
 use Test::More;
 

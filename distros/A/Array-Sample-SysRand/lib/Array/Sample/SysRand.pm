@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2023-06-20'; # DATE
 our $DIST = 'Array-Sample-SysRand'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(sample_sysrand);
 
@@ -47,7 +47,7 @@ Array::Sample::SysRand - Systematic random sampling from an array
 
 =head1 VERSION
 
-This document describes version 0.003 of Array::Sample::SysRand (from Perl distribution Array-Sample-SysRand), released on 2022-05-20.
+This document describes version 0.004 of Array::Sample::SysRand (from Perl distribution Array-Sample-SysRand), released on 2023-06-20.
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,8 @@ This document describes version 0.003 of Array::Sample::SysRand (from Perl distr
  sample_sysrand([0,1,2,3,4,5,6,7,8,9], 3); => (4, 8, 1)
 
 =head1 DESCRIPTION
+
+Keywords: systematic sampling, interval sampling.
 
 =head1 FUNCTIONS
 
@@ -117,13 +119,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

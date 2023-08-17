@@ -1,9 +1,8 @@
 use strict; use warnings;
 package assign::0;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.17';
 
-use assign();
 use assign::Array;
 use assign::Hash;
 
@@ -11,8 +10,19 @@ use Filter::Simple;
 use PPI;
 use XXX;
 
-sub import {
-    my $pkg = $assign::assign_class = shift;
+our $var_prefix = '___';
+our $var_id = 1000;
+our $var_suffix = '';
+
+sub new {
+    my $class = shift;
+    my $self = bless { @_ }, $class;
+    my $code = $self->{code}
+        or die "$class\->new requires 'code' string";
+    $self->{line} //= 0;
+    $self->{doc} = PPI::Document->new(\$code);
+    $self->{doc}->index_locations;
+    return $self;
 }
 
 # FILTER_ONLY code_no_comments => \&filter;
@@ -20,17 +30,11 @@ FILTER_ONLY all => \&filter;
 
 sub filter {
     my ($class) = @_;
-    $assign::assign_class = 'assign::0';
-    $_ = assign->new(
+    $_ = $class->new(
         code => $_,
         line => ([caller(4)])->[2],
     )->transform();
 };
-
-sub new {
-    my ($class) = @_;
-    die "Calling '$class\->new' is invalid. Use 'assign->new' intead";
-}
 
 sub debug {
     my ($class, $code) = @_;
@@ -39,7 +43,7 @@ sub debug {
     } elsif (not ref($code)) {
         if (not -f $code) {
             XXX $code;
-            die "Argument to assign::0->debug() is not a valid file.\n" .
+            die "Argument to $class\->debug() is not a valid file.\n" .
                 "Code strings need to be passed as scalar refs.";
         }
         open my $fh, $code or die "Can't open '$code' for input";
@@ -47,8 +51,7 @@ sub debug {
     } else {
         die "Invalid arguments for $class->debug(...)";
     }
-    local $assign::assign_class = 'assign::0';
-    assign->new(code => $code)->transform;
+    $class->new(code => $code)->transform;
 }
 
 sub transform {
@@ -156,8 +159,8 @@ sub transform_assignment_statement {
 }
 
 sub gen_var {
-    $assign::var_id++;
-    return "\$$assign::var_prefix$assign::var_id$assign::var_suffix";
+    $var_id++;
+    return "\$$var_prefix$var_id$var_suffix";
 }
 
 sub replace_statement_node {

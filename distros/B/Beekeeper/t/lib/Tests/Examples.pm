@@ -79,7 +79,7 @@ sub check_02_author_testing : Test(startup => 1) {
 
     unless ($ENV{'AUTHOR_TESTING'}) {
         # Fiddling with shell stdin/stdout makes test fail when run by cpanm or dzil
-        $self->SKIP_ALL("This test fails when run by cpanm or dzil");
+        $self->SKIP_ALL("This test fiddles with stdout and fails when run by cpanm or dzil");
     }
 
     ok( 1, "Author testing");
@@ -94,6 +94,17 @@ sub check_03_dzil_release_testing : Test(startup => 1) {
     }
 
     ok( 1, "Not dzil release testing");
+}
+
+sub check_04_root_permissions : Test(startup => 1) {
+    my ($self) =  @_;
+
+    unless ($> == 0) {
+        # Starting and stopping daemons requires root permissions
+        $self->SKIP_ALL("This test requires root permissions");
+    }
+
+    ok( 1, "Root permissions");
 }
 
 sub test_01_example_basic : Test(1) {

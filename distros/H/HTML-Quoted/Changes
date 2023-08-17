@@ -1,3 +1,7 @@
+0.05 2023-07-11
+
+ * Mark hr as an inline tag
+
 0.04    Tue May 21 11:52:10 PDT 2013
 
     * add combine_hunks method (RJBS)

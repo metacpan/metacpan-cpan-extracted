@@ -6,6 +6,9 @@ Revision history for the module "App::diroctopus" :
 
 [Versions in recent]
 
+0.051  2023-06-07 wed : 
+  - dirstrata1.pm で 英文でモジュールを説明する(MetaCPANに分かりやすく表示される部分)が、別のモジュールのものになっていたので、訂正。
+
 0.050  2023-04-07 fri : 
   - dirhier の名前を dirstrata1 に変更。dir+hierは意味が広すぎて、名前空間を無駄に占有していると思うため。strata1の1はsimpleの意味を込めた。
 

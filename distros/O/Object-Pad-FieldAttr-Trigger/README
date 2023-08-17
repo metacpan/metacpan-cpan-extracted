@@ -9,7 +9,7 @@ SYNOPSIS
        use Object::Pad::FieldAttr::Trigger;
     
        class Label {
-          has $title :param :reader :writer :Trigger(redraw);
+          field $title :param :reader :writer :Trigger(redraw);
     
           method redraw {
              ...
@@ -36,7 +36,7 @@ FIELD ATTRIBUTES
 
  :Trigger
 
-       has $field :writer :Trigger(NAME) ...;
+       field $name :writer :Trigger(NAME) ...;
 
     Declares that the accessor method generated for the field by the
     :writer attribute will invoke the method named by the :Trigger

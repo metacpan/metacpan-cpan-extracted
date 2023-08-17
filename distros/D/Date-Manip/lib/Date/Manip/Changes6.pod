@@ -36,7 +36,20 @@ incompatible. These are marked with an exclamation mark (!).
 #=head1 VERSION 6.95 (expected 2024-03-01)
 #=head1 VERSION 6.94 (expected 2023-12-01)
 #=head1 VERSION 6.93 (expected 2023-09-01)
-#=head1 VERSION 6.92 (expected 2023-06-01)
+
+=head1 VERSION 6.92 (2023-06-07)
+
+=over 5
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2023c).
+
+=item Documentation fixes
+ 
+Typo fix.  Reported by Derek Terveer
+
+=back
 
 =head1 VERSION 6.91 (2023-03-01)
 

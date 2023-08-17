@@ -32,7 +32,7 @@ sub _around_when_first_param_is_and_index {
 
 # ABSTRACT: Op code
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -740,7 +740,7 @@ MarpaX::Java::ClassFile::Struct::OpCode - Op code
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

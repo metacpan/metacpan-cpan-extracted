@@ -36,15 +36,15 @@ print $tags->flush."\n";
 
 # Output:
 # CSS
-# table, td, th {
+# .table, .table td, .table th {
 #         border: 1px solid #ddd;
 #         text-align: left;
 # }
-# table {
+# .table {
 #         border-collapse: collapse;
 #         width: 100%;
 # }
-# th, td {
+# .table th, .table td {
 #         padding: 15px;
 # }
 #

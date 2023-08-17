@@ -5,5 +5,5 @@ if ! [ -e MANIFEST ]; then
 	exit 1
 fi
 
-git ls-tree -r master --name-only |grep -v '\.gitignore' | tee MANIFEST
+git ls-tree -r master --name-only |grep -v '\.gitignore' | sort | tee MANIFEST
 

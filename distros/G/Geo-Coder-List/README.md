@@ -1,14 +1,15 @@
--[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-List.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-List)
--[![Windows Build status](https://ci.appveyor.com/api/projects/status/naayd09612e10llw/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-list/branch/master)
--[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
--[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](https://metacpan.org/release/Geo-Coder-List)
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-List.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-List)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/naayd09612e10llw/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-list/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](https://metacpan.org/release/Geo-Coder-List)
+
 # NAME
 
 Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.29
+Version 0.31
 
 # SYNOPSIS
 
@@ -72,10 +73,11 @@ and OpenStreetMap for other places:
 ## geocode
 
 Runs geocode on all of the loaded drivers.
-See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces%3A%3AV3) for an explanation
+See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces%3A%3AV3) for an explanation.
 
 The name of the Geo-Coder that gave the result is put into the geocode element of the
-return value, if the value was retrieved from the cache the value will be undefined.
+return value,
+if the value was retrieved from the cache the value will be undefined.
 
     if(defined($location->{'geocoder'})) {
         print 'Location information retrieved using ', $location->{'geocoder'}, "\n";
@@ -84,15 +86,16 @@ return value, if the value was retrieved from the cache the value will be undefi
 ## ua
 
 Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
-You can call _env\_proxy_ for example, to get the proxy information from
-environment variables:
+You can call _env\_proxy_,
+for example,
+to set the proxy information from environment variables:
 
     my $geocoder_list = Geo::Coder::List->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
     $geocoder_list->ua($ua);
 
-Note that unlike Geo::Coders, there is no read method, since that would be pointless.
+Note that unlike Geo::Coders there is no read method since that would be pointless.
 
 ## reverse\_geocode
 
@@ -144,16 +147,12 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List)
 
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/d/Geo-Coder-List](https://cpanratings.perl.org/d/Geo-Coder-List)
-
 - MetaCPAN
 
     [https://metacpan.org/release/Geo-Coder-List](https://metacpan.org/release/Geo-Coder-List)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2022 Nigel Horne.
+Copyright 2016-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

@@ -48,7 +48,7 @@ sub validate_each {
   my @validations = @{$self->validations};
   my $validator = use_module($self->validator_class)
       ->new(
-        validations => [[ [0..$#$value], @validations ]],
+        validations => [[ [ map { "${attribute}[${_}]" } 0..$#$value ], @validations ]],
         %{ $self->validator_class_args },
       );
 
@@ -61,7 +61,7 @@ sub validate_each {
 
     $errors->each(sub {
       my ($index, $message) = @_;
-      $record->errors->add("${attribute}.${index}", $message);
+      $record->errors->add("${index}", $message);
     });
   }
 }

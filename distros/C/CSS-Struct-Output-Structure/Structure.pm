@@ -6,7 +6,7 @@ use warnings;
 
 use Error::Pure qw(err);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub flush {
 	my ($self, $reset_flag) = @_;
@@ -204,6 +204,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=create_struct_and_return.pl
+
  use strict;
  use warnings;
 
@@ -267,6 +269,8 @@ Returns undef.
  # ]
 
 =head1 EXAMPLE2
+
+=for comment filename=create_struct_and_print.pl
 
  use strict;
  use warnings;
@@ -340,12 +344,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

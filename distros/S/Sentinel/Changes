@@ -1,5 +1,11 @@
 Revision history for Sentinel
 
+0.07    2023-07-03
+        [CHANGES]
+         * Overall module refresh:
+            + Requires perl v5.14+
+            + Use Test2::V0 for unit tests
+
 0.06    2019-01-14 21:02:18
         [BUGFIXES]
          * Use an AV in mg_obj rather than a struct in mg_ptr, which has

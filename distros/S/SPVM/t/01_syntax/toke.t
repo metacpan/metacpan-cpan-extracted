@@ -28,7 +28,7 @@ use Test::More;
 
 # Line number
 {
-  compile_not_ok_file('CompileError::Syntax::LineNumber', qr/our.*\b8:3\b/i);
+  compile_not_ok_file('CompileError::Syntax::LineNumber', qr/our.*\b8:3\b/is);
 }
 
 # Exception Message Format
@@ -39,7 +39,7 @@ use Test::More;
   }
 }
 
-# Class Name
+# Basic Type Name
 {
   {
     my $source = 'class myclass;';
@@ -47,11 +47,11 @@ use Test::More;
   }
   {
     my $source = 'class Myclass::foo;';
-    compile_not_ok($source, qr|The part names of the "Myclass::foo" class must begin with an upper case character|);
+    compile_not_ok($source, qr|The part names of the "Myclass::foo" module must begin with an upper case character|);
   }
   {
     my $source = 'class Myclass::Foo::bar;';
-    compile_not_ok($source, qr|The part names of the "Myclass::Foo::bar" class must begin with an upper case character|);
+    compile_not_ok($source, qr|The part names of the "Myclass::Foo::bar" module must begin with an upper case character|);
   }
   {
     my $source = 'class Myclass__Foo;';
@@ -79,7 +79,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { use NotFoundClass; }';
-    compile_not_ok($source, qr|\QFailed to load the "NotFoundClass" class. The class file "NotFoundClass.spvm" is not found|);
+    compile_not_ok($source, qr|\QFailed to load the "NotFoundClass" module. The class file "NotFoundClass.spvm" is not found|);
   }
 }
 
@@ -461,12 +461,45 @@ use Test::More;
   }
 }
 
+# Unexpected Charater
+{
+  {
+    my $source = "class MyClass { \xFE }";
+    compile_not_ok($source, q|The character -2 in a 8bit signed integer is not expected|);
+  }
+}
+
+# __END__
+{
+  {
+    my $source = "class MyClass { }\n__END__\nhello world";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { }__END__ hello world";
+    compile_ok($source);
+  }
+  {
+    my $source = "class MyClass { __END__ }";
+    compile_not_ok($source, q|Unexpected token ""|);
+  }
+}
+
 # Extra
 {
   {
     my $source = q|class MyClass { static method main : void () { eval {} } }|;
     compile_ok($source);
   }
+  
+  # Unexpected token contains \n  at
+  {
+    # Invalid "_"
+    my $source = 'class Tmp { static method main : void () { _-123; } }';
+    compile_not_ok($source, qr/\n  at .+ line /);
+  }
 }
+
 
 done_testing;

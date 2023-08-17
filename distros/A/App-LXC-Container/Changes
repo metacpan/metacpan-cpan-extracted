@@ -1,0 +1,70 @@
+Revision history for Perl extension App-LXC-Container
+
+0.14 2023-08-16T08:34:30Z
+
+0.14 2023-08-16T08:33:53Z
+
+    - t/03-setup.t: skipping \A regexp tests in older Perl versions
+    - t/06-update.t: another fix to count elements of hash in older Perl versions
+    - t/06-update.t: allowed different number of elements in 'mount_' hash tests
+
+0.13 2023-08-15T08:34:42Z
+
+    - t/06-update.t: added diagnostics for a smoker error
+    - t/06-update.t: allow switched sequence of one error output
+    - fixed counting of elements in t/06-update.t for older Perl versions
+
+0.12 2023-08-14T07:42:15Z
+
+    - fix for t/06-update.t: now loading modules before setting up mocking
+    - added unsupportet OSes
+    - fixed counting of elements in t/05-mounts.t for older Perl versions
+
+0.11 2023-08-11T12:06:07Z
+
+    - fixed some tests failing on smokers (in t/06-update.t and t/08-data.t)
+    - simplified dependency check as it's all done in memory anyway
+
+0.10 2023-08-09T07:54:01Z
+
+    - t/08-data.t: minor improvements and diagnostics for last smoker errors
+
+0.09 2023-08-08T12:23:36Z
+
+    - some more mockup fixes for smokers (in t/06-update.t and t/07-run.t)
+
+0.08 2023-08-07T12:07:40Z
+
+    - now also mocking executables searched for by t/02-init.t (only on smokers)
+    - fixed handling of missing packages in Data/common.pm
+    - removed superfluous files in t/mockup
+
+0.07 2023-08-06T07:40:40Z
+
+    - corrected bad mockup fix of 0.06
+
+0.06 2023-08-05T10:17:31Z
+
+    - now trying to mockup everything (apparently no smoker has LXC installed)
+    - bug fix in plan(s) of t/04-setup-rt.t
+
+0.05 2023-08-04T10:40:22Z
+
+    - added OS test to get better feedback from CPAN smoke testers
+
+0.04 2023-08-03T08:18:06Z
+
+    - made LXC binaries mandatory (otherwise /etc/lxc/default.conf is missing too)
+
+0.03 2023-08-01T08:46:41Z
+
+    - added runtime dependencies (additional restrictions to Linux)
+    - fixed bug for older Perl versions ('local' must be quoted as key of HASH)
+
+0.02 2023-07-31T08:01:37Z
+
+    - fixed a dumb configuration error (missing dependency to my own module)
+
+0.01 2023-07-30T07:47:21Z
+
+    - original (alpha) version

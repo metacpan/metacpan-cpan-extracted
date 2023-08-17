@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 aa99def60a65ca73768ad3c3ae1689020a5315f156f5cf0b2971f3b885c3487e A.pm
+SHA256 64ad0c08c600da2dbdf7a1ca54bcfb68ee87ad824918ea8dcd14a82d37bed3ec CONCEPT
+SHA256 95d6525166e93804ffd7100fa7c04741a5759d70d5d026b94e1c3972dbb8caf9 Changes
+SHA256 8fe735228348a2644f842b30c1a661c29e2626829e609fec35f42e9d3a25d25a LICENSE
+SHA256 fdedb16e1065406e36c72d7d8f4dbe7beb018447739beec4d01227349685367a MANIFEST
+SHA256 ef021e161b4ec544760be30c4974182de49ad24183c8c750f50fa0cb0a700299 META.yml
+SHA256 ba0203ab0c873cad13ee86ce5fc220838a428f9dbe2059fdb2e99049da41fd1f Makefile.PL
+SHA256 a1dcf2a45f73c11cb9966b32e549aa1d8855e169dc99a6399fc7d997a7acf207 README
+SHA256 952d73b56f635de5ef30a36e4b99143b09fe9e1997db41a852c85de3f2f7c7f3 examples/link.pl
+SHA256 455d73c03d597af1232e41369a3c8b209174d83d0746ae205cce531589878bba examples/link_tags.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 b4436897841328b8913db6e9081799133b2b272daa53faf0e8e390b17fdaee62 t/Data-HTML-A/01-use.t
+SHA256 ed4e0eac3b734d5711d34715c9d317283b2eb36a0ad497122fc74f0bff449408 t/Data-HTML-A/02-version.t
+SHA256 19f30ee30bedcf5d39d33847ce97a8f461ae826c06216433773065e87c2cff97 t/Data-HTML-A/03-new.t
+SHA256 fe6f9be07ed87586ab02de9d422ff627bd664a63796ca509f5acce6f32cdc27f t/Data-HTML-A/04-css_class.t
+SHA256 0b6369ab0b518f338efe9137c8e47ed3446bd0ab6f32a234f1f977b66e3d09ef t/Data-HTML-A/04-data.t
+SHA256 7c40630578e01f0418a1aaa6393e912e8360bef9790ea293a191d8f52514da45 t/Data-HTML-A/05-data-type.t
+SHA256 2b6a97624f67fe345ec8f6a812ef96ce4cc7d500079044f20c6518433a64697b t/Data-HTML-A/06-url.t
+SHA256 d6252bce80ce066d38a8fe4778a077dfebd6a861a5f171a3208105bc3fbc12e5 xt/Data-HTML-A/01-pod_coverage.t
+SHA256 9e557cb51174a23c69329d1514f84ce6e1a3f1cd8a7faf055c453b74a5b144cc xt/Data-HTML-A/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmSyrK4ACgkQojV9Rpe/
+B8sc4g/7B5VnFf4N3XlitTtn4R3mUETEIAmvHTeGf1wZhQs7yJprh+zyl/7HZ4a8
+6ef9rL/SARhe++YJ8ro8gi7JggaNbQXikLPY/hDuiYCWCeJXLXxyf6iMtBcomX/C
+djduBF/KlA0LZIdDeMik4bUvPnpK6bjW+gngFsKv7PRIJAzROy4EI9rF4My2GSbL
+ucLDYJqhF2xgEyIyh+EbyRcy6VdFx99kg4Rc5joXvEcgjZEuUZuXo2dedUx91n0w
+7IQ4FdbpOrORQW+0oPGH8sad3QZwkkg+AzxsJlPdmvUJzYA03eOtGlWNOeeADPz2
+TIxsk4FBPeA0VR2NtVdduErlWmHHrEXuTdvFt/B8EyYBtL4N1ovYzZ6XufysQ2JR
+NHrElwZzznPzLMnoTIj/EFoFuV0rhfqxqSLDKIcoLp1HGtIguexPv320TypCyub1
+blVK+luelD9hdqVbJ4FALZTi0HO6LbGI/yoILJch6TiYtcTYesNzfEskZ6sQ1Oiv
+eVcxQgI8MMm2aDbfwcMIM3B5e27EEe4lUBFBtG6sDLZj2x/2wU71R6aD5aAVNdkH
+xUQ8LOv7vVBsZ1caCywqha/52o39VAoZ9cRK8k4KhhIgu1ELwRI8byS5/qrGQ50i
+IX8ZgHTVfAju1M+tdSd8YjBto7gIqlkZqRXp1eN4HouLFamWsDo=
+=TOVq
+-----END PGP SIGNATURE-----

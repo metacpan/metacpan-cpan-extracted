@@ -6,7 +6,9 @@ eg/pssh
 eg/pssh-keygen
 eg/remoteinteract.pl
 eg/remoteinteract2.pl
+lib/Net/SSH/Perl.pm
 lib/Net/SSH/Perl/Agent.pm
+lib/Net/SSH/Perl/Auth.pm
 lib/Net/SSH/Perl/Auth/ChallengeResponse.pm
 lib/Net/SSH/Perl/Auth/KeyboardInt.pm
 lib/Net/SSH/Perl/Auth/KeyboardInteractive.pm
@@ -15,11 +17,11 @@ lib/Net/SSH/Perl/Auth/PublicKey.pm
 lib/Net/SSH/Perl/Auth/Rhosts.pm
 lib/Net/SSH/Perl/Auth/Rhosts_RSA.pm
 lib/Net/SSH/Perl/Auth/RSA.pm
-lib/Net/SSH/Perl/Auth.pm
 lib/Net/SSH/Perl/AuthMgr.pm
 lib/Net/SSH/Perl/Buffer.pm
 lib/Net/SSH/Perl/Channel.pm
 lib/Net/SSH/Perl/ChannelMgr.pm
+lib/Net/SSH/Perl/Cipher.pm
 lib/Net/SSH/Perl/Cipher/AES128_CBC.pm
 lib/Net/SSH/Perl/Cipher/AES128_CTR.pm
 lib/Net/SSH/Perl/Cipher/AES192_CBC.pm
@@ -38,14 +40,14 @@ lib/Net/SSH/Perl/Cipher/DES.pm
 lib/Net/SSH/Perl/Cipher/DES3.pm
 lib/Net/SSH/Perl/Cipher/IDEA.pm
 lib/Net/SSH/Perl/Cipher/RC4.pm
-lib/Net/SSH/Perl/Cipher.pm
-lib/Net/SSH/Perl/Comp/Zlib.pm
 lib/Net/SSH/Perl/Comp.pm
+lib/Net/SSH/Perl/Comp/Zlib.pm
 lib/Net/SSH/Perl/Config.pm
 lib/Net/SSH/Perl/Constants.pm
+lib/Net/SSH/Perl/Handle.pm
 lib/Net/SSH/Perl/Handle/SSH1.pm
 lib/Net/SSH/Perl/Handle/SSH2.pm
-lib/Net/SSH/Perl/Handle.pm
+lib/Net/SSH/Perl/Kex.pm
 lib/Net/SSH/Perl/Kex/C25519.pm
 lib/Net/SSH/Perl/Kex/DH.pm
 lib/Net/SSH/Perl/Kex/DH1.pm
@@ -56,7 +58,7 @@ lib/Net/SSH/Perl/Kex/DH18SHA512.pm
 lib/Net/SSH/Perl/Kex/DHGEX.pm
 lib/Net/SSH/Perl/Kex/DHGEXSHA1.pm
 lib/Net/SSH/Perl/Kex/DHGEXSHA256.pm
-lib/Net/SSH/Perl/Kex.pm
+lib/Net/SSH/Perl/Key.pm
 lib/Net/SSH/Perl/Key/DSA.pm
 lib/Net/SSH/Perl/Key/ECDSA.pm
 lib/Net/SSH/Perl/Key/ECDSA256.pm
@@ -66,7 +68,6 @@ lib/Net/SSH/Perl/Key/Ed25519.pm
 lib/Net/SSH/Perl/Key/Ed25519.xs
 lib/Net/SSH/Perl/Key/RSA.pm
 lib/Net/SSH/Perl/Key/RSA1.pm
-lib/Net/SSH/Perl/Key.pm
 lib/Net/SSH/Perl/Mac.pm
 lib/Net/SSH/Perl/Packet.pm
 lib/Net/SSH/Perl/Proxy.pm
@@ -74,6 +75,7 @@ lib/Net/SSH/Perl/SSH1.pm
 lib/Net/SSH/Perl/SSH2.pm
 lib/Net/SSH/Perl/Subsystem/Client.pm
 lib/Net/SSH/Perl/Subsystem/Server.pm
+lib/Net/SSH/Perl/Util.pm
 lib/Net/SSH/Perl/Util/Authfile.pm
 lib/Net/SSH/Perl/Util/Hosts.pm
 lib/Net/SSH/Perl/Util/RSA.pm
@@ -81,9 +83,9 @@ lib/Net/SSH/Perl/Util/SSH1Misc.pm
 lib/Net/SSH/Perl/Util/SSH1MP.pm
 lib/Net/SSH/Perl/Util/Term.pm
 lib/Net/SSH/Perl/Util/Win32.pm
-lib/Net/SSH/Perl/Util.pm
-lib/Net/SSH/Perl.pm
 LICENSE
+LICENSE_ARTISTIC
+LICENSE_GNU
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -91,7 +93,6 @@ META.yml
 Perl.xs
 ppport.h
 README
-SIGNATURE
 src/blowfish/blf.h
 src/blowfish/blowfish.c
 src/chacha/chacha.c
@@ -113,7 +114,6 @@ src/ed25519/sha512.c
 src/ed25519/sha512.h
 src/ed25519/sign.c
 src/ed25519/verify.c
-t/00-signature.t
 t/01-compile.t
 t/02-buffer.t
 t/03-packet.t
@@ -132,3 +132,4 @@ t/psshd
 t/test-common.pl
 ToDo
 typemap
+META.json                                Module JSON meta-data (added by MakeMaker)

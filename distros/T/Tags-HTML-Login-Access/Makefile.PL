@@ -23,6 +23,7 @@ requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'Tags::HTML' => 0;
+requires 'Tags::HTML::Messages' => 0.09;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-Access/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-Access';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Login-Access';
@@ -33,7 +34,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.07';
 
 # Run.
 WriteAll();

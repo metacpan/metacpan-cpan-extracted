@@ -25,6 +25,7 @@ my $node_organizes = {
     NodeId_namespaceIndex	=> 0,
     NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
     NodeId_identifier		=> NS0ID_ORGANIZES,
+    NodeId_print		=> "i=".NS0ID_ORGANIZES,
 };
 
 sub get_objecttypes_reference {

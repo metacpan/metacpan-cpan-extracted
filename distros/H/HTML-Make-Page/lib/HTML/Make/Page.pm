@@ -9,8 +9,8 @@ our @EXPORT_OK = qw/make_page/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.02';
-use HTML::Make '0.15';
+our $VERSION = '0.04';
+use HTML::Make 0.16;
 
 sub add_meta
 {

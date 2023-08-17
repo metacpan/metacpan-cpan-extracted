@@ -11,6 +11,7 @@ Run the following commands, preferably as sudo.
 
 sudo perl Makefile.PL
 sudo make all
+sudo make test
 sudo make install
 sudo make clean
 

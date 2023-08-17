@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostDigitalSignatureRequest.name :   ,
-# PostDigitalSignatureRequest.digitalsignaturefile :   ,
+# PostDigitalSignatureRequest.name : The workbook name.  ,
+# PostDigitalSignatureRequest.digitalsignaturefile : Digital signature file parameters.  ,
 # PostDigitalSignatureRequest.password :   ,
-# PostDigitalSignatureRequest.folder :   ,
-# PostDigitalSignatureRequest.storageName :    
+# PostDigitalSignatureRequest.folder : Original workbook folder.  ,
+# PostDigitalSignatureRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_digital_signature' } = { 
-    	summary => '',
+    	summary => 'Digital Signature.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -133,14 +133,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'digitalsignaturefile' => {
      	datatype => 'string',
      	base_name => 'digitalsignaturefile',
-     	description => '',
+     	description => 'Digital signature file parameters.',
      	format => '',
      	read_only => '',
      		},
@@ -154,14 +154,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

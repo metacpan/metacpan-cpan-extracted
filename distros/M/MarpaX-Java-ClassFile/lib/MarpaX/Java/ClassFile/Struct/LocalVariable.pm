@@ -14,7 +14,7 @@ use MarpaX::Java::ClassFile::Struct::_Base
 
 # ABSTRACT: local variable
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -42,7 +42,7 @@ MarpaX::Java::ClassFile::Struct::LocalVariable - local variable
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

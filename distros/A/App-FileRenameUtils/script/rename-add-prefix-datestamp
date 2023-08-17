@@ -6,13 +6,13 @@ use Log::ger;
 use Log::ger::Screen;
 
 #use File::Which;
+use IPC::System::Options 'system', -log=>1;
 
 unless (@ARGV >= 1) {
     die "Usage: rename-add-prefix-datestamp <FILE>...\n";
 }
 #die "rename-add-prefix-datestamp: Can't find perlmv in PATH\n" unless which("perlmv");
 
-my $prefix = shift @ARGV;
 system "perlmv", "add-prefix-datestamp", "-a", "avoid_duplicate_prefix=1", @ARGV;
 
 # ABSTRACT: Add datestamp prefix (YYYYMMDD-) to filenames
@@ -30,7 +30,7 @@ rename-add-prefix-datestamp - Add datestamp prefix (YYYYMMDD-) to filenames
 
 =head1 VERSION
 
-This document describes version 0.010 of rename-add-prefix-datestamp (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
+This document describes version 0.011 of rename-add-prefix-datestamp (from Perl distribution App-FileRenameUtils), released on 2023-05-24.
 
 =head1 SYNOPSIS
 

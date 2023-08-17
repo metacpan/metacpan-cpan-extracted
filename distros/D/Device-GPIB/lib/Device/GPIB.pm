@@ -26,7 +26,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 
 # Preloaded methods go here.
@@ -35,27 +35,27 @@ our $VERSION = '1.0';
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
 Device::GPIB - Perl extension to access
 a variety of generic and specific GPIB devices, via a number of
-supported GPIB interfaces.
+supported GPIB interfaces. Device::GPIB does not do anything specific except to make a place
+for documentation and as a wrapper for all included modules. 
 
 Generic command line programs can be used to scan the GPIB bus and to
 send arbitrary commands and queries to any device that supports GPIB.
 
-Perl Modules and command line programs to access specific
+Perl Modules with API and command line programs to access specific
 features of a number of HP, Tektronix and Advantest devices are also
 provided.
 
-Supports a number of GPIB interfaces and controllers including:
-Prologix GPIB-USB Controller and compatibles, including:
+Supports a number of GPIB interfaces devices an and controllers including:
+Prologix GPIB-USB Controller and compatibles, such as:
    AR488 for Arduino from Twilight-Logic: https://github.com/Twilight-Logic/AR488
       (tested with Arduino Nano and custom wiring interface)
 LinuxGpib compatible devices (requires linux-gpib from https://sourceforge.net/projects/linux-gpib)
-   (Tested with Keysight 82357B)
+   (Tested with Keysight 82357B USB-GPIB adapter)
 
 This module obsoletes and replaces the earlier Device::GPIB::Prologix
 module from the same author.
@@ -123,6 +123,49 @@ Of course the list of things you can do depends on the device.
 =head2 EXPORT
 
 None by default.
+
+=head1 NOTES
+
+AR488
+
+The AR488 software for arduino from Twilight-Logic is very good, and
+Device::GPIB::Controllers:Prologix works with it, however it is not
+identical to a Prologix, and we had to add some workarounds to manage
+the differences:
+
+- It is not possible to set GPIB address 0 with ++addr, so the scan.pl
+  program starts at GPIB address 1 by default.
+
+- When a USB serial port connection is made to the AR488 (at least on
+Nano and Uno) the Arduino reboots and (unlike the Prologix) takes a
+few seconds before it is ready to accept commands. This requires us to
+add some polling in Device::GPIB::Controllers::Prologix->initialised()
+to wait until it is ready. Therefore response times are fast with a
+Prologix slower with AR488.
+
+- When the USB serial port connection is closed, the AR488 may or may
+not have enough time to send the last command to the addressed
+device. We have added a short delay after device close to ensure the
+last command is sent.
+
+LinuxGpib
+
+The LinuxGpib drivers and supporting software are excellent and very
+fast (at least with linux-gpib-4.3.5 on Ubuntu 22.10 and kernel
+5.19.0). If you intend to use the LinuxGpib Controller part of this
+module you will need to install the LinuxGpib drivers and the Perl
+bindings as described in lib/Device/GPIB/Controllers/README.
+
+LinuxGpib behaves slightly differently to Prologix in that the
+LinuxGpib read timeout is the time required for the entire GPIB reply
+to be read, not just the inter-byte spacing. The means that the
+timeout must be longer than the time taken for the longest GPIB
+command response. Local tests here show that the 'PLA' Plot All
+command of the HP3577A Network Analyser takes some 9 seconds, so the
+LinuxGpib Controller timeout is set somewhat above that to 30 seconds.
+This make the scan.pl program run fairly slowly when the LinuxGpib
+Controller is used.
+
 
 =head1 SEE ALSO
 

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListObjectConvertToRangeRequest.name :   ,
-# PostWorksheetListObjectConvertToRangeRequest.sheetName :   ,
-# PostWorksheetListObjectConvertToRangeRequest.listObjectIndex :   ,
-# PostWorksheetListObjectConvertToRangeRequest.folder :   ,
-# PostWorksheetListObjectConvertToRangeRequest.storageName :    
+# PostWorksheetListObjectConvertToRangeRequest.name : The workbook name.  ,
+# PostWorksheetListObjectConvertToRangeRequest.sheetName : The worksheet name.  ,
+# PostWorksheetListObjectConvertToRangeRequest.listObjectIndex : List object index.  ,
+# PostWorksheetListObjectConvertToRangeRequest.folder : Original workbook folder.  ,
+# PostWorksheetListObjectConvertToRangeRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_convert_to_range' } = { 
-    	summary => '',
+    	summary => 'Converts list object to range in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => '',
+     	description => 'List object index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

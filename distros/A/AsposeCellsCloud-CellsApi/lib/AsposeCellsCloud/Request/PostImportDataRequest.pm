@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostImportDataRequest.name :   ,
+# PostImportDataRequest.name : The workbook name.  ,
 # PostImportDataRequest.importOption :   ,
-# PostImportDataRequest.folder :   ,
-# PostImportDataRequest.storageName :    
+# PostImportDataRequest.folder : Original workbook folder.  ,
+# PostImportDataRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_import_data' } = { 
-    	summary => '',
+    	summary => 'Imports data into workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
@@ -144,14 +144,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

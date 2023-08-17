@@ -10,10 +10,16 @@ Grab the latest version using the command:
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.
 
-The library is managed with autoconf, automake, make and pkg-config.  Once
-installed, here are some commands you might try:
+Make sure to use only functions from the C standard library.
 
-    autoreconf -i
-    ./configure
+The library is managed with CMake.  Here are some commands you might try:
+
+    mkdir build
+    cd build
+    cmake ..
     make
-    make check VERBOSE=1
+    make test
+
+If clang-format is installed, you can format the source code files:
+
+    make clang-format

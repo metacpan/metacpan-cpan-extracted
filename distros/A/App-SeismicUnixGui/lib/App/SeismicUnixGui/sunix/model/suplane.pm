@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::suplane;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME: SUPLANE - create common offset data file with up to 3 planes	
+ PERL PROGRAM NAME: SUPLANE - create common offset data file with up to 3 planes	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

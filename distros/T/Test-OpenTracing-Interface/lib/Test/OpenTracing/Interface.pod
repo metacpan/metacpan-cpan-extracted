@@ -75,7 +75,7 @@ Each of the packages mentioned above exports the following functions:
     
     can_all_ok $test_thing, "TestThing object has all required methods";
 
-Much like L<Test::Most>, this does thest that a class or object 'can' do 'all'
+Much like L<Test::More>, this does thest that a class or object 'can' do 'all'
 the required methods as defined in the L<OpenTracing::Interface> API. But
 without having to know what actually needs to be there.
 

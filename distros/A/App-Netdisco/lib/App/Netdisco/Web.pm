@@ -27,6 +27,7 @@ use App::Netdisco::Util::Web qw/
   request_is_api_report
   request_is_api_search
 /;
+use App::Netdisco::Util::Permission 'acl_matches';
 
 BEGIN {
   no warnings 'redefine';
@@ -98,6 +99,27 @@ BEGIN {
     }
     return $self->{path};
   };
+
+  # implement same_site
+  # from https://github.com/PerlDancer/Dancer-Session-Cookie/issues/20
+  *Dancer::Session::Cookie::_cookie_params = sub {
+      my $self     = shift;
+      my $name     = $self->session_name;
+      my $duration = $self->_session_expires_as_duration;
+      my %cookie   = (
+          name      => $name,
+          value     => $self->_cookie_value,
+          path      => setting('session_cookie_path') || '/',
+          domain    => setting('session_domain'),
+          secure    => setting('session_secure'),
+          http_only => setting("session_is_http_only") // 1,
+          same_site => setting("session_same_site"),
+      );
+      if ( defined $duration ) {
+          $cookie{expires} = time + $duration;
+      }
+      return %cookie;
+  };
 }
 
 use App::Netdisco::Web::AuthN;
@@ -137,6 +159,26 @@ if (setting('extra_web_plugins') and ref [] eq ref setting('extra_web_plugins'))
     unshift @INC, dir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'site_plugins')->stringify;
     _load_web_plugins( setting('extra_web_plugins') );
 }
+
+foreach my $tag (keys %{ setting('_admin_tasks') }) {
+    my $code = sub {
+        # trick the ajax into working as if this were a tabbed page
+        params->{tab} = $tag;
+
+        var(nav => 'admin');
+        template 'admintask', {
+          task => setting('_admin_tasks')->{ $tag },
+        }, { layout => 'main' };
+    };
+
+    if (setting('_admin_tasks')->{ $tag }->{ 'roles' }) {
+        get "/admin/$tag" => require_any_role setting('_admin_tasks')->{ $tag }->{ 'roles' } => $code;
+    }
+    else {
+        get "/admin/$tag" => require_role admin => $code;
+    }
+}
+
 
 # after plugins are loaded, add our own template path
 push @{ config->{engines}->{netdisco_template_toolkit}->{INCLUDE_PATH} },
@@ -269,8 +311,33 @@ hook 'before_template' => sub {
       for grep {$_ ne 'return_url'} keys %{params()};
     $tokens->{my_query} = $queryuri->query();
 
-    # access to logged in user's roles
-    $tokens->{user_has_role}  = sub { user_has_role(@_) };
+    # access to logged in user's roles (modulo RBAC)
+    $tokens->{user_has_role}  = sub {
+        my ($role, $device) = @_;
+        return false unless $role;
+
+        return user_has_role($role) if $role ne 'port_control';
+        return false unless user_has_role('port_control');
+        return true if not $device;
+
+        my $user = logged_in_user or return false;
+        return true unless $user->portctl_role;
+
+        my $acl = setting('portctl_by_role')->{$user->portctl_role};
+        if ($acl and (ref $acl eq q{} or ref $acl eq ref [])) {
+            return true if acl_matches($device, $acl);
+        }
+        elsif ($acl and ref $acl eq ref {}) {
+            foreach my $key (grep { defined } sort keys %$acl) {
+                # lhs matches device, rhs matches port
+                # but we are not interested in the ports
+                return true if acl_matches($device, $key);
+            }
+        }
+
+        # assigned an unknown role
+        return false;
+    };
 
     # create date ranges from within templates
     $tokens->{to_daterange}  = sub { interval_to_daterange(@_) };
@@ -363,7 +430,8 @@ hook before_layout_render => sub {
 hook 'after' => sub {
     my $r = shift; # a Dancer::Response
 
-    if (request->path eq uri_for('/swagger.json')->path
+    if (request->path =~ m{/swagger\.json} and
+        request->path eq uri_for('/swagger.json')->path
           and ref {} eq ref $r->content) {
         my $spec = dclone $r->content;
 
@@ -409,6 +477,7 @@ $swagger_doc->{tags} = [
   {name => 'Queue',
     description => 'Operations on the Job Queue'},
 ];
+
 $swagger_doc->{securityDefinitions} = {
   APIKeyHeader =>
     { type => 'apiKey', name => 'Authorization', in => 'header' },
@@ -416,6 +485,20 @@ $swagger_doc->{securityDefinitions} = {
     { type => 'basic'  },
 };
 $swagger_doc->{security} = [ { APIKeyHeader => [] } ];
+
+if (setting('trust_x_remote_user')) {
+    foreach my $path (keys %{ $swagger_doc->{paths} }) {
+        foreach my $method (keys %{ $swagger_doc->{paths}->{$path} }) {
+            unshift @{ $swagger_doc->{paths}->{$path}->{$method}->{parameters} }, {
+              name => 'X-REMOTE_USER',
+              description => 'API client user name',
+              in => 'header',
+              required => false,
+              type => 'string',
+            };
+        }
+    }
+}
 
 # manually install Swagger UI routes because plugin doesn't handle non-root
 # hosting, so we cannot use show_ui(1)

@@ -9,6 +9,11 @@ use File::Spec;
 
 #########################
 
+if ( not $ENV{TEST_AUTHOR} ) {
+    my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';
+    plan( skip_all => $msg );
+}
+
 if ( can_run('tiffinfo') ) {
     plan tests => 15;
 }

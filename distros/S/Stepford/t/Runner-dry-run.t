@@ -124,7 +124,7 @@ my $tempdir = tempdir( CLEANUP => 1 );
             ['DryTest::Step::D'],
             {},
         )->graph->as_string,
-        'printed graph as_string'
+        'printed graph as_string',
     );
 
     ok !( -e $tempdir->file('d') ), 'dry run did not create files';

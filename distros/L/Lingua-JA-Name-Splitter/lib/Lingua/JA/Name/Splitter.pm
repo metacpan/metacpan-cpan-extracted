@@ -1,11 +1,12 @@
 package Lingua::JA::Name::Splitter;
+
 use warnings;
 use strict;
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/split_kanji_name split_romaji_name/;
+our @EXPORT_OK = qw/split_kanji_name split_romaji_name $kkre kkname/;
 our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 use utf8;
 use Carp;
 use Lingua::JA::Moji ':all';
@@ -26,11 +27,38 @@ close $in or die $!;
 # The weight to give the position in the kanji if it is a known
 # kanji.
 
-our $length_weight = 0.736; # 42030 successes
+our $length_weight = 0.735; # 42030 successes
 
 # The cutoff for splitting the name
 
 our $split_cutoff = 0.5;
+
+# Set this to a true value to print debugging messages.
+
+#my $debug = 1;
+#use open qw(:std :encoding(UTF-8));a # when debugging
+
+=head2 $kkre
+
+    Kanji-kana regular expression. This is intended to match kanji and
+    kana names.
+
+=cut
+
+our $kkre = qr!
+    \p{InCJKUnifiedIdeographs}|
+    [々〆]|
+    \p{InKana}
+!x;
+
+sub kkname
+{
+    my ($kanji) = @_;
+    if ($kanji !~ /^($kkre)+$/) {
+	return undef;
+    }
+    return 1;
+}
 
 sub split_kanji_name
 {
@@ -44,7 +72,7 @@ sub split_kanji_name
 	carp "$kanji is only one character long, so there is nothing to split";
 	return ($kanji, '');
     }
-    if ($kanji !~ /^(\p{InCJKUnifiedIdeographs}|\p{InKana})+$/) {
+    if (! kkname ($kanji)) {
 	carp "$kanji does not look like a kanji/kana name";
     }
     if (! wantarray ()) {
@@ -55,10 +83,6 @@ sub split_kanji_name
 	return split '', $kanji;
     }
 
-    # What we guess is the given name part of the name
-    my $given;
-    # What we guess is the family name part of the name
-    my $family;
     # The characters in the name, which may not be kanji.
     my @kanji = split '', $kanji;
     # Probability this character is part of the family name.
@@ -80,23 +104,20 @@ sub split_kanji_name
         elsif ($known{$moji}) {
             $p = $length_weight * $p + (1 - $length_weight) * $known{$moji};
         }
+        elsif ($moji eq '々') {
+            # This repeated kanji has the same probability as the
+            # original kanji
+            $p = $probability[$i - 1];
+        }
         $probability[$i] = $p;
-    }
-#    print "@probability\n";
-#    print "@kanji\n";
-    my $in_given;
-    for my $i (0..$#kanji) {
+        #if ($debug) { # Commented out to improve test coverage
+        #    print STDERR "$kanji[$i] i=$i p=$p\n";
+        #}
         if ($probability[$i] < $split_cutoff) {
-            $in_given = 1;
-        }
-        if ($in_given) {
-            $given .= $kanji[$i];
-        }
-        else {
-            $family .= $kanji[$i];
+            return (substr ($kanji, 0, $i), substr ($kanji, $i));
         }
     }
-    return ($family, $given);
+    return (substr ($kanji, 0, -1), substr ($kanji, -1));
 }
 
 sub split_romaji_name

@@ -45,6 +45,13 @@ with **--discrete** option.
 
     Invoke new command individually for every matched part.
 
+- **--fillup**
+
+    Combine a sequence of non-blank lines into a single line before
+    passing them to the filter command.  Newline characters between wide
+    characters are deleted, and other newline characters are replaced with
+    spaces.
+
 # WHY DO NOT USE TEIP
 
 First of all, whenever you can do it with the **teip** command, use
@@ -68,12 +75,7 @@ included in Perl module file.
 You can translate them by DeepL service by executing the above command
 convined with **-Mtee** module which calls **deepl** command like this:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Because **deepl** works better for single line input, you can change
-command part as this:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 The dedicated module [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) is more effective
 for this purpose, though.  In fact, the implementation hint of **tee**
@@ -107,7 +109,33 @@ command:
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Using `--discrete` option is time consuming.  So you can use
+`--separate '\r'` option with `ansifold` which produce single line
+using CR character instead of NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Then convert CR char to NL after by [tr(1)](http://man.he.net/man1/tr) command or some.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Consider a situation where you want to grep for strings from
+non-header lines. For example, you may want to search for images from
+the `docker image ls` command, but leave the header line.  You can do
+it by following command.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Option `-Mline -L 2:` retrieves the second to last lines and sends
+them to the `grep perl` command. Option `--discrete` is required,
+but this is called only once, so there is no performance drawback.
+
+In this case, `teip -l 2- -- grep` produces error because the number
+of lines in the output is less than input. However, result is quite
+satisfactory :)
 
 # INSTALL
 
@@ -126,6 +154,10 @@ command:
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+The `--fillup` option may not work correctly for Korean text.
 
 # AUTHOR
 

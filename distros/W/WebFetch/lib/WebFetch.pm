@@ -18,7 +18,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch;
-$WebFetch::VERSION = '0.15.5';
+$WebFetch::VERSION = '0.15.9';
 
 use Carp qw(croak);
 use Getopt::Long;
@@ -30,6 +30,8 @@ use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Locale;
 use Date::Calc;
+use Paranoid::IO           qw(pclose);
+use Paranoid::IO::Lockfile qw(pexclock pshlock punlock);
 use WebFetch::Data::Config;
 
 #
@@ -65,6 +67,19 @@ Readonly::Hash my %redirect_params => (
     notable   => "style",
     para      => "style",
     ul        => "style",
+);
+
+# file paths and class names
+Readonly::Scalar my $db_class => "DB_File";
+Readonly::Array my @yaml_class => (
+      ( exists $ENV{WEBFETCH_YAML_CLASS} )
+    ? ( split " ", $ENV{WEBFETCH_YAML_CLASS} )
+    : qw(YAML::XS YAML::Syck YAML::PP YAML)
+);
+Readonly::Hash my %index_file => (
+    db   => "id_index.db",
+    lock => "id_index.lock",
+    yaml => "id_index.yaml",
 );
 
 #
@@ -212,6 +227,22 @@ sub _module_registry
     return;
 }
 ## critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+
+# load a YAML parser class from allowed list
+sub _load_yaml
+{
+    my $yaml_loaded;
+    foreach my $classname (@yaml_class) {
+        try {
+            ## no critic (BuiltinFunctions::ProhibitStringyEval)
+            eval "require $classname" or croak $@;
+            $classname->import(qw(LoadFile DumpFile));
+            $yaml_loaded = $classname;
+        };
+        last if $yaml_loaded;
+    }
+    return $yaml_loaded;
+}
 
 # return WebFetch (or subclass) version number
 sub version
@@ -1251,19 +1282,27 @@ sub _save_file_mode
     return 1;
 }
 
-# check if content is already in index file
-# internal method used by save()
-sub _save_check_index
+# index lookup via legacy DB file
+# returns 1 if item was found in index, 0 if it had to be added to index
+# internal method used by _save_check_index()
+sub _save_check_index_db
 {
     my ( $self, $savable ) = @_;
+    my $was_in_index  = 0;
+    my $index_db_path = $self->{dir} . "/" . $index_file{db};
 
-    # if a URL was provided and index flag is set, use index file
-    my %id_index;
-    my ( $timestamp, $filename );
-    my $was_in_index = 0;
-    if ( ( exists $savable->{url} ) and ( exists $savable->{index} ) ) {
-        require DB_File;
-        tie %id_index, 'DB_File', $self->{dir} . "/id_index.db", &DB_File::O_CREAT | &DB_File::O_RDWR, oct(640);
+    # check if DB_File module is available
+    my $db_available = 0;
+    try {
+        ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        eval "require $db_class" or croak $@;
+        $db_available = 1;
+    };
+
+    # look up content in DB index
+    if ( $db_available and ( exists $savable->{url} ) and ( exists $savable->{index} ) ) {
+        tie my %id_index, 'DB_File', $index_db_path, &DB_File::O_CREAT | &DB_File::O_RDWR;
+        my ( $timestamp, $filename );
         if ( exists $id_index{ $savable->{url} } ) {
             ( $timestamp, $filename ) =
                 split /#/x, $id_index{ $savable->{url} };
@@ -1275,13 +1314,75 @@ sub _save_check_index
         }
         untie %id_index;
     }
+    return $was_in_index;
+}
+
+# index lookup via YAML file
+# returns 1 if item was found in index, 0 if it had to be added to index
+# internal method used by _save_check_index()
+sub _save_check_index_yaml
+{
+    my ( $self, $savable ) = @_;
+    my $was_in_index    = 0;
+    my $index_lock_path = $self->{dir} . "/" . $index_file{lock};
+    my $index_yaml_path = $self->{dir} . "/" . $index_file{yaml};
+
+    # check if YAML module is available
+    my $yaml_loaded = _load_yaml();
+
+    # look up content in YAML index
+    if ( $yaml_loaded and ( exists $savable->{url} ) and ( exists $savable->{index} ) ) {
+        my $id_index_ref = {};
+        my ( $timestamp, $filename );
+
+        # lock and read index YAML if it exists
+        if ( -f $index_lock_path and pshlock($index_lock_path) ) {
+            ($id_index_ref) = LoadFile($index_yaml_path);
+            punlock($index_lock_path);
+            pclose($index_lock_path);
+        }
+        if ( exists $id_index_ref->{ $savable->{url} } ) {
+            ( $timestamp, $filename ) =
+                split /#/x, $id_index_ref->{ $savable->{url} };
+            $was_in_index = 1;
+        } else {
+            $timestamp = time;
+            $id_index_ref->{ $savable->{url} } =
+                $timestamp . "#" . $savable->{file};
+        }
+
+        # save index if modified
+        if ( not $was_in_index and pexclock($index_lock_path) ) {
+            DumpFile( $index_yaml_path, $id_index_ref );
+            punlock($index_lock_path);
+            pclose($index_lock_path);
+        }
+    }
+    return $was_in_index;
+}
+
+# check if content is already in index file
+# internal method used by save()
+sub _save_check_index
+{
+    my ( $self, $savable ) = @_;
+
+    # if a URL was provided and index flag is set, use index file
+    my $was_in_index    = 0;
+    my $index_db_path   = $self->{dir} . "/" . $index_file{db};
+    my $index_yaml_path = $self->{dir} . "/" . $index_file{yaml};
+
+    # use backward-compatible DB_File index if DB index file exists and YAML index does not
+    if ( -f $index_db_path and not -f $index_yaml_path ) {
+        $was_in_index = $self->_save_check_index_db($savable);
+    }
+
+    # handle YAML file
+    $was_in_index = ( $self->_save_check_index_yaml($savable) or $was_in_index );
 
     # For now, we consider it done if the file was in the index.
     # Future options would be to check if URL was modified.
-    if ($was_in_index) {
-        return 0;
-    }
-    return 1;
+    return $was_in_index ? 0 : 1;
 }
 
 # if a URL was provided and no content, get content from URL
@@ -1837,7 +1938,7 @@ WebFetch - Perl module to download/fetch and save information from the Web
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -2749,7 +2850,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

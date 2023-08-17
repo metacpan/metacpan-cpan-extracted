@@ -1,5 +1,8 @@
 Revision history for CSS-Packer
 
+2.09       2023-06-07
+    - Detect the word 'license' as a copyright notice (GH #12, thanks to kovmir)
+
 2.08       2020-03-02
     - Fix Invalid content attr replacement (GH #10, thanks to rapsys)
 

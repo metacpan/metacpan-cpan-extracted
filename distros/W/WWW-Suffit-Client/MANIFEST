@@ -1,0 +1,27 @@
+# MANIFEST Fri 21 Jul 2023 14:45:49 MSK
+
+# General
+Changes                                  Changes list
+INSTALL.md                               Installation instructions
+LICENSE                                  License file
+Makefile.PL                              Makefile builder
+MANIFEST                                 This file
+README.md                                !!! README FIRST !!!
+TODO                                     TO DO
+
+# Libs
+lib/WWW/Suffit/Client.pm                 Main library
+lib/WWW/Suffit/Client/NoAPI.pm           NoAPI methods of the Client class
+lib/WWW/Suffit/Client/V1.pm              V1 methods of the Client class
+
+# Tests
+t/00-fixme.t                             FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                      POD::Coverage testing
+t/00-pod.t                               Checking all POD documents
+t/00-trailingspace.t                     Style test: TrailingSpace
+t/01-use.t                               Test script
+t/02-common.t                            Testing common API methods
+t/03-v1.t                                Testing V1 API methods
+t/04-noapi.t                             Testing NoAPI methods
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

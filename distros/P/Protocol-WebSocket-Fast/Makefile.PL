@@ -26,6 +26,7 @@ my %params = (
         CLIB                 => {
             DIR          => 'clib',
             CMAKE_TARGET => $cmake_tests,
+            CMAKE_OPTIONS => qq{-DPROTOCOL_WEBSOCKET_TESTS=ON},
             FILE         => "lib${cmake_tests}.a",
         },
     },

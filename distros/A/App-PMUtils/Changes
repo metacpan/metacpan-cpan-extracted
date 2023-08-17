@@ -1,3 +1,9 @@
+0.744   2023-05-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli pmcost] Add option --time-hires to adjust with
+          Devel::EndStats 0.210+.
+
+
 0.743   2023-01-28  Released-By: PERLANCAR; Urgency: medium
 
         - [cli pmlist][bugfix] '/' (from completion) etc were not yet

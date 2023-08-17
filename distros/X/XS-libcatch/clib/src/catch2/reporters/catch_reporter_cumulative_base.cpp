@@ -1,12 +1,13 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
 #include <catch2/reporters/catch_reporter_cumulative_base.hpp>
-#include <catch2/reporters/catch_reporter_helpers.hpp>
+
+#include <catch2/internal/catch_move_and_forward.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -69,7 +70,8 @@ namespace Catch {
 
     void
     CumulativeReporterBase::sectionStarting( SectionInfo const& sectionInfo ) {
-        SectionStats incompleteStats( sectionInfo, Counts(), 0, false );
+        // We need a copy, because SectionStats expect to take ownership
+        SectionStats incompleteStats( SectionInfo(sectionInfo), Counts(), 0, false );
         SectionNode* node;
         if ( m_sectionStack.empty() ) {
             if ( !m_rootSection ) {
@@ -143,21 +145,6 @@ namespace Catch {
         m_testRun = Detail::make_unique<TestRunNode>( testRunStats );
         m_testRun->children.swap( m_testCases );
         testRunEndedCumulative();
-    }
-
-    void CumulativeReporterBase::listReporters(std::vector<ReporterDescription> const& descriptions) {
-        defaultListReporters(m_stream, descriptions, m_config->verbosity());
-    }
-
-    void CumulativeReporterBase::listTests(std::vector<TestCaseHandle> const& tests) {
-        defaultListTests(m_stream,
-                         tests,
-                         m_config->hasTestFilters(),
-                         m_config->verbosity());
-    }
-
-    void CumulativeReporterBase::listTags(std::vector<TagInfo> const& tags) {
-        defaultListTags( m_stream, tags, m_config->hasTestFilters() );
     }
 
     bool CumulativeReporterBase::SectionNode::hasAnyAssertions() const {

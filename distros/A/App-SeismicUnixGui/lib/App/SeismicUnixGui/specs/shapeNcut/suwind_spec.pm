@@ -3,8 +3,7 @@ use Moose;
 our $VERSION = '1.0.0';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
-use aliased 'App::SeismicUnixGui::sunix::shapeNcut::suwind';
-use App::SeismicUnixGui::misc::SeismicUnix qw($su $suffix_su);
+use App::SeismicUnixGui::misc::SeismicUnix qw($su $suffix_su $suffix_txt $txt);
 
 my $get              = L_SU_global_constants->new();
 my $var              = $get->var();
@@ -16,14 +15,15 @@ my $true         = $var->{_true};
 my $false        = $var->{_false};
 
 my $Project = Project_config->new();
-my $suwind  = suwind->new();
 
 my $DATA_SEISMIC_SU = $Project->DATA_SEISMIC_SU();    # output data directory
-my $PL_SEISMIC        = $Project->PL_SEISMIC();
-my $max_index       = $suwind->get_max_index();
+my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();    # output data directory
+
+my $PL_SEISMIC      = $Project->PL_SEISMIC();
+my $max_index       = 17;
 
 my $suwind_spec =  {
-    _CONFIG	 				=> $PL_SEISMIC,
+    _CONFIG	 			=> $PL_SEISMIC,
     _DATA_DIR_IN           => $DATA_SEISMIC_SU,
 	_DATA_DIR_OUT          => $DATA_SEISMIC_SU,
 	_binding_index_aref    => '',
@@ -34,7 +34,7 @@ my $suwind_spec =  {
     _file_dialog_type_aref => '',
     _flow_type_aref        => '',
     _has_pipe_in           => $true,
-    _has_outpar          => $false,
+    _has_outpar            => $false,
     _has_pipe_out          => $true,
     _has_redirect_in       => $true,
     _has_redirect_out      => $true,
@@ -65,63 +65,20 @@ my $suwind_spec =  {
 
 sub binding_index_aref {
     my ($self) = @_;
-    my @listbox_index;
+    my @index; 
 
-    $listbox_index[0] = 0;    #
+	$index[0] = 2;    # first item is  ound to DATA_DIR_IN
 
-    $suwind_spec->{_binding_index_aref} = \@listbox_index;
+    $suwind_spec->{_binding_index_aref} = \@index;
 
     return ();
-}
-
-=head2 sub get_binding_index_aref
-
-=cut
-
-sub get_binding_index_aref {
-    my ($self) = @_;
-    my @index;
-
-    if ( $suwind_spec->{_binding_index_aref} ) {
-        my $index_aref = $suwind_spec->{_binding_index_aref};
-        return ($index_aref);
-
-    }
-    else {
-        print(
-            "suwind_spec, get_binding_index_aref, missing binding_index_aref\n"
-        );
-        return ();
-    }
-
-    my $index_aref = $suwind_spec->{_binding_index_aref};
-
-}
-
-=head2 sub get_max_index
-
-=cut
-
-sub get_max_index {
-    my ($self) = @_;
-
-    if ( $suwind_spec->{_max_index} ) {
-
-        my $max_idx = $suwind->get_max_index();
-        return ($max_idx);
-
-    }
-    else {
-        print("suwind_spec, get_max_index, missing max_index\n");
-        return ();
-    }
 }
 
 =head2 sub file_dialog_type_aref
 
     starts at type[0] but 
     refers to an index
-    within a listbox and not the idnex of the
+    within a listbox and not the index of the
     variable: type
     
 =cut 
@@ -131,31 +88,14 @@ sub file_dialog_type_aref {
 
     my @type;
 
-    $type[0] = '';    # $file_dialog_type->{_Data}; # starts at index=0
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	$type[ $index[0]]  = $file_dialog_type->{_Data};
 
     $suwind_spec->{_file_dialog_type_aref} = \@type;
-
     return ();
 
-}
-
-=head2 sub get_file_dialog_type_aref
-
-=cut 
-
-sub get_file_dialog_type_aref {
-    my ($self) = @_;
-
-    if ( $suwind_spec->{_file_dialog_type_aref} ) {
-        my @type = @{ $suwind_spec->{_file_dialog_type_aref} };
-        return ( \@type );
-    }
-    else {
-        print(
-"suwind_spec,get_file_dialog_type_aref, missing file_dialog_type_aref\n"
-        );
-        return ();
-    }
 }
 
 =head2 sub flow_type_aref
@@ -175,17 +115,62 @@ sub flow_type_aref {
 
 }
 
+=head2 sub get_binding_index_aref
+
+=cut
+
+sub get_binding_index_aref {
+    my ($self) = @_;
+    my @index;
+
+    if ( $suwind_spec->{_binding_index_aref} ) {
+    	
+        my $index_aref = $suwind_spec->{_binding_index_aref};
+        return ($index_aref);
+
+    }
+    else {
+        print(
+            "suwind_spec, get_binding_index_aref, missing binding_index_aref\n"
+        );
+        return ();
+    }
+
+    my $index_aref = $suwind_spec->{_binding_index_aref};
+
+}
+
+#=head2 sub get_max_index
+#
+#=cut
+#
+#sub get_max_index {
+#    my ($self) = @_;
+#
+#    if ( $suwind_spec->{_max_index} ) {
+#
+#        my $max_idx = $suwind_spec->{_max_index};
+#        return ($max_idx);
+#
+#    }
+#    else {
+#        print("suwind_spec, get_max_index, missing max_index\n");
+#        return ();
+#    }
+#}
+
 =head2 sub get_binding_length
 
 =cut 
 
 sub get_binding_length {
+	
     my ($self) = @_;
 
     if ( $suwind_spec->{_binding_index_aref} ) {
-        my $length;
-        $length = scalar @{ $suwind_spec->{_binding_index_aref} };
-        return ($length);
+    	
+        my $binding_length = scalar @{ $suwind_spec->{_binding_index_aref} };
+        return ($binding_length);
 
     }
     else {
@@ -196,16 +181,40 @@ sub get_binding_length {
 
 }
 
+=head2 sub get_file_dialog_type_aref
+
+=cut 
+
+sub get_file_dialog_type_aref {
+	
+    my ($self) = @_;
+    if ( $suwind_spec->{_file_dialog_type_aref} ) {
+    	
+        my $index_aref = $suwind_spec->{_file_dialog_type_aref};
+        return ( $index_aref );
+    }
+    else {
+        print(
+"suwind_spec,get_file_dialog_type_aref, missing file_dialog_type_aref\n"
+        );
+        return ();
+    }
+}
+
+
 =head2 sub get_flow_type_aref
 
 =cut 
 
 sub get_flow_type_aref {
+	
     my ($self) = @_;
 
     if ( $suwind_spec->{_flow_type_aref} ) {
-        my $type_aref = $suwind_spec->{_flow_type_aref};
-        return ($type_aref);
+    	
+        my $index_aref = $suwind_spec->{_flow_index_aref};
+        return ($index_aref);
+        
     }
     else {
 
@@ -329,6 +338,13 @@ sub prefix_aref {
         $prefix[$i] = $empty_string;
 
     }
+    
+    my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# third label in GUI is input list file name and needs a home directory
+	$prefix[ $index[0] ] = '$DATA_SEISMIC_TXT' . ".'/'.";
+    
     $suwind_spec->{_prefix_aref} = \@prefix;
     return ();
 
@@ -353,6 +369,14 @@ sub suffix_aref {
         $suffix[$i] = $empty_string;
 
     }
+    
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# label 3 in GUI is input file list name and needs a home directory
+	$suffix[ $index[0] ] = '' . '' . '$suffix_txt';    
+    
+    
     $suwind_spec->{_suffix_aref} = \@suffix;
     return ();
 

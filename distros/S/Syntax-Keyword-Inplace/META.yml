@@ -4,7 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Keyword::Builder: '0.13'
@@ -18,12 +18,12 @@ name: Syntax-Keyword-Inplace
 provides:
   Syntax::Keyword::Inplace:
     file: lib/Syntax/Keyword/Inplace.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   XS::Parse::Keyword: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

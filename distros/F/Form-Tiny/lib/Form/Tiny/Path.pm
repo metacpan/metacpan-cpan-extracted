@@ -1,5 +1,5 @@
 package Form::Tiny::Path;
-$Form::Tiny::Path::VERSION = '2.17';
+$Form::Tiny::Path::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;
@@ -115,20 +115,18 @@ sub make_name_path
 {
 	my ($self, $prefix) = @_;
 
-	my @real_path;
-	my @path = @{$self->path};
-	my @meta = @{$self->meta};
+	my @real_path = @{$self->path};
+	my $meta = $self->meta;
 
-	$prefix //= $#path;
-	for my $ind (0 .. $prefix) {
-		my $part = $path[$ind];
+	@real_path = @real_path[0 .. $prefix]
+		if defined $prefix;
 
-		$part =~ s/\Q$escape_character\E/$escape_character$escape_character/g;
-		$part =~ s/\Q$nesting_separator\E/$escape_character$nesting_separator/g;
-		$part =~ s/\A\Q$array_marker\E\z/$escape_character$array_marker/g
-			unless $meta[$ind] eq 'ARRAY';
-
-		push @real_path, $part;
+	for my $ind (0 .. $#real_path) {
+		if ($meta->[$ind] ne 'ARRAY') {
+			$real_path[$ind] =~ s{
+				(\Q$escape_character\E | \Q$nesting_separator\E | \A\Q$array_marker\E\z)
+			}{$escape_character$1}gx;
+		}
 	}
 
 	return @real_path;

@@ -33,6 +33,7 @@ create table "issue" (
   , "reactions" varchar(1024)
   , "performed_via_github_app" varchar(1024)
   , "draft" varchar(1024)
+  , "state_reason" varchar(1024)
 );
 
 create table "comment" (

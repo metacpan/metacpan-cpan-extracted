@@ -76,7 +76,7 @@
          "web" : "https://github.com/Corion/Future-HTTP"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

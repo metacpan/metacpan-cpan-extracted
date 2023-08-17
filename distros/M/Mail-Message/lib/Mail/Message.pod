@@ -881,7 +881,7 @@ to create expectations about the message's length, but also to determine
 the mime-type and encodings of the body data.
 
 The $bodytype determines which kind of body will be made and defaults to
-the value specified by new(body_type).
+the value specified by L<new(body_type)|Mail::Message/"Constructors">.
 $bodytype may be the name of a body class, or a reference
 to a routine which returns the body's class when passed the $head as only
 argument.
@@ -909,7 +909,7 @@ Inherited, see L<Mail::Message::Construct::Rebuild/"Internals">
 
 Where the L<body()|Mail::Message/"The body"> method can be used to set and get a body, with all
 the necessary checks, this method is bluntly adding the specified body
-to the message.  No conversions, not checking.
+to the message.  No conversions, no checking.
 
 =item $obj-E<gt>B<takeMessageId>( [STRING] )
 
@@ -1295,12 +1295,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.012,
-built on February 11, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.013,
+built on June 24, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

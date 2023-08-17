@@ -3,7 +3,7 @@ package App::SeismicUnixGui::big_streams::iBottomMute;
 =head1 DOCUMENTATION
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iBottomMute.pm 
+ PERL PROGRAM NAME: iBottomMute.pm 
  AUTHOR: Juan Lorenzo
  DATE:  Sept. 14 2015 
  DATE:  June 12, 2017 adapted from iTop_Mute3.pm 
@@ -105,7 +105,7 @@ my $Project                  = Project_config->new();
 my $iSave_bottom_mute_picks  = iSave_bottom_mute_picks->new();
 my $SuMessages               = SuMessages->new();
 
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT)= $Project->DATA_SEISMIC_TXT();
 my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
 my ($date)            = $Project->date();
 
@@ -235,6 +235,7 @@ sub iPicks2par {
 =cut
 
 sub iBM_Save_bottom_mute_picks {
+	print("iBM_save\n");
     $iSave_bottom_mute_picks->gather_num( $iBottomMute->{_gather_num} );
     $iSave_bottom_mute_picks->gather_header( $iBottomMute->{_gather_header} );
     $iSave_bottom_mute_picks->gather_type( $iBottomMute->{_gather_type} );
@@ -443,7 +444,7 @@ sub icp_sorted2oldpicks {
     # sort file names
     $sortfile_in = $XTpicks_in;
     $inbound =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $sortfile_in . '_'
       . $iBottomMute->{_file_in} . '_'
       . $iBottomMute->{_gather_num_suffix};
@@ -451,7 +452,7 @@ sub icp_sorted2oldpicks {
     # TX write file names
     $writefile_out = $XTpicks_out;
     $outbound =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $writefile_out . '_'
       . $iBottomMute->{_file_in} . '_'
       . $iBottomMute->{_gather_num_suffix};

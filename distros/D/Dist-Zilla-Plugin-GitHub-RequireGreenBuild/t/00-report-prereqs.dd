@@ -20,7 +20,8 @@ do { my $x = {
                                       'Test::NoBreakpoints' => '0.15',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {

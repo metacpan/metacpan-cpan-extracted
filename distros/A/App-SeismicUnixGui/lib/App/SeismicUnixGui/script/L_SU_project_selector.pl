@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: ProjectSelector.pl 
+ PERL PROGRAM NAME: L_SU_ProjectSelector.pl 
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 1 2018 
 

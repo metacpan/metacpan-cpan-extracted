@@ -1,9 +1,9 @@
-Last login: Tue Aug 17 12:05:09 [4m2[24m021 from [30m[45m192.0.2.12[0m
+Last login: Tue Aug 17 12:05:09 [4m2[24m021 from [30m[100m192.0.2.12[0m
 [5nkswXX#\swXX#bogusinput
 % Invalid input
 kswXX#\swXX#show ip bgp neighswXX#show ip bgp neighbors 
-[?1h=[36mBGP neighbor is [30m[45m192.0.2.12[0m, remote AS [4m65[24m000, internal link[0m
-  BGP version 4, remote router ID [37m[44m0.0.0.0[0m, VRF default
+[?1h=[36mBGP neighbor is [30m[100m192.0.2.12[0m, remote AS [4m65[24m000, internal link[0m
+  BGP version 4, remote router ID [90m[47m0.0.0.0[0m, VRF default
   Last read never, last write never
   Hold time is 0, keepalive interval is 0 seconds
   Configured hold time is 180, keepalive interval is 60 seconds
@@ -59,9 +59,9 @@ Last login: Tue Aug 17 12:05:09 [4m2[24m021 from [30m[45m192.0.2.12[0m
   Outbound paths dropped by reason:
     IPv4 local address not available: 0
     IPv6 local address not available: 0
-Local AS is [4m65[24m000, local router ID [37m[44m192.0.2.24[0m
+Local AS is [4m65[24m000, local router ID [30m[45m192.0.2.24[0m
 TTL is 255
-[36mRemote TCP address is [30m[45m192.0.2.12[0m, remote port is 179[0m
+[36mRemote TCP address is [30m[100m192.0.2.12[0m, remote port is 179[0m
 ! Sending extended community not configured, updates will be sent without extended communities or route targets
 TCP Socket Information:
   TCP state is SYN-SENT
@@ -81,9 +81,9 @@ TCP Socket Information:
     Delayed Ack Timeout (ato): 0.0ms
     Congestion Window (cwnd): 10
 
-[36mBGP neighbor is [30m[43m192.0.2.1[0m, remote AS [4m65[24m000, internal link[0m
+[36mBGP neighbor is [90m[47m192.0.2.1[0m, remote AS [4m65[24m000, internal link[0m
 [36m Description: "Raku BGP Test Session"[0m
-  BGP version 4, remote router ID [37m[44m0.0.0.0[0m, VRF default
+  BGP version 4, remote router ID [90m[47m0.0.0.0[0m, VRF default
   Last read never, last write never
   Hold time is 0, keepalive interval is 0 seconds
   Configured hold time is 180, keepalive interval is 60 seconds
@@ -139,10 +139,10 @@ TCP Socket Information:
   Outbound paths dropped by reason:
     IPv4 local address not available: 0
     IPv6 local address not available: 0
-Local AS is [4m65[24m000, local router ID [37m[44m192.0.2.24[0m
+Local AS is [4m65[24m000, local router ID [30m[45m192.0.2.24[0m
 TTL is 255
-[36mLocal TCP address is [37m[44m192.0.2.24[0m[0m
-[36mRemote TCP address is [30m[43m192.0.2.1[0m, remote port is [4m1[24m180[0m
+[36mLocal TCP address is [30m[45m192.0.2.24[0m[0m
+[36mRemote TCP address is [90m[47m192.0.2.1[0m, remote port is [4m1[24m180[0m
 Configured remote port is [4m1[24m180
 ! Sending extended community not configured, updates will be sent without extended communities or route targets
 TCP Socket Information:
@@ -164,8 +164,8 @@ TCP Socket Information:
     Congestion Window (cwnd): 1
     Slow-start Threshold (ssthresh): 7
 
-[36mBGP neighbor is [37m[44m192.0.2.3[0m, remote AS [4m65[24m000, internal link[0m
-  BGP version 4, remote router ID [37m[44m192.0.2.3[0m, VRF default
+[36mBGP neighbor is [90m[41m192.0.2.3[0m, remote AS [4m65[24m000, internal link[0m
+  BGP version 4, remote router ID [90m[41m192.0.2.3[0m, VRF default
   Last read 00:00:20, last write 00:00:46
   Hold time is 180, keepalive interval is 60 seconds
   Configured hold time is 180, keepalive interval is 60 seconds
@@ -230,10 +230,10 @@ TCP Socket Information:
     IPv6 local address not available: 0
 [36m  Inbound route map is IN-FOO[0m
 [36m  Outbound route map is OUT-FOO[0m
-Local AS is [4m65[24m000, local router ID [37m[44m192.0.2.24[0m
+Local AS is [4m65[24m000, local router ID [30m[45m192.0.2.24[0m
 TTL is 255
-[36mLocal TCP address is [37m[44m192.0.2.24[0m, local port is [4m43[24m489[0m
-[36mRemote TCP address is [37m[44m192.0.2.3[0m, remote port is 179[0m
+[36mLocal TCP address is [30m[45m192.0.2.24[0m, local port is [4m43[24m489[0m
+[36mRemote TCP address is [90m[41m192.0.2.3[0m, remote port is 179[0m
 ! Sending extended community not configured, updates will be sent without extended communities or route targets
 TCP Socket Information:
   TCP state is ESTABLISHED
@@ -256,8 +256,8 @@ TCP Socket Information:
     Recv Round-trip Time (rcv_rtt): [4m288[24m093.8ms
     Advertised Recv Window (rcv_space): [4m29[24m381
 
-[36mBGP neighbor is [37m[44m192.0.2.17[0m, remote AS [4m65[24m000, internal link[0m
-  BGP version 4, remote router ID [37m[44m192.0.2.17[0m, VRF default
+[36mBGP neighbor is [30m[41m192.0.2.17[0m, remote AS [4m65[24m000, internal link[0m
+  BGP version 4, remote router ID [30m[41m192.0.2.17[0m, VRF default
   Last read 00:00:02, last write 00:00:15
   Hold time is 180, keepalive interval is 60 seconds
   Configured hold time is 180, keepalive interval is 60 seconds
@@ -320,10 +320,10 @@ TCP Socket Information:
   Outbound paths dropped by reason:
     IPv4 local address not available: 0
     IPv6 local address not available: 0
-Local AS is [4m65[24m000, local router ID [37m[44m192.0.2.24[0m
+Local AS is [4m65[24m000, local router ID [30m[45m192.0.2.24[0m
 TTL is 255
-[36mLocal TCP address is [37m[44m192.0.2.24[0m, local port is [4m37[24m533[0m
-[36mRemote TCP address is [37m[44m192.0.2.17[0m, remote port is 179[0m
+[36mLocal TCP address is [30m[45m192.0.2.24[0m, local port is [4m37[24m533[0m
+[36mRemote TCP address is [30m[41m192.0.2.17[0m, remote port is 179[0m
 BFD is enabled and state is Down
 ! Sending extended community not configured, updates will be sent without extended communities or route targets
 TCP Socket Information:
@@ -1648,8 +1648,8 @@ TCP Socket Information:
 [36m     0 PAUSE output[0m
 [32mLoopback0 is up, line protocol is up (connected)[0m
   Hardware is Loopback
-  Internet address is [37m[44m192.0.2.24/32[0m
-  Broadcast address is [30m[42m255.255.255.255[0m
+  Internet address is [30m[45m192.0.2.24/32[0m
+  Broadcast address is [90m[47m255.255.255.255[0m
   IP MTU [4m65[24m535 bytes (default)
 [32m  Up 202 days, 21 hours, 28 minutes, 14 seconds[0m
 [33mManagement1 is administratively down, line protocol is down (disabled)[0m
@@ -1810,14 +1810,14 @@ TCP Socket Information:
 [32m     0 output errors, 0 output discards[0m
 [32mVlan102 is up, line protocol is up (connected)[0m
   Hardware is Vlan, address is 012d.456e.7113 (bia 012d.456e.7113)
-  Internet address is [30m[41m192.0.2.61/28[0m
-  Broadcast address is [30m[42m255.255.255.255[0m
+  Internet address is [30m[100m192.0.2.61/28[0m
+  Broadcast address is [90m[47m255.255.255.255[0m
   IP MTU [4m1[24m500 bytes (default)
 [32m  Up 202 days, 21 hours, 26 minutes, 52 seconds[0m
 [32mVlan210 is up, line protocol is up (connected)[0m
   Hardware is Vlan, address is 012d.456e.7113 (bia 012d.456e.7113)
-  Internet address is [30m[43m192.0.2.3/24[0m
-  Broadcast address is [30m[42m255.255.255.255[0m
+  Internet address is [37m[45m192.0.2.3/24[0m
+  Broadcast address is [90m[47m255.255.255.255[0m
   IP MTU [4m1[24m500 bytes (default)
 [32m  Up 197 days, 20 hours, 55 minutes, 48 seconds[0m
 [K[?1l>kswXX#\swXX#  
@@ -2032,8 +2032,8 @@ Interface        Role       State      Cost      Prio.Nbr Type
 [32mPo6              designated forwarding [4m1[24m999      128.130  P2p Edge[0m
 [32mPo8              designated forwarding [4m19[24m999     128.133  P2p Edge[0m
 
-[37m[44m1.2.3.4[0m:
-Host: [37m[44m1.2.3.4[0m port [4m1[24m000
+[30m[46m1.2.3.4[0m:
+Host: [30m[46m1.2.3.4[0m port [4m1[24m000
 VRF: default
 Refresh interval: [4m3[24m600 seconds
 Retry interval: 600 seconds
@@ -2052,13 +2052,4 @@ Entries: [4m424[24m637
 [32mConnection: Active (11 days, 18:39:28)[0m
 Transport information:
   Protocol: TCP
-
-foo.bar#show platform jericho2 tcam summary 
-              Tcam Allocation (Fap0)              
-   Bank                     Used By    Reserved By
----------- --------------------------- -----------
-      0                    dbIpPacl              -
-      7       dbIp6CpuTrafficPolicy              -
-     12                   dbSystem6              -
-     15                 dbMacSystem              -
 

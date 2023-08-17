@@ -1,5 +1,4 @@
 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Mojo-OBS-Client?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Mojo-OBS-Client)
 [![Windows](https://github.com/Corion/Mojo-OBS-Client/workflows/windows/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Awindows)
 [![MacOS](https://github.com/Corion/Mojo-OBS-Client/workflows/macos/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Amacos)
 [![Linux](https://github.com/Corion/Mojo-OBS-Client/workflows/linux/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Alinux)
@@ -23,11 +22,11 @@ Mojo::OBS::Client - Mojolicious client for the OBS WebSocket remote plugin
 
 ## `->ioloop`
 
-Access the underlying [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop)
+Access the underlying [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop)
 
 ## `->ua`
 
-Access the [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object used to talk to OBS.
+Access the [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) object used to talk to OBS.
 
 ## `->tx`
 
@@ -35,7 +34,7 @@ The websocket connection to OBS.
 
 ## `->protocol`
 
-The [Net::Protocol::OBSRemote](https://metacpan.org/pod/Net::Protocol::OBSRemote) instance used to generate the OBS messages.
+The [Net::Protocol::OBSRemote](https://metacpan.org/pod/Net%3A%3AProtocol%3A%3AOBSRemote) instance used to generate the OBS messages.
 
 ## `->debug`
 
@@ -46,7 +45,7 @@ Switch on debug messages to STDERR. Also enabled if
 
 # METHODS
 
-For the OBS methods, see [Net::Protocl::OBSRemote](https://metacpan.org/pod/Net::Protocl::OBSRemote).
+For the OBS methods, see [Net::Protocl::OBSRemote](https://metacpan.org/pod/Net%3A%3AProtocl%3A%3AOBSRemote).
 
 ## `->login $url, $password`
 
@@ -80,7 +79,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2021-2021 by Max Maischein `corion@cpan.org`.
+Copyright 2021-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

@@ -47,12 +47,15 @@ END
 }
 
 if ($] >= 5.010001) {
-    is (eval <<'END', 1, 'smartmatch compiles') or diag $@;
-    use experimentals;
-    sub bar { 1 };
-    is(1 ~~ \&bar, 1, "smartmatch works as expected");
-    1;
+    local $SIG{__WARN__} = sub { if ($] < 5.037) { fail("Got unexpected warning"); diag($_[0]) } };
+    if ($] <= 5.040000) {
+        is (eval <<'END', 1, 'smartmatch compiles') or diag $@;
+        use experimentals;
+        sub bar { 1 };
+        is(1 ~~ \&bar, 1, "smartmatch works as expected");
+        1;
 END
+    }
 }
 
 if ($] >= 5.018) {

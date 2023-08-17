@@ -1,5 +1,4 @@
 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/WWW-Twitch?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/WWW-Twitch)
 [![Windows](https://github.com/Corion/WWW-Twitch/workflows/windows/badge.svg)](https://github.com/Corion/WWW-Twitch/actions?query=workflow%3Awindows)
 [![MacOS](https://github.com/Corion/WWW-Twitch/workflows/macos/badge.svg)](https://github.com/Corion/WWW-Twitch/actions?query=workflow%3Amacos)
 [![Linux](https://github.com/Corion/WWW-Twitch/workflows/linux/badge.svg)](https://github.com/Corion/WWW-Twitch/actions?query=workflow%3Alinux)

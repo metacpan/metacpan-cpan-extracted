@@ -6,7 +6,7 @@ use warnings;
 use integer;
 use lib '../..';
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 use App::Followme::FIO;
 
@@ -414,7 +414,7 @@ sub trim_string {
 	my ($str) = @_;
 	return '' unless defined $str;
 
-    $str =~ s/[ \t\n]+/ /g;	
+    $str =~ s/\s+/ /g;	
 	$str =~ s/^\s//;
 	$str =~ s/\s$//;
 
@@ -457,7 +457,7 @@ value pairs separated by a colon and a space:
 
 In the above example all the values are short strings and fit on a line.
 Longer values can be split across several lines by starting each line
-sith a greater than sign and space indented beneath the name:
+with a greater than sign and space indented beneath the name:
 
     name1: value1
     name2:

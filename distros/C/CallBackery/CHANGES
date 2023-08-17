@@ -1,3 +1,21 @@
+0.46.5 2023-06-28 08:29:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fixed regression in abstractform (missing signature)
+
+0.46.4 2023-06-26 14:19:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - propper logging for async getters
+
+0.46.3 2023-06-14 18:30:45 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix base schema for yaml config files
+ - switch schema to draft2019
+ - do not reconfigure automatically if the secret file is missing
+
+0.46.2 2023-06-12 15:00:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix restore process to properly reconnect to database
+
 0.46.1 2023-05-23 12:12:33 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - resync branches
@@ -12,7 +30,16 @@
 
  - these changes are necessary to make callbackery work with qx8
 
+0.45.0 2023-05-23 12:05:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ -
+
+0.45.0 2023-05-23 12:05:01 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ -
+=======
 0.45.1 2023-05-08 10:52:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
+>>>>>>> 93b1caf4debb55a06a72ad1d38134bb1f4173bf4
 
  - Reload CardList on action response
 

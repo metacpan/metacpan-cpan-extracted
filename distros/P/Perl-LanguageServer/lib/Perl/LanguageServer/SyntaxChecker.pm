@@ -222,7 +222,7 @@ sub background_checker
 
         my $fn = $uri ;
         $fn =~ s/^file:\/\/// ;
-        $fn = $self -> uri_client2server ($fn) ;
+        $fn = $self -> file_client2server ($fn) ;
         $text = "local \$0; BEGIN { \$0 = '$fn'; if (\$INC{'FindBin.pm'}) { FindBin->again(); } }\n# line 1 \"$fn\"\n" . $text;
 
         my $ret ;
@@ -232,7 +232,12 @@ sub background_checker
         my @inc ;
         @inc = map { ('-I', $_)} @$inc if ($inc) ;
 
-        $self -> logger ("start perl -c for $uri\n") if ($Perl::LanguageServer::debug1) ;
+        my @syntax_options ;
+        if ($self -> use_taint_for_syntax_check) {
+            @syntax_options = ('-T') ;
+        }
+
+        $self -> logger ("start perl @syntax_options -c @inc for $uri\n") if ($Perl::LanguageServer::debug1) ;
         if ($^O =~ /Win/)
             {
 #            ($ret, $out, $errout) = $self -> run_open3 ($text, \@inc) ;
@@ -240,7 +245,7 @@ sub background_checker
             }
         else
             {
-            $ret = run_cmd ([$self -> perlcmd, '-c', @inc],
+            $ret = run_cmd ([$self -> perlcmd, @syntax_options, '-c', @inc],
                 "<", \$text,
                 ">", \$out,
                 "2>", \$errout)
@@ -266,9 +271,10 @@ sub background_checker
                 #print STDERR $line, "\n" ;
                 next if ($line =~ /had compilation errors/) ;
                 $filename = $1 if ($line =~ /at (.+?) line (\d+)[,.]/) ;
+                #print STDERR "line = $lineno  file=$filename fn=$fn\n" ;
+                $filename ||= $fn ;
                 $lineno   = $1 if ($line =~ / line (\d+)[,.]/) ;
 
-                #print STDERR "line = $lineno  file=$filename\n" ;
                 $msg .= $line ;
                 if ($lineno)
                     {

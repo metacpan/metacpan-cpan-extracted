@@ -1,7 +1,13 @@
+.editorconfig
 Build.PL
 Changes
+hax/newSVop.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
+lib/Optree/Generate.pm
+lib/Optree/Generate.xs
+lib/XS/Parse/Infix/FromPerl.pm
+lib/XS/Parse/Infix/FromPerl.xs
 lib/XS/Parse/Keyword/FromPerl.pm
 lib/XS/Parse/Keyword/FromPerl.xs
 LICENSE
@@ -18,4 +24,6 @@ t/12pieces-pad.t
 t/13pieces-structural.t
 t/20newASSIGNOP.t
 t/20newCONDOP.t
+t/30infix.t
+t/31infix-entersub.t
 t/99pod.t

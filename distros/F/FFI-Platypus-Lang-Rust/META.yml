@@ -16,7 +16,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues
   homepage: https://metacpan.org/pod/FFI::Platypus::Lang::Rust
   repository: git://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Andrew Grangaard (SPAZM)'

@@ -3,7 +3,7 @@
 use v5.14;  # package NAME {BLOCK}
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 my @method_call_args;
 
@@ -23,7 +23,7 @@ use Metrics::Any::Adapter 'Testing';
 
 $metrics->inc_counter( handle => );
 
-is_deeply( \@method_call_args,
+is( \@method_call_args,
    [
       [qw( make_counter main/handle ), collector => $metrics, name => "the_name" ],
       [qw( inc_counter_by main/handle 1 )],

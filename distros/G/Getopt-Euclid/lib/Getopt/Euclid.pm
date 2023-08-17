@@ -1902,7 +1902,7 @@ Any placeholder that is immediately followed by C<...>, like so:
         file.type: readable
 
 will match at least once, but as many times as possible before encountering
-the next argument on the command-line. This allows to specify multiple values
+the next argument on the command-line. This allows one to specify multiple values
 for an argument, for example:
 
     -lib file1.txt file2.txt
@@ -2679,16 +2679,18 @@ workaround may be to move the POD to a __DATA__ section or a separate .pod file.
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to
-C<bug-getopt-euclid@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Euclid>.
+Please report any bugs or feature requests via L<GitHub issues|https://github.com/bigpresh/Getopt-Euclid/issues>
 
-Getopt::Euclid has a development repository on Sourceforge.net at
-L<http://sourceforge.net/scm/?type=git&group_id=259291> in which the code is
-managed by Git. Feel free to clone this repository and push patches! To get started:
-  git clone L<git://getopt-euclid.git.sourceforge.net/gitroot/getopt-euclid/getopt-euclid>)
-  git branch 0.2.x origin/0.2.x
-  git checkout 0.2.x
+Pull requests to fix bugs / add features welcome!
+
+L<GitHub repo|https://github.com/bigpresh/Getopt-Euclid>
+
+C<< git clone git@github.com:bigpresh/Getopt-Euclid.git >>
+
+The L<RT queue|https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Euclid>
+still exists but GitHub issues are preferred due to their integration with
+pull requests etc.
+
 
 =head1 AUTHOR
 
@@ -2696,12 +2698,15 @@ Damian Conway  C<< <DCONWAY@cpan.org> >>
 
 Florent Angly C<< <florent.angly@gmail.com> >>
 
+David Precious (BIGPRESH) C<< <davidp@preshweb.co.uk> >>
+
 =head1 LICENCE AND COPYRIGHT
 
 Copyright (c) 2005, Damian Conway C<< <DCONWAY@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
+
 
 =head1 DISCLAIMER OF WARRANTY
 

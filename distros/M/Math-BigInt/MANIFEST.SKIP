@@ -1,4 +1,4 @@
-# Start included MANIFEST.SKIP template from ExtUtils::Manifest 1.73
+# Start included MANIFEST.SKIP template from ExtUtils::Manifest 1.75
 
 # Avoid version control files.
 \bRCS\b
@@ -11,6 +11,8 @@
 \B\.gitignore\b
 \b_darcs\b
 \B\.cvsignore$
+\B\.bzr\b
+\B\.bzrignore$
 
 # Avoid VMS specific MakeMaker generated files
 \bDescrip.MMS$
@@ -48,6 +50,7 @@
 \.#
 \.rej$
 \..*\.sw.?$
+\.~\d+~$
 
 # Avoid OS-specific files/dirs
 # Mac OSX metadata
@@ -76,7 +79,7 @@
 # Avoid AppVeyor file
 ^\.?appveyor.yml
 
-# End included /usr/local/share/perl5/site_perl/5.32/ExtUtils/MANIFEST.SKIP
+# End included /usr/local/lib/perl5/ExtUtils/MANIFEST.SKIP
 
 # Avoid more git stuff.
 \B\.gitattributes\b

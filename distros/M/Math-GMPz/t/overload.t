@@ -4,7 +4,7 @@ use Math::GMPz qw(:mpz);
 use Math::BigFloat; # for some error checking
 #use Devel::Peek;
 
-print "1..44\n";
+print "1..47\n";
 
 print "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
 
@@ -904,7 +904,27 @@ else {
   print "not ok 44\n";
 }
 
+my $uv_max = Math::GMPz->new(~0);
+my $obj1 = $uv_max++;
 
+if($obj1 - $uv_max == -1) {print "ok 45\n"}
+else {
+  warn "$obj1 is not 1 less than $uv_max\n";
+  print "not ok 45\n";
+}
+
+my $obj2 = ++$uv_max;
+if($obj2 == $uv_max) {print "ok 46\n"}
+else {
+  warn "$obj2 != $uv_max\n";
+  print "not ok 46\n";
+}
+
+if($obj2 - $obj1 == 2) {print "ok 47\n"}
+else {
+  warn "$obj2 is not 2 greater than $obj1";
+  print "not ok 47\n";
+}
 
 ## *,+,/,-,*=,+=,-=,/=,&,&=,|,|=,^,^=,
 ## >,>=,<,<=,<=>,==, !=

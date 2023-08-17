@@ -32,7 +32,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 {
   ok(SPVM::TestCase::NativeAPI->check_native_api_indexes);
   ok(SPVM::TestCase::NativeAPI->check_native_api_constant_values);
-  ok(SPVM::TestCase::NativeAPI->check_native_api_precompile_indexes);
   ok(SPVM::TestCase::NativeAPI->check_native_api_compiler_indexes);
   ok(SPVM::TestCase::NativeAPI->check_native_api_string_buffer_indexes);
   ok(SPVM::TestCase::NativeAPI->check_native_api_runtime_indexes);
@@ -47,6 +46,8 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 # class variable access
 {
+  ok(SPVM::TestCase::NativeAPI->get_class_var);
+  
   ok(SPVM::TestCase::NativeAPI->get_class_var_byte_by_name);
   ok(SPVM::TestCase::NativeAPI->get_class_var_byte_by_name_exception);
   ok(SPVM::TestCase::NativeAPI->get_class_var_short_by_name);
@@ -114,11 +115,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->set_field_object_by_name_exception);
 }
 
-# has_interface
-{
-  ok(SPVM::TestCase::NativeAPI->has_interface);
-}
-
 # is_type
 {
   ok(SPVM::TestCase::NativeAPI->is_type);
@@ -134,6 +130,11 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 {
   ok(SPVM::TestCase::NativeAPI->mortal_api);
   ok(SPVM::TestCase::NativeAPI->enter_scope_leave_scope);
+}
+
+# env->call_method_no_mortal
+{
+  ok(SPVM::TestCase::NativeAPI->native_call_method_no_mortal);
 }
 
 # env->call_method
@@ -184,9 +185,9 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 # Check not creating no needed object file
 ok(!-f "$build_dir/work/object/SPVM/CORE.o");
 
-# get_instance_method_id_static
+# get_instance_method_static
 {
-  ok(SPVM::TestCase::NativeAPI->get_instance_method_id_static);
+  ok(SPVM::TestCase::NativeAPI->get_instance_method_static);
 }
 
 # get_bool_object_value
@@ -194,9 +195,9 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   ok(SPVM::TestCase::NativeAPI->get_bool_object_value);
 }
 
-# new_string_raw
+# new_string_no_mortal
 {
-  ok(SPVM::TestCase::NativeAPI->new_string_raw);
+  ok(SPVM::TestCase::NativeAPI->new_string_no_mortal);
 }
 
 # new_string
@@ -204,9 +205,9 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   ok(SPVM::TestCase::NativeAPI->new_string);
 }
 
-# new_string_nolen_raw
+# new_string_nolen_no_mortal
 {
-  ok(SPVM::TestCase::NativeAPI->new_string_nolen_raw);
+  ok(SPVM::TestCase::NativeAPI->new_string_nolen_no_mortal);
 }
 
 # new_string_nolen
@@ -214,19 +215,9 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   ok(SPVM::TestCase::NativeAPI->new_string_nolen);
 }
 
-# get_class_id
+# get_basic_type_id
 {
-  ok(SPVM::TestCase::NativeAPI->get_class_id);
-}
-
-# get_class_id_by_name
-{
-  ok(SPVM::TestCase::NativeAPI->get_class_id_by_name);
-}
-
-# get_basic_type_id_by_name
-{
-  ok(SPVM::TestCase::NativeAPI->get_basic_type_id_by_name);
+  ok(SPVM::TestCase::NativeAPI->get_basic_type_id);
 }
 
 # strerror
@@ -265,19 +256,19 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   }
 }
 
-# new_object_array_raw
+# new_object_array_no_mortal
 {
-  ok(SPVM::TestCase::NativeAPI->new_object_array_raw);
+  ok(SPVM::TestCase::NativeAPI->new_object_array_no_mortal);
 }
 
-# get_args_stack_length
+# args_width
 {
-  ok(SPVM::TestCase::NativeAPI->get_args_stack_length);
+  ok(SPVM::TestCase::NativeAPI->args_width);
 }
 
-# items
+# Default
 {
-  ok(SPVM::TestCase::NativeAPI->items);
+  ok(SPVM::TestCase::NativeAPI->default_all_types);
 }
 
 # new_string_array
@@ -300,7 +291,14 @@ ok(SPVM::TestCase::NativeAPI->runtime_get_method_is_enum);
 
 # get string field
 {
-  ok(SPVM::TestCase::NativeAPI->get_string_field);
+  ok(SPVM::TestCase::NativeAPI->floating_point_constant);
+}
+{
+  ok(SPVM::TestCase::NativeAPI->call_method_in_precompile_class);
+}
+
+{
+  ok(SPVM::TestCase::NativeAPI->get_object_basic_type_name);
 }
 
 # Clear exception

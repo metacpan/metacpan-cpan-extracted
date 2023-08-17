@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinitionBuilder;
-$Form::Tiny::FieldDefinitionBuilder::VERSION = '2.17';
+$Form::Tiny::FieldDefinitionBuilder::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use Types::Standard qw(HashRef);
 use Form::Tiny::FieldDefinition;
 use Form::Tiny::Utils qw(has_form_meta);
 
-has 'data' => (
+has 'build_data' => (
 	is => 'ro',
 	required => 1,
 );
@@ -20,13 +20,14 @@ has 'addons' => (
 	is => 'ro',
 	isa => HashRef,
 	default => sub { {} },
+	init_arg => undef,
 );
 
 sub build
 {
 	my ($self, $context) = @_;
 
-	my $data = $self->data;
+	my $data = $self->build_data;
 	my $dynamic = ref $data eq 'CODE';
 	if ($dynamic && defined blessed $context) {
 		croak 'building a dynamic field definition requires Form::Tiny form'
@@ -49,7 +50,7 @@ sub build
 			$self->name;
 	}
 
-	$definition->addons($self->addons);
+	$definition->set_addons($self->addons);
 
 	return $definition;
 }

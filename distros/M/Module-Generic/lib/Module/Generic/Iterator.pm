@@ -114,9 +114,9 @@ sub next
     }
     else
     {
-        $pos = $self->pos;
         return if( $self->eof );
         $self->pos++;
+        $pos = $self->pos;
     }
     return( $self->elements->index( $pos ) );
 }
@@ -159,11 +159,11 @@ sub prev
     }
     else
     {
+        $self->pos-- if( $self->pos > 0 );
+        # Position of the given element is at the beginning of our array, there is nothing more
         $pos = $self->pos;
-        $self->pos-- if( $pos > 0 );
-        ## Position of the given element is at the beginning of our array, there is nothing more
         return if( $pos <= 0 );
-        $self->pos--;
+        # $self->pos--;
     }
     return( $self->elements->index( $pos ) );
 }

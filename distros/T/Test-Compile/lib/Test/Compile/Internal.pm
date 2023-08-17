@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = version->declare("v3.2.2");
+use version; our $VERSION = version->declare("v3.3.1");
 use File::Find;
 use File::Spec;
 use Test::Builder;
@@ -47,44 +47,43 @@ sub new {
     return $self;
 }
 
-=item C<all_files_ok(@dirs)>
+=item C<all_files_ok(@search)>
 
 Looks for perl files and tests them all for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of files or directories to be 
-searched for perl files, otherwise it searches the default locations you'd expect to find
-perl files in a perl module - see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)> 
-for details.
+If C<@search> is defined then it is taken as an array of files or
+directories to be searched for perl files, otherwise it searches the default
+locations you'd expect to find perl files in a perl module - see
+L</all_pm_files> and L</all_pl_files> for details.
 
 =cut
 sub all_files_ok {
-    my ($self, @dirs) = @_;
+    my ($self, @search) = @_;
 
-    my $pm_ok = $self->all_pm_files_ok(@dirs);
-    my $pl_ok = $self->all_pl_files_ok(@dirs);
+    my $pm_ok = $self->all_pm_files_ok(@search);
+    my $pl_ok = $self->all_pl_files_ok(@search);
 
-    if ( $pm_ok && $pl_ok ) {
-        return 1;
-    }
+    return ( $pm_ok && $pl_ok );
 }
 
 
-=item C<all_pm_files_ok(@dirs)>
+=item C<all_pm_files_ok(@search)>
 
 Checks all the perl module files it can find for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of files or directories to
-be searched for perl files, otherwise it searches some default locations
-- see L</all_pm_files(@dirs)>.
+If C<@search> is defined then it is taken as an array of files or
+directories to be searched for perl files, otherwise it searches the default
+locations you'd expect to find perl files in a perl module - see
+L</all_pm_files> for details.
 
 =cut
 sub all_pm_files_ok {
-    my ($self, @dirs) = @_;
+    my ($self, @search) = @_;
 
     my $test = $self->{test};
 
     my $ok = 1;
-    for my $file ( $self->all_pm_files(@dirs) ) {
+    for my $file ( $self->all_pm_files(@search) ) {
         my $testok = $self->pm_file_compiles($file);
         $ok = $testok ? $ok : 0;
         $test->ok($testok, "$file compiles");
@@ -93,22 +92,22 @@ sub all_pm_files_ok {
 }
 
 
-=item C<all_pl_files_ok(@dirs)>
+=item C<all_pl_files_ok(@search)>
 
 Checks all the perl program files it can find for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of directories to
+If C<@search> is defined then it is taken as an array of directories to
 be searched for perl files, otherwise it searches some default locations
-- see L</all_pl_files(@dirs)>.
+- see L</all_pl_files>.
 
 =cut
 sub all_pl_files_ok {
-    my ($self, @dirs) = @_;
+    my ($self, @search) = @_;
 
     my $test = $self->{test};
 
     my $ok = 1;
-    for my $file ( $self->all_pl_files(@dirs) ) {
+    for my $file ( $self->all_pl_files(@search) ) {
         my $testok = $self->pl_file_compiles($file);
         $ok = $testok ? $ok : 0;
         $test->ok($testok, "$file compiles");
@@ -131,34 +130,36 @@ sub verbose {
     my ($self, $verbose) = @_;
 
     if ( @_ eq 2 ) {
-        $self->{verbose} = $verbose;
+        $self->{_verbose} = $verbose;
     }
 
-    return $self->{verbose};
+    return $self->{_verbose};
 }
 
-=item C<all_pm_files(@dirs)>
+=item C<all_pm_files(@search)>
 
-Searches for and returns a list of perl module files - that is, files with a F<.pm>
-extension.
+Searches for and returns a list of perl module files - that is, files with a
+F<.pm> extension.
 
-If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
-directories to search for perl modules.
+If you provide C<@search>, it'll use that as a list of files to
+process, or directories to search for perl modules.
 
-If you don't provide C<dirs>, it'll search for perl modules in the F<blib/lib> directory,
-if that directory exists, otherwise it'll search the F<lib> directory.
+If you don't provide C<search>, it'll search for perl modules in the F<blib/lib>
+directory (if that directory exists). Otherwise it'll search the F<lib> directory.
 
 Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
 
 =cut
 
 sub all_pm_files {
-    my ($self, @dirs) = @_;
+    my ($self, @search) = @_;
 
-    @dirs = @dirs ? @dirs : $self->_default_locations('lib');
+    if ( ! @search ) {
+        @search = $self->_default_locations('lib');
+    }
 
     my @pm;
-    for my $file ( $self->_find_files(@dirs) ) {
+    for my $file ( $self->_find_files(@search) ) {
         if ( $self->_perl_module($file) ) {
             push @pm, $file;
         }
@@ -166,29 +167,32 @@ sub all_pm_files {
     return @pm;
 }
 
-=item C<all_pl_files(@dirs)>
+=item C<all_pl_files(@search)>
 
-Searches for and returns a list of perl script files - that is, any files that either
-have a case insensitive F<.pl>, F<.psgi> extension, or have no extension but have a perl shebang line.
+Searches for and returns a list of perl script files - that is, any files that
+either have a case insensitive F<.pl>, F<.psgi> extension, or have no extension
+but have a perl shebang line.
 
-If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
-directories to search for perl scripts.
+If you provide C<@search>, it'll use that as a list of files to
+process, or directories to search for perl scripts.
 
-If you don't provide C<dirs>, it'll search for perl scripts in the F<blib/script/> 
-and F<blib/bin/> directories if F<blib> exists, otherwise it'll search the F<script/>
-and F<bin/> directories
+If you don't provide C<search>, it'll search for perl scripts in the
+F<blib/script/> and F<blib/bin/> directories if F<blib> exists, otherwise
+it'll search the F<script/> and F<bin/> directories
 
 Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
 
 =cut
 
 sub all_pl_files {
-    my ($self, @dirs) = @_;
+    my ($self, @search) = @_;
 
-    @dirs = @dirs ? @dirs : $self->_default_locations('script', 'bin');
+    if ( ! @search ) {
+        @search = $self->_default_locations('script', 'bin');
+    }
 
     my @pl;
-    for my $file ( $self->_find_files(@dirs) ) {
+    for my $file ( $self->_find_files(@search) ) {
         if ( $self->_perl_script($file) ) {
             push @pl, $file;
         }
@@ -309,7 +313,7 @@ sub _run_command {
     my $pid = IPC::Open3::open3(0, $stdout, $stderr, $cmd)
         or die "open3() failed $!";
 
-    my $output;
+    my $output = [];
     for my $handle ( $stdout, $stderr ) {
         if ( $handle ) {
             while ( my $line = <$handle> ) {
@@ -327,7 +331,7 @@ sub _run_command {
 # Works it's way through the input array (files and/or directories), recursively
 # finding files
 sub _find_files {
-    my ($self, @searchlist) = @_;
+    my ($self, @search) = @_;
 
     my @filelist;
     my $addFile = sub {
@@ -340,7 +344,7 @@ sub _find_files {
         }
     };
 
-    for my $item ( @searchlist ) {
+    for my $item ( @search ) {
         $addFile->($item);
         if ( -d $item ) {
             no warnings 'File::Find';
@@ -355,7 +359,9 @@ sub _perl_file_compiles {
     my ($self, $file) = @_;
 
     if ( ! -f $file ) {
-        $self->{test}->diag("$file could not be found") if $self->verbose();
+        if ( $self->verbose() ) {
+            $self->{test}->diag("$file could not be found");
+        }
         return 0;
     }
 
@@ -366,7 +372,7 @@ sub _perl_file_compiles {
         $self->{test}->diag("Executing: " . $command);
     }
     my ($compiles, $output) = $self->_run_command($command);
-    if ( $output && (!defined($self->verbose()) || $self->verbose() != 0) ) {
+    if ( !defined($self->verbose()) || $self->verbose() != 0 ) {
         if ( !$compiles || $self->verbose() ) {
             for my $line ( @$output ) {
                 $self->{test}->diag($line);
@@ -396,10 +402,11 @@ sub _default_locations {
 sub _read_shebang {
     my ($self, $file) = @_;
 
-    open(my $f, "<", $file) or die "could not open $file";
-    my $line = <$f>;
-    if (defined $line && $line =~ m/^#!/ ) {
-        return $line;
+    if ( open(my $f, "<", $file) ) {
+        my $line = <$f>;
+        if (defined $line && $line =~ m/^#!/ ) {
+            return $line;
+        }
     }
 }
 
@@ -437,9 +444,7 @@ sub _perl_script {
 sub _perl_module {
     my ($self, $file) = @_;
 
-    if ( $file =~ /\.pm$/ ) {
-        return 1;
-    }
+    return ( $file =~ /\.pm$/ );
 }
 
 1;

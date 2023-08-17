@@ -4,6 +4,8 @@ use Net::Fritz::Box;
 use Net::Fritz::Phonebook;
 use Data::Dumper;
 
+our $VERSION = '0.05';
+
 use Getopt::Long;
 GetOptions(
     'h|host:s' => \my $host,
@@ -22,13 +24,13 @@ if( my $error = $device->error ) {
 };
 
 my $services = $device->find_service_names(qr/X_AVM-DE_OnTel/);
-    
+
 my $book = Net::Fritz::Phonebook->new(
     service => $services->data->[0],
     id => 1,
 );
 #print $book->name, "\n";
-        
+
 my $contact = Net::Fritz::PhonebookEntry->new(
     name => 'Test Tester',
 );

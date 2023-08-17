@@ -1,5 +1,3 @@
-# $Id: RSA.pm,v 1.10 2009/01/26 01:12:28 turnstep Exp $
-
 package Net::SSH::Perl::Key::RSA;
 use strict;
 use warnings;
@@ -65,7 +63,7 @@ sub keygen {
 
 sub _pub_from_private {
     my $key = shift;
-    
+
     my $hash = $key->{rsa_priv}->key2hash;
     $key->{rsa_pub}->import_key( {
         e => $hash->{e},

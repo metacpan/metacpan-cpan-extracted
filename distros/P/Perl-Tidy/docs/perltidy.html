@@ -444,7 +444,7 @@
 <dt id="enc-s---character-encoding-s"><b>-enc=s</b>, <b>--character-encoding=s</b></dt>
 <dd>
 
-<p>This flag indicates if the input data stream use a character encoding. Perltidy does not look for the encoding directives in the source stream, such as <b>use utf8</b>, and instead relies on this flag to determine the encoding. (Note that perltidy often works on snippets of code rather than complete files so it cannot rely on <b>use utf8</b> directives).</p>
+<p>This flag indicates if the input data stream uses a character encoding. Perltidy does not look for the encoding directives in the source stream, such as <b>use utf8</b>, and instead relies on this flag to determine the encoding. (This is because perltidy often works on snippets of code rather than complete files, so it cannot rely on <b>use utf8</b> directives). Consequently perltidy is likely to encounter problems formatting a file which is only partially encoded.</p>
 
 <p>The possible values for <b>s</b> are:</p>
 
@@ -936,6 +936,66 @@
 <p>To simplify input in the case that all of the tightness flags have the same value &lt;n&gt;, the parameter &lt;-act=n&gt; or <b>--all-containers-tightness=n</b> is an abbreviation for the combination &lt;-pt=n -sbt=n -bt=n -bbt=n&gt;.</p>
 
 </dd>
+<dt id="xbt---extended-block-tightness"><b>-xbt</b>, <b>--extended-block-tightness</b></dt>
+<dd>
+
+<p>The previous section described two controls for spacing within curly braces, namely <b>-block-brace-tightness=n</b> for code block braces and <b>-brace-tightness=n</b> for all other braces.</p>
+
+<p>There is a little fuzziness in this division of brace types though because the curly braces considered by perltidy to contain code blocks for formatting purposes, such as highlighting code structure, exclude some of the small code blocks used by Perl mainly for isolating terms. These include curly braces following a keyword where an indirect object might occur, or curly braces following a type symbol. For example, perltidy does not mark the following braces as code block braces:</p>
+
+<pre><code>    print {*STDERR} $message;
+    return ${$foo};</code></pre>
+
+<p>Consequently, the spacing within these small braced containers by default follows the flag <b>--brace-tightness=n</b> rather than <b>--block-brace-tightness=n</b>, as one might expect.</p>
+
+<p>If desired, small blocks such as these can be made to instead follow the spacing defined by the <b>--block-brace-tightness=n</b> flag by setting <b>--extended-block-tightness</b>. The specific types of small blocks to which this parameter applies is controlled by a companion control parameter, described in the next section.</p>
+
+<p>Note that if the two flags <b>-bbt=n</b> and <b>-bt=n</b> have the same value <b>n</b> then there would be no reason to set this flag.</p>
+
+</dd>
+<dt id="xbtl-s---extended-block-tightness-list-s"><b>-xbtl=s</b>, <b>--extended-block-tightness-list=s</b></dt>
+<dd>
+
+<p>The previous parameter <b>-xbt</b> can be made to apply to curly braces preceded by any of the keywords</p>
+
+<pre><code>    print printf exec system say</code></pre>
+
+<p>and/or the special symbols</p>
+
+<pre><code>    $ @ % &amp; * $#</code></pre>
+
+<p>The parameter string <b>s</b> may contain a selection of these keywords and symbols to indicate the brace types to which <b>-xbt</b> applies. For convenience, all of the keywords can be selected with &#39;k&#39;, and all of the special symbols can be selected with &#39;t&#39;. The default is equivalent to <b>-xbtl=&#39;k&#39;</b>, which selects all of the keywords.</p>
+
+<p>Examples:</p>
+
+<pre><code>   -xbtl=&#39;k&#39;          # selects just the keywords [DEFAULT]
+   -xbtl=&quot;t&quot;          # selects just the special type symbols
+   -xbtl=&quot;k t&quot;        # selects all keywords and symbols, or more simply
+   -xbtl=&quot;kt&quot;         # selects all keywords and symbols
+   -xbtl=&quot;print say&quot;  # selects just keywords B&lt;print&gt; and B&lt;say&gt;:</code></pre>
+
+<p>Here are some formatting examples using the default values of <b>-bt=n</b> and <b>-bbt=n</b>. Note that in these examples <b>$ref</b> is in block braces but <b>$key</b> is not.</p>
+
+<pre><code>    # default formatting
+    print {*STDERR} $message;
+    my $val = ${$ref}{$key};
+
+    # perltidy -xbt           or
+    # perltidy -xbt -xbtl=k
+    print { *STDERR } $message;
+    my $val = ${$ref}{$key};
+
+    # perltidy -xbt -xbtl=t
+    print {*STDERR} $message;
+    my $val = ${ $ref }{$key};
+
+    # perltidy -xbt -xbtl=kt
+    print { *STDERR } $message;
+    my $val = ${ $ref }{$key};</code></pre>
+
+<p>Finally, note that this parameter merely changes the way that the parameter <b>--extended-block-tightness</b> works. It has no effect unless <b>--extended-block-tightness</b> is actually set.</p>
+
+</dd>
 <dt id="tso---tight-secret-operators"><b>-tso</b>, <b>--tight-secret-operators</b></dt>
 <dd>
 
@@ -1350,6 +1410,14 @@
 <pre><code>     perltidy -l=80
         $vmsfile =~ s/;[\d\-]*$//
           ;    # Clip off version number; we can use a newer version as well</code></pre>
+
+</dd>
+<dt id="ipc---ignore-perlcritic-comments"><b>-ipc</b>, <b>--ignore-perlcritic-comments</b></dt>
+<dd>
+
+<p>Perltidy, by default, will look for side comments beginning with <b>## no critic</b> and ignore their lengths when making line break decisions, even if the user has not set <b>-iscl</b>. The reason is that an unwanted line break can make these special comments ineffective in controlling <b>perlcritic</b>.</p>
+
+<p>Setting <b>--ignore-perlcritic-comments</b> tells perltidy not to look for these <b>## no critic</b> comments.</p>
 
 </dd>
 <dt id="hsc---hanging-side-comments"><b>-hsc</b>, <b>--hanging-side-comments</b></dt>
@@ -1968,6 +2036,38 @@
 <p>A conflict occurs if both <b>-bl</b> and <b>-bar</b> are specified.</p>
 
 </dd>
+<dt id="cpb---cuddled-paren-brace"><b>-cpb</b>, <b>--cuddled-paren-brace</b></dt>
+<dd>
+
+<p>A related parameter, <b>--cuddled-paren-brace</b>, causes perltidy to join two lines which otherwise would be</p>
+
+<pre><code>      )
+    {</code></pre>
+
+<p>to be</p>
+
+<pre><code>    ) {</code></pre>
+
+<p>For example:</p>
+
+<pre><code>    # default
+    foreach my $dir (
+        &#39;05_lexer&#39;, &#39;07_token&#39;, &#39;08_regression&#39;, &#39;11_util&#39;,
+        &#39;13_data&#39;,  &#39;15_transform&#39;
+      )
+    {
+        ...
+    }
+
+    # perltidy -cpb
+    foreach my $dir (
+        &#39;05_lexer&#39;, &#39;07_token&#39;, &#39;08_regression&#39;, &#39;11_util&#39;,
+        &#39;13_data&#39;,  &#39;15_transform&#39;
+    ) {
+        ...;
+    }</code></pre>
+
+</dd>
 <dt id="otr---opening-token-right-and-related-flags"><b>-otr</b>, <b>--opening-token-right</b> and related flags</dt>
 <dd>
 
@@ -2120,6 +2220,62 @@
 <pre><code>  -bbpi=0 one continuation level [default]
   -bbpi=1 outdent by one continuation level
   -bbpi=2 indent one full indentation level</code></pre>
+
+</dd>
+<dt id="bfvt-n---brace-follower-vertical-tightness-n"><b>-bfvt=n</b>, <b>--brace-follower-vertical-tightness=n</b></dt>
+<dd>
+
+<p>Some types of closing block braces, such as <b>eval</b>, may be followed by additional code. A line break may be inserted between such a closing brace and the following code depending on the parameter <b>n</b> and the length of the trailing code, as follows:</p>
+
+<p>If the trailing code fits on a single line, then</p>
+
+<pre><code>  -bfvt=0 Follow the input style regarding break/no-break
+  -bfvt=1 Follow the input style regarding break/no-break [Default]
+  -bfvt=2 Do not insert a line break</code></pre>
+
+<p>If the trailing code requires multiple lines, then</p>
+
+<pre><code>  -bfvt=0 Insert a line break
+  -bfvt=1 Insert a line break except for a cuddled block chain [Default]
+  -bfvt=2 Do not insert a line break</code></pre>
+
+<p>So the most compact code is achieved with <b>-bfvt=2</b>.</p>
+
+<p>Example (non-cuddled, multiple lines ):</p>
+
+<pre><code>    # -bfvt=0 or -bvft=1 [DEFAULT]
+    eval {
+        ( $line, $cond ) = $self-&gt;_normalize_if_elif($line);
+        1;
+    }
+      or die sprintf &quot;Error at line %d\nLine %d: %s\n%s&quot;,
+      ( $line_info-&gt;start_line_num() ) x 2, $line, $@;
+
+    # -bfvt=2
+    eval {
+        ( $line, $cond ) = $self-&gt;_normalize_if_elif($line);
+        1;
+    } or die sprintf &quot;Error at line %d\nLine %d: %s\n%s&quot;,
+      ( $line_info-&gt;start_line_num() ) x 2, $line, $@;</code></pre>
+
+<p>Example (cuddled, multiple lines):</p>
+
+<pre><code>    # -bfvt=0
+    eval {
+        #STUFF;
+        1;    # return true
+    }
+      or do {
+        ##handle error
+      };
+
+    # -bfvt=1 [DEFAULT] or -bfvt=2
+    eval {
+        #STUFF;
+        1;    # return true
+    } or do {
+        ##handle error
+    };</code></pre>
 
 </dd>
 </dl>
@@ -3661,6 +3817,26 @@
 <p>But also notice that side comments remain aligned because their alignment is controlled separately with the parameter <b>--valign-side_comments</b> described above.</p>
 
 </dd>
+<dt id="Aligning-postfix-unless-and-if-with---valign-if-unless-or--viu"><b>Aligning postfix unless and if with --valign-if-unless or -viu</b></dt>
+<dd>
+
+<p>By default, postfix <b>if</b> terms align and postfix <b>unless</b> terms align, but separately. For example,</p>
+
+<pre><code>    # perltidy [DEFAULT]
+    print &quot;Tried to add: @ResolveRPM\n&quot; if ( @ResolveRPM and !$Quiet );
+    print &quot;Would need: @DepList\n&quot;      if ( @DepList    and !$Quiet );
+    print &quot;RPM Output:\n&quot;                 unless $Quiet;
+    print join( &quot;\n&quot;, @RPMOutput ) . &quot;\n&quot; unless $Quiet;</code></pre>
+
+<p>The <b>-viu</b> flag causes a postfix <b>unless</b> to be treated as if it were a postfix <b>if</b> for purposes of alignment. Thus</p>
+
+<pre><code>    # perltidy -viu
+    print &quot;Tried to add: @ResolveRPM\n&quot;   if ( @ResolveRPM and !$Quiet );
+    print &quot;Would need: @DepList\n&quot;        if ( @DepList    and !$Quiet );
+    print &quot;RPM Output:\n&quot;                 unless $Quiet;
+    print join( &quot;\n&quot;, @RPMOutput ) . &quot;\n&quot; unless $Quiet;</code></pre>
+
+</dd>
 </dl>
 
 <h2 id="Extended-Syntax">Extended Syntax</h2>
@@ -3778,9 +3954,7 @@
 
 <p>Under Windows, perltidy will also search for a configuration file named <i>perltidy.ini</i> since Windows does not allow files with a leading period (.). Use <code>perltidy -dpro</code> to see the possible locations for your system. An example might be <i>C:\Documents and Settings\All Users\perltidy.ini</i>.</p>
 
-<p>Another option is the use of the PERLTIDY environment variable. The method for setting environment variables depends upon the version of Windows that you are using. Instructions for Windows 95 and later versions can be found here:</p>
-
-<p>http://www.netmanage.com/000/20021101_005_tcm21-6336.pdf</p>
+<p>Another option is the use of the PERLTIDY environment variable. The method for setting environment variables depends upon the version of Windows that you are using.</p>
 
 <p>Under Windows NT / 2000 / XP the PERLTIDY environment variable can be placed in either the user section or the system section. The later makes the configuration file common to all users on the machine. Be sure to enter the full path of the configuration file in the value of the environment variable. Ex. PERLTIDY=C:\Documents and Settings\perltidy.ini</p>
 
@@ -4227,19 +4401,19 @@
  boc    bok    bol    bom    bos    bot    cblx   ce     conv   cpb
  cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc   ddf
  dln    dnl    dop    dp     dpro   drc    dsc    dsm    dsn    dtc
- dtt    dwic   dwls   dwrs   dws    eos    f      fll    fpva   frm
- fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj
- hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv
- hbw    hent   hic    hicm   hico   hih    hihh   hii    hij    hik
- him    hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw
- hsc    html   ibc    icb    icp    iob    isbc   iscl   kgb    kgbd
+ dtt    dwic   dwls   dwrs   dws    eos    f      fpva   frm    fs
+ fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj    hbk
+ hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv    hbw
+ hent   hic    hicm   hico   hih    hihh   hii    hij    hik    him
+ hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw    hsc
+ html   ibc    icb    icp    iob    ipc    isbc   iscl   kgb    kgbd
  kgbi   kis    lal    log    lop    lp     lsl    mem    nib    ohbr
  okw    ola    olc    oll    olq    opr    opt    osbc   osbr   otr
  ple    pod    pvl    q      sac    sbc    sbl    scbb   schb   scp
  scsb   sct    se     sfp    sfs    skp    sob    sobb   sohb   sop
  sosb   sot    ssc    st     sts    t      tac    tbc    toc    tp
- tqw    trp    ts     tsc    tso    vbc    vc     vmll   vsc    w
- wfc    wn     x      xci    xlp    xs</code></pre>
+ tqw    trp    ts     tsc    tso    vbc    vc     viu    vmll   vsc
+ w      wfc    wn     x      xbt    xci    xlp    xs</code></pre>
 
 <p>Equivalently, the prefix &#39;no&#39; or &#39;no-&#39; on the corresponding long names may be used.</p>
 
@@ -4317,7 +4491,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This man page documents perltidy version 20230309</p>
+<p>This man page documents perltidy version 20230701</p>
 
 <h1 id="BUG-REPORTS">BUG REPORTS</h1>
 
@@ -4327,7 +4501,7 @@
 
 <h1 id="COPYRIGHT">COPYRIGHT</h1>
 
-<p>Copyright (c) 2000-2022 by Steve Hancock</p>
+<p>Copyright (c) 2000-2023 by Steve Hancock</p>
 
 <h1 id="LICENSE">LICENSE</h1>
 

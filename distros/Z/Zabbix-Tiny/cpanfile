@@ -4,6 +4,7 @@ requires 'JSON';
 requires 'LWP';
 requires 'LWP::Protocol::https';
 requires 'Moo';
+requires 'version';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

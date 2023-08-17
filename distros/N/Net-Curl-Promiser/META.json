@@ -59,6 +59,6 @@
          "web" : "https://github.com/FGasper/p5-Net-Curl-Promiser"
       }
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

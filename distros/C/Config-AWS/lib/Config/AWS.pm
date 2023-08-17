@@ -19,7 +19,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],
@@ -76,7 +76,7 @@ my $read = sub {
         my $line = $lines->[$i];
         $line =~ s/\R$//;
 
-        if ($line =~ /^\[(?:profile )?([\w-]+)\]/) {
+        if ($line =~ /^\[(?:profile )?([\w\/.@%:_-]+)\]/) {
             $profile = $1;
             next;
         }
@@ -112,7 +112,7 @@ sub read_all {
 }
 
 sub list_profiles {
-    map /^\[(?:profile )?([\w-]+)\]/, @{ &$prepare };
+    map /^\[(?:profile )?([\w\/.@%:_-]+)\]/, @{ &$prepare };
 }
 
 # AWS information methods

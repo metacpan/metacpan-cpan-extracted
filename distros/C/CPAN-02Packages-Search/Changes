@@ -1,5 +1,9 @@
 Revision history for CPAN-02Packages-Search
 
+0.100  2023-08-05 08:25:07 JST
+    - BREAKING CHANGE: Now CPAN::02Packages::Search itself is not fork-safe.
+      If you want to make CPAN::02Packages::Search fork-safe, see, for example, Proc::ForkSafe.
+
 0.002  2022-11-03 09:12:57 JST
     - No functional changes, update dist.ini
 

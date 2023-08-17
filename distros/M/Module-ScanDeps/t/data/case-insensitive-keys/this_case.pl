@@ -1,2 +1,2 @@
-use Test;
+use Foo;
 1;

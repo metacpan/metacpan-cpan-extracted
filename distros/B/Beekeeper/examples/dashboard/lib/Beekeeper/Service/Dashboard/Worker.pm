@@ -1,9 +1,10 @@
-package Beekeeper::Service::Dashboard::Worker;
+package 
+    Beekeeper::Service::Dashboard::Worker;   # hide from PAUSE
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -113,12 +114,14 @@ sub login {
 }
 
 sub service_stats {
-    my ($self, $params) = @_;
+    my ($self, $params, $req) = @_;
 
     my $resol = $params->{'resolution'} || '1s';
     my $count = $params->{'count'}      || 1;
     my $class = $params->{'class'};
     my $after = $params->{'after'};
+
+    $req->deflate_response;
 
     my $stats = $self->{"services_$resol"} or die "Invalid resolution";
 
@@ -162,6 +165,7 @@ sub log_tail {
     }
 
     $req->async_response;
+    $req->deflate_response;
 
     Beekeeper::Service::LogTail->tail_async(
         %filters,
@@ -510,7 +514,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

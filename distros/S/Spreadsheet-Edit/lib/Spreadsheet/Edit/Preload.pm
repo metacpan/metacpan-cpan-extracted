@@ -8,8 +8,11 @@ use strict; use warnings FATAL => 'all'; use feature qw/say state/;
 use utf8;
 
 package Spreadsheet::Edit::Preload;
-our $VERSION = '3.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-05-31'; # DATE from Dist::Zilla::Plugin::OurDate
+
+# Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
+our $VERSION = '1000.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-06-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Import::Into;
@@ -18,7 +21,6 @@ our @CARP_NOT = ('Spreadsheet::Edit');
 
 sub import {
   my $pkg = shift;  # that's us
-#use Data::Dumper::Interp; say "###Preload import pkg=$pkg ",avis(@_);
 
   my $callpkg = caller($Exporter::ExportLevel);
 
@@ -26,8 +28,16 @@ sub import {
   Spreadsheet::Edit->import::into($callpkg, ':all');
 
   # Load the spreadsheet
-  my $sh = Spreadsheet::Edit->new->read_spreadsheet(@_);
-#use Data::Dumper::Interp; say visnew->Objects(0)->dvis('###Preload GOT $sh');
+  my $opthash = ref($_[0]) eq "HASH" ? shift(@_) : {};
+  
+  # Create new sheet, setting verbose, etc. from options
+  my $sh = Spreadsheet::Edit->new(
+             map{ exists($opthash->{$_}) ? ($_ => delete $opthash->{$_}) : () }
+             qw/verbose silent debug/
+           );
+
+  # Read the content
+  $sh->read_spreadsheet($opthash, @_);
 
   # Tie variables in the caller's package
   $sh->tie_column_vars({package => $callpkg}, ':all', ':safe');

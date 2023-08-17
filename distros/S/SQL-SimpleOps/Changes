@@ -1,5 +1,12 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.221.1 Wed Aug 9 12:08:27 2023
+	- fix: Argument "asc|desc" isn't numeric in numeric eq (==) at /usr/lib/perl5/site_perl/5.26.1/SQL/SimpleOps.pm line 850.; by CCELSO
+	- changes: [ATTENTION:] new order_by format configuration, see POD before install; by CCELSO
+
+2023.199.1 Tue Jul 18 04:41:04 2023
+	- added: aliases fields on sql select; by CCELSO
+
 2023.111.1 Fri Apr 21 09:39:34 2023
 	- fix: mkdir permission denied, logfile creation folder for non-root user; by CCELSO
 	- fix: getLastSQL mismatch on syntax error condition; by CCELSO

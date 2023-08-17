@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing an array of annotation
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -51,7 +51,7 @@ MarpaX::Java::ClassFile::BNF::AnnotationArray - Parsing an array of annotation
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

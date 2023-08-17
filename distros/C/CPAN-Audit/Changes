@@ -1,5 +1,21 @@
 Revision history for Perl extension CPAN-Audit
 
+20230709.001 2023-07-09T23:24:24Z
+	* Renée Bäcker added 'queried_module' to the JSON output so yoou
+	can tie what you asked about to the distribution the report gave
+	you. GitHub #50.
+
+20230601.002 2023-06-02T15:43:55Z
+	* Fix a problem that masked some reports from Mojolicious
+	* Fixed a report for PGObject::Util::DBAdmin that used the wrong namespace
+	* Moved MojoX::Dispatch::Static report to Mojolicious
+	* Data update for 2023-06-02
+
+20230601.001 2023-06-02T01:21:17Z
+	* Database update up to 2023-06-01
+	* Many improvements to util/generate from the Perl Toolchain Summit
+	and garu
+
 20230309.004 2023-03-09T12:01:45Z
 	* Fix the GPG signature
 

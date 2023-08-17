@@ -1,5 +1,10 @@
 Revision history for perl Net::Proxmox::VE
 
+0.37 2023-07-2023
+- Fix up debug() method thanks to MartijnLivaart via GH#25
+- Change to JSON::MaybeXS
+- Some pod fixes
+
 0.36 2022-08-25
 - Relicense to MIT. See GH#11
 

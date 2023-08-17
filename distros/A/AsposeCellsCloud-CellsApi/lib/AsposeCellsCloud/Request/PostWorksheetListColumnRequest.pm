@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListColumnRequest.name :   ,
-# PostWorksheetListColumnRequest.sheetName :   ,
-# PostWorksheetListColumnRequest.listObjectIndex :   ,
-# PostWorksheetListColumnRequest.columnIndex :   ,
-# PostWorksheetListColumnRequest.listColumn :   ,
-# PostWorksheetListColumnRequest.folder :   ,
-# PostWorksheetListColumnRequest.storageName :    
+# PostWorksheetListColumnRequest.name : The workbook name.  ,
+# PostWorksheetListColumnRequest.sheetName : The worksheet name.  ,
+# PostWorksheetListColumnRequest.listObjectIndex : List object index.  ,
+# PostWorksheetListColumnRequest.columnIndex : Represents table column index.  ,
+# PostWorksheetListColumnRequest.listColumn : Represents table column description.  ,
+# PostWorksheetListColumnRequest.folder : Original workbook folder.  ,
+# PostWorksheetListColumnRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_column' } = { 
-    	summary => '',
+    	summary => 'Update list column properties.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -151,49 +151,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => '',
+     	description => 'List object index.',
      	format => '',
      	read_only => '',
      		},
      'column_index' => {
      	datatype => 'int',
      	base_name => 'columnIndex',
-     	description => '',
+     	description => 'Represents table column index.',
      	format => '',
      	read_only => '',
      		},
      'list_column' => {
      	datatype => 'ListColumn',
      	base_name => 'listColumn',
-     	description => '',
+     	description => 'Represents table column description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

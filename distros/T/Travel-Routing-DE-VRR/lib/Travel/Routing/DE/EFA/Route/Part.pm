@@ -6,7 +6,13 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.19';
+our $VERSION = '2.21';
+
+my %occupancy = (
+	MANY_SEATS    => 1,
+	FEW_SEATS     => 2,
+	STANDING_ONLY => 3
+);
 
 Travel::Routing::DE::EFA::Route::Part->mk_ro_accessors(
 	qw(arrival_platform arrival_stop
@@ -15,6 +21,7 @@ Travel::Routing::DE::EFA::Route::Part->mk_ro_accessors(
 	  departure_stop departure_date departure_time departure_sdate
 	  departure_stime
 	  footpath_duration footpath_type
+	  occupancy
 	  train_destination train_line train_product
 	  )
 );
@@ -23,6 +30,13 @@ sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $ref = \%conf;
+
+	if ( $ref->{occupancy} and exists $occupancy{ $ref->{occupancy} } ) {
+		$ref->{occupancy} = $occupancy{ $ref->{occupancy} };
+	}
+	else {
+		delete $ref->{occupancy};
+	}
 
 	return bless( $ref, $obj );
 }
@@ -154,7 +168,7 @@ points, without interchanges
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 DESCRIPTION
 
@@ -302,6 +316,11 @@ Returns true if this part of the route has been cancelled (i.e., the entire
 route is probably useless), false otherwise.  For unknown reasons, EFA may
 sometimes return routes which contain cancelled departures.
 
+=item $part->occupancy
+
+Returns expected occupancy, if available. Values range from 1 (low occupancy)
+to 3 (very high occupancy).
+
 =item $part->regular_notes
 
 Remarks about the line serving this connaction part. Returns a list of
@@ -354,7 +373,7 @@ Class::Accessor(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2021 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

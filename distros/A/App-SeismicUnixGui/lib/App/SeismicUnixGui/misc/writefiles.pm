@@ -9,7 +9,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: writefiles 
+ PERL PROGRAM NAME: writefiles 
  AUTHOR: Juan Lorenzo
  DATE: Oct 29 2012
  DESCRIPTION write file operations

@@ -128,7 +128,7 @@ Algorithm::LibLinear::DataSet
 
 =head1 DESCRIPTION
 
-This class represents set of feature vectors with gold answers.
+This class represents set of labeled feature vectors used for learning.
 
 =head1 METHODS
 

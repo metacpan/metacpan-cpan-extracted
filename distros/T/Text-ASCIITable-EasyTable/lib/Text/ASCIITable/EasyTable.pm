@@ -11,9 +11,9 @@ use Text::ASCIITable;
 
 use parent qw(Exporter);
 
-our @EXPORT = qw(easy_table);  ## no critic (ProhibitAutomaticExportation)
+our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 ########################################################################
 {
@@ -131,6 +131,12 @@ sub _render_table {
   $t->setCols(@columns);
 
   for ( @{ $options{data} } ) {
+
+    if ( !@{$_} ) {
+      $t->addRowLine;
+      next;
+    }
+
     $t->addRow( @{$_} );
   }
 
@@ -167,6 +173,14 @@ sub _render_data {
   my $row_count = 0;
 
   for my $row ( @{$data} ) {
+
+    print {*STDERR} Dumper( [ row => $row ] );
+
+    if ( !$row ) {
+      push @rendered_data, [];
+      next;
+    }
+
     last
       if defined $options{max_rows} && ++$row_count > $options{max_rows};
 
@@ -421,12 +435,14 @@ the C<columns> or C<rows> parameters. If you just want to see some
 data and don't care about order, you can just send the C<data>
 parameter and the method will more or less DWIM.>
 
-=head1 CAVEATS
+=head1 HINTS AND TIPS
 
 =over 5
 
 =item * I<C<easy_table()> is meant to be used on small data sets and may not
 be efficient when larger data sets are used.>
+
+=item * Add undef element to the array of data to create a horizontal line.
 
 =back
 

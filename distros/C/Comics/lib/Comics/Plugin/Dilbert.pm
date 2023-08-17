@@ -5,6 +5,9 @@ use warnings;
 
 package Comics::Plugin::Dilbert;
 
+# Ceased for political reasons.
+our $disabled = 1;
+
 use parent qw(Comics::Fetcher::Single);
 
 our $VERSION = "1.00";

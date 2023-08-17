@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::tabledata",
   "PREREQ_PM" => {
+    "App::lcpan::Call" => "0.11",
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::any" => "0.914",
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
@@ -29,6 +30,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::JSON::decode_str" => 0,
     "Log::ger" => "0.038",
+    "MetaCPAN::Client" => 0,
     "Module::Abstract" => 0,
     "Module::List::More" => "0.004007",
     "Module::Load::Util" => "0.004",
@@ -47,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +57,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::lcpan::Call" => "0.11",
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::any" => "0.914",
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
@@ -67,6 +70,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
+  "MetaCPAN::Client" => 0,
   "Module::Abstract" => 0,
   "Module::List::More" => "0.004007",
   "Module::Load::Util" => "0.004",

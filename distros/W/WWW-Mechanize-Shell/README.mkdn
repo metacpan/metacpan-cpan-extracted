@@ -34,7 +34,7 @@ the recorded session. Its main use is as an interactive starting point
 for automating a session through WWW::Mechanize.
 
 The cookie support is there, but no cookies are read from your existing
-browser sessions. See [HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies) on how to implement reading/writing
+browser sessions. See [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies) on how to implement reading/writing
 your current browsers cookies.
 
 ## `WWW::Mechanize::Shell->new %ARGS`
@@ -56,7 +56,7 @@ filename for the rcfile, the `rcfile` parameter can be passed to the constructor
         );
 
     Pass in a premade custom user agent. This object must be compatible to
-    [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize). Use this feature from the command line as
+    [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize). Use this feature from the command line as
 
         perl -Ilib -MWWW::Mechanize::Chrome \
                    -MWWW::Mechanize::Shell \
@@ -419,7 +419,7 @@ The command does not always work nice, for example if a
 site uses tables for layout, it will be harder to guess
 what tables are irrelevant and what tables are relevant.
 
-[HTML::TableExtract](https://metacpan.org/pod/HTML::TableExtract) is needed for this feature.
+[HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract) is needed for this feature.
 
 ## cookies
 
@@ -741,7 +741,7 @@ The public support forum of this module is
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002-2020 Max Maischein
+Copyright (C) 2002-2023 Max Maischein
 
 # AUTHOR
 
@@ -751,4 +751,4 @@ Please contact me if you find bugs or otherwise improve the module. More tests a
 
 # SEE ALSO
 
-[WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize),[WWW::Mechanize::FormFiller](https://metacpan.org/pod/WWW::Mechanize::FormFiller),[WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW::Mechanize::Firefox)
+[WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize),[WWW::Mechanize::FormFiller](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AFormFiller),[WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AFirefox)

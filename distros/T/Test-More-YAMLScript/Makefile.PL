@@ -22,24 +22,24 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Test::More::YAMLScript",
   "PREREQ_PM" => {
-    "Lingy" => "v0.1.7",
+    "Lingy" => "v0.1.16",
     "Test::Simple" => "1.302191",
     "XXX" => "0.38",
     "YAML::PP" => "0.036",
-    "YAMLScript" => "v0.1.1"
+    "YAMLScript" => "v0.1.9"
   },
-  "VERSION" => "0.1.1",
+  "VERSION" => "0.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Lingy" => "0.1.7",
+  "Lingy" => "0.1.16",
   "Test::Simple" => "1.302191",
   "XXX" => "0.38",
   "YAML::PP" => "0.036",
-  "YAMLScript" => "0.1.1"
+  "YAMLScript" => "0.1.9"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

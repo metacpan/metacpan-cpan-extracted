@@ -3,8 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Object::Pad::ClassAttr::Struct" );
+require Object::Pad::ClassAttr::Struct;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -7,7 +7,7 @@ package Comics::Plugin::Buttersafe;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 our $name    = "Buttersafe";
 
@@ -15,7 +15,7 @@ our $url     = "https://www.buttersafe.com/";
 our $pattern =
   qr{ <img \s+
       src="(?<url>https?://(?:www.)?buttersafe.com/comics/
-	  (?<image>\d+-\d+-\d+-[^./]+\.\w+))" \s+
+	  (?<image>\d+-\d+-\d+[^./]+\.\w+))" \s+
       alt="(?<alt>.*?)" \s+
       />
     }x;

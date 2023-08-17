@@ -158,8 +158,8 @@ add_themes = critic
 [Perl::Critic::Policy::Modules::RequireBarewordIncludes]
 add_themes = critic
 
-[Perl::Critic::Policy::Modules::RequireEndWithOne]
-add_themes = critic
+#[Perl::Critic::Policy::Modules::RequireEndWithOne]
+#add_themes = critic
 
 [Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage]
 add_themes = critic

@@ -3,9 +3,23 @@
 use 5.022;
 use strict;
 use warnings;
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 0.016;
 
 $| = 1;
+
+my $USAGE = "usage: pds_canonize [-l|-g|-z] [file]...\n";
+
+my $type  = 'lex';
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                 if '-' eq $opt;
+    $type = 'zeta', next if 'z' eq $opt;
+    $type = 'lex',  next if 'l' eq $opt;
+    $type = 'gap',  next if 'g' eq $opt;
+    die $USAGE;
+}
+my $method = $type . '_canonize';
 
 while (<<>>) {
     s/^\s+//;
@@ -17,26 +31,42 @@ while (<<>>) {
 
     my $s = Math::DifferenceSet::Planar->from_elements(@e);
 
-    my $s2 = $s->canonize;
-    my @e2 = $s2->elements;
+    my $s2 = $s->$method;
+    my @e2 = $s2->elements_sorted;
 
     print "@e2\n";
 }
 
 __END__
+
 =head1 NAME
 
 pds_canonize - translate planar difference sets into canonical form
 
 =head1 SYNOPSIS
 
-  pds_canonize [file]...
+  pds_canonize [-l|-g|-z] [file]...
 
 =head1 DESCRIPTION
 
-This example program reads planar difference sets, one per line, as
-integer numbers separated by whitespace, translates them so that 0 and
-1 are part of the result, and writes the result to standard output.
+This example program reads planar difference sets, one per line,
+as integer numbers separated by whitespace, translates them into one
+of the canonical forms, and writes the result in ascending order to
+standard output.
+
+Option C<-l> chooses the set containing the elements zero and one.  This
+set is lex-canonical, i.e. lexically minimal when compared element-wise
+from smallest to largest element.  This option is the default.
+
+Option C<-g> chooses the set with the smallest maximum value.  This set
+is gap-canonical, i.e. lexically minimal when compared element-wise from
+largest to smallest element.  It contains zero and has the largest gap
+between consecutive elements at the rightmost position, which is the
+wrap-around after the largest element.
+
+Option C<-z> chooses the zeta-canonical set.  This set has zeta and
+eta values both equal to zero and no zero element unless its order is
+a multiple of three.
 
 =head1 AUTHOR
 
@@ -44,7 +74,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

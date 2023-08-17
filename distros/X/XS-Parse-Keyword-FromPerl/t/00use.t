@@ -5,6 +5,8 @@ use warnings;
 
 use Test2::V0;
 
+require Optree::Generate;
+require XS::Parse::Infix::FromPerl;
 require XS::Parse::Keyword::FromPerl;
 
 pass "Modules loaded";

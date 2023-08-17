@@ -112,7 +112,7 @@ my $top_step_run_count;
 
     is(
         $dep_of_multiple_steps_run_count, 1,
-        'ran step that is child of multiple parents once'
+        'ran step that is child of multiple parents once',
     );
     is( $parent_step_1_run_count, 1, 'Ran parent 1 once' );
     is( $parent_step_2_run_count, 1, 'Ran parent 2 once' );

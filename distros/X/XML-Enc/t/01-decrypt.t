@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
 use XML::Enc;
+use Test::More;
 use MIME::Base64 qw/decode_base64/;
 
 my $base64 = <<'BASE64AES';
@@ -10,8 +10,6 @@ BASE64AES
 
 my $xml = decode_base64($base64);
 
-ok($xml, "Got encrypted AES XML");
-
 my $decrypter = XML::Enc->new(
     {
         key                 => 't/sign-private.pem',
@@ -19,7 +17,7 @@ my $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /68351fcad4f2/, "Successfully Decrypted AES");
+like($decrypter->decrypt($xml), qr/68351fcad4f2/, "Successfully Decrypted AES");
 
 $base64 = <<'BASE64DES';
 PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0
@@ -217,8 +215,6 @@ BASE64DES
 
 $xml = decode_base64($base64);
 
-ok($xml, "Got encrypted DES XML");
-
 $decrypter = XML::Enc->new(
     {
         key                 => 't/sign-private.pem',
@@ -226,7 +222,7 @@ $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /5e08ab4870dfd2f2a/, "Successfully Decrypted DES");
+like($decrypter->decrypt($xml), qr/5e08ab4870dfd2f2a/, "Successfully Decrypted DES");
 
 
 $base64 = <<'FIRSTGO';
@@ -267,8 +263,6 @@ FIRSTGO
 
 $xml = decode_base64($base64);
 
-ok($xml, "Got encrypted DES XML");
-
 $decrypter = XML::Enc->new(
     {
         key                 => 't/sign-private.pem',
@@ -276,6 +270,6 @@ $decrypter = XML::Enc->new(
     }
 );
 
-ok($decrypter->decrypt($xml) =~ /XML-SIG_1/, "Successfully Decrypted DES");
+like($decrypter->decrypt($xml), qr/XML-SIG_1/, "Successfully Decrypted DES");
 
 done_testing;

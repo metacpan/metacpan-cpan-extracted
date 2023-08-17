@@ -1345,18 +1345,15 @@ class TestCase::ExchangeAPI {
     return 1;
   }
   
-  static method optional_args_int : int ($args0 : int, $args1 = 5 : int) {
+  static method optional_args_int : int ($args0 : int, $args1 : int = 5) {
     return $args0 + $args1;
   }
   
   static method die : void ($message : string) {
-    
     die $message;
   }
   
-  static method die_with_error_code : void ($message : string, $error_code : int) {
-    
-    set_error_code($error_code);
-    die $message;
+  static method die_with_die_error_id : void ($message : string) {
+    die Error::System $message;
   }
 }

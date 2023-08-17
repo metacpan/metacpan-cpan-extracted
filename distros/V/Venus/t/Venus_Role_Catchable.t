@@ -37,6 +37,7 @@ $test->for('abstract');
 =includes
 
 method: catch
+method: maybe
 
 =cut
 
@@ -187,6 +188,85 @@ $test->for('example', 4, 'catch', sub {
   @result
 });
 
+=method maybe
+
+The maybe method traps any errors raised by executing the dispatched method
+call and returns undefined on error, effectively supressing the error. This
+method can return a list of values in list-context. This method supports
+dispatching, i.e.  providing a method name and arguments whose return value
+will be acted on by this method.
+
+=signature maybe
+
+  maybe(Str $method, Any @args) (Any)
+
+=metadata maybe
+
+{
+  since => '2.91',
+}
+
+=example-1 maybe
+
+  package main;
+
+  my $example = Example->new;
+
+  my $maybe = $example->maybe('fail');
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'maybe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 maybe
+
+  package main;
+
+  my $example = Example->new;
+
+  my $maybe = $example->maybe('pass');
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'maybe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 maybe
+
+  package main;
+
+  my $example = Example->new;
+
+  my (@maybe) = $example->maybe(sub {1..4});
+
+  # (1..4)
+
+=cut
+
+$test->for('example', 3, 'maybe', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..4];
+
+  @result
+});
+
 =partials
 
 t/Venus.t: pdml: authors
@@ -198,6 +278,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Role/Catchable.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Role/Catchable.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

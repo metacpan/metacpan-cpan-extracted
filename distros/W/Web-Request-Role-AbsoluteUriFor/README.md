@@ -4,7 +4,7 @@ Web::Request::Role::AbsoluteUriFor - Construct an absolute URI honoring script\_
 
 # VERSION
 
-version 1.003
+version 1.004
 
 # SYNOPSIS
 
@@ -22,7 +22,11 @@ version 1.003
 
     # redirect
     $req->absolute_uri_for({ controller=>'foo', action=>'bar' });
-    # http://yoursite.com/mountpoint/foo/bar
+    # https://yoursite.com/mountpoint/foo/bar
+
+    # don't use the base-uri from $req by passing an explit additional value
+    $req->absolute_uri_for({ controller=>'foo', action=>'bar' }, 'https://example.com');
+    # https://example.com/mountpoint/foo/bar
 
 # DESCRIPTION
 
@@ -34,10 +38,16 @@ version 1.003
 
     $req->absolute_uri_for( '/some/path' );
     $req->absolute_uri_for( $ref_uri_for );
+    $req->absolute_uri_for( '/some/path', $base-url );
 
 Construct an absolute URI out of `base_uri`, `script_name` and the
-passed in string.  You can also pass a ref, which will be resolved by
+passed in string. You can also pass a ref, which will be resolved by
 calling `uri_for` on the request object.
+
+If you pass a second argument, this value will be used as the base-uri
+instead of extracting it from the request. This can make sense when
+you for exampel host a white lable service and need to generate
+different links based on some value inside your app.
 
 # THANKS
 

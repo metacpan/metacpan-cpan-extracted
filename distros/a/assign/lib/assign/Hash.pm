@@ -4,6 +4,8 @@ package assign::Hash;
 use assign::Struct;
 use base 'assign::Struct';
 
+use assign::Types;
+
 use XXX;
 
 sub parse_elem {
@@ -13,13 +15,12 @@ sub parse_elem {
     while (@$in) {
         my $tok = shift(@$in);
         my $type = ref($tok);
-        $type =~ s/^PPI::Token::// or XXX $type;
-        next if $type eq 'Whitespace';
+        next if $type eq 'PPI::Token::Whitespace';
 
-        if ($type eq 'Symbol') {
+        if ($type eq 'PPI::Token::Symbol') {
             my $str = $tok->content;
             if ($str =~ /^\$\w+$/) {
-                push @$elems, var->new($str);
+                push @$elems, assign::var->new($str);
                 return 1;
             }
         }
@@ -34,11 +35,21 @@ sub gen_code {
     my $code = [ @$init ];
     my $elems = $self->{elems};
 
+    if ($decl) {
+        push @$code,
+            "$decl(" .
+            join(', ',
+                map $_->val,
+                @$elems
+            ) .
+            ');';
+    }
+
     for my $elem (@$elems) {
         my $type = ref $elem;
         my $var = $elem->val;
         (my $key = $var) =~ s/^\$//;
-        push @$code, "$decl$var $oper $from\->{$key};";
+        push @$code, "$var $oper $from\->{$key};";
     }
 
     return join "\n", @$code;

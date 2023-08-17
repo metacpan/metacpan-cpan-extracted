@@ -9,7 +9,7 @@ Tk::Poplevel - Popping a toplevel without decoration relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.06';
 
 use base qw(Tk::Derived Tk::Toplevel);
 
@@ -99,9 +99,11 @@ sub Populate {
 	}
 	
 	$self->ConfigSpecs(
+		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],
 		-confine => ['PASSIVE', undef, undef, 0],
 		-popalign => ['PASSIVE', undef, undef, 'left'],
 		-popdirection => ['PASSIVE', undef, undef, 'down'],
+		-relief => [$self, 'relief', 'Relief', 'raised'],
 		DEFAULT => [ $self ],
 	);
 }

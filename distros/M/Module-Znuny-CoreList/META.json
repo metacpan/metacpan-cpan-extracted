@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,15 +48,27 @@
    "provides" : {
       "Module::Znuny::CoreList" : {
          "file" : "lib/Module/Znuny/CoreList.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlservices/Module-Znuny-CoreList/issues"
+      },
+      "homepage" : "https://github.com/perlservices/Module-Znuny-CoreList",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlservices/Module-Znuny-CoreList.git",
+         "web" : "https://github.com/perlservices/Module-Znuny-CoreList"
+      }
+   },
+   "version" : "1.03",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

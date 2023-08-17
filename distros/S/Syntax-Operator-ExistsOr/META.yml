@@ -18,11 +18,11 @@ name: Syntax-Operator-ExistsOr
 provides:
   Syntax::Operator::ExistsOr:
     file: lib/Syntax/Operator/ExistsOr.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

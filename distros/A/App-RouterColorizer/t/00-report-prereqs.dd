@@ -17,7 +17,6 @@ do { my $x = {
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0',
                                       'Test::Version' => '1'
                                     }
                     },

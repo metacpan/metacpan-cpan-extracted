@@ -1,15 +1,18 @@
 package String::Util::Match;
 
-our $DATE = '2017-12-10'; # DATE
-our $VERSION = '0.002'; # VERSION
-
-use 5.010001;
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-06-19'; # DATE
+our $DIST = 'String-Util-Match'; # DIST
+our $VERSION = '0.003'; # VERSION
+
 our @EXPORT_OK = qw(
                        match_array_or_regex
+                       num_occurs
                );
 
 our %SPEC;
@@ -89,6 +92,41 @@ sub match_array_or_regex {
     }
 }
 
+$SPEC{num_occurs} = {
+    v => 1.1,
+    summary => "Count how many times a substring occurs (or a regex pattern matches) a string",
+    args => {
+        string => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+        substring => {
+            schema => $_str_or_re,
+            req => 1,
+            pos => 1,
+        },
+    },
+    args_as => 'array',
+    result => {
+        schema => 'uint*',
+    },
+    result_naked => 1,
+};
+sub num_occurs {
+    my ($string, $substr) = @_;
+
+    if (ref $substr eq 'Regexp') {
+        my $n = 0;
+        $n++ while $string =~ /$substr/g;
+        return $n;
+    } else {
+        my $n = 0;
+        $n++ while $string =~ /\Q$substr\E/g;
+        return $n;
+    }
+}
+
 1;
 # ABSTRACT: String utilities related to matching
 
@@ -104,15 +142,20 @@ String::Util::Match - String utilities related to matching
 
 =head1 VERSION
 
-This document describes version 0.002 of String::Util::Match (from Perl distribution String-Util-Match), released on 2017-12-10.
+This document describes version 0.003 of String::Util::Match (from Perl distribution String-Util-Match), released on 2023-06-19.
 
 =head1 SYNOPSIS
 
- use String::Util::Match qw(match_array_or_regex);
+ use String::Util::Match qw(match_array_or_regex num_occurs);
 
  match_array_or_regex('bar',  ['foo', 'bar', qr/[xyz]/]); # true, matches string
  match_array_or_regex('baz',  ['foo', 'bar', qr/[xyz]/]); # true, matches regex
  match_array_or_regex('oops', ['foo', 'bar', qr/[xyz]/]); # false
+
+ print num_occurs("foobarbaz", "a"); # => 2
+ print num_occurs("foobarbaz", "A"); # => 0
+ print num_occurs("foobarbaz", qr/a/i); # => 2
+ print num_occurs("foobarbaz", qr/[aeiou]/); # => 4
 
 =head1 DESCRIPTION
 
@@ -125,7 +168,7 @@ Usage:
 
  match_array_or_regex($needle, $haystack) -> any
 
-Check whether an item matches (list of) values/regexes.
+Check whether an item matches (list of) valuesE<sol>regexes.
 
 Examples:
 
@@ -168,11 +211,45 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$haystack>* => I<re|str|array[re|str]>
 
+(No description)
+
 =item * B<$needle>* => I<str>
+
+(No description)
+
 
 =back
 
 Return value:  (any)
+
+
+
+=head2 num_occurs
+
+Usage:
+
+ num_occurs($string, $substring) -> uint
+
+Count how many times a substring occurs (or a regex pattern matches) a string.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$string>* => I<str>
+
+(No description)
+
+=item * B<$substring>* => I<re|str>
+
+(No description)
+
+
+=back
+
+Return value:  (uint)
 
 =head1 HOMEPAGE
 
@@ -182,6 +259,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/String-Uti
 
 Source repository is at L<https://github.com/perlancar/perl-String-Util-Match>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Util-Match>
@@ -189,16 +295,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

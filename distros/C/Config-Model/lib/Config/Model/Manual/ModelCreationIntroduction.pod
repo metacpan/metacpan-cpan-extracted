@@ -13,7 +13,7 @@ Config::Model::Manual::ModelCreationIntroduction - Introduction to model creatio
 
 =head1 VERSION
 
-version 2.152
+version 2.153
 
 =head1 Introduction
 

@@ -146,15 +146,15 @@ sub get_content {
             if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} && ! $source->{saved_book} ) {
                 $goto_filter = 0;
             }
-            $source->{old_idx_file} //= 0;
+            $source->{old_idx_file} //= 1;
 
             FILE: while ( 1 ) {
                 if ( $goto_filter ) {
                     # keep current source file
                 }
                 else {
-                    my $prompt = 'Choose a File:';
-                    my @pre = ( undef );
+                    my $hidden = 'Choose a File:';
+                    my @pre = ( $hidden, undef );
                     my $change_dir = '  Change dir';
                     if ( $sf->{o}{insert}{history_dirs} == 1 ) {
                         push @pre, $change_dir;
@@ -163,7 +163,7 @@ sub get_content {
                     # Choose
                     my $idx = $tc->choose(
                         $menu,
-                        { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $source->{old_idx_file},
+                        { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $source->{old_idx_file},
                         undef => '  <=' }
                     );
                     if ( ! defined $idx || ! defined $menu->[$idx] ) {
@@ -175,12 +175,19 @@ sub get_content {
                     }
                     if ( $sf->{o}{G}{menu_memory} ) {
                         if ( $source->{old_idx_file} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                            $source->{old_idx_file} = 0;
+                            $source->{old_idx_file} = 1;
                             next FILE;
                         }
                         $source->{old_idx_file} = $idx;
                     }
-                    if ( $menu->[$idx] eq $change_dir ) {
+
+                    if ( $menu->[$idx]  eq $hidden ) {
+                        require App::DBBrowser::Opt::Set;
+                        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                        $opt_set->set_options( 'import' );
+                        next FILE;
+                    }
+                    elsif ( $menu->[$idx] eq $change_dir ) {
                         $source->{dir} = $cs->__new_search_dir();
                         if ( length $source->{dir} ) {
                             $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
@@ -196,17 +203,17 @@ sub get_content {
                         }
                     }
                 }
-                my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
-                if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} ) {
-                    $goto_filter = 0;
-                }
 
                 PARSE: while ( 1 ) {
+                    my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
+                    if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} ) {
+                        $goto_filter = 0;
+                    }
                     if ( $goto_filter ) {
-                        # keep current insert_into_args
+                        # keep current insert_args
                     }
                     else {
-                        $sql->{insert_into_args} = [];
+                        $sql->{insert_args} = [];
                         if ( $parse_mode_idx < 3 && -T $source->{file_fs} ) {
                             my $open_mode;
                             if ( length $sf->{o}{insert}{file_encoding} ) {
@@ -232,7 +239,7 @@ sub get_content {
                             if ( ! $parse_ok ) {
                                 next FILE;
                             }
-                            if ( ! @{$sql->{insert_into_args}} ) {
+                            if ( ! @{$sql->{insert_args}} ) {
                                 $tc->choose(
                                     [ 'empty file!' ],
                                     { prompt => 'Press ENTER' }
@@ -247,7 +254,7 @@ sub get_content {
                                 if ( ! $ok ) {
                                     next FILE;
                                 }
-                                if ( ! @{$sql->{insert_into_args}} ) { #
+                                if ( ! @{$sql->{insert_args}} ) { #
                                     next SHEET if $source->{saved_book};
                                     next FILE;
                                 }

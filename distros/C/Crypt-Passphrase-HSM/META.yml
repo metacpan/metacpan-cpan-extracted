@@ -18,10 +18,10 @@ name: Crypt-Passphrase-HSM
 provides:
   Crypt::Passphrase::HSM:
     file: lib/Crypt/Passphrase/HSM.pm
-    version: '0.005'
+    version: '0.006'
   Crypt::Passphrase::Pepper::HSM:
     file: lib/Crypt/Passphrase/Pepper/HSM.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   Crypt::HSM: '0.010'
@@ -34,6 +34,6 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-hsm/issues
   repository: git://github.com/Leont/crypt-passphrase-hsm.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

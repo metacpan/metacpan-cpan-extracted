@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1925 2023-05-31 11:58:59Z willem $)[2];
 
 
 =head1 NAME
@@ -267,8 +267,7 @@ response to an EDNS query.
 =cut
 
 sub reply {
-	my $query  = shift;
-	my $UDPmax = shift;
+	my ( $query, @UDPmax ) = @_;
 	my $qheadr = $query->header;
 	croak 'erroneous qr flag in query packet' if $qheadr->qr;
 
@@ -289,7 +288,7 @@ sub reply {
 
 	my $edns = $reply->edns();
 	CORE::push( @{$reply->{additional}}, $edns );
-	$edns->udpsize($UDPmax);
+	$edns->udpsize(@UDPmax);
 	return $reply;
 }
 

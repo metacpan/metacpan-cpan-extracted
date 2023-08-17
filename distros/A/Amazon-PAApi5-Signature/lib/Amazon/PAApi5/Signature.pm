@@ -26,7 +26,7 @@ use Class::Accessor::Lite (
     /],
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my $class      = shift;
@@ -230,7 +230,7 @@ NOTE that Product Advertising API 5.0 has usage limit. Please confirm L<https://
 
 See B<example/> directory of this module for more examples.
 
-L<https://github.com/bayashi/Amazon-PAApi5-Signature/tree/master/example>
+L<https://github.com/bayashi/Amazon-PAApi5-Signature/tree/main/example>
 
 
 =head1 DESCRIPTION
@@ -267,7 +267,7 @@ Get a hash for HTTP request
 
 =begin html
 
-<a href="https://github.com/bayashi/Amazon-PAApi5-Signature/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/Amazon-PAApi5-Signature"><img src="https://secure.travis-ci.org/bayashi/Amazon-PAApi5-Signature.png?_t=1591465089"/></a> <a href="https://coveralls.io/r/bayashi/Amazon-PAApi5-Signature"><img src="https://coveralls.io/repos/bayashi/Amazon-PAApi5-Signature/badge.png?_t=1591465089&branch=master"/></a>
+<a href="https://github.com/bayashi/Amazon-PAApi5-Signature/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Amazon-PAApi5-Signature/actions"><img src="https://github.com/bayashi/Amazon-PAApi5-Signature/workflows/main/badge.svg?_t=1691809967"/></a> <a href="https://coveralls.io/r/bayashi/Amazon-PAApi5-Signature"><img src="https://coveralls.io/repos/bayashi/Amazon-PAApi5-Signature/badge.png?_t=1691809967&branch=main"/></a>
 
 =end html
 

@@ -113,10 +113,7 @@ private:
             case DeflateFlag::NO      : return _deflate;
             case DeflateFlag::YES     : return _deflate;
             case DeflateFlag::DEFAULT :
-                return _opcode == Opcode::TEXT &&
-                       _parser._deflate_cfg &&
-                       _parser._deflate_cfg->compression_threshold <= payload_length &&
-                       payload_length > 0
+                return _parser.should_deflate(_opcode, payload_length)
                        ? DeflateFlag::YES : DeflateFlag::NO;
         }
         return DeflateFlag::NO;

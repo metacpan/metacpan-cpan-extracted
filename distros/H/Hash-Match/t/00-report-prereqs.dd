@@ -31,7 +31,7 @@ do { my $x = {
                                       'List::AllUtils' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

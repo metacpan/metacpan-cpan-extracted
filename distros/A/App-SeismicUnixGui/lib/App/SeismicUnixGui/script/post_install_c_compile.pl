@@ -124,7 +124,7 @@ print(
 );
 print("Before running SeismicUnixGui, be sure to add the\n");
 print("following  line to the end of your \".bashrc\" file:\n\n");
-print("export PATH=\$PATH:\$SeismicUnixGui:$C_path$bin\n\n");
+print("export PATH=\$PATH:$C_path$bin\n\n");
 
 print("   End of C-programs Installation\n");
 print("Hit Enter to leave\n");

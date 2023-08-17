@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Authorities;
 # ABSTRACT: Chargeur de notices d'autorité
-$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.39';
+$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.40';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -27,7 +27,7 @@ sub handle_record {
 
     my $ppn = $record->field('001')->value;
     $self->log->notice( 'Autorité #' . $self->count . " ppn $ppn\n");
-    my $record_text = $record->as('Text');
+    my $record_text = $self->sudoc->record_as_text($record);
     $self->log->debug( $record_text );
 
     # On détermine le type d'autorité
@@ -120,7 +120,7 @@ sub handle_record {
             if ( $found ) {
                 push @modified_biblios, $biblionumber;
                 $modif->delete('995');
-                $self->log->debug( $modif->as('Text') );
+                $self->log->debug( $self->sudoc->record_as_text($modif) );
                 ModBiblio($modif->as('Legacy'), $biblionumber, $framework)
                     if $self->doit;
             }
@@ -148,7 +148,7 @@ Koha::Contrib::Sudoc::Loader::Authorities - Chargeur de notices d'autorité
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 AUTHOR
 
@@ -156,7 +156,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Demians.
+This software is Copyright (c) 2023 by Fréderic Demians.
 
 This is free software, licensed under:
 

@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Class::Accessor::Fast);
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 # we are going for a very struct-like class here to try and keep the
 # syntactical noise down.

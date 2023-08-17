@@ -73,7 +73,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.3.8"
+         "version" : "v3.3.9"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.3.8",
+   "version" : "v3.3.9",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],

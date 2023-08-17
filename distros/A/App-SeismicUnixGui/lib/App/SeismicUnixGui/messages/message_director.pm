@@ -31,7 +31,7 @@ my $color_listbox	  = color_listbox_messages->new();
 =head1 DOCUMENTATION
 
 =head2 SYNOPSIS 
-PACKAGE NAME: message_director 
+PERL PROGRAM NAME: message_director 
  AUTHOR: Juan Lorenzo
          Nov 21 2017 
 

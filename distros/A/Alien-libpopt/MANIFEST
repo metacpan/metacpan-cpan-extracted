@@ -1,0 +1,16 @@
+alienfile
+Changes
+examples/alien_libpopt_variables.pl
+libpopt.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Alien-libpopt/01-use.t
+t/Alien-libpopt/02-version.t
+t/Alien-libpopt/03-diag.t
+xt/Alien-libpopt/01-pod_coverage.t
+xt/Alien-libpopt/02-pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

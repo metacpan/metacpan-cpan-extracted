@@ -32,6 +32,7 @@ use strict;
 use Text::CSV;
 use Text::Xslate;
 use Types::Standard;
+use Unicode::UTF8;
 use utf8;
 use warnings;
 use XML::Parser;
@@ -65,6 +66,7 @@ my(@modules) = qw
 	Text::CSV
 	Text::Xslate
 	Types::Standard
+	Unicode::UTF8
 	utf8
 	warnings
 	XML::Parser

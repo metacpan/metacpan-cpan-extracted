@@ -6,7 +6,7 @@ use Getopt::Long;
 use Net::Connection::ncnetstat;
 
 sub version{
-	print "ncnetstat v. 0.3.1\n";
+	print "ncnetstat v. 0.4.0\n";
 }
 
 sub help{
@@ -89,6 +89,7 @@ ptr_f    foreign PTR
 ptr_l    local PTR
 state    state
 uid      user ID
+unsorted Unsorted  ((default))
 user     username
 
 For CPU, memory, PID, and UID searches, the equalities below can be
@@ -106,7 +107,7 @@ my $udp=0;
 my $help=0;
 my $version=0;
 my $dont_resolve_ports=0;
-my $sort='host_fl';
+my $sort='unsorted';
 my $cidr_string;
 my $lcidr_string;
 my $rcidr_string;

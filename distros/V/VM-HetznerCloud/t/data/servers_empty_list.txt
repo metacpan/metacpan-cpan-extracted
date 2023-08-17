@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "pagination": {
+      "last_page": 4,
+      "next_page": 4,
+      "page": 3,
+      "per_page": 25,
+      "previous_page": 2,
+      "total_entries": 100
+    }
+  },
+  "servers": [
+  ]
+}

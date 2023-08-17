@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b4fba8edab1a3b3517224c815a2b7927508aafb86d86afa18db2f766afc5adfd Changes
+SHA256 1b74553a2798e9509726bd9fd135c95b926cb16e9acbd5932caa423769c10b6d LICENSE
+SHA256 3f5746aa837f23981f087a73162e50fa216116fdcc4c2f7c31e5fb0aa112a297 MANIFEST
+SHA256 7009720805c09c78bfdeb95d0909e111ed9061dc4518a4cd50f32e3ebb4c1993 META.json
+SHA256 4ea5fc4a2688077c7dd87164ee4ccc9ce0c3e3a056560616b7a90761458c8737 META.yml
+SHA256 8e0e3d53691bf9414f78658a80a40aff29a67ec5d2f16fa8ca157bba5f9100cc Makefile.PL
+SHA256 ab02606864baf71d3a15578ffdc10d0a957d3ba51d210d38eb8d9f420b4e6472 PKCS10.xs
+SHA256 56385c84492e852193f3bddad9f39eea374e362e702123ea68d9d7e014114c42 README
+SHA256 85db39be6e9fc7d3f156b0ff3aab2cd873a4cd11886ab7626a4ccec10464ae26 cpanfile
+SHA256 aa3b09ac4cc028391ca5a5c8f6113567c0fe2fefa5bdaedb0c18728d482a4569 dist.ini
+SHA256 bb5bb94c753f7bc4245b07371c67c4157879c7a8cb34caf4a9d8af34a380838e lib/Crypt/OpenSSL/PKCS10.pm
+SHA256 97fd94bcdab2b4d93610fded63fa1a526772639f7833b8c7f5d7e708ac8b6736 maint/Makefile_header.PL
+SHA256 0b6e7fd822f5e966a7f84e20bdc097046a9b9841a36552501b5d63d00db9b10f ppport.h
+SHA256 89fa4841e87448b1a8514fd720eb8bd4a2bd57fec4938382af348b853ff0c28c t/CSR.csr
+SHA256 af65437b70b1b89609d1b3b788c793b937c05fb1f636697656b3a0b18b68c0df t/Mytest.t
+SHA256 629919e096f7a5810c2bd9a1e8db705ae75dda4b6862de760763f06c1b65dda3 t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+SHA256 6d1941e0fe26b8bcbcfc675d97a18aac8e1b17e3cd09561810f1c500818357d5 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmTZFTkACgkQ1fh7LgYG
+pfnqmg//X3MVwOnNlgkbGQTgoN9F1dw2EJeqKTWscPpOM0rWVQhvgT1EFMxPSva2
+t6yAxXEKuF5v3HGcfabPk58Zv+3HN5nBFTFZKJQcAM3uQMTj/znT+YXLi1HxpPWY
+P33xqPIUw+ByWFnrcFzADqk2Zz11w8hSeZys0m23BBRlsn3y50X1qZnm6ZHODYFZ
+U0ZQb12+1uGTTaMtOUgtbNVEELf6oFgOyuxg+/Cxk/eKbYDLNDnA4VEBnGg6ndxS
+hu2RbfL4KD8imPeUrsQT4atIMaFokKTgF1Sf9XzwUCUh3aQSb49SI5lkFeoOlniM
+z9wX3+8UFmpeI970506nPDi4Sn5w53UuIxByxC/QkbeT1MWneB2mKDaXinPDUfIx
+51q104cVGbl5COE+JF6FTDOwqLj0ja9X1j+jDHBon8IzBjznYlAkyGYn6k6+cihB
++Bp+82zbqTzg2EUUikVmYrKoGzR5B5cXLroKdY+KVtNjb7/JJ8RUgSIS2FBgdahk
+eY2he4MAXtmq/R//HkrP2tJB/nAx61/XEQUGdMDTH8oTFZbzNmC5lk/AkaNYd4kn
+OLYuXu7Pfjxqv2nH6JCeS83OhAQ/FjvHw5ulkH300iu/upxeBzD0ed7K52qfte5+
+Rv6LZJkgBVk01dz5NqiXqMLovVMZ+7QqYpVS/mSNtLxFMOS0hdU=
+=asur
+-----END PGP SIGNATURE-----

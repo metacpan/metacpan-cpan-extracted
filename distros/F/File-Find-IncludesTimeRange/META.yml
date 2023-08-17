@@ -23,5 +23,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/File-Find-IncludesTimeRange
-version: v0.0.1
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

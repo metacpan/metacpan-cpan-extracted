@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Describe the ColorScale conditional formatting rule. This conditional formatting   rule creates a gradated color scale on the cells.            ',
                                   class => 'ColorScale',
                                   required => [], # TODO
 }                                 );
@@ -129,42 +129,42 @@ __PACKAGE__->method_documentation({
      'max_cfvo' => {
      	datatype => 'ConditionalFormattingValue',
      	base_name => 'MaxCfvo',
-     	description => '',
+     	description => 'Get or set this ColorScale`s max value object.  Cannot set null or CFValueObject    with type FormatConditionValueType.Min to it.',
      	format => '',
      	read_only => '',
      		},
      'max_color' => {
      	datatype => 'Color',
      	base_name => 'MaxColor',
-     	description => '',
+     	description => 'Get or set the max value object`s corresponding color.',
      	format => '',
      	read_only => '',
      		},
      'mid_cfvo' => {
      	datatype => 'ConditionalFormattingValue',
      	base_name => 'MidCfvo',
-     	description => '',
+     	description => 'Get or set this ColorScale`s mid value object.  Cannot set CFValueObject   with type FormatConditionValueType.Max or FormatConditionValueType.Min to   it.            ',
      	format => '',
      	read_only => '',
      		},
      'mid_color' => {
      	datatype => 'Color',
      	base_name => 'MidColor',
-     	description => '',
+     	description => 'Get or set the mid value object`s corresponding color.            ',
      	format => '',
      	read_only => '',
      		},
      'min_cfvo' => {
      	datatype => 'ConditionalFormattingValue',
      	base_name => 'MinCfvo',
-     	description => '',
+     	description => 'Get or set this ColorScale`s min value object.  Cannot set null or CFValueObject   with type FormatConditionValueType.Max to it.            ',
      	format => '',
      	read_only => '',
      		},
      'min_color' => {
      	datatype => 'Color',
      	base_name => 'MinColor',
-     	description => '',
+     	description => 'Get or set the min value object`s corresponding color.',
      	format => '',
      	read_only => '',
      		},    

@@ -10,9 +10,9 @@ SYNOPSIS
     
        class Colour :Struct {
           # These get :param :mutator automatically
-          has $red   = 0;
-          has $green = 0;
-          has $blue  = 0;
+          field $red   = 0;
+          field $green = 0;
+          field $blue  = 0;
     
           # Additional methods are still permitted
           method lightness {

@@ -16,10 +16,11 @@ like($files[0],qr/lib.Test.Compile.pm/,'Found module: Compile.pm');
 like($files[1],qr/lib.Test.Compile.Internal.pm/,'Found module: Internal.pm');
 
 @files = $internal->all_pm_files('t/scripts');
-is(@files,3,'Found correct number of modules in t/scripts');
-like($files[0],qr/t.scripts.LethalImport.pm/,'Found module: Module2.pm');
-like($files[1],qr/t.scripts.Module.pm/,'Found module: Module.pm');
-like($files[2],qr/t.scripts.Module2.pm/,'Found module: Module2.pm');
+is(@files,4,'Found correct number of modules in t/scripts');
+like($files[0],qr/t.scripts.Fail.pm/,'Found module: Module2.pm');
+like($files[1],qr/t.scripts.LethalImport.pm/,'Found module: Module2.pm');
+like($files[2],qr/t.scripts.Module.pm/,'Found module: Module.pm');
+like($files[3],qr/t.scripts.Module2.pm/,'Found module: Module2.pm');
 
 # Try specifying some files rather than directories
 my @search = ('t/scripts/failure.pl', 't/scripts/Module.pm');

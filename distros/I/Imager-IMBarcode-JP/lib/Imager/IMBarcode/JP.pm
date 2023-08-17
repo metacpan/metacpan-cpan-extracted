@@ -5,13 +5,14 @@ use warnings;
 use utf8;
 use Imager;
 use Mouse;
+use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has zipcode => (
     is      => 'rw',
     isa     => 'Int',
-    default => '00000000',
+    default => '0000000',
 );
 
 has address => (
@@ -172,7 +173,7 @@ sub make_bars {
         croak('Invalid zipcode(): ' . $self->zipcode);
     }
     unless ($self->address =~ /^[-0-9A-Z]*$/i) {
-        croak('Invalid address(): ' . $self->zipcode);
+        croak('Invalid address(): ' . $self->address);
     }
     my @bars = ();
     my $checksum = 0;
@@ -228,7 +229,7 @@ sub _build__base {
         ysize => 90,
     );
     $img->settag(name => 'i_xres', value => 300);
-    $img->settag(name => 'i_xres', value => 300);
+    $img->settag(name => 'i_yres', value => 300);
     $img->box(filled => 1, color => '#ffffff');
     return $img;
 }
@@ -239,7 +240,7 @@ sub _draw_num {
     for my $num (@nums) {
         my $pos = $self->_pos;
         my $x = 24 + $pos * 14;
-        my $ymin = $num =~ m{^[12]$} ? 24 : 37;
+        my $ymin = $num =~ m{^[12]$} ? 24 : 38;
         my $ymax = +{
             1 => $ymin + 41,
             2 => $ymin + 27,

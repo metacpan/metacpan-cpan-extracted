@@ -1,16 +1,19 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
-#include <algorithm>
+
 #include <catch2/internal/catch_clara.hpp>
 #include <catch2/internal/catch_console_width.hpp>
 #include <catch2/internal/catch_platform.hpp>
 #include <catch2/internal/catch_string_manip.hpp>
 #include <catch2/internal/catch_textflow.hpp>
+
+#include <algorithm>
+#include <ostream>
 
 namespace {
     bool isOptPrefix( char c ) {
@@ -230,7 +233,7 @@ namespace Catch {
                             return Detail::InternalParseResult::runtimeError(
                                 "Expected argument following " +
                                 token.token);
-                        auto result = valueRef->setValue(argToken.token);
+                        const auto result = valueRef->setValue(argToken.token);
                         if (!result)
                             return Detail::InternalParseResult(result);
                         if (result.value() ==

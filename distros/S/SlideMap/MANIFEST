@@ -4,3 +4,8 @@ Makefile.PL
 SlideMap.pm
 test.pl
 slidemap_documentation.txt
+Artistic_License.txt
+Artistic_License.doc
+README.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

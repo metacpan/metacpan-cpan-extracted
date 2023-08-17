@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -100,14 +99,14 @@ $loop->add( $http );
    is( $response->content_type, "text/plain", 'Content type of final response' );
    is( $response->content, "Document", 'Content of final response' );
 
-   isa_ok( $response->previous, "HTTP::Response", '$response->previous' );
+   isa_ok( $response->previous, [ "HTTP::Response" ], '$response->previous' );
 
    my $previous = $response->previous;
-   isa_ok( $previous->request->uri, "URI", 'Previous request URI is a URI' );
+   isa_ok( $previous->request->uri, [ "URI" ], 'Previous request URI is a URI' );
    is( $previous->request->uri, "http://host0/doc", 'Previous request URI string' );
 
    ok( $future->is_ready, '$future is now ready for final response' );
-   identical( scalar $future->get, $response, '$future->get yields final response' );
+   ref_is( scalar $future->get, $response, '$future->get yields final response' );
 }
 
 {

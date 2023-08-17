@@ -17,7 +17,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.4';
 
 
 sub prepare_app {
@@ -113,7 +113,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.4
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,12 @@ The C</.well-known/traffic-advice> specification is new and may be subject to ch
 This does not validate that the L</data> string or L</file> contains
 valid JSON, or that the JSON conforms to the specification.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.8.5 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 L<https://github.com/buettner/private-prefetch-proxy/blob/main/traffic-advice.md>
@@ -187,7 +193,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2022 by Robert Rothenberg.
+This software is Copyright (c) 2021-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

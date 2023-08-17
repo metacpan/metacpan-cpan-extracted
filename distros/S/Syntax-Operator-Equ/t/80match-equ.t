@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Syntax::Keyword::Match >= 0.08 is not available"
@@ -14,6 +14,9 @@ BEGIN {
 
    Syntax::Keyword::Match->import;
    Syntax::Operator::Equ->import;
+
+   diag( "Syntax::Keyword::Match $Syntax::Keyword::Match::VERSION, " .
+         "Syntax::Operator::Equ $Syntax::Operator::Equ::VERSION" );
 }
 
 # literals

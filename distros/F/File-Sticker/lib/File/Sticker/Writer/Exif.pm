@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Exif;
-$File::Sticker::Writer::Exif::VERSION = '3.0008';
+$File::Sticker::Writer::Exif::VERSION = '3.0101';
 =head1 NAME
 
 File::Sticker::Writer::Exif - write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 3.0008
+version 3.0101
 
 =head1 SYNOPSIS
 

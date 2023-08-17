@@ -1,5 +1,3 @@
-# $Id: CBC.pm,v 1.6 2008/09/24 19:21:21 turnstep Exp $
-
 # This code is based in part on the Systemics Crypt::CBC.
 # Parts copyright (C) 1995, 1996 Systemics Ltd (http://www.systemics.com/)
 # All rights reserved.

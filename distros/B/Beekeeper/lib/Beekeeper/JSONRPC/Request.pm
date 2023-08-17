@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 sub new {
@@ -41,6 +41,10 @@ sub mqtt_properties {
 
 sub async_response {
     $_[0]->{_async_response} = 1;
+}
+
+sub deflate_response {
+    $_[0]->{_deflate_response} = $_[2] || 1024;
 }
 
 sub send_response {
@@ -132,6 +136,11 @@ Returns a hashref containing the MQTT properties of the request.
 
 =head1 METHODS
 
+=head3 deflate_response ( min_size => $min_size )
+
+Deflate the JSON response for the request before being sent to the caller if it is
+longer than `$min_size`. If `$min_size` is not specified a default of 1024 is used.
+
 =head3 async_response
 
 On worker classes remote calls can be processed concurrently by means of calling
@@ -156,7 +165,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

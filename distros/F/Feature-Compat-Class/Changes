@@ -1,5 +1,11 @@
 Revision history for Feature-Compat-Class
 
+0.06    2023-07-03
+        [CHANGES]
+         * Updated documentation for Perl v5.38 release which now includes
+           feature 'class'
+         * Avoid Test::Fatal so the tests are core-only on Perl v5.38
+
 0.05    2023-01-12
         [CHANGES]
          * Don't enable the implied pragmata (strict, warnings, etc..) when

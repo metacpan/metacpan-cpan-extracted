@@ -13,9 +13,9 @@
 #===============================================================================
 
 use strict;
-use warnings;
+use warnings FATAL => 'recursion';
 
-use Test::More tests => 38;
+use Test::More tests => 46;
 use Test::Warn;
 
 
@@ -67,7 +67,7 @@ SKIP: {
 }
 
 SKIP: {
-	skip "NOMTAG/NOMPASS not set", 28 unless (defined $ENV{NOMTAG} and defined $ENV{NOMPASS});
+	skip "NOMTAG/NOMPASS not set", 36 unless (defined $ENV{NOMTAG} and defined $ENV{NOMPASS});
 
 	isnt ($epp->login ($ENV{NOMTAG}, $ENV{NOMPASS}), undef, 'Login with good credentials');
 
@@ -78,10 +78,27 @@ SKIP: {
 		BAIL_OUT ("Cannot login to EPP server");
 	}
 
+	my $res;
+	warning_is {$res = $epp->login ()} 
+		{carped => 'Already logged in'},
+		'Carped msg for double log-in';
+	is ($res, undef, 'Login when already logged in trapped');
+
 	ok ($epp->hello(), 'Hello');
 	ok ($epp->ping(), 'Ping');
 	ok ($epp->logout(), 'Logout');
 	ok ((not defined $epp->hello()), 'Hello attempt when logged out');
+
+	# rt-147136 login as new user.
+	is $epp->{authenticated}, 0, 'Unauthenticated';
+	is $epp->{connected}, 0, 'Unconnected';
+	isnt ($epp->login ("$ENV{NOMTAG}_", $ENV{NOMPASS}), undef, 'Login as secondary user with good credentials');
+	is ($Net::EPP::Registry::Nominet::Code, 1000, 'Logged in') or diag
+	$epp->get_message;
+	is ($epp->{login_params}->[0], "$ENV{NOMTAG}_", 'Correct user');
+	ok ($epp->logout(), 'Logout');
+
+
 	$newargs{login} = 1;
 	$epp = Net::EPP::Registry::Nominet->new (%newargs);
 	ok (defined $epp, 'Reconnect and Login with good credentials');
@@ -96,7 +113,7 @@ SKIP: {
 		'Expected warnings are thrown';
 	ok ((not defined $epp), 'Reconnect with duff SSL cert verification');
 	SKIP: {
-		skip "Server cert may not be valid now", 1 if time > 1675987199;
+		skip "Server cert may not be valid now", 1 if time > 1707436800;
 		$newargs{ca_file}  = 't/ca.crt';
 		$epp = Net::EPP::Registry::Nominet->new (%newargs);
 		ok (defined $epp, 'Reconnect with good SSL cert verification');

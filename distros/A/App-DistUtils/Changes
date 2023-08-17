@@ -1,3 +1,10 @@
+0.154   2023-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - [doc] Mention this-mod, this-dist.
+
+        - [ux] Default dist argument to 'this dist'.
+
+
 0.153   2023-02-25  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

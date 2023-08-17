@@ -1,14 +1,14 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2023 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::IMAP4::Message;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Box::Net::Message';
 
@@ -58,16 +58,16 @@ sub label(@)
     {   # get one value only
         my $label  = shift;
         my $labels = $self->{MM_labels};
-	return $labels->{$label}
-	    if exists $labels->{$label} || exists $labels->{seen};
+        return $labels->{$label}
+            if exists $labels->{$label} || exists $labels->{seen};
 
-	my $flags = $imap->getFlags($id);
+        my $flags = $imap->getFlags($id);
         if($self->{MBIM_cache_labels})
-	{   # the program may have added own labels
+        {   # the program may have added own labels
             @{$labels}{keys %$flags} = values %$flags;
             delete $self->{MBIM_labels_changed};
-	}
-	return $flags->{$label};
+        }
+        return $flags->{$label};
     }
 
     my @private;

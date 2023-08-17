@@ -24,12 +24,12 @@ no_index:
     - inc
 requires:
   Carp: '1.1'
-  DynaLoader: '1.04'
+  DynaLoader: '1.09'
   Exporter: '5.56'
   File::Spec: '3.29'
   IO::File: '1.14'
   MIME::Base64: '2.13'
   Net::DNS: '1.08'
   perl: '5.008009'
-version: '1.20'
+version: '1.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ package MarpaX::Java::ClassFile::Util::BNF;
 
 # ABSTRACT: Provides common BNF top and header contents
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -38,7 +38,7 @@ MarpaX::Java::ClassFile::Util::BNF - Provides common BNF top and header contents
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -1,0 +1,4 @@
+--- !yamlscript
+array =:
+  vec: (1 .. 3)
+hash-map: ."foo" array

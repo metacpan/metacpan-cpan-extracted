@@ -1,0 +1,9 @@
+requires 'Mojolicious'  => '9.32';
+requires 'Archive::Tar' => 0;
+requires 'DBI';
+requires 'DBD::SQLite';
+requires 'perl' => '5.024';
+requires 'Time::Piece';
+requires 'Software::License';
+requires 'Data::Dumper';
+

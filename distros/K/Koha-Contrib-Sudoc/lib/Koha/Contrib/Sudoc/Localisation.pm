@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Localisation;
 # ABSTRACT: Localisation auto de notices biblio
-$Koha::Contrib::Sudoc::Localisation::VERSION = '2.39';
+$Koha::Contrib::Sudoc::Localisation::VERSION = '2.40';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -624,7 +624,7 @@ Koha::Contrib::Sudoc::Localisation - Localisation auto de notices biblio
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 AUTHOR
 
@@ -632,7 +632,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Demians.
+This software is Copyright (c) 2023 by Fréderic Demians.
 
 This is free software, licensed under:
 

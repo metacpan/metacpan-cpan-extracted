@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::HasError;
 # ABSTRACT: Class to model an error
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -90,7 +90,7 @@ Mail::BIMI::Role::HasError - Class to model an error
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 DESCRIPTION
 

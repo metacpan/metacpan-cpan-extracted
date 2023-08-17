@@ -2,16 +2,14 @@ package Hash::Match;
 
 # ABSTRACT: match contents of a hash against rules
 
-use v5.10.0;
-
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = 'v0.7.2';
+our $VERSION = 'v0.8.0';
 
 use Carp qw/ croak /;
 use List::AllUtils qw/ natatime /;
-use Ref::Util qw/ is_coderef is_hashref is_ref is_regexpref /;
+use Ref::Util qw/ is_arrayref is_blessed_ref is_coderef is_hashref is_ref is_regexpref /;
 
 # RECOMMEND PREREQ: List::SomeUtils::XS
 # RECOMMEND PREREQ: Ref::Util::XS
@@ -55,33 +53,32 @@ sub _compile_match {
     }
 }
 
-my %KEY2FN = (
-    '-all'	=> List::AllUtils->can('all'),
-    '-and'	=> List::AllUtils->can('all'),
-    '-any'	=> List::AllUtils->can('any'),
-    '-notall'	=> List::AllUtils->can('notall'),
-    '-notany'	=> List::AllUtils->can('none'),
-    '-or'	=> List::AllUtils->can('any'),
-);
-
 sub _key2fn {
-    my ($key, $ctx) = @_;
+    my ($key, $is_hash) = @_;
+
+    state $KEY2FN = {
+        '-all'    => List::AllUtils->can('all'),
+        '-and'    => List::AllUtils->can('all'),
+        '-any'    => List::AllUtils->can('any'),
+        '-notall' => List::AllUtils->can('notall'),
+        '-notany' => List::AllUtils->can('none'),
+        '-or'     => List::AllUtils->can('any'),
+    };
 
     # TODO: eventually add a warning message about -not being
     # deprecated.
 
     if ($key eq '-not') {
-	$ctx //= '';
-	$key = ($ctx eq 'HASH') ? '-notall' : '-notany';
+	$key = $is_hash ? '-notall' : '-notany';
     }
 
-    $KEY2FN{$key} or croak "Unsupported key: '${key}'";
+    $KEY2FN->{$key} or croak "Unsupported key: '${key}'";
 }
 
 sub _compile_rule {
     my ( $key, $value, $ctx ) = @_;
 
-    if ( my $key_ref = ( ref $key ) ) {
+    if ( is_ref($key) ) {
 
         if (is_regexpref($key)) {
 
@@ -109,33 +106,31 @@ sub _compile_rule {
 
         } else {
 
-            croak "Unsupported key type: '${key_ref}'";
+            croak sprintf( "Unsupported key type: '\%s'", ref $key );
 
         }
 
     } else {
 
-        my $match_ref = ref $value;
+        if ( !is_blessed_ref($value) && ( is_arrayref($value) || is_hashref($value) ) ) {
 
-	if ( $match_ref =~ /^(?:ARRAY|HASH)$/ ) {
-
-            my $it = ( $match_ref eq 'ARRAY' )
-		? natatime 2, @{$value}
-	        : sub { each %{$value} };
+            my $it = is_arrayref($value)
+                ? natatime 2, @{$value}
+                : sub { each %{$value} };
 
             my @codes;
             while ( my ( $k, $v ) = $it->() ) {
                 push @codes, _compile_rule( $k, $v, $key );
             }
 
-            my $fn = _key2fn($key, $match_ref);
+            my $fn = _key2fn($key, is_hashref($value));
 
             return sub {
                 my $hash = $_[0];
                 $fn->( sub { $_->($hash) }, @codes );
             };
 
-        } elsif ( $match_ref =~ /^(?:Regexp|CODE|)$/ ) {
+        } elsif ( is_coderef($value) || is_regexpref($value) || !is_ref($value) ) {
 
             my $match = _compile_match($value);
 
@@ -146,7 +141,7 @@ sub _compile_rule {
 
         } else {
 
-            croak "Unsupported type: '${match_ref}'";
+            croak sprintf( "Unsupported type: '\%s'", ref $value );
 
         }
 
@@ -169,7 +164,7 @@ Hash::Match - match contents of a hash against rules
 
 =head1 VERSION
 
-version v0.7.2
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -320,6 +315,12 @@ You can also use functions to match keys. For example,
     sub { $_[0] > 10 } => $rule,
   ]
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.8.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 The following modules have similar functionality:
@@ -361,7 +362,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

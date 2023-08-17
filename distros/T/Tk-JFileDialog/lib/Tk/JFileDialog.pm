@@ -16,7 +16,7 @@
 package Tk::JFileDialog;
 
 use vars qw($VERSION $bummer $MAXWIDTH);
-our $VERSION = '2.20';
+our $VERSION = '2.31';
 our $MAXWIDTH = 60;  #AVG. CHARACTERS.
 
 require 5.002;
@@ -26,10 +26,13 @@ use Carp;
 use Cwd;
 use File::Glob;
 use Tk;
-use Tk::Dialog;
 use Tk::JBrowseEntry;
 
 my $useAutoScroll = 0;
+my $bummer;
+my $dialog_widget = 'Dialog';
+
+eval 'use Tk::JDialog; $dialog_widget = "JDialog"; 1';
 eval 'use Tk::Autoscroll; $useAutoScroll = 1; 1';
 
 BEGIN
@@ -48,10 +51,31 @@ no strict 'subs';
 	}
 }
 
+eval 'use Tk::Dialog; 1'  if ($dialog_widget !~ 'J');
+
 my $driveletter = '';
 my %lastPaths;
-my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
-$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+my $homedir;
+
+#FIGURE OUT "HOME" DIRECTORY/FOLDER:
+if ($bummer)
+{
+	#M$-WINDOWS (bummer!):
+	if (defined $ENV{'HOMEDRIVE'})
+	{
+		$homedir = $ENV{'HOMEDRIVE'};
+		$homedir .= $ENV{'HOMEPATH'}  if (defined $ENV{'HOMEPATH'});
+	}
+	unless (defined($homedir) && $homedir =~ /\S/)
+	{
+		$homedir = $ENV{'LOGDIR'}  if (defined $ENV{'LOGDIR'});
+	}
+}
+unless (defined $homedir && $homedir =~ /\S/)
+{
+	$homedir = $ENV{'HOME'}  if (defined $ENV{'HOME'});
+	$homedir = ''  unless (defined $homedir);
+}
 $homedir =~ s#[\/\\]$##;
 
 @Tk::JFileDialog::ISA = qw(Tk::Toplevel);
@@ -108,6 +132,7 @@ sub Populate
 		{
 			$FDialog->{'Can'}->invoke  if (defined($FDialog->{'Can'}) && $FDialog->{'Can'}->IsWidget);
 		});
+		$FDialog->transient($FDialog->Parent->toplevel);
 	}
 	## Initialize variables that won't be initialized later
 	$FDialog->{'Retval'} = -1;
@@ -130,13 +155,13 @@ sub Populate
 			-FNameList			=> ['PASSIVE', undef, undef, undef],
 			-FPat			=> ['PASSIVE', undef, undef, ''],
 			-FPatList			=> ['PASSIVE', undef, undef, undef],
-			-FPatFilters	=> ['PASSIVE', undef, undef, undef],
+			-FPatFilters	=> ['PASSIVE', undef, undef, ''],
 			-FPatOnly	=> ['PASSIVE', undef, undef, 0],
 			-File			=> ['PASSIVE', undef, undef, ''],
 			-Geometry		=> ['PASSIVE', undef, undef, undef],
 			-Grab			=> ['PASSIVE', undef, undef, 1],
 			-Horiz		=> ['PASSIVE', undef, undef, 1],
-			-Path			=> ['PASSIVE', undef, undef, undef],
+			-Path			=> ['PASSIVE', undef, undef, ''],
 			-SelDir		=> ['PASSIVE', undef, undef, 0],
 			-SortButton		=> ['PASSIVE', undef, undef, 1],
 			-SortOrder		=> ['PASSIVE', undef, undef, 'Name'],
@@ -160,12 +185,12 @@ sub Populate
 			-Title		=> ['PASSIVE', undef, undef, 'Select File:'],
 			-EDlgTitle		=> ['PASSIVE', undef, undef, 'Incorrect entry or selection!'],
 			-History => ['PASSIVE', undef, undef, 20],
-			-HistFile => ['PASSIVE', undef, undef, undef],
-			-HistDeleteOk => ['PASSIVE', undef, undef, undef],
+			-HistFile => ['PASSIVE', undef, undef, ''],
+			-HistDeleteOk => ['PASSIVE', undef, undef, 0],
 			-HistUsePath => ['PASSIVE', undef, undef, 0],
 			-HistUsePathButton => ['PASSIVE', undef, undef, 0],
-			-PathFile => ['PASSIVE', undef, undef, undef],
-			-DefaultFile => ['PASSIVE', undef, undef, undef],
+			-PathFile => ['PASSIVE', undef, undef, ''],
+			-DefaultFile => ['PASSIVE', undef, undef, ''],
 			-QuickSelect => ['PASSIVE', undef, undef, 1],
 			-DestroyOnHide => ['PASSIVE', undef, undef, 0],
 			-noselecttext => ['PASSIVE', undef, undef, 0],
@@ -480,15 +505,10 @@ sub IsNum
 
 sub BuildListBox
 {
-	my ($self, $fvar, $flabel, $listvar,$hpack, $vpack) = @_;
+	my ($self, $fvar, $flabel, $listvar, $hpack, $vpack) = @_;
 
 	## Create the subframe
-	$self->{$fvar} = $self->{'DFFrame'}->Frame
-			->pack(-side => $self->{'Configure'}{'-Horiz'} ? $hpack : $vpack,
-			-anchor => 'center',
-			-padx => '4m',
-			-pady => '2m',
-	@bothFill, @expand);
+	$self->{$fvar} = $self->{'DFFrame'}->Frame;
 
 	## Create the label
 	$self->{$fvar}->Label(-text => $flabel)->pack(@topPack, @xfill);
@@ -497,8 +517,11 @@ sub BuildListBox
 	my $fbf = $self->{$fvar}->Frame->pack(@topPack, @bothFill, @expand);
 
 	## And the scrollbar and listbox in it
-	$self->{$listvar} = $fbf->Scrolled('Listbox', -scrollbars => 'se', @raised, 
-			-exportselection => 0)->pack(@leftPack, @expand, @bothFill);
+	$self->{$listvar} = $fbf->Scrolled('Listbox',
+			-scrollbars => 'se', 
+			@raised, 
+			-exportselection => 0
+	)->pack(@leftPack, @expand, @bothFill);
 
 	$self->{$listvar}->Subwidget('xscrollbar')->configure(-takefocus => 0);
 	$self->{$listvar}->Subwidget('yscrollbar')->configure(-takefocus => 0);
@@ -507,7 +530,17 @@ sub BuildListBox
 	$self->{$listvar}->bind('<Leave>', sub { $self->bind('<MouseWheel>', [ sub { Tk->break; }]) });
 
 	#NEXT LINE ADDED 20050416 TO PERMIT MULTIFILE SELECTIONS, THANKS TO Paul Falbe FOR THIS PATCH!
-	$self->{$listvar}->configure(-selectmode => $self->{'Configure'}{'-SelectMode'})  if ($listvar eq 'FileList');
+	$self->{$listvar}->configure(-selectmode => $self->{'Configure'}{'-SelectMode'})
+			if ($listvar eq 'FileList');
+
+	#MUST BUILD (FOR BINDINGS' SAKES) BUT ONLY PACK IF USER IS TO SEE IT!:
+	$self->{$fvar}->pack(
+			-side => $self->{'Configure'}{'-Horiz'} ? $hpack : $vpack,
+			-anchor => 'center',
+			-padx => '4m',
+			-pady => '2m',
+			@bothFill, @expand
+	) if ($self->{'Configure'}{"-Show$listvar"});
 }
 
 sub BindDir
@@ -596,13 +629,14 @@ sub BindFile
 	## A single click selects (highlights) the file:
 	$self->{'FileList'}->bind('<ButtonRelease-1>', sub
 	{
+		my $fl = shift;
 		if ($self->{'Configure'}{'-SelDir'} != 1)
 		{
 #			$self->{'Configure'}{'-File'} =
-#					$self->{'FileList'}->get($self->{'FileList'}->curselection);
+#					$fl->get($fl->curselection);
 			#PREV. CHGD. TO NEXT 20050416 TO PERMIT MULTIFILE SELECTIONS, THANKS TO Paul Falbe FOR THIS PATCH!
- 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{'FileList'}->curselection;
+ 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $fl->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$fl->curselection;
 			$self->{'FileEntry'}->icursor('end');
 			$self->{'FileEntry'}->selectionRange(0,'end')
 					unless ($self->{'Configure'}{'-noselecttext'});
@@ -619,12 +653,15 @@ sub BindFile
 		## A single-click completes the selection:
 		$self->{'FileList'}->bind('<1>', sub
 		{
+			my $fl = shift;
 			if ($self->{'Configure'}{'-SelDir'} != 1)
 			{
-				my $f = $self->{'FileList'}->curselection;
-				return if !defined($f);
-				($self->{'Configure'}{'-File'} = $self->{'FileList'}->get($f)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
-				$self->{'OK'}->invoke;
+				my $f = $fl->curselection;
+				if (defined $f)
+				{
+					($self->{'Configure'}{'-File'} = $fl->get($f)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+					$self->{'OK'}->invoke;
+				}
 			}
 		});
 	}
@@ -633,61 +670,65 @@ sub BindFile
 		## A double-click completes the selection:
 		$self->{'FileList'}->bind('<Double-ButtonRelease-1>', sub
 		{
+			my $fl = shift;
 			if ($self->{'Configure'}{'-SelDir'} != 1)
 			{
-				my $f = $self->{'FileList'}->curselection;
-				return if !defined($f);
-				$self->{'OK'}->invoke;
+				my $f = $fl->curselection;
+
+				$self->{'OK'}->invoke  if (defined $f);
 			}
 		});
 	}
 	$self->{'FileList'}->bind('<Return>', sub
 	{
+		my $fl = shift;
 		if ($self->{'Configure'}{'-SelDir'} != 1)
 		{
-			my $f = $self->{'FileList'}->index('active');
+			my $f = $fl->index('active');
 			return if !defined($f);
-#			$self->{'Configure'}{'-File'} = $self->{'FileList'}->get($f);
+#			$self->{'Configure'}{'-File'} = $fl->get($f);
 			#PREV. CHGD. TO NEXT 20050416 TO PERMIT MULTIFILE SELECTIONS, THANKS TO Paul Falbe FOR THIS PATCH!
- 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{'FileList'}->curselection;
+ 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $fl->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$fl->curselection;
 			$self->{'OK'}->focus;
 		}
 	});
 
 	$self->{'FileList'}->bind('<space>', sub
 	{
+		my $fl = shift;
 		if ($self->{'Configure'}{'-SelDir'} != 1)
 		{
-			my $f = $self->{'FileList'}->index('active');
+			my $f = $fl->index('active');
 			return if !defined($f);
-#			$self->{'Configure'}{'-File'} = $self->{'FileList'}->get($f);
+#			$self->{'Configure'}{'-File'} = $fl->get($f);
 			#PREV. CHGD. TO NEXT 20050416 TO PERMIT MULTIFILE SELECTIONS, THANKS TO Paul Falbe FOR THIS PATCH!
-			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{'FileList'}->curselection;
+			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $fl->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$fl->curselection;
 		}
 	});
 
 	$self->{'FileList'}->bind('<Alt-s>', sub
 	{
+		my $fl = shift;
 		if ($self->{'Configure'}{'-SelDir'} != 1)
 		{
-			my $f = $self->{'FileList'}->index('active');
+			my $f = $fl->index('active');
 			return if !defined($f);
 
 			if ($ENV{'jwtlistboxhack'})
 			{
-				$self->{'FileList'}->jwtSpaceSelect($f);
+				$fl->jwtSpaceSelect($f);
 			}
 			else
 			{
-				$self->{'FileList'}->BeginSelect($f);
+				$fl->BeginSelect($f);
 			}
-			($self->{'File'} = $self->{'FileList'}->get($f)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
-#			$self->{'Configure'}{'-File'} = $self->{'FileList'}->get($f);
+			($self->{'File'} = $fl->get($f)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+#			$self->{'Configure'}{'-File'} = $fl->get($f);
 			#PREV. CHGD. TO NEXT 20050416 TO PERMIT MULTIFILE SELECTIONS, THANKS TO Paul Falbe FOR THIS PATCH!
- 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{'FileList'}->curselection;
+ 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $fl->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$fl->curselection;
 			Tk->break;
 		}
 	});
@@ -827,6 +868,7 @@ sub BuildPathEntry
 			-maxwidth => defined($self->{'Configure'}{'-maxwidth'}) ? $self->{'Configure'}{'-maxwidth'} : $MAXWIDTH,
 	)->pack(@leftPack, @expand, @xfill);
 	$self->{$entry}->choices(\%{$self->{'Configure'}{'PathList'}})  if ($favcnt);
+
 	if ($self->{'Configure'}{'-SortButton'})
 	{
 		$self->{'SortxButton'} = $eFrame->Checkbutton( -variable => \$self->{'Configure'}{'-SortOrder'},
@@ -851,7 +893,6 @@ sub BuildPathEntry
 		}
 	});
 
-	my $whichlist = 'DirList';
 	$self->{$entry}->bind('<Tab>',sub 
 	{
 		my ($oldval,$currentval);
@@ -862,7 +903,7 @@ sub BuildPathEntry
 			my $restofsel = $oldval;
 			if ($self->{'Configure'}{'-ShowDirList'})
 			{
-				($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+				($_ = $self->{'DirList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 				$restofsel .= $_ . '/'  if ($_ && $_ ne '.' && $_ ne '..' && $_ ne '/');
 			}
 			$self->{'Configure'}{$LabelVar} = $restofsel;
@@ -876,9 +917,9 @@ sub BuildPathEntry
 		if ($self->{'Configure'}{'-ShowDirList'}) {
 			my ($currentval);
 			$currentval = $lastPaths{$driveletter};
-			$self->{$whichlist}->UpDown(-1);
+			$self->{'DirList'}->UpDown(-1);
 			my ($restofsel) = $currentval;
-			($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+			($_ = $self->{'DirList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 			if (m#^\/$#o)
 			{
 				$restofsel = $_;
@@ -908,9 +949,9 @@ sub BuildPathEntry
 		elsif ($self->{'Configure'}{'-ShowDirList'}) {
 			my ($currentval);
 			$currentval = $lastPaths{$driveletter};
-			$self->{$whichlist}->UpDown(1);
+			$self->{'DirList'}->UpDown(1);
 			my $restofsel = $currentval;
-			($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+			($_ = $self->{'DirList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 			if (m#^\/$#o)
 			{
 				$restofsel = $_;
@@ -968,17 +1009,6 @@ sub BuildFileEntry
 		close TEMP;
 	}
 
-	$self->{"histToggleVal"} = (defined($self->{'Configure'}{'-HistUsePathButton'}) && $self->{'Configure'}{'-HistUsePathButton'} == 1) ? 1 : 0;
-	if ($self->{'Configure'}{'-HistUsePath'}  && $self->{'Configure'}{'-HistUsePath'} != 1)
-	{
-		my $pathLabel = $self->{'Configure'}{'-HistUsePath'};
-		$pathLabel = 'Keep Path'  if ($self->{'Configure'}{'-HistUsePath'} =~ /^\-?\d/);
-		$self->{"histToggle"} = $eFrame->Checkbutton(
-				-text   => $pathLabel,
-				-variable=> \$self->{"histToggleVal"}
-		)->pack(@rightPack);
-	}
-
 	my $altbindings = (!defined($self->{'Configure'}{'-SelDir'}) || $self->{'Configure'}{'-SelDir'} != 1)
 			? 'Right=NoSearch,Return=NonEmptyGo' : 'Right=NoSearch';
 	$self->{$entry} = $eFrame->JBrowseEntry(@sunken,
@@ -1003,7 +1033,7 @@ sub BuildFileEntry
 			-noselecttext => $self->{'Configure'}{'-noselecttext'},
 			-listrelief => 'flat',
 			-maxwidth => defined($self->{'Configure'}{'-maxwidth'}) ? $self->{'Configure'}{'-maxwidth'} : $MAXWIDTH,
-	)->pack(@rightPack, @expand, @xfill);
+	)->pack(@leftPack, @expand, @xfill);
 	if ($Tk::JBrowseEntry::VERSION >= 5.0)
 	{
 		$self->{$entry}->configure(-deletecmd => sub {
@@ -1015,7 +1045,16 @@ sub BuildFileEntry
 	}
 	$self->{$entry}->choices(\@{$self->{'Configure'}{'HistList'}})  if ($histcnt);
 
-	my $whichlist = 'FileList';
+	$self->{"histToggleVal"} = (defined($self->{'Configure'}{'-HistUsePathButton'}) && $self->{'Configure'}{'-HistUsePathButton'} == 1) ? 1 : 0;
+	if ($self->{'Configure'}{'-HistUsePath'}  && $self->{'Configure'}{'-HistUsePath'} != 1)
+	{
+		my $pathLabel = $self->{'Configure'}{'-HistUsePath'};
+		$pathLabel = 'Keep Path'  if ($self->{'Configure'}{'-HistUsePath'} =~ /^\-?\d/);
+		$self->{"histToggle"} = $eFrame->Checkbutton(
+				-text   => $pathLabel,
+				-variable=> \$self->{"histToggleVal"}
+		)->pack(@leftPack);
+	}
 
 	$self->{$entry}->bind('<Escape>',sub {
 		$self->{$entry}->Popdown  if ($self->{$entry}->{'popped'});
@@ -1025,8 +1064,8 @@ sub BuildFileEntry
 		}
 		else
 		{
-		 	$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{$whichlist}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{$whichlist}->curselection;
+		 	$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$self->{'FileList'}->curselection;
 			$self->{$entry}->icursor('end');
 			$self->{$entry}->selectionRange(0,'end')
 					unless ($self->{'Configure'}{'-noselecttext'});
@@ -1044,11 +1083,11 @@ sub BuildFileEntry
 				$currentval = ''  unless ($currentval =~ m#\/#o);
 				$currentval =~ s#(.*\/)(.*)$#$1#;
 				my ($restofsel) = $currentval;
-				($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+				($_ = $self->{'FileList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 				if ($_ && $_ ne '.' && $_ ne '..' && $_ ne '/' && $_ !~ /\,/o)   #IF ADDED 20010131.
 				{
-#					($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
-					my ($sel) = $self->{$whichlist}->curselection;
+#					($_ = $self->{'FileList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+					my ($sel) = $self->{'FileList'}->curselection;
 					$restofsel .= $_  if ($sel =~ /\d/o);
 				}
 				$self->{'Configure'}{$LabelVar} = $restofsel;
@@ -1064,18 +1103,18 @@ sub BuildFileEntry
 			if ($self->{'Configure'}{'-SelectMode'} =~ /(?:multiple|extended)/io)
 			{
 				$self->{'Configure'}{$LabelVar} = '';
-				my $f = $self->{$whichlist}->index('active');
+				my $f = $self->{'FileList'}->index('active');
 				if (defined $f)
 				{
-		 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{$whichlist}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{$whichlist}->curselection;
+		 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$self->{'FileList'}->curselection;
 				}
-				$self->{$whichlist}->focus();
+				$self->{'FileList'}->focus();
 			}
 			else
 			{
-				$self->{$whichlist}->UpDown(-1);
-				($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+				$self->{'FileList'}->UpDown(-1);
+				($_ = $self->{'FileList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 				$self->{'Configure'}{$LabelVar} = $_;
 				$self->{$entry}->icursor('end');
 				$self->{$entry}->selectionRange(0,'end')
@@ -1095,18 +1134,18 @@ sub BuildFileEntry
 			if ($self->{'Configure'}{'-SelectMode'} =~ /(?:multiple|extended)/io)
 			{
 				$self->{'Configure'}{$LabelVar} = '';
-				my $f = $self->{$whichlist}->index('active');
+				my $f = $self->{'FileList'}->index('active');
 				if (defined $f)
 				{
-		 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{$whichlist}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
-					$self->{$whichlist}->curselection;
+		 			$self->{'Configure'}{'-File'} = join ',', map { (my $f = $self->{'FileList'}->get($_)) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o; $f }
+					$self->{'FileList'}->curselection;
 				}
-				$self->{$whichlist}->focus();
+				$self->{'FileList'}->focus();
 			}
 			else
 			{
-				$self->{$whichlist}->UpDown(1);
-				($_ = $self->{$whichlist}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
+				$self->{'FileList'}->UpDown(1);
+				($_ = $self->{'FileList'}->get('active')) =~ s/^\d\d\d\d\d\d\d\d \d\d\d\d //o;
 				$self->{'Configure'}{$LabelVar} = $_;
 				$self->{$entry}->icursor('end');
 
@@ -1129,20 +1168,11 @@ sub BuildListBoxes
 	$self->{'DFFrame'} = $self->Frame;
 	$self->{'DFFrame'}->pack(-before => $self->{'FEF'}, @topPack, @bothFill, @expand);
 	
-	## Build the file window before the directory window, even
-	## though the file window is below the directory window, we'll
-	## pack the directory window before.
-	if ($self->{'Configure'}{'-ShowDirList'})
-	{
-		&BuildListBox($self,'DirFrame',$self->{'Configure'}{'-DirLBCaption'},'DirList','left','top');
-		&BindDir($self);
-	}
+	&BuildListBox($self,'DirFrame',$self->{'Configure'}{'-DirLBCaption'},'DirList','left','top');
+	&BindDir($self);
 
-	if ($self->{'Configure'}{'-ShowFileList'}) {
-		&BuildListBox($self, 'FileFrame',$self->{'Configure'}{'-FileLBCaption'},'FileList','right','bottom');
-		## Set up the bindings for the file list
-		&BindFile($self);
-	}
+	&BuildListBox($self, 'FileFrame',$self->{'Configure'}{'-FileLBCaption'},'FileList','right','bottom');
+	&BindFile($self);
 }
 
 sub BuildFDWindow
@@ -1435,7 +1465,9 @@ sub RescanFiles
 		my @fpatList;
 		$fl->delete(0,'end');
 
-		($_ = defined($self->{'Configure'}{'-FPat'}) ? $self->{'Configure'}{'-FPat'} : '') =~ s/^\s*|\s*$//o;
+		($_ = defined($self->{'Configure'}{'-FPat'}) ? $self->{'Configure'}{'-FPat'} : '');
+		s/^\s+$//;
+		s/\s+$//;
 		if (defined $self->{'Configure'}{'-FPatList'})
 		{
 			$self->{'Configure'}{'-FPat'} = $_ = ${$self->{'Configure'}{'-FPatList'}}[0]  if ((!$_ || /^\*$/o)
@@ -1460,14 +1492,27 @@ sub RescanFiles
 		$self->{'FPat'}->choices(\@fpatList)  if ($#fpatList > 0);
 
 		$self->{'Configure'}{'-FPatFilters'} = $_  if ($self->{'Configure'}{'-FPatOnly'});
-		my @filters = split(/\|/o, $_);
+		(my $protected = $_) =~ s#\\\|#\x04#g;
+		my @filters = split(/\|/o, $protected);
 		@filters = ('')  unless ($#filters >= 0);
+		my @filters_rgx = ();
+		foreach my $f (@filters)
+		{
+			$f =~ s#\x04#\|#g;     #UNPROTECT AND UNESCAPE ESCAPED SEPARATOR ("\|").
+			$f =~ s#\\\.#\x02#go;  #PROTECT ESCAPED SPECIAL CHARACTERS:
+			$f =~ s#\\\*#\x03#go;
+			$f =~ s#\.#\\\.#go;    #CONVERT PATTERN TO PROPER PERL REGEX:
+			$f =~ s#\*#\.\*#go;    #("*" MUST BE ".*", SO WE TREAT "\*" AS "*")!
+			$f =~ s#\x03#\\\*#go;  #UNPROTECT ESCAPED SPECIAL CHARACTERS:
+			$f =~ s#\x02#\.#go;    #(WE TREAT "." AS "\." (MATCH ".") AND "\." AS "." (WILDCARD))!
+			push @filters_rgx, $f;
+		}
 		undef @allfiles;
 
 		#WE'LL EITHER LOAD FILES FROM A USER-PROVIDED LIST -OR- FROM THE CURRENT PATH:
 		my $pathNative = $path;
 		utf8::downgrade($pathNative, 1)  if ($self->{'Configure'}{'-nonLatinFilenames'});
-		if ($self->{'Configure'}{'-FNameList'} && ref($self->{'Configure'}{'-FNameList'}))
+		if (defined($self->{'Configure'}{'-FNameList'}) && ref($self->{'Configure'}{'-FNameList'}))
 		{
 FILELOOP1:			foreach my $f (@{$self->{'Configure'}{'-FNameList'}})  #USER-PROVIDED LIST:
 			{
@@ -1514,7 +1559,7 @@ FILELOOP1:			foreach my $f (@{$self->{'Configure'}{'-FNameList'}})  #USER-PROVID
 					push @allfiles, $_;
 					next;
 				}
-				foreach my $filter (@filters)
+				foreach my $filter (@filters_rgx)
 				{
 					if (/^${filter}$/)
 					{
@@ -1539,7 +1584,7 @@ FILELOOP2:			while ($_ = readdir(DIR))
 					push @allfiles, $_;
 					next;
 				}
-				foreach my $filter (@filters)
+				foreach my $filter (@filters_rgx)
 				{
 					if (/^${filter}$/)
 					{
@@ -1736,10 +1781,10 @@ sub GetReturn
 				{
 					## Put up no create allowed dialog
 					$self->{'Configure'}{'-EDlgText'} = "You must specify an existing folder.\n($fname not found)";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-							-text => $self->{'Configure'}{'-EDlgText'},
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+							-text => \$self->{'Configure'}{'-EDlgText'},
 							-bitmap => 'error'
-					)->Show;
+					)->Show";
 
 					return;
 				}
@@ -1753,17 +1798,36 @@ sub GetReturn
 				{
 					$self->{'Configure'}{'-EDlgText'} = "Only a single file is allowed!\n" 
 							. $self->{'Configure'}{'-File'} . "\nrepresents multiple files.";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-								-text => $self->{'Configure'}{'-EDlgText'},
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+								-text => \$self->{'Configure'}{'-EDlgText'},
 								-bitmap => 'error'
-					)->Show;
+					)->Show";
 
 					return;
 				}
 				my $filenames = '';
 				my $errnames = '';
-				my @filters = split (/\|/o, $self->{'Configure'}{'-FPatFilters'});
+				my $protected = defined ($self->{'Configure'}{'-FPatFilters'})
+						? $self->{'Configure'}{'-FPatFilters'} : '';
+				my @filters = ();
+				if ($protected)
+				{
+					$protected =~ s#\\\|#\x04#g;
+					@filters = split (/\|/o, $protected);
+				}
 				@filters = ('')  unless ($#filters >= 0);
+				my @filters_rgx = ();
+				foreach my $f (@filters)
+				{
+					$f =~ s#\x04#\|#g;     #UNPROTECT AND UNESCAPE ESCAPED SEPARATOR ("\|").
+					$f =~ s#\\\.#\x02#go;  #PROTECT ESCAPED SPECIAL CHARACTERS:
+					$f =~ s#\\\*#\x03#go;
+					$f =~ s#\.#\\\.#go;    #CONVERT PATTERN TO PROPER PERL REGEX:
+					$f =~ s#\*#\.\*#go;    #("*" MUST BE ".*", SO WE TREAT "\*" AS "*")!
+					$f =~ s#\x03#\\\*#go;  #UNPROTECT ESCAPED SPECIAL CHARACTERS:
+					$f =~ s#\x02#\.#go;    #(WE TREAT "." AS "\." (MATCH ".") AND "\." AS "." (WILDCARD))!
+					push @filters_rgx, $f;
+				}
 FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSING PATHS!:
 				{
 					$f =~ s#\\#\/#go;
@@ -1785,7 +1849,7 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 							$filenames .= $f . ',';
 							next;
 						}
-						foreach my $filter (@filters)
+						foreach my $filter (@filters_rgx)
 						{
 							if ($f =~ /^${filter}$/)
 							{
@@ -1820,9 +1884,9 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 							if ($self->{'Configure'}{'-SelectMode'} =~ /(?:multiple|extended)/i);
 					$self->{'Configure'}{'-EDlgText'} = "You must specify ${errdesc}.\n"
 							. "($errnames)";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-							-text => $self->{'Configure'}{'-EDlgText'},
-							-bitmap => 'error')->Show;
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+							-text => \$self->{'Configure'}{'-EDlgText'},
+							-bitmap => 'error')->Show";
 
 					return;
 				}
@@ -1837,10 +1901,10 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 			{
 				## Put up no create allowed dialog
 				$self->{'Configure'}{'-EDlgText'} = "You must specify an existing folder.\n($fname not found)";
-				$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-						-text => $self->{'Configure'}{'-EDlgText'},
+				eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+						-text => \$self->{'Configure'}{'-EDlgText'},
 						-bitmap => 'error'
-				)->Show;
+				)->Show";
 
 				$fname =~ s/ file(\W*)$/ directory$1/i;
 				return;
@@ -1880,10 +1944,10 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 				{
 					## Put up no create allowed dialog
 					$self->{'Configure'}{'-EDlgText'} = "You must specify an existing directory.\n($fname not found)";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-							-text => $self->{'Configure'}{'-EDlgText'},
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+							-text => \$self->{'Configure'}{'-EDlgText'},
 							-bitmap => 'error'
-					)->Show;
+					)->Show";
 
 					return;
 				}
@@ -1895,10 +1959,10 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 				{
 					$self->{'Configure'}{'-EDlgText'} = "Only a single file is allowed!\n" 
 							. $self->{'Configure'}{'-File'} . "\nrepresents multiple files.";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-								-text => $self->{'Configure'}{'-EDlgText'},
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+								-text => \$self->{'Configure'}{'-EDlgText'},
 								-bitmap => 'error'
-					)->Show;
+					)->Show";
 
 					return;
 				}
@@ -1913,9 +1977,27 @@ FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 				my @filelist = split (/\,/, $fname);
 				my $filenames = '';
 				my $errnames = '';
-				my @filters = defined ($self->{'Configure'}{'-FPatFilters'})
-						? split (/\|/o, $self->{'Configure'}{'-FPatFilters'}) : ();
+				my $protected = defined ($self->{'Configure'}{'-FPatFilters'})
+						? $self->{'Configure'}{'-FPatFilters'} : '';
+				my @filters = ();
+				if ($protected)
+				{
+					$protected =~ s#\\\|#\x04#g;
+					@filters = split (/\|/o, $protected);
+				}
 				@filters = ('')  unless ($#filters >= 0);
+				my @filters_rgx = ();
+				foreach my $f (@filters)
+				{
+					$f =~ s#\x04#\|#g;     #UNPROTECT AND UNESCAPE ESCAPED SEPARATOR ("\|").
+					$f =~ s#\\\.#\x02#go;  #PROTECT ESCAPED SPECIAL CHARACTERS:
+					$f =~ s#\\\*#\x03#go;
+					$f =~ s#\.#\\\.#go;    #CONVERT PATTERN TO PROPER PERL REGEX:
+					$f =~ s#\*#\.\*#go;    #("*" MUST BE ".*", SO WE TREAT "\*" AS "*")!
+					$f =~ s#\x03#\\\*#go;  #UNPROTECT ESCAPED SPECIAL CHARACTERS:
+					$f =~ s#\x02#\.#go;    #(WE TREAT "." AS "\." (MATCH ".") AND "\." AS "." (WILDCARD))!
+					push @filters_rgx, $f;
+				}
 FILELOOP4:				foreach my $f (@filelist)
 				{
 #					if ($self->{'Configure'}{'-Create'} > 0 || -f $f)   #SEPARATE THE SHEEP FROM THE GOATS:
@@ -1926,7 +2008,7 @@ FILELOOP4:				foreach my $f (@filelist)
 							$filenames .= $f . ',';
 							next;
 						}
-						foreach my $filter (@filters)
+						foreach my $filter (@filters_rgx)
 						{
 							if ($f =~ /^${filter}$/)
 							{
@@ -1959,9 +2041,9 @@ FILELOOP4:				foreach my $f (@filelist)
 							if ($self->{'Configure'}{'-SelectMode'} =~ /(?:multiple|extended)/i);
 					$self->{'Configure'}{'-EDlgText'} = "You must specify ${errdesc}.\n"
 							. "($errnames)";
-					$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-							-text => $self->{'Configure'}{'-EDlgText'},
-							-bitmap => 'error')->Show;
+					eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+							-text => \$self->{'Configure'}{'-EDlgText'},
+							-bitmap => 'error')->Show";
 
 					return;
 				}
@@ -1975,10 +2057,10 @@ FILELOOP4:				foreach my $f (@filelist)
 			{
 				## Put up no create allowed dialog
 				$self->{'Configure'}{'-EDlgText'} = "You must specify an existing directory.\n($fname not found)";
-				$self->Dialog(-title => $self->{'Configure'}{'-EDlgTitle'},
-						-text => $self->{'Configure'}{'-EDlgText'},
+				eval "\$self->${dialog_widget}(-title => \$self->{'Configure'}{'-EDlgTitle'},
+						-text => \$self->{'Configure'}{'-EDlgText'},
 						-bitmap => 'error'
-				)->Show;
+				)->Show";
 
 				return;
 			}
@@ -2088,6 +2170,8 @@ sub SortFiles
 
 sub _fidtest   #ADDED (v2.11) TO ADDRESS BUG# 128958: FILE TESTS FAIL ON *nix FILESYSTEMS IF PERL CONVERTS STRING TO UTF8?!
 {
+	return 0  unless (defined $_[2]);
+
 	my $strNative = $_[2];
 	utf8::downgrade($strNative, 1)  if ($_[0]->{'Configure'}{'-nonLatinFilenames'});  #LINUX STILL DOEN'T HANDLE UNICODE FILENAMES?!
 	my $s = "$_[1] \$strNative";
@@ -2107,7 +2191,7 @@ widget for Perl/Tk.
 
 =head1 AUTHOR
 
-(c) 1996-2019, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
+(c) 1996-2023, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -2115,7 +2199,7 @@ This is a derived work from Tk::FileDialog, Tk::Listbox and Tk::HList.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 1996-2019 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
+Copyright (c) 1996-2023 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
 All rights reserved.  
 
 Tk::JFileDialog is free software; you can redistribute it and/or
@@ -2163,11 +2247,11 @@ required.
 		-Create => 0
 	);
 
-	$LoadDialog->configure(-FPat => '*pl',
+	$LoadDialog->configure(-FPat => '*.pl',
 		-ShowAll => 0
 	);
 
-	$main->Entry(-textvariable => \$fname)
+	$main->Entry(-textvariable => \$fname, -width => 30)
 		->pack(-expand => 1,
 		-fill => 'x'
 	)->pack;
@@ -2176,7 +2260,7 @@ required.
 		-command => sub {
 			$fname = $LoadDialog->Show(-Horiz => $Horiz);
 			if (!defined($fname)) {
-				$fname = "Fine,Cancel, but no ShowDirList anymore!!!";
+				$fname = "Fine,Cancel, but no Dir. List anymore!!!";
 				$LoadDialog->configure(-ShowDirList => 0);
 			}
 		}
@@ -2196,7 +2280,7 @@ required.
 
 	MainLoop;
 
-	print "Exit Stage right!\n";
+	print "Exiting!\n";
 
 	exit(0);
 
@@ -2207,15 +2291,16 @@ It uses and depends on the author's Tk::JBrowseEntry widget and adds
 numerous features, such as optional history and favorites files, 
 handles MS-Windows drive letters, additional key bindings, etc.
 
-To use JFileDialog, simply create your JFileDialog objects during initialization (or at
-least before a Show).  When you wish to display the JFileDialog, invoke the 'Show' method
-on the JFileDialog object;  The method will return either a file name, a path name, or
-undef.  undef is returned only if the user pressed the Cancel button.
+To use JFileDialog, simply create your JFileDialog objects during 
+initialization (or at least before a Show).  When you wish to display the 
+JFileDialog, invoke the 'Show' method on the JFileDialog object;  The method 
+will return either a file name, a path name, or undef.  undef is returned only 
+if the user pressed the Cancel button.
 
 =head1 WIDGET OPTIONS
 
-Any of the following configuration items may be set via the configure (or Show) method,
-or retrieved via the cget method:
+Any of the following configuration items may be set via the configure 
+(or Show) method, or retrieved via the cget method:
 
 =over 4
 
@@ -2226,38 +2311,44 @@ and the user specifies a non-existent file, a dialog box will be shown
 informing the user of the error (This Dialog Box is configurable via the 
 B<EDlg*> switches, described below).  If set to I<-1>, user can not create 
 a new file nor type in a name, only select from the list.  
+
 Default:  I<1> (enable user to enter a "new" (non-existant) file name).
 
 =item B<-DisableFPat>
 
-Disables the ability of the user to change the file selection pattern (the user is 
-by default allowed to change the status).  
+Disables the ability of the user to change the file selection pattern 
+(the user is by default allowed to change the status).  
+
 Default:  I<FALSE> (enable user to change the file selection pattern).
 
 =item B<-DisableShowAll>
 
 Disables the ability of the user to change the status of 
 the ShowAll flag (the user is by default allowed to change the status).  
-Default:  I<FALSE> (enable user to toggle showing of hidden files and directories).
+
+Default:  I<FALSE> (enable user to toggle showing of hidden files 
+and directories).
 
 =item B<-File>
 
 The default file name.  If specified and the file exists 
-in the currently-selected path, it will be highlighted and selected; and pressing 
-the [Reset] button will reset the selected file to be this one.  
-Default:  none (no default file name is initially shown).
+in the currently-selected path, it will be highlighted and selected; and 
+pressing the [Reset] button will reset the selected file to be this one.  
+
+Default:  I<none> (no default file name is initially shown).
 
 =item B<-FNameList>
 
 Optional reference to a list of specific file names to be displayed in the file 
 list.  User can be forced to select a file from this specific list by further 
 constraints such as B<-DisableFPat> => 1, B<-Create> => -1, B<-SelDir> => -1, 
-and B<-DisableShowAll> => 1.  The list can contain any combination of file names 
-(ie. I<"file.ext">, absolute paths, ie. I<"/home/user/file.ext">, or relative paths, 
-ie. I<"user/file.ext"> or I"<c:file.ext>.  The files will be compared against the 
-current path and, if matching (and existing, if B<-Create> < 1), will be shown in 
-the drop-down list.  
-Default:  none (show all files otherwise matching any other filters 
+and B<-DisableShowAll> => 1.  The list can contain any combination of file 
+names (ie. I<"file.ext">, absolute paths, ie. I<"/home/user/file.ext">, or 
+relative paths, ie. I<"user/file.ext"> or I"<c:file.ext>.  The files will be 
+compared against the current path and, if matching (and existing, 
+if B<-Create> < 1), will be shown in the drop-down list.  
+
+Default:  I<none> (show all files otherwise matching any other filters 
 found in the current path.  
 
 NOTE:  File-names are case-sensitive and paths should be forward 
@@ -2266,39 +2357,52 @@ slashes ("/"), even on M$-Windows.
 =item B<-FPat>
 
 Sets the default file selection pattern.  Only files matching this pattern will 
-be displayed in the File List Box.  It can also be multiple extensions separated by 
-the pipe symbol ("|"), ie. "*.jpg|*.gif|*.png".  
+be displayed in the File List Box.  It can also be multiple extensions 
+separated by the pipe symbol ("|"), ie. "*.jpg|*.gif|*.png".  
+
+NOTE:  The "pattern" is a psuedo-regex that gets converted into a Perl regex, 
+but "*" is converted into ".*", "." is converted into "\." (match literal 
+I<dot>, "\." is converted to ".", and "|" used in a pattern must be escaped 
+("\|") as "|" is the separator character in pattern lists!
+
 Default:  I<''> (*).
 
 =item B<-FPatList>
 
-Specifies a reference to a list of valid file extensions composing the drop-down 
-list for the "Filter" field for selecting a file selection pattern.  Default is 
-empty.  Example:  B<-FPatList> => ['*.jpg|*.gif|*.png', '*.pl|*.pm', '*.exe'].  
-NOTE:  If B<-Fpat> is also specified, but is NOT in the B<-FPatList> list, it will 
-automatically be appended to the top of the list.
+Specifies a reference to a list of valid file extensions composing the 
+drop-down list for the "Filter" field for selecting a file selection pattern.  
+
+Default:  I<empty ('')>.  
+
+Example:  B<-FPatList> => ['*.jpg|*.gif|*.png', '*.pl|*.pm', '*.exe'].  
+NOTE:  If B<-Fpat> is also specified, but is NOT in the B<-FPatList> list, it 
+will automatically be appended to the top of the list.
 
 =item B<-FPatOnly>
 
-Compares all files selected or typed in against the file selection pattern, if set 
-to 1.  This, combined with B<-FPat> and / or B<-FPatList> can force a user to enter 
-files with the proper extension.
+Compares all files selected or typed in against the file selection pattern, 
+if set to 1.  This, combined with B<-FPat> and / or B<-FPatList> can force a 
+user to enter files with the proper extension.
 
 =item B<-Geometry>
 
-Sets the geometry of the File Dialog. Setting the size is a dangerous thing to do.
-If not configured, or set to '', the File Dialog will be centered.  Default: undef 
-(window-manager sets the popup window's geometry).
+Sets the geometry of the File Dialog. Setting the size is a dangerous thing 
+to do.  If not configured, or set to '', the File Dialog will be centered.  
+
+Default:  I<undef> (window-manager sets the popup window's geometry).
 
 =item B<-Grab>
 
-Enables the File Dialog to do an application Grab when displayed.  Default: 1 
-(file dialog will grab focus and be "modal").
+Enables the File Dialog to do an application Grab when displayed.  
+
+Default:  I<1> (file dialog will grab focus and be "modal").
 
 =item B<-HistDeleteOk>
 
-If set, allows user to delete items from the history dropdown list and thus the 
-history file.  Default 0 (do not allow user to remove items in history).
+If set, allows user to delete items from the history dropdown list and thus 
+the history file.  
+
+Default:  I<0> (false)> (do not allow user to remove items in history).
 
 NOTE:  requires Tk::JBrowseEntry v5.0 or later to work.
 
@@ -2306,8 +2410,9 @@ NOTE:  requires Tk::JBrowseEntry v5.0 or later to work.
 
 Enables the keeping of a history of the previous files / directories selected.  
 The file specified must be writable.  If specified, a history of up to 
-"-History" number of files will be kept and will be displayed in a "JBrowseEntry" 
-combo-box permitting user selection.  
+"-History" number of files will be kept and will be displayed in a 
+"JBrowseEntry" combo-box permitting user selection.  
+
 Default:  I<undef> (no history file or drop-down).
 
 =item B<-History>
@@ -2323,35 +2428,41 @@ If set to something other than 1 or 0, a checkbox will appear to the right
 of the history dropdown labeled "Keep Path" to allow user to control this.
 If set to a string, then that will be used for the checkbox label in lieu of 
 "Keep Path".  
+
 Default:  I<undef> (not set).
 
 =item B<-HistUsePathButton>
 
-Set (check or uncheck) the "Keep Path" checkbox created if "-HistUsePath" option 
-is set, otherwise, ignored.  The state of this button can also be fetched by 
-calling the B<getHistUsePathButton()> method, which returns 1 or 0.  
-Default:  I<FALSE> (unchecked).
+Set (check or uncheck) the "Keep Path" checkbox created if "-HistUsePath" 
+option is set, otherwise, ignored.  The state of this button can also be 
+fetched by calling the B<getHistUsePathButton()> method, which returns 1 or 0. 
+
+Default:  I<0 (false)> (unchecked).
 
 =item B<-Horiz>
 
-I<TRUE> sets the File List box to be to the right of the Directory List Box. If 0, the
-File List box will be below the Directory List box.  
-Default:  I<TRUE> (display the listboxes side-by-side).
+I<TRUE> sets the File List box to be to the right of the Directory List Box.  
+If 0, the File List box will be below the Directory List box.  
+
+Default:  I<true> (display the listboxes side-by-side).
 
 =item B<-maxwidth>
 
-Specifies the maximum width in avg. characters the width of the text entry fields 
-are allowed to expand to.  
+Specifies the maximum width in avg. characters the width of the text entry 
+fields are allowed to expand to.  
+
 Default:  I<60> (characters).
 
 =item B<-nonLatinFilenames>
 
 B<NEW> with Version 2.11+:
 
-If set, allows for handling of non-Latin / unicode file-names that Perl doesn't, 
-by default, seem to handle properly as of 5.28.1, as it wants to convert them 
-to utf-8 internally, but then fails to find / match them with the underling 
-file-system names (they likely won't show up in the file / directory lists).  
+If set, allows for handling of non-Latin / unicode file-names that Perl 
+doesn't, by default, seem to handle properly as of 5.28.1, as it wants to 
+convert them to utf-8 internally, but then fails to find / match them with the 
+underling file-system names (they likely won't show up in the file / 
+directory lists).  
+
 Default:  I<0> (unset - only handle normal (ANSI chars < 128) characters in 
 file-names, as was the case pre-v2.11).  
 
@@ -2387,74 +2498,87 @@ Default:  I<undef> (no favorite path file or dropdown list).
 
 =item B<-QuickSelect>
 
-If set to 0, user must invoke the "OK" button to complete selection 
-from the listbox.  If 1 or 2, double-clicking or single-clicking (respectively) an 
-item in the file list automatically completes the selection.  NOTE:  If set to 2 
-(single-click) and I<-SelectMode> is "multiple" or "extended" then it will be 
-forced to 1 (double-click), since single-click will just add the file to the 
-list to be selected.  This also affects the history and favorite path dropdown 
-lists.  If 1 or 2, clicking an item from these lists invokes selection.  
+If set to 0, user must invoke the "OK" button to complete selection from 
+the listbox.  If 1 or 2, double-clicking or single-clicking (respectively) an 
+item in the file list automatically completes the selection.  
+
+NOTE:  If set to 2 (single-click) and I<-SelectMode> is "multiple" or 
+"extended" then it will be forced to 1 (double-click), since single-click will 
+just add the file to the list to be selected.  This also affects the history 
+and favorite path dropdown lists.  If 1 or 2, clicking an item from these 
+lists invokes selection.  
+
 Default:  I<1>.
 
 =item B<-SelDir>
 
-If 1 or 2, enables selection of a directory rather than a file, and disables the
-actions of the File List Box. Setting to 2 allows selection of either a file OR a 
-directory.  If -1, the directory listbox, etc. are disabled and the user is forced 
-to select file(s) from the initially-specified path.  NOTE:  This will NOT prevent 
-the user from typing an alternate path in front of the file name entered, so the 
-application must still verify the path returned and handle as desired, ie. display 
-an error dialog and force them to reenter, strip the path, etc.  
+If 1 or 2, enables selection of a directory rather than a file, and disables 
+the actions of the File List Box. Setting to 2 allows selection of either a 
+file OR a directory.  If -1, the directory listbox, etc. are disabled and the 
+user is forced to select file(s) from the initially-specified path.  
+
+NOTE:  This will NOT prevent the user from typing an alternate path in front 
+of the file name entered, so the application must still verify the path 
+returned and handle as desired, ie. display an error dialog and force them to 
+reenter, strip the path, etc.  
+
 Default:  I<0> (only file(s) may be selected).
 
 =item B<-SelectMode>
  
-Sets the selectmode of the File Dialog.  If not configured it will be defaulted
-to 'browse' (single).  If set to 'multiple' or 'extended', then the user may select 
-more than one file and a comma-delimited list of all selected files is returned.  
-Otherwise, only a single file may be selected.  
+Sets the selectmode of the File Dialog.  If not configured it will be 
+defaulted to 'browse' (single).  If set to 'multiple' or 'extended', then the 
+user may select more than one file and a comma-delimited list of all selected 
+files is returned.  Otherwise, only a single file may be selected.  
+
 Default: I<'browse'> (selecting only a single file from the list allowed).
  
 =item B<-SelHook>
 
-SelHook is configured with a reference to a routine that will be called when a file
-is chosen. The file is called with a sole parameter of the full path and file name
-of the file chosen. If the Create flag is disabled (and the user is not allowed
-to specify new files), the file will be known to exist at the time that SelHook is
-called. Note that SelHook will also be called with directories if the SelDir Flag
-is enabled, and that the JFileDialog box will still be displayed. The JFileDialog box
-should B<not> be destroyed from within the SelHook routine, although it may generally
-be configured.
+SelHook is configured with a reference to a routine that will be called when 
+a fileis chosen. The function is called with a sole parameter of the full path 
+and file name of the file chosen. If the Create flag is disabled (and the user 
+is not allowedto specify new files), the file will be known to exist at the 
+time that SelHook is called. Note that SelHook will also be called with 
+directories if the SelDir Flag is enabled, and that the JFileDialog box will 
+still be displayed.  The JFileDialog box should B<not> be destroyed from within 
+the SelHook routine, although it may generally be configured.
 
-SelHook routines return 0 to reject the selection and allow the user to reselect, and
-any other value to accept the selection. If a SelHook routine returns non-zero, the
-JFileDialog will immediately be withdrawn, and the file will be returned to the caller.
+SelHook routines return 0 to reject the selection and allow the user to 
+reselect, and any other value to accept the selection. If a SelHook routine 
+returns non-zero, the JFileDialog will immediately be withdrawn, and the file 
+will be returned to the caller.
 
-There may be only one SelHook routine active at any time. Configuring the SelHook
-routine replaces any existing SelHook routine. Configuring the SelHook routine with
-0 removes the SelHook routine.  
+There may be only one SelHook routine active at any time. Configuring the 
+SelHook routine replaces any existing SelHook routine. Configuring the SelHook 
+routine with 0 removes the SelHook routine.  
+
 Default:  I<undef> (no callback function).
 
 =item B<-ShowAll>
 
-Determines whether hidden files and directories (.* and those with the M$-Windows "hidden" 
-attribute set, on Windows) are displayed in the File and Directory Listboxes.  
-The Show All Checkbox reflects the setting of this switch.  
+Determines whether hidden files and directories (.* and those with the 
+M$-Windows "hidden" attribute set, on Windows) are displayed in the File and 
+Directory Listboxes.  The Show All Checkbox reflects the setting of 
+this switch.  
+
 Default:  I<0> (do not show hidden files or directories).
 
 =item B<-ShowDirList>
 
 Enable the user to change directories.  If disabled, the directory
-list box will not be shown.  Generally, I<-SelDir> should also be set to -1, otherwise, 
-user can still change directories by typing them in.  
-Default:  I<TRUE> (enable).
+list box will not be shown.  Generally, I<-SelDir> should also be set to -1, 
+otherwise, user can still change directories by typing them in.  
+
+Default:  I<true> (enable).
 
 =item B<-ShowFileList>
 
 Enable the user to select file(s) from a list.  If disabled, the file 
-list box will not be shown.  Generally, I<-SelDir> should also be set to 1, otherwise, 
-user can still select files by typing them in.  
-Default:  I<TRUE> (enable).
+list box will not be shown.  Generally, I<-SelDir> should also be set to 1, 
+otherwise, user can still select files by typing them in.  
+
+Default:  I<true> (enable).
 
 =item B<-Title>
 
@@ -2465,79 +2589,93 @@ Default:  I<'Select File:'>.
 
 =head2 B<Labels and Captions>
 
-For support of internationalization, the text on any of the subwidgets may be
-changed.
+For support of internationalization, the text on any of the subwidgets may 
+be changed.
 
 =over 4
 
 =item B<-CancelButtonLabel>
 
 The text for the Cancel button.  
+
 Default: I<'Cancel'>.
 
 =item B<-CdoutButtonLabel>
 
 The text for the JFM4 Filemanager "Current" Directory button. 
+
 Default: I<'C~dout'>.
 
 =item B<-CWDButtonLabel>
 
 The text for the Cdout Directory button.  
+
 Default: I<'C~WD'>.
 
 =item B<-DirLBCaption>
 
 The Caption above the Directory List Box.  
+
 Default: I<'Folders:'> on Windows sytems, I<'Directories:'> on all others.
 
 =item B<-FileEntryLabel>
 
 The label to the left of the File Entry.  
+
 Default: I<'File:'>.
 
 =item B<-FltEntryLabel>
 
 The label to the left of the Filter entry.  
+
 Default:  I<'Filter:'>.
 
 =item B<-FileLBCaption>
 
 The Caption above the File List Box.  
+
 Default:  I<'Files'>.
 
 =item B<-HomeButtonLabel>
 
 The text for the Home directory button.  
+
 Default:  I<'Home'>.
 
 =item B<-OKButtonLabel>
 
 The text for the OK button.  
+
 Default:  I<'Ok'>.
 
 =item B<-PathEntryLabel>
 
 The label to the left of the Path Entry.  
+
 Default:  I<'Path:'>.
 
 =item B<-RescanButtonLabel>
 
 The text for the Rescan button.  
+
 Default:  I<'Refresh'>.
 
 =item B<-ResetButtonLabel>
 
 The text for the Reset button.  
+
 Default:  I<'Re~set'>.
 
 =item B<-ShowAllLabel>
 
 The text of the Show All Checkbutton.  
+
 Default:  I<'Show All'>.
 
 =item B<-SortButton>
 
 Whether or not to display a checkbox to change file box list sort order.  
+
 Default:  I<TRUE> (show).
 
 =item B<-SortButtonLabel>
@@ -2548,9 +2686,10 @@ Default:  I<'Atime'>.
 =item B<-SortOrder>
 
 Order to display files in the file list box ('Name' or 'Date')
-Default:  I<Name>.
 If I<'Date'>, then the day and time is displayed in the box before 
 the name, (but not included when selected)
+
+Default:  I<Name>.
 
 =back
 
@@ -2567,11 +2706,13 @@ of the error. These switches allow some configuration of that dialog box.
 DEPRECIATED (now ignored)! - The message of the Error Dialog Box.  
 The variables $path, $file, and $filename
 (the full path and filename of the selected file) are available.  
-Default:  I<"You must specify an existing file.\n(\$filename not found)">.
+
+Default:  I<"You must specify an existing file.\n($filename not found)">.
 
 =item B<-EDlgTitle>
 
 The title of the Error Dialog Box.  
+
 Default:  I<'Incorrect entry or selection!'>.
 
 =back
@@ -2584,7 +2725,7 @@ The following non-standard methods may be used with a JFileDialog object
 
 =item B<Show()>
 
-Displays the file dialog box for the user to operate.  Additional configuration
+Displays the file dialog box for the user to operate.  Additional configuration 
 items may be passed in at Show-time In other words, this code snippet:
 Returns nothing.
 
@@ -2598,29 +2739,34 @@ is the same as this code snippet:
 
 =item B<getHistUsePathButton()>
 
-Fetches the value of the "Keep Path" checkbox created by setting the B<-HistUsePath> 
-option.  The checkbox can be set initially by the B<-HistUsePathButton>.  The purpose of 
-this allows an application to "remember" the user's last choice for this checkbox the next 
-time he invokes the JFileDialog widget by fetching it's status via this function after 
-the JFileDialog widget is closed when the user last selected a file, etc., then using that 
-variable as the I<HistUsePathButton> argument when JFileDialog is opened again within the 
-application.  
+Fetches the value of the "Keep Path" checkbox created by setting the 
+B<-HistUsePath> option.  The checkbox can be set initially by the 
+B<-HistUsePathButton>.  The purpose of this allows an application to 
+"remember" the user's last choice for this checkbox the next time he invokes 
+the JFileDialog widget by fetching it's status via this function after the 
+JFileDialog widget is closed when the user last selected a file, etc., then 
+using that variable as the I<HistUsePathButton> argument when JFileDialog is 
+opened again within the application.
+
 Returns integer (1 or 0).
 
 =item B<getLastPath()>
 
-Fetches the current path as it was when the JFileDialog wiget last closed.  The purpose of 
-this allows an application to "remember" the path the previous user selected from the next 
-time he invokes the JFileDialog widget by fetching it's status via this function after 
-the JFileDialog widget is closed when the user last selected a file, etc., then using that 
-variable as the I<-Path> argument when JFileDialog is opened again within the application.  
-Returns I<string> (last path user selected, if known, otherwise the path specified by 
-B<-Path>, if specified, or the current working directory).
+Fetches the current path as it was when the JFileDialog wiget last closed.  
+The purpose of this allows an application to "remember" the path the previous 
+user selected from the next time he invokes the JFileDialog widget by fetching 
+it's status via this function after the JFileDialog widget is closed when the 
+user last selected a file, etc., then using that variable as the I<-Path> 
+argument when JFileDialog is opened again within the application.  
+
+Returns I<string> (last path user selected, if known, otherwise the path 
+specified by B<-Path>, if specified, or the current working directory).
 
 =back
 
 =head1 DEPENDS
 
-Cwd, L<File::Glob>, L<Tk>, L<Tk::Dialog> L<Tk::JBrowseEntry>
+Cwd, L<File::Glob>, L<Tk>, L<Tk::Dialog> (or L<Tk::JDialog> if installed), 
+L<Tk::JBrowseEntry>
 
 =cut

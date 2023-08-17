@@ -3,6 +3,7 @@ package Firefox::Marionette;
 use warnings;
 use strict;
 use Firefox::Marionette::Response();
+use Firefox::Marionette::Bookmark();
 use Firefox::Marionette::Element();
 use Firefox::Marionette::Cache();
 use Firefox::Marionette::Cookie();
@@ -24,6 +25,7 @@ use Firefox::Marionette::ShadowRoot();
 use Waterfox::Marionette::Profile();
 use Compress::Zlib();
 use Config::INI::Reader();
+use Crypt::URandom();
 use Archive::Zip();
 use Symbol();
 use JSON();
@@ -64,7 +66,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.38';
+our $VERSION = '1.43';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -77,6 +79,8 @@ sub _MAX_DISPLAY_LENGTH             { return 10 }
 sub _NUMBER_OF_TERM_ATTEMPTS        { return 4 }
 sub _MAX_VERSION_FOR_ANCIENT_CMDS   { return 31 }
 sub _MAX_VERSION_FOR_NEW_CMDS       { return 61 }
+sub _MAX_VERSION_NO_POINTER_ORIGIN  { return 116 }
+sub _MIN_VERSION_FOR_AWAIT          { return 50 }
 sub _MIN_VERSION_FOR_NEW_SENDKEYS   { return 55 }
 sub _MIN_VERSION_FOR_HEADLESS       { return 55 }
 sub _MIN_VERSION_FOR_WD_HEADLESS    { return 56 }
@@ -113,6 +117,7 @@ sub _MIN_VERSION_FOR_MODERN_SWITCH  { return 90 }
 sub _ACTIVE_UPDATE_XML_FILE_NAME    { return 'active-update.xml' }
 sub _NUMBER_OF_CHARS_IN_TEMPLATE    { return 11 }
 sub _DEFAULT_ADB_PORT               { return 5555 }
+sub _SHORT_GUID_BYTES               { return 9 }
 
 # sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
@@ -209,7 +214,7 @@ switch (branch.getPrefType(arguments[0])) {
 }
 return result;
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     my ( $result, $type ) = @{
         $self->script(
             $self->_compress_script(
@@ -218,7 +223,7 @@ _JS_
             args => [$name]
         )
     };
-    $self->content();
+    $self->_context($old);
     if ($type) {
         if ( $type eq 'integer' ) {
             $result += 0;
@@ -248,12 +253,12 @@ switch (branch.getPrefType(arguments[0])) {
     }
 }
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     $self->script(
         $self->_compress_script( $self->_prefs_interface_preamble() . $script ),
         args => [ $name, $value ]
     );
-    $self->content();
+    $self->_context($old);
     return $self;
 }
 
@@ -333,12 +338,12 @@ sub clear_pref {
     my $script = <<'_JS_';
 branch.clearUserPref(arguments[0]);
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     $self->script(
         $self->_compress_script( $self->_prefs_interface_preamble() . $script ),
         args => [$name]
     );
-    $self->content();
+    $self->_context($old);
     return $self;
 }
 
@@ -794,6 +799,9 @@ sub _init {
         else {
             $parameters{user} ||= getpwuid $EFFECTIVE_USER_ID;
         }
+        if ( $parameters{host} =~ s/:(\d+)$//smx ) {
+            $parameters{port} = $1;
+        }
         $parameters{port} ||= scalar getservbyname 'ssh', 'tcp';
         $self->_setup_ssh(
             $parameters{host}, $parameters{port},
@@ -1107,13 +1115,13 @@ if (('hasPassword' in token) && (!token.hasPassword)) {
   return true;
 }
 _JS_
-    $self->chrome();
+    my $old    = $self->_context('chrome');
     my $result = $self->script(
         $self->_compress_script(
             $self->_pk11_tokendb_interface_preamble() . $script
         )
     );
-    $self->content();
+    $self->_context($old);
     return $result;
 }
 
@@ -1122,13 +1130,13 @@ sub pwd_mgr_logout {
     my $script = <<'_JS_';
 token.logoutAndDropAuthenticatedResources();
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     $self->script(
         $self->_compress_script(
             $self->_pk11_tokendb_interface_preamble() . $script
         )
     );
-    $self->content();
+    $self->_context($old);
     return $self;
 }
 
@@ -1145,14 +1153,14 @@ if (token.needsUserInit) {
   token.changePassword("",arguments[0]);
 }
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     $self->script(
         $self->_compress_script(
             $self->_pk11_tokendb_interface_preamble() . $script
         ),
         args => [$password]
     );
-    $self->content();
+    $self->_context($old);
     return $self;
 }
 
@@ -1169,7 +1177,7 @@ if (token.checkPassword(arguments[0])) {
   return false;
 }
 _JS_
-    $self->chrome();
+    my $old = $self->_context('chrome');
     if (
         $self->script(
             $self->_compress_script(
@@ -1179,11 +1187,515 @@ _JS_
         )
       )
     {
-        $self->content();
+        $self->_context($old);
     }
     else {
-        $self->content();
+        $self->_context($old);
         Firefox::Marionette::Exception->throw('Incorrect Primary Password');
+    }
+    return $self;
+}
+
+sub _bookmark_interface_preamble {
+    my ($self) = @_;
+
+    # toolkit/components/places/nsITaggingService.idl
+    # netwerk/base/NetUtil.sys.mjs
+    # toolkit/components/places/PlacesUtils.sys.mjs
+    return <<'_JS_';    # toolkit/components/places/Bookmarks.sys.mjs
+let bookmarks = ChromeUtils.import("resource://gre/modules/Bookmarks.jsm");
+let placesUtils = ChromeUtils.import("resource://gre/modules/PlacesUtils.jsm");
+let netUtil = ChromeUtils.import("resource://gre/modules/NetUtil.jsm");
+let taggingSvc = Components.classes["@mozilla.org/browser/tagging-service;1"].getService(Components.interfaces.nsITaggingService);
+_JS_
+}
+
+sub _get_bookmark_mapping {
+    my ($self) = @_;
+    my %mapping = (
+        url           => 'url',
+        guid          => 'guid',
+        parent_guid   => 'parentGuid',
+        index         => 'index',
+        guid_prefix   => 'guidPrefix',
+        icon_url      => 'iconUri',
+        icon          => 'icon',
+        tags          => 'tags',
+        type          => 'typeCode',
+        date_added    => 'dateAdded',
+        last_modified => 'lastModified',
+    );
+    return %mapping;
+}
+
+sub _map_bookmark_parameter {
+    my ( $self, $parameter ) = @_;
+    if ( ref $parameter ) {
+        my %mapping = $self->_get_bookmark_mapping();
+
+        foreach my $key ( sort { $a cmp $b } keys %mapping ) {
+            if ( exists $parameter->{$key} ) {
+                $parameter->{ $mapping{$key} } = delete $parameter->{$key};
+                if (   ( $key eq 'icon_url' )
+                    || ( $key eq 'icon' )
+                    || ( $key eq 'url' ) )
+                {
+                    $parameter->{ $mapping{$key} } =
+                      ref $parameter->{$key}
+                      ? $parameter->{$key}->as_string()
+                      : $parameter->{$key};
+                }
+            }
+        }
+    }
+    return $parameter;
+}
+
+sub _get_bookmark {
+    my ( $self, $parameter ) = @_;
+    $parameter = $self->_map_bookmark_parameter($parameter);
+    my $old    = $self->_context('chrome');
+    my $result = $self->script(
+        $self->_compress_script(
+            $self->_bookmark_interface_preamble()
+              . <<'_JS_'), args => [$parameter] );
+return (async function(guidOrInfo) {
+  let bookmark = await bookmarks.Bookmarks.fetch(guidOrInfo);
+  if (bookmark) {
+    for(let name of [ "dateAdded", "lastModified" ]) {
+      bookmark[name] = Math.floor(bookmark[name] / 1000);
+    }
+  }
+  if ((bookmark) && ("url" in bookmark)) {
+    let keyword = await placesUtils.PlacesUtils.keywords.fetch({ "url": bookmark["url"] });
+    if (keyword) {
+      bookmark["keyword"] = keyword["keyword"];
+    }
+    let url = netUtil.NetUtil.newURI(bookmark["url"]);
+    bookmark["tags"] = await placesUtils.PlacesUtils.tagging.getTagsForURI(url);
+
+    let addFavicon = function(pageUrl) {
+      return new Promise((resolve, reject) => {
+        PlacesUtils.favicons.getFaviconDataForPage(
+          pageUrl,
+          function (pageUrl, dataLen, data, mimeType, size) {
+            resolve([ pageUrl, dataLen, data, mimeType, size ]);
+          }
+        );
+      })};
+    let awaitResult = await addFavicon(placesUtils.PlacesUtils.toURI(bookmark["url"]));
+    if (awaitResult[0]) {
+      bookmark["iconUrl"] = awaitResult[0].spec;
+    }
+    let iconAscii = btoa(String.fromCharCode(...new Uint8Array(awaitResult[2])));
+    if (iconAscii) {
+      bookmark["icon"] = "data:" + awaitResult[3] + ";base64," + iconAscii;
+    }
+  }
+  return bookmark;
+})(arguments[0]);
+_JS_
+    $self->_context($old);
+    my $bookmark;
+    if ( defined $result ) {
+        $bookmark = Firefox::Marionette::Bookmark->new( %{$result} );
+    }
+    return $bookmark;
+}
+
+sub bookmarks {
+    my ( $self, @parameters ) = @_;
+    my $parameter;
+    if ( scalar @parameters >= 2 ) {
+        my %parameters = @parameters;
+        $parameter = \%parameters;
+    }
+    else {
+        $parameter = shift @parameters;
+    }
+    if ( !defined $parameter ) {
+        $parameter = {};
+    }
+    $parameter = $self->_map_bookmark_parameter($parameter);
+    my $old       = $self->_context('chrome');
+    my @bookmarks = map { $self->_get_bookmark( $_->{guid} ) } @{
+        $self->script(
+            $self->_compress_script(
+                $self->_bookmark_interface_preamble()
+                  . <<'_JS_'), args => [$parameter] ) };
+return bookmarks.Bookmarks.search(arguments[0]);
+_JS_
+    $self->_context($old);
+    return @bookmarks;
+}
+
+sub add_bookmark {
+    my ( $self, $bookmark ) = @_;
+    my $old = $self->_context('chrome');
+    $self->script(
+        $self->_compress_script(
+            $self->_bookmark_interface_preamble()
+              . <<'_JS_'), args => [$bookmark] );
+for(let name of [ "dateAdded", "lastModified" ]) {
+  if (arguments[0][name]) {
+    arguments[0][name] = new Date(parseInt(arguments[0][name] + "000", 10));
+  }
+}
+if (arguments[0]["tags"]) {
+  let tags = arguments[0]["tags"];
+  delete arguments[0]["tags"];
+  let url = netUtil.NetUtil.newURI(arguments[0]["url"]);
+  taggingSvc.tagURI(url, tags);
+}
+if (arguments[0]["keyword"]) {
+  let keyword = arguments[0]["keyword"];
+  delete arguments[0]["keyword"];
+  let url = arguments[0]["url"];
+  placesUtils.PlacesUtils.keywords.insert({ "url": url, "keyword": keyword });
+}
+let bookmarkStatus = (async function(bookmarkArguments) {
+  let exists = await bookmarks.Bookmarks.fetch({ "guid": bookmarkArguments["guid"] });
+  let bookmark;
+  if (exists) {
+    bookmarkArguments["index"] = exists["index"];
+    bookmark = bookmarks.Bookmarks.update(bookmarkArguments);
+  } else {
+    bookmark = bookmarks.Bookmarks.insert(bookmarkArguments);
+  }
+  let result = await bookmark;
+  if (bookmarkArguments["url"]) {
+    let iconUrl = bookmarkArguments["iconUrl"];
+    if (!iconUrl) {
+      iconUrl = 'fake-favicon-uri:' + bookmarkArguments["url"];
+    }
+    let url = netUtil.NetUtil.newURI(bookmarkArguments["url"]);
+    let rIconUrl = netUtil.NetUtil.newURI(iconUrl);
+    if (bookmarkArguments["icon"]) {
+      let icon = bookmarkArguments["icon"];
+      placesUtils.PlacesUtils.favicons.replaceFaviconDataFromDataURL(
+        rIconUrl,
+        icon,
+      );
+      let iconResult = placesUtils.PlacesUtils.favicons.setAndFetchFaviconForPage(
+          url,
+          rIconUrl,
+          false,
+          placesUtils.PlacesUtils.favicons.FAVICON_LOAD_NON_PRIVATE,
+          null,
+          Services.scriptSecurityManager.getSystemPrincipal()
+        );
+    } else {
+      let iconResult = placesUtils.PlacesUtils.favicons.setAndFetchFaviconForPage(
+        url,
+        rIconUrl,
+        true,
+        placesUtils.PlacesUtils.favicons.FAVICON_LOAD_NON_PRIVATE,
+        null,
+        Services.scriptSecurityManager.getSystemPrincipal()
+      );
+    }
+  }
+  return bookmark;
+})(arguments[0]);
+return bookmarkStatus;
+_JS_
+    $self->_context($old);
+    return $self;
+}
+
+sub delete_bookmark {
+    my ( $self, $bookmark ) = @_;
+    my $guid = $bookmark->guid();
+    my $old  = $self->_context('chrome');
+    $self->script(
+        $self->_compress_script(
+            $self->_bookmark_interface_preamble()
+              . <<'_JS_'), args => [$guid] );
+return bookmarks.Bookmarks.remove(arguments[0]);
+_JS_
+    $self->_context($old);
+    return $self;
+}
+
+sub _generate_history_guid {
+    my ($self) = @_;
+
+    # from GenerateGUID in ./toolkit/components/places/Helpers.cpp
+    my $guid = MIME::Base64::encode_base64(
+        Crypt::URandom::urandom( _SHORT_GUID_BYTES() ) );
+    $guid =~ s/\//-/smxg;
+    $guid =~ s/[+]/_/smxg;
+    chomp $guid;
+    return $guid;
+}
+
+sub import_bookmarks {
+    my ( $self, $path ) = @_;
+    my $read_handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+    binmode $read_handle;
+    my $contents;
+    my $result;
+    while ( $result =
+        $read_handle->read( my $buffer, _LOCAL_READ_BUFFER_SIZE() ) )
+    {
+        $contents .= $buffer;
+    }
+    my $default_menu_title = q[menu];
+    defined $result
+      or Firefox::Marionette::Exception->throw(
+        "Failed to read from '$path':$EXTENDED_OS_ERROR");
+    my $quoted_header_regex = quotemeta <<'_HTML_';
+<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<!-- This is an automatically generated file.
+     It will be read and overwritten.
+     DO NOT EDIT! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+_HTML_
+    $quoted_header_regex =~ s/\\\r?\n/\\s+/smxg;
+    my $title_regex  = qr/[<]TITLE[>]Bookmarks[<]\/TITLE[>]\s+/smx;
+    my $header_regex = qr/[<]H1[>]Bookmarks(?:[ ]Menu)?[<]\/H1[>]\s+/smx;
+    my $list_regex   = qr/[<]DL[>][<]p[>]\s*/smx;
+
+    if ( $contents =~ s/\A\s*$quoted_header_regex\s*//smx ) {
+        $contents =~ s/\A\s*<meta[^>]+><\/meta>\s*//smx;
+        $contents =~ s/\A$title_regex$header_regex$list_regex//smx;
+        my %mapping    = $self->_get_bookmark_mapping();
+        my $processing = 1;
+        my $index      = 0;
+        my $json       = {
+            title          => q[],
+            index          => $index++,
+            $mapping{type} => Firefox::Marionette::Bookmark::FOLDER(),
+            guid           => Firefox::Marionette::Bookmark::ROOT(),
+            children       => [],
+        };
+        my @folders;
+        push @folders, $json;
+        my $folder_name_regex = qr/(UNFILED_BOOKMARKS|PERSONAL_TOOLBAR)/smx;
+        my $folder_regex =
+            qr/\s*[<]DT[>]/smx
+          . qr/[<]H3(?:[ ]ADD_DATE="(\d+)")?(?:[ ]LAST_MODIFIED="(\d+)")?/smx
+          . qr/(?:[ ]${folder_name_regex}_FOLDER="true")?[>]/smx
+          . qr/([^<]+)\s*<\/H3>/smx;
+        my $bookmark_regex =
+            qr/\s*[<]DT[>][<]A[ ]HREF="([^"]+)"[ ]/smx
+          . qr/ADD_DATE="(\d+)"(?:[ ]LAST_MODIFIED="(\d+)")?/smx
+          . qr/(?:[ ]ICON_URI="([^"]+)")?(?:[ ]ICON="([^"]+)")?/smx
+          . qr/(?:[ ]SHORTCUTURL="([^"]+)")?(?:[ ]TAGS="([^"]+)")?[>]/smx
+          . qr/([^<]+)[<]\/A[>]\s*/smx;
+
+        while ($processing) {
+            $processing = 0;
+            if ( $contents =~ s/\A$folder_regex//smx ) {
+                my ( $add_date, $last_modified, $type_of_folder, $text ) =
+                  ( $1, $2, $3, $4 );
+                $processing = 1;
+                if ( !$type_of_folder ) {
+                    my $implied_menu_folder = {
+                        title =>
+                          Encode::decode( 'UTF-8', $default_menu_title, 1 ),
+                        index          => $index++,
+                        $mapping{type} =>
+                          Firefox::Marionette::Bookmark::FOLDER(),
+                        guid     => Firefox::Marionette::Bookmark::MENU(),
+                        children => [],
+                    };
+                    push @{ $folders[-1]->{children} }, $implied_menu_folder;
+                    push @folders,                      $implied_menu_folder;
+                }
+                my $folder_name = $text;
+                my $folder      = {
+                    title => Encode::decode( 'UTF-8', $folder_name, 1 ),
+                    index => $index++,
+                    $mapping{type} => Firefox::Marionette::Bookmark::FOLDER(),
+                    (
+                        $type_of_folder
+                        ? (
+                            $type_of_folder eq 'PERSONAL_TOOLBAR'
+                            ? ( guid =>
+                                  Firefox::Marionette::Bookmark::TOOLBAR() )
+                            : ( guid =>
+                                  Firefox::Marionette::Bookmark::UNFILED() )
+                          )
+                        : ()
+                    ),
+                    $mapping{date_added} =>
+                      $self->_fix_bookmark_date_from_html($add_date),
+                    (
+                        $last_modified
+                        ? (
+                            $mapping{last_modified} =>
+                              $self->_fix_bookmark_date_from_html(
+                                $last_modified),
+                          )
+                        : ()
+                    ),
+                    children => [],
+                };
+                push @{ $folders[-1]->{children} }, $folder;
+                push @folders,                      $folder;
+            }
+            if ( $contents =~ s/\A\s*[<]DL[>][<]p[>]\s*//smx ) {
+                $processing = 1;
+            }
+            if ( $contents =~ s/\A$bookmark_regex//smx ) {
+                my ( $link, $add_date, $last_modified, $icon_uri, $icon,
+                    $keyword, $tags, $text )
+                  = ( $1, $2, $3, $4, $5, $6, $7, $8 );
+                my $link_name = $text;
+                $processing = 1;
+                my $bookmark = {
+                    title => Encode::decode( 'UTF-8', $link_name, 1 ),
+                    uri   => $link,
+                    $mapping{icon_url} => $icon_uri,
+                    icon               => $icon,
+                    index              => $index++,
+                    $mapping{type} => Firefox::Marionette::Bookmark::BOOKMARK(),
+                    $mapping{date_added} =>
+                      $self->_fix_bookmark_date_from_html($add_date),
+                    $mapping{last_modified} =>
+                      $self->_fix_bookmark_date_from_html($last_modified),
+                    tags    => Encode::decode( 'UTF-8', $tags,    1 ),
+                    keyword => Encode::decode( 'UTF-8', $keyword, 1 ),
+                };
+                push @{ $folders[-1]->{children} }, $bookmark;
+            }
+            if ( $contents =~ s/\A\s*[<]HR[>]\s*//smx ) {
+                $processing = 1;
+                my $separator = {
+                    index          => $index++,
+                    $mapping{type} =>
+                      Firefox::Marionette::Bookmark::SEPARATOR(),
+                };
+                push @{ $folders[-1]->{children} }, $separator;
+            }
+            if ( $contents =~ s/\A\s*[<]\/DL[>](?:[<]p[>])?\s*//smx ) {
+                $processing = 1;
+                pop @folders;
+            }
+        }
+        if ($contents) {
+            Firefox::Marionette::Exception->throw(
+                'Unrecognised format for bookmark import');
+        }
+        $json = $self->_find_existing_guids($json);
+        $self->_import_bookmark_json_children( {}, $json );
+    }
+    else {
+        my $json = JSON::decode_json($contents);
+        $self->_import_bookmark_json_children( {}, $json );
+    }
+    return $self;
+}
+
+sub _fix_bookmark_date_from_html {
+    my ( $self, $date ) = @_;
+    if ($date) {
+        $date .= '000000';
+    }
+    return $date;
+}
+
+sub _assign_guid_for_existing_child {
+    my ( $self, $result, $child, %mapping ) = @_;
+    if ( $result->type() == $child->{ $mapping{type} } ) {
+        if ( $result->type() == Firefox::Marionette::Bookmark::FOLDER() ) {
+            if ( $result->title() eq $child->{title} ) {
+                $child->{guid} = $result->guid();
+            }
+        }
+        elsif ( $result->type() == Firefox::Marionette::Bookmark::BOOKMARK() ) {
+            if ( $result->url() eq $child->{uri} ) {
+                $child->{guid} = $result->guid();
+            }
+        }
+        else {    # Firefox::Marionette::Bookmark::SEPARATOR()
+            $child->{guid} = $result->guid();
+        }
+    }
+    return;
+}
+
+sub _find_existing_guids {
+    my ( $self, $json ) = @_;
+    foreach my $child ( @{ $json->{children} } ) {
+        if ( $child->{guid} ) {
+        }
+        else {
+            my $index   = 0;
+            my %mapping = $self->_get_bookmark_mapping();
+            while ( ( !$child->{guid} ) && ( defined $index ) ) {
+                my $result = $self->_get_bookmark(
+                    { parent_guid => $json->{guid}, index => $index } );
+                if ( defined $result ) {
+                    $self->_assign_guid_for_existing_child( $result, $child,
+                        %mapping );
+                    $index += 1;
+                }
+                else {
+                    $child->{guid} = $self->_generate_history_guid();
+                    $index = undef;
+                }
+            }
+        }
+        if ( $child->{children} ) {
+            $self->_find_existing_guids($child);
+        }
+    }
+    return $json;
+}
+
+sub _import_bookmark_json_children {
+    my ( $self, $grand_parent, $parent ) = @_;
+    my $date_added = $parent->{dateAdded};
+    if ( defined $date_added ) {
+        $date_added =~ s/\d{6}$//smx;
+        $date_added += 0;
+    }
+    my $last_modified = $parent->{lastModified};
+    if ( defined $last_modified ) {
+        $last_modified =~ s/\d{6}$//smx;
+        $last_modified += 0;
+    }
+    my $bookmark = Firefox::Marionette::Bookmark->new(
+        guid          => $parent->{guid},
+        parent_guid   => $grand_parent->{guid},
+        title         => $parent->{title},
+        url           => $parent->{uri},
+        date_added    => $date_added,
+        last_modified => $last_modified,
+        type          => $parent->{typeCode},
+        icon_url      => $parent->{iconUri},
+        icon          => $parent->{icon},
+        (
+            $parent->{tags}
+            ? ( tags => [ split /\s*,\s*/smx, $parent->{tags} ] )
+            : ()
+        ),
+        keyword => $parent->{keyword},
+    );
+    if (   ( $bookmark->guid() )
+        && ( !$self->_get_bookmark( $bookmark->guid() ) ) )
+    {
+        $self->add_bookmark($bookmark);
+    }
+    elsif ( $bookmark->url() ) {
+        my $found;
+        foreach
+          my $existing ( $self->bookmarks( $bookmark->url()->as_string() ) )
+        {
+            if ( $existing->url() eq $bookmark->url() ) {
+                $found = 1;
+            }
+        }
+        if ( !$found ) {
+            $self->add_bookmark($bookmark);
+        }
+    }
+    foreach my $child ( @{ $parent->{children} } ) {
+        $self->_import_bookmark_json_children( $parent, $child );
     }
     return $self;
 }
@@ -1654,33 +2166,68 @@ sub add_login {
     else {
         $login = Firefox::Marionette::Login->new(@parameters);
     }
-    my $old = $self->_context('chrome');
+    my $old        = $self->_context('chrome');
+    my $javascript = <<"_JS_";    # xpcom/ds/nsIWritablePropertyBag2.idl
+let updateMeta = function(mLoginInfo, aMetaInfo) {
+  let loginMetaInfo = Components.classes["\@mozilla.org/hash-property-bag;1"].createInstance(Components.interfaces.nsIWritablePropertyBag2);
+  if ("guid" in aMetaInfo && aMetaInfo.guid !== null) {
+     loginMetaInfo.setPropertyAsAUTF8String("guid", aMetaInfo.guid);
+  }
+  if ("creation_in_ms" in aMetaInfo && aMetaInfo.creation_in_ms !== null) {
+     loginMetaInfo.setPropertyAsUint64("timeCreated", aMetaInfo.creation_in_ms);
+  }
+  if ("last_used_in_ms" in aMetaInfo && aMetaInfo.last_used_in_ms !== null) {
+     loginMetaInfo.setPropertyAsUint64("timeLastUsed", aMetaInfo.last_used_in_ms);
+  }
+  if ("password_changed_in_ms" in aMetaInfo && aMetaInfo.password_changed_in_ms !== null) {
+    loginMetaInfo.setPropertyAsUint64("timePasswordChanged", aMetaInfo.password_changed_in_ms);
+  }
+  if ("times_used" in aMetaInfo && aMetaInfo.times_used !== null) {
+    loginMetaInfo.setPropertyAsUint64("timesUsed", aMetaInfo.times_used);
+  }
+  loginManager.modifyLogin(mLoginInfo, loginMetaInfo);
+};
+_JS_
+    if ( $self->_is_firefox_major_version_at_least( _MIN_VERSION_FOR_AWAIT() ) )
+    {
+        $javascript .= <<"_JS_";
+if (loginManager.initializationPromise) {
+  return (async function(aLoginInfo, metaInfo) {
+    await loginManager.initializationPromise;
+    if (loginManager.addLoginAsync) {
+      let rLoginInfo = await loginManager.addLoginAsync(aLoginInfo);
+      updateMeta(rLoginInfo, metaInfo);
+      return rLoginInfo;
+    } else {
+      loginManager.addLogin(loginInfo);
+      updateMeta(loginInfo, metaInfo);
+      return loginInfo;
+    }
+  })(loginInfo, arguments[0]);
+} else {
+  loginManager.addLogin(loginInfo);
+  updateMeta(loginInfo, arguments[0]);
+  return loginInfo;
+}
+_JS_
+    }
+    else {
+        $javascript .= <<"_JS_";
+loginManager.addLogin(loginInfo);
+updateMeta(loginInfo, arguments[0]);
+return loginInfo;
+_JS_
+    }
     $self->script(
         $self->_compress_script(
             $self->_login_interface_preamble()
               . $self->_define_login_info_from_blessed_user(
                 'loginInfo', $login
               )
-              . <<"_JS_"), args => [$login] ); # xpcom/ds/nsIWritablePropertyBag2.idl
-loginManager.addLogin(loginInfo);
-let loginMetaInfo = Components.classes["\@mozilla.org/hash-property-bag;1"].createInstance(Components.interfaces.nsIWritablePropertyBag2);
-if ("guid" in arguments[0] && arguments[0].guid !== null) {
-	loginMetaInfo.setPropertyAsAUTF8String("guid", arguments[0].guid);
-}
-if ("creation_in_ms" in arguments[0] && arguments[0].creation_in_ms !== null) {
-	loginMetaInfo.setPropertyAsUint64("timeCreated", arguments[0].creation_in_ms);
-}
-if ("last_used_in_ms" in arguments[0] && arguments[0].last_used_in_ms !== null) {
-	loginMetaInfo.setPropertyAsUint64("timeLastUsed", arguments[0].last_used_in_ms);
-}
-if ("password_changed_in_ms" in arguments[0] && arguments[0].password_changed_in_ms !== null) {
-	loginMetaInfo.setPropertyAsUint64("timePasswordChanged", arguments[0].password_changed_in_ms);
-}
-if ("times_used" in arguments[0] && arguments[0].times_used !== null) {
-	loginMetaInfo.setPropertyAsUint64("timesUsed", arguments[0].times_used);
-}
-loginManager.modifyLogin(loginInfo, loginMetaInfo);
-_JS_
+              . $javascript
+        ),
+        args => [$login]
+    );
     $self->_context($old);
     return $self;
 }
@@ -1994,7 +2541,7 @@ HVGA	Handheld PC	640	240	640:240	8:3	1:1	153,600
 0.2M2:1	Nokia Series 90 smartphones (7700, 7710)	640	320	2:1	2:1	1:1	204,800
 EGA	Enhanced Graphics Adapter	640	350	640:350	4:3	0.729	224,000
 0.23M9	nHD, used by Nokia 5800, Nokia 5530, Nokia X6, Nokia N97, Nokia N8[6]	640	360	16:9	16:9	1:1	230,400
-0.24M3	Teletext and Viewdata 40x25 character screens (PAL interlaced)	480	500	480:500	4:3	1.389	240,000
+0.24M3	Teletext and Viewdata 40x25 character screens (PAL interlaced)	480	500	480:500	4:3	1.399	240,000
 0.25M3	Namco System 12 arcade system board (e.g. Soulcalibur, Tekken 3, Tekken Tag Tournament) (interlaced)	512	480	512:480	4:3	5:4	245,760
 0.25M3	HGC	720	348	720:348	4:3	0.644	250,560
 0.25M3	MDA	720	350	720:350	4:3	0.648	252,000
@@ -2039,7 +2586,7 @@ SXGA-	Super XGA "Minus"	1280	960	4:3	4:3	1:1	1,228,800
 WSXGA	Wide SXGA	1440	900	8:5	8:5	1:1	1,296,000
 WXGA+	Wide XGA+	1440	900	8:5	8:5	1:1	1,296,000
 SXGA	Super XGA	1280	1024	5:4	5:4	1:1	1,310,720
-1.38M2	Apple PowerBook G4	1440	960	3:2	3:2	1:1	1,382,400
+1.39M2	Apple PowerBook G4	1440	960	3:2	3:2	1:1	1,382,400
 HD+	900p	1600	900	16:9	16:9	1:1	1,440,000
 SXGA+	Super XGA Plus, Lenovo Thinkpad X61 Tablet	1400	1050	4:3	4:3	1:1	1,470,000
 1.47M5	Similar to A4 paper format (~123 dpi for A4 size)	1440	1024	1440:1024	7:5	0.996	1,474,560
@@ -2731,7 +3278,7 @@ sub _read_certificates_from_disk {
     my ( $self, $trust ) = @_;
     my @certificates;
     if ($trust) {
-        if ( ref $trust ) {
+        if ( ref $trust eq 'ARRAY' ) {
             foreach my $path ( @{$trust} ) {
                 my $certificate = $self->_read_certificate_from_disk($path);
                 push @certificates, $certificate;
@@ -2743,6 +3290,22 @@ sub _read_certificates_from_disk {
         }
     }
     return @certificates;
+}
+
+sub _setup_shortcut_proxy {
+    my ( $self, $proxy_parameter, $capabilities ) = @_;
+    my $proxy_uri = URI::URL->new($proxy_parameter);
+    my $firefox_proxy;
+    if ( $proxy_uri->scheme() eq 'https' ) {
+        $firefox_proxy =
+          Firefox::Marionette::Proxy->new( tls => $proxy_uri->host_port() );
+    }
+    else {
+        $firefox_proxy =
+          Firefox::Marionette::Proxy->new( host => $proxy_uri->host_port() );
+    }
+    $capabilities->{proxy} = $firefox_proxy;
+    return $capabilities;
 }
 
 sub _launch_and_connect {
@@ -2759,6 +3322,13 @@ sub _launch_and_connect {
         $self->_import_profile_paths(%parameters);
         $self->_launch(@arguments);
         my $socket = $self->_setup_local_connection_to_firefox(@arguments);
+        if ( my $proxy_parameter = delete $parameters{proxy} ) {
+            $parameters{capabilities} ||=
+              Firefox::Marionette::Capabilities->new();
+            $parameters{capabilities} =
+              $self->_setup_shortcut_proxy( $proxy_parameter,
+                $parameters{capabilities} );
+        }
         ( $session_id, $capabilities ) =
           $self->_initial_socket_setup( $socket, $parameters{capabilities} );
         foreach my $certificate (@certificates) {
@@ -2766,6 +3336,9 @@ sub _launch_and_connect {
                 string => $certificate,
                 trust  => _DEFAULT_CERT_TRUST()
             );
+        }
+        if ( $parameters{bookmarks} ) {
+            $self->import_bookmarks( $parameters{bookmarks} );
         }
     }
     return ( $session_id, $capabilities );
@@ -4373,10 +4946,6 @@ sub _xvfb_exists {
     if ( !$self->_dev_fd_works() ) {
         return 0;
     }
-    eval { require Crypt::URandom; } or do {
-        Carp::carp('Unable to load Crypt::URandom');
-        return 0;
-    };
     if ( my $pid = fork ) {
         waitpid $pid, 0;
         if ( $CHILD_ERROR == 0 ) {
@@ -6389,7 +6958,8 @@ sub _ssh_client_version {
             )
           )
         {
-            if ( $line =~ /^OpenSSH(?:_for_Windows)?_(\d+[.]\d+(?:p\d+)),/smx )
+            if ( $line =~
+                /^OpenSSH(?:_for_Windows)?_(\d+[.]\d+(?:p\d+)?)[ ,]/smx )
             {
                 ( $self->{$key} ) = ($1);
             }
@@ -6909,6 +7479,14 @@ sub _new_session_parameters {
               'moz:useNonSpecCompliantPointerOrigin',
             moz_accessibility_checks => 'moz:accessibilityChecks',
         );
+        if (
+            $self->_is_firefox_major_version_at_least(
+                _MAX_VERSION_NO_POINTER_ORIGIN()
+            )
+          )
+        {
+            delete $booleans{moz_use_non_spec_compliant_pointer_origin};
+        }
         foreach my $method ( sort { $a cmp $b } keys %booleans ) {
             if ( defined $capabilities->$method() ) {
                 $actual->{ $booleans{$method} } =
@@ -7978,6 +8556,54 @@ sub clear {
     return $self;
 }
 
+sub aria_label {    # https://bugzilla.mozilla.org/show_bug.cgi?id=1585622
+    my ( $self, $element ) = @_;
+    if (
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
+        )
+      )
+    {
+        Firefox::Marionette::Exception->throw(
+'get_aria_label method requires a Firefox::Marionette::Element parameter'
+        );
+    }
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetComputedLabel'),
+            { id => $element->uuid() }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $self->_response_result_value($response);
+}
+
+sub aria_role {    # https://bugzilla.mozilla.org/show_bug.cgi?id=1585622
+    my ( $self, $element ) = @_;
+    if (
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
+        )
+      )
+    {
+        Firefox::Marionette::Exception->throw(
+'get_aria_role method requires a Firefox::Marionette::Element parameter'
+        );
+    }
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetComputedRole'),
+            { id => $element->uuid() }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $self->_response_result_value($response);
+}
+
 sub click {
     my ( $self, $element ) = @_;
     if (
@@ -8978,27 +9604,99 @@ sub find_by_partial {
     return $self->find_partial( $value, $from );
 }
 
-sub _find {
-    my ( $self, $value, $using, $from, $options ) = @_;
-    $using ||= 'xpath';
-    my $message_id = $self->_new_message_id();
-    my $parameters = { using => $using, value => $value };
+sub _determine_from {
+    my ( $self, $from ) = @_;
+    my $parameters = {};
     if ( defined $from ) {
         if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() )
         {
-            $parameters->{element} = $from->uuid();
+            if (   ( defined $from )
+                && ( ref $from eq 'Firefox::Marionette::ShadowRoot' ) )
+            {
+                $parameters->{shadowRoot} = $from->uuid();
+            }
+            else {
+                $parameters->{element} = $from->uuid();
+            }
         }
         else {
             $parameters->{ELEMENT} = $from->uuid();
         }
     }
+    return %{$parameters};
+}
+
+sub _retry_find_response {
+    my ( $self, $command, $parameters, $options ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command($command), $parameters ] );
+    return $self->_get_response( $message_id,
+        { using => $parameters->{using}, value => $parameters->{value} },
+        $options );
+}
+
+sub _get_and_retry_find_response {
+    my ( $self, $value, $using, $from, $options ) = @_;
+    my $want_array = delete $options->{want_array};
+    my $message_id = $self->_new_message_id();
+    my $parameters =
+      { using => $using, value => $value, $self->_determine_from($from) };
     my $command =
-      wantarray ? 'WebDriver:FindElements' : 'WebDriver:FindElement';
+      $want_array ? 'WebDriver:FindElements' : 'WebDriver:FindElement';
+    if ( $parameters->{shadowRoot} ) {
+        $command .= 'FromShadowRoot';
+    }
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command($command), $parameters, ] );
+    my $response;
+    eval {
+        $response = $self->_get_response( $message_id,
+            { using => $using, value => $value }, $options );
+    } or do {
+        my $quoted_using = quotemeta $using;
+        my $quoted_value = quotemeta $value;
+        my $invalid_selector_re =
+            qr/invalid[ ]selector:[ ]/smx
+          . qr/Given[ ](?:$quoted_using)[ ]expression[ ]/smx
+          . qr/["](?:$quoted_value)["][ ]is[ ]invalid:[ ]/smx;
+        my $type_error_tag_re = qr/TypeError:[ ]/smx
+          . qr/startNode[.]getElementsByTagName[ ]is[ ]not[ ]a[ ]function/smx;
+        my $not_supported_re =
+          qr/NotSupportedError:[ ]Operation[ ]is[ ]not[ ]supported/smx;
+        my $type_error_class_re = qr/TypeError:[ ]/smx
+          . qr/startNode[.]getElementsByClassName[ ]is[ ]not[ ]a[ ]function/smx;
+        if ( $EVAL_ERROR =~ /^$invalid_selector_re$type_error_tag_re/smx ) {
+            $parameters->{using} = 'css selector';
+            $response =
+              $self->_retry_find_response( $command, $parameters, $options );
+        }
+        elsif ( $EVAL_ERROR =~ /^$invalid_selector_re$not_supported_re/smx ) {
+            $parameters->{using} = 'css selector';
+            $parameters->{value} = q{[name="} . $parameters->{value} . q["];
+            $response =
+              $self->_retry_find_response( $command, $parameters, $options );
+        }
+        elsif ( $EVAL_ERROR =~ /^$invalid_selector_re$type_error_class_re/smx )
+        {
+            $parameters->{using} = 'css selector';
+            $parameters->{value} = q[.] . $parameters->{value};
+            $response =
+              $self->_retry_find_response( $command, $parameters, $options );
+        }
+        else {
+            Carp::croak($EVAL_ERROR);
+        }
+    };
+    return $response;
+}
+
+sub _find {
+    my ( $self, $value, $using, $from, $options ) = @_;
+    $using ||= 'xpath';
+    $options->{want_array} = wantarray;
     my $response =
-      $self->_get_response( $message_id, { using => $using, value => $value },
-        $options );
+      $self->_get_and_retry_find_response( $value, $using, $from, $options );
     if (wantarray) {
         if ( $response->ignored_exception() ) {
             return ();
@@ -9100,6 +9798,16 @@ sub quit {
             }
         } or do {
             warn "Caught an exception while quitting:$EVAL_ERROR\n";
+        };
+        eval {
+            if ( $self->_ssh() ) {
+                $self->_cleanup_remote_filesystem();
+                $self->_terminate_master_control_via_ssh();
+            }
+            $self->_cleanup_local_filesystem();
+            delete $self->{creation_pid};
+        } or do {
+            warn "Caught an exception while cleaning up:$EVAL_ERROR\n";
         };
         $self->_terminate_process();
     }
@@ -10382,11 +11090,6 @@ sub DESTROY {
         }
         else {
             $self->quit();
-            if ( $self->_ssh() ) {
-                $self->_cleanup_remote_filesystem();
-                $self->_terminate_master_control_via_ssh();
-            }
-            $self->_cleanup_local_filesystem();
         }
     }
     return;
@@ -10418,7 +11121,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.38
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -10460,6 +11163,20 @@ Please note that when closing the connection via the client you can end-up in a 
 =head2 active_element
 
 returns the active element of the current browsing context's document element, if the document element is non-null.
+
+=head2 add_bookmark
+
+accepts a L<bookmark|Firefox::Marionette::Bookmark> as a parameter and adds the specified bookmark to the Firefox places database.
+
+    use Firefox::Marionette();
+
+    my $bookmark = Firefox::Marionette::Bookmark->new(
+                     url   => 'https://metacpan.org',
+                     title => 'This is MetaCPAN!'
+                             );
+    my $firefox = Firefox::Marionette->new()->add_bookmark($bookmark);
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 add_certificate
 
@@ -10504,7 +11221,7 @@ accepts a hash of HTTP headers to include in every future HTTP Request.
     $firefox->add_header( 'Track-my-automated-tests' => $uuid );
     $firefox->go('https://metacpan.org/');
 
-these headers are added to any existing headers.  To clear headers, see the L<delete_header|Firefox::Marionette#delete_headers> method
+these headers are added to any existing headers.  To clear headers, see the L<delete_header|/delete_header> method
 
     use Firefox::Marionette();
 
@@ -10576,7 +11293,7 @@ accepts a host name and a hash of HTTP headers to include in every future HTTP R
     $firefox->add_site_header( 'metacpan.org', 'Track-my-automated-tests' => $uuid );
     $firefox->go('https://metacpan.org/');
 
-these headers are added to any existing headers going to the metacpan.org site, but no other site.  To clear site headers, see the L<delete_site_header|Firefox::Marionette#delete_site_headers> method
+these headers are added to any existing headers going to the metacpan.org site, but no other site.  To clear site headers, see the L<delete_site_header|/delete_site_header> method
 
 =head2 addons
 
@@ -10594,6 +11311,14 @@ This method returns true or false depending on if the Firefox process is still r
 
 returns the application type for the Marionette protocol.  Should be 'gecko'.
 
+=head2 aria_label
+
+accepts an L<element|Firefox::Marionette::Element> as the parameter.  It returns the L<ARIA label|https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label> for the L<element|Firefox::Marionette::Element>.
+
+=head2 aria_role
+
+accepts an L<element|Firefox::Marionette::Element> as the parameter.  It returns the L<ARIA role|https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles> for the L<element|Firefox::Marionette::Element>.
+
 =head2 async_script 
 
 accepts a scalar containing a javascript function that is executed in the browser.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
@@ -10602,7 +11327,7 @@ The executing javascript is subject to the L<script|Firefox::Marionette::Timeout
 
 =head2 attribute 
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content from the HTML source code, the L<property|Firefox::Marionette#property> method will return the current content.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content from the HTML source code, the L<property|/property> method will return the current content.
 
     use Firefox::Marionette();
 
@@ -10614,7 +11339,7 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 =head2 await
 
-accepts a subroutine reference as a parameter and then executes the subroutine.  If a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When the subroutine executes successfully, it will return what the subroutine returns.
+accepts a subroutine reference as a parameter and then executes the subroutine.  If a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will sleep for L<sleep_time_in_ms|/sleep_time_in_ms> milliseconds and then execute the subroutine again.  When the subroutine executes successfully, it will return what the subroutine returns.
 
     use Firefox::Marionette();
 
@@ -10636,13 +11361,48 @@ accept a boolean and return the current value of the debug setting.  This allows
 
 just returns the string 'firefox'.  Only of interest when sub-classing.
 
+=head2 bookmarks
+
+accepts either a scalar or a hash as a parameter.  The scalar may by the title of a bookmark or the L<URL|URI::URL> of the bookmark.  The hash may have the following keys;
+
+=over 4
+
+=item * title - The title of the bookmark.
+
+=item * url - The url of the bookmark.
+
+=back
+
+returns a list of all L<Firefox::Marionette::Bookmark|Firefox::Marionette::Bookmark> objects that match the supplied parameters (if any).
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+
+    foreach my $bookmark ($firefox->bookmarks(title => 'This is MetaCPAN!')) {
+      say "Bookmark found";
+    }
+
+    # OR
+
+    foreach my $bookmark ($firefox->bookmarks()) {
+      say "Bookmark found with URL " . $bookmark->url();
+    }
+
+    # OR
+
+    foreach my $bookmark ($firefox->bookmarks('https://metacpan.org')) {
+      say "Bookmark found";
+    }
+
 =head2 browser_version
 
 This method returns the current version of firefox.
 
 =head2 bye
 
-accepts a subroutine reference as a parameter and then executes the subroutine.  If the subroutine executes successfully, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will return L<itself|Firefox::Marionette> to aid in chaining methods.
+accepts a subroutine reference as a parameter and then executes the subroutine.  If the subroutine executes successfully, this method will sleep for L<sleep_time_in_ms|/sleep_time_in_ms> milliseconds and then execute the subroutine again.  When a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will return L<itself|Firefox::Marionette> to aid in chaining methods.
 
     use Firefox::Marionette();
 
@@ -10740,15 +11500,15 @@ changes the scope of subsequent commands to chrome context.  This allows things 
     $firefox->script(...); # running script in chrome context
     $firefox->content();
 
-See the L<context|Firefox::Marionette#context> method for an alternative methods for changing the context.
+See the L<context|/context> method for an alternative methods for changing the context.
 
 =head2 chrome_window_handle
 
-returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.  This method is replaced by L<window_handle|Firefox::Marionette#window_handle> and appropriate L<context|Firefox::Marionette#context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
+returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.  This method is replaced by L<window_handle|/window_handle> and appropriate L<context|/context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
 =head2 chrome_window_handles
 
-returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.  This method is replaced by L<window_handles|Firefox::Marionette#window_handles> and appropriate L<context|Firefox::Marionette#context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
+returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.  This method is replaced by L<window_handles|/window_handles> and appropriate L<context|/context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
 =head2 clear
 
@@ -10769,7 +11529,7 @@ This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 clear_pref
 
-accepts a L<preference|http://kb.mozillazine.org/About:config> name and restores it to the original value.  See the L<get_pref|Firefox::Marionette#get_pref> and L<set_pref|Firefox::Marionette#set_pref> methods to get a preference value and to set to it to a particular value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+accepts a L<preference|http://kb.mozillazine.org/About:config> name and restores it to the original value.  See the L<get_pref|/get_pref> and L<set_pref|/set_pref> methods to get a preference value and to set to it to a particular value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
     use Firefox::Marionette();
     my $firefox = Firefox::Marionette->new();
@@ -10778,7 +11538,7 @@ accepts a L<preference|http://kb.mozillazine.org/About:config> name and restores
 
 =head2 click
 
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  The L<click|Firefox::Marionette#click> method is also used to choose an option in a select dropdown.
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  The L<click|/click> method is also used to choose an option in a select dropdown.
 
     use Firefox::Marionette();
 
@@ -10792,7 +11552,7 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and sen
 
 =head2 close_current_chrome_window_handle
 
-closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|Firefox::Marionette#switch_to_window> to use another window.
+closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|/switch_to_window> to use another window.
 
 =head2 close_current_window_handle
 
@@ -10809,7 +11569,7 @@ changes the scope of subsequent commands to browsing context.  This is the defau
     $firefox->script(...); # running script in chrome context
     $firefox->content();
 
-See the L<context|Firefox::Marionette#context> method for an alternative methods for changing the context.
+See the L<context|/context> method for an alternative methods for changing the context.
 
 =head2 context
 
@@ -10826,7 +11586,7 @@ accepts a string as the first parameter, which may be either 'content' or 'chrom
     $firefox->script(...); # running script in chrome context
     $firefox->context($old_context);
 
-See the L<content|Firefox::Marionette#content> and L<chrome|Firefox::Marionette#chrome> methods for alternative methods for changing the context.
+See the L<content|/content> and L<chrome|/chrome> methods for alternative methods for changing the context.
 
 =head2 cookies
 
@@ -10856,7 +11616,24 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 =head2 current_chrome_window_handle 
 
-see L<chrome_window_handle|Firefox::Marionette#chrome_window_handle>.
+see L<chrome_window_handle|/chrome_window_handle>.
+
+=head2 delete_bookmark
+
+accepts a L<bookmark|Firefox::Marionette::Bookmark> as a parameter and deletes the bookmark from the Firefox database.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $bookmark (reverse $firefox->bookmarks()) {
+      if ($bookmark->parent_guid() ne Firefox::Marionette::Bookmark::ROOT()) {
+        $firefox->delete_bookmark($bookmark);
+      }
+    }
+    say "Bookmarks? We don't need no stinking bookmarks!";
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 delete_certificate
 
@@ -10956,7 +11733,7 @@ This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 developer
 
-returns true if the L<current version|Firefox::Marionette#browser_version> of firefox is a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> (does the minor version number end with an 'b\d+'?) version.
+returns true if the L<current version|/browser_version> of firefox is a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> (does the minor version number end with an 'b\d+'?) version.
 
 =head2 dismiss_alert
 
@@ -11010,7 +11787,7 @@ accepts a filesystem path and returns a matching filehandle.  This is trivial fo
 
 =head2 downloading
 
-returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
+returns true if any files in L<downloads|/downloads> end in C<.part>
 
     use Firefox::Marionette();
     use v5.10;
@@ -11101,7 +11878,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has|Firefox::Marionette#has> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has|/has> method.
 
 =head2 find_id
 
@@ -11121,7 +11898,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_id|Firefox::Marionette#has_id> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_id|/has_id> method.
 
 =head2 find_name
 
@@ -11140,7 +11917,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_name|Firefox::Marionette#has_name> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_name|/has_name> method.
 
 =head2 find_class
 
@@ -11159,7 +11936,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_class|Firefox::Marionette#has_class> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_class|/has_class> method.
 
 =head2 find_selector
 
@@ -11178,7 +11955,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_selector|Firefox::Marionette#has_selector> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_selector|/has_selector> method.
 
 =head2 find_tag
 
@@ -11197,7 +11974,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         # do something
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. For the same functionality that returns undef if no elements are found, see the L<has_tag|Firefox::Marionette#has_tag> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. For the same functionality that returns undef if no elements are found, see the L<has_tag|/has_tag> method.
 
 =head2 find_link
 
@@ -11216,7 +11993,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_link|Firefox::Marionette#has_link> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_link|/has_link> method.
 
 =head2 find_partial
 
@@ -11235,7 +12012,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_partial|Firefox::Marionette#has_partial> method.
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_partial|/has_partial> method.
 
 =head2 forward
 
@@ -11254,20 +12031,20 @@ Navigates the current browsing context to the given L<URI|URI> and waits for the
     my $firefox = Firefox::Marionette->new();
     $firefox->go('https://metacpan.org/'); # will only return when metacpan.org is FULLY loaded (including all images / js / css)
 
-To make the L<go|Firefox::Marionette#go> method return quicker, you need to set the L<page load strategy|Firefox::Marionette::Capabilities#page_load_strategy> L<capability|Firefox::Marionette::Capabilities> to an appropriate value, such as below;
+To make the L<go|/go> method return quicker, you need to set the L<page load strategy|Firefox::Marionette::Capabilities#page_load_strategy> L<capability|Firefox::Marionette::Capabilities> to an appropriate value, such as below;
 
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'eager' ));
     $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
-When going directly to a URL that needs to be downloaded, please see L<BUGS AND LIMITATIONS|Firefox::Marionette#DOWNLOADING-USING-GO-METHOD> for a necessary workaround.
+When going directly to a URL that needs to be downloaded, please see L<BUGS AND LIMITATIONS|/DOWNLOADING-USING-GO-METHOD> for a necessary workaround.
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 get_pref
 
-accepts a L<preference|http://kb.mozillazine.org/About:config> name.  See the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to set a preference value and to restore it to it's original value.  This method returns the current value of the preference.
+accepts a L<preference|http://kb.mozillazine.org/About:config> name.  See the L<set_pref|/set_pref> and L<clear_pref|/clear_pref> methods to set a preference value and to restore it to it's original value.  This method returns the current value of the preference.
 
     use Firefox::Marionette();
     my $firefox = Firefox::Marionette->new();
@@ -11310,7 +12087,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find|Firefox::Marionette#find> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find|/find> method.
 
 =head2 has_id
 
@@ -11326,7 +12103,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_id|Firefox::Marionette#find_id> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_id|/find_id> method.
 
 =head2 has_name
 
@@ -11341,7 +12118,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_name|Firefox::Marionette#find_name> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_name|/find_name> method.
 
 =head2 has_class
 
@@ -11356,7 +12133,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_class|Firefox::Marionette#find_class> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_class|/find_class> method.
 
 =head2 has_selector
 
@@ -11371,7 +12148,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_selector|Firefox::Marionette#find_selector> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_selector|/find_selector> method.
 
 =head2 has_tag
 
@@ -11386,7 +12163,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         # do something
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_tag|Firefox::Marionette#find_tag> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_tag|/find_tag> method.
 
 =head2 has_link
 
@@ -11401,7 +12178,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_link|Firefox::Marionette#find_link> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_link|/find_link> method.
 
 =head2 has_partial
 
@@ -11416,16 +12193,27 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_partial|Firefox::Marionette#find_partial> method.
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_partial|/find_partial> method.
 
 =head2 html
 
-returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alternative when dealing with other non-html content types such as text/plain.
+returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|/json> method for an alternative when dealing with response content types such as application/json and L<strip|/strip> for an alternative when dealing with other non-html content types such as text/plain.
 
     use Firefox::Marionette();
     use v5.10;
 
     say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
+
+=head2 import_bookmarks
+
+accepts a filesystem path to a bookmarks file and imports all the L<bookmarks|Firefox::Marionette::Bookmark> in that file.  It can deal with backups from L<Firefox|https://support.mozilla.org/en-US/kb/export-firefox-bookmarks-to-backup-or-transfer>, L<Chrome|https://support.google.com/chrome/answer/96816?hl=en> or Edge.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->import_bookmarks('/path/to/bookmarks_file.html');
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 images
 
@@ -11466,7 +12254,7 @@ accepts the following as the first parameter;
 
 =back
 
-and an optional true/false second parameter to indicate if the xpi file should be a L<temporary extension|https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/> (just for the existence of this browser instance).  Unsigned xpi files L<may only be loaded temporarily|https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for L<nightly firefox installations|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>).  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
+and an optional true/false second parameter to indicate if the xpi file should be a L<temporary extension|https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/> (just for the existence of this browser instance).  Unsigned xpi files L<may only be loaded temporarily|https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for L<nightly firefox installations|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>).  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|/uninstall> method.
 
     use Firefox::Marionette();
 
@@ -11490,7 +12278,7 @@ and an optional true/false second parameter to indicate if the xpi file should b
 
 =head2 interactive
 
-returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox::Marionette#loaded> is true
+returns true if C<document.readyState === "interactive"> or if L<loaded|/loaded> is true
 
     use Firefox::Marionette();
 
@@ -11529,7 +12317,7 @@ accepts an L<certificate|Firefox::Marionette::Certificate> as the first paramete
 
 =head2 json
 
-returns a L<JSON|JSON> object that has been parsed from the page source of the content document.  This is a convenience method that wraps the L<strip|Firefox::Marionette#strip> method.
+returns a L<JSON|JSON> object that has been parsed from the page source of the content document.  This is a convenience method that wraps the L<strip|/strip> method.
 
     use Firefox::Marionette();
     use v5.10;
@@ -11538,7 +12326,7 @@ returns a L<JSON|JSON> object that has been parsed from the page source of the c
 
 =head2 key_down
 
-accepts a parameter describing a key and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with that key being depressed.
+accepts a parameter describing a key and returns an action for use in the L<perform|/perform> method that corresponding with that key being depressed.
 
     use Firefox::Marionette();
     use Firefox::Marionette::Keys qw(:all);
@@ -11552,7 +12340,7 @@ accepts a parameter describing a key and returns an action for use in the L<perf
 
 =head2 key_up
 
-accepts a parameter describing a key and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with that key being released.
+accepts a parameter describing a key and returns an action for use in the L<perform|/perform> method that corresponding with that key being released.
 
     use Firefox::Marionette();
     use Firefox::Marionette::Keys qw(:all);
@@ -11578,6 +12366,18 @@ returns true if C<document.readyState === "complete">
     $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
     while(!$firefox->loaded()) {
         # redirecting to Test::More page
+    }
+
+=head2 logins
+
+returns a list of all L<Firefox::Marionette::Login|Firefox::Marionette::Login> objects available.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $login ($firefox->logins()) {
+       say "Found login for " . $login->host() . " and user " . $login->user();
     }
 
 =head2 logins_from_csv
@@ -11694,7 +12494,7 @@ maximises the firefox window. This method returns L<itself|Firefox::Marionette> 
 
 =head2 mime_types
 
-returns a list of MIME types that will be downloaded by firefox and made available from the L<downloads|Firefox::Marionette#downloads> method
+returns a list of MIME types that will be downloaded by firefox and made available from the L<downloads|/downloads> method
 
     use Firefox::Marionette();
     use v5.10;
@@ -11711,11 +12511,11 @@ minimises the firefox window. This method returns L<itself|Firefox::Marionette> 
 
 =head2 mouse_down
 
-accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with a mouse button being depressed.
+accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|/perform> method that corresponding with a mouse button being depressed.
 
 =head2 mouse_move
 
-accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse to and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with such a mouse movement, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.  Other parameters that may be passed are listed below;
+accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse to and returns an action for use in the L<perform|/perform> method that corresponding with such a mouse movement, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.  Other parameters that may be passed are listed below;
 
 =over 4
 
@@ -11729,7 +12529,7 @@ This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 mouse_up
 
-accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with a mouse button being released.
+accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|/perform> method that corresponding with a mouse button being released.
 
 =head2 new
  
@@ -11743,11 +12543,11 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
-=item * chatty - Firefox is extremely chatty on the network, including checking for the lastest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, L<connections to firefox.settings.services.mozilla.com will still be made|https://bugzilla.mozilla.org/show_bug.cgi?id=1598562#c13>.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
+=item * chatty - Firefox is extremely chatty on the network, including checking for the latest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, L<connections to firefox.settings.services.mozilla.com will still be made|https://bugzilla.mozilla.org/show_bug.cgi?id=1598562#c13>.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
 
-=item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.  This defaults to "0" (off).
+=item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.  This defaults to "0" (off).  See L<CONSOLE LOGGING|/CONSOLE-LOGGING> for a discussion of how to send log messages to the console.
 
-=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).  This setting may be updated by the L<debug|Firefox::Marionette#debug> method.  If this option is not a boolean (0|1), the value will be passed to the L<MOZ_LOG|https://firefox-source-docs.mozilla.org/networking/http/logging.html> option on the command line of the firefox binary to allow extra levels of debug.
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).  This setting may be updated by the L<debug|/debug> method.  If this option is not a boolean (0|1), the value will be passed to the L<MOZ_LOG|https://firefox-source-docs.mozilla.org/networking/http/logging.html> option on the command line of the firefox binary to allow extra levels of debug.
 
 =item * developer - only allow a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> to be launched. This defaults to "0" (off).
 
@@ -11757,7 +12557,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> will not be activated for this session AND this functionality will only be available for Firefox 61+.
 
-=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name (see the user parameter to change this).  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
+=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE>.  The user will default to the current user name (see the user parameter to change this).  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
 
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
@@ -11769,23 +12569,25 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * nightly - only allow a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> to be launched.  This defaults to "0" (off).
 
-=item * port - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox via the specified port.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.
+=item * port - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox via the specified port.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE>.
 
 =item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeouts#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
-=item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to make changes while firefox is running.
+=item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|/set_pref> and L<clear_pref|/clear_pref> methods to make changes while firefox is running.
 
-=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to make changes while firefox is running.
+=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|/set_pref> and L<clear_pref|/clear_pref> methods to make changes while firefox is running.
+
+=item * proxy - this is a shortcut method for setting a L<proxy|Firefox::Marionette::Proxy> using the L<capabilities|Firefox::Marionette::Capabilities> parameter above.  It accepts a proxy URL.
 
 =item * reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 
-=item * scp - force the scp protocol when transferring files to remote hosts via ssh. See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and the --scp-only option in the L<ssh-auth-cmd-marionette|ssh-auth-cmd-marionette> script in this distribution.
+=item * scp - force the scp protocol when transferring files to remote hosts via ssh. See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and the --scp-only option in the L<ssh-auth-cmd-marionette|ssh-auth-cmd-marionette> script in this distribution.
 
 =item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
 =item * seer - this option is switched off "0" by default.  When it is switched on "1", it will activate the various speculative and pre-fetch options for firefox.  NOTE: that this option only works when profile_name/profile is not specified.
 
-=item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
+=item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|/await> or L<bye|/bye> methods.  This defaults to "1" millisecond.
 
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 
@@ -11793,11 +12595,11 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
 
-=item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name.  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
+=item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE>.  The user will default to the current user name.  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
 
 =item * via - specifies a L<proxy jump box|https://man.openbsd.org/ssh_config#ProxyJump> to be used to connect to a remote host.  See the host parameter.
 
-=item * visible - should firefox be visible on the desktop.  This defaults to "0".  When moving from a X11 platform to another X11 platform, you can set visible to 'local' to enable L<X11 forwarding|https://man.openbsd.org/ssh#X>.  See L<X11 FORWARDING WITH FIREFOX|Firefox::Marionette#X11-FORWARDING-WITH-FIREFOX>.
+=item * visible - should firefox be visible on the desktop.  This defaults to "0".  When moving from a X11 platform to another X11 platform, you can set visible to 'local' to enable L<X11 forwarding|https://man.openbsd.org/ssh#X>.  See L<X11 FORWARDING WITH FIREFOX|/X11-FORWARDING-WITH-FIREFOX>.
 
 =item * waterfox - only allow a binary that looks like a L<waterfox version|https://www.waterfox.net/> to be launched.
 
@@ -11852,7 +12654,7 @@ creates a new WebDriver session.  It is expected that the caller performs the ne
 
 =head2 nightly
 
-returns true if the L<current version|Firefox::Marionette#browser_version> of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number end with an 'a1'?)
+returns true if the L<current version|/browser_version> of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number end with an 'a1'?)
 
 =head2 paper_sizes 
 
@@ -11860,7 +12662,7 @@ returns a list of all the recognised names for paper sizes, such as A4 or LEGAL.
 
 =head2 pause
 
-accepts a parameter in milliseconds and returns a corresponding action for the L<perform|Firefox::Marionette#perform> method that will cause a pause in the chain of actions given to the L<perform|Firefox::Marionette#perform> method.
+accepts a parameter in milliseconds and returns a corresponding action for the L<perform|/perform> method that will cause a pause in the chain of actions given to the L<perform|/perform> method.
 
 =head2 pdf
 
@@ -11882,7 +12684,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * scale - Scale of the webpage rendering.  Defaults to 1.
 
-=item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<paper_sizes|Firefox::Marionette#paper_sizes> method for a list of accepted page size names. 
+=item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<paper_sizes|/paper_sizes> method for a list of accepted page size names. 
 
 =item * shrink_to_fit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
 
@@ -11923,7 +12725,7 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and re
 
 =head2 perform
 
-accepts a list of actions (see L<mouse_up|Firefox::Marionette#mouse_up>, L<mouse_down|Firefox::Marionette#mouse_down>, L<mouse_move|Firefox::Marionette#mouse_move>, L<pause|Firefox::Marionette#pause>, L<key_down|Firefox::Marionette#key_down> and L<key_up|Firefox::Marionette#key_up>) and performs these actions in sequence.  This allows fine control over interactions, including sending right clicks to the browser and sending Control, Alt and other special keys.  The L<release|Firefox::Marionette#release> method will complete outstanding actions (such as L<mouse_up|Firefox::Marionette#mouse_up> or L<key_up|Firefox::Marionette#key_up> actions).
+accepts a list of actions (see L<mouse_up|/mouse_up>, L<mouse_down|/mouse_down>, L<mouse_move|/mouse_move>, L<pause|/pause>, L<key_down|/key_down> and L<key_up|/key_up>) and performs these actions in sequence.  This allows fine control over interactions, including sending right clicks to the browser and sending Control, Alt and other special keys.  The L<release|/release> method will complete outstanding actions (such as L<mouse_up|/mouse_up> or L<key_up|/key_up> actions).
 
     use Firefox::Marionette();
     use Firefox::Marionette::Keys qw(:all);
@@ -11947,7 +12749,7 @@ accepts a list of actions (see L<mouse_up|Firefox::Marionette#mouse_up>, L<mouse
 			          $firefox->mouse_up(RIGHT_BUTTON()),
 		);
 
-See the L<release|Firefox::Marionette#release> method for an alternative for manually specifying all the L<mouse_up|Firefox::Marionette#mouse_up> and L<key_up|Firefox::Marionette#key_up> methods
+See the L<release|/release> method for an alternative for manually specifying all the L<mouse_up|/mouse_up> and L<key_up|/key_up> methods
 
 =head2 profile_directory
 
@@ -11955,7 +12757,7 @@ returns the profile directory used by the current instance of firefox.  This is 
 
 =head2 property
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content from the HTML source code.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|/attribute> method will return the initial content from the HTML source code.
 
     use Firefox::Marionette();
 
@@ -12049,7 +12851,7 @@ refreshes the current page.  The browser will wait for the page to completely re
 
 =head2 release
 
-completes any outstanding actions issued by the L<perform|Firefox::Marionette#perform> method.
+completes any outstanding actions issued by the L<perform|/perform> method.
 
     use Firefox::Marionette();
     use Firefox::Marionette::Keys qw(:all);
@@ -12111,7 +12913,7 @@ This method returns L<itself|Firefox::Marionette> to aid in chaining methods if 
 
 =head2 restart
 
-restarts the browser.  After the restart, L<capabilities|Firefox::Marionette::Capabilities> should be restored.  The same profile settings should be applied, but the current state of the browser (such as the L<uri|Firefox::Marionette#uri> will be reset (like after a normal browser restart).  This method is primarily intended for use by the L<update|Firefox::Marionette#update> method.  Not sure if this is useful by itself.
+restarts the browser.  After the restart, L<capabilities|Firefox::Marionette::Capabilities> should be restored.  The same profile settings should be applied, but the current state of the browser (such as the L<uri|/uri> will be reset (like after a normal browser restart).  This method is primarily intended for use by the L<update|/update> method.  Not sure if this is useful by itself.
 
     use Firefox::Marionette();
 
@@ -12149,7 +12951,7 @@ accepts a scalar containing a javascript function body that is executed in the b
 
 =back
 
-Returns the result of the javascript function.  When a parameter is an L<element|Firefox::Marionette::Element> (such as being returned from a L<find|Firefox::Marionette#find> type operation), the L<script|Firefox::Marionette#script> method will automatically translate that into a javascript object.  Likewise, when the result being returned in a L<script|Firefox::Marionette#script> method is an L<element|https://dom.spec.whatwg.org/#concept-element> it will be automatically translated into a L<perl object|Firefox::Marionette::Element>.
+Returns the result of the javascript function.  When a parameter is an L<element|Firefox::Marionette::Element> (such as being returned from a L<find|/find> type operation), the L<script|/script> method will automatically translate that into a javascript object.  Likewise, when the result being returned in a L<script|/script> method is an L<element|https://dom.spec.whatwg.org/#concept-element> it will be automatically translated into a L<perl object|Firefox::Marionette::Element>.
 
     use Firefox::Marionette();
     use v5.10;
@@ -12170,9 +12972,9 @@ The executing javascript is subject to the L<script|Firefox::Marionette::Timeout
 
 returns a L<File::Temp|File::Temp> object containing a lossless PNG image screenshot.  If an L<element|Firefox::Marionette::Element> is passed as a parameter, the screenshot will be restricted to the element.  
 
-If an L<element|Firefox::Marionette::Element> is not passed as a parameter and the current L<context|Firefox::Marionette#context> is 'chrome', a screenshot of the current viewport will be returned.
+If an L<element|Firefox::Marionette::Element> is not passed as a parameter and the current L<context|/context> is 'chrome', a screenshot of the current viewport will be returned.
 
-If an L<element|Firefox::Marionette::Element> is not passed as a parameter and the current L<context|Firefox::Marionette#context> is 'content', a screenshot of the current frame will be returned.
+If an L<element|Firefox::Marionette::Element> is not passed as a parameter and the current L<context|/context> is 'content', a screenshot of the current frame will be returned.
 
 The parameters after the L<element|Firefox::Marionette::Element> parameter are taken to be a optional hash with the following allowed keys;
 
@@ -12209,7 +13011,7 @@ sends keys to the input field of a currently displayed modal message box
 
 =head2 set_pref
 
-accepts a L<preference|http://kb.mozillazine.org/About:config> name and the new value to set it to.  See the L<get_pref|Firefox::Marionette#get_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to get a preference value and to restore it to it's original value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+accepts a L<preference|http://kb.mozillazine.org/About:config> name and the new value to set it to.  See the L<get_pref|/get_pref> and L<clear_pref|/clear_pref> methods to get a preference value and to restore it to it's original value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
     use Firefox::Marionette();
     my $firefox = Firefox::Marionette->new();
@@ -12233,6 +13035,8 @@ accepts an L<element|Firefox::Marionette::Element> as a parameter and returns it
         warn $element->tag_name();
     }
 
+See the L<FINDING ELEMENTS IN A SHADOW DOM|/FINDING-ELEMENTS-IN-A-SHADOW-DOM> section for how to delve into a L<shadow DOM|https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM>.
+
 =head2 shadowy
 
 accepts an L<element|Firefox::Marionette::Element> as a parameter and returns true if the element has a L<ShadowRoot|https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> or false otherwise.
@@ -12253,7 +13057,7 @@ This function will probably be used to see if the L<shadow_root|Firefox::Marione
 
 =head2 sleep_time_in_ms
 
-accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The default time is "1" millisecond.
+accepts a new time to sleep in L<await|/await> or L<bye|/bye> methods and returns the previous time.  The default time is "1" millisecond.
 
     use Firefox::Marionette();
 
@@ -12267,7 +13071,7 @@ returns the path to the local directory for the ssh connection (if any). For deb
 
 =head2 strip
 
-returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alternative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
+returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|/json> method for an alternative when dealing with response content types such as application/json and L<html|/html> for an alternative when dealing with html content types.  This is a convenience method that wraps the L<html|/html> method.
 
     use Firefox::Marionette();
     use JSON();
@@ -12275,7 +13079,7 @@ returns the page source of the content document after an attempt has been made t
 
     say JSON::decode_json(Firefox::Marionette->new()->go("https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
 
-Note that this method will assume the bytes it receives from the L<html|Firefox::Marionette#html> method are UTF-8 encoded and will translate accordingly, throwing an exception in the process if the bytes are not UTF-8 encoded.
+Note that this method will assume the bytes it receives from the L<html|/html> method are UTF-8 encoded and will translate accordingly, throwing an exception in the process if the bytes are not UTF-8 encoded.
 
 =head2 switch_to_frame
 
@@ -12287,7 +13091,7 @@ set the current browsing context for future commands to the parent of the curren
 
 =head2 switch_to_window
 
-accepts a window handle (either the result of L<window_handles|Firefox::Marionette#window_handles> or a window name as a parameter and switches focus to this window.
+accepts a window handle (either the result of L<window_handles|/window_handles> or a window name as a parameter and switches focus to this window.
 
     use Firefox::Marionette();
 
@@ -12321,11 +13125,11 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 =head2 uname
 
-returns the $^O ($OSNAME) compatible string to describe the plaform where firefox is running.
+returns the $^O ($OSNAME) compatible string to describe the platform where firefox is running.
 
 =head2 update
 
-queries the Update Services and applies any available updates.  L<Restarts|Firefox::Marionette#restart> the browser if necessary to complete the update.  This function is experimental and currently has not been successfully tested on Win32 or MacOS.
+queries the Update Services and applies any available updates.  L<Restarts|/restart> the browser if necessary to complete the update.  This function is experimental and currently has not been successfully tested on Win32 or MacOS.
 
     use Firefox::Marionette();
     use v5.10;
@@ -12346,7 +13150,7 @@ returns a L<status|Firefox::Marionette::UpdateStatus> object that contains usefu
 
 =head2 uninstall
 
-accepts the GUID for the addon to uninstall.  The GUID is returned when from the L<install|Firefox::Marionette#install> method.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+accepts the GUID for the addon to uninstall.  The GUID is returned when from the L<install|/install> method.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
     use Firefox::Marionette();
 
@@ -12364,7 +13168,7 @@ returns the current L<URI|URI> of current top level browsing context for Desktop
 
 =head2 wheel
 
-accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse from and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with such a wheel action, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.  Other parameters that may be passed are listed below;
+accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse from and returns an action for use in the L<perform|/perform> method that corresponding with such a wheel action, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.  Other parameters that may be passed are listed below;
 
 =over 4
 
@@ -12430,6 +13234,33 @@ returns the value for the DISPLAY environment variable if one has been generated
 
 returns the value for the XAUTHORITY environment variable if one has been generated for the xvfb environment
 
+=head1 NETWORK ARCHITECTURE
+
+This module allows for a complicated network architecture, including SSH and HTTP proxies.
+
+  my $firefox = Firefox::Marionette->new(
+                  host  => 'Firefox.runs.here'
+                  via   => 'SSH.Jump.Box',
+                  trust => '/path/to/ca-for-squid-proxy-server.crt',
+                  proxy => 'https://Squid.Proxy.Server:3128'
+                     )->go('https://Target.Web.Site');
+
+produces the following effect, with an ascii box representing a separate network node.
+
+     ---------          ----------         -----------
+     | Perl  |  SSH     | SSH    |  SSH    | Firefox |
+     | runs  |--------->| Jump   |-------->| runs    |
+     | here  |          | Box    |         | here    |
+     ---------          ----------         -----------
+                                                |
+     ----------          ----------             |
+     | Target |  HTTPS   | Squid  |    TLS      |
+     | Web    |<---------| Proxy  |<-------------
+     | Site   |          | Server |
+     ----------          ----------
+
+See the L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> section for more options.
+
 =head1 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
 This module allows you to login to a website without ever directly handling usernames and password details.  The Password Manager may be preloaded with appropriate passwords and locked, like so;
@@ -12468,6 +13299,24 @@ And used to fill in login prompts without explicitly knowing the account details
     $firefox->go('https://pause.perl.org/pause/authenquery')->accept_alert(); # this goes to the page and submits the http auth popup
 
     $firefox->go('https://github.com/login')->fill_login(); # fill the login and password fields without needing to see them
+
+=head1 CONSOLE LOGGING
+
+Sending debug to the console can be quite confusing in firefox, as some techniques won't work in L<chrome|/chrome> context.  The following example can be quite useful.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new( visible => 1, devtools => 1, console => 1, devtools => 1 );
+
+    $firefox->script( q[console.log("This goes to devtools b/c it's being generated in content mode")]);
+
+    $firefox->chrome()->script( q[console.log("Can't be seen b/c it's in chrome mode")]);
+
+    $firefox->chrome()->script( q[const { console } = ChromeUtils.import("resource://gre/modules/Console.jsm"); console.log("Find me in the browser console in chrome mode")]);
+
+    # This won't work b/c of permissions
+    #
+    # $firefox->content()->script( q[const { console } = ChromeUtils.import("resource://gre/modules/Console.jsm"); console.log("Find me in the browser console in content mode")]);
 
 =head1 REMOTE AUTOMATION OF FIREFOX VIA SSH
 
@@ -12510,15 +13359,17 @@ When using ssh, Firefox::Marionette will attempt to pass the L<TMPDIR|https://en
 
 This module uses L<ControlMaster|https://man.openbsd.org/ssh_config#ControlMaster> functionality when using L<ssh|https://man.openbsd.org/ssh>, for a useful speedup of executing remote commands.  Unfortunately, when using ssh to move from a L<cygwin|https://gcc.gnu.org/wiki/SSH_connection_caching>, L<Windows 10 or Windows Server 2019|https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse> node to a remote environment, we cannot use L<ControlMaster|https://man.openbsd.org/ssh_config#ControlMaster>, because at this time, Windows L<does not support ControlMaster|https://github.com/Microsoft/vscode-remote-release/issues/96> and therefore this type of automation is still possible, but slower than other client platforms.
 
+The L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE> section has an example of a more complicated network design.
+
 =head1 WEBGL
 
 There are a number of steps to getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work correctly;
 
 =over
 
-=item 1. The addons parameter to the L<new|Firefox::Marionette#new> method must be set.  This will disable L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
+=item 1. The addons parameter to the L<new|/new> method must be set.  This will disable L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
 
-=item 2. The visible parameter to the L<new|Firefox::Marionette#new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
+=item 2. The visible parameter to the L<new|/new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
 
 =item 3. It can be tricky getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work with a L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.  L<glxinfo|https://dri.freedesktop.org/wiki/glxinfo/> can be useful to help debug issues in this case.  The mesa-dri-drivers rpm is also required for Redhat systems.
 
@@ -12535,9 +13386,32 @@ With all those conditions being met, L<WebGL|https://en.wikipedia.org/wiki/WebGL
         die "WebGL is not supported";
     }
 
+=head1 FINDING ELEMENTS IN A SHADOW DOM
+
+One aspect of L<Web Components|https://developer.mozilla.org/en-US/docs/Web/API/Web_components> is the L<shadow DOM|https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM>.  When you need to explore the structure of a L<custom element|https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements>, you need to access it via the shadow DOM.  The following is an example of navigating the shadow DOM via a html file included in the test suite of this package.
+
+    use Firefox::Marionette();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new();
+    my $firefox_marionette_directory = Cwd::cwd();
+    $firefox->go("file://$firefox_marionette_directory/t/data/elements.html");
+
+    my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+
+    my $outer_div = $firefox->find_id('outer-div', $shadow_root);
+
+So, this module is designed to allow you to navigate the shadow DOM using normal find methods, but you must get the shadow element's shadow root and use that as the root for the search into the shadow DOM.  An important caveat is that L<xpath|https://bugzilla.mozilla.org/show_bug.cgi?id=1822311> and L<tag name|https://bugzilla.mozilla.org/show_bug.cgi?id=1822321> strategies do not officially work yet (and also the class name and name strategies).  This module works around the tag name, class name and name deficiencies by using the matching L<css selector|/find_selector> search if the original search throws a recognisable exception.  Therefore these cases may be considered to be extremely experimental and subject to change when Firefox gets the "correct" functionality.
+
+=head1 WEBSITES THAT BLOCK AUTOMATION
+
+Marionette L<by design|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> allows web sites to detect that the browser is being automated.  Firefox L<no longer (since version 88)|https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to disable this functionality while you are automating the browser.  If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
+
+At the very least, under these circumstances, it would be a good idea to be aware that there's an L<ongoing arms race|https://en.wikipedia.org/wiki/Web_scraping#Methods_to_prevent_web_scraping>, and potential L<legal issues|https://en.wikipedia.org/wiki/Web_scraping#Legal_issues> in this area.
+
 =head1 X11 FORWARDING WITH FIREFOX
 
-This is an experimental addition to this module.  L<X11 Forwarding|https://man.openbsd.org/ssh#X> allows you to launch a L<remote firefox via ssh|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and have it visually appear in your local X11 desktop.  This can be accomplished with the following code;
+L<X11 Forwarding|https://man.openbsd.org/ssh#X> allows you to launch a L<remote firefox via ssh|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and have it visually appear in your local X11 desktop.  This can be accomplished with the following code;
 
     use Firefox::Marionette();
 
@@ -12586,7 +13460,7 @@ This technique is used in the L<setup-for-firefox-marionette-build.sh|setup-for-
  
 =item C<< Failed to correctly setup the Firefox process >>
 
-The module was unable to retrieve a session id and capabilities from Firefox when it requests a L<new_session|Firefox::Marionette#new_session> as part of the initial setup of the connection to Firefox.
+The module was unable to retrieve a session id and capabilities from Firefox when it requests a L<new_session|/new_session> as part of the initial setup of the connection to Firefox.
 
 =item C<< Failed to correctly determined the Firefox process id through the initial connection capabilities >>
  
@@ -12736,7 +13610,7 @@ None reported.  Always interested in any products with marionette support that t
 
 =head2 DOWNLOADING USING GO METHOD
 
-When using the L<go|Firefox::Marionette#go> method to go directly to a URL containing a downloadable file, Firefox can hang.  You can work around this by setting the L<page_load_strategy|Firefox::Marionette::Capabilities#page_load_strategy> to C<none> like below;
+When using the L<go|/go> method to go directly to a URL containing a downloadable file, Firefox can hang.  You can work around this by setting the L<page_load_strategy|Firefox::Marionette::Capabilities#page_load_strategy> to C<none> like below;
 
     #! /usr/bin/perl
 

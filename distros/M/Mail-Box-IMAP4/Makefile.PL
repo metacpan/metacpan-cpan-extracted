@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.007';
+my $VERSION = '3.008';
 
 my %prereq =
   ( Date::Parse      => 0
@@ -13,6 +13,7 @@ my %prereq =
   , File::Compare    => 0
   , File::Copy       => 0
   , File::Spec       => 0
+  , File::Temp       => 0.19
   , IO::Socket::IP   => 0
   , List::Util       => 0
   , Mail::IMAPClient => 3.42
@@ -24,7 +25,7 @@ my %prereq =
   , Mail::Box::Net                => 3
   , Mail::Box::Search             => 3
   , Mail::Box::Test               => 3
-  , Mail::Message                 => 3
+  , Mail::Message                 => 3.013
   , Mail::Message::Body::Lines    => 3
   , Mail::Message::Head::Complete => 3
   , Mail::Message::Head::Delayed  => 3

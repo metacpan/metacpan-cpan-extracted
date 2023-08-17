@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 2;
 use lib qw(t t/data/duplicated_entries);
 use Utils;
 
@@ -32,6 +32,6 @@ my $expected_rv =
 
 # Functional i/f
 my $rv = scan_deps(@roots);
-compare_scandeps_rvs($rv, $expected_rv, \@roots);
+compare_rv($rv, $expected_rv, \@roots);
 
 __END__

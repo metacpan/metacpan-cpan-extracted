@@ -39,7 +39,7 @@ use SNMP::Info;
 
 our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.92';
+$VERSION = '3.94';
 
 # Load MIB for leafs referenced within class
 %MIBS = ('IF-MIB' => 'ifIndex',);
@@ -63,7 +63,8 @@ sub agg_ports_ifstack {
   foreach my $idx ( keys %$ifStack ) {
       my ( $higher, $lower ) = split /\./, $idx;
       next if ( $higher == 0 or $lower == 0 );
-      if ( $ifType->{ $higher } eq 'ieee8023adLag'  or $ifType->{ $higher } eq 'propMultiplexor') {
+      if ( $ifType->{ $higher } eq 'ieee8023adLag'
+            or $ifType->{ $higher } eq 'propMultiplexor' ) {
           $ret->{ $lower } = $higher;
       }
   }

@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableFieldMoveToRequest.name :   ,
-# PostPivotTableFieldMoveToRequest.sheetName :   ,
-# PostPivotTableFieldMoveToRequest.pivotTableIndex :   ,
-# PostPivotTableFieldMoveToRequest.fieldIndex :   ,
-# PostPivotTableFieldMoveToRequest.from :   ,
-# PostPivotTableFieldMoveToRequest.to :   ,
-# PostPivotTableFieldMoveToRequest.folder :   ,
-# PostPivotTableFieldMoveToRequest.storageName :    
+# PostPivotTableFieldMoveToRequest.name : The workbook name.  ,
+# PostPivotTableFieldMoveToRequest.sheetName : The worksheet name.  ,
+# PostPivotTableFieldMoveToRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableFieldMoveToRequest.fieldIndex : Gets the PivotField Object at the specific index.  ,
+# PostPivotTableFieldMoveToRequest.from : The fields area type(Column/Row/Page/Data/Undefined).  ,
+# PostPivotTableFieldMoveToRequest.to : The fields area type(Column/Row/Page/Data/Undefined).  ,
+# PostPivotTableFieldMoveToRequest.folder : Original workbook folder.  ,
+# PostPivotTableFieldMoveToRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_field_move_to' } = { 
-    	summary => '',
+    	summary => 'Moves pivot field in pivot table.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -152,56 +152,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'Gets the PivotField Object at the specific index.',
      	format => '',
      	read_only => '',
      		},
      'from' => {
      	datatype => 'string',
      	base_name => 'from',
-     	description => '',
+     	description => 'The fields area type(Column/Row/Page/Data/Undefined).',
      	format => '',
      	read_only => '',
      		},
      'to' => {
      	datatype => 'string',
      	base_name => 'to',
-     	description => '',
+     	description => 'The fields area type(Column/Row/Page/Data/Undefined).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

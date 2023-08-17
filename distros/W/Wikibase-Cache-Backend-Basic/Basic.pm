@@ -5,16 +5,20 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
+use Data::Handle;
 use Error::Pure qw(err);
 use Text::DSV;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ($class, @params) = @_;
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Data handler.
+	$self->{'data_fh'} = Data::Handle->new(__PACKAGE__);
 
 	# Process parameters.
 	set_params($self, @params);
@@ -42,9 +46,9 @@ sub _load_data {
 	my $self = shift;
 
 	# Read data.
-	my $kramerius_data;
 	my $dsv = Text::DSV->new;
-	while (my $data = <DATA>) {
+	my $fh = $self->{'data_fh'};
+	while (my $data = <$fh>) {
 		chomp $data;
 		my ($qid, $label, $description) = $dsv->parse_line($data);
 		$self->{'static'}->{$qid}->{'label'} = $label;
@@ -61,6 +65,124 @@ sub _save {
 }
 
 1;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Wikibase::Cache::Backend::Basic - Wikibase cache backend to local static basic ids (units, common properties)
+
+=head1 SYNOPSIS
+
+ use Wikibase::Cache::Backend::Basic;
+
+ my $obj = Wikibase::Cache::Backend::Basic->new;
+ my $value = $obj->get($type, $key);
+ $obj->save($type, $key, $value);
+
+=head1 METHODS
+
+=head2 C<new>
+
+ my $obj = Wikibase::Cache::Backend::Basic->new;
+
+Constructor.
+
+=over 8
+
+=item * C<data_fh>
+
+Data file handler from which is mapping fetched.
+Data file is in format parsed by L<Text::DSV>.
+
+Default value is mapping in this file on the end.
+
+=back
+
+Returns instance of object.
+
+=head2 C<get>
+
+ my $value = $obj->get($type, $key);
+
+Get cache value for C<$type> and C<$key>.
+Possible types are 'description' and 'label'.
+
+Returns string.
+
+=head2 C<save>
+
+ $obj->save($type, $key, $value);
+
+Save method is not implemented in this implementation of backend.
+Goes to error.
+
+=head1 ERROR
+
+ new():
+         From Class::Utils::set_params():
+                 Unknown parameter '%s'.
+
+ get():
+         Type '%s' isn't supported.
+         Type must be defined.';
+
+ save():
+         Type '%s' isn't supported.
+         Type must be defined.';
+         Wikibase::Cache::Backend::Basic doesn't implement save() method.
+ 
+
+=head1 EXAMPLE
+
+=for comment filename=p31_label_and_description.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Cache::Backend::Basic;
+
+ my $obj = Wikibase::Cache::Backend::Basic->new;
+
+ # Print out.
+ print 'P31 label: '.$obj->get('label', 'P31')."\n";
+ print 'P31 description: '.$obj->get('description', 'P31')."\n";
+
+ # Output:
+ # P31 label: instance of
+ # P31 description: that class of which this subject is a particular example and member
+
+=head1 DEPENDENCIES
+
+L<Class::Utils>,
+L<Data::Handle>,
+L<Error::Pure>,
+L<Text::DSV>,
+L<Wikibase::Cache::Backend>.
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Wikibase-Cache-Backend-Basic>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021-2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.04
+
+=cut
 
 __DATA__
 # Basic properties
@@ -82,10 +204,13 @@ P291:place of publication:geographical place of publication of the edition (use 
 P393:edition number:number of an edition (first, second, ... as 1, 2, ...) or event
 P407:language of work or name:language associated with this creative work (such as books, shows, songs, or websites) or a name (for persons use "native language" (P103) and "languages spoken, written or signed" (P1412))
 P577:publication date:date or point in time when a work was first published or released
+P580:start time:time an entity begins to exist or a statement starts being valid
+P582:end time:time an entity ceases to exist or a statement stops being valid
 P655:translator:agent who adapts any kind of written text from one language to another
 P691:NKCR AUT ID:identifier in the Czech National Authority Database (National Library of Czech Republic)
 P735:given name:first name or another given name of this person; values used with the property should not link disambiguations nor family names
 P813:retrieved:date or point in time that information was retrieved from a database or website (for use in online sources)
+P854:reference URL:should be used for Internet URLs as references. Use "Wikimedia import URL" (P4656) for imports from WMF sites
 P957:ISBN-10:former identifier for a book (edition), ten digits. Used for all publications up to 2006 (convertible to ISBN-13 for some online catalogs; useful for old books or fac-similes not reedited since 2007)
 P1104:number of pages:number of pages in an edition of a written work; see allowed units constraint for valid values to use for units in conjunction with a number
 P1476:title:published name of a work, such as a newspaper article, a literary work, piece of music, a website, or a performance work

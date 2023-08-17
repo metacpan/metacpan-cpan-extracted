@@ -183,7 +183,7 @@ sub find {
 sub get {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
 
   my ($index) = @args;
 
@@ -264,42 +264,13 @@ sub map {
 }
 
 sub merge {
-  my ($self, $lvalue, @rvalue) = @_;
+  my ($self, @rvalues) = @_;
 
-  if (!$lvalue) {
-    return $self->get;
-  }
+  require Venus;
 
-  if (!@rvalue) {
-    @rvalue = ($lvalue);
-    $lvalue = $self->get;
-  }
+  my $lvalue = {%{$self->get}};
 
-  if (@rvalue > 1) {
-    @rvalue = ($lvalue, @rvalue);
-    $lvalue = $self->get;
-  }
-
-  my $result = {%{$lvalue}};
-
-  for my $rvalue (@rvalue) {
-    for my $index (CORE::keys(%$rvalue)) {
-      my $lprop = $$lvalue{$index};
-      my $rprop = $$rvalue{$index};
-
-      $result->{$index}
-        = ((ref($rprop) eq 'HASH') and (ref($lprop) eq 'HASH'))
-        ? merge($self, $lprop, $rprop)
-        : $rprop;
-    }
-  }
-
-  if (!$self->{merge}++) {
-    $result = merge($self, $self->get, $result);
-    CORE::delete($self->{merge});
-  }
-
-  return $result;
+  return Venus::merge($lvalue, @rvalues);
 }
 
 sub none {
@@ -362,6 +333,36 @@ sub path {
   return wantarray ? ($self->find(@path)) : $self->find(@path);
 }
 
+sub puts {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  require Venus::Array;
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($into, $path) = @args[$i, $i+1];
+
+    next if !defined $path;
+
+    my $value;
+    my @range;
+
+    ($path, @range) = @{$path} if ref $path eq 'ARRAY';
+
+    $value = $self->path($path);
+    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $into eq 'SCALAR') {
+      $$into = $value;
+    }
+
+    CORE::push @{$result}, $value;
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub random {
   my ($self) = @_;
 
@@ -398,9 +399,13 @@ sub reverse {
 sub set {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
+
+  return $self->value(@args) if @args == 1 && ref $args[0] eq 'HASH';
 
   my ($index, $value) = @args;
+
+  return if not defined $index;
 
   return $self->value->{$index} = $value;
 }
@@ -2427,9 +2432,7 @@ I<Since C<0.01>>
 
 The merge method returns a hash reference where the elements in the hash and
 the elements in the argument(s) are merged. This operation performs a deep
-merge and clones the datasets to ensure no side-effects. The merge behavior
-merges hash references only, all other data types are assigned with precendence
-given to the value being merged.
+merge and clones the datasets to ensure no side-effects.
 
 I<Since C<0.01>>
 
@@ -2807,6 +2810,120 @@ I<Since C<0.01>>
   my ($path, $exists) = $hash->path('/baz');
 
   # (undef, 0)
+
+=back
+
+=cut
+
+=head2 puts
+
+  puts(Any @args) (ArrayRef)
+
+The puts method select values from within the underlying data structure using
+L<Venus::Hash/path>, optionally assigning the value to the preceeding scalar
+reference and returns all the values selected.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item puts example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  my $puts = $hash->puts(undef, 'fruit', undef, 'color');
+
+  # ["apple", "red"]
+
+=back
+
+=over 4
+
+=item puts example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  $hash->puts(\my $fruit, 'fruit', \my $expiry, 'meta.expiry');
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=back
+
+=over 4
+
+=item puts example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  $hash->puts(
+    \my $fruit, 'fruit',
+    \my $color, 'color',
+    \my $expiry, 'meta.expiry',
+    \my $ripe, 'meta.ripe',
+  );
+
+  my $puts = [$fruit, $color, $expiry, $ripe];
+
+  # ["apple", "red", "5d", undef]
+
+=back
+
+=over 4
+
+=item puts example 4
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({set => [1..20]});
+
+  $hash->puts(
+    \my $a, 'set.0',
+    \my $b, 'set.1',
+    \my $m, ['set', '2:-2'],
+    \my $x, 'set.18',
+    \my $y, 'set.19',
+  );
+
+  my $puts = [$a, $b, $m, $x, $y];
+
+  # [1, 2, [3..18], 19, 20]
 
 =back
 

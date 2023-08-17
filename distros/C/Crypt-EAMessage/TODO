@@ -10,4 +10,6 @@ If you are looking for ways to help:
     kinds of tests!
 * File encryption routines - for all routines have a variant that works
   with files as input or output or both.
+* Better Corinna support.  Look for a "serialize" method and use
+  "deserialize" parameter on the receiving side.
 

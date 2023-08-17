@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 # VERSION
 
-version 1.210880
+version 1.231931
 
 # DESCRIPTION
 
@@ -55,7 +55,6 @@ It is somewhat equivilent to:
     [Test::TrailingSpace]
     filename_regex = '\.($?:ini|pl|pm|t|txt)\z'
 
-    [Test::UnusedVars]
     [Test::UseAllModules]
     [Test::Version]
     [TestRelease]
@@ -111,7 +110,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018,2020-2021 by Joelle Maslak.
+This software is copyright (c) 2018,2020-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

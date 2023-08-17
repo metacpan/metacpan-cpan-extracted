@@ -21,7 +21,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    },
    test_requires => {
       'File::Slurper' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

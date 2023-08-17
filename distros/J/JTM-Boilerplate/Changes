@@ -1,3 +1,15 @@
+2.231980  2023-07-17 12:23:48-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Enable Try/Catch support in older Perls
+ * Enable Corina OOB support
+ * Enable defer support
+ * Enable all Perl feature bundles
+
+2.231930  2023-07-12 13:44:43-04:00 America/Toronto
+ Joelle Maslak <jmaslak@antelopenet>
+ * Remove Test::Strict (Perl 5.38 compatability)
+ * Remove switch / smartmatch support
+
 2.211420  2021-05-22 03:11:56+00:00 UTC
  Joelle Maslak <jmaslak@antelopenet>
  * Take advantage of 5.34 features

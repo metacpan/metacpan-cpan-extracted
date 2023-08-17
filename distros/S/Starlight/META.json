@@ -1,5 +1,5 @@
 {
-   "abstract" : "a light and pure-Perl PSGI/Plack HTTP server with pre-forks",
+   "abstract" : "Light and pure-Perl PSGI/Plack HTTP server with pre-forks",
    "author" : [
       "Piotr Roszatycki <dexter@cpan.org>",
       "Piotr Roszatycki <dexter@cpan.org>",
@@ -7,7 +7,7 @@
       "Paul Seamons <paul@seamons.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -17,32 +17,43 @@
    },
    "name" : "Starlight",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "HTTP::Tiny" : "0",
-            "Test::More" : "0.88",
-            "Test::TCP" : "0.15"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0",
+            "Software::License" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "IO::Socket::IP" : "0",
+            "Time::HiRes" : "0"
+         },
          "requires" : {
-            "Plack" : "0.992",
+            "Plack" : "0.9920",
             "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP" : "0",
+            "Test::More" : "0.88",
+            "Test::TCP" : "0.15"
          }
       }
    },
    "provides" : {
       "Plack::Handler::Starlight" : {
          "file" : "lib/Plack/Handler/Starlight.pm",
-         "version" : "0.0400"
+         "version" : "0.0503"
       },
       "Starlight" : {
          "file" : "lib/Starlight.pm",
-         "version" : "0.0400"
+         "version" : "0.0503"
       },
       "Starlight::Server" : {
          "file" : "lib/Starlight/Server.pm",
-         "version" : "0.0400"
+         "version" : "0.0503"
       }
    },
    "release_status" : "stable",
@@ -57,6 +68,6 @@
          "url" : "http://github.com/dex4er/Starlight"
       }
    },
-   "version" : "0.0400",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.0503",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

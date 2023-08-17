@@ -29,7 +29,11 @@ my $authnreq = $sp->authn_request(
     $idp->format('persistent')
 )->as_xml;
 
-my $xp = get_xpath($authnreq);
+my $xp = get_xpath(
+    $authnreq,
+    saml2p => 'urn:oasis:names:tc:SAML:2.0:protocol',
+    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
+);
 
 my $redirect = $sp->sso_redirect_binding($idp, 'SAMLRequest');
 isa_ok($redirect, 'Net::SAML2::Binding::Redirect');

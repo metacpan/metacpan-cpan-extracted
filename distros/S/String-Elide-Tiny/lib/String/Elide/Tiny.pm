@@ -1,15 +1,23 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package String::Elide::Tiny;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.002'; # VERSION
-
 # be tiny
-#use strict 'subs', 'vars';
-#use warnings;
+#IFUNBUILT
+# use strict;
+# use warnings;
+#END IFUNBUILT
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-08-08'; # DATE
+our $DIST = 'String-Elide-Tiny'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 sub import {
     my $pkg = shift;
     my $caller = caller;
+#IFUNBUILT
+# no strict 'refs';
+#END IFUNBUILT
     for my $sym (@_) {
         if ($sym eq 'elide') { *{"$caller\::$sym"} = \&{$sym} }
         else { die "$sym is not exported!" }
@@ -19,15 +27,19 @@ sub import {
 sub elide {
     my ($str, $max_len, $opts) = @_;
 
+    die "Please specify str" unless defined $str;
+    die "Please specify max_len" unless defined $max_len;
+
+    return "" if $max_len <= 0;
+
     $opts ||= {};
 
     my $str_len = length $str;
+    return $str if $str_len <= $max_len;
 
     my $marker = defined $opts->{marker} ? $opts->{marker} : "...";
     my $marker_len = length $marker;
     return substr($marker, 0, $max_len) if $max_len < $marker_len;
-
-    return $str if $str_len <= $max_len;
 
     my $truncate = $opts->{truncate} || 'right';
     if ($truncate eq 'left') {
@@ -64,7 +76,7 @@ String::Elide::Tiny - A very simple text truncating function, elide()
 
 =head1 VERSION
 
-This document describes version 0.002 of String::Elide::Tiny (from Perl distribution String-Elide-Tiny), released on 2019-09-11.
+This document describes version 0.003 of String::Elide::Tiny (from Perl distribution String-Elide-Tiny), released on 2023-08-08.
 
 =head1 SYNOPSIS
 
@@ -120,14 +132,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/String-Eli
 
 Source repository is at L<https://github.com/perlancar/perl-String-Elide-Tiny>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Elide-Tiny>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Text::Elide> is also quite simple and elides at word boundaries, but it's not
@@ -147,11 +151,37 @@ L<String::Elide::Lines> is based on this module but works on a line-basis.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Elide-Tiny>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

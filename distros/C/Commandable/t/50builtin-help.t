@@ -17,6 +17,7 @@ package MyTest::Command::one {
    use constant COMMAND_OPTS => (
       { name => "verbose|v", description => "verbose option" },
       { name => "target|t=", description => "target option" },
+      { name => "silent",    description => "silent option", negatable => 1 },
    );
    sub run {}
 }
@@ -88,6 +89,9 @@ EOF
   one [OPTIONS...] $ARG
 
 * OPTIONS: *
+    <<--[no-]silent>>
+      silent option
+
     <<--target <value>>>, <<-t <value>>>
       target option
 

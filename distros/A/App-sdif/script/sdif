@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.26
+Version 4.28
 
 =head1 SYNOPSIS
 
@@ -34,16 +34,16 @@ Version 4.26
     --[no]number, -n	print line number
     --digit=#		set the line number digits (default 4)
     --truncate, -t	truncate long line
-    --[no]onword	fold line on word boundaries
+    --boundary=#        line folding boundary (default word)
     --context, -c, -C#	context diff
     --unified, -u, -U#	unified diff
 
-    --width=#, -W#	specify width of output (default 80)
-    --margin=#		specify margin column number (default 0)
-    --runin=#		specify run-in column number (default --margin)
-    --runout=#		specify run-out column number (default --margin)
+    --width=#, -W#	width of output (default 80)
+    --margin=#		margin column number (default 0)
+    --runin=#		run-in column number (default --margin)
+    --runout=#		run-out column number (default --margin)
     --mark=position	mark position (right, left, center, side) or no
-    --column=order	set column order (default ONM)
+    --column=order	column order (default ONM)
     --view, -v		viewer mode
     --parallel[=#], -V	treat unknown text as common part (default 2)
     --ambiguous=s	ambiguous character width (detect, wide, narrow)
@@ -124,7 +124,8 @@ use Getopt::EX::Hashed; {
     has digit          => '  =i ' , default => 4 ;
     has column         => '  =s ' ;
     has truncate       => 't !  ' ;
-    has onword         => '  !  ' , default => 1 ;
+    has boundary       => '  =s ' , default => 'word' ;
+    has onword         => '  !  ' ;
     has mark           => '  =s ' , default => 'center' ;
     has prefix         => '  !  ' , default => $default_prefix ;
     has prefix_pattern => '  =s ' , default => $default_prefix_pattern ;
@@ -149,9 +150,9 @@ use Getopt::EX::Hashed; {
     has visible        => '  =i%' , default => {} ;
     has tabstop        => '  =i ' , default => 8;
     has tabhead        => '  =s ' ;
-    has tabstyle       => '  =s ' ;
+    has tabstyle       => 'ts=s ' ;
     has tabspace       => '  =s ' ;
-    has unit           => 'by=s ' ;
+    has unit           => 'by:s ' ;
 
     has ignore_case         => 'i    ' ;
     has ignore_space_change => 'b    ' ;
@@ -161,6 +162,9 @@ use Getopt::EX::Hashed; {
     has unified             => 'U  =i' ;
     has c                   => '     ' ;
     has u                   => '     ' ;
+
+    has '+onword'
+	=> sub { $_->boundary = $_[1] ? 'word' : '' } ;
 
     has '+cdifopts'
 	=> sub { push @cdifopts, shellwords $_[1] } ;
@@ -445,7 +449,7 @@ if ($readfile) {
     seek NEW, 0, 0 or die unless -p NEW;
 }
 
-my @boundary = $app->onword ? (boundary => 'word') : ();
+my @boundary = (boundary => $app->boundary);
 my $color_re = qr{ \e \[ [\d;]* [mK] }x;
 
 my $oline = 1;
@@ -1063,9 +1067,16 @@ output from normal, context (B<diff -c>) and unified diff (B<diff
 Truncate lines if they are longer than printing width.
 Default false.
 
-=item B<-->[B<no->]B<onword>
+=item B<--boundary>=[C<none>,C<word>,C<space>]
 
-Fold long line at word boundaries.
+Set text wrap boundary.  If set as C<word> or C<space>, text is not
+wrapped in the middle of alphanumeric word or non-space sequence.  See
+L<Text::ANSI::Fold> for detail.
+Default is C<word>.
+
+=item B<--onword>
+
+Shortcut for B<--boundary=word>.  No longer recommended to use.
 Default true.
 
 =item B<-->[B<no->]B<cdif>[=I<command>]
@@ -1145,23 +1156,27 @@ this option, unchanged lines are placed at the same position.
 =item B<-V3>, B<--parallel=3>
 
 B<sdif> processes only looks-like-diff-output data and print anything
-else as is to standard out.  Option C<-V> or C<--parralel> makes
+else as is to standard out.  Option C<-V> or C<--parallel> makes
 unknown text as common to old and new data.  This is useful to see
 file including conflict marker data compatible with L<git(1)>.
 
 This option takes an optional number parameter and 2 is assumed when
-omitted.  Other than 2, only 3 is an effective number.
+omitted.  Other than 2, only 3 is an effective value.  L<diff3(1)>
+command can produce conflict marker style output with C<-m> option.
+So you can use like this:
+
+    $ diff3 -m A B C | sdif -V3
 
 =item B<--ambiguous>=I<width_spec>
 
-This is an experimental option to specify how to treat Unicode
-ambiguous width characters.  Default value is 'narrow'.
+Specify the way to treat Unicode ambiguous width characters.  Default
+value is C<narrow>.
 
 =over 4
 
 =item B<detect> or B<auto>
 
-Detect from user's locate.  Set 'wide' when used in CJK environment.
+Detect from user's locate.  Set C<wide> when used in CJK environment.
 
 =item B<wide> or B<full>
 
@@ -1220,10 +1235,12 @@ L<cdif/--visible>.
 
 =item B<--tabstyle>=[C<space>,C<dot>,C<symbol>,C<shade>,C<bar>,C<dash>...]
 
-Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
-characters at once according to the given style name.  Select from
-C<space>, C<dot>, C<symbol>, C<shade>, C<bar>, C<dash> and others.
-See L<Text::ANSI::Fold/tabstyle> for available styles.
+=item B<--ts>=...
+
+Option B<--tabstyle> (or B<--ts>) allow to set B<--tabhead> and
+B<--tabspace> characters at once according to the given style name.
+Select from C<space>, C<dot>, C<symbol>, C<shade>, C<bar>, C<dash> and
+others.  See L<Text::ANSI::Fold/tabstyle> for available styles.
 
 Multiple styles can be mixed up like C<symbol,space>.  In this case,
 tabhead and tabspace are taken from C<symbol> and C<space> style

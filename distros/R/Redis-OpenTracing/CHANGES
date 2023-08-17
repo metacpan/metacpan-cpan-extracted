@@ -2,6 +2,35 @@ CHANGE LOG
 ==========
 
 
+2023-07-26 v0.3.0
+-----------------
+- add `error`, `error.kind`, and `message` to spans in case of an exception.
+- improve testing
+
+
+2023-07-21 v0.2.3
+-----------------
+- improve testing
+
+
+2023-07-20 v0.2.2
+-----------------
+- Add and change testing
+- Fix `cpanfile`
+
+
+2023-07-19 v0.2.1
+-----------------
+- Add GitHub workflows
+- Fix `cpanfile`
+
+
+2021-09-27 v0.2.0
+-----------------
+- Add `tags` attribute to be able to set `peer.address` and `component`
+- Set `component` tag to injected `redis` client
+
+
 2021-09-21 v0.1.1
 -----------------
 - Add MetaCPAN resources

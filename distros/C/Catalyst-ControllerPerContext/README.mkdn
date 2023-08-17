@@ -1,0 +1,70 @@
+# NAME
+
+Catalyst::ControllerPerContext - Context Scoped Controlelrs
+
+# SYNOPSIS
+
+    package Example::Controller::Register;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::ControllerPerRequest';
+
+    has registration => (
+      is => 'ro',
+      lazy => 1,
+      required => 1,
+      default => sub($self) { $self->ctx->Model('Users')->registration },
+    );
+
+    sub root :Chained(/root) PathPart(register) Args(0) {
+      my ($self, $c) = @_;
+      $self->registration;
+    }
+
+    __PACKAGE__->meta->make_immutable;  
+
+# DESCRIPTION
+
+Classic [Catalyst::Controller](https://metacpan.org/pod/Catalyst%3A%3AController)s are application scoped, which means we create an instance of the
+controller when the application starts as a singleton instance, which is reused for all request
+going forward.  This has the lowest overhead.   However it makes it hard to do things like use
+controller attributes since those attributes get shared for all requests.  By changing to creating
+a new controller for each request you can then use those attributes.
+
+This for the most part is nothing you couldn't do with the stash but has the upside of avoiding
+the stash typo bugs you see a lot and also the stash is shared for the entire context so stuff
+you stuff in there might be too broadly accessible, whereas data in controller attributes is 
+scoped to the controller only.
+
+I consider this an experimental release to let interested people (including myself) to play with 
+the idea of per context controllers and see if it leads to new approaches and better code.  Please
+be warned that the code under the hood here is a bit of a hack up due to how we added some features
+to Controller over time that made the assumption that an attribute is application scoped (such as
+how we merged the action role support many years ago).  If this turns out to be a good idea we'll
+need to make deeper fixes to the base [Catalyst::Controller](https://metacpan.org/pod/Catalyst%3A%3AController) to make this right.   As a result of
+this hacking I can't be sure this controller will be a drop in replacement everywhere, especially
+if you've doing a ton of customization to the base controller code in a custom controller subclass.
+
+In order to emphasize the magnitude of this crime / hack there's not really many test cased ;)
+
+Some of the things I'm using this to experiement with is using controller attributes to define
+a stronger API between the controller and its views and using controller attributes as proxies
+for the models a controller works with.
+
+# ALSO SEE
+
+[Catalyst::Runtime](https://metacpan.org/pod/Catalyst%3A%3ARuntime), [Catalyst::Controller](https://metacpan.org/pod/Catalyst%3A%3AController)
+
+# AUTHOR
+
+    John Napiorkowski <jjnapiork@cpan.org>
+
+# COPYRIGHT
+
+    2022
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

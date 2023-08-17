@@ -49,6 +49,7 @@ throws_ok(
     qr/HTTP error/,
     'Croak on non-200 HTTP response.'
 );
+
 #throws_ok(
 #    sub { my $events = $zabbix->do('event.get', {output => 'extended'}); },
 #    qr/Empty response received from the Zabbix API. This can indicate an error on the API side like running out of memory./,

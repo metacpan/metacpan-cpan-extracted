@@ -1,5 +1,24 @@
 Revision history for XS-Parse-Keyword-FromPerl
 
+0.07    2023-07-19
+        [CHANGES]
+         * Updates for XPK v0.35:
+            + Renamed container macros `XPK_PARENS`, etc...
+            + Added `XPK_FLAG_BLOCKSCOPE`, `XPK_INTRO_MY`
+
+0.06    2023-07-09
+        [CHANGES]
+         * Improvements to `make_entersub_op()`:
+            + Optional `flags` named argument instead of upfront zero
+            + Support also plain strings, stored as GV with RV2CV at runtime
+         * Various docs updates and fixes
+
+0.05    2023-07-08
+        [CHANGES]
+         * Split out all the optree-generating functions into a new module,
+           `Optree::Generate`
+         * Added `XS::Parse::Infix::FromPerl`
+
 0.04    2023-03-06
         [CHANGES]
          * Provide wrappings of `newASSIGNOP()` and `newCONDOP()`

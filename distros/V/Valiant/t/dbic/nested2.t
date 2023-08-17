@@ -60,7 +60,7 @@ use Test::DBIx::Class
       "Middle Bottom Children has too few rows (minimum is 3)",
       "Middle Bottom Children Is Invalid",
     ],
-    "middle.bottom.children.0.child_value" => [
+    "middle.bottom.children[0].child_value" => [
       "Middle Bottom Children Child Value is too short (minimum is 5 characters)",
     ],
     "middle.middle_value" => [
@@ -82,7 +82,7 @@ use Test::DBIx::Class
       "Children has too few rows (minimum is 3)",
       "Children Is Invalid",
     ],
-    "children.0.child_value" => [
+    "children[0].child_value" => [
       "Children Child Value is too short (minimum is 5 characters)",
     ],
   }, 'Got expected errors';

@@ -1,6 +1,6 @@
 package Catmandu::PICA;
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 1;
 __END__
@@ -52,6 +52,8 @@ introduction into Catmandu.
 =item * L<Catmandu::Fix::Bind::pica_diff>
 
 =item * L<Catmandu::Fix::Condition::pica_match>
+
+=item * L<Catmandu::Fix::pica_update>
 
 =item * L<Catmandu::Fix::pica_add>
 

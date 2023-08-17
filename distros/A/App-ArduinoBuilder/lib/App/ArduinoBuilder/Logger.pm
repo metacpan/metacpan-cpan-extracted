@@ -5,11 +5,12 @@ use warnings;
 use utf8;
 
 use Carp qw(confess);
+use Data::Dumper;
 use Exporter 'import';
 
-our @EXPORT = qw(fatal error warning info debug full_debug);
-our @EXPORT_OK = (@EXPORT, qw(log_cmd set_log_level set_prefix print_stack_on_fatal_error));
-our %EXPORT_TAGS = (all => [@EXPORT_OK], all_logger => [@EXPORT, 'log_cmd']);
+our @EXPORT = qw(fatal error warning info debug full_debug dump dump_long dump_short);
+our @EXPORT_OK = (@EXPORT, qw(log_cmd set_log_level is_logged set_prefix print_stack_on_fatal_error dump dump_short));
+our %EXPORT_TAGS = (default => [@EXPORT], all => [@EXPORT_OK], all_logger => [@EXPORT, 'log_cmd']);
 
 my $LEVEL_FATAL = 0;  # Fatal errors, abort the program.
 my $LEVEL_ERROR = 1;  # Recoverable errors (almost unused).
@@ -19,7 +20,7 @@ my $LEVEL_DEBUG = 4;  # Any possibly lengthy debugging information.
 my $LEVEL_CMD = 5;  # Command lines being executed (log method not exported by default).
 my $LEVEL_FULL_DEBUG = 6;  # Any possibly very-lengthy debugging information.
 
-my $default_level = $LEVEL_INFO;
+my $default_level = $ENV{ARDUINO_BUILDER_LOG_LEVEL} // $LEVEL_INFO;
 my $current_level = $default_level;
 my $prefix = '';
 my $die_with_stack_trace = 0;
@@ -36,11 +37,52 @@ sub _level_to_prefix {
   return 'UNKNOWN';
 }
 
+sub _stringify {
+  my ($s) = @_;
+  $s = $s->() if ref $s eq 'CODE';
+  return $s unless ref $s;
+  local $Data::Dumper::Indent = 2;
+  local $Data::Dumper::Pad = '    ';
+  local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Sortkeys = 1;
+  local $Data::Dumper::Sparseseen = 1;
+  return Dumper($s);
+}
+
+sub _stringify_short {
+  my ($s) = @_;
+  $s = $s->() if ref $s eq 'CODE';
+  return $s unless ref $s;
+  local $Data::Dumper::Indent = 0;
+  local $Data::Dumper::Pad = '';
+  local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Sortkeys = 1;
+  local $Data::Dumper::Sparseseen = 1;
+  return Dumper($s);
+}
+
+# TODO: make these return objects that can be stringified automatically so that
+# this work with any printing.
+sub dump {
+  my ($data) = @_;
+  return sub { _stringify($data) };
+}
+
+sub dump_long {
+  return &dump->(@_);
+}
+
+sub dump_short {
+  my ($data) = @_;
+  return sub { _stringify_short($data) };
+}
+
 sub _log {
   my ($level, $message, @args) = @_;
   return if $level > $current_level;
-  @args = map { ref eq 'CODE' ? $_->() : $_ } @args;
+  @args = map { _stringify($_) } @args;
   my $msg = sprintf "%s%s${message}\n", _level_to_prefix($level), $prefix, @args;
+  chomp($msg) if $msg =~ m/\n\n$/;
   if ($level == $LEVEL_FATAL) {
     if ($die_with_stack_trace) {
       confess $msg.'Died';  # Will print "message\nDied at foo.pm line 45\n..."
@@ -82,6 +124,11 @@ sub set_log_level {
   my ($level) = @_;
   $current_level = _string_to_level($level);
   return;
+}
+
+sub is_logged {
+  my ($level) = @_;
+  return $current_level >= _string_to_level($level);
 }
 
 sub print_stack_on_fatal_error {

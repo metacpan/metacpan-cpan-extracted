@@ -3,14 +3,14 @@ use strict;
 use warnings;
 
 # Fields
-sub __class_name {
+sub __name {
   my $self = shift;
   if (@_) {
-    $self->{__class_name} = $_[0];
+    $self->{__name} = $_[0];
     return $self;
   }
   else {
-    return $self->{__class_name};
+    return $self->{__name};
   }
 }
 
@@ -40,15 +40,16 @@ our $AUTOLOAD;
 sub AUTOLOAD {
   my $self = shift;
   
-  my $__class_name = $self->__class_name;
+  my $basic_type_name = $self->__name;
   
   my $method_name = $AUTOLOAD;
   $method_name =~ s/^SPVM::ExchangeAPI::Class:://;
   
-  my $ret = $self->__api->call_method($__class_name, $method_name, @_);
+  my $ret = $self->__api->call_method($basic_type_name, $method_name, @_);
   
   return $ret;
 }
+
 sub DESTROY {}
 
 1;
@@ -64,7 +65,7 @@ C<SPVM::BlessedObject::Class> is a class object to call class methods.
 =head1 Usage
   
   # The same as the Int->__new(1) in SPVM language
-  my $class = SPVM::ExchangeAPI::Class->__new(__class_name => 'Int', __api => $api);
+  my $class = SPVM::ExchangeAPI::Class->__new(__name => 'Int', __api => $api);
   my $value = $class->new(1);
 
 Create a class object using the L<SPVM::ExchangeAPI|SPVM::ExchangeAPI/"class"> method in the L<SPVM::ExchangeAPI> class:
@@ -74,10 +75,10 @@ Create a class object using the L<SPVM::ExchangeAPI|SPVM::ExchangeAPI/"class"> m
 
 =head1 Fields
 
-=head2 __class_name
+=head2 __name
 
-  my $__class_name = $self->__class_name;
-  $self->__class_name($__class_name);
+  my $name = $self->__name;
+  $self->__name($name);
 
 Gets and sets a class name.
 
@@ -100,7 +101,7 @@ Options:
 
 =over 2
 
-=item * C<__class_name> : string
+=item * C<__name> : string
 
 A class name
 
@@ -116,7 +117,7 @@ A L<SPVM::ExchangeAPI> object
 
   $class->foo(@args);
 
-Calls L<call_method|SPVM::ExchangeAPI/"call_method"> method in the L<SPVM::ExchangeAPI> class using the L</"__class_name"> field and the method name given in the C<AUTOLOAD> method.
+Calls L<call_method|SPVM::ExchangeAPI/"call_method"> method in the L<SPVM::ExchangeAPI> class using the L</"__name"> field and the method name given in the C<AUTOLOAD> method.
 
 =head1 Copyright & License
 

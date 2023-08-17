@@ -1,5 +1,15 @@
 Revision history for IO-Socket-IP
 
+0.42    2023-07-25
+        [CHANGES]
+         * Put error string in `$IO::Socket::errstr` as done by
+           IO::Socket v1.45
+         * Updated for Perl v5.14 - use `package NAME VERSION` syntax
+
+        [BUGFIXES]
+         * Fix typo 'behvior' (RT133467) (thanks ferivoz@riseup.net)
+         * Fix for DragonflyBSD and IPV6_V6ONLY from core perl (RT148293)
+
 0.41    2020-09-15 16:59
         [CHANGES]
          * Updated to `=head2 barename` documentation style

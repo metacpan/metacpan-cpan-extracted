@@ -15,7 +15,7 @@ int32_t SPVM__Sys__User__Passwd__pw_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_name\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -31,7 +31,7 @@ int32_t SPVM__Sys__User__Passwd__pw_passwd(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_passwd\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -47,7 +47,7 @@ int32_t SPVM__Sys__User__Passwd__pw_uid(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_uid\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -63,7 +63,7 @@ int32_t SPVM__Sys__User__Passwd__pw_gid(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_gid\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -79,7 +79,7 @@ int32_t SPVM__Sys__User__Passwd__pw_gecos(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_gecos\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -95,7 +95,7 @@ int32_t SPVM__Sys__User__Passwd__pw_dir(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_dir\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   
@@ -111,7 +111,7 @@ int32_t SPVM__Sys__User__Passwd__pw_shell(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"pw_shell\" in the class \"Sys::User::Passwd\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_passwd = stack[0].oval;
   

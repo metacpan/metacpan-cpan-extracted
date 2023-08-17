@@ -4,7 +4,7 @@ Types::SQL - a library of SQL types
 
 # VERSION
 
-version v0.6.1
+version v0.7.0
 
 # SYNOPSIS
 
@@ -120,6 +120,18 @@ my $type = Type::Tiny->new(
 The method should return a hash of values that are passed to the
 `add_column` method of [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSource).
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.7.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.6.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
+# SEE ALSO
+
 [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny).
 
 [Types::SQL::Util](https://metacpan.org/pod/Types%3A%3ASQL%3A%3AUtil), which provides a utility function for translating
@@ -150,7 +162,7 @@ Slaven Rezić <slaven@rezic.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Robert Rothenberg.
+This software is Copyright (c) 2016-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

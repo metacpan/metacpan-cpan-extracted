@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
             "Perinci::Sub::Gen::AccessTable" : "0.592",
-            "Perinci::Sub::Util" : "0.470",
+            "Perinci::Sub::Util" : "0.471",
             "Perinci::Sub::XCompletion::filename" : "0",
             "Perinci::Sub::XCompletion::sortsub_spec" : "0",
             "Sah::Schema::filename" : "0",
@@ -100,211 +100,219 @@
    "provides" : {
       "App::CSVUtils" : {
          "file" : "lib/App/CSVUtils.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv2paras" : {
          "file" : "lib/App/CSVUtils/csv2paras.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv2td" : {
          "file" : "lib/App/CSVUtils/csv2td.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv2vcf" : {
          "file" : "lib/App/CSVUtils/csv2vcf.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_add_fields" : {
          "file" : "lib/App/CSVUtils/csv_add_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_avg" : {
          "file" : "lib/App/CSVUtils/csv_avg.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_check_cell_values" : {
          "file" : "lib/App/CSVUtils/csv_check_cell_values.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_check_field_names" : {
          "file" : "lib/App/CSVUtils/csv_check_field_names.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_check_field_values" : {
          "file" : "lib/App/CSVUtils/csv_check_field_values.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_check_rows" : {
          "file" : "lib/App/CSVUtils/csv_check_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_cmp" : {
          "file" : "lib/App/CSVUtils/csv_cmp.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_concat" : {
          "file" : "lib/App/CSVUtils/csv_concat.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_convert_to_hash" : {
          "file" : "lib/App/CSVUtils/csv_convert_to_hash.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_csv" : {
          "file" : "lib/App/CSVUtils/csv_csv.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_delete_fields" : {
          "file" : "lib/App/CSVUtils/csv_delete_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_dump" : {
          "file" : "lib/App/CSVUtils/csv_dump.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_each_row" : {
          "file" : "lib/App/CSVUtils/csv_each_row.pm",
-         "version" : "1.024"
+         "version" : "1.030"
+      },
+      "App::CSVUtils::csv_fill_cells" : {
+         "file" : "lib/App/CSVUtils/csv_fill_cells.pm",
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_fill_template" : {
          "file" : "lib/App/CSVUtils/csv_fill_template.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_find_values" : {
          "file" : "lib/App/CSVUtils/csv_find_values.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_freqtable" : {
          "file" : "lib/App/CSVUtils/csv_freqtable.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_gen" : {
          "file" : "lib/App/CSVUtils/csv_gen.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_get_cells" : {
          "file" : "lib/App/CSVUtils/csv_get_cells.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_grep" : {
          "file" : "lib/App/CSVUtils/csv_grep.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_info" : {
          "file" : "lib/App/CSVUtils/csv_info.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_intrange" : {
          "file" : "lib/App/CSVUtils/csv_intrange.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_list_field_names" : {
          "file" : "lib/App/CSVUtils/csv_list_field_names.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_lookup_fields" : {
          "file" : "lib/App/CSVUtils/csv_lookup_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_ltrim" : {
          "file" : "lib/App/CSVUtils/csv_ltrim.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_map" : {
          "file" : "lib/App/CSVUtils/csv_map.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_munge_field" : {
          "file" : "lib/App/CSVUtils/csv_munge_field.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_munge_rows" : {
          "file" : "lib/App/CSVUtils/csv_munge_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
+      },
+      "App::CSVUtils::csv_pick_cells" : {
+         "file" : "lib/App/CSVUtils/csv_pick_cells.pm",
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_pick_fields" : {
          "file" : "lib/App/CSVUtils/csv_pick_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_pick_rows" : {
          "file" : "lib/App/CSVUtils/csv_pick_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_quote" : {
          "file" : "lib/App/CSVUtils/csv_quote.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_replace_newline" : {
          "file" : "lib/App/CSVUtils/csv_replace_newline.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_rtrim" : {
          "file" : "lib/App/CSVUtils/csv_rtrim.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_select_fields" : {
          "file" : "lib/App/CSVUtils/csv_select_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_select_rows" : {
          "file" : "lib/App/CSVUtils/csv_select_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_setop" : {
          "file" : "lib/App/CSVUtils/csv_setop.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_shuf_fields" : {
          "file" : "lib/App/CSVUtils/csv_shuf_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_shuf_rows" : {
          "file" : "lib/App/CSVUtils/csv_shuf_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_sort_fields" : {
          "file" : "lib/App/CSVUtils/csv_sort_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_sort_rows" : {
          "file" : "lib/App/CSVUtils/csv_sort_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_sorted_fields" : {
          "file" : "lib/App/CSVUtils/csv_sorted_fields.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_sorted_rows" : {
          "file" : "lib/App/CSVUtils/csv_sorted_rows.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_split" : {
          "file" : "lib/App/CSVUtils/csv_split.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_sum" : {
          "file" : "lib/App/CSVUtils/csv_sum.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_transpose" : {
          "file" : "lib/App/CSVUtils/csv_transpose.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_trim" : {
          "file" : "lib/App/CSVUtils/csv_trim.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_uniq" : {
          "file" : "lib/App/CSVUtils/csv_uniq.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::csv_unquote" : {
          "file" : "lib/App/CSVUtils/csv_unquote.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       },
       "App::CSVUtils::paras2csv" : {
          "file" : "lib/App/CSVUtils/paras2csv.pm",
-         "version" : "1.024"
+         "version" : "1.030"
       }
    },
    "release_status" : "stable",
@@ -319,286 +327,296 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "1.024",
+   "version" : "1.030",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.034000"
+         "version" : "5.038000"
       },
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-add-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-avg",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-check-cell-values",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-check-field-values",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-check-field-names",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-check-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-cmp",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-concat",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-convert-to-hash",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-csv",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-delete-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-dump",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-each-row",
-            "version" : "0.424"
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-fill-cells",
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-fill-template",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-find-values",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-freqtable",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-gen",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-get-cells",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-grep",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-list-field-names",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-info",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-intrange",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-lookup-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-ltrim",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-map",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-munge-field",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-munge-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-pick",
-            "version" : "0.424"
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-pick-cells",
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-pick-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-pick-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-quote",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-replace-newline",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-rtrim",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-select-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-select-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-setop",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-shuf",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-shuf-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-shuf-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sort",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sort-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sorted",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sorted-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sorted-rows",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sort-fields",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-split",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-sum",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-transpose",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-trim",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-uniq",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-unquote",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv2paras",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv2td",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv2vcf",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript paras2csv",
-            "version" : "0.424"
+            "version" : "0.425"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
@@ -624,52 +642,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -679,27 +697,27 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.606"
+            "version" : "0.608"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -775,17 +793,17 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -795,7 +813,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.028"
+                        "version" : "6.030"
                      }
                   ],
                   "include_underscores" : 0
@@ -840,73 +858,73 @@
                "Dist::Zilla::Plugin::PodWeaver" : {
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::PERLANCAR/Name",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::PERLANCAR/Version",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/prelude",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::PERLANCAR/Leftovers",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/postlude",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
@@ -941,7 +959,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::PERLANCAR/Authors",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -956,12 +974,12 @@
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.785"
+                        "version" : "0.786"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -976,7 +994,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::PERLANCAR/SingleEncoding",
-                        "version" : "4.017"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
@@ -987,12 +1005,12 @@
                }
             },
             "name" : "@Author::PERLANCAR/PodWeaver",
-            "version" : "4.008"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -1080,7 +1098,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
             "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
@@ -1090,7 +1108,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Author::PERLANCAR/Prereqs::CheckCircular",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
@@ -1106,7 +1124,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1117,7 +1135,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1128,7 +1146,7 @@
                }
             },
             "name" : "RuntimeRecommends",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1139,62 +1157,62 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.028"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.028"
+            "version" : "6.030"
          }
       ],
       "zilla" : {
@@ -1202,15 +1220,15 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.028"
+         "version" : "6.030"
       }
    },
    "x_authority" : "cpan:PERLANCAR",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

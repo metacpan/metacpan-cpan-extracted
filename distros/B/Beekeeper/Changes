@@ -1,3 +1,9 @@
+0.10    2023-07-27
+  - Add support for compressed responses.
+  - Recover from lost connections to broker.
+  - Ping brokers to avoid disconnections due to inactivity.
+  - Update JS libraries used by examples.
+
 0.09    2021-07-23
   - Add instructions for running pools as systemd services.
   - Update install instructions for Mosquitto broker.

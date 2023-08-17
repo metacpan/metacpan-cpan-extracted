@@ -14,6 +14,7 @@ my $builder = Module::Build->new(
     meta_merge => {
       resources => {
         repository => 'https://github.com/damil/Text-Transliterator',
+        bugtracker => 'https://github.com/damil/Text-Transliterator/issues',
        }
      },
 );

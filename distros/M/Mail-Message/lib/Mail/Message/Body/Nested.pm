@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Body::Nested;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message::Body';
 
@@ -79,7 +79,7 @@ sub print(;$)
 
 sub partNumberOf($)
 {   my ($self, $part) = @_;
-    $self->message->partNumber;
+    $self->message->partNumber || '1';
 }
 
 
@@ -130,6 +130,7 @@ sub moveLocation($)
     $self;
 }
 
+#-------------------------
 
 sub nested() { shift->{MMBN_nested} }
 

@@ -1,7 +1,7 @@
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: change_a_line_everywhere
+PERL PROGRAM NAME: change_a_line_everywhere
 
 AUTHOR:  
 
@@ -498,7 +498,7 @@ sub _set_replacement_type1 {
 					  or die("File $pathNfile_list[$i] not found");
 
 					foreach my $text (@slurp) {
-						printf OUT $text . "\n";    # add \n!!!!
+						print OUT $text . "\n";    # add \n!!!!
 													# print("$text \n");
 					}
 
@@ -580,7 +580,7 @@ sub _set_replacement_type2 {
 					  or die("File $pathNfile_list[$i] not found");
 
 					foreach my $text (@slurp) {
-						printf OUT $text . "\n";    # add \n!!!!
+						print OUT $text . "\n";    # add \n!!!!
 
 						#					print("$text \n");
 					}
@@ -659,7 +659,7 @@ sub _set_replacement_type3 {
 					#				  or die("File $pathNfile_list[$i] not found");
 					#
 					#				foreach my $text (@slurp) {
-					#					printf OUT $text . "\n";    # add \n!!!!
+					#					print OUT $text . "\n";    # add \n!!!!
 					#					print("$text \n");
 					#				}
 					#
@@ -843,7 +843,7 @@ sub _set_replacement_type5 {
 
 							foreach my $text (@slurp) {
 
-								printf OUT $text . "\n";    # add \n!!!!
+								print OUT $text . "\n";    # add \n!!!!
 
 								#								print $text."\n";
 
@@ -1018,14 +1018,14 @@ sub _set_replacement_type6 {
 								  )
 								{
 
-									printf OUT $slurp[$count_line]
+									print OUT $slurp[$count_line]
 									  . "\n";    # add \n!!!!
 
 								}
 
 								my $insert_line =
 								  "our \$VERSION = '0.0.1';" . "\n";    # add \n
-								printf OUT $insert_line;
+								print OUT $insert_line;
 
 								for (
 									my $count_line = ( $line + 1 ) ;
@@ -1034,7 +1034,7 @@ sub _set_replacement_type6 {
 								  )
 								{
 
-									printf OUT $slurp[$count_line]
+									print OUT $slurp[$count_line]
 									  . "\n";    # add \n!!!!
 
 								}

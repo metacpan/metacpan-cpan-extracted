@@ -1688,7 +1688,6 @@ sub agni_exec(&) {
    my $cb = shift;
 
    local $PApp::SQL::Database = $PApp::Config::Database;
-   local $PApp::NOW;
    local $PApp::SQL::DBH;
    local %PApp::state;
    local %PApp::temporary;

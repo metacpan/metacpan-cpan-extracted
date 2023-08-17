@@ -1,5 +1,5 @@
 package OPM::Maker::Utils::OTRS3;
-$OPM::Maker::Utils::OTRS3::VERSION = '1.1.1';
+$OPM::Maker::Utils::OTRS3::VERSION = '1.2.0';
 # ABSTRACT: Provide helper functions for OTRS <= 3
 
 use strict;
@@ -73,7 +73,7 @@ OPM::Maker::Utils::OTRS3 - Provide helper functions for OTRS <= 3
 
 =head1 VERSION
 
-version 1.1.1
+version 1.2.0
 
 =head1 METHODS
 

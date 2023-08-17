@@ -21,7 +21,7 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-$Template::Plugin::Gettext::VERSION = '0.8';
+$Template::Plugin::Gettext::VERSION = '1.0';
 use strict;
 
 use Locale::TextDomain 1.30 qw(com.cantanea.Template-Plugin-Gettext);
@@ -201,6 +201,9 @@ sub __fixup {
 sub __gettext {
     my ($textdomain, $msgid) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -215,6 +218,9 @@ sub gettext {
 
 sub __ngettext {
     my ($textdomain, $msgid, $msgid_plural, $count) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
@@ -233,6 +239,9 @@ sub ngettext {
 sub __pgettext {
     my ($textdomain, $context, $msgid) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -249,6 +258,9 @@ sub pgettext {
 sub __gettextp {
     my ($textdomain, $msgid, $context) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -264,6 +276,9 @@ sub gettextp {
 
 sub __npgettext {
     my ($textdomain, $context, $msgid, $msgid_plural, $count) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
@@ -283,6 +298,9 @@ sub npgettext {
 sub __ngettextp {
     my ($textdomain, $msgid, $msgid_plural, $count, $context) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -300,6 +318,9 @@ sub ngettextp {
 
 sub __xgettext {
     my ($textdomain, $msgid, %vars) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
@@ -319,6 +340,9 @@ sub xgettext {
 
 sub __nxgettext {
     my ($textdomain, $msgid, $msgid_plural, $count, %vars) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
@@ -343,6 +367,9 @@ sub nxgettext {
 sub __pxgettext {
     my ($textdomain, $context, $msgid, %vars) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -363,6 +390,9 @@ sub pxgettext {
 
 sub __xgettextp {
     my ($textdomain, $msgid, $context, %vars) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
@@ -385,6 +415,9 @@ sub xgettextp {
 sub __npxgettext {
     my ($textdomain, $context, $msgid, $msgid_plural, $count, %vars) = @_;
 
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
+
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
@@ -406,6 +439,9 @@ sub npxgettext {
 
 sub __nxgettextp {
     my ($textdomain, $msgid, $msgid_plural, $count, $context, %vars) = @_;
+
+    local %ENV = %ENV;
+    delete $ENV{LANGUAGE};
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};

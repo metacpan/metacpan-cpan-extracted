@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.021';
+$Telegram::Bot::Brain::VERSION = '0.023';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -10,6 +10,7 @@ use warnings;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
+use Mojo::JSON qw/encode_json/;
 use Carp qw/croak/;
 use Log::Any;
 use Data::Dumper;
@@ -111,7 +112,7 @@ sub sendMessage {
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardRemove'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ForceReply' );
-    $send_args->{reply_markup} = $reply_markup;
+    $send_args->{reply_markup} = encode_json($reply_markup->as_hashref);
   }
 
   my $token = $self->token || croak "no token?";
@@ -220,7 +221,8 @@ sub _process_message {
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
     if (! $update) {
-      die "Do not know how to handle this update: " . Dumper($item);
+      warn "Telegram::Bot::Brain does not know how to handle this update: " . Dumper($item);
+      return;
     }
 
     foreach my $listener (@{ $self->listeners }) {
@@ -237,7 +239,7 @@ sub _post_request {
 
   my $res = $self->ua->post($url, form => $form_args)->result;
   if    ($res->is_success) { return $res->json->{result}; }
-  elsif ($res->is_error)   { die "Failed to post: " . $res->message; }
+  elsif ($res->is_error)   { die "Failed to post: " . $res->json->{description}; }
   else                     { die "Not sure what went wrong"; }
 }
 
@@ -256,7 +258,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -381,13 +383,23 @@ subclass - consult the documenation for each below to see what to expect.
 
 Note that not all methods have yet been implemented.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Justin Hawkins <justin@eatmorecode.com>
 
+=item *
+
+James Green <jkg@earth.li>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Justin Hawkins.
+This software is copyright (c) 2023 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

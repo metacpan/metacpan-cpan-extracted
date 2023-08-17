@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 27;
+use Test::Most tests => 29;
 use Test::NoWarnings;
 
 BEGIN {
@@ -18,11 +18,11 @@ SEARCH: {
 	eval {
 		require CHI;
 
-		CHI->import;
+		CHI->import();
 	};
 
 	if($@) {
-		diag("CHI not installed");
+		diag('CHI not installed');
 		$cache = undef;
 	} else {
 		diag("Using CHI $CHI::VERSION");
@@ -71,9 +71,16 @@ SEARCH: {
 	$ENV{'REMOTE_ADDR'} = '66.249.73.149';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)';
 
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [{
+		cache => $cache,
+	}]);
 	ok($i->is_search_engine() == 1);
 	ok($i->browser_type() eq 'search');
+	SKIP: {
+		skip 'Test requires CHI access', 2 unless($cache);
+		cmp_ok($cache->get("66.249.73.149/$ENV{HTTP_USER_AGENT}"), 'eq', 'search', 'cache works');
+		ok(!defined($cache->get("12.159.106.42/$ENV{HTTP_USER_AGENT}")));
+	}
 
 	$ENV{'HTTP_USER_AGENT'} = 'A nonsense user agent string';
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
@@ -82,10 +89,9 @@ SEARCH: {
 	]);
 	ok($i->is_search_engine() == 0);
 	ok($i->browser_type() eq 'robot');
-diag($i->browser_type());
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
-		ok(defined($cache->get("is_search/212.159.106.41/$ENV{HTTP_USER_AGENT}")));
-		ok(!defined($cache->get("is_search/212.159.106.42/$ENV{HTTP_USER_AGENT}")));
+		cmp_ok($cache->get("212.159.106.41/$ENV{HTTP_USER_AGENT}"), 'eq', 'robot', 'cache works');
+		ok(!defined($cache->get("12.159.106.42/$ENV{HTTP_USER_AGENT}")));
 	}
 }

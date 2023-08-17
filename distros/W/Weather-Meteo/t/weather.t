@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use Test::Most tests => 9;
-use Geo::Location::Point 0.08;
+use Geo::Location::Point 0.09;
 
 BEGIN {
 	use_ok('Weather::Meteo');
@@ -33,7 +33,12 @@ WEATHER: {
 			diag(Data::Dumper->new([$weather])->Dump());
 		}
 
-		my $location = new_ok('Geo::Location::Point' => [ latitude => 51.34, longitude => 1.42 ]);
+		my $location;
+		if(my $key = $ENV{'TIMEZONEDB_KEY'}) {
+			$location = new_ok('Geo::Location::Point' => [ latitude => 51.34, longitude => 1.42, key => $key ]);
+		} else {
+			$location = new_ok('Geo::Location::Point' => [ latitude => 51.34, longitude => 1.42 ]);
+		}
 		$weather = $meteo->weather($location, '2022-12-25');
 		cmp_ok(scalar(@{$weather->{'hourly'}->{'rain'}}), '==', 24, '24 sets of hourly rainfall data');
 		@rain = @{$weather->{'hourly'}->{'rain'}};

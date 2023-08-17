@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostCopyCellIntoCellRequest.name :   ,
-# PostCopyCellIntoCellRequest.destCellName :   ,
-# PostCopyCellIntoCellRequest.sheetName :   ,
-# PostCopyCellIntoCellRequest.worksheet :   ,
-# PostCopyCellIntoCellRequest.cellname :   ,
-# PostCopyCellIntoCellRequest.row :   ,
-# PostCopyCellIntoCellRequest.column :   ,
-# PostCopyCellIntoCellRequest.folder :   ,
-# PostCopyCellIntoCellRequest.storageName :    
+# PostCopyCellIntoCellRequest.name : The workbook name.  ,
+# PostCopyCellIntoCellRequest.destCellName : Destination cell name  ,
+# PostCopyCellIntoCellRequest.sheetName : Destination worksheet name.  ,
+# PostCopyCellIntoCellRequest.worksheet : Source worksheet name.  ,
+# PostCopyCellIntoCellRequest.cellname : Source cell name  ,
+# PostCopyCellIntoCellRequest.row : Source row  ,
+# PostCopyCellIntoCellRequest.column : Source column  ,
+# PostCopyCellIntoCellRequest.folder : Original workbook folder.  ,
+# PostCopyCellIntoCellRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_copy_cell_into_cell' } = { 
-    	summary => '',
+    	summary => 'Copies data to destination cell from a source cell in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -157,63 +157,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'destCellName',
-     	description => '',
+     	description => 'Destination cell name',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Destination worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'worksheet',
-     	description => '',
+     	description => 'Source worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cellname' => {
      	datatype => 'string',
      	base_name => 'cellname',
-     	description => '',
+     	description => 'Source cell name',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'Source row',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Source column',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

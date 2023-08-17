@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021,2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::In 0.04;
+package Syntax::Operator::In 0.06;
 
 use v5.14;
 use warnings;
@@ -19,7 +19,7 @@ C<Syntax::Operator::In> - infix element-of-list meta-operator
 
 =head1 SYNOPSIS
 
-On a suitably-patched perl:
+On Perl v5.38 or later:
 
    use Syntax::Operator::In;
 
@@ -32,13 +32,15 @@ On a suitably-patched perl:
 This module provides an infix meta-operator that implements a element-of-list
 test on either strings or numbers.
 
-Current versions of perl do not directly support custom infix operators. The
-documentation of L<XS::Parse::Infix> describes the situation, with reference
-to a branch experimenting with this new feature. This module is therefore
-I<almost> entirely useless on standard perl builds. While the regular parser
-does not support custom infix operators, they are supported via
-C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>, and so custom keywords
-which attempt to parse operator syntax may be able to use it.
+Support for custom infix operators was added in the Perl 5.37.x development
+cycle and is available from development release v5.37.7 onwards, and therefore
+in Perl v5.38 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail.
+
+While Perl versions before this do not support custom infix operators, they
+can still be used via C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>.
+Custom keywords which attempt to parse operator syntax may be able to use
+these.
 
 For operators that already specialize on string or numerical equality, see
 instead L<Syntax::Operator::Elem>.
@@ -47,21 +49,35 @@ instead L<Syntax::Operator::Elem>.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( 1, @_ ) }
+sub unimport_into { shift->apply( 0, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $on, $caller, @syms ) = @_;
 
    @syms or @syms = qw( in );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Operator::In/in"}++ if delete $syms{in};
+   if( delete $syms{in} ) {
+      $on ? $^H{"Syntax::Operator::In/in"}++
+          : delete $^H{"Syntax::Operator::In/in"};
+   }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

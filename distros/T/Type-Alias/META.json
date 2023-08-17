@@ -1,0 +1,82 @@
+{
+   "abstract" : "type alias for type constraints",
+   "author" : [
+      "kobaken <kfly@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.22",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Type-Alias",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Type::Tiny" : "1.010002",
+            "Types::Equal" : "0.02",
+            "perl" : "5.020000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Type::Alias" : {
+         "file" : "lib/Type/Alias.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/Type-Alias/issues"
+      },
+      "homepage" : "https://github.com/kfly8/Type-Alias",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kfly8/Type-Alias.git",
+         "web" : "https://github.com/kfly8/Type-Alias"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:KFLY",
+   "x_contributors" : [
+      "kobaken <kentafly88@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

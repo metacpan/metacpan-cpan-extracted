@@ -22,7 +22,7 @@ my %fatpacked;
 
 $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_CPANMINUS';
   package App::cpanminus;
-  our $VERSION = "1.7046";
+  our $VERSION = "1.7047";
   
   =encoding utf8
   
@@ -4816,7 +4816,8 @@ CPAN_META
 
 $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'CPAN_META_CHECK';
   package CPAN::Meta::Check;
-  $CPAN::Meta::Check::VERSION = '0.012';
+  # vi:noet:sts=2:sw=2:ts=2
+  $CPAN::Meta::Check::VERSION = '0.018';
   use strict;
   use warnings;
   
@@ -4825,20 +4826,22 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   our @EXPORT_OK = qw/check_requirements requirements_for verify_dependencies/;
   our %EXPORT_TAGS = (all => [ @EXPORT, @EXPORT_OK ] );
   
-  use CPAN::Meta::Prereqs '2.132830';
+  use CPAN::Meta::Prereqs 2.132830;
   use CPAN::Meta::Requirements 2.121;
   use Module::Metadata 1.000023;
   
   sub _check_dep {
   	my ($reqs, $module, $dirs) = @_;
   
-  	$module eq 'perl' and return ($reqs->accepts_module($module, $]) ? () : sprintf "Your Perl (%s) is not in the range '%s'", $], $reqs->requirements_for_module($module));
+  	return $reqs->accepts_module($module, $]) ? () : sprintf "Your Perl (%s) is not in the range '%s'", $], $reqs->requirements_for_module($module) if $module eq 'perl';
   
   	my $metadata = Module::Metadata->new_from_module($module, inc => $dirs);
   	return "Module '$module' is not installed" if not defined $metadata;
+  
   	my $version = eval { $metadata->version };
-  	return "Missing version info for module '$module'" if $reqs->requirements_for_module($module) and not $version;
-  	return sprintf 'Installed version (%s) of %s is not in range \'%s\'', $version, $module, $reqs->requirements_for_module($module) if not $reqs->accepts_module($module, $version || 0);
+  	return sprintf 'Installed version (%s) of %s is not in range \'%s\'',
+  			(defined $version ? $version : 'undef'), $module, $reqs->requirements_for_module($module)
+  		if not $reqs->accepts_module($module, $version || 0);
   	return;
   }
   
@@ -4846,9 +4849,11 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   	my ($reqs, $module, $dirs) = @_;
   	my $metadata = Module::Metadata->new_from_module($module, inc => $dirs);
   	return if not defined $metadata;
+  
   	my $version = eval { $metadata->version };
-  	return "Missing version info for module '$module'" if not $version;
-  	return sprintf 'Installed version (%s) of %s is in range \'%s\'', $version, $module, $reqs->requirements_for_module($module) if $reqs->accepts_module($module, $version);
+  	return sprintf 'Installed version (%s) of %s is in range \'%s\'',
+  			(defined $version ? $version : 'undef'), $module, $reqs->requirements_for_module($module)
+  		if $reqs->accepts_module($module, $version);
   	return;
   }
   
@@ -4893,7 +4898,7 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   
   =head1 VERSION
   
-  version 0.012
+  version 0.018
   
   =head1 SYNOPSIS
   
@@ -4926,8 +4931,6 @@ $fatpacked{"CPAN/Meta/Check.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   =item * L<Test::CheckDeps|Test::CheckDeps>
   
   =item * L<CPAN::Meta|CPAN::Meta>
-  
-  =for comment # vi:noet:sts=2:sw=2:ts=2
   
   =back
   

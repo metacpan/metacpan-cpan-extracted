@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteHorizontalPageBreakRequest.name :   ,
-# DeleteHorizontalPageBreakRequest.sheetName :   ,
-# DeleteHorizontalPageBreakRequest.index :   ,
-# DeleteHorizontalPageBreakRequest.folder :   ,
-# DeleteHorizontalPageBreakRequest.storageName :    
+# DeleteHorizontalPageBreakRequest.name : The workbook name.  ,
+# DeleteHorizontalPageBreakRequest.sheetName : The worksheet name.  ,
+# DeleteHorizontalPageBreakRequest.index : Removes the HPageBreak element at a specified name. Element index, zero based.  ,
+# DeleteHorizontalPageBreakRequest.folder : Original workbook folder.  ,
+# DeleteHorizontalPageBreakRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_horizontal_page_break' } = { 
-    	summary => '',
+    	summary => 'Delete a horizontal page breaks in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'Removes the HPageBreak element at a specified name. Element index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

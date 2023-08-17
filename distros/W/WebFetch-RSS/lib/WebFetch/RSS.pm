@@ -14,10 +14,11 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::RSS;
-$WebFetch::RSS::VERSION = '0.3.0';
+$WebFetch::RSS::VERSION = '0.3.2';
 use base "WebFetch";
 
-use WebFetch "0.15.5";
+use if $] < 5.010, "version";
+use WebFetch v0.15.5;
 use Readonly;
 use Carp;
 use Try::Tiny;
@@ -241,7 +242,7 @@ WebFetch::RSS - generate or read an RSS feed for WebFetch
 
 =head1 VERSION
 
-version 0.3.0
+version 0.3.2
 
 =head1 SYNOPSIS
 

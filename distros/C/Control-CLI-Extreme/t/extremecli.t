@@ -16,10 +16,10 @@ my $Timeout		= 30;		# seconds
 my $ConnectionTimeout	= 15;		# seconds
 my $ErrorMode		= 'return';	# always return, so we check outcome in this test script
 my $ErrMsgFormat	= 'verbose';
-my $InputLog		 = 'extremecli.t.in';
-my $OutputLog		 = 'extremecli.t.out';
-my $DumpLog		 = 'extremecli.t.dump';
-my $DebugLog		 = 'extremecli.t.dbg';
+my $InputLog		;# = 'extremecli.t.in';
+my $OutputLog		;# = 'extremecli.t.out';
+my $DumpLog		;# = 'extremecli.t.dump';
+my $DebugLog		;# = 'extremecli.t.dbg';
 my $Host		;
 my $TcpPort		;
 my $Username		;# = 'rwa';
@@ -47,6 +47,8 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			Wing			=> 'show wireless radio detail',
 #			SLX			=> 'show system',
 			SLX			=> 'show interface stats brief', # Better test, on serial port, SLX really fills the output of this command with garbage..
+			HiveOS			=> 'show running-config | exclude "console page"',
+			Ipanema			=> 'ifconfig',
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',
@@ -250,7 +252,7 @@ if (@ARGV) {
 
 do {{ # Test loop, we keep testing until user satisfied
 
-	my ($cli, $ok, $output, $output2, $result, $prompt, $lastPrompt, $diffPrompt, $more_prompt, $familyType, $acli, $masterCpu, $dualCpu, $cmd, $origBaudrate, $slx);
+	my ($cli, $ok, $output, $output2, $result, $prompt, $lastPrompt, $diffPrompt, $more_prompt, $familyType, $acli, $masterCpu, $dualCpu, $cmd, $origBaudrate, $slx, $morePagingDisable);
 	my ($connectionType, $username, $password, $host, $tcpPort, $baudrate, $useBaudrate, $blocking)
 	 = ($ConnectionType, $Username, $Password, $Host, $TcpPort, $Baudrate, $UseBaudrate, $Blocking);
 
@@ -372,7 +374,7 @@ do {{ # Test loop, we keep testing until user satisfied
 
 	# Test automatic locking on device more-prompt
 	$more_prompt = $cli->more_prompt;
-	ok( $more_prompt, "Checking autoset --more-- prompt" );
+	ok( defined $more_prompt, "Checking autoset --more-- prompt" );
 	diag "Automatically set --more-- prompt (inside =-> <-=):\n=->$more_prompt<-=";
 
 	# Test family_type attribute
@@ -410,10 +412,10 @@ do {{ # Test loop, we keep testing until user satisfied
 		}
 	}
 
-	# Test enabling more paging on device (except on PassportERS Standby CPUs)
+	# Test enabling more paging on device (except where not supported: Ipanema & PassportERS Standby CPUs)
 	# - More paging is usually already enabled on device
 	# - This test is to check that device_more_paging() behaves correctly before attribute 'model' is set 
-	unless ($familyType eq 'PassportERS' && !$cli->attribute('is_master_cpu')) {
+	unless ($familyType eq 'Ipanema' || $familyType eq 'PassportERS' && !$cli->attribute('is_master_cpu')) {
 		$ok = $cli->device_more_paging(1);
 		if (defined $ok && $ok == 0) { # Non-blocking mode not ready
 			ok( !$blocking, "Checking 0 return value only in non-blocking mode" );
@@ -549,7 +551,8 @@ do {{ # Test loop, we keep testing until user satisfied
 	ok( $lastPrompt, "Checking last_prompt is set" );
 	diag "New prompt after enable (PrivExec) : $lastPrompt";
 
-	unless ($familyType eq 'WLAN2300' || $familyType eq 'ExtremeXOS') { # Skip this test for family types which have no config context
+	unless ($familyType eq 'WLAN2300' || $familyType eq 'ExtremeXOS' ||
+		$familyType eq 'HiveOS'   || $familyType eq 'Ipanema') { # Skip this test for family types which have no config context
 
 		# Test entering config mode (not applicable on some product / CLI modes)
 		if    ( ($familyType eq 'PassportERS' && !$acli) || $familyType eq 'Accelar' || $familyType eq 'WLAN9100' ||
@@ -667,7 +670,8 @@ do {{ # Test loop, we keep testing until user satisfied
 	diag $cli->errmsg unless $ok;
 
 	# Test disabling more paging on device (except on PassportERS Standby CPUs)
-	unless ($familyType eq 'PassportERS' && !$masterCpu) {
+	$morePagingDisable = 0;
+	unless ($familyType eq 'Ipanema' || ($familyType eq 'PassportERS' && !$masterCpu)) {
 		$ok = $cli->device_more_paging(0);
 		if (defined $ok && $ok == 0) { # Non-blocking mode not ready
 			ok( !$blocking, "Checking 0 return value only in non-blocking mode" );
@@ -685,9 +689,10 @@ do {{ # Test loop, we keep testing until user satisfied
 		if ($blocking) { ok( $ok, "Testing device_more_paging(0) method") }
 		else { ok( $ok, "Testing device_more_paging(0) and device_more_paging_poll() methods") }
 		diag $cli->errmsg unless $ok;
+		$morePagingDisable = 1 if $ok;
 	}
 
-	if ($ok && !($familyType eq 'PassportERS' && !$masterCpu) ) { # If we disabled more paging above...
+	if ($morePagingDisable) { # If we disabled more paging above...
 
 		# Test sending same show command as above ('show sys info'), with more paging disabled
 		($ok, $output2) = $cli->cmd(

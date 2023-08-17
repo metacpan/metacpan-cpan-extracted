@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.016';
+$Test::Consul::VERSION = '0.017';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -11,7 +11,7 @@ use Path::Tiny;
 use POSIX qw(WNOHANG);
 use Carp qw(croak);
 use HTTP::Tiny v0.014;
-use Net::EmptyPort qw(check_port);
+use Net::EmptyPort qw(check_port can_bind);
 use File::Temp qw(tempfile);
 use Scalar::Util qw(blessed);
 use Data::Random qw(rand_words);
@@ -33,7 +33,9 @@ sub _unique_empty_port {
     $current_port ++;
     $current_port = $start_port if $current_port > $end_port;
     next if check_port($current_port, 'tcp');
+    next if ! can_bind('127.0.0.1', $current_port, 'tcp');
     next if $udp_too and check_port($current_port, 'udp');
+    next if $udp_too and (! can_bind('127.0.0.1', $current_port, 'udp'));
     $port = $current_port;
   }
 
@@ -196,6 +198,12 @@ sub start {
   # Test::Consul. Just disable it.
   if ($self->version >= 1_000_005) {
     $config{ports}{grpc} = -1;
+  }
+
+  # Likewise for grpc above, 1.14.0 added grpc_tls which listens on 8503, and
+  # would clash with a second active Test::Consul
+  if ($self->version >= 1_014_000) {
+    $config{ports}{grpc_tls} = -1;
   }
 
   if ($self->enable_acls()) {
@@ -577,7 +585,7 @@ L<https://github.com/robn/Test-Consul>
 
 =item *
 
-Rob N ★ <robn@robn.io>
+Rob Norris <robn@despairlabs.com>
 
 =back
 
@@ -588,6 +596,10 @@ Rob N ★ <robn@robn.io>
 =item *
 
 Aran Deltac <bluefeet@gmail.com>
+
+=item *
+
+Matthew Horsfall <wolfsage@gmail.com>
 
 =back
 

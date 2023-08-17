@@ -42,12 +42,12 @@
       },
       "test" : {
          "requires" : {
-            "Test::Builder::Tester" : "0",
-            "Test::Most" : "0"
+            "Test::Builder::Tester" : "1.28",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.23.0",
+   "version" : "v0.23.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

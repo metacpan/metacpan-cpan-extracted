@@ -19,6 +19,7 @@ name 'App-Test-DWG-LibreDWG-JSON';
 perl_version 5.006;
 readme_from 'bin/test-dwg-libredwg-json';
 recursive_author_tests('xt');
+requires 'CAD::AutoCAD::Detect' => 0.02;
 requires 'Capture::Tiny' => 0;
 requires 'File::Copy' => 0;
 requires 'File::Path' => 0;
@@ -38,7 +39,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.01';
+version '0.03';
 
 # Run.
 WriteAll();

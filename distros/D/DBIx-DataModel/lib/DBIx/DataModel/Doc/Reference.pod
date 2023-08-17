@@ -243,7 +243,7 @@ wherever possible with a USING clause instead of an ON clause, i.e.
   SELECT * FROM Table1 INNER JOIN Table2 USING(column)
 
 This option can be overridden at the statement level.
-The advantages of joins with USING a discussed in 
+The advantages of joins with USING is discussed in 
 L<SQL::Abstract::More/"joins with USING clause instead of ON">.
 
 
@@ -2135,6 +2135,11 @@ subclass may override this method if the database driver provides a
 better way (for example L<DBIx::DataModel::Statement::JDBC> calls the 
 Java method C<getMemberCount>).
 
+The number of rows I<actually retrieved> (which depends on how many
+calls were made to the C<< ->next() >> method) can be easily
+computed as
+
+  my $retrieved_rows_count = $statement->row_num - $statement->offset;
 
 
 =head3 row_num()
@@ -2142,6 +2147,13 @@ Java method C<getMemberCount>).
 Returns the index number of the next row to be fetched
 (starting at C<< $self->offset >>, or 0 by default).
 
+=head3 nb_fetched_rows()
+
+Returns the number of rows effectively fetched through this
+statement.
+
+This method can only be called after the statement is finished
+(after calls to C<< ->all() >> or C<< -next_and_finish() >>).
 
 
 =head2 Pagination
@@ -2178,9 +2190,12 @@ Returns the indices of first and last rows on the current page.
 These numbers are given in "user coordinates", i.e. starting
 at 1, not 0 : so if C<-page_size> is 10 and C<-page_index> is 
 3, the boundaries are 21 / 30, while technically the current
-offset is 20. On the last page, the C<$last> index corresponds
-to C<row_count> (so C<$last - $first> is not always equal
-to C<pageSize + 1>).
+offset is 20. The C<$last> index may be inferior to 30 if the
+last page has less than 10 rows.
+
+This method can only be called after the statement is finished
+(after calls to C<< ->all() >> or C<< -next_and_finish() >>).
+
 
 =head3 page_rows()
 

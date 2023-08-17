@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..69\n";
+print "1..72\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -1102,6 +1102,28 @@ if(Rmpfr_erangeflag_p()) { print "ok 69\n" }
 else {
   warn "erangeflag not set\n";
   print "not ok 69\n";
+}
+
+my $obj0 = Math::MPFR->new(sqrt 2);
+my $obj1 = $obj0++;
+
+if($obj1 - $obj0 == -1) {print "ok 70\n"}
+else {
+  warn "$obj1 is not 1 less than $obj0\n";
+  print "not ok 70\n";
+}
+
+my $obj2 = ++$obj0;
+if($obj2 == $obj0) {print "ok 71\n"}
+else {
+  warn "$obj2 != $obj0\n";
+  print "not ok 71\n";
+}
+
+if($obj2 - $obj1 == 2) {print "ok 72\n"}
+else {
+  warn "$obj2 is not 2 greater than $obj1\n";
+  print "not ok 72\n";
 }
 
 sub adjust {

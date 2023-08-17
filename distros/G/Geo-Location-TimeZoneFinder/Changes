@@ -1,5 +1,9 @@
 Revision history for Geo::Location::TimeZoneFinder
 
+1.001  2023-07-23 10:59:17 CEST
+
+  - Fix the tests by not importing "new"
+
 1.000  2023-01-01 12:16:15 CET
 
   - First version

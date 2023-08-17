@@ -1,5 +1,5 @@
 package GitLab::API::v4::WWWClient;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -27,6 +27,7 @@ This class makes it possible to interact with the GitLab web site.
 
 use Carp qw( croak );
 use HTTP::Tiny;
+use List::Util qw( first );
 use Types::Common::String qw( NonEmptySimpleStr );
 
 use Moo;
@@ -80,6 +81,7 @@ sub sign_in {
     my ($self, $username, $password) = @_;
 
     my $tiny = HTTP::Tiny->new(
+        verify_SSL => 1,
         max_redirect => 0,
     );
 
@@ -96,10 +98,13 @@ sub sign_in {
         m{name="authenticity_token" value="(.+?)"}
     )[0];
 
-    my $first_session = (
-        $load_res->{headers}->{'set-cookie'} =~
-        m{_gitlab_session=(.+?);}
-    )[0];
+    
+    my ($first_session) = do{
+        my $set_cookie_headers = $load_res->{headers}->{ 'set-cookie' };
+        $set_cookie_headers = [ $set_cookie_headers ] if !ref $set_cookie_headers;
+        my $value = first { $_ =~ m{^_gitlab_session=(.*)} } @$set_cookie_headers;
+        $value =~ s{^_gitlab_session=}{}r;
+    };
 
     my $submit_res = $tiny->post_form(
         $sign_in_url,
@@ -121,10 +126,12 @@ sub sign_in {
 
     _croak_res( 'post', $sign_in_url, $submit_res );
 
-    my $second_session = (
-        $submit_res->{headers}->{'set-cookie'} =~
-        m{_gitlab_session=(.+?);}
-    )[0];
+    my ($second_session) = do{
+        my $set_cookie_headers = $submit_res->{headers}->{ 'set-cookie' };
+        $set_cookie_headers = [ $set_cookie_headers ] if !ref $set_cookie_headers;
+        my $value = first { $_ =~ m{^_gitlab_session=(.*)} } @$set_cookie_headers;
+        $value =~ s{^_gitlab_session=}{}r;
+    };
 
     my $home_res = $tiny->get(
         $base_url,
@@ -159,6 +166,7 @@ sub get {
     my ($self, $path) = @_;
 
     my $tiny = HTTP::Tiny->new(
+        verify_SSL => 1,
         max_redirect => 0,
     );
 
@@ -194,9 +202,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
+See L<GitLab::API::v4/LICENSE>.
 
 =cut
 

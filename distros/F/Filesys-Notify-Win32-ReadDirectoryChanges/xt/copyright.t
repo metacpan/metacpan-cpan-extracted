@@ -11,13 +11,6 @@ my $last_modified_year = 0;
 
 my $is_checkout = -d '.git';
 
-BEGIN {
-    if( $^O ne 'MSWin32' ) {
-        plan skip_all => "This module only works on Windows";
-        exit;
-    };
-}
-
 plan tests => 1;
 require './Makefile.PL';
 # Loaded from Makefile.PL

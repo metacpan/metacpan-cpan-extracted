@@ -7,6 +7,18 @@ SYNOPSIS
 
 DESCRIPTION
 
+ hook
+
+    Executes a hook, if specified at configure time.
+
+    Takes the following:
+
+      * $hook - the hook to execute
+
+      * $data - data to pass to the sub
+
+    It returns undef
+
  applicant_list
 
     Retrieves a list of all known applicants.

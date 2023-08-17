@@ -20,7 +20,7 @@ my $flow_type        = $get->flow_type_href();
 my $DATA_SEISMIC_SU = $Project->DATA_SEISMIC_SU();    # output data directory
 my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT(); 
 my $PL_SEISMIC       = $Project->PL_SEISMIC();
-my $max_index         = 12;                             # Insert a number here
+my $max_index        = 7;                             # Insert a number here
 
 my $suxcor_spec = {
 	_CONFIG                => $PL_SEISMIC,
@@ -63,9 +63,7 @@ sub binding_index_aref {
 
 	my @index;
 
-	$index[0] = 0;    # first item is  bound to DATA_DIR_IN
-	$index[1] = 9;
-	$index[2] = 10;
+	$index[0] = 6;
 
 	$suxcor_spec->{_binding_index_aref} = \@index;
 	return ();
@@ -89,8 +87,6 @@ sub file_dialog_type_aref {
 	my @index      = @$index_aref;
 	
 	$type[ $index[0] ] = $file_dialog_type->{_Data};
-	$type[ $index[1] ] = $file_dialog_type->{_Data};
-	$type[ $index[2] ] = $file_dialog_type->{_Data};
 
 	$suxcor_spec->{_file_dialog_type_aref} = \@type;
 	return ();
@@ -108,8 +104,6 @@ sub flow_type_aref {
 	my @type;
 
 	$type[0] = $flow_type->{_user_built};
-	$type[1] = $flow_type->{_user_built};
-	$type[2] = $flow_type->{_user_built};
 
 	$suxcor_spec->{_flow_type_aref} = \@type;
 	return ();
@@ -326,14 +320,8 @@ sub prefix_aref {
 	my $index_aref = get_binding_index_aref();
 	my @index      = @$index_aref;
 
-	# first label in GUI is input file1 and needs a home directory
-	$prefix[ $index[0] ] = '$DATA_SEISMIC_TXT' . ".'/'.";
-
-	# label 10 in GUI is input file2 and needs a home directory
-	$prefix[ $index[1] ] = '$DATA_SEISMIC_SU' . ".'/'.";
-
-	# label 11 in GUI is input file3 and needs a home directory
-	$prefix[ $index[2] ] = '$DATA_SEISMIC_SU' . ".'/'.";	
+	# label 7 in GUI is input file and needs a home directory
+	$prefix[ $index[0] ] = '$DATA_SEISMIC_SU' . ".'/'.";
 	
 	$suxcor_spec->{_prefix_aref} = \@prefix;
 	return ();
@@ -363,15 +351,9 @@ sub suffix_aref {
 	my $index_aref = get_binding_index_aref();
 	my @index      = @$index_aref;
 
-	# label 1 in GUI is input file1 and needs a home directory
-	$suffix[ $index[0] ] = "" . '$suffix_txt';
+	# label 7 in GUI is input file1 and needs a home directory
+	$suffix[ $index[0] ] = "" . '$suffix_su';
 
-	# label 10 in GUI is input file2 and needs a home directory
-	$suffix[ $index[1] ] = "" . '$suffix_su';	
-
-	# label 11 in GUI is input file2 and needs a home directory
-	$suffix[ $index[2] ] = "" . '$suffix_su';		
-	
 	$suxcor_spec->{_suffix_aref} = \@suffix;
 	return ();
 

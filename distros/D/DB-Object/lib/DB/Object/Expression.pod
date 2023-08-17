@@ -1,0 +1,64 @@
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Expression - Expression Object
+
+=head1 SYNOPSIS
+
+    my $op = $dbh->ANY( 1, 2, 3 );
+    # will produce:
+    ANY ( 1, 2, 3 )
+
+    "'something'" == $dbh->ALL( qw( some other words ) );
+    "'something'" == $dbh->ANY( qw( some other words ) );
+    "'something'" == $dbh->IN( qw( some other words ) );
+    # 'something' ANY ( some, other, words );
+    "something" != $dbh->ANY( qw( some other words ) );
+    # 'something' NOT ANY ( some, other, words );
+
+=head1 DESCRIPTION
+
+This is a class to represent an expression and is fairly simple, and designed to be recognised and  processed accordingly when building SQL statements, such as in C<WHERE> clauses.
+
+C<DB::Object::Expression> are instantiated when operators like C<ALL>, C<ANY> or C<IN> are subject to overloading. such as demonstrated in the L<SYNOPSIS>
+
+=head1 METHODS
+
+=head2 new
+
+Takes a list of values that are saved in the newly created object returned.
+
+=head2 as_string
+
+Returns a space separated list of values embedded in the object.
+
+For example:
+
+     "'something'" == $dbh->ANY( qw( some other words ) );
+    # 'something' ANY ( some, other, words );
+
+=head2 components
+
+In list context, returns an array of those values passed to L</new> and in scalar context, it returns those value as array reference.
+
+=head1 OVERLOADING
+
+Objects for this class calls L</as_string> when they need to be stringified.
+
+=head1 SEE ALSO
+
+L<DB::Object::ALL>, L<DB::Object::ANY>, L<DB::Object::IN>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2023 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

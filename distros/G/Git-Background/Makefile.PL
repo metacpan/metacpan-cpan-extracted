@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ my %WriteMakefileArgs = (
     },
     DISTNAME         => 'Git-Background',
     LICENSE          => 'open_source',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     NAME             => 'Git::Background',
     PREREQ_PM        => {
         Carp               => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
         lib                     => 0,
         overload                => 0,
     },
-    VERSION => '0.006',
+    VERSION => '0.007',
     test    => {
         TESTS => 't/*.t',
     },

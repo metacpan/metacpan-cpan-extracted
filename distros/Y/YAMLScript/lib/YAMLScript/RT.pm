@@ -1,67 +1,69 @@
 use strict; use warnings;
 package YAMLScript::RT;
 
+use Lingy::RT;
 use base 'Lingy::RT';
 
-use Lingy::Common;
+use YAMLScript;
+use YAMLScript::Common;
 use YAMLScript::Core;
 use YAMLScript::Reader;
+use YAMLScript::ReadLine;
 
 use constant LANG => 'YAMLScript';
 use constant reader_class => 'YAMLScript::Reader';
+use constant RL => YAMLScript::ReadLine->new;
 
-our ($rt, $reader);
+use constant repl_intro_command =>
+    q<(println (str *LANG* " " (yamlscript-version) " [" *HOST* "]\n"))>;
 
-sub new {
-    my $class = shift;
-    $rt = $class->SUPER::new(@_);
+sub class_names {
+    [
+        @{Lingy::RT::class_names()},
+        'Lingy::RT',
+        'YAMLScript::Core',
+    ];
 }
 
-sub rt { $rt }
+my $reader;
+sub reader { $reader }
 
 sub init {
     my $self = shift;
     $self->SUPER::init(@_);
     $reader = $self->require_new($self->reader_class);
-    $self->rep(q<
-      (def load-file (fn [f]
-        (cond
-          (ends-with? f ".ys")
-          (eval (read-file-ys f))
-
-          (ends-with? f ".ly")
-          (-load-file-ly f)
-
-          :else
-          (throw (str "Can't load-file '" f "'\n"))
-      )))>);
+    $self->rep(q< (use 'YAMLScript.Core) >);
     return $self;
 }
 
-sub user_namespace {
-    my ($self) = @_;
+sub core_namespace {
+    my $self = shift;
 
-    Lingy::Namespace->new(
-        name => 'user',
-        refer => [
-            $self->core,
-            $self->util,
-            YAMLScript::Core->new,
-        ],
-    );
+    my $ns = $self->SUPER::core_namespace(@_);
+
+    $YAMLScript::VERSION =~ /^(\d+)\.(\d+)\.(\d+)$/;
+    $self->rep("
+      (def *yamlscript-version*
+        {
+          :major       $1
+          :minor       $2
+          :incremental $3
+          :qualifier   nil
+        })
+    ");
+
+    return $ns;
 }
 
-sub repl {
-    local $YAMLScript::Reader::read_ys = 1;
-    my $self = shift;
-    $self->SUPER::repl(@_);
+sub is_lingy_class {
+    my ($self, $class) = @_;
+    $class->isa(CLASS) or $class =~ /^(?:Lingy|YAMLScript)::\w/;
 }
 
 
 # TODO Find cleaner way to override 'require' to support .ys files.
-use Lingy::Lang::RT;
-package Lingy::Lang::RT;
-use Lingy::Common;
+use Lingy::RT;
+package Lingy::RT;
 
 no warnings 'redefine';
 
@@ -71,42 +73,31 @@ sub require {
         err "'require' only works with symbols"
             unless ref($spec) eq SYMBOL;
 
-        return nil if $Lingy::RT::ns{$$spec};
+        return nil if $Lingy::Main::ns{$$spec};
 
         my $name = $$spec;
 
         my $path = $name;
-        $path =~ s/^lingy\.lang\./Lingy.Lang\./;
-        $path =~ s/^lingy\./Lingy\./;
+        $path =~ s/^lingy\.lang\./Lingy./;
+        $path =~ s/^lingy\./Lingy./;
+        $path =~ s/^ys\./YAMLScript./;
         my $module = $path;
         $path =~ s/\./\//g;
 
         for my $inc (@INC) {
             $inc =~ s{^([^/.])}{./$1};
             my $inc_path = "$inc/$path";
-            if (-f "$inc_path.pm" or
-                -f "$inc_path.ly" or
+            if (-f "$inc_path.ly" or
                 -f "$inc_path.ys"
             ) {
-                if (-f "$inc_path.pm") {
-                    CORE::require("$inc_path.pm");
-                    $module =~ s/\./::/g;
-                    err "Can't require $name. " .
-                        "$module is not a Lingy::Namespace."
-                        unless $module->isa('Lingy::Namespace');
-                    $module->new(
-                        name => symbol($name),
-                        refer => Lingy::RT->core,
-                    );
-                }
                 if (-f "$inc_path.ly") {
-                    my $ns = $Lingy::RT::ns{$Lingy::RT::ns};
-                    Lingy::RT->rep(qq< (load-file "$inc_path.ly") >);
+                    my $ns = RT->current_ns;
+                    RT->rep(qq< (load-file "$inc_path.ly") >);
                     $ns->current;
                 }
                 if (-f "$inc_path.ys") {
-                    my $ns = $Lingy::RT::ns{$Lingy::RT::ns};
-                    Lingy::RT->rep(qq< (load-file "$inc_path.ys") >);
+                    my $ns = RT->current_ns;
+                    RT->rep(qq< (load-file "$inc_path.ys") >);
                     $ns->current;
                 }
                 next outer;
@@ -116,6 +107,5 @@ sub require {
     }
     return nil;
 }
-
 
 1;

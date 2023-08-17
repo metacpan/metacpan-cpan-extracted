@@ -42,7 +42,7 @@ C11:
 
 GNU C99:
 
-  my $config = SPVM::Builder::Config->new_c99(file => __FILE__);
+  my $config = SPVM::Builder::Config->new_gnu99(file => __FILE__);
   
   $config;
 
@@ -116,7 +116,7 @@ Examples:
   
 =head2 Native Implementation Function
 
-This is an example of SPVM natvie class. The config file is L<GNU99|/"GNU99 Config File">.
+This is an example of SPVM natvie class. The config file is C99.
   
   // SPVM/MyClass.c
   
@@ -140,7 +140,7 @@ A native implementation function must have a name created with the following ste
 
 =over 2
 
-=item * 1. C<::> in the SPVM class name is replaced with C<__>.
+=item * 1. C<::> in the SPVM basic type name is replaced with C<__>.
 
 =item * 2. C<SPVM__> is added at the beginning.
 
@@ -158,7 +158,7 @@ MyClass:
     native method foo : void ();
   }
   
-  SPVM__MyCLass__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
+  SPVM__MyClass__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   }
   
@@ -184,7 +184,7 @@ A native implementation function has two arguments.
 
 The first argument is the C<SPVM_ENV*> type and it should be named C<env>. This is an L<execution environment|Execution Environment>.
 
-The second argument is the C<SPVM_VALUE*> type and it should be named C<stack>. This is an L<execution stack|Execution Stack>.
+The second argument is the C<SPVM_VALUE*> type and it should be named C<stack>. This is an L<call stack|Call Stack>.
 
   int32_t SPVM__MyClass__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -208,11 +208,11 @@ If you want to use SPVM Native Method from Perl, create a "~/.spvm_build" direct
 
   ~/.spvm_build
 
-The generated object files exists under "work/object" under the build directory. The object file name is the name which the extension of the SPVM class name is changed to ".o".
+The generated object files exists under "work/object" under the build directory. The object file name is the name which the extension of the SPVM basic type name is changed to ".o".
 
   ~/.spvm_build/work/object/MyClass.o
 
-The generated shared libraries exists under "work/lib" under the build directory. The name of shared library is the name which the extension of the SPVM class name is changed to ".so", or etc corresponding to your os.
+The generated shared libraries exists under "work/lib" under the build directory. The name of shared library is the name which the extension of the SPVM basic type name is changed to ".so", or etc corresponding to your os.
 
   # Unix/Linux
   ~/.spvm_build/work/object/MyClass.so
@@ -229,20 +229,12 @@ The object of the C<SPVM_ENV*> type is an execution environement.
 This object is passed as the first argument of a Native API.
 
   int32_t SPVM__MyClass__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
-
+  
   }
 
-To create a new execution environment with the same runtime, initialize command line arguments and call C<INIT> blocks, use the L<new_env|SPVM::Document::NativeAPI/"new_env"> method.
+=head1 Call Stack
 
-  SPVM_ENV* my_env = env->new_env(env);
-
-To free this object, use the L<free_env|SPVM::Document::NativeAPI/"free_env"> method.
-
-  my_env->free_env(my_env);
-
-=head1 Execution Stack
-
-An execution stack is passed to the second argument of the definition of the native method.. Stack is used getting arguments and return the value.
+A call stack is passed to the second argument of the definition of the native method.. Stack is used getting arguments and return the value.
 
   int32_t SPVM__MyClass__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
     
@@ -433,21 +425,22 @@ For example, in the case of L<Complex_2d|SPVM::Complex_2d>, do the following.
 
 =head1 Calling Method
 
-If you want to call a method, you get a method id using L<get_class_method_id|"get_class_method_id"> or L<get_instance_method_id|"get_instance_method_id">.
+If you want to call a method, you get a method id using L<get_class_method|"get_class_method"> or L<get_instance_method|"get_instance_method">.
 
-L<get_class_method_id|"get_class_method_id"> get a method id of a class method.
+L<get_class_method|"get_class_method"> get a method id of a class method.
 
-L<get_instance_method_id|"get_instance_method_id"> get a method id of a instance method.
+L<get_instance_method|"get_instance_method"> get a method id of a instance method.
 
   // Get method id of class method
-  int32_t method_id = env->get_class_method_id(env, "MyClass", "sum", "int(int,int)");
-
+  int32_t basic_type_id = env->get_basic_type_id(env, "MyClass");
+  void* method = env->get_class_method(env, basic_type_id, "sum");
+  
   // Get method id of instance method
-  int32_t method_id = env->get_instance_method_id(env, object, "sum", "int(int,int)");
+  int32_t method = env->get_instance_method(env, object, "sum");
 
-If method_id is less than 0, it means that the method was not found. It is safe to handle exceptions as follows.
+If method is less than 0, it means that the method was not found. It is safe to handle exceptions as follows.
 
-  if (method_id < 0) { return env->die(env, stack, "Can't find method id", __func__, "MyClass.c", __LINE__); }
+  if (!method) { return env->die(env, stack, "Can't find method id", __func__, "MyClass.c", __LINE__); }
 
 Set the SPVM method argument to stack before calling the method.
 
@@ -456,7 +449,7 @@ Set the SPVM method argument to stack before calling the method.
 
 To call a SPVM method, use the <a href="#native-api-native-sub-api-call_method">call_method</a> function.
 
-  int32_t error = env->call_method(env, method_id, stack);
+  int32_t error = env->call_method(env, method, stack);
 
 Nonzero if the method raised an exception, 0 if no exception occurred.
 

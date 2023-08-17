@@ -44,7 +44,6 @@ my @names;
 my @values;
 my @checkbuttons;
 
-# 32
 my $param_flow_grey = {
 	_checkbuttons_aref       => '',
 	_checkbuttons_aref2      => '',
@@ -73,14 +72,17 @@ my $param_flow_grey = {
 	_num_items4checkbuttons  => 0,
 	_num_items4names         => 0,
 	_num_items4values        => 0,
+	_param_index             => '',
 	_prog_names_aref         => '',
 	_prog_version_aref       => '',
 	_selection_index         => 0,
 	_start                   => 0,
+	_value                   => '',
 	_values_aref             => '',
 	_values_aref2            => '',
 };
 
+my @cloned_values_aref2;
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 my $get = L_SU_global_constants->new();
@@ -98,8 +100,11 @@ my $empty_string = $var->{_empty_string};
 
 sub _get_good_length4item {
 	my ( $self, $index4flow ) = @_;
+
 	my $idx    = $index4flow;
 	my $length = scalar @{ $param_flow_grey->{_good_values_aref2}[$idx] };
+
+	#	print 'a\n';
 	return ($length);
 }
 
@@ -116,7 +121,11 @@ sub _get_names_aref {
 		my ( @names_aref, @names );
 		@names_aref = @{ @{ $param_flow_grey->{_names_aref2} }[$item_index] };
 
-		print("param_flow_grey, _get_names_aref, @names_aref, index=$item_index\n");
+		#		print(
+		#			"param_flow_grey, _get_names_aref, @names_aref, index=$item_index\n"
+		#		);
+		#
+		#			print 'b\n';
 		return ( \@names_aref );
 	}
 }
@@ -149,8 +158,8 @@ sub _get_values_aref {
 sub _set_good_labels4item {
 	my ($index4flow) = @_;
 
-	# print("param_flow_grey,set_good_indices4item,
-	# self,index4flow: $self,$index4flow\n");
+	#	print("param_flow_grey,set_good_indices4item,
+	#	 index4flow: $index4flow\n");
 	my $idx = $index4flow;
 	my (@good);
 	my ($j);
@@ -163,7 +172,7 @@ sub _set_good_labels4item {
 	my $values_aref = _get_values_aref($idx);
 	my $length      = scalar @$values_aref;
 
-	for ( my $i = 0, $j = 0; $i < $length; $i++ ) {
+	for ( my $i = 0, $j = 0 ; $i < $length ; $i++ ) {
 
 		# print("param_flow_grey, _set_good_labels4item:
 		# values_aref is @$values_aref[$i]\n");
@@ -186,12 +195,14 @@ sub _set_good_labels4item {
 
 			}
 			else {
-				print("param_flow_grey, _set_good_labels_4item: unexpected ending\n");
+				print(
+"param_flow_grey, _set_good_labels_4item: unexpected ending\n"
+				);
 			}
 
 		}
 		else {
-			# NADA print("param_flow_grey, _set_good_labels_4item: no values are present, can not be saved\n");
+# NADA print("param_flow_grey, _set_good_labels_4item: no values are present, can not be saved\n");
 		}
 	}
 
@@ -222,21 +233,21 @@ sub _set_good_labels4item {
 sub _set_good_values4item {
 	my ($index4flow) = @_;
 
-#	print("param_flow_grey,set_good_indices4item,index4flow: $index4flow \n");
+ #    print("param_flow_grey,set_good_indices4item,index4flow: $index4flow \n");
 
 	my $idx = $index4flow;    # program sequence in flow
 	my (@good);
 	my ($j);
 
-#	print("1. param_flow_grey,_set_good_values4item, flow index:$idx, 
-#	prog name:@{$param_flow_grey->{_prog_names_aref}}[$idx] \n");
+	#	print("1. param_flow_grey,_set_good_values4item, flow index:$idx,
+	#	prog name:@{$param_flow_grey->{_prog_names_aref}}[$idx] \n");
 
 	my $values_aref = _get_values_aref($idx);
 	my $length      = scalar @$values_aref;
 
-#	print("2. param_flow_grey,_set_good_values4item, length: $length\n");
+	#	print("2. param_flow_grey,_set_good_values4item, length: $length\n");
 
-	for ( my $i = 0, $j = 0; $i < $length; $i++ ) {
+	for ( my $i = 0, $j = 0 ; $i < $length ; $i++ ) {
 
 #		print("param_flow_grey, _set_good_values_4item: index=$i, values_aref= @$values_aref[$i]\n");
 		if ( defined( @{$values_aref}[$i] )
@@ -246,16 +257,18 @@ sub _set_good_values4item {
 			if ( @$values_aref[$i] ne "'nu'" ) {
 
 				my $value =
-					${ @{ $param_flow_grey->{_values_aref2} }[$idx] }[$i];
+				  ${ @{ $param_flow_grey->{_values_aref2} }[$idx] }[$i];
 
-#				print("2. param_flow_grey,_set_good_values4item,good index #$i\n");
-#				print("2. param_flow_grey,_set_good_values4item,value:$value \n");
+		#				print("2. param_flow_grey,_set_good_values4item,good index #$i\n");
+		#				print("2. param_flow_grey,_set_good_values4item,value:$value \n");
 				$good[$j] = $value;
 				$j++;
 
 			}
 			else {
-				print("param_flow_grey, _set_good_values_4item: unexpected ending\n");
+				print(
+"param_flow_grey, _set_good_values_4item: unexpected ending\n"
+				);
 			}
 
 		}
@@ -266,14 +279,14 @@ sub _set_good_values4item {
 
 	$num_good_values[$idx] = $j;
 
-#	print("param_flow_grey,_set_good_values4item,good_values=@good \n");
+	#	print("param_flow_grey,_set_good_values4item,good_values=@good \n");
 
 	$param_flow_grey->{_num_good_values_aref} = \@num_good_values;
 
 	$good_values[$idx] = \@good;
 	$param_flow_grey->{_good_values_aref2} = \@good_values;
 
-	# print("	3. param_flow_grey,_set_good_values4item,num_good_values= $num_good_values[$idx], values are:	@{@{$param_flow_grey->{_good_values_aref2}}[$idx]}\n");
+# print("	3. param_flow_grey,_set_good_values4item,num_good_values= $num_good_values[$idx], values are:	@{@{$param_flow_grey->{_good_values_aref2}}[$idx]}\n");
 	return ();
 }
 
@@ -305,7 +318,7 @@ sub clear {
 	$param_flow_grey->{_indices}                 = -1;
 	$param_flow_grey->{_label_boxes_w}           = '';
 	$param_flow_grey->{_length}                  = '';
-	$param_flow_grey->{_max_index}               = -1;	
+	$param_flow_grey->{_max_index}               = -1;
 	$param_flow_grey->{_names_aref}              = '';
 	$param_flow_grey->{_names_aref2}             = '';
 	$param_flow_grey->{_num_good_values_aref}    = 0;
@@ -315,10 +328,12 @@ sub clear {
 	$param_flow_grey->{_num_items4checkbuttons}  = 0;
 	$param_flow_grey->{_num_items4names}         = 0;
 	$param_flow_grey->{_num_items4values}        = 0;
+	$param_flow_grey->{_param_index}             = '';
 	$param_flow_grey->{_prog_names_aref}         = '';
 	$param_flow_grey->{_prog_version_aref}       = '';
 	$param_flow_grey->{_selection_index}         = -1;
 	$param_flow_grey->{_start}                   = '';
+	$param_flow_grey->{_value}                   = '';
 	$param_flow_grey->{_values_aref}             = '';
 	$param_flow_grey->{_values_aref2}            = '';
 	@program_names                               = ();
@@ -330,7 +345,7 @@ sub clear {
 	@values                                      = ();
 	@checkbuttons                                = ();
 
-	# print("param_flow_grey, clear finished\n");
+	#	print("param_flow_grey, clear finished\n");
 	return ();
 
 }
@@ -351,13 +366,17 @@ sub clear_flow_items_version_aref {
 
 		# if ($param_flow_grey->{_prog_version_aref} eq '') {
 
-		# 	print("param_flow_grey, clear_flow_items_version_aref, param_flow_grey->{_prog_version_aref} = '' \n");
-		# }
+# 	print("param_flow_grey, clear_flow_items_version_aref, param_flow_grey->{_prog_version_aref} = '' \n");
+# }
 
 	}
 	else {
-		print("param_flow_grey, clear_flow_items_version_aref, missing program_version_aref\n");
+		print(
+"param_flow_grey, clear_flow_items_version_aref, missing program_version_aref\n"
+		);
 	}
+
+	#	print("d\n");
 
 }
 
@@ -377,60 +396,63 @@ sub delete_selection {
 	my $first     = 0;
 	$param_flow_grey->{_index2delete} = $index2delete;
 
-	# print("\nparam_flow_grey,delete_selection B4 deletion,idx2delete=$index2delete\n");
-	# view_data($index2delete);
-	
-	if ( $index2delete eq 'all' 
-	and $num_items > 0 ) {
-		
+#print("\nparam_flow_grey,delete_selection B4 deletion,idx2delete=$index2delete\n");
+# view_data($index2delete);
+
+	if (    $index2delete eq 'all'
+		and $num_items > 0 )
+	{
+
 		# print("param_flow_grey, all deleted using double quotes \n");
-		
+
 		@{ $param_flow_grey->{_checkbuttons_aref2} } = '';
-		@{ $param_flow_grey->{_names_aref2} } = '';
-		@{ $param_flow_grey->{_values_aref2} } = '';
-		@{ $param_flow_grey->{_prog_names_aref} } = '';
-		
-		$param_flow_grey->{_num_items} = 0;
-		$param_flow_grey->{_num_items4flow} = 0;
-		$param_flow_grey->{_num_items4values} = 0;
-		$param_flow_grey->{_num_items4names} = 0;
+		@{ $param_flow_grey->{_names_aref2} }        = '';
+		@{ $param_flow_grey->{_values_aref2} }       = '';
+		@{ $param_flow_grey->{_prog_names_aref} }    = '';
+
+		$param_flow_grey->{_num_items}              = 0;
+		$param_flow_grey->{_num_items4flow}         = 0;
+		$param_flow_grey->{_num_items4values}       = 0;
+		$param_flow_grey->{_num_items4names}        = 0;
 		$param_flow_grey->{_num_items4checkbuttons} = 0;
-	
-		$param_flow_grey->{_indices} = -1;
-		$param_flow_grey->{_index4values} = -1;
-		$param_flow_grey->{_index4names} = -1;
+
+		$param_flow_grey->{_indices}            = -1;
+		$param_flow_grey->{_index4values}       = -1;
+		$param_flow_grey->{_index4names}        = -1;
 		$param_flow_grey->{_index4checkbuttons} = -1;
-		$param_flow_grey->{_index4flow} = -1;
-		
+		$param_flow_grey->{_index4flow}         = -1;
+
 	}
-	elsif ( $index2delete == $end && $num_items > 1 ) {    
-			# CASE 1: delete end item but not the last one
-			# final item but more than one item
-		    # print("index2delete = end, idx $index2delete\n");
-		    # empty end index of array
-		    
+	elsif ( $index2delete == $end && $num_items > 1 ) {
+
+		# CASE 1: delete end item but not the last one
+		# final item but more than one item
+		# print("index2delete = end, idx $index2delete\n");
+		# empty end index of array
+
 		pop @{ $param_flow_grey->{_checkbuttons_aref2} };
 		pop @{ $param_flow_grey->{_names_aref2} };
 		pop @{ $param_flow_grey->{_values_aref2} };
 		pop @{ $param_flow_grey->{_prog_names_aref} };
-	
+
 		$param_flow_grey->{_num_items}--;
 		$param_flow_grey->{_num_items4flow}--;
 		$param_flow_grey->{_num_items4values}--;
 		$param_flow_grey->{_num_items4names}--;
 		$param_flow_grey->{_num_items4checkbuttons}--;
-			
+
 		$param_flow_grey->{_indices}--;
 		$param_flow_grey->{_index4values}--;
 		$param_flow_grey->{_index4names}--;
 		$param_flow_grey->{_index4checkbuttons}--;
-			
+
 		$param_flow_grey->{_index4flow}--;
 
 		# no $index_after;
-	
+
 	}
 	elsif ( $index2delete >= 0 && $index2delete < $end ) {
+
 		# CASE 2: GENERAL CASE
 		#  listbox has 3 items or more
 		#  I can delete any but final
@@ -439,18 +461,23 @@ sub delete_selection {
 		# print("index2delete >= 0 , idx2delete=$index2delete end=$end \n");
 		# print("index_after $index_after \n");
 
-		for ( my $i = $index_after, my $j = $index2delete; $i <= $end; $i++, $j++ ) {
+		for (
+			my $i = $index_after, my $j = $index2delete ;
+			$i <= $end ;
+			$i++, $j++
+		  )
+		{
 
-			# print("Prog names B4 delete  @{$param_flow_grey->{_prog_names_aref}}	\n");
+	# print("Prog names B4 delete  @{$param_flow_grey->{_prog_names_aref}}	\n");
 
 			@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } =
-				@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$i] };
+			  @{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$i] };
 			@{ @{ $param_flow_grey->{_names_aref2} }[$j] } =
-				@{ @{ $param_flow_grey->{_names_aref2} }[$i] };
+			  @{ @{ $param_flow_grey->{_names_aref2} }[$i] };
 			@{ @{ $param_flow_grey->{_values_aref2} }[$j] } =
-				@{ @{ $param_flow_grey->{_values_aref2} }[$i] };
+			  @{ @{ $param_flow_grey->{_values_aref2} }[$i] };
 			@{ $param_flow_grey->{_prog_names_aref} }[$j] =
-				@{ $param_flow_grey->{_prog_names_aref} }[$i];
+			  @{ $param_flow_grey->{_prog_names_aref} }[$i];
 		}
 
 		# empty end index of array
@@ -460,49 +487,52 @@ sub delete_selection {
 		pop @{ $param_flow_grey->{_values_aref2} };
 		pop @{ $param_flow_grey->{_prog_names_aref} };
 
-		# print("Prog names After delete @{$param_flow_grey->{_prog_names_aref}}	\n");
-						
-	 	$param_flow_grey->{_num_items}--;
+  # print("Prog names After delete @{$param_flow_grey->{_prog_names_aref}}	\n");
+
+		$param_flow_grey->{_num_items}--;
 		$param_flow_grey->{_num_items4flow}--;
 		$param_flow_grey->{_num_items4values}--;
 		$param_flow_grey->{_num_items4names}--;
 		$param_flow_grey->{_num_items4checkbuttons}--;
-			
+
 		$param_flow_grey->{_indices}--;
 		$param_flow_grey->{_index4values}--;
 		$param_flow_grey->{_index4names}--;
 		$param_flow_grey->{_index4checkbuttons}--;
-			
+
 		$param_flow_grey->{_index4flow}--;
-		
+
 	}
 	elsif ( $index2delete == 0 && $num_items == 1 ) {
-		# CASE 3: listbox has only 1 and final item left	
+
+		# CASE 3: listbox has only 1 and final item left
 		# print("index2delete = 0 and num_items=1, idx $index2delete\n");
 		# empty end index of array
 		pop @{ $param_flow_grey->{_checkbuttons_aref2} };
 		pop @{ $param_flow_grey->{_names_aref2} };
 		pop @{ $param_flow_grey->{_values_aref2} };
 		pop @{ $param_flow_grey->{_prog_names_aref} };
-		
-		$param_flow_grey->{_num_items} = 0;
-		$param_flow_grey->{_num_items4flow} = 0;
-		$param_flow_grey->{_num_items4values} = 0;
-		$param_flow_grey->{_num_items4names} = 0;
+
+		$param_flow_grey->{_num_items}              = 0;
+		$param_flow_grey->{_num_items4flow}         = 0;
+		$param_flow_grey->{_num_items4values}       = 0;
+		$param_flow_grey->{_num_items4names}        = 0;
 		$param_flow_grey->{_num_items4checkbuttons} = 0;
-	
-		$param_flow_grey->{_indices} = -1;
-		$param_flow_grey->{_index4values} = -1;
-		$param_flow_grey->{_index4names} = -1;
+
+		$param_flow_grey->{_indices}            = -1;
+		$param_flow_grey->{_index4values}       = -1;
+		$param_flow_grey->{_index4names}        = -1;
 		$param_flow_grey->{_index4checkbuttons} = -1;
-	
+
 		$param_flow_grey->{_index4flow} = -1;
 
 		# no $index_after;
-		
-	} else {
+
+	}
+	else {
 		print("delete_selection, param_flow_grey, unexcpeted result\n");
 	}
+
 	# print("\nAfter delete_selection, index2delete was $index2delete\n");
 	# view_data($index2delete);
 
@@ -559,7 +589,7 @@ sub get_check_buttons_settings {
 	if ( $index >= 0 ) {
 		my @on_off = @{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$index] };
 
-		# print("param_flow_grey,get_check_buttons_settings: is @on_off\n");
+		#		print("param_flow_grey,get_check_buttons_settings: is @on_off\n");
 
 		return ( \@on_off );
 	}
@@ -576,8 +606,8 @@ sub get_flow_index {
 	my ($self) = @_;
 	my $current_idx = $param_flow_grey->{_index4flow};
 
-	# print("param_flow_grey, get flow_index,
-	# current_idx is $param_flow_grey->{_index4flow}\n");
+	#	print("param_flow_grey, get flow_index,
+	#	current_idx is $param_flow_grey->{_index4flow}\n");
 	return ($current_idx);
 }
 
@@ -592,8 +622,8 @@ sub get_flow_prog_names_aref {
 
 	if ( $param_flow_grey->{_prog_names_aref} ne $empty_string ) {
 
-		# print("param_flow_grey, get_flow_prog_names_aref,
-		# @{$param_flow_grey->{_prog_names_aref}}\n");
+		#		print("param_flow_grey, get_flow_prog_names_aref,
+		#		@{$param_flow_grey->{_prog_names_aref}}\n");
 
 		my $hash->{_prog_names_aref} = $param_flow_grey->{_prog_names_aref};
 		return ( $hash->{_prog_names_aref} );
@@ -614,8 +644,8 @@ sub get_flow_items_version_aref {
 	my ($self) = @_;
 	my $program_version_aref = $param_flow_grey->{_prog_version_aref};
 
-	# print("param_flow_grey, get_flow_items_version_aref
-	# @{$param_flow_grey->{_prog_version_aref}}\n");
+	#	print("param_flow_grey, get_flow_items_version_aref
+	#	@{$param_flow_grey->{_prog_version_aref}}\n");
 
 	return ($program_version_aref);
 }
@@ -630,9 +660,9 @@ sub get_good_labels_aref2 {
 	if ( $param_flow_grey->{_good_labels_aref2} ) {
 		my $good_labels_aref2 = $param_flow_grey->{_good_labels_aref2};
 
-		# print(" param_flow_grey,get_good_labels_aref2,
-		# good_labels for index 0=
-		# @{@{$param_flow_grey->{_good_labels_aref2}}[0]}\n");
+		#		print(" param_flow_grey,get_good_labels_aref2,
+		#		good_labels for index 0=
+		#		@{@{$param_flow_grey->{_good_labels_aref2}}[0]}\n");
 		return ($good_labels_aref2);
 	}
 	return ();
@@ -662,9 +692,9 @@ sub get_good_values_aref2 {
 
 sub get_names_aref {
 	my ($self) = @_;
-	
+
 	my $index = $param_flow_grey->{_selection_index};
-	
+
 	if ( $index >= 0 ) {
 		my @names_aref;
 		my ($length);
@@ -672,7 +702,7 @@ sub get_names_aref {
 		@names_aref = @{ @{ $param_flow_grey->{_names_aref2} }[$index] };
 		$length     = scalar @names_aref;
 
-#		print(" param_flow_grey, get_names_aref:  @names_aref, index is $index\n");
+#  		print(" param_flow_grey, get_names_aref:  @names_aref, index is $index\n");
 		return ( \@names_aref );
 	}
 	else {
@@ -703,6 +733,8 @@ sub get_num_good_values_aref {
 
 	if ( $param_flow_grey->{_num_good_values_aref} ) {
 		my $num_good_values_aref = $param_flow_grey->{_num_good_values_aref};
+
+		#			print("e\n");
 		return ($num_good_values_aref);
 	}
 	return ();
@@ -716,15 +748,16 @@ sub get_num_good_values_aref {
 
 =cut
 
-sub get_max_index{
+sub get_max_index {
 	my ($self) = @_;
 
 	if ( $param_flow_grey->{_num_items} >= 0 ) {
-		
+
 		my $max_index = $param_flow_grey->{_num_items} + 1;
 
 		my $result = $max_index;
-		print("param_flow_grey,get_max_index, max_index = $param_flow_grey->{_max_index} \n");
+
+# print("param_flow_grey,get_max_index, max_index = $param_flow_grey->{_max_index} \n");
 		return ($result);
 
 	}
@@ -734,7 +767,6 @@ sub get_max_index{
 	}
 
 }
-
 
 =head2 sub get_num_items
 
@@ -748,9 +780,11 @@ sub get_num_items {
 	my ($self) = @_;
 
 	if ( $param_flow_grey->{_num_items} >= 0 ) {
+
 		my $num_items = $param_flow_grey->{_num_items};
 
 		my $result = $num_items;
+
 #		print("param_flow_grey,get_num_items, num_items = $param_flow_grey->{_num_items} \n");
 		return ($result);
 
@@ -764,41 +798,43 @@ sub get_num_items {
 
 =head2 sub get_values_aref
 
+Collect all the values, whether empty
+or not
 
 =cut
 
 sub get_values_aref {
 	my ($self) = @_;
 
-	# print("param_flow_grey, get_values :_selection_index $param_flow_grey->{_selection_index}\n");
+# print("param_flow_grey, get_values :_selection_index $param_flow_grey->{_selection_index}\n");
 
 	if ( ( $param_flow_grey->{_selection_index} >= 0 )
 		&& $param_flow_grey->{_values_aref2} )
 	{
 
 		my $index = $param_flow_grey->{_selection_index};
-
-		# print("param_flow_grey, get_values :_values_aref2:@{@{$param_flow_grey->{_values_aref2}}[$index]}\n");
 		my ( $i, $j, $length );
-		my ( @values_aref, @values );
+		my (@values);
 
-		# print("param_flow_grey, get_values :index $index\n");
+		#		print("param_flow_grey, get_values :flow index= $index\n");
+		@values = @{ @{ $param_flow_grey->{_values_aref2} }[$index] };
 
-		@values_aref = @{ @{ $param_flow_grey->{_values_aref2} }[$index] };
-		$length      = scalar @values_aref;
+		#		$length      = scalar @values;
+		#		print("param_flow_grey, get_values :length=$length\n");
 
-		# print("param_flow_grey,get_values :values_aref is @values_aref\n");
+		#		for my $in (@values) {
+		#			print("param_flow_grey,get_values :value is--$in--\n");
+		#		}
+		#		print("\n");
 
-		for ( $i = 1, $j = 0; $i < $length; $i = $i + 2, $j++ ) {
-			$values[$j] = $values_aref[$i];
-
-			# print("param_flow_grey, get_values :index $j values: $values[$j]\n");
-		}
-		return ( \@values_aref );
+#    print("param_flow_grey,view_data: checkbuttons: @{@{$param_flow_grey->{_checkbuttons_aref2}}[$i]}\n\n");
+		return ( \@values );
 
 	}
 	else {
-		print("param_flow_grey,get_values_aref :selection_index <=0  or values_aref2\n");
+		print(
+"param_flow_grey,get_values_aref :selection_index <=0  or vmissing alues_aref2\n"
+		);
 		return ();
 	}
 }
@@ -811,15 +847,15 @@ sub get_values_aref {
 =cut
 
 sub insert_selection {
-	my ($self)    = @_;
-	
+	my ($self) = @_;
+
 	my $first     = 0;
 	my $idx2mv    = $param_flow_grey->{_index2move};
 	my $destn_idx = $param_flow_grey->{_destination_index};
 	my $end       = $param_flow_grey->{_indices};
 	my $num_items = $param_flow_grey->{_num_items};
 
-	# # print("param_flow_grey,insert_selection start is $idx2mv\n");
+	#	 print("param_flow_grey,insert_selection start is $idx2mv\n");
 	# print("param_flow_grey,insert_selection,destn_id is $destn_idx\n");
 	# print("param_flow_grey,insert_selection, last index  is $end\n");
 
@@ -835,57 +871,67 @@ sub insert_selection {
 	@tmp_names_aref  = @{ @{ $param_flow_grey->{_names_aref2} }[$idx2mv] };
 	@tmp_values_aref = @{ @{ $param_flow_grey->{_values_aref2} }[$idx2mv] };
 	@tmp_checkbuttons_aref =
-		@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$idx2mv] };
+	  @{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$idx2mv] };
 
-	# print(" param_flow_grey,insert_selection,mobile prog name: $tmp_prog_name	 \n");
-	# print(" mobile names originally at index $idx2mv is @tmp_names_aref\n");
-	# print(" values:	 		@tmp_values_aref   \n");
-	# print(" checkbuttons: 	@tmp_checkbuttons_aref \n");
+# print(" param_flow_grey,insert_selection,mobile prog name: $tmp_prog_name	 \n");
+# print(" mobile names originally at index $idx2mv is @tmp_names_aref\n");
+# print(" values:	 		@tmp_values_aref   \n");
+# print(" checkbuttons: 	@tmp_checkbuttons_aref \n");
 
 	# STEP 2 intermediate vector containing everything except mobile item
 	# swap files have one less item than the original array
 	if ( $idx2mv > $first ) {
 
-		for ( my $i = $first, my $j = $first; $j < $idx2mv; $i++, $j++ ) {
+		for ( my $i = $first, my $j = $first ; $j < $idx2mv ; $i++, $j++ ) {
 			$swap_prog_names[$i] =
-				@{ $param_flow_grey->{_prog_names_aref} }[$j];
+			  @{ $param_flow_grey->{_prog_names_aref} }[$j];
 			$swap_names_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
 			$swap_values_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
 			$swap_checkbuttons_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
 
-			# print(" 1. filling  swap vector at index $i with @{$swap_names_aref[$i]}\n");
-			# print(" 1. filling  swap vector values t index $i with @{$swap_values_aref[$i]}\n");
-			#print(" 1. filling  swap vector values t index $i with $swap_prog_names[$i]\n");
+# print(" 1. filling  swap vector at index $i with @{$swap_names_aref[$i]}\n");
+# print(" 1. filling  swap vector values t index $i with @{$swap_values_aref[$i]}\n");
+#print(" 1. filling  swap vector values t index $i with $swap_prog_names[$i]\n");
 		}
-		for ( my $i = $idx2mv, my $j = ( $idx2mv + 1 ); $j <= $end; $i++, $j++ ) {
+		for (
+			my $i = $idx2mv, my $j = ( $idx2mv + 1 ) ;
+			$j <= $end ;
+			$i++, $j++
+		  )
+		{
 			$swap_prog_names[$i] =
-				@{ $param_flow_grey->{_prog_names_aref} }[$j];
+			  @{ $param_flow_grey->{_prog_names_aref} }[$j];
 			$swap_names_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
 			$swap_values_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
 			$swap_checkbuttons_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
 
-			# print(" 2. filling  swap vector at index $i with @{$swap_names_aref[$i]}\n");
+ # print(" 2. filling  swap vector at index $i with @{$swap_names_aref[$i]}\n");
 		}
 	}
 	else {    # assume $idx2mv=0
-		for ( my $i = $first, my $j = ( $first + 1 ); $j <= $end; $i++, $j++ ) {    # idx2mv=0
+		for (
+			my $i = $first, my $j = ( $first + 1 ) ;
+			$j <= $end ;
+			$i++, $j++
+		  )
+		{     # idx2mv=0
 
 			$swap_prog_names[$i] =
-				@{ $param_flow_grey->{_prog_names_aref} }[$j];
+			  @{ $param_flow_grey->{_prog_names_aref} }[$j];
 			$swap_names_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_names_aref2} }[$j] } );
 			$swap_values_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$j] } );
 			$swap_checkbuttons_aref[$i] =
-				clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
+			  clone( \@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$j] } );
 
-			# print(" 3. filling intermediate vector at int. index $i with @{$swap_names_aref[$i]}\n");
+# print(" 3. filling intermediate vector at int. index $i with @{$swap_names_aref[$i]}\n");
 		}
 	}
 
@@ -893,56 +939,62 @@ sub insert_selection {
 	#  into the final destination container
 	if ( $destn_idx > $first ) {    # assume $destn_idx > 0
 
-		for ( my $i = $first, my $j = $first; $i < $destn_idx; $i++, $j++ ) {
+		for ( my $i = $first, my $j = $first ; $i < $destn_idx ; $i++, $j++ ) {
 			@{ $param_flow_grey->{_prog_names_aref} }[$i] =
-				$swap_prog_names[$j];
+			  $swap_prog_names[$j];
 			@{ @{ $param_flow_grey->{_names_aref2} }[$i] } =
-				@{ $swap_names_aref[$j] };
+			  @{ $swap_names_aref[$j] };
 			@{ @{ $param_flow_grey->{_values_aref2} }[$i] } =
-				@{ $swap_values_aref[$j] };
+			  @{ $swap_values_aref[$j] };
 			@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$i] } =
-				@{ $swap_checkbuttons_aref[$j] };
+			  @{ $swap_checkbuttons_aref[$j] };
 
-			# print(" 1. final vector at new index $i uses swap @{$swap_names_aref[$j]}\n");
-			# print(" 1. final vector at new index $i is @{@{$param_flow_grey->{_names_aref2}}[$i]}\n");
+# print(" 1. final vector at new index $i uses swap @{$swap_names_aref[$j]}\n");
+# print(" 1. final vector at new index $i is @{@{$param_flow_grey->{_names_aref2}}[$i]}\n");
 		}
 
-		for ( my $i = ( $destn_idx + 1 ), my $j = $destn_idx; $i <= $end; $i++, $j++ ) {
+		for (
+			my $i = ( $destn_idx + 1 ), my $j = $destn_idx ;
+			$i <= $end ;
+			$i++, $j++
+		  )
+		{
 			@{ $param_flow_grey->{_prog_names_aref} }[$i] =
-				$swap_prog_names[$j];
+			  $swap_prog_names[$j];
 			@{ @{ $param_flow_grey->{_names_aref2} }[$i] } =
-				@{ $swap_names_aref[$j] };
+			  @{ $swap_names_aref[$j] };
 			@{ @{ $param_flow_grey->{_values_aref2} }[$i] } =
-				@{ $swap_values_aref[$j] };
+			  @{ $swap_values_aref[$j] };
 			@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$i] } =
-				@{ $swap_checkbuttons_aref[$j] };
+			  @{ $swap_checkbuttons_aref[$j] };
 
-			# print(" 2. final vector at new index $i with swap @{$swap_names_aref[$j]}\n");
+# print(" 2. final vector at new index $i with swap @{$swap_names_aref[$j]}\n");
 
 		}
 	}
 	else {    # assume $destn_idx = 0
-		      #  swap files have one less item than the original array
-		      #   print(" 2A. destn_idx = $destn_idx\n");
-		      # print(" 4. swap vector index=0 with @{$swap_names_aref[0]}\n");
-		      # print(" 4. swap vector index=1 with @{$swap_names_aref[1]}\n");
-		      # print(" 4. swap vector index=2 with @{$swap_names_aref[2]}\n\n");
+			#  swap files have one less item than the original array
+			#   print(" 2A. destn_idx = $destn_idx\n");
+			# print(" 4. swap vector index=0 with @{$swap_names_aref[0]}\n");
+			# print(" 4. swap vector index=1 with @{$swap_names_aref[1]}\n");
+			# print(" 4. swap vector index=2 with @{$swap_names_aref[2]}\n\n");
 
-		for ( my $i = ( $first + 1 ), my $j = $first; $j < $end; $i++, $j++ ) {
+		for ( my $i = ( $first + 1 ), my $j = $first ; $j < $end ; $i++, $j++ )
+		{
 			my @swp_nam_tr = @{ $swap_names_aref[$j] };
 
-			# print(" 4. swap vector at swap index j=$j has value of @swp_nam_tr \n");
+	  # print(" 4. swap vector at swap index j=$j has value of @swp_nam_tr \n");
 			@{ $param_flow_grey->{_prog_names_aref} }[$i] =
-				$swap_prog_names[$j];
+			  $swap_prog_names[$j];
 			@{ @{ $param_flow_grey->{_names_aref2} }[$i] } = @swp_nam_tr;
 			@{ @{ $param_flow_grey->{_values_aref2} }[$i] } =
-				@{ $swap_values_aref[$j] };
+			  @{ $swap_values_aref[$j] };
 			@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$i] } =
-				@{ $swap_checkbuttons_aref[$j] };
+			  @{ $swap_checkbuttons_aref[$j] };
 
-			#print(" 3. swap vector at index $j, @{$swap_names_aref[$j]}  names final vector at new index $i \n");
-			#print(" 3. swap vector at index $j, @{$swap_values_aref[$j]}  values final vector at new index $i \n");
-			#print(" 3. swap vector at index $j,  $swap_prog_names[$j] prog names final vector at new index $i \n");
+#print(" 3. swap vector at index $j, @{$swap_names_aref[$j]}  names final vector at new index $i \n");
+#print(" 3. swap vector at index $j, @{$swap_values_aref[$j]}  values final vector at new index $i \n");
+#print(" 3. swap vector at index $j,  $swap_prog_names[$j] prog names final vector at new index $i \n");
 		}
 	}
 
@@ -951,9 +1003,9 @@ sub insert_selection {
 	@{ @{ $param_flow_grey->{_names_aref2} }[$destn_idx] }  = @tmp_names_aref;
 	@{ @{ $param_flow_grey->{_values_aref2} }[$destn_idx] } = @tmp_values_aref;
 	@{ @{ $param_flow_grey->{_checkbuttons_aref2} }[$destn_idx] } =
-		@tmp_checkbuttons_aref;
+	  @tmp_checkbuttons_aref;
 
-	# print(" 4. final vector at new index $destn_idx with temp vector @tmp_names_aref\n");
+# print(" 4. final vector at new index $destn_idx with temp vector @tmp_names_aref\n");
 
 	#print("data after insertion\n");
 	#view_data();
@@ -984,7 +1036,7 @@ sub length {
 		@values_aref = @{ @{ $param_flow_grey->{_values_aref2} }[$index] };
 		$length      = scalar @values_aref;
 
-		# print("param_flow_grey, length, num values: $length\n");
+		#		print("param_flow_grey, length, num values: $length\n");
 		#  						print("param_flow_grey, index: $index\n");
 		return ($length);
 	}
@@ -1006,6 +1058,8 @@ sub set_check_buttons_settings_aref {
 	my $index       = $param_flow_grey->{_selection_index};
 	my $chkbut_aref = $check_buttons_settings_aref;
 
+	#		print("e\n");
+
 	if ( $index >= 0 ) {
 		my ( $i, $j, $length );
 		my @on_off;
@@ -1015,23 +1069,23 @@ sub set_check_buttons_settings_aref {
 
 		# $length			= scalar @$chkbut_aref;
 
-		# print("param_flow_grey,set_check_buttons_settings: is @$chkbut_aref\n");
+	  # print("param_flow_grey,set_check_buttons_settings: is @$chkbut_aref\n");
 
-		#for ($i=1,$j=0; $i < $length; $i=$i+2,$j++ ) {
-		#for ($i=0; $i < $length; $i++ ) {
-		#$values[$j]  = $values_aref[$i];
-		#print("param_flow_grey, set_check_buttons_settings :index $j values: $values[$j]\n");
-		#if(@$values_aref[$i] eq $nu) {
-		#  	$on_off[$i]     = $off;
-		# print(" 1. param_flow_grey, set_check_buttons_settings,$on_off[$i]\n");
-		#}
-		#else {
-		#		$on_off[$i]     = $on;
-		# print(" 2. param_flow_grey, set_check_buttons_settings,$on_off[$i]\n");
-		#}
-		# print("param_flow_grey: set_check_buttons_settings :index $i setting $nu is: $on_off[$i]\n");
-		#}
-		#return();
+#for ($i=1,$j=0; $i < $length; $i=$i+2,$j++ ) {
+#for ($i=0; $i < $length; $i++ ) {
+#$values[$j]  = $values_aref[$i];
+#print("param_flow_grey, set_check_buttons_settings :index $j values: $values[$j]\n");
+#if(@$values_aref[$i] eq $nu) {
+#  	$on_off[$i]     = $off;
+# print(" 1. param_flow_grey, set_check_buttons_settings,$on_off[$i]\n");
+#}
+#else {
+#		$on_off[$i]     = $on;
+# print(" 2. param_flow_grey, set_check_buttons_settings,$on_off[$i]\n");
+#}
+# print("param_flow_grey: set_check_buttons_settings :index $i setting $nu is: $on_off[$i]\n");
+#}
+#return();
 	}
 	return ();
 }
@@ -1047,7 +1101,7 @@ sub set_flow_items_version_aref {
 	if ($program_version_aref) {
 		$param_flow_grey->{_prog_version_aref} = $program_version_aref;
 
-		#print("param_flow_grey, set_flow_items_version_aref @{$param_flow_grey->{_prog_version_aref}}\n");
+#print("param_flow_grey, set_flow_items_version_aref @{$param_flow_grey->{_prog_version_aref}}\n");
 	}
 }
 
@@ -1063,7 +1117,7 @@ sub set_insert_start {
 	my ( $self, $start ) = @_;
 	$param_flow_grey->{_index2move} = $start;
 
-	# print("param_flow_grey,set_insert_start is $start\n");
+	#	print("param_flow_grey,set_insert_start is $start\n");
 	return ();
 }
 
@@ -1079,7 +1133,7 @@ sub set_insert_end {
 	my ( $self, $end ) = @_;
 	$param_flow_grey->{_destination_index} = $end;
 
-	# print("param_flow_grey,set_insert_end  $end \n");
+	#	print("param_flow_grey,set_insert_end  $end \n");
 
 	return ();
 }
@@ -1095,8 +1149,8 @@ sub set_insert_end {
 sub set_flow_index {
 	my ( $self, $index ) = @_;
 
-	# print("param_flow_grey, set_flow_index,index, $index\n");
-	if (  CORE::length($index)  ) {
+	#	print("param_flow_grey, set_flow_index,index, $index\n");
+	if ( CORE::length $index ) {
 
 		if ( $index ne $empty_string && $index >= 0 ) {
 
@@ -1104,19 +1158,21 @@ sub set_flow_index {
 
 		}
 		else {
-			# print(
-			# "param_flow_grey, set_flow_index,unexpected index, index:$index NADA\n"
-			# );
+	   # print(
+	   # "param_flow_grey, set_flow_index,unexpected index, index:$index NADA\n"
+	   # );
 		}
 	}
 	elsif ( $index ne $empty_string && $index < 0 ) {
 
-		# assume flow index selected = 0 . Should not be a problem because we assume that any and
-		# all parameters values are changed when ANY flow item is selected
+# assume flow index selected = 0 . Should not be a problem because we assume that any and
+# all parameters values are changed when ANY flow item is selected
 		$index = 0;
 		$param_flow_grey->{_selection_index} = $index;
 
-		print("param_flow_grey, set_flow_index,index does not exist, index:$index\n");
+		print(
+"param_flow_grey, set_flow_index,index does not exist, index:$index\n"
+		);
 
 	}
 	else {
@@ -1136,7 +1192,7 @@ sub set_names_aref {
 	my ( $self, $names_aref ) = @_;
 	my $index = $param_flow_grey->{_selection_index};
 
-	# print(" param_flow_grey, set_names:  @{$names_aref}, index is $index\n");
+	#	print(" param_flow_grey, set_names:  @{$names_aref}, index is $index\n");
 
 	if ( $index >= 0 ) {
 		my @names_aref;
@@ -1150,6 +1206,29 @@ sub set_names_aref {
 	}
 }
 
+=head2 sub set_param_index
+
+ set single index
+
+=cut 
+
+sub set_param_index {
+	my ( $self, $index ) = @_;
+
+	if ( CORE::length($index) ) {
+
+		$param_flow_grey->{_param_index} = $index;
+#		print(
+#"param_flow_color, set_param_index, $param_flow_grey->{_param_index}\n"
+#		);
+	}
+	else {
+		print("param_flow_color, set_param_index, missing value\n");
+	}
+
+	return ();
+}
+
 =head2 sub set_good_labels 
 
 	select names with values
@@ -1161,10 +1240,10 @@ sub set_good_labels {
 	my ($self) = @_;
 	my $length = $param_flow_grey->{_num_items4flow};
 
-	# print("param_flow_grey,set_good_labels
-	# num_items4flow:	$param_flow_grey->{_num_items4flow}\n");
+	#	print("param_flow_grey,set_good_labels
+	#	num_items4flow:	$param_flow_grey->{_num_items4flow}\n");
 
-	for ( my $i = 0; $i < $length; $i++ ) {
+	for ( my $i = 0 ; $i < $length ; $i++ ) {
 		_set_good_labels4item($i);
 	}
 
@@ -1183,9 +1262,9 @@ sub set_good_values {
 	my ($self) = @_;
 	my $length = $param_flow_grey->{_num_items4flow};    # no. programs in flow
 
-	# print("param_flow_grey,set_good_values num_items4flow:	$param_flow_grey->{_num_items4flow}\n");
+# print("param_flow_grey,set_good_values num_items4flow:	$param_flow_grey->{_num_items4flow}\n");
 
-	for ( my $i = 0; $i < $length; $i++ ) {
+	for ( my $i = 0 ; $i < $length ; $i++ ) {
 		_set_good_values4item($i);
 	}
 
@@ -1200,22 +1279,22 @@ sub set_good_values {
 sub set_good_labels4item {
 	my ( $self, $index4flow ) = @_;
 
-	# print("param_flow_grey,set_good_labels4item,
-	# self,index4flow: $self,$index4flow\n");
+	#	 print("param_flow_grey,set_good_labels4item,
+	#	 self,index4flow: $self,$index4flow\n");
 
 	my $idx = $index4flow;
 	my ( @good,            @good_labels );
 	my ( $num_good_labels, $j );
 
 	# print("1. param_flow_grey,set_good_labels4item,
-	#flow index:$idx, prog name:
+	# flow index:$idx, prog name:
 	# @{$param_flow_grey->{_prog_names_aref}}[$idx] \n");
 
 	# good values (not names) determine good names
 	my $values_aref = _get_values_aref($idx);
 	my $length      = scalar @$values_aref;
 
-	for ( my $i = 0, $j = 0; $i < $length; $i++ ) {
+	for ( my $i = 0, $j = 0 ; $i < $length ; $i++ ) {
 
 		# print("param_flow_grey, set_good_labels4item:
 		# values_aref is @$values_aref[$i]\n");
@@ -1254,8 +1333,8 @@ sub set_good_labels4item {
 sub set_good_values4item {
 	my ( $self, $index4flow ) = @_;
 
-	# print("param_flow_grey,set_good_values4item,
-	# self,index4flow: $self,$index4flow\n");
+	#	 print("param_flow_grey,set_good_values4item,
+	#	 self,index4flow: $self,$index4flow\n");
 
 	my $idx = $index4flow;
 	my ( @good,            @good_values );
@@ -1268,7 +1347,7 @@ sub set_good_values4item {
 	my $values_aref = _get_values_aref($idx);
 	my $length      = scalar @$values_aref;
 
-	for ( my $i = 0, $j = 0; $i < $length; $i++ ) {
+	for ( my $i = 0, $j = 0 ; $i < $length ; $i++ ) {
 
 		# print("param_flow_grey, set_good_values4item:
 		# values_aref is @$values_aref[$i]\n");
@@ -1283,7 +1362,8 @@ sub set_good_values4item {
 			$j++;
 		}
 		else {
-			print("param_flow_grey,set_good_values4item, a bad value detected\n");
+			print(
+				"param_flow_grey,set_good_values4item, a bad value detected\n");
 
 		}
 	}
@@ -1302,45 +1382,96 @@ sub set_good_values4item {
 	return ();
 }
 
+=head2 sub set_param_value
+
+Store single value
+
+=cut
+
+sub set_param_value {
+	my ( $self, $value ) = @_;
+
+# print("param_flow_grey,set_param_value param_flow_grey->{_selection_index}= $param_flow_grey->{_selection_index}\n");
+
+	if (   CORE::length($value)
+		&& CORE::length( $param_flow_grey->{_param_index} )
+		&& CORE::length( $param_flow_grey->{_selection_index} ) )
+	{
+		my $param_index  = $param_flow_grey->{_param_index};
+		my $flow_index   = $param_flow_grey->{_selection_index};
+#		print("param_flow_grey,set_param_value, flow index: $flow_index\n");
+#        print("param_flow_grey,set_param_value, param index: $param_index\n");
+#		print("param_flow_grey,set_param_value, values =$value\n");
+
+		$cloned_values_aref2[$flow_index] =
+		  clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$flow_index] } );
+
+#		my $length = scalar @{ $cloned_values_aref2[$flow_index] };
+#		print(" OK 1. param_flow_grey, set_param_value:length=$length\n");
+		
+		my @transfer_array = @{ $cloned_values_aref2[$flow_index] };
+		$transfer_array[$param_index] = $value;
+		$cloned_values_aref2[$flow_index] = \@transfer_array;
+
+		@{ @{ $param_flow_grey->{_values_aref2} }[$flow_index] } =
+		  @{ $cloned_values_aref2[$flow_index] };
+
+#        print("1. param_flow_grey, set_param_value:@{@{ $param_flow_grey->{_values_aref2} }[$flow_index]}\n");
+#         print("1. param_flow_grey, set_param_value:@{$cloned_values_aref2[$flow_index]}\n");
+
+	}
+	else {
+		# print("param_flow_grey, set_param_value: selection index < 0 NADA\n");
+	}
+
+	# print("param_flow_grey,set_param_value :values_aref[0] are @$value[0]\n");
+	return ();
+}
+
 =head2 sub set_values_aref
 
+Store values
 
 =cut
 
 sub set_values_aref {
 	my ( $self, $values_aref ) = @_;
 
-	# print("param_flow_grey,set_values param_flow_grey->{_selection_index}= $param_flow_grey->{_selection_index}\n");
+# print("param_flow_grey,set_values param_flow_grey->{_selection_index}= $param_flow_grey->{_selection_index}\n");
 
 	if ( $param_flow_grey->{_selection_index} >= 0 ) {
 
 		my $index = $param_flow_grey->{_selection_index};
+
 		# print("param_flow_grey,set_values_aref, flow index: $index\n");
 		# print("param_flow_grey,set_values_aref, values_aref=@$values_aref\n");
-		
+
 		if ( $index >= 0 ) {
 			my ( $i, $j, $length );
-			my ( @values_aref, @values, @values_array);
+			my ( @values, );
 
 			@{ $param_flow_grey->{_values_aref2} }[$index] = $values_aref;
-			@values_array = @$values_aref;
-			$length       = scalar @values_array;
 
-			for ( $i = 1, $j = 0; $i < $length; $i = $i + 2, $j++ ) {
-				
-				$values[$j] = $values_array[$i];
+			$cloned_values_aref2[$index] =
+			  clone( \@{ @{ $param_flow_grey->{_values_aref2} }[$index] } );
 
-				# print("1. param_flow_grey, set_values_aref :index $j values: $values[$j]\n");
-			}
-			
-			# print("2. param_flow_grey,set_values_aref: @values\n");
+			$length = scalar @{ $cloned_values_aref2[$index] };
+
+			# print(" OK 1. param_flow_grey, set_values_aref:length=$length\n");
+
+			@{ @{ $param_flow_grey->{_values_aref2} }[$index] } =
+			  @{ $cloned_values_aref2[$index] };
+
+#        print("1. param_flow_grey, set_values_aref:@{@{ $param_flow_grey->{_values_aref2} }[$index]}\n");
+#         print("1. param_flow_grey, set_values_aref:@{$cloned_values_aref2[$index]}\n");
+
 		}
 	}
 	else {
 		# print("param_flow_grey, set_values_aref: selection index < 0 NADA\n");
 	}
 
-	# print("param_flow_grey,set_values_aref :values_aref[0] are @$values_aref[0]\n");
+# print("param_flow_grey,set_values_aref :values_aref[0] are @$values_aref[0]\n");
 	return ();
 }
 
@@ -1361,16 +1492,19 @@ sub stack_checkbuttons_aref2 {
 	my ( $self, $checkbuttons_aref ) = @_;
 	my $index = $param_flow_grey->{_index4checkbuttons} + 1;
 
+	#		print("f\n");
+
 	$checkbuttons[$index] = $checkbuttons_aref;
 	$param_flow_grey->{_checkbuttons_aref2} = \@checkbuttons;
 
 	$param_flow_grey->{_indices} = $index;
 	$param_flow_grey->{_index4checkbuttons}++;
 	$param_flow_grey->{_num_items4checkbuttons}++;
-	$param_flow_grey->{_num_items} = $param_flow_grey->{_num_items4checkbuttons};
+	$param_flow_grey->{_num_items} =
+	  $param_flow_grey->{_num_items4checkbuttons};
 
-	# print("param_flow_grey,stack_checkbuttons_aref2,  @{$checkbuttons[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
-	# print("param_flow_grey,stack_checkbuttons_aref2,  @{@{$param_flow_grey->{_checkbuttons_aref2}}[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
+# print("param_flow_grey,stack_checkbuttons_aref2,  @{$checkbuttons[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
+# print("param_flow_grey,stack_checkbuttons_aref2,  @{@{$param_flow_grey->{_checkbuttons_aref2}}[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
 
 	return ();
 }
@@ -1392,6 +1526,8 @@ sub stack_checkbuttons_aref2 {
 sub stack_flow_item {
 	my ( $self, $program_name_sref ) = @_;
 
+	#	print("g\n");
+
 	if ($program_name_sref) {
 		my $index = $param_flow_grey->{_index4flow} + 1;
 
@@ -1405,8 +1541,8 @@ sub stack_flow_item {
 		$param_flow_grey->{_num_items4flow}++;
 		$param_flow_grey->{_num_items}++;
 
-		# print("param_flow_grey, stack_flow_item @{$param_flow_grey->{_prog_names_aref}}, num_items $param_flow_grey->{_num_items}\n");
-		# print("param_flow_grey, stack_flow_item, index: $index\n");
+# print("param_flow_grey, stack_flow_item @{$param_flow_grey->{_prog_names_aref}}, num_items $param_flow_grey->{_num_items}\n");
+# print("param_flow_grey, stack_flow_item, index: $index\n");
 
 	}
 	return ();
@@ -1432,6 +1568,8 @@ sub stack_names_aref2 {
 
 	my ( $self, $names_aref ) = @_;
 
+	#	print("h\n");
+
 	if ($names_aref) {
 		my $index = $param_flow_grey->{_index4names} + 1;
 
@@ -1443,9 +1581,9 @@ sub stack_names_aref2 {
 		$param_flow_grey->{_num_items4names}++;
 		$param_flow_grey->{_num_items} = $param_flow_grey->{_num_items4names};
 
-		# for (my $i=0; $i<=$index;$i++) {
-		#  	print("param_flow_grey,stack_names_aref2, an accumulating array of arrays: @{@{$param_flow_grey->{_names_aref2}}[$i]} item $i\n");
-		# }
+# for (my $i=0; $i<=$index;$i++) {
+#  	print("param_flow_grey,stack_names_aref2, an accumulating array of arrays: @{@{$param_flow_grey->{_names_aref2}}[$i]} item $i\n");
+# }
 
 	}
 	else {
@@ -1474,6 +1612,8 @@ sub stack_values_aref2 {
 
 	if ($values_aref) {
 
+		#		print("i\n");
+
 		my $index = $param_flow_grey->{_index4values} + 1;
 
 		$values[$index] = $values_aref;
@@ -1484,11 +1624,11 @@ sub stack_values_aref2 {
 		$param_flow_grey->{_num_items4values}++;
 		$param_flow_grey->{_num_items} = $param_flow_grey->{_num_items4values};
 
-		# print("param_flow_grey,stack_values_aref2, values: @{$values[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
+# print("param_flow_grey,stack_values_aref2, values: @{$values[$index]},idx $index num_items $param_flow_grey->{_num_items}\n");
 
-		#  		for (my $i=0; $i<=$index;$i++) {
-		#     		print("param_flow_grey,stack_values_aref2, an accumulating array of arrays: @{$param_flow_grey->{_values_aref2}} item $i\n");
-		#  		}
+#  		for (my $i=0; $i<=$index;$i++) {
+#     		print("param_flow_grey,stack_values_aref2, an accumulating array of arrays: @{$param_flow_grey->{_values_aref2}} item $i\n");
+#  		}
 
 	}
 	else {
@@ -1513,34 +1653,43 @@ sub stack_values_aref2 {
 =cut
 
 sub view_data {
+
 	my ($self) = @_;
 	my @num_progs;
 
 	my $indices = $param_flow_grey->{_indices};
 	$num_progs[0] = $param_flow_grey->{_num_items};
-
 	$num_progs[1] = scalar( @{ $param_flow_grey->{_names_aref2} } );
-
-	#    $num_progs[3] = scalar  ( @{$param_flow_grey->{_values_aref2}} );
-	#    $num_progs[4] = scalar  ( @{$param_flow_grey->{_checkbuttons_aref2}});
 	$num_progs[2] = scalar( @{ $param_flow_grey->{_prog_names_aref} } );
+	$num_progs[3] = scalar( @{ $param_flow_grey->{_values_aref2} } );
+	$num_progs[4] = scalar(@cloned_values_aref2);    # same as above
+	$num_progs[5] = scalar( @{ $param_flow_grey->{_checkbuttons_aref2} } );
 
-	# print("\n param_flow_grey,view_data, _prog_names @{$param_flow_grey->{_prog_names_aref}}\n");
-   # print("\nparam_flow_grey,view_data:number of items in list in 4-5 different ways  @num_progs \n");
+	print(
+"\nparam_flow_grey,view_data:number of programs in flow, in 6 different ways @num_progs \n"
+	);
 
-	# print("param_flow_grey,view_data:max index = $indices  \n\n");
+# print("\n param_flow_grey,view_data, _prog_names @{$param_flow_grey->{_prog_names_aref}}\n");
+# print("param_flow_grey,view_data:max index (# items in a flow) = $indices  \n\n");
 
-	# print("param_flow_grey,view_data, param_flow_grey_ has hash=$param_flow_grey\n ");
+# print("param_flow_grey,view_data, param_flow_grey_ has hash=$param_flow_grey\n ");
 
-	for ( my $i = 0; $i <= $indices; $i++ ) {
+	for ( my $i = 0 ; $i <= $indices ; $i++ ) {
 
-		print("param_flow_grey,view_data: names:        @{@{$param_flow_grey->{_names_aref2}}[$i]}\n");
-		print("param_flow_grey,view_data: values:       @{@{$param_flow_grey->{_values_aref2}}[$i]}\n");
+		for my $name ( @{ @{ $param_flow_grey->{_names_aref2} }[$i] } ) {
+			print("param_flow_grey,view_data: name:      $name\n");
+		}
 
-		#     print("param_flow_grey,view_data: checkbuttons: @{@{$param_flow_grey->{_checkbuttons_aref2}}[$i]}\n\n");
+#     print("param_flow_grey,view_data: checkbuttons: @{@{$param_flow_grey->{_checkbuttons_aref2}}[$i]}\n\n");
+# for my $value ( @{ @{ $param_flow_grey->{_values_aref2} }[$i] } ) {
+		for my $value ( @{ $cloned_values_aref2[$i] } ) {
+			print("param_flow_grey,view_data: value:     $value\n");
+		}
+
+#     print("param_flow_grey,view_data: checkbuttons: @{@{$param_flow_grey->{_checkbuttons_aref2}}[$i]}\n\n");
+		print("\n");
 	}
-	print("\n");
-	
+
 }
 
 1;

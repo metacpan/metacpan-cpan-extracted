@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Commandable::Invocation 0.10;
+package Commandable::Invocation 0.11;
 
 use v5.14;
 use warnings;
@@ -115,7 +115,7 @@ sub _escape
    my $self = shift;
    my ( $s ) = @_;
 
-   $s =~ s/["\\]/\\$1/g;
+   $s =~ s/(["\\])/\\$1/g;
 
    return $s;
 }

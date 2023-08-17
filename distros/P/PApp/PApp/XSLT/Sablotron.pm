@@ -13,6 +13,8 @@ The PApp::XSLT::Sablotron module is a wrapper around
 XML::Sablotron. Unless you specifically need Sablotron you should see
 L<PApp::XSLT>.
 
+B<DEPRECATED: DO NOT USE THIS IN NEW CODE>.
+
 =over 4
 
 =cut
@@ -28,6 +30,11 @@ use XML::Sablotron;
 use Convert::Scalar ();
 
 use PApp::Exception;
+
+# workaround for libsablot needing a lot of stack because it recurses deeply
+use Coro::State;
+Coro::State::cctx_stacksize 16384 * 8
+   if (Coro::State::cctx_stacksize) < 16384 * 8;
 
 use base PApp::XSLT;
 

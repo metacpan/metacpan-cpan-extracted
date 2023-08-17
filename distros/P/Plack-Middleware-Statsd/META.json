@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "PSGI",
       "Plack",
@@ -52,11 +52,11 @@
             "Ref::Util::XS" : "0"
          },
          "requires" : {
-            "Feature::Compat::Try" : "0",
             "List::Util" : "0",
             "Plack::Middleware" : "0",
             "Ref::Util" : "0",
             "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
             "parent" : "0",
             "perl" : "v5.14.0",
             "warnings" : "0"
@@ -90,7 +90,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.6.2"
+         "version" : "v0.6.3"
       }
    },
    "release_status" : "stable",
@@ -105,10 +105,10 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.6.2",
+   "version" : "v0.6.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

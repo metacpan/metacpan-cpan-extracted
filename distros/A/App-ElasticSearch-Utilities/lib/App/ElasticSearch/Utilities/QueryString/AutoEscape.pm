@@ -1,10 +1,10 @@
 package App::ElasticSearch::Utilities::QueryString::AutoEscape;
 # ABSTRACT: Provides a prefix of '=' to use the term filter
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Const::Fast;
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::AutoEscape - Provides a prefix of '=
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 SYNOPSIS
 

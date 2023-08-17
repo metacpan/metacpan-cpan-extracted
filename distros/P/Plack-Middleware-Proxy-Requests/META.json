@@ -4,42 +4,45 @@
       "Piotr Roszatycki <dexter@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Proxy-Requests",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Twiggy" : "0"
-         },
          "requires" : {
             "Plack" : "0",
             "Plack::App::Proxy" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Plack::Middleware::Proxy::Requests" : {
          "file" : "lib/Plack/Middleware/Proxy/Requests.pm",
-         "version" : "0.0102"
+         "version" : "0.0104"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Middleware-Proxy-Requests"
+         "web" : "http://github.com/dex4er/perl-Plack-Middleware-Proxy-Requests/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -48,5 +51,6 @@
          "url" : "http://github.com/dex4er/perl-Plack-Middleware-Proxy-Requests"
       }
    },
-   "version" : "0.0102"
+   "version" : "0.0104",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

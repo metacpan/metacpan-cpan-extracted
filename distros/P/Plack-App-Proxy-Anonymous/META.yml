@@ -1,0 +1,31 @@
+---
+abstract: 'anonymous proxy requests'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-Proxy-Anonymous
+provides:
+  Plack::App::Proxy::Anonymous:
+    file: lib/Plack/App/Proxy/Anonymous.pm
+    version: '0.0100'
+requires:
+  Plack: '0'
+  Plack::App::Proxy: '0'
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/dex4er/perl-Plack-App-Proxy-Anonymous/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-Plack-App-Proxy-Anonymous
+version: '0.0100'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

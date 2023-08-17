@@ -1,6 +1,6 @@
 package Mail::BIMI::Options;
 # ABSTRACT: Shared options
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -28,6 +28,8 @@ has no_validate_cert => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAI
   documentation => 'Do not validate VMC' );
 has no_validate_svg => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_VALIDATE_SVG}},
   documentation => 'Do not validate SVG' );
+has require_dkim => ( is => 'rw', lazy => 0, default => sub {return $ENV{MAIL_BIMI_REQUIRE_DKIM}},
+  documentation => 'Require DKIM authentication' );
 has require_vmc => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_REQUIRE_VMC}},
   documentation => 'Require VMC validation' );
 has ssl_root_cert => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_SSL_ROOT_CERT}//undef},
@@ -65,7 +67,7 @@ Mail::BIMI::Options - Shared options
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 DESCRIPTION
 
@@ -140,6 +142,12 @@ Do not validate VMC
 is=rw
 
 Do not validate SVG
+
+=head2 require_dkim
+
+is=rw
+
+Require DKIM authentication
 
 =head2 require_vmc
 

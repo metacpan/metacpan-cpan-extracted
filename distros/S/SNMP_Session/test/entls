@@ -1,0 +1,269 @@
+#!/usr/bin/perl -w
+###
+### entls - list ENTITY-MIB
+###
+### Author:       Simon Leinen <simon@switch.ch>
+### Date created: 03-May-2005
+
+use strict;
+use SNMP_util;
+use SNMP_Table;
+
+## Prototypes
+sub init_mibs ();
+sub collect_entity_information ($ );
+sub print_physical ($$);
+sub print_phys_tree ($$);
+sub print_phys_tree_1 ($$@);
+sub get_physical ($ );
+sub decode_truth_value ($ );
+sub snmp_decode_value ($@);
+sub node_is_transceiver_sensor ($ );
+sub router_pretty_name ($ );
+sub router_pretty_name_1 ($ );
+sub usage ();
+
+my @targets = ();
+
+my $phys_tree;
+
+## Set to 1 if you want entPhysicalVendorType to be printed.
+##
+my $print_vendor_type = 0;
+
+## Set to 1 if you want the entPhysical index to be printed.
+##
+my $print_ent_physical_index = 0;
+
+## Set to 1 if you want transceiver sensors listed.
+##
+my $transceiver_sensors = 0;
+
+## Directory in which to find router configurations.
+## Currently, this is only used to find the "canonical" names
+## of routers, using the `hostname' command from the router
+## configuration file.
+##
+my $rancid_base = '/usr/local/rancid/backbone/configs';
+
+my $print_relative_index = 1;
+my $print_hierarchy_indentation = 1;
+
+my $current_router;
+my $current_transceiver;
+
+while (@ARGV) {
+    if ($ARGV[0] eq '-V') {
+	$print_vendor_type = 1;
+    } elsif ($ARGV[0] eq '-i') {
+	$print_ent_physical_index = 1;
+    } elsif ($ARGV[0] eq '-t') {
+	$transceiver_sensors = 1;
+	$print_ent_physical_index = 1;
+	$print_relative_index = 0;
+	$print_hierarchy_indentation = 0;
+    } elsif ($ARGV[0] eq '-h') {
+	usage ();
+	exit (0);
+    } elsif ($ARGV[0] =~ /^-/) {
+	warn ("Unknown option ",$ARGV[0]);
+	usage ();
+	exit (1);
+    } else {
+	push @targets, $ARGV[0];
+    }
+    shift @ARGV;
+}
+usage (), exit 1 unless @targets;
+
+init_mibs ();
+foreach my $target (@targets) {
+    $current_router = $target;
+    $current_router =~ s/.*@//;
+    $current_router =~ s/:.*//;
+    collect_entity_information ($target);
+    print_physical ($current_router, $phys_tree);
+}
+1;
+
+sub collect_entity_information ($ ) {
+    my ($target) = @_;
+    $phys_tree = get_physical ($target);
+}
+
+sub print_physical ($$) {
+    my ($current_router, $phys_tree) = @_;
+    if ($transceiver_sensors) {
+	print "target --default--\n\trouter\t= ",
+	router_pretty_name ($current_router), "\n";
+	print "\tdirectory-desc\t= \"Router %router% transceiver monitoring\"\n";
+	print "\tdisplay-name\t= \"%router% - %short-desc%\"\n";
+	print "\tlong-desc\t= \"<H3>%short-desc%</H3>\"\n";
+    } else {
+	print "Physical Entities\n\n";
+    }
+    print_phys_tree ($phys_tree, "");
+}
+
+sub print_phys_tree ($$) {
+    print_phys_tree_1 ($_[0], $_[1], ());
+}
+
+sub print_phys_tree_1 ($$@) {
+    my ($node, $prefix, @stack) = @_;
+    $node->{parent_stack} = \@stack;
+    printf STDOUT ("%s%s\n", $prefix, $node->tostring ())
+	if !$transceiver_sensors or node_is_transceiver_sensor ($node);
+    foreach my $class (sort keys %{$node->{_children}}) {
+	my $class_children = $node->{_children}->{$class};
+	foreach my $child_index (sort { $a <=> $b } keys %{$class_children}) {
+	    print_phys_tree_1 ($class_children->{$child_index},
+			       ($print_hierarchy_indentation
+				? (' 'x length $prefix)
+				: '')
+			       .($print_relative_index
+				 ? sprintf ("%d. ", $child_index)
+				 : ''),
+			       ($node, @stack));
+	}
+    }
+}
+
+sub node_is_transceiver_sensor ($ ) {
+    my ($node) = @_;
+    ($node->{vendorType} =~ /1\.3\.6\.1\.4\.1\.9\.12\.3\.1\.8\.(4[6789]|50)$/)
+	? 1 : 0;
+}
+### get_if_entries TARGET
+###
+### Read the MIB-II interface table, and construct a hash mapping the
+### interface indices to hashes containing important slots.
+### Currently, only ifDescr and ifAlias are recorded.
+###
+sub get_if_entries ($ ) {
+    my ($target) = @_;
+    return snmp_rows_to_objects
+      ($target, 'MIBII::Interface', 'if', qw(descr alias));
+}
+
+sub get_physical ($ ) {
+    my ($target) = @_;
+    my ($phys, $root);
+    $phys = snmp_rows_to_objects
+	($target, 'Entity::PhysicalEntry', 'entPhysical',
+	 qw(descr vendorType containedIn class parentRelPos name
+	    hardwareRev firmwareRev softwareRev serialNum mfgName
+	    modelName alias assetID isFRU));
+    foreach my $i1 (keys %{$phys}) {
+	my $e1 = $phys->{$i1};
+	if ($e1->{containedIn} == 0) {
+	    die "multiple roots" if defined $root;
+	    $root = $e1;
+	}
+	foreach my $i2 (keys %{$phys}) {
+	    my $e2 = $phys->{$i2};
+	    next if $e2->{_visited};
+	    if ($i1 == $e2->{containedIn}) {
+		$e1->{_children}->{$e2->{class}}->{$e2->{parentRelPos}} = $e2;
+		$e2->{parent} = $e1;
+	    }
+	}
+    }
+    return $root;
+}
+
+sub decode_truth_value ($ ) {return snmp_decode_value ($_[0], qw(1 0));}
+
+sub snmp_decode_value ($@) {
+    my ($index, @mapvec) = @_;
+    return $index if $index < 1 or $index > $#mapvec+1;
+    return $mapvec[$index-1];
+}
+
+sub init_mibs () {
+    snmpmapOID
+	(qw(
+entPhysicalDescr	1.3.6.1.2.1.47.1.1.1.1.2
+entPhysicalVendorType	1.3.6.1.2.1.47.1.1.1.1.3
+entPhysicalContainedIn	1.3.6.1.2.1.47.1.1.1.1.4
+entPhysicalClass	1.3.6.1.2.1.47.1.1.1.1.5
+entPhysicalParentRelPos	1.3.6.1.2.1.47.1.1.1.1.6
+entPhysicalName		1.3.6.1.2.1.47.1.1.1.1.7
+entPhysicalHardwareRev	1.3.6.1.2.1.47.1.1.1.1.8
+entPhysicalFirmwareRev	1.3.6.1.2.1.47.1.1.1.1.9
+entPhysicalSoftwareRev	1.3.6.1.2.1.47.1.1.1.1.10
+entPhysicalSerialNum	1.3.6.1.2.1.47.1.1.1.1.11
+entPhysicalMfgName	1.3.6.1.2.1.47.1.1.1.1.12
+entPhysicalModelName	1.3.6.1.2.1.47.1.1.1.1.13
+entPhysicalAlias	1.3.6.1.2.1.47.1.1.1.1.14
+entPhysicalAssetID	1.3.6.1.2.1.47.1.1.1.1.15
+entPhysicalIsFRU	1.3.6.1.2.1.47.1.1.1.1.16
+));
+}
+
+sub usage () {
+    print "Usage: $0 -h\n";
+    print "Usage: $0 [-V] [-i] [-t] TARGET...\n";
+    print "  -V      print entities' vendorTypes\n";
+    print "  -i      print indexes from entPhysicalTable\n";
+    print "  -t      list transceiver sensors\n";
+}
+
+my %router_pretty_name = ();
+
+sub router_pretty_name ($ ) {
+    my ($router_name) = @_;
+    return $router_pretty_name{$router_name}
+	if exists $router_pretty_name{$router_name};
+    return ($router_pretty_name{$router_name}
+	    = router_pretty_name_1 ($router_name));
+}
+
+sub router_pretty_name_1 ($ ) {
+    my ($router_name) = @_;
+    open (CONFIG, $rancid_base.'/'.$router_name)
+	or return $router_name;
+    while (<CONFIG>) {
+	return $1 if /^hostname (.*)$/;
+    }
+    close CONFIG;
+}
+
+package MIBII::Interface;
+package Entity::PhysicalEntry;
+
+my $last_transceiver;
+
+sub tostring ($ ) {
+    my ($node) = @_;
+    my $result = '';
+    my $parent = $node->{parent_stack}->[0];
+    my $current_transceiver = $parent->{name};
+    if (defined $current_transceiver
+	&& (!defined $last_transceiver || $current_transceiver ne $last_transceiver)) {
+	my $target = "$current_transceiver";
+	$target = lc $target;
+	$target =~ s/^transceiver //;
+	$target =~ s/[ \/.]/_/g;
+	$target =~ s/^gi/gigabitethernet/g;
+	$target =~ s/^te/tengigabitethernet/g;
+	print "\ntarget $target\n";
+	print "\tshort-desc\t= \"",$current_transceiver,"\"\n";
+	print "\ttarget-type\t= \"monitored-transceiver\"\n";
+	$last_transceiver = $current_transceiver;
+    }
+    if ($transceiver_sensors) {
+	my ($interface, $sensor_type) = split (/ /, $node->{name}, 2);
+	$sensor_type =~ s/[ \/]/-/g;
+	$result = "\t".lc $sensor_type;
+	$result .= sprintf (" = \"%d\"", $node->{index});
+    } else {
+	$result .= sprintf ("%d:", $node->{index})
+	    if $print_ent_physical_index;
+	$result .= sprintf ("%s", $node->{name});
+	$result .= " (".$node->{alias}.")" if $node->{alias};
+	$result .= " (".$node->{vendorType}.")"
+	    if $print_vendor_type and $node->{vendorType};
+    }
+    return $result;
+}

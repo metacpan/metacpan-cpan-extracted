@@ -4,14 +4,11 @@ use Test::More 0.98;
 use lib '../lib', 'lib';
 #
 use Termbox qw[:all];
-my $isa_tty = -t STDIN && ( -t STDOUT || !( -f STDOUT || -c STDOUT ) );
-plan skip_all => 'Tests require an STDOUT to be a TTY' if !$isa_tty;
 #
 my @chars = split //, 'hello, world!';
 my $code  = tb_init();
 ok !$code, 'termbox init';
-ok tb_select_input_mode(TB_INPUT_ESC);
-ok tb_select_output_mode(TB_OUTPUT_NORMAL);
+diag tb_strerror(tb_last_errno) if $code;
 tb_clear();
 my @rows = (
     [ TB_WHITE,   TB_BLACK ],
@@ -21,17 +18,14 @@ my @rows = (
     [ TB_YELLOW,  TB_BLUE ],
     [ TB_MAGENTA, TB_CYAN ]
 );
-
-for my $colors ( 0 .. $#rows ) {
-    my $j = 0;
-    for my $char (@chars) {
-        tb_change_cell( $j, $colors, ord $char, @{ $rows[$colors] } );
-        $j++;
+for my $row ( 0 .. $#rows ) {
+    for my $col ( 0 .. $#chars ) {
+        tb_set_cell( $col, $row, $chars[$col], @{ $rows[$row] } );
     }
 }
 tb_present();
-diag 'Hold it for a second...';
-sleep 1;
+diag 'Hold it for a few seconds...';
+sleep 3;
 tb_shutdown();
 pass 'That works!';
 done_testing;

@@ -27,8 +27,8 @@ int sv2string(config_setting_t *, SV *);
 int sv2addint(const char *, config_setting_t *, config_setting_t *, SV *);
 int sv2addfloat(const char *, config_setting_t *, config_setting_t *, SV *);
 int sv2addstring(const char *, config_setting_t *, config_setting_t *, SV *);
-int sv2addarray(config_setting_t *, SV *);
-int sv2addobject(config_setting_t *, SV *);
+int sv2addarray(config_setting_t *, char *, config_setting_t *, SV *);
+int sv2addobject(config_setting_t *, char *, config_setting_t *, SV *);
 
 void set_scalar(config_setting_t *, SV *, int , int *);
 void set_scalar_elem(config_setting_t *, int, SV *, int, int *);
@@ -71,7 +71,7 @@ set_scalar(config_setting_t *settings, SV *value, int valueType, int *status)
 			*status = config_setting_set_string(settings, SvPV_nolen(value));
             break;
 		default:
-            Perl_croak(aTHX_ "Scalar have not this type!");
+            Perl_croak(aTHX_ "[ERROR] Scalar have not this type!");
 	}
 }
 
@@ -99,7 +99,7 @@ set_scalar_elem(config_setting_t *settings, int idx, SV *value, int valueType, i
 			settings_item = config_setting_set_string_elem(settings, idx, SvPV_nolen(value));
             break;
 		default:
-            Perl_croak(aTHX_ "Scalar element have not this type!");
+            Perl_croak(aTHX_ "[ERROR] Scalar element have not this type!");
 	}
 	*status = !settings_item ? 0 : 1;
 }
@@ -220,7 +220,7 @@ set_arrayvalue(config_setting_t *settings, const char *key, AV *value, int flag)
 		case CONFIG_TYPE_FLOAT:
 		case CONFIG_TYPE_BOOL:
 		case CONFIG_TYPE_STRING:
-			Perl_croak(aTHX_ "Scalar can't add array node!");
+			Perl_croak(aTHX_ "[ERROR] Scalar can't add array node!");
 			break;
 		case CONFIG_TYPE_ARRAY:
 		case CONFIG_TYPE_LIST:
@@ -251,10 +251,10 @@ set_hashvalue(config_setting_t *settings, const char *key, HV *value, int boolde
 		case CONFIG_TYPE_FLOAT:
 		case CONFIG_TYPE_BOOL:
 		case CONFIG_TYPE_STRING:
-			Perl_croak(aTHX_ "Scalar can't add hash node!");
+			Perl_croak(aTHX_ "[ERROR] Scalar can't add hash node!");
 			break;
 		case CONFIG_TYPE_ARRAY:
-			Perl_croak(aTHX_ "Array can't add hash node!");
+			Perl_croak(aTHX_ "[ERROR] Array can't add hash node!");
 			break;
 		case CONFIG_TYPE_LIST:
 			settings_item = config_setting_add(settings, NULL, CONFIG_TYPE_GROUP);
@@ -358,37 +358,91 @@ int sv2addstring(const char *key, config_setting_t *setting, config_setting_t *c
 	return CONFIG_TRUE == config_setting_set_string(child_setting, SvPV_nolen(val)) ? LIBCONFIG_OK : LIBCONFIG_ERR_COMMON;
 }
 
-int sv2addarray(config_setting_t *setting, SV *sv)
+int sv2addarray(config_setting_t *parent_setting, char *key, config_setting_t *setting, SV *sv)
 {
 	int ret = LIBCONFIG_OK;
 	AV *av = (AV *)SvRV(sv);
+#if PERL_API_REVISION >= 5 && PERL_API_VERSION >= 32
 	int avlen = (int)av_count(av);
-	int settinglen = config_setting_length(setting);
-	config_setting_t *child_setting;
-	for (int i = 0; i < avlen; i ++)
+#else
+	int avlen = av_len(av) + 1;
+#endif
+	// get the first one
+	int i = 0;
+	SV *child_sv_0 = *(av_fetch(av, i, 0));
+	int save_type = SvROK(child_sv_0) ? SvTYPE(SvRV(child_sv_0)) : SvTYPE(child_sv_0);
+	int is_setting_array_type = 1;
+	i ++;
+	for (; i < avlen; i ++)
 	{
 		SV *child_sv = *(av_fetch(av, i, 0));
-		switch (SvTYPE(child_sv))
+		if (save_type != (SvROK(child_sv) ? SvTYPE(SvRV(child_sv)) : SvTYPE(child_sv)))
 		{
-			case SVt_IV:
-				{
-					child_setting = config_setting_get_elem(setting, i);
-					ret += sv2addint(NULL, setting, child_setting, child_sv);
+			is_setting_array_type = 0;
+			break;
+		}
+	}
+	if (setting == NULL)
+	{
+		setting = config_setting_add(parent_setting, key, is_setting_array_type ? CONFIG_TYPE_ARRAY : CONFIG_TYPE_LIST);
+	}
+	else
+	{
+		setting->type = is_setting_array_type ? CONFIG_TYPE_ARRAY : CONFIG_TYPE_LIST;
+	}
+	int settinglen = config_setting_length(setting);
+	// Perl_warn(aTHX_ "ss name: %s av index: %d, settinglen: %d and setting type: %d", setting->name, avlen, settinglen, setting->type);
+	i = 0;
+	for (; i < avlen; i ++)
+	{
+		SV *child_sv = *(av_fetch(av, i, 0));
+		// check type
+		config_setting_t *child_setting = NULL;
+		if (SvROK(child_sv))
+		{
+			switch (SvTYPE(SvRV(child_sv)))
+			{
+				case SVt_PVAV:
+					{
+						child_setting = config_setting_get_elem(setting, i);
+						ret += sv2addarray(setting, NULL, child_setting, child_sv);
+						break;
+					}
+				case SVt_PVHV:
+					{
+						child_setting = config_setting_get_elem(setting, i);
+						ret += sv2addobject(setting, NULL, child_setting, child_sv);
+						break;
+					}
+				default:
 					break;
-				}
-			case SVt_NV:
-				{
-					child_setting = config_setting_get_elem(setting, i);
-					ret += sv2addfloat(NULL, setting, child_setting, child_sv);
+			}
+		}
+		else
+		{
+			switch (SvTYPE(child_sv))
+			{
+				case SVt_IV:
+					{
+						child_setting = config_setting_get_elem(setting, i);
+						ret += sv2addint(NULL, setting, child_setting, child_sv);
+						break;
+					}
+				case SVt_NV:
+					{
+						child_setting = config_setting_get_elem(setting, i);
+						ret += sv2addfloat(NULL, setting, child_setting, child_sv);
+						break;
+					}
+				case SVt_PV:
+					{
+						child_setting = config_setting_get_elem(setting, i);
+						ret += sv2addstring(NULL, setting, child_setting, child_sv);
+						break;
+					}
+				default:
 					break;
-				}
-			case SVt_PV:
-				{
-					child_setting = config_setting_get_elem(setting, i);
-					ret += sv2addstring(NULL, setting, child_setting, child_sv);
-					break;
-				}
-			default:
+			}
 		}
 	}
 	while (settinglen > avlen)
@@ -399,8 +453,12 @@ int sv2addarray(config_setting_t *setting, SV *sv)
 	return ret;
 }
 
-int sv2addobject(config_setting_t *setting, SV *sv)
+int sv2addobject(config_setting_t *parent_setting, char *key, config_setting_t *setting, SV *sv)
 {
+	if (setting == NULL)
+	{
+		setting = config_setting_add(parent_setting, key, CONFIG_TYPE_GROUP);
+	}
 	int ret = LIBCONFIG_OK;
 	HV *hv = (HV *)SvRV(sv);
 	hv_iterinit(hv);
@@ -417,17 +475,16 @@ int sv2addobject(config_setting_t *setting, SV *sv)
 			{
 				case SVt_PVAV:
 					{
-						config_setting_t *child_setting = config_setting_add(setting, key, CONFIG_TYPE_ARRAY);
-						ret += sv2addarray(child_setting, val);
+						ret += sv2addarray(setting, key, child_setting, val);
 						break;
 					}
 				case SVt_PVHV:
 					{
-						config_setting_t *child_setting = config_setting_add(setting, key, CONFIG_TYPE_GROUP);
-						sv2addobject(child_setting, val);
+						ret += sv2addobject(setting, key, child_setting, val);
 						break;
 					}
 				default:
+					break;
 			}
 		}
 		else
@@ -450,6 +507,7 @@ int sv2addobject(config_setting_t *setting, SV *sv)
 						break;
 					}
 				default:
+					break;
 			}
 		}
 	}
@@ -461,98 +519,52 @@ int sv2addobject(config_setting_t *setting, SV *sv)
 int set_general_value(Conf__Libconfig conf, const char *path, SV *sv)
 {
 	int ret = LIBCONFIG_OK;
+	config_setting_t *parent_setting;
+	char *start_path;
 	config_setting_t *elem = path != NULL && strlen(path) == 0 ? config_root_setting(conf) : config_lookup(conf, path);
-	if (!elem)
+	if (elem == NULL)
 	{
-		config_setting_t *parent_setting;
-		char *start_path;
 		auto_check_and_create(conf, path, &parent_setting, &start_path);
-		if (SvROK(sv))
+	}
+	if (SvROK(sv))
+	{
+		switch (SvTYPE(SvRV(sv)))
 		{
-			switch (SvTYPE(SvRV(sv)))
-			{
-				case SVt_PVAV:
+			case SVt_PVAV:
 				{
-					elem = config_setting_add(parent_setting, start_path, CONFIG_TYPE_ARRAY);
-					ret += sv2addarray(elem, sv);
+					ret += sv2addarray(parent_setting, start_path, elem, sv);
 					break;
 				}
-				case SVt_PVHV:
+			case SVt_PVHV:
 				{
-					elem = config_setting_add(parent_setting, start_path, CONFIG_TYPE_GROUP);
-					ret += sv2addobject(elem, sv);
+					ret += sv2addobject(parent_setting, start_path, elem, sv);
 					break;
 				}
-				default:
-			}
-		}
-		else
-		{
-			// create the setting
-			config_setting_t *child_setting = NULL;
-			switch (SvTYPE(sv))
-			{
-				case SVt_IV:
-					{
-						ret = sv2addint(start_path, parent_setting, child_setting, sv);
-						break;
-					}
-				case SVt_NV:
-					{
-						ret = sv2addfloat(start_path, parent_setting, child_setting, sv);
-						break;
-					}
-				case SVt_PV:
-					{
-						ret = sv2addstring(start_path, parent_setting, child_setting, sv);
-						break;
-					}
-				default:
-			}
+			default:
+				break;
 		}
 	}
 	else
 	{
-		if (SvROK(sv))
+		switch (SvTYPE(sv))
 		{
-			switch (SvTYPE(SvRV(sv)))
-			{
-				case SVt_PVAV:
+			case SVt_IV:
 				{
-					elem->type = CONFIG_TYPE_ARRAY;
-					ret += sv2addarray(elem, sv);
+					ret = elem ? sv2int(elem, sv) : sv2addint(start_path, parent_setting, elem, sv);
 					break;
 				}
-				case SVt_PVHV:
+			case SVt_NV:
 				{
-					elem->type = CONFIG_TYPE_GROUP;
-					ret += sv2addobject(elem, sv);
+					ret = elem ? sv2float(elem, sv) : sv2addfloat(start_path, parent_setting, elem, sv);
 					break;
 				}
-				default:
-			}
-		}
-		else
-		{
-			switch (SvTYPE(sv))
-			{
-				case SVt_IV:
-					{
-						sv2int(elem, sv);
-						break;
-					}
-				case SVt_NV:
-					{
-						sv2float(elem, sv);
-						break;
-					}
-				case SVt_PV:
-					{
-						sv2string(elem, sv);
-						break;
-					}
-				default:
-			}
+			case SVt_PV:
+				{
+					ret = elem ? sv2string(elem, sv) : sv2addstring(start_path, parent_setting, elem, sv);
+					break;
+				}
+			default:
+				break;
 		}
 	}
 	return ret;
@@ -660,9 +672,11 @@ get_general_value(Conf__Libconfig conf, const char *path, SV **svref)
 			*svref = newSVnv(config_setting_get_float(elem));
 			break;
 		case CONFIG_TYPE_STRING:
-			const char *val = config_setting_get_string(elem);
-			*svref = newSVpvn(val, strlen(val));
-			break;
+			{
+				const char *val = config_setting_get_string(elem);
+				*svref = newSVpvn(val, strlen(val));
+				break;
+			}
 		case CONFIG_TYPE_ARRAY:
 			{
 				return get_general_array(elem, svref);
@@ -676,7 +690,7 @@ get_general_value(Conf__Libconfig conf, const char *path, SV **svref)
 				return get_general_object(elem, svref);
 			}
 		default:
-			Perl_warn(aTHX_ "Scalar have not this type: %d in %s", config_setting_type(elem), path);
+			Perl_warn(aTHX_ "[WARN] Scalar have not this type: %d in %s", config_setting_type(elem), path);
 			return LIBCONFIG_ERR_COMMON;
 	}
 	return LIBCONFIG_OK;
@@ -690,7 +704,8 @@ int get_general_array(config_setting_t *setting, SV **sv_pptr)
 	}
 	AV *child_av_ptr = newAV();
 	int arr_len = config_setting_length(setting);
-	for (int i = 0; i < arr_len; i++)
+	int i = 0;
+	for (; i < arr_len; i++)
 	{
 		config_setting_t *child_setting = config_setting_get_elem(setting, i);
 		switch (config_setting_type(child_setting))
@@ -723,7 +738,7 @@ int get_general_array(config_setting_t *setting, SV **sv_pptr)
 				}
 			default:
 				{
-					Perl_warn(aTHX_ "Array have not this type: %d", config_setting_type(setting));
+					Perl_warn(aTHX_ "[WARN] Array have not this type: %d", config_setting_type(setting));
 					return LIBCONFIG_ERR_COMMON;
 				}
 		}
@@ -740,7 +755,8 @@ int get_general_list(config_setting_t *setting, SV **sv_pptr)
 	}
 	AV *child_av_ptr = newAV();
 	int list_size = config_setting_length(setting);
-	for (int i = 0; i < list_size; i++)
+	int i = 0;
+	for (; i < list_size; i++)
 	{
 		config_setting_t *child_setting = config_setting_get_elem(setting, i);
 		switch (config_setting_type(child_setting))
@@ -803,7 +819,7 @@ int get_general_list(config_setting_t *setting, SV **sv_pptr)
 				}
 			default:
 				{
-					Perl_warn(aTHX_ "List have not this type: %d in [%d]", config_setting_type(setting), i);
+					Perl_warn(aTHX_ "[WARN] List have not this type: %d in [%d]", config_setting_type(setting), i);
 					return LIBCONFIG_ERR_COMMON;
 				}
 		}
@@ -820,7 +836,8 @@ int get_general_object(config_setting_t *setting, SV **sv_pptr)
 	}
 	HV *child_hv_ptr = newHV();
 	int obj_cnt = config_setting_length(setting);
-	for (int i = 0; i < obj_cnt; i++)
+	int i = 0;
+	for (; i < obj_cnt; i++)
 	{
 		config_setting_t *child_setting = config_setting_get_elem(setting, i);
 		switch (config_setting_type(child_setting))
@@ -883,7 +900,7 @@ int get_general_object(config_setting_t *setting, SV **sv_pptr)
 				}
 			default:
 				{
-					Perl_warn(aTHX_ "Object have not this type: %d", config_setting_type(setting));
+					Perl_warn(aTHX_ "[WARN] Object have not this type: %d", config_setting_type(setting));
 					return LIBCONFIG_ERR_COMMON;
 				}
 		}
@@ -1243,6 +1260,18 @@ libconfig_add_scalar(conf, path, key, value)
 			settings = config_lookup(conf, path);
 		}
 		RETVAL = set_scalarvalue(settings, key, value, 0, 0);
+		/*
+		char *new_path = (char *)malloc(strlen(path) + strlen(key) + 2);
+		if (path != NULL && strlen(path) == 0)
+		{
+			sprintf(new_path, "%s", key);
+		} else {
+			sprintf(new_path, "%s.%s", path, key);
+		}
+		int ret = set_general_value(conf, new_path, value);
+		free(new_path);
+		RETVAL = ret == 0;
+		*/
 	}
 	OUTPUT:
 		RETVAL
@@ -1264,6 +1293,18 @@ libconfig_add_boolscalar(conf, path, key, value)
 			settings = config_lookup(conf, path);
 		}
 		RETVAL = set_scalarvalue(settings, key, value, 0, 2);
+		/*
+		char *new_path = (char *)malloc(strlen(path) + strlen(key) + 2);
+		if (path != NULL && strlen(path) == 0)
+		{
+			sprintf(new_path, "%s", key);
+		} else {
+			sprintf(new_path, "%s.%s", path, key);
+		}
+		int ret = set_boolean_value(conf, new_path, value);
+		free(new_path);
+		RETVAL = ret == 0;
+		*/
 	}
 	OUTPUT:
 		RETVAL
@@ -1345,6 +1386,18 @@ libconfig_add_list(conf, path, key, value)
 			settings = config_lookup(conf, path);
 		}
 		RETVAL = set_arrayvalue(settings, key, value, 1);
+		/*
+		char *new_path = (char *)malloc(strlen(path) + strlen(key) + 2);
+		if (path != NULL && strlen(path) == 0)
+		{
+			sprintf(new_path, "%s", key);
+		} else {
+			sprintf(new_path, "%s.%s", path, key);
+		}
+		int ret = set_general_value(conf, new_path, value);
+		free(new_path);
+		RETVAL = ret == 0;
+		*/
 	OUTPUT:
 		RETVAL
 
@@ -1356,7 +1409,8 @@ libconfig_add_hash(conf, path, key, value)
 	HV *value
     PREINIT:
         config_setting_t *settings;
-	CODE:
+    CODE:
+    {
 		if (path != NULL && strlen(path) == 0)
 		{
 			settings = config_root_setting(conf);
@@ -1364,6 +1418,19 @@ libconfig_add_hash(conf, path, key, value)
 			settings = config_lookup(conf, path);
 		}
 		RETVAL = set_hashvalue(settings, key, value, 0);
+		/*
+		char *new_path = (char *)malloc(strlen(path) + strlen(key) + 2);
+		if (path != NULL && strlen(path) == 0)
+		{
+			sprintf(new_path, "%s", key);
+		} else {
+			sprintf(new_path, "%s.%s", path, key);
+		}
+		int ret = set_general_value(conf, new_path, value);
+		free(new_path);
+		RETVAL = ret == 0;
+		*/
+	}
 	OUTPUT:
 		RETVAL
 
@@ -1400,7 +1467,7 @@ libconfig_delete_node(conf, path)
 		sprintf(parentpath, "%.*s", (int)(strlen(path) - strlen(key) - 1), path);
         settings = config_lookup(conf, parentpath);
 		if (!settings) {
-			Perl_croak (aTHX_ "Not the node of path: %s", parentpath);
+			Perl_croak (aTHX_ "[ERROR] Not the node of path: %s", parentpath);
 		}
 		RETVAL = 1 | config_setting_remove(settings, key);
 	}
@@ -1417,7 +1484,7 @@ libconfig_delete_node_key(conf, path, key)
     CODE:
         settings = config_lookup(conf, path);
 		if (!settings) {
-			Perl_croak (aTHX_ "Not the node of path.!");
+			Perl_croak (aTHX_ "[ERROR] Not the node of path.!");
 		}
 		RETVAL = 1 | config_setting_remove(settings, key);
     OUTPUT:
@@ -1433,7 +1500,7 @@ libconfig_delete_node_elem(conf, path, idx)
     CODE:
         settings = config_lookup(conf, path);
 		if (!settings) {
-			Perl_croak (aTHX_ "Not the node of path.!");
+			Perl_croak (aTHX_ "[ERROR] Not the node of path.!");
 		}
 		RETVAL = 1 | config_setting_remove_elem(settings, idx);
     OUTPUT:

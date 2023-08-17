@@ -7,8 +7,8 @@ README
 t/00-load.t
 t/01_word_document.t
 t/02_latin1.t
-t/pod.t
+t/03_buggy_accents.t
+t/04_mixed_encoding.t
 xt/pod-coverage.t
 xt/pod.t
-Makefile.PL
 META.json

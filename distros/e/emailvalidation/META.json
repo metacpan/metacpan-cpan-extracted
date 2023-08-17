@@ -1,0 +1,54 @@
+{
+   "abstract" : "validate & verify any email address",
+   "author" : [
+      "Dominik Kukacka <dominik@everapi.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "emailvalidation",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Moose" : "0.24"
+         }
+      }
+   },
+   "provides" : {
+      "Emailvalidation" : {
+         "file" : "lib/emailvalidation.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/everapihq/emailvalidation-perl/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/everapihq/emailvalidation-perl"
+      }
+   },
+   "version" : 0,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

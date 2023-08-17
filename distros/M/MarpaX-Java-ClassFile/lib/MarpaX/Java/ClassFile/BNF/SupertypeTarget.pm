@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a supertype_target
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -52,7 +52,7 @@ MarpaX::Java::ClassFile::BNF::SupertypeTarget - Parsing of a supertype_target
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

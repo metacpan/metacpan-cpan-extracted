@@ -1,5 +1,9 @@
 # Changes file for Date-Holidays
 
+## 1.35 2023-08-16 Maintenance release, update not required
+
+- Merged PR [#113](https://github.com/jonasbn/perl-date-holidays/pull/113) by @haarg. Removing unused explicit imports, where error handling will change in the future, so this is a preemptive change
+
 ## 1.34 2022-10-10 Bug fix release, update not required
 
 - Specified requirement for [Test::MockModule](https://metacpan.org/pod/Test::MockModule) as `0.13`, when migrating to use of a `cpanfile` for dependency specification, I forgot to specify the version even though it was specified in the Dist::Zilla configuration `dist.ini`, thanks to @eserte for spotting this. It is actually a regression in that sense that it was also fixed in [#47](https://github.com/jonasbn/Date-Holidays/issues/47). This addresses [#76](https://github.com/jonasbn/Date-Holidays/issues/76)

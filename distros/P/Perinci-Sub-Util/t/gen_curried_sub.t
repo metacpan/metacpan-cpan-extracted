@@ -3,8 +3,8 @@
 use 5.010;
 use strict;
 use warnings;
-
 use Test::More 0.98;
+
 use Perinci::Sub::Util qw(gen_curried_sub);
 
 package Foo;
@@ -27,8 +27,12 @@ sub bar {
 
 package main;
 
+gen_curried_sub('Foo::bar', {a=>3});
+is(bar(b=>3), 9);
+
 gen_curried_sub('Foo::bar', {a=>2}, 'Foo::baz');
 is(Foo::baz(b=>3), 6);
+
 
 DONE_TESTING:
 done_testing;

@@ -129,7 +129,7 @@ sub get {
             [ 'X-Auth-Token' => $self->cloudfiles->token ] );
         my $response = $self->cloudfiles->_request($request);
         confess 'Object ' . $self->name . ' not found' if $response->code == 404;
-        confess 'Unknown error' if $response->code != 200;
+        confess 'Unknown error' if !$response->is_success;
         confess 'Data corruption error'
             if $response->header('ETag') ne md5_hex( $response->content );
         $self->_set_attributes_from_response($response);
@@ -166,7 +166,7 @@ sub get_filename {
     my $response = $self->cloudfiles->_request( $request, $filename );
 
     confess 'Object ' . $self->name . ' not found' if $response->code == 404;
-    confess 'Unknown error' if $response->code != 200;
+    confess 'Unknown error' if !$response->is_success;
     confess 'Data corruption error' unless $self->_validate_local_file( $filename,  
                                                                         $response->header('Content-Length'),  
                                                                         $response->header('ETag') );
@@ -189,7 +189,7 @@ sub delete {
         [ 'X-Auth-Token' => $self->cloudfiles->token ] );
     my $response = $self->cloudfiles->_request($request);
     confess 'Object ' . $self->name . ' not found' if $response->code == 404;
-    confess 'Unknown error' if $response->code != 204;
+    confess 'Unknown error' if !$response->is_success;
 }
 
 sub purge_cdn {
@@ -200,7 +200,7 @@ sub purge_cdn {
     my $response = $self->cloudfiles->_request($request);
     confess 'Not Found' if $response->code == 404;
     confess 'Unauthorized request' if $response->code == 403;
-    confess 'Unknown error' if $response->code != 204;
+    confess 'Unknown error' if !$response->is_success;
 }
 
 sub put {
@@ -217,7 +217,7 @@ sub put {
     );
     my $response = $self->cloudfiles->_request($request);
     
-    if ($response->code == 204) {
+    if ($response->is_success) {
         ## since the value was set successfully, we can set all our instance data appropriately.
         
         $self->etag($md5_hex);
@@ -250,7 +250,7 @@ sub put_filename {
     );
     my $response = $self->cloudfiles->_request($request);
     
-    if ($response->code == 204) {
+    if ($response->is_success) {
         $self->etag($md5_hex);
         $self->size($size);
         if ($self->cache_value) {

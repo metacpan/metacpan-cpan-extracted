@@ -8,13 +8,9 @@ use Mo::utils qw(check_isa check_length check_number check_required);
 
 extends 'Data::Image';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has commons_name => (
-	is => 'ro',
-);
-
-has dt_created => (
 	is => 'ro',
 );
 
@@ -36,9 +32,6 @@ sub BUILD {
 	# Check commons_name.
 	check_required($self, 'commons_name');
 	check_length($self, 'commons_name', 255);
-
-	# Check date created.
-	check_isa($self, 'dt_created', 'DateTime');
 
 	# Check date uploaded.
 	check_isa($self, 'dt_uploaded', 'DateTime');
@@ -280,6 +273,37 @@ Get image width.
 
 Returns number.
 
+ new():
+         From Data::Image:
+                 From Mo::utils:
+                         Parameter 'author' has length greater than '255'.
+                                 Value: %s
+                         Parameter 'comment' has length greater than '1000'.
+                                 Value: %s
+                         Parameter 'dt_created' must be a 'DateTime' object.
+                                 Value: %s
+                                 Reference: %s
+                         Parameter 'height' must a number.
+                                 Value: %s
+                         Parameter 'id' must a number.
+                                 Value: %s
+                         Parameter 'size' must a number.
+                                 Value: %s
+                         Parameter 'url' has length greater than '255'.
+                                 Value: %s
+                         Parameter 'url_cb' must be a code.
+                                 Value: %s
+                         Parameter 'width' must a number.
+                                 Value: %s
+         Parameter 'commons_name' is required.
+         Parameter 'commons_name' has length greater than '255'.
+                 Value: %s
+         Parameter 'dt_uploaded' must be a 'DateTime' object.
+                 Value: %s
+                 Reference: %s
+         Parameter 'page_id' must a number.
+                 Value: %s
+
 =head1 EXAMPLE
 
 =for comment filename=create_and_print_image.pl
@@ -356,12 +380,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

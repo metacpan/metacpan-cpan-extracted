@@ -8,10 +8,11 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util qw(none);
 use Readonly;
+use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.01;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -19,7 +20,8 @@ sub new {
 
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
-		['css_access', 'form_method', 'lang', 'register_url', 'text', 'width'], @params);
+		['css_access', 'form_method', 'lang', 'logo_image_url', 'register_url',
+		'text', 'width'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# CSS style for access box.
@@ -30,6 +32,9 @@ sub new {
 
 	# Language.
 	$self->{'lang'} = 'eng';
+
+	# Logo.
+	$self->{'logo_image_url'} = undef;
 
 	# Register URL.
 	$self->{'register_url'} = undef;
@@ -69,18 +74,23 @@ sub new {
 		err "Texts for language '$self->{'lang'}' doesn't exist.";
 	}
 
+	$self->{'_tags_messages'} = Tags::HTML::Messages->new(
+		'css' => $self->{'css'},
+		'flag_no_messages' => 0,
+		'tags' => $self->{'tags'},
+	);
+
 	# Object.
 	return $self;
 }
 
 # Process 'Tags'.
 sub _process {
-	my $self = shift;
+	my ($self, $messages_ar) = @_;
 
 	my $username_id = 'username';
 	my $password_id = 'password';
 
-	# Main content.
 	$self->{'tags'}->put(
 		['b', 'form'],
 		['a', 'class', $self->{'css_access'}],
@@ -90,6 +100,21 @@ sub _process {
 		['b', 'legend'],
 		['d', $self->_text('login')],
 		['e', 'legend'],
+	);
+
+	if (defined $self->{'logo_image_url'}) {
+		$self->{'tags'}->put(
+			['b', 'div'],
+			['a', 'class', 'logo'],
+			['b', 'img'],
+			['a', 'src', $self->{'logo_image_url'}],
+			['a', 'alt', 'logo'],
+			['e', 'img'],
+			['e', 'div'],
+		);
+	}
+
+	$self->{'tags'}->put(
 
 		['b', 'p'],
 		['b', 'label'],
@@ -100,6 +125,7 @@ sub _process {
 		['a', 'type', 'text'],
 		['a', 'name', $username_id],
 		['a', 'id', $username_id],
+		['a', 'autofocus', 'autofocus'],
 		['e', 'input'],
 		['e', 'p'],
 
@@ -132,7 +158,11 @@ sub _process {
 		) : (),
 
 		['e', 'fieldset'],
+	);
 
+	$self->{'_tags_messages'}->process($messages_ar);
+
+	$self->{'tags'}->put(
 		['e', 'form'],
 	);
 
@@ -141,7 +171,7 @@ sub _process {
 
 # Process 'CSS::Struct'.
 sub _process_css {
-	my $self = shift;
+	my ($self, $message_types_hr) = @_;
 
 	$self->{'css'}->put(
 		['s', '.'.$self->{'css_access'}],
@@ -150,6 +180,18 @@ sub _process_css {
 		['d', 'padding', '20px'],
 		['d', 'border-radius', '5px'],
 		['d', 'box-shadow', '0 0 10px rgba(0, 0, 0, 0.2)'],
+		['e'],
+
+		['s', '.'.$self->{'css_access'}.' .logo'],
+		['d', 'height', '5em'],
+		['d', 'width', '100%'],
+		['e'],
+
+		['s', '.'.$self->{'css_access'}.' img'],
+		['d', 'margin', 'auto'],
+		['d', 'display', 'block'],
+		['d', 'max-width', '100%'],
+		['d', 'max-height', '5em'],
 		['e'],
 
 		['s', '.'.$self->{'css_access'}.' fieldset'],
@@ -195,7 +237,13 @@ sub _process_css {
 		['s', '.'.$self->{'css_access'}.' button[type="submit"]:hover'],
 		['d', 'background-color', '#45a049'],
 		['e'],
+
+		['s', '.'.$self->{'css_access'}.' .messages'],
+		['d', 'text-align', 'center'],
+		['e'],
 	);
+
+	$self->{'_tags_messages'}->process_css($message_types_hr);
 
 	return;
 }
@@ -227,8 +275,8 @@ Tags::HTML::Login::Access - Tags helper for login access.
  use Tags::HTML::Login::Access;
 
  my $obj = Tags::HTML::Login::Access->new(%params);
- $obj->process;
- $obj->process_css;
+ $obj->process($message_ar);
+ $obj->process_css($message_types_hr);
 
 =head1 METHODS
 
@@ -268,6 +316,12 @@ Language in ISO 639-3 code.
 
 Default value is 'eng'.
 
+=item * C<logo_image_url>
+
+URL to logo image.
+
+Default value is undef.
+
 =item * C<register_url>
 
 URL to registration page.
@@ -302,17 +356,23 @@ Default value is:
 
 =head2 C<process>
 
- $obj->process;
+ $obj->process($message_ar);
 
 Process Tags structure for login box.
+
+Reference to array with message objects C<$message_ar> must be a instance of
+L<Data::Message::Simple> object.
 
 Returns undef.
 
 =head2 C<process_css>
 
- $obj->process_css;
+ $obj->process_css($message_types_hr);
 
 Process CSS::Struct structure for login box.
+
+Variable C<$message_type_hr> is reference to hash with keys for message type and value for color in CSS style.
+Possible message types are info and error now. Types are defined in L<Data::Message::Simple>.
 
 Returns undef.
 
@@ -418,7 +478,7 @@ Returns undef.
  #       <label for="username">
  #       </label>
  #       User name
- #       <input type="text" name="username" id="username">
+ #       <input type="text" name="username" id="username" autofocus="autofocus">
  #       </input>
  #     </p>
  #     <p>
@@ -436,13 +496,62 @@ Returns undef.
  #   </fieldset>
  # </form>
 
+=head1 EXAMPLE2
+
+=for comment filename=plack_app_login_access.pl
+
+ use strict;
+ use warnings;
+ 
+ use CSS::Struct::Output::Indent;
+ use Plack::App::Tags::HTML;
+ use Plack::Runner;
+ use Tags::HTML::Login::Access;
+ use Tags::Output::Indent;
+ use Unicode::UTF8 qw(decode_utf8);
+ 
+ my $css = CSS::Struct::Output::Indent->new;
+ my $tags = Tags::Output::Indent->new(
+         'xml' => 1,
+         'preserved' => ['style'],
+ );
+ my $login = Tags::HTML::Login::Access->new(
+         'css' => $css,
+         'tags' => $tags,
+         'register_url' => '/register',
+ );
+ $login->process_css;
+ my $app = Plack::App::Tags::HTML->new(
+         'component' => 'Tags::HTML::Container',
+         'data' => [sub {
+                 my $self = shift;
+                 $login->process;
+                 return;
+         }],
+         'css' => $css,
+         'tags' => $tags,
+         'title' => 'Login and password',
+ )->to_app;
+ Plack::Runner->new->run($app);
+
+ # Output screenshot is in images/ directory.
+
+=begin html
+
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-Login-Access/master/images/plack_app_login_access.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-Login-Access/master/images/plack_app_login_access.png" alt="Web app example" width="300px" height="300px" />
+</a>
+
+=end html
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
 L<Readonly>,
-L<Tags::HTML>.
+L<Tags::HTML>,
+L<Tags::HTML::Messages>.
 
 =head1 SEE ALSO
 
@@ -451,6 +560,10 @@ L<Tags::HTML>.
 =item L<Tags::HTML::Login::Button>
 
 Tags helper for login button.
+
+=item L<Tags::HTML::Login::Register>
+
+Tags helper for login register.
 
 =back
 
@@ -466,12 +579,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.07
 
 =cut

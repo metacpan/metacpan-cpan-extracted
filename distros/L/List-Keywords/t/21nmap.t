@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test2::V0;
-use Test::Refcount;
+use Test2::V0 0.000148;  # is_refcount
 
 use List::Keywords 'nmap';
 
@@ -41,6 +40,20 @@ use List::Keywords 'nmap';
 {
    is( [1, (nmap my ($x) { $x } 2), 3], [1, 2, 3],
       'nmap behaves correctly as list operator' );
+}
+
+# refcounts
+{
+   my $arr = [];
+   is_oneref( $arr, '$arr has one reference before test' );
+
+   my $result;
+
+   ( $result ) = nmap my ($x) { $x } $arr;
+   is_refcount( $arr, 2, '$arr has two references after nmap my ($x) BLOCK' );
+
+   undef $result;
+   is_oneref( $arr, '$arr has one reference at end of test' );
 }
 
 done_testing;

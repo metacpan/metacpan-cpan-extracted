@@ -14,7 +14,8 @@ is_deeply(
   decode_docsis($bytes),
   {
     MtaConfigDelimiter => [1, 255],
-    SnmpMibObject      => {oid => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0', STRING => 'w%d8%b8y%b3%1b%cf%0a%ac"%14%e1%99-1%d5'}
+    SnmpMibObject      =>
+      {oid => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0', STRING => 'w%d8%b8y%b3%1b%cf%0a%ac"%14%e1%99-1%d5'}
   },
   'md5',
 );
@@ -25,7 +26,10 @@ is_deeply(
   decode_docsis($bytes),
   {
     MtaConfigDelimiter => [1, 255],
-    SnmpMibObject => {oid => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0', STRING => 'T%df~f%89X%ee%83U%08%e4%f4%975%10[%e9%ae%25b'}
+    SnmpMibObject      => {
+      oid    => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0',
+      STRING => 'T%df~f%89X%ee%83U%08%e4%f4%975%10[%e9%ae%25b'
+    }
   },
   'sha1',
 );

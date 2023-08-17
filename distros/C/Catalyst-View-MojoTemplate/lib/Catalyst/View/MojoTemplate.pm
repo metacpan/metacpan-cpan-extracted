@@ -6,7 +6,7 @@ use Mojo::ByteStream qw(b);
 
 extends 'Catalyst::View';
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 has app => (is=>'ro');
 has auto_escape => (is=>'ro', required=>1, default=>1);

@@ -74,5 +74,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/steve-m-hay/Filter-Crypto
-version: '2.09'
+version: '2.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,9 +3,9 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp etc.
-use t_TestCommon  # Test::More etc.
+use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug mycheckeq_literal expect1 mycheck 
+            bug mycheckeq_literal expect1 mycheck
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -22,7 +22,7 @@ my $inpath = create_testdata(
       [ "A title3", "Btitle",    "Ctitle", "Dtitle", "Etitle" ], # **TITLES**
       [ "A title4", "Btitle",    "Ctitle", "Dtitle", "Etitle" ], # duplicate
       [ "A title5", "Btitle",    "Ctitle", "Dtitle", ""       ],
-      [ "A title6", "Btitle",    "Ctitle", "",       "Etitle" ], 
+      [ "A title6", "Btitle",    "Ctitle", "",       "Etitle" ],
       [ "A title7", "Btitle",    "Ctitle", "Dtitle", "not e"  ],
       [ "A title8", "Btitle",    "Ctitle", "Dtitle", "Especial" ], # alternate
       [ "A title9", "Btitle",    "Ctitle", "Dtitle", ""       ],
@@ -46,12 +46,12 @@ my $s3 = Spreadsheet::Edit->new(clone => $s2);
 say "s3: ",$s3->data_source unless $silent;
 die unless $s3->data_source =~ /cloned from cloned from My ds1/i;
 
-{ new_sheet; my $lno=__LINE__; 
+{ new_sheet; my $lno=__LINE__;
   die "data_source = <<", data_source(), ">>\n  ...does not include line number or has wrong number"
-    unless data_source() =~ /created.*$lno/i; 
+    unless data_source() =~ /created.*$lno/i;
 }
 
-say "new_sheet: ",data_source unless $silent; 
+say "new_sheet: ",data_source unless $silent;
 
 say "Done." unless $silent;
 exit 0;

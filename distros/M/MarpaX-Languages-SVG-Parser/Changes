@@ -1,5 +1,24 @@
 Revision history for Perl extension MarpaX::Languages::SVG::Parser.
 
+1.11  2023-07-13T15:05:56
+	- Fix version number in Perser.pm. It was still 1.09 after the release of 1.10.
+		It is now 1.11. Oops.
+	- In Makefile.PL add Unicode::UTF8 for use by Path::Tiny.spew_utf8(). The Unicode module
+		is not mandatory but significantly speeds up raw output.
+	- In t/test.real.data.t, change call to Path::Tiny -> spew() to spew_utf8().
+		The reason for this is that the test code writes the outputs of
+		scripts/parse.file.pl to text files and then compares them with files
+		shipped with the module. But on MS Windows outputs have CRLF line-endings
+		while shipped files are created under Debian, and have LF line-endings.
+		This problem was reported by the now famous Gregor Herrmann who risked life
+		and limb running tests under MS Windows (shudder). Thanx!
+	- Capture the output of test.real.data.t, using data/utf8.01.svg as input, as
+		data/utf8.01.log written with spew_utf8() so it matches during end-user tests.
+	- And yes, check all tests still pass under Debian.
+
+1.10  2019-09-09T23:59:59
+	- Change heading from Copyright to Copyright and Licence.
+
 1.09  2017-08-13T17:56:00
 	- Adopt new repo structure. See
 		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
@@ -7,7 +26,7 @@ Revision history for Perl extension MarpaX::Languages::SVG::Parser.
 	- Add t/00.versions.* to display the version #s of all pre-reqs.
 	- Fix typo in scripts/pod2html.sh.
 
-1.08  Fri Mar  6 09:31:00 2015
+1.08  2015-03-06T09:31:00
 	- Replace XML::SAX::ParserFactory with XML::Parser, now that I'm using Perl V 5.20.2,
 		and the utf8 pain goes away.
 	- Rewrite MarpaX::Languages::SVG::Parser::SAXHandler as *::XMLHandler.
@@ -18,28 +37,28 @@ Revision history for Perl extension MarpaX::Languages::SVG::Parser.
 		Note: I'm running Text::CSV::Encoded V 0.22 patched as per #RT93438.
 		Also I'm now running Perl V 5.20.2, which requires the patch just mentioned.
 
-1.07  Fri Sep 19 16:19:00 2014
+1.07  2014-09-19T16:19:00
 	- Fix code which generates the demo page.
 
-1.06  Fri Sep 19 09:15:00 2014
+1.06  2014-09-19T09:15:00
 	- Fix typo in repo in Build.PL.
 
-1.05  Wed Sep 17 17:22:00 2014
+1.05  2014-09-17T17:22:00
 	- Update Build.PL and Makefile.PL re putting this package on github.
 
-1.04  Thu May 27 08:31:00 2014
+1.04  2014-05-27T08:31:00
 	- Remove t/version.t, and so remove Test::Version, since the latter fails when combined with Test::Pretty.
 		I do not use Test::Pretty, only Test::More.
 
-1.03  Sat Feb 22 17:44:00 2014
+1.03  2014-02-22T17:44:00
 	- Add 'lexeme default = latm => 1' to the grammar.
 	- Make V 2.082 the minimum version for Marpa::R2.
 
-1.02  Fri Nov  1 15:51:00 2013
+1.02  2013-11-01T15:51:00
 	- Stop tests from requiring *::Utis, which uses *::Config, which is for my use only.
 	- Simplify t/test.fake.data.t by not 'use'ing unused modules.
 
-1.01  Tue Oct 29 16:23:00 2013
+1.01  2013-10-29T16:23:00
 	- Set utf8 (sic) unilaterally on the log output, if logging. This allows STDOUT to be redirected.
 		For non-utf8 input files (data/*.svg except data/utf8.01.svg), it will not be noticed.
 		For data/utf8.01.svg, and similar user files, it is vital if log ouptut is being captured.
@@ -67,5 +86,5 @@ Revision history for Perl extension MarpaX::Languages::SVG::Parser.
 	- Add t/test.real.data.t to check output of parse.file.pl against data/*.log.
 	- Rename t/runner.t to t/test.fake.data.t.
 
-1.00  Thu Oct 20 13:34:00 2013
+1.00  2013-10-20T13:34:00
 	  - Original version

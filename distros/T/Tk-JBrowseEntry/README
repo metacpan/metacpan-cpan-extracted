@@ -197,8 +197,8 @@ SEE ALSO
     Tk::BrowseEntry Tk::HListbox Tk::Listbox Tk::JComboBox Tk::Entry
 
 WIDGET-SPECIFIC OPTIONS
-    -state => *normal | readonly | text | textonly | disabled*
-        Default: normal
+    -state => *'normal' | 'readonly' | 'text' | 'textonly' | 'disabled'*
+        Default: 'normal'
 
         JBrowseEntry supports 5 different states:
 
@@ -269,20 +269,29 @@ WIDGET-SPECIFIC OPTIONS
         means button1 regardless of modifier.
 
         "Tab=KeepList" - Normally, if the [Tab] key is pressed while the
-        drop-down list is displayed, the drop-down list is removed from view
-        (rolled up) and the focus simply returns to the text entry field.
+        drop-down list is displayed and focused, the drop-down list is
+        removed from view (rolled up) and the focus simply returns to the
+        text entry field.
+
         Specifying "Tab=KeepList" (on Unixish systems) makes
         Tk::JBrowseEntry keep the drop-down list displayed while returning
-        the focus back to the text field. If "Tab=Popup" is also specified,
-        it implies "KeepList" as well on Unixish systems where the list is
-        not "fixed" as this avoids trapping the user in a "tab loop" between
-        the text-entry field and the drop-down list. Either way, the listbox
-        is undisplayed anyway when the JBrowseEntry widget itself goes out
-        of focus, or either the [Enter] or [Esc] key is pressed. If the
-        drop-down list is a "fixed" list (*-fixedlist* is specified), then
-        the list always remains in view and only the focus changes and this
-        setting is ignored. This setting is also ignored on M$-Windows
-        platforms, which is beyond our control.
+        the focus back to the text field when either tabbing off of the
+        listbox or selecting an entry via the *spacebar* key. To roll the
+        listbox back up (unless *-fixedlist* is specified), simply press the
+        Enter or Tab key, or click on the entry-field.
+
+        "Tab=Popup" - Normally, if the [Tab] key is pressed while the
+        text-entry field is displayed and focused, the focus advances to the
+        next widget.
+
+        Specifying "Tab=Popup" will cause the listbox to be popped up and
+        receive the focus. Either way, the listbox is undisplayed anyway
+        when the JBrowseEntry widget itself goes out of focus, or either the
+        [Enter] or [Esc] key is pressed. If the drop-down list is a "fixed"
+        list (*-fixedlist* is specified), then the list always remains in
+        view and only the focus changes and this setting is ignored. This
+        setting is also ignored on M$-Windows platforms, which is beyond our
+        control.
 
         "Down=None", "Up=None", "Right=None", "Esc=None", "Return=None",
         "Space=None" - causes pressing that respective key to NOT perform
@@ -313,10 +322,9 @@ WIDGET-SPECIFIC OPTIONS
 
     -browsecmd
         Specifies a callback function to call when a selection is made in
-        the popped up listbox. It is passed the widget and the text of the
-        entry selected. This function is called after the entry variable has
-        been assigned the value, (so the programmer can validate and
-        override the user's entry if desired).
+        the popped up listbox. This function is called after the entry
+        variable has been assigned the value, (so the programmer can
+        validate and override the user's entry if desired).
 
         The function is passed the widget reference itself (self), the
         content of the entry field (not necessarily equal to the -variable
@@ -370,6 +378,20 @@ WIDGET-SPECIFIC OPTIONS
         $w->state($w->state()); after dynamically changing foreground or
         background colors for the widget.
 
+    -default
+        (string) - If set, it becomes the default value, ie. if the user
+        presses the Esc (escape) key inside the text box (pressing Esc a
+        second time blanks out the field unless *-state == 'readonly'*).
+        It's recommended to set this to either the *-variable* variable (the
+        variable itself, not it's reference) or to a string representing one
+        of the values in the dropdown listbox, to avoid possibly confusing
+        users.
+
+        NOTE: The initial value set in the text field will be whatever's in
+        the *-variable*, NOT the *-default* value unless *-variable* is not
+        defined! If neither option is defined, the initial value will be
+        empty string ('').
+
     -deleteitemsok
         If set, allows user to delete individual items in the drop-down list
         by pressing the <Delete> key to delete the current (active) item. No
@@ -402,28 +424,33 @@ WIDGET-SPECIFIC OPTIONS
         up (hiding) when not. Setting this option to a true value will cause
         the drop-down list to be a fixed listbox widget packed below the
         rest of the widget. Specifying -fixedlist => *"top"* will instead
-        display the listbox *above* the rest of the widget. Default: 0 -
-        drop-down list is not fixed (pre-v5.10 behavior).
+        display the listbox *above* the rest of the widget.
 
-        NOTE: A list can be set to both "fixed" ("-fixedlist => ...") and
-        "bouncy" ("-altbinding => 'list=bouncy'") at the same time. This
+        Default: 0 (false) - drop-down list is not fixed (pre-v5.10
+        behavior).
+
+        NOTE: A list can be set to both "fixed" (*-fixedlist =* ...>) and
+        "bouncy" (*-altbinding =* 'list=bouncy'>) at the same time. This
         will ensure that the focus always jumps right back to the text field
         whenever the user selects an entry from the list. Otherwise, "fixed"
         lists alternate focus between the list and the entry field when the
         user clicks on the list to select a value, as if the list is
         alternating between "popped down" and "popped up" - this is not
-        considered a bug.
+        considered a bug, but a feature.
 
     -indicator
         Only used if -listboxtype is set to HListbox, otherwise ignored.
         Specifies whether an indicator image may be included with HListbox
-        entries. Default 0 (no indicator image).
+        entries.
+
+        Default: 0 (false - no indicator image).
 
     -itemtype
         Only used if -listboxtype is set to HListbox, otherwise ignored.
         Specifies the type of data permitted for HListbox entries. Valid
-        values are: *"text"*, *"image"*, and *"imagetext"*. Default:
-        *"text"*.
+        values are: *"text"*, *"image"*, and *"imagetext"*.
+
+        Default: *"text"*.
 
     -label
         Specify a label to be displayed next to the widget. The default is
@@ -442,6 +469,10 @@ WIDGET-SPECIFIC OPTIONS
     -labelfont
         Specify alternate font for the label.
 
+        NOTE: To change the font for the text entry field, use -font. See
+        also -listfont below for changing the font of the items in the
+        listbox.
+
     -labelPack
         Specify alternate packing options for the label. The default is:
         "[-side => 'left', -anchor => 'e']" ("[-side => 'left', -anchor =>
@@ -452,27 +483,34 @@ WIDGET-SPECIFIC OPTIONS
         later, you should set -label to ''.
 
     -labelrelief
-        Default "flat"
+        Default: "flat"
 
         Allow relief of the label portion of the widget to be specified.
 
     -listboxtype
         Specifies tye type of listbox widget to use for the drop-down list.
-        Valid values are *"Listbox"* and *"HListbox"*. Default is
-        *"Listbox"* (Tk::Listbox). If *"HListbox"* is specified, you must
-        have Tk::HListbox (v2.1+) installed or the application will fail
-        with an error.
+        Valid values are *"Listbox"* and *"HListbox"*. If *"HListbox"* is
+        specified, you must have Tk::HListbox (v2.1+) installed or the
+        application will fail with an error.
+
+        Default: *"Listbox"* (Tk::Listbox).
 
     -listcmd
         Specifies a callback function to call when the button next to the
         entry is pressed to popup the choices in the listbox. This is called
         before popping up the listbox, so can be used to populate the
-        entries in the listbox.
+        entries in the listbox. It passes the widget itself, and now also
+        passes in the current value string in the text-entry field (when the
+        list was popped up).
+
+        Default: none (no callback function)
 
     -listfont
-        Specify an alternate font for the text in the listbox. Use "-font"
-        to change the text of the text entry field. For best results,
-        "-font" and "-listfont" should specify fonts of similar size.
+        Specify an alternate font for the text in the listbox.
+
+        NOTE: Use -font to change the text of the text entry field. For best
+        results, *-font* and *-listfont* should usually specify fonts of
+        similar size.
 
     -listrelief
         Specifies relief for the drop-down list (default is "sunken").
@@ -480,9 +518,14 @@ WIDGET-SPECIFIC OPTIONS
     -listwidth
         Specifies the width of the popup listbox.
 
+        Default: The same width (including any scrollbar) as the text entry
+        field's width.
+
     -nobutton
         Whether or not to display the button that toggles the drop-down
-        list. Set to 1 to hide. Default 0 (display the button).
+        list. Set to 1 (true) to hide.
+
+        Default: 0 (false - display the button).
 
         Prevents drop-down list button from being displayed if set to 1
         (true).
@@ -508,7 +551,9 @@ WIDGET-SPECIFIC OPTIONS
         the next widget in the main window. In either case, if the text
         field is changed, focus remains on the text field, otherwise focus
         advances to next widget, so, after completing, pressing [Tab] again
-        advances to next widget.
+        advances to next widget. (NEW in v5.30): If set to 3, then
+        tab-completion will only occur when tabbing off of a focused and
+        visible listbox.
 
     -textbackground
         Specify alternate background for the entry field (when editable).
@@ -522,7 +567,9 @@ WIDGET-SPECIFIC OPTIONS
 
     -textdisabledforeground
         Specify alternate foreground for the entry field (when *-state* is
-        disabled). Default: -disabledforeground or a dark grey.
+        disabled).
+
+        Default: -disabledforeground or a dark grey.
 
     -textreadonlybackground
         Specify alternate background for the entry field (when *-state* is
@@ -530,7 +577,9 @@ WIDGET-SPECIFIC OPTIONS
 
     -textreadonlyforeground
         Specify alternate foreground for the entry field (when *-state* is
-        readonly). Default is a light gray.
+        readonly).
+
+        Default: a light gray.
 
 INHERITED OPTIONS
     -activestyle
@@ -569,16 +618,24 @@ INHERITED OPTIONS
         Specifies the foreground color for the widget and it's subwidgets.
 
     -height
-        Specify the maximum number of items to be displayed in the listbox
-        before a vertical scrollbar is automatically added. Default is
-        infinity (listbox will not be given a scrollbar regardless of the
+        Specify the maximum number of items (rows) to be displayed in the
+        listbox before a vertical scrollbar is automatically added. Default
+        is infinity (listbox will not be given a scrollbar regardless of the
         number of items added).
+
+        NOTE: This can overflow below the user's screen, so it is
+        recommended to set this to a sane value to cause a scrollbar to be
+        added automatically if needed, if there are going to be potentially
+        say a dozen or more items.
 
     -maxwidth
         Specifies the maximum width the entry and listbox widgets can expand
-        to in characters. The default is zero, meaning expand to the width
+        to in characters. Default is *0* (zero), meaning expand to the width
         to accomodate the widest string in the list. (Ignored if -width > 0
         (a fixed width) is specified).
+
+    -textvariable
+        Depreciated - use -variable now.
 
     -variable
         Specifies a scalar reference to the variable in which the entered
@@ -597,7 +654,7 @@ WIDGET METHODS
         activate() invokes the activate() option on the listbox to make the
         item with the index specified by the first argument "active". Unless
         a second argument is passed containing a false value, the value of
-        the "-textvariable" variable is also set to this now active value.
+        the "-variable" variable is also set to this now active value.
 
     $widget->choices([listref])
         Sets the drop-down list listbox to the list of values referenced by
@@ -637,20 +694,15 @@ WIDGET METHODS
     $widget->dereference(hashvalue)
         Returns the actual option key value that corresponds to the choice
         value displayed in the listbox. (undef if there is none). (Opposite
-        of reference() and referenceOnly(). Use this function on the
-        -variable reference variable to get the actual data (hash key),
-        since the reference variable will contain the VALUE displayed to the
-        user! If the choices are a list rather than a hash, then the value
-        is returned as is. Returns undef on error.
-
-    $widget->dereferenceOnly(hashkey)
-        Returns 1 if the key specified by "hashkey" is one of the valid
-        choices and the list of choices is a hash, otherwise undef is
-        returned.
+        of reference(). Use this function on the -variable reference
+        variable to get the actual data (hash key), since the reference
+        variable will contain the VALUE displayed to the user! If the
+        choices are a list rather than a hash, then the value is returned as
+        is. Returns undef on error.
 
     $widget->get_hashref_byname()
         Returns a reference to the current hash of choices (keyed by the
-        option visable to the user) if the choice list is a hash (reversed
+        option visable tothe user) if the choice list is a hash (reversed
         from the hash passed to choices()), otherwise, undef is returned.
 
     $widget->get_hashref_byvalue()
@@ -659,13 +711,12 @@ WIDGET METHODS
         to choices()), otherwise, undef is returned.
 
     $widget->get([first [, last]])
-        get() with no arguments returns the current value of the
-        "-textvariable" variable. If any arguments are passed, they are
-        passed directly to the listbox->get() function, ie. "0", "end" to
-        return all *text* values of the listbox. For choice hashes, the
-        value returned is what is displayed to the user. If Tk::HListbox is
-        used, only the *text* part of the entries are returned. The
-        arguments are indices.
+        get() with no arguments returns the current value of the "-variable"
+        variable. If any arguments are passed, they are passed directly to
+        the listbox->get() function, ie. "0", "end" to return all *text*
+        values of the listbox. For choice hashes, the value returned is what
+        is displayed to the user. If Tk::HListbox is used, only the *text*
+        part of the entries are returned. The arguments are indices.
 
     $widget->get_icursor([index])
         Return the location of *index* in the *text-entry* field. Values
@@ -704,9 +755,9 @@ WIDGET METHODS
         elements are added to the end of the list. List can be a reference
         to a list (*listref*). If a hash reference is specified, then the
         values are displayed to the user in the drop-down list, but the
-        values returned by the "-textvariable" variable or the get()
-        function are the corresponding hash key(s). The individual items in
-        the referenced array are normally simple text strings unless
+        values returned by the "-variable" variable or the get() function
+        are the corresponding hash key(s). The individual items in the
+        referenced array are normally simple text strings unless
         -listboxtype is set to *"HListbox"*, in which case, each can be
         either a simple text string or a hashref to a hash of attributes and
         values representing a valid Tk::HListbox entry, for example: {-image
@@ -735,7 +786,7 @@ WIDGET METHODS
         Activates drop-down list as if user pressed the button (unless state
         is "text" or "textonly" or "disabled". Returns 1 if drop-down list
         activated, zero otherwise. If the drop-down list is already visible,
-        then removes it (pops it back down) and returns zero. Available in
+        then removes it (pops it back down) and returns zero.Available in
         versions 5.0 and later. The current keyboard focus is saved for
         restoration when the drop-down list is rolled up unless
         *nofocussave* is specified and is true, in which case, focus will

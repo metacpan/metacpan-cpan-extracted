@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookSettingsRequest.name :   ,
-# PostWorkbookSettingsRequest.settings :   ,
-# PostWorkbookSettingsRequest.folder :   ,
-# PostWorkbookSettingsRequest.storageName :    
+# PostWorkbookSettingsRequest.name : The workbook name.  ,
+# PostWorkbookSettingsRequest.settings : Workbook Setting description.  ,
+# PostWorkbookSettingsRequest.folder : Original workbook folder.  ,
+# PostWorkbookSettingsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_settings' } = { 
-    	summary => '',
+    	summary => 'Updates workbook setting.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'settings' => {
      	datatype => 'WorkbookSettings',
      	base_name => 'settings',
-     	description => '',
+     	description => 'Workbook Setting description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

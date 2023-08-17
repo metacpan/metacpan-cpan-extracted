@@ -32,9 +32,11 @@ Checking if you have Tie::File 0 ... Yes (1.02)
 Checking if you have IO::Capture::Extended 0.09 ... No
 Checking if you have IO::Capture 0.05 ... Yes (0.05)
 ==> Found dependencies: IO::Capture::Extended
-Searching IO::Capture::Extended (0.09) on cpanmetadb ...
+Searching IO::Capture::Extended (0.09) on mirror https://cpan.metacpan.org ...
+Downloading index file https://cpan.metacpan.org/modules/02packages.details.txt.gz ...
+Uncompressing index file...
 --> Working on IO::Capture::Extended
-Fetching http://www.cpan.org/authors/id/J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz
+Fetching https://cpan.metacpan.org/authors/id/J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz
 -> OK
 Unpacking IO-Capture-Extended-0.13.tar.gz
 Entering IO-Capture-Extended-0.13

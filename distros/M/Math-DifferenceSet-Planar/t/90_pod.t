@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2007-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -19,6 +19,7 @@ BEGIN {
     require Test::Pod;                  # redundant, but clue for CPANTS
 }
 
-all_pod_files_ok();
+my @dirs = ('examples', -d 'blib'? 'blib': ('lib', 'share'));
+all_pod_files_ok(all_pod_files(@dirs));
 
 __END__

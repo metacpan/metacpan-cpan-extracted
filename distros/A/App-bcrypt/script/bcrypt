@@ -1,0 +1,411 @@
+#!/usr/bin/perl
+
+use v5.30;
+use experimental qw(signatures);
+
+=encoding utf8
+
+=head1 NAME
+
+bcrypt - A command-line tool to deal with bcrypt password hashing
+
+=head1 SYNOPSIS
+
+Run this from the command line. By default, it reads one line of standard
+input to get the password. This way the password doesn't show up in
+your shell's history:
+
+	$ bcrypt
+	Reading password on standard input...
+	Hello World
+	$2b$12$yQePGL/7.u6mVY8tt6fqTO08hQEc2qdWQ..FehvCwBIgMxzM0ULkq
+
+Control the various inputs:
+
+	$ bcrypt --cost 10 --salt abcdef0123456789 --type 2a
+	Reading password on standard input...
+	Hello World
+	$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu
+
+To check a password against a hash, use C<--compare>. Since the hashed
+value has C<$>, which is a shell special character in various shells,
+quote the value:
+
+	$ perl script/bcrypt --compare '$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu' <<<"Hello World"
+	Reading password on standard input...
+	Hello World
+	Match
+
+In a program, load the program as a module and call C<run> with the
+same strings you'd use on the command line. The return value of C<run>
+is the exit status:
+
+	require '/path/to/bcrypt';
+
+	my $exit_status = App::bcrypt::run( @command_line_strings );
+	exit $exit_status;
+
+=head1 DESCRIPTION
+
+=head2 Options
+
+=over 4
+
+=item * C<--compare> - the hash to compare to the password
+
+=item * C<--cost>, C<-c> - the cost factor, which should be between 5 and 31, inclusively. This is the exponent for a power of two, so things get slow quickly (default: 12)
+
+=item * C<--debug>, C<-d> - turn on debugging (default: off)
+
+=item * C<--eol>, C<-e> - the string to add to the end of the hash on output (default: newline)
+
+=item * C<--help>, C<-h> - show the documentation and exit. This takes precedence over all other options besides C<--update-modules> and C<--version>.
+
+=item * C<--no-eol>, C<-n> - do not add anything to the end of the line (default: off)
+
+=item * C<--password>, C<-p> - the password to hash or to compare. But, it's probably better to send it through standard input if you are using this as a command-line program and not a library.
+
+=item * C<--quiet>, C<-q> - suppress information messages (default: off)
+
+=item * C<--salt>, C<-s> - the salt to use. This is a string the should encode to 16-octet UTF-8  (default: random string)
+
+=item * C<--type>, C<-t> - the Bcrypt type, which is one of C<2a>, C<2b> (default), C<2x>, or C<2y>
+
+=item * C<--update-modules> - use cpan(1) to update or install all the Perl modules this program needs. This takes precedence over all other options.
+
+=item * C<--version>, C<-v> - show the version. With C<--debug>, this shows extra information about the Perl bits. This option takes precedence over all others except C<--update-modules>.
+
+=back
+
+=head2 Environment
+
+If these environment variables are set, they are used as the default values
+when you do not specify a value through the command line options:
+
+=over 4
+
+=item * BCRYPT_COST
+
+=item * BCRYPT_EOL
+
+=item * BCRYPT_NO_EOL
+
+=item * BCRYPT_QUIET
+
+=item * BCRYPT_SALT
+
+=item * BCRYPT_TYPE
+
+=back
+
+=head2 Exit values
+
+=over 4
+
+=item * 0 - Success in either making the new hash, or that the hash and password match for C<--compare>
+
+=item * 1 - The hash and password for C<--compare> do not match
+
+=item * 2 - Invalid input
+
+=back
+
+=head2 Examples
+
+Install the modules using cpan if you've dropped this file into a system:
+
+	$ bcrypt --update-modules
+
+Create a password with the defaults:
+
+	$ bcrypt
+	Reading password on standard input...
+	Hello World
+
+Same thing, but without the extra output:
+
+	$ perl script/bcrypt -q
+	Hello World
+	$2b$12$IqR8.HcodAzvngql3qDw2upnUrjj9HSxutWCgPrUsga0gm7AvTOUu
+
+By default, there's a newline at the end of the hash because it's a normal
+output line, but you can remove that with C<--no-eol>. First, normally:
+
+	$ bcrypt -q | hexdump -C
+	Hello World
+	00000000  24 32 62 24 31 32 24 35  4b 63 68 65 4f 6d 65 48  |$2b$12$5KcheOmeH|
+	00000010  61 67 52 62 77 2f 4a 57  70 79 54 55 65 73 70 39  |agRbw/JWpyTUesp9|
+	00000020  67 76 41 58 78 32 66 6e  79 6e 41 33 2f 6b 75 35  |gvAXx2fnynA3/ku5|
+	00000030  6a 43 50 4a 7a 70 5a 38  39 47 58 65 0a           |jCPJzpZ89GXe.|
+	0000003d
+
+Now, notice the lack of the C<0a> at the end:
+
+	$ bcrypt -q --no-eol | hexdump -C
+	Hello World
+	00000000  24 32 62 24 31 32 24 4d  36 67 2e 54 64 7a 48 49  |$2b$12$M6g.TdzHI|
+	00000010  44 58 52 30 73 33 66 2f  66 57 74 74 4f 61 54 70  |DXR0s3f/fWttOaTp|
+	00000020  34 2f 7a 57 5a 47 63 44  76 56 63 45 6d 6a 49 4e  |4/zWZGcDvVcEmjIN|
+	00000030  50 79 4c 79 41 74 48 62  71 56 79 75              |PyLyAtHbqVyu|
+	0000003c
+
+Choose your own settings. The value for C<--salt> should be a string that
+will UTF-8 encode to exactly 16 octets. Care with C<--cost> because that's
+a power of 2:
+
+	$ bcrypt --type 2a --cost 30 --salt abcdef0123456789
+	Reading password on standard input...
+	Hello World
+	$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu
+
+Compare a hash to a password supplied on standard input:
+
+	$ bcrypt --compare '$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu'
+	Reading password on standard input...
+	Hello Worldd
+	Does not match
+
+Do the same thing quietly, but use the exit value to figure out what
+happened. This bad password has an extra C<d>:
+
+	$ bcrypt --quiet --compare '$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu'
+	Hello Worldd
+	$ echo $?
+	1
+
+This password is the right one:
+
+	$ bcrypt --quiet --compare '$2a$10$WUHhXETkKBCwKxOzLha2MOVweNmcwXQeoLR9jJlmEcl7rMR2ymqNu'
+	Hello World
+	$ echo $?
+	0
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Crypt::Bcrypt (which this program uses)
+
+=item * Mojolicious::Plugin::Bcrypt
+
+=item * Mojolicious::Command::bcrypt
+
+=item * https://github.com/shoenig/bcrypt-tool, a Golang tool
+
+=back
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github:
+
+	http://github.com/briandfoy/app-bcrypt
+
+=head1 AUTHOR
+
+brian d foy, C<< <brian d foy> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023, brian d foy, All Rights Reserved.
+
+You may redistribute this under the terms of the Artistic License 2.0.
+
+=cut
+
+package App::bcrypt;
+
+sub VERSION { '1.001' }
+
+exit run( @ARGV ) unless caller;
+
+sub EX_SUCCESS  () { 0 }
+sub EX_NO_MATCH () { 1 }
+sub EX_USAGE    () { 2 }
+
+sub run ( @args ) {
+	return _update_modules() if grep { $_ eq '--update-modules' } @args;
+
+	my $processed_args = _process_args(\@args);
+	exit EX_USAGE unless defined $processed_args;
+
+	return _show_version($processed_args->{'debug'}) if $processed_args->{'version'};
+	return _show_help() if $processed_args->{'help'};
+
+	if( $processed_args->{quiet} ) {
+		no warnings qw(redefine);
+		*_message = sub { 1 }
+		}
+
+	my $errors = _validate_args( $processed_args );
+
+	if( $errors->@* > 0 ) {
+		foreach ( $errors->@* ) {
+			_message( $_ );
+			}
+		return EX_USAGE;
+		}
+
+	if( ! defined $processed_args->{'password'} ) {
+		$processed_args->{'password'} = _read_password();
+		}
+
+	if( defined $processed_args->{compare} ) {
+		state $rc = require Crypt::Bcrypt;
+		my $r = Crypt::Bcrypt::bcrypt_check( $processed_args->@{qw(password compare)} );
+
+		return do {
+			if( $r ) {
+				_message("Match");
+				EX_SUCCESS;
+				}
+			else {
+				_message("Does not match");
+				EX_NO_MATCH;
+				}
+			};
+		}
+
+	if( $processed_args->{'debug'} ) {
+		say _dumper($processed_args);
+		}
+
+	state $rc = require Crypt::Bcrypt;
+	my $hashed = Crypt::Bcrypt::bcrypt( $processed_args->@{qw(password type cost salt)} );
+
+	local $\ = do {
+		if( $processed_args->{'no-eol'} ) { undef }
+		elsif( $processed_args->{'eol'} ) { $processed_args->{'eol'} }
+		else                              { "\n" }
+		};
+
+	print $hashed;
+
+	return EX_SUCCESS;
+	}
+
+sub _defaults () {
+	my %hash = (
+		'no-eol'  => $ENV{BCRYPT_NO_EOL}   // 0,
+		cost      => $ENV{BCRYPT_COST}     // 12,
+		debug     => $ENV{BCRYPT_DEBUG}    // 0,
+		eol       => $ENV{BCRYPT_EOL}      // "\n",
+		quiet     => $ENV{BCRYPT_QUIET}    // 0,
+		salt      => _default_salt(),
+		type      => lc( $ENV{BCRYPT_TYPE} // '2b' ),
+		);
+
+	return \%hash;
+	}
+
+sub _default_salt () {
+	my $unencoded_salt = do {
+		if( exists $ENV{BCRYPT_SALT} ) {
+			state $rc = require Encode;
+			Encode::encode( 'UTF-8', $ENV{BCRYPT_SALT} )
+			}
+		else {
+			state $rc = require Crypt::URandom;
+			Crypt::URandom::urandom(16)
+			}
+		};
+	}
+
+sub _dumper {
+	state $rc = require Data::Dumper;
+	Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump
+	}
+
+sub _message ($m) {
+	chomp $m;
+	say { _message_fh() } $m;
+	}
+
+sub _message_fh () {
+	$App::bcrypt::fh // *STDOUT
+	}
+
+sub _modules () {
+	qw(Crypt::Bcrypt Crypt::URandom Encode);
+	}
+
+sub _process_args ($args) {
+	state $c = require Getopt::Long;
+
+	my %opts = _defaults()->%*;
+	my %opts_description = (
+		'compare=s'      => \ $opts{'compare'},
+		'cost|c=i'       => \ $opts{'cost'},
+		'debug|d'        => \ $opts{'debug'},
+		'eol|e=s'        => \ $opts{'eol'},
+		'help|h'         => \ $opts{'help'},
+		'no-eol|n'       => \ $opts{'no-eol'},
+		'password|p=s'   => \ $opts{'password'},
+		'quiet|q'        => \ $opts{'quiet'},
+		'salt|s=s'       => \ $opts{'salt'},
+		'type|t=s'       => \ $opts{'type'},
+		'update-modules' => \ $opts{'update-modules'},
+		'version|v'      => \ $opts{'version'},
+		);
+
+	my $ret = Getopt::Long::GetOptionsFromArray( $args, %opts_description );
+	return unless $ret;
+
+	return \%opts;
+	}
+
+sub _read_password () {
+	_message( 'Reading password on standard input...' );
+	my $password = <STDIN>;
+	chomp $password;
+	$password;
+	}
+
+sub _show_help () {
+	state $rc = require Pod::Usage;
+	print Pod::Usage::pod2usage(
+		-verbose => 2,
+		-exitval => 'NOEXIT',
+		);
+	return EX_SUCCESS;
+	}
+
+sub _show_version ($debug = 0) {
+	_message( "$0 " . __PACKAGE__->VERSION );
+	return EX_SUCCESS unless $debug;
+
+	_message( "\tperl $^V at $^X" );
+
+	my $width = ( sort { $a <=> $b } map { length } _modules() )[-1];
+
+	foreach my $module ( sort { $a cmp $b} _modules() ) {
+		my $rc = eval "require $module";
+		my $rel_path = $module =~ s|::|/|gr . '.pm';
+		_message( sprintf "\t%-*s\n\t\t%f\n\t\t%s", $width, $module, $module->VERSION, $INC{$rel_path} )
+		}
+
+	return EX_SUCCESS;
+	}
+
+sub _types () { qw( 2a 2b 2x 2y ) }
+
+sub _update_modules () {
+	state $rc = require App::Cpan;
+	App::Cpan->run( _modules() )
+	}
+
+sub _validate_args ( $processed_args ) {
+	my( $c, $t, $s, $p ) = $processed_args->@{qw(cost type salt password)};
+
+	my @errors;
+
+	push @errors, qq(The cost must be a whole number between 5 and 31, inclusively, but got "$c")
+		unless( int($c) == $c and ( 4 < $c < 32 ) );
+	push @errors, qq(The type must be one of @{[ _types ]}, but got "$t")
+		unless grep { $t eq $_ } _types();
+	push @errors, sprintf "The salt must be 16 octets, but got %s", _dumper($s) =~ s/\R+\z//r
+		unless 16 == length $s;
+
+	return \@errors;
+	}
+
+1;

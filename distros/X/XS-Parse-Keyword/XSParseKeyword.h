@@ -9,7 +9,7 @@ struct XSParseKeywordPieceType {
   union {
     char c;                                       /* LITERALCHAR */
     const char *str;                              /* LITERALSTR */
-    const struct XSParseKeywordPieceType *pieces; /* SCOPEs */
+    const struct XSParseKeywordPieceType *pieces; /* containers */
     void (*callback)(pTHX_ void *hookdata);       /* SETUP, ANONSUB PREPARE+START */
 
     OP *(*op_wrap_callback)(pTHX_ OP *o, void *hookdata);
@@ -17,9 +17,10 @@ struct XSParseKeywordPieceType {
 };
 
 enum {
-  XPK_FLAG_EXPR     = (1<<0),
-  XPK_FLAG_STMT     = (1<<1),
-  XPK_FLAG_AUTOSEMI = (1<<2),
+  XPK_FLAG_EXPR       = (1<<0),
+  XPK_FLAG_STMT       = (1<<1),
+  XPK_FLAG_AUTOSEMI   = (1<<2),
+  XPK_FLAG_BLOCKSCOPE = (1<<3),
 };
 
 enum {
@@ -29,7 +30,8 @@ enum {
   XS_PARSE_KEYWORD_LITERALCHAR = 1,   /* nothing */
   XS_PARSE_KEYWORD_LITERALSTR,        /* nothing */
   XS_PARSE_KEYWORD_AUTOSEMI,          /* nothing */
-  XS_PARSE_KEYWORD_FAILURE = 0x0f,    /* nothing */
+  XS_PARSE_KEYWORD_WARNING = 0x0e,    /* nothing */
+  XS_PARSE_KEYWORD_FAILURE,           /* nothing */
 
   XS_PARSE_KEYWORD_BLOCK = 0x10,      /* op */
   XS_PARSE_KEYWORD_ANONSUB,           /* cv */
@@ -46,6 +48,8 @@ enum {
 
   XS_PARSE_KEYWORD_INFIX = 0x40,      /* infix */
 
+  XS_PARSE_KEYWORD_INTRO_MY = 0x60,   /* emits nothing */
+
   XS_PARSE_KEYWORD_SETUP = 0x70,      /* invokes callback, emits nothing */
 
   XS_PARSE_KEYWORD_ANONSUB_PREPARE,   /* invokes callback, emits nothing */
@@ -58,10 +62,10 @@ enum {
   XS_PARSE_KEYWORD_CHOICE,            /* i, contained */
   XS_PARSE_KEYWORD_TAGGEDCHOICE,      /* i, contained */
   XS_PARSE_KEYWORD_SEPARATEDLIST,     /* i, contained */
-  XS_PARSE_KEYWORD_PARENSCOPE = 0xb0, /* contained */
-  XS_PARSE_KEYWORD_BRACKETSCOPE,      /* contained */
-  XS_PARSE_KEYWORD_BRACESCOPE,        /* contained */
-  XS_PARSE_KEYWORD_CHEVRONSCOPE,      /* contained */
+  XS_PARSE_KEYWORD_PARENS = 0xb0,     /* contained */
+  XS_PARSE_KEYWORD_BRACKETS,          /* contained */
+  XS_PARSE_KEYWORD_BRACES,            /* contained */
+  XS_PARSE_KEYWORD_CHEVRONS,          /* contained */
 };
 
 enum {
@@ -84,7 +88,7 @@ enum {
 
   XPK_TYPEFLAG_ENTERLEAVE = (1<<20), /* wrap ENTER/LEAVE pair around the item */
 
-  XPK_TYPEFLAG_MAYBEPARENS = (1<<21), /* parens themselves are optional on PARENSCOPE */
+  XPK_TYPEFLAG_MAYBEPARENS = (1<<21), /* parens themselves are optional on PARENS */
 };
 
 #define XPK_BLOCK_flags(flags) {.type = XS_PARSE_KEYWORD_BLOCK|(flags), .u.pieces = NULL}
@@ -156,6 +160,8 @@ enum {
 #define XPK_INFIX_MATCH_NOSMART  XPK_INFIX(XPI_SELECT_MATCH_NOSMART)
 #define XPK_INFIX_MATCH_SMART    XPK_INFIX(XPI_SELECT_MATCH_SMART)
 
+#define XPK_INTRO_MY           {.type = XS_PARSE_KEYWORD_INTRO_MY}
+
 #define XPK_SEQUENCE_pieces(p) {.type = XS_PARSE_KEYWORD_SEQUENCE, .u.pieces = p}
 #define XPK_SEQUENCE(...)      XPK_SEQUENCE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
 
@@ -179,30 +185,54 @@ enum {
   {.type = XS_PARSE_KEYWORD_SEPARATEDLIST, .u.pieces = (const struct XSParseKeywordPieceType []){ \
       {.type = XS_PARSE_KEYWORD_LITERALCHAR, .u.c = ','}, __VA_ARGS__, {0}}}
 
+#define XPK_WARNING_bit(bit,s)   {.type = (XS_PARSE_KEYWORD_WARNING|(bit << 24)), .u.str = (const char *)s}
+#define XPK_WARNING(s)               XPK_WARNING_bit(0,s)
+#define XPK_WARNING_AMBIGUOUS(s)     XPK_WARNING_bit(WARN_AMBIGUOUS,   s)
+#define XPK_WARNING_DEPRECATED(s)    XPK_WARNING_bit(WARN_DEPRECATED,  s)
+#define XPK_WARNING_EXPERIMENTAL(s)  XPK_WARNING_bit(WARN_EXPERIMENTAL,s)
+#define XPK_WARNING_PRECEDENCE(s)    XPK_WARNING_bit(WARN_PRECEDENCE,  s)
+#define XPK_WARNING_SYNTAX(s)        XPK_WARNING_bit(WARN_SYNTAX,      s)
+
 #define XPK_FAILURE(s) {.type = XS_PARSE_KEYWORD_FAILURE, .u.str = (const char *)s}
 
-#define XPK_PARENSCOPE_pieces(p) {.type = XS_PARSE_KEYWORD_PARENSCOPE, .u.pieces = p}
-#define XPK_PARENSCOPE(...)      XPK_PARENSCOPE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
-#define XPK_PARENSCOPE_OPT(...) \
-  {.type = XS_PARSE_KEYWORD_PARENSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_PARENS_pieces(p) {.type = XS_PARSE_KEYWORD_PARENS, .u.pieces = p}
+#define XPK_PARENS(...)      XPK_PARENS_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
+#define XPK_PARENS_OPT(...) \
+  {.type = XS_PARSE_KEYWORD_PARENS|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
-#define XPK_ARGSCOPE_pieces(p) {.type = XS_PARSE_KEYWORD_PARENSCOPE|XPK_TYPEFLAG_MAYBEPARENS, .u.pieces = p}
-#define XPK_ARGSCOPE(...)      XPK_ARGSCOPE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
+#define XPK_ARGS_pieces(p) {.type = XS_PARSE_KEYWORD_PARENS|XPK_TYPEFLAG_MAYBEPARENS, .u.pieces = p}
+#define XPK_ARGS(...)      XPK_ARGS_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
 
-#define XPK_BRACKETSCOPE_pieces(p) {.type = XS_PARSE_KEYWORD_BRACKETSCOPE, .u.pieces = p}
-#define XPK_BRACKETSCOPE(...)      XPK_BRACKETSCOPE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
-#define XPK_BRACKETSCOPE_OPT(...) \
-  {.type = XS_PARSE_KEYWORD_BRACKETSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_BRACKETS_pieces(p) {.type = XS_PARSE_KEYWORD_BRACKETS, .u.pieces = p}
+#define XPK_BRACKETS(...)      XPK_BRACKETS_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
+#define XPK_BRACKETS_OPT(...) \
+  {.type = XS_PARSE_KEYWORD_BRACKETS|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
-#define XPK_BRACESCOPE_pieces(p) {.type = XS_PARSE_KEYWORD_BRACESCOPE, .u.pieces = p}
-#define XPK_BRACESCOPE(...)      XPK_BRACESCOPE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
-#define XPK_BRACESCOPE_OPT(...) \
-  {.type = XS_PARSE_KEYWORD_BRACESCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_BRACES_pieces(p) {.type = XS_PARSE_KEYWORD_BRACES, .u.pieces = p}
+#define XPK_BRACES(...)      XPK_BRACES_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
+#define XPK_BRACES_OPT(...) \
+  {.type = XS_PARSE_KEYWORD_BRACES|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
-#define XPK_CHEVRONSCOPE_pieces(p) {.type = XS_PARSE_KEYWORD_CHEVRONSCOPE, .u.pieces = p}
-#define XPK_CHEVRONSCOPE(...)      XPK_CHEVRONSCOPE_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
-#define XPK_CHEVRONSCOPE_OPT(...) \
-  {.type = XS_PARSE_KEYWORD_CHEVRONSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_CHEVRONS_pieces(p) {.type = XS_PARSE_KEYWORD_CHEVRONS, .u.pieces = p}
+#define XPK_CHEVRONS(...)      XPK_CHEVRONS_pieces(((const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }))
+#define XPK_CHEVRONS_OPT(...) \
+  {.type = XS_PARSE_KEYWORD_CHEVRONS|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+
+/* back-compat for older names */
+#define XPK_PARENSCOPE_pieces    XPK_PARENS_pieces
+#define XPK_PARENSCOPE           XPK_PARENS
+#define XPK_PARENSCOPE_OPT       XPK_PARENS_OPT
+#define XPK_ARGSCOPE_pieces      XPK_ARGS_pieces
+#define XPK_ARGSCOPE             XPK_ARGS
+#define XPK_BRACKETSCOPE_pieces  XPK_BRACKETS_pieces
+#define XPK_BRACKETSCOPE         XPK_BRACKETS
+#define XPK_BRACKETSCOPE_OPT     XPK_BRACKETS_OPT
+#define XPK_BRACESCOPE_pieces    XPK_BRACES_pieces
+#define XPK_BRACESCOPE           XPK_BRACES
+#define XPK_BRACESCOPE_OPT       XPK_BRACES_OPT
+#define XPK_CHEVRONSCOPE_pieces  XPK_CHEVRONS_pieces
+#define XPK_CHEVRONSCOPE         XPK_CHEVRONS
+#define XPK_CHEVRONSCOPE_OPT     XPK_CHEVRONS_OPT
 
 /* This type defined in XSParseInfix.h */
 typedef struct XSParseInfixInfo XSParseInfixInfo;

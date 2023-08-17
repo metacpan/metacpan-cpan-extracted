@@ -2,8 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    This document describes version 0.200 of File::Trash::FreeDesktop (from
-    Perl distribution File-Trash-FreeDesktop), released on 2022-05-06.
+    This document describes version 0.205 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2023-08-07.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -61,9 +61,29 @@ DESCRIPTION
         It should not matter though, because trash directories are
         per-filesystem.
 
-    Some other notes:
+    Keywords: recycle bin
 
-    *
+THE TRASH STRUCTURE
+    The following is a short description of the trash structure.
+
+    A trash directory is a per-filesystem, per-user directory structure to
+    allow files to be "trashed", i.e. to be put inside and to be recovered
+    to its original location later should a user changes his/her mind and
+    wants the files back. Otherwise, user can "empty" the trash to delete
+    files permanently.
+
+    A trash directory, e.g. "/home/USER1/.local/share/Trash", contains two
+    subdirectories: "info" and "files". The "files" contain the actual
+    trashed files and their name must be unique. Thus if
+    "/home/USER1/foo.txt" is trashed and then another "/home/USER1/foo.txt"
+    is trashed again, the second file must be renamed to "/home/USER1/foo
+    (1).txt" or something else.
+
+    The "info" subdirectory contains the metadata for each trashed file,
+    with each metadata put in an INI of the same name of the correspoonding
+    file in "files" with ".trashinfo" suffix, under the INI "Trash Info"
+    section. Known INI parameters include: "Path" (the original name/path of
+    the trashed file) and "DeletionDate" (date and time, in ISO8601 format).
 
 NOTES
     Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How
@@ -73,7 +93,13 @@ METHODS
   $trash = File::Trash::FreeDesktop->new(%opts)
     Constructor.
 
-    Currently there are no known options.
+    Known options:
+
+    *   home_only
+
+        Bool. If set to true, instruct the module to just look for trash
+        directory under the home directory and not search other filesystem
+        mountpoints for possible trash directories.
 
   $trash->list_trashes() => LIST
     List user's existing trash directories on the system.
@@ -83,7 +109,7 @@ METHODS
      ("/home/mince/.local/share/Trash",
       "/tmp/.Trash-1000")
 
-  $trash->list_contents([$trash_dir]) => LIST
+  $trash->list_contents([ \%opts ], [ $trash_dir ]) => LIST
     List contents of trash director(y|ies).
 
     If $trash_dir is not specified, list contents from all existing trash
@@ -96,6 +122,49 @@ METHODS
        trash_dir=>"/home/mince/.local/share/Trash"},
       {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
        trash_dir=>"/tmp/.Trash-1000"})
+
+    The "path" key is the original path of the file before it is put into
+    the trash.
+
+    Known options:
+
+    *   suffix
+
+        Str.
+
+    *   path_wildcard
+
+        Wildcard pattern to be matched against path. Only matching entries
+        will be returned.
+
+    *   path_re
+
+        Regexp pattern to be matched against path. Only matching entries
+        will be returned.
+
+    *   path
+
+        Exact matching against path. Only matching entries will be returned.
+
+    *   filename_wildcard
+
+        Wildcard pattern to be matched against the filename part of path.
+        Only matching entries will be returned.
+
+    *   filename_re
+
+        Regexp pattern to be matched against the filename part of path. Only
+        matching entries will be returned.
+
+    *   filename
+
+        Exact matching against filename part of path. Only matching entries
+        will be returned.
+
+    *   mtime
+
+        Int. Only return entries where the trashed file's modification time
+        matches this <value.
 
   $trash->trash([\%opts, ]$file) => STR
     Trash a file (move it into trash dir).
@@ -130,7 +199,7 @@ METHODS
         unique suffix.
 
   $trash->recover([\%opts, ]$file[, $trash_dir])
-    Recover a file from trash.
+    Recover a file or multiple files from trash.
 
     Unless $trash_dir is specified, will search in all existing user's trash
     dirs. Will die on errors.
@@ -138,10 +207,33 @@ METHODS
     If first argument is a hashref, it will be accepted as options. Known
     options:
 
-    *   on_not_found => STR (default 'die')
+    *   filename
 
-        Specify what to do when file is not found in the trash. The default
-        is 'die', but can also be set to 'ignore' and return immediately.
+        See list_contents().
+
+    *   filename_wildcard
+
+        See list_contents().
+
+    *   filename_re
+
+        See list_contents().
+
+    *   path
+
+        See list_contents().
+
+    *   path_wildcard
+
+        See list_contents().
+
+    *   path_re
+
+        See list_contents().
+
+    *   mtime
+
+        See list_contents().
 
     *   on_target_exists => STR (default 'die')
 
@@ -167,11 +259,14 @@ METHODS
         Only recover file having the specified suffix, chosen previously
         during trash().
 
-  $trash->erase($file[, $trash_dir]) => LIST
-    Erase (unlink()) a file in trash.
+  $trash->erase([ \%opts, ] $file[, $trash_dir]) => LIST
+    Erase (unlink()) a file or multiple files in trash.
 
     Unless $trash_dir is specified, will empty all existing user's trash
     dirs. Will ignore if file does not exist in trash. Will die on errors.
+
+    To erase multiple files based on wilcard or regexp pattern, use the
+    options. See list_contents().
 
     Return list of files erased.
 
@@ -197,10 +292,27 @@ SOURCE
     <https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
 
 SEE ALSO
-    [1] http://freedesktop.org/wiki/Specifications/trash-spec
+  Specification
+    <https://freedesktop.org/wiki/Specifications/trash-spec>
 
-    Related modules on CPAN:
+  CLI utilities
+    *   App::TrashUtils
 
+        A set of CLI's written in Perl: trash-empty, trash-list,
+        trash-list-trashes, trash-put, trash-restore, trash-rm.
+
+    *   trash-u (from App::trash::u)
+
+        An alternative CLI, with undo support.
+
+    *   trash-cli
+
+        A set of CLI's written in Python: "trash-empty", "trash-list",
+        "trash-put", "trash-restore", "trash-rm".
+
+        <https://github.com/andreafrancia/trash-cli>
+
+  Related CPAN modules
     *   Trash::Park
 
         Different trash structure (a single CSV file per trash to hold a
@@ -235,13 +347,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2017, 2015, 2014, 2012 by perlancar
+    This software is copyright (c) 2023, 2017, 2015, 2014, 2012 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

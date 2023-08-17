@@ -1,4 +1,5 @@
 #!/bin/false
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Storage
 # ABSTRACT: Store object
 
@@ -6,8 +7,10 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Storage;
-$Net::Proxmox::VE::Storage::VERSION = '0.36';
+$Net::Proxmox::VE::Storage::VERSION = '0.37';
 use parent 'Exporter';
+
+use Carp qw( croak );
 
 
 our @EXPORT  = qw( storages );
@@ -28,8 +31,8 @@ sub get_storage {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No storageid for get_storage()';
-    die 'storageid must be a scalar for get_storage()' if ref $a;
+    my $a = shift or croak 'No storageid for get_storage()';
+    croak 'storageid must be a scalar for get_storage()' if ref $a;
 
     return $self->get( $base, $a );
 
@@ -41,16 +44,16 @@ sub create_storage {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_storage()' unless @p;
+    croak 'No arguments for create_storage()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_storage()'
+        croak 'Single argument not a hash for create_storage()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_storage()'
+        croak 'Odd number of arguments for create_storage()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -63,7 +66,7 @@ sub create_storage {
 sub delete_storage {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_storage()';
+    my $a    = shift or croak 'No argument given for delete_storage()';
 
     return $self->delete( $base, $a );
 
@@ -73,20 +76,20 @@ sub delete_storage {
 sub update_storage {
 
     my $self   = shift or return;
-    my $storageid = shift or die 'No storageid provided for update_storage()';
-    die 'storageid must be a scalar for update_storage()' if ref $storageid;
+    my $storageid = shift or croak 'No storageid provided for update_storage()';
+    croak 'storageid must be a scalar for update_storage()' if ref $storageid;
     my @p = @_;
 
-    die 'No arguments for update_storage()' unless @p;
+    croak 'No arguments for update_storage()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_storage()'
+        croak 'Single argument not a hash for update_storage()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_storage()'
+        croak 'Odd number of arguments for update_storage()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -98,6 +101,8 @@ sub update_storage {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -108,7 +113,7 @@ Net::Proxmox::VE::Storage - Store object
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -288,14 +293,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

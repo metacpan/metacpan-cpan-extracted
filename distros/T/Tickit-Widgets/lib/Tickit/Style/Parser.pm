@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.66;
 
-package Tickit::Style::Parser 0.54;
+package Tickit::Style::Parser 0.55;
 class Tickit::Style::Parser
    :isa(Parser::MGC)
    :strict(params);

@@ -8,69 +8,60 @@ use Types::Standard qw(Int);
 extends 'Example::Controller';
 
 # /todos/...
-sub collection :Via('*Private') At('todos/...') ($self, $c, $user) {
-  $c->action->next(my $collection = $user->todos);
+sub root :At('$path_end/...') Via('../protected') ($self, $c, $user) {
+  $c->action->next(my $todos = $user->todos);
 }
 
   # /todos/...
-  sub search :Via('collection') At('/...') QueryModel(TodosQuery) ($self, $c, $collection, $todo_query) {
-    my $sessioned_query = $c->model('TodosQuery::Session', $todo_query);
-    my $list = $collection->filter_by_request($sessioned_query);
-    $c->action->next($list);
+  sub search :At('/...') Via('root') QueryModel ($self, $c, $todos, $todo_query) {
+    $todos = $todos->filter_by_request($todo_query);
+    $c->action->next($todos);
   }
 
     # GET /todos
-    sub list :GET Via('search') At('') ($self, $c, $list) {
-      return $c->view('HTML::Todos',
-        list => $list,
-        todo => my $new_todo = $list->new_todo,
-      )->set_http_ok;
+    sub list :Get('') Via('search') ($self, $c, $todos) {
+      return $self->view(
+        list => $todos,
+        todo => $todos->new_todo,
+      );
     }
 
   # /todos/...
-  sub new_entity :Via('collection') At('/...') ($self, $c, $list) {
-    $c->view('HTML::Todos::CreateTodo', 
-      todo => my $new_todo = $list->new_todo,
+  sub prepare_build :At('/...') Via('search') ($self, $c, $todos) {
+    $self->view_for('list',
+      list => $todos,
+      todo => my $new_todo = $todos->new_todo
     );
     $c->action->next($new_todo);
   }
 
-    # GET /contacts/init
-    sub init :GET Via('new_entity') At('/init') ($self, $c, $new_contact) {
-      return $c->view->set_http_ok;
-    }
+    # GET /todos/new
+    sub build :Get('new') Via('prepare_build') ($self, $c, $new_todo) { return }
 
     # POST /todos/
-    sub create :POST Via('new_entity') At('') BodyModel(TodoRequest) ($self, $c, $new_todo, $r) {
-      return $new_todo->set_from_request($r) ?
-        $c->view->set_http_ok :
-          $c->view->set_http_bad_request;
+    sub create :Post('') Via('prepare_build') BodyModel ($self, $c, $new_todo, $bm) {
+      return $c->view->clear_todo && $c->view->set_list_to_last_page
+        if $new_todo->set_from_request($bm)->valid;
     }
 
   # /todos/{:Int}/...
-  sub entity :Via('collection') At('{:Int}/...') ($self, $c, $collection, $id) {
+  sub find :At('{:Int}/...') Via('root') ($self, $c, $collection, $id) {
     my $todo = $collection->find($id) // $c->detach_error(404, +{error=>"Todo id $id not found"});
     $c->action->next($todo);
   }
 
     # /todos/{:Int}/...
-    sub setup_update :Via('entity') At('/...') ($self, $c, $todo) {
-      $c->view('HTML::Todos::EditTodo', todo => $todo);
+    sub prepare_edit :At('/...') Via('find') ($self, $c, $todo) {
+      $self->view_for('edit', todo => $todo);
       $c->action->next($todo);
     }
 
       # GET /todos/{:Int}/edit
-      sub edit :GET Via('setup_update') At('edit') ($self, $c, $todo) {
-        return $c->view->set_http_ok;
-      }
+      sub edit :Get('edit') Via('prepare_edit') ($self, $c, $todo) { return }
     
       # PATCH /todos/{:Int}
-      sub update :PATCH Via('setup_update') At('') BodyModel(TodoRequest) ($self, $c, $todo, $r) {
-        return $todo->set_from_request($r) ?
-          $c->view->set_http_ok :
-            $c->view->set_http_bad_request;
+      sub update :Patch('') Via('prepare_edit') BodyModelFor('create') ($self, $c, $todo, $bm) {
+        return $todo->set_from_request($bm);
       }
-
-
 
 __PACKAGE__->meta->make_immutable;

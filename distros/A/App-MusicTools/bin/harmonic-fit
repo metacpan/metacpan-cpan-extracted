@@ -8,9 +8,8 @@
 #
 # Run perldoc(1) on this file for additional documentation.
 
-use strict;
+use 5.14.0;
 use warnings;
-
 use Getopt::Long        qw/GetOptions/;
 use JSON                ();
 use Music::LilyPondUtil ();

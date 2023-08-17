@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::URI.
 
+0.006 - 2023-08-13
+  - Use 'croak' instead of 'die' to make it easier to figure out where your typo is
+
 0.005 - 2023-01-13
   - Added V3 which removes named actions.  See docs for how to specify v2 if you
     need that feature.  Hopefully name actions will land in Catalyst core soon.

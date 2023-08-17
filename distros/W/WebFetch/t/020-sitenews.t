@@ -13,26 +13,26 @@ use File::Basename;
 use File::Compare;
 use Readonly;
 use Scalar::Util qw(reftype);
-use YAML::XS;
 use Try::Tiny;
 
 use Test::More;
 use Test::Exception;
-use WebFetch "0.15.1";
+use if $] < 5.010, "version";
+use WebFetch v0.15.1;
 use WebFetch::Input::SiteNews;
 use WebFetch::Output::Capture;
 
 # configuration & constants
-Readonly::Scalar my $classname        => "WebFetch::Input::SiteNews";
-Readonly::Scalar my $service_name     => "sitenews";
-Readonly::Scalar my $debug_mode       => ( exists $ENV{WEBFETCH_TEST_DEBUG} and $ENV{WEBFETCH_TEST_DEBUG} ) ? 1 : 0;
-Readonly::Scalar my $input_dir        => "t/test-inputs/" . basename( $0, ".t" );
-Readonly::Scalar my $yaml_file        => "test.yaml";
-Readonly::Scalar my $basic_tests      => 9;
-Readonly::Scalar my $file_init_tests  => 3;
-Readonly::Scalar my $tmpdir_template  => "WebFetch-XXXXXXXXXX";
+Readonly::Scalar my $classname       => "WebFetch::Input::SiteNews";
+Readonly::Scalar my $service_name    => "sitenews";
+Readonly::Scalar my $debug_mode      => ( exists $ENV{WEBFETCH_TEST_DEBUG} and $ENV{WEBFETCH_TEST_DEBUG} ) ? 1 : 0;
+Readonly::Scalar my $input_dir       => "t/test-inputs/" . basename( $0, ".t" );
+Readonly::Scalar my $yaml_file       => "test.yaml";
+Readonly::Scalar my $basic_tests     => 9;
+Readonly::Scalar my $file_init_tests => 3;
+Readonly::Scalar my $tmpdir_template => "WebFetch-XXXXXXXXXX";
 Readonly::Array my @dt_param_optional => qw(testing_faketime);
-Readonly::Hash my %dt_param_defaults  => (
+Readonly::Hash my %dt_param_defaults => (
     locale    => "en-US",
     time_zone => "UTC",
 );
@@ -211,6 +211,18 @@ sub capture_feed
 WebFetch::debug_mode($debug_mode);
 my $temp_dir = File::Temp->newdir( TEMPLATE => $tmpdir_template, CLEANUP => ( $debug_mode ? 0 : 1 ), TMPDIR => 1 );
 
+# check if YAML module is available
+## no critic (Subroutines::ProtectPrivateSubs)
+my $yaml_class = WebFetch::_load_yaml();
+## critic (Subroutines::ProtectPrivateSubs)
+
+# skip test if no YAML classes loaded
+if ( not $yaml_class ) {
+    plan skip_all => "no suitable YAML class found on system";
+    exit 0;
+}
+$yaml_class->import(qw(LoadFile));
+
 # locate YAML file with test data
 if ( !-d $input_dir ) {
     BAIL_OUT("can't find test inputs directory: expected $input_dir");
@@ -221,7 +233,7 @@ if ( not -e $yaml_path ) {
 }
 
 # load test data from YAML
-my @yaml_docs   = YAML::XS::LoadFile($yaml_path);
+my @yaml_docs   = LoadFile($yaml_path);
 my $test_data   = $yaml_docs[0];
 my $total_tests = $basic_tests + count_tests($test_data);
 plan tests => $total_tests;

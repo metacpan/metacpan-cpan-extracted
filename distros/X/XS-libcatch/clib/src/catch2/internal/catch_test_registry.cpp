@@ -1,14 +1,13 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
 #include <catch2/internal/catch_test_registry.hpp>
 #include <catch2/internal/catch_compiler_capabilities.hpp>
 #include <catch2/catch_test_case_info.hpp>
-#include <catch2/internal/catch_test_case_registry_impl.hpp>
 #include <catch2/interfaces/catch_interfaces_registry_hub.hpp>
 #include <catch2/internal/catch_string_manip.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
@@ -17,9 +16,10 @@
 #include <iterator>
 
 namespace Catch {
+    ITestInvoker::~ITestInvoker() = default;
 
     namespace {
-        StringRef extractClassName( StringRef classOrMethodName ) {
+        static StringRef extractClassName( StringRef classOrMethodName ) {
             if ( !startsWith( classOrMethodName, '&' ) ) {
                 return classOrMethodName;
             }
@@ -42,8 +42,22 @@ namespace Catch {
             auto const startIdx = reverseEnd - secondLastColons;
             auto const classNameSize = secondLastColons - lastColons - 1;
 
-            return methodName.substr( startIdx, classNameSize );
+            return methodName.substr(
+                static_cast<std::size_t>( startIdx ),
+                static_cast<std::size_t>( classNameSize ) );
         }
+
+        class TestInvokerAsFunction final : public ITestInvoker {
+            using TestType = void ( * )();
+            TestType m_testAsFunction;
+
+        public:
+            TestInvokerAsFunction( TestType testAsFunction ) noexcept:
+                m_testAsFunction( testAsFunction ) {}
+
+            void invoke() const override { m_testAsFunction(); }
+        };
+
     } // namespace
 
     Detail::unique_ptr<ITestInvoker> makeTestInvoker( void(*testAsFunction)() ) {

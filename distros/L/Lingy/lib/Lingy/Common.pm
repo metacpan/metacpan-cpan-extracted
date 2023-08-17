@@ -3,67 +3,116 @@ package Lingy::Common;
 
 use Exporter 'import';
 
-use constant SCALARTYPE => 'Lingy::Lang::ScalarClass';
-use constant LISTTYPE   => 'Lingy::Lang::ListClass';
+use Scalar::Util qw'refaddr reftype';
 
-use constant NUMBERS    => 'Lingy::Lang::Numbers';
-use constant RT         => 'Lingy::Lang::RT';
-use constant TERM       => 'Lingy::Lang::Term';
-use constant THREAD     => 'Lingy::Lang::Thread';
+# RT is the RunTime class accessor function.
+# 'Lingy::RT' or a subclass like 'YAMLScript::RT'.
+BEGIN {
+    *RT = sub { 'Lingy::RT' } unless defined &RT;
+}
 
-use constant ATOM       => 'Lingy::Lang::Atom';
-use constant BOOLEAN    => 'Lingy::Lang::Boolean';
-use constant CHARACTER  => 'Lingy::Lang::Character';
-use constant CLASS      => 'Lingy::Lang::Class';
-use constant FUNCTION   => 'Lingy::Lang::Function';
-use constant HASHMAP    => 'Lingy::Lang::HashMap';
-use constant KEYWORD    => 'Lingy::Lang::Keyword';
-use constant LIST       => 'Lingy::Lang::List';
-use constant MACRO      => 'Lingy::Lang::Macro';
-use constant NIL        => 'Lingy::Lang::Nil';
-use constant NUMBER     => 'Lingy::Lang::Number';
-use constant REGEX      => 'Lingy::Lang::Regex';
-use constant STRING     => 'Lingy::Lang::String';
-use constant SYMBOL     => 'Lingy::Lang::Symbol';
-use constant VECTOR     => 'Lingy::Lang::Vector';
-use constant VAR        => 'Lingy::Lang::Var';
+# Base type classes:
+use constant LISTTYPE   => 'Lingy::ListClass';
+use constant SCALARTYPE => 'Lingy::ScalarClass';
+use constant SEQUENTIAL => 'Lingy::Sequential';
+
+# Type classes:
+use constant ATOM       => 'Lingy::Atom';
+use constant BOOLEAN    => 'Lingy::Boolean';
+use constant CHARACTER  => 'Lingy::Character';
+use constant CLASS      => 'Lingy::Class';
+use constant CLOJURE    => 'Lingy::Clojure';
+use constant COMPILER   => 'Lingy::Compiler';
+use constant FUNCTION   => 'Lingy::Fn';
+use constant HASHMAP    => 'Lingy::HashMap';
+use constant HASHSET    => 'Lingy::HashSet';
+use constant KEYWORD    => 'Lingy::Keyword';
+use constant LIST       => 'Lingy::List';
+use constant MACRO      => 'Lingy::Macro';
+use constant NIL        => 'Lingy::Nil';
+use constant NUMBER     => 'Lingy::Number';
+use constant REGEX      => 'Lingy::Regex';
+use constant STRBUILD   => 'Lingy::StringBuilder';
+use constant STRING     => 'Lingy::String';
+use constant SYMBOL     => 'Lingy::Symbol';
+use constant SYSTEM     => 'Lingy::System';
+use constant UTIL       => 'Lingy::Util';
+use constant VECTOR     => 'Lingy::Vector';
+use constant VAR        => 'Lingy::Var';
+
+# Exception classes:
+use constant EXCEPTION => 'Lingy::Exception';
+use constant ILLEGALARGUMENTEXCEPTION =>
+    'Lingy::IllegalArgumentException';
+
+# Functionality classes:
+use constant NAMESPACE  => 'Lingy::Namespace';
+use constant NUMBERS    => 'Lingy::Numbers';
+use constant TERM       => 'Lingy::Term';
+use constant THREAD     => 'Lingy::Thread';
 
 BEGIN {
     our @EXPORT = qw<
-        READY
+        OK
+
         $symbol_re
+        $namespace_re
 
-        SCALARTYPE
-        LISTTYPE
+        refaddr
+        reftype
 
-        NUMBERS
         RT
+
+        LISTTYPE
+        SCALARTYPE
+        SEQUENTIAL
+
+        COMPILER
+        NAMESPACE
+        NUMBERS
         TERM
         THREAD
+        UTIL
 
-        atom        ATOM
-        boolean     BOOLEAN
-        char        CHARACTER
-        class       CLASS
-        function    FUNCTION
-        hash_map    HASHMAP
-        keyword     KEYWORD
-        list        LIST
-        macro       MACRO
-        nil         NIL
-        number      NUMBER
-        regex       REGEX
-        string      STRING
-        symbol      SYMBOL
-        var         VAR
-        vector      VECTOR
+        ATOM
+        BOOLEAN
+        CHARACTER
+        CLASS
+        CLOJURE
+        FUNCTION
+        HASHMAP
+        HASHSET
+        KEYWORD
+        LIST
+        MACRO
+        NIL
+        NUMBER
+        REGEX
+        STRBUILD
+        STRING
+        SYMBOL
+        SYSTEM
+        VAR
+        VECTOR
 
+        EXCEPTION
+        ILLEGALARGUMENTEXCEPTION
+
+        list
+        string
+        symbol
+
+        has
         err
+        box_val
+        unbox_val
         assert_args
         comp_pair
+        nil
         false
         true
 
+        Dump
         PPP
         WWW
         XXX
@@ -72,10 +121,24 @@ BEGIN {
     >;
 }
 
-use Lingy::Printer;
+{
+    my ($n, $t, $f);
+    ($n, $t, $f) = (1, 1, 0);
+    my $nil = bless \$n, 'Lingy::Nil';
+    my $true = bless \$t, BOOLEAN;
+    my $false = bless \$f, BOOLEAN;
+    sub nil { $nil }
+    sub true { $true }
+    sub false { $false }
+}
 
-our $symbol_re = qr{^(
-    \*?[-\w]+[\?\!\*\#]? |
+our $namespace_re = qr{(?:
+    \w+
+    (?:\.\w+)*
+)}x;
+
+our $symbol_re = qr{(
+    \*?[-\w]+[\?\!\*\#\=]? |
     [-+*/<>] |
     ==? |
     <= |
@@ -83,32 +146,74 @@ our $symbol_re = qr{^(
     ->>?
 )}x;
 
-sub READY { $Lingy::RT::ready // 0 }
+sub OK { $Lingy::RT::OK }
 
-
-sub atom     { ATOM->new(@_) }
-sub boolean  { BOOLEAN->new(@_) }
-sub char     { CHARACTER->read(@_) }
-sub class    { CLASS->_new(@_) }
-sub function { FUNCTION->new(@_) }
-sub keyword  { KEYWORD->new(@_) }
-sub hash_map { HASHMAP->new(@_) }
 sub list     { LIST->new(@_) }
-sub macro    { MACRO->new(@_) }
-sub number   { NUMBER->new(@_) }
-sub regex    { REGEX->new(@_) }
 sub string   { STRING->new(@_) }
 sub symbol   { SYMBOL->new(@_) }
-sub var      { VAR->new(@_) }
-sub vector   { VECTOR->new(@_) }
 
+sub has {
+    my ($caller) = caller;
+    my $name = shift;
+    my $method =
+        sub {
+            $#_
+                ? $_[0]{$name} = $_[1]
+                : $_[0]{$name};
+        };
+    no strict 'refs';
+    *{"${caller}::$name"} = $method;
+};
+
+our $error_prefix = '';
 sub err {
     my $msg = shift;
     $msg = sprintf $msg, @_;
-    die "Error:" .
-        ($msg =~ /\n./ ? "\n" : ' ') .
-        $msg .
-        "\n";
+
+    # XXX This is needed to keep the mal tests passing for now.
+    $error_prefix = 'Error:' if $ENV{LINGY_TEST};
+
+    if ($error_prefix) {
+        $msg = $error_prefix .
+            ($msg =~ /\n./ ? "\n" : ' ') .
+            $msg;
+    }
+
+    die "$msg\n";
+}
+
+sub box_val {
+    map {
+        my $o = $_;
+        my $type = ref($o);
+        if (not($type)) {
+            /^\-?\d+$/ ? NUMBER->new($o) : STRING->new($o);
+        }
+        elsif ($type eq 'HASH') {
+            HASHMAP->new([
+                map box_val($_), %$o
+            ]);
+        }
+        elsif ($type eq 'ARRAY') {
+            VECTOR->new([
+                map box_val($_), %$o
+            ]);
+        }
+        elsif ($type =~ /^(?:SCALAR|REF|Regexp)$/) {
+            XXX($o, "Lingy can't box this object yet");
+        } else {
+            $o;
+        }
+    } @_;
+}
+
+sub unbox_val {
+    my ($obj) = @_;
+    ref($obj) =~ /^
+        Lingy::(
+            String|Number|Boolean|Nil|HashMap|Vector|Fn
+        )
+    $/x ? $obj->unbox : $obj;
 }
 
 sub assert_args {
@@ -136,7 +241,7 @@ sub comp_pair {
         my $i = 0;
         for my $e (@$x) {
             return 1 if $i > @$y;
-            my $r = comp_pair $x->[$i], $y->[$i];
+            my $r = comp_pair($x->[$i], $y->[$i]);
             return $r if $r;
             $i++;
         }
@@ -145,9 +250,12 @@ sub comp_pair {
     "$x" cmp "$y";
 }
 
+sub Dump {
+    _dump(@_);
+}
 sub PPP {
     require Lingy::Printer;
-    die _dump(Lingy::Printer::pr_str(@_));
+    die _dump(RT->printer->pr_str(@_));
 }
 sub WWW {
     warn _dump(@_);

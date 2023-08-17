@@ -1,0 +1,257 @@
+#!/usr/bin/env perl
+#ABSTRACT: Start an interactive session on the cluster
+#PODNAME: session
+use v5.16;
+use Getopt::Long;
+use File::Basename;
+use Term::ANSIColor qw(:constants);
+use FindBin qw($RealBin);
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+} 
+use NBI::Slurm;
+my $BIN = basename($0);
+my $USER = $ENV{USER};
+my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
+my $DEFAULT_SESSION = $config->{'session'} // "";
+my $SPECIAL_SESSION = $config->{'special_session'} // "";
+my $NAME = "session";
+my $MEM_MB = 1000;
+my $CORES = 1;
+my $DAYS = 0;
+my $HOURS = 4;
+my $OPT_INTEL;
+my $OPT_PARTITION;
+my $OPT_SPECIAL;
+my $OPT_VERBOSE;
+GetOptions(
+    'c|t|threads=i' => \$CORES,
+    'm|mem=s' => \$MEM_MB,
+    'd|days=i' => \$DAYS,
+    'h|hours=i' => \$HOURS,
+    'n|name=s' => \$NAME,
+    'q|queue=s' => \$OPT_PARTITION,
+    's|special' => \$OPT_SPECIAL,
+    'i|intel' => \$OPT_INTEL,
+    'verbose' => \$OPT_VERBOSE,
+    'version' => sub { say "session v", $NBI::Slurm::VERSION; exit(0); },
+    'help' => sub { usage(); exit(0); },
+) or usage(1);
+
+# Get memory
+$MEM_MB = parse_memory($MEM_MB);
+
+if ($MEM_MB < 350) {
+    say STDERR RED, "[WARNING]", RESET, "Memory set to $MEM_MB Mb, automatically setting to $MEM_MB Gb", RESET;
+    $MEM_MB *= 1000;
+}
+# Get hours / days
+my $ADD_DAYS = 0;
+($ADD_DAYS, $HOURS) = hours_to_days_hours($HOURS);
+$DAYS += $ADD_DAYS;
+
+# Get queue
+if (not $OPT_PARTITION) {
+    if ($config->{'queue'}) {
+        $OPT_PARTITION = $config->{'queue'};
+    } else {
+        $OPT_PARTITION = partition_tag($HOURS);
+    }
+}
+
+my $PARAMS = $DEFAULT_SESSION;
+$PARAMS   .= $OPT_INTEL    ?  " --constraint=intel " : "";
+$PARAMS   .= $OPT_SPECIAL  ?  " $SPECIAL_SESSION "   : "";
+
+my $PARTITION //= $OPT_PARTITION;
+
+say STDERR "-" x 40;
+print STDERR YELLOW, 
+        "job name    ", RESET, $NAME, "\n",
+YELLOW, "memory      ", RESET, $MEM_MB, " Mb\n",
+YELLOW, "cores       ", RESET, $CORES, "\n",
+YELLOW, "time        ", RESET, "$DAYS days $HOURS hours", "\n",
+YELLOW, "partition   ", RESET, $PARTITION, "\n";
+
+say STDERR "-" x 40;
+my $cmd = qq(srun --job-name=$NAME --mem=$MEM_MB -c $CORES --time=$DAYS-$HOURS -n 1 --disable-status -s --pty --partition=$PARTITION $PARAMS -u bash -li);
+
+say STDERR $cmd if ($OPT_VERBOSE);
+
+if (has_srun() == 0) {
+    say STDERR RED, "[ERROR] srun not found... Are you on the cluster?", RESET;
+}
+exec($cmd);
+
+sub partition_tag {
+    my $hours = shift;
+    if ($hours <= 2) {
+        return "qib-short,nbi-short";
+    } elsif ($hours <= 8) {
+        return "qib-medium,nbi-medium";
+    } else {
+        return "qib-long,nbi-long";
+    }
+}
+sub hours_to_days_hours {
+    my $hours = shift;
+    my $days = int($hours / 24);
+    my $hours = $hours % 24;
+    return ($days, $hours);
+}
+
+
+sub parse_memory {
+    # Parse string return mb
+    my $mem = shift;
+    my $mb = 0;
+    if ($mem =~ /^(\d+)$/) {
+        $mb = $1;
+    } elsif ($mem =~ /(\d+)\s?Gb?/i) {
+        $mb = $1 * 1000;
+    } elsif ($mem =~ /(\d+)\s?Mb?/i) {
+        $mb = $1;
+    } elsif ($mem =~ /(\d+)\s?Kb?/i) {
+        $mb = int($1 / 1000);
+    } else {
+        $mb = $mem;
+    }
+    return $mb;
+}
+sub usage {
+    print <<"EOF";
+Usage: $BIN [options]
+
+Options:
+  -c, --threads   Number of CPU cores (default: 1)
+  -m, --mem       Memory size in MB (default: 1000)
+  -h, --hours     Number of hours (default: 4)
+  -n, --name      Job name (default: session)
+  -q, --queue     Queue/partition name (default: determined by hours)
+  -s, --special   Enable the special parameter string from the config file (default: off)
+  -i, --intel     Use Intel constraint (default: off)
+
+EOF
+  exit() if ($_[0]);
+}
+
+sub has_srun {
+    # Check if srun is available
+    my $srun = `srun --version 2> /dev/null`;
+    chomp $srun;
+    if ($srun eq "") {
+        return 0;
+    }
+    return 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+session - Start an interactive session on the cluster
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 SYNOPSIS
+
+  session [options]
+  
+  Options:
+    -c  --threads   Number of CPU cores (default: 1)
+    -m  --mem       Memory size in MB (default: 1000)
+    -h  --hours     Number of hours (default: 4)
+    -d  --days      Number of days (added to hours)
+    -n  --name      Job name (default: session)
+    -q  --queue     Queue/partition name (default: determined by hours)
+    -s  --special   Enable the special parameter string from the config file (default: off)
+    -i  --intel     Use Intel constraint (default: off)
+
+=head1 DESCRIPTION
+
+The C<session> script allows you to start an interactive session on the cluster with customizable options.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c, --threads> INT
+
+Number of CPU cores. By default, it is set to 1.
+
+=item B<-m, --mem> STRING|INT
+
+Memory size. If an integer is given, it's used as memory in MB. Specify "dddGB" to set memory in GB. 
+By default it is set to 1000, which is 1GB. If a number <=200 is provided, it will be used as GB.
+
+=item B<-h, --hours> INT
+
+Number of hours. By default, it is set to 4.
+
+=item B<-d, --days> INT
+
+Number of days. Default is 0, and can be omitted (hours will update the days)
+
+=item B<-n, --name> STRING
+
+Job name. By default, it is set to "session".
+
+=item B<-q, --queue> STRING
+
+Queue/partition name.
+
+=item B<-s, --special>
+
+Enable the special parameter string from the config file (default: off). See the CONFIGURATION section below.
+
+=item B<-i, --intel>
+
+Use Intel constraint. By default, it is turned off.
+
+=back
+
+=head1 EXAMPLES
+
+Start an interactive session with 2 CPU cores, 2000 MB of memory, and 8 hours:
+
+  session -c 2 -m 2GB -h 8
+
+Start an interactive session with the default settings:
+
+  session
+
+=head1 CONFIGURATION
+
+In your C<~/.nbislurm.config> file, you can set two C<session>-specific options:
+
+  default_session=STRING
+  special_session=STRING
+
+The command to start the session will always include the C<default_session> option. 
+
+If you want to start a session with the C<special_session> option, you can use the C<--special> option:
+
+  session --special
+
+Consider that the C<--intel> switch is a special case of adding the C<--constraint=intel> option to the command.
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

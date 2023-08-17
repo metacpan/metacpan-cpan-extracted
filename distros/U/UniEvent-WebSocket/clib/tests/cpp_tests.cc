@@ -16,15 +16,6 @@ using panda::unievent::LoopSP;
 using panda::unievent::StreamSP;
 using panda::string;
 
-static bool _init () {
-    panda::log::set_level(panda::log::Level::Warning);
-    panda::log::set_logger([](auto& msg, auto&) {
-        printf("%s\n", msg.c_str());
-    });
-    return true;
-}
-static bool __init = _init();
-
 struct Pair {
     ServerSP server;
     ClientSP client;

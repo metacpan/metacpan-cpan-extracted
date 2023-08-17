@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <catch2/internal/catch_unique_ptr.hpp>
 
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -25,16 +26,24 @@
 
 namespace Catch {
 
+    /**
+     * A **view** of a tag string that provides case insensitive comparisons
+     *
+     * Note that in Catch2 internals, the square brackets around tags are
+     * not a part of tag's representation, so e.g. "[cool-tag]" is represented
+     * as "cool-tag" internally.
+     */
     struct Tag {
-        Tag(StringRef original_, StringRef lowerCased_):
-            original(original_), lowerCased(lowerCased_)
+        constexpr Tag(StringRef original_):
+            original(original_)
         {}
-        StringRef original, lowerCased;
+        StringRef original;
 
-        friend bool operator<( Tag const& lhs, Tag const& rhs );
+        friend bool operator< ( Tag const& lhs, Tag const& rhs );
+        friend bool operator==( Tag const& lhs, Tag const& rhs );
     };
 
-    struct ITestInvoker;
+    class ITestInvoker;
 
     enum class TestCaseProperties : uint8_t {
         None = 0,
@@ -79,7 +88,7 @@ namespace Catch {
         std::string name;
         StringRef className;
     private:
-        std::string backingTags, backingLCaseTags;
+        std::string backingTags;
         // Internally we copy tags to the backing storage and then add
         // refs to this storage to the tags vector.
         void internalAppendTag(StringRef tagString);

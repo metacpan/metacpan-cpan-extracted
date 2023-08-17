@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::shapeNcut::sukill;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -79,12 +79,12 @@ Usage 3:
 
  JML V0.0.2, 1.30.23
 
- Normally, sukill can kill contiguous traces
- To kill while skipping traces requires
- iteration over the same file.
+ Normally, sukill can kill contiguous traces.
+ To kill while skipping traces requires an
+ iteration (i.e., logical for loop) over the same file.
  
  In V0.0.2 I wrap an extension to process an arbitrary
- list of trace numbers . I automate the iteration by including
+ list of trace numbers. I automate the iteration by including
  two additional parameters: list and su_base_file_name
  
  The parameter "list" is the name of a text file.
@@ -102,16 +102,16 @@ Usage 3:
 
   "list" = a file name (in directory path: DATA_SEISMICS_TXT)
   
-  su_base_file_name =   e.g., 1001 (in directory path: DATA_SEISMIC_SU)
+  su_base_file_name =   e.g., 1001, which by defaults lies
+  in directory path: DATA_SEISMIC_SU
   
   Notes:
   If list is used then su_base_file_name and key MUST be used
   If list is used ONLY su_base_file_name and key CAN be used
 
-  Within code herein, the imported "list" includes path and name,
-  hence its name: _inbound_list.
-  
-  But user only enters a list name in GUI using the mouse <MB3>.
+  Within code, the imported "list" includes path and name;
+  hence its name: _inbound_list. User enters a list name in 
+  GUI using the mouse <MB3>.
 
 =cut
 
@@ -179,15 +179,11 @@ sub Step {
 	my ($self) = @_;
 
 	if (    length $sukill->{_inbound_list}
-		and length $sukill->{_key}
 		and length $sukill->{_inbound}
-		and not length $sukill->{_min}
-		and not length $sukill->{_count}
-		and not length $sukill->{_a} )
+)
 	{
 
 		my $trace_num;
-		my $temp_outbound = '.temp';
 		my @Step;
 
 		my ( $array_ref, $num_gathers ) = _get_trace_numbers();
@@ -196,26 +192,23 @@ sub Step {
 		# print("sukill, num_gathers=$num_gathers\n");
 		# print("sukill, values=@$array_ref\n");
 
-	    # All cases when num_traces >=0
+		# All cases when num_traces >=0
+		# for first file
 		$trace_num = @$array_ref[0];
 		my $step =
 		  "sukill key=$sukill->{_key} count=1 min=$trace_num < $inbound ";
-		my $temp_inbound = $temp_outbound;
 
-		my $penultimate_idx = $num_gathers - 2;
 		my $last_idx        = $num_gathers - 1;
 
-		
 		if ( $last_idx >= 2 ) {
-			
+
 			# number of kills >=3
 			for ( my $i = 1 ; $i < $last_idx ; $i++ ) {
 
 				$trace_num = @$array_ref[$i];
 				$step =
 					$step
-				  . $to 
-				  . "\n"
+				  . $to . "\n"
 				  . "sukill key=$sukill->{_key} "
 				  . "count=1 min=$trace_num ";
 
@@ -228,29 +221,29 @@ sub Step {
 			  . $to
 			  . "sukill key=$sukill->{_key} "
 			  . "count=1 min=$trace_num";
-			  
-			 $sukill->{_Step} = $step;
+
+			$sukill->{_Step} = $step;
 
 		}
 		elsif ( $last_idx == 1 ) {
-			
+
 			# number of kills = 2
 			# For 2nd-to-last trace
-			# print("sukill, last_idx = 1\n");	
-			
+			# print("sukill, last_idx = 1\n");
+
 			$step =
 				$step
 			  . $to
 			  . "sukill key=$sukill->{_key} "
 			  . "count=1 min=@$array_ref[$last_idx] ";
-	  
+
 			$sukill->{_Step} = $step;
 
 		}
 		elsif ( $last_idx == 0 ) {
 
 			$sukill->{_Step} = $step;
-			
+
 		}
 		elsif ( not length $sukill->{_inbound_list} ) {
 
@@ -269,6 +262,8 @@ sub Step {
 			return ();
 		}
 
+	} else{
+		print("sukill, Step, incorrect parameters\n");
 	}
 }
 
@@ -302,6 +297,31 @@ sub clear {
 	$sukill->{_note}                     = '';
 }
 
+=head2 _check4inbound_listNkey
+
+=cut
+
+sub _check4inbound_listNkey {
+	my ($self) = @_;
+
+	if (   $sukill->{_data_type} eq $txt
+		&& length $sukill->{_inbound_list}
+		&& length $sukill->{_key} )
+	{
+		#NADA, $sukill->{_inbound_list} = $sukill->{_inbound_list};
+	}
+	else {
+		print(
+"sukill, _check4inbound_listNkey, improper type, missing list or key\n"
+		);
+	}
+	return ();
+}
+
+=head2 sub _get_inbound
+
+=cut
+
 sub _get_inbound {
 	my ($self) = @_;
 
@@ -314,7 +334,7 @@ sub _get_inbound {
 
 	}
 	else {
-		print("_get_inbound_list, missing su_base_file_name\n");
+		print("sukill,_get_inbound, missing su_base_file_name\n");
 		return ();
 	}
 
@@ -341,6 +361,10 @@ sub _get_inbound_list {
 
 }
 
+=head2 sub _get_trace_numbers
+
+=cut
+
 sub _get_trace_numbers {
 	my ($self) = @_;
 
@@ -365,30 +389,6 @@ sub _get_trace_numbers {
 
 }
 
-=head2 _check4inbound_listNkey
-
-=cut
-
-sub _check4inbound_listNkey {
-	my ($self) = @_;
-
-	if ( $sukill->{_data_type} =
-		   $txt
-		&& length $sukill->{_inbound_list}
-		&& length $sukill->{_key} )
-	{
-
-		#NADA, $sukill->{_inbound_list} = $sukill->{_inbound_list};
-
-	}
-	else {
-		print(
-"sukill, _check4inbound_listNkey, improper type, missing list or key\n"
-		);
-	}
-	return ();
-}
-
 sub _set_inbound {
 	my ($self) = @_;
 
@@ -409,6 +409,10 @@ sub _set_inbound {
 	}
 
 }
+
+=head2 sub _set_inbound_list
+
+=cut
 
 sub _set_inbound_list {
 	my ($self) = @_;

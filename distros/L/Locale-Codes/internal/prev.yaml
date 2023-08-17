@@ -2999,8 +2999,8 @@ country:
         - Zimbabwe
   genc-alpha-2: 
     code: 
-      A1: Unknown
       A2: Guantanamo Bay Naval Base
+      A3: Entity 6
       AD: Andorra
       AE: United Arab Emirates
       AF: Afghanistan
@@ -3230,7 +3230,7 @@ country:
       TM: Turkmenistan
       TN: Tunisia
       TO: Tonga
-      TR: TURKEY
+      TR: Turkey
       TT: Trinidad and Tobago
       TV: Tuvalu
       TW: Taiwan (Province of China)
@@ -3496,6 +3496,9 @@ country:
       el salvador: 
         - SV
         - El Salvador
+      entity 6: 
+        - A3
+        - Entity 6
       equatorial guinea: 
         - GQ
         - Equatorial Guinea
@@ -4026,7 +4029,7 @@ country:
         - Tunisia
       turkey: 
         - TR
-        - TURKEY
+        - Turkey
       turkmenistan: 
         - TM
         - Turkmenistan
@@ -4051,9 +4054,6 @@ country:
       united states of america: 
         - US
         - United States of America
-      unknown: 
-        - A1
-        - Unknown
       uruguay: 
         - UY
         - Uruguay
@@ -4113,8 +4113,8 @@ country:
       ATG: Antigua and Barbuda
       AUS: Australia
       AUT: Austria
-      AX1: Unknown
       AX2: Guantanamo Bay Naval Base
+      AX3: Entity 6
       AZE: Azerbaijan
       BDI: Burundi
       BEL: Belgium
@@ -4325,7 +4325,7 @@ country:
       TON: Tonga
       TTO: Trinidad and Tobago
       TUN: Tunisia
-      TUR: TURKEY
+      TUR: Turkey
       TUV: Tuvalu
       TWN: Taiwan (Province of China)
       TZA: Tanzania
@@ -4595,6 +4595,9 @@ country:
       el salvador: 
         - SLV
         - El Salvador
+      entity 6: 
+        - AX3
+        - Entity 6
       equatorial guinea: 
         - GNQ
         - Equatorial Guinea
@@ -5125,7 +5128,7 @@ country:
         - Tunisia
       turkey: 
         - TUR
-        - TURKEY
+        - Turkey
       turkmenistan: 
         - TKM
         - Turkmenistan
@@ -5150,9 +5153,6 @@ country:
       united states of america: 
         - USA
         - United States of America
-      unknown: 
-        - AX1
-        - Unknown
       uruguay: 
         - URY
         - Uruguay
@@ -5419,7 +5419,7 @@ country:
       780: Trinidad and Tobago
       784: United Arab Emirates
       788: Tunisia
-      792: TURKEY
+      792: Turkey
       795: Turkmenistan
       796: Turks and Caicos Islands
       798: Tuvalu
@@ -5451,6 +5451,7 @@ country:
       906: Coral Sea Islands
       907: Dhekelia
       908: Diego Garcia
+      914: Entity 6
       915: Europa Island
       916: Gaza Strip
       917: Glorioso Islands
@@ -5468,7 +5469,6 @@ country:
       929: Spratly Islands
       930: Svalbard
       931: Tromelin Island
-      932: Unknown
       933: Wake Island
       934: West Bank
     name: 
@@ -5694,6 +5694,9 @@ country:
       el salvador: 
         - 222
         - El Salvador
+      entity 6: 
+        - 914
+        - Entity 6
       equatorial guinea: 
         - 226
         - Equatorial Guinea
@@ -6224,7 +6227,7 @@ country:
         - Tunisia
       turkey: 
         - 792
-        - TURKEY
+        - Turkey
       turkmenistan: 
         - 795
         - Turkmenistan
@@ -6249,9 +6252,6 @@ country:
       united states of america: 
         - 840
         - United States of America
-      unknown: 
-        - 932
-        - Unknown
       uruguay: 
         - 858
         - Uruguay
@@ -9351,7 +9351,6 @@ currency:
       GYD: Guyana Dollar
       HKD: Hong Kong Dollar
       HNL: Lempira
-      HRK: Kuna
       HTG: Gourde
       HUF: Forint
       IDR: Rupiah
@@ -9689,9 +9688,6 @@ currency:
       kina: 
         - PGK
         - Kina
-      kuna: 
-        - HRK
-        - Kuna
       kuwaiti dinar: 
         - KWD
         - Kuwaiti Dinar
@@ -10031,7 +10027,6 @@ currency:
       170: Colombian Peso
       174: Comorian Franc
       188: Costa Rican Colon
-      191: Kuna
       192: Cuban Peso
       203: Czech Koruna
       208: Danish Krone
@@ -10402,9 +10397,6 @@ currency:
       kina: 
         - 598
         - Kina
-      kuna: 
-        - 191
-        - Kuna
       kuwaiti dinar: 
         - 414
         - Kuwaiti Dinar

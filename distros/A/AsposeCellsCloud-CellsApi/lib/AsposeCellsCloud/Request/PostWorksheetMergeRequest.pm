@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetMergeRequest.name :   ,
-# PostWorksheetMergeRequest.sheetName :   ,
-# PostWorksheetMergeRequest.startRow :   ,
-# PostWorksheetMergeRequest.startColumn :   ,
-# PostWorksheetMergeRequest.totalRows :   ,
-# PostWorksheetMergeRequest.totalColumns :   ,
-# PostWorksheetMergeRequest.folder :   ,
-# PostWorksheetMergeRequest.storageName :    
+# PostWorksheetMergeRequest.name : The workbook name.  ,
+# PostWorksheetMergeRequest.sheetName : The worksheet name.  ,
+# PostWorksheetMergeRequest.startRow : The start row.  ,
+# PostWorksheetMergeRequest.startColumn : The start column.  ,
+# PostWorksheetMergeRequest.totalRows : The total rows  ,
+# PostWorksheetMergeRequest.totalColumns : The total columns.  ,
+# PostWorksheetMergeRequest.folder : Original workbook folder.  ,
+# PostWorksheetMergeRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_merge' } = { 
-    	summary => '',
+    	summary => 'Merge cells in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => '',
+     	description => 'The start row.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The start column.',
      	format => '',
      	read_only => '',
      		},
      'total_rows' => {
      	datatype => 'int',
      	base_name => 'totalRows',
-     	description => '',
+     	description => 'The total rows',
      	format => '',
      	read_only => '',
      		},
      'total_columns' => {
      	datatype => 'int',
      	base_name => 'totalColumns',
-     	description => '',
+     	description => 'The total columns.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

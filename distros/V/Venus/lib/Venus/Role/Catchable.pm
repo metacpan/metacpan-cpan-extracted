@@ -29,10 +29,18 @@ sub catch {
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
 }
 
+sub maybe {
+  my ($self, $method, @args) = @_;
+
+  my @result = $self->try($method, @args)->error(\my $error)->result;
+
+  return wantarray ? ($error ? (undef) : (@result)) : ($error ? undef : $result[0]);
+}
+
 # EXPORTS
 
 sub EXPORT {
-  ['catch']
+  ['catch', 'maybe']
 }
 
 1;
@@ -156,6 +164,62 @@ I<Since C<0.01>>
   my ($catch, $result) = $example->catch('fail');
 
   # (bless({...}, "Venus::Error"), undef)
+
+=back
+
+=cut
+
+=head2 maybe
+
+  maybe(Str $method, Any @args) (Any)
+
+The maybe method traps any errors raised by executing the dispatched method
+call and returns undefined on error, effectively supressing the error. This
+method can return a list of values in list-context. This method supports
+dispatching, i.e.  providing a method name and arguments whose return value
+will be acted on by this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item maybe example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $maybe = $example->maybe('fail');
+
+  # undef
+
+=back
+
+=over 4
+
+=item maybe example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $maybe = $example->maybe('pass');
+
+  # true
+
+=back
+
+=over 4
+
+=item maybe example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my (@maybe) = $example->maybe(sub {1..4});
+
+  # (1..4)
 
 =back
 

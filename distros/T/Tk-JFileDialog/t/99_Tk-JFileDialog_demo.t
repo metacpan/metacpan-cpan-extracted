@@ -22,7 +22,13 @@ BEGIN { use_ok('Tk::JFileDialog') };   #NEEDED THIS TO MAKE TEST HARNESS PASS?!?
 if (!$ENV{PERL_MM_USE_DEFAULT} && !$ENV{AUTOMATED_TESTING}) {
 
 diag( "Testing Tk::JFileDialog, Testing v$Tk::JFileDialog::VERSION, Perl $], $^X" );
-diag( "will popup Tk window now...");
+eval 'use Tk::JDialog';
+if ($@) {
+	diag ("..Recommend module Tk::JDialog not installed, will use Tk::Dialog for dialogs." );
+} else {
+	diag( "..BONUS module Tk::JDialog found & will be used for dialogs!" );
+}
+diag( "..will popup Tk window now...");
 
 $SIG{__WARN__} = sub { };
 

@@ -1,6 +1,6 @@
 package Terse::Plugin::UA;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use base 'Terse::Plugin';
 use LWP::UserAgent; use URI; use Scalar::Util qw/reftype/;
 
@@ -52,14 +52,20 @@ sub _request {
 		$self->req_params = $request_parameters;
 		$request_parameters = $self->req_params->serialize();
 	}
-	my @args = ( $method =~ m/get/ ? ($url->query_form(%{$self->req_params}) && (
-		$url,
-		%args,
-	)) : (
-		$url,
-		%args,
-		Content => $request_parameters
-	));
+	my @args;
+	if ($method =~ m/get/i) {
+		$url->query_form(%{$self->req_params});
+		@args = ( 
+			$url,
+			%args,
+		);
+	} else {
+		@args = (
+			$url,
+			%args,
+			Content => $request_parameters
+		);
+	}
 	my $res = $self->ua->$method(@args);
 	$res->{uri} = $url;
 	$self->_parse_response($res, $view);
@@ -103,7 +109,7 @@ Terse::Plugin::UA - Terse LWP::UserAgent plugin.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

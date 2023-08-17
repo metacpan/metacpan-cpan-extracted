@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Text::Treesitter::Language;
 
@@ -22,13 +22,17 @@ unless( -f TREE_SITTER_LANGUAGE_FOURFUNC ) {
 my $lang = Text::Treesitter::Language::load( TREE_SITTER_LANGUAGE_FOURFUNC, "fourfunc" );
 
 # These values are quite fragile to the grammar definition
-is( $lang->symbol_count, 10, '$lang->symbol_count' );
+is( $lang->symbol_count, 11, '$lang->symbol_count' );
 
 my %symbols_by_name = map { $_->name, $_ } $lang->symbols;
 
 ok( exists $symbols_by_name{"+"}, '$lang has a + symbol' );
 ok( $symbols_by_name{"+"}->type_is_anonymous, '$lang + symbol is anonymous' );
 
-is( $lang->field_count, 0, '$lang->field_count' );
+is( $lang->field_count, 1, '$lang->field_count' );
+
+my %fields_by_name = map { $_->name, $_ } $lang->fields;
+
+ok( exists $fields_by_name{operator}, '$lang has an operator field' );
 
 done_testing;

@@ -1,5 +1,11 @@
 Revision history for Perl extension URI::PackageURL.
 
+2.00 2023-06-13
+    - Added "purl-tool(1)" (giterlizzi/perl-URI-PackageURL#3)
+    - Added "URI::PackageURL::Util::purl_to_urls" helper
+    - Fixed name qualifier for "cpan" (giterlizzi/perl-URI-PackageURL#2)
+    - Fixed some little issues
+
 1.10 2022-08-01
     - Fixed "namespace vs name" (RT#143917)
     - Fixed substitution warning when "version" component is not provided

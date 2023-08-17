@@ -1,5 +1,9 @@
 Revision history for Geo::Location::Point
 
+0.09	Wed Jun 14 20:52:13 EDT 2023
+	Increased the test coverage
+	Added the tz() method
+
 0.08	Fri Mar 17 13:13:30 EDT 2023
 	Support the messages latitude and longitude
 

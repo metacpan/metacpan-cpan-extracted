@@ -1,6 +1,6 @@
 package Tcl::pTk::XEvent;
 
-our ($VERSION) = ('1.10');
+our ($VERSION) = ('1.11');
 
 use strict;
 use warnings;
@@ -84,7 +84,7 @@ This is how a XEvent call should be converted to using the Ev() calls, which are
 
                          print "mouse X/Y = $mouseX/$mouseY\n";
                 }, 
-                   Ev('x'), Ev('y) ]
+                   Ev('x'), Ev('y') ]
                 
         );
 

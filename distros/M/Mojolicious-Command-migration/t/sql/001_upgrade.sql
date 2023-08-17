@@ -2,7 +2,7 @@
 
 BEGIN;
 
-ALTER TABLE test ADD COLUMN name varchar(255) NOT NULL DEFAULT '';
+ALTER TABLE test ADD COLUMN `name` varchar(255) NOT NULL DEFAULT '';
 
 
 COMMIT;

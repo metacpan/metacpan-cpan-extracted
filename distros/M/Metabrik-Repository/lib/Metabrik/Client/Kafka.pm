@@ -208,6 +208,7 @@ sub send {
       my $no_known_broker = 'There are no known brokers';
       my $too_big = 'Message is too big';
       my $invalid_arg_messages = 'Invalid argument: messages';
+      my $cannot_send = 'Cannot send';
       my $err = $@;
       if ($@ =~ m{^$no_ack_for_request}i) {
          $err = $no_ack_for_request;
@@ -230,11 +231,39 @@ sub send {
       elsif ($@ =~ m{^$invalid_arg_messages}i) {
          $err = $invalid_arg_messages;
       }
+      elsif ($@ =~ m{^$cannot_send}i) {
+         my ($errnum, $details) = $@ =~ m{, (-\d+),.+?'([^']+)', 'Kafka::Exception}si;
+         $errnum ||= "unknown";
+         $details ||= "unknown";
+         $err = "$cannot_send: $errnum, $details";
+      }
 
       my $broker = $self->_broker;
 
-      return $self->log->error("send: fail for broker [$broker]: [$err]");
+      my $count = 1;
+      my $length = length($messages);
+      if (ref($messages) eq 'ARRAY') {
+         $length = 0;
+         $count = scalar(@$messages);
+         for (@$messages) {
+            $length += length($_);
+         }
+      }
+      return $self->log->error("send: fail for broker [$broker], partition[$partition] ".
+         "message count[$count] with length[$length]: [$err]");
    }
+
+   my $count = 1;
+   my $length = length($messages);
+   if (ref($messages) eq 'ARRAY') {
+      $length = 0;
+      $count = scalar(@$messages);
+      for (@$messages) {
+         $length += length($_);
+      }
+   }
+   $self->log->verbose("send: successful for broker [$broker], partition[$partition] ".
+      "message count[$count] with length[$length]");
 
    return $r;
 }

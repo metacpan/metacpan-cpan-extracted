@@ -6,7 +6,6 @@ use warnings;
 use Test2::V0;
 
 use Commandable::Finder::Packages;
-use Commandable::Invocation;
 
 my $cmd_opts;
 my $cmd_args;
@@ -52,7 +51,7 @@ my $finder = Commandable::Finder::Packages->new(
 {
    undef $cmd_args;
 
-   $finder->find_and_invoke( Commandable::Invocation->new( "cmd" ) );
+   $finder->find_and_invoke_list( qw( cmd ) );
 
    ok( defined $cmd_args, 'cmd command invoked' );
    is( $cmd_args, [], 'cmd command given no args' );
@@ -62,7 +61,7 @@ my $finder = Commandable::Finder::Packages->new(
 {
    undef $cmd_args;
 
-   $finder->find_and_invoke( Commandable::Invocation->new( "cmd argument" ) );
+   $finder->find_and_invoke_list( qw( cmd argument ) );
 
    is( $cmd_args, [ "argument" ], 'cmd command given one arg' );
 }
@@ -72,7 +71,7 @@ my $finder = Commandable::Finder::Packages->new(
    undef $cmd_args;
    undef $cmd_opts;
 
-   $finder->find_and_invoke( Commandable::Invocation->new( "cmd --verbose" ) );
+   $finder->find_and_invoke_list( qw( cmd --verbose ) );
 
    is( $cmd_args, [], 'cmd command given one option' );
    is( $cmd_opts, { verbose => 1 }, 'cmd command given one option' );
@@ -83,7 +82,7 @@ my $finder = Commandable::Finder::Packages->new(
    undef $cmd_args;
    undef $cmd_opts;
 
-   $finder->find_and_invoke( Commandable::Invocation->new( "cmd --verbose --target=red" ) );
+   $finder->find_and_invoke_list( qw( cmd --verbose --target=red ) );
 
    is( $cmd_args, [], 'cmd command given two options' );
    is( $cmd_opts, { verbose => 1, target => "red" }, 'cmd command given two options' );
@@ -94,7 +93,7 @@ my $finder = Commandable::Finder::Packages->new(
    undef $cmd_args;
    undef $cmd_opts;
 
-   $finder->find_and_invoke( Commandable::Invocation->new( "cmd arg cmd2 arg2" ) );
+   $finder->find_and_invoke_list( qw( cmd arg cmd2 arg2 ) );
 }
 
 done_testing;

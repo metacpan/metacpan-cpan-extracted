@@ -25,4 +25,8 @@ WriteMakefile (
         },
     },
     MIN_PERL_VERSION => '5.008009',
+    TEST_REQUIRES => {
+	'Test::Deep' => '1.130',
+	'Test::Warnings' => '0.030',
+    },
 );

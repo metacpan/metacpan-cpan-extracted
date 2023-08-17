@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "FreezeThaw" => 0,
     "HTML::Escape" => 0,
+    "JSON::MaybeXS" => 0,
     "Lingua::EN::Inflexion" => "0.002007",
     "Module::Pluggable::Object" => 0,
     "Module::Runtime" => 0,
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
     "Text::Autoformat" => 0,
     "URI" => "5.17",
     "namespace::autoclean" => 0,
+    "namespace::clean" => 0,
     "overload" => 0
   },
   "TEST_REQUIRES" => {
@@ -59,9 +61,9 @@ my %WriteMakefileArgs = (
     "Test::Needs" => "0.002006",
     "Type::Tiny" => "1.012001"
   },
-  "VERSION" => "0.001022",
+  "VERSION" => "0.002001",
   "test" => {
-    "TESTS" => "t/*.t t/catalyst/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/html/util/*.t t/validator/*.t"
+    "TESTS" => "t/*.t t/catalyst/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/html/util/*.t t/json/*.t t/validator/*.t"
   }
 );
 
@@ -83,6 +85,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FreezeThaw" => 0,
   "HTML::Escape" => 0,
+  "JSON::MaybeXS" => 0,
   "Lingua::EN::Inflexion" => "0.002007",
   "Module::Pluggable::Object" => 0,
   "Module::Runtime" => 0,
@@ -101,6 +104,7 @@ my %FallbackPrereqs = (
   "Type::Tiny" => "1.012001",
   "URI" => "5.17",
   "namespace::autoclean" => 0,
+  "namespace::clean" => 0,
   "overload" => 0
 );
 

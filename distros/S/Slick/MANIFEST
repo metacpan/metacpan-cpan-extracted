@@ -1,0 +1,40 @@
+.dir-locals.el
+bin/slick
+CHANGES
+cpanfile
+examples/cache/app.pl
+examples/docker/app.pl
+examples/docker/Dockerfile
+examples/multi-file/app.pl
+examples/multi-file/lib/MyApp/ItemRouter.pm
+lib/Slick.pm
+lib/Slick/Annotation.pm
+lib/Slick/Cache.pm
+lib/Slick/CacheExecutor.pm
+lib/Slick/CacheExecutor/Memcached.pm
+lib/Slick/CacheExecutor/Redis.pm
+lib/Slick/Context.pm
+lib/Slick/Database.pm
+lib/Slick/DatabaseExecutor.pm
+lib/Slick/DatabaseExecutor/MySQL.pm
+lib/Slick/DatabaseExecutor/Pg.pm
+lib/Slick/Error.pm
+lib/Slick/EventHandler.pm
+lib/Slick/Events.pm
+lib/Slick/Methods.pm
+lib/Slick/Route.pm
+lib/Slick/RouteManager.pm
+lib/Slick/RouteMap.pm
+lib/Slick/Router.pm
+lib/Slick/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+Slick-0.001.tar.gz
+Slick-0.001/META.json
+Slick-0.001/META.yml
+Slick-0.003.tar.gz
+Slick-0.005.tar.gz
+t/01-basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

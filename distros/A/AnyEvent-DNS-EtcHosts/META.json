@@ -5,33 +5,40 @@
       "Marc Lehmann <schmorp@schmorp.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-DNS-EtcHosts",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::Deep" : "0",
-            "Test::More" : "0.98"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0",
+            "Software::License" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent" : "7",
+            "AnyEvent" : "7.0",
             "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "AnyEvent::DNS::EtcHosts" : {
          "file" : "lib/AnyEvent/DNS/EtcHosts.pm",
-         "version" : "0.0103"
+         "version" : "0.0105"
       }
    },
    "release_status" : "stable",
@@ -46,5 +53,6 @@
          "url" : "http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts"
       }
    },
-   "version" : "0.0103"
+   "version" : "0.0105",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

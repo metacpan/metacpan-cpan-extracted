@@ -5,6 +5,7 @@ use warnings;
 use Filesys::Notify::Simple;
 use Test::More;
 use Cwd 'cwd';
+use Cwd 'abs_path';
 use File::Find qw(finddepth);
 use Class::Refresh;
 
@@ -45,6 +46,7 @@ sub run_tests {
 	  }
 }
 
+my %file_to_module_key_map = ();
 
 sub clear_cache {
 	my @files = @_;
@@ -58,6 +60,24 @@ sub clear_cache {
 		my $module_key;
 		unless (scalar @broken_files) {
 			$module_key = (grep {$INC{$_} eq $file} (keys %INC))[0];
+
+			# If module_key is not found for the changed file, the program could be using a symlink. We need to see
+			# any of the entries in %INC is a symlink that points to the changed file.
+			if (!defined) {
+				if (!exists $file_to_module_key_map{$file}) {
+					for my $key (keys %INC) {
+						my $val = $INC{$key};
+
+						# If path is symlink and the symlink links to the changed file.
+						if (-l $val && abs_path($val) eq $file) {
+							$file_to_module_key_map{$file} = $key;
+						}
+					}
+				}
+
+				$module_key = $file_to_module_key_map{$file};
+			}
+
 			next unless $module_key;
 
 			delete $INC{$module_key};
@@ -70,7 +90,6 @@ sub clear_cache {
 		require ($module_key || $file);
 	}
 }
-
 
 sub expand_folders {
 	my @test_files = @_;
@@ -114,8 +133,11 @@ sub start {
 					$path =~ s/$pwd\///g;
 					next if $path =~ /\/\./;
 
-					push @files_changed, $path;
-					print "\n" . $path . " changed";
+					# Ignore duplicates.
+					if (!grep(/^$path$/, @files_changed)) {
+						push @files_changed, $path;
+						print "\n" . $path . " changed";
+					}
 				}
 				return unless @files_changed;
 

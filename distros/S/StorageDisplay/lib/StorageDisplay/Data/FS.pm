@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::FS;
 # ABSTRACT: Handle filesystem data for StorageDisplay
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -52,6 +52,13 @@ around BUILDARGS => sub {
         );
 };
 
+sub keep {
+    my $self = shift;
+    my $fs = shift;
+
+    return $fs->useblock;
+}
+
 sub BUILD {
     my $self=shift;
     my $args=shift;
@@ -90,35 +97,54 @@ sub BUILD {
     #	$self->newChild('FS::FS', $fs->{filesystem}, $st, $fs);
     #}
     my $fullfs = $allfs->{flatfull};
-    if (0) {
+    my $flat=0;
+    if ($flat) {
 	foreach my $id (keys %{$fullfs}) {
 	    my $fs = $fullfs->{$id};
-	    $self->newChild('FS::FS', $st, $fs);
+	    my $fs_elem = $self->newElem('FS::MP::FS', $st, $fs);
+	    if ($self->keep($fs_elem)) {
+		$self->addChild($fs_elem);
+	    }
 	}
     } else {
 	while ($fullfs->{$rootid}->{parent} != 1) {
 	    $rootid = $fullfs->{$rootid}->{parent};
 	}
-	$self->createFS($self, $st, $fullfs, $rootid);
+	#my $
+	$self->addChild($self->createFS($st, $fullfs, $rootid));
     }
 }
 
 sub createFS {
     my $self = shift;
-    my $container = shift;
     my $st = shift;
     my $fullfs = shift;
     my $id = shift;
 
     my $fs = $fullfs->{$id};
+    my $fs_elem = $self->newElem('FS::MP::FS', $st, $fs);
+    if (! exists($fs->{children})) {
+	if ($self->keep($fs_elem)) {
+	    return $fs_elem;
+	}
+	return;
+    }
     if (exists($fs->{children})) {
-	$container->newChild('FS::MP',
-			     'fs' => $fs,
-			     'st' => $st,
-			     'SDFS' => $self,
-			     'fullfs' => $fullfs);
-    } else {
-	$container->newChild('FS::MP::FS', $st, $fs);
+	my @fs_children = map
+	{
+	    my $fs = $self->createFS($st, $fullfs, $_);
+	    defined($fs) ? $fs : ()
+	}
+	@{$fs->{children}};
+
+	if (scalar(@fs_children) == 0 && ! $self->keep($fs_elem)) {
+	    return;
+	}
+	return $self->newElem('FS::MP',
+			      'st' => $st,
+			      'fs' => $fs,
+			      'fs_elem' => $fs_elem,
+			      'fs_children' => \@fs_children);
     }
 }
 
@@ -131,6 +157,7 @@ sub dotLabel {
 
 ##################################################################
 package StorageDisplay::Data::FS::MP::FS;
+# Basic FS info
 
 use Moose;
 use namespace::sweep;
@@ -160,6 +187,13 @@ has 'sourcenames' => (
     );
 
 has 'special' => (
+    is => 'ro',
+    isa => 'Bool',
+    required => 1,
+    default => 0,
+    );
+
+has 'useblock' => (
     is => 'ro',
     isa => 'Bool',
     required => 1,
@@ -205,16 +239,19 @@ around 'BUILDARGS' => sub {
 	print STDERR Dumper($fs), "\n";
 	confess "coucou\n";
     }
+    my $use_block = 0;
+    my $special = 0;
     for my $source (@sources) {
-	if (! $has_sources
+	if (! $has_sources # old software, no 'sources' entry
 	    && $fs->{'fsroot'} ne '/'
 	    && $source =~ m,^(.*)\[$fs->{'fsroot'}\]$,) {
-	    $source = $1;
+	    $source = $1; # only keep relevant part of 'source' entry
 	}
 	my $block;
 	if ($source =~ m,^/dev/,) {
 	    $block = $st->block($source);
 	    push @sourcenames, 'Device: '.$block->dname;
+	    $use_block=1;
 	} elsif ($source =~ m,^/,) {
 	    # TODO : wrong if $target is not a mountpoint
 	    $block = $st->block($source);
@@ -223,7 +260,7 @@ around 'BUILDARGS' => sub {
 	} else {
 	    push @sourcenames, 'Source: '.$source;
 	    $block = $st->block($source);
-	    $fs->{special} = 1;
+	    $special = 1;
 	}
 	push @consume, $block;
     }
@@ -254,6 +291,8 @@ around 'BUILDARGS' => sub {
 	'free' => $fs->{free},
 	'used' => $fs->{used},
 	'size' => $fs->{size},
+	'special' => $special,
+	'useblock' => $use_block,
 	'sourcenames' => join("\n", @sourcenames),
 	'fsroot' => $fs->{fsroot},
 	'fstype' => $fs->{fstype},
@@ -318,6 +357,7 @@ around dotLinks => sub {
 
 ##################################################################
 package StorageDisplay::Data::FS::MP;
+# Container for FS that has children FS
 
 use Moose;
 use namespace::sweep;
@@ -350,12 +390,7 @@ sub BUILD {
     my $self=shift;
     my $args=shift;
 
-    my $st = $args->{st};
-    my $SDFS = $args->{SDFS};
-    my $fullfs = $args->{fullfs};
-    my $fs = $args->{fs};
-
-    $self->newChild('FS::MP::FS', $st, $fs);
+    $self->addChild($args->{fs_elem});
     $self->newChild('FS::MP::C', $args);
 }
 
@@ -367,6 +402,7 @@ sub dotLabel {
 
 ##################################################################
 package StorageDisplay::Data::FS::MP::C;
+# Container for children FS
 
 use Moose;
 use namespace::sweep;
@@ -390,8 +426,8 @@ sub BUILD {
     my $fullfs = $args->{fullfs};
     my $fs = $args->{fs};
 
-    for my $child (@{$fs->{children}}) {
-	$SDFS->createFS($self, $st, $fullfs, $child);
+    for my $child (@{$args->{fs_children}}) {
+	$self->addChild($child);
     }
 }
 
@@ -628,7 +664,7 @@ StorageDisplay::Data::FS - Handle filesystem data for StorageDisplay
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

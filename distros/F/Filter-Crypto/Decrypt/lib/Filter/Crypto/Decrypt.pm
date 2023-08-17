@@ -33,7 +33,7 @@ use XSLoader qw();
 our($VERSION);
 
 BEGIN {
-    $VERSION = '2.09';
+    $VERSION = '2.10';
 
     XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -221,11 +221,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.09
+Version 2.10
 
 =head1 DATE
 
-08 Dec 2020
+02 Jul 2023
 
 =head1 HISTORY
 

@@ -1,16 +1,18 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.043-2-g20e0641
+package OpenAPI::Modern; # git description: v0.045-9-g275a796
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
-# KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
+# ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
+# KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.044';
+our $VERSION = '0.046';
 
 use 5.020;
+use utf8;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -118,7 +120,7 @@ sub validate_request ($self, $request, $options = {}) {
           ($section eq $method ? $method : ()), 'parameters', $idx) };
         my $param_obj = ($section eq $method ? $operation : $path_item)->{parameters}[$idx];
         while (my $ref = $param_obj->{'$ref'}) {
-          $param_obj = $self->_resolve_ref($ref, $state);
+          $param_obj = $self->_resolve_ref('parameter', $ref, $state);
         }
 
         my $fc_name = $param_obj->{in} eq 'header' ? fc($param_obj->{name}) : $param_obj->{name};
@@ -142,6 +144,9 @@ sub validate_request ($self, $request, $options = {}) {
 
     # 3.2 "Each template expression in the path MUST correspond to a path parameter that is included in
     # the Path Item itself and/or in each of the Path Item’s Operations."
+    # We could validate this at document parse time, except the path-item can also be reached via a
+    # $ref and the referencing path could be from another document and is therefore unknowable until
+    # runtime.
     foreach my $path_name (sort keys $path_captures->%*) {
       abort({ %$state, data_path => jsonp($state->{data_path}, qw(uri path), $path_name) },
           'missing path parameter specification for "%s"', $path_name)
@@ -155,7 +160,7 @@ sub validate_request ($self, $request, $options = {}) {
       $state->{schema_path} = jsonp($state->{schema_path}, 'requestBody');
 
       while (my $ref = $body_obj->{'$ref'}) {
-        $body_obj = $self->_resolve_ref($ref, $state);
+        $body_obj = $self->_resolve_ref('request-body', $ref, $state);
       }
 
       if ($request->headers->content_length // $request->body_size) {
@@ -224,6 +229,17 @@ sub validate_response ($self, $response, $options = {}) {
       return $self->_result($state, 1);
     }
 
+    if ($response->headers->header('Transfer-Encoding')) {
+      ()= E({ %$state, data_path => jsonp($state->{data_path}, qw(header Transfer-Encoding)) },
+        'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)')
+        if $response->is_info or $response->code == 204;
+
+      # connect method is not supported in openapi 3.1.0, but this may be possible in the future
+      ()= E({ %$state, data_path => jsonp($state->{data_path}, qw(header Transfer-Encoding)) },
+        'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request')
+        if $response->is_success and $method eq 'connect';
+    }
+
     my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
 
@@ -235,7 +251,7 @@ sub validate_response ($self, $response, $options = {}) {
     my $response_obj = $operation->{responses}{$response_name};
     $state->{schema_path} = jsonp($state->{schema_path}, 'responses', $response_name);
     while (my $ref = $response_obj->{'$ref'}) {
-      $response_obj = $self->_resolve_ref($ref, $state);
+      $response_obj = $self->_resolve_ref('response', $ref, $state);
     }
 
     foreach my $header_name (sort keys(($response_obj->{headers}//{})->%*)) {
@@ -243,7 +259,7 @@ sub validate_response ($self, $response, $options = {}) {
       my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'headers', $header_name) };
       my $header_obj = $response_obj->{headers}{$header_name};
       while (my $ref = $header_obj->{'$ref'}) {
-        $header_obj = $self->_resolve_ref($ref, $state);
+        $header_obj = $self->_resolve_ref('header', $ref, $state);
       }
 
       ()= $self->_validate_header_parameter({ %$state,
@@ -591,14 +607,17 @@ sub _result ($self, $state, $exception = 0) {
   );
 }
 
-sub _resolve_ref ($self, $ref, $state) {
+sub _resolve_ref ($self, $entity_type, $ref, $state) {
   my $uri = Mojo::URL->new($ref)->to_abs($state->{initial_schema_uri});
   my $schema_info = $self->evaluator->_fetch_from_uri($uri);
   abort({ %$state, keyword => '$ref' }, 'EXCEPTION: unable to find resource %s', $uri)
     if not $schema_info;
 
-  abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
+  abort({ %$state, keyword => '$ref' }, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->evaluator->max_traversal_depth;
+
+  abort({ %$state, keyword => '$ref' }, 'EXCEPTION: bad $ref to %s: not a "%s"', $schema_info->{canonical_uri}, $entity_type)
+    if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.jsonp('/$ref');
@@ -693,11 +712,11 @@ __END__
 
 =head1 NAME
 
-OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI document
+OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 SYNOPSIS
 

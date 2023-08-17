@@ -9,13 +9,15 @@ SYNOPSIS
 DESCRIPTION
     "B::Keywords" supplies several arrays of exportable keywords: @Scalars,
     @Arrays, @Hashes, @Filehandles, @Symbols, @Functions, @Barewords,
-    @TieIOMethods, @UNIVERSALMethods and @ExporterSymbols.
+    @BarewordsExtra, @TieIOMethods, @UNIVERSALMethods and @ExporterSymbols.
 
     The @Symbols array includes the contents of each of @Scalars, @Arrays,
     @Hashes, @Functions and @Filehandles.
 
     Similarly, @Barewords adds a few non-function keywords and operators to
     the @Functions array.
+
+    @BarewordsExtra adds a few barewords which are not in keywords.h.
 
     All additions and modifications are welcome.
 
@@ -40,6 +42,10 @@ DATA
     @Barewords
         This is a list of other special keywords in perl including operators
         and all the control structures.
+
+    @BarewordsExtra
+        This is a list of barewords which are missing from keywords.h,
+        handled extra in the tokenizer.
 
     @TieIOMethods
         Those are special tie or PerlIO methods called by the perl core,
@@ -79,6 +85,10 @@ SUPPORT
 
         <http://rt.cpan.org/NoAuth/Bugs.html?Dist=B-Keywords>
 
+    *   GIT repository
+
+        <http://github.com/rurban/b-keywords/>
+
     *   AnnoCPAN: Annotated CPAN documentation
 
         <http://annocpan.org/dist/B-Keywords>
@@ -97,7 +107,7 @@ ACKNOWLEDGEMENTS
 
 COPYRIGHT AND LICENSE
     Copyright 2009 Joshua ben Jore, All rights reserved. Copyright 2013,
-    2015, 2017-2019 Reini Urban, All rights reserved.
+    2015, 2017-2021 Reini Urban, All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either:

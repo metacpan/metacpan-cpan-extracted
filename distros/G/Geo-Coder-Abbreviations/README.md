@@ -4,7 +4,7 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -58,18 +58,14 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Abbreviations](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Abbreviations)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Geo-Coder-Abbreviations](http://cpanratings.perl.org/d/Geo-Coder-Abbreviations)
-
 - Search CPAN
 
     [http://search.cpan.org/dist/Geo-Coder-Abbreviations/](http://search.cpan.org/dist/Geo-Coder-Abbreviations/)
 
-# ACKNOWLEDGEMENTS
+# ACKNOWLEDGMENTS
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

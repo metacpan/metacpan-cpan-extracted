@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -35,27 +35,20 @@ namespace Matchers {
         mutable std::string m_cachedToString;
     };
 
-#ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-    template<typename ObjectT>
-    struct MatcherMethod {
-        virtual bool match(ObjectT const& arg) const = 0;
-    };
-
-#ifdef __clang__
-#    pragma clang diagnostic pop
-#endif
 
     template<typename T>
-    struct MatcherBase : MatcherUntypedBase, MatcherMethod<T> {};
+    class MatcherBase : public MatcherUntypedBase {
+    public:
+        virtual bool match( T const& arg ) const = 0;
+    };
 
     namespace Detail {
 
         template<typename ArgT>
-        struct MatchAllOf final : MatcherBase<ArgT> {
+        class MatchAllOf final : public MatcherBase<ArgT> {
+            std::vector<MatcherBase<ArgT> const*> m_matchers;
+
+        public:
             MatchAllOf() = default;
             MatchAllOf(MatchAllOf const&) = delete;
             MatchAllOf& operator=(MatchAllOf const&) = delete;
@@ -94,9 +87,6 @@ namespace Matchers {
                 rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                 return CATCH_MOVE(rhs);
             }
-
-        private:
-            std::vector<MatcherBase<ArgT> const*> m_matchers;
         };
 
         //! lvalue overload is intentionally deleted, users should
@@ -109,7 +99,9 @@ namespace Matchers {
         MatchAllOf<ArgT> operator&& (MatcherBase<ArgT> const& lhs, MatchAllOf<ArgT> const& rhs) = delete;
 
         template<typename ArgT>
-        struct MatchAnyOf final : MatcherBase<ArgT> {
+        class MatchAnyOf final : public MatcherBase<ArgT> {
+            std::vector<MatcherBase<ArgT> const*> m_matchers;
+        public:
             MatchAnyOf() = default;
             MatchAnyOf(MatchAnyOf const&) = delete;
             MatchAnyOf& operator=(MatchAnyOf const&) = delete;
@@ -147,9 +139,6 @@ namespace Matchers {
                 rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                 return CATCH_MOVE(rhs);
             }
-
-        private:
-            std::vector<MatcherBase<ArgT> const*> m_matchers;
         };
 
         //! lvalue overload is intentionally deleted, users should
@@ -162,8 +151,10 @@ namespace Matchers {
         MatchAnyOf<ArgT> operator|| (MatcherBase<ArgT> const& lhs, MatchAnyOf<ArgT> const& rhs) = delete;
 
         template<typename ArgT>
-        struct MatchNotOf final : MatcherBase<ArgT> {
+        class MatchNotOf final : public MatcherBase<ArgT> {
+            MatcherBase<ArgT> const& m_underlyingMatcher;
 
+        public:
             explicit MatchNotOf( MatcherBase<ArgT> const& underlyingMatcher ):
                 m_underlyingMatcher( underlyingMatcher )
             {}
@@ -175,9 +166,6 @@ namespace Matchers {
             std::string describe() const override {
                 return "not " + m_underlyingMatcher.toString();
             }
-
-        private:
-            MatcherBase<ArgT> const& m_underlyingMatcher;
         };
 
     } // namespace Detail

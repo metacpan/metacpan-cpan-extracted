@@ -128,13 +128,18 @@ one type of dialog for each index
 
 sub file_dialog_type_aref {
     my ($self) = @_;
+ 
+    my @type;  
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
 
-    my @type;
+	# in user_flow, bound index will look for data
+	$type[0]           = '';
 
-    $type[0] = $file_dialog_type->{_Data_PL_SEISMIC};
-	$type[1] = $file_dialog_type->{_Data_PL_SEISMIC};
-	$type[2] = $file_dialog_type->{_Path};
-	$type[3] = $file_dialog_type->{_Path};
+    $type[$index[0]] = $file_dialog_type->{_Data_SEISMIC_TXT};
+	$type[$index[1]] = $file_dialog_type->{_Data_PL_SEISMIC};
+	$type[$index[2]] = $file_dialog_type->{_Path};
+	$type[$index[3]] = $file_dialog_type->{_Path};
 
     $Sucat_spec->{_file_dialog_type_aref} = \@type;
 

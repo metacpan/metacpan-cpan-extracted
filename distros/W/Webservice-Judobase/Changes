@@ -1,4 +1,8 @@
 Revision history for perl module Webservice::Judobase
+0.10 2023-06-02
+  - Bump dependencies
+  - Update xt tests to reflect IJF API
+
 0.09 2023-03-13
   - Bump dependencies
   - Update xt tests to reflect IJF API

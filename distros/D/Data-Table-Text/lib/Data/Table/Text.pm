@@ -11,7 +11,7 @@
 # updateDocumentation - mark synopsis tests with #S and place in synopsis
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20230521;                                                        # Version
+our $VERSION = 20230616;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -5479,6 +5479,28 @@ sub downloadGitHubPublicRepoFile($$$)                                           
   $r                                                                            # Return data read from github
  }
 
+#D1 FPGAs                                                                       # Load verilog into a field programmable gate array
+
+sub fpgaGowin(%)                                                                # Compile verilog to a gowin device.
+ {my (%options) = @_;                                                           # Parameters
+  my $home    = currentDirectory;                                               # Local folder
+  my ($m)     = reverse grep {$_} split m(/), $home;                            # Module is the last element of the path to the current directory
+
+  my $Device  = q(GW1NR-LV9QN88PC6/I5);                                         # Default device
+
+  my $v       = fpe $home, $m, q(sv);                                           # Source file
+  my $j       = fpe $home, $m, qw(json);                                        # Json description
+  my $p       = fpe $home, $m, qw(pnr);                                         # Place and route
+  my $d       = $options{device} // $Device;                                    # Device
+  my ($b)     = searchDirectoryTreesForMatchingFiles($home, qw(.cst));          # Device description
+  $b or confess "Need a .cst file to provide constraints but none found";
+  unlink $j, $p;                                                                # Output files
+
+  xxx(qq(yosys -q -p "read_verilog $v; synth_gowin -top countUp -json $j"));
+  xxx(qq(nextpnr-gowin -v --json $j --write $p --device "$d" --family GW1N-9C --cst $b));
+  xxx(qq(gowin_pack -d GW1N-9C -o pack.fs $p));
+ }
+
 #D1 Processes                                                                   # Start processes, wait for them to terminate and retrieve their results
 
 sub startProcess(&\%$)                                                          # Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.  Use L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> to wait for all these processes to finish.
@@ -6366,7 +6388,9 @@ sub wellKnownUrls                                                               
     blob            => [q(blob),                                                "https://en.wikipedia.org/wiki/Binary_large_object"                                                                               ],
     boson           => [q(Boson),                                               "https://en.wikipedia.org/wiki/Boson"                                                                                             ],
     browser         => [q(web browser),                                         "https://en.wikipedia.org/wiki/Web_browser"                                                                                       ],
+    btree           => [q(B-Tree),                                              "https://en.wikipedia.org/wiki/B-tree"                                                                                            ],
     bulktreeg       => [q(Bulk Tree),                                           "https://github.com/philiprbrenan/TreeBulk"                                                                                       ],
+    bubbleSort      => [q(Bubble Sort),                                         "https://en.wikipedia.org/wiki/Bubble_sort"                                                                                       ],
     button          => [q(Button),                                              "https://en.wikipedia.org/wiki/Button_(computing)"                                                                                ],
     camelCase       => [q(camelCase),                                           "https://en.wikipedia.org/wiki/Camel_case"                                                                                        ],
     cauchy          => [q(Augustin Louis Cauchy),                               "https://en.wikipedia.org/wiki/Augustin-Louis_Cauchy"                                                                             ],
@@ -6762,8 +6786,11 @@ sub wellKnownUrls                                                               
     userExp         => [q(User Experience),                                     "https://en.wikipedia.org/wiki/User_experience"                                                                                   ],
     vector2         => [q(Vectors In Two Dimensions),                           "https://pypi.org/project/Vector2/"                                                                                               ],
     verify          => [q(verify),                                              "https://en.wikipedia.org/wiki/Software_verification_and_validation"                                                              ],
+    verilog         => [q(Verilog),                                             "https://en.wikipedia.org/wiki/Verilog"                                                                                           ],
+    version         => [q(version),                                             "https://en.wikipedia.org/wiki/Software_versioning"                                                                               ],
     vhdl            => [q(VHDL),                                                "https://ghdl.readthedocs.io/en/latest/about.html"                                                                                ],
     vi              => [q(vi),                                                  "https://www.vim.org/"                                                                                                            ],
+    vivado          => [q(Vivado),                                              "https://en.wikipedia.org/wiki/Xilinx_Vivado"                                                                                     ],
     waterfall       => [q(waterfall development methodology),                   "https://en.wikipedia.org/wiki/Waterfall_model"                                                                                   ],
     webpage         => [q(web page),                                            "https://en.wikipedia.org/wiki/Web_page"                                                                                          ],
     webpages        => [q(web pages),                                           "https://en.wikipedia.org/wiki/Web_page"                                                                                          ],
@@ -6789,6 +6816,7 @@ sub wellKnownUrls                                                               
     zerowidthspace  => [q(zero width space),                                    "https://en.wikipedia.org/wiki/Zero-width_space"                                                                                  ],
     zip             => [q(zip),                                                 "https://linux.die.net/man/1/zip"                                                                                                 ],
     zoom            => [q(Zoom),                                                "https://zoom.us/"                                                                                                                ],
+    zynq            => [q(Zynq),                                                "https://www.xilinx.com/products/som/kria/k26c-commercial.html"                                                                   ],
    );
  } # wellKnownUrls
 
@@ -8009,7 +8037,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  expandWellKnownUrlsInHtmlFromPerl expandWellKnownUrlsInPod2Html
  expandWellKnownUrlsInPerlFormat extractCodeBlock
  extractPythonDocumentationFromFiles evalFileAsJson evalOrConfess
- fe fff fileInWindowsFormat fileLargestSize fileList fileMd5Sum fileModTime
+ fe fff fpgaGowin
+ fileInWindowsFormat fileLargestSize fileList fileMd5Sum fileModTime
  fileOutOfDate filePath filePathDir filePathExt fileSize findDirs
  findFileWithExtension findFiles firstFileThatExists firstNChars
  flattenArrayAndHashValues fn fne folderSize formatHtmlAndTextTables

@@ -1,5 +1,3 @@
-# $Id: Kex.pm,v 1.24 2009/02/02 01:18:27 turnstep Exp $
-
 package Net::SSH::Perl::Kex;
 use strict;
 use warnings;
@@ -75,7 +73,7 @@ sub exchange {
     }
     if ($ssh->config->get('compression')) {
         $proposal[ PROPOSAL_COMP_ALGS_CTOS ] =
-        $proposal[ PROPOSAL_COMP_ALGS_STOC ] = "zlib";
+        $proposal[ PROPOSAL_COMP_ALGS_STOC ] = "zlib,none";
     }
     else {
         $proposal[ PROPOSAL_COMP_ALGS_CTOS ] =
@@ -90,7 +88,7 @@ sub exchange {
     $proposal[ PROPOSAL_KEX_ALGS ] .= ',ext-info-c'
         if $proposal[ PROPOSAL_KEX_ALGS ] !~ /ext-info-c/;
     if (my $macs = $ssh->config->get('macs')) {
-        $proposal[ PROPOSAL_MAC_ALGS_CTOS ] = 
+        $proposal[ PROPOSAL_MAC_ALGS_CTOS ] =
         $proposal[ PROPOSAL_MAC_ALGS_STOC ] = $macs;
     }
 

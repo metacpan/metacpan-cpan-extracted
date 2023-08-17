@@ -1,5 +1,3 @@
-# $Id: ChannelMgr.pm,v 1.10 2009/01/26 01:00:25 turnstep Exp $
-
 package Net::SSH::Perl::ChannelMgr;
 use strict;
 use warnings;

@@ -68,6 +68,7 @@ POD = perl.pod	\
 	perl5341delta.pod	\
 	perl5360delta.pod	\
 	perl5361delta.pod	\
+	perl5380delta.pod	\
 	perl561delta.pod	\
 	perl56delta.pod	\
 	perl581delta.pod	\
@@ -88,6 +89,8 @@ POD = perl.pod	\
 	perlbot.pod	\
 	perlcall.pod	\
 	perlcheat.pod	\
+	perlclass.pod	\
+	perlclassguts.pod	\
 	perlclib.pod	\
 	perlcommunity.pod	\
 	perldata.pod	\
@@ -234,6 +237,7 @@ MAN = perl.man	\
 	perl5341delta.man	\
 	perl5360delta.man	\
 	perl5361delta.man	\
+	perl5380delta.man	\
 	perl561delta.man	\
 	perl56delta.man	\
 	perl581delta.man	\
@@ -254,6 +258,8 @@ MAN = perl.man	\
 	perlbot.man	\
 	perlcall.man	\
 	perlcheat.man	\
+	perlclass.man	\
+	perlclassguts.man	\
 	perlclib.man	\
 	perlcommunity.man	\
 	perldata.man	\
@@ -400,6 +406,7 @@ HTML = perl.html	\
 	perl5341delta.html	\
 	perl5360delta.html	\
 	perl5361delta.html	\
+	perl5380delta.html	\
 	perl561delta.html	\
 	perl56delta.html	\
 	perl581delta.html	\
@@ -420,6 +427,8 @@ HTML = perl.html	\
 	perlbot.html	\
 	perlcall.html	\
 	perlcheat.html	\
+	perlclass.html	\
+	perlclassguts.html	\
 	perlclib.html	\
 	perlcommunity.html	\
 	perldata.html	\
@@ -566,6 +575,7 @@ TEX = perl.tex	\
 	perl5341delta.tex	\
 	perl5360delta.tex	\
 	perl5361delta.tex	\
+	perl5380delta.tex	\
 	perl561delta.tex	\
 	perl56delta.tex	\
 	perl581delta.tex	\
@@ -586,6 +596,8 @@ TEX = perl.tex	\
 	perlbot.tex	\
 	perlcall.tex	\
 	perlcheat.tex	\
+	perlclass.tex	\
+	perlclassguts.tex	\
 	perlclib.tex	\
 	perlcommunity.tex	\
 	perldata.tex	\

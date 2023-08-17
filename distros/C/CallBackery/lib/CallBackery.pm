@@ -37,8 +37,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-
-our $VERSION = '0.46.1';
+our $VERSION = '0.46.5';
 
 
 =head2 config
@@ -170,12 +169,7 @@ sub startup {
         $c->res->headers->cache_control('no-cache, no-store, must-revalidate')
             unless $c->req->url->path =~ m{/resource/.+};
     });
-
-    # on initial startup lets get all the 'stuff' into place
-    # reconfigure will also create the secretFile.
-    if (not -f $app->config->secretFile){
-        $app->config->reConfigure;
-    }
+    
     if (my $secrets = $app->config->secretFile) {
         if (-r $secrets) {
             $app->secrets([ path($app->config->secretFile)->slurp ]);

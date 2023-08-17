@@ -13,7 +13,7 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 =head2 SYNOPSIS System_Variables::
 
- PACKAGE NAME:iPicks2sort.pm
+ PERL PROGRAM NAME:iPicks2sort.pm
  AUTHOR: Juan Lorenzo
  DATE: June 14 2019
 
@@ -98,7 +98,6 @@ use App::SeismicUnixGui::misc::SeismicUnix qw($true $false $in $out $to
   $itemp_picks_ $itemp_picks_sorted_
   $out $suffix_su);
 
-my ($PL_SEISMIC)       = $Project->PL_SEISMIC();
 my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine calc 

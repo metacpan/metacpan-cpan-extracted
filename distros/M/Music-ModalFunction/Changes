@@ -1,0 +1,82 @@
+Revision history for Music-ModalFunction
+
+0.0315 2023-07-16 07:33:22
+    - Pin the needed MIDI::Util version.
+
+0.0314 2023-07-16 07:27:02
+    - Fix package name typo!
+
+0.0313 2023-07-16 07:21:58
+    - Attempt to fix the mystery smoke test failure...
+
+0.0312 2023-06-05 23:24:55
+    - Improve documentation again!
+
+0.0311 2023-06-05 23:13:13
+    - Improve documentation.
+
+0.0310 2023-06-05 23:05:53
+    - Fix a POD line!
+
+0.0309 2023-06-05 22:55:26
+    - Add comments to eg/mode-pivot.
+    - Improve documentation.
+
+0.0308 2023-06-05 12:22:53
+    - Improve eg/mode-pivot a bit more.
+    - Improve documentation.
+
+0.0307 2023-06-04 21:35:58
+    - Improve eg/mode-pivot.
+    - Improve documentation.
+
+0.0306 2023-06-04 19:00:08
+    - Improve documentation!
+
+0.0305 2023-06-04 11:42:29
+    - Improve documentation again.
+
+0.0304 2023-06-04 11:37:00
+    - Fix the description grammar.
+
+0.0303 2023-06-04 11:18:56
+    - Improve eg/mode-pivot again.
+    - Add code comments
+
+0.0302 2023-06-04 08:43:33
+    - Improve eg/mode-pivot.
+
+0.0301 2023-06-04 00:44:59
+    - Add the eg/mode-pivot example program.
+    - Improve documentation.
+
+0.0300 2023-06-03 14:07:39
+    - Update comments and verbose output.
+    - Improved test.
+    - Add the roman_key() rule.
+
+0.0202 2023-06-03 10:15:54
+    - Select and display Roman numeral relationships.
+    - Improve documentation.
+    - Improve test.
+
+0.0201 2023-06-03 08:29:45
+    - Modularize code.
+    - Fix doc examples.
+
+0.0200 2023-06-03 07:28:46
+    - Change the chord_key() argument order to match pivot_chord_keys().
+
+0.0103 2023-06-03 06:52:01
+    - Improve documentation.
+
+0.0102 2023-06-03 06:35:12
+    - Improve documentation.
+    - Add test for pivot_chord_keys().
+
+0.0101 2023-06-03 06:13:16
+    - Remove debugging code.
+
+0.0100 2023-06-03 06:06:58
+    - Mint with Dist::Zilla.
+    - Port code from a related script in my Music repo.

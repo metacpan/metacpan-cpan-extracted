@@ -2,48 +2,54 @@ package LWP::ConsoleLogger::Everywhere;
 use strict;
 use warnings;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 use Class::Method::Modifiers ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
 use Module::Runtime          qw( require_module );
 use Try::Tiny                qw( try );
-
+use Log::Dispatch            ();
 no warnings 'once';
 
 my $loggers;
+my $dispatch_logger;
+
+{
+    my $key = "LWPCL_LOGFILE";
+    if ( exists $ENV{$key} && $ENV{$key} ) {
+        my $filename = $ENV{$key};
+        $dispatch_logger = Log::Dispatch->new(
+            outputs => [
+                [ 'File', min_level => 'debug', filename => $filename ],
+            ],
+        );
+    }
+}
+
+my $code_injection = sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $ua       = $self->$orig(@_);
+    my $debug_ua = debug_ua($ua);
+    $debug_ua->logger($dispatch_logger) if $dispatch_logger;
+    push @{$loggers}, $debug_ua;
+    return $ua;
+};
 
 try {
     require_module('LWP::UserAgent');
     Class::Method::Modifiers::install_modifier(
-        'LWP::UserAgent',
-        'around',
-        'new' => sub {
-            my $orig = shift;
-            my $self = shift;
-
-            my $ua = $self->$orig(@_);
-            push @{$loggers}, debug_ua($ua);
-
-            return $ua;
-        }
+        'LWP::UserAgent', 'around',
+        'new' => $code_injection
     );
 };
 
 try {
     require_module('Mojo::UserAgent');
     Class::Method::Modifiers::install_modifier(
-        'Mojo::UserAgent',
-        'around',
-        'new' => sub {
-            my $orig = shift;
-            my $self = shift;
-
-            my $ua = $self->$orig(@_);
-            push @{$loggers}, debug_ua($ua);
-
-            return $ua;
-        }
+        'Mojo::UserAgent', 'around',
+        'new' => $code_injection
     );
 };
 
@@ -74,7 +80,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 1.000000
+version 1.000001
 
 =head1 SYNOPSIS
 
@@ -139,6 +145,37 @@ This class method returns an array reference of all L<LWP::ConsoleLogger> object
 been created so far, with the newest one last. You can use them to fine-tune settings. If there
 is more than one user agent in your application you will need to figure out which one is which.
 Since this is for debugging only, trial and error is a good strategy here.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 LWPCL_LOGFILE
+
+By default all data will be dumped to your console (as the name of this module implies) using
+L<Log::Dispatch>. You may change this behavior though. The general approach is to do it from
+within your script, for example like this:
+
+    use LWP::ConsoleLogger::Everywhere;
+    my $loggers = LWP::ConsoleLogger::Everywhere->loggers;
+    my $log_dispatch = Log::Dispatch->new(
+      outputs => [
+          [ 'File',   min_level => 'debug', filename => 'log_file.txt' ],
+          [ 'Screen', min_level => 'debug' ],
+      ],
+    );
+    foreach my $logger ( @{ $loggers } ) {
+        $logger->logger($log_dispatch);
+    }
+
+The second approach is simpler and is done via an environment variable, for example you can run
+your script like this:
+
+    LWPCL_LOGFILE=foo.log perl -MLWP::ConsoleLogger::Everywhere foo.pl
+
+this will be equivalent to the first approach with the following Log::Dispatch logger:
+
+    my $log_dispatch = Log::Dispatch->new(
+        outputs => [ [ 'File', min_level => 'debug', filename => 'foo.log' ]  ],
+    );
 
 =head1 CAVEATS
 

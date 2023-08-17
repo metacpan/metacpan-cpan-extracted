@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-04-13'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TextWrapUtils/textunwrap_clipboard",
@@ -40,7 +40,7 @@ textunwrap-clipboard - Unwrap (unfold) multiline paragraphs in clipboard to sing
 
 =head1 VERSION
 
-This document describes version 0.006 of textunwrap-clipboard (from Perl distribution App-TextWrapUtils), released on 2023-03-10.
+This document describes version 0.007 of textunwrap-clipboard (from Perl distribution App-TextWrapUtils), released on 2023-04-13.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<textunwrap-clipboard> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, 
 
 B<textunwrap-clipboard> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<textunwrap-clipboard> [B<L<--backend|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>|B<L<-b|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>] [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<textunwrap-clipboard> [B<L<--backend|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>|B<L<-b|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>] [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--tee|/"--tee">>|B<L<--no-tee|/"--tee">>|B<L<--notee|/"--tee">>]
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,10 @@ Valid values:
 
 The default, when left undef, is to detect what clipboard manager is running.
 
+
+=item B<--tee>
+
+If set to true, will also print result to STDOUT.
 
 =back
 

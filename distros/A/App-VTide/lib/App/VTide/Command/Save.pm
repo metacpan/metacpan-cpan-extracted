@@ -17,7 +17,7 @@ use Path::Tiny;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('1.0.1');
+our $VERSION = version->new('1.0.4');
 our $NAME    = 'save';
 our $OPTIONS = [
     'name|n=s',
@@ -133,7 +133,7 @@ App::VTide::Command::Save - Save configuration changes
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Save version 1.0.1
+This documentation refers to App::VTide::Command::Save version 1.0.4
 
 =head1 SYNOPSIS
 

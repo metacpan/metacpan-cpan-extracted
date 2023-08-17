@@ -1,5 +1,153 @@
 Revision history for Perl extension Net::SAML2.
 
+0.73 -- Sat Jul 08 07:35:12 ADT 2023
+
+  - Release of 0.72 as production release
+
+  [ Significant Changes since 0.69 ]
+  - Quite a few changes and improvements including
+  - Support to obtain information about the AuthnStatement from the Assertion
+  - Function to obtain key_name added to the SP
+  - Verification of artifact responses based on an attribute ID ( via XML::Sig 0.64)
+  - Improve Decryption of EncryptedData nodes for Assertions (via XML::Enc 0.12 and up)
+  - Bumps the requirements new versions of:
+  - XML::Enc => "0.12",
+  - XML::Sig => "0.64",
+  - XML::Generator => "1.13"
+
+  - Miscelaneous:
+  - testapp bug fixes and improvements
+  - Github action improvements
+  - Tested ADFS IdP again
+  - Fixed issue DAKKAR reported to LWP::UserAgent Environment Variables
+
+  [ Change Log ]
+
+  - 8115398 Update version for release
+  - d460fb9 v0.72
+  - e04cc05 Fix typo for AuthnRequest Assertion namespace
+  - ebef6bc Increment version for a release
+  - 2d815e0 Add scoping to Net::SAML2::Protocol::AuthnRequest
+  - af3b271 Update test for Net::SAML2::Protocol::AuthnRequest
+  - ed64638 Fix NAME segment of POD for modules.
+  - c83527e v0.71
+  - 914aafb Forgot to increment main module version
+  - 1292296 Increment version and update LICENSE file
+  - dd2c070 v0.70
+  - 79f1a38 Bump XML::Enc version
+  - faecd40 Fix decrypt for encrypted assertions
+  - 9d389f1 Decrypt an assertion with EncryptedData nodes
+  - ae3888a Fix YAML syntax for linux workflow
+  - 4d73198 Add verification for artifact responses on an attribute ID
+  - 7869a2f Add tests for part encrypted/part decrypted assertions
+  - 466e870 Add key_name function to SP
+  - b4c70d8 testapp: option for acs_url_post in authnRequest
+  - fa6c350 testapp: SingleLogoutService is not indexed
+  - d2cf58a install Module::Pluggable
+  - 2dfb0c1 Remove Pari Install from github action
+  - 8932955 Bump requirement for XML::Generator
+  - 11ba40d Create AuthnStatement object
+  - 488a234 ADFS fully tested again and update repo version
+  - 9dbd114 Fixes #169 tests fail when PERL_LWP_SSL_CA_* or HTTPS_CA_* env vars are set
+  - a9aca61 Add XML declartion to generate_metadata
+  - 7cfe56a Configure SP without Single Logout Service
+  - ef16349 Fix version for release
+  - accfc66 v0.69
+
+0.72 -- Fri Jul 07 22:33:42 ADT 2023
+
+  [ Significant Changes since 0.69 ]
+
+  - All changes from 0.71 plus:
+  - e04cc05 Fix typo for AuthnRequest Assertion namespace
+  - ebef6bc Increment version for a release
+  - 2d815e0 Add scoping to Net::SAML2::Protocol::AuthnRequest
+  - af3b271 Update test for Net::SAML2::Protocol::AuthnRequest
+  - ed64638 Fix NAME segment of POD for modules.
+
+0.71 -- Tue Jul 04 23:14:07 ADT 2023
+
+  [ Significant Changes since 0.69 ]
+  - Re-release 0.70 to ensure all commits were included
+  - Quite a few changes and improvements including
+  - Support to obtain information about the AuthnStatement from the Assertion
+  - Function to obtain key_name added to the SP
+  - Verification of artifact responses based on an attribute ID ( via XML::Sig 0.64)
+  - Improve Decryption of EncryptedData nodes for Assertions (via XML::Enc 0.12 and up)
+  - Bumps the requirements new versions of:
+  - XML::Enc => "0.12",
+  - XML::Sig => "0.64",
+  - XML::Generator => "1.13"
+
+  - Miscelaneous:
+  - testapp bug fixes and improvements
+  - Github action improvements
+  - Tested ADFS IdP again
+  - Fixed issue DAKKAR reported to LWP::UserAgent Environment Variables
+
+  [ Change Log ]
+  - 914aafb Forgot to increment main module version
+  - 1292296 Increment version and update LICENSE file
+  - dd2c070 v0.70
+  - 79f1a38 Bump XML::Enc version
+  - faecd40 Fix decrypt for encrypted assertions
+  - 9d389f1 Decrypt an assertion with EncryptedData nodes
+  - ae3888a Fix YAML syntax for linux workflow
+  - 4d73198 Add verification for artifact responses on an attribute ID
+  - 7869a2f Add tests for part encrypted/part decrypted assertions
+  - 466e870 Add key_name function to SP
+  - b4c70d8 testapp: option for acs_url_post in authnRequest
+  - fa6c350 testapp: SingleLogoutService is not indexed
+  - d2cf58a install Module::Pluggable
+  - 2dfb0c1 Remove Pari Install from github action
+  - 8932955 Bump requirement for XML::Generator
+  - 11ba40d Create AuthnStatement object
+  - 488a234 ADFS fully tested again and update repo version
+  - 9dbd114 Fixes #169 tests fail when PERL_LWP_SSL_CA_* or HTTPS_CA_* env vars are set
+  - a9aca61 Add XML declartion to generate_metadata
+  - 7cfe56a Configure SP without Single Logout Service
+  - ef16349 Fix version for release
+  - accfc66 (timlegge/master) v0.69
+
+0.70 -- Tue Jul 04 22:12:49 ADT 2023
+
+  [ Significant Changes since 0.69 ]
+
+  - Quite a few changes and improvements including
+  - Support to obtain information about the AuthnStatement from the Assertion
+  - Function to obtain key_name added to the SP
+  - Verification of artifact responses based on an attribute ID ( via XML::Sig 0.64)
+  - Improve Decryption of EncryptedData nodes for Assertions (via XML::Enc 0.12 and up)
+  - Bumps the requirements new versions of:
+  - XML::Enc => "0.12",
+  - XML::Sig => "0.64",
+  - XML::Generator => "1.13"
+
+  - Miscelaneous:
+  - testapp bug fixes and improvements
+  - Github action improvements
+  - Tested ADFS IdP again
+  - Fixed issue DAKKAR reported to LWP::UserAgent Environment Variables
+
+  [ Change Log ]
+  - 9d389f1 Decrypt an assertion with EncryptedData nodes
+  - ae3888a Fix YAML syntax for linux workflow
+  - 4d73198 Add verification for artifact responses on an attribute ID
+  - 7869a2f Add tests for part encrypted/part decrypted assertions
+  - 466e870 Add key_name function to SP
+  - b4c70d8 testapp: option for acs_url_post in authnRequest
+  - fa6c350 testapp: SingleLogoutService is not indexed
+  - d2cf58a install Module::Pluggable
+  - 2dfb0c1 Remove Pari Install from github action
+  - 8932955 Bump requirement for XML::Generator
+  - 11ba40d Create AuthnStatement object
+  - 488a234 ADFS fully tested again and update repo version
+  - 9dbd114 Fixes #169 tests fail when PERL_LWP_SSL_CA_* or HTTPS_CA_* env vars are set
+  - a9aca61 Add XML declartion to generate_metadata
+  - 7cfe56a Configure SP without Single Logout Service
+  - ef16349 Fix version for release
+  - accfc66 (timlegge/master) v0.69
+
 0.69 -- Tue Apr 04 20:20:22 ADT 2023
 
   [ Significant Changes since 0.67 ]

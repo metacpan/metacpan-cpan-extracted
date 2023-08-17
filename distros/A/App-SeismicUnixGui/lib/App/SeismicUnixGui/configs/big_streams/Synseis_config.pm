@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::Synseis_config;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: Synseis_config.pm 
+ PERL PROGRAM NAME: Synseis_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: 
        Jan 31 2018

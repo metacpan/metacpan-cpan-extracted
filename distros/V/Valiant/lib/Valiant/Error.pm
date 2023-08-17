@@ -51,7 +51,6 @@ around BUILDARGS => sub {
 
   # Pull the main attributes out of the options hashref
   my ($object, $attribute, $type, $i18n, $set_options, $bad_value) = delete @{$options}{qw/object attribute type i18n options bad_value/};
-
   # Get the i18n from options if passed, otherwise from the model if the model so
   # defines it, lastly just make one if we need it.
   $i18n ||= $object->can('i18n') ?
@@ -109,9 +108,9 @@ sub full_message {
   my @defaults = ();
   if($object->can('i18n_scope')) {
     $attribute =~s/\.\d+//g;
+    $attribute =~s/\[\d+\]//g;
     my $i18n_scope = $object->i18n_scope;
     my @parts =  split '\.', $attribute; # For nested attributes
-    #TODO remove array indexes [\d]
     my $attribute_name = pop @parts;
     my $namespace = join '/', @parts if @parts;
     my $attributes_scope = "${i18n_scope}.errors.models";
@@ -144,13 +143,14 @@ sub full_message {
   my $attr_name = do {
     my $human_attr = $attribute;
     $human_attr =~s/\./ /g;
+    $human_attr =~s/\[\d+\]//g;
     $human_attr =~s/_id$//; # remove trailing _id
     $human_attr =~s/_/ /g;
     $human_attr = autoformat $human_attr, {case=>'title'};
     $human_attr =~s/[\n]//g; # Is this a bug in Text::Autoformat???
     $human_attr;
   };
-  
+
   $attr_name = $object->human_attribute_name($attribute, +{default=>$attr_name});
 
   return my $translated = $i18n->translate(
@@ -176,15 +176,21 @@ sub generate_message {
   $options ||= +{};
   $type = delete $options->{message} if $i18n->is_i18n_tag($options->{message}||'');
 
+  my $local_attribute;
+  if(defined $attribute) {
+    $local_attribute = $attribute if defined $attribute;
+    $local_attribute =~s/\[\d+\]//g;
+  }
+
   # There's only a value associated with this error if there is an attribute
   # as well.  Otherwise its just an error on the model as a whole
-  my $value = defined($attribute) ? 
-    $object->read_attribute_for_validation($attribute) :
+  my $value = defined($local_attribute) ? 
+    $object->read_attribute_for_validation($local_attribute) :
     undef;
 
   my %options = (
     model => $object->model_name->human,
-    attribute => defined($attribute) ? $object->human_attribute_name($attribute, $options) : undef,
+    attribute => defined($local_attribute) ? $object->human_attribute_name($local_attribute, $options) : undef,
     value => $value,
     object => $object,
     %{$options||+{}},
@@ -193,12 +199,6 @@ sub generate_message {
   my @defaults = ();
   if($object->can('i18n_scope')) {
     my $i18n_scope = $object->i18n_scope;
-    my $local_attribute;
-    if(defined $attribute) {
-      $local_attribute = $attribute if defined $attribute;
-      $local_attribute =~s/\[\d+\]//g;
-    }
-
     @defaults = map {
       my $class = $_;
       (defined($local_attribute) ? "${i18n_scope}.errors.models.${\$class->model_name->i18n_key}.attributes.${local_attribute}.${$type}" : ()),
@@ -209,7 +209,7 @@ sub generate_message {
     push @defaults, "${i18n_scope}.errors.messages.${$type}";
   }
 
-  push @defaults, "errors.attributes.${attribute}.${$type}" if defined($attribute);
+  push @defaults, "errors.attributes.${local_attribute}.${$type}" if defined($local_attribute);
   push @defaults, "errors.messages.${$type}";
 
   @defaults = map { $i18n->make_tag($_) } @defaults;

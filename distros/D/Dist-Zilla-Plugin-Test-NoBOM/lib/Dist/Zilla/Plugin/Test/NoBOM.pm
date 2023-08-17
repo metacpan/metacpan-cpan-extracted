@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Test::NoBOM;
-$Dist::Zilla::Plugin::Test::NoBOM::VERSION = '0.002';
+$Dist::Zilla::Plugin::Test::NoBOM::VERSION = '0.003';
 
 # ABSTRACT: Author tests that ensure BOM is not used
 # KEYWORDS: plugin test testing author development BOM
@@ -42,7 +42,7 @@ has _file_obj => (
 );
 
 sub mvp_multivalue_args { qw(files) }
-sub mvp_aliases { return { file => 'files' } }
+sub mvp_aliases         { return { file => 'files' } }
 
 sub register_prereqs {
     my $self = shift;
@@ -108,7 +108,7 @@ Dist::Zilla::Plugin::Test::NoBOM - Author tests that ensure BOM is not used
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ Gregor Goldbach <glauschwuffel@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gregor Goldbach.
+This software is copyright (c) 2023 by Gregor Goldbach.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

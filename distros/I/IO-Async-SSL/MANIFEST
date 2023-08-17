@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/delayed_sclient.pl

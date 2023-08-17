@@ -1,3 +1,11 @@
+Thu Jul 20 07:47:36 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.64 - get_location_constraint() ]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	(get_location_constraint): content already decoded
+
 Mon Apr 17 08:07:13 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.63 - pass -key to Crypt::CBC]:

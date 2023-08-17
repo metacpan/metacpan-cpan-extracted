@@ -1,0 +1,35 @@
+requires 'perl' => 5.14.0;
+requires 'indirect' => 0.36;
+requires 'multidimensional' => 0.011;
+requires 'strictures' => 1.0;
+requires 'Text::Diff' => 1.37;
+requires 'UI::Various' => 0.37;
+
+# Unfortunately apparently cpanfile does not support the syntax of
+# Module::Install::External, but we still add those as comment:
+#requires_external_bin 'cp';
+#requires_external_bin 'id';
+#requires_external_bin 'lxc-attach';
+#requires_external_bin 'lxc-execute';
+#requires_external_bin 'lxc-ls';
+#requires_external_bin 'sh';
+#requires_external_bin 'tty';
+
+recommends 'Tk' => "804.030";
+
+on 'test' => sub {
+    requires 'Test::More'   => 0.98;
+    requires 'Test::Output' => 1.01;
+    requires 'Test::Warn'   => 0.23;
+};
+
+on 'develop' => sub {
+    requires 'Minilla';
+};
+
+# needed, but mocked during test (especially smoke-tests):
+#on 'runtime' => sub {
+    #requires_external_bin 'nft';
+    #requires_external_bin 'su';
+    #requires_external_bin 'xauth';
+#};

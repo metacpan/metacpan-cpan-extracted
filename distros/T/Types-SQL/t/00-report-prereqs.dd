@@ -37,7 +37,7 @@ do { my $x = {
                                       'Type::Utils' => '0.44',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => 'v5.14.0',
                                       'version' => '0.77'
                                     }
                     },

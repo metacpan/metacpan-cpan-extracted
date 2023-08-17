@@ -1,0 +1,8 @@
+Version 0.002 - 2023-07-11
+
+  - Fix bug in hiding steps which use a step range
+
+
+Version 0.001 - 2023-07-11
+
+  - Initial release, mostly working

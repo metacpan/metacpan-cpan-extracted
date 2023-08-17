@@ -84,6 +84,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.75",
+   "version" : "0.77",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

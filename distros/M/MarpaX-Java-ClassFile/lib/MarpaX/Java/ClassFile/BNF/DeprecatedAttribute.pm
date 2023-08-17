@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of an deprecated attribute
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -58,7 +58,7 @@ MarpaX::Java::ClassFile::BNF::DeprecatedAttribute - Parsing of an deprecated att
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

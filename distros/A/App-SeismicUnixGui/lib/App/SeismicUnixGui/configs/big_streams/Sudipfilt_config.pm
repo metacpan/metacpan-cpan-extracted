@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::Sudipfilt_config;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: Sudipfilt_config.pm
+ PERL PROGRAM NAME: Sudipfilt_config.pm
  AUTHOR: Juan Lorenzo
  DATE: 	 July 1 2016 
  	   

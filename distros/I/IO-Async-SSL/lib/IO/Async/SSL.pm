@@ -1,15 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package IO::Async::SSL;
+package IO::Async::SSL 0.25;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.24';
-$VERSION = eval $VERSION;
 
 use Carp;
 
@@ -20,7 +17,7 @@ use IO::Socket::SSL 2.003 qw( $SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE ); # defau
 
 use Future 0.33; # ->catch_with_f
 use IO::Async::Handle 0.29;
-use IO::Async::Loop '0.61'; # new Listen API
+use IO::Async::Loop 0.61; # new Listen API
 
 =head1 NAME
 

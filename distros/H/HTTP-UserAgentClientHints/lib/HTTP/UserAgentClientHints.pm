@@ -4,7 +4,7 @@ use warnings;
 use HTTP::UserAgentClientHints::BrandVersion;
 use HTTP::UserAgentClientHints::Util;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $HTTP_HEADER_PREFIX = 'Sec-CH-UA';
 
@@ -126,12 +126,30 @@ HTTP::UserAgentClientHints - To Handle User Agent Client Hints
 
 =head1 SYNOPSIS
 
+This is an example of C<app.psgi> application with C<HTTP::UserAgentclientHints>.
+
+    use strict;
+    use warnings;
+    use Plack::Request;
     use HTTP::UserAgentClientHints;
 
-    my $uach = HTTP::UserAgentClientHints->new($headers);
-    print $uach->platform;
+    my $app = sub {
+        my $env = shift;
 
-    $headers->header('Accept-CH' => $uach->accept_ch);
+        my $req = Plack::Request->new($env);
+        my $uach = HTTP::UserAgentClientHints->new($req->headers);
+
+        return [
+            200,
+            [
+                "Content-Type", "text/plain",
+                "Accept-CH", $uach->accept_ch,
+            ],
+            [$uach->platform || ''],
+        ];
+    };
+
+Within a browser it supports UA-CH, then a response will include a platform information.
 
 
 =head1 DESCRIPTION
@@ -216,7 +234,7 @@ To get a string for C<Accept-CH> header in order to request UA-CH. By default, t
 
 =begin html
 
-<a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/README.pod"><img src="https://img.shields.io/badge/Version-0.05-green?style=flat"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/actions"><img src="https://github.com/bayashi/HTTP-UserAgentClientHints/workflows/main/badge.svg?_t=1681289447"/></a> <a href="https://coveralls.io/r/bayashi/HTTP-UserAgentClientHints"><img src="https://coveralls.io/repos/bayashi/HTTP-UserAgentClientHints/badge.png?_t=1681289447&branch=main"/></a>
+<a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/README.md"><img src="https://img.shields.io/badge/Version-0.06-green?style=flat"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/actions"><img src="https://github.com/bayashi/HTTP-UserAgentClientHints/workflows/main/badge.svg?_t=1691717315"/></a> <a href="https://coveralls.io/r/bayashi/HTTP-UserAgentClientHints"><img src="https://coveralls.io/repos/bayashi/HTTP-UserAgentClientHints/badge.png?_t=1691717315&branch=main"/></a>
 
 =end html
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.16';
+our $VERSION='0.17';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';

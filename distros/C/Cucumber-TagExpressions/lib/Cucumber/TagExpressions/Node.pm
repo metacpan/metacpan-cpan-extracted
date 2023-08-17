@@ -1,6 +1,6 @@
 
 package Cucumber::TagExpressions::Node;
-$Cucumber::TagExpressions::Node::VERSION = '4.1.0';
+$Cucumber::TagExpressions::Node::VERSION = '5.0.6';
 =head1 NAME
 
 Cucumber::TagExpressions::Node - Cucumber Tag expression components
@@ -55,7 +55,7 @@ sub stringify { }
 =cut
 
 package Cucumber::TagExpressions::LiteralNode {
-$Cucumber::TagExpressions::LiteralNode::VERSION = '4.1.0';
+$Cucumber::TagExpressions::LiteralNode::VERSION = '5.0.6';
 =head2 Cucumber::TagExpressions::LiteralNode
 
 =head3 DESCRIPTION
@@ -86,12 +86,12 @@ The tag to test presence for.
     sub stringify {
         my ( $self ) = @_;
 
-        return $self->tag;
+        return ($self->tag =~ s/([ ()\\])/\\$1/gr);
     }
 }
 
 package Cucumber::TagExpressions::AndNode {
-$Cucumber::TagExpressions::AndNode::VERSION = '4.1.0';
+$Cucumber::TagExpressions::AndNode::VERSION = '5.0.6';
 =head2 Cucumber::TagExpressions::AndNode
 
 =head3 DESCRIPTION
@@ -112,7 +112,7 @@ The sub-expressions to evaluate.
     # 'use Moo' implies 'use strict; use warnings;'
     extends 'Cucumber::TagExpressions::Node';
 
-    use List::Util qw( all );
+    use List::Util qw( all reduce );
 
     has terms => ( is => 'ro', required => 1 );
 
@@ -125,14 +125,15 @@ The sub-expressions to evaluate.
     sub stringify {
         my ( $self ) = @_;
 
-        return join('', '(and ',
-                    join(' ', map { $_->stringify } @{ $self->terms } ),
-                    ')');
+        return
+            reduce { '( ' . $a . ' and ' . $b . ' )' }
+            map { $_->stringify }
+            @{ $self->terms };
     }
 }
 
 package Cucumber::TagExpressions::OrNode {
-$Cucumber::TagExpressions::OrNode::VERSION = '4.1.0';
+$Cucumber::TagExpressions::OrNode::VERSION = '5.0.6';
 =head2 Cucumber::TagExpressions::OrNode
 
 =head3 DESCRIPTION
@@ -153,7 +154,7 @@ The sub-expressions to evaluate.
     # 'use Moo' implies 'use strict; use warnings;'
     extends 'Cucumber::TagExpressions::Node';
 
-    use List::Util qw( any );
+    use List::Util qw( any reduce );
 
     has terms => ( is => 'ro', required => 1 );
 
@@ -166,14 +167,15 @@ The sub-expressions to evaluate.
     sub stringify {
         my ( $self ) = @_;
 
-        return join('', '(or ',
-                    join(' ', map {$_->stringify} @{ $self->terms } ),
-                    ')');
+        return
+            reduce { '( ' . $a . ' or ' . $b . ' )' }
+            map { $_->stringify }
+            @{ $self->terms };
     }
 }
 
 package Cucumber::TagExpressions::NotNode {
-$Cucumber::TagExpressions::NotNode::VERSION = '4.1.0';
+$Cucumber::TagExpressions::NotNode::VERSION = '5.0.6';
 =head2 Cucumber::TagExpressions::NotNode
 
 =head3 DESCRIPTION
@@ -203,13 +205,17 @@ The wrapped node class instance for which to negate the result.
 
     sub stringify {
         my ( $self ) = @_;
-
-        return '(not ' . $self->expression->stringify . ')';
+        if ($self->expression->isa('Cucumber::TagExpressions::AndNode') ||
+            $self->expression->isa('Cucumber::TagExpressions::OrNode')) {
+            # -- HINT: Binary Operators already have already '( ... )'.
+            return 'not ' . $self->expression->stringify;
+        }
+        return 'not ( ' . $self->expression->stringify . ' )';
     }
 }
 
 package Cucumber::TagExpressions::ExpressionNode {
-$Cucumber::TagExpressions::ExpressionNode::VERSION = '4.1.0';
+$Cucumber::TagExpressions::ExpressionNode::VERSION = '5.0.6';
 =head2 Cucumber::TagExpressions::ExpressionNode
 
 =head3 DESCRIPTION
@@ -236,12 +242,14 @@ An instance of one of the other node class types.
         my $tags = (ref $tags[0] and ref $tags[0] eq 'HASH') ? $tags[0]
             : { map { $_ => 1 } @tags };
 
+        return 1==1 if not defined $self->sub_expression;
         return not not $self->sub_expression->evaluate( $tags );
     }
 
     sub stringify {
         my ( $self ) = @_;
 
+        return 'true' if not defined $self->sub_expression;
         return $self->sub_expression->stringify;
     }
 }

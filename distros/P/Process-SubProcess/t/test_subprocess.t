@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 # @author Bodo (Hugo) Barwich
-# @version 2020-09-06
+# @version 2023-07-06
 # @package Test for the Process::SubProcess Module
-# @subpackage test_subprocess.t
+# @subpackage t/test_subprocess.t
 
 # This Module runs tests on the Process::SubProcess Module
 #

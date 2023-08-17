@@ -37,6 +37,7 @@ patches/4.2-add-callbacksto-extend-customfields-capabilities.patch
 patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
 patches/4.4.2-add-callbacks-to-extend-customfields-capabilities.patch
 patches/5.0-add-callbacks-to-extend-customfields-capabilities.patch
+patches/5.0.4-add-callbacks-to-extend-customfields-capabilities.patch
 README
 README.md
 static/js/conditional-customfields.js

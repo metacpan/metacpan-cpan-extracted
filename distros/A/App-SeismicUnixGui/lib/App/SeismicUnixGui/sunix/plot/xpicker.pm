@@ -5,7 +5,7 @@
 
 =head2 SYNOPSIS
 
-PACKAGE NAME:  XPICKER - X wiggle-trace plot of f(x1,x2) via Bitmap with PICKing	
+PERL PROGRAM NAME:  XPICKER - X wiggle-trace plot of f(x1,x2) via Bitmap with PICKing	
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:

@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
 
-    On a suitable perl version:
+    On Perl v5.38 or later:
 
+       use v5.38;
        use Syntax::Operator::Equ;
     
        if($x equ $y) {
@@ -16,7 +17,7 @@ SYNOPSIS
           say "i and j are both undef, or both defined and equal numbers";
        }
 
-    Or, on a standard perl via Syntax::Keyword::Match:
+    Or via Syntax::Keyword::Match on Perl v5.14 or later:
 
        use v5.14;
        use Syntax::Keyword::Match;
@@ -40,16 +41,16 @@ DESCRIPTION
     operand is, or otherwise behave the same as the regular string or
     number equality tests if both operands are defined.
 
-    Current stable versions of perl do not directly support custom infix
-    operators, but the ability was added in the 5.37.x development cycle
-    and is available from perl v5.37.7 onwards. The documentation of
-    XS::Parse::Infix describes the situation in more detail. This module is
-    therefore almost entirely useless on stable perl builds. While the
-    regular parser does not support custom infix operators, they are
-    supported via XS::Parse::Infix and hence XS::Parse::Keyword, and so
-    custom keywords which attempt to parse operator syntax may be able to
-    use it. One such module is Syntax::Keyword::Match; see the SYNOPSIS
-    example given above.
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+    While Perl versions before this do not support custom infix operators,
+    they can still be used via XS::Parse::Infix and hence
+    XS::Parse::Keyword. Custom keywords which attempt to parse operator
+    syntax may be able to use these. One such module is
+    Syntax::Keyword::Match; see the SYNOPSIS example given above.
 
 OPERATORS
 
@@ -98,6 +99,10 @@ FUNCTIONS
        my $equal = is_numequ( $lhs, $rgh );
 
     A function version of the "===" numerical operator.
+
+SEE ALSO
+
+      * Syntax::Operator::Eqr - string equality and regexp match operator
 
 AUTHOR
 

@@ -6,7 +6,6 @@ use Module::Runtime ();
 use Valiant::I18N;
 
 with 'Valiant::Naming';
-
 # Non public helper methods
 
 sub set_unless_defined {
@@ -37,7 +36,15 @@ has tag_helpers => (
     return Module::Runtime::use_module('Valiant::HTML::Util::Form')->new(%args);
   }
 
-has _theme => ( is => 'rw', required => 1, init_arg=>'theme', default => sub { +{} } );
+has theme => ( is => 'ro', required => 1, lazy =>1, builder => '_build_theme' );
+
+  sub _build_theme {
+    my ($self) = @_;
+    my $theme = $self->can('default_theme') ? $self->default_theme : +{};
+    my $view_theme = $self->view->can('formbuilder_theme') ? $self->view->formbuilder_theme : +{};
+    return +{ %$theme, %$view_theme };
+  }
+
 has _nested_child_index => (is=>'rw', init_arg=>undef, required=>1, default=>sub { +{} });
 
 around BUILDARGS => sub {
@@ -56,12 +63,6 @@ sub DEFAULT_COLLECTION_CHECKBOX_BUILDER { return 'Valiant::HTML::FormBuilder::Ch
 sub DEFAULT_COLLECTION_RADIO_BUTTON_BUILDER { return 'Valiant::HTML::FormBuilder::RadioButton' }
 
 sub id { return shift->options->{id} }
-
-sub theme {
-  my ($self) = @_;
-  my $default_theme = $self->can('default_theme') ? $self->default_theme : +{};
-  return +{ %$default_theme, %{$self->_theme} };
-}
 
 sub nested_child_index {
   my ($self, $attribute) = @_;
@@ -101,6 +102,13 @@ sub human_name_for_attribute {
   return $self->model->can('human_attribute_name') ?
     $self->model->human_attribute_name($attribute) :
       $self->tag_helpers->_humanize($attribute);
+}
+
+sub human_name_for_label {
+  my ($self, $label) = @_;
+  return $self->model->can('human_label_name') ?
+    $self->model->human_label_name($label) :
+      $self->tag_helpers->_humanize($label);
 }
 
 sub attribute_has_errors {
@@ -162,7 +170,7 @@ sub model_errors {
   my $show_message_on_field_errors = delete $options->{show_message_on_field_errors};
 
   if(
-    $self->model->has_errors &&     # We have errors
+    $self->_model_has_errors &&     # We have errors
     # !scalar(@errors) &&             # but no model errorsS_VIEW
     ($show_message_on_field_errors)   # And a default model error
   ) {
@@ -178,9 +186,15 @@ sub model_errors {
   return $error_content;
 }
 
+sub _model_has_errors {
+  my ($self) = @_;
+  return $self->model->has_errors if $self->model->can('has_errors');
+  return 0;
+}
 sub _get_model_errors {
   my ($self) = @_;
-  return my @errors = $self->model->errors->model_messages;
+  return my @errors = $self->model->errors->model_messages if $self->model->can('errors');
+  return ();
 }
 
 sub _generate_default_model_error {
@@ -210,7 +224,7 @@ sub _default_model_errors_content {
 
 sub merge_theme {
   my ($self, %theme) = @_;
-  $self->_theme(+{ %{$self->_theme}, %theme });
+  $self->theme(+{ %{$self->theme}, %theme });
 }
 
 sub merge_theme_field_opts {
@@ -246,11 +260,13 @@ sub label {
 
   $options = $self->merge_theme_field_opts(label=>$attribute, $options);
 
+  my $label ='';
   if((ref($content)||'') eq 'CODE') {
-    return $self->tag_helpers->label_tag($attribute, $self->process_options($attribute, $options), sub { $content->($translated_attribute) } );
+    $label = $self->tag_helpers->label_tag($attribute, $self->process_options($attribute, $options), sub { $content->($translated_attribute) } );
   } else {
-    return $self->tag_helpers->label_tag($attribute, $content, $self->process_options($attribute, $options));
+    $label = $self->tag_helpers->label_tag($attribute, $content, $self->process_options($attribute, $options));
   }
+  return $label;
 }
 
 # $fb->errors_for($attribute)
@@ -267,26 +283,32 @@ sub errors_for {
   }
   $options = $self->merge_theme_field_opts(errors_for=>$attribute, $options);
 
-  die "Can't display errors on a model that doesn't support the errors method" unless $self->model->can('errors');
+  return '' unless $self->model->can('errors');
 
   my @errors = $self->model->errors->full_messages_for($attribute);
-  return '' unless @errors;
+  return '' unless scalar(@errors);
   
   my $max_errors = exists($options->{max_errors}) ? delete($options->{max_errors}) : undef;
   @errors = @errors[0..($max_errors-1)] if($max_errors);
-  $content = $self->_default_errors_for_content($self->process_options($attribute, $options)) unless defined($content);
+  $options = $self->process_options($attribute, $options);
+  $content = $self->_default_errors_for_content($options) unless defined($content);
 
-  return $content->(@errors);  
+  my $response = $self->view->safe('');
+  $response = $content->(@errors) if @errors;
+
+  return $response;
 }
 
 sub _default_errors_for_content {
   my ($self, $options) = @_;
   return sub {
     my (@errors) = @_;
+
     if( scalar(@errors) == 1 ) {
-       return $self->tag_helpers->content_tag('div', $errors[0], $options);
+       return $self->tag_helpers->content_tag('div', $errors[0], {%$options, data=>{error_param=>1}});
     } else {
-       return $self->tag_helpers->content_tag('ol', $options, sub { map { $self->tag_helpers->content_tag('li', $_) } @errors });
+      my @li_content = map { $self->tag_helpers->content_tag('li', $_, {data=>{error_param=>1}}) } @errors;
+      return $self->tag_helpers->content_tag('ol', $self->view->safe_concat(@li_content), $options);
     }
   }
 }
@@ -318,20 +340,35 @@ sub process_options {
 sub input {
   my ($self, $attribute, $options) = (shift, shift, (@_ ? shift : +{}));
   $options = $self->merge_theme_field_opts($options->{type} || 'input', $attribute, $options);
-  my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
+
+  my %flags = ();
+  $flags{force_validity} = delete $options->{force_validity} if exists $options->{force_validity};
+  $flags{errors_classes} = delete $options->{errors_classes} if exists $options->{errors_classes};
+
+  my $response = $self->_input($attribute, $options, \%flags);
+  return $response;
+}
+
+sub _input {
+  my ($self, $attribute, $html_attrs, $flags) = @_;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
+  my $valid = 1;
+  if(exists($flags->{force_validity})) {
+    $valid = $flags->{force_validity};
+  } elsif($model->can('errors')) {
+    $valid = $model->errors->where($attribute) ? 0 : 1;
+  }
 
-  $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
-    if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
+  $html_attrs->{class} = join(' ', (grep { defined $_ } $html_attrs->{class}, $flags->{errors_classes}))
+    if $flags->{errors_classes} && !$valid;
 
-  set_unless_defined(type => $options, 'text');
-  set_unless_defined(id => $options, $self->tag_id_for_attribute($attribute));
-  set_unless_defined(name => $options, $self->tag_name_for_attribute($attribute));
-  $options->{value} = $self->tag_value_for_attribute($attribute) unless defined($options->{value});
+  set_unless_defined(type => $html_attrs, 'text');
+  set_unless_defined(id => $html_attrs, $self->tag_id_for_attribute($attribute));
+  set_unless_defined(name => $html_attrs, $self->tag_name_for_attribute($attribute));
+  $html_attrs->{value} = $self->tag_value_for_attribute($attribute) unless defined($html_attrs->{value});
+  $html_attrs = $self->process_options($attribute, $html_attrs);
 
-  $options = $self->process_options($attribute, $options);
-
-  return $self->tag_helpers->input_tag($attribute, $options);
+  my $response = $self->tag_helpers->input_tag($attribute, $html_attrs);
 }
 
 sub password {
@@ -710,7 +747,7 @@ sub collection_select {
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1;
   $collection = $model->$collection unless Scalar::Util::blessed($collection); 
 
-  my (@selected, $name, $id) = @_;
+  my (@selected, $name, $id) = ();
   if(ref $method_proto) {
     $options->{multiple} = 1 unless exists($options->{multiple});
     $options->{include_hidden} = 0 unless exists($options->{include_hidden}); # Avoid adding two
@@ -740,7 +777,7 @@ sub collection_select {
     }
 
     $name = $self->tag_name_for_attribute($method_proto);
-    $id = $self->tag_id_for_attribute($method_proto);
+    $options->{id} = $id = $self->tag_id_for_attribute($method_proto);
   }
   
   my @disabled = ( @{delete($options->{disabled})||[]});
@@ -779,9 +816,10 @@ sub collection_checkbox {
   my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
 
   # It's either +{ person_roles => role_id } or roles
-  my ($attribute, $attribute_value_method) = ();
+  my ($attribute, $attribute_value_method, $is_spec_attribute) = ();
   if( (ref($attribute_spec)||'') eq 'HASH' ) {
     ($attribute, $attribute_value_method) = (%{ $attribute_spec });
+    $is_spec_attribute = 1;
   } else {
     $attribute = $attribute_spec;
     $attribute_value_method = $value_method;
@@ -791,11 +829,19 @@ sub collection_checkbox {
 
   my @checked_values = ();
   my $value_collection = $self->tag_value_for_attribute($attribute);
-  $value_collection = $self->tag_helpers->array_to_collection(map { $_->can('to_model') ? $_->to_model : $_ } @$value_collection)
+  $value_collection = $self->tag_helpers->array_to_collection(map { Scalar::Util::blessed($_) && $_->can('to_model') ? $_->to_model : $_ } @$value_collection)
     if (ref($value_collection)||'') eq 'ARRAY';
 
   while(my $value_model = $value_collection->next) {
-    push @checked_values, $value_model->$attribute_value_method unless $value_model->can('is_marked_for_deletion') && $value_model->is_marked_for_deletion;
+    if($value_model->can($attribute_value_method)) {
+      push @checked_values, $value_model->$attribute_value_method
+        unless $value_model->can('is_marked_for_deletion') && $value_model->is_marked_for_deletion;
+    } elsif($value_model->isa('Valiant::HTML::Util::Collection::Item') && $value_model->can('value')) {
+      push @checked_values, $value_model->value
+        unless $value_model->can('is_marked_for_deletion') && $value_model->is_marked_for_deletion;
+    }else {
+      warn "Can't find value for " . ref($value_model) . " for $attribute";
+    }
   }
 
   my @checkboxes = ();
@@ -807,6 +853,7 @@ sub collection_checkbox {
     parent_builder => $self,
     attribute => $attribute,
     tag_helpers => $self->tag_helpers,
+    is_spec_attribute => $is_spec_attribute,
     errors => [$model->errors->where($attribute)],
   };
   $checkbox_builder_options->{namespace} = $self->namespace if $self->has_namespace;
@@ -814,7 +861,7 @@ sub collection_checkbox {
   $collection = $model->$collection unless Scalar::Util::blessed($collection);
 
   while (my $checkbox_model = $collection->next) {
-    my $index = $self->nested_child_index($attribute); 
+    #my $index = $self->nested_child_index($attribute); 
     my $name = "@{[ $self->name ]}.${attribute}";
     my $checked = grep {
       my $current_value = $checkbox_model->can('read_attribute_for_html') ? 
@@ -824,12 +871,12 @@ sub collection_checkbox {
     } @checked_values;
 
     if($include_hidden && !scalar(@checkboxes)) { # Add nop as first to handle empty list
-      my $hidden_fb = $self->tag_helpers->_instantiate_builder($name, $value_collection->build, {%$checkbox_builder_options, index=>$index});
-      push @checkboxes, $hidden_fb->hidden('_nop', +{value=>'1'});
-      $index = $self->nested_child_index($attribute);
+      my $hidden_fb = $self->tag_helpers->_instantiate_builder($name, $value_collection->build, {%$checkbox_builder_options});
+      my $hidden_value = $self->_collection_checkbox_hidden_value($attribute, $is_spec_attribute, $options); 
+      push @checkboxes, $hidden_fb->hidden($name, +{name=>$name, id=>$self->tag_id_for_attribute($attribute).'_hidden', value=>$hidden_value});
     }
 
-    $checkbox_builder_options->{index} = $index;
+    #$checkbox_builder_options->{index} = $index;
     $checkbox_builder_options->{checked} = $checked;
     $checkbox_builder_options->{parent_builder} = $self;
     my $checkbox_fb = $self->tag_helpers->_instantiate_builder($name, $checkbox_model, $checkbox_builder_options);
@@ -846,6 +893,12 @@ sub collection_checkbox {
     id => $self->tag_id_for_attribute($attribute),
     %$options,
   }); 
+}
+
+sub _collection_checkbox_hidden_value {
+  my ($self, $attribute, $is_spec_attribute, $options) = @_;
+  my $value = $is_spec_attribute ? '{"_nop":""}' : '';
+  return $value;
 }
 
 sub _default_collection_checkbox_content {
@@ -932,8 +985,13 @@ sub _default_collection_radio_buttons_content {
 
 sub radio_buttons {
   my ($self, $attribute, $collection_proto) = (shift, shift, shift);
-  $collection_proto = $self->model->$collection_proto unless (ref($collection_proto)||'') eq 'ARRAY';
-  my $collection = $self->tag_helpers->array_to_collection(@$collection_proto);
+
+  my $collection;
+  $collection = $self->model->$collection_proto if (ref(\$collection_proto)||'') eq 'SCALAR';
+  $collection = $self->tag_helpers->array_to_collection(@$collection_proto) if (ref($collection_proto)||'') eq 'ARRAY';
+
+  #$collection_proto = $self->model->$collection_proto unless (ref($collection_proto)||'') eq 'ARRAY';
+  #my $collection = $self->tag_helpers->array_to_collection(@$collection_proto);
   return $self->collection_radio_buttons($attribute, $collection, @_);
 }
 
@@ -1180,6 +1238,13 @@ Examples:
     });
 
 If you pass a scalar as content, the scalar can be a string or a translation tag.
+
+B<Note> Please note this method doesn't show any of the model or field errors,
+it just shows a generic 'form has errors' message.  You can either call the field or
+L</model_errors> methods, or you can loop over errors in the custom complex
+content callback.  Alternatively if you have model level errors for this object
+you might prefer to use the L</model_errors> method with the C<show_message_on_field_errors>
+option.
 
 =head2 model_errors
 
@@ -2034,13 +2099,15 @@ In these examples C<$collection> and C<$roles_collection> can be either a collec
 which is the method name on the current model which provides the collection.
 
     $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label'); 
-    # <input id="person_roles_0__nop" name="person.roles[0]._nop" type="hidden" value="1"/>
-    # <label for="person_roles_1_id">user</label>
-    # <input checked id="person_roles_1_id" name="person.roles[1].id" type="checkbox" value="1"/>
-    # <label for="person_roles_2_id">admin</label>
-    # <input checked id="person_roles_2_id" name="person.roles[2].id" type="checkbox" value="2"/>
-    # <label for="person_roles_3_id">guest</label>
-    # <input id="person_roles_3_id" name="person.roles[3].id" type="checkbox" value="3"/>
+    # <div id="person_roles">
+    #   <input id="person_roles_hidden" name="person.roles" type="hidden" value="{'_nop':1}"/>
+    #   <label for="person_roles_1">user</label>
+    #   <input checked id="person_roles_1" name="person.roles" type="checkbox" value="{'id':1}"/>
+    #   <label for="person_roles_2">admin</label>
+    #   <input checked id="person_roles_2" name="person.roles" type="checkbox" value="{'id':2}"/>
+    #   <label for="person_roles_3">guest</label>
+    #   <input id="person_roles_3" name="person.roles" type="checkbox" value="{'id':3}"/>
+    # </div>
 
 Please note when the $attribute is a collection value we add a hidden field to allow you to send a signal
 to the form processor that this namespace contains no records.   Otherwise the form will just send 
@@ -2057,13 +2124,15 @@ L<Valiant::HTML::FormBuilder::Checkbox>):
               $fb_roles->label({class=>'form-check-label'});
     });
 
-    # <input id="person_roles_4__nop" name="person.roles[4]._nop" type="hidden" value="1"/>
-    # <input checked class="form-check-input" id="person_roles_5_id" name="person.roles[5].id" type="checkbox" value="1"/>
-    # <label class="form-check-label" for="person_roles_5_id">user</label>
-    # <input checked class="form-check-input" id="person_roles_6_id" name="person.roles[6].id" type="checkbox" value="2"/>
-    # <label class="form-check-label" for="person_roles_6_id">admin</label>
-    # <input class="form-check-input" id="person_roles_7_id" name="person.roles[7].id" type="checkbox" value="3"/>
-    # <label class="form-check-label" for="person_roles_7_id">guest</label>
+    # <div id="person_roles">
+    #   <input id="person_roles_hidden" name="person.roles" type="hidden" value="{'_nop':1}"/>
+    #   <label for="person_roles_1" class="form-check-label">user</label>
+    #   <input checked class="form-check-input" id="person_roles_1" name="person.roles" type="checkbox" value="{'id':1}"/>
+    #   <label for="person_roles_2" class="form-check-label">admin</label>
+    #   <input checked class="form-check-input" id="person_roles_2" name="person.roles" type="checkbox" value="{'id':2}"/>
+    #   <label for="person_roles_3" class="form-check-label">guest</label>
+    #   <input  class="form-check-input" id="person_roles_3" name="person.roles" type="checkbox" value="{'id':3}"/>
+    # </div>
 
 In addition to overriding C<checkbox> and C<label> to already contain value and state (if its checked or
 not) information.   This special builder contains some additional methods of possible use, you should see
@@ -2076,9 +2145,9 @@ If provided C<%options> is a hashref of the following optional values
 =item include_hidden
 
 Defaults to whatever the method C<default_collection_checkbox_include_hidden> returns.  In the core code
-the returns true.   If true will include a hidden field set to the name of the collection, which is uses
+this returns true.   If true will include a hidden field set to the name of the collection, which is uses
 to indicate 'no checked values' since HTML will send nothing by default if there's no checked values.  It
-will add this hidden field for each checkbox item to represent the 'off' value.
+will add this hidden field for each checkbox item to represent the 'none checked' value.
 
 =item builder
 
@@ -2192,6 +2261,74 @@ separately.  Example:
 
 Supports using a template subroutine reference (like L</collection_radio_buttons>) when you need to be
 fussy about style and positioning.
+
+=head1 THEMING
+
+You can add a method called C<default_theme> to your custom form builder sub class to return a hashref of default
+attributes for the various form elements.  For example:
+
+    package Example::FormBuilder;
+
+    use Moo;
+    use Example::Syntax;
+
+    extends 'Valiant::HTML::FormBuilder';
+
+    sub default_theme($self) {
+      return +{ 
+        errors_for => +{ class=>'invalid-feedback' },
+        label => +{ class=>'form-label' },
+        input => +{ class=>'form-control', errors_classes=>'is-invalid' },
+        date_field => +{ class=>'form-control', errors_classes=>'is-invalid' },
+        password => +{ class=>'form-control', errors_classes=>'is-invalid' },
+        submit => +{ class=>'btn btn-lg btn-success btn-block' },
+        button => +{ class=>'btn btn-lg btn-primary btn-block' },
+        text_area => +{ class=>'form-control' },
+        checkbox => +{ class=>'form-check-input', errors_classes=>'is-invalid' },
+        collection_radio_buttons => +{errors_classes=>'is-invalid'},
+        collection_checkbox => +{errors_classes=>'is-invalid'},
+        collection_select => +{class=>'form-control', errors_classes=>'is-invalid'},
+        select => +{class=>'form-control', errors_classes=>'is-invalid'},
+        radio_buttons => +{errors_classes=>'is-invalid'},
+        radio_button => +{class=>'custom-control-input', errors_classes=>'is-invalid'},
+        model_errors => +{ class=>'alert alert-danger', role=>'alert' },
+        form_has_errors => +{ class=>'alert alert-danger', role=>'alert' },
+        attributes => {
+          password => {
+            password => { autocomplete=>'new-password' }
+          }
+        },
+      };
+    }
+
+In the above example you set class defaults for most of the form elements based on the method name. In
+addition you can set specific attributes for specific model attributes (as in the 'password' attribute
+at the end of the last example. 
+
+Then you you call a method like C<text_field> it will automatically add the default attributes for that
+element.  For example:
+
+    $fb->input('name');
+    # <input class="form-control" id="person_name" name="person.name" type="text" value="">
+
+If you are using a CSS framework you can use this to setup default (but overridable) classes for the various
+form elements.  For example:
+
+    $fb->input('name', {class=>'form-control form-control-lg'});
+    # <input class="form-control form-control-lg" id="person_name" name="person.name" type="text" value="">
+
+You can instead add a method called C<formbuilder_theme> to your view class which does the same thing but
+allows you to make local view specific customatizations.  If you use both the formbuilder default theme is
+added first and the view theme would override it.
+
+Please note that you are not limited to passing HTML attributes here, you an pass anything that is a valid
+attribute for the form field you are generating.
+
+B<NOTE:> I'm still working out some of the rules around how we merge or override the various themes so if you 
+go wild here you will need to follow the release notes for following versions carefully.   I consider theming
+a beta feature subject to breaking changes if that's what I need to do to fix bugs or make it more flexible.
+
+1;
 
 =head1 SEE ALSO
 

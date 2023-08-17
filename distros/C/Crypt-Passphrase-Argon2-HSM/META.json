@@ -44,7 +44,7 @@
    "provides" : {
       "Crypt::Passphrase::Argon2::HSM" : {
          "file" : "lib/Crypt/Passphrase/Argon2/HSM.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -53,12 +53,12 @@
          "web" : "https://github.com/Leont/crypt-passphrase-argon2-hsm/issues"
       },
       "repository" : {
-         "type" : "git,",
+         "type" : "git",
          "url" : "git://github.com/Leont/crypt-passphrase-argon2-hsm.git",
          "web" : "https://github.com/Leont/crypt-passphrase-argon2-hsm"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

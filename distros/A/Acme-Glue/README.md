@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2021.08
+2023.08
 
 # DESCRIPTION
 
@@ -23,7 +23,7 @@ are shot at.
 
 # SNIPPETS
 
-Here are the snippets that accompany the photo project
+Here are the snippets that may accompany the photo project
 
 ## LEEJO (transform.pl)
 
@@ -89,6 +89,46 @@ Here are the snippets that accompany the photo project
     $off, $width, $bits, $val, $res
     .
     __END__
+
+## LEEJO (example from "How Perl Saved the Human Genome Project" complete with syntax error)
+
+    use Boulder::Stream; 
+    $stream = new Boulder::Stream; 
+    while ($record=$stream->read_record('NAME','SEQUENCE')) {
+        $name = $record->get('NAME'); 
+        $sequence = $record->get('SEQUENCE'); 
+
+        ...continue processing...
+
+        $record->add(QUALITY_CHECK=>"OK|); 
+        $stream->write_record($record); 
+    } 
+
+## LEEJO (quine - a program that prints itself out)
+
+    $_=q(print"\$_=q($_);eval;");eval;
+
+## LEEJO (perl5 LOC count as of 5.38 release)
+
+    % git branch
+    * blead
+    % find . -name "*.[ch]" | xargs wc -l | sort -nr | head -n5
+      788279 total
+      436086 ./charclass_invlists.h
+       17540 ./sv.c
+       16254 ./regcomp.c
+       15712 ./op.c
+
+## MIKESTOK (soundex "joke")
+
+    sub Soundex
+    {
+      local ($_, $f) = shift;
+
+      y;a-z;A-Z;;y;A-Z;;cd;$_ ne q???do{($f)=m;^(.);;s;$f+;;;
+      y;AEHIOUWYBFPVCGJKQSXZDTLMNR;00000000111122222222334556;;
+      y;;;cs;y;0;;d;s;^;$f;;s;$;0000;;m;(^.{4});;$1;}:q;;;
+    }
 
 ## SLU (MAZE.BAS)
 

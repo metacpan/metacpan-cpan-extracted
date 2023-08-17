@@ -20,7 +20,7 @@ my $class = Module::Build->subclass(
 # Sys::Tlock::Config.pm
 # Do not modify. Overwritten at install time.
 
-package Config;
+package Sys::Tlock::Config;
 use strict;
 
 our \$home = '${home}';
@@ -28,7 +28,7 @@ our \$home = '${home}';
 1;
 __END__
 
-                ] =~ s/^\s+//r =~ s/\s+$//r;
+            ] =~ s/^\s+//r =~ s/\s+$//r;
             close $cm;
 
             $self->SUPER::ACTION_install;
@@ -54,10 +54,12 @@ $class->new(
     create_readme       => 0 ,
     requires            => {
         'File::Basename' => '0' ,
+        'Getopt::Std'    => '0' ,
         'Time::HiRes'    => '0' ,
         } ,
     configure_requires => {
         'Module::Build' => 0.42 ,
+        'File::Copy'    => 0 ,
         } ,
     meta_merge => {
         resources => {

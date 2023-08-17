@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+# midi-dump - show the contents of a MIDI file
+use MIDI;
+die "Usage: midi-dump midi-file\n" unless @ARGV;
+my $opus = MIDI::Opus->new( { from_file => $ARGV[0] } );
+$opus->dump( { dump_tracks => 1 } );

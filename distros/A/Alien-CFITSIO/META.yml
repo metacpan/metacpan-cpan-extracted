@@ -38,7 +38,7 @@ no_index:
 provides:
   Alien::CFITSIO:
     file: lib/Alien/CFITSIO.pm
-    version: v4.2.0.0
+    version: v4.3.0.0
 requires:
   Alien::Base: '0'
   base: '0'
@@ -48,7 +48,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-CFITSIO
   repository: https://gitlab.com/djerius/alien-cfitsio.git
-version: v4.2.0.0
+version: v4.3.0.0
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -60,11 +60,12 @@ x_alienfile:
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

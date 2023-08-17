@@ -1,5 +1,16 @@
 Revision history for perlfaq
 
+5.20230812  2023-08-12 21:30:12Z
+  * some typo fixes to perlfaq4 (PR #103 and PR#104, brian d foy)
+  * some wording improvements to perlfaq4 for "Why doesn't & work the way I want it to?"
+    (PR#104, resolves issue #101, brian d foy)
+  * some updates to perlfaq2 for perl magazines (PR#105, brian d foy)
+
+5.20230701  2023-07-01 00:23:37Z
+  * Fix Unicode code point range in glossary (Felipe Gasper, #98)
+  * faq4: recommend fc() for string sorting, rather than lc() (brian d foy,
+    #102)
+
 5.20210520  2021-05-20 04:16:03Z
   * faq5: remove suggestion to use read() for slurping (PR#96, Dan Book)
 

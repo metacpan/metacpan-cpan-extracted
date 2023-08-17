@@ -1,3 +1,8 @@
+v0.06 2023.06.01
+  Link to issues from META files
+  Add GitHub Actions
+  Add list of build dependencies
+
 v0.05 2012.05.18
   Move author tests to xt
   Avoid sort in scalar context
@@ -14,7 +19,7 @@ v0.03 2006.09.22
   New tubes:
   - grep
 
-  Change the run mode, 
+  Change the run mode,
   my $p = Pipe->cat("file");        # returns a Pipe object
   $p->run;   # executes the pipe.
 

@@ -26,7 +26,7 @@ use List::Util   ();
 use Params::Util ();
 use Padre::MIME  ();
 
-our $VERSION    = '1.00';
+our $VERSION    = '1.02';
 our $COMPATIBLE = '0.95';
 
 my %MIME = ();
@@ -277,6 +277,7 @@ Padre::Comment->register(
 	'text/x-eiffel'             => '--',
 	'text/x-forth'              => '\\',
 	'text/x-fortran'            => '!',
+	'text/x-fsharp'             => '//',
 	'text/x-haskell'            => '--',
 	'application/x-latex'       => '%',
 	'application/x-lisp'        => ';',
@@ -311,7 +312,7 @@ Padre::Comment->register(
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5 itself.

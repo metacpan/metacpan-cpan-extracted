@@ -30,17 +30,18 @@ sub gen_hour_tz
     }
 
     # Hours line up with time zones. So it's a equal to time zone offset.
-    my $sign       = ( $hour >= 0 ) ? "+" : "-";
+    my $sign       = ( $hour >= 0 ) ? "+"    : "-";
+    my $ew         = ( $hour >= 0 ) ? "East" : "West";
     my $offset_hr  = abs($hour);
     my $offset_min = 0;
 
     # generate strings from time zone parameters
-    my $zone_abbrev = sprintf( "%s%s%02d",  "Solar", $sign, $offset_hr );
+    my $zone_abbrev = sprintf( "%s%02d",    $ew,     $offset_hr );
     my $zone_name   = sprintf( "%s/%s",     "Solar", $zone_abbrev );
     my $offset_str  = sprintf( "%s%d:%02d", $sign,   $offset_hr, $offset_min );
 
     # output time zone data
-    say "# Solar Time by hourly increment: $sign $offset_hr";
+    say "# Solar Time by hourly increment: $sign$offset_hr";
     say "# " . join( "\t", qw(Zone NAME ), "", qw(STDOFF RULES FORMAT [UNTIL]) );
     say join( "\t", "Zone", $zone_name, $offset_str, "-", $zone_abbrev );
     say "";
@@ -113,7 +114,7 @@ gen-ltz.pl - generate longitude-based solar timezone info files
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 USAGE
 

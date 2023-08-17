@@ -1128,7 +1128,6 @@ void Rmpfr_get_q(mpq_t * a, mpfr_t * b) {
      mpfr_get_f(temp, *b, GMP_RNDN);
      mpq_set_f (*a, temp);
      mpf_clear(temp);
-   }
 #endif
 }
 
@@ -6164,18 +6163,14 @@ SV * _get_xs_version(pTHX) {
      return newSVpv(XS_VERSION, 0);
 }
 
-SV * overload_inc(pTHX_ SV * a, SV * b, SV * third) {
+void overload_inc(pTHX_ SV * a, SV * b, SV * third) {
      DEAL_WITH_NANFLAG_BUG_OVERLOADED
-     SvREFCNT_inc(a);
      mpfr_add_ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), 1, __gmpfr_default_rounding_mode);
-     return a;
 }
 
-SV * overload_dec(pTHX_ SV * a, SV * b, SV * third) {
+void overload_dec(pTHX_ SV * a, SV * b, SV * third) {
      DEAL_WITH_NANFLAG_BUG_OVERLOADED
-     SvREFCNT_inc(a);
      mpfr_sub_ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), 1, __gmpfr_default_rounding_mode);
-     return a;
 }
 
 SV * overload_mul_2exp(pTHX_ SV * a, SV * b, SV * third) {
@@ -13079,23 +13074,41 @@ CODE:
 OUTPUT:  RETVAL
 
 
-SV *
+void
 overload_inc (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = overload_inc (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        overload_inc(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
-SV *
+void
 overload_dec (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = overload_dec (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        overload_dec(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 overload_mul_2exp (a, b, third)

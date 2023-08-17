@@ -3,7 +3,7 @@ package LWP::ConsoleLogger::Easy;
 use strict;
 use warnings;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 use HTTP::Request             ();
 use HTTP::Response            ();
@@ -116,7 +116,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 1.000000
+version 1.000001
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ readable HTML to text conversions.
 
 =head1 FUNCTIONS
 
-=head2 debug_ua( $mech, $verbosity )
+=head2 debug_ua( $ua, $verbosity )
 
 When called without a verbosity argument, this function turns on all logging.
 I'd suggest going with this to start with and then turning down the verbosity

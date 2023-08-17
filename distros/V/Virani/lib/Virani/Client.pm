@@ -114,8 +114,9 @@ Reaches out via HTTP or HTTPS and fetches the PCAP and JSON metadata.
               with '.json' appended.
         - Default :: out.pcap
 
-    - type :: 'tcpdump' or 'tshark', depending on what one wants the filter todo.
-        - Default :: tcpdump
+    - type :: 'tcpdump', 'bpf2tshark', or 'tshark', depending on what one wants the filter todo.
+              If not set, the remote system uses what ever is defined as the default for that set.
+        - Default :: undef
 
 The following are required
 
@@ -134,10 +135,6 @@ sub fetch {
 
 	if ( !defined( $opts{filter} ) ) {
 		die('Nothing specified for $opts{filter}');
-	}
-
-	if ( !defined( $opts{type} ) ) {
-		$opts{type} = 'tcpdump';
 	}
 
 	if ( !defined( $opts{file} ) ) {
@@ -172,7 +169,10 @@ sub fetch {
 	$opts{filter} =~ s/\ /\%20/g;
 
 	# put the url together
-	my $url = $self->{url} . '?start=' . $opts{start}->epoch . '&end=' . $opts{end}->epoch . '&type=' . $opts{type};
+	my $url = $self->{url} . '?start=' . $opts{start}->epoch . '&end=' . $opts{end}->epoch;
+	if (defined($opts{type})) {
+		$url = $url . '&type=' . $opts{type};
+	}
 	if ( defined( $self->{apikey} ) ) {
 		$url = $url . '&apikey=' . $self->{apikey};
 	}

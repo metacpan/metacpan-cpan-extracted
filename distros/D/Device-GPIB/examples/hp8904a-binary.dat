@@ -1,0 +1,16 @@
+# binary.dat
+# GPIB commands for HP8904A
+# Output digital sequence string from Figure 3-10
+# perl -I lib bin/gpib.pl -address 26 -noclear -debug -file examples/hp8904-binary.dat 
+#
+PS
+GM4
+BSB
+SBP0.5MS
+DAPH5VL
+DAPL0.2VL
+#
+SEQP1ET
+WSQ000100110111;
+SEQE12ET
+RUNC

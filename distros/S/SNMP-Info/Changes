@@ -1,3 +1,15 @@
+Version 3.94 (2023-07-25)
+
+  [BUG FIXES]
+
+  * partial revert #484 and replace with Cisco specific CiscoAgg::agg_ports_propvirtual
+
+Version 3.93 (2023-07-14)
+
+  [ENHANCEMENTS]
+
+  * #484 add Aggregate::agg_ports_ifstack to CiscoAgg::agg_ports
+
 Version 3.92 (2023-02-20)
 
   [NEW FEATURES]

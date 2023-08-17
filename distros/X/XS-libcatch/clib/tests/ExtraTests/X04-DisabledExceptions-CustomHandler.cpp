@@ -1,10 +1,20 @@
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
 #include <catch2/catch_test_macros.hpp>
+
+#include <iostream>
 
 namespace Catch {
     [[noreturn]]
     void throw_exception(std::exception const& e) {
-        Catch::cerr() << "====== CUSTOM HANDLER ====== run terminates because an exception was thrown.\n"
-                      << "The message was: " << e.what() << '\n';
+        std::cerr << "====== CUSTOM HANDLER ====== run terminates because an exception was thrown.\n"
+                  << "The message was: " << e.what() << '\n';
         // Avoid abort and other exceptional exits -- there is no way
         // to tell CMake that abort is the desired outcome of a test.
         exit(1);

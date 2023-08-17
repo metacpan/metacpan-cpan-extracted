@@ -7,7 +7,7 @@ BEGIN { use_ok('RPM::Query') };
 my $rq   = RPM::Query->new;
 isa_ok($rq, 'RPM::Query');
 
-my $skip = not qx{rpm --version > /dev/null ; echo $?};
+my $skip = $^O eq 'linux' ? do {qx{rpm --version}; $?} : 1;
 
 sub rpm {
   my $cmd    = join ' ', rpm => map {"'$_'"} @_;

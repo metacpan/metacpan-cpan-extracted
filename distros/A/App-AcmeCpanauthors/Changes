@@ -1,16 +1,23 @@
-0.003   2017-07-07 (PERLANCAR)
+0.004   2023-06-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention TableData::Acme::CPANAuthors.
+
+
+0.003   2017-07-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Enable static install.
 
 
-0.002   2016-10-01 (PERLANCAR)
+0.002   2016-10-01  Released-By: PERLANCAR
 
 	- [ux] In tab completion, also exclude Acme::CPANAuthors modules
 	  that do not contain authors list.
 
 
-0.001   2016-10-01 (PERLANCAR)
+0.001   2016-10-01  Released-By: PERLANCAR
 
         - First release.

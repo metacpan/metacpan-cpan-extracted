@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+my $USAGE = "usage: pds_iterate [-s|-l|-g|-z|-a] [-D database] [min [max]]\n";
+
+my $type   = 'available_sets';
+my $db     = undef;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    $type = 'known_std_refs',  next if 's' eq $opt || 'z' eq $opt;
+    $type = 'known_lex_refs',  next if 'l' eq $opt;
+    $type = 'known_gap_refs',  next if 'g' eq $opt;
+    $type = 'available_sets',  next if 'a' eq $opt;
+    $db   = shift(@ARGV),      next if 'D' eq $opt && @ARGV;
+    $db   = $1,                next if $opt =~ /^D(.+)s/;
+    die $USAGE;
+}
+die $USAGE if 2 < @ARGV || grep {!/^(?:0|[1-9][0-9]*)\z/} @ARGV;
+my @minmax = @ARGV;
+my $iterate = "iterate_$type";
+
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
+
+my $it = Math::DifferenceSet::Planar->$iterate(@minmax);
+while (my $ds = $it->()) {
+    my @elems = $ds->elements_sorted;
+    print "@elems\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_iterate - display sample planar difference sets for ranges of orders
+
+=head1 SYNOPSIS
+
+  pds_iterate [-s|-l|-g|-z|-a] [-D database] [min [max]]
+
+=head1 DESCRIPTION
+
+This example program iterates through all available planar difference sets
+of a given type and range and prints their elements in ascending order.
+
+Option C<-s> chooses standard reference sets.
+
+Option C<-l> chooses lexically minimal reference sets.
+
+Option C<-g> chooses big-to-small lexically minimal reference sets.
+
+Option C<-z> chooses lexically minimal zeta-canonical reference sets.
+Currently, standard reference sets are the same sets.
+
+Option C<-a> chooses any sets available in the database, without assurance
+of reference properties.  This is the default.  Usually, that still
+means standard reference sets, but special databases might store other
+sample sets.
+
+Parameter C<-D> specifies an alternate sample database.
+
+Optional arguments I<min> and I<max> restrict the orders to a range.
+Without a specified range, all available sets are printed.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

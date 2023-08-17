@@ -67,4 +67,9 @@ There following options are taken.
 
     - strptime :: The format for use with L<Time::Piece>->strptime.
         - Default :: %s
+
+    - ts_is_unixtime :: Skips using Time::Piece and strptime as it is
+                        just a simple numeric test. For this subsecs
+                        should be included in the capture group
+                        'timestamp' for the regex.
 ```

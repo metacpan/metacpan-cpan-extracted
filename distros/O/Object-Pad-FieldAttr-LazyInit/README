@@ -9,7 +9,7 @@ SYNOPSIS
        use Object::Pad::FieldAttr::LazyInit;
     
        class Item {
-          has $uuid :reader :param :LazyInit(_make_uuid);
+          field $uuid :reader :param :LazyInit(_make_uuid);
     
           method _make_uuid {
              require Data::GUID;
@@ -33,7 +33,7 @@ FIELD ATTRIBUTES
 
  :LazyInit
 
-       has $field :LazyInit(NAME) ...;
+       field $name :LazyInit(NAME) ...;
 
     Declares that if the field variable is read from before it has been
     otherwise initialised, then the named method will be called first to
@@ -55,14 +55,14 @@ FIELD ATTRIBUTES
     other fields, you can reduce the possibility of getting stuck in such a
     manner.
 
-       has $field_zero :param;
+       field $field_zero :param;
     
-       has $field_one :LazyInit(_make_one);
+       field $field_one :LazyInit(_make_one);
        method _make_one {
           # we can safely use $field_zero in here
        }
     
-       has $field_two :LazyInit(_make_two);
+       field $field_two :LazyInit(_make_two);
        method _make_two {
           # we can safely use $field_zero and $field_one
        }

@@ -1,5 +1,8 @@
 Revision history for Perl module CPAN::ReverseDependencies
 
+0.03 2023-08-02 NEILB
+    - Added `use Test::RequiresInternet` to relevant tests
+
 0.02 2021-03-21 NEILB
     - switched to using MetaCPAN::Client
     - added functional interface

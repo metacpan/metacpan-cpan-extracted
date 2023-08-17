@@ -36,9 +36,10 @@ sub do_stuff {
         open $fh2, '>', $tempname2;
         print {$fh2} "Hello World\n";
         close $fh2;
-        unlink $tempname2 or warn $!;
+        chmod 0444 => "$tempname2" or diag "$!";
+        unlink $tempname2 or diag "$!";
 
-        rename $tempname3, $rename_target or warn $! ;
+        rename $tempname3, $rename_target or diag $! ;
     };
     return ($tempname2,$t, $tempname3, $rename_target);
 }
@@ -61,7 +62,7 @@ sleep 1;
 
 $w->unwatch_directory( path => $tempdir );
 
-my @actions2 = ('added','modified','modified','removed');
+my @actions2 = ('added','modified','modified','modified','modified','removed');
 my @actions3 = ('added','old_name','renamed');
 my @actions4 = ('new_name');
 

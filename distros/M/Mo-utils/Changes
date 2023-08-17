@@ -1,3 +1,20 @@
+0.17 2023-07-09T12:51:58+02:00
+ - Add check_regexp() function.
+
+0.16 2023-07-05T13:56:20+02:00
+ - Add check_string_begin() function.
+ - Add Mo::utils::Language to SEE ALSO section in doc.
+ - Add Wikibase::Datatype::Utils to SEE ALSO section in doc.
+ - Fix indent in doc.
+ - Fix SYNOPSIS section in doc.
+
+0.15 2023-06-10T18:35:55+02:00
+ - Add check_strings() subroutine.
+ - Fix dependencies in doc.
+ - Regen README file.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.14 2022-09-28T18:17:25+02:00
  - Revert 0.13 version situation if key doesn't exist. It's not useful with
    Mo.

@@ -13,7 +13,7 @@ use MarpaX::Java::ClassFile::Struct::_Base
 
 # ABSTRACT: line and number
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -36,7 +36,7 @@ MarpaX::Java::ClassFile::Struct::LineNumber - line and number
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

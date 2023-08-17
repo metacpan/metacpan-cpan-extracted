@@ -29,7 +29,7 @@ GIS-Distance-Fast GitHub issue tracker:
 
 [https://github.com/bluefeet/GIS-Distance-Fast/issues](https://github.com/bluefeet/GIS-Distance-Fast/issues)
 
-# AUTHORS
+# AUTHOR
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>

@@ -6,6 +6,8 @@ t/Device-GPIB.t
 lib/Device/GPIB.pm
 lib/Device/GPIB/HP/HP3456A.pm
 lib/Device/GPIB/HP/HP3577A.pm
+lib/Device/GPIB/HP/HP5342A.pm
+lib/Device/GPIB/HP/HP8904A.pm
 lib/Device/GPIB/Tektronix.pm
 lib/Device/GPIB/Advantest/TR4131.pm
 lib/Device/GPIB/Controller.pm
@@ -24,17 +26,23 @@ lib/Device/GPIB/Controllers/README
 lib/Device/GPIB/Generic.pm
 Makefile.PL
 bin/dm5010.pl
+bin/hp3456a.pl
 bin/hp3577.pl
+bin/hp5342a.pl
+bin/hp8904a.pl
 bin/dm5110.pl
 bin/afg5101.pl
 bin/pfg5105.pl
 bin/si5010.pl
 bin/ps5010.pl
-bin/hp3456a.pl
 bin/dc5009.pl
 bin/scan.pl
 bin/tr4131.pl
 bin/mi5010.pl
 bin/gpib.pl
+examples/README
+examples/hp8904a-binary.dat
+examples/hp8904a-basic.dat
+examples/hp8904a-tones.dat
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

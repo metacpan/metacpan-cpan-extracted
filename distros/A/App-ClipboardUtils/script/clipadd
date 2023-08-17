@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-08'; # DATE
+our $DATE = '2023-04-13'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Clipboard/Any/add_clipboard_content",
@@ -40,7 +40,7 @@ clipadd - Shorter alias for add-clipboard-content
 
 =head1 VERSION
 
-This document describes version 0.006 of clipadd (from Perl distribution App-ClipboardUtils), released on 2022-12-08.
+This document describes version 0.007 of clipadd (from Perl distribution App-ClipboardUtils), released on 2023-04-13.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<clipadd> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<clipadd> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<clipadd> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<content|/"--content=s">>]
+B<clipadd> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--tee|/"--tee">>|B<L<--no-tee|/"--tee">>|B<L<--notee|/"--tee">>] -- [I<L<content|/"--content=s">>]
 
 
 
@@ -84,6 +84,10 @@ The default, when left undef, is to detect what clipboard manager is running.
 
 
 Can also be specified as the 1st command-line argument.
+
+=item B<--tee>
+
+If set to true, will output content back to STDOUT.
 
 =back
 
@@ -272,7 +276,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

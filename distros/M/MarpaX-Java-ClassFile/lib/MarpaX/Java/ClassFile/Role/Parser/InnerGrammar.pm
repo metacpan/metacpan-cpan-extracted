@@ -5,7 +5,7 @@ package MarpaX::Java::ClassFile::Role::Parser::InnerGrammar;
 
 # ABSTRACT: Parsing engine role for .class file parsing - inner grammar
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -69,7 +69,7 @@ MarpaX::Java::ClassFile::Role::Parser::InnerGrammar - Parsing engine role for .c
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

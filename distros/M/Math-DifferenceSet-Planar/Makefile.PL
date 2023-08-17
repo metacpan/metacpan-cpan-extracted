@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -25,6 +25,7 @@ my %versions = map {
     Math::DifferenceSet::Planar
     Math::DifferenceSet::Planar::Data
     Math::DifferenceSet::Planar::Schema
+    Math::DifferenceSet::Planar::Schema::Result::DatabaseVersion
     Math::DifferenceSet::Planar::Schema::Result::DifferenceSet
     Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace
 );

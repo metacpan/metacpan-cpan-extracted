@@ -1468,6 +1468,18 @@ XUngrabPointer(dpy, timestamp)
     Display *dpy
     Time timestamp
 
+int
+XWarpPointer(dpy, wnd, dest_w, src_x, src_y, src_width, src_height, dest_x, dest_y)
+    Display *dpy
+    WindowOrNull wnd
+    WindowOrNull dest_w
+    int src_x
+    int src_y
+    unsigned int src_width
+    unsigned int src_height
+    int dest_x
+    int dest_y
+
 void
 XGrabButton(dpy, button, modifiers, wnd, owner_events, event_mask, pointer_mode, keyboard_mode, confine_to, cursor)
     Display *dpy

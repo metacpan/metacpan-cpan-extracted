@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.231460';
+$App::RouterColorizer::VERSION = '1.231650';
 use Moose;
 
 use feature 'signatures';
@@ -40,12 +40,20 @@ our $RESET  = "\e[0m";
 
 our @BGCOLORS = (
     "\e[30m\e[47m",    # black on white
+    "\e[35m\e[47m",    # magenta on white
+    "\e[90m\e[47m",    # gray on white
     "\e[30m\e[41m",    # black on red
+    "\e[90m\e[41m",    # gray on red
+    "\e[37m\e[41m",    # white on red
     "\e[30m\e[42m",    # black on green
     "\e[30m\e[43m",    # black on yellow (orange)
+    "\e[31m\e[43m",    # red on yellow (orange)
     "\e[37m\e[44m",    # white on blue
     "\e[30m\e[45m",    # black on magenta
+    "\e[37m\e[45m",    # white on magenta
     "\e[30m\e[46m",    # black on cyan
+    "\e[30m\e[100m",   # black on gray
+    "\e[97m\e[100m",   # white on gray
 );
 
 our $NUM      = qr/$RE{num}{real}/;
@@ -221,7 +229,7 @@ s/^ ( \Q  Configured maximum total number of routes is \E \d+ (?: \Q, warning li
     #
 
     # We look for information lines
-    if ( $line =~ m/^     ((?:$INT [^, ][^,]+, )*$INT [^, ][^,]+)$/ ) {
+    if ( $line =~ m/^     ((?:$INT [^,]+, )*$INT [^,]+)$/ ) {
         my (%values) =
           map { reverse split / /, $_, 2 } split ', ', $1;
 
@@ -771,7 +779,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.231460
+version 1.231650
 
 =head1 DESCRIPTION
 

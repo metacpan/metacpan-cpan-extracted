@@ -1,3 +1,7 @@
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
@@ -16,7 +20,9 @@ my %crufty = (
 	'bsd-1-clause-1.c'            => undef,
 	'bsd.f'                       => undef,
 	'bsd-3-clause.cpp'            => undef,
+	'bug-559429'                  => undef,
 	'gpl-1'                       => undef,
+	'gpl-2'                       => undef,
 	'gpl-2+'                      => undef,
 	'gpl-2+.scm'                  => undef,
 	'gpl-3.sh'                    => undef,
@@ -38,14 +44,16 @@ my $naming
 	= String::License::Naming::Custom->new(
 	schemes => [qw(debian spdx internal)] );
 
-sub parse
+sub parse ($path_string)
 {
-	my $path   = path(shift);
-	my $string = $path->slurp_utf8;
+	my ( $path, $string, $license );
+
+	$path   = path($path_string);
+	$string = $path->slurp_utf8;
 	$string = uncruft($string)
 		if exists $crufty{ $path->relative('t/devscripts') };
 
-	my $license = String::License->new(
+	$license = String::License->new(
 		string => $string,
 		naming => $naming,
 	)->as_text;

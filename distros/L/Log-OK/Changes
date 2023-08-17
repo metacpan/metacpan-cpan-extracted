@@ -1,3 +1,14 @@
+v0.2.0 2023-07-25
+  [features]
+    - Reduced the amount of boilerplate with sensible default options
+    - Die when logging level is not supported.  Prevents a bunch of error messages
+    - Default command line option is now 'verbose'. Specify an 'undef' to
+      disable
+  [changes]
+    - POD synopsis example revised.
+    - uses constant::more v0.2.0 for a little memory saving
+
+
 v0.1.6 2023-02-11
   [fixes]
   - Remove annoying warning message re failed log level sync

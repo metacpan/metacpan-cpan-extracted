@@ -38,9 +38,9 @@ Mnet::T::test_perl({
     name    => 'new login with username, no password, prompt%',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "username: "; read INPUT
-            echo -n "prompt% ";   read INPUT
-            echo -n "prompt% ";   read INPUT
+            printf "username: "; read INPUT
+            printf "prompt%% ";   read INPUT
+            printf "prompt%% ";   read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -55,9 +55,9 @@ Mnet::T::test_perl({
     name    => 'new login with passcode, no username, prompt#',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "passcode: "; read INPUT
-            echo -n "prompt# ";   read INPUT
-            echo -n "prompt# ";   read INPUT
+            printf "passcode: "; read INPUT
+            printf "prompt# ";   read INPUT
+            printf "prompt# ";   read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -72,8 +72,8 @@ Mnet::T::test_perl({
     name    => 'new login with no username, no password and prompt:',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt: "; read INPUT
-            echo -n "prompt: "; read INPUT
+            printf "prompt: "; read INPUT
+            printf "prompt: "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -87,7 +87,7 @@ Mnet::T::test_perl({
     name    => 'new login failed before username prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "fail"; read INPUT
+            printf "fail"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -102,8 +102,8 @@ Mnet::T::test_perl({
     name    => 'new login failed after login prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "login: "; read INPUT
-            echo -n "fail";    read INPUT
+            printf "login: "; read INPUT
+            printf "fail";    read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -118,9 +118,9 @@ Mnet::T::test_perl({
     name    => 'new login failed after password prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "username: "; read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "fail";       read INPUT
+            printf "username: "; read INPUT
+            printf "password: "; read INPUT
+            printf "fail";       read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -150,9 +150,9 @@ Mnet::T::test_perl({
     name    => 'check log_login info',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt\$ "; read INPUT
-            echo -n "prompt\$ "; read INPUT
-            echo -n "prompt\$ "; read INPUT
+            printf "prompt\$ "; read INPUT
+            printf "prompt\$ "; read INPUT
+            printf "prompt\$ "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -178,9 +178,9 @@ Mnet::T::test_perl({
 #    pre     => <<'    pre-eof',
 #        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
 #            echo "prompt:"
-#            echo -n "prompt>"; read INPUT
-#            echo -n "prompt>"; read INPUT
-#            echo -n "prompt>"; read INPUT
+#            printf "prompt>"; read INPUT
+#            printf "prompt>"; read INPUT
+#            printf "prompt>"; read INPUT
 #        ' >$EXPECT
 #    pre-eof
 #    perl    => $perl,
@@ -200,10 +200,10 @@ Mnet::T::test_perl({
 #    pre     => <<'    pre-eof',
 #        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
 #            echo "banner start"; echo "not failed"; echo "banner end"
-#            echo -n "username: "; read INPUT
-#            echo -n "password: "; read INPUT
-#            echo -n "prompt% ";   read INPUT
-#            echo -n "prompt% ";   read INPUT
+#            printf "username: "; read INPUT
+#            printf "password: "; read INPUT
+#            printf "prompt%% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
 #        ' >$EXPECT
 #    pre-eof
 #    perl    => $perl,
@@ -222,11 +222,11 @@ Mnet::T::test_perl({
 #    name    => 'new login skipped post-login banner failed_re text',
 #    pre     => <<'    pre-eof',
 #        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-#            echo -n "username: "; read INPUT
-#            echo -n "password: "; read INPUT
+#            printf "username: "; read INPUT
+#            printf "password: "; read INPUT
 #            echo "banner start"; echo "not failed"; echo "banner end"
-#            echo -n "prompt% ";   read INPUT
-#            echo -n "prompt% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
 #        ' >$EXPECT
 #    pre-eof
 #    perl    => $perl,
@@ -244,9 +244,9 @@ Mnet::T::test_perl({
 #    name    => 'new login autodetects that username is not needed',
 #    pre     => <<'    pre-eof',
 #        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-#            echo -n "password: "; read INPUT
-#            echo -n "prompt% ";   read INPUT
-#            echo -n "prompt% ";   read INPUT
+#            printf "password: "; read INPUT
+#            printf "prompt%% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
 #        ' >$EXPECT
 #    pre-eof
 #    perl    => $perl,
@@ -264,8 +264,8 @@ Mnet::T::test_perl({
 #    name    => 'new login autodetects that username and password not needed',
 #    pre     => <<'    pre-eof',
 #        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-#            echo -n "prompt% ";   read INPUT
-#            echo -n "prompt% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
+#            printf "prompt%% ";   read INPUT
 #        ' >$EXPECT
 #    pre-eof
 #    perl    => $perl,

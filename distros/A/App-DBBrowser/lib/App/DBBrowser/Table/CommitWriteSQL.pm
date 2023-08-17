@@ -32,20 +32,18 @@ sub commit_sql {
     my $rows_to_execute = [];
     my $count_affected;
     if ( $stmt_type eq 'Insert' ) {
-        if ( ! @{$sql->{insert_into_args}} ) {
+        if ( ! @{$sql->{insert_args}} ) {
             return 1;
         }
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
-        $rows_to_execute = $sql->{insert_into_args};
-        $count_affected = @$rows_to_execute;
+        $count_affected = @{$sql->{insert_args}};
     }
     else {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
-        $rows_to_execute = [ [ @{$sql->{set_args}}, @{$sql->{where_args}} ] ];
         my $all_arrayref = [];
         if ( ! eval {
             my $sth = $dbh->prepare( "SELECT * FROM $sql->{table} " . $sql->{where_stmt} );
-            $sth->execute( @{$sql->{where_args}} );
+            $sth->execute();
             my $col_names = $sth->{NAME};
             $all_arrayref = $sth->fetchall_arrayref;
             $count_affected = @$all_arrayref;
@@ -81,16 +79,16 @@ sub commit_sql {
         $transaction = 0;
     };
     if ( $transaction ) {
-        return $sf->__transaction( $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting );
+        return $sf->__transaction( $sql, $stmt_type, $count_affected, $waiting );
     }
     else {
-        return $sf->__auto_commit( $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting );
+        return $sf->__auto_commit( $sql, $stmt_type, $count_affected, $waiting );
     }
 }
 
 
 sub __transaction {
-    my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
+    my ( $sf, $sql, $stmt_type, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
@@ -98,11 +96,12 @@ sub __transaction {
     my $rolled_back;
     my $sth;
     if ( ! eval {
-        $sth = $dbh->prepare(
-            $ax->get_stmt( $sql, $stmt_type, 'prepare' )
-        );
-        for my $values ( @$rows_to_execute ) {
-            $sth->execute( @$values );
+        $sth = $dbh->prepare( $ax->get_stmt( $sql, $stmt_type, 'prepare' ) );
+        if ( $stmt_type eq 'Insert' ) {
+            $sth->execute( @$_ ) for @{$sql->{insert_args}};
+        }
+        else {
+            $sth->execute();
         }
         if ( $stmt_type eq 'Insert' && $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
             # already asked for confirmation (create table + insert data) in Create_table
@@ -142,7 +141,7 @@ sub __transaction {
 
 
 sub __auto_commit {
-    my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
+    my ( $sf, $sql, $stmt_type, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
@@ -164,11 +163,12 @@ sub __auto_commit {
         }
     }
     if ( ! eval {
-        my $sth = $dbh->prepare(
-            $ax->get_stmt( $sql, $stmt_type, 'prepare' )
-        );
-        for my $values ( @$rows_to_execute ) {
-            $sth->execute( @$values );
+        my $sth = $dbh->prepare( $ax->get_stmt( $sql, $stmt_type, 'prepare' ) );
+        if ( $stmt_type eq 'Insert' ) {
+            $sth->execute( @$_ ) for @{$sql->{insert_args}};
+        }
+        else {
+            $sth->execute();
         }
         1 }
     ) {

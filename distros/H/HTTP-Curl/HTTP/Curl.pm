@@ -2,7 +2,7 @@ package HTTP::Curl;
 
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL CURLE_WRITE_ERROR CURLE_OPERATION_TIMEDOUT CURLE_RECV_ERROR);
 
@@ -171,7 +171,8 @@ sub do_http {
 		my ($multi_ev, $easy, $url, $opt, $cb) = @_;
 		my $finish = _prepare($easy, $url, $opt);
 		if ($multi_ev) {
-			$multi_ev->($easy, sub { $cb->($finish->(@_)) }, 4 * 60);
+			my $timeout = $$opt{timeout} || 300;
+			$multi_ev->($easy, sub { $cb->($finish->(@_)) }, $timeout);
 		} else {
 			$cb->(_do_http($easy, $url, $opt));
 		}

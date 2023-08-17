@@ -105,3 +105,8 @@ Revision history for Perl extension B::Keywords.
   - Fix for broken <archlibexp>/CORE/keywords.h test on system macOS
     (PR #5, @nega0)
   - finally added with 5.35.8 (RT #141406)
+1.25 2023-06-19 15:16:08 rurban
+  - Add Corinna keywords, new with Perl 5.38.0 (PR #8, @trwyant)
+    ADJUST class field method
+1.26 2023-06-19 18:43 rurban
+  - Updated README

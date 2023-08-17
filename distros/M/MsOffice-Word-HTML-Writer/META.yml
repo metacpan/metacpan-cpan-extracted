@@ -15,18 +15,20 @@ name: MsOffice-Word-HTML-Writer
 provides:
   MsOffice::Word::HTML::Writer:
     file: lib/MsOffice/Word/HTML/Writer.pm
-    version: '1.08'
+    version: '1.10'
 requires:
   Carp: '0'
+  Encode: '2.12'
   MIME::Base64: '0'
   MIME::Types: '0'
   Module::Build: '0'
   Params::Validate: '0'
   Scalar::Util: '0'
   Test::More: '0'
+  perl: '5.01'
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/MsOffice-Word-HTML-Writer
-version: '1.08'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

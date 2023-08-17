@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.9
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.400.10
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2023/06/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,7 +31,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
     use Nice::Try;
-    $VERSION     = 'v0.400.9';
+    $VERSION     = 'v0.400.10';
     use Devel::Confess;
 };
 
@@ -931,13 +931,13 @@ sub _from_days
         hour       => 0,
         minute     => 0,
         second     => 0,
-        time_zone => $tz->name,
+        time_zone => $tz,
     );
-    my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz->name );
+    my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz );
     # https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
     my $epoch_days = $epoch->delta_days( $origin )->delta_days();
     my $days_since_epoch = $from_days - int( $epoch_days );
-    my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz->name );
+    my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz );
     return( $dt );
 }
 
@@ -1317,7 +1317,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v0.400.9
+    v0.400.10
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,26 @@
 Revision history for PerlX-Let:
 
+v0.3.0    2023-06-14 21:34:37+01:00 Europe/London
+  [Incompatible Changes]
+  - The deprecated code prefix syntax `let $s = $expr { ... }` has been removed.
+
+  - The deprecated comma syntax `let $a = ..., $b = ...` has been removed.
+
+  [Documentation]
+  - Documented the support policy for older Perls.
+
+  - Updated copyright year.
+
+  - Fix encoding of links in README.
+
+  [Other]
+  - Removed redundant strictures.
+
+  [Toolchain]
+  - Sign distribution.
+
+  - Update MANIGFEST.SKIP rules.
+
 v0.2.8    2020-11-21 12:25:31+00:00 Europe/London
   [Documentation]
   - Fixed typo in POD.

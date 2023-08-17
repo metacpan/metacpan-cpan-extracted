@@ -89,7 +89,7 @@ my $file2 = $tempdir->file('file2');
     is(
         scalar $file1->slurp,
         scalar $file2->slurp,
-        'file1 and file2 contents are identical'
+        'file1 and file2 contents are identical',
     );
 }
 

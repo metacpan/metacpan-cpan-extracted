@@ -3,14 +3,16 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 # Unit tests for plug-in API in Neo4j::Driver::Events
 
-plan tests => 9 + 1;
+plan tests => 9 + $no_warnings;
 
 use Neo4j::Driver;
 use Neo4j::Driver::Events;

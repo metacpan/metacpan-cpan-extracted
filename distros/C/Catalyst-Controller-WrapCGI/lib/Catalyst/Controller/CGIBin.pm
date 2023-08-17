@@ -1,7 +1,7 @@
 use utf8;
 package Catalyst::Controller::CGIBin;
 our $AUTHORITY = 'cpan:RKITOVER';
-$Catalyst::Controller::CGIBin::VERSION = '0.038';
+$Catalyst::Controller::CGIBin::VERSION = '0.039';
 use Moose;
 use Moose::Util::TypeConstraints;
 use mro 'c3';

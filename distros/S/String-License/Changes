@@ -7,10 +7,67 @@ Home page:    <https://metacpan.org/release/String-License>
 Bug tracker:  <https://rt.cpan.org/Dist/Display.html?Queue=String-License>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v0.0.9	2023-07-04
+
+ [ Bug Fixes ]
+ - tighten runtime-requirement for List::Util
+
+v0.0.8	2023-07-04
+
+ [ Bug Fixes ]
+ - really use List::Util (not List::SomeUtils), everywhere
+
+ [ Packaging ]
+ - revert to run perltidy (not perltidier) with tidyall
+
+v0.0.7	2023-07-03
+
+ [ Bug Fixes ]
+ - stepwise detect prepended version, with Regexp::Pattern::License v3.11.0
+ - stepwise detect version_only, with Regexp::Pattern::License v3.11.0
+
+ [ Test Suite ]
+ - tighten tests to cover non-optional trailing 'license' since
+   Regexp::Pattern::License v3.11.0
+ - update author tests to cover Regexp::Pattern::License v3.11.0
+
+ [ Other ]
+ - declare dummy method with empty signature in one line, hopefully
+   pleasing perl v5.20-v5.24
+ - simplify code; use List::Util (not List::SomeUtils)
+ - sort LICENSES by amount of contained licenses, then key length, then
+   alphabetically
+ - sort NAMES objects by key length before alphabetically
+ - store resolved shortname and caption in objects (not internal id)
+ - tighten positioning and reporting of stepwise detected version
+ - tiny optimization in version number mangling
+ - tiny optimization: check if named match is defined (not if true)
+ - track confirmed fulltext or grant as object (not boolean)
+ - track detected fulltext license as object (not just positional range)
+ - track detected license grant as object (not just positional range)
+ - used named capture for local patterns
+
+v0.0.6	2023-06-03
+
+ [ Test Suite ]
+ - use Feature::Compat::Class after core features, to support newer perl
+   Graham Knop++
+   Jitka Plesníková++
+
+ [ Packaging ]
+ - require perl v5.20, needed for subroutine signatures
+
+ [ Other ]
+ - add internal note method to generalize trait hinting
+ - add internal tag methods to generalize coverage tracking
+ - code cleanup, by extending tag methods
+ - drop obsolete custom BSD and CC double-detection avoidance
+ - use subroutine signatures
+
 v0.0.5	2023-05-30
 
  [ Test Suite ]
- - _:r1685459263r127
+ - Use Test::Script to ensure correct perl invokes script in tests.
    petr Pisar++
 
 v0.0.4	2023-01-18

@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+# ABSTRACT: Loverl application script
+# PODNAME: Loverl
+
+use v5.36;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Loverl;
+
+my %arg = ( show_version_cmd => 1, );
+my $cmd = Loverl->new( \%arg );
+$cmd->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Loverl - Loverl application script
+
+=head1 VERSION
+
+version 0.005
+
+=head1 AUTHOR
+
+Nobunaga <nobunaga@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Nobunaga.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -72,7 +72,7 @@ sub is_failure {
 
 ok($ssasl = Authen::SASL->new( %params ), "new");
 $server = $ssasl->server_new("ldap","localhost");
-my $cb;
+undef $cb;
 $server->server_start("", sub { $cb = 1 });
 ok $cb, "callback called"; $cb = 0;
 $server->server_step("foo", sub { $cb = 1 });

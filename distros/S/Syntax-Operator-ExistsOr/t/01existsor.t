@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::ExistsOr;
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
@@ -28,15 +28,25 @@ my %hash = ( k1 => "value", k2 => undef );
    $hash{k2} \\ $rhs_eval{k2}++;
    $hash{k3} \\ $rhs_eval{k3}++;
 
-   is_deeply( \%rhs_eval, { k3 => 1 }, 'existsor short-circuits its RHS' );
+   is( \%rhs_eval, { k3 => 1 }, 'existsor short-circuits its RHS' );
 }
 
 # Stack discipline
 {
-   is_deeply( [ "before", $hash{k1} \\ "not", "after" ], [ "before", "value", "after" ],
+   is( [ "before", $hash{k1} \\ "not", "after" ], [ "before", "value", "after" ],
       'logical existsor exists in stack' );
-   is_deeply( [ "before", $hash{k3} \\ "not", "after" ], [ "before", "not", "after" ],
+   is( [ "before", $hash{k3} \\ "not", "after" ], [ "before", "not", "after" ],
       'logical existsor missing in stack' );
+}
+
+# unimport
+{
+   no Syntax::Operator::ExistsOr;
+
+   # \\ isn't usable as a symbol name but we can hack something up
+   my $rref = \\"key";
+
+   ok( ref($rref) && ref($$rref), '\\\\ parses as double-refgen' );
 }
 
 done_testing;

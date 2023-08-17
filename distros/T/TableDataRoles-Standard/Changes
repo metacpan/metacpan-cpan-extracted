@@ -1,3 +1,10 @@
+0.016   2023-06-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add role: Munge::MungeColumns.
+
+        - [role Munge::*] Add 'load' option (from Module::Load::Util 0.09).
+
+
 0.015   2023-02-24  Released-By: PERLANCAR; Urgency: medium
 
         - [doc] Mention TableDataRole::Source::SQLite.

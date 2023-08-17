@@ -1,7 +1,7 @@
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: convert2V07
+PERL PROGRAM NAME: convert2V07
 
 AUTHOR:  
 
@@ -328,7 +328,7 @@ elsif ( $length_of_slurp > 0 ) {
 	# add \n!!!!
 	for ( my $i = 0 ; $i < $length_of_slurp ; $i++ ) {
 
-		printf OUT $slurp[$i] . "\n";
+		print OUT $slurp[$i] . "\n";
 
 		#		print $slurp[$i] . "\n";
 	}
@@ -401,7 +401,7 @@ elsif ( $length_of_slurp > 0 ) {
 	# add \n!!!!
 	for ( my $i = 0 ; $i < $length_of_slurp ; $i++ ) {
 
-		printf OUT $slurp[$i] . "\n";
+		print OUT $slurp[$i] . "\n";
 	}
 
 	close(OUT);
@@ -476,7 +476,7 @@ elsif ( $length_of_slurp > 0 ) {
 	# add \n!!!!
 	for ( my $i = 0 ; $i < $length_of_slurp ; $i++ ) {
 
-		printf OUT $slurp[$i] . "\n";
+		print OUT $slurp[$i] . "\n";
 	}
 
 	close(OUT);

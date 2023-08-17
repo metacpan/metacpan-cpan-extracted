@@ -1,5 +1,18 @@
 Revision history for Webservice-KvKAPI
 
+0.105     2023-08-16 11:24:36Z
+
+     * Query a different host when using the CLI script
+
+0.104     2023-08-16 01:05:49Z
+
+ `   * Fix some minor POD errors
+     * Remove deprecation warnings caused by Object::Pad
+       * Change `has' to `field'
+       * Change `class Foo does Bar' to `class Foo :does(Bar)'
+       * Bump Object::Pad to minimum of 0.66 which introduces has and
+         deprecates does. Object::Pad 0.800 deprecates the `has' keyword.
+
 0.103     2022-02-25 17:45:50Z
 
     * Update POD for query_kvk.pl

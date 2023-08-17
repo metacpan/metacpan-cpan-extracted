@@ -56,91 +56,91 @@
    "provides" : {
       "Net::CLI::Interact" : {
          "file" : "lib/Net/CLI/Interact.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Action" : {
          "file" : "lib/Net/CLI/Interact/Action.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::ActionSet" : {
          "file" : "lib/Net/CLI/Interact/ActionSet.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Logger" : {
          "file" : "lib/Net/CLI/Interact/Logger.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Phrasebook" : {
          "file" : "lib/Net/CLI/Interact/Phrasebook.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Role::Engine" : {
          "file" : "lib/Net/CLI/Interact/Role/Engine.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Role::FindMatch" : {
          "file" : "lib/Net/CLI/Interact/Role/FindMatch.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Role::Iterator" : {
          "file" : "lib/Net/CLI/Interact/Role/Iterator.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Role::Prompt" : {
          "file" : "lib/Net/CLI/Interact/Role/Prompt.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Base" : {
          "file" : "lib/Net/CLI/Interact/Transport/Base.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Loopback" : {
          "file" : "lib/Net/CLI/Interact/Transport/Loopback.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Net_OpenSSH" : {
          "file" : "lib/Net/CLI/Interact/Transport/Net_OpenSSH.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Platform::Unix" : {
          "file" : "lib/Net/CLI/Interact/Transport/Platform/Unix.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Platform::Win32" : {
          "file" : "lib/Net/CLI/Interact/Transport/Platform/Win32.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Role::ConnectCore" : {
          "file" : "lib/Net/CLI/Interact/Transport/Role/ConnectCore.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Role::StripControlChars" : {
          "file" : "lib/Net/CLI/Interact/Transport/Role/StripControlChars.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::SSH" : {
          "file" : "lib/Net/CLI/Interact/Transport/SSH.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Serial" : {
          "file" : "lib/Net/CLI/Interact/Transport/Serial.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Telnet" : {
          "file" : "lib/Net/CLI/Interact/Transport/Telnet.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Wrapper::Base" : {
          "file" : "lib/Net/CLI/Interact/Transport/Wrapper/Base.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Wrapper::IPC_Run" : {
          "file" : "lib/Net/CLI/Interact/Transport/Wrapper/IPC_Run.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       },
       "Net::CLI::Interact::Transport::Wrapper::Net_Telnet" : {
          "file" : "lib/Net/CLI/Interact/Transport/Wrapper/Net_Telnet.pm",
-         "version" : "2.300004"
+         "version" : "2.300005"
       }
    },
    "release_status" : "stable",
@@ -155,6 +155,6 @@
          "url" : "https://github.com/ollyg/Net-CLI-Interact"
       }
    },
-   "version" : "2.300004",
+   "version" : "2.300005",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

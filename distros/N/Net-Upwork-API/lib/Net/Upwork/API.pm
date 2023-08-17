@@ -19,7 +19,7 @@ use warnings;
 use Net::Upwork::API::Config;
 use Net::Upwork::API::Client;
 
-our $VERSION = '2.1.4';
+our $VERSION = '2.2.0';
 
 use constant TOKEN_TYPE_BEARER => 'Bearer';
 
@@ -116,7 +116,9 @@ sub get_access_token {
     my $self = shift;
     my ($code) = @_;
 
-    chomp($code);
+    if (defined $code) {
+        chomp($code);
+    }
 
     $self->{client}{access_token_session} = $self->{client}{oauth_client}->get_access_token($code);
 

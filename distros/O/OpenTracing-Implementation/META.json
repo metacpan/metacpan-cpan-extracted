@@ -41,11 +41,14 @@
       },
       "test" : {
          "requires" : {
+            "Module::Loaded" : "0",
+            "OpenTracing::Interface::Tracer" : "0",
+            "Role::Tiny::With" : "0",
             "Test::Most" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.32.0",
+   "version" : "v0.33.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.27"
+            "XS::Parse::Infix::Builder" : "0.28"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Infix" : "0.27",
+            "XS::Parse::Infix" : "0.28",
             "perl" : "5.014"
          }
       },
@@ -40,11 +40,11 @@
    "provides" : {
       "Syntax::Operator::Elem" : {
          "file" : "lib/Syntax/Operator/Elem.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Syntax::Operator::In" : {
          "file" : "lib/Syntax/Operator/In.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

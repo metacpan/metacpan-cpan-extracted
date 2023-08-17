@@ -7,13 +7,13 @@ use parent 'Exporter';
 
 our @EXPORT = qw( fmtsheet
                   check_colspec_is_undef
-                  check_no_sheet 
+                  check_no_sheet
                   create_testdata
                 );
 
 use t_Common;
-use t_TestCommon qw/bug
-                    verif_eval_err insert_loc_in_evalstr
+use t_TestCommon ':no-Test2',
+                 qw/bug verif_eval_err insert_loc_in_evalstr
                     dprint dprintf/;
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
 
@@ -32,7 +32,7 @@ sub check_colspec_is_undef(@) {
   no strict 'refs';
   my $s = sheet({package => caller});
   foreach(@_) {
-    bug "Colspec ".vis($_)." is unexpectedly defined" 
+    bug "Colspec ".vis($_)." is unexpectedly defined"
       if defined ${"$pkg\::colx"}{$_};
     eval{ $s->spectocx($_) }; verif_eval_err;
   }

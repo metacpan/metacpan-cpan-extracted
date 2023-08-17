@@ -7,7 +7,7 @@ CGI::Application::Plugin::OpenTracing - Use OpenTracing in CGI Applications
 
 =head1 VERSION
 
-This is documentation for version 'v0.103.2'
+This is documentation for version 'v0.104.0'
 
 
 

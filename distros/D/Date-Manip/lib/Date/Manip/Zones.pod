@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Dec  2 12:34:19 EST 2022
-#    Data version: tzdata2022g
-#    Code version: tzcode2022g
+#    Generated on: Wed Jun  7 12:25:41 EDT 2023
+#    Data version: tzdata2023c
+#    Code version: tzcode2023c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -188,7 +188,6 @@ database:
      America/Whitehorse                   amwhit00
      America/Winnipeg                     amwinn00
      America/Yakutat                      amyaku00
-     America/Yellowknife                  amyell00
      Antarctica/Casey                     ancase00
      Antarctica/Davis                     andavi00
      Antarctica/Macquarie                 anmacq00
@@ -523,6 +522,7 @@ The zoneinfo database provides several standard aliases, including:
      America/Thunder_Bay                  America/Toronto
      America/Tortola                      America/Puerto_Rico
      America/Virgin                       America/Puerto_Rico
+     America/Yellowknife                  America/Edmonton
      Antarctica/DumontDUrville            Pacific/Port_Moresby
      Antarctica/McMurdo                   Pacific/Auckland
      Antarctica/South_Pole                Pacific/Auckland
@@ -803,6 +803,7 @@ default alias can be overridden as described above.
                                           Europe/Athens
                                           Europe/Bucharest
                                           Europe/Chisinau
+                                          Africa/Cairo
                                           Europe/Helsinki
                                           Asia/Gaza
                                           Asia/Hebron
@@ -819,7 +820,6 @@ default alias can be overridden as described above.
                                           Europe/Simferopol
                                           Europe/Kaliningrad
                                           Europe/Minsk
-                                          Africa/Cairo
                                           Europe/Moscow
                                           Europe/Warsaw
      EST5EDT                              America/New_York
@@ -865,6 +865,8 @@ default alias can be overridden as described above.
                                           Europe/Tallinn
                                           Europe/Vilnius
      MSK-3MSD                             Europe/Moscow
+                                          Europe/Volgograd
+                                          Europe/Kirov
                                           Europe/Simferopol
                                           Europe/Chisinau
                                           Europe/Kyiv
@@ -878,7 +880,6 @@ default alias can be overridden as described above.
                                           America/Ciudad_Juarez
                                           America/Boise
                                           America/Cambridge_Bay
-                                          America/Yellowknife
                                           America/Inuvik
                                           America/Mazatlan
                                           America/Chihuahua
@@ -901,7 +902,6 @@ default alias can be overridden as described above.
                                           America/North_Dakota/New_Salem
                                           America/Regina
                                           America/Swift_Current
-                                          America/Yellowknife
      NST11NPT                             America/Adak
                                           America/Nome
      NZST-12NZDT                          Pacific/Auckland
@@ -1043,6 +1043,7 @@ Aliases include:
      America/Thunder_Bay                  America/Toronto
      America/Tortola                      America/Puerto_Rico
      America/Virgin                       America/Puerto_Rico
+     America/Yellowknife                  America/Edmonton
      Antarctica/DumontDUrville            Pacific/Port_Moresby
      Antarctica/McMurdo                   Pacific/Auckland
      Antarctica/South_Pole                Pacific/Auckland
@@ -1458,16 +1459,15 @@ L<Date::Manip::TZ> module.
                         America/Hermosillo
                         America/Mazatlan
                         America/Boise
-                        America/Yellowknife
                         America/Dawson_Creek
                         America/Inuvik
                         America/Fort_Nelson
                         America/Dawson
                         America/Whitehorse
-                        America/Chihuahua
-                        America/Ojinaga
                         Etc/GMT-7
                         G
+                        America/Chihuahua
+                        America/Ojinaga
                         America/North_Dakota/Beulah
                         America/Bahia_Banderas
                         America/North_Dakota/New_Salem
@@ -1515,9 +1515,9 @@ L<Date::Manip::TZ> module.
                         America/North_Dakota/Center
                         America/North_Dakota/New_Salem
                         America/North_Dakota/Beulah
-                        America/Ciudad_Juarez
                         Etc/GMT-6
                         F
+                        America/Ciudad_Juarez
                         America/Cancun
                         America/Indiana/Petersburg
                         America/Indiana/Vincennes
@@ -1764,9 +1764,9 @@ L<Date::Manip::TZ> module.
      0      -02:09:40   America/Noronha
      0      -02:00:00   Atlantic/South_Georgia
                         America/Noronha
+                        America/Nuuk
                         Etc/GMT-2
                         B
-                        America/Nuuk
                         America/Scoresbysund
                         Atlantic/Cape_Verde
                         Atlantic/Azores
@@ -1832,7 +1832,6 @@ L<Date::Manip::TZ> module.
                         Europe/Madrid
                         Europe/Paris
                         Pacific/Kanton
-                        America/Yellowknife
                         America/Cambridge_Bay
                         Africa/Lagos
                         Antarctica/Casey
@@ -1951,10 +1950,10 @@ L<Date::Manip::TZ> module.
                         Europe/Chisinau
                         Europe/Kaliningrad
                         Africa/Tripoli
-                        Asia/Damascus
-                        Asia/Amman
                         Etc/GMT+2
                         O
+                        Asia/Damascus
+                        Asia/Amman
                         Europe/Istanbul
                         Europe/Simferopol
                         Europe/Minsk
@@ -2413,7 +2412,6 @@ L<Date::Manip::TZ> module.
                         America/Ciudad_Juarez
                         America/Boise
                         America/Cambridge_Bay
-                        America/Yellowknife
                         America/Inuvik
                         America/Chihuahua
                         America/Mazatlan
@@ -2562,7 +2560,8 @@ L<Date::Manip::TZ> module.
                         Antarctica/Palmer
      1      -01:30:00   America/St_Johns
                         America/Montevideo
-     1      -01:00:00   America/Noronha
+     1      -01:00:00   America/Nuuk
+                        America/Noronha
                         America/Scoresbysund
                         Atlantic/Azores
                         Atlantic/Cape_Verde
@@ -2634,6 +2633,7 @@ L<Date::Manip::TZ> module.
                         Asia/Gaza
                         Asia/Hebron
                         Asia/Jerusalem
+                        Africa/Cairo
                         Europe/Helsinki
                         Asia/Famagusta
                         Asia/Nicosia
@@ -2645,7 +2645,6 @@ L<Date::Manip::TZ> module.
                         Asia/Damascus
                         Asia/Amman
                         Europe/Istanbul
-                        Africa/Cairo
                         Europe/Simferopol
                         Europe/Kaliningrad
                         Europe/Minsk
@@ -3153,6 +3152,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Chisinau
                       Asia/Gaza
                       Asia/Hebron
+                      Africa/Cairo
                       Europe/Helsinki
                       Asia/Famagusta
                       Asia/Nicosia
@@ -3164,7 +3164,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Asia/Damascus
                       Asia/Amman
                       Europe/Istanbul
-                      Africa/Cairo
                       Europe/Simferopol
                       Europe/Kaliningrad
                       Europe/Minsk
@@ -3328,7 +3327,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Ciudad_Juarez
                       America/Boise
                       America/Cambridge_Bay
-                      America/Yellowknife
                       America/Inuvik
                       America/Chihuahua
                       America/Mazatlan
@@ -3362,8 +3360,9 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/North_Dakota/New_Salem
                       America/Regina
                       America/Swift_Current
-                      America/Yellowknife
      MSD              Europe/Moscow
+                      Europe/Volgograd
+                      Europe/Kirov
                       Europe/Simferopol
                       Europe/Chisinau
                       Europe/Kyiv
@@ -3374,6 +3373,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Vilnius
      MSK              Europe/Moscow
                       Europe/Simferopol
+                      Europe/Volgograd
+                      Europe/Kirov
                       Europe/Minsk
                       Europe/Kyiv
                       Europe/Chisinau
@@ -3389,7 +3390,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Hermosillo
                       America/Mazatlan
                       America/Boise
-                      America/Yellowknife
                       America/Dawson_Creek
                       America/Inuvik
                       America/Fort_Nelson
@@ -3415,7 +3415,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/North_Dakota/New_Salem
                       America/Regina
                       America/Swift_Current
-                      America/Yellowknife
                       America/Phoenix
      N                N
      NDDT             America/St_Johns

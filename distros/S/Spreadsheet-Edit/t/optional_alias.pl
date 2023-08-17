@@ -3,9 +3,9 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp etc.
-use t_TestCommon  # Test::More etc.
+use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug mycheckeq_literal expect1 mycheck 
+            bug mycheckeq_literal expect1 mycheck
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -17,7 +17,7 @@ use Spreadsheet::Edit qw(:all);
 
 my $inpath = create_testdata(
     rows => [
-      [ "Atitle", "bee title", "Ctitle", "Dtitle" ],     
+      [ "Atitle", "bee title", "Ctitle", "Dtitle" ],
     ],
     gen_rows => 4,  # some data rows
 );
@@ -35,11 +35,11 @@ read_spreadsheet $inpath;
 
 # Normal alias which succeeds
 alias Balias1 => qr/bee title/i; # void context
-die unless $colx{Balias1} == 1; 
+die unless $colx{Balias1} == 1;
 die unless 1 == alias Balias2 => qr/bee title/i;  # cx 1
-die unless $colx{Balias2} == 1; 
-apply { 
-  die unless $Balias1 eq "B".$rx; 
+die unless $colx{Balias2} == 1;
+apply {
+  die unless $Balias1 eq "B".$rx;
 };
 
 # Normal alias attempt fails with non-matching regex
@@ -56,7 +56,7 @@ apply {
   eval { $Xalias2 = "foo" }; verif_eval_err qr/unk.*colspec/i; # write
 };
 
-# optional alias 
+# optional alias
 alias {optional => 1}, Xalias3 => qr/non existent/;
 die unless exists $colx{Xalias3};
 die "colx{Xalias3} unexpectedly defined!\n  colx: $colx{Xalias3}\n  colx_desc: $colx_desc{Xalias3}"

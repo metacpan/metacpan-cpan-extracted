@@ -1,15 +1,15 @@
 package PDF::Collage::TemplatesCollection;
 use v5.24;
 use warnings;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.002' }
 
 use Carp;
 use JSON::PP qw< decode_json >;
+use Scalar::Util qw< blessed >;
 use PDF::Collage::Template ();
 
 use Moo;
 use experimental qw< signatures >;
-no warnings qw< experimental::signatures >;
 
 use namespace::clean;
 
@@ -17,12 +17,10 @@ has resolver   => (is => ro => required => 1 => coerce => \&__resolver);
 has _selectors => (is => 'lazy');
 
 sub _build__selectors ($self) {
-   my $list = $self->_resolve(undef, 'list')
-     or croak "cannot ask 'list' to resolver";
    my @selectors =
-      map {  s{\A (?: \./)? definitions/ | \.json\z}{}rgmxs }
-      grep { m{\A (?: \./)? definitions/.*\.json \z}mxs }
-      $list->@*;
+      map  { s{\.json}{}rmxs }
+      grep { m{\.json \z}mxs }
+      $self->resolver->get_sub_resolver('definitions')->list_asset_keys;
    return \@selectors;
 } ## end sub _build__selectors
 
@@ -32,34 +30,20 @@ sub get ($self, $selector) {
    $selector = $self->_selector_from($selector)
       or croak 'invalid selector';
 
-   my $json = $self->_resolve("definitions/$selector.json", 'data');
-   my $definition = decode_json($json);
-
-   $definition = { commands => $definition }
-      unless ref($definition) eq 'HASH';
-
    my $resolver = $self->resolver;
-   $definition->{functions} = {
-      as_data => sub ($key) { $resolver->($key, 'data') },
-      as_file => sub ($key, $keep_extension = 1) {
-         my $old_name = $resolver->($key, 'file');
-         return $old_name unless $keep_extension;
 
-         # ensure the extension is there... should I rename the file?
-         my $extension = $key =~ s{\A.*?\.}{.}rgmxs;
-         my $elen = length($extension);
-         return $old_name
-            if length($old_name) >= $elen
-            && substr($old_name, -$elen, $elen) eq $extension;
+#   my $def = $resolver->get_sub_resolver('definitions')
+#      ->get_asset("$selector.json")->parsed_as_json;
+   my $def = $resolver->get_asset("./definitions/$selector.json")->parsed_as_json;
 
-         # extension is not there, append it
-         my $new_name = $old_name . $extension;
-         rename $old_name, $new_name;
-         return $new_name;
-      },
+   $def = { commands => $def } unless ref($def) eq 'HASH';
+
+   $def->{functions} = {
+      as_data => sub ($key) { $resolver->get_asset($key)->raw_data },
+      as_file => sub ($key) { $resolver->get_asset($key)->file     },
    };
 
-   return PDF::Collage::Template->new($definition);
+   return PDF::Collage::Template->new($def);
 }
 
 sub render ($self, $selector = undef, $data = undef) {
@@ -67,13 +51,13 @@ sub render ($self, $selector = undef, $data = undef) {
    return $self->get($selector)->render($data);
 }
 
-sub _resolve ($self, $key, $type) { $self->resolver->($key, $type) }
-
 # coercion function to get a Data::Resolver CDDE reference back
 sub __resolver ($candidate) {
-   return $candidate if ref($candidate) eq 'CODE';
-   require Data::Resolver;
-   return Data::Resolver::generate($candidate);
+   return $candidate if blessed($candidate);
+   my $class = $candidate->{class};
+   my $path = "$class.pm" =~ s{::}{/}rgmxs;
+   require $path;
+   return $class->new($candidate->%*);
 }
 
 sub _selector_from ($self, $selector) {

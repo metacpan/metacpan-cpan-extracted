@@ -19,20 +19,26 @@ SVN::Rami - Automates merging to multiple branches
 
 =cut
 
-our $VERSION = '0.202';
+our $VERSION = '0.205';
 
 
 =head1 SYNOPSIS
 
 Used by the script L<rami|https://metacpan.org/dist/SVN-Rami/view/bin/rami>. This is not (yet) a stand-alone module.
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
-There are currently no publicly available methods because
-this module is only intended to be used by the script
+This module is only intended to be used by the script
 L<rami|https://metacpan.org/dist/SVN-Rami/view/bin/rami>.
+There are a few publicly available subroutines,
+but they are not guaranteed to be compatible between revisions.
 
 =cut
+
+#
+# Documentation of public subroutines is provided inline below.
+#
+
 
 #
 #Reads a two-column CSV file and converts it to key-value pairs.
@@ -58,57 +64,6 @@ sub load_csv_as_map {
 	return @result;
 }
 
-=head1 AUTHOR
-
-Dan Richter, C<< <dan.richter at trdpnt.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-svn-rami at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Rami>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc SVN::Rami
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Rami>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/SVN-Rami>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/SVN-Rami>
-
-=back
-
-=head1 SEE ALSO
-
-SVK::Merge
-
-=head1 LICENSE AND COPYRIGHT
-
-This software is copyright (c) 2023 by Dan Richter.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-
-=cut
 
 #
 # This utility function simply dumps data to a file.
@@ -257,12 +212,66 @@ sub rami_main {
 			$source_branch = $target_branch;
 			$source_revision = $target_revision;
 		} else {
-			print "Skipping branch $target_branch because we don't need to merge it.\n";
+			# print "Skipping branch $target_branch because we don't need to merge it.\n";
 		}
 	}
 
 	if ( ! $found_branch ) {
 		die "Unrecognized branch $source_branch\n";
+	}
+}
+
+
+=head2 windows_safe_remove_tree
+
+	windows_safe_remove_tree "foo/bar", "c:\\temp"
+
+B<This function is still in beta.> Removes a directory and all its sub-directories.
+Same as L<File::Path::remove_tree|https://metacpan.org/pod/File::Path>,
+but provides a work-around for a Windows issue involving very long filenames.
+Works on all operating systems, not just Windows.
+
+
+=head3 Statement of the problem
+
+On Windows it is possible to create files that have more than 
+L<MAX_PATH|https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN#maximum-path-length-limitation>=260
+characters, but Windows will
+L<report errors when you try to delete them|https://appuals.com/fix-source-file-names-are-larger-than-is-supported-by-the-file-system/>.
+If you try to delete them manually, you might see this error message:
+"The source file names are larger than is supported by the file system".
+If you try to delete the files with C<File::Path::remove_tree>,
+you might see this error message:
+"cannot remove directory for [...]: Directory not empty".
+
+=head3 Existing work-arounds
+
+Besides this function, many work-arounds have been proposed. See:
+
+=over
+
+=item * A L<work-around in Perl|http://stringstream.blogspot.com/2014/11/perl-long-paths-issue-in-windows.html> which uses L<Win32::LongPath|https://metacpan.org/pod/Win32::LongPath>.
+(Note that the maintainers of L<File::Path::remove_tree|https://metacpan.org/pod/File::Path>
+have L<declined a request to integrate the work-around|https://rt.cpan.org/Public/Bug/Display.html?id=105169>.)
+
+=item * L<Work-arounds on the command-line|https://superuser.com/questions/78434/how-to-delete-directories-with-path-names-too-long-for-normal-delete>
+
+=item * L<Work-arounds in the Windows GUI|https://appuals.com/fix-source-file-names-are-larger-than-is-supported-by-the-file-system/>
+
+=back
+
+=cut
+
+sub windows_safe_remove_tree {
+	if ($^O ne 'MSWin32') {
+		# Normal case: not Windows
+		File::Path::remove_tree @_;
+	} else {
+		# Windows: do the work-around
+		my @filenames = @_;
+		for (@filenames) { s#/#\\#g }  # Convert slashes to backslashes, e.g., a/b/c -> a\b\c
+		my $windows_filenames = join(' ', @filenames);
+		exec("rmdir /Q /S $windows_filenames");
 	}
 }
 
@@ -336,6 +345,56 @@ sub EXEC {
 	return $result;
 }
 
+=head1 AUTHOR
 
+Dan Richter, C<< <dan.richter at trdpnt.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-svn-rami at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Rami>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc SVN::Rami
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Rami>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/SVN-Rami>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/SVN-Rami>
+
+=back
+
+=head1 SEE ALSO
+
+L<SVK::Merge|https://metacpan.org/pod/SVK::Merge>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by Dan Richter.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+=cut
 
 1; # End of SVN::Rami

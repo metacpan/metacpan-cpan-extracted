@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+use 5.036;
+use utf8;
+
+use File::Basename;
+use Cwd          qw(getcwd);
+use Scalar::Util qw(reftype);
+use DDP;
+
+my $valid_verbs = [qw(run generate module)];
+my $verb        = shift;
+my $lib_dir     = getcwd . '/lib';
+
+(
+    say
+"Invalid command '$verb' type 'slick help' for a list of the valid commands."
+      && exit 1 )
+  unless grep { $_ eq $verb } $valid_verbs->@*;
+
+my $noun = shift;
+
+unless ($noun) {
+    say qq{No noun provided, please provide a noun for the command: '$verb'};
+
+    if ( $verb eq 'run' ) {
+        say qq{Perhaps you meant something like: 'slick run app.pl'?};
+    }
+    elsif ( $verb eq 'generate' ) {
+        say
+qq{Perhaps you meant something like: 'slick generate router MyApp::Router::ItemRouter'};
+    }
+
+    exit 1;
+}
+
+if ( $verb eq 'run' ) {
+    do( rindex( $noun, '/', 0 ) == 0 ? $noun : './' . $noun );
+    wait && exit 0;
+}
+
+unless ( -d $lib_dir ) {
+    say qq{Could not find directory: $lib_dir};
+    say 'Please create this directory to continue.';
+    exit 1;
+}

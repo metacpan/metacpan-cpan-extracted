@@ -1,0 +1,15 @@
+Revision history for Dancer2-Template-Mason
+
+0.1.1 2023-08-14
+ [DOCUMENTATION]
+ - Document how to deal with Mason caching configuration. (#3, cromedome++)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 50 insertions(+), 1 deletion(-)
+
+0.1.0 2023-08-01
+ [ENHANCEMENTS]
+ - Initial release, based on Dancer-Template-Mason.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 3 insertions(+)

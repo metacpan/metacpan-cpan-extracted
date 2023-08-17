@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib "t";
 use testcase "t::stages";
@@ -14,7 +14,7 @@ sub stages { return $_[0] }
 {
    my $ret = stages { one => "one" };
 
-   is_deeply( $ret, { one => "one" },
+   is( $ret, { one => "one" },
       'not permitted keyword falls through to regular symbol lookup' );
 }
 
@@ -24,7 +24,7 @@ sub stages { return $_[0] }
 
    my $ret = stages { two => "two" };
 
-   is_deeply( $ret, { two => "two" },
+   is( $ret, { two => "two" },
       'keyword permitted by key but denied by func' );
 }
 

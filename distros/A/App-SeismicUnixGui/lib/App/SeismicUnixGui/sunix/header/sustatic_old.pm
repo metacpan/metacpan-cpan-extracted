@@ -6,7 +6,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: sustatic 
+ PERL PROGRAM NAME: sustatic 
  AUTHOR: Juan Lorenzo
  DATE: June 2 2016 
  DESCRIPTION surface consistent receiver-source static

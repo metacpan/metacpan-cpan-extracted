@@ -112,8 +112,10 @@ static void parse_in(pTHX_ U32 flags, SV **parsedata, void *hookdata)
   lex_read_space(0);
 
   struct XSParseInfixInfo *info;
-  if(!parse_infix(XPI_SELECT_EQUALITY, &info))
+  if(!parse_infix(XPI_SELECT_ANY, &info))
     croak("Expected an equality test operator");
+  if(info->cls != XPI_CLS_EQUALITY)
+    croak("The %s operator is not permitted for the in: meta-operator (cls=%d)", info->opname, info->cls);
 
   /* parsedata will be an AV containing
    *  [0] IV = enum Inop_Operator
@@ -218,7 +220,7 @@ struct XSParseInfixHooks infix_elem_num = {
 MODULE = Syntax::Operator::In    PACKAGE = Syntax::Operator::In
 
 BOOT:
-  boot_xs_parse_infix(0.27);
+  boot_xs_parse_infix(0.28);
 
   register_xs_parse_infix("in", &infix_in, NULL);
 

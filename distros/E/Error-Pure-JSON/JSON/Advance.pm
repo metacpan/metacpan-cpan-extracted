@@ -1,11 +1,9 @@
 package Error::Pure::JSON::Advance;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Output::JSON qw(err_json);
 use Error::Pure::Utils qw(err_helper);
 use List::MoreUtils qw(none);
@@ -15,8 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Global variables.
 our %ERR_PARAMETERS;
@@ -83,11 +80,9 @@ Error::Pure::JSON::Advance - Error::Pure module for JSON output with additional 
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::JSON::Advance qw(err);
 
  # Additional parameters.
@@ -104,11 +99,9 @@ Error::Pure::JSON::Advance - Error::Pure module for JSON output with additional 
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::JSON::Advance qw(err);
 
  # Additional parameters.
@@ -125,11 +118,9 @@ Error::Pure::JSON::Advance - Error::Pure module for JSON output with additional 
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::JSON;
  use Error::Pure::JSON::Advance qw(err);
 
@@ -187,21 +178,22 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-JSON>
+L<https://github.com/michal-josef-spacek/Error-Pure-JSON>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

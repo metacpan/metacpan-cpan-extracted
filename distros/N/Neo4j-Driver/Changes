@@ -1,5 +1,28 @@
 Revision history for Neo4j::Driver
 
+0.40  2023-07-19
+
+ - Add documentation that calling element_id() on nodes and relationships
+   from Neo4j version 4 and earlier might change to become a fatal error.
+
+0.39  2023-07-06
+
+ - The concurrent_tx option is no longer experimental (now defaults to off).
+ - Fix erroneous warnings for disabled concurrent transactions on HTTP.
+ - Internal change: Store driver config options in a hash of their own.
+
+0.38  2023-06-18
+
+ - Mitigate more test failures on slow machines and on Perl v5.14 and older.
+ - Tests no longer fail for unexpected warnings, except during author testing.
+
+0.37  2023-02-27  (TRIAL RELEASE)
+
+ - Add deprecation warning to node and relationship id() methods on Neo4j 5
+ - Fix a bug introduced in 0.36 which prevented some Bolt server/network errors
+   from being reported correctly.
+ - Mitigate test failures on slow machines and on Perl v5.10
+
 0.36  2023-02-05
 
  - Add support for managed transaction functions.

@@ -105,7 +105,7 @@ struct Connection : Refcnt, protected IStreamSelfListener {
         message().opcode(Opcode::BINARY).send(std::forward<B>(begin), std::forward<E>(end), callback);
     }
 
-    void send_text (string& payload, const send_fn& callback = {}) {
+    void send_text (string_view payload, const send_fn& callback = {}) {
         message().opcode(Opcode::TEXT).send(payload, callback);
     }
 
@@ -154,6 +154,10 @@ struct Connection : Refcnt, protected IStreamSelfListener {
 
     void stats_counter(const StatisticsSP& val) {stats = val;}
     StatisticsSP stats_counter() {return stats;}
+
+    bool should_deflate(Opcode opcode, size_t payload_length) const {
+        return parser->should_deflate(opcode, payload_length);
+    }
 
 protected:
     State    _state;

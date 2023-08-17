@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "lib::relative" : {
          "file" : "lib/lib/relative.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -73,8 +73,9 @@
          "web" : "https://github.com/Grinnz/lib-relative"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_contributors" : [
+      "Chase Whitener <cwhitener@gmail.com>",
       "Dan Book <grinnz@grinnz.com>",
       "Paulo Custodio <pauloscustodio@gmail.com>"
    ],

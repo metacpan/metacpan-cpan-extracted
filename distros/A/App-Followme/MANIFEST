@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/App/Followme.pm
 lib/App/Followme/BaseData.pm
+lib/App/Followme/BinaryData.pm
 lib/App/Followme/ConfiguredObject.pm
 lib/App/Followme/ConvertPage.pm
 lib/App/Followme/CreateGallery.pm
@@ -34,10 +35,12 @@ lib/App/Followme/Web.pm
 lib/App/Followme/WebData.pm
 script/followme
 share/bundle.pl
+share/clean.pl
 share/flatten.pl
 share/followme.el
 share/install.sh
 t/BaseData.t
+t/BinaryData.t
 t/ConfiguredObject.t
 t/ConvertPage.t
 t/CreateGallery.t

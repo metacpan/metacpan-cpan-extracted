@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -48,7 +48,11 @@ class ValidatingTestListener : public Catch::EventListenerBase {
     };
 
 public:
-    ValidatingTestListener(Catch::ReporterConfig const& config) :
+    static std::string getDescription() {
+        return "Validates ordering of Catch2's listener events";
+    }
+
+    ValidatingTestListener(Catch::IConfig const* config) :
         EventListenerBase(config) {
         m_preferences.shouldReportAllAssertions = true;
     }
@@ -67,7 +71,7 @@ public:
         ++m_testCaseCounter.starting;
 
         // Reset the part tracking for partial test case events
-        m_lastSeenPartNumber = -1;
+        m_lastSeenPartNumber = uint64_t(-1);
     }
 
     void testCasePartialStarting(Catch::TestCaseInfo const&,

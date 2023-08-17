@@ -11,7 +11,7 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME:iBottomMutePicks2par.pm
+ PERL PROGRAM NAME:iBottomMutePicks2par.pm
  AUTHOR: Juan Lorenzo
  DATE: June 12 2017 
 
@@ -98,7 +98,7 @@ my $iBottomMutePicks2par = {
 
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($true $false $in $out $to $ibot_mute_par_ $itemp_bot_mute_picks_ $itemp_bot_mute_picks_sorted_par_  $out $suffix_su);
-my ($PL_SEISMIC) = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine clear
 
@@ -181,8 +181,8 @@ sub calc {
     $mkparfile_out =
       $itemp_bot_mute_picks_sorted_par_ . $iBottomMutePicks2par->{_file_in};
 
-    $iBottomMutePicks2par->{TX_inbound}  = $PL_SEISMIC . '/' . $mkparfile_in;
-    $iBottomMutePicks2par->{TX_outbound} = $PL_SEISMIC . '/' . $mkparfile_out;
+    $iBottomMutePicks2par->{TX_inbound}  = $DATA_SEISMIC_TXT . '/' . $mkparfile_in;
+    $iBottomMutePicks2par->{TX_outbound} = $DATA_SEISMIC_TXT . '/' . $mkparfile_out;
 
     $mkparfile->clear();
     $mkparfile->string1('tmute');

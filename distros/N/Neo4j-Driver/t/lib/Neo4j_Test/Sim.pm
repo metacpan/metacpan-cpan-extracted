@@ -166,8 +166,8 @@ package Neo4j_Test::Sim::Store;
 use parent 'Neo4j::Driver::Net::HTTP::LWP';
 sub new {
 	my ($class, $driver) = @_;
-	$driver->{jolt} = 0;  # sim currently only supports JSON
-	$driver->{cypher_params_v2} = 1;  # sim uses old param syntax
+	$driver->{config}->{jolt} = 0;  # sim currently only supports JSON
+	$driver->{config}->{cypher_params_v2} = 1;  # sim uses old param syntax
 	return $class->SUPER::new($driver);
 }
 sub request {

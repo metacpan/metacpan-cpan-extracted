@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# mockup ip for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+echo "${0##*/} should not be called anywhere!" >&2
+exit 2

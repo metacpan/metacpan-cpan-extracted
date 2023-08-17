@@ -17,13 +17,23 @@ as it can be replaced by `Catch.cmake` that provides the function
 command line interface instead of parsing C++ code with regular expressions.
 
 
-## Planned changes
+### `CATCH_CONFIG_BAZEL_SUPPORT`
 
-### Console Colour API
+Catch2 supports writing the Bazel JUnit XML output file when it is aware
+that is within a bazel testing environment. Originally there was no way
+to accurately probe the environment for this information so the flag
+`CATCH_CONFIG_BAZEL_SUPPORT` was added. This now deprecated. Bazel has now had a change
+where it will export `BAZEL_TEST=1` for purposes like the above. Catch2
+will now instead inspect the environment instead of relying on build configuration.
 
-The API for Catch2's console colour will be changed to take an extra
-argument, the stream to which the colour code should be applied.
+### `IEventLister::skipTest( TestCaseInfo const& testInfo )`
 
+This event (including implementations in derived classes such as `ReporterBase`)
+is deprecated and will be removed in the next major release. It is currently
+invoked for all test cases that are not going to be executed due to the test run
+being aborted (when using `--abort` or `--abortx`). It is however
+**NOT** invoked for test cases that are [explicitly skipped using the `SKIP`
+macro](skipping-passing-failing.md#top).
 
 ---
 

@@ -8,7 +8,7 @@ Data::BiaB - Analyze Band-in-a-Box data files
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = 0.11;
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,14 @@
 Revision history for Perl extension MooseX-Types-Data-Serializer.
 
+0.05 2023-06-06T16:48:39Z
+
+ - Declare x_authority.
+
+0.04 2023-06-06T15:55:30Z
+
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.03 2019-02-18T06:08:46Z
 
  - Migrate all the tests from Test::More to Test2::V0.

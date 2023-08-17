@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::header::surange;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SURANGE - get max and min values for non-zero header entries	
+ PERL PROGRAM NAME:  SURANGE - get max and min values for non-zero header entries	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

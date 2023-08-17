@@ -1,0 +1,12 @@
+.travis.yml
+Changes
+lib/Pipe/Tube/Csv.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/02-csv.t
+xt/90-pod.t
+xt/91-pod-coverage.t
+xt/99-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

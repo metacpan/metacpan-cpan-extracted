@@ -7,7 +7,6 @@ use ExtUtils::MakeMaker;
 use File::Copy;
 use File::Spec;
 use File::Which;
-use C::Scan::Constants;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 my $gnulike_p = which('gcc') && -e '/dev/null';
@@ -38,20 +37,21 @@ WriteMakefile(
     # OBJECT            => '$(O_FILES)', # link all the C files too
 );
 if ($gnulike_p) {
+    eval {require C::Scan::Constants};
     # looks like we're on something Gnu-like, attempt to find rados header file
     # and generate constants from it
     my $output = `echo '#include <rados/librados.h>' | cpp -H -o /dev/null 2>&1 | head -n1`;
     # drop out to fallback if we get an error
     goto FALLBACK if $output =~ m/clang: error/;
     my ($path) = ($output =~ m!^\. (.*)$!);
-    my @constants = extract_constants_from( $path );
+    my @constants = C::Scan::Constants::extract_constants_from( $path );
     @constants = grep { $_ ne 'CEPH_LIBRADOS_H' and
                         $_ ne 'CEPH_RADOS_API' and
                         $_ ne 'VOIDPTR_RADOS_T'} @constants;
     # suppress help to STDERR
     open SAVERR, ">&STDERR";
     open STDERR, ">/dev/null";
-    write_constants_module( "Ceph::Rados", @constants );
+    C::Scan::Constants::write_constants_module( "Ceph::Rados", @constants );
     open  STDERR, ">&SAVERR";
     close SAVERR;
 }

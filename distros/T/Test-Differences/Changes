@@ -1,5 +1,9 @@
 Changes file for Test::Differences
 
+0.70   2023-07-07
+    - Stop pointless use of taint-mode in tests, so tests pass when perl is
+      built without taint support
+
 0.69   2022-01-07
     - Special-case Unknown::Values objects in comparisons, as it's better to spit
       out a diagnostic failure than to just die;

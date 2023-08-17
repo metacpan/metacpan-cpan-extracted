@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::header::sugethw;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUGETHW - sugethw writes the values of the selected key words		
+ PERL PROGRAM NAME:  SUGETHW - sugethw writes the values of the selected key words		
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

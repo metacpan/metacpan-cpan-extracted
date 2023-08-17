@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 # This "test" never fails, but prints a benchmark comparison between this
 # syntax and a simple if/elsif chain

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::PulseLength;
 #ABSTRACT: Pulse length sweep
-$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.872';
+$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.881';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -94,7 +94,7 @@ Lab::XPRESS::Sweep::PulseLength - Pulse length sweep
 
 =head1 VERSION
 
-version 3.872
+version 3.881
 
 =head1 SYNOPSIS
 

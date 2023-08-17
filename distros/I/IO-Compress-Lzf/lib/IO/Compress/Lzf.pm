@@ -5,15 +5,15 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.204 ;
+use IO::Compress::Base 2.206 ;
 
-use IO::Compress::Base::Common  2.204 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzf  2.204 ;
+use IO::Compress::Base::Common  2.206 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzf  2.206 ;
 #use Compress::Lzf ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzfError);
 
-$VERSION = '2.204';
+$VERSION = '2.206';
 $LzfError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -364,7 +364,7 @@ Defaults to 0.
 
 =back
 
-=head2 Examples
+=head2 Oneshot Examples
 
 Here are a few example that show the capabilities of the module.
 
@@ -443,7 +443,10 @@ The format of the constructor for C<IO::Compress::Lzf> is shown below
     my $z = IO::Compress::Lzf->new( $output [,OPTS] )
         or die "IO::Compress::Lzf failed: $LzfError\n";
 
-It returns an C<IO::Compress::Lzf> object on success and undef on failure.
+The constructor takes one mandatory parameter, C<$output>, defined below and
+zero or more C<OPTS>, defined in L<Constructor Options>.
+
+It returns an C<IO::Compress::Lzf> object on success and C<undef> on failure.
 The variable C<$LzfError> will contain an error message on failure.
 
 If you are running Perl 5.005 or better the object, C<$z>, returned from
@@ -455,6 +458,18 @@ these forms
 
     $z->print("hello world\n");
     print $z "hello world\n";
+
+Below is a simple exaple of using the OO interface to create an output file
+C<myfile.lzf> and write some data to it.
+
+    my $filename = "myfile.lzf";
+    my $z = IO::Compress::Lzf->new($filename)
+        or die "IO::Compress::Lzf failed: $LzfError\n";
+
+    $z->print("abcde");
+    $z->close();
+
+See the L</Examples> for more.
 
 The mandatory parameter C<$output> is used to control the destination
 of the compressed data. This parameter can take one of these forms.
@@ -536,7 +551,52 @@ This is a placeholder option.
 
 =head2 Examples
 
-TODO
+=head3 Streaming
+
+This very simple command line example demonstrates the streaming capabilities
+of the module. The code reads data from STDIN or all the files given on the
+commandline, compresses it, and writes the compressed data to STDOUT.
+
+    use strict ;
+    use warnings ;
+    use IO::Compress::Lzf qw(lzf $LzfError) ;
+
+    my $z = IO::Compress::Lzf->new("-", Stream => 1)
+        or die "IO::Compress::Lzf failed: $LzfError\n";
+
+    while (<>) {
+        $z->print("abcde");
+    }
+    $z->close();
+
+Note the use of C<"-"> to means C<STDOUT>. Alternatively you can use C<\*STDOUT>.
+
+=head3 Compressing a file from the filesystem
+
+To read the contents of the file C<file1.txt> and write the compressed
+data to the file C<file1.txt.lzf> there are a few options
+
+Start by creating the compression object and opening the input file
+
+    use strict ;
+    use warnings ;
+    use IO::Compress::Lzf qw(lzf $LzfError) ;
+
+    my $input = "file1.txt";
+    my $z = IO::Compress::Lzf->new("file1.txt.lzf")
+        or die "IO::Compress::Lzf failed: $LzfError\n";
+
+    # open the input file
+    open my $fh, "<", "file1.txt"
+        or die "Cannot open file1.txt: $!\n";
+
+    # loop through the input file & write to the compressed file
+    while (<$fh>) {
+        $z->print($_);
+    }
+
+    # not forgetting to close the compressed file
+    $z->close();
 
 =head1 Methods
 

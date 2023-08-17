@@ -1,5 +1,18 @@
 Version history for Catalyst-TraitFor-Request-Methods:
 
+v0.5.2    2023-06-14 15:37:24+01:00 Europe/London
+  [Tests]
+  - Added required module for tests to work around broken CPAN Testers environments.
+
+v0.5.1    2023-06-11 14:30:20+01:00 Europe/London
+  [Documentation]
+  - Document support policy for older Perl versions.
+
+  - Bumped copyright year.
+
+  [Tests]
+  - Cleaned up prerequisite reports.
+
 v0.5.0    2022-09-20 18:18:30+01:00 Europe/London
   [Enhancements]
   - Removed the use of Data::Enum, since it is slower than comparing strings.

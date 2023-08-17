@@ -1,67 +1,73 @@
 {
-   "abstract" : "PerlIO layer for XZ (de)compression",
-   "release_status" : "stable",
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "homepage" : "https://metacpan.org/pod/PerlIO::via::xz",
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/PerlIO-via-xz/issues"
+         },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/PerlIO-via-xz",
+         "url" : "https://github.com/Tux/PerlIO-via-xz"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
       },
-   "name" : "PerlIO-via-xz",
    "dynamic_config" : 1,
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>"
-      ],
+   "generated_by" : "Author",
    "prereqs" : {
       "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
-         },
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302191"
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
             },
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
+            },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
             }
          },
       "runtime" : {
          "requires" : {
             "IO::Compress::Xz" : "2.100",
-            "IO::Uncompress::UnXz" : "2.100",
-            "perl" : "5.012000",
+            "Carp" : "0",
             "PerlIO" : "0",
-            "Carp" : "0"
+            "perl" : "5.012000",
+            "IO::Uncompress::UnXz" : "2.100"
             },
          "recommends" : {
-            "IO::Uncompress::UnXz" : "2.201",
-            "IO::Compress::Xz" : "2.201"
+            "IO::Compress::Xz" : "2.204",
+            "IO::Uncompress::UnXz" : "2.204"
+            }
+         },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302195"
+            },
+         "requires" : {
+            "Test::More" : "0"
             }
          }
       },
-   "license" : [
-      "perl_5"
+   "name" : "PerlIO-via-xz",
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
       ],
+   "abstract" : "PerlIO layer for XZ (de)compression",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "version" : "0.06",
    "provides" : {
       "PerlIO::via::xz" : {
-         "file" : "lib/PerlIO/via/xz.pm",
-         "version" : "0.05"
+         "version" : "0.06",
+         "file" : "lib/PerlIO/via/xz.pm"
          }
       },
-   "generated_by" : "Author",
-   "version" : "0.05",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/PerlIO-via-xs/issues"
-         },
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/Tux/PerlIO-via-xs",
-         "url" : "https://github.com/Tux/PerlIO-via-xs"
-         },
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "homepage" : "https://metacpan.org/pod/PerlIO::via::xz"
-      }
+   "release_status" : "stable",
+   "license" : [
+      "perl_5"
+      ]
    }

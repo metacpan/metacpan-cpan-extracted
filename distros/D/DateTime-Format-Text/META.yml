@@ -3,6 +3,7 @@ abstract: 'Find a Date in Text'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  Class::Simple: '0'
   ExtUtils::MakeMaker: '0'
   Test::Deep: '0'
   Test::Most: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Text
   repository: git://github.com/nigelhorne/DateTime-Format-Text.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

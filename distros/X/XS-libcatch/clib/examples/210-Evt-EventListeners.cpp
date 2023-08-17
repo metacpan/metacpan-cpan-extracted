@@ -22,7 +22,7 @@ std::string ws(int const level) {
 }
 
 std::ostream& operator<<(std::ostream& out, Catch::Tag t) {
-    return out << "original: " << t.original << "lower cased: " << t.lowerCased;
+    return out << "original: " << t.original;
 }
 
 template< typename T >
@@ -308,7 +308,7 @@ struct MyListener : Catch::EventListenerBase {
     using EventListenerBase::EventListenerBase; // inherit constructor
 
     // Get rid of Wweak-tables
-    ~MyListener();
+    ~MyListener() override;
 
     // The whole test run starting
     void testRunStarting( Catch::TestRunInfo const& testRunInfo ) override {
@@ -420,8 +420,8 @@ TEST_CASE_METHOD( Fixture, "3: Testcase with class-based fixture", "[tag-C][tag-
 }
 
 // Compile & run:
-// - g++ -std=c++11 -Wall -I$(CATCH_SINGLE_INCLUDE) -o 210-Evt-EventListeners 210-Evt-EventListeners.cpp 000-CatchMain.o && 210-Evt-EventListeners --success
-// - cl -EHsc -I%CATCH_SINGLE_INCLUDE% 210-Evt-EventListeners.cpp 000-CatchMain.obj && 210-Evt-EventListeners --success
+// - g++ -std=c++14 -Wall -I$(CATCH_SINGLE_INCLUDE) -o 210-Evt-EventListeners 210-Evt-EventListeners.cpp && 210-Evt-EventListeners --success
+// - cl -EHsc -I%CATCH_SINGLE_INCLUDE% 210-Evt-EventListeners.cpp && 210-Evt-EventListeners --success
 
 // Expected compact output (all assertions):
 //

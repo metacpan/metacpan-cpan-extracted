@@ -1,10 +1,10 @@
 {
    "abstract" : "unofficial interface to the efa.vrr.de German itinerary service",
    "author" : [
-      "Copyright (C) 2009-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+      "Copyright (C) 2009-2021 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
             "Class::Accessor" : "0",
             "Exception::Class" : "0",
             "Getopt::Long" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "List::Util" : "0",
             "XML::LibXML" : "0",
@@ -43,23 +44,23 @@
    "provides" : {
       "Travel::Routing::DE::EFA" : {
          "file" : "lib/Travel/Routing/DE/EFA.pm",
-         "version" : "2.19"
+         "version" : "2.21"
       },
       "Travel::Routing::DE::EFA::Route" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route.pm",
-         "version" : "2.19"
+         "version" : "2.21"
       },
       "Travel::Routing::DE::EFA::Route::Message" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route/Message.pm",
-         "version" : "2.19"
+         "version" : "2.21"
       },
       "Travel::Routing::DE::EFA::Route::Part" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route/Part.pm",
-         "version" : "2.19"
+         "version" : "2.21"
       },
       "Travel::Routing::DE::VRR" : {
          "file" : "lib/Travel/Routing/DE/VRR.pm",
-         "version" : "2.19"
+         "version" : "2.21"
       }
    },
    "release_status" : "stable",
@@ -71,6 +72,6 @@
          "url" : "https://github.com/derf/Travel-Routing-DE-VRR"
       }
    },
-   "version" : "2.19",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.21",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

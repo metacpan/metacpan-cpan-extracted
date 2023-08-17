@@ -28,6 +28,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use WebService::Fastly::Object::HistoricalFieldResultsAttributes;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -159,7 +160,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
     'data' => {
-        datatype => 'ARRAY[HASH[string,string]]',
+        datatype => 'ARRAY[HistoricalFieldResultsAttributes]',
         base_name => 'data',
         description => '',
         format => '',
@@ -168,7 +169,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->openapi_types( {
-    'data' => 'ARRAY[HASH[string,string]]'
+    'data' => 'ARRAY[HistoricalFieldResultsAttributes]'
 } );
 
 __PACKAGE__->attribute_map( {

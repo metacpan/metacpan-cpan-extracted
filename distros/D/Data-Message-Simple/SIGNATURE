@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 714d675f54c5eb2fc4d8e88ef9ee1c65e9d66af0eec32b2795420af9dfb132a5 CONCEPT
+SHA256 dfacc17d52151a0e7edcd38906bebc3c7d68fac7c286967639e60c81f96dae56 Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 bbc05bf1a3292d2e137231f28fde235d2b1a0739d65d061cdb9402cd7439cee9 MANIFEST
+SHA256 3d26d336721273987d856c109cfb64203bf26dfe7aea94355756ebb9b7315e10 META.yml
+SHA256 325aece2e91f9520a844137c89f84ada5344ab2dd73e45829325cf95913d082e Makefile.PL
+SHA256 545e93c4b16f8815e57d244494e5d84a66afe927d37ef734bf5cb92ba0efbc5f README
+SHA256 5f7af3f6d71d2f72345819d65ab3a2b4dfe724cc4abd75f8dbe2917a9c0bbb9c Simple.pm
+SHA256 ac74f5d3901ce56abe9958df22dd259b0379e69c3e4cbc5ebb7961848e7472ea examples/create_and_print_message.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 e0c38e93af0d8e78d28c1ead882138d8ff5de5f6675641d2e3134cf849659f3f t/Data-Message-Simple/01-use.t
+SHA256 91ed0a36af5149c5fe7183362145541e53b6674689c7726042f7a822b4f87b0f t/Data-Message-Simple/02-version.t
+SHA256 9d757bf503bd6b50c2964c16b680bf50156a786a3f5392f1b9b109499069b1ea t/Data-Message-Simple/03-new.t
+SHA256 c826d06a7f25c93788ceeedc2178e2db071425ca1dae0199d1c1fd48ff273adb t/Data-Message-Simple/04-lang.t
+SHA256 bc74719e2df6cf13f83f09109010e59b4ca65c62290521699c3f9515d46ef3e4 t/Data-Message-Simple/05-text.t
+SHA256 6d4a1eb5e75147a6aeb5695cafcaba5f3fe835b28f15c87534eb10ae9be96554 t/Data-Message-Simple/06-type.t
+SHA256 9b0231902a4dda67256583d3fb92449c67630c3a6be1311cc8215668e4313d27 xt/Data-Message-Simple/01-pod_coverage.t
+SHA256 da3f8e72cccf46b4397d563dfe1c07ad3b0872f4438ed98d9ec80a1b3b332ce2 xt/Data-Message-Simple/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmSS0b8ACgkQojV9Rpe/
+B8vbww/8DWsxNKR5aJ4DvtpktIMZ0+lv0pV9TH3GWOdf+eHd5cKj/8qQdxceKbaW
+81TmPeBOwT7JobRittVGq3jocyKF0neQgHmqPjwQL4HNif1Hhu2r9BV8el2rWSR+
+yQtYJovaLlkkp2tXqsn69e94hVa/4jyK/yzzj6eOCQgn6zudSxzZ31bTCG785HVJ
+jOK4st/khV0u7X68IGXzC+AlKxQ8DwZJSLanR+KWNcAGM+ydCnpUqcJY+m6ZYx7d
+uEfaX9WVkJyTnnN+fRqwPHqXJAbm3cJhXNnTjpkRt+VXM3swJ8znwic4QQY8zcMt
+Fe0Uf/reRYXK5aDXYoL5tosyyOnT/e36DM5+rz7LeVSMAEQAgJieMLy8WXCDebXP
+zWJM4k1ZWb+zgqoRcOYnnF5u9QZ286ihCoTjlx88rK/88APMljSEYzInFC6mPvZW
+LTiL44IyQQ5DtJrP1UB2Ds0/4xAGKExSwMnxNCv+/IN/pNgs4VS93seURBO63A/B
+XcPgrmZ3+67PtDc+E4Ukw2IxrEaIgSrdTsikb4Th0vz0Task6OukW627gWUEHnTW
+nA9P4EK35Brx0MtDU4oc/juvvqv9zcHa0eSTMUydWuXvsbOw+P7KU9L4KJx82UX1
+kIa9YrAITpo6F2gBNX7ekMXpR5zQXcVQkuyVPpHXvaw3gXAkT+A=
+=KxRa
+-----END PGP SIGNATURE-----

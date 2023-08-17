@@ -13,7 +13,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,12 +22,12 @@ name: CPAN-Mini-Inject
 provides:
   CPAN::Mini::Inject:
     file: lib/CPAN/Mini/Inject.pm
-    version: '0.35'
+    version: '0.37'
   CPAN::Mini::Inject::Config:
     file: lib/CPAN/Mini/Inject/Config.pm
-    version: '0.35'
+    version: '0.37'
 requires:
-  CPAN::Checksums: '0'
+  CPAN::Checksums: '2.13'
   CPAN::Mini: '0.32'
   Carp: '0'
   Compress::Zlib: '0'
@@ -46,10 +46,12 @@ requires:
   LWP::Simple: '0'
   Net::EmptyPort: '0'
   Pod::Usage: '0'
+  Test::InDistDir: '0'
   Test::More: '0'
   YAML: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Mini-Inject
   license: http://dev.perl.org/licenses/
   repository: git://github.com/AndyA/CPAN--Mini--Inject.git
-version: '0.35'
+version: '0.37'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -125,7 +125,7 @@ best suited to your situation.
 
 A complete description of the functional interfaces available.  NOTE:
 it is recommended that you use the OO interface wherever possible
-as the functional interfaces have some imitations.
+as the functional interfaces have some limitations.
 
 =back
 

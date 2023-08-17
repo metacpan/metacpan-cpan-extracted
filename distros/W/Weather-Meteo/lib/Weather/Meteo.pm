@@ -16,11 +16,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ sub new {
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 
+    Takes an optional argument, tz, which defaults to 'Europe/London'.
+    For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
+
 =cut
 
 sub weather {
@@ -95,8 +98,11 @@ sub weather {
 		$param{latitude} = $location->latitude();
 		$param{longitude} = $location->longitude();
 		$param{'date'} = $_[1];
+		if($_[0]->can('tz') && $ENV{'TIMEZONEDB_KEY'}) {
+			$param{'tz'} = $_[0]->tz();
+		}
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD")');
+		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD" [ , tz = $tz ])');
 		return;
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
@@ -105,6 +111,7 @@ sub weather {
 	my $latitude = $param{latitude};
 	my $longitude = $param{longitude};
 	my $date = $param{'date'};
+	my $tz = $param{'tz'} || 'Europe/London';
 
 	if(!defined($latitude)) {
 		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD")');
@@ -127,8 +134,8 @@ sub weather {
 		'start_date' => $date,
 		'end_date' => $date,
 		'hourly' => 'temperature_2m,rain,snowfall,weathercode',
-		'daily' => 'weathercode,temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum,precipitation_hours',
-		'timezone' => 'Europe/London',	# FIXME
+		'daily' => 'weathercode,temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum,precipitation_hours,windspeed_10m_max,windgusts_10m_max',
+		'timezone' => $tz,
 			# https://stackoverflow.com/questions/16086962/how-to-get-a-time-zone-from-a-location-using-latitude-and-longitude-coordinates
 		'windspeed_unit' => 'mph',
 		'precipitation_unit' => 'inch'

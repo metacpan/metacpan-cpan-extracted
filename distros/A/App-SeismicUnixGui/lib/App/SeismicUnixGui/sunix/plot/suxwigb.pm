@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::suxwigb;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUXWIGB - X-windows Bit-mapped WIGgle plot of a segy data set		
+ PERL PROGRAM NAME:  SUXWIGB - X-windows Bit-mapped WIGgle plot of a segy data set		
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

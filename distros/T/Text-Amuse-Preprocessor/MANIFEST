@@ -21,6 +21,7 @@ t/common.t
 t/crash-on-verb.t
 t/crash_on_loop.t
 t/exclude-verbatim.t
+t/farsi.t
 t/footnotes.t
 t/footnotes/bad.in
 t/footnotes/bad2.in
@@ -61,6 +62,7 @@ t/testfiles/de.muse
 t/testfiles/en.muse
 t/testfiles/eo.muse
 t/testfiles/es.muse
+t/testfiles/farsi.html
 t/testfiles/fi.muse
 t/testfiles/fr.muse
 t/testfiles/full.in.muse
@@ -73,6 +75,7 @@ t/testfiles/mk.muse
 t/testfiles/nl.muse
 t/testfiles/pl.muse
 t/testfiles/pt.muse
+t/testfiles/rtl.html
 t/testfiles/ru.muse
 t/testfiles/sq.muse
 t/testfiles/sr.muse

@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.608 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2022-02-14.
+    This document describes version 0.609 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2023-07-14.
 
 SYNOPSIS
      use 5.010;
@@ -580,7 +580,7 @@ CELL (HORIZONTAL AND VERTICAL) ALIGNMENT
 CELL FORMATS
     The per-column- and per-cell- "formats" style regulates how to format
     data. The value for this style setting will be passed to
-    Data::Unixish::Apply's "apply()", as the "functions" argument. So it
+    Data::Unixish::Apply's apply(), as the "functions" argument. So it
     should be a single string (like "date") or an array (like "['date',
     ['centerpad', {width=>20}]]").
 
@@ -698,7 +698,7 @@ ATTRIBUTES
 
   rows => ARRAY OF ARRAY OF STR
     Store row data. You can set this attribute directly, or add rows
-    incrementally using "add_row()" and "add_rows()" methods.
+    incrementally using add_row() and add_rows() methods.
 
   row_filter => CODE|ARRAY OF INT
     When drawing, only show rows that match this. Can be an array containing
@@ -762,8 +762,8 @@ ATTRIBUTES
     exception.
 
     (In the future, setting "use_utf8" to 0 might opt the module to use the
-    non-"mb_*" version of functions from Text::ANSI::Util, e.g. "ta_wrap()"
-    instead of "ta_mbwrap()", and so on).
+    non-"mb_*" version of functions from Text::ANSI::Util, e.g. ta_wrap()
+    instead of ta_mbwrap(), and so on).
 
   wide => BOOL
     Whether to support wide characters. The default is to check for the
@@ -790,7 +790,7 @@ ATTRIBUTES
 
   show_row_separator => INT (default: 2)
     When drawing, whether to show separator lines between rows. The default
-    (2) is to only show separators drawn using "add_row_separator()". If you
+    (2) is to only show separators drawn using add_row_separator(). If you
     set this to 1, lines will be drawn after every data row. If you set this
     attribute to 0, no lines will be drawn whatsoever.
 
@@ -882,14 +882,12 @@ METHODS
   $t->add_row(\@row[, \%styles]) => OBJ
     Add a row. Note that row data is not copied, only referenced.
 
-    Can also add per-row styles (which can also be done using
-    "row_style()").
+    Can also add per-row styles (which can also be done using row_style()).
 
   $t->add_rows(\@rows[, \%styles]) => OBJ
     Add multiple rows. Note that row data is not copied, only referenced.
 
-    Can also add per-row styles (which can also be done using
-    "row_style()").
+    Can also add per-row styles (which can also be done using row_style()).
 
   $t->add_row_separator() => OBJ
     Add a row separator line.
@@ -1201,11 +1199,11 @@ FAQ
 
    Why are there 'ASCII::None' as well 'UTF8::None' and 'BoxChar::None' border styles?
     Because of the row separator, that can still be drawn if
-    "add_row_separator()" is used. See next question.
+    add_row_separator() is used. See next question.
 
    I want to hide borders, and I do not want row separators to be shown!
     The default is for separator lines to be drawn if drawn using
-    "add_row_separator()", e.g.:
+    add_row_separator(), e.g.:
 
      $t->add_row(['row1']);
      $t->add_row(['row2']);
@@ -1420,14 +1418,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015,
-    2014, 2013 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016,
+    2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

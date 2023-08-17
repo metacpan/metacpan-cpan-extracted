@@ -1,5 +1,28 @@
 Revision history for Plack-Middleware-BlockHeaderInjection
 
+v1.1.1    2023-06-19 09:41:15+01:00 Europe/London
+  [Documentation]
+  - Fixed typo in Changes.
+
+v1.1.0    2023-06-15 23:44:37+01:00 Europe/London
+  [Incompatible Changes]
+  - Bumped the minimum version of Perl to v5.12.
+
+  [Documentation]
+  - Documented the support policy for earlier Perl versions.
+
+  - Updated copyright year.
+
+  [Toolchain]
+  - Sign the distribution.
+
+  - Removed `.travis.yml` from repo.
+
+  - Updated MANIFEST.SKIP rules.
+
+  [Other]
+  - Perltidied the source code.
+
 v1.0.1    2020-12-11 15:32:37+00:00 Europe/London
   [Toolchain]
   - Fixed error in Dist::Zilla config.

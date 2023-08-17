@@ -30,6 +30,5 @@ test_requires 'Test::Exception' => '0';
 test_requires 'Test::More';
 test_requires 'Test::LWP::UserAgent';
 
-use_ptar;
 auto_install;
 WriteAll;

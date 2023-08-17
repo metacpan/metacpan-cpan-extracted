@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 40;
+use Test::More tests => 42;
 use Test::Deep;
 
 use Conf::Libconfig;
@@ -136,6 +136,16 @@ is_deeply($foo->value("abc.hash_ref"),
 	{key => "value", num => 1, float => 3.14, bignum => -1223372036854775809, arr => [1,2,3], obj=>{"k"=>"v"}},
 	"get hash ref value - status ok"
 );
+
+is($foo->set_value("abc.list_ref", [1.2,"hello", 4, [1,2,["group",2,["a","b","c"]]], {k1=>1, k2=>3.56, k3=>"hello"}]),
+	0,
+	"set list ref value - status ok"
+);
+is_deeply($foo->value("abc.list_ref"),
+	[1.2,"hello", 4, [1,2,["group",2,["a","b","c"]]], {k1=>1, k2=>3.56, k3=>"hello"}],
+	"get list ref value - status ok"
+);
+
 
 # scalar test
 ok($foo->add("me.mar", $binarykey, "0b0"), "add bool scalar - status ok");

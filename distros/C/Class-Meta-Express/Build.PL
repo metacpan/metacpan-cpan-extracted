@@ -1,6 +1,32 @@
 use Module::Build;
 
-my $build = Module::Build->new(
+my $class = Module::Build->subclass(
+    class => 'My::Builder',
+    code => q{
+        sub ACTION_tarball_name { print shift->dist_dir . ".tar.gz\n" }
+        sub ACTION_latest_changes {
+            my $self = shift;
+            (my $dv = $self->dist_version) =~ s/^v//;
+            open my $in, '<:raw', 'Changes' or die "Cannot open Changes: $!\n";
+            open my $out, '>:raw', 'latest_changes.md' or die "Cannot open latest_changes.md: $!\n";
+            while (<$in>) { last if /^\Q$dv\E\b/ }
+            print {$out} "Changes for v$dv\n";
+            while (<$in>) {
+                last if /^\s*$/;
+                chomp;
+                if (s/^\s+-/-  /) {
+                    print {$out} "\n";
+                } else {
+                    s/^\s+/ /;
+                }
+                print {$out} $_;
+            }
+            $self->add_to_cleanup('latest_changes.md');
+        }
+    },
+);
+
+$class->new(
     module_name        => 'Class::Meta::Express',
     license            => 'perl',
     create_makefile_pl => 'traditional',
@@ -13,10 +39,9 @@ my $build = Module::Build->new(
     },
     meta-express_merge => {
         resources => {
-            homepage   => 'http://search.cpan.org/dist/Class-Meta-Express/',
-            bugtracker => 'http://github.com/theory/class-meta-express/issues/',
-            repository => 'http://github.com/theory/class-meta-express/',
+            homepage   => 'https://search.cpan.org/dist/Class-Meta-Express/',
+            bugtracker => 'https://github.com/theory/class-meta-express/issues/',
+            repository => 'https://github.com/theory/class-meta-express/',
         }
     },
-);
-$build->create_build_script;
+)->create_build_script;

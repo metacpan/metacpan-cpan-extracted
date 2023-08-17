@@ -1,0 +1,58 @@
+{
+   "abstract" : "Launch Zoom meetings via Perl",
+   "author" : [
+      "Elvin Aslanov <rwp.primary@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Zoom-Meeting",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Path::Tiny" : "0",
+            "System::Command" : "0",
+            "URI" : "0",
+            "builtin" : "0",
+            "experimental" : "0",
+            "lib" : "0",
+            "overload" : "0",
+            "perl" : "v5.37.12"
+         }
+      }
+   },
+   "provides" : {
+      "Zoom::Meeting" : {
+         "file" : "lib/Zoom/Meeting.pm",
+         "version" : "0.231740"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rwp-cpan/Zoom-Meeting/issues"
+      },
+      "homepage" : "https://github.com/rwp-cpan/Zoom-Meeting",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rwp-cpan/Zoom-Meeting.git",
+         "web" : "https://github.com/rwp-cpan/Zoom-Meeting"
+      }
+   },
+   "version" : "0.231740",
+   "x_generated_by_perl" : "v5.37.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

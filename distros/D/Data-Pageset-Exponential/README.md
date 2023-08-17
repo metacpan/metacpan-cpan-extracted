@@ -4,7 +4,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 # VERSION
 
-version v0.3.2
+version v0.3.3
 
 # SYNOPSIS
 
@@ -27,7 +27,7 @@ my $pages = $pager->pages_in_set;
 This is a pager designed for paging through resultsets that contain
 hundreds if not thousands of pages.
 
-The interface is similar to [Data::Pageset](https://metacpan.org/pod/Data::Pageset) with sliding pagesets.
+The interface is similar to [Data::Pageset](https://metacpan.org/pod/Data%3A%3APageset) with sliding pagesets.
 
 # ATTRIBUTES
 
@@ -128,21 +128,21 @@ Returns an array reference of pages in the page set.
 This returns the first page number of the previous page set, for the
 first exponent.
 
-It is added for compatability with [Data::Pageset](https://metacpan.org/pod/Data::Pageset).
+It is added for compatability with [Data::Pageset](https://metacpan.org/pod/Data%3A%3APageset).
 
 ## `next_set`
 
 This returns the first page number of the next page set, for the first
 exponent.
 
-It is added for compatability with [Data::Pageset](https://metacpan.org/pod/Data::Pageset).
+It is added for compatability with [Data::Pageset](https://metacpan.org/pod/Data%3A%3APageset).
 
 # KNOWN ISSUES
 
 ## Differences with Data::Page
 
-This module is intended as a drop-in replacement for [Data::Page](https://metacpan.org/pod/Data::Page).
-However, it is based on a complete rewrite of [Data::Page](https://metacpan.org/pod/Data::Page) using
+This module is intended as a drop-in replacement for [Data::Page](https://metacpan.org/pod/Data%3A%3APage).
+However, it is based on a complete rewrite of [Data::Page](https://metacpan.org/pod/Data%3A%3APage) using
 [Moo](https://metacpan.org/pod/Moo), rather than extending it.  Because of that, it needs to fake
 `@ISA`.  This may break some applications.
 
@@ -156,7 +156,7 @@ value.
 
 ## Differences with Data::Pageset
 
-This module can behave like [Data::Pageset](https://metacpan.org/pod/Data::Pageset) in `slide` mode if the
+This module can behave like [Data::Pageset](https://metacpan.org/pod/Data%3A%3APageset) in `slide` mode if the
 exponent is set to `1`:
 
 ```perl
@@ -167,10 +167,16 @@ my $pager = Data::Pageset::Exponential->new(
 );
 ```
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.10.1 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 # SEE ALSO
 
-- [Data::Page](https://metacpan.org/pod/Data::Page)
-- [Data::Pageset](https://metacpan.org/pod/Data::Pageset)
+- [Data::Page](https://metacpan.org/pod/Data%3A%3APage)
+- [Data::Pageset](https://metacpan.org/pod/Data%3A%3APageset)
 
 # SOURCE
 
@@ -190,11 +196,11 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-Test code was adapted from [Data::Page](https://metacpan.org/pod/Data::Page) to ensure compatability.
+Test code was adapted from [Data::Page](https://metacpan.org/pod/Data%3A%3APage) to ensure compatability.
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

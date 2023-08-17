@@ -1,6 +1,6 @@
 ## WebSocket example
 
-> *Try this example [here](https://beekeeper.net.ar/examples/calculator.html)*
+> *Try a [live demo](https://beekeeper.net.ar/examples/calculator.html) of this example*
 
 This example demonstrates the use of services from browsers using WebSockets.
 
@@ -125,13 +125,16 @@ mosquitto -c /etc/mosquitto/examples.conf
 ```
 If the broker is running elsewhere than localhost edit `bus.config.json` and `config.js` accordingly.
 
-> Detailed Mosquitto install instructions can be found [here](../../doc/Brokers.md)
+> *Detailed Mosquitto install instructions can be found [here](../../doc/Brokers.md)*
 
 ---
 
 ### Acknowledgements
 
-This software uses the following library:
+This software uses the following libraries:
 
 - MQTT.js - https://github.com/mqttjs/MQTT.js  
+  Released under the terms of the MIT license
+
+- pako - https://github.com/nodeca/pako  
   Released under the terms of the MIT license

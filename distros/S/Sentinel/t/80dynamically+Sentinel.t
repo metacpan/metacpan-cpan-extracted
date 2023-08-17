@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Syntax::Keyword::Dynamically is not available"
@@ -31,7 +31,7 @@ subtest "dynamically setting a Sentinel" => sub {
       is( accessor, "inside", 'value within scope' );
    }
    is( accessor, "restored", 'value restored after block leave' );
-   is_deeply( \@set_values, [ "new", "saved" ], 'STORE magic invoked' );
+   is( \@set_values, [ "new", "saved" ], 'STORE magic invoked' );
 };
 
 done_testing;

@@ -3,10 +3,11 @@ package Catalyst::Plugin::URI;
 use Moo::Role;
 use Scalar::Util ();
 use Moo::_Utils ();
+use Carp 'croak';
 
 requires 'uri_for';
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 my $uri_v1 = sub {
   my ($c, $path, @args) = @_;
@@ -17,13 +18,13 @@ my $uri_v1 = sub {
   }
  
   # Hard error if the spec looks wrong...
-  die "$path is not a string" unless ref \$path eq 'SCALAR';
-  die "$path is not a controller.action specification" unless $path=~m/^(.*)\.(.+)$/;
+  croak "$path is not a string" unless ref \$path eq 'SCALAR';
+  croak "$path is not a controller.action specification" unless $path=~m/^(.*)\.(.+)$/;
  
-  die "$1 is not a controller"
+  croak "$1 is not a controller"
     unless my $controller = $c->controller($1||'');
  
-  die "$2 is not an action for controller ${\$controller->component_name}"
+  croak "$2 is not an action for controller ${\$controller->component_name}"
     unless my $action = $controller->action_for($2);
  
   return $c->uri_for($action, @args);
@@ -38,28 +39,28 @@ my $uri_v2 = sub {
   }
 
   # Hard error if the spec looks wrong...
-  die "$action_proto is not a string" unless ref \$action_proto eq 'SCALAR';
+  croak "$action_proto is not a string" unless ref \$action_proto eq 'SCALAR';
 
   my $action;
   if($action_proto =~/^\/?#/) {
-    die "$action_proto is not a named action"
+    croak "$action_proto is not a named action"
       unless $action = $c->dispatcher->get_action_by_path($action_proto);
   } elsif($action_proto=~m/^(.*)\:(.+)$/) {
-    die "$1 is not a controller"
+    croak "$1 is not a controller"
       unless my $controller = $c->controller($1||'');
-    die "$2 is not an action for controller ${\$controller->component_name}"
+    croak "$2 is not an action for controller ${\$controller->component_name}"
       unless $action = $controller->action_for($2);
   } elsif($action_proto =~/\//) {
     my $path = $action_proto=~m/^\// ? $action_proto : $c->controller->action_for($action_proto)->private_path;
-    die "$action_proto is not a full or relative private action path" unless $path;
-    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+    croak "$action_proto is not a full or relative private action path" unless $path;
+    croak "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
   } elsif($action = $c->controller->action_for($action_proto)) {
     # Noop
   } else {
     # Fallback to static
     $action = $action_proto;
   }
-  die "We can't create a URI from $action with the given arguments"
+  croak "We can't create a URI from $action with the given arguments"
     unless my $uri = $c->uri_for($action, @args);
 
   return $uri;
@@ -80,17 +81,17 @@ my $uri_v3 = sub {
 
   my $action;
   if($action_proto =~/^\/?\*/) {
-    die "$action_proto is not a named action"
+    croak "$action_proto is not a named action"
       unless $action = $c->dispatcher->get_action_by_path($action_proto);
   } elsif($action_proto=~m/^(.*)\:(.+)$/) {
-    die "$1 is not a controller"
+    croak "$1 is not a controller"
       unless my $controller = $c->controller($1||'');
-    die "$2 is not an action for controller ${\$controller->component_name}"
+    croak "$2 is not an action for controller ${\$controller->component_name}"
       unless $action = $controller->action_for($2);
   } elsif($action_proto =~/\//) {
     my $path = $action_proto=~m/^\// ? $action_proto : $c->controller->action_for($action_proto)->private_path;
-    die "$action_proto is not a full or relative private action path" unless $path;
-    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+    croak "$action_proto is not a full or relative private action path" unless $path;
+    croak "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
   } elsif($action = $c->controller->action_for($action_proto)) {
     # Noop
   } else {
@@ -98,7 +99,7 @@ my $uri_v3 = sub {
     $action = $action_proto;
   }
 
-  die "We can't create a URI from $action with the given arguments"
+  croak "We can't create a URI from $action with the given arguments"
     unless my $uri = $c->uri_for($action, @args);
 
   return $uri;
@@ -123,9 +124,9 @@ after 'setup_finalize', sub {
     my %action_hash = %{$c->dispatcher->_action_hash||+{}};
     foreach my $key (keys %action_hash) {
       if(my ($name) = @{$action_hash{$key}->attributes->{Name}||[]}) {
-        die "You can only name endpoint actions on a chain"
+        croak "You can only name endpoint actions on a chain"
           if defined$action_hash{$key}->attributes->{CaptureArgs};
-        die "Named action '$name' is already defined"
+        croak "Named action '$name' is already defined"
           if $c->dispatcher->_action_hash->{"/#$name"};
         $c->dispatcher->_action_hash->{"/#$name"} = $action_hash{$key};      
       }

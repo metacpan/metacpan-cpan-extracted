@@ -1,0 +1,37 @@
+---
+abstract: 'Perl interface to access the ifsc.razorpay.com webservice.'
+author:
+  - 'Rohit R Manjrekar <manjrekarrohit76@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Response: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BankDetails-India
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CHI: '0'
+  Carp: '0'
+  Cwd: '0'
+  Digest::MD5: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Sereal: '0'
+  XML::Simple: '0'
+  perl: '5.006'
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

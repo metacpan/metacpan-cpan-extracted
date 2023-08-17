@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'xml_file_source' => {
      	datatype => 'FileSource',
      	base_name => 'XMLFileSource',
-     	description => '',
+     	description => 'XML file source',
      	format => '',
      	read_only => '',
      		},
      'import_position' => {
      	datatype => 'ImportPosition',
      	base_name => 'ImportPosition',
-     	description => '',
+     	description => 'Import position description.',
      	format => '',
      	read_only => '',
      		},    

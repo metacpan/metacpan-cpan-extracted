@@ -12,11 +12,11 @@ Net::Bot::IRC::Message - An IRC protocol message class.
 
 =head1 VERSION
 
-Version 0.01
+Version 1.0.1
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '1.0.1';
 
 
 =head1 SYNOPSIS
@@ -29,7 +29,7 @@ our $VERSION = '0.01';
         params  => $params,
     });
     my $raw_message = $outgoing->compile();
-    
+
     my $incoming = Net::Bot::IRC::Message->new({
         unparsed => $raw_message,
     });
@@ -112,7 +112,7 @@ sub compile {
                       . $self->{params};
 
     $self->{unparsed} = $message;
-    
+
     return $self->{unparsed};
 }
 
@@ -122,7 +122,7 @@ Mark Caudill, C<< <mcaudill at cpan.org> >>
 
 =head1 SOURCE
 
-The source for this module is maintained at C<< <git@github.com:flakblas/Net-Bot-IRC-Message.git> >>.
+The source for this module is maintained at C<< <git@github.com:markcaudill/Net-Bot-IRC-Message.git> >>.
 
 =head1 BUGS
 
@@ -161,7 +161,7 @@ L<http://search.cpan.org/dist/Net-Bot-IRC-Message/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Mark Caudill.
+Copyright 2023 Mark Caudill.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

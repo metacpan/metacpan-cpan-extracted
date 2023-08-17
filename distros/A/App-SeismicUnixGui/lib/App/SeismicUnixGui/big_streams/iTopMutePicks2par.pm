@@ -10,7 +10,7 @@ use aliased 'App::SeismicUnixGui::misc::mkparfile';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME:iTopMutePicks2par.pm
+ PERL PROGRAM NAME:iTopMutePicks2par.pm
  AUTHOR: Juan Lorenzo
  DATE: May 5 2009
 
@@ -97,7 +97,7 @@ use App::SeismicUnixGui::misc::SeismicUnix
   qw($true $false $in $out $to $itop_mute_par_ $itemp_top_mute_picks_ $itemp_top_mute_picks_sorted_par_ $out $suffix_su);
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 my $Project = Project_config->new();
-my ($PL_SEISMIC) = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine clear
 
@@ -175,8 +175,8 @@ sub calc {
     $mkparfile_out =
       $itemp_top_mute_picks_sorted_par_ . $iTopMutePicks2par->{_file_in};
 
-    $iTopMutePicks2par->{TX_inbound}  = $PL_SEISMIC . '/' . $mkparfile_in;
-    $iTopMutePicks2par->{TX_outbound} = $PL_SEISMIC . '/' . $mkparfile_out;
+    $iTopMutePicks2par->{TX_inbound}  = $DATA_SEISMIC_TXT . '/' . $mkparfile_in;
+    $iTopMutePicks2par->{TX_outbound} = $DATA_SEISMIC_TXT . '/' . $mkparfile_out;
 
     $mkparfile->clear();
     $mkparfile->string1('tmute');

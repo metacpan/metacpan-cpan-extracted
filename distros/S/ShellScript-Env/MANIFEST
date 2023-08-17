@@ -8,4 +8,5 @@ t/lib
 t/bin/ignore
 t/root/bin/ignore
 t/root/lib/ignore
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

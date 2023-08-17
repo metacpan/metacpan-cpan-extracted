@@ -18,16 +18,17 @@ use warnings;
 use XML::Parser::Lite;
 use Spreadsheet::Gnumeric::StyleRegion;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use parent qw(Spreadsheet::Gnumeric::Base);
 
 BEGIN {
     Spreadsheet::ReadGnumeric->define_instance_accessors
 	(# User options to control parsing.
-	 qw(gzipped_p cells rc attr merge minimal_attributes convert_colors),
+	 qw(gzipped_p cells rc attr merge),
+	 qw(process_formulas minimal_attributes convert_colors),
 	 # Intermediate data structures for sheet parsing.
-	 qw(sheet style_regions style_attributes),
+	 qw(sheet style_regions style_attributes formulas),
 	 # XML parsing internals.
 	 qw(current_elt current_attrs chars namespaces element_stack));
 }
@@ -204,6 +205,54 @@ sub _encode_cell_name {
 	       . _encode_cell_name(1 + ($value - 1) % 26)));
 }
 
+sub _tokenize_formula {
+    # This only cares about cell names; everything else is left as strings.
+    # But we have to tokenize well enough that we don't mistake the "E9" in the
+    # number "9E9" for a cell name, which is why we must distinguish numbers.
+    # The result is an arrayref of two kinds of elements:  Cell names are
+    # turned into two-element arrayrefs of _decode_cell_name indices, and
+    # everything else (including whitespace) remains a string.
+    my ($formula) = @_;
+
+    my $parsed = [ ];
+    while (length($formula)) {
+	if ($formula =~ /^([-+]?[\d.]+([-+]?[eE]\d+)?)/) {
+	    # This includes some malformed numeric constants, but we don't have
+	    # to care; there shouldn't be any such in saved spreadsheets.
+	    my $number = $1;
+	    push(@$parsed, $number);
+	    $formula = substr($formula, length($number));
+	}
+	elsif ($formula =~/^(\w+\d+)/) {
+	    my $name = $1;
+	    push(@$parsed,  [ _decode_cell_name($name) ]);
+	    $formula = substr($formula, length($name));
+	}
+	else {
+	    my ($stuff) = $formula =~ /^([^\w\d]+)/;
+	    push(@$parsed,  $stuff);
+	    $formula = substr($formula, length($stuff));
+	}
+    }
+    return $parsed;
+}
+
+sub _untokenize_formula {
+    # Given a parsed formula returned by _tokenize_formula above plus
+    # column and row offsets, construct a new formula string and return it.
+    my ($parsed, $delta_col, $delta_row) = @_;
+
+    join('', map {
+	    if (ref($_)) {
+		my ($col, $row) = @$_;
+		_encode_cell_name($col + $delta_col) . ($row + $delta_row);
+	    }
+	    else {
+		$_;
+	    }
+	 } @$parsed);
+}
+
 ### Spreadsheet parsing
 
 sub _parse_stream {
@@ -304,11 +353,38 @@ sub _process_Merge_elt {
 sub _process_Cell_elt {
     my ($self, $text, %keys) = @_;
 
+    # Both $row and $col are zero-based; the cell matrix is one-based.
+    my ($row, $col) = ($keys{Row}, $keys{Col});
+
+    # Deal with ExprID references.
+    if (my $id = $keys{ExprID}) {
+	if (! $self->process_formulas) {
+	    # The caller doesn't care.
+	}
+	elsif ($text) {
+	    # Defining this formula.
+	    $self->{_formulas}[$id] = [ $col, $row, $text, undef ];
+	}
+	elsif (my $expr = $self->{_formulas}[$id]) {
+	    # Reference to a previously defined formula.
+	    my ($def_col, $def_row, $def_text, $parsed) = @$expr;
+	    $parsed = $expr->[3] = _tokenize_formula($def_text)
+		unless $parsed;
+	    $text = _untokenize_formula($parsed,
+					   $col - $def_col, $row - $def_row);
+	}
+	else {
+	    # The spreadsheet save code should ensure this never happens.
+	    my $cell = _encode_cell_name($col + 1) . ($row + 1);
+	    my $label = $self->{_sheet}{label};
+	    warn("Undefined ExprID '$id' in $cell of ",
+		 "sheet '$label'; ignoring.\n");
+	}
+    }
+
     # Ignore empty cells.
     return
 	unless $text;
-    # Both $row and $col are zero-based; the cell matrix is one-based.
-    my ($row, $col) = ($keys{Row}, $keys{Col});
     $self->{_sheet}{cell}[$col + 1][$row + 1] = $text
 	if $self->rc;
     $self->{_sheet}{_encode_cell_name($col + 1) . ($row + 1)} = $text
@@ -532,14 +608,15 @@ Spreadsheet::ReadGnumeric - read a Gnumeric file, return Spreadsheet::Read
 
 =head1 VERSION
 
-Version 0.3
+Version 0.4
 
 =head1 SYNOPSIS
 
     use Spreadsheet::ReadGnumeric;
 
     my $reader = Spreadsheet::ReadGnumeric->new
-        (rc => 1, cells => 1);	# these are the defaults
+        (rc => 1, cells => 1,	# these are the defaults
+	 process_formulas => 0);
     my $book = $reader->parse('spreadsheet.gnumeric');
     my $n_sheets = $book->[0]{sheets};
     my $sheet_1 = $book->[1];
@@ -559,12 +636,8 @@ may be easier to access this module through C<Spreadsheet::Read>, even
 if you only want to parse Gnumeric data.
 
 Note that Gnumeric only saves raw cell values, and not their
-formatted versions.  In particular, Gnumeric saves expressions, and not
-expression values, never mind formatted expression values.
-Even the expressions are sometimes encoded in a way
-that C<Spreadsheet::ReadGnumeric> cannot not completely unparse, so
-the returned data structure will look less well populated than the
-spreadsheet does in Gnumeric.  See the "ExprID" TODO item below.
+formatted versions.  In particular, Gnumeric saves formulas, and not
+formula values, never mind formatted formula values.
 
 =head1 METHODS
 
@@ -647,6 +720,16 @@ Given zero-based column and row indices, look in L</style_regions> for
 a suitable C<Spreadsheet::Gnumeric::StyleRegion> instance, and return
 its attribute hash.
 
+=head3 formulas
+
+Slot that contains an arrayref indexed by the "ExprID" attribute of
+formula cells.  Each entry is itself an arrayref of four elements, the
+zero-based column and row indices where the formula is defined, the
+original formula as a string (complete with leading "="), and the
+tokenized formula; this is initially "undef" and only filled in if the
+formula is referenced elsewhere.  The L</process_formulas> slot
+describes how this is done.
+
 =head3 gzipped_p
 
 Slot that determines whether C<parse> will test whether its
@@ -702,6 +785,22 @@ The input can be a reference (which is taken to be an open stream), a
 file name, or a literal string that contains the data.  If given an
 non-seekable stream, the C<stream_gzipped_p> slot must be defined in
 order to skip the test for compressed input.
+
+=head3 process_formulas
+
+Slot which, if true, requests that spreadsheet parsing should go to
+the trouble of reconstituting formulas.  The default is false, which
+may change, since formula processing probably doesn't cost very much.
+
+When Gnumeric copies a formula, it offsets the cell names referenced
+in the formula by the change in location.  When the spreadsheet is
+saved, if neither formula is modified, the first time the equation is
+mentioned it is saved as a string with a unique "ExprID" and the
+second time the same "ExprID" is cited and the string is empty.  If
+C<process_formulas> is false, the second and all subsequent references
+to the formula are left empty, but if C<process_formulas> is true, the
+correct equation is reconstituted for each cell in the same way the
+copies were created by Gnumeric.
 
 =head3 rc
 
@@ -778,23 +877,6 @@ that's my theory, and I'm sticking to it.
 Note that the "clip", "strip", and "pivot" options of
 C<Spreadsheet::Read> are handled by its C<_clipsheets> sub, so I do
 not intend to do anything about them here.
-
-These are not in any necessary order of importance.
-
-=over 4
-
-=item *
-
-Handle "ExprID".  These are Cell attributes, e.g.:
-
-        <gnm:Cell Row="10" Col="7" ExprID="1"/>
-
-Looking at the test data, they seem to indicate that the missing
-content is the expression in the earlier cell with the same ID after
-shifting by the location difference.  This requires parsing equations,
-though.
-
-=back
 
 =head1 BUGS
 

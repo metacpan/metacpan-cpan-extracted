@@ -131,7 +131,7 @@ sub file_dialog_type_aref {
 
     my @type;
 
-    $type[0] = $file_dialog_type->{_Data_PL_SEISMIC};
+    $type[0] = $file_dialog_type->{_Data_SEISMIC_TXT};
 	$type[1] = $file_dialog_type->{_Data_PL_SEISMIC};
 	$type[2] = $file_dialog_type->{_Path};
 	$type[3] = $file_dialog_type->{_Path};

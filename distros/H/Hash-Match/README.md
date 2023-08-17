@@ -4,7 +4,7 @@ Hash::Match - match contents of a hash against rules
 
 # VERSION
 
-version v0.7.2
+version v0.8.0
 
 # SYNOPSIS
 
@@ -177,12 +177,18 @@ You can also use functions to match keys. For example,
 ]
 ```
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.8.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 # SEE ALSO
 
 The following modules have similar functionality:
 
-- [Data::Match](https://metacpan.org/pod/Data::Match)
-- [Data::Search](https://metacpan.org/pod/Data::Search)
+- [Data::Match](https://metacpan.org/pod/Data%3A%3AMatch)
+- [Data::Search](https://metacpan.org/pod/Data%3A%3ASearch)
 
 # SOURCE
 
@@ -211,7 +217,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

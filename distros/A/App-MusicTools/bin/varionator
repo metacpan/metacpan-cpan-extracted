@@ -8,7 +8,7 @@
 #   varionator 'c (d f) (g e b) c'
 #   echo 'c (d f) (g e b) c' | varionator -
 
-use strict;
+use 5.14.0;
 use warnings;
 
 my $possible = possibilities();

@@ -8,7 +8,7 @@ use Types::Standard qw/Str InstanceOf/;
 
 # ABSTRACT: Java .class parsing
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -64,7 +64,7 @@ MarpaX::Java::ClassFile - Java .class parsing
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,12 @@ L<The Java Virtual Machine Specification, Java SE 8 Edition, Chapter 4: The clas
 =head1 AUTHOR
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Graham Knop
+
+Graham Knop <haarg@haarg.org>
 
 =head1 COPYRIGHT AND LICENSE
 

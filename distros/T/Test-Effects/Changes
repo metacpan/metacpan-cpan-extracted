@@ -40,3 +40,8 @@ Revision history for Test-Effects
     - Doc patch to overcome stupid limitations on module
       descriptions under =head1 NAME
       (thanks Gordon)
+
+
+0.002000  Tue Jul  4 15:18:02 2023
+
+    - Removed all use of smartmatching and given/when for 5.38 compatibility

@@ -1,5 +1,3 @@
-# $Id: DH1.pm,v 1.19 2009/01/26 01:00:25 turnstep Exp $
-
 package Net::SSH::Perl::Kex::DH1;
 
 use strict;

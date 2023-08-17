@@ -12,13 +12,17 @@ module.exports = grammar({
   ],
 
   rules: {
-    fourfunc: ($) => $._expr,
+    fourfunc: ($) => $.expr,
 
     _expr: ($) => choice(
       seq('(', $._expr, ')'),
       $.number,
-      prec.left(2, seq($._expr, MULOP, $._expr)),
-      prec.left(1, seq($._expr, ADDOP, $._expr)),
+      $.expr,
+    ),
+
+    expr: ($) => choice(
+      prec.left(2, seq($._expr, field('operator', MULOP), $._expr)),
+      prec.left(1, seq($._expr, field('operator', ADDOP), $._expr)),
     ),
 
     number: ($) => /[0-9]+(?:\.[0-9]+)?/,

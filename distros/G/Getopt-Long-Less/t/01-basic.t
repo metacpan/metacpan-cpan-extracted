@@ -1,12 +1,11 @@
 #!perl
 
-use 5.010;
 use strict;
 use warnings;
-
-use Getopt::Long::Less qw(Configure GetOptions GetOptionsFromArray);
 use Test::Exception;
 use Test::More 0.98;
+
+use Getopt::Long::Less qw(Configure GetOptions GetOptionsFromArray);
 
 subtest "basics" => sub {
     test_getopt(
@@ -335,7 +334,7 @@ subtest "bundling" => sub {
 sub test_getopt {
     my %args = @_;
 
-    my $name = $args{name} // do {
+    my $name = defined($args{name}) ? $args{name} : do {
         my $name = '';
         if (ref($args{args}[0]) eq 'HASH') {
             $name .= "spec:[".join(", ", @{ $args{args} }[1..@{$args{args}}-1])."]";
@@ -371,7 +370,7 @@ sub test_getopt {
         if ($args{expected_res_hash}) {
             # in 'input_res_hash', user supplies the hash she uses to store the
             # options in (optional if first argument is hashref).
-            my $res_hash = $args{input_res_hash} //
+            my $res_hash = defined($args{input_res_hash}) ? $args{input_res_hash} :
                 (ref($args{args}[0]) eq 'HASH' ? $args{args}[0] : undef);
             die "BUG: Please specify input_res_hash" unless $res_hash;
 

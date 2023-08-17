@@ -2,8 +2,8 @@
    "abstract" : "Test and measure with Perl",
    "author" : [
       "Andreas K. H\u00fcttel <mail@akhuettel.de>",
-      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>",
       "Mia Schambeck <mia.schambeck@mailbox.org>",
+      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>",
       "Erik Fabrizzi <erik.fabrizzi@stud.uni-regensburg.de>"
    ],
    "dynamic_config" : 0,
@@ -147,7 +147,7 @@
       "x_IRC" : "irc://irc.libera.chat/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.872",
+   "version" : "3.881",
    "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

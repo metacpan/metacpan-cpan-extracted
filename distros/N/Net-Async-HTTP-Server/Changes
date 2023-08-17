@@ -1,5 +1,15 @@
 Revision history for Net-Async-HTTP-Server
 
+0.14    2023-06-05
+        [CHANGES]
+         * `use v5.14` in all perl files
+         * Use Test2::V0 for unit testing
+         * Handle UNIX sockets correctly when setting up PSGI env
+
+        [BUGFIXES]
+         * Support PSGI apps that set the same header multiple times
+           (RT148426)
+
 0.13    2020-05-13
         [CHANGES]
          * Use Test::Metrics::Any for metrics testing

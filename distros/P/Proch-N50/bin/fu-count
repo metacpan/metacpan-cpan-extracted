@@ -232,7 +232,7 @@ fu-count - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 1.5.6
+version 1.5.8
 
 =head1 SYNOPSIS
 
@@ -364,7 +364,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
+This software is Copyright (c) 2018-2023 by Andrea Telatin.
 
 This is free software, licensed under:
 

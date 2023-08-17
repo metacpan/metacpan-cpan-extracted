@@ -132,11 +132,11 @@
    "provides" : {
       "CPAN::Meta::Requirements" : {
          "file" : "lib/CPAN/Meta/Requirements.pm",
-         "version" : "2.142"
+         "version" : "2.143"
       },
       "CPAN::Meta::Requirements::Range" : {
          "file" : "lib/CPAN/Meta/Requirements/Range.pm",
-         "version" : "2.142"
+         "version" : "2.143"
       }
    },
    "release_status" : "stable",
@@ -151,13 +151,14 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Meta-Requirements"
       }
    },
-   "version" : "2.142",
+   "version" : "2.143",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Ed J <mohawk2@users.noreply.github.com>",
       "Graham Knop <haarg@haarg.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Leon Timmermans <fawaka@gmail.com>",
+      "Paul Howarth <paul@city-fan.org>",
       "Ricardo Signes <rjbs@semiotic.systems>",
       "robario <webmaster@robario.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",

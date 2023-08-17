@@ -5,13 +5,15 @@ Panda-Date - extremely fast Date C++ framework with timezones, microseconds, rel
 # How to Use
 If you are familliar with CMake and find_package then you already know what to do.
 Your project should use CMake to use Panda-Date. It does not neigther download nor install its dependencies. It should be observeble with [find_package](https://cmake.org/cmake/help/latest/command/find_package.html).  There are several ways to achive it. In any case you will need the following list of dependencies:
-* Catch2 [https://github.com/catchorg/Catch2](https://github.com/catchorg/Catch2)
 * Panda-Lib [https://github.com/CrazyPandaLimited/panda-lib](https://github.com/CrazyPandaLimited/panda-lib)
+* [Optional] Catch2 [https://github.com/catchorg/Catch2](https://github.com/catchorg/Catch2)
+
+Catch2 is used for tests. Tests are disabled by default. To turn it on set PANDA_DATE_TESTS=ON.
 
 #### Option 1: add_subdirectory
 Clone all dependencies and Panda-Date itself anywhere to your project directory. Add following lines to CMakeLists.txt
 ```cmake
-add_subdirectory(clone_dir/Catch2 ${CMAKE_CURRENT_BINARY_DIR}/modules/Catch2)
+#add_subdirectory(clone_dir/Catch2 ${CMAKE_CURRENT_BINARY_DIR}/modules/Catch2)
 add_subdirectory(clone_dir/panda-lib ${CMAKE_CURRENT_BINARY_DIR}/modules/panda-lib)
 add_subdirectory(clone_dir/Date ${CMAKE_CURRENT_BINARY_DIR}/modules/Date)
 
@@ -25,8 +27,8 @@ First you need a directory for installed dependencies of your project, e.g. cmak
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=cmake/prefix
-cmake --build ..
-cmake --build .. --target install
+cmake --build .
+cmake --build . --target install
 ```
 Add following lines to your CMakeLists.txt
 ```cmake

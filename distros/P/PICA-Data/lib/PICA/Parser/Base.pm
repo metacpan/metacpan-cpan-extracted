@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use PICA::Data::Field;
 use Carp         qw(croak);
@@ -15,7 +15,8 @@ sub _new {
     bless {
         strict   => !!$options{strict},
         fh       => defined $options{fh} ? $options{fh} : \*STDIN,
-        annotate => $options{annotate}
+        annotate => $options{annotate},
+        counter  => 0,
     }, $class;
 }
 
@@ -49,11 +50,16 @@ sub new {
     $self;
 }
 
+sub count {
+    return $_[0]->{counter};
+}
+
 sub next {
     my ($self) = @_;
 
     while (my $record = $self->_next_record) {
         next unless @$record;
+        $self->{counter}++;
 
         # get last 003@ $0 as _id (TODO: _id for level 1 and 2?)
         my $id;
@@ -145,6 +151,10 @@ reference to a Unicode string. L<PICA::Parser::XML> also detects plain XML strin
 
 Reads the next PICA+ record. Returns a L<PICA::Data> object (that is a blessed
 hash with keys C<record> and optional C<_id>).
+
+=head2 count
+
+Get the number of records read so far.
 
 =head1 SEE ALSO
 

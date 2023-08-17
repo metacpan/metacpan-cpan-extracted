@@ -1,14 +1,21 @@
 NAME
-    test-dwg-libredwg-json - Script to test DWG file by LibreDWG
-    conversoions via JSON.
+    test-dwg-libredwg-json - Script to test DWG file by LibreDWG conversions
+    via JSON.
 
 SYNOPSIS
      test-dwg-libredwg-json [-d test_dir] [-h] [-v level] [--version] dwg_file
 
+DESCRIPTION
+    This tool is used to test libredwg JSON conversions on DWG file.
+
+    The process is to convert DWG file to LibreDWG JSON representation, back
+    to DWG and again to JSON. After this create diff between two JSON
+    representations to output.
+
 ARGUMENTS
     *       "-d test_dir"
 
-            Test directory. If dosn't exist, create dir in system tmp.
+            Test directory. If doesn't exist, create dir in system tmp.
 
     *       "-h"
 
@@ -31,6 +38,10 @@ ARGUMENTS
 EXAMPLE
      test-dwg-libredwg-json __FILE__.dwg
 
+SEE ALSO
+    test-dwg-libredwg-dwgread
+        Script to test DWG files by LibreDWG dwgread command.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-JSON>
 
@@ -45,5 +56,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

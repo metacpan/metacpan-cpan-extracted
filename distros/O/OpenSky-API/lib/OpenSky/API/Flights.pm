@@ -2,7 +2,7 @@
 
 package OpenSky::API::Flights;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose;
 use OpenSky::API::Types qw(InstanceOf);
 use OpenSky::API::Core::Flight;
@@ -36,7 +36,7 @@ OpenSky::API::Flights
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

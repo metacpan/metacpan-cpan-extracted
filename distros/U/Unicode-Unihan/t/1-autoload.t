@@ -1,10 +1,6 @@
-#
-# $Id: 1-autoload.t,v 0.2 2007/03/25 21:39:11 dankogai Exp $
-#
-
 use strict;
 our %Method;
-BEGIN { 
+BEGIN {
     opendir my $dh, "srctxt" or die "srctxt:$!";
     my %keys = ();
     for my $f (readdir($dh)){

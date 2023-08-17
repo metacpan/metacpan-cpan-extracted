@@ -97,7 +97,7 @@ my $ran_step_3;
     ok( $ran_step_2, 'Step 2 with dependency with undef last_run_time' );
     ok(
         !$ran_step_3,
-        'Step 3 with dependency with older last_run_time did not run'
+        'Step 3 with dependency with older last_run_time did not run',
     );
 }
 

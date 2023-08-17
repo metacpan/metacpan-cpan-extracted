@@ -1,0 +1,7 @@
+Package: dpkg
+Architecture: amd64
+
+Package: dpkg
+Architecture: i386
+
+Architecture: amd64

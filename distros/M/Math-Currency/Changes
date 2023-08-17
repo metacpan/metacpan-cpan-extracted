@@ -1,5 +1,9 @@
 Revision history for Math::Currency
 
+0.53  2023-07-06
+    - Fix localize() so that it works correctly for perl 5.37.7 where
+      currency_symbol is empty string
+
 0.52  2017-07-29
     - make SEE ALSO pod entries clickable
     - don't include .travis.yml in the build

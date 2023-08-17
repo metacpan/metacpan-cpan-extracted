@@ -7,7 +7,7 @@ our @EXPORT_OK = qw/frameTypeStringificator/;
 
 # ABSTRACT: Returns the string describing a frame type
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -38,7 +38,7 @@ MarpaX::Java::ClassFile::Util::FrameTypeStringification - Returns the string des
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -4,8 +4,8 @@ use namespace::autoclean;
 use Moose;
 no warnings 'uninitialized';
 
-our $VERSION = '0.65';
-$VERSION = eval $VERSION;
+our $VERSION = '0.66';
+$VERSION =~ tr/_//d;
 
 use Carp;
 use Tie::IxHash ();

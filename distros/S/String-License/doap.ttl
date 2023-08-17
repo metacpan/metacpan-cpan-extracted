@@ -482,6 +482,23 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Change;
+			rdfs:label "Stop use \"file\" command MIME info to decide which files to check (use only internal list of file extensions by default).";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/803724>;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Deprecate --text option.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add --encoding option. By default, input files are handled as utf-8 and information is printed on STDOUT as utf-8.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect freetype license.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
 			rdfs:label "Parse multi-line copyright block.";
 			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
 			doap-changeset:fixes <https://bugs.debian.org/519080>;
@@ -534,23 +551,6 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Check files without suffix by default.";
-			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Stop use \"file\" command MIME info to decide which files to check (use only internal list of file extensions by default).";
-			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
-			doap-changeset:fixes <https://bugs.debian.org/803724>;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Deprecate --text option.";
-			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add --encoding option. By default, input files are handled as utf-8 and information is printed on STDOUT as utf-8.";
-			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Detect freetype license.";
 			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
 		];
 	];
@@ -819,11 +819,11 @@
 	doap-deps:runtime-recommendation [ doap-deps:on "re::engine::RE2"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "Array::IntSpan"^^doap-deps:CpanId ], [
 		doap-deps:on "Feature::Compat::Class 0.04"^^doap-deps:CpanId;
-	], [ doap-deps:on "List::SomeUtils"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern 0.2.12"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Regexp::Pattern::License 3.4.0"^^doap-deps:CpanId;
-	], [ doap-deps:on "perl 5.012000"^^doap-deps:CpanId ];
+	], [ doap-deps:on "perl 5.020000"^^doap-deps:CpanId ];
 	doap-deps:test-recommendation [ doap-deps:on "File::BaseDir"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern::License 3.9.0"^^doap-deps:CpanId;
 	], [
@@ -842,7 +842,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "String-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-4>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-5>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-4>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-5>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-6>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-7>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-8>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-9>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://salsa.debian.org/build-common-team/p5-string-license>;
@@ -933,10 +933,7 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Tests;
-			rdfs:label [
-				a doap-changeset:Tests;
-				rdfs:label "update test Software-License.t, and tighten to require version 0.104004";
-			], "Use Test::Script to ensure correct perl invokes script in tests.";
+			rdfs:label "Use Test::Script to ensure correct perl invokes script in tests.";
 			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/148479>;
 			doap-changeset:thanks <https://people.redhat.com/\u007Eppisar>;
 		];
@@ -945,12 +942,143 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.5.tar.gz>;
 	doap:revision        "v0.0.5"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-6>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.6"^^xsd:string;
+	dc:issued            "2023-06-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "add internal tag methods to generalize coverage tracking";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "code cleanup, by extending tag methods";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "require perl v5.20, needed for subroutine signatures";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "use subroutine signatures";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "drop obsolete custom BSD and CC double-detection avoidance";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "add internal note method to generalize trait hinting";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "use Feature::Compat::Class after core features, to support newer perl";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/148507>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>, <https://people.redhat.com/\u007Ejplesning>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.6.tar.gz>;
+	doap:revision        "v0.0.6"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-7>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.7"^^xsd:string;
+	dc:issued            "2023-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "stepwise detect version_only, with Regexp::Pattern::License v3.11.0";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "tighten tests to cover non-optional trailing 'license' since Regexp::Pattern::License v3.11.0";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "simplify code; use List::Util (not List::SomeUtils)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "sort NAMES objects by key length before alphabetically";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "sort LICENSES by amount of contained licenses, then key length, then alphabetically";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "tiny optimization in version number mangling";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "used named capture for local patterns";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "tiny optimization: check if named match is defined (not if true)";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "update author tests to cover Regexp::Pattern::License v3.11.0";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "declare dummy method with empty signature in one line, hopefully pleasing perl v5.20-v5.24";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "store resolved shortname and caption in objects (not internal id)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "track detected fulltext license as object (not just positional range)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "track detected license grant as object (not just positional range)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "track confirmed fulltext or grant as object (not boolean)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "tighten positioning and reporting of stepwise detected version";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "stepwise detect prepended version, with Regexp::Pattern::License v3.11.0";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.7.tar.gz>;
+	doap:revision        "v0.0.7"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-8>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.8"^^xsd:string;
+	dc:issued            "2023-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "really use List::Util (not List::SomeUtils), everywhere";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "revert to run perltidy (not perltidier) with tidyall";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.8.tar.gz>;
+	doap:revision        "v0.0.8"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-9>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.9"^^xsd:string;
+	dc:issued            "2023-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "tighten runtime-requirement for List::Util";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.9.tar.gz>;
+	doap:revision        "v0.0.9"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/dcantrell>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:david@cantrell.org.uk>, <mailto:dcantrell@cpan.org>;
 	foaf:name            "David Cantrell";
 	foaf:nick            "DCANTRELL";
 	foaf:page            <https://metacpan.org/author/DCANTRELL>.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:haarg@cpan.org>;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;
@@ -970,6 +1098,11 @@
 	a                    doap-bugs:Issue;
 	doap-bugs:id         "148479"^^xsd:string;
 	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=148479>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/148507>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "148507"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=148507>.
 
 <http://webid.debian.net/maintainers/abe>
 	foaf:mbox            <mailto:abe@debian.org>;
@@ -1013,6 +1146,10 @@
 <https://badges.fedoraproject.org/user/smani>
 	foaf:mbox            <mailto:manisandro@gmail.com>;
 	foaf:name            "Sandro Mani".
+
+<https://people.redhat.com/\u007Ejplesning>
+	foaf:mbox            <mailto:jplesning@redhat.com>;
+	foaf:name            "Jitka Plesníková".
 
 <https://people.redhat.com/\u007Eppisar>
 	foaf:mbox            <mailto:ppisar@redhat.com>;

@@ -5,8 +5,6 @@ use warnings;
 use strict;
 use 5.014;
 
-use File::Basename qw( basename );
-
 use DBD::mysql 4.041 qw();  # mysql_enable_utf8mb4 requires 4.041 or greater
 use DBI              qw();
 
@@ -68,7 +66,7 @@ sub get_db_handle {
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
     my $dsn;
-    my $show_sofar = 'DB '. basename( $db );
+    my $show_sofar = 'DB '. $db;
     if ( ! $env_var_yes->{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
         $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
         my $host = $cred->get_login( 'host', $show_sofar, $settings );

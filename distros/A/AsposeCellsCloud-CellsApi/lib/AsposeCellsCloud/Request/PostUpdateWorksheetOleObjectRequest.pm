@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostUpdateWorksheetOleObjectRequest.name :   ,
-# PostUpdateWorksheetOleObjectRequest.sheetName :   ,
-# PostUpdateWorksheetOleObjectRequest.oleObjectIndex :   ,
-# PostUpdateWorksheetOleObjectRequest.ole :   ,
-# PostUpdateWorksheetOleObjectRequest.folder :   ,
-# PostUpdateWorksheetOleObjectRequest.storageName :    
+# PostUpdateWorksheetOleObjectRequest.name : The workbook name.  ,
+# PostUpdateWorksheetOleObjectRequest.sheetName : The worsheet name.  ,
+# PostUpdateWorksheetOleObjectRequest.oleObjectIndex : Ole object index.  ,
+# PostUpdateWorksheetOleObjectRequest.ole : Ole Object description.  ,
+# PostUpdateWorksheetOleObjectRequest.folder : Original workbook folder.  ,
+# PostUpdateWorksheetOleObjectRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_update_worksheet_ole_object' } = { 
-    	summary => '',
+    	summary => 'Update an OLE object in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worsheet name.',
      	format => '',
      	read_only => '',
      		},
      'ole_object_index' => {
      	datatype => 'int',
      	base_name => 'oleObjectIndex',
-     	description => '',
+     	description => 'Ole object index.',
      	format => '',
      	read_only => '',
      		},
      'ole' => {
      	datatype => 'OleObject',
      	base_name => 'ole',
-     	description => '',
+     	description => 'Ole Object description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -20,7 +20,6 @@ sub import
     warnings->import ();
 
     Test::More->import ();
-    XS::Check->import (':all');
 
     XSCT->export_to_level (1);
 }

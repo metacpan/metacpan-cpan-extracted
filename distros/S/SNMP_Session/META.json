@@ -1,12 +1,13 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "SNMPv1/v2 Protocol Handling",
    "author" : [
-      "unknown"
+      "Simon Leinen <simon.leinen@gmail.com>",
+      "Mike Mitchell"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -29,9 +30,39 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "IO::Socket" : "0",
+            "IO::Socket::INET6" : "0",
+            "Net::SNMP" : "0",
+            "Socket" : "0",
+            "Socket6" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.15",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sleinen/snmp-session/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/sleinen/snmp-session"
+      }
+   },
+   "version" : "1.16",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_test_requires" : {
+      "Test::More" : 0
+   }
 }

@@ -8,6 +8,7 @@ use App::Netdisco::Util::Device
 use App::Netdisco::Backend::Job;
 
 use Module::Load ();
+use JSON::PP ();
 use Try::Tiny;
 
 use base 'Exporter';
@@ -235,9 +236,16 @@ sub jq_defer {
   # seeing as defer is only triggered by an SNMP connect failure, this
   # behaviour seems reasonable, to me (or desirable, perhaps).
 
+  # the deferrable_actions setting exists as a workaround to this behaviour
+  # should it be needed by any action (that is, per-device action but
+  # do not increment deferrals count and simply try to run again).
+
   try {
     schema(vars->{'tenant'})->txn_do(sub {
-      if ($job->device) {
+      if ($job->device
+          and not scalar grep { $job->action eq $_ }
+                              @{ setting('deferrable_actions') || [] }) {
+
         schema(vars->{'tenant'})->resultset('DeviceSkip')->find_or_create({
           backend => setting('workers')->{'BACKEND'}, device => $job->device,
         },{ key => 'device_skip_pkey' })->increment_deferrals;
@@ -246,7 +254,7 @@ sub jq_defer {
       # lock db row and update to show job is available
       schema(vars->{'tenant'})->resultset('Admin')
         ->search({ job => $job->id }, { for => 'update' })
-        ->update({ status => 'queued', started => undef });
+        ->update({ status => 'queued', started => undef, log => $job->log });
     });
     $happy = true;
   }
@@ -279,7 +287,7 @@ sub jq_complete {
         ->search({ job => $job->id }, { for => 'update' })
         ->update({
           status => $job->status,
-          log    => $job->log,
+          log    => (ref($job->log) eq ref('')) ? $job->log : '',
           started  => $job->started,
           finished => $job->finished,
           (($job->action eq 'hook') ? (subaction => $job->subaction) : ()),
@@ -324,7 +332,7 @@ sub jq_insert {
   $jobs = [$jobs] if ref [] ne ref $jobs;
 
   # bit of a hack for heroku hosting to avoid DB overload
-  return true if setting('defanged_admin') eq 'false_admin';
+  return true if setting('defanged_admin') ne 'admin';
 
   my $happy = false;
   try {
@@ -338,15 +346,27 @@ sub jq_insert {
           if ($spec->{port}) {
               $row = schema(vars->{'tenant'})->resultset('DevicePort')
                                              ->find($spec->{port}, $spec->{device});
+              undef $row unless
+                scalar grep {('cf_'. $_) eq $spec->{action}}
+                            grep {defined}
+                            map {$_->{name}}
+                            @{ setting('custom_fields')->{device_port} || [] };
           }
           else {
               $row = schema(vars->{'tenant'})->resultset('Device')
                                              ->find($spec->{device});
+              undef $row unless
+                scalar grep {('cf_'. $_) eq $spec->{action}}
+                            grep {defined}
+                            map {$_->{name}}
+                            @{ setting('custom_fields')->{device} || [] };
           }
+
           die 'failed to find row for custom field update' unless $row;
 
+          my $coder = JSON::PP->new->utf8(0)->allow_nonref(1)->allow_unknown(1);
+          $spec->{subaction} = $coder->encode( $spec->{extra} || $spec->{subaction} );
           $spec->{action} =~ s/^cf_//;
-          $spec->{subaction} = to_json( $spec->{subaction} );
           $row->make_column_dirty('custom_fields');
           $row->update({
             custom_fields => \['jsonb_set(custom_fields, ?, ?)'

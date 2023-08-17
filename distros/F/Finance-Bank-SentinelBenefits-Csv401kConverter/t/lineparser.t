@@ -179,7 +179,7 @@ diag( 'testing employer match dividend true' );
   is( $line->side(), 'ReinvDiv', 'We are reinvesting a dividend here' );
 }
 
-# Copyright 2009-2011 David Solimano
+# Copyright 2009-2023 David Solimano
 # This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
 # Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify

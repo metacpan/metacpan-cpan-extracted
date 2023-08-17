@@ -33,37 +33,40 @@ sub run_subtest(@) {
 
 my @subtests = @ARGV;
 if (@subtests == 0) {
-  @subtests = (<$Bin/*.pl>);
+  @subtests = (sort <$Bin/*.pl>);
   foreach my $subtest (@subtests) {
     say "> Found subtest $subtest";
   }
   die unless @subtests >= 4;  # update this as we add more of them
 }
 
-plan tests => scalar(@subtests) * 2;
+plan tests => ($debug||$verbose) ? scalar(@subtests)+1 : scalar(@subtests) * 2;
 
 # Note: --silent --verbose etc. arguments are parsed in t_TestCommon.pm
 
-##### Run with --silent ##### 
-for my $st (@subtests) {
-  subtest_buffered with_silent => sub {
-    my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
-    ok($swstat == 0, "zero exit status from $st",
-       "$soutput\nNon-zero exit status from subtest '$st' --silent"
-      ) || return;
-    like($soutput,
-         # If a subtest uses Test2 it will output the usual messages. Otherwise
-         # it should output nothing at all when invoked with --silent.
-         qr/\A(?:(?:\#\ Seeded.*\n)? # The test system sometimes(?) puts this out first
-               (?:ok\ \d+.*\n)+    # successful test outputs
-               1\.\.\d+\n          # The final line
-            )?\z/x
-    ,
-    "checking '$st' for silence violations",
-    "<<$soutput>>\nSILENCE VIOLATED by subtest '$st' --silent"
-    );
-    done_testing();
-  };
+##### Run with --silent #####
+SKIP: {
+  skip "Skipping --silent tests because \$debug or \$verbose is true" if $debug || $verbose;
+  for my $st (@subtests) {
+    subtest_buffered with_silent => sub {
+      my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
+      ok($swstat == 0, "zero exit status from $st",
+         "$soutput\nNon-zero exit status from subtest '$st' --silent"
+        ) || return;
+      like($soutput,
+           # If a subtest uses Test2 it will output the usual messages. Otherwise
+           # it should output nothing at all when invoked with --silent.
+           qr/\A(?:(?:\#\ Seeded.*\n)? # The test system sometimes(?) puts this out first
+                 (?:ok\ \d+.*\n)+    # successful test outputs
+                 1\.\.\d+\n          # The final line
+              )?\z/x
+      ,
+      "checking '$st' for silence violations",
+      "<<$soutput>>\nSILENCE VIOLATED by subtest '$st' --silent"
+      );
+      done_testing();
+    };
+  }
 }
 
 ##### Run with --verbose #####

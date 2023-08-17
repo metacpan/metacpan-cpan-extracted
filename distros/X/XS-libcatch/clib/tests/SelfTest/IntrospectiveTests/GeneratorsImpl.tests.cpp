@@ -1,9 +1,22 @@
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
+#if defined( __GNUC__ ) || defined( __clang__ )
+#    pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generator_exception.hpp>
 #include <catch2/generators/catch_generators_adapters.hpp>
 #include <catch2/generators/catch_generators_random.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
+#include <catch2/generators/catch_generator_exception.hpp>
 
 // Tests of generator implementation details
 TEST_CASE("Generators internals", "[generators][internals]") {
@@ -399,5 +412,136 @@ TEST_CASE("GENERATE handles function (pointers)", "[generators][compilation][app
 
 TEST_CASE("GENERATE decays arrays", "[generators][compilation][approvals]") {
     auto str = GENERATE("abc", "def", "gh");
+    (void)str;
     STATIC_REQUIRE(std::is_same<decltype(str), const char*>::value);
+}
+
+TEST_CASE("Generators count returned elements", "[generators][approvals]") {
+    auto generator = Catch::Generators::FixedValuesGenerator<int>( { 1, 2, 3 } );
+    REQUIRE( generator.currentElementIndex() == 0 );
+    REQUIRE( generator.countedNext() );
+    REQUIRE( generator.currentElementIndex() == 1 );
+    REQUIRE( generator.countedNext() );
+    REQUIRE( generator.currentElementIndex() == 2 );
+    REQUIRE_FALSE( generator.countedNext() );
+    REQUIRE( generator.currentElementIndex() == 2 );
+}
+
+TEST_CASE( "Generators can stringify their elements",
+           "[generators][approvals]" ) {
+    auto generator =
+        Catch::Generators::FixedValuesGenerator<int>( { 1, 2, 3 } );
+
+    REQUIRE( generator.currentElementAsString() == "1"_catch_sr );
+    REQUIRE( generator.countedNext() );
+    REQUIRE( generator.currentElementAsString() == "2"_catch_sr );
+    REQUIRE( generator.countedNext() );
+    REQUIRE( generator.currentElementAsString() == "3"_catch_sr );
+}
+
+namespace {
+    class CustomStringifyGenerator
+        : public Catch::Generators::IGenerator<bool> {
+        bool m_first = true;
+
+        std::string stringifyImpl() const override {
+            return m_first ? "first" : "second";
+        }
+
+        bool next() override {
+            if ( m_first ) {
+                m_first = false;
+                return true;
+            }
+            return false;
+        }
+
+    public:
+        bool const& get() const override;
+    };
+
+    // Avoids -Wweak-vtables
+    bool const& CustomStringifyGenerator::get() const { return m_first; }
+} // namespace
+
+TEST_CASE( "Generators can override element stringification",
+           "[generators][approvals]" ) {
+    CustomStringifyGenerator generator;
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+    REQUIRE( generator.countedNext() );
+    REQUIRE( generator.currentElementAsString() == "second"_catch_sr );
+}
+
+namespace {
+    class StringifyCountingGenerator
+        : public Catch::Generators::IGenerator<bool> {
+        bool m_first = true;
+        mutable size_t m_stringificationCalls = 0;
+
+        std::string stringifyImpl() const override {
+            ++m_stringificationCalls;
+            return m_first ? "first" : "second";
+        }
+
+        bool next() override {
+            if ( m_first ) {
+                m_first = false;
+                return true;
+            }
+            return false;
+        }
+
+    public:
+
+        bool const& get() const override;
+        size_t stringificationCalls() const { return m_stringificationCalls; }
+    };
+
+    // Avoids -Wweak-vtables
+    bool const& StringifyCountingGenerator::get() const { return m_first; }
+
+} // namespace
+
+TEST_CASE( "Generator element stringification is cached",
+           "[generators][approvals]" ) {
+    StringifyCountingGenerator generator;
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+    REQUIRE( generator.currentElementAsString() == "first"_catch_sr );
+
+    REQUIRE( generator.stringificationCalls() == 1 );
+}
+
+TEST_CASE( "Random generators can be seeded", "[generators][approvals]" ) {
+    SECTION( "Integer generator" ) {
+        using Catch::Generators::RandomIntegerGenerator;
+        RandomIntegerGenerator<int> rng1( 0, 100, 0x1234 ),
+                                    rng2( 0, 100, 0x1234 );
+
+        for ( size_t i = 0; i < 10; ++i ) {
+            REQUIRE( rng1.get() == rng2.get() );
+            rng1.next(); rng2.next();
+        }
+    }
+    SECTION("Float generator") {
+        using Catch::Generators::RandomFloatingGenerator;
+        RandomFloatingGenerator<double> rng1( 0., 100., 0x1234 ),
+                                        rng2( 0., 100., 0x1234 );
+        for ( size_t i = 0; i < 10; ++i ) {
+            REQUIRE( rng1.get() == rng2.get() );
+            rng1.next();
+            rng2.next();
+        }
+    }
+}
+
+TEST_CASE("Filter generator throws exception for empty generator",
+          "[generators]") {
+    using namespace Catch::Generators;
+
+    REQUIRE_THROWS_AS(
+        filter( []( int ) { return false; }, value( 3 ) ),
+        Catch::GeneratorException );
 }

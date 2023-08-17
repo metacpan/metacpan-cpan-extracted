@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::ProhibitNoStrict
 package ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2023-07-02'; # DATE
 our $DIST = 'ColorTheme'; # DIST
-our $VERSION = '2.1.2'; # VERSION
+our $VERSION = '2.1.3'; # VERSION
 
 1;
 # ABSTRACT: Color themes
@@ -24,11 +25,16 @@ ColorTheme - Color themes
 
 =head1 VERSION
 
-This document describes version 2.1.2 of ColorTheme (from Perl distribution ColorTheme), released on 2020-06-19.
+This document describes version 2.1.3 of ColorTheme (from Perl distribution ColorTheme), released on 2023-07-02.
 
 =head1 DESCRIPTION
 
 This document specifies a way to create and use color themes.
+
+If you want a quick way to create a color theme module, modify an existing one
+for a specific application. For example, for L<JSON::Color>, see
+L<ColorTheme::JSON::Color::default_rgb> or
+L<ColorTheme::JSON::Color::bright256>.
 
 =head1 SPECIFICATION STATUS
 
@@ -226,10 +232,6 @@ arguments.
 Allowing coderef as color allows for flexibility, e.g. for doing gradation
 border color, random color, context-sensitive color, etc.
 
-=head1 HISTORY
-
-L<Color::Theme> is an older specification, superseded by this document.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/ColorTheme>.
@@ -238,6 +240,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/ColorTheme
 
 Source repository is at L<https://github.com/perlancar/perl-ColorTheme>.
 
+=head1 SEE ALSO
+
+L<DefHash>
+
+=head1 HISTORY
+
+L<Color::Theme> is an older specification, superseded by this document.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2018, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ColorTheme>
@@ -245,20 +284,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<DefHash>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

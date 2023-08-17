@@ -1,6 +1,11 @@
-0.02 2022-03-17
-    * Released on an unsuspecting world
+0.04 2023-07-21
+    * Don't resurrect old comments, even if the issue has been updated recently
+    * Various build and test suite upgrades
 
 0.03 2022-03-18
     * Actually load Filter::signatures so signatures actually work on
       Perl versions pre-5.020
+
+0.02 2022-03-17
+    * Released on an unsuspecting world
+

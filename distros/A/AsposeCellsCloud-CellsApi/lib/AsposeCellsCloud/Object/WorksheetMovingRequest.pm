@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Used by workbook moving requests.',
                                   class => 'WorksheetMovingRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'destination_worksheet' => {
      	datatype => 'string',
      	base_name => 'DestinationWorksheet',
-     	description => '',
+     	description => 'Destination worksheet name.  ',
      	format => '',
      	read_only => '',
      		},
      'position' => {
      	datatype => 'string',
      	base_name => 'Position',
-     	description => '',
+     	description => 'Position to move. Can be BEFORE or AFTER.',
      	format => '',
      	read_only => '',
      		},    

@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.91';
+our $VERSION = '3.55';
 
 # AUTHORITY
 
@@ -25,7 +25,10 @@ sub import {
   my %exports = (
     args => 1,
     array => 1,
+    arrayref => 1,
     assert => 1,
+    async => 1,
+    await => 1,
     bool => 1,
     box => 1,
     call => 1,
@@ -34,19 +37,27 @@ sub import {
     caught => 1,
     chain => 1,
     check => 1,
+    clargs => 1,
     cli => 1,
     code => 1,
     config => 1,
+    container => 1,
     cop => 1,
     data => 1,
     date => 1,
+    docs => 1,
     error => 1,
     false => 1,
     fault => 1,
     float => 1,
     gather => 1,
     hash => 1,
+    hashref => 1,
+    is_bool => 1,
+    is_false => 1,
+    is_true => 1,
     json => 1,
+    list => 1,
     load => 1,
     log => 1,
     make => 1,
@@ -56,21 +67,28 @@ sub import {
     name => 1,
     number => 1,
     opts => 1,
+    pairs => 1,
     path => 1,
     perl => 1,
     process => 1,
     proto => 1,
+    puts => 1,
     raise => 1,
     random => 1,
+    range => 1,
     regexp => 1,
     replace => 1,
+    render => 1,
+    resolve => 1,
     roll => 1,
     search => 1,
     space => 1,
     schema => 1,
     string => 1,
+    syscall => 1,
     template => 1,
     test => 1,
+    text => 1,
     then => 1,
     throw => 1,
     true => 1,
@@ -94,16 +112,27 @@ sub import {
   return $self;
 }
 
+# HOOKS
+
+sub _qx {
+  my (@args) = @_;
+  local $| = 1;
+  local $SIG{__WARN__} = sub {};
+  (do{local $_ = qx(@{[@args]}); chomp if $_; $_}, $?, ($? >> 8))
+}
+
 # FUNCTIONS
 
-sub args (@) {
-  my (@args) = @_;
+sub args ($;$@) {
+  my ($data, $code, @args) = @_;
 
-  return (!@args)
-    ? ({})
-    : ((@args == 1 && ref($args[0]) eq 'HASH')
-    ? (!%{$args[0]} ? {} : {%{$args[0]}})
-    : (@args % 2 ? {@args, undef} : {@args}));
+  require Venus::Args;
+
+  if (!$code) {
+    return Venus::Args->new($data);
+  }
+
+  return Venus::Args->new($data)->$code(@args);
 }
 
 sub array ($;$@) {
@@ -118,6 +147,14 @@ sub array ($;$@) {
   return Venus::Array->new($data)->$code(@args);
 }
 
+sub arrayref (@) {
+  my (@args) = @_;
+
+  return @args > 1
+    ? ([@args])
+    : ((ref $args[0] eq 'ARRAY') ? ($args[0]) : ([@args]));
+}
+
 sub assert ($$) {
   my ($data, $expr) = @_;
 
@@ -126,6 +163,22 @@ sub assert ($$) {
   my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
 
   return $assert->validate($data);
+}
+
+sub async ($) {
+  my ($code) = @_;
+
+  require Venus::Process;
+
+  return Venus::Process->new->async($code);
+}
+
+sub await ($;$) {
+  my ($process, $timeout) = @_;
+
+  require Venus::Process;
+
+  return $process->await($timeout);
 }
 
 sub bool (;$) {
@@ -240,6 +293,18 @@ sub check ($$) {
   return Venus::Assert->new->expression($expr)->check($data);
 }
 
+sub clargs (@) {
+  my (@args) = @_;
+
+  my ($argv, $specs) = (@args > 1)
+    ? (map arrayref($_), @args)
+    : ([@ARGV], arrayref(@args));
+
+  return (
+    args($argv), opts($argv, 'reparse', $specs), vars({}),
+  );
+}
+
 sub cli (;$) {
   my ($data) = @_;
 
@@ -272,6 +337,18 @@ sub config ($;$@) {
   }
 
   return Venus::Config->new($data)->$code(@args);
+}
+
+sub container ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Container;
+
+  if (!$code) {
+    return Venus::Container->new($data);
+  }
+
+  return Venus::Container->new($data)->$code(@args);
 }
 
 sub cop (@) {
@@ -308,6 +385,16 @@ sub date ($;$@) {
   }
 
   return Venus::Date->new($data)->$code(@args);
+}
+
+sub docs {
+  my (@args) = @_;
+
+  my $file = (grep -f, (caller(0))[1], $0)[0];
+
+  my $data = data($file);
+
+  return $data->docs->string(@args > 1 ? @args : (undef, @args));
 }
 
 sub error (;$) {
@@ -378,6 +465,38 @@ sub hash ($;$@) {
   return Venus::Hash->new($data)->$code(@args);
 }
 
+sub hashref (@) {
+  my (@args) = @_;
+
+  return @args > 1
+    ? ({(scalar(@args) % 2) ? (@args, undef) : @args})
+    : ((ref $args[0] eq 'HASH')
+    ? ($args[0])
+    : ({(scalar(@args) % 2) ? (@args, undef) : @args}));
+}
+
+sub is_bool ($) {
+  my ($data) = @_;
+
+  return type($data, 'coded', 'BOOLEAN') ? true() : false();
+}
+
+sub is_false ($) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data)->is_false;
+}
+
+sub is_true ($) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data)->is_true;
+}
+
 sub json (;$$) {
   my ($code, $data) = @_;
 
@@ -398,6 +517,12 @@ sub json (;$$) {
   return fault(qq(Invalid "json" action "$code"));
 }
 
+sub list (@) {
+  my (@args) = @_;
+
+  return map {defined $_ ? (ref eq 'ARRAY' ? (@{$_}) : ($_)) : ($_)} @args;
+}
+
 sub load ($) {
   my ($data) = @_;
 
@@ -407,9 +532,26 @@ sub load ($) {
 sub log (@) {
   my (@args) = @_;
 
+  state $codes = {
+    debug => 'debug',
+    error => 'error',
+    fatal => 'fatal',
+    info => 'info',
+    trace => 'trace',
+    warn => 'warn',
+  };
+
+  unshift @args, 'debug' if @args && !$codes->{$args[0]};
+
   require Venus::Log;
 
-  return Venus::Log->new->debug(@args);
+  my $log = Venus::Log->new($ENV{VENUS_LOG_LEVEL});
+
+  return $log if !@args;
+
+  my $code = shift @args;
+
+  return $log->$code(@args);
 }
 
 sub make (@) {
@@ -437,12 +579,65 @@ sub match ($;&) {
   return $match->result;
 }
 
-sub merge (@) {
-  my (@args) = @_;
+sub merge {
+  my ($lvalue, @rvalues) = @_;
 
-  require Venus::Hash;
+  if (!$lvalue) {
+    return {};
+  }
 
-  return Venus::Hash->new({})->merge(@args);
+  my $rvalue;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+    $result = merge($result, $_) for @rvalues;
+    return $result;
+  }
+  else {
+    $rvalue = $rvalues[0];
+  }
+
+  if (!$rvalue) {
+    return $lvalue;
+  }
+
+  if (ref $lvalue eq 'HASH') {
+    if (ref $rvalue eq 'HASH') {
+      for my $index (keys %{$rvalue}) {
+        my $lprop = $lvalue->{$index};
+        my $rprop = $rvalue->{$index};
+        $lvalue->{$index} = (
+            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
+            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
+          )
+          ? merge($lprop, $rprop)
+          : $rprop;
+      }
+    }
+    else {
+      $lvalue = $rvalue;
+    }
+  }
+
+  if (ref $lvalue eq 'ARRAY') {
+    if (ref $rvalue eq 'ARRAY') {
+      for my $index (0..$#{$rvalue}) {
+        my $lprop = $lvalue->[$index];
+        my $rprop = $rvalue->[$index];
+        $lvalue->[$index] = (
+            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
+            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
+          )
+          ? merge($lprop, $rprop)
+          : $rprop;
+      }
+    }
+    else {
+      $lvalue = $rvalue;
+    }
+  }
+
+  return $lvalue;
 }
 
 sub meta ($;$@) {
@@ -491,6 +686,19 @@ sub opts ($;$@) {
   }
 
   return Venus::Opts->new($data)->$code(@args);
+}
+
+sub pairs (@) {
+  my ($args) = @_;
+
+  my $result = defined $args
+    ? (
+    ref $args eq 'ARRAY'
+    ? ([map {[$_, $args->[$_]]} 0..$#{$args}])
+    : (ref $args eq 'HASH' ? ([map {[$_, $args->{$_}]} sort keys %{$args}]) : ([])))
+    : [];
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub path ($;$@) {
@@ -549,6 +757,23 @@ sub proto ($;$@) {
   return Venus::Prototype->new($data)->$code(@args);
 }
 
+sub puts ($;@) {
+  my ($data, @args) = @_;
+
+  $data = cast($data);
+
+  my $result = [];
+
+  if ($data->isa('Venus::Hash')) {
+    $result = $data->puts(@args);
+  }
+  elsif ($data->isa('Venus::Array')) {
+    $result = $data->puts(@args);
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub raise ($;$) {
   my ($self, $data) = @_;
 
@@ -578,6 +803,12 @@ sub random (;$@) {
   return $random->$code(@args);
 }
 
+sub range ($;@) {
+  my ($data, @args) = @_;
+
+  return array($data, 'range', @args);
+}
+
 sub regexp ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -588,6 +819,12 @@ sub regexp ($;$@) {
   }
 
   return Venus::Regexp->new($data)->$code(@args);
+}
+
+sub render ($;$) {
+  my ($data, $args) = @_;
+
+  return template($data, 'render', undef, $args || {});
 }
 
 sub replace ($;$@) {
@@ -608,6 +845,12 @@ sub replace ($;$@) {
   }
 
   return Venus::Replace->new(@data)->$code(@args);
+}
+
+sub resolve ($;@) {
+  my ($data, @args) = @_;
+
+  return container($data, 'resolve', @args);
 }
 
 sub roll (@) {
@@ -670,6 +913,41 @@ sub string ($;$@) {
   return Venus::String->new($data)->$code(@args);
 }
 
+sub syscall ($;@) {
+  my (@args) = @_;
+
+  require Venus::Os;
+
+  for (my $i = 0; $i < @args; $i++) {
+    if ($args[$i] =~ /^\|+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\&+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\w+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^[<>]+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\d[<>&]+\d?$/) {
+      next;
+    }
+    if ($args[$i] =~ /\$[A-Z]\w+/) {
+      next;
+    }
+    if ($args[$i] =~ /^\$\((.*)\)$/) {
+      next;
+    }
+    $args[$i] = Venus::Os->quote($args[$i]);
+  }
+
+  my ($data, $exit, $code) = (_qx(@args));
+
+  return wantarray ? ($data, $code) : (($exit == 0) ? true() : false());
+}
+
 sub template ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -692,6 +970,16 @@ sub test ($;$@) {
   }
 
   return Venus::Test->new($data)->$code(@args);
+}
+
+sub text {
+  my (@args) = @_;
+
+  my $file = (grep -f, (caller(0))[1], $0)[0];
+
+  my $data = data($file);
+
+  return $data->text->string(@args > 1 ? @args : (undef, @args));
 }
 
 sub then (@) {
@@ -870,7 +1158,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.91
+3.55
 
 =cut
 
@@ -878,11 +1166,7 @@ OO Standard Library for Perl 5
 
   package main;
 
-  use Venus qw(
-    catch
-    error
-    raise
-  );
+  use Venus 'catch', 'error', 'raise';
 
   # error handling
   my ($error, $result) = catch {
@@ -890,16 +1174,16 @@ OO Standard Library for Perl 5
   };
 
   # boolean keywords
-  if ($result and $result eq false) {
-    true;
+  if ($result) {
+    error;
   }
 
   # raise exceptions
-  if (false) {
+  if ($result) {
     raise 'MyApp::Error';
   }
 
-  # and much more!
+  # boolean keywords, and more!
   true ne false;
 
 =cut
@@ -1006,11 +1290,12 @@ This package provides the following functions:
 
 =head2 args
 
-  args(Any @args) (HashRef)
+  args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
 
-The args function takes a list of arguments and returns a hashref.
+The args function builds and returns a L<Venus::Args> object, or dispatches to
+the coderef or method provided.
 
-I<Since C<2.32>>
+I<Since C<3.10>>
 
 =over 4
 
@@ -1020,9 +1305,9 @@ I<Since C<2.32>>
 
   use Venus 'args';
 
-  my $args = args(content => 'example');
+  my $args = args ['--resource', 'users'];
 
-  # {content => "example"}
+  # bless({...}, 'Venus::Args')
 
 =back
 
@@ -1034,37 +1319,9 @@ I<Since C<2.32>>
 
   use Venus 'args';
 
-  my $args = args({content => 'example'});
+  my $args = args ['--resource', 'users'], 'indexed';
 
-  # {content => "example"}
-
-=back
-
-=over 4
-
-=item args example 3
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content');
-
-  # {content => undef}
-
-=back
-
-=over 4
-
-=item args example 4
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content', 'example', 'algorithm');
-
-  # {content => "example", algorithm => undef}
+  # {0 => '--resource', 1 => 'users'}
 
 =back
 
@@ -1109,6 +1366,58 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 arrayref
+
+  arrayref(Any @args) (ArrayRef)
+
+The arrayref function takes a list of arguments and returns a arrayref.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item arrayref example 1
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref(content => 'example');
+
+  # [content => "example"]
+
+=back
+
+=over 4
+
+=item arrayref example 2
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref([content => 'example']);
+
+  # [content => "example"]
+
+=back
+
+=over 4
+
+=item arrayref example 3
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref('content');
+
+  # ['content']
+
+=back
+
+=cut
+
 =head2 assert
 
   assert(Any $data, Str $expr) (Any)
@@ -1143,6 +1452,70 @@ I<Since C<2.40>>
   my $assert = assert(1234567890, 'float');
 
   # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=cut
+
+=head2 async
+
+  async(CodeRef $code, Any @args) (Process)
+
+The async function accepts a callback and executes it asynchronously via
+L<Venus::Process/async>. This function returns a
+L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
+with L</await>.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item async example 1
+
+  package main;
+
+  use Venus 'async';
+
+  my $async = async sub{
+    'done'
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 await
+
+  await(Process $process, Int $timeout) (Any)
+
+The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
+L<Venus::Process> object and eventually returns a value (or values) for it. The
+value(s) returned are the return values or emissions from the asychronous
+callback executed with L</async> which produced the process object.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item await example 1
+
+  package main;
+
+  use Venus 'async', 'await';
+
+  my $process;
+
+  my $async = async sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  };
+
+  my $await = await $async;
+
+  # ['done']
 
 =back
 
@@ -1681,6 +2054,75 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 clargs
+
+  clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+
+The clargs function accepts a single arrayref of L<Getopt::Long> specs, or an
+arrayref of arguments followed by an arrayref of L<Getopt::Long> specs, and
+returns a three element list of L<Venus::Args>, L<Venus::Opts>, and
+L<Venus::Vars> objects. If only a single arrayref is provided, the arguments
+will be taken from C<@ARGV>.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item clargs example 1
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs;
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=back
+
+=over 4
+
+=item clargs example 2
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=back
+
+=over 4
+
+=item clargs example 3
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['--resource', 'help'],
+    ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=back
+
+=cut
+
 =head2 cli
 
   cli(ArrayRef $args) (Cli)
@@ -1793,9 +2235,62 @@ I<Since C<2.55>>
 
   use Venus 'config';
 
-  my $config = config {}, 'from_perl', '{"data"=>1}';
+  my $config = config {}, 'read_perl', '{"data"=>1}';
 
   # bless({...}, 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 container
+
+  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The container function builds and returns a L<Venus::Container> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item container example 1
+
+  package main;
+
+  use Venus 'container';
+
+  my $container = container {};
+
+  # bless({...}, 'Venus::Config')
+
+=back
+
+=over 4
+
+=item container example 2
+
+  package main;
+
+  use Venus 'container';
+
+  my $data = {
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => "tmplog"
+        }
+      }
+    }
+  };
+
+  my $log = container $data, 'resolve', 'log';
+
+  # bless({value => '/tmp/log'}, 'Venus::Path')
 
 =back
 
@@ -1933,6 +2428,64 @@ I<Since C<2.40>>
   my $date = date time;
 
   # bless({...}, 'Venus::Date')
+
+=back
+
+=cut
+
+=head2 docs
+
+  docs(Any @args) (Any)
+
+The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item docs example 1
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'ABSTRACT';
+
+  # "Example Abstract"
+
+=back
+
+=over 4
+
+=item docs example 2
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'NAME';
+
+  # "Example #1\nExample #2"
 
 =back
 
@@ -2238,6 +2791,217 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 hashref
+
+  hashref(Any @args) (HashRef)
+
+The hashref function takes a list of arguments and returns a hashref.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item hashref example 1
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref(content => 'example');
+
+  # {content => "example"}
+
+=back
+
+=over 4
+
+=item hashref example 2
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref({content => 'example'});
+
+  # {content => "example"}
+
+=back
+
+=over 4
+
+=item hashref example 3
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content');
+
+  # {content => undef}
+
+=back
+
+=over 4
+
+=item hashref example 4
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content', 'example', 'algorithm');
+
+  # {content => "example", algorithm => undef}
+
+=back
+
+=cut
+
+=head2 is_bool
+
+  is_bool(Any $arg) (Bool)
+
+The is_bool function returns L</true> if the value provided is a boolean value,
+not merely truthy, and L</false> otherwise.
+
+I<Since C<3.18>>
+
+=over 4
+
+=item is_bool example 1
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool true;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_bool example 2
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool false;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_bool example 3
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_bool example 4
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 0;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_false
+
+  is_false(Any $data) (Bool)
+
+The is_false function accepts a scalar value and returns true if the value is
+falsy.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item is_false example 1
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 0;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_false example 2
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 1;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_true
+
+  is_true(Any $data) (Bool)
+
+The is_true function accepts a scalar value and returns true if the value is
+truthy.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item is_true example 1
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_true example 2
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 0;
+
+  # false
+
+=back
+
+=cut
+
 =head2 json
 
   json(Str $call, Any $data) (Any)
@@ -2306,6 +3070,59 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 list
+
+  list(Any @args) (Any)
+
+The list function accepts a list of values and flattens any arrayrefs,
+returning a list of scalars.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item list example 1
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list 1..4;
+
+  # (1..4)
+
+=back
+
+=over 4
+
+=item list example 2
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4];
+
+  # (1..4)
+
+=back
+
+=over 4
+
+=item list example 3
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4], 5, [6..10];
+
+  # (1..10)
+
+=back
+
+=cut
+
 =head2 load
 
   load(Any $name) (Space)
@@ -2335,7 +3152,10 @@ I<Since C<2.32>>
   log(Any @args) (Log)
 
 The log function prints the arguments provided to STDOUT, stringifying complex
-values, and returns a L<Venus::Log> object.
+values, and returns a L<Venus::Log> object. If the first argument is a log
+level name, e.g. C<debug>, C<error>, C<fatal>, C<info>, C<trace>, or C<warn>,
+it will be used when emitting the event. The desired log level is specified by
+the C<VENUS_LOG_LEVEL> environment variable and defaults to C<trace>.
 
 I<Since C<2.40>>
 
@@ -2522,10 +3342,10 @@ I<Since C<2.50>>
 
 =head2 merge
 
-  merge(HashRef @args) (HashRef)
+  merge(Any @args) (Any)
 
-The merge function returns a hash reference which is a merger of all of the
-hashref arguments provided.
+The merge function returns a value which is a merger of all of the arguments
+provided.
 
 I<Since C<2.32>>
 
@@ -2714,6 +3534,74 @@ I<Since C<2.55>>
   # my $resource = $opts->get('resource');
 
   # "users"
+
+=back
+
+=cut
+
+=head2 pairs
+
+  pairs(Any $data) (ArrayRef)
+
+The pairs function accepts an arrayref or hashref and returns an arrayref of
+arrayrefs holding keys (or indices) and values. The function returns an empty
+arrayref for all other values provided. Returns a list in list context.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item pairs example 1
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs [1..4];
+
+  # [[0,1], [1,2], [2,3], [3,4]]
+
+=back
+
+=over 4
+
+=item pairs example 2
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # [['a',1], ['b',2], ['c',3], ['d',4]]
+
+=back
+
+=over 4
+
+=item pairs example 3
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs [1..4];
+
+  # ([0,1], [1,2], [2,3], [3,4])
+
+=back
+
+=over 4
+
+=item pairs example 4
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # (['a',1], ['b',2], ['c',3], ['d',4])
 
 =back
 
@@ -2909,6 +3797,46 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 puts
+
+  puts(Any @args) (ArrayRef)
+
+The puts function select values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, optionally assigning the value to
+the preceeding scalar reference and returns all the values selected.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item puts example 1
+
+  package main;
+
+  use Venus 'puts';
+
+  my $data = {
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  };
+
+  puts $data, (
+    \my $fruit, 'fruit',
+    \my $expiry, 'meta.expiry'
+  );
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=back
+
+=cut
+
 =head2 raise
 
   raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -3004,6 +3932,44 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 range
+
+  range(Int | Str @args) (ArrayRef)
+
+The range function returns the result of a L<Venus::Array/range> operation.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item range example 1
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], ':4';
+
+  # [1..5]
+
+=back
+
+=over 4
+
+=item range example 2
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], '-4:-1';
+
+  # [6..9]
+
+=back
+
+=cut
+
 =head2 regexp
 
   regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -3047,6 +4013,33 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 render
+
+  render(Str $data, HashRef $args) (Str)
+
+The render function accepts a string as a template and renders it using
+L<Venus::Template>, and returns the result.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item render example 1
+
+  package main;
+
+  use Venus 'render';
+
+  my $render = render 'hello {{name}}', {
+    name => 'user',
+  };
+
+  # "hello user"
+
+=back
+
+=cut
+
 =head2 replace
 
   replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
@@ -3081,6 +4074,52 @@ I<Since C<2.55>>
   my $replace = replace ['hello world', 'world', 'universe'], 'get';
 
   # "hello universe"
+
+=back
+
+=cut
+
+=head2 resolve
+
+  resolve(HashRef $value, Any @args) (Any)
+
+The resolve function builds and returns an object via L<Venus::Container/resolve>.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item resolve example 1
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $resolve = resolve {};
+
+  # undef
+
+=back
+
+=over 4
+
+=item resolve example 2
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $data = {
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+      }
+    }
+  };
+
+  my $log = resolve $data, 'log';
+
+  # bless({...}, 'Venus::Path')
 
 =back
 
@@ -3268,6 +4307,74 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 syscall
+
+  syscall(Int | Str @args) (Any)
+
+The syscall function perlforms system call, i.e. a L<perlfunc/qx> operation,
+and returns C<true> if the command succeeds, otherwise returns C<false>. In
+list context, returns the output of the operation and the exit code.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item syscall example 1
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-v';
+
+  # true
+
+=back
+
+=over 4
+
+=item syscall example 2
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-z';
+
+  # false
+
+=back
+
+=over 4
+
+=item syscall example 3
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'sun', '--heat-death';
+
+  # ('done', 0)
+
+=back
+
+=over 4
+
+=item syscall example 4
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'earth', '--melt-icecaps';
+
+  # ('', 127)
+
+=back
+
+=cut
+
 =head2 template
 
   template(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -3343,6 +4450,114 @@ I<Since C<2.55>>
   my $test = test 't/Venus.t', 'for', 'synopsis';
 
   # bless({...}, 'Venus::Test')
+
+=back
+
+=cut
+
+=head2 text
+
+  text(Any @args) (Any)
+
+The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item text example 1
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'name';
+
+  # "Example Name"
+
+=back
+
+=over 4
+
+=item text example 2
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'titles', '#1';
+
+  # "Example Title #1"
+
+=back
+
+=over 4
+
+=item text example 3
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text undef, 'name';
+
+  # "Example Name"
 
 =back
 
@@ -4177,6 +5392,16 @@ manipulating regexp replacement data.
 
 =over 4
 
+=item venus-run
+
+This library contains a L<Venus::Run> class which provides a base class for
+providing a command execution system for creating CLIs (command-line
+interfaces).
+
+=back
+
+=over 4
+
 =item venus-scalar
 
 This library contains a L<Venus::Scalar> class which provides methods for
@@ -4208,6 +5433,15 @@ parsing and manipulating package namespaces.
 
 This library contains a L<Venus::String> class which provides methods for
 manipulating string data.
+
+=back
+
+=over 4
+
+=item venus-task
+
+This library contains a L<Venus::Task> class which provides a base class for
+creating CLIs (command-line interfaces).
 
 =back
 

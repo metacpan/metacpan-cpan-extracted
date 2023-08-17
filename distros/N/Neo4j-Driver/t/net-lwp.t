@@ -5,13 +5,16 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
+
 use Mock::Quick;
 
 
 # Unit tests for Neo4j::Driver::Net::HTTP::LWP
 
-plan tests => 1 + 13 + 1;
+plan tests => 1 + 13 + $no_warnings;
 
 use Neo4j::Driver::Net::HTTP::LWP;
 use HTTP::Headers;

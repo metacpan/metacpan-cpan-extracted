@@ -3,8 +3,9 @@
 
 =head1 NAME
 
-Tk::JBrowseEntry - Full-featured "Combo-box" (Text-entry combined with drop-down 
-listbox) derived from Tk::BrowseEntry with many additional features and options.
+Tk::JBrowseEntry - Full-featured "Combo-box" (Text-entry combined with 
+drop-down listbox) derived from Tk::BrowseEntry with many additional features 
+and options.
 
 =head1 SYNOPSIS
 
@@ -30,12 +31,13 @@ listbox) derived from Tk::BrowseEntry with many additional features and options.
 =head1 DESCRIPTION
 
 Tk::JBrowseEntry is a derived widget from Tk::BrowseEntry, but adds numerous 
-features and options.  Among them are hash lists (one set of values is displayed 
-for the user, but another is used as data), ability to disable either the text 
-entry widget or the listbox, ability to allow user to delete items from the list, 
-additional keyboard bindings, ability to have the drop-down list "fixed" (always 
-displayed, ability to use Tk::HListbox, ie. to include thumbnail icons in the 
-list), customized key bindings and behaviour, and much more!
+features and options.  Among them are hash lists (one set of values is 
+displayed for the user, but another is used as data), ability to disable 
+either the text entry widget or the listbox, ability to allow user to delete 
+items from the list, additional keyboard bindings, ability to have the 
+drop-down list "fixed" (always displayed, ability to use Tk::HListbox, ie. to 
+include thumbnail icons in the list), customized key bindings and behaviour, 
+and much more!
 
 JBrowseEntry widgets allow one to specify a full combo-box, a "readonly" 
 box (text field allows user to type the 1st letter of an item to search for, 
@@ -204,21 +206,22 @@ L<Tk::BrowseEntry> L<Tk::HListbox> L<Tk::Listbox> L<Tk::JComboBox> L<Tk::Entry>
 
 =over 4
 
-=item B<-state> => I<normal | readonly | text | textonly | disabled>
+=item B<-state> => I<'normal' | 'readonly' | 'text' | 'textonly' | 'disabled'>
 
-Default: B<normal>
+Default:  B<'normal'>
 
 JBrowseEntry supports 5 different states:
 
 =over 4
 
-I<normal>:  Default operation -- Both text entry field and drop-down list button 
-function normally. 
+I<normal>:  Default operation -- Both text entry field and drop-down list 
+button function normally. 
 
-I<readonly>:  Drop-down list functions normally. When text entry field has focus, 
-user may type in a letter, and the drop-down list immediately drops down and the 
-first/ next matching item becomes highlighted. The user must ultimately select 
-from the list of valid entries and may not enter anything else.
+I<readonly>:  Drop-down list functions normally. When text entry field has 
+focus, user may type in a letter, and the drop-down list immediately drops 
+down and the first/ next matching item becomes highlighted. The user must 
+ultimately select from the list of valid entries and may not enter 
+anything else.
 
 I<text>:  Text entry functions normally, but drop-down list button is disabled. 
 User must type in an entry or use the up and down arrows to choose from among 
@@ -278,18 +281,25 @@ etc.  Multiple values can be separated by commas.  "mod" means any modifier
 (Shift|Control|Alt), "*button1" means button1 regardless of modifier.
 
 "Tab=KeepList" - Normally, if the [Tab] key is pressed while the drop-down 
-list is displayed, the drop-down list is removed from view (rolled up) and 
-the focus simply returns to the text entry field.  Specifying "Tab=KeepList" 
-(on Unixish systems) makes Tk::JBrowseEntry keep the drop-down list displayed 
-while returning the focus back to the text field.  If "Tab=Popup" is also 
-specified, it implies "KeepList" as well on Unixish systems where the list 
-is not "fixed" as this avoids trapping the user in a "tab loop" between the 
-text-entry field and the drop-down list.  Either way, the listbox is 
-undisplayed anyway when the JBrowseEntry widget itself goes out of focus, or 
-either the [Enter] or [Esc] key is pressed.  If the drop-down list is a 
-"fixed" list (I<-fixedlist> is specified), then the list always remains in 
-view and only the focus changes and this setting is ignored.  This setting is 
-also ignored on M$-Windows platforms, which is beyond our control.
+list is displayed and focused, the drop-down list is removed from view 
+(rolled up) and the focus simply returns to the text entry field.  
+
+Specifying "Tab=KeepList" (on Unixish systems) makes Tk::JBrowseEntry keep the 
+drop-down list displayed while returning the focus back to the text field 
+when either tabbing off of the listbox or selecting an entry via the 
+I<spacebar> key.  To roll the listbox back up (unless I<-fixedlist> is 
+specified), simply press the Enter or Tab key, or click on the entry-field.
+
+"Tab=Popup" - Normally, if the [Tab] key is pressed while the text-entry field 
+is displayed and focused, the focus advances to the next widget.
+
+Specifying "Tab=Popup" will cause the listbox to be popped up and receive the 
+focus.  Either way, the listbox is undisplayed anyway when the JBrowseEntry 
+widget itself goes out of focus, or either the [Enter] or [Esc] key is pressed. 
+If the drop-down list is a "fixed" list (I<-fixedlist> is specified), then the 
+list always remains in view and only the focus changes and this setting 
+is ignored.  This setting is also ignored on M$-Windows platforms, which is 
+beyond our control.
 
 "Down=None", "Up=None", "Right=None", "Esc=None", "Return=None", "Space=None" 
 - causes pressing that respective key to NOT perform it's default 
@@ -320,9 +330,9 @@ field is tabbed away from.  The one case the author uses this option on is the
 =item B<-browsecmd>
 
 Specifies a callback function to call when a selection is made in the popped 
-up listbox. It is passed the widget and the text of the entry selected. This 
-function is called after the entry variable has been assigned the value, 
-(so the programmer can validate and override the user's entry if desired).
+up listbox.  This function is called after the entry variable has been 
+assigned the value, (so the programmer can validate and override the user's 
+entry if desired).
 
 The function is passed the widget reference itself (self), the content of the 
 entry field (not necessarily equal to the B<-variable> reference value), and 
@@ -376,6 +386,19 @@ I<-state> is changed, therefore, it's a good idea to also call
 $w->state($w->state()); after dynamically changing foreground or background 
 colors for the widget.
 
+=item B<-default>
+
+(string) - If set, it becomes the default value, ie. if the user presses 
+the Esc (escape) key inside the text box (pressing Esc a second time blanks 
+out the field unless I<-state == 'readonly'>).  It's recommended to set this 
+to either the I<-variable> variable (the variable itself, not it's reference) 
+or to a string representing one of the values in the dropdown listbox, to 
+avoid possibly confusing users.
+
+NOTE:  The initial value set in the text field will be whatever's in the 
+I<-variable>, NOT the I<-default> value unless I<-variable> is not defined!  
+If neither option is defined, the initial value will be empty string ('').
+
 =item B<-deleteitemsok>
 
 If set, allows user to delete individual items in the drop-down list by 
@@ -408,31 +431,34 @@ $MainWin->Getimage('cbxarrow') and a custom bitmap for M$-Windows.
 
 Normally the drop-down list pops up and down when requested, rolling up 
 (hiding) when not.  Setting this option to a true value will cause the 
-drop-down list to be a fixed listbox widget packed below the rest of the widget.  
-Specifying B<-fixedlist> => I<"top"> will instead display the listbox 
-I<above> the rest of the widget.  Default: 0 - drop-down list is not 
-fixed (pre-v5.10 behavior).
+drop-down list to be a fixed listbox widget packed below the rest of the 
+widget.  Specifying B<-fixedlist> => I<"top"> will instead display the 
+listbox I<above> the rest of the widget.  
 
-NOTE:  A list can be set to both "fixed" ("-fixedlist => ...") and "bouncy" 
-("-altbinding => 'list=bouncy'") at the same time.  This will ensure that 
+Default:  B<0> (false) - drop-down list is not fixed (pre-v5.10 behavior).
+
+NOTE:  A list can be set to both "fixed" (I<-fixedlist => ...>) and "bouncy" 
+(I<-altbinding => 'list=bouncy'>) at the same time.  This will ensure that 
 the focus always jumps right back to the text field whenever the user 
 selects an entry from the list.  Otherwise, "fixed" lists alternate 
 focus between the list and the entry field when the user clicks on 
 the list to select a value, as if the list is alternating between 
-"popped down" and "popped up" - this is not considered a bug.
+"popped down" and "popped up" - this is not considered a bug, but a feature.
 
 =item B<-indicator>
 
 Only used if B<-listboxtype> is set to HListbox, otherwise ignored.  
 Specifies whether an indicator image may be included with HListbox entries.  
-Default 0 (no indicator image).
+
+Default:  B<0> (false - no indicator image).
 
 =item B<-itemtype>
 
 Only used if B<-listboxtype> is set to HListbox, otherwise ignored.  
 Specifies the type of data permitted for HListbox entries.  
 Valid values are:  I<"text">, I<"image">, and I<"imagetext">.  
-Default: I<"text">.
+
+Default:  I<"text">.
 
 =item B<-label>
 
@@ -455,6 +481,9 @@ Specify alternate foreground for the label.
 
 Specify alternate font for the label.
 
+NOTE:  To change the font for the text entry field, use B<-font>.  See also 
+B<-listfont> below for changing the font of the items in the listbox.
+
 =item B<-labelPack>
 
 Specify alternate packing options for the label. The default is: 
@@ -467,7 +496,7 @@ later, you should set B<-label> to ''.
 
 =item B<-labelrelief>
 
-Default B<"flat">
+Default:  B<"flat">
 
 Allow relief of the label portion of the widget to be specified.
 
@@ -475,21 +504,28 @@ Allow relief of the label portion of the widget to be specified.
 
 Specifies tye type of listbox widget to use for the drop-down list.  
 Valid values are I<"Listbox"> and I<"HListbox">.  
-Default is I<"Listbox"> (Tk::Listbox).  
 If I<"HListbox"> is specified, you must have Tk::HListbox (v2.1+) installed 
 or the application will fail with an error.
+
+Default:  I<"Listbox"> (Tk::Listbox).  
 
 =item B<-listcmd>
 
 Specifies a callback function to call when the button next to the entry is 
 pressed to popup the choices in the listbox. This is called before popping up 
-the listbox, so can be used to populate the entries in the listbox. 
+the listbox, so can be used to populate the entries in the listbox.  It passes 
+the widget itself, and now also passes in the current value string in the 
+text-entry field (when the list was popped up).
+
+Default:  none (no callback function)
 
 =item B<-listfont>
 
-Specify an alternate font for the text in the listbox. Use "-font" to change 
-the text of the text entry field. For best results, "-font" and "-listfont" 
-should specify fonts of similar size. 
+Specify an alternate font for the text in the listbox.  
+
+NOTE:  Use B<-font> to change the text of the text entry field.  For best 
+results, I<-font> and I<-listfont> should usually specify fonts of 
+similar size.  
 
 =item B<-listrelief>
 
@@ -499,10 +535,15 @@ Specifies relief for the drop-down list (default is "sunken").
 
 Specifies the width of the popup listbox. 
 
+Default:  The same width (including any scrollbar) as the text entry 
+field's width.
+
 =item B<-nobutton>
 
 Whether or not to display the button that toggles the drop-down list.  
-Set to 1 to hide.  Default B<0> (display the button).
+Set to B<1> (true) to hide.  
+
+Default:  B<0> (false - display the button).
 
 Prevents drop-down list button from being displayed if set to 1 (true).
 
@@ -527,6 +568,8 @@ to the default value or empty string.  If set to "0", focus is simply advanced
 to the next widget in the main window.  In either case, if the text field is 
 changed, focus remains on the text field, otherwise focus advances to next 
 widget, so, after completing, pressing [Tab] again advances to next widget.
+(NEW in v5.30):  If set to 3, then tab-completion will only occur when tabbing 
+off of a focused and visible listbox.
 
 =item B<-textbackground>
 
@@ -543,6 +586,7 @@ Specify alternate background for the entry field (when I<-state> is disabled).
 =item B<-textdisabledforeground>
 
 Specify alternate foreground for the entry field (when I<-state> is disabled).
+
 Default:  B<-disabledforeground> or a dark grey.
 
 =item B<-textreadonlybackground>
@@ -552,7 +596,8 @@ Specify alternate background for the entry field (when I<-state> is readonly).
 =item B<-textreadonlyforeground>
 
 Specify alternate foreground for the entry field (when I<-state> is readonly).
-Default is a light gray.
+
+Default:  a light gray.
 
 =back
 
@@ -599,16 +644,25 @@ Specifies the foreground color for the widget and it's subwidgets.
 
 =item B<-height>
 
-Specify the maximum number of items to be displayed in the listbox before a 
-vertical scrollbar is automatically added. Default is infinity (listbox will 
-not be given a scrollbar regardless of the number of items added). 
+Specify the maximum number of items (rows) to be displayed in the listbox 
+before a vertical scrollbar is automatically added.  Default is infinity 
+(listbox will not be given a scrollbar regardless of the number of 
+items added).  
+
+NOTE:  This can overflow below the user's screen, so it is recommended to set 
+this to a sane value to cause a scrollbar to be added automatically if needed, 
+if there are going to be potentially say a dozen or more items.
 
 =item B<-maxwidth>
 
 Specifies the maximum width the entry and listbox widgets can expand to in 
-characters. The default is zero, meaning expand to the width to accomodate the 
-widest string in the list.  (Ignored if B<-width> > 0 (a fixed width) 
+characters.  Default is I<0> (zero), meaning expand to the width to accomodate 
+the widest string in the list.  (Ignored if B<-width> > 0 (a fixed width) 
 is specified).
+
+=item B<-textvariable>
+
+B<Depreciated> - use B<-variable> now.
 
 =item B<-variable>
 
@@ -631,107 +685,108 @@ are later added or removed the width will be recalculated.
 
 =item $widget->B<activate>(index)
 
-activate() invokes the activate() option on the listbox to make the item with the 
-index specified by the first argument "active".  Unless a second argument is 
-passed containing a false value, the value of the "-textvariable" variable is also 
-set to this now active value.
+activate() invokes the activate() option on the listbox to make the item with 
+the index specified by the first argument "active".  Unless a second argument 
+is passed containing a false value, the value of the "-variable" variable is 
+also set to this now active value.
 
 =item $widget->B<choices>([listref])
 
-Sets the drop-down list listbox to the list of values referenced by I<listref>, if
-specified.  Returns the current list of choices in the listbox if no arguments 
-provided.  If a I<hashref> is specified, the keys represent the actual data values 
-and the values represent the corresponding values the user sees displayed in the 
-listbox.  NOTE:  If a I<hashref> is specified, the B<-variable> should be initialized 
-to one of the hash VALUES rather than it's corresponding key.  The individual items in 
-the referenced array are normally simple text strings unless B<-listboxtype> is set to 
-I<"HListbox">, in which case, each can be either a simple text string or a hashref to a 
-hash of attributes and values representing a valid Tk::HListbox entry, for example: 
+Sets the drop-down list listbox to the list of values referenced by I<listref>, 
+if specified.  Returns the current list of choices in the listbox if no 
+arguments provided.  If a I<hashref> is specified, the keys represent the 
+actual data values and the values represent the corresponding values the user 
+sees displayed in the listbox.  NOTE:  If a I<hashref> is specified, the 
+B<-variable> should be initialized to one of the hash VALUES rather than it's 
+corresponding key.  The individual items in the referenced array are normally 
+simple text strings unless B<-listboxtype> is set to I<"HListbox">, in which 
+case, each can be either a simple text string or a hashref to a hash of 
+attributes and values representing a valid Tk::HListbox entry, for example: 
 {-image => $thumbnailimage, -text => 'text string'}.
 
 =item $widget->B<curselection>()
 
-Returns the currently-selected element in the listbox, if any, otherwise, B<undef>.
+Returns the currently-selected element in the listbox, if any, otherwise, 
+B<undef>.
 
 =item $widget->B<delete>(first [, last])
 
-Deletes one or more elements of the listbox.  First and last are indices specifying 
-the first and last elements in the range to delete.  If last isn't specified it 
-defaults to first, i.e. a single element is deleted.
+Deletes one or more elements of the listbox.  First and last are indices 
+specifying the first and last elements in the range to delete.  If last isn't 
+specified it defaults to first, i.e. a single element is deleted.
 
 =item $widget->B<delete_byvalue>(hashkey)
 
-Deletes one or more elements of the listbox.  "hashkey" specifies the element to 
-be deleted by the value visible to the user.
+Deletes one or more elements of the listbox.  "hashkey" specifies the element 
+to be deleted by the value visible to the user.
 
 =item $widget->B<reference>(hashkey)
 
-Returns the value (displayed in the listbox) that corresponds to the choice key 
-specified by "hashkey".  If the key is not one of the valid choices or the choices 
-are a list instead of a hash, then the hashkey itself is returned.  If the choices are 
-a list rather than a hash, then the value is returned as is.  Returns B<undef> on error. 
+Returns the value (displayed in the listbox) that corresponds to the choice 
+key specified by "hashkey".  If the key is not one of the valid choices or the 
+choices are a list instead of a hash, then the hashkey itself is returned.  If 
+the choices are a list rather than a hash, then the value is returned as is.  
+Returns B<undef> on error. 
 
 =item $widget->B<dereference>(hashvalue)
 
-Returns the actual option key value that corresponds to the choice value displayed 
-in the listbox.  (undef if there is none).  (Opposite of reference() and 
-referenceOnly().  Use this function on the -variable reference variable to get 
-the actual data (hash key), since the reference variable will contain the VALUE 
-displayed to the user!  If the choices are a list rather than a hash, then the 
-value is returned as is.  Returns B<undef> on error. 
-
-=item $widget->B<dereferenceOnly>(hashkey)
-
-Returns 1 if the key specified by "hashkey" is one of the valid choices and the list 
-of choices is a hash, otherwise B<undef> is returned.
+Returns the actual option key value that corresponds to the choice value 
+displayed in the listbox.  (undef if there is none).  
+(Opposite of reference().  Use this function on the -variable reference 
+variable to get the actual data (hash key), since the reference variable will 
+contain the VALUE displayed to the user!  If the choices are a list rather 
+than a hash, then the value is returned as is.  Returns B<undef> on error. 
 
 =item $widget->B<get_hashref_byname>()
 
-Returns a reference to the current hash of choices (keyed by the option visable to
-the user) if the choice list is a hash (reversed from the hash passed to choices()), 
-otherwise, B<undef> is returned.
+Returns a reference to the current hash of choices (keyed by the option 
+visable tothe user) if the choice list is a hash (reversed from the hash 
+passed to choices()), otherwise, B<undef> is returned.
 
 =item $widget->B<get_hashref_byvalue>()
 
-Returns a reference to the current hash of choices (keyed by actual option value) 
-if the choice list is a hash (same as the hash passed to choices()), 
+Returns a reference to the current hash of choices (keyed by actual option 
+value) if the choice list is a hash (same as the hash passed to choices()), 
 otherwise, B<undef> is returned.
 
 =item $widget->B<get>([first [, last]])
 
-get() with no arguments returns the current value of the "-textvariable" variable.  
+get() with no arguments returns the current value of the "-variable" variable.  
 If any arguments are passed, they are passed directly to the listbox->get() 
-function, ie. "0", "end" to return all I<text> values of the listbox.  For choice 
-hashes, the value returned is what is displayed to the user.  If Tk::HListbox is 
-used, only the I<text> part of the entries are returned.  The arguments are indices.
+function, ie. "0", "end" to return all I<text> values of the listbox.  For 
+choice hashes, the value returned is what is displayed to the user.  
+If Tk::HListbox is used, only the I<text> part of the entries are returned.  
+The arguments are indices.
 
 =item $widget->B<get_icursor>([index])
 
-Return the location of I<index> in the I<text-entry> field.  Values known to be 
-valid are:  "insert" and "end", which return the character position of the insertion 
-cursor and the location of the "end" of the current input string (ie. it's length).  
-The cursor is set by the $widget->B<icursor> function.  If no argument (I<index>) is 
-given, the index of the insertion cursor (I<"insert">) is returned.
+Return the location of I<index> in the I<text-entry> field.  Values known to 
+be valid are:  "insert" and "end", which return the character position of the 
+insertion cursor and the location of the "end" of the current input string 
+(ie. it's length).  The cursor is set by the $widget->B<icursor> function.  
+If no argument (I<index>) is given, the index of the insertion cursor 
+(I<"insert">) is returned.
 
 =item $widget->B<get_index>(value)
 
 Returns the index number in the list (zero-based) that can be used by get() of 
-the value specified by "value", or undef if "value" is not in the list of choices.  
-If the choice list is a hash, then "value" should be the value displayed (stored 
-in the -variable reference variable), not the hash key.  This function is the 
-reverse of the B<get>() function.
+the value specified by "value", or undef if "value" is not in the list of 
+choices.  If the choice list is a hash, then "value" should be the value 
+displayed (stored in the -variable reference variable), not the hash key.  
+This function is the reverse of the B<get>() function.
 
 =item $widget->B<hasreference>(hashkey)
 
-Returns the value (displayed in the listbox) that corresponds to the choice key 
-specified by "hashkey".  If the key is not one of the valid choices or the choices 
-are a list instead of a hash, then B<undef> is returned.
+Returns the value (displayed in the listbox) that corresponds to the choice 
+key specified by "hashkey".  If the key is not one of the valid choices or the 
+choices are a list instead of a hash, then B<undef> is returned.
 
 =item $widget->B<icursor>(index)
 
-Sets the location of the text-entry field's text cursor to I<index>.  Valid values 
-are numeric (zero for beginning) and "end" for placing the cursor at the end of the 
-text.  The index can be retrieved by using the $widget->B<get_icursor>(index) function.
+Sets the location of the text-entry field's text cursor to I<index>.  
+Valid values are numeric (zero for beginning) and "end" for placing the cursor 
+at the end of the text.  The index can be retrieved by using the 
+$widget->B<get_icursor>(index) function.
 
 =item $widget->B<index>(index)
 
@@ -739,25 +794,26 @@ Invokes and returns the result of the listbox->index() function.
 
 =item $widget->B<insert>(index, [item | list | listref | hashref])
 
-Inserts one or more elements in the list just before the element given by index.  
-If I<index> is specified as "end" then the new elements are added to the end of the list.
-List can be a reference to a list (I<listref>).  If a hash reference is specified, 
-then the values are displayed to the user in the drop-down list, but the values 
-returned by the "-textvariable" variable or the get() function are the corresponding 
-hash key(s).  The individual items in the referenced array are normally simple text 
-strings unless B<-listboxtype> is set to I<"HListbox">, in which case, each can be 
-either a simple text string or a hashref to a hash of attributes and values representing 
-a valid Tk::HListbox entry, for example: {-image => $thumbnailimage, -text => 'text string'}.
+Inserts one or more elements in the list just before the element given by 
+index.  If I<index> is specified as "end" then the new elements are added to 
+the end of the list.  List can be a reference to a list (I<listref>).  If a 
+hash reference is specified, then the values are displayed to the user in the 
+drop-down list, but the values returned by the "-variable" variable or the 
+get() function are the corresponding hash key(s).  The individual items in the 
+referenced array are normally simple text strings unless B<-listboxtype> is set 
+to I<"HListbox">, in which case, each can be either a simple text string or a 
+hashref to a hash of attributes and values representing a valid Tk::HListbox 
+entry, for example: {-image => $thumbnailimage, -text => 'text string'}.
 
 =item $widget->B<selectionRange>(index1, index2)
 
-Select (highlight) the text in the text-entry field between I<index1> and I<index2>.
-Valid values are numeric (zero for beginning), "insert" and "end".
+Select (highlight) the text in the text-entry field between I<index1> and 
+I<index2>.  Valid values are numeric (zero for beginning), "insert" and "end".
 
 =item $widget->B<size>()
 
-Invokes and returns the result of the listbox size() function (the number of items in 
-the list).
+Invokes and returns the result of the listbox size() function (the number of 
+items in the list).
 
 =item $widget->B<state>([normal | readonly | text | textonly | disabled])
 
@@ -765,19 +821,20 @@ Get or set the state of the widget.
 
 =item $widget->B<Popdown>([nofocusrestore])
 
-Roll up (undisplay) the drop-down list.  If I<nofocusrestore> is specified and is true, no 
-attempt will be made to refocus the previous widget focused when the drop-down list was 
-popped up.  This is useful when the developer intends to immediately focus somewhere 
-else.
+Roll up (undisplay) the drop-down list.  If I<nofocusrestore> is specified and 
+is true, no attempt will be made to refocus the previous widget focused when 
+the drop-down list was popped up.  This is useful when the developer intends 
+to immediately focus somewhere else.
 
 =item $widget->B<PressButton>([nofocussave])
 
-Activates drop-down list as if user pressed the button (unless state is "text" or "textonly" 
-or "disabled".  Returns 1 if drop-down list activated, zero otherwise.  If the drop-down 
-list is already visible, then removes it (pops it back down) and returns zero.
-Available in versions 5.0 and later.  The current keyboard focus is saved for restoration 
-when the drop-down list is rolled up unless I<nofocussave> is specified and is true, in 
-which case, focus will remain with the JBrowseEntry widget whose button was "pressed".
+Activates drop-down list as if user pressed the button (unless state is "text" 
+or "textonly" or "disabled".  Returns 1 if drop-down list activated, zero 
+otherwise.  If the drop-down list is already visible, then removes it (pops it 
+back down) and returns zero.Available in versions 5.0 and later.  The current 
+keyboard focus is saved for restoration when the drop-down list is rolled up 
+unless I<nofocussave> is specified and is true, in which case, focus will 
+remain with the JBrowseEntry widget whose button was "pressed".
 
 =back
 
@@ -844,18 +901,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package Tk::JBrowseEntry;
 
-BEGIN
-{
+#BEGIN
+#{
 	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.25';
+	$VERSION = '5.30';
 
 	use strict;
+	use warnings;
 	use Carp;
 	use Tk;
 	use Tk::Frame;
 	eval 'use Tk::HListbox; $haveHListbox = ($Tk::HListbox::VERSION >= 2.1) ? 1 : 0; 1';
 	use base qw(Tk::Frame);
-};
+#};
 
 Construct Tk::Widget 'JBrowseEntry';
 
@@ -890,8 +948,7 @@ sub ClassInit
 		}
 		else
 		{
-			my $bits = pack("b11"x12,
-					"....###....",
+			my $bits = pack("b11"x11,
 					"....###....",
 					"....###....",
 					"....###....",
@@ -904,7 +961,7 @@ sub ClassInit
 					".#########.",
 					".#########."
 			);
-			$mw->DefineBitmap($BITMAP => 11,12, $bits);
+			$mw->DefineBitmap($BITMAP => 11,11, $bits);
 		}
 		$FOCUSEDBITMAP = __PACKAGE__ . "::fdownarrow";
 
@@ -926,8 +983,7 @@ sub ClassInit
 		}
 		else
 		{
-			my $bits = pack("b11"x12,
-					"....###....",
+			my $bits = pack("b11"x11,
 					"....###....",
 					"....###....",
 					"....###....",
@@ -940,9 +996,15 @@ sub ClassInit
 					".#########.",
 					".#########."
 			);
-			$mw->DefineBitmap($FOCUSEDBITMAP => 11,12, $bits);
+			$mw->DefineBitmap($FOCUSEDBITMAP => 11,11, $bits);
 		}
 	}
+	return $class->SUPER::ClassInit($mw);
+}
+
+sub SetBindtags {     #function added by Jeff Stephens:
+	my ($self) = @_;
+	$self->SUPER::SetBindtags;
 }
 
 sub Populate
@@ -998,6 +1060,8 @@ sub Populate
 	#NEXT 2 OPTIONS ADDED 20070904 BY JWT:
 	$w->{'-buttonborderwidth'} = defined($args->{'-buttonborderwidth'})
 		? delete($args->{'-buttonborderwidth'}) : 1;
+	$w->{'-default'} = defined($args->{'-default'})
+		? delete($args->{'-default'}) : undef;
 	$w->{'-entryborderwidth'} = defined($args->{'-entryborderwidth'})
 		? $args->{'-entryborderwidth'} : 0;
 	$w->{'-nobutton'} = defined($args->{'-nobutton'})
@@ -1081,7 +1145,7 @@ sub Populate
 		$tf->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'x', -expand => 1)
 				unless ($w->{'-fixedlist'} =~ /top/);
 		my $height = $w->{'-height'} ||= 3;
-		$c = $w->Frame(-bd => 2, -relief => 'flat', -takefocus => 0);
+		$c = $w->Frame(-bd => 0, -relief => 'flat', -takefocus => 0);
 		$sl = $c->Scrolled($w->{'-listboxtype'}, '-takefocus' => 0, '-selectmode' => 'browse', '-height' => $height, '-scrollbars' => 'oe', '-activestyle' => $w->{'-activestyle'}
 		)->pack(-fill => 'x', -expand => 1);
 		(my $lbtype = $w->{'-listboxtype'}) =~ tr/A-Z/a-z/;
@@ -1091,7 +1155,7 @@ sub Populate
 		$tf->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'x', -expand => 1)
 				if ($w->{'-fixedlist'} =~ /top/);
 		$c->bind('<FocusIn>' => sub {
-			if ($w->{'_lbignorefocus'} == 1)  #DON'T REFOCUS ON JUST POPPED-DOWN "BOUNCY" LISTBOX!
+			if (!defined($w->{'_lbignorefocus'}) || $w->{'_lbignorefocus'} == 1)  #DON'T REFOCUS ON JUST POPPED-DOWN "BOUNCY" LISTBOX!
 			{
 				$w->{'_lbignorefocus'} = 0;
 			}
@@ -1106,7 +1170,7 @@ sub Populate
 	else
 	{
 		$tf->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'x', -expand => 1);
-		$c = $w->Toplevel(-bd => 2, -relief => 'raised');
+		$c = $w->Toplevel(-bd => 0, -relief => 'raised');
 		$c->overrideredirect(1);
 		$c->withdraw;
 		$sl = $c->Scrolled($w->{'-listboxtype'}, '-selectmode' => 'browse', '-scrollbars' => 'oe');
@@ -1144,9 +1208,10 @@ sub Populate
 			-colorstate  => [qw/PASSIVE  colorState  ColorState         0/],
 			#-colorstate  => [qw/PASSIVE  colorState  ColorState/,  undef],
 			-arrowimage  => [ {-image => $b}, qw/arrowImage ArrowImage/, undef],
-			-variable    => '-textvariable',
+			-variable    => [ {-textvariable => $e}, qw/variable Variable/, undef],
 			-label       => [ {-text => $ll}, qw/label Label/, undef],
 				-labelrelief => [ {-relief => $ll}, qw/relief Relief/, undef],
+				-listrelief  => [ {-relief => $sl}, qw/relief Relief/, 'sunken'],
 				-labelbackground => [ {-background => $ll}, qw/background Background/, undef],
 				-labelforeground => [ {-foreground => $ll}, qw/foreground Foreground/, undef],
 				-labelfont => [ {-font => $ll}, qw/font Font/, undef],
@@ -1159,9 +1224,9 @@ sub Populate
 				-entryborderwidth => [ {-borderwidth => $e}, qw/borderWidth BorderWidth/, 0],
 				-buttonbackground => [ {-background => $b}, qw/background Background/, undef],
 				-buttonforeground => [ {-foreground => $b}, qw/foreground Foreground/, undef],
-			-background  => [[SELF, DESCENDANTS], qw/background   Background/,   undef],
-			-foreground  => [[SELF, DESCENDANTS], qw/foreground   Foreground/,   undef],
-			-default     => ['PASSIVE', undef, undef, ''],
+			-background  => [['SELF', 'DESCENDANTS'], qw/background   Background/,   undef],
+			-foreground  => [['SELF', 'DESCENDANTS'], qw/foreground   Foreground/,   undef],
+			-default     => ['PASSIVE', undef, undef, undef],
 		DEFAULT      => [$e] );
 
 	$sl->configure(-relief => $w->{'-listrelief'}||'sunken');
@@ -1178,18 +1243,19 @@ sub Populate
 		}
 	}
 	$w->configure(%argHash)  if ($haveSomething);
-no strict 'refs';
-	my $var_ref = $w->cget( '-textvariable' );
+	my $var_ref = $w->{'-variable'};
 
+	$w->{'default'} = $w->{'-default'};
+	unless (defined $w->{'default'})
+	{
+		$w->{'default'} = defined($w->{'-variable'}) ? ${$w->{'-variable'}} : undef;
+	}
 	#SET UP DUMMY SO IT DISPLAYSS IF NO VARIABLE SPECIFIED:
 	unless (defined($var_ref) && ref($var_ref))
 	{
-		$var_ref = '';
-		$w->configure(-textvariable => \$var_ref);
+		$var_ref = defined($w->{'default'}) ? $w->{'default'} : '';
+		$w->configure(-variable => \$var_ref);
 	}
-
-	eval { $w->{'default'} = $_[1]->{'-default'} || (defined($_[1]->{'-variable'}) ? ${$_[1]->{'-variable'}}
-			: undef); };
 }
 
 sub focus   #CALLED WHENEVER MAIN WIDGET TAKES FOCUS:
@@ -1266,7 +1332,7 @@ sub SetBindings
 			$self->focusNext;
 			Tk->break;
 		}
-		$w->LbFindSelection();
+		$w->LbFindSelection(0);
 		if ($w->{'popped'})  #LISTBOX IS SHOWING:
 		{
 			$w->LbCopySelection(0,'entry.${keyModifier}return');
@@ -1287,21 +1353,20 @@ sub SetBindings
 		my ($state) = $w->cget( "-state" );
 		return  if ($state eq 'textonly' || $state eq 'disabled' || $w->{'-altbinding'} =~ /Right\=None/io);
 
-no strict 'refs';
-		my $var_ref = $w->cget( '-textvariable' );
+		my $var_ref = $w->cget('-variable');
 		return  unless (defined($var_ref) && defined($$var_ref) && $$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
 
 		my @listsels = $w->getText('0','end');
 		return  if ($#listsels < 0);  #NO LIST TO SEARCH, SO PUNT!
 
 		my $srchPattern = $$var_ref;
-		my $found = $w->LbFindSelection();   #SEARCH FOR CURRENT TEXT: RETURNS 1 IF FULL MATCH (IN LIST), -1 IF CONTAINS, 0 IF NO MATCH.
+		my $found = $w->LbFindSelection(0);   #SEARCH FOR CURRENT TEXT: RETURNS 1 IF FULL MATCH (IN LIST), -1 IF CONTAINS, 0 IF NO MATCH.
 		return  unless (defined($found) && $found);  #NO MATCH, PUNT!
 
 		my $index;
-		$index = $w->LbIndex(2)  if ($found < 0 && $w->LbFindSelection($srchPattern)); #IF MATCH ONLY CONTAINS TEXT, SEARCH AGAIN STARTING AT *NEXT* ENTRY.
+		$index = $w->LbIndex(2)  if ($found < 0 && $w->LbFindSelection(0,$srchPattern)); #IF MATCH ONLY CONTAINS TEXT, SEARCH AGAIN STARTING AT *NEXT* ENTRY.
 		if (defined $index) {
-			$$var_ref = $listsels[$index];
+			$$var_ref = $w->reference($listsels[$index]);
 			$e->icursor('end');
 			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
 		}
@@ -1314,7 +1379,7 @@ no strict 'refs';
 
 		if ($w->{'-altbinding'} =~ /Down\=Popup/io && $state !~ /text/o)  #MAKE DOWN-ARROW POP UP DD-LIST.
 		{
-			$w->LbFindSelection(); 
+			$w->LbFindSelection(0); 
 			if (!$w->{'-fixedlist'} && $w->{'popped'})  #LISTBOX IS SHOWING:
 			{
 				$w->LbCopySelection(1,'entry.down');
@@ -1330,25 +1395,30 @@ no strict 'refs';
 		{
 			return if ($state eq 'text');
 
-			$w->LbFindSelection(); 
+			$w->LbFindSelection(0); 
 			$w->Subwidget("slistbox")->focus;
 		}
 		else
 		{
-			$w->LbFindSelection();
+			$w->LbFindSelection(0);
 			my $l = $w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'});
 			my @listsels = $w->getText('0','end');
+			return  unless ($#listsels >= 0);
+
 			my $index = $w->LbIndex(3);
-			$l->selectionClear($index++);
-			$index = 0  if ($index > $#listsels);
-no strict 'refs';
-			my $var_ref = $w->cget( '-textvariable' );
-			$$var_ref = $listsels[$index];
+			my $var_ref = $w->cget('-variable');
+			if ($$var_ref eq $listsels[$index])
+			{
+				$l->selectionClear($index++);
+				$index = $#listsels  if ($index > $#listsels);
+#REPLACE PREV. WITH THIS FOR ROUND-ROBIN:			$index = 0  if ($index > $#listsels);
+			}
+			$$var_ref = $w->reference($listsels[$index]);
 			$l->activate($index);      #ADDED 20070904 PER PATCH FROM WOLFRAM HUMANN.
 			$l->selectionSet($index);
 			$l->see($index)  if ($w->{'-fixedlist'});
 			$e->icursor('end');
-			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
+#LET'S NOT DO:			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
 		}
 	};
 
@@ -1359,7 +1429,7 @@ no strict 'refs';
 
 		if ($w->{'-altbinding'} =~ /Up\=Popup/io && $state !~ /text/o)  #MAKE DOWN-ARROW POP UP DD-LIST.
 		{
-			$w->LbFindSelection(); 
+			$w->LbFindSelection(1); 
 			if (!$w->{'-fixedlist'} && $w->{'popped'})  #LISTBOX IS SHOWING:
 			{
 				$w->LbCopySelection(1,'entry.down');
@@ -1375,25 +1445,30 @@ no strict 'refs';
 		{
 			return if ($state eq 'text');
 
-			$w->LbFindSelection();
+			$w->LbFindSelection(1);
 			$w->Subwidget("slistbox")->focus;
 		}
 		else
 		{
-			$w->LbFindSelection();
+			$w->LbFindSelection(1);
 			my $l = $w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'});
 			my @listsels = $w->getText('0','end');
+			return  unless ($#listsels >= 0);
+
 			my $index = $w->LbIndex(3);
-			$l->selectionClear($index--);
-			$index = $#listsels  if ($index < 0);
-no strict 'refs';
-			my $var_ref = $w->cget( '-textvariable' );
-			$$var_ref = $listsels[$index];
+			my $var_ref = $w->cget('-variable');
+			if ($$var_ref eq $listsels[$index])
+			{
+				$l->selectionClear($index--);
+				$index = 0  if ($index < 0);
+#REPLACE PREV. WITH THIS FOR ROUND-ROBIN:			$index = $#listsels  if ($index < 0);
+			}
+			$$var_ref = $w->reference($listsels[$index]);
 			$l->activate($index);      #ADDED 20070904 PER PATCH FROM WOLFRAM HUMANN.
 			$l->selectionSet($index);
 			$l->see($index)  if ($w->{'-fixedlist'});
 			$e->icursor('end');
-			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
+#LET'S NOT DO:			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
 		}
 	};
 
@@ -1407,13 +1482,21 @@ no strict 'refs';
 		}
 		else   #JUST RESET TEXT FIELD TO DEFAULT OR EMPTY:
 		{
-no strict 'refs';
-			my $var_ref = $w->cget( '-textvariable' );
+			my $var_ref = $w->cget('-variable');
 			#if ($$var_ref eq $w->{'default'} && $w->cget( '-state' ) ne 'readonly')
 			#CHGD. TO NEXT 20030531 PER PATCH BY FRANK HERRMANN.
-			$$var_ref = (defined $w->{'default'} and $$var_ref eq $w->{'default'} 
-					and $w->cget( '-state' ) ne 'readonly') ? '' : $w->{'default'};
+			if ($w->cget('-state') eq 'readonly')
+			{
+				$$var_ref = $w->{'default'}  if (defined $w->{'default'});
+			}
+			else
+			{
+				$$var_ref = (defined($w->{'default'}) && $$var_ref eq $w->{'default'})
+						? '' : $w->{'default'};
+				$$var_ref = ''  unless (defined $$var_ref);  #MAKE THE NANNY-STATERS HAPPY!
+			}
 			$e->icursor('end');
+			$w->{'searchindx'} = 0;
 		}
 		$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));   #ADDED 20020716
 		Tk->break;
@@ -1426,7 +1509,7 @@ no strict 'refs';
 		my ($state) = $w->cget( '-state' );
 		if ($state eq 'readonly')
 		{
-			my $res = $w->LbFindSelection();
+			my $res = $w->LbFindSelection(0);
 			if ($w->{'popped'})  #LISTBOX IS SHOWING:
 			{
 				$w->LbCopySelection(0,'entry.space');
@@ -1494,17 +1577,15 @@ no strict 'refs';
 	{
 		unless ($b->cget( '-state' ) eq 'disabled')
 		{
-$w->LbFindSelection()  if ($w->{'popped'});  #(IF LISTBOX IS SHOWING, FIND & HIGHLIGHT CLOSEST MATCH TO TEXT):
+#1 $w->LbFindSelection(0)  if ($w->{'popped'});  #(IF LISTBOX IS SHOWING, FIND & HIGHLIGHT CLOSEST MATCH TO TEXT):
+#$w->LbFindSelection(0);
 			$w->PopupChoices;   #TOGGLES DISPLAY OF LISTBOX!
 			if ($w->{'popped'})
 			{
-my $index = $w->LbIndex(1);
+#my $index = $w->LbIndex(1);
 
 				$sl->focus;
 				$sl->raise;
-$l->activate($index);         #THIS UNDERLINES IT.
-$l->selectionClear(0,'end');  #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
-$l->selectionSet($index);     #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
 				$w->{'_ignorefocus'} = 1;
 			}
 			else
@@ -1512,7 +1593,7 @@ $l->selectionSet($index);     #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
 				$w->{'_ignorefocus'} = 0;
 				$w->focus;
 			}
-$w->LbCopySelection(1,'button.button1');
+#LET'S NOT DO: $w->LbCopySelection(1,'button.button1');
 		}
 		Tk->break;
 	});
@@ -1531,6 +1612,7 @@ $w->LbCopySelection(1,'button.button1');
 			$w->Popdown(1); #  if ($w->{'popped'} && $w->{'-altbinding'} =~ /List\=Bouncy/io);
 			$w->focus();
 		}
+		$l->selectionSet($l->index('active'))  if ($w->{'popped'});
 		Tk->break;
 	});
 
@@ -1539,7 +1621,6 @@ $w->LbCopySelection(1,'button.button1');
 		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
-		$w->LbFindSelection();
 		$w->PopupChoices;
 	});
 
@@ -1548,7 +1629,6 @@ $w->LbCopySelection(1,'button.button1');
 		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
-		$w->LbFindSelection();
 		$w->PopupChoices;
 		Tk->break;
 	});
@@ -1558,7 +1638,6 @@ $w->LbCopySelection(1,'button.button1');
 		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
-		$w->LbFindSelection();
 		$w->PopupChoices;
 		Tk->break;
 	});
@@ -1647,21 +1726,21 @@ $w->LbCopySelection(1,'button.button1');
 		#NEXT LINE ADDED 20030531 PER PATCH BY FRANK HERRMANN.
 		$w->Callback(-browsecmd => $w, $w->Subwidget('entry')->get, 'entry.tab')
 				if ($w->{'-browse'} == 1);
-		if ($w->{'-tabcomplete'} && $w->cget('-state') !~ /(?:textonly|disabled)/o)
+		if (($w->{'-tabcomplete'} == 1 || $w->{'-tabcomplete'} == 2)
+				&& $w->cget('-state') !~ /(?:textonly|disabled)/o)
 		{
-no strict 'refs';
-			my $var_ref = $w->cget( '-textvariable' );
+			my $var_ref = $w->cget('-variable');
 			return  unless ($$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
 
 			my @listsels = $w->getText('0','end');
 			my $srchPattern = $$var_ref;
-			my $found = $w->LbFindSelection();   #SEARCH FOR CURRENT TEXT: RETURNS 1 IF FULL MATCH (IN LIST), -1 IF CONTAINS, 0 IF NO MATCH.
+			my $found = $w->LbFindSelection(0);   #SEARCH FOR CURRENT TEXT: RETURNS 1 IF FULL MATCH (IN LIST), -1 IF CONTAINS, 0 IF NO MATCH.
 			if ($found)
 			{
 				my $index;
-				$index = $w->LbIndex(2)  if ($found < 0 && $w->LbFindSelection($srchPattern)); #IF MATCH ONLY CONTAINS TEXT, SEARCH AGAIN STARTING AT *NEXT* ENTRY.
+				$index = $w->LbIndex(2)  if ($found < 0 && $w->LbFindSelection(0,$srchPattern)); #IF MATCH ONLY CONTAINS TEXT, SEARCH AGAIN STARTING AT *NEXT* ENTRY.
 				if (defined $index) {
-					$$var_ref = $listsels[$index];
+					$$var_ref = $w->reference($listsels[$index]);
 					$e->icursor('end');
 					$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
 					$same = 0;
@@ -1684,9 +1763,10 @@ no strict 'refs';
 		{
 			$w->{'searchindx'} = 0;
 		}
+
 		my $wasPoppedAlready = $w->{'popped'};
 		$w->Popdown(1)  if ($wasPoppedAlready);   #UNDISPLAYS LISTBOX.
-		if ($same)  #TEXT NOT CHANGED TY TAB-COMPLETION:
+		if ($same)  #TEXT NOT CHANGED BY TAB-COMPLETION:
 		{
 			my $state = $w->cget('-state');
 			if (!$wasPoppedAlready && $w->{'-altbinding'} =~ /Tab\=Popup/io
@@ -1719,8 +1799,7 @@ no strict 'refs';
 		}
 		else   #TRY TO GO TO NEXT WIDGET IN MAIN WINDOW:
 		{
-			my $self = shift;
-			$self->focusNext;
+			shift->focusNext;
 		}
 		Tk->break;
 	});
@@ -1745,7 +1824,7 @@ no strict 'refs';
 			{
 				$s->Subwidget($w->{'-listboxtype'})->configure('-takefocus' => 1);
 				$w->{'popped'} = 1;
-#MUSN'T DO (& DON'T NEED!):			$w->LbFindSelection();
+#MUSN'T DO (& DON'T NEED!):			$w->LbFindSelection(0);
 				$s->see('active');
 				$w->Subwidget('choices')->configure(-cursor => 'arrow');
 				$w->{'_ignorefocus'} = 1;
@@ -1780,11 +1859,9 @@ no strict 'refs';
 
 	$l->bind('<space>' => sub    #[Spacebar] PRESSED IN DD-LIST (COPY SELECTED ENTRY TO TEXT FIELD):
 	{
-		my $state = $w->cget('-state');
-		my $index = $w->LbIndex(1);
-
 		$w->{'_ignorefocus'} = 0;
-		$w->LbCopySelection(0,'listbox.space',1);
+		my $dontrollup = ($w->{'-altbinding'} =~ /Tab\=KeepList/i) ? -1 : 0;
+		$w->LbCopySelection($dontrollup,'listbox.space',1);
 		Tk->break;
 	});
 
@@ -1793,8 +1870,20 @@ no strict 'refs';
 		#THE TRICK HERE IS WE WANT TO UN-POP (ROLL-UP) THE DD-LIST WHEN TABBING OFF OF
 		#IT UNLESS "Tab=KeepList" IS SET AND WE'RE NOT A "FIXED" LIST:
 		$w->{'_ignorefocus'} = 0;
-		if ($w->{'-fixedlist'} || ($w->{'-altbinding'} !~ /Tab\=KeepList/io
-				&& $w->{'-altbinding'} !~ /Tab\=Popup/io))  #THIS LAST TEST JUST TO PREVENT TRAPPING USER IN A TABBING CIRCLEJERK BETWEEN DD-LIST AND ENTRY FIELD!
+		if ($w->{'-tabcomplete'})  #IF TAB COMPLETES SELECTION, SET TEXT FIELD TO NEAREST MATCH IN LIST:
+		{
+#			#WE'RE DOING TAB-COMPLETE, SO FIND THE NEAREST MATCHING ITEM IN DD-LIST AND SET TEXT TO IT:
+			my @listsels = $w->getText('0','end');
+			my $index = $w->LbIndex(2);
+			if (defined $index)
+			{
+				my $var_ref = $w->cget('-variable');
+				my $index_value = $w->reference($listsels[$index]);
+				$$var_ref = $index_value  unless ($$var_ref eq $index_value);
+			}
+		}
+		if ($w->{'-altbinding'} !~ /Tab\=KeepList/io
+				&& $w->{'-altbinding'} !~ /Tab\=Popup/io)  #THIS LAST TEST JUST TO PREVENT TRAPPING USER IN A TABBING CIRCLEJERK BETWEEN DD-LIST AND ENTRY FIELD!
 		{
 			#BEHAVE LIKE MODERN COMBOS - SIMPLY HIDE THE LISTBOX AND FOCUS BACK ON THE TEXT FIELD 
 			#W/O CHANGING IT'S CONTENT:
@@ -1812,15 +1901,7 @@ no strict 'refs';
 		}
 		else  #BEHAVE OUR OLD WAY: LEAVE DD-LIST SHOWING (DON'T "Popdown"), BUT PUT FOCUS ON THE TEXT FIELD W/O CHANGING IT'S CONTENT (UNLESS "TAB-COMPLETE" CHANGES IT):
 		{
-			if ($w->{'-tabcomplete'} && $w->LbFindSelection())  #IF TAB COMPLETES SELECTION, SET TEXT FIELD TO NEAREST MATCH IN LIST:
-			{
-				#WE'RE DOING TAB-COMPLETE, SO FIND THE NEAREST MATCHING ITEM IN DD-LIST AND SET TEXT TO IT:
-				my @listsels = $w->getText('0','end');
-				my $index = $w->LbIndex(1);
-no strict 'refs';
-				my $var_ref = $w->cget( '-textvariable' );
-				$$var_ref = $listsels[$index]  unless ($$var_ref eq $listsels[$index])
-			}   #OTHERWISE, LEAVE TEXT FIELD ALONE.
+			$w->Popdown(1)  unless ($w->{'-altbinding'} =~ /Tab\=KeepList/io);
 			#SET THE TEXT CURSOR TO END AND HIGHLIGHT (UNLESS -noselectext):
 			$e->icursor('end');
 			$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
@@ -1892,9 +1973,9 @@ no strict 'refs';
 	$f->bind('<Key>' => [\&keyFn,$w,$e,$l]);
 	$e->bind('<ButtonRelease-1>' => sub {    #MOUSE CLICKED ON ENTRY FIELD:
 		my ($state) = $w->cget( '-state' );
-		if ($state eq 'readonly')
+		if ($state eq 'readonly' && !$w->{'-fixedlist'})
 		{
-			my $res = $w->LbFindSelection();
+			my $res = $w->LbFindSelection(0);
 			if ($w->{'popped'})  #LISTBOX IS SHOWING:
 			{
 				$w->Popdown(1);
@@ -1951,17 +2032,19 @@ sub keyFn   #JWT: TRAP LETTERS PRESSED AND ADJUST SELECTION ACCORDINGLY.
 
 	if ($w->cget( '-state' ) eq 'readonly')  #ADDED 20020711 TO ALLOW TYPING 1ST LETTER TO SELECT NEXT VALID ITEM!
 	{
-		$w->LbFindSelection($mykey)  if ($mykey);  #JUMP TO 1ST ITEM STARTING WITH THIS KEY
-		$w->LbCopySelection(1,"key.$mykey");
+		if ($mykey) {
+			$w->PopupChoices  unless ($w->{'popped'});  #LISTBOX IS NOT SHOWING:  SHOW IT!:
+			$w->LbFindSelection(0,$mykey);  #JUMP TO 1ST ITEM STARTING WITH THIS KEY
+		}
 	}
 	elsif ($flag == 1)      #LISTBOX HAS FOCUS:
 	{
 		$w->{'_ignorefocus'} = 0;
-		$w->LbFindSelection($mykey)  if ($mykey =~ /\S/o);  #JUMP TO NEXT ITEM STARTING WITH THIS KEY
+		$w->LbFindSelection(0,$mykey)  if ($mykey =~ /\S/o);  #JUMP TO NEXT ITEM STARTING WITH THIS KEY
 	}
 	else                    #TEXT FIELD HAS FOCUS:
 	{
-		$w->LbFindSelection()  if ($mykey =~ /\S/o);  #JUMP TO 1ST ITEM MATCHING TEXT FIELD.
+		$w->LbFindSelection(0)  if ($mykey =~ /\S/o);  #JUMP TO 1ST ITEM MATCHING TEXT FIELD.
 		if (!$flag && $w->{'-browse'} == 1 && ($mykey =~ /\S/o || $mykey eq ' ')) {
 			$w->Subwidget('entry')->selectionRange(0,'end')
 					unless ($w->{'-noselecttext'} || !$w->Subwidget('entry')->index('end'));
@@ -1996,15 +2079,16 @@ sub PopupChoices   #TOGGLE STATE OF DD-LIST (POP UP OR DOWN):
 	}
 	else                 #DD-LIST NOT DISPLAYED, POP IT UP:
 	{
-		my $x = $w->Callback(-listcmd, $w);
+		my $x = $w->Callback(-listcmd, $w, $w->Subwidget('entry')->get);
 		return undef  if (defined($x) && $x =~ /nolist/io);   #IF -listcmd CALLBACK RETURNS 'nolist',
+
 		my $c = $w->Subwidget('choices');
 		my $s = $w->Subwidget('slistbox');
 		if ($w->{'-fixedlist'})  #IF WE'RE A FIXED LIST (ALWAYS DISPLAYED), JUST MARK IT POPPED UP & GIVE IT FOCUS:
 		{
 			$s->Subwidget($w->{'-listboxtype'})->configure('-takefocus' => 1);
 			$w->{'popped'} = 1;
-			$w->LbFindSelection();
+			$w->LbFindSelection(0);
 			$s->see('active');
 			$c->configure(-cursor => 'arrow');
 			$s->focus;
@@ -2105,7 +2189,7 @@ sub PopupChoices   #TOGGLE STATE OF DD-LIST (POP UP OR DOWN):
 		$s->focus;
 		$w->{'popped'} = 1;
 
-		$w->LbFindSelection();
+		$w->LbFindSelection(0);
 		$s->see('active');
 		$c->configure(-cursor => 'arrow');
 		$w->grabGlobal;
@@ -2157,15 +2241,13 @@ sub LbCopySelection
 
 	if (defined $index)
 	{
-no strict 'refs';
-		my $var_ref = $w->cget( '-textvariable' );
-		$$var_ref = $w->getText($index);
+		my $var_ref = $w->cget('-variable');
+		$$var_ref = $w->reference($w->getText($index));
 		$e->icursor('end');
 		$e->selectionRange(0,'end')  unless ($w->{'-noselecttext'} || !$e->index('end'));
 	}
 	if ($justcopy <= 0)  #1 MEANS JUST COPY, NO SEARCH & CALLBACK -1 MEANS LEAVE DD-LIST UP & FOCUSED (USER CLICKED ON IT!):
 	{
-		$w->{'searchindx'} = 0;
 		$w->Popdown  unless ($justcopy < 0);  # ROLL UP THE LISTBOX, SINCE IT'S VISIBLE:
 		my $altbinding = $w->{'-altbinding'};
 		if ($altbinding =~ /NoListbox\=([^\;]+)/io) {
@@ -2195,7 +2277,7 @@ no strict 'refs';
 
 sub LbFindSelection
 {
-	my ($w, $srchval) = @_;
+	my ($w, $reverse, $srchval) = @_;
 
 	my $lettersearch = 0;
 	if (defined($srchval) && $srchval =~ /\S/o)
@@ -2208,6 +2290,7 @@ sub LbFindSelection
 		unless (defined ($srchval) && $srchval =~ /\S/o)
 		{
 			$w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'})->activate(0);
+			$w->{'searchindx'} = 0;
 
 			return 0;
 		}
@@ -2217,46 +2300,70 @@ sub LbFindSelection
 
 	return 0  if ($#listsels < 0);
 
-	unless ($lettersearch)   #DON'T BOTHER W/EXACT MATCHING IF JUST SEARCHING FOR (FIRST FEW) LETTERS:
+	my $index = 0;
+	if ($w->{'popped'} && $lettersearch)
 	{
-		foreach my $i (0..$#listsels)   #SEARCH FOR TRUE EQUALITY.
+		$w->{'searchindx'} = $l->index('active');
+		$index = $reverse ? $w->{'searchindx'} : $w->{'searchindx'} + 1;
+		$index = 0  if ($index > $#listsels);
+		$index = $#listsels  if ($index < 0);
+	}
+	elsif (defined $w->{'searchindx'})
+	{
+		$index = $w->{'searchindx'};
+	}
+	if ($reverse) {
+		for (my $i=$#listsels;$i>=0;$i--)   #SEARCH W/O REGARD TO CASE, START W/CURRENT SELECTION.
 		{
-			if ($listsels[$i] eq $srchval)
+			#if ($listsels[$index] =~ /^$srchval/i)
+			#CHGD. TO NEXT 20030531 PER PATCH BY FRANK HERRMANN.
+#		if (defined $srchval && $listsels[$index] =~ /^$srchval/i) #CHGD TO NEXT 20060429 TO PREVENT TK-ERROR ON "("!
+			my $index_value = $w->reference($listsels[$index]);
+			if ($index_value =~ /^\Q$srchval\E/i)
 			{
 				$l->selectionClear('0','end');
-				$l->activate($i);
-				$l->selectionSet($i);
+				$l->activate($index);
+				$l->selectionSet($index);
 				$l->update();
-				$l->see($i);
-
-				return 1;    #EXACT MATCH
+				$l->see($index);
+				if ($lettersearch) {
+					--$w->{'searchindx'};
+					$w->{'searchindx'} = $#listsels  if ($w->{'searchindx'} < 0);
+				} else {
+					$w->{'searchindx'} = $index;
+				}
+				return ($index_value =~ /^\Q$srchval\E$/i) ? 1 : -1;  #(1=EXACT MATCH, CASE INSENSITIVE, -1=MATCH CONTAINS SEARCH STRING.
 			}
+			--$index;
+			$index = $#listsels  if ($index < 0);    #ROLL BACK AROUND IF AT BOTTOM.
+			$w->{'searchindx'} = $index;
 		}
-	}
-
-	my $index = $w->{'searchindx'} || 0;
-
-	foreach my $i (0..$#listsels)   #SEARCH W/O REGARD TO CASE, START W/CURRENT SELECTION.
-	{
-		#if ($listsels[$index] =~ /^$srchval/i)
-		#CHGD. TO NEXT 20030531 PER PATCH BY FRANK HERRMANN.
-#		if (defined $srchval && $listsels[$index] =~ /^$srchval/i) #CHGD TO NEXT 20060429 TO PREVENT TK-ERROR ON "("!
-		if ($listsels[$index] =~ /^\Q$srchval\E/i)
+	} else {
+		foreach my $i (0..$#listsels)   #SEARCH W/O REGARD TO CASE, START W/CURRENT SELECTION.
 		{
-			$l->selectionClear('0','end');
-			$l->activate($index);
-			$l->selectionSet($index);
-			$l->update();
-			$l->see($index);
-			if ($lettersearch) {
-				++$w->{'searchindx'};
-				$w->{'searchindx'} = 0  if ($w->{'searchindx'} > $#listsels);
+			#if ($listsels[$index] =~ /^$srchval/i)
+			#CHGD. TO NEXT 20030531 PER PATCH BY FRANK HERRMANN.
+#		    if (defined $srchval && $listsels[$index] =~ /^$srchval/i) #CHGD TO NEXT 20060429 TO PREVENT TK-ERROR ON "("!
+			my $index_value = $w->reference($listsels[$index]);
+			if ($index_value =~ /^\Q$srchval\E/i)
+			{
+				$l->selectionClear('0','end');
+				$l->activate($index);
+				$l->selectionSet($index);
+				$l->update();
+				$l->see($index);
+				if ($lettersearch) {
+					++$w->{'searchindx'};
+					$w->{'searchindx'} = 0  if ($w->{'searchindx'} > $#listsels);
+				} else {
+					$w->{'searchindx'} = $index;
+				}
+				return ($index_value =~ /^\Q$srchval\E$/i) ? 1 : -1;  #(1=EXACT MATCH, CASE INSENSITIVE, -1=MATCH CONTAINS SEARCH STRING.
 			}
-			return ($listsels[$index] =~ /^\Q$srchval\E$/i) ? 1 : -1;  #(1=EXACT MATCH, CASE INSENSITIVE, -1=MATCH CONTAINS SEARCH STRING.
+			++$index;
+			$index = 0  if ($index > $#listsels);    #ROLL BACK AROUND IF AT BOTTOM.
+			$w->{'searchindx'} = $index;
 		}
-		++$index;
-		$index = 0  if ($index > $#listsels);    #ROLL BACK AROUND IF AT BOTTOM.
-		$w->{'searchindx'} = $index;
 	}
 	$l->selectionClear('0','end');
 	$l->activate(0);
@@ -2305,7 +2412,7 @@ sub LbIndex   #FETCH THE INDEX OF THE SELECTED OR ACTIVE ENTRY FROM THE DD-LIST:
 				{
 					for (my $i=0; $i<=$#listsels;$i++)
 					{
-						return $index  if ($listsels[$index] =~ /^\Q$textval\E/i);
+						return $index  if ($w->reference($listsels[$index]) =~ /^\Q$textval\E/i);
 						++$index;
 						$index = 0  if ($index > $#listsels);    #ROLL BACK AROUND IF AT BOTTOM.
 						$w->{'searchindx'} = $index;
@@ -2338,7 +2445,7 @@ sub Popdown   # POP DOWN (ROLL UP/HIDE) THE DD-LIST BOX!
 				unless ($w->{'-noselecttext'} || !$w->Subwidget('entry')->index('end'));
 	}
 
-	if ($w->{'savefocus'} && Tk::Exists($w->{'savefocus'}))  #USED BY PressButton FUNCTION TO RESTORE FOCUS TO WIDGET THAT HAD IT WHEN DEVELOPER CALLED IT:
+	if (defined($w->{'savefocus'}) && $w->{'savefocus'} && Tk::Exists($w->{'savefocus'}))  #USED BY PressButton FUNCTION TO RESTORE FOCUS TO WIDGET THAT HAD IT WHEN DEVELOPER CALLED IT:
 	{
 		$w->{'savefocus'}->focus;
 		delete $w->{'savefocus'};
@@ -2353,7 +2460,7 @@ sub _adustLBsize   #ADJUST THE DD-LIST WIDTH / HEIGHT, IF WE NEED TO:
 {
 	my $w = shift;
 	my @l = $w->getText(0, 'end');
-	$w->{'-width'} = $w->{'-maxwidth'}  if (defined($w->{'-maxwidth'}) && $w->{'-maxwidth'} > 0 && $w->{'-width'} > $w->{'-maxwidth'});
+	$w->{'-width'} = $w->{'-maxwidth'}  if (defined($w->{'-width'}) && defined($w->{'-maxwidth'}) && $w->{'-maxwidth'} > 0 && $w->{'-width'} > $w->{'-maxwidth'});
 	my $w_width = (defined $w->{'-width'}) ? $w->{'-width'} : 0;  #NEEDED B/C PERL'S BECOME A NANNY-STATE W/WARNINGS!
 	my $width = $w_width;
 	unless ($width)
@@ -2386,7 +2493,7 @@ sub getText  #GET THE ACTUAL TEXT OF ENTRIES (EVEN IF THEY'RE HList HASHES!) (WR
 		my @items = $w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'})->get(@indices);
 		for (my $i=0;$i<=$#items;$i++)
 		{
-			$items[$i] = $items[$i]->{'-text'}  if (ref($items[$i]) && defined($items[$i]->{'-text'}));
+			$items[$i] = $w->dereference($items[$i]->{'-text'})  if (ref($items[$i]) && defined($items[$i]->{'-text'}));
 		}
 		return @items;   #RETURNS ARRAY.
 	}
@@ -2395,9 +2502,9 @@ sub getText  #GET THE ACTUAL TEXT OF ENTRIES (EVEN IF THEY'RE HList HASHES!) (WR
 		my $item = $w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'})->get($indices[0]);
 		if (ref $item)
 		{
-			return (defined $item->{'-text'}) ? $item->{'-text'} : '';
+			return (defined $item->{'-text'}) ? $w->dereference($item->{'-text'}) : '';
 		}
-		return $item;   #RETURNS SCALAR (THE SINGLE ITEM MATCHING THE INDEX:
+		return $w->dereference($item);   #RETURNS SCALAR (THE SINGLE ITEM MATCHING THE INDEX:
 	}
 }
 
@@ -2571,8 +2678,8 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 		{
 			$txtbg = 'lightgray';
 		}
-		elsif ($w->{'-colorstate'} =~ /^(?:2|dark|readonlydark)$/io
-				|| !defined $Tk::Widget::TwilightThreshold)  #DEFINED IF USING OUR MODIFIED "setPalette.pl"!
+		elsif ($w->{'-colorstate'} =~ /^(?:2|dark|readonlydark)$/io)
+#x?				|| !defined $Tk::Widget::TwilightThreshold)  #DEFINED IF USING OUR MODIFIED "setPalette.pl"!
 		{
 			$txtfg = ($txtbg eq $entry->cget('-readonlybackground')) ? 'gray30' : 'black';
 		}
@@ -2603,7 +2710,7 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 				-highlightbackground => $framehlbg);
 		$frame->configure(-relief => ($w->{'-relief'} || 'sunken'), 
 				-takefocus => 0, -highlightcolor => $framehlcolor,
-				-highlightcolor => $texthlcolor, -highlightbackground => $framehlbg);
+				-highlightbackground => $framehlbg);
 		$entry->configure( -state => 'normal', 
 				-takefocus => (1 & ($w->{'takefocus'} || $w->{'btntakesfocus'})), 
 				-foreground => $txtfg, -background => $txtbg, -highlightcolor => $texthlcolor,
@@ -2697,36 +2804,24 @@ sub dereference   #USER-CALLABLE FUNCTION, ADDED 20050125.
 {
 	my $w = shift;
 	return undef  unless (defined $_[0]);
-	my $userValue = shift;
-	return (defined($w->{'hashref_bydesc'}) && defined($w->{'hashref_bydesc'}->{$userValue}))
-			? $w->{'hashref_bydesc'}->{$userValue} : $userValue;
-}
-
-sub dereferenceOnly   #USER-CALLABLE FUNCTION, ADDED 20050125.
-{
-	my $w = shift;
-	return undef  unless (defined $_[0]);
-	my $userValue = shift;
-	return (defined($w->{'hashref_bydesc'}) && defined($w->{'hashref_bydesc'}->{$userValue}))
-			? $w->{'hashref_bydesc'}->{$userValue} : undef;
+	return (defined($w->{'hashref_bydesc'}) && defined($w->{'hashref_bydesc'}->{$_[0]}))
+			? $w->{'hashref_bydesc'}->{$_[0]} : $_[0];
 }
 
 sub reference   #USER-CALLABLE FUNCTION, ADDED 20110227, v. 4.8:
 {
 	my $w = shift;
 	return undef  unless (defined $_[0]);
-	my $userValue = shift;
-	return (defined($w->{'hashref'}) && defined($w->{'hashref'}->{$userValue}))
-			? $w->{'hashref'}->{$userValue} : $userValue;
+	return (defined($w->{'hashref'}) && defined($w->{'hashref'}->{$_[0]}))
+			? $w->{'hashref'}->{$_[0]} : $_[0];
 }
 
 sub hasreference   #USER-CALLABLE FUNCTION, ADDED 20050125.
 {
 	my $w = shift;
 	return undef  unless (defined $_[0]);
-	my $userValue = shift;
-	return (defined($w->{'hashref_bydesc'}) && defined($w->{'hashref_bydesc'}->{$userValue}))
-			? 1 : 0;
+	return (defined($w->{'hashref_bydesc'})
+			&& defined($w->{'hashref_bydesc'}->{$_[0]})) ? 1 : 0;
 }
 
 sub get_hashref_byname   #USER-CALLABLE FUNCTION, ADDED 20110227, v. 4.8:
@@ -2750,14 +2845,18 @@ sub get_hashref_byvalue   #USER-CALLABLE FUNCTION, ADDED 20110227, v. 4.8:
 sub get    #USER-CALLABLE FUNCTION, ADDED 20090210 v4.72 (returns DISPLAYED VALUE for choice hashes)!
 {
 	my $w = shift;
-	if ( @_ )   #RETURN TEXT VALUES FOR GIVEN INDEX(ES).
+	if ($#{_} >= 0)   #RETURN TEXT VALUES FOR GIVEN INDEX(ES).
 	{
-		return $w->getText( @_ );
+		my @items = $w->getText(@_);
+		for (my $i=0;$i<=$#items;$i++)
+		{
+			$items[$i] = $w->reference($items[$i]);
+		}
+		return @items;   #RETURNS ARRAY.
 	}
 	else        #NO ARGS, RETURN CURRENT TEXT FIELD VALUE:
 	{
-no strict 'refs';
-		my $var_ref = $w->cget( '-textvariable' );
+		my $var_ref = $w->cget('-variable');
 		return $$var_ref;
 	}
 }
@@ -2765,7 +2864,8 @@ no strict 'refs';
 sub get_index    #USER-CALLABLE FUNCTION, ADDED 20110227, v. 4.8:
 {
 	my $w = shift;
-	return undef  unless (@_);
+	return undef  unless ($#{_} >= 0);
+
 	my $val = shift;
 	my @keys = $w->get(0, 'end');
 	for (my $k=0;$k<=$#keys;$k++)
@@ -2780,9 +2880,8 @@ sub activate    #USER-CALLABLE FUNCTION, ADDED 20090210 v4.72
 	my $w = shift;
 	my $indx = shift;
 	my $res = $w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'})->activate($indx);
-no strict 'refs';
-	my $var_ref = $w->cget( '-textvariable' );
-	$$var_ref = $w->getText($indx);
+	my $var_ref = $w->cget('-variable');
+	$$var_ref = $w->reference($w->getText($indx));
 	return $res;
 }
 

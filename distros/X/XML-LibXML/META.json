@@ -4,7 +4,7 @@
       "Petr Pajas <PAJAS@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "dom",
       "html",
@@ -97,6 +97,6 @@
          "web" : "https://github.com/shlomif/perl-XML-LibXML"
       }
    },
-   "version" : "2.0208",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2.0209",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

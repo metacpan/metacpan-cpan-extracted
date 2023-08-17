@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "JSON::RPC2::TwoWay",
   "PREREQ_PM" => {
-    "JSON::MaybeXS" => 0
+    "JSON::MaybeXS" => 0,
+    "Time::HiRes" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +28,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "JSON::MaybeXS" => 0
+  "JSON::MaybeXS" => 0,
+  "Time::HiRes" => 0
 );
 
 

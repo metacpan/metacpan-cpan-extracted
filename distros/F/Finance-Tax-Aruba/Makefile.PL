@@ -35,10 +35,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Math::BigInt" => 0,
     "Test::Lib" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => 0,
+  "Math::BigInt" => 0,
   "Module::Pluggable" => 0,
   "Moose" => "2.2013",
   "Moose::Role" => "2.2013",

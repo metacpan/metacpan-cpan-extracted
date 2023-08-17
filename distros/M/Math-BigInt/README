@@ -16,7 +16,7 @@ commands:
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for these modules with the
-perldoc command.
+perldoc command:
 
     perldoc Math::BigInt
     perldoc Math::BigFloat
@@ -29,7 +29,7 @@ commands:
 
 You can also look for information at:
 
-    GitHub
+    GitHub Source Repository
         https://github.com/pjacklam/p5-Math-BigInt
 
     RT: CPAN's request tracker
@@ -40,20 +40,6 @@ You can also look for information at:
 
     CPAN Testers Matrix
         http://matrix.cpantesters.org/?dist=Math-BigInt
-
-    CPAN Ratings
-        https://cpanratings.perl.org/dist/Math-BigInt
-
-    The Bignum mailing list
-
-        Post to mailing list
-            "bignum at lists.scsys.co.uk"
-
-        View mailing list
-            http://lists.scsys.co.uk/pipermail/bignum/
-
-        Subscribe/Unsubscribe
-            http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum
 
 COPYRIGHT AND LICENCE
 

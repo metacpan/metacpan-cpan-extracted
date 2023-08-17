@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::par::mkparfile;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  MKPARFILE - convert ascii to par file format 				
+ PERL PROGRAM NAME:  MKPARFILE - convert ascii to par file format 				
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

@@ -1,0 +1,141 @@
+#!/usr/local/bin/perl -w
+## Name:	test/ip-addr-to-if-index
+## Author:	Simon Leinen  <simon@switch.ch>
+## Description:	Find ifIndex for given IP address
+######################################################################
+## Usage: test/ip-addr-to-if-index [-q] community@hostname ipaddr...
+##
+## This script finds the interface indices corresponding to the given
+## IP addresses on the node.
+##
+## Example: 
+##
+## $ ./test/ip-addr-to-if-index public@babar 127.0.0.1 130.59.4.2
+## 127.0.0.1       lo0        1
+## 130.59.4.2      hme0       2
+##
+## The `-q' form suppresses the IP addresses and interface
+## description:
+##
+## $ ./test/ip-addr-to-if-index -q public@babar 127.0.0.1 130.59.4.2
+## 1
+## 2
+######################################################################
+
+require 5.002;
+use strict;
+use SNMP_Session;
+use BER;
+
+sub usage();
+sub ether_hex($ );
+sub ifDescr($ $ );
+
+my ($hostname,$community,$quiet);
+$quiet = 0;
+while ($ARGV[0] =~ /^-/) {
+    if ($ARGV[0] eq '-q') {
+	$quiet = 1;
+	shift @ARGV;
+    } else {
+	usage ();
+    }
+}
+$hostname = shift @ARGV || usage();
+($community,$hostname) = ($hostname =~ /^(.*)@(.*)$/);
+
+my $session;
+
+die "Couldn't open SNMP session to $hostname"
+    unless ($session = SNMP_Session->open ($hostname, $community, 161));
+
+my $ip_address;
+while ($ip_address = shift @ARGV) {
+    my ($ip1,$ip2,$ip3,$ip4);
+    usage()
+	unless (($ip1,$ip2,$ip3,$ip4)
+		= $ip_address =~ m/^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/);
+
+    my @ifIndex_OID = qw(1 3 6 1 2 1 4 20 1 2);
+    push @ifIndex_OID, $ip1;
+    push @ifIndex_OID, $ip2;
+    push @ifIndex_OID, $ip3;
+    push @ifIndex_OID, $ip4;
+
+    my @oids = (encode_oid (@ifIndex_OID));
+
+    if ($session->get_request_response (@oids)) {
+	my $response = $session->pdu_buffer;
+	my ($bindings, $binding, $oid, $value);
+	my ($ifIndex);
+
+	($bindings) = $session->decode_get_response ($response);
+
+	## IfIndex
+	($binding,$bindings) = decode_sequence ($bindings);
+	($oid,$value) = decode_by_template ($binding, "%O%@");
+	$ifIndex = pretty_print ($value);
+
+	if (!$quiet) {
+	    printf STDOUT ("%-15s %-10s ", $ip_address,
+			   &ifDescr ($ifIndex, $session));
+	}
+	printf STDOUT ("%d\n", $ifIndex);
+
+    } else {
+	die "No response received.\n";
+    }
+}
+
+$session->close ();
+
+1;
+
+sub usage ()
+{
+    die "usage: $0 community\@hostname ipaddr...";
+}
+
+## ether_hex (HEX_STRING)
+##
+## Converts a raw hex representation into the common form used in
+## Ethernet addresses, e.g. "080020830069" becomes
+## "08:00:20:83:00:69".
+##
+sub ether_hex ($ )
+{
+    my ($string) = @_;
+    $string =~ s/([0-9a-f][0-9a-f])/$1:/g;
+    $string =~ s/:$//;
+    $string;
+}
+
+my %ifDescrCache;
+
+## ifDescr (IFINDEX, SESSION)
+##
+## Return the interface description associated with the given
+## IFINDEX.  Uses SESSION as the destination for SNMP request.
+## Results are cached in %ifDescrCache to avoid sending the same SNMP
+## request more than once.
+##
+sub ifDescr($ $ )
+{
+    my @ifDescr = split ('\.','1.3.6.1.2.1.2.2.1.2');
+    my ($ifIndex, $session) = @_;
+
+    return $ifDescrCache{$ifIndex,$session}
+    if defined ($ifDescrCache{$ifIndex,$session});
+    push @ifDescr,$ifIndex;
+    if ($session->get_request_response (encode_oid (@ifDescr))) {
+	my $response = $session->pdu_buffer;
+	my ($bindings, $binding, $oid, $value);
+
+	($bindings) = $session->decode_get_response ($response);
+	($binding,$bindings) = decode_sequence ($bindings);
+	($oid,$value) = decode_by_template ($binding, "%O%@");
+	return $ifDescrCache{$ifIndex,$session} = pretty_print ($value);
+    } else {
+	return "if#".$ifIndex;
+    }
+}

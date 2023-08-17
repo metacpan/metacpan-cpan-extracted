@@ -6,14 +6,14 @@ What is it?
    subroutine library. For more information on cfitsio, see
    http://heasarc.gsfc.nasa.gov/fitsio
 
-Where can (did) I get it?
+Where can I get it?
 -------------------------
-   https://hea-www.harvard.edu/~rpete/cfitsio
    https://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
+   https://github.com/pratzlaff/Astro-FITS-CFITSIO
 
 What version of cfitsio does this module require?
 ----------------------------------------------
-  Astro::FITS::CFITSIO requires at least cfitsio version 4.10
+   Astro::FITS::CFITSIO requires at least cfitsio version 4.3.0
 
 Installation
 ------------
@@ -24,8 +24,9 @@ Installation
 
 Copyright and License
 ---------------------
-   Copyright (C) 2002,2004,2006,2011,2012,2013,2016,2018,2020,2022 by the
-   Smithsonian Astrophysical Observatory.
+
+   Copyright (C) 2002,2004,2006,2011,2012,2013,2016,2018,2020,2022,2023
+   by the Smithsonian Astrophysical Observatory.
 
    This software is released under the same terms as Perl. A copy of
    the Perl license may be obtained at http://dev.perl.org/licenses/

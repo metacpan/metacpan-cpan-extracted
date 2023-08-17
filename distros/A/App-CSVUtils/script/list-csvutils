@@ -9,9 +9,9 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Module::List::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 my $res = gen_read_table_func(
     name => 'list_csvutils',
@@ -129,7 +129,7 @@ list-csvutils - List CSV utilities in App::CSVUtils::*
 
 =head1 VERSION
 
-This document describes version 1.024 of list-csvutils (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of list-csvutils (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 SYNOPSIS
 
@@ -758,7 +758,6 @@ For fish and zsh, install L<shcompgen> as described above.
  | csv-ltrim           | Left-trim (remove leading whitespace) values and/or fields in CSV       | munging  |         1 |                  0 |          1 |                   0 | modifies-values |
  | csv-munge-field     | Munge a field in every row of CSV file with Perl code                   | munging  |         1 |                  0 |          1 |                   0 | modifies-field  |
  | csv-munge-rows      | Modify CSV data rows using Perl code                                    | munging  |         1 |                  0 |          1 |                   0 | modifies-rows   |
- | csv-quote           | Make sure values of CSV are quoted                                      | munging  |         1 |                  0 |          1 |                   0 |                 |
  | csv-replace-newline | Replace newlines in CSV values                                          | munging  |         1 |                  0 |          1 |                   0 | modifies-rows   |
  | csv-rtrim           | Right-trim (remove trailing whitespace) values and/or fields in CSV     | munging  |         1 |                  0 |          1 |                   0 | modifies-values |
  | csv-transpose       | Transpose a CSV                                                         | munging  |         1 |                  0 |          1 |                   0 |                 |

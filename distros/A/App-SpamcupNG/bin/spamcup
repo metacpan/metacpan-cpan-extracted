@@ -12,7 +12,7 @@ use App::SpamcupNG
   qw(main_loop read_config %OPTIONS_MAP config_logger);
 use App::SpamcupNG::UserAgent;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -53,17 +53,17 @@ if ( $opts{h} ) {
     print_footer();
 }
 
-my $cfg = File::Spec->catfile( $ENV{HOME}, '.spamcupNG.yml' );
+my $cfg = File::Spec->catfile( my_home(), '.spamcupNG.yml' );
 
-if ( ( -e $cfg ) and ( scalar(@ARGV) < 1 ) ) {
+if ( -e $cfg ) {
     $accounts = read_config( $cfg, \%opts );
     $opts{delay} = DELAY;
 }
-else {
-    $opts{V} = 'INFO' unless ( exists( $opts{V} ) );
-}
 
-config_logger( $opts{V}, File::Spec->catfile( $ENV{HOME}, 'spamcup.log' ) );
+$opts{V} = 'INFO' unless ( exists( $opts{V} ) );
+$opts{delay} = DELAY unless ( exists($opts{delay}) );
+
+config_logger( $opts{V}, File::Spec->catfile( my_home(), 'spamcup.log' ) );
 my $logger = Log::Log4perl->get_logger('SpamcupNG');
 
 if ( ( $logger->is_warn() ) and ( not -e $cfg ) ) {
@@ -99,6 +99,7 @@ if ( $logger->is_info() ) {
 
 my ( $ident, $pass ) = define_auth( \%opts );
 compat_opts( $ident, $pass, \%opts );
+$logger->logdie('Could not define authentication method through configuration') unless($ident || $accounts);
 my $ua = App::SpamcupNG::UserAgent->new($VERSION);
 
 if ($accounts) {
@@ -174,7 +175,6 @@ Based on Spamcup from Toni Willberg
 
 sub define_auth {
     my $opts_ref = shift;
-
     my ( $ident, $pass );
 
   DEF_USER: {
@@ -193,8 +193,7 @@ sub define_auth {
             last DEF_USER;
         }
 
-        if ( $ident =~ /\@/ ) {
-
+        if ( $ident && $ident =~ /\@/ ) {
             unless ( $opts_ref->{p} || $opts_ref->{p} eq '' ) {
                 print "Enter password: ";
                 $pass = <STDIN>;
@@ -211,7 +210,10 @@ sub define_auth {
     }
 
     return $ident, $pass;
+}
 
+sub my_home {
+    return ($^O eq 'MSWin32') ? $ENV{HOMEPATH} : $ENV{HOME};
 }
 
 __END__

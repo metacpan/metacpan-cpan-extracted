@@ -4,7 +4,7 @@
       "Koichi Taniguchi (a.k.a. nipotan) <taniguchi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "perl_5"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Imager::IMBarcode::JP" : {
          "file" : "lib/Imager/IMBarcode/JP.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -66,11 +66,12 @@
       },
       "homepage" : "https://github.com/nipotan/Imager-IMBarcode-JP",
       "repository" : {
-         "url" : "git://github.com/nipotan/Imager-IMBarcode-JP.git",
+         "type" : "git",
+         "url" : "https://github.com/nipotan/Imager-IMBarcode-JP.git",
          "web" : "https://github.com/nipotan/Imager-IMBarcode-JP"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:TANIGUCHI",
    "x_contributors" : [
       "nipotan <nipotan@gmail.com>"

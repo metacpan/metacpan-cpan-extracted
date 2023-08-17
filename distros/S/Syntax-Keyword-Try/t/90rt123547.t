@@ -3,7 +3,8 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+use Test2::IPC;
 
 # RT123547 observes that if S:K:T is loaded late after multiple threads
 #   are actually started, it will crash

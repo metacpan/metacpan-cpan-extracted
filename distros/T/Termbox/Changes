@@ -1,5 +1,11 @@
 Revision history for Perl extension Termbox
 
+2.00 2023-06-14T16:40:56Z
+
+	- Based on incompatible fork of termbox (which was abandoned)
+	- Old examples have been removed until they're rewritten
+	- New UI example: eg/editor.pl
+
 0.12 2023-01-11T23:48:45Z
 
 	- Pull upstream changes

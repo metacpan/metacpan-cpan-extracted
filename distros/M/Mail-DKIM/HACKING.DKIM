@@ -30,11 +30,18 @@ New version - update version numbers in these files:
 New algorithm:
   create new algorithm class by copying and editing
     lib/Mail/DKIM/Algorithm/rsa_sha1.pm
-  edit lib/Mail/DKIM/Common.pm:
+  edit lib/Mail/DKIM/Signature.pm:
     get_algorithm_class() - add a check for your new algorithm and return
       the name of your new algorithm class
     add a "use" line at the top of this file so that your algorithm class
       gets imported
+  if the new algorithm uses a different key type (k=), also edit
+    lib/Mail/DKIM/PublicKey.pm:
+      check()
+      convert()
+      verify_digest()
+    lib/Mail/DKIM/Verifier.pm:
+      _check_and_verify_signature()
 
 --
 

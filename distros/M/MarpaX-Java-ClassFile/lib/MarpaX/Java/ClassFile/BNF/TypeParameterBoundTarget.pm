@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a type_parameter_bound_target
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -53,7 +53,7 @@ MarpaX::Java::ClassFile::BNF::TypeParameterBoundTarget - Parsing of a type_param
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

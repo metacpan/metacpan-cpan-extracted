@@ -1,13 +1,14 @@
+.editorconfig
 Build.PL
 Changes
 hax/perl-backcompat.c.inc
 lib/Object/Pad/FieldAttr/Trigger.pm
 lib/Object/Pad/FieldAttr/Trigger.xs
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01trigger.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

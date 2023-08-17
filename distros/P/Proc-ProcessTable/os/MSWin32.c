@@ -26,6 +26,13 @@ details. */
 #include <pwd.h>
 #include <sys/cygwin.h>
 #else
+/* MinGW32 sddl.h requires WINVER >= 0x0500 for ConvertSidToStringSidA prototype */
+#if defined(WINVER) && WINVER < 0x0500
+#undef WINVER
+#endif
+#ifndef WINVER
+#define WINVER 0x0500
+#endif
 #include <sddl.h>
 #endif
 

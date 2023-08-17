@@ -1,5 +1,8 @@
 Revision history for Net-Connection-lsof
 
+0.3.0	 2023-06-01/13:15
+		 - Redirect stderr to dev null to prevent pointless warning about kern diffferences from lsof.
+
 0.2.0	 2019-08-16/16:40
 		 - WChan support added to Linux.
 

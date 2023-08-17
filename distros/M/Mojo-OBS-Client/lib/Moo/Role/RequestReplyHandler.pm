@@ -6,7 +6,7 @@ no warnings 'experimental::signatures';
 use Scalar::Util 'weaken';
 use Moo::Role::RequestReplyHandler::EventListener;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 requires 'get_reply_key';
 

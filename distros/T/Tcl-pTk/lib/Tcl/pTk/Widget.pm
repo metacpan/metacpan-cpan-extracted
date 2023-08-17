@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('1.10');
+our ($VERSION) = ('1.11');
 
 use Config;
 use IO::Handle; 
@@ -104,6 +104,7 @@ my %ptk2tcltk =
      ScrollableFrame    => ['ScrollableFrame', 'sframe', 'BWidget', 'auto_load ScrollableFrame'],
      Tktable    => ['table', 'table', 'Tktable', 'auto_load Tktable'],
      );
+our $_ptk2tcltk = \%ptk2tcltk;
 
 # Default ISAs for autoloaded widgets. If not defined in files anywhere else,
 #   then the ISAs will defined as shown below when widget is created. If widget

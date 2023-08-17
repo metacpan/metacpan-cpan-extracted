@@ -1,0 +1,223 @@
+#!/usr/bin/env perl
+
+# some adobe URLs to ignore
+my $ignore_urls = {
+	'armmf.adobe.com:443//arm-manifests/win/ReaderDCManifest3.msi' => 1,
+	'armmf.adobe.com:443//arm-manifests/win/ArmManifest3.msi'      => 1,
+};
+
+#
+my @regexp_stealth_files_to_ignore
+	= ('C:\\\Users\\\[A-Za-z]+\\\AppData\\\Local\\\Adobe\\\ARM\\\Reader_\d+.\d+.\d+\\\[A-Za-z0-9]+\.[Tt][Mm][Pp]');
+
+# created scheduled tasks to ignore
+my $scheduled_tasks_to_ignore = {
+	'"C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\Reader_sl.exe"' => 1,
+	'C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\Reader_sl.exe '  => 1,
+};
+
+# procmem yara rules to ignore for matching PIDs
+my @procmem_yara_ignore = ( 'embedded_win_api', 'vmdetect' );
+
+# ignore reg_keys
+my $ignore_reg_keys = { 'HKEY_LOCAL_MACHINE\System' => 1, };
+
+my @signatures = @{ $report->{signatures} };
+
+# replacement sigs
+my @new_sigs;
+
+my $drop_by_name = { 'infostealer_cookies' => 1, };
+
+my $generic_pid_ignores = {
+	dead_connect                          => 1,
+	exploit_heapspray                     => 1,
+	antidebug_setunhandledexceptionfilter => 1,
+	ransomware_file_modifications         => 1,
+};
+my $extended_pid_ignores = {
+	encrypt_pcinfo               => 1,
+	encrypted_ioc                => 1,
+	network_cnc_https_generic    => 1,
+	enumerates_running_processes => 1,
+	terminates_remote_process    => 1,
+	network_document_http        => 1,
+	network_document_file        => 1,
+};
+
+# process each signature
+my $sig_count = 0;
+foreach my $item (@signatures) {
+	my $drop_it = 0;
+
+	# generic PID ignores just assume every data entry has
+	# PID and ignores those entries that match
+	if ( $generic_pid_ignores->{ $item->{name} } ) {
+		my @new_data;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{pid} ) && !defined( $all_scratch{adobe_pids}{ $item_data_entry->{pid} } ) )
+			{
+				push( @new_data, $item_data_entry );
+			} elsif ( !defined( $item_data_entry->{pid} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}    # extended PID ignores assume some the fields don't have PIDs and as long as none of the PIDs
+		 # match then it is safe to ignore
+	elsif ( $extended_pid_ignores->{ $item->{name} } ) {
+		my @new_data;
+		my $other_pid_found = 0;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{pid} ) && !defined( $all_scratch{adobe_pids}{ $item_data_entry->{pid} } ) )
+			{
+				push( @new_data, $item_data_entry );
+				$other_pid_found = 1;
+			} elsif ( !defined( $item_data_entry->{pid} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) || !$other_pid_found ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}    # ignores URLs specified in the lookup hash $ignore_urls
+	elsif ( $item->{name} eq 'http_request' ) {
+		my @new_data;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{url} ) && !defined( $ignore_urls->{ $item_data_entry->{url} } ) ) {
+				push( @new_data, $item_data_entry );
+			} elsif ( !defined( $item_data_entry->{url} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}    # ignore created schedule task commands as specified in the lookup table $schuled_tasks_to_ignore
+	elsif ( $item->{name} eq 'uses_windows_utilities_to_create_scheduled_task' ) {
+		my @new_data;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{command} )
+				&& !defined( $scheduled_tasks_to_ignore->{ $item_data_entry->{command} } ) )
+			{
+				push( @new_data, $item_data_entry );
+			} elsif ( !defined( $item_data_entry->{command} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}    # regkeys to ignore access of as per the lookup table $ignore_reg_keys
+	elsif ( $item->{name} eq 'registry_credential_store_access' ) {
+		my @new_data;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{regkey} )
+				&& !defined( $ignore_reg_keys->{ $item_data_entry->{regkey} } ) )
+			{
+				push( @new_data, $item_data_entry );
+			} elsif ( !defined( $item_data_entry->{regkey} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}    # if the name matches, drop it out right
+	elsif ( defined( $drop_by_name->{ $item->{name} } ) ) {
+		$drop_it = 1;
+	}    # check stealth files created against regexs in @regexp_stealth_files_to_ignore
+	elsif ( $item->{name} eq 'stealth_file' ) {
+		my @new_data;
+		my $has_a_file = 0;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{file} ) ) {
+				my $regex_matched = 0;
+				foreach my $regexp (@regexp_stealth_files_to_ignore) {
+					if ( $item_data_entry->{file} =~ /$regexp/ ) {
+						$regex_matched = 1;
+					}
+				}
+				if ( !$regex_matched ) {
+					$has_a_file = 1;
+					push( @new_data, $item_data_entry );
+				}
+			} elsif ( defined( $item_data_entry->{pid} )
+				&& !defined( $all_scratch{adobe_pids}{ $item_data_entry->{pid} } ) )
+			{
+				push( @new_data, $item_data_entry );
+
+			} else {
+				push( @new_data, $item_data_entry );
+			}
+		} ## end foreach my $item_data_entry ( @{ $item->{data} ...})
+
+		if ( !defined( $new_data[0] ) || !$has_a_file ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	 } # filter out adobe procs that match yara rules in @procmem_yara_ignore
+	elsif ( $item->{name} eq 'procmem_yara' ) {
+		my @new_data;
+		foreach my $item_data_entry ( @{ $item->{data} } ) {
+			if ( defined( $item_data_entry->{Hit} ) )
+			{
+				my @PIDs=keys(%{ $all_scratch{adobe_pids} });
+				my $add_data_item=1;
+				foreach my $pid (@PIDs) {
+					my $regex='^PID\ +'.$pid .'\ .* \'';
+					foreach my $yara_rule (@procmem_yara_ignore) {
+						my $finalregex=$regex.$yara_rule.'\'$';
+						if ($item_data_entry->{Hit} =~ /$finalregex/) {
+							$add_data_item=0;
+						}
+					}
+				}
+				if ($add_data_item) {
+					push( @new_data, $item_data_entry );
+				}
+			} elsif ( !defined( $item_data_entry->{Hit} ) ) {
+				push( @new_data, $item_data_entry );
+			}
+		}
+
+		if ( !defined( $new_data[0] ) ) {
+			$drop_it = 1;
+		} else {
+			$item->{data} = \@new_data;
+		}
+	}
+
+	if ( !$drop_it ) {
+		push( @new_sigs, $item );
+		print '.signatures[' . $sig_count . '], ' . $item->{name} . "\n";
+	} else {
+		print 'Dropping .signatures[' . $sig_count . '], ' . $item->{name} . "\n";
+	}
+
+	$sig_count++;
+} ## end foreach my $item (@signatures)
+
+# save the updated signature
+$report->{signatures} = \@new_sigs;
+
+# note it as being changed
+$changed=1;

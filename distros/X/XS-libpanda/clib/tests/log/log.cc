@@ -1,4 +1,8 @@
 #include "logtest.h"
+#include "panda/log/console.h"
+#include "panda/log/log.h"
+#include "panda/log/multi.h"
+#include <iostream>
 
 #define TEST(name) TEST_CASE("log: " name, "[log]")
 
@@ -91,4 +95,49 @@ TEST("VLA capture") {
     int size = 10;
     int a[size];
     panda_log_error(a[1]);
+}
+
+TEST("synopsis") {
+    set_logger([](const string& msg, const Info&) {
+        std::cout << msg << std::endl;
+    });
+    set_formatter("%1t %c[%L/%1M]%C %f:%l,%F(): %m");
+    set_level(Level::Info);
+
+    panda_log_info("info message");
+    panda_log_warning("hello");
+    panda_log(Level::Error, "Achtung!");
+    panda_log_debug("here"); // will not be logged, because min level is INFO, and message will NOT be evaluated
+
+    Module my_log_module("CustomName");
+    panda_log_error(my_log_module, "custom only"); // use certain log module for logging
+
+    int data[] = {1,42,5};
+    //callback will not be called if log level is insufficient
+    panda_log_notice([&] {
+        for (auto v : data) {
+            log << (v + 1);
+        }
+    });
+
+    // macro uses name panda_log_module as logging module
+    // first found by C++ name lookup is used
+    // you may want to define panda_log_module in your application namespace
+    {
+        Module panda_log_module("my_module", Level::Error); // local variables have the highest priority
+
+        panda_log_error("anything"); // logged with module "my_module"
+        panda_log_warning("warn"); // will not be logged / evaluated
+    }
+
+    // choose a backend for logging
+    set_logger(new ConsoleLogger());
+
+    // or log to multiple backends
+    set_logger(new MultiLogger({
+        MultiLogger::Channel(new ConsoleLogger()),
+        MultiLogger::Channel([](const string&, const Info&) {
+            // custom logging function
+        })
+    }));
 }

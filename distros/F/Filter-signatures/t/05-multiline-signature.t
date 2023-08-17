@@ -64,7 +64,7 @@ $name
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Multiline default values";
-sub  { my ($name,$value)=@_;$value ='bar' if @_ <= 1;();
+sub  { my ($name,$value)=@_;$value = 'bar' if @_ <= 1;();
 
 
 

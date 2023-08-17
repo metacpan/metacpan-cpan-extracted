@@ -1,0 +1,102 @@
+Revision history for Crypt-OpenSSL-SignCSR.
+
+0.14 -- Wed Jul 26 21:53:12 ADT 2023
+
+    - 46298e7 Support openbsd's LibreSSL
+    - f782397 v0.13
+
+0.13 -- Tue Jul 25 23:43:27 ADT 2023
+
+    - 63caf53 fix linux github actions
+    - e6ce8ba A few more openssl differences and compiler issues
+    - cfd7e85 Point to correct repo
+    - f48933d use Crypt::OpenSSL:ConfiguredAPI to get the set API level
+    - 0aa73aa v0.12
+
+0.12 -- Thu Jul 20 23:41:31 ADT 2023
+
+    - 150a974 Increment version for release
+    - 61978d5 Fix incorrect case for PERL_VERSION
+    - 9f7fafe Change tabs to spaces - no code changes
+    - 10d3a65 Fix issue with more openssl versions
+    - 9eccdd7 (tag: 0.11, origin/main) v0.11
+
+0.11 -- Tue Jul 18 19:27:54 ADT 2023
+
+    - daa5dd9 Increment version for release
+    - 3a09798 Remove undocumented sigopts from sign()
+    - 4295e6b Better regex for more openssl versions
+    - a32ff18 Find out the version of OpenSSL
+    - 2a21fa4 v0.10
+
+0.10 -- Sat Jul 08 21:24:27 ADT 2023
+
+    - 7272fa3 Increment the version for a release
+    - 4b10acc Include all of 1.1 Openssl releases in older functions
+    - b9d2ae4 v0.09
+
+0.09 -- Sat Jul 08 15:26:53 ADT 2023
+
+    [ Release 0.08 as production]
+    - Some additional fixes for openssl versions since 0.07
+    - 70debea Update version for release
+    - 1e9fef5 v0.08
+
+0.08 -- Fri Jul 07 23:58:11 ADT 2023
+
+    - a6dc051 Fix up a few older openssl issues
+    - 2e233f8 Increment repo versioni - in Makefile.PLwq
+    - ee4d8c9 Increment repo version
+    - 1676f26 (tag: 0.07) v0.07
+
+0.07 -- Sun Jul 02 22:05:17 ADT 2023
+
+    - 344b594 Some packaging fixes
+    - 32fe761 Fix a pod issue and increment repo version
+    - 40c37df (tag: 0.06) v0.06
+
+
+0.06 -- Sat Jul 01 21:09:19 ADT 2023
+
+    [Significant Changes since 0.05]
+
+    Fix some remaining issues with openssl versions and
+    a build issue on threaded perls which requires context
+
+    [Detailed Logs]
+
+    - ddfd2c2 Fix issue with threaded perl requiring context
+    - 9b57abd More changes to fix warnings and errors for mac and windows
+    - f063bee Increment version
+    - 24b5db6 (tag: 0.05) v0.05
+
+0.05 -- Fri Jun 30 17:26:04 ADT 2023
+
+    [Significant Changes since 0.04]
+
+    Breaking Changes: The sign() function now only accepts the
+    Certificate Signing Request (CSR).  The other options have
+    been moved to the constructor and functions are provided to
+    update and obtain the values if required.
+
+    - e7421ed Remove the unsupported macos 10.15 github action
+    - 5996f1a Redesign of the interface and constructor
+    - 642250e Add Crypt::OpenSSL::Guess as a dependency
+    - f2e7378 Some additional OpenSSL change for version differences
+
+0.04 -- Sun Jun 25 14:52:41 ADT 2023
+
+    - Address issues compiling against older openssl versions
+
+0.03 -- Tue Jun 20 10:27:40 ADT 2023
+
+    - Fix a few packaging issues - no code changes
+
+0.02 -- Mon Jun 19 23:57:58 ADT 2023
+
+    - Early Official Release.  Same as version 0.01
+
+0.01 -- Mon Jun 19 23:43:59 ADT 2023
+
+	- Original Early Version - likely to change before official release
+

@@ -6,11 +6,17 @@ virani - PCAP fetch tool for use with FPCs that save to PCAP format.
 
 =head1 SYNOPSIS
 
-virani B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<-t> <set>]
+virani B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<--set> <set>]
 [B<--config> <file>] [B<-w> <output] [B<--nc>]
 
-virani B<-r> <remote> B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<-t> <set>]
+virani B<-s> <start> B<-e> <end> [B<-t> <type>] [B<--set> <set>]
+[B<--config> <file>] [B<-w> <output] [B<--nc>] <filter>
+
+virani B<-r> <remote> B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<--set> <set>]
 B<--config> <file>] [B<-w> <output] [B<--nc>] [B<-a> <apikey>] [B<-k>]
+
+virani B<-r> <remote> B<-s> <start> B<-e> <end> [B<-t> <type>] [B<--sett> <set>]
+B<--config> <file>] [B<-w> <output] [B<--nc>] [B<-a> <apikey>] [B<-k>] <filter>
 
 =head1 DESCRIPTION
 
@@ -64,13 +70,18 @@ API key for remote URL if needed.
 
 Filter for use with tshark or tcpdump.
 
+If this is undef, ARGV will be used instead for filter info.
+
+If filter points to a file, teasted via -f, then that file will be
+read in and used the filter.
+
 =head2 -t <type>
 
-tcpdump or tshark
+tcpdump, tshark, or bpf2tshark
 
-Default :: tcpdump
+If not specified will default to what ever the default is for that set.
 
-=head2 -t <set>
+=head2 --set <set>
 
 Set to use. If undef, uses whatever the default is.
 
@@ -108,6 +119,12 @@ If cached, do not use it.
 
 Do not check the SSL cert for HTTPS for remote.
 
+=head2 --buffer <seconds>
+
+Apply this many seconds before and after the start time.
+
+Default: undef
+
 =cut
 
 use strict;
@@ -121,7 +138,7 @@ use Virani::Client;
 use JSON;
 
 sub version {
-	print "viarni v. 0.0.1\n";
+	print 'viarni v. ' . $Virani::VERSION . "\n";
 }
 
 sub help {
@@ -144,7 +161,7 @@ sub help {
 -t <type>         tcpdump or tshark
                   Default :: tcpdump
 
--t <set>          Set to use. If undef, uses whatever the default is.
+--set <set>      Set to use. If undef, uses whatever the default is.
                   Default :: undef
 
 --config <config> Config file to use.
@@ -163,8 +180,11 @@ sub help {
 
 -k                Do not check the SSL cert for HTTPS for remote.
 
+--buffer <secs>   Apply this many seconds before and after the start time.
+                  Default: undef
+
 ';
-}
+} ## end sub help
 
 # get the cli optiosn
 my $help    = 0;
@@ -182,10 +202,11 @@ my $config_virani = '/usr/local/etc/virani.toml';
 my $tmpdir;
 my $no_cache             = 0;
 my $quiet                = 0, my $verbose = 1;
-my $type                 = 'tcpdump';
+my $type;
 my $verify_hostname      = 1;
 my $verify_hostname_flag = 0;
 my $timeout;
+my $buffer;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -206,6 +227,7 @@ GetOptions(
 	't=s'       => \$type,
 	'k'         => \$verify_hostname_flag,
 	'timeout=s' => \$timeout,
+	'buffer=s'  => \$buffer,
 );
 
 if ($help) {
@@ -218,11 +240,47 @@ if ($version) {
 	exit;
 }
 
+# if not specified via -f use ARGV as for the filter
+if ( !defined($filter) ) {
+	if ( defined( $ARGV[0] ) ) {
+		$filter = join( ' ', @ARGV );
+	}
+}
+
+# remove ending and trailing spaces
+if ( defined($filter) ) {
+	$filter =~ s/^\s+//;
+	$filter =~ s/\s+$//;
+} else {
+	$filter = '';
+}
+
+# if the filter is file, read the file and use it as the filter
+# once read in new lines will be replaced with  spaces and commented lines removed
+if ( -f $filter ) {
+	my $raw_filter;
+	eval { $raw_filter = read_file($filter); };
+	if ($@) {
+		die( 'Failed to read "' . $filter . '" ... ' . $@ );
+	}
+	$filter = '';
+	# split the read data appart, removing blank lines and lines with juts
+	foreach my $line ( grep( !/^\s*\#/, grep( !/^\s*$/, split( /\n/, $raw_filter ) ) ) ) {
+		# remove leading and trailing white space
+		$line =~ s/^\s+//;
+		$line =~ s/\s+$//;
+		# comments at the end of a line
+		$line =~ s/\#.*$//;
+		$filter = $filter . ' ' . $line;
+	}
+	# remove the space that the start that the code above will result in
+	$filter =~ s/^\ //;
+} ## end if ( -f $filter )
+
 if ( !defined($start) ) {
 	die('No start time set via -s');
-}
-elsif ( !defined($end) ) {
-	die('No start time set via -s');
+} elsif ( !defined($end) ) {
+	die('No end time set via -e');
 }
 
 if ($quiet) {
@@ -233,13 +291,37 @@ if ($verify_hostname_flag) {
 	$verify_hostname = 0;
 }
 
+# make sure the buffer is numeric if specified
+if ( defined($buffer) && $buffer !~ /^\d+$/ ) {
+	die( '--buffer is set to "' . $buffer . '" which is non-numeric' );
+}    # buffer is numeric, so apply it to the start and end
+elsif ( defined($buffer) ) {
+	my $start_obj = Time::Piece::Guess->guess_to_object( $start, 1 );
+	if ( !defined($start_obj) ) {
+		die( '-s value of "' . $start . '" could not be parsed by Time::Piece::Guess' );
+	}
+
+	my $end_obj = Time::Piece::Guess->guess_to_object( $end, 1 );
+	if ( !defined($end_obj) ) {
+		die( '-e value of "' . $end . '" could not be parsed by Time::Piece::Guess' );
+	}
+
+	# apply the offsets
+	$start_obj = $start_obj - $buffer;
+	$end_obj   = $end_obj + $buffer;
+
+	# get the new start time
+	$start = $start_obj->epoch;
+	$end   = $end_obj->epoch;
+} ## end elsif ( defined($buffer) )
+
 my $start_obj;
-eval { $start_obj = Time::Piece::Guess->guess_to_object($start); };
+eval { $start_obj = Time::Piece::Guess->guess_to_object( $start, 1 ); };
 if ( $@ || !defined($start_obj) ) {
 	die( 'Failed to parse the start stamp,"' . $start . '",' );
 }
 my $end_obj;
-eval { $end_obj = Time::Piece::Guess->guess_to_object($end); };
+eval { $end_obj = Time::Piece::Guess->guess_to_object( $end, 1 ); };
 if ( $@ || !defined($end_obj) ) {
 	die( 'Failed to parse the end timestamp,"' . $end . '",' );
 }
@@ -266,67 +348,56 @@ if ( !$remote ) {
 	}
 
 	exit 0;
-}
-else {
+} else {
 	# check to see if remote is a config file
 	my $config_file;
 	if ( -f $remote ) {
 		$config_file = $remote;
-	}
-	elsif ( -f $remote . '.toml' ) {
+	} elsif ( -f $remote . '.toml' ) {
 		$config_file = $remote . '.toml';
-	}
-	elsif ( -f '/usr/local/etc/virani.d/' . $remote ) {
+	} elsif ( -f '/usr/local/etc/virani.d/' . $remote ) {
 		$config_file = '/usr/local/etc/virani.d/' . $remote;
-	}
-	elsif ( -f '/usr/local/etc/virani.d/' . $remote . '.toml' ) {
+	} elsif ( -f '/usr/local/etc/virani.d/' . $remote . '.toml' ) {
 		$config_file = '/usr/local/etc/virani.d/' . $remote . '.toml';
-	}
-	elsif ( -f '/etc/virani.d/' . $remote ) {
+	} elsif ( -f '/etc/virani.d/' . $remote ) {
 		$config_file = '/etc/virani.d/' . $remote;
-	}
-	elsif ( -f '/etc/virani.d/' . $remote . '.toml' ) {
+	} elsif ( -f '/etc/virani.d/' . $remote . '.toml' ) {
 		$config_file = '/etc/virani.d/' . $remote . '.toml';
 	}
 
 	my $toml;
 	if ( defined($config_file) ) {
-		print 'Config File: ' . $config_file;
+		print 'Config File: ' . $config_file . "\n";
 
+		my $err;
 		my $raw_toml = read_file($config_file) || die( 'Failed to read "' . $config_file . '"' );
-		my ( $toml, $err ) = from_toml($raw_toml);
+		( $toml, $err ) = from_toml($raw_toml);
 		unless ($toml) {
 			die( "Error parsing '" . $config_file . "':" . $err );
 		}
-	}
-	elsif ( $remote =~ /^[Hh][Tt][Tt][Pp][Ss]*\:\/\// ) {
+	} elsif ( $remote =~ /^[Hh][Tt][Tt][Pp][Ss]*\:\/\// ) {
 		print 'URL: ' . $remote . "\n";
 		$url = $remote;
-	}
-	else {
+	} else {
 		die( "'" . $remote . "' does not appear to be a config file or a HTTP or HTTPS URL" );
 	}
 
 	if ( defined($apikey) ) {
 		print "API key: specified via -a\n";
-	}
-	elsif ( defined( $ENV{virani_api_key} ) ) {
+	} elsif ( defined( $ENV{virani_api_key} ) ) {
 		print 'API key: specified via $ENV{virani_api_key}' . "\n";
 		$apikey = $ENV{virani_api_key};
-	}
-	elsif ( defined($toml) && defined( $toml->{apikey} ) ) {
+	} elsif ( defined($toml) && defined( $toml->{apikey} ) ) {
 		print 'API key: specified via config file at ' . $config_file . "\n";
 		$apikey = $toml->{apikey};
 	}
 
 	if ( defined($timeout) ) {
 		print "Timeout: specified via --timeout\n";
-	}
-	elsif ( defined( $ENV{virani_timeout} ) ) {
+	} elsif ( defined( $ENV{virani_timeout} ) ) {
 		print 'Timeout: specified via $ENV{virani_timeout}' . "\n";
 		$timeout = $ENV{virani_timeout};
-	}
-	elsif ( defined($toml) && defined( $toml->{timeout} ) ) {
+	} elsif ( defined($toml) && defined( $toml->{timeout} ) ) {
 		print 'Timeout: specified via config file at ' . $config_file . "\n";
 		$timeout = $toml->{timeout};
 	}
@@ -334,8 +405,7 @@ else {
 	if ( !defined($url) ) {
 		if ( defined( $toml->{url} ) ) {
 			$url = $toml->{url};
-		}
-		else {
+		} else {
 			die( "No url specified in '" . $config_file . "'" );
 		}
 	}
@@ -355,4 +425,4 @@ else {
 	print 'Written to ' . $write . "\n";
 
 	exit 0;
-}
+} ## end else [ if ( !$remote ) ]

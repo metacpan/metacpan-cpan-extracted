@@ -4,7 +4,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 # VERSION
 
-version v0.10.1
+version v0.11.0
 
 # SYNOPSIS
 
@@ -75,6 +75,8 @@ when a resource is blocked.  It defaults to 400 (Bad Request).
 # SUPPORT FOR OLDER PERL VERSIONS
 
 Since v0.9.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 If you need this module on Perl v5.10, please use one of the v0.8.x
 versions of this module.  Significant bug or security fixes may be

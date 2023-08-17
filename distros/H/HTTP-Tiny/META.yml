@@ -22,7 +22,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   HTTP::Tiny:
     file: lib/HTTP/Tiny.pm
-    version: '0.082'
+    version: '0.088'
 recommends:
   HTTP::CookieJar: '0.001'
   IO::Socket::IP: '0.32'
@@ -58,10 +58,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/chansen/p5-http-tiny/issues
-  homepage: https://github.com/chansen/p5-http-tiny
-  repository: https://github.com/chansen/p5-http-tiny.git
-version: '0.082'
+  bugtracker: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues
+  homepage: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny
+  repository: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git
+version: '0.088'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alan Gardner <gardner@pythian.com>'
@@ -103,6 +103,7 @@ x_contributors:
   - 'SkyMarshal <skymarshal1729@gmail.com>'
   - 'Sören Kornetzki <soeren.kornetzki@delti.com>'
   - 'Steve Grazzini <steve.grazzini@grantstreet.com>'
+  - 'Stig Palmquist <git@stig.io>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tom Hukins <tom@eborcom.com>'

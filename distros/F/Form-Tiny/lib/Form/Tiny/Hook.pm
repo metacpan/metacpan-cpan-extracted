@@ -1,5 +1,5 @@
 package Form::Tiny::Hook;
-$Form::Tiny::Hook::VERSION = '2.17';
+$Form::Tiny::Hook::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;

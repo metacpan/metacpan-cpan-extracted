@@ -4,7 +4,7 @@
       "DERIV <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -92,11 +92,11 @@
    "provides" : {
       "WebService::Async::SmartyStreets" : {
          "file" : "lib/WebService/Async/SmartyStreets.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::Async::SmartyStreets::Address" : {
          "file" : "lib/WebService/Async/SmartyStreets/Address.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -111,21 +111,22 @@
          "web" : "https://github.com/binary-com/perl-WebService-Async-SmartyStreets"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "chylli-binary <chylli@binary.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "Abdalla Mourad <abdullah.f98m@gmail.com>",
       "Brandon <52795236+brandon-binary@users.noreply.github.com>",
-      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "chylli-deriv <chylli@binary.com>",
       "felipe-binary <64797927+felipe-binary@users.noreply.github.com>",
+      "felipe-deriv <64797927+felipe-deriv@users.noreply.github.com>",
       "limchengyang <45479072+limchengyang@users.noreply.github.com>",
       "Luis Bobadilla <108674246+luis-bobadilla-deriv@users.noreply.github.com>",
       "Tom Molesworth <tom@binary.com>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

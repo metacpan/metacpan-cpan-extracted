@@ -18,9 +18,14 @@ my $s = $driver->session;
 # class, particularly for input that is legal, but unusual -- for example,
 # due to coding errors on the client's part.
 
-use Test::More 0.96 tests => 13 + 2;
+use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
+
+plan tests => 13 + 1 + $no_warnings;
+
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
 

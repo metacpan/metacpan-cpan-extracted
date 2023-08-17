@@ -9,9 +9,9 @@ use Data::Sah::FilterCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -119,7 +119,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -147,6 +147,8 @@ Basically, a filter rule will provide an expression (C<expr_filter>) to convert
 data to another. Multiple filter rules will be combined to form the final
 filtering code.
 
+=head2 meta()
+
 The filter rule module must contain C<meta> subroutine which must return a
 hashref (L<DefHash>) that has the following keys (C<*> marks that the key is
 required):
@@ -161,23 +163,6 @@ Metadata specification version. From L<DefHash>. Currently at 1.
 
 From L<DefHash>.
 
-=back
-
-The filter rule module must also contain C<filter> subroutine which must
-generate the code for filtering. The subroutine must accept a hash of arguments
-(C<*> indicates required arguments):
-
-=over
-
-=item * data_term => str
-
-=back
-
-The C<filter> subroutine must return a hashref with the following keys (C<*>
-indicates required keys):
-
-=over
-
 =item * might_fail => bool
 
 Whether coercion might fail, e.g. because of invalid input. If set to 1,
@@ -189,13 +174,45 @@ should be set to undefined value.
 
 This is used for filtering rules that act as a data checker.
 
-=item * expr_filter => str
+=item * args => hash
+
+List of arguments that this filter accepts, in the form of hash where hash keys
+are argument names and hash values are argument specifications. Argument
+specification is a L<DefHash> similar to argument specification for functions in
+L<Rinci::function> specification.
+
+=back
+
+=head2 filter()
+
+The filter rule module must also contain C<filter> subroutine which must
+generate the code for filtering. The subroutine must accept a hash of arguments
+and will be passed these:
+
+=over
+
+=item * data_term => str
+
+=item * args => hash
+
+The arguments for the filter. Hash keys will contain the argument names, while
+hash values will contain the argument's values.
+
+=back
+
+The C<filter> subroutine must return a hashref with the following keys (C<*>
+indicates required keys):
+
+=over
+
+=item * expr_filter* => str
 
 Expression in the target language to actually convert data.
 
 =item * modules => hash
 
-A list of modules required by the expression.
+A list of modules required by the expression, where hash keys are module names
+and hash values are modules' minimum versions.
 
 =back
 
@@ -214,6 +231,104 @@ code):
    ...
    return $data;
  }
+
+=head2 Filter modules included in this distribution
+
+=over
+
+=item 1. L<Data::Sah::Filter::js::Str::downcase>
+
+=item 2. L<Data::Sah::Filter::js::Str::lc>
+
+=item 3. L<Data::Sah::Filter::js::Str::lcfirst>
+
+=item 4. L<Data::Sah::Filter::js::Str::lowercase>
+
+=item 5. L<Data::Sah::Filter::js::Str::ltrim>
+
+=item 6. L<Data::Sah::Filter::js::Str::rtrim>
+
+=item 7. L<Data::Sah::Filter::js::Str::trim>
+
+=item 8. L<Data::Sah::Filter::js::Str::uc>
+
+=item 9. L<Data::Sah::Filter::js::Str::ucfirst>
+
+=item 10. L<Data::Sah::Filter::js::Str::upcase>
+
+=item 11. L<Data::Sah::Filter::js::Str::uppercase>
+
+=item 12. L<Data::Sah::Filter::perl::Array::check_uniq>
+
+=item 13. L<Data::Sah::Filter::perl::Array::check_uniqnum>
+
+=item 14. L<Data::Sah::Filter::perl::Array::check_uniqstr>
+
+=item 15. L<Data::Sah::Filter::perl::Array::remove_undef>
+
+=item 16. L<Data::Sah::Filter::perl::Array::uniq>
+
+=item 17. L<Data::Sah::Filter::perl::Array::uniqnum>
+
+=item 18. L<Data::Sah::Filter::perl::Array::uniqstr>
+
+=item 19. L<Data::Sah::Filter::perl::Float::ceil>
+
+=item 20. L<Data::Sah::Filter::perl::Float::check_has_fraction>
+
+=item 21. L<Data::Sah::Filter::perl::Float::check_int>
+
+=item 22. L<Data::Sah::Filter::perl::Float::floor>
+
+=item 23. L<Data::Sah::Filter::perl::Float::round>
+
+=item 24. L<Data::Sah::Filter::perl::Str::check>
+
+=item 25. L<Data::Sah::Filter::perl::Str::check_lowercase>
+
+=item 26. L<Data::Sah::Filter::perl::Str::check_oneline>
+
+=item 27. L<Data::Sah::Filter::perl::Str::check_uppercase>
+
+=item 28. L<Data::Sah::Filter::perl::Str::downcase>
+
+=item 29. L<Data::Sah::Filter::perl::Str::ensure_trailing_newline>
+
+=item 30. L<Data::Sah::Filter::perl::Str::lc>
+
+=item 31. L<Data::Sah::Filter::perl::Str::lcfirst>
+
+=item 32. L<Data::Sah::Filter::perl::Str::lowercase>
+
+=item 33. L<Data::Sah::Filter::perl::Str::ltrim>
+
+=item 34. L<Data::Sah::Filter::perl::Str::oneline>
+
+=item 35. L<Data::Sah::Filter::perl::Str::remove_comment>
+
+=item 36. L<Data::Sah::Filter::perl::Str::remove_nondigit>
+
+=item 37. L<Data::Sah::Filter::perl::Str::remove_whitespace>
+
+=item 38. L<Data::Sah::Filter::perl::Str::replace_map>
+
+=item 39. L<Data::Sah::Filter::perl::Str::rtrim>
+
+=item 40. L<Data::Sah::Filter::perl::Str::trim>
+
+=item 41. L<Data::Sah::Filter::perl::Str::try_center>
+
+=item 42. L<Data::Sah::Filter::perl::Str::uc>
+
+=item 43. L<Data::Sah::Filter::perl::Str::ucfirst>
+
+=item 44. L<Data::Sah::Filter::perl::Str::upcase>
+
+=item 45. L<Data::Sah::Filter::perl::Str::uppercase>
+
+=item 46. L<Data::Sah::Filter::perl::Str::wrap>
+
+=back
 
 =head1 VARIABLES
 

@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.885';
+our $VERSION = '1.888';
 
 use threads;
 use threads::shared;
@@ -326,7 +326,7 @@ MCE::Channel::ThreadsFast - Fast channel for producer(s) and many consumers
 
 =head1 VERSION
 
-This document describes MCE::Channel::ThreadsFast version 1.885
+This document describes MCE::Channel::ThreadsFast version 1.888
 
 =head1 DESCRIPTION
 
@@ -353,7 +353,7 @@ Current module available since MCE 1.877.
  my $chnl_a = MCE::Channel->new( impl => 'ThreadsFast' );
 
  # Specify the 'mp' option for safe use by two or more producers
- # sending or recieving on the left side of the channel (i.e.
+ # sending or receiving on the left side of the channel (i.e.
  # ->enqueue/->send or ->recv2/->recv2_nb).
 
  my $chnl_b = MCE::Channel->new( impl => 'ThreadsFast', mp => 1 );

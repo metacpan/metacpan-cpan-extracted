@@ -3,7 +3,7 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '1.38';
+our $VERSION = '1.43';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -18,6 +18,10 @@ sub new {
         }
         $parameters{http}  = $host;
         $parameters{https} = $host;
+    }
+    elsif ( $parameters{tls} ) {
+        $parameters{pac} =
+qq[data:text/plain,function FindProxyForURL(){return "HTTPS $parameters{tls}"}];
     }
     my $element = bless {%parameters}, $class;
     return $element;
@@ -82,7 +86,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 1.38
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -99,6 +103,11 @@ Version 1.38
 
     my $proxy = Firefox::Marionette::Proxy->new( host => 'squid.example.com:3128' );
     my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( proxy => $proxy ) );
+
+    # OR
+
+    my $proxy = Firefox::Marionette::Proxy->new( tls => "squid.example.org:443" );
+    my $firefox = Firefox::Marionette->new(capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy));
 
 =head1 DESCRIPTION
 
@@ -127,6 +136,8 @@ accepts a hash as a parameter.  Allowed keys are below;
 =item * socks - defines the proxy host for a SOCKS proxy traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
 
 =item * socks_version - defines the SOCKS proxy version when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.  It must be any integer between 0 and 255 inclusive, but it defaults to '5'.
+
+=item * tls - defines a L<pac|Firefox::Marionette::Proxy#type> function pointing to a TLS secured proxy for FTP, HTTP, and HTTPS traffic.  This was derived from L<bug 378637|https://bugzilla.mozilla.org/show_bug.cgi?id=378637>
 
 =back
 

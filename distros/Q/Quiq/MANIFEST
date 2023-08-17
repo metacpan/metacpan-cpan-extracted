@@ -130,6 +130,7 @@ lib/Quiq/ImageMagick.pm
 lib/Quiq/ImagePool.pm
 lib/Quiq/ImagePool/Directory.pm
 lib/Quiq/ImagePool/Sequence.pm
+lib/Quiq/Imap/Client.pm
 lib/Quiq/Ipc.pm
 lib/Quiq/JavaScript.pm
 lib/Quiq/JQuery.pm
@@ -168,6 +169,7 @@ lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
 lib/Quiq/PerlModule.pm
+lib/Quiq/PhotoStorage.pm
 lib/Quiq/PlotlyJs.pm
 lib/Quiq/PlotlyJs/Reference.pm
 lib/Quiq/PlotlyJs/TimeSeries.pm
@@ -370,6 +372,7 @@ t/bin/Quiq/ImageMagick.t
 t/bin/Quiq/ImagePool.t
 t/bin/Quiq/ImagePool/Directory.t
 t/bin/Quiq/ImagePool/Sequence.t
+t/bin/Quiq/Imap/Client.t
 t/bin/Quiq/Ipc.t
 t/bin/Quiq/JavaScript.t
 t/bin/Quiq/JQuery.t
@@ -408,6 +411,7 @@ t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
 t/bin/Quiq/PerlModule.t
+t/bin/Quiq/PhotoStorage.t
 t/bin/Quiq/PlotlyJs.t
 t/bin/Quiq/PlotlyJs/Reference.t
 t/bin/Quiq/PlotlyJs/TimeSeries.t

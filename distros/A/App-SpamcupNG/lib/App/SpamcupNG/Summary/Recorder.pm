@@ -6,7 +6,7 @@ use Hash::Util qw(lock_hash);
 use DBI 1.643;
 use DateTime 1.55;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 =pod
 

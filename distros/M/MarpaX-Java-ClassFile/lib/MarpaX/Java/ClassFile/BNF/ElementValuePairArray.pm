@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing an array of element value pair
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -58,7 +58,7 @@ MarpaX::Java::ClassFile::BNF::ElementValuePairArray - Parsing an array of elemen
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

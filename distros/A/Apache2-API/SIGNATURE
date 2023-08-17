@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 14b3d4c2a7d76baf85abc48bbc2911d1a4da3ff90801ada2fcd306e947338bae CHANGES
+SHA256 0daa680b92d6d23837c3aa21fcbc56a310132b00dd6eb7075176a9a0b80ce77a CONTRIBUTING.md
+SHA256 1408a92621df4cc58b15479cf88b72165713900e3f5103cafe90afd0ac6deffc MANIFEST
+SHA256 e1361bf4f3704b89a53b5dd19f7274ec27fdf2aef81055152d3e064f392b1df8 META.json
+SHA256 4235317bf89621a3d9c363240c8ca78bf90d78e8f8d5c437a4dbf6847d5159b3 META.yml
+SHA256 12bee7e04fccc637b19a384d37b205f3712ba93194ca9c47fb7925a8d2f3ebf5 Makefile.PL
+SHA256 8008359cc47b83f5875ac6348ea919668d0f69cc00c6c00e7128e04751eefc1f README
+SHA256 26088dbb25b6b29dd0f651c021fff8f65e3c37a265a5eaef4911c8926bf90307 README.md
+SHA256 73a95e12a7ab1b9604e1a13c0660c1ffef9a1a2ed4f2c662e55537478e816ec5 lib/Apache2/API.pm
+SHA256 60160a2bd4face31492c1a8ba75198f1cad75e16a86f009efe8a24f8868209fb lib/Apache2/API/DateTime.pm
+SHA256 f89d09f44184b5f7ee28ab0a311b49cfb553f5c1836a552f926a80822bf9967d lib/Apache2/API/Query.pm
+SHA256 c2700474e21bd8c8f2048b870bcae1c81a9d37298152dd15d459876d6460887e lib/Apache2/API/Request.pm
+SHA256 75ef15df3a0ff8fa5a3cc27491f0e30225d9859c1e8f74e91b490b1598b561ed lib/Apache2/API/Request/Params.pm
+SHA256 aef7822897fe8af542218ec7d8ea0089d7bb1899f58b8b3182460773e421f8ad lib/Apache2/API/Request/Upload.pm
+SHA256 2f62f3907e06db82cfbe873401fea2f31d0fb0406812fc2df761a1d2ceb7bc4c lib/Apache2/API/Response.pm
+SHA256 5c1545e2ba5b7a9a0ce51bda818423b18648f76b3e2465f3f4aded3bd0d554a5 lib/Apache2/API/Status.pm
+SHA256 c57f25537b518b39d44842061a4ba8848c9e936a5305bbf1ed3eddab1d2a67e1 scripts/startup.pl
+SHA256 6b386ddbdfddf10e3a4f822281faa57f0867f1fb253dba6920220a743a393d6a t/00.load.t
+SHA256 8cd30ed713ba10037557de4c66ad15a3ccf2ce115281a0ebd21a9823e5c0c49e t/01.api.t
+SHA256 a9f7337923f6e70962dbe0a63f3ce66d8773a658de4a874cc4001b3539e45fee t/02.datetime.t
+SHA256 eccdde6004e8fd4599f24cd3fb6159d6dc88f2aaa36fbf98f8a55e08975bff56 t/03.query.t
+SHA256 e383ec6efae49c46f166cd59e8b39dd38b0269acf8de47aa49e55ce8a24d2d68 t/04.status.t
+SHA256 c51f13d508f1abf4a782398b084ccd51a847e057b6d117dd5e8dacfe00ef5caa t/05.other.t
+SHA256 f493598fe4163465ad7539d49c32b84f335f320055e9715d554493b2cecac4c5 t/90.coverage.t
+SHA256 4078280a2bd703e111776029e90998fec7e4401924a2272fe69f0122bee659be t/91.pod.t
+SHA256 566e79c08955e1d9f7682e822a6df51009438091fde033a0929655655d8ee6e7 t/92.signature.t
+SHA256 3f93bfcebfe0951d578634d012f65734b40a0d68af4d32de03689b69b54c034d t/93.manifest.t
+SHA256 610bb2233eaefa594359fd529387118cd79768ff3bdb1ce9a462dd382120df41 t/99.kwalitee.t
+SHA256 926482972612b4093e5029c5701664d47e45ddda3989406366638ab563f4ea5c t/TEST.PL
+SHA256 937939d64f52de3c66a1a9f21f7d1d352cb998e1f719f12c9bbe2c24047be786 t/conf/extra.conf.in
+SHA256 f457a704fb3849dcf8850402630672af57f6708b8689bd30b90addc4318ba8cc t/conf/options.conf.in
+SHA256 a0782e9a904ba3a619ed797345af08c6fae60380fcde61cdc5008ee7e408d201 t/lib/Test/Apache2/API.pm
+SHA256 f14deb326cfe3f337813010fb26d16e319a58fbe5f92bfeb9e776a50379ae95a t/lib/Test/Apache2/API/Request.pm
+SHA256 f6a8e6d44ab5d81c58be30709936f4cd0576e3dc5931da9fe2ec4338ff2c4862 t/lib/Test/Apache2/API/Response.pm
+SHA256 9273eef2084f16d5d95c4426ffbff8714a7eddc13a9a7d25063de763ba9c688c t/lib/Test/Apache2/Common.pm
+SHA256 ca4beff78eb1f5944fb9409db0c3fd48cccd4610d839a8b855d62a6980c1b086 t/server.crt
+SHA256 15f7f65457b3abc0ee1b454bf06f658b88f685d233dcf96d1e11a5978f6be291 t/server.key
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmSF1R8ACgkQXzwCYc2y
+51Jl1w//RlhwwwOzkX8WY5Vb/xCy5+eeQadM2wEEuWvli18CBfEIfzBgcu6Mvun4
+F4etR1pxeY2qSk0V/rG6cGmwmNti61+qTDxbUDpy7c7rt2mmheet0AJQdcJWe4K5
+ov9Yj8JrPouoojgjg7mUTfwC4O796gJDe5ddzkoFYN+y78u2ChMmlVQDEbwF7+ez
+skQ1od9c3rWxC8GceOamxjpg6xAsA+wSB56BqefmXWZRxIXiD4iWcDYBz4q/D+l1
+BtORnSSrLx1WcIsgobdyFyh0mmFVCGdpNZEcwJxrnApqs2bOT+juSlEhn6/cOhNa
+UhUloEWOgd4YQd359ZvGJu+4/kp29PzlMIXD3n3PmdVe3C+jvfTxPJv8clo8bSfl
+hP7QxUh3hfvhkFCcanJMPfJPYSbkdX5DMqvx6vGDcS5qOKnN1zPVWazTILK/yidF
+jbEKLycLN6cUQMzFyoiTTc1MqwYFVwHD1rzK2RVRS9/MyeYiJmHNL5j4E1zt0s4l
+MTqJpLU+ne5Twa9rNvCLq+X4Nn9iDbAa/8FwAODytcGDJdZQ0Ka4d43tilZfWyfK
+OpBljAF3ugoieVzTj3X9tsffkk8GGGOMU4FIjcv670+N4TdQFtlPMFLlwWfsOTvh
+X9fMbmHs8U7xF5FPEa/t1EXXqUnKn/17wAi4qqoA64Urk65rQQU=
+=ZaY1
+-----END PGP SIGNATURE-----

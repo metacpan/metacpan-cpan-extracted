@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,10 @@ no_index:
 provides:
   MooX::Role::CloneSet:
     file: lib/MooX/Role/CloneSet.pm
-    version: v0.1.0
+    version: v0.1.1
   MooX::Role::CloneSet::BuildArgs:
     file: lib/MooX/Role/CloneSet/BuildArgs.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   Moo: '1.006'
   namespace::clean: '0.25'
@@ -37,7 +37,8 @@ requires:
 resources:
   bugtracker: https://github.com/ppentchev/MooX-Role-CloneSet/issues
   homepage: https://github.com/ppentchev/MooX-Role-CloneSet
-  repository: git://github.com/ppentchev/MooX-Role-CloneSet.git
-version: v0.1.0
+  repository: https://github.com/ppentchev/MooX-Role-CloneSet.git
+version: v0.1.1
 x_authority: cpan:ROAM
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -7,6 +7,46 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.11.1	2023-08-08
+
+ [ Test Suite ]
+ - test-recommend recent re::engine::RE2 and tighten test
+   02-regexp-pattern_RE2.t to not fail on perl v3.38
+
+v3.11.0	2023-07-03
+
+ [ Bug Fixes ]
+ - disambiguate objects naumen zpl_2.
+ - list longest item first in synthesized patterns
+ - stop make trailing 'license' optional in synthesized patterns;
+   disambiguate objects mit_new x11.
+
+ [ Documentation ]
+ - document captures for trait objects version version_later
+   version_numberstring version_only
+
+ [ Test Suite ]
+ - add tests checking version traits
+
+ [ Packaging ]
+ - add settings file to tidy tool precious
+
+ [ Other ]
+ - Removed: deprecate trait options or_at_option version_later_paragraph
+   version_later_postfix version_number version_number_suffix
+ - Removed: drop named capture version from trait object version
+ - extend subpattern version_number to cover trailing letter
+ - extend trait object version to cover dual-versioned grants
+ - extend trait object version with named capture version_of
+ - extend trait object version_later to cover another variant
+ - extend trait object version_only; include in trait object version
+ - extend trait objects version* to cover space inside parens
+ - generalize subpattern at_option
+ - generalize subpattern version_number_prefix
+ - tighten fulltext patterns for objects gpl_2 osl_1 osl_1_1 osl_2 osl_2_1
+   rpl_1_5 rpsl_1 simpl_2
+ - use explicit license patterns (don't synthesize) for cc_* objects
+
 v3.10.1	2023-04-02
 
  [ Bug Fixes ]

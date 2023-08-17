@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 use App::CSVUtils::csv_csv;
 use Perinci::Sub::Util qw(gen_modified_sub);
@@ -23,6 +23,8 @@ This is a simple wrapper to <prog:csv-csv>. It's equivalent to:
     % csv-csv --no-output-always-quote --no-output-quote-empty ...
 
 which is the default anyway.
+
+Keywords: dequote
 
 _
 
@@ -69,7 +71,7 @@ App::CSVUtils::csv_unquote - Make sure values of CSV are unquoted unless when ne
 
 =head1 VERSION
 
-This document describes version 1.024 of App::CSVUtils::csv_unquote (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of App::CSVUtils::csv_unquote (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 FUNCTIONS
 
@@ -97,6 +99,8 @@ This is a simple wrapper to L<csv-csv>. It's equivalent to:
  % csv-csv --no-output-always-quote --no-output-quote-empty ...
 
 which is the default anyway.
+
+Keywords: dequote
 
 This function is not exported.
 

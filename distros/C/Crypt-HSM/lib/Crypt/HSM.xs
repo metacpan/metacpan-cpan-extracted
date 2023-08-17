@@ -1249,9 +1249,9 @@ static const attribute_entry* S_get_attribute_entry(pTHX_ const char* name, size
 #define get_attribute_entry(name, name_length) S_get_attribute_entry(aTHX_ name, name_length)
 
 static void S_set_intval(pTHX_ CK_ATTRIBUTE* current, CK_ULONG value) {
-	Newxz(current->pValue, 1, uint64_t);
+	Newxz(current->pValue, 1, CK_ULONG);
 	SAVEFREEPV(current->pValue);
-	current->ulValueLen = 8;
+	current->ulValueLen = sizeof(CK_ULONG);
 	*(CK_ULONG*)current->pValue = value;
 }
 #define set_intval(current, value) S_set_intval(aTHX_ current, value)
@@ -1674,7 +1674,7 @@ OUTPUT:
 
 void slots(Crypt::HSM self, CK_BBOOL tokenPresent = 1)
 PPCODE:
-	CK_ULONG count;
+	CK_ULONG count, i;
 
 	CK_RV result = self->funcs->C_GetSlotList(tokenPresent, NULL, &count);
 	if ( result != CKR_OK )
@@ -1690,7 +1690,7 @@ PPCODE:
 	if (result != CKR_OK)
 		croak_with("Couldn't get slots", result);
 
-	for(unsigned int i = 0; i < count; i++)
+	for(i = 0; i < count; i++)
 		mPUSHs(new_slot(self, slotList[i]));
 
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88 tests => 2;
+use Test::RequiresInternet;
 use CPAN::ReverseDependencies;
 
 my $crd = CPAN::ReverseDependencies->new();

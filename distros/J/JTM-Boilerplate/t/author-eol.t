@@ -29,8 +29,7 @@ my @files = (
     't/data/perlcriticrc',
     't/release-changes_has_content.t',
     't/release-kwalitee.t',
-    't/release-trailing-space.t',
-    't/release-unused-vars.t'
+    't/release-trailing-space.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

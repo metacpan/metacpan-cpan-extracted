@@ -13,7 +13,7 @@ $VERSION = eval $VERSION;
 #the infostring says it all
 my $infostring = 'contract a data file by computing the mean over n input rows to produce one output row
 
-txdcontract 2 < 100rows.dat > 50rows.dat
+txdcontract n < 100rows.dat > 50rows.dat
 
 A partial bin at the end is dropped. When you choose value-based binning, there
 will always be some data dropped at the end. That way, you only get mean values
@@ -22,6 +22,9 @@ assumed to be sorted according to the column chosen for value-based binning.';
 
 our @ISA = ('Text::NumericData::App');
 
+my $stats_stddev = 1;
+my $stats_minmax = 2;
+
 sub new
 {
 	my $class = shift;
@@ -29,6 +32,10 @@ sub new
 		'bincol', '', 'c'
 		,	'bin by values in given column instead of contracting by row count'
 	,	'binsize', 1, 'b', 'size of one bin'
+	,	'stats', 0, 's', 'add columns with statistic values for the bins'
+		.	" ($stats_stddev: standard deviation,"
+		.	" $stats_minmax: min and max values, "
+		.	($stats_stddev|$stats_minmax).": stddev, min, max)"
 	);
 
 	return $class->SUPER::new
@@ -44,6 +51,8 @@ sub new
 		,pipe_init   => \&preinit
 		,pipe_begin  => \&init
 		,pipe_data   => \&process_data
+		,pipe_header => \&process_header
+		,pipe_first_data => \&process_first_data
 	});
 }
 
@@ -86,8 +95,46 @@ sub init
 	$self->new_txd();
 	$self->{binval} = undef;
 	$self->{mean} = [];
+	$self->{binbuffer} = [];
 	$self->{meancount} = defined $self->{n} ? $self->{n} : 0;
 	$self->{ln} = 0;
+	$self->{sline} = '';
+}
+
+# Delay header printout for processing column headers.
+sub process_header
+{
+	my $self = shift;
+	my $sline = $_[0];
+	$_[0] = $self->{sline};
+	$self->{sline} = $sline;
+}
+
+# Append stats titles. This is rather convoluted, I need to make this nicer.
+sub process_first_data
+{
+	my $self = shift;
+	my $txd = $self->{txd};
+	my $data = $txd->line_data($_[0]);
+	if(@{$self->{txd}{titles}})
+	{
+		my $cols = @{$data};
+		my $devi = $cols;
+		my $mini = $self->{param}{stats} & $stats_stddev ? $devi+$cols : $cols;
+		for(my $i=0; $i<$cols; ++$i)
+		{
+			my $tit = defined $txd->{titles}[$i] ? $txd->{titles}[$i] : ($i+1);
+			$txd->{titles}[$devi+$i] = 'dev:'.$tit
+				if($self->{param}{stats} & $stats_stddev);
+			if($self->{param}{stats} & $stats_minmax)
+			{
+				$txd->{titles}[$mini+$i] = 'min:'.$tit;
+				$txd->{titles}[$mini+$cols+$i] = 'max:'.$tit;
+			}
+		}
+		return $self->{txd}->title_line();
+	}
+	else{  return \$self->{sline}; }
 }
 
 sub process_data
@@ -108,6 +155,8 @@ sub process_data
 		{
 			$self->{mean}[$i] += $data->[$i];
 		}
+		push(@{$self->{binbuffer}}, [@{$data}])
+			if($self->{param}{stats});
 		++$self->{ln};
 	}
 	else # Value-based binning needs to figure out if we crossed the border.
@@ -119,14 +168,59 @@ sub process_data
 
 	if($bin_finished or (defined $self->{n} and $self->{ln} == $self->{n}))
 	{
-		for(my $i = 0; $i <= $#{$self->{mean}}; ++$i)
+		my @outdata;
+		for(@{$self->{mean}})
 		{
-			$self->{mean}[$i] /= $self->{ln};
+			push(@outdata, $_ /= $self->{ln});
 		}
-		$self->{mean}[$self->{bincol}] = $self->{binval}
+		if($self->{param}{stats} & $stats_stddev)
+		{
+			my @sum;
+			for(my $d=0; $d<$self->{ln}; ++$d)
+			{
+				for(my $i=0; $i<@{$self->{mean}}; ++$i)
+				{
+					$sum[$i] += ($self->{binbuffer}[$d][$i] - $self->{mean}[$i])**2;
+				}
+			}
+			for(my $i=0; $i<@{$self->{mean}}; ++$i)
+			{
+				push(@outdata, sqrt($sum[$i]/$self->{ln}));
+			}
+		}
+		if($self->{param}{stats} & $stats_minmax)
+		{
+			my @min;
+			my @max;
+			for(my $d=0; $d<$self->{ln}; ++$d)
+			{
+				for(my $i=0; $i<@{$self->{mean}}; ++$i)
+				{
+					$max[$i] = $self->{binbuffer}[$d][$i]
+						if( not defined $max[$i] or
+						    $self->{binbuffer}[$d][$i] > $max[$i] );
+					$min[$i] = $self->{binbuffer}[$d][$i]
+						if( not defined $min[$i] or
+						    $self->{binbuffer}[$d][$i] < $min[$i] );
+				}
+			}
+			# Loop ensures that we really have the given amount of entries,
+			# even if buffer was empty.
+			for(my $i=0; $i<@{$self->{mean}}; ++$i)
+			{
+				push(@outdata, $min[$i]);
+			}
+			for(my $i=0; $i<@{$self->{mean}}; ++$i)
+			{
+				push(@outdata, $max[$i]);
+			}
+		}
+
+		$outdata[$self->{bincol}] = $self->{binval}
 			if $bin_finished;
-		$_[0] = ${$self->{txd}->data_line($self->{mean})};
+		$_[0] = ${$self->{txd}->data_line(\@outdata)};
 		@{$self->{mean}} = ();
+		@{$self->{binbuffer}} = ();
 		$self->{ln} = 0;
 	}
 
@@ -139,6 +233,8 @@ sub process_data
 		{
 			$self->{mean}[$i] += $data->[$i];
 		}
+		push(@{$self->{binbuffer}}, [@{$data}])
+			if($self->{param}{stats});
 		++$self->{ln};
 	}
 }

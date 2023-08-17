@@ -1,4 +1,6 @@
-1.5.9    xx.xx.2022
+1.5.10   20.07.2023
+            - fix for gcc 13
+1.5.9    03.10.2022
             - improve tests for iptr/wiptr
 1.5.8    26.11.2021
             - upgrade tests for catch-v3

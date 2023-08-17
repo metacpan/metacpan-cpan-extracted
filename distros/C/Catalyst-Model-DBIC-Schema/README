@@ -274,7 +274,7 @@ CONFIG PARAMETERS
     Catalyst::TraitFor::Model::DBIC::Schema::PerRequestSchema
 
   compose_namespaces
-    This model calls "compose_namespaces" in DBIx::Class::Schema by default
+    This model calls "compose_namespace" in DBIx::Class::Schema by default
     to install classes into the model namespaces. You can turn that off by
     setting this attribute to false. Default is true.
 

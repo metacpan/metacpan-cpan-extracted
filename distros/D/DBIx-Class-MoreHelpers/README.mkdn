@@ -1,0 +1,40 @@
+# NAME
+
+DBIx::Class::MoreHelpers - More helpers for DBIx::Class
+
+# VERSION
+
+version 1.0001
+
+# SYNOPSIS
+
+More tools for simplifying common uses of [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+
+# DESCRIPTION
+
+Take a look at the individual components of this bundle for more documentation:
+
+- [DBIx::Class::Helper::ResultSet::MoreShortcuts](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelper%3A%3AResultSet%3A%3AMoreShortcuts)
+
+# DEPENDENCIES
+
+- [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+- [Dbix::Class::Helpers](https://metacpan.org/pod/Dbix%3A%3AClass%3A%3AHelpers)
+
+# ACKNOWLEDGEMENTS
+
+None of this could have happened without [fREW](https://metacpan.org/author/FREW)'s outstanding
+work on [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelpers), on which this module depends.
+
+Also, big thanks to my teammates at Clearbuilt for batting around ideas and encouragement.
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

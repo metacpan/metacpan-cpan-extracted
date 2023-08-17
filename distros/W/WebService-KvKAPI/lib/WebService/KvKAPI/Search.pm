@@ -1,13 +1,13 @@
 use utf8;
 package WebService::KvKAPI::Search;
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 # ABSTRACT: WebService::KvKAPI::Search package needs a propper abstract
 
 use v5.26;
 use Object::Pad;
 use WebService::KvKAPI::Formatters ':all';
 
-class WebService::KvKAPI::Search does WebService::KvKAPI::Roles::OpenAPI;
+class WebService::KvKAPI::Search :does(WebService::KvKAPI::Roles::OpenAPI);
 
 my @valid_params = qw(
     kvkNummer
@@ -58,15 +58,15 @@ WebService::KvKAPI::Search - WebService::KvKAPI::Search package needs a propper 
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 
@@ -272,6 +272,7 @@ components:
       type: apiKey
       name: apikey
       in: header
+
 __END__
 
 =head1 DESCRIPTION
@@ -281,13 +282,13 @@ Commerce.
 
 =head1 SYNOPSIS
 
-use WebService::KvKAPI::Search;
+    use WebService::KvKAPI::Search;
 
-my $api = WebService::KvKAPI::Search->new(
-    # see WebService::KvKAPI->new()
-);
+    my $api = WebService::KvKAPI::Search->new(
+        # see WebService::KvKAPI->new()
+    );
 
-$api->search(%args);
+    $api->search(%args);
 
 =head1 ATTRIBUTES
 

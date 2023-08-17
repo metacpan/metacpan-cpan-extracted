@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -25,7 +24,7 @@ my $static = Tickit::Widget::Static->new( text => "Widget" );
    $widget->set_child( $static );
 
    is( scalar $widget->children, 1, '$widget has 1 child after adding' );
-   identical( $widget->child, $static, '$widget->child is $static' );
+   ref_is( $widget->child, $static, '$widget->child is $static' );
 
    is( $widget->lines, 1, '$widget->lines is 1' );
    is( $widget->cols,  6, '$widget->cols is 6' );

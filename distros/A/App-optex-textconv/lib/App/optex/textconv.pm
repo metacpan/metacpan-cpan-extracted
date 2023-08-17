@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -88,6 +88,11 @@ JPEG files is converted to their exif information (.jpeg, .jpg).
 Name start with C<http://> or C<https://> is converted to text data
 translated by L<w3c(1)> command.
 
+=item gpg
+
+Invoke L<gpg(1)> command to decrypt encrypted files with C<.gpg>
+extention.
+
 =item pandoc
 
 Use L<pandoc|https://pandoc.org/> command to translate Microsoft
@@ -109,8 +114,12 @@ converted to plain text by original code implemented in
 L<App::optex::textconv::ooxml::regex> module.  Algorithm used in this
 module is extremely simple, and consequently runs fast.
 
+=begin COMMENT
+
 If related modules are available, L<App::optex::textconv::ooxml::xslt>
 is used to covert XML using XSLT mechanism.
+
+=end COMMENT
 
 Two module are included in this distribution to use other external
 converter program, B<pandoc> and B<tika>, those implement much more

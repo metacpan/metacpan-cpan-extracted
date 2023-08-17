@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use URI::PackageURL::CLI;
+
+exit URI::PackageURL::CLI->run(@ARGV) unless caller();
+
+1;
+
+__END__
+=encoding utf-8
+
+=head1 NAME
+
+purl-tool - PackageURL tool
+
+=head1 SYNOPSIS
+
+    purl-tool [OPTIONS]...STRING
+    purl-tool [--help|--man|--version]
+
+    Options:
+          --help                Brief help message
+          --man                 Full documentation
+          --version             Print version
+
+          --download-url        Download URL
+          --repository-url      Repository URL
+
+      -0, --null                Return NULL char instead of new line
+
+          --format=FORMAT       Output format
+          --dumper              Data::Dumper format (--format=dumper)
+          --json                JSON output format (--format=json)
+          --yaml                YAML output format (--format=yaml)
+          --env                 ENV output format (--format=env)
+
+    Examples:
+
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --json | jq
+
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --download-url)
+
+
+=head1 DESCRIPTION
+
+C<purl-tool> PackageURL tool
+
+=head1 EXAMPLES
+
+Parse the given PackageURL string and return JSON and send the STDOUT to L<jq>:
+
+B<purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --json | jq>
+
+Download the package from the repository using PackageURL string:
+
+B<wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --download-url)>
+
+=head1 AUTHOR
+
+L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2022-2023 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under.

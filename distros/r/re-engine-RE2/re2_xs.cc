@@ -202,7 +202,7 @@ RE2_comp(pTHX_ SV * const pattern, const U32 flags)
     */
     rx->nparens = ri->NumberOfCapturingGroups();
 
-#if PERL_VERSION >= 37 && PERL_SUBVERSION >=7
+#if (PERL_VERSION >= 37 && PERL_SUBVERSION >=7) || PERL_VERSION > 37
     rx->logical_nparens = rx->nparens;
 #endif
 
@@ -255,7 +255,7 @@ RE2_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
     re->subbeg = strbeg;
     re->sublen = strend - strbeg;
 
-    for (int i = 0; i <= re->nparens; i++) {
+    for (U32 i = 0; i <= re->nparens; i++) {
         if(res[i].data()) {
             re->offs[i].start = res[i].data() - strbeg;
             re->offs[i].end   = res[i].data() - strbeg + res[i].length();

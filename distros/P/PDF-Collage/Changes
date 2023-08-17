@@ -1,2 +1,9 @@
+0.002  2023-06-11 15:19:37 CEST
+   - Release after 138 PASSes on CPAN Testers (thanks!)
+
+0.001001  2023-05-23 21:44:27 CEST
+   - Adapted implementation to leverage Data::Resolver 0.006
+   - Add support for horizontal alignment of text elements
+
 0.001  2023-02-12 19:53:11 CET
    - Initial release

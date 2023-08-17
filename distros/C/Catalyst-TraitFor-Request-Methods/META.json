@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Catalyst",
       "Catalyst::Request",
@@ -63,6 +63,7 @@
             "HTTP::Request::Common" : "0",
             "Module::Metadata" : "0",
             "Moose" : "0",
+            "Plack::Middleware::MethodOverride" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "lib" : "0",
@@ -74,7 +75,7 @@
    "provides" : {
       "Catalyst::TraitFor::Request::Methods" : {
          "file" : "lib/Catalyst/TraitFor/Request/Methods.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.5.2"
       }
    },
    "release_status" : "stable",
@@ -88,10 +89,10 @@
          "web" : "https://github.com/robrwo/Catalyst-TraitFor-Request-Methods-"
       }
    },
-   "version" : "v0.5.0",
+   "version" : "v0.5.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

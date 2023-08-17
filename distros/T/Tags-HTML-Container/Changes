@@ -1,3 +1,6 @@
+0.03 2023-06-25T16:12:38+02:00
+ - Add parameter for container height.
+
 0.02 2023-05-30T09:00:01+02:00
  - Fix test dependencies.
 

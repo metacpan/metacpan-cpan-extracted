@@ -1,5 +1,16 @@
 #!perl
 
+package
+    Local::Test::Module1;
+
+use strict;
+use warnings;
+
+sub new { my $class = shift; bless {@_}, $class }
+sub foo { my $self = shift; $self->{foo} }
+sub bar { 5 }
+
+package main;
 use strict 'subs', 'vars';
 use warnings;
 use Test::Exception;
@@ -91,6 +102,11 @@ subtest load_module_with_optional_args => sub {
         ok( defined(&{"Module::Load::Util::Test::Target::foo5"}));
         ok(!defined(&{"Module::Load::Util::Test::Target::foo6"}));
     };
+
+    subtest "opt:load=0" => sub {
+        load_module_with_optional_args({load=>0}, ["Local::Test::Module1" => {}]);
+        is(Local::Test::Module1::bar(), 5);
+    };
 };
 
 subtest instantiate_class_with_optional_args => sub {
@@ -108,6 +124,11 @@ subtest instantiate_class_with_optional_args => sub {
         is(ref $obj, 'Module::Load::Util::Test::Class');
         is($obj->[0], "arg1");
         is($obj->[1], "1");
+    };
+    subtest "opt:load=0" => sub {
+        my $obj = instantiate_class_with_optional_args({load=>0}, ["Local::Test::Module1" => {foo=>3}]);
+        is(ref $obj, 'Local::Test::Module1');
+        is($obj->foo, 3);
     };
 };
 

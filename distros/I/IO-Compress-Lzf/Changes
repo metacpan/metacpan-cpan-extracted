@@ -1,6 +1,38 @@
 CHANGES
 -------
 
+  2.206 25 July 2023
+
+    * 2.206
+      Tue, 25 Jul 2023 16:42:26 +0100
+      5a913f0ff4c0b2967e1a043712b82b11b3e8eec1
+
+    * drop rt.cpan from SUPPORT section
+      Tue, 18 Jul 2023 09:20:21 +0100
+      e9c8b2e7b3d63f48d8a4f027b31a8b70ff917471
+
+  2.205 16 July 2023
+
+    * 2.205
+      Sun, 16 Jul 2023 20:43:53 +0100
+      b7530eefa428d49839b859931813c28e7fae5828
+
+    * Add perl 5.38
+      Thu, 13 Jul 2023 11:14:30 +0100
+      9c7049cc08774dbdfd20345d5ebe9a9904fe4db6
+
+    * Add on workflow_dispatch
+      Fri, 9 Jun 2023 16:26:33 +0100
+      8ab8c6f977cae86452d1cf4fc188dbda111060d4
+
+    * Add some OO examples
+      Fri, 9 Jun 2023 16:19:08 +0100
+      b0db67bc9f2b55a57efb08c42b30d68d8c8fcd7e
+
+    * Version 2.204
+      Wed, 8 Feb 2023 21:44:38 +0000
+      6239166264412253cdf0fd889995ea44d62c78fb
+
   2.201 25 June 2022
 
       * 2.201

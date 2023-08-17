@@ -312,9 +312,9 @@ sub latest_parse {
 #
 # and contains buried within a megabyte mountain of hideous script
 #
-#     "user":{"crumb":"hdDX\u002FHGsZ0Q",
+#     "RequestPlugin":{"user":{"age":0,"crumb":"8OyCBPyO4ZS"
 #
-# The \u002F is backslash escape for "/" character.
+# Any \u002F or similar is escaped "/" character or similar.
 # The crumb is included in a CSV download query like the following
 # (alas can't use http, it redirects to https)
 #
@@ -684,11 +684,13 @@ sub daily_cookie_parse {
   my ($content, $resp) = @_;
 
   # script like, with backslash escaping on "\uXXXX"
+  #   "user":{"age":0,"crumb":"8OyCBPyO4ZS"
+  # The form prior to about July 2023 was
   #   "user":{"crumb":"hdDX\u002FHGsZ0Q",
   # The form prior to about January 2023 was
   #   "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
   #
-  $content =~ /"user":\{"crumb":"([^"]*)"/
+  $content =~ /"user":\{[^\}]*"crumb":"([^"]*)"/
     or die "Yahoo daily data: CrumbStore not found in parse";
   my $crumb = App::Chart::Yahoo::javascript_string_unquote($1);
 

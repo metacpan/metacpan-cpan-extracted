@@ -135,24 +135,38 @@ for my $iteration (1..2) {
 }
 
 {
-  package Test::SubExporter::SETUPALT;
-  use Sub::Exporter -setup => {
-    -as      => 'alternimport',
-    exports => [ qw(Y) ],
-  };
+  # Okay, what's going on here?
+  #
+  # We want to test that the -as argument to Sub::Exporter's own -setup behaves
+  # according to the usual -as rules.  That means it won't install the importer
+  # code as "import", but as the given name.  We use Exporter to provide a
+  # do-nothing import routine, and then test that this routine is *not*
+  # clobbered by Sub::Exporter.
+  {
+    package Test::SubExporter::SETUPALT;
+    use Exporter qw(import);
+    our %EXPORT_TAGS = ( "all" => [] );
 
-  sub X { return "desired" }
-  sub Y { return "other" }
+    use Sub::Exporter -setup => {
+      -as      => 'alternimport',
+      exports => [ qw(Y) ],
+    };
 
-  package Test::SubExporter::SETUP::ALTCONSUMER;
+    sub X { return "desired" }
+    sub Y { return "other" }
+  }
 
-  Test::SubExporter::SETUPALT->import(':all');
-  eval { X() };
-  main::like($@, qr/undefined subroutine/i, "X didn't get imported");
+  {
+    package Test::SubExporter::SETUP::ALTCONSUMER;
 
-  eval { Y() };
-  main::like($@, qr/undefined subroutine/i, "Y didn't get imported");
+    Test::SubExporter::SETUPALT->import(':all');
+    eval { X() };
+    main::like($@, qr/undefined subroutine/i, "X didn't get imported");
 
-  Test::SubExporter::SETUPALT->alternimport(':all');
-  main::is(Y(), "other", "other importer (via -setup { -as ...}) worked");
+    eval { Y() };
+    main::like($@, qr/undefined subroutine/i, "Y didn't get imported");
+
+    Test::SubExporter::SETUPALT->alternimport(':all');
+    main::is(Y(), "other", "other importer (via -setup { -as ...}) worked");
+  }
 }

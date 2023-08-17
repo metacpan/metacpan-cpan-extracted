@@ -1,5 +1,11 @@
 Revision history for Acme-Color-Rust
 
+0.05      2023-06-14 17:19:47 -0600
+  - Use `*std::os::raw::c_char` instead of `*i8`
+    for C strings.  This is more portable and fixes
+    the build on Linux Arm64 and probably other
+    platforms (gh#5)
+
 0.04      2022-10-25 07:29:33 -0600
   - Rustfmt rust source (gh#4)
 

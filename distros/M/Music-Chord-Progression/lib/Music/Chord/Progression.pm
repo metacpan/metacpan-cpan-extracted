@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Create network transition chord progressions
 
-our $VERSION = '0.0605';
+our $VERSION = '0.0609';
 
 use Moo;
 use strictures 2;
@@ -40,10 +40,24 @@ has net => (
 
 
 has chord_map => (
-    is      => 'ro',
-    isa     => sub { croak "$_[0] is not an arrayref" unless ref $_[0] eq 'ARRAY' },
-    default => sub { ['', 'm', 'm', '', '', 'm', 'dim'] },
+    is => 'lazy',
 );
+sub _build_chord_map {
+    my ($self) = @_;
+    my %scale = (
+        chromatic  => [ ('m') x 12 ],
+        major      => [ '',    'm',   'm',   '',    '',    'm',   'dim' ],
+        ionian     => [ '',    'm',   'm',   '',    '',    'm',   'dim' ],
+        dorian     => [ 'm',   'm',   '',    '',    'm',   'dim', ''    ],
+        phrygian   => [ 'm',   '',    '',    'm',   'dim', '',    'm'   ],
+        lydian     => [ '',    '',    'm',   'dim', '',    'm',   'm'   ],
+        mixolydian => [ '',    'm',   'dim', '',    'm',   'm',   ''    ],
+        minor      => [ 'm',   'dim', '',    'm',   'm',   '',    ''    ],
+        aeolian    => [ 'm',   'dim', '',    'm',   'm',   '',    ''    ],
+        locrian    => [ 'dim', '',    'm',   'm',   '',    '',    'm'   ],
+    );
+    return $scale{ $self->scale_name };
+}
 
 
 has scale_name => (
@@ -68,7 +82,26 @@ has scale => (
 sub _build_scale {
     my ($self) = @_;
     my @scale = get_scale_notes($self->scale_note, $self->scale_name);
-    print 'Scale: ', ddc(\@scale) if $self->verbose;
+    my %equiv = (
+        'C#'  => 'Db',
+        'D#'  => 'Eb',
+        'E#'  => 'F',
+        'F#'  => 'Gb',
+        'G#'  => 'Ab',
+        'A#'  => 'Bb',
+        'B#'  => 'C',
+        'Cb'  => 'B',
+        'Dbb' => 'C',
+        'Ebb' => 'D',
+        'Fb'  => 'E',
+        'Gbb' => 'F',
+        'Abb' => 'G',
+        'Bbb' => 'A',
+    );
+    for (@scale) {
+        $_ = $equiv{$_} if exists $equiv{$_};
+    }
+    print ucfirst($self->scale_name), ' scale: ', ddc(\@scale) if $self->verbose;
     return \@scale;
 }
 
@@ -334,7 +367,7 @@ Music::Chord::Progression - Create network transition chord progressions
 
 =head1 VERSION
 
-version 0.0605
+version 0.0609
 
 =head1 SYNOPSIS
 
@@ -414,9 +447,25 @@ The chord names of each scale position.
 The number of items in this list must be equal to the number of keys
 in the B<net>.
 
-Default: C<[ '', 'm', 'm', '', '', 'm', 'dim' ]>
+Default: C<[ '', 'm', 'm', '', '', 'm', 'dim' ]> (major scale)
 
 Here C<''> refers to the major chord and C<'m'> means minor.
+
+Here are the known chord mappings:
+
+  chromatic  => [ ('m') x 12 ],
+  major      => [ '',    'm',   'm',   '',    '',    'm',   'dim' ],
+  ionian     => [ '',    'm',   'm',   '',    '',    'm',   'dim' ],
+  dorian     => [ 'm',   'm',   '',    '',    'm',   'dim', ''    ],
+  phrygian   => [ 'm',   '',    '',    'm',   'dim', '',    'm'   ],
+  lydian     => [ '',    '',    'm',   'dim', '',    'm',   'm'   ],
+  mixolydian => [ '',    'm',   'dim', '',    'm',   'm',   ''    ],
+  minor      => [ 'm',   'dim', '',    'm',   'm',   '',    ''    ],
+  aeolian    => [ 'm',   'dim', '',    'm',   'm',   '',    ''    ],
+  locrian    => [ 'dim', '',    'm',   'm',   '',    '',    'm'   ],
+
+If B<chord_map>  is not defined and a known B<scale_name> is given to
+the constructor, the corresponding B<chord_map> above, will be used.
 
 Alternative example:
 
@@ -577,7 +626,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2020-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

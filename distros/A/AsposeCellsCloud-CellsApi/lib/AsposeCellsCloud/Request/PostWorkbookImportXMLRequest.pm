@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookImportXMLRequest.name :   ,
-# PostWorkbookImportXMLRequest.importXMLRequest :   ,
+# PostWorkbookImportXMLRequest.name : The workbook(Excel/ODS/...) name.  ,
+# PostWorkbookImportXMLRequest.importXMLRequest : password  ,
 # PostWorkbookImportXMLRequest.password :   ,
-# PostWorkbookImportXMLRequest.folder :   ,
-# PostWorkbookImportXMLRequest.storageName :   ,
-# PostWorkbookImportXMLRequest.outPath :   ,
-# PostWorkbookImportXMLRequest.outStorageName :   ,
-# PostWorkbookImportXMLRequest.checkExcelRestriction :    
+# PostWorkbookImportXMLRequest.folder : Original workbook folder.  ,
+# PostWorkbookImportXMLRequest.storageName : Storage name.  ,
+# PostWorkbookImportXMLRequest.outPath : Output file path.  ,
+# PostWorkbookImportXMLRequest.outStorageName : Storage name for output file.  ,
+# PostWorkbookImportXMLRequest.checkExcelRestriction : check Excel restriction.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_import_xml' } = { 
-    	summary => '',
+    	summary => 'Imports/Updates an XML data file into the workbook.The XML data file can be a cloud file or HTTP URI data.',
         params => $params,
         returns => 'string',
     };
@@ -150,14 +150,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook(Excel/ODS/...) name.',
      	format => '',
      	read_only => '',
      		},
      'import_xml_request' => {
      	datatype => 'ImportXMLRequest',
      	base_name => 'importXMLRequest',
-     	description => '',
+     	description => 'password',
      	format => '',
      	read_only => '',
      		},
@@ -171,35 +171,35 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => '',
+     	description => 'Output file path.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => '',
+     	description => 'Storage name for output file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'check Excel restriction.',
      	format => '',
      	read_only => '',
      		},    

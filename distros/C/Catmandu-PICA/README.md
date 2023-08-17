@@ -29,6 +29,7 @@ introduction into Catmandu.
 - [Catmandu::Fix::Bind::pica\_each](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_each)
 - [Catmandu::Fix::Bind::pica\_diff](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_diff)
 - [Catmandu::Fix::Condition::pica\_match](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ACondition%3A%3Apica_match)
+- [Catmandu::Fix::pica\_update](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_update)
 - [Catmandu::Fix::pica\_add](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_add)
 - [Catmandu::Fix::pica\_set](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_set)
 - [Catmandu::Importer::PICA](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3APICA)

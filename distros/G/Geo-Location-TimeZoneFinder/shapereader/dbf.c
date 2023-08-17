@@ -10,31 +10,69 @@
 /* SPDX-License-Identifier: ISC OR Artistic-1.0-Perl OR GPL-1.0-or-later */
 
 #include "dbf.h"
-#include "convert.h"
+#include "byteorder.h"
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define SIZEOF16(x) (((sizeof(x) + 15) >> 4) << 4)
+
+static size_t
+file_fread(dbf_file_t *fh, void *buf, size_t count)
+{
+    size_t nr = fread(buf, 1, count, (FILE *) fh->stream);
+    fh->num_bytes += nr;
+    return nr;
+}
+
+static int
+file_feof(dbf_file_t *fh)
+{
+    return feof((FILE *) fh->stream);
+}
+
+static int
+file_ferror(dbf_file_t *fh)
+{
+    return ferror((FILE *) fh->stream);
+}
+
+static int
+file_fsetpos(dbf_file_t *fh, size_t offset)
+{
+    if (offset > LONG_MAX) {
+        errno = EINVAL;
+        return -1;
+    }
+    return fseek((FILE *) fh->stream, (long) offset, SEEK_SET);
+}
+
 dbf_file_t *
-dbf_file(dbf_file_t *fh, FILE *fp, void *user_data)
+dbf_init_file(dbf_file_t *fh, FILE *stream, void *user_data)
 {
     assert(fh != NULL);
-    assert(fp != NULL);
+    assert(stream != NULL);
 
-    fh->fp = fp;
+    fh->stream = stream;
+    fh->fread = file_fread;
+    fh->feof = file_feof;
+    fh->ferror = file_ferror;
+    fh->fsetpos = file_fsetpos;
     fh->user_data = user_data;
     fh->num_bytes = 0;
     fh->error[0] = '\0';
-    fh->_record_size = 0;
+    fh->header_size = 0;
+    fh->record_size = 0;
 
     return fh;
 }
 
 void
-dbf_error(dbf_file_t *fh, const char *format, ...)
+dbf_set_error(dbf_file_t *fh, const char *format, ...)
 {
     va_list ap;
 
@@ -50,7 +88,7 @@ static size_t
 field_size(const dbf_field_t *field)
 {
     size_t n;
-    if (field->type == DBFT_CHARACTER) {
+    if (field->type == DBF_TYPE_CHARACTER) {
         n = (field->decimal_places << 8) | field->length;
     }
     else {
@@ -61,16 +99,16 @@ field_size(const dbf_field_t *field)
 
 static void
 get_bytes_readonly(const dbf_record_t *record, const dbf_field_t *field,
-                   const char **pbytes, size_t *plen)
+                   const char **pbytes, size_t *len)
 {
-    *pbytes = record->_bytes + field->_offset;
-    *plen = field->_size;
+    *pbytes = record->bytes + field->offset;
+    *len = field->size;
 }
 
 static void
 get_left_justified_string(const dbf_record_t *record,
                           const dbf_field_t *field, const char **pstr,
-                          size_t *plen)
+                          size_t *len)
 {
     const char *s;
     size_t n;
@@ -80,13 +118,13 @@ get_left_justified_string(const dbf_record_t *record,
         --n;
     }
     *pstr = s;
-    *plen = n;
+    *len = n;
 }
 
 static void
 get_right_justified_string(const dbf_record_t *record,
                            const dbf_field_t *field, const char **pstr,
-                           size_t *plen)
+                           size_t *len)
 {
     const char *s;
     size_t n;
@@ -97,39 +135,211 @@ get_right_justified_string(const dbf_record_t *record,
         --n;
     }
     *pstr = s;
-    *plen = n;
+    *len = n;
+}
+
+static int
+is_leap_year(int year)
+{
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+}
+
+static int
+days_in_month(int month, int year)
+{
+    int i;
+    const int days_in_month[2][12] = {
+        {31, 28, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31},
+        {31, 29, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31},
+    };
+
+    assert(month >= 1);
+    assert(month <= 12);
+
+    i = is_leap_year(year) ? 1 : 0;
+    return days_in_month[i][month - 1];
+}
+
+static int
+day_of_week(int day, int month, int year)
+{
+    static const int t[12] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+
+    assert(month >= 1);
+    assert(month <= 12);
+
+    if (month < 3) {
+        year -= 1;
+    }
+    return (year + year / 4 - year / 100 + year / 400 + t[month - 1] + day) %
+           7;
+}
+
+static int
+day_of_year(int day, int month, int year)
+{
+    int i;
+    const int days_for_month[2][12] = {
+        {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334},
+        {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335},
+    };
+
+    assert(month >= 1);
+    assert(month <= 12);
+
+    i = is_leap_year(year) ? 1 : 0;
+    return days_for_month[i][month - 1] + day;
+}
+
+void
+dbf_jd_to_tm(int32_t jd, int32_t jt, struct tm *tm)
+{
+    int sec, min, hour, day, month, year;
+    int64_t a, b, c, d, e, alpha;
+    double s, m, h;
+    const double month_days_without_jan_feb = (365 - 31 - 28) / 10.0;
+
+    assert(tm != NULL);
+
+    a = jd;
+    if (jd >= 2299161) {
+        alpha = (int64_t) ((jd - 1867216.25) / 36524.25);
+        a = a + 1 + alpha - (alpha >> 2);
+    }
+    b = a + 1524;
+    c = (int64_t) ((b - 122.1) / 365.25);
+    d = (int64_t) (c * 365.25);
+    e = (int64_t) ((b - d) / month_days_without_jan_feb);
+    day = (int) (b - d - (int64_t) (e * month_days_without_jan_feb));
+    if (e > 13) {
+        month = (int) (e - 13);
+    }
+    else {
+        month = (int) (e - 1);
+    }
+    if (month == 2 && day > 28) {
+        day = 29;
+    }
+    if (month == 2 && day == 29 && e == 3) {
+        year = (int) (c - 4716);
+    }
+    else if (month > 2) {
+        year = (int) (c - 4716);
+    }
+    else {
+        year = (int) (c - 4715);
+    }
+
+    s = jt / 1000.0;
+    m = s / 60.0;
+    h = m / 60.0;
+    hour = (int) h;
+    min = (int) ((h - hour) * 60.0);
+    sec = (int) ((m - min) * 60.0 - hour * 3600.0);
+
+    memset(tm, 0, sizeof(*tm)); /* NOLINT */
+    tm->tm_sec = sec;
+    tm->tm_min = min;
+    tm->tm_hour = hour;
+    tm->tm_mday = day;
+    tm->tm_mon = month - 1;
+    tm->tm_year = year - 1900;
+    tm->tm_wday = (int) ((jd + 1) % 7);
+    tm->tm_yday = day_of_year(day, month, year) - 1;
+    tm->tm_isdst = -1;
+}
+
+int
+dbf_yyyymmdd_to_tm(const char *ymd, size_t n, struct tm *tm)
+{
+    int ok = 0;
+    int day = 0, month = 0, year = 0, wday = 0, yday = 0;
+    size_t a, i, k, z;
+    int c;
+
+    assert(ymd != NULL);
+    assert(tm != NULL);
+
+    k = 0;
+    z = 1;
+    i = n;
+    while (i > 0 && (c = ymd[i - 1]) >= '0' && c <= '9') {
+        a = c - '0';
+        switch (k) {
+        case 0:
+            day = a;
+            break;
+        case 1:
+            day += 10 * a;
+            break;
+        case 2:
+            month = a;
+            break;
+        case 3:
+            month += 10 * a;
+            break;
+        default:
+            year += z * a;
+            z *= 10;
+            break;
+        }
+        ++k;
+        --i;
+    }
+
+    if (i == 0 && k >= 8) {
+        if (month >= 1 && month <= 12) {
+            if (day >= 1 && day <= days_in_month(month, year)) {
+                wday = day_of_week(day, month, year);
+                yday = day_of_year(day, month, year);
+                ok = 1;
+            }
+        }
+    }
+
+    memset(tm, 0, sizeof(*tm)); /* NOLINT */
+    if (ok) {
+        tm->tm_mday = day;
+        tm->tm_mon = month - 1;
+        tm->tm_year = year - 1900;
+        tm->tm_wday = wday;
+        tm->tm_yday = yday - 1;
+    }
+    tm->tm_isdst = -1;
+
+    return ok;
 }
 
 void
 dbf_record_bytes(const dbf_record_t *record, const dbf_field_t *field,
-                 const char **pbytes, size_t *plen)
+                 const char **pbytes, size_t *len)
 {
     assert(record != NULL);
     assert(field != NULL);
     assert(pbytes != NULL);
-    assert(plen != NULL);
+    assert(len != NULL);
 
-    get_bytes_readonly(record, field, pbytes, plen);
+    get_bytes_readonly(record, field, pbytes, len);
 }
 
 int
 dbf_record_date(const dbf_record_t *record, const dbf_field_t *field,
-                struct tm *ptm)
+                struct tm *tm)
 {
     const char *s;
     size_t n;
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(ptm != NULL);
+    assert(tm != NULL);
 
     get_bytes_readonly(record, field, &s, &n);
-    return shp_yyyymmdd_to_tm(s, n, ptm);
+    return dbf_yyyymmdd_to_tm(s, n, tm);
 }
 
 int
 dbf_record_datetime(const dbf_record_t *record, const dbf_field_t *field,
-                    struct tm *ptm)
+                    struct tm *tm)
 {
     int ok = 0;
     const char *bytes;
@@ -138,7 +348,7 @@ dbf_record_datetime(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(ptm != NULL);
+    assert(tm != NULL);
 
     get_bytes_readonly(record, field, &bytes, &n);
     if (n == 8) {
@@ -146,13 +356,13 @@ dbf_record_datetime(const dbf_record_t *record, const dbf_field_t *field,
         jt = shp_le32_to_int32(&bytes[4]);
         ok = 1;
     }
-    shp_jd_to_tm(jdn, jt, ptm);
+    dbf_jd_to_tm(jdn, jt, tm);
     return ok;
 }
 
 int
 dbf_record_double(const dbf_record_t *record, const dbf_field_t *field,
-                  double *pvalue)
+                  double *value)
 {
     int ok = 0;
     const char *bytes;
@@ -161,20 +371,20 @@ dbf_record_double(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_bytes_readonly(record, field, &bytes, &n);
     if (n == 8) {
         d = shp_le64_to_double(bytes);
         ok = 1;
     }
-    *pvalue = d;
+    *value = d;
     return ok;
 }
 
 int
 dbf_record_int32(const dbf_record_t *record, const dbf_field_t *field,
-                 int32_t *pvalue)
+                 int32_t *value)
 {
     int ok = 0;
     const char *bytes;
@@ -183,20 +393,20 @@ dbf_record_int32(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_bytes_readonly(record, field, &bytes, &n);
     if (n == 4) {
         i = shp_le32_to_int32(bytes);
         ok = 1;
     }
-    *pvalue = i;
+    *value = i;
     return ok;
 }
 
 int
 dbf_record_int64(const dbf_record_t *record, const dbf_field_t *field,
-                 int64_t *pvalue)
+                 int64_t *value)
 {
     int ok = 0;
     int64_t i = 0;
@@ -205,21 +415,21 @@ dbf_record_int64(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_bytes_readonly(record, field, &bytes, &n);
     if (n == 8) {
         i = shp_le64_to_int64(&bytes[0]);
         ok = 1;
     }
-    *pvalue = i;
+    *value = i;
     return ok;
 }
 
 int
 dbf_record_is_deleted(const dbf_record_t *record)
 {
-     return (record->_bytes[0] == '*');
+    return (record->bytes[0] == '*');
 }
 
 static int
@@ -246,20 +456,20 @@ dbf_record_is_null(const dbf_record_t *record, const dbf_field_t *field)
     assert(field != NULL);
 
     switch (field->type) {
-    case DBFT_CHARACTER:
+    case DBF_TYPE_CHARACTER:
         get_left_justified_string(record, field, &s, &n);
         is_null = (n == 0);
         break;
-    case DBFT_DATE:
+    case DBF_TYPE_DATE:
         get_left_justified_string(record, field, &s, &n);
         is_null = (n == 0 || is_all(s, n, '0'));
         break;
-    case DBFT_FLOAT:
-    case DBFT_NUMBER:
+    case DBF_TYPE_FLOAT:
+    case DBF_TYPE_NUMBER:
         get_right_justified_string(record, field, &s, &n);
         is_null = (n == 0 || s[0] == '*');
         break;
-    case DBFT_LOGICAL:
+    case DBF_TYPE_LOGICAL:
         switch (dbf_record_logical(record, field)) {
         case 'F':
         case 'f':
@@ -366,19 +576,19 @@ dbf_record_strdup(const dbf_record_t *record, const dbf_field_t *field)
 
 void
 dbf_record_string(const dbf_record_t *record, const dbf_field_t *field,
-                  const char **pstr, size_t *plen)
+                  const char **pstr, size_t *len)
 {
     assert(record != NULL);
     assert(field != NULL);
     assert(pstr != NULL);
-    assert(plen != NULL);
+    assert(len != NULL);
 
-    get_left_justified_string(record, field, pstr, plen);
+    get_left_justified_string(record, field, pstr, len);
 }
 
 int
 dbf_record_strtod(const dbf_record_t *record, const dbf_field_t *field,
-                  double *pvalue)
+                  double *value)
 {
     int ok = 0;
     double d = 0.0;
@@ -388,7 +598,7 @@ dbf_record_strtod(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -399,13 +609,13 @@ dbf_record_strtod(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = d;
+    *value = d;
     return ok;
 }
 
 int
 dbf_record_strtol(const dbf_record_t *record, const dbf_field_t *field,
-                  int base, long *pvalue)
+                  int base, long *value)
 {
     int ok = 0;
     long l = 0;
@@ -415,7 +625,7 @@ dbf_record_strtol(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -426,13 +636,13 @@ dbf_record_strtol(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = l;
+    *value = l;
     return ok;
 }
 
 int
 dbf_record_strtold(const dbf_record_t *record, const dbf_field_t *field,
-                   long double *pvalue)
+                   long double *value)
 {
     int ok = 0;
     long double d = 0.0;
@@ -442,7 +652,7 @@ dbf_record_strtold(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -453,13 +663,13 @@ dbf_record_strtold(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = d;
+    *value = d;
     return ok;
 }
 
 int
 dbf_record_strtoll(const dbf_record_t *record, const dbf_field_t *field,
-                   int base, long long *pvalue)
+                   int base, long long *value)
 {
     int ok = 0;
     long long l = 0;
@@ -469,7 +679,7 @@ dbf_record_strtoll(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -480,13 +690,13 @@ dbf_record_strtoll(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = l;
+    *value = l;
     return ok;
 }
 
 int
 dbf_record_strtoul(const dbf_record_t *record, const dbf_field_t *field,
-                   int base, unsigned long *pvalue)
+                   int base, unsigned long *value)
 {
     int ok = 0;
     unsigned long l = 0;
@@ -496,7 +706,7 @@ dbf_record_strtoul(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -507,13 +717,13 @@ dbf_record_strtoul(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = l;
+    *value = l;
     return ok;
 }
 
 int
 dbf_record_strtoull(const dbf_record_t *record, const dbf_field_t *field,
-                    int base, unsigned long long *pvalue)
+                    int base, unsigned long long *value)
 {
     int ok = 0;
     unsigned long long l = 0;
@@ -523,7 +733,7 @@ dbf_record_strtoull(const dbf_record_t *record, const dbf_field_t *field,
 
     assert(record != NULL);
     assert(field != NULL);
-    assert(pvalue != NULL);
+    assert(value != NULL);
 
     get_right_justified_string(record, field, &s, &n);
     if (n > 0) {
@@ -534,41 +744,44 @@ dbf_record_strtoull(const dbf_record_t *record, const dbf_field_t *field,
             ok = (end[0] == '\0');
         }
     }
-    *pvalue = l;
+    *value = l;
     return ok;
 }
 
 static dbf_version_t
 database_type(dbf_version_t version)
 {
-    dbf_version_t type = 0;
+    dbf_version_t type;
 
     switch (version) {
-    case DBFV_DBASE2:
-        type = DBFV_DBASE2;
+    case DBF_VERSION_DBASE2:
+        type = DBF_VERSION_DBASE2;
         break;
-    case DBFV_DBASE3:
-    case DBFV_DBASE3_MEMO:
-    case DBFV_DBASE4:
-    case DBFV_DBASE4_MEMO:
-    case DBFV_DBASE5:
-    case DBFV_FOXPRO_MEMO:
-    case DBFV_VISUAL_FOXPRO:
-    case DBFV_VISUAL_FOXPRO_AUTO:
-    case DBFV_VISUAL_FOXPRO_VARIFIELD:
-    case DBFV_VISUAL_OBJECTS:
-    case DBFV_VISUAL_OBJECTS_MEMO:
-        type = DBFV_DBASE3;
+    case DBF_VERSION_DBASE3:
+    case DBF_VERSION_DBASE3_MEMO:
+    case DBF_VERSION_DBASE4:
+    case DBF_VERSION_DBASE4_MEMO:
+    case DBF_VERSION_DBASE5:
+    case DBF_VERSION_FOXPRO_MEMO:
+    case DBF_VERSION_VISUAL_FOXPRO:
+    case DBF_VERSION_VISUAL_FOXPRO_AUTO:
+    case DBF_VERSION_VISUAL_FOXPRO_VARIFIELD:
+    case DBF_VERSION_VISUAL_OBJECTS:
+    case DBF_VERSION_VISUAL_OBJECTS_MEMO:
+        type = DBF_VERSION_DBASE3;
         break;
-    case DBFV_DBASE7:
-        type = DBFV_DBASE7;
+    case DBF_VERSION_DBASE7:
+        type = DBF_VERSION_DBASE7;
+        break;
+    default:
+        type = DBF_VERSION_UNKNOWN;
         break;
     }
     return type;
 }
 
 static void
-get_field_dbase2(const char *buf, size_t *poffset, dbf_field_t *field)
+get_field_dbase2(const char *buf, size_t *offset, dbf_field_t *field)
 {
     int i;
 
@@ -582,13 +795,13 @@ get_field_dbase2(const char *buf, size_t *poffset, dbf_field_t *field)
         field->reserved[i] = 0;
     }
 
-    field->_size = field_size(field);
-    field->_offset = *poffset;
-    *poffset += field->_size;
+    field->size = field_size(field);
+    field->offset = *offset;
+    *offset += field->size;
 }
 
 static void
-get_field_dbase3(const char *buf, size_t *poffset, dbf_field_t *field)
+get_field_dbase3(const char *buf, size_t *offset, dbf_field_t *field)
 {
     int i;
 
@@ -602,9 +815,9 @@ get_field_dbase3(const char *buf, size_t *poffset, dbf_field_t *field)
         field->reserved[i] = (unsigned char) buf[18 + i];
     }
 
-    field->_size = field_size(field);
-    field->_offset = *poffset;
-    *poffset += field->_size;
+    field->size = field_size(field);
+    field->offset = *offset;
+    *offset += field->size;
 }
 
 static int
@@ -622,15 +835,14 @@ read_header_dbase2(dbf_file_t *fh, dbf_version_t version,
     dbf_header_t *header = NULL;
 
     header_size = 521;
-    nr = fread(&buf[1], 1, header_size - 1, fh->fp);
-    fh->num_bytes += nr;
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read file header");
+    nr = (*fh->fread)(fh, &buf[1], header_size - 1);
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read file header");
         goto cleanup;
     }
     if (nr != header_size - 1) {
-        dbf_error(fh, "Expected file header of %zu bytes, got %zu",
-                  header_size, nr + 1);
+        dbf_set_error(fh, "Expected file header of %zu bytes, got %zu",
+                      header_size, nr + 1);
         errno = EINVAL;
         goto cleanup;
     }
@@ -643,7 +855,7 @@ read_header_dbase2(dbf_file_t *fh, dbf_version_t version,
     descriptors = &buf[8];
 
     if (record_size < 1) {
-        dbf_error(fh, "Record size %zu is invalid", record_size);
+        dbf_set_error(fh, "Record size %zu is invalid", record_size);
         errno = EINVAL;
         goto cleanup;
     }
@@ -655,14 +867,14 @@ read_header_dbase2(dbf_file_t *fh, dbf_version_t version,
         n += 16;
     }
 
-    result_size = sizeof(*header) + num_fields * sizeof(dbf_field_t);
+    result_size = SIZEOF16(*header) + num_fields * sizeof(dbf_field_t);
     header = (dbf_header_t *) calloc(1, result_size);
     if (header == NULL) {
-        dbf_error(fh, "Cannot allocate %zu bytes", result_size);
+        dbf_set_error(fh, "Cannot allocate %zu bytes", result_size);
         goto cleanup;
     }
 
-    fields = (dbf_field_t *) (((char *) header) + sizeof(*header));
+    fields = (dbf_field_t *) (void *) (((char *) header) + SIZEOF16(*header));
 
     header->version = version;
     header->year = year;
@@ -688,17 +900,11 @@ read_header_dbase2(dbf_file_t *fh, dbf_version_t version,
     }
 
     if (offset != record_size) {
-        dbf_error(fh, "Sum %zu of field lengths differs from record size %zu",
-                  offset, record_size);
+        dbf_set_error(fh,
+                      "Sum %zu of field lengths differs from record size %zu",
+                      offset, record_size);
         free(header);
         header = NULL;
-        goto cleanup;
-    }
-
-    if (feof(fh->fp)) {
-        free(header);
-        header = NULL;
-        rc = 0;
         goto cleanup;
     }
 
@@ -725,15 +931,14 @@ read_header_dbase3(dbf_file_t *fh, dbf_version_t version,
     dbf_field_t *fields, *field, **field_next;
     dbf_header_t *header = NULL;
 
-    nr = fread(&buf[1], 1, 31, fh->fp);
-    fh->num_bytes += nr;
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read file header");
+    nr = (*fh->fread)(fh, &buf[1], 31);
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read file header");
         goto cleanup;
     }
     if (nr != 31) {
-        dbf_error(fh, "Expected file header of %zu bytes, got %zu",
-                  (size_t) 32, nr + 1);
+        dbf_set_error(fh, "Expected file header of %zu bytes, got %zu",
+                      (size_t) 32, nr + 1);
         errno = EINVAL;
         goto cleanup;
     }
@@ -746,44 +951,41 @@ read_header_dbase3(dbf_file_t *fh, dbf_version_t version,
     record_size = shp_le16_to_uint16(&buf[10]);
 
     if (header_size < 32) {
-        dbf_error(fh, "Header size %zu is invalid", header_size);
+        dbf_set_error(fh, "Header size %zu is invalid", header_size);
         errno = EINVAL;
         goto cleanup;
     }
 
     if (record_size < 1) {
-        dbf_error(fh, "Record size %zu is invalid", record_size);
+        dbf_set_error(fh, "Record size %zu is invalid", record_size);
         errno = EINVAL;
         goto cleanup;
     }
 
     descriptors_size = header_size - 32;
     if (descriptors_size == 0) {
-        dbf_error(fh, "No field descriptors");
+        dbf_set_error(fh, "No field descriptors");
         errno = EINVAL;
         goto cleanup;
     }
 
     descriptors = (char *) malloc(descriptors_size);
     if (descriptors == NULL) {
-        dbf_error(fh, "Cannot allocate %zu bytes", descriptors_size);
+        dbf_set_error(fh, "Cannot allocate %zu bytes", descriptors_size);
         goto cleanup;
     }
 
-    nr = fread(descriptors, 1, descriptors_size, fh->fp);
-    fh->num_bytes += nr;
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read field descriptors");
+    nr = (*fh->fread)(fh, descriptors, descriptors_size);
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read field descriptors");
         goto cleanup;
     }
     if (nr != descriptors_size) {
-        dbf_error(fh, "Expected field descriptors of %zu bytes, got %zu",
-                  descriptors_size, nr);
+        dbf_set_error(fh, "Expected field descriptors of %zu bytes, got %zu",
+                      descriptors_size, nr);
         errno = EINVAL;
         goto cleanup;
     }
-
-    fh->_record_size = record_size;
 
     num_fields = 0;
     n = 0;
@@ -793,19 +995,20 @@ read_header_dbase3(dbf_file_t *fh, dbf_version_t version,
     }
 
     if (num_fields > 2046) {
-        dbf_error(fh, "Expected at most %d fields, got %d", 2046, num_fields);
+        dbf_set_error(fh, "Expected at most %d fields, got %d", 2046,
+                      num_fields);
         errno = EINVAL;
         goto cleanup;
     }
 
-    result_size = sizeof(*header) + num_fields * sizeof(dbf_field_t);
+    result_size = SIZEOF16(*header) + num_fields * sizeof(dbf_field_t);
     header = (dbf_header_t *) calloc(1, result_size);
     if (header == NULL) {
-        dbf_error(fh, "Cannot allocate %zu bytes", result_size);
+        dbf_set_error(fh, "Cannot allocate %zu bytes", result_size);
         goto cleanup;
     }
 
-    fields = (dbf_field_t *) (((char *) header) + sizeof(*header));
+    fields = (dbf_field_t *) (void *) (((char *) header) + SIZEOF16(*header));
 
     header->version = version;
     header->year = year;
@@ -834,17 +1037,11 @@ read_header_dbase3(dbf_file_t *fh, dbf_version_t version,
     }
 
     if (offset != record_size) {
-        dbf_error(fh, "Sum %zu of field lengths differs from record size %zu",
-                  offset, record_size);
+        dbf_set_error(fh,
+                      "Sum %zu of field lengths differs from record size %zu",
+                      offset, record_size);
         free(header);
         header = NULL;
-        goto cleanup;
-    }
-
-    if (feof(fh->fp)) {
-        free(header);
-        header = NULL;
-        rc = 0;
         goto cleanup;
     }
 
@@ -868,33 +1065,37 @@ dbf_read_header(dbf_file_t *fh, dbf_header_t **pheader)
     dbf_version_t version;
 
     assert(fh != NULL);
-    assert(fh->fp != NULL);
     assert(pheader != NULL);
 
-    nr = fread(bytes, 1, 1, fh->fp);
-    fh->num_bytes += nr;
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read file version");
+    nr = (*fh->fread)(fh, bytes, 1);
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read file version");
         goto cleanup;
     }
     if (nr != 1) {
-        dbf_error(fh, "Expected 1 byte, got %zu", nr);
+        dbf_set_error(fh, "Expected 1 byte, got %zu", nr);
         errno = EINVAL;
         goto cleanup;
     }
 
     version = (dbf_version_t) bytes[0];
     switch (database_type(version)) {
-    case DBFV_DBASE2:
+    case DBF_VERSION_DBASE2:
         rc = read_header_dbase2(fh, version, pheader);
         break;
-    case DBFV_DBASE3:
+    case DBF_VERSION_DBASE3:
         rc = read_header_dbase3(fh, version, pheader);
         break;
     default:
-        dbf_error(fh, "Database version %d is not supported", version);
+        dbf_set_error(fh, "Database version %d is not supported", version);
         errno = EINVAL;
+        *pheader = NULL;
         goto cleanup;
+    }
+
+    if (*pheader != NULL) {
+        fh->header_size = (*pheader)->header_size;
+        fh->record_size = (*pheader)->record_size;
     }
 
 cleanup:
@@ -912,24 +1113,21 @@ dbf_read_record(dbf_file_t *fh, dbf_record_t **precord)
     size_t nr;
 
     assert(fh != NULL);
-    assert(fh->fp != NULL);
-    assert(fh->_record_size > 0);
+    assert(fh->record_size > 0);
     assert(precord != NULL);
 
-    record_size = fh->_record_size;
+    record_size = fh->record_size;
 
     result_size = sizeof(*record) + record_size;
     record = (dbf_record_t *) malloc(result_size);
     if (record == NULL) {
-        dbf_error(fh, "Cannot allocate %zu bytes", result_size);
+        dbf_set_error(fh, "Cannot allocate %zu bytes", result_size);
         goto cleanup;
     }
 
     buf = ((char *) record) + sizeof(*record);
-    record->_bytes = buf;
-    if ((nr = fread(buf, 1, record_size, fh->fp)) > 0) {
-        fh->num_bytes += nr;
-
+    record->bytes = buf;
+    if ((nr = (*fh->fread)(fh, buf, record_size)) > 0) {
         if (buf[0] == '\x1a') {
             /* Reached end-of-file marker. */
             free(record);
@@ -939,22 +1137,22 @@ dbf_read_record(dbf_file_t *fh, dbf_record_t **precord)
         }
 
         if (nr != record_size) {
-            dbf_error(fh, "Expected record of %zu bytes, got %zu",
-                      record_size, nr);
+            dbf_set_error(fh, "Expected record of %zu bytes, got %zu",
+                          record_size, nr);
             free(record);
             record = NULL;
             goto cleanup;
         }
     }
 
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read record");
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read record");
         free(record);
         record = NULL;
         goto cleanup;
     }
 
-    if (feof(fh->fp)) {
+    if ((*fh->feof)(fh)) {
         free(record);
         record = NULL;
         rc = 0;
@@ -962,6 +1160,34 @@ dbf_read_record(dbf_file_t *fh, dbf_record_t **precord)
     }
 
     rc = 1;
+
+cleanup:
+
+    *precord = record;
+
+    return rc;
+}
+
+int
+dbf_seek_record(dbf_file_t *fh, size_t record_number, dbf_record_t **precord)
+{
+    int rc = -1;
+    size_t file_offset;
+    dbf_record_t *record = NULL;
+
+    assert(fh != NULL);
+    assert(fh->header_size > 0);
+    assert(fh->record_size > 0);
+    assert(precord != NULL);
+
+    file_offset = record_number * fh->record_size + fh->header_size;
+    if ((*fh->fsetpos)(fh, file_offset) != 0) {
+        dbf_set_error(fh, "Cannot set file position to record number %zu\n",
+                      record_number);
+        goto cleanup;
+    }
+
+    rc = dbf_read_record(fh, &record);
 
 cleanup:
 
@@ -984,7 +1210,6 @@ dbf_read(dbf_file_t *fh, dbf_header_callback_t handle_header,
     size_t nr;
 
     assert(fh != NULL);
-    assert(fh->fp != NULL);
     assert(handle_header != NULL);
     assert(handle_record != NULL);
 
@@ -1001,7 +1226,7 @@ dbf_read(dbf_file_t *fh, dbf_header_callback_t handle_header,
     result_size = sizeof(*record) + record_size;
     record = (dbf_record_t *) malloc(result_size);
     if (record == NULL) {
-        dbf_error(fh, "Cannot allocate %zu bytes", result_size);
+        dbf_set_error(fh, "Cannot allocate %zu bytes", result_size);
         goto cleanup;
     }
 
@@ -1014,14 +1239,12 @@ dbf_read(dbf_file_t *fh, dbf_header_callback_t handle_header,
         goto cleanup;
     }
 
-    record_num = 0;
-
     buf = ((char *) record) + sizeof(*record);
-    record->_bytes = buf;
-    while ((nr = fread(buf, 1, record_size, fh->fp)) > 0) {
-        file_offset = fh->num_bytes;
-        fh->num_bytes += nr;
+    record->bytes = buf;
 
+    record_num = 0;
+    file_offset = fh->num_bytes;
+    while ((nr = (*fh->fread)(fh, buf, record_size)) > 0) {
         if (buf[0] == '\x1a') {
             /* Reached end-of-file marker. */
             rc = 0;
@@ -1029,10 +1252,10 @@ dbf_read(dbf_file_t *fh, dbf_header_callback_t handle_header,
         }
 
         if (nr != record_size) {
-            dbf_error(fh,
-                      "Expected record of %zu bytes at index %zu and "
-                      "file position %zu, got %zu",
-                      record_size, record_num, file_offset, nr);
+            dbf_set_error(fh,
+                          "Expected record of %zu bytes at index %zu and "
+                          "file position %zu, got %zu",
+                          record_size, record_num, file_offset, nr);
             goto cleanup;
         }
 
@@ -1045,22 +1268,23 @@ dbf_read(dbf_file_t *fh, dbf_header_callback_t handle_header,
             goto cleanup;
         }
 
+        file_offset = fh->num_bytes;
         ++record_num;
     }
 
-    if (ferror(fh->fp)) {
-        dbf_error(fh, "Cannot read record");
+    if ((*fh->ferror)(fh)) {
+        dbf_set_error(fh, "Cannot read record");
         goto cleanup;
     }
 
     if (record_num < num_records) {
-        dbf_error(fh, "Expected %zu records, got %zu", num_records,
-                  record_num);
+        dbf_set_error(fh, "Expected %zu records, got %zu", num_records,
+                      record_num);
         errno = EINVAL;
         goto cleanup;
     }
 
-    if (feof(fh->fp)) {
+    if ((*fh->feof)(fh)) {
         rc = 0;
         goto cleanup;
     }

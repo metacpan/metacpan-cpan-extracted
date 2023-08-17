@@ -160,7 +160,7 @@ int _is_NOK_and_POK(SV * in) {
   return 0;
 }
 
-MODULE = Math::MPFR::Random  PACKAGE = Math::MPFR::Random
+MODULE = Math::MPFR::Random  PACKAGE = Math::MPFR::Random  
 
 PROTOTYPES: DISABLE
 
@@ -204,7 +204,7 @@ OUTPUT:  RETVAL
 
 int
 _has_pv_nv_bug ()
-
+		
 
 int
 _is_NOK_and_POK (in)

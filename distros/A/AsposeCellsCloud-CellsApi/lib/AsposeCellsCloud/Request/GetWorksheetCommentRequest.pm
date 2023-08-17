@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCommentRequest.name :   ,
-# GetWorksheetCommentRequest.sheetName :   ,
-# GetWorksheetCommentRequest.cellName :   ,
-# GetWorksheetCommentRequest.folder :   ,
-# GetWorksheetCommentRequest.storageName :    
+# GetWorksheetCommentRequest.name : The workbook name.  ,
+# GetWorksheetCommentRequest.sheetName : The worksheet name.  ,
+# GetWorksheetCommentRequest.cellName : The cell name  ,
+# GetWorksheetCommentRequest.folder : Original workbook folder.  ,
+# GetWorksheetCommentRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_comment' } = { 
-    	summary => '',
+    	summary => 'Gets comment by cell name in worksheet.',
         params => $params,
         returns => 'CommentResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'cellName',
-     	description => '',
+     	description => 'The cell name',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

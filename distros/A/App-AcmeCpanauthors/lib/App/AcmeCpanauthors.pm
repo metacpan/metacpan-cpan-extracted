@@ -1,11 +1,13 @@
 package App::AcmeCpanauthors;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-06-17'; # DATE
+our $DIST = 'App-AcmeCpanauthors'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -171,7 +173,7 @@ sub acme_cpanauthors {
                 } else {
                     return [200, "OK",
                             [grep {!_should_skip($_)}
-                                 map {s/\AAcme::CPANAuthors:://; $_}
+                                 map {my $ac_mod = $_; $ac_mod =~ s/\AAcme::CPANAuthors:://; $ac_mod }
                                      grep {/Acme::CPANAuthors::/} sort @{$res->[2]}]];
                 }
             } elsif ($method eq 'metacpan') {
@@ -228,7 +230,7 @@ App::AcmeCpanauthors - Unofficial CLI for Acme::CPANAuthors
 
 =head1 VERSION
 
-This document describes version 0.003 of App::AcmeCpanauthors (from Perl distribution App-AcmeCpanauthors), released on 2017-07-07.
+This document describes version 0.004 of App::AcmeCpanauthors (from Perl distribution App-AcmeCpanauthors), released on 2023-06-17.
 
 =head1 SYNOPSIS
 
@@ -241,7 +243,7 @@ See the included script L<acme-cpanauthors>.
 
 Usage:
 
- acme_cpanauthors(%args) -> [status, msg, result, meta]
+ acme_cpanauthors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Unofficial CLI for Acme::CPANAuthors.
 
@@ -251,19 +253,19 @@ Examples:
 
 =item * List installed Acme::CPANAuthors::* modules:
 
- acme_cpanauthors( action => "list_installed");
+ acme_cpanauthors(action => "list_installed");
 
 =item * List available Acme::CPANAuthors::* modules on CPAN:
 
- acme_cpanauthors( action => "list_cpan");
+ acme_cpanauthors(action => "list_cpan");
 
 =item * Like previous example, but use local CPAN mirror first:
 
- acme_cpanauthors( action => "list_cpan", lcpan => 1);
+ acme_cpanauthors(action => "list_cpan", lcpan => 1);
 
 =item * List PAUSE ID's of Indonesian authors:
 
- acme_cpanauthors( module => "Indonesian", action => "list_ids");
+ acme_cpanauthors(module => "Indonesian", action => "list_ids");
 
 =back
 
@@ -275,9 +277,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<action>* => I<str>
 
+(No description)
+
 =item * B<detail> => I<bool>
 
-Display more information when listing modules/result.
+Display more information when listing modulesE<sol>result.
 
 =item * B<lcpan> => I<bool>
 
@@ -287,16 +291,17 @@ Use local CPAN mirror first when available (for -L).
 
 Acme::CPANAuthors::* module name, without Acme::CPANAuthors:: prefix.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -312,6 +317,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-AcmeCp
 
 Source repository is at L<https://github.com/perlancar/perl-App-AcmeCpanauthors>.
 
+=head1 SEE ALSO
+
+L<Acme::CPANAuthors> and C<Acme::CPANAuthors::*> modules.
+
+L<TableData::Acme::CPANAuthors>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-AcmeCpanauthors>
@@ -319,20 +359,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<Acme::CPANAuthors> and C<Acme::CPANAuthors::*> modules.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

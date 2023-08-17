@@ -174,6 +174,10 @@ sub _test_perl_command {
     # use subshell and redirection to capture all command output
     $command = "( echo; $command ) 2>&1" if $command;
 
+    # warn that `echo -n` doesn't work in darwin os, use printf instead
+    croak("echo -n doesn't work on darwin os, use printf instead")
+        if $command =~ /echo\s+-n/;
+
     # finished _test_per_command, return command
     return $command;
 }

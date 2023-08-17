@@ -220,7 +220,7 @@ sub write_private {
     local *FH;
     open FH, ">$key_file" or die "Cannot write key file";
     print FH MARK_BEGIN;
-    print FH encode_b64($b->bytes),"\n"; 
+    print FH encode_b64($b->bytes),"\n";
     print FH MARK_END;
     close FH;
 }
@@ -340,8 +340,8 @@ Net::SSH::Perl::Key::Ed25519 - Ed25519 key object
 I<Net::SSH::Perl::Key::Ed25519> subclasses I<Net::SSH::Perl::Key>
 to implement an OpenSSH key object.  It uses code taken from the
 SUPERCOP ref10 implementation to do the crypto heavy lifting.
-The I<Net::SSH::Perl::Buffer> class is used to create blobs and 
-transforms those it into a key object and to write keys to an 
+The I<Net::SSH::Perl::Buffer> class is used to create blobs and
+transforms those it into a key object and to write keys to an
 openssh-key-v1 file.
 
 =head1 USAGE
@@ -361,7 +361,7 @@ Returns the signature blob.
 
 Given a signature blob I<$signature> and the original signed data
 I<$data>, attempts to verify the signature using the public key
-portion of I<$key>. 
+portion of I<$key>.
 
 I<$signature> should be an SSH-compatible signature blob, as
 returned from I<sign>; I<$data> should be a string of data, as

@@ -261,7 +261,7 @@ E:not([href*=bar])
 --- selector
 F > E:nth-of-type(3)
 --- xpath
-//F/E[3]
+//F/E[count(preceding-sibling::E) = 2 and parent::*]
 
 ===
 --- selector
@@ -490,7 +490,7 @@ E#i:lang(c):first-child
 --- xpath
 //*[contains(concat(' ', normalize-space(@class), ' '), ' warning ')]
 
- 
+
 ===
 --- selector
 :nth-child(1)
@@ -520,6 +520,7 @@ E:nth-child(2)
 E:nth-child(even)
 --- xpath
 //E[not((count(preceding-sibling::*)+1)<0) and ((count(preceding-sibling::*) + 1) - 0) mod 2 = 0 and parent::*]
+
 ===
 --- selector
 E:nth-child(odd)
@@ -531,9 +532,22 @@ E:nth-child(odd)
 E:nth-child(2n)
 --- xpath
 //E[not((count(preceding-sibling::*)+1)<0) and ((count(preceding-sibling::*) + 1) - 0) mod 2 = 0 and parent::*]
+
 ===
 --- selector
 E:nth-child(2n+1)
+--- xpath
+//E[not((count(preceding-sibling::*)+1)<1) and ((count(preceding-sibling::*) + 1) - 1) mod 2 = 0 and parent::*]
+
+===
+--- selector
+E:nth-child(-n+3)
+--- xpath
+//E[not((count(preceding-sibling::*)+1)>3) and ((3 - (count(preceding-sibling::*) + 1)) mod 1) = 0 and parent::*]
+
+===
+--- selector
+E:nth-child(2n + 1)
 --- xpath
 //E[not((count(preceding-sibling::*)+1)<1) and ((count(preceding-sibling::*) + 1) - 1) mod 2 = 0 and parent::*]
 
@@ -626,7 +640,7 @@ option[ value="" ]
 ===
 --- selector
 tr[class!="wantedClass"]
-  
+
 --- xpath
 //tr[@class!='wantedClass']
 ===

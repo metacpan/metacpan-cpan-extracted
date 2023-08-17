@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'File or folder information',
                                   class => 'StorageFile',
                                   required => [], # TODO
 }                                 );
@@ -128,35 +128,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'File or folder name.',
      	format => '',
      	read_only => '',
      		},
      'is_folder' => {
      	datatype => 'boolean',
      	base_name => 'IsFolder',
-     	description => '',
+     	description => 'True if it is a folder.',
      	format => '',
      	read_only => '',
      		},
      'modified_date' => {
      	datatype => 'DateTime',
      	base_name => 'ModifiedDate',
-     	description => '',
+     	description => 'File or folder last modified DateTime.',
      	format => '',
      	read_only => '',
      		},
      'size' => {
      	datatype => 'int',
      	base_name => 'Size',
-     	description => '',
+     	description => 'File or folder size.',
      	format => '',
      	read_only => '',
      		},
      'path' => {
      	datatype => 'string',
      	base_name => 'Path',
-     	description => '',
+     	description => 'File or folder path.',
      	format => '',
      	read_only => '',
      		},    

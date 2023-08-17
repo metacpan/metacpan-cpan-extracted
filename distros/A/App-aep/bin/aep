@@ -1,224 +1,426 @@
-#!perl
+#!/usr/bin/env perl
 
-# Internal perl
-use 5.010001;
-use feature 'say';
-
-# Internal perl modules
+# Core
 use warnings;
 use strict;
-use Data::Dumper;
+use utf8;
+use v5.28;
 
-# External modules 
-use App::aep;
+# Experimental (stable)
+use experimental 'signatures';
+
+# External modules
 use YAML::XS;
 use Getopt::Long::Descriptive;
+use POE qw(Session::PlainCall);
+
+# Our modules
+use App::aep;
+
+# Debug
+use Data::Dumper;
+use Carp qw(cluck longmess shortmess);
 
 # Version of this software
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
-my $app = App::aep->new(\&signal_handle);
+# Config defaults
+my $opt_conf_def = { 'AEP_SOCKETPATH' => '/tmp/aep.sock', };
 
-my ($opt, $usage) = describe_options(
+# Option specs
+my @opt_desc = (
     'aep %o <some-arg>',
     [
         'config-env',
-        'Read config values from ehe enviroment only.',
+        'Read config values from the enviroment only.',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
-    [ 
-        'config-file',
+    [
+        'config-file=s',
         'Read config from a config file only.',
         {
-            default =>  0
-        }
+            'default' => '$unset',
+        },
     ],
-    [ 
+    [
         'config-args',
         'Read config values from arguments only.',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
-    [ 
+    [
         'config-merge',
         'Merge together env, file and args to generate a config.',
         {
-            default =>  1
-        }
+            'default' => 1,
+        },
     ],
-    [ 
+    [
         'config-order=s',
-        'The order to merge options together, comma separated, default is: env,file,args',
-        { 
-            default => 'env,file,args'
-        }
+'The order to merge options together, comma separated, default is: env,file,args',
+        {
+            'default' => 'env,file,args',
+        },
     ],
     [],
-    [ 
+    [
         'env-prefix=s',
-        'What prefix to look for on enviromentals, default is aep-',
+        'What prefix to look for aep config enviromentals, default is AEP_',
         {
-            default => 'aep-'
-        }
+            'default' => 'AEP_',
+        },
     ],
     [],
     [
         'command=s',
-        'What to actually run within the container, default is print aes help.'
+        'What to actually run within the container, default is print aes help.',
+        {
+            'default' => 'aep --help',
+        }
     ],
     [
         'command-args',
         'The arguments to add to the command, default is nothing.',
         {
-            default =>  'aep,--help'
-        }
+            'default' => "",
+        },
     ],
     [
         'command-restart=i',
-        'If the command exits how many times to retry it, default 0 set to -1 for infinate',
+'If the command exits how many times to retry it, default 0 set to -1 for infinate',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
     [
         'command-restart-delay=i',
-        'The time in milliseconds to wait before retrying the command, default 1000',
+'The time in milliseconds to wait before retrying the command, default 1000',
         {
-            default =>  1000
-        }
+            'default' => 1000,
+        },
     ],
     [],
     [
         'lock-server',
-        'Act like a lock server, this means we will expect other aeps to connect to us, we in turn will say when they should actually start, this is to counter-act race issues when starting multi image containers such as docker-compose, default: no',
+'Act like a lock server, this means we will expect other aeps to connect to us, we in turn will say when they should actually start, this is to counter-act race issues when starting multi image containers such as docker-compose, default: no',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
     [
         'lock-server-host=s',
         'What host to bind to, defaults to 0.0.0.0',
         {
-            default =>  '0.0.0.0'
-        }
+            'default' => '0.0.0.0',
+        },
     ],
     [
         'lock-server-port=i',
         'What port to bind to, defaults to 60000',
         {
-            default =>  60000
-        }
+            'default' => 60000,
+        },
     ],
     [
-        'lock-server-default-run',
+        'lock-server-default-run=i',
         'If we get sent an ID we do not know what to do with, tell it to run',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
     [
         'lock-server-default-ignore',
         'If we get sent an ID we do not know what to do with, ignore it',
         {
-            default =>  1
-        }
+            'default' => 1,
+        },
     ],
     [
         'lock-server-order',
-        'The list of ids and the order to allow them to run, allows OR || operators, for example: db,redis1||redis2,redis1||redis2,nginx',
+'The list of ids and the order to allow them to run, allows OR || operators, for example: db,redis1||redis2,redis1||redis2,nginx',
         {
-            default =>  ''
-        }
+            'default' => '',
+        },
     ],
     [
         'lock-server-exhaust-action=s',
-        'What to do if all clients have been started (list end), options are: exit, idle, restart or execute. The default is idle',
+'What to do if all clients have been started (list end), options are: exit, idle, restart or execute. The default is idle',
         {
-            default =>  'idle'
-        }
+            'default' => 'idle',
+        },
     ],
     [],
     [
         'lock-client',
-        'Become a lock client, this will mean your aep will connect to another aep to learn when it should run its command.',
+'Become a lock client, this will mean your aep will connect to another aep to learn when it should run its command.',
         {
-            default =>  0
-        }
+            'default' => 0,
+        },
     ],
     [
         'lock-server-host=s',
         'What host to connect to, defaults to: aep-master',
         {
-            default =>  'aep-master'
-        }
+            'default' => 'aep-master'
+        },
     ],
     [
         'lock-server-port=i',
         'What port to connect to, defaults to 60000',
         {
-            default =>  60000
-        }
+            'default' => 60000,
+        },
     ],
     [
         'lock-trigger=s',
-        'Please read perldoc App::aep example is to large for here, default is: none:time:10000',
+'Please read perldoc App::aep example is to large for here, default is: none:time:10000',
         {
-            default =>  'none:time:10000'
-        }
+            'default' => 'none:time:10000'
+        },
     ],
     [
         'lock-id=s',
         'What ID we should say we are, mandatory when acting as a lock-client',
         {
-            default =>  $$
-        }
+            'default' => $$,
+        },
     ],
     [],
-    [ 
+    [
         'help',
-        'print usage message and exit', 
-        { 
-            shortcircuit => 1 
-        } 
+        'print usage message and exit',
+        {
+            'shortcircuit' => 1,
+        },
+    ],
+    [
+        'help-config=s',
+'print configuration examples for: config-env, config-files, config-arg or config-merge eg: help-config config-env',
+        {
+            'shortcircuit' => 1,
+        },
+    ],
+    [
+        'help-config',
+        'print configuration examples',
+        {
+            'shortcircuit' => 1,
+        },
+    ],
+    [
+        'docker-health-check',
+'Call this from docker-compose for a health report, returns an exit of 0(success) or 1(failure)',
+        {
+            'default' => 0,
+        },
+    ],
+);
+my $opt_index = do {
+    my $opt_map;
+    my $opt_num = 0 - 1;
+    foreach my $opt_read (@opt_desc) {
+
+        # Increment out count every iteration
+        $opt_num++;
+
+        # Skip lines of text and blank arrays
+        if    ( ref($opt_read) ne 'ARRAY' )   { next }
+        elsif ( scalar( @{$opt_read} ) == 0 ) { next }
+
+        # Create a map to the item
+        $opt_map->{ $opt_read->[0] } = $opt_num;
+    }
+
+    # Return the map
+    $opt_map;
+};
+my @opt_spec = (
+    [
+        'command-restart=i',
+        'maximum number of command restarts',
+        {
+            'callbacks' => {
+                'is_positive' => sub { _check_positive_number(shift) },
+            },
+        },
+    ],
+    [
+        'config-file=s',
+        'specify a configuration file to use',
+        {
+            'callbacks' => {
+                'exists' => sub { _check_exists(shift) },
+            },
+        },
     ],
 );
 
-#print($usage->text), exit if 
-# say $usage->text;
+# Read in our options
+my ( $opt, $usage ) = describe_options( @opt_desc, @opt_spec );
 
-if (
-    $opt->help
-) 
-{
+if ( $opt->help ) {
     say $usage->text;
     exit 0;
 }
 
-say Dumper($opt);
+# Define our main function that starts out perl POE kernel
+sub main (@args) {
+    my $options = {};
 
-# Sub routines
+    # Default exit code of error
+    my $exit_code   = 1;
+    my $exit_reason = 'Unknown';
 
-sub signal_handle 
-{
-    my ($value,@other) = @_;
+    # Create a function to handle setting exit
+    my $exit_func = sub {
+        my ( $code, $reason ) = @_;
+        if   ( defined $code && $code =~ m#^\d+$# ) { $exit_code = $code }
+        else                                        { $exit_code = 1 }
+        if   ( defined $reason ) { $exit_reason = $reason }
+        else                     { $reason      = 'Unknown' }
+    };
 
-    say "Signal: $value";
+    # Create an appropriate heap for our session
+    my $func_map = _create_heap( $args[0], $args[1] );
+    $func_map->{'_'}->{'debug'}    = sub { _func_debug(@_) };
+    $func_map->{'_'}->{'set_exit'} = $exit_func;
 
-    if ($value eq 'INT') 
-    {
-        # Pass the message to children, then exit yourself or perhaps wait 
-        # on them dieing for a little while?
+    my $session = POE::Session::PlainCall->create(
+        'package'   => 'App::aep',
+        'ctor_args' => [$options],
+        'heap'      => $func_map,
+        'states'    => [qw( _start sig_int sig_term sig_chld scheduler )],
+    );
 
-        # Clean up any run wheels
+    $poe_kernel->run();
 
-        # Exit cleanly
-        exit 0;
-    }
-    
+    # Return an appropriate code and reason
+    return ( $exit_code, $exit_reason );
 }
+
+sub _create_heap ( $opt, $usage ) {
+    my $map = { '_' => {}, };
+    $map->{'_'}->{'opt'}     = $opt;
+    $map->{'_'}->{'usage'}   = $usage;
+    $map->{'_'}->{'default'} = $opt_conf_def;
+    $map->{'_'}->{'config'}  = {};
+
+    # As it will be accessed a lot, keep a copy here
+    my $env_prefix = $opt->env_prefix;
+
+ # Collect appropriate enviromental variables and stash them in the funcmap/heap
+    foreach my $env_key ( keys %ENV ) {
+        my $env_val = $ENV{$env_key};
+        if ( $env_key =~ m{^\Q$env_prefix\E} ) {
+            $map->{'_'}->{'aep'}->{$env_key} = $env_val;
+        }
+        else {
+            $map->{'_'}->{'env'}->{$env_key} = $env_val;
+        }
+    }
+
+    # Process the resultant config
+    # TODO
+    $map->{'_'}->{'config'} = $map->{'_'}->{'default'};
+
+    return $map;
+}
+
+# Helper functions for repeated calls
+sub _default_opt_lookup ($def_opt_name) {
+    my $def = $opt_desc[ $opt_index->{$def_opt_name} ];
+    if ( scalar( @{$def} ) >= 2 ) {
+        $def = $def->[2];
+    }
+    if ( $def->{'default'} ) {
+        $def = $def->{'default'};
+    }
+    else {
+        $def = 0;
+    }
+    return $def;
+}
+
+sub _check_exists ($val) {
+    if ( $val ne '$unset' ) { $val ? -e $val : undef }
+    else                    { 1 }
+}
+
+sub _check_positive_number ($val) {
+    return ( $val >= 0 ) ? 1 : undef;
+}
+
+# Show debug messages
+sub _func_debug ( $pipe, $line, $message ) {
+    my @buffer;
+
+    if ( $message && ref($message) eq 'HASH' ) {
+
+        # Fancy message - Add a default for lefttab (add more later)
+        if ( $message->{'lines'} && ref( $message->{'lines'} ) eq 'ARRAY' ) {
+
+            # nothing to do, makes sense
+            @buffer = @{ $message->{'lines'} };
+        }
+        else {
+            # No idea what to do, re-pop it as dumper
+            push @buffer,
+              'Unexpected multiline format log packet, using data::dumper';
+            push @buffer, split( /\n/, Dumper( $message->{'lines'} ) );
+        }
+    }
+    else {
+        push @buffer, $message;
+    }
+
+    my $msg_first        = 1;
+    my $left_buffer_size = 0;
+    foreach my $out_msg (@buffer) {
+        if ( $msg_first++ == 1 ) {
+            my $msg_prefix = "AEP($pipe:$line) ";
+            $left_buffer_size = length($msg_prefix);
+            say STDERR "\r$msg_prefix$out_msg";
+        }
+        else {
+            say STDERR ' ' x $left_buffer_size, $out_msg;
+        }
+    }
+
+    return;
+}
+
+# Call the main function with selected options
+exit do {
+    my ( $exit_code, $exit_reason ) = main( $opt, $usage );
+
+    if (   ( !defined $exit_code )
+        || ( $exit_code !~ m#^\d+$# )
+        || ( $exit_code > 255 )
+        || ( $exit_code < 0 ) )
+    {
+        $exit_code = 255;
+    }
+
+    _func_debug(
+        'STDERR', __LINE__,
+        {
+            'lines' => [
+                "Child exiting with: $exit_code",
+                "Status: $exit_reason",
+                'Perl exception: ' . $!,
+            ]
+        }
+    );
+
+    $exit_code;
+};
+
+__END__
+
+# ABSTRACT: turns baubles into trinkets
 
 =head1 NAME
 
@@ -236,7 +438,8 @@ Paul G Webster <daemon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Paul G Webster.
+This software is copyright (c) 2023 by Paul G Webster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+

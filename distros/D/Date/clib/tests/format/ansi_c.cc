@@ -2,7 +2,7 @@
 
 #define TEST(name) TEST_CASE("format-ansi_c: " name, "[format-ansi_c]")
 
-static void test (string name, string_view str, ptime_t epoch, string_view tzabbr) {
+static void test (std::string name, string_view str, ptime_t epoch, string_view tzabbr) {
     SECTION(name) {
         Date d(str);
         CHECK(!d.error());

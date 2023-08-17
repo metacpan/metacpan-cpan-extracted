@@ -13,6 +13,8 @@ BEGIN {
 
 MAPBOX: {
 	SKIP: {
+		skip('Test requires Internet access', 18) unless(-e 't/online.enabled');
+
 		eval {
 			require Geo::Coder::Mapbox;
 
@@ -29,7 +31,7 @@ MAPBOX: {
 
 		if($@) {
 			diag('Geo::Coder::Mapbox not installed - skipping tests');
-			skip 'Geo::Coder::Mapbox not installed', 18;
+			skip('Geo::Coder::Mapbox not installed', 18);
 		} else {
 			diag("Using Geo::Coder::Mapbox $Geo::Coder::Mapbox::VERSION");
 		}

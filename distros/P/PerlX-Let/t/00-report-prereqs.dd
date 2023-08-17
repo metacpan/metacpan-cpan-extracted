@@ -28,7 +28,6 @@ do { my $x = {
                                       'Keyword::Simple' => '0.04',
                                       'Text::Balanced' => '0',
                                       'perl' => 'v5.12.0',
-                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -40,7 +39,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0'
+                                   'Test::Most' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

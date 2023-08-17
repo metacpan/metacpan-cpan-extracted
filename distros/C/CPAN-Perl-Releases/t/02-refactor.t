@@ -62,7 +62,6 @@ my $stuff =
     "tar.gz" => "J/JE/JESSE/perl-5.11.3.tar.gz",
   },
   "5.11.5" => {
-    "tar.bz2" => "S/SH/SHAY/perl-5.11.5.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.11.5.tar.gz",
   },
   "5.12.0" => {
@@ -114,7 +113,6 @@ my $stuff =
     "tar.gz" => "F/FL/FLORA/perl-5.13.4.tar.gz",
   },
   "5.13.5" => {
-    "tar.bz2" => "S/SH/SHAY/perl-5.13.5.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.13.5.tar.gz",
   },
   "5.13.6" => {
@@ -178,7 +176,6 @@ my $stuff =
     "tar.gz" => "F/FL/FLORA/perl-5.15.4.tar.gz",
   },
   "5.15.5" => {
-    "tar.bz2" => "S/SH/SHAY/perl-5.15.5.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.15.5.tar.gz",
   },
   "5.15.6" => {
@@ -222,7 +219,6 @@ my $stuff =
     "tar.gz" => "T/TO/TONYC/perl-5.17.2.tar.gz",
   },
   "5.17.3" => {
-    "tar.bz2" => "S/SH/SHAY/perl-5.17.3.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.17.3.tar.gz",
   },
   "5.17.4" => {
@@ -258,7 +254,6 @@ my $stuff =
     "tar.gz" => "D/DA/DAGOLDEN/perl-5.19.1.tar.gz",
   },
   "5.19.3" => {
-    "tar.bz2" => "S/SH/SHAY/perl-5.19.3.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.19.3.tar.gz",
   },
   "5.21.6" => {

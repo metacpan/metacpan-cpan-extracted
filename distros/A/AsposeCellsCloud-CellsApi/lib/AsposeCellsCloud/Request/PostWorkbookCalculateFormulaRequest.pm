@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookCalculateFormulaRequest.name :   ,
-# PostWorkbookCalculateFormulaRequest.options :   ,
-# PostWorkbookCalculateFormulaRequest.ignoreError :   ,
-# PostWorkbookCalculateFormulaRequest.folder :   ,
-# PostWorkbookCalculateFormulaRequest.storageName :    
+# PostWorkbookCalculateFormulaRequest.name : The workbook name.  ,
+# PostWorkbookCalculateFormulaRequest.options : Calculation Options.  ,
+# PostWorkbookCalculateFormulaRequest.ignoreError : ignore Error.  ,
+# PostWorkbookCalculateFormulaRequest.folder : Original workbook folder.  ,
+# PostWorkbookCalculateFormulaRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_calculate_formula' } = { 
-    	summary => '',
+    	summary => 'Calculate all formulas in workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'options' => {
      	datatype => 'CalculationOptions',
      	base_name => 'options',
-     	description => '',
+     	description => 'Calculation Options.',
      	format => '',
      	read_only => '',
      		},
      'ignore_error' => {
      	datatype => 'string',
      	base_name => 'ignoreError',
-     	description => '',
+     	description => 'ignore Error.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

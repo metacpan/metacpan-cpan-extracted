@@ -179,7 +179,7 @@ sub first {
 sub get {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
 
   my ($index) = @args;
 
@@ -295,6 +295,16 @@ sub map {
   return wantarray ? (@$result) : $result;
 }
 
+sub merge {
+  my ($self, @rvalues) = @_;
+
+  require Venus;
+
+  my $lvalue = [@{$self->get}];
+
+  return Venus::merge($lvalue, @rvalues);
+}
+
 sub none {
   my ($self, $code) = @_;
 
@@ -408,6 +418,34 @@ sub push {
   return $data;
 }
 
+sub puts {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($into, $path) = @args[$i, $i+1];
+
+    next if !defined $path;
+
+    my $value;
+    my @range;
+
+    ($path, @range) = @{$path} if ref $path eq 'ARRAY';
+
+    $value = $self->path($path);
+    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $into eq 'SCALAR') {
+      $$into = $value;
+    }
+
+    CORE::push @{$result}, $value;
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub random {
   my ($self) = @_;
 
@@ -427,14 +465,18 @@ sub range {
 
   my ($f, $l) = split /:/, $note, 2;
 
-  $l = $f if !defined $l;
-
   my $data = $self->get;
 
   $f = 0 if !defined $f || $f eq '';
+  $l = $f if !defined $l;
   $l = $#$data if !defined $l || $l eq '';
 
-  return $self->slice((0+$f)..(0+$l));
+  $f = 0+$f;
+  $l = 0+$l;
+
+  $l = $#$data + $l if $f > -1 && $l < 0;
+
+  return $self->slice($f..$l);
 }
 
 sub reverse {
@@ -466,9 +508,13 @@ sub rsort {
 sub set {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
+
+  return $self->value(@args) if @args == 1 && ref $args[0] eq 'ARRAY';
 
   my ($index, $value) = @args;
+
+  return if not defined $index;
 
   return $self->value->[$index] = $value;
 }
@@ -2648,6 +2694,42 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 merge
+
+  merge(ArrayRef @data) (ArrayRef)
+
+The merge method returns an array reference where the elements in the array and
+the elements in the argument(s) are merged. This operation performs a deep
+merge and clones the datasets to ensure no side-effects.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item merge example 1
+
+  # given: synopsis;
+
+  my $merge = $array->merge([10..15]);
+
+  # [10..15,7,8,9]
+
+=back
+
+=over 4
+
+=item merge example 2
+
+  # given: synopsis;
+
+  my $merge = $array->merge([1,2,{1..4},4..9]);
+
+  # [1,2,{1..4},4..9]
+
+=back
+
+=cut
+
 =head2 ne
 
   ne(Any $arg) (Bool)
@@ -3147,6 +3229,131 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 puts
+
+  puts(Any @args) (ArrayRef)
+
+The puts method select values from within the underlying data structure using
+L<Venus::Array/path>, optionally assigning the value to the preceeding scalar
+reference and returns all the values selected.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item puts example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  my $puts = $array->puts(undef, '0.fruit', undef, '1.fruit');
+
+  # ["apple", "lemon"]
+
+=back
+
+=over 4
+
+=item puts example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(\my $fruit1, '0.fruit', \my $fruit2, '1.fruit');
+
+  my $puts = [$fruit1, $fruit2];
+
+  # ["apple", "lemon"]
+
+=back
+
+=over 4
+
+=item puts example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(
+    \my $fruit1, '0.fruit',
+    \my $fruit2, '1.fruit',
+    \my $fruit3, '2.fruit',
+  );
+
+  my $puts = [$fruit1, $fruit2, $fruit3];
+
+  # ["apple", "lemon", undef]
+
+=back
+
+=over 4
+
+=item puts example 4
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..20]);
+
+  $array->puts(
+    \my $a, '0',
+    \my $b, '1',
+    \my $m, ['', '2:-2'],
+    \my $x, '18',
+    \my $y, '19',
+  );
+
+  my $puts = [$a, $b, $m, $x, $y];
+
+  # [1, 2, [3..18], 19, 20]
+
+=back
+
+=cut
+
 =head2 random
 
   random() (Any)
@@ -3305,6 +3512,146 @@ I<Since C<2.55>>
   my $range = $array->range(0..3);
 
   # [1..4]
+
+=back
+
+=over 4
+
+=item range example 10
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-1:8');
+
+  # [9,1..9]
+
+=back
+
+=over 4
+
+=item range example 11
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:8');
+
+  # [1..9]
+
+=back
+
+=over 4
+
+=item range example 12
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-2');
+
+  # [1..7]
+
+=back
+
+=over 4
+
+=item range example 13
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-2');
+
+  # [8]
+
+=back
+
+=over 4
+
+=item range example 14
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-20');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 15
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-20');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 16
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-6');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 17
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-8');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 18
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-9');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 19
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-5:-1');
+
+  # [5..9]
 
 =back
 

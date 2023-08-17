@@ -5,7 +5,6 @@ package DBIx::DataModel::Statement;
 
 use warnings;
 use strict;
-use List::Util       qw/min/;
 use List::MoreUtils  qw/firstval any/;
 use Scalar::Util     qw/weaken dualvar/;
 use POSIX            qw/LONG_MAX/;
@@ -549,6 +548,7 @@ sub row_num {
   return $self->{row_num};
 }
 
+
 sub next {
   my ($self, $n_rows) = @_;
 
@@ -594,7 +594,19 @@ sub all {
 
 sub page_size   { shift->{args}{-page_size}  || POSIX::LONG_MAX  }
 sub page_index  { shift->{args}{-page_index} || 1                }
-sub offset      { shift->{offset}            || 0                }
+
+sub offset      {
+  my ($self) = @_;
+
+  if (!exists $self->{offset}) {
+    # compute on demand -- will default to 0 if there is no pagination
+    $self->{offset} = exists $self->{args}{-offset} ? $self->{args}{-offset}
+                                                    : ($self->page_index - 1) * $self->page_size;
+  }
+
+  return $self->{offset};
+}
+
 
 
 sub page_count {
@@ -611,7 +623,8 @@ sub page_boundaries {
   my ($self) = @_;
 
   my $first = $self->offset + 1;
-  my $last  = min($self->row_count, $first + $self->page_size - 1);
+  my $last  = $self->offset + $self->nb_fetched_rows;
+
   return ($first, $last);
 }
 
@@ -658,8 +671,22 @@ sub headers {
 
 sub finish {
   my $self = shift;
+
+  $self->{nb_fetched_rows} = $self->row_num - $self->offset;
   $self->sth->finish;
 }
+
+
+sub nb_fetched_rows {
+  my ($self) = @_;
+
+  exists $self->{nb_fetched_rows}
+    or croak "->nb_fetched_rows() can only be called on a finished statement";
+
+  return $self->{nb_fetched_rows};
+}
+
+
 
 
 sub make_fast {

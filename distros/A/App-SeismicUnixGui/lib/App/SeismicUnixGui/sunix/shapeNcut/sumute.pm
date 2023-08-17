@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::shapeNcut::sumute;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -237,7 +237,7 @@ xmute=85,96
 To create a multi-gather parameter file 
 this composite "parfile"" can be concatenated using the Tool: Sucat
 
-Internally, sumute uses "susplit" to breaks a large multi-gather file into individual
+Internally, sumute uses "susplit" to break a large multi-gather file into individual
 shotpoint gathers (ep), or cdp gathers or fldr (gathers) according to Segy
 key header words. 
 
@@ -263,6 +263,7 @@ xmute=73,96
 =head2 CHANGES and their DATES
 
 Nov. 2022, V 0.0.2
+June 2023, split files are read from DATA_SEISMIC_SU directory
 
 =cut
 
@@ -275,7 +276,7 @@ our $VERSION = '0.0.2';
 
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use App::SeismicUnixGui::misc::SeismicUnix
-  qw($go $in $itop_mute_par_ $ibot_mute_par_ $off $on $out $ps $to $suffix_ascii $suffix_bin 
+  qw($go $in $itop_mute_par_ $ibot_mute_par_ $off $on $out $ps $to $suffix_ascii $suffix_bin
   $suffix_ps $suffix_segy $suffix_su $tmute $xmute);
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
@@ -296,7 +297,7 @@ my $DATA_SEISMIC_BIN = $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();
 my $PL_SEISMIC       = $Project->PL_SEISMIC();
 my $PS_SEISMIC       = $Project->PS_SEISMIC();
-my $log               = message->new();
+my $log              = message->new();
 
 my $var          = $get->var();
 my $on           = $var->{_on};
@@ -306,7 +307,7 @@ my $false        = $var->{_false};
 my $empty_string = $var->{_empty_string};
 
 my ($imute_par_);
-my (@tmute, @xmute, @output, @Steps, @gather_number, @par_file );
+my ( @tmute, @xmute, @output, @Steps, @gather_number, @par_file );
 
 =head2 Encapsulated
 hash of private variables
@@ -326,7 +327,7 @@ my $sumute = {
 	_ntaper                 => '',
 	_par                    => '',
 	_par_directory          => '',
-	_susplit_stem           => '.split_',
+	_susplit_stem           => 'split4sumute',
 	_tfile                  => '',
 	_tm0                    => '',
 	_tmute                  => '',
@@ -337,6 +338,7 @@ my $sumute = {
 	_note                   => '',
 
 };
+
 =head2 sub _get_par_sets
 
 =cut
@@ -346,7 +348,8 @@ sub _get_par_sets {
 	my (@self) = @_;
 
 	if (    $sumute->{_multi_gather_par_file} ne $empty_string
-		and $sumute->{_gather_type} ne $empty_string ) {
+		and $sumute->{_gather_type} ne $empty_string )
+	{
 
 =head2 instantiate classes
 
@@ -369,8 +372,9 @@ sub _get_par_sets {
 		my $par_gather_count;
 
 		$multi_par_file_w_path = $sumute->{_multi_gather_par_file};
-		$inbound           = $multi_par_file_w_path;
-		print("sumute,_get_par_sets, inbound=$inbound\n");
+		$inbound               = $multi_par_file_w_path;
+
+		#		 print("sumute,_get_par_sets, inbound=$inbound\n");
 
 =head2 read i/p file
 
@@ -379,34 +383,41 @@ sub _get_par_sets {
 		$control->set_back_slashBgone($inbound);
 		$inbound = $control->get_back_slashBgone();
 
-		# open multi-gather_par_file 
-        # which contains a list of the 
+		# open multi-gather_par_file
+		# which contains a list of the
 		# individual par files
 		my $ref_file_name = \$inbound;
-		my ( $items_aref2, $numberOfItems_aref ) = $files->read_par($ref_file_name);
-		
-		print("multi-gather-parameter file contains: @{$items_aref2}\n");
+		my ( $items_aref2, $numberOfItems_aref ) =
+		  $files->read_par($ref_file_name);
 
-		# 'first array member is gather name
-		# ,e.g. 'cdp' or just 'gather'
+	# print("multi-gather-parameter file #0 contains: @{@{$items_aref2}[0]}\n");
+
+		# first array member is gather name
+		# ,e.g. 'cdp' or 'tmute=', or or just 'gather'
 		# and a list of par_gather numbers
 		@par_gather = @{ @{$items_aref2}[0] };
 		my $gather_type = $par_gather[0];
-		print("sumute, _get_par_sets, gather_type=--$gather_type\n");
+		# print("sumute, _get_par_sets, gather_type=--$gather_type\n");
 
 =head2 capture errors
 
 =cut
 
-		if (   $gather_type ne $empty_string
-			&& $gather_type eq $sumute->{_gather_type} ) {
+		if ( length $gather_type
+			&& $gather_type eq $sumute->{_gather_type} )
+		{
 
-			# print("sumute, _get_par_sets, gather type=$gather_type and $sumute->{_gather_type}\n");
-			# print("sumute, _get_par_sets, gather type OK\n");
+# print("sumute, _get_par_sets, gather type=$gather_type and $sumute->{_gather_type}\n");
+# print("sumute, _get_par_sets, gather type OK\n");
 
-		} else {
-			print("sumute, _get_par_sets, gather type missing in 1 or 2 places\n");
-			print("sumute, _get_par_sets, gather=--$gather_type-- versus --$sumute->{_gather_type}--\n");
+		}
+		else {
+			print(
+				"sumute, _get_par_sets, gather type missing in 1 or 2 places\n"
+			);
+			print(
+"sumute, _get_par_sets, gather=--$gather_type-- versus --$sumute->{_gather_type}--\n"
+			);
 		}
 
 =head2 share values with namespace
@@ -420,16 +431,16 @@ gather name, e.g. cdp or ep or gather
 		my $last_par_index        = ( scalar @par_gather ) - 1;
 		my @number_of_picks       = @$numberOfItems_aref;
 
-		# print("sumute, _get_par_sets,last_par_index=$last_par_index\n");
-		# print("sumute, _get_par_sets,number_of_par_gathers=$number_of_par_gathers\n");
-		# print("sumute, _get_par_sets,old par_gather=@par_gather\n");
+# print("sumute, _get_par_sets,last_par_index=$last_par_index\n");
+# print("sumute, _get_par_sets,number_of_par_gathers=$number_of_par_gathers\n");
+# print("sumute, _get_par_sets,old par_gather=@par_gather\n");
 
 		my @new_par_gather = @par_gather[ 1 .. $last_par_index ];
 		$sumute->{_par_gather_number_aref} = \@new_par_gather;
 
-		# print("sumute, _get_par_sets,new_par_gather=@new_par_gather\n");
-		# print("sumute, _get_par_sets,gather_type=$gather_type\n");
-		# print("sumute, _get_par_sets,number_of_gathers=$number_of_par_gathers\n");
+	# print("sumute, _get_par_sets,new_par_gather=@new_par_gather\n");
+	# print("sumute, _get_par_sets,gather_type=$gather_type\n");
+	# print("sumute, _get_par_sets,number_of_gathers=$number_of_par_gathers\n");
 
 =head2 collect tmute and xmute
 for each gather 
@@ -437,29 +448,33 @@ for each gather
 =cut
 
 		for (
-			my $par_gather_count = 1, my $i = 0;
-			$par_gather_count <= $number_of_par_gathers;
+			my $par_gather_count = 1, my $i = 0 ;
+			$par_gather_count <= $number_of_par_gathers ;
 			$par_gather_count++, $i++
-		) {
+		  )
+		{
 
-			# print("sumute,_get_par_sets, par_gather_count: $par_gather_count\n");
+		 # print("sumute,_get_par_sets, par_gather_count: $par_gather_count\n");
 			$par_gather_number = $par_gather[$par_gather_count];
 
-			# print("sumute,_get_par_sets, par_gather_number: $par_gather_number\n");
+	   # print("sumute,_get_par_sets, par_gather_number: $par_gather_number\n");
 			$row = ( $par_gather_count * 2 ) - 1;
 
 			# print("sumute,_get_par_sets, row: $row\n");
 
-			my $last_sample_index = scalar @{ @{$items_aref2}[ ( $row + 1 ) ] } - 1;
+			my $last_sample_index =
+			  scalar @{ @{$items_aref2}[ ( $row + 1 ) ] } - 1;
 
-			my @new_x_picks = @{ @{$items_aref2}[ ( $row + 1 ) ] }[ 1 .. $last_sample_index ];
+			my @new_x_picks =
+			  @{ @{$items_aref2}[ ( $row + 1 ) ] }[ 1 .. $last_sample_index ];
 
-			# print("sumute,_get_par_sets, new_x_picks:@new_x_picks,last_sample_index:$last_sample_index\n");
+# print("sumute,_get_par_sets, new_x_picks:@new_x_picks,last_sample_index:$last_sample_index\n");
 			$x_picks_aref2[$i] = \@new_x_picks;
 
-			my @new_time_picks = @{ @{$items_aref2}[ ($row) ] }[ 1 .. $last_sample_index ];
+			my @new_time_picks =
+			  @{ @{$items_aref2}[ ($row) ] }[ 1 .. $last_sample_index ];
 
-			# print("sumute,_get_par_sets, new_time_picks:@new_time_picks,last_sample_index:$last_sample_index\n");
+# print("sumute,_get_par_sets, new_time_picks:@new_time_picks,last_sample_index:$last_sample_index\n");
 			$time_picks_aref2[$i] = \@new_time_picks;
 
 		}    # no. gathers with parameter sets
@@ -472,7 +487,8 @@ for each gather
 
 		return ( \@time_picks_aref2, \@x_picks_aref2, $tmute, $xmute );
 
-	} else {
+	}
+	else {
 		print(
 			"sumute,_get_par_sets, missing multi_gather_par_file or
 		missing definition of gather type\n"
@@ -481,8 +497,6 @@ for each gather
 	}
 
 }
-
-
 
 =head2 sub Step
 
@@ -516,9 +530,7 @@ with multi_gather_su_file
 
 =cut			
 
-		my $inbound   = $sumute->{_multi_gather_su_file};
-
-#		print("sumute,Step, inbound = $inbound\n");
+		my $inbound = $sumute->{_multi_gather_su_file};
 
 =head2 get modules
 
@@ -549,10 +561,13 @@ with multi_gather_su_file
 	susplit parameter values
 
 =cut
-
+#		print("sumute, inbound= $inbound\n");
 		$susplit->clear();
+		$susplit->close( quotemeta(1) );
+		$susplit->su_base_file_name($inbound);
 		$susplit->key( $sumute->{_gather_type} );
 		$susplit->stem( $sumute->{_susplit_stem} );
+		$susplit->verbose( quotemeta(1) );
 		$susplit->suffix($suffix_su);
 		$susplit[0] = $susplit->Step();
 
@@ -562,9 +577,8 @@ single-gather split from composite su file
 
 =cut
 
-		my $delete_files = '.split_' . '*';
-		system("rm -rf $delete_files");
-		
+#		my $delete_files = '.split_' . '*';
+#		system("rm -rf $delete_files");
 
 =head2 DEFINE
 
@@ -574,9 +588,8 @@ Run flow in system independently of sumute
 
 =cut
 
-		my @items = ( $susplit[0], $in, $inbound );
+		my @items = ( $susplit[0]);
 		$flow[0] = $run->modules( \@items );
-		
 
 =head2 RUN FLOW(s)
 
@@ -590,26 +603,27 @@ Run flow in system independently of sumute
 
 =cut
 
-	$log->screen($flow[0]);
-	my $time = localtime;
-	$log->file(time);
-	$log->file($flow[0]);
+		$log->screen( $flow[0] );
+		my $time = localtime;
+		$log->time();
+		$log->file( $flow[0] );
 
-
-=head2 collect output split file names from the PL_SEISMIC directory
+=head2 collect output split file names from the DATA_SU_SEISMIC directory
 
 =cut
 
-		opendir( my $dh, $PL_SEISMIC, );
-		my @split_file_names = grep( /.split_/, readdir($dh) );
+		opendir( my $dh, $DATA_SEISMIC_SU, );
+		my $search = $sumute->{_susplit_stem};
+		my @split_file_names = grep( /$search/, readdir($dh) );
 		closedir($dh);
 
 		$number_of_split_files = scalar @split_file_names;
 
-		# print("2. sumute,Step,list length = $number_of_split_files\n");
-		# print("2. sumute,Step,list[0] $split_file_names[0]\n");
+#		print("2. sumute,Step,list length = $number_of_split_files\n");
+#		print("2. sumute,Step,list[0] $split_file_names[0]\n");
+
 		# print("2. sumute,Step,list[1] $split_file_names[1]\n");
-		# print("2. sumute,Step,split_files = @split_file_names\n");
+#		print("2. sumute,Step,split_files = @split_file_names\n");
 
 =head2 prepare sumute with split files
 
@@ -645,8 +659,9 @@ Run flow in system independently of sumute
 			# NADA
 		}
 
-=head2 get the temporary single-gather parameter files
-match parameter file to correct split data file
+=head2 get the temporary single-gather 
+parameter files
+that match split data files
 
 =cut
 
@@ -717,7 +732,7 @@ i=0
 			$muted_output[0] = $split_file_matches[0];
 			$muted_output[0] =~ s/.su//;
 			$muted_output[0] =
-			  $PL_SEISMIC . '/' . $muted_output[0] . '_mute' . $suffix_su;
+			  $DATA_SEISMIC_SU . '/' . $muted_output[0] . '_mute' . $suffix_su;
 
 			my @time_picks = @{ @{$time_picks_aref2}[0] };
 			my @x_picks    = @{ @{$x_picks_aref2}[0] };
@@ -735,7 +750,7 @@ i=0
 			$result =
 				' sumute'
 			  . $in
-			  . $PL_SEISMIC . '/'
+			  . $DATA_SEISMIC_SU . '/'
 			  . $split_file_matches[0]
 			  . $out
 			  . $muted_output[0]
@@ -758,7 +773,9 @@ i=0
 		   # print("2 sumute,Step,muted_output: $muted_output[$i] case i=$i\n");
 				$muted_output[$i] =~ s/.su//;
 				$muted_output[$i] =
-				  $PL_SEISMIC . '/' . $muted_output[$i] . '_mute' . $suffix_su;
+					$DATA_SEISMIC_SU . '/'
+				  . $muted_output[$i] . '_mute'
+				  . $suffix_su;
 
 				my @time_picks = @{ @{$time_picks_aref2}[$i] };
 				my @x_picks    = @{ @{$x_picks_aref2}[$i] };
@@ -770,7 +787,7 @@ i=0
 					$result
 				  . ' sumute'
 				  . $in
-				  . $PL_SEISMIC . '/'
+				  . $DATA_SEISMIC_SU . '/'
 				  . $split_file_matches[$i]
 				  . $out
 				  . $muted_output[$i]
@@ -793,7 +810,7 @@ i=0
 # print("2 sumute,Step,muted_output: $muted_output[$last_case] case i=$last_case\n");
 			$muted_output[$last_case] =~ s/.su//;
 			$muted_output[$last_case] =
-				$PL_SEISMIC . '/'
+				$DATA_SEISMIC_SU . '/'
 			  . $muted_output[$last_case] . '_mute'
 			  . $suffix_su;
 
@@ -807,7 +824,7 @@ i=0
 				$result
 			  . ' sumute'
 			  . $in
-			  . $PL_SEISMIC . '/'
+			  . $DATA_SEISMIC_SU . '/'
 			  . $split_file_matches[$last_case]
 			  . $out
 			  . $muted_output[$last_case]
@@ -979,9 +996,8 @@ sub clear {
 	$sumute->{_nmute}                  = '';
 	$sumute->{_ntaper}                 = '';
 	$sumute->{_par}                    = '',
-	$sumute->{_susplit_stem}			= '.split_',      # maintain, do not clear
-	$sumute->{_par_directory}			= '',
-	$sumute->{_tfile}					= '';
+	$sumute->{_susplit_stem}           = 'split4sumute',    # maintain, do not clear
+	$sumute->{_par_directory}          = '', $sumute->{_tfile} = '';
 	$sumute->{_tm0}     = '';
 	$sumute->{_tmute}   = '';
 	$sumute->{_twindow} = '';
@@ -989,7 +1005,7 @@ sub clear {
 	$sumute->{_xmute}   = '';
 	$sumute->{_Step}    = '';
 	$sumute->{_note}    = '';
-	
+
 }
 
 =head2 sub gather_type
@@ -1007,11 +1023,11 @@ sub gather_type {
 
 		$sumute->{_gather_type} = $gather_type;
 
-	} else {
+	}
+	else {
 		print("sumute, gather_type, missing gather_type,\n");
 	}
 }
-
 
 =head2 sub header_word_mute
 
@@ -1027,7 +1043,8 @@ sub header_word_mute {
 		$sumute->{_note} = $sumute->{_note} . ' hmute=' . $sumute->{_key};
 		$sumute->{_Step} = $sumute->{_Step} . ' hmute=' . $sumute->{_key};
 
-	} else {
+	}
+	else {
 		print("sumute, header_word, missing key,\n");
 	}
 }
@@ -1112,7 +1129,6 @@ sub mode {
 	}
 }
 
-
 =head2 sub multi_gather_par_file
 
 sumute can only handle one
@@ -1127,7 +1143,7 @@ par files.
 
 However, currently sumute can not
 read multi-gather-par files.
-The user is unaware in SeismicUnixGui
+The user is unaware of this in SeismicUnixGui
 
 multi-gather_par_files are 
 written like sunmo files with cdp numbers on the first line
@@ -1147,7 +1163,9 @@ sub multi_gather_par_file {
 
 		my $files = manage_files_by2->new();
 
-=head2 module definitions$sumute->{_par_gather_number_aref}
+=head2 module definitions
+
+$sumute->{_par_gather_number_aref}
 
 =cut
 
@@ -1155,7 +1173,8 @@ sub multi_gather_par_file {
 
 		$sumute->{_multi_gather_par_file} = $multi_gather_par_file;
 
-		my ( $time_picks_aref2, $x_picks_aref2, $first_name, $second_name ) = _get_par_sets();
+		my ( $time_picks_aref2, $x_picks_aref2, $first_name, $second_name ) =
+		  _get_par_sets();
 
 		# collect single-gather mute paramters (tmut and xmute3)
 		# write tmute and xmute in successive lines
@@ -1163,19 +1182,20 @@ sub multi_gather_par_file {
 		# run _get_par_sets previously
 		my $number_of_gathers = scalar @{ $sumute->{_par_gather_number_aref} };
 
-		# print("sumute,multi_gather_par_file, number_of_gathers=$number_of_gathers\n");
+# print("sumute,multi_gather_par_file, number_of_gathers=$number_of_gathers\n");
 
-		for ( my $i = 0; $i < $number_of_gathers; $i++ ) {
+		for ( my $i = 0 ; $i < $number_of_gathers ; $i++ ) {
 
 			my $time_picks_ref = @{$time_picks_aref2}[$i];
 			my $x_picks_ref    = @{$x_picks_aref2}[$i];
 
-			# print("sumute,multi_gather_par_file, time_picks=@{$time_picks_ref}\n");
-			# print("sumute,multi_gather_par_file, x_picks=@{$x_picks_ref}\n");
+	   # print("sumute,multi_gather_par_file, time_picks=@{$time_picks_ref}\n");
+	   # print("sumute,multi_gather_par_file, x_picks=@{$x_picks_ref}\n");
 
 		}
 
-	} else {
+	}
+	else {
 		print("sumute,multi_gather_par_file, missing mult-gather-par file\n");
 		return ();
 	}
@@ -1196,11 +1216,11 @@ sub multi_gather_su_file {
 
 		# print("sumute, multi_gather_su_file=$multi_gather_su_file\n");
 
-	} else {
+	}
+	else {
 		print("sumute, multi_gather_su_file, missing multi_gather_su_file,\n");
 	}
 }
-
 
 =head2 sub nmute 
 
@@ -1256,11 +1276,11 @@ sub offset_word {
 		$sumute->{_note} = $sumute->{_note} . ' key=' . $sumute->{_key};
 		$sumute->{_Step} = $sumute->{_Step} . ' key=' . $sumute->{_key};
 
-	} else {
+	}
+	else {
 		print("sumute, offset_word, missing key,\n");
 	}
 }
-
 
 =head2 sub par 
 
@@ -1270,13 +1290,20 @@ sub offset_word {
 sub par {
 
 	my ( $self, $par ) = @_;
-	if ( $par ne $empty_string) {
+	if ( $par ne $empty_string ) {
 
-		$sumute->{_par}  = $par;
-		$sumute->{_note} = $sumute->{_note} . ' par=' . $sumute->{_par_directory} . '/' . $sumute->{_par};
-		$sumute->{_Step} = $sumute->{_Step} . ' par=' . $sumute->{_par_directory} . '/' . $sumute->{_par};
+		$sumute->{_par} = $par;
+		$sumute->{_note} =
+			$sumute->{_note} . ' par='
+		  . $sumute->{_par_directory} . '/'
+		  . $sumute->{_par};
+		$sumute->{_Step} =
+			$sumute->{_Step} . ' par='
+		  . $sumute->{_par_directory} . '/'
+		  . $sumute->{_par};
 
-	} else {
+	}
+	else {
 		print("sumute, par, missing par,or par_directory\n");
 	}
 }
@@ -1295,20 +1322,21 @@ sub par_directory {
 
 	if ( $par_directory ne $empty_string ) {
 
-		if ( $par_directory eq 'PL_SEISMIC' ) {
+		if ( $par_directory eq 'DATA_SEISMIC_TXT' ) {
 
-			$par_directory = $PL_SEISMIC;
+			$par_directory = $DATA_SEISMIC_TXT;
 			$sumute->{_par_directory} = $par_directory;
 
-		} else {
+		}
+		else {
 			print("sumute, par_directory, unexpected par_directory,\n");
 		}
 
-	} else {
+	}
+	else {
 		print("sumute, par_directory, missing par_directory,\n");
 	}
 }
-
 
 =head2 sub par_file 
 
@@ -1318,14 +1346,21 @@ sub par_directory {
 sub par_file {
 
 	my ( $self, $par ) = @_;
-        
-	if ( length $par) {
-	
-		$sumute->{_par}  = $par;
-		$sumute->{_note} = $sumute->{_note} . ' par=' . $sumute->{_par_directory} . '/' . $sumute->{_par};
-		$sumute->{_Step} = $sumute->{_Step} . ' par=' . $sumute->{_par_directory} . '/' . $sumute->{_par};
 
-	} else {
+	if ( length $par ) {
+
+		$sumute->{_par} = $par;
+		$sumute->{_note} =
+			$sumute->{_note} . ' par='
+		  . $sumute->{_par_directory} . '/'
+		  . $sumute->{_par};
+		$sumute->{_Step} =
+			$sumute->{_Step} . ' par='
+		  . $sumute->{_par_directory} . '/'
+		  . $sumute->{_par};
+
+	}
+	else {
 		print("sumute, par_file, missing par or par_directory,\n");
 	}
 }
@@ -1410,8 +1445,6 @@ sub twindow {
 	}
 }
 
-
-
 =head2 sub type 
 
 
@@ -1438,11 +1471,11 @@ sub type {
 		$sumute->{_note} = $sumute->{_note} . ' mode=' . $sumute->{_mode};
 		$sumute->{_Step} = $sumute->{_Step} . ' mode=' . $sumute->{_mode};
 
-	} else {
+	}
+	else {
 		print("sumute, type, missing mode,\n");
 	}
 }
-
 
 =head2 sub xfile 
 

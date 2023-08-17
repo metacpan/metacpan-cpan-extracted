@@ -57,9 +57,6 @@ BEGIN {
 
 use vars qw($VERSION $h);
 
-use lib "../lib";
-use lib "lib";
-
 use HTTP::OAI;
 use Pod::Usage;
 

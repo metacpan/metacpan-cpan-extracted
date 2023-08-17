@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FirefoxMultiAccountContainersUtils.pm'
@@ -14,6 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/firefox-container',
+    'script/firefox-mua-add-container',
+    'script/firefox-mua-dump-identities-json',
     'script/firefox-mua-list-containers',
     'script/firefox-mua-modify-containers',
     'script/firefox-mua-sort-containers',

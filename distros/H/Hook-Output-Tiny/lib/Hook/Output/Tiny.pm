@@ -2,7 +2,7 @@ package Hook::Output::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use Carp qw(croak);
 
@@ -20,7 +20,7 @@ BEGIN {
         *$_ = sub {
             my ($self) = @_;
 
-            if (!wantarray) {
+            if (! wantarray) {
                 warn "Calling $sub_name() in non-list context is deprecated!\n";
             }
             return defined $self->{$sub_name}{data}
@@ -36,14 +36,13 @@ BEGIN {
             my ($self) = @_;
 
             my $HANDLE = uc $sub_name;
-            open $self->{$sub_name}{handle}, ">&$HANDLE"
+            open $self->{$sub_name}{handle}, '>&', $HANDLE
               or croak("can't hook " . uc $sub_name . ": $!");
             close $HANDLE;
             open $HANDLE, '>>', \$self->{$sub_name}{data} or croak($!);
         };
     }
 }
-
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
     return bless \%struct, $_[0];
@@ -58,9 +57,53 @@ sub unhook {
     for (_handles($handle)) {
         no strict 'refs'; # To allow a string as STDOUT/STDERR bareword handles
         close uc $_;
-        open uc $_, ">&$self->{$_}{handle}" or croak($!);
+        open uc $_, '>&', $self->{$_}{handle} or croak($!);
     }
 }
+
+# Commenting out include() and exclude(). They're to be used to filter the
+# output. They have no docs nor tests yet.
+
+#sub include {
+#    my ($self, $include) = @_;
+#
+#    if (defined $include) {
+#        if (ref $include ne 'ARRAY') {
+#            croak("include() requires an array of regex objects sent in");
+#        }
+#        if (! defined $include->[0]) {
+#            croak("include() requires at least one regex object within the array reference");
+#        }
+#        for (@$include) {
+#            if (ref $_ ne 'REGEX') {
+#                croak("include()'s array reference must only contain regex objects");
+#            }
+#        }
+#        $self->{include} = $include;
+#    }
+#
+#    return $self->{include} // [];
+#}
+#sub exclude {
+#    my ($self, $exclude) = @_;
+#
+#    if (defined $exclude) {
+#        if (ref $exclude ne 'ARRAY') {
+#            croak("exclude() requires an array of regex objects sent in");
+#        }
+#        if (! defined $exclude->[0]) {
+#            croak("exclude() requires at least one regex object within the array reference");
+#        }
+#        for (@$exclude) {
+#            if (ref $_ ne 'REGEX') {
+#                croak("exclude()'s array reference must only contain regex objects");
+#            }
+#        }
+#        $self->{exclude} = $exclude;
+#    }
+#
+#    return $self->{exclude} // [];
+#}
 sub flush {
     my ($self, $handle) = @_;
     delete $self->{$_}{data} for _handles($handle);
@@ -106,9 +149,8 @@ __END__
 Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
 =for html
-<a href="http://travis-ci.org/stevieb9/p5-hook-output-tiny"><img src="https://secure.travis-ci.org/stevieb9/p5-hook-output-tiny.png"/></a>
-<a href="https://ci.appveyor.com/project/stevieb9/p5-hook-output-tiny"><img src="https://ci.appveyor.com/api/projects/status/br01o72b3if3plsw/branch/master?svg=true"/></a>
-<a href='https://coveralls.io/github/stevieb9/p5-hook-output-tiny?branch=master'><img src='https://coveralls.io/repos/stevieb9/p5-hook-output-tiny/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+<a href="https://github.com/stevieb9/p5-hook-output-tiny/actions"><img src="https://github.com/stevieb9/p5-hook-output-tiny/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/=?branch=master'><img src='https://coveralls.io/repos/stevieb9/p5-hook-output-tiny/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
 
@@ -261,7 +303,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2023 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

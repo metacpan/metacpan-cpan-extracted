@@ -3,9 +3,9 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp etc.
-use t_TestCommon  # Test::More etc.
+use t_TestCommon  # Test2::V0 etc.
          qw/$verbose $silent $debug dprint dprintf
-            bug mycheckeq_literal expect1 mycheck 
+            bug mycheckeq_literal expect1 mycheck
             verif_no_internals_mentioned
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
@@ -20,7 +20,7 @@ use Test::Deep::NoTest qw/eq_deeply/;
 package Other {
   use t_Common;
   use t_TestCommon qw/:DEFAULT $silent $debug $verbose dprint dprintf/;
-  
+
   use Spreadsheet::Edit ':FUNCS', # don't import stdvars
                         '@rows' => { -as, '@myrows' },
                         qw(%colx @crow %crow $num_cols @linenums),
@@ -42,7 +42,7 @@ package Other {
             ;
   title_rx 0;
   tie_column_vars qw(OtitleA OtitleB);
-  
+
   # N.B. "our" only applies within lexical scope
   our ($OtitleA, $OtitleB, $OtitleC);
 
@@ -55,12 +55,12 @@ package Other {
 use Spreadsheet::Edit ':all';
 
 my ($testdata, $inpath) = create_testdata(
-    name => "in1", 
+    name => "in1",
     rows => [
               [ "Pre-title-row stuff (this is rowx 0)" ],
               [ "A title  ",   # trailing spaces
                 "Btitle",
-                "  Multi-Word Title C", 
+                "  Multi-Word Title C",
                 "",  # empty title in column D
                 "H", # instead of "E", looks like ABC code
                 "F", # same as this column's ABC code
@@ -81,13 +81,13 @@ my ($testdata, $inpath) = create_testdata(
 # A4,B4,C4,D4,E4,F4,G4,H4,I2,J2,K2,L2
 # A5,B5,C5,D5,E5,F5,G5,H5,I2,J2,K2,L2
 # A6,B6,C6,D6,E6,F6,G6,H6,I2,J2,K2,L2
-  
+
 # Determine which column keys should be usable for column cx.
 # Input: $L indicates the *original* position of the column ('A' .. 'L'),
 #   and therefore the column data values (e.g. L="D" implies D2/D3/D4/D5/D6).
-# Output: 
+# Output:
 #   $title_L contains a letter which should be in the title, or "" if
-#     the title should be empty.  
+#     the title should be empty.
 #   $ABC_usable is true if the cx2let($cx) is a valid key for this column.
 #   $title_usable is true if the title is a valid colx key for this column
 sub title_info($$) {
@@ -336,7 +336,7 @@ our ($A,$B,$C,$D,$E,   $G,   $I,$J,$K,$L);
 
 check_no_sheet;
 
-# Auto-tie all columns, current and future.  
+# Auto-tie all columns, current and future.
 # Note that tie_column_vars has it's own separate comprehensive test
 tie_column_vars ':all';
 
@@ -385,11 +385,11 @@ options silent => $silent, verbose => $verbose, debug => $debug;
         { my %nopts = options(); bug() unless $nopts{$key} eq $new; }
         $s->options($key => $old);
         { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
-    
+
         # There was a bug where $sheet->options() used current sheet instead of $sheet
         # (and died if there was no current sheet)
-        { package Baloney; my %nopts = $s->options; 
-          main::bug unless main::u($nopts{$key}) eq main::u($old) && main::u($nopts{$key}) ne $new; 
+        { package Baloney; my %nopts = $s->options;
+          main::bug unless main::u($nopts{$key}) eq main::u($old) && main::u($nopts{$key}) ne $new;
         }
     };
     my $err = $@;
@@ -447,7 +447,7 @@ check_colx qw(Aalias_0 Aalia2_0 Dalias_D Ealias_E Falias_F
 
 # alias to title which is defined but no variable yet tied to it
 alias MWTCalia => qr/Multi.Word .*C/;
-  
+
 apply_torx {
   die unless $A         eq "A2";
   die unless $A_title   eq "A2";
@@ -459,8 +459,8 @@ apply_torx {
   die unless $E         eq "E2";
   die unless $H         eq "E2";
   die unless $F         eq "F2";
-  die unless $G         eq "G2"; 
-  die unless $Gtitle    eq "G2"; 
+  die unless $G         eq "G2";
+  die unless $Gtitle    eq "G2";
   die unless $Z         eq "H2";
   die unless $I         eq "I2";
   die unless $_0        eq "I2";
@@ -474,7 +474,7 @@ apply_torx {
 
 # spectocx, with title defined
 { # "A title  ",Btitle,"  Multi-Word Title C",,H,F,Gtitle,Z,"0","003","999","-1"
-  my $cxliststr = join " ", 
+  my $cxliststr = join " ",
       spectocx qw(Aalias Aalia2 Dalias Ealias Falias),
                   qr/^[A-Z].*title/;
   die "Wong spectocx after title valid: $cxliststr"
@@ -522,14 +522,14 @@ apply_torx {
   die dvis '$Halia4 is wrong' unless u($Halia4) eq "E2";
 } 2;
 
-alias Zalia1 => qr/^Z$/; 
+alias Zalia1 => qr/^Z$/;
   die "wrong Zalia1 alias result" unless spectocx('Zalia1') == 7;
 
 # Regexp always match numeric titles
-die "Numtl0"   unless 8 == alias Numtl0 => qr/^0$/; 
-die "Numtl003" unless 9 == alias Numtl003 => qr/^003$/; 
-die "Numtl000" unless 10 == alias Numtl999 => qr/^999$/; 
-die "Minus1" unless 11 == alias Minus1 => qr/^-1$/; 
+die "Numtl0"   unless 8 == alias Numtl0 => qr/^0$/;
+die "Numtl003" unless 9 == alias Numtl003 => qr/^003$/;
+die "Numtl000" unless 10 == alias Numtl999 => qr/^999$/;
+die "Minus1" unless 11 == alias Minus1 => qr/^-1$/;
 
 # But numbers are treated as absolute cx values if <= num_cols
 die "Cx0_alias" unless 0 == alias Cx0_alias => "0";
@@ -600,9 +600,9 @@ check_both('ABCDEFGHIJKL');
 
 # Verify error checks
 foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
-        ) 
+        )
 {
-  my @pairs = @$_; 
+  my @pairs = @$_;
   my @saved = ($first_data_rx, $last_data_rx, $title_rx);
   scope_guard {
     first_data_rx $saved[0];
@@ -648,14 +648,14 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     my %visited;
     sub ck_apply(@) {
       my %actual = map{ $_ => 1 } @_;
-      my $visited_str = join ",", sort { $a <=> $b } grep{$visited{$_}} 
+      my $visited_str = join ",", sort { $a <=> $b } grep{$visited{$_}}
                                                      keys %visited;
-      foreach(@_){ 
-        confess "ck_apply:FAILED TO VISIT $_ (visited $visited_str)" 
-          unless $visited{$_}; 
+      foreach(@_){
+        confess "ck_apply:FAILED TO VISIT $_ (visited $visited_str)"
+          unless $visited{$_};
       }
-      foreach(keys %visited){ 
-        confess "ck_apply:WRONGLY VISITED $_" unless $actual{$_}; 
+      foreach(keys %visited){
+        confess "ck_apply:WRONGLY VISITED $_" unless $actual{$_};
       }
       while (my($rx,$count) = each %visited) {
         confess "ck_apply:MULTIPLE VISITS TO $rx" if $count != 1;
@@ -817,11 +817,11 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
 #sub ttt($) {
 #  my $tag = shift;
 #  say "### $tag ", join(" ", map{vis} @{ $rows[title_rx] }),"\n";
-#  #say dvis '  %colx\n'; 
+#  #say dvis '  %colx\n';
 #  my %shown;
 #  foreach(qw/A B C D E F G H I J K L Z/) {
 #    my $cx = $colx{$_};
-#    say "  $_ →  ",u($colx_desc{$_}), 
+#    say "  $_ →  ",u($colx_desc{$_}),
 #         (defined($cx) && !$shown{$cx}++
 #            ? (",  rx2[$cx]=",vis($rows[2]->[$cx])) : ()), "\n"
 #  };
@@ -860,7 +860,7 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
 
 # Rename
 
-    our ($AAAtitle, $AAAtitle_alias);  # not initially imported 
+    our ($AAAtitle, $AAAtitle_alias);  # not initially imported
     bug if defined $AAAtitle;
     bug if defined $AAAtitle_alias;
 
@@ -882,7 +882,7 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
 
     # However user-defined aliases remain valid
     apply_torx { bug unless $AAAtitle_alias eq "A$rx" } 3;
-    
+
 # switch sheet
 
     my $sheet1 = sheet();
@@ -935,7 +935,7 @@ EOF
     # 10/8/2021: tie_column_vars(Regex args) no longer supported!
     #tie_column_vars qr/^Title/;
     tie_column_vars '$TitleP';
-    apply { our $TitleP; bug unless $TitleP eq "P$rx"; 
+    apply { our $TitleP; bug unless $TitleP eq "P$rx";
             check_colspec_is_undef('Gtitle');
           };
     apply { check_currow_data('PQRSTU*'); };
@@ -944,7 +944,7 @@ EOF
     $p = sheet($sheet1);
     bug unless $p == $sheet2;
     bug unless $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__} == $sheet1;
-    apply { our $TitleP; bug unless $Gtitle eq "G$rx"; 
+    apply { our $TitleP; bug unless $Gtitle eq "G$rx";
             check_colspec_is_undef('TitleP');
           };
     check_both('ABCDEFGHIJKLMNO');
@@ -955,7 +955,7 @@ EOF
             check_colspec_is_undef('Gtitle');
           };
     sheet($sheet1);
-    apply { our $TitleP; bug unless $Gtitle eq "G$rx"; 
+    apply { our $TitleP; bug unless $Gtitle eq "G$rx";
             check_colspec_is_undef('TitleP');
           };
 
@@ -971,7 +971,7 @@ EOF
     { my $tmp;
       apply_torx { die "bug($Gtitle)" unless $Gtitle eq "G2" } [2];
       sheet( sheet({package => "Other"}) );
-      apply_torx { 
+      apply_torx {
         ## With Perl v5.20.1 the following eval does not catch the exception
         #die "bug($Gtitle)" if defined eval{ $Gtitle };
         die "bug($Gtitle)" if defined eval{ my $dummy = $Gtitle };
@@ -1049,7 +1049,7 @@ EOF
 
 # write_csv
 
-    my $outfile = "/tmp/output.csv";
+    my $outfile = Path::Tiny->tempfile("output_XXXXX", SUFFIX => ".csv");
     write_csv "$outfile";
 
     { local $/ = undef; # slurp
@@ -1070,9 +1070,9 @@ EOF
         #die dvisq('\nWRONG DATA WRITTEN (diff starts at offset $badoff)\n\n$finald\n---\n $testd\n===\n$finaldata\n---\n $testdata\n').fmtsheet()
         die visnew->Useqq('unicode:controlpic:qq={}')->ivis('\nWRONG DATA WRITTEN (diff starts at offset $badoff)\n'
                 .'f=$finald\n---\nt=$testd\n')
-                .(" " x (5+$badoff))."^\n" 
+                .(" " x (5+$badoff))."^\n"
                 .'\n'.fmtsheet()
-      } 
+      }
     }
 
 # sort
@@ -1086,8 +1086,8 @@ EOF
   #     [   9,      000,    26      ],
   #     [   314,    159,    26      ],
   #     [   77,     888,    999     ],
-  sort_rows { 
-              my ($p, $q)=@_; 
+  sort_rows {
+              my ($p, $q)=@_;
               Carp::confess("bug1") unless defined($p);
               Carp::confess("bug2") unless $myrows[$p] == $a;
               Carp::confess("bug3") unless $myrows[$q] == $b;

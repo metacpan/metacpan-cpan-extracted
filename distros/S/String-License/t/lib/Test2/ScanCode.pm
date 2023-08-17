@@ -1,21 +1,24 @@
 package Test2::ScanCode;
 
-my $CLASS = __PACKAGE__;
-
+use v5.20;
 use strict;
 use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+my $CLASS = __PACKAGE__;
 
 use Test2::API qw(context);
 use Test2::Todo;
 use Test2::Compare qw(compare strict_convert);
 
-use Test2::Require::Module     qw(YAML::XS);
-use Test2::Require::TestCorpus qw(ScanCode);
+use Test2::Require::Module qw(YAML::XS);
 
 use Path::Tiny 0.053;
-use List::SomeUtils qw(uniq);
+use List::Util qw(uniq);
 
 use lib 't/lib';
+use Test2::Require::TestCorpus qw(ScanCode);
 use Uncruft;
 
 use String::License;
@@ -30,15 +33,15 @@ my $naming
 	= String::License::Naming::Custom->new(
 	schemes => [qw(debian spdx internal)] );
 
-sub licenses ($)
+sub licenses ($corpus)
 {
-	my $corpus      = shift;
-	my @licensedirs = qw(
+	my ( @licensedirs, $licenses );
+
+	@licensedirs = qw(
 		src/licensedcode/data/licenses
 		src/licensedcode/data/composites/licenses
 		src/licensedcode/data/non-english/licenses
 	);
-	my $licenses;
 
 	# collect license hints
 	for ( map { path($corpus)->child($_)->children(qr/\.yml$/) }
@@ -52,15 +55,16 @@ sub licenses ($)
 	return $licenses;
 }
 
-sub expected ($$;$)
+sub expected ( $file, $licenses, $overrides = undef )
 {
-	my ( $file, $licenses, $overrides ) = @_;
-	my $stem = $file->basename(qr/\.[^.]+/);
+	my ( $stem, $hints, $license_key );
+
+	$stem = $file->basename(qr/\.[^.]+/);
 
 	return $overrides->{$stem} if ( $overrides and $overrides->{$stem} );
 
-	my $hints = YAML::XS::LoadFile( $file->sibling("$stem.yml") );
-	my $license_key
+	$hints = YAML::XS::LoadFile( $file->sibling("$stem.yml") );
+	$license_key
 		= $licenses->{$stem}{spdx_license_key} || $licenses->{$stem}{key}
 		if $licenses->{$stem};
 
@@ -102,60 +106,59 @@ sub expected ($$;$)
 # * "skip" as second word skips item
 # * remaining uncommented words is a "fix", replacing expected expression
 # * trailing comment is used as reason for todo or skip, or as note for fix
-sub parse_skipfile ($;$)
+sub parse_skipfile ($file)
 {
-	my ( $file, $testpaths ) = shift;
 	my $skips;
 	foreach ( path($file)->lines_utf8( { chomp => 1 } ) ) {
 		next unless $_;    # blank line
 
-		my ( $text, $comment ) = split /\s*#\s*/;
+		my ( $text, $comment, @args, $target, $fix, $pending, $skip );
+
+		( $text, $comment ) = split /\s*#\s*/;
 		next unless ($text);    # comment-only line
 
-		@_ = split ' ', $text;
-		next unless (@_);       # virtually empty line
+		@args = split ' ', $text;
+		next unless (@args);    # virtually empty line
 
-		my $target = shift;
-		unless (@_) {
+		$target = shift @args;
+		unless (@args) {
 			$skips->{$target} = $comment ? [ '', '', '', $comment ] : 1;
 			next;
 		}
 
-		my ( $fix, $pending, $skip );
-
-		$pending = ( $_[0] eq 'todo' );
-		$skip    = ( $_[0] eq 'skip' );
-		shift if ( $pending or $skip );
-		$fix = @_ ? join ' ', @_ : '';
+		$pending = ( $args[0] eq 'todo' );
+		$skip    = ( $args[0] eq 'skip' );
+		shift @args if ( $pending or $skip );
+		$fix = @args ? join ' ', @args : '';
 		$skips->{$target} = [ $pending, $skip, $fix, $comment ];
 	}
 
 	return $skips;
 }
 
-sub are_licensed_like_scancode ($;$$)
+sub are_licensed_like_scancode ( $testpaths, $skipfile = undef,
+	$overrides = undef )
 {
-	my ( $testpaths, $skipfile, $overrides ) = @_;
+	my ( $ctx, $licenses, $skiplist, $failures );
 
-	my $ctx = context();
+	$ctx = context();
 
-	my $licenses = licenses($corpus);
+	$licenses = licenses($corpus);
 
-	my $skiplist = parse_skipfile( $skipfile, $testpaths );
-
-	my $failures;
+	$skiplist = parse_skipfile($skipfile);
 
 	foreach my $file (
 		sort { lc($a) cmp lc($b) }
 		map  { path($corpus)->child($_)->children } @{$testpaths}
 		)
 	{
+		my ($pat, $skipdata, $fix,  $pending, $skip, $note, $reason, $todo,
+			$exp, $got,      $name, $delta
+		);
 
 		next if ( $file =~ /\.yml$/ );
 
-		my $pat = 'detect %s "%s" for ' . $file->basename;
-
-		my ( $skipdata, $fix, $pending, $skip, $note );
+		$pat = 'detect %s "%s" for ' . $file->basename;
 
 		if ($skiplist) {
 			$skipdata = $skiplist->{ $file->basename(qr/\.[^.]+/) };
@@ -166,23 +169,23 @@ sub are_licensed_like_scancode ($;$$)
 			}
 		}
 
-		my $reason = $note || 'Fix later';
+		$reason = $note || 'Fix later';
 
 		if ($skip) {
 			$ctx->skip( $file->basename, $reason );
 			next;
 		}
 
-		my $todo = Test2::Todo->new( reason => $reason )
+		$todo = Test2::Todo->new( reason => $reason )
 			if ($pending);
 
 		# avoid fc() to support older Perl: SPDX probably use only ASCII
-		my $exp = join ' and/or ',
+		$exp = join ' and/or ',
 			uniq sort { lc($a) cmp lc($b) }
 			map       { $licenses->{$_}{spdx_license_key} || $_ }
 			@{ expected( $file, $licenses, $overrides ) };
 
-		my $got = String::License->new(
+		$got = String::License->new(
 			string => uncruft( $file->slurp ),
 			naming => $naming,
 		)->as_text;
@@ -208,9 +211,9 @@ sub are_licensed_like_scancode ($;$$)
 		# TODO: support NONE (i.e. certainly no license)
 		$got =~ s/^UNKNOWN\K$/_OR_NONE/g;
 
-		my $name = sprintf( $pat, 'licensing', $fix ? "$fix ($exp)" : $exp );
+		$name = sprintf( $pat, 'licensing', $fix ? "$fix ($exp)" : $exp );
 
-		my $delta = compare( $got, $fix || $exp, \&strict_convert );
+		$delta = compare( $got, $fix || $exp, \&strict_convert );
 		if ($delta) {
 			$ctx->fail( $name, $delta->diag );
 			$failures++;

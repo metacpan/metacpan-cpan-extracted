@@ -58,6 +58,7 @@ use Data::Printer::Filter::GLOB;
 use Data::Printer::Filter::FORMAT;
 use Data::Printer::Filter::Regexp;
 use Data::Printer::Filter::CODE;
+use Data::Printer::Filter::OBJECT;
 use Data::Printer::Filter::GenericClass;
 
 # create our basic accessors:
@@ -363,7 +364,7 @@ sub _load_filters {
     my ($self, $props) = @_;
 
     # load our core filters (LVALUE is under the 'SCALAR' filter module)
-    my @core_filters = qw(SCALAR ARRAY HASH REF VSTRING GLOB FORMAT Regexp CODE GenericClass);
+    my @core_filters = qw(SCALAR ARRAY HASH REF VSTRING GLOB FORMAT Regexp CODE OBJECT GenericClass);
     foreach my $class (@core_filters) {
         $self->_load_external_filter($class);
     }
@@ -571,7 +572,7 @@ sub _filters_for_data {
     return @potential_filters;
 }
 
-# _see($data): marks data as seen if it was never seen it before.
+# _see($data): marks data as seen if it was never seen before.
 # if we are showing refcounts, we return those. Initially we had
 # this funcionallity separated, but refcounts increase as we find
 # them again and because of that we were seeing weird refcounting.
@@ -589,11 +590,19 @@ sub _see {
     return {} unless ref $data;
     my $id = pack 'J', Scalar::Util::refaddr($data);
     if (!exists $self->{_seen}{$id}) {
-        $self->{_seen}{$id} = {
+        my $entry = {
             name     => $self->current_name,
             refcount => ($self->show_refcount ? $self->_refcount($data) : 0),
         };
-        return { refcount => $self->{_seen}{$id}->{refcount} };
+        # the values returned by tied hashes are temporaries, so we can't
+        # mark them as 'seen'. Ideally, we'd use something like
+        # Hash::Util::Fieldhash::register() (see PR#179) and remove entries
+        # from $self->{_seen} when $data is destroyed. The problem is this
+        # adds a lot of internal magic to the data we're inspecting (we tried,
+        # see Issue#75), effectively changing it. So we just ignore them, at
+        # the risk of missing some circular reference.
+        $self->{_seen}{$id} = $entry unless $options{tied_parent};
+        return { refcount => $entry->{refcount} };
     }
     return { refcount => $self->{_seen}{$id}->{refcount} } if $options{seen_override};
     return $self->{_seen}{$id};
@@ -897,7 +906,6 @@ or 'false'. If you have more than one of those in your data, Data::Printer
 will by default print the second one as a circular reference. When this option
 is set to true, it will instead resolve the scalar value and keep going. (default: false)
 
-
 =head2 Array Options
 
 =head3 array_max
@@ -923,8 +931,7 @@ or 'end'. (default: 'begin')
 
 When set, shows the index number before each array element. (default: 1)
 
-
-=head4 Hash Options
+=head2 Hash Options
 
 =head3 align_hash
 
@@ -1170,7 +1177,7 @@ option to 0.
 =head3 class_method
 
 When Data::Printer is printing an object, it first looks for a method
-named "C<_dataprinter>" and, if one is found, we call it instead of actually
+named "C<_data_printer>" and, if one is found, we call it instead of actually
 parsing the structure.
 
 This way, module authors can control how Data::Printer outputs their objects

@@ -48,8 +48,8 @@ my $calendar = {
 };
 
 my $tc = Finance::Calendar->new(calendar => $calendar);
-my ($LSE, $RANDOM, $FOREX, $ASX, $HKSE, $METAL, $JSC) =
-    map { Finance::Exchange->create_exchange($_) } qw(LSE RANDOM FOREX ASX HKSE METAL JSC);
+my ($LSE, $RANDOM, $FOREX, $ASX, $HKSE, $METAL, $JSC, $SWX) =
+    map { Finance::Exchange->create_exchange($_) } qw(LSE RANDOM FOREX ASX HKSE METAL JSC SWX);
 
 subtest 'trades_on' => sub {
     ok !$tc->trades_on($LSE,   Date::Utility->new('1-Jan-14')),  'LSE doesn\'t trade on 1-Jan-14 because it is on holiday.';
@@ -484,6 +484,48 @@ subtest 'regularly_adjust_trading_hours_on_2' => sub {
 
     ok($tc->closes_early_on($FOREX, $friday), 'Forex closes early on ' . $friday->day_as_string);
     ok($tc->closes_early_on($METAL, $friday), 'Metal closes early on ' . $friday->day_as_string);
+};
+
+# Test next_open_at for cases - when exchange will open on next day, exchange is in between trading brakes,
+# exchange will open on the same day
+subtest 'next_open_at' => sub {
+    # SWX - it has no trading break
+    # Weekday - Exchange is already closed, should be open on next day
+    my $monday_closed     = Date::Utility->new('12-Jun-23 19:00:00');
+    my $next_trading_time = $tc->next_open_at($SWX, $monday_closed);
+    is($next_trading_time->datetime, '2023-06-13 07:00:00', 'Correct next open date and time.');
+
+    # Weekday - Exchange is not open yet 01 am GMT and it is a weekday, should be open on at 07 GMT same day
+    my $early_monday = Date::Utility->new('12-Jun-23 01:00:00');
+    $next_trading_time = $tc->next_open_at($SWX, $early_monday);
+    is($next_trading_time->datetime, '2023-06-12 07:00:00', 'Correct next open date and time.');
+
+    # Weekend - Exchange is already closed and it is a weekend, should be open on next monday
+    my $last_weekday = $monday_closed->plus_time_interval('4d');
+    $next_trading_time = $tc->next_open_at($SWX, $last_weekday);
+    is($next_trading_time->datetime, '2023-06-19 07:00:00', 'Correct next open date and time.');
+
+    # HKSE - it has trading breaks
+    # Weekday - Exchange is already closed, should be open on next day
+    my $hkse_monday_closed = Date::Utility->new('12-Jun-23 08:00:00');
+    $next_trading_time = $tc->next_open_at($HKSE, $hkse_monday_closed);
+    is($next_trading_time->datetime, '2023-06-13 01:30:00', 'Correct next open date and time.');
+
+    # Weekday - Exchange is not open yet 01 am GMT and it is a weekday, should be open on at 01:30 GMT same day
+    my $hkse_early_monday = Date::Utility->new('12-Jun-23 01:00:00');
+    $next_trading_time = $tc->next_open_at($HKSE, $hkse_early_monday);
+    is($next_trading_time->datetime, '2023-06-12 01:30:00', 'Correct next open date and time.');
+
+    # Weekday - Exchange is in trading brake
+    my $hkse_in_break = Date::Utility->new('12-Jun-23 04:15:00');
+    $next_trading_time = $tc->next_open_at($HKSE, $hkse_in_break);
+    is($next_trading_time->datetime, '2023-06-12 05:00:00', 'Correct next open date and time.');
+
+    # Weekend - Exchange is already closed and it is a weekend, should be open on next monday
+    my $hkse_last_weekday = $hkse_monday_closed->plus_time_interval('4d');
+    $next_trading_time = $tc->next_open_at($HKSE, $hkse_last_weekday);
+    is($next_trading_time->datetime, '2023-06-19 01:30:00', 'Correct next open date and time.');
+
 };
 
 done_testing();

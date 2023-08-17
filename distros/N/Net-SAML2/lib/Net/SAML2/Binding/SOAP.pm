@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -10,7 +10,7 @@ use Try::Tiny;
 
 with 'Net::SAML2::Role::VerifyXML';
 
-# ABSTRACT: Net::SAML2::Binding::SOAP - SOAP binding for SAML
+# ABSTRACT: SOAP binding for SAML
 
 
 use Net::SAML2::XML::Sig;
@@ -46,6 +46,12 @@ has 'anchors' => (
     isa       => 'HashRef',
     required  => 0,
     predicate => 'has_anchors'
+);
+
+has verify => (
+    is        => 'ro',
+    isa       => 'HashRef',
+    predicate => 'has_verify',
 );
 
 # BUILDARGS
@@ -110,7 +116,11 @@ sub handle_response {
                 no_xml_declaration => 1,
                 cert_text          => $cert,
                 cacert             => $self->cacert,
-                anchors            => $self->anchors
+                anchors            => $self->anchors,
+                $self->has_verify ? (
+                    ns => { 'artifact' => $self->verify->{ns} },
+                    id_attr => '/artifact:' . $self->verify->{attr_id},
+                ) : (),
             );
             return 1;
         }
@@ -218,11 +228,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Binding::SOAP - Net::SAML2::Binding::SOAP - SOAP binding for SAML
+Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 
@@ -234,6 +244,17 @@ version 0.69
   );
 
   my $response = $soap->request($req);
+
+Note that LWP::UserAgent maybe used which means that environment variables
+may affect the use of https see:
+
+=over
+
+=item * L<PERL_LWP_SSL_CA_FILE and HTTPS_CA_FILE|https://metacpan.org/pod/LWP::UserAgent#SSL_ca_file-=%3E-$path>
+
+=item * L<PERL_LWP_SSL_CA_PATH and HTTPS_CA_DIR|https://metacpan.org/pod/LWP::UserAgent#SSL_ca_path-=%3E-$path>
+
+=back
 
 =head1 METHODS
 

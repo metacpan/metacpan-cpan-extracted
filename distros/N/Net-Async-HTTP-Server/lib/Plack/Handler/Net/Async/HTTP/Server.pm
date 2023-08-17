@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
-package Plack::Handler::Net::Async::HTTP::Server;
+package Plack::Handler::Net::Async::HTTP::Server 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Net::Async::HTTP::Server::PSGI;
 use IO::Async::Loop;
-
-our $VERSION = '0.13';
 
 =head1 NAME
 

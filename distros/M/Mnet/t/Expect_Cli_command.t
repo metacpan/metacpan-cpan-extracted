@@ -31,10 +31,10 @@ Mnet::T::test_perl({
     name    => 'command method call',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;   read INPUT
-            echo -n prompt%;   read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo -n prompt%;   read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -50,10 +50,10 @@ Mnet::T::test_perl({
     name    => 'command method with prompt_re',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;   read INPUT
-            echo -n prompt%;   read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo -n prompt%;   read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -70,9 +70,9 @@ Mnet::T::test_perl({
     name    => 'command method timeout',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
-            echo output;     read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
+            echo output;       read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -89,9 +89,9 @@ Mnet::T::test_perl({
     name    => 'command method timeout handling',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
-            echo output;     read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
+            echo output;       read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -107,12 +107,12 @@ Mnet::T::test_perl({
     name    => 'command method with output pagination',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo MORE;       read INPUT
+            echo MORE;         read INPUT
             echo more output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -128,12 +128,12 @@ Mnet::T::test_perl({
     name    => 'command method cached output',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
             echo uncached output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -150,12 +150,12 @@ Mnet::T::test_perl({
     name    => 'command cache clear method',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
             echo uncached output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '

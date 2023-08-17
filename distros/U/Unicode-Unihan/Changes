@@ -1,5 +1,8 @@
 # Revision history for Perl extension Unicode::Unihan.
 
+0.044 2023-07-23T00:00:40Z
+	* Fix use_ok and isa_ok tests (Graham Knopp, #8)
+
 0.043 2022-03-08T01:18:31Z
 	* Makefile.PL is more careful about the DBM files it creates. This
 	responds to GitHub #2, and RT-125349 and RT-75802.

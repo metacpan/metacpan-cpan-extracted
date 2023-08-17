@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::Keyword::Accessor;
@@ -39,6 +39,15 @@ my $obj = Test1->new;
    $obj->x = "new value";
    is( $obj->value, "new value", 'write access wrote value' );
    ok( $callcount{set}, 'set {} was invoked' );
+}
+
+# unimport
+{
+   no Object::Pad::Keyword::Accessor;
+
+   sub accessor { return "normal function" }
+
+   is( accessor, "normal function", 'accessor() parses as a normal function call' );
 }
 
 done_testing;

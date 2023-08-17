@@ -1,3 +1,4 @@
+requires 'perl' => '5.008001';
 requires 'Moose' => '1.23';
 requires 'MooseX::Types' => '0.37';
 requires 'Data::Serializer' => '0.54';

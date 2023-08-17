@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::model::elatriuni;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

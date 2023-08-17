@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Try;
 
@@ -118,6 +118,14 @@ use Syntax::Keyword::Try;
    }
 
    ok( $destroyed, 'catch ($var) does not retain value' );
+}
+
+{
+   no Syntax::Keyword::Try;
+
+   sub try { return "normal function" }
+
+   is( try, "normal function", 'try() parses as a normal function call' );
 }
 
 done_testing;

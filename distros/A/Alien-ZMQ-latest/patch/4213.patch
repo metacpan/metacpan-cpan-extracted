@@ -1,0 +1,42 @@
+From 92b2c38a2c51a1942a380c7ee08147f7b1ca6845 Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <bluca@debian.org>
+Date: Sun, 13 Jun 2021 16:21:07 +0100
+Subject: [PATCH] Problem: build with curve fails on GCC 11
+
+Solution: ignore false positives due to compiler bug:
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99578
+
+Fixes https://github.com/zeromq/libzmq/issues/4206
+---
+ src/curve_client_tools.hpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/curve_client_tools.hpp b/src/curve_client_tools.hpp
+index 3c098ba937e6f1010df97f46dfd9fe01cb62d7ed..7e0d25b3a413b7ff8a0e1d0f12fa14a3d8b6ba14 100644
+--- a/src/curve_client_tools.hpp
++++ b/src/curve_client_tools.hpp
+@@ -180,6 +180,12 @@ struct curve_client_tools_t
+         //  Create Box [C + vouch + metadata](C'->S')
+         std::fill (initiate_plaintext.begin (),
+                    initiate_plaintext.begin () + crypto_box_ZEROBYTES, 0);
++
++        //  False positives due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99578
++#if __GNUC__ >= 11
++#pragma GCC diagnostic ignored "-Warray-bounds"
++#pragma GCC diagnostic ignored "-Wstringop-overflow="
++#endif
+         memcpy (&initiate_plaintext[crypto_box_ZEROBYTES], public_key_, 32);
+         memcpy (&initiate_plaintext[crypto_box_ZEROBYTES + 32], vouch_nonce + 8,
+                 16);
+@@ -189,6 +195,10 @@ struct curve_client_tools_t
+             memcpy (&initiate_plaintext[crypto_box_ZEROBYTES + 48 + 80],
+                     metadata_plaintext_, metadata_length_);
+         }
++#if __GNUC__ >= 11
++#pragma GCC diagnostic pop
++#pragma GCC diagnostic pop
++#endif
+ 
+         memcpy (initiate_nonce, "CurveZMQINITIATE", 16);
+         put_uint64 (initiate_nonce + 16, cn_nonce_);

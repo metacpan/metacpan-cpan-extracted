@@ -57,7 +57,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.210';
+our $VERSION = '1.211';
 
 # -----------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ sub resources {
 
 =head1 VERSION
 
-1.210
+1.211
 
 =head1 AUTHOR
 

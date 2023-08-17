@@ -19,7 +19,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.5.0';
 
 
 sub prepare_app {
@@ -74,8 +74,8 @@ sub prepare_app {
 
     $self->rules( my $rules = {} );
 
-    my %codes = ( whitelist => -1, blacklist => 0 );
-    my %types = ( ip        => '', netblock  => 1 );
+    my %codes = ( whitelist => -1, allowed => -1, blacklist => 0, rejected => 0, norobots => 0 );
+    my %types = ( ip => '', netblock => 1 );
 
     for my $line ( pairs @blocks ) {
 
@@ -84,12 +84,15 @@ sub prepare_app {
 
         my ( $rate, $type ) = @{ $rule };
 
-        $rate //= $codes{blacklist};
-        $rate = $codes{$rate} if exists $codes{$rate};
-
         $type //= "ip";
         my $mask = $types{$type} // $type;
         $mask = $block if $mask eq "1";
+
+        $rate //= "rejected";
+        if (exists $codes{$rate}) {
+            $mask = $rate if $mask eq "";
+            $rate = $codes{$rate};
+        }
 
         $rules->{$block} = [ $rate, $mask ];
         $match->add( $block => [$block] );
@@ -105,6 +108,13 @@ sub call {
     my $rule = $name ? $self->rules->{$name} : [ $self->default_rate ];
 
     my $rate = $rule->[0];
+
+    if ( $rate == 0 && $rule->[1] && $rule->[1] eq "norobots" ) {
+        if ( $env->{PATH_INFO} eq "/robots.txt" ) {
+            $rate = ONE_MINUTE;    # one request/second
+        }
+    }
+
     if ( $rate >= 0 ) {
 
         my $limit = $rate == 0;
@@ -162,7 +172,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.4.2
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -226,10 +236,14 @@ The keys are network blocks, and the values are an array reference of rates and 
 separated values can be used instead, to make it easier to directly use the configuration from something like
 L<Config::General>.)
 
-The rates are either the maximum number of requests per minute, or "whitelist" to not limit the network block, or
-"blacklist" to always forbid a network block.
+The rates are either the maximum number of requests per minute, or "whitelist" or "allowed" to not limit the network
+block, or "blacklist" or "rejected" to always forbid a network block.
 
-(The rate "-1" corresponds to "whitelist", and the rate "0" corresponds to "blacklist".)
+(The rate "-1" corresponds to "allowed", and the rate "0" corresponds to "rejected".)
+
+A special rate code of "norobots" will reject all requests except for F</robots.txt>, which is allowed at a rate of 60
+per minute.  This will allow you to block a robot but still allow the robot to access the robot rules that say it is
+disallowed.
 
 The tracking type defaults to "ip", which applies limits to individual ips. You can also use "netblock" to apply the
 limits to all hosts in that network block, or use a name so that limits are applied to all hosts in network blocks
@@ -275,6 +289,19 @@ e.g. one minute.  If you use a different time interval, then you may need to adj
 This does not try and enforce any consistency or block overlapping netblocks.  It trusts L<Net::IP::Match::Trie> to
 handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
 
+When configuring the L</greylist> netblocks from a configuration file using L<Config::General>, duplicate netblocks may
+be merged in unexpected ways, for example
+
+    10.0.0.0/16   60 group-1
+
+    ...
+
+    10.0.0.0/16  120 group-2
+
+may be merged as something like
+
+    '10.0.0.0/16' => [ '60 group-1', '120 group-2' ],
+
 Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
 exception for trusted networks that gives them a higher rate than the default.
 
@@ -288,11 +315,9 @@ requests. This is probably not something that you want.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.4.0, the this module requires Perl v5.12 or later.
+This module requires Perl v5.12 or later.
 
-If you need this module on Perl v5.10, please use one of the v0.3.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
+Future releases may only support Perl versions released in the last ten years
 
 =head1 SOURCE
 

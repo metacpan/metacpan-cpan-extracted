@@ -46,7 +46,7 @@ cmp_deeply(\@cv_names, ['external_cv', 'fission_yeast_phenotype']);
 
 my @db_names = sort $ontology_data->get_db_names();
 
-cmp_deeply(\@db_names, ['EXT', 'FYPO', 'PATO', 'PMID', 'PomBase', '_global']);
+cmp_deeply(\@db_names, [qw(EXT FYPO OBO_REL PATO PMID PomBase RO _global)]);
 
 my @fypo_cvterms = $ontology_data->get_terms_by_cv_name('fission_yeast_phenotype');
 

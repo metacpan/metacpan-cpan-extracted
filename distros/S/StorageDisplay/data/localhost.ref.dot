@@ -5,7 +5,7 @@ digraph "eyak"{ // HEADER: MACHINE
 		color=lightgrey;
 		fillcolor=white;
 		node [style=filled,color=white,fillcolor=white,shape=rectangle];
-			{ "machine@eyak|Partition::MSDOS@dm-10" [
+			{ "machine@eyak|Partition::MSDOS@dm-9" [
 				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
 						<TR> <TD COLSPAN="2">Linux device-mapper (linear)</TD> </TR><TR><TD >/dev/eyak/kvm-miathan<BR/>Label: msdos<BR/>Size: 10.0 GiB</TD>    <TD BGCOLOR="lightgrey">
 						<TABLE >
@@ -114,16 +114,16 @@ digraph "eyak"{ // HEADER: MACHINE
 						shape=rectangle;style=striped;fillcolor="pink"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-3" [
-						label="PV: /dev/mapper/pv3_decrypted\nSize: 500 GiB\nFree: 2.00 GiB\nUsed: 498 GiB";
-						shape=rectangle;style=striped;fillcolor="pink;0.996000.2:green"
+						label="PV: /dev/mapper/pv3_decrypted\nSize: 500 GiB\nFree: 7.00 GiB\nUsed: 493 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.985999.2:green"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-4" [
 						label="PV: /dev/mapper/pv4_decrypted\nSize: 500 GiB\nFree: 0 B\nUsed: 500 GiB";
 						shape=rectangle;style=striped;fillcolor="pink"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-5" [
-						label="PV: /dev/mapper/pv5_decrypted\nSize: 150 GiB\nFree: 60.0 GiB\nUsed: 90.0 GiB";
-						shape=rectangle;style=striped;fillcolor="pink;0.600078.2:green"
+						label="PV: /dev/mapper/pv5_decrypted\nSize: 150 GiB\nFree: 50.0 GiB\nUsed: 100 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.666753.2:green"
 					]; }
 					label="eyak's PVs";
 				}
@@ -135,7 +135,7 @@ digraph "eyak"{ // HEADER: MACHINE
 						fillcolor="yellow"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::LVs|::LV@crypt_user" [
-						label="LV: crypt_user\nSize: 5.00 GiB";
+						label="LV: crypt_user\nSize: 10.0 GiB";
 						fillcolor="yellow"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::LVs|::LV@data" [
@@ -164,7 +164,7 @@ digraph "eyak"{ // HEADER: MACHINE
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::LVs|::LV@photo-arch" [
 						label="LV: photo-arch\nSize: 300 GiB";
-						fillcolor="lightgrey"
+						fillcolor="yellow"
 					]; }
 					{ "machine@eyak|LVM::VG@eyak|::LVs|::LV@photos" [
 						label="LV: photos\nSize: 277 GiB";
@@ -184,8 +184,8 @@ digraph "eyak"{ // HEADER: MACHINE
 					]; }
 					label="eyak's LVs";
 				}
-				label="LVM: eyak\nSize: 1.61 TiB\nFree: 62.0 GiB";
-				style=striped;fillcolor="pink;0.962434.2:green"
+				label="LVM: eyak\nSize: 1.61 TiB\nFree: 57.0 GiB";
+				style=striped;fillcolor="pink;0.965465.2:green"
 			}
 			subgraph "cluster_machine@eyak|LVM::VG@eyak-init" {
 				style=filled;
@@ -217,19 +217,20 @@ digraph "eyak"{ // HEADER: MACHINE
 				label="LVM: eyak-init\nSize: 10.00 GiB\nFree: 1020 MiB";
 				style=striped;fillcolor="pink;0.900352.2:green"
 			}
-			subgraph "cluster_machine@eyak|LUKS@dm-9" {
+			subgraph "cluster_machine@eyak|LUKS@dm-18" {
 				style=filled;
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				{ "machine@eyak|LUKS@dm-9|::Encrypted@dm-9" [
-					label="/dev/eyak/crypt_user\nSize: 5.00 GiB";
+				{ "machine@eyak|LUKS@dm-18|::Encrypted@dm-18" [
+					label="/dev/eyak/crypt_user\nSize: 10.0 GiB";
 					fillcolor="yellow"
 				]; }
-				{ "machine@eyak|LUKS@dm-9|::Decrypted::None@LUKS@dm-9@@" [
-					label="Not decrypted";
+				{ "machine@eyak|LUKS@dm-18|::Decrypted::Present@dm-19" [
+					label="/dev/mapper/_dev_dm_18\nSize: 9.98 GiB";
+					fillcolor="yellow"
 				]; }
-				label="/dev/eyak/crypt_user\nLUKS version 1";
+				label="/dev/eyak/crypt_user\nLUKS version 2";
 			}
 			subgraph "cluster_machine@eyak|LUKS@nvme0n1p3" {
 				style=filled;
@@ -296,9 +297,9 @@ digraph "eyak"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				{ "machine@eyak|FS|::SWAP::Partition@dm-16" [
-					label="SWAP\nDevice: /dev/eyak/swap\nSize: 18.9 GiB\nFree: 12.3 GiB\nUsed: 6.60 GiB";
-					shape=rectangle;style=striped;fillcolor="pink;0.348603.2:green"
+				{ "machine@eyak|FS|::SWAP::Partition@dm-15" [
+					label="SWAP\nDevice: /dev/eyak/swap\nSize: 18.9 GiB\nFree: 13.3 GiB\nUsed: 5.68 GiB";
+					shape=rectangle;style=striped;fillcolor="pink;0.299780.2:green"
 				]; }
 				subgraph "cluster_machine@eyak|FS|::MP@27@/" {
 					style=filled;
@@ -306,301 +307,67 @@ digraph "eyak"{ // HEADER: MACHINE
 					fillcolor=lightgrey;
 					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 					{ "machine@eyak|FS|::MP@27@/|::FS@FS@27@/" [
-						label="/\nDevice: /dev/eyak/root\next4\nSize: 68.6 GiB\nFree: 1.36 GiB\nUsed: 64.0 GiB";
-						shape=rectangle;style=striped;fillcolor="pink;0.932316.2:green;0.019890.2:orange"
+						label="/\nDevice: /dev/eyak/root\next4\nSize: 68.6 GiB\nFree: 1.37 GiB\nUsed: 64.0 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.932217.2:green;0.019988.2:orange"
 					]; }
 					subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/" {
 						color=white;
 						fillcolor=white;
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" [
-								label="/sys (sysfs)";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys" {
-								color=white;
-								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [
-									label="/sys/kernel/security (securityfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@31@/sys/fs/cgroup" [
-									label="/sys/fs/cgroup (cgroup2)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@32@/sys/fs/pstore" [
-									label="/sys/fs/pstore (pstore)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@33@/sys/firmware/efi/efivars" [
-									label="/sys/firmware/efi/efivars (efivarfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [
-									label="/sys/fs/bpf (bpf)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug" {
-									style=filled;
-									color=lightgrey;
-									fillcolor=lightgrey;
-									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-									{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::FS@FS@38@/sys/kernel/debug" [
-										label="/sys/kernel/debug (debugfs)";
-										shape=rectangle;style=striped;fillcolor="yellow"
-									]; }
-									subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::C@38@/sys/kernel/debug" {
-										color=white;
-										fillcolor=white;
-										{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::C@38@/sys/kernel/debug|FS::MP::FS@FS@301@/sys/kernel/debug/tracing" [
-											label="/sys/kernel/debug/tracing (tracefs)";
-											shape=rectangle;style=striped;fillcolor="yellow"
-										]; }
-										label="";
-									}
-									label="";
-								}
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@39@/sys/kernel/tracing" [
-									label="/sys/kernel/tracing (tracefs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@40@/sys/kernel/config" [
-									label="/sys/kernel/config (configfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@41@/sys/fs/fuse/connections" [
-									label="/sys/fs/fuse/connections (fusectl)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::FS@FS@21@/proc" [
-								label="/proc (proc)";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc" {
-								color=white;
-								fillcolor=white;
-								subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc" {
-									style=filled;
-									color=lightgrey;
-									fillcolor=lightgrey;
-									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-									{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" [
-										label="/proc/sys/fs/binfmt_misc\nSource: systemd-1\nautofs";
-										shape=rectangle;style=striped;fillcolor="yellow"
-									]; }
-									subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc" {
-										color=white;
-										fillcolor=white;
-										{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@112@/proc/sys/fs/binfmt_misc" [
-											label="/proc/sys/fs/binfmt_misc (binfmt_misc)";
-											shape=rectangle;style=striped;fillcolor="yellow"
-										]; }
-										label="";
-									}
-									label="";
-								}
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP::FS@FS@91@/proc/fs/nfsd" [
-									label="/proc/fs/nfsd (nfsd)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" [
-								label="/dev\nSource: udev\ndevtmpfs\nSize: 15.6 GiB\nFree: 15.6 GiB\nUsed: 0 B";
-								shape=rectangle;style=striped;fillcolor="green"
-							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev" {
-								color=white;
-								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@23@/dev/pts" [
-									label="/dev/pts (devpts)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@29@/dev/shm" [
-									label="/dev/shm\ntmpfs\nSize: 15.6 GiB\nFree: 15.6 GiB\nUsed: 9.93 MiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000622.2:green"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@36@/dev/hugepages" [
-									label="/dev/hugepages (hugetlbfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@37@/dev/mqueue" [
-									label="/dev/mqueue (mqueue)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" [
-								label="/run\ntmpfs\nSize: 3.12 GiB\nFree: 3.12 GiB\nUsed: 4.02 MiB";
-								shape=rectangle;style=striped;fillcolor="pink;0.001259.2:green"
-							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run" {
-								color=white;
-								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@30@/run/lock" [
-									label="/run/lock\ntmpfs\nSize: 5.00 MiB\nFree: 4.99 MiB\nUsed: 12.0 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.002344.2:green"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@62@/run/credentials/systemd-sysusers.service" [
-									label="/run/credentials/systemd-sysusers.service (ramfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@66@/run/credentials/systemd-tmpfiles-setup-dev.service" [
-									label="/run/credentials/systemd-tmpfiles-setup-dev.service (ramfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@109@/run/rpc_pipefs" [
-									label="/run/rpc_pipefs\nSource: sunrpc\nrpc_pipefs";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@119@/run/credentials/systemd-sysctl.service" [
-									label="/run/credentials/systemd-sysctl.service (ramfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@143@/run/credentials/systemd-tmpfiles-setup.service" [
-									label="/run/credentials/systemd-tmpfiles-setup.service (ramfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@565@/run/owfs" [
-									label="/run/owfs\nSource: OWFS\nfuse.OWFS";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@1547@/run/docker/netns/bf51b71f614f" [
-									label="/run/docker/netns/bf51b71f614f\nSource: nsfs[net:[4026532872]]
-Subdir: net:[4026532872]\nnsfs";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000" {
-									style=filled;
-									color=lightgrey;
-									fillcolor=lightgrey;
-									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-									{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::FS@FS@1819@/run/user/1000" [
-										label="/run/user/1000\ntmpfs\nSize: 3.12 GiB\nFree: 3.12 GiB\nUsed: 160 kiB";
-										shape=rectangle;style=striped;fillcolor="pink;0.000049.2:green"
-									]; }
-									subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::C@1819@/run/user/1000" {
-										color=white;
-										fillcolor=white;
-										{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::C@1819@/run/user/1000|FS::MP::FS@FS@1864@/run/user/1000/gvfs" [
-											label="/run/user/1000/gvfs\nSource: gvfsd-fuse\nfuse.gvfsd-fuse";
-											shape=rectangle;style=striped;fillcolor="yellow"
-										]; }
-										{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::C@1819@/run/user/1000|FS::MP::FS@FS@1909@/run/user/1000/doc" [
-											label="/run/user/1000/doc\nSource: portal\nfuse.portal";
-											shape=rectangle;style=striped;fillcolor="yellow"
-										]; }
-										label="";
-									}
-									label="";
-								}
-								label="";
-							}
-							label="";
-						}
 						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot" {
 							style=filled;
 							color=lightgrey;
 							fillcolor=lightgrey;
 							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::FS@FS@94@/boot" [
-								label="/boot\nDevice: /dev/eyak-init/boot\next4\nSize: 973 MiB\nFree: 813 MiB\nUsed: 93.2 MiB";
-								shape=rectangle;style=striped;fillcolor="pink;0.095780.2:green;0.835185.2:orange"
+								label="/boot\nDevice: /dev/eyak-init/boot\next4\nSize: 973 MiB\nFree: 841 MiB\nUsed: 65.6 MiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.067377.2:green;0.863589.2:orange"
 							]; }
 							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot" {
 								color=white;
 								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@103@/boot/efi" [
-									label="/boot/efi\nDevice: /dev/nvme0n1p1\nvfat\nSize: 599 MiB\nFree: 499 MiB\nUsed: 99.7 MiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.166554.2:green"
+								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@106@/boot/efi" [
+									label="/boot/efi\nDevice: /dev/nvme0n1p1\nvfat\nSize: 599 MiB\nFree: 499 MiB\nUsed: 99.8 MiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.166612.2:green"
 								]; }
 								label="";
 							}
 							label="";
 						}
 						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@97@/srv/chorale" [
-							label="/srv/chorale\nDevice: /dev/eyak/chorale\next4\nSize: 196 GiB\nFree: 972 MiB\nUsed: 185 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.943999.2:green;0.004849.2:orange"
+							label="/srv/chorale\nDevice: /dev/eyak/chorale\next4\nSize: 196 GiB\nFree: 16.2 GiB\nUsed: 170 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.866093.2:green;0.082756.2:orange"
 						]; }
-						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@100@/srv/photos" [
-							label="/srv/photos\nDevice: /dev/eyak/photos\next4\nSize: 272 GiB\nFree: 35.4 GiB\nUsed: 234 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.859707.2:green;0.130069.2:orange"
-						]; }
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home" {
+						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home" {
 							style=filled;
 							color=lightgrey;
 							fillcolor=lightgrey;
 							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" [
-								label="/home\nDevice: /dev/eyak/home\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
-								shape=rectangle;style=striped;fillcolor="pink;0.905813.2:green;0.045066.2:orange"
+							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home" [
+								label="/home\nDevice: /dev/eyak/home\next4\nSize: 245 GiB\nFree: 6.48 GiB\nUsed: 227 GiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.924422.2:green;0.026457.2:orange"
 							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::C@106@/home" {
+							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::C@100@/home" {
 								color=white;
 								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::C@106@/home|FS::MP::FS@FS@1530@/home/user/travail/perso/private" [
-									label="/home/user/travail/perso/private\nSource: encfs\nfuse.encfs";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
 								label="";
 							}
 							label="";
 						}
-						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@662@/srv/data" [
-							label="/srv/data\nDevice: /dev/eyak/data\next4\nSize: 295 GiB\nFree: 66.3 GiB\nUsed: 215 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.729323.2:green;0.224811.2:orange"
+						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@103@/srv/photos" [
+							label="/srv/photos\nDevice: /dev/eyak/photos\next4\nSize: 272 GiB\nFree: 26.2 GiB\nUsed: 243 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.893629.2:green;0.096147.2:orange"
 						]; }
-						subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::FS@FS@1363@/mnt" [
-								label="/mnt\nDevice: /dev/eyak/home
-Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
-								shape=rectangle;style=striped;fillcolor="pink;0.905813.2:green;0.045066.2:orange"
-							]; }
-							subgraph "cluster_machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::C@1363@/mnt" {
-								color=white;
-								fillcolor=white;
-								{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::C@1363@/mnt|FS::MP::FS@FS@1532@/mnt/travail/perso/private" [
-									label="/mnt/travail/perso/private\nSource: encfs\nfuse.encfs";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1458@/var/lib/docker/overlay2/e02df2e121eb163289f9285aa3f2833cb6190bf73c0040096dd4a0492501d5fa/merged" [
-							label="/var/lib/docker/overlay2/e02df2e121eb163289f9285aa3f2833cb6190bf73c0040096dd4a0492501d5fa/merged\noverlay\nSize: 68.6 GiB\nFree: 1.36 GiB\nUsed: 64.0 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.932316.2:green;0.019890.2:orange"
+						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@684@/srv/photos-archives" [
+							label="/srv/photos-archives\nDevice: /dev/eyak/photo-arch\next4\nSize: 294 GiB\nFree: 17.0 GiB\nUsed: 264 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.896229.2:green;0.057768.2:orange"
+						]; }
+						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1324@/srv/data" [
+							label="/srv/data\nDevice: /dev/eyak/data\next4\nSize: 295 GiB\nFree: 22.2 GiB\nUsed: 259 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.878753.2:green;0.075381.2:orange"
+						]; }
+						{ "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1656@/srv/user/crypt" [
+							label="/srv/user/crypt\nDevice: /dev/mapper/_dev_dm_18\next4\nSize: 9.73 GiB\nFree: 3.60 GiB\nUsed: 5.62 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.577311.2:green;0.369775.2:orange"
 						]; }
 						label="";
 					}
@@ -705,7 +472,7 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			// Links from LVM VG: LVM::VG@eyak
 			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-4" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@chorale"
 			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-3" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@chorale"
-			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-3" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@crypt_user"
+			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-5" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@crypt_user"
 			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-3" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@data"
 			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-2" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@home"
 			"machine@eyak|LVM::VG@eyak|::PVs|::PV@dm-5" -> "machine@eyak|LVM::VG@eyak|::LVs|::LV@home"
@@ -724,7 +491,7 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			"machine@eyak|LVM::VG@eyak-init|::PVs|::PV@nvme0n1p2" -> "machine@eyak|LVM::VG@eyak-init|::LVs|::LV@base-root"
 			"machine@eyak|LVM::VG@eyak-init|::PVs|::PV@nvme0n1p2" -> "machine@eyak|LVM::VG@eyak-init|::LVs|::LV@boot"
 			// Links from LUKS: /dev/eyak/crypt_user
-			"machine@eyak|LUKS@dm-9|::Encrypted@dm-9" -> "machine@eyak|LUKS@dm-9|::Decrypted::None@LUKS@dm-9@@"
+			"machine@eyak|LUKS@dm-18|::Encrypted@dm-18" -> "machine@eyak|LUKS@dm-18|::Decrypted::Present@dm-19"
 			// Links from LUKS: /dev/nvme0n1p3
 			"machine@eyak|LUKS@nvme0n1p3|::Encrypted@nvme0n1p3" -> "machine@eyak|LUKS@nvme0n1p3|::Decrypted::Present@dm-2"
 			// Links from LUKS: /dev/nvme0n1p4
@@ -733,90 +500,22 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			"machine@eyak|LUKS@nvme0n1p5|::Encrypted@nvme0n1p5" -> "machine@eyak|LUKS@nvme0n1p5|::Decrypted::Present@dm-4"
 			// Links from LUKS: /dev/nvme0n1p6
 			"machine@eyak|LUKS@nvme0n1p6|::Encrypted@nvme0n1p6" -> "machine@eyak|LUKS@nvme0n1p6|::Decrypted::Present@dm-5"
-			// Links from FS::MP::FS@FS@20@/sys
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" [style=invis]
-			// Links from FS::MP::FS@FS@28@/sys/kernel/security
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [style=invis]
-			// Links from FS::MP::FS@FS@31@/sys/fs/cgroup
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@31@/sys/fs/cgroup" [style=invis]
-			// Links from FS::MP::FS@FS@32@/sys/fs/pstore
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@32@/sys/fs/pstore" [style=invis]
-			// Links from FS::MP::FS@FS@33@/sys/firmware/efi/efivars
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@33@/sys/firmware/efi/efivars" [style=invis]
-			// Links from FS::MP::FS@FS@34@/sys/fs/bpf
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [style=invis]
-			// Links from FS::MP::FS@FS@38@/sys/kernel/debug
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::FS@FS@38@/sys/kernel/debug" [style=invis]
-			// Links from FS::MP::FS@FS@301@/sys/kernel/debug/tracing
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::FS@FS@38@/sys/kernel/debug" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP@38@/sys/kernel/debug|::C@38@/sys/kernel/debug|FS::MP::FS@FS@301@/sys/kernel/debug/tracing" [style=invis]
-			// Links from FS::MP::FS@FS@39@/sys/kernel/tracing
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@39@/sys/kernel/tracing" [style=invis]
-			// Links from FS::MP::FS@FS@40@/sys/kernel/config
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@40@/sys/kernel/config" [style=invis]
-			// Links from FS::MP::FS@FS@41@/sys/fs/fuse/connections
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::FS@FS@20@/sys" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@20@/sys|::C@20@/sys|FS::MP::FS@FS@41@/sys/fs/fuse/connections" [style=invis]
-			// Links from FS::MP::FS@FS@21@/proc
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::FS@FS@21@/proc" [style=invis]
-			// Links from FS::MP::FS@FS@35@/proc/sys/fs/binfmt_misc
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::FS@FS@21@/proc" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" [style=invis]
-			// Links from FS::MP::FS@FS@112@/proc/sys/fs/binfmt_misc
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@112@/proc/sys/fs/binfmt_misc" [style=invis]
-			// Links from FS::MP::FS@FS@91@/proc/fs/nfsd
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::FS@FS@21@/proc" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@21@/proc|::C@21@/proc|FS::MP::FS@FS@91@/proc/fs/nfsd" [style=invis]
-			// Links from FS::MP::FS@FS@22@/dev
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" [style=invis]
-			// Links from FS::MP::FS@FS@23@/dev/pts
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@23@/dev/pts" [style=invis]
-			// Links from FS::MP::FS@FS@29@/dev/shm
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@29@/dev/shm" [style=invis]
-			// Links from FS::MP::FS@FS@36@/dev/hugepages
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@36@/dev/hugepages" [style=invis]
-			// Links from FS::MP::FS@FS@37@/dev/mqueue
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::FS@FS@22@/dev" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@22@/dev|::C@22@/dev|FS::MP::FS@FS@37@/dev/mqueue" [style=invis]
-			// Links from FS::MP::FS@FS@24@/run
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" [style=invis]
-			// Links from FS::MP::FS@FS@30@/run/lock
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@30@/run/lock" [style=invis]
-			// Links from FS::MP::FS@FS@62@/run/credentials/systemd-sysusers.service
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@62@/run/credentials/systemd-sysusers.service" [style=invis]
-			// Links from FS::MP::FS@FS@66@/run/credentials/systemd-tmpfiles-setup-dev.service
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@66@/run/credentials/systemd-tmpfiles-setup-dev.service" [style=invis]
-			// Links from FS::MP::FS@FS@109@/run/rpc_pipefs
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@109@/run/rpc_pipefs" [style=invis]
-			// Links from FS::MP::FS@FS@119@/run/credentials/systemd-sysctl.service
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@119@/run/credentials/systemd-sysctl.service" [style=invis]
-			// Links from FS::MP::FS@FS@143@/run/credentials/systemd-tmpfiles-setup.service
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@143@/run/credentials/systemd-tmpfiles-setup.service" [style=invis]
-			// Links from FS::MP::FS@FS@565@/run/owfs
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@565@/run/owfs" [style=invis]
-			// Links from FS::MP::FS@FS@1547@/run/docker/netns/bf51b71f614f
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP::FS@FS@1547@/run/docker/netns/bf51b71f614f" [style=invis]
-			// Links from FS::MP::FS@FS@1819@/run/user/1000
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::FS@FS@24@/run" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::FS@FS@1819@/run/user/1000" [style=invis]
-			// Links from FS::MP::FS@FS@1864@/run/user/1000/gvfs
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::FS@FS@1819@/run/user/1000" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::C@1819@/run/user/1000|FS::MP::FS@FS@1864@/run/user/1000/gvfs" [style=invis]
-			// Links from FS::MP::FS@FS@1909@/run/user/1000/doc
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::FS@FS@1819@/run/user/1000" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@24@/run|::C@24@/run|FS::MP@1819@/run/user/1000|::C@1819@/run/user/1000|FS::MP::FS@FS@1909@/run/user/1000/doc" [style=invis]
 			// Links from FS::MP::FS@FS@94@/boot
 			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::FS@FS@94@/boot" [style=invis]
-			// Links from FS::MP::FS@FS@103@/boot/efi
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::FS@FS@94@/boot" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@103@/boot/efi" [style=invis]
+			// Links from FS::MP::FS@FS@106@/boot/efi
+			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::FS@FS@94@/boot" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@106@/boot/efi" [style=invis]
 			// Links from FS::MP::FS@FS@97@/srv/chorale
 			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@97@/srv/chorale" [style=invis]
-			// Links from FS::MP::FS@FS@100@/srv/photos
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@100@/srv/photos" [style=invis]
-			// Links from FS::MP::FS@FS@106@/home
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" [style=invis]
-			// Links from FS::MP::FS@FS@1530@/home/user/travail/perso/private
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::C@106@/home|FS::MP::FS@FS@1530@/home/user/travail/perso/private" [style=invis]
-			// Links from FS::MP::FS@FS@662@/srv/data
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@662@/srv/data" [style=invis]
-			// Links from FS::MP::FS@FS@1363@/mnt
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::FS@FS@1363@/mnt" [style=invis]
-			// Links from FS::MP::FS@FS@1532@/mnt/travail/perso/private
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::FS@FS@1363@/mnt" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::C@1363@/mnt|FS::MP::FS@FS@1532@/mnt/travail/perso/private" [style=invis]
-			// Links from FS::MP::FS@FS@1458@/var/lib/docker/overlay2/e02df2e121eb163289f9285aa3f2833cb6190bf73c0040096dd4a0492501d5fa/merged
-			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1458@/var/lib/docker/overlay2/e02df2e121eb163289f9285aa3f2833cb6190bf73c0040096dd4a0492501d5fa/merged" [style=invis]
+			// Links from FS::MP::FS@FS@100@/home
+			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home" [style=invis]
+			// Links from FS::MP::FS@FS@103@/srv/photos
+			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@103@/srv/photos" [style=invis]
+			// Links from FS::MP::FS@FS@684@/srv/photos-archives
+			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@684@/srv/photos-archives" [style=invis]
+			// Links from FS::MP::FS@FS@1324@/srv/data
+			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1324@/srv/data" [style=invis]
+			// Links from FS::MP::FS@FS@1656@/srv/user/crypt
+			"machine@eyak|FS|::MP@27@/|::FS@FS@27@/" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1656@/srv/user/crypt" [style=invis]
 			// Links from Libvirt::VM::Block@sdb
 			// SOURCE LINK: visio 21474836480 (sdb) "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
 			// Links from Libvirt::VM::Block@sdc
@@ -841,9 +540,9 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			// SOURCE LINK: debiantesting 0 (hda) "machine@eyak|Libvirt|::VM@debiantesting|::Block@hda"
 			// Links from Libvirt::VM::Block@vda
 			// SOURCE LINK: OrdiClaire 0 (vda) "machine@eyak|Libvirt|::VM@OrdiClaire|::Block@vda"
-			// Links for Partition::MSDOS@dm-10
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-miathan" -> "machine@eyak|Partition::MSDOS@dm-10"
-			// Links for Partition::MSDOS@dm-10
+			// Links for Partition::MSDOS@dm-9
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-miathan" -> "machine@eyak|Partition::MSDOS@dm-9"
+			// Links for Partition::MSDOS@dm-9
 			// Links for Partition::Table
 			// Links for Partition::Table::Part::Data@1
 			// Links for Partition::Table::Part::SubTable@2
@@ -897,10 +596,10 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			// Links for LVM::VG::LVs::LV@base-root
 			// Links for LVM::VG::LVs::LV@boot
 			// Links for LUKS: /dev/eyak/crypt_user
-			// Links for LUKS::Encrypted@dm-9
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@crypt_user" -> "machine@eyak|LUKS@dm-9|::Encrypted@dm-9"
-			// Links for LUKS::Encrypted@dm-9
-			// Links for LUKS::Decrypted::None@LUKS@dm-9@@
+			// Links for LUKS::Encrypted@dm-18
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@crypt_user" -> "machine@eyak|LUKS@dm-18|::Encrypted@dm-18"
+			// Links for LUKS::Encrypted@dm-18
+			// Links for LUKS::Decrypted::Present@dm-19
 			// Links for LUKS: /dev/nvme0n1p3
 			// Links for LUKS::Encrypted@nvme0n1p3
 			"machine@eyak|Partition::GPT@nvme0n1":"3" -> "machine@eyak|LUKS@nvme0n1p3|::Encrypted@nvme0n1p3"
@@ -922,97 +621,49 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			// Links for LUKS::Encrypted@nvme0n1p6
 			// Links for LUKS::Decrypted::Present@dm-5
 			// Links for FS
-			// Links for FS::SWAP::Partition@dm-16
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@swap" -> "machine@eyak|FS|::SWAP::Partition@dm-16"
-			// Links for FS::SWAP::Partition@dm-16
+			// Links for FS::SWAP::Partition@dm-15
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@swap" -> "machine@eyak|FS|::SWAP::Partition@dm-15"
+			// Links for FS::SWAP::Partition@dm-15
 			// Links for FS::MP@27@/
 			// Links for FS::MP::FS@FS@27@/
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@root" -> "machine@eyak|FS|::MP@27@/|::FS@FS@27@/"
 			// Links for FS::MP::FS@FS@27@/
 			// Links for FS::MP::C@27@/
-			// Links for FS::MP@20@/sys
-			// Links for FS::MP::FS@FS@20@/sys
-			// Links for FS::MP::C@20@/sys
-			// Links for FS::MP::FS@FS@28@/sys/kernel/security
-			// Links for FS::MP::FS@FS@31@/sys/fs/cgroup
-			// Links for FS::MP::FS@FS@32@/sys/fs/pstore
-			// Links for FS::MP::FS@FS@33@/sys/firmware/efi/efivars
-			// Links for FS::MP::FS@FS@34@/sys/fs/bpf
-			// Links for FS::MP@38@/sys/kernel/debug
-			// Links for FS::MP::FS@FS@38@/sys/kernel/debug
-			// Links for FS::MP::C@38@/sys/kernel/debug
-			// Links for FS::MP::FS@FS@301@/sys/kernel/debug/tracing
-			// Links for FS::MP::FS@FS@39@/sys/kernel/tracing
-			// Links for FS::MP::FS@FS@40@/sys/kernel/config
-			// Links for FS::MP::FS@FS@41@/sys/fs/fuse/connections
-			// Links for FS::MP@21@/proc
-			// Links for FS::MP::FS@FS@21@/proc
-			// Links for FS::MP::C@21@/proc
-			// Links for FS::MP@35@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::FS@FS@35@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::C@35@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::FS@FS@112@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::FS@FS@91@/proc/fs/nfsd
-			// Links for FS::MP@22@/dev
-			// Links for FS::MP::FS@FS@22@/dev
-			// Links for FS::MP::C@22@/dev
-			// Links for FS::MP::FS@FS@23@/dev/pts
-			// Links for FS::MP::FS@FS@29@/dev/shm
-			// Links for FS::MP::FS@FS@36@/dev/hugepages
-			// Links for FS::MP::FS@FS@37@/dev/mqueue
-			// Links for FS::MP@24@/run
-			// Links for FS::MP::FS@FS@24@/run
-			// Links for FS::MP::C@24@/run
-			// Links for FS::MP::FS@FS@30@/run/lock
-			// Links for FS::MP::FS@FS@62@/run/credentials/systemd-sysusers.service
-			// Links for FS::MP::FS@FS@66@/run/credentials/systemd-tmpfiles-setup-dev.service
-			// Links for FS::MP::FS@FS@109@/run/rpc_pipefs
-			// Links for FS::MP::FS@FS@119@/run/credentials/systemd-sysctl.service
-			// Links for FS::MP::FS@FS@143@/run/credentials/systemd-tmpfiles-setup.service
-			// Links for FS::MP::FS@FS@565@/run/owfs
-			// Links for FS::MP::FS@FS@1547@/run/docker/netns/bf51b71f614f
-			// Links for FS::MP@1819@/run/user/1000
-			// Links for FS::MP::FS@FS@1819@/run/user/1000
-			// Links for FS::MP::C@1819@/run/user/1000
-			// Links for FS::MP::FS@FS@1864@/run/user/1000/gvfs
-			// Links for FS::MP::FS@FS@1909@/run/user/1000/doc
 			// Links for FS::MP@94@/boot
 			// Links for FS::MP::FS@FS@94@/boot
 			"machine@eyak|LVM::VG@eyak-init|::LVs|::LV@boot" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::FS@FS@94@/boot"
 			// Links for FS::MP::FS@FS@94@/boot
 			// Links for FS::MP::C@94@/boot
-			// Links for FS::MP::FS@FS@103@/boot/efi
-			"machine@eyak|Partition::GPT@nvme0n1":"1" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@103@/boot/efi"
-			// Links for FS::MP::FS@FS@103@/boot/efi
+			// Links for FS::MP::FS@FS@106@/boot/efi
+			"machine@eyak|Partition::GPT@nvme0n1":"1" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@94@/boot|::C@94@/boot|FS::MP::FS@FS@106@/boot/efi"
+			// Links for FS::MP::FS@FS@106@/boot/efi
 			// Links for FS::MP::FS@FS@97@/srv/chorale
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@chorale" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@97@/srv/chorale"
 			// Links for FS::MP::FS@FS@97@/srv/chorale
-			// Links for FS::MP::FS@FS@100@/srv/photos
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@photos" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@100@/srv/photos"
-			// Links for FS::MP::FS@FS@100@/srv/photos
-			// Links for FS::MP@106@/home
-			// Links for FS::MP::FS@FS@106@/home
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@home" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home"
-			// Links for FS::MP::FS@FS@106@/home
-			// Links for FS::MP::C@106@/home
-			// Links for FS::MP::FS@FS@1530@/home/user/travail/perso/private
-			// Links for FS::MP::FS@FS@662@/srv/data
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@data" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@662@/srv/data"
-			// Links for FS::MP::FS@FS@662@/srv/data
-			// Links for FS::MP@1363@/mnt
-			// Links for FS::MP::FS@FS@1363@/mnt
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@home" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@1363@/mnt|::FS@FS@1363@/mnt"
-			// Links for FS::MP::FS@FS@1363@/mnt
-			// Links for FS::MP::C@1363@/mnt
-			// Links for FS::MP::FS@FS@1532@/mnt/travail/perso/private
-			// Links for FS::MP::FS@FS@1458@/var/lib/docker/overlay2/e02df2e121eb163289f9285aa3f2833cb6190bf73c0040096dd4a0492501d5fa/merged
+			// Links for FS::MP@100@/home
+			// Links for FS::MP::FS@FS@100@/home
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@home" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home"
+			// Links for FS::MP::FS@FS@100@/home
+			// Links for FS::MP::C@100@/home
+			// Links for FS::MP::FS@FS@103@/srv/photos
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@photos" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@103@/srv/photos"
+			// Links for FS::MP::FS@FS@103@/srv/photos
+			// Links for FS::MP::FS@FS@684@/srv/photos-archives
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@photo-arch" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@684@/srv/photos-archives"
+			// Links for FS::MP::FS@FS@684@/srv/photos-archives
+			// Links for FS::MP::FS@FS@1324@/srv/data
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@data" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1324@/srv/data"
+			// Links for FS::MP::FS@FS@1324@/srv/data
+			// Links for FS::MP::FS@FS@1656@/srv/user/crypt
+			"machine@eyak|LUKS@dm-18|::Decrypted::Present@dm-19" -> "machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@1656@/srv/user/crypt"
+			// Links for FS::MP::FS@FS@1656@/srv/user/crypt
 			// Links for Libvirt Virtual Machines
 			// Links for Libvirt::VM@visio
 			// Links for Libvirt::VM::Block@sdb
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-discord" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
 			// Links for Libvirt::VM::Block@sdb
 			// Links for Libvirt::VM::Block@sdc
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
+			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
 			// Links for Libvirt::VM::Block@sdc
 			// Links for Libvirt::VM@vagrant_default
 			// Links for Libvirt::VM::Block@vda
@@ -1021,14 +672,14 @@ Subdir: /user\next4\nSize: 245 GiB\nFree: 11.0 GiB\nUsed: 222 GiB";
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-test-uefi-root" -> "machine@eyak|Libvirt|::VM@test_uefi|::Block@vda"
 			// Links for Libvirt::VM::Block@vda
 			// Links for Libvirt::VM::Block@sda
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" -> "machine@eyak|Libvirt|::VM@test_uefi|::Block@sda"
+			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home" -> "machine@eyak|Libvirt|::VM@test_uefi|::Block@sda"
 			// Links for Libvirt::VM::Block@sda
 			// Links for Libvirt::VM@test_BIOS
 			// Links for Libvirt::VM::Block@sdb
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-test-root" -> "machine@eyak|Libvirt|::VM@test_BIOS|::Block@sdb"
 			// Links for Libvirt::VM::Block@sdb
 			// Links for Libvirt::VM::Block@sda
-			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@106@/home|::FS@FS@106@/home" -> "machine@eyak|Libvirt|::VM@test_BIOS|::Block@sda"
+			"machine@eyak|FS|::MP@27@/|::C@27@/|FS::MP@100@/home|::FS@FS@100@/home" -> "machine@eyak|Libvirt|::VM@test_BIOS|::Block@sda"
 			// Links for Libvirt::VM::Block@sda
 			// Links for Libvirt::VM@part2_master
 			// Links for Libvirt::VM::Block@vda

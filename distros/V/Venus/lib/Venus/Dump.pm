@@ -61,15 +61,15 @@ sub build_self {
     my ($data) = @_;
     require Data::Dumper;
     no warnings 'once';
-    local $Data::Dumper::Indent = 0;
-    local $Data::Dumper::Purity = 0;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Purity = 1;
     local $Data::Dumper::Quotekeys = 0;
     local $Data::Dumper::Deepcopy = 1;
     local $Data::Dumper::Deparse = 1;
     local $Data::Dumper::Sortkeys = 1;
     local $Data::Dumper::Terse = 1;
     local $Data::Dumper::Useqq = 1;
-    Data::Dumper->Dump([$data]) =~ s/^"|"$//gr;
+    Data::Dumper->Dump([$data])
   });
 
   $self->decoder(sub {

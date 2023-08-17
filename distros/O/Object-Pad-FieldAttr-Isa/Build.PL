@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -17,11 +18,10 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::FieldAttr::Isa',
    requires => {
-      'Object::Pad' => '0.60',
+      'Object::Pad' => '0.66',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000147',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

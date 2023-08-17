@@ -11,11 +11,11 @@ my $test = sub {
     my ($app, @args) = @_;
     return sub {
         my ($env) = @_;
-        my $app = builder {
+        my $proxyapp = builder {
             enable 'Plack::Middleware::Proxy::Requests', @args;
             $app;
         };
-        return $app->($env);
+        return $proxyapp->($env);
     };
 };
 
@@ -37,12 +37,12 @@ my $test = sub {
     };
 
     my $app_proxy_url = sub {
-        [ 200, [ 'Content-Type' => 'text/plain' ], [ $_[0]->{'plack.proxy.url'} ] ]
+        [200, ['Content-Type' => 'text/plain'], [$_[0]->{'plack.proxy.url'}]]
     };
 
     {
-        ok my $res = $test->($app_proxy_url)->($env);
-        is $res->[2][0], $uri;
+        ok my $res = $test->($app_proxy_url)->($env), '$res';
+        is $res->[2][0], $uri, '$uri';
     }
 }
 

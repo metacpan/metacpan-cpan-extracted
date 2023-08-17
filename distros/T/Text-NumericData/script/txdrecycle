@@ -7,10 +7,10 @@ exit $app->run();
 
 __END__
 
+
 =head1 NAME
 
 txdrecycle - Rearrange lines (records) in files in accordance to changing the viewport along a cyclic coordinate.
-
 
 =head1 DESCRIPTION
 
@@ -22,13 +22,13 @@ These are the general rules for specifying parameters to this program:
 
 	txdrecycle -s -xyz -s=value --long --long=value [--] [files/stuff]
 
-You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+You mention the options to change parameters in any order or even multiple times. They are processed in the oder given, later operations overriding/extending earlier settings. Using the separator "--" stops option parsing
 An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
 Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
 
 There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
-	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
 
@@ -81,8 +81,7 @@ fill value for undefined data (from Text::NumericData)
 
 	0
 
-show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
-
+Show the help message. Value 1..9: help level, par: help for paramter par (long name) only.
 
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
@@ -135,6 +134,18 @@ use this separator for input (otherwise deduce from data; TAB is another way to 
 
 shift the viewport by that value (nearest existing data point), direction is subject to misunderstandings
 
+=item B<smother>, B<m> (scalar)
+
+	0
+
+compute arithmetic mean of initial outer boundaries that are supposed to be identical, but are not
+
+=item B<smother-except>, B<x> (array)
+
+	[]
+
+list of columns to extempt from smothering (in addition to the coordinate column)
+
 =item B<strict>, B<S> (scalar)
 
 	0
@@ -161,6 +172,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2023 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

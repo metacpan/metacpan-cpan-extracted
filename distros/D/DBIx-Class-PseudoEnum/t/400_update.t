@@ -45,7 +45,7 @@ fixtures_ok [
 
 
 subtest 'update for pseudo-enum created via direct injection' => sub {
-   plan(5);
+   plan(6);
    my $contraption = Contraption->find(1);
    like(
       lives {
@@ -60,7 +60,7 @@ subtest 'update for pseudo-enum created via direct injection' => sub {
       dies {
          $contraption->update( { status => 'nothing'} );
       },
-      qr/^You have attempted to assign a value to status that is not valid:/,
+      qr/You have attempted to assign a value to status that is not valid:/,
       'Unable to update with an invalid value'
    );
 
@@ -74,10 +74,17 @@ subtest 'update for pseudo-enum created via direct injection' => sub {
    $contraption = Contraption->find(1);
    is( $contraption->status, undef, 'properly round-tripped an update with null status.' );
 
+   like(
+      lives {
+         $contraption->update( { note => 'This is a note' });
+      },
+      1,
+      'Able to update non-enumerated field correctly.'
+   )
 };
 
 subtest 'update for pseudo-enum created via enumerate' => sub {
-   plan(4);
+   plan(5);
    my $doodad = Doodad->find(1);
    like(
       lives {
@@ -93,7 +100,7 @@ subtest 'update for pseudo-enum created via enumerate' => sub {
       dies {
          $doodad->update( {  status => 'BOGUS!' } )
       },
-      qr/^You have attempted to assign a value to status that is not valid:/,
+      qr/You have attempted to assign a value to status that is not valid:/,
       'Unable to update with an invalid value'
    );
 
@@ -103,6 +110,15 @@ subtest 'update for pseudo-enum created via enumerate' => sub {
       },
       qr/NOT NULL constraint failed/,
       'Unable to update with a null value in a non-nullable field'
+   );
+   $doodad->discard_changes;
+
+   like(
+      lives {
+         $doodad->update( { note => 'This is a note' });
+      },
+      1,
+      'Able to update non-enumerated field correctly.'
    );
 };
 

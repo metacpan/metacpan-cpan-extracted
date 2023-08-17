@@ -1,8 +1,8 @@
 package Atto;
-$Atto::VERSION = '0.004';
+$Atto::VERSION = '0.005';
 # ABSTRACT: A tiny microservice builder
 
-use 5.008_001;
+use 5.008001;
 use warnings;
 use strict;
 
@@ -246,13 +246,13 @@ L<https://github.com/robn/Atto>
 
 =item *
 
-Robert Norris <rob@eatenbyagrue.org>
+Rob Norris <rob@despairlabs.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2016 by Robert Norris.
+This software is copyright (c) 2015-2016 by Rob Norris.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

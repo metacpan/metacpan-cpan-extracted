@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetPivotTableRequest.name :   ,
-# PutWorksheetPivotTableRequest.sheetName :   ,
-# PutWorksheetPivotTableRequest.folder :   ,
-# PutWorksheetPivotTableRequest.sourceData :   ,
-# PutWorksheetPivotTableRequest.destCellName :   ,
-# PutWorksheetPivotTableRequest.tableName :   ,
-# PutWorksheetPivotTableRequest.useSameSource :   ,
-# PutWorksheetPivotTableRequest.storageName :    
+# PutWorksheetPivotTableRequest.name : The workbook name.  ,
+# PutWorksheetPivotTableRequest.sheetName : The worksheet name.  ,
+# PutWorksheetPivotTableRequest.folder : Original workbook folder.  ,
+# PutWorksheetPivotTableRequest.sourceData : The data for the new PivotTable cache.  ,
+# PutWorksheetPivotTableRequest.destCellName : The cell in the upper-left corner of the PivotTable report`s destination range.  ,
+# PutWorksheetPivotTableRequest.tableName : The name of the new PivotTable report.  ,
+# PutWorksheetPivotTableRequest.useSameSource : Indicates whether using same data source when another existing pivot table has used this data source. If the property is true, it will save memory.  ,
+# PutWorksheetPivotTableRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_pivot_table' } = { 
-    	summary => '',
+    	summary => 'Adds a pivot table in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'source_data' => {
      	datatype => 'string',
      	base_name => 'sourceData',
-     	description => '',
+     	description => 'The data for the new PivotTable cache.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'destCellName',
-     	description => '',
+     	description => 'The cell in the upper-left corner of the PivotTable report`s destination range.',
      	format => '',
      	read_only => '',
      		},
      'table_name' => {
      	datatype => 'string',
      	base_name => 'tableName',
-     	description => '',
+     	description => 'The name of the new PivotTable report.',
      	format => '',
      	read_only => '',
      		},
      'use_same_source' => {
      	datatype => 'string',
      	base_name => 'useSameSource',
-     	description => '',
+     	description => 'Indicates whether using same data source when another existing pivot table has used this data source. If the property is true, it will save memory.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

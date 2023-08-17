@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-06'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.485'; # VERSION
+our $VERSION = '0.486'; # VERSION
 
 our %SPEC;
 
@@ -303,7 +303,7 @@ App::FilterOrgByHeadlines - Filter Org by headlines
 
 =head1 VERSION
 
-This document describes version 0.485 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2023-04-06.
+This document describes version 0.486 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2023-07-12.
 
 =head1 FUNCTIONS
 

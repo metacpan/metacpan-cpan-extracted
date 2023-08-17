@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetAddPictureRequest.name :   ,
-# PutWorksheetAddPictureRequest.sheetName :   ,
-# PutWorksheetAddPictureRequest.picture :   ,
-# PutWorksheetAddPictureRequest.upperLeftRow :   ,
-# PutWorksheetAddPictureRequest.upperLeftColumn :   ,
-# PutWorksheetAddPictureRequest.lowerRightRow :   ,
-# PutWorksheetAddPictureRequest.lowerRightColumn :   ,
-# PutWorksheetAddPictureRequest.picturePath :   ,
-# PutWorksheetAddPictureRequest.folder :   ,
-# PutWorksheetAddPictureRequest.storageName :    
+# PutWorksheetAddPictureRequest.name : The workbook name.  ,
+# PutWorksheetAddPictureRequest.sheetName : The worsheet name.  ,
+# PutWorksheetAddPictureRequest.picture : Pictute object  ,
+# PutWorksheetAddPictureRequest.upperLeftRow : The image upper left row.  ,
+# PutWorksheetAddPictureRequest.upperLeftColumn : The image upper left column.  ,
+# PutWorksheetAddPictureRequest.lowerRightRow : The image low right row.  ,
+# PutWorksheetAddPictureRequest.lowerRightColumn : The image low right column.  ,
+# PutWorksheetAddPictureRequest.picturePath : The picture path, if not provided the picture data is inspected in the request body.  ,
+# PutWorksheetAddPictureRequest.folder : Original workbook folder.  ,
+# PutWorksheetAddPictureRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_add_picture' } = { 
-    	summary => '',
+    	summary => 'Adds a new picture in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -162,70 +162,70 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worsheet name.',
      	format => '',
      	read_only => '',
      		},
      'picture' => {
      	datatype => 'Picture',
      	base_name => 'picture',
-     	description => '',
+     	description => 'Pictute object',
      	format => '',
      	read_only => '',
      		},
      'upper_left_row' => {
      	datatype => 'int',
      	base_name => 'upperLeftRow',
-     	description => '',
+     	description => 'The image upper left row.',
      	format => '',
      	read_only => '',
      		},
      'upper_left_column' => {
      	datatype => 'int',
      	base_name => 'upperLeftColumn',
-     	description => '',
+     	description => 'The image upper left column.',
      	format => '',
      	read_only => '',
      		},
      'lower_right_row' => {
      	datatype => 'int',
      	base_name => 'lowerRightRow',
-     	description => '',
+     	description => 'The image low right row.',
      	format => '',
      	read_only => '',
      		},
      'lower_right_column' => {
      	datatype => 'int',
      	base_name => 'lowerRightColumn',
-     	description => '',
+     	description => 'The image low right column.',
      	format => '',
      	read_only => '',
      		},
      'picture_path' => {
      	datatype => 'string',
      	base_name => 'picturePath',
-     	description => '',
+     	description => 'The picture path, if not provided the picture data is inspected in the request body.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

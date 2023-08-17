@@ -25,16 +25,16 @@ no_index:
 provides:
   Amazon::S3:
     file: lib/Amazon/S3.pm
-    version: '0.63'
+    version: '0.64'
   Amazon::S3::Bucket:
     file: lib/Amazon/S3/Bucket.pm
-    version: '0.63'
+    version: '0.64'
   Amazon::S3::Constants:
     file: lib/Amazon/S3/Constants.pm
-    version: '0.63'
+    version: '0.64'
   Amazon::S3::Logger:
     file: lib/Amazon/S3/Logger.pm
-    version: '0.63'
+    version: '0.64'
   Amazon::S3::Signature::V4:
     file: lib/Amazon/S3/Signature/V4.pm
     version: '0'
@@ -61,5 +61,5 @@ resources:
   bugtracker: http://github.com/rlauer6/perl-amazon-s3/issues
   homepage: http://github.com/rlauer6/perl-amazon-s3
   repository: git://github.com/rlauer6/perl-amazon-s3.git
-version: '0.63'
+version: '0.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

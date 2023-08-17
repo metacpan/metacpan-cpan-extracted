@@ -38,15 +38,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 {
   ok(SPVM::TestCase::Method->return_mulnum_automatical_numeric_convertion);
 }
-# variable length arguments
-{
-  ok(SPVM::TestCase::Method->vaarg_objects_pass_each_values);
-  ok(SPVM::TestCase::Method->vaarg_objects_pass_array);
-  ok(SPVM::TestCase::Method->vaarg_pass_each_values);
-  ok(SPVM::TestCase::Method->vaarg_pass_array);
-  ok(SPVM::TestCase::Method->vaarg_objects_pass_empty);
-}
-
 # Anon method
 {
   ok(SPVM::TestCase::Method->cb_obj_capture);
@@ -247,9 +238,16 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::Method->optional_args);
 }
 
-# items
+# args_width
 {
-  ok(SPVM::TestCase::Method->items);
+  ok(SPVM::TestCase::Method->args_width);
+}
+
+# Interface Methods
+{
+  {
+    ok(SPVM::TestCase::Method->call_interface_method_exception);
+  }
 }
 
 # All object is freed

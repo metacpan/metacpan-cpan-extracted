@@ -33,18 +33,18 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Syntax::Keyword::Defer" : {
          "file" : "lib/Syntax/Keyword/Defer.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Syntax::Keyword::Finally" : {
          "file" : "lib/Syntax/Keyword/Finally.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

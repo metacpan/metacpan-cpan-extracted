@@ -9,7 +9,7 @@ use Crypt::Passphrase;
 
 use Crypt::HSM;
 
-my $path = $ENV{HSM_PROVIDER};
+my $path = $ENV{HSM_PROVIDER} // '';
 
 plan skip_all => '' unless -e $path;
 

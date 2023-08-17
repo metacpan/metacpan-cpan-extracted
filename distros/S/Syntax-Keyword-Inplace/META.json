@@ -33,14 +33,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Syntax::Keyword::Inplace" : {
          "file" : "lib/Syntax/Keyword/Inplace.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

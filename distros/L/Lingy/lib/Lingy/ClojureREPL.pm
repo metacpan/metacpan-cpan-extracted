@@ -16,7 +16,7 @@ my ($select_out, $select_err);
 my $Y = "\e[0;33m";
 my $Z = "\e[0m";
 
-my $clojure_jar;
+my $clojure_jar = $ENV{LINGY_CLOJURE_JAR};
 my $already_searched = 0;
 my $main_repl = <<'...';
 (require '[clojure.main :as main])
@@ -26,7 +26,10 @@ my $main_repl = <<'...';
   :prompt #()
   :caught (fn [e]
     (let [
-      e-via (binding [ *data-readers* {'error identity} ] (let [ err-data (read-string (pr-str e))] (:via err-data)))
+      e-via (binding
+        [ *data-readers* {'error identity} ]
+        (let [ err-data (read-string (pr-str e))]
+          (:via err-data)))
       [m1 m2 m3] e-via ]
       (if m1 (println (:message m1)))
       (if m2 (println (:message m2)))))])
@@ -48,7 +51,8 @@ sub start {
             die "Can't open '$file' for input: $!";
         my $text = do {local $/; <$fh>};
         $text =~ /java -cp +(.+?\.jar)/ or do {
-            print "${Y}Can't find 'clojure' on this system$Z\n";
+            print "${Y}Can't find the Clojure jar file on this system.$Z\n";
+            print "${Y}Try setting the LINGY_CLOJURE_JAR env variable.$Z\n";
             return;
         };
         $clojure_jar = $1;
@@ -114,17 +118,18 @@ sub rep {
         usleep 500_000;
     }
 
-    chomp $output;
+    $output =~ s/\n*\z//;
+    $output .= "\n" if length $output;
 
     print STDOUT "${Y}Clojure:$Z\n$output\n";
 }
 
 END {
     if (defined $pid) {
-        print "$Y*** Stopping Clojure REPL server ($pid)$Z\n";
         print $in '(java.lang.System/exit 0)', "\n";
         waitpid( $pid, 0 );
         my $rc = $? >> 8;
+        print "$Y*** Stopped Clojure REPL server ($pid)$Z\n";
         exit $rc unless $rc == 0;
     }
 }

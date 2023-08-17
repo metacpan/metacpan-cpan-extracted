@@ -6,7 +6,7 @@ use Moose;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: readfiles 
+ PERL PROGRAM NAME: readfiles 
  AUTHOR: Juan Lorenzo
  DATE: Oct 29 2012
  DESCRIPTION read file operations
@@ -178,7 +178,7 @@ sub cols_1p {
 	if ($ref_origin) {
 		$readfiles->{_ref_file} = $ref_origin;
 
-	   # print ("\n readfiles, cols_1, The input file is called $ref_origin\n");
+#	   print ("\n readfiles, cols_1, The input file is called $ref_origin\n");
 		open( FILE, $readfiles->{_ref_file} )
 		  || print("Can't open file_name, $!\n");
 

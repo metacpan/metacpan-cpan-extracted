@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::LazyInit 0.05;
+package Object::Pad::FieldAttr::LazyInit 0.06;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.50;
+use Object::Pad 0.66;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -23,7 +23,7 @@ C<Object::Pad::FieldAttr::LazyInit> - lazily initialise C<Object::Pad> fields at
    use Object::Pad::FieldAttr::LazyInit;
 
    class Item {
-      has $uuid :reader :param :LazyInit(_make_uuid);
+      field $uuid :reader :param :LazyInit(_make_uuid);
 
       method _make_uuid {
          require Data::GUID;
@@ -46,7 +46,7 @@ future. As a result, this module should be considered equally experimental.
 
 =head2 :LazyInit
 
-   has $field :LazyInit(NAME) ...;
+   field $name :LazyInit(NAME) ...;
 
 Declares that if the field variable is read from before it has been otherwise
 initialised, then the named method will be called first to create an initial
@@ -66,14 +66,14 @@ initialised. By placing the initialiser method immediately after the field
 declaration, before any other fields, you can reduce the possibility of
 getting stuck in such a manner.
 
-   has $field_zero :param;
+   field $field_zero :param;
 
-   has $field_one :LazyInit(_make_one);
+   field $field_one :LazyInit(_make_one);
    method _make_one {
       # we can safely use $field_zero in here
    }
 
-   has $field_two :LazyInit(_make_two);
+   field $field_two :LazyInit(_make_two);
    method _make_two {
       # we can safely use $field_zero and $field_one
    }
@@ -83,6 +83,11 @@ getting stuck in such a manner.
 sub import
 {
    $^H{"Object::Pad::FieldAttr::LazyInit/LazyInit"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::FieldAttr::LazyInit/LazyInit"};
 }
 
 =head1 AUTHOR

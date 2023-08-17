@@ -12,7 +12,7 @@ my $mp_gen;
 # also set MP_APXS
 if ($ENV{MOD_PERL_2_BUILD}) {
     push @ARGV, "-apxs", $ENV{MP_APXS};
-    my $mp_gen = satisfy_mp_generation(2);
+    $mp_gen = satisfy_mp_generation(2);
 }
 else {
     $mp_gen = satisfy_mp_generation();
@@ -23,9 +23,6 @@ else {
 unless ( $ARGV[0] eq '--dist' || $ENV{MOD_PERL_2_BUILD} ) {
     if ( $Config{'osname'} eq 'linux' ) {
         $prereqs{'Linux::Pid'} = 0;
-        if ( -e '/proc/self/smaps' ) {
-            $prereqs{'Linux::Smaps'} = 0;
-        }
     }
     elsif ( $Config{'osname'} =~ /(bsd|aix)/i ) {
         $prereqs{'BSD::Resource'} = 0;
@@ -37,8 +34,18 @@ unless ( $ARGV[0] eq '--dist' || $ENV{MOD_PERL_2_BUILD} ) {
 
 my $HAS_APACHE_TEST = check_for_apache_test();
 
+my $VERSION;
+set_apache_sizelimit_version();
+
 my %common_opts = (
+                   VERSION         => $VERSION,
                    PREREQ_PM       => \%prereqs,
+                   dist            => {
+                       COMPRESS => 'gzip -9f', SUFFIX => 'gz',
+                       PREOP   => 'find $(DISTVNAME) -type d -print|xargs chmod 0755 && ' .
+                                  'find $(DISTVNAME) -type f -print|xargs chmod 0644',
+                       TO_UNIX => 'find $(DISTVNAME) -type f -print|xargs dos2unix'
+                   },
                    clean           => { FILES => 't/TEST' },
                   );
 
@@ -52,7 +59,6 @@ if ($mp_gen == 1 || $ENV{MAINTAINER_BUILDING_RELEASE}) {
     require ExtUtils::MakeMaker;
     ExtUtils::MakeMaker::WriteMakefile(
                                        %common_opts,
-                                       VERSION_FROM    => "lib/Apache/SizeLimit.pm",
                                        NAME            => "Apache::SizeLimit",
                                        ABSTRACT_FROM   => 'lib/Apache/SizeLimit.pm',
                                       );
@@ -62,7 +68,6 @@ else {
     require ModPerl::MM;
     ModPerl::MM::WriteMakefile(
                                %common_opts,
-                               VERSION_FROM    => "lib/Apache2/SizeLimit.pm",
                                NAME            => "Apache2::SizeLimit",
                                ABSTRACT_FROM   => 'lib/Apache2/SizeLimit.pm',
                               );
@@ -71,7 +76,7 @@ else {
 sub check_for_apache_test {
     return unless eval {
         require Apache::Test;
-         if ($Apache::Test::VERSION < $at_min_ver) {
+        if ($Apache::Test::VERSION < $at_min_ver) {
             die "Apache::Test version is " . $Apache::Test::VERSION . 
                 ", minimum version required is $at_min_ver" . 
                 ", tests will be skipped\n";
@@ -88,6 +93,28 @@ sub check_for_apache_test {
     Apache::TestRunPerl->generate_script();
 
     return 1;
+}
+
+sub set_apache_sizelimit_version {
+    # We cannot require Apache::SizeLimit or Apache2::SizeLimit to access their
+    # $VERSIONs because they depend on Apache::Constants / Apache2::Const and at
+    # least the latter cannot be loaded in a command-line script (at least not
+    # on Windows, where it fails to load because ModPerl/Const/Const.dll cannot
+    # be loaded). Even Apache::SizeLimit::Core cannot be loaded on Windows
+    # because it is not implemented on that platform. So instead we use MM's
+    # parse_version() method to read the $VERSION for us.
+    $VERSION = MM->parse_version('lib/Apache/SizeLimit.pm');
+
+    my $fh = Symbol::gensym();
+    open $fh, 'Changes' or die "Can't open Changes: $!";
+    while (<$fh>) {
+        if(/^=item.*-(dev|rc\d+)/) {
+            $VERSION .= "-$1";
+            last;
+        }
+        last if /^=item/;
+    }
+    close $fh;
 }
 
 # If a specific generation was passed as an argument,
@@ -111,13 +138,14 @@ sub satisfy_mp_generation {
 
     unless ($wanted == 1 || $wanted == 2) {
         die "don't know anything about mod_perl generation: $wanted\n" .
-            "currently supporting only generations 1 and 2";
+            "currently supporting only generations 1 and 2.\n" .
+            "Please specify MOD_PERL=1 or MOD_PERL=2 on the commandline\n";
     }
 
     my $selected = 0;
 
     if ($wanted == 1) {
-        require_mod_perl();
+        require_mod_perl(1);
         if ($mod_perl::VERSION >= 1.99) {
             # so we don't pick 2.0 version if 1.0 is wanted
             die "You don't seem to have mod_perl 1.0 installed";
@@ -126,7 +154,7 @@ sub satisfy_mp_generation {
     }
     elsif ($wanted == 2) {
         #warn "Looking for mod_perl 2.0";
-        require_mod_perl();
+        require_mod_perl(2);
         if ($mod_perl::VERSION < 2.0) {
             die "You don't seem to have mod_perl 2.0 installed";
         }
@@ -142,9 +170,25 @@ sub satisfy_mp_generation {
 }
 
 sub require_mod_perl {
-
-    eval { require mod_perl };
-    eval { require mod_perl2 }  if ($@);
+    my($rversion) = @_;
+    if (!$rversion || $rversion==1){
+        eval { require mod_perl };
+        if ($rversion == 1){
+            if ($@){
+		warn "Note: Did not find mod_perl installed\n";
+	    }
+            return; # do not die, let PREREQ_PM handle it
+        }
+    }
+    if ($@ || !$rversion || $rversion==2){
+        eval { require mod_perl2 };
+        if ($rversion == 2){
+            if ($@){
+		warn "Note: Did not find mod_perl2 installed\n";
+	    }
+            return; # do not die, let PREREQ_PM handle it
+        }
+    }
     die "Can't find mod_perl installed\nThe error was: $@" if $@;
 }
 
@@ -201,7 +245,7 @@ EOF
                 unshift @INC, $atlib if -d $atlib;
             } 
 
-            eval { require mod_perl2 } if ($@);
+            eval { require mod_perl2 };
             unless ($@) {
                 $wanted = 2;
             }
@@ -219,12 +263,13 @@ package MY;
 sub postamble {
     my $self = shift;
 
+    my $q = ($^O =~ /MSWin32/i ? '"' : "'");
+
     my $string = $self->SUPER::postamble;
 
-    $string .= <<'EOF';
+    $string .= <<"EOF";
 tag :
-	svn copy https://svn.apache.org/repos/asf/perl/Apache-SizeLimit/trunk https://svn.apache.org/repos/asf/perl/Apache-SizeLimit/tags/$(VERSION_SYM)
-	@echo update lib/Apache/SizeLimit.pm VERSION now
+	svn copy -m $q\$(VERSION_SYM) tag$q https://svn.apache.org/repos/asf/perl/Apache-SizeLimit/trunk https://svn.apache.org/repos/asf/perl/Apache-SizeLimit/tags/\$(VERSION_SYM)
 EOF
 
     return $string;

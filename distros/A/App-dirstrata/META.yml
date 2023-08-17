@@ -20,5 +20,5 @@ no_index:
 resources:
   bugtracker: https://github.com/tulamili/App-dirstrata/issues
   repository: https://github.com/tulamili/App-dirstrata.git
-version: '0.030'
+version: '0.032'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

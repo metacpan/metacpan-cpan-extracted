@@ -13,9 +13,9 @@ my $multi = Net::Curl::Multi->new();
 my $curl_ev = Net::Curl::Multi::EV::curl_ev($multi);
 
 my @urls = (
-	"http://www.bing.com/",
-	"http://www.bing.com/search?q=curl",
-	"http://www.bing.com/search?q=perl+curl",
+	"https://www.bing.com/",
+	"https://www.bing.com/search?q=curl",
+	"https://www.bing.com/search?q=perl+curl",
 );
 
 
@@ -42,7 +42,8 @@ sub add_request {
 			my @last_headers = split /\r?\n/, $last_headers;;
 
 			my $first_line = shift @last_headers;
-			my ($code, $message) = $first_line =~ m/HTTP\/\d\.\d\s+(\d+)\s+(.+)/;
+			my ($protocol, $code, $message) = $first_line =~ m/(HTTP\/\d(?:\.\d)?)\s+(\d+)(?:\s+(.+))?/;
+			$message ||= $protocol;
 			my $body_length = length $body;
 
 			print "$code ($message)\t$url\t$body_length\n";

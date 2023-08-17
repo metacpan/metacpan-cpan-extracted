@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -55,11 +55,20 @@ sub cleanup {
 	return;
 }
 
-# Initialize before dynamic part.
+# Initialize in dynamic part.
 sub init {
 	my ($self, @params) = @_;
 
 	$self->_init(@params);
+
+	return;
+}
+
+# Initialize in preparation phase.
+sub prepare {
+	my ($self, @params) = @_;
+
+	$self->_prepare(@params);
 
 	return;
 }
@@ -111,6 +120,14 @@ sub _init {
 	return;
 }
 
+sub _prepare {
+	my ($self, @params) = @_;
+
+	# Default is no special code.
+
+	return;
+}
+
 sub _process {
 	my ($self, @params) = @_;
 
@@ -145,6 +162,7 @@ Tags::HTML - Tags helper abstract class.
 
  my $obj = Tags::HTML->new(%params);
  $obj->cleanup(@params);
+ $obj->prepare(@params);
  $obj->init(@params);
  $obj->process;
  $obj->process_css;
@@ -163,20 +181,20 @@ Returns instance of class.
 
 =item * C<css>
 
-'CSS::Struct::Output' object for L<process_css> processing.
+'L<CSS::Struct::Output>' object for L</process_css> processing.
 
 Default value is undef.
 
 =item * C<no_css>
 
 No CSS support flag.
-If this flag is set to 1, L<process_css()> returns undef.
+If this flag is set to 1, L</process_css> don't process CSS style.
 
 Default value is 0.
 
 =item * C<tags>
 
-'Tags::Output' object for L<process> processing.
+'L<Tags::Output>' object for L</process> processing.
 
 Default value is undef.
 
@@ -194,7 +212,17 @@ Returns undef.
 
  $obj->init(@params);
 
+Process initialization in page run.
+It's useful in e.g. L<Plack::App::Tags::HTML>.
+
+Returns undef.
+
+=head2 C<prepare>
+
+ $obj->prepare(@params);
+
 Process initialization before page run.
+It's useful in e.g. L<Plack::App::Tags::HTML>.
 
 Returns undef.
 
@@ -202,7 +230,7 @@ Returns undef.
 
  $obj->process;
 
-Process Tags structure.
+Process L<Tags> structure.
 
 Returns undef.
 
@@ -210,7 +238,7 @@ Returns undef.
 
  $obj->process_css;
 
-Process CSS::Struct structure.
+Process L<CSS::Struct> structure.
 
 Returns undef.
 
@@ -256,7 +284,8 @@ Returns undef.
  sub _cleanup {
          my $self = shift;
 
-         delete $self->{'_data'};
+         delete $self->{'_dynamic_data'};
+         delete $self->{'_static_data'};
 
          return;
  }
@@ -264,7 +293,15 @@ Returns undef.
  sub _init {
          my ($self, @variables) = @_;
 
-         $self->{'_data'} = \@variables;
+         $self->{'_dynamic_data'} = \@variables;
+
+         return;
+ }
+
+ sub _prepare {
+         my ($self, @variables) = @_;
+
+         $self->{'_static_data'} = \@variables;
 
          return;
  }
@@ -275,9 +312,18 @@ Returns undef.
          $self->{'tags'}->put(
                  ['b', 'div'],
          );
-         foreach my $variable (@{$self->{'_data'}}) {
+         foreach my $variable (@{$self->{'_static_data'}}) {
                  $self->{'tags'}->put(
                          ['b', 'div'],
+                         ['a', 'class', 'static'],
+                         ['d', $variable],
+                         ['e', 'div'],
+                 );
+         }
+         foreach my $variable (@{$self->{'_dynamic_data'}}) {
+                 $self->{'tags'}->put(
+                         ['b', 'div'],
+                         ['a', 'class', 'dynamic'],
                          ['d', $variable],
                          ['e', 'div'],
                  );
@@ -299,8 +345,11 @@ Returns undef.
          'tags' => $tags,
  );
 
- # Init data.
- $obj->init('foo', 'bar', 'baz');
+ # Init static data.
+ $obj->prepare('foo', 'bar');
+
+ # Init dynamic data.
+ $obj->init('baz', 'bax');
 
  # Process.
  $obj->process;
@@ -312,14 +361,17 @@ Returns undef.
  # Output:
  # HTML
  # <div>
- #   <div>
+ #   <div class="static">
  #     foo
  #   </div>
- #   <div>
+ #   <div class="static">
  #     bar
  #   </div>
- #   <div>
+ #   <div class="dynamic">
  #     baz
+ #   </div>
+ #   <div class="dynamic">
+ #     bax
  #   </div>
  # </div>
 
@@ -424,12 +476,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

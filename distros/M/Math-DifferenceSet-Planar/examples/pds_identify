@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+my $USAGE = "usage: pds_identify [-D database] [file]...\n";
+
+my $db = undef;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                     if '-' eq $opt;
+    $db = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db = $1,           next if $opt =~ /^D(.+)/s;
+    die $USAGE;
+}
+
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+
+    my $order  = $s->order;
+    my $lambda = $s->lambda || '?';
+    my $theta  = $s->theta;
+
+    print "$order $lambda $theta\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_identify - display fingerprints of planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_identify [-D database] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line, as
+integer numbers separated by whitespace, calculates three values order,
+lambda, and theta, uniquely identifying each set, and writes these
+values to standard output.  Cf. L<Math::DifferenceSet::Planar> for the
+definition of these values, and the example program F<pds_from_lambda>
+for the reverse operation.
+
+With option B<-D> and a database parameter, standard reference sets are
+taken from that database rather than the default one.
+
+The program will fail with an error message if an input line is not
+a planar difference set, or if it is outside the bounds of available
+standard reference sets.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

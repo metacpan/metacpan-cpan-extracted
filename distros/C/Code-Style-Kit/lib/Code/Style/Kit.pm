@@ -5,12 +5,12 @@ use Data::OptList;
 use Import::Into;
 use Carp;
 use mro ();
-use Package::Stash qw(get_all_symbols);
+use Package::Stash;
 use Module::Runtime qw(use_module);
 
 use constant DEBUG => $ENV{CODE_STYLE_KIT_DEBUG};
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: build composable bulk exporters
 
 
@@ -228,7 +228,7 @@ Code::Style::Kit - build composable bulk exporters
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

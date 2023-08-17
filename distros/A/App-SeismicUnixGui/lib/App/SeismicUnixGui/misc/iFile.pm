@@ -436,6 +436,7 @@ sub get_Data_path {
 	my $DATA_SEISMIC_WELL_SYNSEIS = $Project->DATA_SEISMIC_WELL_SYNSEIS();
 	my $PS_SEISMIC                = $Project->PS_SEISMIC();
 	my $Data_PL_SEISMIC           = $Project->PL_SEISMIC();
+	my $Data_SEISMIC_TXT          = $DATA_SEISMIC_TXT;
 
 	if ( $iFile->{_flow_type} eq $flow_type_href->{_user_built} ) {
 
@@ -607,11 +608,22 @@ sub get_Data_path {
 			$file_dialog_type_h->{_Data_PL_SEISMIC} )
 		{
 
-# case 1B.2
-# print("case 1B.2 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
+# case 1B.2A
+# print("case 1B.2A iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
 			$iFile->{_path} = $Data_PL_SEISMIC;
 
 		}
+		elsif ( length $entry_label 
+			and $iFile->{_dialog_type} eq
+			$file_dialog_type_h->{_Data_SEISMIC_TXT} )
+		{
+
+# case 1B.2B
+# print("case 1B.2B iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
+			$iFile->{_path} = $Data_SEISMIC_TXT;
+
+		}
+		
 		elsif ( $entry_label ne $empty_string ) {
 
 			# CASE 1B.3
@@ -666,7 +678,14 @@ sub get_Data_path {
 #			print("case 2A.2 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
 			$iFile->{_path} = $Data_PL_SEISMIC;
 
-		}
+		} elsif ( $entry_label ne $empty_string
+			and $iFile->{_dialog_type} eq
+			$file_dialog_type_h->{_Data_SEISMIC_TXT} ) {
+				
+	      # CASE 2A.3 	
+			$iFile->{_path} = $Data_SEISMIC_TXT;	
+#		    print("case 2A.3 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");		
+	}
 		elsif ( $entry_label eq $empty_string ) {
 
 	   # CASE 2A.3

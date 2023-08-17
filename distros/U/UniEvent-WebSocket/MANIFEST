@@ -1,5 +1,7 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
+clib/README.md
 clib/src/panda/unievent/websocket.h
 clib/src/panda/unievent/websocket/Client.cc
 clib/src/panda/unievent/websocket/Client.h
@@ -35,6 +37,7 @@ lib/UniEvent/WebSocket/Server.pod
 lib/UniEvent/WebSocket/ServerConnection.pm
 lib/UniEvent/WebSocket/ServerConnection.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/echo.pl

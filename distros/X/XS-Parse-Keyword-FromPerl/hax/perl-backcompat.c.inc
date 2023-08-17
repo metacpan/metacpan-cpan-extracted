@@ -34,6 +34,16 @@ typedef SV PADNAME;
 
 #if !HAVE_PERL_VERSION(5, 22, 0)
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#  define newPADNAMEpvn(p,n)      S_newPADNAMEpvn(aTHX_ p,n)
+static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
+{
+  PADNAME *pn = newSVpvn(pv, n);
+  /* PADNAMEs need to be at least SVt_PVNV in order to store the COP_SEQ_*
+   * fields */
+  sv_upgrade(pn, SVt_PVNV);
+  return pn;
+}
+#  define PadnameREFCNT_dec(pn)   SvREFCNT_dec(pn)
 #endif
 
 #ifndef av_count
@@ -50,6 +60,10 @@ typedef SV PADNAME;
 
 #ifndef block_start
 #  define block_start(a)         Perl_block_start(aTHX_ a)
+#endif
+
+#ifndef cophh_exists_pvs
+#  define cophh_exists_pvs(a,b,c)  cBOOL(cophh_fetch_pvs(a,b,c))
 #endif
 
 #ifndef cv_clone
@@ -76,6 +90,10 @@ typedef SV PADNAME;
 
 #ifndef OpSIBLING
 #  define OpSIBLING(op)  ((op)->op_sibling)
+#endif
+
+#ifndef OpHAS_SIBLING
+#  define OpHAS_SIBLING(op)  (cBOOL(OpSIBLING(op)))
 #endif
 
 #ifndef OpMORESIB_set
@@ -180,16 +198,18 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 }
 #endif
 
-#ifdef PERL_USE_GCC_BRACE_GROUPS
-#  define xV_FROM_REF(XV, ref)  \
+#ifndef xV_FROM_REF
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define xV_FROM_REF(XV, ref)  \
   ({ SV *_ref = ref; assert(SvROK(_ref)); assert(SvTYPE(SvRV(_ref)) == SVt_PV ## XV); (XV *)(SvRV(_ref)); })
-#else
-#  define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
-#endif
+#  else
+#    define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#  endif
 
-#define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
-#define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
-#define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#  define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
+#  define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
+#  define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#endif
 
 #ifndef newPADxVOP
 #  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)

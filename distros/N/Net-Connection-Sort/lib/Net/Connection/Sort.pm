@@ -10,11 +10,11 @@ Net::Connection::Sort - Sorts array of Net::Connection objects.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -198,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-Sort>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Connection-Sort>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Net-Connection-Sort>
 
 =item * Search CPAN
 

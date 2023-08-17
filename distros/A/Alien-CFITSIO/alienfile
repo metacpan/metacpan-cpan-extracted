@@ -8,7 +8,7 @@ use Sort::Versions;
 use alienfile;
 
 # we support any CFITSIO library higher than this
-use constant CFITSIO_VERSION => '4.2.0';
+use constant CFITSIO_VERSION => '4.3.0';
 
 my %req_version = (
     defined $ENV{ALIEN_CFITSIO_EXACT_VERSION}

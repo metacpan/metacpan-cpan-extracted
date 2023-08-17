@@ -3,7 +3,7 @@ package Crypt::Passphrase::Argon2::HSM;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent 'Crypt::Passphrase::Argon2::Encrypted';
 use Crypt::Passphrase 0.010 -encoder;
@@ -31,26 +31,27 @@ sub new {
 	return $self;
 }
 
-sub encrypt_hash {
-	my ($self, $algorithm, $id, $iv, $raw) = @_;
+sub lookup_key {
+	my ($self, $id, $operation) = @_;
 
 	croak 'No active pepper given' if not defined $id;
 	my $label = "$self->{prefix}$id";
-	my ($key) = $self->{session}->find_objects({ label => $label, encrypt => 1 });
-	croak "No such key $label" if not defined $key;
+	my ($key) = $self->{session}->find_objects({ label => $label, $operation => 1 });
+	croak "No such key $label for $operation" if not defined $key;
 
-	return $self->{session}->encrypt($algorithm, $key, $raw, $iv);
+	return $key;
+}
+
+sub encrypt_hash {
+	my ($self, $algorithm, $id, $iv, $plaintext) = @_;
+	my $key = $self->lookup_key($id, 'encrypt');
+	return $self->{session}->encrypt($algorithm, $key, $plaintext, $iv);
 }
 
 sub decrypt_hash {
-	my ($self, $algorithm, $id, $iv, $raw) = @_;
-
-	croak 'No active pepper given' if not defined $id;
-	my $label = "$self->{prefix}$id";
-	my ($key) = $self->{session}->find_objects({ label => $label, decrypt => 1 });
-	croak "No such key $label" if not defined $key;
-
-	return $self->{session}->decrypt($algorithm, $key, $raw, $iv);
+	my ($self, $algorithm, $id, $iv, $ciphertext) = @_;
+	my $key = $self->lookup_key($id, 'decrypt');
+	return $self->{session}->decrypt($algorithm, $key, $ciphertext, $iv);
 }
 
 sub supported_ciphers {

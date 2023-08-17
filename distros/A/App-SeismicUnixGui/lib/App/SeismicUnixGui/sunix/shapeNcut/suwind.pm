@@ -4,17 +4,31 @@ package App::SeismicUnixGui::sunix::shapeNcut::suwind;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUWIND - window traces by key word					
+ PERL PROGRAM NAME:  SUWIND - window traces by key word					
  AUTHOR: Juan Lorenzo
  DATE:  Nov 1 2012  
  DESCRIPTION: suwind a lists of header words
  or an single value
  
- Version:  0.0.2
+ Version:  0.0.3
 
 =head2 USE
 
 =head3 NOTES
+
+Example:
+If skip is used, s is ignored e.g. s=2 skip=1 key=tracl j=2
+
+Example:
+
+accept=4,9,11 max=0    (max=0 is needed)
+
+Example: where in data, tracl=1,2,3, etc.
+
+j=3 key=tracl,s=0, tracl's are 3, 6, 9 etc.,
+j=2 key=tracl s=0, tracl's are 2, 4, 6 etc.
+j=2 key=tracl s=1, tracl's are 1, 3, 5,7
+j=2 key=tracl s=2, tracl's are 2, 4, 6,8 etc.,
 
 =head4 Examples
 
@@ -115,20 +129,29 @@ package App::SeismicUnixGui::sunix::shapeNcut::suwind;
 
 =head2 CHANGES and their DATES
 
+V 0.0.3 May 2023
+Include a file name conatining a singel-column list of numbers which
+represent trace header values. Make sure to set the header as well.
+
 =cut
 
 use Moose;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
-use App::SeismicUnixGui::misc::L_SU_global_constants;
-my $get = App::SeismicUnixGui::misc::L_SU_global_constants->new();
+use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
+use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
+use aliased 'App::SeismicUnixGui::misc::control';
 
-my $var          = $get->var();
-my $empty_string = $var->{_empty_string};
+my $get              = App::SeismicUnixGui::misc::L_SU_global_constants->new();
+my $var              = $get->var();
+my $manage_files_by2 = manage_files_by2->new();
+my $control          = control->new();
+my $empty_string     = $var->{_empty_string};
 
 my $suwind = {
     _abs     => '',
     _accept  => '',
+    _accept_only_list_name => '',
     _count   => '',
     _dt      => '',
     _f1      => '',
@@ -191,6 +214,7 @@ sub clear {
 
     $suwind->{_abs}     = '';
     $suwind->{_accept}  = '';
+    $suwind->{_accept_only_list_name} = '',
     $suwind->{_count}   = '';
     $suwind->{_dt}      = '';
     $suwind->{_f1}      = '';
@@ -253,44 +277,93 @@ sub accept {
     }
 }
 
+#=pod sub accept_only_list 
+#
+# sub accept_only_list: when selecting multiple traces
+#     all at once.
+#     Should be used with list,setheaderword.
+#     
+#=cut
+#
+#sub accept_only_list {
+#	
+#    my ( $self, $ref_list ) = @_;
+#    my @list = @$ref_list if defined($ref_list);
+#
+#    if ( $ref_list ne $empty_string ) {
+#
+#      # print("1. suwind, accept_only_list,suwind->{_Step},$suwind->{_Step}\n");
+#      #   perl starts lists at 0
+#        my $length_list = scalar(@list);
+#        my $end         = $length_list;
+#        my $start       = 0;
+#
+#        # print("suwind, accept_only_list, @list\n");
+#        # print("suwind, accept_only_list,list[0], $list[0]\n");
+#        # print("suwind, accept_only_list,length_list, $length_list\n");
+#
+#        # init
+#        $suwind->{_Step} =
+#          $suwind->{_Step} . ' max=0 accept=' . $list[$start];
+#
+#        # rest
+#        for ( my $i = $start + 1 ; $i < $end ; $i++ ) {
+#
+#            $suwind->{_Step} = $suwind->{_Step} . ',' . $list[$i];
+#            ###  print("suwind, accept_only_list,i=$i \n");
+#
+#        }
+#
+#    }
+#    else {
+#        print("suwind, accept_only_list, missing ref_list,\n");
+#    }
+#
+#    # print("2. suwind, accept_only_list,suwind->{_Step},$suwind->{_Step} \n");
+#
+#}
+
 =pod sub accept_only_list 
 
  sub accept_only_list: when selecting multiple traces
-                  all at once
-                  should be used with list,setheaderword 
+     all at once.
+     Should be used with list, setheaderword.
+     
 =cut
 
-sub accept_only_list {
-    my ( $self, $ref_list ) = @_;
-    my @list = @$ref_list if defined($ref_list);
+sub accept_only_list_name {
 
-    if ( $ref_list ne $empty_string ) {
+    my ( $self, $list_name ) = @_;
 
-      # print("1. suwind, accept_only_list,suwind->{_Step},$suwind->{_Step}\n");
-      #   perl starts lists at 0
-        my $length_list = scalar(@list);
-        my $end         = $length_list;
+    if ( length $list_name) {
+    	
+    	$control->set_back_slashBgone($list_name);
+		$list_name = $control->get_back_slashBgone();
+    	
+    	my ($list_ref, $num_rows) = $manage_files_by2->read_1col($list_name);	
+    	my @list = @$list_ref;
+
+
         my $start       = 0;
 
-        # print("suwind, accept_only_list, @list\n");
-        # print("suwind, accept_only_list,list[0], $list[0]\n");
-        # print("suwind, accept_only_list,length_list, $length_list\n");
+        # print("suwind, accept_only_list_name, list[0], $list[0]\n");
+        # print("suwind, accept_only_list_name, num_rows, $num_rows\n");
 
-        # init
+        # first value of list
         $suwind->{_Step} =
           $suwind->{_Step} . ' max=0 accept=' . $list[$start];
 
-        # rest
-        for ( my $i = $start + 1 ; $i < $end ; $i++ ) {
+        # for the rest
+        for ( my $i = $start + 1 ; $i < $num_rows ; $i++ ) {
 
             $suwind->{_Step} = $suwind->{_Step} . ',' . $list[$i];
-            ###  print("suwind, accept_only_list,i=$i \n");
+            print("suwind, accept_only_list_name,i=$i \n");
 
         }
 
     }
     else {
-        print("suwind, accept_only_list, missing ref_list,\n");
+        print("suwind, accept_only_list_name, missing ref_list,\n");
     }
 
     # print("2. suwind, accept_only_list,suwind->{_Step},$suwind->{_Step} \n");
@@ -802,7 +875,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 16;
+    my $max_index = 17;
 
     return ($max_index);
 }

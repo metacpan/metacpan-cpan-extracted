@@ -112,18 +112,19 @@ sub __drop {
         $info .= sprintf "  (%s %s)\n", insert_sep( $row_count, $sf->{i}{info_thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
     }
     my $prompt = "CONFIRM:";
+    my ( $no, $yes ) = ( '- NO', '- YES' );
     # Choose
     my $choice = $tc->choose(
-        [ undef, 'YES' ],
-        { info => $info, prompt => $prompt, undef => 'NO', clear_screen => 1 }
+        [ undef, $no, $yes ],
+        { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '  <=' }
     );
     $ax->print_sql_info( $info );
-    if ( defined $choice && $choice eq 'YES' ) {
-        my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
-        $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
-        return 1;
+    if ( ! defined $choice || $choice eq $no ) {
+        return;
     }
-    return;
+    my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
+    $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
+    return 1;
 }
 
 

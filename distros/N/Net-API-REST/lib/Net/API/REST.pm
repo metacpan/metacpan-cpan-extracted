@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.8.1
+## Version v1.0.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/01/05
+## Modified 2023/06/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,22 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use common::sense;
-    use parent qw( Module::Generic );
+    use Apache2::API qw( :common );
+    use parent qw( Apache2::API );
     use vars qw( $VERSION $DEBUG $API_VERSION );
     use curry;
     use version;
-    use Encode ();
-    use Apache2::Const qw( :common :http );
-    use Apache2::RequestRec ();
-    use Apache2::RequestIO ();
-    use Apache2::ServerUtil ();
-    use Apache2::RequestUtil ();
-    use Apache2::Response ();
     use Apache2::Reload;
-    use Apache2::Log;
-    use APR::Base64 ();
-    use APR::Request ();
-    use APR::UUID ();
     use JSON::PP ();
     use Regexp::Common;
     # use Nice::Try debug => 6, debug_file => '/usr/local/src/perl/Net-API-REST/dev/debug_nice_try.pl', debug_code => 1;
@@ -43,7 +33,6 @@ BEGIN
     # 2019-09-26
     # We use our own drop-in replacement because of a bug in ModPerl and JSON::XS not recognising hash reference passed
     use Net::API::REST::JWT;
-    use DateTime;
     # use DateTime::Format::Strptime;
     use Net::API::REST::DateTime;
     use MIME::Base64 ();
@@ -52,8 +41,8 @@ BEGIN
 #   use IO::Compress::Deflate;
     use Net::API::REST::Request;
     use Net::API::REST::Response;
-    use Net::API::REST::Status;
-    $VERSION = 'v0.8.1';
+    use Apache2::API::Status;
+    $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -90,7 +79,7 @@ sub init
     # Default handlers
     $self->{is_allowed}->{access}   = sub{ return( Apache2::Const::HTTP_OK ); } unless( exists( $self->{is_allowed}->{access} ) && ref( $self->{is_allowed}->{access} ) eq 'CODE' );
     $self->{is_allowed}->{network}  = sub{ return( Apache2::Const::HTTP_OK ); } unless( exists( $self->{is_allowed}->{network} ) && ref( $self->{is_allowed}->{network} ) eq 'CODE' );
-    $self->SUPER::init( @_ );
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     if( length( $self->{api_version} ) )
     {
         $self->api_version( $self->{api_version} );
@@ -106,8 +95,6 @@ sub init
     }
     return( $self );
 }
-
-sub apache_request { return( shift->_set_get_object_without_init( 'apache_request', 'Apache2::RequestRec', @_ ) ); }
 
 sub api_uri { return( shift->_set_get_object( 'api_uri', 'URI', @_ ) ); }
 
@@ -126,255 +113,13 @@ sub api_version
     return( $self->{api_version} );
 }
 
-sub bailout
-{
-    my $self = shift( @_ );
-    my $msg;
-    if( ref( $_[0] ) eq 'HASH' )
-    {
-        $msg = shift( @_ );
-    }
-    else
-    {
-        $msg = { code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR };
-        $msg->{message} = join( '', @_ ) if( @_ );
-    }
-    ## We send the error to our error method
-    $msg->{code} ||= Apache2::Const::HTTP_INTERNAL_SERVER_ERROR;
-    $self->error( $msg ) if( $msg->{message} );
-    CORE::delete( $msg->{skip_frames} );
-    ## So it gets logged or displayed on terminal
-    my( $pack, $file, $line ) = caller;
-    my $sub_str = ( caller( 1 ) )[3];
-    my $sub = CORE::index( $sub_str, '::' ) != -1 ? substr( $sub_str, rindex( $sub_str, '::' ) + 2 ) : $sub_str;
-    ## Now we tweak the hash to send it to the client
-    $msg->{message} = CORE::delete( $msg->{public_message} ) || 'An unexpected server error has occurred';
-    ## Give it a chance to be localised
-    $msg->{message} = $self->gettext( $msg->{message} );
-    my $ctype = $self->response->content_type;
-    if( $ctype eq 'application/json' )
-    {
-        return( $self->reply( $msg->{code}, { error => $msg->{message} } ) );
-    }
-    else
-    {
-        try
-        {
-            my $r = $self->apache_request;
-            $r->status( $msg->{code} );
-            $r->rflush;
-            $r->print( $msg->{message} );
-            return( $msg->{code} );
-        }
-        catch( $e )
-        {
-            return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        }
-    }
-}
-
 sub base_path { return( shift->_set_get_scalar( 'base_path', @_ ) ); }
 
 sub checkonly { return( shift->_set_get_boolean( 'checkonly', @_ ) ); }
 
-sub compression_threshold { return( shift->_set_get_number( 'compression_threshold', @_ ) ); }
-
-## https://perl.apache.org/docs/2.0/api/APR/Base64.html#toc_C_decode_
-sub decode_base64
-{
-    my $self = shift( @_ );
-    my $data = shift( @_ );
-    try
-    {
-        return( APR::Base64::decode( $data ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to base64 decode data: $e" ) );
-    }
-}
-
-sub decode_json
-{
-    my $self = shift( @_ );
-    my $raw  = shift( @_ ) || return( $self->error( "No json data was provided to decode." ) );
-    my $json = $self->json;
-    my $hash;
-    try
-    {
-        $hash = $json->utf8->decode( $raw );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to decode json payload: $e" ) );
-    }
-    return( $hash );
-}
-
-sub decode_uri
-{
-    my $self = shift( @_ );
-    return( URI::Escape::uri_unescape( shift( @_ ) ) );
-}
-
-sub decode_url
-{
-    my $self = shift( @_ );
-    return( APR::Request::decode( shift( @_ ) ) );
-}
-
-sub decode_utf8
-{
-    my $self = shift( @_ );
-    my $v = shift( @_ );
-#   try
-#   {
-#       return( Encode::decode_utf8( @_, FB_CROAK ) );
-#   }
-#   catch( $e )
-#   {
-#       return( $self->error( "Error while decoding text: $e" ) );
-#   }
-    my $rv = eval
-    {
-        ## utf8 is more lax than the strict standard of utf-8; see Encode man page
-        Encode::decode( 'utf8', $v, Encode::FB_CROAK );
-    };
-    if( $@ )
-    {
-        $self->error( "Error while decoding text: $@" );
-        return( $v );
-    }
-    return( $rv );
-}
-
-# sub decode_utf8{ return( Encode::decode_utf8( $_[1] ) ); }
-
 sub default_methods { return( shift->_set_get_array( 'default_methods', @_ ) ); }
 
-## https://perl.apache.org/docs/2.0/api/APR/Base64.html#toc_C_encode_
-# sub encode_base64 { return( APR::Base64::encode( @_ ) ); }
-sub encode_base64
-{
-    my $self = shift( @_ );
-    my $data = shift( @_ );
-    return( $self->error( "No valid to base64 encode was provided." ) ) if( !length( $data ) );
-    try
-    {
-        return( APR::Base64::encode( $data ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to base64 encode data: $e" ) );
-    }
-}
-
-sub encode_json
-{
-    my $self = shift( @_ );
-    my $hash = shift( @_ ) || return( $self->error( "No perl hash reference was provided to encode." ) );
-    return( $self->error( "Hash provided ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
-    my $json = $self->json;
-    my $data;
-    try
-    {
-        $data = $json->encode( $hash );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to encode perl data: $e\nPerl data are: ", sub{ $self->printer( $hash ) } ) );
-    }
-    return( $data );
-}
-
-sub encode_uri
-{
-    my $self = shift( @_ );
-    return( URI::Escape::uri_escape( shift( @_ ) ) );
-}
-sub encode_url
-{
-    my $self = shift( @_ );
-    return( APR::Request::encode( shift( @_ ) ) );
-}
-
-sub encode_utf8
-{
-    my $self = shift( @_ );
-    my $v = shift( @_ );
-#   try
-#   {
-#       return( Encode::encode_utf8( $v, FB_CROAK ) );
-#   }
-#   catch( $e )
-#   {
-#       $self->error( "Error while encoding text: $e" );
-#       return( $v );
-#   }
-    my $rv = eval
-    {
-        ## utf8 is more lax than the strict standard of utf-8; see Encode man page
-        Encode::encode( 'utf8', $v, Encode::FB_CROAK );
-    };
-    if( $@ )
-    {
-        $self->error( "Error while encoding text: $@" );
-        return( $v );
-    }
-    return( $rv );
-}
-
-# sub encode_utf8 { return( Encode::encode_utf8( $_[1] ) ); }
-
 sub endpoint { return( shift->_set_get_object( 'endpoint', 'Net::API::REST::Endpoint', @_ ) ); }
-
-## https://perl.apache.org/docs/2.0/api/APR/UUID.html
-sub generate_uuid
-{
-    my $self = shift( @_ );
-    try
-    {
-        return( APR::UUID->new->format );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to generate an uuid using APR::UUID package: $e" ) );
-    }
-}
-
-## rfc 6750 https://tools.ietf.org/html/rfc6750
-sub get_auth_bearer
-{
-    my $self = shift( @_ );
-    my $bearer = $self->request->authorization;
-    ## Found a bearer
-    if( $bearer )
-    {
-        ## https://jwt.io/introduction/
-        ## https://tools.ietf.org/html/rfc7519
-        if( $bearer =~ /^Bearer[[:blank:]]+([a-zA-Z0-9][a-zA-Z0-9\-\_\~\+\/\=]+(?:\.[a-zA-Z0-9\_][a-zA-Z0-9\-\_\~\+\/\=]+){2,4})$/i )
-        {
-            my $token = $1;
-            return( $token );
-        }
-        else
-        {
-            return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Bad bearer authorization format" }) );
-        }
-    }
-    else
-    {
-        ## Return empty, not undef, because undef is for errors
-        return( '' );
-    }
-}
-
-## https://perl.apache.org/docs/2.0/api/Apache2/ServerUtil.html
-sub get_handlers { return( shift->_try( 'server', 'get_handlers', @_ ) ); }
-
-## Does nothing and it should be superseded by a class inheriting our module
-## This gives a chance to return a localised version of our string to the user
-sub gettext { return( $_[1] ); }
 
 # In Apache2 conf:
 # PerlResponseHandler MyPackage::REST which would inherit from Net::API::REST
@@ -383,24 +128,35 @@ sub handler : method
     # https://perl.apache.org/docs/2.0/user/handlers/http.html#HTTP_Request_Handler_Skeleton
     my( $class, $r ) = @_;
     # my $handlerClass = $r->dir_config( 'Net_API_REST_Handler' ) || 'Net::API::REST' ;
-    my $debug = $r->dir_config( 'DEBUG' ) || 0;
-    my $req = Net::API::REST::Request->new( $r, debug => $DEBUG );
+    my $debug = $r->dir_config( 'DEBUG' ) || $DEBUG;
+    my $req = Net::API::REST::Request->new( $r, debug => $debug );
     # An error has occurred
     if( !defined( $req ) )
     {
+        $r->log_error( "${class}::handler: Error instantiating an Net::API::REST::Request object: " . Net::API::REST::Request->error );
         return( Net::API::REST::Request->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
-    my $resp = Net::API::REST::Response->new( request => $req, debug => $DEBUG );
+    my $resp = Net::API::REST::Response->new( request => $req, debug => $debug ) || do
+    {
+        $r->log_error( "${class}::handler: Error instantiating an Net::API::REST::Response object: " . Net::API::REST::Response->error );
+        return( Net::API::REST::Response->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    };
     my $self = $class->new(
         apache_request => $r,
         debug       => $debug,
         request     => $req,
         response    => $resp,
-    );
+    ) || do
+    {
+        $r->log_error( "Error instantiating a new $class object: ", $class->error );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    };
+    
     if( my $code = $self->log_handler )
     {
         $r->set_handlers( 'PerlPrivateLogHandler' => $code );
     }
+    
     # $self->apache_request( $r );
     # $r->log_error( "Received Apache request $r, object debug value is: ", $self->debug );
     # Full uri. $r->uri only returns the path
@@ -451,7 +207,7 @@ sub handler : method
     # Only the content type, ie without the charset. Example: application/json; charset=utf-8
     my $ct = lc( $req->type );
     # We check if content type is provided at all since it could be missing, such as in 
-    # a POST or GET request with no content or query
+    # a OPTIONS, POST or GET request with no content or query
     if( length( $ct ) && scalar( @$ok_ct ) && !scalar( grep( $ct eq $_, @$ok_ct ) ) )
     {
         # Net::API::REST::reply will automatically set a json with an error message based on the user language
@@ -471,7 +227,7 @@ sub handler : method
                 $client_api_version_is_ok++;
             }
         }
-        return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_version) is not supported." } ) );
+        return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_version) is not supported." } ) ) unless( $client_api_version_is_ok );
     }
     
     # Protection against DNS rebinding attacks
@@ -483,6 +239,9 @@ sub handler : method
         {
             # Net::API::REST::reply will automatically set a json with an error message based on the user language
             return( $self->reply({ code => Apache2::Const::HTTP_UNAUTHORIZED }) );
+        }
+        else
+        {
         }
     }
     
@@ -507,7 +266,10 @@ sub handler : method
     }
     
     my $origin = $req->headers( 'Origin' );
-    $self->http_cors if( $origin );
+    if( $origin )
+    {
+        $self->http_cors;
+    }
     
     my $path = $uri->path;
     if( my $base = $r->dir_config( 'Net_API_REST_Base' ) ) 
@@ -612,22 +374,6 @@ EOT
     }
 }
 
-sub header_datetime
-{
-    my $self = shift( @_ );
-    my $dt;
-    if( @_ )
-    {
-        return( $self->error( "Date time provided ($dt) is not an object." ) ) if( !Scalar::Util::blessed( $_[0] ) );
-        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
-        $dt = shift( @_ );
-    }
-    $dt = DateTime->now if( !defined( $dt ) );
-    my $fmt = Net::API::REST::DateTime->new;
-    $dt->set_formatter( $fmt );
-    return( $dt );
-}
-
 # Mut be overriden by sub package
 sub http_cors { return; }
 
@@ -658,12 +404,23 @@ Variables .....: %s
 EOT
     $self->noexec->messagef( 3, $tmpl, $ep->handler, $ep->access, join( ', ', @{$ep->methods} ), join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
 
-    my $req_methods = [CORE::split( /\,[[:blank:]]*/, $req->headers( 'Access-Control-Request-Method' ) )];
-    foreach my $m ( @$req_methods )
+    my $req_methods = [CORE::split( /\,[[:blank:]]*/, ( $req->headers( 'Access-Control-Request-Method' ) || '' ) )];
+    if( scalar( @$req_methods ) )
     {
-        if( !$ep->is_method_allowed( $m ) )
+        foreach my $m ( @$req_methods )
         {
-            return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED );
+            if( !$ep->is_method_allowed( $m ) )
+            {
+                return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED );
+            }
+        }
+        if( !$ep->methods->is_empty )
+        {
+            $res->headers( 'Access-Control-Allow-Methods' => $ep->methods->join( ', ' )->scalar );
+        }
+        else
+        {
+            $res->headers( 'Access-Control-Allow-Methods' => '*' );
         }
     }
     
@@ -737,8 +494,8 @@ EOT
     return( Apache2::Const::HTTP_NO_CONTENT );
 }
 
-## To be overriden by module inheriting our package
-sub init_headers { return( 1 ); }
+# To be overriden by module inheriting our package
+sub init_headers { return(1); }
 
 # Set or get handlers for various phases to check if the user is allowed access
 # Currently available handlers: network and access
@@ -769,21 +526,6 @@ sub is_allowed
         }
     }
 }
-
-sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_enabled', @_ ) ); }
-
-# sub json
-# {
-#   my $self = shift( @_ );
-#   if( !$self->{json} )
-#   {
-#       $self->{json} = JSON->new->allow_nonref;
-#   }
-#   return( $self->{json} );
-# }
-# We return a new object each time, because if we cached it, some routine might set the utf8 bit flagged on while some other would not want it
-# Also, you might wonder why use JSON::PP and not JSON::XS ? Well, JSON::XS has some issues working under Apache2 modperl
-sub json { return( JSON::PP->new->relaxed->convert_blessed ); }
 
 sub jwt_accepted_algo { return( shift->_set_get_array( 'jwt_accepted_algo', @_ ) ); }
 
@@ -1080,304 +822,6 @@ sub jwt_verify
 sub jwt_verify_audience { return( shift->_set_get_object( 'jwt_verify_audience', 'Regexp', @_ ) ); }
 
 sub key { return( shift->_set_get_scalar( 'key', @_ ) ); }
-
-sub lang { return( shift->_set_get_scalar( 'lang', @_ ) ); }
-
-sub lang_unix
-{
-    my $self = shift( @_ );
-    my $lang = $self->{lang};
-    $lang =~ tr/-/_/;
-    return( $lang );
-}
-
-sub lang_web
-{
-    my $self = shift( @_ );
-    my $lang = $self->{lang};
-    $lang =~ tr/_/-/;
-    return( $lang );
-}
-
-sub log_error { return( shift->_try( 'apache_request', 'log_error', @_ ) ); }
-
-sub print
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    if( scalar( @_ ) == 1 && ref( $_[0] ) )
-    {
-        $opts = shift( @_ );
-    }
-    else
-    {
-        $opts->{data} = join( '', @_ );
-    }
-    return( $self->error( "No data was provided to print out." ) ) if( !CORE::length( $opts->{data} ) );
-    my $r = $self->apache_request;
-    my $json = $opts->{data};
-    my $bytes = 0;
-    # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
-    my $threshold = $self->compression_threshold || 0;
-    # rfc1952
-    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
-    my $z;
-    if( CORE::length( $json ) > $threshold && 
-        $self->request->accept_encoding =~ /\bgzip\b/i && 
-        $self->_load_class( 'IO::Compress::Gzip' ) && 
-        ( $z = IO::Compress::Gzip->new( '-', Minimal => 1 ) ) )
-    {
-        #require Compress::Zlib;
-        #$r->print( Compress::Zlib::memGzip( $json ) );
-        # $r->content_encoding( 'gzip' );
-        $self->response->content_encoding( 'gzip' );
-        $self->response->headers->set( 'Content-Encoding' => 'gzip' );
-        # Why Vary? https://blog.stackpath.com/accept-encoding-vary-important/
-        # We use merge, because another value may already be set
-        $self->response->headers->merge( 'Vary' => 'Accept-Encoding' );
-        # $r->send_http_header;
-        $z->print( $json );
-        $z->close;
-    }
-    elsif( CORE::length( $json ) > $threshold && 
-        $self->request->accept_encoding =~ /\bbzip2\b/i &&
-        $self->_load_class( 'IO::Compress::Bzip2' ) &&
-        ( $z = IO::Compress::Bzip2->new( '-' ) ) )
-    {
-        # $r->content_encoding( 'bzip2' );
-        $self->response->content_encoding( 'bzip2' );
-        $self->response->headers->set( 'Content-Encoding' => 'bzip2' );
-        $self->response->headers->merge( 'Vary' => 'Accept-Encoding' );
-        # $r->send_http_header;
-        $z->print( $json );
-        $z->close;
-    }
-    elsif( CORE::length( $json ) > $threshold && 
-        $self->request->accept_encoding =~ /\bdeflate\b/i && 
-        $self->_load_class( 'IO::Compress::Deflate' ) &&
-        ( $z = IO::Compress::Deflate->new( '-' ) ) )
-    {
-        ## $r->content_encoding( 'deflate' );
-        $self->response->content_encoding( 'deflate' );
-        $self->response->headers->set( 'Content-Encoding' => 'deflate' );
-        $self->response->headers->merge( 'Vary' => 'Accept-Encoding' );
-        # $r->send_http_header;
-        $z->print( $json );
-        $z->close;
-    }
-    else
-    {
-        $self->response->headers->unset( 'Content-Encoding' );
-        # $self->response->content_encoding( undef() );
-        # $r->send_http_header;
-        # $r->print( $json );
-        # $json = Encode::encode_utf8( $json ) if( utf8::is_utf8( $json ) );
-        try
-        {
-            my $bytes = $r->print( $json );
-        }
-        catch( $e )
-        {
-        }
-    }
-    # $r->rflush;
-    $self->response->rflush;
-    return( $self );
-}
-
-## push_handlers($hook_name => \&handler);
-## push_handlers($hook_name => [\&handler, \&handler2]);
-sub push_handlers { return( shift->_try( 'server', 'push_handlers', @_ ) ); }
-
-sub reply
-{
-    my $self = shift( @_ );
-    my( $code, $ref );
-    # $self->reply( Apache2::Const::HTTP_OK, { message => "All is well" } );
-    if( scalar( @_ ) == 2 )
-    {
-        ( $code, $ref ) = @_;
-    }
-    # $self->reply({ code => Apache2::Const::HTTP_OK, message => "All is well" } );
-    elsif( ref( $_[0] ) eq 'HASH' )
-    {
-        $ref = shift( @_ );
-        $code = $ref->{code} if( CORE::length( $ref->{code} ) );
-    }
-    my $r = $self->apache_request;
-    if( $code !~ /^[0-9]+$/ )
-    {
-        $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        $self->response->rflush;
-        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
-        $self->error( "http code to be used '$code' is invalid. It should be only integers." );
-        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    }
-    if( ref( $ref ) ne 'HASH' )
-    {
-        $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        $self->response->rflush;
-        # $r->send_http_header;
-        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
-        $self->error( "Data provided to send is not an hash ref." );
-        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    }
-    
-    my $msg;
-    if( CORE::exists( $ref->{success} ) )
-    {
-        $msg = $ref->{success};
-    }
-    # Maybe error is a string, or maybe it is already an error hash like { error => { message => '', code => '' } }
-    elsif( CORE::exists( $ref->{error} ) && !Net::API::REST::Status->is_success( $code ) )
-    {
-        if( ref( $ref->{error} ) eq 'HASH' )
-        {
-            $msg = $ref->{error}->{message};
-        }
-        else
-        {
-            $msg = $ref->{error};
-            $ref->{error} = {};
-        }
-        $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-        $ref->{error}->{message} = "$msg" if( !CORE::length( $ref->{error}->{message} ) && ( !ref( $msg ) || overload::Method( $msg => "''" ) ) );
-        CORE::delete( $ref->{message} ) if( CORE::length( $ref->{message} ) );
-        CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
-    }
-    elsif( CORE::exists( $ref->{message} ) )
-    {
-        $msg = $ref->{message};
-        # We format the message like in bailout, ie { error => { message => '', code => '' } }
-        if( $self->response->is_error( $code ) )
-        {
-            $ref->{error} = {} if( ref( $ref->{error} ) ne 'HASH' );
-            $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-            $ref->{error}->{message} = $ref->{message} if( !CORE::length( $ref->{error}->{message} ) );
-            CORE::delete( $ref->{message} ) if( CORE::length( $ref->{message} ) );
-            CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
-        }
-        else
-        {
-        }
-    }
-    elsif( $self->response->is_error( $code ) )
-    {
-        $ref->{error} = {} if( !CORE::exists( $ref->{error} ) || ref( $ref->{error} ) ne 'HASH' );
-        $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-        CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
-    }
-
-    my $frameOffset = 0;
-    my $sub = ( caller( $frameOffset + 1 ) )[3];
-    $frameOffset++ if( substr( $sub, rindex( $sub, '::' ) + 2 ) eq 'reply' );
-    my( $pack, $file, $line ) = caller( $frameOffset );
-    $sub = ( caller( $frameOffset + 1 ) )[3];
-    # Without an Access-Control-Allow-Origin field, this would trigger an erro ron the web browser
-    # So we make sure it is there if not set already
-	unless( $self->response->headers->get( 'Access-Control-Allow-Origin' ) )
-	{
-        $self->response->headers->set( 'Access-Control-Allow-Origin' => '*' );
-    }
-    # As an api, make sure there is no caching by default unless the field has already been set.
-	unless( $self->response->headers->get( 'Cache-Control' ) )
-	{
-        $self->response->headers->set( 'Cache-Control' => 'private, no-cache, no-store, must-revalidate' );
-    }
-    $self->response->content_type( 'application/json' );
-    # $r->status( $code );
-    $self->response->code( $code );
-    if( defined( $msg ) && $self->apache_request->content_type ne 'application/json' )
-    {
-        # $r->custom_response( $code, $msg );
-        $self->response->custom_response( $code, $msg );
-    }
-    else
-    {
-        # $r->custom_response( $code, '' );
-        $self->response->custom_response( $code, '' );
-        #$r->status( $code );
-    }
-    
-    # We make sure the code is set
-    if( CORE::exists( $ref->{error} ) && !$self->response->is_success( $code ) )
-    {
-        $ref->{error}->{code} = $code if( ref( $ref->{error} ) eq 'HASH' && !CORE::length( $ref->{error}->{code} ) );
-        my $lang = $self->lang_unix;
-        if( !length( "$lang" ) && $ref->{locale} )
-        {
-            $lang = $ref->{locale};
-        }
-        
-        unless( length( "$lang" ) )
-        {
-            $lang = $self->request->preferred_language( Net::API::REST::Status->supported_languages );
-            # Make sure we are dealing with unix style language code
-            $lang =~ tr/-/_/;
-            if( CORE::length( $lang ) == 2 )
-            {
-                $lang = Net::API::REST::Status->convert_short_lang_to_long( $lang );
-            }
-            # We have something weird, like maybe eng?
-            elsif( $lang !~ /^[a-z]{2}_[A-Z]{2}$/ )
-            {
-                $lang = Net::API::REST::Status->convert_short_lang_to_long( substr( $lang, 0, 2 ) );
-            }
-        }
-        my $err_description;
-        if( !$ref->{error}->{error_description} && ( $err_description = $self->response->get_http_message( $code, $lang ) ) )
-        {
-            $ref->{error}->{error_description} = $err_description;
-        }
-        else
-        {
-            $ref->{error}->{error_description} = $self->gettext( $self->response->get_http_message( $code ) );
-        }
-
-        if( !exists( $ref->{error}->{locale} ) &&
-            defined( $msg ) && 
-            $self->_is_a( $msg => 'Text::PO::String' ) && 
-            defined( my $locale = $msg->locale ) )
-        {
-            $ref->{error}->{locale} = $locale if( length( "$locale" ) );
-        }
-        elsif( !exists( $ref->{error}->{locale} ) &&
-               defined( $lang ) &&
-               length( "$lang" ) )
-        {
-            $ref->{error}->{locale} = $lang;
-        }
-    }
-    else
-    {
-        $ref->{code} = $code if( !CORE::length( $ref->{code} ) );
-        if( !exists( $ref->{locale} ) &&
-            defined( $msg ) && 
-            $self->_is_a( $msg => 'Text::PO::String' ) && 
-            defined( my $locale = $msg->locale ) )
-        {
-            $ref->{locale} = $locale if( length( "$locale" ) );
-        }
-    }
-    
-    if( CORE::exists( $ref->{cleanup} ) &&
-        defined( $ref->{cleanup} ) &&
-        ref( $ref->{cleanup} ) eq 'CODE' )
-    {
-        my $cleanup = CORE::delete( $ref->{cleanup} );
-        # See <https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHandler>
-        $self->request->request->pool->cleanup_register( $cleanup, $self );
-        # $r->push_handlers( PerlCleanupHandler => $cleanup );
-    }
-    
-    my $json = $self->json->utf8->relaxed(0)->encode( $ref );
-    # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
-    $self->print( $json ) || do
-    {
-        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
-    return( $code );
-}
 
 sub request { return( shift->_set_get_object( 'request', 'Net::API::REST::Request', @_ ) ); }
 
@@ -1888,38 +1332,6 @@ sub routes
     return( $self->{routes} );
 }
 
-sub server
-{
-    my $self = shift( @_ );
-    try
-    {
-        my $r = $self->apache_request;
-        return( $r->server ) if( $r );
-        return( Apache2::ServerUtil->server );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to get the Apache server object: $e" ) );
-    }
-}
-
-## sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
-## Or maybe the environment variable SERVER_SOFTWARE, e.g. Apache/2.4.18
-## sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
-sub server_version 
-{
-    my $self = shift( @_ );
-    # $self->request->log_error( "Apache version is: " . Apache2::ServerUtil::get_server_description );
-    return( version->parse( '2.4.18' ) );
-}
-
-## $ok = $s->set_handlers($hook_name => \&handler);
-## $ok = $s->set_handlers($hook_name => [\&handler, \&handler2]);
-## $ok = $s->set_handlers($hook_name => []);
-## $ok = $s->set_handlers($hook_name => undef);
-## https://perl.apache.org/docs/2.0/api/Apache2/ServerUtil.html#C_set_handlers_
-sub set_handlers { return( shift->_try( 'server', 'set_handlers', @_ ) ); }
-
 sub supported_api_versions
 {
     my $self = shift( @_ );
@@ -1941,22 +1353,6 @@ sub supported_content_types { return( shift->_set_get_array( 'supported_content_
 sub supported_languages { return( shift->_set_get_array( 'supported_languages', @_ ) ); }
 
 sub supported_methods { return( shift->_set_get_array( 'supported_methods', @_ ) ); }
-
-sub warn
-{
-    my $self = shift( @_ );
-    my $txt = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
-    my( $pkg, $file, $line, @otherInfo ) = caller;
-    my $sub = ( caller( 1 ) )[3];
-    my $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
-    my $trace = Devel::StackTrace->new;
-    my $frame = $trace->next_frame;
-    my $frame2 = $trace->next_frame;
-    my $r = $self->apache_request;
-    $txt = sprintf( "$txt called from %s in package %s in file %s at line %d\n%s\n",  $frame2->subroutine, $frame->package, $frame->filename, $frame->line, $trace->as_string );
-    return( $r->warn( $txt ) ) if( $r );
-    return( CORE::warn( $txt ) );
-}
 
 sub well_known
 {
@@ -2018,11 +1414,11 @@ sub is_method_allowed
     return( scalar( grep( /^$meth$/i, @$ok_methods ) ) );
 }
 
-sub methods { return( shift->_set_get_array( 'methods', @_ ) ); }
+sub methods { return( shift->_set_get_array_as_object( 'methods', @_ ) ); }
 
 sub path { return( shift->_set_get_uri( 'path', @_ ) ); }
 
-sub path_info { return( shift->_set_get_array( 'path_info', @_ ) ); }
+sub path_info { return( shift->_set_get_array_as_object( 'path_info', @_ ) ); }
 
 # sub variables { return( shift->_set_get_hash_as_object( 'variables', 'Net::API::REST::Endpoint::Variables', @_ ) ); }
 sub variables { return( shift->_set_get_hash_as_mix_object( 'variables', @_ ) ); }
@@ -2185,15 +1581,17 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.8.1
+    v1.0.1
 
 =head1 DESCRIPTION
 
 The purpose of this module is to provide a powerful, yet simple framework to implement a RESTful API under Apache2 mod_perl.
 
+As of version C<1.0.0>, this module inherits from L<Apache2::API>. Please check its documentation. Other methods specific to this module are documented here.
+
 =head1 METHODS
 
-=head2 new( hash )
+=head2 new
 
 This initiates the package and take the following parameters:
 
@@ -2209,10 +1607,6 @@ Optional. If set with a positive integer, this will activate verbose debugging m
 
 =back
 
-=head2 apache_request()
-
-Returns the L<Apache2::RequestRec> object.
-
 =head2 api_uri()
 
 Returns the api URI as a C<URI> object.
@@ -2220,18 +1614,6 @@ Returns the api URI as a C<URI> object.
 =head2 api_version( integer or decimal )
 
 Get or sets the current api version on the server.
-
-=head2 bailout( error string )
-
-Given an error message, this will prepare the http header and response accordingly.
-
-It will call B<gettext> to get the localised version of the error message, so this method is expected to be overriden by inheriting package.
-
-If the outgoing content type set is C<application/json> then this will return a properly formatted standard json error, such as:
-
-    { "error": { "code": 401, "message": "Something went wrong" } }
-
-Otherwise, it will send to the client the message as is.
 
 =head2 base_path( path )
 
@@ -2241,99 +1623,15 @@ If in the Directory directive of the Apache Virtual Host, a C<Net_API_REST_Base>
 
 The number of bytes threshold beyond which, the B<reply> method will gzip compress the data returned to the client.
 
-=head2 decode_base64( data )
-
-Given some data, this will decode it using base64 algorithm. It uses L<APR::Base64::decode> in the background, because L<MIME::Decoder> may have some issue under mod_perl.
-
-=head2 decode_json( data )
-
-This decode from utf8 some data into a perl structure.
-
-If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
-
-=head2 decode_uri( $string )
-
-Provided with an uri encoded string, and this uses L<URI::Escape> to return its decoded form.
-
-See also L</encode_uri>
-
-=head2 decode_url( $string )
-
-Given a url-encoded string, this returns the decoded string
-
-This uses L<APR::Request> XS method.
-
-=head2 decode_utf8( data )
-
-Decode some data from ut8 into perl internal utf8 representation.
-
-If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
-
 =head2 default_methods( [ qw( GET POST ... ) ] )
 
 This sets or gets the default methods supported by an endpoint.
-
-=head2 encode_base64( data )
-
-Given some data, this will encode it using base64 algorithm. It uses L<APR::Base64::encode> in the background, because L<MIME::Decoder> may have some issue under mod_perl.
-
-=head2 encode_json( hash reference )
-
-Given a hash reference, this will encode it into a json data representation.
-
-However, this will not utf8 encode it, because this is done upon printing the data and returning it to the client.
-
-=head2 encode_uri( $string )
-
-Provided with a string, and this uses L<URI::Escape> to return an uri encoded string.
-
-See also L</decode_uri>
-
-=head2 encode_url( $string )
-
-Given a string, this returns its url-encoded version
-
-This uses L<APR::Request> XS method.
-
-=head2 encode_utf8( data )
-
-This encode in ut8 the data provided and return it.
-
-If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
 
 =head2 endpoint( [ Net::API::REST::Endpoint object ] )
 
 This gets or sets an L<Net::API::REST::Endpoint> object.
 
-=head2 generate_uuid()
-
-Generates an uuid string and return it.
-
-=head2 get_auth_bearer()
-
-Checks whether an C<Authorization> http header was provided, and get the Bearer value.
-
-If no header was found, it returns an empty string.
-
-If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
-
-=head2 get_handlers()
-
-Returns a reference to a list of handlers enabled for a given phase.
-
-    $handlers_list = $res->get_handlers( $hook_name );
-
-A list of handlers configured to run at the child_exit phase:
-
-    @handlers = @{ $res->get_handlers( 'PerlChildExitHandler' ) || []};
-
-=head2 gettext( 'string id' )
-
-Get the localised version of the string passed as an argument.
-
-This is supposed to be superseded by the package inheriting from L<Net::API::REST>
-
-=head2 handler()
+=head2 handler
 
 This is the main method called by Apache to handle the response. To make this work, in the Apache configuration, you must set the handler to your package and have your package inherit from L<Net::API::REST>. For example:
 
@@ -2354,10 +1652,6 @@ Having found a route, B<handler> calls the anonymous subroutine in charge of han
 If no route was found, B<handler> returns a C<400 Bad Request>.
 
 If the endpoint handler returns undef(), B<handler> will return a C<500 Server Error>, otherwise it will pass the return value back to Apache. The return value should be an L<Apache2::Const> return code.
-
-=head2 header_datetime( DateTime object )
-
-Given a C<DateTime> object, this sets it to GMT time zone and set the proper formatter (L<Net::API::REST::DateTime>) so that the stringification is compliant with http headers standard.
 
 =head2 http_cors()
 
@@ -2473,14 +1767,6 @@ For example:
 
 =back
 
-=head2 is_perl_option_enabled()
-
-Checks if perl option is enabled in the Virtual Host and returns a boolean value
-
-=head2 json()
-
-Returns a JSON object.
-
 =head2 jwt_accepted_algo( string )
 
 Get or set the algorithm supported for the JWT tokens.
@@ -2567,42 +1853,6 @@ If provided, this will set the I<exp> property to I<iat> + I<ttl>
 
 =head2 key
 
-=head2 lang( string )
-
-Set or get the current language
-
-=head2 lang_unix( string )
-
-Given a language, this returns a language code formatted the unix way, ie en-GB would become en_GB
-
-=head2 lang_web( string )
-
-Given a language, this returns a language code formatted the web way, ie en_GB would become en-GB
-
-=head2 log_error( string )
-
-Given a string, this will log the data into the error log.
-
-When log_error is accessed with the L<Apache2::RequestRec> the error gets logged into the Virtual Host log, but when log_error gets accessed via the L<Apache2::ServerUtil> object, the error get logged into the Apache main error log.
-
-=head2 print( list )
-
-print out the list of strings and returns the number of bytes sent.
-
-=head2 push_handlers
-
-=head2 reply( http code, message | hash reference )
-
-Given an http code and a message, or just a hash reference, B<reply> will find out if the code provided is an error and format the replied json appropriately like:
-
-    { "error": { "code": 400, "message": "Some error" } }
-
-It will json encode the returned data and print it out back to the client after setting the http returned code.
-
-If a C<cleanup> hash property is provided with a callback code reference as a value, it will be set as a cleanup callback by calling C<< $r->pool->cleanup_register >>. See L<https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHandler>
-
-The L<Net::API::REST> object will be passed as the first and only argument to the callback routine.
-
 =head2 request()
 
 Returns the L<Net::API::REST::Request> object. This object is set early during the instantiation in the B<handler> method.
@@ -2625,16 +1875,6 @@ Otherwise, a L<Net::API::REST::Endpoint> is returned.
 
 This sets the routes for all the endpoints proposed by the RESTful server
 
-=head2 server()
-
-Returns a L<Apache2::Server> object
-
-=head2 server_version()
-
-Tries hard to find out the version number of the Apache server.
-
-=head2 set_handlers()
-
 =head2 supported_api_versions( array reference )
 
 Get or set the list of supported api versions
@@ -2644,12 +1884,6 @@ Get or set the list of supported api versions
 Get or set the list of supported language codes, such as fr_FR, en_GB, ja_JP, zh_TW, etc
 
 =head2 supported_methods( array reference )
-
-Get or set the list of supported http methods.
-
-=head2 warn( list )
-
-Given a list of string, this sends a warning.
 
 =head2 well_known()
 
@@ -2663,51 +1897,15 @@ Given an object type, a method name and optional parameters, this attempts to ca
 
 Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with L<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
 
-=head1 Net::API::REST::Endpoint methods
-
-=head2 access()
-
-This specifies the level of access: private or restricted
-
-=head2 handler()
-
-Returns the handler found to handle the endpoint
-
-=head2 is_method_allowed()
-
-Returns a boolean on whether the given method is allowed.
-
-=head2 methods()
-
-Returns an array reference of the methods allowed for this endpoint.
-
-=head2 path_info()
-
-Returns a string for this path info, if any.
-
-=head2 supported_content_types
-
-Sets or gets an array of supported content types
-
-=head2 variables()
-
-Returns a hash reference of name => value pairs for the variables found in the endpoint sought by in the http request. For example:
-
-    /org/jp/llc/12/directors/23/profile
-
-In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using L<Net::API::REST>
-
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
-CPAN ID: jdeguest
-
-https://gitlab.com/jackdeguest/Net-API-REST
-
 =head1 SEE ALSO
 
-L<Net::API::REST::Cookie>, L<Net::API::REST::DateTime>, L<Net::API::REST::JWT>, L<Net::API::REST::Endpoint>, L<Net::API::REST::Query>, L<Net::API::REST::Request>, L<Net::API::REST::Request::Params>, L<Net::API::REST::Request::Upload>, L<Net::API::REST::Response>, L<Net::API::REST::Status>
+L<Net::API::REST::JWT>, L<Net::API::REST::Endpoint>, L<Net::API::REST::Request>, L<Net::API::REST::Response>
+
+L<Apache2::API::DateTime>, L<Apache2::API::Query>, L<Apache2::API::Request>, L<Apache2::API::Response>, L<Apache2::API::Status>
 
 L<Apache2::Request>, L<Apache2::RequestRec>, L<Apache2::RequestUtil>
 

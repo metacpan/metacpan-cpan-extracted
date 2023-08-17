@@ -28,7 +28,7 @@ $outh->print( scalar do {
    <$in_h> } );
 
 __DATA__
-package XS::Parse::Keyword::Builder_data 0.33;
+package XS::Parse::Keyword::Builder_data 0.38;
 
 use v5.14;
 use warnings;

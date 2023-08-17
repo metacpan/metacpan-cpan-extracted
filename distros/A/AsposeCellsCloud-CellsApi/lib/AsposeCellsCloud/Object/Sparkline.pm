@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'A sparkline represents a tiny chart or graphic in a worksheet cell that provides a visual representation of data.            ',
                                   class => 'Sparkline',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'column' => {
      	datatype => 'int',
      	base_name => 'Column',
-     	description => '',
+     	description => 'Gets the column index of the sparkline.',
      	format => '',
      	read_only => '',
      		},
      'data_range' => {
      	datatype => 'string',
      	base_name => 'DataRange',
-     	description => '',
+     	description => 'Represents the data range of the sparkline.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'Row',
-     	description => '',
+     	description => 'Gets the row index of the sparkline.',
      	format => '',
      	read_only => '',
      		},    

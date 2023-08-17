@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib "t";
 use testcase "t::stages";
@@ -16,7 +16,7 @@ BEGIN { $^H{"t::stages/permit"} = 1; }
 
    stages withattr :atname(atvalue) { }
 
-   is_deeply( $t::stages::captured, [ atname => "atvalue" ],
+   is( $t::stages::captured, [ atname => "atvalue" ],
       'captured an attribute by attr filter' );
 }
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Martin Becker, Blaubeuren.
+# Copyright (c) 2021-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -14,9 +14,20 @@ use Config;
 use Math::DifferenceSet::Planar;
 use constant MDP => Math::DifferenceSet::Planar::;
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 #########################
+
+my $bits = $Config{'ivsize'} * 8;
+my $bool = MDP->available(5, $bits);
+ok(!$bool);
+SKIP: {
+    skip 'from_lambda not implemented', 2 if !MDP->can('from_lambda');
+    my $much = 1 << ($bits >> 1);
+    my $ds   = eval { MDP->from_lambda($much, 1, 0) };
+    ok(!defined($ds));
+    like($@, qr/^order [0-9]+ too large for this platform/);
+}
 
 SKIP: {
     skip 'order 100K sets not supported', 4 if !MDP->available(99991);

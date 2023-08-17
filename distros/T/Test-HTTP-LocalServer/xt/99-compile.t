@@ -13,10 +13,14 @@ BEGIN {
 
 plan 'no_plan';
 
+require './Makefile.PL';
+# Loaded from Makefile.PL
+our %module = get_module_info();
+
 my $last_version = undef;
 
 sub check {
-    return if (! m{(\.pm|\.pl) \z}xmsi);
+    #return if (! m{(\.pm|\.pl) \z}xmsi);
 
     my ($stdout, $stderr, $exit) = capture(sub {
         system( $^X, '-Mblib', '-c', $_ );
@@ -37,7 +41,20 @@ sub check {
     };
 }
 
-find({wanted => \&check, no_chdir => 1},
-     grep { -d $_ }
-         'blib', 'scripts', 'examples', 'bin', 'lib'
-     );
+my @files;
+find({wanted => \&wanted, no_chdir => 1},
+    grep { -d $_ }
+         'blib/lib', 'examples', 'lib'
+    );
+
+if( my $exe = $module{EXE_FILES}) {
+    push @files, @$exe;
+};
+
+for (@files) {
+    check($_)
+}
+
+sub wanted {
+  push @files, $File::Find::name if /\.p(l|m|od)$/;
+}

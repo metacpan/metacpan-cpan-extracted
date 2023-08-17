@@ -2,26 +2,42 @@ package Spreadsheet::SimpleExcel;
 
 # ABSTRACT: Create Excel files with Perl
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
+our $VERSION = '1.93'; # VERSION
+
+use Excel::Writer::XLSX;
 use Spreadsheet::WriteExcel;
+use Spreadsheet::WriteExcel::Big;
 use IO::Scalar;
 use IO::File;
 use XML::Writer;
 
-our $VERSION     = '1.92';
-our $errstr      = '';
-
 sub new{
   my ($class,%opts) = @_;
-  my $self = {};
-  $self->{worksheets} = $opts{-worksheets} || [];
-  $self->{type}       = 'application/vnd.ms-excel';
-  $self->{BIG}        = $opts{-big}        || 0;
-  $self->{FILE}       = $opts{-filename}   || '';
-  bless($self,$class);
+
+  my %formats = (
+      xls     => 'Spreadsheet::WriteExcel',
+      xls_big => 'Spreadsheet::WriteExcel::Big',
+      xlsx    => 'Excel::Writer::XLSX',
+  );
+
+  my $param = {
+      worksheets => $opts{-worksheets} || [],
+      type       => 'application/vnd.ms-excel',
+      BIG        => $opts{-big}        || 0,
+      FILE       => $opts{-filename}   || '',
+      subclass   => ( $formats{ lc ( $opts{-format} // 'xls' ) } // $formats{xls} ),
+      errstr     => '',
+  };
+
+  if ( $param->{BIG} && ( !$opts{-format} || $opts{-format} eq 'xls' ) ) {
+      $param->{subclass} = $formats{xls_big};
+  }
+
+  my $self = bless $param,$class;
   
   for my $sheet( @{ $self->{worksheets} } ){
       if( length($sheet->[0]) > 31 ){
@@ -43,24 +59,27 @@ sub current_sheet{
 sub add_worksheet{
     my ($self,@array) = @_;
     my ($package,$filename,$line) = caller();
+
+    $self->{errstr} = '';
+
     unless(defined $array[0]){
-        $errstr = qq~No worksheet defined at Spreadsheet::SimpleExcel add_worksheet() from
+        $self->{errstr} = qq~No worksheet defined at Spreadsheet::SimpleExcel add_worksheet() from
             $filename line $line\n~;
         $array[0] = 'unknown' unless defined $array[0];
-        return undef;
+        return;
     }
 
     if( length( $array[0] ) > 31 ){
-        $errstr = qq~Length of worksheet name has be at most 31~;
-        return undef;
+        $self->{errstr} = qq~Length of worksheet name has be at most 31~;
+        return;
     }
   
     $self->_last_sheet($array[0]);
   
     if(grep{$_->[0] eq $array[0]}@{$self->{worksheets}}){
-        $errstr = qq~Duplicate worksheet-title at Spreadsheet::SimpleExcel add_worksheet() from
+        $self->{errstr} = qq~Duplicate worksheet-title at Spreadsheet::SimpleExcel add_worksheet() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     push(@{$self->{worksheets}},[@array]);
     return 1;
@@ -78,13 +97,15 @@ sub del_worksheet{
     my ($self,$title) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     $title = $self->_last_sheet unless defined $title;
     $self->_last_sheet( $title );
   
-    unless(defined $title){
-        $errstr = qq~No worksheet-title defined at Spreadsheet::SimpleExcel del_worksheet() from
+    unless ( $title ){
+        $self->{errstr} = qq~No worksheet-title defined at Spreadsheet::SimpleExcel del_worksheet() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     my @worksheets = grep{$_->[0] ne $title}@{$self->{worksheets}};
     $self->{worksheets} = [@worksheets];
@@ -94,6 +115,8 @@ sub add_row{
     my ($self,$title,$arref,$props) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     if(ref $title eq 'ARRAY'){
         $props  = $arref;
         $arref  = $title;
@@ -104,14 +127,14 @@ sub add_row{
     $self->_last_sheet( $title );
   
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     unless(ref($arref) eq 'ARRAY'){
-        $errstr = qq~Is not an arrayref at Spreadsheet::SimpleExcel add_row() from
+        $self->{errstr} = qq~Is not an arrayref at Spreadsheet::SimpleExcel add_row() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     foreach my $worksheet(@{$self->{worksheets}}){
         if($worksheet->[0] eq $title){
@@ -126,6 +149,8 @@ sub set_headers{
     my ($self,$title,$arref,$props) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     if(ref $title eq 'ARRAY'){
         $props  = $arref;
         $arref  = $title;
@@ -136,14 +161,14 @@ sub set_headers{
     $self->_last_sheet( $title );
     
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_headers() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_headers() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     unless(ref($arref) eq 'ARRAY'){
-        $errstr = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_headers() from
+        $self->{errstr} = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_headers() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     foreach my $worksheet(@{$self->{worksheets}}){
         if($worksheet->[0] eq $title){
@@ -158,6 +183,8 @@ sub set_headers_format{
     my ($self,$title,$arref) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     if(ref $title eq 'ARRAY'){
         $arref = $title;
         $title = $self->_last_sheet;
@@ -167,14 +194,14 @@ sub set_headers_format{
     $self->_last_sheet( $title );
   
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_headers_format() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_headers_format() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     unless(ref($arref) eq 'ARRAY'){
-        $errstr = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_headers_format() from
+        $self->{errstr} = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_headers_format() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     foreach my $worksheet(@{$self->{worksheets}}){
         if($worksheet->[0] eq $title){
@@ -188,6 +215,8 @@ sub set_headers_format{
 sub set_data_format{
     my ($self,$title,$arref) = @_;
     my ($package,$filename,$line) = caller();
+
+    $self->{errstr} = '';
   
     if(ref $title eq 'ARRAY'){
         $arref = $title;
@@ -198,14 +227,14 @@ sub set_data_format{
     $self->_last_sheet( $title );
     
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_data_format() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel set_data_format() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     unless(ref($arref) eq 'ARRAY'){
-        $errstr = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_data_format() from
+        $self->{errstr} = qq~Is not an arrayref at Spreadsheet::SimpleExcel set_data_format() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     foreach my $worksheet(@{$self->{worksheets}}){
         if($worksheet->[0] eq $title){
@@ -220,6 +249,8 @@ sub add_row_at{
     my ($self,$title,$index,$arref,$props) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     if(ref $index eq 'ARRAY'){
         $props = $arref;
         $arref = $index;
@@ -231,22 +262,22 @@ sub add_row_at{
     $self->_last_sheet( $title );
   
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row_at() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row_at() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     unless(ref($arref) eq 'ARRAY'){
-        $errstr = qq~Is not an arrayref at Spreadsheet::SimpleExcel add_row() from
+        $self->{errstr} = qq~Is not an arrayref at Spreadsheet::SimpleExcel add_row() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     foreach my $worksheet(@{$self->{worksheets}}){
         if($worksheet->[0] eq $title){
-            my @array = @{$worksheet->[1]->{'-data'}};
+            my @array = @{$worksheet->[1]->{'-data'} || [] };
             if($index =~ /[^\d]/ || $index > $#array){
-                $errstr = qq~Index not in Array at Spreadsheet::SimpleExcel add_row_at() from
+                $self->{errstr} = qq~Index not in Array at Spreadsheet::SimpleExcel add_row_at() from
                     $filename line $line\n~;
-                return undef;
+                return;
             }
             splice(@array,$index,0,$arref);
             $worksheet->[1]->{'-data'} = \@array;
@@ -260,15 +291,17 @@ sub sort_data{
     my ($self,$title,$index,$type) = @_;
     my ($package,$filename,$line) = caller();
   
+    $self->{errstr} = '';
+
     if(scalar @_ == 1){
-        $errstr = qq~at least column index is missing ($filename line $line)~;
-        return undef;
+        $self->{errstr} = qq~at least column index is missing ($filename line $line)~;
+        return;
     }
     elsif(scalar @_ == 2){
         if($title =~ /\D/){
-            $errstr = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
+            $self->{errstr} = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
                 $filename line $line\n~;
-            return undef;
+            return;
           
         }
         else{
@@ -290,9 +323,9 @@ sub sort_data{
     $self->_last_sheet( $title );
   
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel sort_data() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel sort_data() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
   
     foreach my $worksheet(@{$self->{worksheets}}){
@@ -302,14 +335,14 @@ sub sort_data{
             my @array = @{$worksheet->[1]->{'-data'}};
             last unless(scalar(@array) > 0);
             if($index >= scalar(@{$array[0]})){
-                $errstr = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
+                $self->{errstr} = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
                     $filename line $line\n~;
-                return undef;
+                return;
             }
             if(not defined $index || $index =~ /\D/){
-                $errstr = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
+                $self->{errstr} = qq~Index not in Array at Spreadsheet::SimpleExcel sort_data() from
                     $filename line $line\n~;
-                return undef;
+                return;
             }
             if(_is_numeric(\@array,$index)){
                 if($type && $type eq 'DESC'){
@@ -330,6 +363,7 @@ sub sort_data{
             last;
         }
     }
+
     return 1;
 }# end sort_data
 
@@ -337,13 +371,15 @@ sub reset_sort{
     my ($self,$title) = @_;
     my ($package,$filename,$line) = caller();
     
+    $self->{errstr} = '';
+
     $title = $self->_last_sheet unless defined $title;
     $self->_last_sheet( $title );
     
     unless(grep{$_->[0] eq $title}@{$self->{worksheets}}){
-        $errstr = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row_at() from
+        $self->{errstr} = qq~Worksheet $title does not exist at Spreadsheet::SimpleExcel add_row_at() from
             $filename line $line\n~;
-        return undef;
+        return;
     }
     my (@worksheets) = grep{$_->[0] eq $title}@{$self->{worksheets}};
     for my $sheet(@worksheets){
@@ -352,13 +388,16 @@ sub reset_sort{
 }# reset_sort
 
 sub errstr{
-    return $errstr;
+    my ($self) = @_;
+    return $self->{errstr};
 }# end errstr
 
 sub sort_worksheets{
     my ($self,$type) = @_;
     $type ||= 'ASC';
     
+    $self->{errstr} = '';
+
     my @title_array = map{$_->[0]}@{$self->{worksheets}};
     if( _is_title_numeric(\@title_array) ){
         @{$self->{worksheets}} = sort{$a->[0] <=> $b->[0]}@{$self->{worksheets}};
@@ -388,231 +427,253 @@ sub _is_title_numeric{
 }# end _is_numeric
 
 sub _do_sort{
-  my ($worksheet) = @_;
-  my @array = @{$worksheet->[1]->{'-data'}};
-  if(exists  $worksheet->[1]->{sortstring} && 
-     defined $worksheet->[1]->{sortstring} && 
-             $worksheet->[1]->{sortstring} =~ /\w/){
-    $worksheet->[1]->{-data} = [sort{eval($worksheet->[1]->{sortstring})}@array];
-  }
+    my ($worksheet) = @_;
+    my @array = @{$worksheet->[1]->{'-data'}};
+    if(exists  $worksheet->[1]->{sortstring} && 
+         defined $worksheet->[1]->{sortstring} && 
+                 $worksheet->[1]->{sortstring} =~ /\w/){
+        $worksheet->[1]->{-data} = [sort{eval($worksheet->[1]->{sortstring})}@array]; ## no critic
+    }
 }# _do_sort
 
 sub output{
-  my ($self,$lines) = @_;
-  my ($package,$filename,$line) = caller();
-  $lines ||= 32000;
-  $lines =~ s/\D//g;
-  my $excel = $self->_make_excel($lines);
-  unless(defined $excel){
-    $errstr = qq~Could not create Spreadsheet at Spreadsheet::SimpleExcel output() from
-         $filename line $line\n~;
-    return undef;
-  }
-  print "Content-type: ".$self->{type}."\n\n",
-        $excel;
+    my ($self,$lines) = @_;
+    my ($package,$filename,$line) = caller();
+    $lines ||= 32000;
+    $lines =~ s/\D//g;
+  
+    $self->{errstr} = '';
+  
+    my $excel = $self->_make_excel($lines);
+    unless(defined $excel){
+        $self->{errstr} = qq~Could not create Spreadsheet at Spreadsheet::SimpleExcel output() from
+             $filename line $line\n~;
+        return;
+    }
+    print "Content-type: ".$self->{type}."\n\n",
+          $excel;
 }# end output
 
 sub output_as_string{
-  my ($self,$lines) = @_;
-  my ($package,$filename,$line) = caller();
-  $lines ||= 32000;
-  $lines =~ s/\D//g;
-  my $excel = $self->_make_excel($lines);
-  unless(defined $excel){
-    $errstr = qq~Could not create Spreadsheet at Spreadsheet::SimpleExcel output_to_file() from
-        $filename line $line\n~;
-    return undef;
-  }
-  return $excel;
+    my ($self,$lines) = @_;
+    my ($package,$filename,$line) = caller();
+    $lines ||= 32000;
+    $lines =~ s/\D//g;
+
+    $self->{errstr} = '';
+
+    my $excel = $self->_make_excel($lines);
+    unless(defined $excel){
+        $self->{errstr} = qq~Could not create Spreadsheet at Spreadsheet::SimpleExcel output_to_file() from
+            $filename line $line\n~;
+        return;
+    }
+    return $excel;
 }# end output_as_string
 
 sub output_to_file{
-  my ($self,$filename,$lines) = @_;
-  my ($package,$file,$line) = caller();
-  $lines ||= 32000;
-  $lines =~ s/\D//g;
-  unless($filename){
-    if($self->{FILE}){
-        $filename = $self->{FILE};
+    my ($self,$filename,$lines) = @_;
+    my ($package,$file,$line) = caller();
+    $lines ||= 32000;
+    $lines =~ s/\D//g;
+
+    $self->{errstr} = '';
+
+    unless($filename){
+        if($self->{FILE}){
+            $filename = $self->{FILE};
+        }
+        else{
+            $self->{errstr} = qq~No filename specified at Spreadsheet::SimpleExcel output_to_file() from
+                $file line $line\n~;
+            return;
+        }
     }
-    else{
-        $errstr = qq~No filename specified at Spreadsheet::SimpleExcel output_to_file() from
+
+    #$filename =~ s/[^A-Za-z0-9_\.\/]//g; #/
+    my $excel = $self->_make_excel($lines);
+
+    unless(defined $excel){
+        $self->{errstr} = qq~Could not create $filename at Spreadsheet::SimpleExcel output_to_file() from
             $file line $line\n~;
-        return undef;
+        return;
     }
-  }
-  #$filename =~ s/[^A-Za-z0-9_\.\/]//g; #/
-  my $excel = $self->_make_excel($lines);
-  unless(defined $excel){
-    $errstr = qq~Could not create $filename at Spreadsheet::SimpleExcel output_to_file() from
-        $file line $line\n~;
-    return undef;
-  }
-  open(EXCEL,">$filename") or die $!;
-  binmode EXCEL;
-  print EXCEL $excel;
-  close EXCEL;
-  return 1;
+  
+    open my $excel_fh, ">", $filename or die $!;
+    binmode $excel_fh;
+    print $excel_fh $excel or die $!;
+    close $excel_fh or die $!;
+  
+    return 1;
 }# end output_to_file
 
 sub output_to_XML{
-  my ($self,$filename) = @_;
-  my ($package,$file,$line) = caller();
-  unless($filename){
-    $errstr = qq~No filename specified at Spreadsheet::SimpleExcel output_to_XML() from
-        $file line $line\n~;
-    return undef;
-  }
-  unless(scalar(@{$self->{worksheets}}) >= 1){
-    $errstr = qq~No worksheets in Spreadsheet~;
-    return undef;
-  }
-  
-  my $fh = IO::File->new(">$filename");
-  my $xml = XML::Writer->new(OUTPUT => $fh, DATA_MODE => 1, DATA_INDENT => 2);
-  $xml->xmlDecl('UTF-8','yes');
-  $xml->startTag('workbook');
-  for my $worksheet(@{$self->{worksheets}}){
-    my $name = $worksheet->[0];
-    $name =~ s~[^\w]~_~g;
-    $xml->startTag($name);
-    
-    my @headers;
-    my @datasets = @{$worksheet->[1]->{-data}};
-    if(exists $worksheet->[1]->{-headers}){
-      @headers = (@{$worksheet->[1]->{-headers}});
-      for(@headers){
-        s~[^\w]~_~g; 
-      }
+    my ($self,$filename) = @_;
+    my ($package,$file,$line) = caller();
+
+    $self->{errstr} = '';
+
+    unless($filename){
+        $self->{errstr} = qq~No filename specified at Spreadsheet::SimpleExcel output_to_XML() from
+            $file line $line\n~;
+        return;
     }
-    else{
-      my $var = 'A';
-      for(0..scalar(@{$datasets[0]})-1){
-        ++$var;
-        push(@headers,$var);
-      }
-    }
-    my $row = 0;
-    for my $data(@datasets){
-      $xml->startTag('Row'.(++$row));
-      for my $i(0..scalar(@$data)-1){
-        $xml->startTag($headers[$i]);
-        $xml->characters($data->[$i]);
-        $xml->endTag($headers[$i]);
-      }
-      $xml->endTag('Row'.$row);
+    unless(scalar(@{$self->{worksheets}}) >= 1){
+        $self->{errstr} = qq~No worksheets in Spreadsheet~;
+        return;
     }
     
-    $xml->endTag($name);
-  }
-  $xml->endTag('workbook');
-  $xml->end();
-  $fh->close();
+    my $fh = IO::File->new(">$filename");
+    my $xml = XML::Writer->new(OUTPUT => $fh, DATA_MODE => 1, DATA_INDENT => 2);
+    $xml->xmlDecl('UTF-8','yes');
+    $xml->startTag('workbook');
+    for my $worksheet(@{$self->{worksheets}}){
+        my $name = $worksheet->[0];
+        $name =~ s~[^\w]~_~g;
+        $xml->startTag($name);
+        
+        my @headers;
+        my @datasets = @{$worksheet->[1]->{-data}};
+        if(exists $worksheet->[1]->{-headers}){
+            @headers = (@{$worksheet->[1]->{-headers}});
+            for(@headers){
+                s~[^\w]~_~g; 
+            }
+        }
+        else{
+            my $var = 'A';
+            for(0..scalar(@{$datasets[0]})-1){
+              ++$var;
+              push(@headers,$var);
+            }
+        }
+        my $row = 0;
+        for my $data(@datasets){
+            $xml->startTag('Row'.(++$row));
+            for my $i(0..scalar(@$data)-1){
+              $xml->startTag($headers[$i]);
+              $xml->characters($data->[$i]);
+              $xml->endTag($headers[$i]);
+            }
+            $xml->endTag('Row'.$row);
+        }
+        
+        $xml->endTag($name);
+    }
+
+    $xml->endTag('workbook');
+    $xml->end();
+    $fh->close();
 }# output_to_XML
 
 sub _make_excel{
-  my ($self,$nr_of_lines) = @_;
-  my ($package,$filename,$line) = caller();
-  my $c_lines = $nr_of_lines || 32000;
-  unless(scalar(@{$self->{worksheets}}) >= 1){
-    $errstr = qq~No worksheets in Spreadsheet~;
-    return undef;
-  }
-  my $output;
-  tie(*XLS,'IO::Scalar',\$output);
-  my $excel;
-  unless($excel = new Spreadsheet::WriteExcel(\*XLS)){
-    $errstr = qq~Could not create spreadsheet object ($!) from
-        $filename line $line~;
-    return undef;
-  }
-  if($self->{BIG}){
-    eval{require Spreadsheet::WriteExcel::Big};
-    if($@){
-      $errstr = $@;
-      return undef;
+    my ($self,$nr_of_lines) = @_;
+  
+    my ($package,$filename,$line) = caller();
+
+    $self->{errstr} = '';
+  
+    my $c_lines = $nr_of_lines || 32000;
+    unless(scalar(@{$self->{worksheets}}) >= 1){
+        $self->{errstr} = qq~No worksheets in Spreadsheet~;
+        return;
     }
-    unless($excel = new Spreadsheet::WriteExcel::Big(\*XLS)){#$fname)){
-      $errstr = qq~Could not create spreadsheet object ($!) from
-          $filename line $line~;
-      return undef;
+  
+    my $module = $self->{subclass};
+  
+    my $output;
+    tie(*XLS,'IO::Scalar',\$output);
+    my $excel;
+    unless($excel = $module->new(\*XLS)){
+        $self->{errstr} = qq~Could not create spreadsheet object ($!) from
+            $filename line $line~;
+        return;
     }
-  }
-  #else{
+    #else{
     my @titles = map{$_->[0]}@{$self->{worksheets}};
     foreach my $worksheet(@{$self->{worksheets}}){
-      my $sheet = $excel->addworksheet($worksheet->[0]);
-      _do_sort($worksheet);
-      my $col  = 0;
-      my $row  = 0;
-      my $page = 2;
-      _header2sheet($sheet,$worksheet->[1]->{-headers},$worksheet->[1]->{-headers_format});
-      $row++ if(exists $worksheet->[1]->{'-headers'} && scalar(@{$worksheet->[1]->{'-headers'}}) > 0);
-      foreach my $data(@{$worksheet->[1]->{-data}}){
-        $col = 0;
-        if($row >= $c_lines){
-          my $title = $worksheet->[0].'_p'.$page;
-          while(grep{$_ eq $title}@titles){
-            $page++;
-            $title = $worksheet->[0].'_p'.$page;
-          }
-          push(@titles,$title);
-          $sheet = $excel->addworksheet($title);
-          $row = 0;
-          if(scalar(@{$worksheet->[1]->{'-headers'}}) > 0){
-            $row = 1;
-            _header2sheet($sheet,$worksheet->[1]->{-headers},$worksheet->[1]->{-headers_format});
-          }
+        my $sheet = $excel->add_worksheet($worksheet->[0]);
+
+        _do_sort($worksheet);
+
+        my $col  = 0;
+        my $row  = 0;
+        my $page = 2;
+
+        _header2sheet($sheet,$worksheet->[1]->{-headers},$worksheet->[1]->{-headers_format});
+
+        $row++ if(exists $worksheet->[1]->{'-headers'} && scalar(@{$worksheet->[1]->{'-headers'}}) > 0);
+
+        foreach my $data(@{$worksheet->[1]->{-data}}){
+            $col = 0;
+            if($row >= $c_lines){
+                my $title = $worksheet->[0].'_p'.$page;
+
+                while(grep{$_ eq $title}@titles){
+                    $page++;
+                    $title = $worksheet->[0].'_p'.$page;
+                }
+
+                push(@titles,$title);
+                $sheet = $excel->add_worksheet($title);
+                $row = 0;
+
+                if(scalar(@{$worksheet->[1]->{'-headers'}}) > 0){
+                    $row = 1;
+                    _header2sheet($sheet,$worksheet->[1]->{-headers},$worksheet->[1]->{-headers_format});
+                }
+            }
+            my $formatref = $worksheet->[1]->{-data_format};
+            foreach my $value(@$data){
+                if(defined $formatref && defined $formatref->[$col]){
+                    if($formatref->[$col] eq 's'){
+                        $sheet->write_string($row,$col,$value);
+                    }
+                    elsif($formatref->[$col] eq 'n'){
+                        $sheet->write_number($row,$col,$value);
+                    }
+                    else{
+                        $sheet->write($row,$col,$value);
+                    }
+                }
+                #elsif($value =~ /^=/){
+                #  $sheet->write_string($row,$col,$value);
+                #}
+                else{
+                    $sheet->write($row,$col,$value);
+                }
+                $col++;
+            }
+            $row++;
         }
-        my $formatref = $worksheet->[1]->{-data_format};
-        foreach my $value(@$data){
-          if(defined $formatref && defined $formatref->[$col]){
-            if($formatref->[$col] eq 's'){
-              $sheet->write_string($row,$col,$value);
-            }
-            elsif($formatref->[$col] eq 'n'){
-              $sheet->write_number($row,$col,$value);
-            }
-            else{
-              $sheet->write($row,$col,$value);
-            }
-          }
-          #elsif($value =~ /^=/){
-          #  $sheet->write_string($row,$col,$value);
-          #}
-          else{
-            $sheet->write($row,$col,$value);
-          }
-          $col++;
-        }
-        $row++;
-      }
     }
+
     $excel->close();
-  #}
-  return $output;
+
+    return $output;
 }# end _make_excel
 
 sub _header2sheet{
-  my ($sheet,$arref,$formatref) = @_;
-  my $col = 0;
-  foreach(@$arref){
-    unless(defined $formatref && defined $formatref->[$col]){
-      $sheet->write(0,$col,$_);
+    my ($sheet,$arref,$formatref) = @_;
+    my $col = 0;
+
+    for my $value ( @{ $arref } ) {
+        unless(defined $formatref && defined $formatref->[$col]){
+            $sheet->write(0,$col,$value);
+        }
+        else{
+            if($formatref->[$col] eq 's'){
+                $sheet->write_string(0,$col,$value);
+            }
+            elsif($formatref->[$col] eq 'n'){
+                $sheet->write_number(0,$col,$value);
+            }
+            else{
+                $sheet->write(0,$col,$value);
+            }
+        }
+        $col++;
     }
-    else{
-      if($formatref->[$col] eq 's'){
-        $sheet->write_string(0,$col,$_);
-      }
-      elsif($formatref->[$col] eq 'n'){
-        $sheet->write_number(0,$col,$_);
-      }
-      else{
-        $sheet->write(0,$col,$_);
-      }
-    }
-    $col++;
-  }
 }# end _header2sheet
 
 sub sheets{
@@ -635,7 +696,7 @@ Spreadsheet::SimpleExcel - Create Excel files with Perl
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 SYNOPSIS
 
@@ -698,6 +759,22 @@ version 1.92
   $excel2->output();
   
   $excel2->output_to_XML('test.xml');
+
+  ## create XLSX
+  my $worksheet3 = [ 'NAME', { -data => \@data } ];
+  my $file3      = 'test.xlsx';
+  
+  # create a new instance
+  my $excel3 = Spreadsheet::SimpleExcel->new(
+      -worksheets => [$worksheet3],
+      -filename   => $file3,
+      -format     => 'xlsx',
+  );
+  
+  # add headers to 'NAME'
+  $excel3->set_headers('NAME',[qw/this is a test/]);
+  
+  $excel3->output_to_file();
 
 =head1 DESCRIPTION
 

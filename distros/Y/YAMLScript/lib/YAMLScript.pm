@@ -1,2 +1,10 @@
 package YAMLScript;
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.12';
+
+use Lingy;
+use YAMLScript::RT;
+use base 'Lingy';
+
+use constant error_prefix => 'YAMLScript Error:';
+
+1;

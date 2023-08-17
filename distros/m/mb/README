@@ -58,7 +58,7 @@ SYNOPSIS
     Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
 
   supported operating systems:
-    Apple Inc. OS X,
+    Apple Inc. Mac OS X, OS X, macOS,
     Hewlett-Packard Development Company, L.P. HP-UX,
     International Business Machines Corporation AIX,
     Microsoft Corporation Windows,

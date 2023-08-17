@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181420;
+our $VERSION = 1.20230614174403;
 
 my $formatters = [
                 {
@@ -102,46 +102,57 @@ my $validators = {
             )\\d|
             22252[0-4]
           )\\d\\d|
-          5(?:
-            00(?:
-              0\\d|
-              5[05]
-            )|
-            11(?:
-              00|
-              [124]\\d|
-              3[01]
-            )|
-            (?:
-              520|
-              909
-            )0|
-            75(?:
-              00|
-              [57]5
-            )|
-            8(?:
-              0(?:
-                [01]\\d|
-                2[0-4]
-              )|
-              58[89]|
-              8(?:
-                55|
-                88
-              )
-            )
-          )\\d{4}|
           (?:
             5(?:
-              [14]4|
-              5[0157-9]|
-              68|
-              7[0147-9]|
-              9[1-35-9]
+              00(?:
+                0\\d|
+                44|
+                5[05]|
+                77|
+                88|
+                99
+              )|
+              1(?:
+                1(?:
+                  00|
+                  [124]\\d|
+                  3[01]
+                )|
+                4\\d\\d
+              )|
+              (?:
+                44|
+                68
+              )\\d\\d|
+              5(?:
+                [0157-9]\\d\\d|
+                200
+              )|
+              7(?:
+                [0147-9]\\d\\d|
+                5(?:
+                  00|
+                  [57]5
+                )
+              )|
+              8(?:
+                0(?:
+                  [01]\\d|
+                  2[0-4]
+                )|
+                58[89]|
+                8(?:
+                  55|
+                  88
+                )
+              )|
+              9(?:
+                090|
+                [1-35-9]\\d\\d
+              )
             )|
-            790
-          )\\d{6}|
+            790\\d\\d
+          )\\d{4}|
           5(?:
             0(?:
               070|
@@ -177,81 +188,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995364", "Aspindza",
-"995439", "Ambrolauri",
-"995443", "Gagra",
-"995493", "Poti",
-"995353", "Gurdjaani",
-"995351", "Sagaredjo",
-"995435", "Sachkhere",
-"995414", "Xobi",
-"995491", "Terdjola",
-"995344", "Tskhinvali",
+$areanames{en} = {"995448", "Gulripshi",
+"995479", "Chiatura",
+"995349", "Akhmeta",
 "995426", "Kobuleti",
+"995364", "Aspindza",
+"995365", "Akhaltsikhe",
+"995341", "Rustavi",
+"995354", "Lagodekhi",
+"995355", "Signagi",
+"995472", "Tsageri",
+"995347", "Djava",
+"995342", "Akhalgori",
+"995371", "Kaspi",
+"995496", "Ozurgeti",
+"995370", "Gori",
 "995372", "Gardabani",
+"995447", "Gali",
+"995435", "Sachkhere",
+"995442", "Sukhumi",
+"995434", "Bagdati",
+"995413", "Senaki",
+"995348", "Tianeti",
+"995492", "Zestafoni",
+"995353", "Gurdjaani",
+"995497", "Tkibuli",
+"995491", "Terdjola",
+"995446", "Tkvarcheli",
+"995363", "Tsalka",
+"995427", "Xelvachauri",
+"995422", "Batumi",
+"995415", "Zugdidi",
+"995414", "Xobi",
+"995433", "Kharagauli",
+"995346", "Dusheti",
+"995351", "Sagaredjo",
+"995416", "Tsalendjikha",
+"995362", "Akhalkalaki",
+"995350", "Telavi",
+"995367", "Bordjomi",
+"995361", "Ninotsminda",
+"995352", "Kvareli",
+"995357", "Marneuli",
+"995493", "Poti",
+"995360", "Dmanisi",
+"995345", "Stefanstminda\/Kazbegi",
+"995344", "Tskhinvali",
+"995369", "Kareli",
+"995359", "TetriTskaro",
+"995423", "Xulo",
+"995358", "Bolnisi",
+"995439", "Ambrolauri",
+"995368", "Khashuri",
+"995431", "Kutaisi",
+"995374", "Tigvi",
 "995437", "Lentekhi",
 "995432", "Vani",
-"995415", "Zugdidi",
-"995434", "Bagdati",
-"995369", "Kareli",
-"995345", "Stefanstminda\/Kazbegi",
-"99532", "Tbilisi",
-"995374", "Tigvi",
-"995348", "Tianeti",
-"995342", "Akhalgori",
-"995347", "Djava",
-"995423", "Xulo",
-"995418", "Martvili",
-"995417", "Chkhorotskhu",
-"995412", "Abasha",
-"995496", "Ozurgeti",
-"995365", "Akhaltsikhe",
-"995349", "Akhmeta",
-"995356", "DedoplisTskaro",
-"995446", "Tkvarcheli",
-"995419", "Choxatauri",
-"995350", "Telavi",
-"995473", "Oni",
-"995368", "Khashuri",
-"995362", "Akhalkalaki",
-"995367", "Bordjomi",
-"995371", "Kaspi",
 "995445", "Ochamchire",
-"995360", "Dmanisi",
-"995431", "Kutaisi",
-"995355", "Signagi",
-"995495", "Khoni",
-"995366", "Adigeni",
-"995497", "Tkibuli",
-"995492", "Zestafoni",
-"995358", "Bolnisi",
-"995357", "Marneuli",
-"995352", "Kvareli",
-"995447", "Gali",
-"995442", "Sukhumi",
-"995448", "Gulripshi",
-"995359", "TetriTskaro",
-"995410", "Mestia",
-"995346", "Dusheti",
-"995424", "Shuaxevi",
-"995416", "Tsalendjikha",
-"995433", "Kharagauli",
-"995373", "Mtskheta",
-"995425", "Qeda",
-"995361", "Ninotsminda",
-"995370", "Gori",
-"995479", "Chiatura",
-"995436", "Tskaltubo",
-"995413", "Senaki",
-"995422", "Batumi",
-"995427", "Xelvachauri",
-"995341", "Rustavi",
 "995444", "Gudauta",
-"995411", "Samtredia",
+"995418", "Martvili",
 "995494", "lanchxuti",
-"995354", "Lagodekhi",
-"995363", "Tsalka",
-"995472", "Tsageri",};
+"995495", "Khoni",
+"995473", "Oni",
+"995436", "Tskaltubo",
+"995412", "Abasha",
+"995443", "Gagra",
+"995366", "Adigeni",
+"995373", "Mtskheta",
+"995417", "Chkhorotskhu",
+"995356", "DedoplisTskaro",
+"995411", "Samtredia",
+"995410", "Mestia",
+"995419", "Choxatauri",
+"99532", "Tbilisi",
+"995425", "Qeda",
+"995424", "Shuaxevi",};
 
     sub new {
       my $class = shift;

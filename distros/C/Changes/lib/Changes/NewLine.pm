@@ -38,7 +38,6 @@ sub as_string
 {
     my $self = shift( @_ );
     my $raw = $self->raw;
-    $self->message( 4, "Raw new line was '", ( $raw // '' ), "'" );
     if( defined( $raw ) && $raw->defined )
     {
         return( $raw );

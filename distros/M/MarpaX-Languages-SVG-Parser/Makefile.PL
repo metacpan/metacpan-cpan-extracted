@@ -55,6 +55,7 @@ my(%params) =
 		'Text::CSV'				=> 0,
 		'Text::Xslate'			=> 1.6002,
 		'Types::Standard'		=> 0.026,
+		'Unicode::UTF8'			=> 0.62,
 		'utf8'					=> 0,
 		'warnings'				=> 0,
 		'XML::Parser'			=> 2.44,

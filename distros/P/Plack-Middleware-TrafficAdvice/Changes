@@ -1,5 +1,11 @@
 Revision history for Plack-Middleware-TrafficAdvice:
 
+v0.2.4    2023-06-11 14:33:50+01:00 Europe/London
+  [Documentation]
+  - Document support policy for older Perl versions.
+
+  - Update copyright year.
+
 v0.2.3    2022-09-02 14:16:22+01:00 Europe/London
  [Other]
  - Signed distribution.

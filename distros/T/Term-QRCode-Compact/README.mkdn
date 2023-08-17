@@ -133,6 +133,15 @@ Options
     Currently for ASCII the dimensions the dimensions
     are `2x1` for ascii and `2x1` for `utf8`.
 
+- **level**
+
+    Optional
+
+        level => 'L',
+
+    The level of error correction, 'H', 'M' or 'L'.
+    Default is 'M'.
+
 # SEE ALSO
 
 [Text::QRCode](https://metacpan.org/pod/Text%3A%3AQRCode) - needs an update to support `.` in `@INC`

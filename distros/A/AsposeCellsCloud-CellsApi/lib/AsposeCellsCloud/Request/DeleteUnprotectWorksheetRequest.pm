@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteUnprotectWorksheetRequest.name :   ,
-# DeleteUnprotectWorksheetRequest.sheetName :   ,
-# DeleteUnprotectWorksheetRequest.protectParameter :   ,
-# DeleteUnprotectWorksheetRequest.folder :   ,
-# DeleteUnprotectWorksheetRequest.storageName :    
+# DeleteUnprotectWorksheetRequest.name : The workbook name.  ,
+# DeleteUnprotectWorksheetRequest.sheetName : The worksheet name.  ,
+# DeleteUnprotectWorksheetRequest.protectParameter : WorksheetResponse with protection settings. Only password is used here.  ,
+# DeleteUnprotectWorksheetRequest.folder : Original workbook folder.  ,
+# DeleteUnprotectWorksheetRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_unprotect_worksheet' } = { 
-    	summary => '',
+    	summary => 'Unprotects worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'protect_parameter' => {
      	datatype => 'ProtectSheetParameter',
      	base_name => 'protectParameter',
-     	description => '',
+     	description => 'WorksheetResponse with protection settings. Only password is used here.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

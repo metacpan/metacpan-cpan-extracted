@@ -16,3 +16,8 @@ Revision history for Net-Bot-IRC-NumericCodes
         Added some better tests and found/fixed some minor errors
         in the return code hash.
 
+0.5.1   Wed May 31 2023
+        Updating links and formatting and spelling.
+
+1.0.0   Thu Jun 1 2023
+        Bump version

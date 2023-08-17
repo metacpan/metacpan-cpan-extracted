@@ -1,39 +1,43 @@
 ---
 abstract: 'Executable Uniform Command-Line Interface Descriptions'
 author:
-  - 'Damian Conway (DCONWAY@CPAN.org)'
+  - 'David Precious <davidp@preshweb.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Pod::Checker: 0
-  Test::More: 0
+  Data::Dumper: '0'
+  Pod::Checker: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: 5.006_001
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Getopt-Euclid
-no_index:
-  directory:
-    - inc
-    - t
-recommends:
-  IO::Pager::Page: 0
 requires:
-  File::Basename: 0
-  File::Spec::Functions: 0
-  List::Util: 0
-  Pod::PlainText: 0
-  Pod::Select: 0
-  Text::Balanced: 0
-  perl: 5.005
-  version: 0
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  IO::Page: '0'
+  IO::Pager::Page: '0'
+  List::Util: '0'
+  Pod::PlainText: '0'
+  Pod::Select: '0'
+  Symbol: '0'
+  Text::Balanced: '0'
+  perl: 5.006_001
+  re: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Euclid
-  homepage: http://search.cpan.org/search?query=Getopt%3A%3AEuclid&mode=dist
-  license: http://dev.perl.org/licenses/
-  repository: git://getopt-euclid.git.sourceforge.net/gitroot/getopt-euclid/getopt-euclid
-version: 0.004005
+  bugtracker: https://github.com/bigpresh/Getopt-Euclid/issues
+  homepage: https://github.com/bigpresh/Getopt-Euclid
+  repository: git://github.com/bigpresh/Getopt-Euclid.git
+version: 0.4.6
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

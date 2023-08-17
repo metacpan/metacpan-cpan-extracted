@@ -1,0 +1,12 @@
+Changes
+lib/ENV/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-parse.t
+t/02-dotenv.t
+t/03-redacted_env.t
+t/data/test.env
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

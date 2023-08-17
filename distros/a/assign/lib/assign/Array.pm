@@ -4,6 +4,8 @@ package assign::Array;
 use assign::Struct;
 use base 'assign::Struct';
 
+use assign::Types;
+
 use XXX;
 
 sub parse_elem {
@@ -13,31 +15,47 @@ sub parse_elem {
     while (@$in) {
         my $tok = shift(@$in);
         my $type = ref($tok);
-        $type =~ s/^PPI::Token::// or XXX $type;
-        next if $type eq 'Whitespace';
+        next if $type eq 'PPI::Token::Whitespace';
 
-        if ($type eq 'Symbol') {
+        if ($type eq 'PPI::Token::Symbol') {
             my $str = $tok->content;
-            if ($str =~ /^\$\w+$/) {
-                push @$elems, $self->get_var($str);
+            if ($str =~ /^[\$\@]\w+$/) {
+                my $elem = $self->get_var($str);
+                push @$elems, $elem;
                 return 1;
             }
         }
-        if ($type eq 'Number') {
+
+        # Parse @$a in the following if-statement.
+        if ($type eq 'PPI::Token::Cast') {
+            $tok->content eq '@' or
+                XXX $tok, "unexpected token";
+            $tok = shift(@$in);
+            $type = ref($tok);
+            my $str = $tok->content;
+            $type eq 'PPI::Token::Symbol' and $str =~ /^\$\w+$/ or
+                XXX $tok, "unexpected token";
+            my $elem = $self->get_var($str);
+            $elem->{cast} = 1;
+            push @$elems, $elem;
+            return 1;
+        }
+
+        if ($type eq 'PPI::Token::Number') {
             my $str = $tok->content;
             if ($str =~ /^[1-9][0-9]*$/) {
-                push @$elems, skip_num->new($str);
+                push @$elems, assign::skip_num->new($str);
                 return 1;
             }
         }
-        if ($type eq 'Magic') {
+        if ($type eq 'PPI::Token::Magic') {
             my $str = $tok->content;
             if ($str eq '_') {
-                push @$elems, skip->new;
+                push @$elems, assign::skip->new;
                 return 1;
             }
             if ($str eq '$_') {
-                push @$elems, var->new($str);
+                push @$elems, assign::var->new($str);
                 return 1;
             }
         }
@@ -52,25 +70,41 @@ sub gen_code {
     my $code = [ @$init ];
     my $elems = $self->{elems};
 
+    if ($decl) {
+        push @$code,
+            "$decl(" .
+            join(', ',
+                map $_->val,
+                grep {$_->val ne '$_'}
+                grep {$_->val =~ /^[\$\@]/}
+                @$elems
+            ) .
+            ');';
+    }
+
     my $i = 0;
     for my $elem (@$elems) {
         my $type = ref $elem;
-        my $dec = $decl;
-        if ($type eq 'skip') {
+        if ($type eq 'assign::skip') {
             $i++;
             next;
         }
-        if ($type eq 'skip_num') {
+        if ($type eq 'assign::skip_num') {
             $i += $elem->val;
             next;
         }
-        if ($elem->val eq '$_') {
-            $dec = '';
-        }
+
         my $var = $elem->val;
         my $def = $elem->{def} // '';
         $def &&= " // $def";
-        push @$code, "$dec$var $oper $from\->[$i]$def;";
+
+        push @$code,
+            ($elem->sigil eq '@')
+                ? "$var $oper \@$from\[$i..\@$from-1\]$def;" :
+            ($elem->{cast})
+                ? "$var $oper \[\@$from\[$i..\@$from-1\]\]$def;" :
+            "$var $oper $from\->[$i]$def;";
+
         $i++;
     }
 

@@ -1,3 +1,7 @@
+0.06 2023-08-02T14:00:30+02:00
+ - Update licenses to v3.21.
+ - Update Module::Install to 1.21 version.
+
 0.05 2023-03-01T12:34:17+01:00
  - Add example for check_exception() method.
  - Fix typo in doc example.

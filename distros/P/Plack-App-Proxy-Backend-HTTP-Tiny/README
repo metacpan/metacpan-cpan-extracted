@@ -1,31 +1,41 @@
 NAME
 
-    Plack::App::Proxy::HTTP::Tiny - backend for Plack::App::Proxy
+    Plack::App::Proxy::HTTP::Tiny - Backend for Plack::App::Proxy
 
 SYNOPSIS
 
-      # In app.psgi
-      use Plack::Builder;
-      use Plack::App::Proxy::Anonymous;
+        # In app.psgi
+        use Plack::Builder;
     
-      builder {
-          enable "Proxy::Requests";
-          Plack::App::Proxy->new(backend => 'HTTP::Tiny')->to_app;
-      };
+        builder {
+            enable "Proxy::Requests";
+            Plack::App::Proxy->new(backend => 'HTTP::Tiny', options => {
+                timeout => 15
+            })->to_app;
+        };
 
 DESCRIPTION
 
-    This backend uses HTTP::Tiny to make HTTP requests.
+    This backend uses HTTP::Tiny::PreserveHostHeader to make HTTP requests.
 
-    HTTP::Tiny backend is Pure-Perl only and doesn't require any
-    architecture specific files.
+    HTTP::Tiny::PreserveHostHeader is a wrapper for HTTP::Tiny which is
+    Pure-Perl only and doesn't require any architecture specific files.
 
     It is possible to bundle it e.g. by App::FatPacker.
+
+    All options from the Plack::App::Proxy constructor goes to
+    HTTP::Tiny::PreserveHostHeader constructor. This backend sets some
+    default options for HTTP::Tiny::PreserveHostHeader:
+
+        max_redirect => 0,
+        http_proxy   => undef,
+        https_proxy  => undef,
+        all_proxy    => undef,
 
 SEE ALSO
 
     Plack, Plack::App::Proxy, Plack::Middleware::Proxy::Requests,
-    HTTP::Tiny.
+    HTTP::Tiny, HTTP::Tiny::PreserveHostHeader.
 
 BUGS
 
@@ -45,7 +55,7 @@ AUTHOR
 
 LICENSE
 
-    Copyright (c) 2014 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2014-2016, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

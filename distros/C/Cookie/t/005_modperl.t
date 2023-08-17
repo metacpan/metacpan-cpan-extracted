@@ -13,6 +13,7 @@ BEGIN
         require_ok( 'Apache::Test' ) || BAIL_OUT( "Unable to load Apache::Test" );
         use_ok( 'Apache::TestUtil' ) || BAIL_OUT( "Unable to load Apache::TestUtil" );
         use_ok( 'Apache::TestRequest' ) || BAIL_OUT( "Unable to load Apache::TestRequest" );
+        use_ok( 'HTTP::Request' ) || BAIL_OUT( "Unable to load HTTP::Request" );
         plan no_plan;
     }
     else

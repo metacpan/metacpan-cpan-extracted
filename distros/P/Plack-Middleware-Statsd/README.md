@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.6.2
+version v0.6.3
 
 # SYNOPSIS
 
@@ -247,7 +247,7 @@ allow you to monitor process size information.  In your `app.psgi`:
 
 ```perl
 use Net::Statsd::Tiny;
-use Feature::Compat::Try;
+use Try::Tiny;
 
 my $statsd = Net::Statsd::Tiny->new( ... );
 
@@ -268,8 +268,8 @@ builder {
             $statsd->timing_ms('psgi.proc.shared', $shared);
             $statsd->timing_ms('psgi.proc.unshared', $unshared);
         }
-        catch($e) {
-            warn $e;
+        catch {
+            warn $_;
         };
     };
 ```
@@ -277,6 +277,8 @@ builder {
 # KNOWN ISSUES
 
 ## Non-standard HTTP status codes
+
+## Unknown Status Codes
 
 If your application is returning a status code that is not handled by
 [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus), then the metrics may not be logged for that reponse.
@@ -290,6 +292,8 @@ need to add metrics logging yourself.
 # SUPPORT FOR OLDER PERL VERSIONS
 
 Since v0.6.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 If you need this module on Perl v5.10, please use one of the v0.5.x
 versions of this module.  Significant bug or security fixes may be
@@ -326,7 +330,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

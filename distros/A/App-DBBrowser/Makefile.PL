@@ -18,10 +18,10 @@ WriteMakefile(
     LICENSE          => 'perl',
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        bugtracker => {
-            web => "https://github.com/kuerbis/App-DBBrowser/issues",
-        },
         resources   => {
+            bugtracker => {
+                web => "https://github.com/kuerbis/App-DBBrowser/issues",
+            },
             repository => {
               type => 'git',
               web  => 'https://github.com/kuerbis/App-DBBrowser',
@@ -64,8 +64,8 @@ WriteMakefile(
         'SQL::Type::Guess'        => 0,
         'Term::Choose'            => '1.761',
         'Term::Choose::Util'      => '0.137',
-        'Term::Form'              => '0.553',
-        'Term::Form::ReadLine'    => '0.553',
+        'Term::Form'              => '0.554',
+        'Term::Form::ReadLine'    => '0.554',
         'Term::TablePrint'        => '0.160',
         'Text::CSV_XS'            => 0,
         %prereqs_os_specific,

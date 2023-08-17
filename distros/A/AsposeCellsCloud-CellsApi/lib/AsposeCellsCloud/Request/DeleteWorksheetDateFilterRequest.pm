@@ -59,18 +59,18 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetDateFilterRequest.name :   ,
-# DeleteWorksheetDateFilterRequest.sheetName :   ,
-# DeleteWorksheetDateFilterRequest.fieldIndex :   ,
-# DeleteWorksheetDateFilterRequest.dateTimeGroupingType :   ,
-# DeleteWorksheetDateFilterRequest.year :   ,
-# DeleteWorksheetDateFilterRequest.month :   ,
-# DeleteWorksheetDateFilterRequest.day :   ,
-# DeleteWorksheetDateFilterRequest.hour :   ,
-# DeleteWorksheetDateFilterRequest.minute :   ,
-# DeleteWorksheetDateFilterRequest.second :   ,
-# DeleteWorksheetDateFilterRequest.folder :   ,
-# DeleteWorksheetDateFilterRequest.storageName :    
+# DeleteWorksheetDateFilterRequest.name : The workbook name.  ,
+# DeleteWorksheetDateFilterRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetDateFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
+# DeleteWorksheetDateFilterRequest.dateTimeGroupingType : Specifies how to group dateTime values.  ,
+# DeleteWorksheetDateFilterRequest.year : The year.  ,
+# DeleteWorksheetDateFilterRequest.month : The month.  ,
+# DeleteWorksheetDateFilterRequest.day : The day.  ,
+# DeleteWorksheetDateFilterRequest.hour : The hour.  ,
+# DeleteWorksheetDateFilterRequest.minute : The minute.  ,
+# DeleteWorksheetDateFilterRequest.second : The second.  ,
+# DeleteWorksheetDateFilterRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetDateFilterRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -81,7 +81,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_date_filter' } = { 
-    	summary => '',
+    	summary => 'Removes a date filter in worksheet.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -170,84 +170,84 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).',
      	format => '',
      	read_only => '',
      		},
      'date_time_grouping_type' => {
      	datatype => 'string',
      	base_name => 'dateTimeGroupingType',
-     	description => '',
+     	description => 'Specifies how to group dateTime values.',
      	format => '',
      	read_only => '',
      		},
      'year' => {
      	datatype => 'int',
      	base_name => 'year',
-     	description => '',
+     	description => 'The year.',
      	format => '',
      	read_only => '',
      		},
      'month' => {
      	datatype => 'int',
      	base_name => 'month',
-     	description => '',
+     	description => 'The month.',
      	format => '',
      	read_only => '',
      		},
      'day' => {
      	datatype => 'int',
      	base_name => 'day',
-     	description => '',
+     	description => 'The day.',
      	format => '',
      	read_only => '',
      		},
      'hour' => {
      	datatype => 'int',
      	base_name => 'hour',
-     	description => '',
+     	description => 'The hour.',
      	format => '',
      	read_only => '',
      		},
      'minute' => {
      	datatype => 'int',
      	base_name => 'minute',
-     	description => '',
+     	description => 'The minute.',
      	format => '',
      	read_only => '',
      		},
      'second' => {
      	datatype => 'int',
      	base_name => 'second',
-     	description => '',
+     	description => 'The second.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

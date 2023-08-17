@@ -4,7 +4,7 @@
       "Jos\u00e9 Mic\u00f3 <jose.mico@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,95 +43,95 @@
    "provides" : {
       "Beekeeper" : {
          "file" : "lib/Beekeeper.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::AnyEvent" : {
          "file" : "lib/Beekeeper/AnyEvent.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Client" : {
          "file" : "lib/Beekeeper/Client.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Config" : {
          "file" : "lib/Beekeeper/Config.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::JSONRPC" : {
          "file" : "lib/Beekeeper/JSONRPC.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::JSONRPC::Error" : {
          "file" : "lib/Beekeeper/JSONRPC/Error.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::JSONRPC::Notification" : {
          "file" : "lib/Beekeeper/JSONRPC/Notification.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::JSONRPC::Request" : {
          "file" : "lib/Beekeeper/JSONRPC/Request.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::JSONRPC::Response" : {
          "file" : "lib/Beekeeper/JSONRPC/Response.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Logger" : {
          "file" : "lib/Beekeeper/Logger.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::MQTT" : {
          "file" : "lib/Beekeeper/MQTT.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::LogTail" : {
          "file" : "lib/Beekeeper/Service/LogTail.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::LogTail::Worker" : {
          "file" : "lib/Beekeeper/Service/LogTail/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::Router::Worker" : {
          "file" : "lib/Beekeeper/Service/Router/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::Sinkhole::Worker" : {
          "file" : "lib/Beekeeper/Service/Sinkhole/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::Supervisor" : {
          "file" : "lib/Beekeeper/Service/Supervisor.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::Supervisor::Worker" : {
          "file" : "lib/Beekeeper/Service/Supervisor/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Service::ToyBroker::Worker" : {
          "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Worker" : {
          "file" : "lib/Beekeeper/Worker.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Worker::Extension::RemoteSession" : {
          "file" : "lib/Beekeeper/Worker/Extension/RemoteSession.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::Worker::Extension::SharedCache" : {
          "file" : "lib/Beekeeper/Worker/Extension/SharedCache.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::WorkerPool" : {
          "file" : "lib/Beekeeper/WorkerPool.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Beekeeper::WorkerPool::Daemon" : {
          "file" : "lib/Beekeeper/WorkerPool/Daemon.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -146,8 +146,9 @@
          "web" : "https://github.com/jmico/beekeeper"
       }
    },
-   "version" : "0.09",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.10",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

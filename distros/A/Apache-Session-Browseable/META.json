@@ -4,7 +4,7 @@
       "Xavier Guimard, E<lt>x.guimard@free.frE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,8 +21,10 @@
       },
       "runtime" : {
          "recommends" : {
+            "DBD::Cassandra" : "0",
             "DBI" : "0",
-            "Net::LDAP" : "0.38"
+            "Net::LDAP" : "0.38",
+            "Redis" : "0"
          },
          "requires" : {
             "Apache::Session" : "0",
@@ -39,7 +41,11 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.3.11"
+         "version" : "v1.3.13"
+      },
+      "Apache::Session::Browseable::Cassandra" : {
+         "file" : "lib/Apache/Session/Browseable/Cassandra.pm",
+         "version" : "v1.3.13"
       },
       "Apache::Session::Browseable::DBI" : {
          "file" : "lib/Apache/Session/Browseable/DBI.pm",
@@ -88,6 +94,10 @@
       "Apache::Session::Browseable::SQLite" : {
          "file" : "lib/Apache/Session/Browseable/SQLite.pm",
          "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Cassandra" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Cassandra.pm",
+         "version" : "v1.3.13"
       },
       "Apache::Session::Browseable::Store::DBI" : {
          "file" : "lib/Apache/Session/Browseable/Store/DBI.pm",
@@ -155,6 +165,6 @@
          "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
       }
    },
-   "version" : "v1.3.11",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.3.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

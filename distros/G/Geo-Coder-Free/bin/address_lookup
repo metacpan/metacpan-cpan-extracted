@@ -64,7 +64,7 @@ sub AUTOLOAD {
 	my $param = $AUTOLOAD;
 
 	unless($param eq 'MyLogger::DESTROY') {
-		die "Need to define $param\n";
+		die "Need to define $param";
 	}
 }
 

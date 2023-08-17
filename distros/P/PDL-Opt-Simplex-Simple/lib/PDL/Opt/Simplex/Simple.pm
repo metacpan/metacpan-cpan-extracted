@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::Opt::Simplex::Simple;
-$VERSION = '1.7';
+$VERSION = '1.8';
 
 use 5.010;
 use strict;
@@ -37,22 +37,57 @@ sub new
 {
 	my ($class, %args) = @_;
 
-	my %valid_opts = map { $_ => 1 }
-		qw/f log vars ssize nocache max_iter tolerance srand
-			stagnant_minima_count stagnant_minima_tolerance
-			reduce_search/;
+	my %valid_args = map { $_ => 1 }
+		qw/f log vars
+			max_iter
+			nocache
+			tolerance
+			srand
+			stagnant_minima_count
+			stagnant_minima_tolerance
+
+			opts
+			/;
+
+	# Only check simplex opts if this is the PDL::Opt::Simplex::Simple class:
+	if ($class eq __PACKAGE__)
+	{
+		my $ssize = delete $args{ssize};
+		if ($ssize)
+		{
+			warn "deprecation: ssize should be secified as new(opts => {ssize => $ssize})";
+			if (defined($args{opts}{ssize}))
+			{
+				die "you cannot specify both 'ssize => $ssize' and 'opts => { ssize=>X }'";
+			}
+
+			$args{opts}{ssize} = $ssize;
+		}
+
+		$args{opts}{ssize} //= 1;
+
+		my %valid_simplex_opts = map { $_ => 1 }
+				qw/	ssize
+					reduce_search
+				/;
+
+		foreach my $k (keys %{ $args{opts} // {} })
+		{
+			next if $k =~ /^_/;
+			die "invalid option: $k" if !$valid_simplex_opts{$k};
+		}
+	}
 
 	foreach my $k (keys %args)
 	{
 		next if $k =~ /^_/;
-		die "invalid option: $k" if !$valid_opts{$k};
+		die "invalid option: $k" if !$valid_args{$k};
 	}
 
 	my $self = bless(\%args, $class);
 
 	$self->{tolerance}                 //=  1e-6;
 	$self->{max_iter}                  //=  1000;
-	$self->{ssize}                     //=  1;
 	$self->{stagnant_minima_tolerance} //= $self->{tolerance};
 	
 	if ($self->{srand})
@@ -77,15 +112,15 @@ sub new
 	}
 
 	# _ssize is the array for multiple simplex retries.
-	if (ref($self->{ssize}) eq 'ARRAY')
+	if (ref($self->{opts}{ssize}) eq 'ARRAY')
 	{
-		$self->{_ssize} = $self->{ssize};
+		$self->{_ssize} = $self->{opts}{ssize};
 
-		$self->{ssize} = $self->{ssize}[0];
+		$self->{opts}{ssize} = $self->{opts}{ssize}[0];
 	}
 	else
 	{
-		$self->{_ssize} = [ $self->{ssize} ];
+		$self->{_ssize} = [ $self->{opts}{ssize} ];
 	}
 
 	$self->set_vars($self->{vars});
@@ -100,6 +135,7 @@ sub optimize
 
 	$self->{optimization_pass} = 1;
 	$self->{log_count} = 0;
+	$self->{iter_count} = 0;
 
 	delete $self->{best_minima};
 	delete $self->{best_vars};
@@ -146,31 +182,16 @@ sub _optimize
 	if ($self->{optimization_pass} == 1)
 	{
 		my $vec_result = $self->_simplex_f($vec_initial);
-		$self->_simplex_log($vec_initial, $vec_result, pdl $self->{ssize});
+		$self->_simplex_log($vec_initial, $vec_result, pdl $self->{opts}{ssize});
 	}
 
 	my ( $vec_optimal, $opt_ssize, $optval );
 
 	# Catch early cancellation
 	eval {
-		($vec_optimal, $opt_ssize, $optval) = simplex($vec_initial,
-			$self->{ssize},
-			$self->{tolerance},
-			$self->{max_iter},
-
-			# We need to lambda $self into place for the f() and log() callbacks:
-			sub {
-				my ($vec) = @_;
-				return $self->_simplex_f($vec);
-			},
-
-			# log callback
-			sub {
-				my ($vec, $vals, $ssize) = @_;
-				$self->_simplex_log(@_);
-			}
-		);
+		( $vec_optimal, $opt_ssize, $optval ) = $self->__optimize($vec_initial);
 	};
+
 	my $err = $@;
 
 	if (!$err)
@@ -219,11 +240,66 @@ sub _optimize
 	return $result;
 }
 
+# This is called by _optimize, it does the real work.  This
+# is the function that other classes could override to implement
+# other optimization algorithms:
+sub __optimize
+{
+	my ($self, $vec_initial) = @_;
+
+	my ( $vec_optimal, $opt_ssize, $optval );
+
+	($vec_optimal, $opt_ssize, $optval) = simplex($vec_initial,
+		$self->{opts}{ssize},
+		$self->{tolerance},
+		$self->{max_iter},
+
+		# We need to lambda $self into place for the f() and log() callbacks:
+		sub {
+			my ($vec) = @_;
+			return $self->_simplex_f($vec);
+		},
+
+		# log callback
+		sub {
+			my ($vec, $vals, $ssize) = @_;
+			$self->_simplex_log(@_);
+		}
+	);
+
+
+	return ($vec_optimal, $opt_ssize, $optval);
+}
+
 # This is the simplex callback to evaluate the function "f()"
 # based on the content of $self->{vars}:
 sub _simplex_f
 {
 	my ($self, $vec) = @_;
+
+	my $var_min = $self->_build_simplex_var_min();
+	my $var_max = $self->_build_simplex_var_max();
+
+	if (defined($var_min) && defined($var_max))
+	{
+		my $vec_new = $vec;
+		$vec_new = !($vec_new < $var_min) * $vec_new + ($vec_new < $var_min)*$var_min;
+
+		# PDL::Opt::Simplex uses a constant 0.00001 as (what appears to
+		# be) a minimum step size.  If the variable being optimized is
+		# clamped to the upper limit on the first iteration then it
+		# will fail almost immediately.  Thus, we clamp to
+		# ($var_max*1.0001) which seems to be just enough to prevent it
+		# from failing.  If you notice optimization failures due to
+		# this clamping code then try these:
+		#   1. Change the value of round_each (if any)
+		#   2. Increase your max value so it doesn't go too high
+		#   3. Remove your min/max constraint
+		#   4. Change the 1.0001 value on this line:
+		$vec_new = !($vec_new > $var_max) * $vec_new + ($vec_new > $var_max)*$var_max*1.0001;
+
+		$vec .= $vec_new;
+	}
 
 	my @vars = $self->_get_simplex_vars($vec);
 
@@ -241,10 +317,10 @@ sub _simplex_f
 	# Sometimes PDL provides multiple variable sets to calculate.  If 'reduce_search'
 	# is flagged then treat them as the same and only evaluate the first variable set.
 	# This speeds up the optimization but may provide suboptimal results.
-	if ($self->{reduce_search})
+	if ($self->{opts}{reduce_search})
 	{
 		# Call the user's function and pass their vars.
-		my $ret = $self->call_f($vars[0]);
+		my $ret = $self->_call_f($vars[0]);
 
 		# @f_ret is the resulting weight, which is the same for _all_ vars:
 		push @f_ret, $ret foreach @vars;
@@ -255,7 +331,7 @@ sub _simplex_f
 		{
 			# Call the user's function and pass their vars.
 			# @f_ret is the resulting weight for _each_ var:
-			push @f_ret, $self->call_f($vars);
+			push @f_ret, $self->_call_f($vars);
 		}
 	}
 
@@ -348,6 +424,7 @@ sub _simplex_log
 		best_minima => $self->{best_minima}->sclr,
 		best_vars => $self->{best_vars},
 		log_count => $self->{log_count},
+		iter_count => $self->{iter_count},
 		cancel => $self->{cancel},
 		prev_minima_count => $self->{prev_minima_count},
 		cache_hits => $self->{cache_hits},
@@ -406,29 +483,27 @@ sub set_ssize
 {
 	my ($self, $ssize) = @_;
 
-	$self->{ssize} = $ssize;
+	$self->{opts}{ssize} = $ssize;
 }
 
 sub scale_ssize
 {
 	my ($self, $scale) = @_;
 
-	$self->{ssize} *= $scale;
+	$self->{opts}{ssize} *= $scale;
 }
 
-
-
-# build a pdl for use by simplex()
-sub _build_simplex_vars 
+# Iterate the vars that are enabled in order that they
+# will be populated (sorted by name) and call $f->($var)
+# each iteration.  Return the result as a piddle.
+sub _build_enabled_var_list
 {
-	my ($self) = @_;
+	my ($self, $f) = @_;
 
 	my $vars = $self->{vars};
 
-	my @pdl_vars;
+	my @ret_vars;
 
-	my $any_pdl;
-	my $any_scalar;
 	foreach my $var_name (sort keys(%$vars))
 	{
 		my $var = $vars->{$var_name};
@@ -440,20 +515,110 @@ sub _build_simplex_vars
 			# var is enabled for simplex if enabled[$i] == 1
 			if ($var->{enabled}->[$i])
 			{
-				my $val = $var->{values}->[$i];
-				$any_pdl++ if ref($val) eq 'PDL';
-				$any_scalar++ if !ref($val);
-				push(@pdl_vars, $val / $var->{perturb_scale}->[$i]);
+				my %opts;
+				foreach my $opt (keys %$var)
+				{
+					$opts{$opt} = $var->{$opt}->[$i];
+				}
+				$opts{value} = delete $opts{values}; # singular
+				push @ret_vars, $f->(\%opts);
+
 			}
 		}
 	}
+
+	my $pdl = pdl \@ret_vars;
+	return $pdl;
+
+}
+
+# build a pdl for use by simplex()
+sub _build_simplex_vars
+{
+	my ($self) = @_;
+
+	my $any_pdl;
+	my $any_scalar;
+
+	my $pdl = $self->_build_enabled_var_list(sub {
+			my $var = shift;
+			my $val = $var->{value};
+
+			$any_pdl++ if ref($val) eq 'PDL';
+			$any_scalar++ if !ref($val);
+
+			return $val / $var->{perturb_scale};
+		});
 
 	die "Your {vars} must be either all scalar or all PDL's" if ($any_pdl && $any_scalar);
 
 	$self->{_vars_are_pdl} = 1 if ($any_pdl);
 
-	my $pdl = pdl \@pdl_vars;
 	return $pdl;
+}
+
+# build a pdl of variable attributes by attribute name
+#    See `Expanded "vars" Format` for vars.  For example:
+#    - value
+#    - minmax
+#    - perturb_scale
+#  returns undef if any var attributes are undefined.
+sub _build_simplex_var_attrs
+{
+	my ($self, $name) = @_;
+
+	my $any_undef;
+
+	my $pdl = $self->_build_enabled_var_list(sub {
+			my $var = shift;
+			if (!defined($var->{$name}))
+			{
+				$any_undef++;
+				return 0;
+			}
+			else
+			{
+				return $var->{$name};
+			}
+		});
+
+	return undef if ($any_undef);
+
+	return $pdl;
+}
+
+# return a piddle of min values for each var, or undef if minmax is undefined.
+sub _build_simplex_var_min
+{
+	my ($self) = @_;
+
+	my $mm = $self->_build_simplex_var_attrs('minmax');
+
+	if (defined($mm))
+	{
+		return $mm->slice(0)->clump(-1);
+	}
+	else
+	{
+		return undef;
+	}
+}
+
+# return a piddle of max values for each var, or undef if minmax is undefined.
+sub _build_simplex_var_max
+{
+	my ($self) = @_;
+
+	my $mm = $self->_build_simplex_var_attrs('minmax');
+
+	if (defined($mm))
+	{
+		return $mm->slice(1)->clump(-1);
+	}
+	else
+	{
+		return undef;
+	}
 }
 
 sub _simple_to_expanded
@@ -469,7 +634,7 @@ sub _simple_to_expanded
 
 		# Copy the structure from what was passed into the %exp
 		# hash so we can modify it without changing the orignal.
-		if (is_numeric($var))
+		if (_is_numeric($var))
 		{
 			$var = $exp{$var_name} = { values => [ $vars->{$var_name} ] }
 		}
@@ -510,7 +675,7 @@ sub _simple_to_expanded
 			# make a copy to release the original reference: 
 			$var->{values} = [ @{ $var->{values} } ];
 		}
-		elsif (is_numeric($var->{values}))
+		elsif (_is_numeric($var->{values}))
 		{
 			$var->{values} = [ $var->{values} ];
 		}
@@ -524,16 +689,16 @@ sub _simple_to_expanded
 
 		# If enabled is missing or a non-scalar (ie =1 or =0) then form it properly
 		# as either all 1's or all 0's:
-		if (!defined($var->{enabled}) || (is_numeric($var->{enabled}) && $var->{enabled}))
+		if (!defined($var->{enabled}) || (_is_numeric($var->{enabled}) && $var->{enabled}))
 		{
 			$var->{enabled} = [ map { 1 } (1..$n) ] 
 		}
-		elsif (defined($var->{enabled}) && is_numeric($var->{enabled}) && !$var->{enabled})
+		elsif (defined($var->{enabled}) && _is_numeric($var->{enabled}) && !$var->{enabled})
 		{
 			$var->{enabled} = [ map { 0 } (1..$n) ] 
 		}
 
-		if (ref($var->{minmax}) eq 'ARRAY' && is_numeric($var->{minmax}->[0]) && @{$var->{minmax}} == 2)
+		if (ref($var->{minmax}) eq 'ARRAY' && _is_numeric($var->{minmax}->[0]) && @{$var->{minmax}} == 2)
 		{
 			$var->{minmax} = [ map { $var->{minmax} } (1..$n) ];
 		}
@@ -542,17 +707,17 @@ sub _simple_to_expanded
 		$var->{perturb_scale} //= [ map { 1 } (1..$n) ];
 
 		# Make it an array the of length $n:
-		if (is_numeric($var->{perturb_scale}))
+		if (_is_numeric($var->{perturb_scale}))
 		{
 			$var->{perturb_scale} = [ map { $var->{perturb_scale} } (1..$n) ] 
 		}
 
-		if (defined($var->{round_each}) && is_numeric($var->{round_each}))
+		if (defined($var->{round_each}) && _is_numeric($var->{round_each}))
 		{
 			$var->{round_each} = [ map { $var->{round_each} } (1..$n) ] 
 		}
 
-		if (defined($var->{round_result}) && is_numeric($var->{round_result}))
+		if (defined($var->{round_result}) && _is_numeric($var->{round_result}))
 		{
 			$var->{round_result} = [ map { $var->{round_result} } (1..$n) ] 
 		}
@@ -586,14 +751,14 @@ sub _simple_to_expanded
 
 				my ($min, $max) = @$mm;
 
-				if ($var->{values}->[$i] < $min)
+				if ($var->{enabled}->[$i] && $var->{values}->[$i] < $min)
 				{
-					die "initial value for $var_name\[$i] beyond constraint: $var->{values}->[$i] < $min " 
+					die "initial value for $var_name\[$i] below min constraint: $var->{values}->[$i] < $min " 
 				}
 
-				if ($var->{values}->[$i] > $max)
+				if ($var->{enabled}->[$i] && $var->{values}->[$i] > $max)
 				{
-					die "initial value for $var_name\[$i] beyond constraint: $var->{values}->[$i] > $max " 
+					die "initial value for $var_name\[$i] beyond max constraint: $var->{values}->[$i] > $max "
 				}
 			}
 		}
@@ -620,7 +785,7 @@ sub _expanded_to_simple
 		{
 			$h{$var} = $vars->{$var};
 		}
-		elsif (is_numeric($vars->{$var}))
+		elsif (_is_numeric($vars->{$var}))
 		{
 			$h{$var} = [ $vars->{$var} ];
 		}
@@ -651,7 +816,7 @@ sub _expanded_to_original
 	my %result;
 	foreach my $var_name (keys(%$orig))
 	{
-		if (is_numeric($orig->{$var_name}))
+		if (_is_numeric($orig->{$var_name}))
 		{
 			$result{$var_name} = $exp->{$var_name}->{values}->[0];
 		}
@@ -700,16 +865,16 @@ sub _vars_round_result
 		next unless defined $var->{round_result};
 
 		# In case values it not an array:
-		if (is_numeric($var->{values}))
+		if (_is_numeric($var->{values}))
 		{
-			$var->{values} = pdl_nearest($var->{round_result}, $var->{values}, 'round_result');
+			$var->{values} = _pdl_nearest($var->{round_result}, $var->{values}, 'round_result');
 			next;
 		}
 
 		my $n = @{ $var->{values} };
 
 		# use temp var @round_result so we don't mess with the $vars structure.
-		if (is_numeric($var->{round_result}))
+		if (_is_numeric($var->{round_result}))
 		{
 			@round_result = map { $var->{round_result} } (1..$n);
 		}
@@ -721,7 +886,7 @@ sub _vars_round_result
 		# Round to a precision if defined:
 		foreach (my $i = 0; $i < $n; $i++)
 		{
-			$var->{values}->[$i] = pdl_nearest($round_result[$i], $var->{values}->[$i], 'round_result');
+			$var->{values}->[$i] = _pdl_nearest($round_result[$i], $var->{values}->[$i], 'round_result');
 		}
 	}
 
@@ -770,7 +935,7 @@ sub _get_simplex_var
 		# otherwise use the original index in $var.
 		if ($var->{enabled}->[$i])
 		{
-			$val = $pdl->slice("($pdl_idx)");
+			$val = $pdl->slice("($pdl_idx)")->copy;
 			$val *= $var->{perturb_scale}->[$i];
 			$pdl_idx++;
 		}
@@ -779,20 +944,20 @@ sub _get_simplex_var
 			$val = $var->{values}->[$i];
 		}
 
-		# Modify the resulting value depending on these rules:
-		if (defined($var->{minmax}))
-		{
-			my ($min, $max) = @{ $var->{minmax}->[$i] };
-			$val = clamp_minmax($val, $min => $max, $var_name);
-		}
-
 		# Round to the nearest value on each iteration.
 		# It is probably best to round at the end to keep
 		# precision during each iteration, but the option
 		# is available:
 		if (defined($var->{round_each}))
 		{
-			$val = pdl_nearest($var->{round_each}->[$i], $val, $var_name);
+			$val = _pdl_nearest($var->{round_each}->[$i], $val, $var_name);
+		}
+
+		# Modify the resulting value depending on these rules:
+		if (defined($var->{minmax}))
+		{
+			my ($min, $max) = @{ $var->{minmax}->[$i] };
+			$val = _clamp_minmax($val, $min => $max, $var_name);
 		}
 
 		push @ret, $val; 
@@ -801,7 +966,7 @@ sub _get_simplex_var
 	return \@ret;
 }
 
-sub pdl_nearest
+sub _pdl_nearest
 {
 	my ($nearest, $val, $noun) = @_;
 
@@ -821,13 +986,13 @@ sub pdl_nearest
 		# It would be helpful if PDL had a native nearest() impelementation.
 
 		my $idx = 0;
-		$val = pdl_map(sub { nearest($nearest, $_[0]) }, $val);
+		$val = _pdl_map(sub { nearest($nearest, $_[0]) }, $val);
 	}
 
 	return $val;
 }
 
-sub pdl_map
+sub _pdl_map
 {
 	my ($sub, $val) = @_;
 	my @slices;
@@ -858,7 +1023,7 @@ sub pdl_map
 	return $val;
 }
 
-sub clamp_minmax
+sub _clamp_minmax
 {
 	my ($val, $min, $max) = @_;
 
@@ -937,7 +1102,7 @@ sub _get_simplex_vars
 
 		if (!$pdl_size)
 		{
-			die "pdl_size is undefined or zero, are you using any zero-dimension variable arrays?"
+			die "!pdl_size: did you define any variables? are there zero-dimension variable arrays?"
 		}
 
 		# Now that we know the $pdl_size, make PDLs of the right size for any non-PDLs
@@ -1004,14 +1169,7 @@ sub _get_simplex_vars
 	return @ret;
 }
 
-sub get_best_simplex_vars
-{
-	my $self = shift;
-
-	return $self->_get_simplex_vars($self->{best_vec});
-}
-
-sub var_cache
+sub _var_cache
 {
 	my ($self, $vars, $value) = @_;
 
@@ -1021,7 +1179,7 @@ sub var_cache
 	foreach my $var_name (sort keys(%$vars))
 	{
 		$key .= "$var_name=";
-		if (is_numeric($vars->{$var_name}))
+		if (_is_numeric($vars->{$var_name}))
 		{
 			$key .= $vars->{$var_name}
 		}
@@ -1055,23 +1213,25 @@ sub var_cache
 	}
 }
 
-sub call_f
+sub _call_f
 {
 	my ($self, $vars) = @_;
 
+	$self->{iter_count}++;
+
 	# Try to use a cached result:
-	my $result = $self->var_cache($vars);
+	my $result = $self->_var_cache($vars);
 
 	if (!defined($result))
 	{
 		$result = $self->{f}->($vars);
-		$self->var_cache($vars => $result);
+		$self->_var_cache($vars => $result);
 	}
 
 	return $result;
 }
 
-sub is_numeric
+sub _is_numeric
 {
 	my $var = shift;
 	return (!ref($var) || ref($var) eq 'PDL')
@@ -1118,8 +1278,10 @@ PDL::Opt::Simplex::Simple - A simplex optimizer for the rest of us
 			x => 1 
 		},
 		f => sub { 
+				my $vars = shift;
+
 				# Parabola with minima at x = -3
-				return (($_->{x}+3)**2 - 5) 
+				return (($vars->{x}+3)**2 - 5)
 			}
 	);
 
@@ -1140,12 +1302,17 @@ PDL::Opt::Simplex::Simple - A simplex optimizer for the rest of us
 		f => sub { 
 				my ($vec1, $vec2) = ($_->{vec1}, $_->{vec2});
 				
-				# do something with $vec1 and $vec2
-				# and return() the result to be minimized by simplex.
+				 # do something with $vec1 and $vec2
+				 # and return() the result to be minimized by simplex.
 			},
-		log => sub { }, # log callback
-		ssize => 0.1,   # initial simplex size, smaller means less perturbation
-		max_iter => 100 # max iterations
+		log => sub { },  # log callback
+		max_iter => 100, # max iterations
+
+		# simplex-specific options:
+		opts => {
+			# initial simplex size, smaller means less perturbation
+			ssize => 0.1,   
+		},
 	);
 
 
@@ -1212,6 +1379,14 @@ Useful for calling simplex again with refined values
 
 =item * $self->scale_ssize($scale) - Multiply the current C<ssize> by C<$scale>
 
+=item * dumpify($vars)
+
+This is for debugging:
+
+Builds a tree from C<$vars> that is suitable for passing to L<Data::Dumper>.  This is
+neccesary because PDL's need to be stringified since Dumper() will dump at the
+object itself.
+
 =back
 
 =head1 ARGUMENTS
@@ -1268,6 +1443,11 @@ Expanded format:
 =item C<minmax>:  a double-array of min-max pairs (per index for vectors)
 
 Min-max pairs are clamped before being evaluated by simplex.
+
+Note: for internal PDL::Opt::Simplex reasons, the C<max> value is increased as
+C<$var_max*1.0001>, or one ten-thousandth bigger than the max value you
+request.  See the comment at the top of
+C<PDL::Opt::Simplex::Simple-E<gt>_simplex_f()> for details
 
 =item C<round_result>:  Round the value to the nearest increment of this value upon completion
 
@@ -1389,7 +1569,8 @@ values are available in the C<$state> hashref:
 	'best_pass' =>  3,              # the pass# that had the best goal result
 	'best_minima' => 0.2345         # The least value so far, returned by "f"
 	'best_vars' => { x=>1, ...}     # The vars associated with "best_minima"
-	'log_count' => 22,              # number of times log has been called
+	'log_count' => 22,              # number of times log has been called in this pass
+	'iter_count' => 123,            # number of f() has been called (including cache hits)
 	'prev_minima_count' => 10,      # number of same minima's in a row
 	'cancel' =>     0,              # true if the simplex iteration is being cancelled
 	'all_vars' => [{x=>1},...],     # multiple var options from simplex are logged here
@@ -1420,8 +1601,11 @@ the best result as the input to the next simplex iteration in an attempt
 to find increasingly better results.  For example, 4 iterations with each
 C<ssize> one-half of the previous:
 
-	ssize => [ 4, 2, 1, 0.5 ]
+Note: C<ssize> is a simplex-specific option that must be placed in C<{opts}>:
 
+	opts => {
+		ssize => [ 4, 2, 1, 0.5 ]
+	}
 
 Default: 1
 
@@ -1498,6 +1682,13 @@ accurate but will take longer to complete.  However, it is still useful if you h
 computation (C<f>) and want to converge sooner for an initial first pass.  It is still recommended
 to run a final pass without C<reduce_search>.
 
+Note: C<reduce_search> is a simplex-specific option that must be placed in C<{opts}>:
+
+	opts => {
+		reduce_search => 1,
+		...
+	}
+
 =head1 BEST PRACTICES AND USE CASES
 
 =head2 Antenna Geometry: Use an array for the C<ssize> parameter from coarse to fine perturbation.
@@ -1529,7 +1720,9 @@ previous iteration finds a "good" (but not "great") result; the best minima
 from across all simplex passes is kept as the final result in case latter passes
 do not perform as well:
 
-	ssize => [ 0.090, 0.075, 0.050, 0.025, 0.012 ]
+	opts => {
+		ssize => [ 0.090, 0.075, 0.050, 0.025, 0.012 ]
+	}
 
 This allows us to optimize antenna gain from 10.2 dBi with a single pass to
 11.3 dBi after 5 passes, in addition to a much improved VSWR value.
@@ -1557,7 +1750,9 @@ that define its behavior (Kp, Ki, and Kd),  and the satellite tracking is
 			ki => 120,
 			kd => 5
 		},
-		ssize => 1,
+		opts => {
+			ssize => 1,
+		},
 		f => sub { 
 				my $vars = shift;
 				
@@ -1596,7 +1791,9 @@ this we used the extended variable format as follows:
 				perturb_scale => 1,
 			},
 		},
-		ssize => 1, # <- ssize is still set to 1 !
+		opts => {
+			ssize => 1, # <- ssize is still set to 1 !
+		},
 		f => sub { 
 				my $vars = shift;
 				
@@ -1671,17 +1868,23 @@ Patches welcome ;)
 
 =over 4
 
-=item Video about how optimization algorithms like Simplex work, visually: L<https://youtu.be/NI3WllrvWoc>
-
-=item Wikipedia Article: L<https://en.wikipedia.org/wiki/Simplex_algorithm>,
-
 =item PDL Implementation of Simplex: L<PDL::Opt::Simplex>, L<http://pdl.perl.org/>
 
 =item This modules github repository: L<https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple>
 
 =back
 
-=head2 Example links:
+=head2 References:
+
+=over 4
+
+=item Wikipedia Article: L<https://en.wikipedia.org/wiki/Simplex_algorithm>
+
+=item Video about how optimization algorithms like Simplex work, visually: L<https://youtu.be/NI3WllrvWoc>
+
+=back
+
+=head2 Examples:
 
 =over 4
 
@@ -1691,6 +1894,15 @@ Patches welcome ;)
 
 =back
 
+=head2 Other Optimization Implementations:
+
+=over 4
+
+=item L<PDL::Opt::ParticleSwarm> - A PDL implementation of Particle Swarm
+
+=item L<PDL::Opt::ParticleSwarm::Simple> - Use names for Particle Swarm-optimized values
+
+=back
 
 =head1 AUTHOR
 

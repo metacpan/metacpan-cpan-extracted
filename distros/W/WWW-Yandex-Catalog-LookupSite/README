@@ -1,3 +1,9 @@
+DEPRECATED
+
+Yandex.Catalog service was shut down in 2017, and Thematic Index of Citing (тИЦ) was replaced with Site Quality Index (ИКС) in 2018. Thus, this module is deprecated.
+
+---
+
 WWW-Yandex-Catalog-LookupSite
 
 This module retrieves a website's Thematic Index of Citing, checks 

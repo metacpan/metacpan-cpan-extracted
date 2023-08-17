@@ -2,51 +2,45 @@ use 5.008005; use strict; use warnings;
 
 package Catalyst::Plugin::CachedUriForAction;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
-use mro;
+use Moose::Role;
+use Class::MOP::Class ();
 use Carp ();
 use URI::Encode::XS 'uri_encode_utf8';
 
-sub CACHE_KEY () { __PACKAGE__ . '::action_uri_info' }
-
-sub setup_finalize {
+after setup_finalize => sub {
 	my $c = shift;
-	$c->maybe::next::method( @_ );
 
-	my $dispatcher = $c->dispatcher;
-	my $cache = \%{ $dispatcher->{(CACHE_KEY)} };
+	my %cache;
+
 	for my $action ( values %{ $c->dispatcher->_action_hash } ) {
-		my $xa = $dispatcher->expand_action( $action );
+		my $xa = $c->dispatcher->expand_action( $action );
 		my $n_caps = $xa->number_of_captures;
 
 		# not an action that a request can be dispatched to?
-		next if not defined $dispatcher->uri_for_action( $action, [ ('dummy') x $n_caps ] );
+		next if not defined $c->dispatcher->uri_for_action( $action, [ ('dummy') x $n_caps ] );
 
 		my $n_args = $xa->number_of_args; # might be undef to mean "any number"
 		my $tmpl = $c->uri_for( $action, [ ("\0\0\0\0") x $n_caps ], ("\0\0\0\0") x ( $n_args || 0 ) );
 		my @part = split /%00%00%00%00/, $tmpl, -1;
-		$cache->{ '/' . $action->reverse } = [ $n_caps, $n_args, ( shift @part ), \@part ];
+		$cache{ '/' . $action->reverse } = [ $n_caps, $n_args, ( shift @part ), \@part ];
 	}
-}
 
-sub uri_for_action {
-	my $c = shift;
-
-	my $dispatcher = $c->dispatcher;
-	my $cache = $dispatcher && $dispatcher->{(CACHE_KEY)}
-		or return $c->next::method( @_ ); # fall back if called too early
-
-	my $action     = shift;
+	Class::MOP::Class->initialize( $c )->add_around_method_modifier( uri_for_action => sub {
+	########################################################################
+	shift;
+	my $c        = shift;
+	my $action   = shift;
 	my $captures = @_ && 'ARRAY'  eq ref $_[0]  ? shift : [];
 	my $fragment = @_ && 'SCALAR' eq ref $_[-1] ? pop   : undef;
 	my $params   = @_ && 'HASH'   eq ref $_[-1] ? pop   : undef;
 
-	$action = '/' . $dispatcher->get_action_by_path( $action )->reverse
+	$action = '/' . $c->dispatcher->get_action_by_path( $action )->reverse
 		if ref $action
 		and do { local $@; eval { $action->isa( 'Catalyst::Action' ) } };
 
-	my $info = $cache->{ $action }
+	my $info = $cache{ $action }
 		or Carp::croak "Can't find action for path '$action' in uri_for_action";
 
 	my ( $n_caps, $n_args, $path, $extra_parts ) = @$info;
@@ -123,9 +117,14 @@ sub uri_for_action {
 	}
 
 	$uri_obj;
-}
+	########################################################################
+	} );
+
+};
 
 BEGIN { delete $Catalyst::Plugin::CachedUriForAction::{'uri_encode_utf8'} }
+
+no Moose::Role;
 
 1;
 
@@ -207,7 +206,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Aristotle Pagaltzis.
+This software is copyright (c) 2023 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

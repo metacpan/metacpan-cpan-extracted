@@ -35,7 +35,7 @@ Module::Build->new(
       bugtracker => 'https://github.com/netdisco/nd2-web-plugin-rancid/issues',
       repository => 'https://github.com/netdisco/nd2-web-plugin-rancid',
       MailingList => 'https://lists.sourceforge.net/lists/listinfo/netdisco-users',
-      IRC => 'irc://irc.freenode.org/#netdisco',
+      IRC => 'irc://irc.libera.chat/#netdisco',
     },
   },
 )->create_build_script;

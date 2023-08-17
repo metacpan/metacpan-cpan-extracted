@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.38
+    Version 1.43
 
 SYNOPSIS
 
@@ -54,6 +54,21 @@ SUBROUTINES/METHODS
 
     returns the active element of the current browsing context's document
     element, if the document element is non-null.
+
+ add_bookmark
+
+    accepts a bookmark as a parameter and adds the specified bookmark to
+    the Firefox places database.
+
+        use Firefox::Marionette();
+    
+        my $bookmark = Firefox::Marionette::Bookmark->new(
+                         url   => 'https://metacpan.org',
+                         title => 'This is MetaCPAN!'
+                                 );
+        my $firefox = Firefox::Marionette->new()->add_bookmark($bookmark);
+
+    This method returns itself to aid in chaining methods.
 
  add_certificate
 
@@ -220,6 +235,18 @@ SUBROUTINES/METHODS
     returns the application type for the Marionette protocol. Should be
     'gecko'.
 
+ aria_label
+
+    accepts an element as the parameter. It returns the ARIA label
+    <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label>
+    for the element.
+
+ aria_role
+
+    accepts an element as the parameter. It returns the ARIA role
+    <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles>
+    for the element.
+
  async_script
 
     accepts a scalar containing a javascript function that is executed in
@@ -276,6 +303,40 @@ SUBROUTINES/METHODS
  default_binary_name
 
     just returns the string 'firefox'. Only of interest when sub-classing.
+
+ bookmarks
+
+    accepts either a scalar or a hash as a parameter. The scalar may by the
+    title of a bookmark or the URL of the bookmark. The hash may have the
+    following keys;
+
+      * title - The title of the bookmark.
+
+      * url - The url of the bookmark.
+
+    returns a list of all Firefox::Marionette::Bookmark objects that match
+    the supplied parameters (if any).
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+    
+        foreach my $bookmark ($firefox->bookmarks(title => 'This is MetaCPAN!')) {
+          say "Bookmark found";
+        }
+    
+        # OR
+    
+        foreach my $bookmark ($firefox->bookmarks()) {
+          say "Bookmark found with URL " . $bookmark->url();
+        }
+    
+        # OR
+    
+        foreach my $bookmark ($firefox->bookmarks('https://metacpan.org')) {
+          say "Bookmark found";
+        }
 
  browser_version
 
@@ -546,6 +607,24 @@ SUBROUTINES/METHODS
  current_chrome_window_handle
 
     see chrome_window_handle.
+
+ delete_bookmark
+
+    accepts a bookmark as a parameter and deletes the bookmark from the
+    Firefox database.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+        foreach my $bookmark (reverse $firefox->bookmarks()) {
+          if ($bookmark->parent_guid() ne Firefox::Marionette::Bookmark::ROOT()) {
+            $firefox->delete_bookmark($bookmark);
+          }
+        }
+        say "Bookmarks? We don't need no stinking bookmarks!";
+
+    This method returns itself to aid in chaining methods.
 
  delete_certificate
 
@@ -1251,6 +1330,20 @@ SUBROUTINES/METHODS
     
         say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
 
+ import_bookmarks
+
+    accepts a filesystem path to a bookmarks file and imports all the
+    bookmarks in that file. It can deal with backups from Firefox
+    <https://support.mozilla.org/en-US/kb/export-firefox-bookmarks-to-backup-or-transfer>,
+    Chrome <https://support.google.com/chrome/answer/96816?hl=en> or Edge.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->import_bookmarks('/path/to/bookmarks_file.html');
+
+    This method returns itself to aid in chaining methods.
+
  images
 
     returns a list of all of the following elements;
@@ -1436,6 +1529,18 @@ SUBROUTINES/METHODS
             # redirecting to Test::More page
         }
 
+ logins
+
+    returns a list of all Firefox::Marionette::Login objects available.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+        foreach my $login ($firefox->logins()) {
+           say "Found login for " . $login->host() . " and user " . $login->user();
+        }
+
  logins_from_csv
 
     accepts a filehandle as a parameter and then reads the filehandle for
@@ -1616,7 +1721,7 @@ SUBROUTINES/METHODS
       browser should use a proxy.
 
       * chatty - Firefox is extremely chatty on the network, including
-      checking for the lastest malware/phishing sites, updates to
+      checking for the latest malware/phishing sites, updates to
       firefox/etc. This option is therefore off ("0") by default, however,
       it can be switched on ("1") if required. Even with chatty switched
       off, connections to firefox.settings.services.mozilla.com will still
@@ -1628,7 +1733,8 @@ SUBROUTINES/METHODS
 
       * console - show the browser console
       <https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/>
-      when the browser is launched. This defaults to "0" (off).
+      when the browser is launched. This defaults to "0" (off). See CONSOLE
+      LOGGING for a discussion of how to send log messages to the console.
 
       * debug - should firefox's debug to be available via STDERR. This
       defaults to "0". Any ssh connections will also be printed to STDERR.
@@ -1663,10 +1769,10 @@ SUBROUTINES/METHODS
 
       * host - use ssh <https://man.openbsd.org/ssh.1> to create and
       automate firefox on the specified host. See REMOTE AUTOMATION OF
-      FIREFOX VIA SSH. The user will default to the current user name (see
-      the user parameter to change this). Authentication should be via
-      public keys loaded into the local ssh-agent
-      <https://man.openbsd.org/ssh-agent>.
+      FIREFOX VIA SSH and NETWORK ARCHITECTURE. The user will default to
+      the current user name (see the user parameter to change this).
+      Authentication should be via public keys loaded into the local
+      ssh-agent <https://man.openbsd.org/ssh-agent>.
 
       * implicit - a shortcut to allow directly providing the implicit
       timeout, instead of needing to use timeouts from the capabilities
@@ -1690,7 +1796,8 @@ SUBROUTINES/METHODS
 
       * port - if the "host" parameter is also set, use ssh
       <https://man.openbsd.org/ssh.1> to create and automate firefox via
-      the specified port. See REMOTE AUTOMATION OF FIREFOX VIA SSH.
+      the specified port. See REMOTE AUTOMATION OF FIREFOX VIA SSH and
+      NETWORK ARCHITECTURE.
 
       * page_load - a shortcut to allow directly providing the page_load
       timeout, instead of needing to use timeouts from the capabilities
@@ -1709,6 +1816,9 @@ SUBROUTINES/METHODS
       any changes made to the profile on the disk while it is running,
       instead, use the set_pref and clear_pref methods to make changes
       while firefox is running.
+
+      * proxy - this is a shortcut method for setting a proxy using the
+      capabilities parameter above. It accepts a proxy URL.
 
       * reconnect - an experimental parameter to allow a reconnection to
       firefox that a connection has been discontinued. See the survive
@@ -1750,10 +1860,10 @@ SUBROUTINES/METHODS
 
       * user - if the "host" parameter is also set, use ssh
       <https://man.openbsd.org/ssh.1> to create and automate firefox with
-      the specified user. See REMOTE AUTOMATION OF FIREFOX VIA SSH. The
-      user will default to the current user name. Authentication should be
-      via public keys loaded into the local ssh-agent
-      <https://man.openbsd.org/ssh-agent>.
+      the specified user. See REMOTE AUTOMATION OF FIREFOX VIA SSH and
+      NETWORK ARCHITECTURE. The user will default to the current user name.
+      Authentication should be via public keys loaded into the local
+      ssh-agent <https://man.openbsd.org/ssh-agent>.
 
       * via - specifies a proxy jump box
       <https://man.openbsd.org/ssh_config#ProxyJump> to be used to connect
@@ -2321,6 +2431,10 @@ SUBROUTINES/METHODS
             warn $element->tag_name();
         }
 
+    See the FINDING ELEMENTS IN A SHADOW DOM section for how to delve into
+    a shadow DOM
+    <https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM>.
+
  shadowy
 
     accepts an element as a parameter and returns true if the element has a
@@ -2435,7 +2549,7 @@ SUBROUTINES/METHODS
 
  uname
 
-    returns the $^O ($OSNAME) compatible string to describe the plaform
+    returns the $^O ($OSNAME) compatible string to describe the platform
     where firefox is running.
 
  update
@@ -2575,6 +2689,35 @@ SUBROUTINES/METHODS
     returns the value for the XAUTHORITY environment variable if one has
     been generated for the xvfb environment
 
+NETWORK ARCHITECTURE
+
+    This module allows for a complicated network architecture, including
+    SSH and HTTP proxies.
+
+      my $firefox = Firefox::Marionette->new(
+                      host  => 'Firefox.runs.here'
+                      via   => 'SSH.Jump.Box',
+                      trust => '/path/to/ca-for-squid-proxy-server.crt',
+                      proxy => 'https://Squid.Proxy.Server:3128'
+                         )->go('https://Target.Web.Site');
+
+    produces the following effect, with an ascii box representing a
+    separate network node.
+
+         ---------          ----------         -----------
+         | Perl  |  SSH     | SSH    |  SSH    | Firefox |
+         | runs  |--------->| Jump   |-------->| runs    |
+         | here  |          | Box    |         | here    |
+         ---------          ----------         -----------
+                                                    |
+         ----------          ----------             |
+         | Target |  HTTPS   | Squid  |    TLS      |
+         | Web    |<---------| Proxy  |<-------------
+         | Site   |          | Server |
+         ----------          ----------
+
+    See the REMOTE AUTOMATION OF FIREFOX VIA SSH section for more options.
+
 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
     This module allows you to login to a website without ever directly
@@ -2617,6 +2760,26 @@ AUTOMATING THE FIREFOX PASSWORD MANAGER
         $firefox->go('https://pause.perl.org/pause/authenquery')->accept_alert(); # this goes to the page and submits the http auth popup
     
         $firefox->go('https://github.com/login')->fill_login(); # fill the login and password fields without needing to see them
+
+CONSOLE LOGGING
+
+    Sending debug to the console can be quite confusing in firefox, as some
+    techniques won't work in chrome context. The following example can be
+    quite useful.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new( visible => 1, devtools => 1, console => 1, devtools => 1 );
+    
+        $firefox->script( q[console.log("This goes to devtools b/c it's being generated in content mode")]);
+    
+        $firefox->chrome()->script( q[console.log("Can't be seen b/c it's in chrome mode")]);
+    
+        $firefox->chrome()->script( q[const { console } = ChromeUtils.import("resource://gre/modules/Console.jsm"); console.log("Find me in the browser console in chrome mode")]);
+    
+        # This won't work b/c of permissions
+        #
+        # $firefox->content()->script( q[const { console } = ChromeUtils.import("resource://gre/modules/Console.jsm"); console.log("Find me in the browser console in content mode")]);
 
 REMOTE AUTOMATION OF FIREFOX VIA SSH
 
@@ -2688,6 +2851,9 @@ REMOTE AUTOMATION OF FIREFOX VIA SSH
     therefore this type of automation is still possible, but slower than
     other client platforms.
 
+    The NETWORK ARCHITECTURE section has an example of a more complicated
+    network design.
+
 WEBGL
 
     There are a number of steps to getting WebGL
@@ -2719,12 +2885,66 @@ WEBGL
             die "WebGL is not supported";
         }
 
+FINDING ELEMENTS IN A SHADOW DOM
+
+    One aspect of Web Components
+    <https://developer.mozilla.org/en-US/docs/Web/API/Web_components> is
+    the shadow DOM
+    <https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM>.
+    When you need to explore the structure of a custom element
+    <https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements>,
+    you need to access it via the shadow DOM. The following is an example
+    of navigating the shadow DOM via a html file included in the test suite
+    of this package.
+
+        use Firefox::Marionette();
+        use Cwd();
+    
+        my $firefox = Firefox::Marionette->new();
+        my $firefox_marionette_directory = Cwd::cwd();
+        $firefox->go("file://$firefox_marionette_directory/t/data/elements.html");
+    
+        my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+    
+        my $outer_div = $firefox->find_id('outer-div', $shadow_root);
+
+    So, this module is designed to allow you to navigate the shadow DOM
+    using normal find methods, but you must get the shadow element's shadow
+    root and use that as the root for the search into the shadow DOM. An
+    important caveat is that xpath
+    <https://bugzilla.mozilla.org/show_bug.cgi?id=1822311> and tag name
+    <https://bugzilla.mozilla.org/show_bug.cgi?id=1822321> strategies do
+    not officially work yet (and also the class name and name strategies).
+    This module works around the tag name, class name and name deficiencies
+    by using the matching css selector search if the original search throws
+    a recognisable exception. Therefore these cases may be considered to be
+    extremely experimental and subject to change when Firefox gets the
+    "correct" functionality.
+
+WEBSITES THAT BLOCK AUTOMATION
+
+    Marionette by design
+    <https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver>
+    allows web sites to detect that the browser is being automated. Firefox
+    no longer (since version 88)
+    <https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to
+    disable this functionality while you are automating the browser. If the
+    web site you are trying to automate mysteriously fails when you are
+    automating a workflow, but it works when you perform the workflow
+    manually, you may be dealing with a web site that is hostile to
+    automation.
+
+    At the very least, under these circumstances, it would be a good idea
+    to be aware that there's an ongoing arms race
+    <https://en.wikipedia.org/wiki/Web_scraping#Methods_to_prevent_web_scraping>,
+    and potential legal issues
+    <https://en.wikipedia.org/wiki/Web_scraping#Legal_issues> in this area.
+
 X11 FORWARDING WITH FIREFOX
 
-    This is an experimental addition to this module. X11 Forwarding
-    <https://man.openbsd.org/ssh#X> allows you to launch a remote firefox
-    via ssh and have it visually appear in your local X11 desktop. This can
-    be accomplished with the following code;
+    X11 Forwarding <https://man.openbsd.org/ssh#X> allows you to launch a
+    remote firefox via ssh and have it visually appear in your local X11
+    desktop. This can be accomplished with the following code;
 
         use Firefox::Marionette();
     

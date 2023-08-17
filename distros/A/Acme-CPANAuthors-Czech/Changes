@@ -1,3 +1,10 @@
+0.31 2023-07-31T12:03:40+02:00
+ - Add ATG CPAN account.
+ - Add BULB CPAN account.
+ - Add DPOKORNY CPAN account.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.30 2021-09-16T16:12:02+02:00
  - Add PAJOUT CPAN account.
 

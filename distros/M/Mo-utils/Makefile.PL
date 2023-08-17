@@ -20,6 +20,7 @@ readme_from 'utils.pm';
 recursive_author_tests('xt');
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'Scalar::Util' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Mo-utils/issues',
@@ -31,7 +32,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.14';
+version '0.17';
 
 # Run.
 WriteAll();

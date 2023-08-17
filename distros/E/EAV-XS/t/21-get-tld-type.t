@@ -5,18 +5,7 @@ use Test::More;
 
 
 my $testnum = 0;
-my $eav = EAV::XS->new(
-    'allow_tld' =>
-        EAV::XS::TLD_NOT_ASSIGNED |
-        EAV::XS::TLD_COUNTRY_CODE |
-        EAV::XS::TLD_GENERIC |
-        EAV::XS::TLD_GENERIC_RESTRICTED |
-        EAV::XS::TLD_INFRASTRUCTURE |
-        EAV::XS::TLD_SPONSORED |
-        EAV::XS::TLD_TEST |
-        EAV::XS::TLD_SPECIAL |
-        EAV::XS::TLD_RETIRED
-);
+my $eav = EAV::XS->new('allow_tld' => EAV::XS::TLD_ALL);
 
 ok (defined $eav);
 ok ($eav->get_tld_type() == EAV::XS::TLD_INVALID); # is_email() was not called
@@ -42,7 +31,7 @@ $testnum += 2;
 #ok ($eav->get_tld_type() == EAV::XS::TLD_TEST);
 #$testnum += 2;
 
-ok ($eav->is_email('sponsored@example.duck'));
+ok ($eav->is_email('not-assigned@example.duck'));
 ok ($eav->get_tld_type() == EAV::XS::TLD_NOT_ASSIGNED);
 $testnum += 2;
 

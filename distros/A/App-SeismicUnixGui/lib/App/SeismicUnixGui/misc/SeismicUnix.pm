@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::SeismicUnix;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: SeismicUnix.pm 
+ PERL PERL PROGRAM NAME: SeismicUnix.pm 
  AUTHOR: 	Juan Lorenzo
  DATE: 		earlier than 2018 
 
@@ -62,6 +62,7 @@ our (@EXPORT_OK, @ISA); #Global variables
   $ipicks $itemp_picks_
   $itemp_picks_sorted_
   $itemp_num_points $itemp_picks_sorted_par_
+  $ibottom_mute_file_list $itop_mute_file_list
   $ipicks_par_ $ipick_check_pickfile_
   $itop_mute $_itop_mute
   $itop_mute_par_ $itemp_top_mute_picks_ $itemp_top_mute_picks_ttr_ $itemp_top_mute_num_points_
@@ -74,6 +75,7 @@ our (@EXPORT_OK, @ISA); #Global variables
   $itemp_bot_mute_picks_sorted_ $itemp_bot_mute_picks_sorted_par $itemp_bot_mute_picks_sorted_par_
   $ibot_mute_check_pickfile $ibot_mute_check_pickfile_ $ibot_mute_xfile_picks $ibot_mute_tfile_picks
   $temp_single_gather_par_file_mute  
+  $mute
   $temp 
   $fldr
   $ivpicks_sorted_par_
@@ -92,7 +94,8 @@ our (@EXPORT_OK, @ISA); #Global variables
   $suffix_target  $suffix_target_tilde $suffix_param $suffix_pick $suffix_profile $suffix_env $suffix_report $sx 
   $to_outpar_file
   $to $txt $text $tracf $tracl $tracr $trid $year
-  $tmute $xmute );
+  $tmute $xmute 
+  $velan );
 
 # suffix_types
 our $DAT  = 'DAT;';
@@ -107,8 +110,6 @@ our $sgy  = 'sgy';
 our $bin  = 'bin';
 our	$empty = '';
 our $par  = 'par';
-
-#	our $txt							= 'txt';   ALSO in SEGY HEADERS- below
 our $text = 'text';
 
 # SURFACE WAVE ANALYSIS
@@ -154,6 +155,7 @@ our $ibot_mute_check_pickfile_        = '.ibotmute_pickfile_exists_';
 our $ibot_mute_check_pickfile         = '.ibotmute_pickfile_exists_';
 our $ibot_mute_xfile_picks            = 'bot_mute_xfile_picks';
 our $ibot_mute_tfile_picks            = 'bot_mute_tfile_picks';
+our $mute                             = 'mute';
 our $temp_single_gather_par_file_mute = '.temp_single_gather_par_file_mute';
 our $temp                             = 'temp';
 our $tmute							  = 'tmute';
@@ -167,6 +169,7 @@ our $gather_numo_suffix = '_gather';
 =cut
 
 our $ivpicks_sorted_par_ = 'ivpicks_sorted_par_';
+our $velan               = 'velan';
 
 # FFT
 our $ifft                        = 'ifft';
@@ -189,6 +192,8 @@ our $itemp_num_points        = '.itemp_num_points';
 our $itemp_picks_par_        = '.itemp_picks_par_';
 our $itemp_picks_sorted_     = '.itemp_picks_sorted_';
 our $itemp_picks_sorted_par_ = '.itemp_picks_sorted_par_';
+our $ibottom_mute_file_list  = 'ibottom_mute_file_list';
+our $itop_mute_file_list     = 'itop_mute_file_list';
 
 #iSpectralAnalysis
 

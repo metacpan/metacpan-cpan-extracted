@@ -7,7 +7,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 =head1 DOCUMENTATION
 
 =head2 SYNOPSIS 
-PACKAGE NAME: SuMessages 
+PERL PROGRAM NAME: SuMessages 
  AUTHOR: Juan Lorenzo
          July 29 2015
 

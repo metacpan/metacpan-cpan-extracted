@@ -30,6 +30,7 @@ my $delay            = 3;
 my $nosplash         = FALSE;
 my $show_names       = FALSE;
 my $noaccel          = FALSE;
+my $ignore_x         = FALSE;
 my $heads            = 1;
 my $threads          = Sys::CPU::cpu_count() * 2;
 my $RUNNING : shared = TRUE;
@@ -51,6 +52,7 @@ GetOptions(
     'noaccel'      => \$noaccel,
     'threads=i'    => \$threads,
     'names'        => \$show_names,
+	'ignore-x-windows' => \$ignore_x,
 );
 my @paths : shared = @ARGV;
 
@@ -102,7 +104,7 @@ if ($errors) {
 my @thrd;
 
 $threads /= scalar(@devs);
-$threads = min(20,$threads);
+$threads = min(20,$threads); # enforce a 20 thread hard limit
 
 # Run the slides in threads and have the main thread do housekeeping.
 my $showit = $splash;
@@ -159,12 +161,17 @@ sub gather {
     my @pics;
     foreach my $path (@paths) {
         chop($path) if ($path =~ /\/$/);
-        print STDOUT "Scanning - $path\n";
+        print STDERR "Scanning - $path";
         opendir(my $DIR, "$path") || die "Problem reading $path directory";
         chomp(my @dir = readdir($DIR));
         closedir($DIR);
 
-        return if (!$showall && grep(/^\.nomedia$/, @dir));
+        if (!$showall && grep(/^\.nomedia$/, @dir)) {
+            print STDERR " [Skipped]\n";
+            return;
+        } else {
+            print STDERR "\n";
+        }
         foreach my $file (@dir) {
             next if ($file =~ /^\.+/);
             if (-d "$path/$file") {
@@ -493,6 +500,7 @@ sub show {
           'SPLASH'      => $display,
           'SIMULATED_X' => $nx,
           'SIMULATED_Y' => $ny,
+		  'IGNORE_X_WINDOWS' => $ignore_x,
       )
       :
       Graphics::Framebuffer->new(
@@ -501,6 +509,7 @@ sub show {
           'SPLASH'      => $splash,
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,
+		  'IGNORE_X_WINDOWS' => $ignore_x,
       );
     local $SIG{'ALRM'} = local $SIG{'INT'}  = local $SIG{'QUIT'} = local $SIG{'KILL'} = local $SIG{'TERM'} = local $SIG{'HUP'} = undef;
 

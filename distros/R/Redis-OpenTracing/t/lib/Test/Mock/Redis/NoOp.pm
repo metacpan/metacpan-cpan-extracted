@@ -50,34 +50,27 @@ use warnings;
 
 use Test::Builder;
 use Test::Deep qw/cmp_details deep_diag/;
-use Test::MockObject;
-
-
 
 sub mock_new {
     my $class = shift;
     
-    my $mock = Test::MockObject->new( );
-    
-    $mock->set_isa('Redis::NoOp');
-    
-    $mock->mock(
-        connect     => sub { "OK" },
-    );
-    $mock->mock(
-        ping        => sub { "PONG" },
-    );
-    $mock->mock(
-        set         => sub { "OK" },
-    );
-    
-    $mock->set_list(
-        keys        => qw/foo bar baz/,
-    );
-    
-    $mock->{ 'server' } = 'http://redis.example.com:8080';
-    
-    return $mock
+    bless [], $class;
+}
+
+sub connect { _push_calls(@_); "OK" }
+sub ping    { _push_calls(@_); "PONG" }
+sub set     { _push_calls(@_); "OK" }
+sub keys    { _push_calls(@_); my @keys = (qw/foo bar baz/); return @keys }
+sub dies    { _push_calls(@_); die "$_[1]" // "Exception in Redis::NoOp" }
+
+
+
+sub _push_calls {
+    my $self = shift;
+    my $sub = [ caller(1)]->[3];
+    $sub =~ s/.*:://;
+
+    push @$self, $sub, [$self, @_]
 }
 
 
@@ -104,12 +97,8 @@ sub mock_cmp_calls {
 sub _extraxt_all_calls {
     my ( $class, $mock ) = @_;
     
-    my @calls;
-    while ( my( $name, $args ) = $mock->next_call( ) ) {
-        push @calls, $name, $args
-    }
     
-    return @calls;
+    return @$mock;
     
 }
 

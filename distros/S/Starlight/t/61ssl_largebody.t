@@ -3,21 +3,22 @@
 use strict;
 use warnings;
 
-BEGIN { delete $ENV{http_proxy} };
+BEGIN { delete $ENV{http_proxy}; delete $ENV{https_proxy} }
 
-# workaround for HTTP::Tiny + Test::TCP
-BEGIN { $INC{'threads.pm'} = 0 };
-sub threads::tid { }
-
-use HTTP::Tiny;
+use FindBin;
+use LWP::UserAgent;
 use Test::TCP;
 use Test::More;
-use FindBin;
 
 use Starlight::Server;
 
 if ($^O eq 'MSWin32' and $] >= 5.016 and $] < 5.019005 and not $ENV{PERL_TEST_BROKEN}) {
     plan skip_all => 'Perl with bug RT#119003 on MSWin32';
+    exit 0;
+}
+
+if ($^O eq 'MSWin32' and $] < 5.014 and not $ENV{PERL_TEST_BROKEN}) {
+    plan skip_all => 'Too old Perl on MSWin32';
     exit 0;
 }
 
@@ -31,37 +32,47 @@ if (not eval { require IO::Socket::SSL; }) {
     exit 0;
 }
 
+if (not eval { require LWP::Protocol::https; }) {
+    plan skip_all => 'LWP::Protocol::https required';
+    exit 0;
+}
+
 if (not eval { require Net::SSLeay; Net::SSLeay->VERSION(1.49); }) {
     plan skip_all => 'Net::SSLeay >= 1.49 required';
     exit 0;
 }
 
-if (eval { require Acme::Override::INET; } ) {
+if (eval { require Acme::Override::INET; }) {
     plan skip_all => 'Acme::Override::INET is not supported';
     exit 0;
 }
 
-my $ca_crt     = "$FindBin::Bin/../examples/ca.crt";
+my $ca_crt = "$FindBin::Bin/../examples/ca.crt";
 my $server_crt = "$FindBin::Bin/../examples/localhost.crt";
 my $server_key = "$FindBin::Bin/../examples/localhost.key";
 
-my $body       = 'x'x(32*1024); # > 16KB
+my $body = 'x' x (32 * 1024);    # > 16KB
 
 test_tcp(
     client => sub {
         my $port = shift;
         sleep 1;
-        my $ua = HTTP::Tiny->new(
-            verify_SSL => 1,
-            SSL_options => {
-                SSL_ca_file   => $ca_crt,
-           }
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(10);
+        $ua->ssl_opts(
+            verify_hostname => 1,
+            SSL_ca_file     => $ca_crt,
         );
         my $res = $ua->get("https://127.0.0.1:$port/");
-        ok $res->{success};
-        like $res->{headers}{server}, qr/Starlight/;
-        like $res->{content}, qr/xxxxxxxxxx/;
-        is length $res->{content}, length $body;
+
+        ok $res->is_success, 'is_success';
+        is $res->code, '200', 'code';
+        is $res->message, 'OK', 'message';
+        like $res->header('server'), qr/Starlight/, 'server in headers';
+        like $res->content, qr/xxxxxxxxxx/, 'content';
+        is length $res->content, length $body, 'length of content';
+
         sleep 1;
     },
     server => sub {
@@ -70,11 +81,12 @@ test_tcp(
             quiet         => 1,
             host          => '127.0.0.1',
             port          => $port,
+            ipv6          => 0,
             ssl           => 1,
             ssl_key_file  => $server_key,
             ssl_cert_file => $server_crt,
         )->run(
-            sub { [ 200, [], [$body] ] },
+            sub { [200, [], [$body]] },
         );
     }
 );

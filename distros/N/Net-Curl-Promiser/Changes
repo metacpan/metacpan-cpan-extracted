@@ -1,5 +1,12 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.20 Mon 24 Jul 2023
+- Fix Select test (broken in 0.19).
+
+0.19 Mon 24 Jul 2023
+- Fix tests on Solaris with new perls.
+- Fix trivial POD issue.
+
 0.18 Wed 13 Apr 2022
 - Fix warning in Mojo test with old, buggy Mojo (8.43)
 

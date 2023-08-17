@@ -57,7 +57,7 @@
          "web" : "https://github.com/Corion/HTML-Selector-XPath"
       }
    },
-   "version" : "0.26",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

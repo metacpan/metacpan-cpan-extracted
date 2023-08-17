@@ -205,4 +205,13 @@ is run(['repeat_inner', items => ['hr' => ['separator']], ['p' => ['replace_inne
     wrapped('<div id=x title=a><p>p1</p><hr><p>p2</p></div>'),
     'repeat_inner';
 
+{
+    my $subtemplate = HTML::Blitz->new(
+        ['div' => ['repeat_inner', items => ['p' => ['replace_inner_var', 'var']] ] ],
+    )->apply_to_html('(inner)', '<div><br> <p>A</p></div>');
+    is run(['replace_inner_template', $subtemplate], $html, { items => [{ var => 'v1' }, { var => 'v2' }] }),
+        wrapped('<div id=x title=a><div><br> <p>v1</p><br> <p>v2</p></div></div>'),
+        'replace_inner_template + repeat_inner';
+}
+
 done_testing;

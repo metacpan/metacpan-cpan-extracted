@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.007';
+our $VERSION = '1.009';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -22,8 +22,8 @@ use Errno ();
 my ($is_winenv, $zero_bytes, %sock_ready);
 
 BEGIN {
-    $is_winenv = ( $^O =~ /mswin|mingw|msys|cygwin/i ) ? 1 : 0;
-    $zero_bytes = "\x00\x00\x00\x00";
+    $is_winenv  = ( $^O =~ /mswin|mingw|msys|cygwin/i ) ? 1 : 0;
+    $zero_bytes = pack('L', 0);
 }
 
 sub CLONE {
@@ -134,8 +134,7 @@ sub _sock_ready {
    my ($socket, $timeout) = @_;
    return '' if !defined $timeout && $sock_ready{"$socket"} > 1;
 
-   my ($delay, $val_bytes, $start) = (0, "\x00\x00\x00\x00", time);
-   my $ptr_bytes = unpack('I', pack('P', $val_bytes));
+   my ($val_bytes, $delay, $start) = (pack('L', 0), 0, time);
 
    if (!defined $timeout) {
       $sock_ready{"$socket"}++;
@@ -147,14 +146,14 @@ sub _sock_ready {
 
    while (1) {
       # MSWin32 FIONREAD - from winsock2.h macro
-      ioctl($socket, 0x4004667f, $ptr_bytes);
+      ioctl($socket, 0x4004667f, $val_bytes);
 
       return '' if $val_bytes ne $zero_bytes;
       return  1 if $timeout && time > $timeout;
 
       # delay after a while to not consume a CPU core
       sleep(0.015), next if $delay;
-      $delay = 1 if time - $start > 0.015;
+      $delay = 1 if time - $start > 0.030;
    }
 }
 
@@ -184,7 +183,7 @@ Mutex::Util - Utility functions for Mutex
 
 =head1 VERSION
 
-This document describes Mutex::Util version 1.007
+This document describes Mutex::Util version 1.009
 
 =head1 SYNOPSIS
 

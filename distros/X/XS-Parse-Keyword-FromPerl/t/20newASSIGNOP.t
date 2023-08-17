@@ -6,10 +6,12 @@ use warnings;
 use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
-   opcode
    KEYWORD_PLUGIN_EXPR
-   newASSIGNOP newGVOP newSVOP newUNOP
    register_xs_parse_keyword
+);
+use Optree::Generate qw(
+   opcode
+   newASSIGNOP newGVOP newSVOP newUNOP
 );
 
 use constant {

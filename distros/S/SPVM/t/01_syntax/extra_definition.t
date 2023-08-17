@@ -26,7 +26,7 @@ use Test::More;
 
 # Class
 {
-  # Class attribute
+  # Module attribute
   {
     {
       my $source = 'class MyClass : pointer { has x : int; }';
@@ -47,9 +47,7 @@ use Test::More;
     compile_ok_file('CompileError::Interface::NativeMethod');
     compile_not_ok_file('CompileError::Interface::StaticMethod');
     compile_not_ok_file('CompileError::Interface::ArrayElementCantAssign');
-    compile_not_ok_file('CompileError::Interface::NotHaveInterfaceMethod');
     compile_ok_file('CompileError::Interface::NoMethods');
-    compile_not_ok_file('CompileError::Interface::MultiRequiredMethods');
     compile_not_ok_file('CompileError::Interface::HasImplNotFound');
   }
   # Class variable difinition
@@ -156,27 +154,27 @@ use Test::More;
     # Optional argument
     {
       {
-        my $source = 'class MyClass { static method foo : void ($args0 = Int->new(1) : int) { } }';
+        my $source = 'class MyClass { static method foo : void ($args0 : int = Int->new(1)) { } }';
         compile_not_ok($source);
       }
       {
-        my $source = 'class MyClass { static method foo : void ($args0 = 0.3 : float) { } }';
+        my $source = 'class MyClass { static method foo : void ($args0 : float = 0.3) { } }';
         compile_not_ok($source);
       }
       {
-        my $source = 'class MyClass { static method foo : void ($args0 = "abc" : object) { } }';
+        my $source = 'class MyClass { static method foo : void ($args0 : object = "abc") { } }';
         compile_not_ok($source);
       }
       {
-        my $source = 'class MyClass { static method foo : void ($args0 = undef : int*) { } }';
+        my $source = 'class MyClass { static method foo : void ($args0 : int* = undef) { } }';
         compile_not_ok($source);
       }
       {
-        my $source = 'class MyClass { use Complex_2d; static method foo : void ($args0 = 0 : Complex_2d) { } }';
+        my $source = 'class MyClass { use Complex_2d; static method foo : void ($args0 : Complex_2d = 0) { } }';
         compile_not_ok($source);
       }
       {
-        my $source = 'class MyClass { static method foo : void ($args0 = 0 : int, $args1 : int) { } }';
+        my $source = 'class MyClass { static method foo : void ($args0 : int = 0, $args1 : int) { } }';
         compile_not_ok($source);
       }
     }
@@ -227,7 +225,7 @@ use Test::More;
     {
       {
         my $source = [
-          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns = undef : object[]) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
+          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns : object[] = undef) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
           'class MyClass::Socket extends MyClass::Handle {}',
           'class MyClass::Handle { has blocking : ro int;}',
         ];
@@ -235,7 +233,7 @@ use Test::More;
       }
       {
         my $source = [
-          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns = undef : object[]) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
+          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns : object[] = undef) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
           'class MyClass::Socket extends MyClass::Handle {}',
           'class MyClass::Handle { }',
         ];
@@ -257,7 +255,7 @@ use Test::More;
     my $source = [
       'class MyClass { use Point; static method main : int () { Point->not_found; } }',
     ];
-    compile_not_ok($source, qr|The "not_found" method in the "Point" class is not found|);
+    compile_not_ok($source);
   }
 }
 

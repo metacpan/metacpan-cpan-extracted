@@ -1,3 +1,25 @@
+0.0.17 Wed Jul  5 09:09:17 AM EDT 2023
+ - Change package names for internal classes
+
+0.0.16 Mon Jun 26 07:40:51 PM EDT 2023
+ - Change license to same terms as Perl
+
+0.0.15 sat jun 24 11:09:15 am edt 2023
+ - Add a test for multi-line assignment statement
+ - Put all code from assign.pm in assign::0
+ - Refactor to declare vars before assignments
+
+0.0.14 Fri Jun 16 01:25:44 PM CDT 2023
+ - Don't set PERL5LIB in testing
+
+0.0.12 Tue Jun 13 10:49:57 AM CDT 2023
+ - Add Capture::Tiny to test.requires
+
+0.0.11 Tue Jun 13 10:17:25 AM CDT 2023
+ - Support slurpy @x and @$x forms
+ - Update docs for new slurpy forms
+ - Add Kang-min Liu to authors
+
 0.0.10 Fri May 12 07:30:34 AM PDT 2023
  - Support default values for array vars
 

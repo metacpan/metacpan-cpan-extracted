@@ -13,7 +13,7 @@
 Name: nl
 Description: line numbering filter
 Author: jul, kaldor@cpan.org
-License: Artistic License 2.0
+License: artistic2
 
 =end metadata
 
@@ -25,7 +25,7 @@ use utf8;
 use Getopt::Std;
 use File::Basename;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -40,7 +40,7 @@ Usage: $program [-V] [-p] [-b type] [-d delim] [-f type] [-h type] [-i incr] [-l
     -d delim        characters (max 2) indicating new section (default : '\\:')
     -f type         same as -b but for footer lines (default : 'n')
     -h type         same as -b but for header lines (default : 'n')
-    -i incr         increment value (dafault : 1)
+    -i incr         increment value (default : 1)
     -n format       'ln'    left justified
                     'rn'    right justified without leading zeros (default)
                     'rz'    right justified with leading zeros
@@ -114,7 +114,7 @@ sub print_number {
 	{
 		print ' ' x $width;
 	}
-	
+
 	print $sep;
 }
 
@@ -151,7 +151,7 @@ sub print_line {
 	{
 		die $usage;
 	}
-	
+
 	print $line;
 }
 
@@ -186,8 +186,6 @@ while (<>)
 		print_line($_, $type[$section], $regex[$section]);
 	}
 }
-
-exit 1;
 
 __END__
 

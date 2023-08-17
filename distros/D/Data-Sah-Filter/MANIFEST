@@ -32,7 +32,11 @@ lib/Data/Sah/Filter/perl/Float/check_int.pm
 lib/Data/Sah/Filter/perl/Float/floor.pm
 lib/Data/Sah/Filter/perl/Float/round.pm
 lib/Data/Sah/Filter/perl/Str/check.pm
+lib/Data/Sah/Filter/perl/Str/check_lowercase.pm
+lib/Data/Sah/Filter/perl/Str/check_oneline.pm
+lib/Data/Sah/Filter/perl/Str/check_uppercase.pm
 lib/Data/Sah/Filter/perl/Str/downcase.pm
+lib/Data/Sah/Filter/perl/Str/ensure_trailing_newline.pm
 lib/Data/Sah/Filter/perl/Str/lc.pm
 lib/Data/Sah/Filter/perl/Str/lcfirst.pm
 lib/Data/Sah/Filter/perl/Str/lowercase.pm

@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::header::sulhead;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

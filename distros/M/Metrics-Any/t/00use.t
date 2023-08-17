@@ -3,18 +3,19 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Metrics::Any" );
-use_ok( "Metrics::Any::Adapter" );
-use_ok( "Metrics::Any::Collector" );
+require Metrics::Any;
+require Metrics::Any::Adapter;
+require Metrics::Any::Collector;
 
-use_ok( "Metrics::Any::AdapterBase::Stored" );
+require Metrics::Any::AdapterBase::Stored;
 
-use_ok( "Metrics::Any::Adapter::File" );
-use_ok( "Metrics::Any::Adapter::Null" );
-use_ok( "Metrics::Any::Adapter::Stderr" );
-use_ok( "Metrics::Any::Adapter::Tee" );
-use_ok( "Metrics::Any::Adapter::Test" );
+require Metrics::Any::Adapter::File;
+require Metrics::Any::Adapter::Null;
+require Metrics::Any::Adapter::Stderr;
+require Metrics::Any::Adapter::Tee;
+require Metrics::Any::Adapter::Test;
 
+pass( "Modules loaded" );
 done_testing;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 546;
+use Test::More tests => 8;
 
 use lib qw(t t/data/static);
 use Utils;
@@ -72,7 +72,7 @@ my $rv1 = scan_deps(
             recurse => 0,
           );
 
-compare_scandeps_rvs($rv1, $expected_rv1, \@roots1);
+compare_rv($rv1, $expected_rv1, \@roots1);
 
 
 ##############################################################
@@ -143,7 +143,7 @@ my $rv2 = scan_deps(
             recurse => 0,
           );
 
-compare_scandeps_rvs($rv2, $expected_rv2, \@roots2);
+compare_rv($rv2, $expected_rv2, \@roots2);
 
 
 ##############################################################
@@ -224,7 +224,7 @@ my $rv3 = scan_deps(
             recurse => 1,
           );
 
-compare_scandeps_rvs($rv3, $expected_rv_ABC_skip_TestA, \@roots_ABC);
+compare_rv($rv3, $expected_rv_ABC_skip_TestA, \@roots_ABC);
 
 
 ##############################################################
@@ -285,7 +285,7 @@ my $rv4 = scan_deps(
             recurse => 1,
           );
 
-compare_scandeps_rvs($rv4, $expected_rv_ABC_skip_TestC, \@roots_ABC);
+compare_rv($rv4, $expected_rv_ABC_skip_TestC, \@roots_ABC);
 
 
 ##############################################################
@@ -353,7 +353,7 @@ my $rv5 = scan_deps(
             recurse => 1,
           );
 
-compare_scandeps_rvs($rv5, $expected_rv_ABC_skip_TestA_TestC, \@roots_ABC);
+compare_rv($rv5, $expected_rv_ABC_skip_TestA_TestC, \@roots_ABC);
 
 
 ##############################################################
@@ -406,7 +406,7 @@ my $rv6 = scan_deps(
             recurse => 1,
           );
 
-compare_scandeps_rvs($rv6, $expected_rv_AB_skip_TestC, \@roots_AB);
+compare_rv($rv6, $expected_rv_AB_skip_TestC, \@roots_AB);
 
 ##############################################################
 
@@ -454,6 +454,5 @@ my $rv7 = scan_deps(
           );
 
 #is_deeply($rv7, $expected_rv_AB_skip_TestD);
-compare_scandeps_rvs($rv7, $expected_rv_AB_skip_TestD, \@roots_AB);
+compare_rv($rv7, $expected_rv_AB_skip_TestD, \@roots_AB);
 
-__END__

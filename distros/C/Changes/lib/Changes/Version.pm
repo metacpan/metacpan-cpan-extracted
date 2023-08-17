@@ -86,8 +86,6 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
-    # XXX
-    # print( STDERR ref( $self ), "::init: called with args: '", join( "', '", map( defined( $_ ) ? $_ : 'undef', @_ ) ), "'\n" );
     $self->{alpha}  = undef;
     # Used for other version types
     $self->{beta}   = undef;
@@ -126,15 +124,9 @@ sub init
         return( $self->pass_error ) if( !defined( $v ) );
         # And we copy the collected value as default values for our new object, which can then be overriden by additional option passed here.
         @$self{ @$keys } = @$v{ @$keys };
-        # XXX
-        # print( STDERR ref( $self ), "::init: \$v -> ", $self->dump( $v ), "\n" );
     }
     $self->{_init_strict_use_sub} = 1;
-    # XXX
-    # print( STDERR ref( $self ), "::init: passing \@_ to SUPER::init: '", join( "', '", @_ ), "'\n" );
     my $rv = $self->SUPER::init( @_ );
-    # XXX
-    # print( STDERR ref( $self ), "::init: \$rv is defined ? ", ( defined( $rv ) ? 'yes' : 'no' ), "\n" );
     return( $self->pass_error ) if( !defined( $rv ) );
     return( $self );
 }
@@ -144,15 +136,10 @@ sub alpha { return( shift->reset(@_)->_set_get_number( { field => 'alpha', undef
 sub as_string
 {
     my $self = shift( @_ );
-    # XXX
-    # my $caller = [caller];
-    # print( STDERR ref( $self ), "::as_string: called from file $caller->[1] at line $caller->[2]\n" );
-    # print( STDERR ref( $self ), "::as_string: _reset exists? ", ( exists( $self->{_reset} ) ? 'yes' : 'no' ), "\n" );
     if( !exists( $self->{_reset} ) || 
         !defined( $self->{_reset} ) ||
         !CORE::length( $self->{_reset} ) )
     {
-        $self->message( 5, "Reset is disabled, checking for cache value '", ( $self->{_cache_value} // '' ), "' and raw cache '", ( $self->{raw} // '' ), "'" );
         if( exists( $self->{_cache_value} ) &&
             defined( $self->{_cache_value} ) &&
             length( $self->{_cache_value} ) )
@@ -161,7 +148,6 @@ sub as_string
         }
         elsif( defined( $self->{original} ) && length( "$self->{original}" ) )
         {
-            $self->message( 5, "Re-using the original cache '", $self->{original}->scalar, "' (", overload::StrVal( $self->{original} ), ")." );
             return( $self->{original}->scalar );
         }
     }
@@ -256,13 +242,11 @@ sub normal
         if( $opts->{raw} )
         {
             $v = $clone->_stringify;
-            $self->message( 4, "Wants raw. String is already formatted with qv, returning '$v'" );
             # We already did it with stringify, so we return what we got
             return( $v );
         }
         else
         {
-            $self->message( 4, "Does not want raw. String is already formatted with qv, returning a clone of self" );
             $clone->type( 'dotted' );
             return( $clone );
         }
@@ -289,15 +273,12 @@ sub numify
             my $alpha = $clone->alpha;
             $clone->alpha( undef );
             $v = $clone->_stringify;
-            $self->message( 4, "Alpha value is '", ( $alpha // '' ), "'. Stringified version string, before calling version, is: $v" );
             my $str = version->parse( $v )->numify;
             $str .= "_${alpha}" if( defined( $alpha ) && length( "$alpha" ) );
-            $self->message( 4, "Numified version string is '$str', appending alpha ? ", ( ( defined( $alpha ) && length( "$alpha" ) ) ? "'_${alpha}'" : 'no' ) );
             return( $str );
         }
         else
         {
-            $self->message( 4, "Returning cloned object for numified version." );
             my $new = $self->clone;
             # This will also remove qv boolean
             $new->type( 'decimal' );
@@ -322,7 +303,6 @@ sub parse
     if( $str =~ /^$VERSION_LAX_REGEX$/ )
     {
         my $re = { %+ };
-        $self->message( 4, "Found version with regexp data -> ", sub{ $self->dump( $re ) } );
         my $def = { original => $str };
         if( defined( $re->{dotted} ) && length( $re->{dotted} ) )
         {
@@ -364,20 +344,16 @@ sub parse
                 length( $def->{alpha} ) < 3 && 
                 !$self->compat )
             {
-                $self->message( 5, "Decimal version has alpha value. Getting version object from '$re->{release}'" );
                 $v = version->parse( "$re->{release}" );
             }
             else
             {
-                $self->message( 5, "Getting version object from '$str'" );
                 $v = version->parse( "$str" );
             }
             my $vstr = $v->normal;
-            $self->message( 5, "Sub parsing normalised version '$v'" );
             if( $vstr =~ /^$VERSION_LAX_REGEX$/ )
             {
                 my $re2 = { %+ };
-                $self->message( 5, "Subparsing yielded -> ", sub{ $self->dump( $re2 ) } );
                 if( defined( $re2->{dotted} ) && length( $re2->{dotted} ) )
                 {
                     if( defined( $re2->{minor_patch} ) )
@@ -392,7 +368,6 @@ sub parse
                 }
             }
         }
-        $self->message( 5, "Version components are -> ", sub{ $self->dump( $def ) } );
         my $new = $self->new( %$def );
         $new->{_version} = $v if( defined( $v ) );
         return( $self->pass_error ) if( !defined( $new ) );
@@ -422,9 +397,6 @@ sub reset
             !CORE::length( $self->{_reset} ) 
         ) && scalar( @_ ) )
     {
-        # XXX
-        # my $trace = $self->_get_stack_trace;
-        # print( STDERR ref( $self ), "::reset called with trace $trace\n" );
         $self->{_reset} = scalar( @_ );
         if( defined( $self->{major} ) )
         {
@@ -501,7 +473,6 @@ sub _cascade
     elsif( $frag eq 'patch' || ( $frag_is_int && $frag == 3 ) )
     {
         $self->alpha( undef );
-        $self->message( 4, "After setting undef, value for alpha is '", ( $self->{alpha} // '' ), "'" );
     }
     elsif( $frag eq 'alpha' )
     {
@@ -530,7 +501,6 @@ sub _cascade
 sub _compare
 {
     my( $left, $right, $swap ) = @_;
-    $left->message( 4, "Arguments received: '", overload::StrVal( $left ), "' '", ( defined( $right ) ? $right : 'undef' ), "', '", ( defined( $swap ) ? $swap : 'undef' ), "'" );
     my $class = ref( $left );
     unless( $left->_is_a( $right => $class ) )
     {
@@ -560,7 +530,6 @@ sub _compare
     # perl -Mversion -lE 'my $v = version->parse("v1.2.3"); my $v2 = version->parse("v1.2.3_4"); say $v > $v2'
     # See RT#145290: <https://rt.cpan.org/Ticket/Display.html?id=145290>
     # return( $left->{_version} == $right->{_version} );
-    $left->message( 5, "Comparing '$lv' to '$rv' -> '", ( $lv == $rv ), "'" );
     # return( $lv == $rv );
     return( $lv <=> $rv );
 }
@@ -570,10 +539,7 @@ sub _compute
     my $self = shift( @_ );
     my $opts = pop( @_ );
     my( $other, $swap, $nomethod, $bitwise ) = @_;
-    # XXX
-    # print( STDERR ref( $self ), "::compute: Called with \$other = '", ( $other // '' ), "', swap = '", ( $swap // '' ), "' and extra '", ( $nomethod // '' ), "' and \$bitwise is '", ( $bitwise // '' ), "'\n" );
     my $frag = $self->default_frag // 'minor';
-    $self->message( 5, "Called with \$frag = '$frag' (default fragment is '", ( $self->default_frag // 'undef' ), "'), \$other = '", ( $other // '' ), "', swap = '", ( $swap // '' ), "' and extra '", ( $nomethod // '' ), "' and \$bitwise is '", ( $bitwise // '' ), "'" );
     $frag = 'minor' if( $frag !~ /^(major|minor|patch|alpha|\d+)$/ );
     if( !defined( $opts ) || 
         ref( $opts ) ne 'HASH' || 
@@ -600,7 +566,6 @@ sub _compute
             die( "Cannot find code reference for method ", ( $frag_is_int ? $map->{ $frag } : $frag ) );
     }
     my $val = defined( $coderef ) ? $coderef->( $self ) : $extra->[ $frag - 4 ];
-    $self->message( 4, "Operation is '$op' for fragment '$frag' and $frag value '", ( defined( $val ) ? $val : 'undef' ), "' (", overload::StrVal( $val ), "), other is '", ( defined( $other ) ? $other : 'undef' ), " (", overload::StrVal( $other ), ") and swap is ", ( $swap ? 'true' : 'not true' ) );
     my $err;
     if( !defined( $val ) )
     {
@@ -624,10 +589,8 @@ sub _compute
     {
         $eval = $swap ? ( defined( $other ) ? $other : 'undef' ) . "${op} \$n" : "\$n ${op} " . ( defined( $other ) ? $other : 'undef' );
     }
-    $self->message( 5, "Evaluating '$eval'" );
     my $rv = eval( $eval );
     $err = $@ if( $@ );
-    $self->message( 5, "\$rv = '$rv' and \$@ = '$@'" );
     if( defined( $err ) )
     {
         warn( $err, "\n" ) if( $self->_warnings_is_enabled );
@@ -656,15 +619,12 @@ sub _compute
         
         if( defined( $coderef ) )
         {
-            $self->message( 5, "Updating $frag level to $new_val" );
             $coderef->( $new, $new_val );
         }
         else
         {
-            $self->message( 5, "Setting fragment offset $frag to $new_val" );
             $extra->[( $frag - 4 )] = $new_val;
         }
-        $self->message( 5, "$frag is set to '", $coderef->( $new ), "'" );
         $new->_cascade( $frag );
         return( $new );
     }
@@ -724,7 +684,6 @@ sub _inc_dec
     
     if( defined( $coderef ) )
     {
-        $self->message( 5, "Updating $frag level to $n" );
         $coderef->( $self, $n );
     }
     else
@@ -763,7 +722,6 @@ sub _stringify
         # For example: 3_6 would trigger version error "Invalid version format (alpha without decimal)"
         $def->{minor} = 0 if( ( !defined( $def->{minor} ) || !length( "$def->{minor}" ) ) && defined( $def->{alpha} ) && length( "$def->{alpha}" ) );
     }
-    # $self->message( 4, "version fragments are -> ", sub{ $self->dump( $def ) } );
     my $ok = 0;
     for( qw( patch minor major ) )
     {
@@ -782,7 +740,6 @@ sub _verify
     my $self = shift( @_ );
     if( defined( $self ) )
     {
-        $self->message( 5, "Is \$self a Changes::Version object? -> ", ( Module::Generic->_is_a( $self => 'Changes::Version' ) ? 'yes' : 'no' ), " and _version exists ? ", ( exists( $self->{_version} ) ? 'yes' : 'no' ), " and is _version (", overload::StrVal( $self->{_version} ), ") a version object ? ", ( Module::Generic->_is_a( $self->{_version} => 'version' ) ? 'yes' : 'no' ) );
     }
     if( defined( $self ) &&
         Module::Generic->_is_a( $self => 'Changes::Version' ) &&
@@ -1372,7 +1329,7 @@ This is an alias for L</as_string>
 
 =head2 target
 
-Sets or gets the target format. By default this is C<perl>. This means that L</as_string> will format the version string for C<perl>. n future release of this class, other format wil be supported, such as C<opensource>
+Sets or gets the target format. By default this is C<perl>. This means that L</as_string> will format the version string for C<perl>. In future release of this class, other format wil be supported, such as C<opensource>
 
 Returns a L<scalar object|Module::Generic::Scalar>
 

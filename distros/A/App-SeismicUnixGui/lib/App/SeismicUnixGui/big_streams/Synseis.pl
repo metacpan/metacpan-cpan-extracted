@@ -1,7 +1,7 @@
 
 =head2 SYNOPSIS
 
- FILE/PACKAGE NAME: Synseis.pl
+ FILE/PERL PROGRAM NAME: Synseis.pl
 
  AUTHOR:  Juan M. Lorenzo (sm), gllore@lsu.edu
 

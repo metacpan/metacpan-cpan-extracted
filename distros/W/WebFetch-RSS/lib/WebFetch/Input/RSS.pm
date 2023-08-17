@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::RSS;
-$WebFetch::Input::RSS::VERSION = '0.3.0';
+$WebFetch::Input::RSS::VERSION = '0.3.2';
 
 # inherit everything as a derived class - this exists just for backward compatibility
 use base "WebFetch::RSS";
@@ -31,7 +31,7 @@ WebFetch::Input::RSS - compatibility mode to access WebFetch::RSS under its prev
 
 =head1 VERSION
 
-version 0.3.0
+version 0.3.2
 
 =head1 SYNOPSIS
 

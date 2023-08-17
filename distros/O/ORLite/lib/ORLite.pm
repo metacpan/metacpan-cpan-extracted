@@ -1,4 +1,4 @@
-package ORLite;
+package ORLite; # git description: 6868f8c
 
 # See POD at end of file for documentation
 
@@ -12,10 +12,7 @@ use Params::Util 1.00 ();
 use DBI         1.607 ();
 use DBD::SQLite  1.27 ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.98';
-}
+our $VERSION = '1.99';
 
 # Support for the 'prune' option
 my @PRUNE = ();
@@ -1109,7 +1106,7 @@ The C<cleanup> option should be a single literal SQL statement.
 If provided, this statement will be automatically run on the database
 during C<END>-time, after the last transaction has been completed.
 
-This will typically either by a full C<'VACUUM ANALYZE'> or the more
+This will typically either by a full C<'VACUUM; ANALYZE'> or the more
 simple C<'VACUUM'>.
 
 =head2 prune

@@ -7,7 +7,7 @@ package Rex::Service::Debian::systemd;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use Rex::Service::Redhat::systemd;
 use base qw(Rex::Service::Redhat::systemd);

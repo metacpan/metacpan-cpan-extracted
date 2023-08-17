@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_info/csv_info",
@@ -43,7 +43,7 @@ csv-info - Show information about CSV file (number of rows, fields, etc)
 
 =head1 VERSION
 
-This document describes version 1.024 of csv-info (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of csv-info (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 SYNOPSIS
 

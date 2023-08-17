@@ -37,4 +37,5 @@ t/encoding/copr-utf8.h
 t/exception/Bison/grammar.cxx
 t/exception/Cecill/tv_implementpoly.reference
 t/grant/Apache/one_helper.rb
+t/lib/Test2/Require/WorkingUtf8.pm
 t/reading.t

@@ -67,7 +67,8 @@ my $response = {
 	      'ExtensionObject_content_typeId' => {
 		'NodeId_identifier' => 0,
 		'NodeId_identifierType' => 0,
-		'NodeId_namespaceIndex' => 0
+		'NodeId_namespaceIndex' => 0,
+		'NodeId_print' => "i=0",
 	      },
 	      'ExtensionObject_content_body' => undef,
 	    },

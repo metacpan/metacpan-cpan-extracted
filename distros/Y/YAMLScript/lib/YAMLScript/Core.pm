@@ -1,33 +1,34 @@
 use strict; use warnings;
 package YAMLScript::Core;
 
-use Lingy::Namespace;
-use base 'Lingy::Namespace';
-use Lingy::Common;
+use File::Spec;
 
-use constant NAME => 'ys.core';
+use YAMLScript::Common;
 
-our %ns = (
-    fn('ends-with?'   => 2 => \&ends_with_q),
-    fn('read-file-ys' => 1 => \&read_file_ys),
-);
+sub dirname {
+    my ($file_path) = @_;
+    use File::Spec;
+    my(undef, $dirname, undef) = File::Spec->splitpath($file_path);
+    STRING->new($dirname);
+}
 
 sub ends_with_q {
     my ($str, $substr) = @_;
-    $str = $$str;
-    $substr = $$substr;
-    boolean(
-      length($str) >= length($substr) and
-      substr($str, 0-length($substr)) eq $substr
+    BOOLEAN->new(
+      length("$str") >= length("$substr") and
+      substr("$str", 0-length("$substr")) eq "$substr"
     );
 }
 
 sub read_file_ys {
     my ($file) = @_;
-    my $text = YAMLScript::RT->slurp($file);
-    my $reader = $YAMLScript::RT::reader;
-    my $ast = $reader->read_ys($text, $file);
-    return $ast;
+    my $text = RT->slurp_file($file);
+    RT->reader->read_ys($text, $file);
+}
+
+sub read_string_ys {
+    my ($string) = @_;
+    RT->reader->read_ys($string, undef);
 }
 
 1;

@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+# Generate and play a chord progression that changes keys every four
+# measures, based on the final phrase pivot chord.
+#
+# Write-up: https://ology.github.io/2023/06/05/querying-a-music-theory-database/
+
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression Music-ModalFunction);
+use MIDI::Util qw(setup_score midi_format);
+use Music::Chord::Progression ();
+use Music::ModalFunction ();
+
+my $pitch   = shift || 'C';
+my $scale   = shift || 'ionian';
+my $phrases = shift || 4;
+
+my $score = setup_score();
+
+for my $i (1 .. $phrases) {
+    my $prog = Music::Chord::Progression->new(
+        scale_note => $pitch,
+        scale_name => $scale,
+        max        => 4,
+        flat       => 1,
+        resolve    => 0,
+        verbose    => 1,
+    );
+    my $chords = $prog->generate;
+
+    # add the chords to the score
+    for my $chord (@$chords) {
+        $score->n('wn', midi_format(@$chord));
+    }
+
+    # remember the last pitch and scale
+    my $last_pitch = $pitch;
+    my $last_scale = $scale;
+    # get the chord quality and pitch of the final chord of the phrase
+    my $chord = $prog->phrase->[-1] =~ /dim/ ? 'dim'
+              : $prog->phrase->[-1] =~ /m/   ? 'min' : 'maj';
+    (my $modal_pitch = $prog->phrase->[-1]) =~ s/^([A-G][b#]?).*?$/$1/;
+    # convert accidentals to midi format
+    $modal_pitch =~ s/#/s/;
+    $modal_pitch =~ s/b/f/;
+
+    # make a modal query object with the current chord and mode
+    my $m = Music::ModalFunction->new(
+        chord_note => lc($modal_pitch),
+        chord      => $chord,
+        mode_note  => $last_pitch,
+        mode       => $last_scale,
+    );
+    my $results = $m->pivot_chord_keys;
+    last unless @$results;
+    # select a random member of the query results
+    my $result = $results->[ int rand @$results ];
+    # get the result pitch
+    $pitch = substr $result->[7], 0, 1;
+    # get the result accidental
+    (my $accidental = $result->[7]) =~ s/^[a-g]([fs]?)/$1/;
+    # convert from midi format back to #/b format
+    $accidental = '#' if $accidental eq 's';
+    $accidental = 'b' if $accidental eq 'f';
+    # redefine the pitch with the accidental appended
+    $pitch = uc($pitch) . $accidental;
+    # get the scale from the result
+    $scale = $result->[8];
+}
+
+$score->write_score("$0.mid");

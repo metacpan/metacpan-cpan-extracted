@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::plot::pswigp;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

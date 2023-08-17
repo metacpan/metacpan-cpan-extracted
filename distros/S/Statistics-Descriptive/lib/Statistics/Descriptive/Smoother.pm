@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Smoother;
-$Statistics::Descriptive::Smoother::VERSION = '3.0800';
+$Statistics::Descriptive::Smoother::VERSION = '3.0801';
 use strict;
 use warnings;
 
@@ -73,7 +73,7 @@ Statistics::Descriptive::Smoother - Base module for smoothing statistical data
 
 =head1 VERSION
 
-version 3.0800
+version 3.0801
 
 =head1 SYNOPSIS
 

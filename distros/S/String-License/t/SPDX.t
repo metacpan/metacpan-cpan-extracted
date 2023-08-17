@@ -1,3 +1,7 @@
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
@@ -39,18 +43,19 @@ my %Debian2SPDX = (
 
 my $naming = String::License::Naming::SPDX->new;
 
-sub scanner
+sub scanner ( $path, $state )
 {
-	my $expected = $_->basename('.txt');
-	my $string   = $_->slurp_utf8;
-	$string = uncruft($string)
+	my ( $expected, $string, $license, $todo );
+
+	$expected = $path->basename('.txt');
+	$string   = $path->slurp_utf8;
+	$string   = uncruft($string)
 		if exists $crufty{$expected};
 
-	my $license = String::License->new(
+	$license = String::License->new(
 		string => $string,
 		naming => $naming,
 	)->as_text;
-	my $todo;
 
 	is $Debian2SPDX{$license} || $license, $expected, "Corpus file $_";
 }

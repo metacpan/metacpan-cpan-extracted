@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Head::ListGroup;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message::Head::FieldGroup';
 
@@ -28,9 +28,8 @@ sub init($$)
     {   require Mail::Message::Field::Address;
         my $mi   = Mail::Message::Field::Address->coerce($address);
 
-        $self->log(ERROR =>
-                "Cannot convert \"$address\" into an address object"), return
-            unless defined $mi;
+        defined $mi
+            or $self->log(ERROR => "Cannot convert \"$address\" into an address object"), return;
 
         $address = $mi;
     }

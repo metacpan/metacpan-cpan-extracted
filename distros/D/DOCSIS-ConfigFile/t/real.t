@@ -24,18 +24,18 @@ mkdir 't/data' unless (-d 't/data/');
 my $dc = DOCSIS::ConfigFile->new(advanced_output => 0, shared_secret => '');
 my ($data_bin, $data_config, $new_bin);
 
-ok($data_bin = generate_binary(), 'DATA is read');
+ok($data_bin = generate_binary(),       'DATA is read');
 ok(data_to_file($data_bin, 'data.bin'), 'DATA written to data.bin');
-is(docsis('data.bin'), 0, 'docsis decoded data.bin => data.c');
+is(docsis('data.bin'),  0, 'docsis decoded data.bin => data.c');
 is(hexdump('data.bin'), 0, 'data.bin dumped as data.hex') if HEXDUMP;
 ok($data_config = $dc->decode(\$data_bin), 'DC decoded DATA');
 data_to_file($data_config, 'data.json');
 ok($new_bin = $dc->encode($data_config), 'DC encodede DATA back');
-ok(data_to_file($new_bin, 'new.bin'), 'encoded DATA stored to new.bin');
+ok(data_to_file($new_bin, 'new.bin'),    'encoded DATA stored to new.bin');
 is(hexdump('new.bin'), 0, 'new.bin dumped as new.hex') if HEXDUMP;
 
 if (is(docsis('new.bin'), 0, 'docsis decoded new.bin => new.c')) {
-  is(qx{diff -u t/data/data.c t/data/new.c}, '', 'no diff from docsis decoded output');
+  is(qx{diff -u t/data/data.c t/data/new.c},     '', 'no diff from docsis decoded output');
   is(qx{diff -u t/data/data.hex t/data/new.hex}, '', 'no diff from hexdump output') if HEXDUMP;
 }
 else {

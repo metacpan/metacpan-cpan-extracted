@@ -3,10 +3,11 @@ package Test::Tk;
 
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '3.01';
 
 use Config;
 use Test::More;
+use Test::Deep;
 use Tk;
 
 use Exporter;
@@ -51,12 +52,10 @@ sub dotests {
 		for (@tests) {
 			my ($call, $expected, $comment) = @$_;
 			my $result = &$call;
-			if ($expected =~ /^ARRAY/) {
-				ok(listcompare($expected, $result), $comment)
-			} elsif ($expected =~ /^HASH/) {
-				ok(hashcompare($expected, $result), $comment)
-			} else {
+			if (ref $expected =~ /^SCALAR/) {
 				ok(($expected eq $result), $comment)
+			} else {
+				cmp_deeply($expected, $result, $comment); 
 			}
 		}
 		$app->after(5, sub { $app->destroy }) unless $show
@@ -65,6 +64,7 @@ sub dotests {
 
 sub hashcompare {
 	my ($h1, $h2) = @_;
+	warn "Depricated 'hashcompare', use Test::Deep";
 	my @l1 = sort keys %$h1;
 	my @l2 = sort keys %$h2;
 	return 0 unless listcompare(\@l1, \@l2);
@@ -85,7 +85,7 @@ sub hashcompare {
 }
 
 sub listcompare {
-	my ($l1, $l2) = @_;
+	my ($l1, $l2) = @_;;
 	my $size1 = @$l1;
 	my $size2 = @$l2;
 	if ($size1 ne $size2) { return 0 }
@@ -115,7 +115,6 @@ sub starttesting {
 			skip 'No XServer running for this user', $size;
 		}
 	}
-
 }
 
 1;
@@ -149,12 +148,12 @@ Test::Tk - Testing Tk widgets.
 
 =head1 DESCRIPTION
 
-This module aims to assist in the testing of Perl/T kwidgets.
+This module aims to assist in the testing of Perl/Tk widgets.
 
 B<createapp> creates a MainWindow widget and places it in the variable B<$app>.
 It sets a timer with delay B<$delay> to start the internal test routine.
 
-b<starttesting> launches the main loop and sets a timer with delay B<$delay> to start the internal test routine.
+B<starttesting> launches the main loop and sets a timer with delay B<$delay> to start the internal test routine.
 
 When testing is done the MainWindow is destroyed and the test script continues.
 
@@ -221,15 +220,11 @@ Places the object in B>$app>.
 
 =item B<hashcompare>I<(\%hash1, \%hash2)>
 
-Returns true of both hashes have an identical set of keys and all values are equal.
-If a value is a reference to a list it will call B<listcompare>.
-If a value is a reference to a hash it will call B<hashcompare>.
+Depricated 'hashcompare', use Test::Deep
 
 =item B<listcompare>I<(\@list1, \@list2)>
 
-Returns true of both lists have are of equal size and content.
-If a list element is a reference to a list it will call B<listcompare>.
-If a list element is a reference to a hash it will call B<hashcompare>.
+Depricated 'hashcompare', use Test::Deep
 
 =item B<starttesting>
 
@@ -241,6 +236,7 @@ the internal test routine.
 =head1 SEE ALSO
 
 L<Test::More>
+L<Test::Deep>
 
 =head1 AUTHOR
 

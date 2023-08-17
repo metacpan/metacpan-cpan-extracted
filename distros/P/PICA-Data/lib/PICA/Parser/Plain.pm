@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -49,15 +49,13 @@ sub _next_record {
             $occ  = $3;
             $data = $4;
         }
+        elsif ($self->{strict}) {
+            croak "ERROR: invalid PICA field structure \"$field\"";
+        }
         else {
-            if ($self->{strict}) {
-                croak " ERROR : no valid PICA field structure \"$field\"";
-            }
-            else {
-                carp
-                    "WARNING: no valid PICA field structure \"$field\". Skipped field";
-                next
-            }
+            carp
+                "WARNING: invalid PICA field structure \"$field\". Skipped field";
+            next;
         }
 
         if (!$self->{strict} && $data =~ /^ƒ/) {
@@ -83,7 +81,7 @@ sub _next_record {
                     }
                     else {
                         $tokens[-1] .= $code;
-                        $code = substr $value, 0, 1;
+                        $code  = substr $value, 0, 1;
                         $value = substr $value, 1;
                     }
                 }

@@ -1,8 +1,6 @@
 use strict; use warnings;
 package assign::Struct;
 
-use assign::Types;
-
 use XXX;
 
 sub new {
@@ -83,7 +81,7 @@ sub get_var {
             if ref($d) eq 'PPI::Token::Symbol' and
                 $def !~ /^\$\w+$/;
     }
-    var->new($var, $def);
+    assign::var->new($var, $def);
 }
 
 1;

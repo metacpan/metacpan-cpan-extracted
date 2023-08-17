@@ -3,13 +3,12 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Style 0.54;
+package Tickit::Style 0.55;
 
-use strict;
 use warnings;
-use 5.010;
 use experimental 'postderef';
 
 use Carp;

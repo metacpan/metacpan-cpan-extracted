@@ -135,7 +135,7 @@ SKIP: {
             );
 
             # Decrypt using XML::Enc
-            ok($decrypter->decrypt($encrypted) =~ /1076 2478 0678 5589/,
+            like($decrypter->decrypt($encrypted), qr/1076 2478 0678 5589/,
                     "Decrypted xmlsec1 $dm $km Element");
 
             # Test Encrypted Content
@@ -152,7 +152,7 @@ SKIP: {
             unlink 'encrypted-content.xml';
 
             # Decrypt using XML::Enc
-            ok($decrypter->decrypt($encrypted) =~ /1076 2478 0678 5589/,
+            like($decrypter->decrypt($encrypted), qr/1076 2478 0678 5589/,
                     "Decrypted $dm $km xmlsec1 Content");
         }
     }

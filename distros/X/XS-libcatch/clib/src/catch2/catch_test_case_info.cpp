@@ -1,15 +1,14 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
 #include <catch2/catch_test_case_info.hpp>
 #include <catch2/internal/catch_enforce.hpp>
-#include <catch2/catch_test_spec.hpp>
-#include <catch2/interfaces/catch_interfaces_testcase.hpp>
 #include <catch2/internal/catch_string_manip.hpp>
+#include <catch2/internal/catch_case_insensitive_comparisons.hpp>
 
 #include <cassert>
 #include <cctype>
@@ -59,7 +58,7 @@ namespace Catch {
             else if( tag == "!nonportable"_sr )
                 return TestCaseProperties::NonPortable;
             else if( tag == "!benchmark"_sr )
-                return static_cast<TestCaseProperties>(TestCaseProperties::Benchmark | TestCaseProperties::IsHidden );
+                return TestCaseProperties::Benchmark | TestCaseProperties::IsHidden;
             else
                 return TestCaseProperties::None;
         }
@@ -103,8 +102,13 @@ namespace Catch {
         }
     } // end unnamed namespace
 
-    bool operator<( Tag const& lhs, Tag const& rhs ) {
-        return lhs.original < rhs.original;
+    bool operator<(  Tag const& lhs, Tag const& rhs ) {
+        Detail::CaseInsensitiveLess cmp;
+        return cmp( lhs.original, rhs.original );
+    }
+    bool operator==( Tag const& lhs, Tag const& rhs ) {
+        Detail::CaseInsensitiveEqualTo cmp;
+        return cmp( lhs.original, rhs.original );
     }
 
     Detail::unique_ptr<TestCaseInfo>
@@ -126,7 +130,6 @@ namespace Catch {
         // (including optional hidden tag and filename tag)
         auto requiredSize = originalTags.size() + sizeOfExtraTags(_lineInfo.file);
         backingTags.reserve(requiredSize);
-        backingLCaseTags.reserve(requiredSize);
 
         // We cannot copy the tags directly, as we need to normalize
         // some tags, so that [.foo] is copied as [.][foo].
@@ -136,12 +139,20 @@ namespace Catch {
         for (size_t idx = 0; idx < originalTags.size(); ++idx) {
             auto c = originalTags[idx];
             if (c == '[') {
-                assert(!inTag);
+                CATCH_ENFORCE(
+                    !inTag,
+                    "Found '[' inside a tag while registering test case '"
+                        << _nameAndTags.name << "' at " << _lineInfo );
+
                 inTag = true;
                 tagStart = idx;
             }
             if (c == ']') {
-                assert(inTag);
+                CATCH_ENFORCE(
+                    inTag,
+                    "Found unmatched ']' while registering test case '"
+                        << _nameAndTags.name << "' at " << _lineInfo );
+
                 inTag = false;
                 tagEnd = idx;
                 assert(tagStart < tagEnd);
@@ -150,7 +161,11 @@ namespace Catch {
                 // it over to backing storage and actually reference the
                 // backing storage in the saved tags
                 StringRef tagStr = originalTags.substr(tagStart+1, tagEnd - tagStart - 1);
-                CATCH_ENFORCE(!tagStr.empty(), "Empty tags are not allowed");
+                CATCH_ENFORCE( !tagStr.empty(),
+                               "Found an empty tag while registering test case '"
+                                   << _nameAndTags.name << "' at "
+                                   << _lineInfo );
+
                 enforceNotReservedTag(tagStr, lineInfo);
                 properties |= parseSpecialTag(tagStr);
                 // When copying a tag to the backing storage, we need to
@@ -164,17 +179,20 @@ namespace Catch {
                 // the tags.
                 internalAppendTag(tagStr);
             }
-            (void)inTag; // Silence "set-but-unused" warning in release mode.
         }
+        CATCH_ENFORCE( !inTag,
+                       "Found an unclosed tag while registering test case '"
+                           << _nameAndTags.name << "' at " << _lineInfo );
+
+
         // Add [.] if relevant
         if (isHidden()) {
             internalAppendTag("."_sr);
         }
 
         // Sort and prepare tags
-        toLowerInPlace(backingLCaseTags);
-        std::sort(begin(tags), end(tags), [](Tag lhs, Tag rhs) { return lhs.lowerCased < rhs.lowerCased; });
-        tags.erase(std::unique(begin(tags), end(tags), [](Tag lhs, Tag rhs) {return lhs.lowerCased == rhs.lowerCased; }),
+        std::sort(begin(tags), end(tags));
+        tags.erase(std::unique(begin(tags), end(tags)),
                    end(tags));
     }
 
@@ -195,9 +213,6 @@ namespace Catch {
         std::string combined("#");
         combined += extractFilenamePart(lineInfo.file);
         internalAppendTag(combined);
-        // TBD: Running this over all tags again is inefficient, but
-        //      simple enough. In practice, the overhead is small enough.
-        toLowerInPlace(backingLCaseTags);
     }
 
     std::string TestCaseInfo::tagsAsString() const {
@@ -223,13 +238,7 @@ namespace Catch {
         backingTags += tagStr;
         const auto backingEnd = backingTags.size();
         backingTags += ']';
-        backingLCaseTags += '[';
-        // We append the tag to the lower-case backing storage as-is,
-        // because we will perform the lower casing later, in bulk
-        backingLCaseTags += tagStr;
-        backingLCaseTags += ']';
-        tags.emplace_back(StringRef(backingTags.c_str() + backingStart, backingEnd - backingStart),
-                          StringRef(backingLCaseTags.c_str() + backingStart, backingEnd - backingStart));
+        tags.emplace_back(StringRef(backingTags.c_str() + backingStart, backingEnd - backingStart));
     }
 
     bool operator<( TestCaseInfo const& lhs, TestCaseInfo const& rhs ) {

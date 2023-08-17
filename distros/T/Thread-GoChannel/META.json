@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,14 +14,9 @@
    },
    "name" : "Thread-GoChannel",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.4004"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004"
+            "Module::Build::Tiny" : "0.046"
          }
       },
       "develop" : {
@@ -48,7 +43,7 @@
    "provides" : {
       "Thread::GoChannel" : {
          "file" : "lib/Thread/GoChannel.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -63,9 +58,12 @@
          "web" : "https://github.com/Leont/thread-gochannel"
       }
    },
-   "version" : "0.001",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.003",
+   "x_contributors" : [
+      "Ed Sabol <esabol@users.noreply.github.com>"
+   ],
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

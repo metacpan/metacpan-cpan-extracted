@@ -4,7 +4,6 @@ use warnings;
 use Hustle::Table;
 use Test::More;
 
-plan  tests=>8;
 
 my $table=Hustle::Table->new;
 
@@ -21,6 +20,18 @@ $table->add({matcher=>qr/re(g)(e)x/, value=>sub {
 		ok $_[0] eq "regex", "regex match";
 		ok $_[1][0] eq "g", "regex capture ok";
 		ok $_[1][1] eq "e", "regex capture ok";
+	}}
+);
+
+$table->add({matcher=>qr/no(?:c)apture/, value=>sub { 
+		ok $_[0] eq "nocapture", "regex match, no capture";
+		ok $_[1]->@*==0, "zero captures"
+	}}
+);
+
+$table->add({matcher=>qr/nomatched(C)*apture/, value=>sub { 
+		ok $_[0] eq "nomatchedapture", "regex match, unmatched capture";
+		ok $_[1]->@*==0, "zero captures";
 	}}
 );
 
@@ -50,11 +61,15 @@ my @inputs=(
 		"match at the end",
 		1234,
 		"regex",
+    "nocapture",
+    "nomatchedapture",
 		"unmatched",
-		"sub"
+		"sub",
+
 );
 
 for(@inputs){
-	($entry,$capture)=$dispatcher->($_);
+	($entry, $capture)=$dispatcher->($_);
 	$entry->[1]($_, $capture);
 }
+done_testing;

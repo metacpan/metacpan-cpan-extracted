@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,10 +15,10 @@ name: Dist-Zilla-PERLSRVDE
 provides:
   Dist::Zilla::PERLSRVDE:
     file: lib/Dist/Zilla/PERLSRVDE.pm
-    version: v1.0.1
+    version: v1.1.1
   Dist::Zilla::PluginBundle::PERLSRVDE:
     file: lib/Dist/Zilla/PluginBundle/PERLSRVDE.pm
-    version: v1.0.1
+    version: v1.1.1
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::CheckChangesHasContent: '0'
@@ -31,7 +31,6 @@ requires:
   Dist::Zilla::Plugin::MetaResources: '0'
   Dist::Zilla::Plugin::NextRelease: '0'
   Dist::Zilla::Plugin::OurPkgVersion: '0'
-  Dist::Zilla::Plugin::PodCoverageTests: '0'
   Dist::Zilla::Plugin::PodSyntaxTests: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
   Dist::Zilla::Plugin::ReadmeAddDevInfo: '0'
@@ -40,6 +39,7 @@ requires:
   Dist::Zilla::Plugin::Test::NoBOM: '0'
   Dist::Zilla::Plugin::Test::NoTabs: '0'
   Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable: '0'
   Dist::Zilla::PluginBundle::Git: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
@@ -49,9 +49,11 @@ resources:
   bugtracker: https://github.com/perlservices/Dist-Zilla-PERLSRVDE/issues
   homepage: https://github.com/perlservices/Dist-Zilla-PERLSRVDE
   repository: git://github.com/perlservices/Dist-Zilla-PERLSRVDE.git
-version: 1.0.1
+version: 1.1.1
 x_contributors:
+  - 'Gabor Szabo <gabor@szabgab.com>'
   - 'Håkon Hægland <hakon.hagland@gmail.com>'
   - 'reneeb <info@perl-services.de>'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

@@ -15,7 +15,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Record;
-$WebFetch::Data::Record::VERSION = '0.15.5';
+$WebFetch::Data::Record::VERSION = '0.15.9';
 use strict;
 use warnings;
 use base qw( WebFetch );
@@ -172,7 +172,7 @@ WebFetch::Data::Record - WebFetch Embedding API data record
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

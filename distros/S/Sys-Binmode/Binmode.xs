@@ -27,7 +27,7 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
 
 #define DOWNGRADE_SVPV(sv) if (SvPOK(sv) && SvUTF8(sv)) sv_utf8_downgrade(sv, FALSE)
 
-static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
+PERL_STATIC_INLINE void MY_DOWNGRADE(pTHX_ SV** svp) {
     if (UNLIKELY(SvGAMAGIC(*svp))) {
 
         /* If the parameter in question is magical/overloaded

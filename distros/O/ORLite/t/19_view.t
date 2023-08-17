@@ -11,7 +11,8 @@ BEGIN {
 
 use Test::More tests => 81;
 use File::Spec::Functions ':ALL';
-use t::lib::Test;
+use lib 't/lib';
+use LocalTest;
 
 # Set up again
 my $file = test_db();

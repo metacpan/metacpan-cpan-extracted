@@ -82,7 +82,7 @@ has output_file_name =>
 	required => 0,
 );
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 # ------------------------------------------------
 
@@ -1143,6 +1143,10 @@ Without this pragma, data/utf8.01.svg gives you the dread 'Wide character in pri
 
 The pragma is not in the module because it's global, and the end user's program may not want it at all.
 
+In scripts/tests.real.data.t change the call to Path::Tiny.spew() to spew_utf8() so UTF8 in the log is written
+in raw mode. Now the test file logs created under Debian and shipped can be safely compared with the logs written
+when the code is tested under MS Windows.
+
 Lastly, I have unilaterally set the utf8 attribute used by L<Log::Handler>. This is harmless for non-utf-8 file,
 and is vital for data/utf8.01.svg and similar end-user files. It allows the log output (STDOUT) to be redirected.
 And indeed, this is what some of the tests do.
@@ -1209,7 +1213,7 @@ L<MarpaX::Languages::SVG::Parser> was written by Ron Savage I<E<lt>ron@savage.ne
 
 Home page: L<http://savage.net.au/>.
 
-=head1 Copyright
+=head1 Copyright and Licence
 
 Australian copyright (c) 2013, Ron Savage.
 

@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorkbookNameValueRequest.name :   ,
-# GetWorkbookNameValueRequest.nameName :   ,
-# GetWorkbookNameValueRequest.folder :   ,
-# GetWorkbookNameValueRequest.storageName :    
+# GetWorkbookNameValueRequest.name : The workbook name.  ,
+# GetWorkbookNameValueRequest.nameName : the Aspose.Cells.Name element name.  ,
+# GetWorkbookNameValueRequest.folder : Original workbook folder.  ,
+# GetWorkbookNameValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_name_value' } = { 
-    	summary => '',
+    	summary => 'Gets workbook`s name value.',
         params => $params,
         returns => 'RangeValueResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'name_name' => {
      	datatype => 'string',
      	base_name => 'nameName',
-     	description => '',
+     	description => 'the Aspose.Cells.Name element name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

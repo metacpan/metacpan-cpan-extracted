@@ -118,4 +118,23 @@ use Object::Pad ':experimental(adjust_params)';
       'Named param expressions are evaluated in order' );
 }
 
+# out-of-block control flow emits warnings
+{
+   my $warnings;
+   BEGIN { $SIG{__WARN__} = sub { $warnings .= $_[0] }; }
+
+   my $WARNLINE;
+
+   class ReturnFromAdjust {
+      $WARNLINE = __LINE__+1;
+      ADJUST { return; }
+   }
+
+   BEGIN { undef $SIG{__WARN__} }
+
+   like( $warnings,
+      qr/^Using return to leave an ADJUST block is discouraged and will be removed in a later version at \S+ line $WARNLINE\./,
+      'return from ADJUST emits warning' );
+}
+
 done_testing;

@@ -1,13 +1,13 @@
 package Perl::Metrics::Simple::Output::PlainText;
 
-our $VERSION = 'v1.0.1';
-
 use strict;
 use warnings;
 
 use parent qw(Perl::Metrics::Simple::Output);
 
 use Readonly 1.03;
+
+our $VERSION = 'v1.0.3';
 
 Readonly my $MAX_PLAINTEXT_LABEL_LENGTH => 25;
 Readonly my $EMPTY_STRING               => q{};
@@ -126,7 +126,7 @@ sub make_list_of_subs {
     $list_of_subs .= _make_column( 'size',       $column_widths->{lines} );
     $list_of_subs .= "\n";
 
-    foreach my $sub (@$sorted_all_subs) {
+    foreach my $sub (@{$sorted_all_subs}) {
         $list_of_subs .= _make_list_of_subs_line( $sub, $column_widths );
     }
 
@@ -160,7 +160,7 @@ sub _get_column_widths {
         lines             => 4,
     };
 
-    foreach my $sub (@$main_from_each_file) {
+    foreach my $sub (@{$main_from_each_file}) {
         foreach my $col ( 'mccabe_complexity', 'name', 'path', 'lines' ) {
             if ( length( $sub->{$col} ) > $column_widths->{$col} ) {
                 $column_widths->{$col} = length( $sub->{$col} );

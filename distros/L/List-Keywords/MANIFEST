@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/op_sibling_splice.c.inc

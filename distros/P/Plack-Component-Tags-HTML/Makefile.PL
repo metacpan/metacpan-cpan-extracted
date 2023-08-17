@@ -31,12 +31,16 @@ requires 'Tags::Output::Raw' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-Component-Tags-HTML';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'HTTP::Request::Common' => 0;
 test_requires 'Plack::Test' => 0;
+test_requires 'Tags::Output::Raw' => 0;
+test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.13';
+version '0.15';
 
 # Run.
 WriteAll();

@@ -1,14 +1,7 @@
-#!/usr/bin/perl
-use strictures 2;
 use Termbox qw[:all];
-use experimental 'signatures';
-
-# Based on http://electronictoofree.blogspot.com/2018/03/text-based-user-interface-termbox.html
+#
 my @chars = split //, 'hello, world!';
 my $code  = tb_init();
-die sprintf "termbox init failed, code: %d\n", $code if $code;
-tb_select_input_mode(TB_INPUT_ESC);
-tb_select_output_mode(TB_OUTPUT_NORMAL);
 tb_clear();
 my @rows = (
     [ TB_WHITE,   TB_BLACK ],
@@ -18,20 +11,11 @@ my @rows = (
     [ TB_YELLOW,  TB_BLUE ],
     [ TB_MAGENTA, TB_CYAN ]
 );
-
-for my $colors ( 0 .. $#rows ) {
-    my $j = 0;
-    for my $char (@chars) {
-        tb_change_cell( $j, $colors, $char, @{ $rows[$colors] } );
-        $j++;
+for my $row ( 0 .. $#rows ) {
+    for my $col ( 0 .. $#chars ) {
+        tb_set_cell( $col, $row, $chars[$col], @{ $rows[$row] } );
     }
 }
 tb_present();
-while (1) {
-    my $ev = Termbox::Event->new();
-    tb_poll_event($ev);
-    if ( $ev->key == TB_KEY_ESC ) {
-        tb_shutdown();
-        exit 0;
-    }
-}
+sleep 3;
+tb_shutdown();

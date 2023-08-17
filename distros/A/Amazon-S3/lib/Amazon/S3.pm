@@ -51,7 +51,7 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '0.63'; ## no critic (RequireInterpolation)
+our $VERSION = '0.64'; ## no critic (RequireInterpolation)
 
 ########################################################################
 sub new {
@@ -1561,7 +1561,7 @@ managing Amazon S3 buckets and keys.
 
 =head1 DESCRIPTION
 
-This documentation refers to version 0.63.
+This documentation refers to version 0.64.
 
 C<Amazon::S3> provides a portable client interface to Amazon Simple
 Storage System (S3).

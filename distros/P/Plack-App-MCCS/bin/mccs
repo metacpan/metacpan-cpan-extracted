@@ -1,73 +1,414 @@
 #!/usr/bin/env perl
 
-use warnings;
-use strict;
+# ABSTRACT: Fully-featured static file server.
 
-use Getopt::Long;
+use v5.36;
+
+our $VERSION = "2.002000";
+$VERSION = eval $VERSION;
+
+use if $ENV{MCCS_DEVELOPMENT}, "lib", "lib/";
+
+use Getopt::Long qw(:config no_ignore_case no_auto_abbrev pass_through);
 use Plack::App::MCCS;
 use Plack::Runner;
+use Pod::Usage;
 
-my $defaults = {};
-
-# first, parse our own options
-Getopt::Long::Configure qw/no_ignore_case no_auto_abbrev pass_through/;
-Getopt::Long::GetOptions(
-	'no-minify'		=> \$defaults->{no_minify},
-	'no-compress'	=> \$defaults->{no_compress},
-	'no-etag'		=> \$defaults->{no_etag}
+my $man  = 0;
+my $help = 0;
+my %opts = (
+    minify   => 1,
+    compress => 1,
+    etag     => 1,
 );
+
+GetOptions(
+    'help|h'      => \$help,
+    'man'         => \$man,
+    'minify!'     => \$opts{minify},
+    'compress!'   => \$opts{compress},
+    'etag!'       => \$opts{etag},
+    'vhost-mode'  => \$opts{vhost_mode},
+    'ignore-file' => \$opts{ignore_file},
+) or pod2usage(2);
+
+if ($help) {
+    pod2usage(1);
+    exit 0;
+} elsif ($man) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+    exit 0;
+}
 
 # now let Plack::Runner parse plackup options
 my $runner = Plack::Runner->new();
 $runner->parse_options(@ARGV);
 
 # after this, the root directory should be in $runner->{argv}
-my $root = $runner->{argv}->[0] || './';
-print "Serving files from $root\n";
+if ( scalar @{ $runner->{argv} } > 0 ) {
+    $opts{root} = $runner->{argv}->[0];
+}
 
 # create the Plack::App::MCCS app and start running it
-my %options = ( root => $root );
-foreach (qw/minify compress etag/) {
-	$options{defaults}->{$_} = 0
-		if $defaults->{"no_$_"};
-}
-$runner->run(Plack::App::MCCS->new(%options)->to_app);
+$runner->run( Plack::App::MCCS->new(%opts)->to_app );
 
 __END__
 =head1 NAME
 
-mccs - start a static file server using Plack::App::MCCS
+mccs - Fully-featured static file server.
 
 =head1 SYNOPSIS
 
-	# on the command line
+    $ mccs [OPTS] [DIR]
 
-	# start serving current directory on port 5000
-	mccs
+    # serve current working directory over HTTP, port 5000
+    $ mccs
 
-	# start serving a directory on port 80 using Starman
-	mccs -s Starman --listen :80 /some/directory
-
-	# serve without minification, compression and etag creation
-	mccs --no-minify --no-compress --no-etag
+    # serve a directory on port 80 using Starman
+    $ mccs -s Starman --listen :80 /some/directory
 
 =head1 DESCRIPTION
 
-C<mccs> provides a quick and easy way to start serving files from a directory
-using L<Plack::App::MCCS>. It loads C<MCCS> with L<Plack::Runner>, so it works
-just like L<plackup> and accepts all options C<plackup> accepts. Use whatever
-Plack handler you like.
+C<mccs> is an HTTP static file server that can be used as a standalone
+application, or as a L<Plack> component.
 
-Just like C<MCCS>, all options are turned on by default, so C<mccs> will attempt
-to minify and compress appropriate files, and create ETags. You can disable this
-with C<--no-minify>, C<--no-compress> and C<--no-etag>, respectively.
+=head2 FEATURES
+
+=over
+
+=item * Automatic, durable compression of files based on client support.
+
+=item * Automatic minification of CSS and JavaScript files.
+
+=item * Content negotiation including proper setting and handling of
+cache-related headers.
+
+=item * Optional virtual-hosts mode for serving multiple websites.
+
+=item * Flexible deployment with support for various HTTP servers, FastCGI
+servers, UNIX domain sockets, and more.
+
+=back
+
+C<mccs> aims for reducing CPU load by retaining minified and compressed
+representations of files until they are no longer valid. It does not recompress
+on every request.
+
+For information on how to use C<mccs> as a library or embedded in L<Plack>
+applications, see L<Plack::App::MCCS> and L<Plack::Middleware::MCCS>.
+
+=head1 ARGUMENTS
+
+DIR
+
+    The directory to serve files from. Defaults to the current working
+    directory.
+
+=head1 OPTIONS
+
+=over
+
+=item --minify/--nominify
+
+Whether to minify CSS/JS files automatically. By default, C<--minify> is on.
+
+=item --compress/--nocompress
+
+Whether to compress files automatically. By default, C<--compress> is on.
+
+=item --etag/--noetag
+
+Whether to calculate ETag values for files and support C<If-None-Match> headers.
+By default, C<--etag> is on.
+
+=item --vhost-mode
+
+Enables virtual hosts mode, which allows serving multiple websites based on the
+HTTP Host header (HTTP/1.0 requests will not be supported in this mode). When
+enabled, the directory being served must contain subdirectories named after
+each host/domain to be served.
+
+=item --ignore-file
+
+Accepts a path to a file in the L<Gitignore|https://git-scm.com/docs/gitignore>
+format. Any request that matches a rule in this file will result in a 404 Not
+Found response. Defaults to .mccsignore in the root directory. In vhost mode,
+every host can have its own ignore file, and there can also one global file for
+all hosts. Both the host-specific file and the global file will be used if they
+exist.
+
+=item -s, --server, the C<PLACK_SERVER> environment variable
+
+Selects a specific server implementation to run on. When provided, the C<-s> or
+C<--server> flag will be preferred over the environment variable.
+
+If no option is given, C<mccs> will try to detect the I<best> server
+implementation based on the environment variables as well as modules loaded by
+your application in C<%INC>. See L<Plack::Loader> for details.
+
+=item -S, --socket
+
+Listens on a UNIX domain socket path. Defaults to undef. This option is only
+valid for servers which support UNIX sockets.
+
+=item -l, --listen
+
+Listens on one or more addresses, whether "HOST:PORT", ":PORT", or "PATH"
+(without colons). You may use this option multiple times to listen on multiple
+addresses, but the server will decide whether it supports multiple interfaces.
+
+=item -D, --daemonize
+
+Makes the process run in the background. It's up to the backend server/handler
+implementation whether this option is respected or not.
+
+=item --access-log
+
+Specifies the pathname of a file where the access log should be written.  By
+default, in the development environment access logs will go to STDERR.
+
+=back
+
+Note that C<mccs> is an extension of L<plackup>, and accepts all the flags
+and options supported by it, but not all make sense in the context of C<mccs>
+usage. It is recommended to use an HTTP server such as L<Twiggy> or L<Starman>
+in a production setting. Other options that starts with "--" are passed through
+to the backend server. See each L<Plack::Handler> backend's documentation for
+more details on their available options.
+
+=head1 HOW DOES IT WORK?
+
+When a request is accepted by the server, the following process is initiated:
+
+=over
+
+=item 1. Discovery:
+
+C<mccs> attempts to find the requested path in the root directory. If the
+path is not found, C<404 Not Found> is returned. If the path exists but
+is a directory, C<403 Forbidden> is returned (directory listings are currently
+not supported).
+
+=item 2. Examination:
+
+C<mccs> will try to find the content type of the file, either by its extension
+(relying on L<Plack::MIME> for that), or by a specific setting provided
+to the app by the user (will take precedence). If not found (or file has
+no extension), C<text/plain> is assumed (which means you should give your
+files proper extensions if possible).
+
+C<mccs> will also determine for how long to allow clients (whether browsers,
+proxy caches, etc.) to cache the file. By default, it will set a representation
+as valid for 86400 seconds (i.e. one day). However, this can be changed either
+by setting a different global validity interval, or by setting a specific value
+for certain file types.
+
+By default, C<mccs> also sets the C<public> option for the C<Cache-Control>
+header, meaning caches are allowed to save responses even when authentication is
+performed. You can change that the same way.
+
+=item 3. Minification
+
+If the content type is C<text/css> or C<application/javascript>, C<mccs> will
+try to find a pre-minified version of it on disk. If found, and the version is
+younger than the original file, then it will be marked for serving. Otherwise,
+if L<CSS::Minifier::XS> or L<JavaScript::Minifier:XS> are installed, C<mccs>
+will minify the file, save the minified version to disk, and mark it as the
+version to serve. Future requests to the same file will see the minified version
+and not minify again.
+
+C<mccs> searches for files that end with C<.min.css> and C<.min.js>, and that's
+how it creates them too. If a request comes to C<style.css>, for example, then
+C<mccs> will look for C<style.min.css>, possibly creating it if not found or
+stale. The request path remains the same (C<style.css>) though, even internally.
+If a request comes to C<style.min.css> (which you don't really want when
+using C<mccs>), the app will not attempt to minify it again (so you won't
+get things like C<style.min.min.css>).
+
+If C<min_cache_dir> is specified, it will do all its searching and storing of
+generated minified files within C<$root>/C<$min_cache_dir> and ignore minified
+files outside that directory.
+
+=item 4. Compression
+
+If the client supports compressed responses (via the gzip, deflate or
+zstd algorithms), as noted by the C<Accept-Encoding> header, C<mccs> will try to
+find a precompressed version of the file on disk. If found, and is not stale,
+this version is marked for serving. Otherwise, if the appropriate compression
+module is installed, C<mccs> will compress the file, save the compressed version
+to disk, and mark it as the version to serve. Future requests to the same file
+will see the compressed version and not compress again.
+
+C<mccs> searches for files that end with the appropriate extension for the
+algorithm (i.e. C<.gz>, C<.zip>, C<.zstd>), and that's how it creates them too.
+If a request comes to C<style.css> from a client that prefers gzip responses,
+for example, and the file was minified in the previous step, C<mccs> will look
+for C<style.min.css.gz>, possibly creating it if not found. The request path
+remains the same (C<style.css>) though, even internally.
+
+C<mccs> honors weight values supplied in the C<Accept-Encoding> header, and will
+serve using the highest-weighted algorithm it supports.
+
+=item 5. Cache Validation
+
+If the client provided the C<If-Modified-Since> header, C<mccs> will determine
+if the file we're serving has been modified after the supplied date, and return
+C<304 Not Modified> immediately if not.
+
+If file doesn't have the 'no-store' cache control option, and the client
+provided the C<If-None-Match> header, C<mccs> will look for a file that has the
+the same name as the file we're going to serve, plus an C<.etag> suffix, such
+as C<style.min.css.gz.etag>, for example. If found, and not stale, the content
+of this file is read and compared with the provided ETag. If the two values are
+equal, C<mccs> will immediately return C<304 Not Modified>.
+
+=item 6. ETagging
+
+If an C<.etag> file wasn't found in the previous step, and the file we're
+serving doesn't have the 'no-store' cache control option, C<mccs> will create
+one from the file's inode, last modification date and size. Future requests
+to the same file will see this ETag file, so it is not created again.
+
+=item 7. Headers and Cache-Control
+
+C<mccs> now sets headers, especially cache control headers, as appropriate:
+
+=over
+
+=item * C<Content-Encoding> is set to the compression algorithm used, if any.
+
+=item * C<Content-Length> is set with the size of the file in bytes.
+
+=item * C<Content-Type> is set with the MIME type of the file (if a text file,
+the character string is appended, e.g. C<text/css; charset=UTF-8>).
+
+=item * C<Last-Modified> is set with the last modification date of the file in
+HTTP date format.
+
+=item * C<Expires> is set with the date on which cached versions should expire,
+as determined in stage 2, in HTTP date format.
+
+=item * C<Cache-Control> is set with the number of seconds the representation is
+valid for (unless caching of the file is not allowed) and other options, as
+determined in stage 2.
+
+=item * C<Etag> is set with the ETag value (if exists).
+
+=item * C<Vary> is set with C<Accept-Encoding>.
+
+=back
+
+=item 8. Serving
+
+The selected file is served to the client.
+
+=back
+
+=head1 CAVEATS AND THINGS TO CONSIDER
+
+=over
+
+=item * You can't tell C<mccs> not to minify/compress a specific file type, but
+only disable minification/compression altogether.
+
+=item * Directory listings are not supported.
+
+=item * Caching middlewares such as L<Plack::Middleware::Cache> and L<Plack::Middleware::Cached>
+don't rely on Cache-Control headers (or so I understand) for
+their expiration values, which makes them less useful for applications that
+rely on L<Plack::App::MCCS> or L<Plack::Middleware::MCCS>. You'll probably be
+better off with an external cache like L<Varnish|https://www.varnish-cache.org/>
+if you want a cache on your application server. Even without a server cache, your
+application should still appear faster for users due to browser caching (and
+also CPU load should be decreased).
+
+=item * C<Range> requests are not supported. See L<Plack::App::File::Range> if
+you need that.
+
+=item * The app is mounted on a directory and can't be set to only serve
+requests that match a certain regular expression. Use the
+L<middleware|Plack::Middleware::MCCS> for that.
+
+=back
+
+=head1 DIAGNOSTICS
+
+C<mccs> doesn't directly throw any exceptions, instead returning HTTP errors
+to the client and possibly issuing some C<warn>s. The following list should
+help you to determine some potential problems with C<MCCS>:
+
+=over
+
+=item C<< "Failed compressing %s with %s: %s" >>
+
+This warning is issued when C<mccs> fails to compress a file with a certain
+algorithm. When it happens, a compressed representation will not be returned.
+
+=item C<< "Can't open ETag file %s.etag for reading" >>
+
+This warning is issued when C<mccs> can't read an ETag file, probably because
+it does not have enough permissions. The request will still be fulfilled,
+but it won't have the C<ETag> header.
+
+=item C<< "Can't open ETag file %s.etag for writing" >>
+
+Same as before, but when C<mccs> can't write an ETag file.
+
+=item C<403 Forbidden> is returned for files that exist
+
+If a request for a certain file results in a C<403 Forbidden> error, it
+probably means C<mccs> has no read permissions for that file.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<mccs> requires no configuration files or environment variables.
+
+=head1 REQUIREMENTS
+
+C<mccs> B<requires> the following dependencies:
+
+=over
+
+=item * L<Perl 5.36+|https://www.perl.org/>
+
+=item * L<HTTP::Date>
+
+=item * L<Plack>
+
+=back
+
+C<mccs> will use the following CPAN modules if they exist:
+
+=over
+
+=item * L<CSS::Minifier::XS>
+
+=item * L<JavaScript::Minifier::XS>
+
+=item * L<IO::Compress::Zstd>
+
+=back
+
+The following CPAN modules are also recommended:
+
+=over
+
+=item * L<Twiggy> for an event-loop based HTTP server.
+
+=item * L<Starman> for a preforking HTTP server.
+
+=back
+
+=head1 INCOMPATIBILITIES WITH OTHER MODULES
+
+None reported.
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-Plack-App-MCCS@rt.cpan.org>, or through the web interface at
+Please report any bugs or feature requests to C<bug-Plack-App-MCCS@rt.cpan.org>,
+or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Plack-App-MCCS>.
 
 =head1 SEE ALSO
@@ -78,37 +419,25 @@ L<Plack::App::MCCS>, L<Plack::Middleware::MCCS>, L<Plack::Runner>, L<plackup>.
 
 Ido Perlmuter <ido@ido50.net>
 
+=head1 ACKNOWLEDGMENTS
+
+Some of this application's code is based on L<Plack::App::File> by Tatsuhiko
+Miyagawa and L<Plack::Middleware::ETag> by Franck Cuny.
+
+Christian Walde contributed new features and fixes for the 1.0.0 release.
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011-2016, Ido Perlmuter C<< ido@ido50.net >>.
+Copyright (c) 2011-2023, Ido Perlmuter C<< ido@ido50.net >>.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See L<perlartistic|perlartistic> 
-and L<perlgpl|perlgpl>.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

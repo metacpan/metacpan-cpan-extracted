@@ -3,18 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1506';
+our $VERSION = '0.1507';
 
 use Moo;
 use strictures 2;
-
 use List::Util qw(any);
 use Music::Chord::Note ();
 use Music::Chord::Positions ();
 use Music::Note ();
 use Music::Scales qw(get_scale_notes);
 use Music::ToRoman ();
-
 use namespace::clean;
 
 with('Music::PitchNum');
@@ -61,12 +59,12 @@ sub cadence {
 
     my $cadence = [];
 
-    my $key       = $args{key} || $self->key;
-    my $scale     = $args{scale} || $self->scale;
-    my $octave    = $args{octave} // $self->octave;
-    my $picardy   = $args{picardy} || $self->picardy;
-    my $type      = $args{type} || 'perfect';
-    my $leading   = $args{leading} || 1;
+    my $key       = $args{key}       || $self->key;
+    my $scale     = $args{scale}     || $self->scale;
+    my $octave    = $args{octave}    // $self->octave;
+    my $picardy   = $args{picardy}   || $self->picardy;
+    my $type      = $args{type}      || 'perfect';
+    my $leading   = $args{leading}   || 1;
     my $variation = $args{variation} || 1;
     my $inversion = $args{inversion} || 0;
 
@@ -304,7 +302,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1506
+version 0.1507
 
 =head1 SYNOPSIS
 
@@ -315,7 +313,7 @@ version 0.1506
   my $chords = $mc->cadence;
   # [G B D], [C E G C]
 
-  $mc = Music::Cadence->new( octave => 4 );
+  $mc = Music::Cadence->new(octave => 4);
 
   $chords = $mc->cadence;
   # [G4 B4 D4], [C4 E4 G4 C5]
@@ -350,15 +348,15 @@ version 0.1506
   $chords = $mc->cadence;
   # [Gs5 C5 Ds5], [Cs5 F5 Gs5 Cs6]
 
-  $mc = Music::Cadence->new( format => 'midinum' );
+  $mc = Music::Cadence->new(format => 'midinum');
 
-  $chords = $mc->cadence( octave => 4 );
+  $chords = $mc->cadence(octave => 4);
   # [67 71 62], [60 64 67 72]
 
-  $chords = $mc->cadence( octave => -1 );
+  $chords = $mc->cadence(octave => -1);
   # [7 11 2], [0 4 7 12] <- pitch-classes!
 
-  $mc = Music::Cadence->new( seven => 1 );
+  $mc = Music::Cadence->new(seven => 1);
 
   $chords = $mc->cadence;
   # [G B D F], [C E G A# C]
@@ -501,6 +499,8 @@ Supported cadences are:
   perfect
   plagal
 
+And "authentic" cadence is either perfect or imperfect.
+
 The B<variation> applies to the C<deceptive> and C<imperfect> cadences.
 
 If the B<type> is C<deceptive>, the B<variation> determines the final
@@ -602,13 +602,15 @@ L<https://en.wikipedia.org/wiki/Cadence>
 
 L<https://www.musictheoryacademy.com/how-to-read-sheet-music/cadences/>
 
+L<https://www.musictheory.net/lessons/55>
+
 =head1 AUTHOR
 
 Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2019-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

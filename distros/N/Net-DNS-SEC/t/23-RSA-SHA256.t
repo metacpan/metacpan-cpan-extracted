@@ -1,11 +1,12 @@
 #!/usr/bin/perl
-# $Id: 23-RSA-SHA256.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
+# $Id: 23-RSA-SHA256.t 1924 2023-05-17 13:56:25Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 use Test::More;
+use TestToolkit;
 
 my %prerequisite = (
 	'Net::DNS::SEC' => 1.15,
@@ -124,21 +125,13 @@ is( eval { $class->verify( $sigdata, $key, undef ) }, undef, 'verify fails if si
 
 
 # test detection of invalid private key descriptors
-eval { Net::DNS::SEC::Private->new('Kinvalid.private') };
-my ($exception1) = split /\n/, "$@\n";
-ok( $exception1, "invalid keyfile:	[$exception1]" );
+exception( 'invalid keyfile', sub { Net::DNS::SEC::Private->new('Kinvalid.private') } );
 
-eval { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') };
-my ($exception2) = split /\n/, "$@\n";
-ok( $exception2, "missing keyfile:	[$exception2]" );
+exception( 'missing keyfile', sub { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') } );
 
-eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
-my ($exception3) = split /\n/, "$@\n";
-ok( $exception3, "unspecified algorithm:	[$exception3]" );
+exception( 'unspecified algorithm', sub { Net::DNS::SEC::Private->new( signame => 'private' ) } );
 
-eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
-my ($exception4) = split /\n/, "$@\n";
-ok( $exception4, "unspecified signame:	[$exception4]" );
+exception( 'unspecified signame', sub { Net::DNS::SEC::Private->new( algorithm => 1 ) } );
 
 
 # exercise code for key with long exponent (not required for DNSSEC)

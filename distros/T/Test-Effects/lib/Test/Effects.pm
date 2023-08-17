@@ -1,15 +1,16 @@
 package Test::Effects;
 
 use warnings;
-no if $] >= 5.018, 'warnings', "experimental::smartmatch";
 use strict;
 use 5.014;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use Test::More;
 use Test::Trap;
 use base 'Test::Builder::Module';
+
+use match::smart 'match';
 
 # Export the modules interface (and that of Test::More)...
 our @EXPORT = (
@@ -61,16 +62,16 @@ sub _is_or_like {
     # Report problems as being in the appropriate place...
     local $Test::Builder::Level = $Test::Builder::Level + $LEVEL_OFFSET_NESTED;
 
-    given (ref $expected) {
-        when ('CODE')   {
+    for my $expected_type (ref $expected) {
+        if ($expected_type eq 'CODE')   {
             no warnings;
             my $ok = \&Test::Builder::ok;
             local *Test::Builder::ok = sub { $_[2] = $desc unless defined $_[2]; $ok->(@_); };
             ok($expected->($got, $desc), $desc);
         }
-        when ('Regexp')                     { &like(@_);   }
-        when (looks_like_number($expected)) { &is_num(@_); }
-        default                             { &is(@_);     }
+        elsif ($expected_type eq 'Regexp')   { &like(@_);   }
+        elsif (looks_like_number($expected)) { &is_num(@_); }
+        else                                 { &is(@_);     }
     }
 }
 
@@ -80,14 +81,16 @@ sub _is_deeply {
     # Report problems as being in the appropriate place...
     local $Test::Builder::Level = $Test::Builder::Level + $LEVEL_OFFSET_NESTED;
 
-    given (ref $expected) {
-        when ('CODE')   {
+    for my $expected_type (ref $expected) {
+        if ($expected_type eq 'CODE')   {
             no warnings;
             my $ok = \&Test::Builder::ok;
             local *Test::Builder::ok = sub { $_[2] = $desc unless defined $_[2]; $ok->(@_); };
             ok($expected->($got, $desc), $desc);
         }
-        default { &is_deeply(@_) }
+        else {
+            &is_deeply(@_);
+        }
     }
 }
 
@@ -97,23 +100,24 @@ sub _is_like_or_deeply {
     # Report problems as being in the appropriate place...
     local $Test::Builder::Level = $Test::Builder::Level + $LEVEL_OFFSET_NESTED;
 
-    given (ref $expected) {
-        when ('CODE')   {
+    for my $expected_type (ref $expected) {
+        if ($expected_type eq 'CODE')   {
             no warnings;
             my $ok = \&Test::Builder::ok;
             local *Test::Builder::ok = sub { $_[2] = $desc unless defined $_[2]; $ok->(@_); };
             ok($expected->($got, $desc), $desc);
         }
-        when ('Regexp') { my $got_val = ref($got) eq 'ARRAY' && @{$got} == 1
-                                        ? $got->[0]
-                                        : $got;
-                          like($got_val, $expected, $desc);
-                        }
-        when (q{}) {
+        elsif ($expected_type eq 'Regexp') {
+            my $got_val = ref($got) eq 'ARRAY' && @{$got} == 1 ? $got->[0] : $got;
+            like($got_val, $expected, $desc);
+        }
+        elsif ($expected_type eq q{}) {
             if (looks_like_number($expected)) { &is_num(@_) }
             else                              {     &is(@_) }
         }
-        default { &is_deeply(@_) }
+        else {
+            &is_deeply(@_);
+        }
     }
 }
 
@@ -123,26 +127,31 @@ sub _is_like_or_list {
     # Report problems as being in the appropriate place...
     local $Test::Builder::Level = $Test::Builder::Level + $LEVEL_OFFSET_NESTED;
 
-    given (ref $expected) {
-        when ('CODE')   {
+    for my $expected_type (ref $expected) {
+        if ($expected_type eq 'CODE')   {
             no warnings;
             my $ok = \&Test::Builder::ok;
             local *Test::Builder::ok = sub { $_[2] = $desc unless defined $_[2]; $ok->(@_); };
             ok($expected->($got, $desc), $desc);
         }
-        when ('Regexp') { my $got_val = ref($got) eq 'ARRAY' && @{$got} == 1
-                                        ? $got->[0]
-                                        : $got;
-                          like($got_val, $expected, $desc);
-                        }
-        when (q{} && looks_like_number($expected)) { &is_num(@_); }
-        when (q{})                                 { &is(@_);   }
-        when (q{ARRAY}) {
+        elsif ($expected_type eq 'Regexp') {
+            my $got_val = ref($got) eq 'ARRAY' && @{$got} == 1 ? $got->[0] : $got;
+            like($got_val, $expected, $desc);
+        }
+        elsif ($expected_type eq q{} && looks_like_number($expected)) {
+            &is_num(@_);
+        }
+        elsif ($expected_type eq q{}) {
+            &is(@_);
+        }
+        elsif ($expected_type eq q{ARRAY}) {
             for my $n (0..$#{$expected}) {
                 _is_or_like($got->[$n], $expected->[$n], "$desc [warning $n]");
             }
         }
-        default { &is_deeply(@_) }
+        else {
+            &is_deeply(@_);
+        }
     }
 }
 
@@ -290,7 +299,7 @@ sub effects_ok (&;+$) {
     # Correct common mispecifications...
     for my $option (keys %BAD_NULL_VALUE_FOR) {
         next if !exists $expected->{$option};
-        if ($expected->{$option} ~~ $BAD_NULL_VALUE_FOR{$option}) {
+        if (match( $expected->{$option}, $BAD_NULL_VALUE_FOR{$option} )) {
             $expected->{$option} = $NULL_VALUE_FOR{$option};
         }
     }
@@ -314,10 +323,10 @@ sub effects_ok (&;+$) {
 
     # Redirect test output, so we can retrospectively de-terse on errors...
     my $tests_output;
-    given (Test::Builder->new()) {
-        $_->output(\$tests_output);
-        $_->failure_output(\$tests_output);
-        $_->todo_output(\$tests_output);
+    for my $builder (Test::Builder->new()) {
+        $builder->output(\$tests_output);
+        $builder->failure_output(\$tests_output);
+        $builder->todo_output(\$tests_output);
     }
 
     # Preview description under terse too, in case of failures...
@@ -388,7 +397,7 @@ sub effects_ok (&;+$) {
             my ($self, $target) = @_;
 
             # If what you're looking for is WITHOUT'd, pretend to fail...
-            if ($target ~~ $without_list || "/$target" ~~ $without_list) {
+            if (match($target, $without_list) || match("/$target", $without_list)) {
                 _croak "Can't locate $target in \@INC (\@INC contains: @real_INC)";
             }
             return;
@@ -412,9 +421,13 @@ sub effects_ok (&;+$) {
 
         # Infer context, if necessary...
         if (exists $expected->{'return'}) {
-            given (ref $expected->{'return'}) {
-                when ('ARRAY') { $expected->{'list_return'}   = delete $expected->{'return'} }
-                default        { $expected->{'scalar_return'} = delete $expected->{'return'} }
+            for my $return_type (ref $expected->{'return'}) {
+                if ($return_type eq 'ARRAY') {
+                    $expected->{'list_return'}   = delete $expected->{'return'};
+                }
+                else {
+                    $expected->{'scalar_return'} = delete $expected->{'return'};
+                }
             }
         }
 
@@ -475,9 +488,9 @@ sub effects_ok (&;+$) {
         for my $info (qw< stdout stderr warn die exit>) {
             if (exists $expected->{$info}) {
                 no strict 'refs';
-                my $desc = $expected->{$info} ~~ $NULL_VALUE_FOR{$info}
-                           ? 'No ' . $DESCRIBE{$info}->($expected->{$info}) . ' (as expected)'
-                           : ucfirst $DESCRIBE{$info}->($expected->{$info},'was') . ' as expected';
+                my $desc = match($expected->{$info}, $NULL_VALUE_FOR{$info})
+                            ? 'No ' . $DESCRIBE{$info}->($expected->{$info}) . ' (as expected)'
+                            : ucfirst $DESCRIBE{$info}->($expected->{$info},'was') . ' as expected';
 
                 $TEST_FOR{$info}->($trap->$info, $expected->{$info}, $desc);
             }
@@ -629,7 +642,7 @@ Test::Effects - Test all effects at once (return value, I/O, warnings, exception
 
 =head1 VERSION
 
-This document describes Test::Effects version 0.001005
+This document describes Test::Effects version 0.002000
 
 
 =head1 SYNOPSIS

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ReadmeFromPod
 
+0.38 2023-07-24 15:58:24
+    - fix syntax of version check for Pod::Readme (@haarg)
+
 0.37 2018-12-21 09:34:01
     - fix path for Dist::Zilla v6+
 

@@ -3,7 +3,7 @@ NAME
     for Mojolicious::Plugin::Web::Auth
 
 VERSION
-    version 0.04
+    version 0.05
 
 SYNOPSIS
         # Mojolicious
@@ -39,6 +39,13 @@ DESCRIPTION
     This module adds LinkedIn
     <https://developer.linkedin.com/docs/rest-api/> support to
     Mojolicious::Plugin::Web::Auth.
+
+    The only extra URL option is the "user_more_info_url" which the user can
+    use to do a Mojo::UserAgent call to with the access token as a
+    parameter, to get the other info such as profile image and first or last
+    name. This URL can also be modified by the user to retrieve extra
+    fields. For more details refer to the LinkedIn API
+    <https://developer.linkedin.com/docs/rest-api/>.
 
 AUTHOR
     Vikas N Kumar <vikas@cpan.org>

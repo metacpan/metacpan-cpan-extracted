@@ -1,5 +1,6 @@
 Changes
 Makefile.PL
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/Catalyst/Plugin/CachedUriForAction.pm
 t/00-load.t

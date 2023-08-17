@@ -8,7 +8,7 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
@@ -77,7 +77,7 @@ my %_functions= (
     )],
   fn_input => [qw( XAllowEvents XBell XGrabButton XGrabKey XGrabKeyboard
     XGrabPointer XQueryKeymap XQueryPointer XSetInputFocus XUngrabButton
-    XUngrabKey XUngrabKeyboard XUngrabPointer keyboard_leds )],
+    XUngrabKey XUngrabKeyboard XUngrabPointer XWarpPointer keyboard_leds )],
   fn_keymap => [qw( XDisplayKeycodes XGetKeyboardMapping XGetModifierMapping
     XKeysymToKeycode XLookupString XRefreshKeyboardMapping XSetModifierMapping
     load_keymap save_keymap )],
@@ -210,7 +210,7 @@ sub _mark_dead {
     # depend on the connection (which Xlib has now freed) and sets them all to NULL.
     # That, in turn, removes them all from the _obj_cache
     $self->_set_pointer_value(undef);
-    # The Display* still exists, so we should still allow finding this object vy looking up that pointer
+    # The Display* still exists, so we should still allow finding this object by looking up that pointer
     $self->{_pointer_value}= $pointer_value;
     Scalar::Util::weaken( $_obj_cache{$pointer_value}= $self );
 }
@@ -1234,6 +1234,14 @@ Cancel a grab registered by L</XGrabKey>.
 
   XUngrabButton($display, $button, $modifiers, $window)
 
+=head3 XWarpPointer
+
+  XWarpPointer($display, $src_win, $dest_win, $src_x, $src_y, $src_width, $src_height, $dest_x, $dest_y)
+
+Move pointer to C<$dest_win> C<< ($dest_x, $dest_y) >>, or relative to current position if
+C<$dest_win> is undefined.  If the C<$src_*> parameters are defined, the move only occurs if
+the cursor is currently within that rectangle of that window.
+
 =head3 XAllowEvents
 
   XAllowEvents($display, $event_mode, $timestamp)
@@ -1625,13 +1633,17 @@ Paul Seyfert <pseyfert.mathphys@gmail.com>
 
 Ethan Straffin <ethanstraffin@gmail.com>
 
+=item *
+
+Sergei Zhmylev <zhmylove@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2021 by Michael Conrad
+Copyright (C) 2017-2023 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

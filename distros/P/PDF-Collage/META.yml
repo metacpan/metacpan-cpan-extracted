@@ -24,15 +24,15 @@ no_index:
 provides:
   PDF::Collage:
     file: lib/PDF/Collage.pm
-    version: '0.001'
+    version: '0.002'
   PDF::Collage::Template:
     file: lib/PDF/Collage/Template.pm
-    version: '0.001'
+    version: '0.002'
   PDF::Collage::TemplatesCollection:
     file: lib/PDF/Collage/TemplatesCollection.pm
-    version: '0.001'
+    version: '0.002'
 requires:
-  Data::Resolver: '0.002'
+  Data::Resolver: '0.006'
   Image::PNG::Libpng: '0.57'
   Moo: '2.005005'
   PDF::Builder: '3.025'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://codeberg.org/polettix/PDF-Collage/issues
   homepage: https://codeberg.org/polettix/PDF-Collage
   repository: https://codeberg.org/polettix/PDF-Collage.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.36.0

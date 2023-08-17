@@ -32,12 +32,12 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   {
     my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path -h);
     my $output = `$spvmdist_cmd`;
-    like($output, qr/\Qusage: spvmdist [<options>] <class_name> [<dir>]/);
+    like($output, qr/\Qusage: spvmdist [<options>] <class name> [<dir>]/);
   }
   {
     my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path --help);
     my $output = `$spvmdist_cmd`;
-    like($output, qr/\Qusage: spvmdist [<options>] <class_name> [<dir>]/);
+    like($output, qr/\Qusage: spvmdist [<options>] <class name> [<dir>]/);
   }
 }
 
@@ -66,7 +66,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   ok(SPVM::Builder::Util::file_contains($spvm_class_file, "class Foo {"));
   ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'Copyright'));
   ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'MIT License'));
-  ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'version "0.001_001";'));
+  ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'version "0.001";'));
   
   my $makefile_pl_file = "$tmp_dir/SPVM-Foo/Makefile.PL";
   ok(-f $makefile_pl_file);
@@ -179,7 +179,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   my $spvm_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.spvm";
   ok(-f $spvm_class_file);
   ok(SPVM::Builder::Util::file_contains($spvm_class_file, "class Foo {"));
-  ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'version "0.001_001";'));
+  ok(SPVM::Builder::Util::file_contains($spvm_class_file, 'version "0.001";'));
   
   my $makefile_pl_file = "$tmp_dir/SPVM-Foo/Makefile.PL";
   ok(-f $makefile_pl_file);
@@ -304,11 +304,11 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   ok(SPVM::Builder::Util::file_contains($native_class_file, 'Copyright'));
   ok(SPVM::Builder::Util::file_contains($native_class_file, 'MIT License'));
 
-  my $gitkeep_file_for_native_class_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_include_dir);
+  my $gitkeep_file_for_native_module_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_include_dir);
 
-  my $gitkeep_file_for_native_class_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_src_dir);
+  my $gitkeep_file_for_native_module_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_src_dir);
 
   chdir($save_cur_dir) or die;
 }
@@ -340,11 +340,11 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   ok(SPVM::Builder::Util::file_contains($native_class_file, 'static const char* FILE_NAME = "Foo/Bar/Baz.c";'));
   ok(SPVM::Builder::Util::file_contains($native_class_file, "SPVM__Foo__Bar__Baz__foo"));
 
-  my $gitkeep_file_for_native_class_include_dir = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM/Foo/Bar/Baz.native/include/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_include_dir);
+  my $gitkeep_file_for_native_module_include_dir = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM/Foo/Bar/Baz.native/include/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_include_dir);
 
-  my $gitkeep_file_for_native_class_src_dir = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM/Foo/Bar/Baz.native/src/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_src_dir);
+  my $gitkeep_file_for_native_module_src_dir = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM/Foo/Bar/Baz.native/src/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_src_dir);
 
   chdir($save_cur_dir) or die;
 }
@@ -549,7 +549,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   
   my $mymeta_json = 'MYMETA.json';
   ok(-f $mymeta_json);
-  ok(SPVM::Builder::Util::file_contains($mymeta_json, "0.001_001"));
+  ok(SPVM::Builder::Util::file_contains($mymeta_json, "0.001"));
   
   chdir($save_cur_dir) or die;
 }
@@ -622,7 +622,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   chdir($save_cur_dir) or die;
 }
 
-# --no-build-spvm-classes
+# --no-build-spvm-modules
 {
   my $tmp_dir = File::Temp->newdir;
   my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path --native c --precompile Foo);
@@ -636,7 +636,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   
   local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
-  my $ret = system("$^X Makefile.PL --no-build-spvm-classes");
+  my $ret = system("$^X Makefile.PL --no-build-spvm-modules");
   ok($ret == 0);
   
   ok(!SPVM::Builder::Util::file_contains('Makefile', 'build_dynamic_lib_dist_native'));
@@ -684,11 +684,11 @@ for my $test_index (0 .. 1) {
   my $native_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.c";
   ok(!-f $native_class_file);
 
-  my $gitkeep_file_for_native_class_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_include_dir);
+  my $gitkeep_file_for_native_module_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_include_dir);
 
-  my $gitkeep_file_for_native_class_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_src_dir);
+  my $gitkeep_file_for_native_module_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_src_dir);
 
   my $basic_test_file = "$tmp_dir/SPVM-Foo/t/basic.t";
   ok(-f $basic_test_file);
@@ -749,11 +749,11 @@ for my $test_index (0 .. 1) {
   my $native_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.c";
   ok(!-f $native_class_file);
 
-  my $gitkeep_file_for_native_class_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_include_dir);
+  my $gitkeep_file_for_native_module_include_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/include/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_include_dir);
 
-  my $gitkeep_file_for_native_class_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
-  ok(-f $gitkeep_file_for_native_class_src_dir);
+  my $gitkeep_file_for_native_module_src_dir = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.native/src/.gitkeep";
+  ok(-f $gitkeep_file_for_native_module_src_dir);
 
   my $basic_test_file = "$tmp_dir/SPVM-Foo/t/basic.t";
   ok(-f $basic_test_file);

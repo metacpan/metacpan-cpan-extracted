@@ -1,0 +1,8 @@
+0.02 2023-07-15T16:26:53+02:00
+ - Add tests.
+ - Fix example in doc.
+ - Improve and fix documentation.
+ - Regen link_tags.pl example.
+
+0.01 2023-07-08T17:53:07+02:00
+ - First version.

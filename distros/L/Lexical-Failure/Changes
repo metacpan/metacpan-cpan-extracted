@@ -42,3 +42,24 @@ Revision history for Lexical-Failure
     - Simplified and sharpened t/inner_scalar.t
       which also removed the requirement for PadWalker
       (thanks Father C!)
+
+
+0.001000  Tue Jul  4 17:54:22 2023
+
+    - [POTENTIALLY INCOMPATIBLE CHANGE]
+      As it makes no sense to use fail() for error-signalling
+      in non-API-level subroutines, fail() now always fails
+      at the API level (i.e. at the level of the call stack where
+      control leaves the current package). In other words, calling
+      fail() in a nested subroutine within a package, fails the
+      subroutine where we first entered the package.
+      See the documentation for details.
+      (Many thanks, Konrad!)
+
+    - Removed all use of smartmatching and given/when for 5.38 compatibility
+
+
+0.001001  Wed Jul  5 09:02:37 2023
+
+    - Shrouded new internal 'package Carp' declarations from CPAN
+      (Sorry, Neil. Sorry, Andreas.)

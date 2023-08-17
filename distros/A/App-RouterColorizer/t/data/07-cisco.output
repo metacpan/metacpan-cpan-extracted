@@ -45,7 +45,7 @@ sw07#terminal length 0
 sw07#show int
 [32mVlan1 is up, line protocol is up [0m
   Hardware is EtherSVI, address is cc5a.5373.32c0 (bia cc5a.5373.32c0)
-  Internet address is [30m[46m192.168.50.20/24[0m
+  Internet address is [90m[41m192.168.50.20/24[0m
   MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
      reliability 255/255, txload 1/255, rxload 1/255
   Encapsulation ARPA, loopback not set

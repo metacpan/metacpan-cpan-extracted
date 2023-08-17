@@ -30,7 +30,10 @@ my %module = (
                 url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
             },
-            bugtracker => "https://rt.cpan.org/Public/Dist/Display.html?Name=$distbase",
+            bugtracker  => {
+              web    => "https://github.com/Corion/$distbase/issues",
+              # mailto => 'meta-bugs@example.com',
+            },
             license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
@@ -166,8 +169,9 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
+[![Windows](https://github.com/Corion/$distbase/workflows/windows/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/$distbase/workflows/macos/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/$distbase/workflows/linux/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Alinux)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -215,16 +219,14 @@ sub update_file {
     my( $filename, $new_content ) = @_;
     my $content;
     if( -f $filename ) {
-        open my $fh, '<', $filename
+        open my $fh, '<:raw:encoding(UTF-8)', $filename
             or die "Couldn't read '$filename': $!";
-        binmode $fh;
         local $/;
         $content = <$fh>;
     };
 
     if( $content ne $new_content ) {
-        if( open my $fh, '>', $filename ) {
-            binmode $fh;
+        if( open my $fh, '>:raw:encoding(UTF-8)', $filename ) {
             print $fh $new_content;
         } else {
             warn "Couldn't (re)write '$filename': $!";

@@ -78,6 +78,34 @@ $useragent->map_response(sub {
     }
 );
 
+
+## apiinfo.version request:
+$useragent->map_response(
+    sub {
+        my $req     = shift;
+        my $content = decode_json( $req->{_content} );
+        $id         = $content->{id};
+
+        if (  $content->{method} eq 'apiinfo.version' ) {
+            return 1;
+        }
+    },
+    sub {
+        return HTTP::Response->new(
+            '200', 'OK',
+            HTTP::Headers->new( 'content-type' => 'application/json' ),
+            encode_json(
+                {
+                    jsonrpc => '2.0',
+                    result  => '6.4',
+                    id      => $id,
+                }
+            ),
+        );
+    }
+);
+
+
 $useragent->map_response(sub {
         my $req = shift;
         my $content = decode_json($req->{_content});

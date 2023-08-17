@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_cells_cloud_service_status' } = { 
-    	summary => '',
+    	summary => 'Aspose.Cells Cloud service health status check(old). ',
         params => $params,
         returns => 'string',
     };

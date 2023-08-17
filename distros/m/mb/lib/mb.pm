@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.56';
+$VERSION = '0.57';
 $VERSION = $VERSION;
 
 # internal use
@@ -785,9 +785,23 @@ sub mb::set_script_encoding ($) {
     #
     # Break through the limitations of regular expressions of Perl
     # http://d.hatena.ne.jp/gfx/20110212/1297512479
+    #
+    # REG_INF has been raised from 65,536 to 2,147,483,647
+    # https://perldoc.perl.org/perl5380delta#REG_INF-has-been-raised-from-65,536-to-2,147,483,647
 
     if ($script_encoding =~ /\A (?: rfc2279 | utf8 | wtf8 ) \z/xms) {
         ${mb::_anchor} = qr{.*?}xms;
+    }
+    elsif ($] >= 5.038000) {
+        ${mb::_anchor} = {
+            'sjis'      => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\x9F\xE0-\xFC]+\z).*?|.*?[^\x81-\x9F\xE0-\xFC](?>[\x81-\x9F\xE0-\xFC][\x81-\x9F\xE0-\xFC])*?))}xms,
+            'eucjp'     => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\xA1-\xFE\xA1-\xFE]+\z).*?|.*?[^\xA1-\xFE\xA1-\xFE](?>[\xA1-\xFE\xA1-\xFE][\xA1-\xFE\xA1-\xFE])*?))}xms,
+            'gbk'       => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\xFE\x81-\xFE]+\z).*?|.*?[^\x81-\xFE\x81-\xFE](?>[\x81-\xFE\x81-\xFE][\x81-\xFE\x81-\xFE])*?))}xms,
+            'uhc'       => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\xFE\x81-\xFE]+\z).*?|.*?[^\x81-\xFE\x81-\xFE](?>[\x81-\xFE\x81-\xFE][\x81-\xFE\x81-\xFE])*?))}xms,
+            'big5'      => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\xFE\x81-\xFE]+\z).*?|.*?[^\x81-\xFE\x81-\xFE](?>[\x81-\xFE\x81-\xFE][\x81-\xFE\x81-\xFE])*?))}xms,
+            'big5hkscs' => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\xFE\x81-\xFE]+\z).*?|.*?[^\x81-\xFE\x81-\xFE](?>[\x81-\xFE\x81-\xFE][\x81-\xFE\x81-\xFE])*?))}xms,
+            'gb18030'   => qr{(?(?=.{0,2147483646}\z)(?:$x)*?|(?(?=[^\x81-\xFE\x81-\xFE]+\z).*?|.*?[^\x81-\xFE\x81-\xFE](?>[\x81-\xFE\x81-\xFE][\x81-\xFE\x81-\xFE])*?))}xms,
+        }->{$script_encoding} || die;
     }
     elsif ($] >= 5.030000) {
         ${mb::_anchor} = {
@@ -2180,22 +2194,25 @@ sub parse_expr {
         $parsed .= parse_ambiguous_char();
     }
 
-    # CORE::do { block }   --> CORE::do { block }
-    # CORE::eval { block } --> CORE::eval { block }
-    # CORE::try { block }  --> CORE::try { block }
-    elsif (/\G ( CORE:: (?: do | eval | try ) \s* ) ( \{ ) /xmsgc) {
+    # CORE::do { block }      --> CORE::do { block }
+    # CORE::eval { block }    --> CORE::eval { block }
+    # CORE::try { block }     --> CORE::try { block }
+    # CORE::finally { block } --> CORE::finally { block }
+    elsif (/\G ( CORE:: (?: do | eval | try | finally ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         $parsed .= parse_ambiguous_char();
     }
 
-    # mb::do { block }   --> do { block }
-    # mb::eval { block } --> eval { block }
-    # mb::try { block }  --> try { block }
-    # do { block }       --> do { block }
-    # eval { block }     --> eval { block }
-    # try { block }      --> try { block }
-    elsif (/\G (?: mb:: | $old_package )? ( (?: do | eval | try ) \s* ) ( \{ ) /xmsgc) {
+    # mb::do { block }      --> do { block }
+    # mb::eval { block }    --> eval { block }
+    # mb::try { block }     --> try { block }
+    # mb::finally { block } --> finally { block }
+    # do { block }          --> do { block }
+    # eval { block }        --> eval { block }
+    # try { block }         --> try { block }
+    # finally { block }     --> finally { block }
+    elsif (/\G (?: mb:: | $old_package )? ( (?: do | eval | try | finally ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         $parsed .= parse_ambiguous_char();
@@ -5378,7 +5395,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
     Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
 
   supported operating systems:
-    Apple Inc. OS X,
+    Apple Inc. Mac OS X, OS X, macOS,
     Hewlett-Packard Development Company, L.P. HP-UX,
     International Business Machines Corporation AIX,
     Microsoft Corporation Windows,
@@ -7751,7 +7768,10 @@ This is a lost technology in this century.
 
 Limitation of Regular Expression
 
-This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or later can treat the codepoint string which exceeds 65534 octets with a regular expression, and only perl 5.10.1 or later can 32766 octets.
+This software has limitation from \G in multibyte anchoring.
+Only perl 5.38.0 or later can treat the codepoint string which exceeds 2147483646 octets with a regular expression,
+only perl 5.30.0 or later can treat the codepoint string which exceeds 65534 octets with a regular expression,
+and only perl 5.10.1 or later can 32766 octets.
 
   see also,
   
@@ -7770,7 +7790,10 @@ This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or
   perlre length limit
   http://stackoverflow.com/questions/4592467/perlre-length-limit
 
-Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30 or later, you can increase those limits.
+  REG_INF has been raised from 65,536 to 2,147,483,647
+  https://perldoc.perl.org/perl5380delta#REG_INF-has-been-raised-from-65,536-to-2,147,483,647
+
+Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30 or later, or perl 5.38 or later, you can increase those limits.
 That's better way.
 
 =back
@@ -8446,7 +8469,7 @@ have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/c
 
 =head1 GIVE US BUG REPORT
 
-We have tested and verified this software using the best of my ability.
+We have tested and verified this software using the best of our ability.
 However, this software containing much regular expression is bound to contain some bugs.
 Thus, if you happen to find a bug that's in this software and not your own program, you can try to reduce it to a minimal test case and then report it to author's address.
 If you have an idea that could make this a more useful tool, please let share it.

@@ -59,8 +59,6 @@ foreach my $t (
     );
 }
 
-
-
 sub get_handler {
     my ($host, $script_name) = @_;
     return builder {
@@ -82,6 +80,57 @@ sub get_handler {
             }
             elsif ( $path eq '/uri_for' ) {
                 $uri = $req->absolute_uri_for({ controller=>'controller', action=>'action' });
+            }
+            return $req->new_response({
+                status=>200,
+                content=>$uri
+            })->finalize;
+        };
+    };
+}
+
+foreach my $t (
+    ['example.com',undef,'https://override.example.com/nice','https://override.example.com/controller/action'],
+    ['example.com','/foo','https://override.example.com/foo/nice','https://override.example.com/foo/controller/action'],
+    ['example.com','/foo/','https://override.example.com/foo/nice','https://override.example.com/foo/controller/action'],
+    ['example.com/','/foo/','https://override.example.com/foo/nice','https://override.example.com/foo/controller/action'],
+) {
+    my $host = shift(@$t);
+    my $script_name = shift(@$t);
+    my $override_host = "https://override.example.com";
+
+    test_psgi(
+        app    => get_handler_override_host($host, $script_name, $override_host),
+        client => sub {
+            my $cb = shift;
+            is($cb->( GET "http://localhost/string" )->content,$t->[0],"string: ".$t->[0]);
+            is($cb->( GET "http://localhost/string-no-slash" )->content,$t->[0],"string no slash: ".$t->[0]);
+            is($cb->( GET "http://localhost/uri_for" )->content,$t->[1], "uri_for: ".$t->[1]);
+        }
+    );
+}
+
+sub get_handler_override_host {
+    my ($host, $script_name, $override) = @_;
+    return builder {
+        sub {
+            my $env  = shift;
+
+            $env->{HTTP_HOST} = $host;
+            $env->{SCRIPT_NAME} = $script_name if $script_name;
+
+            my $req  = $req_class->name->new_from_env($env);
+            my $path = $env->{PATH_INFO};
+
+            my $uri;
+            if ( $path eq '/string' ) {
+                $uri=$req->absolute_uri_for('/nice', $override);
+            }
+            if ( $path eq '/string-no-slash' ) {
+                $uri=$req->absolute_uri_for('nice', $override);
+            }
+            elsif ( $path eq '/uri_for' ) {
+                $uri = $req->absolute_uri_for({ controller=>'controller', action=>'action' }, $override);
             }
             return $req->new_response({
                 status=>200,

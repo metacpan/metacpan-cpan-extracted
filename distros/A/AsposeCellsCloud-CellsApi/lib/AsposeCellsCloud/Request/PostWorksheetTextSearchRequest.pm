@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetTextSearchRequest.name :   ,
-# PostWorksheetTextSearchRequest.sheetName :   ,
-# PostWorksheetTextSearchRequest.text :   ,
-# PostWorksheetTextSearchRequest.folder :   ,
-# PostWorksheetTextSearchRequest.storageName :    
+# PostWorksheetTextSearchRequest.name : The workbook name.  ,
+# PostWorksheetTextSearchRequest.sheetName : The worksheet name.  ,
+# PostWorksheetTextSearchRequest.text : Text to search.  ,
+# PostWorksheetTextSearchRequest.folder : Original workbook folder.  ,
+# PostWorksheetTextSearchRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_text_search' } = { 
-    	summary => '',
+    	summary => 'Searchs text in worksheet.',
         params => $params,
         returns => 'TextItemsResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'text' => {
      	datatype => 'string',
      	base_name => 'text',
-     	description => '',
+     	description => 'Text to search.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

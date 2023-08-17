@@ -10,9 +10,9 @@ use Org::Parser::Tiny;
 use Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-06'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.485'; # VERSION
+our $VERSION = '0.486'; # VERSION
 
 our %SPEC;
 
@@ -74,8 +74,8 @@ our $_complete_state = sub {
     # get todo states
     my @states;
     for my $doc (values %docs) {
-        for (@{ $doc->todo_states }, @{ $doc->done_states }) {
-            push @states, $_ unless $_ ~~ @states;
+        for my $state (@{ $doc->todo_states }, @{ $doc->done_states }) {
+            push @states, $state unless grep { $_ eq $state } @states;
         }
     }
     Complete::Util::complete_array_elem(array=>\@states, word=>$args{word});
@@ -106,8 +106,8 @@ our $_complete_priority = sub {
     # get priorities
     my @prios;
     for my $doc (values %docs) {
-        for (@{ $doc->priorities }) {
-            push @prios, $_ unless $_ ~~ @prios;
+        for my $prio (@{ $doc->priorities }) {
+            push @prios, $prio unless grep { $_ eq $prio } @prios;
         }
     }
     Complete::Util::complete_array_elem(array=>\@prios, word=>$args{word});
@@ -142,8 +142,8 @@ our $_complete_tags = sub {
             sub {
                 my $el = shift;
                 return unless $el->isa('Org::Element::Headline');
-                for ($el->get_tags) {
-                    push @tags, $_ unless $_ ~~ @tags;
+                for my $tag ($el->get_tags) {
+                    push @tags, $tag unless grep { $_ eq $tag } @tags;
                 }
             }
         );
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.485 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2023-04-06.
+This document describes version 0.486 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2023-07-12.
 
 =head1 DESCRIPTION
 

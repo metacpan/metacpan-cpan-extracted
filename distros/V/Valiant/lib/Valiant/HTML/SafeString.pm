@@ -81,6 +81,12 @@ sub to_string { return ${$_[0]} }
 
 sub to_bool { return ${$_[0]} ? 1 : 0 }
 
+sub append {
+  my ($self, @rest) = @_;
+  my $string = join '', map { is_safe($_) ? $_->to_string : escape_html($_) } grep { defined($_) } @rest;
+  ${$self} .= $string;
+}
+
 1;
 
 =head1 NAME

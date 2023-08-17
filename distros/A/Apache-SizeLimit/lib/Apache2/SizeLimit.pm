@@ -34,7 +34,7 @@ die "Apache2::SizeLimit at the moment works only with non-threaded MPMs"
 use constant IS_WIN32 => $Config{'osname'} eq 'MSWin32' ? 1 : 0;
 
 # 2.x requires 5.6.x+ so 'our' is okay
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 use Apache::SizeLimit::Core qw(
                              $MAX_PROCESS_SIZE
@@ -42,7 +42,6 @@ use Apache::SizeLimit::Core qw(
                              $MIN_SHARE_SIZE
                              $CHECK_EVERY_N_REQUESTS
                              $START_TIME
-                             $USE_SMAPS
                              $VERSION
                              $REQUEST_COUNT
                             );
@@ -174,7 +173,7 @@ Apache2::SizeLimit - Because size does matter.
 
 =head1 DESCRIPTION
 
-******************************** NOIICE *******************
+******************************** NOTICE *******************
 
     This version is only for httpd 2.x and mod_perl 2.x
     series.
@@ -326,78 +325,6 @@ are worried about performance, you can consider using C<<
 Apache2::SizeLimit->set_check_interval() >> to reduce how often this
 read happens.
 
-As of linux 2.6, F</proc/self/statm> does not report the amount of
-memory shared by the copy-on-write mechanism as shared memory. This
-means that decisions made based on shared memory as reported by that
-interface are inherently wrong.
-
-However, as of the 2.6.14 release of the kernel, there is
-F</proc/self/smaps> entry for each process. F</proc/self/smaps>
-reports various sizes for each memory segment of a process and allows
-us to count the amount of shared memory correctly.
-
-If C<Apache2::SizeLimit> detects a kernel that supports
-F</proc/self/smaps> and the C<Linux::Smaps> module is installed it
-will use that module instead of F</proc/self/statm>.
-
-Reading F</proc/self/smaps> is expensive compared to
-F</proc/self/statm>. It must look at each page table entry of a
-process.  Further, on multiprocessor systems the access is
-synchronized with spinlocks. Again, you might consider using C<<
-Apache2::SizeLimit->set_check_interval() >>.
-
-=head3 Copy-on-write and Shared Memory
-
-The following example shows the effect of copy-on-write:
-
-  <Perl>
-    require Apache2::SizeLimit;
-    package X;
-    use strict;
-    use Apache2::Const -compile => qw(OK);
-
-    my $x = "a" x (1024*1024);
-
-    sub handler {
-      my $r = shift;
-      my ($size, $shared) = $Apache2::SizeLimit->_check_size();
-      $x =~ tr/a/b/;
-      my ($size2, $shared2) = $Apache2::SizeLimit->_check_size();
-      $r->content_type('text/plain');
-      $r->print("1: size=$size shared=$shared\n");
-      $r->print("2: size=$size2 shared=$shared2\n");
-      return OK;
-    }
-  </Perl>
-
-  <Location /X>
-    SetHandler modperl
-    PerlResponseHandler X
-  </Location>
-
-The parent Apache process allocates memory for the string in
-C<$x>. The C<tr>-command then overwrites all "a" with "b" if the
-handler is called with an argument. This write is done in place, thus,
-the process size doesn't change. Only C<$x> is not shared anymore by
-means of copy-on-write between the parent and the child.
-
-If F</proc/self/smaps> is available curl shows:
-
-  r2@s93:~/work/mp2> curl http://localhost:8181/X
-  1: size=13452 shared=7456
-  2: size=13452 shared=6432
-
-Shared memory has lost 1024 kB. The process' overall size remains unchanged.
-
-Without F</proc/self/smaps> it says:
-
-  r2@s93:~/work/mp2> curl http://localhost:8181/X
-  1: size=13052 shared=3628
-  2: size=13052 shared=3636
-
-One can see the kernel lies about the shared memory. It simply doesn't
-count copy-on-write pages as shared.
-
 =head2 solaris 2.6 and above
 
 For solaris we simply retrieve the size of F</proc/self/as>, which
@@ -477,8 +404,6 @@ memory size limits:
 =item * $Apache2::SizeLimit::MAX_UNSHARED_SIZE
 
 =item * $Apache2::SizeLimit::CHECK_EVERY_N_REQUESTS
-
-=item * $Apache2::SizeLimit::USE_SMAPS
 
 =back
 

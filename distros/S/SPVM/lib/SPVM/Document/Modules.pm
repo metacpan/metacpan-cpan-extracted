@@ -68,9 +68,25 @@ The list of SPVM Standard Modules. All Standard classes are yet experimental sta
 
 =item * L<Format|SPVM::Format>
 
+=item * L<Global|SPVM::Global>
+
 =item * L<Hash|SPVM::Hash>
 
 =item * L<Hash::Entry|SPVM::Hash::Entry>
+
+=item * L<Immutable::ByteList|SPVM::Immutable::ByteList>
+
+=item * L<Immutable::DoubleList|SPVM::Immutable::DoubleList>
+
+=item * L<Immutable::FloatList|SPVM::Immutable::FloatList>
+
+=item * L<Immutable::IntList|SPVM::Immutable::IntList>
+
+=item * L<Immutable::LongList|SPVM::Immutable::LongList>
+
+=item * L<Immutable::ShortList|SPVM::Immutable::ShortList>
+
+=item * L<Immutable::StringList|SPVM::Immutable::StringList>
 
 =item * L<Int|SPVM::Int>
 
@@ -81,6 +97,30 @@ The list of SPVM Standard Modules. All Standard classes are yet experimental sta
 =item * L<Long|SPVM::Long>
 
 =item * L<LongList|SPVM::LongList>
+
+=item * L<Native|SPVM::Native>
+
+=item * L<Native::Arg|SPVM::Native::Arg>
+
+=item * L<Native::BasicType|SPVM::Native::BasicType>
+
+=item * L<Native::ClassVar|SPVM::Native::ClassVar>
+
+=item * L<Native::Compiler|SPVM::Native::Compiler>
+
+=item * L<Native::Env|SPVM::Native::Env>
+
+=item * L<Native::Field|SPVM::Native::Field>
+
+=item * L<Native::Method|SPVM::Native::Method>
+
+=item * L<Native::MethodCall|SPVM::Native::MethodCall>
+
+=item * L<Native::ClassFile|SPVM::Native::ClassFile>
+
+=item * L<Native::Runtime|SPVM::Native::Runtime>
+
+=item * L<Native::Stack|SPVM::Native::Stack>
 
 =item * L<Point|SPVM::Point>
 
@@ -107,6 +147,10 @@ The list of SPVM Standard Modules. All Standard classes are yet experimental sta
 =item * L<Stringer|SPVM::Stringer>
 
 =item * L<StringList|SPVM::StringList>
+
+=item * L<Time|SPVM::Time>
+
+=item * L<Time::Info|SPVM::Time::Info>
 
 =back
 

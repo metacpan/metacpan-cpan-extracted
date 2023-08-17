@@ -678,7 +678,7 @@ sub rdap_vcard_as_norid_whois_string {
 	push @wa, "Type.......................: " . $type;
 
 	if ($type eq 'organization') {
-	    # When full layer access is configured, two names should be present in the card:
+	    # When full layer access is achived, two names should be present in the card:
 	    #   - the legal name should be found in fn
 	    #   - the org. name should be in the 'organization' field.
 	    push @wa, "Organization Name..........: " . $card->organization if ($card->organization);
@@ -1112,8 +1112,6 @@ formatted service.
 	service_url         => 'https://rdap.norid.no',
 	debug               => 0,
 	use_cache  	    => 0,
-	norid_header_secret => 'secret1234',
-	norid_header_proxy  => 1,
      });
 
     # test HEAD operation for existence

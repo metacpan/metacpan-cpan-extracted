@@ -6,13 +6,13 @@ use warnings;
 
 use English;
 use Error::Pure qw(err);
-use Plack::Util::Accessor qw(component constructor_args data data_css data_init);
+use Plack::Util::Accessor qw(component constructor_args data data_css data_init data_prepare);
 use Symbol::Get;
 
-our $VERSION = 0.12;
+our $VERSION = 0.14;
 
 sub _css {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	if ($self->{'_component'}->can('process_css')) {
 		my @data_css;
@@ -67,11 +67,20 @@ sub _prepare_app {
 		err "Component must be a instance of 'Tags::HTML' class.";
 	}
 
+	# Init prepared data.
+	if ($self->{'_component'}->can('prepare')) {
+		my @data = ();
+		if (defined $self->data_prepare) {
+			push @data, @{$self->data_prepare};
+		}
+		$self->{'_component'}->prepare(@data);
+	}
+
 	return;
 }
 
 sub _process_actions {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	if ($self->{'_component'}->can('init')) {
 		my @data = ();
@@ -85,7 +94,7 @@ sub _process_actions {
 }
 
 sub _tags_middle {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	my @data;
 	if (defined $self->data) {
@@ -106,7 +115,7 @@ __END__
 
 =head1 NAME
 
-Plack::App::Tags::HTML - Plack application for running Tags::HTML objects.
+Plack::App::Tags::HTML - Plack application for running L<Tags::HTML> objects.
 
 =head1 SYNOPSIS
 
@@ -117,7 +126,7 @@ Plack::App::Tags::HTML - Plack application for running Tags::HTML objects.
 
 =head1 METHODS
 
-Class inherites Plack::Component::Tags::HTML.
+Class inherites L<Plack::Component::Tags::HTML>.
 
 =head2 C<new>
 
@@ -131,31 +140,41 @@ Returns instance of object.
 
 =item * C<component>
 
-Tags::HTML component.
+L<Tags::HTML> component.
 
 Option is required.
 
 =item * C<constructor_args>
 
-Tags::HTML component constructor arguments.
+L<Tags::HTML> component constructor arguments.
 
 Default value is undef.
 
 =item * C<data>
 
-Array data structure as input argument of Tags::HTML::process().
+Array data structure as input argument of L<Tags::HTML::process()|Tags::HTML/process>.
 
 Default value is undef.
 
 =item * C<data_css>
 
-Reference to array with structure for input argument of C<Tags::HTML::process_css()>.
+Reference to array with structure for input argument of L<Tags::HTML::process_css()|Tags::HTML/process_css>.
 
 Default value is undef.
 
 =item * C<data_init>
 
-Reference to array with structure for input argument of C<Tags::HTML::init()>.
+Reference to array with structure for input argument of L<Tags::HTML::init()|Tags::HTML/init>.
+
+This structure is used in init phase of each web app call.
+
+Default value is undef.
+
+=item * C<data_prepare>
+
+Reference to array with structure for input argument of L<Tags::HTML::init()|Tags::HTML/init>.
+
+This structure is used in init phase of preparation of web app.
 
 Default value is undef.
 
@@ -309,6 +328,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.14
 
 =cut

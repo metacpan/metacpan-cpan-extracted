@@ -1,16 +1,13 @@
 .bashrc
-.temp
 App-SeismicUnixGui-0.80.1.tar.gz
 App-SeismicUnixGui-0.80.6.tar.gz
 App-SeismicUnixGui-0.80.7.tar.gz
 App-SeismicUnixGui-0.82.0.tar
 App-SeismicUnixGui-0.82.0.tar.gz
 App-SeismicUnixGui-0.82.0/.bashrc
-App-SeismicUnixGui-0.82.0/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0.tar
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0.tar.gz
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/.bashrc
-App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/cpan-upload.sh
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/manifest.pl
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/dist/my_uninstall.sh
@@ -563,7 +560,6 @@ App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/wipe.pm
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/write_LSU.pm
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/writefiles.pm
-App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/.temp
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/100
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c55_file
 App-SeismicUnixGui-0.82.0/App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/gui_history.txt
@@ -1967,7 +1963,6 @@ App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/whereami2.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/wipe.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/write_LSU.pm
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/misc/writefiles.pm
-App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/.temp
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/100
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c15_file
 App-SeismicUnixGui-0.82.0/lib/App/SeismicUnixGui/script/c35_file
@@ -2624,7 +2619,6 @@ App-SeismicUnixGui-0.82.0/t/specs.t
 App-SeismicUnixGui-0.82.0/t/sunix.t
 App-SeismicUnixGui-0.82.3.tar.gz
 App-SeismicUnixGui-0.82.4/.bashrc
-App-SeismicUnixGui-0.82.4/.temp
 App-SeismicUnixGui-0.82.4/dist/cpan-upload.sh
 App-SeismicUnixGui-0.82.4/dist/my_uninstall.sh
 App-SeismicUnixGui-0.82.4/dist/uninstall_module.pl
@@ -4098,6 +4092,9 @@ lib/App/SeismicUnixGui/configs/big_streams/Sudipfilt.config
 lib/App/SeismicUnixGui/configs/big_streams/Sudipfilt_config.pm
 lib/App/SeismicUnixGui/configs/big_streams/Synseis.config
 lib/App/SeismicUnixGui/configs/big_streams/Synseis_config.pm
+lib/App/SeismicUnixGui/configs/big_streams/test.pl
+lib/App/SeismicUnixGui/configs/big_streams/test.pm
+lib/App/SeismicUnixGui/configs/big_streams/test2.pm
 lib/App/SeismicUnixGui/configs/data/ctrlstrip.config
 lib/App/SeismicUnixGui/configs/data/data_in.config
 lib/App/SeismicUnixGui/configs/data/data_out.config
@@ -4145,6 +4142,7 @@ lib/App/SeismicUnixGui/configs/filter/supofilt.config
 lib/App/SeismicUnixGui/configs/filter/supolar.config
 lib/App/SeismicUnixGui/configs/filter/susmgauss2.config
 lib/App/SeismicUnixGui/configs/filter/sutvband.config
+lib/App/SeismicUnixGui/configs/filter/test.pl
 lib/App/SeismicUnixGui/configs/header/segyclean.config
 lib/App/SeismicUnixGui/configs/header/segyhdrmod.config
 lib/App/SeismicUnixGui/configs/header/segyhdrs.config
@@ -4382,6 +4380,7 @@ lib/App/SeismicUnixGui/configs/transform/sufft.config
 lib/App/SeismicUnixGui/configs/transform/sugabor.config
 lib/App/SeismicUnixGui/configs/transform/suicepstrum.config
 lib/App/SeismicUnixGui/configs/transform/suifft.config
+lib/App/SeismicUnixGui/configs/transform/suminphase.config
 lib/App/SeismicUnixGui/configs/transform/suphasevel.config
 lib/App/SeismicUnixGui/configs/transform/suspecfk.config
 lib/App/SeismicUnixGui/configs/transform/suspecfx.config
@@ -4396,6 +4395,8 @@ lib/App/SeismicUnixGui/developer/code/immodpg/kill4mmodpg_development.pl
 lib/App/SeismicUnixGui/developer/code/sunix/change_a_line_everywhere.pl
 lib/App/SeismicUnixGui/developer/code/sunix/convert2V07.pl
 lib/App/SeismicUnixGui/developer/code/sunix/convert2V08.pl
+lib/App/SeismicUnixGui/developer/code/sunix/data_tbd.pl
+lib/App/SeismicUnixGui/developer/code/sunix/data_test.pl
 lib/App/SeismicUnixGui/developer/code/sunix/nameNnumber.txt
 lib/App/SeismicUnixGui/developer/code/sunix/prog_doc2pm.pm
 lib/App/SeismicUnixGui/developer/code/sunix/README.pm
@@ -4420,6 +4421,7 @@ lib/App/SeismicUnixGui/developer/code/sunix/sunix_package_tail.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sunix_package_use.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sunix_spec.pm
 lib/App/SeismicUnixGui/developer/code/sunix/sustkvel_changes.pm
+lib/App/SeismicUnixGui/developer/code/sunix/test.pl
 lib/App/SeismicUnixGui/developer/code/sunix/update.pm
 lib/App/SeismicUnixGui/developer/code/sunix/update_main_version_number.pl
 lib/App/SeismicUnixGui/developer/Stripped/data/ctrlstrip.cwp.main
@@ -4855,7 +4857,9 @@ lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_L_SU
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
+lib/App/SeismicUnixGui/doc/SeismicUnixGui_Installation_Guide_0.82.9.pdf
 lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.82.5.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.84.0.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -5164,7 +5168,6 @@ lib/App/SeismicUnixGui/script/.split_cdp0000058.su
 lib/App/SeismicUnixGui/script/.split_cdp0000059.su
 lib/App/SeismicUnixGui/script/.split_cdp0000060.su
 lib/App/SeismicUnixGui/script/.split_cdp0000061.su
-lib/App/SeismicUnixGui/script/.temp
 lib/App/SeismicUnixGui/script/100
 lib/App/SeismicUnixGui/script/c15_file
 lib/App/SeismicUnixGui/script/c35_file
@@ -5195,6 +5198,7 @@ lib/App/SeismicUnixGui/script/L_SUV0.82.1.pl
 lib/App/SeismicUnixGui/script/L_SUV0.82.2.pl
 lib/App/SeismicUnixGui/script/L_SUV0.82.3.pl
 lib/App/SeismicUnixGui/script/LICENSE
+lib/App/SeismicUnixGui/script/outpar
 lib/App/SeismicUnixGui/script/post_install_c_compile.pl
 lib/App/SeismicUnixGui/script/post_install_env.pl
 lib/App/SeismicUnixGui/script/post_install_fortran_compile.pl
@@ -5208,6 +5212,9 @@ lib/App/SeismicUnixGui/script/SetProject
 lib/App/SeismicUnixGui/script/snapshotx.data
 lib/App/SeismicUnixGui/script/snapshoty.data
 lib/App/SeismicUnixGui/script/snapshotz.data
+lib/App/SeismicUnixGui/script/split_tracl002_neg.su
+lib/App/SeismicUnixGui/script/split_tracl298_.su
+lib/App/SeismicUnixGui/script/split_tracl298_neg.su
 lib/App/SeismicUnixGui/script/Sseg2su
 lib/App/SeismicUnixGui/script/Sucat
 lib/App/SeismicUnixGui/script/Sudipfilt
@@ -5215,6 +5222,8 @@ lib/App/SeismicUnixGui/script/Synseis
 lib/App/SeismicUnixGui/script/test.pl
 lib/App/SeismicUnixGui/script/test_ppm.pl
 lib/App/SeismicUnixGui/script/waveform
+lib/App/SeismicUnixGui/script/wiener_of_spiked_voice_coil_signtaure
+lib/App/SeismicUnixGui/script/wiener_spiked_voice_coil_signtaure
 lib/App/SeismicUnixGui/script/xk
 lib/App/SeismicUnixGui/specs/big_streams/iBottomMute_spec.pm
 lib/App/SeismicUnixGui/specs/big_streams/immodpg_spec.pm
@@ -5509,6 +5518,7 @@ lib/App/SeismicUnixGui/specs/transform/sufft_spec.pm
 lib/App/SeismicUnixGui/specs/transform/sugabor_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suicepstrum_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suifft_spec.pm
+lib/App/SeismicUnixGui/specs/transform/suminphase_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suphasevel_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suspecfx_spec.pm
 lib/App/SeismicUnixGui/specs/transform/sutaup_spec.pm
@@ -5610,6 +5620,7 @@ lib/App/SeismicUnixGui/sunix/header/swapbhed.pm
 lib/App/SeismicUnixGui/sunix/inversion/suinvco3d.pm
 lib/App/SeismicUnixGui/sunix/inversion/suinvvxzco.pm
 lib/App/SeismicUnixGui/sunix/inversion/suinvzco3d.pm
+lib/App/SeismicUnixGui/sunix/junk
 lib/App/SeismicUnixGui/sunix/migration/sudatumfd.pm
 lib/App/SeismicUnixGui/sunix/migration/sugazmig.pm
 lib/App/SeismicUnixGui/sunix/migration/sukdmig2d.pm
@@ -5808,6 +5819,7 @@ lib/App/SeismicUnixGui/sunix/transform/sufft.pm
 lib/App/SeismicUnixGui/sunix/transform/sugabor.pm
 lib/App/SeismicUnixGui/sunix/transform/suicepstrum.pm
 lib/App/SeismicUnixGui/sunix/transform/suifft.pm
+lib/App/SeismicUnixGui/sunix/transform/suminphase.pm
 lib/App/SeismicUnixGui/sunix/transform/suphasevel.pm
 lib/App/SeismicUnixGui/sunix/transform/suspecfk.pm
 lib/App/SeismicUnixGui/sunix/transform/suspecfx.pm

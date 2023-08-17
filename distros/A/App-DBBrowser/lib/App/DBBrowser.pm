@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.324';
+our $VERSION = '2.338';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -23,7 +23,6 @@ use App::DBBrowser::DB;
 #use App::DBBrowser::Join;             # required
 use App::DBBrowser::Opt::Get;
 #use App::DBBrowser::Opt::Set;         # required
-#use App::DBBrowser::Opt::DBSet        # required
 #use App::DBBrowser::Subqueries;       # required
 #use App::DBBrowser::Table;            # required
 #use App::DBBrowser::Union;            # required
@@ -38,8 +37,8 @@ sub new {
     my ( $class ) = @_;
     my $info = {
         tc_default    => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, undef => '<<', prompt => 'Your choice:' },
-        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2, keep => 6 },
-        tr_default    => { hide_cursor => 2, clear_screen => 1, page => 2 },
+        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2, keep => 6, auto_up => 1 },
+        tr_default    => { hide_cursor => 2, clear_screen => 1, page => 2, history => [ 0 .. 1000 ] },
         tcu_default   => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6 }, ##
         lyt_h         => { order => 0, alignment => 2 },
         lyt_v         => { undef => '  BACK', layout => 2 },
@@ -53,6 +52,7 @@ sub new {
         _confirm      => '  CONFIRM',
         _reset        => '  RESET',
         ok            => '-OK-',
+        menu_addition => '%%',
         info_thsd_sep => ',',
     };
     return bless { i => $info }, $class;
@@ -180,6 +180,8 @@ sub run {
             next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last PLUGIN;
         }
+        # Oracle: key word "AS" not supported in Table aliases (Union, Join, Derived tables)
+        $sf->{i}{" AS "} = $driver eq 'Oracle' ? " " : " AS ";
 
         # DATABASES
 
@@ -282,7 +284,7 @@ sub run {
             my $dbh;
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db );
-                $sf->{d}{identifier_quote_char} = $dbh->get_info(29) // '"', # SQL_IDENTIFIER_QUOTE_CHAR
+                $sf->{d}{identifier_quote_char} = $dbh->get_info(29) // '"'; # SQL_IDENTIFIER_QUOTE_CHAR
                 #$sf->{d}{catalog_name_sep} = $dbh->get_info(41) // '.';  # SQL_CATALOG_NAME_SEPARATOR
                 #$sf->{d}{catalog_location} = $dbh->get_info(114) || 1;   # SQL_CATALOG_LOCATION
                 1 }
@@ -354,14 +356,8 @@ sub run {
                     # `$schema` remains undefined
                 }
                 elsif ( @schemas == 1 ) {
-                    if ( @$sys_schemas ) {
-                        $schema = $sys_schemas->[0];
-                        $is_system_schema = 1;
-                    }
-                    else {
-                        $schema = $user_schemas->[0];
-                    }
-                    $skipped_menus++ if $skipped_menus == 2
+                    $schema = ( @$user_schemas, @$sys_schemas )[0]; # to preserve unstringified `undef`
+                    $skipped_menus++ if $skipped_menus == 2;
                 }
                 else {
                     my $back = $skipped_menus == 2 ? $sf->{i}{_quit} : $sf->{i}{_back};
@@ -421,7 +417,7 @@ sub run {
 
                 TABLE: while ( 1 ) {
 
-                    my ( $join, $union, $from_subquery, $db_setting ) = ( '  Join', '  Union', '  Derived', '  DB settings' );
+                    my ( $join, $union, $from_subquery ) = ( '  Join', '  Union', '  Derived' );
                     my $hidden = $db_string;
                     my $table;
                     if ( $sf->{redo_table} ) {
@@ -440,7 +436,6 @@ sub run {
                         push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
                         push @$menu_table, $join          if $sf->{o}{enable}{join};
                         push @$menu_table, $union         if $sf->{o}{enable}{union};
-                        push @$menu_table, $db_setting    if $sf->{o}{enable}{db_settings};
                         my $back = $skipped_menus == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         my $idx_tbl = $tc->choose(
@@ -465,27 +460,6 @@ sub run {
                             $old_idx_tbl = $idx_tbl;
                         }
                     }
-                    if ( $table eq $db_setting ) {
-                        my $changed;
-                        if ( ! eval {
-                            require App::DBBrowser::Opt::DBSet;
-                            my $db_opt_set = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
-                            $changed = $db_opt_set->database_setting( $db );
-                            1 }
-                        ) {
-                            $ax->print_error_message( $@ );
-                            next TABLE;
-                        }
-                        if ( $changed ) {
-                            $sf->{redo_db} = $db;
-                            $sf->{redo_is_system_db} = $is_system_db;
-                            $sf->{redo_schema} = $schema;
-                            $sf->{redo_is_system_schema} = $is_system_schema;
-                            $dbh->disconnect(); # reconnects
-                            next DATABASE;
-                        }
-                        next TABLE;
-                    }
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -494,27 +468,36 @@ sub run {
                             next TABLE;
                         }
                         elsif ( $ret == 1 ) {
-                            # update the list of available tables and reenter the $hidden submenu
+                            # update the list of available tables
                             $sf->{redo_schema} = $schema;
                             $sf->{redo_is_system_schema} = $is_system_schema;
-                            $sf->{redo_table}  = $table;
+                            $sf->{redo_table} = $table; # stay in the $hidden submenu
                             next SCHEMA;
                         }
                         elsif ( $ret == 2 ) {
-                            # reattach databases and therefore recall `get_scheams`
-                            # and reenter the $hidden submenu
+                            # attached/dedached databases and therefore recall `get_schemas` to get the new schemas
                             $sf->{redo_db} = $db;
                             $sf->{redo_is_system_db} = $is_system_db;
-                            $sf->{redo_table}  = $table;
+                            $sf->{redo_table} = $table; # stay in the $hidden submenu
+                            next DATABASE;
+                        }
+                        elsif ( $ret == 3 ) {
+                            # new db-settings and therefore reconnect to the database
+                            $sf->{redo_db} = $db;
+                            $sf->{redo_is_system_db} = $is_system_db;
+                            $sf->{redo_schema} = $schema;
+                            $sf->{redo_is_system_schema} = $is_system_schema;
+                            $sf->{redo_table} = $table; # stay in the $hidden submenu
+                            $dbh->disconnect(); # reconnects
                             next DATABASE;
                         }
                     }
-                    my ( $qt_table, $qt_columns );
+                    my ( $qt_table, $qt_columns, $qt_aliases );
                     if ( $table eq $join ) {
                         require App::DBBrowser::Join;
                         my $new_j = App::DBBrowser::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         $sf->{d}{special_table} = 'join';
-                        if ( ! eval { ( $qt_table, $qt_columns ) = $new_j->join_tables(); 1 } ) {
+                        if ( ! eval { ( $qt_table, $qt_columns, $qt_aliases ) = $new_j->join_tables(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
@@ -531,7 +514,7 @@ sub run {
                         next TABLE if ! defined $qt_table;
                     }
                     elsif ( $table eq $from_subquery ) {
-                        $sf->{d}{special_table} = 'subquery';
+                        $sf->{d}{special_table} = 'from_subquery';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
@@ -540,11 +523,14 @@ sub run {
                     }
                     else {
                         $sf->{d}{special_table} = '';
+                        $table =~ s/^[-\ ]\s//;
+                        $sf->{d}{table_key} = $table;
                         if ( ! eval {
-                            $table =~ s/^[-\ ]\s//;
-                            $sf->{d}{table_key} = $table;
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+                            if ( $sf->{o}{alias}{table} ) {
+                                $qt_table .= $sf->{i}{" AS "} . $ax->prepare_identifier( 't1' );
+                            }
                             $sf->{d}{cols} = $ax->column_names( $qt_table );
                             $qt_columns = $ax->quote_cols( $sf->{d}{cols} );
                             1 }
@@ -556,10 +542,6 @@ sub run {
                     my $table_footer;
                     if ( $sf->{d}{special_table} ) {
                         $table_footer = ucfirst $sf->{d}{special_table};
-                        my $qc = quotemeta $sf->{d}{identifier_quote_char};
-                        if ( $qt_table =~ /\sAS\s$qc([^$qc]+)$qc\z/ ) {
-                            $table_footer .= ': ' . $1;
-                        }
                     }
                     else {
                         $table_footer = $sf->{d}{table_key};
@@ -567,7 +549,12 @@ sub run {
                     $sf->{d}{table_footer} = "     '$table_footer'     ";
                     require App::DBBrowser::Table;
                     my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                    $tbl->browse_the_table( $qt_table, $qt_columns );
+                    my $sql = {};
+                    $ax->reset_sql( $sql );
+                    $sql->{table} = $qt_table;
+                    $sql->{cols} = $qt_columns;
+                    $sql->{alias} = $qt_aliases // {};
+                    $tbl->browse_the_table( $sql );
                 }
             }
         }
@@ -589,9 +576,8 @@ sub __derived_table {
     if ( ! defined $qt_table ) {
         return;
     }
-    my $alias = $ax->alias( $tmp, 'derived_table', $qt_table, 'Derived_Table' );
-    if ( length $alias ) {
-        $qt_table .= " AS " . $ax->prepare_identifier( $alias );
+    if ( $sf->{o}{alias}{table} || $sf->{i}{driver} =~ /^(?:mysql|MariaDB|Pg)\z/ ) {
+        $qt_table .= $sf->{i}{" AS "} . $ax->prepare_identifier( 't1' );
     }
     $tmp->{table} = $qt_table;
     my $columns = $ax->column_names( $qt_table );
@@ -620,7 +606,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.324
+Version 2.338
 
 =head1 DESCRIPTION
 

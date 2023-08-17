@@ -11,16 +11,16 @@ File::Find::IncludesTimeRange - Takes a array of time stamped items(largely mean
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
     use File::Find::IncludesTimeRange;
-    usexs Time::Piece;
+    uses Time::Piece;
     use Data::Dumper;
 
     my @files=(
@@ -50,7 +50,16 @@ our $VERSION = '0.0.1';
                                                   regex=>'(?<timestamp>\d\d\d\d\d\d+)(\.pcap|(?<subsec>\.\d+)\.pcap)$',
                                                   strptime=>'%s',
                                                  );
+    print Dumper($found);
 
+    # do similar, but skip parsing the time stamp as it is already in unixtime
+    my $found=File::Find::IncludesTimeRange->find(
+                                                  items=>\@files,
+                                                  start=>$start,
+                                                  end=>$end,
+                                                  regex=>'(?<timestamp>(\d\d\d\d\d\d+|\d\d\d\d\d\+.\d+))\.pcap$',
+                                                  ts_is_unixtime => 1,
+                                                 );
     print Dumper($found);
 
 =head1 SUBROUTINES
@@ -80,6 +89,10 @@ There following options are taken.
     - strptime :: The format for use with L<Time::Piece>->strptime.
         - Default :: %s
 
+    - ts_is_unixtime :: Skips using Time::Piece and strptime as it is just a simple
+                        numeric test. For this subsecs should be included in the
+                        capture group 'timestamp' for the regex.
+
 =cut
 
 sub find {
@@ -88,38 +101,34 @@ sub find {
 	# some basic error checking
 	if ( !defined( $opts{start} ) ) {
 		die('$opts{start} is undef');
-	}
-	elsif ( !defined( $opts{end} ) ) {
+	} elsif ( !defined( $opts{end} ) ) {
 		die('$opts{end} is undef');
-	}
-	elsif ( !defined( $opts{items} ) ) {
+	} elsif ( !defined( $opts{items} ) ) {
 		die('$opts{items} is undef');
-	}
-	elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{start} ) ne 'Time::Piece' ) {
 		die('$opts{start} is not a Time::Piece object');
-	}
-	elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
+	} elsif ( ref( $opts{end} ) ne 'Time::Piece' ) {
 		die('$opts{end} is not a Time::Piece object');
-	}
-	elsif ( ref( $opts{items} ) ne 'ARRAY' ) {
+	} elsif ( ref( $opts{items} ) ne 'ARRAY' ) {
 		die('$opts{items} is not a ARRAY');
-	}elsif ( $opts{start} > $opts{end} ) {
+	} elsif ( $opts{start} > $opts{end} ) {
 		die('$opts{start} is greater than $opts{end}');
 	}
 
-	if (!defined($opts{strptime}) ) {
-		$opts{strptime}='%s';
+	if ( !defined( $opts{strptime} ) ) {
+		$opts{strptime} = '%s';
 	}
 
-	if (!defined($opts{regex})) {
-		$opts{regex}='(?<timestamp>\d\d\d\d\d\d+)(\.pcap|(?<subsec>\.\d+)\.pcap)$';
+	if ( !defined( $opts{regex} ) ) {
+		$opts{regex} = '(?<timestamp>\d\d\d\d\d\d+)(\.pcap|(?<subsec>\.\d+)\.pcap)$';
 	}
 
 	my $start = $opts{start}->epoch;
 	my $end   = $opts{end}->epoch;
 
-	my $found          = {};
-	my $timestamp_save = {};
+	# a HoA of found timestamps
+	# each value is a array containing files for that time stamp
+	my $found = {};
 	foreach my $item ( @{ $opts{items} } ) {
 		if ( $item =~ /$opts{regex}/ ) {
 			my $subsec        = '';
@@ -129,58 +138,81 @@ sub find {
 			}
 
 			my $timestamp;
-			eval { $timestamp = Time::Piece->strptime( $timestamp_raw, $opts{strptime} ); };
-			if ( !$@ && defined($timestamp) ) {
-				my $full_timestamp = $timestamp->epoch . $subsec;
+			my $full_timestamp;
+			if ( !$opts{ts_is_unixtime} ) {
+				# we have one we actually need to parse.... attempt to
+				# and if we can get the time stamp
+				eval { $timestamp = Time::Piece->strptime( $timestamp_raw, $opts{strptime} ); };
+				if ( !$@ && defined($timestamp) ) {
+					$full_timestamp = $timestamp->epoch . $subsec;
+				}
+			} else {
+				# if ts_is_unixtime, then no need to parse it... just go ahead and use it
+				$full_timestamp = $timestamp_raw;
+			}
+
+			# only not going to be defined if the eval above failed for Time::Piece->strptime
+			if ( defined($full_timestamp) ) {
 				if ( !defined( $found->{$full_timestamp} ) ) {
-					$found->{$full_timestamp}          = [];
-					$timestamp_save->{$full_timestamp} = $timestamp;
+					$found->{$full_timestamp} = [];
 				}
 				push( @{ $found->{$full_timestamp} }, $item );
 			}
-		}
-	}
+		} ## end if ( $item =~ /$opts{regex}/ )
+	} ## end foreach my $item ( @{ $opts{items} } )
 
 	my @found_timestamps = sort( keys( %{$found} ) );
 	my $previous_timestamp;
 	my $previous_found;
-	my $previous_t;
 	my @timestamp_to_return;
 	foreach my $current_timestamp (@found_timestamps) {
-		my $t = $timestamp_save->{$current_timestamp};
-
-		if ( ( $opts{start} <= $t ) && ( $t <= $opts{end} ) ) {
+		if ( ( $start <= $current_timestamp ) && ( $current_timestamp <= $end ) ) {
 			push( @timestamp_to_return, $current_timestamp );
 
 			# if we find one that it is between, but not equal, then add the previous as that contains the start
-			if ( defined($previous_timestamp) && !$previous_found && ( $opts{start} != $t ) ) {
+			if ( defined($previous_timestamp) && !$previous_found && ( $start != $current_timestamp ) ) {
 				$previous_found = 1;
 				push( @timestamp_to_return, $previous_timestamp );
-			}elsif (!$previous_found && ( $opts{start} == $t ) ) {
+			} elsif ( !$previous_found && ( $start == $current_timestamp ) ) {
 				$previous_found = 1;
 			}
-		}
-
-		# if the time period falls between when two files was created, we will find 
-		if (!$previous_found && defined($previous_timestamp) && ( $opts{end} < $t )) {
-			$previous_found=1;
+		} elsif ( defined($previous_timestamp)
+			&& !$previous_found
+			&& $previous_timestamp < $start
+			&& $current_timestamp > $end )
+		{
+			$previous_found = 1;
 			push( @timestamp_to_return, $previous_timestamp );
 		}
 
 		$previous_timestamp = $current_timestamp;
-		$previous_t         = $t;
+	} ## end foreach my $current_timestamp (@found_timestamps)
+
+	# if we did not find anything and we have timestamps,
+	# and the last timestamp is before the end, add it...
+	#
+	# this happens when the time frame desired is after any of the timestamps
+	# such as will happen with a start of now-30 and a end of now
+	if (  !defined( $timestamp_to_return[0] )
+		&& defined( $found_timestamps[0] )
+		&& $found_timestamps[$#found_timestamps] <= $end )
+	{
+		push( @timestamp_to_return, $found_timestamps[$#found_timestamps] );
 	}
 
-	my $to_return=[];
-	# the second sort is needed as if 
-	foreach my $item (sort(@timestamp_to_return)) {
-		foreach my $file (@{ $found->{$item} }) {
-			push(@{ $to_return }, $file);
+	my $to_return = [];
+
+	# the second sort is needed as if
+	foreach my $item ( sort(@timestamp_to_return) ) {
+		foreach my $file ( @{ $found->{$item} } ) {
+			push( @{$to_return}, $file );
 		}
 	}
 
+	# the file name to write to
+
 	return $to_return;
-}
+} ## end sub find
 
 =head1 AUTHOR
 
@@ -209,10 +241,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-IncludesTimeRange>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/File-Find-IncludesTimeRange>
 
 =item * Search CPAN
 

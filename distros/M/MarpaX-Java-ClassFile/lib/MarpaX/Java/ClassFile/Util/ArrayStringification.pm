@@ -7,7 +7,7 @@ our @EXPORT_OK = qw/arrayStringificator/;
 
 # ABSTRACT: Unblessed array stringification helper
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -64,7 +64,7 @@ MarpaX::Java::ClassFile::Util::ArrayStringification - Unblessed array stringific
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

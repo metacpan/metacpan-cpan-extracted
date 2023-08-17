@@ -34,9 +34,8 @@ sub defaults {
         },
         alias => {
             select_func_sq => 0,
-            derived_table  => 0,
             join           => 0,
-            union          => 0,
+            table          => 0,
         },
         enable => {
             create_table => 0,
@@ -48,14 +47,8 @@ sub defaults {
             update      => 0,
             delete      => 0,
 
-            expand_select   => 0,
-            expand_where    => 0,
-            expand_group_by => 0,
-            expand_having   => 0,
-            expand_order_by => 0,
-            expand_set      => 0,
-
-            parentheses => 0,
+            extended_cols   => 0,
+            extended_values => 0,
 
             m_derived   => 0,
             join        => 0,
@@ -64,8 +57,9 @@ sub defaults {
 
             j_derived  => 0,
 
-            u_derived => 0,
-            union_all => 0,
+            u_derived     => 0,
+            u_where       => 0,
+            u_parentheses => 0,
         },
         table => {
             codepage_mapping  => 0, # not an option, always 0
@@ -92,7 +86,7 @@ sub defaults {
             parse_mode_input_file    => 0,
             enable_input_filter      => 0,
             empty_to_null_plain      => 1,
-            empty_to_null_file       => 0,
+            empty_to_null_file       => 1,
             data_source_Create_table => 2,
             data_source_Insert       => 2,
             show_hidden_files        => 0,

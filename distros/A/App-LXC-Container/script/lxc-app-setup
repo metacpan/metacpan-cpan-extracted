@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+#
+# Author, Copyright and License: see end of file
+
+=head1 NAME
+
+lxc-app-setup - setup meta-configuration for an LXC application container
+
+=head1 SYNOPSIS
+
+    lxc-app-setup <container>
+
+=head1 ABSTRACT
+
+main script used to setup the meta-configuration for an LXC application
+container
+
+=head1 DESCRIPTION
+
+This script runs the user interface to create a new meta-configuration for
+an LXC application container or modify the configuration of an existing one.
+This meta-configuration is not the final one used by LXC itself but (at
+least partly) a more simple and general one.
+
+=cut
+
+#########################################################################
+
+##################
+# load packages: #
+##################
+
+use v5.14;
+use strictures 2;
+no indirect 'fatal';
+no multidimensional;
+use warnings 'once';
+
+use Cwd;
+
+BEGIN {
+    ($_ = $0) =~ s|[^/]+/[^/]+$|lib|;
+    unshift @INC, $_  if  cwd() =~ m!/App-LXC-Container(?:-\d\.\d+)?(?:/|$)!;
+}
+
+use App::LXC::Container;
+use App::LXC::Container::Texts;
+
+#################################################
+# all work is done in the corresponding module: #
+#################################################
+
+1 == @ARGV  or  fatal 'usage__1_container__2', $0, '';
+App::LXC::Container::setup($ARGV[0]);
+
+#########################################################################
+
+=head1 SEE ALSO
+
+C<L<App::LXC::Container>>, C<L<App::LXC::Container::Setup>>
+
+=head1 LICENSE
+
+Copyright (C) Thomas Dorner.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.  See LICENSE file for more details.
+
+=head1 AUTHOR
+
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
+
+=cut

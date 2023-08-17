@@ -18,6 +18,7 @@
 
 #include "dbf.h"
 #include "shp.h"
+#include "shx.h"
 #include <stdlib.h>
 
 #endif

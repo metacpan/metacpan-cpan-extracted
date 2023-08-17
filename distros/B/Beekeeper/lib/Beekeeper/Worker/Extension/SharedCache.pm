@@ -3,7 +3,7 @@ package Beekeeper::Worker::Extension::SharedCache;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Exporter 'import';
 
@@ -89,6 +89,13 @@ sub new {
         );
     }
 
+    # Ping backend brokers to avoid disconnections due to inactivity
+    $self->{ping_timer} = AnyEvent->timer(
+        after    => 60 * rand(),
+        interval => 60,
+        cb       => sub { $Self->_ping_backend_brokers },
+    );
+
     return $self;
 }
 
@@ -127,7 +134,15 @@ sub _connect_to_all_brokers {
                 my $delay = $self->{connect_err}->{$bus_id}++;
                 $self->{reconnect_tmr}->{$bus_id} = AnyEvent->timer(
                     after => ($delay < 10 ? $delay * 3 : 30),
-                    cb    => sub { $bus->connect },
+                    cb => sub { 
+                        $bus->connect(
+                            on_connack => sub {
+                                log_warn "Reconnected to $bus_id";
+                                $self->_setup_sync_listeners($bus);
+                                $self->_accept_sync_requests($bus) if $self->{synced};
+                            }
+                        );
+                    },
                 );
             },
         );
@@ -272,6 +287,16 @@ sub _accept_sync_requests {
             log_error "Could not subscribe to topic '$topic'" unless $success;
         }
     );
+}
+
+sub _ping_backend_brokers {
+    my $self = shift;
+
+    foreach my $bus (@{$self->{_BUS_GROUP}}) {
+
+        next unless $bus->{is_connected};
+        $bus->pingreq;
+    }
 }
 
 my $_now = 0;
@@ -608,7 +633,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

@@ -34,6 +34,14 @@ sub fails_dummy {
     my $blitz = HTML::Blitz->new(
         { dummy_marker_re => qr/\bXXX\b/},
         [ 'script.dummy' => ['replace_inner_text' => ''] ],
+        [ 'input.dummy' => ['set_attribute_text', title => 'irrelevant'] ],
+    );
+    fails_dummy $blitz, 'with attribute value after setting other attribute';
+}
+{
+    my $blitz = HTML::Blitz->new(
+        { dummy_marker_re => qr/\bXXX\b/},
+        [ 'script.dummy' => ['replace_inner_text' => ''] ],
     );
     $blitz->add_rules(
         [ 'input.dummy' => ['set_attribute_text', value => 'nice'] ],

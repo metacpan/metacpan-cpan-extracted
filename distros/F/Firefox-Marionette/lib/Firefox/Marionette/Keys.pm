@@ -53,7 +53,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION = '1.38';
+our $VERSION = '1.43';
 
 sub CANCEL          { return chr hex '0xE001' }
 sub HELP            { return chr hex '0xE002' }
@@ -108,7 +108,7 @@ Firefox::Marionette::Keys - Human readable special keys for the Marionette proto
 
 =head1 VERSION
 
-Version 1.38
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -129,7 +129,7 @@ Version 1.38
 
 This module handles the implementation of the Firefox Marionette human readable special keys
 
-=head1 SUBROUTINES/METHODS
+=head1 CONSTANTS
 
 =head2 ALT
 
@@ -306,6 +306,10 @@ returns the Tab codepoint, which is 0xE004
 =head2 ZENKAKU_HANKAKU
 
 returns the Zenkaku (full-width) - Hankaku (half-width) codepoint, which is 0xE040
+
+=head1 SUBROUTINES/METHODS
+
+None.
 
 =head1 DIAGNOSTICS
 

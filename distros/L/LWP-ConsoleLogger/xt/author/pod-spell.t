@@ -19,6 +19,8 @@ David
 Easy
 Everywhere
 Gregory
+Håkon
+Hægland
 Inc
 Jack
 LWP
@@ -34,6 +36,7 @@ Wireshark
 davidp
 github
 goschwald
+hakon
 lib
 olaf
 params

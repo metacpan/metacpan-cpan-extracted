@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -336,7 +336,7 @@ sub _cd($;$)
 	s|^/{2,}|/|;
     }
     else
-    {   $_ = abs_path($_);   }
+    {	$_ = abs_path($_);   }
     my @files = ();
     my $dir;
     if (opendir $dir, $_)
@@ -354,7 +354,7 @@ sub _cd($;$)
 	}
 	closedir $dir;
     }
-    else
+    elsif ($cd)
     {
 	@files = $self->_cd();
 	$self->{_msg} = message('can_t_open__1__2', $_, $!);
@@ -393,7 +393,7 @@ sub selection($)
     my $directory = $self->{directory};
     $directory =~ s|(?<=[^/])$|/|;
     if ($self->mode == 0)
-    {   return $directory . $self->{_inputvar};   }
+    {	return $directory . $self->{_inputvar};   }
     if ($self->mode == 1)
     {
 	$_ = $lb->selected();

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbooksMergeRequest.name :   ,
-# PostWorkbooksMergeRequest.mergeWith :   ,
-# PostWorkbooksMergeRequest.folder :   ,
-# PostWorkbooksMergeRequest.storageName :   ,
-# PostWorkbooksMergeRequest.mergedStorageName :    
+# PostWorkbooksMergeRequest.name : Workbook name.  ,
+# PostWorkbooksMergeRequest.mergeWith : The workbook to merge with.  ,
+# PostWorkbooksMergeRequest.folder : Original workbook folder.  ,
+# PostWorkbooksMergeRequest.storageName : Storage name.  ,
+# PostWorkbooksMergeRequest.mergedStorageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbooks_merge' } = { 
-    	summary => '',
+    	summary => 'Merge workbooks.',
         params => $params,
         returns => 'WorkbookResponse',
     };
@@ -133,35 +133,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'Workbook name.',
      	format => '',
      	read_only => '',
      		},
      'merge_with' => {
      	datatype => 'string',
      	base_name => 'mergeWith',
-     	description => '',
+     	description => 'The workbook to merge with.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'merged_storage_name' => {
      	datatype => 'string',
      	base_name => 'mergedStorageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

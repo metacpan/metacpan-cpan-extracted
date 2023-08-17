@@ -82,6 +82,11 @@ OpenTracing::Implementation::Test::Tracer/"cmp_easy" >>
 
 Make testing more easy.
 
+=item L<< C<cmp_spans> |
+OpenTracing::Implementation::Test::Tracer/"cmp_spans" >>
+
+Make testing more reliable, using easy testing on all spans, not skipping any.
+
 =item L<< C<clear_spans> |
 OpenTracing::Implementation::Test::Tracer/"clear_spans" >>
 
@@ -92,6 +97,8 @@ Removes all saved spans from the tracer.
 
 
 =head2 SpanContext
+
+=over
 
 =item L<< C<level> |
 OpenTracing::Implementation::Test::SpanContext/"level" >>

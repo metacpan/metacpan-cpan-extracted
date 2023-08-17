@@ -1,5 +1,7 @@
 #!perl -T
 
+use strict;
+
 use Test::Most tests => 1;
 
 BEGIN {

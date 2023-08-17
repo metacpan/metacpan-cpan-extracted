@@ -4,6 +4,7 @@ author:
   - 'Bjoern Hee <github@spredehagl.com>'
 build_requires: {}
 configure_requires:
+  File::Copy: '0'
   Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
@@ -13,17 +14,18 @@ meta-spec:
   version: '1.4'
 name: Sys-Tlock
 provides:
-  Config:
-    file: lib/Sys/Tlock/Config.pm
   Sys::Tlock:
     file: lib/Sys/Tlock.pm
-    version: '0.12'
+    version: '1.1'
+  Sys::Tlock::Config:
+    file: lib/Sys/Tlock/Config.pm
 requires:
   File::Basename: '0'
+  Getopt::Std: '0'
   Time::HiRes: '0'
 resources:
   bugtracker: https://github.com/spragl/Tlock/issues
   license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/spragl/Tlock
-version: '0.12'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

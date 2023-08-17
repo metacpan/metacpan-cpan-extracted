@@ -1,0 +1,175 @@
+NAME
+    Curses::UI::Char - Create and manipulate character widgets.
+
+CLASS HIERARCHY
+     Curses::UI::Widget
+        |
+        +----Curses::UI::Label
+                |
+                +----Curses::UI::Char
+
+SYNOPSIS
+     use Curses::UI;
+
+     my $win = $cui->add('window_id', 'Window');
+     my $number = $win->add(
+             'mynum', 'Curses::UI::Char',
+             -char => 5,
+     );
+     $number->draw;
+
+DESCRIPTION
+    Curses::UI::Number is a widget that shows a number in graphic form.
+
+STANDARD OPTIONS
+    "-parent", "-x", "-y", "-width", "-height", "-pad", "-padleft",
+    "-padright", "-padtop", "-padbottom", "-ipad", "-ipadleft",
+    "-ipadright", "-ipadtop", "-ipadbottom", "-title", "-titlefullwidth",
+    "-titlereverse", "-onfocus", "-onblur".
+
+    For an explanation of these standard options, see Curses::UI::Widget.
+
+REMOVED OPTIONS
+    "-text".
+
+WIDGET-SPECIFIC OPTIONS
+    *       "-char" < CHARACTER >
+
+            Character..
+
+            Default value is undef.
+
+    *       "-fill" < CHARACTER >
+
+            Character for Curses::UI::Char drawing.
+
+            Default value is '█'.
+
+STANDARD METHODS
+    "layout", "draw", "intellidraw", "focus", "onFocus", "onBlur".
+
+    For an explanation of these standard methods, see Curses::UI::Widget.
+
+WIDGET-SPECIFIC METHODS
+    *       "new(%parameters)"
+
+            Constructor.
+
+            Create widget with volume in graphic form, defined by -volume
+            number.
+
+            Returns object.
+
+    *       "char([$character])"
+
+            Get or set character.
+
+            Returns character (A - Z).
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new;
+ 
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+ 
+     # Add volume.
+     $win->add(
+             undef, 'Curses::UI::Char',
+             '-char' => 'A',
+     );
+ 
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+ 
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     #   ██
+     # ██  ██
+     # ██████
+     # ██  ██
+     # ██  ██
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new(
+             -color_support => 1,
+     );
+ 
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+
+     # Add number.
+     my $char = $win->add(
+             undef, 'Curses::UI::Char',
+             '-border' => 1,
+             '-char' => 'A',
+     );
+ 
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+
+     # Time.
+     $cui->set_timer(
+             'timer',
+             sub {
+                     my $act = ord($char->char) - 65;
+                     $act += 1;
+                     if ($act > 25) {
+                             $act = 0;
+                     }
+                     $char->char(chr($act + 65));
+
+                     return;
+             },
+             1,
+     );
+ 
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # ┌──────┐
+     # │██████│
+     # │██  ██│
+     # │██  ██│
+     # │██  ██│
+     # │██████│
+     # └──────┘
+
+DEPENDENCIES
+    Curses::UI::Common, Curses::UI::Label, Curses::UI::Widget,
+    Unicode::UTF8.
+
+SEE ALSO
+    Task::Curses::UI
+        Install the Curses::UI modules.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Curses-UI-Char>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2015-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

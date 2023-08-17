@@ -3,17 +3,17 @@ abstract: 'client for BigBlueButton API'
 author:
   - 'Alexander Ruzhnikov <a.ruzhnikov@reg.ru>'
 build_requires:
-  Test::More: 0.98
+  FindBin: '0'
+  Test::More: '0.98'
+  Test::Spec: '0'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.15.2, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: API-BigBlueButton
 no_index:
   directory:
@@ -28,27 +28,30 @@ no_index:
 provides:
   API::BigBlueButton:
     file: lib/API/BigBlueButton.pm
-    version: 0.013
+    version: '0.015'
   API::BigBlueButton::Requests:
     file: lib/API/BigBlueButton/Requests.pm
-    version: 0.013
+    version: '0.015'
   API::BigBlueButton::Response:
     file: lib/API/BigBlueButton/Response.pm
-    version: 0.013
+    version: '0.015'
 requires:
-  Carp: 0
-  Digest::SHA1: 0
-  LWP::UserAgent: 6.05
-  XML::Fast: 0
-  base: 0
-  constant: 0
-  perl: 5.008008
+  Carp: '0'
+  Digest::SHA1: '0'
+  LWP::UserAgent: '6.05'
+  XML::Fast: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.008008'
 resources:
-  bugtracker: https://github.com/regru/API-BigBlueButton/issues
-  homepage: https://github.com/regru/API-BigBlueButton
-  repository: git://github.com/regru/API-BigBlueButton.git
-version: 0.013
+  bugtracker: https://github.com/ruzhnikov/API-BigBlueButton/issues
+  homepage: https://github.com/ruzhnikov/API-BigBlueButton
+  repository: https://github.com/ruzhnikov/API-BigBlueButton.git
+version: '0.015'
 x_authority: cpan:BCDE
 x_contributors:
-  - 'Alexander Ruzhnikov <ruzhnikov85@gmail.com>'
   - 'Alexander Ruzhnikov <a.ruznikov@reg.ru>'
+  - 'Alexander Ruzhnikov <ruzhnikov85@gmail.com>'
+  - 'Ivan Sokolov <vaneska.ru@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

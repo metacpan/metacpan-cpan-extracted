@@ -23,10 +23,10 @@ eval "use App::Followme::FIO";
 require App::Followme::FileData;
 
 my $test_dir = catdir(@path, 'test');
-rmtree($test_dir) if -e $test_dir;
+rmtree($test_dir, 0, 1) if -e $test_dir;
 
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+mkdir($test_dir) unless -e $test_dir;
+ 
 chdir($test_dir) or die $!;
 
 #----------------------------------------------------------------------
@@ -50,10 +50,9 @@ do {
     my @count = qw(one two three);
 
     $code[0] = <<'EOQ';
------
 title: The Page %%
 author: Bernie Simon
------
+......
 <h1>Count %%</h1>
 
 <p>This is the description. This is the rest of the content.</p>

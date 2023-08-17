@@ -1,6 +1,6 @@
 ## Dashboard
 
-> *Try this dashboard [here](https://beekeeper.net.ar/dashboard/) &nbsp;(user: guest, password: guest)*
+> *Try a [live demo](https://beekeeper.net.ar/dashboard/) of this dashboard*
 
 ![](../../doc/images/dashboard.png)
 
@@ -135,7 +135,7 @@ If the broker is running elsewhere than localhost edit `bus.config.json` and `co
 Mosquitto can serve http data as well, when setting the `http_dir` configuration option.
 This feature can be used in simple projects to host the html files of the dashboard.
 
-> Detailed Mosquitto install instructions can be found [here](../../doc/Brokers.md)
+> *Detailed Mosquitto install instructions can be found [here](../../doc/Brokers.md)*
 
 ---
 
@@ -143,13 +143,16 @@ This feature can be used in simple projects to host the html files of the dashbo
 
 This software uses the following libraries:
 
-- Semantic UI - https://semantic-ui.com/  
+- Fomantic UI - https://fomantic-ui.com/  
   Released under the terms of the MIT license
 
 - jQuery - https://jquery.com/  
   Released under the terms of the MIT license
 
 - MQTT.js - https://github.com/mqttjs/MQTT.js  
+  Released under the terms of the MIT license
+
+- pako - https://github.com/nodeca/pako  
   Released under the terms of the MIT license
 
 - D3.js - https://d3js.org/  

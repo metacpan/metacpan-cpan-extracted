@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Smoother::Exponential;
-$Statistics::Descriptive::Smoother::Exponential::VERSION = '3.0800';
+$Statistics::Descriptive::Smoother::Exponential::VERSION = '3.0801';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ Statistics::Descriptive::Smoother::Exponential - Implement exponential smoothing
 
 =head1 VERSION
 
-version 3.0800
+version 3.0801
 
 =head1 SYNOPSIS
 

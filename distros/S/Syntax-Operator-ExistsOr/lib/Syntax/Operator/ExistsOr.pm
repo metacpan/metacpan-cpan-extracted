@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::ExistsOr 0.01;
+package Syntax::Operator::ExistsOr 0.02;
 
 use v5.14;
 use warnings;
@@ -40,20 +40,56 @@ This module provides an infix operator that similar to the defined-or C<//>
 core perl operator, but which cares about hash element existence rather than
 definedness.
 
-Current stable versions of perl do not directly support custom infix
-operators, but the ability was added in the 5.37.x development cycle and is
-available from perl v5.37.7 onwards. The documentation of L<XS::Parse::Infix>
-describes the situation in more detail. This module is therefore I<almost>
-entirely useless on stable perl builds. While the regular parser does not
-support custom infix operators, they are supported via C<XS::Parse::Infix> and
-hence L<XS::Parse::Keyword>, and so custom keywords which attempt to parse
-operator syntax may be able to use it.
+Support for custom infix operators was added in the Perl 5.37.x development
+cycle and is available from development release v5.37.7 onwards, and therefore
+in Perl v5.38 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail.
+
+While Perl versions before this do not support custom infix operators, they
+can still be used via C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>.
+Custom keywords which attempt to parse operator syntax may be able to use
+these.
 
 This module does not provide wrapper functions for the operators, as their
 inherent short-circuiting behaviour would appear confusing when expressed in
 function-like syntax.
 
 =cut
+
+sub import
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->import_into( $caller, @_ );
+}
+
+sub unimport
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( 1, @_ ) }
+sub unimport_into { shift->apply( 0, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $on, $caller, @syms ) = @_;
+
+   @syms or @syms = qw( existsor );
+
+   my %syms = map { $_ => 1 } @syms;
+   if( delete $syms{existsor} ) {
+      $on ? $^H{"Syntax::Operator::ExistsOr/existsor"}++
+          : delete $^H{"Syntax::Operator::ExistsOr/existsor"};
+   }
+
+   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+}
 
 =head1 OPERATORS
 
@@ -90,27 +126,6 @@ for this operator would be neater written
 It is included largely for completeness.
 
 =cut
-
-sub import
-{
-   my $class = shift;
-   my $caller = caller;
-
-   $class->import_into( $caller, @_ );
-}
-
-sub import_into
-{
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
-
-   @syms or @syms = qw( existsor );
-
-   my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Operator::ExistsOr/existsor"}++ if delete $syms{existsor};
-
-   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
-}
 
 =head1 AUTHOR
 

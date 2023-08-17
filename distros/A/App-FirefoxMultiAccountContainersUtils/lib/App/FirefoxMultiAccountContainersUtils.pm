@@ -8,9 +8,9 @@ use Log::ger;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-04'; # DATE
+our $DATE = '2023-06-06'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -27,17 +27,22 @@ About the add-on: <https://addons.mozilla.org/en-US/firefox/addon/multi-account-
 _
 };
 
-our %arg0_profile = (
+our %argspec0_profile = (
     profile => {
-        schema => 'firefox::local_profile_name*',
-        req => 1,
+        # XXX not observed yet by pericmd-lite when setting default value for
+        # args, only 'default' clause is checked. so we currently still set
+        # default value manually in _get_containers_json
+        schema => 'firefox::local_profile_name::default_first*',
         pos => 0,
     },
 );
 
-our %argopt_profile = (
+our %argspecopt_profile = (
     profile => {
-        schema => 'firefox::local_profile_name*',
+        # XXX not observed yet by pericmd-lite when setting default value for
+        # args, only 'default' clause is checked. so we currently still set
+        # default value manually in _get_containers_json
+        schema => 'firefox::local_profile_name::default_first*',
     },
 );
 
@@ -58,7 +63,7 @@ sub _get_containers_json {
             unless $res->[0] == 200;
         if ($args->{-dry_run}) {
             log_info "[DRY-RUN] Note that Firefox is still running, ".
-                "you should stop Firefox first when actually sorting containers";
+                "you should stop Firefox first when actually modifying containers";
         } else {
             return [412, "Please stop Firefox first"] if $res->[2];
         }
@@ -67,6 +72,13 @@ sub _get_containers_json {
     $res = Firefox::Util::Profile::list_firefox_profiles(detail=>1);
     return [500, "Can't list Firefox profiles: $res->[0] - $res->[1]"]
         unless $res->[0] == 200;
+
+    # set default value of args, this will eventually be removed if pericmd has
+    # observed x.perl.default_value_rules
+    #use DDC; print "D1:"; dd $args;
+    $args->{profile} //= $res->[2][0]{name};
+    #use DDC; print "D2:"; dd $args;
+
     my $path;
     {
         for (@{ $res->[2] }) {
@@ -125,7 +137,7 @@ $SPEC{firefox_mua_list_containers} = {
     v => 1.1,
     summary => "List Firefox Multi-Account Containers add-on's containers",
     args => {
-        %arg0_profile,
+        %argspec0_profile,
     },
 };
 sub firefox_mua_list_containers {
@@ -153,7 +165,7 @@ the record. It can also choose to return false to instruct deleting the record.
 
 _
     args => {
-        %arg0_profile,
+        %argspec0_profile,
         code => {
             schema => ['any*', of=>['code*', 'str*']],
             req => 1,
@@ -229,6 +241,95 @@ sub firefox_mua_modify_containers {
     [200];
 }
 
+$SPEC{firefox_mua_add_container} = {
+    v => 1.1,
+    summary => "Add a new Firefox Multi-Account container",
+    description => <<'_',
+
+This utility will copy the last container record, change the name to the one you
+specify, and add it to the list of containers. You can also set some other
+attributes.
+
+_
+    args => {
+        %argspec0_profile,
+        name => {
+            summary => 'Name for the new container',
+            schema => ['str*', min_len=>1],
+            pos => 1,
+        },
+        color => {
+            schema => ['str*', match=>qr/\A\w+\z/], # XXX currently not validated for valid values
+        },
+        icon => {
+            schema => ['str*', match=>qr/\A\w+\z/], # XXX currently not validated for valid values
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub firefox_mua_add_container {
+    require App::FirefoxUtils;
+    require File::Copy;
+    require File::Slurper;
+    require Firefox::Util::Profile;
+    require JSON::MaybeXS;
+
+    my %args = @_;
+    defined(my $name = $args{name}) or return [400, "Please specify name for new container"];
+
+    my $res;
+    $res = _get_containers_json(\%args, 'backup');
+    return $res unless $res->[0] == 200;
+
+    my $path = $res->[2]{path};
+    my $json = $res->[2]{content};
+
+    # we currently need one existing identity
+    @{ $json->{identities} } or return [412, "I need at least one existing identity"];
+    my $new_identity = { %{$json->{identities}[-1]} };
+    $new_identity->{name} = $name;
+
+    # check that name does not already exist
+    for my $identity (@{ $json->{identities} }) {
+        return [409, "Identity with name '$name' already exists"] if $identity->{name} eq $name;
+    }
+
+    # set other attributes
+    if (defined $args{icon}) {
+        $new_identity->{icon} = $args{icon};
+    }
+    if (defined $args{color}) {
+        $new_identity->{color} = $args{color};
+    }
+
+    # set user context id to the greatest
+    {
+        my $max_context_id = 0;
+        for my $identity (@{ $json->{identities} }) {
+            $max_context_id = $identity->{userContextId}
+                if $max_context_id < $identity->{userContextId}
+                && $identity->{userContextId} < 4294967295;
+        }
+        $new_identity->{userContextId} = $max_context_id;
+    }
+
+    # add the new container
+    push @{ $json->{identities} }, $new_identity;
+
+    if ($args{-dry_run}) {
+        # convert boolean object to 1/0 for display
+        for (@{ $json->{identities} }) { $_->{public} = $_->{public} ? 1:0 }
+
+        return [200, "OK (dry-run)", $json->{identities}[-1]];
+    }
+
+    log_info "Writing $path ...";
+    File::Slurper::write_text($path, JSON::MaybeXS::encode_json($json));
+    [200];
+}
+
 $SPEC{firefox_mua_sort_containers} = {
     v => 1.1,
     summary => "Sort Firefox Multi-Account Containers add-on's containers",
@@ -251,7 +352,7 @@ that you use often (`foo`, `bar`, `baz`, `qux`) at the top.
 
 _
     args => {
-        %arg0_profile,
+        %argspec0_profile,
         %Sort::Sub::argsopt_sortsub,
     },
     features => {
@@ -297,6 +398,33 @@ sub firefox_mua_sort_containers {
     [200];
 }
 
+$SPEC{firefox_mua_dump_identities_json} = {
+    v => 1.1,
+    summary => "Dump the content of identities.json",
+    description => <<'_',
+
+_
+    args => {
+        %argspec0_profile,
+    },
+};
+sub firefox_mua_dump_identities_json {
+    require App::FirefoxUtils;
+    require Firefox::Util::Profile;
+    require JSON::MaybeXS;
+
+    my %args = @_;
+
+    my $res;
+    $res = _get_containers_json(\%args);
+    return $res unless $res->[0] == 200;
+
+    my $path = $res->[2]{path};
+    my $json = $res->[2]{content};
+
+    [200, "OK", $json];
+}
+
 $SPEC{open_firefox_container} = {
     v => 1.1,
     summary => "CLI to open URL in a new Firefox tab, in a specific multi-account container",
@@ -318,7 +446,7 @@ Ref: <https://github.com/mozilla/multi-account-containers/issues/365>
 
 _
     args => {
-        %argopt_profile,
+        %argspecopt_profile,
         container => {
             schema => 'str*',
             completion => \&_complete_container,
@@ -331,6 +459,16 @@ _
             schema => ['array*', of=>'str*'],
             pos => 1,
             slurpy => 1,
+        },
+        extra_firefox_options_before => {
+            summary => 'Additional options (arguments) to put before the URLs',
+            schema => ['array*', of=>'str*'],
+            cmdline_aliases => {'b'=>{}},
+        },
+        extra_firefox_options_after => {
+            summary => 'Additional options (arguments) to put after the URLs',
+            schema => ['array*', of=>'str*'],
+            cmdline_aliases => {'a'=>{}},
         },
     },
     features => {
@@ -347,6 +485,17 @@ _
             argv => [qw|mycontainer|],
             test => 0,
             'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Open URL in a new tab in a new window',
+            argv => [qw|mycontainer www.example.com -b --new-window|],
+            test => 0,
+            'x.doc.show_result' => 0,
+            description => <<'_',
+
+This command passes the `--new-window` option to `firefox`.
+
+_
         },
     ],
     links => [
@@ -367,7 +516,12 @@ sub open_firefox_container {
         push @urls, $url;
     }
 
-    my @cmd = ("firefox", @urls);
+    my @cmd = (
+        "firefox",
+        @{$args{extra_firefox_options_before} // []},
+        @urls,
+        @{$args{extra_firefox_options_after} // []},
+    );
     log_trace "Executing %s ...", \@cmd;
     exec @cmd;
     #[200]; # won't be reached
@@ -388,7 +542,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.015 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
+This document describes version 0.017 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
 
 =head1 SYNOPSIS
 
@@ -399,15 +553,19 @@ containers addon:
 
 =over
 
-=item * L<firefox-container>
+=item 1. L<firefox-container>
 
-=item * L<firefox-mua-list-containers>
+=item 2. L<firefox-mua-add-container>
 
-=item * L<firefox-mua-modify-containers>
+=item 3. L<firefox-mua-dump-identities-json>
 
-=item * L<firefox-mua-sort-containers>
+=item 4. L<firefox-mua-list-containers>
 
-=item * L<open-firefox-container>
+=item 5. L<firefox-mua-modify-containers>
+
+=item 6. L<firefox-mua-sort-containers>
+
+=item 7. L<open-firefox-container>
 
 =back
 
@@ -415,6 +573,103 @@ containers addon:
 About the add-on: L<https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>.
 
 =head1 FUNCTIONS
+
+
+=head2 firefox_mua_add_container
+
+Usage:
+
+ firefox_mua_add_container(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Add a new Firefox Multi-Account container.
+
+This utility will copy the last container record, change the name to the one you
+specify, and add it to the list of containers. You can also set some other
+attributes.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<color> => I<str>
+
+(No description)
+
+=item * B<icon> => I<str>
+
+(No description)
+
+=item * B<name> => I<str>
+
+Name for the new container.
+
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
+
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=E<gt>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 firefox_mua_dump_identities_json
+
+Usage:
+
+ firefox_mua_dump_identities_json(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Dump the content of identities.json.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 firefox_mua_list_containers
@@ -431,7 +686,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<profile>* => I<firefox::local_profile_name>
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
 
 
 =back
@@ -497,7 +754,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<code>* => I<code|str>
 
-=item * B<profile>* => I<firefox::local_profile_name>
+(No description)
+
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
 
 
 =back
@@ -557,7 +818,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<profile>* => I<firefox::local_profile_name>
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
 
 =item * B<sort_args> => I<array[str]>
 
@@ -616,6 +879,16 @@ Examples:
 
  open_firefox_container(container => "mycontainer");
 
+=item * Open URL in a new tab in a new window:
+
+ open_firefox_container(
+     container => "mycontainer",
+   urls => ["www.example.com"],
+   extra_firefox_options_before => ["--new-window"]
+ );
+
+This command passes the C<--new-window> option to C<firefox>.
+
 =back
 
 This utility opens a new firefox tab in a specific multi-account container. This
@@ -640,9 +913,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<container>* => I<str>
 
-=item * B<profile> => I<firefox::local_profile_name>
+(No description)
+
+=item * B<extra_firefox_options_after> => I<array[str]>
+
+Additional options (arguments) to put after the URLs.
+
+=item * B<extra_firefox_options_before> => I<array[str]>
+
+Additional options (arguments) to put before the URLs.
+
+=item * B<profile> => I<firefox::local_profile_name::default_first>
+
+(No description)
 
 =item * B<urls> => I<array[str]>
+
+(No description)
 
 
 =back
@@ -703,7 +990,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for LWP-ConsoleLogger
 
+1.000001  2023-06-21 16:14:51Z
+    - Enable selection of log filename from environment variable (GH#28) (Håkon
+      Hægland)
+
 1.000000  2022-08-17 18:19:05Z
     - This module is no longer considered to be beta
     - Document that Everywhere can be used with the -M switch (GH#22) (Olaf

@@ -25,6 +25,7 @@ my $handler = builder {
             cms_prefixes,
             document_extensions,
             dot_files,
+            exchange_prefixes,
             fake_extensions,
             header_injection,
             ip_address_referer,
@@ -338,6 +339,34 @@ test_psgi
 
     subtest 'blocked' => sub {
         my $req = GET "/foo/example.doc";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked exchange' => sub {
+        my $req = GET "/ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked exchange' => sub {
+        my $req = GET '/autodiscover/autodiscover.json?@zdi/Powershell';
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked exchange' => sub {
+        my $req = POST "/Autodiscover/Autodiscover.xml";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked exchange' => sub {
+        my $req = GET '/ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application';
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";

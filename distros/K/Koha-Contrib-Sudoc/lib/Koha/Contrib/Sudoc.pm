@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.39';
+$Koha::Contrib::Sudoc::VERSION = '2.40';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -224,6 +224,34 @@ sub load_waiting {
 }
 
 
+sub record_as_text {
+    my ($self, $record) = @_;
+
+    my $text = $record->as('Text');
+    my @lines;
+    for my $line (split /\n/, $text) {
+        if (length($line) > 100) {
+            my @words = split / /, $line;
+            $line = '';
+            while (@words) {
+                my $word = shift @words;
+                if (length($word) + length($line) > 100) {
+                    push @lines, $line;
+                    $line = "       $word";
+                }
+                else {
+                    $line = $line ? "$line $word" : $word;
+                }
+            }
+            push @lines, $line;
+        }
+        else {
+            push @lines, $line;
+        }
+    }
+    return join("\n", @lines) . "\n\n";
+}
+
 1;
 
 __END__
@@ -238,7 +266,7 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 DESCRIPTION
 
@@ -252,7 +280,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Demians.
+This software is Copyright (c) 2023 by Fréderic Demians.
 
 This is free software, licensed under:
 

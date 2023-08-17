@@ -21,13 +21,14 @@ sub set_valid {
     $ENV{OMP_CANCELLATION}      = q{TRUE};
     $ENV{OMP_DISPLAY_ENV}       = q{TRUE};
     $ENV{OMP_TARGET_OFFLOAD}    = q{MANDATORY};
-    $ENV{OMP_DYNAMIC}           = q{TRUE};
+    $ENV{OMP_DYNAMIC}           = q{true};
     $ENV{OMP_DEFAULT_DEVICE}    = 0;
     $ENV{OMP_MAX_ACTIVE_LEVELS} = 1;
     $ENV{OMP_MAX_TASK_PRIORITY} = 0;
     $ENV{OMP_NESTED}            = q{TRUE};
     $ENV{OMP_NUM_THREADS}       = 16;
     $ENV{OMP_THREAD_LIMIT}      = 1;
+    $ENV{OMP_TEAMS_THREAD_LIMIT}      = 1;
     $ENV{OMP_WAIT_POLICY}       = q{PASSIVE};
     $ENV{GOMP_DEBUG}            = 0;
 }
@@ -101,8 +102,18 @@ dies_ok( sub { $env->assert_omp_environment }, q{Fails as expectedly when OMP_NU
 
 set_valid();
 
+$ENV{OMP_NUM_TEAMS} = q{figgy};
+dies_ok( sub { $env->assert_omp_environment }, q{Fails as expectedly when OMP_NUM_TEAMS is invalid} );
+
+set_valid();
+
 $ENV{OMP_THREAD_LIMIT} = q{aaa};
 dies_ok( sub { $env->assert_omp_environment }, q{Fails as expectedly when OMP_THREAD_LIMIT is invalid} );
+
+set_valid();
+
+$ENV{OMP_TEAMS_THREAD_LIMIT} = q{aaa};
+dies_ok( sub { $env->assert_omp_environment }, q{Fails as expectedly when OMP_TEAMS_THREAD_LIMIT is invalid} );
 
 set_valid();
 

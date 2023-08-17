@@ -3,13 +3,13 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::FieldAttr::Final;
 
 class Example {
-   has $field :reader :param :Final;
+   field $field :reader :param :Final;
 
    ADJUST { $field = uc $field }
 

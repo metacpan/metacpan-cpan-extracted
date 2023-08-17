@@ -31,15 +31,34 @@ sub load_workers {
       if $plugin !~ m/^\+/;
     $plugin =~ s/^\+//;
 
-    next unless $plugin =~ m/::Plugin::${action}(?:::|$)/i;
+    next unless $plugin =~ m/::Plugin::(?:${action}|Internal)(?:::|$)/i;
     $ENV{ND2_LOG_PLUGINS} && debug "loading worker plugin $plugin";
     Module::Load::load $plugin;
   }
 
-  # now vars->{workers} is populated, we set the dispatch order
   my $workers = vars->{'workers'}->{$action} || {};
+
+  # need to merge in internal workers without overriding action workers
+  # we also drop any "stage" (sub-namespace) and install to "__internal__"
+  # which has higher run priority than "_base_" and any other.
+
+  foreach my $phase (qw/check early main user store late/) {
+    next unless exists vars->{'workers'}->{'internal'}
+      and exists vars->{'workers'}->{'internal'}->{$phase};
+    my $internal = vars->{'workers'}->{'internal'};
+
+    foreach my $namespace (keys %{ $internal->{$phase} }) {
+      foreach my $priority (keys %{ $internal->{$phase}->{$namespace} }) {
+        push @{ $workers->{$phase}->{'__internal__'}->{$priority} },
+          @{ $internal->{$phase}->{$namespace}->{$priority} };
+      }
+    }
+  }
+
+  # use DDP; my $x = vars{'workers'}; p $x; p $workers;
+
+  # now vars->{workers} is populated, we set the dispatch order
   my $driverless_main = 0;
-  #use DDP; p vars->{'workers'};
 
   foreach my $phase (qw/check early main user store late/) {
     my $pname = "workers_${phase}";

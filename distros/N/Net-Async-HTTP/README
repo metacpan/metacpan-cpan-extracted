@@ -150,6 +150,12 @@ PARAMETERS
 
  proxy_port => INT
 
+    Since version 0.10.
+
+ proxy_path => PATH
+
+    Since version 0.49.
+
     Optional. Default values to apply to each request method.
 
  cookie_jar => HTTP::Cookies
@@ -285,10 +291,12 @@ METHODS
       defined, will default to http or https depending on whether SSL is
       being used.
 
-    family => INT
+    family => INT or STRING
 
       Optional. Restricts the socket family for connecting. If not defined,
-      will default to the globally-configured value in the object.
+      will default to the globally-configured value in the object. The
+      value may either be a PF_* constant directly, or the lowercase name
+      of one such as inet.
 
     SSL => BOOL
 
@@ -337,7 +345,16 @@ METHODS
 
     proxy_port => INT
 
+      Since version 0.10.
+
       Optional. Override the hostname or port number implied by the URI.
+
+    proxy_path => PATH
+
+      Since version 0.49.
+
+      Optional. Set a UNIX socket path to use as a proxy. To make use of
+      this, also set the family argument to unix.
 
     For either request type, it takes the following arguments:
 
@@ -466,12 +483,20 @@ METHODS
        $response = await $http->PUT( $uri, $content, %args );
     
        $response = await $http->POST( $uri, $content, %args );
-    
+
+    Since version 0.36.
+
        $response = await $http->PATCH( $uri, $content, %args );
 
-    Convenient wrappers for performing GET, HEAD, PUT, POST or PATCH
-    requests with a URI object and few if any other arguments, returning a
-    Future.
+    Since version 0.48.
+
+       $response = await $http->DELETE( $uri, %args );
+
+    Since version 0.49.
+
+    Convenient wrappers for performing GET, HEAD, PUT, POST, PATCH or
+    DELETE requests with a URI object and few if any other arguments,
+    returning a Future.
 
     Remember that POST with non-form data (as indicated by a plain scalar
     instead of an ARRAY reference of form data name/value pairs) needs a

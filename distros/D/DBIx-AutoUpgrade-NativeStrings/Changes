@@ -1,5 +1,7 @@
 Revision history for DBIx-AutoUpgrade-NativeStrings
 
+1.02     16.07.2023
+  - more detailed debugging messages, including SQL and caller context
 
 1.01     22.05.2023
   - initial version

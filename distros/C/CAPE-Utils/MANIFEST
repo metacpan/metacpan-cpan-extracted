@@ -9,10 +9,14 @@ t/pod-coverage.t
 t/pod.t
 src_bin/cape_utils
 src_bin/mojo_cape_submit
+src_bin/mojo_cape_submit_extend
 src_bin/suricata_extract_submit
 src_bin/suricata_extract_submit_extend
 bin/.exists
 systemd/mojo_cape_submit.service
 perltidyrc
+munge_examples/pdf_check
+munge_examples/pdf_munge
+.gitignore
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

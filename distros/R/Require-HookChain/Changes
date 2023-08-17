@@ -1,3 +1,47 @@
+0.015   2023-07-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [test] [bugfix] Add basic tests for all hooks, fix a couple of bugs
+          (hooks previously not working).
+
+        - [doc] Various improvements to documentation, notably add documentation
+          about hook ordering. Annotate code in Synopsis more. Remove mention of
+          filter:: subnamespace and replace it with precheck:: and postcheck::.
+
+        - New hooks: debug::dump_source::{stderr,logger}.
+
+
+0.014   2023-05-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix POD formatting.
+
+        - [doc] Tweak Synopsis to make it clearer that you can install multiple
+          other hooks and they all work.
+
+
+0.013   2023-04-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add hook: source::test::code.
+
+        - [doc] Tweak document for source::test::str hook.
+
+
+0.012   2023-04-22  Released-By: PERLANCAR; Urgency: high
+
+        - Add option -debug.
+
+        - [bugfix] -end was not functioning as advertised.
+
+        - Add hook: source::test::str.
+
+        - [doc] Document import options.
+
+        - [doc] Tweak Synopsis to make example clearer.
+
+        - [internal] Always use our own version of blessed(), to be minimalist.
+
+
 0.011   2023-02-12  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

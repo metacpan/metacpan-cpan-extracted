@@ -152,7 +152,7 @@ sub matchHeader{
   is(1, $sawType, "Should see type in header");
 }
 
-# Copyright 2009-2011 David Solimano
+# Copyright 2009-2023 David Solimano
 # This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
 # Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify

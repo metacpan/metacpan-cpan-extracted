@@ -2,26 +2,32 @@ package Thrall;
 
 =head1 NAME
 
-Thrall - a simple PSGI/Plack HTTP server which uses threads
+Thrall - Simple PSGI/Plack HTTP server which uses threads
 
 =head1 SYNOPSIS
 
-  $ plackup -s Thrall --port=80 [options] your-app.psgi
+=for markdown ```console
 
-  $ plackup -s Thrall --port=443 --ssl=1 --ssl-key-file=file.key
-                      --ssl-cert-file=file.crt [options] your-app.psgi
+    $ plackup -s Thrall --port=80 [options] your-app.psgi
 
-  $ plackup -s Thrall --port=80 --ipv6 [options] your-app.psgi
+    $ plackup -s Thrall --port=443 --ssl=1 --ssl-key-file=file.key
+                        --ssl-cert-file=file.crt [options] your-app.psgi
 
-  $ plackup -s Thrall --socket=/tmp/thrall.sock [options] your-app.psgi
+    $ plackup -s Thrall --port=80 --ipv6 [options] your-app.psgi
 
-  $ starlight your-app.psgi
+    $ plackup -s Thrall --socket=/tmp/thrall.sock [options] your-app.psgi
+
+    $ thrall your-app.psgi
+
+    $ thrall --help
+
+=for markdown ```
 
 =head1 DESCRIPTION
 
 Thrall is a standalone HTTP/1.1 server with keep-alive support. It uses
-threads instead pre-forking, so it works correctly on Windows. It is pure-Perl
-implementation which doesn't require any XS package.
+threads instead pre-forking, so it works correctly on Windows. It is a
+pure-Perl implementation which doesn't require any XS package.
 
 See L<plackup> and L<thrall> (lower case) for available command line
 options.
@@ -30,16 +36,14 @@ options.
 
 =cut
 
-
 use 5.008_001;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0305';
+our $VERSION = '0.0405';
 
 1;
-
 
 __END__
 
@@ -68,7 +72,7 @@ Tatsuhiko Miyagawa
 
 =head1 LICENSE
 
-Copyright (c) 2013-2017 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2013-2017, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

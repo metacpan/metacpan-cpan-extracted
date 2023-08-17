@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Class for disc space information.',
                                   class => 'DiscUsage',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'used_size' => {
      	datatype => 'int',
      	base_name => 'UsedSize',
-     	description => '',
+     	description => 'Application used disc space.',
      	format => '',
      	read_only => '',
      		},
      'total_size' => {
      	datatype => 'int',
      	base_name => 'TotalSize',
-     	description => '',
+     	description => 'Total disc space.',
      	format => '',
      	read_only => '',
      		},    

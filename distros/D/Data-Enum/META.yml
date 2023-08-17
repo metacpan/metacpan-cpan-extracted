@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 keywords:
   - immutable
   - read-only
@@ -24,7 +24,7 @@ name: Data-Enum
 provides:
   Data::Enum:
     file: lib/Data/Enum.pm
-    version: v0.2.6
+    version: v0.2.7
 recommends:
   Package::Stash::XS: '0'
 requires:
@@ -39,8 +39,8 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Data-Enum/issues
   repository: git://github.com/robrwo/perl-Data-Enum.git
-version: v0.2.6
+version: v0.2.7
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

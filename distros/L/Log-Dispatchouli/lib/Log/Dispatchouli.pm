@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.002;
+package Log::Dispatchouli 3.006;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -447,6 +447,10 @@ sub log_debug {
 #pod result logged.  If its result is also a code reference, you get whatever
 #pod garbage that code reference stringifies to.
 #pod
+#pod If the value in C<$data_ref> is a reference reference, then the referenced
+#pod scalar will be passed to String::Flogger, and the resulting string will be used
+#pod as the value to log.  That string will be quoted as described above, if needed.
+#pod
 #pod =cut
 
 sub log_event {
@@ -862,7 +866,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.002
+version 3.006
 
 =head1 SYNOPSIS
 
@@ -900,13 +904,13 @@ docs.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -1057,6 +1061,10 @@ lazy.  Don't push the limits.
 If the value in C<$data_ref> is a code reference, it will be called and its
 result logged.  If its result is also a code reference, you get whatever
 garbage that code reference stringifies to.
+
+If the value in C<$data_ref> is a reference reference, then the referenced
+scalar will be passed to String::Flogger, and the resulting string will be used
+as the value to log.  That string will be quoted as described above, if needed.
 
 =head2 log_debug_event
 
@@ -1369,7 +1377,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,15 +1,17 @@
 package DOCSIS::ConfigFile;
 use strict;
 use warnings;
+use Carp qw(carp confess croak);
 
 use constant CAN_TRANSLATE_OID => $ENV{DOCSIS_CAN_TRANSLATE_OID} // eval 'require SNMP;1' || 0;
-use constant DEBUG => $ENV{DOCSIS_CONFIGFILE_DEBUG} || 0;
+use constant DEBUG             => $ENV{DOCSIS_CONFIGFILE_DEBUG}                           || 0;
 use if DEBUG, 'Data::Dumper';
 
 if (CAN_TRANSLATE_OID) {
   require File::Basename;
   require File::Spec;
-  our $OID_DIR = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), 'ConfigFile', 'mibs'));
+  our $OID_DIR = File::Spec->rel2abs(
+    File::Spec->catdir(File::Basename::dirname(__FILE__), 'ConfigFile', 'mibs'));
   warn "[DOCSIS] Adding OID directory $OID_DIR\n" if DEBUG;
   SNMP::addMibDirs($OID_DIR);
   SNMP::loadModules('ALL');
@@ -22,28 +24,29 @@ use Exporter 'import';
 use DOCSIS::ConfigFile::Decode;
 use DOCSIS::ConfigFile::Encode;
 
-our $VERSION = '0.76';
+our $VERSION = '1.01';
 our @EXPORT_OK = qw(decode_docsis encode_docsis);
 our ($DEPTH, $CONFIG_TREE, @CMTS_MIC) = (0, {});
 
 sub decode_docsis {
-  my $args    = ref $_[-1] eq 'HASH' ? $_[-1] : {};
+  my $options = ref $_[-1] eq 'HASH' ? $_[-1] : {};
   my $bytes   = shift;
-  my $current = $args->{blueprint} || $CONFIG_TREE;
-  my $pos     = $args->{pos} || 0;
+  my $current = $options->{blueprint} || $CONFIG_TREE;
+  my $pos     = $options->{pos}       || 0;
   my $data    = {};
   my $end;
 
   if (ref $bytes eq 'SCALAR') {
     my ($file, $r) = ($$bytes, 0);
     $bytes = '';
-    open my $BYTES, '<', $file or die "decode_docsis $file: $!";
+    open my $BYTES, '<', $file or croak "Can't decode DOCSIS file $file: $!";
     while ($r = sysread $BYTES, my $buf, 131072, 0) { $bytes .= $buf }
-    die "decode_docsis $file: $!" unless defined $r;
+    croak "Can't decode DOCSIS file $file: $!" unless defined $r;
+    warn "[DOCSIS] Decode @{[length $bytes]} bytes from $file\n" if DEBUG;
   }
 
   local $DEPTH = $DEPTH + 1 if DEBUG;
-  $end = $args->{end} || length $bytes;
+  $end = $options->{end} || length $bytes;
 
   while ($pos < $end) {
     my $code = unpack 'C', substr $bytes, $pos++, 1 or next;    # next on $code=0
@@ -57,12 +60,13 @@ sub decode_docsis {
     }
 
     unless ($name) {
-      warn "[DOCSIS] Internal error: No syminfo defined for code=$code.";
+      carp "[DOCSIS] Internal error: No syminfo defined for code=$code.";
       next;
     }
 
     unless ($syminfo->{lsize}) {
-      warn sprintf "[DOCSIS]%sDecode %s type=%s (0x%02x), len=0\n", join('', (' ' x $DEPTH)), $name, $code, $code
+      warn sprintf "[DOCSIS]%sDecode %s type=%s (0x%02x), len=0\n", join('', (' ' x $DEPTH)),
+        $name, $code, $code
         if DEBUG;
       next;
     }
@@ -73,20 +77,21 @@ sub decode_docsis {
     $length = unpack $t, substr $bytes, $pos, $syminfo->{lsize};
     $pos += $syminfo->{lsize};
 
-    warn sprintf "[DOCSIS]%sDecode %s type=%s (0x%02x), len=%s, with %s()\n", join('', (' ' x $DEPTH)), $name, $code,
-      $code, $length, $syminfo->{func} // 'unknown'
+    warn sprintf "[DOCSIS]%sDecode %s type=%s (0x%02x), len=%s, with %s()\n",
+      join('', (' ' x $DEPTH)), $name, $code, $code, $length, $syminfo->{func} // 'unknown'
       if DEBUG;
 
     if ($syminfo->{nested}) {
-      local @$args{qw(blueprint end pos)} = ($syminfo->{nested}, $length + $pos, $pos);
-      $value = decode_docsis($bytes, $args);
+      local @$options{qw(blueprint end pos)} = ($syminfo->{nested}, $length + $pos, $pos);
+      $value = decode_docsis($bytes, $options);
     }
     elsif (my $f = DOCSIS::ConfigFile::Decode->can($syminfo->{func})) {
       $value = $f->(substr $bytes, $pos, $length);
       $value = {oid => @$value{qw(oid type value)}} if $name eq 'SnmpMibObject';
     }
     else {
-      die qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Decode");
+      confess
+        qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Decode");
     }
 
     $pos += $length;
@@ -106,15 +111,15 @@ sub decode_docsis {
 }
 
 sub encode_docsis {
-  my ($data, $args) = @_;
-  my $current = $args->{blueprint} || $CONFIG_TREE;
+  my ($data, $options) = @_;
+  my $current = $options->{blueprint} || $CONFIG_TREE;
   my $mic     = {};
   my $bytes   = '';
 
-  local $args->{depth} = ($args->{depth} || 0) + 1;
-  local $DEPTH = $args->{depth} if DEBUG;
+  local $options->{depth} = ($options->{depth} || 0) + 1;
+  local $DEPTH = $options->{depth} if DEBUG;
 
-  if ($args->{depth} == 1 and defined $args->{mta_algorithm}) {
+  if ($options->{depth} == 1 and defined $options->{mta_algorithm}) {
     delete $data->{MtaConfigDelimiter};
     $bytes .= encode_docsis({MtaConfigDelimiter => 1}, {depth => 1});
   }
@@ -127,8 +132,8 @@ sub encode_docsis {
     for my $item (_to_list($data->{$name}, $syminfo)) {
       if ($syminfo->{nested}) {
         warn "[DOCSIS]@{[' 'x$DEPTH]}Encode $name with encode_docsis\n" if DEBUG;
-        local @$args{qw(blueprint)} = ($current->{$name}{nested});
-        $value = encode_docsis($item, $args);
+        local @$options{qw(blueprint)} = ($current->{$name}{nested});
+        $value = encode_docsis($item, $options);
       }
       elsif (my $f = DOCSIS::ConfigFile::Encode->can($syminfo->{func})) {
         warn "[DOCSIS]@{[' 'x$DEPTH]}Encode $name with $syminfo->{func}\n" if DEBUG;
@@ -138,7 +143,8 @@ sub encode_docsis {
         elsif ($name eq 'SnmpMibObject') {
           my @k = qw(type value);
           local $item->{oid} = $item->{oid};
-          $value = pack 'C*', $f->({value => {oid => delete $item->{oid}, map { shift(@k), $_ } %$item}});
+          $value = pack 'C*',
+            $f->({value => {oid => delete $item->{oid}, map { shift(@k), $_ } %$item}});
         }
         else {
           local $syminfo->{name} = $name;
@@ -146,12 +152,13 @@ sub encode_docsis {
         }
       }
       else {
-        die qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Encode");
+        confess
+          qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Encode");
       }
 
       {
         use warnings FATAL => 'all';
-        $type = pack 'C', $syminfo->{code};
+        $type   = pack 'C', $syminfo->{code};
         $length = $syminfo->{lsize} == 2 ? pack('n', length $value) : pack('C', length $value);
       }
 
@@ -160,14 +167,14 @@ sub encode_docsis {
     }
   }
 
-  return $bytes if $args->{depth} != 1;
-  return _mta_eof($bytes, $args) if defined $args->{mta_algorithm};
-  return _cm_eof($bytes, $mic, $args);
+  return $bytes                     if $options->{depth} != 1;
+  return _mta_eof($bytes, $options) if defined $options->{mta_algorithm};
+  return _cm_eof($bytes, $mic, $options);
 }
 
 sub _cm_eof {
   my $mic      = $_[1];
-  my $args     = $_[2];
+  my $options  = $_[2];
   my $cmts_mic = '';
   my $pads     = 4 - (1 + length $_[0]) % 4;
   my $eod_pad;
@@ -175,7 +182,8 @@ sub _cm_eof {
   $mic->{CmMic} = pack('C*', 6, 16) . Digest::MD5::md5($_[0]);
 
   $cmts_mic .= $mic->{$_} || '' for @CMTS_MIC;
-  $cmts_mic = pack('C*', 7, 16) . Digest::HMAC_MD5::hmac_md5($cmts_mic, $args->{shared_secret} || '');
+  $cmts_mic
+    = pack('C*', 7, 16) . Digest::HMAC_MD5::hmac_md5($cmts_mic, $options->{shared_secret} || '');
   $eod_pad = pack('C', 255) . ("\0" x $pads);
 
   return $_[0] . $mic->{CmMic} . $cmts_mic . $eod_pad;
@@ -183,19 +191,23 @@ sub _cm_eof {
 
 sub _mta_eof {
   my $mta_algorithm = $_[1]->{mta_algorithm} || '';
-  my $hash = '';
+  my $hash          = '';
 
   if ($mta_algorithm) {
+    croak "mta_algorithm must be empty string, md5 or sha1."
+      unless $mta_algorithm =~ /^(md5|sha1)$/;
     $hash = $mta_algorithm eq 'md5' ? Digest::MD5::md5_hex($_[0]) : Digest::SHA::sha1_hex($_[0]);
     $hash
-      = encode_docsis({SnmpMibObject => {oid => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0', STRING => "0x$hash"}}, {depth => 1});
+      = encode_docsis(
+      {SnmpMibObject => {oid => '1.3.6.1.4.1.4491.2.2.1.1.2.7.0', STRING => "0x$hash"}},
+      {depth         => 1});
   }
 
   return $hash . $_[0] . encode_docsis({MtaConfigDelimiter => 255}, {depth => 1});
 }
 
 sub _to_list {
-  return $_[0] if $_[1]->{func} =~ /_list$/;
+  return $_[0]    if $_[1]->{func} =~ /_list$/;
   return @{$_[0]} if ref $_[0] eq 'ARRAY';
   return $_[0];
 }
@@ -204,13 +216,13 @@ sub _to_list {
 sub _validate {
   if ($_[1]->{limit}[1]) {
     if ($_[0] =~ /^-?\d+$/) {
-      die "[DOCSIS] $_[1]->{name} holds a too high value. ($_[0])" if $_[1]->{limit}[1] < $_[0];
-      die "[DOCSIS] $_[1]->{name} holds a too low value. ($_[0])"  if $_[0] < $_[1]->{limit}[0];
+      croak "[DOCSIS] $_[1]->{name} holds a too high value. ($_[0])" if $_[1]->{limit}[1] < $_[0];
+      croak "[DOCSIS] $_[1]->{name} holds a too low value. ($_[0])"  if $_[0] < $_[1]->{limit}[0];
     }
     else {
       my $length = ref $_[0] eq 'ARRAY' ? @{$_[0]} : length $_[0];
-      die "[DOCSIS] $_[1]->{name} is too long. ($_[0])"  if $_[1]->{limit}[1] < $length;
-      die "[DOCSIS] $_[1]->{name} is too short. ($_[0])" if $length < $_[1]->{limit}[0];
+      croak "[DOCSIS] $_[1]->{name} is too long. ($_[0])"  if $_[1]->{limit}[1] < $length;
+      croak "[DOCSIS] $_[1]->{name} is too short. ($_[0])" if $length < $_[1]->{limit}[0];
     }
   }
   return $_[0];
@@ -277,9 +289,9 @@ $CONFIG_TREE = {
         lsize  => 1,
         limit  => [1, 255],
         nested => {
-          DsFreqRangeEnd      => {code => 3, func => 'uint',   lsize => 1, limit => [0, 4294967295]},
-          DsFreqRangeStart    => {code => 2, func => 'uint',   lsize => 1, limit => [0, 4294967295]},
-          DsFreqRangeStepSize => {code => 4, func => 'uint',   lsize => 1, limit => [0, 4294967295]},
+          DsFreqRangeEnd      => {code => 3, func => 'uint', lsize => 1, limit => [0, 4294967295]},
+          DsFreqRangeStart    => {code => 2, func => 'uint', lsize => 1, limit => [0, 4294967295]},
+          DsFreqRangeStepSize => {code => 4, func => 'uint', lsize => 1, limit => [0, 4294967295]},
           DsFreqRangeTimeout  => {code => 1, func => 'ushort', lsize => 1, limit => [0, 65535]},
         },
       },
@@ -565,10 +577,6 @@ $CONFIG_TREE = {
 
 DOCSIS::ConfigFile - Decodes and encodes DOCSIS config files
 
-=head1 VERSION
-
-0.76
-
 =head1 DESCRIPTION
 
 L<DOCSIS::ConfigFile> is a class which provides functionality to decode and
@@ -585,38 +593,35 @@ server. These files are L<binary encode|DOCSIS::ConfigFile::Encode> using a
 variety of functions, but all the data in the file are constructed by TLVs
 (type-length-value) blocks. These can be nested and concatenated.
 
+See the source code or L<https://thorsen.pm/docsisious> for list of
+supported parameters.
+
 =head1 SYNOPSIS
 
   use DOCSIS::ConfigFile qw(encode_docsis decode_docsis);
 
   $data = decode_docsis $bytes;
-
-  $bytes = encode_docsis(
-             {
-               GlobalPrivacyEnable => 1,
-               MaxCPE              => 2,
-               NetworkAccess       => 1,
-               BaselinePrivacy => {
-                 AuthTimeout       => 10,
-                 ReAuthTimeout     => 10,
-                 AuthGraceTime     => 600,
-                 OperTimeout       => 1,
-                 ReKeyTimeout      => 1,
-                 TEKGraceTime      => 600,
-                 AuthRejectTimeout => 60,
-                 SAMapWaitTimeout  => 1,
-                 SAMapMaxRetries   => 4
-               },
-               SnmpMibObject => [
-                 {oid => "1.3.6.1.4.1.1.77.1.6.1.1.6.2",    INTEGER => 1},
-                 {oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING  => "bootfile.bin"}
-               ],
-               VendorSpecific => {
-                 id => "0x0011ee",
-                 options => [30 => "0xff", 31 => "0x00", 32 => "0x28"]
-               }
-             }
-           );
+  $bytes = encode_docsis({
+    GlobalPrivacyEnable => 1,
+    MaxCPE              => 2,
+    NetworkAccess       => 1,
+    BaselinePrivacy     => {
+      AuthTimeout       => 10,
+      ReAuthTimeout     => 10,
+      AuthGraceTime     => 600,
+      OperTimeout       => 1,
+      ReKeyTimeout      => 1,
+      TEKGraceTime      => 600,
+      AuthRejectTimeout => 60,
+      SAMapWaitTimeout  => 1,
+      SAMapMaxRetries   => 4
+    },
+    SnmpMibObject => [
+      {oid => "1.3.6.1.4.1.1.77.1.6.1.1.6.2",    INTEGER => 1},
+      {oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING  => "bootfile.bin"}
+    ],
+    VendorSpecific => {id => "0x0011ee", options => [30 => "0xff", 31 => "0x00", 32 => "0x28"]}
+  });
 
 =head1 OPTIONAL MODULE
 
@@ -624,14 +629,27 @@ You can install the L<SNMP.pm|SNMP> module to translate between SNMP
 OID formats. With the module installed, you can define the C<SnmpMibObject>
 like the example below, instead of using numeric OIDs:
 
-  encode_docsis(
-    {
-      SnmpMibObject => [
-        {oid => "docsDevNmAccessIp.1",     IPADDRESS => "10.0.0.1"},
-        {oid => "docsDevNmAccessIpMask.1", IPADDRESS => "255.255.255.255"},
-      ]
-    },
-  );
+  encode_docsis({
+    SnmpMibObject => [
+      {oid => "docsDevNmAccessIp.1",     IPADDRESS => "10.0.0.1"},
+      {oid => "docsDevNmAccessIpMask.1", IPADDRESS => "255.255.255.255"},
+    ]
+  });
+
+=head1 WEB APPLICATION
+
+There is an example web application bundled with this distribution called
+"Docsisious". To run this application, you need to install L<Mojolicious> and
+L<YAML::XS>:
+
+  $ curl -L https://cpanmin.us | perl - -M https://cpan.metacpan.org DOCSIS::ConfigFile Mojolicious;
+
+After installing the modules above, you can run the web app like this:
+
+  $ docsisious --listen http://*:8000;
+
+And then open your favorite browser at L<http://localhost:8000>. To see a live
+demo, you can visit L<https://thorsen.pm/docsisious>.
 
 =head1 FUNCTIONS
 
@@ -690,6 +708,12 @@ Copyright (C) 2014-2018, Jan Henning Thorsen
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 CREDITS
+
+=head2 Font Awesome
+
+C<docsisious> bundles L<Font Awesome|https://fontawesome.com/>.
 
 =head1 AUTHOR
 

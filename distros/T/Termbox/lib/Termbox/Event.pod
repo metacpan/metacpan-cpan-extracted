@@ -1,0 +1,89 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Termbox::Event - A Single User Interaction
+
+=head1 SYNOPSIS
+
+=head2 Description
+
+This class represents an incoming event from the tty.
+
+Given the event type, the following fields are relevant:
+
+=over
+
+=item when C<TB_EVENT_KEY>
+
+(key XOR ch, one will be zero), mod. Note there is overlap between
+C<TB_MOD_CTRL> and C<TB_KEY_CTRL_*>. C<TB_MOD_CTRL> and C<TB_MOD_SHIFT> are
+only set as modifiers to C<TB_KEY_ARROW_*>.
+
+=item when C<TB_EVENT_RESIZE>
+
+w, h
+
+=item when C<TB_EVENT_MOUSE>
+
+key (C<TB_KEY_MOUSE_*>), x, y
+
+=back
+
+=head1 Methods
+
+Events are loaded with a lot of data... user these methods to access it:
+
+=head2 C<type( )>
+
+Returns one of C<TB_EVENT_*> constants.
+
+=head2 C<mod( )>
+
+Returns bitwise C<TB_MOD_*> constants
+
+=head2 C<key( )>
+
+One of the C<TB_KEY_.+> constants imported from Termbox with the C<:key> tag.
+
+=head2 C<ch( )>
+
+A single Unicode code point, if available.
+
+=head2 C<w( )>
+
+Resize width.
+
+=head2 C<h( )>
+
+Resize height
+
+=head2 C<x( )>
+
+Mouse x.
+
+=head2 C<y( )>
+
+Mouse y.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+Unicode
+
+=end stopwords
+
+=cut

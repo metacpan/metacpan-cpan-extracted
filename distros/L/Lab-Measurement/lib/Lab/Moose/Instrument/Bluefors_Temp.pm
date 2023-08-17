@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Bluefors_Temp;
-$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.872';
+$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.881';
 #ABSTRACT: Bluefors temperature control
 
 use v5.20;
@@ -310,7 +310,7 @@ Lab::Moose::Instrument::Bluefors_Temp - Bluefors temperature control
 
 =head1 VERSION
 
-version 3.872
+version 3.881
 
 =head1 SYNOPSIS
 

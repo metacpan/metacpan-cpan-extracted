@@ -24,11 +24,13 @@ sub new
 	my $class = shift;
 	my @pars =
 	(
-	  'columns',undef,'c',
-	    'list (comma-separeted) of columns to extract - plain command line args are added to this list'
+		'columns',undef,'c'
+	,	'list (comma-separeted) of columns to extract - plain command line args are added to this list'
+	.	' (fully specified ranges are supported, 3-5 = 3,4,5)'
 	, 'title','-1','',
 	    'choices for determining column indices from column titles: -1 for automatic treatment of given column values as plain indices if they are integers and as column title to match otherwise, 0: only expect numeric column indices, 1: only expect titles to match; about title matches: you give Perl regular expressions to match against the titles, you write the $bla part in m/$bla/'
 	, 'debug', 0, '', 'print some stuff to stderr to help debugging'
+	, 'invert', 0, 'i', 'specify columns to _omit_, not to include'
 	);
 
 	return $class->SUPER::new
@@ -54,10 +56,25 @@ sub preinit
 	my $self = shift;
 	my $param = $self->{param};
 
-	$self->{pcols} = defined $param->{columns}
-		? [split(/\s*,\s*/, $param->{columns})]
-		: [];
-	push(@{$self->{pcols}}, @{$self->{argv}});
+	$self->{pcols} = [];
+	my @pcols = defined $param->{columns}
+		? (split(/\s*,\s*/, $param->{columns}))
+		: ();
+	for(@pcols, @{$self->{argv}})
+	{
+		if(/^(\d+)-(\d+)$/)
+		{
+			my $incr = $1 < $2 ? +1 : -1;
+			for(my $c = $1; $c != $2+$incr; $c+=$incr)
+			{
+				push(@{$self->{pcols}}, $c);
+			}
+		}
+		else
+		{
+			push(@{$self->{pcols}}, $_);
+		}
+	}
 	#print STDERR "You really want NO data?\n" unless @pcols;
 	return 0;
 }
@@ -140,7 +157,9 @@ sub process_first_data
 	{
 		print STDERR "Got actual titles, extracting.\n"
 			if $param->{debug};
-		return $self->{txd}->title_line($self->{cols});
+		return $self->{txd}->title_line(
+			$param->{invert} ? undef : $self->{cols}
+		,	$param->{invert} ? $self->{cols} : undef );
 	}
 	else{  return \$self->{sline}; }
 }
@@ -149,6 +168,8 @@ sub process_first_data
 sub process_data
 {
 	my $self = shift;
+	my $include = $self->{param}{invert} ? undef : $self->{cols};
+	my $exclude = $self->{param}{invert} ? $self->{cols} : undef;
 	$_[0] = ${$self->{txd}->data_line(
-		$self->{txd}->line_data($_[0]),$self->{cols} )};
+		$self->{txd}->line_data($_[0]), $include, $exclude )};
 }

@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+# Given sample planar difference sets, find lex, gap, or zeta-canonical
+# reference sets of their respective spaces, without using precomputed sets.
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+my $USAGE = "usage: pds_find_any_ref [-l|-g|-z] [file]...\n";
+
+my $type = 1;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last            if '-' eq $opt;
+    $type = 1, next if 'l' eq $opt;
+    $type = 2, next if 'g' eq $opt;
+    $type = 0, next if 'z' eq $opt;
+    die $USAGE;
+}
+
+while(<<>>) {
+    s/^\s+//;
+    my @list = split /\s+/;
+    next if !@list;
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @list;
+    my $s1 = Math::DifferenceSet::Planar->from_elements_fast(@list);
+    my $it = $type == 1? $s1->iterate_planes: $s1->iterate_planes_zc;
+    my $cmp = $s1->can($type == 2? 'compare_topdown': 'compare');
+    my $best = $it->();
+    $best = $best->gap_canonize if $type == 2;
+    while (my $s = $it->()) {
+        $s = $s->gap_canonize if $type == 2;
+        $best = $s if $best->$cmp($s) > 0;
+    }
+    my @e = $best->elements_sorted;
+    print "@e\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_find_any_ref - find reference planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_find_any_ref [-l|-g|-z] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line,
+as integer numbers separated by whitespace, finds from each of their
+respective spaces the reference set of a specified type, and prints the
+results.  It can be used to get standard reference sets from arbitrary
+sample sets without using pre-computed data.
+
+Currently, there are three types of supported reference sets.
+Option B<-l> (the default) finds lexically lowest sets when compared
+from smallest to largest element.  Option B<-g> finds lexically lowest
+sets when compared from largest to smallest element.  Option B<-z> finds
+the lexically lowest zeta-canonical set when compared from smallest to
+largest element.  Note that in any case all rotations of the sets in the
+input are considered, which takes I<O(nE<179>)> or more modular integer
+operations for sets of order I<n>.  For zeta-canonical references,
+a much faster algorithm is implemented in another example program.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

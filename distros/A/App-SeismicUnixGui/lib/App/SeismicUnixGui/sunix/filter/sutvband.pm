@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::filter::sutvband;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

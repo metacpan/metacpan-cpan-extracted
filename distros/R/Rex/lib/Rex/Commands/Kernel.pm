@@ -29,7 +29,7 @@ package Rex::Commands::Kernel;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;

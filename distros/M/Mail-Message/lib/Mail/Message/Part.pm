@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Part;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message';
 
@@ -101,14 +101,14 @@ sub readFromParser($;$)
 {   my ($self, $parser, $bodytype) = @_;
 
     my $head = $self->readHead($parser)
-            || Mail::Message::Head::Complete->new
-                 ( message     => $self
-                 , field_type  => $self->{MM_field_type}
-                 , $self->logSettings
-                 );
+     || Mail::Message::Head::Complete->new
+          ( message     => $self
+          , field_type  => $self->{MM_field_type}
+          , $self->logSettings
+          );
 
     my $body = $self->readBody($parser, $head, $bodytype)
-            || Mail::Message::Body::Lines->new(data => []);
+     || Mail::Message::Body::Lines->new(data => []);
 
     $self->head($head);
     $self->storeBody($body->contentInfoFrom($head));

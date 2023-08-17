@@ -74,7 +74,7 @@ $test->for('synopsis', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->trace(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -87,6 +87,9 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for logging information using various log levels.
+The default log level is L<trace>. Acceptable log levels are C<trace>,
+C<debug>, C<info>, C<warn>, C<error>, and C<fatal>, and the set log level will
+handle events for its level and any preceding levels in the order specified.
 
 =cut
 
@@ -110,7 +113,8 @@ $test->for('integrates');
 
 =attribute handler
 
-The handler attribute holds the callback that handles logging.
+The handler attribute holds the callback that handles logging. The handler is
+passed the log level and the log messages.
 
 =signature handler
 
@@ -132,7 +136,7 @@ The handler attribute holds the callback that handles logging.
 
   my $events = [];
 
-  $handler = $log->handler(sub{push @$events, [@_]});
+  $handler = $log->handler(sub{shift; push @$events, [@_]});
 
 =cut
 
@@ -146,7 +150,9 @@ $test->for('example', 1, 'handler', sub {
 
 =attribute level
 
-The level attribute holds the current log level.
+The level attribute holds the current log level. Valid log levels are C<trace>,
+C<debug>, C<info>, C<warn>, C<error> and C<fatal>, and will emit log messages
+in that order. Invalid log levels effectively disable logging.
 
 =signature level
 
@@ -251,7 +257,7 @@ $test->for('example', 1, 'debug', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->debug(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -279,7 +285,7 @@ $test->for('example', 2, 'debug', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('info');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->debug(1, 'Something failed!');
   is_deeply $logs, [];
@@ -318,7 +324,7 @@ $test->for('example', 1, 'error', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->error(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -346,7 +352,7 @@ $test->for('example', 2, 'error', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('fatal');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->error(1, 'Something failed!');
   is_deeply $logs, [];
@@ -385,7 +391,7 @@ $test->for('example', 1, 'fatal', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->fatal(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -413,7 +419,7 @@ $test->for('example', 2, 'fatal', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('unknown');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->fatal(1, 'Something failed!');
   is_deeply $logs, [];
@@ -452,7 +458,7 @@ $test->for('example', 1, 'info', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->info(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -480,7 +486,7 @@ $test->for('example', 2, 'info', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('warn');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->info(1, 'Something failed!');
   is_deeply $logs, [];
@@ -774,7 +780,7 @@ $test->for('example', 1, 'trace', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->trace(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -802,7 +808,7 @@ $test->for('example', 2, 'trace', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('debug');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->trace(1, 'Something failed!');
   is_deeply $logs, [];
@@ -841,7 +847,7 @@ $test->for('example', 1, 'warn', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->warn(1, 'Something failed!');
   is_deeply $logs, [['1 Something failed!']];
@@ -869,7 +875,7 @@ $test->for('example', 2, 'warn', sub {
   ok $result->isa('Venus::Log');
   ok $result->level('error');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
   ok $result->warn(1, 'Something failed!');
   is_deeply $logs, [];
@@ -883,7 +889,7 @@ The write method invokes the log handler, i.e. L</handler>, and returns the invo
 
 =signature write
 
-  write(Any @data) (Log)
+  write(Str $level, Any @data) (Log)
 
 =metadata write
 
@@ -897,7 +903,7 @@ The write method invokes the log handler, i.e. L</handler>, and returns the invo
 
   package main;
 
-  # $log = $log->write(time, 'Something failed!');
+  # $log = $log->write('info', time, 'Something failed!');
 
   # bless(..., "Venus::Log")
 
@@ -908,11 +914,11 @@ $test->for('example', 1, 'write', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Log');
   my $logs = [];
-  $result->handler(sub{push @$logs, [@_]});
+  $result->handler(sub{shift; push @$logs, [@_]});
   ok !@$logs;
-  ok $result->write(1, 'Something failed!');
+  ok $result->write('info', 1, 'Something failed!');
   is_deeply $logs, [[1, 'Something failed!']];
-  ok $result->write(2, 'Something failed!');
+  ok $result->write('info', 2, 'Something failed!');
   is_deeply $logs, [[1, 'Something failed!'], [2, 'Something failed!']];
 
   $result
@@ -929,6 +935,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Log.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Log.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

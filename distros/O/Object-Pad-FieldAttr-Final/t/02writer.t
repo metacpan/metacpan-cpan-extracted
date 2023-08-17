@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::FieldAttr::Final;
@@ -12,7 +12,7 @@ my $compile_warnings;
 BEGIN { $SIG{__WARN__} = sub { $compile_warnings .= $_[0] }; }
 
 class Example {
-   has $field :reader :writer :param :Final;
+   field $field :reader :writer :param :Final;
 
    ADJUST { $field = uc $field }
 

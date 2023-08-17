@@ -18,10 +18,8 @@
          "requires" : {
             "HTTP::Cookies" : "0",
             "IO::Async::Test" : "0",
-            "Test::Identity" : "0",
-            "Test::Metrics::Any" : "0",
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000147",
+            "Test::Metrics::Any" : "0"
          }
       },
       "configure" : {
@@ -48,22 +46,22 @@
             "Struct::Dumb" : "0.07",
             "Time::HiRes" : "0",
             "URI" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       }
    },
    "provides" : {
       "Net::Async::HTTP" : {
          "file" : "lib/Net/Async/HTTP.pm",
-         "version" : "0.48"
+         "version" : "0.49"
       },
       "Net::Async::HTTP::Connection" : {
          "file" : "lib/Net/Async/HTTP/Connection.pm",
-         "version" : "0.48"
+         "version" : "0.49"
       },
       "Net::Async::HTTP::StallTimer" : {
          "file" : "lib/Net/Async/HTTP/StallTimer.pm",
-         "version" : "0.48"
+         "version" : "0.49"
       }
    },
    "release_status" : "stable",
@@ -73,6 +71,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.48",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.49",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

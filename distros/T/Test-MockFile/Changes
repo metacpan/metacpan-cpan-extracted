@@ -1,5 +1,8 @@
 Revision history for Test-MockFile
 
+0.036   7/26/2023
+- GH #181 - Detect incorrect usage of add_strict_rule_for_command
+
 0.035   11/30/2022
 - GH #180 - Prevent open() and sysopen() from opening GLOB(..)-like paths.
 

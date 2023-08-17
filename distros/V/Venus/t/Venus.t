@@ -5,12 +5,193 @@ use 5.018;
 use strict;
 use warnings;
 
-use Config;
 use Test::More;
 use Venus::Test;
 
+use Config;
+use Venus::Process;
+use Venus::Path;
+
+use_ok "Venus";
+
 my $test = test(__FILE__);
 my $fsds = qr/[:\\\/\.]+/;
+
+our $TEST_VENUS_QX_DATA = '';
+our $TEST_VENUS_QX_EXIT = 0;
+our $TEST_VENUS_QX_CODE = 0;
+
+# _qx
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::_qx"} = sub {
+    (
+      $TEST_VENUS_QX_DATA,
+      $TEST_VENUS_QX_EXIT,
+      $TEST_VENUS_QX_CODE
+    )
+  };
+}
+
+our @TEST_VENUS_PROCESS_PIDS;
+our $TEST_VENUS_PROCESS_ALARM = 0;
+our $TEST_VENUS_PROCESS_CHDIR = 1;
+our $TEST_VENUS_PROCESS_EXIT = 0;
+our $TEST_VENUS_PROCESS_EXITCODE = 0;
+our $TEST_VENUS_PROCESS_FORK = undef;
+our $TEST_VENUS_PROCESS_FORKABLE = 1;
+our $TEST_VENUS_PROCESS_SERVE = 0;
+our $TEST_VENUS_PROCESS_KILL = 0;
+our $TEST_VENUS_PROCESS_OPEN = 1;
+our $TEST_VENUS_PROCESS_PID = 12345;
+our $TEST_VENUS_PROCESS_PPID = undef;
+our $TEST_VENUS_PROCESS_PING = 1;
+our $TEST_VENUS_PROCESS_SETSID = 1;
+our $TEST_VENUS_PROCESS_TIME = 0;
+our $TEST_VENUS_PROCESS_WAITPID = undef;
+
+$Venus::Process::PATH = Venus::Path->mktemp_dir;
+$Venus::Process::PID = $TEST_VENUS_PROCESS_PID;
+
+# _alarm
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_alarm"} = sub {
+    $TEST_VENUS_PROCESS_ALARM = $_[0]
+  };
+}
+
+# _chdir
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_chdir"} = sub {
+    $TEST_VENUS_PROCESS_CHDIR
+  };
+}
+
+# _exit
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exit"} = sub {
+    $TEST_VENUS_PROCESS_EXIT
+  };
+}
+
+# _exitcode
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exitcode"} = sub {
+    $TEST_VENUS_PROCESS_EXITCODE
+  };
+}
+
+# _fork
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_fork"} = sub {
+    if (defined $TEST_VENUS_PROCESS_FORK) {
+      return $TEST_VENUS_PROCESS_FORK;
+    }
+    else {
+      push @TEST_VENUS_PROCESS_PIDS,
+        $TEST_VENUS_PROCESS_PID+@TEST_VENUS_PROCESS_PIDS;
+      return $TEST_VENUS_PROCESS_PIDS[-1];
+    }
+  };
+}
+
+# _forkable
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_forkable"} = sub {
+    return $TEST_VENUS_PROCESS_FORKABLE;
+  };
+}
+
+# _serve
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_serve"} = sub {
+    return $TEST_VENUS_PROCESS_SERVE;
+  };
+}
+
+# _kill
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_kill"} = sub {
+    $TEST_VENUS_PROCESS_KILL;
+  };
+}
+
+# _open
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_open"} = sub {
+    $TEST_VENUS_PROCESS_OPEN
+  };
+}
+
+# _ping
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_ping"} = sub {
+    $TEST_VENUS_PROCESS_PING
+  };
+}
+
+# _setsid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_setsid"} = sub {
+    $TEST_VENUS_PROCESS_SETSID
+  };
+}
+
+# _time
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_time"} = sub {
+    $TEST_VENUS_PROCESS_TIME || time
+  };
+}
+
+# _waitpid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_waitpid"} = sub {
+    if (defined $TEST_VENUS_PROCESS_WAITPID) {
+      return $TEST_VENUS_PROCESS_WAITPID;
+    }
+    else {
+      return pop @TEST_VENUS_PROCESS_PIDS;
+    }
+  };
+}
+
+# default
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::default"} = sub {
+    $TEST_VENUS_PROCESS_PID
+  };
+}
+
 
 =name
 
@@ -40,7 +221,10 @@ $test->for('abstract');
 
 function: args
 function: array
+function: arrayref
 function: assert
+function: async
+function: await
 function: bool
 function: box
 function: call
@@ -49,19 +233,27 @@ function: catch
 function: caught
 function: chain
 function: check
+function: clargs
 function: cli
 function: code
 function: config
+function: container
 function: cop
 function: data
 function: date
+function: docs
 function: error
 function: false
 function: fault
 function: float
 function: gather
 function: hash
+function: hashref
+function: is_bool
+function: is_false
+function: is_true
 function: json
+function: list
 function: load
 function: log
 function: make
@@ -71,21 +263,28 @@ function: meta
 function: name
 function: number
 function: opts
+function: pairs
 function: path
 function: perl
 function: process
 function: proto
+function: puts
 function: raise
 function: random
+function: range
 function: regexp
+function: render
 function: replace
+function: resolve
 function: roll
 function: search
 function: space
 function: schema
 function: string
+function: syscall
 function: template
 function: test
+function: text
 function: then
 function: throw
 function: true
@@ -106,11 +305,7 @@ $test->for('includes');
 
   package main;
 
-  use Venus qw(
-    catch
-    error
-    raise
-  );
+  use Venus 'catch', 'error', 'raise';
 
   # error handling
   my ($error, $result) = catch {
@@ -118,16 +313,16 @@ $test->for('includes');
   };
 
   # boolean keywords
-  if ($result and $result eq false) {
-    true;
+  if ($result) {
+    error;
   }
 
   # raise exceptions
-  if (false) {
+  if ($result) {
     raise 'MyApp::Error';
   }
 
-  # and much more!
+  # boolean keywords, and more!
   true ne false;
 
 =cut
@@ -237,17 +432,20 @@ $test->for('description');
 
 =function args
 
-The args function takes a list of arguments and returns a hashref.
+The args function builds and returns a L<Venus::Args> object, or dispatches to
+the coderef or method provided.
 
 =signature args
 
-  args(Any @args) (HashRef)
+  args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
 
 =metadata args
 
 {
-  since => '2.32',
+  since => '3.10',
 }
+
+=cut
 
 =example-1 args
 
@@ -255,16 +453,16 @@ The args function takes a list of arguments and returns a hashref.
 
   use Venus 'args';
 
-  my $args = args(content => 'example');
+  my $args = args ['--resource', 'users'];
 
-  # {content => "example"}
+  # bless({...}, 'Venus::Args')
 
 =cut
 
 $test->for('example', 1, 'args', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example"};
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Args';
 
   $result
 });
@@ -275,56 +473,16 @@ $test->for('example', 1, 'args', sub {
 
   use Venus 'args';
 
-  my $args = args({content => 'example'});
+  my $args = args ['--resource', 'users'], 'indexed';
 
-  # {content => "example"}
+  # {0 => '--resource', 1 => 'users'}
 
 =cut
 
 $test->for('example', 2, 'args', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example"};
-
-  $result
-});
-
-=example-3 args
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content');
-
-  # {content => undef}
-
-=cut
-
-$test->for('example', 3, 'args', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => undef};
-
-  $result
-});
-
-=example-4 args
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content', 'example', 'algorithm');
-
-  # {content => "example", algorithm => undef}
-
-=cut
-
-$test->for('example', 4, 'args', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example", algorithm => undef};
+  my $result = $tryable->result;
+  is_deeply $result, {0 => '--resource', 1 => 'users'};
 
   $result
 });
@@ -387,6 +545,80 @@ $test->for('example', 2, 'array', sub {
   $result
 });
 
+=function arrayref
+
+The arrayref function takes a list of arguments and returns a arrayref.
+
+=signature arrayref
+
+  arrayref(Any @args) (ArrayRef)
+
+=metadata arrayref
+
+{
+  since => '3.10',
+}
+
+=example-1 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref(content => 'example');
+
+  # [content => "example"]
+
+=cut
+
+$test->for('example', 1, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [content => "example"];
+
+  $result
+});
+
+=example-2 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref([content => 'example']);
+
+  # [content => "example"]
+
+=cut
+
+$test->for('example', 2, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [content => "example"];
+
+  $result
+});
+
+=example-3 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref('content');
+
+  # ['content']
+
+=cut
+
+$test->for('example', 3, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['content'];
+
+  $result
+});
+
 =function assert
 
 The assert function builds a L<Venus::Assert> object and returns the result of
@@ -441,6 +673,109 @@ $test->for('example', 2, 'assert', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   isa_ok $result, 'Venus::Assert::Error';
+
+  $result
+});
+
+=function async
+
+The async function accepts a callback and executes it asynchronously via
+L<Venus::Process/async>. This function returns a
+L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
+with L</await>.
+
+=signature async
+
+  async(CodeRef $code, Any @args) (Process)
+
+=metadata async
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 async
+
+  package main;
+
+  use Venus 'async';
+
+  my $async = async sub{
+    'done'
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'async', sub {
+  no warnings 'once';
+  if ($Config{d_pseudofork}) {
+    plan skip_all => 'Fork emulation not supported';
+    return 1;
+  }
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  ok $result->{directory};
+
+  $result
+});
+
+=function await
+
+The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
+L<Venus::Process> object and eventually returns a value (or values) for it. The
+value(s) returned are the return values or emissions from the asychronous
+callback executed with L</async> which produced the process object.
+
+=signature await
+
+  await(Process $process, Int $timeout) (Any)
+
+=metadata await
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 await
+
+  package main;
+
+  use Venus 'async', 'await';
+
+  my $process;
+
+  my $async = async sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  };
+
+  my $await = await $async;
+
+  # ['done']
+
+=cut
+
+$test->for('example', 1, 'await', sub {
+  no warnings 'once';
+  if ($Config{d_pseudofork}) {
+    plan skip_all => 'Fork emulation not supported';
+    return 1;
+  }
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['done'];
 
   $result
 });
@@ -1210,6 +1545,113 @@ $test->for('example', 2, 'check', sub {
   !$result
 });
 
+=function clargs
+
+The clargs function accepts a single arrayref of L<Getopt::Long> specs, or an
+arrayref of arguments followed by an arrayref of L<Getopt::Long> specs, and
+returns a three element list of L<Venus::Args>, L<Venus::Opts>, and
+L<Venus::Vars> objects. If only a single arrayref is provided, the arguments
+will be taken from C<@ARGV>.
+
+=signature clargs
+
+  clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+
+=metadata clargs
+
+{
+  since => '3.10',
+}
+
+=cut
+
+=example-1 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs;
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 1, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, [];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, [];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
+=example-2 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 2, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, [];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, [];
+  is_deeply $result[1]->specs, ['resource|r=s', 'help|h'];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
+=example-3 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['--resource', 'help'],
+    ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 3, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, ['--resource', 'help'];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, ['--resource', 'help'];
+  is_deeply $result[1]->specs, ['resource|r=s', 'help|h'];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
 =function cli
 
 The cli function builds and returns a L<Venus::Cli> object.
@@ -1376,7 +1818,7 @@ $test->for('example', 1, 'config', sub {
 
   use Venus 'config';
 
-  my $config = config {}, 'from_perl', '{"data"=>1}';
+  my $config = config {}, 'read_perl', '{"data"=>1}';
 
   # bless({...}, 'Venus::Config')
 
@@ -1387,6 +1829,79 @@ $test->for('example', 2, 'config', sub {
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Config';
   is_deeply $result->get, {data => 1};
+
+  $result
+});
+
+=function container
+
+The container function builds and returns a L<Venus::Container> object, or
+dispatches to the coderef or method provided.
+
+=signature container
+
+  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata container
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 container
+
+  package main;
+
+  use Venus 'container';
+
+  my $container = container {};
+
+  # bless({...}, 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'container', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Container';
+  is_deeply $result->get, {};
+
+  $result
+});
+
+=example-2 container
+
+  package main;
+
+  use Venus 'container';
+
+  my $data = {
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => "tmplog"
+        }
+      }
+    }
+  };
+
+  my $log = container $data, 'resolve', 'log';
+
+  # bless({value => '/tmp/log'}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 2, 'container', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+  ok $result->value eq '/tmp/log';
 
   $result
 });
@@ -1583,6 +2098,84 @@ $test->for('example', 3, 'date', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Date';
+
+  $result
+});
+
+=function docs
+
+The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+=signature docs
+
+  docs(Any @args) (Any)
+
+=metadata docs
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 docs
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'ABSTRACT';
+
+  # "Example Abstract"
+
+=cut
+
+$test->for('example', 1, 'docs', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Abstract";
+
+  $result
+});
+
+=example-2 docs
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'NAME';
+
+  # "Example #1\nExample #2"
+
+=cut
+
+$test->for('example', 2, 'docs', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example #1\nExample #2";
 
   $result
 });
@@ -2016,6 +2609,319 @@ $test->for('example', 2, 'hash', sub {
   $result
 });
 
+=function hashref
+
+The hashref function takes a list of arguments and returns a hashref.
+
+=signature hashref
+
+  hashref(Any @args) (HashRef)
+
+=metadata hashref
+
+{
+  since => '3.10',
+}
+
+=example-1 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref(content => 'example');
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 1, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-2 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref({content => 'example'});
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 2, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-3 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content');
+
+  # {content => undef}
+
+=cut
+
+$test->for('example', 3, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => undef};
+
+  $result
+});
+
+=example-4 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content', 'example', 'algorithm');
+
+  # {content => "example", algorithm => undef}
+
+=cut
+
+$test->for('example', 4, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example", algorithm => undef};
+
+  $result
+});
+
+=function is_bool
+
+The is_bool function returns L</true> if the value provided is a boolean value,
+not merely truthy, and L</false> otherwise.
+
+=signature is_bool
+
+  is_bool(Any $arg) (Bool)
+
+=metadata is_bool
+
+{
+  since => '3.18',
+}
+
+=cut
+
+=example-1 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool true;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool false;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 1;
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-4 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 0;
+
+  # false
+
+=cut
+
+$test->for('example', 4, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=function is_false
+
+The is_false function accepts a scalar value and returns true if the value is
+falsy.
+
+=signature is_false
+
+  is_false(Any $data) (Bool)
+
+=metadata is_false
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 is_false
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 0;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_false
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 1;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'is_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=function is_true
+
+The is_true function accepts a scalar value and returns true if the value is
+truthy.
+
+=signature is_true
+
+  is_true(Any $data) (Bool)
+
+=metadata is_true
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 is_true
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 1;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_true
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 0;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'is_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
 =function json
 
 The json function builds a L<Venus::Json> object and will either
@@ -2128,6 +3034,83 @@ $test->for('example', 4, 'json', sub {
   $result
 });
 
+=function list
+
+The list function accepts a list of values and flattens any arrayrefs,
+returning a list of scalars.
+
+=signature list
+
+  list(Any @args) (Any)
+
+=metadata list
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list 1..4;
+
+  # (1..4)
+
+=cut
+
+$test->for('example', 1, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..4];
+
+  @result
+});
+
+=example-2 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4];
+
+  # (1..4)
+
+=cut
+
+$test->for('example', 2, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..4];
+
+  @result
+});
+
+=example-3 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4], 5, [6..10];
+
+  # (1..10)
+
+=cut
+
+$test->for('example', 3, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..10];
+
+  @result
+});
+
 =function load
 
 The load function loads the package provided and returns a L<Venus::Space> object.
@@ -2166,7 +3149,10 @@ $test->for('example', 1, 'load', sub {
 =function log
 
 The log function prints the arguments provided to STDOUT, stringifying complex
-values, and returns a L<Venus::Log> object.
+values, and returns a L<Venus::Log> object. If the first argument is a log
+level name, e.g. C<debug>, C<error>, C<fatal>, C<info>, C<trace>, or C<warn>,
+it will be used when emitting the event. The desired log level is specified by
+the C<VENUS_LOG_LEVEL> environment variable and defaults to C<trace>.
 
 =signature log
 
@@ -2425,12 +3411,12 @@ $test->for('example', 6, 'match', sub {
 
 =function merge
 
-The merge function returns a hash reference which is a merger of all of the
-hashref arguments provided.
+The merge function returns a value which is a merger of all of the arguments
+provided.
 
 =signature merge
 
-  merge(HashRef @args) (HashRef)
+  merge(Any @args) (Any)
 
 =metadata merge
 
@@ -2712,6 +3698,104 @@ $test->for('example', 2, 'opts', sub {
   is $result->get('resource'), "users";
 
   $result
+});
+
+=function pairs
+
+The pairs function accepts an arrayref or hashref and returns an arrayref of
+arrayrefs holding keys (or indices) and values. The function returns an empty
+arrayref for all other values provided. Returns a list in list context.
+
+=signature pairs
+
+  pairs(Any $data) (ArrayRef)
+
+=metadata pairs
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs [1..4];
+
+  # [[0,1], [1,2], [2,3], [3,4]]
+
+=cut
+
+$test->for('example', 1, 'pairs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [[0,1], [1,2], [2,3], [3,4]];
+
+  $result
+});
+
+=example-2 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # [['a',1], ['b',2], ['c',3], ['d',4]]
+
+=cut
+
+$test->for('example', 2, 'pairs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['a',1], ['b',2], ['c',3], ['d',4]];
+
+  $result
+});
+
+=example-3 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs [1..4];
+
+  # ([0,1], [1,2], [2,3], [3,4])
+
+=cut
+
+$test->for('example', 3, 'pairs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [[0,1], [1,2], [2,3], [3,4]];
+
+  @result
+});
+
+=example-4 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # (['a',1], ['b',2], ['c',3], ['d',4])
+
+=cut
+
+$test->for('example', 4, 'pairs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [['a',1], ['b',2], ['c',3], ['d',4]];
+
+  @result
 });
 
 =function path
@@ -2997,6 +4081,58 @@ $test->for('example', 2, 'proto', sub {
   $result
 });
 
+=function puts
+
+The puts function select values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, optionally assigning the value to
+the preceeding scalar reference and returns all the values selected.
+
+=signature puts
+
+  puts(Any @args) (ArrayRef)
+
+=metadata puts
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 puts
+
+  package main;
+
+  use Venus 'puts';
+
+  my $data = {
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  };
+
+  puts $data, (
+    \my $fruit, 'fruit',
+    \my $expiry, 'meta.expiry'
+  );
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=cut
+
+$test->for('example', 1, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "5d"];
+
+  $result
+});
+
 =function raise
 
 The raise function generates and throws a named exception object derived from
@@ -3147,6 +4283,62 @@ $test->for('example', 2, 'random', sub {
   $result
 });
 
+=function range
+
+The range function returns the result of a L<Venus::Array/range> operation.
+
+=signature range
+
+  range(Int | Str @args) (ArrayRef)
+
+=metadata range
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 range
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], ':4';
+
+  # [1..5]
+
+=cut
+
+$test->for('example', 1, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..5];
+
+  $result
+});
+
+=example-2 range
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], '-4:-1';
+
+  # [6..9]
+
+=cut
+
+$test->for('example', 2, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [6..9];
+
+  $result
+});
+
 =function regexp
 
 The regexp function builds and returns a L<Venus::Regexp> object, or dispatches
@@ -3209,6 +4401,45 @@ $test->for('example', 2, 'regexp', sub {
   $result
 });
 
+=function render
+
+The render function accepts a string as a template and renders it using
+L<Venus::Template>, and returns the result.
+
+=signature render
+
+  render(Str $data, HashRef $args) (Str)
+
+=metadata render
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 render
+
+  package main;
+
+  use Venus 'render';
+
+  my $render = render 'hello {{name}}', {
+    name => 'user',
+  };
+
+  # "hello user"
+
+=cut
+
+$test->for('example', 1, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "hello user";
+
+  $result
+});
+
 =function replace
 
 The replace function builds and returns a L<Venus::Replace> object, or
@@ -3265,6 +4496,70 @@ $test->for('example', 2, 'replace', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is $result, "hello universe";
+
+  $result
+});
+
+=function resolve
+
+The resolve function builds and returns an object via L<Venus::Container/resolve>.
+
+=signature resolve
+
+  resolve(HashRef $value, Any @args) (Any)
+
+=metadata resolve
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 resolve
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $resolve = resolve {};
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 resolve
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $data = {
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+      }
+    }
+  };
+
+  my $log = resolve $data, 'log';
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 2, 'resolve', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
 
   $result
 });
@@ -3537,6 +4832,118 @@ $test->for('example', 2, 'string', sub {
   $result
 });
 
+=function syscall
+
+The syscall function perlforms system call, i.e. a L<perlfunc/qx> operation,
+and returns C<true> if the command succeeds, otherwise returns C<false>. In
+list context, returns the output of the operation and the exit code.
+
+=signature syscall
+
+  syscall(Int | Str @args) (Any)
+
+=metadata syscall
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-v';
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'perl';
+  local $TEST_VENUS_QX_EXIT = 0;
+  local $TEST_VENUS_QX_CODE = 0;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-z';
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'perl';
+  local $TEST_VENUS_QX_EXIT = 7424;
+  local $TEST_VENUS_QX_CODE = 29;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'sun', '--heat-death';
+
+  # ('done', 0)
+
+=cut
+
+$test->for('example', 3, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'done';
+  local $TEST_VENUS_QX_EXIT = 0;
+  local $TEST_VENUS_QX_CODE = 0;
+  my @result = $tryable->result;
+  is_deeply [@result], ['done', 0];
+
+  @result
+});
+
+=example-4 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'earth', '--melt-icecaps';
+
+  # ('', 127)
+
+=cut
+
+$test->for('example', 4, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = '';
+  local $TEST_VENUS_QX_EXIT = -1;
+  local $TEST_VENUS_QX_CODE = 127;
+  my @result = $tryable->result;
+  is_deeply [@result], ['', 127];
+
+  @result
+});
+
 =function template
 
 The template function builds and returns a L<Venus::Template> object, or
@@ -3652,6 +5059,141 @@ $test->for('example', 2, 'test', sub {
   my $result = $tryable->result;
   isa_ok $result, "Venus::Test";
   is $result->file, 't/Venus.t';
+
+  $result
+});
+
+=function text
+
+The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+=signature text
+
+  text(Any @args) (Any)
+
+=metadata text
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'name';
+
+  # "Example Name"
+
+=cut
+
+$test->for('example', 1, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Name";
+
+  $result
+});
+
+=example-2 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'titles', '#1';
+
+  # "Example Title #1"
+
+=cut
+
+$test->for('example', 2, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Title #1";
+
+  $result
+});
+
+=example-3 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text undef, 'name';
+
+  # "Example Name"
+
+=cut
+
+$test->for('example', 3, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Name";
 
   $result
 });
@@ -4235,132 +5777,11 @@ returns an instance of L<Venus::Process> representing the current process.
 
 =cut
 
-our $TEST_VENUS_PROCESS_ALARM = 0;
-our $TEST_VENUS_PROCESS_CHDIR = 1;
-our $TEST_VENUS_PROCESS_EXIT = 0;
-our $TEST_VENUS_PROCESS_EXITCODE = 0;
-our $TEST_VENUS_PROCESS_FORK = undef;
-our $TEST_VENUS_PROCESS_FORKABLE = 1;
-our $TEST_VENUS_PROCESS_KILL = 0;
-our $TEST_VENUS_PROCESS_OPEN = 1;
-our $TEST_VENUS_PROCESS_PID = 12345;
-our $TEST_VENUS_PROCESS_SETSID = 1;
-our $TEST_VENUS_PROCESS_WAITPID = undef;
-
-# _alarm
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_alarm"} = sub {
-    $TEST_VENUS_PROCESS_ALARM = $_[0]
-  };
-}
-
-# _chdir
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_chdir"} = sub {
-    $TEST_VENUS_PROCESS_CHDIR
-  };
-}
-
-# _exit
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_exit"} = sub {
-    $TEST_VENUS_PROCESS_EXIT
-  };
-}
-
-# _exitcode
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_exitcode"} = sub {
-    $TEST_VENUS_PROCESS_EXITCODE
-  };
-}
-
-# _fork
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_fork"} = sub {
-    if (defined $TEST_VENUS_PROCESS_FORK) {
-      return $TEST_VENUS_PROCESS_FORK;
-    }
-    else {
-      return $TEST_VENUS_PROCESS_PID++;
-    }
-  };
-}
-
-# _forkable
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_forkable"} = sub {
-    return $TEST_VENUS_PROCESS_FORKABLE;
-  };
-}
-
-# _kill
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_kill"} = sub {
-    $TEST_VENUS_PROCESS_KILL;
-  };
-}
-
-# _open
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_open"} = sub {
-    $TEST_VENUS_PROCESS_OPEN
-  };
-}
-
-# _pid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_pid"} = sub {
-    $TEST_VENUS_PROCESS_PID
-  };
-}
-
-# _setsid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_setsid"} = sub {
-    $TEST_VENUS_PROCESS_SETSID
-  };
-}
-
-# _waitpid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_waitpid"} = sub {
-    if (defined $TEST_VENUS_PROCESS_WAITPID) {
-      return $TEST_VENUS_PROCESS_WAITPID;
-    }
-    else {
-      return --$TEST_VENUS_PROCESS_PID;
-    }
-  };
-}
-
 $test->for('example', 1, 'work', sub {
   if ($Config{d_pseudofork}) {
     plan skip_all => 'Fork emulation not supported';
+    return 1;
   }
-  return 1;
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
@@ -4846,6 +6267,16 @@ manipulating regexp replacement data.
 
 $test->for('feature', 'venus-replace');
 
+=feature venus-run
+
+This library contains a L<Venus::Run> class which provides a base class for
+providing a command execution system for creating CLIs (command-line
+interfaces).
+
+=cut
+
+$test->for('feature', 'venus-run');
+
 =feature venus-scalar
 
 This library contains a L<Venus::Scalar> class which provides methods for
@@ -4881,6 +6312,15 @@ manipulating string data.
 =cut
 
 $test->for('feature', 'venus-string');
+
+=feature venus-task
+
+This library contains a L<Venus::Task> class which provides a base class for
+creating CLIs (command-line interfaces).
+
+=cut
+
+$test->for('feature', 'venus-task');
 
 =feature venus-template
 
@@ -4993,6 +6433,6 @@ $test->for('license');
 
 # END
 
-$test->render('lib/Venus.pod') if $ENV{RENDER};
+$test->render('lib/Venus.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::BigInt try => 'GMP';
+use Math::DifferenceSet::Planar 0.016;
+
+$| = 1;
+
+my $USAGE = "usage: pds_iterate_spaces [-D database] [min [max]]\n";
+
+my $db = undef;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                       if '-' eq $opt;
+    $db   = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db   = $1,           next if $opt =~ /^D(.+)s/;
+    die $USAGE;
+}
+die $USAGE if 2 < @ARGV || grep {!/^(?:0|[1-9][0-9]*)\z/} @ARGV;
+my @minmax = @ARGV;
+
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
+
+my $it = Math::DifferenceSet::Planar->iterate_known_spaces(@ARGV);
+while (my $txt = $it->()) {
+    print "$txt\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_iterate_spaces - display stored rotator space data
+
+=head1 SYNOPSIS
+
+  pds_iterate_spaces [-D database] [min [max]]
+
+=head1 DESCRIPTION
+
+This example program iterates through stored planar difference set space
+structures and displays them as text.  This tool is intended mostly as a
+debugging-aid, as the precise meaning of the information and its usage
+within the library is implementation-dependent and mostly affecting
+performance rather than functionality.
+
+Parameter C<-D> specifies an alternate spaces database.
+
+Optional arguments I<min> and I<max> restrict the orders to a range.
+Without a specified range, all available space descriptions are printed.
+
+Currently, the output format is a line for each order, with this format:
+
+The order, followed by a colon and a blank, the subspace of the
+multipliers, a blank, and the subspace of the rotators in square brackets.
+Subspaces are lists of I<radix> "^" I<depth> pairs, separated by blanks.
+Example:
+
+  7: 7^3 [2^6 5^2]
+
+The product of the depths of a space is its cardinality.  In the example,
+we have 3 multipliers and 6*2 rotators, and the multiplicative group of
+values coprime to the modulus 57 has 36 elements in total.  The three
+multipliers are 1, 7, and 7^2, while the 12 rotators are products
+2^I<i> * 5^I<j> with I<i> ranging from 0 to 5 and I<j> ranging from 0
+to 1, all operations understood modulo 57.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

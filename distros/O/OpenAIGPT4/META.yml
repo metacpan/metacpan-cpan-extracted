@@ -22,8 +22,8 @@ requires:
   JSON: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
-  perl: '5.032'
+  perl: '5.026'
 resources:
   repository: https://github.com/kawamurashingo/OpenAIGPT4.git
-version: '0.13'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

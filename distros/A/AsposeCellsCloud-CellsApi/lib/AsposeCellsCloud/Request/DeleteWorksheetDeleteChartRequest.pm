@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetDeleteChartRequest.name :   ,
-# DeleteWorksheetDeleteChartRequest.sheetName :   ,
-# DeleteWorksheetDeleteChartRequest.chartIndex :   ,
-# DeleteWorksheetDeleteChartRequest.folder :   ,
-# DeleteWorksheetDeleteChartRequest.storageName :    
+# DeleteWorksheetDeleteChartRequest.name : The workbook name.  ,
+# DeleteWorksheetDeleteChartRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetDeleteChartRequest.chartIndex : The chart index.  ,
+# DeleteWorksheetDeleteChartRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetDeleteChartRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_delete_chart' } = { 
-    	summary => '',
+    	summary => 'Deletes a chart by index in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'chart_index' => {
      	datatype => 'int',
      	base_name => 'chartIndex',
-     	description => '',
+     	description => 'The chart index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

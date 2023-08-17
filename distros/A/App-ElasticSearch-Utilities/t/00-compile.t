@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 29 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ElasticSearch/Utilities.pm',
     'App/ElasticSearch/Utilities/Aggregations.pm',
     'App/ElasticSearch/Utilities/Connection.pm',
     'App/ElasticSearch/Utilities/HTTPRequest.pm',
+    'App/ElasticSearch/Utilities/Metrics.pm',
     'App/ElasticSearch/Utilities/Query.pm',
     'App/ElasticSearch/Utilities/QueryString.pm',
     'App/ElasticSearch/Utilities/QueryString/AutoEscape.pm',
@@ -36,6 +37,8 @@ my @scripts = (
     'scripts/es-daily-index-maintenance.pl',
     'scripts/es-graphite-dynamic.pl',
     'scripts/es-index-blocks.pl',
+    'scripts/es-index-fields.pl',
+    'scripts/es-index-scan.pl',
     'scripts/es-nodes.pl',
     'scripts/es-open.pl',
     'scripts/es-search.pl',

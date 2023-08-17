@@ -1,0 +1,2546 @@
+2023-06-11  Michal Josef Špaček  <michal.josef.spacek@gmail.com>
+
+	* Makefile.PL, MANIFEST, ...: Packaging improvements
+
+2022-11-23  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/get-cisco-power-usage.pl: New demo script
+
+2017-06-24  Allan Jude  <allanjude@freebsd.org>
+
+	* lib/SNMP_Session.pm: Apply Socket6 patch from FreeBSD ports
+
+2008-03-19  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Improved initialization of the flags for
+	non-blocking behavior in receive_response_3().  The __DIE__ and
+	__WARN__ signal handlers should be bound to the defaults, because
+	the caller might be binding those and get in our way.  Also, we
+	only want to compute the flags once, on initialization.
+
+2007-12-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm, lib/SNMP_Session.pm, lib/BER.pm:
+	Upgraded to Artistic License 2.0.
+
+	Copyright notice updated for 2008.
+
+	* Artistic: Upgraded to Artistic License 2.0, from
+	http://svn.perl.org/viewcvs/parrot/trunk/LICENSE?view=markup&rev=19096
+
+2007-11-01  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm: New MIB parsing code from Mike Mitchell.
+
+2007-10-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION):
+	Upgraded to 1.11, to pick up change to SNMP_util.pm.
+
+	* changes.html: Document loop detection fix in SNMP_util.pm.
+
+	* faq.html, index.html: Updated my e-mail address.
+
+	* README, README.SNMP_util, lib/SNMP_Session.pm, lib/SNMP_util.pm,
+	changes.html: Changed Tobi Oetiker's mail address.
+
+	* README, index.html: Changed MRTG URL.
+
+	* lib/SNMP_util.pm: [All changes from Mike Mitchell]
+
+	Global replace || => or, && => and, to avoid precedence errors.
+
+	(snmpwalk_flg): Improved loop detection.
+
+2007-10-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): Upgraded to 1.11, to pick up
+	change to SNMP_util.pm.
+
+	* README, README.SNMP_util, changes.html, lib/SNMP_Session.pm:
+	Changed Tobi Oetiker's mail address.
+
+	* lib/SNMP_util.pm: [All changes from Mike Mitchell]
+
+	Changed Tobi Oetiker's mail address.
+
+	Global replace || => or, && => and, to avoid precedence errors.
+
+	(snmpwalk_flg): Improved loop detection.
+
+	* README: Changed MRTG URL.
+
+2007-05-18  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, changes.html, index.html: Updated copyright.
+
+	* lib/SNMP_util.pm (Check_OID):
+	Fix regexp for qualified OID case (Mike Mitchell).
+
+2007-05-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Added Mike Fischer as a contributor.
+
+	($VERSION): Incremented to 1.10.
+
+	(receive_response_3): Added optional "dont_block" argument.  If
+	this is present and non-zero, pass MSG_DONTWAIT to the recv()
+	call.  MSG_DONTWAIT is wrapped in an eval, to avoid breaking the
+	code on systems that don't have the flag.
+
+	(request_response_5): Pass dont_block=1 to receive_response_3.
+	According to Mike Fisher, Linux sometimes blocks on recv() even
+	though a select() for readability has returned, for example when a
+	checksum fails.
+
+2007-05-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Added Mike Fischer as a contributor.
+
+	($VERSION): Incremented to 1.10.
+
+	(receive_response_3): Added optional "dont_block" argument.  If
+	this is present and non-zero, pass MSG_DONTWAIT to the recv()
+	call.  MSG_DONTWAIT is wrapped in an eval, to avoid breaking the
+	code on systems that don't have the flag.
+
+	(request_response_5): Pass dont_block=1 to receive_response_3.
+	According to Mike Fisher, Linux sometimes blocks on recv() even
+	though a select() for readability has returned, for example when a
+	checksum fails.
+
+2007-01-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm: Updated copyright notice.
+
+	(pretty_print): Use PDU names according to RFC3416.
+
+2006-12-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/cricket-genconf-sensor:
+	Try to install newly generated configuration, where possible.
+
+	* test/cricket-genconf-sensor: Added header comment.
+
+	* test/cricket-genconf-sensor: New script.
+
+2006-12-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/entls (router_pretty_name):
+	New subroutine, greps RANCID configuration file
+	for `hostname' command.  Caches the result so that files are only
+	opened once.
+
+	(print_physical): Use new forms of per-router defaults.
+
+	* test/entls:
+	Changed so that `-t' generates a Cricket configuration file to measure
+	all transceivers that support DOM (Digital Optical Monitoring).  This
+	involves some structural changes.
+
+	(print_phys_tree): Implemented in terms of the new
+	`print_phys_tree_1'.
+
+	(print_phys_tree_1): Maintain a stack of parent nodes when traversing
+	the node tree.  This stack is stored in each node's `parent_stack'
+	slot, and can be used by the node class' `tostring' method.
+
+	* test/entls ($print_vendor_type, $print_ent_physical_index):
+	New variables.
+
+	(Entity::PhysicalEntry::tostring): Added optional printing of index
+	and entPhysicalVendorType, controlled by the above variables.
+
+2006-10-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm, lib/BER.pm: Updated copyright string.
+
+2006-08-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* faq.html:
+	Updated SNMPv3 text, mentioning that SNMPv3 is supported by MRTG 2.13
+	and up, using Net::SNMP.
+
+	* lib/SNMP_util.pm (snmpLoad_OID_Cache):
+	Strip single or double quotes around the OID and
+	value.  This allows us to read SunNet Manager OID files, which are
+	also distributed by e.g. Cisco (ftp://ftp.cisco.com/pub/mibs/oid).
+	Idea by Jan van Keulen, code cleanup by Mike Mitchell.
+
+2006-07-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 1.08.
+
+	* lib/SNMP_Session.pm (BEGIN):
+	Bind the __DIE__ signal handler, so that detection of IPv6
+	capability works even when someone else has bound that handler.
+	(Patch from Tobi Oetiker.)
+
+2006-04-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Table.pm (snmp_row_to_object): Added.
+
+2006-04-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/trap-listener: Added prettyfication of OIDs.
+
+	Suppressed less-than-useful output such as the trap community or the
+	source port.
+
+2006-03-16  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Update copyright notice for 2006.
+
+2006-02-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/entls: New "entls" script.
+
+2006-01-20  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/qosls: Slight improvements in output for readability.
+
+	* README: Credit Jan van Keulen.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 1.08.
+
+	* lib/SNMP_util.pm:
+	Some fixes from Mike Mitchell, notably in the area of OID translation.
+
+2006-01-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/find-admin-up-oper-down.pl:
+	Find interfaces that are admin up but oper down.
+
+2006-01-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html:
+	Fixed $session -> $trap_session in trap receipt example.  Thanks to
+	rahul shah <shahrahulb@yahoo.co.in> for noticing this.
+
+2005-12-10  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm (SNMPv2c_Session::map_table_start_end):
+	Slight reindentation.
+
+	* lib/SNMP_Session.pm (SNMPv2c_Session::map_table_start_end): Call
+	`SNMP_Session::index_compare' rather than just `index_compare'.
+
+2005-11-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* faq.html: Upgraded SNMP URI syntax reference from draft to RFC 4088.
+
+2005-07-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Added missing `mailto:'.
+
+	* index.html, changes.html: README.SNMP_util -> dist/
+
+2005-07-08  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm (snmpwalk_flg): Bug fix by Laurent Girod.
+
+2005-04-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Table.pm: Repository : :ext:diotima:/home/leinen/CVS
+	Module     : SNMP_Session/lib
+	Working dir: ~/perl/SNMP_Session/lib/
+
+
+
+	In directory .:
+	              Up-To-Date  1.38        BER.pm
+	              Up-To-Date  1.145       SNMP_Session.pm
+	              Added                   SNMP_Table.pm
+	              Up-To-Date  1.51        SNMP_util.pm
+
+	--------------------- End ---------------------
+	-- last cmd: cvs -f status -v --
+
+2005-03-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/qosls: *** empty log message ***
+
+	* test/if-counters.pl: New options: -B to avoid use of get-bulk.
+
+	-C to avoid use of curses.
+
+	* test/bgpls: *** empty log message ***
+
+2005-01-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* faq.html: Updated.
+
+2004-12-19  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls: Added `-n' option to suppress resolving IP addresses.
+
+	(usage): Made more readable.
+
+	* test/msdpls (usage): Explain options.
+
+	* test/msdpls (usage): Added.
+
+2004-12-07  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Removed strange formatting.
+
+2004-11-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list (%short_types): Added a few new types.
+
+	(@nestmasters): Beginning of update.
+
+2004-10-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Require BER.pm 1.05.
+
+	($VERSION): Incremented to 1.07.
+
+	* lib/SNMP_Session.pm:
+	context_flag -> context_flag() to fix error message from "use strict
+	subs" with recent Perl versions.  Acknowledged Gerry Dalton.
+
+	* changes.html:
+	Documented 1.06 (SNMPv2 inform parsing) and 1.07 (strict subs bug with
+	newer Perl versions) changes to SNMP_Session.pm.
+
+	* MANIFEST (META.yml): Added by MakeMaker.
+
+	* README: Added Gerry Dalton.
+
+2004-09-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl:
+	Added `-s' option to look at L3 switching statistics on a Catalyst
+	6500 and probably some other Cisco L3 switches.
+
+	(out_switching_engine): New subroutine.
+
+2004-09-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls: Added `-d' flag.
+
+	Added debugging output.
+
+2004-09-04  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm:
+	Mention Andrew Cornford-Matheson in the header comment.
+
+	* lib/SNMP_Session.pm ($VERSION): 1.05 -> 1.06.
+
+	(decode_trap_request): Understand inform requests, too.
+
+2004-09-02  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, index.html: CMU SNMP -> Net-SNMP.
+
+	* index.html (decode_trap_request):
+	Mention that it supports SNMPv2 informs, too.
+
+	* README (Contributors): Added Andrew Cornford-Matheson.
+
+	(decode_trap_request): Mention that it supports SNMPv2 informs, too.
+
+	* changes.html: Upgraded to 1.05.
+
+2004-08-23  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html:
+	New distribution site http://www.switch.ch/misc/leinen/snmp/perl/dist/
+
+	Made pointers more absolute.
+
+2004-07-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm ($VERSION): Upped to 1.05.
+
+	(BEGIN): Register various pretty printers.
+
+	(pretty_printer): Simplified because most types are handled by
+	registered pretty printers now.
+
+	* lib/SNMP_Session.pm ($VERSION): Upped to 1.05.
+
+	* changes.html: Document 1.04 change (in SNMP_util.pm).
+
+	* ChangeLog: Updated using C-x v a.
+
+	* index.html: Updated copyright years.
+
+	* lib/SNMP_util.pm, lib/SNMP_Session.pm ($VERSION): Upped to 1.04.
+
+	* lib/SNMP_util.pm (snmpget, snmpgetnext, snmpset):
+	Use wantarray() to determine whether
+	to return an array or just the first value.
+
+2004-07-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm, lib/SNMP_Session.pm ($VERSION): Upped to 1.04.
+
+	* lib/SNMP_util.pm (snmpget, snmpgetnext, snmpset):
+	Use wantarray() to determine whether
+	to return an array or just the first value.
+
+2004-06-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Updated copyright years.
+
+2004-03-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm:
+	Require recent versions of BER.pm and SNMP_Session.pm.
+
+	($VERSION): Incremented to 1.03.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 1.03.
+
+	* changes.html (SNMP_util.pm): Documented 1.03 fix.
+
+	* lib/SNMP_util.pm (snmpwalk_flg):
+	Added missing line from Mike Mitchell's patch.
+
+2004-03-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 1.02.
+
+	* changes.html: Document BER.pm 1.01 and 1.02.
+
+	* lib/SNMP_Session.pm:
+	Require BER.pm 1.01, because previous versions lack support for a
+	variant of integer encoding.
+
+	($VERSION): Incremented to 1.01.
+
+2004-02-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER-1.01-Mike-Mitchell.diff, BER-1.01-02.diff: Applied.
+
+	* lib/SNMP_util.pm (snmpwalkhash, snmpwalk_flg):
+	Implemented the new hash-reference
+	argument.
+
+	* changes.html: Documented BER.pm and SNMP_util.pm news in 1.02.
+
+	* test/ber-test.pl: Use strict.
+
+	Added function prototypes.
+
+	* lib/BER.pm (%pretty_printer):
+	New variable.  This is a hash of pretty-printers
+	per BER type code.  It is manipulated by register_pretty_printer() and
+	unregister_pretty_printer(), and used by pretty_print().
+
+	(register_pretty_printer, unregister_pretty_printer): New subroutines,
+	contributed by Mike Mitchell.
+
+	(pretty_print): If a pretty-printer has been registered for the type
+	code, call it.
+
+	(encode_intlike): In the Math::BigInt case, copy the integer before
+	taking its bmod(), because bmod() is destructive.
+
+	* README.SNMP_util:
+	Document additional optional `hash ref' argument to snmpwalkhash().
+
+2004-02-08  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm (decode_intlike_s): Use decode_length().
+
+	(decode_length): Accept an optional second argument, specifying the
+	offset into the first argument at which to begin parsing.  This
+	eliminates a substr() operation for every object.  The callers have
+	been adapted accordingly.
+
+	* README: Added Milen Pavlov.
+
+2003-12-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): 0.99 -> 1.00.
+
+	* changes.html: 0.100 -> 1.00.
+
+	* test/iftop: Added support for 64-bit counters.
+
+	* lib/SNMP_Session.pm ($default_use_16bit_request_ids): New variable.
+
+	(encode_request_3): Obey `use_16bit_request_ids' in request ID
+	generation.
+
+	* changes.html: Added note on `use_16bit_request_ids'.
+
+	* README: Added Luc Pauwels <Luc.Pauwels@xalasys.com> as a contributor.
+
+2003-12-04  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html:
+	Added new "Served Individual Item Link" to the "Essential SNMP" book
+	on Amazon, but commented it out because it breaks the formatting.
+
+	Removed the "NEW" icon from the existing Essential SNMP pointer.
+
+2003-11-26  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/iftop: Adding iftop
+
+	* test/README (iftop): Added URL.
+
+	* test/README, MANIFEST: Added Dave Plonka's `iftop'.
+
+2003-11-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html:
+	Document Mike Mitchell's snmpset support for all known types.
+
+	* lib/SNMP_util.pm (snmpset): Encode all known types.
+
+2003-11-07  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Mentioned Christopher J. Tengi.
+
+	* README, lib/SNMP_util.pm:
+	Added Christopher J. Tengi to contributors list.
+
+	* changes.html: Document 0.99 changes.
+
+	* lib/SNMP_util.pm ($VERSION): Incremented to 0.99.
+
+	* lib/SNMP_util.pm (snmpset): Support Gauge32 values.
+
+2003-10-20  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.99.
+
+	* lib/SNMP_Session.pm (SNMPv1_Session::open):
+	Simplify initial request_id generation.
+
+	* lib/SNMP_Session.pm (encode_request_3):
+	Handle avoid_negative_request_ids in a saner way.
+	Thanks to Mike Mitchell.
+
+2003-09-26  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/trap-send:
+	Added forward declarations.  Thanks to Bret Allibone for pointing out
+	the problem.
+
+2003-09-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Documented 0.98 changes.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.98.
+
+	* lib/SNMP_Session.pm: Require BER version 0.95.
+
+	Fixed a portability issue in the IPv6 code.
+
+	* lib/SNMP_util.pm: Require BER version 0.95.
+
+2003-09-08  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm: Changes from Mike Mitchell:
+
+	Depend on SNMP_Session.pm 0.97.
+
+	Fix parsing of OIDs with multiple quoted strings.
+
+	($VERSION): Incremented to 0.98.
+
+2003-09-02  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Undid most of the last change.
+
+	* lib/SNMP_Session.pm: Removed ``use strict "subs"'' in a few places.
+
+	* README: Added Joerg Kummer to credits.
+
+	* lib/SNMP_util.pm ($VERSION): Increased to 0.97.
+
+	(snmpset): Added TimeTicks support, courtesy Joerg Kummer.
+
+	* changes.html: TimeTicks support in snmpset.
+
+	* changes.html: Added IPv6; $default_avoid_negative_request_ids notes.
+
+	* contrib/SNMP_util.pm, test/util-trap.pl, test/v6-list-prefixes, test/vc-counters.pl, test/verio-problem.pl:
+	Initial import of the essential parts of SNMP_Session
+
+	* contrib/SNMP_util.pm, test/util-trap.pl, test/v6-list-prefixes, test/vc-counters.pl, test/verio-problem.pl:
+	New file.
+
+	* faq.html, p2.htm, security.html, test/atol-test.c, test/bad-trap.pl, test/bay-atm-test.pl, test/bgp-check-routes, test/bulkwalkbug.pl, test/cammer, test/capturetest.pl, test/counter64-test.pl, test/d.pl, test/digital-bug, test/fore-test.pl, test/inexist.pl, test/list-bgp4-table, test/mcount.pl, test/mdebug, test/negative-counter.pl, test/sequence-bug.pl, test/set-test.pl, test/shipmr, test/snmptrap.note, test/snmptrap.pl:
+	Initial import of the essential parts of SNMP_Session
+
+	* faq.html, p2.htm, security.html, test/atol-test.c, test/bad-trap.pl, test/bay-atm-test.pl, test/bgp-check-routes, test/bulkwalkbug.pl, test/cammer, test/capturetest.pl, test/counter64-test.pl, test/d.pl, test/digital-bug, test/fore-test.pl, test/inexist.pl, test/list-bgp4-table, test/mcount.pl, test/mdebug, test/negative-counter.pl, test/sequence-bug.pl, test/set-test.pl, test/shipmr, test/snmptrap.note, test/snmptrap.pl:
+	New file.
+
+2003-06-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Updated Philippe Simonet's e-mail.
+
+	Added Valerio Bontempi and Lorenzo Colitti.
+
+	* lib/SNMP_Session.pm ($SNMP_Session::default_avoid_negative_request_ids):
+	Exported.
+
+2003-06-04  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm:
+	Changes from Lorenzo Colitti: Avoid eval() in some places to make code
+	more robust.
+
+2003-05-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/wwwtest: Also use CGI.pm to generate HTML.
+
+	* test/wwwtest (snmp_get, write_query_form): Use CGI.pm methods.
+
+	* test/wwwtest: Use CGI.pm for query parsing.
+
+	Open SNMPv2c_Session.
+
+	(parse_query): Deleted.
+
+	($ipv4_only_p): New variable.
+
+	* test/test.pl: Parse option arguments: `-4', `-v (1|2)'.
+
+	* test/test.pl: Add subroutine prototypes; use strict.
+
+	Use additional arguments to SNMP_Session->open to activate IPv6 code.
+
+	* lib/SNMP_Session.pm (SNMPv1_Session::open):
+	Create an IO::Socket::INET object, rather than
+	an IO::Socket::INET6 object, whenever sockfamily is AF_INET.
+
+	(SNMPv2c_Session::open): Avoid trying to bless() an undefined object,
+	to improve error diagnostics.
+
+	* test/wwwtest: Added subroutine prototypes.
+
+	($community_file_name): New variable.
+
+	(write_query_form): Compute <option> tags from @allowed_hosts.
+
+	* lib/SNMP_Session.pm (SNMPv1_Session::BEGIN):
+	Insist on version 1.26 when trying to import
+	IO::Socket::INET6.
+
+	(SNMPv1_Session::open): No longer pass PeerAddress and PeerPort when
+	creating the INET6 Socket object.  This means that the socket will not
+	be connected.  This, in turn, means that `lenient_address_matching'
+	and socket-recycling will have a chance of working.
+
+	* test/if-counters.pl: Add IPv6 support:
+
+	* Require SNMP_Session 0.96 or later.
+
+	* Accept `-4' option to set `ipv4only' in SNMP_Session->open() call.
+
+	* Updated usage message.
+
+	* test/walk-intf.pl: Added subroutine prototype for usage().
+
+2003-05-25  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm:
+	Added IPv6 changes by Valerio Bontempi and Lorenzo Colitti.
+
+	* lib/BER.pm: application_flag -> application_flag (),
+	context_flag -> context_flag ().
+
+	* lib/SNMP_Session.pm (encode_request_3):
+	encode_int_0 -> encode_int_0 ().
+
+2003-05-10  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm:
+	Integrated IPv6 patch by Valerio Bontempi and Lorenzo Colitti.
+
+2003-03-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm: Mention Jan Kasprzak as a contributor.
+
+	* README: Added Jan Kasprzak.
+
+2003-03-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html, index.html: Copyright -> 2003.
+
+	* changes.html: Document decode_sequence() bug fix.
+
+	* lib/SNMP_Session.pm, lib/BER.pm ($VERSION): Increased to 0.95.
+
+	* lib/SNMP_util.pm: Added Jakob Ilves' return_array_refs support.
+
+	* lib/BER.pm (decode_sequence): Fix operator precedence bug.
+
+2003-02-27  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl:
+	Clear the screen after traversing the interfaces.  This helps when
+	interfaces are removed while the program is running.
+
+2003-02-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html:
+	Fixed decode_by_template() call in trap reception example.
+
+2002-10-27  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Added pointer to test/capturetest.pl.
+
+	* MANIFEST: Added test/capturetest.pl.
+
+	* changes.html: Documented 0.94 changes to BER.pm and SNMP_Session.pm.
+
+	* README: Added Jakob Ilves to list of contributors.
+
+	* lib/BER.pm ($VERSION): Incremented to 0.94.
+
+2002-10-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm (request_response_5, open):
+	Support PDU capture buffer.
+
+	* lib/BER.pm (pretty_generic_sequence, decode_generic_tlv):
+	New functions for
+	debugging, contributed by Jakob Ilves <jakob.ilves@oracle.com>
+	(/IlvJa).
+
+2002-10-02  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, index.html: Use "or" instead of "||" in examples.
+
+2002-09-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html:
+	Document $default_avoid_negative_request_ids in SNMP_Session.pm.
+
+	Document changes to SNMP_util.pm.
+
+	* test/trap-listener:
+	Added argument parsing and usage() message.  The UDP port to listen on
+	can now be specified using `-p'.
+
+	Print better diagnostics for decoding errors.
+
+	* lib/SNMP_Session.pm (open):
+	Undid problematic "optimization" when computing the
+	possibly-negative request_id.
+
+	* index.html: Added pointer to IOG.
+
+2002-09-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($default_avoid_negative_request_ids):
+	New variable.
+
+	(encode_request_3): Honor `avoid_negative_request_ids'.
+
+	(open): Set `avoid_negative_request_ids', and initialize the
+	`request_id' slot accordingly.
+
+2002-05-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm (snmpwalk_flg):
+	Added missing initialization to suppress warning when
+	`-w' is in use.
+
+2002-05-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm: Updated to 0.93b1 from Mike.
+
+	* README.SNMP_util:
+	Updated to 0.93b1 from Mike - describe new snmpwalk() behavior (now
+	accepts multiple OIDs).
+
+	* lib/SNMP_util.pm (snmpwalk_flg):
+	Added missing initialization to suppress warning when
+	`-w' is in use.
+
+2002-03-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls ($css_stylesheet): Deleted.
+
+	(msdp_duplicate_report_header): Inline the CSS stylesheet.
+
+	(msdp_report_duplicate_sas): Use `pretty_ip_html'.
+
+	Format entries as a table.
+
+	(pretty_ip_html): New subroutine.
+
+2002-03-01  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/uli-fh-to-dns.pl: New file.
+
+2002-02-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm:
+	(decode_oid, decode_by_template_2, decode_sequence, decode_string):
+	Abort and return error when the PDU is shorter than the length bytes
+	promised.
+
+2002-02-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls (msdp_fill_in_duplicates):
+	New subroutine that removes all
+	non-duplicate SAs from the hash and fills in the duplicates with more
+	information by doing specific walks.
+
+	* test/msdpls: Generate HTML output.
+
+2002-02-16  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls: Changed code to list duplicate SAs.
+
+2002-02-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/msdpls: New file.
+
+	* changes.html: Fixed text according to Mike Mitchell's mail.
+
+	* lib/SNMP_Session.pm (decode_trap_request):
+	Better error handling for decoding problems.
+
+	* lib/BER.pm (decode_by_template_2):
+	Better diagnostics for undefined or short PDUs.
+
+	* lib/BER.pm (decode_by_template):
+	Better diagnostics for undefined or short PDUs.
+
+2002-02-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION):
+	Incremented to 0.92, to synchronize with SNMP_util.pm.
+
+	* changes.html: Documented SNMP_util 0.92b2 changes.
+
+	* lib/SNMP_util.pm ($VERSION): Incremented to 0.92.
+
+	(@EXPORT): Export new symbol `snmpmaptable4'.
+
+	(snmpmaptable4): New subroutine.
+
+	Use map_table_start_end.
+
+	(snmpmaptable): Now implemented in terms of `snmpmaptable4'.
+
+	(toOID): Convert strings to indexes.
+
+	(snmpMIB_to_OID): New one-pass/two-pass MIB parsing code.
+
+	* README.SNMP_util: New version from Mike Mitchell (0.92b2):
+
+	Document how to set sessino parameters using a hash as the first OID.
+
+	Document snmpmaptable4.
+
+2002-01-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Updated copyright notice.
+
+	Documented map_table_start_end fix.
+
+	* index.html, README, lib/BER.pm, lib/SNMP_Session.pm:
+	Updated copyright notice.
+
+	* test/if-counters.pl:
+	Fixed argument parsing so that target and options can be mixed.
+
+	* test/if-counters.pl (out_interface):
+	Suppress "unrouted VLAN..." interfaces.
+
+2002-01-26  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.91.
+
+2001-12-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm (SNMPv2_Session::map_table_start_end):
+	Added comments.
+
+	Fixed bug that caused a superfluous query to be sent when the table
+	was already fully received.
+
+2001-12-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list (%short_types): Recognize "GM-GE2-2.5G-A".
+
+2001-12-11  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list (%short_types):
+	Recognize "GM-GE2" as channel ("c") card.
+
+	* test/sorrento-nest-list:
+	Applied the new naming scheme Chris Watts (Ascom) and myself had
+	agreed upon.
+
+2001-12-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added /ref=nosim/ to Amazon book pointers.
+
+2001-11-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/lambda-webmon.pl (get_amp_status):
+	New subroutine that does all the SNMP requests.
+
+	(make_amp_html_page): Renamed from `make_html_page'.
+
+2001-11-28  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/lambda-webmon.pl (@eastbound_amps, @westbound_amps):
+	New naming convention.
+
+2001-11-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/lambda-webmon.pl: New file.
+
+2001-11-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/lambda-monitor.pl ($inverse_video):
+	New variable.  Default is normal video now.
+
+	(show_light_trail): dbM -> dBm.
+
+	(print_html_trailer): Added color legend.
+
+	(class_for_amp_status): New subroutine that converts the amplifier
+	status bits into a class by finding the highest bit set.
+
+	* test/lambda-monitor.pl: Added HTML output.
+
+	* test/lambda-monitor.pl: New file.
+
+2001-11-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Documented new SNMP_util.pm and if-counters.pl.
+
+	* index.html: Added pointer to "Essential SNMP".
+
+	* test/snmpspeed.pl: *** empty log message ***
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.90.
+
+	* test/if-counters.pl:
+	Implemented Counter64 support (activated by "-l" argument):
+
+	Use Math::BigInt.
+
+	($counter64_p, $ifHCInOctets, ifHCOutOctets): New variables.
+
+	(rate_32): Added optional multiplier argument.
+
+	(rate_64, rate, rate_or_0): New subroutines that generalize rate_32.
+
+	(out_interface): Use rate_or_0 rather than rate_32.
+
+	Use ifHCOutOctets/ifHCOutOctets if $counter64_p is set.
+
+	Always request ifAlias for the interface description.
+
+	(usage): Document -l flag.
+
+	* lib/SNMP_util.pm: Fixed typo in comment.
+
+	* test/snmpwalkh.pl: Fixed typo in comment (Example 2 -> Example 3).
+
+	* test/snmpwalkh.pl: New version ("0.90b2") from Mike Mitchell.
+
+	* lib/SNMP_util.pm: New version ("0.90b2") from Mike Mitchell:
+
+	(snmpwalk, snmpwalkhash): Now implemented as trampolines to
+	snmpwalk_flg.
+
+	(snmpopen): Bug fix in handling of the optional "port" argument.
+
+2001-11-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm (error_return, error, ber_error):
+	Moved downward in the file, but
+	forgot why.
+
+2001-10-19  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl (rate_32):
+	New subroutine that computes a rate from two Counter32
+	values and an interval.
+
+	(out_interface): Use it.
+
+2001-10-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list (%nestmasters): Added muxBE1.
+
+2001-09-18  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list (%nestmasters): Added muxCE1.
+
+2001-09-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/sorrento-nest-list: New file.
+
+2001-08-27  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README.SNMP_util:
+	Added documentation for snmpwalkhash (Mike Mitchell).
+
+	* changes.html (SNMP_util.pm):
+	Mentioned new version 0.89 with new snmpwalkhash
+	subroutine.
+
+	* MANIFEST (test/snmpwalkh.pl): Added.
+
+	* test/snmpwalkh.pl: New file.
+
+	* lib/SNMP_util.pm (snmpwalkhash): New function.
+
+2001-08-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html:
+	lenient_source_port_matching now defaults to 1 rather than 0.
+
+	* lib/SNMP_Session.pm (SNMPv1_Session::open):
+	Default lenient_source_port_matching to 1
+	rather than 0.
+
+2001-07-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm (pretty_print):
+	Handle SNMPv2 exception codes by calling error(),
+	which returns undef and leaves a message in $errmsg.
+
+	* changes.html: error code -> exception code.
+
+	* lib/SNMP_Session.pm: Added missing/new credits.
+
+	* changes.html: Document request-id range bug fix.
+
+	* lib/SNMP_Session.pm (encode_request_3, open):
+	Make sure that the request_id is always in
+	the range -2^31 to (2^31)-1.  Thanks to Sergio Macedo
+	<macedo@tmp.com.br> for noticing this bug.
+
+2001-07-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: *** empty log message ***
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.88.
+
+	* README: Acknowledged Michael Deegan <michael@cnspc18.murdoch.edu.au>.
+
+	* lib/SNMP_Session.pm (package SNMPv1_Session, package SNMPv2_Session):
+	Added missing `use
+	Carp;'.
+
+2001-06-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl:
+	Print comment for non-Cisco routers, now that we get it from ifAlias.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to reflect BER.pm change.
+
+	* lib/BER.pm: Slightly modified patch from Bert Driehuis:
+
+	(snmp_nosuchobject, snmp_nosuchinstance, snmp_endofmibview): New
+	(constant) subroutines.
+
+	(pretty_print): Convert SNMPv2 error codes to undef.
+
+	* changes.html: Documented new SNMPv2 error code handling.
+
+	* README (Contributors): Added Bert Driehuis.
+
+2001-05-28  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl:
+	Use ifAlias rather than locIfDescr.  The advantages are that ifAlias
+	is not Cisco-specific, and it is defined even on ATM subinterfaces on
+	Ciscos.
+
+2001-05-25  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/snmpmap_table-test.pl: Shortened the code for easier reading.
+
+2001-05-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: Note new behavior of BER::pretty_print.
+
+	* lib/BER.pm ($VERSION): Increased to 0.86.
+
+	* lib/BER.pm (pretty_print):
+	Return undef if original value is undefined.
+
+	* test/snmpmap_table-test.pl: New file.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.86.
+
+	* changes.html: Added note on snmpmaptable.
+
+	* lib/SNMP_util.pm: Indentation changes.
+
+	(snmpmaptable): Renamed from snmpmap_table.
+
+	Solved FUNARG problem.
+
+	* README.SNMP_util (snmpmaptable): Renamed from snmpmap_table.
+
+	* README.SNMP_util, lib/SNMP_util.pm:
+	snmpmap_table: New from Mike Mitchell.
+
+2001-05-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm: 0.86b2 from Mike Mitchell.
+
+	* changes.html: *** empty log message ***
+
+	* lib/SNMP_util.pm (snmpopen): Avoid using $port when it's undefined.
+
+	* README.SNMP_util, lib/SNMP_util.pm: 0.86b1 from Mike Mitchell.
+
+2001-05-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm (open):
+	No longer try to convert local address using inet_aton(),
+	because IO::Socket::INET->new does that.
+
+	* lib/SNMP_Session.pm: Use Carp; warn -> carp, die -> croak.
+
+	* README: Added Alistair Mills.
+
+	Clarified documentation on pretty-printing OIDs.
+
+	* lib/SNMP_Session.pm (open, sa_equal_p):
+	Added support for `lenient_source_port_matching'.
+
+2001-05-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* changes.html: New file.
+
+	* index.html: Moved changes to `changes.html'.
+
+	Clarified pretty-printing.
+
+	* lib/SNMP_util.pm (snmpopen): Default port to 161 for non-type-1.
+
+	* lib/SNMP_util.pm: New version 0.85 from Mike Mitchell:
+
+	Accept HASH as first OID to set SNMP options.
+
+	Use Carp for error messages.
+
+2001-03-07  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/mrtg-ipmcast: Removed `cisco-' from name.
+
+	* test/mrtg-ipmcast (usage): Improved help message.
+
+	* test/mrtg-ipmcast: Support `-p' flag.
+
+	(usage): Defined.
+
+	* test/mrtg-ipmcast: Added SNMPv2 support.
+
+	* test/mrtg-ipmcast: Removed SWITCH specifics.
+
+2001-01-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm: Version 0.84 received from Mike.
+
+2000-12-19  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm:
+	New version from Mike Mitchell.  The local host can now be specified
+	along with the port.  See README.SNMP_util for the syntax.
+
+	* README.SNMP_util:
+	New version from Mike Mitchell.  Documents SNMP version and local
+	address specifications.
+
+2000-12-18  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: *** empty log message ***
+
+	* lib/SNMP_Session.pm ($VERSION): Increased to 0.83.
+
+	(open): Allow local address to be specified by an additional optional
+	argument.
+
+	Set new slot `lenient_source_address_matching' to 1.
+
+	(request_response_5): Don't resend on reception on unmatched replies.
+
+	(sa_equal_p): This is now a method on session objects.
+
+	If the session's `lenient_source_address_matching' slot is set, don't
+	compare host addresses, just ports.
+
+2000-12-10  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document retry fix.
+
+	* lib/SNMP_Session.pm (request_response_5):
+	Rearranged so that we will no longer send an
+	additional retry for whose response we won't wait anymore.
+
+2000-12-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Added Brett T Warden to contributors list.
+
+	* index.html: Documented Brett T Warden changes.
+
+	* lib/SNMP_Session.pm ($VERSION):
+	Incremented to pick up change in BER.pm.
+
+	($default_retries): Clarified header comment.
+
+	* lib/BER.pm ($VERSION): Incremented.
+
+	* lib/BER.pm (pretty_print): Pass UInteger32 to pretty_unsignedlike().
+
+	(encode_oid): Accept OIDs of length 2 (such as 0.0).
+
+	* lib/BER.pm (encode_oid): Fix by Rik Hoorelbeke for large subids.
+
+2000-11-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added credits for Rik Hoorelbeke.
+
+	Document changes to encode_oid() and SNMPv2c_Session::map_table.
+
+	* README: Added credits for Rik Hoorelbeke.
+
+2000-10-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document sa_equal_p change.
+
+	* lib/SNMP_Session.pm (sa_equal_p): New function.
+
+	(receive_response_3): Use `!sa_equal_p' rather than `ne' to compare
+	addresses.
+
+	* test/if-counters.pl: Added forward declarations.
+
+2000-10-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/map-table.pl: Recognize `-v 2'.
+
+	* test/if-status.pl: Added forward declarations.
+
+	Added SNMPv2 support.
+
+	* test/if-status.pl: New file.
+
+2000-10-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented recent changes.
+
+	* lib/SNMP_Session.pm (request_response_5):
+	Updated comment according to recent change in
+	receive_response_3.
+
+	* lib/SNMP_Session.pm ($recycle_socket):
+	New exported variable.  When this is, all new
+	SNMP_Session objects will share a single UDP socket.
+
+	(open_trap_session): Use `undef' rather than 0.0.0.0 as the remote
+	address in the SNMP_Session structure.
+
+	(receive_response_3): Changed handling of mismatched source
+	addresses.  If the source address of an incoming packet doesn't match
+	the expected address (as specified by the session's `remote_addr'
+	slot), the PDU is always ignored and zero is returned.  Also, if the
+	$recycle_socket variable is set, mismatched replies never cause a
+	warning even when the session's `debug' slot is set.
+
+	(to_string): Handle session objects with undefined `remote_addr'.
+
+	* lib/BER.pm (encode_uinteger32, encode_counter32, encode_counter64, encode_gauge32):
+	New exported subroutines.
+
+	* test/trap-listener: Added forward declarations.
+
+2000-10-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html, README: Removed MIB Parsing stuff.
+
+	* test/list-bgp4-neighbors:
+	Improved output; in particular the hostname is now be printed if
+	possible.
+
+	* trap-send.pl: foo
+
+	* MANIFEST (test/sun-find-process): Added.
+
+	* lib/SNMP_Session.pm (map_table_start_end):
+	Rewrote to cope with holes in tables.  Escape
+	to SNMPv1 (get-next) code if the new `use_getbulk' slot in the session
+	object is NOT set.
+
+2000-10-02  simon  <simon.leinen@switch.ch>
+
+	* test/walk-test.pl:
+	Don't ask for ipAdEntAddr in map_table because that can be derived
+	from the index.
+
+2000-09-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/max-list-sessions: Added header comment.
+
+	* test/max-list-sessions (out_session, out_call): Removed.
+
+	* test/max-list-sessions:
+	Print out just one table.  The callStatusTable is now used to populate
+	entries in the session entries that had been created from
+	ssnStatusTable.
+
+2000-07-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm (%SNMP_util::OIDS):
+	Moved around to keep lexicographical order.
+
+2000-06-20  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/mrtg-ipmcast: New file.
+
+	* test/README: Added `sun-find-process'.
+
+	* test/sun-find-process: New file.
+
+2000-05-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_util.pm (%SNMP_util::OIDS):
+	Added OIDs from IF-MIB (RFC1573).
+
+	* lib/SNMP_util.pm: Recognize SNMP version specifier.
+
+2000-05-27  Simon Leinen  <simon.leinen@switch.ch>
+
+	* MANIFEST (test/asn1-test.pl):
+	Removed because it refers to the ASN_1.pm module,
+	which I started writing three years ago but never finished, and which
+	is (correctly) not included in the distribution.
+
+2000-05-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl: Added `-D' option to show drops (ifOutDiscards).
+
+	Be more modular with respect to printing/reading the different
+	optional columns.
+
+2000-04-12  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/SNMP_Session.pm: Fixed header comment.
+
+2000-04-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/list-ospf-neighbors, test/list-bgp4-neighbors: New file.
+
+2000-03-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/if-counters.pl: Allow port to be specified (-p).
+
+	* test/trap-listener ($port): New variable.
+
+	This should be settable by a command-line option.
+
+	* test/README: Added documentation and sorted alphabetically.
+
+	* README: Added contributors: Paul E. Erkkila, Johannes Demel.
+
+	* MANIFEST (test/cisco-cpus, test/cisco-memory): Added.
+
+	* index.html: Document Counter64 support and map_table improvement.
+
+	* lib/SNMP_Session.pm (SNMPv2c_Session::map_table_start_end):
+	Added $expected_oid_count hack
+
+2000-03-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* lib/BER.pm (encode_intlike, decode_intlike_s):
+	Added code to handle big integers
+	using Math::BigInt.
+
+	* test/ber-test.pl: Added a test for encoding of big integers.
+
+	* test/ber-test.pl: Added tests for huge integers.
+
+2000-02-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test/cisco-cpus: New file.
+
+2000-02-08  simon  <simon.leinen@switch.ch>
+
+	* README.SNMP_util: Refer to Artistic license.
+
+	Adapted to main README.
+
+	* lib/SNMP_util.pm (snmpMIB_to_OID):
+	Map OBJECT-IDENTITY to OBJECT IDENTIFIER.
+
+2000-01-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html:
+	Added a pointer to the parent (SNMP) page (to attract people to my
+	Amazon pointers 8-).
+
+	* index.html: Fixed HTML error.
+
+	* test/if-counters.pl, README, lib/BER.pm, index.html, lib/SNMP_Session.pm:
+	Copyright 2000.
+
+	* lib/SNMP_Session.pm ($VERSION): Incremented to 0.76.
+
+	* test/walk-test.pl: Added SNMPv2 (getBulk) support.
+
+	* ChangeLog: *** empty log message ***
+
+	* index.html: foo
+
+	* test/if-counters.pl:
+	No longer retrieves Cisco-specific variables by default.  Use the new
+	option `-c' to re-activate this.
+
+	* lib/SNMP_Session.pm (default_max_repetitions): Make settable.
+
+	(debug): New read/write method.
+
+	(map_table_start_end): Added some debugging messages.
+
+1999-12-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Use &gt; rather than > in a few places.
+
+
+1999-12-15  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Use &gt; rather than > in a few places.
+
+1999-10-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Clarified SNMPv2 traps.
+
+	* README: Documented new features (SNMPv2 Traps).
+
+	* index.html:
+	Changed documentation of v2_trap_request_send for new signature.
+
+	* index.html: Documented changes in version 0.75.
+
+1999-09-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added note about removed uninitialized variable warning.
+
+	* index.html: Added change log entry for SNMP_util.pm 0.72.
+
+1999-09-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* MANIFEST (Artistic): Added.
+
+	* Makefile.PL (dist): Use "gzip -9f" for compression.
+
+	* Makefile.PL: New file.
+
+	* index.html, README:
+	Added copyright and pointer to "Artistic" license.
+
+	* Artistic: New file.
+
+1999-09-02  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented introduction of IO::Socket.
+
+1999-07-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented $BER::pretty_print_timeticks.
+
+1999-06-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Mention changes in new SNMP_util.pm.
+
+	* README.SNMP_util: Upgraded to 0.71 from Mike Mitchell.
+
+1999-04-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* mibparse.pl: New file.
+
+1999-04-07  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added pointer to README.SNMP_util file.
+
+	* index.html:
+	Document 0.70 changes (MIB parsing addition to lib/SNMP_util.pm</tt>.
+
+	* README.SNMP_util:
+	Update from Mike Mitchell to include snmpMIB_to_OID().
+
+1999-03-10  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document new community string parsing.
+
+1999-02-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented changes for SNMP_util.pm 0.57 -> 0.58.
+
+1999-02-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document agent methods.
+
+	* README: Added Mike McCauley's credit.
+
+	* MANIFEST (test/SNMPAgent.pm): Added.
+
+1999-02-21  simon  <simon.leinen@switch.ch>
+
+	* index.html: Fixed a few Weblint warnings.
+
+	* index.html: Added note about really big tables.
+
+	* index.html: Documented map_table implementation for SNMPv2c.
+
+	Documented map_table_4.
+
+	* MANIFEST (test/if-counters.pl): Added.
+
+1999-02-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented recent changes.
+
+	* README: Added Alan Nichols (Sun) to the list of contributors.
+
+1999-02-17  Simon Leinen  <simon.leinen@switch.ch>
+
+	* mibtree.pl: New file.
+
+1999-01-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added note about bind() error message fix.
+
+1998-12-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document SNMP_util.pm change.
+
+1998-12-11  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added Mike Mitchell's changes.
+
+	* README.SNMP_util: New version from Mike Mitchell.
+
+1998-11-16  Simon Leinen  <simon.leinen@switch.ch>
+
+	* MANIFEST (test/sun-ps): Added.
+
+	* MANIFEST: New file.
+
+	* index.html: Document fixed response matching logic.
+
+1998-10-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile.orig (TESTSRCS): Added test/discover.
+
+	* index.html: Point to FTP directory rather than the archive directly.
+
+	* index.html: Mentioned Clinton Wong's changes.
+
+1998-10-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added a note on broadcast/multicast support.
+
+1998-09-08  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, index.html: Fixed sample trap-reception code.
+
+1998-08-19  Simon Leinen  <simon.leinen@switch.ch>
+
+	* trap-send.pl: New file.
+
+1998-08-18  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile.orig (DOCS): Added README.SNMP_util.
+
+	* README.SNMP_util: New file.
+
+1998-08-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Simple.pm: New file.
+
+1998-08-10  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added pointer to FTP location.
+
+1998-07-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Get html40 validator icon locally.
+
+1998-07-16  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Made HTML 4.0 (Transitional) compliant.
+
+1998-07-01  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile.orig (TESTSRCS): Added trap-send and trap-listener.
+
+	* index.html, README: Added documentation about receiving traps.
+
+1998-07-01  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm ($VERSION): Upped version to 0.60.
+
+	(open): Accept optional additional argument BIND_TO_PORT.
+
+	(open_trap_session): New method, calls open with BIND_TO_PORT 162
+	(or an alternate port given as an optional argument).
+
+	(decode_trap_request, receive_trap): New methods for decoding and
+	receiving SNMPv1 traps, respectively.
+
+	* BER.pm (pretty_uptime_value):
+	New function split off from pretty_uptime.
+
+	($template_debug): New variable, controls debugging output in
+	decode_by_template_2.
+
+	(decode_by_template_2): Added debugging output.
+
+	Fixed computation of position of error in template string.
+
+	Added %A (IP address), %u (uptime).
+
+	(decode_int, decode_string): Better error reporting, include
+	erroneous tags.
+
+	* Makefile (TESTSRCS): Added trap-send and trap-listener.
+
+	* index.html, README: Added documentation about receiving traps.
+
+1998-06-24  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm (set_timeout, set_retries, set_backoff):
+	Fixed warning.
+
+	* SNMP_util.pm (snmptrap): Added upTime handling.
+
+	* index.html: Documented new methods and map_table fix.
+
+	* SNMP_Session.pm (set_timeout, set_retries, set_backoff): 
+	New methods.
+
+	(map_table_start_end): Fixed comparison logic so that an index of
+	"0" no longer terminates the table.
+
+1998-06-11  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Updated RFC 1213 reference for new server.
+
+	* index.html: Updated pointer to mrtg page.
+
+1998-06-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Noted SNMP_util.pm.
+
+	Shortened section about Higher-Level APIs.
+
+	* README: Updated to be in line with the current index.html.
+
+	* Makefile (PKGSRCS): Added SNMP_util.pm.
+
+	* BER.pm: Added exported subroutine `encode_timeticks'.
+
+	Upped version to 0.58.
+
+1998-06-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Added exported subroutine `encode_timeticks'.
+
+	Upped version to 0.58.
+
+1998-06-02  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_util.pm: New version from Mike Mitchell:
+
+	I've changed the API so that the first argument is
+	'community@host:port'.
+
+	* SNMP_util.pm: New file.
+
+1998-05-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm (get_request_response,
+	set_request_response,getnext_request_response): Pass 1 rather
+	than 0 as the $error argument.
+
+	(receive_response_3): Fix a bug which prevented the $errorp
+	argument from being passed correctly.
+
+1998-05-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (TESTSRCS): Added test/if-to-routes.pl.
+
+1998-05-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Upped verision number to 0.57.
+
+	Added credit to Mike Diehn for encode_ip_address.
+
+	* index.html: Added sections about walking tables and sending traps.
+
+1998-04-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm ($VERSION): Upped to 0.58.
+
+	(trap_request_send): Return 1, not 0, on success.
+
+	* BER.pm (encode_ip_address): New exported subroutine.
+
+	(encode_intlike): New subroutine, could be used to encode
+	integer-like data such as uptime.
+
+1998-04-21  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm: Added encoding of traps, courtesy Mike Mitchell
+	<mcm@unx.sas.com>.
+
+1998-04-09  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm (request_response_5, receive_response_3,
+	unwrap_response_6): Replace request_response_4,
+	receive_response_2, and unwrap_response_5, respectively.  Added
+	$errorp argument to control error handling.
+
+	(map_table): Count calls to walk function and return the total
+	number.
+
+	No longer pretty_print the table entries before passing them to
+	the walk function.
+
+	(get_request_response, set_request_response,
+	getnext_request_response, send_query): Added formal argument
+	lists.
+
+	(SNMPv1_Session::open): Initialize new slots `error_status' and
+	`error_index' to be used for user-supplied error handling.
+
+1998-04-06  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (TESTSRCS): Renamed test/test_table.pl to
+	test/test-table.pl for consistency.
+
+	* SNMP_Session.pm (map_table, map_table_start_end, index_compare,
+	oid_diff): New subroutines.
+
+	(index_compare, oid_diff): New exported names.
+
+	* Makefile (TESTSRCS): Added new table test scripts.
+
+1998-03-25  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Document two new fixes.
+
+	* BER.pm (encode_int): New version by Mike Mitchell
+	<mcm@unx.sas.com>.
+
+	* README: Added Mike Mitchell to the list of contributors.
+
+1998-03-25  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Added Mike Mitchell to the list of contributors.
+
+1998-03-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm (pretty_uptime): Be careful to use integer arithmetic.
+
+	($VERSION): 0.54 -> 0.55.
+
+1998-03-05  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README: Added Niels Bakker to the credits.
+
+1998-02-14  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm ($VERSION): -> 0.54.
+
+	* BER.pm: Changed the spacing in prototype argument lists so that
+ 	Perl 5.003 likes it.
+
+1998-02-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Removed forgotten diagnostic message.
+
+	Made spacing before parentheses consistent.
+
+1998-02-13  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Removed forgotten diagnostic message.
+
+	Made spacing before parentheses consistent.
+
+1998-02-11  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Use prototypes consistently.
+
+	Fixed two benign errors found by this.
+
+1998-01-30  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README (Credits): Added Dan Cox and Iouri Pakhomenko.
+
+	* index.html: Mentioned that Iouri Pakhomenko also noted the
+ 	error_return bug.
+
+1998-01-29  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Mention Dan Cox' fix to return_error.
+
+	* SNMP_Session.pm ($VERSION): 0.55 -> 0.56.
+
+	* SNMP_Session.pm (request_response_4):
+	Call $this->error when no response is received.
+
+	(error_return): Converted to a method, so that SNMPv1_Session
+ 	inherits it.
+
+	* index.html: SNMPv2 -> SNMPv3.
+
+	* index.html: Noted that leading dots are now ignored in OIDs.
+
+1998-01-07  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (INSTALL):
+	ginstall -> install.  GNU install is no longer installed in
+	our new environment.  However, Solaris 2.6 install seems to be
+	compatible enough to BSD install at last.
+
+	* BER.pm ($VERSION): Incremented to 0.52.
+
+	* BER.pm (encode_oid): Ignore leading dot.
+
+1997-12-22  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm ($errmsg, $suppress_warnings):
+	New variables for silent error
+	handling.
+
+1997-12-03  Simon Leinen  <simon.leinen@switch.ch>
+
+	* ChangeLog: *** empty log message ***
+
+	* index.html: Documented recent changes.
+
+	* SNMP_Session.pm: Upped version number.
+
+	* BER.pm: No longer use integer.
+
+	No longer call "warn".
+
+	* SNMP_Session.pm: Handle encoding errors in a sensible way.
+
+	($SNMP_Session::errmsg, $SNMP_Session::suppress_warnings): New
+ 	variables that give the caller more control about error messages.
+
+Wed Dec  3 20:05:50 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Documented recent changes.
+
+	* BER.pm: No longer use integer.
+
+	No longer call "warn".
+
+	* SNMP_Session.pm: Handle encoding errors in a sensible way.
+
+	($SNMP_Session::errmsg, $SNMP_Session::suppress_warnings): New
+	variables that give the caller more control about error messages.
+
+	Upped version number.
+
+Mon Dec  1 12:38:42 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm (decode_intlike_s): Multiply with 256 rather than shifting 8.
+
+Fri Nov 28 21:59:11 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm:
+	Better error handling.  No longer calls die(), but returns undefined
+	values and leaves an error message in $BER::errmsg.
+
+	* SNMP_Session.pm (ber_error):
+	New subroutine that passes an error up from the BER module.
+
+	(unwrap_response_5): Use it.
+
+Tue Nov 25 13:58:40 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, index.html: Found an application for sending traps.
+
+Fri Nov 14 19:25:22 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Added test/arp.
+
+	* Makefile (TESTSRCS): Added test/arp.
+
+Fri Oct 31 18:21:36 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (dist): Used to be called `shar'.
+
+	Install index.html, tol.
+
+	* index.html: Moved description of last change forward.
+
+	* SNMP_Session.pm ($VERSION): Incremented.
+
+	* SNMP_Session.pm: Added Daniel L. Needles' change to avoid
+ 	passing numeric IP addresses to inet_ntoa().
+
+	* README: Give credit to Daniel L. Needles.
+
+	* index.html: Mention Dan L. Needle's contribution.
+
+Mon Sep 22 19:25:36 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm (hex_string, hex_string_of_type): New subroutines.
+
+Fri Aug 22 10:54:00 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Bradford T. -> Brad.
+
+Thu Aug 21 14:05:37 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html, README (Set Requests): Point to test/set-test.pl.
+
+	* index.html: Added missing `mailto:' to URL.
+
+Tue Aug 19 14:43:17 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm: Use more canonic e-mail address for matter.
+
+	* Makefile (TESTSRCS): Added set-test.pl.
+
+	* README, index.html: Use more canonic e-mail address for matter.
+
+Sat Aug 16 00:06:21 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (TESTSRCS): Added some, removed party-test.pl.
+
+	(DOCS): Added test/README, index.html.
+
+	(PKGSRCS): Removed Party.pm.
+
+	(TESTSRCS): Renamed from PROGSRCS.
+
+	Moved all test scripts to `test' subdirectory.
+
+	* index.html, README: snmp-set Support: Added credits for matter,
+ 	small description on snmpset usage, updated to-do items.
+
+	* SNMP_Session.pm: Added set-request support based on code
+ 	contributed my Matthew Trunnell <matter@media.mit.edu>:
+
+	(encode_request): The former list of encoded OIDs can now also
+ 	contain OID/value pairs.  Those are represented by references to
+ 	two-element arrays, the encoded OID and the encoded value.
+
+	(encode_set_request): New subroutine.
+
+	(set_request_response): New subroutine.
+
+	(request_response_4): Return undef as soon as an error response
+ 	packet has been received, rather than retrying.
+
+	(unwrap_response_5): Recognize OID/value pairs (but print only the
+ 	OID).
+
+	This fix doesn't really have anything to do with set-request
+ 	support:
+
+	(receive_response_2): Undefine the "unwrapped" cache so that you
+ 	don't get the data from the last request if you ignore the error
+ 	return.
+
+	($VERSION): Incremented to 0.52.
+
+Thu Jul 31 11:56:31 1997  leinen  <leinen@bolivar>
+
+	* test.pl: Fixed pathname to Perl.
+
+	* SNMP_Session.pm (open): Better error messages.
+
+	* SNMP_Session.pm: Better diagnostics:
+
+	(request_response_4): Renamed from request_response_3, take
+ 	additional argument $oids.
+
+	(receive_response_2): Renamed from receive_response_1, take
+ 	additional argument $oids.
+
+	(unwrap_response_5): Renamed from unwrap_response_4, take
+ 	additional argument $oids.  Use this to generate error message
+ 	when we have an errorIndex.
+
+	(error): New method to print an error message referring to a
+ 	specific session.
+
+	(to_string): New function, factored out from `describe'.  Be much
+ 	more verbose.
+
+	($VERSION): Incremented to 0.51.
+
+Wed Jul  9 16:17:30 1997  leinen  <leinen@bolivar>
+
+	* index.html: Document recent changes: version numbers, unsigned
+ 	printing.
+
+	* SNMP_Session.pm: Added versioning as supported by Exporter.pm.
+
+	* BER.pm: Don't die in a few places.
+
+	($VERSION): New variable, initially 0.50.
+
+	(version): New subroutine.
+
+Wed Jul  2 16:02:23 1997  leinen  <leinen@bolivar>
+
+	* BER.pm (pretty_uptime): Avoid negative times.
+
+	* BER.pm: Removed debugging version of decode_intlike_s.
+
+	(pretty_uptime): Use decode_unsignedlike rather than
+ 	decode_intlike.
+
+	* BER.pm: Buggy version that should work with mrtg on all systems.
+
+Thu Jun 12 09:05:17 1997  leinen  <leinen@bolivar>
+
+	* README: Updated sample code.
+
+	Added pointer to HTML page.
+
+Thu Jun 12 09:00:34 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* test.pl, walk-test.pl:
+ 	Better error message for session open failure.
+
+	* index.html: Updated for new error handling and adapted sample
+ 	code, note dependency on Perl 5.002, note use of strict.
+
+Thu Jun 12 08:47:53 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm, SNMP_Session.pm: Require Perl 5.002.
+
+	* SNMP_Session.pm: Be less strict.
+
+Mon Apr 28 18:55:20 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* README, index.html: Moved my home page to
+ 	http://www.switch.ch/misc/leinen/.
+
+Thu Apr  3 14:08:26 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Point to .tar.gz rather than .shar.
+
+	* Makefile (shar): Make a tar.gz file, too, and install both under
+ 	$(DESTDIR).
+
+	* BER.pm (encode_int_0): New exported subroutine that generates
+ 	the BER encoding for the integer zero.
+
+	* SNMP_Session.pm: Never die on exceptional situations, but write
+ 	a warning and return undef.
+
+	(encode_request): Use encode_int_0.
+
+	(unwrap_response_4): Better diagnostics for unparseable and error
+ 	responses.
+
+Mon Mar 24 09:16:03 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm: Handle unsigned integers correctly.
+
+Fri Feb 21 09:07:03 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm (unwrap_response_4): Integrated fix by Tobi
+ 	Oetiker for doubly declared lexical variable $request_id.
+
+Mon Feb 17 13:31:39 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* index.html: Mrtg: Don't mention beta version 2.0 anymore, since
+ 	this has now been released.
+
+	* README, index.html: SNMP_Session::open -> SNMP_Session->open
+ 	(thanks to "Robert Weatherford(grim)" <rweather@ctron.com>)
+
+Mon Feb 17 13:26:16 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* BER.pm (@EXPORT): Export `encoded_oid_prefix_p'.
+
+	(encoded_oid_prefix_p): Handle subids > 127.
+
+	Return length of prefix in second encoded OID as a result.
+
+	(decode_subid): New subroutine that decodes a single subid from an
+ 	encoded OID.
+
+Sun Feb  2 16:47:30 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* asn1-test.pl: Added test for sequence decoding.
+
+	* ASN_1.pm (ASN_1::Sequence): Fixed `new' method.
+
+	(decode): Added Sequence decoding.
+
+	* asn1-test.pl, ASN_1.pm: Initial revision
+
+Sat Feb  1 17:42:01 1997  Simon Leinen  <simon.leinen@switch.ch>
+
+	* Makefile (PROGSRCS): Added ber-test.pl.
+
+	* BER.pm: Use integer.
+
+	(decode_intlike): Simplified by writing a proper loop to decode
+ 	octet by octet.  This should also solve any problems with signed
+ 	vs. unsigned.
+
+	* ber-test.pl (decode_intlike_test): New subroutine.
+
+	(regression_test): Use it.
+
+	* ber-test.pl: Use integer.
+
+	Added several test cases.
+
+	* ber-test.pl: Initial revision
+
+	* BER.pm (regression_test): Removed.  This is now in ber-test.pl.
+
+Wed Jan 15 08:56:54 1997  leinen  <leinen@ohiggins>
+
+	* SNMP_Session.pm: Backed out the changes between revisions 1.27
+ 	and 1.28 that used the new subroutines in Socket.pm.  It turned
+ 	out that those routines require Perl 5.002 or later.  Put the new
+ 	code back in and commented it out with clear notices - look for
+ 	the markers "Perl 5.002 or later" and "end of pre-5.002 code".
+
+Tue Jan 14 09:01:57 1997  leinen  <leinen@ohiggins>
+
+	* BER.pm, SNMP_Session.pm: Commented out use strict/use vars and
+ 	explain why.
+
+Mon Jan 13 13:28:04 1997  leinen  <leinen@ohiggins>
+
+	* BER.pm: Updated my e-mail address in the header comment.
+
+Tue Jan  7 16:38:48 1997  leinen  <leinen@ohiggins>
+
+	* index.html: Updated from latest README.
+
+	Added section with recent changes and credits.
+
+	* README: Updated from latest index.html.
+
+	* SNMP_Session.pm: Make better use of the functionality in
+ 	Socket.pm.
+
+Thu Dec 26 17:31:32 1996  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm (receive_response_1): Perform the address check
+ 	only if debugging is set on the session.
+
+	* SNMP_Session.pm (receive_response_1): Don't return failure if
+ 	response comes from a different address.  Also, the warning is
+ 	only issued if debugging is set for the session.
+
+Fri Dec 20 14:50:03 1996  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm: Import @ISA from vars.
+
+	Added debugging.
+
+	Fixed header comment.
+
+	(unwrap_response_4): Removed spurious argument to
+	decode_by_template().
+
+	* BER.pm: Use strict.
+
+	(pretty_print): Declare $result as lexical variable.
+
+	(decode_by_template): Implement %i and %s without prefix arguments.
+
+	(encoded_oid_prefix_p): Declare $subid1, $subid2 lexical.
+
+Fri Dec 20 09:56:28 1996  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm ($default_timeout, $default_retries,
+ 	$default_backoff): New values.  Improved following discussions on
+ 	the mrtg mailing list.
+
+	(encode_request): Increment request ID.
+
+	(request_response_3): Renamed from `request_response'.  Added
+ 	`response_tag' argument.  Unwrap each received response.  If this
+ 	fails because of mismatching community or request ID, just ignore
+ 	the request and retry.
+
+	(SNMPv1_Session::open): Cast the random request ID to an int.
+
+	(unwrap_response_4): Renamed from `unwrap_response'.  Added
+ 	`request_id' argument.
+
+	Check community and request ID and return undefined if there is a
+ 	mismatch.
+
+	(receive_response_1): Renamed from `receive_response'.  Added
+ 	`response_tag' parameter.
+
+	Fixed report of response from bad address.
+
+Tue Dec 17 18:16:55 1996  Simon Leinen  <simon.leinen@switch.ch>
+
+	* SNMP_Session.pm: Stripped contributor entries.
+
+	(decode_get_response): Call unwrap_response via eval and simply
+ 	return zero when it dies.
+
+	(receive_response): Return zero if response comes from different
+ 	address.
+
+	(request_response): Wait for another packet when receive_response
+ 	fails.
+
+	* BER.pm: Contributors list: slightly fixed.
+
+	(encode_oid): Removed comments.
+
+Tue Dec 17 13:54:42 1996  Simon Leinen  <simon.leinen@switch.ch>
+
+	* walk-test.pl: Changed path to Perl.
+
+	($hostname): Changed default.
+
+	* SNMP_Session.pm: Updated my e-mail address.
+
+	* BER.pm (encode_oid): Added check for negative OID subids, by
+ 	Yufang HU <yhu@casc.com>
+
+	support up to 32bit subids, by Philippe Simonet
+ 	<sip00@vg.swissptt.ch>.
+
+Sun Aug 25 23:49:15 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* SNMP_Session.pm (request_response):
+	Perform retries with exponential backoff.
+
+	(retries, backoff): New slots of the SNMP_Session object.  Default
+ 	values are 3 and 1.5, respectively.
+
+Wed Jul 10 08:18:16 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* README: Added Heine Peters to contributors list.
+
+	* walk-test.pl: Accept hostname and community as command-line
+ 	arguments.  These default to ``neon-tetra'' and ``public'',
+ 	respectively.
+
+	* SNMP_Session.pm: New header comment.
+
+Wed Jul 10 08:06:11 1996  Tobias Oetiker  <oetiker@ee.ethz.ch>
+
+	Changed default timeout from 2 to 10 seconds.
+
+Wed Jul 10 08:06:11 1996  Heine Peters  <peters@dkrz.de>
+
+	Allow remote host to be specified as IP address in dotted-quad
+	notation rather than by name (integrated change dated April 25).
+
+	No longer bind the UDP socket to a specific address.
+
+Tue Jul  9 09:40:28 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* README: Added list of contributors.
+
+	Added pointer to mrtg 2.0.
+
+Tue Jul  9 08:41:22 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* BER.pm (decode_intlike): Fixed shifting of first byte.
+
+	* BER.pm: Reformatted the header comment and added my name.
+
+	* BER.pm (decode_string): Cleaned up by removing my old code that
+ 	had been commented out by Andrzej Tobola when he fixed it.
+
+Tue Jul  9 08:41:22 1996  Andrzej Tobola  <san@iem.pw.edu.pl>
+
+	* BER.pm (decode_string): Support long strings by using
+	decode_length.
+
+Tue Jul  9 08:41:22 1996  Tobias Oetiker  <oetiker@ee.ethz.ch>
+
+	* BER.pm (decode_intlike): Handle five-byte integers.
+
+Tue Jul  9 08:41:22 1996  Dave Rand  <dlr@Bungi.com>
+
+	* BER.pm (pretty_uptime): New subroutine to print sysUpTime
+	readably.
+
+Mon Jul  8 17:15:43 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* README: Updated my e-mail address.
+
+	Note that get-next is now supported.
+
+	* Makefile (PROGSRCS): Added walk-test.pl.
+
+	* walk-test.pl: Initial revision
+
+	* test.pl: Actually use the hostname passed on the command line.
+
+	* BER.pm (encoded_oid_prefix_p): New subroutine that checks
+ 	whether one encoded OID is a prefix of the other.
+
+	* SNMP_Session.pm (request_response): New function called by both
+ 	get_request_response and getnext_request_response.
+
+	* SNMP_Session.pm:
+	(getnext_request, encode_getnext_request,
+ 	getnext_request_response): New functions.
+
+	(encode_request): New subroutine called by both encode_get_request
+ 	and encode_getnext_request.
+
+	* BER.pm (pretty_oid): Print subids beyond 127 CORRECTLY.
+
+	* BER.pm (pretty_oid): Print subids beyond 127.
+
+	* BER.pm (pretty_print): Call `pretty_ip_address' for objects with
+ 	snmp_ip_address_tag.
+
+	(pretty_ip_address): New subroutine that prints an IP address
+ 	object in decimal quad notation.
+
+Wed Jun 12 15:55:20 1996  Simon Leinen  <simon@instrumatic.ch>
+
+	* BER.pm (encode_oid): Support OID subids up to 16383, up from 127.
+
+Fri Dec 22 11:45:02 1995  Simon Leinen  <simon@instrumatic.ch>
+
+	* wwwtest: Added forward definitions of all subroutines.
+
+	Check whether the hostname is in the list of allowed hosts.
+
+	(html_error_message): added horizontal line below the title.
+
+Fri Jul 28 17:23:14 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* wwwtest (write_query_form): added a footer with links to the
+ 	SNMP module's page, the gateway's source and my home page.
+
+Mon Jul 17 13:51:04 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* Makefile (DOCS): removed ChangeLog.
+
+Thu Jul  6 13:15:59 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* test.pl, wwwtest, SNMP_Session.pm:
+	Use accessor methods for slots of SNMP_Session.
+
+Thu Jul  6 12:57:37 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* test.pl (%ugly_oids): use qw() to define them, as in wwwtest.
+
+	* test.pl: Simplified a tiny bit by adding the instance numbers to
+ 	the parameters of snmp_get.
+
+Wed Jul  5 22:11:47 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* wwwtest, party-test.pl: Added header comment.
+
+	* BER.pm, Party.pm: Added comments.
+
+	* Makefile (ALLDIST): mention $(DOCS) before $(ALLSRCS) so that
+ 	the README is the first file in a shar archive.
+
+Wed Jul  5 21:39:49 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* wwwtest (html_error_message, html_quote): moved to the end of
+ 	the file.
+
+	* wwwtest (write_query_form): default to liasg7 to simplify
+ 	testing at home.
+
+	* wwwtest (query_to_html_response): added heading containing the
+ 	name of the queried host.
+
+	(write_query_form): use here document to reduce quoting.
+
+	* wwwtest: Moved handling of parameterless case to
+ 	`write_query_form()'.
+
+	(write_query_form): new procedure.
+
+	(parse_query): return result rather than putting it in global hash
+ 	%query.
+
+	* wwwtest: Changed form to use SELECT tags so that there is a very
+ 	limited choice of host and community names.
+
+	* wwwtest: If called without QUERY_STRING, act as a form that
+ 	allows the user to specify a host and community name.
+
+	If called with a QUERY_STRING, extract host and community name and
+ 	use this as the target of the query.
+
+	Wrap SNMP session creation and get query in evals, and generate a
+ 	HTML error message if one of them fails.
+
+	* SNMP_Session.pm (host_not_found_error): generate an error
+ 	message trying to explain why a given host hasn't been found by
+ 	one of the gethostby...() routines.
+
+	(open): use `host_not_found_error' to generate better error
+ 	messages.
+
+	* test.pl: Added header comment.
+
+	Parse command-line arguments.
+
+Mon Jul  3 13:53:26 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* README: Explain how to encode OIDs.
+
+	Explain (roughly) how to decode the results.
+
+Wed Jun 28 22:47:48 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* wwwtest: Removed HP-agent-specific variables so that I can test
+ 	the code against CMU SNMPv2.
+
+Wed Jun 28 22:46:55 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* Makefile (DOCS, ALLDIST): new variables.
+
+	(shar): new target.
+
+	* SNMP_Session.pm:
+	Moved the SNMPv1-specific parts to a subclass SNMPv1_Session.
+
+	* Makefile, ChangeLog: Initial revision
+
+Wed Jun 28 21:41:51 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* party-test.pl: Initial revision
+
+	* Party.pm: use BER.
+
+	* Party.pm: Initial revision
+
+	* SNMP_Session.pm (snmp_version_1, snmp_version_2): new subroutines.
+
+	(open): fixed typo in getprotobyname('udp').
+
+Mon Jun 19 19:43:12 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* README (Example): use package BER, remove BER:: prefixes.
+
+	* wwwtest, test.pl: use BER.
+
+	Removed BER:: package prefixes.
+
+	* BER.pm: use Exporter.
+
+	* README: Tabified.
+
+Wed Jun 14 21:59:15 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* wwwtest (snmp_get):
+	produce HTML error message when get_request_response fails.
+
+	* SNMP_Session.pm (get_request_response):
+	don't warn if wait_for_response fails, return
+	0.
+
+	* wwwtest (%ugly_oids):
+	added a couple of statistics about the first two
+	interfaces.
+
+	* BER.pm (pretty_print): format null objects as "(null)".
+
+	* wwwtest: Generate more properly structured HTML.
+
+	(%ugly_oids): Reformatted, added some variables.
+
+Mon Jun 12 15:43:36 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* README: Initial revision
+
+Fri May 19 17:07:46 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* BER.pm (decode_by_template):
+	improve error message for length mismatch.
+
+	(decode_length): support lengths up to 65536.
+
+	* BER.pm (decode_intlike): support length 3 integers.
+
+	Fix error message for unsupported integer length.
+
+	* BER.pm: Added SNMP-specific tags (counter, gauge, IP address etc.)
+
+	(pretty_print): handle counters and gauges, which are treated just
+	like integers.
+
+	* wwwtest: Initial revision
+
+Thu May 18 22:18:41 1995  Simon Leinen  <simon@lia.di.epfl.ch>
+
+	* BER.pm, SNMP_Session.pm: Added -*- mode -*- comment for Emacs.
+
+	* test.pl: Layout change.
+
+	* BER.pm: Export several symbols.
+
+	(decode_by_template): assume the constructor flag when the user gives
+	a tag value in a %{ option.
+
+	* SNMP_Session.pm: Use the BER package, removed BER:: prefixes.
+
+	* BER.pm (decode_by_template): avoid recursion.
+
+	* SNMP_Session.pm (open):
+	generate a file handle so that multiple sessions can be used
+	at the same time.
+
+	* SNMP_Session.pm:
+	Use symbolic constants for PDU tags and default UDP port.
+
+	(describe): include timeout value in the output.
+
+	* test.pl: Removed `&'s before subroutine names.
+
+	* BER.pm: Improved layout.
+
+	(decode_string): Improved error message.
+
+	* BER.pm: Use symbolic constants for tags and flags.
+
+	* SNMP_Session.pm:
+	Use `Socket.pm' to get the socket constants (AF_INET, SOCK_DGRAM).
+
+	* test.pl (snmp_get): new subroutine.
+
+	* BER.pm (pretty_using_decoder): new function.
+
+	(pretty_string, pretty_int): use it.
+
+	* test.pl: Use a different mechanism to pretty print OIDs.
+
+	* SNMP_Session.pm:
+	Renamed the `socket' member to `sock' in order to avoid confusion.
+
+	* test.pl: Moved the BER and SNMP_Session packages to subfiles.
+
+	* BER.pm (decode_by_template):
+	in the %i handler, cast $expected to int in
+	order to fix false mismatches.
+
+	* BER.pm, SNMP_Session.pm, test.pl: Initial revision
+

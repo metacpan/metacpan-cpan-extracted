@@ -2,14 +2,14 @@
 X_No_Archive: Yes
 abstract: 'Create Text-based User Interfaces Without ncurses'
 author:
-  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+  - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Devel::CheckBin: '0'
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.046'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,25 +28,18 @@ no_index:
 provides:
   Termbox:
     file: lib/Termbox.pm
-    version: '0.12'
-  Termbox::Cell:
-    file: lib/Termbox/Cell.pm
-    version: '0.12'
-  Termbox::Event:
-    file: lib/Termbox/Event.pm
-    version: '0.12'
+    version: '2.00'
 requires:
   FFI::Platypus: '2'
   FFI::Platypus::Lang::CPP: '0'
   File::ShareDir: '0'
   File::Spec::Functions: '0'
   perl: '5.020'
-  strictures: '2'
 resources:
   bugtracker: https://github.com/sanko/Termbox.pm/issues
   homepage: https://github.com/sanko/Termbox.pm
   repository: https://github.com/sanko/Termbox.pm.git
-version: '0.12'
+version: '2.00'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

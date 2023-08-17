@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Encode" => 0,
     "English" => 0,
+    "Env" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
     "File::Path" => 0,
@@ -58,7 +59,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "5.011",
+  "VERSION" => "5.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "Data::Dumper::Interp" => "5.013",
   "Encode" => 0,
   "English" => 0,
+  "Env" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,

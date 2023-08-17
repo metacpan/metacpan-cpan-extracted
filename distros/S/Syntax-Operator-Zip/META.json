@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Operator::Zip" : {
          "file" : "lib/Syntax/Operator/Zip.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

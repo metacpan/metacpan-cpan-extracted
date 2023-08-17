@@ -1,4 +1,4 @@
-Last login: Mon Aug 16 14:48:18 [4m2[24m021 from [30m[41m192.0.2.18[0m
+Last login: Mon Aug 16 14:48:18 [4m2[24m021 from [90m[41m192.0.2.18[0m
 JUNOS tip:
 Use '#' in the beginning of a line in command scripts to cause the
 rest of the line to be ignored.
@@ -776,11 +776,11 @@ user@swXX> show interfaces
     Protocol inet, MTU: [4m1[24m562
       Flags: Is-Primary
       Addresses, Flags: Primary Is-Default Is-Preferred Is-Primary
-        Destination: 128/2, Local: [30m[42m128.0.0.1[0m, Broadcast: [30m[45m191.255.255.255[0m
+        Destination: 128/2, Local: [37m[45m128.0.0.1[0m, Broadcast: [30m[100m191.255.255.255[0m
       Addresses, Flags: Primary
-        Destination: 128/2, Local: [30m[43m128.0.0.17[0m, Broadcast: [30m[45m191.255.255.255[0m
+        Destination: 128/2, Local: [30m[46m128.0.0.17[0m, Broadcast: [30m[100m191.255.255.255[0m
       Addresses
-        Destination: 128/2, Local: [30m[47m128.0.0.32[0m, Broadcast: [30m[45m191.255.255.255[0m
+        Destination: 128/2, Local: [30m[46m128.0.0.32[0m, Broadcast: [30m[100m191.255.255.255[0m
     Protocol tnp, MTU: [4m1[24m562
       Flags: Is-Primary
       Addresses, Flags: Primary
@@ -838,7 +838,7 @@ user@swXX> show interfaces
     Protocol inet, MTU: [4m1[24m500
       Flags: Is-Primary
       Addresses, Flags: Primary Is-Default Is-Preferred Is-Primary
-        Destination: 128/2, Local: [30m[42m128.0.0.127[0m, Broadcast: [30m[45m191.255.255.255[0m
+        Destination: 128/2, Local: [90m[47m128.0.0.127[0m, Broadcast: [30m[100m191.255.255.255[0m
 
 [32mPhysical interface: lo0, Enabled, Physical link is Up[0m
   Interface index: 6, SNMP ifIndex: 6
@@ -938,15 +938,15 @@ user@swXX> show interfaces
     Protocol inet, MTU: [4m1[24m500
       Flags: Is-Primary, User-MTU
       Addresses, Flags: Is-Default Is-Preferred Is-Primary
-        Destination: [30m[45m192.0.2.48/28[0m, Local: [30m[46m192.0.2.49[0m, Broadcast: [30m[46m192.0.2.63[0m
+        Destination: [30m[47m192.0.2.48/28[0m, Local: [37m[41m192.0.2.49[0m, Broadcast: [90m[41m192.0.2.63[0m
     Protocol inet6, MTU: [4m1[24m500
     Max nh cache: [4m20[24m000, New hold nh limit: [4m20[24m000, Curr nh cnt: 0, Curr new hold cnt: 0,
     NH drop cnt: 0
       Flags: Is-Primary, User-MTU
       Addresses, Flags: Is-Default Is-Preferred Is-Primary
-        Destination: [30m[42mf00:ba7::/120[0m, Local: [30m[42mf00:ba7::5[0m
+        Destination: [37m[45mf00:ba7::/120[0m, Local: [97m[100mf00:ba7::5[0m
       Addresses, Flags: Is-Preferred
-        Destination: [37m[44mfe80::/64[0m, Local: [30m[42mfe80::1235:67ff:fe89:6841[0m
+        Destination: [30m[41mfe80::/64[0m, Local: [37m[41mfe80::1235:67ff:fe89:6841[0m
 
 [1;31mPhysical interface: vme, Enabled, Physical link is Down[0m
   Interface index: 68, SNMP ifIndex: 35
@@ -1024,16 +1024,16 @@ Interface               Admin Link Proto    Local                 Remote
 [1;31mae4                     up    down[0m
 [1;31mae4.0                   up    down eth-switch[0m
 [32mbme0                    up    up[0m
-[32mbme0.32768              up    up   inet     [30m[47m128.0.0.1/2[0m     [0m
-                                            [30m[41m128.0.0.17/2[0m    
-                                            [30m[45m128.0.0.32/2[0m    
+[32mbme0.32768              up    up   inet     [37m[45m128.0.0.1/2[0m     [0m
+                                            [30m[46m128.0.0.17/2[0m    
+                                            [30m[46m128.0.0.32/2[0m    
                                    tnp      0x11            
 [33mbme0.32769              down  up   eth-switch[0m
 [32mdsc                     up    up[0m
 [32mgre                     up    up[0m
 [32mipip                    up    up[0m
 [32mjsrv                    up    up[0m
-[32mjsrv.1                  up    up   inet     [30m[47m128.0.0.127/2[0m   [0m
+[32mjsrv.1                  up    up   inet     [90m[47m128.0.0.127/2[0m   [0m
 [32mlo0                     up    up[0m
 ---(more)---                                        [32mlo0.16384               up    up   inet     [30m[45m127.0.0.1[0m           --> 0/0[0m
 [32mlsi                     up    up[0m
@@ -1044,9 +1044,9 @@ Interface               Admin Link Proto    Local                 Remote
 [32mpime                    up    up[0m
 [32mtap                     up    up[0m
 [32mvlan                    up    up[0m
-[32mvlan.102                up    up   inet     [30m[42m192.0.2.49/28[0m[0m
-                                   inet6    [30m[41mf00:ba7::5/120[0m
-                                            [30m[45mfe80::f00:ba7:6841/64[0m
+[32mvlan.102                up    up   inet     [35m[47m192.0.2.49/28[0m[0m
+                                   inet6    [30m[42mf00:ba7::5/120[0m
+                                            [30m[43mfe80::f00:ba7:6841/64[0m
 [1;31mvme                     up    down[0m
 
 {master:1}
@@ -1428,9 +1428,9 @@ Interface               Admin Link Proto    Local                 Remote
 
 [36m  Logical interface bme0.32768 [0m
     Flags: Up Encapsulation: ENET2
-    inet  [30m[47m128.0.0.1/2[0m     
-          [30m[41m128.0.0.17/2[0m    
-          [30m[45m128.0.0.32/2[0m    
+    inet  [37m[45m128.0.0.1/2[0m     
+          [30m[46m128.0.0.17/2[0m    
+          [30m[46m128.0.0.32/2[0m    
     tnp   0x11            
 
 [36m  Logical interface bme0.32769 [0m
@@ -1459,7 +1459,7 @@ Interface               Admin Link Proto    Local                 Remote
 
 [36m  Logical interface jsrv.1 [0m
     Flags: Up 0x20[4m004[24m000 Encapsulation: unknown
-    inet  [30m[47m128.0.0.127/2[0m   
+    inet  [90m[47m128.0.0.127/2[0m   
 
 [32mPhysical interface: lo0, Enabled, Physical link is Up[0m
   Type: Loopback, Link-level type: Unspecified, MTU: Unlimited, Clocking: Unspecified,
@@ -1511,9 +1511,9 @@ Interface               Admin Link Proto    Local                 Remote
 
 [36m  Logical interface vlan.102 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    inet  [30m[42m192.0.2.49/28[0m
-    inet6 [30m[41mf00:ba7::5/120[0m
-          [30m[45mfe80::f00:ba7:6841/64[0m
+    inet  [35m[47m192.0.2.49/28[0m
+    inet6 [30m[42mf00:ba7::5/120[0m
+          [30m[43mfe80::f00:ba7:6841/64[0m
 
 [1;31mPhysical interface: vme, Enabled, Physical link is Down[0m
   Type: Mgmt-VLAN, Link-level type: Mgmt-VLAN, MTU: [4m1[24m518, Clocking: Unspecified,
@@ -1706,19 +1706,19 @@ Interface               Admin Link Proto    Local                 Remote
 [32mge-0/1/0                up    up[0m
 [32mge-0/1/0.0              up    up   eth-switch[0m
 [32mbme0                    up    up[0m
-[32mbme0.0                  up    up   inet     [30m[47m128.0.0.1/2[0m     [0m
-                                            [30m[45m128.0.0.4/2[0m     
-                                            [37m[44m128.0.0.16/2[0m    
-                                            [30m[43m128.0.0.63/2[0m    
+[32mbme0.0                  up    up   inet     [37m[45m128.0.0.1/2[0m     [0m
+                                            [97m[100m128.0.0.4/2[0m     
+                                            [37m[45m128.0.0.16/2[0m    
+                                            [30m[100m128.0.0.63/2[0m    
 [32mcbp0                    up    up[0m
 [32mdsc                     up    up[0m
 [32mesi                     up    up[0m
 [32mgre                     up    up[0m
 [32mipip                    up    up[0m
 [32mirb                     up    up[0m
-[32mirb.80                  up    up   inet     [30m[45m10.1.2.3/25[0m  [0m
+[32mirb.80                  up    up   inet     [37m[45m10.1.2.3/25[0m  [0m
 [32mjsrv                    up    up[0m
----(more 84%)---                                        [32mjsrv.1                  up    up   inet     [30m[47m128.0.0.127/2[0m   [0m
+---(more 84%)---                                        [32mjsrv.1                  up    up   inet     [90m[47m128.0.0.127/2[0m   [0m
 [32mlo0                     up    up[0m
 [32mlo0.16385               up    up   inet    [0m
 [32mlsi                     up    up[0m
@@ -1741,7 +1741,7 @@ Interface               Admin Link Proto    Local                 Remote
 [32msp-0/0/0                up    up[0m
 [32msp-0/0/0.0              up    up   inet[0m
                                    inet6
-[32msp-0/0/0.16383          up    up   inet     [30m[46m10.0.0.1[0m            --> [30m[43m10.0.0.16[0m[0m
+[32msp-0/0/0.16383          up    up   inet     [30m[100m10.0.0.1[0m            --> [30m[100m10.0.0.16[0m[0m
 [32mesi                     up    up[0m
 [32mfti0                    up    up[0m
 [1;31mfxp0                    up    down[0m
@@ -1754,7 +1754,7 @@ Interface               Admin Link Proto    Local                 Remote
 [32mppe0                    up    up        [0m
 [32mrbeb                    up    up[0m
 [32mst0                     up    up[0m
-[1;31mst0.1000                up    down inet     [30m[42m192.0.2.1/31[0m [0m
+[1;31mst0.1000                up    down inet     [35m[47m192.0.2.1/31[0m [0m
 
 
 {master:0}

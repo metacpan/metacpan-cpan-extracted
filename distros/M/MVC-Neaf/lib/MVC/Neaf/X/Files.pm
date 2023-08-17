@@ -2,7 +2,7 @@ package MVC::Neaf::X::Files;
 
 use strict;
 use warnings;
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -29,6 +29,7 @@ So this module is here to fill the gap in L<MVC::Neaf>.
 
 =cut
 
+use Cwd qw(abs_path);
 use File::Basename;
 use Encode;
 
@@ -113,6 +114,9 @@ sub new {
 
     defined $options{root}
         or $class->my_croak( "option 'root' is required" );
+    ref $options{root}
+        and $class->my_croak( "option 'root' must be a string" );
+    $options{root} = abs_path($options{root}) || $options{root};
 
     my @extra = grep { !$static_options{$_} } keys %options;
     $class->my_croak( "Unknown options @extra" )
@@ -429,7 +433,7 @@ sub make_handler {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

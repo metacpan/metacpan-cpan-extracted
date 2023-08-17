@@ -1,0 +1,6 @@
+
+Revision history for the module "App::colalign"
+
+0.020  2023-08-10 作成を発案。
+0.021  2023-08-11 名前を colconnect から colalign に変更。READMEやcolconnect.pm に、様々な文章を追加した。
+0.022  2023-08-12 MANIFEST の作り方を失敗していたので、再作成。

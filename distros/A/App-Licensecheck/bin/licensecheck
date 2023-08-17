@@ -12,7 +12,7 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.8
+Version v3.3.9
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ use Log::Any::Adapter;
 
 use App::Licensecheck;
 
-our $VERSION = 'v3.3.8';
+our $VERSION = 'v3.3.9';
 
 my $progname = path($0)->basename;
 

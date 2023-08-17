@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,20 +26,23 @@ no_index:
 provides:
   MooX::ChainedAttributes:
     file: lib/MooX/ChainedAttributes.pm
-    version: '0.07'
+    version: '0.08'
   MooX::ChainedAttributes::Role::GenerateAccessor:
     file: lib/MooX/ChainedAttributes/Role/GenerateAccessor.pm
-    version: '0.07'
+    version: '0.08'
 requires:
+  Carp: '0'
   Moo: '1.004005'
+  Moo::Role: '1.004005'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-ChainedAttributes/issues
   homepage: https://github.com/bluefeet/MooX-ChainedAttributes
-  repository: git://github.com/bluefeet/MooX-ChainedAttributes.git
-version: '0.07'
+  repository: https://github.com/bluefeet/MooX-ChainedAttributes.git
+version: '0.08'
+x_authority: cpan:BLUEFEET
 x_contributors:
-  - 'Aran Deltac <aran@ziprecruiter.com>'
   - 'Graham Knop <haarg@haarg.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

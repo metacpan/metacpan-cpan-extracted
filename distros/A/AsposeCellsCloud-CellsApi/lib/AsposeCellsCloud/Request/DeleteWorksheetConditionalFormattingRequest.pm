@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetConditionalFormattingRequest.name :   ,
-# DeleteWorksheetConditionalFormattingRequest.sheetName :   ,
-# DeleteWorksheetConditionalFormattingRequest.index :   ,
-# DeleteWorksheetConditionalFormattingRequest.folder :   ,
-# DeleteWorksheetConditionalFormattingRequest.storageName :    
+# DeleteWorksheetConditionalFormattingRequest.name : The workbook name.  ,
+# DeleteWorksheetConditionalFormattingRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetConditionalFormattingRequest.index : Gets the Conditional Formatting element at the specified index.  ,
+# DeleteWorksheetConditionalFormattingRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetConditionalFormattingRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formatting' } = { 
-    	summary => '',
+    	summary => 'Remove a conditional formatting.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'Gets the Conditional Formatting element at the specified index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

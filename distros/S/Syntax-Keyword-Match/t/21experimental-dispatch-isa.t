@@ -3,10 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-BEGIN {
-   plan skip_all => "isa operator requires perl version >= 5.32" unless $] >= 5.032;
-}
+use Test2::V0;
 
 use Syntax::Keyword::Match qw( match :experimental(dispatch) );
 

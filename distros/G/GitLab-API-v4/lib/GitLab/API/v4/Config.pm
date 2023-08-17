@@ -1,5 +1,5 @@
 package GitLab::API::v4::Config;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -28,7 +28,7 @@ L</SYNOPSIS>.
 
 use Getopt::Long;
 use IO::Prompter;
-use JSON;
+use JSON::MaybeXS;
 use Log::Any qw( $log );
 use Path::Tiny;
 use Types::Common::String -types;
@@ -236,9 +236,7 @@ sub configure {
         '-stdio', '-verbatim',
     );
 
-    my $json = JSON->new
-        ->pretty
-        ->canonical
+    my $json = JSON::MaybeXS->new(pretty => 1, canonical => 1)
     ->encode({
         $url           ? (url=>$url) : (),
         $private_token ? (private_token=>$private_token) : (),
@@ -266,9 +264,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
+See L<GitLab::API::v4/LICENSE>.
 
 =cut
 

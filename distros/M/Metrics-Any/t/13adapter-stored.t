@@ -3,7 +3,7 @@
 use v5.14;  # package NAME {BLOCK}
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any '$metrics';
 
@@ -60,7 +60,7 @@ use Metrics::Any::Adapter 'localTestAdapter';
       push @walkdata, [ $type, $name, $labels, $value ];
    } );
 
-   is_deeply( \@walkdata, [
+   is( \@walkdata, [
       [ counter => counter => [], 1 ],
 
       [ distribution => distribution => [], [ 1, 3, 5 ] ],
@@ -94,7 +94,7 @@ use Metrics::Any::Adapter 'localTestAdapter';
       push @walkdata, [ $type, $name, $labels, $value ];
    } );
 
-   is_deeply( \@walkdata, [
+   is( \@walkdata, [
       [ counter => counter => [], 100 ],
 
       [ gauge => gauge => [], 25 ],

@@ -1,6 +1,6 @@
 use utf8;
 package WebService::KvKAPI::Roles::OpenAPI;
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 # ABSTRACT: WebService::KvkAPI::Roles::OpenAPI package needs a propper abstract
 
 use v5.26;
@@ -11,10 +11,10 @@ use Carp qw(croak);
 use OpenAPI::Client;
 use Try::Tiny;
 
-has $api_host :accessor :param = undef;
-has $api_key  :param = undef;
-has $spoof    :param = 0;
-has $client   :accessor;
+field $api_host :accessor :param = undef;
+field $api_key  :param = undef;
+field $spoof    :param = 0;
+field $client   :accessor;
 
 ADJUST {
 
@@ -92,7 +92,7 @@ WebService::KvKAPI::Roles::OpenAPI - WebService::KvkAPI::Roles::OpenAPI package 
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 SYNOPSIS
 
@@ -127,11 +127,11 @@ The L<OpenAPI::Client> object used for doing the API calls.
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 

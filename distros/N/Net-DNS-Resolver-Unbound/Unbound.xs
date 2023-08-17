@@ -1,11 +1,11 @@
 
 =head1 NAME
 
-Unbound.xs - Perl interface to libunbound
+Unbound.xs - Perl binding for NLnetLabs libunbound
 
 =head1 DESCRIPTION
 
-Perl XS extension providing access to the NLnetLabs libunbound library.
+Perl XS extension providing access to the libunbound resolver library.
 
 This implementation is intended to support Net::DNS::Resolver::Unbound.
 It is NOT, nor will it ever be, suitable for general use.
@@ -13,7 +13,7 @@ It is NOT, nor will it ever be, suitable for general use.
 
 =head1 COPYRIGHT
 
-Copyright (c)2022 Dick Franks
+Copyright (c)2022-2023 Dick Franks
 
 All Rights Reserved
 
@@ -94,8 +94,9 @@ int
 query_id(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 0, 0);
+	int id = SvIVX(*index);
     CODE:
-	RETVAL = SvIVX(*index);
+	RETVAL = id;
     OUTPUT:
 	RETVAL
 
@@ -114,7 +115,7 @@ result(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 2, 0);
     CODE:
-	RETVAL = index ?  av_pop(handle) : NULL;
+	RETVAL = index ?  av_pop(handle) : newSVpv("", 0);
     OUTPUT:
 	RETVAL
 
@@ -257,10 +258,12 @@ ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
 
 Net::DNS::Resolver::Unbound::Handle
 ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass, int query_id=0)
+    INIT:
+	int async_id = 0;
     CODE:
 	RETVAL = newAV();
 	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
-					(void*) RETVAL, async_callback, NULL) );
+					(void*) RETVAL, async_callback, &async_id) );
 	av_push(RETVAL, newSViv(query_id) );
     OUTPUT:
 	RETVAL
@@ -320,19 +323,19 @@ VERSION(void)
 	RETVAL
 
 Net::DNS::Resolver::Unbound::Handle
-emulate_callback(int query_id, int err, struct ub_result* result=NULL)
+emulate_callback(int async_id, int err, struct ub_result* result=NULL)
     CODE:
 	RETVAL = newAV();
-	av_push(RETVAL, newSViv(query_id) );
+	av_push(RETVAL, newSViv(async_id) );
 	async_callback( (void*) RETVAL, err, result );
     OUTPUT:
 	RETVAL
 
 Net::DNS::Resolver::Unbound::Handle
-emulate_wait(int query_id)
+emulate_wait(int async_id)
     CODE:
 	RETVAL = newAV();
-	av_push(RETVAL, newSViv(query_id) );
+	av_push(RETVAL, newSViv(async_id) );
     OUTPUT:
 	RETVAL
 

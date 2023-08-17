@@ -66,7 +66,7 @@ managing Amazon S3 buckets and keys.
 
 # DESCRIPTION
 
-This documentation refers to version 0.63.
+This documentation refers to version 0.64.
 
 `Amazon::S3` provides a portable client interface to Amazon Simple
 Storage System (S3).

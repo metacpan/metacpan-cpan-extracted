@@ -1,18 +1,48 @@
-Revision history for Devel-EndStats
+0.212   2023-05-12  Released-By: PERLANCAR; Urgency: high
 
-0.20    2015-03-26 (PERLANCAR)
+        - [bugfix] Fix another instance of gettimeofday() invocation.
+
+
+0.211   2023-05-12  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix invocation of gettimeofday() to get correct result
+          (mistake not detected early because we are not using stricture?).
+
+
+0.210   2023-05-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - We now do not hide any modules from being listed, to avoid being
+          deceptive by accident.
+
+        - We are now more minimalistic and avoid loading any module by default,
+          including 'strict', 'warnings', and 'Time::HiRes'. This means by
+          default time is measured using builtin time() which only has 1-second
+          precision. To enable subsecond precision, explicitly set 'time_hires'
+          option to true.
+
+        - Rename environment variable DEVELENDSTATS_OPTS to
+          PERL_DEVEL_ENDSTATS_OPTS.
+
+        [ENHANCEMENTS]
+
+        - Add option 'debug'.
+
+
+0.20    2015-03-26  Released-By: PERLANCAR
 
 	- [ux] Show program runtime in ms too.
 
 
-0.19    2015-01-03 (PERLANCAR)
+0.19    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.18    2014-11-13 (PERLANCAR)
+0.18    2014-11-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,20 +50,20 @@ Revision history for Devel-EndStats
 	  5.8/earlier perls [CT].
 
 
-0.17    2014-11-09 (PERLANCAR)
+0.17    2014-11-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Typo in checking 'time' sort order.
 
 
-0.16    2014-11-09 (PERLANCAR)
+0.16    2014-11-09  Released-By: PERLANCAR
 
         - Don't show warning when encountering file '-e' in %INC (I encountered
           this when using Moo, where this pair shows up: 'main.pm' => '-e').
 
 
-0.15    2014-08-21 (SHARYANTO)
+0.15    2014-08-21  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -44,51 +74,51 @@ Revision history for Devel-EndStats
           it is advised that one does 'eval "require $mod; 1" or die ...').
 
 
-0.14    2014-05-18 (SHARYANTO)
+0.14    2014-05-18  Released-By: SHARYANTO
 
         - Add option: show_memsize.
 
 
-0.13    2014-05-09 (SHARYANTO) - Happy birthday, Jinny!
+0.13    2014-05-09  Released-By: SHARYANTO; Note: Happy birthday, Jinny!
 
         - Add options: hide_core, hide_noncore.
 
 
-0.12    2013-07-17 (SHARYANTO)
+0.12    2013-07-17  Released-By: SHARYANTO
 
         - No functional changes. Minor documentation improvements (thanks Neil).
 
 
-0.11    2012-12-11 (SHARYANTO)
+0.11    2012-12-11  Released-By: SHARYANTO
 
         - Add option 'force'.
 
 
-0.10    2012-10-18 (SHARYANTO)
+0.10    2012-10-18  Released-By: SHARYANTO
 
         - No functional changes. Tweak warning message and avoid perl undef
           warning.
 
 
-0.09    2012-10-04 (SHARYANTO)
+0.09    2012-10-04  Released-By: SHARYANTO
 
         - No functional changes. Fix a typo, avoid perl undef warning, and add a
           helpful warning message when Devel::EndStats is loaded late.
 
 
-0.08    2012-07-27 (SHARYANTO)
+0.08    2012-07-27  Released-By: SHARYANTO
 
         - No functional changes
 
         - Tweak: show module load times in ms instead of s.
 
 
-0.07    2012-07-26 (SHARYANTO)
+0.07    2012-07-26  Released-By: SHARYANTO
 
         - Bug: don't increase order unless requiring a new file.
 
 
-0.06    2012-07-26 (SHARYANTO)
+0.06    2012-07-26  Released-By: SHARYANTO
 
         - Add caller, load timing (still inclusive though), and load order
           information.
@@ -96,7 +126,7 @@ Revision history for Devel-EndStats
         - Allow sorting list of modules using the 'sort' option.
 
 
-0.05    2011-02-16 (SHARYANTO)
+0.05    2011-02-16  Released-By: SHARYANTO
 
         - Use Time::HiRes for more precision.
 
@@ -107,25 +137,25 @@ Revision history for Devel-EndStats
 	- Some formatting tweaks.
 
 
-0.04    2010-08-26 (SHARYANTO)
+0.04    2010-08-26  Released-By: SHARYANTO
 
         - Some doc work: sample output, formatting, wording.
 
 
-0.03    2010-08-04 (SHARYANTO)
+0.03    2010-08-04  Released-By: SHARYANTO
 
         - print stats to STDERR instead of STDOUT.
 
         - Fix failing tests.
 
 
-0.02    2010-07-28 (SHARYANTO)
+0.02    2010-07-28  Released-By: SHARYANTO
 
         - Require Perl 5.10.
 
         - Add options: verbose, exclude_endstats_modules.
 
 
-0.01    2010-07-28 (SHARYANTO)
+0.01    2010-07-28  Released-By: SHARYANTO
 
         - First release.

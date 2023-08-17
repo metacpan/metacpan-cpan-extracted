@@ -8,8 +8,14 @@ Form::Tiny::Manual::Cookbook - common advanced tasks with Form::Tiny
 
 =head2 Corinna compatibility
 
-Future Perl core object orientation system named Corinna, currently implemented
-in L<Object::Pad>, can also be used together with Form::Tiny:
+Perl core OO system named Corinna (experimental) is not currently compatible
+with bless-style objects. Since it uses different than hashref storage for its
+objects, it is unlikely that it will ever be compatible. It is recommended to
+stick to Moo/se when using Form::Tiny.
+
+=head2 Object::Pad compatibility
+
+L<Object::Pad>, the playground for Corinna, can be used together with Form::Tiny:
 
 	use Object::Pad;
 
@@ -148,4 +154,12 @@ call C<form_meta> method on the package before going out of scope, for example:
 	extends 'ParentForm';
 
 	__PACKAGE__->form_meta;
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Form::Tiny::Manual>, the main reference
+
+=back
 

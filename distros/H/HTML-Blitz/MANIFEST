@@ -16,6 +16,7 @@ lib/HTML/Blitz/Template.pm
 lib/HTML/Blitz/TokenType.pm
 Makefile.PL
 Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
 MANIFEST			This list of files
 MANIFEST.SKIP
 simple-benchmark/bench.html

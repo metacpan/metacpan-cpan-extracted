@@ -1,3 +1,12 @@
+0.34 -- Mon Aug 07 19:46:22 ADT 2023
+
+Bug Fixes
+
+Thanks to chrisridd and fschlich for these bug fixes
+  * Fixes: #47 2nd - Debug output using print instead of printf
+  * Fixes #47 Debug output using print instead of printf
+  * ASN1.pod: fix minor typo
+
 0.33 -- Wed Sep 22 19:49:53 ADT 2021
 
   * Official CPAN release of 0.33

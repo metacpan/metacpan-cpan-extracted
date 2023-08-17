@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::plot::lprop;
 
 =head2 SYNOPSIS
 true
-PACKAGE NAME:
+PERL PROGRAM NAME:
 AUTHOR:  
 
 DATE:

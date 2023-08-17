@@ -1,0 +1,28 @@
+---
+abstract: 'A Perl module for handling webhooks sent by Stripe'
+author:
+  - 'Ian Boddison <bod@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-Stripe-Webhook
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA: '5.94'
+  HTTP::Tiny: '0.014'
+  JSON::PP: '2.00'
+  Time::Piece: '1.20'
+  perl: '5.010'
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -31,7 +31,7 @@ sub register {
 	$manager->add_handler(
 		http_adapter_factory => sub {
 			my ($continue, $driver) = @_;
-			$self->{base} = $driver->{uri};
+			$self->{base} = $driver->config('uri');
 			return $self;
 		},
 	);

@@ -5,7 +5,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # SYNOPSIS
 
@@ -75,6 +75,11 @@ Next command simply produces the same result.
     Name start with `http://` or `https://` is converted to text data
     translated by [w3c(1)](http://man.he.net/man1/w3c) command.
 
+- gpg
+
+    Invoke [gpg(1)](http://man.he.net/man1/gpg) command to decrypt encrypted files with `.gpg`
+    extention.
+
 - pandoc
 
     Use [pandoc](https://pandoc.org/) command to translate Microsoft
@@ -93,9 +98,6 @@ Microsoft office document in XML format (.docx, .pptx, .xlsx) is
 converted to plain text by original code implemented in
 [App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Aregex) module.  Algorithm used in this
 module is extremely simple, and consequently runs fast.
-
-If related modules are available, [App::optex::textconv::ooxml::xslt](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Axslt)
-is used to covert XML using XSLT mechanism.
 
 Two module are included in this distribution to use other external
 converter program, **pandoc** and **tika**, those implement much more

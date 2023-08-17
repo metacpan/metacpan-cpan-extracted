@@ -116,8 +116,8 @@ sub get_max_index {
     }
 }
 
+
 =head2 sub file_dialog_type_aref
- 	= $Project->DATA_SEISMIC_SU();   # output data directory
 
 =cut 
 

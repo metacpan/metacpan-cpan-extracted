@@ -1,6 +1,6 @@
 package CPAN::ReverseDependencies;
 # ABSTRACT: given a CPAN dist name, find other CPAN dists that use it
-$CPAN::ReverseDependencies::VERSION = '0.02';
+$CPAN::ReverseDependencies::VERSION = '0.03';
 use 5.006;
 use strict;
 use warnings;

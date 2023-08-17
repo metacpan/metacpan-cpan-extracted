@@ -1,43 +1,35 @@
 NAME
 
-    RosettaCode - An Application to interface with http://rosettacode.org
-
-VERSION
-
-    This document describes RosettaCode version 0.0.15.
+    RosettaCode - A tool to extract RosettaCode's code samples
 
 SYNOPSIS
 
     From the command line:
 
-        > rosettacode help
-        > git clone https://github.com/acmeism/RosettaCodeData
-        > cd RosettaCodeData
-        > rosettacode sync .
+        $ git clone https://github.com/acmeism/RosettaCodeData
+        $ cd RosettaCodeData
+        $ rosettacode           # or `make build`
 
 DESCRIPTION
 
-    RosettaCode.org is a fantastic wiki that contains ~ 750 programming
-    tasks, each implemented in up to ~ 550 programming languages.
+    RosettaCode.org is a fantastic wiki that contains ~1200 programming
+    tasks, each implemented in up to ~900 programming languages. There are
+    over 100,000 code samples!
 
     This tool aims to make it easier for programmers to obtain and try the
     various code samples.
 
     At this point, the main function is to extract the code examples and
-    put them into a git repository on GitHub. You probably don't need to
-    use this tool yourself. You can just get the repository here:
+    organize them into this git repository on GitHub:
 
-        git clone https://github.com/acmeism/RosettaCodeData
+      * https://github.com/acmeism/RosettaCodeData
 
-    This tool will just update all the files in that repository.
-
-AUTHOR
-
-    Ingy döt Net <ingy@cpan.org>
+    The make build command in that repository requires this CPAN module,
+    which does all the work.
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2013-2017. Ingy döt Net.
+    Copyright 2013-2023 by Ingy döt Net
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -17,10 +17,10 @@ namespace Catch {
     // as well as
     //    << stuff +StreamEndStop
     struct StreamEndStop {
-        StringRef operator+() const { return StringRef(); }
+        constexpr StringRef operator+() const { return StringRef(); }
 
         template <typename T>
-        friend T const& operator+( T const& value, StreamEndStop ) {
+        constexpr friend T const& operator+( T const& value, StreamEndStop ) {
             return value;
         }
     };

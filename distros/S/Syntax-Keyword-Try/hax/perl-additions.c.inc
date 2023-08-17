@@ -177,7 +177,7 @@ static void S_ensure_module_version(pTHX_ SV *module, SV *version)
 #  define fetch_superclass_method_pv(stash, pv, len, level)  S_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
 static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
 {
-#if HAVE_PERL_VERSION(5, 18, 0)
+#  if HAVE_PERL_VERSION(5, 18, 0)
   GV *gv = gv_fetchmeth_pvn(stash, pv, len, level, GV_SUPER);
 #  else
   SV *superclassname = newSVpvf("%*s::SUPER", HvNAMELEN_get(stash), HvNAME_get(stash));

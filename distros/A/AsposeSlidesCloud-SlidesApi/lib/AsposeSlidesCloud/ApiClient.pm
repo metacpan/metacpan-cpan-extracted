@@ -32,6 +32,7 @@ use utf8;
 
 use MIME::Base64;
 use LWP::UserAgent;
+use HTTP::Date;
 use HTTP::Headers;
 use HTTP::Response;
 use HTTP::Request::Common qw(DELETE POST GET HEAD PUT);
@@ -126,7 +127,6 @@ sub call_api_once {
         $header_params->{'Content-Type'} = lc $header_params->{'Content-Type'} eq 'multipart/form' ?
             'form-data' : $header_params->{'Content-Type'};
         $_request = POST($_url, %$header_params, Content => $_body_data);
-  
     }
     elsif ($method eq 'PUT') {
         # multipart
@@ -172,8 +172,8 @@ sub get_body_data {
     my ($header_params, $body_data, $files) = @_;
     my $part_count = 0;
     if (defined $body_data) {
-        if (!(ref $body_data eq "HASH") && $body_data->can('to_hash')) {
-            $body_data = $body_data->to_hash;
+        if (!(ref $body_data eq "HASH") && (rindex ref $body_data, "AsposeSlidesCloud::Object::", 0) == 0) {
+            $body_data = decode_json(JSON->new->convert_blessed->encode($body_data));
         }
         if (ref $body_data eq "HASH") {
             $body_data = to_json($body_data); # model to json string
@@ -281,6 +281,61 @@ sub to_string {
     }
 }
 
+
+# from Perl hashref
+sub from_hash {
+    my ($self, $instance, $hash) = @_;
+
+    # loop through attributes and use swagger_types to deserialize the data
+    my $current_types = {};
+    while ( my ($_key, $_type) = each %{$instance->swagger_types} ) {
+        $current_types->{$_key} = $_type;
+    }
+    while ( my ($_key, $_type) = each %{$current_types} ) {
+    	my $_json_attribute = $instance->attribute_map->{$_key}; 
+        if ($_type =~ /^array\[/i) { # array
+            my $_subclass = substr($_type, 6, -1);
+            my @_array = ();
+            foreach my $_element (@{$hash->{$_json_attribute}}) {
+                if (defined $_element) {
+                    push @_array, $self->_deserialize($_subclass, $_element);
+                } else {
+                    push @_array, undef;
+                }
+            }
+            foreach my $_element (@{$hash->{lcfirst($_json_attribute)}}) {
+                if (defined $_element) {
+                    push @_array, $self->_deserialize(lcfirst($_subclass), $_element);
+                } else {
+                    push @_array, undef;
+                }
+            }
+            $instance->{$_key} = \@_array;
+        } elsif (exists $hash->{$_json_attribute}) { #hash(model), primitive, datetime
+            $instance->{$_key} = $self->_deserialize($_type, $hash->{$_json_attribute});
+        } elsif (exists $hash->{lcfirst($_json_attribute)}) { #hash(model), primitive, datetime
+            $instance->{$_key} = $self->_deserialize($_type, $hash->{lcfirst($_json_attribute)});
+        }
+    }
+  
+    return $instance;
+}
+
+# deserialize non-array data
+sub _deserialize {
+    my ($self, $type, $data) = @_;
+        
+    if ($type eq 'DateTime') {
+        return DateTime->from_epoch(epoch => str2time($data));
+    } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
+        return $data;
+    } else { # hash(model)
+        my $class = AsposeSlidesCloud::ClassRegistry->get_class_name(ucfirst($type), $data);
+        my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new();
+        return $self->from_hash($_instance, $data);
+    }
+}
+
 # Deserialize a JSON string into an object
 #  
 # @param string $class class name is passed as a string
@@ -331,9 +386,9 @@ sub deserialize
         $class = AsposeSlidesCloud::ClassRegistry->get_class_name($class, $data);
         my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new;
         if (ref $data eq "HASH") {
-            return $_instance->from_hash($data);
+            return $self->from_hash($_instance, $data);
         } else { # string, need to json decode first
-            return $_instance->from_hash(decode_json $data);
+            return $self->from_hash($_instance, decode_json $data);
         }
     }
 }

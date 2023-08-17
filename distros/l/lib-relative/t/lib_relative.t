@@ -6,6 +6,37 @@ use File::Basename ();
 use File::Spec ();
 use File::Temp ();
 use lib::relative ();
+use Config;
+
+sub has_symlinks {
+  return $Config{d_symlink}
+    unless $^O eq 'msys' || $^O eq 'MSWin32';
+
+  if ($^O eq 'msys') {
+    # msys needs both `d_symlink` and a special environment variable
+    return unless $Config{d_symlink};
+    return $ENV{MSYS} =~ /winsymlinks:nativestrict/;
+  } elsif ($^O eq 'MSWin32') {
+    # Perl 5.33.5 adds symlink support for MSWin32 but needs elevated
+    # privileges so verify if we can use it for testing.
+    my $error;
+    my $can_symlink;
+    { # catch block
+      local $@;
+      $error = $@ || 'Error' unless eval { # try block
+        # temp dirs with newdir() get cleaned up when they go out of scope
+        my $wd = File::Temp->newdir();
+        my $foo = File::Spec->catfile($wd, 'foo');
+        my $bar = File::Spec->catfile($wd, 'bar');
+        open my $fh, '>', $foo;
+        $can_symlink = symlink $foo, $bar;
+        1;
+      };
+    }
+    return 1 if $can_symlink && !$error;
+    return;
+  }
+}
 
 # Relative path absolutized
 {
@@ -37,14 +68,14 @@ use lib::relative ();
 
 # Symlinked __FILE__
 SKIP: {
-  skip 4, 'symlinks broken in msys' if $^O eq 'msys';
+  skip 'symlinks not supported in this build', 4 unless has_symlinks();
   local @INC = @INC;
   my $dir = File::Temp->newdir;
   skip 4, 'tempdir in @INC' if grep { m!^\Q$dir\E! } @INC;
   my $path = File::Spec->catfile(File::Basename::dirname(Cwd::abs_path __FILE__), 'testlib', 'load_relative.pl');
   my $link = File::Spec->catfile($dir, 'load_relative.pl');
   my $rc;
-  eval { $rc = symlink $path, $link; 1 } or skip 4, 'symlinks not supported';
+  eval { $rc = symlink $path, $link; 1 } or skip 'symlinks not supported', 4;
   die "symlink failed: $!" unless $rc;
   do $link or die "failed to run $path: $!";
 

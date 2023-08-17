@@ -1,20 +1,26 @@
-SYNOPSIS
+NAME
+    Devel::EndStats - Display run time and dependencies after running code
 
+VERSION
+    This document describes version 0.212 of Devel::EndStats (from Perl
+    distribution Devel-EndStats), released on 2023-05-12.
+
+SYNOPSIS
      # from the command line
-     % perl -MDevel::EndStats script.pl
-    
+     % perl -MDevel::EndStats=time_hires,1 script.pl
+
      ##### sample output #####
      <normal script output, if any...>
-    
+
      # BEGIN stats from Devel::EndStats
      # Program runtime duration: 0.055s
      # Total number of required files loaded: 132
      # Total number of required lines loaded: 48772
      # END stats
-    
-     ##### sample output (with verbose=1, some cut) #####
+
+     ##### sample output (with verbose=1 & time_hires=1, some cut) #####
      <normal script output, if any...>
-    
+
      # BEGIN stats from Devel::EndStats
      # Program runtime duration: 0.055s
      # Total number of required files loaded: 132
@@ -28,89 +34,187 @@ SYNOPSIS
      # END stats
 
 DESCRIPTION
-
     Devel::EndStats runs in the END block, displaying various statistics
     about your program, such as:
 
-      * how many seconds the program ran;
+    *   how many seconds the program ran;
 
-      * how many required files and total number of lines loaded (from
-      %INC);
+    *   how many required files and total number of lines loaded (from
+        %INC);
 
-      * etc.
+    *   etc.
+
+    It works by installing a hook in @INC to record the loading of modules.
 
     Some notes/caveats:
 
     Devel::EndStats should be loaded before other modules, for example by
     running it on the command-line, as shown in the SYNOPSIS.
 
-OPTIONS
+KNOWN ISSUES
+    * Timing and memory usage is inclusive instead of exclusive.
 
+OPTIONS
     Some options are accepted. They can be passed via the use statement:
 
      # from the command line
      % perl -MDevel::EndStats=verbose,1 script.pl
-    
+
      # from script
      use Devel::EndStats verbose=>1;
 
-    or via the DEVELENDSTATS_OPTS environment variable:
+    or via the "PERL_DEVEL_ENDSTATS_OPTS" environment variable:
 
-     % DEVELENDSTATS_OPTS='verbose=1' perl -MDevel::EndStats script.pl
+     % PERL_DEVEL_ENDSTATS_OPTS='verbose=1' perl -MDevel::EndStats script.pl
 
-      * verbose => BOOL (default: 0)
+    If you use the later, you will need to use "use" and not "require" to
+    load "Devel::EndStats", because reading the environment variable is done
+    in the "import()" hook of the module.
 
-      Can also be set via VERBOSE environment variable. If set to true,
-      display more statistics (like per-module statistics).
+    *   verbose
 
-      * sort => STR (default: '-time')
+        Bool, default 0. Can also be set via "VERBOSE" environment variable.
+        If set to true, display more statistics (like per-module
+        statistics).
 
-      Set how to sort the list of loaded modules ('file' = by file, 'time'
-      = by load time, 'caller' = by first caller's package, 'order' = by
-      order of loading, 'lines' = by number of lines). Only relevant when
-      'verbose' is on.
+    *   debug
 
-      * force => BOOL (default: 0)
+        Bool, default 0. Can also be set via "DEBUG" environment variable.
+        If set to true, display debugging messages to stderr.
 
-      By default, if BEGIN phase did not succeed, stats will not be shown.
-      This option forces displaying the stats.
+    *   time_hires
 
-      * hide_core => BOOL (default: 0)
+        Bool, default 0. By default, time is measured using the builtin
+        "time()" which only has 1-second precision. To enable subsecond
+        precision, set this option to true. Setting this option to true will
+        load Time::HiRes and affect the results.
 
-      Whether to hide core modules while listing modules in verbose mode.
+    *   sort
 
-      * hide_noncore => BOOL (default: 0)
+        String, default "caller". Set how to sort the list of loaded modules
+        ('file' = by file, 'time' = by load time, 'caller' = by first
+        caller's package, 'order' = by order of loading, 'lines' = by number
+        of lines). Only relevant when 'verbose' is on.
 
-      Whether to hide non-core modules while listing modules in verbose
-      mode.
+    *   force
 
-      * show_memsize => BOOL (default: 0)
+        Bool, default 0. By default, if BEGIN phase did not succeed, stats
+        will not be shown. This option forces displaying the stats.
 
-      Whether to show memory usage information. Currently this is done by
-      probing /proc/$$/statm because some other memory querying modules are
-      unusable (e.g. Devel::SizeMe currently segfaults on my system,
-      Devel::InterpreterSize is too heavy).
+    *   hide_core
+
+        Bool, default 0. Whether to hide core modules while listing modules
+        in "verbose" mode. When this is set to true, will load
+        Module::CoreList, so that will affect the results.
+
+    *   hide_noncore
+
+        Bool, default 0. Whether to hide non-core modules while listing
+        modules in "verbose" mode. When this is set to true, will load
+        Module::CoreList, so that will affect the results.q
+
+    *   show_memsize
+
+        Bool, default 0. Whether to show memory usage information. Currently
+        this is done by probing "/proc/$$/statm" because some other memory
+        querying modules are unusable (e.g. Devel::SizeMe currently
+        segfaults on my system, "Devel::InterpreterSize" is too heavy).
 
 FAQ
-
- What is the purpose of this module?
-
+  What is the purpose of this module?
     This module might be useful during development. I first wrote this
     module when trying to reduce startup overhead of a command line
     application, by looking at how many modules the app has loaded and try
     to avoid loading modules whenever it's unnecessary.
 
- Can you add (so and so) information to the stats?
+  Why are some modules always shown as being already loaded despite me not having loaded any of such modules?
+    These are "Devel::EndStats" itself and modules that are loaded by
+    "Devel::EndStats", e.g. "Time::HiRes", "Module::CoreList", and modules
+    that are loaded by *those* modules.
 
+  Why are some modules have 'Seq' (sequence) value of '?'
+    These are modules that are loaded before "Devel::EndStats" and had not
+    been traced by "Devel::EndStats"'s @INC hook.
+
+  PERL_DEVEL_ENDSTATS_OPTS is not observed!
+    Make sure you load "Devel::EndStats" using "use" and not "require", or
+    make sure you "import()" the module, because reading of the environment
+    variable is done in the "import()" hook.
+
+  How to measure subsecond times?
+    Set option "time_hires" to true. Either from the "use" line:
+
+     # in perl code
+     use Devel::EndStats time_hires=>1;
+
+     # on the command line
+     % perl -MDevel::EndStats=time_hires,1
+
+    or from the environment variable "PERL_DEVEL_ENDSTATS_OPTS":
+
+     % PERL_DEVEL_ENDSTATS_OPTS="time_hires=1" perl -MDevel::EndStats ...
+
+  Can you add (so and so) information to the stats?
     Sure, if it's useful. As they say, (comments|patches) are welcome.
 
-SEE ALSO
+ENVIRONMENT
+  VERBOSE
+    Bool. If set to true, will set "verbose" option to true.
 
+  DEBUG
+    Bool. If set to true, will set "debug" option to true.
+
+  PERL_DEVEL_ENDSTATS_OPTS
+    String. A space-separated key-value pairs to set options.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Devel-EndStats>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Devel-EndStats>.
+
+SEE ALSO
     There are many modules on CPAN that can be used to generate dependency
     information for your code. Neil Bowers has written a review
     <http://neilb.org/reviews/dependencies.html> that covers most of them.
 
-KNOWN ISSUES
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    * Timing and memory usage is inclusive instead of exclusive.
+CONTRIBUTORS
+    *   Neil Bowers <neil@bowers.com>
+
+    *   Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2015, 2014, 2013, 2012, 2010 by
+    perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-EndStats>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

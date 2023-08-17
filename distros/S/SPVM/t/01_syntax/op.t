@@ -34,14 +34,6 @@ use Test::More;
   }
 }
 
-# refcnt
-{
-  {
-    my $source = 'class MyClass { static method main : void () { refcnt 1; } }';
-    compile_not_ok($source, qr'The operand of the refcnt operator must be a variable');
-  }
-}
-
 # Reference operator
 {
   {
@@ -50,7 +42,7 @@ use Test::More;
   }
 }
 
-# Class Name
+# Basic Type Name
 {
   compile_not_ok_file('CompileError::Class::ClassNameDifferntFromClassFileName', qr/The class name "ClassNameDifferntFromClassFileNameXXXXXXX" must be "CompileError::Class::ClassNameDifferntFromClassFileName"/);
 }
@@ -75,11 +67,11 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { use Point as point; }';
-    compile_not_ok($source, qr/The class alias name "point" must begin with an upper case character/);
+    compile_not_ok($source, qr/The alias name "point" must begin with an upper case character/);
   }
   {
     my $source = 'class MyClass { use Point as Po; use Point as Po; }';
-    compile_not_ok($source, qr/The class alias name "Po" is already used/);
+    compile_not_ok($source, qr/The alias name "Po" is already used/);
   }
 }
 
@@ -95,17 +87,65 @@ use Test::More;
 # Interface Definition
 {
   {
+    my $source = 'class MyClass : interface_t {}';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { method foo : void (); }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { method foo : void (); method bar : void (); }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { method foo : void () {} }';
+    compile_ok($source);
+  }
+  
+  {
     my $source = 'class MyClass : interface_t { our $FOO : int; }';
     compile_not_ok($source, qr/The interface cannnot have class variables/);
   }
+  
   {
     my $source = 'class MyClass : interface_t { has foo : int; }';
     compile_not_ok($source, qr/The interface cannnot have fields/);
   }
+  
+  {
+    my $source = 'class MyClass : interface_t { static method foo : void (); }';
+    compile_not_ok($source, qr/The method defined in the interface must be an instance method/);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { enum { FOO } }';
+    compile_not_ok($source, q|The method defined in the interface must be an instance method.|);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { INIT { } }';
+    compile_not_ok($source, q|The method defined in the interface must be an instance method.|);
+  }
+  
+  {
+    my $source = 'class MyClass : interface_t { method DESTROY : void (); }';
+    compile_ok($source);
+  }
+  
   {
     my $source = 'class MyClass : interface_t  { interface MyClass; required method foo : void (); }';
-    compile_not_ok($source, q|The interface name specified by the interface statement must be different from the name of the current interface|);
+    compile_ok($source);
   }
+  
+  {
+    my $source = 'class MyClass : interface_t { required method foo : void (); required method bar : void (); }';
+    compile_ok($source);
+  }
+  
 }
 
 # Pointer Class
@@ -113,22 +153,6 @@ use Test::More;
   {
     my $source = 'class MyClass : pointer { has foo : int; }';
     compile_ok($source);
-  }
-}
-
-# Field Definition
-{
-  {
-    my $source = 'class MyClass { has foo : int; has foo : int; }';
-    compile_not_ok($source, qr/Redeclaration of the "foo" field in the "MyClass" class/);
-  }
-}
-
-# Class Variable Definition
-{
-  {
-    my $source = 'class MyClass { our $FOO : int; our $FOO : int;}';
-    compile_not_ok($source, qr/Redeclaration of the class variable "\$FOO" in the "MyClass" class/);
   }
 }
 
@@ -143,28 +167,12 @@ use Test::More;
     compile_not_ok($source, qr/The anon method must be an instance method/);
   }
   {
-    my $source = 'class MyClass :interface_t { static method foo : void (); }';
-    compile_not_ok($source, qr/The method defined in the interface must be an instance method/);
-  }
-  {
     my $source = 'class MyClass { required method foo : void () { } }';
     compile_not_ok($source, qr/The method defined in the class cannnot have the method attribute "required"/);
   }
   {
     my $source = 'class MyClass { method foo : void () { } method foo : void () { } }';
     compile_not_ok($source, qr/Redeclaration of the "foo" method in the "MyClass" class/);
-  }
-  {
-    my $source = 'class MyClass : interface_t { required method foo : void (); required method bar : void (); }';
-    compile_not_ok($source, qr/The interface cannnot have multiple required methods/);
-  }
-  {
-    my $source = 'class MyClass : interface_t {}';
-    compile_ok($source);
-  }
-  {
-    my $source = 'class MyClass : interface_t { method foo : void (); }';
-    compile_ok($source);
   }
   {
     my $source = 'class MyClass : mulnum_t { method foo : void () { } }';
@@ -327,7 +335,7 @@ use Test::More;
     compile_ok($source);
   }
   {
-    my $source = 'class MyClass { version "123456789.123456789_123"; }';
+    my $source = 'class MyClass { version "123456789.123456789123"; }';
     compile_ok($source);
   }
   {

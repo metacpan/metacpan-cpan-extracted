@@ -39,14 +39,13 @@ eval "use App::Followme::FIO";
 require App::Followme::FolderData;
 
 my $test_dir = catdir(@path, 'test');
-rmtree($test_dir)  if -e $test_dir;
+rmtree($test_dir, 0, 1)  if -e $test_dir;
 
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+mkdir($test_dir) unless -e $test_dir;
 
 my $archive = catfile(@path, 'test', 'archive'); 
-mkdir $archive or die $!;
-chmod 0755, $archive;
+mkdir $archive unless -e $archive;
+  
 chdir($test_dir) or die $!;
 
 #----------------------------------------------------------------------

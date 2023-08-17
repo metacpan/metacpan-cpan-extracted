@@ -1,7 +1,7 @@
 package GIS::Distance::Fast;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our @ISA;
 
@@ -69,7 +69,7 @@ GIS-Distance-Fast GitHub issue tracker:
 
 L<https://github.com/bluefeet/GIS-Distance-Fast/issues>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
     Aran Clary Deltac <bluefeet@gmail.com>
 
@@ -79,4 +79,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

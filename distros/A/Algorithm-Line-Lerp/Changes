@@ -1,0 +1,7 @@
+Revision history for Algorithm-Line-Lerp
+
+0.02    2023-06-15
+        Add 'bline' function with the traditional Bresenham.
+
+0.01    2023-06-14
+        First version, released on an unsuspecting world.

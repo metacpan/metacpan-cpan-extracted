@@ -25,5 +25,5 @@ requires:
   version: '0.77'
 resources:
   repository: https://github.com/hirose31/AWS-CLIWrapper.git
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

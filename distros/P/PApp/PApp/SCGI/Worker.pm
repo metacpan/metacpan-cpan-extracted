@@ -26,7 +26,14 @@ use AnyEvent;
 use EV;
 use PApp ();
 use PApp::SCGI;
+use Coro ();
+use Coro::AnyEvent ();
 use Agni;
+
+# can be overwritten
+our $WORKER_EXIT = sub {
+   exit 0;
+};
 
 # functions dealing with the template process of papp-scgid
 
@@ -98,29 +105,26 @@ our $CONTROLW;
 sub finish {
    print "[$$] worker exiting ($_[0]).\n" if $VERBOSE >= 2;
 
-   exit 0;
+   $WORKER_EXIT->($_[0]);
 }
 
-sub idle;
-sub idle {
-   my ($acceptor, $idler);
+sub mainloop {
+   Coro::async {
+      while () {
+         Coro::AnyEvent::readable $LISTEN, $REFRESH
+            or finish "idle";
 
-   $acceptor = AE::io $LISTEN, 0, sub {
-      if (accept my $fh, $LISTEN) {
-         ($acceptor, $idler) = ();
          syswrite $CONTROL, "1";
-         PApp::SCGI::handle $fh;
+
+         while (accept my $fh, $LISTEN) {
+            PApp::SCGI::handle $fh;
+
+            --$MAX_REQUESTS
+               or finish "maxreq";
+         }
+
          syswrite $CONTROL, "0";
-         idle;
-
-         --$MAX_REQUESTS
-            or finish "mr";
       }
-   };
-
-   $idler = AE::timer $REFRESH, 0, sub {
-      ($acceptor, $idler) = ();
-      finish "id";
    };
 }
 
@@ -134,6 +138,12 @@ sub run {
    defined $AnyEvent::MODEL
       and die "PApp::SCGI::Worker: error: anyevent already initialised\n";
 
+   # our SIGCHLD (and AnyEvent::Fork) likely destroyed any SIGCHLD
+   # handler EV installed, and there is no way tof ix this in pure perl,
+   # so we destroy and recreate the default loop here.
+   EV::default_destroy;
+   EV::default_loop;
+
    AnyEvent::detect;
    AE::now_update;
 
@@ -141,7 +151,7 @@ sub run {
       and IO::AIO::reinit (); # close your eyes and fly blind
 
    PApp::post_fork_cleanup;
-   PApp->event('childinit');
+   PApp->event ('childinit');
 
    AnyEvent::fh_block $CONTROL;
 
@@ -149,7 +159,7 @@ sub run {
       exit 0;
    };
 
-   idle;
+   mainloop;
 
    @_ = ();
    goto &EV::run;

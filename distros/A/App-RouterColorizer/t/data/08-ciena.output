@@ -225,7 +225,7 @@ xxxxx.xxxxxx$ ptp show ptp 1/1
 | Number of Lanes                            | 1                                             |
 | Adjacency Configuration                    |                                               |
 |   Auto Provisioning                        | Enabled                                       |
-|   Far End Chassis                          | [30m[45mfe80::aaaa:bbbb:cccc:dddd[0m                     |
+|   Far End Chassis                          | [30m[47mfe80::aaaa:bbbb:cccc:dddd[0m                     |
 |   Far End Slot                             | 2                                             |
 |   Far End Port                             | 1                                             |
 |   Adjacency Requested Tx Power (dBm)       |                       | 4.0                   |

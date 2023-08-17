@@ -10,6 +10,9 @@ t/03_awscli_timeout.t
 t/03_awscli_version.t
 t/03_region.t
 t/04_errors.t
+t/05_catch_error_options.t
+t/06_catch_errors.t
+t/bin/mock-aws
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t

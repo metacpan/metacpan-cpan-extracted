@@ -1,13 +1,14 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Net::Async::HTTP::Server" );
-use_ok( "Net::Async::HTTP::Server::Request" );
+require Net::Async::HTTP::Server;
+require Net::Async::HTTP::Server::Request;
 
-use_ok( "Plack::Handler::Net::Async::HTTP::Server" );
+require Plack::Handler::Net::Async::HTTP::Server;
 
+pass "Modules loaded";
 done_testing;

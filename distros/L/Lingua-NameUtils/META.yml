@@ -1,0 +1,50 @@
+---
+abstract: 'Identify given/family names and capitalize correctly'
+author:
+  - 'raf <raforg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  Unicode::Normalize: '0'
+  charnames: '0'
+  open: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-NameUtils
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Lingua::NameUtils:
+    file: lib/Lingua/NameUtils.pm
+    version: '1.003'
+requires:
+  Exporter: '0'
+  Lingua::JA::Name::Splitter: '0'
+  perl: '5.014'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rafmod/Lingua-NameUtils/issues
+  homepage: https://metacpan.org/dist/Lingua-NameUtils
+  repository: git://github.com/rafmod/Lingua-NameUtils.git
+version: '1.003'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,13 +1,6 @@
 #!perl
 use Test::More;
 
-BEGIN {
-    if( $^O ne 'MSWin32' ) {
-        plan skip_all => "This module only works on Windows";
-        exit;
-    };
-}
-
 # Check our Pod
 # The test was provided by Andy Lester,
 # who stole it from Brian D. Foy

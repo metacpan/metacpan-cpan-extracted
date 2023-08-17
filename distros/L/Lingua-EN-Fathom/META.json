@@ -4,13 +4,13 @@
       "Kim Ryan <kimryan at cpan org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4208",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Fathom",
    "prereqs" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "Lingua::EN::Fathom" : {
          "file" : "lib/Lingua/EN/Fathom.pm",
-         "version" : "1.22"
+         "version" : "1.27"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/kimryan/Readability"
       }
    },
-   "version" : "1.22",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

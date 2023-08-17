@@ -52,8 +52,9 @@ WIDGET-SPECIFIC OPTIONS
 
         -hidden => 1 | 0
             Specifies whether or not the entry should be visible or hidden:
-            (0 (false) for visible, 1 (true) for hidden). Default: 0 -
-            visible.
+            (0 (false) for visible, 1 (true) for hidden).
+
+            Default: 0 (visible).
 
         -indicatoritemtype => ['text' | 'image' | 'imagetext']
             Specify an "indicator" of this type.
@@ -68,15 +69,17 @@ WIDGET-SPECIFIC OPTIONS
 
         -itemtype => ['text' | 'image' | 'imagetext']
             Specifies the type of display item of this entry. Can be
-            *"text"*, *"image"*, or *"imagetext"*. Default: Whatever is
-            specified, if anything, for the widget, (see -itemtype under
-            WIDGET OPTIONS below). If not specified there, then the default
-            is *"text"*, though *"imagetext"* allows for either or both an
-            image or text.
+            *"text"*, *"image"*, or *"imagetext"*.
+
+            Default: Whatever is specified, if anything, for the widget,
+            (see -itemtype under WIDGET OPTIONS below). If not specified
+            there, then the default is *"text"*, though *"imagetext"* allows
+            for either or both an image or text.
 
         -textanchor => ['n', 's', 'e', 'w']
-            Side of text the IMAGE is displayed on. Default: *'w'* (West /
-            left, ie. image before text)
+            Side of text the IMAGE is displayed on.
+
+            Default: *'w'* (West / left, ie. image before text)
 
         -style => $ImageStyleObject
             Use an already-defined HList ItemStyle object (see Tk::ItemStyle
@@ -117,7 +120,7 @@ WIDGET-SPECIFIC OPTIONS
         a hashed box around it. The "activebackground" color, however, is
         always fixed as the same color as the the widget's background.
 
-        Default: same color as the widget's foreground color.
+        Default: Same color as the widget's foreground color.
 
     Name: browsecmd
     Class: BrowseCmd
@@ -169,21 +172,24 @@ WIDGET-SPECIFIC OPTIONS
         Specify horizontal padding style in pixels around the image for the
         rows in the listbox which are type *image* or *imagetext*.
 
-        Default: 0
+        Default: 0 (no padding added)
 
     Name: -ipady
         Specify vertical padding style in pixels around the image for the
         rows in the listbox which are type *image* or *imagetext*. NOTE:
         This changes the height of the affected rows.
 
-        Default: 1 (and setting to 0 is the same as 1).
+        Default: 1 (pixels added to both top and bottom, and setting to 0 is
+        the same as 1).
 
     Name: itemType
     Class: ItemType
     Switch: -itemtype
         Specifies the default type of display item. Can be "text", "image",
-        or "imagetext". The default is "text", though "imagetext" allows for
-        either or both an image or text.
+        or "imagetext".
+
+        Default: "text", though *"imagetext"* allows for either or both an
+        image or text.
 
     Name: listVariable
     Class: Variable
@@ -205,7 +211,7 @@ WIDGET-SPECIFIC OPTIONS
         Specifies an alternate background color for item(s) currently
         "selected".
 
-        Default: a slightly brighter shade of the widget's current
+        Default: A slightly brighter shade of the widget's current
         background color.
 
     Name: selectForeground
@@ -214,7 +220,7 @@ WIDGET-SPECIFIC OPTIONS
         Specifies an alternate foreground color for item(s) currently
         "selected".
 
-        Default: the widget's current foreground color.
+        Default: The widget's current foreground color.
 
     Name: selectMode
     Class: SelectMode
@@ -258,7 +264,7 @@ WIDGET-SPECIFIC OPTIONS
         Specify horizontal padding style in pixels around the text for the
         rows in the listbox which are type *text*.
 
-        Default: 2
+        Default: 2 (pixels - added to both left and right side)
 
     Name: -tpady => *number*
         Specify vertical padding style in pixels around the text for the
@@ -354,6 +360,8 @@ WIDGET METHODS
         Returns a list containing the numerical indices of all of the
         elements in the HListbox that are currently selected. If there are
         no elements selected in the listbox then an empty list is returned.
+        This method is the complement (opposite) of *selectionSet()* in
+        functionality.
 
         NOTE: Not supported by *Tk::HList*.
 
@@ -521,6 +529,8 @@ WIDGET METHODS
         If there is no visible bounding box associated with the zero-based
         *index*, then *undef* is returned.
 
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
+
     *$listbox*->scan(*option, *?*arg(s), ...*?)
         This command is used to implement scanning on listboxes. It has two
         forms, depending on *option*:
@@ -592,7 +602,8 @@ WIDGET METHODS
         *$listbox*->selectionSet(*first-index, *?*last-index*?)
             Selects all of the elements in the range between *first-index*
             and *last-index*, inclusive, without affecting the selection
-            state of elements outside that range.
+            state of elements outside that range. This is the complement
+            (opposite) of *curselection()* in functionality.
 
             NOTE: Prior to v2.7, if more than two indices were passed to
             *selectionSet()*, then the element of each index in the list
@@ -668,7 +679,7 @@ WIDGET METHODS
             listbox, 0.33 indicates the element one-third the way through
             the listbox, and so on.
 
-        *$listbox*->yviewScroll( *number, what* );
+        *$listbox*->yviewScroll(*number, what*);
             This command adjusts the view in the window up or down according
             to *number* and *what*. *Number* must be an integer. *What* must
             be either units or pages. If *what* is units, the view adjusts

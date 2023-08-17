@@ -1,6 +1,6 @@
 use utf8;
 package Finance::Tax::Aruba;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use Moose;
 use namespace::autoclean;
 
@@ -20,7 +20,7 @@ Finance::Tax::Aruba - A package that deals with tax calculations for Aruba
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

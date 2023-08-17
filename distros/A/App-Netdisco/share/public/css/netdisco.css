@@ -68,8 +68,8 @@ div.content > div.tab-content table.nd_floatinghead thead {
     overflow: auto;
 }
 
-#snmpPartialSearch {
-  margin-top: -3px;
+.nd_snmp_search_param {
+  margin-top: -3px !important;
 }
 
 /* fake looks for form submit buttons embedded in bootstrap dropdowns */
@@ -103,8 +103,9 @@ div.content > div.tab-content table.nd_floatinghead thead {
 }
 
 .qtip-content {
-  padding-bottom: 0px;
-  line-height: 8px;
+  font-size: 15px;
+  font-family: monospace;
+  white-space: pre;
 }
 
 /* for where min-width is set but we don't want it */

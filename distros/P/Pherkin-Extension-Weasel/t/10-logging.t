@@ -174,7 +174,7 @@ $content = _flush_and_read_log();
 
 like($content, qr!<img src="[a-z0-9./]+-step-pre-\d+\.png"!,
      q{Pre-step screenshot correctly added});
-like($content, qr!<td>Given step 1</td>!,
+like($content, qr!<td colspan="2"><h3>Given step 1</h3></td>!,
      q{Step 1 correctly included in log output});
 
 

@@ -1,3 +1,38 @@
+0.205   2023-08-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Add constructor option: home_only (related RT issue: RT#149306).
+
+
+0.204   2023-07-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow erase() and recover() to accept multiple files via
+          {filename,path}_{wildcard,re} options.
+
+
+0.203   2023-07-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Use globstar option when matching with wildcard.
+
+
+0.202   2023-07-29  Released-By: PERLANCAR; Urgency: medium
+
+        - list_contents(): rename (undocumented) filtering option
+          search_path to path, add other filtering options path_re,
+          path_wildcard, filename, filename_re, filename_wildcard.
+
+        - When parsing .trashinfo files, make DeletionDate parameter optional.
+
+        - [doc] Add description of trash directory structure.
+
+
+0.201   2023-07-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::TrashUtils, App::trash::u, trash-cli (Python
+          CLIs).
+
+
 0.200   2022-05-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add more logging statement and a more useful error message,

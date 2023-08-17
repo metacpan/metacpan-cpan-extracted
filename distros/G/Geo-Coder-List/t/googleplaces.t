@@ -13,7 +13,7 @@ BEGIN {
 
 GOOGLEPLACES: {
 	SKIP: {
-		skip 'Test requires Internet access', 16 unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 16) unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::GooglePlaces::V3;

@@ -8,9 +8,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-28'; # DATE
+our $DATE = '2023-05-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.743'; # VERSION
+our $VERSION = '0.744'; # VERSION
 
 our %SPEC;
 $SPEC{pmstripper} = {
@@ -95,7 +95,7 @@ pmstripper - Strip Perl module source codes using Perl::Stripper
 
 =head1 VERSION
 
-This document describes version 0.743 of pmstripper (from Perl distribution App-PMUtils), released on 2023-01-28.
+This document describes version 0.744 of pmstripper (from Perl distribution App-PMUtils), released on 2023-05-12.
 
 =head1 SYNOPSIS
 

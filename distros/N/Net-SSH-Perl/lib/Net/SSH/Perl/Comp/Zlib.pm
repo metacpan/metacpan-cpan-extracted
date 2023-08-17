@@ -1,5 +1,3 @@
-# $Id: Zlib.pm,v 1.3 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::Comp::Zlib;
 
 use strict;

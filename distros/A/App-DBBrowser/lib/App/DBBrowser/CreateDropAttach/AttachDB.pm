@@ -73,7 +73,7 @@ sub attach_db {
             # Readline
             my $alias = $tr->readline(
                 'Alias: ',
-                { info => $info, clear_screen => 1 }
+                { info => $info, clear_screen => 1, history => [ 'a' .. 'z' ] }
             );
             $ax->print_sql_info( $info );
             if ( ! length $alias ) {

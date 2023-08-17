@@ -1,10 +1,10 @@
 package PICA::Parser::Plus;
 use v5.14.1;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use charnames qw(:full);
-use Carp qw(carp croak);
+use Carp      qw(carp croak);
 
 use parent 'PICA::Parser::Base';
 
@@ -38,11 +38,11 @@ sub _next_record {
         }
         else {
             if ($self->{strict}) {
-                croak "ERROR: no valid PICA field structure \"$field\"";
+                croak "ERROR: invalid PICA field structure \"$field\"";
             }
             else {
                 carp
-                    "WARNING: no valid PICA field structure \"$field\". Skipped field";
+                    "WARNING: invalid PICA field structure \"$field\". Skipped field";
                 next;
             }
         }

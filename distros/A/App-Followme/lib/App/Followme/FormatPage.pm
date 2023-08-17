@@ -11,7 +11,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -154,6 +154,16 @@ sub parse_page {
 
     $self->parse_blocks($page, $block_handler, $prototype_handler);
     return $blocks;
+}
+
+#----------------------------------------------------------------------
+# Initialize the extension
+
+sub setup {
+    my ($self) = @_;
+
+    $self->{extension} = $self->{web_extension};
+    return;
 }
 
 #----------------------------------------------------------------------
@@ -351,11 +361,18 @@ The following parameters are used from the configuration:
 
 =over 4
 
+=item exclude_index
+
+If this value is non-zero, the index page in a folder will not change when other
+pages in its folder change and vice versa. The default value of this variable is 
+zero.
+
 =item data_pkg
 
 The name of the module that processes web files. The default value is
 'App::Followme::WebData'.
 
+=item web_extension
 
 The extension used by web pages. The default value is html
 

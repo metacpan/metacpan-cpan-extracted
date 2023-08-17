@@ -17,38 +17,37 @@
   #include "spvm_type.h"
   #include "spvm_block.h"
   #include "spvm_list.h"
-  #include "spvm_class.h"
   #include "spvm_attribute.h"
-  #include "spvm_constant_string.h"
+  #include "spvm_string.h"
 %}
 
 %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
-%token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE ERROR_CODE ERROR ITEMS VERSION_DECL
+%token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE EVAL_ERROR_ID ARGS_WIDTH VERSION_DECL
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-%token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID EXTENDS SUPER
+%token <opval> FATCAMMA RW RO WO INIT NEW OF BASIC_TYPE_ID EXTENDS SUPER
 %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_classes classes class class_block version_decl
-%type <opval> opt_declarations declarations declaration
+%type <opval> opt_definitions definitions definition
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-%type <opval> method anon_method opt_args args arg has use require alias our
+%type <opval> method anon_method opt_args args arg has use require alias our anon_method_has_list anon_method_has
 %type <opval> opt_attributes attributes
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement foreach_statement
 %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
 %type <opval> block eval_block init_block switch_block if_require_statement
-%type <opval> unary_operator binary_operator comparison_operator isa is_type is_compile_type
-%type <opval> call_method opt_vaarg
+%type <opval> unary_operator binary_operator comparison_operator isa isa_error is_type is_error is_compile_type
+%type <opval> call_method
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> assign inc dec allow can
 %type <opval> new array_init die warn opt_extends
 %type <opval> var_decl var interface union_type
 %type <opval> operator opt_operators operators opt_operator logical_operator void_return_operator
-%type <opval> field_name method_name class_name class_alias_name is_read_only
-%type <opval> type qualified_type basic_type array_type
+%type <opval> field_name method_name alias_name is_read_only
+%type <opval> type qualified_type basic_type array_type class_type
 %type <opval> array_type_with_length ref_type  return_type type_comment opt_type_comment
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
@@ -57,11 +56,11 @@
 %left <opval> BIT_OR BIT_XOR
 %left <opval> BIT_AND
 %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-%nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
+%nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA ISA_ERROR IS_TYPE IS_ERROR IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT TYPE_NAME COMPILE_TYPE_NAME DUMP NEW_STRING_LEN IS_READ_ONLY COPY
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -73,7 +72,7 @@ grammar
 opt_classes
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | classes
     {
@@ -105,19 +104,19 @@ classes
   | class
 
 class
-  : CLASS basic_type opt_extends class_block END_OF_FILE
+  : CLASS class_type opt_extends class_block END_OF_FILE
     {
       $$ = SPVM_OP_build_class(compiler, $1, $2, $4, NULL, $3);
     }
-  | CLASS basic_type opt_extends ':' opt_attributes class_block END_OF_FILE
+  | CLASS class_type opt_extends ':' opt_attributes class_block END_OF_FILE
     {
       $$ = SPVM_OP_build_class(compiler, $1, $2, $6, $5, $3);
     }
-  | CLASS basic_type opt_extends ';' END_OF_FILE
+  | CLASS class_type opt_extends ';' END_OF_FILE
     {
       $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, NULL, $3);
     }
-  | CLASS basic_type opt_extends ':' opt_attributes ';' END_OF_FILE
+  | CLASS class_type opt_extends ':' opt_attributes ';' END_OF_FILE
     {
       $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, $5, $3);
     }
@@ -127,25 +126,25 @@ opt_extends
     {
       $$ = NULL;
     }
-  | EXTENDS class_name
+  | EXTENDS basic_type
     {
       $$ = SPVM_OP_build_extends(compiler, $1, $2);
     }
 
 class_block
-  : '{' opt_declarations '}'
+  : '{' opt_definitions '}'
     {
       SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
       SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, $2);
       $$ = op_class_block;
     }
 
-opt_declarations
+opt_definitions
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
-  | declarations
+  | definitions
     {
       if ($1->id == SPVM_OP_C_ID_LIST) {
         $$ = $1;
@@ -156,8 +155,8 @@ opt_declarations
       }
     }
 
-declarations
-  : declarations declaration
+definitions
+  : definitions definition
     {
       SPVM_OP* op_list;
       if ($1->id == SPVM_OP_C_ID_LIST) {
@@ -171,19 +170,19 @@ declarations
       
       $$ = op_list;
     }
-  | declaration
+  | definition
 
-declaration
+definition
   : version_decl
-  | has
-  | method
-  | enumeration
-  | our
   | use
+  | alias
   | allow
   | interface
   | init_block
-  | alias
+  | enumeration
+  | our
+  | has ';'
+  | method
 
 init_block
   : INIT block
@@ -198,41 +197,41 @@ version_decl
     }
 
 use
-  : USE class_name ';'
+  : USE basic_type ';'
     {
       int32_t is_require = 0;
-      SPVM_OP* op_name_class_alias = NULL;
-      $$ = SPVM_OP_build_use(compiler, $1, $2, op_name_class_alias, is_require);
+      SPVM_OP* op_name_alias = NULL;
+      $$ = SPVM_OP_build_use(compiler, $1, $2, op_name_alias, is_require);
     }
-  | USE class_name AS class_alias_name ';'
+  | USE basic_type AS alias_name ';'
     {
       int32_t is_require = 0;
       $$ = SPVM_OP_build_use(compiler, $1, $2, $4, is_require);
     }
 
 require
-  : REQUIRE class_name
+  : REQUIRE basic_type
     {
-      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->current_file, compiler->current_line);
       int32_t is_require = 1;
       $$ = SPVM_OP_build_use(compiler, op_use, $2, NULL, is_require);
     }
 
 alias
-  : ALIAS class_name AS class_alias_name ';'
+  : ALIAS basic_type AS alias_name ';'
     {
-      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_alias(compiler, op_use, $2, $4);
     }
 
 allow
-  : ALLOW class_name ';'
+  : ALLOW basic_type ';'
     {
       $$ = SPVM_OP_build_allow(compiler, $1, $2);
     }
 
 interface
-  : INTERFACE class_name ';'
+  : INTERFACE basic_type ';'
     {
       $$ = SPVM_OP_build_implement(compiler, $1, $2);
     }
@@ -240,7 +239,7 @@ interface
 enumeration
   : opt_attributes ENUM enumeration_block
     {
-      $$ = SPVM_OP_build_enumeration(compiler, $2, $3, $1);
+      $$ = SPVM_OP_build_enumeration_definition(compiler, $2, $3, $1);
     }
 
 enumeration_block 
@@ -254,7 +253,7 @@ enumeration_block
 opt_enumeration_values
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | enumeration_values
     {
@@ -299,41 +298,41 @@ enumeration_value
 our
   : OUR VAR_NAME ':' opt_attributes qualified_type opt_type_comment ';'
     {
-      $$ = SPVM_OP_build_our(compiler, $1, $2, $4, $5);
+      $$ = SPVM_OP_build_class_var_definition(compiler, $1, $2, $4, $5);
     }
 
 has
-  : HAS field_name ':' opt_attributes qualified_type opt_type_comment ';'
+  : HAS field_name ':' opt_attributes qualified_type opt_type_comment
     {
-      $$ = SPVM_OP_build_field(compiler, $1, $2, $4, $5);
+      $$ = SPVM_OP_build_field_definition(compiler, $1, $2, $4, $5);
     }
 
 method
-  : opt_attributes METHOD method_name ':' return_type '(' opt_args opt_vaarg')' block
+  : opt_attributes METHOD method_name ':' return_type '(' opt_args ')' block
      {
-       $$ = SPVM_OP_build_method(compiler, $2, $3, $5, $7, $1, $10, NULL, $8, 0, 0);
+       $$ = SPVM_OP_build_method_definition(compiler, $2, $3, $5, $7, $1, $9, NULL, 0, 0);
      }
-  | opt_attributes METHOD method_name ':' return_type '(' opt_args opt_vaarg')' ';'
+  | opt_attributes METHOD method_name ':' return_type '(' opt_args ')' ';'
      {
-       $$ = SPVM_OP_build_method(compiler, $2, $3, $5, $7, $1, NULL, NULL, $8, 0, 0);
+       $$ = SPVM_OP_build_method_definition(compiler, $2, $3, $5, $7, $1, NULL, NULL, 0, 0);
      }
-  | opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
+  | opt_attributes METHOD ':' return_type '(' opt_args ')' block
      {
-       $$ = SPVM_OP_build_method(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, 0, 0);
+       $$ = SPVM_OP_build_method_definition(compiler, $2, NULL, $4, $6, $1, $8, NULL, 0, 0);
      }
-  | opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg ')' ';'
+  | opt_attributes METHOD ':' return_type '(' opt_args ')' ';'
      {
-       $$ = SPVM_OP_build_method(compiler, $2, NULL, $4, $6, $1, NULL, NULL, $7, 0, 0);
+       $$ = SPVM_OP_build_method_definition(compiler, $2, NULL, $4, $6, $1, NULL, NULL, 0, 0);
      }
 
 anon_method
-  : opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
+  : opt_attributes METHOD ':' return_type '(' opt_args ')' block
      {
        int32_t is_init = 0;
        int32_t is_anon = 1;
-       $$ = SPVM_OP_build_method(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, is_init, is_anon);
+       $$ = SPVM_OP_build_method_definition(compiler, $2, NULL, $4, $6, $1, $8, NULL, is_init, is_anon);
      }
-  | '[' args ']' opt_attributes METHOD ':' return_type '(' opt_args opt_vaarg')' block
+  | '[' anon_method_has_list ']' opt_attributes METHOD ':' return_type '(' opt_args ')' block
      {
        SPVM_OP* op_list_args;
        if ($2->id == SPVM_OP_C_ID_LIST) {
@@ -346,13 +345,13 @@ anon_method
        
        int32_t is_init = 0;
        int32_t is_anon = 1;
-       $$ = SPVM_OP_build_method(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, is_init, is_anon);
+       $$ = SPVM_OP_build_method_definition(compiler, $5, NULL, $7, $9, $4, $11, op_list_args, is_init, is_anon);
      }
 
 opt_args
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | args
     {
@@ -389,22 +388,43 @@ arg
     {
       $$ = SPVM_OP_build_arg(compiler, $1, $3, NULL, NULL);
     }
-  | var ASSIGN operator ':' qualified_type opt_type_comment
+  | var ':' qualified_type opt_type_comment ASSIGN operator
     {
-      $$ = SPVM_OP_build_arg(compiler, $1, $5, NULL, $3);
+      $$ = SPVM_OP_build_arg(compiler, $1, $3, NULL, $6);
     }
 
-opt_vaarg
-  : /* Empty */
+anon_method_has_list
+  : anon_method_has_list ',' anon_method_has
     {
-      $$ = NULL;
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      
+      $$ = op_list;
     }
-  | DOT3
+  | anon_method_has_list ','
+  | anon_method_has
+
+anon_method_has
+  : has ASSIGN operator
+    {
+      $$ = SPVM_OP_build_anon_method_field_definition(compiler, $1, $3);
+    }
+  | has
+    {
+      $$ = SPVM_OP_build_anon_method_field_definition(compiler, $1, NULL);
+    }
 
 opt_attributes
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | attributes
     {
@@ -438,7 +458,7 @@ attributes
 opt_statements
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | statements
     {
@@ -498,18 +518,26 @@ statement
   | void_return_operator ';'
   | ';'
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->current_file, compiler->current_line);
     }
   | die ';'
 
 die
   : DIE operator
     {
-      $$ = SPVM_OP_build_die(compiler, $1, $2);
+      $$ = SPVM_OP_build_die(compiler, $1, $2, NULL);
     }
   | DIE
     {
-      $$ = SPVM_OP_build_die(compiler, $1, NULL);
+      $$ = SPVM_OP_build_die(compiler, $1, NULL, NULL);
+    }
+  | DIE type operator
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, $3, $2);
+    }
+  | DIE type
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, NULL, $2);
     }
 
 void_return_operator
@@ -570,13 +598,13 @@ switch_statement
 switch_block
   : '{' opt_case_statements '}'
     {
-      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, compiler->current_file, compiler->current_line);
       op_block->uv.block->id = SPVM_BLOCK_C_ID_SWITCH;
       $$ = SPVM_OP_build_switch_block(compiler, op_block, $2, NULL);
     }
   | '{' opt_case_statements default_statement '}'
     {
-      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, compiler->current_file, compiler->current_line);
       op_block->uv.block->id = SPVM_BLOCK_C_ID_SWITCH;
       $$ = SPVM_OP_build_switch_block(compiler, op_block, $2, $3);
     }
@@ -584,7 +612,7 @@ switch_block
 opt_case_statements
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | case_statements
     {
@@ -641,20 +669,20 @@ default_statement
 if_require_statement
   : IF '(' require ')' block
     {
-      SPVM_OP* op_if_require = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF_REQUIRE, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_if_require = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF_REQUIRE, compiler->current_file, compiler->current_line);
       
       $$ = SPVM_OP_build_if_require_statement(compiler, op_if_require, $3, $5, NULL);
     }
   | IF '(' require ')' block ELSE block
     {
-      SPVM_OP* op_if_require = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF_REQUIRE, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_if_require = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF_REQUIRE, compiler->current_file, compiler->current_line);
       
       $$ = SPVM_OP_build_if_require_statement(compiler, op_if_require, $3, $5, $7);
     }
 if_statement
   : IF '(' operator ')' block else_statement
     {
-      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6, 0);
       
       // if is wraped with block to allow the following syntax
       //  if (var_decl $var = 3) { ... }
@@ -665,7 +693,7 @@ if_statement
     }
   | UNLESS '(' operator ')' block else_statement
     {
-      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6, 0);
       
       // if is wraped with block to allow the following syntax
       //  if (var_decl $var = 3) { ... }
@@ -678,7 +706,7 @@ if_statement
 else_statement
   : /* NULL */
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->current_file, compiler->current_line);
     };
   | ELSE block
     {
@@ -686,7 +714,7 @@ else_statement
     }
   | ELSIF '(' operator ')' block else_statement
     {
-      $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6, 0);
     }
 
 block 
@@ -706,7 +734,7 @@ eval_block
 opt_operators
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
     }
   | operators
     {
@@ -723,7 +751,7 @@ opt_operators
 opt_operator
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->current_file, compiler->current_line);
     }
   | operator
 
@@ -749,7 +777,7 @@ operator
     {
       if ($2->id == SPVM_OP_C_ID_LIST) {
         SPVM_OP* op_operator = $2->first;
-        SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, compiler->cur_file, compiler->cur_line);
+        SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, compiler->current_file, compiler->current_line);
         while ((op_operator = SPVM_OP_sibling(compiler, op_operator))) {
           SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_operator);
           SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_operator);
@@ -765,7 +793,9 @@ operator
   | isweak_field
   | comparison_operator
   | isa
+  | isa_error
   | is_type
+  | is_error
   | is_compile_type
   | TRUE
     {
@@ -778,17 +808,12 @@ operator
   | is_read_only
   | can
   | logical_operator
-  | CLASS_ID class_name
+  | BASIC_TYPE_ID type
     {
-      $$ = SPVM_OP_build_class_id(compiler, $1, $2);
+      $$ = SPVM_OP_build_basic_type_id(compiler, $1, $2);
     }
-  | ERROR_CODE
-  | SET_ERROR_CODE operator
-    {
-      $$ = SPVM_OP_build_set_error_code(compiler, $1, $2);
-    }
-  | ERROR
-  | ITEMS
+  | EVAL_ERROR_ID
+  | ARGS_WIDTH
 
 operators
   : operators ',' operator
@@ -833,7 +858,11 @@ unary_operator
     {
       $$ = SPVM_OP_build_unary_op_var(compiler, $1, $2);
     }
-  | REFOP operator
+  | TYPE_NAME operator
+    {
+      $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+    }
+  | COMPILE_TYPE_NAME operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
@@ -1014,7 +1043,13 @@ comparison_operator
 isa
   : operator ISA type
     {
-      $$ = SPVM_OP_build_is_type(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
+    }
+
+isa_error
+  : operator ISA_ERROR type
+    {
+      $$ = SPVM_OP_build_isa_error(compiler, $2, $1, $3);
     }
 
 is_type
@@ -1023,10 +1058,16 @@ is_type
       $$ = SPVM_OP_build_is_type(compiler, $2, $1, $3);
     }
     
+is_error
+  : operator IS_ERROR type
+    {
+      $$ = SPVM_OP_build_is_error(compiler, $2, $1, $3);
+    }
+    
 is_compile_type
   : operator IS_COMPILE_TYPE type
     {
-      $$ = SPVM_OP_build_is_type(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_is_compile_type(compiler, $2, $1, $3);
     }
     
 logical_operator
@@ -1060,51 +1101,33 @@ new
     }
   | NEW array_type_with_length
     {
-      $$ = SPVM_OP_build_new(compiler, $1, $2, NULL);
+      SPVM_OP* op_length = $2->last;
+      SPVM_OP_cut_op(compiler, $2->last);
+      $$ = SPVM_OP_build_new(compiler, $1, $2, op_length);
     }
   | anon_method
     {
-      // Method
-      SPVM_OP* op_method = $1;
-      
-      // Class
-      SPVM_OP* op_class = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS, op_method->file, op_method->line);
-      
-      // Create class block
-      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, op_method->file, op_method->line);
-      SPVM_OP* op_list_declarations = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP_insert_child(compiler, op_list_declarations, op_list_declarations->last, op_method);
-      SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_declarations);
-      
-      // Build class
-      SPVM_OP_build_class(compiler, op_class, NULL, op_class_block, NULL, NULL);
-
-      // Type
-      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_class->uv.class->type, op_method->file, op_method->line);
-      
-      // New
-      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_method->file, op_method->line);
-      $$ = SPVM_OP_build_new(compiler, op_new, op_type, NULL);
+      $$ = SPVM_OP_build_anon_method(compiler, $1);
     }
 
 array_init
   : '[' opt_operators ']'
     {
-      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->current_file, compiler->current_line);
       int32_t is_key_values = 0;
       $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2, is_key_values);
     }
   | '{' operators '}'
     {
-      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->current_file, compiler->current_line);
       int32_t is_key_values = 1;
       $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2, is_key_values);
     }
   | '{' '}'
     {
-      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->current_file, compiler->current_line);
       int32_t is_key_values = 1;
-      SPVM_OP* op_list_elements = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_list_elements = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_array_init(compiler, op_array_init, op_list_elements, is_key_values);
     }
 
@@ -1120,82 +1143,86 @@ convert
       $$ = SPVM_OP_build_type_cast(compiler, op_convert, $4, $1, NULL);
     }
 
-array_access
-  : operator ARROW '[' operator ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $4);
-    }
-  | array_access '[' operator ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
-    }
-  | field_access '[' operator ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
-    }
-
 call_method
   : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, $4);
     }
   | CURRENT_CLASS SYMBOL_NAME
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, op_operators);
     }
-  | class_name ARROW method_name '(' opt_operators  ')'
+  | basic_type ARROW method_name '(' opt_operators  ')'
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
     }
-  | class_name ARROW method_name
+  | basic_type ARROW method_name
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_operators);
     }
   | operator ARROW method_name '(' opt_operators ')'
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
     }
   | operator ARROW method_name
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_operators);
     }
   | operator ARROW '(' opt_operators ')'
     {
-      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, op_method_name, $4);
+    }
+
+array_access
+  : operator ARROW '[' operator ']'
+    {
+      SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, compiler->current_file, compiler->current_line);
+      $$ = SPVM_OP_build_array_access(compiler, op_array_access, $1, $4);
+    }
+  | array_access '[' operator ']'
+    {
+      SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, compiler->current_file, compiler->current_line);
+      $$ = SPVM_OP_build_array_access(compiler, op_array_access, $1, $3);
+    }
+  | field_access '[' operator ']'
+    {
+      SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, compiler->current_file, compiler->current_line);
+      $$ = SPVM_OP_build_array_access(compiler, op_array_access, $1, $3);
     }
 
 field_access
   : operator ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $4);
     }
   | field_access '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $3);
     }
   | array_access '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $3);
+      SPVM_OP* op_array_access = $1;
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
+      $$ = SPVM_OP_build_field_access(compiler, op_field_access, op_array_access, $3);
     }
 
 weaken_field
   : WEAKEN var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_weaken_field(compiler, $1, op_field_access);
     }
@@ -1203,7 +1230,7 @@ weaken_field
 unweaken_field
   : UNWEAKEN var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_unweaken_field(compiler, $1, op_field_access);
     }
@@ -1211,7 +1238,7 @@ unweaken_field
 isweak_field
   : ISWEAK var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_isweak_field(compiler, $1, op_field_access);
     }
@@ -1229,22 +1256,22 @@ can
 array_length
   : '@' operator
     {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $2);
     }
   | '@' '{' operator '}'
     {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
     }
   | SCALAR '@' operator
     {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
     }
   | SCALAR '@' '{' operator '}'
     {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
     }
 
@@ -1274,6 +1301,9 @@ type
   : basic_type
   | array_type
   | ref_type
+
+class_type
+  : basic_type
 
 basic_type
   : SYMBOL_NAME
@@ -1358,13 +1388,13 @@ return_type
   : qualified_type opt_type_comment
   | VOID
     {
-      $$ = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_void_type(compiler, compiler->current_file, compiler->current_line);
     }
 
 opt_type_comment
   : /* Empty */
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, compiler->current_file, compiler->current_line);
     }
   | type_comment
 
@@ -1400,10 +1430,7 @@ field_name
 method_name
   : SYMBOL_NAME
 
-class_name
-  : SYMBOL_NAME
-
-class_alias_name
+alias_name
   : SYMBOL_NAME
 
 %%

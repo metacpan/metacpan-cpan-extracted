@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1874 2022-09-23 13:37:00Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1926 2023-05-31 12:05:13Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -37,7 +37,7 @@ my %metadata = (
 
 my %prerequisite = (
 	'Carp'	       => 1.10,
-	'DynaLoader'   => 1.04,
+	'DynaLoader'   => 1.09,
 	'Exporter'     => 5.56,
 	'File::Spec'   => 3.29,
 	'IO::File'     => 1.14,
@@ -53,18 +53,18 @@ my $inc = '';
 my $lib = '-lcrypto';
 my $nul = MSWin32 ? 'nul' : '/dev/null';
 
-if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
-	chomp $dir;
-	$inc = "-I$dir/include";
-	$lib = "-L$dir/lib -lcrypto";
-
-} elsif (`pkg-config --modversion libcrypto 2>$nul`) {
+if (`pkg-config --modversion libcrypto 2>$nul`) {
 	$inc = `pkg-config --cflags libcrypto 2>$nul`;
 	$lib = `pkg-config --libs   libcrypto 2>$nul`;
-
 } elsif (MSWin32) {
 	$lib = '-llibeay32' if $Config{cc} =~ /cl/;
 	$lib = '-leay32'    if $Config{cc} =~ /gcc/;
+}
+
+if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
+	chomp $dir;
+	$inc = "-I$dir/include";
+	$lib = "-L$dir/lib $lib";
 }
 
 $inc = $ENV{OPENSSL_INCLUDE} if $ENV{OPENSSL_INCLUDE};
@@ -85,19 +85,22 @@ exit;
 
 package MY;				## customise generated Makefile
 
-sub test {
-	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
-
-	return join '', shift->SUPER::test(), <<'END';
-# suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
+sub constants {
+	return join "\n", shift->SUPER::constants(), <<'END' if $^O =~ /MSWin/i;
+#	include test directory
+TEST_DIR = t
+FULLPERLRUN = $(FULLPERL) "-I$(TEST_DIR)"
+END
+	return join "\n", shift->SUPER::constants(), <<'END';
+#	suppress parallel test execution	include test directory
+TEST_DIR = t
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL) "-I$(TEST_DIR)"
 END
 }
 
 
 sub dist {
-	return join '', shift->SUPER::dist(), <<'END';
-
+	return join "\n", shift->SUPER::dist(), <<'END';
 # $(PERM_RWX) raises security issues downstream
 PREOP = $(CHMOD) $(PERM_RW) $(DISTVNAME)$(DFSEP)demo$(DFSEP)*
 END
@@ -115,7 +118,7 @@ sub install {
 	}
 
 	eval "require $distro";		## no critic
-	my @version = grep {$_} 'version', eval { $distro->VERSION };
+	my @version = ( 'version', eval { $distro->VERSION } );
 
 	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
@@ -161,24 +164,23 @@ END
 
 
 sub postamble {
-	my $devnull = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
-	return <<"PlanB" unless `gcov -v 2>$devnull`;
-test_cover :
-	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test
-	cover -summary
-PlanB
 	my $ldflags = "-fprofile-arcs -ftest-coverage";
 	my $ccflags = "-O0 $ldflags";
-	return <<"PlanA";
+	my $devnull = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+	return <<"PlanA" if `gcov -v 2>$devnull`;
 test_cover :
 	cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W SEC.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
-	gcov SEC.xs
-	gcov2perl SEC.xs.gcov
-	cover -summary
+	cover
 	\$(NOECHO) \$(TOUCH) SEC.c	# force XS rebuild before install
 PlanA
+
+	return <<'PlanB';
+test_cover :
+	cover -delete
+	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
+	cover
+PlanB
 }
 
 

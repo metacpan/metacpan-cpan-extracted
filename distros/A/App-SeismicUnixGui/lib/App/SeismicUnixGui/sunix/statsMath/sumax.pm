@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::sumax;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUMAX - get trace by trace local/global maxima, minima, or absolute maximum
+ PERL PROGRAM NAME:  SUMAX - get trace by trace local/global maxima, minima, or absolute maximum
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

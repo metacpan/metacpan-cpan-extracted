@@ -1,13 +1,15 @@
 #!perl
 
-our $DATE = '2020-03-25'; # DATE
-our $VERSION = '0.006'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-06-17'; # DATE
+our $DIST = 'App-cpanmodules'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 my $prefix = '/App/cpanmodules/';
 
@@ -36,7 +38,7 @@ cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.006 of cpanmodules (from Perl distribution App-cpanmodules), released on 2020-03-25.
+This document describes version 0.007 of cpanmodules (from Perl distribution App-cpanmodules), released on 2023-06-17.
 
 =head1 SYNOPSIS
 
@@ -100,9 +102,29 @@ C<*> marks required options.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
 
 =item B<--format>=I<s>
 
@@ -111,6 +133,12 @@ Choose output format, e.g. json, text.
 Default value:
 
  undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
 
 =item B<--help>, B<-h>, B<-?>
 
@@ -130,28 +158,40 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
 =item B<--no-env>
 
 Do not read environment for default options.
 
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
 
 =item B<--subcommands>
 
@@ -161,6 +201,15 @@ List available subcommands.
 
 Display program's version and exit.
 
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
 =back
 
 =head2 Options for subcommand get
@@ -168,6 +217,11 @@ Display program's version and exit.
 =over
 
 =item B<--module>=I<s>*, B<-m>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -177,9 +231,18 @@ Display program's version and exit.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--mentions>=I<s>
 
+(No description)
+
+
 =item B<--module>=I<s>, B<-m>
+
+(No description)
+
 
 =back
 
@@ -189,7 +252,15 @@ Display program's version and exit.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--module>=I<s>*, B<-m>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--with-attr>=I<s@>
 
@@ -210,6 +281,11 @@ See C<--with-attr>.
 =over
 
 =item B<--module>=I<s>*, B<-m>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -251,7 +327,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/cpanmodules.conf>, F<~/cpanmodules.conf>, or F</etc/cpanmodules.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/cpanmodules.conf>, F</home/u1/cpanmodules.conf>, or F</etc/cpanmodules.conf>.
 
 All found files will be read and merged.
 
@@ -263,7 +339,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -294,17 +385,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 CPANMODULES_OPT => str
+=head2 CPANMODULES_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/cpanmodules.conf>
+=head2 /home/u1/.config/cpanmodules.conf
 
-F<~/cpanmodules.conf>
+=head2 /home/u1/cpanmodules.conf
 
-F</etc/cpanmodules.conf>
+=head2 /etc/cpanmodules.conf
 
 =head1 HOMEPAGE
 
@@ -313,14 +404,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-cpanmo
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-cpanmodules>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanmodules>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -341,11 +424,37 @@ L<cpanauthors> from L<App::CPANAuthorsUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanmodules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

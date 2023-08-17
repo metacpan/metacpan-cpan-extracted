@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Antonis Kalou <a.kalou@shadowcat.co.uk>",
+      "Jess Robinson <j.robinson@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-Storage-DBI-MariaDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::MariaDB" : "1.00",
+            "DBIx::Class" : "0.082820"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "SQL::Translator" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB.git",
+         "web" : "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

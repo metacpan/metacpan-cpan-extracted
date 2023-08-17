@@ -43,9 +43,9 @@ Mnet::T::test_perl({
     name    => 'prompt truncate',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt> "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -64,9 +64,9 @@ Mnet::T::test_perl({
     name    => 'enable when already in enable',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt# ";   read INPUT
-            echo -n "prompt# ";   read INPUT
-            echo -n "prompt# ";   read INPUT
+            printf "prompt# "; read INPUT
+            printf "prompt# "; read INPUT
+            printf "prompt# "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -85,9 +85,9 @@ Mnet::T::test_perl({
     name    => 'enable with no prompts',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt# ";   read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt# "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -106,10 +106,10 @@ Mnet::T::test_perl({
     name    => 'enable with password prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "prompt# ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "password: "; read INPUT
+            printf "prompt# ";   read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -129,11 +129,11 @@ Mnet::T::test_perl({
     name    => 'enable with username and password prompts',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
-            echo -n "username: "; read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "prompt# ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "username: "; read INPUT
+            printf "password: "; read INPUT
+            printf "prompt# ";   read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -154,13 +154,13 @@ Mnet::T::test_perl({
     name    => 'enable failed',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> ";   read INPUT
-            echo -n "prompt> ";   read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "password: "; read INPUT
-            echo -n "% Bad enable passwords, too many failures!"
-            echo -n "prompt> ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "prompt> ";   read INPUT
+            printf "password: "; read INPUT
+            printf "password: "; read INPUT
+            printf "password: "; read INPUT
+            printf "%% Bad enable passwords, too many failures!"
+            printf "prompt> ";   read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -182,9 +182,9 @@ Mnet::T::test_perl({
     name    => 'close with changing prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt# "; read INPUT
-            echo -n "prompt# "; read INPUT
-            echo -n "prompt> "; read INPUT
+            printf "prompt# "; read INPUT
+            printf "prompt# "; read INPUT
+            printf "prompt> "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,
@@ -211,11 +211,11 @@ Mnet::T::test_perl({
     name    => 'enable method --record',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n "prompt> "; read INPUT
-            echo -n "prompt> "; read INPUT
-            echo -n "prompt# "; read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt> "; read INPUT
+            printf "prompt# "; read INPUT
             echo "output";
-            echo -n "prompt# "; read INPUT
+            printf "prompt# "; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl,

@@ -85,7 +85,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.111.1";
+	our $VERSION = "2023.221.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -105,8 +105,8 @@
 	use constant SQL_SIMPLE_CURSOR_RELOAD => 5;	# page current
 
 	use constant SQL_SIMPLE_ORDER_OFF => undef;	# order disabled
-	use constant SQL_SIMPLE_ORDER_ASC => 1;		# order asceding
-	use constant SQL_SIMPLE_ORDER_DESC => 2;	# order descending
+	use constant SQL_SIMPLE_ORDER_ASC => "ASC";	# order asceding
+	use constant SQL_SIMPLE_ORDER_DESC => "DESC";	# order descending
 
 	use constant SQL_SIMPLE_CMD_OFF => 0;		# sql_save disabled
 	use constant SQL_SIMPLE_CMD_ON => 1;		# sql_save update
@@ -491,8 +491,9 @@ sub _SelectCursor()
 	## have order by?
 	my @order;
 	if	(!defined($argv->{order_by})) {}
-	elsif	(ref($argv->{order_by}) eq "") { @order = ($argv->{order_by}); }
 	elsif	(ref($argv->{order_by}) eq "ARRAY") { @order = @{$argv->{order_by}}; }
+	elsif	(ref($argv->{order_by}) eq "HASH") { @order = ($argv->{order_by}); }
+	elsif	(ref($argv->{order_by}) eq "") { @order = ($argv->{order_by}); }
 	else
 	{
 		$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"009");
@@ -501,23 +502,23 @@ sub _SelectCursor()
 	## test the type of cursor
 	if	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_TOP)
 	{
-		unshift(@order,$argv->{cursor_key} => SQL_SIMPLE_ORDER_ASC);
+		unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_ASC});
 	}
 	elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_BACK)
 	{
-		unshift(@order,$argv->{cursor_key} => SQL_SIMPLE_ORDER_DESC);
+		unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_DESC});
 
 		unshift(@{$argv->{where}}, $argv->{cursor_key} => [ "<", $argv->{cursor} ]);
 	}
 	elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_NEXT || $argv->{cursor_command} == SQL_SIMPLE_CURSOR_RELOAD)
 	{
-		unshift(@order,$argv->{cursor_key} => SQL_SIMPLE_ORDER_ASC);
+		unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_ASC});
 
 		unshift(@{$argv->{where}}, $argv->{cursor_key} => [ ">", $argv->{cursor} ]);
 	}
 	elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_LAST)
 	{
-		unshift(@order,$argv->{cursor_key} => SQL_SIMPLE_ORDER_DESC);
+		unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_DESC});
 	}
 	else
 	{
@@ -643,6 +644,7 @@ sub _Select()
 	}
 	my @fields_work;
 	my %fields_distinct;
+	my %fields_aliases;
 	if (defined($argv->{fields}))
         {
 		if (ref($argv->{fields}) ne "ARRAY")
@@ -654,6 +656,13 @@ sub _Select()
 		{
 			my $field = $argv->{fields}[$ix];
 			my $distinct;
+			my $alias;
+			if (ref($field) eq "HASH")
+			{
+				$alias = $field;
+				($fields_aliases{$alias}{f},$fields_aliases{$alias}{a}) = each(%{$field});
+				$field = $fields_aliases{$alias}{f};
+			}
 			if ($field =~ /^distinct$/i)
 			{
 				$field = $argv->{fields}[++$ix];
@@ -677,7 +686,7 @@ sub _Select()
 					}
 				}
 			}
-			push(@fields_work,$field);
+			push(@fields_work,$alias || $field);
 			$fields_distinct{$field} = 1 if ($distinct);
 		}
 	}
@@ -721,14 +730,9 @@ sub _Select()
 	if (defined($argv->{order_by}))
 	{
 		if	(ref($argv->{order_by}) eq "") { @order_work = ($argv->{order_by}); }
+		elsif	(ref($argv->{order_by}) eq "HASH") { @order_work = ($argv->{order_by}); }
 		elsif	(ref($argv->{order_by}) eq "ARRAY")
 		{
-			if (@{$argv->{order_by}} == 1) { @order_work = @{$argv->{order_by}}; }
-			if (@{$argv->{order_by}} % 2 != 0)
-			{
-				$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"009");
-				return SQL_SIMPLE_RC_SYNTAX;
-			}
 		       	push(@order_work,@{$argv->{order_by}});
 		}
 		else
@@ -745,11 +749,20 @@ sub _Select()
 	{
 		foreach my $field(@fields_work)
 		{
+			my $alias;
 			my $distinct = ($fields_distinct{$field}) ? "DISTINCT " : "";
-			## escape?
+			## field is hash?
+			if (defined($fields_aliases{$field}))
+			{
+				$alias = $fields_aliases{$field}{a};
+				$field = $fields_aliases{$field}{f};
+			}
+			## is escape?
 			if ($field =~ /^\\(.*)/)
 			{
-				push(@fields,$distinct.$1);
+				($alias) ?
+					push(@fields,$distinct.$1." ".$alias) :
+					push(@fields,$distinct.$1);
 				next;
 			}
 			## have function?
@@ -778,6 +791,8 @@ sub _Select()
 				my $table = $1;
 				my $field = $2;
 				my $realn = $self->getAliasCols($table,$field);
+				($alias) ?
+					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b." ".$alias) :
 				($field ne $realn) ?
 					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b." ".$table."_".$field) :
 					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b);
@@ -787,11 +802,18 @@ sub _Select()
 				if (@tables_work == 1)
 				{
 					my $realn = $self->getAliasCols($table,$field);
+					($alias) ?
+						push(@fields,$distinct.$field_a.$realn.$field_b." ".$alias) :
 					($field ne $realn) ?
 						push(@fields,$distinct.$field_a.$realn.$field_b." ".$field) :
 						push(@fields,$distinct.$field_a.$field.$field_b);
 				}
-				else { push(@fields,$distinct.$field); }
+				else
+				{
+					($alias) ?
+						push(@fields,$distinct.$field." ".$alias):
+						push(@fields,$distinct.$field);
+			     	}
 			}
 		}
 	}
@@ -808,22 +830,14 @@ sub _Select()
 	while (@order_work)
 	{
 		my $field = shift(@order_work);
-		if ($field =~ /^(.*?)\.(.*?)$/)
+		if (ref($field) eq "HASH")
 		{
-			my $table = $1;
-			my $field = $2;
-			$field = $table.".".$self->getAliasCols($table,$field);
+			foreach my $_id(sort(keys(%{$field})))
+			{
+				$self->_SelectOrderBy(\@order,$table,$_id,$field->{$_id});
+			}
 		}
-		else
-		{
-			$field = $self->getAliasCols($table,$field);
-		}
-		if (@order_work)
-		{
-			my $ordem = shift(@order_work);
-			$field .= " ".(($ordem == SQL_SIMPLE_ORDER_DESC) ? 'DESC' : ($ordem == SQL_SIMPLE_ORDER_ASC) ? 'ASC' : $ordem);
-		}
-		push(@order,$field);
+		else { $self->_SelectOrderBy(\@order,$table,$field); }
 	}
 	## make tables
 	my @tables;
@@ -854,6 +868,30 @@ sub _Select()
 
 	$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"012");
 	return SQL_SIMPLE_RC_EMPTY;
+}
+
+sub _SelectOrderBy()
+{
+	my $self = shift;
+	my $array = shift;
+	my $table = shift;
+	my $field = shift;
+	my $order = shift;
+
+	if ($field =~ /^(.*?)\.(.*?)$/)
+	{
+		my $table = $1;
+		my $field = $2;
+		$field = $table.".".$self->getAliasCols($table,$field);
+	}
+	else { $field = $self->getAliasCols($table,$field); }
+
+       	if ($order)
+	{
+		$order = uc($order);
+		$field .= " ".(($order eq SQL_SIMPLE_ORDER_ASC) ? 'ASC' : ($order eq SQL_SIMPLE_ORDER_DESC) ? 'DESC' : 'USING '.$order);
+	}
+	push(@{$array},$field);
 }
 
 ################################################################################

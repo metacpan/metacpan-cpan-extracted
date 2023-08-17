@@ -1481,7 +1481,7 @@ sub _get_data_scale {
 
 =head2 _get_initial_model
 
- PERL PACKAGE NAME: _get_initial_model
+ PERL PERL PROGRAM NAME: _get_initial_model
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 21 2020
 
@@ -1676,7 +1676,7 @@ sub _get_initial_model {
 
 =head2 _get_initial_model4gui
 
- PERL PACKAGE NAME: _get_initial_model4gui
+ PERL PERL PROGRAM NAME: _get_initial_model4gui
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 21 2020
 

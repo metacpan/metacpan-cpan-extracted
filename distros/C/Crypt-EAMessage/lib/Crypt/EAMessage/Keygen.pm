@@ -4,7 +4,7 @@
 #
 
 package Crypt::EAMessage::Keygen;
-$Crypt::EAMessage::Keygen::VERSION = '1.220391';
+$Crypt::EAMessage::Keygen::VERSION = '1.232011';
 use v5.22;
 
 use strict;
@@ -36,7 +36,7 @@ Crypt::EAMessage::Keygen
 
 =head1 VERSION
 
-version 1.220391
+version 1.232011
 
 =head1 SYNOPSIS
 

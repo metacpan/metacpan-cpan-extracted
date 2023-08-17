@@ -38,7 +38,7 @@ enum {
   FORBID_LOOPEX_DEFAULT = (1<<0),
 };
 
-static void walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *permittedgotos, const char *blockname)
+static OPCODE walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *permittedgotos)
 {
   bool is_loop = FALSE;
   SV *labelsv = NULL;
@@ -47,7 +47,7 @@ static void walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *perm
     case OP_NEXTSTATE:
     case OP_DBSTATE:
       PL_curcop = (COP *)o;
-      return;
+      return 0;
 
     case OP_RETURN:
       goto forbid;
@@ -117,18 +117,21 @@ static void walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *perm
     }
 
 forbid:
-      croak("Can't \"%s\" out of %s", PL_op_name[o->op_type], blockname);
+      return o->op_type;
 
     default:
       break;
   }
 
   if(!(o->op_flags & OPf_KIDS))
-    return;
+    return 0;
 
   OP *kid = cUNOPo->op_first;
   while(kid) {
-    walk_ops_forbid(aTHX_ kid, flags, permittedloops, permittedgotos, blockname);
+    OPCODE ret = walk_ops_forbid(aTHX_ kid, flags, permittedloops, permittedgotos);
+    if(ret)
+      return ret;
+
     kid = OpSIBLING(kid);
 
     if(is_loop) {
@@ -144,6 +147,8 @@ forbid:
     else
       hv_delete_ent(permittedloops, labelsv, 0, 0);
   }
+
+  return 0;
 }
 
 #ifndef forbid_outofblock_ops
@@ -161,7 +166,32 @@ static void S_forbid_outofblock_ops(pTHX_ OP *o, const char *blockname)
 
   walk_ops_find_labels(aTHX_ o, gotolabels);
 
-  walk_ops_forbid(aTHX_ o, FORBID_LOOPEX_DEFAULT, looplabels, gotolabels, blockname);
+  OPCODE forbidden = walk_ops_forbid(aTHX_ o, FORBID_LOOPEX_DEFAULT, looplabels, gotolabels);
+  if(forbidden)
+    croak("Can't \"%s\" out of %s", PL_op_name[forbidden], blockname);
+
+  LEAVE;
+}
+#endif
+
+#ifndef warn_outofblock_ops
+#  define warn_outofblock_ops(o, fmt)  S_warn_outofblock_ops(aTHX_ o, fmt)
+static void S_warn_outofblock_ops(pTHX_ OP *o, const char *fmt)
+{
+  ENTER;
+  SAVEVPTR(PL_curcop);
+
+  HV *looplabels = newHV();
+  SAVEFREESV((SV *)looplabels);
+
+  HV *gotolabels = newHV();
+  SAVEFREESV((SV *)gotolabels);
+
+  walk_ops_find_labels(aTHX_ o, gotolabels);
+
+  OPCODE forbidden = walk_ops_forbid(aTHX_ o, FORBID_LOOPEX_DEFAULT, looplabels, gotolabels);
+  if(forbidden)
+    warn(fmt, PL_op_name[forbidden]);
 
   LEAVE;
 }

@@ -61,7 +61,7 @@ sub new {
 # Run Operation Request
 # PostWatermarkRequest.File : File to upload  ,
 # PostWatermarkRequest.text :   ,
-# PostWatermarkRequest.color :   ,
+# PostWatermarkRequest.color : e.g. #1032ff  ,
 # PostWatermarkRequest.password :   ,
 # PostWatermarkRequest.checkExcelRestriction :    
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_watermark' } = { 
-    	summary => '',
+    	summary => 'Add Text Watermark to Excel files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -152,7 +152,7 @@ __PACKAGE__->method_documentation({
      'color' => {
      	datatype => 'string',
      	base_name => 'color',
-     	description => '',
+     	description => 'e.g. #1032ff',
      	format => '',
      	read_only => '',
      		},

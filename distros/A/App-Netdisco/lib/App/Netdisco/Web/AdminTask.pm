@@ -84,7 +84,7 @@ ajax "/ajax/control/admin/snapshot_req" => require_role admin => sub {
       if not schema(vars->{'tenant'})->resultset('SNMPObject')->count();
 
     # will store for download and for browsing
-    add_job('snapshot', $device->addr, 'yes') or send_error('Bad device', 400);
+    add_job('snapshot', $device->addr, undef, 'db') or send_error('Bad device', 400);
 };
 
 get "/ajax/content/admin/snapshot_get" => require_role admin => sub {
@@ -103,25 +103,6 @@ ajax "/ajax/control/admin/snapshot_del" => require_role setting('defanged_admin'
 
     schema(vars->{'tenant'})->resultset('DeviceSnapshot')->find($device->addr)->delete;
     schema(vars->{'tenant'})->resultset('DeviceBrowser')->search({ip => $device->addr})->delete;
-};
-
-get '/admin/*' => require_role admin => sub {
-    my ($tag) = splat;
-
-    if (exists setting('_admin_tasks')->{ $tag }) {
-      # trick the ajax into working as if this were a tabbed page
-      params->{tab} = $tag;
-
-      var(nav => 'admin');
-      template 'admintask', {
-        task => setting('_admin_tasks')->{ $tag },
-      }, { layout => 'main' };
-    }
-    else {
-      var('notfound' => true);
-      status 'not_found';
-      template 'index', {}, { layout => 'main' };
-    }
 };
 
 true;

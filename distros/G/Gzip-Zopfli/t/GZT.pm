@@ -24,7 +24,7 @@ sub import
     utf8->import ();
     warnings->import ();
     Test::More->import ();
-    Zopfli::Compress->import (':all');
+    Gzip::Zopfli->import (':all');
     GZT->export_to_level (1);
 }
 

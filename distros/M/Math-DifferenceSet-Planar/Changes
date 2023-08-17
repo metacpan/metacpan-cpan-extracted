@@ -1,5 +1,19 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+1.000   Sat, 08 Jul 2023 06:15:12 +0200
+        - revised data structure
+        - added principal elements arithmetic
+        - introduced three types of reference sets
+        - added mapping sets to lambda and theta
+        - improved compression in database
+        - calculated reference sets for all samples
+        - consolidated and extended example scripts
+        - added handling of large sets
+        - added checks to avoid arithmetic overflow
+        - added class methods for space properties
+        - extended documentation
+        - removed deprecated check_elements method
+
 0.018   Sun, 28 Aug 2022 12:29:16 +0200
         - new methods min_element and max_element
         - new example scripts pds_info and A353077.pl

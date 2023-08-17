@@ -1,5 +1,22 @@
 Revision history for Dist-Zilla-PluginBundle-AVAR
 
+0.35 2023-07-31 16:57:35
+
+    - stop using unused module Moose::Autobox (haarg)
+
+0.34 2016-08-10 13:51:30
+
+    - Stop using the Authority module by default, really, does anyone
+      care about this thing? It was a silly hack of mine at the time.
+
+0.33 2016-08-10 13:46:30
+
+    - We now pass use_begin => 1 to PkgVersion so this Just Works with
+      XS distros.
+
+    - Version 0.32 would only work on perls that had experimental.pm,
+      e.g. not on 5.14.2, just stop using that module & smartmatch.
+
 0.32 2015-02-08 08:48:53
 
     - fix warnings from given/when on perl 5.18+

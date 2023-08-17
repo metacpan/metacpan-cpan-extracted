@@ -1,5 +1,13 @@
 Revision history for Perl module HTML::Make::Page
 
+0.04 2023-07-31
+
+- Change version syntax in use statement (HAARG)
+
+0.03 2023-07-24
+
+- Require HTML::Make version 0.16 due to problems with Perl 5.
+
 0.02 2021-04-06
 
 - Add ability for inline JavaScript in <head>

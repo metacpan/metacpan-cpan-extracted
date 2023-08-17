@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::data::segyread;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SEGYREAD - read an SEG-Y tape						
+ PERL PROGRAM NAME:  SEGYREAD - read an SEG-Y tape						
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

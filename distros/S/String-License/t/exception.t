@@ -1,3 +1,7 @@
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.5.0';
 
@@ -19,15 +23,6 @@ my %crufty = (
 	'Autoconf/pkg.m4'                      => undef,
 	'Bison/grammar.cxx'                    => undef,
 	'Bison/parse-date.c'                   => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
-	''                                     => undef,
 	'Classpath/CDDL-GPL-2-CP'              => undef,
 	'Classpath/GPL-2-CP'                   => undef,
 	'Classpath/LICENSE'                    => undef,
@@ -50,6 +45,7 @@ my %crufty = (
 	'Proguard/LICENSE_exception.md'        => undef,
 	'Qt/kcmaudiocd.h'                      => undef,
 	'Qt/konsolekalendaradd.h'              => undef,
+	'Qt/main.cpp'                          => undef,
 	'Qt/qatomic_aarch64.h'                 => undef,
 	'Qt/qsslconfiguration.h'               => undef,
 	'SDC/sdc.py'                           => undef,
@@ -63,13 +59,15 @@ my $naming
 
 my $todo;
 
-sub parse
+sub parse ($path_string)
 {
-	my $path   = path(shift);
-	my $string = $path->slurp_utf8;
+	my ( $path, $string, $license );
+
+	$path   = path($path_string);
+	$string = $path->slurp_utf8;
 	$string = uncruft($string)
 		if exists $crufty{ $path->relative('t/exception') };
-	my $license = String::License->new(
+	$license = String::License->new(
 		string => $string,
 		naming => $naming,
 	)->as_text;

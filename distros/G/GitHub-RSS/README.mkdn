@@ -1,6 +1,7 @@
 
-[![Travis Build Status](https://travis-ci.org/Corion/GitHub-RSS.svg?branch=master)](https://travis-ci.org/Corion/GitHub-RSS)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/GitHub-RSS?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/GitHub-RSS)
+[![Windows](https://github.com/Corion/GitHub-RSS/workflows/windows/badge.svg)](https://github.com/Corion/GitHub-RSS/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/GitHub-RSS/workflows/macos/badge.svg)](https://github.com/Corion/GitHub-RSS/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/GitHub-RSS/workflows/linux/badge.svg)](https://github.com/Corion/GitHub-RSS/actions?query=workflow%3Alinux)
 
 # NAME
 

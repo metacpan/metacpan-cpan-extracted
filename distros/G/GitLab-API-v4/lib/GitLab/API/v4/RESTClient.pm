@@ -1,5 +1,5 @@
 package GitLab::API::v4::RESTClient;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -9,9 +9,9 @@ GitLab::API::v4::RESTClient - The HTTP client that does the heavy lifting.
 
 =head1 DESCRIPTION
 
-Currently this class uses L<HTTP::Tiny> and L<JSON> to do its job.  This may
-change, and the interface may change, so documentation is lacking in order
-to not mislead people.
+Currently this class uses L<HTTP::Tiny> and L<JSON::MaybeXS> to do its job.
+This may change, and the interface may change, so documentation is lacking in
+order to not mislead people.
 
 If you do want to customize how this class works then take a look at the
 source.
@@ -40,7 +40,7 @@ and you will have encountered an error when making the request
 use Carp qw();
 use HTTP::Tiny::Multipart;
 use HTTP::Tiny;
-use JSON;
+use JSON::MaybeXS;
 use Log::Any qw( $log );
 use Path::Tiny;
 use Try::Tiny;
@@ -102,7 +102,7 @@ has http_tiny => (
     isa => InstanceOf[ 'HTTP::Tiny' ],
 );
 sub _build_http_tiny {
-    return HTTP::Tiny->new();
+    return HTTP::Tiny->new( verify_SSL => 1 );
 }
 
 has json => (
@@ -110,7 +110,7 @@ has json => (
     isa => HasMethods[ 'encode', 'decode' ],
 );
 sub _build_json {
-    return JSON->new->utf8->allow_nonref();
+    return JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);
 }
 
 has http_tiny_request => (
@@ -271,9 +271,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
+See L<GitLab::API::v4/LICENSE>.
 
 =cut
 

@@ -11,9 +11,9 @@ use Perinci::To::POD;
 use Sub::Identify qw(sub_fullname);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-04-14'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Rinci'; # DIST
-our $VERSION = '0.785'; # VERSION
+our $VERSION = '0.786'; # VERSION
 
 our $pa = Perinci::Access::Perl->new;
 
@@ -21,6 +21,9 @@ our $pa = Perinci::Access::Perl->new;
 has exclude_modules => (
     is => 'rw',
     isa => 'Str',
+    default => sub {
+        '\\A(Sah::SchemaR::.+|Pod::Weaver::Plugin::Rinci)\\z';
+    }
 );
 has exclude_files => (
     is => 'rw',
@@ -302,7 +305,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.785 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2023-03-02.
+This document describes version 0.786 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2023-04-14.
 
 =head1 SYNOPSIS
 
@@ -445,6 +448,10 @@ Bool. Used to set the default for the C</force_reload> configuration option.
 
 String (regex pattern). Used to set the default value for the
 C</exclude_modules> configuration option.
+
+By default, if this is not specified, then some modules are by default skipped:
+
+ '\\A(Sah::SchemaR::.+|Pod::Weaver::Plugin::Rinci)\\z'
 
 =head2 PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES
 

@@ -12,7 +12,7 @@ Validate::CodiceFiscale - Validate an Italian "Codice Fiscale"
 
 =head1 VERSION
 
-This document describes Validate::CodiceFiscale version 0.001.
+This document describes Validate::CodiceFiscale version 0.004.
 
 =begin html
 
@@ -71,8 +71,8 @@ Module usage:
             name => 'Foo',
             surname => 'Bar',
             sex => 'f',
-            birthdate => '1998-03-11',
-            birthplace => 'B833',
+            date => '1998-03-11',
+            place => 'B833',
          }
       }
    );
@@ -112,17 +112,17 @@ of an uppercase o letter, or similar errors with other digits/letters.
 The validation can optionally take additional data regarding the name,
 surname, birth date, birth place, and sex to perform a more thorough
 validation based on the official rules. This part is subject to false
-positives for the following reasons:
+validations (negative or positive) for the following reasons:
 
 =over
 
 =item *
 
-Places are required to be entered as official codes, but there is no
-validation that the specific code was active at the date of birth in the
-Codice Fiscale. As an example, the C<$valid> Codice Fiscale in the
-L</SYNOPSIS> is syntactally valid, but otherwise impossible because code
-C<B833> disappeared in 1995 (two places were merged together).
+Places are generally validated against available data collected from
+L<ANPR|https://www.anagrafenazionale.interno.it/> and
+L<ISTAT|https://www.istat.it/>, but they might be lacking. Additionally,
+there is no attempt at matching I<similar> names, or names that are
+valid but e.g. expressed in their original language.
 
 =item *
 
@@ -133,11 +133,14 @@ tell whether the specific person holds the specific variant of the code.
 
 =back
 
-So well... use it to spot negatives, but don't trust positives too much.
+In the end, it provides a reaasonable way of spotting negatives, but it
+might validate codes that would otherwise be considered invalid by the
+reference authority because there is nobody tied to the otherwise
+synctactically valid code.
 
 =head1 INTERFACE
 
-There are three main functions for doing checks, each targeting a
+There are four main functions for doing checks, each targeting a
 different I<style> of use, plus an additional function that can be
 helpful for one-liners.
 
@@ -174,8 +177,7 @@ collect all errors to be fed into the exception, not only the first one.
 =item C<data>
 
 pass additional data for validation, as a hash reference optionally
-containing keys C<name>, C<surname>, C<birthdate>, C<sex>,
-C<birthplace>.
+containing keys C<name>, C<surname>, C<date>, C<sex>, and C<place>.
 
 =item C<on_error>
 
@@ -189,6 +191,74 @@ be used as the argument for C<die>.
 
 =back
 
+=head2 B<< decode_cf >>
+
+   my $decoded = decode_cf($cf, %options);
+
+Perform a full validation and provides back a data structure with the
+parsed data and the outcome of all available tests. This is the most
+complete form of validation that can be performed by this module.
+
+Supported options:
+
+=over
+
+=item C<data>
+
+pass additional data for validation, as a hash reference optionally
+containing keys C<name>, C<surname>, C<date>, C<sex>, and C<place>.
+
+=item C<years_baseline>
+
+the baseline year for disambiguating two-digits. As an example, people
+born in 1920 and people born in 2020 both have C<20> as the year part in
+their respective codes, so this allows setting the right expectation. In
+lack of this parameter, whatever came last is selected (in the example
+above, C<20> would be interpreted as C<2020>).
+
+=back
+
+The output data structure contains the following keys:
+
+=over
+
+=item C<errors>
+
+pointing to an array reference with a list of validation errors (if
+any);
+
+=item C<portions>
+
+pointing to a hash reference with the disassemble of the input data, if
+possible (it is always possible as long as the input length is 16
+characters).
+
+=item C<date>
+
+as C<YYYY-MM-DD>)
+
+=item C<place>
+
+as string of characters
+
+=item C<sex>
+
+as a single-letter character, either C<F> or C<M>
+
+=item C<year>
+
+=item C<month>
+
+=item C<day>
+
+as integers.
+
+=back
+
+The decoded data can be useful to perform further validations, e.g. for
+validating the place name in cases that are not covered by this module
+(e.g. when expressed in a language different from Italian, etc.).
+
 =head2 B<< is_valid_cf >>
 
    my $boolean = is_valid_cf($cf, %options);
@@ -198,7 +268,7 @@ boolean value.
 
 It's possible to pass an additional key/value pair with key C<data> and
 a hash reference optionally containing keys C<name>, C<surname>,
-C<birthdate>, C<sex>, C<birthplace>.
+C<date>, C<sex>, and C<place>.
 
 
 =head2 B<< r >>
@@ -230,8 +300,15 @@ error.
 =item C<data>
 
 pass additional data for validation, as a hash reference optionally
-containing keys C<name>, C<surname>, C<birthdate>, C<sex>,
-C<birthplace>.
+containing keys C<name>, C<surname>, C<date>, C<sex>, and C<place>.
+
+=item C<years_baseline>
+
+the baseline year for disambiguating two-digits. As an example, people
+born in 1920 and people born in 2020 both have C<20> as the year part in
+their respective codes, so this allows setting the right expectation. In
+lack of this parameter, whatever came last is selected (in the example
+above, C<20> would be interpreted as C<2020>).
 
 =back
 
@@ -254,6 +331,12 @@ Flavio Poletti <flavio@polettix.it>
 
 =head1 COPYRIGHT AND LICENSE
 
+This distribution is mainly composed of code, but it also includes
+I<data> (in the C<__DATA__> section of the module) that is derived from
+publicly available data sources.
+
+=head2 Code
+
 Copyright 2023 by Flavio Poletti <flavio@polettix.it>
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -268,5 +351,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+=head2 Data
+
+The data contained in the C<__DATA__> section of the main module is
+assembled from the following sources:
+
+=over
+
+=item *
+
+Archive of Italian codes for places, including periods of validity, from file
+L<ANPR_archivio_comuni.csv|https://www.anagrafenazionale.interno.it/wp-content/uploads/ANPR_archivio_comuni.csv>, available from Italian Ministero
+dell'Interno with license L<CC-BY 4.0|https://creativecommons.org/licenses/by/4.0/legalcode.it> (according to page L<Note legali|https://www.anagrafenazionale.interno.it/note-legali/> as of 2023-08-06).
+The file is accessible from page L<Archivio storico dei comuni|https://www.anagrafenazionale.interno.it/area-tecnica/archivio-storico-dei-comuni/>.
+
+=item *
+
+Archive of codes for foreign places, from file L<Elenco codici e denominazioni delle unità territoriali estere|https://www.istat.it/it/files//2011/01/Elenco-codici-e-denominazioni-unita-territoriali-estere.zip>, available from
+L<ISTAT|https://www.istat.it/> with license L<CC-BY 3.0|http://creativecommons.org/licenses/by/3.0/it/> (according to page L<Note legali: responsabilità e licenza|https://www.istat.it/it/note-legali> as of 2023-08-06).
+The file is accessible from page L<Codici delle unità territoriali estere|https://www.istat.it/it/archivio/6747>.
+
+=back
 
 =cut

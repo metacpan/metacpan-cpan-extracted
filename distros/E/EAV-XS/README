@@ -223,6 +223,18 @@ METHODS
         "example.", "onion." and also Second Level Domains, such as,
         "example.com.", "example.net." and "example.org.".
 
+    *   TLD_ALL - all flags above OR'ed:
+
+          TLD_ALL = TLD_NOT_ASSIGNED |
+                    TLD_COUNTRY_CODE |
+                    TLD_GENERIC |
+                    TLD_GENERIC_RESTRICTED |
+                    TLD_INFRASTRUCTURE |
+                    TLD_SPONSORED |
+                    TLD_TEST |
+                    TLD_SPECIAL |
+                    TLD_RETIRED
+
     For instance, to allow only country-code and generic TLDs you have to
     write this:
 

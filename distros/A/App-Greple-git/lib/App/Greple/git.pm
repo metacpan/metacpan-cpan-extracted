@@ -1,6 +1,28 @@
 package App::Greple::git;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
+
+use v5.14;
+use warnings;
+
+use Data::Dumper;
+use App::Greple::Common;
+use List::Util qw(any);
+
+use File::Spec::Functions qw(canonpath);
+*canon = \&canonpath;
+
+sub git_file_or_die {
+    my %arg = @_;
+    my $name = delete $arg{&FILELABEL} or die;
+    my $path = canon($name);
+    state $git_files //= do {
+	my @files = `git ls-files`;
+	chomp @files;
+	+{ map { canon($_) => 1 } @files };
+    };
+    $git_files->{$path} or die "SKIP $name";
+}
 
 1;
 
@@ -16,7 +38,7 @@ git - Greple git module
 
 =head1 DESCRIPTION
 
-App::Greple::git is a greple module to handle git output.
+App::Greple::git is a greple module to support git command
 
 =head1 OPTIONS
 
@@ -58,6 +80,14 @@ field name as a parameter.  B<--color-header-by-author> is defined as
 follows:
 
     option --color-header-by-author --color-header-by-field Author
+
+=item B<--only-git-files>
+
+Only files under git control from a given file are processed, all
+other files are ignored.  This option is intended to be used in
+combination with B<--glob> or other options that allow many files to
+be processed at once.  To target all files under git control, use the
+B<--git> option in the B<-Mdig> module.
 
 =back
 
@@ -136,3 +166,15 @@ option --color-header-by-field \
 
 option --color-header-by-author \
 	--color-header-by-field Author
+
+define :CM_1: ^<<<<<<<.*\n
+define :CM_2: ^=======.*\n
+define :CM_3: ^>>>>>>>.*\n
+
+option --color-cm \
+	--need 0 --all \
+	--re :CM_1:|:CM_2:|:CM_3: --cm Y \
+	--re :CM_1:\\K(?s:.*?)(?=:CM_2:) --cm C \
+	--re :CM_2:\\K(?s:.*?)(?=:CM_3:) --cm M
+
+option --only-git-files --begin __PACKAGE__::git_file_or_die

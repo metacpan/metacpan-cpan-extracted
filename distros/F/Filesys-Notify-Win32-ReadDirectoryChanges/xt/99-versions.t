@@ -8,12 +8,6 @@ use strict;
 use File::Find;
 use Test::More;
 
-BEGIN {
-    if( $^O ne 'MSWin32' ) {
-        plan skip_all => "This module only works on Windows";
-        exit;
-    };
-}
 require './Makefile.PL';
 # Loaded from Makefile.PL
 our %module = get_module_info();

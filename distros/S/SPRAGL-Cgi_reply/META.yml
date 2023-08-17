@@ -1,0 +1,32 @@
+---
+abstract: 'Simple HTTP replies.'
+author:
+  - 'Bjoern Hee <github@spredehagl.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SPRAGL-Cgi_reply
+provides:
+  SPRAGL::Cgi_reply:
+    file: lib/SPRAGL/Cgi_reply.pm
+    version: '1.3'
+requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  JSON: '0'
+resources:
+  bugtracker: https://github.com/spragl/Cgi_reply/issues
+  license: http://apache.org/licenses/LICENSE-2.0
+  repository: https://github.com/spragl/Cgi_reply
+version: '1.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

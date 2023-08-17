@@ -1,6 +1,46 @@
 CHANGES
 -------
 
+  2.206 25 July 2023
+
+    * 2.206
+      Tue, 25 Jul 2023 16:21:41 +0100
+      8cb376d21785d7304586cd03d528a9d2d56aeb58
+
+    * drop rt.cpan from SUPPORT section
+      Tue, 18 Jul 2023 09:22:56 +0100
+      4dba5be3e368bc6681a229294a07e34abcae858d
+
+  2.205 8 February 2023
+
+    * 2.205
+      Sun, 16 Jul 2023 16:21:33 +0100
+      62de94af7f8328691abbadbeeb0f2b5effc551b2
+
+    * Test::More::isn't warns in perl 5.38
+      Sun, 9 Jul 2023 21:52:47 +0100
+      cab526b7f1d8fed30e30f3a16c07af66d5b4d4b5
+
+    * Add perl 5.38 & run cron for upstream repos
+      Sun, 9 Jul 2023 21:49:34 +0100
+      6c9f55033f725eab641411a1ac7f54f26250eeef
+
+    * add on workflow_dispatch
+      Fri, 9 Jun 2023 16:32:22 +0100
+      4d3a1d1a261be3599eee48ba28c349a7fc0f1750
+
+    * fix reference to github issue
+      Mon, 22 May 2023 12:37:07 +0100
+      edcb04c0b3bdbc2893654fcc7600474ba090c77a
+
+    * Fix to allow building with C++17 register keyword not allowed in C++17 https://github.com/pmqs/Compress-Raw-Bzip2/issues/11
+      Mon, 22 May 2023 12:29:30 +0100
+      9357289d218d14d64fc31cfa8ae5746a6dcbfca3
+
+    * Silence warnings on HPUX https://github.com/pmqs/Compress-Raw-Bzip2/issues/10
+      Thu, 23 Mar 2023 14:05:43 +0000
+      1418b2afd5b16bb9ddbc19e377c16c6af113d64f
+
   2.204 8 February 2023
 
     * Cast isdigit argument as unsigned char

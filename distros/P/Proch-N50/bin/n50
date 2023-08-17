@@ -583,7 +583,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.5.6
+version 1.5.8
 
 =head1 SYNOPSIS
 
@@ -591,12 +591,15 @@ version 1.5.6
 
 =head1 DESCRIPTION
 
-This program parses a list of FASTA/FASTQ files calculating for each one the
-number of sequences, the sum of sequences lengths and the N50, N75, N90 and auN*.
+This program parses a list of B<FASTA/FASTQ> files calculating for each one the
+number of sequences, the sum of sequences lengths and the N50, N75, N90 and 
+L<auN|https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>.
 It will print the result in different formats, by default only the N50 is printed
 for a single file and all metrics in TSV format for multiple files.
 
-I<*>: See L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>
+If a single file is provided, by default the output will be the N50 value only.
+If multiple files are provided, by default the output will be a TSV table with
+filename and N50 for each file. More output formats are available (see below).
 
 =head1 PARAMETERS
 
@@ -796,7 +799,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
+This software is Copyright (c) 2018-2023 by Andrea Telatin.
 
 This is free software, licensed under:
 

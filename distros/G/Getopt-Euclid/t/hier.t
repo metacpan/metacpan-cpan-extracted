@@ -21,6 +21,7 @@ BEGIN {
     chmod 0644, $0;
 }
 
+use lib '.';
 use t::lib::HierDemo;
 use Test::More 'no_plan';
 

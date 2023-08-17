@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -30,13 +29,13 @@ is( $widget->cols, 16, '$widget->cols after ->add' );
 is( $widget->rowcount, 2, '$widget->rowcount' );
 is( $widget->colcount, 2, '$widget->colcount' );
 
-identical( $widget->get( 0, 0 ), $statics[0], '->get( 0, 0 )' );
-identical( $widget->get( 1, 1 ), $statics[3], '->get( 1, 1 )' );
+ref_is( $widget->get( 0, 0 ), $statics[0], '->get( 0, 0 )' );
+ref_is( $widget->get( 1, 1 ), $statics[3], '->get( 1, 1 )' );
 
-is_deeply( [ $widget->get_row( 0 ) ], [ $statics[0], $statics[1] ],
+is( [ $widget->get_row( 0 ) ], [ exact_ref($statics[0]), exact_ref($statics[1]) ],
    '$widget->get_row' );
 
-is_deeply( [ $widget->get_col( 0 ) ], [ $statics[0], $statics[2] ],
+is( [ $widget->get_col( 0 ) ], [ exact_ref($statics[0]), exact_ref($statics[2]) ],
    '$widget->get_col' );
 
 $widget->set_window( $win );
@@ -111,8 +110,8 @@ is_display( \@screen,
 
    is( $widget->rowcount, 3, '->rowcount after ->insert_row' );
 
-   identical( $widget->get( 1, 0 ), $more_statics[0], '->get on new row' );
-   identical( $widget->get( 2, 0 ), $statics[2], '->get on existing moved row' );
+   ref_is( $widget->get( 1, 0 ), $more_statics[0], '->get on new row' );
+   ref_is( $widget->get( 2, 0 ), $statics[2], '->get on existing moved row' );
 
    flush_tickit;
 
@@ -139,8 +138,8 @@ is_display( \@screen,
 
    is( $widget->colcount, 3, '->colcount after ->insert_col' );
 
-   identical( $widget->get( 0, 1 ), $more_statics[0], '->get on new col' );
-   identical( $widget->get( 0, 2 ), $statics[1], '->get on existing moved col' );
+   ref_is( $widget->get( 0, 1 ), $more_statics[0], '->get on new col' );
+   ref_is( $widget->get( 0, 2 ), $statics[1], '->get on existing moved col' );
 
    flush_tickit;
 
@@ -187,9 +186,9 @@ is_display( \@screen,
       { child => Tickit::Widget::Static->new( text => "right" ), col_expand => 1 }
    ] );
 
-   is_deeply( { $gridbox->child_opts( $gridbox->get( 0, 1 ) ) },
-      { col_expand => 1, row_expand => 0 },
-      '->append_row accepts hashes with extra opts' );
+   is( { $gridbox->child_opts( $gridbox->get( 0, 1 ) ) },
+       { col_expand => 1, row_expand => 0 },
+       '->append_row accepts hashes with extra opts' );
 }
 
 # append_col with options
@@ -200,9 +199,9 @@ is_display( \@screen,
       { child => Tickit::Widget::Static->new( text => "bottom" ), row_expand => 1 }
    ] );
 
-   is_deeply( { $gridbox->child_opts( $gridbox->get( 1, 0 ) ) },
-      { col_expand => 0, row_expand => 1 },
-      '->append_col accepts hashes with extra opts' );
+   is( { $gridbox->child_opts( $gridbox->get( 1, 0 ) ) },
+       { col_expand => 0, row_expand => 1 },
+       '->append_col accepts hashes with extra opts' );
 }
 
 done_testing;

@@ -64,7 +64,7 @@ is $contact->name, "Fritz M\x{fc}ller", "We store and retrieve the name immediat
 (my $existing) = grep { my $c = $_;
                         grep { $_->{content} eq $manual_number } @{$c->numbers}
                       } @{ $phonebook->entries };
-if( isn't $existing, undef, "The manually entered contact does exist" ) {
+if( isnt $existing, undef, "The manually entered contact does exist" ) {
     if( !is $existing->name, $contact->name, "The name (and encoding) match") {
         diag Dumper( $existing->name );
         diag Dumper $existing->numbers;
@@ -106,7 +106,7 @@ $phonebook->reload;
 ($existing) = grep { my $c = $_;
                         grep { $_->{content} eq $number } @{$c->numbers}
                       } @{ $phonebook->entries };
-isn't $existing, undef, "Our contract exists now";
+isnt $existing, undef, "Our contract exists now";
 if(! is $existing->{name}, $name, "We retrieve the same name we wrote") {
     diag 'Got:      ' . Dumper $existing->{name};
     diag 'Expected: ' . Dumper $name;
@@ -126,7 +126,7 @@ SKIP: {
         fail "Our contact exists now";
         skip "No contact, no name to check", 2;
     } else {
-        isn't $existing2, undef, "Our contact exists now";
+        isnt $existing2, undef, "Our contact exists now";
         if(! is $existing2->{name}, $name, "We retrieve the same name we wrote") {
             diag 'Got:      ' . Dumper $existing2->{name};
             diag 'Expected: ' . Dumper $name;

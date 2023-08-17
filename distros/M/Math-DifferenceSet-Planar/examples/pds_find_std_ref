@@ -1,0 +1,188 @@
+#!/usr/bin/env perl
+
+# Given sample planar difference sets, find the lexically first
+# zeta-canonical sets of their respective spaces, without using
+# features introduced in Math::DifferenceSet::Planar v1.000.
+
+use strict;
+use warnings;
+use Math::Prime::Util qw(invmod mulmod);
+use Math::DifferenceSet::Planar 0.016;
+
+$| = 1;
+
+my $USAGE = "usage: pds_find_std_ref [file]...\n";
+
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if '-' eq $opt;
+    die $USAGE;
+}
+
+while(<<>>) {
+    s/^\s+//;
+    my @list = split /\s+/;
+    next if !@list;
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @list;
+    my $s1 =
+        Math::DifferenceSet::Planar->from_elements_fast(@list)->zeta_canonize;
+    @list  = $s1->elements_sorted;
+
+    # get main elements of the plane of the sample
+    my $order = $s1->order;
+    my $mult  = $s1->multipliers;
+    my $base  = $s1->order_base;
+    my $mod   = $s1->modulus;
+    my @supp  = my @princ = my @divs = ();
+    my %todo  = map {($_ => 1)} @list;
+    foreach my $start (@list) {
+        next if !exists $todo{$start};
+        delete $todo{$start};
+        my $this  = mulmod($start, $base, $mod);
+        my $count = 1;
+        while ($this != $start) {
+            delete $todo{$this};
+            ++$count;
+            $this = mulmod($this, $base, $mod);
+        }
+        if ($count == $mult) {
+            my $div = invmod($start, $mod);
+            if (defined $div) {
+                push @divs, $div;
+                push @princ, $start;
+            }
+            else {
+                push @supp, [$count, $start];
+            }
+        }
+        elsif ($count > 2) {
+            push @supp, [$count, $start];
+        }
+    }
+    if (!@divs) {
+        # plane has no principal elements, consider all rotators
+        my $it = $s1->iterate_rotators;
+        while (my $r = $it->()) {
+            push @divs, $r;
+        }
+    }
+
+    # compute main elements of candidate reference sets and keep best set
+    my $bf = shift @divs;
+    my @best = ();
+    foreach my $p (@princ) {
+        my $t = my $t0 = mulmod($bf, $p, $mod);
+        next if $t0 == 1;
+        foreach my $m (2 .. $mult) {
+            $t = mulmod($t, $base, $mod);
+            $t0 = $t if $t0 > $t;
+        }
+        push @best, $t0;
+    }
+    foreach my $cs (@supp) {
+        my ($c, $s) = @{$cs};
+        $s = my $s0 = mulmod($bf, $s, $mod);
+        foreach my $m (2 .. $c) {
+            $s = mulmod($s, $base, $mod);
+            $s0 = $s if $s0 > $s;
+        }
+        push @best, $s0;
+    }
+    @best = sort { $a <=> $b } @best;
+    DIV:
+    foreach my $div (@divs) {
+        my @this = ();
+        foreach my $p (@princ) {
+            my $t = my $t0 = mulmod($div, $p, $mod);
+            next if $t0 == 1;
+            foreach my $m (2 .. $mult) {
+                $t = mulmod($t, $base, $mod);
+                $t0 = $t if $t0 > $t;
+            }
+            push @this, $t0;
+        }
+        foreach my $cs (@supp) {
+            my ($c, $s) = @{$cs};
+            $s = my $s0 = mulmod($div, $s, $mod);
+            foreach my $m (2 .. $c) {
+                $s = mulmod($s, $base, $mod);
+                $s0 = $s if $s0 > $s;
+            }
+            push @this, $s0;
+        }
+        @this = sort { $a <=> $b } @this;
+        foreach my $i (0 .. $#best) {
+            my $cmp = $this[$i] <=> $best[$i];
+            if ($cmp) {
+                if ($cmp < 0) {
+                    $bf = $div;
+                    @best = @this;
+                }
+                next DIV;
+            }
+        }
+        die "assertion failed: non-unique principal rotations";
+    }
+    my @e = $s1->multiply($bf)->elements_sorted;
+    print "@e\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_find_std_ref - find lambda one planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_find_std_ref [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line,
+as integer numbers separated by whitespace, finds from each of their
+respective spaces the lexically first zeta-canonical set, and prints the
+results.  It can be used to get standard reference sets from arbitrary
+sample sets and actually was used to prepare various collections of
+pre-computed sets for Math::DifferenceSet::Planar.
+
+For these sets, by definition, lambda is one and theta is zero.
+
+The algorithm uses the fact that, unless the order is four, one of the
+principal elements of the desired reference set has to be equal to one
+and thus the lambda value of an arbitrary zeta-canonical set is always
+one of its principal elements.  With the principal elements of the
+plane of the sample set as candidates for lambda, that many candidate
+references sets are calculated and the lexically lowest one is the result.
+Comparison of sets is sped up by just looking at main elements.  In total,
+for order n, the complexity is only O(n^2) modular integer operations.
+
+If the order is four there are no principal elements, and candidate lambda
+values are simply taken from a rotator base (containing two elements).
+Taking candidates from rotator bases in general, rather than just in this
+exceptional case, would increase the complexity by one order of magnitude.
+
+The computation of main elements is done explicitly here without
+using Math::DifferenceSet::Planar methods, to illustrate all essential
+components of the algorithm in one place.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

@@ -1,10 +1,42 @@
 ==================================================
-Changes from 2021-12-04 00:00:00 +0000 to present.
+Changes from 2022-08-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2022-12-04 21:15:15 +0000
+version 0.017 at 2023-08-10 00:43:13 +0000
 ------------------------------------------
+
+  Change: 0d3f707965dd08671fecb3d3218d52c51727af80
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2023-08-09 21:40:23 +0000
+
+    Merge pull request #10 from glasswalk3r/bugfix/windows
+
+    Bugfix/windows 
+
+  Change: 2c25a300abed25b53ce50c5c27bcfc6d3db86b1f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2023-07-30 00:31:52 +0000
+
+    fix: windows home dir 
+
+  Change: 8f065fa6dd1643cf4d31368bf7058d6783122d36
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2023-07-29 19:50:37 +0000
+
+    fix: avoiding warnings 
+
+  Change: 3bd5d9f55a786e67bbaafd9df07d0e3556b719cf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2023-07-29 19:49:38 +0000
+
+    fix: getting error string 
+
+  Change: d1edc26ba049244dd8c65b837c3ff90175f245ef
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2023-07-29 19:48:53 +0000
+
+    version bump 
 
   Change: bf9933e20b83668c7d3d917be1ad1090813a2935
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

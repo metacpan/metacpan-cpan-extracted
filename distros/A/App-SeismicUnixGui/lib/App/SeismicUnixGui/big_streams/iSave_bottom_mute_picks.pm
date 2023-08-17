@@ -6,6 +6,8 @@ use aliased 'App::SeismicUnixGui::misc::message';
 use aliased 'App::SeismicUnixGui::misc::flow';
 use aliased 'App::SeismicUnixGui::sunix::shell::cp';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
+use App::SeismicUnixGui::misc::SeismicUnix qw($itemp_bot_mute_picks_sorted_par_ $ibot_mute_par_ 
+$ibottom_mute_file_list $suffix_txt );
 
 =head1 DOCUMENTATION
 
@@ -82,12 +84,11 @@ my $iSave_bot_mute_picks = {
 
 =head2
 
- Import file-name  and directory definitions
+ Import directory definitions
 
 =cut 
 
-use App::SeismicUnixGui::misc::SeismicUnix qw($itemp_bot_mute_picks_sorted_par_ $ibot_mute_par_);
-my ($PL_SEISMIC) = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine clear
 
@@ -168,12 +169,12 @@ sub calc {    #
       . $iSave_bot_mute_picks->{_gather_num};
 
     $iSave_bot_mute_picks->{_inbound} =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $itemp_bot_mute_picks_sorted_par_
       . $iSave_bot_mute_picks->{_file_in};
 
     $iSave_bot_mute_picks->{_outbound} =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $ibot_mute_par_
       . $iSave_bot_mute_picks->{_file_in}
       . $suffix;
@@ -181,6 +182,20 @@ sub calc {    #
     $cp->from( $iSave_bot_mute_picks->{_inbound} );
     $cp->to( $iSave_bot_mute_picks->{_outbound} );
     $cp[1] = $cp->Step();
+    
+    
+=head2
+
+    append file name to an output list
+    ibottom_mute_file_list
+    
+=cut
+
+	my $append = ("echo $ibot_mute_par_$iSave_bot_mute_picks->{_file_in}$suffix >>\\
+	$DATA_SEISMIC_TXT/$ibottom_mute_file_list$suffix_txt");
+        
+	system($append);
+	print("$append\n");
 
 =head2
 

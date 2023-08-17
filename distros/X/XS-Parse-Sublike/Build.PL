@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -5,6 +6,9 @@ use lib 'inc';
 use Module::Build::with::XSTests;
 
 my @extra_compiler_flags = qw( -I. -Ihax );
+
+# Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
+push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
@@ -16,8 +20,7 @@ my $build = Module::Build::with::XSTests->new(
    },
    test_requires => {
       'Sub::Util' => 0,
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

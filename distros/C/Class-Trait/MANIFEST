@@ -56,3 +56,4 @@ t/test_lib/TSimple.pm
 t/test_lib/TSpouse.pm
 t/test_lib/TSyncRead.pm
 t/test_lib/Ttitle.pm
+META.json

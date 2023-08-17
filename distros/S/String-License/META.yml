@@ -28,37 +28,37 @@ optional_features: {}
 provides:
   String::License:
     file: lib/String/License.pm
-    version: v0.0.5
+    version: v0.0.9
   String::License::Naming:
     file: lib/String/License/Naming.pm
-    version: v0.0.5
+    version: v0.0.9
   String::License::Naming::Custom:
     file: lib/String/License/Naming/Custom.pm
-    version: v0.0.5
+    version: v0.0.9
   String::License::Naming::SPDX:
     file: lib/String/License/Naming/SPDX.pm
-    version: v0.0.5
+    version: v0.0.9
 recommends:
   re::engine::RE2: '0'
 requires:
   Array::IntSpan: '0'
   Feature::Compat::Class: '0.04'
-  List::SomeUtils: '0'
+  List::Util: '1.45'
   Log::Any: '0'
   Path::Tiny: '0.062'
   Regexp::Pattern: v0.2.12
   Regexp::Pattern::License: v3.4.0
   namespace::clean: '0'
-  perl: '5.012000'
+  perl: '5.020000'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/String-License/project
   bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=String-License
   homepage: https://metacpan.org/pod/String::License
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/p5-string-license
-version: v0.0.5
+version: v0.0.9
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

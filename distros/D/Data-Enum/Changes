@@ -1,5 +1,11 @@
 Revision history for Data-Enum:
 
+v0.2.7    2023-06-11 14:25:38+01:00 Europe/London
+  [Documentation]
+  - Document support policy for older Perl versions.
+
+  - Bump copyright year.
+
 v0.2.6    2022-09-22 16:42:59+01:00 Europe/London
  [Enhancements]
   - Add MATCH method to support use with match::simple.

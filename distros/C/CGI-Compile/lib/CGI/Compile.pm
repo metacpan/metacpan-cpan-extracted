@@ -3,7 +3,7 @@ package CGI::Compile;
 use strict;
 use 5.008_001;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Cwd;
 use File::Basename;
@@ -549,7 +549,7 @@ lestrrat E<lt>lestrrat+github@gmail.comE<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
+Copyright (c) 2023 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

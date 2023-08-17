@@ -1,5 +1,5 @@
 package Pod::Weaver::Section::Support;
-$Pod::Weaver::Section::Support::VERSION = '1.013';
+$Pod::Weaver::Section::Support::VERSION = '1.014';
 # ABSTRACT: Add a SUPPORT section to your POD
 
 use Moose 1.03;
@@ -638,7 +638,7 @@ sub _add_websites
     if ( grep { $_ eq 'all' } @{ $self->websites } )
     {    ## no critic ( BuiltinFunctions::ProhibitBooleanGrep )
         @{ $self->websites } =
-            qw( metacpan search rt ratings kwalitee testers testmatrix deps );
+            qw( metacpan rt kwalitee testers testmatrix deps );
     }
 
     # Make the website links!
@@ -807,7 +807,7 @@ Pod::Weaver::Section::Support - Add a SUPPORT section to your POD
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 DESCRIPTION
 
@@ -1009,27 +1009,11 @@ L<https://metacpan.org/release/Pod-Weaver-Section-Support>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Pod-Weaver-Section-Support>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Section-Support>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Pod-Weaver-Section-Support>
 
 =item *
 

@@ -27,20 +27,20 @@ my $ret_ar = $css->flush(1);
 is_deeply(
 	$ret_ar,
 	[
-		['s', 'table'],
-		['s', 'td'],
-		['s', 'th'],
+		['s', '.table'],
+		['s', '.table td'],
+		['s', '.table th'],
 		['d', 'border', '1px solid #ddd'],
 		['d', 'text-align', 'left'],
 		['e'],
 
-		['s', 'table'],
+		['s', '.table'],
 		['d', 'border-collapse', 'collapse'],
 		['d', 'width', '100%'],
 		['e'],
 
-		['s', 'th'],
-		['s', 'td'],
+		['s', '.table th'],
+		['s', '.table td'],
 		['d', 'padding', '15px'],
 		['e'],
 	],

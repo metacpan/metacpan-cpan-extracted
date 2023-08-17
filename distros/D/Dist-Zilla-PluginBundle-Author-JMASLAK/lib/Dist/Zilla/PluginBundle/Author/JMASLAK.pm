@@ -11,7 +11,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::JMASLAK;
 # ABSTRACT: JMASLAK's Plugin Bundle
-$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.210880';
+$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.231931';
 
 use Moose;
 use Dist::Zilla;
@@ -46,7 +46,6 @@ AUTOPLUG: {
     use Dist::Zilla::Plugin::Test::NoTabs;
     use Dist::Zilla::Plugin::Test::ReportPrereqs;
     use Dist::Zilla::Plugin::Test::TrailingSpace;
-    use Dist::Zilla::Plugin::Test::UnusedVars;
     use Dist::Zilla::Plugin::Test::UseAllModules;
     use Dist::Zilla::Plugin::Test::Version;
 
@@ -101,7 +100,6 @@ sub configure {
     $self->add_plugins('Test::ReportPrereqs');
     $self->add_plugins(
         [ 'Test::TrailingSpace' => { filename_regex => '\.($?:ini|pl|pm|t|txt)\z' } ] );
-    $self->add_plugins('Test::UnusedVars');
     $self->add_plugins('Test::UseAllModules');
     $self->add_plugins('Test::Version');
 
@@ -265,7 +263,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 =head1 VERSION
 
-version 1.210880
+version 1.231931
 
 =head1 DESCRIPTION
 
@@ -316,7 +314,6 @@ It is somewhat equivilent to:
     [Test::TrailingSpace]
     filename_regex = '\.($?:ini|pl|pm|t|txt)\z'
 
-    [Test::UnusedVars]
     [Test::UseAllModules]
     [Test::Version]
     [TestRelease]
@@ -372,7 +369,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018,2020-2021 by Joelle Maslak.
+This software is copyright (c) 2018,2020-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

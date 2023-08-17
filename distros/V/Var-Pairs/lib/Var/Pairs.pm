@@ -1,7 +1,7 @@
 package Var::Pairs;
 use 5.014;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 
 use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -247,8 +247,8 @@ sub _invert {
         croak 'Invalid call to invert() in scalar context';
     }
 
-    given (ref($var_ref) || 'SCALAR') {
-        when ('HASH') {
+    for my $var_type (ref($var_ref) || 'SCALAR') {
+        if ($var_type eq 'HASH') {
             for my $key (keys %{$var_ref}) {
                 my $values = $var_ref->{$key};
                 for my $value ( ref $values eq 'ARRAY' ? @$values : $values ) {
@@ -257,7 +257,7 @@ sub _invert {
                 }
             }
         }
-        when ('ARRAY') {
+        elsif ($var_type eq 'ARRAY') {
             for my $key (0..$#{$var_ref}) {
                 my $values = $var_ref->[$key];
                 for my $value ( ref $values eq 'ARRAY' ? @$values : $values ) {
@@ -266,7 +266,7 @@ sub _invert {
                 }
             }
         }
-        default {
+        else {
             croak "Argument to invert() must be hash or array (not \L$_\E)";
         }
     }
@@ -329,7 +329,7 @@ Var::Pairs - OO iterators and pair constructors for variables
 
 =head1 VERSION
 
-This document describes Var::Pairs version 0.004001
+This document describes Var::Pairs version 0.004002
 
 
 =head1 SYNOPSIS

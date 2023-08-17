@@ -5,17 +5,23 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Trim whitespaces at the beginning and end of string',
+        description => <<'_',
+
+Tabs and newlines will also be trimmed.
+
+_
         examples => [
             {value=>'foo'},
             {value=>' foo ', filtered_value=>'foo'},
+            {value=>"  \tfoo  \n", filtered_value=>'foo', summary=>"Tabs and newlines will also be trimmed"},
         ],
     };
 }
@@ -49,7 +55,7 @@ Data::Sah::Filter::perl::Str::trim - Trim whitespaces at the beginning and end o
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -76,14 +82,13 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Str::trim (fro
 
  "foo" # valid, unchanged
  " foo " # valid, becomes "foo"
+ "  \tfoo  \n" # valid, becomes "foo" (Tabs and newlines will also be trimmed)
 
 =for Pod::Coverage ^(meta|filter)$
 
-L<Data::Sah::Filter::perl::Str::ltrim>
+=head1 DESCRIPTION
 
-L<Data::Sah::Filter::perl::Str::rtrim>
-
-L<Data::Sah::Filter::perl::Str::remove_whitespace>
+Tabs and newlines will also be trimmed.
 
 =head1 HOMEPAGE
 
@@ -92,6 +97,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-F
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Filter>.
+
+=head1 SEE ALSO
+
+L<Data::Sah::Filter::perl::Str::ltrim>
+
+L<Data::Sah::Filter::perl::Str::rtrim>
+
+L<Data::Sah::Filter::perl::Str::remove_whitespace>
 
 =head1 AUTHOR
 

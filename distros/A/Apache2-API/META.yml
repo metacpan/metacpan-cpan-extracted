@@ -1,0 +1,79 @@
+---
+abstract: 'Apache2 API Framework'
+author:
+  - 'Jacques Deguest <jack@deguest.jp>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  Test2::V0: '0.000145'
+  Test::Mock::Apache2: '0.05'
+  Test::MockObject: '1.20180705'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Time: '0'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  APR::Base64: '0'
+  APR::Pool: '0'
+  APR::Request::Apache2: '0'
+  APR::Request::Cookie: '0'
+  APR::Socket: '0'
+  APR::UUID: '0'
+  Apache2::Connection: '0'
+  Apache2::Const: '0'
+  Apache2::Log: '0'
+  Apache2::Reload: '0'
+  Apache2::Request: '0'
+  Apache2::RequestIO: '0'
+  Apache2::RequestRec: '0'
+  Apache2::RequestUtil: '0'
+  Apache2::Response: '0'
+  Apache2::ServerUtil: '0'
+  Apache2::SubRequest: '0'
+  Apache::Test: '0'
+  Cookie: v0.2.4
+  DateTime: '1.57'
+  DateTime::Format::Strptime: '1.79'
+  DateTime::TimeZone: '2.51'
+  DateTime::TimeZone::Catalog::Extend: v0.3.0
+  Devel::Confess: '0'
+  Encode: '3.01'
+  Exporter: '5.70'
+  HTTP::AcceptLanguage: '0.02'
+  JSON: '4.03'
+  JSON::XS: '4.03'
+  Module::Generic: v0.30.5
+  Nice::Try: v1.3.4
+  Regexp::Common: '0'
+  Scalar::Util: '1.50'
+  URI: '0'
+  URI::Escape: '3.31'
+  URI::Query: '0.16'
+  Want: '0.29'
+  parent: '0'
+  perl: '5.026001'
+  strict: '0'
+  utf8: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Apache2-API/issues
+  repository: https://gitlab.com/jackdeguest/Apache2-API
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

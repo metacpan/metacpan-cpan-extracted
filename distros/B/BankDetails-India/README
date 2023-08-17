@@ -1,0 +1,26 @@
+BankDetails::India
+
+BankDetails::India is a Perl module that provides an interface to fetch bank details using the IFSC code in India.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DOCUMENTATION
+
+You can find documentation for this module with the perldoc command:
+
+    perldoc BankDetails::India
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+COPYRIGHT
+
+(c) 2023, Rohit Manjrekar

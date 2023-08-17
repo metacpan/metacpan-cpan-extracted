@@ -325,7 +325,7 @@ METHODS
     FIELD has no default value. ORDER defaults to ASC(ending). DESC(ending)
     is also a valid value for OrderBy.
 
-    FIELD also accepts "FUNCTION(FIELD)" format.
+    FIELD also accepts FUNCTION(FIELD) format.
 
   OrderByCols ARRAY
     OrderByCols takes an array of paramhashes of the form passed to OrderBy.

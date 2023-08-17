@@ -19,10 +19,10 @@ name: App-DistUtils
 provides:
   App::DistUtils:
     file: lib/App/DistUtils.pm
-    version: '0.153'
+    version: '0.154'
 requires:
   Complete::Dist: '0'
-  Complete::Module: '0.262'
+  Complete::Module: '0.263'
   Cwd: '0'
   Dist::Util: '0.070'
   Dist::Util::Debian: '0.006'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DistUtils
   homepage: https://metacpan.org/release/App-DistUtils
   repository: git://github.com/perlancar/perl-App-DistUtils.git
-version: '0.153'
+version: '0.154'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -49,7 +49,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.031'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -219,7 +219,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

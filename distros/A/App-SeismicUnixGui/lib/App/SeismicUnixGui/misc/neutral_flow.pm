@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::neutral_flow;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: neutral_flow.pm
+ PERL PERL PROGRAM NAME: neutral_flow.pm
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 8 2018 
 

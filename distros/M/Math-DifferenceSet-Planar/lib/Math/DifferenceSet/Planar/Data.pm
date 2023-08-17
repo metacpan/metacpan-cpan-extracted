@@ -13,27 +13,32 @@ use Math::DifferenceSet::Planar::Schema;
 # .......... index ..........   # .......... value ..........
 use constant _F_DATA     => 0;  # difference set result set object
 use constant _F_SPACES   => 1;  # PDS space result set object or undef
-use constant _F_PATH     => 2;  # database path name
-use constant _NFIELDS    => 3;
+use constant _F_VERSION  => 2;  # PDS space result set object or undef
+use constant _F_PATH     => 3;  # database path name
+use constant _NFIELDS    => 4;
 
-our $VERSION  = '0.018';
+our $VERSION  = '1.000';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
 
+use constant _KNOWN => { '<>' => 0 };
+
 # ----- private subroutines -----
 
 sub _iterate {
-    my ($domain, $min, $max, @columns) = @_;
-    my @sel = ();
+    my ($domain, $query, $min, $max, @columns) = @_;
+    my @sel  = $query? @{$query}: ();
+    my @osel = ();
     my $dir = 'ASC';
     if (defined($min) && defined($max) && $min > $max) {
         ($min, $max, $dir) = ($max, $min, 'DESC');
     }
-    push @sel, '>=' => $min if defined $min;
-    push @sel, '<=' => $max if defined $max;
+    push @osel, '>=' => $min if defined $min;
+    push @osel, '<=' => $max if defined $max;
+    push @sel, order_ => { @osel } if @osel;
     my $results = $domain->search(
-        @sel? { order_ => { @sel } }: undef,
+        @sel? { @sel }: undef,
         {
             @columns? ( columns => \@columns ): (),
             order_by => "order_ $dir",
@@ -44,9 +49,19 @@ sub _iterate {
 
 # ----- private accessor methods -----
 
-sub _data   { $_[0]->[_F_DATA]   }
-sub _spaces { $_[0]->[_F_SPACES] }
-sub _path   { $_[0]->[_F_PATH]   }
+sub _data    { $_[0]->[_F_DATA]    }
+sub _spaces  { $_[0]->[_F_SPACES]  }
+sub _version { $_[0]->[_F_VERSION] }
+sub _path    { $_[0]->[_F_PATH]    }
+
+sub _get_version_of {
+    my ($this, $table_name) = @_;
+    my $version = $this->_version;
+    return (0, 0) if !defined $version;
+    my $rec = $version->search({ table_name => $table_name })->single;
+    return (0, 0) if !defined $rec;
+    return ($rec->major, $rec->minor);
+}
 
 # ----- class methods -----
 
@@ -85,7 +100,9 @@ sub new {
     croak "bad database: query failed: $@" if !defined $count;
     my $spaces = $schema->resultset('DifferenceSetSpace');
     undef $spaces if !eval { $spaces->search->count };
-    return bless [$data, $spaces, $path], $class;
+    my $version = $schema->resultset('DatabaseVersion');
+    undef $version if !eval { $version->search->count };
+    return bless [$data, $spaces, $version, $path], $class;
 }
 
 # ----- object methods -----
@@ -105,22 +122,36 @@ sub get_space {
     return $spaces->search({ order_ => $order })->single;
 }
 
+sub get_version       { $_[0]->_get_version_of('difference_set')       }
+sub get_space_version { $_[0]->_get_version_of('difference_set_space') }
+
 sub iterate {
     my ($this, $min, $max) = @_;
-    return _iterate($this->_data, $min, $max);
+    return _iterate($this->_data, undef, $min, $max);
 }
 
 sub iterate_properties {
-    my ($this, $min, $max) = @_;
-    my @columns = qw(order_ base exponent modulus n_planes);
-    return _iterate($this->_data, $min, $max, @columns);
+    my ($this, $min, $max, @columns) = @_;
+    foreach my $col (@columns) {
+        $col = 'order_' if $col eq 'order';
+    }
+    @columns =
+        grep {!/delta/}
+        Math::DifferenceSet::Planar::Schema::Result::DifferenceSet->columns
+        if !@columns;
+    return _iterate($this->_data, undef, $min, $max, @columns);
+}
+
+sub iterate_refs {
+    my ($this, $type, $min, $max) = @_;
+    return _iterate($this->_data, [$type => { '<>' => 0 }], $min, $max);
 }
 
 sub iterate_spaces {
     my ($this, $min, $max) = @_;
     my $spaces = $this->_spaces;
     return sub {} if !defined $spaces;
-    return _iterate($spaces, $min, $max);
+    return _iterate($spaces, undef, $min, $max);
 }
 
 sub min_order    { $_[0]->_data->get_column('order_')->min  }
@@ -131,15 +162,13 @@ sub path         { $_[0]->_path                             }
 sub sp_min_order {
     my ($this) = @_;
     my $spaces = $this->_spaces;
-    return undef if !defined $spaces;
-    return $spaces->get_column('order_')->min;
+    return $spaces && $spaces->get_column('order_')->min;
 }
 
 sub sp_max_order {
     my ($this) = @_;
     my $spaces = $this->_spaces;
-    return 0 if !defined $spaces;
-    return $spaces->get_column('order_')->max;
+    return $spaces && $spaces->get_column('order_')->max;
 }
 
 sub sp_count {
@@ -147,6 +176,21 @@ sub sp_count {
     my $spaces = $this->_spaces;
     return 0 if !defined $spaces;
     return $spaces->search->count;
+}
+
+sub ref_min_order {
+    my ($this, $type) = @_;
+    return $this->_data->search({$type => _KNOWN})->get_column('order_')->min;
+}
+
+sub ref_max_order {
+    my ($this, $type) = @_;
+    return $this->_data->search({$type => _KNOWN})->get_column('order_')->max;
+}
+
+sub ref_count {
+    my ($this, $type) = @_;
+    return $this->_data->search({$type => _KNOWN})->count;
 }
 
 1;
@@ -161,7 +205,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.018 of
+This documentation refers to version 1.000 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS
@@ -191,10 +235,22 @@ Math::DifferenceSet::Planar::Data.
   $count = $data->count;
   $path  = $data->path;
 
+  $it = $data->iterate_refs('ref_std', $min, $max);
+  while (my $pds = $it->()) {
+    # ...
+  }
+
+  $min   = $data->ref_min_order('ref_std');
+  $max   = $data->ref_max_order('ref_lex');
+  $count = $data->ref_count('ref_gap');
+
   $space = $data->get_space(9);
   $min   = $data->sp_min_order;
   $max   = $data->sp_max_order;
   $count = $data->sp_count;
+
+  ($major, $minor) = $data->get_version;
+  ($major, $minor) = $data->get_space_version;
 
 =head1 DESCRIPTION
 
@@ -254,8 +310,8 @@ Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 C<$data-E<gt>get($order, @columns)> does the same, but returns a partial
 record with only the columns that are specified.  This is particularly
-efficient if the I<deltas> column and thus the I<elements> accessor are
-not needed.
+efficient if the I<delta_main> column and thus the I<main_elements>
+accessor are not needed.
 
 =item I<iterate>
 
@@ -274,11 +330,16 @@ descending size.
 =item I<iterate_properties>
 
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
-C<$data-E<gt>iterate_properties(@args)> behaves exactly like
-C<$data-E<gt>iterate(@args)>, except that the result records have no
-deltas component and thus no access to elements.  Using this method
+C<$data-E<gt>iterate_properties(@minmax)> behaves exactly like
+C<$data-E<gt>iterate(@minmax)>, except that the result records have no
+delta_main component and thus no access to elements.  Using this method
 to browse difference set properties is more efficient than fetching
 complete records.
+
+With additional arguments after the minimum and maximum order, these
+arguments are taken as names of components to fetch, so that the resulting
+records can be even more tailored to what is needed.  Minimum and maximum
+order can not be omitted in that case, but may be C<undef>.
 
 =item I<min_order>
 
@@ -302,6 +363,35 @@ in the database.
 
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
 C<$data-E<gt>path> returns the full path name of the database.
+
+=item I<iterate_refs>
+
+If C<$data> is a Math::DifferenceSet::Planar::Data object,
+C<$data-E<gt>iterate_refs($type)> with C<$type> one of
+C<'ref_std'>, C<'ref_lex'>, or C<'ref_gap'>, returns a code reference
+that, repeatedly called, returns all reference planar difference set
+records of the givent type in the database.  The iterator returns a
+false value when it is exhausted.
+
+Optional arguments after the type argument are minimum and maximum order
+values in like the optional arguments of I<iterate>.
+
+=item I<ref_min_order>
+
+This method takes a type argument like I<iterate_refs> and returns the
+smallest order of available reference sets of that kind, or C<undef>
+if none are available.
+
+=item I<ref_max_order>
+
+This method takes a type argument like I<iterate_refs> and returns the
+largest order of available reference sets of that kind, or C<undef>
+if none are available.
+
+=item I<ref_count>
+
+This method takes a type argument like I<iterate_refs> and returns the
+number of available reference sets of that kind.
 
 =item I<get_space>
 
@@ -339,7 +429,7 @@ difference set space in the database, or C<undef> if no spaces are stored.
 
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
 C<$data-E<gt>sp_max_order> returns the order of the largest planar
-difference set space in the database, or zero if no spaces are stored.
+difference set space in the database, or C<undef> if no spaces are stored.
 
 =item I<sp_count>
 
@@ -347,6 +437,21 @@ If C<$data> is a Math::DifferenceSet::Planar::Data object,
 C<$data-E<gt>sp_count> returns the number of planar difference set spaces
 in the database.  This may be greater or less than the number of sample
 planar difference sets or even zero.
+
+=item I<get_version>
+
+If C<$data> is a Math::DifferenceSet::Planar::Data object,
+C<$data-E<gt>get_version> returns a pair of numbers matching the planar
+difference set collection major and minor version reported in the
+database.  Missing version information is treated as I<major = minor = 0>.
+
+=item I<get_space_version>
+
+If C<$data> is a Math::DifferenceSet::Planar::Data object,
+C<$data-E<gt>get_space_version> returns a pair of numbers matching
+the planar difference set spaces collection major and minor version
+reported in the database.  Missing version information is treated as
+I<major = minor = 0>.
 
 =back
 
@@ -403,7 +508,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

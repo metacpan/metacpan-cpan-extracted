@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iSelect_tr_Sumute_top;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iSelect_tr_Sumute_top.pm
+ PERL PROGRAM NAME: iSelect_tr_Sumute_top.pm
  AUTHOR: Juan Lorenzo
  DATE:   April 2 2009 V1.
          Aug 9, 2011 V1.2
@@ -78,8 +78,8 @@ my $suximage   = suximage->new();
 my $SuMessages = SuMessages->new();
 my $Project    = Project_config->new();
 
-my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_SU)  = $Project->DATA_SEISMIC_SU();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 Establish
  
@@ -357,7 +357,7 @@ sub calcNdisplay {
         $iSelect_tr_Sumute_top->{_TX_outbound} =
           $itemp_top_mute_picks_ . $iSelect_tr_Sumute_top->{_file_in};
         $suximage->picks(
-            $PL_SEISMIC . '/' . $iSelect_tr_Sumute_top->{_TX_outbound} );
+            $DATA_SEISMIC_TXT . '/' . $iSelect_tr_Sumute_top->{_TX_outbound} );
 
 # print("iSelect_tr_Sumute_top,suximage,Writing picks to $itemp_top_mute_picks_$iSelect_tr_Sumute_top->{_file_in}  \n\n");
 # print("number of tries is $iSelect_tr_Sumute_top->{_number_of_tries}\n\n");
@@ -399,7 +399,7 @@ sub calcNdisplay {
         $iSelect_tr_Sumute_top->{_TX_outbound} =
           $itemp_top_mute_picks_ . $iSelect_tr_Sumute_top->{_file_in};
         $suxwigb->picks(
-            $PL_SEISMIC . '/' . $iSelect_tr_Sumute_top->{_TX_outbound} );
+            $DATA_SEISMIC_TXT . '/' . $iSelect_tr_Sumute_top->{_TX_outbound} );
 
 # print("iSelect_tr_Sumute_top, suxwigb, writing picks to $itemp_top_mute_picks_$iSelect_tr_Sumute_top->{_file_in} \n\n");
 # print("number of tries is $iSelect_tr_Sumute_top->{_number_of_tries} \n\n");

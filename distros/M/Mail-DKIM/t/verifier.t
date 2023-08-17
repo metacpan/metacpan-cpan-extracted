@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 105;
+use Test::More tests => 111;
 
 use Mail::DKIM::Verifier;
 
@@ -161,6 +161,14 @@ ok( $dkim->result_detail =~ /dns.*timed? ?out/i, "type of dns failure" );
 test_email( "badkey_15.txt", "invalid" );    # dns error (SERVFAIL)
 ok( $dkim->result_detail =~ /public key/,     "detail mentions public key" );
 ok( $dkim->result_detail =~ /dns.*SERVFAIL/i, "type of dns failure" );
+
+# test ed25519
+test_email( "goodkey_ed25519.txt", "pass" );
+test_email( "badkey1_ed25519.txt", "invalid" ); # key has invalid length
+test_email( "badkey2_ed25519.txt", "fail" ); # header modified
+test_email( "badkey3_ed25519.txt", "fail" ); # body modified
+test_email( "badkey4_ed25519.txt", "invalid" ); # missing key
+test_email( "badkey5_ed25519.txt", "invalid" ); # empty key
 
 sub read_file {
     my $srcfile = shift;

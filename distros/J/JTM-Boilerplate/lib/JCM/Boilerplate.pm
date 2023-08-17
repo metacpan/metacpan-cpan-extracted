@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015-2021 Joelle Maslak
+# Copyright (C) 2015-2023 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '2.211420';
+$JCM::Boilerplate::VERSION = '2.231980';
 use strict;
 use warnings;
 
@@ -33,7 +33,8 @@ sub import ( $self, $type = 'script' ) {
     warnings->import::into($target);
     autodie->import::into($target);
 
-    feature->import::into( $target, ':5.22' );
+    my ($ver) = "$PERL_VERSION" =~ m/^v(\d+\.\d+)\..*$/;
+    feature->import::into( $target, ":$ver" );
 
     utf8->import::into($target);    # Allow UTF-8 Source
 
@@ -47,6 +48,8 @@ sub import ( $self, $type = 'script' ) {
         Moose::Util::TypeConstraints->import::into($target);
         MooseX::StrictConstructor->import::into($target);
         namespace::autoclean->import::into($target);
+    } else {
+        Feature::Compat::Class->import::into($target);
     }
 
     Carp->import::into($target);
@@ -55,11 +58,13 @@ sub import ( $self, $type = 'script' ) {
 
     feature->import::into( $target, 'postderef' );    # Not needed if feature bundle >= 5.23.1
 
+    Feature::Compat::Defer->import::into($target);
+    Feature::Compat::Try->import::into($target);
+
     # We haven't been using this
     # feature->import::into($target, 'refaliasing');
     feature->import::into( $target, 'signatures' );
 
-    feature->import::into( $target, 'switch' );
     feature->import::into( $target, 'unicode_strings' );
     # warnings->unimport::out_of($target, 'experimental::refaliasing');
     warnings->unimport::out_of( $target, 'experimental::signatures' );
@@ -67,9 +72,6 @@ sub import ( $self, $type = 'script' ) {
     if ( $PERL_VERSION lt v5.24.0 ) {
         warnings->unimport::out_of( $target, 'experimental::postderef' );
     }
-
-    # For "switch" feature
-    warnings->unimport::out_of( $target, 'experimental::smartmatch' );
 
     # For "re 'strict'" feature
     warnings->unimport::out_of( $target, 'experimental::re_strict' );
@@ -90,10 +92,6 @@ sub import ( $self, $type = 'script' ) {
 
         # Turn off bareword filehandles
         feature->unimport::out_of( $target, 'bareword_filehandles' );
-
-        # Turn on Try/Catch
-        feature->import::into( $target, 'try' );
-        warnings->unimport::out_of( $target, 'experimental::try' );
     }
 
     return;
@@ -113,7 +111,7 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.211420
+version 2.231980
 
 =head1 SYNOPSIS
 
@@ -144,7 +142,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2020 by Joelle Maslak.
+This software is copyright (c) 2015-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

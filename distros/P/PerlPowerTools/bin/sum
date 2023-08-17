@@ -16,9 +16,9 @@ License:
 # An implementation of the 'cksum' utility in Perl.  Written for the Perl
 # Power Tools (PPT) project by Theo Van Dinter (felicity@kluge.net).
 
+use strict;
 use integer;
 use Getopt::Std;
-use strict;
 use vars qw($opt_h $opt_o);
 
 &help unless getopts('ho:');
@@ -33,9 +33,16 @@ $opt_o = 1 unless ( $0 =~ /cksum$/ || defined($opt_o) );
 my($exitval) = 0; # return value
 
 foreach (@ARGV) {
-	open(IN, '<', $_) || die "Can't open file for reading:$!";
+	my $fh;
+	if ($_ eq '-') {
+		$fh = *STDIN;
+	} elsif (!open($fh, '<', $_)) {
+		warn "$0: $_: $!\n";
+		$exitval = 1;
+		next;
+	}
 	my($rval,$crc,$len)=
-		($opt_o==0)?&crc32(\*IN):($opt_o==1)?&sum1(\*IN):&sum2(\*IN);
+		($opt_o==0)?&crc32($fh):($opt_o==1)?&sum1($fh):&sum2($fh);
 	unless ( defined($rval) && ($rval == 0) ) {
 		warn "$0: $_: $!\n";
 		$exitval = 1;
@@ -44,7 +51,7 @@ foreach (@ARGV) {
 
 	# Display output information
 	printf "%lu %lu%s\n",$crc,$len,($_ eq "-")?"":" $_";
-	close(IN);
+	close($fh) if ($_ ne '-');
 }
 
 exit $exitval;
@@ -89,6 +96,7 @@ sub crc32 {
 	my($crc) = my($len) = 0;
 	my($buf,$num,$i);
 	my($buflen) = 4096; # buffer is "4k", you can up it if you want...
+	my $MASK32 = 0xffffffff;
 
 	# crctable/crc32 alg converted from openbsd's cksum program ...
 	my(@crctable) = (
@@ -147,18 +155,20 @@ sub crc32 {
 	);
 
 	while($num = sysread $fh, $buf, $buflen) {
-		for($len = ($len+$num)&0xffffffff, $i = 0; $i<$num; $i++) {
+		for($len = ($len + $num) & $MASK32, $i = 0; $i < $num; $i++) {
 			$crc = ($crc << 8 ^ $crctable[$crc >> 24 ^ ord(substr $buf, $i, 1)])
-					& 0xffffffff;
+					& $MASK32;
 		}
 	}
 
 	my($rlen) = $len; # for reporting ...
 	for(;$len!=0;$len>>=8) { # MSB first
 		$crc = (($crc << 8) ^ $crctable[($crc >> 24) ^ ($len&0xff)])
-				& 0xffffffff;
+				& $MASK32;
 	}
-	return $num,~$crc,$rlen;
+	$crc = ~$crc;
+	$crc &= $MASK32;
+	return $num, $crc, $rlen;
 }
 
 sub help {

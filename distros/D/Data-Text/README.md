@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -115,10 +115,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Text](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Text)
-
-- CPANTS
-
-    [http://cpants.cpanauthors.org/dist/Data-Text](http://cpants.cpanauthors.org/dist/Data-Text)
 
 - CPAN Testers' Matrix
 

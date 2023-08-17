@@ -1,6 +1,6 @@
 # http://bit.ly/cpanfile
 # http://bit.ly/cpanfile_version_formats
-requires 'perl', '5.008005';
+requires 'perl', '5.012005';
 requires 'strict';
 requires 'warnings';
 

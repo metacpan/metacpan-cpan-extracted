@@ -1,0 +1,11 @@
+Revision history for MIDI-Segment
+
+0.03    2023-07-19
+        Better mandate that the segments are of equal duration.
+
+0.02    2023-07-18
+        Better handle lilypond MIDI which has a control track without
+        note_on events in it.
+
+0.01    2023-07-18
+        First version, released on a mostly unsuspecting world.

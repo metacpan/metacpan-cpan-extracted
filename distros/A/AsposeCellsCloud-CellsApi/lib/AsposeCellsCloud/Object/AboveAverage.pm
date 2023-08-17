@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Describe the AboveAverage conditional formatting rule. This conditional formatting    rule highlights cells that are above or below the average for all values    in the range.',
                                   class => 'AboveAverage',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'is_above_average' => {
      	datatype => 'boolean',
      	base_name => 'IsAboveAverage',
-     	description => '',
+     	description => 'Get or set the flag indicating whether the rule is an "above average" rule.   `true` indicates `above average`.  Default value is true.            ',
      	format => '',
      	read_only => '',
      		},
      'is_equal_average' => {
      	datatype => 'boolean',
      	base_name => 'IsEqualAverage',
-     	description => '',
+     	description => 'Get or set the flag indicating whether the `aboveAverage` and `belowAverage`   criteria is inclusive of the average itself, or exclusive of that value.   `true` indicates to include the average value in the criteria.  Default value   is false.            ',
      	format => '',
      	read_only => '',
      		},
      'std_dev' => {
      	datatype => 'int',
      	base_name => 'StdDev',
-     	description => '',
+     	description => 'Get or set the number of standard deviations to include above or below the  average in the conditional formatting rule. The input value must between  0 and 3 (include 0 and 3). Setting this value to 0 means stdDev is not set.   The default value is 0.            ',
      	format => '',
      	read_only => '',
      		},    

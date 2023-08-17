@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use Class::Method::Modifiers;
 use Scalar::Util;

@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.76";
+our $VERSION = "1.78";
 
 use Clone qw();
 use Encode qw();
@@ -258,7 +258,7 @@ sub __DoSearch {
     while ( my $row = $records->fetchrow_hashref() ) {
 
         # search_builder_count_all is from combine search
-        if ( !$self->{count_all} && $row->{search_builder_count_all} ) {
+        if ( !defined $self->{count_all} && $row->{search_builder_count_all} ) {
             $self->{count_all} = $row->{search_builder_count_all};
         }
 
@@ -317,6 +317,12 @@ sub _DoCount {
         return $count_all;
     }
 
+    return $self->__DoCount;
+}
+
+sub __DoCount {
+    my $self = shift;
+
     my $QueryString = $self->BuildSelectCountQuery();
     my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
     return 0 unless $records;
@@ -341,9 +347,13 @@ sub _DoSearchAndCount {
     my $QueryString = $self->BuildSelectAndCountQuery();
     my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
 
-    $self->{count_all} = 0;
+    undef $self->{count_all};
     # __DoSearch updates count_all
     my $count     = $self->__DoSearch($records);
+
+    # If no results returned, we have to query the count separately.
+    $self->{count_all} //= $self->__DoCount;
+
     return ( $count, $self->{count_all} );
 }
 
@@ -1635,7 +1645,7 @@ sub CountAll {
     # If we haven't actually got all objects loaded in memory, we
     # really just want to do a quick count from the database.
     # or if we have paging enabled then we count as well and store it in count_all
-    if ( $self->{'must_redo_search'} || ( $self->RowsPerPage && !$self->{'count_all'} ) ) {
+    if ( $self->{'must_redo_search'} || ( $self->RowsPerPage && !defined $self->{'count_all'} ) ) {
         # If we haven't already asked the database for the row count, do that
         $self->_DoCount;
 

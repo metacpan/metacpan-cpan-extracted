@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.36';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.40';
 
 use parent 'Neo4j::Types::Relationship';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -37,6 +37,8 @@ sub start_id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{start} if defined $$self->{_meta}->{start};
+	
+	warnings::warnif deprecated => "Relationship->start_id() is deprecated since Neo4j 5; use start_element_id()";
 	my ($id) = $$self->{_meta}->{element_start} =~ m/^4:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
@@ -55,6 +57,8 @@ sub end_id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{end} if defined $$self->{_meta}->{end};
+	
+	warnings::warnif deprecated => "Relationship->end_id() is deprecated since Neo4j 5; use end_element_id()";
 	my ($id) = $$self->{_meta}->{element_end} =~ m/^4:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
@@ -82,6 +86,8 @@ sub id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{id} if defined $$self->{_meta}->{id};
+	
+	warnings::warnif deprecated => "Relationship->id() is deprecated since Neo4j 5; use element_id()";
 	my ($id) = $$self->{_meta}->{element_id} =~ m/^5:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
@@ -127,7 +133,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.36
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -175,6 +181,13 @@ hasn't yet been updated for S<Neo4j 5>, this method provides
 the legacy numeric ID instead. Note that a numeric ID cannot
 successfully be used with C<elementId()> in Cypher expressions.
 
+The behaviour of this method when the element ID is unavailable
+is subject to change in a future version of the driver.
+In particular, making this a fatal error is being considered.
+This would help users to discover such issues early. See
+L<Neo4j-Types PR#3|https://github.com/johannessen/neo4j-types/pull/3>
+for further details.
+
 Neo4j element IDs are not designed to be persistent. As such,
 if you want a public identity to use for your relationships,
 attaching an explicit 'id' property is a better choice.
@@ -195,8 +208,8 @@ within a particular context, for example the current transaction.
 Neo4j 5 has B<deprecated> numeric IDs. They will likely become
 unavailable in future Neo4j versions. This method will try to
 auto-generate a S<numeric ID> from the new S<element ID> value
-(or return C<undef> if that fails). A deprecation warning will
-be issued by this method in a future version of this driver.
+(or return C<undef> if that fails). A deprecation warning is
+issued by this method if the S<element ID> is available.
 
 Neo4j relationship IDs are not designed to be persistent. As such,
 if you want a public identity to use for your relationships,
@@ -234,8 +247,8 @@ Return a numeric ID for the node where this relationship starts.
 Neo4j 5 has B<deprecated> numeric IDs. They will likely become
 unavailable in future Neo4j versions. This method will try to
 auto-generate a S<numeric ID> from the new S<element ID> value
-(or return C<undef> if that fails). A deprecation warning will
-be issued by this method in a future version of this driver.
+(or return C<undef> if that fails). A deprecation warning is
+issued by this method if the S<element ID> is available.
 
 =head2 end_element_id
 
@@ -258,8 +271,8 @@ Return a numeric ID for the node where this relationship ends.
 Neo4j 5 has B<deprecated> numeric IDs. They will likely become
 unavailable in future Neo4j versions. This method will try to
 auto-generate a S<numeric ID> from the new S<element ID> value
-(or return C<undef> if that fails). A deprecation warning will
-be issued by this method in a future version of this driver.
+(or return C<undef> if that fails). A deprecation warning is
+issued by this method if the S<element ID> is available.
 
 =head2 type
 

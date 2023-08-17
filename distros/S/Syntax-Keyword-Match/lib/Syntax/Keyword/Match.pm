@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.10;
+package Syntax::Keyword::Match 0.13;
 
 use v5.14;
 use warnings;
@@ -30,6 +30,8 @@ C<Syntax::Keyword::Match> - a C<match/case> syntax for perl
       case(3) { say "It's three" }
       case(4), case(5)
               { say "It's four or five" }
+      case if($n < 10)
+              { say "It's less than ten" }
       default { say "It's something else" }
    }
 
@@ -57,30 +59,6 @@ warnings in the C<experimental> category, unless silenced.
    use Syntax::Keyword::Match qw( match :experimental );  # all of the above
 
 =cut
-
-my @EXPERIMENTAL = qw( dispatch );
-
-sub import
-{
-   shift;
-   my @syms = @_;
-
-   @syms or @syms = ( "match" );
-
-   my %syms = map { $_ => 1 } @syms;
-
-   $^H{"Syntax::Keyword::Match/match"}++ if delete $syms{match};
-
-   foreach ( @EXPERIMENTAL ) {
-      $^H{"Syntax::Keyword::Match/experimental($_)"}++ if delete $syms{":experimental($_)"};
-   }
-
-   if( delete $syms{":experimental"} ) {
-      $^H{"Syntax::Keyword::Match/experimental($_)"}++ for @EXPERIMENTAL;
-   }
-
-   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
-}
 
 =head1 KEYWORDS
 
@@ -113,12 +91,22 @@ C<sub> or C<do> block. For example:
       }
    };
 
+If the controlling expression introduces a new variable, that variable will be
+visible within any of the C<case> blocks, and will go out of scope after the
+C<match> statement finishes. This may be useful for temporarily storing the
+result of a more complex expression.
+
+   match( my $x = some_function_call() : == ) {
+      case ...
+   }
+
 =head3 Comparison Operators
 
 The comparison operator must be either C<eq> (to compare cases as strings) or
 C<==> (to compare them as numbers), or C<=~> (to compare cases using regexps).
 
-On Perl versions 5.32 onwards, the C<isa> operator is also supported, allowing
+I<Since version 0.11 on any Perl release>, or previous versions on Perl
+releases 5.32 onwards, the C<isa> operator is also supported, allowing
 dispatch based on what type of object the controlling expression gives.
 
    match( $obj : isa ) {
@@ -178,6 +166,43 @@ sequences of multiple C<case> blocks with constant expressions. This handling
 is implemented with a custom operator that will entirely confuse modules like
 C<B::Deparse> or optree inspectors like coverage tools so is not selected by
 default, but can be enabled for extra performance in critical sections.
+
+=head2 case if
+
+   case if(EXPR) { STATEMENTS... }
+
+   case(VAL), case if(EXPR) { STATEMENTS... }
+
+A C<case> statement may also be written C<case if> with a boolean predicate
+expression in parentheses. This inserts a direct boolean test into the
+comparison logic, allowing for other logical tests that aren't easily
+expressed as uses of the comparison operator. As C<case if> is an alternative
+to a regular C<case>, they can be combined on a single code block if required.
+
+For example, when testing an inequality in a selection of numerical C<==>
+tests, or a single regexp test among some string C<eq> tests.
+
+   match( $num : == ) {
+      case(0)           { ... }
+      case(1), case(2)  { ... }
+      case if($num < 5) { ... }
+   }
+
+Z<>
+
+   match( $str : eq ) {
+      case("abc")           { ... }
+      case("def")           { ... }
+      case if($str =~ m/g/) { ... }
+   }
+
+By default the match value is not assigned into a variable that is visible
+to C<case if> expressions, but if needed a new lexical can be constructed by
+using a regular C<my> assignment.
+
+   match( my $v = some_expression() : eq ) {
+      case if($v =~ m/pattern/) { ... }
+   }
 
 =head2 default
 
@@ -245,6 +270,51 @@ Code written in C will perform identically even if any of the C<case> labels
 and associated code are moved around into a different order. The syntax
 provided by this module notionally performs all of its tests in the order they
 are written in, and any changes of that order might cause a different result.
+
+=cut
+
+sub import
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->import_into( $caller, @_ );
+}
+
+sub unimport
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+my @EXPERIMENTAL = qw( dispatch );
+
+sub import_into   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport_into { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $cb, $caller, @syms ) = @_;
+
+   @syms or @syms = ( "match" );
+
+   my %syms = map { $_ => 1 } @syms;
+
+   $cb->( "Syntax::Keyword::Match/match" ) if delete $syms{match};
+
+   foreach ( @EXPERIMENTAL ) {
+      $cb->( "Syntax::Keyword::Match/experimental($_)" ) if delete $syms{":experimental($_)"};
+   }
+
+   if( delete $syms{":experimental"} ) {
+      $cb->( "Syntax::Keyword::Match/experimental($_)" ) for @EXPERIMENTAL;
+   }
+
+   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+}
 
 =head1 TODO
 

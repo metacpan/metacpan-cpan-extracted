@@ -151,6 +151,9 @@ mce_flow sub {
    $w = MCE->do('check_unicode_out', 'fifo, check unicode peek', $q->peek(0));
    $w = MCE->do('check_unicode_out', 'fifo, check unicode insert', $q->dequeue_nb);
 
+   $q->enqueue($sappho_text);
+   $w = MCE->do('check_unicode_out', 'fifo, check unicode dequeue_timed', $q->dequeue_timed);
+
    return;
 };
 
@@ -223,6 +226,9 @@ mce_flow sub {
    $q->insert(0, $sappho_text);
    $w = MCE->do('check_unicode_out', 'lifo, check unicode peek', $q->peek(0));
    $w = MCE->do('check_unicode_out', 'lifo, check unicode insert', $q->dequeue_nb);
+
+   $q->enqueue($sappho_text);
+   $w = MCE->do('check_unicode_out', 'lifo, check unicode dequeue_timed', $q->dequeue_timed);
 
    return;
 };

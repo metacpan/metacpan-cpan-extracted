@@ -1,0 +1,90 @@
+NAME
+    Mo::utils::Language - Mo language utilities.
+
+SYNOPSIS
+     use Mo::utils qw(check_language);
+
+     check_language($self, $key);
+
+DESCRIPTION
+    Mo language utilities for checking of data objects.
+
+SUBROUTINES
+  "check_language"
+     check_language($self, $key);
+
+    Check parameter defined by $key if it's ISO 639-1 language code and if
+    language exists. Value could be undefined.
+
+    Returns undef.
+
+ERRORS
+     check_language():
+             Language code '%s' isn't ISO 639-1 code.
+             Language with ISO 639-1 code '%s' doesn't exist.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Language qw(check_language);
+
+     my $self = {
+             'key' => 'en',
+     };
+     check_language($self, 'en');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Language qw(check_language);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_language($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Language code 'xx' isn't ISO 639-1 code.
+
+DEPENDENCIES
+    Error::Pure, Exporter, List::Util, Locale::Language, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Language>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

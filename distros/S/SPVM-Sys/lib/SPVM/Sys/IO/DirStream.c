@@ -28,7 +28,7 @@ int32_t SPVM__Sys__IO__DirStream__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
     int32_t status = closedir(dir_stream);
     if (status == -1) {
       env->die(env, stack, "[System Error]closedir failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
-      return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+      return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
     }
     env->set_pointer(env, stack, obj_self, NULL);
   }

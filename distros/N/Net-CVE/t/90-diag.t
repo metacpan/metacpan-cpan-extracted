@@ -66,6 +66,8 @@ ok   ($d = $r->diag,				"Diag on a bad URL");
 is   ($d->{action}, "get",					"Action get");
 is   ($d->{source}, "$r->{url}/CVE-2021-12232",			"Source");
 is   ($d->{status}, 599,					"Status");
-like ($d->{reason}, qr{^Internal Exception: Could not connect},	"Error");
+like ($d->{reason}, qr{^(?:Internal \s+ Exception:\s+ Could \s+ not \s+ connect
+			  |Internal \s+ Exception:\s+ SSL \s+ connection\s+failed
+			  |Bad \s+ Gateway)}ix,			"Error");
 
 done_testing;

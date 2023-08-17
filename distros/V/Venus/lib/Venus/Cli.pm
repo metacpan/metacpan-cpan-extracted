@@ -69,7 +69,6 @@ sub arg {
   my $_type = $data->{type};
 
   require Venus::Array;
-  require Venus::Unpack;
 
   # value
   @values = @{Venus::Array->new($self->parser->unused)->range($_range // 0)};
@@ -85,23 +84,6 @@ sub arg {
     && exists $data->{default})
   {
     @values = ($_default);
-  }
-
-  my %type_map = (
-    boolean => 'number',
-    float => 'float',
-    number => 'number',
-    string => 'string',
-    yesno => 'yesno',
-  );
-
-  # type
-  if ($_type) {
-    my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
-      'validate', $type_map{$_type}
-    );
-    $self->throw('error_on_arg_validation', $caught->message, $_name, $_type)->error
-      if $caught;
   }
 
   # return boolean values
@@ -733,7 +715,6 @@ sub opt {
   my $_type = $data->{type};
 
   require Venus::Array;
-  require Venus::Unpack;
 
   my $parsed = $self->parser->get($name);
 
@@ -751,23 +732,6 @@ sub opt {
     && exists $data->{default})
   {
     @values = ($_default);
-  }
-
-  my %type_map = (
-    boolean => 'number',
-    float => 'float',
-    number => 'number',
-    string => 'string',
-    yesno => 'yesno',
-  );
-
-  # type
-  if ($_type) {
-    my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
-      'validate', $type_map{$_type}
-    );
-    $self->throw('error_on_opt_validation', $caught->message, $_name, $_type)->error
-      if $caught;
   }
 
   # return boolean values
@@ -806,6 +770,12 @@ sub parser {
   require Venus::Opts;
 
   return Venus::Opts->new(value => $self->data, specs => $self->spec);
+}
+
+sub pass {
+  my ($self, $method, @args) = @_;
+
+  return $self->exit(0, $method, @args);
 }
 
 sub set {
@@ -1161,6 +1131,44 @@ sub str {
   return $self->get_str($name);
 }
 
+sub test {
+  my ($self, $key, $name) = @_;
+
+  my @values = $self->$key($name);
+
+  my $data = $self->get($key, $name);
+
+  my $type = $data->{type} || 'boolean';
+
+  my %type_map = (
+    boolean => 'number',
+    float => 'float',
+    number => 'number',
+    string => 'string',
+    yesno => 'yesno',
+  );
+
+  require Venus::Assert;
+
+  if ($type) {
+    for (my $i = 0; $i < @values; $i++) {
+      my $assert = Venus::Assert->new("at index $i")->expression(
+        $type_map{$type}
+      );
+      if (my $caught = $assert->catch('validate', $values[$i])) {
+        $self->error({
+          throw => "error_on_${key}_validation",
+          error => $caught->message,
+          name => $name,
+          type => $type,
+        });
+      }
+    }
+  }
+
+  return wantarray ? (@values) : [@values];
+}
+
 # ROUTINES
 
 sub _wrap_text {
@@ -1192,29 +1200,45 @@ sub _wrap_text {
 # ERRORS
 
 sub error_on_arg_validation {
-  my ($self, $error, $name, $type) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.arg.validation',
-    message => (join ': ', 'Invalid argument', $name, $error),
-    stash => {
-      name => $name,
-      type => $type,
-    },
+  my $message = 'Invalid argument: {{name}}: {{error}}';
+
+  my $stash = {
+    name => $data->{name},
+    type => $data->{type},
+    error => $data->{error},
   };
+
+  my $result = {
+    name => 'on.arg.validation',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_opt_validation {
-  my ($self, $error, $name, $type) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.opt.validation',
-    message => (join ': ', 'Invalid option', $name, $error),
-    stash => {
-      name => $name,
-      type => $type,
-    },
+  my $message = 'Invalid option: {{name}}: {{error}}';
+
+  my $stash = {
+    name => $data->{name},
+    type => $data->{type},
+    error => $data->{error},
   };
+
+  my $result = {
+    name => 'on.opt.validation',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;
@@ -1249,7 +1273,7 @@ Cli Class for Perl 5
 
   # [1]
 
-  # $cli->data;
+  # $cli->parsed;
 
   # {help => 1}
 
@@ -1445,29 +1469,6 @@ I<Since C<2.55>>
   my ($name) = $cli->arg('name');
 
   # "example"
-
-=back
-
-=over 4
-
-=item arg example 7
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['--help']);
-
-  $cli->set('arg', 'name', {
-    type => 'string',
-    range => '0',
-  });
-
-  my ($name) = $cli->arg('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
-
-  # Invalid argument: name: received (undef), expected (string)
 
 =back
 
@@ -2281,29 +2282,6 @@ I<Since C<2.55>>
 
 =back
 
-=over 4
-
-=item opt example 7
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['example', '--name', 'example']);
-
-  $cli->set('opt', 'name', {
-    type => 'number',
-    multi => 1,
-  });
-
-  my ($name) = $cli->opt('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
-
-  # Invalid option: name: received (undef), expected (number)
-
-=back
-
 =cut
 
 =head2 parsed
@@ -2368,6 +2346,45 @@ I<Since C<2.55>>
   my $parser = $cli->parser;
 
   # bless({...}, 'Venus::Opts')
+
+=back
+
+=cut
+
+=head2 pass
+
+  pass(Str|CodeRef $code, Any @args) (Any)
+
+The pass method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item pass example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass;
+
+  # ()
+
+=back
+
+=over 4
+
+=item pass example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass('stash', 'executed', 1);
+
+  # ()
 
 =back
 
@@ -2600,6 +2617,105 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 test
+
+  test(Str $type, Str $name) (Any)
+
+The test method validates the values for the C<arg> or C<opt> specified and
+returns the value(s) associated. If validation failed an exception is thrown.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item test example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # "help"
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
+
+  # Invalid argument: name: received (undef), expected (string)
+
+=back
+
+=over 4
+
+=item test example 3
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'string',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # "example"
+
+=back
+
+=over 4
+
+=item test example 4
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'number',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
+
+  # Invalid option: name: received (undef), expected (number)
+
+=back
+
+=cut
+
 =head1 ERRORS
 
 This package may raise the following errors:
@@ -2616,15 +2732,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_arg_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_arg_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid argument: example: ..."
 
@@ -2648,15 +2769,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_opt_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_opt_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid option: example: ..."
 

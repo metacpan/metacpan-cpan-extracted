@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Cookies.pm
-## Version v0.2.9
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/06/29
+## Modified 2023/06/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,137 +16,13 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( Module::Generic );
+    use parent qw( Cookie::Jar );
     use vars qw( $VERSION );
-    use APR::Pool ();
-    use APR::Request::Cookie;
-    use APR::Request::Apache2;
-    use Net::API::REST::Cookie;
-    use Nice::Try;
-    use Cookie::Baker ();
-    use Scalar::Util;
-    our $VERSION = 'v0.2.9';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
 use warnings;
-
-sub init
-{
-    my $self = shift( @_ );
-    my $req;
-    $req = shift( @_ ) if( @_ && ( @_ % 2 ) );
-    $self->SUPER::init( @_ );
-    $self->{request} = $req if( $req );
-    return( $self->error( "No Net::API::REST::Request object was provided." ) ) if( !$self->{request} );
-    $self->{_cookies} = {};
-    return( $self );
-}
-
-sub delete
-{
-    my $self = shift( @_ );
-    my $name = shift( @_ );
-    return if( !CORE::length( $name ) );
-    my $ref = $self->{_cookies};
-    return if( !CORE::exists( $ref->{ $name } ) );
-    ## Remove cookie and return the previous entry
-    return( CORE::delete( $ref->{ $name } ) );
-}
-
-sub exists
-{
-    my $self = shift( @_ );
-    my $name = shift( @_ );
-    return( $self->error( "No cookie name was provided to check if it exists." ) ) if( !CORE::length( $name ) );
-    my $ref = $self->{_cookies};
-    return( CORE::exists( $ref->{ $name } ) );
-}
-
-sub fetch
-{
-    my $self = shift( @_ );
-    my $ref = $self->{_cookies};
-    my $cookies = {};
-    try
-    {
-        my $pool = $self->_request->pool;
-        # my $o = APR::Request::Apache2->handle( $self->request->pool );
-        my $o = APR::Request::Apache2->handle( $self->_request );
-        if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
-        {
-            my $j = $o->jar;
-            foreach my $cookie_name ( keys( %$j ) )
-            {
-                $cookies->{ $cookie_name } = $j->{ $cookie_name };
-            }
-        }
-        else
-        {
-            my $cookie_header = $self->request->headers( 'Cookie' );
-#           foreach my $cookie ( CORE::split( /\;[[:blank:]]*/, $cookie_header ) )
-#           {
-#               if( CORE::index( $cookie, '=' ) != -1 )
-#               {
-#                   my( $c_name, $c_value ) = CORE::split( /[[:blank:]]*=[[:blank:]]*/, $cookie, 2 );
-#                   $cookies->{ $c_name } = $c_value;
-#               }
-#               else
-#               {
-#                   CORE::warn( "Warning only: unable to find an = sign to split cookie name from its value. Original data is: $cookie\n" );
-#               }
-#           }
-        }
-    }
-    catch( $e )
-    {
-    }
-    my $cookie_header = $self->request->headers( 'Cookie' );
-    if( !scalar( keys( %$cookies ) ) && $cookie_header )
-    {
-        $cookies = Cookie::Baker::crush_cookie( $cookie_header );
-    }
-    ## We are called in void context like $jar->fetch which means we fetch the cookies and add them to our stack internally
-    if( !defined( wantarray() ) )
-    {
-        foreach my $cookie_name ( keys( %$cookies ) )
-        {
-            $ref->{ $cookie_name } = $cookies->{ $cookie_name };
-        }
-    }
-    return( $cookies );
-}
-
-sub get { return( shift->{_cookies}->{ $_[0] } ); }
-
-sub make
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
-    return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
-    $opts->{request} = $self->request;
-    $opts->{debug} = $self->debug;
-    my $c = Net::API::REST::Cookie->new( $opts ) ||
-    return( $self->pass_error( Net::API::REST::Cookie->error ) );
-    return( $c );
-}
-
-sub request { return( shift->_set_get_object( 'request', 'Net::API::REST::Request', @_ ) ); }
-
-sub set
-{
-    my $self = shift( @_ );
-    my( $name, $object ) = @_;
-    return( $self->error( "No cookie name was provided to set." ) ) if( !CORE::length( $name ) );
-    return( $self->error( "Cookie value should be an object." ) ) if( !Scalar::Util::blessed( $object ) );
-    return( $self->error( "Cookie object does not have any as_string method." ) ) if( !$object->can( 'as_string' ) );
-    my $ref = $self->{_cookies};
-    $ref->{ $name } = $object->value;
-    $self->request->err_headers( 'Set-Cookie', $object->as_string );
-}
-
-sub _request { return( shift->request->request ); }
 
 1;
 # NOTE: pod
@@ -191,81 +67,29 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
 
 =head1 VERSION
 
-    v0.2.9
+    v1.0.0
 
 =head1 DESCRIPTION
 
 This is a module to handle cookies sent from the web browser, and also to create new cookie to be returned by the server to the web browser.
 
+As of version C<1.0.0>, this module inherits all of its methods from L<Cookie::Jar>. Please check its documentation directly.
+
 The reason for this module is because Apache2::Cookie does not work well in decoding cookies, and L<Cookie::Baker> C<Set-Cookie> timestamp format is wrong. They use Mon-09-Jan 2020 12:17:30 GMT where it should be, as per rfc 6265 Mon, 09 Jan 2020 12:17:30 GMT
 
 Also L<APR::Request::Cookie> and L<Apache2::Cookie> which is a wrapper around L<APR::Request::Cookie> return a cookie object that returns the value of the cookie upon stringification instead of the full C<Set-Cookie> parameters. Clearly they designed it with a bias leaned toward collecting cookies from the browser.
-
-=head1 METHODS
-
-=head2 new( hash )
-
-This initiates the package and take the following parameters:
-
-=over 4
-
-=item I<request>
-
-This is a required parameter to be sent with a value set to a L<Net::API::REST::Request> object
-
-=item I<debug>
-
-Optional. If set with a positive integer, this will activate verbose debugging message
-
-=back
-
-=head2 delete( cookie_name )
-
-Given a cookie name, this will remove it from the cookie jar.
-
-However, this will NOT remove it from the web browser by sending a Set-Cookie header.
-
-It returns the value of the cookie removed.
-
-=head2 exists( cookie_name )
-
-Given a cookie name, this will check if it exists.
-
-=head2 fetch()
-
-Retrieve all possible cookies from the http request received from the web browser.
-
-It returns an hash reference of cookie name => cookie value
-
-=head2 get( cookie_name )
-
-Given a cookie name, this will retrieve its value and return it.
-
-=head2 make
-
-Provided with some parameters and this will instantiate a new L<Net::API::REST::Cookie> object with those parameters and return the new object.
-
-=head2 set( cookie_name, cookie_value )
-
-Given a cookie name, and a cookie object, this adds it or replace the previous one if any.
-
-This will also add the cookie to the outgoing http headers using the C<Set-Cookie> http header.
 
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
-CPAN ID: jdeguest
-
-https://gitlab.com/jackdeguest/Net-API-REST
-
 =head1 SEE ALSO
 
-L<Apache2::Cookies>, L<APR::Request::Cookie>, L<Cookie::Baker>
+L<Cookie::Jar>, L<Cookie>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

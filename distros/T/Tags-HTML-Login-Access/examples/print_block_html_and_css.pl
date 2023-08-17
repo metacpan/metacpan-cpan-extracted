@@ -81,7 +81,7 @@ print $tags->flush."\n";
 #       <label for="username">
 #       </label>
 #       User name
-#       <input type="text" name="username" id="username">
+#       <input type="text" name="username" id="username" autofocus="autofocus">
 #       </input>
 #     </p>
 #     <p>

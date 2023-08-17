@@ -1,7 +1,7 @@
 use utf8;
 package Catalyst::Controller::WrapCGI;
 our $AUTHORITY = 'cpan:RKITOVER';
-$Catalyst::Controller::WrapCGI::VERSION = '0.038';
+$Catalyst::Controller::WrapCGI::VERSION = '0.039';
 use 5.008_001;
 use Moose;
 use mro 'c3';

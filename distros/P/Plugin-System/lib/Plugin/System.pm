@@ -1,0 +1,168 @@
+## no critic: TestingAndDebugging::RequireUseStrict
+package Plugin::System;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-23'; # DATE
+our $DIST = 'Plugin-System'; # DIST
+our $VERSION = '0.000'; # VERSION
+
+1;
+# ABSTRACT: An opinionated plugin system for your Perl framework/application
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Plugin::System - An opinionated plugin system for your Perl framework/application
+
+=head1 VERSION
+
+This document describes version 0.000 of Plugin::System (from Perl distribution Plugin-System), released on 2023-07-23.
+
+=head1 SYNOPSIS
+
+ package Your::Framework;
+ use Plugin::System;
+
+ Plugin::System->init_plugin_system(
+
+     # optional, default to caller package (i.e. in this case, Your::Framework)
+     namespace => 'Your::Framework::Plugin',
+
+     # required, list of known events
+     events => {
+         check_input => { ... },
+         output => { ... },
+         ...
+     },
+     ...
+
+ );
+
+ sub bar {
+     ...
+     __PACKAGE__->run_event_with_plugins(
+         event => 'check_input',
+         # req_handler => 0,                         # optional
+         # run_all_handlers => 1,                    # optional
+         # allow_before_handler_to_skip_rest => 1,   # optional
+         # allow_handler_to_skip_rest => 1,          # optional
+         # allow_handler_to_repeat_event => 1,       # optional
+         # allow_after_handler_to_skip_rest => 1,    # optional
+         # allow_after_handler_to_repeat_event => 1, # optional
+         # stop_after_first_handler_failure => 1,    # optional
+     );
+ }
+
+ 1;
+
+Afterwards, your framework can use the plugin system, e.g.:
+
+ # a plugin module, containing handlers and meta information
+ package Your::Framework::Plugin::Foo;
+
+ sub plugin_meta {
+     return +{ priority => ..., };
+ }
+
+ sub new {
+     my ($self, %args) = @_;
+     ...
+ }
+
+ # required handler if we want to handle the 'check_input' event
+ sub on_check_input {
+     ...
+
+     # plugin can signal success by returning [200] or error by returning [4xx]
+     # or [5xx] status. it can also return [201] to instruct run_event() to skip
+     # calling the rest of the plugins for the event. it can also return [204]
+     # to "decline".
+ }
+
+ # a before_ handler is optional
+ sub before_check_input {
+     my ($self, $r) = @_;
+     ...
+
+     # plugin can instruct to cancel the event by returning [601].
+ }
+
+ # an after_ handler is optional
+ sub after_check_input {
+     my ($self, $r) = @_;
+     ...
+     # plugin can instruct to repeat an event by returning [602].
+ }
+
+ 1;
+
+To use the plugin, user can activate it:
+
+ use Your::Framework 'Foo' => {arg=>..., arg2 => ...};
+
+=head1 DESCRIPTION
+
+B<NOT YET IMPLEMENTED. A NAME GRAB ONLY.>
+
+A plugin approach offers flexibility. Users can enable or disable plugins which
+they need, sometimes also in the order that they want. Each plugin can supply
+behavior at various points (events) in an application. More than one plugin
+(also multiple instances of the same plugin) can supply behavior for a single
+event. In addition, a plugin can modify the flow of the application by aborting
+or repeating an event.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Plugin-System>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Plugin-System>.
+
+=head1 SEE ALSO
+
+L<Module::Pluggable> and its variants like L<Module::Pluggable::Fast>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Plugin-System>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

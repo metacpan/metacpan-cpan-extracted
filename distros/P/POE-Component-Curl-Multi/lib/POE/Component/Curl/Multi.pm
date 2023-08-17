@@ -1,5 +1,5 @@
 package POE::Component::Curl::Multi;
-$POE::Component::Curl::Multi::VERSION = '0.22';
+$POE::Component::Curl::Multi::VERSION = '1.00';
 #ABSTRACT: a fast HTTP POE component
 
 use strict;
@@ -25,6 +25,8 @@ sub spawn {
   my $options = delete $opts{options};
   my $self = bless \%opts, $package;
   delete $self->{ipresolve} unless $self->{ipresolve} && $self->{ipresolve} =~ m!^[46]$!;
+  delete $self->{verifypeer} unless defined $self->{verifypeer} && $self->{verifypeer} =~ m!^[01]$!;
+  delete $self->{verifyhost} unless defined $self->{verifyhost} && $self->{verifyhost} =~ m!^[02]$!;
   $self->{max_concurrency} = 0 unless $self->{max_concurrency} &&
     $self->{max_concurrency} =~ m!^\d+$!;
   $self->{followredirects} = 0 unless
@@ -182,6 +184,10 @@ sub _request {
   }
   delete $args->{ipresolve}
     unless $args->{ipresolve} && $args->{ipresolve} =~ m!^[46]$!;
+  delete $args->{verifypeer}
+    unless defined $args->{verifypeer} && $args->{verifypeer} =~ m!^[01]$!;
+  delete $args->{verifyhost}
+    unless defined $args->{verifyhost} && $args->{verifyhost} =~ m!^[02]$!;
   $args->{sender} = $sender_id;
   if ( $errsp ) {
     $errsp->request( $args->{request} ) unless $errsp->code() eq '400';
@@ -202,9 +208,28 @@ sub _request {
     my $easy = Net::Curl::Easy->new;
     my $req = $args->{request};
     $easy->setopt(CURLOPT_URL, $req->uri);
-    $easy->setopt(CURLOPT_SSL_VERIFYPEER, 0);
+    my $verifypeer;
+    if ( defined $args->{verifypeer} ) {
+      $verifypeer = $args->{verifypeer};
+    }
+    elsif ( defined $self->{verifypeer} ) {
+      $verifypeer = $self->{verifypeer};
+    }
+    $easy->setopt(CURLOPT_SSL_VERIFYPEER, $verifypeer) if defined $verifypeer;
+    my $verifyhost;
+    if ( defined $args->{verifyhost} ) {
+      $verifypeer = $args->{verifyhost};
+    }
+    elsif ( defined $self->{verifyhost} ) {
+      $verifypeer = $self->{verifyhost};
+    }
+    $easy->setopt(CURLOPT_SSL_VERIFYHOST, $verifyhost) if defined $verifyhost;
     $easy->setopt(CURLOPT_DNS_CACHE_TIMEOUT, 0);
-    $easy->setopt(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    my $ipresolve = $args->{ipresolve} || $self->{ipresolve};
+    if ( $ipresolve ) {
+      $easy->setopt(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4) if $ipresolve eq '4';
+      $easy->setopt(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6) if $ipresolve eq '6';
+    }
     $easy->setopt(CURLOPT_ENCODING, '');
     if ( $self->{agent} ) {
       my $agent = $self->{agent}->[ rand @{ $self->{agent} } ];
@@ -373,7 +398,7 @@ POE::Component::Curl::Multi - a fast HTTP POE component
 
 =head1 VERSION
 
-version 0.22
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -429,6 +454,11 @@ L<POE::Component::Client::HTTP>.
 
 It is inspired by L<AnyEvent::Curl::Multi>.
 
+Versions of this module prior to 0.23 did not verify the peer's certificate
+when performing SSL/TLS. As of 0.23 peer verification is the default behaviour.
+If this is a problem for you then see the C<verifypeer> ( and optionally the
+C<verifyhost> ) options to C<spawn> and C<request>.
+
 =head1 CONSTRUCTOR
 
 =over
@@ -471,6 +501,41 @@ See L<http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTPROXY>
 
 Specify the maximum number of concurrent requests, a value of C<0> means
 no limit will be imposed. The default is C<0>.
+
+=item C<ipresolve>
+
+Specify what kind of IP addresses to use when hostnames resolve to more than
+one version of IP.
+
+Specify C<4> for IPv4 only or C<6> for IPv6 only.
+
+The default is C<curl>'s default which is C<whatever>, which will use all
+IP versions.
+
+See L<https://curl.se/libcurl/c/CURLOPT_IPRESOLVE.html>
+
+=item C<verifypeer>
+
+Relevant to SSL/TLS, specify whether the authenticity of the peer's certificate should be
+verified. Set to C<1> for verification or C<0> to live dangerously.
+
+Curl defaults to C<1> if you don't specify this.
+
+See L<https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html> for the full details.
+
+=item C<verifyhost>
+
+Again relevant to SSL/TLS, specify whether the hostname on the certificate is for
+the server it is known as.
+
+Set to C<2> to verify that the hostname (either in the Common Name field or a Subject
+Alternative Name field) matches the hostname in the URL.
+
+Set to C<0> to disable this verification and live with the consequences.
+
+Curl defaults to C<2> if you don't specify this.
+
+See L<https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html> for the full details.
 
 =item C<curl_debug>
 
@@ -558,6 +623,41 @@ Specify a proxy to use. This overrides the C<proxy> set with C<spawn>, if
 applicable.
 
 See L<http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTPROXY>
+
+=item C<ipresolve>
+
+Specify what kind of IP addresses to use when hostnames resolve to more than
+one version of IP.
+
+Specify C<4> for IPv4 only or C<6> for IPv6 only.
+
+The default is C<curl>'s default which is C<whatever>, which will use all
+IP versions.
+
+See L<https://curl.se/libcurl/c/CURLOPT_IPRESOLVE.html>
+
+=item C<verifypeer>
+
+Relevant to SSL/TLS, specify whether the authenticity of the peer's certificate should be
+verified. Set to C<1> for verification or C<0> to live dangerously.
+
+Curl defaults to C<1> if you don't specify this.
+
+See L<https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html> for the full details.
+
+=item C<verifyhost>
+
+Again relevant to SSL/TLS, specify whether the hostname on the certificate is for
+the server it is known as.
+
+Set to C<2> to verify that the hostname (either in the Common Name field or a Subject
+Alternative Name field) matches the hostname in the URL.
+
+Set to C<0> to disable this verification and live with the consequences.
+
+Curl defaults to C<2> if you don't specify this.
+
+See L<https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html> for the full details.
 
 =item C<session>
 
@@ -676,7 +776,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
+This software is copyright (c) 2023 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

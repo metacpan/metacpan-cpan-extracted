@@ -3,20 +3,20 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::Zip;
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
 
 # List literals
-is_deeply( [ qw( one two three ) M ( 1 .. 3 ) ],
+is( [ qw( one two three ) M ( 1 .. 3 ) ],
    [ one => 1, two => 2, three => 3 ],
    'basic mesh' );
 
-is_deeply( [ qw( one two ) M ( 1 .. 3 ) ],
+is( [ qw( one two ) M ( 1 .. 3 ) ],
    [ one => 1, two => 2, undef, 3 ],
    'mesh fills in blanks of LHS' );
-is_deeply( [ qw( one two three ) M ( 1 .. 2 ) ],
+is( [ qw( one two three ) M ( 1 .. 2 ) ],
    [ one => 1, two => 2, three => undef ],
    'mesh fills in blanks of RHS' );
 
@@ -33,7 +33,7 @@ is_deeply( [ qw( one two three ) M ( 1 .. 2 ) ],
 {
    my @n = (1..3);
    $_++ for @n M ("x")x3;
-   is_deeply( \@n, [1..3], 'mesh returns copies of arguments' );
+   is( \@n, [1..3], 'mesh returns copies of arguments' );
 }
 
 done_testing;

@@ -6,8 +6,8 @@ SPECIFICATION VERSION
     0.2
 
 VERSION
-    This document describes version 0.2.2 of TableData (from Perl
-    distribution TableData), released on 2022-11-29.
+    This document describes version 0.2.3 of TableData (from Perl
+    distribution TableData), released on 2023-04-19.
 
 SYNOPSIS
     Use one of the "TableData::*" modules.
@@ -51,34 +51,58 @@ NAMESPACE ORGANIZATION
     More specific subnamespaces for more specific types of table data are
     described in entries below.
 
+  TableData::Calendar::*
+    For calendar-related data.
+
+  TableData::Calendar::Date::*
+    For table containing calendar dates.
+
+    Examples:
+
+    "TableData::Calendar::Date::Holiday::ID" contains holiday dates for
+    Indonesia.
+
+    "TableData::Calendar::Date::Holiday::AU::TAS" contains holiday dates for
+    Tasmania, Australia.
+
+  TableData::Lingua::*
+    For human-language-related data.
+
+  TableData::Lingua::Dict::*
+    For dictionaries.
+
+    For monolingual language dictionaries, a 2-letter ISO language code
+    should be added as subnamespace prefix. For bilingual dictionaries, a
+    "LANGCODE1_LANGCODE2" should be added as subnamespace prefix.
+
+    All "TableData::Lingua::Dict::*" modules should contain the columns
+    "entry" and "description".
+
+    Examples: TableData::Lingua::Dict::Foldoc,
+    TableData::Lingua::Dict::ID::KBBI,
+    TableData::Lingua::Dict::ZH::Proverb::StarDict,
+    TableData::Lingua::Dict::FR_EN::FreeDict.
+
+  TableData::Lingua::Word::*
+    For tables that contain word list. This is now preferred namespace to
+    WordList, and an alternative for "ArrayData::Lingua::Word::" namespace.
+
+    All "TableData::Lingua::Word::*" modules should contain the column
+    "word" so they are usable from applications like word games.
+
+    A 2-letter ISO language code should be added as subnamespace prefix
+    whenever applicable.
+
+    Example: TableData::Lingua::Word::EN::Adjective::TalkEnglish (list of
+    top adjectives from talkenglish.com website, along with some other data
+    like frequency).
+
   TableData::Locale::*
     For locale-related data.
 
     Examples: "TableData::Locale::Country" (list of countries in the world),
     TableData::Locale::US::State (list of US states),
     "TableData::Locale::ID::Province" (list of Indonesian provinces).
-
-  TableData::Lingua::*
-    For human-language-related data
-
-    Examples: TableData::Lingua::Word::EN::Adjective::TalkEnglish (list of
-    top adjectives from talkenglish.com website, along with some other data
-    like frequency). More specific "TableData::Lingua::*" subnamespaces are
-    described in entries below.
-
-  TableData::Lingua::Word::*
-    All "TableData::Lingua::Word::*" modules should contain the column
-    "word" so they are usable from applications like word games.
-
-  TableData::Lingua::Dict::*
-    For dictionaries.
-
-    Examples: TableData::Lingua::Dict::ID::KBBI,
-    TableData::Lingua::Dict::ZH::Proverb::StarDict,
-    TableData::Lingua::Dict::FR_EN::FreeDict.
-
-    All "TableData::Lingua::Dict::*" modules should contain the columns
-    "entry" and "description".
 
   TableDataRole::*
     The roles.
@@ -146,7 +170,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -113,7 +113,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.14.2",
+  "VERSION" => "1.14.3",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t t/scm/*.t"
   }

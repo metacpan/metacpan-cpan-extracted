@@ -1,3 +1,10 @@
+0.19 2023-07-22
+    * Various test suite fixes
+
+0.18 2023-07-21
+    * Support //= in signatures, like 5.38 does
+    * Various test suite fixes
+
 0.17 2020-10-03
     * Make some capture groups atomic to speed up matching
     * Documentation updates to mention more common code pitfalls that trip up

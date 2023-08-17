@@ -8,17 +8,13 @@ ABSTRACT
 
 VERSION
 
-    2.91
+    3.55
 
 SYNOPSIS
 
       package main;
     
-      use Venus qw(
-        catch
-        error
-        raise
-      );
+      use Venus 'catch', 'error', 'raise';
     
       # error handling
       my ($error, $result) = catch {
@@ -26,16 +22,16 @@ SYNOPSIS
       };
     
       # boolean keywords
-      if ($result and $result eq false) {
-        true;
+      if ($result) {
+        error;
       }
     
       # raise exceptions
-      if (false) {
+      if ($result) {
         raise 'MyApp::Error';
       }
     
-      # and much more!
+      # boolean keywords, and more!
       true ne false;
 
 DESCRIPTION
@@ -97,11 +93,12 @@ FUNCTIONS
 
  args
 
-      args(Any @args) (HashRef)
+      args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
 
-    The args function takes a list of arguments and returns a hashref.
+    The args function builds and returns a Venus::Args object, or
+    dispatches to the coderef or method provided.
 
-    Since 2.32
+    Since 3.10
 
     args example 1
 
@@ -109,9 +106,9 @@ FUNCTIONS
       
         use Venus 'args';
       
-        my $args = args(content => 'example');
+        my $args = args ['--resource', 'users'];
       
-        # {content => "example"}
+        # bless({...}, 'Venus::Args')
 
     args example 2
 
@@ -119,29 +116,9 @@ FUNCTIONS
       
         use Venus 'args';
       
-        my $args = args({content => 'example'});
+        my $args = args ['--resource', 'users'], 'indexed';
       
-        # {content => "example"}
-
-    args example 3
-
-        package main;
-      
-        use Venus 'args';
-      
-        my $args = args('content');
-      
-        # {content => undef}
-
-    args example 4
-
-        package main;
-      
-        use Venus 'args';
-      
-        my $args = args('content', 'example', 'algorithm');
-      
-        # {content => "example", algorithm => undef}
+        # {0 => '--resource', 1 => 'users'}
 
  array
 
@@ -172,6 +149,44 @@ FUNCTIONS
       
         # [1..9]
 
+ arrayref
+
+      arrayref(Any @args) (ArrayRef)
+
+    The arrayref function takes a list of arguments and returns a arrayref.
+
+    Since 3.10
+
+    arrayref example 1
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref(content => 'example');
+      
+        # [content => "example"]
+
+    arrayref example 2
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref([content => 'example']);
+      
+        # [content => "example"]
+
+    arrayref example 3
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref('content');
+      
+        # ['content']
+
  assert
 
       assert(Any $data, Str $expr) (Any)
@@ -200,6 +215,57 @@ FUNCTIONS
         my $assert = assert(1234567890, 'float');
       
         # Exception! (isa Venus::Assert::Error)
+
+ async
+
+      async(CodeRef $code, Any @args) (Process)
+
+    The async function accepts a callback and executes it asynchronously
+    via "async" in Venus::Process. This function returns a "dyadic"
+    Venus::Process object which can be used with "await".
+
+    Since 3.40
+
+    async example 1
+
+        package main;
+      
+        use Venus 'async';
+      
+        my $async = async sub{
+          'done'
+        };
+      
+        # bless({...}, 'Venus::Process')
+
+ await
+
+      await(Process $process, Int $timeout) (Any)
+
+    The await function accepts a "dyadic" Venus::Process object and
+    eventually returns a value (or values) for it. The value(s) returned
+    are the return values or emissions from the asychronous callback
+    executed with "async" which produced the process object.
+
+    Since 3.40
+
+    await example 1
+
+        package main;
+      
+        use Venus 'async', 'await';
+      
+        my $process;
+      
+        my $async = async sub{
+          ($process) = @_;
+          # in forked process ...
+          return 'done';
+        };
+      
+        my $await = await $async;
+      
+        # ['done']
 
  bool
 
@@ -604,6 +670,61 @@ FUNCTIONS
       
         # false
 
+ clargs
+
+      clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+
+    The clargs function accepts a single arrayref of Getopt::Long specs, or
+    an arrayref of arguments followed by an arrayref of Getopt::Long specs,
+    and returns a three element list of Venus::Args, Venus::Opts, and
+    Venus::Vars objects. If only a single arrayref is provided, the
+    arguments will be taken from @ARGV.
+
+    Since 3.10
+
+    clargs example 1
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs;
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
+    clargs example 2
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs ['resource|r=s', 'help|h'];
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
+    clargs example 3
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs ['--resource', 'help'],
+          ['resource|r=s', 'help|h'];
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
  cli
 
       cli(ArrayRef $args) (Cli)
@@ -690,9 +811,52 @@ FUNCTIONS
       
         use Venus 'config';
       
-        my $config = config {}, 'from_perl', '{"data"=>1}';
+        my $config = config {}, 'read_perl', '{"data"=>1}';
       
         # bless({...}, 'Venus::Config')
+
+ container
+
+      container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The container function builds and returns a Venus::Container object, or
+    dispatches to the coderef or method provided.
+
+    Since 3.20
+
+    container example 1
+
+        package main;
+      
+        use Venus 'container';
+      
+        my $container = container {};
+      
+        # bless({...}, 'Venus::Config')
+
+    container example 2
+
+        package main;
+      
+        use Venus 'container';
+      
+        my $data = {
+          '$metadata' => {
+            tmplog => "/tmp/log"
+          },
+          '$services' => {
+            log => {
+              package => "Venus/Path",
+              argument => {
+                '$metadata' => "tmplog"
+              }
+            }
+          }
+        };
+      
+        my $log = container $data, 'resolve', 'log';
+      
+        # bless({value => '/tmp/log'}, 'Venus::Path')
 
  cop
 
@@ -796,6 +960,55 @@ FUNCTIONS
         my $date = date time;
       
         # bless({...}, 'Venus::Date')
+
+ docs
+
+      docs(Any @args) (Any)
+
+    The docs function builds a Venus::Data object using "docs" in
+    Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
+    script, i.e. $0, and returns the result of a "string" in Venus::Data
+    operation using the arguments provided.
+
+    Since 3.30
+
+    docs example 1
+
+        package main;
+      
+        use Venus 'docs';
+      
+        # =head1 ABSTRACT
+        #
+        # Example Abstract
+        #
+        # =cut
+      
+        my $docs = docs 'head1', 'ABSTRACT';
+      
+        # "Example Abstract"
+
+    docs example 2
+
+        package main;
+      
+        use Venus 'docs';
+      
+        # =head1 NAME
+        #
+        # Example #1
+        #
+        # =cut
+        #
+        # =head1 NAME
+        #
+        # Example #2
+        #
+        # =cut
+      
+        my $docs = docs 'head1', 'NAME';
+      
+        # "Example #1\nExample #2"
 
  error
 
@@ -1026,6 +1239,161 @@ FUNCTIONS
       
         # [[1, 2], [3, 4], [5, 6], [7, 8]]
 
+ hashref
+
+      hashref(Any @args) (HashRef)
+
+    The hashref function takes a list of arguments and returns a hashref.
+
+    Since 3.10
+
+    hashref example 1
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref(content => 'example');
+      
+        # {content => "example"}
+
+    hashref example 2
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref({content => 'example'});
+      
+        # {content => "example"}
+
+    hashref example 3
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref('content');
+      
+        # {content => undef}
+
+    hashref example 4
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref('content', 'example', 'algorithm');
+      
+        # {content => "example", algorithm => undef}
+
+ is_bool
+
+      is_bool(Any $arg) (Bool)
+
+    The is_bool function returns "true" if the value provided is a boolean
+    value, not merely truthy, and "false" otherwise.
+
+    Since 3.18
+
+    is_bool example 1
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool true;
+      
+        # true
+
+    is_bool example 2
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool false;
+      
+        # true
+
+    is_bool example 3
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool 1;
+      
+        # false
+
+    is_bool example 4
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool 0;
+      
+        # false
+
+ is_false
+
+      is_false(Any $data) (Bool)
+
+    The is_false function accepts a scalar value and returns true if the
+    value is falsy.
+
+    Since 3.04
+
+    is_false example 1
+
+        package main;
+      
+        use Venus 'is_false';
+      
+        my $is_false = is_false 0;
+      
+        # true
+
+    is_false example 2
+
+        package main;
+      
+        use Venus 'is_false';
+      
+        my $is_false = is_false 1;
+      
+        # false
+
+ is_true
+
+      is_true(Any $data) (Bool)
+
+    The is_true function accepts a scalar value and returns true if the
+    value is truthy.
+
+    Since 3.04
+
+    is_true example 1
+
+        package main;
+      
+        use Venus 'is_true';
+      
+        my $is_true = is_true 1;
+      
+        # true
+
+    is_true example 2
+
+        package main;
+      
+        use Venus 'is_true';
+      
+        my $is_true = is_true 0;
+      
+        # false
+
  json
 
       json(Str $call, Any $data) (Any)
@@ -1076,6 +1444,45 @@ FUNCTIONS
       
         # Exception! (isa Venus::Fault)
 
+ list
+
+      list(Any @args) (Any)
+
+    The list function accepts a list of values and flattens any arrayrefs,
+    returning a list of scalars.
+
+    Since 3.04
+
+    list example 1
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list 1..4;
+      
+        # (1..4)
+
+    list example 2
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list [1..4];
+      
+        # (1..4)
+
+    list example 3
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list [1..4], 5, [6..10];
+      
+        # (1..10)
+
  load
 
       load(Any $name) (Space)
@@ -1100,7 +1507,11 @@ FUNCTIONS
       log(Any @args) (Log)
 
     The log function prints the arguments provided to STDOUT, stringifying
-    complex values, and returns a Venus::Log object.
+    complex values, and returns a Venus::Log object. If the first argument
+    is a log level name, e.g. debug, error, fatal, info, trace, or warn, it
+    will be used when emitting the event. The desired log level is
+    specified by the VENUS_LOG_LEVEL environment variable and defaults to
+    trace.
 
     Since 2.40
 
@@ -1245,10 +1656,10 @@ FUNCTIONS
 
  merge
 
-      merge(HashRef @args) (HashRef)
+      merge(Any @args) (Any)
 
-    The merge function returns a hash reference which is a merger of all of
-    the hashref arguments provided.
+    The merge function returns a value which is a merger of all of the
+    arguments provided.
 
     Since 2.32
 
@@ -1392,6 +1803,57 @@ FUNCTIONS
       
         # "users"
 
+ pairs
+
+      pairs(Any $data) (ArrayRef)
+
+    The pairs function accepts an arrayref or hashref and returns an
+    arrayref of arrayrefs holding keys (or indices) and values. The
+    function returns an empty arrayref for all other values provided.
+    Returns a list in list context.
+
+    Since 3.04
+
+    pairs example 1
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my $pairs = pairs [1..4];
+      
+        # [[0,1], [1,2], [2,3], [3,4]]
+
+    pairs example 2
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my $pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+      
+        # [['a',1], ['b',2], ['c',3], ['d',4]]
+
+    pairs example 3
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my @pairs = pairs [1..4];
+      
+        # ([0,1], [1,2], [2,3], [3,4])
+
+    pairs example 4
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my @pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+      
+        # (['a',1], ['b',2], ['c',3], ['d',4])
+
  path
 
       path(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -1534,6 +1996,41 @@ FUNCTIONS
       
         # bless({...}, 'Venus::Prototype')
 
+ puts
+
+      puts(Any @args) (ArrayRef)
+
+    The puts function select values from within the underlying data
+    structure using "path" in Venus::Array or "path" in Venus::Hash,
+    optionally assigning the value to the preceeding scalar reference and
+    returns all the values selected.
+
+    Since 3.20
+
+    puts example 1
+
+        package main;
+      
+        use Venus 'puts';
+      
+        my $data = {
+          size => "small",
+          fruit => "apple",
+          meta => {
+            expiry => '5d',
+          },
+          color => "red",
+        };
+      
+        puts $data, (
+          \my $fruit, 'fruit',
+          \my $expiry, 'meta.expiry'
+        );
+      
+        my $puts = [$fruit, $expiry];
+      
+        # ["apple", "5d"]
+
  raise
 
       raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -1605,6 +2102,35 @@ FUNCTIONS
       
         # "ryKUPbJHYT"
 
+ range
+
+      range(Int | Str @args) (ArrayRef)
+
+    The range function returns the result of a "range" in Venus::Array
+    operation.
+
+    Since 3.20
+
+    range example 1
+
+        package main;
+      
+        use Venus 'range';
+      
+        my $range = range [1..9], ':4';
+      
+        # [1..5]
+
+    range example 2
+
+        package main;
+      
+        use Venus 'range';
+      
+        my $range = range [1..9], '-4:-1';
+      
+        # [6..9]
+
  regexp
 
       regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -1638,6 +2164,27 @@ FUNCTIONS
       
         # "ID 00000"
 
+ render
+
+      render(Str $data, HashRef $args) (Str)
+
+    The render function accepts a string as a template and renders it using
+    Venus::Template, and returns the result.
+
+    Since 3.04
+
+    render example 1
+
+        package main;
+      
+        use Venus 'render';
+      
+        my $render = render 'hello {{name}}', {
+          name => 'user',
+        };
+      
+        # "hello user"
+
  replace
 
       replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
@@ -1666,6 +2213,43 @@ FUNCTIONS
         my $replace = replace ['hello world', 'world', 'universe'], 'get';
       
         # "hello universe"
+
+ resolve
+
+      resolve(HashRef $value, Any @args) (Any)
+
+    The resolve function builds and returns an object via "resolve" in
+    Venus::Container.
+
+    Since 3.30
+
+    resolve example 1
+
+        package main;
+      
+        use Venus 'resolve';
+      
+        my $resolve = resolve {};
+      
+        # undef
+
+    resolve example 2
+
+        package main;
+      
+        use Venus 'resolve';
+      
+        my $data = {
+          '$services' => {
+            log => {
+              package => "Venus/Path",
+            }
+          }
+        };
+      
+        my $log = resolve $data, 'log';
+      
+        # bless({...}, 'Venus::Path')
 
  roll
 
@@ -1804,6 +2388,57 @@ FUNCTIONS
       
         # "helloWorld"
 
+ syscall
+
+      syscall(Int | Str @args) (Any)
+
+    The syscall function perlforms system call, i.e. a "qx" in perlfunc
+    operation, and returns true if the command succeeds, otherwise returns
+    false. In list context, returns the output of the operation and the
+    exit code.
+
+    Since 3.04
+
+    syscall example 1
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my $syscall = syscall 'perl', '-v';
+      
+        # true
+
+    syscall example 2
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my $syscall = syscall 'perl', '-z';
+      
+        # false
+
+    syscall example 3
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my ($data, $code) = syscall 'sun', '--heat-death';
+      
+        # ('done', 0)
+
+    syscall example 4
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my ($data, $code) = syscall 'earth', '--melt-icecaps';
+      
+        # ('', 127)
+
  template
 
       template(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -1863,6 +2498,101 @@ FUNCTIONS
         my $test = test 't/Venus.t', 'for', 'synopsis';
       
         # bless({...}, 'Venus::Test')
+
+ text
+
+      text(Any @args) (Any)
+
+    The text function builds a Venus::Data object using "text" in
+    Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
+    script, i.e. $0, and returns the result of a "string" in Venus::Data
+    operation using the arguments provided.
+
+    Since 3.30
+
+    text example 1
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text 'name';
+      
+        # "Example Name"
+
+    text example 2
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text 'titles', '#1';
+      
+        # "Example Title #1"
+
+    text example 3
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text undef, 'name';
+      
+        # "Example Name"
 
  then
 
@@ -2445,6 +3175,12 @@ FEATURES
       This library contains a Venus::Replace class which provides methods
       for manipulating regexp replacement data.
 
+    venus-run
+
+      This library contains a Venus::Run class which provides a base class
+      for providing a command execution system for creating CLIs
+      (command-line interfaces).
+
     venus-scalar
 
       This library contains a Venus::Scalar class which provides methods
@@ -2464,6 +3200,11 @@ FEATURES
 
       This library contains a Venus::String class which provides methods
       for manipulating string data.
+
+    venus-task
+
+      This library contains a Venus::Task class which provides a base class
+      for creating CLIs (command-line interfaces).
 
     venus-template
 

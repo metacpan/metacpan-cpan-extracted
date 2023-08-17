@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 # Export subroutine cavaspazi
 our @EXPORT = qw(cavaspazi);
 
-$Acme::Cavaspazi::VERSION = "1.0.1";
+$Acme::Cavaspazi::VERSION = "1.0.3";
 
 
 
@@ -44,7 +44,7 @@ Acme::Cavaspazi - a simple function to remove spaces from strings or lists of st
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Andrea Telatin, Nicola Vitulo.
+This software is Copyright (c) 2023 by Andrea Telatin, Nicola Vitulo.
 
 This is free software, licensed under:
 

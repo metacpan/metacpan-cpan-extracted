@@ -32,7 +32,7 @@ mv-add-prefix-number - Add serial number (1, 2, ...) to filenames
 
 =head1 VERSION
 
-This document describes version 0.010 of mv-add-prefix-number (from Perl distribution App-FileRenameUtils), released on 2023-03-19.
+This document describes version 0.011 of mv-add-prefix-number (from Perl distribution App-FileRenameUtils), released on 2023-05-24.
 
 =head1 SYNOPSIS
 

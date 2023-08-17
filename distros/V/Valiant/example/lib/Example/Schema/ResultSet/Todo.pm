@@ -13,11 +13,16 @@ sub newer_first($self) {
 }
 
 sub filter_by_request($self, $request) {
-  my $todos = $request->status_all ?
-    $self : $self->search_rs({status=>$request->status});
-  $todos = $todos->page_or_last($request->page); 
-  $todos->status($request->status);
-  return $todos;
+  my $filtered_resultset = $self->next::method($request);
+  $filtered_resultset = $filtered_resultset->search({status=>$request->status}) unless $request->status_all;
+  $filtered_resultset->status($request->status);
+  return $filtered_resultset; 
+}
+
+sub get_last_page($self) {
+  my $new_resultset = $self->page($self->pager->last_page);
+  $new_resultset->status($self->status);
+  return $new_resultset; 
 }
 
 sub new_todo($self) {

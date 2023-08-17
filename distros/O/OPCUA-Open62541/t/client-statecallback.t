@@ -6,7 +6,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 15 + 10 * 4;
+    OPCUA::Open62541::Test::Client::planning() + 15 + (10 + 6) * 4;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -64,6 +64,7 @@ lives_ok { $client->{config}->setStateCallback($callback); }
 	STATUSCODE_GOOD],
     [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CLOSED,
 	STATUSCODE_GOOD],
+
     [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CREATE_REQUESTED,
 	STATUSCODE_GOOD],
     [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CREATED,
@@ -73,6 +74,24 @@ lives_ok { $client->{config}->setStateCallback($callback); }
     [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_ACTIVATED,
 	STATUSCODE_GOOD],
 );
+SKIP: {
+    skip "client does not close and reopen with discovery and endpoint url",
+	6 *4 if not OPCUA::Open62541::ClientConfig->can('setApplicationUri');
+    splice(@states, 4, 0, (
+    [ SECURECHANNELSTATE_CLOSED,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD ],
+    [ SECURECHANNELSTATE_FRESH,		SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD ],
+    [ SECURECHANNELSTATE_HEL_SENT,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD ],
+    [ SECURECHANNELSTATE_ACK_RECEIVED,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPN_SENT,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    ));
+}
 $client->run();
 is(scalar @states, 0, "states connected");
 

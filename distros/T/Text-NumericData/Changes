@@ -1,5 +1,21 @@
 Revision history for Text-NumericData
 
+2.004001 (2022-07-15)
+	- Remove taint mode from tests.
+
+2.004000
+	- Fix strict separator logic (no fuzzy whitespace on separators
+	  when strict parsing is in effect).
+	- Fix txdfilter --headlines to do what it was supposed to do.
+	- Add txdcontract --stats.
+	- Add txdhistogram --cumulative and --binpoints.
+	- Add ranges to txdcolumns.
+	- Add txdinfo --rows.
+	- Add txdfilter --index.
+	- Add txdcolumns --invert.
+	- Add txdrecycle --smother.
+	- Add min and max column to txdstatistics output.
+
 2.003003
 	- Make tests more robust by introducing proper numerical error range.
 

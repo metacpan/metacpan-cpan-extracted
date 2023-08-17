@@ -1,11 +1,17 @@
+.editorconfig
 Changes
 lib/Mozilla/CA.pm
 lib/Mozilla/CA/cacert.pem
+maint/cacert-diff
+maint/get-tarball-name
+maint/make-tarball
 maint/mk-ca-bundle.pl
+maint/prepare-release
 maint/update-cacert-file
 maint/update-mk-ca-bundle
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/locate-file.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

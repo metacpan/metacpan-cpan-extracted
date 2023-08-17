@@ -46,10 +46,20 @@ Set(%Lifecycles,
      __maps__ => {
         'default -> support' => {
             'stalled'  => 'waiting for customer',
+            'new'      => 'new',
+            'open'     => 'open',
+            'resolved' => 'resolved',
+            'rejected' => 'rejected',
+            'deleted'  => 'deleted',
         },
         'support -> default' => {
             'waiting for support'  => 'stalled',
-            'waiting for customer' => 'stalled'
+            'waiting for customer' => 'stalled',
+            'new'      => 'new',
+            'open'     => 'open',
+            'resolved' => 'resolved',
+            'rejected' => 'rejected',
+            'deleted'  => 'deleted',
         }
      }
 );

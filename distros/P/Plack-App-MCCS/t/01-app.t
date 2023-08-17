@@ -1,16 +1,16 @@
 #!perl
 
 use strict;
-use Test::More tests => 51;
+use Test2::V0;
 use Plack::Test;
 use Plack::App::MCCS;
 use HTTP::Request;
 use HTTP::Date;
-use Data::Dumper;
 use autodie;
 
 my $app = Plack::App::MCCS->new(
-	root => 't/rootdir',
+	root => 't/rootdir/example1.com',
+    ignore_file => 'mccsignore',
 	types => {
 		'.less' => {
 			content_type => 'text/stylesheet-less',
@@ -52,6 +52,12 @@ test_psgi
 		# let's look at the cache control
 		is($res->header('Cache-Control'), 'max-age=360, must-revalidate', 'Received specific cache control for style.css');
 
+		# let's request style.css and see we're getting a minified, deflated version
+		$req = HTTP::Request->new(GET => '/style.css', ['Accept-Encoding' => 'deflate']);
+		my $deflated = $cb->($req);
+		is($deflated->code, 200, 'Found style.css');
+		is($deflated->header('Content-Encoding'), 'deflate', 'Received deflated representation of style.css');
+
 		# let's request style.css again with an If-Not-Modified header
 		$req = HTTP::Request->new(GET => '/style.css', ['If-Modified-Since' => $res->header('Last-Modified'), 'Accept-Encoding' => 'gzip']);
 		my $newres = $cb->($req);
@@ -70,7 +76,7 @@ test_psgi
 
 		# let's request script.js and see we're receiving an automatically minified version
 		SKIP: {
-			unless ($app->_can_minify_js) {
+			unless ($app->_minifiers->{js}) {
 				diag("Skipping JS minification as JavaScript::Minifier::XS is unavailable");
 				skip 'No JavaScript::Minifier::XS', 6;
 			}
@@ -127,22 +133,15 @@ LESS
 
 		# let's request style2.less with Accept-Encoding and see
 		# if a gzipped representation is automatically created by IO::Compress::Gzip
-		SKIP: {
-			unless ($app->_can_gzip) {
-				diag("Skipping gzip compression as IO::Compress::Gzip is unavailable");
-				skip 'No IO::Compress::Gzip', 3;
-			}
-
-			$req = HTTP::Request->new(GET => '/style2.less', ['Accept-Encoding' => 'gzip']);
-			$res = $cb->($req);
-			is($res->code, 200, 'Requested style2.less with Accept-Encoding and got 200 OK');
-			is($res->header('Content-Encoding'), 'gzip', 'Requested style2.less with Accept-Encoding and got Content-Encoding == gzip');
-			ok($res->header('Content-Length') < $length, 'Length of style2.less gzipped is lower than ungzipped');
-		}
+        $req = HTTP::Request->new(GET => '/style2.less', ['Accept-Encoding' => 'gzip']);
+        $res = $cb->($req);
+        is($res->code, 200, 'Requested style2.less with Accept-Encoding and got 200 OK');
+        is($res->header('Content-Encoding'), 'gzip', 'Requested style2.less with Accept-Encoding and got Content-Encoding == gzip');
+        ok($res->header('Content-Length') < $length, 'Length of style2.less gzipped is lower than ungzipped');
 
 		# let's request style3.css and see it is automatically minified
 		SKIP: {
-			unless ($app->_can_minify_css) {
+			unless ($app->_minifiers->{css}) {
 				diag("Skipping CSS minification as CSS::Minifier::XS is unavailable");
 				skip 'No CSS::Minifier::XS', 2;
 			}
@@ -180,16 +179,29 @@ LESS
 		$res = $cb->($req);
 		is($res->code, 200, 'Found file in a subdirectory');
 		is($res->content, "The Smashing Pumpkins\n", 'file in a subdirectory has correct content');
+
+        # let's make sure requests that match the .mccsignore file return 404
+        $req = HTTP::Request->new(GET => '/.hidden/file');
+        $res = $cb->($req);
+        is($res->code, 404, '.hidden/file is ignored in .mccsignore');
+
+        $req = HTTP::Request->new(GET => '/ignore-this.pl');
+        $res = $cb->($req);
+        is($res->code, 404, 'ignore-this.pl is ignored in .mccsignore');
+
+        # the ignore file itself should not be accessible
+        $req = HTTP::Request->new(GET => '/mccsignore');
+        $res = $cb->($req);
+        is($res->code, 404, 'ignore file itself is inaccessible');
 	};
 
-# let's quickly test one request with a defaults setting
+# let's quickly test one request that shouldn't allow caching
 test_psgi
 	app => Plack::App::MCCS->new(
-		root => 't/rootdir',
-		defaults => {
-			cache_control => ['no-cache', 'no-store'],
-			valid_for => -900,
-		},
+		root => 't/rootdir/example1.com',
+        ignore_file => 'mccsignore',
+		default_cache_control => ['no-cache', 'no-store'],
+		default_valid_for => -900,
 	)->to_app,
 	client => sub {
 		my $cb = shift;
@@ -204,20 +216,20 @@ test_psgi
 
 # remove files created by this test suit
 unlink grep { -e }
-      't/rootdir/mccs.png.etag',
-      't/rootdir/script.min.js',
-      't/rootdir/script.min.js.etag',
-      't/rootdir/script.min.js.gz',
-      't/rootdir/script.min.js.gz.etag',
-      't/rootdir/style.min.css.etag',
-      't/rootdir/style.min.css.gz.etag',
-      't/rootdir/style2.less.gz',
-      't/rootdir/style2.less.etag',
-      't/rootdir/style2.less.gz.etag',
-      't/rootdir/style3.min.css',
-      't/rootdir/style3.min.css.etag',
-      't/rootdir/text.etag',
-      't/rootdir/dir/subdir/smashingpumpkins.txt.etag';
+      't/rootdir/example1.com/mccs.png.etag',
+      't/rootdir/example1.com/script.min.js',
+      't/rootdir/example1.com/script.min.js.etag',
+      't/rootdir/example1.com/script.min.js.gz',
+      't/rootdir/example1.com/script.min.js.gz.etag',
+      't/rootdir/example1.com/style.min.css.etag',
+      't/rootdir/example1.com/style.min.css.gz.etag',
+      't/rootdir/example1.com/style2.less.gz',
+      't/rootdir/example1.com/style2.less.etag',
+      't/rootdir/example1.com/style2.less.gz.etag',
+      't/rootdir/example1.com/style3.min.css',
+      't/rootdir/example1.com/style3.min.css.etag',
+      't/rootdir/example1.com/text.etag',
+      't/rootdir/example1.com/dir/subdir/smashingpumpkins.txt.etag';
 
 $app->min_cache_dir("min_cache");
 test_psgi
@@ -227,7 +239,7 @@ test_psgi
 
 		# let's request script.js and see we're receiving an automatically minified version
 		SKIP: {
-			unless ($app->_can_minify_js) {
+			unless ($app->_minifiers->{js}) {
 				diag("Skipping JS minification as JavaScript::Minifier::XS is unavailable");
 				skip 'No JavaScript::Minifier::XS', 7;
 			}
@@ -237,16 +249,16 @@ test_psgi
 			is($res->code, 200, 'Found script.js');
 			is($res->header('Content-Type'), 'application/javascript; charset=UTF-8', 'Received proper content type for script.js');
 			is($res->content, q!$(document).ready(function(){var name=$('#name').val();var password=$('#password').val();showSomething(name,password);});function showSomething(name,password){alert("Hi "+name+", your password is "+password+" and I am going to broadcast it to the entire world.");}!, 'Received minified version of script.js');
-			ok(-f "t/rootdir/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js", "minified file created in cache dir");
-			ok(-f "t/rootdir/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js.etag", "etag file created in cache dir");
-			ok(!-f "t/rootdir/dir/subdir/script.min.js", "no minified file created in data dir");
-			ok(!-f "t/rootdir/dir/subdir/script.min.js.etag", "no etag file created in data dir");
+			ok(-f "t/rootdir/example1.com/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js", "minified file created in cache dir");
+			ok(-f "t/rootdir/example1.com/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js.etag", "etag file created in cache dir");
+			ok(!-f "t/rootdir/example1.com/dir/subdir/script.min.js", "no minified file created in data dir");
+			ok(!-f "t/rootdir/example1.com/dir/subdir/script.min.js.etag", "no etag file created in data dir");
 
                   unlink grep { -e }
-                        "t/rootdir/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js",
-                        "t/rootdir/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js.etag",
-                        "t/rootdir/dir/subdir/smashingpumpkins.txt.etag";
-                  rmdir "t/rootdir/min_cache";
+                        "t/rootdir/example1.com/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js",
+                        "t/rootdir/example1.com/min_cache/%2Fdir%2Fsubdir%2Fscript.min.js.etag",
+                        "t/rootdir/example1.com/dir/subdir/smashingpumpkins.txt.etag";
+                  rmdir "t/rootdir/example1.com/min_cache";
 		}
 
 		# let's get a file in a subdirectory
@@ -254,8 +266,56 @@ test_psgi
 		my $res = $cb->($req);
 		is($res->code, 200, 'Found file in a subdirectory');
 		is($res->content, "The Smashing Pumpkins\n", 'file in a subdirectory has correct content');
-		ok(-f "t/rootdir/dir/subdir/smashingpumpkins.txt.etag", "etag file for unminified file remains in data dir");
+		ok(-f "t/rootdir/example1.com/dir/subdir/smashingpumpkins.txt.etag", "etag file for unminified file remains in data dir");
 	};
-$app->min_cache_dir(undef);
+
+# test virtal-hosts mode
+$app = Plack::App::MCCS->new(
+	root => 't/rootdir',
+    ignore_file => 'mccsignore',
+    vhost_mode => 1,
+    minify => 0,
+    compress => 0,
+    etag => 0,
+);
+test_psgi
+	app => $app->to_app,
+	client => sub {
+		my $cb = shift;
+
+		my $req = HTTP::Request->new(GET => '/text');
+        $req->remove_header('Host');
+		my $res = $cb->($req);
+        is($res->code, 404);
+
+        $req->header('Host', 'example1.com');
+        $res = $cb->($req);
+        is($res->code, 200);
+
+        $req->header('Host', 'example2.com');
+        $res = $cb->($req);
+        is($res->code, 404);
+
+        $req = HTTP::Request->new(GET => '/index.html');
+        $req->header('Host', 'example2.com');
+        $res = $cb->($req);
+        is($res->code, 200);
+        is($res->content, "This is a test\n");
+
+        $req = HTTP::Request->new(GET => '/ignore-this.pl');
+        $req->header('Host', 'example1.com');
+        $res = $cb->($req);
+        is($res->code, 404, 'ignore-this.pl is ignored in example1.com');
+
+        $req = HTTP::Request->new(GET => '/mccsignore');
+        $req->header('Host', 'example1.com');
+        $res = $cb->($req);
+        is($res->code, 404, 'ignore file itself is inaccessible');
+
+        $req = HTTP::Request->new(GET => '/ignore-this.pl');
+        $req->header('Host', 'example2.com');
+        $res = $cb->($req);
+        is($res->code, 200, 'ignore-this.pl is not ignored in example2.com');
+	};
 
 done_testing();

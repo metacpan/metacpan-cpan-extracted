@@ -23,6 +23,7 @@ cgi
 dir
 ENV
 getpairs
+instantiate
 NetBSD
 paramref
 Solaris

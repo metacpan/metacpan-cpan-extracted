@@ -801,7 +801,7 @@ static const struct XSParseKeywordHooks hooks_ngrep = {
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_PREFIXED_BLOCK(
       XPK_KEYWORD("my"),
-      XPK_PARENSCOPE(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
+      XPK_PARENS(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
     ),
     XPK_LISTEXPR_LISTCTX,
     {0},
@@ -815,7 +815,7 @@ static const struct XSParseKeywordHooks hooks_nmap = {
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_PREFIXED_BLOCK(
       XPK_KEYWORD("my"),
-      XPK_PARENSCOPE(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
+      XPK_PARENS(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
     ),
     XPK_LISTEXPR_LISTCTX,
     {0},
@@ -826,7 +826,7 @@ static const struct XSParseKeywordHooks hooks_nmap = {
 MODULE = List::Keywords    PACKAGE = List::Keywords
 
 BOOT:
-  boot_xs_parse_keyword(0.05);
+  boot_xs_parse_keyword(0.35);
 
   register_xs_parse_keyword("first", &hooks_first, newSViv(0));
 

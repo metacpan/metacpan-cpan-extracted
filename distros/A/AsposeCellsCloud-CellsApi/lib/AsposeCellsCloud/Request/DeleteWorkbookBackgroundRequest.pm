@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorkbookBackgroundRequest.name :   ,
-# DeleteWorkbookBackgroundRequest.folder :   ,
-# DeleteWorkbookBackgroundRequest.storageName :    
+# DeleteWorkbookBackgroundRequest.name : The workbook name.  ,
+# DeleteWorkbookBackgroundRequest.folder : Original workbook folder.  ,
+# DeleteWorkbookBackgroundRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_workbook_background' } = { 
-    	summary => '',
+    	summary => 'Delete workbook background.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -123,21 +123,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

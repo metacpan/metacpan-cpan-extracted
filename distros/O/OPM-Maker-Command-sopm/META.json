@@ -53,15 +53,15 @@
    "provides" : {
       "OPM::Maker::Command::sopm" : {
          "file" : "lib/OPM/Maker/Command/sopm.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.2.0"
       },
       "OPM::Maker::Utils::OTRS3" : {
          "file" : "lib/OPM/Maker/Utils/OTRS3.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.2.0"
       },
       "OPM::Maker::Utils::OTRS4" : {
          "file" : "lib/OPM/Maker/Utils/OTRS4.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlservices/OPM-Maker-Command-sopm"
       }
    },
-   "version" : "1.1.1",
+   "version" : "1.2.0",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

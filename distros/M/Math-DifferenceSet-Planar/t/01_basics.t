@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-use Test::More tests => 198;
+use Test::More tests => 229;
 BEGIN { use_ok('Math::DifferenceSet::Planar') };
 
 #########################
@@ -29,6 +29,9 @@ sub pds_ok {
         }
     }
 };
+
+my $ARITH_BITS = int 1.5+log(~0 >> 1)/log(2);
+diag("arithmetic bits: $ARITH_BITS");
 
 my %p9 = (
     '0 1 3 9 27 49 56 61 77 81'   => '90 0 10 14 30 35 42 64 82 88',
@@ -105,6 +108,7 @@ ok(!Math::DifferenceSet::Planar->available(0, 2));
 ok(!Math::DifferenceSet::Planar->available(2, 30));
 ok(!Math::DifferenceSet::Planar->available(3, -1));
 ok(!Math::DifferenceSet::Planar->available(2, 40));
+ok(!Math::DifferenceSet::Planar->available(1073741824));
 
 ok(Math::DifferenceSet::Planar->known_space(9));
 ok(!Math::DifferenceSet::Planar->known_space(6));
@@ -113,11 +117,11 @@ ok(!Math::DifferenceSet::Planar->known_space(~0>>1&~1));
 
 my $ds = Math::DifferenceSet::Planar->new(9);
 my @el = $ds->elements;
-ok(exists $p9{"@el"});
-pds_ok($ds, "@el");
+ok(exists $p9{"@el"}, 'order 9 sample available');
+pds_ok($ds, "@el", 'order 9 sample sanity check');
 
 $ds = Math::DifferenceSet::Planar->new(3, 2);
-pds_ok($ds, "@el");
+pds_ok($ds, "@el", 'param 3,2 sample sanity check');
 
 my $ne = $ds->elements;
 is($ne, 10);
@@ -131,39 +135,52 @@ is($ds->modulus, 91);
 is($ds->element(0), 0);
 is($ds->element(9), $el[9]);
 is($ds->element(10), undef);
+is($ds->element(-1), $el[9]);
+is($ds->element(-10), $el[0]);
+is($ds->element(-11), undef);
 
 my $ds1 = $ds->translate(10);
 my @el1 = map { ($_ + 10) % 91 } @el;
-pds_ok($ds1, "@el1");
+pds_ok($ds1, "@el1", 'simple translation');
 is($ds1->start_element, 10);
 $ds1 = $ds1->translate(-91);
-pds_ok($ds1, "@el1");
+pds_ok($ds1, "@el1", 'negative trivial translation');
 $ds1 = $ds1->translate(910);
-pds_ok($ds1, "@el1");
+pds_ok($ds1, "@el1", 'positive trivial translation');
 
 my $ds1a = $ds->translate(-1);
 my @el1a = map { ($_ - 1) % 91 } @el;
-pds_ok($ds1a, "@el1a");
+pds_ok($ds1a, "@el1a", 'negative translation');
 is($ds1a->min_element, 0);
 is($ds1a->max_element, 90);
+is($ds1a->element(1), 0);
 
 my @se = $ds->elements_sorted;
 is("@se", "@el");
 my @el1s = sort { $a <=> $b } @el1;
 @se = $ds1->elements_sorted;
 is("@se", "@el1s");
+SKIP: {
+    if ($ds1->can('element_sorted')) {
+        is($ds1->element_sorted(0), $el1s[0]);
+        is($ds1->element_sorted(1), $el1s[1]);
+    }
+    else {
+        skip 'element_sorted not yet implemented', 2;
+    }
+}
 
 my $ds2 = $ds1->canonize;
-pds_ok($ds2, "@el");
+pds_ok($ds2, "@el", 'canonization');
 $ds2 = $ds->canonize;
-pds_ok($ds2, "@el");
+pds_ok($ds2, "@el", 'redundant canonization');
 
 my $dsg = $ds->gap_canonize;
-pds_ok($dsg, $g9{"@el"});
+pds_ok($dsg, $g9{"@el"}, 'gap canonization');
 
 foreach my $q (7, 8, 9) {
     my $ds = Math::DifferenceSet::Planar->new($q);
-    my @el = $ds->elements;
+    my @el = $ds->canonize->elements;
     my $dz = $ds->zeta_canonize;
     pds_ok($dz, $z789{"@el"}, "zeta/$q");
     my $dzz = $dz->zeta_canonize;
@@ -176,43 +193,51 @@ foreach my $q (7, 8, 9) {
 
 foreach my $d (71, 0, 45) {
     my @e = $ds->find_delta($d);
-    ok(2 == @e);
+    ok(2 == @e, "find_delta $d");
     ok(2 == grep { 0 <= $_ && $_ < 91 } @e);
     my $delta = $e[1] - $e[0];
     ok($delta == $d || $delta == $d - 91);
 }
 
-my $nods = Math::DifferenceSet::Planar->from_elements_fast(
-    0, 1, 5, 7, 17, 28, 31, 49
-);
-my @noe = eval { $nods->find_delta(19) };
-ok(0 == @noe);
-like($@, qr/^bogus set: delta not found: 19 \(mod 57\)/);
+my $nods = eval {
+    Math::DifferenceSet::Planar->from_elements_fast(
+        0, 1, 5, 7, 17, 28, 31, 49
+    )
+};
+if ($nods) {
+    my @noe = eval { $nods->find_delta(19) };
+    ok(0 == @noe, 'delta in bogus set');
+    like($@, qr/^bogus set: delta not found: 19 \(mod 57\)/);
+}
+else {
+    pass;
+    like($@, qr/^bogus set: prime divisor 7 of order 7 is not a multiplier/);
+}
 
 my @pe = $ds->peak_elements;
 my $dmax = ($ds->modulus - 1) / 2;
-ok(@pe == 2);
-ok(($pe[1] - $pe[0]) % $ds->modulus == $dmax);
-ok($ds->contains($pe[0]));
-ok($ds->contains($pe[1]));
+ok(@pe == 2, 'peak elements');
+ok(($pe[1] - $pe[0]) % $ds->modulus == $dmax, 'peak elements delta');
+ok($ds->contains($pe[0]), 'peak element 1 in set');
+ok($ds->contains($pe[1]), 'peak element 2 in set');
 my @pe2 = $ds->peak_elements;
-is("@pe2", "@pe");
+is("@pe2", "@pe", 'peak element second run');
 my @set = grep { $ds->contains($_) } -1 .. 91;
-is("@set", "@el");
+is("@set", "@el", 'ds contains');
 my @set1 = grep { $ds1->contains($_) } -1 .. 91;
-is("@set1", "@el1s");
+is("@set1", "@el1s", 'ds1 contains');
 
 my $eta = $ds->eta;
-ok(0 <= $eta && $eta < 91);
+ok(0 <= $eta && $eta < 91, 'eta range');
 my @mp  = $ds->multiply(3)->elements;
 my @te  = $ds->translate($eta)->elements;
-is("@mp", "@te");
+is("@mp", "@te", 'eta value');
 my $eta2 = $ds->eta;
-ok($eta == $eta2);
+ok($eta == $eta2, 'eta second run');
 my $eta3 = Math::DifferenceSet::Planar->from_elements(
     4, 7, 8, 13, 28, 35, 51, 53
 )->eta;
-is($eta3, 21);
+is($eta3, 21, 'eta3 value');
 
 my $zeta = $ds->zeta;
 ok(0 <= $zeta && $zeta < 91);
@@ -226,6 +251,9 @@ is($zeta2, 0);
 my @lg = $ds->largest_gap;
 is(0+@lg, 3);
 is("@lg", '27 49 22');
+
+@lg = $ds->gap_canonize->largest_gap;
+is("@lg", '69 0 22');
 
 SequentialIteratorTest: {
     local $Math::DifferenceSet::Planar::_MAX_ENUM_COUNT = 0;
@@ -247,20 +275,23 @@ SequentialIteratorTest: {
 
 UnstructuredIteratorTest: {
     local $Math::DifferenceSet::Planar::_USE_SPACES_DB  = 0;
-    is($ds->n_planes, 12);
-    my $it = $ds->iterate_rotators;
-    my $it2 = $ds->iterate_rotators;
+    my $ds16 = Math::DifferenceSet::Planar->new(16);
+    is($ds16->n_planes, 12);
+    my $it = $ds16->iterate_rotators;
+    my $it2 = $ds16->iterate_rotators;
     is(ref($it), 'CODE');
     my @p = ();
     while (my $ro = $it->()) {
       push @p, $ro;
     }
-    is("@p", '1 2 4 5 8 10 16 19 20 23 29 46');
+    is("@p", '1 5 11 17 19 23 25 29 41 59 67 97');
     undef $it;
     is($it2->(), 1);
 }
 
 StructuredIteratorTest: {
+    local $Math::DifferenceSet::Planar::_MAX_MEMO_COUNT = 1;
+    Math::DifferenceSet::Planar->new(2)->iterate_rotators;
     $ds = Math::DifferenceSet::Planar->new(9);
     is($ds->n_planes, 12);
     my $it = $ds->iterate_rotators;
@@ -280,13 +311,13 @@ pds_ok($it3->(), "@el");
 my $nds = $it3->();
 my @nel = $nds->elements;
 ok("@nel" ne "@el");
-ok(exists $p9{"@nel"});
+ok(exists $p9{"@nel"}, 'iterator yields another plane');
 pds_ok($nds, "@nel");
 my $c = 2;
 while ($it3->() && $c < 99) {
     ++$c;
 }
-is($c, 12);
+is($c, 12, 'got the right number of planes');
 
 my @m = $ds->multipliers;
 is("@m", '1 3 9 27 81 61');
@@ -294,35 +325,76 @@ is("@m", '1 3 9 27 81 61');
 my $mul = $ds->multipliers;
 is($mul, 6);
 
+@m = eval { Math::DifferenceSet::Planar->multipliers(9) };
+is("@m", '1 3 9 27 81 61');
+@m = eval { Math::DifferenceSet::Planar->multipliers(3, 2) };
+is("@m", '1 3 9 27 81 61');
+@m = eval { Math::DifferenceSet::Planar->multipliers(9, 1) };
+is("@m", '');
+like($@, qr/^order base 9 is not a prime/);
+@m = eval { Math::DifferenceSet::Planar->multipliers(6) };
+is("@m", '');
+like($@, qr/^order 6 is not a prime/);
+@m = eval { Math::DifferenceSet::Planar->multipliers(127, 111) };
+is("@m", '');
+like($@, qr/^order 127 \*\* 111 too large for this platform/);
+@m = eval { Math::DifferenceSet::Planar->multipliers(79, 5) };
+if (@m) {
+    is(0+@m, 15, 'whow, order 3M set multipliers supported');
+}
+else {
+    like(
+        $@, qr/^order 79 \*\* 5 too large for this platform/,
+        'arithmetic overflow correctly avoided'
+    );
+}
+@m = eval { Math::DifferenceSet::Planar->multipliers };
+is("@m", '');
+like($@, qr/^parameters expected if called as a class method/);
+
 my $ds3 = $ds->multiply(1);
-pds_ok($ds3, "@el");
+pds_ok($ds3, "@el", 'multiplying by 1');
 my $ds4 = $ds->multiply(10);
 my $tel = $p9{"@el"};
-pds_ok($ds4, $tel);
+pds_ok($ds4, $tel, 'multiplying by 10');
 $ds3 = $ds->multiply(3)->canonize;
-pds_ok($ds3, "@el");
+pds_ok($ds3, "@el", 'multiplying by a multiplier');
 $ds3 = $ds4->multiply(82);
-pds_ok($ds3, "@el");
+pds_ok($ds3, "@el", 'multiplying by another multiplier');
 
 $ds3 = eval { $ds->multiply(35) };
 is($ds3, undef);
-like($@, qr/^35: factor is not coprime to modulus/);
+like($@, qr/^factor 35 is not coprime to modulus/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->new(6) };
 is($ds3, undef);
-like($@, qr/^PDS\(6\) not available/);
+like($@, qr/^order 6 is not a prime power/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->new(4, 1) };
 is($ds3, undef);
-like($@, qr/^PDS\(4, 1\) not available/);
+like($@, qr/^order base 4 is not a prime/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->new(0, 2) };
 is($ds3, undef);
-like($@, qr/^PDS\(0, 2\) not available/);
+like($@, qr/^order base 0 is not a prime/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->new(73, 5) };
 is($ds3, undef);
-like($@, qr/^PDS\(73, 5\) not available/);
+if ($ARITH_BITS < 64) {
+    like($@, qr/^order 73 \*\* 5 too large for this platform/);
+}
+else {
+    like($@, qr/^PDS\(73, 5\) not available/);
+}
+
+$ds3 = eval { Math::DifferenceSet::Planar->new(3077056399) };
+is($ds3, undef);
+if ($ARITH_BITS <= 64) {
+    like($@, qr/^order 3077056399 too large for this platform/);
+}
+else {
+    like($@, qr/^PDS\(3077056399\) not available/);
+}
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     1, 2, 4, 10, 28, 50, 57, 62, 78, 82,
@@ -367,13 +439,19 @@ is($ds3, undef);
 like($@, qr/^duplicate element: 1/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
-    0, 1, 2
+    0, 1, 4
 )};
 is($ds3, undef);
-like($@, qr/^apparently not a planar difference set/);
+like($@, qr/^bogus set: prime divisor 2 of order 2 is not a multiplier/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     0, 1, 5, 7, 17, 28, 31, 49
+)};
+is($ds3, undef);
+like($@, qr/^bogus set: prime divisor 7 of order 7 is not a multiplier/);
+
+$ds3 = eval { Math::DifferenceSet::Planar->from_elements(
+    0, 1, 4, 9, 22, 34, 39, 51,
 )};
 is($ds3, undef);
 like($@, qr/^apparently not a planar difference set/);
@@ -587,8 +665,9 @@ is($c2, $count);
 my $ds_a = Math::DifferenceSet::Planar->new(8);
 my @maps = $ds_b->find_all_linear_maps($ds_a);
 is(0+@maps, 9);
-my $md = join q[ ], map {join q[|], @{$_}} @maps;
-is($md, '5|1 7|31 10|3 14|63 20|7 28|54 39|0 40|15 56|36');
+my $mf = join q[ ], map { $_->[0] } @maps;
+is($mf, '5 7 10 14 20 28 39 40 56');
+is($maps[0]->[1], 1);
 
 my $ds_c = Math::DifferenceSet::Planar->from_elements_fast($ds_b->elements);
 my ($f, $d) = $ds_c->find_linear_map($ds_a);
@@ -599,6 +678,35 @@ my $ds_d = $ds_c->multiply(2)->translate(-$ds_c->zeta);;
 ($f, $d) = $ds_c->find_linear_map($ds_c);
 is("$f|$d", '1|0');
 ok($ds_c->same_plane($ds_d));
+$ds_a = Math::DifferenceSet::Planar->from_elements_fast($ds_a->elements);
+($f, $d) = $ds_c->find_linear_map($ds_a);
+$found = grep { $_->[0] == $f && $_->[1] == $d } @maps;
+is($found, 1);
+my $ds_e = Math::DifferenceSet::Planar->from_elements_fast(19, 20, 2, 12, 14);
+my $ds_f = Math::DifferenceSet::Planar->from_elements_fast(16, 17, 20, 9, 11);
+my $ds_g = Math::DifferenceSet::Planar->from_elements_fast(7, 8, 13, 15, 4);
+is($ds_e->same_plane($ds_f), !0, 'same plane w/o ref order 4');
+is($ds_e->same_plane($ds_g), !1, 'not same plane w/o ref order 4');
+$ds_e = Math::DifferenceSet::Planar->from_elements(19, 20, 2, 12, 14);
+$ds_f = Math::DifferenceSet::Planar->from_elements(16, 17, 20, 9, 11);
+$ds_g = Math::DifferenceSet::Planar->from_elements(7, 8, 13, 15, 4);
+is($ds_e->same_plane($ds_f), !0, 'same plane w/ ref order 4');
+is($ds_e->same_plane($ds_g), !1, 'not same plane w/ ref order 4');
+
+my $ds_h = eval {
+    Math::DifferenceSet::Planar->from_elements_fast(0, 2, 7, 8, 11)
+};
+diag($@) if !defined $ds_h;
+pds_ok($ds_h, '7 8 11 0 2', 'zeta zero theta nonzero from_elements');
+
+MEMO_TEST: {
+    local $Math::DifferenceSet::Planar::_MAX_MEMO_COUNT = 1;
+    # calling from_elements with an order not yet encountered
+    my $ds = Math::DifferenceSet::Planar->from_elements(
+        0, 1, 3, 9
+    );
+    pds_ok($ds, '0 1 3 9');
+}
 
 $c2 = eval { Math::DifferenceSet::Planar->set_database('NONEXISTENT.FILE') };
 is($c2, undef);
@@ -618,11 +726,4 @@ SKIP: {
     }
 }
 
-MEMO_TEST: {
-    local $Math::DifferenceSet::Planar::_MAX_MEMO_COUNT = 1;
-    # calling from_elements with an order not yet encountered
-    my $ds = Math::DifferenceSet::Planar->from_elements(
-        0, 1, 3, 9
-    );
-    pds_ok($ds, '0 1 3 9');
-}
+__END__

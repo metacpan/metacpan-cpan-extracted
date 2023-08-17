@@ -1,5 +1,29 @@
 Revision history for Perl module Module::Generic
 
+v0.31.1 2023-07-31T08:50:04+0900
+    - Improved methods _set_get_hash, _set_get_array and _set_get_boolean in Module::Generic
+    - Improved method load_json in Module::Generic::File
+    - Added method cause to Module::Generic::Exception to mirror the similar property found in JavaScript exception objects.
+    - Corrected a small bug in method _set_get_class_array_object in Module::Generic
+    - Updated Module::Generic::Finfo to use File::MMagic::XS if it is installed or fallback to File::MMagic
+
+v0.31.0 2023-07-30T08:12:20+0900
+    - Added the support method _on_error as a callback triggered by call to error()
+    - Added the option 'wantlist' to method _set_get_array_as_object() in Module::Generic
+    - Updated method _set_get_scalar_as_object in Module::Generic
+    - Improved the method unload_perl() in Module::Generic::File to allow for the use of a callback to format the perl data.
+    - Improved the method _set_get_version to allow to pass a definition hash reference and specify a class to handle the version number.
+    - Improved the method _set_get_class
+    - Created the class _set_get_class_array_object
+    - Improved method as_hash in Module::Generic
+    - Improved method __create_class in Module::Generic
+    - Improved method init() in Module::Generic to allow hash or hash reference to be provided containing keys with dashes inside, such as "some-thing" and be checked against both "some-thing" and "some_thing"
+    - Improved AUTOLOAD in Module::Generic to check for object property also using the underscore converted to dash, such as some_thing -> some-thing
+    - Improved the methods load() and load_utf8() in Module::Generic::File to return a scalar object in object context.
+
+v0.30.5 2023-06-11T10:24:31+0900
+    - Improved method error() to also allow for the return of array, code, glob, hash or scalar reference when required
+
 v0.30.4 2023-05-25T04:12:20+0900
     - Corrected a small bug in unit test 22.parse_timestamp.t when module DateTime::Format::JP is not installed
 

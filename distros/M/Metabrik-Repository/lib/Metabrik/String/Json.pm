@@ -20,6 +20,12 @@ sub brik_properties {
          decode => [ qw($data) ],
          is_valid => [ qw($data) ],
       },
+      attributes => {
+         use_utf8 => [ qw(0|1) ],
+      },
+      attributes_default => {
+         use_utf8 => 1,
+      },
       require_modules => {
          'JSON::XS' => [ ],
       },
@@ -40,7 +46,7 @@ sub encode {
    eval {
       my $j = JSON::XS->new;
       $j->relaxed(1);
-      $j->utf8(1);
+      $j->utf8($self->use_utf8);
       $encoded = $j->encode($data);
    };
    if ($@) {
@@ -63,7 +69,7 @@ sub decode {
    eval {
       my $j = JSON::XS->new;
       $j->relaxed(1);
-      $j->utf8(1);
+      $j->utf8($self->use_utf8);
       $decoded = $j->decode($data);
    };
    if ($@) {

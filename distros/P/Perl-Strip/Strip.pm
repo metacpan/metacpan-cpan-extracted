@@ -31,8 +31,8 @@ inherits all of it's methods, even the ones not documented here.
 
 package Perl::Strip;
 
-our $VERSION = '1.1';
-our $CACHE_VERSION = 2;
+our $VERSION = '1.2';
+our $CACHE_VERSION = 3;
 
 use common::sense;
 
@@ -134,7 +134,9 @@ sub document {
       if (!$prev || !$next) {
          $ws->delete;
       } else {
-         if (
+         if ($next->isa (PPI::Token::Whitespace::)) {
+            $ws->delete;
+         } elsif (
             $next->isa (PPI::Token::Operator::) && $next->{content} =~ /^(?:,|=|!|!=|==|=>)$/ # no ., because of digits. == float
             or $prev->isa (PPI::Token::Operator::) && $prev->{content} =~ /^(?:,|=|\.|!|!=|==|=>)$/
             or $prev->isa (PPI::Token::Structure::)
@@ -146,10 +148,14 @@ sub document {
                        || $next->isa (PPI::Structure::Condition::)))
                )
          ) {
-            $ws->delete;
-         } elsif ($prev->isa (PPI::Token::Whitespace::)) {
-            $ws->{content} = ' ';
-            $prev->delete;
+            # perl has some idiotic warnings about nonexisting operators
+            if ($prev->isa (PPI::Token::Operator::) && $prev->{content} eq "="
+                && $next->isa (PPI::Token::Operator::) && $next->{content} =~ /[+\-]/
+            ) {
+               # avoid "Reverse %s operator" diagnostic
+            } else {
+               $ws->delete;
+            }
          } else {
             $ws->{content} = ' ';
          }

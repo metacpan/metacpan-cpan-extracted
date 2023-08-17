@@ -38,7 +38,7 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
 
 Algorithm::LibLinear is an XS module that provides features of LIBLINEAR, a fast C library for classification and regression.
 
-Current version is based on LIBLINEAR 2.45, released on August 11, 2022.
+Current version is based on LIBLINEAR 2.47, released on July 9, 2023.
 
 =head1 METHODS
 
@@ -124,7 +124,7 @@ For outlier detection:
 
 =item weights
 
-Weights adjust the cost parameter of different classes (C<-wi>.)
+Weights to adjust the cost parameter of different classes (C<-wi>.)
 
 For example,
 
@@ -189,7 +189,7 @@ L<Algorithm::SVM> - A Perl binding to LIBSVM.
 
 =head2 Algorithm::LibLinear
 
-Copyright (c) 2013-2022 Koichi SATO. All rights reserved.
+Copyright (c) 2013-2023 Koichi SATO. All rights reserved.
 
 The MIT License (MIT)
 
@@ -201,7 +201,7 @@ THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 
 =head2 LIBLINEAR
 
-Copyright (c) 2007-2022 The LIBLINEAR Project.
+Copyright (c) 2007-2023 The LIBLINEAR Project.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

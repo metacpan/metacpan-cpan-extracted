@@ -15,7 +15,7 @@ get '/garbled' => sub {"Hello world!"}; my $line = __LINE__;
 my $content;
 warnings_like {
     $content = neaf->run_test('/garbled');
-} [qr/Controller must return hash.*\b$file\b.*\b$line\.?\n?$/], "Warning correct";
+} [qr/Controller must return hash.*\b\Q$file\E\b.*\b$line\.?\n?$/], "Warning correct";
 
 like $content, qr/Error 500/, "Error returned to the user";
 

@@ -1,13 +1,18 @@
+bin/purl-tool
 Changes
 INSTALL.md
 lib/URI/PackageURL.pm
+lib/URI/PackageURL/CLI.pm
+lib/URI/PackageURL/Util.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README.md
 t/00-load.t
 t/10-encode.t
 t/20-decode.t
+t/30-util.t
+t/40-cli.t
 t/99-official-purl-test-suite.t
 t/manifest.t
 t/pod-coverage.t

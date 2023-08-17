@@ -1,28 +1,38 @@
 ---
-abstract: 'Catalyst plugin for scrubbing/sanitizing html'
+abstract: 'Catalyst plugin for scrubbing/sanitizing incoming parameters'
 author:
-  - 'Hideo Kimura, <hide@hide-k.net<gt>'
+  - 'David Precious <davidp@preshweb.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0.88
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Test: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.95'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-Plugin-HTML-Scrubber
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
 requires:
-  Catalyst::Runtime: 5.71001
-  HTML::Scrubber: 0
+  Catalyst::ClassData: '0'
+  HTML::Scrubber: '0'
+  MRO::Compat: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/hidek/Catalyst-Plugin-HTML-Scrubber.git
-version: 0.02
+  bugtracker: https://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber/issues
+  homepage: https://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber
+  repository: git://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber.git
+version: '0.03'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

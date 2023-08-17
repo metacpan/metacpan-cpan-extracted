@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/newOP_CUSTOM.c.inc

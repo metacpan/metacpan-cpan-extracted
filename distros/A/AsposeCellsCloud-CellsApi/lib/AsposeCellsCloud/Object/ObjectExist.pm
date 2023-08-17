@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Object exists',
                                   class => 'ObjectExist',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'exists' => {
      	datatype => 'boolean',
      	base_name => 'Exists',
-     	description => '',
+     	description => 'Indicates that the file or folder exists.',
      	format => '',
      	read_only => '',
      		},
      'is_folder' => {
      	datatype => 'boolean',
      	base_name => 'IsFolder',
-     	description => '',
+     	description => 'True if it is a folder, false if it is a file.',
      	format => '',
      	read_only => '',
      		},    

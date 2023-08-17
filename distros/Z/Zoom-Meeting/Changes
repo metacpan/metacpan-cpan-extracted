@@ -1,0 +1,16 @@
+Revision history for Perl distribution WWW-PiHole
+
+This is a changelog file in addition to git commit messages.
+
+0.231740  2023-06-23 12:45:21+02:00 Europe/Budapest
+
+0.231570  2023-06-06 18:18:09+02:00 Europe/Budapest
+
+  - Fix typos in Changes
+  - Document methods (launch, _url, and new)
+  - Add and document new public methods (id and password)
+
+0.231550  2023-06-04 19:59:11+02:00 Europe/Budapest
+  - Add _url private method to construct Zoom URL
+  - Add launch public method to start Zoom with the constructed URL
+  - Release to CPAN after GitHub

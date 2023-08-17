@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -11,20 +11,23 @@
 #include <catch2/internal/catch_list.hpp>
 #include <catch2/internal/catch_context.hpp>
 #include <catch2/internal/catch_run_context.hpp>
-#include <catch2/internal/catch_stream.hpp>
 #include <catch2/catch_test_spec.hpp>
 #include <catch2/catch_version.hpp>
-#include <catch2/interfaces/catch_interfaces_reporter.hpp>
 #include <catch2/internal/catch_startup_exception_registry.hpp>
 #include <catch2/internal/catch_sharding.hpp>
+#include <catch2/internal/catch_test_case_registry_impl.hpp>
 #include <catch2/internal/catch_textflow.hpp>
 #include <catch2/internal/catch_windows_h_proxy.hpp>
-#include <catch2/reporters/catch_reporter_listening.hpp>
-#include <catch2/interfaces/catch_interfaces_reporter_registry.hpp>
+#include <catch2/reporters/catch_reporter_multi.hpp>
+#include <catch2/internal/catch_reporter_registry.hpp>
 #include <catch2/interfaces/catch_interfaces_reporter_factory.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
+#include <catch2/internal/catch_stdstreams.hpp>
+#include <catch2/internal/catch_istream.hpp>
 
 #include <algorithm>
+#include <cassert>
+#include <exception>
 #include <iomanip>
 #include <set>
 
@@ -33,52 +36,75 @@ namespace Catch {
     namespace {
         const int MaxExitCode = 255;
 
-        IStreamingReporterPtr createReporter(std::string const& reporterName, IConfig const* config) {
-            auto reporter = Catch::getRegistryHub().getReporterRegistry().create(reporterName, config);
+        IEventListenerPtr createReporter(std::string const& reporterName, ReporterConfig&& config) {
+            auto reporter = Catch::getRegistryHub().getReporterRegistry().create(reporterName, CATCH_MOVE(config));
             CATCH_ENFORCE(reporter, "No reporter registered with name: '" << reporterName << '\'');
 
             return reporter;
         }
 
-        IStreamingReporterPtr makeReporter(Config const* config) {
-            if (Catch::getRegistryHub().getReporterRegistry().getListeners().empty()) {
-                return createReporter(config->getReporterName(), config);
+        IEventListenerPtr prepareReporters(Config const* config) {
+            if (Catch::getRegistryHub().getReporterRegistry().getListeners().empty()
+                    && config->getProcessedReporterSpecs().size() == 1) {
+                auto const& spec = config->getProcessedReporterSpecs()[0];
+                return createReporter(
+                    spec.name,
+                    ReporterConfig( config,
+                                    makeStream( spec.outputFilename ),
+                                    spec.colourMode,
+                                    spec.customOptions ) );
             }
 
-            auto multi = Detail::make_unique<ListeningReporter>(config);
+            auto multi = Detail::make_unique<MultiReporter>(config);
+
             auto const& listeners = Catch::getRegistryHub().getReporterRegistry().getListeners();
             for (auto const& listener : listeners) {
-                multi->addListener(listener->create(Catch::ReporterConfig(config)));
+                multi->addListener(listener->create(config));
             }
-            multi->addReporter(createReporter(config->getReporterName(), config));
+
+            for ( auto const& reporterSpec : config->getProcessedReporterSpecs() ) {
+                multi->addReporter( createReporter(
+                    reporterSpec.name,
+                    ReporterConfig( config,
+                                    makeStream( reporterSpec.outputFilename ),
+                                    reporterSpec.colourMode,
+                                    reporterSpec.customOptions ) ) );
+            }
+
             return multi;
         }
 
         class TestGroup {
         public:
-            explicit TestGroup(IStreamingReporterPtr&& reporter, Config const* config):
+            explicit TestGroup(IEventListenerPtr&& reporter, Config const* config):
                 m_reporter(reporter.get()),
                 m_config{config},
                 m_context{config, CATCH_MOVE(reporter)} {
 
-                auto const& allTestCases = getAllTestCasesSorted(*m_config);
-                m_matches = m_config->testSpec().matchesByFilter(allTestCases, *m_config);
-                auto const& invalidArgs = m_config->testSpec().getInvalidArgs();
+                assert( m_config->testSpec().getInvalidSpecs().empty() &&
+                        "Invalid test specs should be handled before running tests" );
 
-                if (m_matches.empty() && invalidArgs.empty()) {
-                    for (auto const& test : allTestCases)
-                        if (!test.getTestCaseInfo().isHidden())
-                            m_tests.emplace(&test);
+                auto const& allTestCases = getAllTestCasesSorted(*m_config);
+                auto const& testSpec = m_config->testSpec();
+                if ( !testSpec.hasFilters() ) {
+                    for ( auto const& test : allTestCases ) {
+                        if ( !test.getTestCaseInfo().isHidden() ) {
+                            m_tests.emplace( &test );
+                        }
+                    }
                 } else {
-                    for (auto const& match : m_matches)
-                        m_tests.insert(match.tests.begin(), match.tests.end());
+                    m_matches =
+                        testSpec.matchesByFilter( allTestCases, *m_config );
+                    for ( auto const& match : m_matches ) {
+                        m_tests.insert( match.tests.begin(),
+                                        match.tests.end() );
+                    }
                 }
 
                 m_tests = createShard(m_tests, m_config->shardCount(), m_config->shardIndex());
             }
 
             Totals execute() {
-                auto const& invalidArgs = m_config->testSpec().getInvalidArgs();
                 Totals totals;
                 for (auto const& testCase : m_tests) {
                     if (!m_context.aborting())
@@ -89,27 +115,26 @@ namespace Catch {
 
                 for (auto const& match : m_matches) {
                     if (match.tests.empty()) {
-                        m_reporter->noMatchingTestCases(match.name);
-                        totals.error = -1;
+                        m_unmatchedTestSpecs = true;
+                        m_reporter->noMatchingTestCases( match.name );
                     }
-                }
-
-                if (!invalidArgs.empty()) {
-                    for (auto const& invalidArg: invalidArgs)
-                         m_reporter->reportInvalidArguments(invalidArg);
                 }
 
                 return totals;
             }
 
-        private:
-            using Tests = std::set<TestCaseHandle const*>;
+            bool hadUnmatchedTestSpecs() const {
+                return m_unmatchedTestSpecs;
+            }
 
-            IStreamingReporter* m_reporter;
+
+        private:
+            IEventListener* m_reporter;
             Config const* m_config;
             RunContext m_context;
-            Tests m_tests;
+            std::set<TestCaseHandle const*> m_tests;
             TestSpec::Matches m_matches;
+            bool m_unmatchedTestSpecs = false;
         };
 
         void applyFilenamesAsTags() {
@@ -135,14 +160,17 @@ namespace Catch {
             getCurrentMutableContext().setConfig(m_config.get());
 
             m_startupExceptions = true;
-            Colour colourGuard( Colour::Red );
-            Catch::cerr() << "Errors occurred during startup!" << '\n';
+            auto errStream = makeStream( "%stderr" );
+            auto colourImpl = makeColourImpl(
+                ColourMode::PlatformDefault, errStream.get() );
+            auto guard = colourImpl->guardColour( Colour::Red );
+            errStream->stream() << "Errors occurred during startup!" << '\n';
             // iterate over all exceptions and notify user
             for ( const auto& ex_ptr : exceptions ) {
                 try {
                     std::rethrow_exception(ex_ptr);
                 } catch ( std::exception const& ex ) {
-                    Catch::cerr() << TextFlow::Column( ex.what() ).indent(2) << '\n';
+                    errStream->stream() << TextFlow::Column( ex.what() ).indent(2) << '\n';
                 }
             }
         }
@@ -157,7 +185,7 @@ namespace Catch {
 
     void Session::showHelp() const {
         Catch::cout()
-                << "\nCatch v" << libraryVersion() << '\n'
+                << "\nCatch2 v" << libraryVersion() << '\n'
                 << m_cli << '\n'
                 << "For more detailed usage please see the project docs\n\n" << std::flush;
     }
@@ -165,7 +193,7 @@ namespace Catch {
         Catch::cout()
                 << std::left << std::setw(16) << "description: " << "A Catch2 test executable\n"
                 << std::left << std::setw(16) << "category: " << "testframework\n"
-                << std::left << std::setw(16) << "framework: " << "Catch Test\n"
+                << std::left << std::setw(16) << "framework: " << "Catch2\n"
                 << std::left << std::setw(16) << "version: " << libraryVersion() << '\n' << std::flush;
     }
 
@@ -178,12 +206,15 @@ namespace Catch {
         if( !result ) {
             config();
             getCurrentMutableContext().setConfig(m_config.get());
-            Catch::cerr()
-                << Colour( Colour::Red )
+            auto errStream = makeStream( "%stderr" );
+            auto colour = makeColourImpl( ColourMode::PlatformDefault, errStream.get() );
+
+            errStream->stream()
+                << colour->guardColour( Colour::Red )
                 << "\nError(s) in input:\n"
                 << TextFlow::Column( result.errorMessage() ).indent( 2 )
                 << "\n\n";
-            Catch::cerr() << "Run with -? for usage\n\n" << std::flush;
+            errStream->stream() << "Run with -? for usage\n\n" << std::flush;
             return MaxExitCode;
         }
 
@@ -257,16 +288,17 @@ namespace Catch {
         if( m_startupExceptions )
             return 1;
 
-
-        if( m_configData.shardIndex >= m_configData.shardCount ) {
-            Catch::cerr() << "The shard count (" << m_configData.shardCount << ") must be greater than the shard index ("  << m_configData.shardIndex << ")\n" << std::flush;
-            return 1;
-        }
-
         if (m_configData.showHelp || m_configData.libIdentify) {
             return 0;
         }
 
+        if ( m_configData.shardIndex >= m_configData.shardCount ) {
+            Catch::cerr() << "The shard count (" << m_configData.shardCount
+                          << ") must be greater than the shard index ("
+                          << m_configData.shardIndex << ")\n"
+                          << std::flush;
+            return 1;
+        }
 
         CATCH_TRY {
             config(); // Force config to be constructed
@@ -281,7 +313,16 @@ namespace Catch {
             getCurrentMutableContext().setConfig(m_config.get());
 
             // Create reporter(s) so we can route listings through them
-            auto reporter = makeReporter(m_config.get());
+            auto reporter = prepareReporters(m_config.get());
+
+            auto const& invalidSpecs = m_config->testSpec().getInvalidSpecs();
+            if ( !invalidSpecs.empty() ) {
+                for ( auto const& spec : invalidSpecs ) {
+                    reporter->reportInvalidTestSpec( spec );
+                }
+                return 1;
+            }
+
 
             // Handle list request
             if (list(*reporter, *m_config)) {
@@ -291,13 +332,26 @@ namespace Catch {
             TestGroup tests { CATCH_MOVE(reporter), m_config.get() };
             auto const totals = tests.execute();
 
-            if( m_config->warnAboutNoTests() && totals.error == -1 )
+            if ( tests.hadUnmatchedTestSpecs()
+                && m_config->warnAboutUnmatchedTestSpecs() ) {
+                return 3;
+            }
+
+            if ( totals.testCases.total() == 0
+                && !m_config->zeroTestsCountAsSuccess() ) {
                 return 2;
+            }
+
+            if ( totals.testCases.total() > 0 &&
+                 totals.testCases.total() == totals.testCases.skipped
+                && !m_config->zeroTestsCountAsSuccess() ) {
+                return 4;
+            }
 
             // Note that on unices only the lower 8 bits are usually used, clamping
             // the return value to 255 prevents false negative when some multiple
             // of 256 tests has failed
-            return (std::min) (MaxExitCode, (std::max) (totals.error, static_cast<int>(totals.assertions.failed)));
+            return (std::min) (MaxExitCode, static_cast<int>(totals.assertions.failed));
         }
 #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
         catch( std::exception& ex ) {

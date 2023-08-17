@@ -5,8 +5,8 @@ SYNOPSIS
      use Tags::HTML::Messages;
 
      my $obj = Tags::HTML::Messages->new(%params);
-     $obj->process($message_ar, $id);
-     $obj->process_css($id, $color);
+     $obj->process($message_ar);
+     $obj->process_css($type, $color);
 
 METHODS
   "new"
@@ -18,44 +18,72 @@ METHODS
 
             'CSS::Struct::Output' object for process_css processing.
 
-            It's required.
-
             Default value is undef.
+
+    *       "css_messages"
+
+            CSS class for main messages div block.
+
+            Default value is 'messages'.
+
+    *       "flag_no_messages"
+
+            Flag for no messages printing.
+
+            Possible values:
+
+             0 - Print nothing
+             1 - Print message box with 'No messages.' text.
+
+            Default value is 1.
 
     *       "tags"
 
             'Tags::Output' object.
 
-            It's required.
-
             Default value is undef.
 
   "process"
-     $obj->process($message_ar, $id);
+     $obj->process($message_ar);
 
     Process Tags structure for output.
+
+    Reference to array with message objects $message_ar must be a instance
+    of Data::Message::Simple object.
 
     Returns undef.
 
   "process_css"
-     $obj->process_css($id, $color);
+     $obj->process_css($message_types_hr);
 
     Process CSS::Struct structure for output.
+
+    Variable $message_type_hr is reference to hash with keys for message
+    type and value for color in CSS style. Possible message types are info
+    and error now. Types are defined in Data::Message::Simple.
 
     Returns undef.
 
 ERRORS
      new():
-             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
-             Parameter 'tags' must be a 'Tags::Output::*' class.
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             Bad list of messages.
+             Bad message data object.
+
+     process_css():
+             Message types must be a hash reference.
 
 EXAMPLE1
      use strict;
      use warnings;
 
      use CSS::Struct::Output::Indent;
+     use Data::Message::Simple;
      use Tags::HTML::Page::Begin;
      use Tags::HTML::Page::End;
      use Tags::HTML::Messages;
@@ -69,6 +97,10 @@ EXAMPLE1
      my $css = CSS::Struct::Output::Indent->new;
      my $begin = Tags::HTML::Page::Begin->new(
              'css' => $css,
+             'lang' => {
+                     'title' => 'Tags::HTML::Messages example',
+             },
+             'generator' => 'Tags::HTML::Messages',
              'tags' => $tags,
      );
      my $end = Tags::HTML::Page::End->new(
@@ -80,21 +112,31 @@ EXAMPLE1
      );
 
      # Error structure.
-     my $error_messages_ar = [
-             'Error #1',
-             'Error #2',
-     ];
-     my $ok_messages_ar = [
-             'Ok #1',
-             'Ok #2',
+     my $message_ar = [
+             Data::Message::Simple->new(
+                     'text' => 'Error #1',
+                     'type' => 'error',
+             ),
+             Data::Message::Simple->new(
+                     'text' => 'Error #2',
+                     'type' => 'error',
+             ),
+             Data::Message::Simple->new(
+                     'lang' => 'en',
+                     'text' => 'Ok #1',
+             ),
+             Data::Message::Simple->new(
+                     'text' => 'Ok #2',
+             ),
      ];
 
      # Process page.
-     $messages->process_css('error', 'red');
-     $messages->process_css('ok', 'green');
+     $messages->process_css({
+             'error' => 'red',
+             'info' => 'green',
+     });
      $begin->process;
-     $messages->process($error_messages_ar, 'error');
-     $messages->process($ok_messages_ar, 'ok');
+     $messages->process($message_ar);
      $end->process;
 
      # Print out.
@@ -102,39 +144,46 @@ EXAMPLE1
 
      # Output:
      # <!DOCTYPE html>
-     # <html>
+     # <html lang="en">
      #   <head>
      #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+     #     <meta name="generator" content="Tags::HTML::Messages" />
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      #     <title>
-     #       Page title
+     #       Tags::HTML::Messages example
      #     </title>
      #     <style type="text/css">
-     # #error {
-     #      color: red;
+     # .error {
+     #         color: red;
      # }
-     # #ok {
-     #      color: green;
+     # .info {
+     #         color: green;
      # }
      # </style>
      #   </head>
      #   <body>
-     #     <span id="error">
-     #       Error #1
-     #     </span>
-     #     <span id="error">
-     #       Error #2
-     #     </span>
-     #     <span id="ok">
-     #       Ok #1
-     #     </span>
-     #     <span id="ok">
-     #       Ok #2
-     #     </span>
+     #     <div class="messages">
+     #       <span class="error">
+     #         Error #1
+     #       </span>
+     #       <br />
+     #       <span class="error">
+     #         Error #2
+     #       </span>
+     #       <br />
+     #       <span class="info" lang="en">
+     #         Ok #1
+     #       </span>
+     #       <br />
+     #       <span class="info">
+     #         Ok #2
+     #       </span>
+     #     </div>
      #   </body>
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure.
+    Class::Utils, Error::Pure, Scalar::Util, Tags::HTML.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-Messages>
@@ -145,10 +194,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020
+    © Michal Josef Špaček 2020-2023
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.09
 

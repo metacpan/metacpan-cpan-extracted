@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.66;
 
-package Tickit::Widget::LinearBox 0.53;
+package Tickit::Widget::LinearBox 0.54;
 class Tickit::Widget::LinearBox
    :strict(params)
    :isa(Tickit::ContainerWidget);
@@ -186,6 +187,22 @@ method render_to_rb
    my ( $rb, $rect ) = @_;
 
    $rb->eraserect( $rect );
+
+   if( $self->get_style_values( "spacing" ) > 0 and @_children and
+         my $line_style = $self->get_style_values( "line_style" ) ) {
+      my $line_pen = $self->get_style_pen( "line" );
+      my $prev_win = $_children[0]->window;
+
+      foreach my $idx ( 1 .. $#_children ) {
+         my $next_win = $_children[$idx]->window
+            or next;
+
+         $self->render_dividing_line( $rb, $prev_win, $next_win,
+            $line_style, $line_pen ) if $prev_win;
+
+         $prev_win = $next_win;
+      }
+   }
 }
 
 =head2 add

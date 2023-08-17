@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
@@ -22,13 +22,13 @@ unless( -f TREE_SITTER_LANGUAGE_C ) {
 }
 
 my $p = Text::Treesitter::Parser->new;
-isa_ok( $p, "Text::Treesitter::Parser", '$p' );
+isa_ok( $p, [ "Text::Treesitter::Parser" ], '$p' );
 
 my $lang = Text::Treesitter::Language::load( TREE_SITTER_LANGUAGE_C, "c" );
-isa_ok( $lang, "Text::Treesitter::Language", '$lang' );
+isa_ok( $lang, [ "Text::Treesitter::Language" ], '$lang' );
 
 ok( $p->set_language( $lang ), '$p->set_language accepts language' ) or
-   BAIL_OUT "Unable to set language";
+   bail_out( "Unable to set language" );
 
 use constant C_PROG => <<'EOF';
 #include <stdio.h>
@@ -39,12 +39,12 @@ int main(void) {
 }
 EOF
 my $tree = $p->parse_string( C_PROG );
-isa_ok( $tree, "Text::Treesitter::Tree", '$tree' );
+isa_ok( $tree, [ "Text::Treesitter::Tree" ], '$tree' );
 
 is( $tree->text, C_PROG, '$tree->text' );
 
 my $root = $tree->root_node;
-isa_ok( $root, "Text::Treesitter::Node", '$root' );
+isa_ok( $root, [ "Text::Treesitter::Node" ], '$root' );
 
 is( $root->tree, $tree, '$root->tree is $tree' );
 
@@ -58,19 +58,21 @@ ok( $root->is_named,                       '$root->is_named' );
 
 ok( !$root->has_error, '$root has no errors' );
 
-is_deeply( [ $root->start_point ], [ 0, 0 ], '$root->start_point' );
-is_deeply( [ $root->end_point   ], [ 6, 0 ], '$root->end_point' );
+is( [ $root->start_point ], [ 0, 0 ], '$root->start_point' );
+is( [ $root->end_point   ], [ 6, 0 ], '$root->end_point' );
 
 is( $root->child_count, 2, '$root->child_count' );
 
 my @nodes = $root->child_nodes;
 is( scalar @nodes, 2, '$root->child_nodes returned 2 nodes' );
 
-isa_ok( $nodes[0], "Text::Treesitter::Node", '$nodes[0]' );
+isa_ok( $nodes[0], [ "Text::Treesitter::Node" ], '$nodes[0]' );
 
 is( $nodes[0]->type, "preproc_include", '$nodes[0]->type' );
 is( $nodes[0]->text, "#include <stdio.h>\n\n", '$nodes[0]->text' );
 
 is( $nodes[1]->type, "function_definition", '$nodes[1]->type' );
+
+ok( $nodes[1]->child_by_field_name( "body" ), '$nodes[1]->child_by_field_name("body")' );
 
 done_testing;

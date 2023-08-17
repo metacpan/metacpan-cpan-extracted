@@ -60,10 +60,10 @@ sub new {
 
 # Run Operation Request
 # PostSplitRequest.File : File to upload  ,
-# PostSplitRequest.format :   ,
+# PostSplitRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostSplitRequest.password :   ,
-# PostSplitRequest.from :   ,
-# PostSplitRequest.to :   ,
+# PostSplitRequest.from : sheet index  ,
+# PostSplitRequest.to : sheet index  ,
 # PostSplitRequest.checkExcelRestriction :    
 
 {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_split' } = { 
-    	summary => '',
+    	summary => 'Split Excel spreadsheet files by worksheet, save as kinds of format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
@@ -164,14 +164,14 @@ __PACKAGE__->method_documentation({
      'from' => {
      	datatype => 'int',
      	base_name => 'from',
-     	description => '',
+     	description => 'sheet index',
      	format => '',
      	read_only => '',
      		},
      'to' => {
      	datatype => 'int',
      	base_name => 'to',
-     	description => '',
+     	description => 'sheet index',
      	format => '',
      	read_only => '',
      		},

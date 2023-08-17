@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostHideWorksheetColumnsRequest.name :   ,
-# PostHideWorksheetColumnsRequest.sheetName :   ,
-# PostHideWorksheetColumnsRequest.startColumn :   ,
-# PostHideWorksheetColumnsRequest.totalColumns :   ,
-# PostHideWorksheetColumnsRequest.folder :   ,
-# PostHideWorksheetColumnsRequest.storageName :    
+# PostHideWorksheetColumnsRequest.name : The workbook name.  ,
+# PostHideWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostHideWorksheetColumnsRequest.startColumn : The begin column index to be operated.  ,
+# PostHideWorksheetColumnsRequest.totalColumns : Number of columns to be operated.  ,
+# PostHideWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PostHideWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_hide_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Hide worksheet columns.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The begin column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'total_columns' => {
      	datatype => 'int',
      	base_name => 'totalColumns',
-     	description => '',
+     	description => 'Number of columns to be operated.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

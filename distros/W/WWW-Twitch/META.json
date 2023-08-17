@@ -38,6 +38,7 @@
             "Moo" : "2",
             "Pod::Usage" : "0",
             "Text::Table" : "0",
+            "YAML" : "0",
             "perl" : "5.020"
          }
       },
@@ -61,7 +62,7 @@
          "web" : "https://github.com/Corion/WWW-Twitch"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

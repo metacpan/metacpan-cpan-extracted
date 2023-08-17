@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests =>11;
 use lib './lib';
 
 
@@ -17,8 +17,9 @@ BEGIN {
       Finance::QIF
       DateTime
       Moose
-      MooseX::Method::Signatures
       MooseX::StrictConstructor
+      MooseX::Traits
+      Parse::Method::Signatures
       Scalar::Util
       Moose::Util::TypeConstraints
       DateTime::Format::Flexible
@@ -30,7 +31,7 @@ BEGIN {
     }
 }
 
-# Copyright 2009-2011 David Solimano
+# Copyright 2009-2023 David Solimano
 # This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
 # Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 {
    "abstract" : "Interface to IRIS based web departure monitors.",
    "author" : [
-      "Copyright (C) 2013-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+      "Copyright (C) 2013-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4232",
@@ -58,15 +58,15 @@
    "provides" : {
       "Travel::Status::DE::IRIS" : {
          "file" : "lib/Travel/Status/DE/IRIS.pm",
-         "version" : "1.85"
+         "version" : "1.88"
       },
       "Travel::Status::DE::IRIS::Result" : {
          "file" : "lib/Travel/Status/DE/IRIS/Result.pm",
-         "version" : "1.85"
+         "version" : "1.88"
       },
       "Travel::Status::DE::IRIS::Stations" : {
          "file" : "lib/Travel/Status/DE/IRIS/Stations.pm",
-         "version" : "1.85"
+         "version" : "1.88"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-IRIS"
       }
    },
-   "version" : "1.85",
+   "version" : "1.88",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,9 @@
+0.18 2023-06-19
+- Fix on perl >= 5.38 (issue #15)
+- Fix re->nparens signess warning (PR #13)
+
 0.17 2023-01-27
-- Fix bug in previous, Zeroing with wrong type -> wrong size (PR #11)
+- Fix bug in previous, Zeroing with wrong size (PR #11)
 
 0.16 2023-01-27
 - Unbreak on blead Perl (PR #10, thanks Yves Orton)

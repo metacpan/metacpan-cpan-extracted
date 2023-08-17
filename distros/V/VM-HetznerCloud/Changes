@@ -1,0 +1,19 @@
+Revision history for VM::HetznerCloud
+=====================================
+
+0.0.3   2023-06-20 16:43:00
+
+  * updated dependency list
+  * fixed parameter validation
+  * fixed parameter handling for the requests
+  * re-generated api classes
+
+0.0.2   2023-06-19 08:20:00
+
+  * Re-Generated method names:
+      create_actions_shutdown -> shutdown
+  * Removed unnecessary dependencies
+
+0.0.1   2023-06-16 15:59:00
+
+  * Initial release

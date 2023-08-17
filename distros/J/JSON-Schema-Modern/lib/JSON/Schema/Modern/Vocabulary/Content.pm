@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.566';
+our $VERSION = '0.569';
 
 use 5.020;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -63,7 +64,7 @@ sub _eval_keyword_contentEncoding ($self, $data, $schema, $state) {
   return 1;
 }
 
-sub _traverse_keyword_contentMediaType { shift->_traverse_keyword_contentEncoding(@_) }
+sub _traverse_keyword_contentMediaType { goto \&_traverse_keyword_contentEncoding }
 
 sub _eval_keyword_contentMediaType ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
@@ -127,7 +128,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.566
+version 0.569
 
 =head1 DESCRIPTION
 

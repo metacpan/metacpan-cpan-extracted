@@ -81,31 +81,31 @@
    "provides" : {
       "OpenSky::API" : {
          "file" : "lib/OpenSky/API.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::Core::Flight" : {
          "file" : "lib/OpenSky/API/Core/Flight.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::Core::StateVector" : {
          "file" : "lib/OpenSky/API/Core/StateVector.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::Flights" : {
          "file" : "lib/OpenSky/API/Flights.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::States" : {
          "file" : "lib/OpenSky/API/States.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::Types" : {
          "file" : "lib/OpenSky/API/Types.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "OpenSky::API::Utils::Iterator" : {
          "file" : "lib/OpenSky/API/Utils/Iterator.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -120,10 +120,11 @@
          "web" : "https://github.com/Ovid/opensky-api"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Ovid <ovid@cpan.org>"
    ],
+   "x_deprecated" : 1,
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-2.0"

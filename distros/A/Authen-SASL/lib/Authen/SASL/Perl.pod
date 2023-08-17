@@ -6,6 +6,10 @@
 
 Authen::SASL::Perl -- Perl implementation of the SASL Authentication framework
 
+=head1 VERSION
+
+version 2.1700
+
 =head1 SYNOPSIS
 
  use Authen::SASL qw(Perl);
@@ -50,7 +54,7 @@ no passwords are transferred in clear-text over the wire.
 
 Due to the simplicity of the protocol CRAM-MD5 is susceptible
 to replay and dictionary attacks, so DIGEST-MD5 should be used
-in preferrence.
+in preference.
 
 
 =item DIGEST-MD5
@@ -78,10 +82,10 @@ allows the use of external authentication systems as SASL mechanisms.
 
 The GSSAPI SASL mechanism as defined in RFC 2222 resp. IETF Draft
 draft-ietf-sasl-gssapi-XX.txt allows using the Generic Security Service
-Application Program Interface [GSSAPI] KERBEROS V5 as as SASL mechanism.
+Application Program Interface [GSSAPI] KERBEROS V5 as a SASL mechanism.
 
 Although GSSAPI is a general mechanism for authentication it is almost
-exlusively used for Kerberos 5.
+exclusively used for Kerberos 5.
 
 
 =item LOGIN
@@ -91,7 +95,7 @@ draft-murchison-sasl-login-XX.txt allows  the
 combination of username and clear-text password to be used
 in a SASL mechanism.
 
-It does does not provide a security layer and sends the credentials
+It does not provide a security layer and sends the credentials
 in clear over the wire.
 Thus this mechanism should not be used without adequate security
 protection.
@@ -151,4 +155,3 @@ All rights reserved. This document is distributed, and may be redistributed,
 under the same terms as Perl itself.
 
 =cut
-

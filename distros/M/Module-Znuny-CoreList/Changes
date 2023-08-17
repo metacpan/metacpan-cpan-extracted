@@ -1,6 +1,38 @@
 Release history for Module::Znuny::CoreList
 ===========================================
 
+1.03    2023-06-02 07:35:00
+
+  * fix minor issue: return from shipped() when no module is given
+  * improve tests
+  * fix #1: fix repository_type to add repository information to META files
+
+1.02    2023-06-01 16:34:43
+
+  * Added Znuny version 7.0.5
+  * Added Znuny version 7.0.4
+  * Added Znuny version 7.0.3
+  * Added Znuny version 7.0.2
+  * Added Znuny version 7.0.1
+  * Added Znuny version 6.5.2
+  * Added Znuny version 6.5.1
+  * Added Znuny version 6.4.5
+  * Added Znuny version 6.4.4
+  * Added Znuny version 6.4.3
+  * Added Znuny version 6.4.2
+  * Added Znuny version 6.4.1
+  * Added Znuny version 6.3.4
+  * Added Znuny version 6.3.3
+  * Added Znuny version 6.3.2
+  * Added Znuny version 6.0.48
+  * Added Znuny version 6.0.47
+  * Added Znuny version 6.0.46
+  * Added Znuny version 6.0.45
+  * Added Znuny version 6.0.44
+  * Added Znuny version 6.0.43
+  * Added Znuny version 6.0.42
+  * Added Znuny version 6.0.41
+
 1.01    2022-03-17 09:42
 
  * Add znuny 6.0.38

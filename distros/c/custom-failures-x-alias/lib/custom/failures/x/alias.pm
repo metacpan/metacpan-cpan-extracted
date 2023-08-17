@@ -2,12 +2,12 @@ package custom::failures::x::alias;
 
 # ABSTRACT: export aliases for custom::failures
 
-use v5.10.0;
+use v5.12.0;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub _croak {
     require Carp;
@@ -83,7 +83,9 @@ sub import {
             my $alias = $alias->( $failure, \%opt );
             push @export, $alias;
             my $fqn = "${caller}::${alias}";
-            *$fqn = sub () { "${caller}::${failure}" }
+            ## no critic(BuiltinFunctions::ProhibitStringyEval)
+            eval "package ${caller}; sub ${alias} () { '${caller}::${failure}' } 1;"
+              or _croak( "error creating $fqn" );
         }
 
         if ( $exporter eq 'Exporter' ) {
@@ -137,7 +139,7 @@ custom::failures::x::alias - export aliases for custom::failures
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

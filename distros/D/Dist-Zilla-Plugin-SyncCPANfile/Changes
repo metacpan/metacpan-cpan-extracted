@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-SyncCPANfile
 
+0.04  2023-07-04 15:17:00
+
+        - fix cpan_audit feature: add support for version range
+        - improve tests
+
+0.03  2023-06-29 17:30:00
+
+        - add feature to bump version of prereqs to a (more) secure version (via CPAN::Audit)
+
 0.02  2021-01-09 20:40:00
         - fix prereq list
 

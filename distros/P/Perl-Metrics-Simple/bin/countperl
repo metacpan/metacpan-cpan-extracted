@@ -3,14 +3,15 @@
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use Getopt::Long;
-use Perl::Metrics::Simple qw(0.13);
+use Perl::Metrics::Simple 0.13;
 use Perl::Metrics::Simple::Output::HTML;
 use Perl::Metrics::Simple::Output::JSON;
 use Perl::Metrics::Simple::Output::PlainText;
 use Pod::Usage qw(pod2usage);
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
 exit main() if not caller;
 
@@ -25,22 +26,22 @@ sub main {
 
     if ( my $modifiers = $options->{'method-modifiers'} ) {
         push @Perl::Metrics::Simple::Analysis::File::METHOD_MODIFIERS,
-            split( /,/, $modifiers );
+            split /,/sxm, $modifiers;
     }
 
     my $analysis = Perl::Metrics::Simple->new()->analyze_files(@files);
 
     if ( $options->{'html'} ) {
         my $html = Perl::Metrics::Simple::Output::HTML->new($analysis);
-        print $html->make_report();
+        print $html->make_report() or croak 'Failed to print!';
     }
     elsif ( $options->{'json'} ) {
         my $json = Perl::Metrics::Simple::Output::JSON->new($analysis);
-        print $json->make_report();
+        print $json->make_report() or croak 'Failed to print!';
     }
     else {
         my $plain = Perl::Metrics::Simple::Output::PlainText->new($analysis);
-        print $plain->make_report();
+        print $plain->make_report() or croak 'Failed to print!';
     }
 
     return 0;
@@ -82,7 +83,7 @@ __END__
 
 =head1 NAME
 
-countperl - count lines, packages, subs and complexity of Perl files.
+countperl - count lines, packages, subs, and complexity of Perl files.
 
 =head1 USAGE
 

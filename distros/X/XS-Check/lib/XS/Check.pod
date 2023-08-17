@@ -23,13 +23,13 @@ produces output
     /usr/home/ben/projects/xs-check/examples/synopsis.xs:3: len is not a STRLEN variable (unsigned int ).
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.14/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.13 of XS-Check
-corresponding to L<git commit 74c31d3e805ada02c70f12d92dd4eba400ed6e09|https://github.com/benkasminbullock/xs-check/commit/74c31d3e805ada02c70f12d92dd4eba400ed6e09> released on Wed May 26 06:44:38 2021 +0900.
+This documents version 0.14 of XS-Check
+corresponding to L<git commit ebf92c9ce84862ecc1565096c1c0b42352e13d78|https://github.com/benkasminbullock/xs-check/commit/ebf92c9ce84862ecc1565096c1c0b42352e13d78> released on Mon Jul 24 10:02:08 2023 +0900.
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ produces output
     Remove the 'Perl_' prefix from Perl_croak at 1.
 
 
-(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/reporter.pl> in the distribution.)
+(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.14/examples/reporter.pl> in the distribution.)
 
 
 This was added in version 0.07 of the module..
@@ -140,7 +140,7 @@ produces output
     1: Remove the 'Perl_' prefix from Perl_croak.
 
 
-(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/set-file.pl> in the distribution.)
+(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.14/examples/set-file.pl> in the distribution.)
 
 
 This was added in version 0.08 of the module.
@@ -246,7 +246,7 @@ This was added in version 0.12 of the module.
 
 =head1 LIMITATIONS
 
-As of 0.13, the module has the following limitations.
+As of 0.14, the module has the following limitations.
 
 =over
 
@@ -363,7 +363,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2017-2021
+2017-2023
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

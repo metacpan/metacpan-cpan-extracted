@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
@@ -36,12 +36,12 @@ sub walk_tree
 
 my $tree1 = $p->parse_string( "1 + 2" );
 my $root1 = $tree1->root_node;
-is( walk_tree( $root1 ), "fourfunc[number[] +[] number[]]", 'walk_tree of root1' );
+is( walk_tree( $root1 ), "fourfunc[expr[number[] +[] number[]]]", 'walk_tree of root1' );
 
 $p->reset;
 
 my $tree2 = $p->parse_string( "3 * 4" );
 my $root2 = $tree2->root_node;
-is( walk_tree( $root2 ), "fourfunc[number[] *[] number[]]", 'walk_tree of root2 after reset' );
+is( walk_tree( $root2 ), "fourfunc[expr[number[] *[] number[]]]", 'walk_tree of root2 after reset' );
 
 done_testing;

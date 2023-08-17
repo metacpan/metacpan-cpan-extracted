@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.052";
+our $VERSION = "0.053";
 
 =head1 NAME
 
@@ -276,9 +276,23 @@ sub linux_generic {
     # ::diag"Np: $n_phys_id, NC: $n_core_id, NP: $n_processor, NC: $n_cpu";
     $self->{__cpu_count} = $n_cpu;
 
-    my @parts = ("model name", "vendor_id", "cpu mhz");
-    my %info = map { ($_ => $self->from_cpuinfo ($_)) } @parts;
-    $self->{__cpu} = sprintf "%s (%s %.0fMHz)", map { $info{$_} } @parts;
+    {	my @tags = ("model name", "vendor_id", "cpu mhz");
+	my %info = map { ($_ => $self->from_cpuinfo ($_)) } @tags;
+	unless (defined $info{$tags[0]}) {
+	    # riscv64 -> rv64imafdc
+	    $info{$tags[0]} = $self->from_cpuinfo ("isa");
+	    }
+	$info{$tags[2]} and $info{$tags[2]} = sprintf "%.0fMHz", $info{$tags[2]};
+	my @cpui;
+	if ($info{$tags[0]}) {
+	    push @cpui => $info{shift @tags};
+	    push @cpui => "(".(join " " => grep { length } @info{@tags}).")";
+	    }
+	else {
+	    push @cpui =>                  grep { length } @info{@tags};
+	    }
+	$self->{__cpu} = join " " => @cpui;
+	}
 
     if ($n_phys_id) {
 	$n_processor > $n_phys_id and
@@ -363,14 +377,14 @@ sub linux_ppc {
 
     $self->{__cpu_count} = $self->count_in_cpuinfo (qr/^processor\s+:\s+/);
 
-    my @parts = qw( cpu machine clock );
-    my %info = map { ($_ => $self->from_cpuinfo ($_)) } @parts;
+    my @tags = qw( cpu machine clock );
+    my %info = map { ($_ => $self->from_cpuinfo ($_)) } @tags;
     if ($info{detected} = $self->from_cpuinfo ("detected as")){
 	$info{detected} =~ s/.*(\b.+Mac G\d).*/$1/;
 	$info{machine} = $info{detected};
 	}
 
-    $self->{__cpu} = sprintf "%s %s (%s)", map { $info{$_} } @parts;
+    $self->{__cpu} = sprintf "%s %s (%s)", map { $info{$_} } @tags;
     } # linux_ppc
 
 =head2 $si->linux_sparc
@@ -394,9 +408,9 @@ sub linux_sparc {
 
     $self->{__cpu_count} = $self->from_cpuinfo ("ncpus active");
 
-    my @parts = qw( cpu Cpu0ClkTck );
-    my %info  = map { ($_ => $self->from_cpuinfo ($_)) } @parts;
-    my $cpu   = $info{cpu};
+    my @tags = qw( cpu Cpu0ClkTck );
+    my %info = map { ($_ => $self->from_cpuinfo ($_)) } @tags;
+    my $cpu  = $info{cpu};
     $info{Cpu0ClkTck} and
 	$cpu .=  sprintf " (%.0fMHz)", hex ($info{Cpu0ClkTck}) / 1_000_000;
     $self->{__cpu} = $cpu;

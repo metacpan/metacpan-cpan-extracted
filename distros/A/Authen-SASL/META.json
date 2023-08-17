@@ -1,0 +1,122 @@
+{
+   "abstract" : "SASL Authentication framework",
+   "author" : [
+      "Graham Barr <gbarr@pobox.com>",
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Authen-SASL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Weaver::Section::ReplaceVersion" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "GSSAPI" : "0"
+         },
+         "requires" : {
+            "Digest::HMAC_MD5" : "0",
+            "Digest::MD5" : "0",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::SASL" : {
+         "file" : "lib/Authen/SASL.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::CRAM_MD5" : {
+         "file" : "lib/Authen/SASL/CRAM_MD5.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::EXTERNAL" : {
+         "file" : "lib/Authen/SASL/EXTERNAL.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl" : {
+         "file" : "lib/Authen/SASL/Perl.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::ANONYMOUS" : {
+         "file" : "lib/Authen/SASL/Perl/ANONYMOUS.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::CRAM_MD5" : {
+         "file" : "lib/Authen/SASL/Perl/CRAM_MD5.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::DIGEST_MD5" : {
+         "file" : "lib/Authen/SASL/Perl/DIGEST_MD5.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::EXTERNAL" : {
+         "file" : "lib/Authen/SASL/Perl/EXTERNAL.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::GSSAPI" : {
+         "file" : "lib/Authen/SASL/Perl/GSSAPI.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::LOGIN" : {
+         "file" : "lib/Authen/SASL/Perl/LOGIN.pm",
+         "version" : "2.1700"
+      },
+      "Authen::SASL::Perl::PLAIN" : {
+         "file" : "lib/Authen/SASL/Perl/PLAIN.pm",
+         "version" : "2.1700"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbarr/perl-authen-sasl/issues"
+      },
+      "homepage" : "https://github.com/gbarr/perl-authen-sasl/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/perl-authen-sasl.git",
+         "web" : "https://github.com/gbarr/perl-authen-sasl/"
+      }
+   },
+   "version" : "2.1700",
+   "x_contributors" : [
+      "Chris Ridd <chris.ridd@isode.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Graham Ollis <plicease@cpan.org>",
+      "Norbert Klasen <norbert.klasen@daasi.de>",
+      "Paul Kranenburg <kranenburg@few.eur.nl>",
+      "Pete Houston <githubdevteam@openstrike.co.uk>",
+      "Peter Marschall <peter@adpm.de>",
+      "Yann Kerherve <yann@cyberion.net>",
+      "openstrike <git@openstrike.co.uk>"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

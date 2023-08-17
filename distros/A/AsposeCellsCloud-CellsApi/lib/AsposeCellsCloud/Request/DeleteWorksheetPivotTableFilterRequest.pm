@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetPivotTableFilterRequest.name :   ,
-# DeleteWorksheetPivotTableFilterRequest.sheetName :   ,
-# DeleteWorksheetPivotTableFilterRequest.pivotTableIndex :   ,
-# DeleteWorksheetPivotTableFilterRequest.fieldIndex :   ,
-# DeleteWorksheetPivotTableFilterRequest.needReCalculate :   ,
-# DeleteWorksheetPivotTableFilterRequest.folder :   ,
-# DeleteWorksheetPivotTableFilterRequest.storageName :    
+# DeleteWorksheetPivotTableFilterRequest.name : The workbook name.  ,
+# DeleteWorksheetPivotTableFilterRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetPivotTableFilterRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# DeleteWorksheetPivotTableFilterRequest.fieldIndex : Gets the PivotField Object at the specific index.  ,
+# DeleteWorksheetPivotTableFilterRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# DeleteWorksheetPivotTableFilterRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetPivotTableFilterRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_table_filter' } = { 
-    	summary => '',
+    	summary => 'Deletes a pivot filter in piovt table.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,49 +149,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'Gets the PivotField Object at the specific index.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

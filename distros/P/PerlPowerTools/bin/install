@@ -14,7 +14,9 @@ License: perl
 
 use strict;
 
-my ($VERSION) = '1.2';
+use Getopt::Std qw(getopts);
+
+my ($VERSION) = '1.3';
 
 sub usage () {
     <<EOUsage;
@@ -39,59 +41,7 @@ my $Errors = 0;
 
 # process options
 my %opt;
-
-while (@ARGV and $ARGV[0] =~ /^-/) {
-    my $opt = shift;
-
-    last if $opt eq '--';
-
-    if ($opt =~ s/^-C//) {
-        $opt{C}++;
-    }
-    elsif ($opt =~ s/^-c//) {
-        $opt{c}++;
-    }
-    elsif ($opt =~ s/^-D//) {
-        $Debug++;
-    }
-    elsif ($opt =~ s/^-d//) {
-        $opt{d}++;
-    }
-    elsif ($opt =~ s/^-f(.*)//) {  # compat
-        $opt{f} = $1 || shift;
-    }
-    elsif ($opt =~ s/^-g(.*)//) {
-        $opt{g} = $1 || shift;
-    }
-    elsif ($opt =~ s/^-M//) {  # compat
-        $opt{M}++;
-    }
-    elsif ($opt =~ s/^-m(.*)//) {
-        $opt{m} = $1 || shift;
-    }
-    elsif ($opt =~ s/^-o(.*)//) {
-        $opt{o} = $1 || shift;
-    }
-    elsif ($opt =~ s/^-p//) {
-        $opt{p}++;
-    }
-    elsif ($opt =~ s/^-s//) {
-        $opt{s}++;
-    }
-    elsif ($opt =~ s/^-\?//) {
-        warn usage;
-        exit 0;
-    }
-    else {
-        $opt =~ s/^-//;
-        die "$0: illegal option -- $opt\n", usage;
-    }
-
-    if ($opt) {
-        unshift @ARGV, "-$opt";
-    }
-}
-
+getopts('CcDdf:g:Mm:o:ps', \%opt) or die usage;
 die usage unless @ARGV;
 
 if ($opt{d} and grep($_, @opt{qw/ C c D p /}) > 0) {
@@ -99,6 +49,7 @@ if ($opt{d} and grep($_, @opt{qw/ C c D p /}) > 0) {
 }
 
 $opt{C}++ if $opt{p};
+$Debug = 1 if $opt{D};
 
 # these probably won't make sense elsewhere
 if ($Unix) {
@@ -235,6 +186,9 @@ sub install_files {
     my $dst = pop @ARGV;
     my $dir = -d $dst;
 
+    if (scalar(@ARGV) == 0) {
+        die "$0: missing destination file operand after '$dst'\n";
+    }
     if (!$dir and @ARGV > 1) {
         die "$0: $dst is not a directory\n", usage;
     }
@@ -258,6 +212,12 @@ sub install_files {
             }
         }
 
+        if (-d $file) {
+            warn "$0: ignoring directory '$file'\n";
+            $Errors++;
+            next;
+        }
+
         if ($opt{C}) {
             if (system "cmp", "-s", $file, $targ) {
                 warn "$0: copy $file $targ\n" if $Debug;
@@ -269,26 +229,15 @@ sub install_files {
                 }
             }
             else {
-                if ($Debug >= 2) {
-                    warn "$0: $file not copied to $targ\n";
-                }
+                warn("$0: $file not copied to $targ\n") if $Debug;
                 next;
             }
         }
-        elsif ($opt{c}) {
+        else { # default -c
             warn "$0: copy $file $targ\n" if $Debug;
 
             unless ( File::Copy::copy($file, $targ) ) {
                 warn "$0: copy $file $targ: $!\n";
-                $Errors++;
-                next;
-            }
-        }
-        else {
-            warn "$0: move $file $targ\n" if $Debug;
-
-            unless ( File::Copy::move($file, $targ) ) {
-                warn "$0: move $file $targ: $!\n";
                 $Errors++;
                 next;
             }
@@ -327,7 +276,7 @@ B<install> B<-d> [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<directory> 
 
 =head1 DESCRIPTION
 
-B<install> moves (or copies if B<-C> or B<-c> are specified) files to the
+B<install> copies files to the
 target path specified by I<file2> or I<directory>.  Alternatively, if
 B<-d> is specified, B<install> creates directories (also creating missing
 parent directories as necessary, similar to B<mkdir -p>).
@@ -339,12 +288,12 @@ B<install> accepts these options:
 =item B<-C>
 
 Copy the file only if it differs from the target (according to
-B<cmp -s>).  This option implies B<-c>.
+B<cmp>).
 
 =item B<-c>
 
-Copy the file instead of performing the default action of deleting
-the original.
+Copy the file. This option is provided for compatibility and is the
+default.
 
 =item B<-D>
 
@@ -432,4 +381,3 @@ you wish, provided you do not restrict others from doing the same.
 umask(2), chmod(1), mkdir(1), chown(8), chgrp(8), strip(1)
 
 =cut
-

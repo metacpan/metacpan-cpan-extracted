@@ -22,7 +22,7 @@ my $data_ref = {};
 @{$data_ref}{1..6} = ('a'..'f');
 
 while (my $next = $data_ref->each_pair) {
-    ok $next->key     ~~ $data_ref               => 'key method correct';
+    ok exists $data_ref->{$next->key}            => 'key method correct';
     ok $next->value   eq $data_ref->{$next->key} => 'value method correct';
     delete $data_ref->{$next->key};
 }

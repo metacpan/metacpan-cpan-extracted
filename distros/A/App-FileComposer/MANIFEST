@@ -1,0 +1,16 @@
+bin/mkscript
+Build.PL
+Changes
+lib/App/FileComposer.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/method-check.t
+t/pod-coverage.t
+t/pod.t
+t/trap-error.t
+xt/boilerplate.t
+META.yml
+META.json

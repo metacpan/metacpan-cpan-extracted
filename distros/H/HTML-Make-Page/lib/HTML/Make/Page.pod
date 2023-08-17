@@ -35,13 +35,13 @@ produces output
     </html>
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.02/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.04/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.02 of HTML-Make-Page
-corresponding to L<git commit 4eaaced079d780001a6dd1b4c12b1bb39a071554|https://github.com/benkasminbullock/html-make-page/commit/4eaaced079d780001a6dd1b4c12b1bb39a071554> released on Tue Apr 6 20:22:23 2021 +0900.
+This documents version 0.04 of HTML-Make-Page
+corresponding to L<git commit a4b30a2e24715e722e5ae536ede7e8bab77facf8|https://github.com/benkasminbullock/html-make-page/commit/a4b30a2e24715e722e5ae536ede7e8bab77facf8> released on Mon Jul 31 07:13:34 2023 +0900.
 
 =head1 DESCRIPTION
 
@@ -221,7 +221,7 @@ produces output
     </html>
 
 
-(This example is included as L<F<js-text.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.02/examples/js-text.pl> in the distribution.)
+(This example is included as L<F<js-text.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.04/examples/js-text.pl> in the distribution.)
 
 
 =head1 DEPENDENCIES
@@ -243,7 +243,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2021
+2021-2023
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

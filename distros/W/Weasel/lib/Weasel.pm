@@ -5,7 +5,7 @@ Weasel - Perl's php/Mink-inspired abstracted web-driver framework
 
 =head1 VERSION
 
-0.29
+0.31
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 # From https://w3c.github.io/webdriver/webdriver-spec.html#keyboard-actions
 my %key_codes = (
@@ -252,21 +252,21 @@ sub session {
 
 =head1 AUTHOR
 
-Erik Huelsmann
+  Erik Huelsmann
 
 =head1 CONTRIBUTORS
 
-Erik Huelsmann
-Yves Lavoie
+  Erik Huelsmann
+  Yves Lavoie
 
 =head1 MAINTAINERS
 
-Erik Huelsmann
+  Erik Huelsmann
 
 =head1 BUGS AND LIMITATIONS
 
 Bugs can be filed in the GitHub issue tracker for the Weasel project:
- https://github.com/perl-weasel/weasel/issues
+ L<https://github.com/perl-weasel/weasel/issues>
 
 =head1 SOURCE
 
@@ -278,19 +278,15 @@ The source code repository for Weasel is at
 Community support is available through
 L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
-=head1 MAINTAINERS
-
-Erik Huelsmann
-
 =head1 BUGS
 
 Bugs can be filed in the GitHub issue tracker for the Weasel project:
- https://github.com/perl-weasel/weasel/issues
+ L<https://github.com/perl-weasel/weasel/issues>
 
 =head1 SOURCE
 
 The source code repository for Weasel is at
- https://github.com/perl-weasel/weasel
+ L<https://github.com/perl-weasel/weasel>
 
 =head1 SUPPORT
 
@@ -299,7 +295,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016-2021  Erik Huelsmann
+ (C) 2016-2023  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

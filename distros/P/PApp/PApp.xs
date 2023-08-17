@@ -901,7 +901,7 @@ surl(...)
                     key[ 0] = xuserid     ; key[ 1] = xuserid      >> 8; key[ 2] = xuserid      >> 16; key[ 3] = xuserid      >> 24;
                     key[ 4] = xstateid    ; key[ 5] = xstateid     >> 8; key[ 6] = xstateid     >> 16; key[ 7] = xstateid     >> 24;
                     key[ 8] = xalternative; key[ 9] = xalternative >> 8; key[10] = xalternative >> 16; key[11] = xalternative >> 24;
-                    key[12] = xsessionid  ; key[13] = xsessionid   >> 8; key[14] = xsessionid   >> 16; key[15] = xsessionid   >> 24;
+                    key[12] = 0x55        ; key[13] = 0x55             ; key[14] = 0x55              ; key[15] = 0x55              ;
 
                     ENTER;
                     PUSHMARK (SP);

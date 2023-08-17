@@ -6,23 +6,21 @@ use Example::Syntax;
 
 extends 'Example::Controller';
 
-sub setup_entity :Via(*Private) At('account/...') ($self, $c, $user) {
-  $c->action->next($user->account);
+sub root :At('$path_end/...') Via('../protected')  ($self, $c, $user) {
+  $c->action->next(my $account = $user->account);
 }
 
-  sub setup_update :Via('setup_entity') At('/...') ($self, $c, $account) { 
-    $c->view('HTML::Account', account => $account);
+  sub prepare_edit :At('...') Via('root') ($self, $c, $account) { 
+    $self->view_for('edit', account => $account);
     $c->action->next($account);
   }
 
-    sub edit :GET Via('setup_update') At('edit') ($self, $c, $account) {
-      return  $c->view->set_http_ok;
-    }
+    # GET /account
+    sub edit :Get('edit') Via('prepare_edit') ($self, $c, $account) { return }
 
-    sub update :PATCH Via('setup_update') At('') BodyModel(AccountRequest) ($self, $c, $account, $r) {
-      return $account->update_account($r) ?
-        $c->view->set_http_ok : 
-          $c->view->set_http_bad_request;
+    # PATCH /account
+    sub update :Patch('') Via('prepare_edit') BodyModel ($self, $c, $account, $bm) {
+      return $account->set_from_request($bm);
     }
 
 __PACKAGE__->meta->make_immutable;

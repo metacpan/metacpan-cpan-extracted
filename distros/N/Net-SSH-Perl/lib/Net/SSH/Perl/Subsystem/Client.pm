@@ -1,5 +1,3 @@
-# $Id: Client.pm,v 1.8 2001/07/11 21:57:35 btrott Exp $
-
 package Net::SSH::Perl::Subsystem::Client;
 use strict;
 use warnings;

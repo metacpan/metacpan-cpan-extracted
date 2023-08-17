@@ -1,0 +1,27 @@
+---
+abstract: 'parse prefixed environment variables and dotnev (.env) files into Perl'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ENV-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/garu/ENV-Util/issues/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/garu/ENV-Util
+version: 0.03
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1040,13 +1040,13 @@ sub read_1col {
 
 	# this function reads 1 col from  a text file
 
-	my ( $self, $origin ) = @_;
+	my ( $self, $file_name ) = @_;
 	my @OFFSET;
 
-	#	print ("\nThe input file is called $origin\n");
+	print ("\nmanage_files_by2, read_1col, The input file is called $file_name\n");
 
 	# open the file of interest
-	open( FILE, $origin ) || print("Can't open $origin, $!\n");
+	open( FILE, $file_name ) || print("Can't open $file_name, $!\n");
 
 	#set the counter
 	my $i = 0;
@@ -1059,7 +1059,7 @@ sub read_1col {
 		my ($x) = $line;
 		$OFFSET[$i] = $x;
 
-		#		print("\n Reading 1 col file:$OFFSET[$i]\n");
+		print("\n manage_files_by2, read_1col, Reading 1 col file:$OFFSET[$i]\n");
 		$i = $i + 1;
 
 	}
@@ -1069,7 +1069,7 @@ sub read_1col {
 	my $num_rows = scalar @OFFSET;
 
 	# print out the number of lines of data for the user
-	#	print ("This file contains $num_rows rows of data\n\n\n");
+	print ("manage_files_by2, read_1col, This file contains $num_rows rows of data\n\n\n");
 	# make sure arrays do not contaminate outside
 	my $result = \@OFFSET;
 
@@ -1214,7 +1214,7 @@ sub set_cat_su {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 
@@ -1352,7 +1352,7 @@ sub set_cat_txt {
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

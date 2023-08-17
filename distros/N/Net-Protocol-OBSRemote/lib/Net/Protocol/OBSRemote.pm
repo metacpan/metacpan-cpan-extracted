@@ -7,7 +7,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -210,7 +210,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2021-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2021-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

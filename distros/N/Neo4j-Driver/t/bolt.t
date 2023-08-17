@@ -5,7 +5,9 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 package Local::Bolt;
@@ -62,6 +64,13 @@ sub connected { 0 }
 sub client_errnum { -13 }
 sub client_errmsg { "all wrong" }
 
+package Local::Bolt::StreamFailure;
+use parent -norequire => 'Local::Bolt';
+sub success { ${shift->[0]} ? 0 : 1 }
+sub failure { ${shift->[0]} ? 1 : 0 }
+sub client_errnum { ${shift->[0]} ? -666 : 0 }
+sub client_errmsg { "" }
+
 package Local::Bolt::FailureRef;
 sub new { bless $_[1], shift }
 sub server_errcode { shift->{server_errcode} }
@@ -84,16 +93,16 @@ use Neo4j::Driver;
 
 sub new_session {
 	my $d = Neo4j::Driver->new('bolt:');
-	$d->{net_module} = shift;
+	$d->{config}->{net_module} = shift;
 	$d->basic_auth(username => 'password');
-	$d->{tls} = shift if scalar @_;
-	$d->{auth} = shift if scalar @_;
+	$d->{config}->{tls} = shift if scalar @_;
+	$d->{config}->{auth} = shift if scalar @_;
 	return ( $d, $d->session(database => 'dummy') );
 }
 
 my ($s, $f, $t, $r, $v);
 
-plan tests => 1 + 9 + 1;
+plan tests => 1 + 10 + $no_warnings;
 
 
 lives_and { ok $s = new_session('Local::Bolt') } 'driver';
@@ -195,6 +204,15 @@ subtest 'bolt error' => sub {
 };
 
 
+subtest 'bolt stream error' => sub {
+	plan skip_all => "stream not lazy" if $Neo4j::Driver::Result::Bolt::gather_results;
+	plan tests => 3;
+	lives_and { ok $f = new_session('Local::Bolt::StreamFailure') } 'new stream failure';
+	lives_and { ok $r = $f->run('dummy') } 'result stream';
+	throws_ok { $r->has_next } qr/\bBolt error -666\b/i, 'fetch failure';
+};
+
+
 subtest 'bolt trigger error' => sub {
 	plan tests => 9 * 2;
 	my $h = sub { $f = shift };
@@ -253,6 +271,7 @@ subtest 'gather_results' => sub {
 
 
 subtest 'bolt live' => sub {
+	plan skip_all => "Perl version too old for Neo4j::Bolt" if $] < 5.012;
 	plan tests => 1;
 	throws_ok {
 		Neo4j::Driver->new('bolt://localhost:14')->session();

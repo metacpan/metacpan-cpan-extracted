@@ -476,6 +476,10 @@ sub next_scroll {
    my $scroll = $self->_scroll;
    $self->brik_help_run_undef_arg('open_scroll', $scroll) or return;
 
+   my $try = $self->try;
+
+RETRY:
+
    my $next;
    eval {
       if ($count > 1) {
@@ -490,7 +494,13 @@ sub next_scroll {
    };
    if ($@) {
       chomp($@);
-      return $self->log->error("next_scroll: failed with: [$@]");
+      if (--$try == 0) {
+         return $self->log->error("next_scroll: failed after try [$try] tries ".
+            "with error [$@]");
+      }
+      $self->log->warning("next_scroll: sleeping 10 seconds before retry cause error: [$@]");
+      sleep 10;
+      goto RETRY;
    }
 
    return $next;

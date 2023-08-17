@@ -4,13 +4,56 @@ use warnings;
 
 =head1 NAME
 
-rami - Automates merging to multiple branches
+rami - Automates merging/committing a single change to
+an arbitrary number of branches
 
 =head1 SYNOPSIS
 
-Should be invoked from the command line:
+Try it from the command line, using this real demonstration repository.
+Merge revision 7 from the trunk to all the branches, as follows:
 
-  rami -c <version-number>
+  $ rami --load-repo-config-from-svn-url=https://github.com/DanTheDancer/demo-rami/trunk/rami-config
+  ...
+  Checked out revision 8.
+  
+  $ rami -c 7
+  ...
+  Password for 'you': ***********
+  Committed revision 9
+
+Of course, it won't work as well if you don't have permission to commit to that repository,
+which you probably don't. But let's look at what the commands do.
+
+  $ rami --load-repo-config-from-svn-url=https://github.com/DanTheDancer/demo-rami/trunk/rami-config
+
+Configures Rami using the files at that URL. There is only one such file, named C<urls.csv>,
+which tells it the branches to which it should merge changes to the trunk.
+
+  $ rami -c 7
+
+Tells Rami to merge revision 7. Rami figures out that revision 7 was made to the trunk, and that
+according to C<urls.csv>, changes to the trunk should go to three branches. So it commits the
+change to all three branches.
+
+Note: if it encounters a merge conflict, Rami will exit with an error message.
+
+=head1 FILES
+
+Both configuration and repository working directories can be found in the C<~/.rami> directory.
+
+=head1 BUGS
+
+When run from Cygwin, rami uses the Cygwin user's home directory,
+which is different from the Windows user's home directory.
+This means that rami on Cygwin and rami on Windows do not share the same configuration.
+
+Rami keeps a local copy of all the branches, even when it is not running.
+(In other words, if you run Rami, you will have all the branches sitting
+on your hard drive at once.)
+This makes Rami run faster, but uses a lot of disk space.
+
+Rami might interpret the branch name (which should be something like "trunk" or "3.1")
+as an SVN URL if the name starts with something like "http:" or "svn:".
 
 =head1 SUPPORT
 
@@ -37,9 +80,15 @@ L<https://metacpan.org/release/SVN-Rami>
 
 =back
 
+=head1 ETYMOLOGY
+
+"Rami" is Latin for "to the branch."
+It would be more correct to call it "to the branches," but that would be "Ramis",
+which would be easily confused with L<a certain programming language|https://en.wikipedia.org/wiki/RAMIS_(software)>.
+
 =head1 SEE ALSO
 
-SVK::Merge
+L<SVK::Merge|https://metacpan.org/pod/SVK::Merge>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -59,13 +108,12 @@ package rami;
 # ABSTRACT: automate merging to an arbitrary number of branches
 
 # To invoke this script from the dev environment, use:
-#   perl -Ilib bin\rami
+#   perl -Ilib "bin\rami"
 # For example:
-#   perl -Ilib bin\rami -c 84987 
+#   perl -Ilib "bin\rami" -c 84987 
 
 use SVN::Rami;
 
-# TODO: parse equals sign: --load-repo-config-from-svn-url=http://...
 my $load_config_from_SVN_arg = '--load-repo-config-from-svn-url';
 # my $help_command = '--help';
 

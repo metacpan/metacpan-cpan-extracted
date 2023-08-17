@@ -15,6 +15,7 @@ my $regions = +{ map {
 } @$archs };
 
 my $versions = [
+    "5.38",
     "5.36",
     "5.34",
     "5.32",
@@ -25,6 +26,7 @@ my $versions = [
 $versions = [sort {version->parse("v$b") <=> version->parse("v$a")} @$versions];
 
 my $versions_al2 = [
+    "5.38",
     "5.36",
     "5.34",
     "5.32",
@@ -36,10 +38,9 @@ my $layers = {};
 my $pm = Parallel::ForkManager->new(10);
 $pm->run_on_finish(sub {
     my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
-    if (!$data) {
-        return;
-    }
+    return unless $data;
     my ($version, $region, $arn) = @$data;
+    return unless $version && $region && $arn;
     $layers->{$version} //= {};
     $layers->{$version}{$region} = $arn;
 });
@@ -96,10 +97,10 @@ my $layers_al2_x86_64 = {};
 my $pm_al2_x86_64 = Parallel::ForkManager->new(10);
 $pm_al2_x86_64->run_on_finish(sub {
     my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
-    if (!$data) {
-        return;
-    }
+    return unless $data;
     my ($version, $region, $arn) = @$data;
+    return unless $version && $region && $arn;
+
     $layers_al2_x86_64->{$version} //= {};
     $layers_al2_x86_64->{$version}{$region} = $arn;
 });
@@ -156,10 +157,9 @@ my $layers_al2 = {};
 my $pm_al2 = Parallel::ForkManager->new(10);
 $pm_al2->run_on_finish(sub {
     my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
-    if (!$data) {
-        return;
-    }
+    return unless $data;
     my ($version, $region, $arch, $arn) = @$data;
+    return unless $version && $region && $arch && $arn;
     $layers_al2->{$version} //= {};
     $layers_al2->{$version}{$region} //= {};
     $layers_al2->{$version}{$region}{$arch} = $arn;
@@ -254,9 +254,7 @@ print $fh "our \$LAYERS = {\n";
 for my $version (@$versions) {
     print $fh "    '$version' => {\n";
     for my $region (@{$regions->{x86_64}}) {
-        if (!$layers->{$version}{$region}{runtime_arn}) {
-            next;
-        }
+        next unless $layers->{$version}{$region}{runtime_arn};
         print $fh <<EOS
         '$region' => {
             runtime_arn     => "$layers->{$version}{$region}{runtime_arn}",
@@ -276,6 +274,7 @@ for my $version (@$versions_al2) {
     for my $arch (@$archs) {
         print $fh "        '$arch' => {\n";
         for my $region (@{$regions->{$arch}}) {
+            next unless $layers_al2->{$version}{$region}{$arch}{runtime_arn};
             print $fh <<EOS
             '$region' => {
                 runtime_arn     => "$layers_al2->{$version}{$region}{$arch}{runtime_arn}",
@@ -359,6 +358,18 @@ Finally, create new function using awscli.
         --role arn:aws:iam::xxxxxxxxxxxx:role/service-role/lambda-custom-runtime-perl-role \
         --layers "arn:aws:lambda:$REGION:445285296882:layer:perl-@@LATEST_PERL_LAYER@@-runtime-al2-x86_64:@@LATEST_RUNTIME_VERSION@@"
 
+It also supports L<response streaming|https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html>.
+
+    sub handle {
+        my ($payload, $context) = @_;
+        return sub {
+            my $responder = shift;
+            my $writer = $responder->('application/json');
+            $writer->write('{"foo": "bar"}');
+            $writer->close;
+        };
+    }
+
 =head1 DESCRIPTION
 
 This package makes it easy to run AWS Lambda Functions written in Perl.
@@ -434,6 +445,7 @@ for my $version (@$versions_al2) {
     for my $arch(@$archs) {
         print $fh "=item $arch architecture\n\n=over\n\n";
         for my $region (@{$regions->{$arch}}) {
+            next unless $layers_al2->{$version}{$region}{$arch}{runtime_arn};
             print $fh "=item C<$layers_al2->{$version}{$region}{$arch}{runtime_arn}>\n\n";
         }
         print $fh "=back\n\n";
@@ -629,6 +641,7 @@ for my $version (@$versions_al2) {
     for my $arch(@$archs) {
         print $fh "=item $arch architecture\n\n=over\n\n";
         for my $region (@{$regions->{$arch}}) {
+            next unless $layers_al2->{$version}{$region}{$arch}{paws_arn};
             print $fh "=item C<$layers_al2->{$version}{$region}{$arch}{paws_arn}>\n\n";
         }
         print $fh "=back\n\n";
@@ -688,7 +701,7 @@ It means that we support the two most recent stable release series.
 We also provide the layers for legacy custom runtime as known as "provided".
 These layers are only for backward compatibility.
 We recommend to migrate to Amazon Linux 2.
-We may stop maintenance without any notice.
+These layers are NO LONGER MAINTAINED and WILL NOT RECEIVE ANY UPDATES.
 
 =head2 Pre-built Public Lambda Layers for Amazon Linux
 
@@ -701,6 +714,7 @@ EOS
 for my $version (@$versions) {
     print $fh "=item Perl $version\n\n=over\n\n";
     for my $region (@{$regions->{x86_64}}) {
+        next unless $layers->{$version}{$region}{runtime_arn};
         print $fh "=item C<$layers->{$version}{$region}{runtime_arn}>\n\n";
     }
     print $fh "=back\n\n";
@@ -718,9 +732,7 @@ EOS
 for my $version (@$versions) {
     print $fh "=item Perl $version\n\n=over\n\n";
     for my $region (@{$regions->{x86_64}}) {
-        if (!$layers->{$version}{$region}{paws_arn}) {
-            next;
-        }
+        next unless $layers->{$version}{$region}{paws_arn};
         print $fh "=item C<$layers->{$version}{$region}{paws_arn}>\n\n";
     }
     print $fh "=back\n\n";
@@ -744,7 +756,7 @@ C<https://shogo82148-lambda-perl-runtime-$REGION.s3.amazonaws.com/perl-$VERSION-
 Previously, we provided the layers that named without CPU architectures.
 These layers are compatible with x86_64 and only for backward compatibility.
 We recommend to specify the CPU architecture.
-We may stop maintenance without any notice.
+These layers are NO LONGER MAINTAINED and WILL NOT RECEIVE ANY UPDATES.
 
 =head2 Pre-built Legacy Public Lambda Layers for Amazon Linux 2
 
@@ -757,6 +769,7 @@ EOS
 for my $version (@$versions_al2) {
     print $fh "=item Perl $version\n\n=over\n\n";
     for my $region (@{$regions->{x86_64}}) {
+        next unless $layers_al2_x86_64->{$version}{$region}{runtime_arn};
         print $fh "=item C<$layers_al2_x86_64->{$version}{$region}{runtime_arn}>\n\n";
     }
     print $fh "=back\n\n";
@@ -774,6 +787,7 @@ EOS
 for my $version (@$versions_al2) {
     print $fh "=item Perl $version\n\n=over\n\n";
     for my $region (@{$regions->{x86_64}}) {
+        next unless $layers_al2_x86_64->{$version}{$region}{paws_arn};
         print $fh "=item C<$layers_al2_x86_64->{$version}{$region}{paws_arn}>\n\n";
     }
     print $fh "=back\n\n";

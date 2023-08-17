@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+use POSIX qw(strftime);
+
+my $dir = dirname(__FILE__);
+my $root = abs2rel(abs_path(catfile($dir, updir)));
+
+my $new_version = strftime '%Y%m%d', gmtime;
+
+my $release_changes;
+
+{
+    my $infile = canonpath("$root/Changes");
+    my $outfile = "$infile.update.$$";
+
+    open my $in, '<', $infile
+        or die "can't read $infile: $!";
+    open my $out, '>', $outfile
+        or die "can't write $outfile: $!";
+
+    my $found_version;
+    my $head = '';
+    while (my $line = <$in>) {
+        if ($found_version) {
+            print { $out } $line;
+        }
+        elsif ($line =~ /^v?([\d.]+)\b/) {
+            my $prev_version = $1;
+            $found_version++;
+
+            (my $prelude, $release_changes)
+                = $head =~ /\A(.*?)((?:^[ \t]+-.*)?)\z/ms;
+
+            my $date = strftime '%Y-%m-%d', gmtime;
+
+            $release_changes =~ s{\n+\z}{};
+
+            $release_changes .= "\n"
+                if length $release_changes;
+
+            my $cert_diff = `"$^X" "$root/maint/cacert-diff" "v$prev_version"`;
+            if (length $cert_diff) {
+                $release_changes .= "  - Update from Mozilla repository to $date\n";
+                $release_changes .= $cert_diff;
+            }
+            if (!length $release_changes) {
+                close $out;
+                unlink $outfile;
+                die "No entries in Changes - stopping release!\n";
+            }
+
+            if (int $new_version == int $prev_version) {
+                $new_version = $prev_version + 0.1;
+            }
+
+            print { $out } $prelude;
+            print { $out } "$new_version\n";
+            print { $out } $release_changes;
+            print { $out } "\n";
+            print { $out } $line;
+        }
+        else {
+            $head .= $line;
+        }
+    }
+
+    print "Updating Changes file.\n";
+    rename $outfile, $infile
+        or die "can't replace $infile with $outfile: $!";
+}
+
+{
+    my $infile = canonpath("$root/lib/Mozilla/CA.pm");
+    my $outfile = "$infile.update.$$";
+
+    open my $in, '<', $infile
+        or die "can't read $infile: $!";
+    open my $out, '>', $outfile
+        or die "can't write $outfile: $!";
+    my $found_version;
+    while (my $line = <$in>) {
+        if (!$found_version) {
+            $line =~ s{(^our \$VERSION = )'\d+(?:\.\d+)?'}{$1'$new_version'}
+                and $found_version++;
+        }
+        print { $out } $line;
+    }
+    close $in;
+    close $out or die $!;
+
+    print "Updating version in $infile to $new_version.\n";
+    rename $outfile, $infile
+        or die "can't replace $infile with $outfile: $!";
+}
+
+{
+    system 'git', '-C', $root, 'add', 'Changes';
+    system 'git', '-C', $root, 'add', 'lib/Mozilla/CA.pm';
+    system 'git', '-C', $root, 'commit', '-m', "release $new_version";
+    my $pid = open my $fh, '|-', 'git', 'tag', '-a', '-F', '-', "v$new_version";
+    print { $fh } "release $new_version\n\n";
+    print { $fh } $release_changes;
+    close $fh;
+    waitpid $pid, 0;
+}
+
+if (defined $ENV{GITHUB_OUTPUT}) {
+    open my $fh, '>>', $ENV{GITHUB_OUTPUT}
+        or die "can't append to $ENV{GITHUB_OUTPUT}: $!";
+    print { $fh } "tag-name=v$new_version\n";
+    close $fh;
+}

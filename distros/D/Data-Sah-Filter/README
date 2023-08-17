@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.016 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2023-04-25.
+    This document describes version 0.021 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2023-06-21.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);
@@ -30,6 +30,7 @@ DESCRIPTION
     convert data to another. Multiple filter rules will be combined to form
     the final filtering code.
 
+  meta()
     The filter rule module must contain "meta" subroutine which must return
     a hashref (DefHash) that has the following keys ("*" marks that the key
     is required):
@@ -41,15 +42,6 @@ DESCRIPTION
     *   summary => str
 
         From DefHash.
-
-    The filter rule module must also contain "filter" subroutine which must
-    generate the code for filtering. The subroutine must accept a hash of
-    arguments ("*" indicates required arguments):
-
-    *   data_term => str
-
-    The "filter" subroutine must return a hashref with the following keys
-    ("*" indicates required keys):
 
     *   might_fail => bool
 
@@ -63,13 +55,37 @@ DESCRIPTION
 
         This is used for filtering rules that act as a data checker.
 
-    *   expr_filter => str
+    *   args => hash
+
+        List of arguments that this filter accepts, in the form of hash
+        where hash keys are argument names and hash values are argument
+        specifications. Argument specification is a DefHash similar to
+        argument specification for functions in Rinci::function
+        specification.
+
+  filter()
+    The filter rule module must also contain "filter" subroutine which must
+    generate the code for filtering. The subroutine must accept a hash of
+    arguments and will be passed these:
+
+    *   data_term => str
+
+    *   args => hash
+
+        The arguments for the filter. Hash keys will contain the argument
+        names, while hash values will contain the argument's values.
+
+    The "filter" subroutine must return a hashref with the following keys
+    ("*" indicates required keys):
+
+    *   expr_filter* => str
 
         Expression in the target language to actually convert data.
 
     *   modules => hash
 
-        A list of modules required by the expression.
+        A list of modules required by the expression, where hash keys are
+        module names and hash values are modules' minimum versions.
 
     Basically, the "filter" subroutine must generate a code that accepts a
     non-undef data and must convert this data to the desired value.
@@ -86,6 +102,54 @@ DESCRIPTION
        ...
        return $data;
      }
+
+  Filter modules included in this distribution
+    1. Data::Sah::Filter::js::Str::downcase
+    2. Data::Sah::Filter::js::Str::lc
+    3. Data::Sah::Filter::js::Str::lcfirst
+    4. Data::Sah::Filter::js::Str::lowercase
+    5. Data::Sah::Filter::js::Str::ltrim
+    6. Data::Sah::Filter::js::Str::rtrim
+    7. Data::Sah::Filter::js::Str::trim
+    8. Data::Sah::Filter::js::Str::uc
+    9. Data::Sah::Filter::js::Str::ucfirst
+    10. Data::Sah::Filter::js::Str::upcase
+    11. Data::Sah::Filter::js::Str::uppercase
+    12. Data::Sah::Filter::perl::Array::check_uniq
+    13. Data::Sah::Filter::perl::Array::check_uniqnum
+    14. Data::Sah::Filter::perl::Array::check_uniqstr
+    15. Data::Sah::Filter::perl::Array::remove_undef
+    16. Data::Sah::Filter::perl::Array::uniq
+    17. Data::Sah::Filter::perl::Array::uniqnum
+    18. Data::Sah::Filter::perl::Array::uniqstr
+    19. Data::Sah::Filter::perl::Float::ceil
+    20. Data::Sah::Filter::perl::Float::check_has_fraction
+    21. Data::Sah::Filter::perl::Float::check_int
+    22. Data::Sah::Filter::perl::Float::floor
+    23. Data::Sah::Filter::perl::Float::round
+    24. Data::Sah::Filter::perl::Str::check
+    25. Data::Sah::Filter::perl::Str::check_lowercase
+    26. Data::Sah::Filter::perl::Str::check_oneline
+    27. Data::Sah::Filter::perl::Str::check_uppercase
+    28. Data::Sah::Filter::perl::Str::downcase
+    29. Data::Sah::Filter::perl::Str::ensure_trailing_newline
+    30. Data::Sah::Filter::perl::Str::lc
+    31. Data::Sah::Filter::perl::Str::lcfirst
+    32. Data::Sah::Filter::perl::Str::lowercase
+    33. Data::Sah::Filter::perl::Str::ltrim
+    34. Data::Sah::Filter::perl::Str::oneline
+    35. Data::Sah::Filter::perl::Str::remove_comment
+    36. Data::Sah::Filter::perl::Str::remove_nondigit
+    37. Data::Sah::Filter::perl::Str::remove_whitespace
+    38. Data::Sah::Filter::perl::Str::replace_map
+    39. Data::Sah::Filter::perl::Str::rtrim
+    40. Data::Sah::Filter::perl::Str::trim
+    41. Data::Sah::Filter::perl::Str::try_center
+    42. Data::Sah::Filter::perl::Str::uc
+    43. Data::Sah::Filter::perl::Str::ucfirst
+    44. Data::Sah::Filter::perl::Str::upcase
+    45. Data::Sah::Filter::perl::Str::uppercase
+    46. Data::Sah::Filter::perl::Str::wrap
 
 VARIABLES
   $Log_Filter_Code => bool (default: from ENV or 0)

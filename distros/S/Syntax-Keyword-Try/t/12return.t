@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Try;
 
@@ -33,7 +33,7 @@ use Syntax::Keyword::Try;
 
 # return LIST from try
 {
-   is_deeply(
+   is(
       [ sub {
          try { return qw( A B C ) } catch ($e) {}
       }->() ],

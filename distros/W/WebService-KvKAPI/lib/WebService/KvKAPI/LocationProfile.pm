@@ -1,13 +1,13 @@
 use utf8;
 package WebService::KvKAPI::LocationProfile;
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 # ABSTRACT: Instance of OpenAPI client for locatieprofiel API of the KvK.
 
 use v5.26;
 use Object::Pad;
 use WebService::KvKAPI::Formatters qw(format_location_number);
 
-class WebService::KvKAPI::LocationProfile does WebService::KvKAPI::Roles::OpenAPI;
+class WebService::KvKAPI::LocationProfile :does(WebService::KvKAPI::Roles::OpenAPI);
 
 method get_location_profile {
     my $id  = format_location_number(shift);
@@ -31,15 +31,15 @@ WebService::KvKAPI::LocationProfile - Instance of OpenAPI client for locatieprof
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 
@@ -285,13 +285,13 @@ Chamber of Commerce
 
 =head1 SYNOPSIS
 
-use WebService::KvKAPI::LocationProfile;
+    use WebService::KvKAPI::LocationProfile;
 
-my $api = WebService::KvKAPI::LocationProfile->new(
-    # see WebService::KvKAPI->new()
-);
+    my $api = WebService::KvKAPI::LocationProfile->new(
+        # see WebService::KvKAPI->new()
+    );
 
-$api->get_location_profile($location_number);
+    $api->get_location_profile($location_number);
 
 =head1 METHODS
 

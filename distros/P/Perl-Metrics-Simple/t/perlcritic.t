@@ -16,9 +16,16 @@ if ($EVAL_ERROR) {
     plan( skip_all => $msg );
 }
 
+eval { require Perl::Critic::Utils; };
+
+if ($EVAL_ERROR) {
+    my $msg = 'Perl::Critic::Utils required for this test';
+    plan( skip_all => $msg );
+}
+
 my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
 
-my @perl_files = Test::Perl::Critic::all_code_files();
+my @perl_files = Perl::Critic::Utils::all_perl_files();
 all_critic_ok( @perl_files );
 

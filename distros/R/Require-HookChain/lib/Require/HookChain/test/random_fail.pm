@@ -7,9 +7,9 @@ package Require::HookChain::test::random_fail;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-07-23'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub new {
     my ($class, $probability) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::test::random_fail - Fail a module loading randomly
 
 =head1 VERSION
 
-This document describes version 0.011 of Require::HookChain::test::random_fail (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.015 of Require::HookChain::test::random_fail (from Perl distribution Require-HookChain), released on 2023-07-23.
 
 =head1 SYNOPSIS
 

@@ -23,17 +23,20 @@ GetOptions(
 
 pod2usage({-exitval => 0, -verbose => 2}) if $help;
 
+my $cnt = 0;
+my $tot = scalar @ARGV;
 for my $file (@ARGV) {
+    $cnt++;
     my $basename = basename($file);
     my $dirname = dirname($file);
     # check if file exists
     if (!-e $file) {
-        print STDERR "File $file does not exist. Skipping...\n";
+	print STDERR "$cnt/$tot File $file does not exist. Skipping...\n";
         next;
     }
     if ($verbose) {
             my $type = -d $file ? 'directory' : 'file';
-            print STDERR "Processing [$type] $file...\n"
+            print STDERR "$cnt/$tot Processing $dirname -> $basename [$type]...\n"
     }
     if ($rename) {
 
@@ -41,12 +44,16 @@ for my $file (@ARGV) {
         $new_file =~ s/ /_/g;
         my $dest = File::Spec->catfile($dirname, $new_file);
         if ($dry_run) {
-            print STDERR "#mv \"$file\" \"$new_file\"";
+            print  "#mv \"$file\" \"$dest\"\n";
         } else {
             rename "$file", "$dest" or die "Can't rename $file to $dest: $!";
         }
     }
     elsif ($substitute) {
+        if (-d $file) {
+         print STDERR "Skipping: substitute only works with files...\n" if ($verbose);
+	 next;
+	}
         open my $fh, '<', $file or die "Can't open $file: $!";
         my $content = do { local $/; <$fh> };
         close $fh;
@@ -73,7 +80,7 @@ cavaspazi - a simple script to remove spaces from filenames or file contents
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -122,7 +129,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Andrea Telatin, Nicola Vitulo.
+This software is Copyright (c) 2023 by Andrea Telatin, Nicola Vitulo.
 
 This is free software, licensed under:
 

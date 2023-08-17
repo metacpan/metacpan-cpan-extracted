@@ -14,7 +14,7 @@ use StorageDisplay::Data::Partition;
 package StorageDisplay::Data::Loop;
 # ABSTRACT: Handle LVM data for StorageDisplay
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -216,7 +216,7 @@ StorageDisplay::Data::Loop - Handle LVM data for StorageDisplay
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

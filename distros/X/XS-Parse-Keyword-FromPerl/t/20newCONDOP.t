@@ -6,19 +6,21 @@ use warnings;
 use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
-   opcode
    KEYWORD_PLUGIN_EXPR
-   newCONDOP
-   op_scope
-   XPK_PARENSCOPE XPK_TERMEXPR XPK_BLOCK
+   XPK_PARENS XPK_TERMEXPR XPK_BLOCK
    register_xs_parse_keyword
+);
+use Optree::Generate qw(
+   opcode
+   op_scope
+   newCONDOP
 );
 
 # cond
 BEGIN {
    register_xs_parse_keyword( cond =>
       permit_hintkey => "main/cond",
-      pieces => [XPK_PARENSCOPE(XPK_TERMEXPR), XPK_BLOCK, XPK_BLOCK],
+      pieces => [XPK_PARENS(XPK_TERMEXPR), XPK_BLOCK, XPK_BLOCK],
       build => sub {
          my ( $outref, $args, $hookdata ) = @_;
 

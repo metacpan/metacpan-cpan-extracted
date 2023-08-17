@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -64,17 +64,20 @@ use parent qw(MVC::Neaf::View);
 =item * preload => { name => 'in-memory template' } - preload some templates.
 See C<preload()> below.
 
+=item * INCLUDE_PATH => [path, ...] - will be calculated relative
+to the calling file, if not starts with a '/'.
+
+=back
+
 Also any UPPERCASE OPTIONS will be forwarded to the backend
 (i.e. Template object) w/o changes.
 
 Any extra options except those above will cause an exception.
 
-=back
-
 =cut
 
 my %new_opt;
-$new_opt{$_}++ for qw( template preserve_dash engine preload preload_auto );
+$new_opt{$_}++ for qw( template preserve_dash engine preload preload_auto neaf_base_dir );
 
 my @opt_provider = qw(
     INCLUDE_PATH ABSOLUTE RELATIVE DEFAULT ENCODING CACHE_SIZE STAT_TTL
@@ -91,37 +94,41 @@ sub new {
     croak( "$class->new: Unknown options @extra" )
         if @extra;
 
-    $opt{engine} ||= do {
+    my $engine  = delete $opt{engine};
+    my $preload = delete $opt{preload};
+    my $self    = $class->SUPER::new(%opt);
+
+    $self->{engine} ||= do {
+        # enforce non-absolute paths to be calculated relative to caller file
+        $tt_opt{INCLUDE_PATH} = $self->dir( $tt_opt{INCLUDE_PATH} || [] );
+
         my %prov_opt;
-        $tt_opt{INCLUDE_PATH} ||= [];
-        $prov_opt{$_} = $tt_opt{$_}
-            for @opt_provider;
-        defined $prov_opt{$_} or delete $prov_opt{$_}
-            for keys %prov_opt;
+        foreach( @opt_provider) {
+            $prov_opt{$_} = $tt_opt{$_}
+                if defined $tt_opt{$_};
+        };
 
         my $prov = delete $tt_opt{LOAD_TEMPLATES} || [
             Template::Provider->new(\%prov_opt)
         ];
-        $opt{engine_preload} = Template::Provider->new({
+        $self->{engine_preload} = Template::Provider->new({
             %prov_opt,
             CACHE_SIZE => undef,
             STAT_TTL   => 4_000_000_000,
         });
         # shallow copy (not unshift) to avoid spoiling original values
-        $prov = [ $opt{engine_preload}, @$prov ];
+        $prov = [ $self->{engine_preload}, @$prov ];
 
         Template->new (%tt_opt, LOAD_TEMPLATES => $prov);
     };
 
-    my $pre = delete $opt{preload};
-    my $self = $class->SUPER::new(%opt);
 
     # TODO 0.40 automagically preload from the calling file's DATA section
-    if ( ref $pre eq 'HASH' ) {
-        $self->preload( $_ => $pre->{$_} )
-            for keys %$pre;
-    } elsif ($pre) {
-        $self->_croak("preload must be a hash, not ".(ref $pre || "a scalar") );
+    if ( ref $preload eq 'HASH' ) {
+        $self->preload( $_ => $preload->{$_} )
+            for keys %$preload;
+    } elsif ($preload) {
+        $self->_croak("preload must be a hash, not ".(ref $preload || "a scalar") );
     };
     return $self;
 };
@@ -191,7 +198,7 @@ L<Template> - the template toolkit used as backend.
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

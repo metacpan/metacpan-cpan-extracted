@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+v0.6.1 2023-06-14T19:46:54+0900
+    - Correcting minor bug due to lack of precision in Text::PO::Element
+
 v0.6.0 2023-04-14T21:28:01+0900
     - Added JavaScript function fetchLocalen() in share/gettext.js
 

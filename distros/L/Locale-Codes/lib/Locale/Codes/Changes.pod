@@ -24,6 +24,14 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
+=head1 VERSION 3.74  (2023-06-07  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+=back
+
 =head1 VERSION 3.73  (2023-03-06  sbeck)
 
 =over 5

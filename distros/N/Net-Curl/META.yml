@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/sparky/perl-Net-Curl/issues
   homepage: https://github.com/sparky/perl-Net-Curl
   repository: git://github.com/sparky/perl-Net-Curl.git
-version: '0.53'
+version: '0.54'
 x_contributors:
   - 'Bálint Szilakszi'
   - 'David Geiger'

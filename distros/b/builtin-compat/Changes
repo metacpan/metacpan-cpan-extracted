@@ -1,5 +1,9 @@
 Revision history for builtin-compat
 
+0.002001 - 2023-07-30
+  - change prototype of trim to ($) to match perl 5.38 and newer
+  - avoid possible conflicts with builtin::Backport
+
 0.002000 - 2023-04-22
   - add is_tainted function
   - ensure the expermental::builtin warnings category always exists

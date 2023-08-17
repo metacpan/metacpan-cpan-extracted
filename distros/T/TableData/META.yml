@@ -20,13 +20,13 @@ name: TableData
 provides:
   TableData:
     file: lib/TableData.pm
-    version: v0.2.2
+    version: v0.2.3
   TableData::Test::Spec::Basic:
     file: lib/TableData/Test/Spec/Basic.pm
-    version: v0.2.2
+    version: v0.2.3
   TableDataRole::Spec::Basic:
     file: lib/TableDataRole/Spec/Basic.pm
-    version: v0.2.2
+    version: v0.2.3
 requires:
   Role::Tiny: '0'
   Role::Tiny::With: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData
   homepage: https://metacpan.org/release/TableData
   repository: git://github.com/perlancar/perl-TableData.git
-version: 0.2.2
+version: 0.2.3
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -212,7 +212,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -324,7 +324,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

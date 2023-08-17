@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetValidationsRequest.name :   ,
-# GetWorksheetValidationsRequest.sheetName :   ,
-# GetWorksheetValidationsRequest.folder :   ,
-# GetWorksheetValidationsRequest.storageName :    
+# GetWorksheetValidationsRequest.name : The workbook name.  ,
+# GetWorksheetValidationsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetValidationsRequest.folder : Original workbook folder.  ,
+# GetWorksheetValidationsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_validations' } = { 
-    	summary => '',
+    	summary => 'Get validations description in worksheet.',
         params => $params,
         returns => 'ValidationsResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,0 +1,297 @@
+#!/usr/bin/env perl
+#ABSTRACT: Search for HPC packages in the cluster
+#PODNAME: shelf
+use 5.012;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use JSON::PP;
+use File::Basename;
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+use FindBin qw($RealBin);
+use Storable;
+use lib "$RealBin";
+use NBI::Slurm;
+my $opt_help;
+my $opt_verbose; 
+my $opt_inst;
+my $opt_stage;
+my $opt_new;
+my $opt_legacy;
+my $opt_extended;
+my $opt_refresh;
+my $version = $NBI::Slurm::VERSION;
+GetOptions(
+  's|stage=s'    => \$opt_stage,
+  'i|institute=s'=> \$opt_inst,
+  'l|legacy-only'=> \$opt_legacy,
+  'n|new-catalogue' => \$opt_new,
+  'x|extended_search' => \$opt_extended,
+  'verbose'      => \$opt_verbose,
+  'refresh'      => \$opt_refresh,
+  'version'      => sub { say "shelf v$version"; exit },
+  'h|help'       => \$opt_help,
+);
+pod2usage({-exitval => 0, -verbose => 2}) if $opt_help;	
+my $search = $ARGV[0];
+
+my $cache_file = "$RealBin/catalogue.cache";
+my $cache = {};
+$cache = retrieve($cache_file) if (-e $cache_file and not $opt_refresh);
+unless ($search) {
+ die "Specify a search string for HPC packages.\n";
+}
+my @locations = (
+	'/qib/software/',
+	'/tgac/software/',
+	'/nbi/software/',
+	'/ei/software/'
+	
+);
+
+my @stages = (
+	'testing',
+	'staging',
+	'production',
+);
+
+my $cache_age = NBI::Slurm::days_since_update($cache_file);
+if ($cache_age > 14) {
+	say STDERR RED, "Cache file $cache_file is $cache_age days old. Consider refreshing it with --refresh", RESET;
+}
+
+if ($opt_refresh or not -e $cache_file) {
+	say STDERR BLUE, "Refreshing cache file $cache_file", RESET if ($opt_verbose);
+	for my $location (@locations) {
+		say STDERR BLUE, "\t legacy: $location", RESET if ($opt_verbose);
+		#if (defined $opt_inst) {
+		#	next unless $location =~/$opt_inst/i;
+		#}
+
+		# LEGACY
+		for my $stage (@stages) {
+			#last if ($opt_new);
+
+			if (defined $opt_stage) {
+				next unless $stage=~/$opt_stage/i;
+			}
+			my @files = <$location$stage/bin/*>;
+			for my $file (@files) {
+				my $pack = basename($file);
+				$cache->{$pack} = $file;
+				#if ($search eq $pack) {
+				#	print GREEN, BOLD, $pack, RESET, "\tsource package $file\n" ;
+				#} elsif ($pack=~/$search/i) {
+				#	print GREEN, $pack, RESET, "\tsource package $file\n" ;
+				#}
+			}
+		}
+
+
+	}
+
+	for my $location (@locations) {
+		say STDERR BLUE, "\t modern: $location", RESET if ($opt_verbose);
+		#last if ($opt_legacy);	
+		#if (defined $opt_inst) {
+		#	next unless $location =~/$opt_inst/i;
+		#}
+		# CONTAINERS
+		my @containers = <${location}containers/*>;
+		for my $container (@containers) {
+			
+			if (-e "$container/Singularity.manifest") {
+				my $data = getinfo("$container/Singularity.manifest");
+					
+					if ($data->{UUID} eq $search) {
+						#say  CYAN, "From $container/Singularity.manifest", RESET;
+						#print_details($data);
+						exit;
+					} elsif ($data->{Application} =~/$search/i or $data->{Provides} =~/\W$search\W/ or ((defined $opt_extended and $data->{Description} =~/$search/i )) ) {
+						#say YELLOW $data->{Application},'-',$data->{ApplicationVersion}, RESET "\t", 'source package ', $data->{UUID};
+						my $pass;
+					}
+					$cache->{"$data->{Application}:$data->{Provides}"} = $data->{UUID};
+		
+			}
+		}
+	}
+	store $cache, $cache_file;
+} else {
+	say STDERR BLUE, "Using cache file $cache_file", RESET if ($opt_verbose);
+}
+
+my $result_count = 0;
+my $last_container = '';
+for my $key (keys %$cache) {
+	my $str = $key;
+	my $pack = $cache->{$key};
+	my @provides = ();
+	if ($key =~/^([^:]+):(.+)$/) {
+		next if $opt_legacy; 
+		$str =  $1;
+		
+		@provides = split(/,/, $2);
+	} else {
+		next if $opt_new;
+	}
+
+	# check if $search is an element of @provides in a perl 5.12 friendly wya
+	my $found = 0;
+	for my $provide (@provides) {
+		if ($provide=~/^$search$/i) {
+			$found = 1;
+			last;
+		}
+	}
+	if ($str =~/$search/i or $found) {
+		$result_count++;
+		$last_container = $str;
+		my $color = $provides[0] ? GREEN : YELLOW;
+		#print $color, $str, RESET, "\tsource package $pack\n" ;
+		# Print str with 30 chars max and then spaces, then \t and source package $pack
+		my $str2 = substr($str, 0, 30);
+		my $spaces = ' ' x (30 - length($str2));
+		print $color, $str2, $spaces, RESET, "\tsource package $pack\n";
+
+	}
+}
+say STDERR BLUE, "Found $result_count results", RESET if ($opt_verbose);
+if ( ($result_count == 1 and $last_container) or $search=~/^[\da-f]+-[\da-f]+-[\da-f]+-[\da-f]+-[\da-f]+$/i) {
+	for my $l (@locations) {
+		my $q = $last_container ? $last_container : $search;
+		if (-e "${l}/containers/$q/Singularity.manifest") {
+			my $data = getinfo("${l}/containers/$q/Singularity.manifest");
+			say STDERR BLUE " - Reading ${l}/containers/$q/Singularity.manifest", RESET if ($opt_verbose);
+			print_details($data);
+			last;
+		} 
+	}
+}  
+sub print_details {
+	my $data = shift @_;
+	say STDERR BOLD "\n== ", $data->{Application}, ' ', $data->{ApplicationVersion}, " == ", RESET, "($data->{Institute})";
+	
+	say STDERR CYAN "Provides:\n - ", RESET, join("\n - ", split(/,/,$data->{Provides}));
+	say STDERR CYAN 'Description: ', RESET, $data->{Description};
+	say STDERR CYAN 'Build date: ', RESET, $data->{BuildDate};
+
+	print "\nsource package $data->{UUID}\n";
+	
+} 
+
+sub getinfo {
+	my $json_file = shift @_;
+	my $json;
+	{
+	  local $/; #Enable 'slurp' mode
+	  open my $fh, "<", $json_file;
+	  $json = <$fh>;
+	  close $fh;
+	}
+	return decode_json($json);
+	
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+shelf - Search for HPC packages in the cluster
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 SYNOPSIS
+
+  shelf [options] search_key
+
+=head1 DESCRIPTION
+
+Scan installed packages in the NBI HPC. The search is case insensitive.
+Will use a cache file to speed up the search.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-l>, B<--legacy-only>
+
+Only display software in the legacy catalogue.
+
+=item B<-n>, B<--new-only>
+
+Only display software in the new catalogue (containers).
+
+=item B<--refresh>
+
+Force a refresh of the cache file.
+
+=item B<--verbose>
+
+Prints more information about the packages.
+
+=item B<--version>
+
+Prints the version of the script.
+
+=back
+
+=head1 OUTPUT
+
+When searching for a query string, the script will print the name and how to activate it:
+
+  shelf metaphlan
+
+Will produce:
+
+  MetaPhlAn                source package 9020df39-c4ad-402b-b299-896159114bd7 
+  metaphlan2-2.7.5        source package /nbi/software/testing/bin/metaphlan2-2.7.5 
+  metaphlan-3.0           source package /ei/software/testing/bin/metaphlan-3.0 
+  metaphlan-2f1b17a1f4e9  source package /ei/software/testing/bin/metaphlan-2f1b17a1f4e9 
+  metaphlan2-2.96.1       source package /ei/software/testing/bin/metaphlan2-2.96.1 
+  MetaPhlAn               source package edb34606-aeeb-41c2-890b-079c2ef1fd1c 
+  metaphlan-3.0.13        source package /nbi/software/testing/bin/metaphlan-3.0.13 
+  metaphlan-2.0           source package /ei/software/testing/bin/metaphlan-2.0 
+  metaphlan2-2.7.8        source package /nbi/software/testing/bin/metaphlan2-2.7.8 
+
+When a singularity package ID is specified, if a manifest is found it will print the details:
+
+  shelf 9020df39-c4ad-402b-b299-896159114bd7
+
+Will produce:  
+
+  == MetaPhlAn 3.0.10 == (QIB)  
+  Provides: 
+   - metahplan  
+   - read_fastx.py  
+   - merge_metaphlan_tables.py  
+  
+  Description: MetaPhlAn is a computational tool for profiling the composition of microbial communities
+  (Bacteria, Archaea and Eukaryotes) from metagenomic shotgun sequencing data (i.e. not 16S) with species-level.
+  With StrainPhlAn 3.0, it is possible to perform accurate strain-level microbial profiling.
+  [https://github.com/biobakery/MetaPhlAn/wiki/MetaPhlAn-3.0]  
+  
+  Build date: UNK  
+   
+  source package 9020df39-c4ad-402b-b299-896159114bd7
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

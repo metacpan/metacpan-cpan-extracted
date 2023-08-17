@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,7 @@
 #ifndef CATCH_OPTIMIZER_HPP_INCLUDED
 #define CATCH_OPTIMIZER_HPP_INCLUDED
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC__)
 #   include <atomic> // atomic_thread_fence
 #endif
 
@@ -32,16 +32,23 @@ namespace Catch {
         namespace Detail {
             inline void optimizer_barrier() { keep_memory(); }
         } // namespace Detail
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC__)
 
+#if defined(_MSVC_VER)
 #pragma optimize("", off)
+#elif defined(__IAR_SYSTEMS_ICC__)
+// For IAR the pragma only affects the following function
+#pragma optimize=disable
+#endif
         template <typename T>
         inline void keep_memory(T* p) {
             // thanks @milleniumbug
             *reinterpret_cast<char volatile*>(p) = *reinterpret_cast<char const volatile*>(p);
         }
         // TODO equivalent keep_memory()
+#if defined(_MSVC_VER)
 #pragma optimize("", on)
+#endif
 
         namespace Detail {
             inline void optimizer_barrier() {

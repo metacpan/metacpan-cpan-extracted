@@ -3,26 +3,29 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Tickit::WidgetRole::SingleChildContainer' );
+require Tickit::WidgetRole::SingleChildContainer;
 
-use_ok( 'Tickit::Widgets' );
+require Tickit::Widgets;
 
-use_ok( 'Tickit::Widget::Border' );
-use_ok( 'Tickit::Widget::Box' );
-use_ok( 'Tickit::Widget::Button' );
-use_ok( 'Tickit::Widget::CheckButton' );
-use_ok( 'Tickit::Widget::Entry' );
-use_ok( 'Tickit::Widget::Fill' );
-use_ok( 'Tickit::Widget::Frame' );
-use_ok( 'Tickit::Widget::GridBox' );
-use_ok( 'Tickit::Widget::HBox' );
-use_ok( 'Tickit::Widget::HSplit' );
-use_ok( 'Tickit::Widget::Placegrid' );
-use_ok( 'Tickit::Widget::RadioButton' );
-use_ok( 'Tickit::Widget::Spinner' );
-use_ok( 'Tickit::Widget::VBox' );
-use_ok( 'Tickit::Widget::VSplit' );
+require Tickit::Widget::Border;
+require Tickit::Widget::Box;
+require Tickit::Widget::Button;
+require Tickit::Widget::CheckButton;
+require Tickit::Widget::Entry;
+require Tickit::Widget::Fill;
+require Tickit::Widget::Frame;
+require Tickit::Widget::GridBox;
+require Tickit::Widget::HBox;
+require Tickit::Widget::HLine;
+require Tickit::Widget::HSplit;
+require Tickit::Widget::Placegrid;
+require Tickit::Widget::RadioButton;
+require Tickit::Widget::Spinner;
+require Tickit::Widget::VBox;
+require Tickit::Widget::VLine;
+require Tickit::Widget::VSplit;
 
+pass( "Modules loaded" );
 done_testing;

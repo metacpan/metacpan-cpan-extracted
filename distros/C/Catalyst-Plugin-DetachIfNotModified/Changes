@@ -1,5 +1,29 @@
 Release history of Catalyst-Plugin-DetachIfNotModified:
 
+v0.3.1    2023-06-22 12:32:19+01:00 Europe/London
+  [Tests]
+  - Added required module for tests to work around broken CPAN Testers environments.
+
+v0.3.0    2023-06-08 09:17:19+01:00 Europe/London
+  [Incompatible Changes]
+  - Perl v5.14 is now required.
+
+  [Bug Fix]
+  - detach_if_not_modified_since will ignore empty lists.
+
+  [Documentation]
+  - Documented Perl version support policy.
+
+  - Bump copyright year.
+
+  - Fix encoding of links in README.
+
+  [Other]
+  - Update MANIFEST.SKIP rules.
+
+  [Toolchain]
+  - Sign the distribution.
+
 v0.2.1    2021-04-27 16:46:25+01:00 Europe/London
   [Bug Fixes]
   - Remove unnecessary test prereq.

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iSunmo;
 
 =head2 SYNOPSIS
 
-  PACKAGE NAME: iSunmo
+  PERL PROGRAM NAME: iSunmo
 
   Purpose:  interactive sunmo
   AUTHOR:  Juan M. Lorenzo

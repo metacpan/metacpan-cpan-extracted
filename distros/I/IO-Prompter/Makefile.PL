@@ -12,6 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'         => 0,
         'Contextual::Return' => 0,
+        'match::smart'       => 0.010,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'IO-Prompter-*' },

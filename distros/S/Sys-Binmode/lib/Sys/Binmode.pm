@@ -3,6 +3,8 @@ package Sys::Binmode;
 use strict;
 use warnings;
 
+our $VERSION = '0.05';
+
 =encoding utf-8
 
 =head1 NAME
@@ -286,8 +288,6 @@ Maybe someday!
 =cut
 
 #----------------------------------------------------------------------
-
-our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);

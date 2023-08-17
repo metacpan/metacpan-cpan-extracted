@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+#
+# Author, Copyright and License: see end of file
+
+=head1 NAME
+
+lxc-app-run - update configuration for an LXC application container
+
+=head1 SYNOPSIS
+
+    lxc-app-run [{-u|--user} <user>] [{-d|--dir|--directory} <directory>] \
+        <container> <command> <parameters>...
+
+=head1 ABSTRACT
+
+main script used to run a previously configured LXC application container
+
+Note that the script must be called as root (see L<App::LXC::Container::Run>
+for details).
+
+=head1 DESCRIPTION
+
+This script runs a command inside of an LXC application container previously
+created or updated with L<lxc-app-update>.  Parameters following the command
+are passed through unmodified.  If no user is specified, the command runs as
+C<root>, which is a root account especially restricted to the container
+unless explicitly configured otherwise (usually a bad idea).  Likewise
+another given user is restricted unless explicitly added to the list of
+allowed users for the configuration (usually not a bad idea).  The command
+is run in C</> or the specified directory.
+
+Note that the previously created configuration for LXC itself contains a
+mandatory C<MASTER> comment in the second line.  This comment may not be
+deleted or modified, otherwise the start of the container may fail or the
+container may not work as expected.
+
+=cut
+
+#########################################################################
+
+##################
+# load packages: #
+##################
+
+use v5.14;
+use strictures 2;
+no indirect 'fatal';
+no multidimensional;
+use warnings 'once';
+
+use Cwd;
+
+BEGIN {
+    ($_ = $0) =~ s|[^/]+/[^/]+$|lib|;
+    unshift @INC, $_  if  cwd() =~ m!/App-LXC-Container(?:-\d\.\d+)?(?:/|$)!;
+}
+
+use App::LXC::Container;
+use App::LXC::Container::Texts;
+#debug(4);			# FIXME: remove for release!
+
+#################################################
+# all work is done in the corresponding module: #
+#################################################
+
+2 <= @ARGV  or
+    fatal 'usage__1_container__2',
+    $0
+    . ' [{-d|--dir|--directory} <starting-directory>]'
+    . ' [{-u|--user} <user>]',
+    ' <command> [<parameters>...]';
+App::LXC::Container::run(@ARGV);
+
+#########################################################################
+
+=head1 SEE ALSO
+
+C<L<App::LXC::Container>>, C<L<App::LXC::Container::Run>>
+
+=head1 LICENSE
+
+Copyright (C) Thomas Dorner.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.  See LICENSE file for more details.
+
+=head1 AUTHOR
+
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
+
+=cut

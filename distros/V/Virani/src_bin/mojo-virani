@@ -64,11 +64,14 @@ sub the_stuff {
 	if ( !defined($set) or $set eq '' ) {
 		$set = $virani->get_default_set;
 	}
-	$virani->verbose( 'info', 'Set: ' . $set );
 
 	# get the start value and make sure it is sane
 	my $start_obj;
 	my $start = $c->param('start');
+	my $stime = $c->param('stime');
+	if ( defined($stime) ) {
+		$start = $stime;
+	}
 	if ( !defined($start) ) {
 		$c->render( text => "No start value specified\n", status => 400, );
 		$virani->verbose( 'err', 'Start time not specified' );
@@ -83,7 +86,11 @@ sub the_stuff {
 
 	# get the end value and make sure it is sane
 	my $end_obj;
-	my $end = $c->param('end');
+	my $end   = $c->param('end');
+	my $etime = $c->param('etime');
+	if ( defined($etime) ) {
+		$end = $etime;
+	}
 	if ( !defined($end) ) {
 		$c->render( text => "No end value specified\n", status => 400, );
 		$virani->verbose( 'err', 'End time not specified' );
@@ -111,6 +118,7 @@ sub the_stuff {
 			$virani->verbose( 'err', 'Type "' . $type . '" not a valid type' );
 			return;
 		}
+		$virani->verbose( 'info', 'Type: ' . $type );
 	}
 
 	# get the bpf value and make sure it is vaguely sane
@@ -126,8 +134,7 @@ sub the_stuff {
 	$get_meta = $c->param('get_meta');
 	if ($get_meta) {
 		$get_meta = 1;
-	}
-	else {
+	} else {
 		$get_meta = 0;
 	}
 	$virani->verbose( 'info', 'get_meta: ' . $get_meta );
@@ -135,13 +142,15 @@ sub the_stuff {
 	my $return_file;
 	if ( !$get_meta ) {
 		my $returned;
+		$virani->verbose( 'info', 'calling get_pcap_local...' );
 		eval {
 			$returned = $virani->get_pcap_local(
-				set    => $set,
-				start  => $start_obj,
-				end    => $end_obj,
-				filter => $bpf,
-				type   => $type,
+				set     => $set,
+				start   => $start_obj,
+				end     => $end_obj,
+				filter  => $bpf,
+				type    => $type,
+				verbose => 1,
 			);
 		};
 		if ($@) {
@@ -149,6 +158,7 @@ sub the_stuff {
 			$virani->verbose( 'err', 'get_pcap_local failed: ' . $@ );
 			return;
 		}
+		$virani->verbose( 'info', 'get_pcap_local finished' );
 
 		# if there are more than 0 found pcaps and the count is the same as the failed cound,
 		# then generation of them all failed
@@ -168,35 +178,39 @@ sub the_stuff {
 					. ', failed_count: '
 					. $returned->{failed_count} );
 			return;
-		}
+		} ## end if ( $returned->{pcap_count} == $returned->...)
 		$return_file = $returned->{path};
-	}else {
-		eval{
+	} else {
+		eval {
 			$return_file = $virani->get_cache_file(
-												   set    => $set,
-												   start  => $start_obj,
-												   end    => $end_obj,
-												   filter => $bpf,
-												   type   => $type,
-												   );
-			$return_file=$return_file.'.json';
+				set    => $set,
+				start  => $start_obj,
+				end    => $end_obj,
+				filter => $bpf,
+				type   => $type,
+			);
+			$return_file = $return_file . '.json';
 		};
 		if ($@) {
 			$c->render( text => "Getting metadata JSON failed... please see syslog\n", status => 400, );
 			return;
 		}
-		$virani->verbose( 'info', 'returning '.$return_file);
-	}
+	} ## end else [ if ( !$get_meta ) ]
+	$virani->verbose( 'info', 'returning ' . $return_file );
 
 	# if this fails, it is a old version of Mojolicious
-	eval { $c->reply->file($return_file); };
+	eval {
+		$c->res->headers->content_type('application/x-download');
+		$c->reply->file($return_file);
+	};
 	if ($@) {
 		use File::Slurp;
 		my $raw_pcap = read_file($return_file);
 		$c->render( data => $raw_pcap );
 	}
+	$virani->verbose( 'info', 'finished returning ' . $return_file );
 
 	return;
-}
+} ## end sub the_stuff
 
 app->start;

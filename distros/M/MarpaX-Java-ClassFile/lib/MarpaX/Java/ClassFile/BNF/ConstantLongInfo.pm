@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a CONSTANT_Long_info
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -55,7 +55,7 @@ MarpaX::Java::ClassFile::BNF::ConstantLongInfo - Parsing of a CONSTANT_Long_info
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

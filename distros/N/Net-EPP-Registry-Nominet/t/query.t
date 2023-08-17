@@ -11,7 +11,7 @@
 #===============================================================================
 
 use strict;
-use warnings;
+use warnings FATAL => 'recursion';
 use utf8;
 
 use Test::More;
@@ -34,8 +34,7 @@ my $tag = lc $ENV{NOMTAG};
 
 my $changes = {
 	'add' => { 'ns' => ["ns1.oberon-$tag.co.uk", "ns1.macduff-$tag.co.uk"] },
-	'rem' => {},
-	'chg' => {}
+	'rem' => {}
 };
 
 $epp->modify_domain ("duncan-$tag.co.uk", $changes);

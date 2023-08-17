@@ -246,6 +246,8 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(!probe_piece(aTHX_ argsv, argidx, pieces++, hookdata))
         return FALSE;
 
+      lex_read_space(0);
+
       parse_pieces(aTHX_ argsv, argidx, pieces, hookdata);
       return TRUE;
     }
@@ -291,9 +293,11 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       }
       /* we're now committed */
       THISARG.i = 1;
+      lex_read_space(0);
       if(pieces[2].type)
         parse_pieces(aTHX_ argsv, argidx, pieces + 2, hookdata);
 
+      lex_read_space(0);
       if(!probe_piece(aTHX_ argsv, argidx, pieces + 0, hookdata))
         return TRUE;
 
@@ -301,15 +305,17 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         parse_pieces(aTHX_ argsv, argidx, pieces + 1, hookdata);
         THISARG.i++;
 
+        lex_read_space(0);
+
         if(!probe_piece(aTHX_ argsv, argidx, pieces + 0, hookdata))
           break;
       }
       return TRUE;
     }
 
-    case XS_PARSE_KEYWORD_PARENSCOPE:
+    case XS_PARSE_KEYWORD_PARENS:
       if(piece->type & XPK_TYPEFLAG_MAYBEPARENS)
-        croak("TODO: probe_piece on type=PARENSCOPE+MAYBEPARENS");
+        croak("TODO: probe_piece on type=PARENS+MAYBEPARENS");
 
       if(lex_peek_unichar(0) != '(')
         return FALSE;
@@ -317,21 +323,21 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
-    case XS_PARSE_KEYWORD_BRACKETSCOPE:
+    case XS_PARSE_KEYWORD_BRACKETS:
       if(lex_peek_unichar(0) != '[')
         return FALSE;
 
       parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
-    case XS_PARSE_KEYWORD_BRACESCOPE:
+    case XS_PARSE_KEYWORD_BRACES:
       if(lex_peek_unichar(0) != '{')
         return FALSE;
 
       parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
-    case XS_PARSE_KEYWORD_CHEVRONSCOPE:
+    case XS_PARSE_KEYWORD_CHEVRONS:
       if(lex_peek_unichar(0) != '<')
         return FALSE;
 
@@ -407,6 +413,15 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     case XS_PARSE_KEYWORD_AUTOSEMI:
       parse_autosemi();
       return;
+
+    case XS_PARSE_KEYWORD_WARNING:
+    {
+      int warnbit = piece->type >> 24;
+      if(warnbit && !ckWARN(warnbit))
+        return;
+      warn("%s", piece->u.str);
+      return;
+    }
 
     case XS_PARSE_KEYWORD_FAILURE:
       yycroak(piece->u.str);
@@ -660,6 +675,10 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       (*argidx)++;
       return;
 
+    case XS_PARSE_KEYWORD_INTRO_MY:
+      intro_my();
+      return;
+
     case XS_PARSE_KEYWORD_INFIX:
     {
       if(!XSParseInfix_parse(aTHX_ piece->u.c, &THISARG.infix))
@@ -682,6 +701,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
           return;
         THISARG.i++;
         pieces++;
+        lex_read_space(0);
       }
 
       parse_pieces(aTHX_ argsv, argidx, pieces, hookdata);
@@ -713,13 +733,15 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1, hookdata);
         THISARG.i++;
 
+        lex_read_space(0);
+
         if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0, hookdata))
           break;
         lex_read_space(0);
       }
       return;
 
-    case XS_PARSE_KEYWORD_PARENSCOPE:
+    case XS_PARSE_KEYWORD_PARENS:
     {
       bool has_paren = (lex_peek_unichar(0) == '(');
 
@@ -749,7 +771,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
     }
 
-    case XS_PARSE_KEYWORD_BRACKETSCOPE:
+    case XS_PARSE_KEYWORD_BRACKETS:
       if(is_optional) {
         THISARG.i = 0;
         (*argidx)++;
@@ -766,7 +788,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       return;
 
-    case XS_PARSE_KEYWORD_BRACESCOPE:
+    case XS_PARSE_KEYWORD_BRACES:
       if(is_optional) {
         THISARG.i = 0;
         (*argidx)++;
@@ -783,7 +805,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       return;
 
-    case XS_PARSE_KEYWORD_CHEVRONSCOPE:
+    case XS_PARSE_KEYWORD_CHEVRONS:
       if(is_optional) {
         THISARG.i = 0;
         (*argidx)++;
@@ -827,6 +849,12 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
   SV *argsv = newSV(maxargs * sizeof(XSParseKeywordPiece));
   SAVEFREESV(argsv);
 
+  bool is_blockscope = hooks->flags & XPK_FLAG_BLOCKSCOPE;
+
+  int floor;
+  if(is_blockscope)
+    floor = block_start(TRUE);
+
   size_t argidx = 0;
   if(hooks->build)
     parse_pieces(aTHX_ argsv, &argidx, hooks->pieces, reg->hookdata);
@@ -869,6 +897,9 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
   }
   else
     ret = (*hooks->build1)(aTHX_ op, args + 0, reg->hookdata);
+
+  if(is_blockscope)
+    *op = op_scope(block_end(floor, *op));
 
   switch(hooks->flags & (XPK_FLAG_EXPR|XPK_FLAG_STMT)) {
     case XPK_FLAG_EXPR:

@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper::Base;
-$Docker::CLI::Wrapper::Base::VERSION = '0.0.6';
+$Docker::CLI::Wrapper::Base::VERSION = '0.0.7';
 use strict;
 use warnings;
 use 5.014;
@@ -48,14 +48,23 @@ sub calc_docker_cmd_line_prefix
     return ['docker'];
 }
 
+sub calc_docker_cmd
+{
+    my ( $self, $args ) = @_;
+
+    my $cmd = $args->{cmd};
+    return { docker_cmd => [ @{ $self->docker_cmd_line_prefix }, @$cmd, ], };
+}
+
 sub docker
 {
     my ( $self, $args ) = @_;
 
     my $cmd = $args->{cmd};
     return $self->do_system(
-        { %$args, cmd => [ @{ $self->docker_cmd_line_prefix }, @$cmd, ], } );
+        { %$args, cmd => $self->calc_docker_cmd( $args, )->{'docker_cmd'}, } );
 }
+
 1;
 
 __END__
@@ -70,7 +79,21 @@ Docker::CLI::Wrapper::Base - base class.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
+
+=head1 SYNOPSIS
+
+    use Docker::CLI::Wrapper::Base;
+
+    my $obj = Docker::CLI::Wrapper::Base->new();
+
+    $obj->do_system(
+        {
+            cmd => [
+                qw/ls -l/,
+            ],
+        }
+    );
 
 =head1 METHODS
 
@@ -81,6 +104,12 @@ Sugar for system(@CMD) - prints and dies on error.
 =head2 $obj->docker({ cmd => [@CMD]});
 
 Runs docker using the args in @CMD, using do_system.
+
+=head2 $obj->calc_docker_cmd({ cmd => [@CMD]});
+
+Calculates the docker command and returns it (without executing it).
+
+[Added in version 0.0.7.]
 
 =head2 $obj->calc_docker_cmd_line_prefix()
 

@@ -53,6 +53,36 @@ __PACKAGE__->has_many(
   { 'foreign.person_id' => 'self.id' }
 );
 
+__PACKAGE__->has_many(
+  posts =>
+  'Example::Schema::Result::Post',
+  { 'foreign.person_id' => 'self.id' }
+);
+
+__PACKAGE__->has_many(
+  comments =>
+  'Example::Schema::Result::Comment',
+  { 'foreign.person_id' => 'self.id' }
+);
+
+__PACKAGE__->has_many(
+  viewable_posts2 =>
+    'Example::Schema::Result::Post::Viewable',
+    sub {
+      my $args = shift;
+      return 
+        +{ },
+         { "$args->{foreign_alias}.id" => \[' is not null', $args->{self_result_object}->id ] };
+    },
+);
+
+sub viewable_posts($self, $search_args = {}) {
+  my $schema = $self->result_source->schema;
+  return $schema->resultset('Post::Viewable')->search(
+    $search_args,
+    { bind => [ $self->id ] }
+  );
+}
 
 __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
 __PACKAGE__->validates( password => (presence=>1, confirmation => 1,  on=>'create' ));
@@ -64,14 +94,20 @@ __PACKAGE__->validates( password => (confirmation => {
 __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
 __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
 
-__PACKAGE__->validates(credit_cards => (set_size=>{min=>2, max=>4}, on=>'account' ));
+__PACKAGE__->validates(credit_cards => (set_size=>{min=>2, max=>4, skip_if_blank=>1} ));
 __PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
 
-__PACKAGE__->validates(person_roles => (set_size=>{min=>1}, with=>'validate_roles', on=>'account' ));
+__PACKAGE__->validates(person_roles => (set_size=>{min=>1}, with=>'validate_roles' ));
 __PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
 __PACKAGE__->accept_nested_for('contacts', {allow_destroy=>1});
 
 __PACKAGE__->accept_nested_for('profile');
+__PACKAGE__->accept_nested_for('roles');
+
+__PACKAGE__->validates_with(sub {
+  my ($self, $opts) = @_;
+  $self->errors->add(undef, "No MEga!!!!!") if (($self->last_name||'') eq 'mega');
+});
 
 sub validate_roles($self, $attribute_name, $value, $opt) {
 
@@ -140,10 +176,22 @@ sub register($self, $request) {
   return $self->registered;
 }
 
-sub update_account($self, $request) {
-  $self->context('account')->set_columns_recursively($request->nested_params);
- $self->context('account')->update; 
-  return $self->valid;
+## There's are proxied to other resultsets for now but we expect that
+## ecentually they could be impacted by the current user.
+
+sub states {
+  my $self = shift;
+  return $self->result_source->schema->resultset('State');
+}
+
+sub viewable_roles {
+  my $self = shift;
+  return $self->result_source->schema->resultset('Role');
+}
+
+sub employment_options {
+  my $self = shift;
+  return $self->result_source->schema->resultset('Employment');
 }
 
 1;

@@ -1,7 +1,7 @@
 package Mail::DKIM::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: verifies a DKIM-signed message
 
 # Copyright 2005-2009 Messiah College. All rights reserved.
@@ -348,11 +348,15 @@ sub _check_and_verify_signature {
         return ( 'invalid', $self->{signature_reject_reason} );
     }
 
-    # make sure key is big enough
-    my $keysize = $pkey->cork->size * 8;    # in bits
-    if ( $keysize < 1024 && $self->{Strict} ) {
-        $self->{signature_reject_reason} = "Key length $keysize too short";
-        return ( 'fail', $self->{signature_reject_reason} );
+    # special handling for RSA signatures
+    my $k = $pkey->get_tag('k') || 'rsa';
+    if ($k eq 'rsa') {
+        # make sure key is big enough
+        my $keysize = $pkey->cork->size * 8;    # in bits
+        if ( $keysize < 1024 && $self->{Strict} ) {
+            $self->{signature_reject_reason} = "Key length $keysize too short";
+            return ( 'fail', $self->{signature_reject_reason} );
+        }
     }
 
     # verify signature
@@ -372,6 +376,9 @@ sub _check_and_verify_signature {
         }
         elsif ( $E =~ /^(panic:.*?) at / ) {
             $E = "OpenSSL $1";
+        }
+        elsif ( $E =~ /^FATAL: (.*) at / ) {
+            $E = "Ed25519 $1";
         }
         $result  = 'fail';
         $details = $E;
@@ -493,7 +500,7 @@ Mail::DKIM::Verifier - verifies a DKIM-signed message
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 SYNOPSIS
 

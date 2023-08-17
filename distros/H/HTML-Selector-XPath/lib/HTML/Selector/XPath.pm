@@ -2,7 +2,7 @@ package HTML::Selector::XPath;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 require Exporter;
 our @EXPORT_OK = qw(selector_to_xpath);
@@ -29,7 +29,7 @@ my $reg = {
         (?: ($ident) | "([^"]*)" | '([^']*)') \s* \] /x,
     badattr => qr/^\[/,
     attrN   => qr/^:not\(/i, # we chop off the closing parenthesis below in the code
-    pseudo  => qr/^:([()a-z0-9_+-]+)/i,
+    pseudo  => qr/^:([-\w]+\(?)/i,
     # adjacency/direct descendance
     combinator => qr/^(\s*[>+~\s](?!,))/i,
     # rule separator
@@ -69,15 +69,15 @@ sub convert_attribute_match {
 }
 
 sub _generate_child {
-    my ($direction,$a,$b) = @_;
+    my ($direction,$name,$a,$b) = @_;
     if ($a == 0) { # 0n+b
         $b--;
-        "[count($direction-sibling::*) = $b and parent::*]"
+        "[count($direction-sibling::$name) = $b and parent::*]"
     } elsif ($a > 0) { # an + b
-        return "[not((count($direction-sibling::*)+1)<$b) and ((count($direction-sibling::*) + 1) - $b) mod $a = 0 and parent::*]"
+        return "[not((count($direction-sibling::$name)+1)<$b) and ((count($direction-sibling::$name) + 1) - $b) mod $a = 0 and parent::*]"
     } else { # -an + $b
         $a = -$a;
-        return "[not((count($direction-sibling::*)+1)>$b) and (($b - (count($direction-sibling::*) + 1)) mod $a) = 0 and parent::*]"
+        return "[not((count($direction-sibling::$name)+1)>$b) and (($b - (count($direction-sibling::$name) + 1)) mod $a) = 0 and parent::*]"
     }
 }
 
@@ -86,7 +86,7 @@ sub nth_child {
     if (@_ == 1) {
         ($a,$b) = (0,$a);
     }
-    _generate_child('preceding', $a, $b);
+    _generate_child('preceding', '*', $a, $b);
 }
 
 sub nth_last_child {
@@ -94,11 +94,38 @@ sub nth_last_child {
     if (@_ == 1) {
         ($a,$b) = (0,$a);
     }
-    _generate_child('following', $a, $b);
+    _generate_child('following', '*', $a, $b);
 }
 
 # A hacky recursive descent
 # Only descends for :not(...)
+sub consume_An_plus_B {
+    my( $rrule ) = @_;
+
+    my( $A, $B );
+
+    if( $$rrule =~ s/^odd\s*\)// ) {
+        ($A,$B) = (2, 1)
+    } elsif( $$rrule =~ s/^even\s*\)// ) {
+        ($A,$B) = (2, 0)
+    } elsif( $$rrule =~ s/^\s*(-?\d+)\s*\)// ) {
+        ($A,$B) = (0, $1)
+    } elsif( $$rrule =~ s/^\s*(-?\d*)\s*n\s*(?:\+\s*(\d+))?\s*\)// ) {
+        ($A,$B) = ($1, $2 || 0);
+        if( ! defined $A ) {
+            $A = '0';
+        } elsif( $A eq '-') {
+            $A = '-1';
+        } elsif( $A eq '' ) {
+            $A = '1';
+        }
+    } else {
+        croak "Can't parse formula from '$$rrule'";
+    }
+
+    return ($A, $B);
+}
+
 sub consume {
     my ($self, $rule, %parms) = @_;
     my $root = $parms{root} || '/';
@@ -206,26 +233,30 @@ sub consume {
                 push @parts, nth_last_child(1);
             } elsif ( $1 eq 'only-child') {
                 push @parts, nth_child(1), nth_last_child(1);
-            } elsif ($1 =~ /^lang\(([\w\-]+)\)$/) {
+            } elsif ($1 =~ /^lang\($/) {
+                $rule =~ s/\s*([\w\-]+)\s*\)//
+                    or Carp::croak "Can't parse language part from $rule";
                 push @parts, "[\@xml:lang='$1' or starts-with(\@xml:lang, '$1-')]";
-            } elsif ($1 =~ /^nth-child\(odd\)$/) {
-                push @parts, nth_child(2, 1);
-            } elsif ($1 =~ /^nth-child\(even\)$/) {
-                push @parts, nth_child(2, 0);
-            } elsif ($1 =~ /^nth-child\((\d+)\)$/) {
-                push @parts, nth_child($1);
-            } elsif ($1 =~ /^nth-child\((\d+)n(?:\+(\d+))?\)$/) {
-                push @parts, nth_child($1, $2||0);
-            } elsif ($1 =~ /^nth-last-child\((\d+)\)$/) {
-                push @parts, nth_last_child($1);
-            } elsif ($1 =~ /^nth-last-child\((\d+)n(?:\+(\d+))?\)$/) {
-                push @parts, nth_last_child($1, $2||0);
-            } elsif ($1 =~ /^first-of-type$/) {
-                push @parts, "[1]";
-            } elsif ($1 =~ /^nth-of-type\((\d+)\)$/) {
-                push @parts, "[$1]";
+            } elsif ($1 =~ /^nth-child\(\s*$/) {
+                my( $A, $B ) = consume_An_plus_B(\$rule);
+                push @parts, nth_child($A, $B);
+            } elsif ($1 =~ /^nth-last-child\(\s*$/) {
+                my( $A, $B ) = consume_An_plus_B(\$rule);
+                push @parts, nth_last_child($A, $B);
+            } elsif ($1 =~ /^first-of-type\s*$/) {
+                my $type = $parts[-1];
+                push @parts, _generate_child('preceding', $type, 0, 1);
+
+            } elsif ($1 =~ /^nth-of-type\(\s*$/) {
+                my( $A, $B ) = consume_An_plus_B(\$rule);
+                my $type = $parts[-1];
+                push @parts, _generate_child('preceding', $type, $A, $B);
+
             } elsif ($1 =~ /^last-of-type$/) {
                 push @parts, "[last()]";
+
+            # Err?! This one does not really exist in the CSS spec...
+            # Why did I add this?
             } elsif ($1 =~ /^contains\($/) {
                 if( $rule =~ s/^\s*"([^"]*)"\s*\)// ) {
                     push @parts, qq{[text()[contains(string(.),"$1")]]};

@@ -1,3 +1,100 @@
+20230619 2023-06-19T08:56:28Z
+ - 2971 prefixes
+ - added:   accid acp adf aec3po aff afm afr ags alg ammo ams apb apods
+            archivo arena arp asf asgs asio aspect atcc atd atm atts baf
+            bag2 bao bau bcfowl bcom bdg bdsubj beer beo besluitvor biocrm
+            biogrid biolink birthdate bitl bkb bld bldont ble bleadapter
+            bmp bop bp3 bperson bpo brick brot bs bsdd bsh ca capes caso
+            cbb cbs cbv cci ccomid ccp ccr ccsla ceox cerealstoo cfrl cgo
+            ch chameo chear check chemrof chemsci chess ci ciao cido cinema
+            citedcat coda cog comp compub conll conllu consolid constant
+            contax contry coos coreo country county covido coy cpc cpg
+            crmeh crminf crmsci cska cso cto ctrl cts cur cvb cwmo d2s daap
+            databus datagc dave dbd dbm dbms dbonto dbowl dbpg dby dcatno
+            dcb dentsci devuan dfc dfcb dick diso djo dm dmo dmp docam doce
+            dom donto dprov dpv dqvno drk dsd dsi ea earth eb ebg eccf ecfo
+            edu edupro eep ei2a encargado epcis eppl epplan eppo eproc
+            eproc2 eqp era ermrk esagen esagm esautob esbici esc esconv
+            esempleo esgs esservicio estraf eupont eurio ewg exo experts
+            express extech faas fdof fdp feed fel fernanda fibo film fnom
+            foio folio fpr freq fso fx gas gax gco gcon gdprov gdprtext
+            generiek genre geodcat geofabric ggbn ghga gleio gmo gnaf
+            goavoc godaddy gom gql grscicoll gufo gx hctl hdgi hico hmas
+            hni hola hops hosp hpont hqdm hqdmontol hu hyr i18n iaco iaph
+            ibeacon icon iddo idot idpo idsc ii imbor imjv inchikey
+            ingredient interop io iospress iottta isoadr istex itcrdf itops
+            jsonld jsonschema jup jur karstlink kdsf kgi kko knows koko
+            kokot kpd ksam la lado lbds lbdserver lblodlg lcnaf ld ldc ldes
+            ldpsc lds lesa lexicog lg linkedart linkml loci lol losp lprov
+            lrcommon lsqr luigiusai lv2 m3lite m4i m8g mag magmardl
+            magmauser malaka manto marc marcgt maroc matmine matrycs matvoc
+            mbkeys mccv mdcs melding memorix mesh2021 mgv mindat misp mltd
+            mmms mnx mobiliteit modsci mondo motogp movieo mpg123 mr mrk
+            mrt mus mwapi nalt nanopub nas nbo ncbi nen2660 nno noise nom
+            nomo notify nprl nsd nsg ntp nutscode oav obws occ ocds oco
+            ocsw odf ods oeo oeso ofn ofo ogcf ogham oghamonto ogura oidc
+            olias omim omnlc omop one ontobras ontologia ontouml oop oplben
+            oplfeat oplsoft opltw ordo osdu osmm osmnode osmo osmrel osmt
+            osmway osys otl oup p2po paam paf peco perscido persoon pgo
+            pgxo pham phto phy pineapple pit pnv poke powla ppeer pplan pq
+            prismdb probont property proton pubchem qk qkdv quid quran raad
+            radar rami rank raum rb rbdoc rc rcgs rdaao rdaed rdaeo rdaep
+            rdaid rdaim rdaio rdamat rdamd rdamo rdan rdand rdano rdap
+            rdapath rdapd rdapol rdasca rdasource rdat rdatask rdatb rdatd
+            rdato rdaut rdawd rdawo rdaxd rdaxo react refexo reg relation
+            respond rico risk rism rkd rl rmlt rnce roar robotarm roc
+            rofchrda roffgrda rofitrda rofsfrda roh rpg rro rsctx rsp rsx
+            rtedurp rto s223 s4agri s4city s4ee s4ener s4syst samian
+            saref4envi scho schoi sds seasd semsur sense setl sfl she shema
+            signify sirext skoslex skosm skosthes slm smithy snomedct soall
+            sohu sohua sohuc sohud sohuea sohueccont sohuecons sohues sohuj
+            sohukd sohur sohut sohutr soma somaae somab somac somael somaem
+            somaen somaeq somaf somaind somains somaio somais somamic
+            somamin soman somanr somaoc somapa somapl somarock somarocki
+            somas somaw soph sophatmo sophatmoc sophatmofo sophatmofr
+            sophatmol sophatmopc sophatmops sophatmos sophatmot sophatmow
+            sophatmowm sophb sophcm sophcr sophcy sophec sophei sophel
+            sophen sophfd sophfi sophft sophg sophgf sophgg sophgs sophgt
+            sophgv sophhe sophhy sophm sopho sophoc sophod sophpc sophr
+            sophso sophst sophsy sophsyc sophw sophwn soproc soprocc
+            soprocp soprocsc soprocw soprop sopropb sopropcap sopropcat
+            sopropcha sopropche sopropcon sopropcou sopropdife sopropdifu
+            sopropdr soprope sopropef sopropfr sopropfu sopropi sopropm
+            sopropmf sopropo sopropp sopropq sopropr soprops sopropsdir
+            sopropsdis sopropsh sopropsl sopropsm sopropsp sopropst sopropt
+            soproptf soproptg sopropti sorea soreaa soreaab soreaabl
+            soreaah soreaas soreaaw soreabb soreac soreacz soreaer soreahb
+            soreal soreala sorealc sorealf sorealg sorealo sorealp sorealt
+            sorealv soreao soreaofe soreaofl sorear soreas sorel sorelch
+            sorelcl sorelh sorelm sorelph sorelpr sorelsc sorelsp sorelt
+            sorep sorepdf sorepdm sorepdp sorepds sorepdsa sorepdsg
+            sorepdsr sorepdsv sorepm sorepmf sorepmfo sorepmg sorepmo
+            sorepmso sorepmst soreps sorepsc sorepscd sorepsd sorepsf
+            sorepsg3 sorepsl sorepsme sorepsmo sorepsp sorepsrs sorepsu
+            sorept soreptd sorepts sost sostb sostc sostdp sostef sostf
+            sosto sostp sostrb sostrc sostre sostrg sostri sostro sostrr
+            sostrt sostsb sostsc sostsl sostso sostsp sostss sostst sostsy
+            sosttc sosttf sosttg sostth sostti sostv sou spatialf spec
+            spvqa srmo srr srt srtun srv ssnx stat stencila stirdata stix
+            stx sty summa sure swa sweet taxref taxrefprop tb tci tempo
+            terms tern textgrid threat thub toaru trak trao tree trek tro
+            tso tsso ttrpg uberon ucum ufo uimo ul ultragaz univ url value
+            vcs veelana veo version vhbieo vir vl vlueprint vntourism
+            vocals vph vr w3geo w3id waa walmart wasa wdno wds wdtn weki
+            wfont wild wotc wotsec xbrll xmlns xyz yandex yanice
+ - removed: wikimedia
+ - changed: activity adr afn agro antenne bag bdd bf bfo bgcat bgt bibframe
+            bibtex bl bp cdc cdt ceo cex chebi cidoc co crmdig cube
+            dbpediaowl dcm dossier ecos eg esdir ext fno geoes gist go grel
+            gs1 hg html ianarel iao iot latitude leak leaks lexinfo lindt
+            link linkedmdb lmdb meta og ops pair ping premis psh psys qudt
+            rdapo resource rml rs saref sct sdm sdo sg shex sim so sport st
+            status td test tg tp unit up viaf vra wikipedia won xapi
+
+ - Support update from local file
+
+{{$NEXT}}
+
 20190227  2019-02-27 21:25:54 CET
  - 2173 prefixes
  - added:   agrovoc aksw bl cbim cdao cim conference dot edr eepsa esdbpr

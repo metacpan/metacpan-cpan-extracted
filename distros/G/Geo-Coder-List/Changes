@@ -1,5 +1,18 @@
 Revision history for Geo-Coder-List
 
+0.31	Thu Jun 29 09:23:17 EDT 2023
+	Change the croaks to carps
+	Fix test when Geo::Coder::Free is not installed
+
+0.30	Tue Jun 27 20:53:14 EDT 2023
+	Better error message on wrong parameter
+	Fix count if not enough installers installed in t/list.t
+	Calling new on an object now returns a clone
+	Don't fail if geocode.farm is down
+	Handle OSM not setting state
+	reverse_geocode now looks in the second cache
+	Croak when geocode has invalid argument rather than silently return
+
 0.29	Sun Jan 23 08:17:25 EST 2022
 	Disable t/geofarm.t on smokers
 

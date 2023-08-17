@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -150,7 +149,7 @@ is_cursorpos( 0, 0, 'Position after Delete' );
 my $line;
 $entry->set_on_enter(
    sub {
-      identical( $_[0], $entry, 'on_enter $_[0] is $entry' );
+      ref_is( $_[0], $entry, 'on_enter $_[0] is $entry' );
       $line = $_[1];
    }
 );

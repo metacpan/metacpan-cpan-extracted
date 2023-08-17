@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -63,7 +63,7 @@ local *IO::Async::Handle::connect = sub {
 
    wait_for { defined $header };
 
-   isa_ok( $header, "HTTP::Response", '$header for Content-Length' );
+   isa_ok( $header, [ "HTTP::Response" ], '$header for Content-Length' );
    is( $header->content_length, 15, '$header->content_length' );
    is( $header->content_type, "text/plain", '$header->content_type' );
 
@@ -110,7 +110,7 @@ local *IO::Async::Handle::connect = sub {
 
    wait_for { defined $header };
 
-   isa_ok( $header, "HTTP::Response", '$header for chunked' );
+   isa_ok( $header, [ "HTTP::Response" ], '$header for chunked' );
    is( $header->content_length, 15, '$header->content_length' );
    is( $header->content_type, "text/plain", '$header->content_type' );
 
@@ -159,7 +159,7 @@ local *IO::Async::Handle::connect = sub {
 
    wait_for { defined $header };
 
-   isa_ok( $header, "HTTP::Response", '$header for EOF' );
+   isa_ok( $header, [ "HTTP::Response" ], '$header for EOF' );
    is( $header->content_type, "text/plain", '$header->content_type' );
 
    $peersock->syswrite( "Hello, " );

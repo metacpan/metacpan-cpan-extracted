@@ -1,6 +1,6 @@
 package Catmandu::Importer::SRU::Parser::ppxml;
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 use Moo;
 use PICA::Parser::PPXML;

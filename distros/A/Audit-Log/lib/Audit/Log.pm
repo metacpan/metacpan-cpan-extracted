@@ -1,4 +1,4 @@
-package Audit::Log 0.003;
+package Audit::Log 0.005;
 
 use strict;
 use warnings;
@@ -6,13 +6,26 @@ use warnings;
 use 5.006;
 use v5.12.0;    # Before 5.006, v5.10.0 would not be understood.
 
-# ABSTRACT: auditd log parser with no external dependencies, using no perl features past 5.12
+use File::Which();
+use UUID::Tiny();
+use List::Util qw{uniq};
+
+# ABSTRACT: auditd log parser with minimal dependencies, using no perl features past 5.12
 
 sub new {
     my ( $class, $path, @returning ) = @_;
     $path = '/var/log/audit/audit.log' unless $path;
-    die "Cannot access $path" unless -f $path;
-    return bless( { path => $path, returning => \@returning }, $class );
+    my $fullpath = File::Which::which('ausearch');
+
+    if ( $path eq 'ausearch' ) {
+        die "Cannot find ausearch" unless -f $fullpath;
+    }
+    else {
+        die "Cannot access $path" unless -f $path;
+    }
+    return
+      bless( { path => $path, ausearch => $fullpath, returning => \@returning },
+        $class );
 }
 
 sub search {
@@ -21,8 +34,20 @@ sub search {
     my $ret      = [];
     my $in_block = 1;
     my $line     = -1;
-    my ( $cwd, $exe, $comm ) = ( '', '', '' );
-    open( my $fh, '<', $self->{path} );
+    my ( $cwd, $exe, $comm, $res ) = ( '', '', '', '' );
+    my $fh;
+    if ( $self->{path} eq 'ausearch' ) {
+        my @args = qw{--input-logs --raw};
+        push( @args, ( '-k',  $self->{key} ) );
+        push( @args, ( '-sv', $options{res} ? 'yes' : 'no' ) )
+          if defined $options{success};
+        push( @args, ( '-comm', $options{comm} ) ) if defined $options{comm};
+        open( $fh, '|', qq|$self->{fullpath} @args| )
+          or die "Could not run $self->{fullpath}!";
+    }
+    else {
+        open( $fh, '<', $self->{path} ) or die "Could not open $self->{path}!";
+    }
   LINE: while (<$fh>) {
         next if index( $_, 'SYSCALL' ) < 0 && !$in_block;
 
@@ -61,11 +86,13 @@ sub search {
         $parsed{cwd}       = $cwd;
         $parsed{exe}  //= $exe;
         $parsed{comm} //= $comm;
+        $parsed{res}  //= $res;
 
         if ( exists $options{key} && $parsed{type} eq 'SYSCALL' ) {
             $in_block = $parsed{key} =~ $options{key};
             $exe      = $parsed{exe};
             $comm     = $parsed{comm};
+            $res      = lc( $parsed{success} ) eq 'yes';
             $cwd      = '';
             next unless $in_block;
         }
@@ -89,6 +116,38 @@ sub search {
     return $ret;
 }
 
+sub file_changes(&@) {
+    my ( $block, @dirs ) = @_;
+    my %rules;
+
+    # Instruct auditctl to add UUID based rules
+    foreach my $dir (@dirs) {
+        $rules{$dir} = UUID::Tiny::create_uuid_as_string( UUID::Tiny::UUID_V1,
+            UUID::Tiny::UUID_NS_DNS );
+
+        #TODO handle errors, etc
+        system( qw[auditctl -w], $dir, qw[-p rw -k], $rules{$dir} );
+    }
+
+    $block->();
+
+    # Unload the rule, flush the log
+    foreach my $dir (@dirs) {
+
+        #TODO errors, flush
+        system( qw[auditctl -W], $dir );
+    }
+
+    # Grab events
+    my $parser = Audit::Log->new( 'ausearch', qw{name cwd} );
+
+    # TODO support arrayref
+    my $entries = $parser->search( 'key' => [ values(%rules) ] );
+    return uniq
+      map { $_->{name} =~ m/^\// ? $_->{name} : "$_->{cwd}/$_->{name}" }
+      @$entries;
+}
+
 1;
 
 __END__
@@ -99,11 +158,11 @@ __END__
 
 =head1 NAME
 
-Audit::Log - auditd log parser with no external dependencies, using no perl features past 5.12
+Audit::Log - auditd log parser with minimal dependencies, using no perl features past 5.12
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -143,8 +202,22 @@ Here's an example of dumping keyed events for the last day, which you could then
 
     ausearch --raw --key backupwatch -ts `date --date yesterday '+%x'` > yesterdays-audit.log
 
-Even then the audit log is quite likely to only have a few days of retention.
-Be sure to stash results appropriately.
+If you pass 'ausearch' as the audit log path to new(), we will pipe-open to this in subsequent search() calls.
+
+=head3 configuring retention
+
+The audit log is quite likely to have very limited retention.
+This is configured in the max_log_file and num_logs parameter of /etc/auditd/audit.conf
+You will only have max_log_file * num_logs MB of events stored, so plan according to how much you need to watch.
+
+Your specific use case should be observed, and tuned accordingly.
+For example, the average audit log line is ~200 bytes, so you can get maybe 40k entries per log at max_log_file=8.
+Each file action is (worst case) 5 lines in the log, resulting in maybe 8k file modifications per 8MB logfile.
+
+As such, stashing results or watching very tightly around blocks of functionality is highly recommended.
+Especially in situations such as public servers which are likely to get a large amount of SSH bounces recorded in the log by default.
+
+The block-scoped methods in this module are built to serve precisely this use case.
 
 =head1 METHODS
 
@@ -183,6 +256,19 @@ Example:
     # Get all records that are from the last 24 hours
     my $rows = $parser->search( type => qr/path/i, nametype=qr/delete|create|normal/i, newer => ( time - 86400 ) );
 
+=head3 Speeding it up: by command or its outcome
+
+The 'res' parameter in audit logs allows you to filter on whether or not the command had a good (or bad) exit code.
+If this option is not passed, you will get all results regardless of their exit code.
+Useful for building things like ban-on-fail watchdogs.
+
+    # Failed outbound SSH attempts.
+    # You can also pass 'exe' to specifically filter to the path of the executable
+    # or neglect to do so if somebody's trying to hide from santa's naughty list.
+    my $rows = $parser->search( res => 0, comm => 'ssh', exe => '/usr/bin/ssh' );
+    my $maybe_fake = $parser->search( res => 0, comm => 'ssh' );
+    my @naughty = List::Util::all { $_->{exe} ne '/usr/bin/ssh' } @$maybe_fake;
+
 =head3 Getting full paths with CWDs
 
 PATH records don't actually store the full path to what is acted upon unless the process acting upon it used an absolute path.
@@ -201,10 +287,21 @@ Example of getting all the commands run which triggered audit events:
     my $parser = Audit::Log->new(undef, 'exe')
     my $rows = $parser->search();
 
+=head1 FUNCTIONS
+
+All these are block-scoped watchers provided for convenience and testing purposes.
+
+=head2 file_changes(CODE block, LIST dirs) = ARRAY
+
+Returns the list of files that changed in the proceeding block.
+
+    my @changes = file_changes { ... } qw{/tmp /mydir};
+    is(scalar(@changes), 0, "No spooky action at a distance");
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/teodesian/Audit-Log-perl/issues>
+L<https://github.com/Troglodyne-Internet-Widgets/Audit-Log-perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

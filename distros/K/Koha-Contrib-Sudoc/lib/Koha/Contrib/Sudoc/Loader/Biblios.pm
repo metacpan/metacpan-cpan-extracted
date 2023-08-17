@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.39';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.40';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -49,7 +49,7 @@ sub handle_record {
 
     my $ppn = $record->field('001')->value;
     $self->log->notice("Notice #" . $self->count . " ppn $ppn\n");
-    $self->log->debug( $record->as('Text') );
+    $self->log->debug( $self->sudoc->record_as_text($record) );
 
     # On déplace le PPN
     $self->sudoc->ppn_move($record, $self->sudoc->c->{biblio}->{ppn_move});
@@ -161,7 +161,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 AUTHOR
 
@@ -169,7 +169,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Demians.
+This software is Copyright (c) 2023 by Fréderic Demians.
 
 This is free software, licensed under:
 

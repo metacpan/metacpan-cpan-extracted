@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.57  2023-07-07 00:00:00
+  - supports finally { block }
+  - supports mb::finally { block }
+  - supports CORE::finally { block }
+  - supports REG_INF has been raised from 65,536 to 2,147,483,647
+  - created by INABA Hitoshi
+
 0.56  2023-03-23 00:00:00
   - add t/8101_old_package_big5.t
   - add t/8102_old_package_big5hkscs.t

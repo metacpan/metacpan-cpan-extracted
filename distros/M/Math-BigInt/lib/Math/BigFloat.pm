@@ -20,7 +20,7 @@ use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed >;
 use Math::BigInt  qw< >;
 
-our $VERSION = '1.999838';
+our $VERSION = '1.999839';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -2475,24 +2475,56 @@ sub blog {
     my ($class, $x, $base, @r);
 
     # Only objectify the base if it is defined, since an undefined base, as in
-    # $x->blog() or $x->blog(undef) signals that the base is Euler's number.
+    # $x->blog() or $x->blog(undef) signals that the base is Euler's number =
+    # 2.718281828...
 
     if (!ref($_[0]) && $_[0] =~ /^[A-Za-z]|::/) {
         # E.g., Math::BigFloat->blog(256, 2)
         ($class, $x, $base, @r) =
           defined $_[2] ? objectify(2, @_) : objectify(1, @_);
     } else {
-        # E.g., Math::BigFloat::blog(256, 2) or $x->blog(2)
+        # E.g., $x->blog(2) or the deprecated Math::BigFloat::blog(256, 2)
         ($class, $x, $base, @r) =
           defined $_[1] ? objectify(2, @_) : objectify(1, @_);
     }
 
     return $x if $x->modify('blog');
 
+    # Handle all exception cases and all trivial cases. I have used Wolfram
+    # Alpha (http://www.wolframalpha.com) as the reference for these cases.
+
     return $x -> bnan(@r) if $x -> is_nan();
 
-    return $upgrade -> blog($x, $base, @r)
-      if defined($upgrade) && $x -> is_neg();
+    if (defined $base) {
+        $base = $class -> new($base)
+          unless defined(blessed($base)) && $base -> isa($class);
+        if ($base -> is_nan() || $base -> is_one()) {
+            return $x -> bnan(@r);
+        } elsif ($base -> is_inf() || $base -> is_zero()) {
+            return $x -> bnan(@r) if $x -> is_inf() || $x -> is_zero();
+            return $x -> bzero(@r);
+        } elsif ($base -> is_negative()) {              # -inf < base < 0
+            return $x -> bzero(@r) if $x -> is_one();   #     x = 1
+            return $x -> bone('+', @r)  if $x == $base; #     x = base
+            # we can't handle these cases, so upgrade, if we can
+            return $upgrade -> blog($x, $base, @r) if defined $upgrade;
+            return $x -> bnan(@r);
+        }
+        return $x -> bone(@r) if $x == $base;       # 0 < base && 0 < x < inf
+    }
+
+    if ($x -> is_inf()) {                       # x = +/-inf
+        my $sign = defined($base) && $base < 1 ? '-' : '+';
+        return $x -> binf($sign, @r);
+    } elsif ($x -> is_neg()) {                  # -inf < x < 0
+        return $upgrade -> blog($x, $base, @r) if defined $upgrade;
+        return $x -> bnan(@r);
+    } elsif ($x -> is_one()) {                  # x = 1
+        return $x -> bzero(@r);
+    } elsif ($x -> is_zero()) {                 # x = 0
+        my $sign = defined($base) && $base < 1 ? '+' : '-';
+        return $x -> binf($sign, @r);
+    }
 
     # we need to limit the accuracy to protect against overflow
     my $fallback = 0;
@@ -2513,66 +2545,6 @@ sub blog {
         $scale = abs($params[0] || $params[1]) + 4; # take whatever is defined
     }
 
-    my $done = 0;
-    if (defined $base) {
-        $base = $class -> new($base)
-          unless defined(blessed($base)) && $base -> isa($class);
-        if ($base -> is_nan() || $base -> is_one()) {
-            $x = $x -> bnan();
-            $done = 1;
-        } elsif ($base -> is_inf() || $base -> is_zero()) {
-            if ($x -> is_inf() || $x -> is_zero()) {
-                $x = $x -> bnan();
-            } else {
-                $x = $x -> bzero(@params);
-            }
-            $done = 1;
-        } elsif ($base -> is_negative()) { # -inf < base < 0
-            if ($x -> is_one()) {          #     x = 1
-                $x = $x -> bzero(@params);
-            } elsif ($x == $base) {
-                $x = $x -> bone('+', @params); #     x = base
-            } else {
-                $x = $x -> bnan();   #     otherwise
-            }
-            $done = 1;
-        } elsif ($x == $base) {
-            $x = $x -> bone('+', @params); # 0 < base && 0 < x < inf
-            $done = 1;
-        }
-    }
-
-    # We now know that the base is either undefined or positive and finite.
-
-    unless ($done) {
-        if ($x -> is_inf()) {   #   x = +/-inf
-            my $sign = defined $base && $base < 1 ? '-' : '+';
-            $x = $x -> binf($sign);
-            $done = 1;
-        } elsif ($x -> is_neg()) { #   -inf < x < 0
-            $x = $x -> bnan();
-            $done = 1;
-        } elsif ($x -> is_one()) { #   x = 1
-            $x = $x -> bzero(@params);
-            $done = 1;
-        } elsif ($x -> is_zero()) { #   x = 0
-            my $sign = defined $base && $base < 1 ? '+' : '-';
-            $x = $x -> binf($sign);
-            $done = 1;
-        }
-    }
-
-    if ($done) {
-        if ($fallback) {
-            # clear a/p after round, since user did not request it
-            $x->{_a} = undef;
-            $x->{_p} = undef;
-        }
-        return $downgrade -> new($x -> bdstr(), @r)
-          if defined($downgrade) && $x->is_int();
-        return $x;
-    }
-
     # when user set globals, they would interfere with our calculation, so
     # disable them and later re-enable them
     no strict 'refs';
@@ -2587,11 +2559,10 @@ sub blog {
     $x->{_a} = undef;
     $x->{_p} = undef;
 
-    $done = 0;
+    my $done = 0;
 
-    # If both the invocand and the base are integers, try to calculate integer
-    # result first. This is very fast, and in case the real result was found, we
-    # can stop right here.
+    # If both $x and $base are integers, try to calculate an integer result
+    # first. This is very fast, and if the exact result was found, we are done.
 
     if (defined($base) && $base -> is_int() && $x -> is_int()) {
         my $x_lib = $LIB -> _new($x -> bdstr());
@@ -2605,24 +2576,25 @@ sub blog {
         }
     }
 
+    # If the integer result was not accurate, compute the natural logarithm
+    # log($x) (using reduction by 10 and possibly also by 2), and if a
+    # different base was requested, convert the result with log($x)/log($base).
+
     unless ($done) {
-
-        # First calculate the log to base e (using reduction by 10 and possibly
-        # also by 2), and if a different base was requested, convert the result.
-
-        $x = $x->_log_10($scale);
+        $x = $x -> _log_10($scale);
         if (defined $base) {
             # log_b(x) = ln(x) / ln(b), so compute ln(b)
-            my $base_log_e = $base->copy()->_log_10($scale);
-            $x = $x->bdiv($base_log_e, $scale);
+            my $base_log_e = $base -> copy() -> _log_10($scale);
+            $x = $x -> bdiv($base_log_e, $scale);
         }
     }
 
     # shortcut to not run through _find_round_parameters again
+
     if (defined $params[0]) {
-        $x = $x->bround($params[0], $params[2]); # then round accordingly
+        $x = $x -> bround($params[0], $params[2]); # then round accordingly
     } else {
-        $x = $x->bfround($params[1], $params[2]); # then round accordingly
+        $x = $x -> bfround($params[1], $params[2]); # then round accordingly
     }
     if ($fallback) {
         # clear a/p after round, since user did not request it
@@ -2634,7 +2606,7 @@ sub blog {
     $$pbr = $pb;
 
     return $downgrade -> new($x -> bdstr(), @r)
-      if defined($downgrade) && $x->is_int();
+      if defined($downgrade) && $x -> is_int();
     return $x;
 }
 
@@ -2695,8 +2667,10 @@ sub bexp {
     # infinite recursion, but it avoids unnecessary upgrading and downgrading in
     # the intermediate computations.
 
-    local $Math::BigInt::upgrade = undef;
-    local $Math::BigFloat::downgrade = undef;
+    # Temporarily disable downgrading
+
+    my $dng = Math::BigFloat -> downgrade();
+    Math::BigFloat -> downgrade(undef);
 
     my $x_org = $x->copy();
 
@@ -2819,14 +2793,20 @@ sub bexp {
             $x = $x->bfround($params[1], $params[2]); # then round accordingly
         }
     }
+
     if ($fallback) {
         # clear a/p after round, since user did not request it
         $x->{_a} = undef;
         $x->{_p} = undef;
     }
-    # restore globals
+
+    # Restore globals
     $$abr = $ab;
     $$pbr = $pb;
+
+    # Restore downgrading.
+
+    Math::BigFloat -> downgrade($dng);
 
     return $downgrade -> new($x -> bdstr(), @r)
       if defined($downgrade) && $x -> is_int();
@@ -5462,7 +5442,7 @@ sub _log {
     my $class = ref $x;
 
     # in case of $x == 1, result is 0
-    return $x->bzero() if $x->is_one();
+    return $x -> bzero() if $x -> is_one();
 
     # XXX TODO: rewrite this in a similar manner to bexp()
 
@@ -5481,56 +5461,49 @@ sub _log {
     # ln (x)  = 2 |   --- + - * --- + - * --- + ... |  x > 1/2
     #             |_   x    2   x^2   3   x^3      _|
 
-    my ($limit, $v, $u, $below, $factor, $next, $over, $f);
+    # scale used in intermediate computations
+    my $scaleup = $scale + 4;
 
-    $v = $x->copy();
+    my ($v, $u, $numer, $denom, $factor, $f);
+
+    $v = $x -> copy();
     $v = $v -> binc();                  # v = x+1
-    $x = $x->bdec();
-    $u = $x->copy();                    # u = x-1; x = x-1
-    $x = $x->bdiv($v, $scale);          # first term: u/v
-    $below = $v->copy();
-    $over = $u->copy();
+    $x = $x -> bdec();
+    $u = $x -> copy();                  # u = x-1; x = x-1
+
+    $x = $x -> bdiv($v, $scaleup);        # first term: u/v
+
+    $numer = $u -> copy();              # numerator
+    $denom = $v -> copy();              # denominator
+
     $u = $u -> bmul($u);                # u^2
     $v = $v -> bmul($v);                # v^2
-    $below = $below->bmul($v);          # u^3, v^3
-    $over = $over->bmul($u);
-    $factor = $class->new(3);
-    $f = $class->new(2);
 
-    $limit = $class->new("1E-". ($scale-1));
+    $numer = $numer -> bmul($u);        # u^3
+    $denom = $denom -> bmul($v);        # v^3
 
-    while (3 < 5) {
-        # we calculate the next term, and add it to the last
-        # when the next term is below our limit, it won't affect the outcome
-        # anymore, so we stop
+    $factor = $class -> new(3);
+    $f = $class -> new(2);
 
-        # calculating the next term simple from over/below will result in quite
-        # a time hog if the input has many digits, since over and below will
-        # accumulate more and more digits, and the result will also have many
-        # digits, but in the end it is rounded to $scale digits anyway. So if we
-        # round $over and $below first, we save a lot of time for the division
-        # (not with log(1.2345), but try log (123**123) to see what I mean. This
-        # can introduce a rounding error if the division result would be f.i.
-        # 0.1234500000001 and we round it to 5 digits it would become 0.12346,
-        # but if we truncated $over and $below we might get 0.12345. Does this
-        # matter for the end result? So we give $over and $below 4 more digits
-        # to be on the safe side (unscientific error handling as usual... :+D
-
-        $next = $over->copy()->bround($scale+4)
-          ->bdiv($below->copy()->bmul($factor)->bround($scale+4),
-                 $scale);
-
-        last if $next->bacmp($limit) <= 0;
+    while (1) {
+        my $next = $numer -> copy() -> bround($scaleup)
+          -> bdiv($denom -> copy() -> bmul($factor) -> bround($scaleup), $scaleup);
 
         $next->{_a} = undef;
         $next->{_p} = undef;
-        $x = $x->badd($next);
+        my $x_prev = $x -> copy();
+        $x = $x -> badd($next);
+
+        last if $x -> bacmp($x_prev) == 0;
+
         # calculate things for the next term
-        $over *= $u;
-        $below *= $v;
-        $factor = $factor->badd($f);
+        $numer  = $numer -> bmul($u);
+        $denom  = $denom -> bmul($v);
+        $factor = $factor -> badd($f);
     }
-    $x->bmul($f);               # $x *= 2
+
+    $x = $x -> bmul($f);             # $x *= 2
+    $x = $x -> bround($scale);
 }
 
 sub _log_10 {
@@ -5559,8 +5532,12 @@ sub _log_10 {
 
     # In addition, the values for blog(2) and blog(10) are cached.
 
-    # Calculate nr of digits before dot. x = 123, dbd = 3; x = 1.23, dbd = 1;
-    # x = 0.0123, dbd = -1; x = 0.000123, dbd = -3, etc.
+    # Calculate the number of digits before the dot, i.e., 1 + floor(log10(x)):
+    #   x = 123      => dbd =  3
+    #   x = 1.23     => dbd =  1
+    #   x = 0.0123   => dbd = -1
+    #   x = 0.000123 => dbd = -3
+    #   etc.
 
     my $dbd = $LIB->_num($x->{_e});
     $dbd = -$dbd if $x->{_es} eq '-';
@@ -5570,6 +5547,11 @@ sub _log_10 {
     # infinite recursion
 
     my $calc = 1;               # do some calculation?
+
+    # No upgrading or downgrading in the intermediate computations.
+
+    local $Math::BigInt::upgrade = undef;
+    local $Math::BigFloat::downgrade = undef;
 
     # disable the shortcut for 10, since we need log(10) and this would recurse
     # infinitely deep
@@ -5631,7 +5613,6 @@ sub _log_10 {
         # at import() time, since not everybody needs this)
         $LOG_10 = $class->new($LOG_10, undef, undef) unless ref $LOG_10;
 
-        #print "x = $x, dbd = $dbd, calc = $calc\n";
         # got more than one digit before the dot, or more than one zero after
         # the dot, so do:
         #  log(123)    == log(1.23) + log(10) * 2
@@ -5642,13 +5623,6 @@ sub _log_10 {
             $l_10 = $LOG_10->copy(); # copy for mul
         } else {
             # else: slower, compute and cache result
-
-            # Disabling upgrading and downgrading is no longer necessary to
-            # avoid an infinite recursion, but it avoids unnecessary upgrading
-            # and downgrading in the intermediate computations.
-
-            local $Math::BigInt::upgrade = undef;
-            local $Math::BigFloat::downgrade = undef;
 
             # shorten the time to calculate log(10) based on the following:
             # log(1.25 * 8) = log(1.25) + log(8)
@@ -5717,14 +5691,6 @@ sub _log_10 {
             $l_2 = $LOG_2->copy(); # copy() for the mul below
         } else {
             # else: slower, compute and cache result
-
-            # Disabling upgrading and downgrading is no longer necessary to
-            # avoid an infinite recursion, but it avoids unnecessary upgrading
-            # and downgrading in the intermediate computations.
-
-            local $Math::BigInt::upgrade = undef;
-            local $Math::BigFloat::downgrade = undef;
-
             $l_2 = $two->copy();
             $l_2 = $l_2->_log($scale); # scale+4, actually
             $LOG_2 = $l_2->copy(); # cache the result for later
@@ -6772,28 +6738,6 @@ L<https://metacpan.org/release/Math-BigInt>
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt>
-
-=item * The Bignum mailing list
-
-=over 4
-
-=item * Post to mailing list
-
-C<bignum at lists.scsys.co.uk>
-
-=item * View mailing list
-
-L<http://lists.scsys.co.uk/pipermail/bignum/>
-
-=item * Subscribe/Unsubscribe
-
-L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum>
-
-=back
 
 =back
 

@@ -18,6 +18,8 @@ use Test::More tests => 4;
 
 use WWW::Mechanize::Shell;
 
+delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
+
 my $server = Test::HTTP::LocalServer->spawn();
 
 my $user = 'foo';

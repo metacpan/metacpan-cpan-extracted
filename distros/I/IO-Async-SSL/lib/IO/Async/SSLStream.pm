@@ -1,17 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package IO::Async::SSLStream;
+package IO::Async::SSLStream 0.25;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Stream );
 IO::Async::Stream->VERSION( '0.59' );
-
-our $VERSION = '0.24';
-$VERSION = eval $VERSION;
 
 use IO::Async::SSL;
 

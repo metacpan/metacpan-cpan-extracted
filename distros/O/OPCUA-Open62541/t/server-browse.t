@@ -108,6 +108,7 @@ my $expected_reference = [{
 	    NodeId_identifier => 0,
 	    NodeId_namespaceIndex => 0,
 	    NodeId_identifierType => 0,
+	    NodeId_print => "i=0",
 	},
 	ExpandedNodeId_namespaceUri => undef,
 	ExpandedNodeId_serverIndex => 0,
@@ -116,13 +117,15 @@ my $expected_reference = [{
     ReferenceDescription_referenceTypeId => {
 	NodeId_identifier => 0,
 	NodeId_namespaceIndex => 0,
-	NodeId_identifierType => 0
+	NodeId_identifierType => 0,
+	NodeId_print => "i=0",
     },
     ReferenceDescription_nodeId => {
 	ExpandedNodeId_nodeId => {
 	    NodeId_namespaceIndex => 0,
 	    NodeId_identifierType => 0,
-	    NodeId_identifier => 85
+	    NodeId_identifier => 85,
+	    NodeId_print => "i=85",
 	},
 	ExpandedNodeId_serverIndex => 0,
 	ExpandedNodeId_namespaceUri => undef
@@ -149,6 +152,8 @@ for (['Types', 86], ['Views', 87]) {
 	{QualifiedName_name} = $_->[0];
     $expected_reference->[0]{ReferenceDescription_nodeId}
 	{ExpandedNodeId_nodeId}{NodeId_identifier} = $_->[1];
+    $expected_reference->[0]{ReferenceDescription_nodeId}
+	{ExpandedNodeId_nodeId}{NodeId_print} = "i=$_->[1]";
 
     is_deeply($references, $expected_reference, "reference");
 }

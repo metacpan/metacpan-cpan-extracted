@@ -6,7 +6,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: unif2 
+ PERL PROGRAM NAME: unif2 
  AUTHOR: Juan Lorenzo
  DATE: June 2 2016 
  DESCRIPTION surface consistent receiver-source static

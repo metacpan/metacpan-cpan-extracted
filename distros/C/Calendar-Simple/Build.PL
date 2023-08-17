@@ -23,6 +23,7 @@ my $build = Module::Build->new(
   create_makefile_pl => 'traditional',
   script_files       => [ 'bin/pcal' ],
   meta_merge => {
+    'meta-spec' => { version => 2 },
     resources => {
       repository => {
         type => 'git',
@@ -31,7 +32,7 @@ my $build = Module::Build->new(
       },
       bugtracker => {
         web => 'https://github.com/davorg/calendar-simple/issues',
-      }
+      },
     },
   },
 );

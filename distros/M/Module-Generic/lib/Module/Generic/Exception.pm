@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.2.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/01/11
+## Modified 2023/08/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.2.2';
+    our $VERSION = 'v1.2.3';
 };
 
 BEGIN
@@ -187,6 +187,8 @@ sub caught
     return unless( Scalar::Util::blessed( $e ) && $e->isa( $class ) );
     return( $e );
 }
+
+sub cause { return( shift->_set_get_hash_as_mix_object( 'cause', @_ ) ); }
 
 sub code { return( shift->_set_get_scalar( 'code', @_ ) ); }
 
@@ -347,5 +349,256 @@ sub THAW
 sub TO_JSON { return( shift->as_string ); }
 
 1;
-
+# NOTE: POD
 __END__
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Exception - Generic Module Exception Class
+
+=head1 SYNOPSIS
+
+    my $ex = Module::Generic::Exception->new({
+        code => 404,
+        type => $error_type,
+        file => '/home/joe/some/lib/My/Module.pm',
+        line => 120,
+        message => 'Invalid property provided',
+        package => 'My::Module',
+        subroutine => 'customer_info',
+        # Some optional discretionary metadata hash reference
+        cause =>
+            {
+            object => $some_object,
+            payload => $raw_data,
+            },
+    });
+
+    print( "Error stack trace: ", $ex->stack_trace, "\n" );
+    # or
+    $object->customer_orders || die( "Error in file ", $object->error->file, " at line ", $object->error->line, "\n" );
+    # or simply:
+    $object->customer_orders || die( "Error: ", $object->error, "\n" );
+    $ex->cause->payload;
+
+=head1 VERSION
+
+    v1.2.3
+
+=head1 DESCRIPTION
+
+This is a simple and straightforward exception class you can use or inherit from. The error object can be stringified or compared.
+
+When stringified, it provides the error message along with precise information about where the error occurred and a stack trace.
+
+L<Module::Generic::Exception> objects are created by L<Module::Generic/"error"> method.
+
+=head1 METHODS
+
+=head2 new
+
+It takes either an L<Module::Generic::Exception> object or an hash reference of properties, or a list of arguments that will be concatanated to form the error message. The list of arguments can contain code reference such as reference to sub routines, who will be called and their returned value added to the error message string. For example :
+
+    my $ex = Module::Generic::Exception->new( "Invalid property. Value recieved are: ", sub{ Dumper( $hash ) } );
+
+    # or
+
+    my $ex = Module::Generic::Exception->new( $other_exception_object_for_reuse );
+    # This will the I<object> property
+
+    # or
+
+    my #ex = Module::Generic::Exception->new({
+        message => "Invalid property.",
+        code => 404,
+        type => 'customer',
+    })
+
+Possible properties that can be specified are :
+
+=over 4
+
+=item * C<cause>
+
+An optional and arbitrary hash reference of metadata that serve to provide more context on the error.
+
+=item * C<code>
+
+An error code
+
+=item * C<file>
+
+The localtion where the error occurred. This is populated using the L<Devel::StackTrace/"filename">
+
+=item * C<line>
+
+The line number in the file where the error occurred.This is populated using the L<Devel::StackTrace/"line">
+
+=item * C<message>
+
+The error message. It can be provided as a list of arguments that will be concatenated, or as the I<message> property in an hash reference, or copied from another exception object passed as the sole argument.
+
+=item * C<object>
+
+When this is set, such as when another L<Module::Generic::Exception> object is provided as unique argument, then the properties I<message>, I<code>, I<type>, I<retry_after> are copied from it in the new exception object.
+
+=item * C<package>
+
+The package name where the error occurred.  This is populated using the L<Devel::StackTrace/"package">
+
+=item * C<retry_after>
+
+An optional value to indicate in seconds how long to wait to retry.
+
+=item * C<skip_frames>
+
+This is used as a parameter to L<Devel::StackTrace> upon instantiation to instruct how many it should skip to start creating the stack trace.
+
+=item * C<subroutine>
+
+The name of the sub routine from which this was called.  This is populated using the L<Devel::StackTrace/"subroutine">
+
+=item * C<type>
+
+An optional error type
+
+=back
+
+It returns the exception object.
+
+=head2 as_string
+
+This returns a string representation of the Exception such as :
+
+    Invalid property within package My::Module at line 120 in file /home/john/lib/My/Module.pm
+        # then some strack trace here
+
+=head2 caught
+
+    use Nice::Try;
+    try
+    {
+        # An error made with Module::Generic::Exception
+        die( $object->error );
+    }
+    catch( $e )
+    {
+        # If this error is one of ours
+        if( Module::Generic::Exception->caught( $e ) )
+        {
+            # Do something about it
+        }
+    }
+
+But L<Nice::Try> let's you do this:
+
+    try
+    {
+        die( $object->error );
+    }
+    catch( Module::Generic::Exception $e )
+    {
+        # Do something about it
+    }
+
+=head2 cause
+
+Sets or gets an hash reference of metadata that serve to provide more context on the error.
+
+This returns an L<hash object|Module::Generic::Hash>.
+
+=head2 code
+
+Set or get the error code. It returns the current value.
+
+=head2 file
+
+Set or get the file path where the error originated. It returns the current value.
+
+=head2 line
+
+Set or get the line where the error originated. It returns the current value.
+
+=head2 message
+
+Set or get the error message. It returns the current value.
+
+It takes a string, or a list of strings which will be concatenated.
+
+For example :
+
+    $ex->messsage( "I found some error:", $some_data );
+
+=head2 package
+
+Set or get the class/package name where the error originated. It returns the current value.
+
+=head2 PROPAGATE
+
+This method is called by perl when you call L<perlfunc/die> with no parameters and C<$@> is set to a L<Module::Generic::Exception> object.
+
+This returns a new exception object that perl will use to replace the value in C<$@>
+
+=head2 rethrow
+
+This rethrow (i.e. L<perlfunc/"die">) the original error. It must be called with the exception object or else it will return undef.
+
+This is ok :
+
+    $ex->rethrow;
+
+But this is not :
+
+    Module::Generic::Exception->rethrow;
+
+=head2 retry_after
+
+Set or get the number of seconds to way before to retry whatever cause the error. It returns the current value.
+
+=head2 subroutine
+
+Set or get the subroutine where the error originated. It returns the current value.
+
+=head2 throw
+
+Provided with a message string, this will create a new L<Module::Generic::Exception> object and call L<perlfunc/"die"> with it.
+
+=head2 TO_JSON
+
+Special method called by L<JSON> to transform this object into a string suitable to be added in a json data.
+
+=head2 trace
+
+Set or get the L<Devel::StackTrace> object used to provide a full stack trace of the error. It returns the current value.
+
+=head2 type
+
+Set or get the error type. It returns the current value.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

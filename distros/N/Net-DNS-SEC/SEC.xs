@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1872 2022-09-16 09:33:02Z willem $"
+#define XS_Id "$Id: SEC.xs 1926 2023-05-31 12:05:13Z willem $"
 
 
 =head1 NAME
@@ -219,13 +219,13 @@ EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
 	unsigned char sigbuf[512];		/* RFC3110(2) */
 	STRLEN buflen = sizeof(sigbuf);
-	int r;
+	int error;
     CODE:
 	checkerr( EVP_DigestSignInit( ctx, NULL, md, NULL, pkey ) );
-	r = EVP_DigestSign( ctx, sigbuf, &buflen, msgbuf, msglen );
+	error = EVP_DigestSign( ctx, sigbuf, &buflen, msgbuf, msglen );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
-	checkerr(r);
+	checkerr(error);
 	RETVAL = newSVpvn( (char*)sigbuf, buflen );
     OUTPUT:
 	RETVAL
@@ -318,15 +318,15 @@ EVP_PKEY_new_DSA(SV *p_SV, SV *q_SV, SV *g_SV, SV *y_SV, SV *x_SV)
 	BIGNUM *p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
 	BIGNUM *q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
 	BIGNUM *g = BN_bin2bn( (unsigned char*) SvPVX(g_SV), SvCUR(g_SV), NULL );
-	BIGNUM *x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
+	BIGNUM *x = SvCUR(x_SV) == 0 ? NULL : BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
 	BIGNUM *y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
     CODE:
 #ifdef OBSOLETE_API
 	DSA *dsa = DSA_new();
-	DSA_set0_pqg( dsa, p, q, g );
-	DSA_set0_key( dsa, y, x );
+	checkerr( DSA_set0_pqg( dsa, p, q, g ) );
+	checkerr( DSA_set0_key( dsa, y, x ) );
 	RETVAL = EVP_PKEY_new();
-	EVP_PKEY_assign( RETVAL, EVP_PKEY_DSA, (char*)dsa );
+	checkerr( EVP_PKEY_assign( RETVAL, EVP_PKEY_DSA, (char*)dsa ) );
 #else
 	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "DSA", NULL );
 	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
@@ -370,10 +370,10 @@ EVP_PKEY_new_RSA(SV *n_SV, SV *e_SV, SV *d_SV, SV *p_SV, SV *q_SV)
     CODE:
 #ifdef OBSOLETE_API
 	RSA *rsa = RSA_new();
-	RSA_set0_factors( rsa, p, q );
-	RSA_set0_key( rsa, n, e, d );
+	checkerr( RSA_set0_factors( rsa, p, q ) );
+	checkerr( RSA_set0_key( rsa, n, e, d ) );
 	RETVAL = EVP_PKEY_new();
-	EVP_PKEY_assign( RETVAL, EVP_PKEY_RSA, (char*)rsa );
+	checkerr( EVP_PKEY_assign( RETVAL, EVP_PKEY_RSA, (char*)rsa ) );
 #else
 	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "RSA", NULL );
 	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();

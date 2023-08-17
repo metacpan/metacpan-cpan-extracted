@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostSetCellRangeValueRequest.name :   ,
-# PostSetCellRangeValueRequest.sheetName :   ,
-# PostSetCellRangeValueRequest.cellarea :   ,
-# PostSetCellRangeValueRequest.value :   ,
-# PostSetCellRangeValueRequest.type :   ,
-# PostSetCellRangeValueRequest.folder :   ,
-# PostSetCellRangeValueRequest.storageName :    
+# PostSetCellRangeValueRequest.name : The workbook name.  ,
+# PostSetCellRangeValueRequest.sheetName : The worksheet name.  ,
+# PostSetCellRangeValueRequest.cellarea : Cell area (like "A1:C2")  ,
+# PostSetCellRangeValueRequest.value : Range value  ,
+# PostSetCellRangeValueRequest.type : Value data type (like "int")  ,
+# PostSetCellRangeValueRequest.folder : Original workbook folder.  ,
+# PostSetCellRangeValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_set_cell_range_value' } = { 
-    	summary => '',
+    	summary => 'Sets the value of the range in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cellarea' => {
      	datatype => 'string',
      	base_name => 'cellarea',
-     	description => '',
+     	description => 'Cell area (like "A1:C2")',
      	format => '',
      	read_only => '',
      		},
      'value' => {
      	datatype => 'string',
      	base_name => 'value',
-     	description => '',
+     	description => 'Range value',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Value data type (like "int")',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

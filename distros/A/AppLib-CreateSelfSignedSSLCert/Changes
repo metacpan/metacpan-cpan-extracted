@@ -1,4 +1,14 @@
-0.150   2017-10-11 (PERLANCAR)
+0.152   2023-06-05  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Forgot octal notation, derp.
+
+
+0.151   2023-06-05  Released-By: PERLANCAR; Urgency: medium
+
+        - chmod 400 key file.
+
+
+0.150   2017-10-11  Released-By: PERLANCAR
 
         - First release, split from App-CreateSelfSignedSSLCert and rename
           App::CreateSelfSignedSSLCert to AppLib::CreateSelfSignedSSLCert so it

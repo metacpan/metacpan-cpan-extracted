@@ -8,15 +8,17 @@ build_requires:
   IO::Handle: '0'
   IO::Socket::SSL: '0'
   IPC::Open3: '0'
-  JSON: '0'
+  JSON::MaybeXS: '0'
   Module::Build: '0.28'
+  Test::CPAN::Meta: '0'
   Test::More: '0'
   Test::Trap: '0'
+  Test::Vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,27 +27,27 @@ name: Net-Proxmox-VE
 provides:
   Net::Proxmox::VE:
     file: lib/Net/Proxmox/VE.pm
-    version: '0.36'
+    version: '0.37'
   Net::Proxmox::VE::Access:
     file: lib/Net/Proxmox/VE/Access.pm
-    version: '0.36'
+    version: '0.37'
   Net::Proxmox::VE::Cluster:
     file: lib/Net/Proxmox/VE/Cluster.pm
-    version: '0.36'
+    version: '0.37'
   Net::Proxmox::VE::Nodes:
     file: lib/Net/Proxmox/VE/Nodes.pm
-    version: '0.36'
+    version: '0.37'
   Net::Proxmox::VE::Pools:
     file: lib/Net/Proxmox/VE/Pools.pm
-    version: '0.36'
+    version: '0.37'
   Net::Proxmox::VE::Storage:
     file: lib/Net/Proxmox/VE/Storage.pm
-    version: '0.36'
+    version: '0.37'
 requires:
   Carp: '0'
   HTTP::Headers: '0'
   HTTP::Request::Common: '0'
-  JSON: '0'
+  JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   parent: '0'
@@ -53,9 +55,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/mrproper/proxmox-ve-api-perl/issues
   homepage: https://github.com/mrproper/proxmox-ve-api-perl
   repository: https://github.com/mrproper/proxmox-ve-api-perl.git
-version: '0.36'
+version: '0.37'
 x_author_pledge:
   version: 1
 x_contributors:
@@ -65,11 +68,12 @@ x_contributors:
   - 'Eric Bollengier <ebollengier@gmail.com>'
   - 'Jack Sauriol <sauriol@csh.rit.edu>'
   - 'japp-0xlabs <japp@0xlabs.com>'
+  - 'Martijn Lievaart <m@rtij.nl>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'mrproper <psynode@gmail.com>'
   - 'p5i <petr.v.ilin@gmail.com>'
   - 'Peter Valdemar Mørch <peter@morch.com>'
   - 'PIQUET Damien <piqudam@gmail.com>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

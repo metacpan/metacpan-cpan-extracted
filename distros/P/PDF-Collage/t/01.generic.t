@@ -6,6 +6,9 @@ no warnings 'experimental::signatures';
 
 use PDF::Collage 'collage';
 use Data::Resolver ();
+use Data::Resolver::FromDir;
+use Data::Resolver::FromTar;
+use Data::Resolver::Alternatives;
 
 use Test::More;
 use Test::Exception;
@@ -76,20 +79,18 @@ subtest 'multiple selectors' => sub {
 subtest 'composition from multiple sources' => sub {
    my $path1    = sibling(__FILE__, 'input-prefixed.tar');
    my $path2    = sibling(__FILE__, 'input2.dir');
-   my $resolver = Data::Resolver::generate(
-      {
-         -factory => resolver_from_alternatives => alternatives => [
-            {-factory => resolver_from_tar => archive => $path1},
-            {-factory => resolver_from_dir => root    => $path2},
-         ],
-         throw => 1,
-      }
+
+   my $resolver = Data::Resolver::Alternatives->new(
+      alternatives => [
+         Data::Resolver::FromTar->new(root => $path1),
+         Data::Resolver::FromDir->new(root => $path2),
+      ]
    );
    my $pc = collage(resolver => $resolver);
 
    my @selectors = sort { $a cmp $b } $pc->selectors;
    is_deeply \@selectors, [qw< sample1 sample2 sample3 >],
-     'multiple, aggregated selectors';
+     'multiple, aggregated selectors' or diag(@selectors);
 
    my $template = $pc->get('sample2');
    my $pdf;

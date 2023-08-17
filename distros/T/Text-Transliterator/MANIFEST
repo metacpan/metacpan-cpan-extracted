@@ -7,7 +7,8 @@ README
 t/00-load.t
 t/01-transliterator.t
 t/02-unaccent.t
-t/pod-coverage.t
-t/pod.t
+xt/pod-coverage.t
+xt/pod.t
 META.yml
 META.json
+

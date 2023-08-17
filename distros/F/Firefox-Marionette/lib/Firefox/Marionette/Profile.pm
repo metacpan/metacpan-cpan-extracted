@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.38';
+our $VERSION = '1.43';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -521,7 +521,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.38
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -552,11 +552,13 @@ Version 1.38
 
 This module handles the implementation of a C<prefs.js> Firefox Profile
 
-=head1 SUBROUTINES/METHODS
+=head1 CONSTANTS
 
 =head2 ANY_PORT
 
 returns the port number for Firefox to listen on any port (0).
+
+=head1 SUBROUTINES/METHODS
 
 =head2 new
 

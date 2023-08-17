@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -42,6 +42,9 @@ for historical weather data from 1940.
     @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
+
+    Takes an optional argument, tz, which defaults to 'Europe/London'.
+    For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
 
 ## ua
 

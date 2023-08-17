@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a enum_const_value
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -57,7 +57,7 @@ MarpaX::Java::ClassFile::BNF::EnumConstValue - Parsing of a enum_const_value
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

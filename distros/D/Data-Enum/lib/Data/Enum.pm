@@ -18,7 +18,7 @@ use overload ();
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-our $VERSION = 'v0.2.6';
+our $VERSION = 'v0.2.7';
 
 
 
@@ -122,7 +122,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.6
+version v0.2.7
 
 =head1 SYNOPSIS
 
@@ -241,6 +241,12 @@ This method adds support for L<match::simple>.
 The overheard of creating a new class instance and resolving methods may actually take more time than comparing simple
 strings.  When using this in production code, you may want to benchmark performance.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.10 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 L<Class::Enum>
@@ -273,7 +279,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2022 by Robert Rothenberg.
+This software is Copyright (c) 2021-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

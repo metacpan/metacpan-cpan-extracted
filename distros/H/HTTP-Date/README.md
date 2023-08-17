@@ -4,7 +4,7 @@ HTTP::Date - HTTP::Date - date conversion routines
 
 # VERSION
 
-version 6.05
+version 6.06
 
 # SYNOPSIS
 
@@ -91,7 +91,8 @@ time2str() and str2time(), are exported by default.
         "Feb  3  1994"      -- Unix 'ls -l' format
         "Feb  3 17:03"      -- Unix 'ls -l' format
 
-        "11-15-96  03:52PM" -- Windows 'dir' format
+        "11-15-96  03:52PM"   -- Windows 'dir' format
+        "11-15-1996  03:52PM" -- Windows 'dir' format with four-digit year
 
     The parser ignores leading and trailing whitespace.  It also allow the
     seconds to be missing and the month to be numerical in most formats.
@@ -113,7 +114,7 @@ time2str() and str2time(), are exported by default.
 
 # SEE ALSO
 
-["time" in perlfunc](https://metacpan.org/pod/perlfunc#time), [Time::Zone](https://metacpan.org/pod/Time::Zone)
+["time" in perlfunc](https://metacpan.org/pod/perlfunc#time), [Time::Zone](https://metacpan.org/pod/Time%3A%3AZone)
 
 # AUTHOR
 
@@ -121,7 +122,7 @@ Gisle Aas <gisle@activestate.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1995-2019 by Gisle Aas.
+This software is copyright (c) 1995 by Gisle Aas.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

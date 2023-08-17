@@ -1,7 +1,7 @@
 package Mail::DKIM::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -61,16 +61,21 @@ sub init {
     my $self = shift;
     $self->SUPER::init;
 
-    if ( defined $self->{KeyFile} ) {
-        $self->{Key} ||=
-          Mail::DKIM::PrivateKey->load( File => $self->{KeyFile} );
-    }
-
     unless ( $self->{'Algorithm'} ) {
 
         # use default algorithm
         $self->{'Algorithm'} = 'rsa-sha1';
     }
+
+    my $type = 'rsa'; # default
+    $type = 'ed25519' if ( $self->{'Algorithm'} =~ /^ed25519/ );
+
+    if ( defined $self->{KeyFile} ) {
+        $self->{Key} ||=
+          Mail::DKIM::PrivateKey->load( File => $self->{KeyFile},
+            Type => $type );
+    }
+
     unless ( $self->{'Method'} ) {
 
         # use default canonicalization method
@@ -86,6 +91,7 @@ sub init {
         # use default selector
         $self->{'Selector'} = 'unknown';
     }
+
 }
 
 sub finish_header {
@@ -153,6 +159,10 @@ sub finish_header {
                     $self->{'Expiration'} ? ( Expiration => $self->{'Expiration'} )
                     : ()
                 ),
+                (
+                    $self->{'Tags'} ? ( Tags => $self->{'Tags'} )
+                    : ()
+                ),
             )
         );
     }
@@ -175,6 +185,9 @@ sub finish_body {
         # finished canonicalizing
         $algorithm->finish_body;
 
+        my $type = 'rsa'; # default
+        $type = 'ed25519' if ( $self->{'Algorithm'} =~ /^ed25519/ );
+
         # load the private key file if necessary
         my $signature = $algorithm->signature;
         my $key =
@@ -183,7 +196,8 @@ sub finish_body {
           || $self->{Key}
           || $self->{KeyFile};
         if ( defined($key) && !ref($key) ) {
-            $key = Mail::DKIM::PrivateKey->load( File => $key );
+            $key = Mail::DKIM::PrivateKey->load( File => $key,
+                Type => $type );
         }
         $key
           or die "no key available to sign with\n";
@@ -426,7 +440,7 @@ Mail::DKIM::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 SYNOPSIS
 
@@ -548,6 +562,11 @@ The list of headers signed by default is as follows
     In-Reply-To References
     List-Id List-Help List-Unsubscribe List-Subscribe
     List-Post List-Owner List-Archive
+
+=item Tags
+
+An optional hashref of additional tags to be added to the DKIM
+signature generated.
 
 =back
 

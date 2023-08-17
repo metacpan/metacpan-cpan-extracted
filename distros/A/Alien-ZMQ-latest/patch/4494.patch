@@ -1,0 +1,48 @@
+From f7df6c8599835d6022335d63f37e291514d9a6f4 Mon Sep 17 00:00:00 2001
+From: Arnaud Loonstra <arnaud@sphaero.org>
+Date: Tue, 24 Jan 2023 12:54:48 +0100
+Subject: [PATCH] deprecate sprint and replace with snprintf
+
+---
+ src/tcp_address.cpp              |  3 ++-
+ src/udp_engine.cpp               |  4 ++--
+ tests/test_inproc_connect.cpp    |  4 ++--
+ tests/test_issue_566.cpp         |  2 +-
+ tests/test_proxy.cpp             | 12 ++++++++----
+ tests/test_reqrep_tcp.cpp        |  8 ++++++--
+ tests/test_setsockopt.cpp        |  2 +-
+ tests/test_stream_disconnect.cpp |  4 ++--
+ tests/test_unbind_wildcard.cpp   | 12 ++++++------
+ tests/test_ws_transport.cpp      |  3 ++-
+ tests/testutil.cpp               | 18 +++++++++---------
+ 11 files changed, 41 insertions(+), 31 deletions(-)
+
+diff --git a/src/tcp_address.cpp b/src/tcp_address.cpp
+index bdda66a2002340cedc359c1949a53b06a18a0961..46b4defc79fe7e4c6f2760f7fcb8af6b631b723f 100644
+--- a/src/tcp_address.cpp
++++ b/src/tcp_address.cpp
+@@ -129,7 +129,8 @@ static std::string make_address_string (const char *hbuf_,
+     pos += hbuf_len;
+     memcpy (pos, ipv6_suffix_, sizeof ipv6_suffix_ - 1);
+     pos += sizeof ipv6_suffix_ - 1;
+-    pos += sprintf (pos, "%d", ntohs (port_));
++    pos += snprintf (pos, max_port_str_length + 1 * sizeof (char), "%d",
++                     ntohs (port_));
+     return std::string (buf, pos - buf);
+ }
+ 
+diff --git a/src/udp_engine.cpp b/src/udp_engine.cpp
+index d09bfe166ec3b4d161b3bf4e0acb24f6c5aab090..47f1359e1bdab32d82a8a0f09e2f2669e98f5230 100644
+--- a/src/udp_engine.cpp
++++ b/src/udp_engine.cpp
+@@ -367,8 +367,8 @@ void zmq::udp_engine_t::sockaddr_to_msg (zmq::msg_t *msg_,
+     const char *const name = inet_ntoa (addr_->sin_addr);
+ 
+     char port[6];
+-    const int port_len =
+-      sprintf (port, "%d", static_cast<int> (ntohs (addr_->sin_port)));
++    const int port_len = snprintf (port, 6 * sizeof (char), "%d",
++                                   static_cast<int> (ntohs (addr_->sin_port)));
+     zmq_assert (port_len > 0);
+ 
+     const size_t name_len = strlen (name);

@@ -58,7 +58,7 @@ use Test::More;
             )
         },
         undef,
-        'no exception when topic variable is modified by a step'
+        'no exception when topic variable is modified by a step',
     );
 
 }

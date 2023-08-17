@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostUpdateWorksheetPropertyRequest.name :   ,
-# PostUpdateWorksheetPropertyRequest.sheetName :   ,
-# PostUpdateWorksheetPropertyRequest.sheet :   ,
-# PostUpdateWorksheetPropertyRequest.folder :   ,
-# PostUpdateWorksheetPropertyRequest.storageName :    
+# PostUpdateWorksheetPropertyRequest.name : The workbook name.  ,
+# PostUpdateWorksheetPropertyRequest.sheetName : The worksheet name.  ,
+# PostUpdateWorksheetPropertyRequest.sheet : The worksheet description.  ,
+# PostUpdateWorksheetPropertyRequest.folder : Original workbook folder.  ,
+# PostUpdateWorksheetPropertyRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_update_worksheet_property' } = { 
-    	summary => '',
+    	summary => 'Update worksheet properties.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'sheet' => {
      	datatype => 'Worksheet',
      	base_name => 'sheet',
-     	description => '',
+     	description => 'The worksheet description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

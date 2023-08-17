@@ -1,13 +1,13 @@
 use utf8;
 package WebService::KvKAPI::BasicProfile;
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 # ABSTRACT: Instance of OpenAPI client for Basisprofiel API of the KvK.
 
 use v5.26;
 use Object::Pad;
 use WebService::KvKAPI::Formatters qw(format_kvk_number);
 
-class WebService::KvKAPI::BasicProfile does WebService::KvKAPI::Roles::OpenAPI;
+class WebService::KvKAPI::BasicProfile :does(WebService::KvKAPI::Roles::OpenAPI);
 
 method get_basic_profile {
     my ($kvk, $geo) = @_;
@@ -53,15 +53,15 @@ WebService::KvKAPI::BasicProfile - Instance of OpenAPI client for Basisprofiel A
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 
@@ -517,16 +517,16 @@ Chamber of Commerce
 
 =head1 SYNOPSIS
 
-use WebService::KvKAPI::BasicProfile;
+    use WebService::KvKAPI::BasicProfile;
 
-my $api = WebService::KvKAPI::BasicProfile->new(
-    # see WebService::KvKAPI->new()
-);
+    my $api = WebService::KvKAPI::BasicProfile->new(
+        # see WebService::KvKAPI->new()
+    );
 
-$api->get_basic_profile($coc_number, $include_geo_data);
-$api->get_owner($coc_number, $include_geo_data);
-$api->get_main_location($coc_number, $include_geo_data);
-$api->get_locations($coc_number);
+    $api->get_basic_profile($coc_number, $include_geo_data);
+    $api->get_owner($coc_number, $include_geo_data);
+    $api->get_main_location($coc_number, $include_geo_data);
+    $api->get_locations($coc_number);
 
 =head1 METHODS
 

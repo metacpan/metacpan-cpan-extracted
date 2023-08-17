@@ -1,0 +1,12 @@
+Revision history for Blockchain-Ethereum-Transaction
+0.005
+    - OP recommended file layout
+0.004
+    - Major refactoring
+0.003
+    - Fix usage example
+0.002
+    - Fix minor documentation bugs
+    - Add standalone script
+0.001
+    - Release

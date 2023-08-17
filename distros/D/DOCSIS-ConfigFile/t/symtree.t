@@ -1,5 +1,5 @@
-use warnings;
 use strict;
+use warnings;
 use DOCSIS::ConfigFile 'encode_docsis';
 use Test::More;
 

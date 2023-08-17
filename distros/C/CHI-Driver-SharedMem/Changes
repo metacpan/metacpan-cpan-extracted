@@ -1,5 +1,23 @@
 Revision history for CHI::Driver::SharedMem
 
+0.18	Tue Aug 15 20:03:16 EDT 2023
+	Implement LRU when the shared memory segment is full
+
+0.17	Sat Aug 12 21:41:26 EDT 2023
+	Dabble without a locking system, let's see if CHI can handle that
+	API Change: size is now shm_size; shmkey is now shm_key
+
+0.16	Fri Aug 11 16:04:17 EDT 2023
+	Use a common lock - previously locks were app named
+	Fix occasional errors in DEMOLISH trying to lock the file after it's
+		gone away
+
+0.15	Wed Aug  9 20:32:43 EDT 2023
+	Use JSON instead of Storable, it's more reliable
+	Remove the shared memory area when running 'make test'
+	Remove the shared area if it's only full of expired keys and it's about to
+		become unreferenced
+
 0.14	Thu 23 Jan 10:34:54 EST 2014
 	Fix a rare condition where the data fails to read
 	Added work around for RT89892

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::wipe;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: wipe 
+ PERL PROGRAM NAME: wipe 
  AUTHOR: Juan Lorenzo
  DATE:  July 3 2017 
 

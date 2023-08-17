@@ -22,6 +22,7 @@ img/test-gimp.xbm
 img/test-multi0xff.jpg
 img/test-notrailer.gif
 img/test-unknowncode.gif
+img/test.avif
 img/test.gif			An GIF example
 img/test.ico
 img/test.jpg			An Exif example from my Digicam
@@ -51,6 +52,7 @@ lib/Bundle/Image/Info/SVG.pm
 lib/Bundle/Image/Info/XBM.pm
 lib/Bundle/Image/Info/XPM.pm
 lib/Image/Info.pm
+lib/Image/Info/AVIF.pm
 lib/Image/Info/BMP.pm
 lib/Image/Info/GIF.pm
 lib/Image/Info/ICO.pm
@@ -71,6 +73,7 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00_basics.t
+t/avif.t
 t/bad_exif.t
 t/bmp.t
 t/exif.t

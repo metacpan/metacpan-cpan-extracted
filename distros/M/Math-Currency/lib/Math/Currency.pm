@@ -14,7 +14,7 @@
 #------------------------------------------------------------------------------
 
 package Math::Currency;
-$Math::Currency::VERSION = '0.52';
+$Math::Currency::VERSION = '0.53';
 # ABSTRACT: Exact Currency Math with Formatting and Rounding
 
 use strict;
@@ -228,14 +228,14 @@ sub format {
         }
     }
     else { # called as class method to set the default currency
-	if ( defined $key && not exists $FORMAT->{$key} ) {
-	    unless ( defined $LC_MONETARY->{$key} ) {
-		eval "require Math::Currency::$key";
-		unknown_currency($key) if $@;
-	    }
-	    $FORMAT = $LC_MONETARY->{$key};
-	    return $FORMAT;
-	}
+        if (defined $key && not exists $FORMAT->{$key}) {
+            unless (defined $LC_MONETARY->{$key}) {
+                eval "require Math::Currency::$key";
+                unknown_currency($key) if $@;
+            }
+            $FORMAT = $LC_MONETARY->{$key};
+            return $FORMAT;
+        }
     }
 
 
@@ -333,7 +333,7 @@ sub localize {
     }
 
     # so you can test to see if locale was effective
-    return 0 if ! exists $localeconv->{'currency_symbol'};
+    return 0 if ! exists $localeconv->{'currency_symbol'} || $localeconv->{'currency_symbol'} eq '';
 
     $$format = {
         INT_CURR_SYMBOL   => $localeconv->{'int_curr_symbol'}   || '',
@@ -465,13 +465,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Math::Currency - Exact Currency Math with Formatting and Rounding
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -664,8 +666,6 @@ USD 1,234.56
 
 This an exportable function that constructs a new object.  Takes the same arguments
 as C<new()>.
-
-=encoding UTF-8
 
 =for Pod::Coverage unknown_currency
 
@@ -948,13 +948,17 @@ L<Math::BigInt>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/perl-math-currency>
-and may be cloned from L<git://github.com/mschout/perl-math-currency.git>
+The development version is on github at L<https://https://github.com/mschout/perl-math-currency>
+and may be cloned from L<git://https://github.com/mschout/perl-math-currency.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-math-currency@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Currency
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-math-currency/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

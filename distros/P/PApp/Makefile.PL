@@ -82,8 +82,9 @@ WriteMakefile(
                     Digest::SHA1	=> 1.01,
                     JSON::XS		=> 2.01,
                     MIME::Base64        => 0,
-                    AnyEvent            => 7.12,
+                    AnyEvent            => 7.17,
                     AnyEvent::Fork      => 1.31,
+                    Coro                => 6.56,
 
                     DBD::mysql		=> 2.04,
                     Guard               => 1.0,
@@ -98,54 +99,64 @@ WriteMakefile(
 
 sub MY::postamble {
    my $self=shift;
-   my $postamble="
+   my $postamble = <<'EOF';
 
 force:
 
 all :: secure
 
 secure :: write-config
-	\$(PERL) write-config
+	$(PERL) write-config
 
 reconfig: force
-	\$(PERL) write-config
+	$(PERL) write-config
 
 i18n: force
-	./bin/papp-admin `for domain in papp bench dbedit demo iso639 iso3166 iso3166full; do \\
-	  echo --domain \$\$domain --export i18n/\$\$domain.po; \\
+	./bin/papp-admin `for domain in papp bench dbedit demo iso639 iso3166 iso3166full; do \
+	  echo --domain $$domain --export i18n/$$domain.po; \
 	done`
 
-# set \$VERSION in all modules
+# set $VERSION in all modules
 setver:
-	\$(PERL) -pi -e 's/^(\\s*(?:our\\s+)?\\\$\$VERSION\\s*=\\s*).*\$\$/\$\${1}\$(VERSION);/' *.pm PApp/*.pm I18n/*.pm Recode/*.pm
+	$(PERL) -pi -e 's/^(\s*(?:our\s+)?\$$VERSION\s*=\s*).*$$/$${1}$(VERSION);/' *.pm PApp/*.pm I18n/*.pm Recode/*.pm
 
 predist: setver i18n
 	pod2text PApp.pm >README
 	#mysqldump -d -B papp >gen-db.sql
-	\$(MAKE) tardist
-
-install :: secure all
-	\$(PERL) ./papp-install --install
-
-install :: secure all
-	\@echo
-	\@echo '*****'
-	\@echo '***** Please run:'
-	\@echo '*****'
-	\@echo '***** make init		to initialize the papp database'
-	\@echo '***** make update	to update an existing papp installation'
-	\@echo '*****'
-	\@echo
+	$(MAKE) tardist
 
 init: secure all
-	\$(PERL) ./papp-install --init
+	$(PERL) ./papp-install --init
 
 update: secure all
-	\$(PERL) ./papp-install --update
+	$(PERL) ./papp-install --update
+EOF
 
-";
+   if ($ENV{PAPP_INSTALL_SKIP_CONFIG}) {
+      $postamble .= <<'EOF';
 
-   $postamble;
+install :: all
+	$(PERL) ./papp-install --install --skipconfig
+EOF
+   } else {
+      $postamble .= <<'EOF';
+
+install :: secure all
+	$(PERL) ./papp-install --install
+
+install :: secure all
+	@echo
+	@echo '*****'
+	@echo '***** Please run:'
+	@echo '*****'
+	@echo '***** make init		to initialize the papp database'
+	@echo '***** make update	to update an existing papp installation'
+	@echo '*****'
+	@echo
+EOF
+   }
+
+   $postamble
 }
 
 system $Config{make}, "secure";

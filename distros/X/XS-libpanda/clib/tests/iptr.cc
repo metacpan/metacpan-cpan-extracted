@@ -122,7 +122,7 @@ TEST("ctor") {
         }
         REQUIRE(Tracer::dtor_calls == 1);
     }
-        
+
     SECTION("move from foreign iptr") {
         {
             auto src = TestChildSP(new TestChild(321));
@@ -600,6 +600,33 @@ TEST("compiles") {
     REQUIRE(foo(iptr<A>(nullptr)) == 10);
     REQUIRE(foo(iptr<B>(nullptr)) == 20);
     REQUIRE(foo(iptr<AA>(nullptr)) == 10);
+}
+
+TEST_CASE("refcnt synopsis", "[.]") {
+    auto pass_somewhere = [](iptr<Refcnt>) {};
+
+    class MyType : public Refcnt {
+        double my_data;
+    };
+
+    class MyCustomType : public MyType {};
+
+    {
+        iptr<MyType> p = new MyType();
+    } // ~MyType and delete here automatically
+
+    weak_iptr<MyType> w;
+    {
+        iptr<MyType> p = new MyType();
+        w = p;
+        pass_somewhere(p);
+    } // ~MyType and delete here automatically
+
+    if (iptr<MyType> tmp = w.lock()) { // if object exists lock() returns a strong pointer to it
+        // do anything with tmp
+    }
+    iptr<MyType> p = new MyCustomType();
+    iptr<MyCustomType> cp = dynamic_pointer_cast<MyCustomType>(p);
 }
 
 // TEST("use weak with fdecl") {

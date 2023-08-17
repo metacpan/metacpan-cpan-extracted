@@ -3,7 +3,7 @@
 
 requires "HTTP::Request" => "6.44";
 requires "JSON::Tiny" => "0.58";
-requires "LWP::UserAgent" => "6.68";
+requires "LWP::UserAgent" => "6.70";
 requires "Moo" => "2.005005";
 requires "namespace::clean" => "0.27";
 requires "perl" => "v5.10.0";
@@ -12,7 +12,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
-  requires "Test2::V0" => "0.000148";
+  requires "Test2::V0" => "0.000155";
   requires "Test::More" => "0";
 };
 
@@ -25,6 +25,7 @@ on 'develop' => sub {
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::CPAN::Meta" => "0";
   requires "Test::CPAN::Meta::JSON" => "0.16";
+  requires "Test::DistManifest" => "0";
   requires "Test::EOL" => "0";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::MinimumVersion" => "0";
@@ -36,5 +37,6 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Synopsis" => "0";
+  requires "Test::Vars" => "0";
   requires "Test::Version" => "1";
 };

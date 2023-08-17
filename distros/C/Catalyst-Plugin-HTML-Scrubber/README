@@ -1,27 +1,63 @@
-This is Perl module Catalyst::Plugin::HTML::Scrubber.
+NAME
 
-INSTALLATION
+    Catalyst::Plugin::HTML::Scrubber - Catalyst plugin for
+    scrubbing/sanitizing incoming parameters
 
-Catalyst::Plugin::HTML::Scrubber installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+SYNOPSIS
 
-    % cpan Catalyst::Plugin::HTML::Scrubber
+        use Catalyst qw[HTML::Scrubber];
+    
+        MyApp->config( 
+            scrubber => {
+                auto => 1,  # automatically run on request
+                ignore_params => [ qr/_html$/, 'article_body' ],
+                
+                # The following are options to HTML::Scrubber
+                params => [
+                    default => 0,
+                    comment => 0,
+                    script => 0,
+                    process => 0,
+                    allow => [qw [ br hr b a h1]],
+                ],
+            },
+       );
 
-Download it, unpack it, then build it as per the usual:
+DESCRIPTION
 
-    % perl Makefile.PL
-    % make && make test
+    On request, sanitize HTML tags in all params (with the ability to
+    exempt some if needed), to protect against XSS (cross-site scripting)
+    attacks and other unwanted things.
 
-Then install it:
+EXTENDED METHODS
 
-    % make install
+    setup
 
-DOCUMENTATION
+      See SYNOPSIS for how to configure the plugin, both with its own
+      configuration (e.g. whether to automatically run, whether to exempt
+      certain fields) and passing on any options from HTML::Scrubber to
+      control exactly what scrubbing happens.
 
-Catalyst::Plugin::HTML::Scrubber documentation is available as in POD. So you can do:
+    prepare_parameters
 
-    % perldoc Catalyst::Plugin::HTML::Scrubber
+      Sanitize HTML tags in all parameters (unless `ignore_params` exempts
+      them).
 
-to read the documentation online with your favorite pager.
+SEE ALSO
 
-Hideo Kimura
+    Catalyst, HTML::Scrubber.
+
+AUTHOR
+
+    Hideo Kimura, << <hide@hide-k.net> >> original author
+
+    David Precious (BIGPRESH), <davidp@preshweb.co.uk> maintainer since
+    2023-07-17
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2005 by Hideo Kimura
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

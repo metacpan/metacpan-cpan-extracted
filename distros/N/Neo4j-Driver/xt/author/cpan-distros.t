@@ -3,9 +3,11 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 # The purpose of these tests is to help prevent any change to the
@@ -27,7 +29,7 @@ my $neo4j_ver = $driver && $driver->session->server->version;
 plan skip_all => "no connection to Neo4j server" unless $driver && ! $Neo4j_Test::sim;
 plan skip_all => "Neo4j server version too old" if $neo4j_ver =~ m{^Neo4j/[12]\.};
 
-plan tests => 1 + 1;
+plan tests => 1 + $no_warnings;
 
 
 subtest 'REST::Neo4p' => sub {
@@ -60,7 +62,7 @@ subtest 'REST::Neo4p' => sub {
 	lives_ok {
 		my $q = REST::Neo4p::Query->new('MATCH (n) RETURN n LIMIT 1');
 		$q->execute;
-		my $row = $q->fetch;
+		my $row; warning { $row = $q->fetch };  # Ignore possible deprecation warning on Neo4j 5
 		$node = $row->[0] if $row;
 	} 'query match node';
 	SKIP: {
@@ -72,7 +74,7 @@ subtest 'REST::Neo4p' => sub {
 	lives_ok {
 		my $q = REST::Neo4p::Query->new('MATCH p=()--() RETURN p LIMIT 1');
 		$q->execute;
-		my $row = $q->fetch;
+		my $row; warning { $row = $q->fetch };  # Ignore possible deprecation warning on Neo4j 5
 		$path = $row->[0] if $row;
 	} 'query match path';
 	SKIP: {

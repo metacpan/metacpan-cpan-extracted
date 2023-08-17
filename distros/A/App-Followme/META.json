@@ -66,113 +66,117 @@
    "provides" : {
       "App::Followme" : {
          "file" : "lib/App/Followme.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::BaseData" : {
          "file" : "lib/App/Followme/BaseData.pm"
       },
+      "App::Followme::BinaryData" : {
+         "file" : "lib/App/Followme/BinaryData.pm",
+         "version" : "2.03"
+      },
       "App::Followme::ConfiguredObject" : {
          "file" : "lib/App/Followme/ConfiguredObject.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::ConvertPage" : {
          "file" : "lib/App/Followme/ConvertPage.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::CreateGallery" : {
          "file" : "lib/App/Followme/CreateGallery.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::CreateIndex" : {
          "file" : "lib/App/Followme/CreateIndex.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::CreateRss" : {
          "file" : "lib/App/Followme/CreateRss.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::CreateSitemap" : {
          "file" : "lib/App/Followme/CreateSitemap.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::EditSections" : {
          "file" : "lib/App/Followme/EditSections.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::FIO" : {
          "file" : "lib/App/Followme/FIO.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::FileData" : {
          "file" : "lib/App/Followme/FileData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::FolderData" : {
          "file" : "lib/App/Followme/FolderData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::FormatPage" : {
          "file" : "lib/App/Followme/FormatPage.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::Guide" : {
          "file" : "lib/App/Followme/Guide.pm"
       },
       "App::Followme::Initialize" : {
          "file" : "lib/App/Followme/Initialize.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::JpegData" : {
          "file" : "lib/App/Followme/JpegData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::Module" : {
          "file" : "lib/App/Followme/Module.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::NestedText" : {
          "file" : "lib/App/Followme/NestedText.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::PodData" : {
          "file" : "lib/App/Followme/PodData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::Template" : {
          "file" : "lib/App/Followme/Template.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::TextData" : {
          "file" : "lib/App/Followme/TextData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::UploadData" : {
          "file" : "lib/App/Followme/UploadData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::UploadFtp" : {
          "file" : "lib/App/Followme/UploadFtp.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::UploadLocal" : {
          "file" : "lib/App/Followme/UploadLocal.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::UploadNone" : {
          "file" : "lib/App/Followme/UploadNone.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::UploadSite" : {
          "file" : "lib/App/Followme/UploadSite.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::Web" : {
          "file" : "lib/App/Followme/Web.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "App::Followme::WebData" : {
          "file" : "lib/App/Followme/WebData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -186,7 +190,7 @@
          "web" : "https://github.com/Jinzang/App-Followme"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_contributors" : [
       "root <root@mars.localdomain>"
    ],

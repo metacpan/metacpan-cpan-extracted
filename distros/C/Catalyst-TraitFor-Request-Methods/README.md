@@ -4,7 +4,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 # VERSION
 
-version v0.5.0
+version v0.5.2
 
 # SYNOPSIS
 
@@ -90,6 +90,12 @@ The request method is `PATCH`.
 
 The request method is not recognized.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 # SEE ALSO
 
 [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest)
@@ -114,7 +120,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2022 by Robert Rothenberg.
+This software is Copyright (c) 2019-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

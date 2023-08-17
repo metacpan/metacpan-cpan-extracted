@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001011';
+our $VERSION   = '0.001012';
 
 use Story::Interact::Page ();
 use Story::Interact::Syntax ();

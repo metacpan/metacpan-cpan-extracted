@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use Test::More tests => 6;
 use Text::NumericData::App::txdconstruct;

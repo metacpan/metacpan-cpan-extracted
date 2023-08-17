@@ -1,0 +1,190 @@
+/* Styles for the Slides UI */
+/* Main list should be organized vertically, but try to let each slide seek its natural width */
+.slides {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+.slide {
+	position: relative;
+	display: inline-block;
+	text-align: center;
+	/*border: 1px solid #444;*/
+}
+/* right edge of screen, stays 0px width until class 'open' is added */
+.slides-sidebar {
+	position: fixed;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: auto;
+	z-index: 10;
+	padding: 0;
+	color: #BBB;
+	background-color: #111111AA;
+	text-align: left;
+	font-size: 12pt;
+	font-family: Helvetica, sans-serif;
+}
+
+/* upper-right corner that is always visible */
+.slides-corner {
+	position: fixed;
+	top: 0;
+	right: 0;
+}
+/* button that opens/closes the sidebar. Always visible even when sidebar is 0px wide */
+.slides-sidebar-btn {
+	display: block;
+	margin: 4px 4px .5em auto;
+	width: 30px;
+	border: 2px solid black;
+	border-radius: 4px;
+	padding: 0;
+	background-color: #111;
+}
+/* fancy animated icon for the sidebar open/close button */
+.slides-sidebar-btn .bar {
+	position: relative;
+	border: none;
+	background-color: #BBB;
+	margin: 4px;
+	height: 3px;
+	transition: 0.3s;
+}
+.slides-sidebar.open .slides-sidebar-btn .bar1 {
+    -webkit-transform: translate(0, 7px) rotate(-45deg);
+    transform: translate(0, 7px) rotate(-45deg);
+}
+.slides-sidebar.open .slides-sidebar-btn .bar2 { opacity: 0; }
+.slides-sidebar.open .slides-sidebar-btn .bar3 {
+    -webkit-transform: translate(0, -7px) rotate(45deg);
+    transform: translate(0, -7px) rotate(45deg);
+}
+
+/* Hide notifications immediately when sidebar opened. */
+.slides-sidebar.open .slides-notify {
+	display: none;
+}
+
+/* main UI area of the sidebar which grows when sidebar is opened */
+.slides-sidebar .ui {
+	width: 0;
+	overflow: hidden;
+	transition: width .3s;
+}
+.slides-sidebar.open .ui {
+	width: 14em;
+}
+.slides-sidebar .ui-inner {
+	padding: .5em;
+	width: 9em;
+	margin-right: auto;
+}
+.slides-sidebar h5 {
+	margin: .5em 0 .3em 0;
+	padding: 0;
+	font-weight: bold;
+}
+
+.slides-notify p { margin: .5em; padding: 0; text-align: right; width: 200px; }
+
+.slides .status {
+	font-size: 75%;
+	margin: 0; padding: 0;
+	list-style-type: none;
+}
+.slides .status li {
+	display: block;
+	margin: 2px 0; padding: 0;
+}
+.slides .status li .host {
+	font-family: Consolas, Inconsolata, Courier New, monospace;
+}
+.slides .status li.connecting { color: #FFFFBB; }
+.slides .status li.connected { color: #CCFFCC; }
+.slides .status li.disconnected { color: #FFCCCC; }
+.slides .status li.broadcast { color: #CCCCEE; }
+
+.slides .status-actions {
+	display: flex;
+	flex-flow: column;
+	gap: 4px;
+	margin: 4px 0;
+}
+.slides .status-actions > * { display: none; }
+.slides .status-actions > label { font-size: 90%; white-space: nowrap; }
+
+.navbuttons {
+	position: fixed;
+	left:0;
+	bottom: 0;
+	z-index: 9;
+}
+.navbuttons button {
+	display: block; width: 75px; height: 100px;
+	margin: 16px;
+	background-color: #111111AA; color: white;
+	font-size: 14pt;
+	touch-action:manipulation;
+}
+.navbuttons button.step {
+	height: 200px;
+}
+
+.presenternotes {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	z-index: 9;
+	background-color: #111111AA;
+	font-size: 14pt;
+}
+
+/* main content of 
+.slides-menu {
+	margin: 30px 4px 4px 4px;
+}
+.slides-menu button { display: block; }
+.slides-menu-btn {
+	position: fixed;
+	top: 0;
+	right: 0;
+	margin: 0 0 .5em auto;
+	width: 30px;
+	border: 2px solid black;
+	border-radius: 4px;
+	padding: 0;
+	background-color: #111;
+}
+.slides-menu-btn .bar {
+	position: relative;
+	border: none;
+	background-color: #BBB;
+	margin: 4px;
+	height: 3px;
+	transition: 0.3s;
+}
+.slides-menu.open .slides-menu-btn .bar1 {
+    -webkit-transform: translate(0, 7px) rotate(-45deg);
+    transform: translate(0, 7px) rotate(-45deg);
+}
+.slides-menu.open .slides-menu-btn .bar2 { opacity: 0; }
+.slides-menu.open .slides-menu-btn .bar3 {
+    -webkit-transform: translate(0, -7px) rotate(45deg);
+    transform: translate(0, -7px) rotate(45deg);
+}
+.slides-menu .status > * { display: none; }
+.slides-menu.open .status > * { display: block; }
+.slides-menu .status .popup { display: block; }
+
+.slides-menu .status-actions button { display: none; }
+.slides-menu .status-actions button.show { display: block; }
+.slides-menu .status-actions .popup { display: block; }
+
+
+#websocket-reconnect { position: fixed; top: 0; right: 0; z-index: 10; }
+#slideshow-join { position: fixed; top: 0; right: 4px; z-index: 9; font-size: 22px; }
+.slideshow-address { font: 28px monospace; }
+ol.slides { margin: 0; padding: 0; list-style: none; }

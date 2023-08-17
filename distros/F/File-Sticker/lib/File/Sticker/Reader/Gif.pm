@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Gif;
-$File::Sticker::Reader::Gif::VERSION = '3.0008';
+$File::Sticker::Reader::Gif::VERSION = '3.0101';
 =head1 NAME
 
 File::Sticker::Reader::Gif - read and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 3.0008
+version 3.0101
 
 =head1 SYNOPSIS
 

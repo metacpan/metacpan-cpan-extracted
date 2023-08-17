@@ -13,12 +13,12 @@ package Image::Info;
 # modify it under the same terms as Perl v5.8.8 itself.
 #
 # Previously maintained by Tels - (c) 2006 - 2008.
-# Currently maintained by Slaven Rezic - (c) 2008 - 2022.
+# Currently maintained by Slaven Rezic - (c) 2008 - 2023.
 
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.43';
+$VERSION = '1.44';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -175,6 +175,7 @@ sub determine_file_format
    return "PPM" if /^P[1-6]/;
    return "XPM" if /(^\/\* XPM \*\/)|(static\s+char\s+\*\w+\[\]\s*=\s*{\s*"\d+)/;
    return "XBM" if /^(?:\/\*.*\*\/\n)?#define\s/;
+   return "AVIF" if /\A....ftypavif/s;
    return "SVG" if /^(<\?xml|[\012\015\t ]*<svg\b)/;
    return "WEBP" if /^RIFF.{4}WEBP/s;
    return undef;
@@ -466,6 +467,10 @@ The following image file formats are supported:
 
 =over
 
+
+=item AVIF
+
+Supports the basic standard info key names.
 
 =item BMP
 

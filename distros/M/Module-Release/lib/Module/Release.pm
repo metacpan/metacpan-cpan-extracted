@@ -25,7 +25,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '2.128';
+our $VERSION = '2.133';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
@@ -197,23 +197,23 @@ sub _set_defaults {
 	my( $self, %params ) = @_;
 
 	my $defaults = {
-			'Makefile.PL'  => 'Makefile.PL',
-			'Makefile'     => 'Makefile',
-			make           => $Config::Config{make},
-			manifest       => 'MANIFEST',
-			debug          => $ENV{RELEASE_DEBUG} || 0,
-			local_file     => undef,
-			remote_file    => undef,
-			input_fh       => *STDIN{IO},
-			output_fh      => *STDOUT{IO},
-			debug_fh       => *STDERR{IO},
-			null_fh        => IO::Null->new(),
-			quiet          => 0,
-			devnull        => File::Spec->devnull,
-			ignore_prereqs => '',
-			module_name    => undef,
-			%params,
-		   };
+		'Makefile.PL'  => 'Makefile.PL',
+		'Makefile'     => 'Makefile',
+		make           => $Config::Config{make},
+		manifest       => 'MANIFEST',
+		debug          => $ENV{RELEASE_DEBUG} || 0,
+		local_file     => undef,
+		remote_file    => undef,
+		input_fh       => *STDIN{IO},
+		output_fh      => *STDOUT{IO},
+		debug_fh       => *STDERR{IO},
+		null_fh        => IO::Null->new(),
+		quiet          => 0,
+		devnull        => File::Spec->devnull,
+		ignore_prereqs => '',
+		module_name    => undef,
+		%params,
+		};
 
 	foreach my $key ( keys %$defaults ) {
 		$self->{$key} = $defaults->{$key};
@@ -477,25 +477,25 @@ Added in 1.21.
 =cut
 
 sub perls {
-    my $self = shift;
+	my $self = shift;
 
-    my @perls = keys %{$self->{perls}};
+	my @perls = keys %{$self->{perls}};
 	$self->_debug( "perls at the start [@perls]" );
 
-    # Sort them
-    @perls =
-	map  { $_->[0] }
-	sort { $a->[2] <=> $b->[2] || $a->[3] <=> $b->[3] || $a->[0] cmp $b->[0] }
-	map  { [ $_->[0], ( $_->[1] =~ m/(perl5\.(?|([0-9]{3})_?([0-9]{2})|([0-9]{1,2})\.([0-9]+)))/) ] }
-	map  { [ $_, (m{.*/(.*)}) ] }
-	grep { -x $_ }
-	@perls;
+	# Sort them
+	@perls =
+		map  { $_->[0] }
+		sort { $a->[2] <=> $b->[2] || $a->[3] <=> $b->[3] || $a->[0] cmp $b->[0] }
+		map  { [ $_->[0], ( $_->[1] =~ m/(perl5\.(?|([0-9]{3})_?([0-9]{2})|([0-9]{1,2})\.([0-9]+)))/) ] }
+		map  { [ $_, (m{.*/(.*)}) ] }
+		grep { -x $_ }
+		@perls;
 
 	$self->_debug( "perls after filtering [@perls]" );
 	$self->_debug( "Testing with " . @perls . " perls" );
 
-    return @perls;
-    }
+	return @perls;
+	}
 
 =item add_a_perl( PATH )
 
@@ -572,7 +572,7 @@ Return the value of input_fh.
 =cut
 
 sub input_fh {
-    return $_[0]->{input_fh};
+	return $_[0]->{input_fh};
 }
 
 =item output_fh
@@ -720,7 +720,7 @@ sub build_makefile {
 		return;
 		}
 
-	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1" );
+	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1 0<&-" );
 
 	$self->_print( "done\n" );
 	}
@@ -783,8 +783,8 @@ sub test {
 				}
 			}
 
-          $self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
-          }
+			$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
+		}
 
 	$self->_print( "all tests pass\n" );
 	}
@@ -1379,8 +1379,8 @@ Read a line from whatever is in input_fh and return it.
 =cut
 
 sub _slurp {
-    my $fh = $_[0]->input_fh;
-    return <$fh>;
+	my $fh = $_[0]->input_fh;
+	return <$fh>;
 }
 
 =item _dashes()
@@ -1454,7 +1454,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

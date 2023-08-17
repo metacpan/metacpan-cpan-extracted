@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::RadioButton 0.36;
+package Tickit::Widget::RadioButton 0.37;
 class Tickit::Widget::RadioButton
    :strict(params)
    :isa(Tickit::Widget);

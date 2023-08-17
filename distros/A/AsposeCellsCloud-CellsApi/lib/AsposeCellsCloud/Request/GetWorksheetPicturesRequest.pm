@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPicturesRequest.name :   ,
-# GetWorksheetPicturesRequest.sheetName :   ,
-# GetWorksheetPicturesRequest.folder :   ,
-# GetWorksheetPicturesRequest.storageName :    
+# GetWorksheetPicturesRequest.name : The workbook name.  ,
+# GetWorksheetPicturesRequest.sheetName : The worksheet name.  ,
+# GetWorksheetPicturesRequest.folder : Original workbook folder.  ,
+# GetWorksheetPicturesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pictures' } = { 
-    	summary => '',
+    	summary => 'Get pictures description in worksheet.',
         params => $params,
         returns => 'PicturesResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

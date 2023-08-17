@@ -1,6 +1,11 @@
 #pragma once
 #include "panda/protocol/websocket/ClientParser.h"
+#include "panda/protocol/websocket/ConnectRequest.h"
 #include "panda/protocol/websocket/inc.h"
+#include "panda/unievent/Loop.h"
+#include "panda/unievent/SslContext.h"
+#include "panda/unievent/Timer.h"
+#include "panda/unievent/forward.h"
 #include "panda/unievent/websocket/ServerConnection.h"
 #include <panda/log.h>
 #include <panda/test/catch.h>
@@ -12,10 +17,19 @@
 // #include <catch2/matchers/catch_matchers_string.hpp>
 
 using namespace panda;
-using namespace panda::unievent;
+// using namespace panda::unievent;
 using namespace panda::unievent::test;
 using namespace panda::unievent::websocket;
-using Location = http::Server::Location;
+using Location = unievent::http::Server::Location;
+using unievent::SslContext;
+using unievent::Loop;
+using unievent::LoopSP;
+using unievent::StreamSP;
+using unievent::Pipe;
+using unievent::PipeSP;
+using unievent::Tcp;
+using unievent::TcpSP;
+
 
 #define VSSL "[v-ssl]"
 
@@ -80,7 +94,7 @@ struct ServerPair {
 
     void enable_echo();
     void autorespond(const string&);
-    
+
     void send (const string& str, Opcode = Opcode::TEXT);
 
     //RawResponseSP get_response ();

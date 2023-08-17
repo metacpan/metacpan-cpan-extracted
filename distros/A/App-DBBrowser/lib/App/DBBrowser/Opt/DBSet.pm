@@ -225,7 +225,7 @@ sub __group_readline_db {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $new_list = $tf->fill_form(
         $list,
-        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
+        { prompt => $prompt, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {

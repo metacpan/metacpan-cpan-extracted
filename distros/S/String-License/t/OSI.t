@@ -1,3 +1,7 @@
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
@@ -29,16 +33,16 @@ plan 26 + grep {defined} values %crufty;
 my $naming
 	= String::License::Naming::Custom->new( schemes => [qw(osi internal)] );
 
-sub scanner
+sub scanner ( $path, $state )
 {
-	my ($path)   = @_;
-	my $expected = $path->basename('.txt');
-	my $string   = $path->slurp_utf8;
-	my $got      = String::License->new(
+	my ( $expected, $string, $got, $todo );
+
+	$expected = $path->basename('.txt');
+	$string   = $path->slurp_utf8;
+	$got      = String::License->new(
 		string => $string,
 		naming => $naming,
 	)->as_text;
-	my $todo;
 
 	if ( exists $crufty{ $path->relative($CORPUS_DIR) } ) {
 		my $tolerated = $crufty{ $path->relative($CORPUS_DIR) };

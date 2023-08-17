@@ -1,5 +1,3 @@
-# $Id: Perl.pm,v 1.126 2009/02/02 01:18:27 turnstep Exp $
-
 package Net::SSH::Perl;
 use strict;
 use warnings;
@@ -27,7 +25,7 @@ eval {
     $HOSTNAME = hostname();
 };
 
-$VERSION = '2.14';
+$VERSION = '2.142';
 
 sub VERSION { $VERSION }
 
@@ -516,10 +514,10 @@ also be fully compatible with the "official" SSH implementation. If
 you find an SSH2 implementation that is not compatible with
 I<Net::SSH::Perl>, please let me know (email address down in
 I<AUTHOR & COPYRIGHTS>); it turns out that some SSH2 implementations
-have subtle differences from others. AES-CTR (C<aes256-ctr>, 
-C<aes192-ctr>, and C<aes128-ctr>) and Chacha20-Poly1305 ciphers are 
-currently supported for SSH2 encryption.  Deprecated ciphers 
-AES-CBC (C<aes256-cbc>, C<aes192-cbc>, and C<aes128-cbc>) 3DES 
+have subtle differences from others. AES-CTR (C<aes256-ctr>,
+C<aes192-ctr>, and C<aes128-ctr>) and Chacha20-Poly1305 ciphers are
+currently supported for SSH2 encryption.  Deprecated ciphers
+AES-CBC (C<aes256-cbc>, C<aes192-cbc>, and C<aes128-cbc>) 3DES
 (C<3des-cbc>), Blowfish (C<blowfish-cbc>), and RC4 (C<arcfour>)
 are available but not enabled by default.  One can enable them by
 using the Ciphers options parameter. For example:
@@ -528,7 +526,7 @@ using the Ciphers options parameter. For example:
 
 Using the + notation will append a cipher to the default ciphers list.
 
-Integrity checking is performed by the C<hmac-sha2-256>, 
+Integrity checking is performed by the C<hmac-sha2-256>,
 C<hmac-sha2-512>, C<hmac-sha2-256-etm@openssh.com>, or
 C<hmac-sha2-512-etm@openssh.com> algorithms.  The deprecated C<hmac-sha1>
 or C<hmac-md5> algorithms are available but not enabled by default.  Many
@@ -537,11 +535,11 @@ MAC algorithm.  To enable this, use the following options parameter:
 
     options => [ "MACs +hmac-sha1" ]
 
-Compression, if requested, is limited to Zlib. 
+Compression, if requested, is limited to Zlib.
 
 Supported server host key algorithms are C<ssh-ed25519>, C<rsa-sha2-512>,
 C<rsa-sha2-256>, C<ecdsa-sha2-nistp521>, C<ecdsa-sha2-nistp384>,
-C<ecdsa-sha2-nistp256>, and C<ssh-rsa>.  Deprecated C<ssh-dss> is 
+C<ecdsa-sha2-nistp256>, and C<ssh-rsa>.  Deprecated C<ssh-dss> is
 supported but not enabled by default.  It can be enabled with the options
 parameter:
 
@@ -549,11 +547,11 @@ parameter:
 
 Supported SSH2 public key authentication algorithms are the same.
 
-Supported Key Exchange (KEX) algorithms are C<diffie-hellman-group1-sha1>, 
-C<diffie-hellman-group14-sha1>, c<diffie-hellman-group14-sha256>, 
-C<diffie-hellman-group16-sha512>, C<diffie-hellman-group18-sha512>, 
-C<diffie-hellman-group-exchange-sha256>, C<diffie-hellman-group-exchange-sha1>, 
-and C<curve25519-sha256@libssh.org>/C<curve25519-sha256>.  The 
+Supported Key Exchange (KEX) algorithms are C<diffie-hellman-group1-sha1>,
+C<diffie-hellman-group14-sha1>, c<diffie-hellman-group14-sha256>,
+C<diffie-hellman-group16-sha512>, C<diffie-hellman-group18-sha512>,
+C<diffie-hellman-group-exchange-sha256>, C<diffie-hellman-group-exchange-sha1>,
+and C<curve25519-sha256@libssh.org>/C<curve25519-sha256>.  The
 C<diffie-hellman-group1-sha1> algorithm is disabled by default, but can
 be activated via the options parameter:
 
@@ -804,12 +802,12 @@ Or:
 
     Ciphers +aes*-cbc
 
-will add aes128-cbc, aes192-cbc, and aes256-cbc to the default Ciphers 
+will add aes128-cbc, aes192-cbc, and aes256-cbc to the default Ciphers
 
 While:
 
     KexAlgorithms -*-sha512
-    
+
 will remove all algorithms that end in -sha512 from the default list.
 
 =back
@@ -920,7 +918,7 @@ to be called at specific times.
 
 The behavior of the I<register_handler> method differs between
 the I<Net::SSH::Perl> SSH-1 and SSH-2 implementations. This is so
-because of the differences between the protocols (all 
+because of the differences between the protocols (all
 client-server communications in SSH-2 go through the channel
 mechanism, which means that input packets are processed
 differently).

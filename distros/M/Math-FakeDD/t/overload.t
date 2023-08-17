@@ -10,7 +10,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.07, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.08, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 
@@ -145,8 +145,12 @@ cmp_ok(Math::FakeDD->new('1.4'), 'ne', '[1.3 -4.4408920985006264e-17]', "dd_strn
 # I haven't found a way of invoking the '0+'
 # overloading, so test dd_numify() instead.
 
-my $dd = dd_numify(Math::FakeDD->new(2 ** 10) + Math::FakeDD->new(2 ** 70));
-cmp_ok( $dd, '==', (2 ** 10) + (2 ** 70), "'dd_numify' ok");
+my $dd = Math::FakeDD->new((2 ** -10) + (2 ** 10)) + Math::FakeDD->new((2 ** 70) + (2 ** 90));
+my $numify_check = mpfr2098(2 ** -10);
+Math::MPFR::Rmpfr_add_d($numify_check, $numify_check, 2 ** 10, 0);
+Math::MPFR::Rmpfr_add_d($numify_check, $numify_check, 2 ** 70, 0);
+Math::MPFR::Rmpfr_add_d($numify_check, $numify_check, 2 ** 90, 0);
+cmp_ok( dd_numify($dd), '==', $numify_check, "'dd_numify' ok");
 
 my $dbl_max = Math::MPFR::Rmpfr_get_d(Math::MPFR->new('1.7976931348623157e+308'), 0);
 

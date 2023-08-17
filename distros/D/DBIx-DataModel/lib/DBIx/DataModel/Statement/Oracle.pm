@@ -33,33 +33,32 @@ sub sqlize {
   # remove -limit and -offset from args; they will be handled later in
   # prepare() and execute(), see below
   $self->{_ora_limit}  = delete $self->{args}{-limit};
-  $self->{offset}      = delete $self->{args}{-offset};
+  $self->{_ora_offset} = delete $self->{args}{-offset};
 
   # if there is an offset, we must ask for a scrollable statement
   $self->refine(-prepare_attrs => 
                   {ora_exe_mode => OCI_STMT_SCROLLABLE_READONLY})
-     if $self->{offset};
+     if $self->{_ora_offset};
 
   return $self->next::method();
 }
 
 
-# recompute page size/index from limit/offset
+# recompute page size/index from _ora_* fields
 sub page_size   { my $self = shift;
                   $self->{_ora_limit}  || POSIX::LONG_MAX            }
 sub page_index  { my $self = shift;
-                  int(($self->{offset} || 0) / $self->page_size) + 1 }
-
+                  my $offset = $self->{_ora_offset} || 0;
+                  return int($offset / $self->page_size) + 1 }
 
 
 sub execute {
   my ($self, @args) = @_;
   $self->next::method(@args);
 
-  # go to initial offset, if needed 
-  if ($self->{offset}) {
-    $self->{sth}->ora_fetch_scroll(OCI_FETCH_ABSOLUTE, $self->{offset});
-    $self->{row_num} = $self->{offset};
+  # go to initial offset, if needed
+  if (my $offset = $self->{_ora_offset}) {
+    $self->{sth}->ora_fetch_scroll(OCI_FETCH_ABSOLUTE, $offset);
   }
   return $self;
 }

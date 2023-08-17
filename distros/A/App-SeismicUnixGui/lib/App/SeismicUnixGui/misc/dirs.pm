@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::dirs;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: dirs
+ PERL PERL PROGRAM NAME: dirs
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 5 2018
 

@@ -2,7 +2,7 @@ package builtin::compat;
 use strict;
 use warnings;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002001';
 $VERSION =~ tr/_//d;
 
 use namespace::clean ();
@@ -20,7 +20,7 @@ sub created_as_string ($);
 sub created_as_number ($);
 sub ceil ($);
 sub floor ($);
-sub trim;
+sub trim ($);
 sub indexed;
 
 BEGIN { eval { require builtin } }
@@ -100,7 +100,7 @@ sub floor ($) {
 }
 END_CODE
   trim      => sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE',
-sub trim {
+sub trim ($) {
   my $string = shift;
   s/\A\s+//, s/\s+\z// for $string;
   return $string;
@@ -139,7 +139,9 @@ while (my ($sub, $fb) = splice @fb, 0, 2) {
     $code .= $fb . "\n";
   }
 
-  *{'builtin::'.$sub} = \&$sub;
+  if (!defined &{'builtin::'.$sub}) {
+    *{'builtin::'.$sub} = \&$sub;
+  }
 }
 
 my $e;

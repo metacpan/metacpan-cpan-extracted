@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use Object::Pad 0.70;
 
-package Text::Treesitter::Tree 0.06;
+package Text::Treesitter::Tree 0.10;
 class Text::Treesitter::Tree
    :strict(params);
 
@@ -21,7 +22,19 @@ C<Text::Treesitter::Tree> - holds the result of a F<tree-sitter> parse operation
 
 =head1 SYNOPSIS
 
-   TODO
+Usually accessed indirectly, via C<Text::Treesitter>.
+
+   use Text::Treesitter;
+
+   my $ts = Text::Treesitter->new(
+      lang_name => "perl",
+   );
+
+   my $tree = $ts->parse_string( $input );
+
+   my $root = $tree->root_node;
+
+   ...
 
 =head1 DESCRIPTION
 

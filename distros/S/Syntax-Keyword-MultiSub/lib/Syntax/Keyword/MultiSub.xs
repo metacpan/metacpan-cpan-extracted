@@ -129,6 +129,7 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 redo:
     switch(o->op_type) {
       case OP_NEXTSTATE:
+      case OP_DBSTATE:
         o = o->op_next;
         goto redo;
 

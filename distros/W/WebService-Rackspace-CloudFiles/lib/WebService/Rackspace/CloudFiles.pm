@@ -11,7 +11,7 @@ use LWP::UserAgent::Determined;
 use URI::QueryParam;
 use JSON::Any;
 use Carp qw(confess);
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 my $DEBUG = 0;
 
@@ -150,7 +150,7 @@ sub _authenticate {
     $self->is_authenticated(0);
 
     confess 'Unauthorized'  if $response->code == 401;
-    confess 'Unknown error' if $response->code != 204;
+    confess 'Unknown error' if !$response->is_success;
 
     my $storage_url = $response->header('X-Storage-Url')
         || confess 'Missing storage url';
@@ -201,7 +201,7 @@ sub containers {
         [ 'X-Auth-Token' => $self->token ] );
     my $response = $self->_request($request);
     return if $response->code == 204;
-    confess 'Unknown error' if $response->code != 200;
+    confess 'Unknown error' if !$response->is_success;
     my @containers;
 
     foreach my $container_data ( @{JSON::Any->from_json($response->content)} ) {

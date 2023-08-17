@@ -1,0 +1,66 @@
+
+=pod
+
+=head1 NAME
+
+  Math::Int113 - 113-bit integer arithmetic
+
+=head1 DESCRIPTION
+
+  113-bit integer arithmetic using perl's native arithmetic operations.
+  This requires that perl's NV either is '__float128' or the IEEE 754
+  'long double'.
+  This module will fail to build && fail to load if that requirement is not
+  met.
+
+=head1 SYNOPSIS
+
+  use Math::Int113;
+
+  A Math::Int113 object holds, by definition, an (113-bit) integer value in
+  the range:
+  -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
+
+  All integer values in that range are representable as Math::Int113 objects.
+
+  -10384593717069655257060992658440192 and 10384593717069655257060992658440192
+  are both also exactly representable, but we exclude them because
+  -10384593717069655257060992658440193 and 10384593717069655257060992658440193
+  round to (respectively) the same values.
+
+  Inf and NaN values will cause fatal errors. (Both will be reported as
+  "overflows", though this is perhaps not strictly accurate with respect
+  to NaN.)
+
+  Any perl scalar, $x, will be evaluated as int($x), except for scalars used
+  in '**' and '**=' operations, where they will be evaluated as per normal.
+  This allows (eg) for $obj**0.5 to be evlauated as int(sqrt($obj)) rather
+  simply as $obj**0 (which is 1).
+
+  my $a = Math::Int113->new('123.5') # $a holds value of 123
+  my $b = $a + 42.5; # $b holds value of 165
+  $b += 35;          # $b holds value of 200
+  print $b, "\n";    # prints 200
+  $b /= 10.6;        # $b holds value of 20
+  $c = $b ** 0.5;    # $c holds value of int(sqrt(20))
+  print $c;          # prints 4.
+
+=head1 FUNCTIONS
+
+  No functions are provided, except for new() and the subroutines that are
+  responsible for overloading the  '+', '-', '*', '/', '**', '++', '--',
+  '>=', '<=', '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=',
+  '**=', '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^='
+  (and perhaps other) operations.
+
+head1 LICENSE
+
+  This program is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+  Copyright 2023, Sisyphus
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

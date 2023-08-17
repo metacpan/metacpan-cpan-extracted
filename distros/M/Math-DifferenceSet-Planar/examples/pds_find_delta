@@ -3,7 +3,7 @@
 use 5.022;
 use strict;
 use warnings;
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 0.009;
 
 $| = 1;
 
@@ -28,6 +28,7 @@ while (<<>>) {
 }
 
 __END__
+
 =head1 NAME
 
 pds_find_delta - find pairs of difference set elements with given difference
@@ -55,7 +56,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2020-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

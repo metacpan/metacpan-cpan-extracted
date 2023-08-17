@@ -1,4 +1,6 @@
-2.1.5    xx.xx.2021
+2.1.6    20.07.2023
+           - upgrade tests for catch-v3
+2.1.5    26.11.2021
            - upgrade tests for catch-v3
 2.1.4    09.11.2021
            - bugfix: path_segments() didn't decode last segments

@@ -10,7 +10,7 @@ use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iVpicks2par 
+ PERL PROGRAM NAME: iVpicks2par 
  AUTHOR: Juan Lorenzo
  DATE:   Nov 1 2012,
          sept. 13 2013

@@ -11,16 +11,15 @@ struct spvm_var_decl {
   SPVM_TYPE* type;
   SPVM_VAR* var;
   SPVM_OP* op_optional_arg_default;
-  int32_t id;
-  int32_t mem_id;
-  int32_t arg_id;
-  int8_t is_tmp;
+  const char* name;
+  int32_t index;
+  int32_t runtime_var_index;
+  int32_t arg_stack_index;
   int8_t is_arg;
-  int8_t is_eternal;
 };
 
 SPVM_VAR_DECL* SPVM_VAR_DECL_new();
 
-SPVM_VAR_DECL* SPVM_VAR_DECL_new_eternal(SPVM_COMPILER* compiler);
+SPVM_VAR_DECL* SPVM_VAR_DECL_new_arg(SPVM_COMPILER* compiler);
 
 #endif

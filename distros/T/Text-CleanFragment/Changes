@@ -1,3 +1,8 @@
+0.06 2023-07-07
+  * Remove -T from tests
+  * Documentation updates
+  * No code changes, no need to upgrade
+
 0.05 2022-10-25
   * Fix regex in synopsis
   * Add another test

@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -396,7 +396,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 
@@ -599,7 +599,7 @@ use B<-s> I<service> when making requests.
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2021 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

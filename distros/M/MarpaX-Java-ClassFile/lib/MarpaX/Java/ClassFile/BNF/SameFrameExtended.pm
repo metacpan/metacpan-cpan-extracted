@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a same_frame_extended
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -60,7 +60,7 @@ MarpaX::Java::ClassFile::BNF::SameFrameExtended - Parsing of a same_frame_extend
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

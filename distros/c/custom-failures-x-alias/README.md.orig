@@ -1,0 +1,201 @@
+# NAME
+
+custom::failures::x::alias - export aliases for custom::failures
+
+# VERSION
+
+version 0.03
+
+# SYNOPSIS
+
+    package MyApp::failure;
+    use custom::failures::x::alias qw/io::flie io::network/;
+
+# DESCRIPTION
+
+This package creates importable alias subroutines for failure classes created by [custom::failures](https://metacpan.org/pod/custom%3A%3Afailures).
+
+Typically, you use [custom::failures](https://metacpan.org/pod/custom%3A%3Afailures) like this:
+
+    package MyApp::failure;
+    use custom::failures qw/io::flie io::network/;
+
+and later
+
+    package MyApp;
+    use MyApp::failure;
+
+    # somewhere deep in your code
+    MyApp::failure::io::flie->throw();
+
+["custom::failures::x::alias"](#custom-failures-x-alias) creates shortened aliases so that you don't have to type so much:
+
+    package MyApp::failure;
+    use custom::failures::x::alias qw/io::flie io::network/;
+
+and later,
+
+    package MyApp;
+    use MyApp::failure ':all'
+
+    # somewhere deep in your code
+    io_flie->throw;
+    io_network->throw;
+
+# USAGE
+
+## Simple usage
+
+Use it like you would `custom::failures`.
+
+    package MyApp::failure;
+    use custom::failures::x::alias qw/io::flie io::network/;
+
+This will create alias subroutines `MyApp::failure::io_flie` and `MyApp::failure::io_network`,
+and make them importable. When using `MyApp::failure`, either import specific aliases:
+
+    package MyApp;
+    use MyApp::failure qw( io_flie );
+
+    io_flie->throw;
+
+Or import them all:
+
+    package MyApp;
+    use MyApp::failure ':all';
+
+    io_flie->throw;
+
+## Modifying the alias subroutine names
+
+The names of the alias subroutines may be modified by passing options
+to `custom::failures::x::alias` preceding the list of failure
+classes, e.g.
+
+    package MyApp::failure;
+    use custom::failures::x::alias  -prefix => $pfx, @failures;
+
+The options are:
+
+- _-prefix_ => $prefix
+
+    The next element in the list is a string which will be prepended to
+    the normalized class names.  For example,
+
+        use custom::failures::x::alias  -prefix => 'failure_, 'io::flie';
+
+    results in a alias name of
+
+        failure_io_flie
+
+- _-suffix_ => $suffix
+
+    The next element in the list is a string which will be appended to
+    the normalized class names.  For example,
+
+        use custom::failures::x::alias  -suffix => '_failure', 'io::flie';
+
+    results in a alias name of
+
+        io_flie_failure
+
+- _-alias_ => $coderef
+
+    This hands over complete control.  `$coderef` should return
+    a legal Perl subroutine name and is called as
+
+        $alias_name = $coderef->( $class_name, \%opt);
+
+    where `$class_name` is the name passed via the `use` statement, and
+    `%opt` has entries for `-suffix` and `-prefix` if specified, e.g.
+
+        use custom::failures::x::alias
+          -suffix => '_failure',
+           -alias => \&mysub, 'io::flie';
+
+    results in a call to `mysub`:
+
+        mysub( 'io::flie', { -suffix => _failure } );
+
+    The default routine looks like this:
+
+        sub _alias {
+            my ( $failure, $opt ) = @_;
+            $failure =~ s/::/_/g;
+            return ($opt->{-prefix} // '')  . $failure . ($opt->{-suffix} // '') ;
+        }
+
+- _-export_
+
+    If this option is present (it takes no argument), aliases are unconditionally exported.
+
+- _-exporter_ => $class
+
+    This will change which exporter is used.  By default the standard [Exporter](https://metacpan.org/pod/Exporter) class is used.
+    A useful alternative is [Exporter::Tiny](https://metacpan.org/pod/Exporter%3A%3ATiny), which allows the user of your failure module to
+    dynamically alter the imported alias names, e.g.:
+
+        package MyApp::failure;
+        use custom::failures::x::alias
+           -exporter => 'Exporter::Tiny', qw/io::flie io::network/;
+
+    and later,
+
+        package MyApp;
+        use MyApp::failure { suffix => '_failure' }, -all;
+
+        # somewhere deep in your code
+        io_flie_failure->throw;
+        io_network_failure->throw;
+
+    An alternative is for the user of your failure module to use [Importer](https://metacpan.org/pod/Importer).
+
+# HOW IT WORKS
+
+[custom::failures::x::alias](https://metacpan.org/pod/custom%3A%3Afailures%3A%3Ax%3A%3Aalias) does the following:
+
+1. It uses [custom::failures](https://metacpan.org/pod/custom%3A%3Afailures) to create the specified classes in the caller's namespace.
+2. For each class it installs an alias subroutine with a shortened and
+normalized name into the caller's namespace.
+3. It makes the caller an exporter, either by installing the `import`
+routine from [Exporter](https://metacpan.org/pod/Exporter) into the caller's namespace, or making the caller a subclass of a user
+specified exporter class (e.g. [Exporter::Tiny](https://metacpan.org/pod/Exporter%3A%3ATiny)).
+4. It adds the aliases to the caller's  `@EXPORT_OK` or (optionally) `@EXPORT`.
+5. It adds the aliases to the `all` entry in the caller's  `%EXPORT_TAGS`;
+
+# SUPPORT
+
+## Bugs
+
+Please report any bugs or feature requests to bug-custom-failures-x-alias@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=custom-failures-x-alias
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/custom-failures-x-alias
+
+and may be cloned from
+
+    https://gitlab.com/djerius/custom-failures-x-alias.git
+
+# SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+- [custom::failures](https://metacpan.org/pod/custom%3A%3Afailures)
+- [Exporter](https://metacpan.org/pod/Exporter)
+- [Exporter::Tiny](https://metacpan.org/pod/Exporter%3A%3ATiny)
+- [Importer](https://metacpan.org/pod/Importer)
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

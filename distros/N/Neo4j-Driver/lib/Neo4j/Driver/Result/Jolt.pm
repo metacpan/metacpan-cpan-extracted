@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.36';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -122,7 +122,7 @@ sub _gather_results {
 		});
 	}
 	
-	$params->{error_handler}->($error) if ref $error;
+	$self->{info}->{_error} = $error if ref $error;
 	$self->{http_agent} = undef;
 	
 	if (@results == 1) {

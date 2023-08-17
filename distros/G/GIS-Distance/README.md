@@ -25,7 +25,7 @@ This module calculates distances between geographic points on, at the moment,
 planet Earth.  Various ["FORMULAS"](#formulas) are available that provide different levels
 of accuracy versus speed.
 
-[GIS::Distance::Fast](https://metacpan.org/pod/GIS%3A%3ADistance%3A%3AFast), a separate distribution, ships with C implmentations of
+[GIS::Distance::Fast](https://metacpan.org/pod/GIS%3A%3ADistance%3A%3AFast), a separate distribution, ships with C implementations of
 some of the formulas shipped with GIS::Distance.  If you're looking for speed
 then install it and the ::Fast formulas will be automatically used by this module.
 
@@ -215,11 +215,17 @@ GIS-Distance GitHub issue tracker:
 
 [https://github.com/bluefeet/GIS-Distance/issues](https://github.com/bluefeet/GIS-Distance/issues)
 
-# AUTHORS
+# AUTHOR
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>
+```
+
+# CONTRIBUTORS
+
+```
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Florian Schlichting <fsfs@debian.org>
 ```
 
 # LICENSE

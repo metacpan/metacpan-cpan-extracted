@@ -10,7 +10,7 @@ use Unicode::UTF8 qw(encode_utf8);
 use WQS::SPARQL;
 use WQS::SPARQL::Result;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -97,6 +97,18 @@ sub _reconcile {
 	my @sparql;
 
 	return @sparql;
+}
+
+sub _exists_id {
+	my ($self, $reconcilation_rules_hr, $id) = @_;
+
+	if (exists $reconcilation_rules_hr->{'identifiers'}->{$id}
+		&& defined $reconcilation_rules_hr->{'identifiers'}->{$id}) {
+
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 1;
@@ -254,7 +266,7 @@ L<WQS::SPARQL::Result>.
 
 =item L<Wikidata::Reconcilation::Periodical>
 
-TODO
+Wikidata reconcilation class for periodical.
 
 =back
 
@@ -276,6 +288,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

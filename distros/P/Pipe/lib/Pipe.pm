@@ -6,7 +6,7 @@ use 5.006;
 use Want qw(want);
 our $DEBUG;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub logger {
     my ($self, $msg, $class) = @_;
@@ -96,7 +96,7 @@ DESTROY {
 
 =head1 NAME
 
-Pipe - Framework to create pipes using iterators
+Pipe - Framework for creating pipes using iterators
 
 =head1 SYNOPSIS
 
@@ -392,21 +392,17 @@ Perl with Pipe:
 
 Probably plenty but nothing I know of. Please report them to the author.
 
-=head1 Development
-
-The Subversion repository is here: http://svn1.hostlocal.com/szabgab/trunk/Pipe/
-
 =head1 Thanks
 
 to Gaal Yahas
 
 =head1 AUTHOR
 
-Gabor Szabo <gabor@pti.co.il>
+Gabor Szabo L<http://szabgab.com/>
 
 =head1 COPYRIGHT
 
-Copyright 2006 by Gabor Szabo <gabor@pti.co.il>.
+Copyright 2006 by Gabor Szabo <szabgab@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -1,5 +1,7 @@
 package WWW::Yandex::Catalog::LookupSite;
 
+# ABSTRACT: DEPRECATED
+
 # Last updated July 27, 2014
 #
 # Author:       Irakliy Sunguryan ( www.sochi-travel.info )
@@ -9,7 +11,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION    = '0.11';
+$VERSION    = '0.12';
 
 use LWP::UserAgent;
 
@@ -190,7 +192,13 @@ __END__
 
 =head1 NAME
 
-WWW::Yandex::Catalog::LookupSite - Query Yandex Catalog for a website's presence, its Index of Citing, descriptions, and the list of categories it belongs to.
+WWW::Yandex::Catalog::LookupSite - DEPRECATED
+
+DEPRECATION NOTE: Yandex closed it's Yandex.Catalog service in 2017, and replaced it's Thematic Index of Citing (тИЦ) with Quality Index of Site (ИКС) in 2018. Thus, this module is deprecated.
+
+---
+
+Query Yandex Catalog for a website's presence, its Index of Citing, descriptions, and the list of categories it belongs to.
 
 =head1 SYNOPSIS
 

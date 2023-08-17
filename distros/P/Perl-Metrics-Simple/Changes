@@ -1,5 +1,21 @@
 Revision history for Perl module Perl::Metrics::Simple
 
+v1.0.3 - August 2023
+  Fix https://github.com/matisse/Perl-Metrics-Simple/issues/16
+
+  - Change an import in `countperl` to use a version number literal.
+  - Fix various issues found by Test::Perl::Critic
+
+v1.0.2 - July 2023
+  Fix https://github.com/matisse/Perl-Metrics-Simple/issues/12
+
+  - Change `_rewrite_moose_method_modifiers` in
+    `Perl/Metrics/Simple/Analysis/File.pm` to check if a node supports the
+    `literal` method and use `string` instead if it does not.
+    Changes based on contribution by https://github.com/jwrightecs
+
+  - Fix typos in File.pm (thank you Florian Schlichting, fschlich)
+
 v1.0.1 - March 2021
   Fix https://github.com/matisse/Perl-Metrics-Simple/issues/9
     

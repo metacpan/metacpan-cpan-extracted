@@ -1,3 +1,13 @@
+1.0  2023-06-16
+	- The module is now considered stable. Version bumped to 1.0.
+	- Setting the environment variable $LANGUAGE no longer prevents
+	  the module from working correctly (github issue
+	  https://github.com/gflohr/Template-Plugin-Gettext/issues/18)
+	- Other ssues fixed:
+	  o https://github.com/gflohr/Template-Plugin-Gettext/issues/11
+	  o https://github.com/gflohr/Template-Plugin-Gettext/issues/13
+	  o https://github.com/gflohr/Template-Plugin-Gettext/issues/14
+
 0.8  2023-03-15
 	- Fixed spelling errors.
 	- Documentation.

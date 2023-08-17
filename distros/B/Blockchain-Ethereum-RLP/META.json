@@ -4,7 +4,7 @@
       "Reginaldo Costa <refeco@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -27,19 +27,17 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.70"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.50",
+            "Object::PAD" : "0.79",
             "perl" : "5.026000"
          }
       },
       "test" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -50,6 +48,6 @@
          "web" : "https://github.com/refeco/perl-RLP"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

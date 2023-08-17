@@ -513,8 +513,9 @@
    FUNCTIONS" regarding permissible string formats.
    The following operators are overloaded:
 
-    + - * /
-    += -= *= /= ++ --
+    + - * / **
+    += -= *= /= **=
+    ++ --
     == != !
     < <= > >= <=>
     "" abs 0+
@@ -538,9 +539,20 @@
     eg - do ($mpfr_obj > $mpq_obj), not ($mpq_obj < $mpfr_obj).
 
 
-    Math::GMPz (or Math::GMP) objects can be used only with the
+    Math::GMPz and Math::GMP and objects can be used with the
     comparison operators ( == != < <= > >= <=> ) and with the '+', '+=',
     '-', '-=', '*', '*=', '/', '/=', '**' and '**=' operators.
+
+    Math::MPFR objects can be used  with '+', '-', '*', '/' and '**'
+    operators - in which case the operation will return a Math::MPFR
+    object.
+    If $Math::GMPq::RETYPE is set to 1, then Math::MPFR objects can
+    also be used with '+=', '*=', '-=', '/=' and '**=' operators.
+    In such instances, the Math::GMPz object is set ("retyped" to a
+    Math::MPFR object that contains the result of the operation,
+    subject to the precision of the Math::MPFR object and the
+    default rounding mode being used.
+    $Math::GMPq::RETYPE is initially set to 0 (false).
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is

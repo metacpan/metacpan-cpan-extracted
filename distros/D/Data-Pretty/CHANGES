@@ -1,0 +1,18 @@
+Revision history for Perl module Data::Pretty
+
+v0.1.3 2023-08-08T11:06:02+0900
+    - Corrected some errors
+    - Added the global variable $CODE_DEPARSE set to true by default to reproduce the perl code of anonymous subroutines
+    - Changed default indent $INDENT to 4 spaces instead of 2
+    - Improve unit tests
+
+v0.1.2 2023-08-07T18:58:26+0900
+    - Use of qw( ) to list words
+
+v0.1.1 2023-08-06T21:09:26+0900
+    - Minor correction to the documentation
+    - Removed surrounding double quotes around hash keys that do not need it
+      (alphanumeric keys and numbers)
+
+v0.1.0 2023-08-06T10:01:50+0900
+	- Initial version

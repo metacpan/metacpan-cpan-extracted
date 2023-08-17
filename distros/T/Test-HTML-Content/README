@@ -1,26 +1,73 @@
-Test::HTML::Content version 0.09
-=========================
+Test::HTML::Content - Perl extension for testing HTML output
 
-This module provides an easy way to test elements of 
-generated HTML. It is intended for tests of templating
-systems or generally generated HTML.
+DESCRIPTION
+
+This is a module to test the HTML output of your programs in simple
+test scripts. It can test a scalar (presumably containing HTML) for
+the presence (or absence, or a specific number) of tags having (or
+lacking) specific attributes. Unspecified attributes are ignored,
+and the attribute values can be specified as either scalars (meaning
+a match succeeds if the strings are identical) or regular expressions
+(meaning that a match succeeds if the actual attribute value is matched
+by the given RE) or undef (meaning that the attribute must not
+be present).
+
+If you want to specify or test the deeper structure
+of the HTML (for example, META tags within the BODY) or the (textual)
+content of tags, you will have to resort to C<xpath_ok>,C<xpath_count>
+and C<no_xpath>, which take an XPath expression. If you find yourself crafting
+very complex XPath expression to verify the structure of your output, it is
+time to rethink your testing process and maybe use a template based solution
+or simply compare against prefabricated files as a whole.
+
+The used HTML parser is HTML::TokeParser, the used XPath module
+is XML::XPath or XML::LibXML. XML::XPath needs valid xHTML, XML::LibXML
+will try its best to force your code into xHTML, but it is best to
+supply valid xHTML (snippets) to the test functions.
+
+If no XPath parsers/interpreters are available, the tests will automatically
+skip, so your users won't need to install XML::XPath or XML::LibXML. The module
+then falls back onto a crude implementation of the core functions for tags,
+links, comments and text, and the diagnostic output of the tests varies a bit.
+
+The test functionality is derived from L<Test::Builder>, and the export
+behaviour is the same. When you use Test::HTML::Content, a set of
+HTML testing functions is exported into the namespace of the caller.
+
 
 INSTALLATION
 
-To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-HTML::TokeParser to parse the HTML
-Test::Builder    to implement test functionality
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-COPYRIGHT AND LICENCE
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002-2013 Max Maischein, corion@cpan.org
+
+
+
+
+
+SEE ALSO
+
+perl(1), L<Test::Builder>,L<Test::Simple>,L<Test::HTML::Lint>.
+
+AUTHOR
+
+Max Maischein E<lt>corion@cpan.orgE<gt>
+
+LICENSE
+
+This code may be distributed under the same terms as Perl itself.
+

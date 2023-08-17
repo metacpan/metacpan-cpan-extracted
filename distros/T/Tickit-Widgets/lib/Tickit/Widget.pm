@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget 0.56;
+package Tickit::Widget 0.57;
 class Tickit::Widget :repr(HASH);
 
 use experimental 'postderef';

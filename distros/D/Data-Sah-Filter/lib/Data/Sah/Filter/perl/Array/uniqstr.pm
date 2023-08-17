@@ -5,14 +5,14 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
         v => 1,
-        summary => 'Make an array uniq using List::Util\'s uniq() (synonym for uniq)',
+        summary => 'Make an array uniq using List::Util\'s uniqstr() (synonym for uniq)',
         target_type => 'array',
         args => {
         },
@@ -32,14 +32,14 @@ sub filter {
     $res->{modules}{'List::Util'} = 1.54;
     $res->{expr_filter} = join(
         "",
-        "[List::Util::uniq(\@{ $dt })]",
+        "[List::Util::uniqstr(\@{ $dt })]",
     );
 
     $res;
 }
 
 1;
-# ABSTRACT: Make an array uniq using List::Util's uniq() (synonym for uniq)
+# ABSTRACT: Make an array uniq using List::Util's uniqstr() (synonym for uniq)
 
 __END__
 
@@ -49,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Filter::perl::Array::uniqstr - Make an array uniq using List::Util's uniq() (synonym for uniq)
+Data::Sah::Filter::perl::Array::uniqstr - Make an array uniq using List::Util's uniqstr() (synonym for uniq)
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Array::uniqstr (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Array::uniqstr (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 

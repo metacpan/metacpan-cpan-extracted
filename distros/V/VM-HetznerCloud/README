@@ -1,0 +1,90 @@
+NAME
+
+    VM::HetznerCloud - Perl library to work with the API for the Hetzner
+    Cloud
+
+VERSION
+
+    version 0.0.3
+
+SYNOPSIS
+
+        use VM::HetznerCloud;
+    
+        my $cloud = VM::HetznerCloud->new(
+            token => 'ABCDEFG1234567',    # your api token
+        );
+    
+        my $server_client = $cloud->server;
+        my $server_list   = $server_client->list;
+
+ATTRIBUTES
+
+      * base_uri
+
+      (optional) Default: v1
+
+      * client
+
+      (optional) A Mojo::UserAgent compatible user agent. By default a new
+      object of Mojo::UserAgent is created.
+
+      * host
+
+      (optional) This is the URL to Hetzner's Cloud-API. Defaults to
+      https://api.hetzner.cloud
+
+      * token
+
+      (required) Your API token.
+
+METHODS
+
+ actions
+
+ certificates
+
+ datacenters
+
+ firewalls
+
+ floating_ips
+
+ images
+
+ isos
+
+ load_balancer_types
+
+ load_balancers
+
+ locations
+
+ networks
+
+ placement_groups
+
+ pricing
+
+ primary_ips
+
+ server_types
+
+ servers
+
+ ssh_keys
+
+ volumes
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

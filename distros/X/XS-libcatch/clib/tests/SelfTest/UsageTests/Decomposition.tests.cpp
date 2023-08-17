@@ -1,7 +1,10 @@
-/*
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
 
 #include <iostream>
 #include <cstdio>
@@ -29,8 +32,10 @@ TEST_CASE( "Reconstruction should be based on stringification: #914" , "[Decompo
     CHECK(truthy(false));
 }
 
-TEST_CASE("#1005: Comparing pointer to int and long (NULL can be either on various systems)", "[Decomposition]") {
+TEST_CASE("#1005: Comparing pointer to int and long (NULL can be either on various systems)", "[Decomposition][approvals]") {
     FILE* fptr = nullptr;
-    REQUIRE(fptr == 0);
-    REQUIRE(fptr == 0l);
+    REQUIRE( fptr == 0 );
+    REQUIRE_FALSE( fptr != 0 );
+    REQUIRE( fptr == 0l );
+    REQUIRE_FALSE( fptr != 0l );
 }

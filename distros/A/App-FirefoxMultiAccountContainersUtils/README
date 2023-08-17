@@ -3,30 +3,110 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.015 of
+    This document describes version 0.017 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
+    App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to Firefox
     multi-account containers addon:
 
-    *   firefox-container
-
-    *   firefox-mua-list-containers
-
-    *   firefox-mua-modify-containers
-
-    *   firefox-mua-sort-containers
-
-    *   open-firefox-container
+    1. firefox-container
+    2. firefox-mua-add-container
+    3. firefox-mua-dump-identities-json
+    4. firefox-mua-list-containers
+    5. firefox-mua-modify-containers
+    6. firefox-mua-sort-containers
+    7. open-firefox-container
 
     About the add-on:
     <https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers
     />.
 
 FUNCTIONS
+  firefox_mua_add_container
+    Usage:
+
+     firefox_mua_add_container(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Add a new Firefox Multi-Account container.
+
+    This utility will copy the last container record, change the name to the
+    one you specify, and add it to the list of containers. You can also set
+    some other attributes.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color => *str*
+
+        (No description)
+
+    *   icon => *str*
+
+        (No description)
+
+    *   name => *str*
+
+        Name for the new container.
+
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  firefox_mua_dump_identities_json
+    Usage:
+
+     firefox_mua_dump_identities_json(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Dump the content of identities.json.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   firefox_mua_list_containers
     Usage:
 
@@ -38,7 +118,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   profile* => *firefox::local_profile_name*
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -97,7 +179,11 @@ FUNCTIONS
 
     *   code* => *code|str*
 
-    *   profile* => *firefox::local_profile_name*
+        (No description)
+
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
 
     Special arguments:
 
@@ -147,7 +233,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   profile* => *firefox::local_profile_name*
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
 
     *   sort_args => *array[str]*
 
@@ -198,6 +286,16 @@ FUNCTIONS
 
          open_firefox_container(container => "mycontainer");
 
+    *   Open URL in a new tab in a new window:
+
+         open_firefox_container(
+             container => "mycontainer",
+           urls => ["www.example.com"],
+           extra_firefox_options_before => ["--new-window"]
+         );
+
+        This command passes the "--new-window" option to "firefox".
+
     This utility opens a new firefox tab in a specific multi-account
     container. This requires the Firefox Multi-Account Containers add-on, as
     well as another add-on called "Open external links in a container",
@@ -218,9 +316,23 @@ FUNCTIONS
 
     *   container* => *str*
 
-    *   profile => *firefox::local_profile_name*
+        (No description)
+
+    *   extra_firefox_options_after => *array[str]*
+
+        Additional options (arguments) to put after the URLs.
+
+    *   extra_firefox_options_before => *array[str]*
+
+        Additional options (arguments) to put before the URLs.
+
+    *   profile => *firefox::local_profile_name::default_first*
+
+        (No description)
 
     *   urls => *array[str]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -277,7 +389,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

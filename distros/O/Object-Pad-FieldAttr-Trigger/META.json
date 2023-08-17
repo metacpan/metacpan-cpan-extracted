@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -27,19 +27,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.60"
+            "Object::Pad" : "0.66"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Object::Pad::FieldAttr::Trigger" : {
          "file" : "lib/Object/Pad/FieldAttr/Trigger.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

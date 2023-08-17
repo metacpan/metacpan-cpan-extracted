@@ -28,6 +28,12 @@
 
 #include "bzlib_private.h"
 
+/*
+  Perl-specific change to allow building with C++
+  The 'register' keyword not allowed from C++17
+  see https://github.com/pmqs/Compress-Raw-Bzip2/issues/11
+*/
+#define register
 
 /*---------------------------------------------------*/
 /*--- Bit stream I/O                              ---*/
@@ -240,7 +246,8 @@ void sendMTFValues ( EState* s )
 {
    Int32 v, t, i, j, gs, ge, totc, bt, bc, iter;
    Int32 nSelectors, alphaSize, minLen, maxLen, selCtr;
-   Int32 nGroups, nBytes;
+   Int32 nGroups;
+   Int32 nBytes = 0;
 
    /*--
    UChar  len [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];

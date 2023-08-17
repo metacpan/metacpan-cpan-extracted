@@ -49,7 +49,7 @@
          "requires" : {
             "Future::AsyncAwait" : "0.61",
             "IO::Async::Loop" : "0",
-            "Net::Async::Redis" : "3.002",
+            "Net::Async::Redis" : "3.024",
             "perl" : "5.026"
          }
       },
@@ -74,19 +74,19 @@
    "provides" : {
       "Net::Async::Redis::Cluster::Node::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node/XS.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Net::Async::Redis::Cluster::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/XS.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Net::Async::Redis::Protocol::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Net::Async::Redis::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis-XS"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"

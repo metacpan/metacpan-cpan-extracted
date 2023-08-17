@@ -39,8 +39,7 @@ class Cwd {
   
   static method getdcwd : string ($drive : string = undef) {
     unless (Sys::OS->is_windows) {
-      set_error_code class_id Error::NotSupported;
-      die "The getdcwd is not supported on this system(_WIN32)";
+      die Error::NotSupported "The getdcwd is not supported on this system(_WIN32)";
     }
     my $drive_id = 0;
     if ($drive) {

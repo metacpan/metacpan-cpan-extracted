@@ -1,0 +1,20 @@
+Revision history for Business-Stripe-Webhook
+
+1.12    1st July 2023
+	 Modified tests to prevent failure when Test::Warn is not installed
+	 Added new author test for VERSION in module and POD
+
+1.11    19th June 2023
+	 Modified tests to prevent signature failing after CPAN deployment
+	 Added new error check to 'process' method
+
+1.10    18th June 2023
+	 Added preferred option to supply input to the constructor instead of attempting to read input from STDIN
+	 Enhanced tests
+
+1.0	10th June 2023
+	 First production release
+
+0.1     10th June 2023 
+         First version, released on an unsuspecting world.
+

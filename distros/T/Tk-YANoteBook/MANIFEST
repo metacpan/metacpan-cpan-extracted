@@ -1,0 +1,10 @@
+Changes
+lib/Tk/close_icon.xpm
+lib/Tk/YANoteBook.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/Tk-YANoteBook.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

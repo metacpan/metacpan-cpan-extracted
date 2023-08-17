@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iVA;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iVA.pm 
+ PERL PROGRAM NAME: iVA.pm 
  AUTHOR: Juan Lorenzo
  DATE:   Nov 1 2012,
          sept. 13 2013

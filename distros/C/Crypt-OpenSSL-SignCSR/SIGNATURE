@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 56ba692a8cd30dd3732ea729b0017f206cd3651668ea1de518da460dcd65108f Changes
+SHA256 78bf555d326f70d30775fa4b6778fa89e1236fe6b39be58e88e893f497bfce90 LICENSE
+SHA256 7b5a63a545f6144dcc7f5c3b657f61f2205ff84ba26dbec8f2988252dfbb8e8e MANIFEST
+SHA256 b007c4b00e9ded2534cc8a2877a7f30c1d4fb2a3b3b2a17d0084a7e549480225 META.json
+SHA256 470cd096f65ea68e2f8e9aa284cf0126676848bcabd2aaa4378f8b19fa2ed98d META.yml
+SHA256 ba73dd0750bd3a8dfaa272cc4b5d207d848df5d05ffd4df8a0b002993e6f9117 Makefile.PL
+SHA256 13c7b8ab2cf28dca853b1fa5b99c3b94e64a44eb191639268ff51b1241454fa3 README
+SHA256 6471c9685aa3dd4c1c2e56b7bbff2694117f84e754a35b6bd5bd887873d48c38 SignCSR.xs
+SHA256 633890c2e5c6b5b3d55d282ea3733de70ed20af9efdb3a87fc0570f3f112a772 cpanfile
+SHA256 528e555729cd9ca77e13fb6cf7114eaec3373e48bc8576c97841523635d8edab dist.ini
+SHA256 5ca7c731f3c38f11428f7169688a1c1c3b11dd2d599fdfac4d743150daa273cd lib/Crypt/OpenSSL/SignCSR.pm
+SHA256 cfa3fa6b9b174f22ef9e4cb99a045c1d7852a277a25fed495c4dc23e98d21148 maint/Makefile_header.PL
+SHA256 0b6e7fd822f5e966a7f84e20bdc097046a9b9841a36552501b5d63d00db9b10f ppport.h
+SHA256 1a68a6fe6ca3f3eaf5346ed566bed6d983eb9829bd2b59a40f633cc2f2e9f2cb t/000-Crypt-OpenSSL-SignCSR.t
+SHA256 a9f2d330d23a3cdfc53f623ecf956c1850a2087e1cfd668443493023f41c8425 t/001-openssl-version.t
+SHA256 ec1e078ce0fd05347deb0f696b5be44cc883e2b9efda4b5acccbd08809720af2 t/002-create-cert-from-csr.t
+SHA256 b767fd04e42b0dff8e25ee6e8ba631e27d32dbacac36b0826462b6c39824f325 t/003-openssl-crypt-pkcs10.t
+SHA256 3b1d756ece0096c291932530baa529011823869e2d61869540750482b3c35daf t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+SHA256 32c3dda5dcdc1547688df3821d6123eac9c722c549732e0158e6fbe622a97e82 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmTBv/oACgkQ1fh7LgYG
+pfkArg/+KrDM3oQP9RNIxSXUPTslNZ+NyeDaXYRHHt5YF6LHaa/vvYeyotQQQ26k
+TUHVDrVBmaoDlTvt4CpIFFwX8vzeZHuU2iC3dQnMQJ2g5JcjzukpaBNUyB8zUYV/
+rqxcLeT+rWetW+zRKTKbRXDKmwOwNhMDrV7UHQ5sTugxb4tWtPfana31RpMwP27A
+AjVwby0MopyNB0FzryCB9K1OhoSn5wAITkXswg3+LPDWoTwpkjIMUgTldXHOjUlE
+xbOFrbUTk9dk3172UsxQllAs2GSd1IxyVUWo34w3uAogd4mj/OHlXnm8TO/6MBom
+3tHJiTFnnNHe6cz2PzwKzuSx4D3/mdtaOK5rzo8KnXcINMOTEdJpG9Bc7JRC+4bV
+uPH5nQy/tDOYCTy73PepOMoHSOBdUldGWtHE7ze4GEDLp4gRwFJt/RgIw62rWUk/
+TjXlScY701MnoTWKSJrh9pK35PzmdQtvsNL9r93cQvJ5nj3cLAxnrRV+uM9PiqRk
+4+Mo7gHJwH0i2AMEo0AzthVIEc/gm8Q3mTga3USdQ8tH79Ka0ZdtyBhjT9LtV0Wi
+bazCxhfh8WYL2dJQChFDc8EC0Tq9v2gZbZFke3GMkvx4hTfHjKyXYA31y2BwYgDP
+1lCvIJo695sc1zl2ZiK2SMradbZYLI/4XU1G+ePQR7rL0N2urJk=
+=cYDc
+-----END PGP SIGNATURE-----

@@ -13,6 +13,7 @@ t/10-new.t
 t/bing.t
 t/boiler.t
 t/canada.t
+t/carp.t
 t/census.t
 t/changes.t
 t/comment-spelling.t
@@ -40,10 +41,12 @@ t/osm.t
 t/ovi.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/postcodes.t
 t/rand.t
 t/snippets.t
+t/ua.t
 t/unused.t
 t/us.t
 t/used.t

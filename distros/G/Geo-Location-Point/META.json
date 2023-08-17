@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.68, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -34,12 +34,14 @@
          "requires" : {
             "Carp" : "0",
             "GIS::Distance" : "0",
+            "TimeZone::TimeZoneDB" : "0",
             "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
             "Test::Carp" : "0",
+            "Test::Compile" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0"
@@ -60,6 +62,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Location-Point"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

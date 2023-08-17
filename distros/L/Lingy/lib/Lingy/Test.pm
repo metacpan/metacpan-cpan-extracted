@@ -6,11 +6,20 @@ use base 'Exporter';
 use Test::More;
 use YAML::PP;
 
+use Lingy;
 use Lingy::RT;
 use Lingy::Common;
+use Lingy::ReadLine;
 
 use Capture::Tiny qw'capture capture_merged';
 use File::Temp 'tempfile';
+
+BEGIN {
+    $ENV{LINGY_TEST} //= 1;
+    if (defined $INC{'Carp/Always.pm'}) {
+        eval "no Carp::Always";
+    }
+}
 
 use lib 'lib', './test/lib', './t/lib';
 
@@ -18,9 +27,11 @@ symlink 't', 'test' if -d 't' and not -e 'test';
 
 my $ypp = YAML::PP->new;
 
-our $rt = Lingy::RT->init;
+our $gnu_readline =
+    Term::ReadLine->new('')->ReadLine eq 'Term::ReadLine::Gnu';
 
-$ENV{LINGY_TEST} = 1;
+RT->init;
+$Lingy::RT::OK = 0;
 
 our $lingy =
     -f './blib/script/lingy' ? './blib/script/lingy' :
@@ -47,14 +58,13 @@ our @EXPORT = qw<
     tempfile
 
     $lingy
-    $rt
     $eg
 
     rep
     run_is
     test
     test_out
-    test_list
+    tests
 
     PPP WWW XXX YYY ZZZ
 >;
@@ -69,10 +79,10 @@ sub import {
 }
 
 sub rep {
-    $rt->rep(@_);
+    RT->rep(@_);
 }
 
-sub test_list {
+sub tests {
     my ($spec) = @_;
     my $list = $ypp->load_string($spec);
     for my $elem (@$list) {
@@ -89,6 +99,7 @@ sub test_list {
 # Test 'rep' for return value or error:
 my $test_i = 0;
 sub test {
+    RT->nextID(10);
     $test_i++;
     if ($ENV{ONLY} and $ENV{ONLY} != $test_i) {
         return;
@@ -96,7 +107,8 @@ sub test {
     my ($input, $want, $label) = @_;
     $label //= "'${\ collapse $input}' -> '${\line $want}'";
 
-    my $got = eval { join("\n", $rt->rep($input)) };
+    $Lingy::RT::OK = 1;
+    my $got = eval { join("\n", RT->rep($input)) };
     $got = $@ if $@;
     chomp $got;
 
@@ -104,6 +116,8 @@ sub test {
 
     if (ref($want) eq 'Regexp') {
         like $got, $want, $label;
+    } elsif ($want =~ s{^/(.*)/$}{$1}) {
+        like $got, qr/$want/, $label;
     } else {
         is $got, $want, $label;
     }
@@ -113,7 +127,7 @@ sub test_out {
     my ($input, $want, $label) = @_;
     $label //= "'${\ collapse $input}' -> '${\line $want}'";
     my ($got) = Capture::Tiny::capture_merged {
-        $rt->rep($input);
+        RT->rep($input);
     };
     chomp $got;
     chomp $want;

@@ -23,6 +23,7 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Deep' => 0,
 	'Test::Most' => 0,
+	'Test::Number::Delta' => 0,	# Always needed since used in free.t
 	'Test::NoWarnings' => 0,
 };
 
@@ -38,7 +39,6 @@ if($online_tests) {
 	$test_requires->{'Geo::Coder::Ovi'} = 0;
 	$test_requires->{'Geo::Coder::Postcodes'} = 0;
 	# $test_requires->{'Geo::Coder::XYZ'} = 0.06;
-	$test_requires->{'Test::Number::Delta'} = 0;
 	$test_requires->{'Test::LWP::UserAgent'} = 0;
 	$test_requires->{'Test::Carp'} = 0;
 	$test_requires->{'LWP::UserAgent::Throttled'} = 0.04;
@@ -50,7 +50,7 @@ WriteMakefile(
     NAME		=> 'Geo::Coder::List',
     AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
     VERSION_FROM	=> 'lib/Geo/Coder/List.pm',
-    ABSTRACT_FROM       => 'lib/Geo/Coder/List.pm',
+    ABSTRACT_FROM	=> 'lib/Geo/Coder/List.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
@@ -66,13 +66,13 @@ WriteMakefile(
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo::Coder::List-*' },
     META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
+	'meta-spec' => { version => 2 },
+	resources => {
+		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-List.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-List',
-    		}, bugtracker => {
+		}, bugtracker => {
 			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List',
 			mailto => 'bug-Geo-Coder-List@rt.cpan.org'
 		}
@@ -83,7 +83,7 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
 	return 0 if(!-t STDIN);
 
 	my $s = IO::Socket::INET->new(
@@ -93,7 +93,7 @@ sub are_online
 	if($s) {
 		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
 			close($s);
-			return 1;
+			return 0;
 		}
 
 		print <<EOF;

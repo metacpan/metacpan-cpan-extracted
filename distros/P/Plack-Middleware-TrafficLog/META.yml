@@ -3,9 +3,13 @@ abstract: 'Log headers and body of HTTP traffic'
 author:
   - 'Piotr Roszatycki <dexter@cpan.org>'
 build_requires:
-  Test::More: '0'
+  Software::License: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,7 +18,7 @@ name: Plack-Middleware-TrafficLog
 provides:
   Plack::Middleware::TrafficLog:
     file: lib/Plack/Middleware/TrafficLog.pm
-    version: '0.0401'
+    version: '0.0404'
 requires:
   POSIX::strftime::Compiler: '0'
   Plack: '0'
@@ -23,4 +27,5 @@ resources:
   bugtracker: http://github.com/dex4er/perl-Plack-Middleware-TrafficLog/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dex4er/perl-Plack-Middleware-TrafficLog
-version: '0.0401'
+version: '0.0404'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

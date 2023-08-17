@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Smoother::Weightedexponential;
-$Statistics::Descriptive::Smoother::Weightedexponential::VERSION = '3.0800';
+$Statistics::Descriptive::Smoother::Weightedexponential::VERSION = '3.0801';
 use strict;
 use warnings;
 
@@ -94,7 +94,7 @@ exponential smoothing
 
 =head1 VERSION
 
-version 3.0800
+version 3.0801
 
 =head1 SYNOPSIS
 

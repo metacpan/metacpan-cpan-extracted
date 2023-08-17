@@ -1,25 +1,41 @@
 use Lingy::Test;
 
-test '#"fo+o"',
-     '#"fo+o"';
+tests <<'...';
+- - '#"fo+o"'
+  - '#"fo+o"'
 
-test '(re-pattern "fo+o")',
-     '#"fo+o"';
+- - (re-pattern "fo+o")
+  - '#"fo+o"'
 
-test '(re-find #"foo" "foobar")',
-     '"foo"';
+- - '(re-find #"foo" "foobar")'
+  - '"foo"'
 
-test '(re-find #"foo" "bar")',
-     'nil';
+- - '(re-find #"foo" "bar")'
+  - nil
 
-test '(re-find #"(f)(o)(o)" "foobar")',
-     '["foo" "f" "o" "o"]';
+- - '(re-find #"(f)(o)(o)" "foobar")'
+  - '["foo" "f" "o" "o"]'
 
-test '(re-matches #"fo*bar" "foooobar")',
-     '"foooobar"';
+- - '(re-matches #"fo*bar" "foooobar")'
+  - '"foooobar"'
 
-test '(re-matches #"f(o*)bar" "foooobar")',
-     '["foooobar" "oooo"]';
+- - '(re-matches #"f(o*)bar" "foooobar")'
+  - '["foooobar" "oooo"]'
 
-test '(re-matches #"fo*bar" "foooobarbaz")',
-     'nil';
+- - '(re-matches #"fo*bar" "foooobarbaz")'
+  - nil
+
+- - '#"\bfoo\b"'
+  - '#"\bfoo\b"'
+
+- - >-
+    #"\[\]\{\}\(\)\+\*\?\^\$\|"
+  - >-
+    #"\[\]\{\}\(\)\+\*\?\^\$\|"
+
+- - '(re-matches #"\{{3}(\d+)\+(\}*)" "{{{123+}}}")'
+  - '["{{{123+}}}" "123" "}}}"]'
+
+# - - >
+#     #"\a\b\c\d\e\f\h\n\r\s\t\u0000\v\w\x00\z\`\~\!\@\#\$\%\^\&\*\(\)\-\_\=\+\{\}\[\]\|\\\:\;\"\'\<\>\,\.\?\/\000\1\2\3\4\5\6\7\8\9\A\B\G\H\Q\R\S\T\U\V\W\X\Y\Z
+...

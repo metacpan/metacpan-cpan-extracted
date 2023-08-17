@@ -1,3 +1,2335 @@
+0.989035 2023-08-14
+
+  [Changes]
+    * An interface can have multiple required methods.
+    * An interface can define an interface of itself.
+      class MyClass : interface_t {
+        interface MyClass;
+      }
+  [Document Changes]
+    * Module Attribute is renamed to Class Attribute
+    * SPVM::Document::NativeModule is renamed to SPVM::Document::NativeClass
+  
+  [Incompatible Changes]
+    * All methods and fields and native APIs that names are "module_name" are renamed to "class_name".
+    * The module file native API is renamed to the class file native API.
+  [Bug Fix]
+    * A bug fix: the get_field_string native API does not work well.
+0.989034 2023-08-14
+
+  [Bug Fix]
+    * A bug is fixed: the interface checking has not worked well in compilation time.
+    * A bug is fixed: the has_interface basic type native APIhas not worked well.
+    * A bug is fixed: The checking of interface compatibility has not worked well in required interface methods.
+  [Changes]
+    * The checking of interface compatibility is performed when a type conversion is performed.
+  [New Feature]
+    * The duck typing is supported.
+    * The type assignability is cached.
+0.989033 2023-08-08
+
+  [New Features]
+    * The following native APIs are added.
+
+      void** (*get_field_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      void** (*get_field_object_address_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+      int32_t (*check_stack_env)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+    * The Native class is added.
+    * The Native::MethodCall::Callback class is added.
+    * The following methods are added to the Native::MethodCall class.
+    
+      static method call_callback : void ($callback : Native::MethodCall::Callback, $error_id : int*, $stack = undef : Native::Stack);
+
+      static method call_class_method : void ($basic_type_name : string, $method_name : string, $error_id : int*, $stack : Native::Stack = undef, $env : Native::Env = undef);
+      
+      static method get_exception : string ($stack : Native::Stack = undef, $env : Native::Env = undef);
+
+      static method set_exception : void ($exception : string, $stack : Native::Stack = undef, $env : Native::Env = undef);
+    
+0.989032 2023-08-04
+  [Revertion]
+    * The following change is reverted.
+    
+      The definitions of the following fields in the Env class are changed.
+      
+      -  has compiler : ro Native::Compiler;
+      +  has compiler : Native::Compiler;
+
+      -  has runtime : ro Native::Runtime;
+      +  has runtime : Native::Runtime;
+0.989031 2023-08-02
+  [New Features]
+    * The Native::MethodCall class is added.
+  [Incompatibe Changes]
+    * The definitions of the following fields in the Stack class are changed.
+      -  has env : ro Native::Env;
+      +  has env : Native::Env;
+
+    * The definitions of the following fields in the Env class are changed.
+    
+      -  has compiler : ro Native::Compiler;
+      +  has compiler : Native::Compiler;
+
+      -  has runtime : ro Native::Runtime;
+      +  has runtime : Native::Runtime;
+
+0.989030 2023-07-28
+  [Incompatible Changes]
+    * The following native APIs are renamed.
+      -  int32_t (*items)(SPVM_ENV* env, SPVM_VALUE* stack);
+      +  int32_t (*args_width)(SPVM_ENV* env, SPVM_VALUE* stack);
+    * The items operator is renamed to args_width.
+  [New Features]
+    * The following runtime native APIs were added.
+    
+      +  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+      
+    * The following argument native APIs were added.
+    
+      + int32_t (*get_stack_index)(void* runtime, void* arg);
+      
+  [Changes]
+    * The width of the arguments must be less than or equal to 255.
+0.989029 2023-07-27
+  [New Features]
+    * The following native APIs were added.
+    
+      void* (*get_field_object_defined_and_has_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file_name, int32_t line);
+  [Bug Fix]
+    * The Native::Env memory bug is fixed.
+    
+0.989028 2023-07-26
+  [New Features]
+    * The following compiler native APIs were added.
+    
+      void (*add_module_file)(void* compiler, const char* module_name);
+      void (*delete_module_file)(void* compiler, const char* module_name);
+
+  [New Features]
+    * The following module file native APIs are added.
+    
+      +  void* (*free_instance)(void* compiler, void* module_file);
+
+  [Incompatible Changes]
+    * The order of the compiler native APIs were changed.
+      0 new_instance,
+      1 free_instance,
+      2 get_start_line,
+      3 set_start_line,
+      4 get_start_file,
+      5 set_start_file,
+      6 get_include_dirs_length,
+      7 get_include_dir,
+      8 add_include_dir,
+      9 clear_include_dirs,
+      10 get_module_file,
+      11 set_module_file,
+      12 compile,
+      13 get_error_message,
+      14 get_error_messages_length,
+      15 get_runtime,
+    * if (rquire Foo) statement was now reset after a single compilation.
+    * The set_module_file compiler native API can be set even if the module file alread exists.
+    * The following methods in the Native::ModuleFile class were removed.
+      
+      static method new : Native::ModuleFile ($compiler : Native::Compiler);
+      method set_module_name : void ($module_name : string);
+      
+    * The following module file Native APIs were removed.
+      
+      void* (*new_instance)(void* compiler);
+      void (*set_module_name)(void* compiler, void* module_file, const char* module_name);
+    
+    * The following compiler native APIs were removed.
+      
+      void (*set_module_file)(void* compiler, const char* module_name, void* module_file);
+    
+    * Native API IDs of the module file native APIs were changed.
+
+      0 get_module_name
+      1 get_file
+      2 set_file
+      3 get_dir
+      4 set_dir
+      5 get_rel_file
+      6 set_rel_file
+      7 get_content
+      8 set_content
+      9 get_content_length
+      10 set_content_length
+
+    * Native API IDs of the compiler native APIs were changed.
+
+      0 new_instance
+      1 free_instance
+      2 get_start_line
+      3 set_start_line
+      4 get_start_file
+      5 set_start_file
+      6 get_include_dirs_length
+      7 get_include_dir
+      8 add_include_dir
+      9 clear_include_dirs
+      10 add_module_file
+      11 delete_module_file
+      12 get_module_file
+      13 compile
+      14 get_error_message
+      15 get_error_messages_length
+      16 get_runtime
+
+      
+0.989027 2023-07-23
+  [Bug Fix]
+    * A bug fixed: The error messages of the compiler had not been freeded properly.
+    * A bug fixed: The each time compile memory had not been freeded when the compilation failed.
+    
+0.989026 2023-07-21
+  [Incompatible Changes]
+    * The __module_name field in the SPVM::ExchangAPI::Class was renamed to the __name field.
+    
+    * The module file native APIs were changed.
+    
+      -  void (*set_module_name)(void* compiler, void* module_file, void* module_name);
+      +  void (*set_module_name)(void* compiler, void* module_file, const char* module_name);
+      -  void (*set_file)(void* compiler, void* module_file, void* file);
+      +  void (*set_file)(void* compiler, void* module_file, const char* file);
+      -  void (*set_dir)(void* compiler, void* module_file, void* dir);
+      +  void (*set_dir)(void* compiler, void* module_file, const char* dir);
+      -  void (*set_rel_file)(void* compiler, void* module_file, void* rel_file);
+      +  void (*set_rel_file)(void* compiler, void* module_file, const char* rel_file);
+      -  void (*set_content)(void* compiler, void* module_file, void* content);
+      +  void (*set_content)(void* compiler, void* module_file, const char* content);
+   * The following compiler native APIs were renamed.
+     -  void (*add_module_file)(void* compiler, const char* module_name, void* module_file);
+     +  void (*set_module_file)(void* compiler, const char* module_name, void* module_file);
+
+  [New Features]
+    * The Native::ModuleFile class was added.
+
+    * The following methods were added to the Native::Compiler.
+      +  method get_module_file : Native::ModuleFile ($module_name : string);
+      +  method set_module_file : void ($module_name : string, $module_file : Native::ModuleFile);
+
+  [Bug Fix]
+    * The bug that SPVM file dependencies was wrong was fixed.
+0.989025 2023-07-18
+  [New Features]
+    * The following methods were added to the Native::Runtime.
+      method get_basic_types_length : int ();
+      
+      method get_basic_type : Native::BasicType ($id : int);
+      
+    * The following argument native API were added.
+    
+      const char* (*get_name)(void* runtime, void* arg);
+      int32_t (*get_index)(void* runtime, void* arg);
+
+  [Incompatible Changes]
+    * Modules renamed.
+      Env was renamed to Native::Env.
+      Stack was renamed to Native::Stack.
+      Runtime was renamed to Native::Runtime.
+      Compiler was renamed to Native::Compiler.
+    
+    * The native API IDs in the class variable native APIs were changed.
+      
+      0 get_name
+      1 get_index
+      2 get_basic_type
+      3 get_type_dimension
+      4 get_type_flag
+      5 get_current_basic_type
+    
+    * The index native API were added to the class variable native APIs.
+    
+      int32_t (*get_index)(void* runtime, void* class_var);
+
+    * The native API IDs in the argument native APIs were changed.
+
+      0 get_name
+      1 get_index
+      2 get_basic_type
+      3 get_type_dimension
+      4 get_type_flag
+      
+    * The following methods in the Native::Runtime were removed.
+      
+      - method get_basic_type_names : string[] ();
+      - method get_basic_type_parent_name : string ($basic_type_name : string);
+      - method get_basic_type_anon_basic_type_names : string[] ($basic_type_name : string);
+      - method get_method_names : string[] ($basic_type_name : string, $options : object[] = undef)
+      - method get_method_is_class_method : int ($basic_type_name : string, $method_name : string);
+      - method get_precompile_method_address : Address ($basic_type_name : string, $method_name : string);
+      - method get_native_method_address : Address ($basic_type_name : string, $method_name : string);
+      - method set_native_method_address : string ($basic_type_name : string, $method_name : string, $address : Address);
+      - method set_precompile_method_address : string ($basic_type_name : string, $method_name : string, $address : Address);
+      
+    * The following methods in the Native::Runtime were changed.
+      
+      - method build_precompile_module_source : string ($basic_type_name : string);
+      + method build_precompile_module_source : string ($basic_type : Native::BasicType);
+      
+0.989024 2023-07-14
+  [New Features]
+    * The runtime was created by the additional compile.
+    
+    * The following native APIs were added.
+    
+      void* compiler;
+      
+  [Incompatibe Changes]
+    * The DESTROY method in the Runtime class was removed.
+  [Incompatibe Changes]
+    * The DESTROY method in the Runtime class was removed.
+    
+    * The following runtime native APIs were removed.
+    
+      -  void* (*new_instance)(void);
+      -  void (*free_instance)(void* runtime);
+    
+    * The runtime native API IDs were reordered.
+    
+      0 get_object_data_offset
+      1 get_object_ref_count_offset
+      2 get_object_length_offset
+      3 get_basic_type_by_id
+      4 get_basic_type_by_name
+      5 get_basic_types_length
+      6 is_object_type
+      7 can_assign
+      8 build_precompile_module_source
+      9 build_precompile_method_source
+    
+    * Compiler native APIs were changed.
+
+      -  void* (*build_runtime)(void* compiler);
+      +  void* (*get_runtime)(void* compiler);
+    
+    * The following methods in the Compiler class were changed.
+      
+      -  native method build_runtime : Runtime ();
+      +  native method get_runtime : Runtime ();
+
+    * The following methods and fields in the Env class were changed.
+         # Fields
+      -  has runtime : ro Runtime;
+      +  has compiler : ro Compiler;
+
+         # Class Methods
+      -  native static method new : Env ($runtime : Runtime = undef);
+      +  native static method new : Env ($compiler : Compiler = undef);
+
+  [Incompatibe Changes]
+  
+    * The Native API IDs were reordered.
+    0 compiler
+    1 runtime
+    2 api
+    3 new_env
+    4 free_env
+    5 call_init_methods
+    6 set_command_info_program_name
+    7 set_command_info_argv
+    8 set_command_info_base_time
+    9 destroy_class_vars
+    10 items
+    11 get_object_basic_type
+    12 get_object_basic_type_id
+    13 get_object_basic_type_name
+    14 get_object_type_dimension
+    15 get_basic_type
+    16 get_basic_type_by_name
+    17 get_basic_type_by_id
+    18 get_basic_type_id
+    19 get_basic_type_id_by_name
+    20 get_class_var
+    21 get_class_var_byte
+    22 get_class_var_short
+    23 get_class_var_int
+    24 get_class_var_long
+    25 get_class_var_float
+    26 get_class_var_double
+    27 get_class_var_object
+    28 get_class_var_string
+    29 set_class_var_byte
+    30 set_class_var_short
+    31 set_class_var_int
+    32 set_class_var_long
+    33 set_class_var_float
+    34 set_class_var_double
+    35 set_class_var_object
+    36 set_class_var_string
+    37 get_class_var_object_address
+    38 get_class_var_byte_by_name
+    39 get_class_var_short_by_name
+    40 get_class_var_int_by_name
+    41 get_class_var_long_by_name
+    42 get_class_var_float_by_name
+    43 get_class_var_double_by_name
+    44 get_class_var_object_by_name
+    45 get_class_var_string_by_name
+    46 set_class_var_byte_by_name
+    47 set_class_var_short_by_name
+    48 set_class_var_int_by_name
+    49 set_class_var_long_by_name
+    50 set_class_var_float_by_name
+    51 set_class_var_double_by_name
+    52 set_class_var_object_by_name
+    53 set_class_var_string_by_name
+    54 get_field
+    55 get_field_static
+    56 get_field_byte
+    57 get_field_short
+    58 get_field_int
+    59 get_field_long
+    60 get_field_float
+    61 get_field_double
+    62 get_field_object
+    63 get_field_string
+    64 set_field_byte
+    65 set_field_short
+    66 set_field_int
+    67 set_field_long
+    68 set_field_float
+    69 set_field_double
+    70 set_field_object
+    71 set_field_string
+    72 get_field_byte_by_name
+    73 get_field_short_by_name
+    74 get_field_int_by_name
+    75 get_field_long_by_name
+    76 get_field_float_by_name
+    77 get_field_double_by_name
+    78 get_field_object_by_name
+    79 get_field_string_by_name
+    80 set_field_byte_by_name
+    81 set_field_short_by_name
+    82 set_field_int_by_name
+    83 set_field_long_by_name
+    84 set_field_float_by_name
+    85 set_field_double_by_name
+    86 set_field_object_by_name
+    87 set_field_string_by_name
+    88 get_field_string_chars_by_name
+    89 get_method
+    90 get_class_method
+    91 get_instance_method_static
+    92 get_instance_method
+    93 call_method_no_mortal
+    94 call_method
+    95 call_class_method_by_name
+    96 call_instance_method_static_by_name
+    97 call_instance_method_by_name
+    98 new_object_no_mortal
+    99 new_object
+    100 new_object_by_name
+    101 new_pointer_object_no_mortal
+    102 new_pointer_object
+    103 new_pointer_object_by_name
+    104 get_pointer
+    105 set_pointer
+    106 new_string_nolen_no_mortal
+    107 new_string_nolen
+    108 new_string_no_mortal
+    109 new_string
+    110 new_byte_array_no_mortal
+    111 new_byte_array
+    112 new_short_array_no_mortal
+    113 new_short_array
+    114 new_int_array_no_mortal
+    115 new_int_array
+    116 new_long_array_no_mortal
+    117 new_long_array
+    118 new_float_array_no_mortal
+    119 new_float_array
+    120 new_double_array_no_mortal
+    121 new_double_array
+    122 new_object_array_no_mortal
+    123 new_object_array
+    124 new_object_array_by_name
+    125 new_string_array
+    126 new_muldim_array_no_mortal
+    127 new_muldim_array
+    128 new_muldim_array_by_name
+    129 new_mulnum_array_no_mortal
+    130 new_mulnum_array
+    131 new_mulnum_array_by_name
+    132 new_array_proto_no_mortal
+    133 new_array_proto
+    134 length
+    135 get_elems_byte
+    136 get_elems_short
+    137 get_elems_int
+    138 get_elems_long
+    139 get_elems_float
+    140 get_elems_double
+    141 get_elem_object
+    142 get_elem_string
+    143 set_elem_object
+    144 set_elem_string
+    145 get_chars
+    146 get_bool_object_value
+    147 concat_no_mortal
+    148 concat
+    149 shorten
+    150 make_read_only
+    151 is_read_only
+    152 print
+    153 print_stderr
+    154 dump_no_mortal
+    155 dump
+    156 dumpc
+    157 copy_no_mortal
+    158 copy
+    159 get_spvm_version_string
+    160 get_spvm_version_number
+    161 get_version_string
+    162 get_version_number
+    163 die
+    164 get_exception
+    165 set_exception
+    166 new_stack_trace_no_mortal
+    167 new_stack_trace
+    168 is_string
+    169 is_class
+    170 is_pointer_class
+    171 is_array
+    172 is_object_array
+    173 is_numeric_array
+    174 is_mulnum_array
+    175 isa
+    176 isa_by_name
+    177 is_type
+    178 is_type_by_name
+    179 elem_isa
+    180 get_elem_size
+    181 get_type_name_no_mortal
+    182 get_type_name
+    183 get_compile_type_name_no_mortal
+    184 get_compile_type_name
+    185 enter_scope
+    186 leave_scope
+    187 push_mortal
+    188 remove_mortal
+    189 weaken
+    190 isweak
+    191 unweaken
+    192 strerror_string
+    193 strerror_string_nolen
+    194 strerror
+    195 strerror_nolen
+    196 allocator
+    197 new_memory_env
+    198 free_memory_env
+    199 get_memory_blocks_count_env
+    200 new_memory_stack
+    201 free_memory_stack
+    202 get_memory_blocks_count_stack
+    203 new_stack
+    204 free_stack
+    205 get_ref_count
+    206 inc_ref_count
+    207 dec_ref_count
+  
+0.989023 2023-07-12
+  [New Features]
+    * The following native APIs were added.
+      +  void* (*get_class_var_string)(void* env, void* stack, void* class_var);
+      +  void (*set_class_var_string)(void* env, void* stack, void* class_var, void* value);
+      +  void* (*get_class_var_string_by_name)(void* env, void* stack, const void* basic_type_name, const void* class_var_name, int32_t** error_id, const void* func_name, const void* file, int32_t line);
+      +  void (*set_class_var_string_by_name)(void* env, void* stack, const void* basic_type_name, const void* class_var_name, void* value, int32_t** error_id, const void* func_name, const void* file, int32_t line);
+      +  void* (*get_field_string)(void* env, void* stack, void* object, void* field);
+      +  void (*set_field_string)(void* env, void* stack, void* object, void* field, void* value);
+      +  void* (*get_field_string_by_name)(void* env, void* stack, void* object, const void* field_name, int32_t** error_id, const void* func_name, const void* file, int32_t line);
+      +  void (*set_field_string_by_name)(void* env, void* stack, void* object, const void* field_name, void* value, int32_t** error_id, const void* func_name, const void* file, int32_t line);
+    
+    * The following methods were added to the Env class.
+    
+      method get_exception : string ();
+      method set_exception : void ($exception : string);
+      
+  [Incompatibe Changes]
+    * The Native API IDs were reordered.
+    
+      0 runtime
+      1 api
+      2 new_env
+      3 free_env
+      4 call_init_methods
+      5 set_command_info_program_name
+      6 set_command_info_argv
+      7 set_command_info_base_time
+      8 destroy_class_vars
+      9 items
+      10 get_object_basic_type
+      11 get_object_basic_type_id
+      12 get_object_basic_type_name
+      13 get_object_type_dimension
+      14 get_basic_type
+      15 get_basic_type_by_name
+      16 get_basic_type_by_id
+      17 get_basic_type_id
+      18 get_basic_type_id_by_name
+      19 get_class_var
+      20 get_class_var_byte
+      21 get_class_var_short
+      22 get_class_var_int
+      23 get_class_var_long
+      24 get_class_var_float
+      25 get_class_var_double
+      26 get_class_var_object
+      27 get_class_var_string
+      28 set_class_var_byte
+      29 set_class_var_short
+      30 set_class_var_int
+      31 set_class_var_long
+      32 set_class_var_float
+      33 set_class_var_double
+      34 set_class_var_object
+      35 set_class_var_string
+      36 get_class_var_object_address
+      37 get_class_var_byte_by_name
+      38 get_class_var_short_by_name
+      39 get_class_var_int_by_name
+      40 get_class_var_long_by_name
+      41 get_class_var_float_by_name
+      42 get_class_var_double_by_name
+      43 get_class_var_object_by_name
+      44 get_class_var_string_by_name
+      45 set_class_var_byte_by_name
+      46 set_class_var_short_by_name
+      47 set_class_var_int_by_name
+      48 set_class_var_long_by_name
+      49 set_class_var_float_by_name
+      50 set_class_var_double_by_name
+      51 set_class_var_object_by_name
+      52 set_class_var_string_by_name
+      53 get_field
+      54 get_field_static
+      55 get_field_byte
+      56 get_field_short
+      57 get_field_int
+      58 get_field_long
+      59 get_field_float
+      60 get_field_double
+      61 get_field_object
+      62 get_field_string
+      63 set_field_byte
+      64 set_field_short
+      65 set_field_int
+      66 set_field_long
+      67 set_field_float
+      68 set_field_double
+      69 set_field_object
+      70 set_field_string
+      71 get_field_byte_by_name
+      72 get_field_short_by_name
+      73 get_field_int_by_name
+      74 get_field_long_by_name
+      75 get_field_float_by_name
+      76 get_field_double_by_name
+      77 get_field_object_by_name
+      78 get_field_string_by_name
+      79 set_field_byte_by_name
+      80 set_field_short_by_name
+      81 set_field_int_by_name
+      82 set_field_long_by_name
+      83 set_field_float_by_name
+      84 set_field_double_by_name
+      85 set_field_object_by_name
+      86 set_field_string_by_name
+      87 get_field_string_chars_by_name
+      88 get_method
+      89 get_class_method
+      90 get_instance_method_static
+      91 get_instance_method
+      92 call_method_no_mortal
+      93 call_method
+      94 call_class_method_by_name
+      95 call_instance_method_static_by_name
+      96 call_instance_method_by_name
+      97 new_object_no_mortal
+      98 new_object
+      99 new_object_by_name
+      100 new_pointer_object_no_mortal
+      101 new_pointer_object
+      102 new_pointer_object_by_name
+      103 get_pointer
+      104 set_pointer
+      105 new_string_nolen_no_mortal
+      106 new_string_nolen
+      107 new_string_no_mortal
+      108 new_string
+      109 new_byte_array_no_mortal
+      110 new_byte_array
+      111 new_short_array_no_mortal
+      112 new_short_array
+      113 new_int_array_no_mortal
+      114 new_int_array
+      115 new_long_array_no_mortal
+      116 new_long_array
+      117 new_float_array_no_mortal
+      118 new_float_array
+      119 new_double_array_no_mortal
+      120 new_double_array
+      121 new_object_array_no_mortal
+      122 new_object_array
+      123 new_object_array_by_name
+      124 new_string_array
+      125 new_muldim_array_no_mortal
+      126 new_muldim_array
+      127 new_muldim_array_by_name
+      128 new_mulnum_array_no_mortal
+      129 new_mulnum_array
+      130 new_mulnum_array_by_name
+      131 new_array_proto_no_mortal
+      132 new_array_proto
+      133 length
+      134 get_elems_byte
+      135 get_elems_short
+      136 get_elems_int
+      137 get_elems_long
+      138 get_elems_float
+      139 get_elems_double
+      140 get_elem_object
+      141 get_elem_string
+      142 set_elem_object
+      143 set_elem_string
+      144 get_chars
+      145 get_bool_object_value
+      146 concat_no_mortal
+      147 concat
+      148 shorten
+      149 make_read_only
+      150 is_read_only
+      151 print
+      152 print_stderr
+      153 dump_no_mortal
+      154 dump
+      155 dumpc
+      156 copy_no_mortal
+      157 copy
+      158 get_spvm_version_string
+      159 get_spvm_version_number
+      160 get_version_string
+      161 get_version_number
+      162 die
+      163 get_exception
+      164 set_exception
+      165 new_stack_trace_no_mortal
+      166 new_stack_trace
+      167 is_string
+      168 is_class
+      169 is_pointer_class
+      170 is_array
+      171 is_object_array
+      172 is_numeric_array
+      173 is_mulnum_array
+      174 isa
+      175 isa_by_name
+      176 is_type
+      177 is_type_by_name
+      178 elem_isa
+      179 get_elem_size
+      180 get_type_name_no_mortal
+      181 get_type_name
+      182 get_compile_type_name_no_mortal
+      183 get_compile_type_name
+      184 enter_scope
+      185 leave_scope
+      186 push_mortal
+      187 remove_mortal
+      188 weaken
+      189 isweak
+      190 unweaken
+      191 strerror_string
+      192 strerror_string_nolen
+      193 strerror
+      194 strerror_nolen
+      195 allocator
+      196 new_memory_env
+      197 free_memory_env
+      198 get_memory_blocks_count_env
+      199 new_memory_stack
+      200 free_memory_stack
+      201 get_memory_blocks_count_stack
+      202 new_stack
+      203 free_stack
+      204 get_ref_count
+      205 inc_ref_count
+      206 dec_ref_count
+
+    * The following native APIs were removed.
+    
+      - int32_t (*has_interface)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* interface_basic_type);
+      -  int32_t (*has_interface_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* basic_type_name);
+      -  void* (*alloc_memory_block_zero)(SPVM_ENV* env, size_t size);
+      -  void (*free_memory_block)(SPVM_ENV* env, void* block);
+      -  int32_t (*get_memory_blocks_count)(SPVM_ENV* env);
+      -  void* memory_blocks_count;
+
+    
+    * The following native APIs were renamed.
+
+      -  int32_t (*call_init_blocks)(SPVM_ENV* env, SPVM_VALUE* stack);
+      +  int32_t (*call_init_methods)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+      -  void (*cleanup_global_vars)(SPVM_ENV* env, SPVM_VALUE* stack);
+      +  void (*destroy_class_vars)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+      -  void* (*new_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+      +  void* (*new_object_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+      -  void* (*new_byte_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_byte_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_short_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_short_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_int_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_int_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_long_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_long_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_float_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_float_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_double_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      +  void* (*new_double_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+      -  void* (*new_object_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      +  void* (*new_object_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      -  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
+      +  void* (*new_muldim_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
+      -  void* (*new_mulnum_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      +  void* (*new_mulnum_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      -  void* (*new_string_nolen_raw)(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes);
+      +  void* (*new_string_nolen_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes);
+      -  void* (*new_string_raw)(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes, int32_t length);
+      +  void* (*new_string_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes, int32_t length);
+      -  void* (*concat_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* string1, void* string2);
+      +  void* (*concat_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* string1, void* string2);
+      -  void* (*new_stack_trace_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);
+      +  void* (*new_stack_trace_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);
+      -  int32_t (*call_method_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* method, int32_t items);
+      +  int32_t (*call_method_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* method, int32_t items);
+      -  void* (*get_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      +  void* (*get_type_name_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  void* (*dump_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      +  void* (*dump_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  void* (*new_array_proto_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t length);
+      +  void* (*new_array_proto_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t length);
+      -  void* (*copy_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      +  void* (*copy_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  void* (*new_pointer_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, void* pointer);
+      +  void* (*new_pointer_object_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, void* pointer);
+      -  void* (*get_compile_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t dimension, int32_t flag);
+      +  void* (*get_compile_type_name_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t dimension, int32_t flag);
+
+    * The following methods in the Env class were renamed.
+    
+      -  method build_stack : Stack ();
+      +  method new_stack : Stack ();
+      
+0.989022 2023-07-11
+  [Document Fix]
+    * The doc of Native API IDs of the module file native APIs were fixed.
+  
+  [Incompatibe Changes]
+    * The runtime native APIs were changed.
+    
+      -  void* object_header_size;
+      -  void* object_ref_count_offset;
+      -  void* object_length_offset;
+      +  int32_t (*get_object_data_offset)(void* runtime);
+      +  int32_t (*get_object_ref_count_offset)(void* runtime);
+      +  int32_t (*get_object_length_offset)(void* runtime);  
+
+      -  void (*build_precompile_module_source)(void* runtime, void* string_buffer, const char* module_name);
+      -  void (*build_precompile_method_source)(void* runtime, void* string_buffer, const char* module_name, const char* method_name);
+      +  void (*build_precompile_module_source)(void* runtime, void* string_buffer, void* module_basic_type);
+      +  void (*build_precompile_method_source)(void* runtime, void* string_buffer, void* method);
+
+    * The method native APIs were changed.
+      -  void* (*get_opcode)(void* runtime, void* method, int32_t opcode_index);
+      +  void* (*get_opcode_by_index)(void* runtime, void* method, int32_t opcode_index);
+    
+0.989021 2023-07-11
+  [New Features]
+    * The argument native API was added.
+    * The class native variable API was added.
+    * The field native API was added.
+    * The method native API was added.
+    * The basic type native API was added.
+    
+    * The following method were added to the Env class.
+    
+      static method new : Env ($runtime : Runtime = undef);
+    
+    * The following native APIs were added.
+      void* (*get_runtime)(SPVM_ENV* env, SPVM_VALUE* stack);
+      void (*set_runtime)(SPVM_ENV* env, SPVM_VALUE* stack, void* runtime);
+
+  [Document Changes]
+    * SPVM::Document::NativeClass was renamed to SPVM::Document::NativeModule.
+  [Incompatibe Changes]
+    * Native API IDs of the runtime native APIs were reordered.
+
+      0 new_instance
+      1 free_instance
+      2 object_header_size
+      3 object_ref_count_offset
+      4 object_length_offset
+      5 get_basic_type_by_id
+      6 get_basic_type_by_name
+      7 get_basic_types_length
+      8 is_object_type
+      9 can_assign
+      10 build_precompile_module_source
+      11 build_precompile_method_source
+
+    * The following runtime native APIs were removed.
+
+      -  const char* (*get_method_name)(void* runtime, void* method);
+      -  int32_t (*get_method_is_class_method)(void* runtime, void* method);
+      -  int32_t (*get_method_is_anon)(void* runtime, void* method);
+      -  int32_t (*get_method_is_native)(void* runtime, void* method);
+      -  int32_t (*get_method_is_precompile)(void* runtime, void* method);
+      -  int32_t (*get_method_byte_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_short_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_int_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_long_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_float_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_double_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_object_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_ref_vars_width)(void* runtime, void* method);
+      -  int32_t (*get_method_mortal_stack_length)(void* runtime, void* method);
+      -  int32_t (*get_method_opcodes_length)(void* runtime, void* method);
+      -  int32_t (*get_method_args_length)(void* runtime, void* method);
+      -  int32_t (*get_method_required_args_length)(void* runtime, void* method);
+      -  int32_t (*get_method_is_enum)(void* runtime, void* method);
+      -  void* (*get_method_return_basic_type)(void* runtime, void* method);
+      -  int32_t (*get_method_return_type_dimension)(void* runtime, void* method);
+      -  int32_t (*get_method_return_type_flag)(void* runtime, void* method);
+      -  void* (*get_method_current_basic_type)(void* runtime, void* method);
+      -  void* (*get_method_by_index)(void* runtime, void* basic_type, int32_t method_index);
+      -  void* (*get_method_by_name)(void* runtime, void* basic_type, const char* method_name);
+      -  void* (*get_method_by_name)(void* runtime, void* basic_type, const char* method_name);
+      -  int32_t (*get_method_index)(void* runtime, void* method);
+      -  void* (*get_native_method_address)(void* runtime, void* method);
+      -  void (*set_native_method_address)(void* runtime, void* method, void* address);
+      -  void* (*get_precompile_method_address)(SPVM_ENV*, void* method);
+      -  void (*set_precompile_method_address)(void* runtime, void* method, void* address);
+         
+      -  const char* (*get_field_name)(void* runtime, void* field);
+      -  void* (*get_field_basic_type)(void* runtime, void* field);
+      -  int32_t (*get_field_type_dimension)(void* runtime, void* field);
+      -  int32_t (*get_field_type_flag)(void* runtime, void* field);
+      -  void* (*get_field_current_basic_type)(void* runtime, void* field);
+      -  void* (*get_field_by_index)(void* runtime, void* basic_type, int32_t field_index);
+      -  void* (*get_field_by_name)(void* runtime, void* basic_type, const char* field_name);
+      -  int32_t (*get_field_index)(void* runtime, void* field);
+      -  int32_t (*get_field_offset)(void* runtime, void* field);
+
+      -  void* (*get_class_var_by_index)(void* runtime, void* basic_type, int32_t class_var_index);
+      -  const char* (*get_class_var_name)(void* runtime, void* class_var);
+      -  void* (*get_class_var_basic_type)(void* runtime, void* class_var);
+      -  int32_t (*get_class_var_type_dimension)(void* runtime, void* class_var);
+      -  int32_t (*get_class_var_type_flag)(void* runtime, void* class_var);
+      -  void* (*get_class_var_current_basic_type)(void* runtime, void* class_var);
+      -  void* (*get_class_var_by_name)(void* runtime, void* basic_type, const char* class_var_name);
+      -  int32_t (*get_class_var_index)(void* runtime, void* class_var);
+      -  void* (*get_class_var_current_basic_type)(void* runtime, void* class_var);
+      -  void* (*get_class_var_by_name)(void* runtime, void* basic_type, const char* class_var_name);
+      -  int32_t (*get_class_var_index)(void* runtime, void* class_var);
+          
+      -  void* (*get_arg_basic_type)(void* runtime, void* arg);
+      -  int32_t (*get_arg_type_dimension)(void* runtime, void* arg);
+      -  int32_t (*get_arg_type_flag)(void* runtime, void* arg);
+      -  void* (*get_arg_by_index)(void* runtime, void* method, int32_t arg_index);
+    
+      - void* (*get_basic_type_anon_basic_type)(void* runtime, void* basic_type, int32_t anon_basic_type_index);
+      -  const char* (*get_basic_type_module_rel_file)(void* runtime, void* basic_type);
+      -  const char* (*get_basic_type_module_dir)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_is_anon)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_fields_length)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_methods_length)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+      -  void* (*get_basic_type_parent)(void* runtime, void* basic_type);
+      -  const char* (*get_basic_type_version_string)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+      -  void* (*get_basic_type_parent)(void* runtime, void* basic_type);
+      -  const char* (*get_basic_type_version_string)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+      -  void* (*get_basic_type_parent)(void* runtime, void* basic_type);
+      -  const char* (*get_basic_type_version_string)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_id)(void* runtime, void* basic_type);
+
+    * The following runtime native APIs were renamed.
+    
+      -  void* (*get_field)(void* runtime, void* basic_type, int32_t field_index);
+      +  void* (*get_field_by_index)(void* runtime, void* basic_type, int32_t field_index);
+      
+      -  void* (*get_class_var)(void* runtime, void* basic_type, int32_t class_var_index);
+      +  void* (*get_class_var_by_index)(void* runtime, void* basic_type, int32_t class_var_index);
+      
+      -  void* (*get_method)(void* runtime, void* basic_type, int32_t method_index);
+      +  void* (*get_method_by_index)(void* runtime, void* basic_type, int32_t method_index);
+
+      -  void* (*get_arg)(void* runtime, void* method, int32_t arg_index);
+      +  void* (*get_arg_by_index)(void* runtime, void* method, int32_t arg_index);
+
+    * The spvm_native.c was removed.
+      
+    * The methods in the Runtime class were removed.
+
+      -  method build_env : Env ();
+
+    * The following structures in Native API were renamed.
+
+      -struct spvm_env_compiler;
+      -typedef struct spvm_env_compiler SPVM_ENV_COMPILER;
+      +struct spvm_api_compiler;
+      +typedef struct spvm_api_compiler SPVM_API_COMPILER;
+
+      -struct spvm_env_module_file;
+      -typedef struct spvm_env_module_file SPVM_ENV_MODULE_FILE;
+      +struct spvm_api_module_file;
+      +typedef struct spvm_api_module_file SPVM_API_MODULE_FILE;
+
+      -struct spvm_env_runtime;
+      -typedef struct spvm_env_runtime SPVM_ENV_RUNTIME;
+      +struct spvm_api_runtime;
+      +typedef struct spvm_api_runtime SPVM_API_RUNTIME;
+
+      -struct spvm_env_string_buffer;
+      -typedef struct spvm_env_string_buffer SPVM_ENV_STRING_BUFFER;
+      +struct spvm_api_string_buffer;
+      +typedef struct spvm_api_string_buffer SPVM_API_STRING_BUFFER;
+
+      -struct spvm_env_allocator;
+      -typedef struct spvm_env_allocator SPVM_ENV_ALLOCATOR;
+      +struct spvm_api_allocator;
+      +typedef struct spvm_api_allocator SPVM_API_ALLOCATOR;
+    
+    * The following native API were removed.
+    
+      -  void (*free_env_prepared)(SPVM_ENV* env);
+      -  void (*free_env)(SPVM_ENV* env);
+      -  SPVM_ENV* (*new_env)(SPVM_ENV* env);
+
+    * The following native API were renamed.
+
+      -  SPVM_ENV* (*new_env_raw)();
+      -  void (*free_env_raw)(SPVM_ENV* env);
+      +  SPVM_ENV* (*new_env)();
+      +  void (*free_env)(SPVM_ENV* env);
+
+      -SPVM_ENV* SPVM_NATIVE_new_env_raw(void);
+      +SPVM_ENV* SPVM_NATIVE_new_env(void);
+
+    * The following native module file API were removed.
+       
+       - SPVM_API_MODULE_FILE* (*new_env)(void);
+
+0.989020 2023-07-07
+  [Incompatibe Changes]
+    * The following Native APIs were removed.
+      int32_t (*init_env)(SPVM_ENV* env);
+    
+    * The following Native Runtime APIs were removed.
+      - int32_t* (*get_runtime_codes)(void* runtime);
+      - int32_t (*get_runtime_codes_length)(void* runtime);
+      - void (*build)(void* runtime, int32_t* runtime_codes);
+      - void* (*get_allocator)(void* runtime);
+      - int32_t* (*get_opcodes)(void* runtime);
+      -  int32_t (*get_method_opcodes_base)(void* runtime, void* method);
+      -  int32_t (*get_method_args_base)(void* runtime, void* method);
+      -  int32_t (*get_basic_type_fields_base)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_methods_base)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_base)(void* runtime, void* basic_type);
+    
+    * The following Native Runtime APIs were renamed.
+      -  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, void* method);
+      -  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_byte_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_short_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_int_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_long_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_float_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_double_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_object_vars_width)(void* runtime, void* method);
+      +  int32_t (*get_method_ref_vars_width)(void* runtime, void* method);
+
+    * The following methods in the Runtime were removed.
+     
+      method get_runtime_codes : int[] ();
+      
+    * The following Native Compiler APIs were removed.
+      -  int32_t* (*create_runtime_codes)(void* compiler, void* allocator);
+    
+  [Changes]
+    * The start_file argument of the set_start_file method in the Native Compiler API was copied.
+    * The include_dir argument of the add_include_dir method in the Native Compiler API was copied.
+  [New Features]
+    * The following Native Compiler APIs were added.
+    
+      void* (*get_module_file)(void* compiler, const char* module_name);
+      void (*add_module_file)(void* compiler, const char* module_name, void* module_file);
+      void* (*build_runtime)(void* compiler);
+      
+    * SPVM Module File Native APIs were added.
+    
+    * The following Native API was added.
+    
+      void* (*get_object_basic_type)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  
+0.989019 2023-07-04
+  [Changes]
+    * spvm_module_file.h and spvm_module_c were added to include and src directories.
+    * Compilation error messages in toke.c were improved.
+    * Compilation error messages in op.c were improved.
+  [Incompatibe Changes]
+    * The no_compiler_api option in the SPVM::Builder::Config::Exe module was removed.
+    * The no_precompile option in the SPVM::Builder::Config::Exe module was removed.
+    * The following Native Runtime APIs were changed.
+
+      -  void* (*new_object)();
+      +  void* (*new_instance)(void);
+
+      -  void (*free_object)(void* runtime);
+      +  void (*free_instance)(void* runtime);
+
+    * The following Native Compiler APIs were changed.
+
+      -  void* (*new_object)();
+      +  void* (*new_instance)(void);
+
+      -  void (*free_object)(void* compiler);
+      +  void (*free_instance)(void* compiler);
+
+    * The following Native Precompile APIs were changed.
+
+      -  void* (*new_object)();
+      +  void* (*new_instance)(void);
+
+      -  void (*free_object)(void* precompile);
+      +  void (*free_instance)(void* precompile);
+
+      -  void (*build_source)(void* precompile, void* string_buffer, const char* basic_type_name);
+      +  void (*build_module_source)(void* precompile, void* string_buffer, const char* basic_type_name);
+
+    * The following Native Allocator APIs were changed.
+
+      -  void* (*new_object)();
+      +  void* (*new_instance)(void);
+
+      -  void (*free_object)(void* allocator);
+      +  void (*free_instance)(void* allocator);
+
+    * The following Native String Buffer APIs were changed.
+
+      -  void* (*new_object)();
+      +  void* (*new_instance)(void* allocator, int32_t capacity);
+
+      -  void (*free_object)(void* string_buffer);
+      +  void (*free_instance)(void* string_buffer);
+
+      -  const char* (*get_value)(void* string_buffer);
+      +  const char* (*get_string)(void* string_buffer);
+    
+    * The following Native Runtime APIs were added.
+    
+      +  void (*build_precompile_module_source)(void* runtime, void* string_buffer, const char* module_name);
+      +  void (*build_precompile_method_source)(void* runtime, void* string_buffer, const char* module_name, const char* method_name);
+
+    * The methods in the Rutnime class were added and Native Precompile APIs were removed.
+
+      -  method build_precompile_source : string ($basic_type_name : string);
+      +  method build_precompile_module_source : string ($basic_type_name : string);
+
+0.989018 2023-07-03
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were changed.
+
+      -  void* (*get_basic_type)(void* runtime, int32_t basic_type_id);
+      +  void* (*get_basic_type_by_id)(void* runtime, int32_t basic_type_id);
+    
+0.989017 2023-06-30
+  [New Features]
+    The following Native APIs were added.
+    
+      * void* (*get_basic_type_by_id)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
+    
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were removed.
+      - int32_t (*get_basic_type_id_by_name)(void* runtime, const char* basic_type_name);
+  
+    * The following Native APIs were change.
+      -  void* (*new_pointer_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
+      -  void* (*new_pointer_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
+      +  void* (*new_pointer_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, void* pointer);
+      +  void* (*new_pointer_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, void* pointer);
+
+      -  int32_t (*is_type)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t basic_type_id, int32_t type_dimension);
+      +  int32_t (*is_type)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* basic_type, int32_t type_dimension);
+
+      -  void* (*new_mulnum_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t length);
+      -  void* (*new_mulnum_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t length);
+      +  void* (*new_mulnum_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      +  void* (*new_mulnum_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+
+      -  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t element_dimension, int32_t length);
+      -  void* (*new_muldim_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t element_dimension, int32_t length);
+      +  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
+      +  void* (*new_muldim_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
+
+      -  void* (*new_object_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t length);
+      -  void* (*new_object_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t length);
+      +  void* (*new_object_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+      +  void* (*new_object_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
+
+      -  void* (*new_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
+      -  void* (*new_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
+      +  void* (*new_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+      +  void* (*new_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+
+      -  int32_t (*isa)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t basic_type_id, int32_t type_dimension);
+      +  int32_t (*isa)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* basic_type, int32_t type_dimension);
+
+      -  const char* (*get_version_string)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
+      -  double (*get_version_number)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
+      +  const char* (*get_version_string)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+      +  double (*get_version_number)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type);
+
+      -  int32_t (*has_interface)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t interface_basic_type_id);
+      +  int32_t (*has_interface)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* interface_basic_type);
+
+    * The following Native Runtime APIs were change.
+      -  int32_t (*can_assign)(void* runtime, int32_t dist_basic_type_id, int32_t dist_type_dimension, int32_t dist_type_flag, int32_t src_basic_type_id, int32_t src_type_dimension, int32_t src_type_flag);
+      +  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
+
+      -  int32_t (*is_object_type)(void* runtime, int32_t basic_type_id, int32_t type_dimension, int32_t flag);
+      +  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+
+      -  int32_t (*get_arg_basic_type_id)(void* runtime, void* arg);
+      +  void* (*get_arg_basic_type)(void* runtime, void* arg);
+
+      -  int32_t (*get_method_return_basic_type_id)(void* runtime, void* method);
+      +  void* (*get_method_return_basic_type)(void* runtime, void* method);
+
+      -  int32_t (*get_method_current_basic_type_id)(void* runtime, void* method);
+      +  void* (*get_method_current_basic_type)(void* runtime, void* method);
+
+      -  void* (*get_method)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      +  void* (*get_method)(void* runtime, void* basic_type, int32_t method_index);
+      -  void* (*get_method_by_name)(void* runtime, int32_t basic_type_id, const char* method_name);
+      +  void* (*get_method_by_name)(void* runtime, void* basic_type, const char* method_name);
+
+      -  int32_t (*get_field_basic_type_id)(void* runtime, void* field);
+      +  void* (*get_field_basic_type)(void* runtime, void* field);
+
+      -  int32_t (*get_field_current_basic_type_id)(void* runtime, void* method);
+      +  void* (*get_field_current_basic_type)(void* runtime, void* field);
+
+      -  void* (*get_field_by_name)(void* runtime, int32_t basic_type_id, const char* field_name);
+      +  void* (*get_field_by_name)(void* runtime, void* basic_type, const char* field_name);
+
+      -  void* (*get_field)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      +  void* (*get_field)(void* runtime, void* basic_type, int32_t field_index);
+
+      -  int32_t (*get_class_var_basic_type_id)(void* runtime, void* class_var);
+      +  void* (*get_class_var_basic_type)(void* runtime, void* class_var);
+
+      -  int32_t (*get_class_var_current_basic_type_id)(void* runtime, void* class_var);
+      +  void* (*get_class_var_current_basic_type)(void* runtime, void* class_var);
+
+      -  void* (*get_class_var_by_name)(void* runtime, int32_t basic_type_id, const char* class_var_name);
+      +  void* (*get_class_var_by_name)(void* runtime, void* basic_type, const char* class_var_name);
+
+      -  void* (*get_class_var)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      +  void* (*get_class_var)(void* runtime, void* basic_type, int32_t class_var_index);
+
+      -  const char* (*get_basic_type_version_string)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_version_string)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_parent_id)(void* runtime, int32_t basic_type_id);
+      +  void* (*get_basic_type_parent)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_class_vars_base)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_class_vars_base)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_methods_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_methods_length)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_methods_base)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_methods_base_v2)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_fields_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_fields_length)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_fields_base)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_fields_base)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_is_anon)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_is_anon)(void* runtime, void* basic_type);
+
+      -  const char* (*get_basic_type_module_dir)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_module_dir)(void* runtime, void* basic_type);
+
+      -  const char* (*get_basic_type_module_rel_file)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_module_rel_file)(void* runtime, void* basic_type);
+
+      -  int32_t (*get_basic_type_category)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_category)(void* runtime, void* basic_type);
+
+      -  const char* (*get_basic_type_name)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_name)(void* runtime, void* basic_type);
+
+0.989016 2023-06-29
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were changed.
+      -  int32_t (*get_basic_type_name_id)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_name)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_class_var_name_id)(void* runtime, void* class_var);
+      +  const char* (*get_class_var_name)(void* runtime, void* class_var);
+      -  int32_t (*get_field_name_id)(void* runtime, void* field);
+      +  const char* (*get_field_name)(void* runtime, void* field);
+      -  int32_t (*get_method_name_id)(void* runtime, void* method);
+      +  const char* (*get_method_name)(void* runtime, void* method);
+
+      -  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_module_dir_id)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_module_rel_file)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_module_dir)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_version_string_id)(void* runtime, int32_t basic_type_id);
+      +  const char* (*get_basic_type_version_string)(void* runtime, int32_t basic_type_id);
+
+    * The following Native Runtime APIs were removed.
+      -  const char* (*get_constant_string_value)(void* runtime, int32_t constant_string_id, int32_t* string_length);
+      -  const char* (*get_name)(void* runtime, int32_t constant_string_id);
+    
+  [New Features]
+    * The following Native Runtime APIs were added.
+    const char* (*get_basic_type_name)(void* runtime, int32_t basic_type_id);
+    const char* (*get_class_var_name)(void* runtime, void* class_var);
+    const char* (*get_field_name)(void* runtime, void* field);
+    const char* (*get_method_name)(void* runtime, void* method);
+  [Compilation Error Message Improvement]
+    * Complication error messages were improved.
+  [Changes]
+    * The string cancatlation optimization was removed.
+
+0.989015 2023-06-27
+  [Incompatibe Changes]
+    * The following native APIs were removed.
+    
+      void (*set_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
+      int32_t (*get_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+  [Incompatibe Changes]
+    * The following Native APIs were removed.
+    
+      void* class_vars_heap
+      void* init_flags;
+      int32_t (*get_opcodes_length)(void* runtime);
+
+    * The following Native Runtime APIs were removed.
+    
+      void* init_flags;
+
+0.989014 2023-06-26
+  [Bug Fix]
+    * The bug that the get_field_static Native API didn't work well was fixed.
+  [Incompatibe Changes]
+    * The following Native APIs were removed.
+      
+      void* object_flag_offset;
+      void* object_weaken_backref_head;
+      void* object_basic_type_id_offset;
+      void* object_type_dimension_offset;
+      void* object_length_offset;
+      void* object_header_size;
+      void* object_ref_count_offset;
+      
+    * The following Native Runtime APIs were removed.
+      
+      void* object_flag_offset;
+      void* object_weaken_backref_head;
+      void* object_basic_type_id_offset;
+      void* object_type_dimension_offset;
+    
+    * The following Native Runtime APIs were change.
+
+      -  int32_t (*get_arg_basic_type_id)(void* runtime, int32_t arg_id);
+      -  int32_t (*get_arg_type_dimension)(void* runtime, int32_t arg_id);
+      -  int32_t (*get_arg_type_flag)(void* runtime, int32_t arg_id);
+      +  int32_t (*get_arg_basic_type_id)(void* runtime, void* arg);
+      +  int32_t (*get_arg_type_dimension)(void* runtime, void* arg);
+      +  int32_t (*get_arg_type_flag)(void* runtime, void* arg);
+
+  [New Features]
+    * The following Native Runtime APIs were added.
+        +  void* (*get_arg)(void* runtime, void* method, int32_t arg_index);
+  
+0.989013 2023-06-26
+  [New Features]
+    * The following methods were added.
+      
+      The get_array_unsafe field in the ByteList class was added.
+      The get_array_unsafe field in the ShortList class was added.
+      The get_array_unsafe field in the IntList class was added.
+      The get_array_unsafe field in the LongList class was added.
+      The get_array_unsafe field in the FloatList class was added.
+      The get_array_unsafe field in the DoubleList class was added.
+      The get_array_unsafe field in the List class was added.
+      The get_array_unsafe field in the StringList class was added.
+      The get_string_unsafe field in the StringBuffer class was added.
+   
+   * The following Native API constant value were added.
+      
+      SPVM_NATIVE_VERSION_NUMBER
+      
+      SPVM_NATIVE_VERSION_STRING
+      
+  [Incompatibe Changes]
+    * The following fields were removed.
+    
+      The values field in the ByteList class was removed.
+      The values field in the ShortList class was removed.
+      The values field in the IntList class was removed.
+      The values field in the LongList class was removed.
+      The values field in the FloatList class was removed.
+      The values field in the DoubleList class was removed.
+      The values field in the List class was removed.
+      The values field in the StringList class was removed.
+      The value field in the StringBuffer class was removed.
+    
+    * A version string cannot contain "_".
+      A version string must be able to be parsed by the C<strtod> C function. Otherwise a compilation error occurs.
+      
+0.989012 2023-06-26
+  [Bug Fix]
+    * A bug was fixed: Some native APIs had not returned correct error return values.
+
+  [Incompatibe Changes]
+    * The following Native APIs were changed.
+      -  int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, int32_t args_stack_length, const char* func_nam
+      e, const char* file, int32_t line);
+      -  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* method_name, int32_t args_stack_length, const char* func_name, const char* file, int32
+      _t line);
+      +  void (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, int32_t args_stack_length, int32_t* error, const c
+      har* func_name, const char* file, int32_t line);
+      +  void (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* method_name, int32_t args_stack_length, int32_t* error, const char* func_name, const char
+      * file, int32_t line);
+      -  int32_t (*call_instance_method_static_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, int32_t args_stack_length, const char* func_name, const char* file, int32_t line);
+      +  void (*call_instance_method_static_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, int32_t args_stack_length, int32_t* error, const char* func_name, const char* file, int32_t line);
+
+0.989011 2023-06-25
+  [New Features]
+    * The following Native Runtime API were added.
+
+      int32_t (*get_field_offset)(void* runtime, void* field);
+
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were removed.
+    
+      int32_t (*get_field_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      int32_t (*get_field_address_id_by_name)(void* runtime, const char* basic_type_name, const char* field_name);
+    * The length of the merged fields in a class must be lower than 65535.
+
+    * The following Native APIs were changed.
+      -  void* (*get_class_var)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* class_var_name);
+      +  void* (*get_class_var)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name);
+      
+      -  void* (*get_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+      +  void* (*get_method)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name);
+      
+      -  void* (*get_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+      +  void* (*get_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name);
+      -  void* (*get_instance_method_static)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+      +  void* (*get_instance_method_static)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name);
+      
+      -  int32_t (*get_field_id)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name);
+      +  void* (*get_field)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name);
+      -  int32_t (*get_field_id_static)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name);
+      +  void* (*get_field_static)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name);
+      
+      -  int8_t (*get_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  int16_t (*get_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  int32_t (*get_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  int64_t (*get_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  float (*get_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  double (*get_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  void* (*get_field_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id);
+      -  void (*set_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, int8_t value);
+      -  void (*set_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, int16_t value);
+      -  void (*set_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, int32_t value);
+      -  void (*set_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, int64_t value);
+      -  void (*set_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, float value);
+      -  void (*set_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, double value);
+      -  void (*set_field_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_address_id, void* value);
+      +  int8_t (*get_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  int16_t (*get_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  int32_t (*get_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  int64_t (*get_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  float (*get_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  double (*get_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  void* (*get_field_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  void (*set_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int8_t value);
+      +  void (*set_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int16_t value);
+      +  void (*set_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int32_t value);
+      +  float (*get_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  double (*get_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  void* (*get_field_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  void (*set_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int8_t value);
+      +  void (*set_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int16_t value);
+      +  void (*set_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int32_t value);
+      +  void (*set_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, int64_t value);
+      +  void (*set_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, float value);
+      +  void (*set_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, double value);
+      +  void (*set_field_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field, void* value);
+
+    * The following Native APIs were removed.
+
+      -  int32_t (*get_field_offset)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t field_address_id);
+0.989010 2023-06-22
+  [New Features]
+    * The following Native Runtime APIs were added.
+      +int32_t SPVM_API_RUNTIME_get_class_var_address_id(SPVM_RUNTIME* runtime, SPVM_RUNTIME_METHOD* class_var);
+      +int32_t SPVM_API_RUNTIME_get_class_var_index(SPVM_RUNTIME* runtime, SPVM_RUNTIME_METHOD* class_var);
+      +int32_t SPVM_API_RUNTIME_get_field_address_id(SPVM_RUNTIME* runtime, SPVM_RUNTIME_METHOD* field);
+      +int32_t SPVM_API_RUNTIME_get_field_index(SPVM_RUNTIME* runtime, SPVM_RUNTIME_METHOD* field);
+    * The following Native APIs were added.
+      +  void* (*new_stack_trace_raw_v2)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);
+      +  void* (*new_stack_trace_v2)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);
+      
+      int8_t (*get_class_var_byte_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      int16_t (*get_class_var_short_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      int32_t (*get_class_var_int_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      int64_t (*get_class_var_long_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      float (*get_class_var_float_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      double (*get_class_var_double_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      void* (*get_class_var_object_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index);
+      void (*set_class_var_byte_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, int8_t value);
+      void (*set_class_var_short_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, int16_t value);
+      void (*set_class_var_int_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, int32_t value);
+      void (*set_class_var_long_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, int64_t value);
+      void (*set_class_var_float_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, float value);
+      void (*set_class_var_double_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, double value);
+      void (*set_class_var_object_v2)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t class_var_index, void* value);
+  [Warnings]
+    * The beheivior of the following Native APIs were deprecated and will be replaced with version 2 APIs.
+      +  void* (*new_stack_trace_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, int32_t method_address_id, int32_t line);
+      +  void* (*new_stack_trace)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, int32_t method_address_id, int32_t line);
+      
+      int8_t (*get_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      int16_t (*get_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      int32_t (*get_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      int64_t (*get_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      float (*get_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      double (*get_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      void* (*get_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      void (*set_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int8_t value);
+      void (*set_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int16_t value);
+      void (*set_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int32_t value);
+      void (*set_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int64_t value);
+      void (*set_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, float value);
+      void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, double value);
+      void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, void* value);
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were changed.
+      -  int32_t (*get_basic_type_name_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_name_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_category)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_category)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_module_dir_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_is_anon)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_fields_length)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_methods_length)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_base_address_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_module_dir_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_is_anon)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_fields_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_methods_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_class_vars_base_address_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_class_vars_length)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_parent_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_version_string_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_parent_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_version_string_id)(void* runtime, int32_t basic_type_id);
+    * The following Native APIs were changed.
+      -  int32_t (*call_method_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+      +  int32_t (*call_method_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* method, int32_t args_stack_length);
+      -  int32_t (*call_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+      +  int32_t (*call_method)(SPVM_ENV* env, SPVM_VALUE* stack, void* method, int32_t args_stack_length);
+      
+      -  void* (*new_stack_trace_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, int32_t method_address_id, int32_t line);
+      -  void* (*new_stack_trace)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, int32_t method_address_id, int32_t line);
+      +  void* (*new_stack_trace_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);
+      +  void* (*new_stack_trace)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception, void* method, int32_t line);0.989009 2023-06-21
+      -  int32_t (*get_class_method_id)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name);
+      +  void* (*get_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+      
+      -  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* basic_type_name, const char* method_name);
+      +  void* (*get_instance_method_static)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+      
+      -  int32_t (*get_instance_method_id)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name);
+      +  void* (*get_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name);
+      
+      -  int32_t (*get_method_id)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name);
+      +  void* (*get_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* method_name);
+            
+      -  int32_t (*get_class_var_id)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name);
+      +  void* (*get_class_var)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, const char* class_var_name);
+
+      -  int8_t (*get_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  int16_t (*get_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  int32_t (*get_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  int64_t (*get_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  float (*get_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  double (*get_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  void* (*get_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id);
+      -  void (*set_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int8_t value);
+      -  void (*set_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int16_t value);
+      -  void (*set_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int32_t value);
+      -  void (*set_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, int64_t value);
+      -  void (*set_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, float value);
+      -  void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, double value);
+      -  void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_address_id, void* value);
+      +  int8_t (*get_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  int16_t (*get_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  int32_t (*get_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  int64_t (*get_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  float (*get_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  double (*get_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  void* (*get_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  void (*set_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, int8_t value);
+      +  void (*set_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, int16_t value);
+      +  void (*set_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, int32_t value);
+      +  void (*set_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, int64_t value);
+      +  void (*set_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, float value);
+      +  void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, double value);
+      +  void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, void* value);
+
+    * The following Native Runtime APIs were changed.
+      - void* (*get_field)(void* runtime, void* basic_type, int32_t field_index);
+      - void* (*get_class_var)(void* runtime, void* basic_type, int32_t class_var_index);
+      - void* (*get_method)(void* runtime, void* basic_type, int32_t method_index);
+      + void* (*get_field)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      + void* (*get_class_var)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      + void* (*get_method)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      
+      -  int32_t (*get_method_is_static)(void* runtime, void* method);
+      +  int32_t (*get_method_is_class_method)(void* runtime, void* method);
+      
+      -  void* (*get_basic_type_by_id)(void* runtime, int32_t basic_type_id);
+      +  void* (*get_basic_type)(void* runtime, int32_t basic_type_id);
+    * The following Native Runtime APIs were removed.
+      - int32_t (*get_method_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      - int32_t (*get_method_address_id_by_name)(void* runtime, const char* basic_type_name, const char* method_name);
+
+  [New Features]
+    * The following Native Runtime APIs were added.
+    
+      void* (*get_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name);
+      
+    * The following Native Runtime APIs were added.
+
+      void* (*get_class_var_by_name)(void* runtime, int32_t basic_type_id, const char* class_var_name);
+      void* (*get_field_by_name)(void* runtime, int32_t basic_type_id, const char* field_name);
+      void* (*get_method_by_name)(void* runtime, int32_t basic_type_id, const char* method_name);
+      int32_t (*get_method_address_id)(void* runtime, void* method);
+      int32_t (*get_method_index)(void* runtime, void* method);
+  [Bug Fix]
+    * The following bug was fixed. Cached symbol IDs in the precompile code does not work well in some cases.
+0.989008 2023-06-20
+  [Incompatibe Changes]
+    * The following Native Runtime APIs were changed.
+    
+      -  int32_t (*get_basic_type_rel_file_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, int32_t basic_type_id);
+      
+      -  int32_t (*get_basic_type_dir_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_module_dir_id)(void* runtime, int32_t basic_type_id);
+
+      -  int32_t (*get_method_opcodes_base_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_opcodes_base_address_id)(void* runtime, int32_t method_id);
+      
+      -  int32_t (*get_method_args_base_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_args_base_address_id)(void* runtime, int32_t method_id);
+      
+      -  int32_t (*get_basic_type_fields_base_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, int32_t basic_type_id);
+      
+      -  int32_t (*get_basic_type_methods_base_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, int32_t basic_type_id);
+      
+      -  int32_t (*get_basic_type_class_vars_base_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_class_vars_base_address_id)(void* runtime, int32_t basic_type_id);
+      
+      -  int32_t (*get_method_id_by_index)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      -  int32_t (*get_method_id_by_name)(void* runtime, const char* basic_type_name, const char* method_name);
+      -  int32_t (*get_method_name_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      +  int32_t (*get_method_address_id_by_name)(void* runtime, const char* basic_type_name, const char* method_name);
+      +  int32_t (*get_method_name_id)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_is_static)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_is_anon)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_is_native)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_is_precompile)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_mortal_stack_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_opcodes_base_address_id)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_opcodes_length)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_args_base_address_id)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_args_length)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_is_static)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_is_anon)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_is_native)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_is_precompile)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_mortal_stack_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_opcodes_base_address_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_opcodes_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_args_base_address_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_args_length)(void* runtime, int32_t method_address_id);
+      -  void* (*get_native_method_address)(void* runtime, int32_t method_id);
+      -  void (*set_native_method_address)(void* runtime, int32_t method_id, void* address);
+      -  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_id);
+      -  void (*set_precompile_method_address)(void* runtime, int32_t method_id, void* address);
+      +  void* (*get_native_method_address)(void* runtime, int32_t method_address_id);
+      +  void (*set_native_method_address)(void* runtime, int32_t method_address_id, void* address);
+      +  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_address_id);
+      +  void (*set_precompile_method_address)(void* runtime, int32_t method_address_id, void* address);
+      -  int32_t (*get_method_required_args_length)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_required_args_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_is_enum)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_is_enum)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_return_basic_type_id)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_return_type_dimension)(void* runtime, int32_t method_id);
+      -  int32_t (*get_method_return_type_flag)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_return_basic_type_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_return_type_dimension)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_return_type_flag)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_current_basic_type_id)(void* runtime, int32_t method_id);
+      -  int32_t (*get_field_current_basic_type_id)(void* runtime, int32_t method_id);
+      -  int32_t (*get_class_var_current_basic_type_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_current_basic_type_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_field_current_basic_type_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_class_var_current_basic_type_id)(void* runtime, int32_t method_address_id);
+
+      -  int32_t (*get_field_id_by_index)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      -  int32_t (*get_field_id_by_name)(void* runtime, const char* basic_type_name, const char* field_name);
+      -  int32_t (*get_field_name_id)(void* runtime, int32_t field_id);
+      +  int32_t (*get_field_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      +  int32_t (*get_field_address_id_by_name)(void* runtime, const char* basic_type_name, const char* field_name);
+      +  int32_t (*get_field_name_id)(void* runtime, int32_t field_address_id);
+      -  int32_t (*get_field_basic_type_id)(void* runtime, int32_t field_id);
+      -  int32_t (*get_field_type_dimension)(void* runtime, int32_t field_id);
+      -  int32_t (*get_field_type_flag)(void* runtime, int32_t field_id);
+      +  int32_t (*get_field_basic_type_id)(void* runtime, int32_t field_address_id);
+      +  int32_t (*get_field_type_dimension)(void* runtime, int32_t field_address_id);
+      +  int32_t (*get_field_type_flag)(void* runtime, int32_t field_address_id);
+
+      -  int32_t (*get_class_var_id_by_index)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      -  int32_t (*get_class_var_id_by_name)(void* runtime, const char* basic_type_name, const char* class_var_name);
+      -  int32_t (*get_class_var_name_id)(void* runtime, int32_t class_var_id);
+      +  int32_t (*get_class_var_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      +  int32_t (*get_class_var_address_id_by_name)(void* runtime, const char* basic_type_name, const char* class_var_name);
+      +  int32_t (*get_class_var_name_id)(void* runtime, int32_t class_var_address_id);
+      -  int32_t (*get_class_var_basic_type_id)(void* runtime, int32_t class_var_id);
+      -  int32_t (*get_class_var_type_dimension)(void* runtime, int32_t class_var_id);
+      -  int32_t (*get_class_var_type_flag)(void* runtime, int32_t class_var_id);
+      +  int32_t (*get_class_var_basic_type_id)(void* runtime, int32_t class_var_address_id);
+      +  int32_t (*get_class_var_type_dimension)(void* runtime, int32_t class_var_address_id);
+      +  int32_t (*get_class_var_type_flag)(void* runtime, int32_t class_var_address_id);
+
+      -  int32_t (*get_class_var_address_id_by_index)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      +  void* (*get_class_var)(void* runtime, void* basic_type, int32_t class_var_index);
+
+      -  int32_t (*get_class_var_name_id)(void* runtime, int32_t class_var_address_id);
+      +  int32_t (*get_class_var_name_id)(void* runtime, void* class_var);
+      -  int32_t (*get_class_var_basic_type_id)(void* runtime, int32_t class_var_address_id);
+      -  int32_t (*get_class_var_type_dimension)(void* runtime, int32_t class_var_address_id);
+      -  int32_t (*get_class_var_type_flag)(void* runtime, int32_t class_var_address_id);
+      +  int32_t (*get_class_var_basic_type_id)(void* runtime, void* class_var);
+      +  int32_t (*get_class_var_type_dimension)(void* runtime, void* class_var);
+      +  int32_t (*get_class_var_type_flag)(void* runtime, void* class_var);
+      -  int32_t (*get_class_var_current_basic_type_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_class_var_current_basic_type_id)(void* runtime, void* class_var);
+
+      -  int32_t (*get_field_name_id)(void* runtime, int32_t field_address_id);
+      +  int32_t (*get_field_name_id)(void* runtime, void* field);
+      -  int32_t (*get_field_basic_type_id)(void* runtime, int32_t field_address_id);
+      -  int32_t (*get_field_type_dimension)(void* runtime, int32_t field_address_id);
+      -  int32_t (*get_field_type_flag)(void* runtime, int32_t field_address_id);
+      +  int32_t (*get_field_basic_type_id)(void* runtime, void* field);
+      +  int32_t (*get_field_type_dimension)(void* runtime, void* field);
+      +  int32_t (*get_field_type_flag)(void* runtime, void* field);
+      +  void* (*get_field_by_address_id)(void* runtime, int32_t field_address_id);
+
+      -  int32_t (*get_method_name_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_name_id)(void* runtime, void* method);
+      -  int32_t (*get_method_is_static)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_is_anon)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_is_native)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_is_precompile)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_mortal_stack_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_opcodes_base_address_id)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_opcodes_length)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_args_base_address_id)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_args_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_is_static)(void* runtime, void* method);
+      +  int32_t (*get_method_is_anon)(void* runtime, void* method);
+      +  int32_t (*get_method_is_native)(void* runtime, void* method);
+      +  int32_t (*get_method_is_precompile)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, void* method);
+      +  int32_t (*get_method_mortal_stack_length)(void* runtime, void* method);
+      +  int32_t (*get_method_opcodes_base_address_id)(void* runtime, void* method);
+      +  int32_t (*get_method_opcodes_length)(void* runtime, void* method);
+      +  int32_t (*get_method_args_base_address_id)(void* runtime, void* method);
+      +  int32_t (*get_method_args_length)(void* runtime, void* method);
+      -  void* (*get_native_method_address)(void* runtime, int32_t method_address_id);
+      -  void (*set_native_method_address)(void* runtime, int32_t method_address_id, void* address);
+      -  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_address_id);
+      -  void (*set_precompile_method_address)(void* runtime, int32_t method_address_id, void* address);
+      +  void* (*get_native_method_address)(void* runtime, void* method);
+      +  void (*set_native_method_address)(void* runtime, void* method, void* address);
+      +  void* (*get_precompile_method_address)(SPVM_ENV*, void* method);
+      +  void (*set_precompile_method_address)(void* runtime, void* method, void* address);
+      -  int32_t (*get_method_required_args_length)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_required_args_length)(void* runtime, void* method);
+      -  int32_t (*get_method_is_enum)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_is_enum)(void* runtime, void* method);
+      -  int32_t (*get_method_return_basic_type_id)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_return_type_dimension)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_method_return_type_flag)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_return_basic_type_id)(void* runtime, void* method);
+      +  int32_t (*get_method_return_type_dimension)(void* runtime, void* method);
+      +  int32_t (*get_method_return_type_flag)(void* runtime, void* method);
+      -  int32_t (*get_method_current_basic_type_id)(void* runtime, int32_t method_address_id);
+      -  int32_t (*get_field_current_basic_type_id)(void* runtime, int32_t method_address_id);
+      +  int32_t (*get_method_current_basic_type_id)(void* runtime, void* method);
+      +  int32_t (*get_field_current_basic_type_id)(void* runtime, void* method);
+      
+      -  int32_t (*get_basic_type_name_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_name_id)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_category)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_category)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_module_dir_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_is_anon)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_fields_length)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_fields_length)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_methods_length)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_class_vars_base_address_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_class_vars_length)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_module_rel_file_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_module_dir_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_is_anon)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_fields_base_address_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_fields_length)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_methods_base_address_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_methods_length)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_class_vars_base_address_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_class_vars_length)(void* runtime, void* basic_type);
+      -  int32_t (*get_basic_type_parent_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_version_string_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_parent_id)(void* runtime, void* basic_type);
+      +  int32_t (*get_basic_type_version_string_id)(void* runtime, void* basic_type);
+      
+    * The following Native Runtime API were removed.
+      -  int32_t (*get_anon_method_method_id)(void* runtime, int32_t anon_method_id);
+      -  int32_t (*get_basic_type_anon_methods_base_id)(void* runtime, int32_t basic_type_id);
+      -  int32_t (*get_basic_type_anon_methods_length)(void* runtime, int32_t basic_type_id);
+0.989007 2023-06-19
+  [Document Changes]
+    * The hedding "Class Attribute" was renamed to "Module Attribute"
+    * The hedding "Class Name" was renamed to "Basic Type Name"
+    
+  [Bug Fix and Incompatibe Changes]
+    * The no-build-spvm-classes option in the Makefile.PL that was generated by spvmdist command was renamed to the no-build-spvm-modules option.
+      This had been wrongly changed.
+  [Incompatibe Changes]
+    * The class_name fields in the all classes(.spvm) were renamed to the basic_type_name methods and fields.
+    * The class_name method and fields in the Perl modules(.pm) were renamed to module_name.
+    * The following Native Runtime APIs were changed.
+      -  int32_t (*get_basic_type_parent_class_basic_type_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_parent_id)(void* runtime, int32_t basic_type_id);
+    * The __CLASS__ operator was renamed to __PACKAGE__ operator.
+    
+  [Compilation Error Messages]
+    * The expression "class name" was reduced.
+  [Exception Messages]
+    * The expression "class name" was reduced.
+
+0.989006 2023-06-18
+  [New Features]
+    * The get_basic_type_name method in the Runtime class was added.
+    
+  [Incompatible Changes]
+    * The following Native Runtime APIs were changed.
+      -  int32_t (*get_basic_type_class_path_id)(void* runtime, int32_t basic_type_id);
+      +  int32_t (*get_basic_type_dir_id)(void* runtime, int32_t basic_type_id);
+      
+      -  int32_t (*get_method_class_basic_type_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_current_basic_type_id)(void* runtime, int32_t method_id);
+      
+      -  int32_t (*get_field_class_basic_type_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_field_current_basic_type_id)(void* runtime, int32_t method_id);
+      
+      -  int32_t (*get_class_var_class_basic_type_id)(void* runtime, int32_t method_id);
+      +  int32_t (*get_class_var_current_basic_type_id)(void* runtime, int32_t method_id);
+    * The following Native API contant values were changed.
+    
+      [Before]
+      0 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
+      1 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NOT_FOUND_CLASS
+      2 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF
+      3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID
+      4 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC
+      5 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM
+      6 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING
+      7 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS
+      8 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE
+      9 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
+      
+      [After]
+      0 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
+      1 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF
+      2 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID
+      3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC
+      4 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM
+      5 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING
+      6 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS
+      7 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE
+      8 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
+    * The get_classes_length method in the Runtime class was removed.
+    * The get_class_names in the Runtime class was removed.
+    * The get_parent_class_name in the Runtime class was renamed to the get_basic_type_parent_name method.
+    * The get_class_file in the Runtime class was renamed to the get_file method.
+    * The build_precompile_class_source in the Runtime class was renamed to the build_precompile_source method.
+    * The get_anon_class_names in the Runtime class was renamed to the get_basic_type_anon_basic_type_names method.
+
+    * The following Native Runtime API were changed.
+    
+      -  int32_t (*get_method_is_class_method)(void* runtime, int32_t method_id);
+      +  int32_t (*get_method_is_static)(void* runtime, int32_t method_id);
+    
+    * The following Native Precompile API were changed.
+    
+      -  void (*build_class_source)(void* precompile, void* string_buffer, const char* class_name);
+      +  void (*build_source)(void* precompile, void* string_buffer, const char* class_name);
+    
+    * The following Native Compiler API were changed.
+    
+      -  void (*add_class_path)(void* compiler, const char* class_path);
+      +  void (*add_include_dir)(void* compiler, const char* include_dir);
+
+      -  int32_t (*get_class_paths_length )(void* compiler);
+      +  int32_t (*get_include_dirs_length )(void* compiler);
+
+      -  const char* (*get_class_path )(void* compiler, int32_t index);
+      +  const char* (*get_include_dir )(void* compiler, int32_t index);
+
+      -  void (*clear_class_paths)(void* compiler);
+      +  void (*clear_include_dirs)(void* compiler);
+
+    * The class-path option in the spvmcc command was renamed to include-dir.
+  [Breaking Binary Compatibility]
+    * Binary compatibility was broken.
+    
+0.989005 2023-06-15
+  [Changes]
+    * include/spvm_class.h and src/spvm_class.c were removed.
+0.989004 2023-06-14
+  [New Features]
+    * The get_field_basic_type_id Native Runtime API was added.
+    * The get_field_type_dimension Native Runtime API was added.
+    * The get_field_type_flag Native Runtime API was added.
+    * The get_class_var_basic_type_id Native Runtime API was added.
+    * The get_class_var_type_dimension Native Runtime API was added.
+    * The get_class_var_type_flag Native Runtime API was added.
+    * The get_method_return_basic_type_id Native Runtime API was added.
+    * The get_method_return_type_dimension Native Runtime API was added.
+    * The get_method_return_type_flag Native Runtime API was added.
+    * The get_arg_basic_type_id Native Runtime API was added.
+    * The get_arg_type_dimension Native Runtime API was added.
+    * The get_arg_type_flag Native Runtime API was added.
+    * The get_method_class_basic_type_id Native Runtime API was added.
+    * The get_field_class_basic_type_id Native Runtime API was added.
+    * The get_class_var_class_basic_type_id Native Runtime API was added.
+    * The get_basic_type_parent_class_basic_type_id Native Runtime API was added.
+  [Incompatible Changes]
+    * The get_field_type_id Native Runtime API was removed.
+    * The get_method_return_type_id Native Runtime API was removed.
+    * The get_type_stack_length Native Runtime API was removed.
+    * The get_arg_type_id Native Runtime API was removed.
+    * The get_basic_type_is_class Native Runtime API was removed.
+    * The following Native Runtime APIs were removed.
+      int32_t (*get_type_basic_type_id)(void* runtime, int32_t type_id);
+      int32_t (*get_type_dimension)(void* runtime, int32_t type_id);
+      int32_t (*get_type_is_object)(void* runtime, int32_t type_id);
+      int32_t (*get_type_is_ref)(void* runtime, int32_t type_id);
+      int32_t (*get_type_flag)(void* runtime, int32_t type_id);
+      int32_t (*get_basic_type_class_id)(void* runtime, int32_t basic_type_id);
+      int32_t (*get_field_class_id)(void* runtime, int32_t basic_type_id);
+      int32_t (*get_method_class_id)(void* runtime, int32_t basic_type_id);
+      int32_t (*get_class_var_class_id)(void* runtime, int32_t basic_type_id);
+      int32_t (*get_class_id_by_name)(void* runtime, const char* class_name);
+      int32_t (*get_class_name_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_class_rel_file_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_class_path_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_is_anon)(void* runtime, int32_t class_id);
+      int32_t (*get_class_fields_base_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_fields_length)(void* runtime, int32_t class_id);
+      int32_t (*get_class_methods_base_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_methods_length)(void* runtime, int32_t class_id);
+      int32_t (*get_class_class_vars_base_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_class_vars_length)(void* runtime, int32_t class_id);
+      int32_t (*get_class_anon_methods_base_id)(void* runtime, int32_t class_id);
+      int32_t (*get_class_anon_methods_length)(void* runtime, int32_t class_id);
+
+    * The following Native Runtime APIs were changed.
+      -  int32_t (*get_class_var_id_by_index)(void* runtime, int32_t class_id, int32_t class_var_index);
+      +  int32_t (*get_class_var_id_by_index)(void* runtime, int32_t basic_type_id, int32_t class_var_index);
+      
+      -  int32_t (*get_field_id_by_index)(void* runtime, int32_t class_id, int32_t field_index);
+      +  int32_t (*get_field_id_by_index)(void* runtime, int32_t basic_type_id, int32_t field_index);
+      
+      -  int32_t (*get_method_id_by_index)(void* runtime, int32_t class_id, int32_t method_index);
+      +  int32_t (*get_method_id_by_index)(void* runtime, int32_t basic_type_id, int32_t method_index);
+      
+0.989003 2023-06-09
+  [Bug Fix]
+    * The following bug was fixed: The can_assign Native Runtime API didnot work well.
+  [New Features]
+    * The isa_error operator and the is_operator were added.
+  [Changes]
+    * The Error::System class extends the Error class.
+    * The Error::NotSupported class extends the Error class.
+  [Incompatible Changes]
+    * The get_class_id Native API was removed. This is internally used now.
+    * The get_class_id_by_name Native API was removed. This is internally used now.
+  [Warnings]
+    * Native Runtime APIs that get and set the class id will be removed in the nearly feature.
+0.989002 2023-06-08
+  [Document Bug]
+    * The basic type IDs were wrong. This was fixed.
+    
+      0  SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
+      1  SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
+      2  SPVM_NATIVE_C_BASIC_TYPE_ID_VOID
+      3  SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE
+      4  SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT
+      5  SPVM_NATIVE_C_BASIC_TYPE_ID_INT
+      6  SPVM_NATIVE_C_BASIC_TYPE_ID_LONG
+      7  SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT
+      8  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE
+      9  SPVM_NATIVE_C_BASIC_TYPE_ID_STRING
+      10 SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT
+      11 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS
+      12 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS
+      13 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS
+      14 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS
+      15 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS
+      16 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS
+      17 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
+      18 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
+      19 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
+      20 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS
+      21 SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS
+      22 SPVM_NATIVE_C_BASIC_TYPE_ID_ADDRESS_CLASS
+
+  [New Features]
+    * The basic_type_id operator was added.
+  [Incompatible Changes]
+    * The error operator was renamed to the eval_error_id operator. The eval_error_id operator returns the basic type id, not the class id.
+    * The class_id operator was removed.
+    * The code field in the ExchangeAPI::Error class was renamed to the id field.
+    * The set_error_code operator was removed.
+    * The error_code operator was removed.
+    * The die Native API returned the basic type ID of the Error class.
+    * The deprecated following syntax was removed.
+    
+      var ASSIGN operator ':' qualified_type opt_type_comment
+
+0.989001 2023-06-07
+  [Incompatible Changes]
+    * The new_stack_trace_by_name Native API was removed.
+    * The new_stack_trace_raw_by_name Native API was removed.
+    * The following Native APIs were removed.
+      void* (*new_object_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      void* (*new_muldim_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length);
+      void* (*new_mulnum_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      int32_t (*has_interface_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* interface_basic_type_name);
+    * The IDs of the following Native APIs were changed.
+      new_object_array_by_name
+      new_muldim_array_by_name
+      new_mulnum_array_by_name
+      has_interface_by_name
+    * The definition of the following Native APIs were changed.
+      -  void* (*new_object_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      +  void* (*new_object_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length, int32_t* error, const char* func_name, const char* file, int32_t line);
+      
+      -  void* (*new_muldim_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length);
+      +  void* (*new_muldim_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length, int32_t* error, const char* func_name, const char* file, int32_t line);
+      
+      -  void* (*new_mulnum_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      +  void* (*new_mulnum_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length, int32_t* error, const char* func_name, const char* file, int32_t line);
+  [Bug Fix]
+    * A following bug was fiexed. The new_object_array_by_name, new_muldim_array_by_name, and new_mulnum_array_by_name Native APIs could not be called.
+    * A following bug was fiexed. The isa_by_name, is_type_by_name, and has_interface_by_name Native APIs didnot work correctly.
+  [Internale Changes]
+    * The spvm_object structure was restored. The basci_type_name member was removed in the spvm_object strucutre and the basic_type_id member is added again.
+0.989 2023-06-06
+  [New Features]
+    * The get_object_basic_type_name Native API was added.
+    * The isa_by_name Native API was added.
+    * The is_type_by_name Native API was added.
+    * The new_stack_trace_by_name Native API was added.
+    * The new_stack_trace_raw_by_name Native API was added.
+    * The can_assign Native Runtime API was added.
+    * The following Native APIs were added.
+      void* (*new_object_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      void* (*new_object_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      void* (*new_muldim_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length);
+      void* (*new_muldim_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length);
+      void* (*new_mulnum_array_raw_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      void* (*new_mulnum_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length);
+      int32_t (*has_interface_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* interface_basic_type_name);
+      
+  [Incompatible Changes]
+    * The definition of the get_compile_type_name_raw Native API was changed.
+      -  void* (*get_compile_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t type_flag);
+      +  void* (*get_compile_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t type_flag);
+    * The definition of the get_compile_type_name Native API was changed.
+      -  void* (*get_compile_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t type_flag);
+      +  void* (*get_compile_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t type_flag);
+  [Warning]
+    * Many Native APIs will be changed in the nearly release.
+      The IDs of the symbol will not be published to the user.
+      Risky operations such as ID will be moved from Native APIs to Native Runtime APIs.
+  [Bug Fix]
+    * The bug that the dump operator does not work well weaken fields and elements.
+0.988 2023-06-05
+  [New Features]
+    * The has_keys method in the Hash class is added.
+    * The replacement argument is added to the substr method in the Fn class.
+    
+      static method substr : string ($string : string, $offset : int, $length : int = -1, $replacement : string = undef);
+    
+  [Changed]
+    * An exception is thrown when the invocant of the instance method call is undef.
+  [Exception Message Improvement]
+    The following exception message is changed.
+      -  "The implementation of the \"%s\" instance method defined in \"%s\" is not found.",
+      +  "The implementation of the \"%s\" method in the \"%s\" interface is not found.",
+0.987 2023-05-29
+  [Changes]
+    * INIT block in precompile class is not precompiled.
+0.986 2023-05-29
+  [Incompatible Changes]
+    * The syntax of the optional argument is changed. The before syntax is deprecated and will be removed.
+    [Before]
+    static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 = DEFAULT_VALUE : ARG_TYPE2) {
+      
+    }
+    
+    [After]
+    static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2 = DEFAULT_VALUE) {
+      
+    }
+    
+0.985 2023-05-26
+  [Bug Fix]
+    * The bug that scopes does not work well in some cases.
+0.984 2023-05-25
+  [Bug Fix]
+    * The bug that the allow statemenet throws segfault.
+0.983 2023-05-25
+  [Bug Fix]
+    * The bug of array init reference count is fixed.
+    * The bug of anon method reference count is fixed.
+    * The bug of setting field reference count is fixed.
+  [Incompatible Changes]
+    * The refcnt operator is removed. The reference count is managed internally, not user land.
+    
+0.982 2023-05-24
+  [Document Changes]
+    * The "Execution Stack" heading is renamed to "Call Stack"
+    * The "Capture" heading is renamed to "Anon Method Field Definition".
+  [Incompatible Changes]
+    * Variable Length Argument is removed.
+    * The syntax of the capture is changed. The variable is passed by fields, not local variables.
+    
+0.981 2023-05-22
+  [Incompatible Changes]
+    * Capture syntax is changed. The before syntax is deprecated and will be removed.
+      [Before]
+        [$name : TYPE] method : int () {}
+      [After]
+        [has name : TYPE = $name] method : int () {}
+0.980 2023-05-20
+  [Compilation Error Message Improvement]
+    * Some compilation error messages are improved.
+  [Internal Changes]
+    * Internal changes are done.
+0.979 2023-05-19
+  [Compilation Error Changes]
+    * A compilation error message is changed. "The operand of the case statement must be an integer literal of the int type, a character litaral, or an enumeration value.".
+  [Internal Changes]
+    * The internal symbol names are cleaned up.
+0.978 2023-05-16
+  [Incompatible Changes and Bug Fix]
+    * Fixed the bug that precidence of operators are wrong. The precidence must be the same as Perl.
+  [Compilation Error Improvement]
+    * The compiliation error message "The character %d in a signed int is not expected." in tokenization is output.
+  [Bug Fix]
+    * The bug that __END__ does not work well is fixed.
+    * The bug that variable declaration with logical operator does not work correctly.
+  [Internal Changes]
+    * Removed FREE_TMP op. The reference count is not correct now in source codes.
+0.977 2023-05-11
+  [Incompatible Changes]
+    * The definition of the following native APIs are changed.
+      [Before]
+      void (*call_init_blocks)(SPVM_ENV* env);
+      [After]
+      int32_t (*call_init_blocks)(SPVM_ENV* env, SPVM_VALUE* stack);
+      
+      [Before]
+      int32_t (*set_command_info_base_time)(SPVM_ENV* env, int64_t base_time);
+      [After]
+      int32_t (*set_command_info_base_time)(SPVM_ENV* env, SPVM_VALUE* stack, int64_t base_time);
+
+      [Before]
+      int32_t (*set_command_info_argv)(SPVM_ENV* env, void* obj_argv);
+      [After]
+      int32_t (*set_command_info_argv)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_argv);
+      
+      [Before]
+      int32_t (*set_command_info_program_name)(SPVM_ENV* env, void* obj_program_name);
+      [After]
+      int32_t (*set_command_info_program_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_program_name);
+      
+      [Before]
+      void (*cleanup_global_vars)(SPVM_ENV* env, SPVM_VALUE* stack);
+      [After]
+      void (*cleanup_global_vars)(SPVM_ENV* env);
+  [Changes]
+    * The simple constructor inline expansion is removed.
+    * The constant method inline expansion is removed.
+    * INIT blocks that is the super class or used classes are automatically called.
+  [Document Changes]
+    * The heading "Loading Class" is renamed to "use Statement".
+    * The heading "Allow Field Access" is renamed to "allow Statement".
+    * The heading "Interface Gurantee" is renamed to "interface Statement".
+    * The heading "Class Alias" is renamed to "alias Statement".
+    
+0.976 2023-05-09
+  [New Features]
+    * Added the Immutable::ByteList class.
+    * Added the Immutable::ShortList class.
+    * Added the Immutable::IntList class.
+    * Added the Immutable::LongList class.
+    * Added the Immutable::FloatList class.
+    * Added the Immutable::DoubleList class.
+    * Added the Immutable::StringList class.
+0.975 2023-05-09
+  [Incompatible Changes]
+    * Removed the Mutable::Byte class.
+    * Removed the Mutable::Short class.
+    * Removed the Mutable::Int class.
+    * Removed the Mutable::Long class.
+    * Removed the Mutable::Float class.
+    * Removed the Mutable::Double class.
+    * Removed the deprecated ref operator.
+    * Removed the deprecated index_v2 method in the Fn class.
+    * Removed the deprecated rindex_v2 method in the Fn class.
+0.974 2023-05-08
+  [New Features]
+    * Added the Mutable::Byte class.
+    * Added the Mutable::Short class.
+    * Added the Mutable::Int class.
+    * Added the Mutable::Long class.
+    * Added the Mutable::Float class.
+    * Added the Mutable::Double class.
+  [Incompatible Changes]
+    * The set_value method in the Byte class is removed. This class becomes immutable.
+    * The set_value method in the Short class is removed. This class becomes immutable.
+    * The set_value method in the Int class is removed. This class becomes immutable.
+    * The set_value method in the Long class is removed. This class becomes immutable.
+    * The set_value method in the Float class is removed. This class becomes immutable.
+    * The set_value method in the Double class is removed. This class becomes immutable.
+    
+0.973 2023-05-07
+  [Changes]
+    * Default value is passed to the arguments of native methods.
+  [Test Improvement]
+    * Tests of the floating point literal are added.
+0.972 2023-05-04
+  [New Features]
+    * The die statemenet support undef operand.
+    
+      die undef;
+    * The compile_type_name operator is added.
+  [Changes]
+    * The compile error message of yacc are uniformed.
+    * The indent of the stack trace of an exception is now 2.
+    * The default warn message is changed to "Warning".
+    * The default exception message is changed to "Error".
+  [Incompatible Changes and Breaking Binary Compatibility]
+    * The call_method Native API is renamed to call_method_raw and added the new call_method Native API.
+  [Deprecation and New Features]
+    * The ref operator is deprecated and will be removed.
+      The type_name operator is added. The type_name operator is the same as the ref operator.
 0.971012 2023-05-03
   [Incompatible Changes]
     * The index method in the Fn is replaced with the index_v2 method.
@@ -495,7 +2827,7 @@
         111 unweaken
         112 alloc_memory_block_zero
         113 free_memory_block
-        114 get_memory_blocks_count
+        114 
         115 get_type_name_raw
         116 get_type_name
         117 new_env
@@ -2790,9 +5122,9 @@ Converts the $string to UTF-8 characters, and returns it.
     * Improve many parts. The numeric widening type conversion is replaced with the integer promotional type conversion.
     * Improve the doc of the switch statement.
     * Improve the doc of "Loop Syntax".
-    * Improve the doc of "return Statemenet".
-    * Improve the doc of "Empty Statemenet".
-    * Improve the doc of "Operator Statemenet".
+    * Improve the doc of "return Statement".
+    * Improve the doc of "Empty Statement".
+    * Improve the doc of "Operator Statement".
   [Document Fix]
     * Fix the type of the heading "Character Literal".
 

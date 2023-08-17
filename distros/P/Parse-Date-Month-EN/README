@@ -1,0 +1,87 @@
+NAME
+    Parse::Date::Month::EN - Parse month name from English text
+
+VERSION
+    This document describes version 0.001 of Parse::Date::Month::EN (from
+    Perl distribution Parse-Date-Month-EN), released on 2023-06-16.
+
+SYNOPSIS
+     use Parse::Date::Month::EN qw(parse_date_month_en);
+
+     my $m = parse_date_month_en(text => "sept"); # 9
+     $m = parse_date_month_en(text => "mars"); # undef
+
+DESCRIPTION
+    The goal of this module is to parse month names commonly found in
+    English text. It currently parses abbreviated and full month names in
+    English.
+
+VARIABLES
+    None are exported by default, but they are exportable.
+
+  $Pat
+    A regex.
+
+FUNCTIONS
+  parse_date_month_en
+    Usage:
+
+     parse_date_month_en(%args) -> any
+
+    Parse month name from English text.
+
+    Returns undef when month name is unrecognized.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   text* => *str*
+
+        The input text that contains month name.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Parse-Date-Month-EN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Parse-Date-Month-EN>.
+
+SEE ALSO
+    Other "Parse::Month::Name::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Date-Month-EN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

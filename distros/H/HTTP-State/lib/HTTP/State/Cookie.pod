@@ -1,0 +1,186 @@
+=head1 NAME
+
+HTTP::State::Cookie - Cookie structure and functions
+
+=head1 SYNOPSIS
+
+ # Default import only import "cookie_struct";
+ use HTTP::State::Cookie;
+ 
+ #Import the encoding functions
+ use HTTP::State::Cookie qw<:encode>;
+
+ #Import the decoding functions
+ use HTTP::State::Cookie qw<:decode>;
+
+=head1 DESCRIPTION
+
+Implements a structure representing a HTTP state fragment (cookie) and
+associated creation/encoding/decoding functions. This module can be used
+standalone but it's main purpose is to service L<HTTP::State> for a fast and up
+to date client side 'cookie jar'.
+
+=head1 API
+
+=head2 Structure Creation
+
+=head3 cookie_struct
+
+  #Minimum required arguments
+  cookie_struct name=>"value";
+  
+  #using constant keys
+  cookie_struct name=>"value" KEY()=>"value", ...;
+  cookie_struct name=>"value" KEY, "value", ...;
+
+  #using string names
+  cookie_struct name=>"value, key=>"value", ...;
+
+Creates a cookie structure for later encoding or adding to a L<HTTP::State>
+cookie jar.  Minimal initialisation of the cookie structure is performed to
+allow expected processing of 'default' values for client side cookie jars.
+
+The first two arguments are required. The first must be the B<name> of the
+cookie, and the second must be the B<value>.
+
+Remaining arguments are taken as key/value pairs representing the attributes of
+a cookie.
+
+The first attribute name is examined and expected to be a string or a integer,
+which then determines how all attribute names are handled:
+
+
+=over
+
+=item string
+
+A string matching the expected cookie attribute name (case insensitive) as per
+RFC6265bis-draft:
+
+		Name
+		Value
+		Expires
+		Max-Age
+		Domain
+		Path
+		Secure
+		HTTPOnly
+		SameSite
+    Partitioned
+
+Any other name is silently ignored.
+
+  ie 
+    my $struct = cookie_struct cool_name=>"some_value", Domain=>"somewhere.com"...
+
+=item integer (constant)
+
+An integer value equal to exported constants (C<use HTTP::State::Cookie ":constants">), 
+allows for compile time attribute name checking and performance improvements:
+
+		COOKIE_NAME
+		COOKIE_VALUE
+		COOKIE_EXPIRES
+		COOKIE_MAX_AGE
+		COOKIE_DOMAIN
+		COOKIE_PATH
+		COOKIE_SECURE
+		COOKIE_HTTPONLY
+		COOKIE_SAMESITE
+    COOKIE_PARTITIONED
+
+Any other integer value is ignored.
+
+  ie 
+    my $struct = cookie_struct cool_name=>"some_value", COOKIE_DOMAIN, "somewhere.com", ...
+
+Note that the () will need to used after the constant name when using fat
+arrows:
+
+  # Same as above using fat arrows for attribute key value pairs
+  ie 
+    my $struct = cookie_struct cool_name=>"some_value", COOKIE_DOMAIN()=>"somewhere.com", ...
+
+=back
+
+
+=head2 HTTP Client Side
+
+=head3 encode_cookies
+
+  my $string = encode_cookies $struct1, struct2, ...
+
+Encodes a list of cookie structures into a string suitable as the value of a
+HTTP 'Cookie' header.  This will encode the name and value from multiple
+cookies supplied into a single string, with the HTTP list separator.
+
+Returns a encoded http header value string.
+
+
+=head3 decode_set_cookie
+
+  my  $cookie=decode_set_cookie $string $string;
+  my  $cookie=decode_set_cookie $string $string, $offset;
+
+Decodes a HTTP Set-Cookie header value into a cookie structure and returns it.
+
+If the C<$offset> argument is defined, it is subtracted from the creation and
+last access time fields, if they are present. This performs the reverse of the
+C<$store_and_offset> argument in C<encode_set_cookie> to covert from local time
+to GMT times. This is used by L<HTTP::State> to load cookies in local time for
+storage compatible with L<HTTP::CookieJar>.
+
+
+=head2 HTTP Server Side
+
+=head3 encode_set_cookie
+
+  my $string=encode_set_cookie $cookie;
+  my $string=encode_set_cookie $cookie, $store_and_offset, $partition_key;
+
+Encodes a cookie into a string suitable as the value of HTTP Set-Cookie
+header.
+
+If the C<$store_and_offset> argument is defined, internal fields for the
+cookie are also encoded. The value is also used as a time offset (in seconds)
+to add to the internal creation and last access times.
+
+This is used by L<HTTP::State> to dump cookies in local time for storage
+compatible with L<HTTP::CookieJar>.
+
+If C<$partition_key> is defined, this is the partition key to store in the
+COOKIE_PARTITIONED field when C<$store_and_offset> is defined.
+
+=head3 decode_cookies
+
+  my @cookies = decode_cookies $string;
+  my @cookies = decode_cookies [$string, $string, ...];
+
+
+Decodes a cookie string into cookie structures. Input arguments can be a single
+string from a HTTP Cookie header or an reference to an array of multiple HTTP
+cookie header values.
+
+In the later case, the values are joined together and processed as if it was a
+single string.
+
+Returns a list of cookie structures with only B<name> and B<value> fields set.
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Ruben Westerberg
+
+Licensed under MIT
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

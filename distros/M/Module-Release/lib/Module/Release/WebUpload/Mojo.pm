@@ -17,7 +17,7 @@ our @EXPORT = qw(
 	pause_add_uri
 	);
 
-our $VERSION = '2.128';
+our $VERSION = '2.131';
 
 =encoding utf8
 
@@ -45,9 +45,10 @@ sub web_upload {
 
 	my $ua = $self->make_agent;
 
-	$self->_debug( sprintf "Uploading file %s", $self->local_file );
+	$self->_debug( sprintf "Uploading file %s\n", $self->local_file );
 
 	my $params = {
+		ACTION                        => 'add_uri',
 		HIDDENNAME                    => $self->config->cpan_user,
 		CAN_MULTIPART                 => 1,
 		pause99_add_uri_subdirtext    => '',
@@ -64,14 +65,17 @@ sub web_upload {
 		 form => $params,
 		 );
 
-	if( my $res = eval { $tx->result } ) {
+	if( my $res = eval { $tx->result->is_success } ) {
+		$self->_debug( "Response headers:\n" . $tx->res->to_string . "\n" );
 		$self->_print( "File uploaded\n" );
 		return 1;
 		}
 	else {
 		my $err = $tx->res->error;
-		$self->_print( "$err->{code} response: $err->{message}" ) if $err->{code};
-		$self->_print( "Connection error: $err->{message}" );
+		$self->_print( $err->{code} ?
+			"$err->{code} response: $err->{message}\n"
+			:
+			"Connection error: $err->{message}\n" );
 		return 0;
 		}
 	}
@@ -130,7 +134,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

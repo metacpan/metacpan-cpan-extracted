@@ -1,5 +1,24 @@
 Revision history for PDL-Opt-Simplex-Simple
 
+1.8	2023-08-16T19:18:42-07:00
+	- Implement the PDL::Opt::ParticleSwarm optimization algorithm to
+	  optimize PDL's.  The function and log callback calling convention is
+	  intentionally similar PDL::Opt::Simplex.  Code written to optimize
+	  using Simplex can be trivially converted to optimize with Particle
+	  Swarm.
+	- Implement PDL::Opt::ParticleSwarm::Simple as a subclass of
+	  PDL::Opt::Simplex::Simple.  Again, the calling convention for log and
+	  function callbacks is very similar, only the optimization-specific
+	  options differ.
+	- PDL::Opt::Simplex::Simple: do a better job clamping min/max values
+	  during optimization so the Simplex algorithm doesn't try to work out
+	  of bounds.
+	- PDL::Opt::Simplex::Simple: fixed a major perturb_scale bug
+	- Lots of POD updates, now we achieve 100% POD coverage
+	- Added many more tests
+	- Auto-sort MANIFEST as suggested by @mohawk2
+	- Fixup t/{pod-coverage.t,pod.t,manifest.t} to pass RELEASE_TESTING=1
+
 1.7	2022-11-15T19:12:30-08:00
 	- Reverted fix from 1.6 and increased PDL version requirement to 2.56
 	  per @mohawk.

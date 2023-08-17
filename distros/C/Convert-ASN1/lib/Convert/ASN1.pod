@@ -4,7 +4,7 @@ Convert::ASN1 - ASN.1 Encode/Decode library
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ rules.
 
 =head2 new ( [OPTIONS] )
 
-Contructor, creates a new object.
+Constructor, creates a new object.
 
 If given, B<OPTIONS> are the same ones as for L</"configure ( OPTIONS )"> below.
 

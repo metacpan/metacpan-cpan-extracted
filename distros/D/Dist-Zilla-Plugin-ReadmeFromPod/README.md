@@ -16,7 +16,7 @@ Dist::Zilla::Plugin::ReadmeFromPod - dzil plugin to generate README from POD
 # DESCRIPTION
 
 This plugin generates the `README` from `main_module` (or specified)
-by [Pod::Readme](https://metacpan.org/pod/Pod::Readme).
+by [Pod::Readme](https://metacpan.org/pod/Pod%3A%3AReadme).
 
 ## Options
 
@@ -35,7 +35,7 @@ Other options are "html", "pod", "markdown" and "rtf".
 
 ### `pod_class`
 
-This is the [Pod::Simple](https://metacpan.org/pod/Pod::Simple) class used to translate a file to the
+This is the [Pod::Simple](https://metacpan.org/pod/Pod%3A%3ASimple) class used to translate a file to the
 format you want. The default is based on the ["type"](#type) setting, but if
 you want to generate an alternative type, you can set this option
 instead.
@@ -46,7 +46,7 @@ The name of the file, which defaults to one based on the ["type"](#type).
 
 ## Conflicts with Other Plugins
 
-We will remove the README created by [Dist::Zilla::Plugin::Readme](https://metacpan.org/pod/Dist::Zilla::Plugin::Readme) automatically.
+We will remove the README created by [Dist::Zilla::Plugin::Readme](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AReadme) automatically.
 
 # AUTHORS
 
@@ -54,7 +54,7 @@ Fayland Lam <fayland@gmail.com> and
 Ævar Arnfjörð Bjarmason <avar@cpan.org>
 
 Robert Rothenberg <rrwo@cpan.org> modified this plugin to use
-[Pod::Readme](https://metacpan.org/pod/Pod::Readme).
+[Pod::Readme](https://metacpan.org/pod/Pod%3A%3AReadme).
 
 # LICENSE AND COPYRIGHT
 

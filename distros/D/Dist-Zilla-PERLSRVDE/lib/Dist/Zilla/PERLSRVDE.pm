@@ -5,7 +5,7 @@ package Dist::Zilla::PERLSRVDE;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Dist::Zilla::PERLSRVDE - A dummy module for this namespace
 
 =head1 VERSION
 
-version 1.0.1
+version 1.1.1
 
 =head1 DESCRIPTION
 

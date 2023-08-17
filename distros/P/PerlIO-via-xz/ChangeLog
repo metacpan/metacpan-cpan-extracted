@@ -1,3 +1,7 @@
+0.06	- 05 Jun 2023, H.Merijn Brand
+    * Refine requirements based on known CVE's
+    * Fix repo & bugtracker URLs in META
+
 0.05	- 06 Jan 2023, H.Merijn Brand
     * It is 2023
 

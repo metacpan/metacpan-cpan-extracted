@@ -81,6 +81,7 @@ my %admin_session_guid = (
     NodeId_namespaceIndex	=> 0,
     NodeId_identifierType	=> 4,
     NodeId_identifier		=> "00000001-0000-0000-0000-000000000000",
+    NodeId_print		=> "g=00000001-0000-0000-0000-000000000000",
 );
 
 $server->{config}->setGlobalNodeLifecycle({
@@ -512,6 +513,7 @@ my %target = (
 	$nodes{some_variable_0}{nodeId}{NodeId_namespaceIndex},
     NodeId_identifierType       => NODEIDTYPE_NUMERIC,
     NodeId_identifier           => 0,
+    NodeId_print		=> "ns=1;i=0",
 );
 
 $server->{config}->setGlobalNodeLifecycle({
@@ -537,6 +539,7 @@ $server->{config}->setGlobalNodeLifecycle({
 	# The node context of a generated node is undef.
 	return STATUSCODE_GOOD if defined($$nctx);
 	$target{NodeId_identifier} = 4711;
+	$target{NodeId_print} = "ns=1;i=4711";
 	is_deeply($nodeId, \%target, "generateChildNodeId NodeId");
 	return STATUSCODE_GOOD;
     }

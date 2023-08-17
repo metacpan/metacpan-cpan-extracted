@@ -24,7 +24,8 @@ If called with a prefix argument (C-u), prompt for the target language."
          (if current-prefix-arg
              (completing-read (format "Target language (default: %s): "
                                       xlate-default-target-lang)
-                              xlate-languages nil t)
+                              xlate-languages nil t nil
+			      xlate-default-target-lang xlate-default-target-lang)
            nil)))
   (let ((lang (or target-lang xlate-default-target-lang)))
     (shell-command-on-region

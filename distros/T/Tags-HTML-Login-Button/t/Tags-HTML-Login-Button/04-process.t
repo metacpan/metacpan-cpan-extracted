@@ -1,9 +1,11 @@
 use strict;
 use warnings;
 
+use English;
+use Error::Pure::Utils qw(clean);
 use Tags::HTML::Login::Button;
 use Tags::Output::Structure;
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 
 # Test.
@@ -52,3 +54,12 @@ is_deeply(
 	],
 	'Login button with explicit link a title.',
 );
+
+# Test.
+$obj = Tags::HTML::Login::Button->new;
+eval {
+	$obj->process;
+};
+is($EVAL_ERROR, "Parameter 'tags' isn't defined.\n",
+	"Parameter 'tags' isn't defined.");
+clean();

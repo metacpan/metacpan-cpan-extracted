@@ -1,381 +1,435 @@
-Changes for CryptX
-
-0.078   2023-04-28
-        - fix #89 Crypt::Mac::HMAC b64mac and b64umac object methods do not work
-
-0.077   2022-08-21
-        - fix #82 + #84 new t/mbi_ltm_big*.t failures
-        - fix #85 wrong linker options for aix
-
-0.076   2022-01-07
-        - fix #80 github actions (mac, windows, cygwin)
-        - fix #79 isolate ltc functions (via -Wl,--exclude-libs,ALL)
-        - fix #68 Segmentation fault on Apache due to symbol clash with libasn1
-
-0.075   2021-12-25
-        - fix #78 bundled libtomcrypt update branch:develop (commit:673f5ce2 2021-06-04)
-
-0.074   2021-11-06
-        - fix #75 Missing methods _sadd + _ssub in Math::BigInt::LTM
-        - fix #76 Tests failing for numbers with multiple underscore characters (Math::BigInt::LTM)
-
-0.073   2021-07-18
-        - fix #73 CPAN testers failure with Math::BigInt 1.99982
-        - fix #70 remove lto related hacks from Makefile.PL
-        - fix #72 drop optional prereqs JSON::XS + Cpanel::JSON::XS, use optionally only JSON
-
-0.072   2021-04-29
-        - fix #69 Identifier Octet's Leniency in RSA PKCS#1 Signature Verification
-        - bundled libtomcrypt update branch:develop (commit:165c795b 2021-04-14)
-
-0.071   2021-03-30
-        - fix #67 (better handling of PEM decoding failures)
-
-0.070   2021-02-12
-        - fix #66 remove -flto=auto (Makefile.PL)
-        - fix #65 typo in docs (lib/Crypt/Cipher.pm)
-        - bundled libtomcrypt update branch:develop (commit:910d6252 2021-01-19)
-
-0.069   2020-08-25
-        - fix #64 ECC: segfault on invalid input
-        - fix #63 ltc Licensing could be clearer (added src/{ltc,ltm}/LICENSE)
-        - fix #62 documentation only (Crypt::CBC related)
-        - bundled libtomcrypt update branch:develop (commit:d8d7a83b 2020-07-14)
-
-0.068   2020-03-10
-        - fix #60 Test failues on macOS Catalina
-
-0.067   2020-02-01
-        - new: Crypt::PK::Ed25519
-        - new: Crypt::PK::X25519
-        - bundled libtomcrypt update branch:develop (commit:1937f412 2019-11-22)
-
-0.066   2019-10-20
-        - fix #57 Build fails on i686
-        - bundled libtomcrypt update branch:develop (commit:354c9051 2019-10-20)
-        - no perl module code change
-
-0.065   2019-10-19
-        - fix #56 Math::BigInt 1.999817 breaks the tests of CryptX
-        - bundled libtomcrypt update branch:develop (commit:25410c75 2019-10-17)
-        - no perl module code change, just tests
-
-0.064   2019-06-14
-        - fix #50 libtommath patch - building on HP-UX 11.11 / PA-RISC
-        - necessary XS adaptation to the latest libtommath
-        - bundled libtomcrypt update branch:develop (commit:c600d81e 2019-06-09)
-
-0.063   2018-11-28
-        - proper patch for #46 (related to Math::BigInt::LTM)
-
-0.062   2018-10-30
-        - bundled libtommath  update branch:develop (commit:8b9f98ba 2018-09-23) + stdint.h workaround
-        - bundled libtomcrypt update branch:develop (commit:f413335b 2018-10-29)
-        - fix #45 doc only - sign_message_rfc7518 / sign_message_rfc7518
-        - fix #46 tests only - t/mbi_ltm_bigintpm.t etc. started to fail with latest Math::BigInt
-        - fix #47 gcm_decrypt_verify + chacha20poly1305_decrypt_verify don't verify the tag - SERIOUS SECURITY BUG!
-        - improved CBC/ECB padding (using libtomcrypt's functions: padding_depad + padding_pad)
-        - enable pkcs#8 encrypted RSA keys (supported by the latest libtomcrypt)
-        - exclude wycheproof tests (too big) from dist tarball (via MANIFEST.SKIP)
-
-0.061   2018-06-07
-        - bundled libtommath update (+stdint.h workaround)
-        - bundled libtomcrypt update (+necessary adaptation)
-        - fix #43 HP-UX 11.11 C-ANSI-C has no stdint.h
-        - fix #44 Anonymous unions are GNU and C11 (troubles with HP C/aC++, HP-UX 11.31/IA64)
-
-0.060   2018-05-01
-        - bundled libtomcrypt update
-        - Math::BigInt::LTM - remove buggy tests failing with the latest Math::BigInt
-        - basically no changes to the perl modules
-
-0.059   2018-03-25
-        - new Crypt::Digest::Keccak(224|256|384|512)
-        - new methods sign_hash_rfc7518 + verify_hash_rfc7518 (Crypt::PK::ECC)
-        - improved import of pkcs#8 private keys (Crypt::PK::ECC)
-        - improved export allowing "compressed" variants (Crypt::PK::ECC)
-        - fix #28 Apple's APNS pkcs8 auth key import fails (Crypt::PK::ECC)
-        - fix cpantesters failure (5.8.1 related)
-
-0.058   2018-02-27
-        - fix: decode_b58b + invalid input
-
-0.057   2018-01-31
-        - significant speed-up (more stuff handled on XS level)
-        - Crypt::Checksum is deprecated in favour of Crypt::Checksum::Adler32|CRC32
-
-0.056   2017-12-22
-        - new Crypt::Stream::Rabbit
-
-0.055   2017-11-28
-        - new Crypt::Cipher::IDEA
-        - new Crypt::Cipher::Serpent
-        - new Crypt::Stream::Salsa20
-        - new Crypt::Stream::Sosemanuk
-        - added CCM object oriented interface: new-add-add-done
-        - fix #39 accept CFLAGS and CPPFLAGS from the environment
-        - fix #40 typos in POD
-        - fix HMAC+SHA3 (now compliant with NIST test vectors)
-
-0.054   2017-10-12
-        - fix Crypt::PK::DSA verify
-        - libtomcrypt updated to 1.18 (+ some extra patches)
-        - documentation fixes
-
-0.053   2017-09-15
-        - fix Crypt::PK::DSA generate_key
-
-0.051   2017-08-08
-        - INCOMPATIBLE CHANGE: Crypt::AuthEnc::OCB is now compliant with RFC 7253
-
-0.050   2017-07-18
-        - fix cpantesters failures/warnings
-
-0.049   2017-07-18
-        - libtomcrypt updated to 1.18-rc2 (+ some extra patches)
-        - REMOVED: Crypt::PK::DH encrypt decrypt sign_message verify_message sign_hash verify_hash
-        - NEW: Crypt::Misc - encode_b32*, decode_b32*, encode_b58*, decode_b58*
-        - Crypt::PK::RSA: import public key from X509 certificate
-        - Crypt::PK::DSA: improved generate_key()
-        - Crypt::PK::DH: improved generate_key()
-        - fix #36 aad_add is obsolete for all EncAuth algs (correct is adata_add)
-        - fix #37 GCM - Encryption of the empty string
-
-0.048   2017-05-31
-        - NEW: Crypt::Digest::SHA3_224
-        - NEW: Crypt::Digest::SHA3_256
-        - NEW: Crypt::Digest::SHA3_384
-        - NEW: Crypt::Digest::SHA3_512
-        - NEW: Crypt::Digest::SHAKE
-        - NEW: Crypt::Digest::BLAKE2b_160
-        - NEW: Crypt::Digest::BLAKE2b_256
-        - NEW: Crypt::Digest::BLAKE2b_384
-        - NEW: Crypt::Digest::BLAKE2b_512
-        - NEW: Crypt::Digest::BLAKE2s_128
-        - NEW: Crypt::Digest::BLAKE2s_160
-        - NEW: Crypt::Digest::BLAKE2s_224
-        - NEW: Crypt::Digest::BLAKE2s_256
-        - NEW: Crypt::AuthEnc::ChaCha20Poly1305
-        - NEW: Crypt::Mac::Poly1305
-        - NEW: Crypt::Mac::BLAKE2s
-        - NEW: Crypt::Mac::BLAKE2b
-        - NEW: Crypt::PRNG::ChaCha20
-        - NEW: Crypt::Stream::ChaCha
-        - NEW: Crypt::Stream::RC4
-        - NEW: Crypt::Stream::Sober128
-        - NEW: functions in Crypt::Misc - increment_octets_be, increment_octets_le
-        - Crypt::PRNG now uses chacha20 prng by default
-
-0.047   2017-04-05
-        - fix #32 Compile "ar" step fails when Perl built with -flto (better version)
-        - fix #33 build fails on freebsd 9.2 and 10.0 (ar: fatal: Numeric group ID too large)
-
-0.046   2017-04-04
-        - fix #32 Compile "ar" step fails when Perl built with -flto
-
-0.045   2017-03-31
-        - sync with libtomcrypt/develop
-        - fix #30 fix on SPARC+SolarisStudio
-        - fix #31 Fails tests without '.' in @INC
-        - polish compiler warnings
-
-0.044   2016-11-28
-        - fix #27 Math::BigInt::LTM compatibility with older Math::BigInt
-
-0.043   2016-11-27
-        - fix #26 Math::BigInt::LTM compatibility with Math::BigInt 1.999801+
-
-0.042   2016-11-12
-        - RSA: sign/verify functions now support 'none' padding (INSECURE!)
-        - RC2: min keylen 40bit, used to be 64bit (INSECURE!)
-
-0.041   2016-10-12
-        - ECC: ltc_ecc_is_point memory leak
-        - DSA: properly handle FIPS 186-4 (4.6 + 4.7)
-        - GCM: counter incrementation isn't stopped at 2^32 blocks, which breaks GCM
-        - fix issue #24 Crypt::PK::ECC needs $VERSION (all *.pm have $VERSION)
-
-0.040   2016-09-12
-        - fix file permissions
-        - fix compiler warnings
-
-0.039   2016-08-02
-        - fix build troubles for MacOS / PPC
-
-0.038   2016-07-06
-        - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
-        - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
-        - Math::BigInt::LTM fixed _log_int()
-        - Math::BigInt::LTM fixed _alen()
-        - fix 'Please specify prototyping behavior for CryptX.xs'
-        - libtomcrypt (renaming *tab.c > *tab.c.inc not needed anymore)
-
-0.037   2016-06-16
-        - fix issue #18 Minor issue with comment syntax
-        - fix issue #19 t/checksum.t fails on AIX-5.3
-
-0.036   2016-06-07
-        - fix issue #17 ability to export ecc keys in short/oid form
-
-0.035   2016-06-03
-        - fix issue #14 Ensure Crypt::PK::ECC->key2hash()->{curve_name} is lowercase
-        - fix issue #15 OpenSSL interoperability broken
-
-0.034   2016-05-11
-        - Prevent RSA import_key() from altering a JWK hash reference
-
-0.033   2016-05-09
-        - MSVC6 related fixes (needed for older ActivePerl@MSWin32)
-
-0.032   2016-05-04
-        - Crypt::PK::DH - accept base/prime values
-        - new: DH methods export_key_raw, import_key_raw, params2hash
-        - enhanced: DH method generate_key
-        - new: Crypt::Checksum, Crypt::Checksum::CRC32, Crypt::Checksum::Adler32
-
-0.031   2016-05-01
-        - new: RSA+ECC method export_key_jwk_thumbprint()
-        - new: Crypt::Misc functions random_v4uuid + is_v4uuid
-        - fix: RSA+ECC export_key_jwk produces canonical JSON
-        - fix: RSA+DSA public key export now produces PEM/DER compatible with openssl
-                  public keys exported be previous version can still be imported
-        - fix: ECC import_key now accepts non-standard JWK curve names e.g. "secp112r1", "secp521r1"
-
-0.030   2016-04-13
-        - fix: 0.029 + 0.028 by mistake installed *.inc files to perl/(lib|site|vendor)
-
-0.029   2016-04-13
-        - NEW module: Math::BigInt::LTM
-        - NEW module: Crypt::Misc
-
-0.028   2016-03-23
-        - IMPORTANT: switch from Module::Build to ExtUtils::MakeMaker
-        - fix for broken DSA key (ssh format) loading
-
-0.027   2016-01-25
-        - sync with https://github.com/libtom/libtomcrypt (branch develop)
-        - sync with https://github.com/libtom/libtommath (branch develop)
-        - HP-UX related fixes
-        - JSON dependency is now optional (we check JSON::PP, JSON::XS, Cpanel::JSON::XS)
-        - skip jwk.t if no JSON::* module available
-        - does not require MIME::Base64 (we use base64 routines from libtomcrypt)
-
-0.026   2015-11-28
-        - switch to JSON::MaybeXS
-        - Crypt::PRNG - rand/irand related cosmetics
-        - consistently using UNIX newlines
-
-0.025   2015-07-07
-        - Crypt::PK::ECC+RSA export_key_jwk() allows to export a perl HASH with JWK structure
-
-0.024   2015-06-29
-        - new Crypt::PK::ECC methods
-            verify_message_rfc7518()
-            sign_message_rfc7518()
-            curve2hash()
-        - fix for Crypt::PK::RSA - bug in loading private key in JWK format
-
-0.023   2015-06-10
-        - support for older compilers (gcc3, vc6)
-        - typo in documentation (by tomhukins)
-
-0.022   2015-05-22
-        - new: Crypt::PK::ECC+RSA export_key_jwk() - exporting JWK format
-        - new: Crypt::Digest::SHA512_224
-        - new: Crypt::Digest::SHA512_256
-        - Crypt::PK::ECC+RSA import_key() - support for:
-          * public/private keys in JWK format
-          * private keys in PKCS8 PEM/DER format (unencrypted only)
-        - Crypt::PK::ECC+RSA+DSA import_key() - support for:
-          * public keys in SSH format
-          * public/private keys as a hashref exported via key2hash
-        - libtomcrypt updated to the latest develop branch, commit aeaa6d4a51 Apr 17 08:59:35 2015 +0200
-        - libtommath  updated to the latest develop branch, commit 0fd5e6c17f Dec 11 14:59:35 2014 +0100
-        - documentation fixes
-
-0.021   2014-01-23
-        - fixed asm(...) related compiler failures
-        - dsa_encrypt_key small correction
-        - optimized ecc_encrypt_key
-
-0.020   2014-01-18
-        - INCOMPATIBLE CHANGE: huge redesign of Crypt::PK::ECC
-        - ECC now supports curves y^2 = x^3 + a*x + b
-        - ECC you can use custom curves
-        - ECC import/export of keys in DER/PEM format now compatible with openssl
-        - enabling compile options ASM + ECC_TIMING_RESISTANT
-        - added many test vectors (RSA, DSA, EC) for interoperability with openssl
-
-0.019   2013-10-20
-        - fixed broken CAMELLIA implementation
-
-0.018   2013-10-18
-        - DSA: make_key + sign_hash fixes
-
-0.017   2013-09-24
-        - lowering MIME::Base64 version requirement
-        - support for import/export of password protected RSA/DSA keys
-        - RSA: added - export_key_pem('public_x509')
-        - better handling of dh_free/rsa_free/dsa_free/ecc_free
-        - added openssl test vectors
-        - fixed compiler warnings (RSA/DSA/ECC/DH)
-
-0.016   2013-09-15
-        - added missing test for key2hash, sign_hash, verify_hash
-        - fixed build failures on VC6
-
-0.015   2013-09-12
-        - only documentation fixes
-
-0.014   2013-09-11
-        - Crypt::Digest::NNN + Crypt::Mac::NNN - can produce Base64-URL-Safe encoded digest/mac
-        - Crypt::PRNG + Crypt::PRNG::NNN - Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
-        - Crypt::PK::RSA/DSA/DH/ECC - sign/verify replaced by sign_message/verify_message + sign_hash/verify_hash
-        - Crypt::PK::RSA/DSA/DH/ECC - new method key2hash
-        - documentation fixes
-
-0.013   2013-08-28
-        - DSA/RSA/ECC/DH - importing keys from string changed - now: $pk->import_key(\$buffer_with_key)
-        - DSA/RSA/ECC/DH - size() and is_private() now return undef if no key loaded
-        - improved RSA doc
-
-0.012   2013-06-17
-        - README, LICENSE etc. to improve CPANTS score
-        - somehow works with perl 5.6.2
-
-0.011   2013-06-15
-        - fixing various compiler warnings
-
-0.009   2013-05-19
-        - doc fixes
-        - requires perl 5.8.8 or higher
-        - INCOMPATIBILITY: all digest related 'xxx_base64' functions renamed to 'xxx_b64'
-
-0.008   2013-05-02
-        - fixed prng test failures
-        - Crypt::Digest::* croaks with the "real caller" (not a nice solution)
-
-0.007   2013-04-23
-        - Crypt::PRNG supports add_entropy() - without params
-        - Crypt::PRNG fork-safe & thread-safe
-        - random_string has default $len = 20
-        - doc fixes
-        - cpan tester failure fix for pk_dsa.t
-
-0.006   2013-04-19
-        - added Crypt::KeyDerivation
-        - Win64 compatibility
-
-0.005   2013-04-18
-        - added Crypt::PRNG::Fortuna|RC4|Sober128|Yarrow
-        - added Crypt::PK::RSA|DSA|ECC|DH
-
-0.004   2013-04-16
-        - removing illegal Crypt::Random
-
-0.003   2013-04-16
-        - added Crypt::Mode::CBC|CFB|CTR|ECB|OFB
-        - added Crypt::AuthEnc::CCM|EAX|GCM|OCB
-
-0.002   2013-04-11
-        - first release on CPAN
+Revision histories for Perl extension Number::ZipCode::JP
+
+0.20230731 Mon Jul 31 2023
+    - Update some table classes.
+
+0.20230630 Sat Jul  1 2023
+    - Update some table classes.
+
+0.20230531 Mon Jun  5 2023
+    - Update some table classes.
+
+0.20230428 Fri Apr 28 2023
+    - Update some table classes.
+
+0.20230331 Fri Mar 31 2023
+    - Update some table classes.
+
+0.20230131 Tue Jan 31 2023
+    - Update some table classes.
+
+0.20221228 Thu Dec 29 2022
+    - Update some table classes.
+
+0.20221130 Wed Nov 30 2022
+    - Update some table classes.
+
+0.20221031 Mon Oct 31 2022
+    - Update some table classes.
+
+0.20220930 Fri Sep 30 2022
+    - Update some table classes.
+
+0.20220831 Wed Aug 31 2022
+    - Update some table classes.
+
+0.20220630 Fri Jul  1 2022
+    - Update some table classes.
+
+0.20220531 Tue May 31 2022
+    - Update some table classes.
+
+0.20220428 Thu Apr 28 2022
+    - Update some table classes.
+
+0.20220331 Thu Mar 31 2022
+    - Update some table classes.
+
+0.20211228 Tue Dec 28 2021
+    - Update some table classes.
+
+0.20211130 Tue Nov 30 2021
+    - Update some table classes.
+
+0.20211029 Fri Oct 29 2021
+    - Update some table classes.
+
+0.20210930 Thu Sep 30 2021
+    - Update some table classes.
+
+0.20210831 Tue Aug 31 2021
+    - Update some table classes.
+
+0.20210730 Fri Jul 30 2021
+    - Update some table classes.
+
+0.20210630 Thu Jul  1 2021
+    - Update some table classes.
+
+0.20210531 Mon May 31 2021
+    - Update some table classes.
+
+0.20210430 Fri Apr 30 2021
+    - Update some table classes.
+
+0.20210331 Wed Mar 31 2021
+    - Update some table classes.
+
+0.20210226 Fri Feb 26 2021
+    - Update some table classes.
+
+0.20210129 Fri Jan 29 2021
+    - Update some table classes.
+
+0.20201228 Mon Dec 28 2020
+    - Update some table classes.
+
+0.20201130 Mon Nov 30 2020
+    - Update some table classes.
+
+0.20201031 Sat Oct 31 2020
+    - Update some table classes.
+
+0.20201030 Fri Oct 30 2020
+    - Update some table classes.
+
+0.20200930 Wed Sep 30 2020
+    - Update some table classes.
+
+0.20200831 Mon Aug 31 2020
+    - Update some table classes.
+
+0.20200731 Fri Jul 31 2020
+    - Update some table classes.
+
+0.20200630 Tue Jun 30 2020
+    - Update some table classes.
+
+0.20200529 Fri May 29 2020
+    - Update some table classes.
+
+0.20200430 Thu Apr 30 2020
+    - Update some table classes.
+
+0.20200331 Tue Mar 31 2020
+    - Update some table classes.
+
+0.20200131 Fri Jan 31 2020
+    - Update some table classes.
+
+0.20191227 Sun Dec 29 2019
+    - Update some table classes.
+
+0.20191129 Fri Nov 29 2019
+    - Update some table classes.
+
+0.20191031 Thu Oct 31 2019
+    - Update some table classes.
+
+0.20190930 Mon Sep 30 2019
+    - Update some table classes.
+
+0.20190830 Fri Aug 30 2019
+    - Update some table classes.
+
+0.20190731 Thu Aug  1 2019
+    - Update some table classes.
+
+0.20190628 Fri Jun 28 2019
+    - Update some table classes.
+
+0.20190531 Fri May 31 2019
+    - Update some table classes.
+
+0.20190426 Fri Apr 26 2019
+    - Update some table classes.
+
+0.20190329 Fri Mar 29 2019
+    - Update some table classes.
+
+0.20190228 Thu Feb 28 2019
+    - Update some table classes.
+
+0.20190131 Thu Jan 31 2019
+    - Update some table classes.
+
+0.20181228 Fri Dec 28 2018
+    - Update some table classes.
+
+0.20181130 Sat Dec  1 2018
+    - Update some table classes.
+
+0.20181031 Wed Oct 31 2018
+    - Update some table classes.
+
+0.20180928 Sat Sep 29 2018
+    - Update some table classes.
+
+0.20180901 Sat Sep  1 2018
+    - Update some table classes.
+
+0.20180831 Fri Aug 31 2018
+    - Update some table classes.
+
+0.20180731 Tue Jul 31 2018
+    - Update some table classes.
+
+0.20180629 Mon Jul  2 2018
+    - Update some table classes.
+
+0.20180531 Thu May 31 2018
+    - Update some table classes.
+
+0.20180427 Mon May  7 2018
+    - Update some table classes.
+
+0.20180330 Fri Mar 30 2018
+    - Update some table classes.
+
+0.20180228 Wed Feb 28 2018
+    - Update some table classes.
+
+0.20180131 Wed Jan 31 2018
+    - Update some table classes.
+
+0.20171228 Fri Jan  5 2018
+    - Update some table classes.
+
+0.20171130 Fri Dec  1 2017
+    - Update some table classes.
+
+0.20171031 Tue Oct 31 2017
+    - Update some table classes.
+
+0.20170929 Fri Sep 29 2017
+    - Update some table classes.
+
+0.20170831 Fri Sep  1 2017
+    - Update some table classes.
+
+0.20170731 Mon Jul 31 2017
+    - Update some table classes.
+
+0.20170630 Fri Jun 30 2017
+    - Update some table classes.
+
+0.20170531 Wed May 31 2017
+    - Update some table classes.
+
+0.20170428 Mon May  1 2017
+    - Update some table classes.
+
+0.20170331 Mon Apr  3 2017
+    - Update some table classes.
+
+0.20170228 Tue Feb 28 2017
+    - Update some table classes.
+
+0.20170131 Tue Jan 31 2017
+    - Update some table classes.
+
+0.20161228 Wed Dec 28 2016
+    - Update some table classes.
+
+0.20161122 Tue Nov 22 2016
+    - Update some table classes.
+
+0.20161031 Mon Oct 31 2016
+    - Update some table classes.
+
+0.20160930 Fri Sep 30 2016
+    - Update some table classes.
+
+0.20160831 Wed Aug 31 2016
+    - Update some table classes.
+
+0.20160729 Fri Jul 29 2016
+    - Update some table classes.
+
+0.20160630 Thu Jun 30 2016
+    - Update some table classes.
+
+0.20160531 Tue May 31 2016
+    - Update some table classes.
+
+0.20160428 Thu Apr 28 2016
+    - Update some table classes.
+
+0.20160331 Thu Mar 31 2016
+    - Update some table classes.
+
+0.20160229 Mon Feb 29 2016
+    - Update some table classes.
+
+0.20160129 Fri Jan 29 2016
+    - Update some table classes.
+
+0.20151228 Mon Dec 28 2015
+    - Update some table classes.
+
+0.20151130 Mon Nov 30 2015
+    - Update some table classes.
+
+0.20151030 Fri Oct 30 2015
+    - Update some table classes.
+
+0.20150930 Fri Oct  2 2015
+    - Update some table classes.
+
+0.20150831 Tue Sep  1 2015
+    - Update some table classes.
+
+0.20150731 Fri Jul 31 2015
+    - Update some table classes.
+
+0.20150630 Tue Jun 30 2015
+    - Update some table classes.
+
+0.20150529 Fri May 29 2015
+    - Update some table classes.
+
+0.20150430 Thu Apr 30 2015
+    - Update some table classes.
+
+0.20150331 Tue Mar 31 2015
+    - Update some table classes.
+
+0.20150227 Fri Feb 27 2015
+    - Update some table classes.
+
+0.20150130 Fri Jan 30 2015
+    - Update some table classes.
+
+0.20141226 Mon Dec 29 2014
+    - Update some table classes.
+
+0.20141128 Fri Nov 28 2014
+    - Update some table classes.
+
+0.20141031 Tue Nov  4 2014
+     - Update some table classes.
+
+0.20140930 Tue Sep 30 2014
+     - Update some table classes.
+
+0.20140829 Fri Aug 29 2014
+     - Update some table classes.
+
+0.20140731 Fri Aug  1 2014
+     - Update some table classes.
+
+0.20140630 Mon Jun 30 2014
+     - Update some table classes.
+
+0.20140531 Mon Jun  2 2014
+     - Bug fixed. Previous version breaks compatibility in regexp.
+       (?^...) construct can be used perl 5.14 or later.
+       It's too modern.
+
+0.20140530 Fri May 30 2014
+     - Update some table classes.
+
+0.20140430 Wed Apr 30 2014
+     - Update some table classes.
+
+0.20140328 Sat Mar 29 2014
+     - Update some table classes.
+
+0.20140228 Fri Feb 28 2014
+     - Update some table classes.
+
+0.20140131 Fri Jan 31 2014
+     - Update some table classes.
+
+0.20131227 Mon Jan  6 2014
+     - Update some table classes.
+
+0.20131129 Mon Dec  2 2013
+     - Update some table classes.
+
+0.20131031 Sat Nov  2 2013
+     - Update some table classes.
+
+0.20130930 Mon Sep 30 2013
+     - Update some table classes.
+
+0.20130830 Fri Aug 30 2013
+     - Update some table classes.
+
+0.20130731 Wed Jul 31 2013
+     - Update some table classes.
+
+0.20130628 Fri Jun 28 2013
+     - Update some table classes.
+
+0.20130531 Fri May 31 2013
+     - Update some table classes.
+
+0.20130430 Tue Apr 30 2013
+     - Update some table classes.
+
+0.20130329 Fri Mar 29 2013
+     - Update some table classes.
+
+0.20130228 Thu Feb 28 2013
+     - Update some table classes.
+
+0.20130131 Fri Feb  1 2013
+     - Update some table classes.
+
+0.20121228 Fri Dec 28 2012
+     - Update some table classes.
+
+0.20121130 Fri Nov 30 2012
+     - Update some table classes.
+
+0.20121031 Wed Oct 31 2012
+     - Update some table classes.
+
+0.20120928 Mon Oct  1 2012
+     - Update some table classes.
+
+0.20120831 Fri Aug 31 2012
+     - Update some table classes.
+
+0.20120731 Tue Jul 31 2012
+     - Update some table classes.
+
+0.20120629 Fri Jun 29 2012
+     - Update some table classes.
+
+0.20120531 Thu May 31 2012
+     - Update some table classes.
+
+0.20120427 Tue May  1 2012
+     - Update some table classes.
+
+0.20120330 Mon Apr  2 2012
+     - Update some table classes.
+
+0.20120229 Wed Feb 29 2012
+     - Update some table classes.
+
+0.20120131 Tue Jan 31 2012
+     - Update some table classes.
+
+0.20111228 Thu Dec 29 2011
+     - Update some table classes.
+
+0.20111130 Wed Nov 30 2011
+     - Update some table classes.
+
+0.20111031 Mon Oct 31 2011
+     - Update some table classes.
+
+0.20110930 Fri Sep 30 2011
+     - Update some table classes.
+
+0.20110831 Thu Sep  1 2011
+     - Update some table classes.
+
+0.20110729 Mon Aug  1 2011
+     - Update some table classes.
+
+0.20110630 Tue Jul  5 2011
+     - original version

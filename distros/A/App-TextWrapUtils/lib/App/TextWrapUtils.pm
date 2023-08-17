@@ -8,9 +8,9 @@ use Log::ger;
 use Clipboard::Any ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-04-13'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -50,6 +50,13 @@ our %argspecopt_width = (
         schema => 'posint*',
         default => 80,
         cmdline_aliases => {w=>{}},
+    },
+);
+
+our %argspecopt_tee = (
+    tee => {
+        summary => 'If set to true, will also print result to STDOUT',
+        schema => 'bool*',
     },
 );
 
@@ -124,6 +131,7 @@ sub textwrap {
             $para_text = Text::WideChar::Util::mbwrap($para_text, $width);
         } elsif ($backend eq 'Text::Wrap') {
             require Text::Wrap;
+            no warnings 'once';
             local $Text::Wrap::columns = $width;
             $para_text = Text::Wrap::wrap('', '', $para_text);
         } else {
@@ -152,6 +160,7 @@ _
         %argspecopt_backend,
         %argspecopt_width,
         %Clipboard::Any::argspecopt_clipboard_manager,
+        %argspecopt_tee,
     },
 };
 sub textwrap_clipboard {
@@ -172,6 +181,7 @@ sub textwrap_clipboard {
     return [500, "Can't add clipboard content: $res->[0] - $res->[1]"]
         unless $res->[0] == 200;
 
+    print $wrapped_text if $args{tee};
     [200, "OK"];
 }
 
@@ -211,6 +221,7 @@ _
     args => {
         %argspecopt_backend,
         %Clipboard::Any::argspecopt_clipboard_manager,
+        %argspecopt_tee,
     },
 };
 sub textunwrap_clipboard {
@@ -231,6 +242,7 @@ sub textunwrap_clipboard {
     return [500, "Can't add clipboard content: $res->[0] - $res->[1]"]
         unless $res->[0] == 200;
 
+    print $unwrapped_text if $args{tee};
     [200, "OK"];
 }
 
@@ -249,7 +261,7 @@ App::TextWrapUtils - Utilities related to text wrapping
 
 =head1 VERSION
 
-This document describes version 0.006 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2023-03-10.
+This document describes version 0.007 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2023-04-13.
 
 =head1 DESCRIPTION
 
@@ -349,6 +361,10 @@ Explicitly set clipboard manager to use.
 
 The default, when left undef, is to detect what clipboard manager is running.
 
+=item * B<tee> => I<bool>
+
+If set to true, will also print result to STDOUT.
+
 
 =back
 
@@ -439,6 +455,10 @@ Arguments ('*' denotes required arguments):
 Explicitly set clipboard manager to use.
 
 The default, when left undef, is to detect what clipboard manager is running.
+
+=item * B<tee> => I<bool>
+
+If set to true, will also print result to STDOUT.
 
 =item * B<width> => I<posint> (default: 80)
 

@@ -7,7 +7,7 @@ package Rex::Hardware::Host;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use English qw(-no_match_vars);
 use Rex;

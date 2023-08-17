@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20230423';
+our $VERSION = '5.20230520';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -405,6 +405,7 @@ sub changes_between {
     5.037010 => '2023-03-20',
     5.037011 => '2023-04-20',
     5.036001 => '2023-04-23',
+    5.038000 => '2023-07-02',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -20289,6 +20290,56 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.038000 => {
+        delta_from => 5.037011,
+        changed => {
+            'B::Deparse'            => '1.74',
+            'B::Op_private'         => '5.038000',
+            'CPAN'                  => '2.36',
+            'CPAN::HTTP::Client'    => '1.9602',
+            'Compress::Raw::Bzip2'  => '2.204_001',
+            'Compress::Raw::Zlib'   => '2.204_001',
+            'Config'                => '5.038',
+            'Digest::MD5'           => '2.58_01',
+            'DynaLoader'            => '1.54',
+            'ExtUtils::ParseXS'     => '3.51',
+            'ExtUtils::ParseXS::Constants'=> '3.51',
+            'ExtUtils::ParseXS::CountLines'=> '3.51',
+            'ExtUtils::ParseXS::Eval'=> '3.51',
+            'ExtUtils::ParseXS::Utilities'=> '3.51',
+            'ExtUtils::Typemaps'    => '3.51',
+            'ExtUtils::Typemaps::Cmd'=> '3.51',
+            'ExtUtils::Typemaps::InputMap'=> '3.51',
+            'ExtUtils::Typemaps::OutputMap'=> '3.51',
+            'ExtUtils::Typemaps::Type'=> '3.51',
+            'File::Glob'            => '1.40',
+            'HTTP::Tiny'            => '0.086',
+            'IO'                    => '1.52',
+            'IO::Dir'               => '1.52',
+            'IO::File'              => '1.52',
+            'IO::Handle'            => '1.52',
+            'IO::Pipe'              => '1.52',
+            'IO::Poll'              => '1.52',
+            'IO::Seekable'          => '1.52',
+            'IO::Select'            => '1.52',
+            'IO::Socket'            => '1.52',
+            'IO::Socket::INET'      => '1.52',
+            'IO::Socket::IP'        => '0.41_01',
+            'IO::Socket::UNIX'      => '1.52',
+            'MIME::Base64'          => '3.16_01',
+            'MIME::QuotedPrint'     => '3.16_01',
+            'Module::CoreList'      => '5.20230520',
+            'Module::CoreList::Utils'=> '5.20230520',
+            'POSIX'                 => '2.13',
+            'SDBM_File'             => '1.17',
+            'Storable'              => '3.32',
+            'Time::HiRes'           => '1.9775',
+            'Time::Piece'           => '1.3401_01',
+            'warnings'              => '1.65',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -21683,6 +21734,13 @@ sub is_core
         removed => {
         }
     },
+    5.038000 => {
+        delta_from => 5.037011,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -21874,13 +21932,9 @@ sub is_core
     'Math::BigInt::Trace'   => 'cpan',
     'Math::BigRat'          => 'cpan',
     'Math::BigRat::Trace'   => 'cpan',
-    'Math::Complex'         => 'cpan',
-    'Math::Trig'            => 'cpan',
     'Memoize'               => 'cpan',
     'Memoize::AnyDBM_File'  => 'cpan',
     'Memoize::Expire'       => 'cpan',
-    'Memoize::ExpireFile'   => 'cpan',
-    'Memoize::ExpireTest'   => 'cpan',
     'Memoize::NDBM_File'    => 'cpan',
     'Memoize::SDBM_File'    => 'cpan',
     'Memoize::Storable'     => 'cpan',
@@ -22115,6 +22169,7 @@ sub is_core
     'ok'                    => 'cpan',
     'parent'                => 'cpan',
     'perlfaq'               => 'cpan',
+    'stable'                => 'cpan',
     'version'               => 'cpan',
     'version::regex'        => 'cpan',
 );
@@ -22304,13 +22359,9 @@ sub is_core
     'Math::BigInt::Trace'   => undef,
     'Math::BigRat'          => undef,
     'Math::BigRat::Trace'   => undef,
-    'Math::Complex'         => undef,
-    'Math::Trig'            => undef,
     'Memoize'               => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::AnyDBM_File'  => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::Expire'       => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
-    'Memoize::ExpireFile'   => undef,
-    'Memoize::ExpireTest'   => undef,
     'Memoize::NDBM_File'    => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::SDBM_File'    => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::Storable'     => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
@@ -22511,8 +22562,8 @@ sub is_core
     'Test::use::ok'         => 'http://github.com/Test-More/test-more/issues',
     'Text::Balanced'        => undef,
     'Text::ParseWords'      => undef,
-    'Text::Tabs'            => 'https://github.com/ap/Text-Tabs/issues',
-    'Text::Wrap'            => 'https://github.com/ap/Text-Tabs/issues',
+    'Text::Tabs'            => undef,
+    'Text::Wrap'            => undef,
     'Tie::RefHash'          => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-RefHash',
     'Time::Local'           => 'https://github.com/houseabsolute/Time-Local/issues',
     'Time::Piece'           => undef,
@@ -22545,6 +22596,7 @@ sub is_core
     'ok'                    => 'http://github.com/Test-More/test-more/issues',
     'parent'                => undef,
     'perlfaq'               => 'https://github.com/perl-doc-cats/perlfaq/issues',
+    'stable'                => 'http://rt.cpan.org/Public/Dist/Display.html?Name=experimental',
     'version'               => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',
     'version::regex'        => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',
 );

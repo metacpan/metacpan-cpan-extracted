@@ -1,3 +1,4 @@
+use v5.20;
 use Object::Pad 0.57;
 
 class HelloWorldWidget

@@ -1,7 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use 5.020;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -212,6 +213,43 @@ $openapi_preamble
 components:
   responses:
     foo:
+      description: foo
+  headers:
+    foo:
+      description: foo
+      schema: {}
+paths:
+  /foo:
+    post:
+      responses:
+        200:
+          \$ref: '#/components/headers/foo'
+YAML
+
+  cmp_deeply(
+    ($result = $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response',
+          keywordLocation => jsonp(qw(/paths /foo post responses 200 $ref)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 $ref)))->to_string,
+          error => 'EXCEPTION: bad $ref to /api#/components/headers/foo: not a "response"',
+        },
+      ],
+    },
+    '$ref in responses points to the wrong type',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+components:
+  responses:
+    foo:
       \$ref: '#/i_do_not_exist'
     default:
       description: unexpected failure
@@ -284,6 +322,39 @@ YAML
     },
     'header is evaluated against its schema',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    get:
+      responses:
+        default:
+          description: foo
+YAML
+
+  cmp_deeply(
+    ($result = $openapi->validate_response(response($_, [ 'Transfer-Encoding' => 'blah' ]), { path_template => '/foo', method => 'get' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Transfer-Encoding',
+          keywordLocation => jsonp(qw(/paths /foo get)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo get)))->to_string,
+          error => 'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)',
+        },
+      ],
+    },
+    'Transfer-Encoding header is detected with status code '.$_,
+  )
+  foreach 102, 204;
+
+  # TODO: test 'connect' method, once it's allowed by the spec.
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',

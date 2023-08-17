@@ -53,7 +53,7 @@ This URL is used to access the phone book contents.
     };
 
 Arrayref of the entries in this phone book. Each entry is
-a [Net::Fritz::PhonebookEntry](https://metacpan.org/pod/Net::Fritz::PhonebookEntry).
+a [Net::Fritz::PhonebookEntry](https://metacpan.org/pod/Net%3A%3AFritz%3A%3APhonebookEntry).
 
 # METHODS
 
@@ -114,7 +114,7 @@ on the Fritz!Box again.
 
 # SEE ALSO
 
-[https://avm.de/fileadmin/user\_upload/Global/Service/Schnittstellen/X\_contactSCPD.pdf](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/X_contactSCPD.pdf)
+[https://avm.de/fileadmin/user\_upload/Global/Service/Schnittstellen/x\_contactSCPD.pdf](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/x_contactSCPD.pdf)
 
 # REPOSITORY
 
@@ -130,7 +130,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Fritz-Phonebook](https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Fritz-Phonebook)
-or via mail to [net-fritz-phonebook-Bugs@rt.cpan.org](https://metacpan.org/pod/net-fritz-phonebook-Bugs@rt.cpan.org).
+or via mail to [net-fritz-phonebook-Bugs@rt.cpan.org](https://metacpan.org/pod/net-fritz-phonebook-Bugs%40rt.cpan.org).
 
 # AUTHOR
 
@@ -138,7 +138,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2017 by Max Maischein `corion@cpan.org`.
+Copyright 2017-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

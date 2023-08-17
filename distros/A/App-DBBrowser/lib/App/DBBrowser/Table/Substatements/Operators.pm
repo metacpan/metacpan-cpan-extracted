@@ -12,7 +12,6 @@ use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
-#use App::DBBrowser::Table::Functions::SQL;  # required
 
 
 sub new {
@@ -27,78 +26,81 @@ sub new {
 
 
 sub build_having_col {
-    my ( $sf, $sql, $aggr ) = @_;
-    my $quote_aggr;
+    my ( $sf, $sql, $clause, $aggr ) = @_;
+    my $qt_aggr;
     if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
-        $quote_aggr = $aggr =~ s/^\@//r;
-        $sql->{having_stmt} .= ' ' . $quote_aggr;
+        $qt_aggr = $aggr =~ s/^\@//r;
     }
     elsif ( $aggr eq 'COUNT(*)' ) {
-        $quote_aggr = $aggr;
-        $sql->{having_stmt} .= ' ' . $quote_aggr;
+        $qt_aggr = $aggr;
     }
-    else {
-        $aggr =~ s/\(\S\)\z//;
-        $sql->{having_stmt} .= ' ' . $aggr . "(";
-        $quote_aggr          =       $aggr . "(";
+    elsif ( any { $aggr eq $_ } @{$sf->{i}{avail_aggr}} ) {
         my $tc = Term::Choose->new( $sf->{i}{tc_default} );
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my @pre = ( undef );
-        my $info = $ax->get_sql_info( $sql );
-        # Choose
-        my $quote_col = $tc->choose(
-            [ @pre, @{$sql->{cols}} ],
-            { %{$sf->{i}{lyt_h}}, info => $info }
-        );
-        $ax->print_sql_info( $info );
-        if ( ! defined $quote_col ) {
-            return;
+        if ( $sf->{o}{enable}{extended_cols} ) {
+            push @pre, $sf->{i}{menu_addition};
         }
-        $sql->{having_stmt} .= $quote_col . ")";
-        $quote_aggr         .= $quote_col . ")";
+        $aggr =~ s/\(\S\)\z//;
+        my $bu_having_stmt = $sql->{having_stmt};
+        $sql->{having_stmt} .= ' ' . $aggr . "(";
+        $qt_aggr          =       $aggr . "(";
+        my $info = $ax->get_sql_info( $sql );
+        $sql->{having_stmt} = $bu_having_stmt;
+        my $qt_col;
+
+        COLUMN: while( 1 ) {
+            # Choose
+            my $qt_col = $tc->choose(
+                [ @pre, @{$sql->{cols}} ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $qt_col ) {
+                return;
+            }
+            elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
+                my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                my $complex_column = $ext->column( $sql, $clause );
+                if ( ! defined $complex_column ) {
+                    next COLUMN;
+                }
+                else {
+                    $qt_col = $complex_column;
+                }
+            }
+            $qt_aggr .= $qt_col . ")";
+            last COLUMN;
+        }
     }
-    return $quote_aggr;
+    else { # SQ
+        $qt_aggr = $aggr;
+    }
+    return $qt_aggr;
 }
 
 
 sub choose_and_add_operator {
-    my ( $sf, $sql, $clause, $quote_col ) = @_;
+    my ( $sf, $sql, $clause, $qt_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $stmt = $clause . '_stmt';
-    my $args = $clause . '_args';
-    my $menu_addition;
-    my @operators_default;
-    my @operators_limited;
-    if ( $clause eq 'set' ) {
-        $menu_addition = $sf->{i}{menu_addition};
-        @operators_default = ( " = " );
-        @operators_limited = ( " = " );
-    }
-    else {
-        $menu_addition = '=' . $sf->{i}{menu_addition};
-        @operators_default = @{$sf->{o}{G}{operators}};
-        if ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
-            @operators_default = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators_default;
-        }
-        @operators_limited = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
-    }
-    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
-        unshift @operators_default, $menu_addition;
+    my @operators = @{$sf->{o}{G}{operators}};
+    if ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
+        @operators = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators;
     }
 
     OPERATOR: while( 1 ) {
-        my $is_complex_value;
         my $op;
-        if ( @operators_default == 1 ) {
-            $op = $operators_default[0];
+        if ( @operators == 1 ) {
+            $op = $operators[0];
         }
         else {
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
             # Choose
             $op = $tc->choose(
-                [ @pre, @operators_default ],
+                [ @pre, @operators ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
             $ax->print_sql_info( $info );
@@ -106,252 +108,136 @@ sub choose_and_add_operator {
                 return;
             }
         }
-        if ( $op eq $menu_addition ) {
-            if ( @operators_limited == 1 ) {
-                $op = $operators_limited[0];
-            }
-            else {
-                my @pre = ( undef );
-                my $info = $ax->get_sql_info( $sql );
-                # Choose
-                $op = $tc->choose(
-                    [ @pre, @operators_limited ],
-                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'First select the operator:' }
-                );
-                $ax->print_sql_info( $info );
-                if ( ! defined $op ) {
-                    next OPERATOR;
-                }
-            }
-            $is_complex_value = 1;
-        }
-        else {
-            $is_complex_value = 0;
-        }
         $op =~ s/^\s+|\s+\z//g;
         my $bu_stmt = $sql->{$stmt};
-        my $ok = $sf->__add_operator( $sql, $clause, $quote_col, $op );
-        if ( ! $ok ) {
-            $sql->{$stmt} = $bu_stmt;
-            next OPERATOR;
-        }
-        return $op, $is_complex_value;
-    }
-}
-
-
-sub __add_operator {
-    my ( $sf, $sql, $clause, $quote_col, $op ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $stmt = $clause . '_stmt';
-    my $args = $clause . '_args';
-    my $ok;
-    $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-    if ( $op =~ /^(.+)\s(%?col%?)\z/ ) {
-        $op = $1;
-        my $arg = $2;
-        $sql->{$stmt} .= ' ' . $op;
-        my $quote_col;
-        if ( $stmt eq 'having_stmt' ) {
-            my @pre = ( undef, $sf->{i}{ok} );
-            my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
-            my $info = $ax->get_sql_info( $sql );
-            # Choose
-            my $aggr = $tc->choose(
-                [ @pre, @choices ],
-                { %{$sf->{i}{lyt_h}}, info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $aggr ) {
-                return;
-            }
-            if ( $aggr eq $sf->{i}{ok} ) {
-            }
-            my $backup_tmp = $sql->{$stmt};
-            $quote_col =  $sf->build_having_col( $sql, $aggr );
-            $sql->{$stmt} = $backup_tmp;
-        }
-        else {
-            my $info = $ax->get_sql_info( $sql );
-            # Choose
-            $quote_col = $tc->choose(
-                $sql->{cols},
-                { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Col:' }
-            );
-            $ax->print_sql_info( $info );
-        }
-        if ( ! defined $quote_col ) {
-            return;
-        }
-        if ( $arg !~ /%/ ) {
-            $sql->{$stmt} .= ' ' . $quote_col;
-        }
-        else {
+        $ax->print_sql_info( $ax->get_sql_info( $sql ) );
+        if ( $op =~ /REGEXP(_i)?\z/ ) {
+            $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$qt_col\E \z //x;
+            my $do_not_match_regexp = $op =~ /^NOT/ ? 1 : 0;
+            my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
+            my $regex_op;
             if ( ! eval {
-                require App::DBBrowser::Table::Functions::SQL;
-                my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
-                my @el = map { "'$_'" } grep { length $_ } $arg =~ /^(%?)(col)(%?)\z/g;
-                my $qt_arg = $fsql->concatenate( \@el );
-                $qt_arg =~ s/'col'/$quote_col/;
-                $sql->{$stmt} .= ' ' . $qt_arg;
+                $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
                 1 }
             ) {
                 $ax->print_error_message( $@ );
-                return;
+                next OPERATOR;
             }
+            $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
+            $sql->{$stmt} .= $regex_op;
         }
-    }
-    elsif ( $op =~ /REGEXP(_i)?\z/ ) {
-        $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E \z //x;
-        my $do_not_match_regexp = $op =~ /^NOT/ ? 1 : 0;
-        my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
-        my $regex_op;
-        if ( ! eval {
-            $regex_op = $sf->_regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
-            1 }
-        ) {
-            $ax->print_error_message( $@ );
-            return;
+        elsif ( $op =~ /^(?:ALL|ANY)\z/) {
+            my @comb_op = ( "= $op", "<> $op", "> $op", "< $op", ">= $op", "<= $op" );
+            my @pre = ( undef );
+            my $info = $ax->get_sql_info( $sql );
+            # Choose
+            $op = $tc->choose(
+                [ @pre, @comb_op ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $op ) {
+                next OPERATOR;
+            }
+            $sql->{$stmt} .= ' ' . $op;
         }
-        $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
-        $sql->{$stmt} .= $regex_op;
+        else {
+            $sql->{$stmt} .= ' ' . $op;
+        }
+        $ax->print_sql_info( $ax->get_sql_info( $sql ) );
+        return $op;
     }
-    else {
-        $sql->{$stmt} .= ' ' . $op;
-    }
-    $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-    return 1;
 }
 
 
 sub read_and_add_value {
-    my ( $sf, $sql, $clause, $op, $is_complex_value ) = @_;
+    my ( $sf, $sql, $clause, $qt_col, $op ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt = $clause . '_stmt';
-    my $args = $clause . '_args';
-    if ( $is_complex_value ) {
-        my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $complex_value = $ext->complex_unit( $sql, $clause, 0 );
-        if ( ! defined $complex_value ) {
+    if ( $op =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
+        return 1;
+    }
+    elsif ( $op =~ /^(?:NOT\s)?IN\z/ ) {
+        $sql->{$stmt} .= ' (';
+        my $prev_value;
+        my @bu;
+
+        IN: while ( 1 ) {
+            # Readline
+            my $value = $ext->value( $sql, $clause, {}, $op );
+            if ( ! defined $value ) {
+                if ( @bu ) {
+                    $sql->{$stmt} = pop @bu;
+                    next IN;
+                }
+                return;
+            }
+            if ( $value eq "''" ) {
+                if ( ! @bu ) {
+                    return;
+                }
+                if ( @bu == 1 && $prev_value =~ /^\s*\((.+)\)\s*\z/ ) {
+                    # with one subquery as argument:
+                    # remove parenthesis around the subquery
+                    # because IN (( sq )) not alowed
+                    $sql->{$stmt} = $bu[0] . $1;
+                }
+                $sql->{$stmt} .= ')';
+                return 1;
+            }
+            $prev_value = $value;
+            push @bu, $sql->{$stmt};
+            my $col_sep = @bu == 1 ? '' : ',';
+            $sql->{$stmt} .= $col_sep . $value;
+        }
+    }
+    elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
+        # Readline
+        my $value_1 = $ext->value( $sql, $clause, {}, $op );
+        if ( ! defined $value_1 ) {
             return;
         }
-        if ( $op =~ /^(?:NOT\s)?IN\z/ ) {
-            while ( $complex_value =~ /^\s*\((.+)\)\s*\z/ ) {
-                $complex_value = $1;
-            }
-            $sql->{$stmt} .= '(' . $complex_value . ')';
+        $sql->{$stmt} .= ' ' . $value_1 . ' AND';
+        # Readline
+        my $value_2 = $ext->value( $sql, $clause, {}, $op );
+        if ( ! defined $value_2 ) {
+            return;
         }
-        #elsif ( $op =~ /REGEXP(_i)?\z/ ) {
-        #    $sql->{$stmt} =~ s/\?[^\?]*\z/$complex_value/;
-        #}
+        $sql->{$stmt} .= ' ' . $value_2;
+        return 1;
+    }
+    elsif ( $op =~ /REGEXP(_i)?\z/ ) {
+        # Readline
+        my $value = $ext->value( $sql, $clause, {}, $op );
+        if ( ! defined $value ) {
+            return;
+        }
+        $value = '^$' if ! length $value;
+        if ( $sf->{i}{driver} eq 'SQLite' ) {
+            $sql->{$stmt} =~ s/ (?<=\sREGEXP\() \? (?=,\Q$qt_col\E,[01]\)\z) /$value/x;
+        }
         else {
-            $sql->{$stmt} .= ' ' . $complex_value;
+            $sql->{$stmt} =~ s/\?\z/$value/;
         }
         return 1;
     }
     else {
-        if ( $op =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
-            return 1;
+        # Readline
+        my $value = $ext->value( $sql, $clause, {}, $op );
+        if ( ! defined $value ) {
+            return;
         }
-        elsif ( $op =~ /\s%?col%?\z/ ) {
-            return 1;
-        }
-        elsif ( $op =~ /^(?:NOT\s)?IN\z/ ) {
-            my $col_sep = '';
-            $sql->{$stmt} .= '(';
-
-            IN: while ( 1 ) {
-                my $info = $ax->get_sql_info( $sql );
-                # Readline
-                my $value = $tr->readline(
-                    'Value: ',
-                    { info => $info }
-                );
-                $ax->print_sql_info( $info );
-                if ( ! defined $value ) {
-                    return;
-                }
-                if ( $value eq '' ) {
-                    if ( $col_sep eq '' ) {
-                        return;
-                    }
-                    $sql->{$stmt} .= ')';
-                    return 1;
-                }
-                $sql->{$stmt} .= $col_sep . '?';
-                push @{$sql->{$args}}, $value;
-                $col_sep = ',';
-            }
-        }
-        elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
-            my $info = $ax->get_sql_info( $sql );
-            # Readline
-            my $value_1 = $tr->readline(
-                'Value 1: ',
-                { info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $value_1 ) {
-                return;
-            }
-            $sql->{$stmt} .= ' ' . '?' . ' AND';
-            push @{$sql->{$args}}, $value_1;
-            $info = $ax->get_sql_info( $sql );
-            # Readline
-            my $value_2 = $tr->readline(
-                'Value 2: ',
-                { info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $value_2 ) {
-                return;
-            }
-            $sql->{$stmt} .= ' ' . '?';
-            push @{$sql->{$args}}, $value_2;
-            return 1;
-        }
-        elsif ( $op =~ /REGEXP(_i)?\z/ ) {
-            push @{$sql->{$args}}, '...';
-            my $info = $ax->get_sql_info( $sql );
-            # Readline
-            my $value = $tr->readline(
-                'Pattern: ',
-                { info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $value ) {
-                return;
-            }
-            $value = '^$' if ! length $value;
-            pop @{$sql->{$args}};
-            push @{$sql->{$args}}, $value;
-            return 1;
-        }
-        else {
-            my $prompt = $op =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
-            my $info = $ax->get_sql_info( $sql );
-            # Readline
-            my $value = $tr->readline(
-                $prompt,
-                { info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $value ) {
-                return;
-            }
-            $sql->{$stmt} .= ' ' . '?';
-            push @{$sql->{$args}}, $value;
-            return 1;
-        }
+        $sql->{$stmt} .= ' ' . $value;
+        return 1;
     }
 }
 
 
 sub _regexp {
     my ( $sf, $col, $do_not_match, $case_sensitive ) = @_;
-    if ( $sf->{i}{driver} eq 'SQLite' ) {
+    my $driver = $sf->{i}{driver};
+    if ( $driver eq 'SQLite' ) {
         if ( $do_not_match ) {
             return sprintf " NOT REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
@@ -359,7 +245,7 @@ sub _regexp {
             return sprintf " REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
         if ( $do_not_match ) {
             return " $col NOT REGEXP ?"        if ! $case_sensitive;
             return " $col NOT REGEXP BINARY ?" if   $case_sensitive;
@@ -369,7 +255,7 @@ sub _regexp {
             return " $col REGEXP BINARY ?" if   $case_sensitive;
         }
     }
-    elsif ( $sf->{i}{driver} eq 'Pg' ) {
+    elsif ( $driver eq 'Pg' ) {
         if ( $do_not_match ) {
             return " ${col}::text !~* ?" if ! $case_sensitive;
             return " ${col}::text !~ ?"  if   $case_sensitive;
@@ -379,7 +265,7 @@ sub _regexp {
             return " ${col}::text ~ ?"  if   $case_sensitive;
         }
     }
-    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+    elsif ( $driver eq 'Firebird' ) {
         # SIMILAR TO
         # Unlike in some other languages, the pattern must match the entire
         # string in order to succeed — matching a substring is not enough.
@@ -391,7 +277,7 @@ sub _regexp {
             return " $col SIMILAR TO ? ESCAPE '#'";
         }
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+    elsif ( $driver =~ /^(?:DB2|Oracle)\z/ ) {
         if ( $do_not_match ) {
             return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
@@ -401,7 +287,7 @@ sub _regexp {
             return " REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
         }
     }
-    elsif ( $sf->{i}{driver} eq 'Informix' ) {
+    elsif ( $driver eq 'Informix' ) {
         if ( $do_not_match ) {
             return " $col NOT MATCHES ? ";
         }

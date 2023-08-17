@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Try;
 
@@ -15,7 +15,7 @@ use Syntax::Keyword::Try;
       catch ($e) {}
    } )->( 1, 2, 3 );
 
-   is_deeply( \@args, [ 1, 2, 3 ], 'try{} sees surrounding @_' );
+   is( \@args, [ 1, 2, 3 ], 'try{} sees surrounding @_' );
 }
 
 # catch sees @_
@@ -26,7 +26,7 @@ use Syntax::Keyword::Try;
       catch ($e) { @args = @_ }
    } )->( 4, 5, 6 );
 
-   is_deeply( \@args, [ 4, 5, 6 ], 'catch{} sees @_' );
+   is( \@args, [ 4, 5, 6 ], 'catch{} sees @_' );
 }
 
 done_testing;

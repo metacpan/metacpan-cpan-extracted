@@ -1,0 +1,319 @@
+#!/usr/local/bin/perl -w
+##############################################################################
+### File Name:	  mrtg-ipmcast
+### Description:  Generate MRTG configuration for multicast statistics
+### Author:	  Simon Leinen  <simon@switch.ch>
+### Date Created: 20-Jun-2000
+### RCS $Header: /home/leinen/CVS/SNMP_Session/test/mrtg-ipmcast,v 1.6 2001-03-07 15:38:11 leinen Exp $
+##############################################################################
+### This script can be used to generate a piece of MRTG[1]
+### configuration file for plotting per-interface multicast traffic
+### statistics using IPMROUTE-MIB[2].
+###
+### Usage: mrtg-ipmcast [-d DIR] [-w WORKDIR] [-i ICONDIR]
+###          [-c COMMUNITY] [-v ( 1 | 2c )] [-p port] ROUTER1 ROUTER2 ...
+###
+### This will contact all ROUTERs under the specified COMMUNITY and
+### look at some columns of the ipMRouteInterfaceTable.  For each rows
+### for which those columns have defined values, an MRTG target
+### definition will be written.  Such a target definition might look
+### like this:
+###
+###     Target[swice1-multicast-atm4-0-0.6]: 1.3.6.1.3.60.1.1.4.1.5.66&1.3.6.1.3.60.1.1.4.1.6.66:secret@swiCE1.switch.ch
+###     MaxBytes[swice1-multicast-atm4-0-0.6]: 19375000
+###     AbsMax[swice1-multicast-atm4-0-0.6]: 19375000
+###     Options[swice1-multicast-atm4-0-0.6]: growright,bits
+###     Title[swice1-multicast-atm4-0-0.6]: Multicast Traffic on swiCE1.switch.ch:ATM4/0/0.6-aal5 layer (ATM PVC to swiZHX)
+###     PageTop[swice1-multicast-atm4-0-0.6]: <hr><H3>Multicast Traffic on swiCE1.switch.ch:ATM4/0/0.6-aal5 layer (ATM PVC to swiZHX)</H3>
+###     Directory[swice1-multicast-atm4-0-0.6]: multicast
+###
+### The OIDs are ipMRouteInterfaceInMcastOctets and
+### ipMRouteInterfaceOutMcastOctets indexed for the interface.  In the
+### example, the interface has index 66, and the ifName is
+### "ATM4/0/0.6".
+###
+### "AbsMax" is taken from the ifSpeed value for the interface.
+###
+### "MaxBytes" is set to the multicast rate limit as per
+### ipMRouteInterfaceRateLimit.  If no rate-limit is specified, the
+### same value as for AbsMax will be used.
+###
+### "Directory" is only defined if the "-d DIR" option has been passed
+### to the script.  In the example, the script has been called with
+### "-d multicast".
+###
+### The "-w" and "-i" options can be used to cause WorkDir and IconDir
+### definitions to be generated, respectively.
+##############################################################################
+
+use strict;
+use SNMP_Session "0.58";
+use BER;
+use Socket;
+
+## Forward declarations
+sub usage ($ );
+
+### If set, a Directory[] attribute pointing to this directory will be
+### included for every target in the generated configuration.
+my $directory;
+
+## Define this if you want WorkDir set in the generated configuration
+## file.
+##
+my $work_dir;
+
+## Define this if you want IconDir set in the generated configuration
+## file.
+##
+my $icon_dir;
+
+## An absolute maximum for traffic rates over tunnels, in Bytes per
+## second.  You probably don't need to change this.
+##
+my $abs_max = '100000000';
+
+my $mrouters = [];
+
+my $version = '1';
+
+my $community = 'public';
+
+my $port = 161;
+
+while (@ARGV) {
+    if ($ARGV[0] =~ /^-h/) {
+	usage (0);
+	exit (0);
+    } elsif ($ARGV[0] =~ /^-p/) {
+	if ($ARGV[0] eq '-p') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] =~ /^[0-9]+$/) {
+	    $port = $ARGV[0];
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] =~ /^-v/) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	    $version = '2c' if ($ARGV[0] eq '2');
+	}
+	if ($ARGV[0] eq '1') {
+	    $version = '1';
+	} elsif ($ARGV[0] eq '2c') {
+	    $version = '2c';
+	} elsif ($ARGV[0] eq '2') {
+	    $version = '2c';
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] eq '-c') {
+	shift @ARGV;
+	usage (1) unless @ARGV;
+	$community = $ARGV[0];
+    } elsif ($ARGV[0] eq '-d') {
+	shift @ARGV;
+	usage (1) unless @ARGV;
+	$directory = $ARGV[0];
+    } elsif ($ARGV[0] eq '-w') {
+	shift @ARGV;
+	usage (1) unless @ARGV;
+	$work_dir = $ARGV[0];
+    } elsif ($ARGV[0] eq '-i') {
+	shift @ARGV;
+	usage (1) unless @ARGV;
+	$icon_dir = $ARGV[0];
+    } else {
+	push @{$mrouters}, "$community\@$ARGV[0]:$port";
+    }
+    shift @ARGV;
+}
+
+my %pretty_protocol_name =
+(
+  1 => "other",
+  2 => "local",
+  3 => "netmgmt",
+  4 => "dvmrp",
+  5 => "mospf",
+  6 => "pimSparseDense",
+  7 => "cbt",
+  8 => "pimSparseMode",
+  9 => "pimDenseMode",
+  10 => "igmpOnly",
+  11 => "bgmp",
+  12 => "msdp",
+);
+
+my $ipMRouteInterfaceTtl = [1,3,6,1,3,60,1,1,4,1,2];
+my $ipMRouteInterfaceProtocol = [1,3,6,1,3,60,1,1,4,1,3];
+my $ipMRouteInterfaceRateLimit = [1,3,6,1,3,60,1,1,4,1,4];
+my $ipMRouteInterfaceInMcastOctets = [1,3,6,1,3,60,1,1,4,1,5];
+my $ipMRouteInterfaceOutMcastOctets = [1,3,6,1,3,60,1,1,4,1,6];
+
+## Print head of configuration file
+print "WorkDir: $work_dir\n" if defined $work_dir;
+print "IconDir: $icon_dir\n" if defined $icon_dir;
+print "WriteExpires: Yes\nWeekformat[^]: V\nWithPeak[_]: wmy\n";
+
+foreach my $target (@{$mrouters}) {
+    my $session;
+    my ($community, $mrouter, $port);
+
+    if ($target =~ /^(.*)@(.*):([0-9]+)$/) {
+	$community = $1; $mrouter = $2; $port = $3;
+    } elsif ($target =~ /^(.*)@(.*)$/) {
+	$community = $1; $mrouter = $2; $port = 161;
+    } else {
+	warn "Malformed target $target\n";
+	next;
+    }
+    $session =
+	($version eq '1' ? SNMPv1_Session->open ($mrouter, $community, $port)
+	 : $version eq '2c' ? SNMPv2c_Session->open ($mrouter, $community, $port)
+	 : die "Unknown SNMP version $version")
+	    || die "Opening SNMP_Session to router $mrouter";
+
+    my $if_table = $session->get_if_table;
+
+    my $snmp_target = $community.'@'.$mrouter;
+    $snmp_target .= ":".$port
+	unless $port == 161;
+## eval
+    {
+	$session->map_table
+	([$ipMRouteInterfaceTtl,
+	  $ipMRouteInterfaceProtocol,
+	  $ipMRouteInterfaceRateLimit], sub
+	 { 
+	     my ($index, $ttl, $protocol, $rate_limit) = @_;
+	     grep (defined $_ && ($_=pretty_print $_),
+		   ($protocol, $ttl, $rate_limit));
+	     my ($if_entry, $abs_max_bytes, $rate_limit_bytes,
+		 $interface, $mr, $graph_name);
+	     die unless defined ($if_entry = $if_table->{$index});
+	     if (defined $if_entry->{ifSpeed}) {
+		 if ($rate_limit == 0 || $if_entry->{ifSpeed} < $rate_limit) {
+		     $rate_limit = $if_entry->{ifSpeed} / 1000;
+		 }
+		 $abs_max_bytes = $if_entry->{ifSpeed} >> 3
+		     if defined $if_entry->{ifSpeed};
+	     } else {
+	     }
+	     $abs_max_bytes = $abs_max >> 3
+		 unless defined $abs_max_bytes;
+	     $rate_limit_bytes = $rate_limit * 1000 >> 3;
+
+	     $protocol = $pretty_protocol_name{$protocol}
+	     if exists $pretty_protocol_name{$protocol};
+##	       my $peer_name = gethostbyaddr(pack ("C4",split ('\.',$peer_addr)),
+##					     AF_INET)
+##		   || $peer_addr;
+	     my $peer_name = "?";
+	     $interface = $index;
+	     if (defined ($if_entry->{ifDescr})) {
+		 $interface = $if_entry->{ifDescr};
+	     }
+	     print STDERR "IF $interface TTL $ttl $protocol\n";
+	     $mr = $mrouter;
+	     $mr =~ s/\..*//;
+	     $graph_name = lc ($mr.'-multicast-'.cleanup ($interface));
+	      if (defined ($if_entry->{ifAlias}) && $if_entry->{ifAlias} ne '') {
+		  $interface .= " (".$if_entry->{ifAlias}.")";
+	      } elsif (defined ($if_entry->{locIfDescr}) && $if_entry->{locIfDescr} ne '') {
+		  $interface .= " (".$if_entry->{locIfDescr}.")";
+	      }
+		 print <<EOM;
+
+Target[$graph_name]: 1.3.6.1.3.60.1.1.4.1.5.$index&1.3.6.1.3.60.1.1.4.1.6.$index:$snmp_target
+MaxBytes[$graph_name]: $rate_limit_bytes
+AbsMax[$graph_name]: $abs_max_bytes
+Options[$graph_name]: growright,bits
+Title[$graph_name]: Multicast Traffic on $mrouter:$interface
+PageTop[$graph_name]: <hr><H3>Multicast Traffic on $mrouter:$interface</H3>
+EOM
+    print "Directory[$graph_name]: $directory\n"
+	if $directory;
+	 })
+};
+    $session->close ();
+}
+
+sub cleanup ($ ) {
+    local ($_) = @_;
+    s@/@-@g;
+    s@-(aal5|cef) layer$@@;
+    $_;
+}
+
+sub usage ($) {
+    warn <<EOM;
+Usage: $0 [-w workdir] [-i icondir] [-v (1|2c)] [-p port] [-c community] hostname...
+       $0 -h
+
+  -h           print this usage message and exit.
+
+  -w workdir   specifies the WorkDir parameter for the generated MRTG
+               configuration file.
+
+  -i icondir   specifies the IconDir parameter for the generated MRTG
+               configuration file.
+
+  -v version   can be used to select the SNMP version.  The default
+   	       is SNMPv1, which is what most devices support.  If your box
+   	       supports SNMPv2c, you should enable this by passing "-v 2c"
+   	       to the script.  SNMPv2c is much more efficient for walking
+   	       tables, which is what this tool does.
+
+  -p port      can be used to specify a non-standard UDP port of the SNMP
+               agent (the default is UDP port 161).
+
+  -c community SNMP community string to use.  Defaults to "public".
+
+  hostname...  hostnames or IP addresses of multicast routers
+EOM
+    exit (1) if $_[0];
+}
+
+package SNMP_Session;
+
+sub get_if_table ($) {
+    my ($session) = @_;
+
+    my $result = {};
+
+    my $ifDescr = [1,3,6,1,2,1,2,2,1,2];
+    my $ifSpeed = [1,3,6,1,2,1,2,2,1,5];
+    my $locIfDescr = [1,3,6,1,4,1,9,2,2,1,1,28];
+    my $ifAlias = [1,3,6,1,2,1,31,1,1,1,18];
+    $session->map_table ([$ifDescr,$ifSpeed],
+			 sub ($$$) {
+			     my ($index, $ifDescr, $ifSpeed) = @_;
+			     grep (defined $_ && ($_=pretty_print $_),
+				   ($ifDescr, $ifSpeed));
+			     $result->{$index} = {'ifDescr' => $ifDescr,
+						  'ifSpeed' => $ifSpeed};
+			 });
+    $session->map_table ([$locIfDescr],
+			 sub ($$$) {
+			     my ($index, $locIfDescr) = @_;
+			     grep (defined $_ && ($_=pretty_print $_),
+				   ($locIfDescr));
+			     $result->{$index}->{'locIfDescr'} = $locIfDescr;
+			 });
+    $session->map_table ([$ifAlias],
+			 sub ($$$) {
+			     my ($index, $ifAlias) = @_;
+			     grep (defined $_ && ($_=pretty_print $_),
+				   ($ifAlias));
+			     $result->{$index}->{'ifAlias'} = $ifAlias;
+			 });
+    $result;
+}

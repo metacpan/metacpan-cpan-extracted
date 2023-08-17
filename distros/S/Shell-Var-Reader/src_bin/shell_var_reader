@@ -1,16 +1,25 @@
 #!perl
 
-my $version = '0.1.0';
-
 use strict;
 use warnings;
 use Shell::Var::Reader;
-use TOML qw(to_toml);
-use JSON qw(to_json);
-use YAML;
+use TOML         qw(to_toml from_toml);
+use JSON         qw(to_json decode_json);
+use YAML         qw(Load);
 use Getopt::Long qw(:config pass_through);
 use Data::Dumper;
 use String::ShellQuote;
+use Hash::Merge;
+use File::Slurp;
+use JSON::Path;
+use Rex::CMDB;
+use Rex -feature => [qw/1.4/];
+use Hash::Flatten;
+
+# prevents Rex from printing out rex is exiting after the script ends
+$::QUIET = 2;
+
+my $version = '0.4.0';
 
 my $to_read;
 my $format = 'json';
@@ -18,16 +27,27 @@ my $pretty = 0;
 my $sort   = 0;
 my $version_flag;
 my $help;
+my @includes;
+my $tcmdb;
+my $cmdb_host;
+my $host_vars = "HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NAME";
+my $use_roles = 1;
+my $munger_file;
 GetOptions(
-	'r=s'     => \$to_read,
-	'o=s'     => \$format,
-	'p'       => \$pretty,
-	's'       => \$sort,
-	'h'       => \$help,
-	'help'    => \$help,
-	'v'       => \$version_flag,
-	'version' => \$version_flag,
-
+	'r=s'         => \$to_read,
+	'o=s'         => \$format,
+	'p'           => \$pretty,
+	's'           => \$sort,
+	'h'           => \$help,
+	'help'        => \$help,
+	'v'           => \$version_flag,
+	'version'     => \$version_flag,
+	'i=s'         => \@includes,
+	'tcmdb=s'     => \$tcmdb,
+	'cmdb_host=s' => \$cmdb_host,
+	'host_vars=s' => \$host_vars,
+	'use_roles=s' => \$use_roles,
+	'm=s'         => \$munger_file,
 );
 
 if ($version_flag) {
@@ -44,51 +64,224 @@ if ($help) {
               Formats: json,yaml,toml,dumper(Data::Dumper),shell
 -p            Pretty print
 -s            Sort
+-i <include>  Include file info. May be used multiple times.
+-m <munger>   File containing code to use for munging data prior to output.
+
+--tcmdb <dir>       Optionally include data from a Rex TOML CMDB.
+--cmdb_host <host>  Hostname to use when querying the CMDB.
+                    Default :: undef
+--host_vars <vars>  If --cmdb_host is undef, check this comma seperated
+                    list JSON Paths in the currently found/included vars
+                    for the first possible hit.
+                    Default :: HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NAME
+--use_roles [01]    If roles should be used or not with the Rex TOML CMDB.
+                    Default :: 1
 
 -h/--help     Help
 -v/--version  Version
+
+
+Include Examples...
+-i foo,bar.json       Read in bar.json and include it as the variable foo.
+-i foo.toml           Read in foo.toml and merge it with what it is being merged into taking presidence.
+-i a.jsom -i b.toml   Read in a.json and merge it, then read in in b.json and merge it.
+
 ';
 	exit 255;
-}
+} ## end if ($help)
 
 if ( !defined($to_read) ) {
 	die('No file specified to read via -r');
 }
 
-if ( $format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper' && $format ne 'shell') {
+if ( $format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper' && $format ne 'shell' ) {
 	die( "'" . $format . "' is not a recognized format" );
 }
 
 my $found_vars = Shell::Var::Reader->read_in($to_read);
 
+##
+##
+## includes
+##
+##
+
+my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
+foreach my $include (@includes) {
+	my ( $include_as, $include_file ) = split( /,/, $include, 2 );
+	my $merge = 0;
+	if ( !defined($include_file) ) {
+		$include_file = $include_as;
+		$merge        = 1;
+	}
+
+	# including something as cmdb and using --tcmdb are mutually exclusive
+	if ( $include_as eq 'cmdb' && defined($tcmdb) ) {
+		die(      '"cmdb" used with "'
+				. $include
+				. '" can not be included as it will be over written via included CMDB from --tcmdb' );
+	}
+
+	my $raw_include = read_file($include_file) || die( 'Failed to read "' . $include_file . '"' );
+
+	my $parsed_include;
+
+	if ( $include_file =~ /[Jj][Ss][Oo][Nn]$/ ) {
+		eval { $parsed_include = decode_json($raw_include); };
+		if ($@) {
+			die( 'Parsing "' . $include_file . '" failed... ' . $@ );
+		}
+	} elsif ( $include_file =~ /([Yy][Mm][Ll]|[Yy][Aa][Mm][Ll])$/ ) {
+		eval { $parsed_include = Load($raw_include); };
+		if ($@) {
+			die( 'Parsing "' . $include_file . '" failed... ' . $@ );
+		}
+	} elsif ( $include_file =~ /[Tt][Oo][Mm][Ll]$/ ) {
+		eval {
+			my $err;
+			( $parsed_include, $err ) = from_toml($raw_include);
+			unless ($parsed_include) {
+				die($err);
+			}
+		};
+		if ($@) {
+			die( 'Parsing "' . $include_file . '" failed... ' . $@ );
+		}
+	} ## end elsif ( $include_file =~ /[Tt][Oo][Mm][Ll]$/ )
+
+	if ($merge) {
+		my %tmp_hash = %{ $merger->merge( $found_vars, $parsed_include ) };
+		$found_vars = \%tmp_hash;
+	} else {
+		$found_vars->{$include_as} = $parsed_include;
+	}
+} ## end foreach my $include (@includes)
+
+##
+##
+## Rex TOML CMDB
+##
+##
+
+if ( defined($tcmdb) ) {
+	if ( !-d $tcmdb ) {
+		die( '"' . $tcmdb . '" is not a directory or does not exist' );
+	}
+
+	# if this is not defined, check to see if it is set in shell conf that was read in
+	# or in any of the includes
+	if ( !defined($cmdb_host) ) {
+		# some basic cleanup of the hostname vars string
+		# to make sure we don't have anything empty for it
+		$host_vars =~ s/,[\ \t]*,/, /g;
+		$host_vars =~ s/^[\ \t]*,//g;
+		$host_vars =~ s/,[\ \t]*$//g;
+		if ( $host_vars eq '' ) {
+			die('--host_vars can not be set to ""');
+		}
+		# check the various possble values using jpath
+		foreach my $host_var ( split( /,/, $host_vars ) ) {
+			my $jpath    = JSON::Path->new($host_var);
+			my $hostname = $jpath->get($found_vars);
+			# if we found something not blank and have not set it already, set it
+			if ( defined($hostname) && $hostname ne '' && !defined($cmdb_host) ) {
+				$cmdb_host = $hostname;
+			}
+		}
+	} ## end if ( !defined($cmdb_host) )
+
+	set cmdb => {
+		type           => 'TOML',
+		path           => $tcmdb,
+		merge_behavior => 'LEFT_PRECEDENT',
+		use_roles      => $use_roles,
+	};
+
+	my $cmdb_vars = get cmdb( undef, $cmdb_host );
+
+	my %tmp_hash = %{ $merger->merge( $found_vars, $cmdb_vars ) };
+	$found_vars = \%tmp_hash;
+} ## end if ( defined($tcmdb) )
+
+##
+##
+## munging
+##
+##
+
+if ( defined($munger_file) ) {
+	if ( !-f $munger_file ) {
+		die( '"' . $munger_file . '" specified as a munger file but it does not exist' );
+	}
+
+	my $munger;
+	eval {
+		$munger = read_file($munger_file);
+		if ( !defined($munger) ) {
+			die( 'rea_file("' . $munger_file . '") returned undef' );
+		}
+	};
+	if ($@) {
+		die( 'Failed to read munger file, "' . $munger_file . '"... ' . $@ );
+	}
+
+	eval($munger);
+	if ($@) {
+		die( 'eval($munger) died... ' . $@ );
+	}
+} ## end if ( defined($munger_file) )
+
+##
+##
+## output
+##
+##
+
 # print in the requested format
 if ( $format eq 'toml' ) {
-	print to_toml($found_vars);
-}
-elsif ( $format eq 'yaml' ) {
+	my $to_print = to_toml($found_vars);
+	print $to_print;
+} elsif ( $format eq 'yaml' ) {
 	if ( !$sort ) {
 		$YAML::SortKeys = 0;
 	}
-	print Dump($found_vars);
-}
-elsif ( $format eq 'json' ) {
+	my $to_print = Dump($found_vars);
+	print $to_print;
+} elsif ( $format eq 'json' ) {
 	my $json = JSON->new;
 	$json->canonical($sort);
 	$json->pretty($pretty);
-	print $json->encode($found_vars);
+	my $to_print = $json->encode($found_vars);
+	print $to_print;
 	if ( !$pretty ) {
 		print "\n";
 	}
-}
-elsif ( $format eq 'dumper' ) {
-	print Dumper($found_vars);
-}
-elsif ( $format eq 'shell' ) {
+} elsif ( $format eq 'dumper' ) {
+	my $to_print = Dump($found_vars);
+	print $to_print;
+} elsif ( $format eq 'shell' ) {
+
+	my $escape = rand . rand . rand . rand;
+	$escape =~ s/\.//g;
+	my $make_flat = Hash::Flatten->new(
+		{
+			HashDelimiter  => '_',
+			ArrayDelimiter => '_',
+			EscapeSequence => $escape,
+		}
+	);
+	$found_vars = $make_flat->flatten($found_vars);
+
 	my @keys = keys( %{$found_vars} );
-	foreach my $key (@keys) {
-		print $key. '=' . shell_quote( $found_vars->{$key} ) . "\n";
+	if ($sort) {
+		@keys = sort(@keys);
 	}
-}
+	foreach my $key (@keys) {
+		my $munged_key = $key;
+		$munged_key =~ s/$escape//g;
+		print $munged_key . '=' . shell_quote( $found_vars->{$key} ) . "\n";
+	}
+} ## end elsif ( $format eq 'shell' )
 
 exit 0;
 
@@ -98,7 +291,7 @@ shell_var_reader - Read/run a shell script and return set variable in it.
 
 =head1 SYNOPSIS
 
-shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>]
+shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>] [B<--tcmdb> <dir>] [B<--cmdb_host> <host>] [B<--host_vars> <vars>] [B<--use_roles> [01]] [B<-m> <munger>]
 
 =head1 FLAGS
 
@@ -121,5 +314,89 @@ Pretty print. Not relevant to all outputs.
 =head2 -s
 
 Sort. Not relevant to all outputs.
+
+=head2 -i <include>
+
+Files to parse and include in the produced JSON, TOML, or YAML.
+
+The included file may be either JSON, TOML, or YAML.
+
+If a comma is included, everything before the comma is used as the
+key name to include the parsed data as. Otherwise it will me merged.
+
+Include Examples...
+
+    Read in bar.json and include it as the variable foo.
+    -i foo,bar.json
+
+    Read in foo.toml and merge it with what it is being merged into taking presidence.
+    -i foo.toml
+
+    Read in a.json and merge it, then read in in b.json and merge it.
+    -i a.jsom -i b.toml
+
+=head1 MUNGING FLAGS
+
+=head2 -m <munger>
+
+File containing code to use for munging data prior to output. The file will be read in
+and ran via eval.
+
+The following are accessible and usable from with in it.
+
+    $found_Vars :: Hash reference containing the found variables with everything merged into it.
+    $format :: The output format to use.
+    $host_Vars :: The value of --host_vars .
+    @includes :: A array of containing the various values for -i .
+    $merger :: A Hash::Merge->new('RIGHT_PRECEDENT') object.
+    $munger_file :: The value of -m if specified.
+    $pretty :: If -p was specified or not.
+    $sort :: If -s was specified or not.
+    $tcmdb :: Path to the Rex TOML CMDB if specified.
+    $to_read :: The value of -r .
+    $use_roles :: The value of --use_rules .
+
+To lets say you wanted to delete the variable 'foo', you could do it like below.
+
+    delete($found_vars->{foo});
+
+Or if wanted to set .suricata.enable and a few others based on .SURICATA_INSTANCE_COUNT
+you could do it like below.
+
+    if ($found_vars->{SURICATA_INSTANCE_COUNT}) {
+        $found_vars->{suricata}{enable}=1;
+        $found_vars->{suricata_extract}{enable}=1;
+        $found_vars->{snmpd}{extends}{suricata}{enable}=1;
+        $found_vars->{snmpd}{extends}{suricata_extract}{enable}=1;
+    }
+
+=head1 CMDB FLAGS
+
+Includes data from a CMDB and merge it in. Will overwrite everything previous.
+
+=head2 --tcmdb <dir>
+
+Optionally include data from a Rex TOML CMDB. See L<Rex::CMDB::YAML> for more information
+on that.
+
+=head2 --cmdb_host <host>
+
+Hostname to use when querying the CMDB.
+
+Default :: undef
+
+=head2 --host_vars <vars>
+
+If --cmdb_host is undef, check this comma seperated list JSON Paths in the currently
+found/included vars for the first possible hit. For more info the path stuff, see
+L<JSON::Path>.
+
+Default :: HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NAME
+
+=head2 --use_roles [01]
+
+If roles should be used or not with the Rex TOML CMDB.
+
+Default :: 1
 
 =cut

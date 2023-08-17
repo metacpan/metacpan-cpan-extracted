@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetFreezePanesRequest.name :   ,
-# PutWorksheetFreezePanesRequest.sheetName :   ,
-# PutWorksheetFreezePanesRequest.row :   ,
-# PutWorksheetFreezePanesRequest.column :   ,
-# PutWorksheetFreezePanesRequest.freezedRows :   ,
-# PutWorksheetFreezePanesRequest.freezedColumns :   ,
-# PutWorksheetFreezePanesRequest.folder :   ,
-# PutWorksheetFreezePanesRequest.storageName :    
+# PutWorksheetFreezePanesRequest.name : The workbook name.  ,
+# PutWorksheetFreezePanesRequest.sheetName : The worksheet name.  ,
+# PutWorksheetFreezePanesRequest.row : Row index.  ,
+# PutWorksheetFreezePanesRequest.column : Column index.  ,
+# PutWorksheetFreezePanesRequest.freezedRows : Number of visible rows in top pane, no more than row index.  ,
+# PutWorksheetFreezePanesRequest.freezedColumns : Number of visible columns in left pane, no more than column index.  ,
+# PutWorksheetFreezePanesRequest.folder : Original workbook folder.  ,
+# PutWorksheetFreezePanesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_freeze_panes' } = { 
-    	summary => '',
+    	summary => 'Sets freeze panes in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'Row index.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Column index.',
      	format => '',
      	read_only => '',
      		},
      'freezed_rows' => {
      	datatype => 'int',
      	base_name => 'freezedRows',
-     	description => '',
+     	description => 'Number of visible rows in top pane, no more than row index.',
      	format => '',
      	read_only => '',
      		},
      'freezed_columns' => {
      	datatype => 'int',
      	base_name => 'freezedColumns',
-     	description => '',
+     	description => 'Number of visible columns in left pane, no more than column index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

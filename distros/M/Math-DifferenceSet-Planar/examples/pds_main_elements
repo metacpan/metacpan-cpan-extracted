@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    shift @ARGV;
+    last if $1 eq '-';
+    die "usage: pds_main_elements [file]...\n";
+}
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+
+    my $order = $s->order;
+    my @princ = $s->plane_principal_elements;
+    my @suppl = $s->plane_supplemental_elements;
+    my $mod   = $s->modulus;
+
+    print
+        @princ && @suppl? "@princ | @suppl":
+        @princ?           "@princ"         : "| @suppl", " (mod $mod)\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_main_elements - print main elements of planar difference set planes
+
+=head1 SYNOPSIS
+
+  pds_main_elements [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line,
+as integer numbers separated by whitespace, computes principal and
+supplemental elements of each plane, and writes the result to standard
+output.  Cf. L<Math::DifferenceSet::Planar> for the definition of
+these sets.
+
+If a set has supplemental elements, they will be separated by a "|"
+from the principal elements.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

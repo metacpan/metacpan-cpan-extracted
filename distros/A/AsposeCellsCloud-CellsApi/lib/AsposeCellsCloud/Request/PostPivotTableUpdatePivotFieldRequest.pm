@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableUpdatePivotFieldRequest.name :   ,
-# PostPivotTableUpdatePivotFieldRequest.sheetName :   ,
-# PostPivotTableUpdatePivotFieldRequest.pivotTableIndex :   ,
-# PostPivotTableUpdatePivotFieldRequest.pivotFieldIndex :   ,
-# PostPivotTableUpdatePivotFieldRequest.pivotFieldType :   ,
-# PostPivotTableUpdatePivotFieldRequest.pivotField :   ,
-# PostPivotTableUpdatePivotFieldRequest.needReCalculate :   ,
-# PostPivotTableUpdatePivotFieldRequest.folder :   ,
-# PostPivotTableUpdatePivotFieldRequest.storageName :    
+# PostPivotTableUpdatePivotFieldRequest.name : The workbook name.  ,
+# PostPivotTableUpdatePivotFieldRequest.sheetName : The worksheet name.  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotFieldIndex : Gets the PivotField Object at the specific index.  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotFieldType : Represents PivotTable field type(Undefined/Row/Column/Page/Data).  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotField : Represents pivot field.  ,
+# PostPivotTableUpdatePivotFieldRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# PostPivotTableUpdatePivotFieldRequest.folder : Original workbook folder.  ,
+# PostPivotTableUpdatePivotFieldRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -161,63 +161,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_index' => {
      	datatype => 'int',
      	base_name => 'pivotFieldIndex',
-     	description => '',
+     	description => 'Gets the PivotField Object at the specific index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_type' => {
      	datatype => 'string',
      	base_name => 'pivotFieldType',
-     	description => '',
+     	description => 'Represents PivotTable field type(Undefined/Row/Column/Page/Data).',
      	format => '',
      	read_only => '',
      		},
      'pivot_field' => {
      	datatype => 'PivotField',
      	base_name => 'pivotField',
-     	description => '',
+     	description => 'Represents pivot field.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

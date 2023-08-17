@@ -6,7 +6,7 @@
 
 use strict;
 use warnings;
-use NOLookup::RDAP::RDAPLookup qw / $sepln %RDAP_FIELDSETS %RDAP_REGISTERED_LAYERS/;
+use NOLookup::RDAP::RDAPLookup qw / $sepln %RDAP_FIELDSETS/;
 use NOLookup::RDAP::RDAPLookup::Whois;
 use Encode;
 use Getopt::Long qw(:config no_ignore_case bundling);
@@ -19,10 +19,8 @@ $Data::Dumper::Indent=1;
 
 my ($service_url, $query, $check, $nameservers, $rawtype, $fieldset,
     $cursor, $nopages, $entity, $help, $debug, $verbose, $expand,
-    $short, $use_cache, $header_secret, $header_proxy, $referral_ip,
-    $whois_fmt, $force_ipv, $bauth_username, $bauth_password, $color,
-    @access_layers);
-
+    $short, $use_cache, $referral_ip, $whois_fmt, $force_ipv,
+    $bauth_username, $bauth_password, $color);
 
 my $BG_COL_GREY   = 'on_grey23';
 my $FG_COL_YELLOW = 'yellow';
@@ -35,8 +33,6 @@ print color('reset'), "\n";
 # Default test values unless overrided by their parameters
 my $use_test_values  = 1;
 my $test_service_url = $ENV{RDAP_SERVICE_URL}             || 'https://rdap.test.norid.no';
-my $test_secret      = $ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN} || '';
-my $test_proxy       = $ENV{RDAP_GDPR_NORID_PROXY}        || '';
 my $test_referral_ip = 0; # or an ip, like '1.2.3.4';
 my $test_expand      = 0;
 
@@ -46,8 +42,6 @@ GetOptions(
     'check|c'            => \$check,
     'nameservers|n:i'    => \$nameservers,
     'entity|e'           => \$entity,
-    'header_proxy|y:i'   => \$header_proxy,
-    'header_secret|z:s'  => \$header_secret,
     'referral_ip|I:s'    => \$referral_ip,
     'expand|x'           => \$expand,
     'short|o'	         => \$short,
@@ -64,7 +58,6 @@ GetOptions(
     'fieldset|F:s'       => \$fieldset,
     'cursor|C:s'         => \$cursor,
     'nopages|p:i'        => \$nopages,
-    'access_layers|a:s@' => \@access_layers,
 
     ) or pod2usage('-verbose' => 99, '-sections' => [qw(NAME DESCRIPTION USAGE)]);
 
@@ -77,8 +70,6 @@ unless ($query) {
 
 if ($use_test_values) {
     $service_url   = $test_service_url unless $service_url;
-    $header_secret = $test_secret      unless defined($header_secret);
-    $header_proxy  = $test_proxy       unless defined($header_proxy);
     $referral_ip   = $test_referral_ip unless defined($referral_ip);
     $expand        = $test_expand      unless $expand;
 }
@@ -129,8 +120,6 @@ my %OPTIONS = (
     service_url         => $service_url ,
     debug               => $debug || 0,
     use_cache  	        => $use_cache,
-    norid_header_secret => $header_secret,
-    norid_header_proxy  => $header_proxy,
     norid_referral_ip   => $referral_ip,
     bauth_username      => $bauth_username,
     bauth_password      => $bauth_password,
@@ -140,14 +129,6 @@ my %OPTIONS = (
     nopages             => $nopages,
     force_ipv           => $force_ipv,
     );
-
-# Default access layers are those known by NOLookup lib.
-# Application can override by passing other values.
-if (@access_layers) {
-    # Use passed access layers
-    my %hal = map {$_ => 1} sort @access_layers;
-    $OPTIONS{access_layers} = \%hal;
-}
 
 #print STDERR "OPTIONS: ", Dumper \%OPTIONS;
 
@@ -188,7 +169,6 @@ if ($debug) {
     print STDERR "$0:\n";
     print STDERR " (connecting over ipv $force_ipv since force_ipv option is set)\n" if ($force_ipv);
     print STDERR " Looked up              : ", $ro->_method, "/ ", $ro->_full_url, "\n";
-    print STDERR " Acccess layer set to   : ", $ro->access_layer, "\n";
     print STDERR " Size of returned data  : ", $ro->size || 0, "\n";
 
     # paging data
@@ -296,7 +276,7 @@ With the -w option:
 
   Otherwise the default behavious kicks in. The query type is
   automagically guessed by analyzing the query, combined with
-  -n or -e options to resole some ambiguous cases.
+  -n or -e options to resolve some ambiguous cases.
 
   perl no_rdap.pl -q <query>
 
@@ -415,10 +395,8 @@ Mandatory arguments:
   Authentication options (for Norid usage only):
   Grants access to access layer with more functionality and data
   (default is basic layer)
-  -z: Secret for access layer with higher amount of visible data
   -I: The ip address of the client UA for proper referral rate
       limiting (default is none)
-  -y: Act as a Norid proxy
 
   Page control for searches:
   -F: Fieldset value, undef or one of the valid fieldSets

@@ -3,7 +3,7 @@ package Net::Async::Redis::Cluster::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use parent qw(Net::Async::Redis::Cluster);
 
@@ -21,6 +21,7 @@ API and behaviour should be identical to L<Net::Async::Redis::Cluster>, see ther
 
 use Syntax::Keyword::Try;
 use Net::Async::Redis::XS;
+use Net::Async::Redis::Cluster::Node::XS;
 use Future::AsyncAwait;
 
 async sub bootstrap {
@@ -38,6 +39,15 @@ async sub bootstrap {
     } finally {
         $redis->remove_from_parent if $redis;
     }
+}
+
+sub instantiate_node {
+    my ($self, $slot_data) = @_;
+    return Net::Async::Redis::Cluster::Node::XS->from_arrayref(
+        $slot_data,
+        cluster => $self,
+        $self->node_config
+    )
 }
 
 1;

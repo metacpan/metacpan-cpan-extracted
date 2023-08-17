@@ -1,3 +1,7 @@
+0.03 2023-06-20T14:20:50+02:00
+ - Add helper method _exists_id().
+ - Fix dependency name.
+
 0.02 2023-05-28T11:32:04+02:00
  - Finish example in doc.
  - Forward verbose param to WQS::SPARQL::Result.

@@ -1,0 +1,106 @@
+NAME
+    Data::Message::Simple - Data object for simple message.
+
+SYNOPSIS
+     use Data::Message::Simple;
+
+     my $obj = Data::Message::Simple->new(%params);
+     my $lang = $obj->lang;
+     my $text = $obj->text;
+     my $type = $obj->type;
+
+METHODS
+  "new"
+     my $obj = Data::Message::Simple->new(%params);
+
+    Constructor.
+
+    *       "lang"
+
+            Message language. It's optional. If defined, possible values are
+            ISO 639-1 language codes.
+
+            Default value is undef.
+
+    *       "text"
+
+            Message text. Maximum length of text is 4096 characters. It's
+            required.
+
+    *       "type"
+
+            Message type. Possible value are 'error' and 'info'. It's
+            required. Default value is 'info'.
+
+    Returns instance of object.
+
+  "lang"
+     my $lane = $obj->lang;
+
+    Get ISO 639-1 language code of text.
+
+    Returns string.
+
+  "text"
+     my $text = $obj->text;
+
+    Get message text.
+
+    Returns string.
+
+  "type"
+     my $type = $obj->type;
+
+    Get message type.
+
+    Returns string.
+
+ERRORS
+     new():
+             From Mo::utils:
+                     Parameter 'text' has length greater than '4096'.
+                     Parameter 'text' is required.
+                     Parameter 'type' must be one of defined strings.
+             From Mo::utils::Language:
+                     Language code 'xx' isn't ISO 639-1 code.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Message::Simple;
+
+     my $obj = Data::Message::Simple->new(
+             'lang' => 'en',
+             'text' => 'This is text message.',
+     );
+
+     # Print out.
+     print 'Message type: '.$obj->type."\n";
+     print 'ISO 639-1 language code: '.$obj->lang."\n";
+     print 'Text: '.$obj->text."\n";
+
+     # Output:
+     # Message type: info
+     # ISO 639-1 language code: en
+     # Text: This is text message.
+
+DEPENDENCIES
+    Mo, Mo::utils, Mo::utils::Language, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Message-Simple>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

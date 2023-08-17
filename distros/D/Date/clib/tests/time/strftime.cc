@@ -17,7 +17,7 @@ static void test (string_view fmt, string_view val1, string_view val2 = "EPTA", 
     timelocal(&d2);
 
     if (val2 == "EPTA") val2 = val1;
-    SECTION(string("'") + fmt + "'") {
+    SECTION("'" + std::string(fmt.data(), fmt.size()) + "'") {
         CHECK(strftime(fmt, d1) == val1);
         CHECK(strftime(fmt, d2) == val2);
         if (custom) custom();

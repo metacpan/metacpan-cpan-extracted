@@ -1,0 +1,106 @@
+#!perl
+#
+# eg/bench - benchmark Bresenham and lerp for each of pure perl and C
+
+use 5.22.0;
+use warnings;
+use constant {
+    XX => 0,
+    YY => 1,
+};
+
+use Algorithm::Line::Lerp 0.02 qw(bline line);
+use Benchmark 'cmpthese';
+use POSIX 'lround';    # >= perl 5.22 (2015)
+
+package Bresenham {
+    use integer;
+    use constant {
+        XX => 0,
+        YY => 1,
+    };
+
+    sub line {
+        my ( $x, $y ) = @{ $_[0] };
+        my $dx  = abs( $_[1][XX] - $x );
+        my $sx  = $x < $_[1][XX] ? 1 : -1;
+        my $dy  = abs( $_[1][YY] - $y );
+        my $sy  = $y < $_[1][YY] ? 1 : -1;
+        my $err = ( $dx > $dy ? $dx : -$dy ) / 2;
+        my @points;
+        while (1) {
+            push @points, [ $x, $y ];
+            last if $x == $_[1][XX] and $y == $_[1][YY];
+            my $e2 = $err;
+            if ( $e2 > -$dx ) {
+                $err -= $dy;
+                $x   += $sx;
+            }
+            if ( $e2 < $dy ) {
+                $err += $dx;
+                $y   += $sy;
+            }
+        }
+        return \@points;
+    }
+}
+
+sub ppline {
+    my ( $x, $y ) = @{ $_[0] };
+    my $dx = $_[1][XX] - $x;
+    my $dy = $_[1][YY] - $y;
+
+    my $distance = abs($dx);
+    my $m        = abs($dy);
+    $distance = $m if $m > $distance;
+    return [ $x, $y ] if $distance == 0;
+
+    my @points;
+    my $divn  = 1.0 / $distance;
+    my $xstep = $dx * $divn;
+    my $ystep = $dy * $divn;
+    my $step  = 0;
+    while ( $step <= $distance ) {
+        push @points, [ lround($x), lround($y) ];
+        $step++;
+        $x += $xstep;
+        $y += $ystep;
+    }
+    return \@points;
+}
+
+sub points_of {
+    join ' ', map { "$_->[0],$_->[1]" } @{ $_[0] };
+}
+
+my $first = [ 0, 0 ];
+my $last  = [ 2, 11 ];
+
+# are the results sane for each? (there may be slight variance if lround
+# does something different than Bresenham does? for a game board of a
+# particular size you might check all the different possible lines and
+# look for any differences between the algos)
+say "Bc ", points_of( bline( $first, $last ) );
+say "Bp ", points_of( Bresenham::line( $first, $last ) );
+say "Lc ", points_of( line( $first, $last ) );
+say "Lp ", points_of( ppline( $first, $last ) );
+
+cmpthese(
+    -10,
+    {   bres_c  => sub { bline( $first, $last ) },
+        bres_pp => sub { Bresenham::line( $first, $last ) },
+        lerp_c  => sub { line( $first, $last ) },
+        lerp_pp => sub { ppline( $first, $last ) },
+    }
+);
+
+__END__
+
+                Rate lerp_pp bres_pp  bres_c  lerp_c
+    lerp_pp  49361/s      --     -9%    -67%    -70%
+    bres_pp  54518/s     10%      --    -64%    -67%
+    bres_c  149657/s    203%    175%      --     -9%
+    lerp_c  164164/s    233%    201%     10%      --
+
+In pure perl Bresenham is slightly faster; with C linear interpolation
+is slightly faster. On my system, at least, for the code above.

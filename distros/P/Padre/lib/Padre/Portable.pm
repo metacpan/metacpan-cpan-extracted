@@ -9,7 +9,7 @@ use File::Spec 3.21 (); # 3.21 needed for volume-safe abs2rel
 use Params::Util    ();
 use Padre::Constant ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 sub freeze {
 	return shift unless defined Params::Util::_STRING( $_[0] );
@@ -31,7 +31,7 @@ sub freeze_directory {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

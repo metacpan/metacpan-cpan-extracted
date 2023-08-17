@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181421;
+our $VERSION = 1.20230614174403;
 
 my $formatters = [];
 
@@ -85,13 +85,40 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            63\\d{3}|
-            73(?:
-              0[0-5]\\d|
-              140
+            6200[01]|
+            7(?:
+              310[1-9]|
+              5(?:
+                02[03-9]|
+                12[0-47-9]|
+                22[0-7]|
+                [34](?:
+                  0[1-9]|
+                  8[02-9]
+                )|
+                50[1-9]
+              )
             )
           )\\d{3}|
-          [67]200[01]\\d{3}
+          (?:
+            63\\d\\d|
+            7(?:
+              (?:
+                [0146-9]\\d|
+                2[0-689]
+              )\\d|
+              3(?:
+                [02-9]\\d|
+                1[1-9]
+              )|
+              5(?:
+                [0-2][013-9]|
+                [34][1-79]|
+                5[1-9]|
+                [6-9]\\d
+              )
+            )
+          )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -108,54 +135,57 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"68681", "Kiritimati",
-"686654", "Gilbert\ Islands",
-"68642", "Nonouti",
-"68685", "Kanton",
-"6867538", "Line\ Islands",
-"68626", "Betio",
-"68647", "Nikunau",
-"68624", "Bairiki",
-"68633", "Abaiang",
-"68629", "Bikenibeu",
-"686751", "Betio",
-"68644", "Tabiteuea\ South",
-"68627", "Tarawa",
-"68631", "North\ Tarawa",
-"68649", "Arorae",
-"68635", "Butaritari",
-"68638", "Maiana",
-"68683", "Fanning",
-"6867540", "Phoenix\ Islands",
-"68622", "Bairiki",
-"686655", "Phoenix\ Islands",
-"68672700", "Gilbert\ Islands",
-"68646", "Beru",
-"686750", "Bairiki",
-"686652", "Bikenibeu",
-"686752", "Bikenibeu",
-"68623", "Bairiki",
-"68645", "Onotoa",
-"686650", "Bairiki",
-"68682", "Kiritimati",
-"68639", "Kuria",
-"68641", "Abemama",
-"68634", "Marakei",
-"6867530", "Gilbert\ Islands",
+$areanames{en} = {"68685", "Kanton",
 "68648", "Tamana",
-"686755", "Phoenix\ Islands",
-"68636", "Makin",
-"68640", "Aranuka",
-"68684", "Washington",
-"68632", "North\ Tarawa",
-"686651", "Betio",
-"68621", "Bairiki",
-"68625", "Betio",
-"68643", "Tabiteuea\ North",
+"68683", "Fanning",
+"68647", "Nikunau",
+"68634", "Marakei",
 "68637", "Banaba",
+"68644", "Tabiteuea\ South",
+"68626", "Betio",
+"68623", "Bairiki",
+"68625", "Betio",
+"68675400", "Phoenix\ Islands",
+"68675500", "Phoenix\ Islands",
+"686651", "Betio",
+"68638", "Maiana",
+"686650", "Bairiki",
+"686652", "Bikenibeu",
+"68649", "Arorae",
+"68675021", "Bairiki",
+"68632", "North\ Tarawa",
+"68681", "Kiritimati",
+"68642", "Nonouti",
+"68675300", "Gilbert\ Islands",
+"68672700", "Gilbert\ Islands",
+"68621", "Bairiki",
+"68639", "Kuria",
+"68635", "Butaritari",
+"68633", "Abaiang",
+"68640", "Aranuka",
+"68636", "Makin",
+"68627", "Tarawa",
+"68684", "Washington",
+"68675228", "Bikenibeu",
 "68628", "Bikenibeu",
+"686655", "Phoenix\ Islands",
+"68675381", "Line\ Islands",
+"686654", "Gilbert\ Islands",
+"68675229", "Bikenibeu",
+"68645", "Onotoa",
+"68643", "Tabiteuea\ North",
+"68646", "Beru",
+"68624", "Bairiki",
+"68675125", "Betio",
+"68675126", "Betio",
+"68682", "Kiritimati",
+"68629", "Bikenibeu",
+"68631", "North\ Tarawa",
+"68641", "Abemama",
+"68675022", "Bairiki",
+"68675481", "Line\ Islands",
 "686653", "Gilbert\ Islands",
-"6867548", "Line\ Islands",};
+"68622", "Bairiki",};
 
     sub new {
       my $class = shift;

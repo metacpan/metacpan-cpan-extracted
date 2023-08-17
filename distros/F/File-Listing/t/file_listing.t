@@ -241,7 +241,17 @@ subtest 'dosftp' => sub {
 09-10-96  09:18AM       <DIR>          sl_util
 EOT
 
-  ok @$list, "is 2";
+  is scalar @$list, 2, "is 2";
+  ok $list->[0][0], "src.slf";
+  ok $list->[0][1], "f";
+  ok $list->[1][1], "d";
+
+  $list = parse_dir(<<EOT, undef, 'dosftp');
+02-05-2022  10:48AM                 1415 src.slf
+09-10-2022  09:18AM       <DIR>          sl_util
+EOT
+
+  is scalar @$list, 2, "is 2";
   ok $list->[0][0], "src.slf";
   ok $list->[0][1], "f";
   ok $list->[1][1], "d";

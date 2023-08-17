@@ -1,0 +1,38 @@
+name = "App-LXC-Container"
+# badges = ["travis-ci.com"]
+module_maker = "ModuleBuild"
+static_install = "auto"
+
+# no automatic upload to PAUSE/CPAN (yet):
+[release]
+do_not_upload_to_cpan = true
+
+# we have a mock-up .Xauthority:
+[FileGatherer]
+include_dotfiles = true
+
+#########################################################################
+# This is a Linux-only module!
+requires_external_bin=[
+    'cp',
+    'id',
+    'lxc-attach',
+    'lxc-execute',
+    'lxc-ls',
+    'sh',
+    'tty'
+]
+
+[ReleaseTest]
+MinimumVersion = false
+
+[unsupported]
+os = [
+    'MSWin32',
+    'cygwin',
+    'darwin',
+    'freebsd',
+    'netbsd',
+    'openbsd',
+    'solaris'
+]

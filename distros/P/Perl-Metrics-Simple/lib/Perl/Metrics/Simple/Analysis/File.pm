@@ -10,7 +10,7 @@ use PPI 1.113;
 use PPI::Document;
 use Readonly;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
 Readonly::Scalar my $ALL_NEWLINES_REGEX =>
     qr/ ( \Q$INPUT_RECORD_SEPARATOR\E ) /sxm;
@@ -64,8 +64,15 @@ Readonly::Array our @DEFAULT_METHOD_MODIFIERS => qw(
     around
     );
 
-
 Readonly::Scalar my $LAST_CHARACTER => -1;
+
+Readonly::Scalar my $ONE_SPACE => q{ };
+
+Readonly::Scalar my $PPI_CHILD_INDEX_AFTER => 1;
+Readonly::Scalar my $PPI_CHILD_INDEX_METHOD_NAME => 2;
+Readonly::Scalar my $PPI_CHILD_INDEX_OPERATOR => 3;
+Readonly::Scalar my $PPI_CHILD_INDEX_SUBROUTINE => 4;
+Readonly::Scalar my $PPI_CHILD_INDEX_BLOCK => 5;
 
 our (@LOGIC_KEYWORDS, @LOGIC_OPERATORS, @METHOD_MODIFIERS); # For user-supplied values;
 
@@ -273,7 +280,7 @@ sub logic_operators {
 sub method_modifiers {
     my ($self) = @_;
     return wantarray ? @{$_METHOD_MODIFIERS{$self}} : $_METHOD_MODIFIERS{$self};
-1}
+}
 
 sub measure_complexity {
     my $self = shift;
@@ -393,31 +400,31 @@ sub _rewrite_moose_method_modifiers {
         Carp::confess('Did not supply a document!');
     }
 
-    my $re = '^(' . join('|', map {quotemeta} keys %{$_METHOD_MODIFIERS{$self}}) . ')$';
+    my $re = q{^(} . join(q{|}, map {quotemeta} keys %{$_METHOD_MODIFIERS{$self}}) . q{)$};
     my @method_modifiers =
         # 5th child: { ... }
-        grep { $_->[5]->isa('PPI::Structure::Block') }
+        grep { $_->[$PPI_CHILD_INDEX_BLOCK]->isa('PPI::Structure::Block') }
 
         # 4th child: sub
         grep {
-               $_->[4]->isa('PPI::Token::Word')
-            && $_->[4]->content eq 'sub'
+               $_->[$PPI_CHILD_INDEX_SUBROUTINE]->isa('PPI::Token::Word')
+            && $_->[$PPI_CHILD_INDEX_SUBROUTINE]->content eq 'sub'
         }
 
         # 3rd child: =>
         grep {
-               $_->[3]->isa('PPI::Token::Operator')
-            && $_->[3]->content eq '=>'
+               $_->[$PPI_CHILD_INDEX_OPERATOR]->isa('PPI::Token::Operator')
+            && $_->[$PPI_CHILD_INDEX_OPERATOR]->content eq '=>'
         }
 
         # 2nd child: 'method_name'
-        grep { $_->[2]->isa('PPI::Token::Quote')
-            || $_->[2]->isa('PPI::Token::Word') }
+        grep { $_->[$PPI_CHILD_INDEX_METHOD_NAME]->isa('PPI::Token::Quote')
+            || $_->[$PPI_CHILD_INDEX_METHOD_NAME]->isa('PPI::Token::Word') }
 
         # 1st child: after
         grep {
-               $_->[1]->isa('PPI::Token::Word')
-            && $_->[1]->content =~ /$re/
+               $_->[$PPI_CHILD_INDEX_AFTER]->isa('PPI::Token::Word')
+            && $_->[$PPI_CHILD_INDEX_AFTER]->content =~ /$re/smx
         }
 
         # create an arrayref [item, child0, child1, child2]
@@ -428,14 +435,21 @@ sub _rewrite_moose_method_modifiers {
         grep { $_->class eq 'PPI::Statement' } $document->schildren;
 
     for (@method_modifiers) {
-        my ($old_stmt, @children) = @$_;
-        my $name = '_' . $children[0]->literal . '_' . $children[1]->literal;
+        my ($old_stmt, @children) = @{$_};
+        my $name = '_' . $children[0]->literal . '_';
+        if ( $children[1]->can('literal') ) {
+            $name .= $children[1]->literal;
+        }
+        else {
+            my $string = $children[1]->string;
+            $name .= $string;
+        }
         my $new_stmt = PPI::Statement::Sub->new();
         $new_stmt->add_element(PPI::Token::Word->new('sub'));
-        $new_stmt->add_element(PPI::Token::Whitespace->new(' '));
+        $new_stmt->add_element(PPI::Token::Whitespace->new($ONE_SPACE));
         $new_stmt->add_element(PPI::Token::Word->new($name));
-        $new_stmt->add_element(PPI::Token::Whitespace->new(' '));
-        $new_stmt->add_element($children[4]->clone());
+        $new_stmt->add_element(PPI::Token::Whitespace->new($ONE_SPACE));
+        $new_stmt->add_element($children[$PPI_CHILD_INDEX_SUBROUTINE]->clone());
 
         $old_stmt->insert_after($new_stmt);
         $old_stmt->delete();
@@ -668,7 +682,7 @@ Arrayref of unique packages found in the file.
 =head2 path
 
 Either the path to the file, or a scalar ref if that was supplied
-instaed of a path.
+instead of a path.
 
 =head2 subs
 
@@ -694,7 +708,7 @@ for example C<foo> and C<bar> are hash keys in the following:
 
   { foo => 123, bar => $a }
  
-Copied and somehwat simplified from
+Copied and somewhat simplified from
 http://search.cpan.org/src/THALJEF/Perl-Critic-0.19/lib/Perl/Critic/Utils.pm
 See L<Perl::Critic::Utils|Perl::Critic::Utils>.
 
@@ -734,7 +748,7 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Metrics-Simple
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006-2009 by Eigenstate Consulting, LLC.
+Copyright (c) 2006-2021 by Eigenstate Consulting, LLC.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

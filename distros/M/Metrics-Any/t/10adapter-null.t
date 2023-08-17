@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any::Adapter 'Null';
 use Metrics::Any '$metrics';

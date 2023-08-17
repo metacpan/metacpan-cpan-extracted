@@ -4,7 +4,7 @@ package HTTP::OAI::ListSets;
 
 use strict;
 
-our $VERSION = '4.12';
+our $VERSION = '4.13';
 
 sub set { shift->item(@_) }
 

@@ -109,16 +109,18 @@ sub get_databases {
     $databases = [];
     local $| = 1;
     print 'Searching ... ';
+    my $encoding = Encode::find_encoding( 'locale_fs' );
     if ( $sf->{o}{G}{file_find_warnings} ) {
+        my $file;
         for my $dir ( @$dirs ) {
             File::Find::find( {
                 wanted => sub {
-                    my $file_fs = $_;
-                    return if ! -f $file_fs;
-                    my $file = decode( 'locale_fs', $file_fs );
+                    #my $file_fs = $_;
+                    return if ! -f $_;
+                    $file = $encoding->decode( $_ );
                     print "$file\n";
                     if ( ! eval {
-                        open my $fh, '<:raw', $file_fs or die "$file: $!";
+                        open my $fh, '<:raw', $_ or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";
                         close $fh;
                         push @$databases, $file if $string eq 'SQLite format';
@@ -130,7 +132,7 @@ sub get_databases {
                 },
                 no_chdir => 1,
             },
-            encode( 'locale_fs', $dir ) );
+            $encoding->encode( $dir ) );
         }
         $tc->choose(
             [ 'Press ENTER to continue' ],
@@ -139,15 +141,16 @@ sub get_databases {
     }
     else {
         no warnings qw( File::Find );
+        my $file;
         for my $dir ( @$dirs ) {
             File::Find::find( {
                 wanted => sub {
-                    my $file_fs = $_;
-                    return if ! -f $file_fs;
-                    my $file = decode( 'locale_fs', $file_fs );
+                    #my $file_fs = $_;
+                    return if ! -f $_;
+                    $file = $encoding->decode( $_ );
                     print "$file\n";
                     eval {
-                        open my $fh, '<:raw', $file_fs or die "$file: $!";
+                        open my $fh, '<:raw', $_ or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";
                         close $fh;
                         push @$databases, $file if $string eq 'SQLite format';
@@ -155,7 +158,7 @@ sub get_databases {
                 },
                 no_chdir => 1,
             },
-            encode( 'locale_fs', $dir ) );
+            $encoding->encode( $dir ) );
         }
     }
     print 'Ended searching' . "\n";

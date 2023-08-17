@@ -81,6 +81,7 @@ _EOT_
     my $blitz = HTML::Blitz->new(
         [ '.f', [ transform_inner_sub    => sub { "f($_[0])" } ] ],
         [ '.g', [ replace_inner_template => $t2 ] ],
+        [ '.h', [ replace_inner_text     => 'fixed' ] ],
     );
 
     my $template = <<'_EOT_';
@@ -89,6 +90,9 @@ _EOT_
 <p class=g>y</p>
 <p class="f g">both</p>
 <p class="g f">also both</p>
+<p class="f h"></p>
+<p class="g h"></p>
+<p class="f g h"></p>
 _EOT_
 
     my $result = $blitz->apply_to_html('(test)', $template)->process({
@@ -101,6 +105,9 @@ _EOT_
 <p class=g><span class=f>hi</span></p>
 <p class="f g"><span class=f>hi</span></p>
 <p class="g f"><span class=f>hi</span></p>
+<p class="f h">fixed</p>
+<p class="g h">fixed</p>
+<p class="f g h">fixed</p>
 _EOT_
 }
 

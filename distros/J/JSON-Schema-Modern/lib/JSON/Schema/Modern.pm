@@ -1,16 +1,17 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.565-5-gc2c34f36
+package JSON::Schema::Modern; # git description: v0.568-3-g7e5ee1ce
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.566';
+our $VERSION = '0.569';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -944,8 +945,23 @@ has _media_type => (
     +{
       (map +($_ => $_json_media_type),
         qw(application/json application/schema+json application/schema-instance+json)),
-      map +($_ => sub ($content_ref) { $content_ref }),
-        qw(text/* application/octet-stream),
+      (map +($_ => sub ($content_ref) { $content_ref }),
+        qw(text/* application/octet-stream)),
+      'application/x-www-form-urlencoded' => sub ($content_ref) {
+        \ Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*)->to_hash;
+      },
+      'application/x-ndjson' => sub ($content_ref) {
+        my $decoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1);
+        my $line = 0; # line numbers start at 1
+        \[ map {
+            do {
+              try { ++$line; $decoder->decode($_) }
+              catch ($e) { die 'parse error at line '.$line.': '.$e }
+            }
+          }
+          split(/\r?\n/, $content_ref->$*)
+        ];
+      },
     };
   },
 );
@@ -1022,7 +1038,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.566
+version 0.569
 
 =head1 SYNOPSIS
 
@@ -1160,7 +1176,7 @@ in L</traverse> or L</evaluate>).
 Evaluates the provided instance data against the known schema document.
 
 The data is in the form of a JSON-encoded string (in accordance with
-L<RFC8259|https://tools.ietf.org/html/rfc8259>). B<The string is expected to be UTF-8 encoded.>
+L<RFC8259|https://datatracker.ietf.org/doc/html/rfc8259>). B<The string is expected to be UTF-8 encoded.>
 
 The schema must be in one of these forms:
 
@@ -1395,7 +1411,7 @@ These media types are already known:
 
 =item *
 
-C<application/json> - see L<RFC 4627|https://www.rfc-editor.org/rfc/rfc4627>
+C<application/json> - see L<RFC 4627|https://datatracker.ietf.org/doc/html/rfc4627>
 
 =item *
 
@@ -1408,6 +1424,14 @@ C<application/schema-instance+json> - see L<proposed definition|https://json-sch
 =item *
 
 C<application/octet-stream> - passes strings through unchanged
+
+=item *
+
+C<application/x-www-form-urlencoded>
+
+=item *
+
+C<application/x-ndjson> - see L<https://github.com/ndjson/ndjson-spec>
 
 =item *
 
@@ -1449,11 +1473,11 @@ C<identity> - passes strings through unchanged
 
 =item *
 
-C<base64> - see L<RFC 4648 §4|https://www.rfc-editor.org/rfc/rfc4648#section-4>
+C<base64> - see L<RFC 4648 §4|https://datatracker.ietf.org/doc/html/rfc4648#section-4>
 
 =item *
 
-C<base64url> - see L<RFC 4648 §5|https://www.rfc-editor.org/rfc/rfc4648#section-5>
+C<base64url> - see L<RFC 4648 §5|https://datatracker.ietf.org/doc/html/rfc4648#section-5>
 
 =back
 
@@ -1649,11 +1673,11 @@ L<https://json-schema.org>
 
 =item *
 
-L<RFC8259: The JavaScript Object Notation (JSON) Data Interchange Format|https://tools.ietf.org/html/rfc8259>
+L<RFC8259: The JavaScript Object Notation (JSON) Data Interchange Format|https://datatracker.ietf.org/doc/html/rfc8259>
 
 =item *
 
-L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://tools.ietf.org/html/rfc3986>
+L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://datatracker.ietf.org/doc/html/rfc3986>
 
 =item *
 

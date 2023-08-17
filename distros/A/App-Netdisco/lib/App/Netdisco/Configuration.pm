@@ -19,6 +19,21 @@ BEGIN {
   }
 }
 
+BEGIN {
+  no warnings 'redefine';
+  use SNMP;
+
+  # hardware exception on macOS at least when translateObj
+  # gets something like '.0.0' passed as arg
+
+  my $orig_translate = *SNMP::translateObj{'CODE'};
+  *SNMP::translateObj = sub {
+    my $arg = $_[0];
+    return undef unless defined $arg and $arg !~ m/^[.0]+$/;
+    return $orig_translate->(@_);
+  };
+}
+
 # set up database schema config from simple config vars
 if (ref {} eq ref setting('database')) {
     # override from env for docker
@@ -172,6 +187,10 @@ if ($ENV{NETDISCO_DOMAIN}) {
   }
 }
 
+# override SNMP bulkwalk from environment
+config->{'bulkwalk_off'} = true
+  if (exists $ENV{NETDISCO_SNMP_BULKWALK_OFF} and $ENV{NETDISCO_SNMP_BULKWALK_OFF});
+
 # check user's port_control_reasons
 
 config->{'port_control_reasons'} =
@@ -192,18 +211,7 @@ else {
   config->{'domain_suffix'} = qr//;
 }
 
-# convert radius and tacacs from single to lists
-
-if (ref {} eq ref setting('radius')
-  and exists setting('radius')->{'secret'}) {
-
-  my $servers = (ref [] eq ref setting('radius')->{'server'}
-    ? setting('radius')->{'server'} : [setting('radius')->{'server'}]);
-  config->{'radius'} = [
-    Secret => setting('radius')->{'secret'},
-    NodeList => $servers,
-  ];
-}
+# convert tacacs from single to lists
 
 if (ref {} eq ref setting('tacacs')
   and exists setting('tacacs')->{'key'}) {

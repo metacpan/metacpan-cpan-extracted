@@ -19,10 +19,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Filter::Simple" => "0.95",
     "PPI" => "1.276",
+    "Test::Simple" => "1.302195",
     "XXX" => "0.38",
     "YAML::PP" => "0.036"
   },
-  "VERSION" => "0.0.10",
+  "TEST_REQUIRES" => {
+    "Capture::Tiny" => "0.48"
+  },
+  "VERSION" => "0.0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,8 +34,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => "0.48",
   "Filter::Simple" => "0.95",
   "PPI" => "1.276",
+  "Test::Simple" => "1.302195",
   "XXX" => "0.38",
   "YAML::PP" => "0.036"
 );

@@ -1,0 +1,172 @@
+=head1 NAME
+
+HTTP::MultiPartParser - HTTP MultiPart Parser
+
+=head1 SYNOPSIS
+
+    $parser = HTTP::MultiPartParser->new(
+        boundary  => $boundary,
+        on_header => $on_header,
+        on_body   => $on_body,
+    );
+    
+    while ($octets = read_octets_from_body()) {
+        $parser->parse($octets);
+    }
+    
+    $parser->finish;
+
+=head1 DESCRIPTION
+
+This class provides a low-level API for processing MultiPart MIME data streams 
+conforming to MultiPart types as defined in L<RFC 2616|http://tools.ietf.org/html/rfc2616#section-3.7.2>.
+
+=head1 METHODS
+
+=head2 new
+
+    $parser = HTTP::MultiPartParser->new( %attributes );
+    
+This constructor returns a instance of C<HTTP::MultiPartParser>. Valid 
+attributes inculde:
+
+=over 4
+
+=item * C<boundary> (Mandatory)
+
+    boundary => $value
+
+The unquoted and unescaped I<boundary> parameter value from the Content-Type 
+header field. The I<boundary> parameter value consist of a restricted set of 
+characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046#section-5.1.1>.
+
+    DIGIT / ALPHA / "'" / "(" / ")" /
+    "+" / "_" / "," / "-" / "." /
+    "/" / ":" / "=" / "?"
+
+=item * C<on_header> (Mandatory)
+
+    on_header => $callback->($header)
+
+This callback will be invoked when the header of a part has successfully been 
+received. The callback will only be invoked once for each part.
+
+=item * C<on_header_as>
+
+    on_header_as => 'unparsed' | 'lines'
+
+Defines the C<$header> value for the C<on_header> callback.
+
+=over 4
+
+=item * C<unparsed>
+
+Callback invoked with an octet string containing the unparsed header.
+
+=item * C<lines>
+
+Callback invoked with an ARRAY reference, where each element of the array is a 
+header line. Folding whitespace is removed from all lines and header continuation 
+lines are unwrapped.
+
+=back
+
+=item * C<on_body> (Mandatory)
+
+    on_body => $callback->($chunk, $final)
+
+This callback will be invoked when there is any data available for the body 
+of a part. The callback may be invoked multiple times for each part.
+
+=item * C<on_error>
+
+    on_error => $callback->($message)
+
+This callback will be invoked anytime an error occurs in the parser. After
+receiving an error the parser is no longer useful in its current state.
+
+=item * C<max_preamble_size>
+
+    max_preamble_size => 32768
+
+=item * C<max_header_size>
+
+    max_header_size => 32768
+
+=back
+
+=head2 parse
+
+    $parser->parse($octets);
+
+Parses the given octets.
+
+=head2 finish
+
+    $parser->finish;
+
+Finish the parsing.
+
+=head2 reset
+
+    $parser->reset;
+
+Resets the state of the parser.
+
+=head2 is_aborted
+
+    $boolean = $parser->is_aborted;
+
+Returns true if an error has occurred in the parser.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item B<(F)> Usage: %s
+
+Method called with wrong number of arguments.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<RFC 2616 section 3.7.2 Multipart Types|http://tools.ietf.org/html/rfc2616#section-3.7.2>
+
+=item L<RFC 2046 section 5.1.1 Common Syntax|http://tools.ietf.org/html/rfc2046#section-5.1.1>
+
+=item L<RFC 2388 multipart/form-data|http://tools.ietf.org/html/rfc2388>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/chansen/p5-http-multipartparser/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 SOURCE CODE
+
+This is open source software. The code repository is available for public 
+review and contribution under the terms of the license.
+
+L<httsp://github.com/chansen/p5-http-multipartparser>
+
+    git clone https://github.com/chansen/p5-http-multipartparser
+
+=head1 AUTHOR
+
+Christian Hansen C<chansen@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2012-2017 by Christian Hansen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

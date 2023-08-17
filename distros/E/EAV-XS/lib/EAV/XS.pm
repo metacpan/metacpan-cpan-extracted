@@ -117,12 +117,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
     TLD_TEST
     TLD_SPECIAL
     TLD_RETIRED
+    TLD_ALL
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.7.6";
+our $VERSION = "0.7.8";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);
@@ -144,6 +145,8 @@ use constant TLD_SPONSORED          => 0x00000080;
 use constant TLD_TEST               => 0x00000100;
 use constant TLD_SPECIAL            => 0x00000200;
 use constant TLD_RETIRED            => 0x00000400;
+# all flags above OR'ed, except TLD_INVALID
+use constant TLD_ALL                => 0x000007fc;
 
 1;
 __END__
@@ -390,6 +393,20 @@ L<RFC 7686|https://tools.ietf.org/html/rfc7686> for details.
 Currently, this includes the next TLDs: "test.", "invalid.", 
 "localhost.", "example.", "onion." and also Second Level Domains,
 such as, "example.com.", "example.net." and "example.org.".
+
+=item *
+
+TLD_ALL - all flags above OR'ed:
+
+  TLD_ALL = TLD_NOT_ASSIGNED |
+            TLD_COUNTRY_CODE |
+            TLD_GENERIC |
+            TLD_GENERIC_RESTRICTED |
+            TLD_INFRASTRUCTURE |
+            TLD_SPONSORED |
+            TLD_TEST |
+            TLD_SPECIAL |
+            TLD_RETIRED
 
 =back
 

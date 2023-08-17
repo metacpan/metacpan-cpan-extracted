@@ -1,0 +1,46 @@
+#!perl
+use strict;
+use warnings;
+
+# :squash-remove-start:
+use FindBin;
+use lib "$FindBin::Bin/lib";
+# :squash-remove-end:
+
+require Chicken::Ipsum;
+use Carp qw/ croak /;
+
+if (($ARGV[0] // '') eq '--help') {
+    print HELP_MESSAGE();
+    exit 0;
+}
+
+if (($ARGV[0] // '') eq '--version') {
+    print VERSION_MESSAGE();
+    exit 0;
+}
+
+if (@ARGV > 1) {
+    print STDERR USAGE();
+    exit 2;
+}
+
+my $num_paragraphs = int (shift // 1);
+print scalar Chicken::Ipsum->new->paragraphs($num_paragraphs), "\n";
+
+sub USAGE {
+    return "Usage: chicken-ipsum [NUM]\n";
+}
+
+sub HELP_MESSAGE {
+    return USAGE(),
+        "Generate NUM paragraphs of random chicken noises (1 paragraph by default)\n\n",
+        "Options:\n",
+        "    --help      Show this message\n",
+        "    --version   Show version\n",
+        ;
+}
+
+sub VERSION_MESSAGE {
+    return "chicken-ipsum (Chicken::Ipsum) $Chicken::Ipsum::VERSION\n";
+}

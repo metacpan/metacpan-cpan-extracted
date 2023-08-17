@@ -16,9 +16,13 @@ my $s = $driver->session;
 
 # The following tests are for details of the Record class.
 
-use Test::More 0.96 tests => 2 + 1;
+use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
+
+plan tests => 2 + $no_warnings;
 
 
 my ($q, $r, $w);

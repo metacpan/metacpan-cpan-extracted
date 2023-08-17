@@ -1,3 +1,35 @@
+0.0503  2023-06-22      Piotr Roszatycki <dexter@cpan.org>
+
+* Skip tests which don't work on MSWin32.
+
+0.0502  2023-06-22      Piotr Roszatycki <dexter@cpan.org>
+
+* Configure requires Software::License.
+* More reliable tests.
+* Tests use explicitly 127.0.0.1 as a host.
+
+0.0501  2023-06-18      Piotr Roszatycki <dexter@cpan.org>
+
+* Correct configure requirements.
+
+0.0500  2020-03-17      Piotr Roszatycki <dexter@cpan.org>
+
+* Print connection errors to stderr.
+* Allow to use SSL with IPv6.
+* IPv6 is enabled by default if IO::Socket::IP is available.
+* New option `--ssl-client-ca-file`.
+* Listen on tcp46 socket with `--ipv6` option when `--host` is missing.
+* Default `--host` is undefined which means any interface.
+
+0.0402  2020-03-14      Piotr Roszatycki <dexter@cpan.org>
+
+* Excludes Perl < 5.14 on MSWin32 from SSL tests.
+
+0.0401  2020-03-12      Piotr Roszatycki <dexter@cpan.org>
+
+* Provides cpanfile.
+* More reliable tests.
+
 0.0400  2020-03-12      Piotr Roszatycki <dexter@cpan.org>
 
 * New options `--ssl-ca-file` and `--ssl-verify-mode`.

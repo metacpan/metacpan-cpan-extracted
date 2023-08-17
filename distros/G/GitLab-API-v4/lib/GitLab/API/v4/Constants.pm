@@ -1,5 +1,5 @@
 package GitLab::API::v4::Constants;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -153,9 +153,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
+See L<GitLab::API::v4/LICENSE>.
 
 =cut
 

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::big_streams_param;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: big_streams_param 
+ PERL PERL PROGRAM NAME: big_streams_param 
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 22 2022
 

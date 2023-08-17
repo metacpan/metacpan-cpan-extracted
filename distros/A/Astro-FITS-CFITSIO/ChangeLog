@@ -1,9 +1,29 @@
+2023-07-28  Peter Ratzlaff  <rpete@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.18';
+
+	* CFITSIO.xs: added fits_make_hist{,d,de}, courtesy of Craig
+	Markwardt (craig.b.markwardt@nasa.gov).
+
+	* CFITSIO.xs: added fits_rebin_wcs[d], fits_write_keys_histo,
+	fits_copy_pixlist2image
+
+	* CFITSIO.xs: new in cfitsio 4.3.0, added fits_get_key_com_strlen/ffgkcsl
+	and fits_read_string_key_com/ffgskyc.
+
+	* CFITSIO.xs: change fits_copy_select_rows -> fits_copy_selrows
+
+2023-07-28  Diab Jerius <djerius@cfa.harvard.edu>
+
+	* t/create_file.t: fix cause of Windows test failures, whereby a
+	file must be deleted before its name can be reused.
+
 2023-04-17  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
 
 	* CFITSIO.pm: $VERSION = '1.17';
 
 	* CFITSIO.xs, t/: constructors open_{diskfile,data,image,table}
-	added, beginninng of test suite update, courtesy of Diab Jerius
+	added, beginning of test suite update, courtesy of Diab Jerius
 	(djerius@cfa.harvard.edu).
 
 	* testprog/testprog_pdl.pl: added upd_data methods where

@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.000;
+
+$| = 1;
+
+my $USAGE = "usage: pds_multipliers (p n|q)\n";
+
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if '-' eq $opt;
+    die $USAGE;
+}
+if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
+    die $USAGE;
+}
+
+my @mu = Math::DifferenceSet::Planar->multipliers(@ARGV);
+print "@mu\n";
+
+__END__
+
+=head1 NAME
+
+pds_multipliers - show planar difference set multipliers of a given order
+
+=head1 SYNOPSIS
+
+  pds_multipliers p n
+  pds_multipliers order
+
+=head1 DESCRIPTION
+
+This example program writes multipliers for planar difference sets of a
+given order to standard output.  The order can be specified as a prime
+number and an exponent, or as a prime power.  The output will be a line
+with all multipliers, separated by blanks.
+
+=head1 BUGS AND LIMITATIONS
+
+Although it would be conceivable to compute multipliers of very large
+sets, this tool is only intended to deal with parameters the rest of the
+library could handle, i.e. prime power orders and moduli constrained
+to native integer arithmetic.  Arguments beyond that will trigger a
+runtime error.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

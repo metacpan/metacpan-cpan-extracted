@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -79,7 +78,7 @@ package main;
 {
    my $widget = StyledWidget->new;
 
-   is_deeply( { $widget->get_style_pen->getattrs }, { fg => 2 }, 'style pen for default' );
+   is( { $widget->get_style_pen->getattrs }, { fg => 2 }, 'style pen for default' );
    is( $widget->get_style_text, "Hello, world!", 'render text for default' );
 
    is( $widget->get_style_values( "<Enter>" ), "activate", 'Style for keypress' );
@@ -111,13 +110,13 @@ EOF
 {
    my $widget = StyledWidget->new;
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 4 },
-              'style pen after loading style string' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 4 },
+       'style pen after loading style string' );
 
-   is_deeply( { $widget->get_style_pen("something")->getattrs },
-              { b => 1, u => 1, i => 1 },
-              'pen can have boolean attributes' );
+   is( { $widget->get_style_pen("something")->getattrs },
+       { b => 1, u => 1, i => 1 },
+       'pen can have boolean attributes' );
 
    is( $widget->get_style_values( "<Space>" ), "activate", 'Style for keypress from stylesheet' );
 }
@@ -126,17 +125,17 @@ EOF
 {
    my $widget = StyledWidget->new( class => "BOLD" );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 4, b => 1 },
-              'style pen for widget with class' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 4, b => 1 },
+       'style pen for widget with class' );
 }
 
 {
    my $widget = StyledWidget->new( class => "PLAIN" );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              {},
-              'style pen can cancel fg' );
+   is( { $widget->get_style_pen->getattrs },
+       {},
+       'style pen can cancel fg' );
 }
 
 # Stylesheet-applied style with tags
@@ -145,23 +144,23 @@ EOF
 
    $widget->set_style_tag( active => 1 );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 4, u => 1, bg => 2 },
-              'style pen for widget with style flag set' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 4, u => 1, bg => 2 },
+       'style pen for widget with style flag set' );
 
-   is_deeply( \%style_changed_values,
-              { bg => [ undef, 2 ], u => [ undef, 1 ] },
-              'on_style_changed_values given style changes' );
+   is( \%style_changed_values,
+       { bg => [ undef, 2 ], u => [ undef, 1 ] },
+       'on_style_changed_values given style changes' );
 
    $widget->set_style_tag( active => 0 );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 4 },
-              'style pen for widget with style flag cleared' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 4 },
+       'style pen for widget with style flag cleared' );
 
-   is_deeply( \%style_changed_values,
-              { bg => [ 2, undef ], u => [ 1, undef ] },
-              'on_style_changed_values given style changes after style flag clear' );
+   is( \%style_changed_values,
+       { bg => [ 2, undef ], u => [ 1, undef ] },
+       'on_style_changed_values given style changes after style flag clear' );
 }
 
 # Direct-applied style
@@ -173,45 +172,45 @@ EOF
       }
    );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 5, },
-              'style pen for widget with direct style' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 5, },
+       'style pen for widget with direct style' );
 
    $widget->set_style_tag( active => 1 );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 6, u => 1, bg => 2 },
-              'style pen for widget with direct style tagged' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 6, u => 1, bg => 2 },
+       'style pen for widget with direct style tagged' );
 
-   is_deeply( \%style_changed_values,
-              { fg => [ 5, 6 ], u => [ undef, 1 ], bg => [ undef, 2 ] },
-              'on_style_changed_values for widget with direct style' );
+   is( \%style_changed_values,
+       { fg => [ 5, 6 ], u => [ undef, 1 ], bg => [ undef, 2 ] },
+       'on_style_changed_values for widget with direct style' );
 
    $widget->set_style( fg => 9, 'fg:active' => 10 );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 10, u => 1, bg => 2 },
-              'style pen for widget after direct style changed' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 10, u => 1, bg => 2 },
+       'style pen for widget after direct style changed' );
 
-   is_deeply( \%style_changed_values,
-              { fg => [ 6, 10 ] },
-              'on_style_changed_values after direct style changed' );
+   is( \%style_changed_values,
+       { fg => [ 6, 10 ] },
+       'on_style_changed_values after direct style changed' );
 
    $widget->set_style( 'fg:active' => undef );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 9, u => 1, bg => 2 },
-              'style pen for widget after direct style tagged key deleted' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 9, u => 1, bg => 2 },
+       'style pen for widget after direct style tagged key deleted' );
 
-   is_deeply( \%style_changed_values,
-              { fg => [ 10, 9 ] },
-              'on_style_changed_values after direct style tagged key deleted' );
+   is( \%style_changed_values,
+       { fg => [ 10, 9 ] },
+       'on_style_changed_values after direct style tagged key deleted' );
 
    $widget->set_style( fg => 0 );
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 0, u => 1, bg => 2 },
-              'style pen for widget after direct style sets zero' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 0, u => 1, bg => 2 },
+       'style pen for widget after direct style sets zero' );
 }
 
 # WIDGET_PEN_FROM_STYLE
@@ -252,17 +251,17 @@ EOF
 
    $widget->set_style( spacing => 2 );
 
-   is_deeply( \%style_changed_values,
-              { spacing => [ 1, 2 ] },
-              'on_style_changed_values after reshape key change' );
+   is( \%style_changed_values,
+       { spacing => [ 1, 2 ] },
+       'on_style_changed_values after reshape key change' );
 
    is( $RESHAPED, 1, '$RESHAPED 1 after ->set_style( text )' );
 
    $widget->set_style( text => "Goodbye" );
 
-   is_deeply( \%style_changed_values,
-              { text => [ "Hello, world!", "Goodbye" ] },
-              'on_style_changed_values after reshape key change' );
+   is( \%style_changed_values,
+       { text => [ "Hello, world!", "Goodbye" ] },
+       'on_style_changed_values after reshape key change' );
 
    is( $RESHAPED, 2, '$RESHAPED 2 after ->set_style( text )' );
 
@@ -270,9 +269,9 @@ EOF
    $RENDERED = 0;
    $widget->set_style( marker => "<>" );
 
-   is_deeply( \%style_changed_values,
-              { marker => [ "[]", "<>" ] },
-              'on_style_changed_values after redraw key change' );
+   is( \%style_changed_values,
+       { marker => [ "[]", "<>" ] },
+       'on_style_changed_values after redraw key change' );
 
    flush_tickit;
 
@@ -286,21 +285,21 @@ EOF
 {
    my $widget = StyledWidget::Subclass->new;
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 4, },
-              'style pen for widget subclass' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 4, },
+       'style pen for widget subclass' );
 
    $widget = StyledWidget::StyledSubclass->new;
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 7, },
-              'style pen for widget subclass with independent style' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 7, },
+       'style pen for widget subclass with independent style' );
 
    $widget = StyledWidget::CopiedSubclass->new;
 
-   is_deeply( { $widget->get_style_pen->getattrs },
-              { fg => 2},
-              'widget subclass as -copy clones pen' );
+   is( { $widget->get_style_pen->getattrs },
+       { fg => 2},
+       'widget subclass as -copy clones pen' );
    is( $widget->get_style_values( "text" ),
        "Altered world",
        'widget subclass as -copy has altered text' );
@@ -319,7 +318,7 @@ EOF
 
    my $widget = StyledWidget->new( class => "red" );
 
-   is_deeply( { $widget->get_style_pen->getattrs }, { fg => 4, bg => 1, u => 1 },
+   is( { $widget->get_style_pen->getattrs }, { fg => 4, bg => 1, u => 1 },
       'style pen for default with wildcard' );
 }
 

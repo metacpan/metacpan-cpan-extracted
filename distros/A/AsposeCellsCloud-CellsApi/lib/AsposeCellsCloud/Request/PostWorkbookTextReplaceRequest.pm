@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookTextReplaceRequest.name :   ,
-# PostWorkbookTextReplaceRequest.oldValue :   ,
-# PostWorkbookTextReplaceRequest.newValue :   ,
-# PostWorkbookTextReplaceRequest.folder :   ,
-# PostWorkbookTextReplaceRequest.storageName :    
+# PostWorkbookTextReplaceRequest.name : The workbook name.  ,
+# PostWorkbookTextReplaceRequest.oldValue : The old value.  ,
+# PostWorkbookTextReplaceRequest.newValue : The new value.  ,
+# PostWorkbookTextReplaceRequest.folder : Original workbook folder.  ,
+# PostWorkbookTextReplaceRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_text_replace' } = { 
-    	summary => '',
+    	summary => 'Replaces text in workbook.',
         params => $params,
         returns => 'WorkbookReplaceResponse',
     };
@@ -133,35 +133,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'old_value' => {
      	datatype => 'string',
      	base_name => 'oldValue',
-     	description => '',
+     	description => 'The old value.',
      	format => '',
      	read_only => '',
      		},
      'new_value' => {
      	datatype => 'string',
      	base_name => 'newValue',
-     	description => '',
+     	description => 'The new value.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

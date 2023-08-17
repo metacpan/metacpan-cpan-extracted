@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -93,7 +92,7 @@ foreach my $close ( 0, 1, 2 ) {
    }
 
    is( $response->content, "1st", 'Content of first response' );
-   identical( scalar $future->get, $response, '$future->get for first request' );
+   ref_is( scalar $future->get, $response, '$future->get for first request' );
 
    my $inner_response;
    my $inner_future;
@@ -144,7 +143,7 @@ foreach my $close ( 0, 1, 2 ) {
    wait_for { defined $response };
 
    is( $response->content, "2nd", 'Content of second response' );
-   identical( scalar $future->get, $response, '$future->get for second request' );
+   ref_is( scalar $future->get, $response, '$future->get for second request' );
 
    ok( defined $inner_future, 'defined $inner_future' );
 
@@ -177,7 +176,7 @@ foreach my $close ( 0, 1, 2 ) {
    wait_for { defined $inner_response };
 
    is( $inner_response->content, "3rd", 'Content of inner response' );
-   identical( scalar $inner_future->get, $inner_response, '$inner_future->get for inner request' );
+   ref_is( scalar $inner_future->get, $inner_response, '$inner_future->get for inner request' );
 
    if( $close ) {
       is( scalar $http->children, 0, 'scalar $http->children now 0 again after inner response' );

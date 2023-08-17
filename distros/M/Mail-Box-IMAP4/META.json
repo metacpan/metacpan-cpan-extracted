@@ -38,6 +38,7 @@
             "File::Compare" : "0",
             "File::Copy" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0.19",
             "IO::Socket::IP" : "0",
             "List::Util" : "0",
             "Mail::Box" : "3.007",
@@ -46,7 +47,7 @@
             "Mail::Box::Search" : "3",
             "Mail::Box::Test" : "3",
             "Mail::IMAPClient" : "3.42",
-            "Mail::Message" : "3",
+            "Mail::Message" : "3.013",
             "Mail::Message::Body::Lines" : "3",
             "Mail::Message::Head::Complete" : "3",
             "Mail::Message::Head::Delayed" : "3",
@@ -69,6 +70,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-IMAP4"
       }
    },
-   "version" : "3.007",
+   "version" : "3.008",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

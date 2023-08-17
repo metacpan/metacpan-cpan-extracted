@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Object/Pad/FieldAttr/Isa.pm

@@ -20,4 +20,7 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'WWW-Yandex-Catalog-LookupSite-*' },
+    META_MERGE => {
+        x_deprecated    => 1,
+    },
 );

@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -359,7 +359,7 @@ could turn it off by setting this to 0 within the Padre configuration file.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
@@ -371,7 +371,7 @@ LICENSE file included with this module.
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

@@ -65,7 +65,7 @@ if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 
 $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
 $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
-chomp $_ foreach ( $inc, $lib );
+chomp $_ for ( $inc, $lib );
 
 
 my @header = qw(unbound.h);					# library headers
@@ -96,12 +96,16 @@ exit;
 
 package MY;				## customise generated Makefile
 
-sub test {
-	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
-
-	return join '', shift->SUPER::test(), <<'END';
-# suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
+sub constants {
+	return join "\n", shift->SUPER::constants(), <<'END' if $^O =~ /MSWin/i;
+#	include test directory
+TEST_DIR = t
+FULLPERLRUN = $(FULLPERL) "-I$(TEST_DIR)"
+END
+	return join "\n", shift->SUPER::constants(), <<'END';
+#	suppress parallel test execution	include test directory
+TEST_DIR = t
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL) "-I$(TEST_DIR)"
 END
 }
 
@@ -117,7 +121,7 @@ sub install {
 	}
 
 	eval "require $distro";		## no critic
-	my @version = grep {$_} 'version', eval { $distro->VERSION };
+	my @version = ( 'version', eval { $distro->VERSION } );
 
 	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
@@ -163,24 +167,23 @@ END
 
 
 sub postamble {
-	my $devnull = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
-	return <<"PlanB" unless `gcov -v 2>$devnull`;
-test_cover :
-	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test
-	cover -summary
-PlanB
 	my $ldflags = "-fprofile-arcs -ftest-coverage";
 	my $ccflags = "-O0 $ldflags";
-	return <<"PlanA";
+	my $devnull = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+	return <<"PlanA" if `gcov -v 2>$devnull`;
 test_cover :
 	cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W Unbound.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
-	gcov Unbound.xs
-	gcov2perl Unbound.xs.gcov
-	cover -summary
+	cover
 	\$(NOECHO) \$(TOUCH) Unbound.c	# force XS rebuild before install
 PlanA
+
+	return <<'PlanB';
+test_cover :
+	cover -delete
+	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
+	cover
+PlanB
 }
 
 

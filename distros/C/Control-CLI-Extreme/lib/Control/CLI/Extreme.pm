@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -47,12 +47,14 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	passportbanner	=>	"\x0d* Passport 8",
 	pp1600banner	=>	"\x0d* Passport 16", # The 6 ensures this does not trigger on old Accelar 1x00
 	vspbanner	=>	"All Rights Reserved.\n\x0dVirtual Services Platform",
+	fabengbanner	=>	"Extreme Networks Fabric Engine",
 	consoleLogMsg1	=>	"connected via console port", #On serial port: GlobalRouter SW INFO user rwa connected via console port
 	consoleLogMsg2	=>	"Blocked unauthorized ACLI access",
 	more1		=>	'----More (q=Quit, space/return=Continue)----',
 	more2		=>	'--More--',
 	wlan9100banner	=>	'Avaya Wi-Fi Access Point',
 	xos		=>	'ExtremeXOS',
+	switchEngine	=>	'Extreme Networks Switch Engine',
 	isw		=>	'Product: ISW',
 	slx		=>	'Welcome to the Extreme SLX-OS Software'
 );
@@ -68,6 +70,8 @@ my %Prm = ( # Hash containing list of named parameters returned by attributes
 	s200	=>	'Series200',
 	wing	=>	'Wing',
 	slx	=>	'SLX',
+	hive	=>	'HiveOS',
+	ipanema	=>	'Ipanema',
 	generic	=>	'generic',
 );
 
@@ -89,6 +93,7 @@ my %Attribute = (
 
 	$Prm{pers}	=> [
 			'is_voss',
+			'is_fabric_engine',
 			'is_apls',
 			'apls_box_type',
 			'brand_name',
@@ -117,6 +122,7 @@ my %Attribute = (
 
 	$Prm{xos}	=> [
 			'is_xos',
+			'is_switch_engine',
 			'unit_number',
 			'master_unit',
 			'switch_mode',
@@ -161,13 +167,21 @@ my %Attribute = (
 			'is_oob_connected',
 			],
 
+	$Prm{hive}	=> [
+			'is_hiveos',
+			],
+
+	$Prm{ipanema}	=> [
+			'is_sdwan',
+			],
+
 	$Prm{xlr}	=> [
 			'is_master_cpu',
 			'is_dual_cpu',
 			],
 );
 
-my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{xos}, 'generic');
+my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{xos}, $Prm{ipanema}, 'generic');
 my $GenericPromptRegex = '[\?\$%#>](?:\e\[00?m)?\s?$';
 my %InitPrompt = ( # Initial prompt pattern expected at login
 	# Capturing brackets: $1 = switchName, $2 = login_cpu_slot, $3 = configContext;
@@ -183,6 +197,8 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{s200}		=>	'\(([^\n\x0d\x0a\)]+)\) ()(?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'([^\n\x0d\x0a\)]+?)()(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'([^\n\x0d\x0a\)]+)()(?:\((.+?)\))?# $',
+	$Prm{hive}		=>	'([^\n\x0d\x0a\)]+)()#$',
+	$Prm{ipanema}		=>	'\[([^\n\x0d\x0a\\[\])]+?)(?:\.rt\d)?\]()\$ $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -199,6 +215,8 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{s200}		=>	'\(SWITCHNAME\) (?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'SWITCHNAME(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
+	$Prm{hive}		=>	'SWITCHNAME#$',
+	$Prm{ipanema}		=>	'(?:\[SWITCHNAME(?:\.rt\d)?\]\$|bash-[\d\.]+\$|SWITCHNAME\.?(?:rt\d)?:[~\/\w]+#) $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -222,6 +240,8 @@ my %MorePrompt = ( # Regular expression character like ()[]. need to be backslas
 	$Prm{s200}		=>	'--More-- or \(q\)uit',
 	$Prm{wing}		=>	'--More-- ',
 	$Prm{slx}		=>	'(?:\e\[7m)?(?:--More--|\(END\))(?:\e\[27m)?',
+	$Prm{hive}		=>	' --More-- ',
+	$Prm{ipanema}		=>	'', # N/A on Linux..
 	$Prm{generic}		=>	'----More \(q=Quit, space/return=Continue\)----'
 					. '|--More-- \(q = quit\) '
 					. '|Press any key to continue \(q : quit\) :\x00'
@@ -344,6 +364,14 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '-+\^\n.+'
 					. '|(?:%% )?Error ?: .+'
 					. '|Error\(s\):\n.+'
+				. ')',
+	$Prm{hive}		=>	'^('
+					. '\s+\^--'
+				. ')',
+	$Prm{ipanema}		=>	'('
+					. '^\? Unknown command'
+					. '|: No such file or directory'
+					. '|: incorrect password'
 				. ')',
 );
 our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *[?:] *| )$'; # Y/N prompt
@@ -1511,11 +1539,11 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0);
 							$self->{POLL}{read_buffer} =~ /\* Software Release (?i:v|REL)?(.+?) / && $self->_setAttrib('sw_version', $1);
 						}
-						elsif ($key eq 'vspbanner') {
+						elsif ($key eq 'vspbanner' || $key eq 'fabengbanner') {
 							$login->{family_type} = $Prm{pers};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
 							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1);
-							$self->{POLL}{read_buffer} =~ /Software Release Build (.+?) / && $self->_setAttrib('sw_version', $1);
+							$self->{POLL}{read_buffer} =~ /(?:Software(?: Release)?|Fabric Engine) Build (.+?) / && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'wlan9100banner') {
 							$login->{family_type} = $Prm{xirrus};
@@ -1526,7 +1554,12 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 						elsif ($key eq 'xos') {
 							$login->{family_type} = $Prm{xos};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_xos => 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_xos => 1, is_switch_engine => 0);
+						}
+						elsif ($key eq 'switchEngine') {
+							$login->{family_type} = $Prm{xos};
+							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_xos => 1, is_switch_engine => 1);
 						}
 						elsif ($key eq 'isw') {
 							$login->{family_type} = $Prm{isw};
@@ -1706,7 +1739,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			if (!$login->{family_type} && $login->{non_recognized_login}) { # If we have some complete output, which does not match any of the above, we can come out if we asked to
 				return $self->poll_return($self->error("$pkgsub: Non recognized login output"));
 			}
-		}
+		} # LOGINLOOP
 		if (!$login->{generic_login} && ($login->{family_type} eq $Prm{generic} || ($login->{detectionFromPrompt} && $self->{LASTPROMPT} !~ /^@/)) ) { # Can't tell, need extended discovery
 			$login->{stage}++; # Move to next section in non-blocking mode
 		}
@@ -1906,6 +1939,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		if (length $output) { # Clean up patterns
 			$output =~ s/^(?:\x08 \x08)+//;					# Remove backspace chars following a more prompt, if any
 			$output =~ s/^\x08+ +\x08+//;     				# Remove backspace chars following a more prompt, if any (Wing and SLX)
+			$output =~ s/\x08+ +\x08+//	 if $familyType eq $Prm{hive};	# On HiveOS, these are not necessarily at the beginning of the line
 			$output =~ s/^\x0d *\x0d//	 if $familyType eq $Prm{s200};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
 			$output =~ s/^\x0d *\x00\x0d//	 if $familyType eq $Prm{sr};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
 			$output =~ s/^(?:\e\[D \e\[D)+// if $familyType eq $Prm{isw};	# Remove ISW escape sequences following more prompt
@@ -2234,7 +2268,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 				return $self->poll_return(1);
 			};
-			($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' || $attrib->{attribute} eq 'is_voss' ||
+			($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' ||
+			 $attrib->{attribute} eq 'is_voss' || $attrib->{attribute} eq 'is_fabric_engine' ||
 			 $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name' || # Any new attributes added here, need to be added on exit to this if block below
 			 (!$self->{$Package}{ATTRIBFLAG}{'model'} && ($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports')) || # We need 'model' attrib for port/slot ones
 			 (!$self->{$Package}{ATTRIBFLAG}{'is_voss'} && $attrib->{attribute} =~ /^(?:is_)?oob_/) # We need 'is_voss' attrib for oob ones
@@ -2392,6 +2427,11 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		else { # On standby CPU
 			($attrib->{attribute} eq 'is_apls') && do { # APLS is never dual_cpu
 				$self->_setAttrib('is_apls', 0);
+				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+				return $self->poll_return(1);
+			};
+			($attrib->{attribute} eq 'is_fabric_engine') && do { # FabricEngine is never dual_cpu
+				$self->_setAttrib('is_fabric_engine', 0);
 				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 				return $self->poll_return(1);
 			};
@@ -2727,8 +2767,9 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /MAC Address      : (.+)/g && $self->_setBaseMacAttrib($1);
 			$$outref =~ /System Name      : (.+)/g && $self->_setAttrib('sysname', $1);
-			$$outref =~ /Product          : (.+)/g && $self->_setModelAttrib($1);
-			$$outref =~ /Software Version : V(.+)/g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /Product          : (.+)/g && $self->_setModelAttrib($1); # old ISW models
+			$$outref =~ /Board Type       : (.+)/g && $self->_setModelAttrib($1); # New ISW models
+			$$outref =~ /Software Version : V?(.+)/g && $self->_setAttrib('sw_version', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -2988,6 +3029,82 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [($self->config_context ? 'do ':'') . 'show chassis virtual-ip']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /chassis virtual-ip \"static (.+)\//g && $self->_setAttrib('oob_virt_ip', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
+	elsif ($familyType eq $Prm{hive}) {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Version:\s+HiveOS (\S+) build-\d+/g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /Platform:\s+(\S+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Bootloader ver:\s+v(\S+)/g && $self->_setAttrib('fw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show interface']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortAttrib($outref);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'sysname') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show running-config | include hostname']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /hostname (\S+)/g && $self->_setAttrib('sysname', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'base_mac') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show hw-info']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Ethernet MAC address:\s(.+)/g && $self->_setBaseMacAttrib($1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'baudrate' || $attrib->{attribute} eq 'max_baud') && do {
+			$self->_setAttrib('baudrate', 9600);
+			$self->_setAttrib('max_baud', undef);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
+	elsif ($familyType eq $Prm{ipanema}) {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Name : (\S+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /  Kernel : (\S+)/g && $self->_setAttrib('fw_version', $1);
+			$$outref =~ /  Ipe    : (\S+)/g && $self->_setAttrib('sw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports' || $attrib->{attribute} eq 'base_mac') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['ifconfig']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			my ($outList, $basemac);
+			while ($$outref =~ /^(\w+): flags/mgc) { # Only recover interfaces with a non-zero MAC address
+				my $interface = $1;
+				$outList .= "$interface\n" if $$outref =~ /ether (\S+)/gc and $1 ne '00:00:00:00:00:00';
+				$basemac = $1 if $interface eq 'isw0';
+			}
+			$self->_setBaseMacAttrib($basemac);
+			$self->_setSlotPortAttrib(\$outList);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'sysname') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['ipconfig -d']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /\s+Hostname\s+: (\S+)/g && $self->_setAttrib('sysname', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'baudrate' || $attrib->{attribute} eq 'max_baud') && do {
+			$self->_setAttrib('baudrate', 9600);
+			$self->_setAttrib('max_baud', undef);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3421,7 +3538,6 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	return $self->poll_return($self->error("$pkgsub: No connection established")) unless $familyType;
-	return $self->poll_return(1) if $familyType eq $Prm{isw};
 	if ($familyType eq $Prm{bstk}) {
 		$devMorePage->{cmdString} = $devMorePage->{enable} ? 23 : 0 unless defined $devMorePage->{cmdString};
 		my ($ok, undef, $resref) = $self->poll_cmd($pkgsub, "terminal length $devMorePage->{cmdString}");
@@ -3495,6 +3611,12 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 		return $self->poll_return($ok) unless $ok;
 		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
 	}
+	elsif ($familyType eq $Prm{isw}) {
+		$devMorePage->{cmdString} = $devMorePage->{enable} ? '24' : '0' unless defined $devMorePage->{cmdString};
+		my ($ok, undef, $resref) = $self->cmdPrivExec($pkgsub, undef, ($self->config_context ? 'do ':'') . "terminal length $devMorePage->{cmdString}");
+		return $self->poll_return($ok) unless $ok;
+		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
+	}
 	elsif ($familyType eq $Prm{wing}) {
 		$devMorePage->{cmdString} = $devMorePage->{enable} ? '24' : '0' unless defined $devMorePage->{cmdString};
 		my ($ok, undef, $resref) = $self->cmdPrivExec($pkgsub, undef, ($self->config_context ? 'do ':'') . "terminal length $devMorePage->{cmdString}");
@@ -3504,6 +3626,12 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 	elsif ($familyType eq $Prm{slx}) {
 		$devMorePage->{cmdString} = $devMorePage->{enable} ? 'no length' : 'length 0' unless defined $devMorePage->{cmdString};
 		my ($ok, undef, $resref) = $self->cmdPrivExec($pkgsub, undef, ($self->config_context ? 'do ':'') . "terminal $devMorePage->{cmdString}");
+		return $self->poll_return($ok) unless $ok;
+		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
+	}
+	elsif ($familyType eq $Prm{hive}) {
+		$devMorePage->{cmdString} = $devMorePage->{enable} ? '22' : '0' unless defined $devMorePage->{cmdString};
+		my ($ok, undef, $resref) = $self->poll_cmd($pkgsub, "console page $devMorePage->{cmdString}");
 		return $self->poll_return($ok) unless $ok;
 		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
 	}
@@ -3623,7 +3751,7 @@ sub cmdPrivExec { # If nncli send command in PrivExec mode and restore mode on e
 
 	if ($self->{$Package}{ATTRIB}{'is_nncli'}) {
 		if ($cmdPrivExec->{stage} < 1) { # 1st stage
-			if ($self->{WRITEFLAG}) { # Directs writes were performed, need a new prompt to be sure about last_prompt
+			if ($self->{WRITEFLAG}) { # Direct writes were performed, need a new prompt to be sure about last_prompt
 				$ok = $self->poll_cmd($pkgsub, '');	# Send just carriage return
 				return $ok unless $ok;
 			}
@@ -3697,7 +3825,7 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 
 	if ($self->{$Package}{ATTRIB}{'is_nncli'}) {
 		if ($cmdConfig->{stage} < 1) { # 1st stage
-			if ($self->{WRITEFLAG}) { # Directs writes were performed, need a new prompt to be sure about last_prompt
+			if ($self->{WRITEFLAG}) { # Direct writes were performed, need a new prompt to be sure about last_prompt
 				$ok = $self->poll_cmd($pkgsub, '');	# Send just carriage return
 				return $ok unless $ok;
 			}
@@ -3770,6 +3898,81 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 }
 
 
+sub cmdIpanema { # If on Ipanema, make sure we come out of virtual router instances before sending command, and restore on exit
+	my ($self, $pkgsub, $cmdcli, $morePages) = @_;
+	my $pollsub = "${Package}::cmdIpanema";
+	my ($ok, $outref, $resref);
+
+	unless (defined $self->{POLL}{$pollsub}) { # Create polling structure on 1st call
+		$self->{POLL}{$pollsub} = {
+			stage		=>	0,
+			virtualRt	=>	undef,
+			virtualRtCli	=>	undef,
+			outref		=>	undef,
+			resref		=>	undef,
+		};
+	}
+	my $cmdIpanema = $self->{POLL}{$pollsub};
+
+	if ($cmdIpanema->{stage} < 1) { # 1st stage
+		if ($self->{WRITEFLAG}) { # Direct writes were performed, need a new prompt to be sure about last_prompt
+			$ok = $self->poll_cmd($pkgsub, '');	# Send just carriage return
+			return $ok unless $ok;
+		}
+		$cmdIpanema->{stage}++; # Move to 2nd stage
+	}
+	if ($cmdIpanema->{stage} < 2) { # 2nd stage
+		$cmdIpanema->{stage}++; # Move to 3rd stage - we only spend one cycle here
+		if (  ( ($cmdIpanema->{virtualRt}) = $self->last_prompt =~ /\.rt(\d):/g )
+		   || ( ($cmdIpanema->{virtualRtCli}) = $self->last_prompt =~ /\.rt(\d)\]/g )
+		   ) {
+			my $exitCmd = 'exit';
+			$self->print($exitCmd);
+			$self->debugMsg(8,"\ncmdIpanema() Sending command:>", \$exitCmd, "<\n");
+		}
+	}
+	if ($cmdIpanema->{stage} < 3) { # 3rd stage
+		if ($cmdIpanema->{virtualRt} || $cmdIpanema->{virtualRtCli}) {
+			$ok = $self->poll_cmd($pkgsub); # We don't bother getting $resref here...
+			return $ok unless $ok;
+			# ... because even if $$resref was false, we want to fall through
+		}
+		$cmdIpanema->{stage}++; # Move to 4th stage
+	}
+	if ($cmdIpanema->{stage} < 4) { # 4th stage
+		($ok, $outref, $resref) = $self->poll_cmd($pkgsub, Command => $cmdcli, More_pages => $morePages);
+		return $ok unless $ok;
+		$cmdIpanema->{outref} = $outref;
+		$cmdIpanema->{resref} = $resref;
+		$cmdIpanema->{stage}++; # Move to 5th stage
+	}
+	if ($cmdIpanema->{stage} < 5) { # 5th stage
+		$cmdIpanema->{stage}++; # Move to 6th stage - we only spend one cycle here
+		my $virtualRtCmd;
+		if ($cmdIpanema->{virtualRt}) {
+			$virtualRtCmd = 'ns rt' . $cmdIpanema->{virtualRt} . ' bash';
+		}
+		elsif ($cmdIpanema->{virtualRtCli}) {
+			$virtualRtCmd = 'router ' . $cmdIpanema->{virtualRtCli};
+		}
+		if (defined $virtualRtCmd) {
+			$self->print($virtualRtCmd);
+			$self->debugMsg(8,"\ncmdIpanema() Sending command:>", \$virtualRtCmd, "<\n");
+		}
+	}
+	if ($cmdIpanema->{stage} < 6) { # 6th stage
+		if ($cmdIpanema->{virtualRt}) {
+			$ok = $self->poll_cmd($pkgsub); # We don't bother getting $resref here...
+			return $ok unless $ok;
+			# ... because even if $$resref was false, we want to fall through
+		}
+		($outref, $resref) = ($cmdIpanema->{outref}, $cmdIpanema->{resref});
+		$self->{POLL}{$pollsub} = undef;	# Undef once completed
+		return (1, $outref, $resref);
+	}
+}
+
+
 sub discoverDevice { # Issues CLI commands to host, to determine what family type it belongs to
 	my ($self, $pkgsub) = @_;
 	my $pollsub = "${Package}::discoverDevice";
@@ -3798,6 +4001,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 	}
 
 	# Prefer commands unique to platform, and with small output (not more paged)
+	# Check more common family types first 
 
 	if ($discDevice->{stage} < 3) { # Next stage
 		# BaystackERS detection command
@@ -3809,6 +4013,13 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{bstk}}/;
 			$self->_setDevicePrompts($Prm{bstk}, $1);
 			return (1, $Prm{bstk});
+		}
+		# Ipanema detection via CLI error message
+		if ($$outref =~/^\? Unknown command \(try "help"\)\.$/) {
+			$self->_setFamilyTypeAttrib($Prm{ipanema}, is_nncli => 0, is_sdwan => 1, baudrate => 9600);
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{ipanema}}/;
+			$self->_setDevicePrompts($Prm{ipanema}, $1);
+			return (1, $Prm{ipanema});
 		}
 	}
 	if ($discDevice->{stage} < 4) { # Next stage
@@ -3844,8 +4055,9 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include "by release-manager"');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Image   : Extreme(?:XOS| Networks Switch Engine) version (.+) by /m) {
-			$self->_setFamilyTypeAttrib($Prm{xos}, is_nncli => 0, is_xos => 1, sw_version => $1);
+		if ($$outref =~ /^Image   : Extreme(XOS| Networks Switch Engine) version (.+) by /m) {
+			my $switchEngine = $1 eq 'XOS' ? 0 : 1;
+			$self->_setFamilyTypeAttrib($Prm{xos}, is_nncli => 0, is_xos => 1, is_switch_engine => $switchEngine, sw_version => $2);
 			$self->_setAttrib('fw_version', $1) if $$outref =~ /^BootROM :(.+)$/m;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{xos}}/;
 			$self->_setDevicePrompts($Prm{xos}, $1);
@@ -3857,7 +4069,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'do show version | include ISW'); # Must add do, as we may be in config mode
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Product          : (.+)(?:, PoE Switch)?/m) {
+		if ($$outref =~ /^(Product   |Board Type)       : (.+)(?:, PoE Switch)?/m) {
 			my $model = $1;
 			$self->_setFamilyTypeAttrib($Prm{isw}, is_nncli => 1, is_isw => 1, baudrate => 115200);
 			$self->_setModelAttrib($model);
@@ -3883,6 +4095,33 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		}
 	}
 	if ($discDevice->{stage} < 9) { # Next stage
+		# HiveOS detection command
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version');
+		return $ok unless $ok;
+		$discDevice->{stage}++; # Move to next stage on next cycle
+		if ($$outref =~ /^Version:            HiveOS (\S+) build-\d+/m) {
+			$self->_setFamilyTypeAttrib($Prm{hive}, is_nncli => 0, is_hiveos => 1, baudrate => 9600, sw_version => $1);
+			$self->_setModelAttrib($1) if $$outref =~ /^Platform:\s+(\S+)/m;
+			$self->_setAttrib('fw_version', $1) if $$outref =~ /^Bootloader ver:     v(\S+)/m;
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{hive}}/;
+			$self->_setDevicePrompts($Prm{hive}, $1);
+			return (1, $Prm{hive});
+		}
+	}
+	if ($discDevice->{stage} < 10) { # Next stage
+		# Ipanema detection command
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'ipconfig -d');
+		return $ok unless $ok;
+		$discDevice->{stage}++; # Move to next stage on next cycle
+		if ($$outref =~ /^       \[LAN\]    IPaddr : /m) {
+			$self->_setFamilyTypeAttrib($Prm{ipanema}, is_nncli => 0, is_sdwan => 1, baudrate => 9600);
+			$self->_setAttrib('sysname', $1) if $$outref =~ /^\s+Hostname\s+: (\S+)/m;
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{ipanema}}/;
+			$self->_setDevicePrompts($Prm{ipanema}, $1);
+			return (1, $Prm{ipanema});
+		}
+	}
+	if ($discDevice->{stage} < 11) { # Next stage
 		# Series200 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show slot');
 		return $ok unless $ok;
@@ -3896,7 +4135,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{s200});
 		}
 	}
-	if ($discDevice->{stage} < 10) { # Next stage
+	if ($discDevice->{stage} < 12) { # Next stage
 		# PassportERS-cli detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show bootconfig info');
 		return $ok unless $ok;
@@ -3910,7 +4149,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{pers});
 		}
 	}
-	if ($discDevice->{stage} < 11) { # Next stage
+	if ($discDevice->{stage} < 13) { # Next stage
 		# WLAN 9100 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show contact-info');
 		return $ok unless $ok;
@@ -3924,7 +4163,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{xirrus});
 		}
 	}
-	if ($discDevice->{stage} < 12) { # Next stage
+	if ($discDevice->{stage} < 14) { # Next stage
 		# Secure Router detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show chassis');
 		return $ok unless $ok;
@@ -3938,7 +4177,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{sr});
 		}
 	}
-	if ($discDevice->{stage} < 13) { # Next stage
+	if ($discDevice->{stage} < 15) { # Next stage
 		# WLAN 2300 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show system');
 		return $ok unless $ok;
@@ -3954,7 +4193,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{trpz});
 		}
 	}
-	if ($discDevice->{stage} < 14) { # Next stage
+	if ($discDevice->{stage} < 16) { # Next stage
 		# Accelar detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show sys perf');
 		return $ok unless $ok;
@@ -3995,6 +4234,7 @@ sub debugMsg { # Print a debug message
 
 sub _attribExecuteCmd { # Executes commands for attribute retrieval
 	my ($self, $pkgsub, $attrib, $cmd, $pages, $cmdConfig) = @_;
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	unless ($attrib->{debugMsg}) {
 		my $cmdInfo = $#$cmd ? $cmd->[$self->{$Package}{ATTRIB}{'is_nncli'}] : $cmd->[0];
@@ -4004,6 +4244,7 @@ sub _attribExecuteCmd { # Executes commands for attribute retrieval
 	}
 	return $self->cmdConfig($pkgsub, $cmd->[0], $cmd->[1]) if $#$cmd && $cmdConfig;
 	return $self->cmdPrivExec($pkgsub, $cmd->[0], $cmd->[1], $pages) if $#$cmd;
+	return $self->cmdIpanema($pkgsub, $cmd->[0], $pages) if $familyType eq $Prm{ipanema};
 	return $self->poll_cmd($pkgsub, $cmd->[0], $pages);
 }
 
@@ -4023,7 +4264,7 @@ sub _setDevicePrompts { # Steps to set the actual device prompt & more prompt
 	if ($actualPrompt) { # Generic prompt will skip this
 		# If Perl's metacharacters are used in the switch prompt, backslash them not to mess up prompt regex
 		$actualPrompt =~ s/([\{\}\[\]\(\)\^\$\.\|\*\+\?\\])/\\$1/g;
-		$setPrompt =~ s/SWITCHNAME/$actualPrompt/;
+		$setPrompt =~ s/SWITCHNAME/$actualPrompt/g;
 		$self->debugMsg(4,"setDevicePrompts() Embedding in prompt switch name = '$actualPrompt'\n");
 	}
 	$self->prompt($setPrompt);
@@ -4083,16 +4324,16 @@ sub _setSlotPortAttrib { # Set the Slot & Port attributes
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	@ports = @{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
 	my $slotRegex = '\d{1,3}';
-	while ($$outref =~ /^(?:\s*|interface\s+ethernet|Eth )?(?:($slotRegex)[\/:])?((?:\d{1,3}|(?:gig|ge|fe)\d|s\d)(?:[\/:]\d{1,2})?)/mg) {
+	while ($$outref =~ /^(?:\s*|interface\s+ethernet|Eth )?(?:($slotRegex)[\/:])?((?:\d{1,3}|(?:gig|ge|fe|Eth|lan|wan)\d|s\d)(?:[\/:]\d{1,2})?)/mg) {
 		if (defined $1 && (!defined $currentSlot || $1 != $currentSlot)) { # New slot
 			$currentSlot = $1;
 			push(@slots, $currentSlot) unless grep {$_ eq $currentSlot} @slots;
 		}
 		if (defined $currentSlot) {
-			push(@{$ports[$currentSlot]}, $2) unless grep {$_ eq $2} @{$ports[$currentSlot]};
+			push(@{$ports[$currentSlot]}, lc($2)) unless grep {$_ eq lc($2)} @{$ports[$currentSlot]};
 		}
 		else {
-			push(@ports, $2) unless grep {$_ eq $2} @ports;
+			push(@ports, lc($2)) unless grep {$_ eq lc($2)} @ports;
 		}
 		$slotRegex = '' unless defined $1; # Exos 5720 new channelized port format on standalone unit
 	}
@@ -4109,7 +4350,7 @@ sub _setSlotPortHashAttrib { # Set the Slot & Port attributes where the port att
 	# Get current attribute if partly stored
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	%ports = %{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
-	while ($$outref =~ /^(FastEthernet|GigabitEthernet) (\d\/\d{1,2})/mg) {
+	while ($$outref =~ /^(FastEthernet|(?:\d+)?GigabitEthernet) (\d\/\d{1,2})/mg) {
 		if (!defined $currentHash || $1 ne $currentHash) { # New hash
 			$currentHash = $1;
 			push(@slots, $currentHash) unless grep {$_ eq $currentHash} @slots;
@@ -4170,11 +4411,17 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 	# VOSS is a PassportERS with a VSP model name
 	if ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{pers}) {
 		# Requires is_apls to always be set before is_voss
-		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/ || $model =~ /(?:VOSS|FabricEngine)$/) {
+		if ($model =~ /FabricEngine$/) {
 			$self->_setAttrib('is_voss', 1);
+			$self->_setAttrib('is_fabric_engine', 1);
+		}
+		elsif ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/ || $model =~ /VOSS$/) {
+			$self->_setAttrib('is_voss', 1);
+			$self->_setAttrib('is_fabric_engine', 0);
 		}
 		else {
 			$self->_setAttrib('is_voss', 0);
+			$self->_setAttrib('is_fabric_engine', 0);
 		}
 	}
 	return;
@@ -4202,6 +4449,9 @@ sub _setBaseMacAttrib { # Set & re-format the Base_Mac attribute
 
 	# Reformat the MAC from xx:xx:xx:xx:xx:xx to xx-xx-xx-xx-xx-xx
 	$mac =~ s/:/-/g;
+
+	# Reformat the MAC from xxxx-xxxx-xxxx to xx-xx-xx-xx-xx-xx
+	$mac =~ s/([\da-f]{2})([\da-f]{2})-([\da-f]{2})([\da-f]{2})-([\da-f]{2})([\da-f]{2})/$1-$2-$3-$4-$5-$6/;
 
 	# Reformat the MAC from xxxxxxxxxxxx to xx-xx-xx-xx-xx-xx
 	$mac =~ s/([\da-f]{2})([\da-f]{2})([\da-f]{2})([\da-f]{2})([\da-f]{2})([\da-f]{2})/$1-$2-$3-$4-$5-$6/;
@@ -4432,7 +4682,7 @@ Control::CLI::Extreme - Interact with CLI of Extreme Networking products over an
 =head1 DESCRIPTION
 
 Control::CLI::Extreme is a sub-class of Control::CLI allowing CLI interaction customized for Extreme (including ex-Avaya/ex Nortel Enterprise) Networking products over any of Telnet, SSH or Serial port. It is a drop in replacement for the Control::CLI::AvayaData module following the transfer of the Avaya Data business unit to Extreme Networks.
-This class supports all of Extreme Summit, Virtual Services Platform (VSP), Private Label Switches (APLS DSG BoxTypes), Ethernet Routing Switch (ERS) and ex-Nortel Enterprise (Bay Networks heritage) platforms. Currently supported devices:
+This class supports all the following Extreme Networks devices:
 
 =over 2
 
@@ -4446,7 +4696,7 @@ XOS Summit switches
 
 =item *
 
-Universal Hardware (FabricEngine & SwitchEngine) 5520, 5420, 5320, 5720
+Universal Hardware (FabricEngine & SwitchEngine) 5320, 5420, 5520, 5720, 7520, 7720
 
 =item *
 
@@ -4463,6 +4713,14 @@ SLX Data Center switches
 =item *
 
 ISW industrial switches
+
+=item *
+
+Wireless HiveOS Cloud APs
+
+=item *
+
+Ipanema SD-WAN appliances
 
 =item *
 
@@ -5337,6 +5595,14 @@ B<WLAN2300> : WLAN WSS2300 Controllers
 
 =item *
 
+B<HiveOS> : WLAN Cloud APs
+
+=item *
+
+B<Ipanema> : SD-WAN appliances
+
+=item *
+
 B<Accelar> : Any of the old Accelar 1000, 1100, 1200
 
 =item *
@@ -5387,7 +5653,7 @@ If the I<slots> attribute is defined but empty (i.e. there is no slot number ass
 
 =item *
 
-I<baudrate>: Console port configured baudrate. This attribute only works with devices where the baudrate is configurable or shown by the system (i.e. only PassportERS and BaystackERS devices with the exceptions of ERS-4000 units and standby CPU of a VSP9000/VSP8600). On these devices this attribute will return a defined value. On other devices where the baudrate is not configurable or not shown, an undef value is returned, and in this case it is safe to assume that the valid baudrate is 9600 (with the exception of ExtremeXOS X690 or X870 series switches where it is 115200)
+I<baudrate>: Console port configured baudrate. This attribute only works with devices where the baudrate is configurable or shown by the system (i.e. only PassportERS and BaystackERS devices with the exceptions of ERS-4000 units and standby CPU of a VSP9000/VSP8600) or known to be a fixed value for the family type. On these devices this attribute will return a defined value. On other devices where the baudrate is not configurable or not shown or could vary, an undef value is returned, and in this case it is safe to assume that the valid baudrate is 9600 or 115200 (on newer devices)
 
 =item *
 
@@ -5403,7 +5669,11 @@ Attributes which only apply to B<PassportERS> family type:
 
 =item *
 
-I<is_voss>: Flag; true(1) if the device is a PassportERS VSP model (only I<model> VSP-xxxx) or is an Extreme Product Label Switch (APLS) (I<is_apls> is true); false(0) otherwise.
+I<is_voss>: Flag; true(1) if the device is a PassportERS VSP model (only I<model> VSP-xxxx) or is an Extreme Product Label Switch (APLS) (I<is_apls> is true) or is a FabricEngine (I<is_fabric_engine> is true); false(0) otherwise.
+
+=item *
+
+I<is_fabric_engine>: Flag; true(1) if the device is a FabricEngine switch; false(0) otherwise.
 
 =item *
 
@@ -5519,7 +5789,11 @@ Attributes which only apply to B<ExtremeXOS> family type:
 
 =item *
 
-I<is_xos>: Flag; true(1) if the device is an ExtremeXOS switch; false(0) otherwise.
+I<is_xos>: Flag; true(1) if the device is an ExtremeXOS or SwitchEngine switch; false(0) otherwise.
+
+=item *
+
+I<is_switch_engine>: Flag; true(1) if the device is a SwitchEngine switch; false(0) otherwise.
 
 =item *
 
@@ -5696,6 +5970,30 @@ I<oob_standby_ip>: Out-of-band IP address of Standby Manager Module (MM)
 =item *
 
 I<is_oob_connected>: Flag; true(1) if the connection to the device is to either the oob_ip or oob_virt_ip IP address; false(0) otherwise
+
+=back
+
+
+
+Attributes which only apply to B<HiveOS> family type:
+
+=over 4
+
+=item *
+
+I<is_hiveos>: Flag; true(1) if the device is a HiveOS Cloud AP; false(0) otherwise.
+
+=back
+
+
+
+Attributes which only apply to B<Ipanema> family type:
+
+=over 4
+
+=item *
+
+I<is_sdwan>: Flag; true(1) if the device is an Extreme SD-WAN IP Engines (IPE) appliance; false(0) otherwise.
 
 =back
 
@@ -5993,6 +6291,7 @@ Once set, the object CLI prompt match pattern is only used by the cmd() and cmd_
 This method sets the CLI --More-- prompt match patterns for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned (the $delayPrompt can be set as a subset of $string if $string accepts multiple patterns some of which are subsets of others).
 If no prompt has yet been set (connection not yet established) undef is returned.
 The object's CLI --More-- prompt pattern is automatically set by the connect() and login() methods based upon the device type detected during login. Normally there should be no need to set this manually.
+On family types which do not have any more prompt support (Ipanema) this will be automatically set to the empty string. 
 Once set, the object CLI --More-- prompt match patterns is only used by the cmd() and cmd_prompted() methods.
 
 
@@ -6631,6 +6930,14 @@ If instead the connected device is not in ACLI mode then 'config ' is prepended 
 Arguments after $ok will only be defined if $ok is true(1).
 
 
+=item B<cmdIpanema()> - send a command requiring not to be in virtual router context mode
+
+  ($ok, $outputref, $resultref) = $obj->cmdIpanema($pkgsub, $cmdcli, $morePages);
+
+This method is uniquely made for the Ipanema family type, which has a number of Linux shell contexts; if the connected Ipanema appliance was left in one of the WAN virtual router contexts, this method will exit that context and then send $cmdcli; after sending the command, if a virtual router context was exited, then this method will re-enter that context to leave the device in exactly the same mode it was found in.
+Arguments after $ok will only be defined if $ok is true(1).
+
+
 =item B<discoverDevice()> - discover the family type of connected device
 
   ($ok, $familyType) = $obj->discoverDevice($pkgsub);
@@ -6769,7 +7076,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Ludovico Stevens.
+Copyright 2023 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetListObjectRequest.name :   ,
-# GetWorksheetListObjectRequest.sheetName :   ,
-# GetWorksheetListObjectRequest.listobjectindex :   ,
+# GetWorksheetListObjectRequest.name : The workbook name.  ,
+# GetWorksheetListObjectRequest.sheetName : The worksheet name.  ,
+# GetWorksheetListObjectRequest.listobjectindex : list object index.  ,
 # GetWorksheetListObjectRequest.format :   ,
-# GetWorksheetListObjectRequest.folder :   ,
-# GetWorksheetListObjectRequest.storageName :    
+# GetWorksheetListObjectRequest.folder : Original workbook folder.  ,
+# GetWorksheetListObjectRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_list_object' } = { 
-    	summary => '',
+    	summary => 'Gets list object description by index in worksheet.',
         params => $params,
         returns => 'string',
     };
@@ -142,21 +142,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'listobjectindex' => {
      	datatype => 'int',
      	base_name => 'listobjectindex',
-     	description => '',
+     	description => 'list object index.',
      	format => '',
      	read_only => '',
      		},
@@ -170,14 +170,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,8 +1,26 @@
 Revision history for Perl module Math::GMPz
 
+0.58
+ - Fix overload_div_eq to die gracefully (as opposed to segfaulting) on div by zero.
+ - Fix bugs in t/overload_op_eq.t
+
+0.57
+ - Expand cross-class overloading to include +=, -=, *=, /=, and **= operations,
+   conditionally available only when $Math::GMPz::RETYPE has been set to 1.
+ - Fix bug in t/mpfr_NV_checks.t. (The script needs Math-MPFR-4.07 or later.)
+ - Simplify overloading of '++' and '--'.
+ - Add new functions Rmpz_cmp_sj and Rmpz_cmp_uj (but only for builds where
+   IVSIZE > LONGSIZE).
+ - Modify Rmpz_cmp_IV (to utilize Rmpz_cmp_sj and Rmpz_cmp_uj where applicable).
+
 0.56
  - Add new test file t/mpfr_NV_checks.t
  - Add Random/t/a_v_random.t
+ - Alter Rmpfr_get_z, Rmpfr_get_q and Rmpfr_get_f to croak if the Math::MPFR object
+   is Inf or Nan. The old behaviour followed the C behaviour - but that behaviour is
+   only rather confusing and somewhat pointless, IMO.
+ - Accommodate MS Visual Studio builds
+
 
 0.55
  - Simplify overloading of NVs by utilizing Rmpz_set_NV(). This also seems to fix the

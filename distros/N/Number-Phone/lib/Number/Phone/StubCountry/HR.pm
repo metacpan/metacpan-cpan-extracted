@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181420;
+our $VERSION = 1.20230614174403;
 
 my $formatters = [
                 {
@@ -89,17 +89,22 @@ my $validators = {
           )\\d{6,7}
         ',
                 'mobile' => '
-          98\\d{6,7}|
-          975(?:
-            1\\d|
-            77|
-            9[67]
-          )\\d{4}|
           9(?:
-            0[1-9]|
-            [1259]\\d|
-            7[0679]
-          )\\d{6}
+            (?:
+              0[1-9]|
+              [12589]\\d
+            )\\d\\d|
+            7(?:
+              [0679]\\d\\d|
+              5(?:
+                [01]\\d|
+                44|
+                77|
+                9[67]
+              )
+            )
+          )\\d{4}|
+          98\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '7[45]\\d{6}',
@@ -114,26 +119,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"38548", "Koprivnica\-Križevci",
-"3851", "Zagreb",
-"38520", "Dubrovnik\-Neretva",
-"38552", "Istra",
-"38551", "Primorsko\-goranska",
-"38542", "Varaždin",
-"38544", "Sisak\-Moslavina",
-"38523", "Zadar",
-"38535", "Brod\-Posavina",
-"38534", "Požega\-Slavonia",
-"38549", "Krapina\-Zagorje",
-"38532", "Vukovar\-Srijem",
+$areanames{en} = {"38520", "Dubrovnik\-Neretva",
 "38531", "Osijek\-Baranja",
+"3851", "Zagreb",
+"38534", "Požega\-Slavonia",
+"38532", "Vukovar\-Srijem",
+"38547", "Karlovac",
 "38553", "Lika\-Senj",
+"38551", "Primorsko\-goranska",
+"38549", "Krapina\-Zagorje",
 "38540", "Međimurje",
-"38543", "Bjelovar\-Bilogora",
+"38548", "Koprivnica\-Križevci",
+"38533", "Virovitica\-Podravina",
+"38535", "Brod\-Posavina",
+"38552", "Istra",
 "38522", "Šibenik\-Knin",
 "38521", "Split\-Dalmatia",
-"38547", "Karlovac",
-"38533", "Virovitica\-Podravina",};
+"38543", "Bjelovar\-Bilogora",
+"38523", "Zadar",
+"38544", "Sisak\-Moslavina",
+"38542", "Varaždin",};
 
     sub new {
       my $class = shift;

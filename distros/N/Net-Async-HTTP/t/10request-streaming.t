@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -77,7 +77,7 @@ local *IO::Async::Handle::connect = sub {
    $request_stream =~ s/^(.*)$CRLF$CRLF//s;
    my %req_headers = map { m/^(.*?):\s+(.*)$/g } split( m/$CRLF/, $1 );
 
-   is_deeply( \%req_headers,
+   is( \%req_headers,
       {
          'Host'           => "somewhere",
          'Content-Length' => 21,
@@ -106,7 +106,7 @@ local *IO::Async::Handle::connect = sub {
    is( $response->code, 201, 'Result code for streaming PUT' );
 
    my %res_headers = map { $_ => $response->header( $_ ) } $response->header_field_names;
-   is_deeply( \%res_headers,
+   is( \%res_headers,
       {
          'Content-Length' => 0,
          'Connection'     => "Keep-Alive",

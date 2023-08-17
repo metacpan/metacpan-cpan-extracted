@@ -24,6 +24,8 @@ panda::string get_backtrace_string_pp(Ref except);
 panda::iptr<DualTrace> get_backtrace(Ref except);
 panda::iptr<DualTrace> create_backtrace();
 panda::string as_perl_string(const panda::Stackframe& frame);
+bool has_backtraces(const Ref& except);
+void attach_backtraces(Ref except, const PerlTraceInfoSP& perl_trace);
 
 Sv safe_wrap_exception(Sv ex);
 void install_exception_processor();

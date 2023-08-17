@@ -1,0 +1,45 @@
+
+Revision history for the module "App::resistorcc"
+
+0.054 : 2023-06-09T09:41  : オプション -= を実行したときに # が余計に出力されるバグを見つけたので、訂正。
+0.053 : 2023-06-07T14:00  ; オプション -= を実装。
+0.052 : 2023-06-07T13:10  ; 一個のライブラリにすることにした(https://metacpan.org/pod/Bin::Text::Color::Plus)。
+----- : 2021-05-26 ; Bin::Text::Color::Plus に一旦収録(他の2個のコマンドと共に)。   https://metacpan.org/pod/Bin::Text::Color::Plus
+
+
+% hg log resistorcc
+changeset:   1672:a28875f7bee8
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Feb 16 12:47:17 2020 +0900
+summary:     resistorcc 色を変えた。紫をもっと明るく。
+
+changeset:   1671:6399cd73d7f7
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Feb 16 12:23:43 2020 +0900
+summary:     resistorcc 8の背景に色を付けることを辞めた。9を明るくした。
+
+changeset:   1670:b5628c017b9c
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Feb 16 12:23:25 2020 +0900
+summary:     resistorcc 8の背景に色を付けることを辞めた。9を明るくした。
+
+changeset:   1669:18079271c0d8
+parent:      1660:fea58761e8a4
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Feb 16 12:23:12 2020 +0900
+summary:     resistorcc 8の背景に色を付けることを辞めた。9を明るくした。
+
+changeset:   1660:fea58761e8a4
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Fri Feb 14 16:28:44 2020 +0900
+summary:     resistorcc 複数回重ねて実行しても、表示結果がカオスにならないようにした。
+
+changeset:   1659:0fea509e5eaf
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Fri Feb 14 15:13:39 2020 +0900
+summary:     resistorcc 色を見やすいように変更した。
+
+changeset:   1658:65a28af31f80
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Fri Feb 14 15:07:42 2020 +0900
+summary:     resistorcc 作成

@@ -9,7 +9,7 @@ my %data;
 @data{1..6} = ('a'..'f');
 
 for my $next (pairs %data) {
-    ok $next->key   ~~ %data              => 'key method correct';
+    ok exists $data{ $next->key }         => 'key method correct';
     ok $next->value eq $data{$next->key}  => 'value method correct';
     delete $data{$next->key};
 }

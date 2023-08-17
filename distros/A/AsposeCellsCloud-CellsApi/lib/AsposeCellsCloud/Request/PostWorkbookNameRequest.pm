@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookNameRequest.name :   ,
-# PostWorkbookNameRequest.nameName :   ,
-# PostWorkbookNameRequest.newName :   ,
-# PostWorkbookNameRequest.folder :   ,
-# PostWorkbookNameRequest.storageName :    
+# PostWorkbookNameRequest.name : The workbook name.  ,
+# PostWorkbookNameRequest.nameName : the Aspose.Cells.Name element name.  ,
+# PostWorkbookNameRequest.newName : new name.  ,
+# PostWorkbookNameRequest.folder : Original workbook folder.  ,
+# PostWorkbookNameRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_name' } = { 
-    	summary => '',
+    	summary => 'Update workbook`s name. ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'name_name' => {
      	datatype => 'string',
      	base_name => 'nameName',
-     	description => '',
+     	description => 'the Aspose.Cells.Name element name.',
      	format => '',
      	read_only => '',
      		},
      'new_name' => {
      	datatype => 'Name',
      	base_name => 'newName',
-     	description => '',
+     	description => 'new name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

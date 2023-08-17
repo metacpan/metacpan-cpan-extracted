@@ -2,6 +2,6 @@ resources:
    bugtracker:
       web: https://github.com/Leont/crypt-passphrase-hsm/issues
    repository:
-      type: git,
+      type: git
       url: git://github.com/Leont/crypt-passphrase-hsm.git
       web: https://github.com/Leont/crypt-passphrase-hsm

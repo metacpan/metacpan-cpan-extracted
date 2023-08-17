@@ -1,0 +1,16 @@
+alienfile
+Changes
+examples/alien_librpm_variables.pl
+librpm.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Alien-librpm/01-use.t
+t/Alien-librpm/02-version.t
+t/Alien-librpm/03-xs.t
+xt/Alien-librpm/01-pod_coverage.t
+xt/Alien-librpm/02-pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::unisam;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  UNISAM - UNIformly SAMple a function y(x) specified as x,y pairs	
+ PERL PROGRAM NAME:  UNISAM - UNIformly SAMple a function y(x) specified as x,y pairs	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

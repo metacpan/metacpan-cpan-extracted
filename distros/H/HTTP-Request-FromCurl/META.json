@@ -68,7 +68,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/Corion/HTTP-Request-FromCurl/issues"
+         "web" : "https://github.com/Corion/HTTP-Request-FromCurl/issues"
       },
       "license" : [
          "https://dev.perl.org/licenses/"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.50",
+   "version" : "0.51",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

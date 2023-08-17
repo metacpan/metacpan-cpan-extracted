@@ -12,7 +12,8 @@ use File::Temp;
 use File::Basename qw(basename dirname);
 use Try::Tiny;
 use YAML::XS;
-use WebFetch "0.15.5";
+use if $] < 5.010, "version";
+use WebFetch v0.15.5;
 use WebFetch::RSS;
 use WebFetch::Output::Capture;
 use Data::Dumper;
@@ -29,7 +30,7 @@ Readonly::Scalar my $title_num       => 1;                       # field number 
 Readonly::Scalar my $link_num        => 1;                       # field number for link
 Readonly::Scalar my $creator_num     => 5;                       # field number for creator
 Readonly::Scalar my $tmpdir_template => "WebFetch-XXXXXXXXXX";
-Readonly::Array my @rss_versions     => qw(0.9 0.91 1.0 2.0);
+Readonly::Array my @rss_versions => qw(0.9 0.91 1.0 2.0);
 
 # process file: input RSS, output YAML
 sub rss2yaml

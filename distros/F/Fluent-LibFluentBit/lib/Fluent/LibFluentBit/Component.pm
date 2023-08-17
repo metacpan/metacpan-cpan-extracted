@@ -1,5 +1,5 @@
 package Fluent::LibFluentBit::Component;
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -53,7 +53,7 @@ Fluent::LibFluentBit::Component - Base class for handle-based objects
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

@@ -43,6 +43,7 @@ use vars qw(@ISA $VERSION @EXPORT $errmsg
 	    $suppress_warnings
 	    $default_avoid_negative_request_ids
 	    $default_use_16bit_request_ids);
+use warnings;
 use Socket;
 use BER '1.05';
 use Carp;
@@ -53,7 +54,7 @@ sub map_table_start_end ($$$$$$);
 sub index_compare ($$);
 sub oid_diff ($$);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 @ISA = qw(Exporter);
 
@@ -841,6 +842,7 @@ package SNMPv1_Session;
 
 use strict qw(vars subs);	# see above
 use vars qw(@ISA);
+use warnings;
 use SNMP_Session;
 use Socket;
 use BER;
@@ -1281,6 +1283,7 @@ sub decode_request {
 package SNMPv2c_Session;
 use strict qw(vars subs);	# see above
 use vars qw(@ISA);
+use warnings;
 use SNMP_Session;
 use BER;
 use Carp;

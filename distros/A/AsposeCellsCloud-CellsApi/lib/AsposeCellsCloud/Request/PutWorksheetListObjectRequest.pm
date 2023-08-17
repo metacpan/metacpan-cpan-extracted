@@ -59,17 +59,17 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetListObjectRequest.name :   ,
-# PutWorksheetListObjectRequest.sheetName :   ,
-# PutWorksheetListObjectRequest.startRow :   ,
-# PutWorksheetListObjectRequest.startColumn :   ,
-# PutWorksheetListObjectRequest.endRow :   ,
-# PutWorksheetListObjectRequest.endColumn :   ,
-# PutWorksheetListObjectRequest.folder :   ,
-# PutWorksheetListObjectRequest.hasHeaders :   ,
+# PutWorksheetListObjectRequest.name : The workbook name.  ,
+# PutWorksheetListObjectRequest.sheetName : The worksheet name.  ,
+# PutWorksheetListObjectRequest.startRow : The start row of the list range.  ,
+# PutWorksheetListObjectRequest.startColumn : The start row of the list range.  ,
+# PutWorksheetListObjectRequest.endRow : The start row of the list range.  ,
+# PutWorksheetListObjectRequest.endColumn : The start row of the list range.  ,
+# PutWorksheetListObjectRequest.folder : Original workbook folder.  ,
+# PutWorksheetListObjectRequest.hasHeaders : Whether the range has headers.  ,
 # PutWorksheetListObjectRequest.displayName :   ,
 # PutWorksheetListObjectRequest.showTotals :   ,
-# PutWorksheetListObjectRequest.storageName :    
+# PutWorksheetListObjectRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -80,7 +80,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_list_object' } = { 
-    	summary => '',
+    	summary => 'Adds a list object in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -165,56 +165,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => '',
+     	description => 'The start row of the list range.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The start row of the list range.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'endRow',
-     	description => '',
+     	description => 'The start row of the list range.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => '',
+     	description => 'The start row of the list range.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'has_headers' => {
      	datatype => 'string',
      	base_name => 'hasHeaders',
-     	description => '',
+     	description => 'Whether the range has headers.',
      	format => '',
      	read_only => '',
      		},
@@ -235,7 +235,7 @@ __PACKAGE__->method_documentation({
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

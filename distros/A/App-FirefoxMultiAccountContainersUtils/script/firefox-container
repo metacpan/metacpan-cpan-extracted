@@ -7,9 +7,9 @@ use Log::ger::Screen;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-04'; # DATE
+our $DATE = '2023-06-06'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $container;
 if (defined(my $c = $ENV{FIREFOX_CONTAINER})) {
@@ -50,7 +50,7 @@ firefox-container - Firefox wrapper to open URL's in a specific container
 
 =head1 VERSION
 
-This document describes version 0.015 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
+This document describes version 0.017 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,12 @@ L<this-repo-on-github>:
 This is a simple wrapper for B<firefox>. If the environment variable
 L</FIREFOX_CONTAINER> is defined, will open using L<open-firefox-container>.
 Otherwise, will simply exec C<firefox>.
+
+Note that C<open-firefox-container> has a different set of options than
+C<firefox>, for example to pass the C<--new-window> option to C<firefox> with
+C<open-firefox-container>:
+
+ % FIREFOX_CONTAINER=mycontainer firefox-container -b --new-window www.example.com
 
 =head1 OPTIONS
 
@@ -138,7 +144,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

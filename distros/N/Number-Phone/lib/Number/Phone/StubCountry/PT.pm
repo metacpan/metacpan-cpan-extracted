@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181422;
+our $VERSION = 1.20230614174404;
 
 my $formatters = [
                 {
@@ -106,66 +106,70 @@ my $validators = {
           )\\d{5}
         )|(
           70(?:
-            7\\d|
-            8[17]
-          )\\d{5}
+            38[01]|
+            596|
+            (?:
+              7\\d|
+              8[17]
+            )\\d
+          )\\d{4}
         )',
                 'toll_free' => '80[02]\\d{6}',
                 'voip' => '30\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"351262", "Caldas\ da\ Rainha",
-"351233", "Figueira\ da\ Foz",
-"351268", "Estremoz",
-"351286", "Castro\ Verde",
-"351256", "S\.\ João\ da\ Madeira",
-"351249", "Torres\ Novas",
-"351265", "Setúbal",
-"351292", "Horta",
-"351242", "Ponte\ de\ Sôr",
-"351274", "Proença\-a\-Nova",
-"351245", "Portalegre",
-"35122", "Porto",
-"351269", "Santiago\ do\ Cacém",
-"351231", "Mealhada",
-"351295", "Angra\ do\ Heroísmo",
-"351281", "Tavira",
-"351272", "Castelo\ Branco",
-"351277", "Idanha\-a\-Nova",
-"351278", "Mirandela",
-"351244", "Leiria",
-"351275", "Covilhã",
-"351251", "Valença",
-"351253", "Braga",
-"351283", "Odemira",
-"351279", "Moncorvo",
-"351236", "Pombal",
-"351284", "Beja",
-"351263", "Vila\ Franca\ de\ Xira",
-"351238", "Seia",
-"351232", "Viseu",
-"351254", "Peso\ da\ Régua",
-"351235", "Arganil",
-"351291", "Funchal",
-"351241", "Abrantes",
-"351243", "Santarém",
-"351261", "Torres\ Vedras",
-"35121", "Lisbon",
-"351276", "Chaves",
-"351239", "Coimbra",
-"351273", "Bragança",
+$areanames{en} = {"351277", "Idanha\-a\-Nova",
 "351289", "Faro",
-"351296", "Ponta\ Delgada",
-"351259", "Vila\ Real",
-"351285", "Moura",
-"351252", "V\.\ N\.\ de\ Famalicão",
-"351257", "Braga",
-"351258", "Viana\ do\ Castelo",
-"351266", "Évora",
-"351255", "Penafiel",
-"351234", "Aveiro",
+"351272", "Castelo\ Branco",
+"351271", "Guarda",
 "351282", "Portimão",
-"351271", "Guarda",};
+"351279", "Moncorvo",
+"351281", "Tavira",
+"351249", "Torres\ Novas",
+"351278", "Mirandela",
+"351242", "Ponte\ de\ Sôr",
+"351235", "Arganil",
+"351234", "Aveiro",
+"351254", "Peso\ da\ Régua",
+"351255", "Penafiel",
+"351241", "Abrantes",
+"351265", "Setúbal",
+"351296", "Ponta\ Delgada",
+"35121", "Lisbon",
+"351291", "Funchal",
+"351292", "Horta",
+"351263", "Vila\ Franca\ de\ Xira",
+"351276", "Chaves",
+"351253", "Braga",
+"351233", "Figueira\ da\ Foz",
+"351286", "Castro\ Verde",
+"351285", "Moura",
+"351268", "Estremoz",
+"351284", "Beja",
+"351258", "Viana\ do\ Castelo",
+"351238", "Seia",
+"351274", "Proença\-a\-Nova",
+"351275", "Covilhã",
+"351257", "Braga",
+"351245", "Portalegre",
+"351232", "Viseu",
+"351244", "Leiria",
+"351261", "Torres\ Vedras",
+"351252", "V\.\ N\.\ de\ Famalicão",
+"351231", "Mealhada",
+"351251", "Valença",
+"351262", "Caldas\ da\ Rainha",
+"351239", "Coimbra",
+"351259", "Vila\ Real",
+"351269", "Santiago\ do\ Cacém",
+"351236", "Pombal",
+"351256", "S\.\ João\ da\ Madeira",
+"351273", "Bragança",
+"351295", "Angra\ do\ Heroísmo",
+"351266", "Évora",
+"35122", "Porto",
+"351283", "Odemira",
+"351243", "Santarém",};
 $areanames{pt} = {"35121", "Lisboa",};
 
     sub new {

@@ -1,0 +1,34 @@
+---
+abstract: 'YAML Load YAMLScript Code as Data'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-PP-YAMLScript
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  XXX: '0.38'
+  YAML::PP: '0.036'
+  YAMLScript: v0.1.11
+  perl: v5.16.0
+resources:
+  bugtracker: https://github.com/ingydotnet/yaml-pp-yamlscript-pm/issues
+  homepage: https://github.com/ingydotnet/yaml-pp-yamlscript-pm
+  repository: https://github.com/ingydotnet/yaml-pp-yamlscript-pm.git
+version: 0.0.1
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

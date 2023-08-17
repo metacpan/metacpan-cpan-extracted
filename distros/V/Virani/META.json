@@ -34,7 +34,7 @@
          "requires" : {
             "Digest::MD5" : "0",
             "File::Copy" : "0",
-            "File::Find::IncludesTimeRange" : "0",
+            "File::Find::IncludesTimeRange" : "v0.2.0",
             "File::Find::Rule" : "0",
             "File::Slurp" : "0",
             "File::Spec" : "0",
@@ -46,6 +46,7 @@
             "Net::Subnet" : "0",
             "Sys::Syslog" : "0",
             "TOML" : "0",
+            "Time::Piece::Guess" : "v0.1.0",
             "perl" : "5.006"
          }
       },
@@ -62,6 +63,6 @@
          "web" : "https://github.com/LilithSec/Virani"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

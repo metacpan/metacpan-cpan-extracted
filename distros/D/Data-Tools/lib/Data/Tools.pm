@@ -21,7 +21,7 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.30';
+our $VERSION = '1.41';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -40,6 +40,9 @@ our @EXPORT = qw(
               file_text_save
               file_text_load
               file_text_load_ar
+
+              cmd_read_from
+              cmd_write_to
 
               file_mtime
               file_ctime
@@ -79,6 +82,9 @@ our @EXPORT = qw(
               hash_unlock_recursive
               hash_keys_lock_recursive
               
+              hr_traverse_vals
+              ar_traverse_vals
+              
               list_uniq
 
               str_escape 
@@ -88,6 +94,8 @@ our @EXPORT = qw(
               str_url_unescape 
               
               str_html_escape 
+              str_html_escape_text 
+              str_html_escape_attr 
               str_html_unescape 
               
               str_hex 
@@ -120,8 +128,6 @@ our @EXPORT = qw(
               ref_thaw
 
               fork_exec_cmd
-              
-              parse_csv
             );
 
 our %EXPORT_TAGS = (
@@ -306,6 +312,30 @@ sub file_text_save
 
 ##############################################################################
 
+sub cmd_read_from
+{
+  my @args = ref( $_[0] ) ? @{ $_[0] } : @_;
+
+  open( my $i, "-|", @args ) or return undef;
+  local $/ = undef;
+  my $s = <$i>;
+  close $i;
+  return $s;
+}
+
+sub cmd_write_to
+{
+  my @args = ref( $_[0] ) ? @{ $_[0] } : @_;
+  
+  open( my $o, "|-", @args ) or return undef;
+  print $o @_;
+  close $o;
+  return 1;
+}
+
+
+##############################################################################
+
 sub file_mtime
 {
   return (stat(shift))[9];
@@ -448,13 +478,46 @@ my %HTML_ESCAPES = (
                    "&"  => '&amp;',
                    '"'  => '&quot;',
                    '\\' => '&#134;',
+                   '='  => '&#61;',
+                   );
+
+my %HTML_ESCAPES_TEXT = (
+                   '>'  => '&gt;',
+                   '<'  => '&lt;',
+                   );
+
+my %HTML_ESCAPES_ATTR = (
+                   '>'  => '&gt;',
+                   '<'  => '&lt;',
+                   "'"  => '&rsquo;',
+                   "`"  => '&lsquo;',
+                   '"'  => '&quot;',
+                   '='  => '&#61;',
                    );
 
 sub str_html_escape
 {
   my $text = shift;
 
-  $text =~ s/([<>`'])/$HTML_ESCAPES{ $1 }/ge;
+  $text =~ s/([<>`'&"\\])/$HTML_ESCAPES{ $1 }/ge;
+  
+  return $text;
+}
+
+sub str_html_escape_text
+{
+  my $text = shift;
+
+  $text =~ s/([<>`'&"\\])/$HTML_ESCAPES_TEXT{ $1 }/ge;
+  
+  return $text;
+}
+
+sub str_html_escape_attr
+{
+  my $text = shift;
+
+  $text =~ s/([<>`'&"\\])/$HTML_ESCAPES_ATTR{ $1 }/ge;
   
   return $text;
 }
@@ -846,6 +909,61 @@ sub hash_keys_lock_recursive
     }
 
   return $hr;  
+}
+
+sub hr_traverse_vals
+{
+  my $hr  = shift;
+  my $sub = shift;
+  
+  for( keys %$hr )
+    {
+    my $v = $hr->{ $_ };
+    my $r = ref( $v );
+    if( $r eq 'HASH' )
+      {
+      hr_traverse_vals( $v, $sub );
+      }
+    elsif( $r eq 'ARRAY' )
+      {
+      ar_traverse_vals( $v, $sub );
+      }
+    elsif( $r eq '' )
+      {
+      $hr->{ $_ } = $sub->( $v );
+      }
+    else
+      {
+      confess "unsupported VALUE TYPE";
+      }  
+    }
+}
+
+sub ar_traverse_vals
+{
+  my $ar = shift;
+  my $sub = shift;
+  
+  for( @$ar )
+    {
+    my $r = ref( $_ );
+    if( $r eq 'HASH' )
+      {
+      hr_traverse_vals( $_, $sub );
+      }
+    elsif( $r eq 'ARRAY' )
+      {
+      ar_traverse_vals( $_, $sub );
+      }
+    elsif( $r eq '' )
+      {
+      $_ = $sub->( $_ );
+      }
+    else
+      {
+      confess "unsupported VALUE TYPE";
+      }  
+    }
 }
 
 ##############################################################################

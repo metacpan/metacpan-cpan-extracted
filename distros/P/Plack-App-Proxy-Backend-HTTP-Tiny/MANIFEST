@@ -1,5 +1,7 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/proxy.psgi
 lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm
 MANIFEST			This list of files
@@ -21,7 +23,6 @@ xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
 xt/perlcritic.t
-xt/perlcriticrc
 xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
@@ -32,4 +33,3 @@ Makefile.PL
 LICENSE
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 108;
+use Test::Most tests => 110;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -48,11 +48,15 @@ LOCAL: {
 		local $TODO = "Can't parse this yet";
 		my $location = $geo_coder->geocode('St Mary the Virgin Church, Minster, Thanet, Kent, England');
 		ok(defined($location));
+	}
 
-		$location = $geo_coder->geocode('St Mary the Virgin Church, Church St, Minster, Thanet, Kent, England');
-		ok(defined($location));
-		# delta_within($location->{latitude}, 39.00, 1e-2);
-		# delta_within($location->{longitude}, -77.10, 1e-2);
+	my $location = $geo_coder->geocode('St Mary the Virgin Church, Church St, Minster, Thanet, Kent, England');
+	ok(defined($location));
+	delta_within($location->{latitude}, 51.33, 1e-2);
+	delta_within($location->{longitude}, 1.32, 1e-2);
+	if($ENV{'TEST_VERBOSE'}) {
+		use Data::Dumper;
+		diag(Data::Dumper->new([$location])->Dumper());
 	}
 
 	check($geo_coder,

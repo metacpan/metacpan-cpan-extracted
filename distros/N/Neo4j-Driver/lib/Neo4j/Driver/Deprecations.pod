@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.36
+version 0.40
 
 =head1 OVERVIEW
 
@@ -57,7 +57,7 @@ in L<LWP::UserAgent> and L<IO::Socket::SSL>.
 This option was renamed C<tls_ca> in S<version 0.15> to be more
 consistent with the C<tls> option, then later renamed C<trust_ca>
 in S<version 0.27> to be more consistent with the Neo4j Driver API.
-See L<Neo4j::Driver/"trust_ca">.
+See L<Neo4j::Driver::Config/"trust_ca">.
 
 =head2 Custom networking modules
 
@@ -208,7 +208,7 @@ option won't be extended any further. However, the existing
 parameter syntax conversion is probably useful enough to stand
 on its own feet if given a more appropriate name.
 
-Instead of this option, L<Neo4j::Driver/"cypher_params"> should
+Instead of this option, L<Neo4j::Driver::Config/"cypher_params"> should
 be used.
 
  $driver->config( cypher_params => v2 );

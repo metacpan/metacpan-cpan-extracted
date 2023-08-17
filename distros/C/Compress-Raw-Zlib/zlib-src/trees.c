@@ -36,6 +36,13 @@
 
 #include "deflate.h"
 
+/*
+  Perl-specific change to allow building with C++
+  The 'register' keyword not allowed from C++17
+  see https://github.com/pmqs/Compress-Raw-Zlib/issues/23
+*/
+#define register
+
 #ifdef ZLIB_DEBUG
 #  include <ctype.h>
 #endif

@@ -1,9 +1,17 @@
+use v5;
 use strict;
 use warnings;
 
 use lib 'inc';
 use ExtUtils::CChecker 0.11;
 use Module::Build::with::XSTests;
+
+my @extra_compiler_flags = qw( -I. -Ihax );
+
+# Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
+push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
+
+push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
 my $MIN_PERL = '5.014'; # PL_keyword_plugin
 
@@ -29,46 +37,6 @@ int main(void) { struct Named n; n.a = 0; return n.a; }
 EOF
 ) or die "OS unsupported - C compiler does not support anonymous inner unions\n";
 
-{
-   print "Checking for PL_infix_plugin...\n";
-
-   # Teach $cc how to find and link to libperl
-   require Config;
-   require Text::ParseWords;
-
-   my @linker_flags = (
-      "-L" . File::Spec->catdir($Config::Config{archlibexp}, "CORE"),
-      "-lperl", Text::ParseWords::shellwords( $Config::Config{libs} ),
-   );
-
-   my $have_pl_infix_plugin = 0;
-
-   $have_pl_infix_plugin = 1 if grep { $_ eq "--have-pl_infix_plugin" } @ARGV;
-
-   $have_pl_infix_plugin ||= $cc->try_compile_run(
-      extra_linker_flags => \@linker_flags,
-      source => <<'EOF'
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-int main(void) {
-   struct Perl_custom_infix def;
-   def.prec = INFIX_PREC_LOW;
-   def.build_op = NULL;
-   return 0;
-}
-EOF
-   ) if $] >= 5.037007;
-
-   if( $have_pl_infix_plugin ) {
-      print "Including support for core perl PL_infix_plugin\n";
-      # ->define isn't currently documented but it will be in next version; it
-      # has been present since v0.04, basically forever
-      $cc->define( "HAVE_PL_INFIX_PLUGIN" )
-   }
-}
-
 my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Keyword',
    requires => {
@@ -82,7 +50,7 @@ my $build = Module::Build::with::XSTests->new(
       'ExtUtils::ParseXS' => '3.16',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'ExtUtils::CChecker' => '0.11',
@@ -92,7 +60,7 @@ my $build = Module::Build::with::XSTests->new(
    create_license => 1,
    create_readme  => 1,
 
-   extra_compiler_flags => [qw( -I. -Ihax )],
+   extra_compiler_flags => \@extra_compiler_flags,
    c_source => [ "src/" ],
 );
 

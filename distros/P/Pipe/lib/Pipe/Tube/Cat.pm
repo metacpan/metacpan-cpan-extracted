@@ -5,7 +5,7 @@ use 5.006;
 
 use base 'Pipe::Tube';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub init {
     my ($self, @files) = @_;

@@ -1,5 +1,9 @@
 Revision History for Perl module Net::Songkick
 
+1.0.8 2023-07-27
+
+  - Fix metadata in META files
+
 1.0.7 2021-07-17
 
   - Fixed get_past_events() method

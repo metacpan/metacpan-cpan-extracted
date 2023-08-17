@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Compile
 
+0.26  2023-07-30 23:21:04 UTC
+	- test with simple source filter rather than Switch.pm (haarg)
+
 0.25  2020-08-03 18:39:36 UTC
 	- add file name to package name #25
 

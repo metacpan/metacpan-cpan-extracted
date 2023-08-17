@@ -5,16 +5,16 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-#define LANGUAGE_VERSION 13
-#define STATE_COUNT 11
+#define LANGUAGE_VERSION 14
+#define STATE_COUNT 12
 #define LARGE_STATE_COUNT 5
-#define SYMBOL_COUNT 10
+#define SYMBOL_COUNT 11
 #define ALIAS_COUNT 0
 #define TOKEN_COUNT 8
 #define EXTERNAL_TOKEN_COUNT 0
-#define FIELD_COUNT 0
+#define FIELD_COUNT 1
 #define MAX_ALIAS_SEQUENCE_LENGTH 3
-#define PRODUCTION_ID_COUNT 1
+#define PRODUCTION_ID_COUNT 2
 
 enum {
   anon_sym_LPAREN = 1,
@@ -26,6 +26,7 @@ enum {
   sym_number = 7,
   sym_fourfunc = 8,
   sym__expr = 9,
+  sym_expr = 10,
 };
 
 static const char * const ts_symbol_names[] = {
@@ -39,6 +40,7 @@ static const char * const ts_symbol_names[] = {
   [sym_number] = "number",
   [sym_fourfunc] = "fourfunc",
   [sym__expr] = "_expr",
+  [sym_expr] = "expr",
 };
 
 static const TSSymbol ts_symbol_map[] = {
@@ -52,6 +54,7 @@ static const TSSymbol ts_symbol_map[] = {
   [sym_number] = sym_number,
   [sym_fourfunc] = sym_fourfunc,
   [sym__expr] = sym__expr,
+  [sym_expr] = sym_expr,
 };
 
 static const TSSymbolMetadata ts_symbol_metadata[] = {
@@ -95,6 +98,28 @@ static const TSSymbolMetadata ts_symbol_metadata[] = {
     .visible = false,
     .named = true,
   },
+  [sym_expr] = {
+    .visible = true,
+    .named = true,
+  },
+};
+
+enum {
+  field_operator = 1,
+};
+
+static const char * const ts_field_names[] = {
+  [0] = NULL,
+  [field_operator] = "operator",
+};
+
+static const TSFieldMapSlice ts_field_map_slices[PRODUCTION_ID_COUNT] = {
+  [1] = {.index = 0, .length = 1},
+};
+
+static const TSFieldMapEntry ts_field_map_entries[] = {
+  [0] =
+    {field_operator, 1},
 };
 
 static const TSSymbol ts_alias_sequences[PRODUCTION_ID_COUNT][MAX_ALIAS_SEQUENCE_LENGTH] = {
@@ -103,6 +128,21 @@ static const TSSymbol ts_alias_sequences[PRODUCTION_ID_COUNT][MAX_ALIAS_SEQUENCE
 
 static const uint16_t ts_non_terminal_alias_map[] = {
   0,
+};
+
+static const TSStateId ts_primary_state_ids[STATE_COUNT] = {
+  [0] = 0,
+  [1] = 1,
+  [2] = 2,
+  [3] = 3,
+  [4] = 4,
+  [5] = 5,
+  [6] = 6,
+  [7] = 7,
+  [8] = 8,
+  [9] = 9,
+  [10] = 10,
+  [11] = 11,
 };
 
 static bool ts_lex(TSLexer *lexer, TSStateId state) {
@@ -173,6 +213,7 @@ static const TSLexMode ts_lex_modes[STATE_COUNT] = {
   [8] = {.lex_state = 0},
   [9] = {.lex_state = 0},
   [10] = {.lex_state = 0},
+  [11] = {.lex_state = 0},
 };
 
 static const uint16_t ts_parse_table[LARGE_STATE_COUNT][SYMBOL_COUNT] = {
@@ -187,8 +228,9 @@ static const uint16_t ts_parse_table[LARGE_STATE_COUNT][SYMBOL_COUNT] = {
     [sym_number] = ACTIONS(1),
   },
   [1] = {
-    [sym_fourfunc] = STATE(10),
-    [sym__expr] = STATE(5),
+    [sym_fourfunc] = STATE(11),
+    [sym__expr] = STATE(8),
+    [sym_expr] = STATE(5),
     [anon_sym_LPAREN] = ACTIONS(3),
     [sym_number] = ACTIONS(5),
   },
@@ -201,91 +243,103 @@ static const uint16_t ts_parse_table[LARGE_STATE_COUNT][SYMBOL_COUNT] = {
     [anon_sym_DASH] = ACTIONS(7),
   },
   [3] = {
-    [ts_builtin_sym_end] = ACTIONS(7),
-    [anon_sym_RPAREN] = ACTIONS(7),
-    [anon_sym_STAR] = ACTIONS(7),
-    [anon_sym_SLASH] = ACTIONS(7),
-    [anon_sym_PLUS] = ACTIONS(7),
-    [anon_sym_DASH] = ACTIONS(7),
-  },
-  [4] = {
-    [ts_builtin_sym_end] = ACTIONS(7),
-    [anon_sym_RPAREN] = ACTIONS(7),
+    [ts_builtin_sym_end] = ACTIONS(9),
+    [anon_sym_RPAREN] = ACTIONS(9),
     [anon_sym_STAR] = ACTIONS(9),
     [anon_sym_SLASH] = ACTIONS(9),
-    [anon_sym_PLUS] = ACTIONS(7),
-    [anon_sym_DASH] = ACTIONS(7),
+    [anon_sym_PLUS] = ACTIONS(9),
+    [anon_sym_DASH] = ACTIONS(9),
+  },
+  [4] = {
+    [ts_builtin_sym_end] = ACTIONS(9),
+    [anon_sym_RPAREN] = ACTIONS(9),
+    [anon_sym_STAR] = ACTIONS(11),
+    [anon_sym_SLASH] = ACTIONS(11),
+    [anon_sym_PLUS] = ACTIONS(9),
+    [anon_sym_DASH] = ACTIONS(9),
   },
 };
 
 static const uint16_t ts_small_parse_table[] = {
-  [0] = 3,
-    ACTIONS(11), 1,
+  [0] = 2,
+    ACTIONS(13), 1,
       ts_builtin_sym_end,
-    ACTIONS(9), 2,
+    ACTIONS(15), 4,
       anon_sym_STAR,
       anon_sym_SLASH,
-    ACTIONS(13), 2,
       anon_sym_PLUS,
       anon_sym_DASH,
-  [12] = 3,
-    ACTIONS(15), 1,
-      anon_sym_RPAREN,
-    ACTIONS(9), 2,
-      anon_sym_STAR,
-      anon_sym_SLASH,
-    ACTIONS(13), 2,
-      anon_sym_PLUS,
-      anon_sym_DASH,
-  [24] = 3,
-    ACTIONS(3), 1,
-      anon_sym_LPAREN,
+  [10] = 3,
     ACTIONS(17), 1,
-      sym_number,
-    STATE(6), 1,
-      sym__expr,
-  [34] = 3,
-    ACTIONS(3), 1,
-      anon_sym_LPAREN,
-    ACTIONS(19), 1,
-      sym_number,
-    STATE(3), 1,
-      sym__expr,
-  [44] = 3,
+      anon_sym_RPAREN,
+    ACTIONS(11), 2,
+      anon_sym_STAR,
+      anon_sym_SLASH,
+    ACTIONS(19), 2,
+      anon_sym_PLUS,
+      anon_sym_DASH,
+  [22] = 3,
     ACTIONS(3), 1,
       anon_sym_LPAREN,
     ACTIONS(21), 1,
       sym_number,
-    STATE(4), 1,
+    STATE(6), 2,
       sym__expr,
-  [54] = 1,
+      sym_expr,
+  [33] = 2,
+    ACTIONS(11), 2,
+      anon_sym_STAR,
+      anon_sym_SLASH,
+    ACTIONS(19), 2,
+      anon_sym_PLUS,
+      anon_sym_DASH,
+  [42] = 3,
+    ACTIONS(3), 1,
+      anon_sym_LPAREN,
     ACTIONS(23), 1,
+      sym_number,
+    STATE(3), 2,
+      sym__expr,
+      sym_expr,
+  [53] = 3,
+    ACTIONS(3), 1,
+      anon_sym_LPAREN,
+    ACTIONS(25), 1,
+      sym_number,
+    STATE(4), 2,
+      sym__expr,
+      sym_expr,
+  [64] = 1,
+    ACTIONS(27), 1,
       ts_builtin_sym_end,
 };
 
 static const uint32_t ts_small_parse_table_map[] = {
   [SMALL_STATE(5)] = 0,
-  [SMALL_STATE(6)] = 12,
-  [SMALL_STATE(7)] = 24,
-  [SMALL_STATE(8)] = 34,
-  [SMALL_STATE(9)] = 44,
-  [SMALL_STATE(10)] = 54,
+  [SMALL_STATE(6)] = 10,
+  [SMALL_STATE(7)] = 22,
+  [SMALL_STATE(8)] = 33,
+  [SMALL_STATE(9)] = 42,
+  [SMALL_STATE(10)] = 53,
+  [SMALL_STATE(11)] = 64,
 };
 
 static const TSParseActionEntry ts_parse_actions[] = {
   [0] = {.entry = {.count = 0, .reusable = false}},
   [1] = {.entry = {.count = 1, .reusable = false}}, RECOVER(),
   [3] = {.entry = {.count = 1, .reusable = true}}, SHIFT(7),
-  [5] = {.entry = {.count = 1, .reusable = true}}, SHIFT(5),
+  [5] = {.entry = {.count = 1, .reusable = true}}, SHIFT(8),
   [7] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym__expr, 3),
-  [9] = {.entry = {.count = 1, .reusable = true}}, SHIFT(8),
-  [11] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_fourfunc, 1),
-  [13] = {.entry = {.count = 1, .reusable = true}}, SHIFT(9),
-  [15] = {.entry = {.count = 1, .reusable = true}}, SHIFT(2),
-  [17] = {.entry = {.count = 1, .reusable = true}}, SHIFT(6),
-  [19] = {.entry = {.count = 1, .reusable = true}}, SHIFT(3),
-  [21] = {.entry = {.count = 1, .reusable = true}}, SHIFT(4),
-  [23] = {.entry = {.count = 1, .reusable = true}},  ACCEPT_INPUT(),
+  [9] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_expr, 3, .production_id = 1),
+  [11] = {.entry = {.count = 1, .reusable = true}}, SHIFT(9),
+  [13] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_fourfunc, 1),
+  [15] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym__expr, 1),
+  [17] = {.entry = {.count = 1, .reusable = true}}, SHIFT(2),
+  [19] = {.entry = {.count = 1, .reusable = true}}, SHIFT(10),
+  [21] = {.entry = {.count = 1, .reusable = true}}, SHIFT(6),
+  [23] = {.entry = {.count = 1, .reusable = true}}, SHIFT(3),
+  [25] = {.entry = {.count = 1, .reusable = true}}, SHIFT(4),
+  [27] = {.entry = {.count = 1, .reusable = true}},  ACCEPT_INPUT(),
 };
 
 #ifdef __cplusplus
@@ -312,12 +366,16 @@ extern const TSLanguage *tree_sitter_fourfunc(void) {
     .small_parse_table_map = ts_small_parse_table_map,
     .parse_actions = ts_parse_actions,
     .symbol_names = ts_symbol_names,
+    .field_names = ts_field_names,
+    .field_map_slices = ts_field_map_slices,
+    .field_map_entries = ts_field_map_entries,
     .symbol_metadata = ts_symbol_metadata,
     .public_symbol_map = ts_symbol_map,
     .alias_map = ts_non_terminal_alias_map,
     .alias_sequences = &ts_alias_sequences[0][0],
     .lex_modes = ts_lex_modes,
     .lex_fn = ts_lex,
+    .primary_state_ids = ts_primary_state_ids,
   };
   return &language;
 }

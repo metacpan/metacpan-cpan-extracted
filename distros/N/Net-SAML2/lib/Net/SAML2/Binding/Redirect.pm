@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use Carp qw(croak);
 use Crypt::OpenSSL::RSA;
@@ -17,7 +17,7 @@ use URI::Escape qw(uri_unescape);
 use URI::QueryParam;
 use URI;
 
-# ABSTRACT: Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
+# ABSTRACT: HTTP Redirect binding for SAML
 
 
 
@@ -209,11 +209,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
+Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

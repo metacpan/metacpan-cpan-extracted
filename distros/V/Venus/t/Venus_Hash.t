@@ -66,6 +66,7 @@ method: none
 method: one
 method: pairs
 method: path
+method: puts
 method: random
 method: reset
 method: reverse
@@ -2805,9 +2806,7 @@ $test->for('example', 2, 'map', sub {
 
 The merge method returns a hash reference where the elements in the hash and
 the elements in the argument(s) are merged. This operation performs a deep
-merge and clones the datasets to ensure no side-effects. The merge behavior
-merges hash references only, all other data types are assigned with precendence
-given to the value being merged.
+merge and clones the datasets to ensure no side-effects.
 
 =signature merge
 
@@ -3338,6 +3337,150 @@ $test->for('example', 4, 'path', sub {
   @result
 });
 
+=method puts
+
+The puts method select values from within the underlying data structure using
+L<Venus::Hash/path>, optionally assigning the value to the preceeding scalar
+reference and returns all the values selected.
+
+=signature puts
+
+  puts(Any @args) (ArrayRef)
+
+=metadata puts
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 puts
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  my $puts = $hash->puts(undef, 'fruit', undef, 'color');
+
+  # ["apple", "red"]
+
+=cut
+
+$test->for('example', 1, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "red"];
+
+  $result
+});
+
+=example-2 puts
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  $hash->puts(\my $fruit, 'fruit', \my $expiry, 'meta.expiry');
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=cut
+
+$test->for('example', 2, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "5d"];
+
+  $result
+});
+
+=example-3 puts
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  });
+
+  $hash->puts(
+    \my $fruit, 'fruit',
+    \my $color, 'color',
+    \my $expiry, 'meta.expiry',
+    \my $ripe, 'meta.ripe',
+  );
+
+  my $puts = [$fruit, $color, $expiry, $ripe];
+
+  # ["apple", "red", "5d", undef]
+
+=cut
+
+$test->for('example', 3, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "red", "5d", undef];
+
+  $result
+});
+
+=example-4 puts
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({set => [1..20]});
+
+  $hash->puts(
+    \my $a, 'set.0',
+    \my $b, 'set.1',
+    \my $m, ['set', '2:-2'],
+    \my $x, 'set.18',
+    \my $y, 'set.19',
+  );
+
+  my $puts = [$a, $b, $m, $x, $y];
+
+  # [1, 2, [3..18], 19, 20]
+
+=cut
+
+$test->for('example', 4, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1, 2, [3..18], 19, 20];
+
+  $result
+});
+
 =method random
 
 The random method returns a random element from the array.
@@ -3712,6 +3855,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Hash.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Hash.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

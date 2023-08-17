@@ -4,28 +4,58 @@
 our $test_sub;
 BEGIN {
   # WHY???  It must be something in Perl which otherwise
-  # is not suppressed, triggering out warning trap error.
+  # is not suppressed, triggering our __WARNING__ trap error.
   local ${^WARNING_BITS} = 0; # undo -w flag
   $test_sub = sub{ my $x = 42; };
 }
 
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Common qw/oops/; # strict, warnings, Carp
+use t_Common ; # strict, warnings, Carp
 use t_TestCommon ':silent', # Test2::V0 etc.
                  qw/bug displaystr fmt_codestring timed_run 
                     mycheckeq_literal mycheck @quotes/;
 
-$SIG{__WARN__} = sub { confess "warning trapped; @_" };
+sub oops(@) {
+  @_ = ("TestOOPS:", @_);
+  goto &confess;
+}
+
+$SIG{__WARN__} = sub { confess("warning trapped: @_") };
 
 use Data::Compare qw(Compare);
 
-confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
+# This test mysteriously dies (exit 255) with no visible message 
+# on certain Windows machines.  Try to explicitly 'fail' instead of 
+# actually dieing.
+$SIG{__DIE__} = sub {
+  if ($^S or !defined($^S)) { 
+    die(@_); # in eval or at compile time
+  } else {
+    my $via_carp;
+    for (my $i=0; ;$i++) {
+      my $pkg = caller($i) || last;
+      if ($pkg eq "Carp") {
+        $via_carp=1;
+        last;
+      }
+    }
+    if ($via_carp) {
+      fail("croak/confess caught", @_);
+    } else {
+      my ($fn, $lno) = (caller(0))[1,2];
+      fail("croak/confess caught at ${fn}:$lno", Carp::longmess(@_));
+    }
+    bail_out("die trapped");
+  }
+};
+
+confess("Non-zero CHILD_ERROR ($?)") if $? != 0;
 
 # This script was written before the author knew anything about standard
 # Perl test-harness tools.  So it is a big monolithic thing.
 
-use Data::Dumper::Interp;
+use Data::Dumper::Interp qw/:all/;
 
 sub visFoldwidth() {
   "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
@@ -34,7 +64,7 @@ sub visFoldwidth() {
 }
 
 
-confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
+confess("Non-zero initial CHILD_ERROR ($?)") if $? != 0;
 
 # Run a variety of tests on an item which is a string or strigified object
 # which is not presented as a bare number (i.e. it is shown in quotes).
@@ -53,8 +83,8 @@ confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 #    [ 'avis($_[1])',             '(_Q_)' ],
 #    [ 'avisq($_[1])',            '(_q_)' ],
 #    #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-#    [ 'alvis($_[1])',             '_Q_' ],
-#    [ 'alvisq($_[1])',            '_q_' ],
+#    [ 'avisl($_[1])',             '_Q_' ],
+#    [ 'avislq($_[1])',            '_q_' ],
 #    [ 'ivis(\'$_[1]\')',         '_Q_' ],
 #    [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
 #    [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -84,7 +114,7 @@ sub mychecklit(&$$) {
   my ($doeval, $item, $dq_expected_re) = @_;
   (my $sq_expected_re = $dq_expected_re)
     =~ s{ ( [^\\"]++|(\\.) )*+ \K " }{'}xsg
-       or do{ die "bug" if $dq_expected_re =~ /(?<![^\\])'/; }; #probably
+       or do{ confess "bug" if $dq_expected_re =~ /(?<![^\\])'/; }; #probably
   foreach (
     [ "Data::Dumper::Interp->new()->vis(\$_[1])",  '_Q_' ],
     [ 'vis($_[1])',              '_Q_' ],
@@ -92,8 +122,8 @@ sub mychecklit(&$$) {
     [ 'avis($_[1])',             '(_Q_)' ],
     [ 'avisq($_[1])',            '(_q_)' ],
     #currently broken due to $VAR problem: [ 'avisq($_[1], $_[1])',     '(_q_, _q_)' ],
-    [ 'alvis($_[1])',             '_Q_' ],
-    [ 'alvisq($_[1])',            '_q_' ],
+    [ 'avisl($_[1])',             '_Q_' ],
+    [ 'avislq($_[1])',            '_q_' ],
     [ 'ivis(\'$_[1]\')',         '_Q_' ],
     [ 'ivis(\'foo$_[1]\')',      'foo_Q_' ],
     [ 'ivis(\'foo$\'."_[1]")',   'foo_Q_' ],
@@ -134,7 +164,7 @@ foreach (
 {
   my ($confname, @values) = @$_;
   foreach my $value (@values) {
-    foreach my $base (qw(vis avis hvis alvis hlvis dvis ivis)) {
+    foreach my $base (qw(vis avis hvis avisl hvisl dvis ivis)) {
       foreach my $q ("", "q") {
         my $codestr = $base . $q . "(42";
          $codestr .= ", 43" if $base =~ /^[ahl]/;
@@ -145,9 +175,9 @@ foreach (
                           \$obj->$codestr ;   # discard dump result
                           \$obj->$confname()  # fetch effective setting
                         }";
-        confess "bug:$@ " if $@;
-        confess "\$Data::Dumper::Interp::$confname value is not preserved by $codestr\n",
-            "(Set \$Data::Dumper::Interp::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n"
+        confess("bug:@_ ") if $@;
+        confess("\$Data::Dumper::Interp::$confname value is not preserved by $codestr\n",
+            "(Set \$Data::Dumper::Interp::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n")
           unless (! defined($v) and ! defined($value))
                  || (defined($v) and defined($value) and $v eq $value);
         }
@@ -160,7 +190,7 @@ foreach (
 foreach my $confname (qw/Indent Terse Sparseseen/) {
   no strict 'refs';
   my $val = ${"Data::Dumper::Interp::$confname"};
-  die "\${Data::Dumper::Interp::$confname} = ",vis($val)," SHOULD NOT EXIST"
+  confess "\${Data::Dumper::Interp::$confname} = ",vis($val)," SHOULD NOT EXIST"
     if defined($val);
   eval {newvis->$confname(42)};
   like($@,qr/locate.*method.*$confname/, "$confname method does not exist");
@@ -235,7 +265,7 @@ our @ISA = ("main::Mybase");
 package main;
 
 $_ = "GroupA.GroupB";
-/(.*)\W(.*)/sp or die "nomatch"; # set $1 and $2
+/(.*)\W(.*)/sp or confess "nomatch"; # set $1 and $2
 
 { my $code = 'qsh("a b")';           mycheck $code, '"a b"',  eval $code; }
 { my $code = 'qsh(undef)';           mycheck $code, "undef",  eval $code; }
@@ -251,7 +281,12 @@ $_ = "GroupA.GroupB";
 { my $code = 'qshpath($_)';          mycheck $code, "${_}",   eval $code; }
 { my $code = 'qshpath()';            mycheck $code, "${_}",   eval $code; }
 { my $code = 'qshpath';              mycheck $code, "${_}",   eval $code; }
-{ my $code = q(qshlist("a b","c",'$d')); mycheck $code, q("a b" c '$d'),  eval $code; }
+
+if ($^O eq "MSWin32") {
+  { my $code = q(qshlist("a b","c",'$d')); mycheck $code, q("a b" c "$d"),  eval $code; }
+} else {
+  { my $code = q(qshlist("a b","c",'$d')); mycheck $code, q("a b" c '$d'),  eval $code; }
+}
 
 # Basic checks
 { my $code = 'vis($_)'; mycheck $code, "\"${_}\"", eval $code; }
@@ -259,10 +294,10 @@ $_ = "GroupA.GroupB";
 { my $code = 'vis'; mycheck $code, "\"${_}\"", eval $code; }
 { my $code = 'avis($_,1,2,3)'; mycheck $code, "(\"${_}\",1,2,3)", eval $code; }
 { my $code = 'hvis("foo",$_)'; mycheck $code, "(foo => \"${_}\")", eval $code; }
-{ my $code = 'hlvis("foo",$_)'; mycheck $code, "foo => \"${_}\"", eval $code; }
+{ my $code = 'hvisl("foo",$_)'; mycheck $code, "foo => \"${_}\"", eval $code; }
 { my $code = 'avis(@_)'; mycheck $code, '()', eval $code; }
 { my $code = 'hvis(@_)'; mycheck $code, '()', eval $code; }
-{ my $code = 'hlvis(@_)'; mycheck $code, '', eval $code; }
+{ my $code = 'hvisl(@_)'; mycheck $code, '', eval $code; }
 { my $code = 'avis(undef)'; mycheck $code, "(undef)", eval $code; }
 { my $code = 'hvis("foo",undef)'; mycheck $code, "(foo => undef)", eval $code; }
 { my $code = 'vis(undef)'; mycheck $code, "undef", eval $code; }
@@ -283,9 +318,9 @@ $_ = "GroupA.GroupB";
 { my $code = q(my $v = \"abc"; dvis('$v')); mycheck $code, 'v=\\"abc"', eval $code; }
 { my $code = q(my $v = \"abc"; dvisq('$v')); mycheck $code, "v=\\'abc'", eval $code; }
 { my $code = q(my $v = \*STDOUT; dvisq('$v')); mycheck $code, "v=\\*::STDOUT", eval $code; }
-{ my $code = q(open my $fh, "</dev/null" or die $!; dvis('$fh'));
+{ my $code = q(open my $fh, "</dev/null" or oops $!; dvis('$fh'));
   mycheck $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
-{ my $code = q(open my $fh, "</dev/null" or die $!; dvisq('$fh'));
+{ my $code = q(open my $fh, "</dev/null" or oops $!; dvisq('$fh'));
   mycheck $code, "fh=\\*{'::\$fh'}", eval $code; }
 
 # Data::Dumper::Interp 2.12 : hex escapes including illegal code points:
@@ -297,13 +332,13 @@ $_ = "GroupA.GroupB";
 
 # Check that $1 etc. can be passed (this was once a bug...)
 # The duplicated calls are to check that $1 is preserved
-{ my $code = '" a~b" =~ / (.*)()/ && qsh($1); die unless $1 eq "a~b";qsh($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && qsh($1); oops unless $1 eq "a~b";qsh($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1); die unless $1 eq "a~b";qshpath($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1); oops unless $1 eq "a~b";qshpath($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && vis($1); die unless $1 eq "a~b";vis($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && vis($1); oops unless $1 eq "a~b";vis($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); die unless $1 eq "a \$vv b"; dvis($1)';
+{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); oops unless $1 eq "a \$vv b"; dvis($1)';
   mycheck $code, 'a vv=123 b', eval $code; }
 
 # Check Deparse support
@@ -335,14 +370,14 @@ my $ratstr  = '1/9';
   # stringify everything possible
   local $Data::Dumper::Interp::Objects = 1;  # NOTE: the '1' will be a BigInt !
 
-  my $bigf = eval $bigfstr // die;
-  die(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
+  my $bigf = eval $bigfstr // oops;
+  oops(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
   mychecklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
 
   # Some implementations make everything a Math::BigFloat, others make
   # integers a Math::BigInt .
-  my $bigi = eval $bigistr // die;
-  die(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@")
+  my $bigi = eval $bigistr // oops;
+  oops(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@")
     unless blessed($bigi) =~ /^Math::Big\w*/;
   mychecklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::Big\w*[^\)]*\))?${bigistr}/);
 
@@ -351,30 +386,30 @@ my $ratstr  = '1/9';
     local $Data::Dumper::Interp::Objects = $Sval;
     #my $s = vis($bigf);
     my $s = visnew->Debug(0)->vis($bigf);
-    die "bug(",u($Sval),")($s)" unless $s =~ /^\(?bless.*BigFloat/s;
+    oops "bug(",u($Sval),")($s)" unless $s =~ /^\(?bless.*BigFloat/s;
   }
 }
 {
   # no 'bignum' etc. in effect, just explicit class names
   use Math::BigFloat;
   my $bigf = Math::BigFloat->new($bigfstr);
-  die unless $bigf->isa("Math::BigFloat");
+  oops unless $bigf->isa("Math::BigFloat");
 
   use Math::BigRat;
   my $rat = Math::BigRat->new($ratstr);
-  die unless $rat->isa("Math::BigRat");
+  oops unless $rat->isa("Math::BigRat");
 
   # No stringification if disabled
   { local $Data::Dumper::Interp::Objects = 0;
-    my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
+    my $s = vis($bigf); oops "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
   # No stringification if only some other class enabled (string)
   { local $Data::Dumper::Interp::Objects = 'Some::Other::Class';
-    my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
+    my $s = vis($bigf); oops "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
   # No stringification if only some other class enabled (regex)
   { local $Data::Dumper::Interp::Objects = qr/Some::Other::Class/;
-    my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
+    my $s = vis($bigf); oops "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
   # Yes if globally enabled 
   { local $Data::Dumper::Interp::Objects = 1;
@@ -399,7 +434,7 @@ my $ratstr  = '1/9';
   # Yes if enabled only for a base class (string)
   { local $Data::Dumper::Interp::Objects = ['main::Mybase'];
     my $obj = main::Myderived->new(42);
-    $obj->isa("main::Mybase") or die "urp";
+    $obj->isa("main::Mybase") or oops "urp";
     mychecklit(sub{eval $_[0]}, $obj, qr/\(main::Myderived\)Mybase-ish-1042/);
   }
 }
@@ -415,17 +450,17 @@ my $ratstr  = '1/9';
   # Arrgh!
   eval <<'EOF';
     use bigrat;
-    my $rat = eval $ratstr // die;
-    die unless $rat->isa("Math::BigRat");
+    my $rat = eval $ratstr // oops;
+    oops unless $rat->isa("Math::BigRat");
     mychecklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
 EOF
-  die "urp\n$@" if $@
+  oops "urp\n$@" if $@
 }
 
 # Check string truncation, and that the original data is not modified in-place
 { my $orig_str  = '["abcDEFG",["xyzABCD",{bareword => "fghIJKL"}]]';
-  my $check_data = eval $orig_str; die "bug" if $@;
-  my $orig_data  = eval $orig_str; die "bug" if $@;
+  my $check_data = eval $orig_str; oops "bug" if $@;
+  my $orig_data  = eval $orig_str; oops "bug" if $@;
   foreach my $MSw (1..9) {
     # hand-truncate to create "expected result" data
     (my $exp_str = $orig_str) =~ s{(")([a-zA-Z]{$MSw})([a-zA-Z]*+)(\1)}{
@@ -439,15 +474,18 @@ EOF
                                   }segx;
     local $Data::Dumper::Interp::MaxStringwidth = $MSw;
     mycheck "with MaxStringwidth=$MSw", $exp_str, eval 'vis($orig_data)';
-    die "MaxStringwidth=$MSw : Original data corrupted"
+    oops "MaxStringwidth=$MSw : Original data corrupted"
       unless Compare($orig_data, $check_data);
   }
 }
 
 # There was a bug for s/dvis called direct from outer scope, so don't use eval:
-#WAS BUG HERE: On some older platforms qr/.../ can visualize to a different,
-#longer representation, so forcing wrap to be the same on all platforms.
-my $SS = ($Data::Dumper::Interp::Useqq//"") =~ /dots/ ? "·" : " "; # spacedots in effect?
+#
+# Another bug was here: On some older platforms qr/.../ can visualize to a 
+# different, longer representation, so forcing wrap to be the same everywhere
+#
+my $SS = do{ my $x=" "; dvis('$x') =~ /x="(.)"/ or die; $1 }; # spacedots?
+
 mycheck
   'global dvis %toplex_h',
 q!%toplex_h=(
@@ -479,7 +517,7 @@ timed_run {
   mycheck 'dvis @backtrack_bugtest_data',
         '@backtrack_bugtest_data=(42,{A => 0,BBBBBBBBBBBBB => "foo"})',
         dvis('@backtrack_bugtest_data');
-} 0.05; # was 0.01 but that failed on slow arm machines
+} 0.10; # some cpan test machines are slow!
 
 sub doquoting($$) {
   my ($input, $useqq) = @_;
@@ -516,7 +554,8 @@ sub doquoting($$) {
       $quoted =~ s/"/\\"/g;
       $quoted = '"' . $quoted . '"';
     }
-    confess "testbug: Useqq subopt: '",keys(%subopts),"'\n" if %subopts;
+    oops("testbug: Useqq subopt: '",keys(%subopts),"'\n") 
+      if %subopts;
   } else {
     $quoted =~ s/([\\'])/\\$1/gs;
     $quoted = "'${quoted}'";
@@ -622,8 +661,8 @@ sub get_closure(;$) {
      #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\x{B}\\f\\r\\x{E}\\x{F}\\x{10}\\x{11}\\x{12}\\x{13}\\x{14}\\x{15}\\x{16}\\x{17}\\x{18}\\x{19}\\x{1A}\\e\\x{1C}\\x{1D}\\x{1E}\"\n) ],
     )),
 
-    [__LINE__, q($flex\n), qq(flex=\"Lexical in sub f\"\n) ],
-    [__LINE__, q($$flex_ref\n), qq(\$\$flex_ref=\"Lexical in sub f\"\n) ],
+    [__LINE__, q($flex\n), qq(flex=\"Lexical${SS}in${SS}sub${SS}f\"\n) ],
+    [__LINE__, q($$flex_ref\n), qq(\$\$flex_ref=\"Lexical${SS}in${SS}sub${SS}f\"\n) ],
 
     [__LINE__, q($_ $ARG\n), qq(\$_=\"GroupA.GroupB\" ARG=\"GroupA.GroupB\"\n) ],
     [__LINE__, q($a\n), qq(a=\"global-a\"\n) ],
@@ -695,7 +734,7 @@ EOF
     )),
     #37 :
     map({
-      my ($LQ,$RQ) = (/^(.)(.)$/) or die "bug";
+      my ($LQ,$RQ) = (/^(.)(.)$/) or oops "bug";
       map({
         my $name = $_;
         map({
@@ -822,7 +861,7 @@ EOF
     #warn "##^^^^^^^^^^^ lno=$lno dvis_input='$dvis_input' expected='$expected'\n";
 
     # FUTURE: wrap in subtest with plan skip_all => $skip_condition if skip_condition is true
-    die "skip_condition not impl" if $skip_condition;
+    oops "skip_condition not impl" if $skip_condition;
 
     { local $@;  # check for bad syntax first, to avoid uncontrolled die later
       # For some reason we can't catch exceptions from inside package DB.
@@ -831,7 +870,7 @@ EOF
       #  a bug where $@ was not saved properly.
       #  BUT VERIFY b4 deleting this comment.
       my $ev = eval { "$dvis_input" };
-      die "Bad test string:$dvis_input\nPerl can't interpolate it (lno=$lno)"
+      oops "Bad test string:$dvis_input\nPerl can't interpolate it (lno=$lno)"
          .($@ ? ":\n  $@" : "\n")
         if $@ or ! defined $ev;
     }
@@ -911,7 +950,7 @@ EOF
         if !$useqq && $input =~ tr/\0-\377//c;
       my $exp = doquoting($input, $useqq);
       my $act = Data::Dumper::Interp->new()->Useqq($useqq)->vis($input);
-      die "\n\nUseqq ",u($useqq)," bug:\n"
+      oops "\n\nUseqq ",u($useqq)," bug:\n"
          ."     Input ".displaystr($input)."\n"
          ."  Expected ".displaystr($exp)."\n"
          ."       Got ".displaystr($act)."\n"
@@ -927,7 +966,7 @@ sub f($) {
   get_closure(1);
   $code->(@_);
   no warnings 'once';
-  die "Punct save/restore imbalance" if @Data::Dumper::save_stack != 0;
+  oops "Punct save/restore imbalance" if @Data::Dumper::save_stack != 0;
 }
 sub g($) {
   local $_ = 'SHOULD NEVER SEE THIS';
@@ -935,6 +974,7 @@ sub g($) {
 }
 confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 &g(42,$toplex_ar);
+
 
 #print "Tests passed.\n";
 #say "stderrstring:$stderr_string";

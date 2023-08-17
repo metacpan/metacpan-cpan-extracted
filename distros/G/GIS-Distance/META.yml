@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,37 +26,37 @@ no_index:
 provides:
   GIS::Distance:
     file: lib/GIS/Distance.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::ALT:
     file: lib/GIS/Distance/ALT.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Constants:
     file: lib/GIS/Distance/Constants.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Cosine:
     file: lib/GIS/Distance/Cosine.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Formula:
     file: lib/GIS/Distance/Formula.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::GreatCircle:
     file: lib/GIS/Distance/GreatCircle.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Haversine:
     file: lib/GIS/Distance/Haversine.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::MathTrig:
     file: lib/GIS/Distance/MathTrig.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Null:
     file: lib/GIS/Distance/Null.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Polar:
     file: lib/GIS/Distance/Polar.pm
-    version: '0.19'
+    version: '0.20'
   GIS::Distance::Vincenty:
     file: lib/GIS/Distance/Vincenty.pm
-    version: '0.19'
+    version: '0.20'
 recommends:
   GIS::Distance::Fast: '0.13'
 requires:
@@ -72,10 +72,11 @@ requires:
 resources:
   bugtracker: https://github.com/bluefeet/GIS-Distance/issues
   homepage: https://github.com/bluefeet/GIS-Distance
-  repository: git://github.com/bluefeet/GIS-Distance.git
-version: '0.19'
+  repository: https://github.com/bluefeet/GIS-Distance.git
+version: '0.20'
 x_authority: cpan:BLUEFEET
 x_contributors:
+  - 'Florian Schlichting <fsfs@debian.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

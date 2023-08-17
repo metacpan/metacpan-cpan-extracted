@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -63,7 +63,7 @@ local *IO::Async::Handle::connect = sub {
 
    my $response = wait_for_future( $future )->get;
 
-   isa_ok( $response, "HTTP::Response", '$future->get for fail_on_error false' );
+   isa_ok( $response, [ "HTTP::Response" ], '$future->get for fail_on_error false' );
 
    is( $response->code, 404, '$response->code for fail_on_error false' );
 }

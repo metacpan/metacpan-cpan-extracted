@@ -1,0 +1,206 @@
+NAME
+    Acme::CPANModules::MIMETypes - List of modules to work with MIME types
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::MIMETypes
+    (from Perl distribution Acme-CPANModules-MIMETypes), released on
+    2023-06-30.
+
+DESCRIPTION
+    All recipes are categorized by tasks, then by most recommended module.
+
+    1. Finding out filename extensions for a certain MIME type
+
+    1a. With File::MimeInfo (uses system's type database):
+
+     use File::MimeInfo qw(extensions);
+     $ext  = extensions("image/jpeg"); # => "jpeg"
+     @exts = extensions("image/jpeg"); # => ("jpeg", "jpe", "jpg")
+
+    1b. With MIME::Types (comes with its own type database):
+
+     use MIME::Types;
+     my $mt = MIME::Types->new->type("image/jpeg") or die "Unknown MIME type";
+     my @exts = $m->extensions; # => ("jpeg", "jpg", "jpe", "jfif", "jfif-tbnl")
+
+    1c. With Media::Type::Simple (can uses system's "/etc/mime.types"):
+
+     use Media::Type::Simple;
+     $ext  = ext_from_type("image/jpeg"); # => "jpeg"
+     @exts = ext_from_type("image/jpeg"); # => ("jpeg", "jpg", "jpe", "jfif")
+
+    2. Finding out the MIME type associated with a certain filename
+    extension
+
+    2a. With MIME::Types:
+
+     use MIME::Types;
+     my $mt = MIME::Types->new->mimeTypeOf("gif") or die "Unknown MIME type";
+     say "$mt" ;# => "image/gif"
+
+    2b. With Media::Type::Simple:
+
+     use Media::Type::Simple;
+     $type = type_from_ext("jpg"); # => "image/jpeg"
+
+    2c. With MIME::Type::FileName (comes with its own type database, last
+    updated 2012):
+
+     use MIME::Type::FileName;
+     my $mimetype = MIME::Type::FileName::guess ("my-file.xls") or die "Unknown MIME type";
+
+    3. Guessing MIME type of a file based on its extension
+
+    3a. With File::MimeInfo:
+
+     use File::MimeInfo;
+     my $mime_type = mimetype('test.png') or die "Unknown MIME type";
+
+    3b. With LWP::MediaTypes (comes with its own type database):
+
+     use LWP::MediaTypes;
+     my $type = LWP::MediaTypes::guess_media_type("file.xls") or die "Unknown MIME type";
+
+    4. Guessing MIME type of a file based on its content
+
+    4a. Using File::MimeInfo::Magic (same interface as File::MimeInfo):
+
+     use File::MimeInfo::Magic;
+ 
+     $type = mimetype("file.jpg"); # => "image/jpeg"
+ 
+     # For symlink, will return "octet/symlink". To follow symlink, open file and
+     # pass filehandle.
+     open my $fh, "<", "symlink-to-file.jpg" or die "Can't open file: $!";
+     $type = mimetype($fh); # => "image/jpeg"
+
+    4b. Using other modules:
+
+    Alien::LibMagic
+
+    File::LibMagic
+
+    File::LibMagic::FFI
+
+    File::MMagic
+
+    File::MMagic::XS
+
+    File::Type
+
+ACME::CPANMODULES ENTRIES
+    File::MimeInfo
+        Author: MICHIELB <https://metacpan.org/author/MICHIELB>
+
+    MIME::Types
+        Author: MARKOV <https://metacpan.org/author/MARKOV>
+
+    Media::Type::Simple
+        Author: RRWO <https://metacpan.org/author/RRWO>
+
+    MIME::Type::FileName
+        Author: JHIVER <https://metacpan.org/author/JHIVER>
+
+    LWP::MediaTypes
+        Author: OALDERS <https://metacpan.org/author/OALDERS>
+
+    File::MimeInfo::Magic
+        Author: MICHIELB <https://metacpan.org/author/MICHIELB>
+
+    Alien::LibMagic
+        Author: ZMUGHAL <https://metacpan.org/author/ZMUGHAL>
+
+    File::LibMagic
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
+
+    File::LibMagic::FFI
+        Author: PLICEASE <https://metacpan.org/author/PLICEASE>
+
+    File::MMagic
+        Author: KNOK <https://metacpan.org/author/KNOK>
+
+    File::MMagic::XS
+        Author: DMAKI <https://metacpan.org/author/DMAKI>
+
+    File::Type
+        Author: PMISON <https://metacpan.org/author/PMISON>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n MIMETypes
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries MIMETypes | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=MIMETypes -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::MIMETypes -E'say $_->{module} for @{ $Acme::CPANModules::MIMETypes::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-MIMETypes>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-MIMETypes>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-MIME
+    Types>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

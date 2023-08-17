@@ -1,7 +1,7 @@
 package Mail::DKIM::Algorithm::Base;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: base class for DKIM "algorithms"
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -187,7 +187,7 @@ Mail::DKIM::Algorithm::Base - base class for DKIM "algorithms"
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package OpenTracing::Implementation::Test::Tracer;
 
-our $VERSION = 'v0.102.1';
+our $VERSION = 'v0.104.1';
 
 use Moo;
 
@@ -270,9 +270,15 @@ sub cmp_deeply {
 }
 
 sub cmp_easy {
-    my ($self, $exp, $test_name) = @_;
-    $exp = superbagof(map { superhashof($_) } @$exp);
-    return $self->cmp_deeply($exp, $test_name);
+    my $exp = $_[1];
+    $_[1] = superbagof(map { superhashof($_) } @$exp);
+    goto &cmp_deeply;
+}
+
+sub cmp_spans {
+    my $exp = $_[1];
+    $_[1] = [ map { superhashof($_) } @$exp ];
+    goto &cmp_deeply;
 }
 
 1;
@@ -361,6 +367,16 @@ L<Test::Deep>.
 Same as L<cmp_deeply> but transforms C<$any_expected> into a I<super bag> of
 I<super hashes> before the comparison, so that not all keys need to be specified
 and order doesn't matter.
+
+
+
+=head2 C<cmp_spans>
+
+    $tracer->cmp_spans $all_expected, $test_message;
+
+Same as L<cmp_deeply> but transforms C<$all_expected> into a array reference of
+I<super hashes> before the comparison, so that all spans are to be expected in
+the given order, but not not all keys need to be specified.
 
 
 

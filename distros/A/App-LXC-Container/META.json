@@ -1,0 +1,134 @@
+{
+   "abstract" : "configure, create and run LXC application containers",
+   "author" : [
+      "Thomas Dorner <dorner (at) cpan (dot) org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.21",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-LXC-Container",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Tk" : "804.030"
+         },
+         "requires" : {
+            "Text::Diff" : "1.37",
+            "UI::Various" : "0.37",
+            "indirect" : "0.36",
+            "multidimensional" : "0.011",
+            "perl" : "v5.14.0",
+            "strictures" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Output" : "1.01",
+            "Test::Warn" : "0.23"
+         }
+      }
+   },
+   "provides" : {
+      "App::LXC::Container" : {
+         "file" : "lib/App/LXC/Container.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Data" : {
+         "file" : "lib/App/LXC/Container/Data.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Data::Debian" : {
+         "file" : "lib/App/LXC/Container/Data/Debian.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Data::Ubuntu" : {
+         "file" : "lib/App/LXC/Container/Data/Ubuntu.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Data::common" : {
+         "file" : "lib/App/LXC/Container/Data/common.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Mounts" : {
+         "file" : "lib/App/LXC/Container/Mounts.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Run" : {
+         "file" : "lib/App/LXC/Container/Run.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Setup" : {
+         "file" : "lib/App/LXC/Container/Setup.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Texts" : {
+         "file" : "lib/App/LXC/Container/Texts.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Texts::de" : {
+         "file" : "lib/App/LXC/Container/Texts/de.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Texts::en" : {
+         "file" : "lib/App/LXC/Container/Texts/en.pm",
+         "version" : "0.14"
+      },
+      "App::LXC::Container::Update" : {
+         "file" : "lib/App/LXC/Container/Update.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/thdorner/lxc-container/issues"
+      },
+      "homepage" : "https://gitlab.com/thdorner/lxc-container",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/thdorner/lxc-container.git",
+         "web" : "https://gitlab.com/thdorner/lxc-container"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "Thomas Dorner <dorner@cpan.org>",
+      "Thomas Dorner <td-gitlab@th-dorner.de>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

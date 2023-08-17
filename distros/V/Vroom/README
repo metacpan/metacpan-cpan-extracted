@@ -1,7 +1,9 @@
 NAME
+
     Vroom - Slide Shows in Vim
 
 SYNOPSIS
+
         > mkdir MySlides    # Make a Directory for Your Slides
         > cd MySlides       # Go In There
         > vroom new         # Create Example Slides File
@@ -10,6 +12,7 @@ SYNOPSIS
         > vroom html        # Publish Your Slides as HTML
 
 DESCRIPTION
+
     Ever given a Slide Show and needed to switch over to Vim?
 
     Now you don't ever have to switch again. You're already there.
@@ -20,67 +23,77 @@ DESCRIPTION
     of files that begin with '0', like '03' or '07c' or '05b.pl'.
 
     The slides are named in alphabetic order. That means you can bring them
-    all into a Vim session with the command: "vim 0*". "vroom vroom" does
+    all into a Vim session with the command: vim 0*. vroom vroom does
     exactly that.
 
     You can do things like advance to the next slide with the spacebar.
-    Vroom creates a file called "./.vimrc" with helpful key mappings for
+    Vroom creates a file called ./.vimrc with helpful key mappings for
     navigating a slideshow. See [KEY MAPPINGS] below.
 
-    Vroom takes advantage of Vim's syntax highlighting. It also lets you run
-    slides that contain code.
+    Vroom takes advantage of Vim's syntax highlighting. It also lets you
+    run slides that contain code.
 
     Since Vim is an editor, you can change your slides during the show.
 
 COMMAND USAGE
-    "vroom" has a few command line options:
 
-    "vroom new"
-        Write an example "slides.vroom" file. This example contains all the
-        config options and also examples of all the Vroom syntax features.
+    vroom has a few command line options:
 
-    "vroom vroom"
-        Compile (create) the slides files from the input file and start vim
-        show.
+    vroom new
 
-    "vroom compile"
-        Just compile the slides.
+      Write an example slides.vroom file. This example contains all the
+      config options and also examples of all the Vroom syntax features.
 
-    "vroom html"
-        Publish the slides to HTML, with embedded JavaScript to navigate
-        with the spacebar and backspace keys. Created in the "html/"
-        subdirectory.
+    vroom vroom
 
-    "vroom text"
-        Publish the slides to plain text. This action uses all the text
-        slides in their unsplit form. Created in the "text/" subdirectory.
+      Compile (create) the slides files from the input file and start vim
+      show.
 
-    "vroom clean"
-        Clean up all the compiled output files.
+    vroom compile
 
-    "vroom ghpublish"
-        Creates a shell script in the current directory, that is intended to
-        publish your slides to the special GitHub branch called gh-pages.
-        See [GITHUB NOTES] below.
+      Just compile the slides.
 
-        This command does NOT run the script. It merely creates it for you.
-        It is up to you to review the script and run it (if it makes sense
-        on your system).
+    vroom html
 
-    "vroom <action> --skip=#"
-        The skip option takes a number as its input and skips that number of
-        files during compilation. This is useful when you are polishing your
-        slides and are finished with the first 50. You can say:
+      Publish the slides to HTML, with embedded JavaScript to navigate with
+      the spacebar and backspace keys. Created in the html/ subdirectory.
 
-            vroom vroom --skip=50
+    vroom text
 
-        and it will start on slide #51.
+      Publish the slides to plain text. This action uses all the text
+      slides in their unsplit form. Created in the text/ subdirectory.
 
-    "vroom <action> --input=<file_name>"
-        This option lets you specify an alternate input file name, instead
-        of the default one, "slides.vroom".
+    vroom clean
+
+      Clean up all the compiled output files.
+
+    vroom ghpublish
+
+      Creates a shell script in the current directory, that is intended to
+      publish your slides to the special GitHub branch called gh-pages. See
+      [GITHUB NOTES] below.
+
+      This command does NOT run the script. It merely creates it for you.
+      It is up to you to review the script and run it (if it makes sense on
+      your system).
+
+    vroom <action> --skip=#
+
+      The skip option takes a number as its input and skips that number of
+      files during compilation. This is useful when you are polishing your
+      slides and are finished with the first 50. You can say:
+
+          vroom vroom --skip=50
+
+      and it will start on slide #51.
+
+    vroom <action> --input=<file_name>
+
+      This option lets you specify an alternate input file name, instead of
+      the default one, slides.vroom.
 
 INPUT FORMAT
+
     Here is an example slides.vroom file:
 
         ---- config
@@ -92,39 +105,40 @@ INPUT FORMAT
         # skip: 12      # Skip 12 slides. Useful when making slides.
         ---- center
         My Presentation
-
+    
         by Ingy
         ----
         == Stuff I care about:
-
+    
         * Foo
         +* Bar
         +* Baz
         ---- perl,i10
         # Perl code indented 10 spaces
         use Vroom;
-
+    
         print "Hello World";
         ---- center
         THE END
 
-    A line that starts with "==" is a header line. It will be centered.
+    A line that starts with == is a header line. It will be centered.
 
-    Lines that begin with a "+" cause vroom to split the slide there,
-    causing an animation effect.
+    Lines that begin with a + cause vroom to split the slide there, causing
+    an animation effect.
 
-    Lines that begin with a "%" are slide titles. Titles are completely
-    optional. They are used with notes files, and also for the index page if
-    you convert to HTML. You can have only one of these per slide.
+    Lines that begin with a % are slide titles. Titles are completely
+    optional. They are used with notes files, and also for the index page
+    if you convert to HTML. You can have only one of these per slide.
 
-    A line consisting of nothing but "====" indicates that what follows are
+    A line consisting of nothing but ==== indicates that what follows are
     notes for this slide. Notes are also optional. They are primarily used
     for notes files, but are also included if you convert your presentation
     to HTML. See [SLIDE NOTES] below.
 
 CONFIGURATION OPTIONS
+
     each slide can have one or more configuration options. Options are a
-    comma separated list that follow the "----" header for a slide. Like
+    comma separated list that follow the ---- header for a slide. Like
     this:
 
         ---- config
@@ -135,94 +149,112 @@ CONFIGURATION OPTIONS
         ---- skip
 
     config
-        The slide is really a yaml configuration. It will not be displayed
-        in the presentation, but will tell vroom what to do from that point
-        forward.
 
-        Usually, a "config" slide is the first thing in your input file, but
-        you can use more than one config slide.
+      The slide is really a yaml configuration. It will not be displayed in
+      the presentation, but will tell vroom what to do from that point
+      forward.
+
+      Usually, a config slide is the first thing in your input file, but
+      you can use more than one config slide.
 
     center
-        Center the contents of the slide.
 
-    "i##"
-        'i' followed by a number means to indent the contents by the number
-        of characters.
+      Center the contents of the slide.
 
-    "i-##"
-        'i' followed by a negative number means to strip that number of
-        leading characters from the contents of the slide. This can be
-        useful if you need to have characters special to Vroom at the
-        beginning of your lines, for example if the contents of your slide
-        is unified diff output.
+    i##
 
-    "perl,ruby,python,php,javascript,haskell,actionscript,html,yaml,xml,json
-    ,make,shell,diff"
-        Specifies that the slide is one of those syntaxen, and that the
-        appropriate file extension will be used, thus causing vim to syntax
-        highlight the slide.
+      'i' followed by a number means to indent the contents by the number
+      of characters.
 
-    ".<ext>"
-        You can specify any extension by putting a period in front of it.
-        Like ".md" for MarkDown.
+    i-##
+
+      'i' followed by a negative number means to strip that number of
+      leading characters from the contents of the slide. This can be useful
+      if you need to have characters special to Vroom at the beginning of
+      your lines, for example if the contents of your slide is unified diff
+      output.
+
+    perl,ruby,python,php,javascript,haskell,actionscript,html,yaml,xml,json,make,shell,diff
+
+      Specifies that the slide is one of those syntaxen, and that the
+      appropriate file extension will be used, thus causing vim to syntax
+      highlight the slide.
+
+    .<ext>
+
+      You can specify any extension by putting a period in front of it.
+      Like .md for MarkDown.
 
     include file-path-name
-        Replace the line with the contents of the specified file. Useful to
-        include long files that would make your slides file unruly.
+
+      Replace the line with the contents of the specified file. Useful to
+      include long files that would make your slides file unruly.
 
     replace
-        With the "replace" option, the '+' animations in the slide cause the
-        content to replace the previous partial slide, rather than append to
-        it.
+
+      With the replace option, the '+' animations in the slide cause the
+      content to replace the previous partial slide, rather than append to
+      it.
 
     skip
-        Ignore the following slide completely.
 
-  Config Slide Options
+      Ignore the following slide completely.
+
+ Config Slide Options
+
     You can specify the following configuration options in a config slide:
 
-    "title: <text>"
-        The title of your presentation.
+    title: <text>
 
-    "height: <number>"
-        The number of lines in the terminal you plan to use when presenting
-        the show. Used for centering the content.
+      The title of your presentation.
 
-    "width: <number>"
-        The number of columns in the terminal you plan to use when
-        presenting the show. Used for centering the content.
+    height: <number>
 
-    "auto_size: <0|1>"
-        When set to 1, the height/width options above will be ignored and
-        determined each time you start the slideshow.
+      The number of lines in the terminal you plan to use when presenting
+      the show. Used for centering the content.
 
-    "indent: <number>"
-        All slides will be indented by this number of spaces by default.
+    width: <number>
 
-    "list_indent: <number>"
-        Auto detect slides that have lists in them, and indent them by the
-        specified number of columns.
+      The number of columns in the terminal you plan to use when presenting
+      the show. Used for centering the content.
 
-    "vim: <name>"
-        You can specify the name of the vim executable to use. If you set
-        this to "gvim" special gvim support will be provided.
+    auto_size: <0|1>
+
+      When set to 1, the height/width options above will be ignored and
+      determined each time you start the slideshow.
+
+    indent: <number>
+
+      All slides will be indented by this number of spaces by default.
+
+    list_indent: <number>
+
+      Auto detect slides that have lists in them, and indent them by the
+      specified number of columns.
+
+    vim: <name>
+
+      You can specify the name of the vim executable to use. If you set
+      this to gvim special gvim support will be provided.
 
     GVim options
-        The following options are available, if your vim option is set to
-        gvim.
 
-            fuopt: maxhorz,maxvert
-            guioptions: egmLtT
-            guicursor: a:blinkon0-ver25-Cursor
-            guifont: Bitstream_Vera_Sans_Mono:h18
+      The following options are available, if your vim option is set to
+      gvim.
 
-        These are all documented by gvim's help system. Please see that for
-        more information.
+          fuopt: maxhorz,maxvert
+          guioptions: egmLtT
+          guicursor: a:blinkon0-ver25-Cursor
+          guifont: Bitstream_Vera_Sans_Mono:h18
+
+      These are all documented by gvim's help system. Please see that for
+      more information.
 
 SLIDE NOTES
+
     You can add notes to each slide, if you like. When you create your
-    presentation (with "vroom compile" or "vroom vroom"), a file called
-    "notes.txt" will be created containing all your notes, along with
+    presentation (with vroom compile or vroom vroom), a file called
+    notes.txt will be created containing all your notes, along with
     indications of when to proceed to the next slide. If you give any of
     your slides titles, they will also be put into the notes file in order
     to help you keep track of where you are in the presentation.
@@ -232,58 +264,70 @@ SLIDE NOTES
     presentation; they are just for you.
 
     However, if you convert your presentation to HTML, the notes will be
-    included in a smaller font below each slide. This is useful when sharing
-    your slides with others who were not present at the presentation.
+    included in a smaller font below each slide. This is useful when
+    sharing your slides with others who were not present at the
+    presentation.
 
 KEY MAPPINGS
-    These are the standard key mappings specified in the local ".vimrc".
 
-    "<SPACE>"
-        Advance one slide.
+    These are the standard key mappings specified in the local .vimrc.
 
-    "<BACKSPACE>"
-        Go back one slide.
+    <SPACE>
 
-    "??"
-        Bring up the help screen.
+      Advance one slide.
 
-    "RR" (or R -- deprecated)
-        If the current slide is declared Perl, Python, Ruby, PHP, Haskell or
-        JavaScript, then run it accordingly.
+    <BACKSPACE>
 
-    "QQ"
-        Quit Vroom.
+      Go back one slide.
 
-    "VV"
-        Since these vim options apply while editing the "slides.vroom" file
-        (yes, beware), you can use this shortcut to launch Vroom on the
-        current contents whilst writing your slides.
+    ??
 
-    "EE"
-        Edit the file that the cursor is on the filename of.
+      Bring up the help screen.
 
-        You can put file path names in your slides, and then easily bring
-        them up during your presentation.
+    RR (or R -- deprecated)
 
-    "OO"
-        On a Mac, run the OS X "open" command on the argument that your
-        cursor is on.
+      If the current slide is declared Perl, Python, Ruby, PHP, Haskell or
+      JavaScript, then run it accordingly.
 
-        For instance, if you want to display an image, you could put the
-        file path of the image in your slide, then use OO to launch it.
+    QQ
+
+      Quit Vroom.
+
+    VV
+
+      Since these vim options apply while editing the slides.vroom file
+      (yes, beware), you can use this shortcut to launch Vroom on the
+      current contents whilst writing your slides.
+
+    EE
+
+      Edit the file that the cursor is on the filename of.
+
+      You can put file path names in your slides, and then easily bring
+      them up during your presentation.
+
+    OO
+
+      On a Mac, run the OS X open command on the argument that your cursor
+      is on.
+
+      For instance, if you want to display an image, you could put the file
+      path of the image in your slide, then use OO to launch it.
 
 CUSTOM CONFIGURATION
-    You can create a file called ".vroom/vimrc" in your home directory. If
-    vroom sees this file, it will append it onto every local ".vimrc" file
-    it creates.
 
-    Use this file to specify your own custom vim settings for all your vroom
-    presentations.
+    You can create a file called .vroom/vimrc in your home directory. If
+    vroom sees this file, it will append it onto every local .vimrc file it
+    creates.
 
-    You can also create a file called ".vroom/gvimrc" for gvim overrides, if
+    Use this file to specify your own custom vim settings for all your
+    vroom presentations.
+
+    You can also create a file called .vroom/gvimrc for gvim overrides, if
     you are using gvim.
 
 USING MACVIM OR GVIM
+
     If you have a Mac, you really should try using MacVim for Vroom slide
     shows. You can run it in fullscreen mode, and it looks kinda
     professional.
@@ -292,48 +336,50 @@ USING MACVIM OR GVIM
 
         vim: gvim
 
-    NOTE: On my Mac, I have gvim symlinked to mvim, which is a smart startup
-    script that ships with MacVim. Ping me, if you have questions about this
-    setup.
+    NOTE: On my Mac, I have gvim symlinked to mvim, which is a smart
+    startup script that ships with MacVim. Ping me, if you have questions
+    about this setup.
 
 GITHUB NOTES
-    I(ngy) put all my public talks on github. I think it is an excellent way
-    to publish your slides and give people a url to review them. Here are
-    the things I do to make this work well:
 
-    *   I create a repository for every presentation I give. The name of the
-        repo is of the form <topic>-<event/time>-talk. You can go to
-        <http://github.com/ingydotnet/> and look for the repos ending with
-        "-talk".
+    I(ngy) put all my public talks on github. I think it is an excellent
+    way to publish your slides and give people a url to review them. Here
+    are the things I do to make this work well:
 
-    *   GitHub has a feature called gh-pages that you can use to create a
-        website for each github repo. I use this feature to publish the html
-        output of my talk. I do something like this:
+      * I create a repository for every presentation I give. The name of
+      the repo is of the form <topic>-<event/time>-talk. You can go to
+      http://github.com/ingydotnet/ and look for the repos ending with
+      -talk.
 
-            vroom html
-            mv html /tmp
-            git branch gh-pages
-            git checkout gh-pages
-            rm -r *.html
-            mv /tmp/html/* .
-            rmdir /tmp/html
-            git add .
-            git commit -m 'Publish my slides'
-            git push origin gh-pages
-            git checkout master
+      * GitHub has a feature called gh-pages that you can use to create a
+      website for each github repo. I use this feature to publish the html
+      output of my talk. I do something like this:
 
-    *   Vroom comes with a "ghpublish" option. If you run:
+          vroom html
+          mv html /tmp
+          git branch gh-pages
+          git checkout gh-pages
+          rm -r *.html
+          mv /tmp/html/* .
+          rmdir /tmp/html
+          git add .
+          git commit -m 'Publish my slides'
+          git push origin gh-pages
+          git checkout master
 
-            > vroom ghpublish
-        it will generate a script called C<ghpublish> that contains commands like the
-        ones above, to publish your slides to a gh-pages branch.
+      * Vroom comes with a ghpublish option. If you run:
 
-    *   If my repo is called "vroom-yapcna2009-talk", then after I publish
-        the talk to the gh-pages branch, it will be available as
-        <http://ingydotnet.github.com/vroom-yapcna2009-talk>. I then link
-        this url from <http://github.com/ingydotnet/vroom-yapcna2009-talk>
-        as the Homepage url.
+          > vroom ghpublish
+
+      it will generate a script called ghpublish that contains commands
+      like the ones above, to publish your slides to a gh-pages branch.
+
+      * If my repo is called vroom-yapcna2009-talk, then after I publish
+      the talk to the gh-pages branch, it will be available as
+      http://ingydotnet.github.com/vroom-yapcna2009-talk. I then link this
+      url from http://github.com/ingydotnet/vroom-yapcna2009-talk as the
+      Homepage url.
 
     You can see an example of a talk published to HTML and posted via
-    gh-pages at <http://ingydotnet.github.com/vroom-pm/>.
+    gh-pages at http://ingydotnet.github.com/vroom-pm/.
 

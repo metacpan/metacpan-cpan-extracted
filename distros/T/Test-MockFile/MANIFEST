@@ -30,6 +30,7 @@ t/mock_stat.t
 t/new_dir_interface.t
 t/open-noclose.t
 t/open.t
+t/open_strict.t
 t/opendir.t
 t/path.t
 t/plugin-filetemp.t
@@ -43,8 +44,10 @@ t/runtime-bareword-filehandles.t
 t/stat-x.t
 t/strict-rules.t
 t/strict-rules_file-temp-example.t
+t/strict-rules_scalar.t
 t/symlink.t
 t/sysopen.t
+t/sysopen_strict.t
 t/Test-MockFile_file.t
 t/touch.t
 t/unlink.t

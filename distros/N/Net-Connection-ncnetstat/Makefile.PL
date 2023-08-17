@@ -19,8 +19,9 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 		'Net::Connection'        => '0.2.0',
+		'Net::Connection::lsof'  => '0.3.0',
 		'Net::Connection::Match' => '0.5.0',
-		'Net::Connection::Sort'  => '0.0.1',
+		'Net::Connection::Sort'  => '0.1.1',
 		'Term::ANSIColor'        => '4.06',
 		'Text::ANSITable'        => '0.601',
 		'Getopt::Long'           => '0.0.0',

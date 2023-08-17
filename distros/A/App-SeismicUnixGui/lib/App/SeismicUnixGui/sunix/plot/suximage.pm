@@ -6,7 +6,7 @@ package App::SeismicUnixGui::sunix::plot::suximage;
 
 SUXIMAGE also inherits parameters from XIMAGE (See below)
 
- PACKAGE NAME:  SUXIMAGE - X-windows IMAGE plot of a segy data set	                
+ PERL PROGRAM NAME:  SUXIMAGE - X-windows IMAGE plot of a segy data set	                
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

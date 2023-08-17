@@ -55,7 +55,7 @@ use File::Spec::Functions qw(catfile);
 my $home = home();
 unless( $has_install_base ) {
 	my $path = catfile($home, 'perlpowertools');
-	print <<"HERE";
+	print <<"HERE" unless caller();
 ----------------------------------------------------------------------
 Welcome to Perl Power Tools (http://www.perlpowertools.com).
 
@@ -118,14 +118,15 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'IPC::Run3'  => '0',
-		'Test::More' => '1',
+		'IPC::Run3'      => '0',
+		'Test::More'     => '1',
+		'Test::Pod'      => '0',
+		'Test::Warnings' => '0',
 		},
 
 	'PREREQ_PM'     => {
 		'App::a2p'       => '0',
 		'App::find2perl' => '0',
-		'MIME::Parser'   => '0',
 		},
 
 	'META_MERGE' => {
@@ -133,7 +134,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {
@@ -144,8 +145,12 @@ my %WriteMakefile = (
 		},
 
 	clean => { FILES => "$dist-*" },
+	test => {TESTS => 't/*.t t/*/*.t'}
 	);
 
+# This module uses Test::Deep, which has a dependency that requires
+# v5.12.
+$WriteMakefile{PREREQ_PM}{'MIME::Parser'} = 0 if $] >= 5.012;
 
 sub arguments { \%WriteMakefile }
 

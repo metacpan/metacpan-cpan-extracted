@@ -24,3 +24,6 @@ foo._domainkey.vmt2.cis.att.net  v=DKIM1; k=rsa; n=send%20comments%20to%20tony%4
 nonexistent._domainkey.messiah.edu NXDOMAIN
 test3._domainkey.blackhole.messiah.edu ~~Query timed out~~
 test3._domainkey.blackhole2.messiah.edu ~~SERVFAIL~~
+2023-05-ed25519._domainkey.wander.science  v=DKIM1; k=ed25519; p=pP+YUyRjAvKha4Oc49KAY703oLUS1NLMEuGD3IHMKww=
+2023-05-ed25519-empty._domainkey.wander.science  ""
+invalid._domainkey.wander.science  v=DKIM1; k=ed25519; p=MCowBQYDK2VwAyEA3SUqa9UbfciWkk7tlcJ9P1VD5pXAasg0JUn/OgjVbKE=

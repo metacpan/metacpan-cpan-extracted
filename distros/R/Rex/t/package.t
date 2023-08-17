@@ -5,39 +5,60 @@ use warnings;
 
 our $VERSION = '9999.99.99_99'; # VERSION
 
-use Test::More tests => 5;
+use Test::More tests => 2;
+use Test::Deep;
+use Test::Exception;
 
-use Rex::Pkg::Base;
+use Rex::Pkg::Test;
 
-my $pkg = Rex::Pkg::Base->new;
+my $pkg = Rex::Pkg::Test->new;
 
-my @plist1 = (
-  { name => 'vim', version => '1.0' },
-  { name => 'mc',  version => '2.0' },
-  { name => 'rex', version => '0.51.0' },
-);
+subtest 'package list diffs' => sub {
+  plan tests => 1;
 
-my @plist2 = (
-  { name => 'vim',       version => '1.0' },
-  { name => 'rex',       version => '0.52.0' },
-  { name => 'libssh2-1', version => '0.32.1' },
-);
+  ## no critic (ProhibitDuplicateLiteral)
 
-my @mods = $pkg->diff_package_list( \@plist1, \@plist2 );
+  my @plist1 = (
+    { name => 'vim', version => '1.0' },
+    { name => 'mc',  version => '2.0' },
+    { name => 'rex', version => '0.51.0' },
+  );
 
-my $found_vim = grep { $_->{name} eq "vim" } @mods;
-is( $found_vim, 0, "vim was not modified" );
+  my @plist2 = (
+    { name => 'vim',       version => '1.0' },
+    { name => 'rex',       version => '0.52.0' },
+    { name => 'libssh2-1', version => '0.32.1' },
+  );
 
-my ($found_rex) = grep { $_->{name} eq "rex" } @mods;
-is( $found_rex->{action}, "updated", "rex was updated" );
+  my @expected = (
+    {
+      action  => 'updated',
+      name    => 'rex',
+      version => '0.52.0',
+    },
+    {
+      action  => 'removed',
+      name    => 'mc',
+      version => '2.0',
+    },
+    {
+      action  => 'installed',
+      name    => 'libssh2-1',
+      version => '0.32.1',
+    },
+  );
 
-my ($found_libssh2) = grep { $_->{name} eq "libssh2-1" } @mods;
-is( $found_libssh2->{action}, "installed", "libssh2-1 was installed" );
+  ## use critic
 
-my ($found_mc) = grep { $_->{name} eq "mc" } @mods;
-is( $found_mc->{action}, "removed", "mc was removed" );
+  my @mods = $pkg->diff_package_list( \@plist1, \@plist2 );
 
-my $leftover_found = scalar grep { defined $_->{found} } @mods;
-is( $leftover_found, 0, 'no internal found marker left' );
+  cmp_deeply( \@mods, \@expected, 'expected package modifications' );
+};
+
+subtest 'local package installation' => sub {
+  plan tests => 1;
+
+  lives_ok { $pkg->update('test_package') }, 'update test package';
+};
 
 1;

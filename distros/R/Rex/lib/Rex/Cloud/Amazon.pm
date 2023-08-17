@@ -11,7 +11,7 @@ package Rex::Cloud::Amazon;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 use Rex::Logger;
 use Rex::Cloud::Base;
@@ -322,7 +322,7 @@ sub _make_instance_map {
     private_ip => $_[1]->{"privateIpAddress"},
     (
       security_group => ref $_[1]->{"groupSet"}->{"item"} eq 'ARRAY' ? join ',',
-      map { $_->{groupName} } @{ $_[1]->{"groupSet"}->{"item"} }
+        map { $_->{groupName} } @{ $_[1]->{"groupSet"}->{"item"} }
       : $_[1]->{"groupSet"}->{"item"}->{"groupName"}
     ),
     (

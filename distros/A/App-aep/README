@@ -1,6 +1,3 @@
-NAME
-    App::aep - Advanced Entry Point (for docker and other containers)
-
 SYNOPSIS
         From within your dockerfile, simply use cpan or cpanm to add App::aep
 
@@ -180,7 +177,7 @@ BUGS
 
     You may also catch up to the author 'daemon' on IRC:
 
-    * irc.freenode.net
+    * irc.libera.org
 
     * #perl
 
@@ -188,7 +185,7 @@ AUTHOR
     Paul G Webster <daemon@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by Paul G Webster.
+    This software is copyright (c) 2023 by Paul G Webster.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

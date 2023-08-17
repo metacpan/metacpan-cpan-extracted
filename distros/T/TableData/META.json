@@ -50,15 +50,15 @@
    "provides" : {
       "TableData" : {
          "file" : "lib/TableData.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
       },
       "TableData::Test::Spec::Basic" : {
          "file" : "lib/TableData/Test/Spec/Basic.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
       },
       "TableDataRole::Spec::Basic" : {
          "file" : "lib/TableDataRole/Spec/Basic.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-TableData"
       }
    },
-   "version" : "0.2.2",
+   "version" : "0.2.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -296,7 +296,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
             "name" : "@Author::PERLANCAR/OurDate",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDist",
@@ -435,7 +435,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.784"
+                        "version" : "0.786"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

@@ -4,32 +4,32 @@ NAME
 
 SYNOPSIS
 
-      # In app.psgi
-      use Plack::Builder;
+        # In app.psgi
+        use Plack::Builder;
     
-      builder {
-          enable "TrafficLog", with_body => 1;
-      };
+        builder {
+            enable "TrafficLog", with_body => 1;
+        };
 
 DESCRIPTION
 
     This middleware logs the request and response messages with detailed
-    information about headers and body.
+    information about headers and the body.
 
     The example log:
 
-      [08/Aug/2012:16:59:47 +0200] [164836368] [127.0.0.1 -> 0:5000] [Request ]
-      |GET / HTTP/1.1|Connection: TE, close|Host: localhost:5000|TE: deflate,gzi
-      p;q=0.3|User-Agent: lwp-request/6.03 libwww-perl/6.03||
-      [08/Aug/2012:16:59:47 +0200] [164836368] [127.0.0.1 <- 0:5000] [Response]
-      |HTTP/1.0 200 OK|Content-Type: text/plain||Hello World
+        [08/Aug/2012:16:59:47 +0200] [164836368] [127.0.0.1 -> 0:5000] [Request ]
+        |GET / HTTP/1.1|Connection: TE, close|Host: localhost:5000|TE: deflate,gzi
+        p;q=0.3|User-Agent: lwp-request/6.03 libwww-perl/6.03||
+        [08/Aug/2012:16:59:47 +0200] [164836368] [127.0.0.1 <- 0:5000] [Response]
+        |HTTP/1.0 200 OK|Content-Type: text/plain||Hello World
 
-    This module works also with applications which have delayed response.
-    In that case each chunk is logged separately and shares the same unique
+    This module works also with applications that have delayed response. In
+    that case, each chunk is logged separately and shares the same unique
     ID number and headers.
 
-    The body of request and response is not logged by default. For
-    streaming responses only first chunk is logged by default.
+    The body of the request and response is not logged by default. For
+    streaming responses, only the first chunk is logged by default.
 
 SEE ALSO
 
@@ -37,10 +37,10 @@ SEE ALSO
 
 BUGS
 
-    This module has unstable API and it can be changed in future.
+    This module has an unstable API and it can be changed in the future.
 
-    The log file can contain the binary data if the PSGI server provides
-    binary files.
+    The log file can contain binary data if the PSGI server provides binary
+    files.
 
     If you find the bug or want to implement new features, please report it
     at http://github.com/dex4er/perl-Plack-Middleware-TrafficLog/issues
@@ -54,7 +54,7 @@ AUTHOR
 
 LICENSE
 
-    Copyright (c) 2012, 2014-2015 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2012, 2014-2015, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

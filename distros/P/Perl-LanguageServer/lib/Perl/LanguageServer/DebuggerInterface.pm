@@ -54,6 +54,16 @@ BEGIN {
   @skippkg = ();
   $usrctxt = '';
   $evalarg = '';
+
+  # scan args for stdin redirect
+  for (my $i=0; $i <= $#ARGV; $i++) {
+    if ($ARGV[$i] eq "<" && $i < $#ARGV) {
+      # open stdin from file
+      open STDIN, "<", $ARGV[$i+1] or die "open stdin";
+      # remove from ARGV
+      splice @ARGV, $i, 2;
+    }
+  }
 }
 
 ####
@@ -1479,6 +1489,19 @@ package DB
 
 # ---------------------------------------------------------------------------
 
+sub req_source
+    {
+    my ($class, $params) = @_ ;
+
+    my $filename    = $params -> {filename} ;
+    my $source = join("", @{$main::{'_<'.$filename}});
+    $source =~ s/\n;$//;
+	  
+    return { content => $source };
+    }
+
+# ---------------------------------------------------------------------------
+
 sub req_can_break
     {
     my ($class, $params) = @_ ;
@@ -1692,6 +1715,12 @@ sub init
     my $remote ;
     my $port ;
     ($remote, $port) = split /:/, $ENV{PLSDI_REMOTE} ;
+    if ($remote =~ m/^([0-9.]+)$/) {
+      $remote = $1; # untaint
+    }
+    if ($port =~ m/^(\d+)$/) {
+      $port = $1; # untaint
+    }
 
     $socket = IO::Socket::INET->new(PeerAddr => $remote,
                                     PeerPort => $port,

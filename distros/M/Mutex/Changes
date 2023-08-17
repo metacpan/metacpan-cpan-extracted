@@ -1,6 +1,14 @@
 
 Revision history for Perl module Mutex.
 
+1.009 Tue Jun 06 12:00:00 EST 2023
+
+  * Improved reliability on the Windows platform.
+
+1.008 Wed May 31 19:00:00 EST 2023
+
+  * Improved reliability on the Windows platform.
+
 1.007 Mon Oct 10 04:00:00 EST 2022
 
   * Improved reliability on the Windows platform.

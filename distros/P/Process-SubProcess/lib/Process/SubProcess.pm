@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 # @author Bodo (Hugo) Barwich
-# @version 2023-05-30
+# @version 2023-08-06
 # @package SubProcess Management
 # @subpackage Process/SubProcess.pm
 
 # This Module defines the Class to manage a Subprocess and read its Output and Errors
-# It forks the Main Process to execute the Sub Process Funcionality
+# It launches the Command with IPC::Open3
 #
 #---------------------------------
 # Requirements:
@@ -31,7 +31,8 @@ package Process::SubProcess;
 #----------------------------------------------------------------------------
 #Dependencies
 
-use Exporter 'import';    # gives you Exporter's import() method directly
+use version;
+use Exporter qw(import);    # gives you Exporter's import() method directly
 
 our @EXPORT_OK = qw(runSubProcess);    # symbols to export on request
 
@@ -44,7 +45,7 @@ use IO::Select;
 use IPC::Open3;
 use Symbol qw(gensym);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.1.3';
 
 =head1 DESCRIPTION
 
@@ -58,8 +59,8 @@ for simultaneous execution of multiple Sub Processes while keeping the execution
 separated.
 
 =cut
-# =head1 OVERVIEW
 
+# =head1 OVERVIEW
 
 #----------------------------------------------------------------------------
 #Static Methods
@@ -77,13 +78,13 @@ use constant FLAG_ANYOUT => 3;
 
 This creates adhoc an C<Process::SubProcess> Object and runs the command given as string.
 
-C<COMMAND> - is a single scalar parameter will be interpreted as command to execute
+C<COMMAND> - is a single scalar parameter will be interpreted as command to executed
 without any additional options.
 
 C<OPTIONS> - are passed in a hash like fashion, using key and value pairs.
 Combining the command with additional C<OPTIONS> also requires the hash key C<command> to be set.
 
-See L<Method C<setArrProcess()>>
+See L<Method C<setArrProcess()>|/"setArrProcess ( CONFIGURATIONS )">
 
 =back
 
@@ -145,7 +146,7 @@ B<Parameters:>
 
 C<CONFIGURATIONS> are passed in a hash like fashion, using key and value pairs.
 
-See L<Method C<setArrProcess()>>
+See L<Method C<setArrProcess()>|/"setArrProcess ( CONFIGURATIONS )">
 
 =back
 
@@ -243,11 +244,13 @@ If the process is expected to run longer it is useful to set it to avoid excessi
 It is also important for multiple process execusions, because other processes will not
 be checked before the read has not timed out.
 
-See L<Method C<setName()>>
+See L<Method C<setName()>|/"setName ( NAME )">
 
-See L<Method C<setCommand()>>
+See L<Method C<setCommand()>|/"setCommand ( COMMAND )">
 
-See L<Method C<setReadTimeout()>>
+See L<Method C<setTimeout()>|/"setTimeout ( TIMEOUT )">
+
+See L<Method C<setReadTimeout()>|/"setReadTimeout ( TIMEOUT )">
 
 =back
 
@@ -285,7 +288,7 @@ sub setArrProcess {
 
 Shorthand for C<setArrProcess()>
 
-See L<Method C<setArrProcess()>>
+See L<Method C<setArrProcess()>|/"setArrProcess ( CONFIGURATIONS )">
 
 =back
 
@@ -305,11 +308,14 @@ sub set {
 
 This Method will asign a Name to the process.
 
+The C<NAME> of the C<Process::SubProcess> object will reflect in the logs.
+
+This is useful when there are several processes with the same command running and
+a more prettier readable name is desired.
+
 B<Parameters:>
 
 C<NAME> - is a string that will be assigned as the process name.
-This is useful when there are several processes with the same command running and
-a more prettier readable name is desired.
 
 =back
 
@@ -336,7 +342,11 @@ This method sets the C<COMMAND> property as string that represents the command t
 
 It can only be set when the Sub Process is not running.
 
-See L<Method C<Launch()>>
+B<Parameters:>
+
+C<COMMAND> - is a single scalar parameter that will be interpreted as command to executed
+
+See L<Method C<Launch()>|/"Launch ()">
 
 =back
 
@@ -371,7 +381,7 @@ It is also important for multiple process execusions, because other processes wi
 be checked before the read has not timed out.
 It can only be set when the Sub Process is not running.
 
-See L<Method C<Launch()>>
+See L<Method C<Launch()>|/"Launch ()">
 
 =back
 
@@ -417,7 +427,9 @@ be terminated.
 The C<EXECUTIONTIMEOUT> property must be a positive numeric value. Setting it to a
 negative value C< -1 > will disable the Execution Timeout
 
-See L<Method C<Launch()>>
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<Terminate()>|/"Terminate ()">
 
 =back
 
@@ -501,10 +513,10 @@ Property.
 Per default this the process runs asynchronously. The L<Wait()> method is used to
 monitor its execution and read its outputs
 
-B<Returns:> It returns C< 1 > when the indices and aliases are created and verified as correct.
-Otherwise it returns C< 0 >.
+B<Returns:> It returns C< 1 > when the process was launched correctly.
+otherwise it returns C< 0 >.
 
-See L<Method C<Wait()>>
+See L<Method C<Check()>|/"Check ()">
 
 =back
 
@@ -658,6 +670,24 @@ sub Launch {
 
     return $irs;
 }
+
+=pod
+
+=over 4
+
+=item Check ()
+
+This method checks whether the process is finished and calls the C<Read()> method to
+read its output.
+
+B<Returns:> It returns C< 1 > when the process is still running
+otherwise it returns C< 0 >.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+=back
+
+=cut
 
 sub Check {
     my $self = $_[0];
@@ -818,8 +848,9 @@ sub Check {
         {
             if ( $self->{"_process_status"} < 0 ) {
 
-      #------------------------
-      #The Child Process ID was captured but no Process Status Code was captured
+					      #------------------------
+					      # The Child Process ID was captured
+					      # but no Process Status Code was captured
 
                 $self->{"_error_message"} .=
                   "Sub Process ${sprcnm}: Process does not exist.\n";
@@ -843,6 +874,28 @@ sub Check {
     #Return the Check Result
     return $irng;
 }
+
+=pod
+
+=over 4
+
+=item Read ()
+
+This method reads the C<STDOUT> and C<STDERR> outputs from a running process
+which was started with the C<Launch()> method.
+
+When the process is not started yet it does not do anything.
+
+If a C<TIMEOUT> is set through the C<setReadTimeout()> method the B<Manager Process> keeps
+waiting for output until the C<TIMEOUT> is fulfilled.
+
+See L<Method C<setReadTimeout()>|/"setReadTimeout ( TIMEOUT )">
+
+See L<Method C<Launch()>|/"Launch ()">
+
+=back
+
+=cut
 
 sub Read {
     my $self = $_[0];
@@ -983,6 +1036,35 @@ sub Read {
          #	&& $self->{"_pid"} > 0)
 }
 
+=pod
+
+=over 4
+
+=item Wait ()
+
+This method calls the C<Check()> method continuously for a started process
+which was started with the C<Launch()> method until the C<Check()> method tells that
+the process is finished.
+
+If a C<TIMEOUT> is set through the C<setTimeout()> method the B<Manager Process> will
+terminate the process after the C<TIMEOUT> is fulfilled.
+When a process times out an B<Error Code> of C< 4 > will be set.
+
+B<Returns:> It returns C< 1 > when the process has finished correctly.
+It returns C< 0 > when the process had to be terminated.
+
+See L<Method C<Check()>|/"Check ()">
+
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<Terminate()>|/"Terminate ()">
+
+See L<Method C<setTimeout()>|/"setTimeout ( TIMEOUT )">
+
+=back
+
+=cut
+
 sub Wait {
     my $self = $_[0];
 
@@ -1060,6 +1142,26 @@ sub Wait {
     return $irs;
 }
 
+=pod
+
+=over 4
+
+=item Run ()
+
+This method starts the process calling the C<Launch()> method and then calls
+the C<Wait()> method to wait until the process is finished.
+
+B<Returns:> It returns C< 1 > when the process was started and finished correctly.
+It returns C< 0 > when the process could not be started or had to be terminated.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<Wait()>|/"Wait ()">
+
+=back
+
+=cut
+
 sub Run {
     my $self = $_[0];
 
@@ -1090,6 +1192,26 @@ sub Run {
 
     return $irs;
 }
+
+=pod
+
+=over 4
+
+=item Terminate ()
+
+This method sends a C<TERM> signal to the process if it is running.
+And then checks the process with the C<Check()> method.
+
+It is used by the B<EXECUTIONTIMEOUT> functionality to ensure that the process does not
+run longer than required.
+
+See L<Method C<Check()>|/"Check ()">
+
+See L<Method C<setTimeout()>|/"setTimeout ()">
+
+=back
+
+=cut
 
 sub Terminate {
     my $self   = $_[0];
@@ -1177,16 +1299,48 @@ sub clearErrors() {
 #----------------------------------------------------------------------------
 #Consultation Methods
 
-sub getProcessID {
-    my $self = shift;
+=pod
 
-    return $self->{"_pid"};
+=over 4
+
+=item getProcessID
+
+This Method will return the B<ProcessID> of the process which was assigned by the system
+at launch time.
+
+If the process was not launched yet it will return C< -1 >.
+
+B<Returns:> The B<ProcessID> of the process assigned by the system.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+=back
+
+=cut
+
+sub getProcessID {
+    return $_[0]->{"_pid"};
 }
 
-sub getName {
-    my $self = shift;
+=pod
 
-    return $self->{"_name"};
+=over 4
+
+=item getName
+
+This Method will return the Name to the C<Process::SubProcess> object if any was assigned
+with the C<setName()> method.
+
+B<Returns:> The C<NAME> of the C<Process::SubProcess> object as string.
+
+See L<Method C<setName()>|/"setName ( NAME )">
+
+=back
+
+=cut
+
+sub getName {
+    return $_[0]->{"_name"};
 }
 
 sub getNameComplete {

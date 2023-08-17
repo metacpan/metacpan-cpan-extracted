@@ -73,9 +73,15 @@ fi
 if which direnv > /dev/null; then
   eval "\$(direnv export bash)"
 fi
-PERL=perl
 if which asdf > /dev/null; then
-  PERL="asdf exec perl"
+  ASDF_DIR=\$(asdf info | grep ASDF_DIR | cut -d= -f2)
+  source "\$ASDF_DIR/asdf.sh"
+fi
+PERL=perl
+if which carmel > /dev/null; then
+  PERL='carmel exec -- perl'
+elif which carton > /dev/null; then
+  PERL='carton exec -- perl'
 fi
 export PERL5LIB=@{[$lib // '']}:\$PERL5LIB
 \$PERL -c $script

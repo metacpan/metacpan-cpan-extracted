@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2023 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -39,7 +39,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.085'; # our $VERSION = '';
+$VERSION = '0.095'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -158,13 +158,13 @@ sub sim
 	my $skipreport = $vals{skipreport};
   my %notecases;
 
-  my @trieds; say $tee "HEARE IN SIM \@precedents: " . dump( \@precedents );
+  my @trieds; say $tee "HERE IN SIM \@precedents: " . dump( \@precedents );
   foreach $prec_r ( @precedents )
   {
     my %prec = %{ $prec_r };
     my %to = %{ $prec{to} };
     push ( @trieds, $to{cleanto} );
-  } say $tee "HEARE IN SIM \@trieds: " . dump( \@trieds );
+  } say $tee "HERE IN SIM \@trieds: " . dump( \@trieds );
 
   my @allinstances = @instances ;
   push( @allinstances, @precedents );
@@ -237,7 +237,7 @@ sub sim
             my $launchline;
             if ( ( -e "../tmp/*.res" ) or ( -e "../tmp/*.fl" ) or ( -e "../tmp/*.mfr" ) )
             {
-              $launchline = "rm ../tmp/*.res \n rm ../tmp/*.fl \n rm ../tmp/*.mfr \n cd $simelt/cfg/ \n bps -file $fileconfig -mode script";
+              $launchline = "rm ../tmp/*.res \n rm ../tmp/*.fl \n rm ../tmp/*.mfr \n cd $simelt/tmp/ \n bps -file $fileconfig -mode script";
             }
             else
             {
@@ -258,9 +258,9 @@ sub sim
                 my $fileconfigroot = $fileconfig;
                 $fileconfigroot =~ s/\.cfg//;
                 $resfile = "$simelt/tmp/$fileconfigroot.res";
-                $flfile = "$simelt/tmp/$fileconfigroot.mfr";
+                $flfile = "$simelt/tmp/$fileconfigroot.fl";
                 $shortresfile = "$fileconfigroot.res";
-                $shortflfile = "$fileconfigroot.mfr";
+                $shortflfile = "$fileconfigroot.fl";
               }
 
               open( SIMLIST, ">$simlist") or die( "$!" );
@@ -292,7 +292,10 @@ sub sim
                   if ( $simnetwork eq "y" )
                   {
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile and $flfile." ;
-                    my $printthis =
+                    my $printthis;
+                    if ( $step > 1 )
+                    {                    
+                      $printthis =
 "$launchline<<XXX
 
 c
@@ -315,6 +318,32 @@ y
 -
 XXX
   ";
+                      }
+                      else
+                      {
+$printthis =
+"$launchline<<XXX
+
+c
+$shortresfile
+$shortflfile
+$begin
+$end
+$before
+$step
+s
+y
+Results for $simelt-$dates_to_sim
+y
+y
+-
+-
+-
+-
+-
+XXX
+  ";                        
+                    }
 
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\ $printthis";
                     if ($exeonfiles eq "y")

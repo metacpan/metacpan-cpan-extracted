@@ -5,7 +5,7 @@ SYNOPSIS
      use Tags::HTML::Pager;
 
      my $obj = Tags::HTML::Pager->new(%params);
-     $obj->process($pager_hr);
+     $obj->process($pages_hr);
      $obj->process_css;
 
 METHODS
@@ -53,7 +53,15 @@ METHODS
 
             Callback for creating of url for view page.
 
-            Input argument is page variable with number of page.
+            Input arguments are:
+
+            *   $page_number
+
+                Page variable with number of page.
+
+            *   $pages_hr
+
+                Reference to array which is going to "process".
 
             It's required parameter.
 
@@ -64,7 +72,7 @@ METHODS
             Default value is undef.
 
   "process"
-     $obj->process($pager_hr);
+     $obj->process($pages_hr);
 
     Process Tags structure for output with pager.
 
@@ -191,10 +199,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

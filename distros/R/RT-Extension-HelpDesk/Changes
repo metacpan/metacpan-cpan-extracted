@@ -1,4 +1,7 @@
 Revision history for RT-Extension-HelpDesk
 
+0.02 2023-07-20
+ - Add missing statuses in mapping between default and support lifecycles
+
 0.01 2021-03-30
  - Initial version

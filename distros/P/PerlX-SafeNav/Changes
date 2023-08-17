@@ -1,0 +1,15 @@
+Revision history for perl distribution PerlX-SafeNav
+
+0.004     2023-07-13 08:02:54-0400
+   - support older versions of perls: https://github.com/gugod/PerlX-SafeNav/pull/4
+
+0.003     2023-07-05 09:12:29+0900
+   - Adds `safenav` block syntax.
+
+0.002     2023-07-05 01:00:58+0900
+   - Introduction of the `safenav` pragma, which provides an alternative interface.
+
+0.001     2023-06-25 21:58:11+0900
+   - The first release of PerlX-SafeNav
+   - Minimum implementation that supports a safnav chain of method calls, array fetches and hash fetches.
+   - Most likely very buggy.

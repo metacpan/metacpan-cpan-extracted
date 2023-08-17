@@ -55,13 +55,13 @@ sub new {
 # @param int $version_id Integer identifying a service version. (required)
 # @param string $name The name for the real-time logging configuration. (optional)
 # @param LoggingPlacement $placement  (optional)
-# @param LoggingFormatVersion $format_version  (optional)
 # @param string $format A Fastly [log format string](https://docs.fastly.com/en/guides/custom-log-formats). Must produce valid JSON that Kinesis can ingest. (optional, default to '{"timestamp":"%{begin:%Y-%m-%dT%H:%M:%S}t","time_elapsed":"%{time.elapsed.usec}V","is_tls":"%{if(req.is_ssl, \"true\", \"false\")}V","client_ip":"%{req.http.Fastly-Client-IP}V","geo_city":"%{client.geo.city}V","geo_country_code":"%{client.geo.country_code}V","request":"%{req.request}V","host":"%{req.http.Fastly-Orig-Host}V","url":"%{json.escape(req.url)}V","request_referer":"%{json.escape(req.http.Referer)}V","request_user_agent":"%{json.escape(req.http.User-Agent)}V","request_accept_language":"%{json.escape(req.http.Accept-Language)}V","request_accept_charset":"%{json.escape(req.http.Accept-Charset)}V","cache_status":"%{regsub(fastly_info.state, \"^(HIT-(SYNTH)|(HITPASS|HIT|MISS|PASS|ERROR|PIPE)).*\", \"\\2\\3\") }V"}')
 # @param string $topic The Amazon Kinesis stream to send logs to. Required. (optional)
 # @param AwsRegion $region  (optional)
 # @param string $secret_key The secret key associated with the target Amazon Kinesis stream. Not required if &#x60;iam_role&#x60; is specified. (optional)
 # @param string $access_key The access key associated with the target Amazon Kinesis stream. Not required if &#x60;iam_role&#x60; is specified. (optional)
 # @param string $iam_role The ARN for an IAM role granting Fastly access to the target Amazon Kinesis stream. Not required if &#x60;access_key&#x60; and &#x60;secret_key&#x60; are provided. (optional)
+# @param int $format_version The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;.  (optional, default to 2)
 {
     my $params = {
     'service_id' => {
@@ -81,11 +81,6 @@ sub new {
     },
     'placement' => {
         data_type => 'LoggingPlacement',
-        description => '',
-        required => '0',
-    },
-    'format_version' => {
-        data_type => 'LoggingFormatVersion',
         description => '',
         required => '0',
     },
@@ -117,6 +112,11 @@ sub new {
     'iam_role' => {
         data_type => 'string',
         description => 'The ARN for an IAM role granting Fastly access to the target Amazon Kinesis stream. Not required if &#x60;access_key&#x60; and &#x60;secret_key&#x60; are provided.',
+        required => '0',
+    },
+    'format_version' => {
+        data_type => 'int',
+        description => 'The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;. ',
         required => '0',
     },
     };
@@ -181,11 +181,6 @@ sub create_log_kinesis {
     }
 
     # form params
-    if ( exists $args{'format_version'} ) {
-                $form_params->{'format_version'} = $self->{api_client}->to_form_value($args{'format_version'});
-    }
-
-    # form params
     if ( exists $args{'format'} ) {
                 $form_params->{'format'} = $self->{api_client}->to_form_value($args{'format'});
     }
@@ -213,6 +208,11 @@ sub create_log_kinesis {
     # form params
     if ( exists $args{'iam_role'} ) {
                 $form_params->{'iam_role'} = $self->{api_client}->to_form_value($args{'iam_role'});
+    }
+
+    # form params
+    if ( exists $args{'format_version'} ) {
+                $form_params->{'format_version'} = $self->{api_client}->to_form_value($args{'format_version'});
     }
 
     my $_body_data;
@@ -518,6 +518,109 @@ sub list_log_kinesis {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ARRAY[LoggingKinesisResponse]', $response);
+    return $_response_object;
+}
+
+#
+# update_log_kinesis
+#
+# Update the Amazon Kinesis log endpoint
+#
+# @param string $service_id Alphanumeric string identifying the service. (required)
+# @param int $version_id Integer identifying a service version. (required)
+# @param string $logging_kinesis_name The name for the real-time logging configuration. (required)
+{
+    my $params = {
+    'service_id' => {
+        data_type => 'string',
+        description => 'Alphanumeric string identifying the service.',
+        required => '1',
+    },
+    'version_id' => {
+        data_type => 'int',
+        description => 'Integer identifying a service version.',
+        required => '1',
+    },
+    'logging_kinesis_name' => {
+        data_type => 'string',
+        description => 'The name for the real-time logging configuration.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_log_kinesis' } = {
+        summary => 'Update the Amazon Kinesis log endpoint',
+        params => $params,
+        returns => 'LoggingKinesisResponse',
+        };
+}
+# @return LoggingKinesisResponse
+#
+sub update_log_kinesis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'service_id' is set
+    unless (exists $args{'service_id'}) {
+      croak("Missing the required parameter 'service_id' when calling update_log_kinesis");
+    }
+
+    # verify the required parameter 'version_id' is set
+    unless (exists $args{'version_id'}) {
+      croak("Missing the required parameter 'version_id' when calling update_log_kinesis");
+    }
+
+    # verify the required parameter 'logging_kinesis_name' is set
+    unless (exists $args{'logging_kinesis_name'}) {
+      croak("Missing the required parameter 'logging_kinesis_name' when calling update_log_kinesis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/service/{service_id}/version/{version_id}/logging/kinesis/{logging_kinesis_name}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/x-www-form-urlencoded');
+
+    # path params
+    if ( exists $args{'service_id'}) {
+        my $_base_variable = "{" . "service_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'service_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'version_id'}) {
+        my $_base_variable = "{" . "version_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'version_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'logging_kinesis_name'}) {
+        my $_base_variable = "{" . "logging_kinesis_name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'logging_kinesis_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(token )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('LoggingKinesisResponse', $response);
     return $_response_object;
 }
 

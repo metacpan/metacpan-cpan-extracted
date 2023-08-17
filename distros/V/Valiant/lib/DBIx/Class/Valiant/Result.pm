@@ -138,6 +138,11 @@ sub insert {
   }
 
   $args{context} = \@context;
+  debug 2, "Checking if row for insert is marked for deletion @{[$self]}";
+  if($self->is_marked_for_deletion) {
+    debug 2, "Skipping insert for @{[$self]} because its marked for deletion";
+    return $self;
+  }
 
   debug 2, "About to run validations for @{[$self]} on insert";
   $self->validate(%args) if $self->auto_validation;
@@ -208,7 +213,7 @@ sub update {
 
   if(grep { defined $_ } values %found) {
     my $related = join(', ', grep { $found{$_} } keys %found);
-    die "You are trying to create a relationship ($related) without setting 'accept_nested_for'";
+    die "You are trying to create a relationship ($related) on @{[ $self ]} without setting 'accept_nested_for'";
   }
 
   my %validate_args = (context => \@context) if @context;
@@ -240,6 +245,12 @@ sub update {
     $self->set_related_from_params($related, $related{$related});
 
     delete $self->{_valiant_nested_info};
+  }
+
+  debug 2, "Checking if row for update is marked for deletion @{[$self]}";
+  if($self->is_marked_for_deletion) {
+    debug 2, "Skipping update for @{[$self]} because its marked for deletion";
+    return $self;
   }
 
   debug 2, "About to run validations for @{[$self]} on update";
@@ -361,6 +372,13 @@ sub read_attribute_for_validation {
 sub read_attribute_for_html {
   my ($self, $attribute) = @_;
 
+  return $self->is_marked_for_deletion if $attribute eq '_delete';
+  return 1 if $attribute eq '_add';
+  return $self->read_attribute_for_validation($attribute);
+}
+
+sub get_attribute_for_json {
+  my ($self, $attribute) = @_;
   return $self->is_marked_for_deletion if $attribute eq '_delete';
   return 1 if $attribute eq '_add';
   return $self->read_attribute_for_validation($attribute);
@@ -646,7 +664,7 @@ sub set_multi_related_from_params {
   debug 2, "starting loop to update/create related $related (total @{[ scalar @param_rows ]} rows in loop)";
   foreach my $param_row (@param_rows) {
     debug 3, "top of new loop on param_rows";
-    if($param_row->{_nop}) {
+    if(exists $param_row->{_nop}) {
       debug 3, "Is a NOP row, so skipping";
       next;
     }

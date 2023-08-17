@@ -58,6 +58,7 @@ t/NV_overloading.t
 t/out_str.t
 t/overload.t
 t/overload_cross_class.t
+t/overload_op_eq.t
 t/overload_switch.t
 t/printf.t
 t/PV_NV_BUG.t

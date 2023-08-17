@@ -342,7 +342,7 @@ WIN32 URIS
     look for a signature 'X:\', '\' or 'file:' at the start of each URI to
     see if you are referring to a file or another type of URI.
 
-    Note that you must use '"file:///C:\blah"' with *3 slashes* otherwie
+    Note that you must use '"file:///C:\blah"' with *3 slashes* otherwise
     '"C:"' will become your *host*, which is probably not what you want. See
     URI::file for more details.
 

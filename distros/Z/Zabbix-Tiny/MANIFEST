@@ -14,6 +14,8 @@ examples/zabbix_tiny_example.pl
 lib/Zabbix/Tiny.pm
 minil.toml
 t/000_compile.t
+t/002_new.t
+t/005_login.t
 t/010_test_lwp_useragent.t
 t/020_apiinfo.version.t
 t/030_empty_response.t

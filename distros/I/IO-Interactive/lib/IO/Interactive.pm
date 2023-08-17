@@ -4,7 +4,7 @@ package IO::Interactive;
 use strict;
 use warnings;
 
-$IO::Interactive::VERSION = '1.023';
+$IO::Interactive::VERSION = '1.025';
 
 sub is_interactive {
     my ($out_handle) = (@_, select);    # Default to default output handle
@@ -187,14 +187,16 @@ test is considerably more sophisticated than:
 
 as it takes into account the magic behaviour of C<*ARGV>.
 
-You can also pass C<is_interactive> a writable filehandle, in which case it
-requires that filehandle be connected to a terminal (instead of the
-currently selected).  The usual suspect here is C<*STDERR>:
+You can also pass C<is_interactive> a writable filehandle, in which
+case it requires that filehandle be connected to a terminal (instead
+of the currently selected). The usual suspect here is C<*STDERR>:
 
     if ( is_interactive(*STDERR) ) {
         carp $warning;
     }
 
+Note that C<is_interactive> may return true in a Windows Scheduled
+Task. See Github #6 (https://github.com/briandfoy/io-interactive/issues/6).
 
 =item C<interactive()>
 

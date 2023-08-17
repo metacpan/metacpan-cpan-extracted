@@ -1,5 +1,10 @@
 Revision history for Object-Pad-ClassAttr-Struct
 
+0.06    2023-08-10
+         * Swap all of the unit tests from `Test::More` to `Test2::V0`
+         * Remember to implement `no ...` to disable the syntax
+         * Switch to using `field` of Object::Pad v0.66
+
 0.05    2022-12-20
         [CHANGES]
          * Support `:Struct(readonly)` for declaring non-mutable structure

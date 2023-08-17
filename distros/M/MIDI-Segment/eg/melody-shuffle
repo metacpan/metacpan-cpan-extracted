@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+# melody-shuffle - example use of MIDI::Segment to shuffle a melody
+use strict;
+use warnings;
+use MIDI;
+use MIDI::Segment 0.03;
+use List::Util 'shuffle';
+
+# a given melody from the exercise; pitch, duration (8th or 16th note)
+my @notes = (
+    [ 60, 8 ],  [ 64, 16 ], [ 64, 16 ], [ 67, 8 ],
+    [ 59, 8 ],  [ 65, 8 ],  [ 69, 8 ],  [ 74, 8 ],
+    [ 79, 8 ],  [ 79, 16 ], [ 79, 16 ], [ 79, 8 ],
+    [ 80, 8 ],  [ 80, 16 ], [ 80, 16 ], [ 81, 8 ],
+    [ 81, 16 ], [ 81, 16 ], [ 83, 8 ],  [ 72, 8 ],
+    [ 76, 8 ],  [ 69, 8 ],  [ 64, 8 ],  [ 65, 8 ],
+    [ 59, 8 ],
+);
+my @events;
+my ( $channel, $velocity ) = ( 0, 120 );
+for my $n (@notes) {
+    $n->[1] = 4 if $n->[1] == 16;    # make the 16th notes shorter
+    $n->[1] *= 12;
+    push @events,
+      [ 'note_on',   0,      $channel, $n->[0], $velocity ],
+      [ 'note_off', $n->[1], $channel, $n->[0], $velocity ];
+}
+my $track = MIDI::Track->new( { events => \@events } );
+my $opus  = MIDI::Opus->new( { tracks => [$track] } );
+$opus->write_to_file('out.midi');
+
+my ( $mis, $durations ) = MIDI::Segment->new($opus);
+die "no splits possible\n" unless @$durations;
+
+for my $dur (@$durations) {
+    my $segments = $mis->split($dur);
+    warn "duration $dur has " . scalar(@$segments) . " segments\n";
+    # there's only one track, so map the MIDI events therein into
+    # a new track
+    my $track = MIDI::Track->new(
+        { events => [ map { $_->[0]->@* } shuffle @$segments ] } );
+    my $opus = MIDI::Opus->new( { tracks => [$track] } );
+    $opus->write_to_file("out-shuffle-$dur.midi");
+}

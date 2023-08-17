@@ -3,11 +3,12 @@ abstract: 'Decodes and encodes DOCSIS config files'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.8'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,17 +18,25 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   Digest::HMAC_MD5: '1.00'
   Digest::MD5: '2.30'
   Digest::SHA: '5.00'
   Math::BigInt: '1.80'
   Socket: '1.50'
+  YAML::PP: '0.03'
   bytes: '1.00'
-  perl: '5.010001'
+  perl: '5.016'
 resources:
-  bugtracker: https://github.com/jhthorsen/docsis-configfile/issues
-  homepage: https://github.com/jhthorsen/docsis-configfile
-  repository: https://github.com/jhthorsen/docsis-configfile.git
-version: '0.76'
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
+  bugtracker: https://github.com/jhthorsen/docsis::configfile/issues
+  homepage: https://github.com/jhthorsen/docsis::configfile
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/jhthorsen/docsis::configfile.git
+version: '1.01'
+x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

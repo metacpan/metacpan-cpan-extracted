@@ -42,7 +42,7 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 		lucky_number => 6,
 	});
 
-	if ($input->valid) {
+	if ($form->valid) {
 		print Dumper $form->fields;
 	}
 	else {
@@ -414,7 +414,7 @@ Hook types are listed below:
 
 While regular properties allow for single-field validation, sometimes a need
 arises to check if some fields are synchronized correctly, or even to perform
-some more complex validation. This can be done with the C<cleaup> hook, which
+some more complex validation. This can be done with the C<cleanup> hook, which
 will be only fired once after the validation for every individual field was
 successful. The cleaner subroutine should look like this:
 
@@ -711,15 +711,31 @@ errors will be added to outer form with the outer field name prepended.
 		type => Form1->new,
 	);
 
-Be aware of a special case, an adjustment will be inserted here automatically
-like the following:
+A couple of important details:
 
-	adjust => sub { $instance->fields }
+=over
 
-this will make sure that any coercions and adjustments made in the nested form
-will be added to the outer form as well. If you want to specify your own
-adjustment here, make sure to use the data provided by the C<fields> method of
-the nested form.
+=item * subform will not validate at all if no value was present in main form input
+
+This means that even if subform had required fields, errors will not be added
+to the main form if they are missing. Remember to make your subform required in
+the main for if it is not the behavior you want!
+
+=item * specifying C<message> for the field will completely replace subform's field errors
+
+A single error with the message will be added instead of list of subform errors.
+
+=item * C<default> value for the subform must be its valid input
+
+It will be used to determine the default values for fields of the subform. As
+with regular default values, it will not use filters, coercions or adjustments
+from the main form field.
+
+=item * resulting field will only contain what subform's C<fields> contain
+
+No extra values not defined in the subform will be copied.
+
+=back
 
 =head3 Form inheritance
 

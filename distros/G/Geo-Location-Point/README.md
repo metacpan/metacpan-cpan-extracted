@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -19,6 +19,8 @@ Geo::Location::Point stores a place.
 ## new
 
     $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
+
+Takes one optional argument 'key' which is an API key for [https://timezonedb.com](https://timezonedb.com) for looking up timezone data.
 
 ## lat
 
@@ -59,6 +61,14 @@ Are two points different?
     my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
     print ($loc1 != $loc2), "\n";       # Prints 0
 
+## tz
+
+Returns the timezone of the location.
+
+## timezone
+
+Synonym for tz().
+
 ## as\_string
 
 Prints the object in human-readable format.
@@ -84,7 +94,8 @@ it under the same terms as Perl itself.
 # SEE ALSO
 
 [GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance),
-[Geo::Point](https://metacpan.org/pod/Geo%3A%3APoint)
+[Geo::Point](https://metacpan.org/pod/Geo%3A%3APoint),
+[TimeZone::TimeZoneDB](https://metacpan.org/pod/TimeZone%3A%3ATimeZoneDB).
 
 # LICENSE AND COPYRIGHT
 

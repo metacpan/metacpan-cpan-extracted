@@ -34,25 +34,25 @@ no_index:
 provides:
   OpenSky::API:
     file: lib/OpenSky/API.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::Core::Flight:
     file: lib/OpenSky/API/Core/Flight.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::Core::StateVector:
     file: lib/OpenSky/API/Core/StateVector.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::Flights:
     file: lib/OpenSky/API/Flights.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::States:
     file: lib/OpenSky/API/States.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::Types:
     file: lib/OpenSky/API/Types.pm
-    version: '0.004'
+    version: '0.005'
   OpenSky::API::Utils::Iterator:
     file: lib/OpenSky/API/Utils/Iterator.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Config::INI::Reader: '0'
@@ -72,9 +72,10 @@ resources:
   bugtracker: https://github.com/Ovid/opensky-api/issues
   homepage: https://github.com/Ovid/opensky-api
   repository: https://github.com/Ovid/opensky-api.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - 'Ovid <ovid@cpan.org>'
+x_deprecated: 1
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

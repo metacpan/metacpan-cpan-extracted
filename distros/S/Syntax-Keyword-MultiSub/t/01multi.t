@@ -4,8 +4,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Syntax::Keyword::MultiSub;
 
@@ -18,7 +17,7 @@ use Syntax::Keyword::MultiSub;
    is( f("a"),      "<unary(a)>",     'f() one arg' );
    is( f("b", "c"), "<binary(b, c)>", 'f() two args' );
 
-   like( exception { f("too", "many", "args") },
+   like( dies { f("too", "many", "args") },
       qr/^Unable to find a function body for a call to &main::f having 3 arguments at /,
       'f() complains with too many args' );
 }
@@ -38,6 +37,14 @@ use Syntax::Keyword::MultiSub;
    is( h(1),     "unary(1)",      'h() one arg' );
    is( h(2,3,4), "slurpy(2 3 4)", 'h() three args' );
    is( h(),      "slurpy()",      'h() zero args' );
+}
+
+{
+   no Syntax::Keyword::MultiSub;
+
+   sub multi { return "normal function" }
+
+   is( multi, "normal function", 'multi() parses as a normal function call' );
 }
 
 done_testing;

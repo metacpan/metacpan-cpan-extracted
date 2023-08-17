@@ -1,0 +1,128 @@
+#!/usr/local/bin/perl -w
+###
+### atm-cfgmaker HOST [COMMUNITY]
+###
+### Generate MRTG configuration for the PVCs and PVPs configured on a
+### Cisco LS1010 ATM switch.  Uses the RFC 1213 interfaces group and
+### Cisco's CISCO-ATM-CONN-MIB.
+###
+use strict;
+require 5.002;
+
+use SNMP_Session "0.57";
+use BER;
+
+my $ciscoAtmVclInCells = [1,3,6,1,4,1,9,10,13,1,2,1,1,13];
+my $ciscoAtmVclOutCells = [1,3,6,1,4,1,9,10,13,1,2,1,1,14];
+my $ciscoAtmVclCrossIfIndex = [1,3,6,1,4,1,9,10,13,1,2,1,1,15];
+my $ciscoAtmVclCrossVpi = [1,3,6,1,4,1,9,10,13,1,2,1,1,16];
+my $ciscoAtmVclCrossVci = [1,3,6,1,4,1,9,10,13,1,2,1,1,17];
+
+my $ciscoAtmVplInCells = [1,3,6,1,4,1,9,10,13,1,1,1,1,12];
+my $ciscoAtmVplOutCells = [1,3,6,1,4,1,9,10,13,1,1,1,1,13];
+my $ciscoAtmVplCrossIfIndex = [1,3,6,1,4,1,9,10,13,1,1,1,1,14];
+my $ciscoAtmVplCrossVpi = [1,3,6,1,4,1,9,10,13,1,1,1,1,15];
+
+my $router = shift @ARGV || usage (1);
+my $community = shift @ARGV || 'public';
+
+my $session = SNMP_Session->open ($router, $community, 161)
+    || die "Cannot open SNMP session to $router";
+my $if_table = $session->get_if_table ();
+$session->map_table ([$ciscoAtmVclCrossIfIndex,
+		      $ciscoAtmVclCrossVpi,
+		      $ciscoAtmVclCrossVci],
+		     sub ($$$$) {
+			 my ($index, $cross_if_index, $cross_vpi, $cross_vci)
+			     = @_;
+			 my ($if_index, $vpi, $vci) = split ('\.', $index);
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($cross_if_index, $cross_vpi, $cross_vci));
+			 out_link ($ciscoAtmVclInCells,
+				   $ciscoAtmVclOutCells,
+				   $index,
+				   $if_index,
+				   $cross_if_index,
+				   "VPI=$vpi VCI=$vci",
+				   "VPI=$cross_vpi VCI=$cross_vpi",
+				   $if_table,
+				   $router, $community)
+			     unless ($cross_vpi == 0 && $cross_vci == 5
+				     || $cross_vpi == 0 && $cross_vci == 16);
+		     });
+$session->map_table ([$ciscoAtmVplCrossIfIndex,
+		      $ciscoAtmVplCrossVpi],
+		     sub ($$$$) {
+			 my ($index, $cross_if_index, $cross_vpi)
+			     = @_;
+			 my ($if_index, $vpi) = split ('\.', $index);
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($cross_if_index, $cross_vpi));
+			 out_link ($ciscoAtmVplInCells,
+				   $ciscoAtmVplOutCells,
+				   $index,
+				   $if_index,
+				   $cross_if_index,
+				   "VPI=$vpi",
+				   "VPI=$cross_vpi",
+				   $if_table,
+				   $router, $community);
+		     });
+$session->close ()
+    || warn "Cannot close SNMP session to $router";
+1;
+
+sub usage ($) {
+    if ($_[0]) {
+	die "Usage: $0 switch-name [community]\n";
+    } else {
+	warn "Usage: $0 switch-name [community]\n";
+    }
+}
+
+sub out_link () {
+    my ($in, $out, $index, $if_index, $cross_if_index, $source_vxi, $dest_vxi, $if_table, $host, $community) = @_;
+    my $source_if_descr = $if_table->{$if_index}->{ifDescr} || $if_index;
+    my $dest_if_descr = $if_table->{$cross_if_index}->{ifDescr} || $cross_if_index;
+    my $source_speed = $if_table->{$if_index}->{ifSpeed};
+    my $dest_speed = $if_table->{$cross_if_index}->{ifSpeed};
+    my $min_speed = $source_speed < $dest_speed ? $source_speed : $dest_speed;
+    my $target_name = $host.'-'.$source_if_descr.'-'.$source_vxi;
+    $target_name =~ s/V[CP]I=//g;
+    $target_name =~ s/-ATM/-/;
+    $target_name =~ s@[-. /]@-@g;
+    my $source_oid = join ('.',@{$in}).".".$index;
+    my $dest_oid = join ('.',@{$out}).".".$index;
+    print STDOUT ("#$host Interface $source_if_descr $source_vxi\n");
+    print STDOUT "Target[$target_name]: $source_oid&$dest_oid:$community\@$host * 53\n";
+    print STDOUT "Options[$target_name]: growright,bits\n";
+    print STDOUT "Title[$target_name]: $host $source_vxi\n";
+    print STDOUT "PageTop[$target_name]: <hr><H3>ATM Traffic on $source_vxi</H3>\n";
+    print STDOUT "YLegend[$target_name]: bits per second\n";
+    print STDOUT "ShortLegend[$target_name]: bps\n";
+    print STDOUT "MaxBytes[$target_name]: ",$min_speed/8,"\n";
+    print STDOUT "AbsMax[$target_name]: ",$min_speed/8,"\n";
+    print STDOUT "\n";
+}
+
+package SNMP_Session;
+
+sub get_if_table ($) {
+    my ($session) = @_;
+
+    my $result = {};
+
+    my $ifDescr = [1,3,6,1,2,1,2,2,1,2];
+    my $ifSpeed = [1,3,6,1,2,1,2,2,1,5];
+    my $locIfDescr = [1,3,6,1,4,1,9,2,2,1,1,28];
+    $session->map_table ([$ifDescr,$locIfDescr,$ifSpeed],
+			 sub ($$$) {
+			     my ($index, $ifDescr, $locIfDescr, $ifSpeed) = @_;
+			     grep (defined $_ && ($_=pretty_print $_),
+				   ($ifDescr, $locIfDescr, $ifSpeed));
+			     $result->{$index} = {'ifDescr' => $ifDescr,
+						  'ifSpeed' => $ifSpeed,
+						  'locIfDescr' => $locIfDescr};
+			 });
+    $result;
+}

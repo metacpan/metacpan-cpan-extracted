@@ -1,12 +1,7 @@
 
-[![Travis Build Status](https://travis-ci.org/Corion/Archive-Merged.svg?branch=master)](https://travis-ci.org/Corion/Archive-Merged)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Archive-Merged?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Archive-Merged)
-
-CONTRIBUTING
-
-See lib/WWW/Mechanize/Chrome/Contributing.pod
-
-[Google Keep Extraction](https://github.com/Corion/WWW-Mechanize-Chrome/raw/master/demo/keep-export-demo.mp4)
+[![Windows](https://github.com/Corion/Archive-Merged/workflows/windows/badge.svg)](https://github.com/Corion/Archive-Merged/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Archive-Merged/workflows/macos/badge.svg)](https://github.com/Corion/Archive-Merged/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Archive-Merged/workflows/linux/badge.svg)](https://github.com/Corion/Archive-Merged/actions?query=workflow%3Alinux)
 
 # NAME
 
@@ -72,8 +67,8 @@ Extracts the file to the target name.
 
 # REPOSITORY
 
-The public repository of this module is 
-[http://github.com/Corion/archive-merged](http://github.com/Corion/archive-merged).
+The public repository of this module is
+[https://github.com/Corion/archive-merged](https://github.com/Corion/archive-merged).
 
 # SUPPORT
 
@@ -84,7 +79,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Merged](https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Merged)
-or via mail to [archive-merged-Bugs@rt.cpan.org](https://metacpan.org/pod/archive-merged-Bugs@rt.cpan.org).
+or via mail to [archive-merged-Bugs@rt.cpan.org](https://metacpan.org/pod/archive-merged-Bugs%40rt.cpan.org).
 
 # AUTHOR
 
@@ -92,7 +87,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 
@@ -100,6 +95,6 @@ This module is released under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Archive::Tar](https://metacpan.org/pod/Archive::Tar)
+[Archive::Tar](https://metacpan.org/pod/Archive%3A%3ATar)
 
-[Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive::SevenZip::API::ArchiveTar)
+[Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive%3A%3ASevenZip%3A%3AAPI%3A%3AArchiveTar)

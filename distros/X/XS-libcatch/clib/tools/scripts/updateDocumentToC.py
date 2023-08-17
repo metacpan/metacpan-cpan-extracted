@@ -11,8 +11,6 @@
 # https://github.com/rasbt/markdown-toclify
 #
 
-from  __future__  import print_function
-
 import argparse
 import glob
 import os
@@ -289,7 +287,7 @@ def markdownToclify(
         Path to the markdown output file.
 
       min_toc_len: int (default: 2)
-        Miniumum number of entries to create a table of contents for.
+        Minimum number of entries to create a table of contents for.
 
       github: bool (default: False)
         Uses GitHub TOC syntax if True.

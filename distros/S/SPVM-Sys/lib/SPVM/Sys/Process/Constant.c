@@ -22,7 +22,7 @@ int32_t SPVM__Sys__Process__Constant__EXIT_FAILURE(SPVM_ENV* env, SPVM_VALUE* st
   return 0;
 #else
   env->die(env, stack, "EXIT_FAILURE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -34,7 +34,7 @@ int32_t SPVM__Sys__Process__Constant__EXIT_SUCCESS(SPVM_ENV* env, SPVM_VALUE* st
   return 0;
 #else
   env->die(env, stack, "EXIT_SUCCESS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -46,7 +46,7 @@ int32_t SPVM__Sys__Process__Constant__WNOHANG(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "WNOHANG is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -58,7 +58,7 @@ int32_t SPVM__Sys__Process__Constant__WUNTRACED(SPVM_ENV* env, SPVM_VALUE* stack
   return 0;
 #else
   env->die(env, stack, "WUNTRACED is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -70,7 +70,7 @@ int32_t SPVM__Sys__Process__Constant__WCONTINUED(SPVM_ENV* env, SPVM_VALUE* stac
   return 0;
 #else
   env->die(env, stack, "WCONTINUED is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -82,7 +82,7 @@ int32_t SPVM__Sys__Process__Constant__PRIO_PROCESS(SPVM_ENV* env, SPVM_VALUE* st
   return 0;
 #else
   env->die(env, stack, "PRIO_PROCESS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -94,7 +94,7 @@ int32_t SPVM__Sys__Process__Constant__PRIO_USER(SPVM_ENV* env, SPVM_VALUE* stack
   return 0;
 #else
   env->die(env, stack, "PRIO_USER is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -106,7 +106,7 @@ int32_t SPVM__Sys__Process__Constant__PRIO_PGRP(SPVM_ENV* env, SPVM_VALUE* stack
   return 0;
 #else
   env->die(env, stack, "PRIO_PGRP is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }

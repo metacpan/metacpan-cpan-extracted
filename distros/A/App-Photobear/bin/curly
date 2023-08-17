@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+#ABSTRACT: Get the content of a URL using LWP::UserAgent or system curl
+#PODNAME: curly
+use strict;
+use warnings;
+use Getopt::Long;
+use Term::ANSIColor qw(:constants);
+
+# Usage example
+my $url;
+my $verbose;
+GetOptions(
+    'u|url=s' => \$url,
+    'verbose' => \$verbose,
+);
+sub curl {
+    my ($url) = @_;
+    my $output;
+    eval {
+        require LWP::UserAgent;
+        
+        # Create a UserAgent object
+        my $ua = LWP::UserAgent->new;
+        $ua->ssl_opts(verify_hostname => 0);  # Disable SSL verification (optional)
+        
+        # Send the initial GET request
+        my $response = $ua->get($url);
+        
+        # Follow redirects if any
+        while ($response->is_redirect) {
+            my $redirect_url = $response->header('Location');
+            $response = $ua->get($redirect_url);
+        }
+        say STDERR "[DEBUG] LWP::UserAgent Response code: ", $response->code if $verbose;
+        return $response->decoded_content;
+    };
+    
+    if ($@) {
+        # Fallback to system curl command
+        eval {
+            $output = `curl --silent -L $url`;
+            say STDERR "[DEBUG] used curl: ", $output if $verbose;
+            return $output;
+        };
+        if ($@) {
+            say STDERR "[DEBUG] Curl failed" if $verbose;
+            die "Can't get content of $url: $@";
+        }
+    }
+    return $output;
+}
+
+
+my @URLS = ();
+push(@URLS, @ARGV);
+push(@URLS, $url) if $url;
+foreach my $u (@URLS) {
+    my $content = curl($u);
+    print STDERR CYAN, "## ", $u, RESET, "\n" if $verbose;
+    print $content, "\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+curly - Get the content of a URL using LWP::UserAgent or system curl
+
+=head1 VERSION
+
+version 0.1.2
+
+=head1 SYNOPSIS
+
+  curly [options] [urls]
+
+  Options:
+    
+    -u, --url URL   Specify a single URL to retrieve its content
+    --verbose       Print debug information
+
+=head1 DESCRIPTION
+
+curly is a Perl script that allows you to retrieve the content of a URL using either LWP::UserAgent 
+or the system curl command. It provides a convenient way to fetch the content of a URL and print it to the console.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-u, --url URL>
+
+Specify a single URL to retrieve its content. This option is optional, and you can also provide URLs as command-line arguments.
+
+=back
+
+=head1 USAGE
+
+To use curly, simply run the script with the desired options and URLs. The script will retrieve the content of each URL and print it to the console.
+
+=head2 Examples
+
+Retrieve the content of a single URL:
+
+  curly --url https://example.com
+
+Retrieve the content of multiple URLs:
+
+  curly https://example.com https://google.com
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::par::float2ibm;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

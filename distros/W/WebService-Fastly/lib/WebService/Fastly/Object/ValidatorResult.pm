@@ -28,7 +28,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use WebService::Fastly::Object::ValidatorResultMessages;
+use WebService::Fastly::Object::ValidatorResultData;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -159,37 +159,9 @@ __PACKAGE__->class_documentation({description => 'Results from VCL linting',
 }                                 );
 
 __PACKAGE__->method_documentation({
-    'msg' => {
-        datatype => 'string',
-        base_name => 'msg',
-        description => '',
-        format => '',
-        read_only => 'false',
-            },
-    'status' => {
-        datatype => 'string',
-        base_name => 'status',
-        description => '',
-        format => '',
-        read_only => 'false',
-            },
-    'errors' => {
-        datatype => 'ARRAY[string]',
-        base_name => 'errors',
-        description => '',
-        format => '',
-        read_only => 'false',
-            },
-    'warnings' => {
-        datatype => 'ARRAY[string]',
-        base_name => 'warnings',
-        description => '',
-        format => '',
-        read_only => 'false',
-            },
-    'messages' => {
-        datatype => 'ARRAY[ValidatorResultMessages]',
-        base_name => 'messages',
+    'data' => {
+        datatype => 'ValidatorResultData',
+        base_name => 'data',
         description => '',
         format => '',
         read_only => 'false',
@@ -197,25 +169,16 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->openapi_types( {
-    'msg' => 'string',
-    'status' => 'string',
-    'errors' => 'ARRAY[string]',
-    'warnings' => 'ARRAY[string]',
-    'messages' => 'ARRAY[ValidatorResultMessages]'
+    'data' => 'ValidatorResultData'
 } );
 
 __PACKAGE__->attribute_map( {
-    'msg' => 'msg',
-    'status' => 'status',
-    'errors' => 'errors',
-    'warnings' => 'warnings',
-    'messages' => 'messages'
+    'data' => 'data'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});
 
 __PACKAGE__->openapi_nullable( {
-    'msg' => 'true',
 } );
 
 

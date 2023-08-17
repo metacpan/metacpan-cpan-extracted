@@ -9,12 +9,17 @@ Files: Changes
  doap.ttl
  lib/Regexp/Pattern/License.pm
  lib/Regexp/Pattern/License/Parts.pm
+ t/01-basic.t
  t/02-regexp-pattern.t
  t/02-regexp-pattern_RE2.t
+ t/02-regexp-pattern_RE2_missing.t
+ t/02-structure.t
+ t/03-match-normalized.t
  t/coverage-cc-deprecated.t
  t/coverage-cc.t
  t/coverage-fedora-2.53.t
  t/coverage-osi.t
+ t/coverage-perl.t
  t/coverage-spdx-1.16.t
  t/coverage-spdx-1.17.t
  t/coverage-spdx-1.18.t
@@ -29,8 +34,11 @@ Files: Changes
  t/coverage-spdx-2.6.t
  t/coverage-spdx-3.0.t
  t/coverage-tldr.t
+ t/coverage-trove.t
+ t/coverage-wikidata.t
  t/lib/Test2/Tools/LicenseObject.pm
  t/lib/Test2/Tools/LicenseRegistry.pm
+ t/version.t
 Copyright: Copyright 2023 Jonas Smedegaard.
 License: GPL-3.0
 
@@ -38,21 +46,9 @@ Files: INSTALL
  LICENSE
  README
  TODO
+ precious.toml
 Copyright: Unknown
 License: Unknown
-
-Files: t/02-structure.t
- t/03-match-normalized.t
- t/coverage-trove.t
- t/coverage-wikidata.t
-Copyright: Copyright 2022 Jonas Smedegaard.
-License: GPL-3.0
-
-Files: t/01-basic.t
- t/02-regexp-pattern_RE2_missing.t
- t/coverage-perl.t
-Copyright: Copyright 2021 Jonas Smedegaard.
-License: GPL-3.0
 
 Files: COPYRIGHT
  CREDITS

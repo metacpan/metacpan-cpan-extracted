@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# mockup id for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+[ $# -ge 2 ]  ||  Die 'missing parameter(s)'
+
+case $1 in
+    --groups)
+	case $2 in
+	    0|100[1-3])	echo "$2"	;;
+	    *)		Die "unknown user '$2' in mocked id"
+	esac
+	;;
+    *)
+	Die "unknown option '$1'"
+esac

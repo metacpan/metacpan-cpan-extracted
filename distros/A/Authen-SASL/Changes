@@ -1,3 +1,27 @@
+2.1700  2023-08-09
+  [Fixed]
+    - Version numbering (released as 2.1700,
+      because 2.17 < 2.1401)
+    - POD errors
+    - Typos
+    - Minimum Perl version 5.005 -> 5.6.0
+    - Kwalitee errors
+      * Accidentally packaged MYMETA.*
+      * 'use warnings;' added in all modules
+      * Synchronized versions in all modules
+    - Out of bounds substr() (RT 85294)
+  [Added]
+    - README
+    - More tests
+  [Changed]
+    - Release switched from EUMM to D::Z
+  [Removed]
+    - Authen::SASL::Cyrus is no longer loaded as
+      an implementation; Authen::SASL::XS has been
+      the successor for more than a decade
+
+
+
 Authen-SASL 2.16 -- Tue Sep  4 11:01:18 CDT 2012
 
   * SASL.pod: fix typo [Peter Marschall]
@@ -87,150 +111,150 @@ Enhancements
 
 2003-11-01 18:48  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.06
-	
+        Release 2.06
+        
 2003-10-21 19:59  Graham Barr
 
-	* MANIFEST, lib/Authen/SASL/Perl.pm,
-	lib/Authen/SASL/Perl/ANONYMOUS.pm,
-	lib/Authen/SASL/Perl/CRAM_MD5.pm,
-	lib/Authen/SASL/Perl/DIGEST_MD5.pm,
-	lib/Authen/SASL/Perl/EXTERNAL.pm, lib/Authen/SASL/Perl/LOGIN.pm,
-	lib/Authen/SASL/Perl/PLAIN.pm, t/order.t:
+        * MANIFEST, lib/Authen/SASL/Perl.pm,
+        lib/Authen/SASL/Perl/ANONYMOUS.pm,
+        lib/Authen/SASL/Perl/CRAM_MD5.pm,
+        lib/Authen/SASL/Perl/DIGEST_MD5.pm,
+        lib/Authen/SASL/Perl/EXTERNAL.pm, lib/Authen/SASL/Perl/LOGIN.pm,
+        lib/Authen/SASL/Perl/PLAIN.pm, t/order.t:
 
-	Add ordering so we always pich the best of the available methods instead of
-	just the first
-	
+        Add ordering so we always pich the best of the available methods instead of
+        just the first
+        
 2003-10-17 22:12  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.05
-	
+        Release 2.05
+        
 2003-10-17 22:06  Graham Barr
 
-	* MANIFEST, Makefile.PL:
+        * MANIFEST, Makefile.PL:
 
-	use Module::Install to generate Makefile and add SIGNATURE and META.yml
-	
+        use Module::Install to generate Makefile and add SIGNATURE and META.yml
+        
 2003-10-17 21:19  Graham Barr
 
-	* lib/Authen/SASL/Perl/DIGEST_MD5.pm:
+        * lib/Authen/SASL/Perl/DIGEST_MD5.pm:
 
-	Fix typo
-	
+        Fix typo
+        
 2003-10-17 21:17  Graham Barr
 
-	* lib/Authen/SASL/: Perl.pm, Perl/DIGEST_MD5.pm:
+        * lib/Authen/SASL/: Perl.pm, Perl/DIGEST_MD5.pm:
 
-	Don't call die in DIGEST_MD5, but call set_error and return an empty list
-	
+        Don't call die in DIGEST_MD5, but call set_error and return an empty list
+        
 2003-10-17 21:16  Graham Barr
 
-	* lib/Authen/SASL.pod:
+        * lib/Authen/SASL.pod:
 
-	Update docs to reflect that client_start and client_step return an emtpy list on error
-	
+        Update docs to reflect that client_start and client_step return an emtpy list on error
+        
 2003-05-19 22:41  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.04
-	
+        Release 2.04
+        
 2003-05-19 22:40  Graham Barr
 
-	* t/digest_md5.t:
+        * t/digest_md5.t:
 
-	Avoid used only once warning
-	
+        Avoid used only once warning
+        
 2003-05-19 17:06  Graham Barr
 
-	* MANIFEST, lib/Authen/SASL/Perl/DIGEST_MD5.pm, t/digest_md5.t:
+        * MANIFEST, lib/Authen/SASL/Perl/DIGEST_MD5.pm, t/digest_md5.t:
 
-	Add DIGEST-MD5 mechanism
-	
+        Add DIGEST-MD5 mechanism
+        
 2003-05-19 16:42  Graham Barr
 
-	* MANIFEST, t/login.t:
+        * MANIFEST, t/login.t:
 
-	Add test for login mechanism
-	
+        Add test for login mechanism
+        
 2003-01-21 19:15  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.03
-	
+        Release 2.03
+        
 2003-01-21 12:22  Graham Barr
 
-	* lib/Authen/SASL/Perl/LOGIN.pm:
+        * lib/Authen/SASL/Perl/LOGIN.pm:
 
-	Fix LOGIN mechanism to respond with the username when prompted
-	
+        Fix LOGIN mechanism to respond with the username when prompted
+        
 2002-05-28 15:22  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.02
-	
+        Release 2.02
+        
 2002-05-28 14:36  Graham Barr
 
-	* MANIFEST, lib/Authen/SASL/Perl/LOGIN.pm:
+        * MANIFEST, lib/Authen/SASL/Perl/LOGIN.pm:
 
-	Add LOGIN mechanism commonly used by SMTP
-	
+        Add LOGIN mechanism commonly used by SMTP
+        
 2002-03-31 15:39  Graham Barr
 
-	* lib/Authen/SASL.pm:
+        * lib/Authen/SASL.pm:
 
-	Release 2.01
-	
+        Release 2.01
+        
 2002-03-22 10:13  Graham Barr
 
-	* t/cram_md5.t:
+        * t/cram_md5.t:
 
-	Skip cram_md5 test if Digest::HMAC_MD5 is not installed
-	
+        Skip cram_md5 test if Digest::HMAC_MD5 is not installed
+        
 2002-02-18 16:56  Graham Barr
 
-	* lib/Authen/SASL/Perl.pm:
+        * lib/Authen/SASL/Perl.pm:
 
-	Add securesocket to the ::Perl base class.
-	
+        Add securesocket to the ::Perl base class.
+        
 2002-01-28 19:52  Graham Barr
 
-	* MANIFEST, lib/Authen/SASL.pm, t/anon.t, t/callback.t,
-	t/cram_md5.t, t/external.t, t/plain.t:
+        * MANIFEST, lib/Authen/SASL.pm, t/anon.t, t/callback.t,
+        t/cram_md5.t, t/external.t, t/plain.t:
 
-	Add some tests
-	
+        Add some tests
+        
 2002-01-24 15:21  Graham Barr
 
-	* lib/Authen/SASL/Perl.pm:
+        * lib/Authen/SASL/Perl.pm:
 
-	Allow callback to be called on the connection object
-	
+        Allow callback to be called on the connection object
+        
 2002-01-24 12:04  Graham Barr
 
-	* MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
-	lib/Authen/SASL.pm, lib/Authen/SASL.pod,
-	lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
-	lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
-	lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
-	lib/Authen/SASL/Perl/PLAIN.pm:
+        * MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
+        lib/Authen/SASL.pm, lib/Authen/SASL.pod,
+        lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
+        lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
+        lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
+        lib/Authen/SASL/Perl/PLAIN.pm:
 
-	Initial revision
-	
+        Initial revision
+        
 2002-01-24 12:04  Graham Barr
 
-	* MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
-	lib/Authen/SASL.pm, lib/Authen/SASL.pod,
-	lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
-	lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
-	lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
-	lib/Authen/SASL/Perl/PLAIN.pm:
+        * MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
+        lib/Authen/SASL.pm, lib/Authen/SASL.pod,
+        lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
+        lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
+        lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
+        lib/Authen/SASL/Perl/PLAIN.pm:
 
-	import
-	
+        import
+        

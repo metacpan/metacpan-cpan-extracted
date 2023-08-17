@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Equ 0.05;
+package Syntax::Operator::Equ 0.06;
 
 use v5.14;
 use warnings;
@@ -19,8 +19,9 @@ C<Syntax::Operator::Equ> - equality operators that distinguish C<undef>
 
 =head1 SYNOPSIS
 
-On a suitable perl version:
+On Perl v5.38 or later:
 
+   use v5.38;
    use Syntax::Operator::Equ;
 
    if($x equ $y) {
@@ -31,7 +32,7 @@ On a suitable perl version:
       say "i and j are both undef, or both defined and equal numbers";
    }
 
-Or, on a standard perl via L<Syntax::Keyword::Match>:
+Or via L<Syntax::Keyword::Match> on Perl v5.14 or later:
 
    use v5.14;
    use Syntax::Keyword::Match;
@@ -55,15 +56,16 @@ yield true if both operands are C<undef>, false if exactly one operand is, or
 otherwise behave the same as the regular string or number equality tests if
 both operands are defined.
 
-Current stable versions of perl do not directly support custom infix
-operators, but the ability was added in the 5.37.x development cycle and is
-available from perl v5.37.7 onwards. The documentation of L<XS::Parse::Infix>
-describes the situation in more detail. This module is therefore I<almost>
-entirely useless on stable perl builds. While the regular parser does not
-support custom infix operators, they are supported via C<XS::Parse::Infix> and
-hence L<XS::Parse::Keyword>, and so custom keywords which attempt to parse
-operator syntax may be able to use it. One such module is
-L<Syntax::Keyword::Match>; see the SYNOPSIS example given above.
+Support for custom infix operators was added in the Perl 5.37.x development
+cycle and is available from development release v5.37.7 onwards, and therefore
+in Perl v5.38 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail.
+
+While Perl versions before this do not support custom infix operators, they
+can still be used via C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>.
+Custom keywords which attempt to parse operator syntax may be able to use
+these. One such module is L<Syntax::Keyword::Match>; see the SYNOPSIS example
+given above.
 
 =cut
 
@@ -143,6 +145,16 @@ A function version of the L</equ> stringy operator.
 A function version of the L</===> numerical operator.
 
 =cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Syntax::Operator::Eqr> - string equality and regexp match operator
+
+=back
 
 =head1 AUTHOR
 

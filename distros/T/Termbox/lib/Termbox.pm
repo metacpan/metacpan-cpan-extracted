@@ -1,20 +1,21 @@
-package Termbox 0.12 {
+package Termbox {
     use 5.020;
-    use strictures 2;
+    use strict;
     use warnings;
+    our $VERSION = "2.00";
     #
     use File::ShareDir        qw[dist_dir];
     use File::Spec::Functions qw[catdir canonpath];
     #
     use FFI::CheckLib;
-    use FFI::Platypus 2.00;
+    use FFI::Platypus 2;
     use FFI::Platypus::Memory qw( malloc free );
     $ENV{FFI_PLATYPUS_DLERROR} = 1;
     my $ffi = FFI::Platypus->new(
-        api  => 2,
-        lang => 'CPP',
+        api  => 1,
+        lang => 'C',
         lib  => find_lib_or_exit(
-            lib       => 'termbox',
+            lib       => 'termbox2',
             recursive => 1,
             libpath   => [ qw[ . ./share/lib], canonpath( catdir( dist_dir(__PACKAGE__), 'lib' ) ) ]
         )
@@ -22,23 +23,51 @@ package Termbox 0.12 {
     #
     use base qw[Exporter];
     use vars qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
+
+    # Utility functions that should be at the end but we need it here
+    $ffi->attach( tb_has_truecolor => ['void'] => 'int' );
+    $ffi->attach( tb_has_egc       => ['void'] => 'int' );
+    #
+    our $TRUECOLOR  = tb_has_truecolor();
+    our $uintattr_t = $TRUECOLOR ? 'uint32_t' : 'uint16_t';
     #
     $EXPORT_TAGS{api} = [
         qw[
-            tb_init tb_init_file tb_init_fd tb_shutdown
+            tb_init tb_init_file tb_init_fd tb_init_rwfd tb_shutdown
             tb_width tb_height
-            tb_clear tb_set_clear_attributes
+            tb_clear tb_set_clear_attrs
             tb_present
-            tb_set_cursor
-            tb_put_cell tb_change_cell
-            tb_cell_buffer
-            tb_select_input_mode
-            tb_select_output_mode
+            tb_invalidate
+            tb_set_cursor tb_hide_cursor
+            tb_set_cell tb_set_cell_ex tb_extend_cell
+            tb_set_input_mode
+            tb_set_output_mode
             tb_peek_event
             tb_poll_event
+            tb_get_fds
+            tb_print
+            tb_send
+            tb_set_func
+            tb_utf8_char_length tb_utf8_char_to_unicode tb_utf8_unicode_to_char
+            tb_last_errno tb_strerror
+            tb_cell_buffer
+            tb_has_truecolor tb_has_egc
+            tb_version
         ]
     ];
-    use constant {
+    #
+    sub _export ($$) {
+        my ( $tag, $values ) = @_;
+        push @{ $EXPORT_TAGS{$tag} }, keys %$values;
+        no strict 'refs';
+        for my $key ( keys %$values ) {
+            *{ __PACKAGE__ . '::' . $key } = sub () { $values->{$key} }
+        }
+    }
+    #
+    _export keys => {
+
+        # Terminal-dependent key constants (tb_event.key) and terminfo capabilities
         TB_KEY_F1               => ( 0xFFFF - 0 ),
         TB_KEY_F2               => ( 0xFFFF - 1 ),
         TB_KEY_F3               => ( 0xFFFF - 2 ),
@@ -61,287 +90,266 @@ package Termbox 0.12 {
         TB_KEY_ARROW_DOWN       => ( 0xFFFF - 19 ),
         TB_KEY_ARROW_LEFT       => ( 0xFFFF - 20 ),
         TB_KEY_ARROW_RIGHT      => ( 0xFFFF - 21 ),
-        TB_KEY_MOUSE_LEFT       => ( 0xFFFF - 22 ),
-        TB_KEY_MOUSE_RIGHT      => ( 0xFFFF - 23 ),
-        TB_KEY_MOUSE_MIDDLE     => ( 0xFFFF - 24 ),
-        TB_KEY_MOUSE_RELEASE    => ( 0xFFFF - 25 ),
-        TB_KEY_MOUSE_WHEEL_UP   => ( 0xFFFF - 26 ),
-        TB_KEY_MOUSE_WHEEL_DOWN => ( 0xFFFF - 27 ),
+        TB_KEY_BACK_TAB         => ( 0xffff - 22 ),
+        TB_KEY_MOUSE_LEFT       => ( 0xffff - 23 ),
+        TB_KEY_MOUSE_RIGHT      => ( 0xffff - 24 ),
+        TB_KEY_MOUSE_MIDDLE     => ( 0xffff - 25 ),
+        TB_KEY_MOUSE_RELEASE    => ( 0xffff - 26 ),
+        TB_KEY_MOUSE_WHEEL_UP   => ( 0xffff - 27 ),
+        TB_KEY_MOUSE_WHEEL_DOWN => ( 0xffff - 28 ),
+        #
+        TB_CAP_F1           => 0,
+        TB_CAP_F2           => 1,
+        TB_CAP_F3           => 2,
+        TB_CAP_F4           => 3,
+        TB_CAP_F5           => 4,
+        TB_CAP_F6           => 5,
+        TB_CAP_F7           => 6,
+        TB_CAP_F8           => 7,
+        TB_CAP_F9           => 8,
+        TB_CAP_F10          => 9,
+        TB_CAP_F11          => 10,
+        TB_CAP_F12          => 11,
+        TB_CAP_INSERT       => 12,
+        TB_CAP_DELETE       => 13,
+        TB_CAP_HOME         => 14,
+        TB_CAP_END          => 15,
+        TB_CAP_PGUP         => 16,
+        TB_CAP_PGDN         => 17,
+        TB_CAP_ARROW_UP     => 18,
+        TB_CAP_ARROW_DOWN   => 19,
+        TB_CAP_ARROW_LEFT   => 20,
+        TB_CAP_ARROW_RIGHT  => 21,
+        TB_CAP_BACK_TAB     => 22,
+        TB_CAP__COUNT_KEYS  => 23,
+        TB_CAP_ENTER_CA     => 23,
+        TB_CAP_EXIT_CA      => 24,
+        TB_CAP_SHOW_CURSOR  => 25,
+        TB_CAP_HIDE_CURSOR  => 26,
+        TB_CAP_CLEAR_SCREEN => 27,
+        TB_CAP_SGR0         => 28,
+        TB_CAP_UNDERLINE    => 29,
+        TB_CAP_BOLD         => 30,
+        TB_CAP_BLINK        => 31,
+        TB_CAP_ITALIC       => 32,
+        TB_CAP_REVERSE      => 33,
+        TB_CAP_ENTER_KEYPAD => 34,
+        TB_CAP_EXIT_KEYPAD  => 35,
+        TB_CAP__COUNT       => 36
+    };
+    _export colors => {
+        TB_DEFAULT   => 0x0000,
+        TB_BLACK     => 0x0001,
+        TB_RED       => 0x0002,
+        TB_GREEN     => 0x0003,
+        TB_YELLOW    => 0x0004,
+        TB_BLUE      => 0x0005,
+        TB_MAGENTA   => 0x0006,
+        TB_CYAN      => 0x0007,
+        TB_WHITE     => 0x0008,
+        TB_BOLD      => 0x0100,
+        TB_UNDERLINE => 0x0200,
+        TB_REVERSE   => 0x0400,
+        TB_ITALIC    => 0x0800,
+        TB_BLINK     => 0x1000,
+        TB_256_BLACK => 0x2000, (
+            $TRUECOLOR ? (
+                TB_TRUECOLOR_BOLD      => 0x01000000,
+                TB_TRUECOLOR_UNDERLINE => 0x02000000,
+                TB_TRUECOLOR_REVERSE   => 0x04000000,
+                TB_TRUECOLOR_ITALIC    => 0x08000000,
+                TB_TRUECOLOR_BLINK     => 0x10000000,
+                TB_TRUECOLOR_BLACK     => 0x20000000,
+                ) :
+                ()
+        )
+    };
+    _export event => {
 
-        # These are all ASCII code points below SPACE character and a BACKSPACE key.
-        TB_KEY_CTRL_TILDE       => 0x00,
-        TB_KEY_CTRL_2           => 0x00,    # clash with 'CTRL_TILDE'
-        TB_KEY_CTRL_A           => 0x01,
-        TB_KEY_CTRL_B           => 0x02,
-        TB_KEY_CTRL_C           => 0x03,
-        TB_KEY_CTRL_D           => 0x04,
-        TB_KEY_CTRL_E           => 0x05,
-        TB_KEY_CTRL_F           => 0x06,
-        TB_KEY_CTRL_G           => 0x07,
-        TB_KEY_BACKSPACE        => 0x08,
-        TB_KEY_CTRL_H           => 0x08,    # clash with 'CTRL_BACKSPACE'
-        TB_KEY_TAB              => 0x09,
-        TB_KEY_CTRL_I           => 0x09,    # clash with 'TAB'
-        TB_KEY_CTRL_J           => 0x0A,
-        TB_KEY_CTRL_K           => 0x0B,
-        TB_KEY_CTRL_L           => 0x0C,
-        TB_KEY_ENTER            => 0x0D,
-        TB_KEY_CTRL_M           => 0x0D,    # clash with 'ENTER'
-        TB_KEY_CTRL_N           => 0x0E,
-        TB_KEY_CTRL_O           => 0x0F,
-        TB_KEY_CTRL_P           => 0x10,
-        TB_KEY_CTRL_Q           => 0x11,
-        TB_KEY_CTRL_R           => 0x12,
-        TB_KEY_CTRL_S           => 0x13,
-        TB_KEY_CTRL_T           => 0x14,
-        TB_KEY_CTRL_U           => 0x15,
-        TB_KEY_CTRL_V           => 0x16,
-        TB_KEY_CTRL_W           => 0x17,
-        TB_KEY_CTRL_X           => 0x18,
-        TB_KEY_CTRL_Y           => 0x19,
-        TB_KEY_CTRL_Z           => 0x1A,
-        TB_KEY_ESC              => 0x1B,
-        TB_KEY_CTRL_LSQ_BRACKET => 0x1B,    # clash with 'ESC'
-        TB_KEY_CTRL_3           => 0x1B,    # clash with 'ESC'
-        TB_KEY_CTRL_4           => 0x1C,
-        TB_KEY_CTRL_BACKSLASH   => 0x1C,    # clash with 'CTRL_4'
-        TB_KEY_CTRL_5           => 0x1D,
-        TB_KEY_CTRL_RSQ_BRACKET => 0x1D,    # clash with 'CTRL_5'
-        TB_KEY_CTRL_6           => 0x1E,
-        TB_KEY_CTRL_7           => 0x1F,
-        TB_KEY_CTRL_SLASH       => 0x1F,    # clash with 'CTRL_7'
-        TB_KEY_CTRL_UNDERSCORE  => 0x1F,    # clash with 'CTRL_7'
-        TB_KEY_SPACE            => 0x20,
-        TB_KEY_BACKSPACE2       => 0x7F,
-        TB_KEY_CTRL_8           => 0x7F     # clash with 'BACKSPACE2'
-    };
-    $EXPORT_TAGS{keys} = [
-        qw[
-            TB_KEY_F1
-            TB_KEY_F2
-            TB_KEY_F3
-            TB_KEY_F4
-            TB_KEY_F5
-            TB_KEY_F6
-            TB_KEY_F7
-            TB_KEY_F8
-            TB_KEY_F9
-            TB_KEY_F10
-            TB_KEY_F11
-            TB_KEY_F12
-            TB_KEY_INSERT
-            TB_KEY_DELETE
-            TB_KEY_HOME
-            TB_KEY_END
-            TB_KEY_PGUP
-            TB_KEY_PGDN
-            TB_KEY_ARROW_UP
-            TB_KEY_ARROW_DOWN
-            TB_KEY_ARROW_LEFT
-            TB_KEY_ARROW_RIGHT
-            TB_KEY_MOUSE_LEFT
-            TB_KEY_MOUSE_RIGHT
-            TB_KEY_MOUSE_MIDDLE
-            TB_KEY_MOUSE_RELEASE
-            TB_KEY_MOUSE_WHEEL_UP
-            TB_KEY_MOUSE_WHEEL_DOWN
-            TB_KEY_CTRL_TILDE
-            TB_KEY_CTRL_2
-            TB_KEY_CTRL_A
-            TB_KEY_CTRL_B
-            TB_KEY_CTRL_C
-            TB_KEY_CTRL_D
-            TB_KEY_CTRL_E
-            TB_KEY_CTRL_F
-            TB_KEY_CTRL_G
-            TB_KEY_BACKSPACE
-            TB_KEY_CTRL_H
-            TB_KEY_TAB
-            TB_KEY_CTRL_I
-            TB_KEY_CTRL_J
-            TB_KEY_CTRL_K
-            TB_KEY_CTRL_L
-            TB_KEY_ENTER
-            TB_KEY_CTRL_M
-            TB_KEY_CTRL_N
-            TB_KEY_CTRL_O
-            TB_KEY_CTRL_P
-            TB_KEY_CTRL_Q
-            TB_KEY_CTRL_R
-            TB_KEY_CTRL_S
-            TB_KEY_CTRL_T
-            TB_KEY_CTRL_U
-            TB_KEY_CTRL_V
-            TB_KEY_CTRL_W
-            TB_KEY_CTRL_X
-            TB_KEY_CTRL_Y
-            TB_KEY_CTRL_Z
-            TB_KEY_ESC
-            TB_KEY_CTRL_LSQ_BRACKET
-            TB_KEY_CTRL_3
-            TB_KEY_CTRL_4
-            TB_KEY_CTRL_BACKSLASH
-            TB_KEY_CTRL_5
-            TB_KEY_CTRL_RSQ_BRACKET
-            TB_KEY_CTRL_6
-            TB_KEY_CTRL_7
-            TB_KEY_CTRL_SLASH
-            TB_KEY_CTRL_UNDERSCORE
-            TB_KEY_SPACE
-            TB_KEY_BACKSPACE2
-            TB_KEY_CTRL_8
-        ]
-    ];
-    #
-    use constant { TB_MOD_ALT => 0x01, TB_MOD_MOTION => 0x02 };
-    $EXPORT_TAGS{modifier} = [
-        qw[
-            TB_MOD_ALT
-            TB_MOD_MOTION
-        ]
-    ];
-    #
-    use constant {
-        TB_DEFAULT => 0x00,
-        TB_BLACK   => 0x01,
-        TB_RED     => 0x02,
-        TB_GREEN   => 0x03,
-        TB_YELLOW  => 0x04,
-        TB_BLUE    => 0x05,
-        TB_MAGENTA => 0x06,
-        TB_CYAN    => 0x07,
-        TB_WHITE   => 0x08,
-    };
-    $EXPORT_TAGS{color} = [
-        qw[
-            TB_DEFAULT
-            TB_BLACK
-            TB_RED
-            TB_GREEN
-            TB_YELLOW
-            TB_BLUE
-            TB_MAGENTA
-            TB_CYAN
-            TB_WHITE
-        ]
-    ];
-    #
-    use constant { TB_BOLD => 0x0100, TB_UNDERLINE => 0x0200, TB_REVERSE => 0x0400 };
-    $EXPORT_TAGS{font} = [
-        qw[
-            TB_BOLD
-            TB_UNDERLINE
-            TB_REVERSE
-        ]
-    ];
-    #
-    use constant { TB_EVENT_KEY => 1, TB_EVENT_RESIZE => 2, TB_EVENT_MOUSE => 3 };
-    $EXPORT_TAGS{event} = [
-        qw[
-            TB_EVENT_KEY
-            TB_EVENT_RESIZE
-            TB_EVENT_MOUSE
-        ]
-    ];
-    #
-    use constant {
-        TB_EUNSUPPORTED_TERMINAL => -1,
-        TB_EFAILED_TO_OPEN_TTY   => -2,
-        TB_EPIPE_TRAP_ERROR      => -3
-    };
-    $EXPORT_TAGS{error} = [
-        qw[
-            TB_EUNSUPPORTED_TERMINAL
-            TB_EFAILED_TO_OPEN_TTY
-            TB_EPIPE_TRAP_ERROR
-        ]
-    ];
-    #
-    use constant { TB_HIDE_CURSOR => -1 };
-    $EXPORT_TAGS{cursor} = [
-        qw[
-            TB_HIDE_CURSOR
-        ]
-    ];
-    #
-    use constant {
+        #~ Event types (tb_event.type)
+        TB_EVENT_KEY    => 1,
+        TB_EVENT_RESIZE => 2,
+        TB_EVENT_MOUSE  => 3,
+
+        #~ Key modifiers (bitwise) (tb_event.mod)
+        TB_MOD_ALT    => 1,
+        TB_MOD_CTRL   => 2,
+        TB_MOD_SHIFT  => 4,
+        TB_MOD_MOTION => 8,
+
+        #~ Input modes (bitwise) (tb_set_input_mode)
         TB_INPUT_CURRENT => 0,
         TB_INPUT_ESC     => 1,
         TB_INPUT_ALT     => 2,
-        TB_INPUT_MOUSE   => => 4
-    };
-    $EXPORT_TAGS{input} = [
-        qw[
-            TB_INPUT_CURRENT
-            TB_INPUT_ESC
-            TB_INPUT_ALT
-            TB_INPUT_MOUSE
-        ]
-    ];
-    use constant {
+        TB_INPUT_MOUSE   => 4,
+
+        #~ Output modes (tb_set_output_mode)
         TB_OUTPUT_CURRENT   => 0,
         TB_OUTPUT_NORMAL    => 1,
         TB_OUTPUT_256       => 2,
         TB_OUTPUT_216       => 3,
-        TB_OUTPUT_GRAYSCALE => 4
+        TB_OUTPUT_GRAYSCALE => 4,
+        ( $TRUECOLOR ? ( TB_OUTPUT_TRUECOLOR => 5 ) : () )
     };
-    $EXPORT_TAGS{output} = [
-        qw[
-            TB_OUTPUT_NORMAL
-            TB_OUTPUT_256
-            TB_OUTPUT_216
-            TB_OUTPUT_GRAYSCALE
-        ]
-    ];
+    _export return => {
+        TB_OK                   => 0,
+        TB_ERR                  => -1,
+        TB_ERR_NEED_MORE        => -2,
+        TB_ERR_INIT_ALREADY     => -3,
+        TB_ERR_INIT_OPEN        => -4,
+        TB_ERR_MEM              => -5,
+        TB_ERR_NO_EVENT         => -6,
+        TB_ERR_NO_TERM          => -7,
+        TB_ERR_NOT_INIT         => -8,
+        TB_ERR_OUT_OF_BOUNDS    => -9,
+        TB_ERR_READ             => -10,
+        TB_ERR_RESIZE_IOCTL     => -11,
+        TB_ERR_RESIZE_PIPE      => -12,
+        TB_ERR_RESIZE_SIGACTION => -13,
+        TB_ERR_POLL             => -14,
+        TB_ERR_TCGETATTR        => -15,
+        TB_ERR_TCSETATTR        => -16,
+        TB_ERR_UNSUPPORTED_TERM => -17,
+        TB_ERR_RESIZE_WRITE     => -18,
+        TB_ERR_RESIZE_POLL      => -19,
+        TB_ERR_RESIZE_READ      => -20,
+        TB_ERR_RESIZE_SSCANF    => -21,
+        TB_ERR_CAP_COLLISION    => -22
+    };
+    _export return =>
+        { TB_ERR_SELECT => TB_ERR_POLL(), TB_ERR_RESIZE_SELECT => TB_ERR_RESIZE_POLL() };
+    _export func => { TB_FUNC_EXTRACT_PRE => 0, TB_FUNC_EXTRACT_POST => 1 };
+    #
     @EXPORT_OK          = sort map { @$_ = sort @$_; @$_ } values %EXPORT_TAGS;
     $EXPORT_TAGS{'all'} = \@EXPORT_OK;    # When you want to import everything
 
     #
-    use Termbox::Cell;
+    package                               #
+        Termbox::Cell {
+        use FFI::Platypus::Record;
+        record_layout_1(
+            uint32_t             => 'ch',
+            $Termbox::uintattr_t => 'fg',
+            $Termbox::uintattr_t => 'bg', (
+                Termbox::tb_has_egc() ? ( 'opaque' => 'ech', size_t => 'nech', size_t => 'cech' ) :
+                    ()
+            )
+        );
+        };
     $ffi->type('record(Termbox::Cell)');
     #
-    use Termbox::Event;
+    package    #
+        Termbox::Event {
+        use FFI::Platypus::Record;
+        record_layout_1(
+            qw[
+                uint8_t  type
+                uint8_t  mod
+                uint16_t key
+                uint32_t ch
+                int32_t  w
+                int32_t  h
+                int32_t  x
+                int32_t  y
+            ]
+        );
+        };
+    #
     $ffi->type('record(Termbox::Event)');
     #
-    $ffi->attach( tb_init      => ['void']   => 'int' );
-    $ffi->attach( tb_init_file => ['string'] => 'int' );
-    $ffi->attach( tb_init_fd   => ['int']    => 'int' );
-    $ffi->attach( tb_shutdown  => ['void']   => 'void' );
+    $ffi->attach( tb_init      => ['void']         => 'int' );
+    $ffi->attach( tb_init_file => ['string']       => 'int' );
+    $ffi->attach( tb_init_fd   => ['int']          => 'int' );
+    $ffi->attach( tb_init_rwfd => [ 'int', 'int' ] => 'int' );
+    $ffi->attach( tb_shutdown  => ['void']         => 'void' );
     #
     $ffi->attach( tb_width  => ['void'] => 'int' );
     $ffi->attach( tb_height => ['void'] => 'int' );
     #
-    $ffi->attach( tb_clear                => ['void']                   => 'void' );
-    $ffi->attach( tb_set_clear_attributes => [ 'uint16_t', 'uint16_t' ] => 'void' );
+    $ffi->attach( tb_clear           => ['void']                     => 'void' );
+    $ffi->attach( tb_set_clear_attrs => [ $uintattr_t, $uintattr_t ] => 'void' );
     #
     $ffi->attach( tb_present => ['void'] => 'void' );
     #
-    $ffi->attach( tb_set_cursor => [ 'int', 'int' ] => 'void' );
+    $ffi->attach( tb_invalidate => ['void'] => 'void' );
     #
-    $ffi->attach( tb_put_cell => [ 'int', 'int', 'record(Termbox::Cell)*' ] => 'void' );
-    $ffi->attach( [ 'tb_change_cell' => '_tb_change_cell' ],
-        [ 'int', 'int', 'uint32_t', 'uint16_t', 'uint16_t' ] => 'void' );
-
-    # The C API expects a char which doesn't so much work with Perl's representation of a character.
-    sub tb_change_cell {
-        _tb_change_cell( $_[0], $_[1], ( length $_[2] == 1 ? ord( $_[2] ) : $_[2] ), $_[3], $_[4] );
-    }
+    $ffi->attach( tb_set_cursor  => [ 'int', 'int' ] => 'void' );
+    $ffi->attach( tb_hide_cursor => ['void']         => 'void' );
     #
-    $ffi->attach( tb_cell_buffer => ['void'] => 'record(Termbox::Cell)*' );
+    $ffi->attach(
+        tb_set_cell => [ 'int', 'int', 'uint32_t', $uintattr_t, $uintattr_t ] => 'int',
+        sub {
+            my ( $xsub, $x, $y, $ch, $fg, $bg ) = @_;
+            $xsub->( $x, $y, ord $ch, $fg, $bg );
+        }
+    );
+    $ffi->attach(
+        tb_set_cell_ex => [ 'int', 'int', 'uint32_t', 'size_t', $uintattr_t, $uintattr_t ] => 'int',
+        sub {
+            my ( $xsub, $x, $y, $ch, $nch, $fg, $bg ) = @_;
+            $xsub->( $x, $y, ord $ch, $nch, $fg, $bg );
+        }
+    );
+    $ffi->attach(
+        tb_extend_cell => [ 'int', 'int', 'uint32_t' ] => 'int',
+        sub {
+            my ( $xsub, $x, $y, $ch ) = @_;
+            $xsub->( $x, $y, ord $ch );
+        }
+    );
     #
-    $ffi->attach( tb_select_input_mode => ['int'] => 'int' );
+    $ffi->attach( tb_set_input_mode => ['int'] => 'int' );
     #
-    $ffi->attach( tb_select_output_mode => ['int'] => 'int' );
+    $ffi->attach( tb_set_output_mode => ['int'] => 'int' );
     #
     $ffi->attach( tb_peek_event => [ 'record(Termbox::Event)*', 'int' ] => 'int' );
     #
     $ffi->attach( tb_poll_event => ['record(Termbox::Event)*'] => 'int' );
-
-    # Utils: Not documented yet... might keep them private
-    $ffi->attach( tb_utf8_char_length     => ['char']                   => 'int' );
-    $ffi->attach( tb_utf8_char_to_unicode => [ 'uint32_t *', 'string' ] => 'int' );
-    $ffi->attach( tb_utf8_unicode_to_char => [qw[string uint32_t]]      => 'int' );
     #
+    $ffi->attach( tb_get_fds => [ 'int*', 'int*' ] => 'int' );
+    #
+    $ffi->attach( tb_print => [ 'int', 'int', $uintattr_t, $uintattr_t, 'string' ] => 'int' );
+
+#~ int tb_printf(int x, int y, uintattr_t fg, uintattr_t bg, const char *fmt, ...);
+#~ int tb_print_ex(int x, int y, uintattr_t fg, uintattr_t bg, size_t *out_w, const char *str);
+#~ int tb_printf_ex(int x, int y, uintattr_t fg, uintattr_t bg, size_t *out_w, const char *fmt, ...);
+#
+    $ffi->attach( tb_send => [ 'string', 'size_t' ] => 'int' );
+    #
+    $ffi->type( '(opaque, opaque)->int' => 'closure_t' );   # int (*fn)(struct tb_event *, size_t *)
+    $ffi->attach(
+        tb_set_func => [ 'int', 'closure_t' ] => 'int',
+        sub {
+            CORE::state $cache;
+            my ( $xsub, $fn_type, $func ) = @_;
+            $cache->{$fn_type}->unsticky if $cache->{$fn_type};
+            my $closure;
+            if ($func) {
+                $closure = $ffi->closure(
+                    sub {
+                        my ( $event, $size ) = @_;
+                        $func->(
+                            $ffi->cast( 'opaque', 'record(Termbox::Event)*', $event ),
+                            $ffi->cast( 'opaque', 'size_t*',                 $size )
+                        );
+                    }
+                );
+                $closure->sticky;
+            }
+            $cache->{$fn_type} = $closure;
+            $xsub->( $fn_type, $closure );
+        }
+    );
+    #
+    $ffi->attach( tb_utf8_char_length     => ['char']                   => 'int' );
+    $ffi->attach( tb_utf8_char_to_unicode => [ 'uint32_t*', 'string*' ] => 'int' );
+    $ffi->attach( tb_utf8_unicode_to_char => [ 'string', 'uint32_t' ]   => 'int' );
+    $ffi->attach( tb_last_errno           => ['void']                   => 'int' );
+    $ffi->attach( tb_strerror             => ['int']                    => 'string' );
+    $ffi->attach( tb_cell_buffer          => ['void'] => 'record(Termbox::Cell)*' );
+
+    # tb_has_truecolor and tbs_has_egc are defined near the top
+    $ffi->attach( tb_version => ['void'] => 'string' );
 }
 1;
 __END__
@@ -354,56 +362,53 @@ Termbox - Create Text-based User Interfaces Without ncurses
 
 =head1 SYNOPSIS
 
-	use Termbox qw[:all];
-	my @chars = split //, 'hello, world!';
-	my $code  = tb_init();
-	die sprintf "termbox init failed, code: %d\n", $code if $code;
-	tb_select_input_mode(TB_INPUT_ESC);
-	tb_select_output_mode(TB_OUTPUT_NORMAL);
-	tb_clear();
-	my @rows = (
-		[TB_WHITE,   TB_BLACK],
-		[TB_BLACK,   TB_DEFAULT],
-		[TB_RED,     TB_GREEN],
-		[TB_GREEN,   TB_RED],
-		[TB_YELLOW,  TB_BLUE],
-		[TB_MAGENTA, TB_CYAN]);
-
-	for my $colors (0 .. $#rows) {
-		my $j = 0;
-		for my $char (@chars) {
-			tb_change_cell($j, $colors, ord $char, @{ $rows[$colors] });
-			$j++;
-		}
-	}
-	tb_present();
-	while (1) {
-		my $ev = Termbox::Event->new();
-		tb_poll_event($ev);
-		if ($ev->key == TB_KEY_ESC) {
-			tb_shutdown();
-			exit 0;
-		}
-	}
+    use Termbox 2 qw[:all];
+    #
+    my @chars = split //, 'hello, world!';
+    my $code  = tb_init();
+    tb_clear();
+    my @rows = (
+        [ TB_WHITE,   TB_BLACK ],
+        [ TB_BLACK,   TB_DEFAULT ],
+        [ TB_RED,     TB_GREEN ],
+        [ TB_GREEN,   TB_RED ],
+        [ TB_YELLOW,  TB_BLUE ],
+        [ TB_MAGENTA, TB_CYAN ]
+    );
+    for my $row ( 0 .. $#rows ) {
+        for my $col ( 0 .. $#chars ) {
+            tb_set_cell( $col, $row, $chars[$col], @{ $rows[$row] } );
+        }
+    }
+    tb_present();
+    sleep 3;
+    tb_shutdown();
 
 =head1 DESCRIPTION
 
-Termbox is a library that provides minimalistic API which allows the programmer
-to write text-based user interfaces. The library is cross-platform and has both
-terminal-based implementations on *nix operating systems and a winapi console
-based implementation for windows operating systems. The basic idea is an
-abstraction of the greatest common subset of features available on all major
-terminals and other terminal-like APIs in a minimalistic fashion. Small API
-means it is easy to implement, test, maintain and learn it, that's what makes
-the termbox a distinct library in its area.
+Termbox is a terminal rendering library that retains the
+L<suckless|https://suckless.org/coding_style/> spirit of the original termbox
+(simple API, no dependencies beyond libc) and adds some improvements:
+
+=over
+
+=item strict error checking
+
+=item more efficient escape sequence parsing
+
+=item code gen for built-in escape sequences
+
+=item opt-in support for 32-bit color
+
+=item extended grapheme clusters
+
+=back
 
 =head2 Note
 
-This is a first draft to get my feet wet with FFI::Platypus. It'll likely be
-prone to tipping over. For now, libtermbox is built by this package during
-installation but that'll change when I wrap my mind around Alien::Base, et. al.
-
-This module's API will likely change to be more Perl and less C.
+This module wraps C<libtermbox2>, an incompatible fork of the now abandoned
+C<libtermbox>. I'm not sure why you would but if you're looking for the
+original, try any version of L<Termbox|Termbox>.pm before 2.0.
 
 =head1 Functions
 
@@ -412,7 +417,7 @@ Import them by name or with C<:all>.
 
 =head2 C<tb_init( )>
 
-Initializes the termbox library. This function should be called before any
+Initializes the termbox2 library. This function should be called before any
 other functions. Calling this is the same as C<tb_init_file('/dev/tty')>. After
 successful initialization, the library must be finalized using the
 C<tb_shutdown( )> function.
@@ -421,21 +426,26 @@ If this returns anything other than C<0>, it didn't work.
 
 =head2 C<tb_init_file( $name )>
 
-This function will init the termbox library on the file name provided.
+This function will init the termbox2 library on the file name provided.
 
 =head2 C<tb_init_fd( $fileno )>
 
-This function will init the termbox library on the provided filehandle. This is
-untested.
+This function will init the termbox2 library on the provided filehandle. This
+is untested.
+
+=head2 C<tb_init_rwfd( $rfileno, $wfileno )>
+
+This function will init the termbox2 library on the provided filehandles. This
+is untested.
 
 =head2 C<tb_shutdown( )>
 
-Causes the termbox library to attempt to clean up after itself.
+Causes the termbox2 library to attempt to clean up after itself.
 
 =head2 C<tb_width( )>
 
 Returns the horizontal size of the internal back buffer (which is the same as
-terminal's window size in characters).
+terminal's window size in columns).
 
 The internal buffer can be resized after C<tb_clear( )> or C<tb_present( )>
 function calls. This function returns an unspecified negative value when called
@@ -444,7 +454,7 @@ before C<tb_init( )> or after C<tb_shutdown( )>.
 =head2 C<tb_height( )>
 
 Returns the vertical size of the internal back buffer (which is the same as
-terminal's window size in characters).
+terminal's window size in rows).
 
 The internal buffer can be resized after C<tb_clear( )> or C<tb_present( )>
 function calls. This function returns an unspecified negative value when called
@@ -453,148 +463,251 @@ before C<tb_init( )> or after C<tb_shutdown( )>.
 =head2 C<tb_clear( )>
 
 Clears the internal back buffer using C<TB_DEFAULT> color or the
-color/attributes set by C<tb_set_clear_attributes( )> function.
+color/attributes set by C<tb_set_clear_attrs( )> function.
 
-=head2 C<tb_set_clear_attributes( $fg, $bg )>
+=head2 C<tb_set_clear_attrs( $fg, $bg )>
 
 Overrides the use of C<TB_DEFAULT> to clear the internal back buffer when
 C<tb_clear( )> is called.
 
 =head2 C<tb_present( )>
 
-Synchronizes the internal back buffer with the terminal.
+Synchronizes the internal back buffer with the terminal by writing to tty.
+
+=head2 C<tb_invalidate( )>
+
+Clears the internal front buffer effectively forcing a complete re-render of
+the back buffer to the tty. It is not necessary to call this under normal
+circumstances.
 
 =head2 C<tb_set_cursor( $x, $y )>
 
-Sets the position of the cursor. Upper-left character is C<(0, 0)>. If you pass
-C<TB_HIDE_CURSOR> as both coordinates, then the cursor will be hidden. Cursor
-is hidden by default.
+Sets the position of the cursor. Upper-left character is C<(0, 0)>.
 
-=head2 C<tb_put_cell( $x, $y, $cell )>
+=head2 C<tb_hide_cursor( )>
 
-Changes cell's parameters in the internal back buffer at the specified
-position.
+Hides the cursor.
 
-=head2 C<tb_change_cell( $x, $y, $char, $fg, $bg)>
+=head2 C<tb_set_cell( $x, $y, $ch, $fg, $bg )>
 
-Changes cell's parameters in the internal back buffer at the specified
-position, with the specified character, and with the specified foreground and
-background colors.
+Set cell contents in the internal back buffer at the specified position.
 
-=head2 C<tb_cell_buffer( )>
+Function C<tb_set_cell($x, $y, $ch, $fg, $bg)>is equivalent to
+C<tb_set_cell_ex($x, $y, $ch, 1, $fg, $bg)>.
 
-Returns a C<Termbox::Cell> object containing a pointer to internal cell back
-buffer. You can get its dimensions using C<tb_width( )> and C<tb_height( )>
-methods. The pointer stays valid as long as no C<tb_clear( )> and C<tb_present(
-)> calls are made. The buffer is one-dimensional buffer containing lines of
-cells starting from the top.
+=head2 C<tb_set_cell_ex( $x, $y, $ch, $nch, $fg, $bg )>
 
-=head2 C<tb_select_input_mode( $mode )>
+Set cell contents in the internal back buffer at the specified position. Use
+this function for rendering grapheme clusters (e.g., combining diacritical
+marks).
 
-Sets the termbox input mode. Termbox has two input modes:
+=head2 C<tb_extend_cell( $x, $y, $ch )>
+
+Shortcut to append 1 code point to the given cell.
+
+=head2 C<tb_set_input_mode( $mode )>
+
+Sets the input mode. Termbox has two input modes:
 
 =over
 
-=item 1. Esc input mode.
+=item 1. C<TB_INPUT_ESC>
 
-When ESC sequence is in the buffer and it doesn't match any known ESC sequence
-where ESC means C<TB_KEY_ESC>.
+When escape (C<\x1b>) is in the buffer and there's no match for an escape
+sequence, a key event for TB_KEY_ESC is returned.
 
-=item 2. Alt input mode.
+=item 2. C<TB_INPUT_ALT>
 
-When ESC sequence is in the buffer and it doesn't match any known sequence ESC
-enables C<TB_MOD_ALT> modifier for the next keyboard event.
+When escape (C<\x1b>) is in the buffer and there's no match for an escape
+sequence, the next keyboard event is returned with a C<TB_MOD_ALT> modifier.
 
 =back
 
 You can also apply C<TB_INPUT_MOUSE> via bitwise OR operation to either of the
-modes (e.g. C<TB_INPUT_ESC | TB_INPUT_MOUSE>). If none of the main two modes
-were set, but the mouse mode was, C<TB_INPUT_ESC> mode is used. If for some
-reason you've decided to use C<(TB_INPUT_ESC | TB_INPUT_ALT)> combination, it
-will behave as if only TB_INPUT_ESC was selected.
+modes (e.g., C<TB_INPUT_ESC | TB_INPUT_MOUSE>) to receive C<TB_EVENT_MOUSE>
+events. If none of the main two modes were set, but the mouse mode was,
+C<TB_INPUT_ESC> mode is used. If for some reason you've decided to use
+(C<TB_INPUT_ESC | TB_INPUT_ALT>) combination, it will behave as if only
+C<TB_INPUT_ESC> was selected.
 
-If 'mode' is C<TB_INPUT_CURRENT>, it returns the current input mode.
+If mode is C<TB_INPUT_CURRENT>, the function returns the current input mode.
 
-Default termbox input mode is C<TB_INPUT_ESC>.
+The default input mode is C<TB_INPUT_ESC>.
 
-=head2 C<tb_select_output_mode( $mode )>
+=head2 C<tb_set_output_mode( $mode )>
 
-Sets the termbox output mode. Termbox has three output options:
+Sets the termbox2 output mode. Termbox has multiple output modes:
 
 =over
 
+=item 1. C<TB_OUTPUT_NORMAL> => [0..8]
 
-=item 1. C<TB_OUTPUT_NORMAL> - C<1 .. 8>
+This mode provides 8 different colors: C<TB_BLACK>, C<TB_RED>, C<TB_GREEN>,
+C<TB_YELLOW>, C<TB_BLUE>, C<TB_MAGENTA>, C<TB_CYAN>, C<TB_WHITE>
 
-This mode provides 8 different colors: black, red, green, yellow, blue,
-magenta, cyan, white
+Plus C<TB_DEFAULT> which skips sending a color code (i.e., uses the terminal's
+default color).
 
-Shortcut: C<TB_BLACK>, C<TB_RED>, etc.
+Colors (including C<TB_DEFAULT>) may be bitwise OR'd with attributes:
+C<TB_BOLD>, C<TB_UNDERLINE>, C<TB_REVERSE>, C<TB_ITALIC>, C<TB_BLINK>
 
-Attributes: C<TB_BOLD>, C<TB_UNDERLINE>, C<TB_REVERSE>
+As in all modes, the value C<0> is interpreted as C<TB_DEFAULT> for
+convenience.
 
-Example usage:
-
-	tb_change_cell(x, y, '@', TB_BLACK | TB_BOLD, TB_RED);
-
-
-=item 2. C<TB_OUTPUT_256> - C<0 .. 256>
-
-In this mode you can leverage the 256 terminal mode:
-
-	0x00 - 0x07: the 8 colors as in TB_OUTPUT_NORMAL
-	0x08 - 0x0f: TB_* | TB_BOLD
-	0x10 - 0xe7: 216 different colors
-	0xe8 - 0xff: 24 different shades of grey
+Some notes: C<TB_REVERSE> can be applied as either fg or bg attributes for the
+same effect. C<TB_BOLD>, C<TB_UNDERLINE>, C<TB_ITALIC>, C<TB_BLINK> apply as fg
+attributes only, and are ignored as bg attributes.
 
 Example usage:
 
-	tb_change_cell(x, y, '@', 184, 240);
-	tb_change_cell(x, y, '@', 0xb8, 0xf0);
+    tb_set_cell($x, $y, '@', TB_BLACK | TB_BOLD, TB_RED);
 
-=item 3. C<TB_OUTPUT_216> - C<0 .. 216>
+=item 2. C<TB_OUTPUT_256> => [0..255] + C<TB_256_BLACK>
 
-This mode supports the 3rd range of the 256 mode only. But you don't need to
-provide an offset.
+In this mode you get 256 distinct colors (plus default):
 
-=item 4. C<TB_OUTPUT_GRAYSCALE> - C<0 .. 23>
+                0x00   (1): TB_DEFAULT
+        TB_256_BLACK   (1): TB_BLACK in TB_OUTPUT_NORMAL
+          0x01..0x07   (7): the next 7 colors as in TB_OUTPUT_NORMAL
+          0x08..0x0f   (8): bright versions of the above
+          0x10..0xe7 (216): 216 different colors
+          0xe8..0xff  (24): 24 different shades of gray
 
-This mode supports the 4th range of the 256 mode only. But you do not need to
-provide an offset.
+Attributes may be bitwise OR'd as in C<TB_OUTPUT_NORMAL>.
+
+Note C<TB_256_BLACK> must be used for black, as C<0x00> represents default.
+
+=item 3. C<TB_OUTPUT_216> => [0..216]
+
+This mode supports the 216-color range of C<TB_OUTPUT_256> only, but you don't
+need to provide an offset:
+
+                0x00   (1): TB_DEFAULT
+          0x01..0xd8 (216): 216 different colors
+
+=item 4. C<TB_OUTPUT_GRAYSCALE> => [0..24]
+
+This mode supports the 24-color range of C<TB_OUTPUT_256> only, but you don't
+need to provide an offset:
+
+                0x00   (1): TB_DEFAULT
+          0x01..0x18  (24): 24 different shades of gray
+
+=item 5. C<TB_OUTPUT_TRUECOLOR> => [0x000000..0xffffff] + C<TB_TRUECOLOR_BLACK>
+
+This mode provides 24-bit color on supported terminals. The format is
+C<0xRRGGBB>. Colors may be bitwise OR'd with C<TB_TRUECOLOR_*> attributes.
+
+Note C<TB_TRUECOLOR_BLACK> must be used for black, as C<0x000000> represents
+default.
 
 =back
 
-If 'mode' is C<TB_OUTPUT_CURRENT>, it returns the current output mode.
+If mode is C<TB_OUTPUT_CURRENT>, the function returns the current output mode.
 
-Default termbox output mode is C<TB_OUTPUT_NORMAL>.
+The default output mode is C<TB_OUTPUT_NORMAL>.
 
-=head2 C<tb_peek_event( $event, $timeout )>
+To use the terminal default color (i.e., to not send an escape code), pass
+C<TB_DEFAULT>. For convenience, the value C<0> is interpreted as C<TB_DEFAULT>
+in all modes.
 
-Wait for an event up to 'timeout' milliseconds and fill the 'event' object with
-it, when the event is available. Returns the type of the event (one of
-C<TB_EVENT_*> constants) or C<-1> if there was an error or C<0> in case there
-were no event during 'timeout' period.
+Note, cell attributes persist after switching output modes. Any translation
+between, for example, C<TB_OUTPUT_NORMAL>'s C<TB_RED> and
+C<TB_OUTPUT_TRUECOLOR>'s C<0xff0000> must be performed by the caller. Also note
+that cells previously rendered in one mode may persist unchanged until the
+front buffer is cleared (such as after a resize event) at which point it will
+be re-interpreted and flushed according to the current mode. Callers may invoke
+C<tb_invalidate( )> if it is desirable to immediately re-interpret and flush
+the entire screen according to the current mode.
 
-Current usage:
+Note, not all terminals support all output modes, especially beyond
+C<TB_OUTPUT_NORMAL>. There is also no very reliable way to determine color
+support dynamically. If portability is desired, callers are recommended to use
+C<TB_OUTPUT_NORMAL> or make output mode end-user configurable.
 
-	my $ev = Termbox::Event->new( );
-	tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+=head2 C<tb_peek_event( $event, $timeout_ms )>
+
+Wait for an event up to C<$timeout_ms> milliseconds and fill the $event
+structure with it. If no event is available within the timeout period,
+C<TB_ERR_NO_EVENT> is returned. On a resize event, the underlying C<select(2)>
+call may be interrupted, yielding a return code of C<TB_ERR_POLL>. In this
+case, you may check C<errno> via C<tb_last_errno( )>. If it's C<EINTR>, you can
+safely ignore that and call C<tb_peek_event( )> again.
 
 =head2 C<tb_poll_event( $event )>
 
-Wait for an event forever and fill the 'event' object with it, when the event
-is available. Returns the type of the event (one of C<TB_EVENT_*> constants) or
--1 if there was an error.
+Same as C<tb_peek_event( $event, $timeout_ms )> except no timeout.
 
-Current usage:
+=head2 C<tb_get_fds( \$ttyfd, \$resizefd )>
 
-	my $ev = Termbox::Event->new( );
-	tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+Internal termbox2 FDs that can be used with C<poll()> / C<select()>. Must call
+C<tb_poll_event( $event )> / C<tb_peek_event( $event, $timeout_ms )> if
+activity is detected.
+
+=head2 C<tb_print( $x, $y, $fg, $bg, $str )>
+
+It prints text.
+
+=head2 C<tb_send( $buf, $nbuf )>
+
+Send raw bytes to terminal.
+
+=head2 C<tb_set_func( $fn_type, $fn )>
+
+Set custom functions. C<$fn_type> is one of C<TB_FUNC_*> constants, C<fn> is a
+compatible function pointer, or C<undef> to clear.
+
+=over
+
+=item C<TB_FUNC_EXTRACT_PRE>
+
+If specified, invoke this function BEFORE termbox2 tries to extract any escape
+sequences from the input buffer.
+
+=item C<TB_FUNC_EXTRACT_POST>
+
+If specified, invoke this function AFTER termbox2 tries (and fails) to extract
+any escape sequences from the input buffer.
+
+=back
+
+=head2 C<tb_utf8_char_length( $c )>
+
+Returns the length of a utf8 encoded character.
+
+=head2 C<tb_utf8_char_to_unicode( \$out, $c )>
+
+Converts a utf8 encoded character to Unicode.
+
+=head2 C<tb_utf8_unicode_to_char( \$out, $c )>
+
+Converts a Unicode character to utf8.
+
+=head2 C<tb_last_errno( )>
+
+Returns the last C<errno>.
+
+=head2 C<tb_strerror( $err )>
+
+Returns a string describing the given error.
+
+=head2 C<tb_cell_buffer( )>
+
+Returns the current cell buffer.
+
+=head2 C<tb_has_truecolor( )>
+
+Returns a true value if truecolor values are supported.
+
+=head2 C<tb_has_egc( )>
+
+Returns a true value if Unicode's extended grapheme clusters are supported.
+
+=head2 Ctb_version( )>
+
+Returns the version string of the wrapped libtermbox2.
 
 =head1 Constants
-
-TODO: These aren't fleshed out yet, I'm thinking of grabbing them from the C
-side of FFI::Platypus.
 
 You may import these by name or with the following tags:
 
@@ -604,160 +717,60 @@ These are a safe subset of terminfo keys which exist on all popular terminals.
 Termbox only uses them to stay truly portable. See also Termbox::Event's C<key(
 )> method.
 
-TODO: For now, please see
-https://github.com/nsf/termbox/blob/master/src/termbox.h for the list
-
-=head2 C<:modifier>
-
-Modifier constants. See Termbox::Event's C<mod( )> method and the
-C<tb_select_input_mode( )> function.
-
-=over
-
-=item C<TB_MOD_ALT> - Alt key modifier.
-
-=item C<TB_MOD_MOTION> - Mouse motion modifier
-
-=back
+Please see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/1e0092b50ee96f5993f456e8ecdb06044a38b8eb/termbox2.h#L79>
+for the list
 
 =head2 C<:color>
 
-See Termbox::Cell's C<fg( )> and C<bg( )> values.
+These are foreground and background color values.
 
-=over
-
-=item C<TB_DEFAULT>
-
-=item C<TB_BLACK>
-
-=item C<TB_RED>
-
-=item C<TB_GREEN>
-
-=item C<TB_YELLOW>
-
-=item C<TB_BLUE>
-
-=item C<TB_MAGENTA>
-
-=item C<TB_CYAN>
-
-=item C<TB_WHITE>
-
-=back
-
-=head2 C<:font>
-
-Attributes, it is possible to use multiple attributes by combining them using
-bitwise OR (C<|>). Although, colors cannot be combined. But you can combine
-attributes and a single color. See also Termbox::Cell's C<fg( )> and C<bg( )>
-methods.
-
-=over
-
-=item C<TB_BOLD>
-
-=item C<TB_UNDERLINE>
-
-=item C<TB_REVERSE>
-
-=back
+Please see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/1e0092b50ee96f5993f456e8ecdb06044a38b8eb/termbox2.h#L204>
+for the list
 
 =head2 C<:event>
 
-=over
+Please see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/1e0092b50ee96f5993f456e8ecdb06044a38b8eb/termbox2.h#L229>
+for the list
 
-=item C<TB_EVENT_KEY>
+=head2 C<:return>
 
-=item C<TB_EVENT_RESIZE>
+Common function return values unless otherwise noted.
 
-=item C<TB_EVENT_MOUSE>
+Library behavior is undefined after receiving C<TB_ERR_MEM>. Callers may
+attempt reinitializing by freeing memory, invoking C<tb_shutdown( )>, then
+C<tb_init( )>.
 
-=back
+Please see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/1e0092b50ee96f5993f456e8ecdb06044a38b8eb/termbox2.h#L256>
+for the list
 
-=head2 C<:error>
+=head2 C<:func>
 
-Error codes returned by C<tb_init( )>. A claim is made that all of them are
-self-explanatory except the pipe trap error. Termbox uses unix pipes in order
-to deliver a message from a signal handler (C<SIGWINCH>) to the main event
-reading loop. Honestly in most cases you should just check the returned code as
-C<<E<lt> 0>>.
+Function types to be used with C<tb_set_func( $fn_type, $func )>.
 
-=over
+Please see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/1e0092b50ee96f5993f456e8ecdb06044a38b8eb/termbox2.h#L289>
+for the list
 
-=item C<TB_EUNSUPPORTED_TERMINAL>
+=head1 LICENSE
 
-=item C<TB_EFAILED_TO_OPEN_TTY>
+Copyright (C) Sanko Robinson.
 
-=item C<TB_EPIPE_TRAP_ERROR>
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
 
-=back
+=head1 AUTHOR
 
-=head2 C<:cursor>
-
-=over
-
-=item C<TB_HIDE_CURSOR> - Pass this to C<tb_set_cursor( $x, $y )> to hide the cursor
-
-=back
-
-=head2 C<:input>
-
-Pass one of these to C<tb_select_input_mode( $mode )>:
-
-=over
-
-=item C<TB_INPUT_CURRENT>
-
-=item C<TB_INPUT_ESC>
-
-=item C<TB_INPUT_ALT>
-
-=item C<TB_INPUT_MOUSE>
-
-=back
-
-=head2 C<:output>
-
-Pass one of these to C<tb_select_output_mode( $mode )>:
-
-=over
-
-=item C<TB_OUTPUT_CURRENT>
-
-=item C<TB_OUTPUT_NORMAL>
-
-=item C<TB_OUTPUT_256>
-
-=item C<TB_OUTPUT_216>
-
-=item C<TB_OUTPUT_GRAYSCALE>
-
-=back
-
-=head1 Author
-
-Sanko Robinson E<lt>sanko@cpan.orgE<gt> - http://sankorobinson.com/
-
-CPAN ID: SANKO
-
-=head1 License and Legal
-
-Copyright (C) 2020-2023 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
-
-This program is free software; you can redistribute it and/or modify it under
-the terms of The Artistic License 2.0. See
-http://www.perlfoundation.org/artistic_license_2_0.  For clarification, see
-http://www.perlfoundation.org/artistic_2_0_notes.
-
-When separated from the distribution, all POD documentation is covered by the
-Creative Commons Attribution-Share Alike 3.0 License. See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
-see http://creativecommons.org/licenses/by-sa/3.0/us/.
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 =begin stopwords
 
-nurses winapi libtermbox termbox terminfo bitwise unix ncurses
+ncurses winapi termbox termbox2 libtermbox2 bitwise terminfo unix tty libc
+filehandles fg bg utf8 truecolor reinitializing configurable 0x000000..0xffffff
 
 =end stopwords
 

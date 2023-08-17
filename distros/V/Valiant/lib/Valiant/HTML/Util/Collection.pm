@@ -14,6 +14,7 @@ sub new {
 
 sub _build_item {
   my ($class, $item) = @_;
+  return bless $item, 'Valiant::HTML::Util::Collection::HashItem' if (ref($item)||'') eq 'HASH';
   $item = [$item, $item] unless ref($item);
   return bless $item, 'Valiant::HTML::Util::Collection::Item';
 }
@@ -52,6 +53,20 @@ use overload
 
 sub label { return shift->[0] }
 sub value { return shift->[1] }
+
+package Valiant::HTML::Util::Collection::HashItem;
+
+sub can {
+  my ($self, $method) = @_;
+  return exists($self->{$method});
+}
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = our $AUTOLOAD;
+  $method =~ s/.*:://;
+  return $self->{$method};
+}
 
 1;
 

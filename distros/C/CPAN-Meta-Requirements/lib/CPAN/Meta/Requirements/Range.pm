@@ -4,7 +4,7 @@ use warnings;
 package CPAN::Meta::Requirements::Range;
 # ABSTRACT: a set of version requirements for a CPAN dist
 
-our $VERSION = '2.142';
+our $VERSION = '2.143';
 
 use Carp ();
 
@@ -193,7 +193,7 @@ sub with_string_requirement {
     my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
 
     if (! defined $op) {
-      return $self->with_minimum($part, $module, $bad_version_hook);
+      $self = $self->with_minimum($part, $module, $bad_version_hook);
     } else {
       Carp::croak("illegal requirement string: $req")
         unless my $methods = $methods_for_op{ $op };
@@ -607,7 +607,7 @@ CPAN::Meta::Requirements::Range - a set of version requirements for a CPAN dist
 
 =head1 VERSION
 
-version 2.142
+version 2.143
 
 =head1 SYNOPSIS
 

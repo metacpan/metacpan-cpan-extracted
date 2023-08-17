@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::SiteNews;
-$WebFetch::Input::SiteNews::VERSION = '0.15.5';
+$WebFetch::Input::SiteNews::VERSION = '0.15.9';
 use base "WebFetch";
 
 use Carp;
@@ -26,11 +26,11 @@ use DateTime::Format::ISO8601;
 # set defaults
 my ( $cat_priorities, $now );
 Readonly::Array my @Options => ( "short_path|short=s", "long_path|long=s", );
-Readonly::Scalar my $Usage  => "--short short-output-file --long long-output-file";
+Readonly::Scalar my $Usage => "--short short-output-file --long long-output-file";
 
 # configuration parameters
 Readonly::Scalar my $num_links => 5;
-Readonly::Array my @dt_keys    => qw(locale time_zone);
+Readonly::Array my @dt_keys => qw(locale time_zone);
 
 # functions for access to internal data for testing
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
@@ -444,7 +444,7 @@ WebFetch::Input::SiteNews - download and save SiteNews headlines from a local fi
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -582,7 +582,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

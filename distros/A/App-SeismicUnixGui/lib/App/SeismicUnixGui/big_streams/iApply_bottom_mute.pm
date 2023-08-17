@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iApply_bottom_mute;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iApply_bottom_mute
+ PERL PROGRAM NAME: iApply_bottom_mute
  AUTHOR: Juan Lorenzo
 
  DESCRIPTION:
@@ -66,7 +66,7 @@ my $SuMessages = SuMessages->new();
 
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($itemp_bot_mute_picks_sorted_par_);
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT)      = $Project->DATA_SEISMIC_TXT();
 my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
 
 =head2
@@ -247,7 +247,7 @@ sub calcNdisplay {
 	  $itemp_bot_mute_picks_sorted_par_ . $iApply_bottom_mute->{_file_in};
 
 # print("iApply_bottom_mute_picks, mute pick file is $iApply_bottom_mute->{_parfile_in}\n\n");
-# print("iApplybottom_mute_picks,PL_SEISMIC: $PL_SEISMIC\n");
+# print("iApplybottom_mute_picks,DATA_SEISMIC_TXT: $DATA_SEISMIC_TXT\n");
 
 =head2
 
@@ -256,7 +256,7 @@ sub calcNdisplay {
 =cut
 
 	$sumute->clear();
-	$sumute->par_directory('PL_SEISMIC');
+	$sumute->par_directory('DATA_SEISMIC_TXT');
 	$sumute->par_file( $iApply_bottom_mute->{_parfile_in} );
 	$sumute->offset_word( $iApply_bottom_mute->{_offset_type} );
 	$sumute->type('bottom');

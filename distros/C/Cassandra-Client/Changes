@@ -1,5 +1,10 @@
 Revision history for Cassandra-Client
 
+0.20    2023/07/16
+
+      * Fix incorrect handling of varint/decimal on big-endian machines
+        (caught correctly by tests)
+
 0.19    2022/03/03
 
       * Fix bug with multiple async requests returning result for other

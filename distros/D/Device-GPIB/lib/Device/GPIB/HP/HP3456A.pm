@@ -1,6 +1,6 @@
 # HP3456A.pm
 # Perl module to control a HP 3456A precision voltmeter from perl
-# For fast repsonse Requires EOI set with GPIB command '01'
+# For fast response Requires EOI set with GPIB command '01'
 #
 # Author: Mike McCauley (mikem@airspayce.com),
 # Copyright (C) AirSpayce Pty Ltd
@@ -267,7 +267,7 @@ sub waitSRQ()
 {
     my ($self, $mask) = @_;
     
-    $self->send("SM$mask"); # Front panel SRQ mask
+    $self->send("SM$mask"); # SRQ mask
 #    $self->{Device}->loc(); # Back to local mode else cant press SRQ!
     while (1) # Caution, could block forever
     {

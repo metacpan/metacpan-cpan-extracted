@@ -22,10 +22,14 @@ meta-spec:
 name: Google-Ads-GoogleAds-Client
 no_index:
   namespace:
-    - Google::Ads::GoogleAds::V12::Enums
-    - Google::Ads::GoogleAds::V12::Common
-    - Google::Ads::GoogleAds::V12::Resources
-    - Google::Ads::GoogleAds::V12::Services
+    - Google::Ads::GoogleAds::V13::Enums
+    - Google::Ads::GoogleAds::V13::Common
+    - Google::Ads::GoogleAds::V13::Resources
+    - Google::Ads::GoogleAds::V13::Services
+    - Google::Ads::GoogleAds::V14::Enums
+    - Google::Ads::GoogleAds::V14::Common
+    - Google::Ads::GoogleAds::V14::Resources
+    - Google::Ads::GoogleAds::V14::Services
 requires:
   Class::Load: '0'
   Class::Std::Fast: '0'
@@ -68,5 +72,5 @@ resources:
   bugtracker: https://github.com/googleads/google-ads-perl/issues
   license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/googleads/google-ads-perl
-version: v16.1.2
+version: v18.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

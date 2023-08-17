@@ -15,7 +15,7 @@ use PApp::SQL;
 use Compress::LZF qw(:compress :freeze);
 BEGIN { Compress::LZF::set_serializer "PApp::Storable", "PApp::Storable::net_mstore", "PApp::Storable::mretrieve" }
 
-$VERSION = 2.2;
+$VERSION = 2.3;
 
 require Exporter;
 

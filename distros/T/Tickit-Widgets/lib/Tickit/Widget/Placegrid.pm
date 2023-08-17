@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
+use v5.20;
 use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::Placegrid 0.36;
+package Tickit::Widget::Placegrid 0.37;
 class Tickit::Widget::Placegrid
    :strict(params)
    :isa(Tickit::Widget);

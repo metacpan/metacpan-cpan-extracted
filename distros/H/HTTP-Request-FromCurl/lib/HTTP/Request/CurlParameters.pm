@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 =head1 NAME
 
@@ -959,6 +959,7 @@ The curl command to be used. Default is C<wget>.
 =back
 
 =cut
+
 # These are what wget uses as defaults, not what Perl should use as default!
 our %wget_header_defaults = (
     'Accept'          => '*/*',

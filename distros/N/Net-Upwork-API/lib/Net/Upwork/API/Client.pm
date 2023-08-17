@@ -84,20 +84,35 @@ sub get_oauth_client {
     $lwp = LWP::UserAgent->new();
     $lwp->agent(UPWORK_LIBRARY_USER_AGENT);
 
-    $self->{oauth_client} = Net::OAuth2::Profile::WebServer->new(
-	client_id	   => $self->{config}{client_id},
-        client_secret	   => $self->{config}{client_secret},
-	access_token       => $self->{config}{access_token},
-	refresh_token      => $self->{config}{refresh_token},
-	expires_in         => $self->{config}{expires_in},
-	expires_at         => $self->{config}{expires_at},
-	site		   => BASE_HOST,
-        authorize_path     => URI_AUTH,
-	access_token_path  => URI_ATOKEN,
-	refresh_token_path => URI_ATOKEN,
-	redirect_uri       => $self->{config}{redirect_uri},
-	user_agent         => $lwp
-    );
+    if ($self->{config}{grant_type} eq "client_credentials") {
+        $self->{oauth_client} = Net::OAuth2::Profile::WebServer->new(
+            client_id	       => $self->{config}{client_id},
+            client_secret	   => $self->{config}{client_secret},
+            grant_type         => $self->{config}{grant_type},
+            access_token       => $self->{config}{access_token},
+            expires_in         => $self->{config}{expires_in},
+            expires_at         => $self->{config}{expires_at},
+            site		       => BASE_HOST,
+            access_token_path  => URI_ATOKEN,
+            redirect_uri       => $self->{config}{redirect_uri},
+            user_agent         => $lwp
+        );
+    } else {
+        $self->{oauth_client} = Net::OAuth2::Profile::WebServer->new(
+            client_id	       => $self->{config}{client_id},
+            client_secret	   => $self->{config}{client_secret},
+            access_token       => $self->{config}{access_token},
+            refresh_token      => $self->{config}{refresh_token},
+            expires_in         => $self->{config}{expires_in},
+            expires_at         => $self->{config}{expires_at},
+            site		       => BASE_HOST,
+            authorize_path     => URI_AUTH,
+            access_token_path  => URI_ATOKEN,
+            refresh_token_path => URI_ATOKEN,
+            redirect_uri       => $self->{config}{redirect_uri},
+            user_agent         => $lwp
+        );
+    }
 }
 
 =item get

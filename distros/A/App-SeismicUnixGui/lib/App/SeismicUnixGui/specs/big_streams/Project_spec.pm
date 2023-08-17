@@ -129,7 +129,8 @@ sub file_dialog_type_aref {
 	my @type;
 
 	$type[0] = $file_dialog_type->{_Path};
-	$type[1] = $file_dialog_type->{_Path};
+#	$type[1] = $file_dialog_type->{_Home};
+    $type[1] = $file_dialog_type->{_Path};
 	$type[2] = $file_dialog_type->{_last_dir_in_path};
 	$type[3] = $file_dialog_type->{_last_dir_in_path};
 	$type[4] = $file_dialog_type->{_last_dir_in_path};

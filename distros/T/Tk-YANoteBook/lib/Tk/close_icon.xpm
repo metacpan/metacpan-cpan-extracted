@@ -1,0 +1,22 @@
+/* XPM */
+static char *close[]={
+"16 16 3 1",
+". c None",
+"a c #c00000",
+"b c #ffffc0",
+"......aaaa......",
+"....aaaaaaaa....",
+"...aaaaaaaaaa...",
+"..aaaaaaaaaaaa..",
+".aaabbaaaabbaaa.",
+".aaabbbaabbbaaa.",
+"aaaaabbbbbbaaaaa",
+"aaaaaabbbbaaaaaa",
+"aaaaaabbbbaaaaaa",
+"aaaaabbbbbbaaaaa",
+".aaabbbaabbbaaa.",
+".aaabbaaaabbaaa.",
+"..aaaaaaaaaaaa..",
+"...aaaaaaaaaa...",
+"....aaaaaaaa....",
+"......aaaa......"};

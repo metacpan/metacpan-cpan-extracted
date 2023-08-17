@@ -92,7 +92,7 @@ has text_stack =>
 
 my($myself);
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 # -----------------------------------------------
 

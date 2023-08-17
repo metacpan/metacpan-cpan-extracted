@@ -40,7 +40,7 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-INI-Tiny"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
@@ -48,7 +48,7 @@
          "web" : "https://github.com/ap/Config-INI-Tiny"
       }
    },
-   "version" : "0.105",
+   "version" : "0.106",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2021

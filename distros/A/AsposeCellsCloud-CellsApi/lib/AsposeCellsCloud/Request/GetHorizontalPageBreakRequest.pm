@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetHorizontalPageBreakRequest.name :   ,
-# GetHorizontalPageBreakRequest.sheetName :   ,
-# GetHorizontalPageBreakRequest.index :   ,
-# GetHorizontalPageBreakRequest.folder :   ,
-# GetHorizontalPageBreakRequest.storageName :    
+# GetHorizontalPageBreakRequest.name : The workbook name.  ,
+# GetHorizontalPageBreakRequest.sheetName : The worksheet name.  ,
+# GetHorizontalPageBreakRequest.index : The zero based index of the element.  ,
+# GetHorizontalPageBreakRequest.folder : Original workbook folder.  ,
+# GetHorizontalPageBreakRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_horizontal_page_break' } = { 
-    	summary => '',
+    	summary => 'Gets a horizontal page breaks descripton in worksheet.',
         params => $params,
         returns => 'HorizontalPageBreakResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'The zero based index of the element.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -17,11 +17,11 @@ Net::Connection::lsof - This uses lsof to generate a array of Net::Connection ob
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 
 =head1 SYNOPSIS
@@ -100,7 +100,7 @@ sub lsof_to_nc_objects{
 		$func_args{proc_info}=1;
 	}
 
-	my $output_raw=`lsof -i UDP -i TCP -n -l -P`;
+	my $output_raw=`lsof -i UDP -i TCP -n -l -P 2> /dev/null`;
 	if (
 		( $? ne 0 ) &&
 		(
@@ -306,14 +306,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-lsof>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Connection-lsof>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Net-Connection-lsof>
 
 =item * Search CPAN
 

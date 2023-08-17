@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteHorizontalPageBreaksRequest.name :   ,
-# DeleteHorizontalPageBreaksRequest.sheetName :   ,
-# DeleteHorizontalPageBreaksRequest.row :   ,
-# DeleteHorizontalPageBreaksRequest.folder :   ,
-# DeleteHorizontalPageBreaksRequest.storageName :    
+# DeleteHorizontalPageBreaksRequest.name : The workbook name.  ,
+# DeleteHorizontalPageBreaksRequest.sheetName : The worksheet name.  ,
+# DeleteHorizontalPageBreaksRequest.row : Row index, zero based.  ,
+# DeleteHorizontalPageBreaksRequest.folder : Original workbook folder.  ,
+# DeleteHorizontalPageBreaksRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_horizontal_page_breaks' } = { 
-    	summary => '',
+    	summary => 'Delete horizontal page breaks in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'Row index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

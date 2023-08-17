@@ -210,6 +210,11 @@ ERRORS
      new():
              Parameter 'autofocus' must be a bool (0/1).
                     Value: %s
+             Parameter 'data' must be a array.
+                    Value: %s
+                    Reference: %s
+             Parameter 'data' in 'plain' mode must contain reference to array with scalars.
+             Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
              Parameter 'data_type' has bad value.
              Parameter 'disabled' must be a bool (0/1).
                     Value: %s
@@ -312,10 +317,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

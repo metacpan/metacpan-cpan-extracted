@@ -8,6 +8,7 @@ my $builder = Module::Build->new(
     dist_author         => 'Laurent Dami <dami@cpan.org>',
     dist_version_from   => 'lib/MsOffice/Word/HTML/Writer.pm',
     requires => {
+        perl                => 5.010,
         'utf8'              => 0,
         'Test::More'        => 0,
 	'Carp'              => 0,
@@ -16,6 +17,7 @@ my $builder = Module::Build->new(
 	'Module::Build'     => 0,
         'Params::Validate'  => 0,
         'Scalar::Util'      => 0,
+        'Encode'            => 2.12,
     },
     add_to_cleanup      => [ 'MsOffice-Word-HTML-Writer-*' ],
     meta_merge => {

@@ -8,11 +8,13 @@ use Carp;
 use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
-   opcode
    KEYWORD_PLUGIN_EXPR
-   newBINOP newSVOP newPADxVOP
    XPK_LEXVAR XPK_LEXVAR_SCALAR
    register_xs_parse_keyword
+);
+use Optree::Generate qw(
+   opcode
+   newBINOP newSVOP newPADxVOP
 );
 
 use constant {

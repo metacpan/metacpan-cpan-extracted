@@ -124,7 +124,7 @@ Apache::Session. Session data is stored in a SQLite database.
 
 =head1 SCHEMA
 
-To use this module, you will need at least these columns in a table 
+To use this module, you will need at least these columns in a table
 called 'sessions', or another name if you supply the TableName parameter.
 
  id char(32)     # or however long your session IDs are.

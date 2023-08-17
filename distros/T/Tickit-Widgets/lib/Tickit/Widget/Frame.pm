@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Frame 0.37;
+package Tickit::Widget::Frame 0.38;
 class Tickit::Widget::Frame
    :strict(params)
    :isa(Tickit::SingleChildWidget);

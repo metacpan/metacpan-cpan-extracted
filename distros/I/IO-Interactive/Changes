@@ -1,5 +1,10 @@
 Revision history for Perl module IO::Interactive
 
+1.025 2023-07-05T15:01:36Z
+	* Remove unnecessary -T from pod tests now that v5.38 allows you to
+	compile a perl without taint support. Those perls will refuse to run
+	the programs using -T.
+
 1.023 2021-02-03T22:37:57Z
 	* Explain why ARGV is a problem (Github #9)
 	* Freshen distro, remove Travis CI, add Github Actions

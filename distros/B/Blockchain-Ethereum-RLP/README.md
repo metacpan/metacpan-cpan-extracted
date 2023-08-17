@@ -2,8 +2,6 @@
 
 Recursive Length Prefix (RLP) utility for encoding and decoding ethereum based transaction parameters
 
-This is an transpilation from the python code (with some small changes) at [ethereum.org](https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/) to Perl.
-
 # Table of contents
 
 - [Usage](#usage)
@@ -21,6 +19,16 @@ my $encoded = $rlp->encode($params); #ec098504a817c80082520894353535353535353535
 
 my $encoded_tx_params = 'ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080';
 my $decoded = $rlp->decode(pack "H*", $encoded_tx_params); #['0x9', '0x4a817c800', '0x5208', '0x3535353535353535353535353535353535353535', '0xde0b6b3a7640000', '0x', '0x1', '0x', '0x']
+```
+
+## Standalone version
+
+```bash
+$ rlp --action=encode 0x9 0x4a817c800 0x5208 0x3535353535353535353535353535353535353535 0xde0b6b3a7640000 0x 0x1 0x 0x
+# ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
+
+$ rlp --action=decode ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
+# 0x9, 0x4a817c800, 0x5208, 0x3535353535353535353535353535353535353535, 0xde0b6b3a7640000, 0x, 0x1, 0x, 0x
 ```
 
 # Installation
@@ -55,9 +63,8 @@ You can also look for information at:
 
 # License and Copyright
 
-This software is Copyright (c) 2022 by REFECO.
+This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
   [The MIT License](./LICENSE)
-

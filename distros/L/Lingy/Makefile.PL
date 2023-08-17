@@ -9,7 +9,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A Perl implementation of Clojure",
+  "ABSTRACT" => "A Clojure Platform for Perl",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,48 +23,58 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingy",
   "PREREQ_PM" => {
+    "Bencode" => "1.502",
     "Capture::Tiny" => "0.48",
+    "Carp::Always" => "0.16",
+    "Data::UUID" => "1.226",
     "File::Path" => "2.18",
     "File::Spec" => "3.75",
     "File::Temp" => "0.2311",
     "File::Which" => "1.27",
     "Getopt::Long" => "2.54",
+    "Hash::Ordered" => "0.014",
+    "IO::All" => "0.87",
     "IO::Select" => "1.51",
+    "IO::Socket::INET" => "1.51",
     "Scalar::Util" => "1.63",
     "Sub::Identify" => "0.14",
     "Sub::Name" => "0.27",
     "Term::ReadLine" => "1.17",
-    "Term::ReadLine::Gnu" => "1.45",
     "Test::Simple" => "1.302195",
-    "Tie::IxHash" => "1.23",
     "Time::HiRes" => "1.9764",
     "XXX" => "0.38",
-    "YAML::PP" => "0.036"
+    "YAML::PP" => "0.036",
+    "immutable" => "v0.0.3"
   },
-  "VERSION" => "0.1.8",
+  "VERSION" => "0.1.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "Bencode" => "1.502",
   "Capture::Tiny" => "0.48",
+  "Carp::Always" => "0.16",
+  "Data::UUID" => "1.226",
   "File::Path" => "2.18",
   "File::Spec" => "3.75",
   "File::Temp" => "0.2311",
   "File::Which" => "1.27",
   "Getopt::Long" => "2.54",
+  "Hash::Ordered" => "0.014",
+  "IO::All" => "0.87",
   "IO::Select" => "1.51",
+  "IO::Socket::INET" => "1.51",
   "Scalar::Util" => "1.63",
   "Sub::Identify" => "0.14",
   "Sub::Name" => "0.27",
   "Term::ReadLine" => "1.17",
-  "Term::ReadLine::Gnu" => "1.45",
   "Test::Simple" => "1.302195",
-  "Tie::IxHash" => "1.23",
   "Time::HiRes" => "1.9764",
   "XXX" => "0.38",
-  "YAML::PP" => "0.036"
+  "YAML::PP" => "0.036",
+  "immutable" => "0.0.3"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

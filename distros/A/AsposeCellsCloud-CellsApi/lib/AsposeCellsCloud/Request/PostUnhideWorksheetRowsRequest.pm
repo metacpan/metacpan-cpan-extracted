@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostUnhideWorksheetRowsRequest.name :   ,
-# PostUnhideWorksheetRowsRequest.sheetName :   ,
-# PostUnhideWorksheetRowsRequest.startrow :   ,
-# PostUnhideWorksheetRowsRequest.totalRows :   ,
-# PostUnhideWorksheetRowsRequest.height :   ,
-# PostUnhideWorksheetRowsRequest.folder :   ,
-# PostUnhideWorksheetRowsRequest.storageName :    
+# PostUnhideWorksheetRowsRequest.name : The workbook name.  ,
+# PostUnhideWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# PostUnhideWorksheetRowsRequest.startrow : The begin row index to be operated.  ,
+# PostUnhideWorksheetRowsRequest.totalRows : Number of rows to be operated.  ,
+# PostUnhideWorksheetRowsRequest.height : The new row height.  ,
+# PostUnhideWorksheetRowsRequest.folder : Original workbook folder.  ,
+# PostUnhideWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_unhide_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Unhide rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'startrow' => {
      	datatype => 'int',
      	base_name => 'startrow',
-     	description => '',
+     	description => 'The begin row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'total_rows' => {
      	datatype => 'int',
      	base_name => 'totalRows',
-     	description => '',
+     	description => 'Number of rows to be operated.',
      	format => '',
      	read_only => '',
      		},
      'height' => {
      	datatype => 'double',
      	base_name => 'height',
-     	description => '',
+     	description => 'The new row height.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

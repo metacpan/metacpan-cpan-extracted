@@ -1,8 +1,6 @@
 package Types::SQL;
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 use Type::Library
@@ -22,7 +20,7 @@ use namespace::autoclean;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.7.0';
 
 
 our $Blob = _generate_type(
@@ -135,12 +133,12 @@ our $Numeric = _generate_type(
 sub _size_constraint_generator {
     if (@_) {
         my ($size) = @_;
-        die "Size must be a positive integer" unless $size =~ /^[1-9]\d*$/;
-        my $re = qr/^0*\d{1,$size}$/;
+        die "Size must be a positive integer" unless $size =~ /^[1-9]\d*$/a;
+        my $re = qr/^0*\d{1,$size}$/a;
         return sub { $_ =~ $re };
     }
     else {
-        return sub { $_ =~ /^\d+$/ };
+        return sub { $_ =~ /^\d+$/a };
     }
 }
 
@@ -149,17 +147,17 @@ sub _size_range_constraint_generator {
         my ( $prec, $scale ) = @_;
         $scale //= 0;
 
-        die "Precision must be a positive integer" unless $prec =~ /^[1-9]\d*$/;
-        die "Scale must be a positive integer"     unless $scale =~ /^\d+$/;
+        die "Precision must be a positive integer" unless $prec =~ /^[1-9]\d*$/a;
+        die "Scale must be a positive integer"     unless $scale =~ /^\d+$/a;
 
         my $left = $prec - $scale;
         die "Scale must be less than the precision" if ( $left < 0 );
 
-        my $re = qr/^0*\d{0,$left}([.]\d{0,$scale}0*)?$/;
+        my $re = qr/^0*\d{0,$left}([.]\d{0,$scale}0*)?$/a;
         return sub { $_ =~ $re };
     }
     else {
-        return sub { $_ =~ /^\d+$/ };
+        return sub { $_ =~ /^\d+$/a };
     }
 }
 
@@ -189,7 +187,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.6.1
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -290,6 +288,17 @@ The method should return a hash of values that are passed to the
 C<add_column> method of L<DBIx::Class::ResultSource>.
 
 =for readme continue
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.7.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.6.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 L<Type::Tiny>.
@@ -324,7 +333,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Robert Rothenberg.
+This software is Copyright (c) 2016-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -85,8 +85,12 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => 'git@github.com:briandfoy/module-release.git',
-				web  => 'https://github.com/briandfoy/module-release',
+				url  => $github,
+				web  => $github,
+				},
+			bugtracker => {
+				web  => "$github/issues",
+				url  => "$github/issues",
 				},
 			},
 		keywords => ['workflow', 'module', 'distribution',

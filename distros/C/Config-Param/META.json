@@ -35,11 +35,11 @@
    "provides" : {
       "Config::Param" : {
          "file" : "lib/Config/Param.pm",
-         "version" : "4.000004"
+         "version" : "4.000005"
       },
       "Config::Param::FileWorker" : {
          "file" : "lib/Config/Param/FileWorker.pm",
-         "version" : "4.000004"
+         "version" : "4.000005"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "4.000004",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "4.000005",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

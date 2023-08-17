@@ -21,11 +21,11 @@ Net::Connection::ncnetstat - The backend for ncnetstat, the colorized and enhanc
 
 =head1 VERSION
 
-Version 0.7.1
+Version 0.8.0
 
 =cut
 
-our $VERSION = '0.7.1';
+our $VERSION = '0.8.0';
 
 
 =head1 SYNOPSIS
@@ -99,7 +99,7 @@ This is what is to be passed to L<Net::Connection::Sorter>.
 The default is as below.
 
     {
-     type=>'host_fl',
+     type=>'unsorted',
      invert=>0,
     }
 
@@ -113,7 +113,7 @@ sub new {
 
 	if ( !defined( $args{sorter} ) ) {
 		$args{sorter} = {
-			type   => 'host_fl',
+			type   => 'unsorted',
 			invert => 0,
 		};
 	}
@@ -489,14 +489,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-ncnetstat>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Connection-ncnetstat>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Net-Connection-ncnetstat>
 
 =item * Search CPAN
 

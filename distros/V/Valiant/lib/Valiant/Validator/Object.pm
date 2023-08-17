@@ -70,6 +70,7 @@ sub validate_each {
 
     $value->errors->each(sub {
       my ($attr, $message) = @_;
+      #$attribute =~s/\[\d+\]$//;
       $record->errors->add("${attribute}.${attr}", $message);
     });
   }

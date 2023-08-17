@@ -1,6 +1,6 @@
 package Bundle::DadaMail::IncludedInDistribution;
 
-$VERSION = '0.0.2';
+$VERSION = '0.0.3';
 
 1;
 
@@ -86,7 +86,7 @@ Data::Page - prereq to DataPageset
 
 Date::Format - prereq to something
 
-DataPageset
+Data::Pageset
 
 Digest::SHA::PurePerl - weird 'cause Digest::SHA is core
 
@@ -155,6 +155,8 @@ Parse::RecDescent
 Text::Balanced
 
 PHP::Session
+
+Text::Abbrev
 
 Text::CSV 
 

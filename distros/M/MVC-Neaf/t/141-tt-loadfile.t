@@ -8,11 +8,12 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename;
+use Cwd qw(abs_path);
 
 use MVC::Neaf::View::TT;
 
 my $view = MVC::Neaf::View::TT->new(
-    INCLUDE_PATH => dirname( __FILE__ ),
+    INCLUDE_PATH => abs_path(dirname( __FILE__ )),
     preload => { foo => '[% bar %]' },
 );
 

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'File versions FileVersion.',
                                   class => 'FileVersions',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'value' => {
      	datatype => 'ARRAY[FileVersion]',
      	base_name => 'Value',
-     	description => '',
+     	description => 'File versions FileVersion.',
      	format => '',
      	read_only => '',
      		},    

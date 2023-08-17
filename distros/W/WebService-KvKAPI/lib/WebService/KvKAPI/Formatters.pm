@@ -1,5 +1,5 @@
 package WebService::KvKAPI::Formatters;
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 use warnings;
 use strict;
 
@@ -39,7 +39,7 @@ WebService::KvKAPI::Formatters - Utility package for formatting common numbers
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 DESCRIPTION
 
@@ -61,11 +61,11 @@ Format a chamber of commerce RSIN number to 9 digits
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 

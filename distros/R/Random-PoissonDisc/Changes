@@ -1,5 +1,8 @@
 TO DO:
 
+0.04 2023-07-21
+    * Various test suite fixes, no code changes
+
 0.03 2022-05-22
     * Add `avoid_edge` and `center` options, documentation improvements
       provided by Gene Boggs ( GH #2 )

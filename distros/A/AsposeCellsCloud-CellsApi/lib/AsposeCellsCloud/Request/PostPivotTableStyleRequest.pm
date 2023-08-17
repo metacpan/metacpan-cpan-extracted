@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableStyleRequest.name :   ,
-# PostPivotTableStyleRequest.sheetName :   ,
-# PostPivotTableStyleRequest.pivotTableIndex :   ,
-# PostPivotTableStyleRequest.style :   ,
-# PostPivotTableStyleRequest.needReCalculate :   ,
-# PostPivotTableStyleRequest.folder :   ,
-# PostPivotTableStyleRequest.storageName :    
+# PostPivotTableStyleRequest.name : The workbook name.  ,
+# PostPivotTableStyleRequest.sheetName : The worksheet name.  ,
+# PostPivotTableStyleRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableStyleRequest.style : Style description in request body.  ,
+# PostPivotTableStyleRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# PostPivotTableStyleRequest.folder : Original workbook folder.  ,
+# PostPivotTableStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_style' } = { 
-    	summary => '',
+    	summary => 'Updates style in pivot table.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,49 +149,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'style',
-     	description => '',
+     	description => 'Style description in request body.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

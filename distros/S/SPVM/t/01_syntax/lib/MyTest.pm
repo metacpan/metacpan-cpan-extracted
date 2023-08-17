@@ -27,23 +27,23 @@ sub compile_not_ok {
   
   my $builder = SPVM::Builder->new;
   
-  my $tmp_class_path = File::Temp->newdir;
+  my $tmp_include_dir = File::Temp->newdir;
     
-  my $first_class_name;
+  my $first_basic_type_name;
   for my $source (@$sources) {
-    my $class_name;
+    my $basic_type_name;
     if ($source =~ /\bclass\s+([\w+:]+)\s*/) {
-      $class_name = $1;
+      $basic_type_name = $1;
     }
-    unless (defined $class_name) {
-      die "Can't find class name in the source";
-    }
-    
-    unless (defined $first_class_name) {
-      $first_class_name = $class_name;
+    unless (defined $basic_type_name) {
+      die "Can't find basic type name in the source";
     }
     
-    my $class_file = "$tmp_class_path/$class_name.spvm";
+    unless (defined $first_basic_type_name) {
+      $first_basic_type_name = $basic_type_name;
+    }
+    
+    my $class_file = "$tmp_include_dir/$basic_type_name.spvm";
     $class_file =~ s|::|/|g;
     
     mkpath dirname $class_file;
@@ -54,17 +54,17 @@ sub compile_not_ok {
     close $class_fh;
   }
   
-  compile_not_ok_file($first_class_name, $error_message_re, {class_path => "$tmp_class_path", file => $file, line => $line});
+  compile_not_ok_file($first_basic_type_name, $error_message_re, {include_dir => "$tmp_include_dir", file => $file, line => $line});
 }
 
 sub compile_not_ok_file {
-  my ($class_name, $error_message_re, $options) = @_;
+  my ($basic_type_name, $error_message_re, $options) = @_;
   
   unless ($options) {
     $options = {};
   }
   
-  my $class_path = $options->{class_path};
+  my $include_dir = $options->{include_dir};
   
   my (undef, $caller_file, $caller_line) = caller;
   
@@ -85,15 +85,15 @@ sub compile_not_ok_file {
   }
   
   my $builder = SPVM::Builder->new;
-  if (defined $class_path) {
-    unshift @{$builder->class_paths}, $class_path;
+  if (defined $include_dir) {
+    unshift @{$builder->include_dirs}, $include_dir;
   }
 
   my $compiler = SPVM::Builder::Compiler->new(
-    class_paths => $builder->class_paths
+    include_dirs => $builder->include_dirs
   );
   
-  my $success = $compiler->compile($class_name, $file, $line);
+  my $success = $compiler->compile($basic_type_name, $file, $line);
   ok(!$success);
   my $error_messages = $compiler->get_error_messages;
   my $first_error_message = $error_messages->[0];
@@ -118,23 +118,23 @@ sub compile_ok {
   
   my $builder = SPVM::Builder->new;
   
-  my $tmp_class_path = File::Temp->newdir;
+  my $tmp_include_dir = File::Temp->newdir;
     
-  my $first_class_name;
+  my $first_basic_type_name;
   for my $source (@$sources) {
-    my $class_name;
+    my $basic_type_name;
     if ($source =~ /\bclass\s+([\w+:]+)\s*/) {
-      $class_name = $1;
+      $basic_type_name = $1;
     }
-    unless (defined $class_name) {
-      die "Can't find class name in the source";
-    }
-    
-    unless (defined $first_class_name) {
-      $first_class_name = $class_name;
+    unless (defined $basic_type_name) {
+      die "Can't find basic type name in the source";
     }
     
-    my $class_file = "$tmp_class_path/$class_name.spvm";
+    unless (defined $first_basic_type_name) {
+      $first_basic_type_name = $basic_type_name;
+    }
+    
+    my $class_file = "$tmp_include_dir/$basic_type_name.spvm";
     $class_file =~ s|::|/|g;
     
     mkpath dirname $class_file;
@@ -145,17 +145,17 @@ sub compile_ok {
     close $class_fh;
   }
   
-  compile_ok_file($first_class_name, {class_path => "$tmp_class_path", file => $file, line => $line});
+  compile_ok_file($first_basic_type_name, {include_dir => "$tmp_include_dir", file => $file, line => $line});
 }
 
 sub compile_ok_file {
-  my ($class_name, $options) = @_;
+  my ($basic_type_name, $options) = @_;
   
   unless ($options) {
     $options = {};
   }
   
-  my $class_path = $options->{class_path};
+  my $include_dir = $options->{include_dir};
   
   my (undef, $caller_file, $caller_line) = caller;
   
@@ -176,14 +176,14 @@ sub compile_ok_file {
   }
   
   my $builder = SPVM::Builder->new;
-  if (defined $class_path) {
-    unshift @{$builder->class_paths}, $class_path;
+  if (defined $include_dir) {
+    unshift @{$builder->include_dirs}, $include_dir;
   }
   
   my $compiler = SPVM::Builder::Compiler->new(
-    class_paths => $builder->class_paths
+    include_dirs => $builder->include_dirs
   );
-  my $success = $compiler->compile($class_name, $file, $line);
+  my $success = $compiler->compile($basic_type_name, $file, $line);
   ok($success);
   
   if (!$success) {

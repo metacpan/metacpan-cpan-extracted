@@ -89,10 +89,19 @@ sub test_encoding {
     = $encoding eq 'cp1252' || !$driver_autoupgrades_latin1{$dbh->{Driver}{Name}} ? 'NE' : 'EQ';
   run_tests($dbh, $encoding, without_callbacks => $expected_without_callbacks, $str, $downgrade, $upgrade);
 
-  # now inject callbacks and test again, this time expecting 'EQ' results
-  my $injector = DBIx::AutoUpgrade::NativeStrings->new(native => $encoding);
+  # now inject callbacks and test again, this time expecting 'EQ' results.
+  my @debug_msgs;
+  my $injector = DBIx::AutoUpgrade::NativeStrings->new(
+    native => $encoding,
+    debug  => sub {push @debug_msgs, join "", @_},
+   );
   $injector->inject_callbacks($dbh);
   run_tests($dbh, $encoding, with_callbacks => 'EQ',    $str, $downgrade, $upgrade);
+
+
+  # check a few simple things on debug messages
+  like $debug_msgs[0],  qr/^triggering 'selectrow_array'.*?\[SELECT.*?in main at.*?line \d+/, "first debug msg";
+  like $debug_msgs[-1], qr/^triggering 'execute_array'/,                                      "last debug msg";
 }
 
 
@@ -198,5 +207,4 @@ sub clonestr { # make fresh copies of strings for each test. Otherwise strings w
 
 
 # MISSING TESTS
-# - debug method
 # - ternary form of bind_param()

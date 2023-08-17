@@ -15,6 +15,7 @@ lib/Data/Printer/Filter/FORMAT.pm
 lib/Data/Printer/Filter/GenericClass.pm
 lib/Data/Printer/Filter/GLOB.pm
 lib/Data/Printer/Filter/HASH.pm
+lib/Data/Printer/Filter/OBJECT.pm
 lib/Data/Printer/Filter/REF.pm
 lib/Data/Printer/Filter/Regexp.pm
 lib/Data/Printer/Filter/SCALAR.pm
@@ -67,6 +68,7 @@ t/023-filters.t
 t/024-tied.t
 t/025-profiles.t
 t/026-caller_message.t
+t/027-nativeperlclass.t
 t/100-filter_datetime.t
 t/101-filter_db.t
 t/102-filter_digest.t

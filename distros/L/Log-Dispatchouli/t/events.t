@@ -67,8 +67,8 @@ sub logger_trio {
     ident   => 't/basic.t',
   });
 
-  my $proxy1 = $logger->proxy({ proxy_ctx => { 'inner' => 'proxy' } });
-  my $proxy2 = $proxy1->proxy({ proxy_ctx => { 'outer' => 'proxy' } });
+  my $proxy1 = $logger->proxy({ proxy_ctx => { 'outer' => 'proxy' } });
+  my $proxy2 = $proxy1->proxy({ proxy_ctx => { 'inner' => 'proxy' } });
 
   return ($logger, $proxy1, $proxy2);
 }
@@ -101,6 +101,22 @@ subtest "very basic stuff" => sub {
     'event=programmer-sleepiness excited=3.2 motto="Never say \\"never\\" ever again." weary=8.62',
     "basic data as a hashref",
   );
+
+  {
+    my %kv = (
+      weary   => 8.62,
+      excited => 3.2,
+      motto   => q{Never say "never" ever again.},
+    );
+
+    my $line = Log::Fmt->format_event_string([%kv]);
+
+    cmp_deeply(
+      Log::Fmt->parse_event_string_as_hash($line),
+      \%kv,
+      "parse_event_string_as_hash works",
+    );
+  }
 
   parse_event_ok(
     'event=programmer-sleepiness excited=3.2 motto="Never say \\"never\\" ever again." weary=8.62',
@@ -187,7 +203,7 @@ subtest "very basic proxy operation" => sub {
   messages_ok(
     $logger,
     [
-      'event=pie_picnic inner=proxy outer=proxy pies_eaten=1.2 joy_harvested=6'
+      'event=pie_picnic outer=proxy inner=proxy pies_eaten=1.2 joy_harvested=6'
     ],
     'got the expected log output from events',
   );
@@ -212,11 +228,11 @@ subtest "debugging in the proxies" => sub {
     $logger,
     [
       # 'event=0 seq=0',                          # not logged, debugging
-      'event=1 inner=proxy seq=1',
-      'event=2 inner=proxy outer=proxy seq=2',
+      'event=1 outer=proxy seq=1',
+      'event=2 outer=proxy inner=proxy seq=2',
       # 'event=0 seq=3',                          # not logged, debugging
-      'event=1 inner=proxy seq=4',
-      # 'event=2 inner=proxy outer=proxy seq=5',  # not logged, debugging
+      'event=1 outer=proxy seq=4',
+      # 'event=2 outer=proxy inner=proxy seq=5',  # not logged, debugging
     ],
     'got the expected log output from events',
   );
@@ -280,27 +296,27 @@ subtest "lazy values in proxy context" => sub {
   my $called_B = 0;
   my $callback_B = sub { $called_B++; return 'X' };
 
-  my $proxy1 = $logger->proxy({ proxy_ctx => [ inner => $callback_A ] });
-  my $proxy2 = $proxy1->proxy({ proxy_ctx => [ outer => $callback_B ] });
+  my $proxy1 = $logger->proxy({ proxy_ctx => [ outer => $callback_A ] });
+  my $proxy2 = $proxy1->proxy({ proxy_ctx => [ inner => $callback_B ] });
 
-  $proxy1->log_event('inner-event' => [ guitar => 'electric' ]);
+  $proxy1->log_event('outer-event' => [ guitar => 'electric' ]);
 
-  is($called_A, 1, "inner proxy did log, called inner callback");
-  is($called_B, 0, "inner proxy did log, didn't call outer callback");
+  is($called_A, 1, "outer proxy did log, called outer callback");
+  is($called_B, 0, "outer proxy did log, didn't call inner callback");
 
-  $proxy2->log_event('outer-event' => [ mandolin => 'bluegrass' ]);
+  $proxy2->log_event('inner-event' => [ mandolin => 'bluegrass' ]);
 
-  is($called_A, 1, "outer proxy did log, didn't re-call inner callback");
-  is($called_B, 1, "outer proxy did log, did call outer callback");
+  is($called_A, 1, "inner proxy did log, didn't re-call outer callback");
+  is($called_B, 1, "inner proxy did log, did call inner callback");
 
-  $proxy2->log_event('outer-second' => [ snare => 'infinite' ]);
+  $proxy2->log_event('inner-second' => [ snare => 'infinite' ]);
 
   messages_ok(
     $logger,
     [
-      'event=inner-event inner=X guitar=electric',
-      'event=outer-event inner=X outer=X mandolin=bluegrass',
-      'event=outer-second inner=X outer=X snare=infinite',
+      'event=outer-event outer=X guitar=electric',
+      'event=inner-event outer=X inner=X mandolin=bluegrass',
+      'event=inner-second outer=X inner=X snare=infinite',
     ],
     "all our laziness didn't change our results",
   );
@@ -327,6 +343,48 @@ subtest "reused JSON booleans" => sub {
       'event=tf-thing cond.b.0=1 cond.b.1=0 cond.f.0=0 cond.f.1=0 cond.f.2=0 cond.t.0=1 cond.t.1=1 cond.t.2=1',
     ],
     "JSON bools do what we expect",
+  );
+};
+
+subtest "JSON-ification of refrefs" => sub {
+  my ($logger, $proxy1, $proxy2) = logger_trio();
+
+  $logger->log_event('json-demo' => [
+    foo =>  { a => 1 },
+    bar => \{ a => 1 },
+    baz => \[ 12, 34 ],
+  ]);
+
+  my @messages = map {; $_->{message} } $logger->events->@*;
+
+  messages_ok(
+    $logger,
+    [
+      'event=json-demo foo.a=1 bar="{{{\"a\": 1}}}" baz="{{[12, 34]}}"',
+    ],
+    "refref becomes JSON flogged",
+  );
+
+  my $result = Log::Fmt->parse_event_string($messages[0]);
+
+  cmp_deeply(
+    $result,
+    [
+      event   => 'json-demo',
+      'foo.a' => 1,
+      bar     => "{{{\"a\": 1}}}",
+      baz     => "{{[12, 34]}}",
+    ],
+    "parsing gets us JSON string out, because it is just strings",
+  );
+
+  my ($json_string) = $result->[5] =~ /\A\{\{(.+)\}\}\z/;
+  my $json_struct = decode_json($json_string);
+
+  cmp_deeply(
+    $json_struct,
+    { a => 1 },
+    "we can round trip that JSON",
   );
 };
 

@@ -195,13 +195,12 @@ If I have missed anyone, please let me know.
 
 2022 Update: 
 
-Three of the above packages have now been removed from the list.  Symdump
-has not been updated since 2017, though the author is still active, and
-the package is still available.
+Three of the above packages have now been removed from the list.
 
-Filter is no longer available on CPAN (though the author is still active).
+Symdump has not been updated since 2017, though the author is still active,
+and the package is still available.
 
-GD is still maintained but by a new author.
+Filter and GD are still maintained but by new authors.
 
 So, it seems like we're down to 4 packages that are actively maintained by
 the original author that are older than Date::Manip.

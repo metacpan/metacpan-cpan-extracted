@@ -147,6 +147,8 @@ push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 
 is ($sth->fetchrow_hashref(), undef);
 

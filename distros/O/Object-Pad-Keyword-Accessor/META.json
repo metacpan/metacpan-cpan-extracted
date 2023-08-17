@@ -23,26 +23,26 @@
          "requires" : {
             "Module::Build" : "0.4004",
             "Object::Pad::ExtensionBuilder" : "0.73",
-            "XS::Parse::Keyword::Builder" : "0.30"
+            "XS::Parse::Keyword::Builder" : "0.35"
          }
       },
       "runtime" : {
          "requires" : {
             "Object::Pad" : "0.60",
-            "XS::Parse::Keyword" : "0",
-            "perl" : "5.030"
+            "XS::Parse::Keyword" : "0.35",
+            "perl" : "5.022"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Object::Pad::Keyword::Accessor" : {
          "file" : "lib/Object/Pad/Keyword/Accessor.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

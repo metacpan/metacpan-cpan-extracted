@@ -98,7 +98,7 @@ When qr/I enter (([^"].*)|"(.*)") into "(.+)"/, sub {
     my $label = $4;
 
     my $element = S->{ext_wsl}->page->find(
-        "*labeled", text => $label);
+        "*field", text => $label);
     ok($element, "found element with label '$label'");
     $value ||= C->stash->{feature}->{$param} if $param;
     $element->click;

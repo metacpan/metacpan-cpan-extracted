@@ -1,0 +1,57 @@
+{
+   "abstract" : "anonymous proxy requests",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-Proxy-Anonymous",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "Plack::App::Proxy" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::Proxy::Anonymous" : {
+         "file" : "lib/Plack/App/Proxy/Anonymous.pm",
+         "version" : "0.0100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Plack-App-Proxy-Anonymous/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Plack-App-Proxy-Anonymous"
+      }
+   },
+   "version" : "0.0100",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

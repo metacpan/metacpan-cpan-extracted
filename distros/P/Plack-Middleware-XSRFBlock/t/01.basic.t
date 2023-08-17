@@ -100,6 +100,26 @@ for my $appname ('psgix.input.non-buffered', 'psgix.input.buffered') {
                 'correct error in response body when invalid token in POST'
             );
 
+            # posting empty token and empty cookie should be forbidden
+            $jar->clear('localhost');
+            $jar->set_cookie(
+                3,
+                'PSGI-XSRF-Token' => '',
+                '/', 'localhost',
+            );
+            $res = forbidden_ok (
+                $cb->(
+                    POST "http://localhost/post",
+                    [name => 'Plack', xsrf_token => '']
+                )
+            );
+            is (
+                $res->content,
+                'XSRF detected [form field missing]',
+                'correct error in response body when empty token in POST & cookie'
+            );
+            $jar->clear('localhost');
+
             # now we have a value for the token that we can submit with forms
 
             # make a POST with no token; we should NOT be trying to set the

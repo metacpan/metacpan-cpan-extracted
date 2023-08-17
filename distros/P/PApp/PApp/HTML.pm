@@ -36,7 +36,7 @@ no bytes;
 
 use common::sense;
 
-our $VERSION = 2.2;
+our $VERSION = 2.3;
 our @EXPORT = qw(
 
       errbox

@@ -11,7 +11,7 @@ use MARC::Convert::Wikidata::Item::Periodical;
 use MARC::Convert::Wikidata::Transform;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -513,6 +513,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

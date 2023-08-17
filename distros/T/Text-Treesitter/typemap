@@ -1,10 +1,10 @@
-Text::Treesitter::Language    T_PTROBJ
-Text::Treesitter::_Node       T_STRUCTOBJ
-Text::Treesitter::Parser      T_PTROBJ
-Text::Treesitter::Query       T_PTROBJ
-Text::Treesitter::QueryCursor T_PTROBJ
-Text::Treesitter::QueryMatch  T_STRUCTOBJ
-Text::Treesitter::_Tree       T_PTROBJ
+Text::Treesitter::Language     T_PTROBJ
+Text::Treesitter::_Node        T_STRUCTOBJ
+Text::Treesitter::Parser       T_PTROBJ
+Text::Treesitter::Query        T_PTROBJ
+Text::Treesitter::_QueryCursor T_PTROBJ
+Text::Treesitter::_QueryMatch  T_STRUCTOBJ
+Text::Treesitter::_Tree        T_PTROBJ
 
 INPUT
 T_STRUCTOBJ

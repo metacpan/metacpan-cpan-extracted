@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Getopt::Std;
-use PYX::Optimization
+use PYX::Optimization;
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -33,8 +33,8 @@ sub run {
 		print STDERR "Usage: $0 [-h] [--version] [filename] [-]\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
-		print STDERR "\tfilename\tProcess on filename\n";
-		print STDERR "\t-\t\tProcess on stdin\n";
+		print STDERR "\tfilename\tProcess on filename.\n";
+		print STDERR "\t-\t\tProcess on stdin.\n";
 		return 1;
 	}
 	$self->{'_filename_or_stdin'} = $ARGV[0];
@@ -91,6 +91,8 @@ Run.
 
 =head1 EXAMPLE
 
+=for comment filename=print_help.pl
+
  use strict;
  use warnings;
 
@@ -123,12 +125,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2020 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.04
 
 =cut

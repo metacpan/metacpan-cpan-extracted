@@ -1,7 +1,10 @@
-
 =head1 NAME
 
 Authen::SASL - SASL Authentication framework
+
+=head1 VERSION
+
+version 2.1700
 
 =head1 SYNOPSIS
 
@@ -34,21 +37,21 @@ entirely in Perl.
 
 =item Authen::SASL::XS
 
-This module uses the Cyrus SASL C-library (both version 1 and 2 
+This module uses the Cyrus SASL C-library (both version 1 and 2
 are supported).
 
 =item Authen::SASL::Cyrus
 
-This module is the predecessor to L<Authen::SASL::XS>. It is reccomended
-to use L<Authen::SASL::XS>
+This module is the predecessor to L<Authen::SASL::XS>.
+
+Until version 2.16, Authen::SASL::Cyrus was loaded as an alternative
+to Authen::SASL::XS.
 
 =back
 
-By default the order in which these plugins are selected is 
-Authen::SASL::XS, Authen::SASL::Cyrus and then Authen::SASL::Perl.
-
-If you want to change it or want to specifically use one
-implementation only simply do
+By default Authen::SASL tries to load Authen::SASL::XS first,
+followed by Authen::SASL::Perl on failure. If you want to change the
+order or want to specifically use one implementation only simply do
 
  use Authen::SASL qw(Perl);
 
@@ -81,7 +84,7 @@ See the L<mechanism|/mechanism> method for details.
 
 =item debug =E<gt> VALUE
 
-Set the debug level bit-value to C<VALUE> 
+Set the debug level bit-value to C<VALUE>
 
 Debug output will be sent to C<STDERR>. The
 bits of this value are:
@@ -225,16 +228,26 @@ passing an code reference that, when called, returns the value.
 
 L<Authen::SASL::Perl>, L<Authen::SASL::XS>, L<Authen::SASL::Cyrus>
 
+=head1 MAINTAINER
+
+Erik Huelsmann <ehuels@gmail.com>
+
 =head1 AUTHOR
 
 Graham Barr <gbarr@pobox.com>
 
-Please report any bugs, or post any suggestions, to the perl-ldap mailing list
-<perl-ldap@perl.org>
+=head1 BUGS
+
+Please report any bugs, or any suggestions, in the GitHub project at
+L<https://github.com/gbarr/perl-authen-sasl/issues>.
+
 
 =head1 COPYRIGHT
 
-Copyright (c) 1998-2005 Graham Barr. All rights reserved. This program is
+  Copyright (c) 2023 Erik Huelsmann
+  Copyright (c) 1998-2005 Graham Barr.
+
+All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
 

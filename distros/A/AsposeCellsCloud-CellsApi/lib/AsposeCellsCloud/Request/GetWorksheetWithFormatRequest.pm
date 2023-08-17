@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetWithFormatRequest.name :   ,
-# GetWorksheetWithFormatRequest.sheetName :   ,
-# GetWorksheetWithFormatRequest.format :   ,
-# GetWorksheetWithFormatRequest.verticalResolution :   ,
-# GetWorksheetWithFormatRequest.horizontalResolution :   ,
-# GetWorksheetWithFormatRequest.area :   ,
-# GetWorksheetWithFormatRequest.pageIndex :   ,
-# GetWorksheetWithFormatRequest.folder :   ,
-# GetWorksheetWithFormatRequest.storageName :    
+# GetWorksheetWithFormatRequest.name : The workbook name.  ,
+# GetWorksheetWithFormatRequest.sheetName : The worksheet name.  ,
+# GetWorksheetWithFormatRequest.format : Export format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# GetWorksheetWithFormatRequest.verticalResolution : Image vertical resolution.  ,
+# GetWorksheetWithFormatRequest.horizontalResolution : Image horizontal resolution.  ,
+# GetWorksheetWithFormatRequest.area : Represents the range to be printed.  ,
+# GetWorksheetWithFormatRequest.pageIndex : Represents the page to be printed  ,
+# GetWorksheetWithFormatRequest.folder : Original workbook folder.  ,
+# GetWorksheetWithFormatRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_with_format' } = { 
-    	summary => '',
+    	summary => 'Gets worksheet in some format.',
         params => $params,
         returns => 'string',
     };
@@ -155,63 +155,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'Export format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
      	format => '',
      	read_only => '',
      		},
      'vertical_resolution' => {
      	datatype => 'int',
      	base_name => 'verticalResolution',
-     	description => '',
+     	description => 'Image vertical resolution.',
      	format => '',
      	read_only => '',
      		},
      'horizontal_resolution' => {
      	datatype => 'int',
      	base_name => 'horizontalResolution',
-     	description => '',
+     	description => 'Image horizontal resolution.',
      	format => '',
      	read_only => '',
      		},
      'area' => {
      	datatype => 'string',
      	base_name => 'area',
-     	description => '',
+     	description => 'Represents the range to be printed.',
      	format => '',
      	read_only => '',
      		},
      'page_index' => {
      	datatype => 'int',
      	base_name => 'pageIndex',
-     	description => '',
+     	description => 'Represents the page to be printed',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

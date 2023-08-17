@@ -1,0 +1,12 @@
+
+## INSTALL
+
+cpanm App::daydiff
+
+plenv rehash   # To reset the hash table of the shell to run commands if `plenv' is installed.
+hash -r        # The same with the above `plenv rehash' when bash, zsh, csh is used. (cf. `plenv sh-rehash')
+
+## UNINSTALL 
+
+cpanm -U App::daydiff
+

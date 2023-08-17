@@ -55,6 +55,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/GitHub-RSS/issues"
+      },
       "license" : [
          "https://dev.perl.org/licenses/"
       ],
@@ -64,7 +67,7 @@
          "web" : "https://github.com/Corion/GitHub-RSS"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

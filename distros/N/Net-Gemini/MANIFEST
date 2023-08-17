@@ -11,9 +11,13 @@ lib/Net/Gemini/Server.pm
 t/00-load.t
 t/20-server.t
 t/30-gemini.t
+t/40-gmitool.t
 t/host.cert
 t/host.key
+t/known_hosts
+t/lib/GemServ.pm
 t/mkcertificate
 t/pod-coverage.t
 t/pod.t
+t/torture.t
 SIGNATURE    Added here by Module::Build

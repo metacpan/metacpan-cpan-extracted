@@ -11,10 +11,12 @@ use App::Netdisco::Util::Device 'get_device';
 use App::Netdisco::Util::DNS 'hostname_from_ip';
 use App::Netdisco::Util::SNMP 'snmp_comm_reindex';
 use App::Netdisco::Util::Web 'sort_port';
+
 use Dancer::Plugin::DBIC 'schema';
 use Scope::Guard 'guard';
 use NetAddr::IP::Lite ':lower';
 use Storable 'dclone';
+use JSON::PP ();
 use Encode;
 
 register_worker({ phase => 'early', driver => 'snmp' }, sub {
@@ -73,6 +75,27 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
               return $job->cancel("discover cancelled: $ip failed to return valid $field");
           }
       }
+  }
+
+  # for existing device, filter custom_fields
+  if ($device->in_storage) {
+      my $coder = JSON::PP->new->utf8(0)->allow_nonref(1)->allow_unknown(1);
+
+      # get the custom_fields
+      my $fields = $coder->decode(Encode::encode('UTF-8',$device->custom_fields) || '{}');
+      my %ok_fields = map {$_ => 1}
+                      grep {defined}
+                      map {$_->{name}}
+                      @{ setting('custom_fields')->{device} || [] };
+
+      # filter custom_fields for current valid fields
+      foreach my $field (keys %$fields) {
+          delete $fields->{$field} unless exists $ok_fields{$field};
+          $fields->{$field} = Encode::decode('UTF-8', $fields->{$field});
+      }
+
+      # set new custom_fields
+      $device->set_column( custom_fields => $coder->encode($fields) );
   }
 
   # support for Hooks
@@ -364,11 +387,30 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
   vars->{'hook_data'}->{'ports'} = [values %deviceports];
 
   schema('netdisco')->resultset('DevicePort')->txn_do_locked(sub {
+    my $coder = JSON::PP->new->utf8(0)->allow_nonref(1)->allow_unknown(1);
+
     # backup the custom_fields
-    my @fields = grep {exists $deviceports{$_->{port}}} $device->ports
-      ->search(undef, {columns => [qw/port custom_fields/]})->hri->all;
-    $deviceports{$_->{port}}->{custom_fields} = $_->{custom_fields}
-      for @fields;
+    my %fields = map  {($_->{port} => $coder->decode(Encode::encode('UTF-8',$_->{custom_fields} || '{}')))}
+                 grep {exists $deviceports{$_->{port}}}
+                      $device->ports
+                             ->search(undef, {columns => [qw/port custom_fields/]})
+                             ->hri->all;
+
+    my %ok_fields = map {$_ => 1}
+                    grep {defined}
+                    map {$_->{name}}
+                    @{ setting('custom_fields')->{device_port} || [] };
+
+    # filter custom_fields for current valid fields
+    foreach my $port (keys %fields) {
+        foreach my $field (keys %{ $fields{$port} }) {
+            delete $fields{$port}->{$field} unless exists $ok_fields{$field};
+            $fields{$port}->{$field} = Encode::decode('UTF-8', $fields{$port}->{$field});
+        }
+
+        # set new custom_fields
+        $deviceports{$port}->{custom_fields} = $coder->encode($fields{$port});
+    }
 
     my $gone = $device->ports->delete({keep_nodes => 1});
     debug sprintf ' [%s] interfaces - removed %d interfaces',
@@ -410,6 +452,7 @@ sub _get_ipv4_aliases {
   my @aliases;
 
   my $ip_index   = $snmp->ip_index;
+  my $ip_table   = $snmp->ip_table;
   my $interfaces = $snmp->interfaces;
   my $ip_netmask = $snmp->ip_netmask;
 
@@ -420,6 +463,7 @@ sub _get_ipv4_aliases {
     foreach my $vrf (@vrf_list) {
       snmp_comm_reindex($snmp, $device, $vrf);
       $ip_index   = { %$ip_index,   %{$snmp->ip_index}   };
+      $ip_table   = { %$ip_table,   %{$snmp->ip_table}   };
       $interfaces = { %$interfaces, %{$snmp->interfaces} };
       $ip_netmask = { %$ip_netmask, %{$snmp->ip_netmask} };
     }
@@ -427,7 +471,7 @@ sub _get_ipv4_aliases {
 
   # build device aliases suitable for DBIC
   foreach my $entry (keys %$ip_index) {
-      my $ip = NetAddr::IP::Lite->new($entry)
+      my $ip = NetAddr::IP::Lite->new($ip_table->{$entry}) || NetAddr::IP::Lite->new($entry)
         or next;
       my $addr = $ip->addr;
 
@@ -435,10 +479,10 @@ sub _get_ipv4_aliases {
       next if acl_matches($ip, 'group:__LOOPBACK_ADDRESSES__');
       next if setting('ignore_private_nets') and $ip->is_rfc1918;
 
-      my $iid = $ip_index->{$addr};
+      my $iid = $ip_index->{$entry};
       my $port = $interfaces->{$iid};
-      my $subnet = $ip_netmask->{$addr}
-        ? NetAddr::IP::Lite->new($addr, $ip_netmask->{$addr})->network->cidr
+      my $subnet = $ip_netmask->{$entry}
+        ? NetAddr::IP::Lite->new($addr, $ip_netmask->{$entry})->network->cidr
         : undef;
 
       debug sprintf ' [%s] device - aliased as %s', $device->ip, $addr;

@@ -79,7 +79,7 @@ private:
             pos = expr.find(c, pos + subs.length());
         }
     }
-    
+
     void printIssue (const string& issue) const {
         stream << " " << issue;
     }
@@ -93,7 +93,7 @@ private:
     void printOriginalExpression () const {
         if (result.hasExpression()) stream << " " << result.getExpression();
     }
-    
+
     void printReconstructedExpression () const {
         if (!result.hasExpandedExpression()) return;
         stream << " for: ";
@@ -149,34 +149,34 @@ struct PerlReporter : StreamingReporterBase {
     static Scope context;
 
     static string getDescription () { return "Reports test results in perl test-harness compatible format"; }
-    
-    PerlReporter (const ReporterConfig& config) : StreamingReporterBase(config), scope(), sliding_scope(), fatal() {
+
+    PerlReporter (ReporterConfig&& config) : StreamingReporterBase(std::move(config)), scope(), sliding_scope(), fatal() {
         m_preferences.shouldRedirectStdOut = false;
         m_preferences.shouldReportAllAssertions = true;
     }
-    
+
     void noMatchingTestCases (StringRef unmatchedSpec) override {
         startErrorLine() << "# No test cases matched '" << unmatchedSpec << "'" << endl;
     }
-    
-    void reportInvalidArguments(StringRef invalidArgument) override {
+
+    void reportInvalidTestSpec(StringRef invalidArgument) override {
         startErrorLine() << "# invalid argument '" << invalidArgument << "'" << endl;
     }
-    
+
     void testRunStarting (const TestRunInfo&) override {
         scopes.push_back(context);
         scope = &scopes.back();
     }
-    
+
     void testRunEnded (const TestRunStats&) override {
         context.count  = scope->count;
         context.failed = scope->failed;
         scopes.clear();
         scope = nullptr;
     }
-    
+
     void testCaseStarting (const TestCaseInfo&)  override {}
-    
+
     void testCaseEnded (const TestCaseStats&) override {
         if (fatal) {
             commitAssertions();
@@ -184,7 +184,7 @@ struct PerlReporter : StreamingReporterBase {
         }
         commitSlidingScope();
     }
-    
+
     void sectionStarting (const SectionInfo& info) override {
         if (sliding_scope && sliding_scope->name == info.name) {
             ++sliding_scope;
@@ -193,7 +193,7 @@ struct PerlReporter : StreamingReporterBase {
         commitSlidingScope();
         startScope(info);
     }
-    
+
     void startScope (const SectionInfo& info) {
         startLine();
         auto fullname = scope->fullname.length() ? (scope->fullname + " / " + info.name) : info.name;
@@ -201,21 +201,21 @@ struct PerlReporter : StreamingReporterBase {
         scopes.push_back({0, 0, scope->depth + 1, info.name, fullname});
         scope = &scopes.back();
     }
-    
+
     void sectionEnded (const SectionStats&) override {
         if (fatal) return;
         if (!sliding_scope) sliding_scope = scope + 1;
         --sliding_scope;
         if (sliding_scope == &scopes[1]) commitAssertions();
     }
-    
+
     void commitSlidingScope () {
         if (!sliding_scope) return;
         size_t cnt = &scopes.back() - sliding_scope + 1;
         while (cnt--) closeCurrentScope();
         sliding_scope = nullptr;
     }
-    
+
     void closeCurrentScope () {
         auto name = scope->fullname;
         bool failed = scope->failed;
@@ -223,11 +223,11 @@ struct PerlReporter : StreamingReporterBase {
         if (scope->failed) {
             startErrorLine() << "# Looks like you failed " << scope->failed << " test of " << scope->count << " at [" << name << "]." << endl;
         }
-        
+
         scopes.pop_back();
         if (scopes.empty()) throw "WTF?";
         scope = &scopes.back();
-        
+
         ++scope->count;
         startLine();
         if (failed) {
@@ -237,7 +237,7 @@ struct PerlReporter : StreamingReporterBase {
         else m_stream << "ok";
         m_stream << " " << scope->count << " - [" << name << "]" << endl;
     }
-    
+
     ostream& startLine () {
         for (size_t i = 0; i < scope->depth; ++i) m_stream << "    ";
         return m_stream;
@@ -255,17 +255,17 @@ struct PerlReporter : StreamingReporterBase {
         Printer(s, stats).print();
         assertions.push_back({stats, s.str()});
     }
-    
+
     void commitAssertions () {
         for (auto& row : assertions) {
             auto& stats = row.stats;
             auto result = stats.assertionResult;
             // prevent diagnostic messages from counting
             bool is_test = result.getResultType() != ResultWas::Info && result.getResultType() != ResultWas::Warning;
-            
+
             Colour::Code color = Colour::None;
             ostream& ss = result.succeeded() ? startLine() : startErrorLine();
-            
+
             if (is_test) {
                 ++scope->count;
                 if (result.succeeded()) {
@@ -277,26 +277,26 @@ struct PerlReporter : StreamingReporterBase {
                 }
                 ss << " " << scope->count << " -";
             }
-            
+
             {
-                Colour cg(color); (void)cg;
+                ColourImpl::ColourGuard cg = m_colour->guardColour(color); (void)cg;
                 ss << row.expr;
                 ss << " # at " << result.getSourceInfo();
             }
-    
+
             ss << endl;
-    
+
             if (is_test && !result.succeeded()) {
                 startErrorLine() << "#\e[1;31m Failed test in section [" << scope->fullname << "] at " << result.getSourceInfo() << "\e[0m" << endl;
             }
         }
         assertions.clear();
     }
-    
+
     void fatalErrorEncountered (StringRef) override {
         fatal = true;
     }
-    
+
     void benchmarkEnded(const BenchmarkStats<>& stats) override {
         ostream& ss = startLine();
         ++scope->count;
@@ -304,24 +304,24 @@ struct PerlReporter : StreamingReporterBase {
         if (stats.info.name.length()) ss << stats.info.name << ": ";
         ss << speed(stats.mean.point.count()) << ", " << spent(stats.mean.point.count()) << endl;
     }
-    
+
 private:
     struct AData {
         AssertionStats stats;
         string         expr;
     };
-    
+
     vector<Scope> scopes;
     Scope*        scope;
     Scope*        sliding_scope;
     vector<AData> assertions;
     bool          fatal;
-    
+
     static constexpr const uint64_t usec = 1000;
     static constexpr const uint64_t msec = 1000 * usec;
     static constexpr const uint64_t sec  = 1000 * msec;
     static constexpr const uint64_t min  = 60 * sec;
-    
+
     static inline string spent (double ns) {
         double val;
         const char* units;
@@ -335,7 +335,7 @@ private:
         assert(sz > 0);
         return string(buf, sz);
     }
-    
+
     static inline string speed (double ns) {
         double val;
         const char* units;
@@ -350,7 +350,7 @@ private:
 };
 
 PerlReporter::Scope PerlReporter::context;
-    
+
 CATCH_REGISTER_REPORTER("perl", PerlReporter);
 
 MODULE = Test::Catch                PACKAGE = Test::Catch
@@ -360,28 +360,28 @@ bool _run (SV* count, SV* failed, int depth, ...) {
     int err;
     {
         std::vector<const char*> argv = {"test"};
-        
+
         for (int i = 3; i < items; ++i) {
             SV* arg = ST(i);
             if (!SvOK(arg)) continue;
             argv.push_back(SvPV_nolen(arg));
         }
-        
+
         argv.push_back("-i");
         argv.push_back("-r");
         argv.push_back("perl");
-        
+
         session.useConfigData({});
         err = session.applyCommandLine(argv.size(), argv.data());
     }
     if (err) croak("session.applyCommandLine: error %d", err);
-    
+
     PerlReporter::context.count  = SvUV(count);
     PerlReporter::context.failed = SvUV(failed);
     PerlReporter::context.depth  = depth;
-    
+
     RETVAL = session.run() == 0;
-    
+
     sv_setuv(count, PerlReporter::context.count);
     sv_setuv(failed, PerlReporter::context.failed);
 }

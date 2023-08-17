@@ -1,6 +1,6 @@
-Net::EPP::Registry::Nominet 0.07
+Net::EPP::Registry::Nominet 0.08
 
-Released: 23rd December 2022
+Released: 6th July 2023
 
 
 INSTALLATION
@@ -42,9 +42,11 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Test suite fixes
-Domain check returns reason for unavailability as 3rd value
-Automatically reconnect, re-login and resend a request if no response
+Tests upgrade deep recursion warning to fatal
+Fix logout + login as new user (RT 147136)
+Add fork method
+Add ability to change contact ID in update_contact
+Add ability to move a domain to a different registrant with update_domain
 
 See the Changes file for a complete history.
 
@@ -61,11 +63,14 @@ to read it. Alternatively, you can view the man page with
 
 	man Net::EPP::Registry::Nominet
 
+or on the web at
+https://www.perlconsultancy.com/modules/Net-EPP-Registry-Nominet.shtml
+
 
 COPYRIGHT
 ---------
 
-This software is copyright © 2013-2022 by Pete Houston. It is released
+This software is copyright © 2013-2023 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the GNU General Public Licence
 (version 2).
 

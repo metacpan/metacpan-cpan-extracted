@@ -88,15 +88,17 @@
 #define HAVE_NEG_NAN
 #define STR_NEG_INF "---"
 #define STR_NEG_NAN "?"
-#elif defined(_AIX)
+#elif defined(_AIX) || defined(_AIX50)
 /* xlC compiler: __TOS_AIX__ FIXME: This does not work yet. GH #165 */
-#define STR_INF "INF.0"
-#define STR_INF2 "-INF.0"
+#define STR_INF "INF"
+#define STR_INF2 "INF.0"
+#define HAVE_NEG_NAN
+#define STR_NEG_INF "-INF"
 #define HAVE_NEG_NAN
 #define HAVE_QNAN
 #define STR_NAN "NaN"
-//#define STR_QNAN "NaNQ"
-#define STR_QNAN "NANQ"
+#define STR_QNAN "NaNQ"
+//#define STR_QNAN "NANQ"
 #else
 #define STR_INF "inf"
 #define STR_NAN "nan"
@@ -1588,7 +1590,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
       str = SvPVutf8_force(pv, len);
     }
 #endif
-    if (!len) {
+    if (!len && !SvOBJECT (sv)) {
       encode_const_str (aTHX_ enc, "null", 4, 0);
       SvREFCNT_dec(pv);
       return;
@@ -2219,6 +2221,9 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
             }
 #endif
 
+/* #if defined(_AIX) || defined(_AIX50)
+ * (void)fprintf (stderr, "#|# >%s<\n", enc->cur);
+ * #endif */
 #ifdef STR_INF4
           if (UNLIKELY(strEQc(enc->cur, STR_INF)
                        || strEQc(enc->cur, STR_INF2)
@@ -2236,6 +2241,13 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
             inf_or_nan = 2;
           else if (UNLIKELY(strEQc(enc->cur, STR_NEG_NAN)))
             inf_or_nan = 3;
+#endif
+#if defined(_AIX) || defined(_AIX50)
+          else if (UNLIKELY(strEQc(enc->cur, STR_INF)
+                         || strEQc(enc->cur, STR_INF2)))
+            inf_or_nan = 1;
+          else if (UNLIKELY(strEQc(enc->cur, STR_NEG_INF)))
+            inf_or_nan = 2;
 #endif
           else if
 #ifdef HAVE_QNAN
@@ -3377,7 +3389,16 @@ _decode_str (pTHX_ dec_t *dec, char endstr)
                   case 'n': ++dec_cur; *cur++ = '\012'; break;
                   case 'f': ++dec_cur; *cur++ = '\014'; break;
                   case 'r': ++dec_cur; *cur++ = '\015'; break;
-
+                  case '\'':
+                    {
+                      if( dec->json.flags & F_ALLOW_SQUOTE ) {
+                        *cur++ = *dec_cur++;
+                      } else {
+                        --dec_cur;
+                        ERR ("illegal backslash escape sequence in string");
+                      }
+                      break;
+                    }
                   case 'x':
 		    {
 		      UV c;

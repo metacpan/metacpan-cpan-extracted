@@ -31,15 +31,9 @@ enabled with an import flag:
 
 While it may come useful, it is often unnecessary. The module already does not
 copy any extra data from input to output fields, so you don't have to worry
-about it at all - it will simply get ignored. Enabling strict mode reduces the
-performance of the module by about 50%:
-
-
-	Parsing 100 hash references in an array
-
-	                  Rate form_tiny_strict        form_tiny
-	form_tiny_strict 156/s               --             -57%
-	form_tiny        359/s             131%               --
+about it at all - it will simply get ignored. Benchmarking has shown that
+enabling strict mode reduces the performance of the module by up to 30% (more
+for simple forms).
 
 =head1 THINGS THAT SPEED THE MODULE UP
 

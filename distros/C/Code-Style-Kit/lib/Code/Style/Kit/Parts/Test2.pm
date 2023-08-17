@@ -1,7 +1,7 @@
 package Code::Style::Kit::Parts::Test2;
 use strict;
 use warnings;
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: commonly used test modules (Test2 style)
 
 
@@ -39,7 +39,7 @@ Code::Style::Kit::Parts::Test2 - commonly used test modules (Test2 style)
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

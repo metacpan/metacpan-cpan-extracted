@@ -1,5 +1,9 @@
 Revision history for Web::Request::Role::AbsoluteUriFor
 
+1.004     2023-06-07 15:38:59+02:00
+    - pass a second argument to override the default base uri (Thomas Klausner)
+
+
 1.003     2021-04-04 16:20:28+02:00
     - move data from global dist.ini into dist (Thomas Klausner)
 

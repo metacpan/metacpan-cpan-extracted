@@ -1,5 +1,8 @@
 Revision history for App-gimpgitbuild
 
+0.30.3   2023-07-08
+    - runtime updates and fixes.
+
 0.30.2   2021-10-14
     - Ascertain gjs' presence before build.
         - https://gitlab.gnome.org/GNOME/gimp/-/issues/7341

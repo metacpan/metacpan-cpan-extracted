@@ -1,3 +1,12 @@
+0.007   2023-04-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Update to Clipboard::Any 0.011 to reflect to the generated
+          POD of CLI's.
+
+        - Add utility: get-clipboard-history-item (from Clipboard::Any
+          0.009).
+
+
 0.006   2022-12-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

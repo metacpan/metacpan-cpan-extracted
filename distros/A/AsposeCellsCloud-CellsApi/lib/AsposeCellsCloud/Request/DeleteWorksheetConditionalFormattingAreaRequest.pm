@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetConditionalFormattingAreaRequest.name :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.sheetName :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.startRow :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.startColumn :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.totalRows :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.totalColumns :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.folder :   ,
-# DeleteWorksheetConditionalFormattingAreaRequest.storageName :    
+# DeleteWorksheetConditionalFormattingAreaRequest.name : The workbook name.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.startRow : The start row of the range.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.startColumn : The start column of the range.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.totalRows : The number of rows of the range.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.totalColumns : The number of columns of the range.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formatting_area' } = { 
-    	summary => '',
+    	summary => 'Removes cell area from conditional formatting.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,56 +150,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => '',
+     	description => 'The start row of the range.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The start column of the range.',
      	format => '',
      	read_only => '',
      		},
      'total_rows' => {
      	datatype => 'int',
      	base_name => 'totalRows',
-     	description => '',
+     	description => 'The number of rows of the range.',
      	format => '',
      	read_only => '',
      		},
      'total_columns' => {
      	datatype => 'int',
      	base_name => 'totalColumns',
-     	description => '',
+     	description => 'The number of columns of the range.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

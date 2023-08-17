@@ -1,5 +1,10 @@
 Revision history for List-Keywords
 
+0.11    2023-07-19
+        [CHANGES]
+         * Use is_refcount() from Test2::V0 rather than Test::Refcount
+         * Remember to implement `no List::Keywords` to disable the syntax
+
 0.10    2023-02-02
         [CHANGES]
          * Added `ngrep` and `nmap`

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,16 +21,16 @@ no_index:
 provides:
   App::Greple::tee:
     file: lib/App/Greple/tee.pm
-    version: '0.05'
+    version: '0.99'
 requires:
-  App::Greple: '9.02'
-  App::sdif: v4.24.0
+  App::Greple: '9.07'
+  App::sdif: v4.25.1
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-Greple-tee/issues
   homepage: https://github.com/kaz-utashiro/App-Greple-tee
   repository: https://github.com/kaz-utashiro/App-Greple-tee.git
-version: '0.05'
+version: '0.99'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

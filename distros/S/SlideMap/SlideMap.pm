@@ -27,7 +27,7 @@ require Exporter;
 
 @EXPORT = qw();
 
-$VERSION = '1.1';
+$VERSION = '1.4';
 
 
 # Preloaded methods go here.
@@ -1153,7 +1153,7 @@ None by default.
 
 =head1 AUTHOR
 
-Joseph A. White;	jwhite@tigr.org		Version 1.2		Feb. 7, 2002
+Joseph A. White;	jwhite25@verizon.net		Version 1.4		Aug 14, 2023
 
 =head1 SEE ALSO
 

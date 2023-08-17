@@ -1,6 +1,121 @@
 Revision history for App-DBBrowser
 
 
+2.338     2023-08-14
+        - Fixed wrong module name in ScalarFunctions.pm.
+
+2.337     2023-08-08
+        - Reorganizing extended values.
+        - Option to enable extended arguments.
+        - Use placeholders only when inserting into a table.
+        - Improved case expression info output.
+        - Update documentation.
+
+2.336_02  2023-08-06
+        - Update documentation.
+        - Fixes und updates.
+
+2.336_01  2023-08-04
+        - Reorganizing extended values.
+        - Fixed case expression info output.
+        - Use placeholders only in INSERT INTO statement.
+
+2.336  2023-07-26
+        New:
+        - CASE expressions.
+        - Arithmetic operators.
+        - Extract: day_of_week and year_of_week.
+
+        Changes:
+        - 'empty_to_null' for file import enabled by default.
+        - Update operators ANY and ALL.
+        - Removed operators with col.
+        - Term::Form minimum version '0.554'.
+        - Use Encode::find_encoding
+
+2.335_05  2023-07-25
+        - Arithmetic.
+        - Term::Form minimum version '0.554'.
+        - Enabled empty_to_null for file import by default.
+
+2.335_04  2023-07-19
+        - Update operators ANY and ALL.
+
+2.335_03  2023-07-17
+        - Added day_of_year.
+        - Update day_of_week.
+        - Removed operators with col.
+
+2.335_02  2023-07-17
+        - Added day_of_week
+        - Use Encode::find_encoding
+
+2.335_01  2023-07-14
+        - Added CASE expression.
+
+2.335    2023-07-07
+        - Bugfix in create_table: check for definedness of data type.
+
+2.334    2023-07-06
+        - Aliases in ORDER BY.
+        - Added scalar functions 'extract', 'instr', 'lpad' and 'rpad'.
+
+2.333    2023-07-02
+        Bugfixes:
+        - Single user schema with metadata disabled.
+        - Having clause with subqueries.
+        - Filter: scope of reparse.
+
+        New:
+        - Window functions.
+        - Scalar functions 'coalesce' and 'now'.
+        - Allow nested scalar functions
+        - Operators ALL and ANY.
+        - Choose set operator
+
+        Changes:
+        - fill_form menus: option 'auto_up' set to 1.
+        - Modified options 'alias' and 'extensions'.
+        - Some menu items have been moved to other menus.
+        - Some changes require to reconfigure some options.
+
+2.332    2023-07-02
+        - Bugfix Postgress: single schema with metadata disabled.
+        - Added window functions.
+
+2.331    2023-06-28
+        - Added operators ALL and ANY.
+        - Different fixes.
+
+2.330    2023-06-26
+        - Update Union.pm.
+        - Update Functions.pm.
+        - Update 'get_stmt'.
+
+2.329    2023-06-21
+        - Refactoring Functions.pm.
+        - Nested scalar functions: recursion instead of loop.
+
+2.328    2023-06-15
+        - Some changes require to reconfigure some options.
+        - Some menu items have been moved to other menus.
+        - fill_form menus: option 'auto_up' set to 1.
+        - Added scalar functions 'coalesce' and 'now'.
+        - Modified options 'alias' and 'extensions'.
+        - Bugfix: having clause with subqueries.
+        - Bugfix: filter reparse.
+        - Union: option to set the union type.
+
+2.327    2023-06-02
+        - Bugfix: replace comma with semi-colon.
+
+2.326    2023-06-02
+        - Fixed bugtracker entry in Makefile.PL.
+
+2.325    2023-06-01
+        - Added support for Oracle plugins.
+        - Code refactoring.
+
 2.324    2023-05-02
         - Update documentation.
 

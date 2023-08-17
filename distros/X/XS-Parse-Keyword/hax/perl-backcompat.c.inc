@@ -198,16 +198,18 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 }
 #endif
 
-#ifdef PERL_USE_GCC_BRACE_GROUPS
-#  define xV_FROM_REF(XV, ref)  \
+#ifndef xV_FROM_REF
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define xV_FROM_REF(XV, ref)  \
   ({ SV *_ref = ref; assert(SvROK(_ref)); assert(SvTYPE(SvRV(_ref)) == SVt_PV ## XV); (XV *)(SvRV(_ref)); })
-#else
-#  define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
-#endif
+#  else
+#    define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#  endif
 
-#define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
-#define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
-#define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#  define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
+#  define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
+#  define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#endif
 
 #ifndef newPADxVOP
 #  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)

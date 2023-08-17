@@ -30,4 +30,5 @@ t/time.t
 t/timing.t
 t/lib/Test/Effects/Module1.pm
 t/lib/Test/Effects/Module2.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+# This file documents the revision history for Perl extension CatalystX-ControllerPerContext.
+
+0.005 - 20 June 2023
+  - Add hook to let you pre process arguments at component creation time.
+    Useful in you need to do once time setup of variables and processing of
+    configuration arguments, or other application scoped properties.
+
+0.004 - 03 June 2023
+  - fix dist metadata errors
+
+0.003 - 06 April 2023
+  - Properly set the action namespace if the namespace configuration option is set
+  
+0.002 - 05 September 2022
+  - Properly set the application class attribute. This was a serious bug so you should
+    probably upgrade.  Happy US Labor Day!
+
+0.001 - 21 July 2022
+  - First Release
+

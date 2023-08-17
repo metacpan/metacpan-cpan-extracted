@@ -1,0 +1,8 @@
+0.02 2023-06-27T01:50:29+02:00
+ - Add support of autofocus.
+ - Improve and fix example in doc.
+ - Remove bad constructor parameters.
+ - Update minimal version of Tags::HTML::Login::Register to 0.03.
+
+0.01 2023-06-24T18:07:21+02:00
+ - First version.

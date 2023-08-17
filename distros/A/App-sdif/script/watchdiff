@@ -8,7 +8,7 @@
 ## Original version on Feb 15 2014
 ##
 
-use strict;
+use v5.14;
 use warnings;
 
 use  App::watchdiff;
@@ -38,8 +38,9 @@ watchdiff - repeat command and watch differences
     --[no-]newline      print newline result (default on)
     --[no-]clear        clear screen after output (default on)
     --diff=command      diff command used to compare result
-    --unit=unit         comparison unit (word/char/mecab)
+    --unit=unit         comparison unit (word/letter/char/mecab)
 
+    -V, --verbose       print diff control command (default off)
     -M, --mark          show diff mark (default off)
     -O, --old           show old data (default off)
     -C, --context=i     diff before/after context (default 100)
@@ -49,11 +50,9 @@ watchdiff - repeat command and watch differences
 
 =head1 VERSION
 
-Version 4.26
+Version 4.28
 
 =head1 EXAMPLES
-
-    watchdiff ifconfig -a
 
     watchdiff df
 
@@ -61,13 +60,15 @@ Version 4.26
 
     watchdiff --refresh 5 --noclear df
 
-    watchdiff -sri1 -- netstat -sp icmp
+    watchdiff ifconfig en0
+
+    watchdiff -sri1 -- netstat -sp ip
+
+    watchdiff -ps --diff=sdif netstat -sp ip
 
     watchdiff -e uptime -e iostat -e df
 
-    watchdiff -ps --diff 'sdif --no-command -U-1' netstat -S -I en0
-
-    watchdiff -pc18i10r0 date; say tea is ready
+    watchdiff -pc18i10r0 date; say -v Alex Ramen is ready
 
     watchdiff -sU2 du -h ~/Music
 
@@ -77,15 +78,17 @@ Use C<^C> to terminate.
 
 Basically B<watchdiff> command expect the command output is small
 enough to fit within a terminal screen size.  If the output is longer
-than the screen height, only the final part is shown.  Use B<-C>
-option if the output is large and you want to see modified part only.
+than the screen height, only the final part is shown.
+
+Use B<-C#> option if the output is large and you want to see modified
+part only.  In this case, you may want to use the B<-V> option, since
+it is difficult to tell which part of the data is being displayed.
 
 =head1 AUTHOR
 
 Kazumasa Utashiro
 
 L<https://github.com/kaz-utashiro/sdif-tools>
-
 
 =head1 LICENSE
 
@@ -94,13 +97,11 @@ Copyright 2014-2023 Kazumasa Utashiro
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-
 =head1 SEE ALSO
 
 L<App::sdif>
 
 L<diff(1)>, L<cdif(1)>, L<sdif(1)>
-
 
 =cut
 

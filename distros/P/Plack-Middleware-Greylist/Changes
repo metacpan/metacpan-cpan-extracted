@@ -1,5 +1,22 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.5.0    2023-08-02 11:40:11+01:00 Europe/London
+  [Enhancements]
+  - Added "allowed" and "rejected" as synonyms for "whitelist" and "blacklist".
+
+  - Added "norobots" rate which rejects all requests except for "/robots.txt".
+
+  [Tests]
+  - Renamed test scripts.
+
+v0.4.4    2023-07-03 23:44:56+01:00 Europe/London
+  [Documentation]
+  - Added explicit support policy for older Perl versions.
+
+v0.4.3    2023-07-03 22:34:26+01:00 Europe/London
+  [Documentation]
+  - Noted a KNOWN ISSUE when using Config::General to configure this.
+
 v0.4.2    2023-02-22 09:07:28+00:00 Europe/London
   [Bug Fixes]
   - Count hits from blocked addresses and log them.

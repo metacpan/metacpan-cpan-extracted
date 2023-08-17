@@ -1,4 +1,4 @@
-# This code can be redistributed and modified under the terms of the GNU Affero
+# This code can be redistributed and modified under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
@@ -6,7 +6,7 @@ package HTML::Blitz::ParseError;
 use HTML::Blitz::pragma;
 use overload fallback => 1, '""' => method (@) { $self->to_string };
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 method new($class:
     :$src_name,

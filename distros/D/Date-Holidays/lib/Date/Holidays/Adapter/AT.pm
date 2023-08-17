@@ -10,7 +10,7 @@ use vars qw($VERSION);
 
 my $format = '%#:%m%d';
 
-$VERSION = '1.34';
+$VERSION = '1.35';
 
 # Lifted from Date::Holidays::AT source code
 # Ref: https://metacpan.org/source/MDIETRICH/Date-Holidays-AT-v0.1.4/lib/Date/Holidays/AT.pm
@@ -105,7 +105,7 @@ Date::Holidays::Adapter::AT - an adapter class for Date::Holidays::AT
 
 =head1 VERSION
 
-This POD describes version 1.34 of Date::Holidays::Adapter::AT
+This POD describes version 1.35 of Date::Holidays::Adapter::AT
 
 =head1 DESCRIPTION
 

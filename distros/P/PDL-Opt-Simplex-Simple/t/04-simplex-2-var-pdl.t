@@ -39,34 +39,41 @@ sub backtrace
 }
 
 
+# This tests two things:
+#   1. multi-variable PDL-based optimization
+#   2. values starting at the same value defined by `minmax` complete successfully.
+#      There have been some issues starting out at max values, so we start x on
+#      max and y on min to test and see if it succeeds.  See the comment at the
+#      top of PDL::Opt::Simplex::Simple->_simplex_f() where it clamps to min/max
+#      and injects it into simplex's internal piddle.
 
 
 my $count = 0;
 my $simpl = PDL::Opt::Simplex::Simple->new(
         vars => {
                 x => {
-			values => pdl(30),
+			values => pdl(50), # starts at max
 			enabled => 1,
 			round_each => 0.0005,
 			round_result => 0.5,
 			minmax => [[-35 => 50]]
 		},
                 y => {
-			values => pdl(-30),
+			values => pdl(-35), # starts at min
 			enabled => 1,
 			round_each => 0.0005,
 			round_result => 0.5,
 			minmax => [[-35 => 50]]
 		},
         },
-	ssize => 3,
+	opts => { ssize => 3 },
 	max_iter => 100,
 	tolerance => 1e-6,
         f => sub {
 			my $v = shift;
 			$count++;
 			
-			# Parabola with minima at x = -3
+			# Parabola with minima at x=-3,y=-7 == -14
 			return (($v->{x}+3)**2 - 5) + (($v->{y}+7)**2 - 9);
 		},
 	log => sub {

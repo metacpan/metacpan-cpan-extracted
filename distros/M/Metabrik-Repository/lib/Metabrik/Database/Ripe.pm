@@ -49,9 +49,8 @@ sub update {
       ftp://ftp.afrinic.net/dbase/afrinic.db.gz
       http://ftp.apnic.net/apnic/dbase/data/jpnic.db.gz
       http://ftp.apnic.net/apnic/dbase/data/krnic.db.gz
-      http://ftp.apnic.net/apnic/dbase/data/twnic.in.gz
-      http://ftp.apnic.net/apnic/dbase/data/twnic.pn.gz
-      ftp://ftp.arin.net/pub/rr/arin.db
+      http://ftp.apnic.net/apnic/dbase/data/twnic.db.gz
+      ftp://ftp.arin.net/pub/rr/arin.db.gz
    );
 
    my $datadir = $self->datadir;

@@ -9,7 +9,7 @@ lib/Amazon/PAApi5/Signature.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README.pod
+README.md
 t/00_compile.t
 t/01_basic.t
 xt/01_perlcritic.t

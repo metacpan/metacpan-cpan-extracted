@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.63
+    version 0.64
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -317,8 +317,7 @@ COPYRIGHT AND LICENSE
                 2016       Jeff Fearn
                 2017       Mike Wisener, xmikew
                 2019-2021  Timothy Legge
-                2022       Timothy Legge, Wesley Schwengle
-                2023       Timothy Legge
+                2022-2023  Timothy Legge, Wesley Schwengle
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

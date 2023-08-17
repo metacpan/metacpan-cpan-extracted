@@ -1,5 +1,5 @@
 package Pod::AsciiDoctor;
-$Pod::AsciiDoctor::VERSION = '0.101002';
+$Pod::AsciiDoctor::VERSION = '0.101003';
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
@@ -218,7 +218,7 @@ Pod::AsciiDoctor - Convert from POD to AsciiDoc
 
 =head1 VERSION
 
-version 0.101002
+version 0.101003
 
 =head1 SYNOPSIS
 

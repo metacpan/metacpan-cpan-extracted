@@ -19,10 +19,6 @@ SKIP: {
             skip "ENV is not defined for driver '$d'", TESTS_PER_DRIVER;
         }
 
-        if ( $d eq 'SQLite' && version->parse($DBD::SQLite::VERSION) <= 1.6 ) {
-            skip "Require DBD::SQLite 1.60+ to enable combine search", TESTS_PER_DRIVER;
-        }
-
         my $handle = get_handle($d);
         connect_handle($handle);
 

@@ -6,7 +6,7 @@ package App::SeismicUnixGui::misc::su_select_waveform;
 
 =head2 SYNOPSIS
 
-  PACKAGE NAME:select_waveform.pm
+  PERL PROGRAM NAME:select_waveform.pm
   Purpose: Simple viewing of an su file 
            to select  waveforms  
            waveforms are xtracted at a later stage

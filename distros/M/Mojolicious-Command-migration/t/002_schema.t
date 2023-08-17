@@ -72,6 +72,6 @@ $source = $migration->deployment_statements(
 	filename    => "t/sql/001_upgrade.sql",
 );
 is @$source, 1, 'right output';
-is $source->[0], "ALTER TABLE test ADD COLUMN name varchar(255) NOT NULL DEFAULT ''", 'right result';
+is $source->[0], "ALTER TABLE test ADD COLUMN `name` varchar(255) NOT NULL DEFAULT ''", 'right result';
 
 done_testing;

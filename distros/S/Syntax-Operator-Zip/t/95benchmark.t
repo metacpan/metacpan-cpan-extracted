@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    eval { require List::Util; List::Util->VERSION(1.56) } or
       plan skip_all => "List::Util v1.56 is not available";

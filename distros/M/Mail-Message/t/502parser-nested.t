@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-#
-# Test processing a message/rfc822
-#
+# Test processing a message/rfc822, in unpacked form
 
 use strict;
 use warnings;
@@ -37,7 +35,6 @@ This is some text before a forwarded multipart!!
 --3/Cnt5Mj2+
 Content-Type: message/rfc822
 Content-Description: forwarded message
-Content-Transfer-Encoding: 7bit
 
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
@@ -86,9 +83,9 @@ $msg->printStructure($catch);
 # if 1550 bytes is reported for the whole message, then the Status
 # field hasn't been removed after reading.
 is($dump, <<'DUMP');
-multipart/mixed: forwarded message from Pietje Puk (1551 bytes)
+multipart/mixed: forwarded message from Pietje Puk (1519 bytes)
    text/plain (164 bytes)
-   message/rfc822 (1044 bytes)
+   message/rfc822 (1012 bytes)
       multipart/alternative: A multipart alternative (943 bytes)
          text/plain (148 bytes)
          text/html (358 bytes)

@@ -1,10 +1,10 @@
-# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2023 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
 # Perl itself.
 
-use common::sense;
+use strict;
 
 use Test::More;
 
@@ -34,17 +34,17 @@ ok  pnmatchstar('foo', 'foo/bar/baz');
 ok pnmatchstar('*/**/index.md', 'bg/index.md');
 
 my %files = (
-    'Globstar.pm' => undef,
-    'Globstar.pod' => undef,
-    'lib/File/Globstar.pm' => undef,
-    'src/File/Globstar.pm' => 1,
-    'src/File/Globstar/ListMatch.pm' => 1,
+	'Globstar.pm' => undef,
+	'Globstar.pod' => undef,
+	'lib/File/Globstar.pm' => undef,
+	'src/File/Globstar.pm' => 1,
+	'src/File/Globstar/ListMatch.pm' => 1,
 );
 
 my $pattern = 'src/**/*.p[lm]';
 my $re = translatestar $pattern, pathMode => 1;
 foreach my $file (keys %files) {
-    is pnmatchstar($re, $file), $files{$file}, qq{"$pattern" matches "$file"?};
+	is pnmatchstar($re, $file), $files{$file}, qq{"$pattern" matches "$file"?};
 }
 
 done_testing;

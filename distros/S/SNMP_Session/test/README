@@ -19,6 +19,11 @@ cisco-memory
 	different types of memory on the main processor of a Cisco
 	router.
 
+get-cisco-power-usage.pl
+        Try to get current (external) power usage of a set of Cisco
+        routers using CISCO-ENTITY-SENSOR-MIB and suitable sensors,
+        where available.
+
 if-counters.pl (requires Curses.pm)
 	Displays a router's byte and packet counter development in
 	real-time.  Demonstrates map_table_4 and a heuristic for

@@ -13,7 +13,7 @@ use Scalar::Util qw(blessed);
 use Tags::HTML::Form::Input;
 use Tags::HTML::Form::Select;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -206,6 +206,16 @@ sub _process_css {
 		['d', 'padding', '20px'],
 		['e'],
 
+		['s', '.'.$self->{'form'}->css_class.' fieldset'],
+		['d', 'padding', '20px'],
+		['d', 'border-radius', '15px'],
+		['e'],
+
+		['s', '.'.$self->{'form'}->css_class.' legend'],
+		['d', 'padding-left', '10px'],
+		['d', 'padding-right', '10px'],
+		['e'],
+
 		['s', '.'.$self->{'form'}->css_class.' textarea'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
@@ -231,6 +241,25 @@ sub _process_css {
 		$self->{'select'}->process_css($first_select);
 	}
 
+	# CSS style for button.
+	# XXX Duplicit with Tags::HTML::Form::Input for submit.
+	$self->{'css'}->put(
+		['s', '.'.$self->{'form'}->css_class.' button'],
+		['d', 'width', '100%'],
+		['d', 'background-color', '#4CAF50'],
+		['d', 'color', 'white'],
+		['d', 'padding', '14px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'border', 'none'],
+		['d', 'border-radius', '4px'],
+		['d', 'cursor', 'pointer'],
+		['e'],
+
+		['s', '.'.$self->{'form'}->css_class.' button:hover'],
+		['d', 'background-color', '#45a049'],
+		['e'],
+	);
+
 	return;
 }
 
@@ -251,7 +280,7 @@ sub _tags_button {
 		$self->{'tags'}->put(@{$object->data});
 	} else {
 		$self->{'tags'}->put(
-			['d', $object->data],
+			map { (['d', $_]) } @{$object->data},
 		);
 	}
 	$self->{'tags'}->put(
@@ -329,7 +358,7 @@ Constructor.
 
 =item * C<css>
 
-'CSS::Struct::Output' object for L<process_css> processing.
+'L<CSS::Struct::Output>' object for L</process_css> processing.
 
 Default value is undef.
 
@@ -337,7 +366,7 @@ Default value is undef.
 
 Data object for form.
 
-Could ve a 'Data::HTML::Form' instance.
+Could be a 'L<Data::HTML::Form>' instance.
 
 Default value is instance with 'form' css class.
 
@@ -345,13 +374,13 @@ Default value is instance with 'form' css class.
 
 Data object for submit.
 
-Could be a 'Data::HTML::Form::Input' or 'Data::HTML::Button' instance.
+Could be a 'L<Data::HTML::Form::Input>' or 'L<Data::HTML::Button>' instance.
 
 Default value is instance with 'Save' submit value.
 
 =item * C<tags>
 
-'Tags::Output' object.
+'L<Tags::Output>' object for L</process> processing.
 
 Default value is undef.
 
@@ -361,7 +390,7 @@ Default value is undef.
 
  $obj->process(@fields);
 
-Process Tags structure for fields defined in C<@fields> to output.
+Process L<Tags> structure for fields defined in C<@fields> to output.
 
 Accepted items in C<@fields> are objects:
 
@@ -379,7 +408,7 @@ Returns undef.
 
  $obj->process_css;
 
-Process CSS::Struct structure for output.
+Process L<CSS::Struct> structure for output.
 
 Returns undef.
 
@@ -500,12 +529,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

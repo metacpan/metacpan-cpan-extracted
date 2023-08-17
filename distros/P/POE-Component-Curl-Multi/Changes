@@ -1,6 +1,55 @@
 ==================================================
-Changes from 2016-08-23 00:00:00 +0000 to present.
+Changes from 2018-07-19 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.00 at 2023-07-18 13:03:27 +0000
+-----------------------------------------
+
+  Change: 18630b9c1996698305620552772225c4e02fe155
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-18 14:03:27 +0000
+
+    This is 1.00 stable release 
+
+  Change: 6a5ccf296439d8691e0d86289f898e6334b0d9fc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-17 13:57:33 +0000
+
+    Document default for verifyhost
+
+    Also document warnings about change in behaviour for peer
+    verification defaults since 0.23
+
+    Clarify ipresolve setting of 6 is for IPv6 only. 
+
+-----------------------------------------
+version 0.23 at 2023-07-13 07:38:53 +0000
+-----------------------------------------
+
+  Change: da750d3aa89fc73951d12706191f69c4c0bd7443
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-13 08:38:53 +0000
+
+    This is 0.23 TRIAL release 
+
+  Change: 9988cde4cb80073edfffd028910769ec611333f1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-12 22:54:25 +0000
+
+    verifyhost option implemented and documented 
+
+  Change: 55119cb5f08882b2fc6d53274279bb0d1978b358
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-12 22:42:07 +0000
+
+    verifypeer option implemented and documented 
+
+  Change: d363f21cf91be334257904d7a0ceb2109d3b6004
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-07-12 22:07:18 +0000
+
+    ipresolve option implemented and documented 
 
 -----------------------------------------
 version 0.22 at 2021-08-22 18:11:15 +0000
@@ -52,5 +101,5 @@ version 0.16 at 2020-11-10 04:07:07 +0000
     Changed ssl test to use google.com 
 
 ================================================
-Plus 7 releases after 2016-08-23 00:00:00 +0000.
+Plus 7 releases after 2018-07-19 00:00:00 +0000.
 ================================================

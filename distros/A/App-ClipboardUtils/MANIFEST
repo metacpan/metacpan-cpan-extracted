@@ -15,6 +15,7 @@ script/clipadd
 script/clipget
 script/detect-clipboard-manager
 script/get-clipboard-content
+script/get-clipboard-history-item
 script/list-clipboard-history
 t/00-compile.t
 t/author-critic.t

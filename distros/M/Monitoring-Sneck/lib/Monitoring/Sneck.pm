@@ -12,11 +12,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -94,9 +94,9 @@ Most likely want to run it once per polling interval.
 You can use it in a non-cached manner with out cron, but this will result in a
 longer polling time for LibreNMS or the like when it queries it.
 
-=head1 RETURN HASH/JSON
+=head1 RETURN HASH
 
-The data section of the return hash/JSON is as below.
+The data section of the return hash is as below.
 
     - $hash{data}{alert} :: 0/1 boolean for if there is a aloert or not.
     
@@ -120,18 +120,20 @@ The data section of the return hash/JSON is as below.
     - $hash{data}{time} :: The hostname the check was ran on.
     
     - $hash{data}{config} :: The raw config file if told to include it.
+
+For below '$name' is the name of the check in question.
+
+    - $hash{data}{checks}{$name} :: A hash with info on the checks ran.
     
-    - $hash{data}[checks}{$name} :: A hash with info on the checks ran.
+    - $hash{data}{checks}{$name}{check} :: The command pre-variable substitution.
     
-    - $hash{data}[checks}{$name}{check} :: The command pre-variable substitution.
+    - $hash{data}{checks}{$name}{ran} :: The command ran.
     
-    - $hash{data}[checks}{$name}{ran} :: The command ran.
+    - $hash{data}{checks}{$name}{output} :: The output of the check.
     
-    - $hash{data}[checks}{$name}{output} :: The output of the check.
+    - $hash{data}{checks}{$name}{exit} :: The exit code.
     
-    - $hash{data}[checks}{$name}{exit} :: The exit code.
-    
-    - $hash{data}[checks}{$name}{error} :: Only present it died on a
+    - $hash{data}{checks}{$name}{error} :: Only present it died on a
       signal or could not be executed. Provides a brief description.
 
 =head1 METHODS
@@ -145,17 +147,21 @@ is present, that will be the config file used. Otherwise
 '/usr/local/etc/sneck.conf' is used. The key 'include' is a Perl
 boolean for if the raw config should be included in the JSON.
 
-This function should always work. If there is an error with
-parsing or the like, it will be reported in the expected format
-when $sneck->run is called.
+This function should always work as long as it can read the config.
+If there is an error with parsing or the like, it will be reported
+in the expected format when $sneck->run is called.
 
 This is meant to be rock solid and always work, meaning LibreNMS
 style JSON is always returned(provided Perl and the other modules
 are working).
 
-
-
-    my $sneck=Monitoring::Sneck->new({config=>$file}, include=>0);
+    my $sneck;
+    eval{
+        $sneck=Monitoring::Sneck->new({config=>$file}, include=>0);
+    };
+    if ($@){
+        die($@);
+    }
 
 =cut
 
@@ -403,10 +409,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Monitoring-Sneck>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Monitoring-Sneck>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Monitoring-Sneck>
@@ -423,7 +425,7 @@ l<https://github.com/VVelox/Monitoring-Sneck>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Zane C. Bowers-Hadley.
+This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
 
 This is free software, licensed under:
 

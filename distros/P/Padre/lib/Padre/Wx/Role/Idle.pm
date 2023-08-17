@@ -49,7 +49,7 @@ use warnings;
 use Carp      ();
 use Padre::Wx ();
 
-our $VERSION    = '1.00';
+our $VERSION    = '1.02';
 our $COMPATIBLE = '0.95';
 
 =pod
@@ -151,7 +151,7 @@ sub idle_handler {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl 5 itself.

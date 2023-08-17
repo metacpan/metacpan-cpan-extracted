@@ -1,5 +1,11 @@
 Revision history for Git-Background
 
+0.007  2023-08-05 12:30:25 UTC
+
+  - use binmode($fh, ':encoding(UTF-8)') on the file handles before reading
+    the output from git.
+  - Bump required Perl to 5.10, which is required by Future anyway.
+
 0.006  2022-11-05 13:16:26 UTC
 
   - Switch license to the ISC license

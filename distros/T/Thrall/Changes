@@ -1,3 +1,33 @@
+0.0405  2023-06-20      Piotr Roszatycki <dexter@cpan.org>
+
+* Tests use explicitly 127.0.0.1 as a host.
+
+0.0404  2023-06-20      Piotr Roszatycki <dexter@cpan.org>
+
+* Tests use explicitly 127.0.0.1 as a host.
+
+0.0403  2023-06-20      Piotr Roszatycki <dexter@cpan.org>
+
+* Configure requires threads.
+
+0.0402  2023-06-18      Piotr Roszatycki <dexter@cpan.org>
+
+* Requires threads.
+* Configure requires Software::License.
+
+0.0401  2023-06-18      Piotr Roszatycki <dexter@cpan.org>
+
+* Correct configure requirements.
+
+0.0400  2020-03-17      Piotr Roszatycki <dexter@cpan.org>
+
+* Print connection errors to stderr.
+* Allow to use SSL with IPv6.
+* IPv6 is enabled by default if IO::Socket::IP is available.
+* New option `--ssl-client-ca-file`.
+* Listen on tcp46 socket with `--ipv6` option when `--host` is missing.
+* Default `--host` is undefined which means any interface.
+
 0.0305  2017-01-03      Thomas Stinner <me@stinnux.de>
 
 * Allow setting of SSL CA and SSL Verification Mode

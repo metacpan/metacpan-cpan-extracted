@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Text;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.36';
+$Neo4j::Driver::Result::Text::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -59,13 +59,11 @@ sub new {
 		});
 	}
 	
-	$params->{error_handler}->($error);
-	
-	return bless {}, $class;
+	return bless { _error => $error }, $class;
 }
 
 
-sub _info { {} }  # no transaction status info => treat as closed
+sub _info { shift }
 
 
 sub _results { () }  # no actual results provided here

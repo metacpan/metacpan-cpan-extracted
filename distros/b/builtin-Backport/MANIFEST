@@ -1,0 +1,23 @@
+Build.PL
+Changes
+hax/is_SPACE_utf8_safe_backwards.h
+lib/builtin.pm
+lib/builtin.xs
+lib/builtin/Backport.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01booleans.t
+t/02is_bool.t
+t/03weakrefs.t
+t/04references.t
+t/05created_as.t
+t/06ceil-floor.t
+t/07indexed.t
+t/08trim.t
+t/09taint.t
+t/10export_lexically.t
+t/99pod.t

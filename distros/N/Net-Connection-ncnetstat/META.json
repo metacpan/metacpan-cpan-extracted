@@ -1,0 +1,55 @@
+{
+   "abstract" : "The backend for ncnetstat, the colorized and enhanced netstat like tool.",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Connection-ncnetstat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Unixish::Apply" : "1.570",
+            "Getopt::Long" : "v0.0.0",
+            "Net::Connection" : "v0.2.0",
+            "Net::Connection::Match" : "v0.5.0",
+            "Net::Connection::Sort" : "v0.1.1",
+            "Net::Connection::lsof" : "v0.2.0",
+            "Term::ANSIColor" : "4.06",
+            "Text::ANSITable" : "0.601",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.8.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

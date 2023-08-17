@@ -1,4 +1,13 @@
-Revision history for Blockchain-Contract-Solidity-ABI
+Revision history for Blockchain-Ethereum-RLP
+0.005
+    - Major refactoring
+0.004
+    - Add standalone script
+    - Fix minor documentation bugs
+0.003
+    - Fix empty list decoding
+    - Fix recursive list decoding
+0.002 2023-06-03
+    - Fix zero and odd encoding
 0.001 2023-05-18
     - initial release
-

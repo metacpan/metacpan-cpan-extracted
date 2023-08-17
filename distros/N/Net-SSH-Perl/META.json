@@ -1,0 +1,67 @@
+{
+   "abstract" : "Perl client Interface to SSH",
+   "author" : [
+      "David Robins <dbrobins@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-SSH-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Curve25519" : "0.05",
+            "Crypt::IDEA" : "0",
+            "CryptX" : "0.032",
+            "Digest::MD5" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "IO::Socket" : "0",
+            "Math::GMP" : "1.04",
+            "Scalar::Util" : "0",
+            "String::CRC32" : "1.2",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/net-ssh-perl/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/net-ssh-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/net-ssh-perl",
+         "web" : "https://github.com/briandfoy/net-ssh-perl"
+      }
+   },
+   "version" : "2.142",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

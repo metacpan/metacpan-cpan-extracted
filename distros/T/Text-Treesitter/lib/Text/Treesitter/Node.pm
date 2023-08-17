@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use Object::Pad 0.70;
 
-package Text::Treesitter::Node 0.06;
+package Text::Treesitter::Node 0.10;
 class Text::Treesitter::Node
    :strict(params);
 
@@ -20,7 +21,27 @@ C<Text::Treesitter::Node> - an element of a F<tree-sitter> parse result
 
 =head1 SYNOPSIS
 
-   TODO
+Usually accessed indirectly, via C<Text::Treesitter::Tree>.
+
+   use Text::Treesitter;
+
+   my $ts = Text::Treesitter->new(
+      lang_name => "perl",
+   );
+
+   my $tree = $ts->parse_string( $input );
+
+   my $root = $tree->root_node;
+
+   foreach my $node ( $root->child_nodes ) {
+      next if $node->is_extra;
+      my $name = $node->is_named ? $node->type : '"' . $node->text . '"';
+
+      printf "Node %s extends from line %d to line %d\n",
+         $name,
+         ( $node->start_point )[0] + 1,
+         ( $node->end_point )[0] + 1;
+   }
 
 =head1 DESCRIPTION
 
@@ -141,7 +162,7 @@ Returns true if the node or any of its descendents represents a syntax error.
    $parent = $node->parent;
 
 Returns the node's immediate parent; the node from which this node was
-obtained.
+obtained. Returns C<undef> on the root node.
 
 =head2 child_count
 
@@ -183,6 +204,30 @@ used instead:
       ...
    }
 
+=head2 child_by_field_name
+
+   $child = $node->child_by_field_name( $field_name );
+
+I<Since version 0.07.>
+
+Returns the child node associated with the given field name. This would be the
+same as the value found by
+
+   my %children = $node->field_names_with_child_nodes;
+   $child = $children{ $field_name };
+
+If the node does not have a child with the given field name, an exception is
+thrown.
+
+=head2 try_child_by_field_name
+
+   $child = $node->try_child_by_field_name( $field_name );
+
+I<Since version 0.07.>
+
+Similar to L</child_by_field_name> but returns undef if there is no such child
+rather than throwing an exception.
+
 =cut
 
 method _node () { $node }
@@ -207,7 +252,8 @@ method end_char   { return $tree->byte_to_char( $self->end_byte ) }
 
 method parent ()
 {
-   return Text::Treesitter::Node->new( node => $node->parent, tree => $tree );
+   my $parent = $node->parent or return undef;
+   return Text::Treesitter::Node->new( node => $parent, tree => $tree );
 }
 
 method child_nodes ()
@@ -220,11 +266,67 @@ method field_names_with_child_nodes ()
    return pairmap { $a => Text::Treesitter::Node->new( node => $b, tree => $tree ) } $node->field_names_with_child_nodes;
 }
 
+method child_by_field_name ( $field_name )
+{
+   my $child = $node->child_by_field_name( $field_name );
+   return Text::Treesitter::Node->new( node => $child, tree => $tree )
+}
+
+method try_child_by_field_name ( $field_name )
+{
+   my $child = $node->try_child_by_field_name( $field_name ) or return;
+   return Text::Treesitter::Node->new( node => $child, tree => $tree )
+}
+
+=head2 debug_sprintf
+
+   $str = $node->debug_sprintf();
+
+Returns a debugging test string that represents the node and all its child
+nodes, in a format similar to F<tree-sitter>'s usual S-expr notation.
+
+Basic named nodes are printed with their name in parens; C<(type)>. Anonymous
+nodes have their text string in quotes; C<"text">. Child nodes of named are
+included within the parens of the type name. Field names are printed as
+prefixes with a colon.
+
+   (node)
+
+   (node (children) (go) "here")
+
+   (node left: (node) right: (node))
+
+=cut
+
+method debug_sprintf ()
+{
+   # Unnamed nodes are just their own text
+   if( !$self->is_named ) {
+      return sprintf qq("%s"), $self->text =~ s/([\\"])/\\$1/gr;
+   }
+
+   my @named_children = $self->field_names_with_child_nodes;
+
+   my $ret = "(" . $self->type;
+
+   while( @named_children ) {
+      my $fieldname = shift @named_children;
+      my $child     = shift @named_children;
+
+      $ret .= " ";
+      $ret .= "$fieldname\: " if defined $fieldname;
+      $ret .= $child->debug_sprintf;
+   }
+
+   $ret .= ")";
+
+   return $ret;
+}
+
 =head1 TODO
 
 The following C library functions are currently unhandled:
 
-   ts_node_child_by_field_name
    ts_node_child_by_field_id
    ts_node_next_sibling
    ts_node_prev_sibling

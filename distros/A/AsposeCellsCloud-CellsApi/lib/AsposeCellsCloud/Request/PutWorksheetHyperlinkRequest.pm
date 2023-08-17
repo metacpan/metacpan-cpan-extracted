@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetHyperlinkRequest.name :   ,
-# PutWorksheetHyperlinkRequest.sheetName :   ,
-# PutWorksheetHyperlinkRequest.firstRow :   ,
-# PutWorksheetHyperlinkRequest.firstColumn :   ,
-# PutWorksheetHyperlinkRequest.totalRows :   ,
-# PutWorksheetHyperlinkRequest.totalColumns :   ,
-# PutWorksheetHyperlinkRequest.address :   ,
-# PutWorksheetHyperlinkRequest.folder :   ,
-# PutWorksheetHyperlinkRequest.storageName :    
+# PutWorksheetHyperlinkRequest.name : The workbook name.  ,
+# PutWorksheetHyperlinkRequest.sheetName : The worksheet name.  ,
+# PutWorksheetHyperlinkRequest.firstRow : First row of the hyperlink range.  ,
+# PutWorksheetHyperlinkRequest.firstColumn : First column of the hyperlink range.  ,
+# PutWorksheetHyperlinkRequest.totalRows : Number of rows in this hyperlink range.  ,
+# PutWorksheetHyperlinkRequest.totalColumns : Number of columns of this hyperlink range.  ,
+# PutWorksheetHyperlinkRequest.address : Address of the hyperlink.  ,
+# PutWorksheetHyperlinkRequest.folder : Original workbook folder.  ,
+# PutWorksheetHyperlinkRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_hyperlink' } = { 
-    	summary => '',
+    	summary => 'Adds hyperlink in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -155,63 +155,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'first_row' => {
      	datatype => 'int',
      	base_name => 'firstRow',
-     	description => '',
+     	description => 'First row of the hyperlink range.',
      	format => '',
      	read_only => '',
      		},
      'first_column' => {
      	datatype => 'int',
      	base_name => 'firstColumn',
-     	description => '',
+     	description => 'First column of the hyperlink range.',
      	format => '',
      	read_only => '',
      		},
      'total_rows' => {
      	datatype => 'int',
      	base_name => 'totalRows',
-     	description => '',
+     	description => 'Number of rows in this hyperlink range.',
      	format => '',
      	read_only => '',
      		},
      'total_columns' => {
      	datatype => 'int',
      	base_name => 'totalColumns',
-     	description => '',
+     	description => 'Number of columns of this hyperlink range.',
      	format => '',
      	read_only => '',
      		},
      'address' => {
      	datatype => 'string',
      	base_name => 'address',
-     	description => '',
+     	description => 'Address of the hyperlink.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostAutofitWorkbookRowsRequest.name :   ,
-# PostAutofitWorkbookRowsRequest.startRow :   ,
-# PostAutofitWorkbookRowsRequest.endRow :   ,
-# PostAutofitWorkbookRowsRequest.onlyAuto :   ,
-# PostAutofitWorkbookRowsRequest.folder :   ,
-# PostAutofitWorkbookRowsRequest.storageName :    
+# PostAutofitWorkbookRowsRequest.name : The workbook name.  ,
+# PostAutofitWorkbookRowsRequest.startRow : Start row.  ,
+# PostAutofitWorkbookRowsRequest.endRow : End row.  ,
+# PostAutofitWorkbookRowsRequest.onlyAuto : Only auto.  ,
+# PostAutofitWorkbookRowsRequest.folder : Original workbook folder.  ,
+# PostAutofitWorkbookRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_workbook_rows' } = { 
-    	summary => '',
+    	summary => 'Autofit workbook rows.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -138,42 +138,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => '',
+     	description => 'Start row.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'endRow',
-     	description => '',
+     	description => 'End row.',
      	format => '',
      	read_only => '',
      		},
      'only_auto' => {
      	datatype => 'string',
      	base_name => 'onlyAuto',
-     	description => '',
+     	description => 'Only auto.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

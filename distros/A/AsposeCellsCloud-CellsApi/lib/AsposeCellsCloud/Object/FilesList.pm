@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Files list',
                                   class => 'FilesList',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'value' => {
      	datatype => 'ARRAY[StorageFile]',
      	base_name => 'Value',
-     	description => '',
+     	description => 'Files and folders contained by folder StorageFile.',
      	format => '',
      	read_only => '',
      		},    

@@ -9,7 +9,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
   Test::Pod: '1.51'
-  Test::Script: '1.09'
+  Test::Script: '1.28'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/app-appupdater/issues
   homepage: https://metacpan.org/module/App::Appupdater
   repository: https://github.com/hadjiprocopis/app-appupdater
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

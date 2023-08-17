@@ -4,7 +4,7 @@
       "ICHINOSE Shogo"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.18",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "mit"
    ],
@@ -56,6 +56,7 @@
             "HTTP::Tiny" : "0.076",
             "JSON::Types" : "0.05",
             "JSON::XS" : "4.0",
+            "MIME::Base64" : "0",
             "Plack" : "1.0047",
             "Plack::Middleware::ReverseProxy" : "0.16",
             "Try::Tiny" : "0.30",
@@ -66,6 +67,7 @@
       "test" : {
          "requires" : {
             "File::Slurp" : "9999.25",
+            "Starman" : "0",
             "Test::Deep" : "1.128",
             "Test::More" : "0.98",
             "Test::SharedFork" : "0",
@@ -77,7 +79,7 @@
    "provides" : {
       "AWS::Lambda" : {
          "file" : "lib/AWS/Lambda.pm",
-         "version" : "v0.0.39"
+         "version" : "v0.2.0"
       },
       "AWS::Lambda::Bootstrap" : {
          "file" : "lib/AWS/Lambda/Bootstrap.pm"
@@ -87,6 +89,9 @@
       },
       "AWS::Lambda::PSGI" : {
          "file" : "lib/AWS/Lambda/PSGI.pm"
+      },
+      "AWS::Lambda::ResponseWriter" : {
+         "file" : "lib/AWS/Lambda/ResponseWriter.pm"
       }
    },
    "release_status" : "stable",
@@ -101,13 +106,14 @@
          "web" : "https://github.com/shogo82148/p5-aws-lambda"
       }
    },
-   "version" : "0.0.39",
+   "version" : "0.2.0",
    "x_contributors" : [
       "ICHINOSE Shogo <shogo82148@gmail.com>",
       "Jose Luis Martinez <jlmartinez@capside.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>"
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+      "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

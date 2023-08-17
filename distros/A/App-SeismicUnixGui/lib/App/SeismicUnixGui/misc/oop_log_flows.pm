@@ -15,8 +15,7 @@ my $time = localtime;
 
 $log_flows[0] =
 
- ( "\t" .'my $time = localtime;'. "\n".			
-  "\t" . '$log->file(time);'. "\n".
+ ("\t" . '$log->time();'. "\n".
   "\t" . '$log->file($flow[1]);' . "\n\n") ;
 
 sub section {

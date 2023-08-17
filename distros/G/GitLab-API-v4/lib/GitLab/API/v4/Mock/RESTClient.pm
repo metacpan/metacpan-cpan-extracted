@@ -1,5 +1,5 @@
 package GitLab::API::v4::Mock::RESTClient;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -18,7 +18,7 @@ This module is used by L<GitLab::API::v4::Mock>.
 =cut
 
 use GitLab::API::v4::Mock::Engine;
-use JSON;
+use JSON::MaybeXS;
 use URI;
 
 use Moo;
@@ -178,9 +178,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
+See L<GitLab::API::v4/LICENSE>.
 
 =cut
 

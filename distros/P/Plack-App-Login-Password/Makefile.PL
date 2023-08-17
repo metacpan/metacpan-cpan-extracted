@@ -18,10 +18,13 @@ name 'Plack-App-Login-Password';
 perl_version 5.008;
 readme_from 'Password.pm';
 recursive_author_tests('xt');
+requires 'Plack::Component::Tags::HTML' => 0.15;
+requires 'Plack::Request' => 0;
+requires 'Plack::Response' => 0;
+requires 'Plack::Session' => 0;
 requires 'Plack::Util::Accessor' => 0;
-requires 'Plack::Component::Tags::HTML' => 0.13;
 requires 'Tags::HTML::Container' => 0;
-requires 'Tags::HTML::Login::Access' => 0;
+requires 'Tags::HTML::Login::Access' => 0.05;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-App-Login-Password/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-App-Login-Password';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-App-Login-Password';
@@ -34,7 +37,7 @@ test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

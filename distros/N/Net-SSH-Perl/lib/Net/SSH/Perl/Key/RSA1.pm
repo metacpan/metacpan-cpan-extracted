@@ -1,5 +1,3 @@
-# $Id: RSA1.pm,v 1.13 2001/06/27 22:49:55 btrott Exp $
-
 package Net::SSH::Perl::Key::RSA1;
 use strict;
 use warnings;

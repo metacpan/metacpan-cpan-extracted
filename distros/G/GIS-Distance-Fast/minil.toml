@@ -1,3 +1,4 @@
 name = "GIS-Distance-Fast"
 authority="cpan:BLUEFEET"
 markdown_maker = "Pod::Markdown::Github"
+license = "perl_5"

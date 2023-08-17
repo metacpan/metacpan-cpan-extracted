@@ -9,14 +9,18 @@ my @months = qw(January February March April May June July August
 
 my $mon = shift || (localtime)[4] + 1;
 my $yr  = shift || (localtime)[5] + 1900;
+my $sd  = shift;
+$sd = 1 unless defined $sd;
 
-my @month = calendar($mon, $yr);
-
+my @month = calendar($mon, $yr, $sd);
 my $mon_name = $months[$mon - 1];
 my $pad = int((20 - length("$mon_name $yr")) / 2);
-
 print "\n", ' ' x $pad, "$months[$mon - 1] $yr\n";
-print "Mo Tu We Th Fr Sa Su\n";
+
+my @days = qw(Su Mo Tu We Th Fr Sa);
+push @days, splice @days, 0, $sd;
+print "@days\n";
+
 foreach (@month) {
   print map { $_ ? sprintf "%2d ", $_ : '   ' } @$_;
   print "\n";

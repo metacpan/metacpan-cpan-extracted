@@ -1,7 +1,7 @@
 ---
 abstract: 'Query the Dutch Chamber of Commerence (KvK) API'
 author:
-  - 'Wesley Schwengle <wesley@mintlab.nl>'
+  - 'Wesley Schwengle <waterkip@cpan.org>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.26.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,37 +25,35 @@ name: WebService-KvKAPI
 provides:
   WebService::KvKAPI:
     file: lib/WebService/KvKAPI.pm
-    version: '0.103'
+    version: '0.105'
   WebService::KvKAPI::BasicProfile:
     file: lib/WebService/KvKAPI/BasicProfile.pm
-    version: '0.103'
+    version: '0.105'
   WebService::KvKAPI::Formatters:
     file: lib/WebService/KvKAPI/Formatters.pm
-    version: '0.103'
+    version: '0.105'
   WebService::KvKAPI::LocationProfile:
     file: lib/WebService/KvKAPI/LocationProfile.pm
-    version: '0.103'
+    version: '0.105'
   WebService::KvKAPI::Roles::OpenAPI:
     file: lib/WebService/KvKAPI/Roles/OpenAPI.pm
-    version: '0.103'
+    version: '0.105'
   WebService::KvKAPI::Search:
     file: lib/WebService/KvKAPI/Search.pm
-    version: '0.103'
+    version: '0.105'
 requires:
   Carp: '0'
-  Data::Dumper: '0'
-  Exporter: '0'
   Getopt::Long: '0'
-  Object::Pad: '0'
+  Object::Pad: '0.66'
   OpenAPI::Client: '1.03'
   Pod::Usage: '0'
   Try::Tiny: '0'
   perl: v5.26.0
 resources:
-  repository: git://gitlab.com/mintlab/webservice-kvkapi.git
-version: '0.103'
+  repository: git://gitlab.com/waterkip/webservice-kvkapi.git
+version: '0.105'
 x_contributors:
-  - 'Wesley Schwengle <wesley.schwengle@exxellence.nl>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: EUPL-1.1

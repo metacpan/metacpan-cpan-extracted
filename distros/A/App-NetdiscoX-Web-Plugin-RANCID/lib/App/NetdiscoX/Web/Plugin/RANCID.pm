@@ -3,13 +3,13 @@ package App::NetdiscoX::Web::Plugin::RANCID;
 use strict;
 use warnings;
 
-our $VERSION = '2.006000';
+our $VERSION = '2.006001';
 
 use Dancer ':syntax';
 
 use App::Netdisco::Web::Plugin;
 use App::Netdisco::Util::Device 'get_device';
-use App::Netdisco::Util::Permission 'check_acl';
+use App::Netdisco::Util::Permission 'acl_matches';
 
 use File::ShareDir 'dist_dir';
 register_template_path(
@@ -42,18 +42,18 @@ hook 'before_template' => sub {
     $rancid->{by_ip}       ||= [];
     $rancid->{by_hostname} ||= [];
 
-    if (check_acl(get_device($device->{ip}),$rancid->{excluded})) {
+    if (acl_matches(get_device($device->{ip}),$rancid->{excluded})) {
         session rancid_display => 0;
     } else {
         session rancid_display => 1;
     }
 
     foreach my $g (keys %{ $rancid->{groups} }) {
-        if (check_acl( get_device($device->{ip}), $rancid->{groups}->{$g} )) {
+        if (acl_matches( get_device($device->{ip}), $rancid->{groups}->{$g} )) {
             $tokens->{rancidgroup} = $g;
-            if (check_acl( get_device($device->{ip}),$rancid->{by_hostname})) {
+            if (acl_matches( get_device($device->{ip}),$rancid->{by_hostname})) {
                 $tokens->{ranciddevice} =~ s/$domain_suffix$//;
-            } elsif (check_acl( get_device($device->{ip}), $rancid->{by_ip})) {
+            } elsif (acl_matches( get_device($device->{ip}), $rancid->{by_ip})) {
                 $tokens->{ranciddevice} = $device->{ip};
             }
             last;

@@ -28,7 +28,7 @@ subtest 'insert for pseudo-enum created via direct injection' => sub {
          $contraption_rs =
              Contraption->create( { id => 2, color => 'blue', status => 'Junked' } )
       },
-      qr/^You have attempted to assign a value to status that is not valid:/,
+      qr/You have attempted to assign a value to status that is not valid:/,
       'Unable to create with an invalid value'
    );
 
@@ -62,7 +62,7 @@ subtest 'insert for pseudo-enum created via enumerate' => sub {
          $doodad_rs =
              Doodad->create( { id => 2, color => 'blue', status => 'In-Stock' } )
       },
-      qr/^You have attempted to assign a value to color that is not valid:/,
+      qr/You have attempted to assign a value to color that is not valid:/,
       'Unable to create with an invalid value'
    );
 

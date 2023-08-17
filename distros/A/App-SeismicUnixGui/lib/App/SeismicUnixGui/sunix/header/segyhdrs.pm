@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::header::segyhdrs;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

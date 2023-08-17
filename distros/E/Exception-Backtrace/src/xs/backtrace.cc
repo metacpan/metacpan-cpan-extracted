@@ -212,12 +212,12 @@ Ref _is_safe_to_wrap(Sv& ex, bool add_frame_info) {
 
 };
 
-static bool has_backtraces(const Ref& except) {
+bool has_backtraces(const Ref& except) {
     auto it = except.value();
     return it.payload_exists(&backtrace_c_marker) && it.payload_exists(&backtrace_perl_marker);
 }
 
-static void attach_backtraces(Ref except, const PerlTraceInfoSP& perl_trace) {
+void attach_backtraces(Ref except, const PerlTraceInfoSP& perl_trace) {
     auto it = except.value();
     if (!it.payload_exists(&backtrace_c_marker)) {
         auto bt = new Backtrace();

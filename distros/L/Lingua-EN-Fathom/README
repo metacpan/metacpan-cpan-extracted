@@ -2,37 +2,43 @@ Lingua::EN::Fathom - readability and general measurements of English text
 
 SYNOPSIS
 
-   use Lingua::EN::Fathom;
+use Lingua::EN::Fathom;
 
-   my $text = Lingua::EN::Fathom->new();
+my $text = Lingua::EN::Fathom->new();
 
-   $text->analyse_file("sample.txt");
+$text->analyse_file("sample.txt");
 
-   $accumulate = 1;
-   $text->analyse_block($text_string,$accumulate);
+$accumulate = 1;
+$text->analyse_block($text_string,$accumulate);
 
-   $num_chars             = $text->num_chars;
-   $num_words             = $text->num_words;
-   $percent_complex_words = $text->percent_complex_words;
-   $num_sentences         = $text->num_sentences;
-   $num_text_lines        = $text->num_text_lines;
-   $num_blank_lines       = $text->num_blank_lines;
-   $num_paragraphs        = $text->num_paragraphs;
-   $syllables_per_word    = $text->syllables_per_word;
-   $words_per_sentence    = $text->words_per_sentence;
+ # Methods to return statistics on the analysed text
+ $text->num_chars;
+ $text->num_words;
+ $text->percent_complex_words;
+ $text->num_sentences;
+ $text->num_text_lines;
+ $text->num_non_text_lines;
+ $text->num_blank_lines;
+ $text->num_paragraphs;
+ $text->syllables_per_word;
+ $text->words_per_sentence;
+ $text->unique_words;
+ $text->fog;
+ $text->flesch;
+ $text->kincaid;
 
 
-   %words = $text->unique_words;
-   foreach $word ( sort keys %words )
-   {
-      print("$words{$word} :$word\n");
-   }
+%words = $text->unique_words;
+foreach $word ( sort keys %words )
+{
+   print("$words{$word} :$word\n");
+}
 
-   $fog     = $text->fog;
-   $flesch  = $text->flesch;
-   $kincaid = $text->kincaid;
+$fog     = $text->fog;
+$flesch  = $text->flesch;
+$kincaid = $text->kincaid;
 
-   print($text->report);
+print($text->report);
 
 
 DESCRIPTION
@@ -52,22 +58,22 @@ A hash of all unique words and the number of times they occur is generated.
 
 REQUIRES
 
-Lingua::EN::Syllable
+Lingua::EN::Syllable, Lingua::EN::Sentence
 
 
 HOW TO INSTALL
 
-    perl Makefile.PL
-    make
-    make test
-    make install
-    
-    or..
-    
-    perl Build.PL
-    build
-    build test
-    build install
+ perl Makefile.PL
+ make
+ make test
+ make install
+ 
+ or..
+ 
+ perl Build.PL
+ build
+ build test
+ build install
     
 
 
@@ -78,7 +84,7 @@ Lingua::EN::Fathom was written by Kim Ryan, kimryan at cpan dot org.
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Kim Ryan. All rights reserved.
+Copyright (c) 2023 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

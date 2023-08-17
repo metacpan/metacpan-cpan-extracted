@@ -14,7 +14,7 @@ use Class::Adapter::Builder
 	NEW      => 'Wx::Menu',
 	AUTOLOAD => 'PUBLIC';
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use Class::XSAccessor {
 	getters => {
@@ -30,7 +30,7 @@ sub refresh {1}
 sub Append {
 	my $self  = shift;
 	my $item  = $self->wx->Append(@_);
-	my $label = $item->GetLabel;
+	my $label = $item->GetLabelText;
 	my ($underlined) = ( $label =~ m/(\&\w)/ );
 	my ($accel)      = ( $label =~ m/(Ctrl-.+|Alt-.+)/ );
 	if ( $underlined or $accel ) {
@@ -191,7 +191,7 @@ sub _menu_actions_submenu {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

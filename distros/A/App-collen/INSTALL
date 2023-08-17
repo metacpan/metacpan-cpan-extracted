@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::collen
+
+
+## UNINSTALL 
+
+cpanm -U App::collen
+

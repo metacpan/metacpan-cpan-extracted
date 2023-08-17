@@ -68,6 +68,7 @@ no_leaks_ok {
 } "add variable node leak";
 
 $requestedNewNodeId{NodeId_identifier} = "enigma";
+$requestedNewNodeId{NodeId_print} = "ns=1;s=enigma";
 $attr{VariableAttributes_value}{Variant_scalar} = 23;
 
 my $outNewNodeId;

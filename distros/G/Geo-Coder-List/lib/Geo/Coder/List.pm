@@ -19,11 +19,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.29
+Version 0.31
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -62,9 +62,17 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
-
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if(!defined($class)) {
+		# Using Geo::Coder::List::new(), not Geo::Coder::List->new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
 	return bless { debug => DEBUG, %args, geo_coders => [] }, $class;
 }
@@ -111,10 +119,11 @@ sub push {
 =head2 geocode
 
 Runs geocode on all of the loaded drivers.
-See L<Geo::Coder::GooglePlaces::V3> for an explanation
+See L<Geo::Coder::GooglePlaces::V3> for an explanation.
 
 The name of the Geo-Coder that gave the result is put into the geocode element of the
-return value, if the value was retrieved from the cache the value will be undefined.
+return value,
+if the value was retrieved from the cache the value will be undefined.
 
     if(defined($location->{'geocoder'})) {
         print 'Location information retrieved using ', $location->{'geocoder'}, "\n";
@@ -128,7 +137,8 @@ sub geocode {
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location)');
+		Carp::carp(__PACKAGE__, ' usage: geocode(location => $location) given ', ref($_[0]));
+		return;
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
@@ -137,14 +147,16 @@ sub geocode {
 
 	my $location = $params{'location'};
 
-	return if(!defined($location));
-	return if(length($location) == 0);
+	if((!defined($location)) || (length($location) == 0)) {
+		Carp::carp(__PACKAGE__, ' usage: geocode(location => $location)');
+		return;
+	}
 
 	$location =~ s/\s\s+/ /g;
 	$location = decode_entities($location);
+	print "location: $location\n" if($self->{'debug'});
 
 	my @call_details = caller(0);
-	print "location: $location\n" if($self->{'debug'});
 	if((!wantarray) && (my $rc = $self->_cache($location))) {
 		if(ref($rc) eq 'ARRAY') {
 			$rc = $rc->[0];
@@ -403,7 +415,7 @@ sub geocode {
 	# if($error) {
 		# return { error => $error };
 	# }
-	print "No matches" if($self->{'debug'});
+	print "No matches\n" if($self->{'debug'});
 	if(wantarray) {
 		$self->_cache($location, ());
 		return ();
@@ -414,15 +426,16 @@ sub geocode {
 =head2 ua
 
 Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
-You can call I<env_proxy> for example, to get the proxy information from
-environment variables:
+You can call I<env_proxy>,
+for example,
+to set the proxy information from environment variables:
 
     my $geocoder_list = Geo::Coder::List->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
     $geocoder_list->ua($ua);
 
-Note that unlike Geo::Coders, there is no read method, since that would be pointless.
+Note that unlike Geo::Coders there is no read method since that would be pointless.
 
 =cut
 
@@ -440,6 +453,7 @@ sub ua {
 			}
 			$geocoder->ua($ua);
 		}
+		return $ua;
 	}
 }
 
@@ -550,7 +564,7 @@ sub reverse_geocode {
 				$self->_cache($latlng, $rc[0]);
 				return $rc[0];
 			}
-		} elsif(my $rc = $geocoder->reverse_geocode(%params)) {
+		} elsif(my $rc = $self->_cache($latlng) // $geocoder->reverse_geocode(%params)) {
 			return $rc if(!ref($rc));
 			print Data::Dumper->new([$rc])->Dump() if($self->{'debug'} >= 2);
 			if(my $name = $rc->{'display_name'}) {
@@ -560,6 +574,7 @@ sub reverse_geocode {
 				# Geo::Coder::CA
 				my $name;
 				if(my $usa = $rc->{'usa'}) {
+					# TODO: Use Lingua::Conjunction
 					$name = $usa->{'usstnumber'};
 					if(my $staddress = $usa->{'usstaddress'}) {
 						$name .= ' ' if($name);
@@ -575,6 +590,7 @@ sub reverse_geocode {
 					}
 					return $self->_cache($latlng, "$name, USA");
 				} else {
+					# TODO: Use Lingua::Conjunction
 					$name = $rc->{'stnumber'};
 					if(my $staddress = $rc->{'staddress'}) {
 						$name .= ' ' if($name);
@@ -739,10 +755,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Geo-Coder-List>
-
 =item * MetaCPAN
 
 L<https://metacpan.org/release/Geo-Coder-List>
@@ -751,7 +763,7 @@ L<https://metacpan.org/release/Geo-Coder-List>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2022 Nigel Horne.
+Copyright 2016-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -1,9 +1,9 @@
-use Feature::Compat::Class 0.04;
-
 use v5.12;
 use utf8;
 use warnings;
 use autodie;
+
+use Feature::Compat::Class 0.04;
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.8
+Version v3.3.9
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ See the script for casual usage.
 
 =cut
 
-package App::Licensecheck v3.3.8;
+package App::Licensecheck v3.3.9;
 
 class App::Licensecheck;
 
@@ -121,22 +121,22 @@ method parse
 	}
 	catch ($e) {
 		if ( $encoding and $e =~ /does not map to Unicode/ ) {
+			$log->debugf( 'decoding error: %s', $e );
 			$log->warnf(
 				'failed decoding file %s as %s, will try iso-8859-1',
 				$path, $encoding->name
 			);
-			$log->debugf( 'decoding error: %s', $e );
 			try {
 				$encoding = find_encoding('iso-8859-1');
 				return $self->parse_file;
 			}
 			catch ($e) {
-				if (/does not map to Unicode/) {
+				if ( $e =~ /does not map to Unicode/ ) {
+					$log->debugf( 'decoding error: %s', $e );
 					$log->warnf(
 						'failed decoding file %s as iso-8859-1, will try raw',
 						$path
 					);
-					$log->debugf( 'decoding error: %s', $e );
 					$encoding = undef;
 					return $self->parse_file;
 				}

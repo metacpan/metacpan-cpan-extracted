@@ -1,8 +1,8 @@
 Address
 Connectivity
 Consistency
-Delegation
 DNSSEC
+Delegation
 Nameserver
 Syntax
 Zone

@@ -1,3 +1,15 @@
+0.0404  2023-06-21      Piotr Roszatycki <dexter@cpan.org>
+
+* Fixes wrong unique ID number on 32-bit architectures.
+
+0.0403  2023-06-18      Piotr Roszatycki <dexter@cpan.org>
+
+* Correct configure requirements.
+
+0.0402  2023-06-17      Piotr Roszatycki <dexter@cpan.org>
+
+* Provides cpanfile.
+
 0.0401  2015-10-14      Piotr Roszatycki <dexter@cpan.org>
 
 * Bugfix for typo that shows some warnings on Perl 5.22.

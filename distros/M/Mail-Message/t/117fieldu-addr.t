@@ -283,4 +283,11 @@ is "$f", '=?us-ascii?q?John_Smith_with_a_long_long_long_long_phrase_=28via_test_
 my $new = Mail::Message::Field::Address->parse("$f");
 is $new->phrase, $john;
 
+# Bug reported by Jacob Balazer, 2022-12-21
+# Parsing of comments which miss a \)
+
+my $a2  = Mail::Message::Field::Address->parse('mark <a@b.nl> (comment');
+ok defined $a1, 'Parsed address with broken comment';
+is $a2->comment, 'comment';
+
 done_testing;

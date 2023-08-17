@@ -1,6 +1,15 @@
 Revision history for Dist::Zilla::PERLSRVDE
 ===========================================
 
+1.1.1  2023-06-27 11:19:00
+
+  * fixed bug in attribute handling
+
+1.1.0  2023-06-27 10:50:00
+
+  * Switched from PodCoverageTest plugin to Test::Pod::Coverage::Configurable to be more flexible
+  * Added option 'exclude_from_basic' to exclude plugins from @Basic plugin bundle
+
 1.0.1  2022-09-29 10:28:00
 
   * fix hyperlinks in POD (thanks to Håkon Hægland, @hakonhagland)

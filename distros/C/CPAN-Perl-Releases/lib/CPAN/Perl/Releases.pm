@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '5.20230423';
+$CPAN::Perl::Releases::VERSION = '5.20230720';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -169,7 +169,7 @@ our $data =
 "5.25.6" => { id => 'ARC' },
 "5.25.7" => { id => 'EXODIST' },
 "5.22.3-RC5" => { id => 'SHAY' },
-"5.24.1-RC5" => { id => 'SHAY' },
+"5.24.1-RC5" => { id => 'SHAY', noxz => 1 },
 "5.22.3" => { id => 'SHAY' },
 "5.24.1" => { id => 'SHAY' },
 "5.25.9" => { id => 'ABIGAIL' },
@@ -259,12 +259,10 @@ our $data =
 "5.34.0" => { id => 'XSAWYERX' },
 "5.35.0" => { id => 'RJBS' },
 "5.35.1" => { id => 'CORION' },
-"5.35.2" => { id => 'NEILB' },
 "5.35.3" => { id => 'ETHER' },
 "5.35.4" => { id => 'WOLFSAGE' },
 "5.35.5" => { id => 'LEONT' },
 "5.35.6" => { id => 'HYDAHY' },
-"5.35.7" => { id => 'NEILB' },
 "5.35.8" => { id => 'ATOOMIC' },
 "5.35.9" => { id => 'RENEEB' },
 "5.34.1-RC1" => { id => 'SHAY' },
@@ -278,7 +276,6 @@ our $data =
 "5.37.0" => { id => 'RJBS' },
 "5.37.1" => { id => 'WOLFSAGE' },
 "5.37.2" => { id => 'ATOOMIC' },
-"5.37.3" => { id => 'NEILB' },
 "5.37.4" => { id => 'ETHER' },
 "5.37.5" => { id => 'TODDR' },
 "5.37.6" => { id => 'CORION' },
@@ -291,6 +288,10 @@ our $data =
 "5.36.1-RC3" => { id => 'SHAY' },
 "5.37.11" => { id => 'SHAY' },
 "5.36.1" => { id => 'SHAY' },
+"5.38.0-RC1" => { id => 'RJBS' },
+"5.38.0-RC2" => { id => 'RJBS' },
+"5.38.0" => { id => 'RJBS' },
+"5.39.1" => { id => 'SHAY' },
 };
 
 sub perl_tarballs {
@@ -321,6 +322,7 @@ sub perl_tarballs {
   $foo->{'tar.gz'} = "$path/$perl.tar.gz" unless $onlybz2;
   $foo->{'tar.bz2'} = "$path/$perl.tar.bz2" unless $onlygz || $lvers > 5.027005;
   $foo->{'tar.xz'} = "$path/$perl.tar.xz" if $lvers > 5.021005 && !$noxz;
+  delete $foo->{'tar.bz2'} if $pumpkin eq 'SHAY' && $lvers < 5.028000;
   $cache->{ $vers } = $foo;
   return { %$foo };
 }
@@ -359,7 +361,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 5.20230423
+version 5.20230720
 
 =head1 SYNOPSIS
 

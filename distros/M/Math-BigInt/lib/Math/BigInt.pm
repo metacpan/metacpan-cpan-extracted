@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '1.999838';
+our $VERSION = '1.999839';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -2701,10 +2701,11 @@ sub blog {
 
     my ($class, $x, $base, @r);
 
-    # Don't objectify the base, since an undefined base, as in $x->blog() or
-    # $x->blog(undef) signals that the base is Euler's number.
+    # Only objectify the base if it is defined, since an undefined base, as in
+    # $x->blog() or $x->blog(undef) signals that the base is Euler's number =
+    # 2.718281828...
 
-    if (!ref($_[0]) && $_[0] =~ /^[a-z]\w*(?:::[a-z]\w*)*$/i) {
+    if (!ref($_[0]) && $_[0] =~ /^[a-z]\w*(?:::\w+)*$/i) {
         # E.g., Math::BigInt->blog(256, 2)
         ($class, $x, $base, @r) =
           defined $_[2] ? objectify(2, @_) : objectify(1, @_);
@@ -2722,7 +2723,8 @@ sub blog {
     return $x -> bnan(@r) if $x -> is_nan();
 
     if (defined $base) {
-        $base = $class -> new($base) unless ref $base;
+        $base = $class -> new($base)
+          unless defined(blessed($base)) && $base -> isa($class);
         if ($base -> is_nan() || $base -> is_one()) {
             return $x -> bnan(@r);
         } elsif ($base -> is_inf() || $base -> is_zero()) {
@@ -2730,18 +2732,26 @@ sub blog {
             return $x -> bzero(@r);
         } elsif ($base -> is_negative()) {              # -inf < base < 0
             return $x -> bzero(@r) if $x -> is_one();   #     x = 1
-            return $x -> bone(@r)  if $x == $base;      #     x = base
-            return $x -> bnan(@r);                      #     otherwise
+            return $x -> bone('+', @r)  if $x == $base; #     x = base
+            # we can't handle these cases, so upgrade, if we can
+            return $upgrade -> blog($x, $base, @r) if defined $upgrade;
+            return $x -> bnan(@r);
         }
         return $x -> bone(@r) if $x == $base;   # 0 < base && 0 < x < inf
     }
 
     # We now know that the base is either undefined or >= 2 and finite.
 
-    return $x -> binf('+', @r) if $x -> is_inf();       #   x = +/-inf
-    return $x -> bnan(@r)      if $x -> is_neg();       #   -inf < x < 0
-    return $x -> bzero(@r)     if $x -> is_one();       #   x = 1
-    return $x -> binf('-', @r) if $x -> is_zero();      #   x = 0
+    if ($x -> is_inf()) {                       # x = +/-inf
+        return $x -> binf('+', @r);
+    } elsif ($x -> is_neg()) {                  # -inf < x < 0
+        return $upgrade -> blog($x, $base, @r) if defined $upgrade;
+        return $x -> bnan(@r);
+    } elsif ($x -> is_one()) {                  # x = 1
+        return $x -> bzero(@r);
+    } elsif ($x -> is_zero()) {                 # x = 0
+        return $x -> binf('-', @r);
+    }
 
     # At this point we are done handling all exception cases and trivial cases.
 
@@ -2751,15 +2761,31 @@ sub blog {
     # the default base is e (Euler's number) which is not an integer
     if (!defined $base) {
         require Math::BigFloat;
-        my $u = Math::BigFloat->blog($x)->as_int();
+
+        # disable upgrading and downgrading
+
+        my $upg = Math::BigFloat -> upgrade();
+        my $dng = Math::BigFloat -> downgrade();
+        Math::BigFloat -> upgrade(undef);
+        Math::BigFloat -> downgrade(undef);
+
+        my $u = Math::BigFloat -> blog($x) -> as_int();
+
+        # reset upgrading and downgrading
+
+        Math::BigFloat -> upgrade($upg);
+        Math::BigFloat -> downgrade($dng);
+
         # modify $x in place
+
         $x->{value} = $u->{value};
-        $x->{sign} = $u->{sign};
+        $x->{sign}  = $u->{sign};
+
         return $x -> round(@r);
     }
 
-    my ($rc) = $LIB->_log_int($x->{value}, $base->{value});
-    return $x->bnan(@r) unless defined $rc; # not possible to take log?
+    my ($rc) = $LIB -> _log_int($x->{value}, $base->{value});
+    return $x -> bnan(@r) unless defined $rc;   # not possible to take log?
     $x->{value} = $rc;
     $x = $x -> round(@r);
 }
@@ -8546,28 +8572,6 @@ L<https://metacpan.org/release/Math-BigInt>
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt>
-
-=item * The Bignum mailing list
-
-=over 4
-
-=item * Post to mailing list
-
-C<bignum at lists.scsys.co.uk>
-
-=item * View mailing list
-
-L<http://lists.scsys.co.uk/pipermail/bignum/>
-
-=item * Subscribe/Unsubscribe
-
-L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum>
-
-=back
 
 =back
 

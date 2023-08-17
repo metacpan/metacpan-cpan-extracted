@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.553';
+our $VERSION = '0.554';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -63,7 +63,7 @@ sub _valid_options {
         keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
         read_only          => 'Array_Int',
         skip_items         => 'Regexp',            # undocumented
-                                                    # only keys are checked, passed values are ignored
+                                                   # only keys are checked, passed values are ignored
                                                    # it's up to the user to remove the skipped items from the returned array
         back               => 'Str',
         confirm            => 'Str',
@@ -649,7 +649,7 @@ sub __get_row {
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
-        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} ); # left or right aligned ##
+        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} );
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
         if ( any { $_ == $idx } @{$self->{i}{read_only}} ) {
@@ -1059,7 +1059,9 @@ sub fill_form {
         elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
             # LINE_FEED == CONTROL_J, CARRIAGE_RETURN == CONTROL_M
             my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
-            $up += $self->{i}{info_prompt_row_count} if $self->{i}{info_prompt_row_count};
+            if ( $self->{i}{info_prompt_row_count} ) {
+                $up += $self->{i}{info_prompt_row_count};
+            }
             if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
                 $self->__reset( $up );
                 return;
@@ -1067,24 +1069,12 @@ sub fill_form {
             elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {
                 splice @$list, 0, @{$self->{i}{pre}};
                 $self->__reset( $up );
-                return [ map { [ $orig_list->[$_][0], $list->[$_][1] // '' ] } 0 .. $#{$list} ]; # documentation ##
-                #return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
+                return [ map { [ $orig_list->[$_][0], $list->[$_][1] // '' ] } 0 .. $#{$list} ];
             }
-            if ( $self->{auto_up} == 2 ) {
+            if ( $self->{auto_up} == 2 || $self->{i}{curr_row} == $#$list ) {
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
                 $self->__write_first_screen( $list );
-                $m = $self->__string_and_pos( $list );
-            }
-            elsif ( $self->{i}{curr_row} == $#$list ) {
-                print up( $up );
-                print "\r" . clear_to_end_of_screen();
-                if ( $self->{auto_up} == 1 ) {
-                    $self->__write_first_screen( $list );
-                }
-                else {
-                    $self->__write_first_screen( $list );
-                }
                 $m = $self->__string_and_pos( $list );
             }
             else {
@@ -1095,7 +1085,7 @@ sub fill_form {
                     print down( 1 );
                 }
                 else {
-                    print up( $up );
+                    print up( $self->{i}{end_row} - $self->{i}{begin_row} );
                     $self->__print_next_page( $list );
                 }
             }
@@ -1166,7 +1156,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.553
+Version 0.554
 
 =cut
 
@@ -1248,6 +1238,8 @@ C<fill_form> reads a list of lines from STDIN.
 The first argument is a reference to an array of arrays. The arrays have 1 or 2 elements: the first element is the key
 and the optional second element is the value. The key is used as the prompt string for the "readline", the value is used
 as the default value for the "readline" (initial value of input).
+
+When C<$aoa> is return values of rows where nothing has been entered are set to the empty string.
 
 The optional second argument is a hash-reference. The hash-keys/options are:
 

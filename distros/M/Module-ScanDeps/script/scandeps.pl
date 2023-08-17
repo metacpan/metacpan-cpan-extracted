@@ -114,13 +114,13 @@ foreach my $mod (sort { $a->{name} cmp $b->{name} } @todo ) {
         printf "%-${len}s => '$version',", "'$mod->{name}'" if $version;
     } else {
         printf "%-${len}s => '0', # ", "'$mod->{name}'";
-        my @base = map(_name($_), @{$mod->{used_by}});
+        my @used_by = sort map(_name($_), @{$mod->{used_by}});
         print $seen{$mod->{name}} ? 'S' : ' ';
         print $bin{$mod->{name}}  ? 'X' : ' ';
         print $core{$mod->{name}} ? 'C' : ' ';
         print _modtree && !_modtree->{$mod->{name}} ? '?' : ' ';
         print " # ";
-        print "@base" if @base;
+        print "@used_by" if @used_by;
     }
     print "\n";
 

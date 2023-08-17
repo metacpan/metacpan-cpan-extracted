@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-    On a suitably-patched perl:
+    On Perl v5.38 or later:
 
        use Syntax::Operator::In;
     
@@ -17,14 +17,15 @@ DESCRIPTION
     This module provides an infix meta-operator that implements a
     element-of-list test on either strings or numbers.
 
-    Current versions of perl do not directly support custom infix
-    operators. The documentation of XS::Parse::Infix describes the
-    situation, with reference to a branch experimenting with this new
-    feature. This module is therefore almost entirely useless on standard
-    perl builds. While the regular parser does not support custom infix
-    operators, they are supported via XS::Parse::Infix and hence
-    XS::Parse::Keyword, and so custom keywords which attempt to parse
-    operator syntax may be able to use it.
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+    While Perl versions before this do not support custom infix operators,
+    they can still be used via XS::Parse::Infix and hence
+    XS::Parse::Keyword. Custom keywords which attempt to parse operator
+    syntax may be able to use these.
 
     For operators that already specialize on string or numerical equality,
     see instead Syntax::Operator::Elem.

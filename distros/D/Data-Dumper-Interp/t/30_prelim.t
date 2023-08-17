@@ -216,8 +216,8 @@ t_is( dvis('\%{}'), '\%{}' );
 
 # Once hit an assertion
 { my $obj = bless do{ \(my $x = []) },"Foo::Bar";
-  t_like( Data::Dumper::Interp->new()->Foldwidth(0)->vis($obj),
-          qr/^\Q$obj\E$/ );
+  is( Data::Dumper::Interp->new()->Foldwidth(0)->vis($obj),
+      addrvis($obj) );
 }
 
 # Once caused "UNPARSED !!0" (with perl 5.37.10 & D::D 2.188)

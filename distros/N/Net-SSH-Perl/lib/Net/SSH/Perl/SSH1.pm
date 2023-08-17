@@ -1,5 +1,3 @@
-# $Id: SSH1.pm,v 1.24 2009/01/26 01:05:00 turnstep Exp $
-
 package Net::SSH::Perl::SSH1;
 use strict;
 use warnings;

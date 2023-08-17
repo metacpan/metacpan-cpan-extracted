@@ -1,0 +1,53 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Data::Dumper' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'lib' => '0',
+                                      'perl' => '5.036'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Number::Fraction' => '0',
+                                      'Object::Pad' => '0',
+                                      'experimental' => '0',
+                                      'perl' => '5.034',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Path::Tiny' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::More' => '0',
+                                   'YAML::XS' => '0',
+                                   'lib' => '0',
+                                   'perl' => '5.034'
+                                 }
+                 }
+     };
+  $x;
+ }

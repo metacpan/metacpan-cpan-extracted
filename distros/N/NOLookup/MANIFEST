@@ -34,7 +34,6 @@ lib/NOLookup/Patent/Entry.pm
 lib/NOLookup/RDAP/RDAPLookup.pm
 lib/NOLookup/RDAP/RDAPLookup/Whois.pm
 lib/NOLookup/Whois/WhoisLookup.pm
-t/#04test_rdap.t#
 t/00_compile.t
 t/01test_pod.t
 t/02test_das.t

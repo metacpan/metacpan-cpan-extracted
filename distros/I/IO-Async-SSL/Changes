@@ -1,5 +1,11 @@
 Revision history for IO-Async-SSL
 
+0.25    2023-08-16
+        [BUGFIXES]
+         * Make sure to `use Module VERSION` without quotes to avoid upsetting
+           perl 5.39.1's complaints about undefined import method with
+           arguments
+
 0.24    2022-12-20
         [BUGFIXES]
          * Updated for new error message format of Net::SSLeay (RT142553,

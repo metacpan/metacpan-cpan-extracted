@@ -3,31 +3,38 @@
 use 5.022;
 use strict;
 use warnings;
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 1.000;
 
 $| = 1;
 
+my $USAGE = "usage: pds_info [-D database] [-h] [--key]... [file]...\n";
 my @KEYS = qw(
-    order order_base order_exponent modulus n_planes
+    order order_base order_exponent modulus n_planes n_sets
     start_element peak_elements min_element max_element
-    largest_gap eta zeta
+    largest_gap eta zeta theta lambda n_mult
+    n_elems n_princ n_suppl n_deriv n_fill
 );
 my %keys = map {($_ => 1)} @KEYS;
+@keys{qw(peak_elements largest_gap)} = (2, 3);
 
 my @cols = ();
 my $head = 0;
+my $db   = undef;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/) {
     my $opt = $1;
     shift @ARGV;
-    last                     if '-' eq $opt;
-    $head = 1,          next if 'h' eq $opt;
-    push(@cols, $1   ), next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
-    push(@cols, @KEYS), next if '-all' eq $opt;
-    die "usage: pds_info [-h] [--key]... [file]...\n";
+    last                       if '-' eq $opt;
+    $head = 1,            next if 'h' eq $opt;
+    push(@cols, $1   ),   next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
+    push(@cols, @KEYS),   next if '-all' eq $opt;
+    $db   = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db   = $1,           next if $opt =~ /^D(.+)s/;
+    die $USAGE;
 }
-@cols = @KEYS[0..4] if !@cols;
+@cols = @KEYS[0..4]                            if !@cols;
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
 
-print "@cols\n" if $head;
+print join(q[ ], map {$_, ('_') x ($keys{$_} - 1)} @cols), "\n" if $head;
 while (<<>>) {
     s/^\s+//;
     my @e = split /\s+/;
@@ -41,18 +48,37 @@ while (<<>>) {
         print "unknown\n";
         next;
     }
-    my @res = map { $s->$_ } @cols;
+    my @res = map { $_ || 0 } map { $s->$_ } @cols;
     print "@res\n";
 }
 
+package Math::DifferenceSet::Planar;
+
+use Math::BigInt try => 'GMP';
+
+sub n_sets  { Math::BigInt->new($_[0]->modulus) * $_[0]->n_planes }
+sub n_mult  { 0 + $_[0]->multipliers }
+sub n_elems { 1 + $_[0]->order }
+sub n_princ { 0 + $_[0]->plane_principal_elements }
+sub n_suppl { 0 + $_[0]->plane_supplemental_elements }
+sub n_fill  { 0 + $_[0]->plane_fill_elements }
+
+sub n_deriv {
+    my ($this) = @_;
+    return 1 + $this->order - $this->n_princ - $this->n_suppl - $this->n_fill;
+}
+
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
 pds_info - display information about planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_info [-h] [--key]... [file]...
+  pds_info [-D database] [-h] [--key]... [file]...
 
 =head1 DESCRIPTION
 
@@ -69,12 +95,137 @@ order, order_base, order_exponent, modulus, n_planes.
 
 Attributes of interest can also be specified explicitly by enumerating
 attribute names preceded by two dashes.  In addition to the default
-attributes, these are: start_element, peak_elements (yielding two output
-columns), min_element, max_element, largest_gap (yielding three output
-colums of two elements and their difference), eta, zeta, all (yielding
-all 15 items).
+attributes, these are: n_sets, start_element, peak_elements (yielding
+two output columns), min_element, max_element, largest_gap (yielding
+three output colums of two elements and their difference), eta, zeta,
+theta, lambda, n_mult, n_elems, n_princ, n_suppl, n_deriv, n_fill, all
+(yielding all 24 items).  An unkown value of lambda is replaced by zero
+(which is not an otherwise possible value).
 
 With option B<-h>, the data is preceded by a header line.
+
+Parameter C<-D> specifies an alternate sample database.
+
+=head2 Difference Set Properties
+
+=over 4
+
+=item order
+
+The order of the set, equal to the number of elements minus one.
+
+=item order_base
+
+If the order is written as a power I<p ** n> with maximal I<n>, the
+base I<p>.  Note that I<p> is conjectured to always be a prime number.
+
+=item order_exponent
+
+If the order is written as a power I<p ** n> with maximal I<n>, the
+exponent I<n>.
+
+=item modulus
+
+The modulus, equal to I<(q + 1) * q + 1> if the order is I<q>.
+Also the number of distinct translates of the set.
+
+=item n_planes
+
+The number of distinct planes of the same order.  Difference sets that
+are translates of each other belong to the same plane.
+
+=item n_sets
+
+The total number of distinct planar difference sets of the same order,
+equal to I<n_planes * modulus>.
+
+=item start_element
+
+The unique element I<e> of the set with the property that I<e + 1>
+is also in the set.
+
+=item peak_elements
+
+Two columns.  The unique pair of elements I<e1, e2> of the set with the
+property that I<e2 - e1> is equal to half of the modulus (rounded down).
+
+=item min_element
+
+The smallest element of the set, by residue value between 0 and the
+modulus minus one.
+
+=item max_element
+
+The largest element of the set, by residue value between 0 and the
+modulus minus one.
+
+=item largest_gap
+
+Three columns.  The unique pair of consecutive elements, when listed
+with smallest possible increment and wrap-around, with maximal increment,
+and the increment amount.
+
+Example: I<{3, 4, 6} (mod 7)> has largest-gap elements I<6> and I<3>
+and the increment I<4>, as I<6 + 4 (mod 7)> is congruent to I<3 (mod 7)>.
+
+=item eta
+
+The translation amount equivalent to multiplying the set by I<order_base>.
+
+=item zeta
+
+The translation amount equivalent to multiplying the set by I<order>.
+
+=item theta
+
+The translation amount taking the zeta-canonical representative of
+this set's plane to this set.  For the definition of zeta-canonical,
+cf. L<Math::DifferenceSet::Planar>.
+
+=item lambda
+
+The smallest multiplication value taking the standard reference
+set of this set's order to this set's plane.  The triple I<order>,
+I<lambda>, I<theta> is also called the fingerprint, as it uniquely
+identifies each set.  For the definition of standard reference set,
+cf. L<Math::DifferenceSet::Planar>.
+
+=item n_mult
+
+The number of multipliers of the set.  Multipliers are multiplication
+values that take a set to another set within the same plane, i.e. a
+translate.
+
+=item n_elems
+
+The cardinality of the set, equal to its order plus one.
+
+=item n_princ
+
+The number of principal elements of a set's plane.
+For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+Note that you can get principal and supplemental elements themselves
+with the example program F<pds_main_elements>.
+
+=item n_suppl
+
+The number of supplemental elements of a set's plane.
+For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+=item n_deriv
+
+The number of derived elements of a set's plane.
+For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+=item n_fill
+
+The number of fill elements of a set's plane.
+For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+Note that I<n_princ + n_suppl + n_deriv + n_fill> is equal to I<n_elems>.
+
+=back
 
 =head1 AUTHOR
 
@@ -82,7 +233,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

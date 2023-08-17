@@ -1,5 +1,3 @@
-# $Id: DSA.pm,v 1.24 2008/10/02 18:51:15 turnstep Exp $
-
 package Net::SSH::Perl::Key::DSA;
 use strict;
 use warnings;
@@ -80,7 +78,7 @@ sub sign {
     return unless ord(substr($dersig,0,1,'')) == 2; # Type INTEGER
     my $intlen = ord(substr($dersig,0,1,''));
     my $r = substr($dersig,0,$intlen,'');
-    # numbers with highest bit set are padded with leading zero so strip it 
+    # numbers with highest bit set are padded with leading zero so strip it
     $r = substr($r,$intlen - INTBLOB_LEN) if $intlen > INTBLOB_LEN;
     return unless ord(substr($dersig,0,1,'')) == 2; # Type INTEGER
     $intlen = ord(substr($dersig,0,1,''));

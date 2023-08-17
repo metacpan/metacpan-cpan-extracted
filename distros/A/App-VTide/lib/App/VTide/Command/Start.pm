@@ -18,7 +18,7 @@ use App::VTide::Sessions;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('1.0.1');
+our $VERSION = version->new('1.0.4');
 our $NAME    = 'start';
 our $OPTIONS =
   [ 'windows|w=i', 'add|add-to-session|a', 'test|T!', 'verbose|v+', ];
@@ -80,6 +80,7 @@ sub ctags {
 sub tmux {
     my ( $self, $title, $name ) = @_;
 
+    print "\033];$title\007";
     eval { require Term::Title; }
       and Term::Title::set_titlebar($title);
 
@@ -176,7 +177,7 @@ App::VTide::Command::Start - Start a session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Start version 1.0.1
+This documentation refers to App::VTide::Command::Start version 1.0.4
 
 =head1 SYNOPSIS
 
@@ -189,6 +190,8 @@ This documentation refers to App::VTide::Command::Start version 1.0.1
                     The project to start (If not specified the current
                     directory is used to find a .vtide.yml file to start)
 
+    -a --add-to-session
+                    Save to sessions
     -w --windows[=]int
                     Use a different number of windows from the configured
                     number (i.e. as set is .vtide.yml)

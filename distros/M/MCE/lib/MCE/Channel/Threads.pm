@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.885';
+our $VERSION = '1.888';
 
 use threads;
 use threads::shared;
@@ -320,7 +320,7 @@ MCE::Channel::Threads - Channel for producer(s) and many consumers
 
 =head1 VERSION
 
-This document describes MCE::Channel::Threads version 1.885
+This document describes MCE::Channel::Threads version 1.888
 
 =head1 DESCRIPTION
 
@@ -339,7 +339,7 @@ The API is described in L<MCE::Channel>.
  my $chnl_a = MCE::Channel->new( impl => 'Threads' );
 
  # Specify the 'mp' option for safe use by two or more producers
- # sending or recieving on the left side of the channel (i.e.
+ # sending or receiving on the left side of the channel (i.e.
  # ->enqueue/->send or ->recv2/->recv2_nb).
 
  my $chnl_b = MCE::Channel->new( impl => 'Threads', mp => 1 );

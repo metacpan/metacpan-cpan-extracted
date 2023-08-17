@@ -21,7 +21,7 @@ subtest 'use Foo 0.01' => sub {
     is 0+@tokens, 3 + $has_debug_token;
     subtest 'first token' => sub {
         isa_ok $tokens[0], 'Perl::Lexer::Token';
-        is $tokens[0]->name,   'USE';
+        is $tokens[0]->name,   $] > 5.037001 ? 'KW_USE_or_NO' : 'USE';
         is $tokens[0]->type,   TOKENTYPE_IVAL;
         is $tokens[0]->yylval, 1;
     };

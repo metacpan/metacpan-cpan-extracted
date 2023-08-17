@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::filter::sudipfilt;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUDIPFILT - DIP--or better--SLOPE Filter in f-k domain	
+ PERL PROGRAM NAME:  SUDIPFILT - DIP--or better--SLOPE Filter in f-k domain	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 0.018 of
+This documentation refers to version 1.000 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace.
 
 =cut
 
-our $VERSION = '0.018';
+our $VERSION = '1.000';
 
 =head1 TABLE: C<difference_set_space>
 
@@ -106,6 +106,10 @@ __PACKAGE__->set_primary_key("order_");
 
 L<Math::DifferenceSet::Planar::Schema> - schema class.
 
+=item *
+
+L<Math::DifferenceSet::Planar::Data> - higher level data interface.
+
 =back
 
 =head1 AUTHOR
@@ -114,7 +118,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2021-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2021-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

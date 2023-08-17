@@ -19,14 +19,14 @@ name: Acme-CPANModules-PortedFrom-Python
 provides:
   Acme::CPANModules::PortedFrom::Python:
     file: lib/Acme/CPANModules/PortedFrom/Python.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-Python
   homepage: https://metacpan.org/release/Acme-CPANModules-PortedFrom-Python
   repository: git://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Python.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -204,7 +204,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -316,7 +316,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

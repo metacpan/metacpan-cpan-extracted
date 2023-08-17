@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -18,17 +19,17 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::Keyword::Accessor',
    requires => {
-      'perl' => '5.030', # newSVsv_nomg
+      'perl' => '5.022', # intro_my()
       'Object::Pad' => '0.60',
-      'XS::Parse::Keyword' => 0,
+      'XS::Parse::Keyword' => '0.35',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'Object::Pad::ExtensionBuilder' => '0.73',
-      'XS::Parse::Keyword::Builder' => '0.30',
+      'XS::Parse::Keyword::Builder' => '0.35',
    },
    license => 'perl',
    create_license => 1,

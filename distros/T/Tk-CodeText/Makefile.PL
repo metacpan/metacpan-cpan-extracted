@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
 my $pm = 'CodeText';
@@ -7,25 +8,28 @@ my $ld = '$(INST_LIBDIR)';
 WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
+		'File::Path' => 0,
+		'Math::Round' => 0,
+		'Syntax::Kamelon' => '0.23',
+		'Test::Tk' => '2.00',
 		'Tk' => '800.024',
-		'Syntax::Highlight::Perl' => 0,
+		'Tk::ColorEntry' => '0.03',
+		'Tk::GtkSettings' => '0.05',
+		'Tk::PopList' => '0.04',
 	},
-#	PMLIBDIRS => ['Tk'],
-	PM => {
-		"$pm.pm" => "$ld/$pm.pm",
-		"$pm/Bash.pm" => "$ld/$pm/Bash.pm",
-		"$pm/HTML.pm" => "$ld/$pm/HTML.pm",
-		"$pm/None.pm" => "$ld/$pm/None.pm",
-		"$pm/Perl.pm" => "$ld/$pm/Perl.pm",
-		"$pm/Pod.pm" => "$ld/$pm/Pod.pm",
-		"$pm/Template.pm" => "$ld/$pm/Template.pm",
-		"$pm/Xresources.pm" => "$ld/$pm/Xresources.pm",
-		"$pm.pod" => "$ld/$pm.pod",
-		"RulesEditor.pm" => "$ld/RulesEditor.pm",
-	},
-	VERSION_FROM => "$pm.pm",
-	'dist'	=> {COMPRESS => 'gzip', SUFFIX => 'gz'},
-	($] >= 5.005 ?
-		(ABSTRACT => "a TextUndo widget with syntax highlight capabilities",
-		AUTHOR	=> 'Hans Jeuken (haje@toneel.demon.nl)') : ()),
+	ABSTRACT_FROM => "lib/Tk/$pm.pm",
+	VERSION_FROM => "lib/Tk/$pm.pm",
+	AUTHOR => 'Hans Jeuken <hanje at cpan dot org>',
+	EXE_FILES => ['bin/codetext'],
+	LICENSE	=> 'perl',
+	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'git://github.com/haje61/Tk-CodeText.git',
+				web  => 'https://github.com/haje61/Tk-CodeText',
+			},
+		}}) : ()
+	),
 );

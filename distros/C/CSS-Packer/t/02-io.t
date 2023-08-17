@@ -9,7 +9,7 @@
 use Test::More;
 use Test::File::Contents;
 
-my $not = 19;
+my $not = 21;
 
 SKIP: {
     eval( 'use CSS::Packer' );
@@ -56,9 +56,17 @@ SKIP: {
     $packer->minify( \$var, { remove_copyright => 1 } );
     is( $var, "foo{\nborder:0;\nmargin:1;\npadding:0;\n}\n", 'copyright comment with remove_copyright option');
 
+    $var = "/* License MIT */foo {\nborder:0;\nmargin:1;\npadding:0\n}";
+    $packer->minify( \$var, { remove_copyright => 1 } );
+    is( $var, "foo{\nborder:0;\nmargin:1;\npadding:0;\n}\n", 'copyright comment with remove_copyright option');
+
     $var = "/* Copyright BSD */foo {\nborder:0;\nmargin:1;\npadding:0\n}";
     $packer->minify( \$var, { remove_copyright => 0 } );
     is( $var, '/* Copyright BSD */' . "\n" . "foo{\nborder:0;\nmargin:1;\npadding:0;\n}\n", 'copyright comment without remove_copyright option');
+
+    $var = "/* License MIT */foo {\nborder:0;\nmargin:1;\npadding:0\n}";
+    $packer->minify( \$var, { remove_copyright => 0 } );
+    is( $var, '/* License MIT */' . "\n" . "foo{\nborder:0;\nmargin:1;\npadding:0;\n}\n", 'copyright comment without remove_copyright option');
 
     $packer = CSS::Packer->init();
 

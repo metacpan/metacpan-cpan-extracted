@@ -1,3 +1,7 @@
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
@@ -73,30 +77,31 @@ my %crufty = (
 my $naming = String::License::Naming::Custom->new(
 	schemes => [qw(fedora internal)] );
 
-sub scanner
+sub scanner ( $path, $state )
 {
-	my $expected = $_->basename('.txt');
+	my ( $expected, $string, $license, $todo );
 
-	return if $expected eq $_->basename;
+	$expected = $path->basename('.txt');
 
-	my $string = $_->slurp_utf8;
+	return if $expected eq $path->basename;
+
+	$string = $path->slurp_utf8;
 	$string = uncruft($string)
 		if exists $crufty{$expected};
 
-	my $license = String::License->new(
+	$license = String::License->new(
 		string => $string,
 		naming => $naming,
 	)->as_text;
-	my $todo;
 
 	if ( exists $broken{$expected} ) {
 		like $imperfect{$license} || $license,
 			qr/^\Q$expected\E|\Q$broken{$expected}\E$/,
-			"Corpus file $_";
+			"Corpus file $path";
 		$todo = todo 'not yet implemented';
 	}
 	is( $imperfect{$license} || $license, $expected,
-		"Corpus file $_"
+		"Corpus file $path"
 	);
 }
 

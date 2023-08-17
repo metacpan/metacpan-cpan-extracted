@@ -4,25 +4,27 @@ use strict;
 
 use Graphics::Framebuffer;
 use Getopt::Long;
-use Data::Dumper;
+# use Data::Dumper;
 
-our $RUNNING = 1;
+our $RUNNING = TRUE;
 
 my $new_x;
 my $new_y;
-my $color = 'FFFFFFFF';
-my $ampm  = 0;
+my $color    = 'FFFFFFFF';
+my $ampm     = FALSE;
+my $ignore_x = FALSE;
 
 GetOptions(
-    'x=i'     => \$new_x,
-    'y=i'     => \$new_y,
-    'color=s' => \$color,
-    'ampm'    => \$ampm,
+    'x=i'              => \$new_x,
+    'y=i'              => \$new_y,
+    'color=s'          => \$color,
+    'ampm'             => \$ampm,
+	'ignore-x-windows' => \$ignore_x,
 );
 
 my $FB = (defined($new_x) || defined($new_y)) ?
-  Graphics::Framebuffer->new('SPLASH' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y) :
-  Graphics::Framebuffer->new('SPLASH' => 0);
+  Graphics::Framebuffer->new('SPLASH' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'IGNORE_X_WINDOWS' => $ignore_x) :
+  Graphics::Framebuffer->new('SPLASH' => 0, 'IGNORE_X_WINDOWS' => $ignore_x);
 
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $RUNNING = 0; $FB->text_mode(); exec('reset'); };
 

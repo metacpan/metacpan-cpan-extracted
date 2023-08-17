@@ -1,5 +1,19 @@
 Revision history for perl module Lingua::JA::Name::Splitter
 
+0.12 2023-07-13
+
+* Make split_kanji_name faster (rafork@github)
+* 100% coverage (rafork@github)
+
+0.11 2023-07-04
+
+* Update Enamdict to the latest version
+
+0.10 2023-07-03
+
+* Added repetition mark (rafork@github) and shime
+* Rebuilt probabilities from latest enamdict
+
 0.09 2017-07-29
 
 * Links in documentation

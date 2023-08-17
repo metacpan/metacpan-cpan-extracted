@@ -84,23 +84,17 @@ The capacity. This is the length of the internally reserved elements to extend t
 
 The length of the list.
 
-=head2 values
-
-  has values : ro object[];
-
-The values. This is the elements in the internally used array, but it can be manipulated directly.
-
 =head1 Class Methods
 
 =head2 new
 
-  static method new : List ($array = undef : object[], $capacity = -1 : int);
+  static method new : List ($array : object[] = undef, $capacity : int = -1);
 
 Creates a new C<List> object using L</"new_len">.
 
 The passed length to L</"new_len"> is the length of the $array. If the array is undef, the length is 0.
 
-The element's addresses of the object array are copied to the values of the the created array.
+The element's addresses of the object array are copied to the elements of the the created array.
   
   # object[]
   my $list = List->new([(object)Byte->new(1), Int->new(2), Long->new(3)]);
@@ -110,7 +104,7 @@ The element's addresses of the object array are copied to the values of the the 
 
 =head2 new_len
 
-  static method new_len : List ($proto_array : object[], $length : int, $capacity = -1 : int);
+  static method new_len : List ($proto_array : object[], $length : int, $capacity : int = -1);
 
 Creates a new C<StringList> object with the $protot_array, the $length and the $capacity.
 
@@ -122,7 +116,7 @@ If the $length is greater than the $capacity, the $capacity is set to the length
 
 Exceptions:
 
-The $length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 Examples:
 
@@ -139,9 +133,9 @@ Gets the element of the position of the $index.
 
 Exceptions:
 
-The $index must be greater than or equal to 0. Otherwize an exception is thrown.
+The $index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $index must be less than the length of the $list. Otherwize an exception is thrown.
+The $index must be less than the length of the $list. Otherwise an exception is thrown.
 
 =head2 insert
 
@@ -151,9 +145,9 @@ Inserts an $element to the position of the $index.
 
 Exceptions:
 
-The $index must be greater than or equal to 0. Otherwize an exception is thrown.
+The $index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $index must be less than or equal to the length of the $list. Otherwize an exception is thrown.
+The $index must be less than or equal to the length of the $list. Otherwise an exception is thrown.
 
 =head2 pop
 
@@ -163,7 +157,7 @@ Removes the last element and return it.
 
 Exceptions:
 
-The length of the $list must be greater than 0. Otherwize an exception is thrown.
+The length of the $list must be greater than 0. Otherwise an exception is thrown.
             
 =head2 push
   
@@ -179,9 +173,9 @@ Removes the element at the position of the $index and return it.
 
 Exceptions:
 
-The $index must be greater than or equal to 0. Otherwize an exception is thrown.
+The $index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $index must be less than the length of the $list. Otherwize an exception is thrown.
+The $index must be less than the length of the $list. Otherwise an exception is thrown.
 
 =head2 replace
 
@@ -191,11 +185,11 @@ Replaces the elements of the range specified by the $offset and the $lenght with
 
 Exceptions:
 
-The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
+The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $remove_length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $remove_length must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $offset + the $removing lenght must be less than or equal to the length of the $list. Otherwize an exception is thrown.
+The $offset + the $removing lenght must be less than or equal to the length of the $list. Otherwise an exception is thrown.
 
 =head2 reserve
 
@@ -205,11 +199,9 @@ Reserves the elements with the $new_capacity.
 
 If the $new_capacity is greater than the capacity of the list, the capacity of the list is extended to the $new_capacity.
 
-Note that L</"values"> is replaced with the new values and the values of the original list are copied to the new values in the above case.
-
 Exceptions:
 
-The $new_capacity must be greater than or equal to 0. Otherwize an exception is thrown.
+The $new_capacity must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 resize
 
@@ -219,7 +211,7 @@ Resize the list with the $new_length.
 
 Exceptions:
 
-The $new_length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $new_length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 replace
 
@@ -229,11 +221,11 @@ Replaces the elements of the range specified by the $offset and the $remove_leng
 
 Exceptions:
 
-The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
+The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $remove_length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $remove_length must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $offset + the $removing lenght must be less than or equal to the length of the $list. Otherwize an exception is thrown.
+The $offset + the $removing lenght must be less than or equal to the length of the $list. Otherwise an exception is thrown.
 
 =head2 set
 
@@ -243,9 +235,9 @@ Sets the $element at the position of the $index.
 
 Exceptions:
 
-The $index must be greater than or equal to 0. Otherwize an exception is thrown.
+The $index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $index must be less than the length of the $list. Otherwize an exception is thrown.
+The $index must be less than the length of the $list. Otherwise an exception is thrown.
 
 =head2 set_array
 
@@ -255,9 +247,9 @@ Sets an $array. Each element of the $array is copied to the element of the list.
 
 Exceptions:
 
-The $array must be defined. Otherwize an exception is thrown.
+The $array must be defined. Otherwise an exception is thrown.
 
-The length of the $array must be the $same as the length of the $list. Otherwize an exception is thrown.
+The length of the $array must be the $same as the length of the $list. Otherwise an exception is thrown.
 
 =head2 shift
 
@@ -267,13 +259,21 @@ Removes the first element and return it.
 
 Exceptions:
 
-The length of the $list must be greater than 0. Otherwize an exception is thrown.
+The length of the $list must be greater than 0. Otherwise an exception is thrown.
 
 =head2 to_array
 
   method to_array : object[] ();
 
-Converts the list to an array.
+Creates a new array and copies all elements of the list into the new array, and returns it.
+
+=head2 get_array_unsafe
+
+  method get_array_unsafe : object[] ();
+
+Gets the internally array.
+
+This array is unsafe because it continues to point to the old array if the internal array is extended.
 
 =head2 unshift
 

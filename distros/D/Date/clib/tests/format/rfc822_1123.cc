@@ -2,7 +2,7 @@
 
 #define TEST(name) TEST_CASE("format-rfc822_1123: " name, "[format-rfc822_1123]")
 
-void test (string name, string_view str, ptime_t epoch, string_view tzabbr) {
+void test (std::string name, string_view str, ptime_t epoch, string_view tzabbr) {
     SECTION(name) {
         Date d(str);
         CHECK(!d.error());

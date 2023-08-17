@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 29 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData/AOA.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'TableData/DBI.pm',
     'TableData/Munge/Concat.pm',
     'TableData/Munge/Filter.pm',
+    'TableData/Munge/MungeColumns.pm',
     'TableData/Munge/Reverse.pm',
     'TableData/Sample/DeNiro.pm',
     'TableData/Test/Source/AOA.pm',
@@ -26,6 +27,7 @@ my @module_files = (
     'TableData/Test/Source/Iterator.pm',
     'TableDataRole/Munge/Concat.pm',
     'TableDataRole/Munge/Filter.pm',
+    'TableDataRole/Munge/MungeColumns.pm',
     'TableDataRole/Munge/Reverse.pm',
     'TableDataRole/Source/AOA.pm',
     'TableDataRole/Source/AOH.pm',

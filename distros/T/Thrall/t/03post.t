@@ -5,25 +5,18 @@ use warnings;
 
 BEGIN { delete $ENV{http_proxy} }
 
-# workaround for HTTP::Tiny + Test::TCP
-BEGIN { $INC{'threads.pm'} = 0 }
-sub threads::tid { }
-use HTTP::Tiny;
-use Test::TCP;
-BEGIN { delete $INC{'threads.pm'} }
-BEGIN { $SIG{__WARN__} = sub { warn @_ if not $_[0] =~ /^Subroutine tid redefined/ } }
-
+use LWP::UserAgent;
 use Plack::Runner;
 use Test::More;
-
+use Test::TCP;
 
 if ($^O eq 'MSWin32' and $] >= 5.016 and $] < 5.019005 and not $ENV{PERL_TEST_BROKEN}) {
     plan skip_all => 'Perl with bug RT#119003 on MSWin32';
     exit 0;
 }
 
-if (not eval { HTTP::Tiny->VERSION(0.014) }) {
-    plan skip_all => 'HTTP::Tiny >= 0.014 required';
+if ($^O eq 'cygwin' and not eval { require Win32::Process; }) {
+    plan skip_all => 'Win32::Process required';
     exit 0;
 }
 
@@ -32,24 +25,24 @@ test_tcp(
         my $port = shift;
         my $runner = Plack::Runner->new;
         $runner->parse_options(
-            qw(--server Thrall --env test --quiet --max-workers 0 --port), $port,
+            qw(--server Thrall --env test --quiet --max-workers 10 --ipv6=0 --host 127.0.0.1 --port), $port,
         );
         $runner->run(
             sub {
                 my $env = shift;
                 my $buf = '';
-                        while (length($buf) != $env->{CONTENT_LENGTH}) {
+                while (length($buf) != $env->{CONTENT_LENGTH}) {
                     my $rlen = $env->{'psgi.input'}->read(
                         $buf,
                         $env->{CONTENT_LENGTH} - length($buf),
                         length($buf),
                     );
-                    last unless $rlen > 0;
+                    last if $rlen <= 0;
                 }
                 return [
                     200,
-                    [ 'Content-Type' => 'text/plain' ],
-                    [ $buf ],
+                    ['Content-Type' => 'text/plain'],
+                    [$buf],
                 ];
             },
         );
@@ -69,11 +62,15 @@ Content-Length: 6\r
 EOT
         undef $sock;
         note 'send next request';
-        my $ua = HTTP::Tiny->new( timeout => 10 );
-        my $res = $ua->post_form("http://127.0.0.1:$port/", { a => 1 });
-        ok $res->{success};
-        is $res->{status}, 200;
-        is $res->{content}, 'a=1';
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(10);
+        my $res = $ua->post("http://127.0.0.1:$port/", { a => 1 });
+
+        ok $res->is_success, 'is_success';
+        is $res->code, '200', 'code';
+        is $res->message, 'OK', 'message';
+        is $res->content, 'a=1', 'content';
     },
 );
 

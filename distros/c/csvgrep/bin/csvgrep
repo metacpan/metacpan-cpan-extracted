@@ -14,6 +14,8 @@ my $PROGRAM              = basename($0);
 my $SHOW_COUNT_THRESHOLD = 7;
 my $usage_string         = "usage: $PROGRAM [-h] [-c <cols>] [-d <dir>] [-i] [-mc <col>] <pattern> <file>\n";
 my $case_insensitive     = 0;
+my $back_count           = 0;
+my $use_tab_separator;
 my $match_column;
 my $column_spec;
 
@@ -30,12 +32,18 @@ sub show_matching_rows
     my $total_rows           = 0;
     my @col_indices;
     my @rows;
+    my $fh;
 
     # TSV files have tab as separator instead of comma
-    $sep_char = "\t" if $filename =~ /\.tsv$/;
+    $sep_char = "\t" if $filename =~ /\.tsv$/ || $use_tab_separator;
 
-    open(my $fh, '<:encoding(utf8)', $filename)
-        || die "can't read $filename: $!\n";
+    if ($filename eq '-') {
+        $fh = \*STDIN;
+    }
+    else {
+        open($fh, '<:encoding(utf8)', $filename)
+            || die "can't read $filename: $!\n";
+    }
 
     my $parser     = Text::CSV_XS->new({ sep_char => $sep_char });
     my @headers    = @{ $parser->getline($fh) };
@@ -105,6 +113,18 @@ sub process_command_line
 {
     my $dirpath;
     my $help = 0;
+    my $back_notation = "--back ";
+
+    # -N is shorthand for --back N
+    # Getopt::Long has the <> pseudo option for handling
+    # things like this, but I couldn't get it to work right,
+    # so for now we futz with @ARGV before calling GetOptions
+    for (my $i = 0; $i < int(@ARGV); ++$i) {
+        if ($ARGV[$i] =~ /-([1-9][0-9]*)$/) {
+            splice(@ARGV, $i, 1, "--back", $1);
+            $back_notation = "-";
+        }
+    }
 
     GetOptions(
         'ignore-case|i'     => \$case_insensitive,
@@ -112,7 +132,13 @@ sub process_command_line
         'columns|c=s'       => \$column_spec,
         'directory|d=s'     => \$dirpath,
         'match-column|mc=s' => \$match_column,
+        'tab|t'             => \$use_tab_separator,
+        'back|b=i'          => \$back_count,
     ) || die $usage_string;
+
+    if (!defined($dirpath) && $back_count != 0) {
+        die "You can only use ${back_notation}$back_count in conjunction with -d\n";
+    }
 
     die $usage_string if ($help);
     die $usage_string unless @ARGV == 2
@@ -143,7 +169,9 @@ sub find_newest_file
 
     die "no .csv files found in $dirpath\n" unless @files > 0;
 
-    return "$dirpath/$files[0]";
+    die "no file found $back_count back!\n" if $back_count > 0 && $back_count > int(@files);
+
+    return "$dirpath/$files[$back_count]";
 }
 
 __END__
@@ -250,6 +278,11 @@ only considering files with a C<.csv> or C<.tsv> extension:
 
  % csvgrep -d /usr/local/feeds/users -i smith
 
+If you want to look at 2 files back, you can use the C<--back 2>
+option, or the shorthand version, C<-2>:
+
+ % csvgrep -d /usr/local/feeds/users -2 -i smith
+
 I have various aliases defined, like this:
 
  alias tg="csvgrep -d .../file.csv -c 0,1,2 -i"
@@ -292,6 +325,10 @@ Search the most recently modified C<.csv> or C<.tsv> file in
 the specified directory,
 and grep thar.
 
+=item --back E<lt>NE<gt> | -E<lt>NE<gt>
+
+Go N back in the list of files, when using the C<-d> option.
+
 =item -h
 
 Display short help message.
@@ -305,6 +342,11 @@ Case-insensitive grep.
 Only search the specified column,
 which can be specified with the column's name or index
 (starting at 0).
+
+=item -t
+
+Use TAB as the field separator.
+This will be picked automatically for files with a C<.tsv> extension.
 
 =back
 

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+#              Copyright Catch2 Authors
+# Distributed under the Boost Software License, Version 1.0.
+#   (See accompanying file LICENSE.txt or copy at
+#        https://www.boost.org/LICENSE_1_0.txt)
+
+# SPDX-License-Identifier: BSL-1.0
+
 """
 This test script verifies that the random ordering of tests inside
 Catch2 is invariant in regards to subsetting. This is done by running
@@ -12,6 +19,12 @@ import subprocess
 import sys
 import random
 import xml.etree.ElementTree as ET
+
+def none_to_empty_str(e):
+    if e is None:
+        return ""
+    assert type(e) is str
+    return e
 
 def list_tests(self_test_exe, tags, rng_seed):
     cmd = [self_test_exe, '--reporter', 'xml', '--list-tests', '--order', 'rand',
@@ -26,7 +39,9 @@ def list_tests(self_test_exe, tags, rng_seed):
         raise RuntimeError("Unexpected error output:\n" + process.stderr)
 
     root = ET.fromstring(stdout)
-    result = [elem.text for elem in root.findall('./TestCase/Name')]
+    result = [(none_to_empty_str(tc.find('Name').text),
+               none_to_empty_str(tc.find('Tags').text),
+               none_to_empty_str(tc.find('ClassName').text)) for tc in root.findall('./TestCase')]
 
     if len(result) < 2:
         raise RuntimeError("Unexpectedly few tests listed (got {})".format(

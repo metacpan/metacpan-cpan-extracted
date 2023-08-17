@@ -34,12 +34,8 @@ sub new {
 
 
 sub browse_the_table {
-    my ( $sf, $qt_table, $qt_columns ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sql = {};
-    $ax->reset_sql( $sql );
-    $sql->{table} = $qt_table;
-    $sql->{cols} = $qt_columns;
     $sf->{d}{stmt_types} = [ 'Select' ];
     my $changed = {};
     $ax->print_sql_info( $ax->get_sql_info( $sql ) );
@@ -251,22 +247,24 @@ sub __selected_statement_result {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
-    my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-    unshift @{$sf->{d}{table_print_history}}, [ $statement, \@arguments ];
+    unshift @{$sf->{d}{table_print_history}}, $statement;
     if ( $#{$sf->{d}{table_print_history}} > 50 ) {
         $#{$sf->{d}{table_print_history}} = 50;
     }
     my $sth = $sf->{d}{dbh}->prepare( $statement );
-    $sth->execute( @arguments );
+    $sth->execute();
     my $col_names = $sth->{NAME}; # not quoted
     my $all_arrayref = $sth->fetchall_arrayref;
     unshift @$all_arrayref, $col_names;
 
     if ( $sf->{i}{driver} eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
         print 'Decoding: ...' . "\r"  if $sf->{o}{table}{progress_bar};
-        require Encode;
+        my $encoding = Encode::find_encoding( $sf->{o}{G}{db2_encoding} );
+        if ( ! ref $encoding ) {
+            die qq(encoding "$sf->{o}{G}{db2_encoding}" not found);
+        }
         for my $row ( @$all_arrayref ) {
-            $_ = Encode::decode( $sf->{o}{G}{db2_encoding}, $_ ) for @$row;
+            $_ = $encoding->decode( $_ ) for @$row;
         }
     }
     return $all_arrayref;
@@ -292,7 +290,7 @@ sub __get_filename_fs {
         # Readline
         $file_name = $tr->readline(
             'File name: ',
-            { info => $info, default => $file_name, hide_cursor => 2 }
+            { info => $info, default => $file_name, hide_cursor => 2, history => [] }
         );
         $ax->print_sql_info( $info );
         if ( ! length $file_name ) {

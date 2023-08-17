@@ -1,10 +1,10 @@
 {
-   "abstract" : "The HyperScript like library for Perl.",
+   "abstract" : "Let's write html/xml templates as perl code!",
    "author" : [
       "OKAMURA Naoki a.k.a nyarla: <nyarla@kalaclista.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.21",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::HyperScript" : {
          "file" : "lib/Text/HyperScript.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "Text::HyperScript::Boolean" : {
          "file" : "lib/Text/HyperScript.pm"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/nyarla/p5-Text-HyperScript"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

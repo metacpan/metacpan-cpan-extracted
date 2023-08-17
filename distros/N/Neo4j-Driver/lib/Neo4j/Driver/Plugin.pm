@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.36';
+$Neo4j::Driver::Plugin::VERSION = '0.40';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.36
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,7 @@ for this event and a L<Neo4j::Error> object. The driver's
 default behaviour for this event basically is to
 C<< die $error->as_string() >>.
 
-The driver does not expect event handlers to survive execution.
+The driver does not expect error event handlers to survive execution.
 If you don't call C<die()>, the driver session is likely to be
 in an inconsistent state and you should expect further errors.
 To safely continue after errors, C<use feature 'try'>.
@@ -571,8 +571,7 @@ your code is used in production.
 If you have difficulties achieving your goals without the use of
 driver internals or private APIs, you are most welcome to file a
 GitHub issue about that (or write to my CPAN email address with
-your concerns; make sure you mention Neo4j in the subject to beat
-the spam filters).
+your concerns).
 
 I can't I<promise> that I'll be able to accommodate your use case,
 but I am going to try.

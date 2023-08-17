@@ -11,7 +11,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 =head2 SYNOPSIS 
 
 
- PACKAGE NAME: old_data 
+ PERL PROGRAM NAME: old_data 
  AUTHOR: Juan Lorenzo
  DATE:  Sept. 18 2015 
 
@@ -245,8 +245,8 @@ sub type {
 				  . $old_data->{_gather_num_suffix};
 
 				$old_data->{_TX_inbound} =
-				  $PL_SEISMIC . '/' . $old_data->{_textfile_in}
-				  if defined( ( $old_data && $PL_SEISMIC ) );
+				  $DATA_SEISMIC_TXT . '/' . $old_data->{_textfile_in}
+				  if defined( ( $old_data && $DATA_SEISMIC_TXT ) );
 				$ans = $test->does_file_exist( \$old_data->{_TX_inbound} );
 
 				# print("TX in is $old_data->{_TX_inbound}\n\n");
@@ -286,8 +286,8 @@ sub type {
 				  . $old_data->{_gather_num_suffix};
 
 				$old_data->{_TX_inbound} =
-				  $PL_SEISMIC . '/' . $old_data->{_textfile_in}
-				  if defined( ( $old_data && $PL_SEISMIC ) );
+				  $DATA_SEISMIC_TXT . '/' . $old_data->{_textfile_in}
+				  if defined( ( $old_data && $DATA_SEISMIC_TXT ) );
 				$ans = $test->does_file_exist( \$old_data->{_TX_inbound} );
 
 				return ($ans);
@@ -327,9 +327,9 @@ sub type {
   file name definitions
 
 
-  $itop_mute_picks 	= $PL_SEISMIC.'/'.$itop_mute_check_pickfile_.$old_data->{_file_in};
+  $itop_mute_picks 	= $PL_SE$DATA_SEISMIC_TXTitop_mute_check_pickfile_.$old_data->{_file_in};
 
-  $itop_mute_par         = $PL_SEISMIC.'/'.$itop_mute_par_.$old_data->{_file_in};
+  $itop_mute_par         = $DATA_SEISMIC_TXT.'/'.$itop_mute_par_.$old_data->{_file_in};
 
 #	 set defaults
 #         Do old mute files exist 
@@ -352,9 +352,9 @@ return $old_data->{_find};
   file name definitions
 
 
-  $itop_mute_picks 	= $PL_SEISMIC.'/'.$itop_mute_check_pickfile_.$old_data->{_file_in};
+  $itop_mute_picks 	= $DATA_SEISMIC_TXT.'/'.$itop_mute_check_pickfile_.$old_data->{_file_in};
 
-  $itop_mute_par         = $PL_SEISMIC.'/'.$itop_mute_par_.$old_data->{_file_in};
+  $itop_mute_par         = $DATA_SEISMIC_TXT.'/'.$itop_mute_par_.$old_data->{_file_in};
 
 #	 set defaults
 #         Do old mute files exist 

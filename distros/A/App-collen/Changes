@@ -1,0 +1,6 @@
+
+Revision history for the module "App::collen"
+
+
+0.150  2023-08-12T15:04+0900  App::collen として切り出すことにした。必要であったが今まで単体として公開していなかったため。
+

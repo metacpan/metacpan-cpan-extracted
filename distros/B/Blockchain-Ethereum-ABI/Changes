@@ -1,0 +1,31 @@
+Revision history for Blockchain-Ethereum-ABI
+0.010
+    [Improvements]
+    - Major refactoring
+0.009
+    - fix minor documentation bugs
+    - tuple signature check
+    - remove tidy backup and cache
+0.008
+    - private methods, correct package name
+0.007
+    - remove required test dependencies
+0.006
+    - change license
+0.005
+    - remove organization name from root
+0.004
+    [Bug Fixes]
+    - fix POD
+0.003
+    [Bug Fixes]
+    - set version to encoder/decoder modules to avoid upload conflict after structure change
+0.002
+    [Bug Fixes]
+    - set cpanfile Test::Fatal correct version
+    [Improvements]
+    - added clean for encode/decode functions
+    - project main structure moved to ABI instead of sub-modules
+
+0.001 2022-10-23
+    - initial release

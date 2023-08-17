@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.006';    # VERSION
 
 =head1 NAME
 

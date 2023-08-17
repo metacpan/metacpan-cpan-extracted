@@ -19,10 +19,15 @@ Perl модуль Finance::Quote::Moex
 ```bash
 FQ_LOAD_QUOTELET="-defaults Moex" gnucash
 ```
-2. у GnuCash есть файл настройки среды - `/etc/gnucash/enviroment` (для linux, в остальных думаю есть подобное). Достаточно в конец добавить  
-```
-FQ_LOAD_QUOTELET=-defaults Moex
-```
+2. у GnuCash есть файл настройки среды (общий для всех пользователей)
+  * для Linux `/etc/gnucash/enviroment`;
+  * для Windows `C:\Program Files (x86)\gnucash\etc\gnucash`.  
+  
+  Достаточно в конец добавить: 
+
+  ```
+  FQ_LOAD_QUOTELET=-defaults Moex
+  ```
 3. Поправить модуль загрузки Finance::Quote, как это описано в ручной установке.
 
 ### Установка из cpan
@@ -140,3 +145,8 @@ FQ_LOAD_QUOTELET="-defaults Moex"
 ```
 ONLINE_TEST="y" make test 
 ```
+
+Установка Finance::Quote 
+------------------------
+
+Для установки Finance::Quote на Windows нужно предпринять дополнительные шаги. Согласно [документации GnuCash (eng)](https://wiki.gnucash.org/wiki/Online_Quotes) достаточно запустить "Install Online Price Retrieval" ярлык из меню пуск в группе GnuCash. Эту команду можно запустить через bat файл в недрах каталога установленного GnuCash `C:\Program Files (x86)\gnucash\bin\install-fq-mods.cmd`. Она установит perl и все необходимые модули.

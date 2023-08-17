@@ -4,7 +4,7 @@
       "Curtis \"Ovid\" Poe <curtis.poe@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -84,7 +84,7 @@
             "Function::Parameters" : "2.001003",
             "Future" : "0.48",
             "Future::AsyncAwait" : "0.58",
-            "Syntax::Keyword::MultiSub" : "0.02",
+            "Syntax::Keyword::MultiSub" : "0.03",
             "Syntax::Keyword::Try" : "0.027"
          }
       },
@@ -113,35 +113,35 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Moose::Exception::InvalidImportList" : {
          "file" : "lib/Moose/Exception/InvalidImportList.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended::Custom" : {
          "file" : "lib/MooseX/Extended/Custom.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended::Role::Custom" : {
          "file" : "lib/MooseX/Extended/Role/Custom.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
@@ -156,7 +156,7 @@
          "web" : "https://github.com/Ovid/moosex-extended"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_contributors" : [
       "gmbow <g@mbow.org>",
       "Graham Knop <haarg@haarg.org>",
@@ -165,8 +165,8 @@
       "Toby Inkster <github@toby.ink>",
       "Wesley Schwengle <wesleys@opperschaap.net>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

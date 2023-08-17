@@ -26,8 +26,8 @@ t/6-file-glob.t
 t/7-check-dynaloader.t
 t/8-check_duplicated_entries.t
 t/9-check_path_to_inc_name.t
-t/data/case-insensitive-keys/Test.pm
-t/data/case-insensitive-keys/Test2.pm
+t/data/case-insensitive-keys/Foo.pm
+t/data/case-insensitive-keys/Foo2.pm
 t/data/case-insensitive-keys/that_case.pl
 t/data/case-insensitive-keys/this_case.pl
 t/data/check_path_to_inc_name/Scoped/Package.pm
@@ -37,10 +37,12 @@ t/data/duplicated_entries/Scoped/Package.pm
 t/data/duplicated_entries/use_scoped_package.pl
 t/data/file-glob-no.pl
 t/data/file-glob-yes.pl
+t/data/minimal.pl
 t/data/modules/Foo.pm
 t/data/pluggable/Foo.pm
 t/data/pluggable/Foo/Plugin/Bar.pm
 t/data/pluggable/Foo/Plugin/Baz.pm
+t/data/prefork.pl
 t/data/rt90869.pl
 t/data/ScanFileRE/auto/example/example.h
 t/data/ScanFileRE/example.pm

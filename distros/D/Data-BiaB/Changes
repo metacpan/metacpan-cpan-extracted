@@ -1,5 +1,9 @@
 Revision history for Data-BiaB
 
+0.11	Jul 26 2023
+
+	Fixed version problem for Perl 5.39.
+
 0.10    Aug 01 2016
         First version, released on an unsuspecting world.
 

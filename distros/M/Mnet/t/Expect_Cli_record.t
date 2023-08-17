@@ -38,10 +38,10 @@ Mnet::T::test_perl({
     name    => 'command method record',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -70,12 +70,12 @@ Mnet::T::test_perl({
     name    => 'command method record with cache clear',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo output one
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
             echo output two
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '

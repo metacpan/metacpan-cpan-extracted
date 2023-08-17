@@ -9,6 +9,7 @@ t/ca.crt
 t/check.t
 t/connect.t
 t/delete.t
+t/fork-merge.t
 t/list.t
 t/modify.t
 t/query.t

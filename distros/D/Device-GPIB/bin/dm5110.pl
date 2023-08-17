@@ -76,7 +76,7 @@ do
     sleep($main::opt_delay)
 	if $main::opt_delay;
 }
-while (defined $main::opt_loop && ($main::opt_loop < 0 || ++$loop_count < $main::opt_loop));
+while (defined $main::opt_loop && ($main::opt_loop == 0 || (++$loop_count < $main::opt_loop)));
 
 
 if (defined $main::opt_query)

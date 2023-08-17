@@ -1,0 +1,228 @@
+#!/usr/bin/env perl
+#ABSTRACT: CLI for Photobear powered image processing
+#PODNAME: photobear
+use v5.18;
+use File::Basename;
+use warnings;
+use Getopt::Long;
+use File::Spec::Functions qw(catfile);
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+if (-d 'lib') {
+    use lib 'lib';
+}
+use App::Photobear;
+my $BASE = basename($0);
+my $HOME = $ENV{HOME};
+my $CONFIG_FILE = catfile(catfile($HOME, '.config'), 'photobear.ini');
+my $CONFIG = App::Photobear::loadconfig($CONFIG_FILE);
+my $API_KEY = $CONFIG->{"api_key"} || $ENV{PHOTOBEAR_API_KEY};
+my $opt_config_file;
+my $opt_api_key;
+my $opt_verbose;
+my $opt_outdir = ".";
+my @MODES = @App::Photobear::MODES;
+GetOptions(
+    'o|outdir=s' => \$opt_outdir,
+    'api-key=s' => \$opt_api_key,
+    'config=s'  => \$opt_config_file,
+    'verbose'   => \$opt_verbose,
+    'h|help'      => sub { usage(); exit 0 },
+);
+
+if ($opt_config_file) {
+    say STDERR YELLOW, "# Using config file $opt_config_file", RESET if $opt_verbose;
+    $CONFIG = App::Photobear::loadconfig($opt_config_file);
+    $API_KEY = $CONFIG->{"api_key"} if $CONFIG->{"api_key"};
+} 
+if ($opt_api_key) {
+    if (not defined $API_KEY) {#
+        say STDERR YELLOW, "# Saving API KEY to $CONFIG_FILE", RESET if $opt_verbose;
+        $CONFIG->{"api_key"} = $opt_api_key;
+        App::Photobear::writeconfig($CONFIG_FILE, $CONFIG);
+    }
+    
+}
+
+if (not defined $API_KEY) {
+    usage();
+    say STDERR RED, "\n# No API KEY found [$CONFIG_FILE]", RESET if $opt_verbose;
+    say STDERR "ERROR: API-KEY is required, add it to $CONFIG_FILE or use --api-key option, or the \$PHOTOBEAR_API_KEY environment variable";
+    exit 1;
+}
+
+my $mode = shift @ARGV;
+my $url  = shift @ARGV;
+
+
+if (not defined $mode) {
+    usage();
+    say STDERR RED, "\n ERROR: No command specified", RESET;
+    exit 1;
+} elsif (not grep { $_ eq $mode } @MODES) {
+    
+    usage();
+    say STDERR RED, "\nERROR: Unknown mode $mode", RESET;
+    exit 1;
+}
+
+# Check URL
+if (not defined $url) {
+    usage();
+    say STDERR "\nERROR: No URL specified";
+    exit 1;
+} else {
+    my $check = App::Photobear::url_type($url);
+    if (not defined $check) {
+        say STDERR "\nERROR: Invalid URL $url";
+        exit 1;
+    } elsif ($check !~/image/i) {
+        say STDERR "\nWARNING: URL $url might not point to an image";
+    }
+}
+
+if (! -d $opt_outdir) {
+    eval { mkdir $opt_outdir };
+    if ($@) {
+        say STDERR "\nERROR: Cannot create output directory $opt_outdir";
+        exit 1;
+    }
+}
+my $out = App::Photobear::photobear($API_KEY, $mode, $url);
+
+if ($out->{"status"} ne "success") {
+    say Dumper $out;
+    say STDERR "\nWRONG REQUEST\n";
+    exit 1;
+} else {
+    say STDERR "URL: ", GREEN $out->{"data"}->{"result_url"}, RESET;
+    my $dest = catfile($opt_outdir, basename($out->{"data"}->{"result_url"}));
+    say STDERR "Saving to: ", GREEN, $dest, RESET;
+    App::Photobear::download($out->{"data"}->{"result_url"}, $dest);
+    exit 0;
+}
+
+sub usage {
+
+    my $modes = join(' ', @MODES);
+    print <<EOF;
+ Usage: $BASE [options] <command> <url>
+
+   Commands:
+    $modes
+     
+   General options:
+    --api-key <key>     API key to use 
+    --config <file>     Config file to use [~/.config/photobear.ini]
+    --verbose           Print verbose output
+    --help              Print this help message
+EOF
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+photobear - CLI for Photobear powered image processing
+
+=head1 VERSION
+
+version 0.1.2
+
+=head1 SYNOPSIS
+
+  photobear [options] <command> <url>
+
+=head1 DESCRIPTION
+
+This is a command-line interface (CLI) program for Photobear (L<https://photobear.io>), a tool for image processing. 
+It allows you to perform various operations on images using different commands and a provided URL.
+
+You will need an API key to use the program.
+
+=head1 CONFIGURATION FILE
+
+The program looks for a configuration file at C<~/.config/photobear.ini>, like:
+
+  [photobear]
+  api_key=YOUR_API_KEY
+
+Alternatively you can set the environment variable C<PHOTOBEAR_API_KEY> to your API key, or use the --api-key option.
+
+=head1 COMMANDS
+
+The program supports the following commands:
+
+=over 4
+
+=item B<background_removal>
+
+Remove the background from the image specified by the URL.
+
+=item B<vectorization>
+
+Vectorize the image specified by the URL (output in SVG format).
+
+=item B<super_resolution>
+
+Enlarge the image specified by the URL.
+
+=item B<compress>
+
+Compress the image specified by the URL.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o, --outdir>
+
+Output directory for the processed image. By default, the program saves the image in the current directory.
+
+=item B<--api-key STRING>
+
+Specify the API key to use for accessing Photobear. This key is required for authentication.
+
+=item B<--config FILE>
+
+Specify the configuration file to use. By default, the program looks for the configuration file at C<~/.config/photobear.ini>.
+
+=item B<--verbose>
+
+Print verbose output during the execution of the program.
+
+=item B<--help>
+
+Print the help message, which includes a list of commands and their usage.
+
+=back
+
+=head1 EXAMPLES
+
+Trace an image:
+
+  photobear vectorization https://example.com/image.jpg -o outputdir
+
+=head1 REQUIREMENTS
+
+This program works under B<MacOS> and B<Linux>, and requires Perl 5.18 or higher and C<curl> to be installed.
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

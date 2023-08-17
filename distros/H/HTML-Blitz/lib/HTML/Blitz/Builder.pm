@@ -3,7 +3,7 @@ use HTML::Blitz::pragma;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 our @EXPORT_OK = qw(
     mk_doctype
@@ -350,7 +350,7 @@ Lukas Mai, C<< <lmai at web.de> >>
 Copyright 2022 Lukas Mai.
 
 This module is free software: you can redistribute it and/or modify it under
-the terms of the L<GNU Affero General Public License|https://www.gnu.org/licenses/agpl-3.0.txt>
+the terms of the L<GNU General Public License|https://www.gnu.org/licenses/gpl-3.0.html>
 as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 

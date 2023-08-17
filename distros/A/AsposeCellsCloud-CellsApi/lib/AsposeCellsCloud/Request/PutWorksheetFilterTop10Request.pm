@@ -59,17 +59,17 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetFilterTop10Request.name :   ,
-# PutWorksheetFilterTop10Request.sheetName :   ,
-# PutWorksheetFilterTop10Request.range :   ,
-# PutWorksheetFilterTop10Request.fieldIndex :   ,
-# PutWorksheetFilterTop10Request.isTop :   ,
-# PutWorksheetFilterTop10Request.isPercent :   ,
-# PutWorksheetFilterTop10Request.itemCount :   ,
-# PutWorksheetFilterTop10Request.matchBlanks :   ,
-# PutWorksheetFilterTop10Request.refresh :   ,
-# PutWorksheetFilterTop10Request.folder :   ,
-# PutWorksheetFilterTop10Request.storageName :    
+# PutWorksheetFilterTop10Request.name : The workbook name.  ,
+# PutWorksheetFilterTop10Request.sheetName : The worksheet name.  ,
+# PutWorksheetFilterTop10Request.range : Represents the range to which the specified AutoFilter applies.  ,
+# PutWorksheetFilterTop10Request.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
+# PutWorksheetFilterTop10Request.isTop : Indicates whether filter from top or bottom  ,
+# PutWorksheetFilterTop10Request.isPercent : Indicates whether the items is percent or count  ,
+# PutWorksheetFilterTop10Request.itemCount : The item count  ,
+# PutWorksheetFilterTop10Request.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
+# PutWorksheetFilterTop10Request.refresh : If true, hide the filtered rows.  ,
+# PutWorksheetFilterTop10Request.folder : Original workbook folder.  ,
+# PutWorksheetFilterTop10Request.storageName : Storage name.   
 
 {
     my $params = {
@@ -80,7 +80,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_filter_top10' } = { 
-    	summary => '',
+    	summary => 'Filters the top 10 item in the list in worksheet',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -165,77 +165,77 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'string',
      	base_name => 'range',
-     	description => '',
+     	description => 'Represents the range to which the specified AutoFilter applies.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).',
      	format => '',
      	read_only => '',
      		},
      'is_top' => {
      	datatype => 'string',
      	base_name => 'isTop',
-     	description => '',
+     	description => 'Indicates whether filter from top or bottom',
      	format => '',
      	read_only => '',
      		},
      'is_percent' => {
      	datatype => 'string',
      	base_name => 'isPercent',
-     	description => '',
+     	description => 'Indicates whether the items is percent or count',
      	format => '',
      	read_only => '',
      		},
      'item_count' => {
      	datatype => 'int',
      	base_name => 'itemCount',
-     	description => '',
+     	description => 'The item count',
      	format => '',
      	read_only => '',
      		},
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => '',
+     	description => 'Match all blank or  not blank cell in the list.(true/false)',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => '',
+     	description => 'If true, hide the filtered rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

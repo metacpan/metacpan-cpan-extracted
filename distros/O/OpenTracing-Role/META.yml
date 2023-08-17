@@ -5,6 +5,7 @@ author:
 build_requires:
   Devel::StrictMode: '0'
   ExtUtils::MakeMaker: '0'
+  Moo: '0'
   Test::Deep: '1.130'
   Test::Interface: '0'
   Test::MockObject::Extends: '0'
@@ -28,6 +29,7 @@ no_index:
 requires:
   Carp: '0'
   Data::GUID: '0'
+  List::Util: '0'
   Moo::Role: '0'
   MooX::Enumeration: '0'
   MooX::HandlesVia: '0'
@@ -35,6 +37,7 @@ requires:
   MooX::Should: v0.1.4
   OpenTracing::Interface: v0.206.1
   OpenTracing::Types: '0'
+  Ref::Util: '0'
   Role::Declare::Should: '0'
   Sub::Trigger::Lock: '0'
   Time::HiRes: '0'
@@ -42,5 +45,8 @@ requires:
   Types::Common::Numeric: '0'
   Types::Standard: '0'
   Types::TypeTiny: '0'
-version: v0.86.0
+resources:
+  bugtracker: https://github.com/Perceptyx/perl-opentracing-roles/issues
+  repository: https://github.com/Perceptyx/perl-opentracing-roles.git
+version: v0.86.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

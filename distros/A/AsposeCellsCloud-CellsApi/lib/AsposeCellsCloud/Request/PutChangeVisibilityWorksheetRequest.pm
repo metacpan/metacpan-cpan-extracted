@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutChangeVisibilityWorksheetRequest.name :   ,
-# PutChangeVisibilityWorksheetRequest.sheetName :   ,
-# PutChangeVisibilityWorksheetRequest.isVisible :   ,
-# PutChangeVisibilityWorksheetRequest.folder :   ,
-# PutChangeVisibilityWorksheetRequest.storageName :    
+# PutChangeVisibilityWorksheetRequest.name : The workbook name.  ,
+# PutChangeVisibilityWorksheetRequest.sheetName : Worksheet name.  ,
+# PutChangeVisibilityWorksheetRequest.isVisible : New worksheet visibility value.  ,
+# PutChangeVisibilityWorksheetRequest.folder : Original workbook folder.  ,
+# PutChangeVisibilityWorksheetRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_change_visibility_worksheet' } = { 
-    	summary => '',
+    	summary => 'Changes worksheet visibility.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'is_visible' => {
      	datatype => 'string',
      	base_name => 'isVisible',
-     	description => '',
+     	description => 'New worksheet visibility value.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

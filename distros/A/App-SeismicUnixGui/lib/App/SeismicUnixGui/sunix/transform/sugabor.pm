@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::transform::sugabor;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUGABOR -  Outputs a time-frequency representation of seismic data via
+ PERL PROGRAM NAME:  SUGABOR -  Outputs a time-frequency representation of seismic data via
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

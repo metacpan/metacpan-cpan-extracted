@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.07';
+	our $VERSION = '0.08';
 }
 
 # file-scoped lexicals
@@ -273,6 +273,12 @@ this module only supports two sets: the standard tasks and the tag list.
 sub login {
 	my ($self, $user, $pass, $options) = @_;
 
+	if ($self->{authenticated}) {
+		$Error = 'Already logged in';
+		carp ($Error);
+		return;
+	}
+
 	unless (defined $user) {
 		$Error = 'No username (tagname) supplied';
 		carp ($Error);
@@ -284,6 +290,8 @@ sub login {
 		carp ($Error);
 		return;
 	}
+
+	$self->_go_connect () unless $self->{connected};
 
 	# Set login frame
 	my $login = Net::EPP::Frame::Command::Login->new;
@@ -337,6 +345,13 @@ sub login {
 	$self->{authenticated} = 1;
 	$self->{login_params} = [$user, $pass, $options];
 	return $self;
+}
+
+sub logout {
+	my $self = shift;
+	my $res = $self->SUPER::logout (@_);
+	$self->{authenticated} = 0 if $res;
+	return $res;
 }
 
 =head1 Availability checks
@@ -937,12 +952,20 @@ sub modify_domain {
 	for my $action ('add', 'rem', 'chg') {
 		if ($data->{$action}) {
 			$name = $frame->createElement ("domain:$action");
-			if ($data->{$action}->{ns}) {
+			if ($action ne 'chg' && $data->{$action}->{ns}) {
 				my $name2 = $frame->createElement ("domain:ns");
 				for my $ns (@{$data->{$action}->{ns}}) {
 					$self->_add_nsname ($name2, $frame, $ns);
 				}
 				$name->appendChild ($name2);
+			} elsif ($action eq 'chg') {
+				if ($data->{$action}->{registrant}) {
+					my $name2 = $frame->createElement ("domain:registrant");
+					$name2->appendText ($data->{$action}->{registrant});
+					$name->appendChild ($name2);
+				} else {
+					carp "'chg' is present but no 'registrant' field";
+				}
 			}
 			$obj->appendChild ($name);
 		}
@@ -1037,6 +1060,14 @@ Note that due to an undocumented restriction in Nominet's EPP servers
 it is not possible to modify the disclose flags for both addr and org
 to different values in one request.
 
+If the hashref contains the key C<new-id> like so:
+
+    my $changes = { id => 'ABC123', 'new-id' => 'XYZ789' };
+
+then the ID of the contact will be changed to the new ID (which must
+be unique in the entire registry). In this case any other fields in the
+hashref will be ignored.
+
 =cut
 
 sub update_contact {
@@ -1047,7 +1078,11 @@ sub update_contact {
 sub modify_contact {
 	my ($self, $cont, $data) = @_;
 
-	# Sort out the domain to be updated
+	# If given a 'new-id', update that and nothing else
+	return $self->_modify_contact_id ($cont, $data->{'new-id'})
+		if exists $data->{'new-id'};
+
+	# Sort out the contact to be updated
 	my $frame;
 	my @spec = $self->spec ('contact');
 	$frame = Net::EPP::Frame::Command::Update->new;
@@ -1157,6 +1192,26 @@ sub modify_contact {
 	return $Code == 1000 ? 1 : undef;
 }
 
+sub _modify_contact_id {
+	my ($self, $old_id, $new_id) = @_;
+
+	my @spec  = $self->spec ('contact-id');
+	my $frame = Net::EPP::Frame::Command::Update->new;
+	my $obj   = $frame->addObject (@spec);
+	my $id    = $frame->createElement ('contact-id:id');
+	$id->appendText ($old_id);
+	$obj->appendChild ($id);
+	my $chg = $frame->createElement ('contact-id:chg');
+	$id     = $frame->createElement ('contact-id:id');
+	$id->appendText ($new_id);
+	$chg->appendChild ($id);
+	$obj->appendChild ($chg);
+
+	$frame->getCommandNode->appendChild ($obj);
+	my $response = $self->_send_frame ($frame);
+	return $Code == 1000 ? 1 : undef;
+}
+
 =head2 Modify nameservers
 
 To modify a nameserver, you will need to create a hashref of the
@@ -1215,6 +1270,59 @@ sub modify_host {
 	$frame->getCommandNode->appendChild ($obj);
 	my $response = $self->_send_frame ($frame);
 	return $Code == 1000 ? 1 : undef;
+}
+
+=head1 Fork contact
+
+	my $res = $epp->fork ($old_id, $new_id, @domains);
+
+Splitting out some domains on a contact to a copy of that contact can be
+achieved using C<fork()>. The first optional argument is the existing
+contact ID. If this is undef then the existing contact will be that on
+the listed domains.
+
+The second optional argument is the ID of the new contact to create. If
+this is undef then a random ID will be assigned by Nominet.
+
+The third and subsequent arguments are the domain names to be moved from the
+existing contact to the new.
+
+Returns the new contact ID on success, undef otherwise.
+
+=cut
+
+sub fork {
+	my ($self, $old_id, $new_id, @doms) = @_;
+
+	my $type   = 'f';
+	my @spec   = $self->spec ($type);
+	my $frame  = Net::EPP::Frame::Command::Update->new;
+
+	my $obj    = $frame->createElement ('f:fork');
+	$obj->setAttribute ("xmlns:$type", $spec[1]);
+
+	if (defined $old_id) {
+		my $id = $frame->createElement ('f:contactId');
+		$id->appendText ($old_id);
+		$obj->appendChild ($id);
+	}
+	if (defined $new_id) {
+		my $id = $frame->createElement ('f:newContactId');
+		$id->appendText ($new_id);
+		$obj->appendChild ($id);
+	}
+	for my $dom (@doms) {
+		my $elem = $frame->createElement ('f:domainName');
+		$elem->appendText ($dom);
+		$obj->appendChild ($elem);
+	}
+
+	$frame->getCommandNode->appendChild ($obj);
+	my $response = $self->_send_frame ($frame);
+	return undef unless $Code == 1000;
+	my $id = $response->getNode ('contact:id')->firstChild->toString ();
+	warn "Forked contact ID is $id\n" if $Debug;
+	return $id;
 }
 
 =head1 Querying objects
@@ -1478,7 +1586,7 @@ reset any inactivity timeout which the server might apply. Nominet's
 documentation seems to indicate a 60 minute timeout (as at August 2013).
 
 	my $res = $epp->hello ();
-	
+
 The hello method takes no arguments. It returns 1 on success, undef
 otherwise.
 
@@ -1521,8 +1629,8 @@ array of type, XMLNS and XSI for use with various frame and XML
 routines. It is not expected to be called independently by the user but
 is here if you need it.
 
-Type can currently be one of: domain, contact, contact-ext,
-host, l (for list), u (for unrenew), r (for release)
+Type can currently be one of: domain, contact, contact-ext, contact-id
+host, l (for list), u (for unrenew), r (for release), f (for fork)
 
 	my @spec = $epp->spec ('domain');
 
@@ -1559,6 +1667,11 @@ sub spec {
 			'http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0',
 			'http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0 contact-nom-ext-1.0.xsd');
 	}
+	if ($type eq 'contact-ext' or $type eq 'contact-id') {
+		return ($type,
+			'http://www.nominet.org.uk/epp/xml/std-contact-id-1.0',
+			'http://www.nominet.org.uk/epp/xml/std-contact-id-1.0 std-contact-id-1.0.xsd');
+	}
 	if ($type eq 'host') {
 		return ($type,
 			"urn:ietf:params:xml:ns:host-$EPPVer",
@@ -1578,6 +1691,11 @@ sub spec {
 		return ($type,
 			"http://www.nominet.org.uk/epp/xml/std-release-1.0",
 			"http://www.nominet.org.uk/epp/xml/std-release-1.0 std-release-1.0.xsd");
+	}
+	if ($type eq 'f') {
+		return ($type,
+			"http://www.nominet.org.uk/epp/xml/std-fork-1.0",
+			"http://www.nominet.org.uk/epp/xml/std-fork-1.0 std-fork-1.0.xsd");
 	}
 	if ($type eq 'tag') {
 		return ($type,
@@ -1750,7 +1868,7 @@ sub _send_frame {
 
 =over
 
-=item * The poll, fork, handshake, lock and reseller operations
+=item * The poll, handshake, lock and reseller operations
 are not yet supported.
 
 =item * Much more extensive tests should be performed.
@@ -1779,7 +1897,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2022 by Pete Houston. It is released
+This software is copyright © 2013-2023 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

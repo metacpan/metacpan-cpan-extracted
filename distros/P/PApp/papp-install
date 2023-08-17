@@ -86,11 +86,12 @@ if ($mode_install) {
    my $umask = umask 022;
    mkdir $ETCDIR, 0777;
    umask 077;
-   install ("config", "$ETCDIR/config"); chmod 0644, "$ETCDIR/config";
-   install ("secure", "$ETCDIR/secure"); chmod 0600, "$ETCDIR/secure";
-   umask $umask;
-   print "\n$ETCDIR/secure is mode 600, better chown or chgrp it to the group
-   your webserver or trusted user is running under.\n\n";
+   unless ($mode_skipconfig) {
+      install ("config", "$ETCDIR/config"); chmod 0644, "$ETCDIR/config";
+      install ("secure", "$ETCDIR/secure"); chmod 0600, "$ETCDIR/secure";
+      umask $umask;
+      print "\n$ETCDIR/secure is mode 600, better chown or chgrp it to the group your webserver or trusted user is running under.\n\n";
+   }
 }
 
 if ($mode_init || $mode_update) {

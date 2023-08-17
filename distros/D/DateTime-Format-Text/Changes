@@ -1,5 +1,13 @@
 Revision history for DateTime-Format-Text
 
+0.06
+	Fix misparse of "Foo in November 2009 Bar. XYZZY 45th PLUGH 7th TULIP"
+		which parsed as 45/11/09
+
+0.05 Tue Jun 27 21:40:01 EDT 2023
+	Croak if we can't work out the date
+	Fix misparsing of the string "6 February 1870-18/19 August 1914"
+
 0.04	Fri May 26 14:07:19 EDT 2023
 	Remove errant return statement
 	In array context, ensure that the array is in the same order as the

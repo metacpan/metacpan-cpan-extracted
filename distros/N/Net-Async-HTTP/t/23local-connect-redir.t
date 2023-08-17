@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -64,23 +64,13 @@ $loop->listen(
 
    on_listen_error => sub { die "Test failed early - $_[-1]" },
    on_resolve_error => sub { die "Test failed early - $_[-1]" },
-);
+)->get;
 
-wait_for { defined $port };
-
-my $response;
-
-$http->do_request(
+my $response = $http->do_request(
    uri => URI->new( "http://127.0.0.1:$port/redir" ),
 
-   on_response => sub {
-      $response = $_[0];
-   },
-
    on_error => sub { die "Test failed early - $_[-1]" },
-);
-
-wait_for { defined $response };
+)->get;
 
 is( $response->content_type, "text/plain", '$response->content_type' );
 is( $response->content, "OK", '$response->content' );

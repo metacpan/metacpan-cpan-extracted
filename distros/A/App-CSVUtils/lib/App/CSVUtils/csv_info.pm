@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -68,7 +68,7 @@ App::CSVUtils::csv_info - Show information about CSV file (number of rows, field
 
 =head1 VERSION
 
-This document describes version 1.024 of App::CSVUtils::csv_info (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of App::CSVUtils::csv_info (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 FUNCTIONS
 

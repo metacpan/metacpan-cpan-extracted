@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +23,12 @@ meta-spec:
 name: App-Test-DWG-LibreDWG-JSON
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
 requires:
+  CAD::AutoCAD::Detect: 0.02
   Capture::Tiny: 0
   File::Copy: 0
   File::Path: 0
@@ -41,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-JSON
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-JSON
-version: '0.01'
+version: '0.03'

@@ -44,6 +44,7 @@ files
 
 =cut
 
+use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::misc::readfiles';
 use aliased 'App::SeismicUnixGui::misc::manage_files_by';
@@ -51,22 +52,25 @@ use App::SeismicUnixGui::misc::control '0.0.3';
 use aliased 'App::SeismicUnixGui::misc::control';
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($itop_mute $ibot_mute $ivpicks_sorted_par_ $ep $fldr
-  $cdp);
+  $cdp $mute $su $suffix_su $suffix_txt $velan);
 
 =head2 instantiate new variables
 
 =cut
 
 my $get             = L_SU_global_constants->new();
+my $Project         = Project_config->new();
 my $manage_files_by = manage_files_by->new();
+
+my $DATA_SEISMIC_SU  = $Project->DATA_SEISMIC_SU();    # output seismic data directory
+my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();   # output list directory
 
 =head2 declare local variables
 
 =cut
 
-my $var = $get->var();
+my $var          = $get->var();
 my $empty_string = $var->{_empty_string};
-
 
 =head2 newline:
 
@@ -105,6 +109,7 @@ my $sucat = {
 	_input_suffix         => '',
 	_data_type            => '',
 	_output_file_name     => '',
+	_outbound             => '',
 	_velan_data           => '',
 	_Step                 => ''
 };
@@ -118,7 +123,7 @@ my $sucat = {
 sub clear {
 	my ($self) = @_;
 	$sucat->{_first_file_number_in} = '';
-	$sucat->{_gather_type}          = '';	
+	$sucat->{_gather_type}          = '';
 	$sucat->{_inbound_directory}    = '';
 	$sucat->{_input_name_extension} = '';
 	$sucat->{_input_suffix}         = '';
@@ -130,6 +135,7 @@ sub clear {
 	$sucat->{_number_of_files_in}   = '';
 	$sucat->{_input_suffix}         = '';
 	$sucat->{_output_file_name}     = '';
+	$sucat->{_outbound}             = '';
 	$sucat->{_Step}                 = '';
 }
 
@@ -142,6 +148,7 @@ sub _get_data_type {
 
 	if (    $sucat->{_list_directory} ne $empty_string
 		and $sucat->{_list} ne $empty_string )
+		
 	{
 
 		# my $velan = $ivpicks_sorted_par_;
@@ -159,7 +166,8 @@ sub _get_data_type {
 		my @data_type;
 		my $data_type;
 
-		my $inbound_list = $sucat->{_list_directory} . '/' . $sucat->{_list};
+		my $inbound_list =
+		  $sucat->{_list_directory} . '/' . $sucat->{_list} . $suffix_txt;
 
 		my ( $array_ref, $num_gathers ) = $read->cols_1p($inbound_list);
 
@@ -173,9 +181,9 @@ sub _get_data_type {
 
 				#CASE 1 for mute-type files
 
-				$data_type[$i] = 'mute';
+				$data_type[$i] = $mute;
 
-#				print("sucat,_get_data_type, success, matched mute\n");
+				#				print("sucat,_get_data_type, success, matched mute\n");
 
 			}
 			elsif ( $file_name =~ m/$ivpicks_sorted_par_/ ) {
@@ -183,13 +191,20 @@ sub _get_data_type {
 				#CASE 2 for velan-type files
 
 				# print("success, matched velan\n");
-				$data_type[$i] = 'velan';
+				$data_type[$i] = $velan;
+
+			}
+			elsif ( $file_name =~ m/$suffix_su/ ) {
+
+				# print("success, matched $su\n");
+				$data_type[$i] = $su;
 
 			}
 			else {
-				#				print("sucat,_get_data_type, mismatch\n");
+				print("sucat,_get_data_type, mismatch\n");
 				$data_type[$i] = $empty_string;
 			}
+
 		}
 
 		# all data types must be the same
@@ -231,8 +246,12 @@ sub _get_data_type {
 sub _get_gather_type {
 	my ($self) = @_;
 
-	if (    $sucat->{_list_directory} ne $empty_string
-		and $sucat->{_list} ne $empty_string )
+	if (
+			length $sucat->{_list_directory}
+		and length $sucat->{_list}
+		and ( ( $sucat->{_data_type} eq $velan )
+			 or $sucat->{_data_type} eq $mute )
+	  )
 	{
 
 =head2 instantiate packages
@@ -248,7 +267,8 @@ sub _get_gather_type {
 		my @gather_type;
 		my $gather_type;
 
-		my $inbound_list = $sucat->{_list_directory} . '/' . $sucat->{_list};
+		my $inbound_list =
+		  $sucat->{_list_directory} . '/' . $sucat->{_list} . $suffix_txt;
 
 		my ( $array_ref, $num_gathers ) = $read->cols_1p($inbound_list);
 
@@ -256,7 +276,7 @@ sub _get_gather_type {
 
 			my $file_name = @$array_ref[$i];
 
-			if (   $file_name =~ m/$fldr/  
+			if (   $file_name =~ m/$fldr/
 				or $file_name =~ m/$cdp/ )
 			{
 
@@ -272,7 +292,7 @@ sub _get_gather_type {
 				#CASE 2 for velan-type files
 
 				# print("success, matched velan\n");
-				$gather_type[$i] = 'velan';
+				$gather_type[$i] = $ep;
 
 			}
 			else {
@@ -280,14 +300,14 @@ sub _get_gather_type {
 			}
 		}
 
-		# all data types must be the same
+		# all gather types must be the same
 		$gather_type = $gather_type[0];
 
 		for ( my $i = 0 ; $i < $num_gathers ; $i++ ) {
 
 			if ( $gather_type[0] eq $gather_type[$i] ) {
 
-				# print("sucat,_get_gather_type, gather_type is consistent NADA\n");
+			# print("sucat,_get_gather_type, gather_type is consistent NADA\n");
 
 			}
 			elsif ( $gather_type[0] ne $gather_type[$i] ) {
@@ -308,7 +328,7 @@ sub _get_gather_type {
 
 	}
 	else {
-		print("sucat,_get_gather_type,missing list and its directory\n");
+#		print("sucat,_get_gather_type, missing list and its directory NADA\n");
 	}
 }
 
@@ -325,7 +345,7 @@ sub _set_data_type {
 
 		$sucat->{_data_type} = $data_type;
 
-		# print("sucat, _set_data_type, data_type = $sucat->{_data_type}\n");
+		print("sucat, _set_data_type, data_type = $sucat->{_data_type}\n");
 
 	}
 	else {
@@ -341,14 +361,14 @@ sub _set_data_type {
 =cut
 
 sub _set_gather_type {
-	
+
 	my ($gather_type) = @_;
 
 	if ( $gather_type ne $empty_string ) {
 
 		$sucat->{_gather_type} = $gather_type;
 
-		# print("sucat, _set_gather_type, gather_type = $sucat->{_gather_type}\n");
+	 # print("sucat, _set_gather_type, gather_type = $sucat->{_gather_type}\n");
 
 	}
 	else {
@@ -359,7 +379,7 @@ sub _set_gather_type {
 
 =head2 sub data_type
 
- data_type can be velan,su,txt
+ data_type can be velan,su,txt,mute
 
 =cut
 
@@ -391,21 +411,26 @@ sub data_type {
 		my ( $values_aref, $ValuesPerRow_aref );
 		my $rows;
 
-		my $gather_type = _get_gather_type();
-		my $data_type   = _get_data_type();
+		my $data_type = _get_data_type();
 		_set_data_type($data_type);
+		my $gather_type = _get_gather_type();
 
-		# print("sucat, data_type, data_type=---$data_type---\n\n");
+#		print("sucat, data_type, data_type=---$data_type---\n\n");
 
-		if ( $data_type ne $empty_string ) {
+		if (
+			$data_type ne $empty_string
+			&& (   $data_type eq $velan
+				or $data_type eq $mute )
+		  )
+		{
 
 			my $inbound_list =
-			  $sucat->{_list_directory} . '/' . $sucat->{_list};
+			  $sucat->{_list_directory} . '/' . $sucat->{_list}. $suffix_txt;
 			my ( $ref_array, $num_gathers ) = $read->cols_1p($inbound_list);
 
 			my $DIR_OUT = $sucat->{_list_directory};
 
-			# print("sucat,data_type,num_gathers: $num_gathers\n");
+#			print("sucat,data_type,num_gathers: $num_gathers\n");
 
 =head2
 
@@ -435,12 +460,12 @@ sub data_type {
 
 				my $gather_name = @$ref_array[$file_number];
 
-				# print("reading gather: $gather_name\n");
+				print("sucat,reading gather: $gather_name\n");
 
 				# read number only after last underscore
 				my @splits = split( /_/, $gather_name );
 
-				# print("sucat, splits are:: @splits\n");
+				print("sucat, splits are:: @splits\n");
 				my $last_split_index = $#splits;
 
 				my $last_split = $splits[$last_split_index];
@@ -466,8 +491,8 @@ into an array.
 				$result_t[$line] = @$values_aref[0];
 				$result_v[$line] = @$values_aref[1];
 
-				# print("sucat,data_type,t: $result_t[$line]\n");
-				# print("sucat,data_type,v: $result_v[$line]\n");
+#				print("sucat,data_type,t: $result_t[$line]\n");
+#				print("sucat,data_type,v/x: $result_v[$line]\n");
 
 			}    # end repeat over all mute- or velan-type files
 
@@ -496,53 +521,81 @@ into an array.
 
 			}
 
-			if ( $data_type eq 'velan' ) {
+			if ( $data_type eq $velan ) {
 
-				$manage_files_by->write_cdp( \@sorted_gather_number, $DIR_OUT);
+				$manage_files_by->write_cdp( \@sorted_gather_number, $DIR_OUT );
 				$manage_files_by->write_tnmo_vnmo( \@sorted_gather_number,
 					\@sorted_result_t, \@sorted_result_v, $DIR_OUT );
 
 			}
-			elsif ( $data_type eq 'mute' ) {
-
+			elsif ( $data_type eq $mute ) {
+				
+				# print("sucat,data_type. Data types are mute.\n\n");
 				$manage_files_by->write_gather( \@sorted_gather_number,
 					$DIR_OUT, $gather_type );
-
-				# print("sucat,data_type. Data types are mute.\n\n");
 				$manage_files_by->write_tmute_xmute( \@sorted_gather_number,
 					\@sorted_result_t, \@sorted_result_v, $DIR_OUT );
 
 			}
+
 			else {
 				print("sucat, data_type, unrecognized data_type\n");
 			}
 
 		}
 		else {
-			print(
-				"sucat,data_type. Data types are not:  mute or velan.
-Ignore special formats. Using simple cat. NADA\n\n"
-			);
+			#			print(
+			#				"sucat,data_type. Data types are not:  mute or velan.
+			#Ignore special formats. Using simple cat. NADA\n\n"
+			#			);
 		}
 	}
 }
 
-=head2 sub test:
-
- example of how to use a class method
+=head2 sub get_outbound
 
 =cut
 
-sub test {
-	my ( $test, @value ) = @_;
-	print(
-		"\$test or the first_file_number_in scalar  'holds' a  HASH $test 
- that represents the name of the  
- subroutine you are trying to use and all its needed components\n"
-	);
-	print(
-"\@value, the second scalar is something 'real' you put in, i.e., @value\n\n"
-	);
+sub get_outbound {
+
+	my ($variable) = @_;
+
+	if (    length $sucat->{_outbound}
+		and length $sucat->{_data_type} 
+		and length $sucat->{_output_file_name})
+		
+	{
+		# CASE of list
+		if ( $sucat->{_data_type} eq $su ) {
+
+			my $result = $sucat->{_outbound} . $suffix_su;
+			return ($result);
+			
+		}elsif( $sucat->{_data_type} eq $mute ) {
+			
+			my $result = $DATA_SEISMIC_TXT . '/'. $sucat->{_output_file_name}. $suffix_txt;
+			return ($result);
+		}
+		else {
+			my $result = $sucat->{_outbound};    # no change
+			return ($result);
+		}
+
+	}elsif (  length $sucat->{_outbound}
+		and not length $sucat->{_data_type} 
+		and length $sucat->{_output_file_name}){
+			
+			# CASE of no list
+			my $result = $sucat->{_outbound};    # no change
+			return ($result);
+	}
+	else {
+		print("sucat,get_outbound: missing parameter\n");
+		print("outbound=$sucat->{_outbound}\n");
+		print("data_type=$sucat->{_data_type}\n");		
+		print("output_file_name=$sucat->{_output_file_name}\n");		
+	}
+
 }
 
 =head2 sub first_file_number_in:
@@ -579,7 +632,6 @@ sub inbound_directory {
 		$sucat->{_inbound_directory} = $inbound_directory;
 	}
 	else {
-
 		# print("sucat,inbound_directory: NADA\n");
 	}
 
@@ -597,13 +649,14 @@ sub input_name_extension {
 	my ( $variable, $input_name_extension ) = @_;
 
 	if ( $input_name_extension ne $empty_string ) {
+		
 		$sucat->{_input_name_extension} = $input_name_extension;
+		
 	}
 	else {
 
 		# print("sucat,input_name_extension: NADA\n");
 	}
-
 }
 
 =head2 sub input_name_prefix 
@@ -678,6 +731,8 @@ sub list {
 
 	if ( $list ne $empty_string ) {
 		$sucat->{_list} = $list;
+
+		# print("sucat,list is $sucat->{_list}\n");
 	}
 	else {
 
@@ -696,11 +751,11 @@ sub list_directory {
 	my ( $variable, $list_directory ) = @_;
 
 	if ( $list_directory ne $empty_string ) {
-		
+
 		$sucat->{_list_directory} = $list_directory;
 
 	}
-	
+
 	else {
 		# print("sucat,list_directory: NADA\n");
 	}
@@ -742,10 +797,11 @@ sub outbound_directory {
 	my ( $variable, $outbound_directory ) = @_;
 
 	if ( $outbound_directory ne $empty_string ) {
+		
 		$sucat->{_outbound_directory} = $outbound_directory;
+		
 	}
 	else {
-
 		# print("sucat,outbound_directory: NADA\n");
 	}
 
@@ -761,10 +817,11 @@ sub output_file_name {
 	my ( $variable, $output_file_name ) = @_;
 
 	if ( $output_file_name ne $empty_string ) {
+		
 		$sucat->{_output_file_name} = $output_file_name;
+		
 	}
 	else {
-
 		# print("sucat,output_file_name: NADA\n");
 	}
 
@@ -780,10 +837,11 @@ sub set_list_aref {
 	my ( $variable, $list_aref ) = @_;
 
 	if ( $list_aref ne $empty_string ) {
+		
 		$sucat->{_list_aref} = $list_aref;
+		
 	}
 	else {
-
 		# print("sucat,set_list_aref: NADA\n");
 	}
 
@@ -793,6 +851,23 @@ sub set_list_aref {
   #print(
   #	"sucat, set_list_aref, number_of_files_in=$sucat->{_number_of_files_in}\n\n"
   #);
+}
+
+=head2 sub set_outbound
+
+=cut
+
+sub set_outbound {
+	my ( $variable, $outbound ) = @_;
+
+	if ( length $outbound ) {
+
+		$sucat->{_outbound} = $outbound;
+	}
+	else {
+		print("sucat,set_outbound: missing parameter\n");
+	}
+
 }
 
 =head2 subroutine Step  
@@ -818,11 +893,11 @@ sub Step {
 		# CASE 1A- without data type
 		if ( $sucat->{_data_type} eq $empty_string ) {
 
-			# print(" list is $sucat->{_Step}\n\n");
+			print(" sucat, Step, no list with data_type: $sucat->{_Step}\n\n");
 
 			for ( my $i = 0 ; $i < $sucat->{_number_of_files_in} ; $i++ ) {
 
-				# CASE 1A-1 : there is an input sufffix specified by user
+				# CASE 1A-1 : there is an input suffix specified by user
 				if ( $sucat->{_input_suffix} ne $empty_string ) {
 					print(
 						"Warning: Incorrect settings. Either \n
@@ -859,7 +934,7 @@ sub Step {
 		# CASE 1B: data_type does exist
 		elsif ( $sucat->{_data_type} ne $empty_string ) {
 
-			if ( $sucat->{_data_type} eq 'velan' ) {
+			if ( $sucat->{_data_type} eq $velan ) {
 
 				$sucat->{_Step} =
 					$sucat->{_Step}
@@ -867,10 +942,12 @@ sub Step {
 				  . $sucat->{_list_directory} . '/' . '.tv' . '\\'
 				  . $newline;
 
-		  print("sucat,Step, case of velan,sucat->{_Step}=$sucat->{_Step}\n");
+				print(
+					"sucat,Step, case of velan,sucat->{_Step}=$sucat->{_Step}\n"
+				);
 
 			}
-			elsif ( $sucat->{_data_type} eq 'mute' ) {
+			elsif ( $sucat->{_data_type} eq $mute ) {
 
 				$sucat->{_Step} =
 					$sucat->{_Step}
@@ -880,8 +957,22 @@ sub Step {
 				  . $newline;
 
 			}
+			elsif ( $sucat->{_data_type} eq $su ) {
+
+				for ( my $i = 0 ; $i < $sucat->{_number_of_files_in} ; $i++ ) {
+
+					$sucat->{_Step} =
+						$sucat->{_Step}
+					  . $DATA_SEISMIC_SU . '/'
+					  . @{ $sucat->{_list_aref} }[$i] . ' \\'
+					  . $newline;
+
+				}
+
+			}
+
 			else {
-				print(" list sucat,Step,unexpected data_type\n\n");
+				print(" sucat,Step,unexpected data_type\n\n");
 			}
 		}
 		else {
@@ -919,7 +1010,7 @@ sub Step {
 
 				# CASE 2A-2 there is no input suffix specified by user
 				elsif ( $sucat->{_input_suffix} eq $empty_string ) {
-					
+
 					$sucat->{_Step} =
 						$sucat->{_Step} . ' '
 					  . $sucat->{_inbound_directory} . '/'
@@ -956,14 +1047,14 @@ sub Step {
 					  . $sucat->{_inbound_directory} . '/'
 					  . $sucat->{_input_name_prefix}
 					  . $file
-					  . $sucat->{_input_name_extension}
-					  . '.'.$sucat->{_input_suffix};
+					  . $sucat->{_input_name_extension} . '.'
+					  . $sucat->{_input_suffix};
 					print("2A-1 sucat,Step,file=$file\n");
 				}
 
 				# CASE 2A-2 there is no input suffix specified by user
 				elsif ( $sucat->{_input_suffix} eq $empty_string ) {
-					
+
 					$sucat->{_Step} =
 						$sucat->{_Step} . ' '
 					  . $sucat->{_inbound_directory} . '/'

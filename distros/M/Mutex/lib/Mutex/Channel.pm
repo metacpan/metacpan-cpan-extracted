@@ -11,7 +11,10 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.007';
+our $VERSION = '1.009';
+
+use if $^O eq 'MSWin32', 'threads';
+use if $^O eq 'MSWin32', 'threads::shared';
 
 use base 'Mutex';
 use Mutex::Util;
@@ -49,6 +52,7 @@ sub DESTROY {
 sub new {
     my ($class, %obj) = (@_, impl => 'Channel');
     $obj{_init_pid} = $tid ? $$ .'.'. $tid : $$;
+    $obj{_t_lock} = threads::shared::share( my $t_lock ) if $is_MSWin32;
 
     $use_pipe
         ? Mutex::Util::pipe_pair(\%obj, qw(_r_sock _w_sock))
@@ -62,7 +66,8 @@ sub new {
 sub lock {
     my ($pid, $obj) = ($tid ? $$ .'.'. $tid : $$, shift);
 
-    Mutex::Util::_sock_ready($obj->{_r_sock}) if $is_MSWin32;
+    CORE::lock($obj->{_t_lock}), Mutex::Util::_sock_ready($obj->{_r_sock})
+        if $is_MSWin32;
     Mutex::Util::_sysread($obj->{_r_sock}, my($b), 1), $obj->{ $pid } = 1
         unless $obj->{ $pid };
 
@@ -88,7 +93,8 @@ sub synchronize {
     return unless ref($code) eq 'CODE';
 
     # lock, run, unlock - inlined for performance
-    Mutex::Util::_sock_ready($obj->{_r_sock}) if $is_MSWin32;
+    CORE::lock($obj->{_t_lock}), Mutex::Util::_sock_ready($obj->{_r_sock})
+        if $is_MSWin32;
     Mutex::Util::_sysread($obj->{_r_sock}, $b, 1), $obj->{ $pid } = 1
         unless $obj->{ $pid };
 
@@ -114,14 +120,15 @@ sub timedwait {
     local $@; my $ret = '';
 
     eval {
-        local $SIG{ALRM} = sub { die "alarm clock restart\n" };
+        local $SIG{ALRM} = sub { alarm 0; die "alarm clock restart\n" };
         alarm $timeout unless $is_MSWin32;
 
         die "alarm clock restart\n"
             if $is_MSWin32 && Mutex::Util::_sock_ready($obj->{_r_sock}, $timeout);
 
-        $obj->lock_exclusive, $ret = 1;
-        alarm 0 unless $is_MSWin32;
+        (!$is_MSWin32)
+            ? ($obj->lock_exclusive, $ret = 1, alarm(0))
+            : ($obj->lock_exclusive, $ret = 1);
     };
 
     alarm 0 unless $is_MSWin32;
@@ -145,7 +152,7 @@ Mutex::Channel - Mutex locking via a pipe or socket
 
 =head1 VERSION
 
-This document describes Mutex::Channel version 1.007
+This document describes Mutex::Channel version 1.009
 
 =head1 DESCRIPTION
 

@@ -119,7 +119,6 @@ sub add_group
 sub as_string
 {
     my $self = shift( @_ );
-    $self->message( 5, "Is reset set ? ", ( exists( $self->{_reset} ) ? 'yes' : 'no' ), " and what is cache value '", ( $self->{_cache_value} // '' ), "' and raw cache '", ( $self->{raw} // '' ), "'" );
     if( !exists( $self->{_reset} ) || 
         !defined( $self->{_reset} ) ||
         !CORE::length( $self->{_reset} ) )
@@ -139,11 +138,9 @@ sub as_string
         my $lines = $self->new_array( $cache->scalar );
         $self->elements->foreach(sub
         {
-            $self->message( 4, "Calling as_string on $_" );
             my $this = $_->as_string;
             if( defined( $this ) )
             {
-                $self->message( 4, "Adding string '$this' to new lines" );
                 $lines->push( $this->scalar );
             }
         });
@@ -212,17 +209,12 @@ sub as_string
     my $nl = $self->nl;
     my $lines = $self->new_array;
     my $rel_str = $self->new_scalar( $v . ( $self->spacer // ' ' ) . "$dt" . ( $self->note->length ? ( ' ' . $self->note->scalar ) : '' ) . ( $nl // '' ) );
-    $self->message( 4, "Adding release string '$rel_str' to new lines." );
     $lines->push( $rel_str->scalar );
     $self->elements->foreach(sub
     {
-        $self->message( 4, "Calling as_string on $_" );
-        # XXX
-        $_->debug( $self->debug );
         my $this = $_->as_string;
         if( defined( $this ) )
         {
-            $self->message( 4, "Adding string '$this' (", overload::StrVal( $this ), ") to new lines" );
             $lines->push( $this->scalar );
         }
     });
@@ -276,7 +268,6 @@ sub delete_change
             my $pos = $elements->pos( $change );
             if( !defined( $pos ) )
             {
-                $self->message( 4, "No change object found for object $change (", overload::StrVal( $change ), ")" ) if( !defined( $pos ) );
                 next;
             }
             my $deleted = $elements->delete( $pos, 1 );
@@ -303,7 +294,6 @@ sub delete_group
             my $pos = $elements->pos( $group );
             if( !defined( $pos ) )
             {
-                $self->message( 4, "No group object found for object $group (", overload::StrVal( $group ), ")" );
                 next;
             }
             my $deleted = $elements->delete( $pos, 1 );
@@ -339,7 +329,6 @@ sub format { return( shift->reset(@_)->_set_get_scalar_as_object( 'format', @_ )
 sub freeze
 {
     my $self = shift( @_ );
-    $self->message( 5, "Removing the reset marker -> '", ( $self->{_reset} // '' ), "'" );
     CORE::delete( @$self{qw( _reset )} );
     $self->elements->foreach(sub
     {
@@ -441,7 +430,6 @@ sub reset
             !CORE::length( $self->{_reset} ) 
         ) && scalar( @_ ) )
     {
-        $self->message( 4, "Reset called from -> ", sub{ $self->_get_stack_trace } );
         $self->{_reset} = scalar( @_ );
         # Cascade down the need for reset
         $self->changes->foreach(sub

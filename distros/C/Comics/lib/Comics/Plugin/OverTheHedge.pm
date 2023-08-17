@@ -12,7 +12,7 @@ our $VERSION = "0.02";
 sub register {
     shift->SUPER::register
       ( { name    => "Over the hedge",
-	  url     => "http://www.comics.com/over_the_hedge",
+	  url     => "https://www.gocomics.com/over_the_hedge",
 	} );
 }
 

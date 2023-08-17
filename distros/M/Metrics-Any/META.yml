@@ -3,8 +3,7 @@ abstract: 'abstract collection of monitoring metrics'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,35 +16,35 @@ name: Metrics-Any
 provides:
   Metrics::Any:
     file: lib/Metrics/Any.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter:
     file: lib/Metrics/Any/Adapter.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter::File:
     file: lib/Metrics/Any/Adapter/File.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter::Null:
     file: lib/Metrics/Any/Adapter/Null.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter::Stderr:
     file: lib/Metrics/Any/Adapter/Stderr.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter::Tee:
     file: lib/Metrics/Any/Adapter/Tee.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Adapter::Test:
     file: lib/Metrics/Any/Adapter/Test.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::AdapterBase::Stored:
     file: lib/Metrics/Any/AdapterBase/Stored.pm
-    version: '0.09'
+    version: '0.10'
   Metrics::Any::Collector:
     file: lib/Metrics/Any/Collector.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   List::Util: '1.29'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

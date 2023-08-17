@@ -1,0 +1,66 @@
+{
+   "abstract" : "YAML Load YAMLScript Code as Data",
+   "author" : [
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YAML-PP-YAMLScript",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XXX" : "0.38",
+            "YAML::PP" : "0.036",
+            "YAMLScript" : "v0.1.11",
+            "perl" : "v5.16.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.48"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/yaml-pp-yamlscript-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/yaml-pp-yamlscript-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/yaml-pp-yamlscript-pm.git",
+         "web" : "https://github.com/ingydotnet/yaml-pp-yamlscript-pm"
+      }
+   },
+   "version" : "0.0.1",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

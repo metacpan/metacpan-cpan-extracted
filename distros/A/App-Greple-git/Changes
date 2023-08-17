@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-git
 
+0.04 2023-08-03T02:47:43Z
+
+    - introduce --only-git-files option
+
 0.03 2023-04-18T01:49:59Z
 
     - introduce --color-header-by-author option

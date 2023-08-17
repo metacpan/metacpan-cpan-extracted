@@ -182,6 +182,8 @@ sub executeCommand()
 
     print "execute $command\n" if $main::opt_debug;
     return if (index($command, '#') == 0); # Comment
+    return if length($command) == 0; # Empty
+    
     if ($command =~ /query:(.*)/i)
     {
 	# For commands that dont end in a ? but we still want to see the results eg from VREAD

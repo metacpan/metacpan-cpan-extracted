@@ -18,7 +18,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.35'
+    version: '0.36'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -48,12 +48,12 @@ provides:
 requires:
   Time::HiRes: '1.77'
   Try::Tiny: '0'
-  perl: '5.008001'
+  perl: '5.012000'
 resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
   repository: https://github.com/shogo82148/Redis-Fast.git
-version: '0.35'
+version: '0.36'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -68,6 +68,8 @@ x_contributors:
   - 'Gregor Herrmann <gregoa@debian.org>'
   - 'Ivan Kruglov <ivan.kruglov@booking.com>'
   - 'Ivan Kruglov <ivan.kruglov@yahoo.com>'
+  - 'James Raspass <jraspass@gmail.com>'
+  - 'Jan "Yenya" Kasprzak <kas@fi.muni.cz>'
   - 'Jeff Lavallee <jeff@zeroclue.com>'
   - 'Jose Luis Perez Diez <jluis@escomposlinux.org>'
   - 'João Bolila <joao@bolila.com>'

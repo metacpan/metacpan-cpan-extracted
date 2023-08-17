@@ -76,3 +76,19 @@ Revision history for Tk-JFileDialog
         low ASCII characters) file and directory-names to address a Perl 
         UTF-8/unicode bug.  Closes cpan bug (Feature-request)# 128958.
         * Added official license text and touched up docs.
+2.30    * Add effort to make the popup dialog window transient (for window-
+        managers).
+        * Allow and clarify (document) the use of most regex characters in 
+        file patterns and pattern list (-FPat & -FPatList options).
+        * Will now use Tk::JDialog in lieu of Tk::Dialog, if the former is 
+        installed.
+2.31    2023/06/21
+        * Fix strict catch of undefined variable added in v2.30. :-/
+        * (Hopefully) Fixed Tk-errors in edge-cases where Tk suddenly "can't 
+        autoload the listbox functions" after turning off (hiding) the 
+        directory list and re-show()ing the window (we now always create both 
+        the file & directory listboxes and hide any that are not to be shown).
+        * (Preemptive) - Make sure strict won't complain about undefined home 
+        directory variables (which differ between Windows and Linux).
+        * Add test to test harness to test for and report on the availibility 
+        and usage of the optional Tk::JDialog module (for error dialogs).

@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -33,6 +33,7 @@
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
@@ -83,19 +84,19 @@
    "provides" : {
       "YA::CLI" : {
          "file" : "lib/YA/CLI.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "YA::CLI::ActionRole" : {
          "file" : "lib/YA/CLI/ActionRole.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "YA::CLI::ErrorHandler" : {
          "file" : "lib/YA/CLI/ErrorHandler.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "YA::CLI::Usage" : {
          "file" : "lib/YA/CLI/Usage.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -106,12 +107,12 @@
          "web" : "https://gitlab.com/waterkip/yet-another-cli-module"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
-      "Wesley Schwengle <wesley@opperschaap.net>"
+      "Wesley Schwengle <waterkip@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "BSD"
 }
 

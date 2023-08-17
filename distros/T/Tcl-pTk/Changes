@@ -1,5 +1,21 @@
 Summary of Changes to Tcl::pTk
 
+1.11  2023-08-10
+
+ * font.t: Avoid `Wide character in print` warnings
+ * https://github.com/chrstphrchvz/perl-tcl-ptk/issues/26
+   Fix TkHijack error during `use Tk::widgets qw(…)` in Perl 5.39.1:
+
+     Attempt to call undefined import method with arguments via package "Tk::widgets"
+     (Perhaps you forgot to load the package?)
+
+ * https://github.com/chrstphrchvz/perl-tcl-ptk/issues/27
+   Fix error during `use Tcl::pTk::widgets qw(…)`
+   for widgets with .pm files in Perl/Tk but not Tcl::pTk, e.g.:
+
+     Can't locate Tcl/pTk/Label.pm in @INC
+     (you may need to install the Tcl::pTk::Label module)
+
 1.10  2022-10-07
 
  * Perl/Tk compatibility updates to Text widget:
@@ -16,7 +32,7 @@ Summary of Changes to Tcl::pTk
    and tkHijack_bgerror1.t
  * Implement $w->Widget() method
  * Improve $w->imageNames() method; fix bitmapSubClass.t and photoSubClass.t
- * Fix Tcl::pTk::Widget::_addcascade() for Tk 8.7
+ * Fix Tcl::pTk::Widget::_addcascade() for Tk 8.7 (TIP 577)
 
 1.08_02  2021-04-04
 

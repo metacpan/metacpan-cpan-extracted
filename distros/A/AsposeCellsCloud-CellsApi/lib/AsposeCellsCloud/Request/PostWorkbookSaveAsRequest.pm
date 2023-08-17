@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookSaveAsRequest.name :   ,
-# PostWorkbookSaveAsRequest.newfilename :   ,
+# PostWorkbookSaveAsRequest.name : The workbook name.  ,
+# PostWorkbookSaveAsRequest.newfilename : The new file name.  ,
 # PostWorkbookSaveAsRequest.saveOptions :   ,
-# PostWorkbookSaveAsRequest.isAutoFitRows :   ,
-# PostWorkbookSaveAsRequest.isAutoFitColumns :   ,
-# PostWorkbookSaveAsRequest.folder :   ,
-# PostWorkbookSaveAsRequest.storageName :   ,
+# PostWorkbookSaveAsRequest.isAutoFitRows : Indicates if Autofit rows in workbook.  ,
+# PostWorkbookSaveAsRequest.isAutoFitColumns : Indicates if Autofit columns in workbook.  ,
+# PostWorkbookSaveAsRequest.folder : Original workbook folder.  ,
+# PostWorkbookSaveAsRequest.storageName : Storage name.  ,
 # PostWorkbookSaveAsRequest.outStorageName :   ,
 # PostWorkbookSaveAsRequest.checkExcelRestriction :    
 
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_save_as' } = { 
-    	summary => '',
+    	summary => 'Converts document and saves result to storage.',
         params => $params,
         returns => 'SaveResponse',
     };
@@ -155,14 +155,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'newfilename' => {
      	datatype => 'string',
      	base_name => 'newfilename',
-     	description => '',
+     	description => 'The new file name.',
      	format => '',
      	read_only => '',
      		},
@@ -176,28 +176,28 @@ __PACKAGE__->method_documentation({
      'is_auto_fit_rows' => {
      	datatype => 'string',
      	base_name => 'isAutoFitRows',
-     	description => '',
+     	description => 'Indicates if Autofit rows in workbook.',
      	format => '',
      	read_only => '',
      		},
      'is_auto_fit_columns' => {
      	datatype => 'string',
      	base_name => 'isAutoFitColumns',
-     	description => '',
+     	description => 'Indicates if Autofit columns in workbook.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

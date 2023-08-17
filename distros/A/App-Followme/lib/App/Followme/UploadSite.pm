@@ -13,7 +13,7 @@ use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile catdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 use constant SEED => 96;
 
@@ -286,13 +286,15 @@ sub update_file {
         # Check extension, skip if not a web file
         my ($dir, $basename) = fio_split_filename($file);
         my ($ext) = $basename =~ /\.([^\.]*)$/;
-        next if $ext ne $self->{web_extension};
+        if ($ext eq $self->{web_extension}) {
+            my $page = fio_read_page($file);
 
-        my $page = fio_read_page($file);
-        my $new_page = $self->rewrite_base_tag($page) if $page;
-
-        $local_file = rel2abs(catfile($self->{state_directory}, $basename));
-        fio_write_page($local_file, $new_page);
+            if ($page) {
+                $page = $self->rewrite_base_tag($page);
+                $local_file = rel2abs(catfile($self->{state_directory}, $basename));
+                fio_write_page($local_file, $page);
+            }
+        }
     }
 
     # Upload the file and return the status of the upload

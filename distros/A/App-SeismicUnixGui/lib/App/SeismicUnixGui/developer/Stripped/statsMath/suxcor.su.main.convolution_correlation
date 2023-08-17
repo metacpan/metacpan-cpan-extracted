@@ -49,14 +49,15 @@
  suxcor < data sufile=sweep |						
  suwind itmin=nsweep itmax=nsweep+nsout | sushw key=delrt a=0.0 |...   
 
- sweep=vibroseis sweep in SU format, nsweep=number of samples on	
- the vibroseis sweep, nsout=desired number of samples on output	
+ sweep equals vibroseis sweep in SU format, nsweep=number of samples on	
+ the vibroseis sweep, nsout is equal to the 
+ desired number of samples on output	
 
  or									
  suxcor < data sufile=sweep |						
  suwind itmin=nsweep itmax=nsweep+nsout | sushw key=delrt a=0.0 |...   
 
- tsweep=sweep length in seconds, tout=desired output trace length in seconds
+ tsweep equals sweep length in seconds, tout equals desired output trace length in seconds
 
  In the spatially variant case (panel=1), a window with linear slope 	
  can be defined:						 	

@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use Padre::Locale::T;
 
-our $VERSION    = '1.00';
+our $VERSION    = '1.02';
 our $COMPATIBLE = '0.95';
 
 # The MIME object store
@@ -70,6 +70,8 @@ my %EXT = (
 	e     => 'text/x-eiffel',
 	exe   => 'application/octet-stream',
 	f     => 'text/x-fortran',
+	fs    => 'text/x-fsharp',
+	fsx   => 'text/x-fsharp',
 	htm   => 'text/html',
 	html  => 'text/html',
 	hs    => 'text/x-haskell',
@@ -81,6 +83,7 @@ my %EXT = (
 	lsp   => 'application/x-lisp',
 	lua   => 'text/x-lua',
 	m     => 'text/x-matlab',
+	mk    => 'text/x-makefile',
 	mak   => 'text/x-makefile',
 	pdf   => 'application/pdf',
 	pod   => 'text/x-pod',
@@ -966,6 +969,12 @@ Padre::MIME->create(
 );
 
 Padre::MIME->create(
+	type      => 'text/x-fsharp',
+	name      => "F#",
+	supertype => 'text/plain',
+);
+
+Padre::MIME->create(
 	type      => 'text/x-forth',
 	name      => 'Forth',
 	supertype => 'text/plain',
@@ -1222,7 +1231,7 @@ Padre::MIME->create(
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5 itself.

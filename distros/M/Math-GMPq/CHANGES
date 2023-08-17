@@ -1,7 +1,17 @@
 Revision history for Perl module Math::GMPq
 
+0.55
+ - Fix bugs in t/overload_op_eq.t
+
+0.54
+ - Expand cross-class overloading to include +=, -=, *=, /=, and **= operations,
+   conditionally available only when $Math::GMPq::RETYPE has been set to 1.
+ - Simplify overloading of '++' and '--'.
+
 0.53
  - Add Random/t/a_v_random.t
+ - Accommodate MS Visual Studio builds
+
 0.52
  - Limit test in Makefile.PL for GMPQ_PV_NV_BUG to perl-5.35.9 and earlier.
  - Enable building on Cywin quadmath builds. (Add '-lquadmath' to LIBS.)

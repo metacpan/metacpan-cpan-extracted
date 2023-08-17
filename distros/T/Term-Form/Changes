@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.554   2023-07-23
+    - Bugfix 'auto_up' 0 and 1: preserve info output.
+
 0.553   2023-02-17
     - Update year copyright.
     - Bugfix skip_items: check if key is defined.

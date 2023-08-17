@@ -381,6 +381,7 @@ t/ttkBrowseEntry.t
 t/ttkEntryValidate.t
 t/ttkTixNoteBook.t
 t/unicode.t
+t/usewidgets.t
 t/virtualEv.t
 t/widgetDelete.t
 t/widgetMethod.t

@@ -1,4 +1,4 @@
-Lexical::Failure version 0.000007
+Lexical::Failure version 0.001001
 
 This module sets up two new keywords: C<fail> and C<ON_FAILURE>,
 with which you can quickly create modules whose failure signaling

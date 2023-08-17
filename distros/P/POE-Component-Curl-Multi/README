@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.22
+    version 1.00
 
 SYNOPSIS
 
@@ -60,6 +60,12 @@ DESCRIPTION
 
     It is inspired by AnyEvent::Curl::Multi.
 
+    Versions of this module prior to 0.23 did not verify the peer's
+    certificate when performing SSL/TLS. As of 0.23 peer verification is
+    the default behaviour. If this is a problem for you then see the
+    verifypeer ( and optionally the verifyhost ) options to spawn and
+    request.
+
 CONSTRUCTOR
 
     spawn
@@ -100,6 +106,46 @@ CONSTRUCTOR
 
 	Specify the maximum number of concurrent requests, a value of 0
 	means no limit will be imposed. The default is 0.
+
+      ipresolve
+
+	Specify what kind of IP addresses to use when hostnames resolve to
+	more than one version of IP.
+
+	Specify 4 for IPv4 only or 6 for IPv6 only.
+
+	The default is curl's default which is whatever, which will use all
+	IP versions.
+
+	See https://curl.se/libcurl/c/CURLOPT_IPRESOLVE.html
+
+      verifypeer
+
+	Relevant to SSL/TLS, specify whether the authenticity of the peer's
+	certificate should be verified. Set to 1 for verification or 0 to
+	live dangerously.
+
+	Curl defaults to 1 if you don't specify this.
+
+	See https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html for the
+	full details.
+
+      verifyhost
+
+	Again relevant to SSL/TLS, specify whether the hostname on the
+	certificate is for the server it is known as.
+
+	Set to 2 to verify that the hostname (either in the Common Name
+	field or a Subject Alternative Name field) matches the hostname in
+	the URL.
+
+	Set to 0 to disable this verification and live with the
+	consequences.
+
+	Curl defaults to 2 if you don't specify this.
+
+	See https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html for the
+	full details.
 
       curl_debug
 
@@ -179,6 +225,44 @@ ACCEPTED EVENTS
       applicable.
 
       See http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTPROXY
+
+    ipresolve
+
+      Specify what kind of IP addresses to use when hostnames resolve to
+      more than one version of IP.
+
+      Specify 4 for IPv4 only or 6 for IPv6 only.
+
+      The default is curl's default which is whatever, which will use all
+      IP versions.
+
+      See https://curl.se/libcurl/c/CURLOPT_IPRESOLVE.html
+
+    verifypeer
+
+      Relevant to SSL/TLS, specify whether the authenticity of the peer's
+      certificate should be verified. Set to 1 for verification or 0 to
+      live dangerously.
+
+      Curl defaults to 1 if you don't specify this.
+
+      See https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html for the
+      full details.
+
+    verifyhost
+
+      Again relevant to SSL/TLS, specify whether the hostname on the
+      certificate is for the server it is known as.
+
+      Set to 2 to verify that the hostname (either in the Common Name field
+      or a Subject Alternative Name field) matches the hostname in the URL.
+
+      Set to 0 to disable this verification and live with the consequences.
+
+      Curl defaults to 2 if you don't specify this.
+
+      See https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html for the
+      full details.
 
     session
 
@@ -297,7 +381,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2021 by Chris Williams, Michael S.
+    This software is copyright (c) 2023 by Chris Williams, Michael S.
     Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
 
     This is free software; you can redistribute it and/or modify it under

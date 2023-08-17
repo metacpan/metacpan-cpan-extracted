@@ -3,7 +3,7 @@ package Task::Curses::UI;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 1;
 
@@ -40,6 +40,10 @@ Create and manipulate button widgets
 =item L<Curses::UI::Calendar>
 
 Create and manipulate calendar widgets
+
+=item L<Curses::UI::Char>
+
+Create and manipulate character widgets.
 
 =item L<Curses::UI::Checkbox>
 
@@ -199,7 +203,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2020 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 Artistic License
 
@@ -207,6 +211,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

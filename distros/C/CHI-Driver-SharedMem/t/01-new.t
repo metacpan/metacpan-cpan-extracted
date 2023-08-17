@@ -11,8 +11,7 @@ use IPC::SysV qw(S_IRUSR S_IWUSR);
 use IPC::SharedMem;
 
 BEGIN {
-    use_ok( 'CHI::Driver::SharedMem' ) || print "Bail out!
-";
+	use_ok('CHI::Driver::SharedMem') || print 'Bail out!';
 }
 
 NEW: {
@@ -20,16 +19,19 @@ NEW: {
 	my $SIGSYS_count = 0;
 	eval {
 		local $SIG{SYS} = sub { $SIGSYS_count++ };
-		$shm = IPC::SharedMem->new(1, 8 * 1024, S_IRUSR|S_IWUSR);
+		if($shm = IPC::SharedMem->new(1, 8 * 1024, S_IRUSR|S_IWUSR)) {
+			$shm->remove();
+			$shm = IPC::SharedMem->new(1, 8 * 1024, S_IRUSR|S_IWUSR);
+		}
 	};
 	if($@ || $SIGSYS_count) {
 		if($^O eq 'cygwin') {
-			diag("It may be that the cygserver service isn't running.");
+			BAIL_OUT("It may be that the cygserver service isn't running.");
 		}
 	} else {
 		ok(!defined($shm), 'Shared memory area does not exist before the test');
 		{
-			my $cache = CHI->new(driver => 'SharedMem', shmkey => 1);
+			my $cache = CHI->new(driver => 'SharedMem', shm_key => 1);
 			ok(defined($cache));
 
 			# Calling get_namespaces() will force the area to be created

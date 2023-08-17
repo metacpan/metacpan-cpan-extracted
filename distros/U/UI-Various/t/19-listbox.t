@@ -105,7 +105,7 @@ stdout_is(sub {   $lb0->_show('<1> ');   },
 my $output_select0 = "<0>   leave listbox\nenter selection: ";
 stdout_is
 {   _call_with_stdin("0\n", sub { $lb0->_process(); });   }
-    "      0/0\n\n\n\n\n\n" . $output_select0 . "0\n",
+    "      0/0\n\n\n\n" . $output_select0 . "0\n",
     '_process 1 prints correct output for empty listbox';
 
 stderr_like(sub {   $lb0->remove('x')},
@@ -131,7 +131,7 @@ stderr_like(sub {   $lb8->texts([41, 43]);   },
 	    qr/^'texts' may not be modified.* after initialisation$re_msg_tail/,
 	    'modifying texts after initialisation fails');
 
-$main->add($lb8);			# now we have a maximum width
+$main->add($lb8);		# now we have a maximum width
 stdout_is(sub {   $lb8->_show('<1> ');   },
 	  "<1>   1-5/8\n      1st entry\n      2nd entry\n" .
 	  "      3rd entry\n      4th entry\n      5th entry\n",
@@ -208,7 +208,7 @@ my $lb12 = UI::Various::Listbox->new(texts => [], height => 10, selection => 2,
 				     on_select => sub { $counter++; });
 $lb12->texts(\@text12);		# reassigning an empty array is allowed!
 
-$main->add($lb12);			# now we have a maximum width
+$main->add($lb12);		# now we have a maximum width
 stdout_is(sub {   $lb12->_show('<1> ');   },
 	  "<1>   1-10/12\n      1st entry\n      2nd entry\n" .
 	  "      3rd entry\n      4th entry\n      5th entry\n" .
@@ -392,8 +392,8 @@ $lb_r = UI::Various::Listbox->new(texts => \@text_r_a,
 				      $next++;
 				  });
 
-$main->add($lb_r);			# now we have a maximum width
-$main->width(undef);			# trigger different width computation
+$main->add($lb_r);		# now we have a maximum width
+$main->width(undef);		# trigger different width computation
 
 stdout_is
 {   _call_with_stdin("1\n1\n1\n1\n0\n", sub { $lb_r->_process(); });   }

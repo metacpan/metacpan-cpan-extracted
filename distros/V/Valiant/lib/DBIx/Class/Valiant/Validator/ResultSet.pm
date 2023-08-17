@@ -35,7 +35,7 @@ sub validate_each {
     my $rowidx = 0;
     foreach my $row (@rows) {
       foreach my $importable_error ($row->errors->errors->all) {
-        my $local_attribute = "${attribute}.${rowidx}.@{[ $importable_error->attribute||'*' ]}";
+        my $local_attribute = "${attribute}[${rowidx}].@{[ $importable_error->attribute||'*' ]}";
         $record->errors->import_error($importable_error, +{attribute=>$local_attribute});
       }
       $rowidx++;

@@ -1,3 +1,15 @@
+2.232180  2023-08-06 11:04:38-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Fix test suite bug triggered by Perl 5.39.1
+
+2.232041  2023-07-23 16:50:17+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * Add tests for class objects on 5.38+
+ * Add documentation caveats about class objects (and also CODE
+   and REGEXP references)
+ * Add support for objects with FREEZE/THAW methods (use those over
+   other methods)
+
 2.202270  2020-08-14 21:19:08+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] No longer bring in AnyEvent as a recommended dependency

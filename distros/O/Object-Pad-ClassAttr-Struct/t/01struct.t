@@ -3,15 +3,15 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Object::Pad;
 use Object::Pad::ClassAttr::Struct;
 
 class Example :Struct {
-   has $x;
-   has $y;
-   has $z = undef;
+   field $x;
+   field $y;
+   field $z = undef;
 }
 
 {

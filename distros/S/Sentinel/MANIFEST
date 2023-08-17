@@ -1,13 +1,10 @@
+.editorconfig
 Build.PL
 Changes
 examples/lvalue_as_final.pl
 lib/Sentinel.pm
 lib/Sentinel.xs
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01value.t
 t/02get.t
@@ -18,3 +15,7 @@ t/11accessor.t
 t/12funcargs.t
 t/80dynamically+Sentinel.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

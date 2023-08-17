@@ -31,13 +31,27 @@ GEOCODEFARM: {
 
 		if($@) {
 			diag('Geo::Coder::GeocodeFarm not installed - skipping tests');
-			skip 'Geo::Coder::GeocodeFarm not installed', 21;
+			skip('Geo::Coder::GeocodeFarm not installed', 21);
 		} else {
 			diag("Using Geo::Coder::GeocodeFarm $Geo::Coder::GeocodeFarm::VERSION");
+			diag('Test connection to geocode.farm') if($ENV{'TEST_VERBOSE'});
+			my $s = IO::Socket::INET->new(
+				PeerAddr => 'www.geocode.farm:443',
+				Timeout => 10
+			);
+			if(!defined($s)) {
+				diag('Geofarm is down, disabling tests');
+				skip('Geofarm is down, disabling tests', 21);
+			}
 		}
 		my $ua = new_ok('LWP::UserAgent::Throttled');
 		$ua->throttle({ 'www.geocode.farm' => 2 });	# Don't get blacklisted
 		$ua->env_proxy(1);
+
+		if(!$ua->get('https://www.geocode.farm')->is_success()) {
+			diag('Geofarm is down, disabling tests');
+			skip('Geofarm is down, disabling tests', 20);
+		}
 
 		my $geocoderlist = new_ok('Geo::Coder::List' => [ ua => $ua ]);
 		my $geocoder = new_ok('Geo::Coder::GeocodeFarm');
@@ -45,8 +59,12 @@ GEOCODEFARM: {
 
 		ok(!defined($geocoderlist->geocode()));
 
-		if(!defined($ENV{'AUTOMATED_TESTING'})) {
+		if(!$ENV{'AUTOMATED_TESTING'}) {
 			my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
+
+			if($ENV{'TEST_VERBOSE'}) {
+				diag(Data::Dumper->new([$location])->Dump());
+			}
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
 

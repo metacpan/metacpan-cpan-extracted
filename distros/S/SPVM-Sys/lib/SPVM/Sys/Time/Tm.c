@@ -26,7 +26,7 @@ int32_t SPVM__Sys__Time__Tm__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_tm = stack[0].oval;
   if (obj_tm != NULL) {
     struct tm* st_tm = env->get_pointer(env, stack, obj_tm);
-    env->free_memory_block(env, st_tm);
+    env->free_memory_stack(env, stack, st_tm);
   }
   
   return 0;

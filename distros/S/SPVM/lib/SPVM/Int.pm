@@ -4,25 +4,26 @@ package SPVM::Int;
 
 =head1 Name
 
-SPVM::Int - Int Class
+SPVM::Int - The int Object
+
+=head1 Description
+
+The Int class has methods to manipulate an object that has an int value.
+
+This class is immutable.
+
+This class is automatically loaded.
 
 =head1 Usage
   
   my $int_object = Int->new(5);
   my $int_value = $int_object->value;
-  $int_object->set_value(10);
-
-=head1 Description
-
-C<Int> is the class to hold a value of the C<int> type.
-
-This class is automatically loaded.
 
 =head1 Fields
 
 =head2 value
 
-  has value : rw int;
+  has value : ro int;
 
 The value.
 

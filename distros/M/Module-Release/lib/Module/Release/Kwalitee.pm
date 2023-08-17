@@ -8,7 +8,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-our $VERSION = '2.128';
+our $VERSION = '2.131';
 
 =encoding utf8
 
@@ -95,7 +95,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

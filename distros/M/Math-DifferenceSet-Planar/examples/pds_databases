@@ -2,13 +2,19 @@
 
 use strict;
 use warnings;
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 0.016;
 
 use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
-die "usage: pds_databases [directory]" if @ARGV > 1 || grep {!-d} @ARGV;
+my $USAGE = "usage: pds_databases [directory]\n";
+while (@ARGV && $ARGV[0] =~ /^-(.*)/s) {
+    shift @ARGV;
+    last if $1 eq '-';
+    die $USAGE;
+}
+die $USAGE if @ARGV > 1 || grep {!-d} @ARGV;
 
 if (@ARGV) {
     $Math::DifferenceSet::Planar::Data::DATABASE_DIR = $ARGV[0];
@@ -18,27 +24,41 @@ print "$Math::DifferenceSet::Planar::Data::DATABASE_DIR\n";
 foreach my $db (PDS->list_databases) {
     my $count = eval { PDS->set_database($db) };
     if (defined $count) {
-        my $min = PDS->iterate_available_sets->()->order;
+        my $min = PDS->available_min_order;
         my $max = PDS->available_max_order;
-        printf "%-17s %6d sets,   %7d <= order <= %7d\n",
+        printf "%-17s %6d sets, %11d <= order <= %7d\n",
             $db . ':', $count, $min, $max;
     }
     else {
         print "$db: bad database\n";
         next;
     }
+    if (PDS->can('known_std_ref_count')) {
+        foreach my $type (qw(std lex gap)) {
+            my ($ref_count, $ref_min_order, $ref_max_order) =
+                map {; "known_${type}_ref_$_" } qw(count min_order max_order);
+            my $count = PDS->$ref_count;
+            if ($count) {
+                my $min = PDS->$ref_min_order;
+                my $max = PDS->$ref_max_order;
+                printf "%-17s %6d $type refs, %7d <= order <= %7d\n",
+                    $db . ':', $count, $min, $max;
+            }
+        }
+    }
     if (PDS->can('known_space_count')) {
         my $count = PDS->known_space_count;
         if ($count) {
             my $min = PDS->known_space_min_order;
             my $max = PDS->known_space_max_order;
-            printf "%-17s %6d spaces, %7d <= order <= %7d\n",
+            printf "%-17s %6d spaces, %9d <= order <= %7d\n",
                 $db . ':', $count, $min, $max;
         }
     }
 }
 
 __END__
+
 =head1 NAME
 
 pds_databases - show available planar difference set databases
@@ -51,7 +71,7 @@ pds_databases - show available planar difference set databases
 
 This example program examines the distribution share directory, or its
 optional directory argument, and reports databases found there, with a
-short summary of their content.
+summary of their content.
 
 The output is the name of the directory and a list of database names
 with some of the database properties.  They are displayed in the order
@@ -63,7 +83,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

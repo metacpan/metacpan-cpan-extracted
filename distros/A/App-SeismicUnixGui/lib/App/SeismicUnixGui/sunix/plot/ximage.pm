@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::ximage;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  XIMAGE - X IMAGE plot of a uniformly-sampled function f(x1,x2)     	
+ PERL PROGRAM NAME:  XIMAGE - X IMAGE plot of a uniformly-sampled function f(x1,x2)     	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

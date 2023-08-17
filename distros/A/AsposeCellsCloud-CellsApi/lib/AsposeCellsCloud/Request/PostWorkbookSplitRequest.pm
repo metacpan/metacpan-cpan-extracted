@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookSplitRequest.name :   ,
-# PostWorkbookSplitRequest.format :   ,
+# PostWorkbookSplitRequest.name : The workbook name.  ,
+# PostWorkbookSplitRequest.format : Split format.  ,
 # PostWorkbookSplitRequest.outFolder :   ,
-# PostWorkbookSplitRequest.from :   ,
-# PostWorkbookSplitRequest.to :   ,
-# PostWorkbookSplitRequest.horizontalResolution :   ,
-# PostWorkbookSplitRequest.verticalResolution :   ,
-# PostWorkbookSplitRequest.splitNameRule :   ,
-# PostWorkbookSplitRequest.folder :   ,
-# PostWorkbookSplitRequest.storageName :   ,
+# PostWorkbookSplitRequest.from : Start worksheet index.  ,
+# PostWorkbookSplitRequest.to : End worksheet index.  ,
+# PostWorkbookSplitRequest.horizontalResolution : Image horizontal resolution.  ,
+# PostWorkbookSplitRequest.verticalResolution : Image vertical resolution.  ,
+# PostWorkbookSplitRequest.splitNameRule : rule name : sheetname  newguid   ,
+# PostWorkbookSplitRequest.folder : Original workbook folder.  ,
+# PostWorkbookSplitRequest.storageName : Storage name.  ,
 # PostWorkbookSplitRequest.outStorageName :    
 
 {
@@ -80,7 +80,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_split' } = { 
-    	summary => '',
+    	summary => 'Splits workbook.',
         params => $params,
         returns => 'SplitResultResponse',
     };
@@ -163,14 +163,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'Split format.',
      	format => '',
      	read_only => '',
      		},
@@ -184,49 +184,49 @@ __PACKAGE__->method_documentation({
      'from' => {
      	datatype => 'int',
      	base_name => 'from',
-     	description => '',
+     	description => 'Start worksheet index.',
      	format => '',
      	read_only => '',
      		},
      'to' => {
      	datatype => 'int',
      	base_name => 'to',
-     	description => '',
+     	description => 'End worksheet index.',
      	format => '',
      	read_only => '',
      		},
      'horizontal_resolution' => {
      	datatype => 'int',
      	base_name => 'horizontalResolution',
-     	description => '',
+     	description => 'Image horizontal resolution.',
      	format => '',
      	read_only => '',
      		},
      'vertical_resolution' => {
      	datatype => 'int',
      	base_name => 'verticalResolution',
-     	description => '',
+     	description => 'Image vertical resolution.',
      	format => '',
      	read_only => '',
      		},
      'split_name_rule' => {
      	datatype => 'string',
      	base_name => 'splitNameRule',
-     	description => '',
+     	description => 'rule name : sheetname  newguid ',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

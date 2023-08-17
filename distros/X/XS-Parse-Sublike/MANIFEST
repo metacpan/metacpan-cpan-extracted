@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/block_end.c.inc
@@ -17,7 +18,11 @@ lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
 lib/XS/Parse/Sublike/Builder_data.pm.PL
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01func.t
 t/02func-signatures.t
@@ -48,7 +53,3 @@ t/registrations.xs
 t/stages.xs
 t/testcase.pm
 XSParseSublike.h
-README
-LICENSE
-META.yml
-META.json

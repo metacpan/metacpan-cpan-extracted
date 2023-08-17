@@ -18,4 +18,6 @@ tlib/DefaultModule.pm
 tlib/ExtrasModule.pm
 tlib/SetterErrorModule.pm
 tlib/TestModule.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/nested.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

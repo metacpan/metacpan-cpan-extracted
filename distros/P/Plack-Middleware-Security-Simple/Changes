@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.11.0   2023-08-03 17:29:24+01:00 Europe/London
+  [Exhancements]
+  - Added the exchange_prefixes rule.
+
+  [Documentation]
+  - Support policy for older Perls is documented.
+
 v0.10.1   2023-05-06 11:18:22+01:00 Europe/London
   [Exhancements]
   - Added .c and .cc to the script_extensions rule.

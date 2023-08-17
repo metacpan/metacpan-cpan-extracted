@@ -316,6 +316,110 @@ vir_typed_param_safe_free(virTypedParameterPtr params, int nparams)
     Safefree(params);
 }
 
+static void
+migrate_parse_params(virTypedParameterPtr *paramsRet,
+                     int *nparamsRet,
+                     HV *newparams)
+{
+    virTypedParameterPtr params;
+    int nparams;
+
+    nparams = 21;
+    Newx(params, nparams, virTypedParameter);
+
+    strncpy(params[0].field, VIR_MIGRATE_PARAM_URI,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[0].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[1].field, VIR_MIGRATE_PARAM_DEST_NAME,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[1].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[2].field, VIR_MIGRATE_PARAM_DEST_XML,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[2].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[3].field, VIR_MIGRATE_PARAM_GRAPHICS_URI,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[3].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[4].field, VIR_MIGRATE_PARAM_BANDWIDTH,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[4].type = VIR_TYPED_PARAM_ULLONG;
+
+    strncpy(params[5].field, VIR_MIGRATE_PARAM_LISTEN_ADDRESS,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[5].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[6].field, VIR_MIGRATE_PARAM_DISKS_PORT,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[6].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[7].field, VIR_MIGRATE_PARAM_COMPRESSION,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[7].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[8].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[8].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[9].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[9].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[10].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[10].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[11].field, VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[11].type = VIR_TYPED_PARAM_ULLONG;
+
+    strncpy(params[12].field, VIR_MIGRATE_PARAM_PERSIST_XML,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[12].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[13].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[13].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[14].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[14].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[15].field, VIR_MIGRATE_PARAM_BANDWIDTH_POSTCOPY,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[15].type = VIR_TYPED_PARAM_ULLONG;
+
+    strncpy(params[16].field, VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[16].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[17].field, VIR_MIGRATE_PARAM_TLS_DESTINATION,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[17].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[18].field, VIR_MIGRATE_PARAM_DISKS_URI,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[18].type = VIR_TYPED_PARAM_STRING;
+
+    strncpy(params[19].field, VIR_MIGRATE_PARAM_COMPRESSION_ZLIB_LEVEL,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[19].type = VIR_TYPED_PARAM_INT;
+
+    strncpy(params[20].field, VIR_MIGRATE_PARAM_COMPRESSION_ZSTD_LEVEL,
+            VIR_TYPED_PARAM_FIELD_LENGTH);
+    params[20].type = VIR_TYPED_PARAM_INT;
+
+    nparams = vir_typed_param_from_hv(newparams, params, nparams);
+
+    vir_typed_param_add_string_list_from_hv(newparams, &params, &nparams,
+                                            VIR_MIGRATE_PARAM_MIGRATE_DISKS);
+
+    *paramsRet = params;
+    *nparamsRet = nparams;
+}
+
 
 static int
 _domain_event_lifecycle_callback(virConnectPtr con,
@@ -5729,89 +5833,7 @@ _migrate(dom, destcon, newparams, flags=0)
     virTypedParameterPtr params;
     int nparams;
  CODE:
-    nparams = 19;
-    Newx(params, nparams, virTypedParameter);
-
-    strncpy(params[0].field, VIR_MIGRATE_PARAM_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[0].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[1].field, VIR_MIGRATE_PARAM_DEST_NAME,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[1].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[2].field, VIR_MIGRATE_PARAM_DEST_XML,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[2].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[3].field, VIR_MIGRATE_PARAM_GRAPHICS_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[3].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[4].field, VIR_MIGRATE_PARAM_BANDWIDTH,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[4].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[5].field, VIR_MIGRATE_PARAM_LISTEN_ADDRESS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[5].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[6].field, VIR_MIGRATE_PARAM_DISKS_PORT,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[6].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[7].field, VIR_MIGRATE_PARAM_COMPRESSION,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[7].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[8].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[8].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[9].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[9].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[10].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[10].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[11].field, VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[11].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[12].field, VIR_MIGRATE_PARAM_PERSIST_XML,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[12].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[13].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[13].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[14].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[14].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[15].field, VIR_MIGRATE_PARAM_BANDWIDTH_POSTCOPY,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[15].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[16].field, VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[16].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[17].field, VIR_MIGRATE_PARAM_TLS_DESTINATION,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[17].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[18].field, VIR_MIGRATE_PARAM_DISKS_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[18].type = VIR_TYPED_PARAM_STRING;
-
-    nparams = vir_typed_param_from_hv(newparams, params, nparams);
-
-    vir_typed_param_add_string_list_from_hv(newparams, &params, &nparams,
-                                            VIR_MIGRATE_PARAM_MIGRATE_DISKS);
+    migrate_parse_params(&params, &nparams, newparams);
 
     /* No need to support virDomainMigrate/virDomainMigrate2, since
      * virDomainMigrate3 takes care to call the older APIs internally
@@ -5836,89 +5858,7 @@ _migrate_to_uri(dom, desturi, newparams, flags=0)
     virTypedParameterPtr params;
     int nparams;
  PPCODE:
-    nparams = 19;
-    Newx(params, nparams, virTypedParameter);
-
-    strncpy(params[0].field, VIR_MIGRATE_PARAM_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[0].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[1].field, VIR_MIGRATE_PARAM_DEST_NAME,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[1].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[2].field, VIR_MIGRATE_PARAM_DEST_XML,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[2].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[3].field, VIR_MIGRATE_PARAM_GRAPHICS_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[3].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[4].field, VIR_MIGRATE_PARAM_BANDWIDTH,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[4].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[5].field, VIR_MIGRATE_PARAM_LISTEN_ADDRESS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[5].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[6].field, VIR_MIGRATE_PARAM_DISKS_PORT,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[6].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[7].field, VIR_MIGRATE_PARAM_COMPRESSION,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[7].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[8].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[8].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[9].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[9].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[10].field, VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[10].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[11].field, VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[11].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[12].field, VIR_MIGRATE_PARAM_PERSIST_XML,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[12].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[13].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[13].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[14].field, VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[14].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[15].field, VIR_MIGRATE_PARAM_BANDWIDTH_POSTCOPY,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[15].type = VIR_TYPED_PARAM_ULLONG;
-
-    strncpy(params[16].field, VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[16].type = VIR_TYPED_PARAM_INT;
-
-    strncpy(params[17].field, VIR_MIGRATE_PARAM_TLS_DESTINATION,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[17].type = VIR_TYPED_PARAM_STRING;
-
-    strncpy(params[18].field, VIR_MIGRATE_PARAM_DISKS_URI,
-            VIR_TYPED_PARAM_FIELD_LENGTH);
-    params[18].type = VIR_TYPED_PARAM_STRING;
-
-    nparams = vir_typed_param_from_hv(newparams, params, nparams);
-
-    vir_typed_param_add_string_list_from_hv(newparams, &params, &nparams,
-                                            VIR_MIGRATE_PARAM_MIGRATE_DISKS);
+    migrate_parse_params(&params, &nparams, newparams);
 
     /* No need to support virDomainMigrateToURI/virDomainMigrateToURI2, since
      * virDomainMigrate3 takes care to call the older APIs internally
@@ -9844,6 +9784,8 @@ BOOT:
     REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS, MIGRATE_PARAM_PARALLEL_CONNECTIONS);
     REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_TLS_DESTINATION, MIGRATE_PARAM_TLS_DESTINATION);
     REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_DISKS_URI, MIGRATE_PARAM_DISKS_URI);
+    REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_COMPRESSION_ZLIB_LEVEL, MIGRATE_PARAM_ZLIB_LEVEL);
+    REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_COMPRESSION_ZSTD_LEVEL, MIGRATE_PARAM_ZSTD_LEVEL);
 
     REGISTER_CONSTANT(VIR_DOMAIN_MIGRATE_MAX_SPEED_POSTCOPY, MIGRATE_MAX_SPEED_POSTCOPY);
 

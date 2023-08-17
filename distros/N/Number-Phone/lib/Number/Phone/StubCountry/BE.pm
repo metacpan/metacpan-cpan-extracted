@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181417;
+our $VERSION = 1.20230614174401;
 
 my $formatters = [
                 {
@@ -98,16 +98,7 @@ my $validators = {
               6[569]|
               7[0579]
             )|
-            90(?:
-              0[0-8]|
-              1[36]|
-              2[0-3568]|
-              3[0-689]|
-              [47][2-68]|
-              5[1-68]|
-              6[0-378]|
-              9[34679]
-            )
+            90\\d\\d
           )\\d{4}
         )|(
           78(?:
@@ -125,92 +116,92 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"323", "Anvers",
-"329", "Gand",
-"3212", "Tongres",
-"3253", "Alost",
-"3252", "Termonde",
-"3259", "Ostende",
-"3255", "Renaix",
-"3258", "Furnes",
-"3216", "Louvain",
-"3215", "Malines",
-"3251", "Roulers",
-"322", "Bruxelles",
-"3256", "Courtrai",};
-$areanames{en} = {"3243", "Liège",
-"3282", "Dinant",
-"3261", "Libramont\-Chevigny",
-"3252", "Dendermonde",
-"3210", "Wavre",
-"3213", "Diest",
-"3280", "Stavelot",
-"3283", "Ciney",
-"3265", "Mons",
-"3250", "Bruges",
-"3253", "Aalst",
-"3212", "Tongeren",
-"329", "Ghent",
-"3242", "Liège",
-"3269", "Tournai",
-"323", "Antwerp",
-"3257", "Ypres",
-"3287", "Verviers",
-"3268", "Ath",
-"3264", "La\ Louvière",
-"3214", "Herentals",
-"3256", "Kortrijk",
-"3286", "Durbuy",
-"3219", "Waremme",
-"3251", "Roeselare",
-"3215", "Mechelen",
-"3271", "Charleroi",
-"322", "Brussels",
-"3281", "Namur",
-"3216", "Leuven",
-"3267", "Nivelles",
-"3254", "Ninove",
-"3258", "Veurne",
-"3284", "Marche\-en\-Famenne",
-"3260", "Chimay",
-"3263", "Arlon",
-"3255", "Ronse",
-"3211", "Hasselt",
-"3285", "Huy",
-"3259", "Ostend",
-"3289", "Genk",};
-$areanames{de} = {"3259", "Ostende",
-"3263", "Arel",
-"3216", "Löwen",
-"3215", "Mecheln",
-"3281", "Namür",
-"322", "Brüssel",
-"3257", "Ypern",
+$areanames{nl} = {"3263", "Aarlen",
+"3268", "Aat",
+"3219", "Borgworm",
+"322", "Brussel",
+"3210", "Waver",
 "323", "Antwerpen",
-"3242", "Lüttich",
-"329", "Gent",
-"3280", "Stablo",
-"3212", "Tongern",
+"3243", "Luik",
+"3250", "Brugge",
+"3281", "Namen",
 "3265", "Bergen",
-"3250", "Brügge",
-"3243", "Lüttich",};
-$areanames{nl} = {"3268", "Aat",
-"323", "Antwerpen",
-"3257", "Ieper",
-"3242", "Luik",
 "329", "Gent",
 "3269", "Doornik",
-"3265", "Bergen",
-"3250", "Brugge",
-"3210", "Waver",
-"3243", "Luik",
-"3259", "Oostende",
 "3285", "Hoei",
-"3263", "Aarlen",
-"3267", "Nijvel",
-"3281", "Namen",
-"322", "Brussel",
-"3219", "Borgworm",};
+"3257", "Ieper",
+"3242", "Luik",
+"3259", "Oostende",
+"3267", "Nijvel",};
+$areanames{fr} = {"3216", "Louvain",
+"3259", "Ostende",
+"3251", "Roulers",
+"323", "Anvers",
+"3255", "Renaix",
+"3212", "Tongres",
+"329", "Gand",
+"3215", "Malines",
+"3252", "Termonde",
+"3256", "Courtrai",
+"3253", "Alost",
+"3258", "Furnes",
+"322", "Bruxelles",};
+$areanames{de} = {"322", "Brüssel",
+"3263", "Arel",
+"3215", "Mecheln",
+"3212", "Tongern",
+"3265", "Bergen",
+"3281", "Namür",
+"329", "Gent",
+"323", "Antwerpen",
+"3243", "Lüttich",
+"3250", "Brügge",
+"3259", "Ostende",
+"3242", "Lüttich",
+"3257", "Ypern",
+"3216", "Löwen",
+"3280", "Stablo",};
+$areanames{en} = {"3258", "Veurne",
+"3253", "Aalst",
+"322", "Brussels",
+"3211", "Hasselt",
+"3282", "Dinant",
+"3219", "Waremme",
+"3256", "Kortrijk",
+"3263", "Arlon",
+"3284", "Marche\-en\-Famenne",
+"3268", "Ath",
+"3283", "Ciney",
+"3264", "La\ Louvière",
+"3252", "Dendermonde",
+"3210", "Wavre",
+"3254", "Ninove",
+"3286", "Durbuy",
+"3215", "Mechelen",
+"3265", "Mons",
+"3281", "Namur",
+"3260", "Chimay",
+"329", "Ghent",
+"3289", "Genk",
+"3212", "Tongeren",
+"3214", "Herentals",
+"3250", "Bruges",
+"3287", "Verviers",
+"3255", "Ronse",
+"323", "Antwerp",
+"3243", "Liège",
+"3213", "Diest",
+"3267", "Nivelles",
+"3251", "Roeselare",
+"3259", "Ostend",
+"3261", "Libramont\-Chevigny",
+"3285", "Huy",
+"3257", "Ypres",
+"3216", "Leuven",
+"3242", "Liège",
+"3280", "Stavelot",
+"3269", "Tournai",
+"3271", "Charleroi",};
 
     sub new {
       my $class = shift;

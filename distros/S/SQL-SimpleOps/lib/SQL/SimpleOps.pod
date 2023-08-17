@@ -192,6 +192,8 @@ X<SQL Commands>
        # list of fields
 
        fields => [ col1_alias, col2_alias, ... ],
+       or
+       fields => [ col1_alias, { col2_alias => newalias }, ... ],
 
        # where clause
 
@@ -205,14 +207,17 @@ X<SQL Commands>
 
        # order by options
 
-       order_by => undef,		# (disable the order process)
+       order_by => undef,		# (disable the order process, is default)
        or
-       order_by => col_alias,
+       order_by => col_alias,		# (default is SQL_SIMPLE_ORDER_ASC)
        or
-       order_by =>
-       [
-          col1_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC,
-          col2_alias => ...
+       order_by => { col_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
+       or
+       order_by => [ col1_alias, col2_alias, ... ],
+       or
+       order_by => [
+          { col1_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
+          { col2_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
           ...
        ],
 
@@ -855,7 +860,7 @@ Following methods can be exported:
 =head2 Constructor (method new)
 X<Method Constructor>
 
-  SQL::-Simple->new
+  SQL::SimpleOps->new
   (
      # your global options
   );
@@ -1481,7 +1486,7 @@ This method extract the selected rows from a tables based the conditions in the 
   SQL::SimpleOps->Select
   (
      table => my_table_list,			# mandatory
-     fields => { my_list_of_fields },		# optional for single table, defaul: all columns
+     fields => [ my_list_of_fields ],		# optional for single table, defaul: all columns
                                                 # mandatory for multiple tables list
      where => [ my_where_conditions ],		# mandatory for 'where' rules
      order_by => [ my_order_list ],		# mandatory for 'order by' rules
@@ -1580,6 +1585,16 @@ B<Example6:> Escaping field, no validation will be.
   );
 
 B<NOTE:> The '\' (backslash) will escape all validations.
+
+B<Example7:> Assigning alias field for specific select command.
+
+  SQL::SimpleOps->Select
+  (
+     fields => [ { "field1" => "alias1" }, field2, ... ],
+     ...
+  );
+
+B<NOTE:> Use 'alias1' as buffer reference to get field1 data.
 
 =head2 SelectCursor
 X<SelectCursor>

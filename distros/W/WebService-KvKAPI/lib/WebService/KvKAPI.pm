@@ -1,7 +1,7 @@
 use utf8;
 package WebService::KvKAPI;
 
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
 #
@@ -16,14 +16,14 @@ use WebService::KvKAPI::Search;
 use WebService::KvKAPI::BasicProfile;
 use WebService::KvKAPI::LocationProfile;
 
-has $api_key   :param = undef;
-has $api_host  :param :accessor = undef;
-has $spoof     :param = 0;
+field $api_key   :param = undef;
+field $api_host  :param :accessor = undef;
+field $spoof     :param = 0;
 
 # We need https://rt.cpan.org/Public/Bug/Display.html?id=140712 for delegation
-has $basic_profile;
-has $location_profile;
-has $search;
+field $basic_profile;
+field $location_profile;
+field $search;
 
 ADJUST {
     $search = WebService::KvKAPI::Search->new(
@@ -87,7 +87,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 SYNOPSIS
 
@@ -164,11 +164,11 @@ this.
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 

@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 0.016;
+use Math::DifferenceSet::Planar::Data;
+use Math::BigInt try => 'GMP';
+use Math::Prime::Util qw(logint euler_phi);
+
+$| = 1;
+
+my $USAGE =
+    "usage: pds_iterate_properties [-v] [-h] [-D database] [min [max]]\n";
+
+my $head    = 0;
+my $verbose = 0;
+my $db      = undef;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                          if '-' eq $opt;
+    $head    = 1,            next if 'h' eq $opt;
+    $verbose = 1,            next if 'v' eq $opt;
+    $db      = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db      = $1,           next if $opt =~ /^D(.+)s/;
+    die $USAGE;
+}
+die $USAGE if 2 < @ARGV || grep {!/^(?:0|[1-9][0-9]*)\z/} @ARGV;
+my @minmax = @ARGV;
+
+my $data = Math::DifferenceSet::Planar::Data->new(defined($db)? $db: ());
+if ($verbose) {
+    print
+        "library version: $Math::DifferenceSet::Planar::VERSION\n",
+        'database: ', $data->path, "\n";
+}
+
+my $it = $data->iterate_properties(@minmax[0, 1], qw(order base));
+print "order\tp\tn\tmodulus\t#planes\t#sets\n" if $head;
+while (my $ds = $it->()) {
+    my $o = Math::BigInt->new($ds->order);
+    my $m = ($o + 1) * $o + 1;
+    my $b = $ds->base;
+    my $e = logint($o, $b);
+    my $n = euler_phi($m) / (3 * $e);
+    my $c = $m * $n;
+    print "$o\t$b\t$e\t$m\t$n\t$c\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_iterate_properties - display properties of ranges of stored sets
+
+=head1 SYNOPSIS
+
+  pds_iterate_properties [-h] [-D database] [min [max]]\n";
+
+=head1 DESCRIPTION
+
+This example program iterates through available planar difference sets
+of a given range and shows some of their properties.  These are the
+order, the order base and exponent, the modulus, the number of planes,
+and the total number of cyclic planar difference sets of that order.
+The columns are separated by tabs.
+
+With option B<-v>, information about the library version and database
+location is prepended to the output.
+
+With option B<-h>, the data is preceded by a header line.
+
+Optional parameter C<-D> specifies an alternate sample database.
+
+Optional arguments I<min> and I<max> restrict the orders to a range.
+Without a specified range, all available sets are included.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

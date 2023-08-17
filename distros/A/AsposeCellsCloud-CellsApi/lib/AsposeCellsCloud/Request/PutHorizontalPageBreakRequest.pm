@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PutHorizontalPageBreakRequest.name :   ,
-# PutHorizontalPageBreakRequest.sheetName :   ,
-# PutHorizontalPageBreakRequest.cellname :   ,
-# PutHorizontalPageBreakRequest.row :   ,
-# PutHorizontalPageBreakRequest.column :   ,
-# PutHorizontalPageBreakRequest.startColumn :   ,
-# PutHorizontalPageBreakRequest.endColumn :   ,
-# PutHorizontalPageBreakRequest.folder :   ,
-# PutHorizontalPageBreakRequest.storageName :    
+# PutHorizontalPageBreakRequest.name : The workbook name.  ,
+# PutHorizontalPageBreakRequest.sheetName : The worksheet name.  ,
+# PutHorizontalPageBreakRequest.cellname : Cell name  ,
+# PutHorizontalPageBreakRequest.row : Row index, zero based.  ,
+# PutHorizontalPageBreakRequest.column : Column index, zero based.  ,
+# PutHorizontalPageBreakRequest.startColumn : Start column index, zero based.  ,
+# PutHorizontalPageBreakRequest.endColumn : End column index, zero based.  ,
+# PutHorizontalPageBreakRequest.folder : Original workbook folder.  ,
+# PutHorizontalPageBreakRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_horizontal_page_break' } = { 
-    	summary => '',
+    	summary => 'Adds a horizontal page breaks in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -155,63 +155,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cellname' => {
      	datatype => 'string',
      	base_name => 'cellname',
-     	description => '',
+     	description => 'Cell name',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'Row index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Column index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'Start column index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => '',
+     	description => 'End column index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

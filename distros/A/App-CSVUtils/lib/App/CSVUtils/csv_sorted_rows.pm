@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -61,6 +61,19 @@ _
 
         quiet => {
             summary => 'If set to true, do not show messages',
+            description => <<'_',
+
+Normally a message will be printed to stdout saying whether the rows are sorted
+or not, i.e. one of:
+
+    Rows are sorted
+    Rows are NOT sorted
+
+If this option is specified, then no message will be printed. Instead, you can
+find out whether things are sorted via exit code (or status code in the
+enveloped result, if you request JSON or call this utility as a Perl function).
+
+_
             schema => 'bool*',
             cmdline_aliases => {q=>{}},
         },
@@ -93,7 +106,7 @@ App::CSVUtils::csv_sorted_rows - Check that CSV rows are sorted
 
 =head1 VERSION
 
-This document describes version 1.024 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 FUNCTIONS
 
@@ -235,6 +248,16 @@ argument.
 =item * B<quiet> => I<bool>
 
 If set to true, do not show messages.
+
+Normally a message will be printed to stdout saying whether the rows are sorted
+or not, i.e. one of:
+
+ Rows are sorted
+ Rows are NOT sorted
+
+If this option is specified, then no message will be printed. Instead, you can
+find out whether things are sorted via exit code (or status code in the
+enveloped result, if you request JSON or call this utility as a Perl function).
 
 =item * B<reverse> => I<bool>
 

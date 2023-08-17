@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.05;
+package Feature::Compat::Class 0.06;
 
 use v5.14;
 use warnings;
@@ -40,10 +40,13 @@ C<Feature::Compat::Class> - make C<class> syntax available
 This module provides the new C<class> keyword and related others (C<method>,
 C<field> and C<ADJUST>) in a forward-compatible way.
 
-There is a branch of Perl development source code which provides this syntax,
-under the C<class> named feature. If all goes well, this will become available
-in a stable release in due course. On such perls that contain the feature,
-this module simple enables it.
+Perl added such syntax at version 5.38.0, which is enabled by
+
+   use feature 'class';
+
+On that version of perl or later, this module simply enables the core feature
+equivalent of using it directly. On such perls, this module will install with
+no non-core dependencies, and requires no C compiler.
 
 On older versions of perl before such syntax is availble in core, it is
 currently provided instead using the L<Object::Pad> module, imported with a
@@ -51,19 +54,10 @@ special set of options to configure it to only recognise the same syntax as
 the core perl feature, thus ensuring any code using it will still continue to
 function on that newer perl.
 
-=head2 Perl Branch with C<feature 'class'>
-
-At time of writing, the C<use feature 'class'> syntax is not part of mainline
-perl source but is available in a branch. That branch currently resides at
-L<https://github.com/leonerd/perl5/tree/feature-class/>. It is intended this
-will be migrated to the main C<perl> repository ahead of actually being merged
-once development has progressed further.
-
-This module is a work-in-progress, because the underlying C<feature-class>
-branch is too. Many of the limitations and inabilities listed below are a
-result of the early-access nature of this branch, and are expected to be
-lifted as work progresses towards a more featureful and complete
-implementation.
+This module is a work-in-progress, because the underlying C<feature 'class'>
+is too. Many of the limitations and inabilities listed below are a result of
+the early-access nature of this branch, and are expected to be lifted as work
+progresses towards a more featureful and complete implementation.
 
 =cut
 

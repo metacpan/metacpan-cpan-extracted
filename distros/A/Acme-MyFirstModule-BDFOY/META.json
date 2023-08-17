@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "testing",
       "file"
@@ -70,6 +70,6 @@
          "web" : "https://github.com/briandfoy/Acme-MyFirstModule-BDFOY"
       }
    },
-   "version" : "0.011",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.012",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

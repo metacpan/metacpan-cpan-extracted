@@ -1,3 +1,10 @@
+0.007   2023-06-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention TableData::Acme::CPANModules.
+
+
 0.006   2020-03-25  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

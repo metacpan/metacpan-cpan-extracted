@@ -1,30 +1,42 @@
 package Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap;
-$Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap::VERSION = '1.0';
+$Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap::VERSION = '1.3';
 use Modern::Perl;
 
 =head1 NAME
 
+
+
 Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap - fuzzy lookup 
 of security descriptions to symbols
 
+
+
 =head1 VERSION
 
-version 1.0
+version 1.3
 
 =head1 SYNOPSIS
+
+
 
 This class is necessary because Sentinel does not always supply the symbol
 in the download, so it can become necessary to do a lookup based on the 
 description field that they supply to find the correct security symbol.
 
-=cut
+
+
+=cut 
 
 use Moose;
 use Scalar::Util qw{ openhandle };
 
 =head1 Constructor
 
+
+
 =head2 new()
+
+
 
     my $st = Bank::SentinelBenefits::Csv401kConverter::SymbolMap->new({
         symbol_map => $HashRef[Str] | FileHandle });
@@ -32,27 +44,44 @@ use Scalar::Util qw{ openhandle };
 Can be initialzed either from a hash mapping of the form description -> symbol
 or a comma delimited file of the same type.
 
-=cut
+
+
+=cut 
 
 =head1 Internal accessors
 
+
+
 =head2 $foo->symbol_map()
+
+
 
 This is either a hash ref of strings, mapping descriptions to symbols,
  or a filehandle pointing to a file of the format C<'description','symbol>
 
+
+
 Not really for external use
+
+
 
 =head2 $foo->_true_symbol_map()
 
+
+
 This is a hash ref of strings, mapping descriptions to symbols.  Internal use only.
 
-=cut
+
+
+=cut 
+
 has 'symbol_map' => ( 
     is       => 'ro',
     isa      => 'HashRef[Str] | FileHandle',
     required => 1,
 );
+
+
 
 has '_true_symbol_map' => (
     is       => 'rw',
@@ -62,12 +91,18 @@ has '_true_symbol_map' => (
 
 =head1 Methods
 
+
+
 =head2 $foo->get_symbol($description)
+
+
 
 Takes a security description.  Returns either the symbol, if
 lookup is successful, or undef;
 
-=cut
+
+
+=cut 
 
 sub get_symbol{
     my $self = shift;
@@ -88,6 +123,12 @@ sub get_symbol{
     return;
 }
 
+
+=head2 $foo->BUILD()
+
+Internal Moose infrastructure, ignore.
+
+=cut
 sub BUILD {
     my $self = shift;
     
@@ -123,21 +164,23 @@ no Moose;
 
 __PACKAGE__->meta->make_immutable;
 
-# Copyright 2009-2011 David Solimano
-# This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+=head1 LICENSE AND COPYRIGHT
+Copyright 2009-2023 David Solimano
+This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>.
+Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
+You should have received a copy of the GNU General Public License
+along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>.
 
-1;
+=cut
+1

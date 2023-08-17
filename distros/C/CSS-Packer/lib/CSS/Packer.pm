@@ -6,7 +6,7 @@ use strict;
 use Carp;
 use Regexp::RegGrp;
 
-our $VERSION            = '2.08';
+our $VERSION            = '2.09';
 
 our @COMPRESS           = ( 'minify', 'pretty' );
 our $DEFAULT_COMPRESS   = 'pretty';
@@ -21,7 +21,7 @@ our @COPYRIGHT_ACCESSORS = (
     'copyright_comment'
 );
 
-our $COPYRIGHT_COMMENT  = '\/\*((?>[^*]|\*[^/])*copyright(?>[^*]|\*[^/])*)\*\/';
+our $COPYRIGHT_COMMENT  = '\/\*((?>[^*]|\*[^/])*(?:license|copyright)(?>[^*]|\*[^/])*)\*\/';
 
 our $DICTIONARY     = {
     'STRING1'   => qr~"(?>(?:(?>[^"\\]+)|\\.|\\"|\\\s)*)"~,
@@ -393,7 +393,7 @@ CSS::Packer - Another CSS minifier
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DESCRIPTION
 

@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Acme::Cavaspazi",
   "PREREQ_PM" => {
+    "Acme::Bleach" => 0,
     "Carp" => "1.2",
     "File::Basename" => 0,
     "FindBin" => "1.3",
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "PerlIO::encoding" => 0,
     "Pod::Usage" => 0
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Acme::Bleach" => 0,
   "Carp" => "1.2",
   "File::Basename" => 0,
   "FindBin" => "1.3",

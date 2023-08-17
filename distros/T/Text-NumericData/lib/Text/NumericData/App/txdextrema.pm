@@ -13,10 +13,10 @@ $VERSION = eval $VERSION;
 my $infostring = 'find maxima/minima in textual data files
 
 Usage:
-	txdextrema n < data.dat
+	txdextrema [n] < data.dat
 
 The column we are interested in is simply given as a number (starting at 1) after any options; default is the second one (making sense for x-y data) or the only present one. 
-The example would result in the maximum value of the third column of data.dat being printed.';
+By default the occuring extremal value is printed, but you can choose to print all rows where it occurs.';
 
 our @ISA = ('Text::NumericData::App');
 

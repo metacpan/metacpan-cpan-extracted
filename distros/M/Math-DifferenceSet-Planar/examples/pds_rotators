@@ -3,64 +3,76 @@
 use strict;
 use warnings;
 use Math::Prime::Util qw(mulmod);
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 1.000;
 
 $| = 1;
 
-my $USAGE = "usage: pds_rotators [-f] (p n|q)\n";
+my $USAGE = "usage: pds_rotators [-f|-m] (p n|q)\n";
 
 my $full = 0;
+my $min  = 0;
 while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
     my $opt = $1;
     shift @ARGV;
-    last            if '-' eq $opt;
-    $full = 1, last if 'f' eq $opt;
+    last                      if '-' eq $opt;
+    $full = 1, $min = 0, last if 'f' eq $opt;
+    $full = 0, $min = 1, last if 'm' eq $opt;
     die $USAGE;
 }
 if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
     die $USAGE;
 }
 
-my $ds = Math::DifferenceSet::Planar->new(@ARGV);
-my $mo = $ds->modulus;
-my $it = $ds->iterate_rotators;
-my @mu;
-if ($full) {
-    @mu = $ds->multipliers;
-    shift @mu;
-}
+my $it = Math::DifferenceSet::Planar->iterate_rotators(@ARGV);
 
-while (my $ro = $it->()) {
-    if ($full) {
-        my @eqv = map { mulmod($_, $ro, $mo) } @mu;
-        print "$ro @eqv\n";
+if ($full || $min) {
+    my @mu = Math::DifferenceSet::Planar->multipliers(@ARGV);
+    my $mo;
+    if (@ARGV == 1) {
+        my $or = $ARGV[0];
+        $mo = ($or + 1) * $or + 1;
     }
     else {
+        my $ex = $ARGV[1];
+        $mo = $mu[$ex << 1] + $mu[$ex] + 1;
+    }
+    shift @mu;
+    while (my $ro = $it->()) {
+        my @eqv = sort { $a <=> $b } $ro, map { mulmod($_, $ro, $mo) } @mu;
+        print $full? "@eqv\n": "$eqv[0]\n";
+    }
+}
+else {
+    while (my $ro = $it->()) {
         print $ro, "\n";
     }
 }
 
 __END__
+
 =head1 NAME
 
 pds_rotators - enumerate planar difference set rotators of a given order
 
 =head1 SYNOPSIS
 
-  pds_rotators [-f] p n
-  pds_rotators [-f] order
+  pds_rotators [-f|-m] p n
+  pds_rotators [-f|-m] order
 
 =head1 DESCRIPTION
 
-This example program writes rotators (complete residue systems) for
+This example program writes rotators (reduced residue systems) for
 planar difference sets of a given order to standard output.  The order
 can be specified as a prime number and an exponent, or as a prime power.
 The output will be lines with one integer number per line, for all
 rotators of the given order.
 
-With option B<-f>, output lines consist of lists of equivalent rotator
-values separated by blanks.  Thus all values coprime to the modulus will
-appear, grouped by plane.
+With option B<-m>, the smallest from each equivalence set of residues
+will be output rather than an arbitrary representative.
+
+With option B<-f>, output lines consist of complete equivalence sets
+of rotator values separated by blanks.  Thus all values coprime to the
+modulus will appear, grouped by plane.
 
 =head1 AUTHOR
 
@@ -68,7 +80,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

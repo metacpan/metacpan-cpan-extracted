@@ -1,5 +1,5 @@
 package Fluent::LibFluentBit::Logger;
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -64,7 +64,7 @@ Fluent::LibFluentBit::Logger - Perl-style logger object that logs to the 'lib' i
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,33 @@
+NAME
+
+    App::perl::distrolint - distribution-wide linting tools for Perl
+    distributions
+
+SYNOPSIS
+
+       use App::perl::distrolint;
+    
+       exit App::perl::distrolint->new->run( @ARGV );
+
+DESCRIPTION
+
+    This module implements an application for applying various code-linting
+    tests across the source code for an entire Perl distribution. The
+    individual checks performed are described more in the various
+    App::perl::distrolint::Check::* modules.
+
+    At present in this very early version, many of these checks are very
+    opinionated, doing things specific to the way I personally lay out my
+    code. I fully imagine that at some point I'll get around to adding more
+    flexibility here, via some kind of configuration system, whereby other
+    users can change or disable various checks as they see fit to suit
+    their own coding style. This distribution currently exists largely to
+    allow people to see the kinds of things that are possible, and also
+    acts as a demonstration of the use of Text::Treesitter and
+    tree-sitter-perl to be used as a static linting tool for Perl source
+    code.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Fmt 3.002;
+package Log::Fmt 3.006;
 # ABSTRACT: a little parser and emitter of structured log lines
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -24,6 +24,11 @@ use Scalar::Util qw(refaddr);
 #pod     key2 => $value2,
 #pod   ]);
 #pod
+#pod Note especially that if any value to encode is a reference I<to a reference>,
+#pod then String::Flogger is used to encode the referenced value.  This means you
+#pod can embed, in your logfmt, a JSON dump of a structure by passing a reference to
+#pod the structure, instead of passing the structure itself.
+#pod
 #pod =cut
 
 # ASCII after SPACE but excluding = and "
@@ -40,6 +45,8 @@ sub _quote_string {
 
   return qq{"$string"};
 }
+
+sub string_flogger { 'String::Flogger' }
 
 sub _pairs_to_kvstr_aref {
   my ($self, $aref, $seen, $prefix) = @_;
@@ -62,6 +69,10 @@ sub _pairs_to_kvstr_aref {
 
     if (_CODELIKE $value) {
       $value = $value->();
+    }
+
+    if (ref $value && ref $value eq 'REF') {
+      $value = $self->string_flogger->flog([ '%s', $$value ]);
     }
 
     if (! defined $value) {
@@ -148,7 +159,7 @@ sub parse_event_string {
       my $qstring = $2;
 
       $qstring =~ s{
-        ( \\\\ | \\["nr] | (\\x)\{([[:xdigit:]]{1,5})\} | . )
+        ( \\\\ | \\["nr] | (\\x)\{([[:xdigit:]]{1,5})\} )
       }
       {
           $1 eq "\\\\"        ? "\\"
@@ -176,6 +187,25 @@ sub parse_event_string {
   return \@result;
 }
 
+#pod =method parse_event_string_as_hash
+#pod
+#pod     my $hashref = Log::Fmt->parse_event_string_as_hash($line);
+#pod
+#pod This parses the given line as logfmt, then puts the key/value pairs into a hash
+#pod and returns a reference to it.
+#pod
+#pod Because nothing prevents a single key from appearing more than once, you should
+#pod use this with the understanding that data could be lost.  No guarantee is made
+#pod of which value will be preserved.
+#pod
+#pod =cut
+
+sub parse_event_string_as_hash {
+  my ($self, $string) = @_;
+
+  return { $self->parse_event_string($string)->@* };
+}
+
 1;
 
 __END__
@@ -190,7 +220,7 @@ Log::Fmt - a little parser and emitter of structured log lines
 
 =head1 VERSION
 
-version 3.002
+version 3.006
 
 =head1 OVERVIEW
 
@@ -201,13 +231,13 @@ also do that tolerably-okay parsing for you.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -217,6 +247,11 @@ the minimum required perl.
     key1 => $value1,
     key2 => $value2,
   ]);
+
+Note especially that if any value to encode is a reference I<to a reference>,
+then String::Flogger is used to encode the referenced value.  This means you
+can embed, in your logfmt, a JSON dump of a structure by passing a reference to
+the structure, instead of passing the structure itself.
 
 =head2 parse_event_string
 
@@ -235,13 +270,24 @@ said, the string escaping done by the formatter should correctly reverse.
 If the input string is badly formed, hunks that don't appear to be value
 key/value pairs will be presented as values for the key C<junk>.
 
+=head2 parse_event_string_as_hash
+
+    my $hashref = Log::Fmt->parse_event_string_as_hash($line);
+
+This parses the given line as logfmt, then puts the key/value pairs into a hash
+and returns a reference to it.
+
+Because nothing prevents a single key from appearing more than once, you should
+use this with the understanding that data could be lost.  No guarantee is made
+of which value will be preserved.
+
 =head1 AUTHOR
 
 Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

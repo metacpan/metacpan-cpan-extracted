@@ -1,0 +1,178 @@
+---
+abstract: 'More helpers for DBIx::Class'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  DBIx::Class::Core: '0'
+  DBIx::Class::ResultSet: '0'
+  DBIx::Class::Schema: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Modern::Perl: '0'
+  Test2::Plugin::ExitSummary: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::Times: '0'
+  Test2::V0: '0'
+  Test::DBIx::Class: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-MoreHelpers
+provides:
+  DBIx::Class::Helper::ResultSet::MoreShortcuts:
+    file: lib/DBIx/Class/Helper/ResultSet/MoreShortcuts.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Blank:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Blank.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::BlankOrNull:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/BlankOrNull.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Is:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Is.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::IsAny:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/IsAny.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::IsNot:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/IsNot.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Negative:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Negative.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Nonzero:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Nonzero.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::NotBlank:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/NotBlank.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::NotBlankOrNull:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/NotBlankOrNull.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::NullOrZero:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/NullOrZero.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Positive:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Positive.pm
+    version: '1.0001'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Zero:
+    file: lib/DBIx/Class/Helper/ResultSet/Shortcut/Search/Zero.pm
+    version: '1.0001'
+  DBIx::Class::MoreHelpers:
+    file: lib/DBIx/Class/MoreHelpers.pm
+    version: '1.0001'
+requires:
+  DBIx::Class::Helper::ResultSet::SetOperations: '0'
+  DBIx::Class::Helper::ResultSet::Shortcut::Search::Base: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/DBIx-Class-MoreHelpers/-/issues
+  homepage: https://p3rl.org/DBIx::Class::MoreHelpers
+  repository: https://gitlab.com/GeekRuthie/DBIx-Class-MoreHelpers.git
+version: '1.0001'
+x_BuiltWith:
+  failures:
+    DBIx::Class::Core: 'Module::MetaData could not parse a version from /usr/local/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Core.pm'
+    DBIx::Class::ResultSet: 'Module::MetaData could not parse a version from /usr/local/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/ResultSet.pm'
+    DBIx::Class::Schema: 'Module::MetaData could not parse a version from /usr/local/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Schema.pm'
+  modules:
+    CPAN::Meta: '2.150010'
+    DBIx::Class::Helper::ResultSet::SetOperations: '2.036000'
+    DBIx::Class::Helper::ResultSet::Shortcut::Search::Base: '2.036000'
+    Dist::Zilla: '6.030'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.030'
+    Dist::Zilla::Plugin::CPANFile: '6.030'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.030'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::ExecDir: '6.030'
+    Dist::Zilla::Plugin::FakeRelease: '6.030'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.030'
+    Dist::Zilla::Plugin::MakeMaker: '6.030'
+    Dist::Zilla::Plugin::Manifest: '6.030'
+    Dist::Zilla::Plugin::ManifestSkip: '6.030'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.030'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.030'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.030'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.010'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::PruneCruft: '6.030'
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.029'
+    Dist::Zilla::Plugin::TestRelease: '6.030'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    FindBin: '1.52'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Modern::Perl: '1.20230106'
+    Test2::Plugin::ExitSummary: '0.000155'
+    Test2::Plugin::NoWarnings: '0.09'
+    Test2::Plugin::Times: '0.000155'
+    Test2::V0: '0.000155'
+    Test::DBIx::Class: '0.52'
+    Test::More: '1.302183'
+    base: '2.27'
+    lib: '0.65'
+    parent: '0.238'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

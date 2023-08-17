@@ -30,11 +30,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=PDL-Opt-Simplex-Simple
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/PDL-Opt-Simplex-Simple
+    Please do not use CPAN's request tracker, report bugs here, instead:
+        https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple/issues
 
     Search CPAN
         https://metacpan.org/release/PDL-Opt-Simplex-Simple

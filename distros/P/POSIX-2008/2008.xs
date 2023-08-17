@@ -7,19 +7,58 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#ifdef PERL_IMPLICIT_SYS
+#if defined(PERL_IMPLICIT_SYS)
 #undef open
+#undef close
+#undef stat
+#undef fstat
+#undef lstat
+# if !defined(_WIN32) || defined(__CYGWIN__)
+#undef abort
+#undef access
+#undef chdir
+#undef fchdir
+#undef chmod
+#undef fchmod
+#undef chown
+#undef fchown
+#undef fdopen
+#undef getegid
+#undef geteuid
+#undef getgid
+#undef gethostname
+#undef getuid
+#undef isatty
+#undef killpg
+#undef link
+#undef mkdir
+#undef read
+#undef rename
+#undef rmdir
+#undef setgid
+#undef setuid
+#undef unlink
+#undef write
+# endif
 #endif
 
-#define NEED_sv_2pv_flags
+/* ppport.h says we don't need caller_cx but a frew cpantesters report
+ * "undefined symbol: caller_cx".
+ */
+#define NEED_caller_cx
+#define NEED_croak_xs_usage
 #include "ppport.h"
 
+#include "2008.h"
+
+#ifdef PSX2008_HAS_COMPLEX_H
 #include <complex.h>
+#endif
 #include <ctype.h>
 #ifdef I_DIRENT
 #include <dirent.h>
 #endif
-#ifdef I_DLFCN
+#if defined(I_DLFCN) && defined(PSX2008_HAS_DLFCN_H)
 #include <dlfcn.h>
 #endif
 #include <errno.h>
@@ -30,28 +69,39 @@
 #include <fcntl.h>
 #endif
 #include <fenv.h>
+#ifdef PSX2008_HAS_FNMATCH_H
 #include <fnmatch.h>
+#endif
 #ifdef I_INTTYPES
 #include <inttypes.h>
 #endif
+#ifdef PSX2008_HAS_LIBGEN_H
 #include <libgen.h>
+#endif
 #ifdef I_LIMITS
 #include <limits.h>
+#endif
+#ifdef I_NETDB
+#include <netdb.h>
 #endif
 #ifdef I_MATH
 #include <math.h>
 #endif
-#ifndef __CYGWIN__
+#ifdef PSX2008_HAS_NL_TYPES_H
 #include <nl_types.h>
 #endif
+#ifdef PSX2008_HAS_SIGNAL_H
 #include <signal.h>
+#endif
 #ifdef I_STDLIB
 #include <stdlib.h>
 #endif
 #ifdef I_STRING
 #include <string.h>
 #endif
+#ifdef PSX2008_HAS_STRINGS_H
 #include <strings.h>
+#endif
 #ifdef I_SUNMATH
 #include <sunmath.h>
 #endif
@@ -67,134 +117,278 @@
 #ifdef I_SYS_TYPES
 #include <sys/types.h>
 #endif
+#if defined(I_SYSUIO) && defined(PSX2008_HAS_SYS_UIO_H)
 #include <sys/uio.h>
+#endif
 #ifdef I_TIME
 #include <time.h>
 #endif
 #ifdef I_UNISTD
 #include <unistd.h>
 #endif
-#ifndef __OpenBSD__
+#ifdef PSX2008_HAS_UTMPX_H
 #include <utmpx.h>
 #endif
 
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX 255
+#if defined(__linux__) && defined(PSX2008_HAS_OPENAT2)
+#include <sys/syscall.h>
+#include <linux/openat2.h>
 #endif
+
+#if IVSIZE < LSEEKSIZE
+#define SvOFFT(sv) SvNV(sv)
+#else
+#define SvOFFT(sv) SvIV(sv)
+#endif
+
+#if defined(PSX2008_HAS_SCALBLN)
+#define PSX2008_SCALBN(x, n) scalbln(x, n)
+#elif defined(PSX2008_HAS_SCALBN)
+#define PSX2008_SCALBN(x, n) scalbn(x, n)
+#endif
+
+#if IVSIZE > LONGSIZE
+# if defined(PSX2008_HAS_LLDIV)
+#  define PSX2008_DIV_T lldiv_t
+#  define PSX2008_DIV(numer, denom) lldiv(numer, denom)
+# elif defined(PSX2008_HAS_LDIV)
+#  define PSX2008_DIV_T ldiv_t
+#  define PSX2008_DIV(numer, denom) ldiv(numer, denom)
+# elif defined(PSX2008_HAS_DIV)
+#  define PSX2008_DIV_T div_t
+#  define PSX2008_DIV(numer, denom) div(numer, denom)
+# endif
+#elif IVSIZE > INTSIZE
+# if defined(PSX2008_HAS_LDIV)
+#  define PSX2008_DIV_T ldiv_t
+#  define PSX2008_DIV(numer, denom) ldiv(numer, denom)
+# elif defined(PSX2008_HAS_DIV)
+#  define PSX2008_DIV_T div_t
+#  define PSX2008_DIV(numer, denom) div(numer, denom)
+# endif
+#elif defined(PSX2008_HAS_DIV)
+# define PSX2008_DIV_T div_t
+# define PSX2008_DIV(numer, denom) div(numer, denom)
+#endif
+
+#if IVSIZE > LONGSIZE
+# if defined(PSX2008_HAS_ATOLL)
+#  define PSX2008_ATOI(a) atoll(a)
+# elif defined(PSX2008_HAS_ATOL)
+#  define PSX2008_ATOI(a) atol(a)
+# elif defined(PSX2008_HAS_ATOI)
+#  define PSX2008_ATOI(a) atoi(a)
+# endif
+# if defined(PSX2008_HAS_FFSLL)
+#  define PSX2008_FFS(i) ffsll(i)
+# elif defined(PSX2008_HAS_FFSL)
+#  define PSX2008_FFS(i) ffsl(i)
+# elif defined(PSX2008_HAS_FFS)
+#  define PSX2008_FFS(i) ffs(i)
+# endif
+# if defined(PSX2008_HAS_LLABS)
+#  define PSX2008_ABS(i) llabs(i)
+# elif defined(PSX2008_HAS_LABS)
+#  define PSX2008_ABS(i) labs(i)
+# elif defined(PSX2008_HAS_ABS)
+#  define PSX2008_ABS(i) abs(i)
+# endif
+#elif IVSIZE > INTSIZE
+# if defined(PSX2008_HAS_ATOL)
+#  define PSX2008_ATOI(a) atol(a)
+# elif defined(PSX2008_HAS_ATOI)
+#  define PSX2008_ATOI(a) atoi(a)
+# endif
+# if defined(PSX2008_HAS_FFSL)
+#  define PSX2008_FFS(i) ffsl(i)
+# elif defined(PSX2008_HAS_FFS)
+#  define PSX2008_FFS(i) ffs(i)
+# endif
+# if defined(PSX2008_HAS_LABS)
+#  define PSX2008_ABS(i) labs(i)
+# elif defined(PSX2008_HAS_ABS)
+#  define PSX2008_ABS(i) abs(i)
+# endif
+#else
+# if defined(PSX2008_HAS_ATOI)
+#  define PSX2008_ATOI(a) atoi(a)
+# endif
+# if defined(PSX2008_HAS_FFS)
+#  define PSX2008_FFS(i) ffs(i)
+# endif
+# if defined(PSX2008_HAS_ABS)
+#  define PSX2008_ABS(i) abs(i)
+# endif
+#endif
+
+#if defined(PSX2008_HAS_LLROUND)
+# define PSX2008_LROUND(x) llround(x)
+# define PSX2008_LROUND_T long long
+#elif defined(PSX2008_HAS_LROUND)
+# define PSX2008_LROUND(x) lround(x)
+# define PSX2008_LROUND_T long
+#endif
+
+#if defined(PSX2008_HAS_OPENAT) ||              \
+  defined(PSX2008_HAS_CHDIR) ||                 \
+  defined(PSX2008_HAS_CHMOD) ||                 \
+  defined(PSX2008_HAS_CHOWN) ||                 \
+  defined(PSX2008_HAS_FDATASYNC) ||             \
+  defined(PSX2008_HAS_FDOPEN) ||                \
+  defined(PSX2008_HAS_FDOPENDIR) ||             \
+  defined(PSX2008_HAS_FSTAT) ||                 \
+  defined(PSX2008_HAS_FUTIMENS) ||              \
+  defined(PSX2008_HAS_FSYNC) ||                 \
+  defined(PSX2008_HAS_TRUNCATE) ||              \
+  defined(PSX2008_HAS_ISATTY) ||                \
+  defined(PSX2008_HAS_POSIX_FADVISE) ||         \
+  defined(PSX2008_HAS_POSIX_FALLOCATE) ||       \
+  defined(PSX2008_HAS_READ) ||                  \
+  defined(PSX2008_HAS_WRITE)
+#define PSX2008_NEED_PSX_FILENO
+#endif
+
+#define RETURN_COMPLEX(z) { \
+    EXTEND(SP, 2);          \
+    mPUSHn(creal(z));       \
+    mPUSHn(cimag(z));       \
+}
 
 #include "const-c.inc"
 
-typedef int SysRet;   /* returns 0 as "0 but true" */
-typedef int SysRet0;  /* returns 0 as 0 */
-typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
+typedef IV SysRet;  /* returns -1 as undef, 0 as "0 but true", other unchanged */
+typedef IV SysRet0; /* returns -1 as undef, other unchanged */
+typedef IV SysRetTrue; /* returns 0 as "0 but true", undef otherwise */
+typedef IV psx_fd_t; /* checks for file handle or descriptor via typemap */
 
-/* is*() stuff borrowed from POSIX.xs */
-typedef int (*isfunc_t)(int);
-typedef void (*any_dptr_t)(void *);
-
-#ifndef __NetBSD__
-#define RETURN_STAT_BUF(buf) { \
-    EXTEND(SP, 16);                \
-    mPUSHu( buf.st_dev );          \
-    mPUSHu( buf.st_ino );          \
-    mPUSHu( buf.st_mode );         \
-    mPUSHu( buf.st_nlink );        \
-    mPUSHu( buf.st_uid );          \
-    mPUSHu( buf.st_gid );          \
-    mPUSHu( buf.st_rdev );         \
-    if (sizeof(IV) < 8)            \
-        mPUSHn( buf.st_size );     \
-    else                           \
-        mPUSHi( buf.st_size );     \
-    mPUSHi( buf.st_atim.tv_sec );  \
-    mPUSHi( buf.st_mtim.tv_sec );  \
-    mPUSHi( buf.st_ctim.tv_sec );  \
-    /* actually these come before the times but we follow core stat */ \
-    mPUSHi( buf.st_blksize );      \
-    mPUSHi( buf.st_blocks );       \
-    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
-    mPUSHi( buf.st_atim.tv_nsec ); \
-    mPUSHi( buf.st_mtim.tv_nsec ); \
-    mPUSHi( buf.st_ctim.tv_nsec ); \
+/* Convert unsigned value to string. Shamelessly plagiarized from libowfat. */
+#define FMT_UINT(uint_val, utmp_val, udest, ulen) {                     \
+    UV ulen2;                                                           \
+    char *ud = (char*)(udest);                                          \
+    /* count digits */                                                  \
+    for (ulen=1, utmp_val=(uint_val); utmp_val>9; ++ulen)               \
+      utmp_val /= 10;                                                   \
+    if (ud)                                                             \
+      for (utmp_val=(uint_val), ud+=len, ulen2=ulen+1; --ulen2; utmp_val/=10) \
+        *--ud = (char)((utmp_val%10)+'0');                              \
 }
+
+/* Push int_val as an IV, UV or PV depending on how big the value is.
+ * tmp_val must be a variable of the same type as int_val to get the
+ * string conversion right. */
+#define PUSH_INT_OR_PV(int_val, tmp_val) {                \
+    UV len;                                               \
+    char buf[24];                                         \
+    if ((int_val) < 0) {                                  \
+      if ((int_val) >= IV_MIN)                            \
+        mPUSHi(int_val);                                  \
+      else {                                              \
+        buf[0] = '-';                                     \
+        FMT_UINT(-(int_val), tmp_val, buf+1, len);        \
+        mPUSHp(buf, len+1);                               \
+      }                                                   \
+    }                                                     \
+    else {                                                \
+      if ((int_val) <= UV_MAX)                            \
+        mPUSHu(int_val);                                  \
+      else {                                              \
+        FMT_UINT((int_val), tmp_val, buf, len);           \
+        mPUSHp(buf, len);                                 \
+      }                                                   \
+    }                                                     \
+}
+
+/*
+ * We return decimal strings for values outside the IV_MIN..UV_MAX range.
+ * Since each struct stat member has its own integer type, be it signed or
+ * unsigned, we cannot use a function for the string conversion because that
+ * would need a fixed type declaration. Instead we use a macro and a second
+ * struct stat to apply the correct type.
+ */
+static SV**
+_push_stat_buf(pTHX_ SV **SP, struct stat *st) {
+  struct stat st_tmp;
+
+  PUSH_INT_OR_PV(st->st_dev, st_tmp.st_dev);
+  PUSH_INT_OR_PV(st->st_ino, st_tmp.st_ino);
+  PUSH_INT_OR_PV(st->st_mode, st_tmp.st_mode);
+  PUSH_INT_OR_PV(st->st_nlink, st_tmp.st_nlink);
+  PUSH_INT_OR_PV(st->st_uid, st_tmp.st_uid);
+  PUSH_INT_OR_PV(st->st_gid, st_tmp.st_gid);
+  PUSH_INT_OR_PV(st->st_rdev, st_tmp.st_rdev);
+  PUSH_INT_OR_PV(st->st_size, st_tmp.st_size);
+  PUSH_INT_OR_PV(st->st_atime, st_tmp.st_atime);
+  PUSH_INT_OR_PV(st->st_mtime, st_tmp.st_mtime);
+#ifdef PSX2008_HAS_ST_CTIME
+  PUSH_INT_OR_PV(st->st_ctime, st_tmp.st_ctime);
 #else
-#define RETURN_STAT_BUF(buf) { \
-    EXTEND(SP, 16);                \
-    mPUSHu( buf.st_dev );          \
-    mPUSHu( buf.st_ino );          \
-    mPUSHu( buf.st_mode );         \
-    mPUSHu( buf.st_nlink );        \
-    mPUSHu( buf.st_uid );          \
-    mPUSHu( buf.st_gid );          \
-    mPUSHu( buf.st_rdev );         \
-    if (sizeof(IV) < 8)            \
-        mPUSHn( buf.st_size );     \
-    else                           \
-        mPUSHi( buf.st_size );     \
-    mPUSHi( buf.st_atime );  \
-    mPUSHi( buf.st_mtime );  \
-    mPUSHi( buf.st_ctime );  \
-    /* actually these come before the times but we follow core stat */ \
-    mPUSHi( buf.st_blksize );      \
-    mPUSHi( buf.st_blocks );       \
-    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
-    mPUSHi( buf.st_atimensec ); \
-    mPUSHi( buf.st_mtimensec ); \
-    mPUSHi( buf.st_ctimensec ); \
-}
+  PUSHs(&PL_sv_undef);
+#endif
+  /* actually these come before the times but we follow core stat */
+#ifdef USE_STAT_BLOCKS
+  PUSH_INT_OR_PV(st->st_blksize, st_tmp.st_blksize);
+  PUSH_INT_OR_PV(st->st_blocks, st_tmp.st_blocks);
+#else
+  PUSHs(&PL_sv_undef);
+  PUSHs(&PL_sv_undef);
+#endif
+#if defined(PSX2008_HAS_ST_ATIM)
+  PUSH_INT_OR_PV(st->st_atim.tv_nsec, st_tmp.st_atim.tv_nsec);
+  PUSH_INT_OR_PV(st->st_mtim.tv_nsec, st_tmp.st_mtim.tv_nsec);
+# ifdef PSX2008_HAS_ST_CTIME
+  PUSH_INT_OR_PV(st->st_ctim.tv_nsec, st_tmp.st_ctim.tv_nsec);
+# else
+  PUSHs(&PL_sv_undef);
+# endif
+#elif defined PSX2008_HAS_ST_ATIMENSEC
+  PUSH_INT_OR_PV(st->st_atimensec, st_tmp.st_atimensec);
+  PUSH_INT_OR_PV(st->st_mtimensec, st_tmp.st_mtimensec);
+# ifdef PSX2008_HAS_ST_CTIME
+  PUSH_INT_OR_PV(st->st_ctimensec, st_tmp.st_ctimensec);
+# else
+  PUSHs(&PL_sv_undef);
+# endif
 #endif
 
-static XSPROTO(is_common);
-static XSPROTO(is_common)
-{
-    dXSARGS;
-    if (items != 1)
-#ifdef PERL_ARGS_ASSERT_CROAK_XS_USAGE
-       croak_xs_usage(cv,  "charstring");
-#else
-       croak("Usage: isX(charstring)");
-#endif
-
-    {
-        dXSTARG;
-        STRLEN  len;
-        int     RETVAL;
-        unsigned char *s = (unsigned char *) SvPV(ST(0), len);
-        unsigned char *e = s + len;
-        isfunc_t isfunc = (isfunc_t) XSANY.any_dptr;
-
-        /* This is the real fix for RT#84680 */
-        for (RETVAL = len ? 1 : 0; RETVAL && s < e; s++)
-            if (!isfunc(*s))
-                RETVAL = 0;
-        XSprePUSH;
-        PUSHi((IV)RETVAL);
-    }
-    XSRETURN(1);
+  return SP;
 }
 
+#define RETURN_STAT_BUF(rv, buf) {              \
+    U8 gimme = GIMME_V;                         \
+    if (gimme == G_LIST) {                      \
+      if (rv == 0) {                            \
+        EXTEND(SP, 16);                         \
+        SP = _push_stat_buf(aTHX_ SP, &buf);    \
+      }                                         \
+    }                                           \
+    else if (gimme == G_SCALAR)                 \
+      PUSHs(boolSV(rv == 0));                   \
+}
+
+#ifdef PSX2008_HAS_READLINK
 static char *
-_readlink50c(char *path, int *dirfd) {
+_readlink50c(const char *path, IV *dirfd) {
   /*
-   * CORE::readlink() is broken because it unnecessarily uses a fixed-size
-   * result buffer. We use a dynamically growing buffer instead, leaving it
-   * up to the file system how long a symlink may be.
+   * CORE::readlink() is broken because it uses a fixed-size result buffer of
+   * PATH_MAX bytes (the manpage explicitly advises against this). We use a
+   * dynamically growing buffer instead, leaving it up to the file system how
+   * long a symlink may be.
    */
-  size_t bufsize = 256;
+  size_t bufsize = 1023; /* This should be enough in most cases to read the link in one go. */
   ssize_t linklen;
   char *buf;
 
-  errno = 0;
-
   Newxc(buf, bufsize, char, char);
-  if (!buf)
+  if (!buf) {
+    errno = ENOMEM;
     return NULL;
+  }
 
   while (1) {
     if (dirfd == NULL)
       linklen = readlink(path, buf, bufsize);
     else {
-#ifdef AT_FDCWD
+#ifdef PSX2008_HAS_READLINKAT
       linklen = readlinkat(*dirfd, path, buf, bufsize);
 #else
       errno = ENOSYS;
@@ -202,8 +396,8 @@ _readlink50c(char *path, int *dirfd) {
 #endif
     }
 
-    if (linklen >= 0) {
-      if ((size_t)linklen < bufsize || linklen == SSIZE_MAX) {
+    if (linklen != -1) {
+      if ((size_t)linklen < bufsize) {
         buf[linklen] = '\0';
         return buf;
       }
@@ -215,13 +409,18 @@ _readlink50c(char *path, int *dirfd) {
     }
 
     bufsize <<= 1;
+    bufsize |= 1;
 
     Renew(buf, bufsize, char);
-    if (buf == NULL)
+    if (buf == NULL) {
+      errno = ENOMEM;
       return NULL;
+    }
   }
 }
+#endif
 
+#if defined(PSX2008_HAS_READV) || defined(PSX2008_HAS_PREADV)
 static void
 _free_iov(struct iovec *iov, int cnt) {
   int i;
@@ -231,21 +430,36 @@ _free_iov(struct iovec *iov, int cnt) {
       if (iov[i].iov_base)
         Safefree(iov[i].iov_base);
 }
+#endif
 
+#ifdef PSX2008_HAS_READV
 static int
-_readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
-  int iovcnt, i, rv;
+_readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset_sv, SV *flags_sv) {
+  int i, rv;
   struct iovec *iov;
   void *iov_base;
   /* iov_len is a size_t but it is an error if the sum of the iov_len values
      exceeds SSIZE_MAX ... Dafuq? */
   size_t iov_len, iov_sum, sv_cur;
 
-#ifdef __CYGWIN__
-  if (offset != NULL)
+#ifndef PSX2008_HAS_PREADV
+  if (offset_sv != NULL) {
+    errno = ENOSYS;
     return -1;
+  }
 #endif
-  
+#ifndef PSX2008_HAS_PREADV2
+  if (flags_sv != 0) {
+    errno = ENOSYS;
+    return -1;
+  }
+#endif
+
+  /* The prototype for buffers is \[@$] so that we can be called either with
+     @buffers or $buffers. @buffers gives us an array reference while $buffers
+     gives us a reference to a scalar (which in return is hopefully an array
+     reference). In the latter case we need to resolve the argument twice to
+     get the array. */
   for (i = 0; i < 2; i++) {
     if (SvROK(buffers)) {
       buffers = SvRV(buffers);
@@ -257,23 +471,30 @@ _readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
     croak("buffers is not an array reference");
   }
 
-  iovcnt = av_len(sizes) + 1;
-  if (iovcnt <= 0)
+  Size_t iovcnt = av_count(sizes);
+  if (iovcnt == 0)
     return 0;
+  if (iovcnt > INT_MAX) {
+    errno = EINVAL;
+    return -1;
+  }
 
   Newxz(iov, iovcnt, struct iovec);
-  if (!iov)
+  if (!iov) {
+    errno = ENOMEM;
     return -1;
+  }
 
   for (i = 0; i < iovcnt; i++) {
     SV **size = av_fetch(sizes, i, 0);
     if (size && SvOK(*size)) {
       iov_len = SvUV(*size);
-      if (iov_len) {
+      if (iov_len > 0) {
         Newx(iov_base, iov_len, char);
         if (!iov_base) {
           _free_iov(iov, i);
           Safefree(iov);
+          errno = ENOMEM;
           return -1;
         }
         iov[i].iov_base = iov_base;
@@ -282,12 +503,27 @@ _readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
     }
   }
 
-  if (offset == NULL)
+  if (offset_sv == NULL)
     rv = readv(fd, iov, iovcnt);
-#ifndef __CYGWIN__
-  else
-    rv = preadv(fd, iov, iovcnt, SvOK(offset) ? SvUV(offset) : 0);
+  else if (flags_sv == NULL) {
+#ifdef PSX2008_HAS_PREADV
+    off_t offset = SvOK(offset_sv) ? (off_t)SvOFFT(offset_sv) : 0;
+    rv = preadv(fd, iov, iovcnt, offset);
+#else
+    rv = -1;
+    errno = ENOSYS;
 #endif
+  }
+  else {
+#ifdef PSX2008_HAS_PREADV2
+    off_t offset = SvOK(offset_sv) ? (off_t)SvOFFT(offset_sv) : 0;
+    int flags = SvOK(flags_sv) ? (int)SvIV(flags_sv) : 0;
+    rv = preadv2(fd, iov, iovcnt, offset, flags);
+#else
+    rv = -1;
+    errno = ENOSYS;
+#endif
+  }
 
   if (rv <= 0) {
     _free_iov(iov, iovcnt);
@@ -318,6 +554,7 @@ _readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
     if (!tmp_sv) {
       _free_iov(iov + i, iovcnt - i);
       Safefree(iov);
+      errno = ENOMEM;
       return -1;
     }
 
@@ -338,50 +575,87 @@ _readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
   Safefree(iov);
   return rv;
 }
+#endif
 
+#ifdef PSX2008_HAS_WRITEV
 static int
-_writev50c(pTHX_ int fd, AV *buffers, SV *offset) {
+_writev50c(pTHX_ int fd, AV *buffers, SV *offset_sv, SV *flags_sv) {
   struct iovec *iov;
-  struct iovec iov_elt;
+  char *iov_base;
+  STRLEN iov_len;
   int i, rv;
 
-#ifdef __CYGWIN__
-  if (offset != NULL)
+#ifndef PSX2008_HAS_PWRITEV
+  if (offset_sv != NULL) {
+    errno = ENOSYS;
     return -1;
+  }
+#endif
+#ifndef PSX2008_HAS_PWRITEV2
+  if (flags_sv != NULL) {
+    errno = ENOSYS;
+    return -1;
+  }
 #endif
   
-  const int bufcnt = av_len(buffers) + 1;
-  if (bufcnt <= 0)
+  Size_t bufcnt = av_count(buffers);
+  if (bufcnt == 0)
     return 0;
+  if (bufcnt > INT_MAX) {
+    errno = EINVAL;
+    return -1;
+  }
 
   Newxc(iov, bufcnt, struct iovec, struct iovec);
-  if (!iov)
+  if (!iov) {
+    errno = ENOMEM;
     return -1;
+  }
 
   int iovcnt = 0;
 
   for (i = 0; i < bufcnt; i++) {
     SV **av_elt = av_fetch(buffers, i, 0);
     if (av_elt && SvOK(*av_elt)) {
-      iov_elt.iov_base = (void*)SvPV(*av_elt, iov_elt.iov_len);
-      if (iov_elt.iov_len)
-        iov[iovcnt++] = iov_elt;
+      iov_base = SvPV(*av_elt, iov_len);
+      if (iov_len > 0) {
+        iov[iovcnt].iov_base = (void*)iov_base;
+        iov[iovcnt].iov_len = (size_t)iov_len;
+        iovcnt++;
+      }
     }
   }
 
   if (iovcnt == 0)
     rv = 0;
-  else if (offset == NULL) 
+  else if (offset_sv == NULL) 
     rv = writev(fd, iov, iovcnt);
-#ifndef __CYGWIN__
-  else
-    rv = pwritev(fd, iov, iovcnt, SvOK(offset) ? SvUV(offset) : 0);
+  else if (flags_sv == NULL) {
+#ifdef PSX2008_HAS_PWRITEV
+    off_t offset = SvOK(offset_sv) ? (off_t)SvOFFT(offset_sv) : 0;
+    rv = pwritev(fd, iov, iovcnt, offset);
+#else
+    rv = -1;
+    errno = ENOSYS;
 #endif
+  }
+  else {
+#ifdef PSX2008_HAS_PWRITEV2
+    off_t offset = SvOK(offset_sv) ? (off_t)SvOFFT(offset_sv) : 0;
+    int flags = SvOK(flags_sv) ? (int)SvIV(flags_sv) : 0;
+    rv = pwritev2(fd, iov, iovcnt, offset, flags);
+#else
+    rv = -1;
+    errno = ENOSYS;
+#endif
+  }
 
   Safefree(iov);
   return rv;
 }
+#endif
 
+#ifdef PSX2008_HAS_OPENAT
 static const char*
 flags2raw(int flags) {
   int accmode = flags & O_ACCMODE;
@@ -396,29 +670,22 @@ flags2raw(int flags) {
   else
     return "";
 }
-
-#if PERL_BCDVERSION >= 0x5008005
-static int
-psx_looks_like_number(pTHX_ SV *sv) {
-  return looks_like_number(sv);
-}
-#else
-static int
-psx_looks_like_number(pTHX_ SV *sv) {
-  if (SvPOK(sv) || SvPOKp(sv))
-    return looks_like_number(sv);
-  else
-    return (SvFLAGS(sv) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK));
-}
 #endif
 
-static int
+#if PERL_BCDVERSION >= 0x5008005
+# define psx_looks_like_number(sv) looks_like_number(sv)
+#else
+# define psx_looks_like_number(sv) ((SvPOK(sv) || SvPOKp(sv)) ? looks_like_number(sv) : (SvFLAGS(sv) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK)))
+#endif
+
+#ifdef PSX2008_NEED_PSX_FILENO
+static IV
 psx_fileno(pTHX_ SV *sv) {
   IO *io;
-  int fn = -1;
+  IV fn = -1;
 
   if (SvOK(sv)) {
-    if (psx_looks_like_number(aTHX_ sv))
+    if (psx_looks_like_number(sv))
       fn = SvIV(sv);
     else if ((io = sv_2io(sv))) {
       if (IoIFP(io))  /* from open() or sysopen() */
@@ -430,145 +697,148 @@ psx_fileno(pTHX_ SV *sv) {
 
   return fn;
 }
+#endif
 
+#ifdef PSX2008_HAS_CLOSE
 static int
 psx_close(pTHX_ SV *sv) {
   IO *io;
   int rv = -1;
 
-  if (SvOK(sv)) {
-    if (psx_looks_like_number(aTHX_ sv)) {
+  if (!SvOK(sv))
+    errno = EBADF;
+  else if (psx_looks_like_number(sv)) {
       int fn = SvIV(sv);
       rv = close(fn);
-    }
-    else if ((io = sv_2io(sv))) {
-      if (IoIFP(io))
-        rv = PerlIO_close(IoIFP(io));
-      else if (IoDIRP(io)) {
-#ifdef VOID_CLOSEDIR
-        errno = 0;
-        PerlDir_close(IoDIRP(io));
-        rv = errno ? -1 : 0;
-#else
-        rv = PerlDir_close(IoDIRP(io));
-#endif
-        IoDIRP(io) = 0;
-      }
-    }
   }
+  else if ((io = sv_2io(sv))) {
+    if (IoIFP(io))
+      rv = PerlIO_close(IoIFP(io));
+    else if (IoDIRP(io)) {
+#ifdef VOID_CLOSEDIR
+      errno = 0;
+      PerlDir_close(IoDIRP(io));
+      rv = errno ? -1 : 0;
+#else
+      rv = PerlDir_close(IoDIRP(io));
+#endif
+      IoDIRP(io) = 0;
+    }
+    else
+      errno = EBADF;
+  }
+  else
+    errno = EBADF;
 
   return rv;
 }
+#endif
+
+/* Macro for isalnum, isdigit, etc.
+ * Contains the fix for https://github.com/Perl/perl5/issues/11148 which was
+ * "solved" by them Perl guys by cowardly removing the functions from POSIX.
+ */
+#define ISFUNC(isfunc) {                                          \
+    STRLEN len;                                                   \
+    unsigned char *s = (unsigned char *) SvPV(charstring, len);   \
+    unsigned char *e = s + len;                                   \
+    for (RETVAL = len ? 1 : 0; RETVAL && s < e; s++)              \
+      if (!isfunc(*s))                                            \
+        RETVAL = 0;                                               \
+  }
 
 #define PACKNAME "POSIX::2008"
-
 
 MODULE = POSIX::2008    PACKAGE = POSIX::2008
 
 PROTOTYPES: ENABLE
 
 INCLUDE: const-xs.inc
-  
+
+#ifdef PSX2008_HAS_A64L
 long
 a64l(char* s);
 
-char*
+#endif
+
+#ifdef PSX2008_HAS_L64A
+char *
 l64a(long value);
 
+#endif
+
+#ifdef PSX2008_HAS_ABORT
 void
 abort();
 
+#endif
+
+#ifdef PSX2008_HAS_ALARM
 unsigned
 alarm(unsigned seconds);
 
+#endif
+
+#ifdef PSX2008_HAS_ATOF
 NV
-atof(char *str);
+atof(const char *str);
 
-int
-atoi(char *str);
+#endif
 
-long
-atol(char *str);
+#ifdef PSX2008_ATOI
+IV
+atoi(const char *str);
+  CODE:
+    RETVAL = PSX2008_ATOI(str);
+  OUTPUT: 
+    RETVAL
 
-NV
-atoll(char *str);
+#endif
 
-char*
+#ifdef PSX2008_HAS_BASENAME 
+char *
 basename(char *path);
 
-#ifndef __CYGWIN__
+#endif
+
+#ifdef PSX2008_HAS_CATCLOSE
 int
 catclose(nl_catd catd);
 
-char*
-catgets(nl_catd catd, int set_id, int msg_id, char *dflt);
+#endif
 
-nl_catd
-catopen(char *name, int oflag);
-
-#else
-void
-catclose(...);
-    PPCODE:
-        croak("catclose() not available");
-
-void
-catgets(...);
-    PPCODE:
-        croak("catgets() not available");
-
-void
-catopen(...);
-    PPCODE:
-        croak("catopen() not available");
+#ifdef PSX2008_HAS_CATGETS
+char *
+catgets(nl_catd catd, int set_id, int msg_id, const char *dflt);
 
 #endif
 
+#ifdef PSX2008_HAS_CATOPEN
+nl_catd
+catopen(const char *name, int oflag);
+
+#endif
+
+#ifdef PSX2008_HAS_CLOCK
 clock_t
 clock();
 
-#if !defined(CLOCK_REALTIME) || \
-    (defined(__FreeBSD_version)  && __FreeBSD_version  < 1000000) || \
-    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+#endif
 
+#ifdef PSX2008_HAS_CLOCK_GETCPUCLOCKID
 void
-clock_getcpuclockid(...);
-    PPCODE:
-        croak("clock_getcpuclockid() not available");
-
-#else
-clockid_t
-clock_getcpuclockid(pid_t pid = PerlProc_getpid());
+clock_getcpuclockid(pid_t pid=PerlProc_getpid());
     INIT:
         clockid_t clock_id;
-    CODE:
-        if (clock_getcpuclockid(pid, &clock_id) != 0)
-            XSRETURN_UNDEF;
-        RETVAL = clock_id;
-    OUTPUT:
-        RETVAL
+    PPCODE:
+        if (clock_getcpuclockid(pid, &clock_id) == 0)
+          mPUSHi((IV)clock_id);
 
 #endif
 
-#ifndef CLOCK_REALTIME
+#ifdef PSX2008_HAS_CLOCK_GETRES
 void
-clock_getres(...);
-    PPCODE:
-        croak("clock_getres() not available");
-
-void
-clock_gettime(...);
-    PPCODE:
-        croak("clock_gettime() not available");
-
-void
-clock_settime(...);
-    PPCODE:
-        croak("clock_settime() not available");
-
-#else
-void
-clock_getres(clockid_t clock_id = CLOCK_REALTIME);
+clock_getres(clockid_t clock_id=CLOCK_REALTIME);
     ALIAS:
         clock_gettime = 1
     INIT:
@@ -585,144 +855,169 @@ clock_getres(clockid_t clock_id = CLOCK_REALTIME);
             mPUSHi(res.tv_nsec);
         }
 
-int
+#endif
+
+#ifdef PSX2008_HAS_CLOCK_SETTIME
+void
 clock_settime(clockid_t clock_id, time_t sec, long nsec);
-    INIT:
-        struct timespec tp = { sec, nsec };
-    CODE:
-        RETVAL = clock_settime(clock_id, &tp);
-        if (RETVAL)
-            XSRETURN_UNDEF;
-    OUTPUT:
-        RETVAL
+  INIT:
+    struct timespec tp = { sec, nsec };
+  PPCODE:
+    if (clock_settime(clock_id, &tp) == 0)
+      mPUSHp("0 but true", 10);
 
 #endif
 
-#define RETURN_NANOSLEEP_REMAIN(ret) {                      \
-    if (ret == 0 || errno == EINTR) {                       \
-        if (GIMME_V != G_ARRAY)                             \
-            mPUSHn(remain.tv_sec + remain.tv_nsec/(NV)1e9); \
-        else {                                              \
-            EXTEND(SP, 2);                                  \
-            mPUSHi(remain.tv_sec);                          \
-            mPUSHi(remain.tv_nsec);                         \
-        }                                                   \
+#define PUSH_NANOSLEEP_REMAIN {                             \
+    U8 gimme = GIMME_V;                                     \
+    if (gimme == G_LIST) {                                  \
+      EXTEND(SP, 2);                                        \
+      mPUSHi(remain.tv_sec);                                \
+      mPUSHi(remain.tv_nsec);                               \
     }                                                       \
-    else if (GIMME_V != G_ARRAY)                            \
-        XSRETURN_UNDEF;                                     \
+    else if (gimme == G_SCALAR)                             \
+      mPUSHn(remain.tv_sec + remain.tv_nsec/(NV)1e9);       \
 }
 
-#if !defined(CLOCK_REALTIME) || \
-    (defined(__FreeBSD_version) && __FreeBSD_version < 1101000) || \
-    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || \
-    defined(__OpenBSD__)
-
-void
-clock_nanosleep(...);
-    PPCODE:
-        croak("clock_nanosleep not available");
-
-#else
+#ifdef PSX2008_HAS_CLOCK_NANOSLEEP
 void
 clock_nanosleep(clockid_t clock_id, int flags, time_t sec, long nsec);
-    INIT:
-        const struct timespec request = { sec, nsec };
-        struct timespec remain = { 0, 0 };
-    PPCODE:
-        errno = clock_nanosleep(clock_id, flags, &request, &remain);
-        RETURN_NANOSLEEP_REMAIN(errno)
+  INIT:
+    int rv;
+    const struct timespec request = { sec, nsec };
+    struct timespec remain = { 0, 0 };
+  PPCODE:
+    rv = clock_nanosleep(clock_id, flags, &request, &remain);
+    if (rv == 0 || (errno = rv) == EINTR)
+      PUSH_NANOSLEEP_REMAIN;
 
 #endif
 
-#ifdef HAS_NANOSLEEP
+#ifdef PSX2008_HAS_NANOSLEEP
 void
 nanosleep(time_t sec, long nsec);
-    INIT:
-        struct timespec request = { sec, nsec };
-        struct timespec remain = { 0, 0 };
-        int ret;
-    PPCODE:
-        errno = 0;
-        ret = nanosleep(&request, &remain);
-        RETURN_NANOSLEEP_REMAIN(ret)
+  INIT:
+    const struct timespec request = { sec, nsec };
+    struct timespec remain = { 0, 0 };
+  PPCODE:
+    if (nanosleep(&request, &remain) == 0 || errno == EINTR)
+      PUSH_NANOSLEEP_REMAIN;
 
-#else
-void
-nanosleep(...);
-    PPCODE:
-        croak("nanosleep() not available");
-        
 #endif
 
+#ifdef PSX2008_HAS_CONFSTR
 char *
 confstr(int name);
-    INIT:
-        size_t len;
-        char *buf = NULL;
-    CODE:
-        len = confstr(name, NULL, 0);
-        if (len) {
-            Newxc(buf, len, char, char);
-            if (buf != NULL)
-                confstr(name, buf, len);
-        }
-        RETVAL = buf;
-    OUTPUT:
-        RETVAL
-    CLEANUP:
-        if (buf != NULL)
-            Safefree(buf);
+  INIT:
+    size_t len;
+    char *buf = NULL;
+  CODE:
+    len = confstr(name, NULL, 0);
+    if (len) {
+      Newxc(buf, len, char, char);
+      if (buf != NULL)
+        confstr(name, buf, len);
+    }
+    RETVAL = buf;
+  OUTPUT:
+    RETVAL
+  CLEANUP:
+    if (buf != NULL)
+      Safefree(buf);
 
-char*
+#endif
+
+#ifdef PSX2008_HAS_DIRNAME
+char *
 dirname(char *path);
 
+#endif
+
+#ifdef PSX2008_HAS_DLCLOSE
 int
 dlclose(void *handle);
 
+#endif
+
+#ifdef PSX2008_HAS_DLERROR
 char *
 dlerror();
 
-void *
-dlopen(char *file, int mode);
+#endif
 
+#ifdef PSX2008_HAS_DLOPEN
 void *
-dlsym(void *handle, char *name);
+dlopen(const char *file, int mode);
 
+#endif
+
+#ifdef PSX2008_HAS_DLSYM
+void *
+dlsym(void *handle, const char *name);
+
+#endif
+
+#ifdef PSX2008_HAS_FEGETROUND
 int
 fegetround();
 
-int
-fesetround(int round);
+#endif
 
-int
-ffs(int i);
+#ifdef PSX2008_HAS_FESETROUND
+SysRetTrue
+fesetround(int rounding_mode);
 
-int
-fnmatch(char *pattern, char *string, int flags);
-    CODE:
-        RETVAL = fnmatch(pattern, string, flags);
-        if (RETVAL && RETVAL != FNM_NOMATCH)
-            XSRETURN_UNDEF;
-    OUTPUT:
-        RETVAL
+#endif
 
+#ifdef PSX2008_HAS_FECLEAREXCEPT
+SysRetTrue
+feclearexcept(int excepts);
+
+#endif
+
+#ifdef PSX2008_HAS_FERAISEEXCEPT
+SysRetTrue
+feraiseexcept(int excepts);
+
+#endif
+
+#ifdef PSX2008_HAS_FETESTEXCEPT
+int
+fetestexcept(int excepts);
+
+#endif
+
+#ifdef PSX2008_FFS
+IV
+ffs(IV i);
+  CODE:
+    RETVAL = PSX2008_FFS(i);
+  OUTPUT: 
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_FNMATCH
+void
+fnmatch(const char *pattern, const char *string, int flags);
+  INIT:
+    int rv;
+  PPCODE:
+    rv = fnmatch(pattern, string, flags);
+    if (rv == 0 || rv == FNM_NOMATCH)
+      mPUSHi(rv);
+
+#endif
+
+#ifdef PSX2008_HAS_KILLPG
 int
 killpg(pid_t pgrp, int sig);
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__CYGWIN__)
-void
-getdate(...);
-    PPCODE:
-        croak("getdate() not available");
+#endif
 
+#ifdef PSX2008_HAS_GETDATE
 void
-getdate_err();
-    PPCODE:
-        croak("getdate_err() not available");
-
-#else
-void
-getdate(char *string);
+getdate(const char *string);
     INIT:
         struct tm *tm = getdate(string);
     PPCODE:
@@ -739,10 +1034,11 @@ getdate(char *string);
             mPUSHi(tm->tm_isdst);
         }
 
+#endif
+
+#ifdef PSX2008_HAS_GETDATE_ERR
 int
 getdate_err();
-    PREINIT:
-        extern int getdate_err;
     CODE:
         RETVAL = getdate_err;
     OUTPUT:
@@ -750,8 +1046,9 @@ getdate_err();
 
 #endif
 
+#ifdef PSX2008_HAS_STRPTIME
 void
-strptime(char *s, char *format, SV *sec = NULL, SV *min = NULL, SV *hour = NULL, SV *mday = NULL, SV *mon = NULL, SV *year = NULL, SV *wday = NULL, SV *yday = NULL, SV *isdst = NULL);
+strptime(const char *s, const char *format, SV *sec = NULL, SV *min = NULL, SV *hour = NULL, SV *mday = NULL, SV *mon = NULL, SV *year = NULL, SV *wday = NULL, SV *yday = NULL, SV *isdst = NULL);
     PREINIT:
         char *remainder;
         struct tm tm = { -1, -1, -1, -1, -1, INT_MIN, -1, -1, -1 };
@@ -779,37 +1076,47 @@ strptime(char *s, char *format, SV *sec = NULL, SV *min = NULL, SV *hour = NULL,
       remainder = strptime(s, format, &tm);
 
       if (remainder) {
-        if (GIMME != G_ARRAY)
+        if (GIMME != G_LIST)
           mPUSHi(remainder - s);
         else {
           EXTEND(SP, 9);
-          tm.tm_sec < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_sec);
-          tm.tm_min < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_min);
-          tm.tm_hour < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_hour);
-          tm.tm_mday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_mday);
-          tm.tm_mon < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_mon);
-          tm.tm_year == INT_MIN ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_year);
-          tm.tm_wday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_wday);
-          tm.tm_yday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_yday);
+          if (tm.tm_sec < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_sec);
+          if (tm.tm_min < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_min);
+          if (tm.tm_hour < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_hour);
+          if (tm.tm_mday < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_mday);
+          if (tm.tm_mon < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_mon);
+          if (tm.tm_year == INT_MIN) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_year);
+          if (tm.tm_wday < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_wday);
+          if (tm.tm_yday < 0) PUSHs(&PL_sv_undef); else mPUSHi(tm.tm_yday);
           mPUSHi(tm.tm_isdst);
         }
       }
     }
 
+#endif
+
+#ifdef PSX2008_HAS_GETHOSTID
 long
 gethostid();
 
-char *
-gethostname();
-    INIT:
-        char name[HOST_NAME_MAX+1] = {0};
-    CODE:
-        if (gethostname(name, sizeof(name)) != 0)
-            XSRETURN_UNDEF;
-        RETVAL = name;
-    OUTPUT:
-        RETVAL
+#endif
 
+#ifdef PSX2008_HAS_GETHOSTNAME
+void
+gethostname();
+  INIT:
+#if !defined(MAXHOSTNAMELEN) || MAXHOSTNAMELEN < 256
+    char name[256];
+#else
+    char name[MAXHOSTNAMELEN];
+#endif
+  PPCODE:
+    if (gethostname(name, sizeof(name)) == 0)
+      XSRETURN_PV(name);
+
+#endif
+
+#ifdef PSX2008_HAS_GETITIMER
 void
 getitimer(int which);
     INIT:
@@ -823,6 +1130,9 @@ getitimer(int which);
             mPUSHi(value.it_value.tv_usec);
         }
 
+#endif
+
+#ifdef PSX2008_HAS_SETITIMER
 void
 setitimer(int which, time_t int_sec, int int_usec, time_t val_sec, int val_usec);
     INIT:
@@ -837,25 +1147,42 @@ setitimer(int which, time_t int_sec, int int_usec, time_t val_sec, int val_usec)
             mPUSHi(ovalue.it_value.tv_usec);
         }
 
-int
-getpriority(int which = PRIO_PROCESS, id_t who = 0);
+#endif
+
+#ifdef PSX2008_HAS_GETPRIORITY
+void
+getpriority(int which=PRIO_PROCESS, id_t who=0);
+  INIT:
+    int rv;
+  PPCODE:
+    errno = 0;
+    rv = getpriority(which, who);
+    if (rv != -1 || errno == 0)
+      mPUSHi(rv);
+
+#endif
+
+#ifdef PSX2008_HAS_SETPRIORITY
+SysRetTrue
+setpriority(int prio, int which=PRIO_PROCESS, id_t who=0);
     CODE:
-        errno = 0;
-        RETVAL = getpriority(which, who);
-        if (RETVAL == -1 && errno != 0)
-            XSRETURN_UNDEF;
+        RETVAL = setpriority(which, who, prio);
     OUTPUT:
         RETVAL
 
-SysRet
-setpriority(int value, int which = PRIO_PROCESS, id_t who = 0);
-    CODE:
-        RETVAL = setpriority(which, who, value);
-    OUTPUT:
-        RETVAL
+#endif
 
+#ifdef PSX2008_HAS_GETSID
 pid_t
-getsid(pid_t pid = 0);
+getsid(pid_t pid=0);
+
+#endif
+
+#ifdef PSX2008_HAS_SETSID
+pid_t
+setsid();
+
+#endif
 
 #define RETURN_UTXENT {                                     \
     if (utxent != NULL) {                                   \
@@ -870,31 +1197,13 @@ getsid(pid_t pid = 0);
     }                                                       \
 }
 
-#ifdef __OpenBSD__
-void
-endutxent(...);
-    PPCODE:
-        croak("endutxent() not available");
-
-void
-getutxent(...);
-    PPCODE:
-        croak("getutxent() not available");
-
-void
-getutxid(...);
-    PPCODE:
-        croak("getutxid() not available");
-
-void
-getutxline(...);
-    PPCODE:
-        croak("getutxline() not available");
-
-#else
+#ifdef PSX2008_HAS_ENDUTXENT
 void
 endutxent();
 
+#endif
+
+#ifdef PSX2008_HAS_GETUTXENT
 void
 getutxent();
     INIT:
@@ -902,8 +1211,11 @@ getutxent();
     PPCODE:
         RETURN_UTXENT;
 
+#endif
+
+#ifdef PSX2008_HAS_GETUTXID
 void
-getutxid(short ut_type, char *ut_id = NULL);
+getutxid(short ut_type, char *ut_id=NULL);
     INIT:
         struct utmpx *utxent;
         struct utmpx utxent_req = {0};
@@ -915,6 +1227,9 @@ getutxid(short ut_type, char *ut_id = NULL);
         utxent = getutxline(&utxent_req);
         RETURN_UTXENT;
 
+#endif
+
+#ifdef PSX2008_HAS_GETUTXLINE
 void
 getutxline(char *ut_line);
     INIT:
@@ -927,14 +1242,21 @@ getutxline(char *ut_line);
             RETURN_UTXENT;
         }
 
+#endif
+
+#ifdef PSX2008_HAS_SETUTXENT
 void
 setutxent();
 
 #endif
 
+#ifdef PSX2008_HAS_DRAND48
 NV
 drand48();
 
+#endif
+
+#ifdef PSX2008_HAS_ERAND48
 void
 erand48(unsigned short X0, unsigned short X1, unsigned short X2);
     INIT:
@@ -947,6 +1269,9 @@ erand48(unsigned short X0, unsigned short X1, unsigned short X2);
         mPUSHu(xsubi[1]);
         mPUSHu(xsubi[2]);
 
+#endif
+
+#ifdef PSX2008_HAS_JRAND48
 void
 jrand48(unsigned short X0, unsigned short X1, unsigned short X2);
     ALIAS:
@@ -961,20 +1286,34 @@ jrand48(unsigned short X0, unsigned short X1, unsigned short X2);
         mPUSHu(xsubi[1]);
         mPUSHu(xsubi[2]);
 
+#endif
+
+#ifdef PSX2008_HAS_LRAND48
 long
 lrand48();
 
+#endif
+
+#ifdef PSX2008_HAS_MRAND48
 long
 mrand48();
 
-int
-nice(int incr);
-    CODE:
-        errno = 0;
-        RETVAL = nice(incr);
-    OUTPUT:
-        RETVAL
+#endif
 
+#ifdef PSX2008_HAS_NICE
+void
+nice(int incr);
+  INIT:
+    int rv;
+  PPCODE:
+    errno = 0;
+    rv = nice(incr);
+    if (rv != -1 || errno == 0)
+      mPUSHi(rv);
+
+#endif
+
+#ifdef PSX2008_HAS_SEED48
 void
 seed48(unsigned short seed1, unsigned short seed2, unsigned short seed3);
     INIT:
@@ -987,104 +1326,111 @@ seed48(unsigned short seed1, unsigned short seed2, unsigned short seed3);
         mPUSHu(old[1]);
         mPUSHu(old[2]);
 
+#endif
+
+#ifdef PSX2008_HAS_SRAND48
 void
 srand48(long seedval);
 
+#endif
+
+#ifdef PSX2008_HAS_RANDOM
 long
 random();
 
+#endif
+
+#ifdef PSX2008_HAS_SRANDOM
 void
 srandom(unsigned seed);
 
+#endif
+
+#ifdef PSX2008_HAS_GETEGID
 gid_t
 getegid();
 
+#endif
+
+#ifdef PSX2008_HAS_GETEUID
 uid_t
 geteuid();
 
+#endif
+
+#ifdef PSX2008_HAS_GETGID
 gid_t
 getgid();
 
+#endif
+
+#ifdef PSX2008_HAS_GETUID
 uid_t
 getuid();
 
+#endif
+
+#ifdef PSX2008_HAS_SETEGID
 int
 setegid(gid_t gid);
 
+#endif
+
+#ifdef PSX2008_HAS_SETEUID
 int
 seteuid(uid_t uid);
 
+#endif
+
+#ifdef PSX2008_HAS_SETGID
 int
 setgid(gid_t gid);
 
+#endif
+
+#ifdef PSX2008_HAS_SETREGID
 int
 setregid(gid_t rgid, gid_t egid);
 
+#endif
+
+#ifdef PSX2008_HAS_SETREUID
 int
 setreuid(uid_t ruid, uid_t euid);
 
+#endif
+
+#ifdef PSX2008_HAS_SETUID
 int
 setuid(uid_t uid);
 
-int
-sigpause(int sig);
+#endif
 
-#ifndef __OpenBSD__
+#ifdef PSX2008_HAS_SIGHOLD
 int
 sighold(int sig);
 
+#endif
+
+#ifdef PSX2008_HAS_SIGIGNORE
 int
 sigignore(int sig);
 
-int
-sigrelse(int sig);
+#endif
 
-#else
+#ifdef PSX2008_HAS_SIGPAUSE
 void
-sighold(...);
-  PPCODE:
-    croak("sighold() not available");
-
-void
-sigignore(...);
-  PPCODE:
-    croak("sigignore() not available");
-
-int
-sigrelse(int sig);
-  PPCODE:
-    croak("sigrelse() not available");
+sigpause(int sig);
 
 #endif
 
-#if !defined(CLOCK_REALTIME) || !defined(TIMER_ABSTIME) || !defined(SIGEV_SIGNAL)
-void
-timer_create(...);
-  PPCODE:
-    croak("timer_create() not available");
+#ifdef PSX2008_HAS_SIGRELSE
+int
+sigrelse(int sig);
 
-void
-timer_delete(...);
-  PPCODE:
-    croak("timer_delete() not available");
+#endif
 
-void
-timer_gettime(...);
-  PPCODE:
-    croak("timer_gettime() not available");
-
-void
-timer_getoverrun(...);
-  PPCODE:
-    croak("timer_getoverrun() not available");
-
-void
-timer_settime(...);
-  PPCODE:
-    croak("timer_settime() not available");
-
-#else
-
+#ifdef PSX2008_HAS_TIMER_CREATE
 timer_t
 timer_create(clockid_t clockid, int sig);
   PREINIT:
@@ -1107,12 +1453,21 @@ timer_create(clockid_t clockid, int sig);
   OUTPUT:
     RETVAL
 
-SysRet
+#endif
+
+#ifdef PSX2008_HAS_TIMER_DELETE
+SysRetTrue
 timer_delete(timer_t timerid);
 
+#endif
+
+#ifdef PSX2008_HAS_TIMER_GETOVERRUN
 SysRet0
 timer_getoverrun(timer_t timerid);
 
+#endif
+
+#ifdef PSX2008_HAS_TIMER_GETTIME
 void
 timer_gettime(timer_t timerid);
   PREINIT:
@@ -1131,6 +1486,9 @@ timer_gettime(timer_t timerid);
     }
   }
 
+#endif
+
+#ifdef PSX2008_HAS_TIMER_SETTIME
 void
 timer_settime(timer_t timerid, int flags, time_t interval_sec, long interval_nsec, time_t initial_sec=-1, long initial_nsec=-1);
   PREINIT:
@@ -1163,103 +1521,321 @@ timer_settime(timer_t timerid, int flags, time_t interval_sec, long interval_nse
 ## I/O-related functions
 ########################
 
-SysRet
-chdir(char *path);
-
-SysRet
-chmod(char *path, mode_t mode);
-
-SysRet
-chown(char *path, uid_t owner, gid_t group);
-
-SysRet
-lchown(char *path, uid_t owner, gid_t group);
-
-#ifdef HAS_ACCESS
-SysRet
-access(char *path, int mode);
-
+#ifdef PSX2008_HAS_CHDIR
+SysRetTrue
+chdir(SV *what);
+  INIT:
+    int fd;
+    char *path;
+  CODE: 
+    if (!SvOK(what)) {
+      RETVAL = -1;
+      errno = ENOENT;
+    }
+    else if (SvPOK(what) || SvPOKp(what)) {
+      path = SvPV_nolen(what);
+      RETVAL = chdir(path);
+    } 
+    else {
+      fd = psx_fileno(aTHX_ what);
+#ifdef PSX2008_HAS_FCHDIR
+      RETVAL = fchdir(fd);
 #else
-void
-access(...);
-  PPCODE:
-    croak("access() not available");
+      errno = (fd < 0) ? EBADF : ENOSYS;
+      RETVAL = -1;
+#endif
+    }
+  OUTPUT:
+    RETVAL
 
 #endif
 
-SysRet
-fchdir(psx_fd_t dirfd);
-
-SysRet
-fchmod(psx_fd_t fd, mode_t mode);
-
-SysRet
-fchown(psx_fd_t fd, uid_t owner, gid_t group);
-
-#if !defined(HAS_FSYNC) || (defined(__FreeBSD_version) && __FreeBSD_version < 1101000)
-void
-fdatasync(...);
-    PPCODE:
-        croak("fdatasync not available");
-
+#ifdef PSX2008_HAS_CHMOD
+SysRetTrue
+chmod(SV *what, mode_t mode);
+  INIT:
+    int fd;
+    char *path;
+  CODE: 
+    if (!SvOK(what)) {
+      RETVAL = -1;
+      errno = ENOENT;
+    }
+    else if (SvPOK(what) || SvPOKp(what)) {
+      path = SvPV_nolen(what);
+      RETVAL = chmod(path, mode);
+    } 
+    else {
+      fd = psx_fileno(aTHX_ what);
+#ifdef PSX2008_HAS_FCHMOD
+      RETVAL = fchmod(fd, mode);
 #else
-SysRet
+      errno = (fd < 0) ? EBADF : ENOSYS;
+      RETVAL = -1;
+#endif
+    }
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_CHOWN
+SysRetTrue
+chown(SV *what, uid_t owner, gid_t group);
+  INIT:
+    int fd;
+    char *path;
+  CODE: 
+    if (!SvOK(what)) {
+      RETVAL = -1;
+      errno = ENOENT;
+    }
+    else if (SvPOK(what) || SvPOKp(what)) {
+      path = SvPV_nolen(what);
+      RETVAL = chown(path, owner, group);
+    } 
+    else {
+      fd = psx_fileno(aTHX_ what);
+#ifdef PSX2008_HAS_FCHOWN
+      RETVAL = fchown(fd, owner, group);
+#else
+      errno = (fd < 0) ? EBADF : ENOSYS;
+      RETVAL = -1;
+#endif
+    }
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_LCHOWN
+SysRetTrue
+lchown(const char *path, uid_t owner, gid_t group);
+
+#endif
+
+#ifdef PSX2008_HAS_ACCESS
+SysRetTrue
+access(const char *path, int mode);
+
+#endif
+
+#ifdef PSX2008_HAS_FDATASYNC
+SysRetTrue
 fdatasync(psx_fd_t fd);
 
 #endif
 
-void
-lstat(char *path);
-    ALIAS:
-        stat = 1
-    INIT:
-        int ret = 0;
-        struct stat buf;
-    PPCODE:
-        if (ix == 0)
-#ifdef HAS_LSTAT
-            ret = lstat(path, &buf);
-#else
-            croak("lstat() not available");
-#endif
-        else
-            ret = stat(path, &buf);
-        if (ret == 0)
-            RETURN_STAT_BUF(buf);
-
-#ifdef HAS_FSYNC
-SysRet
+#ifdef PSX2008_HAS_FSYNC
+SysRetTrue
 fsync(psx_fd_t fd);
 
-#else
+#endif
+
+#ifdef PSX2008_HAS_STAT
 void
-fsync(...);
-    PPCODE:
-        croak("fsync() not available");
+stat(SV *what);
+  INIT:
+    int rv = -1;
+    struct stat buf;
+  PPCODE:
+    if (!SvOK(what))
+      errno = ENOENT;
+    else if (SvPOK(what) || SvPOKp(what)) {
+      char *path = SvPV_nolen(what);
+      rv = stat(path, &buf);
+    }
+    else {
+#ifdef PSX2008_HAS_FSTAT
+      int fd = psx_fileno(aTHX_ what);
+      rv = fstat(fd, &buf);
+#else
+      errno = ENOSYS;
+#endif
+    }
+    RETURN_STAT_BUF(rv, buf);
 
 #endif
 
-SysRet
-ftruncate(psx_fd_t fd, off_t length);
+#ifdef PSX2008_HAS_LSTAT
+void
+lstat(const char *path);
+  INIT:
+    int rv;
+    struct stat buf;
+  PPCODE:
+    rv = lstat(path, &buf);
+    RETURN_STAT_BUF(rv, buf);
 
+#endif
+
+#ifdef PSX2008_HAS_ISATTY
 int
 isatty(psx_fd_t fd);
 
-SysRet
-link(char *path1, char *path2);
+#endif
 
-SysRet
-mkdir(char *path, mode_t mode);
+#ifdef PSX2008_HAS_ISALNUM
+int
+isalnum(SV *charstring)
+  CODE:
+    ISFUNC(isalnum)
+  OUTPUT:
+    RETVAL
 
+#endif
+
+#ifdef PSX2008_HAS_ISALPHA
+int
+isalpha(SV *charstring)
+  CODE:
+    ISFUNC(isalpha)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISASCII
+int
+isascii(SV *charstring)
+  CODE:
+    ISFUNC(isascii)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISBLANK
+int
+isblank(SV *charstring)
+  CODE:
+    ISFUNC(isblank)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISCNTRL
+int
+iscntrl(SV *charstring)
+  CODE:
+    ISFUNC(iscntrl)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISDIGIT
+int
+isdigit(SV *charstring)
+  CODE:
+    ISFUNC(isdigit)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISGRAPH
+int
+isgraph(SV *charstring)
+  CODE:
+    ISFUNC(isgraph)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISLOWER
+int
+islower(SV *charstring)
+  CODE:
+    ISFUNC(islower)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISPRINT
+int
+isprint(SV *charstring)
+  CODE:
+    ISFUNC(isprint)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISPUNCT
+int
+ispunct(SV *charstring)
+  CODE:
+    ISFUNC(ispunct)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISSPACE
+int
+isspace(SV *charstring)
+  CODE:
+    ISFUNC(isspace)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISUPPER
+int
+isupper(SV *charstring)
+  CODE:
+    ISFUNC(isupper)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_ISXDIGIT
+int
+isxdigit(SV *charstring)
+  CODE:
+    ISFUNC(isxdigit)
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_LINK
+SysRetTrue
+link(const char *path1, const char *path2);
+
+#endif
+
+#ifdef PSX2008_HAS_MKDIR
+SysRetTrue
+mkdir(const char *path, mode_t mode=0777);
+
+#endif
+
+#ifdef PSX2008_HAS_MKDTEMP
 char *
 mkdtemp(char *template);
 
-SysRet
-mkfifo(char *path, mode_t mode);
+#endif
 
-SysRet
-mknod(char *path, mode_t mode, dev_t dev);
+#ifdef PSX2008_HAS_MKFIFO
+SysRetTrue
+mkfifo(const char *path, mode_t mode);
 
+#endif
+
+#ifdef PSX2008_HAS_MKNOD
+SysRetTrue
+mknod(const char *path, mode_t mode, dev_t dev);
+
+#endif
+
+#ifdef PSX2008_HAS_MKSTEMP
 void
 mkstemp(char *template);
     INIT:
@@ -1274,9 +1850,15 @@ mkstemp(char *template);
             }
         }
 
-FILE*
-fdopen(psx_fd_t fd, char *mode);
+#endif
 
+#ifdef PSX2008_HAS_FDOPEN
+FILE*
+fdopen(psx_fd_t fd, const char *mode);
+
+#endif
+
+#ifdef PSX2008_HAS_FDOPENDIR
 SV*
 fdopendir(psx_fd_t fd);
   INIT:
@@ -1305,7 +1887,7 @@ fdopendir(psx_fd_t fd);
      * I'm not exactly sure if this is the right way to create and return a
      * directory handle. This is what I extracted from pp_open_dir, the code
      * xsubpp generated for the above fdopen(), Symbol::geniosym(), and
-     * http://www.perlmonks.org/?node_id=1197703
+     * https://www.perlmonks.org/?node_id=1197703
      */
     gv = newGVgen(PACKNAME);
     io = GvIOn(gv);
@@ -1318,6 +1900,7 @@ fdopendir(psx_fd_t fd);
   OUTPUT:
     RETVAL
 
+#endif
 
 ##
 ## POSIX::open(), read() and write() return "0 but true" for 0, which
@@ -1325,135 +1908,152 @@ fdopendir(psx_fd_t fd);
 ##
 
 SysRet0
-open(char *path, int oflag = O_RDONLY, mode_t mode = 0600);
+open(const char *path, int oflag=O_RDONLY, mode_t mode=0666);
 
-SysRet
+#ifdef PSX2008_HAS_CLOSE
+SysRetTrue
 close(SV *fd);
-  CODE:
-    RETVAL = psx_close(aTHX_ fd);
-  OUTPUT:
-    RETVAL
+    CODE:
+        RETVAL = psx_close(aTHX_ fd);
+    OUTPUT:
+        RETVAL
 
-#if !defined(AT_FDCWD) || (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+#endif
+
+#ifdef PSX2008_HAS_FACCESSAT
+SysRetTrue
+faccessat(psx_fd_t dirfd, const char *path, int amode, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_FCHMODAT
+SysRetTrue
+fchmodat(psx_fd_t dirfd, const char *path, mode_t mode, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_FCHOWNAT
+SysRetTrue
+fchownat(psx_fd_t dirfd, const char *path, uid_t owner, gid_t group, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_FSTATAT
 void
-faccessat(...);
+fstatat(psx_fd_t dirfd, const char *path, int flags=0);
+  INIT:
+    int rv;
+    struct stat buf;
   PPCODE:
-    croak("faccessat() not available");
+    rv = fstatat(dirfd, path, &buf, flags);
+    RETURN_STAT_BUF(rv, buf);
 
+#endif
+
+#ifdef PSX2008_HAS_LINKAT
+SysRetTrue
+linkat(psx_fd_t olddirfd, const char *oldpath, psx_fd_t newdirfd, const char *newpath, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_MKDIRAT
+SysRetTrue
+mkdirat(psx_fd_t dirfd, const char *path, mode_t mode);
+
+#endif
+
+#ifdef PSX2008_HAS_MKFIFOAT
+SysRetTrue
+mkfifoat(psx_fd_t dirfd, const char *path, mode_t mode);
+
+#endif
+
+#ifdef PSX2008_HAS_MKNODAT
+SysRetTrue
+mknodat(psx_fd_t dirfd, const char *path, mode_t mode, dev_t dev);
+
+#endif
+
+#ifdef PSX2008_HAS_OPENAT
 void
-fchmodat(...);
-  PPCODE:
-    croak("fchmodat() not available");
-
-void
-fchownat(...);
-  PPCODE:
-    croak("fchownat() not available");
-
-void
-fstatat(...);
-  PPCODE:
-    croak("fstatat() not available");
-
-void
-openat(...);
-  PPCODE:
-    croak("openat() not available");
-
-void
-linkat(...);
-  PPCODE:
-    croak("linkat() not available");
-
-void
-mkdirat(...);
-  PPCODE:
-    croak("mkdirat() not available");
-
-void
-mkfifoat(...);
-  PPCODE:
-    croak("mkfifoat() not available");
-
-void
-mknodat(...);
-  PPCODE:
-    croak("mknodat() not available");
-
-void
-readlinkat(...);
-  PPCODE:
-    croak("readlinkat() not available");
-
-void
-renameat(...);
-  PPCODE:
-    croak("renameat() not available");
-
-void
-symlinkat(...);
-  PPCODE:
-    croak("symlinkat() not available");
-
-void
-unlinkat(...);
-  PPCODE:
-    croak("unlinkat() not available");
-
-void
-utimensat(...);
-  PPCODE:
-    croak("utimensat() not available");
-
-#else
-
-SysRet
-faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
-
-SysRet
-fchmodat(psx_fd_t dirfd, char *path, mode_t mode, int flags = 0);
-
-SysRet
-fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
-
-void
-fstatat(psx_fd_t dirfd, char *path, int flags = 0);
-    INIT:
-        struct stat buf;
-    PPCODE:
-        if (fstatat(dirfd, path, &buf, flags) == 0)
-            RETURN_STAT_BUF(buf);
-
-SysRet
-linkat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath, int flags = 0);
-
-SysRet
-mkdirat(psx_fd_t dirfd, char *path, mode_t mode);
-
-SysRet
-mkfifoat(psx_fd_t dirfd, char *path, mode_t mode);
-
-SysRet
-mknodat(psx_fd_t dirfd, char *path, mode_t mode, dev_t dev);
-
-void
-openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
+openat(SV *dirfdsv, const char *path, ...);
+  ALIAS:
+    openat2 = 1
   PREINIT:
-    int got_fd, dir_fd, path_fd;
+    int got_fd, dir_fd, path_fd, flags;
     int return_handle = 0;
-    struct stat st;
+    mode_t mode;
     GV *gv = NULL;
+    DIR *dirp = NULL;
+    FILE *filep = NULL;
+    PerlIO *pio_filep = NULL;
+    struct stat st;
   PPCODE:
   {
-    if (!SvOK(dirfdsv))
+#ifndef PSX2008_HAS_OPENAT2
+    if (ix != 0) {
+      errno = ENOSYS;
       XSRETURN_UNDEF;
-
-    got_fd = psx_looks_like_number(aTHX_ dirfdsv);
-    dir_fd = psx_fileno(aTHX_ dirfdsv);
-    if (dir_fd < 0)
+    }
+#endif
+    if (!SvOK(dirfdsv)) {
+      errno = EBADF;
       XSRETURN_UNDEF;
+    }
 
-    path_fd = openat(dir_fd, path, oflag, mode);
+    /* Allow dirfdsv to be a reference to AT_FDCWD in order to get a file
+       handle instead of a file descriptor */
+    if (SvROK(dirfdsv) && SvTYPE(SvRV(dirfdsv)) == SVt_IV) {
+      if (SvIV(SvRV(dirfdsv)) != AT_FDCWD) {
+        errno = EBADF;
+        XSRETURN_UNDEF;
+      }
+      got_fd = 0;
+      dir_fd = AT_FDCWD;
+    }
+    else {
+      got_fd = psx_looks_like_number(dirfdsv);
+      dir_fd = psx_fileno(aTHX_ dirfdsv);
+      if (dir_fd < 0 && dir_fd != AT_FDCWD) {
+        errno = EBADF;
+        XSRETURN_UNDEF;
+      }
+    }
+
+    if (ix == 0) {
+      /* openat() */
+      if (items > 4)
+        croak_xs_usage(cv, "dirfd, path[, flags[, mode]]");
+      flags = (items > 2) ? SvIV(ST(2)) : O_RDONLY;
+      mode = (items > 3) ? SvIV(ST(3)) : 0666;
+      path_fd = openat(dir_fd, path, flags, mode);
+    }
+#ifdef PSX2008_HAS_OPENAT2
+    else {
+      /* openat2() */
+      if (items != 3)
+        croak_xs_usage(cv, "dirfd, path, how");
+      else {
+        SV* const how_sv = ST(2);
+        if (!SvROK(how_sv) || SvTYPE(SvRV(how_sv)) != SVt_PVHV)
+          croak("%s::openat2: 'how' is not a HASH reference", PACKNAME);
+        else {
+          HV* how_hv = (HV*)SvRV(how_sv);
+          SV** how_flags = hv_fetchs(how_hv, "flags", 0);
+          SV** how_mode = hv_fetchs(how_hv, "mode", 0);
+          SV** how_resolve = hv_fetchs(how_hv, "resolve", 0);
+          struct open_how how = {
+            .flags   = how_flags ? SvUV(*how_flags) : 0,
+            .mode    = how_mode ? SvUV(*how_mode) : 0,
+            .resolve = how_resolve ? SvUV(*how_resolve) : 0
+          };
+          flags = how.flags; /* needed for fdopen() below */
+          path_fd = syscall(SYS_openat2, dir_fd, path, &how, sizeof(how));
+        }
+      }
+    }
+#endif
+
     if (path_fd < 0)
       XSRETURN_UNDEF;
 
@@ -1470,21 +2070,23 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
        * file handle.
        */
       gv = newGVgen(PACKNAME);
-      if (S_ISDIR(st.st_mode)) {
-        DIR *dir = fdopendir(path_fd);
-        if (dir) {
-          IO *io = GvIOn(gv);
-          IoDIRP(io) = dir;
-          return_handle = 1;
-        }
-      }
-      else {
-        const char *raw = flags2raw(oflag);
-        FILE *file = fdopen(path_fd, raw);
-        if (file) {
-          PerlIO *fp = PerlIO_importFILE(file, raw);
-          if (fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp))
+      if (gv) {
+        if (S_ISDIR(st.st_mode)) {
+          dirp = fdopendir(path_fd);
+          if (dirp) {
+            IO *io = GvIOn(gv);
+            IoDIRP(io) = dirp;
             return_handle = 1;
+          }
+        }
+        else {
+          const char *raw = flags2raw(flags);
+          filep = fdopen(path_fd, raw);
+          if (filep) {
+            pio_filep = PerlIO_importFILE(filep, raw);
+            if (pio_filep && do_open(gv, "+<&", 3, FALSE, 0, 0, pio_filep))
+              return_handle = 1;
+          }
         }
       }
     }
@@ -1494,16 +2096,38 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
       retvalsv = sv_bless(retvalsv, GvSTASH(gv));
       mPUSHs(retvalsv);
     }
+    else if (dirp)
+      closedir(dirp);
+    else if (pio_filep)
+      PerlIO_close(pio_filep);
+    else if (filep)
+      fclose(filep);
     else
       close(path_fd);
 
+    /* https://github.com/Perl/perl5/issues/9493 */
     if (gv) 
-      /* https://rt.perl.org/Public/Bug/Display.html?id=59268 */
       (void) hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
   }
 
+#endif
+
+#ifdef PSX2008_HAS_READLINK
 char *
-readlinkat(psx_fd_t dirfd, char *path);
+readlink(const char *path);
+    CODE:
+        RETVAL = _readlink50c(path, NULL);
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        if (RETVAL != NULL)
+            Safefree(RETVAL);
+
+#endif
+
+#ifdef PSX2008_HAS_READLINKAT
+char *
+readlinkat(psx_fd_t dirfd, const char *path);
     CODE:
         RETVAL = _readlink50c(path, &dirfd);
     OUTPUT:
@@ -1512,24 +2136,43 @@ readlinkat(psx_fd_t dirfd, char *path);
         if (RETVAL != NULL)
           Safefree(RETVAL);
 
-SysRet
-renameat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath);
+#endif
 
-SysRet
-symlinkat(char *old, psx_fd_t newdirfd, char *new);
+#ifdef PSX2008_HAS_REALPATH
+char *
+realpath(const char *path);
+    CODE:
+        errno = 0;
+        RETVAL = realpath(path, NULL);
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        if (RETVAL != NULL)
+          safesysfree(RETVAL);
 
-SysRet
-unlinkat(psx_fd_t dirfd, char *path, int flags = 0);
+#endif
 
-#ifndef UTIME_NOW
-void
-utimensat(...);
-  PPCODE:
-    croak("utimensat() not available");
+#ifdef PSX2008_HAS_RENAMEAT
+SysRetTrue
+renameat(psx_fd_t olddirfd, const char *oldpath, psx_fd_t newdirfd, const char *newpath);
 
-#else
-SysRet
-utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+#endif
+
+#ifdef PSX2008_HAS_SYMLINKAT
+SysRetTrue
+symlinkat(const char *target, psx_fd_t newdirfd, const char *linkpath);
+
+#endif
+
+#ifdef PSX2008_HAS_UNLINKAT
+SysRetTrue
+unlinkat(psx_fd_t dirfd, const char *path, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_UTIMENSAT
+SysRetTrue
+utimensat(psx_fd_t dirfd, const char *path, int flags = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     INIT:
         struct timespec times[2] = { { atime_sec, atime_nsec },
                                      { mtime_sec, mtime_nsec } };
@@ -1540,8 +2183,7 @@ utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long 
 
 #endif
 
-#endif
-
+#ifdef PSX2008_HAS_READ
 SysRet0
 read(psx_fd_t fd, SV *buf, size_t count);
     INIT:
@@ -1565,6 +2207,9 @@ read(psx_fd_t fd, SV *buf, size_t count);
         buf
         RETVAL
 
+#endif
+
+#ifdef PSX2008_HAS_WRITE
 SysRet0
 write(psx_fd_t fd, SV *buf, SV *count=NULL);
     INIT:
@@ -1593,50 +2238,72 @@ write(psx_fd_t fd, SV *buf, SV *count=NULL);
     OUTPUT:
         RETVAL
 
+#endif
+
+#ifdef PSX2008_HAS_READV
 SysRet0
 readv(psx_fd_t fd, SV *buffers, AV *sizes);
     PROTOTYPE: $\[@$]$
     CODE:
-        RETVAL = _readv50c(aTHX_ fd, buffers, sizes, NULL);
+        RETVAL = _readv50c(aTHX_ fd, buffers, sizes, NULL, NULL);
     OUTPUT:
         RETVAL
 
-SysRet0
-writev(psx_fd_t fd, AV *buffers);
-    CODE:
-        RETVAL = _writev50c(aTHX_ fd, buffers, NULL);
-    OUTPUT:
-        RETVAL
+#endif
 
-#if defined(__CYGWIN__) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 600000)
-void
-preadv(...);
-  PPCODE:
-    croak("preadv() not available");
-
-void
-pwritev(...);
-  PPCODE:
-    croak("pwritev() not available");
-
-#else
+#ifdef PSX2008_HAS_PREADV
 SysRet0
 preadv(psx_fd_t fd, SV *buffers, AV *sizes, SV *offset=&PL_sv_undef);
-  PROTOTYPE: $\[@$]@
+  PROTOTYPE: $\[@$]$;$
   CODE:
-    RETVAL = _readv50c(aTHX_ fd, buffers, sizes, offset);
-  OUTPUT:
-    RETVAL
-
-SysRet0
-pwritev(psx_fd_t fd, AV *buffers, SV *offset=&PL_sv_undef);
-  CODE:
-    RETVAL = _writev50c(aTHX_ fd, buffers, offset);
+    RETVAL = _readv50c(aTHX_ fd, buffers, sizes, offset, NULL);
   OUTPUT:
     RETVAL
 
 #endif
 
+#ifdef PSX2008_HAS_PREADV2
+SysRet0
+preadv2(psx_fd_t fd, SV *buffers, AV *sizes, SV *offset=&PL_sv_undef, SV *flags=&PL_sv_undef);
+  PROTOTYPE: $\[@$]$;$$
+  CODE:
+    RETVAL = _readv50c(aTHX_ fd, buffers, sizes, offset, flags);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_WRITEV
+SysRet0
+writev(psx_fd_t fd, AV *buffers);
+    CODE:
+        RETVAL = _writev50c(aTHX_ fd, buffers, NULL, NULL);
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_PWRITEV
+SysRet0
+pwritev(psx_fd_t fd, AV *buffers, SV *offset=&PL_sv_undef);
+  CODE:
+    RETVAL = _writev50c(aTHX_ fd, buffers, offset, NULL);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_PWRITEV2
+SysRet0
+pwritev2(psx_fd_t fd, AV *buffers, SV *offset=&PL_sv_undef, SV *flags=&PL_sv_undef);
+  CODE:
+    RETVAL = _writev50c(aTHX_ fd, buffers, offset, flags);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_PREAD
 SysRet0
 pread(psx_fd_t fd, SV *buf, size_t nbytes, SV *offset=NULL, off_t buf_offset=0);
     INIT:
@@ -1655,7 +2322,7 @@ pread(psx_fd_t fd, SV *buf, size_t nbytes, SV *offset=NULL, off_t buf_offset=0);
       if (buf_offset < 0) {
         buf_offset += buf_cur;
         if (buf_offset < 0) {
-          warn("Offset %ld outside string", buf_offset);
+          warn("Offset %lld outside string", (long long int)buf_offset);
           XSRETURN_UNDEF;
         }
       }
@@ -1674,7 +2341,7 @@ pread(psx_fd_t fd, SV *buf, size_t nbytes, SV *offset=NULL, off_t buf_offset=0);
 
       /* now fscking finally read teh data */
       if (nbytes) {
-        off_t f_offset = (offset != NULL && SvOK(offset)) ? SvUV(offset) : 0;
+        off_t f_offset = (offset != NULL && SvOK(offset)) ? (off_t)SvOFFT(offset) : 0;
         RETVAL = pread(fd, cbuf + buf_offset, nbytes, f_offset);
       }
       else
@@ -1690,6 +2357,9 @@ pread(psx_fd_t fd, SV *buf, size_t nbytes, SV *offset=NULL, off_t buf_offset=0);
         buf
         RETVAL
 
+#endif
+
+#ifdef PSX2008_HAS_PWRITE
 SysRet0
 pwrite(psx_fd_t fd, SV *buf, SV *count=NULL, SV *offset=NULL, off_t buf_offset=0);
   INIT:
@@ -1706,7 +2376,7 @@ pwrite(psx_fd_t fd, SV *buf, SV *count=NULL, SV *offset=NULL, off_t buf_offset=0
         buf_offset += buf_cur;
       if (buf_offset < 0 || (!buf_cur && buf_offset > 0) ||
           (buf_cur && buf_offset >= buf_cur)) {
-        warn("Offset %ld outside string", buf_offset);
+        warn("Offset %lld outside string", (long long int)buf_offset);
         XSRETURN_UNDEF;
       }
       max_nbytes = buf_cur - buf_offset;
@@ -1718,7 +2388,7 @@ pwrite(psx_fd_t fd, SV *buf, SV *count=NULL, SV *offset=NULL, off_t buf_offset=0
           i_count = max_nbytes;
       }
       if (i_count) {
-        off_t f_offset = (offset != NULL && SvOK(offset)) ? SvUV(offset) : 0;
+        off_t f_offset = (offset != NULL && SvOK(offset)) ? (off_t)SvOFFT(offset) : 0;
         RETVAL = pwrite(fd, cbuf + buf_offset, i_count, f_offset);
       }
       else
@@ -1728,8 +2398,10 @@ pwrite(psx_fd_t fd, SV *buf, SV *count=NULL, SV *offset=NULL, off_t buf_offset=0
   OUTPUT:
     RETVAL
 
-#ifdef POSIX_FADV_NORMAL
-SysRet
+#endif
+
+#ifdef PSX2008_HAS_POSIX_FADVISE
+SysRetTrue
 posix_fadvise(psx_fd_t fd, off_t offset, off_t len, int advice);
   CODE:
     errno = posix_fadvise(fd, offset, len, advice);
@@ -1737,22 +2409,10 @@ posix_fadvise(psx_fd_t fd, off_t offset, off_t len, int advice);
   OUTPUT:
     RETVAL
 
-#else
-void
-posix_fadvise(...);
-    PPCODE:
-        croak("posix_fadvise() not available");
-
 #endif
 
-#if (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || defined(__OpenBSD__)
-void
-posix_fallocate(...);
-    PPCODE:
-        croak("posix_fallocate() not available");
-
-#else
-SysRet
+#ifdef PSX2008_HAS_POSIX_FALLOCATE
+SysRetTrue
 posix_fallocate(psx_fd_t fd, off_t offset, off_t len);
   CODE:
     errno = posix_fallocate(fd, offset, len);
@@ -1762,513 +2422,853 @@ posix_fallocate(psx_fd_t fd, off_t offset, off_t len);
 
 #endif
 
+#ifdef PSX2008_HAS_PTSNAME
 char *
 ptsname(int fd);
-
-#ifdef HAS_READLINK
-char *
-readlink(char *path);
-    CODE:
-        RETVAL = _readlink50c(path, NULL);
-    OUTPUT:
-        RETVAL
-    CLEANUP:
-        if (RETVAL != NULL)
-            Safefree(RETVAL);
-
+  INIT:
+#ifdef PSX2008_HAS_PTSNAME_R
+    int rv;
+    char name[MAXPATHLEN];
+#endif
+  CODE:
+#ifdef PSX2008_HAS_PTSNAME_R
+    rv = ptsname_r(fd, name, sizeof(name));
+    if (rv == 0)
+      RETVAL = name;
+    else {
+      RETVAL = NULL;
+      errno = rv;
+    }
 #else
-void
-readlink(...);
-  PPCODE:
-    croak("readlink() not available");
+    RETVAL = ptsname(fd);
+#endif
+  OUTPUT:
+    RETVAL
 
 #endif
 
+#ifdef PSX2008_HAS_TTYNAME
+char *
+ttyname(int fd);
+  INIT:
+#ifdef PSX2008_HAS_TTYNAME_R
+    int rv;
+    char name[MAXPATHLEN];
+#endif
+  CODE:
+#ifdef PSX2008_HAS_TTYNAME_R
+    rv = ttyname_r(fd, name, sizeof(name));
+    if (rv == 0)
+      RETVAL = name;
+    else {
+      RETVAL = NULL;
+      errno = rv;
+    }
+#else
+    RETVAL = ttyname(fd);
+#endif
+  OUTPUT:
+    RETVAL
+
+#endif
 
 ##
 ## POSIX::remove() is incorrectly implemented as:
-## "(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])".
-## POSIX requires remove() to be equivalent to unlink() for non-directories.
+## '(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])'.
 ##
-SysRet
-remove(char *path);
+## If $_[0] is a symlink to a directory, POSIX::remove() fails with ENOTDIR
+## from rmdir() instead of removing the symlink (POSIX requires remove() to
+## be equivalent to unlink() for non-directories).
+##
+## This could be fixed like this (correct errno check depends on OS):
+## 'unlink $_[0] or ($!{EISDIR} || $!{EPERM} ? rmdir $_[0] : undef)'
+##
+## Or just use the actual library call like we do here.
+##
 
-SysRet
-rename(char *old, char *new);
+#if defined(__linux__) || defined(__CYGWIN__)
+#define UNLINK_ISDIR_ERRNO (errno == EISDIR)
+#elif !defined(_WIN32)
+#define UNLINK_ISDIR_ERRNO (errno == EISDIR || errno == EPERM)
+#else
+#define UNLINK_ISDIR_ERRNO (errno == EISDIR || errno == EPERM || errno == EACCES)
+#endif
 
-SysRet
-symlink(char *old, char *new);
+#if !defined(PSX2008_HAS_REMOVE) || (defined(_WIN32) && !defined(__CYGWIN__))
+# if defined(PSX2008_HAS_UNLINK) && defined(PSX2008_HAS_RMDIR)
+void
+remove(const char *path);
+  PPCODE:
+    if (unlink(path) == 0 || (UNLINK_ISDIR_ERRNO && rmdir(path) == 0))
+      mPUSHp("0 but true", 10);
 
+# else
+
+# endif
+#else
+SysRetTrue
+remove(const char *path);
+
+#endif
+
+#ifdef PSX2008_HAS_RENAME
+SysRetTrue
+rename(const char *old, const char *new);
+
+#endif
+
+#ifdef PSX2008_HAS_RMDIR
+SysRetTrue
+rmdir(const char *path);
+
+#endif
+
+#ifdef PSX2008_HAS_SYMLINK
+SysRetTrue
+symlink(const char *target, const char *linkpath);
+
+#endif
+
+#ifdef PSX2008_HAS_SYNC
 void
 sync();
 
-SysRet
-truncate(char *path, off_t length);
+#endif
 
-SysRet
-unlink(char *path);
-
-#ifdef UTIME_NOW
-SysRet
-futimens(psx_fd_t fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
-    INIT:
-        struct timespec times[2] = { { atime_sec, atime_nsec },
-                                     { mtime_sec, mtime_nsec } };
-    CODE:
-        RETVAL = futimens(fd, times);
-    OUTPUT:
-        RETVAL
-
+#ifdef PSX2008_HAS_TRUNCATE
+SysRetTrue
+truncate(SV *what, off_t length);
+  INIT:
+    int fd;
+    char *path;
+  CODE:
+    if (!SvOK(what)) {
+      RETVAL = -1;
+      errno = ENOENT;
+    }
+    else if (SvPOK(what) || SvPOKp(what)) {
+      path = SvPV_nolen(what);
+      RETVAL = truncate(path, length);
+    }
+    else {
+      fd = psx_fileno(aTHX_ what);
+#ifdef PSX2008_HAS_FTRUNCATE
+      RETVAL = ftruncate(fd, length);
 #else
-void
-futimens(...);
-    PPCODE:
-        croak("futimens() not available");
+      errno = (fd < 0) ? EBADF : ENOSYS;
+      RETVAL = -1;
+#endif
+    }
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_UNLINK
+SysRetTrue
+unlink(const char *path);
+
+#endif
+
+#ifdef PSX2008_HAS_FUTIMENS
+SysRetTrue
+futimens(psx_fd_t fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+  INIT:
+    const struct timespec times[2] = { { atime_sec, atime_nsec },
+                                       { mtime_sec, mtime_nsec } };
+  CODE:
+    RETVAL = futimens(fd, times);
+  OUTPUT:
+    RETVAL
 
 #endif
 
 ## Integer and real number arithmetic
 #####################################
 
-int
-abs(int i);
+#ifdef PSX2008_ABS
+IV
+abs(IV i)
+  CODE:
+    RETVAL = PSX2008_ABS(i);
+  OUTPUT:
+    RETVAL
 
+#endif
+
+#ifdef PSX2008_HAS_ACOS
 NV
 acos(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ACOSH
 NV
 acosh(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ASIN
 NV
 asin(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ASINH
 NV
 asinh(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ATAN
 NV
 atan(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ATAN2
 NV
 atan2(double y, double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ATANH
 NV
 atanh(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_CBRT
 NV
 cbrt(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_CEIL
 NV
 ceil(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_COPYSIGN
 NV
 copysign(double x, double y);
 
+#endif
+
+#ifdef PSX2008_HAS_COS
 NV
 cos(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_COSH
 NV
 cosh(double x);
 
+#endif
+
+#ifdef PSX2008_DIV
 void
-div(int numer, int denom);
+div(IV numer, IV denom);
     INIT:
-        div_t result;
+        PSX2008_DIV_T result;
     PPCODE:
-        result = div(numer, denom);
+        result = PSX2008_DIV(numer, denom);
         EXTEND(SP, 2);
         mPUSHi(result.quot);
         mPUSHi(result.rem);
 
-void
-ldiv(long numer, long denom);
-    INIT:
-        ldiv_t result;
-    PPCODE:
-        result = ldiv(numer, denom);
-        EXTEND(SP, 2);
-        mPUSHi(result.quot);
-        mPUSHi(result.rem);
+#endif
 
+#ifdef PSX2008_HAS_ERF
 NV
 erf(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ERFC
 NV
 erfc(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_EXP
+NV
+exp(double x);
+
+#endif
+
+#ifdef PSX2008_HAS_EXP2
 NV
 exp2(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_EXPM1
 NV
 expm1(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_FDIM
 NV
 fdim(double x, double y);
 
+#endif
+
+#ifdef PSX2008_HAS_FLOOR
 NV
 floor(double x);
 
-#if (defined(__FreeBSD_version)  && __FreeBSD_version  < 504000) || \
-    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+#endif
 
-void
-fma(...);
-    PPCODE:
-        croak("fma() not available");
-
-#else
+#ifdef PSX2008_HAS_FMA
 NV
 fma(double x, double y, double z);
 
 #endif
 
+#ifdef PSX2008_HAS_FMAX
 NV
 fmax(double x, double y);
 
+#endif
+
+#ifdef PSX2008_HAS_FMIN
 NV
 fmin(double x, double y);
 
+#endif
+
+#ifdef PSX2008_HAS_FMOD
 NV
 fmod(double x, double y);
+
+#endif
+
+#ifdef PSX2008_HAS_FPCLASSIFY
 
 int
 fpclassify(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_HYPOT
 NV
 hypot(double x, double y);
 
+#endif
+
+#ifdef PSX2008_HAS_ILOGB
 int
 ilogb(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ISFINITE
 int
 isfinite(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ISINF
 int
 isinf(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ISNAN
 int
 isnan(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ISNORMAL
 int
 isnormal(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_ISGREATEREQUAL
+int
+isgreaterequal(NV x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_ISLESS
+int
+isless(NV x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_ISLESSEQUAL
+int
+islessequal(NV x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_ISLESSGREATER
+int
+islessgreater(NV x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_ISUNORDERED
+int
+isunordered(NV x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_J0
 NV
 j0(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_J1
 NV
 j1(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_JN
 NV
 jn(int n, double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LDEXP
 NV
 ldexp(double x, int exp);
 
+#endif
+
+#ifdef PSX2008_HAS_LGAMMA
 NV
 lgamma(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LOG
 NV
 log(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LOG10
 NV
 log10(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LOG1P
 NV
 log1p(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LOG2
 NV
 log2(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_LOGB
 NV
 logb(double x);
 
-long
-lround(double x);
+#endif
 
-#if (defined(__FreeBSD_version)  && __FreeBSD_version  < 503001) || \
-    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+#ifdef PSX2008_LROUND
 void
-nearbyint(...);
-    PPCODE:
-        croak("nearbyint() not available");
+lround(double x)
+  INIT:
+    PSX2008_LROUND_T ret, tmp;
+  PPCODE:
+    errno = 0;
+    feclearexcept(FE_ALL_EXCEPT);
+    ret = PSX2008_LROUND(x);
+    if (errno == 0 && fetestexcept(FE_ALL_EXCEPT) == 0)
+      PUSH_INT_OR_PV(ret, tmp);
 
-#else
+#endif
+
+#ifdef PSX2008_HAS_NEARBYINT
 NV
 nearbyint(double x);
 
 #endif
 
+#ifdef PSX2008_HAS_NEXTAFTER
 NV
 nextafter(double x, double y);
 
-NV
-remainder(double x, double y);
+#endif
 
+#ifdef PSX2008_HAS_NEXTTOWARD
+NV
+nexttoward(double x, NV y);
+
+#endif
+
+#ifdef PSX2008_HAS_REMAINDER
+void
+remainder(double x, double y);
+  INIT:
+    double res;
+  PPCODE:
+    errno = 0;
+    feclearexcept(FE_ALL_EXCEPT);
+    res = remainder(x, y);
+    if (errno == 0 && fetestexcept(FE_ALL_EXCEPT) == 0)
+      mPUSHn(res);
+
+#endif
+
+#ifdef PSX2008_HAS_REMQUO
+void
+remquo(double x, double y);
+  INIT:
+    int quo;
+    double res;
+  PPCODE:
+    errno = 0;
+    feclearexcept(FE_ALL_EXCEPT);
+    res = remquo(x, y, &quo);
+    if (errno == 0 && fetestexcept(FE_ALL_EXCEPT) == 0) {
+      mPUSHn(res);
+      mPUSHi(quo);
+    }
+
+#endif
+
+#ifdef PSX2008_HAS_ROUND
 NV
 round(double x);
 
-NV
-scalbn(double x, int n);
+#endif
 
+#ifdef PSX2008_SCALBN
+NV
+scalbn(double x, IV n);
+  CODE:
+    RETVAL = PSX2008_SCALBN(x, n);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_SIGNBIT
 int
 signbit(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_SIN
+NV
+sin(double x);
+
+#endif
+
+#ifdef PSX2008_HAS_SINH
 NV
 sinh(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_TAN
 NV
 tan(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_TANH
 NV
 tanh(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_TGAMMA
 NV
 tgamma(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_TRUNC
 NV
 trunc(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_Y0
 NV
 y0(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_Y1
 NV
 y1(double x);
 
+#endif
+
+#ifdef PSX2008_HAS_YN
 NV
 yn(int n, double x);
 
+#endif
 
 ## Complex arithmetic functions
 ###############################
 
-#ifdef _Complex_I
+#ifdef PSX2008_HAS_CABS
 NV
 cabs(double re, double im);
-    INIT:
-        double complex z = re + im * _Complex_I;
-    CODE:
-        RETVAL = cabs(z);
-    OUTPUT:
-        RETVAL
-
-#else
-void
-cabs(...);
-    PPCODE:
-        croak("cabs() not available");
+  INIT:
+    double complex z = re + im * I;
+  CODE:
+    RETVAL = cabs(z);
+  OUTPUT:
+    RETVAL
 
 #endif
 
-#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 800000)
-void
-carg(...);
-    PPCODE:
-        croak("carg() not available");
-
-void
-cproj(...);
-    PPCODE:
-        croak("cproj() not available");
-
-void
-csqrt(...);
-    PPCODE:
-        croak("csqrt() not available");
-
-#else
+#ifdef PSX2008_HAS_CARG
 NV
 carg(double re, double im);
-    INIT:
-        double complex z = re + im * _Complex_I;
-    CODE:
-        RETVAL = carg(z);
-    OUTPUT:
-        RETVAL
-
-void
-cproj(double re, double im);
-    ALIAS:
-        sqrt = 1
-    INIT:
-        double complex z = re + im * _Complex_I;
-        double complex result;
-    PPCODE:
-        if (ix == 0)
-            result = cproj(z);
-        else
-            result = csqrt(z);
-        EXTEND(SP, 2);
-        mPUSHn(creal(result));
-        mPUSHn(cimag(result));
+  INIT:
+    double complex z = re + im * I;
+  CODE:
+    RETVAL = carg(z);
+  OUTPUT:
+    RETVAL
 
 #endif
 
-#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 503001)
-void
-cimag(...);
-    PPCODE:
-        croak("cimag() not available");
-
-void
-conj(...);
-    PPCODE:
-        croak("conj() not available");
-
-void
-creal(...);
-    PPCODE:
-        croak("creal() not available");
-
-#else
+#ifdef PSX2008_HAS_CIMAG
 NV
 cimag(double re, double im);
-    ALIAS:
-        conj = 1
-        creal = 2
-    INIT:
-        double complex z = re + im * _Complex_I;
-    CODE:
-        switch(ix) {
-        case 0:
-            RETVAL = cimag(z);
-            break;
-        case 1:
-            RETVAL = conj(z);
-            break;
-        default:
-            RETVAL = creal(z);
-            break;
-        }
-    OUTPUT:
-        RETVAL
+  INIT:
+    double complex z = re + im * I;
+  CODE:
+    RETVAL = cimag(z);
+  OUTPUT:
+    RETVAL
 
 #endif
 
-#if defined(_Complex_I) && !defined(__FreeBSD__)
+#ifdef PSX2008_HAS_CONJ
 void
-cpow(double re_x, double im_x, double re_y, double im_y);
-    INIT:
-        double complex x = re_x + im_x * _Complex_I;
-        double complex y = re_y + im_y * _Complex_I;
-        double complex result = cpow(x, y);
-    PPCODE:
-        EXTEND(SP, 2);
-        mPUSHn(creal(result));
-        mPUSHn(cimag(result));
-
-void
-clog(double re, double im);
-    INIT:
-        double complex z = re + im * _Complex_I;
-        double complex result = clog(z);
-    PPCODE:
-        EXTEND(SP, 2);
-        mPUSHn(creal(result));
-        mPUSHn(cimag(result));
-
-#else
-void
-cpow(...);
-    PPCODE:
-        /* https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=221341 */
-        croak("cpow() not available");
-
-void
-clog(...);
-    PPCODE:
-        /* https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=221341 */
-        croak("clog() not available");
+conj(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = conj(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
 
 #endif
 
-#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 900000)
-void
-cexp(...);
-    PPCODE:
-        croak("cexp() not available");
+#ifdef PSX2008_HAS_CPROJ
+NV
+cproj(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+  CODE:
+    RETVAL = cproj(z);
+  OUTPUT:
+    RETVAL
 
-#else
+#endif
+
+#ifdef PSX2008_HAS_CREAL
+NV
+creal(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+  CODE:
+    RETVAL = creal(z);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+#ifdef PSX2008_HAS_CEXP
 void
 cexp(double re, double im);
-    INIT:
-        double complex z = re + im * _Complex_I;
-        double complex result = cexp(z);
-    PPCODE:
-        EXTEND(SP, 2);
-        mPUSHn(creal(result));
-        mPUSHn(cimag(result));
+  INIT:
+    double complex z = re + im * I;
+    double complex result = cexp(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
 
 #endif
 
+#ifdef PSX2008_HAS_CLOG
+void
+clog(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = clog(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CPOW
+void
+cpow(double re_x, double im_x, double re_y, double im_y);
+  INIT:
+    double complex x = re_x + im_x * I;
+    double complex y = re_y + im_y * I;
+    double complex result = cpow(x, y);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CSQRT
+void
+csqrt(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = csqrt(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CACOS
 void
 cacos(double re, double im);
-    ALIAS:
-        cacosh = 1
-        casin = 2    
-        casinh = 3
-        catan = 4
-        catanh = 5
-        ccos = 6
-        ccosh = 7
-        csin = 8
-        csinh = 9
-        ctan = 10
-        ctanh = 11
-    INIT:
-#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
-        ;
-#else
-        double complex z = re + im * _Complex_I;
-        double complex result;
-#endif
-    PPCODE:
-#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
-        PERL_UNUSED_VAR(re);
-        PERL_UNUSED_VAR(im);
-        PERL_UNUSED_VAR(ix);
-        croak("Complex trigonometric functions not available");
-#else
-        switch(ix) {
-        case 0:
-            result = cacos(z);
-            break;
-        case 1:
-            result = cacosh(z);
-            break;
-        case 2:
-            result = casin(z);
-            break;
-        case 3:
-            result = casinh(z);
-            break;
-        case 4:
-            result = catan(z);
-            break;
-        case 5:
-            result = catanh(z);
-            break;
-        case 6:
-            result = ccos(z);
-            break;
-        case 7:
-            result = ccosh(z);
-            break;
-        case 8:
-            result = csin(z);
-            break;
-        case 9:
-            result = csinh(z);
-            break;
-        case 10:
-            result = ctan(z);
-            break;
-        default:
-            result = ctanh(z);
-        }
-        EXTEND(SP, 2);
-        mPUSHn(creal(result));
-        mPUSHn(cimag(result));
+  INIT:
+    double complex z = re + im * I;
+    double complex result = cacos(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
 #endif
 
+#ifdef PSX2008_HAS_CACOSH
+void
+cacosh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = cacosh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CASIN
+void
+casin(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = casin(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CASINH
+void
+casinh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = casinh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CATAN
+void
+catan(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = catan(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CATANH
+void
+catanh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = catanh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CCOS
+void
+ccos(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = ccos(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CCOSH
+void
+ccosh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = ccosh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CSIN
+void
+csin(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = csin(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CSINH
+void
+csinh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = csinh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CTAN
+void
+ctan(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = ctan(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
+
+#ifdef PSX2008_HAS_CTANH
+void
+ctanh(double re, double im);
+  INIT:
+    double complex z = re + im * I;
+    double complex result = ctanh(z);
+  PPCODE:
+    RETURN_COMPLEX(result);
+
+#endif
 
 ## DESTROY is called when a file handle we created (e.g. in openat)
 ## is cleaned up. This is just a dummy to silence AUTOLOAD. We leave
@@ -2277,49 +3277,8 @@ void
 DESTROY(...);
 PPCODE:
 
-
 BOOT:
 {
-    CV *cv;
-    char *file = __FILE__;
-
-    /* is*() stuff borrowed vom POSIX.xs */
-#undef isalnum
-    cv = newXS("POSIX::2008::isalnum", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isalnum;
-#undef isalpha
-    cv = newXS("POSIX::2008::isalpha", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isalpha;
-#undef isblank
-    cv = newXS("POSIX::2008::isblank", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isblank;
-#undef iscntrl
-    cv = newXS("POSIX::2008::iscntrl", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &iscntrl;
-#undef isdigit
-    cv = newXS("POSIX::2008::isdigit", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isdigit;
-#undef isgraph
-    cv = newXS("POSIX::2008::isgraph", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isgraph;
-#undef islower
-    cv = newXS("POSIX::2008::islower", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &islower;
-#undef isprint
-    cv = newXS("POSIX::2008::isprint", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isprint;
-#undef ispunct
-    cv = newXS("POSIX::2008::ispunct", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &ispunct;
-#undef isspace
-    cv = newXS("POSIX::2008::isspace", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isspace;
-#undef isupper
-    cv = newXS("POSIX::2008::isupper", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isupper;
-#undef isxdigit
-    cv = newXS("POSIX::2008::isxdigit", is_common, file);
-    XSANY.any_dptr = (any_dptr_t) &isxdigit;
 }
 
 # vim: set ts=4 sw=4 sts=4 expandtab:

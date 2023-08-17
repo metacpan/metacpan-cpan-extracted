@@ -1,0 +1,128 @@
+#!/usr/bin/env perl
+#ABSTRACT: How to make your configuration file for NBI::Slurm tools
+#PODNAME: configuration_file_info
+
+use strict;
+use warnings;
+use feature qw(say);
+use FindBin qw($RealBin);
+use Getopt::Long;
+use Pod::Usage;
+GetOptions(
+    'help' => sub { pod2usage() },
+);
+my $home_dir = $ENV{HOME};
+if (-e "$home_dir/.nbislurm.config") {
+    say STDERR "Configuration file already exists at $home_dir/.nbislurm.config";
+} else {
+    my $system_tmp_dir = $ENV{TMPDIR} || '/tmp';
+    say STDERR "Creating configuration file at $home_dir/.nbislurm.config";
+    open(my $fh, ">", "$home_dir/.nbislurm.config") or die "Can't open $home_dir/.nbislurm.config for writing: $!";
+    say $fh <<"END";
+
+# Default configuration file for NBI::Slurm tools
+# This file is in key=value format, and can be edited manually.
+# 
+tmpdir=$system_tmp_dir
+# Email address to use for job submission
+email=your.email\@domain.com
+# When to be notified about job status changes: none, end, fail, all
+email_type=end,fail
+END
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+configuration_file_info - How to make your configuration file for NBI::Slurm tools
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 LOCATION
+
+L<NBI::Slurm> tools use a configuration file to store some default values.
+
+At the moment there is no central use of the file, and it's just provided
+as a convenient shortcut for some of the options.
+
+The configuration file is located at C<~/.nbislurm.config>.
+
+    # Create a configuration file
+    $ touch ~/.nbislurm.config
+
+=head1 CONFIGURATION
+
+The file is a simple B<key=value> format. 
+The value can contain spaces and even equal signs, as long as the key doesn't.
+
+=head2 Configuring jobs
+
+=over 4
+
+=item * C<tmpdir>
+
+Where to store temporary files for jobs. It's is recommended to customize this to store jobs and their logs 
+in a convenient location by default.
+
+=item * C<queue>
+
+The default queue to use when submitting jobs. 
+
+=item * C<time>
+
+The default time to use when submitting jobs, in I<time string> format (see L<NBI::Opts>).
+
+=item * C<memory>
+
+The default memory to use when submitting jobs. Recommended to use an integer (MB), but a memory string will also work.
+
+=item * C<threads>
+
+The default number of threads to use when submitting jobs. 
+
+=item * C<email>
+
+The default email address to use when submitting jobs.
+
+=item * C<email_type>
+
+When to send emails, default is 'none'.
+
+=back
+
+=head2 Interactive Sessions
+
+The C<session> script has two additional options that can be set in the configuration file:
+
+=over 4
+
+=item * C<session>
+
+A string of parameters to be used for B<all> interactive sessions.
+
+=item * C<special_session>
+
+A string of parameters to be used for interactive sessions when C<--special> is specified.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

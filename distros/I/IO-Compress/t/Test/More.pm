@@ -361,7 +361,7 @@ sub isnt ($$;$) {
     $Test->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
+# *isn't = \&isnt;
 
 
 =item B<like>
@@ -463,9 +463,9 @@ Checks to make sure the $module or $object can do these @methods
 
 is almost exactly like saying:
 
-    ok( Foo->can('this') && 
-        Foo->can('that') && 
-        Foo->can('whatever') 
+    ok( Foo->can('this') &&
+        Foo->can('that') &&
+        Foo->can('whatever')
       );
 
 only without all the typing and with a better interface.  Handy for
@@ -498,9 +498,9 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = @methods == 1 ? "$class->can('$methods[0]')" 
+    $name = @methods == 1 ? "$class->can('$methods[0]')"
                           : "$class->can(...)";
-    
+
     my $ok = $Test->ok( !@nok, $name );
 
     $Test->diag(map "    $class->can('$_') failed\n", @nok);
@@ -573,8 +573,8 @@ WHOA
             $diag = "$obj_name isn't a '$class' it's a '$ref'";
         }
     }
-            
-      
+
+
 
     my $ok;
     if( $diag ) {
@@ -809,7 +809,7 @@ sub _is_module_name {
 
 Sometimes running a test under certain conditions will cause the
 test script to die.  A certain function or method isn't implemented
-(such as fork() on MacOS), some resource isn't available (like a 
+(such as fork() on MacOS), some resource isn't available (like a
 net connection) or a module isn't available.  In these cases it's
 necessary to skip tests, or declare that they are supposed to fail
 but will work in the future (a todo test).
@@ -1009,7 +1009,7 @@ sub is_deeply {
     unless( @_ == 2 or @_ == 3 ) {
         my $msg = <<WARNING;
 is_deeply() takes two or three args, you gave %d.
-This usually means you passed an array or hash instead 
+This usually means you passed an array or hash instead
 of a reference to it
 WARNING
         chop $msg;   # clip off newline so carp() will put in line/file
@@ -1111,7 +1111,7 @@ These functions are usually used inside an ok().
 
     ok( eq_array(\@this, \@that) );
 
-C<is_deeply()> can do that better and with diagnostics.  
+C<is_deeply()> can do that better and with diagnostics.
 
     is_deeply( \@this, \@that );
 
@@ -1171,7 +1171,7 @@ sub _deep_check {
 
     {
         # Quiet uninitialized value warnings when comparing undefs.
-        local $^W = 0; 
+        local $^W = 0;
 
         $Test->_unoverload(\$e1, \$e2);
 
@@ -1483,7 +1483,7 @@ See F<http://rt.cpan.org> to report and view bugs.
 
 Copyright 2001, 2002, 2004 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
 
-This program is free software; you can redistribute it and/or 
+This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 See F<http://www.perl.com/perl/misc/Artistic.html>

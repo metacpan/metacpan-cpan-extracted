@@ -1,0 +1,77 @@
+{
+   "abstract" : "Safe-navigation for Perl",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>",
+      "Toby Inkster <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.041",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PerlX-SafeNav",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.041"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Tie::Array" : "0",
+            "Tie::Hash" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::SafeNav" : {
+         "file" : "lib/PerlX/SafeNav.pm",
+         "version" : "0.004"
+      },
+      "PerlX::SafeNav::ArrayRef" : {
+         "file" : "lib/PerlX/SafeNav.pm"
+      },
+      "PerlX::SafeNav::HashRef" : {
+         "file" : "lib/PerlX/SafeNav.pm"
+      },
+      "PerlX::SafeNav::Object" : {
+         "file" : "lib/PerlX/SafeNav.pm"
+      },
+      "safenav" : {
+         "file" : "lib/safenav.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/PerlX-SafeNav/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/PerlX-SafeNav.git",
+         "web" : "https://github.com/gugod/PerlX-SafeNav"
+      }
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : "1"
+}

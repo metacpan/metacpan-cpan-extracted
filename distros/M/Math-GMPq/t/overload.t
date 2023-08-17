@@ -3,7 +3,7 @@ use strict;
 use Math::GMPq qw(:mpq);
 use Math::BigInt; # for some error checking
 
-print "1..36\n";
+print "1..39\n";
 
 print "# Using gmp version ", Math::GMPq::gmp_v(), "\n";
 
@@ -233,6 +233,7 @@ if("$p" eq '113/73') {$ok .= 'e'}
 
 $p *= $q;
 $p /= $q;
+
 if("$p" eq '113/73') {$ok .= 'f'}
 
 if($ok eq 'abcdef'
@@ -608,4 +609,26 @@ if($ok eq 'abcd') {print "ok 36\n"}
 else {
   warn "\$ok: $ok\n";
   print "not ok 36\n";
+}
+
+my $obj0 = Math::GMPq->new(~0) / 19;
+my $obj1 = $obj0++;
+
+if($obj1 - $obj0 == -1) {print "ok 37\n"}
+else {
+  warn "$obj1 is not 1 less than $obj0\n";
+  print "not ok 37\n";
+}
+
+my $obj2 = ++$obj0;
+if($obj2 == $obj0) {print "ok 38\n"}
+else {
+  warn "$obj2 != $obj0\n";
+  print "not ok 38\n";
+}
+
+if($obj2 - $obj1 == 2) {print "ok 39\n"}
+else {
+  warn "$obj2 is 2 greater than $obj1\n";
+  print "not ok 39\n";
 }

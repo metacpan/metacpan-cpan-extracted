@@ -1,0 +1,19 @@
+Revision history for Crypt-OpenSSL-ConfiguredAPI.
+
+0.03 -- Tue Jul 25 22:12:36 ADT 2023
+
+    - 915d432 Also requires ConfigureRequires for Crypt::OpenSSL::Guess
+    - eb3a259 v0.02
+
+0.02 -- Tue Jul 25 18:10:42 ADT 2023
+
+    - d18b6c8 Update readme pod
+    - ea4516d Update version and fix incorrect pod
+    - 3c2dcee Sort out issue with the build dependancy
+    - a0b8f8a v0.01
+
+0.01 -- Sun Jul 23 22:41:17 ADT 2023
+
+    - 10fc887 Add .gitignore
+    - b95aa79 Add Github actions for testing
+    - f75c478 Initial Version

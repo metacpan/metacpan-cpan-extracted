@@ -2693,6 +2693,10 @@ If no host is provided, the key is just the cookie, otherwise the resulting key 
 
 You should not need to use this method as it is used internally only.
 
+=head2 length
+
+Read-only. Returns the size of the Cookie repository as a L<number object|Module::Generic::Number>
+
 =head2 load
 
     $jar->load( '/home/joe/cookies.json' ) || die( $jar->error );

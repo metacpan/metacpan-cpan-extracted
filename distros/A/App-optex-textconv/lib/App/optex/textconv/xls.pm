@@ -1,6 +1,6 @@
 package App::optex::textconv::xls;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use strict;
 use warnings;

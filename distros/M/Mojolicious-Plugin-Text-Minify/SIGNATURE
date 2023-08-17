@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 fda1ab4fcfd984a3c8a106ed590cbb54bd42c31b63c85ca6ea658bd985989ae8 Changes
+SHA256 6fe4f1dbde3e52cf2d4ca1da5c1ee98f598c9e6bebfacc920166526477faef73 INSTALL
+SHA256 ec119aeabda763e5c66528fc502b3e43068ecd5a1ac39e7c8e24d912deecaf51 LICENSE
+SHA256 589c864cb024ccb1f99a7c3ad2d8c0c773bb2d4cfddda8fd391ef98d3cefe5ed MANIFEST
+SHA256 ce023305952a2e9559b337ab81c426ecd52e36c1cffdff1de3a7ff5d1e7bc683 MANIFEST.SKIP
+SHA256 110660b60c23349cc0f68b05e4299614bf70b945480618edd926ebb2022e69b1 META.json
+SHA256 ee200f0d09ca8dcb2a4ff09dc2748033b39cdb71c9b18173c6b90523a9ea9647 META.yml
+SHA256 85f7b0ab6d9efb929bf63f74702f9bb9ff22fe34d4c6010a421bdd605bdc229c Makefile.PL
+SHA256 29fb677505b482e77518c6b170a30c91e26936ef680a07987d081dd4a538c48b README.md
+SHA256 9ca7b9232e67f50592c725135086a1f60b5f7f456442c0b0148774468f77ae44 cpanfile
+SHA256 20ac69a0dfa64beaf6bef7325a022004feceadf4ee7c740560c8d9696385a41e dist.ini
+SHA256 a9e5152c6916463c51ecae8222420cacc66aacad91a828d6e4a4516195a9ff74 lib/Mojolicious/Plugin/Text/Minify.pm
+SHA256 a92157ffa112f80216366adf9473731582a54e852eb7977bc190de5b0fb7e751 t/00-report-prereqs.dd
+SHA256 06949202cdcd13d2ea19d07c1913f7a5f1256ef6755e4b7f7d53167c4a3d5f52 t/00-report-prereqs.t
+SHA256 72b1fd92691fbf47ba031bd3c386e3b26a525f3625b573417a85ea99422bec2c t/author-clean-namespaces.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 eb01842038c16291f412266e17b65946b2aec83a3d907e8b498f01b90951d80e t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 41c1e8bfca8857bc8ed67bd4f07873e36976473b1e334da6c2e1c8b2d7e8d9d2 t/author-no-tabs.t
+SHA256 1ee64d4f8248deb3541453ec521ac8057c9a4ba365946b6a02ee760ad28ce164 t/author-pod-coverage.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 c1f29c0000903a78a9a6f6d4d84f375740d5bb333d532c0502bedbe613918127 t/author-portability.t
+SHA256 07f371944db459920486bd9af0443a18db8cf67e8f1b3216950e17e86c3ad8f4 t/basic.t
+SHA256 e2f43f7eb61dff3695481e8142d1131db74c4b46531112f9d7492e8f462cbe84 t/mode-prod.t
+SHA256 04b2cb9fae99a88495c54d00902781e566139de24630feb9f492cf85a986b8d2 t/mode.t
+SHA256 a5a266e46263f85208edd40dab1ca17dc7248e191fa210b100d0dd9ceb40c9cd t/no-minify.t
+SHA256 b5232d273bbe74d423210cfa2a2a12e583900fa420f1c093e1147e9625db790c t/release-check-manifest.t
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 426c441a368792fa6be6a2e35ff0ac997faa48575d090646e9570e056109bb32 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 4792d4526e25f15e1311d93e7cb8cfe70f13bcae14ffb713d3813db5d494ffdb weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmSLYYMACgkQHmWrcYGD
+C6wy4gv/Uv2x8NH03mJAxZcK7JjTN3rSgMulVAvdwNWgLy+6KgmGU+I+jCCojD2S
+NLYSlW64/Z+v0zSLxMo6qdi26j1rv0zb7whB4s2Y6Q1Uv2KM0PrRI7EzFWlw0sgO
+TuUElB9j7nQPGRMzr+BrNgonlmsUlrRhnKMcyOxHiVJQcTVa3lpJSCEyPxftUCcr
+bPBGE7T2O5DSy7wqVe1KO0VIcQZU3WvE6a32eqWOcAkEMKNIMkRzRPTXg0KwWrOo
+rxr/uTIWGUiuz20pxznPqMYzkruZdMfKIdjXbdDmGIOw9kr/Xkyc0EnzWNlEyqqT
+RLGXeG435lkL98RmBB4wwRP1ip3b1odEj/Q8MqLFpe4kuDYWxPMNNUUku1nUEoUN
+1RnrtmmozpyCqz/t3FpmPCpYP1om1feNvcxsvqWk+VgSnp5sGQAOeW9gxwBYg3bC
+6IexublPaj40s6eKJQGKLR56jMyI5mkpOk54a/sWYVgSksuwdqjxuvkGC17r3KSX
+2qyneZal
+=CVl7
+-----END PGP SIGNATURE-----

@@ -1,10 +1,17 @@
 use strict;
 use warnings;
 
+use Test::More;
+
+BEGIN {
+  plan skip_all => 'MooseX::MarkAsMethod is not needed in Moose 2.1400+ and namespace::autoclean 0.16+'
+    if eval { +require namespace::autoclean; namespace::autoclean->VERSION('0.16') };
+}
+
 use Test::Needs {
     'MooseX::MarkAsMethods' => 0,
 };
-use Test::More;
+
 use Test::Fatal;
 
 {

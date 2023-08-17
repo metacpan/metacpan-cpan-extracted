@@ -1,0 +1,48 @@
+---
+abstract: 'Serves a HTML slide show synchronized over WebSocket'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  File::Temp: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-SlideServer
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::ShareDir: '0'
+  File::stat: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Daemontools: '0'
+  Mojo::Base: '0'
+  Mojo::DOM: '0'
+  Mojo::File: '0'
+  Mojo::Log: '0'
+  Mojo::WebSocket: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Text::Markdown::Hoedown: '0'
+  perl: v5.36.0
+resources:
+  bugtracker: https://github.com/nrdvana/perl-App-SlideServer/issues
+  homepage: https://github.com/nrdvana/perl-App-SlideServer
+  repository: https://github.com/nrdvana/perl-App-SlideServer.git
+version: '0.002'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

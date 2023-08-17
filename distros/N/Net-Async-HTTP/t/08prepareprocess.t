@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -17,9 +17,6 @@ testing_loop( $loop );
 my $http = TestingHTTP->new(
    user_agent => "", # Don't put one in request headers
 );
-
-ok( defined $http, 'defined $http' );
-isa_ok( $http, "Net::Async::HTTP", '$http isa Net::Async::HTTP' );
 
 $loop->add( $http );
 

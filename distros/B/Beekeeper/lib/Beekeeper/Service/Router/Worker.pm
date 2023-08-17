@@ -3,7 +3,7 @@ package Beekeeper::Service::Router::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -30,6 +30,7 @@ sub authorize_request {
 
 sub on_startup {
     my $self = shift;
+    weaken $self;
 
     my $worker_config = $self->{_WORKER}->{config};
     my $bus_config    = $self->{_WORKER}->{bus_config};
@@ -54,10 +55,18 @@ sub on_startup {
 
         $self->init_frontend_connection( $config );
     }
+
+    # Ping frontend brokers to avoid disconnections due to inactivity
+    $self->{ping_timer} = AnyEvent->timer(
+        after    => 60 * rand(),
+        interval => 60,
+        cb       => sub { $self->ping_frontend_brokers },
+    );
 }
 
 sub init_frontend_connection {
     my ($self, $config) = @_;
+    weaken $self;
 
     my $bus_id  = $config->{'bus_id'};
     my $back_id = $self->{_BUS}->bus_id;
@@ -77,7 +86,16 @@ sub init_frontend_connection {
             my $delay = $self->{connect_err}->{$bus_id}++;
             $self->{reconnect_tmr}->{$bus_id} = AnyEvent->timer(
                 after => ($delay < 10 ? $delay * 3 : 30),
-                cb    => sub { $bus->connect },
+                cb => sub {
+                    $bus->connect(
+                        on_connack => sub {
+                            # Setup routing
+                            log_warn "Rerouting: $back_id <--> $bus_id";
+                            $self->{FRONTEND}->{$bus_id} = $bus;
+                            $self->pull_frontend_requests( frontend => $bus );
+                        }
+                    );
+                },
             );
         },
     );
@@ -191,7 +209,7 @@ sub on_shutdown {
 
 sub pull_frontend_requests {
     my ($self, %args) = @_;
-    weaken($self);
+    weaken $self;
 
     # Get requests from frontend bus and forward them to backend bus
     #
@@ -380,6 +398,16 @@ sub pull_backend_notifications {
                 log_debug "Forwarding $src_queue \@$backend_id --> msg/frontend/{app}/{service}/{method} \@$frontend_id";
             }
         );
+    }
+}
+
+sub ping_frontend_brokers {
+    my $self = shift;
+
+    foreach my $frontend_bus (values %{$self->{FRONTEND}}) {
+
+        next unless $frontend_bus->{is_connected};
+        $frontend_bus->pingreq;
     }
 }
 
@@ -588,7 +616,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

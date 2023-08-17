@@ -110,6 +110,7 @@ void deflate_config_in (DeflateExt::Config& cfg, const Hash& h) {
     if ((val = h.fetch("compression_level")))          cfg.compression_level          = val.number();
     if ((val = h.fetch("strategy")))                   cfg.strategy                   = val.number();
     if ((val = h.fetch("compression_threshold")))      cfg.compression_threshold      = val.number();
+    if ((val = h.fetch("default_compress_binary")))    cfg.default_compress_binary    = SvTRUE(val);
 }
 
 Sv deflate_config_out (const DeflateExt::Config& cfg) {

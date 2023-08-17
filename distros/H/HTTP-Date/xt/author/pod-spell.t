@@ -49,6 +49,7 @@ Karaban
 Kennedy
 Kilgore
 Koenig
+Kyle
 Lipcon
 Ludlam
 MARKSTOS
@@ -68,7 +69,7 @@ Rolf
 Schilli
 Sean
 Sjogren
-Skytta
+Skyttä
 Slaven
 Spiros
 Steve
@@ -84,6 +85,7 @@ Toru
 Tourbin
 Ville
 Wheeler
+Wright
 YYYY
 Yamaguchi
 Yuri
@@ -109,6 +111,7 @@ jefflee
 john9art
 jraspass
 ka
+kyle
 lib
 ludlam
 mark

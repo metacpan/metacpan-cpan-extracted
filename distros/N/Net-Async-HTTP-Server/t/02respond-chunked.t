@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+
 use IO::Async::Test;
 use IO::Async::Loop;
 

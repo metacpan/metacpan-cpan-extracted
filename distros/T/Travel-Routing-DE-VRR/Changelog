@@ -1,3 +1,14 @@
+Travel::Routing::DE::VRR 2.21 - Sat Jul 22 2023
+
+    * Add service VRR3
+    * Update service URLs for VVO, VRN
+    * Remove discontinued services SVV, TLEM, VBL, Verbundlinie, VOR
+
+Travel::Routing::DE::VRR 2.20 - Fri Mar 26 2021
+
+    * EFA/Route/Part: Add occupancy accessor
+    * efa: Show expected occupancy, if available
+
 Travel::Routing::DE::VRR 2.19 - Sat May 02 2020
 
     * Switch from WTFPL to Perl license (GPL 1+ or Artistic)

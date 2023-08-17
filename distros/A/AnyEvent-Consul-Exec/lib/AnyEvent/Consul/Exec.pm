@@ -1,5 +1,5 @@
 package AnyEvent::Consul::Exec;
-$AnyEvent::Consul::Exec::VERSION = '0.003';
+$AnyEvent::Consul::Exec::VERSION = '0.004';
 # ABSTRACT: Execute a remote command across a Consul cluster
 
 use 5.020;
@@ -21,12 +21,13 @@ sub new {
     ClassName,
     slurpy Dict[
       command => Str,
-      wait    => Optional[Int],
-      dc      => Optional[Str],
-      node    => Optional[Str],
-      service => Optional[Str],
-      tag     => Optional[Str],
-      consul_args => Optional[ArrayRef],
+      wait            => Optional[Int],
+      dc              => Optional[Str],
+      node            => Optional[Str],
+      min_node_count  => Optional[Int],
+      service         => Optional[Str],
+      tag             => Optional[Str],
+      consul_args     => Optional[ArrayRef],
       map { $_ => Optional[CodeRef] } @callbacks,
     ],
   );
@@ -35,6 +36,7 @@ sub new {
   $self->{wait} //= 2;
   $self->{consul_args} //= [];
   $self->{dc_args} = $self->{dc} ? [dc => $self->{dc}] : [];
+  $self->{min_node_count} //= 0;
   return bless $self, $class;
 }
 
@@ -80,9 +82,12 @@ sub _wait_responses {
         if ($act eq 'exit') {
           $self->{_nexit}++;
           $self->{on_exit}->($node, $kv->value);
-          if ($self->{_nack} == $self->{_nexit}) {
-            # XXX super naive. there might be some that haven't acked yet
-            #     should schedule done for a lil bit in the future
+
+          # XXX super naive. there might be some that haven't acked yet
+          #     should schedule done for a lil bit in the future
+          if (   $self->{_nack} == $self->{_nexit}
+              && $self->{_nexit} >= $self->{min_node_count})
+          {
             $self->{_done} = 1;
             $self->_cleanup(sub { $self->{on_done}->() });
           }
@@ -342,6 +347,16 @@ The C<node>, C<service> and C<tag> each take basic regexes that will be used to
 match nodes to run the command on. See the corresponding options to C<consul exec>
 for more info.
 
+If you specify <min_node_count>, at *least* this many nodes must report in
+before we consider a job done. Without this, some nodes might report back
+results before we've seen an ack from the others, and your job may prematurely
+be canceled on those other nodes, or your on_done callback will be called
+prematurely. This is most useful if C<node> is a regex that matches an
+explicit amount of nodes, for example:
+
+    node => /^(host1|host2|host3)$/,
+    min_node_count => 3,
+
 The C<dc> option can take the name of the datacenter to run the command in. The
 exec mechanism is limited to a single datacentre. This option will cause
 L<AnyEvent::Consul::Exec> to find a Consul agent in the named datacenter and
@@ -418,7 +433,17 @@ L<https://github.com/robn/AnyEvent-Consul-Exec>
 
 =item *
 
-Rob N ★ <robn@robn.io>
+Rob Norris <robn@despairlabs.com>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Matthew Horsfall <wolfsage@gmail.com>
 
 =back
 

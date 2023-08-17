@@ -6,7 +6,7 @@ use X11::Xlib;
 use Scalar::Util 'weaken';
 
 # All modules in dist share a version
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 NAME
 
@@ -469,7 +469,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2021 by Michael Conrad
+Copyright (C) 2017-2023 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -27,6 +27,16 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 23.7
+
+* New methods **ReplaceTextFormatting** and **ReplaceTextFormatting** allow to replace text with formatting.
+* Added **AfterAnimationType**, **Rewind** and **AfterAnimationColor** methods to **Effect** class.
+* Added **TrimFromStart** and **TrimFromEnd** methods to **VideoFrame** class.
+
+## Enhancements in Version 23.6
+
+* Added methods ho handle VBA methods: **GetVbaProject**, **GetVbaModule**, **CreateVbaModule**, **UpdateVbaModule** and **DeleteVbaModule**. Added model classes related to VBA: **VbaProject**,  **VbaModule** and  **VbaReference**.
+
 ## Enhancements in Version 23.4
 
 * Added **CreateTableRow**, **UpdateTableRow** and **DeleteTableRow** methods to add, update and delete table rows.

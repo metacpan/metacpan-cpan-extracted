@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.36';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -13,6 +13,7 @@ $Neo4j::Driver::Net::Bolt::VERSION = '0.36';
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::Bolt);
 
+use Try::Tiny;
 use URI 1.25;
 
 use Neo4j::Driver::Result::Bolt;
@@ -37,16 +38,16 @@ sub new {
 	# uncoverable pod
 	my ($class, $driver) = @_;
 	
-	croak "Concurrent transactions are unsupported in Bolt; use multiple sessions" if $driver->{concurrent_tx};
+	croak "Concurrent transactions are unsupported in Bolt; use multiple sessions" if $driver->config('concurrent_tx');
 	
-	my $uri = $driver->{uri};
-	if ($driver->{auth}) {
-		croak "Only Basic Authentication is supported" if $driver->{auth}->{scheme} ne 'basic';
+	my $uri = $driver->config('uri');
+	if (my $auth = $driver->config('auth')) {
+		croak "Only Basic Authentication is supported" if $auth->{scheme} ne 'basic';
 		$uri = $uri->clone;
-		$uri->userinfo( $driver->{auth}->{principal} . ':' . $driver->{auth}->{credentials} );
+		$uri->userinfo( $auth->{principal} . ':' . $auth->{credentials} );
 	}
 	
-	my $net_module = $driver->{net_module} || 'Neo4j::Bolt';
+	my $net_module = $driver->config('net_module') || 'Neo4j::Bolt';
 	if ($net_module eq 'Neo4j::Bolt') {
 		croak "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed)\n"
 			. "Neo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n"
@@ -54,14 +55,14 @@ sub new {
 	}
 	
 	my $cxn;
-	if ($driver->{tls}) {
+	if ($driver->config('encrypted')) {
 		$cxn = $net_module->connect_tls("$uri", {
-			timeout => $driver->{http_timeout},
-			ca_file => $driver->{tls_ca},
+			timeout => $driver->config('timeout'),
+			ca_file => $driver->config('trust_ca'),
 		});
 	}
 	else {
-		$cxn = $net_module->connect( "$uri", $driver->{http_timeout} );
+		$cxn = $net_module->connect( "$uri", $driver->config('timeout') );
 	}
 	$class->_trigger_bolt_error( $cxn, $driver->{plugins} ) unless $cxn->connected;
 	
@@ -71,7 +72,7 @@ sub new {
 		uri => $uri,
 		result_module => $net_module->can('result_handlers') ? ($net_module->result_handlers)[0] : $RESULT_MODULE,
 		server_info => $driver->{server_info},
-		cypher_types => $driver->{cypher_types},
+		cypher_types => $driver->config('cypher_types'),
 		active_tx => 0,
 	}, $class;
 }
@@ -79,45 +80,44 @@ sub new {
 
 # Trigger an error using the given event handler.
 # Meant to only be called after a failure has occurred.
+# May also be called as class method.
 # $ref may be a Neo4j::Bolt ResultStream, Cxn, Txn.
 # $error_handler may be a coderef or the event manager.
 sub _trigger_bolt_error {
-	my ($self, $ref, $error_handler) = @_;
-	
-	local $@;
+	my ($self, $ref, $error_handler, $connection) = @_;
 	my $error = 'Neo4j::Error';
 	
 	$error = $error->append_new( Server => {
 		code => scalar $ref->server_errcode,
 		message => scalar $ref->server_errmsg,
-		raw => scalar eval { $ref->get_failure_details },  # Neo4j::Bolt >= 0.41
-	}) if eval { $ref->server_errcode || $ref->server_errmsg };
+		raw => scalar try { $ref->get_failure_details },  # Neo4j::Bolt >= 0.41
+	}) if try { $ref->server_errcode || $ref->server_errmsg };
 	
 	$error = $error->append_new( Network => {
 		code => scalar $ref->client_errnum,
 		message => scalar $ref->client_errmsg // $BOLT_ERROR{$ref->client_errnum},
 		as_string => $self->_bolt_error($ref),
-	}) if eval { $ref->client_errnum || $ref->client_errmsg };
+	}) if try { $ref->client_errnum || $ref->client_errmsg };
 	
 	$error = $error->append_new( Network => {
 		code => scalar $ref->errnum,
 		message => scalar $ref->errmsg // $BOLT_ERROR{$ref->errnum},
 		as_string => $self->_bolt_error($ref),
-	}) if eval { $ref->errnum || $ref->errmsg };
+	}) if try { $ref->errnum || $ref->errmsg };
 	
-	eval {
-		my $cxn = $self->{connection};
+	try {
+		my $cxn = $connection // $self->{connection};
 		$error = $error->append_new( Network => {
 			code => scalar $cxn->errnum,
 			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
 			as_string => $self->_bolt_error($cxn),
-		}) if eval { $cxn->errnum || $cxn->errmsg } && $cxn != $ref;
+		}) if try { $cxn->errnum || $cxn->errmsg } && $cxn != $ref;
 		$cxn->reset_cxn;
 		$error = $error->append_new( Internal => {  # perlbolt#51
 			code => scalar $cxn->errnum,
 			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
 			as_string => $self->_bolt_error($cxn),
-		}) if eval { $cxn->errnum || $cxn->errmsg };
+		}) if try { $cxn->errnum || $cxn->errmsg };
 	};
 	
 	return $error_handler->($error) if ref $error_handler eq 'CODE';
@@ -191,6 +191,7 @@ sub _run {
 			statement => $statement_json,
 			cypher_types => $self->{cypher_types},
 			server_info => $self->{server_info},
+			error_handler => $tx->{error_handler},
 		});
 	}
 	

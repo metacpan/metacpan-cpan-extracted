@@ -1,0 +1,93 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Termbox::Cell - A Single Conceptual Entity on the Terminal Screen
+
+=head1 SYNOPSIS
+
+=head2 Description
+
+The terminal screen is represented as 2d array of cells. The structure is
+optimized for dealing with single-width (wcwidth()==1) Unicode code points,
+however some support for grapheme clusters (e.g., combining diacritical marks)
+and wide code points (e.g., Hiragana) is provided through ech, nech, cech via
+C<Termbox::tb_set_cell_ex( ... )>. ech is only valid when nech>0, otherwise ch
+is used.
+
+For non-single-width code points, given C<N=wcwidth(ch)/wcswidth(ech)>:
+
+=over
+
+=item when N==0
+
+termbox2 forces a single-width cell. Callers should avoid this if aiming to
+render text accurately.
+
+=item when N>1:
+
+termbox zeroes out the following N-1 cells and skips sending them to the tty.
+So, e.g., if the caller sets x=0,y=0 to an N==2 code point, the caller's next
+set should be at x=2,y=0. Anything set at x=1,y=0 will be ignored. If there are
+not enough columns remaining on the line to render N width, spaces are sent
+instead.
+
+=back
+
+See L<< C<tb_present( )>|Termbox/C<tb_present( )> >> for implementation.
+
+=head1 Methods
+
+Each cell contains the following values:
+
+=head2 C<ch( )>
+
+A single Unicode character, if available.
+
+=head2 C<fg( )>
+
+Bitwise foreground attributes.
+
+=head2 C<bg( )>
+
+Bitwise background attributes.
+
+=head2 C<ech( )>
+
+A grapheme cluster of Unicode code points.
+
+This is only defined if extended grapheme clusters are enabled.
+
+=head2 C<nech( )>
+
+Length in bytes of ech, 0 means use ch instead of ech.
+
+This is only defined if extended grapheme clusters are enabled.
+
+=head2 C<cech( )>
+
+Capacity in bytes of extended grapheme cluster.
+
+This is only defined if extended grapheme clusters are enabled.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+ech nech cech ch Unicode
+
+=end stopwords
+
+=cut

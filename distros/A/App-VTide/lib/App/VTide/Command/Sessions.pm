@@ -13,11 +13,12 @@ use Carp;
 use English    qw/ -no_match_vars /;
 use YAML::Syck qw/ DumpFile LoadFile /;
 use Path::Tiny;
+use App::VTide::Sessions;
 use Data::Dumper qw/Dumper/;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('1.0.4');
 our $NAME    = 'sessions';
 our $OPTIONS = [
     'dest|d=s',  'global|g', 'session|source|s=s', 'verbose|v+',
@@ -30,6 +31,21 @@ has global => (
     lazy    => 1,
     default => sub {
         $_[0]->options->opt->{global} || !$ENV{VTIDE_NAME};
+    },
+);
+has sessions => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        warn "here";
+        my ($self) = @_;
+        my $file =
+            $self->global
+          ? $App::VTide::Sessions::global_file
+          : $App::VTide::Sessions::local_file;
+        my $obj = App::VTide::Sessions->new( { sessions_file => $file } );
+        warn $obj;
+        return $obj;
     },
 );
 
@@ -46,49 +62,41 @@ sub run {
         return;
     }
 
-    my $base = $local ? $self->config->local_base : $self->config->global_base;
-    my $session_file = path( $base, 'sessions.yml' );
+    my $session = $self->sessions;
 
-    $self->$command($session_file);
+    $self->$command($session);
 
     return;
 }
 
 sub session_list {
-    my ( $self, $session_file ) = @_;
+    my ( $self, $session ) = @_;
     my $name = $self->options->opt->{session};
-
-    if ( !-f $session_file ) {
-        warn "No sessions\n";
-        return;
-    }
-
-    my $session = LoadFile($session_file);
 
     if ( $self->options->opt->{verbose} ) {
         print "Sessions:\n";
-        for my $name ( sort keys %$session ) {
+        for my $name ( sort keys %{ $session->sessions } ) {
             print "  $name\n";
         }
         print "\n";
     }
 
     print "$name:\n";
-    if ( $session->{$name} ) {
+    if ( $session->sessions->{$name} ) {
         my $cmd = "vtide session"
           . (
             $name eq 'current'
             ? ''
             : " --session $name"
           );
-        for my $i ( 0 ... @{ $session->{$name} } - 2 ) {
-            my $files = $session->{$name}[$i];
+        for my $i ( 0 ... @{ $session->sessions->{$name} } - 2 ) {
+            my $files = $session->sessions->{$name}[$i];
 
             print "  ", ( join " ", @$files ), "\n";
             if ( $i == 0 ) {
                 print "    ('$cmd shift' to run)\n";
             }
-            elsif ( $i == @{ $session->{$name} } - 2 ) {
+            elsif ( $i == @{ $session->sessions->{$name} } - 2 ) {
                 print "    ('$cmd pop' to run)\n";
             }
         }
@@ -99,9 +107,8 @@ sub session_list {
 }
 
 sub session_unshift {
-    my ( $self, $session_file ) = @_;
+    my ($self) = @_;
     return $self->modify_session(
-        $session_file,
         sub {
             unshift @{ $_[0] }, $self->options->files;
             return;
@@ -111,9 +118,8 @@ sub session_unshift {
 }
 
 sub session_push {
-    my ( $self, $session_file ) = @_;
+    my ($self) = @_;
     return $self->modify_session(
-        $session_file,
         sub {
             push @{ $_[0] }, $self->options->files;
             return;
@@ -123,9 +129,8 @@ sub session_push {
 }
 
 sub session_shift {
-    my ( $self, $session_file ) = @_;
+    my ($self) = @_;
     return $self->modify_session(
-        $session_file,
         sub {
             my ($session) = @_;
             return shift @$session;
@@ -134,9 +139,8 @@ sub session_shift {
 }
 
 sub session_pop {
-    my ( $self, $session_file ) = @_;
+    my ($self) = @_;
     return $self->modify_session(
-        $session_file,
         sub {
             my ($session) = @_;
             return pop @$session;
@@ -145,10 +149,10 @@ sub session_pop {
 }
 
 sub modify_session {
-    my ( $self, $session_file, $modify ) = @_;
+    my ( $self, $modify ) = @_;
     my $name = $self->options->opt->{session};
 
-    my $session = -f $session_file ? LoadFile($session_file) : {};
+    my $session = $self->sessions->sessions;
 
     my $files = $modify->( $session->{$name} );
 
@@ -160,11 +164,11 @@ sub modify_session {
     # TODO work out why update unset with --no-update
     # write the new session out
     if ( $self->options->opt->update ) {
-        DumpFile $session_file, $session;
+        $self->sessions->write_session();
     }
 
     if ( !$files ) {
-        $self->session_list($session_file);
+        $self->session_list();
         return;
     }
 
@@ -174,20 +178,37 @@ sub modify_session {
 }
 
 sub session_copy {
-    my ( $self, $session_file ) = @_;
-    my $name = $self->options->opt->{session};
-    my $dest = $self->options->opt->{dest};
+    my ($self) = @_;
+    my $src    = $self->options->opt->{session};
+    my $dest   = $self->options->opt->{dest};
 
-    my $session = -f $session_file ? LoadFile($session_file) : {};
+    my $session = $self->sessions->sessions;
 
     if ( !$dest ) {
         warn "No destination name!";
         return;
     }
-    $session->{$dest} = [ map { [@$_] } @{ $session->{$name} } ];
+    $session->{$dest} = [ map { [@$_] } @{ $session->{$src} } ];
 
-    DumpFile $session_file, $session;
-    $self->session_list($session_file);
+    $self->sessions->write_session();
+    $self->session_list();
+}
+
+sub session_save {
+    my ($self)  = @_;
+    my $dest    = $self->options->opt->{dest} || 'current';
+    my $session = $self->sessions->get_sessions($dest);
+
+    if ( $self->options->opt->{global} ) {
+        my @list = map { ( split /:/, $_ )[0] } `tmux ls`;
+
+        push @$session, @list;
+    }
+    else {
+        warn "Haven't yet built local session saving";
+    }
+
+    $self->sessions->write_session();
 }
 
 sub auto_complete {
@@ -214,7 +235,7 @@ App::VTide::Command::Sessions - Create/Update/List saved vtide sessions
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Sessions version 0.1.16
+This documentation refers to App::VTide::Command::Sessions version 1.0.4
 
 =head1 SYNOPSIS
 
@@ -224,6 +245,7 @@ This documentation refers to App::VTide::Command::Sessions version 0.1.16
     vtide sessions shift [(-s|--session) name] [-g|--global] [--no-update] [-v|--verbose]
     vtide sessions pop [(-s|--session) name] [-g|--global] [--no-update] [-v|--verbose]
     vtide sessions copy (-s|--source) source_session [-d|--destination] destination_session [-g|--global] [-v|--verbose]
+    vtide sessions save [-d|--destination] destination-session-name
 
     OPTIONS
      -g --global    Look at the global sessions when in side a vtide managed terminal

@@ -2,7 +2,7 @@
 
     Beekeeper client (JSON-RPC over MQTT)
 
-    Copyright 2015-2021 José Micó
+    Copyright 2015-2023 José Micó
 
     For protocol references see: 
     - https://mqtt.org/mqtt-specification
@@ -115,8 +115,16 @@ function BeekeeperClient () { return {
         this.mqtt.on('message', function (topic, message, packet) {
 
             let jsonrpc;
-            try { jsonrpc = JSON.parse( message.toString() ) }
-            catch (e) { throw `Received invalid JSON: ${e}` }
+            try {
+                if (message[0] == 0x78) {
+                    // Deflated JSON
+                    let json = pako.inflate(message, {to:'string'});
+                    jsonrpc = JSON.parse(json);
+                }
+                else {
+                    jsonrpc = JSON.parse(message.toString());
+                }
+            } catch (e) { throw `Received invalid JSON: ${e}` }
             This._debug(`Got  << ${message}`);
 
             const subscr_id = packet.properties.subscriptionIdentifier;

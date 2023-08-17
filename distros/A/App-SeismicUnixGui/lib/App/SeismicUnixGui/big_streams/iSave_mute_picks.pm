@@ -86,7 +86,7 @@ my $iSave_mute_picks = {
 =cut 
 
 use App::SeismicUnixGui::misc::SeismicUnix qw($itemp_top_mute_picks_sorted_par_ $itop_mute_par_);
-my ($PL_SEISMIC) = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 
 =head2 subroutine clear
 
@@ -182,7 +182,7 @@ sub calc {
       . $iSave_mute_picks->{_gather_num};
 
     $iSave_mute_picks->{_inbound} =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . 'itemp_'
       . $iSave_mute_picks->{_purpose}
       . '_picks_sorted_par_'
@@ -191,7 +191,7 @@ sub calc {
       . $iSave_mute_picks->{_gather_num};
 
     $iSave_mute_picks->{_outbound} =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . 'mute_par_'
       . $iSave_mute_picks->{_purpose} . '_'
       . $iSave_mute_picks->{_file_in} . '_'

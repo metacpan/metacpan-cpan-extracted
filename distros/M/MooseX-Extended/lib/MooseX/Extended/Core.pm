@@ -32,7 +32,7 @@ use Ref::Util qw(
 use Carp 'croak';
 #
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
@@ -545,7 +545,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

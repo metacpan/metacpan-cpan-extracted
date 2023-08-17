@@ -4,15 +4,18 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.30;
+our $VERSION = 0.31;
 
 # Modules.
 use Acme::CPANAuthors::Register(
+	'ATG' => 'Ondřej Vostal',
+	'BULB' => 'Jan Hudec',
 	'CHOROBA' => 'E. Choroba',
 	'CONTYK' => 'Petr Šabata',
 	'DANIELR' => 'Roman Daniel',
 	'DANPEDER' => 'Daniel Peder',
 	'DOUGLISH' => 'Dalibor Hořínek',
+	'DPOKORNY' => 'Dan Pokorny',
 	'HIHIK' => 'Jiří Václavík',
 	'HOLCAPEK' => 'Jan Holčapek',
 	'HPA' => 'Petr Vraník',
@@ -100,7 +103,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 44
+ # Count of Czech CPAN authors: 48
 
 =head1 EXAMPLE2
 
@@ -121,51 +124,54 @@ See documentation for L<Acme::CPANAuthors> for more details.
 
  # Output:
  # [
- #     [0]  "CHOROBA",
- #     [1]  "CONTYK",
- #     [2]  "DANIELR",
- #     [3]  "DANPEDER",
- #     [4]  "DOUGLISH",
- #     [5]  "HIHIK",
- #     [6]  "HOLCAPEK",
- #     [7]  "HPA",
- #     [8]  "JANPAZ",
- #     [9]  "JANPOM",
- #     [10] "JENDA",
- #     [11] "JIRA",
- #     [12] "JSPICAK",
- #     [13] "KLE",
- #     [14] "KOLCON",
- #     [15] "MAJLIS",
- #     [16] "MICHALS",
- #     [17] "MILSO",
- #     [18] "MJFO",
- #     [19] "PAJAS",
- #     [20] "PAJOUT",
- #     [21] "PASKY",
- #     [22] "PCIMPRICH",
- #     [23] "PEK",
- #     [24] "PETRIS",
- #     [25] "PKUBANEK",
- #     [26] "POPEL",
- #     [27] "PSME",
- #     [28] "RUR",
- #     [29] "RVASICEK",
- #     [30] "SARFY",
- #     [31] "SEIDLJAN",
- #     [32] "SKIM",
- #     [33] "SMRZ",
- #     [34] "STRAKA",
- #     [35] "TKR",
- #     [36] "TPODER",
- #     [37] "TRIPIE",
- #     [38] "TYNOVSKY",
- #     [39] "VARISD",
- #     [40] "VASEKD",
- #     [41] "YENYA",
- #     [42] "ZABA",
- #     [43] "ZEMAN",
- #     [44] "ZOUL"
+ #     [0]  "ATG",
+ #     [1]  "BULB",
+ #     [2]  "CHOROBA",
+ #     [3]  "CONTYK",
+ #     [4]  "DANIELR",
+ #     [5]  "DANPEDER",
+ #     [6]  "DOUGLISH",
+ #     [7]  "DPOKORNY",
+ #     [8]  "HIHIK",
+ #     [9]  "HOLCAPEK",
+ #     [10] "HPA",
+ #     [11] "JANPAZ",
+ #     [12] "JANPOM",
+ #     [13] "JENDA",
+ #     [14] "JIRA",
+ #     [15] "JSPICAK",
+ #     [16] "KLE",
+ #     [17] "KOLCON",
+ #     [18] "MAJLIS",
+ #     [19] "MICHALS",
+ #     [20] "MILSO",
+ #     [21] "MJFO",
+ #     [22] "PAJAS",
+ #     [23] "PAJOUT",
+ #     [24] "PASKY",
+ #     [25] "PCIMPRICH",
+ #     [26] "PEK",
+ #     [27] "PETRIS",
+ #     [28] "PKUBANEK",
+ #     [29] "POPEL",
+ #     [30] "PSME",
+ #     [31] "RUR",
+ #     [32] "RVASICEK",
+ #     [33] "SARFY",
+ #     [34] "SEIDLJAN",
+ #     [35] "SKIM",
+ #     [36] "SMRZ",
+ #     [37] "STRAKA",
+ #     [38] "TKR",
+ #     [39] "TPODER",
+ #     [40] "TRIPIE",
+ #     [41] "TYNOVSKY",
+ #     [42] "VARISD",
+ #     [43] "VASEKD",
+ #     [44] "YENYA",
+ #     [45] "ZABA",
+ #     [46] "ZEMAN",
+ #     [47] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -184,12 +190,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.30
+0.31
 
 =cut

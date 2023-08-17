@@ -1,3 +1,8 @@
+0.607   2023-07-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Exclude plugin for Task bundle: EnsureSQLSchemaVersionedTest.
+
+
 0.606   2021-08-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Pull in Pod::Weaver::PluginBundle::Author::PERLANCAR for

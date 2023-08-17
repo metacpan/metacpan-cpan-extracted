@@ -2,10 +2,10 @@
    "X_No_Archive" : "Yes",
    "abstract" : "Create Text-based User Interfaces Without ncurses",
    "author" : [
-      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+      "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "artistic_2"
    ],
@@ -30,7 +30,7 @@
       "configure" : {
          "requires" : {
             "Devel::CheckBin" : "0",
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.046"
          }
       },
       "develop" : {
@@ -48,8 +48,7 @@
             "FFI::Platypus::Lang::CPP" : "0",
             "File::ShareDir" : "0",
             "File::Spec::Functions" : "0",
-            "perl" : "5.020",
-            "strictures" : "2"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -61,15 +60,7 @@
    "provides" : {
       "Termbox" : {
          "file" : "lib/Termbox.pm",
-         "version" : "0.12"
-      },
-      "Termbox::Cell" : {
-         "file" : "lib/Termbox/Cell.pm",
-         "version" : "0.12"
-      },
-      "Termbox::Event" : {
-         "file" : "lib/Termbox/Event.pm",
-         "version" : "0.12"
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -84,8 +75,8 @@
          "web" : "https://github.com/sanko/Termbox.pm"
       }
    },
-   "version" : "0.12",
+   "version" : "2.00",
    "x_authority" : "cpan:SANKO",
-   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

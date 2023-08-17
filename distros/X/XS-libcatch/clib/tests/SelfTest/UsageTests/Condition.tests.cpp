@@ -1,7 +1,11 @@
-/*
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
 #ifdef __clang__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wpadded"
@@ -29,15 +33,6 @@ namespace {
         double double_pi = 3.1415926535;
     };
 
-    struct TestDef {
-        TestDef& operator + (const std::string&) {
-            return *this;
-        }
-        TestDef& operator[](const std::string&) {
-            return *this;
-        }
-    };
-
     static const char* returnsConstNull() { return nullptr; }
     static char* returnsNull() { return nullptr; }
 
@@ -49,9 +44,6 @@ namespace {
 // Equality tests
 TEST_CASE( "Equality checks that should succeed" )
 {
-    TestDef td;
-    td + "hello" + "hello";
-
     TestData data;
 
     REQUIRE( data.int_seven == 7 );

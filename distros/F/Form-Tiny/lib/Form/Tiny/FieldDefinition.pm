@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.17';
+$Form::Tiny::FieldDefinition::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;
@@ -44,9 +44,11 @@ has 'type' => (
 );
 
 has 'addons' => (
-	is => 'rw',
+	is => 'ro',
+	writer => 'set_addons',
 	isa => HashRef,
 	default => sub { {} },
+	init_arg => undef,
 );
 
 has 'coerce' => (
@@ -83,6 +85,15 @@ has 'data' => (
 	predicate => 'has_data',
 );
 
+has '_subform' => (
+	is => 'ro',
+	isa => Bool,
+	reader => 'is_subform',
+	lazy => 1,
+	default => sub { $_[0]->has_type && has_form_meta($_[0]->type) },
+	init_arg => undef,
+);
+
 sub BUILD
 {
 	my ($self, $args) = @_;
@@ -101,18 +112,6 @@ sub BUILD
 		croak 'default value for an array field is unsupported'
 			if scalar grep { $_ eq 'ARRAY' } @{$self->get_name_path->meta};
 	}
-
-	# special case for subforms - set automatic adjustments
-	if ($self->is_subform && !$self->is_adjusted) {
-		$self->set_adjustment(sub { $self->type->fields });
-	}
-}
-
-sub is_subform
-{
-	my ($self) = @_;
-
-	return $self->has_type && has_form_meta($self->type);
 }
 
 sub hard_required
@@ -155,10 +154,14 @@ sub get_coerced
 sub get_adjusted
 {
 	my $self = shift;
+	my $value = pop;
 
-	return pop() unless $self->is_adjusted;
+	if ($self->is_subform) {
+		$value = $self->type->fields;
+	}
 
-	return $self->adjust->(@_);
+	return $value unless $self->is_adjusted;
+	return $self->adjust->(@_, $value);
 }
 
 sub get_default
@@ -168,7 +171,16 @@ sub get_default
 	croak 'no default value set but was requested'
 		unless $self->has_default;
 
-	return $self->default->($form);
+	my $default = $self->default->($form);
+	if ($self->is_subform) {
+		my $subform = $self->type;
+		croak 'subform default input is not valid'
+			unless $subform->check($default);
+
+		$default = $subform->fields;
+	}
+
+	return $default;
 }
 
 sub validate
@@ -374,8 +386,8 @@ B<predicate:> I<has_data>
 
 =head2 is_subform
 
-Checks if the field definition's type is a form - whether it mixes in
-L<Form::Tiny::Form> role.
+Checks if the field definition's type is a form - whether it has its own
+Form::Tiny metaobject.
 
 =head2 get_name_path
 

@@ -4,7 +4,7 @@ use List::Util qw(sum);
 use Math::Random::MT::Auto qw(rand gaussian);
 
 use vars qw($VERSION %grid_neighbours);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 # %grid_neighbours caches the vectors pointing to
 # neighbours
@@ -30,7 +30,7 @@ results in aesthetic so called "blue noise".
 
 The algorithm was adapted from a sketch
 by Robert Bridson
-in L<http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf>.
+in L<https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf>.
 
 =head1 DATA REPRESENTATION
 
@@ -69,7 +69,7 @@ range [0, 100).
 =item *
 
 C< candidates > - Number of candidates to inspect before deciding that no
-ew neighbours can be placed around a point.
+new neighbours can be placed around a point.
 
 Default is 30.
 
@@ -102,7 +102,7 @@ random position in the plot.
 
 sub points {
     my ($class,%options) = @_;
-    
+
     $options{center}     ||= 0;
     $options{avoid_edge} ||= 0;
     $options{candidates} ||= 30;
@@ -110,12 +110,12 @@ sub points {
     $options{r} ||= 10;
     #$options{max} ||= 10; # we want to fill the space instead?!
     $options{ grid } ||= {};
-    
+
     my $grid_size = $options{ r } / sqrt( 0+@{$options{dimensions}});
-    
+
     my @result;
     my @work;
-        
+
     # Create a first point in our cube - either at random or in the center:
     my $p = $options{ center }
         ? [map { $_ / 2 } @{ $options{ dimensions }}]
@@ -124,7 +124,7 @@ sub points {
     push @work, $p;
     my $c = grid_coords($grid_size, $p);
     $options{ grid }->{ $c } = $p;
-    
+
     while (@work) {
         my $origin = splice @work, int rnd(0,$#work), 1;
         CANDIDATE: for my $candidate ( 1..$options{ candidates } ) {
@@ -132,21 +132,21 @@ sub points {
             # that is, in the annulus with radius (r,2r)
             # surrounding our current point
             my $dist = rnd( $options{r}, $options{r}*2 );
-            
+
             # Choose a random angle in which to point
             # this vector
             my $angle = random_unit_vector(0+@{$options{ dimensions}});
-            
+
             # Generate a new point by adding the $angle*$dist to $origin
             my $p = [map { $origin->[$_] + $angle->[$_]* $dist } 0..$#$angle];
-            
+
             # Check whether our point lies within the dimensions
             for (0..$#$p) {
                  next CANDIDATE
                     if   $p->[$_] >= $options{ dimensions }->[ $_ ] - $options{ avoid_edge }
                       or $p->[$_] < $options{ avoid_edge }
             };
-            
+
             # check discs by using the grid
             # Here we should check the "neighbours" in the grid too
             my $c = grid_coords($grid_size, $p);
@@ -157,7 +157,7 @@ sub points {
                         next CANDIDATE;
                     };
                 };
-                
+
                 # not already in grid, no close neighbours, add it
                 push @result, $p;
                 push @work, $p;
@@ -168,7 +168,7 @@ sub points {
             };
         };
     };
-    
+
     \@result
 };
 
@@ -244,7 +244,7 @@ random point into the space.
 
 sub neighbour_points {
     my ($size,$point,$grid) = @_;
-    
+
     my $dimension = 0+@$point;
     my $vectors;
     if (! $grid_neighbours{ $dimension }) {
@@ -253,7 +253,7 @@ sub neighbour_points {
         # Count up, and use the number in ternary as our odometer
         [map {
             my $val = $_;
-            my $res = [ map { 
+            my $res = [ map {
                           my $res = $elements[ $val % 3 ];
                           $val = int($val/3);
                           $res
@@ -261,7 +261,7 @@ sub neighbour_points {
             } (1..3**$dimension)
         ];
     };
-    
+
     my @coords = split /\t/, grid_coords( $size, $point );
 
     # Find the elements in the grid according to the offsets
@@ -284,7 +284,7 @@ angle
 and returns a unit vector pointing in
 that direction
 
-The algorithm used is outlined in 
+The algorithm used is outlined in
 Knuth, _The Art of Computer Programming_, vol. 2,
 3rd. ed., section 3.4.1.E.6.
 but has not been verified formally or mathematically
@@ -295,7 +295,7 @@ by the module author.
 sub random_unit_vector {
     my ($dimensions) = @_;
     my (@vec,$len);
-    
+
     # Create normal distributed coordinates
     RETRY: {
         @vec = map { gaussian() } 1..$dimensions;
@@ -304,7 +304,7 @@ sub random_unit_vector {
     };
     # Normalize our vector so we get a unit vector
     @vec = map { $_ / $len } @vec;
-    
+
     \@vec
 };
 
@@ -317,13 +317,13 @@ vector library.
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/random-poissondisc>.
+The public repository of this module is
+L<https://github.com/Corion/random-poissondisc>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -337,7 +337,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2011 by Max Maischein C<corion@cpan.org>.
+Copyright 2011-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -148,8 +148,8 @@ sub _get_version_section {
 	' sub binding_index_aref {'."\n\n".
 	"\t".'my $self 	= @_;'."\n\n".
 	"\t".'my @index;'."\n\n".	
-	"\t".'# first binding index (index=0)'."\n".
-    "\t".'# connects to second item (index=1)'."\n".
+	"\t".'# e.g., first binding index (index=0)'."\n".
+    "\t".'# connects to third item (index=2)'."\n".
     "\t".'# in the parameter list'."\n".
     "#\t".'$index[0] = 1; # inbound item is  bound '."\n".
 	"#\t".'$index[1]	= 2; # inbound item is  bound'."\n".

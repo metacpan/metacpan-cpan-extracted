@@ -1,5 +1,5 @@
 package Thread::GoChannel;
-$Thread::GoChannel::VERSION = '0.001';
+$Thread::GoChannel::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Thread::GoChannel - Fast thread queues with go-like semantics
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-Thread::GoChannel is an alternative to L<Thread::Queue>. By using a smart serialization ladder, it can achieve high performance without compromizing on flexibility.
+Thread::GoChannel is an alternative to L<Thread::Queue>. By using a smart duplication instead of serialization it can achieve high performance without compromising on flexibility.
 
 =head1 METHODS
 

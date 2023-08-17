@@ -3,8 +3,6 @@ use strict;
 use 5.010;
 use Test::More;
 use File::Temp 'tempdir';
-use Win32::API;
-use Win32API::File 'CreateFile', 'CloseHandle', ':FILE_FLAG_', 'FILE_LIST_DIRECTORY', 'OPEN_EXISTING', 'FILE_SHARE_WRITE', 'FILE_SHARE_READ', 'GENERIC_READ';
 
 BEGIN {
     if( $^O !~ /cygwin/ ) {
@@ -12,6 +10,8 @@ BEGIN {
         exit;
     };
 };
+use Win32::API;
+use Win32API::File 'CreateFile', 'CloseHandle', ':FILE_FLAG_', 'FILE_LIST_DIRECTORY', 'OPEN_EXISTING', 'FILE_SHARE_WRITE', 'FILE_SHARE_READ', 'GENERIC_READ';
 plan tests => 1;
 my $is_cygwin = 1;
 

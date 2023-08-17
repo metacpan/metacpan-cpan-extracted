@@ -1,0 +1,37 @@
+=head1 NAME
+
+chicken-ipsum - Generate paragraphs of random chicken noises
+
+=head1 SYNOPSIS
+
+B<chicken-ipsum> [I<NUM>]
+
+I<NUM> is the number of paragraphs to generate. Defaults to 1.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Show a help message and exit.
+
+=item --version
+
+Show version information and exit.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2023 Dan Church (h3xx<attyzatzat>gmx<dottydot>com).
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AVAILABILITY
+
+The latest version of this library is likely to be available from CPAN as well
+as:
+
+L<https://codeberg.org/h3xx/perl-Chicken-Ipsum>

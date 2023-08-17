@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Metrics::Any 0.09;
+package Metrics::Any 0.10;
 
 use v5.14;
 use warnings;

@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Text::Treesitter 0.06;
+package Text::Treesitter 0.10;
 class Text::Treesitter
    :strict(params);
 
@@ -20,7 +21,17 @@ C<Text::Treesitter> - Perl binding for F<tree-sitter>
 
 =head1 SYNOPSIS
 
-   TODO
+   use Text::Treesitter;
+
+   my $ts = Text::Treesitter->new(
+      lang_name => "perl",
+   );
+
+   my $tree = $ts->parse_string( $input );
+
+   my $root = $tree->root_node;
+
+   ...
 
 =head1 DESCRIPTION
 
@@ -244,6 +255,45 @@ method parse_string ( $str )
    require Text::Treesitter::Tree;
 
    $_parser->reset;
+   $_parser->set_included_ranges();
+   return $_parser->parse_string( $str );
+}
+
+=head2 parse_string_range
+
+   $tree = $ts->parse_string_range( $str, %options );
+
+I<Since version 0.10.>
+
+Parses a given input string using the internal parser, within the given byte
+range. Returns a node tree as an instance of L<Text::Treesitter::Tree>.
+
+Takes the following named options:
+
+=over 4
+
+=item start_byte
+
+=item end_byte
+
+The start and end position within the string, in byte counts.
+
+=back
+
+=cut
+
+method parse_string_range ( $str, %options )
+{
+   require Text::Treesitter::Tree;
+
+   $_parser->reset;
+   if( defined $options{start_byte} ) {
+      $_parser->set_included_ranges( [ $options{start_byte}, $options{end_byte} ] ) or
+         croak "Invalid string range";
+   }
+   else {
+      $_parser->set_included_ranges();
+   }
    return $_parser->parse_string( $str );
 }
 
@@ -262,21 +312,44 @@ method load_query_string ( $src )
    return Text::Treesitter::Query->new( $_lang, $src );
 }
 
-=head2 load_query_file
+=head2 query_file_path
 
-   $query = $ts->load_query_file( $path );
+   $path = %ts->query_file_path( $name );
 
-Creates a L<Text::Treesitter::Query> instance by loading the text from the
-given path, and then compiling it as per L</load_query_string>. C<$path> may
-be specified as relative to the current working directory, or relative to the
-language directory given by C<lang_dir>. The first one found will be loaded.
+If a file exists of the given path, then it is returned directly. Otherwise,
+returns a path within the language directory given by C<lang_dir>; either
+directly or within a subdirectory called F<queries/>.
 
 =cut
 
-method load_query_file ( $path )
+method query_file_path ( $name )
 {
-   -f $path or $path = "$_lang_dir/$path";
-   return $self->load_query_string( read_text $path );
+   my $path;
+   foreach (
+      $name,
+      "$_lang_dir/$name",
+      "$_lang_dir/queries/$name"
+   ) {
+      $path = $_;
+      -f $path and return $path;
+   }
+
+   return $path; # make sure to return a defined value
+}
+
+=head2 load_query_file
+
+   $query = $ts->load_query_file( $name );
+
+Creates a L<Text::Treesitter::Query> instance by loading the text from the
+given path, and then compiling it as per L</load_query_string>. The name is
+resolved into a path by using L</query_file_path>.
+
+=cut
+
+method load_query_file ( $name )
+{
+   return $self->load_query_string( read_text $self->query_file_path( $name ) );
 }
 
 =head1 TODO

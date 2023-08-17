@@ -140,6 +140,18 @@ BEGIN {
 #		info => 'The categories member is an array of strings defining the names of categories that the application supposedly belongs to. There is no standard list of possible values, but the W3C maintains a list of known categories. (https://github.com/w3c/manifest/wiki/Categories)'
 #	}
 	%TEMPLATE_FIELDS = (
+		push_button_selector => {
+			key => 'push_button_selector',
+			field => 'Push Button Selector',
+			info => 'A selector for an HTML button used to install the application.',
+			required => 1
+		},
+	 	scope => {
+			key => 'scope',
+			field => 'Scope',
+			info => q|The scope member is a string that defines the navigation scope of this web application's application context. It restricts what web pages can be viewed while the manifest is applied. If the user navigates outside the scope, it reverts to a normal web page inside a browser tab or window.|,
+			required => 1
+		},
 		cache_name => {
 			key => 'cache_name',
 			field => 'Cache Name',
@@ -188,8 +200,8 @@ BEGIN {
 					field => 'Blacklist Regex',
 					info => q|Files that match this regex will be skipped|
 				},{
-					key => 'blacklist_regex',
-					field => 'Blacklist Regex',
+					key => 'whitelist_regex',
+					field => 'Whitelist Regex',
 					info => q|Files that do not match this regex will be skipped|
 				}]
 			},

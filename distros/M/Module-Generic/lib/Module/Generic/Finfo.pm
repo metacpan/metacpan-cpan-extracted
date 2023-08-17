@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/11/06
+## Modified 2023/08/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,9 +17,10 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $HAS_LOCAL_TZ );
+    use vars qw( $VERSION $HAS_LOCAL_TZ $HAS_FILE_MMAGIC_XS );
     use File::Basename ();
-    use File::MMagic::XS ();
+    eval( "use File::MMagic::XS 0.09008" );
+    our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;
     use Module::Generic::Null;
     use Nice::Try;
     use Want;
@@ -63,7 +64,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -241,8 +242,17 @@ sub mime_type
     my $file = $self->filepath;
     try
     {
-        my $m = File::MMagic::XS->new;
-        return( $self->new_scalar( $m->get_mime( $file ) ) );
+        if( $HAS_FILE_MMAGIC_XS )
+        {
+            my $m = File::MMagic::XS->new;
+            return( $self->new_scalar( $m->get_mime( $file ) ) );
+        }
+        else
+        {
+            require File::MMagic;
+            my $m = File::MMagic->new;
+            return( $self->new_scalar( $m->checktype_filename( $file ) ) );
+        }
     }
     catch( $e )
     {
@@ -568,7 +578,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 
@@ -700,7 +710,9 @@ Returns true if this is a socket, false otherwise.
 
 =head2 mime_type
 
-Using L<File::MMagic::XS>, this guesses the file mime type and returns it.
+This guesses the file mime type and returns it as a L<scalar object|Module::Generic::Scalar>
+
+If L<File::MMagic::XS> is installed, it will use it, otherwise, it will use L<File::MMagic>
 
 =head2 mode
 

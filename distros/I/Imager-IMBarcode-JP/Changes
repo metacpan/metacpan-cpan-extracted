@@ -1,5 +1,14 @@
 Revision history for Perl extension Imager-IMBarcode-JP
 
+0.02 2023-08-14T03:16:38Z
+
+    - Fix slightly wrong Y coordinate
+    - Fix invalid number of digits
+    - Fix error messages for `address()` validation
+    - Fix unsipecified DPI for Y direction
+    - Fix to use required module
+    - Add validation test
+
 0.01 2021-06-30T13:32:53Z
 
     - original version

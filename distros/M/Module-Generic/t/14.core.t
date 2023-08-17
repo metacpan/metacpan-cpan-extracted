@@ -10,6 +10,7 @@ BEGIN
     use Test::Time time => 1635754330;
     use DateTime;
     use Nice::Try;
+    use Scalar::Util;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -28,6 +29,7 @@ my $o = MyObject->new(
     user_id => '63d36776-c34e-49ad-8d51-02c8abbee3b2',
     value => 'hello',
     version => 'v1.2.3',
+    debug => $DEBUG,
 );
 isa_ok( $o, 'MyObject', 'new' );
 my $hash = $o->as_hash;
@@ -311,6 +313,31 @@ isnt( $now3, $now );
 # diag( "Is ", overload::StrVal( $now ), " same as ", overload::StrVal( $now3 ) );
 # ok( $now3 ne $now );
 
+diag( "Testing for error returning data type instead of undef" ) if( $DEBUG );
+subtest "want error" => sub
+{
+    $o->name( 'id' );
+    my $name;
+    # Array
+    $name = $o->trigger_error->[0];
+    is( $name => undef, 'error -> array' );
+    # Code
+    $name = $o->trigger_error->();
+    is( $name => undef, 'error -> code' );
+    # Glob
+    my $io = *{$o->trigger_error};
+    is( Scalar::Util::reftype( \$io ) => 'GLOB', 'error -> glob' );
+    # Hash
+    $name = $o->trigger_error->{name};
+    is( $name => undef, 'error -> hash' );
+    # Object
+    $name = $o->trigger_error->name;
+    is( $name => undef, 'error -> object' );
+    # Scalar
+    $name = ${$o->trigger_error};
+    is( $name => undef, 'error -> scalar' );
+};
+
 # NOTE: Glob
 subtest "glob" => sub
 {
@@ -584,7 +611,9 @@ subtest "serialisation" => sub
 
 done_testing();
 
-package MyObject;
+# NOTE: Fake class MyObject
+package
+    MyObject;
 BEGIN
 {
     use strict;
@@ -646,6 +675,11 @@ sub name : lvalue { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 sub setget { return( shift->_set_get( 'setget', @_ ) ); }
 
 sub setget_assign : lvalue { return( shift->_set_get_lvalue( 'setget', @_ ) ); }
+
+sub trigger_error { return( shift->error({
+    message => "Oopsie",
+    want => [qw( all )],
+}) ); }
 
 sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
 

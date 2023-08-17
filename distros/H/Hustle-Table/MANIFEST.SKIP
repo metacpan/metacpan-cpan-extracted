@@ -75,3 +75,4 @@
 #!end included /opt/local/lib/perl5/5.32/ExtUtils/MANIFEST.SKIP
 
 Hustle-Table.*?\.tar\.gz
+\.github

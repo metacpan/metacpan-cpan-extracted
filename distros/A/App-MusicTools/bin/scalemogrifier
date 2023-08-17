@@ -11,9 +11,8 @@
 # A ZSH completion script is available in the zsh-compdef/ directory of
 # the App::MusicTools distribution.
 
-use strict;
+use 5.14.0;
 use warnings;
-
 use Getopt::Long        qw/GetOptions/;
 use List::Util          qw/sum/;
 use Music::LilyPondUtil ();

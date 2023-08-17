@@ -8,12 +8,11 @@ use XS::Parse::Keyword::Builder;
 my $build = Module::Build->new(
    module_name => "List::Keywords",
    test_requires => {
-      'Test2::V0' => 0,
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000148',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.05',
+      'XS::Parse::Keyword::Builder' => '0.35',
    },
    requires => {
       'perl' => '5.014',

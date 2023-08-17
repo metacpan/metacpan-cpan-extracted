@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetRangeSortRequest.name :   ,
-# PostWorksheetRangeSortRequest.sheetName :   ,
-# PostWorksheetRangeSortRequest.cellArea :   ,
-# PostWorksheetRangeSortRequest.dataSorter :   ,
-# PostWorksheetRangeSortRequest.folder :   ,
-# PostWorksheetRangeSortRequest.storageName :    
+# PostWorksheetRangeSortRequest.name : The workbook name.  ,
+# PostWorksheetRangeSortRequest.sheetName : The worksheet name.  ,
+# PostWorksheetRangeSortRequest.cellArea : The area needed to sort.  ,
+# PostWorksheetRangeSortRequest.dataSorter : DataSorter with sorting settings.  ,
+# PostWorksheetRangeSortRequest.folder : The workbook folder.  ,
+# PostWorksheetRangeSortRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_range_sort' } = { 
-    	summary => '',
+    	summary => 'Sorts range in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -142,42 +142,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_area' => {
      	datatype => 'string',
      	base_name => 'cellArea',
-     	description => '',
+     	description => 'The area needed to sort.',
      	format => '',
      	read_only => '',
      		},
      'data_sorter' => {
      	datatype => 'DataSorter',
      	base_name => 'dataSorter',
-     	description => '',
+     	description => 'DataSorter with sorting settings.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

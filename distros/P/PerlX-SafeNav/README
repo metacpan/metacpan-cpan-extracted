@@ -1,0 +1,145 @@
+NAME
+
+    PerlX::SafeNav - Safe-navigation for Perl
+
+SYNOPSIS
+
+    Wrap a chain of method calls to make it resilient on encountering undef
+    values in the middle:
+
+        use PerlX::SafeNav ('$safenav', '$unsafenav', 'safenav');
+    
+        my $answer = safenav {
+            $_->a()->{b}->c()->[42]->d()
+        } $o;
+    
+        my $tire_age = $car -> $safenav
+             -> wheels()
+             -> [0]               # undef, if no wheels at all.
+             -> tire()            # undef, if no tire on the wheel.
+             -> {created_on}
+             -> delta_days($now)
+             -> $unsafenav;
+    
+        unless (defined $tire_age) {
+            # The car either have no wheels, or the first wheel has no tire.
+            ...
+        }
+
+DESCRIPTION
+
+ Background
+
+    In many other languages, there is an operator (often ?.) doing "Safe
+    navigation", or "Optional Chaining". The operator does a method-call
+    when its left-hand side (first operant) is an object. But when the
+    left-hand side is an undefined value (or null value), the operator
+    returns but evaluates to undef.
+
+    For perl there is currently an PPC: Optional Chaining
+    <https://github.com/Perl/PPCs/blob/main/ppcs/ppc0021-optional-chaining-operator.md>
+
+    This module provides a mean of making chains of method call safe
+    regarding undef values. When encountering an undef in the middle of a
+    call chain like $o->foo()->bar()->baz(), the program would die with a
+    message like this:
+
+        Can't call method "bar" on an undefined value
+
+    With the help of this module, instead of making the program die, the
+    call chain is reduced to undef.
+
+ Usages
+
+  $safenav and $unsafenav
+
+    With this module, instead of using a different operator, we wrap a
+    chain of calls to make it safe with the imported $safenav and
+    $unsafenav. $safenav must be placed at the beginning, while $unsafenav
+    must be place at the end. The should be invoked as method calls, like
+    this:
+
+        $obj-> $safenav
+            -> a()
+            -> {b}
+            -> [0]
+            -> c()
+            -> $unsafenav;
+
+    Notice that it is possible to mix all three kinds method calls, hash
+    fetches, and array fetches together in the same chain. If any of the 4
+    sub-expresions returns undef, the entire chain upto $unsafenav would
+    also be evaluated to undef. (For this reason, you probably don't want
+    to concatenate more sub-expressions after $unsafenav.)
+
+    This module provide 2 symbols are both $-sigiled scalar variables, this
+    is on purpose, so that they could be called as methods on arbitrary
+    scalar values.
+
+    It is mandatory to have both $safenav and $unsafenav together in the
+    same chain. Without $unsafenav, the original return value of the chain
+    would be forever wrapped inside the mechanism of PerlX::SafeNav.
+
+    While being unconventional in their look, one benifit is that the
+    chance of having naming conflicts with methods from $o should be very
+    small. However, be aware that $safenav and $unsafenav would be masked
+    by locally-defined variables with the same name.
+
+  safenav block
+
+    A block syntax is also provided by importing the safenav symbol
+    explicitly:
+
+        use PerlX::SafeNav ('safenav');
+    
+        my $answer = safenav {
+            $_ ->a()->{b}->[0]->c()
+        } $o;
+
+    Inside this safenav block, $_ is the safenav-wrapped version of $o, and
+    the chain is automaticly un-wrapped at the end. $answer contains the
+    return value of method c() if no undef values are encountered or
+    otherwise, an undef.
+
+ Bugs
+
+    There are likely many unknown bugs, as the current test suite only
+    covers the minmum set of forms that are known to work.
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+    Toby Inkster <tobyink@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2023 Kang-min Liu <gugod@gugod.org>.
+
+    This is free software, licensed under:
+
+        The MIT License
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

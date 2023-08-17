@@ -13,6 +13,7 @@ my @types = qw(
     BuildInfo
     Byte
     ByteString
+    CertificateVerification
     CreateMonitoredItemsRequest
     CreateSubscriptionRequest
     DataTypeAttributes
@@ -34,7 +35,6 @@ my @types = qw(
     ReadValueId
     ReferenceTypeAttributes
     SetPublishingModeRequest
-    String
     UInt32
     VariableAttributes
     VariableTypeAttributes

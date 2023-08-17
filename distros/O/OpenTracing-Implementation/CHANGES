@@ -2,6 +2,41 @@ CHANGE LOG
 ==========
 
 
+2023-06-07 - v0.33.2
+--------------------
+
+### Fixed
+   -  Clean up warnings during test
+
+
+
+2023-06-06 - v0.33.1
+    --------------------
+
+### Hot Fix
+    - Interface definition
+
+    
+    
+2023-06-06 - v0.33.0
+--------------------
+
+### Fixed
+    - Interface definition for `OpenTracing::Implementation::Interface::Bootstrap`
+
+### Added
+    - convenience method `bootstrap_global-default_tracer`
+
+### Changed
+    - PERL_OPENTRACING_IMPLEMENTATION in favour of OPENTRACING_IMPLEMENTATION
+    - PERL_OPENTRACING_DEBUG in favour of OPENTRACING_DEBUG plus DEBUG
+
+### Improved
+    - tests
+    - documentation
+
+
+
 2021-11-23 - v0.32.0
 --------------------
 

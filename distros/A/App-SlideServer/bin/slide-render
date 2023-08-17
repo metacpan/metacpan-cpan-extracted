@@ -1,0 +1,77 @@
+#! /usr/bin/env perl
+use v5.36;
+use FindBin;
+use Cwd;
+use Mojo::File 'path';
+use Getopt::Long;
+use Pod::Usage;
+use Log::Any '$log';
+use Log::Any::Adapter 'Daemontools',
+	-init => { argv => 1, env => 1, signals => ['USR1','USR2'], out => \*STDERR };
+BEGIN {
+	# Allow running from project dir
+	push @INC, "$FindBin::RealBin/../lib"
+		if -f "$FindBin::RealBin/../lib/App/SlideServer.pm";
+}
+use App::SlideServer 'mojo2logany';
+
+#PODNAME: slide-render
+#ABSTRACT: Print the static HTML for the complete slide show
+our $VERSION = '0.002'; #VERSION
+
+Getopt::Long::Parser->new(config => ['gnu_getopt'])
+	->getoptions(
+		'help|h'     => sub { pod2usage(1) },
+		'output|o=s' => \my $out_file,
+	)
+	or pod2usage(2);
+
+my %opts= (
+	log => mojo2logany(),
+	serve_dir => path($ENV{APP_SLIDESERVER_SERVE_DIR} || Cwd::getcwd()),
+	presenter_key => 'unused',
+);
+$opts{share_dir}= path($ENV{APP_SLIDESERVER_SHARE_DIR})
+	if length ($ENV{APP_SLIDESERVER_SHARE_DIR} // '');
+
+my $app= App::SlideServer->new(\%opts);
+$app->build_slides;
+my $dom= Mojo::DOM->new($app->page_dom);
+$dom->at('div.slides')->append_content(join '', $app->slides_dom->@*);
+$dom->find('.notes')->map('remove');
+my $html= "$dom";
+utf8::encode($html);
+
+if (defined $out_file) {
+	path($out_file)->spew($html);
+} else {
+	print $html or die "write: $!";
+}
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+slide-render - Print the static HTML for the complete slide show
+
+=head1 VERSION
+
+version 0.002
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

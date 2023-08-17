@@ -143,10 +143,8 @@ my $logger
     }
 }
 
-for my $class (
-    qw( AtomicFileGeneratorTest::TwoLineFileGenerator
-    AtomicFileGeneratorTest::TwoLineFileGenerator::PathTiny )
-) {
+for my $class ( qw( AtomicFileGeneratorTest::TwoLineFileGenerator
+    AtomicFileGeneratorTest::TwoLineFileGenerator::PathTiny ) ) {
     subtest $class => sub {
         {
             my $file            = $tempdir->file('no_interruption');
@@ -160,7 +158,7 @@ for my $class (
             is(
                 $pre_commit_file->parent->stringify,
                 $file->parent->stringify,
-                'pre_commit_file and final file are in the same directory'
+                'pre_commit_file and final file are in the same directory',
             );
 
             $step_that_lives->run;
@@ -174,7 +172,7 @@ for my $class (
             undef $step_that_lives;
             ok(
                 !-f $pre_commit_file,
-                'pre commit file cleaned after step runs'
+                'pre commit file cleaned after step runs',
             );
         }
 
@@ -193,7 +191,7 @@ for my $class (
 
             ok(
                 !-f $pre_commit_file,
-                'pre commit file cleaned even if step dies mid-run'
+                'pre commit file cleaned even if step dies mid-run',
             );
         }
     };
@@ -236,19 +234,19 @@ for my $class (
     is(
         $post_commit->slurp,
         'AtomicFileGeneratorTest::PostCommitExists - 0',
-        'post commit file has expected content after first run'
+        'post commit file has expected content after first run',
     );
 
     is(
         exception { $step->run },
         undef,
-        'no exception running step a second time'
+        'no exception running step a second time',
     );
 
     is(
         $post_commit->slurp,
         'AtomicFileGeneratorTest::PostCommitExists - 0',
-        'post commit file has expected content after second run'
+        'post commit file has expected content after second run',
     );
 }
 
@@ -264,19 +262,19 @@ for my $class (
     is(
         $post_commit->slurp,
         'AtomicFileGeneratorTest::PostCommitExists - 1',
-        'post commit file has expected content after first run'
+        'post commit file has expected content after first run',
     );
 
     is(
         exception { $step->run },
         undef,
-        'no exception running step a second time'
+        'no exception running step a second time',
     );
 
     is(
         $post_commit->slurp,
         'AtomicFileGeneratorTest::PostCommitExists - 2',
-        'pre commit file is used even when post commit file exists'
+        'pre commit file is used even when post commit file exists',
     );
 }
 

@@ -7,17 +7,16 @@ exit $app->run();
 
 __END__
 
+
 =head1 NAME
 
 txdcolumns - get specific columns out of textual data files
-
 
 =head1 SYNOPSIS
 
 	pipe | txdcolumns 3 1 | pipe
 
 =head1 DESCRIPTION
-
 
 to extract the third and the first (in that order) column of input. Guess how to extract columns 2, 4 and 3;-)
 
@@ -27,13 +26,13 @@ These are the general rules for specifying parameters to this program:
 
 	txdcolumns -s -xyz -s=value --long --long=value [--] [files/stuff]
 
-You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+You mention the options to change parameters in any order or even multiple times. They are processed in the oder given, later operations overriding/extending earlier settings. Using the separator "--" stops option parsing
 An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
 Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
 
 There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
-	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
 
@@ -49,7 +48,7 @@ ignore whitespace at beginning and end of line (disables strict mode) (from Text
 
 	undef
 
-list (comma-separeted) of columns to extract - plain command line args are added to this list
+list (comma-separeted) of columns to extract - plain command line args are added to this list (fully specified ranges are supported, 3-5 = 3,4,5)
 
 =item B<comchar> (scalar)
 
@@ -92,11 +91,16 @@ fill value for undefined data (from Text::NumericData)
 
 	0
 
-show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
-
+Show the help message. Value 1..9: help level, par: help for paramter par (long name) only.
 
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
+
+=item B<invert>, B<i> (scalar)
+
+	0
+
+specify columns to _omit_, not to include
 
 =item B<lineend> (scalar)
 
@@ -172,6 +176,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2023 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

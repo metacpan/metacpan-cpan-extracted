@@ -6,16 +6,12 @@ use Dancer::Plugin::DBIC 'schema';
 use App::Netdisco::Util::SNMP 'get_communities';
 use App::Netdisco::Util::Device 'get_device';
 use App::Netdisco::Util::Permission 'acl_matches';
+use App::Netdisco::Util::Snapshot qw/load_cache_for_device add_snmpinfo_aliases/;
 
 use SNMP::Info;
 use Try::Tiny;
 use Module::Load ();
-use Storable 'thaw';
-use File::Slurper 'read_text';
-use MIME::Base64 'decode_base64';
 use Path::Class 'dir';
-use File::Path 'make_path';
-use File::Spec::Functions qw(catdir catfile);
 use NetAddr::IP::Lite ':lower';
 use List::Util qw/pairkeys pairfirst/;
 
@@ -63,12 +59,6 @@ Returns C<undef> if the connection fails.
 sub reader_for {
   my ($class, $ip, $useclass) = @_;
   my $device = get_device($ip) or return undef;
-
-  my $pseudo_cache = catfile( catdir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'logs', 'snapshots'), $device->ip );
-  if ($device->in_storage and $device->is_pseudo and ! -f $pseudo_cache) {
-      error sprintf 'transport error - cannot act on pseudo-device [%s] without offline cache', $device->ip;
-      return undef;
-  }
 
   my $readers = $class->instance->readers or return undef;
   return $readers->{$device->ip} if exists $readers->{$device->ip};
@@ -171,13 +161,13 @@ sub _snmp_connect_generic {
   }
 
   # support for offline cache
-  my $pseudo_cache = catfile( catdir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'logs', 'snapshots'), $device->ip );
-  if (-f $pseudo_cache and ($device->is_pseudo or ! $device->in_storage)) {
-    $snmp_args{Cache} = thaw( decode_base64( read_text($pseudo_cache) ) );
-    $snmp_args{Offline} = 1;
-    # support pseudo/offline device renumber and also pseudo device autovivification
-    $device->set_column(is_pseudo => \'true') if ! $device->is_pseudo;
-    debug sprintf 'snmp transport running in offline mode for: [%s]', $device->ip;
+  my $cache = load_cache_for_device($device);
+  if (scalar keys %$cache) {
+      $snmp_args{Cache} = $cache;
+      $snmp_args{Offline} = 1;
+      # support pseudo/offline device renumber and also pseudo device autovivification
+      $device->set_column(is_pseudo => \'true') if not $device->is_pseudo;
+      debug sprintf 'snmp transport running in offline mode for: [%s]', $device->ip;
   }
 
   # any net-snmp options to add or override
@@ -185,7 +175,8 @@ sub _snmp_connect_generic {
     $snmp_args{ $k } = setting('net_snmp_options')->{ $k };
   }
 
-  if (scalar keys %{ setting('net_snmp_options') }) {
+  if (scalar keys %{ setting('net_snmp_options') }
+      or not $snmp_args{BulkWalk}) {
     foreach my $k (sort keys %snmp_args) {
         next if $k eq 'MibDirs';
         debug sprintf 'snmp transport conf: %s => %s', $k, $snmp_args{ $k };
@@ -208,28 +199,60 @@ sub _snmp_connect_generic {
       unshift @classes, $device->snmp_class;
   }
 
-  my $info = undef;
-  COMMUNITY: foreach my $comm (@communities) {
-      next unless $comm;
+  # first try the communities in a fast pass using best version
 
-      VERSION: foreach my $ver (@versions) {
-          next unless $ver;
+  VERSION: foreach my $ver (3, 2) {
+      my %local_args = (%snmp_args,
+        Version => $ver, Retries => 0, Timeout => 200000);
+
+      COMMUNITY: foreach my $comm (@communities) {
+          next unless $comm;
 
           next if $ver eq 3 and exists $comm->{community};
           next if $ver ne 3 and !exists $comm->{community};
 
-          CLASS: foreach my $class (@classes) {
-              next unless $class;
+          my $info = _try_connect($device, $classes[0], $comm, $mode, \%local_args,
+            ($useclass ? 0 : 1) );
 
-              my %local_args = (%snmp_args, Version => $ver);
-              $info = _try_connect($device, $class, $comm, $mode, \%local_args,
-                ($useclass ? 0 : 1) );
-              last COMMUNITY if $info;
+          # if successful, restore the default/user timeouts and return
+          if ($info) {
+              my $class = ($useclass ? $classes[0] : $info->device_type);
+              return $class->new(
+                %snmp_args, Version => $ver,
+                ($info->offline ? (Cache => $info->cache) : ()),
+                _mk_info_commargs($comm),
+              );
           }
       }
   }
 
-  return $info;
+  # then revert to conservative settings and repeat with all versions
+
+  # unless user wants just the fast connections for bulk discovery
+  # or we are on the first discovery attempt of a new device
+  return unless setting('snmp_try_slow_connect');
+
+  CLASS: foreach my $class (@classes) {
+      next unless $class;
+
+      VERSION: foreach my $ver (@versions) {
+          next unless $ver;
+          my %local_args = (%snmp_args, Version => $ver);
+
+          COMMUNITY: foreach my $comm (@communities) {
+              next unless $comm;
+
+              next if $ver eq 3 and exists $comm->{community};
+              next if $ver ne 3 and !exists $comm->{community};
+
+              my $info = _try_connect($device, $class, $comm, $mode, \%local_args,
+                ($useclass ? 0 : 1) );
+              return $info if $info;
+          }
+      }
+  }
+
+  return undef;
 }
 
 sub _try_connect {
@@ -246,9 +269,10 @@ sub _try_connect {
 
   try {
       debug
-        sprintf '[%s:%s] try_connect with ver: %s, class: %s, comm: %s',
+        sprintf '[%s:%s] try_connect with v: %s, t: %s, r: %s, class: %s, comm: %s',
           $snmp_args->{DestHost}, $snmp_args->{RemotePort},
-          $snmp_args->{Version}, $class, $debug_comm;
+          $snmp_args->{Version}, ($snmp_args->{Timeout} / 1000000), $snmp_args->{Retries},
+          $class, $debug_comm;
       Module::Load::load $class;
 
       $info = $class->new(%$snmp_args, %comm_args) or return;
@@ -259,12 +283,13 @@ sub _try_connect {
       if ($reclass and $info and $info->device_type ne $class) {
           $class = $info->device_type;
           debug
-            sprintf '[%s:%s] try_connect with ver: %s, new class: %s, comm: %s',
+            sprintf '[%s:%s] try_connect with v: %s, new class: %s, comm: %s',
               $snmp_args->{DestHost}, $snmp_args->{RemotePort},
               $snmp_args->{Version}, $class, $debug_comm;
 
           Module::Load::load $class;
           $info = $class->new(%$snmp_args, %comm_args);
+          add_snmpinfo_aliases($info) if $info->offline;
       }
   }
   catch {
@@ -355,7 +380,7 @@ sub _build_mibdirs {
 
 sub _get_mibdirs_content {
   my $home = shift;
-  my @list = map {s|$home/||; $_} grep {m/[a-z0-9]/} grep {-d} glob("$home/*");
+  my @list = map {s|$home/||; $_} grep { m|/[a-z0-9-]+$| } grep {-d} glob("$home/*");
   return \@list;
 }
 

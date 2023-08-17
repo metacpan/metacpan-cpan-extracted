@@ -155,6 +155,24 @@ sub paths {
   return wantarray ? @{$result} : $result;
 }
 
+sub quote {
+  my ($self, $data) = @_;
+
+  if (!defined $data) {
+    return '';
+  }
+  elsif ($self->is_win) {
+    return ($data =~ /^"/ && $data =~ /"$/)
+      ? $data
+      : ('"' . (($data =~ s/"/\\"/gr) || "") . '"');
+  }
+  else {
+    return ($data =~ /^'/ && $data =~ /'$/)
+      ? $data
+      : ("'" . (($data =~ s/'/'\\''/gr) || "") . "'");
+  }
+}
+
 sub type {
   my ($self) = @_;
 
@@ -967,6 +985,81 @@ I<Since C<2.80>>
   #   "/usr/local/bin",
   #   "/usr/sbin:/usr/bin",
   # ]
+
+=back
+
+=cut
+
+=head2 quote
+
+  quote(Str $data) (Str)
+
+The quote method accepts a string and returns the OS-specific quoted version of
+the string.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item quote example 1
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $quote = $os->quote("hello \"world\"");
+
+  # "'hello \"world\"'"
+
+=back
+
+=over 4
+
+=item quote example 2
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $quote = $os->quote('hello \'world\'');
+
+  # "'hello '\\''world'\\'''"
+
+=back
+
+=over 4
+
+=item quote example 3
+
+  # given: synopsis
+
+  package main;
+
+  # on mswin32
+
+  my $quote = $os->quote("hello \"world\"");
+
+  # "\"hello \\"world\\"\""
+
+=back
+
+=over 4
+
+=item quote example 4
+
+  # given: synopsis
+
+  package main;
+
+  # on mswin32
+
+  my $quote = $os->quote('hello "world"');
+
+  # '"hello \"world\""'
 
 =back
 

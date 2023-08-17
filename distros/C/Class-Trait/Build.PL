@@ -15,6 +15,9 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup     => ['Class-Trait-*'],
     create_makefile_pl => 'traditional',
+    meta_merge         => {
+        x_deprecated => 1,
+    },
 );
 
 $builder->create_build_script();

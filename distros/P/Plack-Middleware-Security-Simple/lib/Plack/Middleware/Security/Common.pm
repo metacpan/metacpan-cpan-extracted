@@ -17,6 +17,7 @@ our @EXPORT = qw(
    cms_prefixes
    document_extensions
    dot_files
+   exchange_prefixes
    fake_extensions
    header_injection
    ip_address_referer
@@ -32,7 +33,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.10.1';
+our $VERSION = 'v0.11.0';
 
 
 
@@ -85,6 +86,13 @@ sub dot_files {
         PATH_INFO    => qr{(?:\.\./|/\.(?!well-known/))},
         QUERY_STRING => qr{\.\./},
     );
+}
+
+
+sub exchange_prefixes {
+    return (
+        PATH_INFO => qr{^/+(?:ecp|owa|autodiscover)/}i,
+    )
 }
 
 
@@ -208,7 +216,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.10.1
+version v0.11.0
 
 =head1 SYNOPSIS
 
@@ -309,6 +317,10 @@ Added in v0.9.2.
 
 This blocks all requests that refer to dot-files or C<..>, except for
 the F</.well-known/> path.
+
+=head2 exchange_prefixes
+
+This blocks paths associated with Exchange servers.
 
 =head2 fake_extensions
 

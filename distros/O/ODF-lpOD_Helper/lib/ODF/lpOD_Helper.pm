@@ -90,8 +90,8 @@ warnings (L<https://rt.cpan.org/Public/Bug/Display.html?id=97977>)
 
 package ODF::lpOD_Helper;
 
-our $VERSION = '5.011'; # VERSION
-our $DATE = '2023-05-30'; # DATE
+our $VERSION = '5.012'; # VERSION
+our $DATE = '2023-06-02'; # DATE
 
 our @EXPORT = qw(
   Hautomatic_style Hcommon_style

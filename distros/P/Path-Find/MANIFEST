@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Path/Find.pm
+t/Path-Find.t
+t/honk
+t/bonk
+t/1/2/3/honk
+t/3/bonk
+t/1/2/HONK.T
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

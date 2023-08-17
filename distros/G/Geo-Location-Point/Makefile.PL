@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $prereq = {
+	'Carp' => 0,
+	'GIS::Distance' => 0
+};
+
+if(defined($ENV{'TIMEZONEDB_KEY'})) {
+	$prereq->{'TimeZone::TimeZoneDB'} = 0;
+}
+
 WriteMakefile(
     NAME		=> 'Geo::Location::Point',
     AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -14,14 +23,11 @@ WriteMakefile(
     PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'Test::Carp' => 0,
+		'Test::Compile' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Number::Delta' => 0,
-	},
-    PREREQ_PM => {
-	'Carp' => 0,
-	'GIS::Distance' => 0,
-    },
+	}, PREREQ_PM => $prereq,
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo-Location-Point-*' },
     META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec

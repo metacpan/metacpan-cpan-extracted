@@ -52,6 +52,14 @@ EOF
 
 	plugin Extract => 'tar.gz';
 
+	# Patches on top of libzmq 4.3.4.
+	my @patch_commands = map '%{patch} -d src -p2 < %{.install.patch}/' . $_, (
+		'4213.patch',
+		'4480.patch',
+		'4494.patch',
+		'4507.patch',
+	);
+
 	my $enable_static = $^O ne 'MSWin32';
 	my $enable_tests = 0;
 	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
@@ -61,6 +69,7 @@ EOF
 			? ( "noinst_LIBRARIES=" )
 			: ();
 		build [
+			@patch_commands,
 			join(' ',
 				'%{configure}',
 				( $enable_static ? '--enable-static' : '--disable-static' ),
@@ -73,6 +82,7 @@ EOF
 	} elsif( $build_conf_pref eq BUILD_CONF_PREF_CMAKE ) {
 		plugin 'Build::CMake';
 		build [
+			@patch_commands,
 			[ '%{cmake}', -G => '%{cmake_generator}',
 				'-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
 				'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
@@ -82,7 +92,7 @@ EOF
 					? ( '-DPKG_CONFIG_EXECUTABLE=' . File::Which::which('pkg-config'), )
 					: ()
 				),
-				( meta->prop->{platform}->{system_type} eq 'windows-mingw'
+				( meta->prop->{platform}->{system_type} =~ /^windows-(mingw|strawberry)$/
 				? ( '-DZMQ_HAVE_IPC=OFF' )
 				: ()
 				),

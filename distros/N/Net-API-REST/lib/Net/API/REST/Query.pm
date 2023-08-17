@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Query.pm
-## Version v0.1.2
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/13
-## Modified 2022/06/29
+## Modified 2023/06/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,68 +15,13 @@ BEGIN
 {
     use strict;
     use warnings;
-    use common::sense;
-    use parent qw( URI::Query );
+    use parent qw( Apache2::API::Query );
     use vars qw( $VERSION );
-    use utf8 ();
-    use Encode ();
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
 use warnings;
-
-sub _parse_qs
-{
-    my $self = shift( @_ );
-    my $qs = shift( @_ );
-    for( split( /[&;]/, $qs ) )
-    {
-        my( $key, $value ) = map{ URI::Escape::uri_unescape( $_ ) } split( /=/, $_, 2 );
-        $key = Encode::decode_utf8( $key ) if( !utf8::is_utf8( $key ) );
-        $value = Encode::decode_utf8( $value ) if( !utf8::is_utf8( $value ) );
-        $self->{qq}->{$key} ||= [];
-        push( @{$self->{qq}->{$key}}, $value ) if( defined( $value ) && $value ne '' );
-    }
-    $self
-}
-
-sub _init_from_arrayref
-{
-    my( $self, $arrayref ) = @_;
-    while( @$arrayref )
-    {
-        my $key   = shift( @$arrayref );
-        my $value = shift( @$arrayref );
-        my $key_unesc = URI::Escape::uri_unescape( $key );
-        $key_unesc = Encode::decode_utf8( $key_unesc ) if( !utf8::is_utf8( $key_unesc ) );
-
-        $self->{qq}->{$key_unesc} ||= [];
-        if( defined( $value ) && $value ne '' )
-        {
-            my @values;
-            if( !ref( $value ) )
-            {
-                @values = split( "\0", $value );
-            }
-            elsif( ref( $value ) eq 'ARRAY' )
-            {
-                @values = @$value;
-            }
-            else
-            {
-                die( "Invalid value found: $value. Not string or arrayref!" );
-            }
-            # push @{$self->{qq}->{$key_unesc}}, map { uri_unescape($_) } @values;
-            for( @values )
-            {
-                $_ = URI::Escape::uri_unescape( $_ );
-                $_ = UTF::decode_utf8( $_ ) if( !utf8::is_utf8( $_ ) );
-                push( @{$self->{qq}->{$key_unesc}}, $_ );
-            }
-        }
-    }
-}
 
 1;
 # NOTE: pod
@@ -146,19 +91,13 @@ Net::API::REST::Query - utf8 compliant URI query string manipulation
 
 =head1 VERSION
 
-    v0.1.2
+    v1.0.0
 
 =head1 DESCRIPTION
 
-This module simply inherits from L<URI::Query> and changed 2 subroutines to make them compliant with utf8 strings being fed to L<URI::Query>.
+As of version C<1.0.0>, this module fully inherits from L<Apache2::API::Query>.
 
-The 2 subroutines modified are: B<_parse_qs> and B<_init_from_arrayref>
-
-L<URI::Query> does, otherwise, a very good job, but does not utf8 decode data from query strings after having url decoded it.
-
-When, encoding data as query string, it does utf8 encode it before url encoding them, but not the other way around. So this module provides a temporary fix and is likely to be removed in the future when the module maintainer will have fixed this.
-
-The rest below is taken from L<URI::Query> documentation and is copied here for convenience.
+The rest below is taken from L<Apache2::API::Query> documentation and is copied here for convenience.
 
 =head2 CONSTRUCTOR
 
@@ -318,17 +257,9 @@ Returns the current parameter set as a concatenated string of hidden input tags,
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
-CPAN ID: jdeguest
-
-https://gitlab.com/jackdeguest/Net-API-REST
-
-=head1 CREDITS
-
-Gavin Carr <gavin@openfusion.com.au> for his version of L<URI::Query>
-
 =head1 SEE ALSO
 
-L<Apache2::Cookies>, L<APR::Request::Cookie>, L<Cookie::Baker>
+L<Apache2::API::Query>
 
 =head1 COPYRIGHT & LICENSE
 

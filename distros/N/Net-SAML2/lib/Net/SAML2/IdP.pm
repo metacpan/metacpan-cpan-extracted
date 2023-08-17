@@ -1,11 +1,11 @@
 package Net::SAML2::IdP;
 use Moose;
 
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 
-# ABSTRACT: Net::SAML2::IdP - SAML Identity Provider object
+# ABSTRACT: SAML Identity Provider object
 
 
 use Crypt::OpenSSL::Verify;
@@ -268,11 +268,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
+Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 
@@ -287,6 +287,17 @@ version 0.69
             }
         );
   my $sso_url = $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
+
+Note that LWP::UserAgent is used which means that environment variables
+may affect the use of https see:
+
+=over
+
+=item * L<PERL_LWP_SSL_CA_FILE and HTTPS_CA_FILE|https://metacpan.org/pod/LWP::UserAgent#SSL_ca_file-=%3E-$path>
+
+=item * L<PERL_LWP_SSL_CA_PATH and HTTPS_CA_DIR|https://metacpan.org/pod/LWP::UserAgent#SSL_ca_path-=%3E-$path>
+
+=back
 
 =head1 NAME
 

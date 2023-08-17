@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_compress' } = { 
-    	summary => '',
+    	summary => 'Compress XLS, XLSX, XLSM, XLSB, ODS and more',
         params => $params,
         returns => 'FilesResult',
     };

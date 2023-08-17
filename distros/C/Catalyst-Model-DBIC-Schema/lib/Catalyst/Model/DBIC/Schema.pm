@@ -5,8 +5,8 @@ use mro 'c3';
 extends 'Catalyst::Model';
 with 'CatalystX::Component::Traits';
 
-our $VERSION = '0.65';
-$VERSION = eval $VERSION;
+our $VERSION = '0.66';
+$VERSION =~ tr/_//d;
 
 use namespace::autoclean;
 use Carp::Clan '^Catalyst::Model::DBIC::Schema';
@@ -17,7 +17,7 @@ use Module::Runtime qw/use_module/;
 use Catalyst::Model::DBIC::Schema::Types
     qw/ConnectInfo SchemaClass Schema/;
 
-use MooseX::Types::Moose qw/Str/;
+use MooseX::Types::Moose qw/Str Bool/;
 use MooseX::Types::LoadableClass qw/LoadableClass/;
 
 =head1 NAME
@@ -308,7 +308,7 @@ Traits that come with the distribution:
 
 =head2 compose_namespaces
 
-This model calls L<DBIx::Class::Schema/compose_namespaces> by default to
+This model calls L<DBIx::Class::Schema/compose_namespace> by default to
 install classes into the model namespaces. You can turn that off by
 setting this attribute to false. Default is true.
 
@@ -436,9 +436,9 @@ has schema_class => (
     required => 1
 );
 
-has compose_namespaces => (is => 'ro', default => sub { 1 });
+has compose_namespaces => (is => 'ro', isa => Bool, default => 1 );
 
-has install_model_shortcuts => (is => 'ro', default => sub { 1 });
+has install_model_shortcuts => (is => 'ro', isa => Bool, default => 1 );
 
 has storage_type => (is => 'rw', isa => Str);
 

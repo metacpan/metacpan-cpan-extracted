@@ -1,5 +1,8 @@
 Revision history for Perl module WebService::Rackspace::CloudFiles:
 
+2.03  2023-08-02
+    - Updated HTTP response code checking (jwrightecs, gh-26, gh-27)
+
 2.02  2017-07-21
     - Fixed: purge_cdn in Object doesn't do an edge purge, it does a DELETE
       (jwrightecs, gh-23)

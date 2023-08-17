@@ -21,7 +21,7 @@ int32_t SPVM__Sys__IO__Constant__AT_EMPTY_PATH(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "AT_EMPTY_PATH is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -33,7 +33,7 @@ int32_t SPVM__Sys__IO__Constant__AT_FDCWD(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "AT_FDCWD is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -45,7 +45,7 @@ int32_t SPVM__Sys__IO__Constant__AT_NO_AUTOMOUNT(SPVM_ENV* env, SPVM_VALUE* stac
   return 0;
 #else
   env->die(env, stack, "AT_NO_AUTOMOUNT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -57,7 +57,7 @@ int32_t SPVM__Sys__IO__Constant__AT_SYMLINK_FOLLOW(SPVM_ENV* env, SPVM_VALUE* st
   return 0;
 #else
   env->die(env, stack, "AT_SYMLINK_FOLLOW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -69,7 +69,7 @@ int32_t SPVM__Sys__IO__Constant__AT_SYMLINK_NOFOLLOW(SPVM_ENV* env, SPVM_VALUE* 
   return 0;
 #else
   env->die(env, stack, "AT_SYMLINK_NOFOLLOW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -81,7 +81,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_CHOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "CAP_CHOWN is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -93,7 +93,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_DAC_READ_SEARCH(SPVM_ENV* env, SPVM_VALUE* 
   return 0;
 #else
   env->die(env, stack, "CAP_DAC_READ_SEARCH is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -105,7 +105,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_FOWNER(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "CAP_FOWNER is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -117,7 +117,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_FSETID(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "CAP_FSETID is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -129,7 +129,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_LEASE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "CAP_LEASE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -141,7 +141,7 @@ int32_t SPVM__Sys__IO__Constant__CAP_SYS_RESOURCE(SPVM_ENV* env, SPVM_VALUE* sta
   return 0;
 #else
   env->die(env, stack, "CAP_SYS_RESOURCE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -153,7 +153,7 @@ int32_t SPVM__Sys__IO__Constant__DN_ACCESS(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_ACCESS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -165,7 +165,7 @@ int32_t SPVM__Sys__IO__Constant__DN_ATTRIB(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_ATTRIB is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -177,7 +177,7 @@ int32_t SPVM__Sys__IO__Constant__DN_CREATE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_CREATE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -189,7 +189,7 @@ int32_t SPVM__Sys__IO__Constant__DN_DELETE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_DELETE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -201,7 +201,7 @@ int32_t SPVM__Sys__IO__Constant__DN_MODIFY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_MODIFY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -213,7 +213,7 @@ int32_t SPVM__Sys__IO__Constant__DN_MULTISHOT(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "DN_MULTISHOT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -225,7 +225,7 @@ int32_t SPVM__Sys__IO__Constant__DN_RENAME(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "DN_RENAME is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -244,7 +244,7 @@ int32_t SPVM__Sys__IO__Constant__FD_CLOEXEC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "FD_CLOEXEC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -256,7 +256,7 @@ int32_t SPVM__Sys__IO__Constant__F_ADD_SEALS(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_ADD_SEALS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -268,7 +268,7 @@ int32_t SPVM__Sys__IO__Constant__F_DUPFD(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_DUPFD is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -280,7 +280,7 @@ int32_t SPVM__Sys__IO__Constant__F_DUPFD_CLOEXEC(SPVM_ENV* env, SPVM_VALUE* stac
   return 0;
 #else
   env->die(env, stack, "F_DUPFD_CLOEXEC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -292,7 +292,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETFD(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETFD is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -304,7 +304,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETFL(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETFL is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -316,7 +316,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETLEASE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETLEASE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -328,7 +328,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETLK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETLK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -340,7 +340,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETLK64(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETLK64 is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -352,7 +352,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETOWN is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -364,7 +364,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETOWN_EX(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETOWN_EX is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -376,7 +376,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETPIPE_SZ(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "F_GETPIPE_SZ is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -388,7 +388,7 @@ int32_t SPVM__Sys__IO__Constant__F_GETSIG(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GETSIG is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -400,7 +400,7 @@ int32_t SPVM__Sys__IO__Constant__F_GET_FILE_RW_HINT(SPVM_ENV* env, SPVM_VALUE* s
   return 0;
 #else
   env->die(env, stack, "F_GET_FILE_RW_HINT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -412,7 +412,7 @@ int32_t SPVM__Sys__IO__Constant__F_GET_RW_HINT(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "F_GET_RW_HINT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -424,7 +424,7 @@ int32_t SPVM__Sys__IO__Constant__F_GET_SEALS(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_GET_SEALS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -436,7 +436,7 @@ int32_t SPVM__Sys__IO__Constant__F_NOTIFY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_NOTIFY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -448,7 +448,7 @@ int32_t SPVM__Sys__IO__Constant__F_OFD_GETLK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_OFD_GETLK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -460,7 +460,7 @@ int32_t SPVM__Sys__IO__Constant__F_OFD_SETLK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_OFD_SETLK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -472,7 +472,7 @@ int32_t SPVM__Sys__IO__Constant__F_OFD_SETLKW(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "F_OFD_SETLKW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -484,7 +484,7 @@ int32_t SPVM__Sys__IO__Constant__F_OWNER_PGRP(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "F_OWNER_PGRP is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -496,7 +496,7 @@ int32_t SPVM__Sys__IO__Constant__F_OWNER_PID(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_OWNER_PID is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -508,7 +508,7 @@ int32_t SPVM__Sys__IO__Constant__F_OWNER_TID(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_OWNER_TID is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -520,7 +520,7 @@ int32_t SPVM__Sys__IO__Constant__F_RDLCK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_RDLCK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -532,7 +532,7 @@ int32_t SPVM__Sys__IO__Constant__F_SEAL_FUTURE_WRITE(SPVM_ENV* env, SPVM_VALUE* 
   return 0;
 #else
   env->die(env, stack, "F_SEAL_FUTURE_WRITE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -544,7 +544,7 @@ int32_t SPVM__Sys__IO__Constant__F_SEAL_GROW(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SEAL_GROW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -556,7 +556,7 @@ int32_t SPVM__Sys__IO__Constant__F_SEAL_SEAL(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SEAL_SEAL is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -568,7 +568,7 @@ int32_t SPVM__Sys__IO__Constant__F_SEAL_SHRINK(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "F_SEAL_SHRINK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -580,7 +580,7 @@ int32_t SPVM__Sys__IO__Constant__F_SEAL_WRITE(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "F_SEAL_WRITE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -592,7 +592,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETFD(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETFD is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -604,7 +604,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETFL(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETFL is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -616,7 +616,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETLEASE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETLEASE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -628,7 +628,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETLK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETLK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -640,7 +640,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETLK64(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETLK64 is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -652,7 +652,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETLKW(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETLKW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -664,7 +664,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETLKW64(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETLKW64 is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -676,7 +676,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETOWN is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -688,7 +688,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETOWN_EX(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETOWN_EX is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -700,7 +700,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETPIPE_SZ(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "F_SETPIPE_SZ is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -712,7 +712,7 @@ int32_t SPVM__Sys__IO__Constant__F_SETSIG(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_SETSIG is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -724,7 +724,7 @@ int32_t SPVM__Sys__IO__Constant__F_SET_FILE_RW_HINT(SPVM_ENV* env, SPVM_VALUE* s
   return 0;
 #else
   env->die(env, stack, "F_SET_FILE_RW_HINT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -736,7 +736,7 @@ int32_t SPVM__Sys__IO__Constant__F_SET_RW_HINT(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "F_SET_RW_HINT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -748,7 +748,7 @@ int32_t SPVM__Sys__IO__Constant__F_UNLCK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_UNLCK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -760,7 +760,7 @@ int32_t SPVM__Sys__IO__Constant__F_WRLCK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_WRLCK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -772,7 +772,7 @@ int32_t SPVM__Sys__IO__Constant__O_APPEND(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_APPEND is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -784,7 +784,7 @@ int32_t SPVM__Sys__IO__Constant__O_ASYNC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_ASYNC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -796,7 +796,7 @@ int32_t SPVM__Sys__IO__Constant__O_CLOEXEC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_CLOEXEC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -808,7 +808,7 @@ int32_t SPVM__Sys__IO__Constant__O_CREAT(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_CREAT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -820,7 +820,7 @@ int32_t SPVM__Sys__IO__Constant__O_DIRECT(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_DIRECT is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -832,7 +832,7 @@ int32_t SPVM__Sys__IO__Constant__O_DIRECTORY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_DIRECTORY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -844,7 +844,7 @@ int32_t SPVM__Sys__IO__Constant__O_DSYNC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_DSYNC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -856,7 +856,7 @@ int32_t SPVM__Sys__IO__Constant__O_EXCL(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_EXCL is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -868,7 +868,7 @@ int32_t SPVM__Sys__IO__Constant__O_EXEC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_EXEC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -880,7 +880,7 @@ int32_t SPVM__Sys__IO__Constant__O_LARGEFILE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_LARGEFILE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -892,7 +892,7 @@ int32_t SPVM__Sys__IO__Constant__O_NDELAY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_NDELAY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -904,7 +904,7 @@ int32_t SPVM__Sys__IO__Constant__O_NOATIME(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_NOATIME is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -916,7 +916,7 @@ int32_t SPVM__Sys__IO__Constant__O_NOCTTY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_NOCTTY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -928,7 +928,7 @@ int32_t SPVM__Sys__IO__Constant__O_NOFOLLOW(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_NOFOLLOW is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -940,7 +940,7 @@ int32_t SPVM__Sys__IO__Constant__O_NONBLOCK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_NONBLOCK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -952,7 +952,7 @@ int32_t SPVM__Sys__IO__Constant__O_PATH(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_PATH is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -964,7 +964,7 @@ int32_t SPVM__Sys__IO__Constant__O_RDONLY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_RDONLY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -976,7 +976,7 @@ int32_t SPVM__Sys__IO__Constant__O_RDWR(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_RDWR is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -988,7 +988,7 @@ int32_t SPVM__Sys__IO__Constant__O_RSYNC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_RSYNC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1000,7 +1000,7 @@ int32_t SPVM__Sys__IO__Constant__O_SYNC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_SYNC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1012,7 +1012,7 @@ int32_t SPVM__Sys__IO__Constant__O_TMPFILE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_TMPFILE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1024,7 +1024,7 @@ int32_t SPVM__Sys__IO__Constant__O_TRUNC(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_TRUNC is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1036,7 +1036,7 @@ int32_t SPVM__Sys__IO__Constant__O_WRONLY(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "O_WRONLY is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1048,7 +1048,7 @@ int32_t SPVM__Sys__IO__Constant__SEEK_CUR(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "SEEK_CUR is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1060,7 +1060,7 @@ int32_t SPVM__Sys__IO__Constant__SEEK_DATA(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "SEEK_DATA is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1072,7 +1072,7 @@ int32_t SPVM__Sys__IO__Constant__SEEK_END(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "SEEK_END is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1084,7 +1084,7 @@ int32_t SPVM__Sys__IO__Constant__SEEK_HOLE(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "SEEK_HOLE is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1096,7 +1096,7 @@ int32_t SPVM__Sys__IO__Constant__SEEK_SET(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "SEEK_SET is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1108,7 +1108,7 @@ int32_t SPVM__Sys__IO__Constant__R_OK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "R_OK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1120,7 +1120,7 @@ int32_t SPVM__Sys__IO__Constant__W_OK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "W_OK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1132,7 +1132,7 @@ int32_t SPVM__Sys__IO__Constant__X_OK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "X_OK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1144,7 +1144,7 @@ int32_t SPVM__Sys__IO__Constant__F_OK(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "F_OK is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
 }
@@ -1640,7 +1640,7 @@ int32_t SPVM__Sys__IO__Constant__LOCK_SH(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "LOCK_SH is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1652,7 +1652,7 @@ int32_t SPVM__Sys__IO__Constant__LOCK_EX(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "LOCK_EX is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1664,7 +1664,7 @@ int32_t SPVM__Sys__IO__Constant__LOCK_UN(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "LOCK_UN is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1676,7 +1676,7 @@ int32_t SPVM__Sys__IO__Constant__AT_EACCESS(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "AT_EACCESS is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1688,7 +1688,7 @@ int32_t SPVM__Sys__IO__Constant__STDIN_FILENO(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 #else
   env->die(env, stack, "STDIN_FILENO is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1700,7 +1700,7 @@ int32_t SPVM__Sys__IO__Constant__STDOUT_FILENO(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "STDOUT_FILENO is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1712,7 +1712,7 @@ int32_t SPVM__Sys__IO__Constant__STDERR_FILENO(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 #else
   env->die(env, stack, "STDERR_FILENO is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1724,7 +1724,7 @@ int32_t SPVM__Sys__IO__Constant__BUFSIZ(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "BUFSIZ is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1736,7 +1736,7 @@ int32_t SPVM__Sys__IO__Constant___IONBF(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "_IONBF is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1748,7 +1748,7 @@ int32_t SPVM__Sys__IO__Constant___IOLBF(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "_IOLBF is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }
@@ -1760,7 +1760,7 @@ int32_t SPVM__Sys__IO__Constant___IOFBF(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "_IOFBF is not defined on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
 }

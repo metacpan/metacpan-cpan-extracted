@@ -29,7 +29,7 @@ struct channel {
 	Notification write_notification;
 };
 
-Channel* channel_alloc(UV refcount) {
+Channel* S_channel_alloc(pTHX_ UV refcount) {
 	Channel* ret = calloc(1, sizeof(Channel));
 	MUTEX_INIT(&ret->data_mutex);
 	MUTEX_INIT(&ret->reader_mutex);
@@ -127,7 +127,7 @@ void channel_close(Channel* channel) {
 	MUTEX_UNLOCK(&channel->data_mutex);
 }
 
-void channel_refcount_dec(Channel* channel) {
+void S_channel_refcount_dec(pTHX_ Channel* channel) {
 	if (refcount_dec(&channel->refcount) == 1) {
 		notification_unset(&channel->read_notification);
 		notification_unset(&channel->write_notification);

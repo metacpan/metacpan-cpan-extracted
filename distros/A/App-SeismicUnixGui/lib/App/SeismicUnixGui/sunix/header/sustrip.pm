@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::header::sustrip;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUSTRIP - remove the SEGY headers from the traces		
+ PERL PROGRAM NAME:  SUSTRIP - remove the SEGY headers from the traces		
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

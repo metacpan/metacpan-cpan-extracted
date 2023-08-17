@@ -1,5 +1,13 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.007000  2023-06-22 15:37:13+02:00 Europe/Vienna
+    - add get_appliance_extrainfo method
+    - add get_deployment method
+    - add get_interface_state method
+    - add get_interface_labels_by_type method
+    - add get_ha_groups_by_id method
+    - add get_vrf_by_id method
+
 0.006000  2023-05-08 17:30:22+02:00 Europe/Budapest
     - add support for user/password login when Enforce CSRF Token Check is
       enabled

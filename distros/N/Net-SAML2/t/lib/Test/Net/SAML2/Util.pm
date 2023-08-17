@@ -4,6 +4,19 @@ use strict;
 
 # ABSTRACT: Utils for testsuite of Net::SAML2
 
+use Crypt::OpenSSL::X509;
+use Sub::Override;
+use Test::Exception;
+use Test::More;
+use Test::Deep;
+use URI::URL;
+use XML::LibXML::XPathContext;
+use XML::LibXML;
+
+use Net::SAML2::Protocol::AuthnRequest;
+use Net::SAML2::SP;
+use Net::SAML2::Util qw(generate_id);
+
 require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
@@ -11,10 +24,12 @@ our @EXPORT = qw(
     test_xml_attribute_exists
     test_xml_attribute_ok
     test_xml_value_ok
+    test_node_attributes_ok
     get_single_node_ok
     net_saml2_sp
     looks_like_a_cert
     net_saml2_binding_redirect_request
+    net_saml2_authnreq
  );
 
 our @EXPORT_OK;
@@ -22,16 +37,6 @@ our @EXPORT_OK;
 our %EXPORT_TAGS = (
     all => [@EXPORT, @EXPORT_OK],
 );
-
-use XML::LibXML::XPathContext;
-use XML::LibXML;
-use Sub::Override;
-use Test::More;
-use Test::Exception;
-use Net::SAML2::SP;
-use Net::SAML2::Util qw(generate_id);
-use Crypt::OpenSSL::X509;
-use URI::URL;
 
 sub net_saml2_sp {
     return Net::SAML2::SP->new(
@@ -48,7 +53,6 @@ sub net_saml2_sp {
         org_url          => 'http://www.example.com',
 
         url              => 'http://localhost:3000',
-        slo_url_redirect => '/sls-redirect-response',
         acs_url_post     => '/consumer-post',
         acs_url_artifact => '/consumer-artifact',
         error_url        => '/error',
@@ -267,6 +271,39 @@ sub looks_like_a_cert {
     );
 }
 
+sub net_saml2_authnreq {
+    my $ar = Net::SAML2::Protocol::AuthnRequest->new(
+        issuer      => 'http://some/sp',
+        destination => 'http://some/idp',
+        @_
+    );
+    isa_ok($ar, "Net::SAML2::Protocol::AuthnRequest");
+
+    my $xp = get_xpath(
+        $ar->as_xml,
+        samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
+        saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
+    );
+    return ($ar, $xp);
+}
+
+sub test_node_attributes_ok {
+    my $xp         = shift;
+    my $xpath      = shift;
+    my $attributes = shift;
+
+    my $node = get_single_node_ok($xp, $xpath);
+
+    my @attributes = $node->attributes;
+    my %has;
+    foreach (@attributes) {
+        next if $_->isa('XML::LibXML::Namespace');
+        $has{ $_->name } = $_->value;
+    }
+
+    cmp_deeply(\%has, $attributes,
+        '... and all the attributes have the expected values');
+}
 
 1;
 

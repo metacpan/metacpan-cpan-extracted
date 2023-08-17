@@ -5,8 +5,7 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   Sub::Util: '0'
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -19,13 +18,13 @@ name: XS-Parse-Sublike
 provides:
   XS::Parse::Sublike:
     file: lib/XS/Parse/Sublike.pm
-    version: '0.17'
+    version: '0.18'
   XS::Parse::Sublike::Builder:
     file: lib/XS/Parse/Sublike/Builder.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

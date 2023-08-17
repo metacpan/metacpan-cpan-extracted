@@ -78,4 +78,3 @@ t/29.routers_reports_finance_accounts.t
 t/30.routers_reports_finance_billings.t
 t/31.routers_reports_finance_earnings.t
 t/32.routers_graphql.t
-SIGNATURE    Added here by Module::Build

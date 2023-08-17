@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -51,13 +51,13 @@ my $handle;
 
    $handle = delete $connect_args{handle};
    delete @connect_args{qw( SSL on_error )};
-   is_deeply( \%connect_args,
+   is( \%connect_args,
       {
          family   => 0,
          socktype => "stream",
          host     => "remote-site-here",
          service  => 80,
-         is_proxy => '',
+         is_proxy => Test2::V0::F(),
 
          SOCKS_host => "socks.host",
          SOCKS_port => 1234,
@@ -87,7 +87,7 @@ my $peersock;
    $request_stream =~ s/^(.*)$CRLF$CRLF//s;
    my %req_headers = map { m/^([^:]+):\s+(.*)$/g } split( m/$CRLF/, $1 );
 
-   is_deeply( \%req_headers,
+   is( \%req_headers,
       {
          Host       => "remote-site-here",
          Connection => "keep-alive",

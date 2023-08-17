@@ -1,0 +1,243 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SPRAGL::Cgi_read - Barebones CGI.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#IDIOMS">IDIOMS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#OPTIMIZATIONS">OPTIMIZATIONS</a></li>
+      <li><a href="#COMMAND-LINE">COMMAND LINE</a></li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>SPRAGL::Cgi_read - Barebones CGI.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>0.71</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use SPRAGL::Cgi_read;
+
+    # Reading a header.
+    my $greet = &quot;Buon Giorno&quot; if header(&quot;Accept-Language&quot;) =~ m/\b it \b/x;
+
+    # Reading a parameter value.
+    my $id = param-&gt;{ID}; # Parameter names are case sensitive.
+
+    # Multi value parameters.
+    for my ($i,$val) ( each param_all(&quot;files&quot;)-&gt;@* ) {
+        write_to_log &quot;processing &quot;.meta_all(&quot;files&quot;)-&gt;[$i]-&gt;{filename};
+        do_something( ${val} );
+        };</code></pre>
+
+<h1 id="IDIOMS">IDIOMS</h1>
+
+<pre><code>    param-&gt;{p}          # first value of parameter p
+    param_all(&#39;p&#39;)-&gt;@*  # all values assigned to parameter p
+    param_all(&#39;p&#39;)-&gt;[2] # the third value assigned to parameter p
+    meta-&gt;{p}           # metadata for first value of parameter p
+    meta_all(&#39;p&#39;)-&gt;@*   # metadata for every value assigned to parameter p
+    meta_all(&#39;p&#39;)-&gt;[2]  # the metadata for the third value assigned to parameter p
+    keys param-&gt;%*      # list of all parameter names sent in the request</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Barebones module for handling CGI requests. It is applicative and lightweight, and has only a few dependencies.</p>
+
+<p>CGI is simple and quick to code for, even though it is not so performant or fashionable. It nevertheless is handy when making quick and dirty web services that are not going to see a lot of load. HTTP Routing is handled by the file system. Adding or removing functionality is easy and orthogonal, like playing with Lego bricks.</p>
+
+<p>For decades CGI.pm has been the gold standard for doing CGI with Perl. It is a big featureful module, and in many cases that is what is needed. But in other cases you just need a simple basic module.</p>
+
+<p>SPRAGL::Cgi_read.pm exists so you dont have to use CGI.pm.</p>
+
+<p>The SPRAGL::Cgi_read module follows Postels Law (be conservative in what you do, be liberal in what you accept). So in case a request is a bit off, the module will not right out fail, but will try to get fairly intelligible data out of it.</p>
+
+<h2 id="OPTIMIZATIONS">OPTIMIZATIONS</h2>
+
+<p>The SPRAGL::Cgi_read module optimizes ressources based on the imports of the CGI script. This works without further ado for normal scripts. But if the script references a method or variable using the SPRAGL::Cgi_read namespace, then it should specify so in its import statement. This is done by prefixing &quot;::&quot; to the import. For example</p>
+
+<pre><code>    use SPRAGL::Cgi_read qw(param $uri ::meta ::$method);
+    use SPRAGL::Cgi_reply;
+
+    my $custname = param-&gt;{name};
+    my $custmeta = SPRAGL::Cgi_read::meta(name);
+    reply &quot;URI was &quot;.$uri.&quot; and method was &quot;.$SPRAGL::Cgi_read::method;</code></pre>
+
+<p>If these imports are not specified, calls and lookups might give the wrong values.</p>
+
+<h2 id="COMMAND-LINE">COMMAND LINE</h2>
+
+<p>With SPRAGL::Cgi_read you can run your CGI scripts from the commandline. This is convenient when debugging or testing. The script will be run as if a GET request with no data started it. But by using options, you can change that.</p>
+
+<p><b>-c</b></p>
+
+<p>Emulate that the request was a POST request. Send the content to it on STDIN.</p>
+
+<p><b>-H &amp;lt;string&amp;gt;</b></p>
+
+<p>Emulate that the request had the given header field.</p>
+
+<p><b>-q &amp;lt;string&amp;gt;</b></p>
+
+<p>Emulate that the request had the given querystring.</p>
+
+<p>Example:</p>
+
+<pre><code>    perl index.pl -H &quot;Referer: https://news.ycombinator.com/&quot; -q &quot;?tag=mars&quot;</code></pre>
+
+<h1 id="FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</h1>
+
+<p>Loaded by default: <a href="#param">param</a>, <a href="#meta">meta</a>, <a href="#param_all-p">param_all</a>, <a href="#meta_all-p">meta_all</a>, <a href="#header-h">header</a></p>
+
+<p>Loaded on demand: <a href="#method">$method</a>, <a href="#uri">$uri</a>, <a href="#header">%header</a>, <a href="#content">$content</a>, <a href="#cgi_mode">$cgi_mode</a></p>
+
+<dl>
+
+<dt id="param">param()</dt>
+<dd>
+
+<p>Gives a hashref with values for all parameters in the request.</p>
+
+<p>In case a parameter name is assigned a value multiple times, the hashref will only contain &quot;the first&quot; of them.</p>
+
+<p>If the request contained data without any parameter information, that data will be assigned the name &quot;&quot; (empty string). In that case, it will be the only parameter recognized in the request.</p>
+
+<p>Parameter names can consist of any characters, but special characters need to be encoded in the request. The module only prevents the name &quot;&quot; (empty string), as it is reserved for the value that has no parameter name.</p>
+
+</dd>
+<dt id="meta">meta()</dt>
+<dd>
+
+<p>Gives a hashref with metadata for the parameters in the request.</p>
+
+<p>The keys are the parameter names. The values are hashrefs themselves. Their keys can be: - name (string) - The name of the parameter. Same as the key used to look up the hashref. - type (string) - The content-type of the value. - filename (string) - The filename used locally on the client. - header (hashref) - Headers specific for the value.</p>
+
+</dd>
+<dt id="param_all-p">param_all( $p )</dt>
+<dd>
+
+<p>Gives a listref of values for the given parameter name.</p>
+
+<p>If the parameter name was not in the request, the list is empty.</p>
+
+</dd>
+<dt id="meta_all-p">meta_all( $p )</dt>
+<dd>
+
+<p>Gives a listref of metadata entries for the given parameter name.</p>
+
+<p>The list mirrors the list given by the param_all function. Each entry is a hashref built the same way the metadata, given by the meta function, is.</p>
+
+</dd>
+<dt id="header-h">header( $h )</dt>
+<dd>
+
+<p>Gives the value of the given header name.</p>
+
+<p>Gives undef if the given header name was not in the request.</p>
+
+<p>Note that two strings can be different, but be the same header name. To this module header names are US-ASCII case-insensitive, and dashes and underscores are equivalent.</p>
+
+<p>Only headers provided by the web servers CGI interface can be looked up.</p>
+
+</dd>
+<dt id="method">$method</dt>
+<dd>
+
+<p>The method of the request. It can be one of the strings &quot;GET&quot;, &quot;HEAD&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;, &quot;CONNECT&quot;, &quot;PATCH&quot; and &quot;TRACE&quot;. Only in case of the &quot;POST&quot;, &quot;PUT&quot;, &quot;PATCH&quot; methods are parameters read from the request content. In case of the &quot;TRACE&quot; method any parameters sent are ignored.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+<dt id="uri">$uri</dt>
+<dd>
+
+<p>The relative URI of the request. It will contain a querystring, if that was part of the URI the client used.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+<dt id="header">%header</dt>
+<dd>
+
+<p>The request headers are available as the %header hash. Only the headers that are passed on by the web servers CGI interface can be found in the hash. The header names are reformatted, attempting to follow common practice. For example the CGI name &quot;HTTP_ACCEPT_LANGUAGE&quot; will be rewritten to &quot;Accept-Language&quot;.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+<dt id="content">$content</dt>
+<dd>
+
+<p>The content of the request, available as the string <code>$content</code>.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+<dt id="cgi_mode">$cgi_mode</dt>
+<dd>
+
+<p>Is true if the script, that uses SPRAGL::Cgi_read, has been started from CGI.</p>
+
+<p>Only loaded on demand.</p>
+
+</dd>
+</dl>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p>Encode</p>
+
+<p>List::Util</p>
+
+<p>Scalar::Util</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<p>Limited testing. Should work with all major web servers.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="https://metacpan.org/pod/SPRAGL::Cgi_reply">SPRAGL::Cgi_reply</a></p>
+
+<p><a href="https://metacpan.org/pod/CGI">CGI</a></p>
+
+<h1 id="LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</h1>
+
+<p>(c) 2022-2023 Bj&oslash;rn Hee</p>
+
+<p>Licensed under the Apache License, version 2.0</p>
+
+<p>https://www.apache.org/licenses/LICENSE-2.0.txt</p>
+
+
+</body>
+
+</html>
+
+

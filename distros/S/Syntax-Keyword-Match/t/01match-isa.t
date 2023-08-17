@@ -3,10 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-BEGIN {
-   plan skip_all => "isa operator requires perl version >= 5.32" unless $] >= 5.032;
-}
+use Test2::V0 qw( :DEFAULT !match );
 
 use Syntax::Keyword::Match;
 
@@ -54,6 +51,14 @@ package BClass {}
 
    $equal = 0;
    is( greedy_is_ten, "NO", 'Greedy is not 10 when unset' );
+}
+
+{
+   no Syntax::Keyword::Match;
+
+   sub match { return "normal function" }
+
+   is( match, "normal function", 'match() parses as a normal function call' );
 }
 
 done_testing;

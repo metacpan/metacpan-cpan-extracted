@@ -9,7 +9,7 @@ SYNOPSIS
        use Object::Pad::FieldAttr::Isa;
     
        class ListNode {
-          has $next :param :reader :writer :Isa(ListNode) = undef;
+          field $next :param :reader :writer :Isa(ListNode) = undef;
        }
     
        my $first = ListNode->new();
@@ -36,7 +36,7 @@ FIELD ATTRIBUTES
 
  :Isa
 
-       has $field :Isa(CLASSNAME) ...;
+       field $name :Isa(CLASSNAME) ...;
 
     Declares that any value assigned to the field must be an object
     reference, and must be derived from the named class. Attempts to assign

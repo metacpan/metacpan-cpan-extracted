@@ -1,7 +1,10 @@
-/*
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_translate_exception.hpp>
@@ -17,7 +20,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-#pragma clang diagnostic ignored "-Wunreachable-code"
+#pragma clang diagnostic ignored "-Wunreachable-code-return"
 #endif
 
 namespace {
@@ -36,7 +39,7 @@ namespace {
         explicit CustomException(const std::string& msg)
             : m_msg(msg) {}
 
-        std::string getMessage() const {
+        std::string const& getMessage() const {
             return m_msg;
         }
 
@@ -48,9 +51,12 @@ namespace {
     public:
         explicit CustomStdException(const std::string& msg)
             : m_msg(msg) {}
-        ~CustomStdException() noexcept override {}
+        ~CustomStdException() noexcept override = default;
 
-        std::string getMessage() const {
+        CustomStdException( CustomStdException const& ) = default;
+        CustomStdException& operator=( CustomStdException const& ) = default;
+
+        std::string const& getMessage() const {
             return m_msg;
         }
 
@@ -134,7 +140,7 @@ TEST_CASE("Non-std exceptions can be translated", "[.][failing][!throws]" ) {
 }
 
 TEST_CASE("Custom std-exceptions can be custom translated", "[.][failing][!throws]" ) {
-    throw CustomException( "custom std exception" );
+    throw CustomStdException( "custom std exception" );
 }
 
 TEST_CASE( "Custom exceptions can be translated when testing for nothrow", "[.][failing][!throws]" ) {

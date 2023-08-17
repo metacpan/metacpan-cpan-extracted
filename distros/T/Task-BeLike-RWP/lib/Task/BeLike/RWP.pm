@@ -2,6 +2,7 @@
 
 use v5.37.9;
 
+
 package Task::BeLike::RWP;
 
 # TODO: FIX :list
@@ -18,7 +19,11 @@ Task::BeLike::RWP - Perl modules bundle to install from CPAN
 
 =head1 VERSION
 
-version 0.230470
+version 0.231770
+
+=head1 SYNOPSIS
+
+cpanm Task::BeLike::RWP
 
 =head1 DESCRIPTION
 
@@ -48,49 +53,61 @@ Perl distribution management and release
 
 General configuration file parser
 
-=item L<DBI> (L<GitHub|>)
+=item L<DBI> (L<GitHub|https://github.com/perl5-dbi/dbi>)
 
 Database connection and manipulation
 
-=item L<SQL::Abstract> (L<GitHub|>)
+=item L<SQL::Abstract> (L<GitHub|https://github.com/dbsrgits/sql-abstract>)
 
 SQL command abstraction in OOP style with useful statement costructing methods
 
-=item L<URI> (L<GitHub|>)
+=item L<URI> (L<GitHub|https://github.com/libwww-perl/URI>)
 
 General URI class to handle URL's and the like
 
-=item L<Clipboard> (L<GitHub|>)
+=item L<Clipboard> (L<GitHub|https://github.com/shlomif/Clipboard>)
 
 Cross-platform clipboard management
 
-=item L<PadWalker> (L<GitHub|>)
+=item L<PadWalker> (L<GitHub|https://github.com/robinhouston/PadWalker>)
 
 Supported by Perl Debugger as the C<y> command
 
-=item L<Data::Printer> (L<GitHub|>)
+=item L<Data::Printer> (L<GitHub|https://github.com/garu/Data-Printer>)
 
 Aids in debugging by displaying Perl data structures
 
-=item L<Log::Log4Perl> (L<GitHub|>)
+=item L<Log::Log4perl> (L<GitHub|https://github.com/mschilli/log4perl>)
 
 Perl logging framework
 
-=item L<IO::Tee> (L<GitHub|>)
+=item L<IO::Tee> (L<GitHub|https://github.com/neilb/IO-Tee>)
 
 Tee file handle
 
-=item L<Domain::PublicSuffix> (L<GitHub|>)
+=item L<Domain::PublicSuffix> (L<GitHub|https://github.com/nmelnick/domain-publicsuffix>)
 
 Get to the domain root, by Mozilla
 
-=item L<Net::IP::XS> (L<GitHub|>)
+=item L<Net::IP::XS> (L<GitHub|https://github.com/tomhrr/p5-Net-IP-XS>)
 
 IP class
 
-=item L<XML::RSS> (L<GitHub|>)
+=item L<XML::RSS> (L<GitHub|https://github.com/shlomif/perl-XML-RSS>)
 
-RSS parser
+RSS parser. Requires the C<libexpat1-dev> package to be installed.
+
+=item L<Yaml::XS> (L<GitHub|https://github.com/ingydotnet/yaml-libyaml-pm>)
+
+YAML markup parser using C<libyaml> C library
+
+=item L<Rex> (L<GitHub|https://github.com/RexOps/Rex>)
+
+SSH-based automation framework in Perl
+
+=item L<Number::Bytes::Human> (L<GitHub|https://github.com/aferreira/cpan-Number-Bytes-Human>)
+
+Human-redable bytes
 
 =back
 

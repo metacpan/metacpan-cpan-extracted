@@ -1,5 +1,9 @@
 Revision history for Metrics-Any
 
+0.10    2023-07-07
+        [CHANGES]
+         * Swap all of the unit tests from Test::More to Test2::V0
+
 0.09    2022-11-28
         [CHANGES]
          * Define a new API for optional high-performance batch mode

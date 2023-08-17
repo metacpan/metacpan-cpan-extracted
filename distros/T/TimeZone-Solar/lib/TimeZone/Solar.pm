@@ -14,7 +14,7 @@ use warnings;
 ## use critic (Modules::RequireExplicitPackage)
 
 package TimeZone::Solar;
-$TimeZone::Solar::VERSION = '0.2.1';
+$TimeZone::Solar::VERSION = '0.2.2';
 use utf8;
 use autodie;
 use overload
@@ -22,7 +22,7 @@ use overload
     'eq' => "eq_string";
 use Carp qw(croak);
 use Readonly;
-use DateTime::TimeZone qw(0.80);
+use DateTime::TimeZone v0.80.0;
 use Try::Tiny;
 Readonly::Scalar my $debug_mode => ( exists $ENV{TZSOLAR_DEBUG} and $ENV{TZSOLAR_DEBUG} ) ? 1 : 0;
 
@@ -77,7 +77,7 @@ package TimeZone::Solar::Constant {
         return $constants{$name};
     }
 }
-$TimeZone::Solar::Constant::VERSION = '0.2.1';
+$TimeZone::Solar::Constant::VERSION = '0.2.2';
 ## critic ( Modules::ProhibitMultiplePackages )
 
 # get list of constants
@@ -560,7 +560,7 @@ TimeZone::Solar - local solar timezone lookup and utilities including DateTime c
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -859,7 +859,21 @@ See L<https://www.gnu.org/licenses/gpl-3.0-standalone.html>.
 
 =head1 SEE ALSO
 
-LongitudeTZ on Github: https://github.com/ikluft/LongitudeTZ
+=over
+
+=item LongitudeTZ project on Github
+
+https://github.com/ikluft/LongitudeTZ
+
+=item Perl source
+
+https://github.com/ikluft/LongitudeTZ/tree/main/src/perl
+
+=item "Time zone and daylight saving time data" at Internet Assigned Numbers Authority (IANA)
+
+https://data.iana.org/time-zones/tz-link.html
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 

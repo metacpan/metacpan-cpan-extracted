@@ -27,7 +27,7 @@ our %EXPORT_TAGS = (
     all => \@all,
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my @DIRS; # used to implement pushd/popd
 
@@ -85,6 +85,8 @@ and partially we will provide explanation on how to rewrite various Shell
 constructs in Perl.
 
 =head1 DESCRIPTION
+
+=cut
 
 #=head2 awk
 #

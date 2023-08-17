@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.152;
+package Config::Model::Loader 2.153;
 
 use Carp;
 use strict;
@@ -71,6 +71,39 @@ sub _log_cmd {
     $verbose_logger->info("command '$str': $message");
 }
 
+sub _split_string ($str) {
+    # do a split on ' ' but take quoted string into account
+    return (
+        $str =~ m/
+         (         # begin of *one* command
+          (?:        # group parts of a command (e.g ...:...=... )
+           [^\s"']+  # match anything but a space and a quote
+           (?:        # begin quoted group
+             "         # begin of a string
+              (?:        # begin group
+                \\"       # match an escaped quote
+                |         # or
+                [^"]      # anything but a quote
+              )*         # lots of time
+             "         # end of the string
+           )          # end of quoted group
+           ?          # match if I got more than one group
+           (?:        # begin quoted group
+             '         # begin of a string
+              (?:        # begin group
+                \\'       # match an escaped quote
+                |         # or
+                [^']      # anything but a quote
+              )*         # lots of time
+             '         # end of the string
+           )          # end of quoted group
+           ?          # match if I got more than one group
+          )+      # can have several parts in one command
+         )        # end of *one* command
+        /gx    # 'g' means that all commands are fed into @command array
+    );         #"asdf ;
+}
+
 sub load {
     my $self = shift;
 
@@ -96,26 +129,7 @@ sub load {
     # accept commands
     my $huge_string = ref $steps ? join( ' ', @$steps ) : $steps;
 
-    # do a split on ' ' but take quoted string into account
-    my @command = (
-        $huge_string =~ m/
-         (         # begin of *one* command
-          (?:        # group parts of a command (e.g ...:...=... )
-           [^\s"]+  # match anything but a space and a quote
-           (?:        # begin quoted group
-             "         # begin of a string
-              (?:        # begin group
-                \\"       # match an escaped quote
-                |         # or
-                [^"]      # anything but a quote
-              )*         # lots of time
-             "         # end of the string
-           )          # end of quoted group
-           ?          # match if I got more than one group
-          )+      # can have several parts in one command
-         )        # end of *one* command
-        /gx    # 'g' means that all commands are fed into @command array
-    );         #"asdf ;
+    my @command = _split_string($huge_string);
 
     #print "command is ",join('+',@command),"\n" ;
 
@@ -162,7 +176,7 @@ sub _split_cmd {
     my $cmd = shift;
     $logger->trace("split on: ->$cmd<-");
 
-    my $quoted_string = qr/"(?: \\" | [^"] )* "/x;    # quoted string
+    my $quoted_string = qr/(?:"(?: \\" | [^"] )* ")|(?:'(?: \\' | [^'] )* ')/x;    # quoted string
 
     # do a split on ' ' but take quoted string into account
     my @command = (
@@ -188,7 +202,7 @@ sub _split_cmd {
                 | (
                     (?:
                       $quoted_string
-                     | [^#\s]                # or non whitespace
+                     | [^#\s"']              # or non whitespace
                     )+                       # many
                   )
 	        )?
@@ -214,7 +228,7 @@ sub _split_cmd {
             error   => "Syntax error: spurious char at command end: '$leftout'. Did you forget double quotes ?"
         );
     }
-    return wantarray ? @command : \@command;
+    return @command;
 }
 
 my %load_dispatch = (
@@ -1087,7 +1101,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.152
+version 2.153
 
 =head1 SYNOPSIS
 
@@ -1142,28 +1156,20 @@ version 2.152
      listb:0=foo listb:1=baz';
  $root->load( steps => $steps );
 
- print $root->describe,"\n" ;
- # name         value        type         comment
- # foo          FOO          string
- # bar          [undef]      string
- # hash_of_nodes <Foo>        node hash    keys: "en" "fr"
- # lista        foo,bar,baz  list
- # listb        foo,baz      list
-
+ my $s = $root->fetch_element_value('foo');      # => is 'FOO'
+ $s = $root->grab_value('hash_of_nodes:en foo'); # => is 'hello'
+ $s = $root->grab_value('lista:1');              # => is 'bar'
+ $s = $root->grab_value('lista:2');              # => is 'baz'
 
  # delete some data
  $root->load( steps => 'lista~2' );
 
- print $root->describe(element => 'lista'),"\n" ;
- # name         value        type         comment
- # lista        foo,bar      list
+ $s = $root->grab_value('lista:2');              # => is undef
 
  # append some data
  $root->load( steps => q!hash_of_nodes:en foo.=" world"! );
 
- print $root->grab('hash_of_nodes:en')->describe(element => 'foo'),"\n" ;
- # name         value        type         comment
- # foo          "hello world" string
+ $s = $root->grab_value('hash_of_nodes:en foo'); # => is 'hello world'
 
 =head1 DESCRIPTION
 
@@ -1477,9 +1483,11 @@ C<foo#comment:bar> is B<not> valid.
 
 =head2 Quotes
 
-You can surround indexes and values with double quotes. E.g.:
+You can surround indexes and values with single or double quotes. E.g.:
 
-  a_string="\"foo\" and \"bar\""
+  a_string='"foo" and "bar"'
+
+Single quotes were added in version 2.153.
 
 =head1 Examples
 

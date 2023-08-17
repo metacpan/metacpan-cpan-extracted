@@ -5,7 +5,7 @@
       "Cucumber Ltd"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -22,60 +22,63 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.63",
             "Moo" : "0",
-            "perl" : "v5.14.0"
+            "perl" : "v5.14.4"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0"
+            "Test2::Tools::Exception" : "0",
+            "Test2::V0" : "0",
+            "YAML" : "0"
          }
       }
    },
    "provides" : {
       "Cucumber::TagExpressions" : {
          "file" : "lib/Cucumber/TagExpressions.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::AndNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::ExpressionNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::LiteralNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::Node" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::NotNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       },
       "Cucumber::TagExpressions::OrNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v4.1.0"
+         "version" : "v5.0.6"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/cucumber/common/issues"
+         "web" : "https://github.com/cucumber/tag-expressions/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/cucumber/common.git",
-         "web" : "https://github.com/cucumber/common/messages/perl"
+         "url" : "https://github.com/cucumber/tag-expressions.git",
+         "web" : "https://github.com/cucumber/tag-expressions"
       }
    },
-   "version" : "4.1.0",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "5.0.6",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"
 }
 

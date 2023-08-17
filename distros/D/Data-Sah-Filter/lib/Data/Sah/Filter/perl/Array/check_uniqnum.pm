@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
@@ -39,12 +39,12 @@ sub filter {
     my $dt = $fargs{data_term};
     my $gen_args = $fargs{args} // {};
     my $res = {};
-    $res->{modules}{'List::Util'} = 1.54;
+    $res->{modules}{'List::Util::Uniq'} = "0.005";
+    $res->{modules}{'Data::Dmp'} = "0.242";
     $res->{expr_filter} = join(
         "",
-        # TODO: [ux] report the duplicate element(s) in error message
-        "do { my \$tmp=$dt; my \@uniq = List::Util::uniqnum(\@\$tmp); ",
-        ($gen_args->{reverse} ? "\@\$tmp != \@uniq ? [undef,\$tmp] : [\"Array does not have duplicate number(s)\"]" : "\@\$tmp == \@uniq ? [undef,\$tmp] : [\"Array has duplicate number(s)\"]"),
+        "do { my \$orig = $dt; \$tmp=".($gen_args->{ci} ? "[map {lc} \@\$orig]":"$dt")."; my \@dupes = List::Util::Uniq::uniqnum( List::Util::Uniq::dupenum(\@\$tmp) ); ",
+        ($gen_args->{reverse} ? "\@dupes ? [undef,\$tmp] : [\"Array does not have duplicate number(s)\"]" : "!\@dupes ? [undef,\$tmp] : [\"Array has duplicate number(s): \".join(', ', map { Data::Dmp::dmp(\$_) } \@dupes)]"),
         "}",
     );
 
@@ -66,7 +66,7 @@ Data::Sah::Filter::perl::Array::check_uniqnum - Check that an array has unique e
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_uniqnum (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Array::check_uniqnum (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_u
 
  [] # valid, unchanged
  [1,2] # valid, unchanged
- [1,2,"1.0"] # INVALID (Array has duplicate number(s)), becomes undef
+ [1,2,"1.0"] # INVALID (Array has duplicate number(s): "1.0"), becomes undef
  [] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate number(s)), becomes undef
  [1,2] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate number(s)), becomes undef
  [1,2,"1.0"] # filtered with args {reverse=>1}, valid, unchanged

@@ -63,9 +63,8 @@ SYNOPSIS
             Feature b config is: active
 
 DESCRIPTION
-    Performs the similar tasks as "use constant", but adds features to
-    assign values of constants from the command line or environment
-    variables.
+    Performs similar tasks as "use constant", but adds features to assign
+    values of constants from the command line or environment variables.
 
     In addition, constants are only defined/set if they don't exist already,
     making configuring and overriding constants defined in sub modules
@@ -75,7 +74,7 @@ DESCRIPTION
     GetOpt::Long option specification is used for processing command line
     options to give flexibility in how and what switches are used. To save
     on memory, GetOpt::Long is only loaded if option processing is wanted
-    (i.e. the "opt" field is specified).
+    (i.e. the "opt" field non disabled).
 
     In advanced form, a user subroutine can be supplied to give control of
     processing. This is used by Log::OK for example to generate multiple

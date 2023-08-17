@@ -1,0 +1,41 @@
+---
+abstract: 'Sign a Certificate Signing Request in XS.'
+author:
+  - 'Timothy Legge <timlegge@cpan.org>'
+build_requires:
+  Crypt::OpenSSL::ConfiguredAPI: '0'
+  Crypt::OpenSSL::Guess: '0'
+  Crypt::OpenSSL::PKCS10: '0.19'
+  Crypt::OpenSSL::RSA: '0'
+  File::Slurper: '0.012'
+  File::Temp: '0'
+  File::Which: '0'
+  Test::More: '0.88'
+configure_requires:
+  Crypt::OpenSSL::ConfiguredAPI: '0'
+  Crypt::OpenSSL::Guess: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-SignCSR
+provides:
+  Crypt::OpenSSL::SignCSR:
+    file: lib/Crypt/OpenSSL/SignCSR.pm
+    version: '0.14'
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-SignCSR/issues
+  repository: git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-SignCSR.git
+version: '0.14'
+x_generated_by_perl: v5.36.1
+x_maintainers:
+  - 'Timothy Legge <timlegge@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Apache-2.0

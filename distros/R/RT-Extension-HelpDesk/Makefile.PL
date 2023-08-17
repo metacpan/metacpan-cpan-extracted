@@ -1,5 +1,5 @@
-use inc::Module::Install;
 use lib '.';
+use inc::Module::Install;
 
 RTx     'RT-Extension-HelpDesk';
 license 'gpl_2';

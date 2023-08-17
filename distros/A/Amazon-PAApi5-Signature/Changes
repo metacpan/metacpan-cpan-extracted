@@ -1,6 +1,6 @@
 ## Amazon::PAApi5::Signature commit log
 
-https://github.com/bayashi/Amazon-PAApi5-Signature/commits/master
+https://github.com/bayashi/Amazon-PAApi5-Signature/commits/main
 
 ## Tags
 
@@ -8,5 +8,9 @@ https://github.com/bayashi/Amazon-PAApi5-Signature/tags
 
 ## Last Release
 
-0.04   Sat Jun  6 17:11:41 GMT 2020
-    - https://github.com/bayashi/Amazon-PAApi5-Signature/compare/0.03...0.04
+0.05   Sat Aug 12 03:12:47 UTC 2023
+    - https://github.com/bayashi/Amazon-PAApi5-Signature/compare/0.04...0.05
+
+## Special Thanks!
+
+https://github.com/bayashi/Amazon-PAApi5-Signature/graphs/contributors

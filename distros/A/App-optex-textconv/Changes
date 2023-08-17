@@ -1,5 +1,11 @@
 Revision history for Perl extension App-optex-textconv
 
+1.06 2023-06-27T01:52:00Z
+
+    - Support .gpg files.
+    - Support footnote reference in docx file.
+    - Now xslt.pm file is not loaded by default.
+
 1.05 2023-04-14T05:03:38Z
 
     - Support forced line breaks in paragraphs.

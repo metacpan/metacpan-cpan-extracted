@@ -57,75 +57,75 @@
    "provides" : {
       "Log::Any" : {
          "file" : "lib/Log/Any.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter" : {
          "file" : "lib/Log/Any/Adapter.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Base" : {
          "file" : "lib/Log/Any/Adapter/Base.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Capture" : {
          "file" : "lib/Log/Any/Adapter/Capture.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::File" : {
          "file" : "lib/Log/Any/Adapter/File.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Multiplex" : {
          "file" : "lib/Log/Any/Adapter/Multiplex.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Null" : {
          "file" : "lib/Log/Any/Adapter/Null.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Stderr" : {
          "file" : "lib/Log/Any/Adapter/Stderr.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Stdout" : {
          "file" : "lib/Log/Any/Adapter/Stdout.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Syslog" : {
          "file" : "lib/Log/Any/Adapter/Syslog.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Test" : {
          "file" : "lib/Log/Any/Adapter/Test.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Adapter::Util" : {
          "file" : "lib/Log/Any/Adapter/Util.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Manager" : {
          "file" : "lib/Log/Any/Manager.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Proxy" : {
          "file" : "lib/Log/Any/Proxy.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Proxy::Null" : {
          "file" : "lib/Log/Any/Proxy/Null.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Proxy::Test" : {
          "file" : "lib/Log/Any/Proxy/Test.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Proxy::WithStackTrace" : {
          "file" : "lib/Log/Any/Proxy/WithStackTrace.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       },
       "Log::Any::Test" : {
          "file" : "lib/Log/Any/Test.pm",
-         "version" : "1.715"
+         "version" : "1.716"
       }
    },
    "release_status" : "stable",
@@ -140,10 +140,11 @@
          "web" : "https://github.com/preaction/Log-Any"
       }
    },
-   "version" : "1.715",
+   "version" : "1.716",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Andrew Grechkin <andrew.grechkin@gmail.com>",
+      "Andrew Hewus Fresh <andrew+github@afresh1.com>",
       "bj5004 <bartosz.jakubski@hurra.com>",
       "cm-perl <cm-perl@users.noreply.github.com>",
       "Doug Bell <preaction@users.noreply.github.com>",
@@ -161,6 +162,8 @@
       "Paul Durden <alabamapaul@gmail.com>",
       "Philipp Gortan <philipp.gortan@apa.at>",
       "Phill Legault <saladdayllc@gmail.com>",
+      "Samuel Ng <samuel.ng@grantstreet.com>",
+      "Samuel Ng <sng@grantstreet.com>",
       "Shlomi Fish <shlomif@shlomifish.org>",
       "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>",
       "XSven <XSven@users.noreply.github.com>"

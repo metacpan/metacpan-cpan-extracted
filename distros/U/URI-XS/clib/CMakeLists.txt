@@ -1,16 +1,26 @@
 cmake_minimum_required(VERSION 3.0)
+
+if (NOT DEFINED ${PROJECT_NAME})
+    set(NOT_SUBPROJECT ON)
+else()
+    set(NOT_SUBPROJECT OFF)
+endif()
+
 project(panda-uri VERSION 2.1.1 LANGUAGES CXX)
 enable_testing()
 
 set(LIB_TYPE STATIC)
-option(PANDA_URI_BUILD_TESTS OFF)
-if (${PANDA_URI_BUILD_TESTS})
+option(PANDA_URI_TESTS OFF)
+option(PANDA_URI_TESTS_IN_ALL ${NOT_SUBPROJECT})
+
+if (${PANDA_URI_TESTS_IN_ALL})
     set(EXCLUDE_TEST)
 else()
     set(EXCLUDE_TEST EXCLUDE_FROM_ALL)
 endif()
 
 file(GLOB_RECURSE libSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/panda/*.cc")
+list(APPEND libSource "src/panda/uri/parser.cc" "src/panda/uri/parser_ext.cc")
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${libSource})
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -35,10 +45,14 @@ if (ragel_bin)
     endforeach()
 endif()
 
-find_package(panda-lib REQUIRED)
+if (NOT TARGET panda-lib)
+    find_package(panda-lib REQUIRED)
+endif()
 target_link_libraries(${PROJECT_NAME} panda-lib)
 
 ########################tests#######################################
+if (${PANDA_URI_TESTS})
+
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
 set_source_files_properties(${testSource} PROPERTIES COMPILE_FLAGS "-Wno-potentially-evaluated-expression")
 
@@ -51,7 +65,9 @@ target_link_libraries(${PROJECT_NAME}-tests PUBLIC Catch2::Catch2)
 ########################ctests######################################
 add_executable(${PROJECT_NAME}-runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
 target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
-add_test(test-all ${PROJECT_NAME}-runtests)
+add_test(${PROJECT_NAME} ${PROJECT_NAME}-runtests)
+
+endif() # if (${PANDA_URI_TESTS})
 
 ########################install#####################################
 install(DIRECTORY src/ DESTINATION include FILES_MATCHING PATTERN "*.h")

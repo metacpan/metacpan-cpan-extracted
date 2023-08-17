@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 BEGIN 
 {
@@ -38,3 +38,9 @@ $field->style('baz');
 
 is($field->html_field, '<input class="foo" id="bar" maxlength="20" name="name" size="15" style="baz" type="password" value="John">', 'html_field() 4');
 is($field->xhtml_field, '<input class="foo" id="bar" maxlength="20" name="name" size="15" style="baz" type="password" value="John" />', 'xhtml_field() 4');
+
+$field->required(1);
+
+is($field->html_field, '<input class="foo" id="bar" maxlength="20" name="name" required size="15" style="baz" type="password" value="John">', 'html_field() 4');
+is($field->xhtml_field, '<input class="foo" id="bar" maxlength="20" name="name" required="required" size="15" style="baz" type="password" value="John" />', 'xhtml_field() 4');
+

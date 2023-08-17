@@ -1,39 +1,38 @@
---- #YAML:1.0
-name                    : Net-SSH-Perl
-version                 : 2.14
-abstract                : Perl client interface to SSH
-author:              
-  - David Robins <dbrobins@cpan.org>
-  - Lance Kinley <lkinley@rythmos.com>
-license                 : perl
-distribution_type       : module
-dynamic_config          : 1
-
-requires:     
-  CryptX                : 0.032
-  Crypt::Curve25519     : 0.05
-  Crypt::IDEA           : 0
-  IO::Socket            : 0
-  Math::GMP             : 1.04
-  Scalar::Util          : 0
-  String::CRC32         : 1.2
+---
+abstract: 'Perl client Interface to SSH'
+author:
+  - 'David Robins <dbrobins@cpan.org>'
 build_requires:
-  Test::More            : 0.61
-recommends:
-  Module::Signature     : 0.50
-  Digest::BubbleBabble  : 0
-  Crypt::RSA            : 0
-  Term::ReadKey         : 0
-
-resources:
-  homepage              : http://search.cpan.org/dist/Net-SSH-Perl/
-  license               : http://dev.perl.org/licenses/
-  bugtracker            : http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SSH-Perl
-  MailingList           : https://lists.sourceforge.net/lists/listinfo/ssh-sftp-perl-users
-  Repository            : https://github.com/lkinley/Net-SSH-Perl
-
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  version               : 1.4
-  url                   : http://module-build.sourceforge.net/META-spec-v1.4.html
-
-generated_by            : emacs
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SSH-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::Curve25519: '0.05'
+  Crypt::IDEA: '0'
+  CryptX: '0.032'
+  Digest::MD5: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  IO::Socket: '0'
+  Math::GMP: '1.04'
+  Scalar::Util: '0'
+  String::CRC32: '1.2'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/net-ssh-perl/issues
+  homepage: https://github.com/briandfoy/net-ssh-perl
+  repository: https://github.com/briandfoy/net-ssh-perl
+version: '2.142'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,12 +5,12 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   File::Slurper: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,28 +19,28 @@ name: Text-Treesitter
 provides:
   Text::Treesitter:
     file: lib/Text/Treesitter.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::Language:
     file: lib/Text/Treesitter/Language.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::Node:
     file: lib/Text/Treesitter/Node.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::Parser:
     file: lib/Text/Treesitter/Parser.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::Query:
     file: lib/Text/Treesitter/Query.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::QueryCursor:
     file: lib/Text/Treesitter/QueryCursor.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::QueryMatch:
     file: lib/Text/Treesitter/QueryMatch.pm
-    version: '0.06'
+    version: '0.10'
   Text::Treesitter::Tree:
     file: lib/Text/Treesitter/Tree.pm
-    version: '0.06'
+    version: '0.10'
 requires:
   ExtUtils::CppGuess: '0'
   JSON::MaybeUTF8: '0'
@@ -50,5 +50,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

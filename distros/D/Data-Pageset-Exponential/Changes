@@ -1,5 +1,21 @@
 Revision history for Data-Pageset-Exponential:
 
+v0.3.3    2023-06-11 10:54:59+01:00 Europe/London
+  [Enhanceents]
+  - Simplified type imports.
+
+  [Documentation]
+  - Document support policy for older Perl versions.
+
+  - Bump copyright year.
+
+  - Fix encoding of links in README.
+
+  [Toolchain]
+  - Sign distribution.
+
+  - Update MANIFEST.SKIP rules.
+
 v0.3.2    2021-01-25 16:18:02+00:00 Europe/London
   [Documentation]
   - Bump copyright year.

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::par::unisam2;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  UNISAM2 - UNIformly SAMple a 2-D function f(x1,x2)			
+ PERL PROGRAM NAME:  UNISAM2 - UNIformly SAMple a 2-D function f(x1,x2)			
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

@@ -27,12 +27,12 @@ sub new {
         i => $info,
         o => $options,
         avail_operators => [
-            "REGEXP", "REGEXP_i", "NOT REGEXP", "NOT REGEXP_i", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL",
-            "IN", "NOT IN", "BETWEEN", "NOT BETWEEN", " = ", " != ", " <> ", " < ", " > ", " >= ", " <= ",
-            " = col", " != col", " <> col", " < col", " > col", " >= col", " <= col",
-            "LIKE %col%", "NOT LIKE %col%",  "LIKE col%", "NOT LIKE col%", "LIKE %col", "NOT LIKE %col" ],
-            # "LIKE col", "NOT LIKE col"
-        }, $class;
+            " = ", " != ", " <> ", " < ", " > ", " >= ", " <= ",
+            "REGEXP", "REGEXP_i", "NOT REGEXP", "NOT REGEXP_i", "LIKE", "NOT LIKE",
+            "IS NULL", "IS NOT NULL", "IN", "NOT IN", "BETWEEN", "NOT BETWEEN",
+            "ANY", "ALL"
+        ],
+    }, $class;
 }
 
 
@@ -69,12 +69,11 @@ sub _options {
             { name => '_db_defaults', text => '', section => ''  },
         ],
         group_extensions => [
-            { name => '_e_table',         text => "- Tables menu",   section => 'enable' },
-            { name => '_e_join',          text => "- Join menu",     section => 'enable' },
-            { name => '_e_union',         text => "- Union menu",    section => 'enable' },
-            { name => '_e_substatements', text => "- Substatements", section => 'enable' },
-            { name => '_e_parentheses',   text => "- Parentheses",   section => 'enable' },
-            { name => '_e_write_access',  text => "- Write access",  section => 'enable' },
+            { name => '_e_table',        text => "- Tables menu",        section => 'enable' },
+            { name => '_e_join',         text => "- Join menu",          section => 'enable' },
+            { name => '_e_union',        text => "- Union menu",         section => 'enable' },
+            { name => '_e_expressions',  text => "- Columns and Values", section => 'enable' },
+            { name => '_e_write_access', text => "- Write access",       section => 'enable' },
         ],
         group_sql_settings => [
             { name => '_meta',                   text => "- System DB/Tables", section => 'G'      },
@@ -293,27 +292,17 @@ sub set_options {
             elsif ( $opt eq '_e_union' ) {
                 my $prompt = 'Extend Union Menu:';
                 my $sub_menu = [
-                    [ 'u_derived', "- Add Derived",   [ $no, $yes ] ],
-                    [ 'union_all', "- Add Union All", [ $no, $yes ] ],
+                    [ 'u_derived',     "- Derived",     [ $no, $yes ] ],
+                    [ 'u_where',       "- Where",       [ $no, $yes ] ],
+                    [ 'u_parentheses', "- Parentheses", [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_e_substatements' ) {
-                my $prompt = 'Enable Substatement Additions (functions, subqueries) for:';
+            elsif ( $opt eq '_e_expressions' ) {
+                my $prompt = 'Extended expressions:';
                 my $sub_menu = [
-                    [ 'expand_select',   "- SELECT",   [ $no, $yes ] ],
-                    [ 'expand_where',    "- WHERE",    [ $no, $yes ] ],
-                    [ 'expand_group_by', "- GROUB BY", [ $no, $yes ] ],
-                    [ 'expand_having',   "- HAVING",   [ $no, $yes ] ],
-                    [ 'expand_order_by', "- ORDER BY", [ $no, $yes ] ],
-                    [ 'expand_set',      "- SET",      [ $no, $yes ] ],
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
-            elsif ( $opt eq '_e_parentheses' ) {
-                my $prompt = 'Parentheses in WHERE/HAVING:';
-                my $sub_menu = [
-                    [ 'parentheses', "- Add Parentheses", [ $no, $yes ] ],
+                    [ 'extended_cols',   "- Exdented Columns", [ $no, $yes ] ],
+                    [ 'extended_values', "- Exdented Values",  [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -345,10 +334,9 @@ sub set_options {
             elsif ( $opt eq '_alias' ) {
                 my $prompt = 'Enable alias for:';
                 my $sub_menu = [
-                    [ 'select_func_sq', "- Functions/Subqueries in SELECT",  [ $no, $yes ] ],
-                    [ 'derived_table',  "- Derived table",                   [ $no, $yes ] ],
-                    [ 'join',           "- JOIN",                            [ $no, $yes ] ],
-                    [ 'union',          "- UNION",                           [ $no, $yes ] ],
+                    [ 'select_func_sq', "- Functions/Subqueries in SELECT",  [ $no, 'ASK' ] ],
+                    [ 'join',           "- JOIN",                            [ 'AUTO', 'ASK' ] ],
+                    [ 'table',          "- Table",                           [ $no, 'AUTO' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -716,7 +704,7 @@ sub __group_readline {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $new_list = $tf->fill_form(
         $list,
-        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
+        { prompt => $prompt, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {

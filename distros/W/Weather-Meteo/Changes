@@ -1,5 +1,9 @@
 Revision history for Weather::Meteo
 
+0.06	Thu Jun 15 20:49:00 EDT 2023
+	Added bin/weather
+	weather() now supports the 'tz' argument
+
 0.05	Fri Apr 14 09:55:47 EDT 2023
 	Include the daily overview in the results
 	The database is from 1940

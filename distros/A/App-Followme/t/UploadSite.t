@@ -26,17 +26,17 @@ my $sub_dir = catdir(@path, 'test', 'local', 'sub');
 my $remote_dir = catdir(@path, 'test', 'remote');
 my $state_dir = catdir(@path, 'test', 'local', '_state');
 
-rmtree($test_dir) if -e $test_dir;
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+rmtree($test_dir, 0, 1) if -e $test_dir;
+mkdir($test_dir) unless -e $test_dir;
+ 
 mkdir $local_dir or die $!;
-chmod 0755, $local_dir;
+  
 mkdir $sub_dir or die $!;
-chmod 0755, $sub_dir;
+  
 mkdir $remote_dir or die $!;
-chmod 0755, $remote_dir;
+  
 mkdir $state_dir or die $!;
-chmod 0755, $state_dir;
+  
 
 chdir $local_dir or die $!;
 

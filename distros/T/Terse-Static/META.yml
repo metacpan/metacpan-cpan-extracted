@@ -19,7 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  Terse: '0.122'
+  Terse: '0.19'
   perl: '5.006'
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

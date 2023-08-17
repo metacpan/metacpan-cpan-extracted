@@ -1,17 +1,10 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#else
-#define HAVE_UNISTD_H 1
-#define HAVE_CHDIR 1
-#endif
 #include "../shapereader.h"
 #include "tap.h"
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+
+#define UNUSED(x) (void)(x)
 
 #define FESTIVAL 0
 #define FROM 1
@@ -40,8 +33,166 @@ int tests_failed = 0;
 const dbf_header_t *header;
 const dbf_record_t *record;
 
-dbf_file_t fh;
-size_t record_number = 0;
+size_t record_number;
+
+/*
+ * Date tests
+ */
+
+static int
+compare_tm(struct tm *tm, int mday, int mon, int year, int hour, int min,
+           int sec, int wday, int yday)
+{
+    return (tm->tm_mday == mday && tm->tm_mon + 1 == mon &&
+            tm->tm_year + 1900 == year && tm->tm_hour == hour &&
+            tm->tm_min == min && tm->tm_sec == sec && tm->tm_wday == wday &&
+            tm->tm_yday + 1 == yday);
+}
+
+static int
+test_jd_2451545(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2451545, 43200000, &tm);
+    return compare_tm(&tm, 1, 1, 2000, 12, 0, 0, SATURDAY, 1);
+}
+
+static int
+test_jd_2446823(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2446823, 0, &tm);
+    return compare_tm(&tm, 27, 1, 1987, 0, 0, 0, TUESDAY, 27);
+}
+
+static int
+test_jd_2446966(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2446966, 43200000, &tm);
+    return compare_tm(&tm, 19, 6, 1987, 12, 0, 0, FRIDAY, 170);
+}
+
+static int
+test_jd_2447188(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2447188, 0, &tm);
+    return compare_tm(&tm, 27, 1, 1988, 0, 0, 0, WEDNESDAY, 27);
+}
+
+static int
+test_jd_2447332(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2447332, 43200000, &tm);
+    return compare_tm(&tm, 19, 6, 1988, 12, 0, 0, SUNDAY, 171);
+}
+
+static int
+test_jd_2415021(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2415021, 43200000, &tm);
+    return compare_tm(&tm, 1, 1, 1900, 12, 0, 0, MONDAY, 1);
+}
+
+static int
+test_jd_2305448(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2305448, 43200000, &tm);
+    return compare_tm(&tm, 1, 1, 1600, 12, 0, 0, SATURDAY, 1);
+}
+
+static int
+test_jd_2305813(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2305813, 43200000, &tm);
+    return compare_tm(&tm, 31, 12, 1600, 12, 0, 0, SUNDAY, 366);
+}
+
+static int
+test_jd_2026872(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(2026872, 25920000, &tm);
+    return compare_tm(&tm, 10, 4, 837, 7, 12, 0, TUESDAY, 100);
+}
+
+static int
+test_jd_1356001(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(1356001, 43200000, &tm);
+    return compare_tm(&tm, 12, 7, -1000, 12, 0, 0, THURSDAY, 193);
+}
+
+static int
+test_jd_1355867(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(1355867, 0, &tm);
+    return compare_tm(&tm, 29, 2, -1000, 0, 0, 0, WEDNESDAY, 60);
+}
+
+static int
+test_jd_1355671(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(1355671, 77760000, &tm);
+    return compare_tm(&tm, 17, 8, -1001, 21, 36, 0, WEDNESDAY, 229);
+}
+
+static int
+test_jd_0(void)
+{
+    struct tm tm;
+
+    dbf_jd_to_tm(0, 43200000, &tm);
+    return compare_tm(&tm, 1, 1, -4712, 12, 0, 0, MONDAY, 1);
+}
+
+static int
+test_yyyymmdd_15821015(void)
+{
+    struct tm tm;
+
+    dbf_yyyymmdd_to_tm("15821015", 8, &tm);
+    return compare_tm(&tm, 15, 10, 1582, 0, 0, 0, FRIDAY, 288);
+}
+
+static void
+test_dates(void)
+{
+    ok(test_jd_2451545, "test dbf_jd_to_tm with  2000 Jan.  1 12:00");
+    ok(test_jd_2446823, "test dbf_jd_to_tm with  1987 Jan. 27 00:00");
+    ok(test_jd_2446966, "test dbf_jd_to_tm with  1987 Jun. 19 12:00");
+    ok(test_jd_2447188, "test dbf_jd_to_tm with  1988 Jan. 27 00:00");
+    ok(test_jd_2447332, "test dbf_jd_to_tm with  1988 Jun. 19 12:00");
+    ok(test_jd_2415021, "test dbf_jd_to_tm with  1900 Jan.  1 12:00");
+    ok(test_jd_2305448, "test dbf_jd_to_tm with  1600 Jan.  1 12:00");
+    ok(test_jd_2305813, "test dbf_jd_to_tm with  1600 Dec. 31 12:00");
+    ok(test_jd_2026872, "test dbf_jd_to_tm with   837 Apr. 10 07:12");
+    ok(test_jd_1356001, "test dbf_jd_to_tm with -1000 July 12 12:00");
+    ok(test_jd_1355867, "test dbf_jd_to_tm with -1000 Feb. 29 00:00");
+    ok(test_jd_1355671, "test dbf_jd_to_tm with -1001 Aug. 17 21:36");
+    ok(test_jd_0, "test dbf_jd_to_tm with -4712 Jan.  1 12:00");
+    ok(test_yyyymmdd_15821015, "test dbf_yyyymmdd_to_tm");
+}
 
 /*
  * Header tests
@@ -50,7 +201,7 @@ size_t record_number = 0;
 static int
 test_database_version(void)
 {
-    return header->version == DBFV_VISUAL_FOXPRO;
+    return header->version == DBF_VERSION_VISUAL_FOXPRO;
 }
 
 static int
@@ -62,7 +213,7 @@ test_num_records(void)
 static int
 test_header_size(void)
 {
-    return header->header_size == 32 + header->num_fields * 32 + 1;
+    return header->header_size == 32 + (size_t) header->num_fields * 32 + 1;
 }
 
 static int
@@ -81,21 +232,21 @@ static int
 test_field_festival(void)
 {
     dbf_field_t *field = &header->fields[FESTIVAL];
-    return (field->type == DBFT_CHARACTER);
+    return (field->type == DBF_TYPE_CHARACTER);
 }
 
 static int
 test_field_from(void)
 {
     dbf_field_t *field = &header->fields[FROM];
-    return (field->type == DBFT_DATE);
+    return (field->type == DBF_TYPE_DATE);
 }
 
 static int
 test_field_to(void)
 {
     dbf_field_t *field = &header->fields[TO];
-    return (field->type == DBFT_DATETIME);
+    return (field->type == DBF_TYPE_DATETIME);
 }
 
 static int
@@ -109,7 +260,7 @@ static int
 test_field_latitude(void)
 {
     dbf_field_t *field = &header->fields[LATITUDE];
-    return (field->type == DBFT_FLOAT);
+    return (field->type == DBF_TYPE_FLOAT);
 }
 
 static int
@@ -123,35 +274,61 @@ static int
 test_field_bands(void)
 {
     dbf_field_t *field = &header->fields[BANDS];
-    return (field->type == DBFT_INTEGER);
+    return (field->type == DBF_TYPE_INTEGER);
 }
 
 static int
 test_field_admission(void)
 {
     dbf_field_t *field = &header->fields[ADMISSION];
-    return (field->type == DBFT_NUMBER && field->decimal_places == 0);
+    return (field->type == DBF_TYPE_NUMBER && field->decimal_places == 0);
 }
 
 static int
 test_field_beer_price(void)
 {
     dbf_field_t *field = &header->fields[BEER_PRICE];
-    return (field->type == DBFT_CURRENCY && field->decimal_places == 4);
+    return (field->type == DBF_TYPE_CURRENCY && field->decimal_places == 4);
 }
 
 static int
 test_field_food_price(void)
 {
     dbf_field_t *field = &header->fields[FOOD_PRICE];
-    return (field->type == DBFT_NUMBER);
+    return (field->type == DBF_TYPE_NUMBER);
 }
 
 static int
 test_field_sold_out(void)
 {
     dbf_field_t *field = &header->fields[SOLD_OUT];
-    return (field->type == DBFT_LOGICAL && field->length == 1);
+    return (field->type == DBF_TYPE_LOGICAL && field->length == 1);
+}
+
+static int
+handle_dbf_header(dbf_file_t *fh, const dbf_header_t *h)
+{
+    UNUSED(fh);
+    header = h;
+    record_number = 0;
+    ok(test_database_version, "database version matches");
+    ok(test_num_records, "number of records is greater than zero");
+    ok(test_header_size, "header_size matches");
+    ok(test_record_size, "record size is greater than zero");
+    ok(test_num_fields, "number of fields matches");
+    ok(test_field_festival, "festival field is character field");
+    ok(test_field_from, "from field is date field");
+    ok(test_field_to, "to field is date and time field");
+    ok(test_field_location, "field name matches");
+    ok(test_field_latitude, "latitude is float field");
+    ok(test_field_longitude, "longitude is double field");
+    ok(test_field_bands, "bands is integer field");
+    ok(test_field_admission, "admission is number field");
+    ok(test_field_beer_price, "beer price field is currency field");
+    ok(test_field_food_price, "food price is number field");
+    ok(test_field_sold_out, "sold out is logical field");
+    header = NULL;
+    return 1;
 }
 
 /*
@@ -404,38 +581,12 @@ test_sold_out_is_null(void)
     return dbf_record_is_null(record, field);
 }
 
-/*
- * Record tests
- */
-
-static int
-handle_dbf_header(dbf_file_t *fh, const dbf_header_t *h)
-{
-    header = h;
-    ok(test_database_version, "database version matches");
-    ok(test_num_records, "number of records is greater than zero");
-    ok(test_header_size, "header_size matches");
-    ok(test_record_size, "record size is greater than zero");
-    ok(test_num_fields, "number of fields matches");
-    ok(test_field_festival, "festival field is character field");
-    ok(test_field_from, "from field is date field");
-    ok(test_field_to, "to field is date and time field");
-    ok(test_field_location, "field name matches");
-    ok(test_field_latitude, "latitude is float field");
-    ok(test_field_longitude, "longitude is double field");
-    ok(test_field_bands, "bands is integer field");
-    ok(test_field_admission, "admission is number field");
-    ok(test_field_beer_price, "beer price field is currency field");
-    ok(test_field_food_price, "food price is number field");
-    ok(test_field_sold_out, "sold out is logical field");
-    header = NULL;
-    return 1;
-}
-
 static int
 handle_dbf_record(dbf_file_t *fh, const dbf_header_t *h,
-                  const dbf_record_t *r, size_t file_offset)
+                  const dbf_record_t *r, size_t offset)
 {
+    UNUSED(fh);
+    UNUSED(offset);
     header = h;
     record = r;
     switch (record_number) {
@@ -475,40 +626,33 @@ handle_dbf_record(dbf_file_t *fh, const dbf_header_t *h,
 }
 
 int
-main(int argc, char *argv[])
+main(void)
 {
-    const char *datadir = getenv("datadir");
     const char *filename = "types.dbf";
-    FILE *fp;
+    FILE *stream;
+    dbf_file_t fh;
 
-    plan(42);
+    plan(56);
 
-    if (datadir == NULL) {
-        fprintf(stderr,
-                "# The environment variable \"datadir\" is not set\n");
-        return 1;
-    }
+    test_dates();
 
-    if (chdir(datadir) == -1) {
-        fprintf(stderr, "# Cannot change directory to \"%s\": %s\n", datadir,
-                strerror(errno));
-        return 1;
-    }
-
-    fp = fopen(filename, "rb");
-    if (fp == NULL) {
+    stream = fopen(filename, "rb");
+    if (stream == NULL) {
         fprintf(stderr, "# Cannot open file \"%s\": %s\n", filename,
                 strerror(errno));
         return 1;
     }
 
-    dbf_file(&fh, fp, NULL);
+    dbf_init_file(&fh, stream, NULL);
+
+    dbf_set_error(&fh, "%s", "");
+
     if (dbf_read(&fh, handle_dbf_header, handle_dbf_record) == -1) {
         fprintf(stderr, "# Cannot read file \"%s\": %s\n", filename,
                 fh.error);
     }
 
-    fclose(fp);
+    fclose(stream);
 
     done_testing();
 }

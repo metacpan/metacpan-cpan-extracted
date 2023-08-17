@@ -10,8 +10,8 @@ my %data;
 
 while (my $next = each_pair %data) {
     my ($key, $value) = $next->kv;
-    ok $key     ~~ %data        => 'key method correct';
-    ok $value   eq $data{$key}  => 'value method correct';
+    ok exists $data{ $key }    => 'key method correct';
+    ok $value   eq $data{$key} => 'value method correct';
     delete $data{$key};
 }
 

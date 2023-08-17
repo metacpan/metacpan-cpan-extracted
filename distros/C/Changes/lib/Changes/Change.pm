@@ -48,12 +48,10 @@ sub init
 sub as_string
 {
     my $self = shift( @_ );
-    $self->message( 5, "Is reset set ? ", ( exists( $self->{_reset} ) ? 'yes' : 'no' ), " and what is cache value '", ( $self->{_cache_value} // '' ), "' and raw cache '", ( $self->{raw} // '' ), "'" );
     if( !exists( $self->{_reset} ) || 
         !defined( $self->{_reset} ) ||
         !CORE::length( $self->{_reset} ) )
     {
-        $self->message( 5, "Reset is disabled, checking for cache value '", ( $self->{_cache_value} // '' ), "' and raw cache '", ( $self->{raw} // '' ), "'" );
         if( exists( $self->{_cache_value} ) &&
             defined( $self->{_cache_value} ) &&
             length( $self->{_cache_value} ) )
@@ -62,15 +60,12 @@ sub as_string
         }
         elsif( defined( $self->{raw} ) && length( "$self->{raw}" ) )
         {
-            $self->message( 5, "Re-using the raw cache." );
             return( $self->{raw} );
         }
     }
     my $nl = $self->nl;
     my $str = $self->new_scalar( ( $self->spacer1 // '' ) . ( $self->marker // '-' ) . ( $self->spacer2 // '' ) );
-    $self->message( 4, "Prefix is '$str'" );
     my $max = $self->max_width;
-    $self->message( 4, "Max width is '$max' and change text + prefix is '", ( $self->normalise->length + $str->length ), "' characters long." );
     if( $max > 0 && ( $self->normalise->length + $str->length ) > $max )
     {
         my $text;
@@ -116,7 +111,6 @@ sub as_string
         $str->append( $self->normalise );
     }
     $str->append( $nl );
-    $self->message( 4, "Setting change string to '$str'" );
     $self->{_cache_value} = $str;
     CORE::delete( $self->{_reset} );
     return( $str );
@@ -125,7 +119,6 @@ sub as_string
 sub freeze
 {
     my $self = shift( @_ );
-    $self->message( 5, "Removing the reset marker -> '", ( $self->{_reset} // '' ), "'" );
     CORE::delete( @$self{qw( _reset _reset_normalise )} );
     return( $self );
 }

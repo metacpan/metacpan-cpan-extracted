@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.10;
+package Commandable::Finder::SubAttributes::Attrs 0.11;
 
 use v5.14;
 use warnings;

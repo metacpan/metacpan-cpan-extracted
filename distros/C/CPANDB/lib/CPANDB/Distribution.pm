@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use DateTime 0.50 ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 my $today = DateTime->today( time_zone => 'UTC' );
 

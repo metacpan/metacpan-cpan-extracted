@@ -3,11 +3,11 @@ package Net::Curl::Multi::EV;
 use strict;
 use warnings;
 use EV;
-use Net::Curl::Easy qw(CURLE_COULDNT_CONNECT);
+use Net::Curl::Easy qw(CURLE_OPERATION_TIMEDOUT);
 use Net::Curl::Multi qw(CURLMSG_DONE CURL_SOCKET_TIMEOUT /^CURL_POLL_/ /^CURL_CSELECT_/ CURLMOPT_SOCKETFUNCTION CURLMOPT_TIMERFUNCTION);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 BEGIN {
 	Net::Curl::Multi->can('CURLMOPT_TIMERFUNCTION') or
@@ -71,7 +71,7 @@ sub curl_ev {
 			$timer{$easy} = EV::timer $timeout, 0, sub {
 				delete $timer{$easy};
 				$multi->remove_handle($easy);
-				$finish{$easy}->($easy, bless( do{\(my $o = CURLE_COULDNT_CONNECT)}, 'Net::Curl::Easy::Code' ));
+				$finish{$easy}->($easy, bless( do{\(my $o = CURLE_OPERATION_TIMEDOUT)}, 'Net::Curl::Easy::Code' ));
 				delete $finish{$easy};
 			};
 		}
@@ -160,25 +160,25 @@ Net::Curl::Multi::EV - Using Net::Curl::Multi with EV.
  use Net::Curl::Multi;
  use Net::Curl::Easy qw(/^CURLOPT_/);
  use Net::Curl::Multi::EV;
- 
+
  my $multi   = Net::Curl::Multi->new();
  my $curl_ev = Net::Curl::Multi::EV::curl_ev($multi);
 
  my $easy = Net::Curl::Easy->new();
- 
+
  $easy->setopt(CURLOPT_URL, $url);
  # ...
- 
+
  my $finish = sub {
  	my ($easy, $result) = @_;
  	# ... $resul is Net::Curl::Easy::Code
 	# ...
  	EV::break();
  };
- 
+
  my $timeout =  4 * 60
  $curl_ev->($easy, $finish, $timeout);
- 
+
  EV::run();
 
 =head1 DESCRIPTION

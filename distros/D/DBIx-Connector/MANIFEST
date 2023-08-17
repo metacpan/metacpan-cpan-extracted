@@ -1,15 +1,15 @@
 Changes
+Makefile.PL
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/DBIx/Connector.pm
 lib/DBIx/Connector/Driver.pm
 lib/DBIx/Connector/Driver/Firebird.pm
 lib/DBIx/Connector/Driver/MSSQL.pm
-lib/DBIx/Connector/Driver/mysql.pm
 lib/DBIx/Connector/Driver/Oracle.pm
 lib/DBIx/Connector/Driver/Pg.pm
 lib/DBIx/Connector/Driver/SQLite.pm
-Makefile.PL
-MANIFEST
+lib/DBIx/Connector/Driver/mysql.pm
 t/base.t
 t/driver.t
 t/lib/Hook/Guard.pm
@@ -27,6 +27,7 @@ t/txn_ping.t
 xt/pod-coverage.t
 xt/pod-spelling.t
 xt/pod.t
+MANIFEST
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 LICENSE

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::sufdmod1;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUFDMOD1 - Finite difference modelling (1-D first order) for the	
+ PERL PROGRAM NAME:  SUFDMOD1 - Finite difference modelling (1-D first order) for the	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

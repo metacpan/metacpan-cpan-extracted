@@ -17,7 +17,7 @@ package Apache::Reload;
 
 use strict;
 
-$Apache::Reload::VERSION = '0.13';
+$Apache::Reload::VERSION = '0.14';
 
 use vars qw(%INCS %Stat $TouchTime %UndefFields %Ignore);
 

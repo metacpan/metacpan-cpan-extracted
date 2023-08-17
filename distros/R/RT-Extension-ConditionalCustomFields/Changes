@@ -1,5 +1,12 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.09 2023-06-01
+ - Add patch for RT 5.0.4
+ - Update copyright year to 2023
+
+1.08 2022-12-14
+ - Update copyright date
+
 1.07 2022-12-14
  - Update author's name
 

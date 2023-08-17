@@ -1,0 +1,22 @@
+.perlcriticrc
+.perltidyrc
+.tidyallrc
+bin/ethereum-raw-tx
+Changes
+cpanfile
+lib/Blockchain/Ethereum/Transaction.pm
+lib/Blockchain/Ethereum/Transaction/EIP1559.pm
+lib/Blockchain/Ethereum/Transaction/Legacy.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/eip1559.t
+t/legacy.t
+xt/manifest.t
+xt/perl-critic.t
+xt/perl-pod.t
+xt/perl-tidy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,24 +3,25 @@ abstract: 'Search for shared libraries'
 author:
   - 'Philip Gwyn <fil@localdomain>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Sys-GNU-ldconfig
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 1.26
-  File::Glob: 1.05
-  File::Slurp: 9999.13
-  File::Spec: 3.33
-  Test::More: 0.98
-version: 0.02
+  Carp: '1.26'
+  File::Glob: '1.05'
+  File::Slurp: '9999.13'
+  File::Spec: '3.33'
+  Test::More: '0.98'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

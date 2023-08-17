@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use Authen::SASL qw(Perl);
 
@@ -24,4 +24,6 @@ is($conn->client_start, 'gbarr', 'client_start');
 
 is($conn->client_step("xyz"),  undef, 'client_step');
 
-
+$sasl = Authen::SASL->new(mechanism => 'EXTERNAL');
+$conn = $sasl->client_new("ldap","localhost", "noplaintext");
+is ($conn->client_start, '', 'no user callback');

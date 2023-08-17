@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Connection;
+package Net::Async::HTTP::Connection 0.49;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.48';
 
 use Carp;
 
@@ -89,7 +87,8 @@ sub connect
    my $self = shift;
    my %args = @_;
 
-   $self->debug_printf( "CONNECT $args{host}:$args{service}" );
+   my $key = defined $args{path} ? $args{path} : "$args{host}:$args{service}";
+   $self->debug_printf( "CONNECT $key" );
 
    defined wantarray or die "VOID ->connect";
 

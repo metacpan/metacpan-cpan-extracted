@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Dist-Zilla-PluginBundle-Author-JMASLAK
 provides:
   Dist::Zilla::PluginBundle::Author::JMASLAK:
     file: lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm
-    version: '1.210880'
+    version: '1.231931'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::AutoPrereqs: '0'
@@ -57,7 +57,6 @@ requires:
   Dist::Zilla::Plugin::Test::NoTabs: '0'
   Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
   Dist::Zilla::Plugin::Test::TrailingSpace: '0'
-  Dist::Zilla::Plugin::Test::UnusedVars: '0'
   Dist::Zilla::Plugin::Test::UseAllModules: '0'
   Dist::Zilla::Plugin::Test::Version: '0'
   Dist::Zilla::Plugin::TestRelease: '0'
@@ -71,9 +70,9 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK/issues
   repository: git://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK.git
-version: '1.210880'
+version: '1.231931'
 x_contributor_covenant:
   version: 0.02
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

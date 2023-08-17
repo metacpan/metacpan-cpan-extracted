@@ -48,6 +48,13 @@ with B<--discrete> option.
 
 Invoke new command individually for every matched part.
 
+=item B<--fillup>
+
+Combine a sequence of non-blank lines into a single line before
+passing them to the filter command.  Newline characters between wide
+characters are deleted, and other newline characters are replaced with
+spaces.
+
 =back
 
 =head1 WHY DO NOT USE TEIP
@@ -73,12 +80,7 @@ included in Perl module file.
 You can translate them by DeepL service by executing the above command
 convined with B<-Mtee> module which calls B<deepl> command like this:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Because B<deepl> works better for single line input, you can change
-command part as this:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 The dedicated module L<App::Greple::xlate::deepl> is more effective
 for this purpose, though.  In fact, the implementation hint of B<tee>
@@ -111,7 +113,34 @@ command:
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Using C<--discrete> option is time consuming.  So you can use
+C<--separate '\r'> option with C<ansifold> which produce single line
+using CR character instead of NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Then convert CR char to NL after by L<tr(1)> command or some.
+
+    ... | tr '\r' '\n'
+
+=head1 EXAMPLE 3
+
+Consider a situation where you want to grep for strings from
+non-header lines. For example, you may want to search for images from
+the C<docker image ls> command, but leave the header line.  You can do
+it by following command.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Option C<-Mline -L 2:> retrieves the second to last lines and sends
+them to the C<grep perl> command. Option C<--discrete> is required,
+but this is called only once, so there is no performance drawback.
+
+In this case, C<teip -l 2- -- grep> produces error because the number
+of lines in the output is less than input. However, result is quite
+satisfactory :)
+
 =head1 INSTALL
 
 =head2 CPANMINUS
@@ -130,6 +159,10 @@ L<https://github.com/tecolicom/Greple>
 
 L<App::Greple::xlate>
 
+=head1 BUGS
+
+The C<--fillup> option may not work correctly for Korean text.
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -145,7 +178,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.05";
+our $VERSION = "0.99";
 
 use v5.14;
 use warnings;
@@ -158,8 +191,8 @@ use Data::Dumper;
 our $command;
 our $blockmatch;
 our $discrete;
+our $fillup;
 
-my @jammed;
 my($mod, $argv);
 
 sub initialize {
@@ -179,12 +212,28 @@ sub call {
     if (ref $command ne 'ARRAY') {
 	$command = [ shellwords $command ];
     }
-    $exec->command($command)->setstdin($data)->update->data;
+    $exec->command($command)->setstdin($data)->update->data // '';
+}
+
+use Unicode::EastAsianWidth;
+
+sub fillup_paragraph {
+    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
+    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+    s/\s+/ /g;
+    $s1 . $_ . $s2;
 }
 
 sub jammed_call {
     my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
     my @from = @_;
+    if ($fillup) {
+	for (@from) {
+	    s{^.+(?:\n.+)*}{
+		fillup_paragraph ${^MATCH}
+	    }pmge;
+	}
+    }
     $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
     my $from = join '', @from;
@@ -198,18 +247,20 @@ sub jammed_call {
     return @to;
 }
 
+my @jammed;
+
 sub postgrep {
     my $grep = shift;
-    @jammed = my @block = ();
     if ($blockmatch) {
 	$grep->{RESULT} = [
 	    [ [ 0, length ],
 	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback} ]
+		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
 	      } $grep->result
 	    ] ];
     }
     return if $discrete;
+    @jammed = my @block = ();
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	for my $m (@match) {
@@ -234,6 +285,7 @@ __DATA__
 
 builtin --blockmatch $blockmatch
 builtin --discrete!  $discrete
+builtin --fillup!    $fillup
 
 option default \
 	--postgrep &__PACKAGE__::postgrep \

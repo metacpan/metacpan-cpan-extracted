@@ -242,19 +242,22 @@ my $alias_help_menubutton_label_h = {
 # not necessarily informed by DATA_DIR_IN and DATA_DIR_OUT
 $file_dialog_type[0] = 'Data_PL_SEISMIC',
 
-  # in spec files, for when Data is informed
-  # by DATA_DIR_IN and DATA_DIR_OUT
-  $file_dialog_type[1] = 'Data';
+# in spec files, for when Data is informed
+# by DATA_DIR_IN and DATA_DIR_OUT
+$file_dialog_type[1] = 'Data';
 $file_dialog_type[2] = 'Path';
 $file_dialog_type[3] = 'Open';
 $file_dialog_type[4] = 'SaveAs';
 $file_dialog_type[5] = 'last_dir_in_path';
 $file_dialog_type[5] = 'Delete';
+$file_dialog_type[6] = 'Data_SEISMIC_TXT';
 
 my $file_dialog_type_h = {
 	_Data_PL_SEISMIC  => 'Data_PL_SEISMIC',
+	_Data_SEISMIC_TXT => 'Data_SEISMIC_TXT',
 	_Data             => 'Data',
 	_Delete           => 'Delete',
+	_Home             => 'Home',
 	_Path             => 'Path',
 	_last_dir_in_path => 'last_dir_in_path',
 	_Flow             => 'Flow',
@@ -317,6 +320,7 @@ my $var = {
 	_five_pixels            => '5',
 	_five_pixel_borderwidth => 5,
 	_five_lines             => '5',
+	_forward_slash          => "/",
 	_1_line                 => '1',
 	_2_lines                => '2',
 	_3_lines                => '3',
@@ -344,7 +348,7 @@ my $var = {
 	_main_window_geometry          => '1100x750+12+5',
 	_medium_width                  => '100',
 	_message_box_geometry          => '400x250+400+400',
-	_min_clicks4save_button        => 19,     # fixing leaky param_widget memory
+	_min_clicks4save_button        => 45,     # B4:19; fixing leaky param_widget memory
 	_min_clicks4flow_select        => 8,      # fixing leaky param_widget memory
 	_ms2s                          => 0.001,
 	_my_arial                      => "-*-arial-normal-r-*-*-*-120-*-*-*-*-*-*",
@@ -371,7 +375,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.82.9',
+	_program_title                 => 'SeismicUnixGui V0.85.5',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',
@@ -741,6 +745,7 @@ sub get_developer_sunix_category_h {
 		_sugabor     => $developer_sunix_categories[14],
 		_suicepstrum => $developer_sunix_categories[14],
 		_suifft      => $developer_sunix_categories[14],
+		_suminphase  => $developer_sunix_categories[14],		
 		_suphasevel  => $developer_sunix_categories[14],
 		_suspecfk    => $developer_sunix_categories[14],
 		_suspecfx    => $developer_sunix_categories[14],
@@ -870,10 +875,11 @@ my @sunix_statsMath_programs = (
 );
 
 my @sunix_transform_programs = (
-	"dctcomp",     "suamp",  "succepstrum", "sucepstrum",
-	"sucwt",       "succwt", "sufft",       "sugabor",
-	"suicepstrum", "suifft", "suphasevel",  "suspecfk",
-	"suspecfx",    "sutaup",
+	"dctcomp", "suamp", "succepstrum", "sucepstrum",
+	"sucwt", "succwt", "sufft", "sugabor",
+	"suicepstrum", "suifft", "suphasevel", "suspecfk",
+	"suminphase",
+	"suspecfx", "sutaup",
 );
 
 my @sunix_well_programs =
@@ -1018,7 +1024,6 @@ sub alias_FileDialog_button_label_aref {    # array ref
 }
 
 sub alias_help_menubutton_label_aref {
-	
 #	my ($self,$variable) = @_; # array ref
 	my $result = \@alias_help_menubutton_label;
 	return ( $result );
@@ -2157,7 +2162,6 @@ sub superflow_names_aref {
 }
 
 sub superflow_names_gui_aref {
-	
 	my (@self) = @_;
 	return ( \@superflow_names_gui );
 

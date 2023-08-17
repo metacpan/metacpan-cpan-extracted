@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+# Print the historic weather in a place, e.g "weather 2022-06-03 Buxton, NC, USA"
+
+use strict;
+use warnings;
+use File::Basename;
+use Geo::Coder::Free;
+use Geo::Coder::Free::Local;
+use Geo::Coder::Free::OpenAddresses;
+use LWP::UserAgent::Cached;
+use Weather::Meteo;
+# use Data::Dumper;
+
+binmode(STDOUT, ':utf8');
+
+if(scalar(@ARGV) <= 1) {
+	die "Usage: $0 YYYY-MM-DD location";
+}
+
+my $date = shift @ARGV;
+my $location = join(' ', @ARGV);
+my $coordinates = Geo::Coder::Free::Local->new()->geocode($location) //
+	Geo::Coder::Free->new()->geocode($location);
+
+if((!defined($coordinates)) && $ENV{'OPENADDR_HOME'}) {
+	$coordinates = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => $location);
+}
+
+if(!defined($coordinates)) {
+	die "$0: unknown location '$location'";
+}
+
+my $cachedir = $ENV{'CACHEDIR'};
+if($cachedir) {
+	mkdir $cachedir, 0700 if(!-d $cachedir);
+	$cachedir = File::Spec->catfile($cachedir, 'lwp-cache');
+} else {
+	# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'lwp');
+	$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'lwp-cache')
+}
+if(!-d $cachedir) {
+	mkdir $cachedir, 0700 || die "$cachedir: $!";
+}
+my $cached_browser = LWP::UserAgent::Cached->new(cache_dir => $cachedir,
+	agent => basename($0),
+	keep_alive => 1,
+	timeout => 30,
+);
+$cached_browser->env_proxy(1);
+$cached_browser->conn_cache->total_capacity(undef);
+
+my $weather = Weather::Meteo->new(ua => $cached_browser)->weather($coordinates, $date);
+
+# my $temperature = $weather->{'daily'}->{'temperature_2m_max'}[0];
+# my $wmo = $weather->{'daily'}->{'weathercode'}[0];
+
+# use Data::Dumper;
+# print Data::Dumper->new([\$weather])->Dump();
+
+print 'Maximum temperature: ', $weather->{'daily'}->{'temperature_2m_max'}[0], $weather->{'daily_units'}->{'temperature_2m_max'}, "\n";
+print 'Maximum wind speed ', $weather->{'daily'}->{'windspeed_10m_max'}[0], $weather->{'daily_units'}->{'windspeed_10m_max'}, "\n";
+print 'Maximum wind gust speed ', $weather->{'daily'}->{'windgusts_10m_max'}[0], $weather->{'daily_units'}->{'windgusts_10m_max'}, "\n";

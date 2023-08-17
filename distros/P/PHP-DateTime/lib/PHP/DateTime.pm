@@ -1,6 +1,10 @@
 package PHP::DateTime;
+use 5.008001;
+use strict;
+use warnings;
+our $VERSION = '0.09';
 
-$PHP::DateTime::VERSION = '0.07';
+=encoding utf8
 
 =head1 NAME
 
@@ -33,15 +37,10 @@ Neat, eh?
 
 =cut
 
-use strict;
-use warnings;
-
 use Time::DaysInMonth qw();
 use Time::Timezone qw();
 use Time::HiRes qw();
 use Time::Local qw();
-
-our $VERSION = '0.07';
 
 my $days_short   = [qw( Sun Mon Tue Wed Thr Fri Sat )];
 my $days_long    = [qw( Sunday Monday Tuesday Wednesday Thursday Friday Saturday )];
@@ -194,10 +193,11 @@ L<http://php.net/manual/en/ref.datetime.php>
 
 =head1 AUTHOR
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
+=cut

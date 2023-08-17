@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::filter::suk1k2filter;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

@@ -66,8 +66,10 @@ method: okay
 method: opt
 method: parsed
 method: parser
+method: pass
 method: set
 method: str
+method: test
 
 =cut
 
@@ -89,7 +91,7 @@ $test->for('includes');
 
   # [1]
 
-  # $cli->data;
+  # $cli->parsed;
 
   # {help => 1}
 
@@ -340,37 +342,6 @@ $test->for('example', 6, 'arg', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is $result, "example";
-
-  $result
-});
-
-=example-7 arg
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['--help']);
-
-  $cli->set('arg', 'name', {
-    type => 'string',
-    range => '0',
-  });
-
-  my ($name) = $cli->arg('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
-
-  # Invalid argument: name: received (undef), expected (string)
-
-=cut
-
-$test->for('example', 7, 'arg', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Cli::Error';
-  ok $result->is('on.arg.validation');
-  like $result->message, qr/Invalid argument: name/;
 
   $result
 });
@@ -1524,37 +1495,6 @@ $test->for('example', 6, 'opt', sub {
   (@result)
 });
 
-=example-7 opt
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['example', '--name', 'example']);
-
-  $cli->set('opt', 'name', {
-    type => 'number',
-    multi => 1,
-  });
-
-  my ($name) = $cli->opt('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
-
-  # Invalid option: name: received (undef), expected (number)
-
-=cut
-
-$test->for('example', 7, 'opt', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Cli::Error';
-  ok $result->is('on.opt.validation');
-  like $result->message, qr/Invalid option: name/;
-
-  $result
-});
-
 =method parsed
 
 The parsed method returns the values provided to the CLI for all registered
@@ -1645,6 +1585,63 @@ $test->for('example', 1, 'parser', sub {
   is_deeply $result->specs, ['help|h'];
 
   $result
+});
+
+=method pass
+
+The pass method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+=signature pass
+
+  pass(Str|CodeRef $code, Any @args) (Any)
+
+=metadata pass
+
+{
+  since => '3.10',
+}
+
+=example-1 pass
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'pass', sub {
+  local $CLI_EXIT_RETVAL = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
+
+  !$result
+});
+
+=example-2 pass
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass('stash', 'executed', 1);
+
+  # ()
+
+=cut
+
+$test->for('example', 2, 'pass', sub {
+  local $CLI_EXIT_RETVAL = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
+
+  !$result
 });
 
 =method set
@@ -2034,6 +2031,139 @@ $test->for('example', 1, 'str', sub {
   $result
 });
 
+=method test
+
+The test method validates the values for the C<arg> or C<opt> specified and
+returns the value(s) associated. If validation failed an exception is thrown.
+
+=signature test
+
+  test(Str $type, Str $name) (Any)
+
+=metadata test
+
+{
+  since => '3.10',
+}
+
+=cut
+
+=example-1 test
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # "help"
+
+=cut
+
+$test->for('example', 1, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "help";
+
+  $result
+});
+
+=example-2 test
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
+
+  # Invalid argument: name: received (undef), expected (string)
+
+=cut
+
+$test->for('example', 2, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.arg.validation');
+  like $result->render, qr/Invalid argument: name/;
+
+  $result
+});
+
+=example-3 test
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'string',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # "example"
+
+=cut
+
+$test->for('example', 3, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "example";
+
+  $result
+});
+
+=example-4 test
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'number',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
+
+  # Invalid option: name: received (undef), expected (number)
+
+=cut
+
+$test->for('example', 4, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.opt.validation');
+  like $result->render, qr/Invalid option: name/;
+
+  $result
+});
+
 =error error_on_arg_validation
 
 This package may raise an error_on_arg_validation exception.
@@ -2046,15 +2176,20 @@ $test->for('error', 'error_on_arg_validation');
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_arg_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_arg_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid argument: example: ..."
 
@@ -2074,7 +2209,7 @@ $test->for('example', 1, 'error_on_arg_validation', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_arg_validation";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Invalid argument: example: ...";
   $name = $result->stash('name');
   is $name, "example";
@@ -2096,15 +2231,20 @@ $test->for('error', 'error_on_opt_validation');
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_opt_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_opt_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid option: example: ..."
 
@@ -2124,7 +2264,7 @@ $test->for('example', 1, 'error_on_opt_validation', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_opt_validation";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Invalid option: example: ...";
   $name = $result->stash('name');
   is $name, "example";
@@ -2145,6 +2285,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Cli.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Cli.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

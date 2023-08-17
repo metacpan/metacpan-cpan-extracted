@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -10,41 +10,42 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Date::Holidays::* adapter and aggregator for all your holiday needs",
   "AUTHOR" => "Jonas B. <jonasbn\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Module::Build" => "0.30"
+    "Module::Build" => "0.4234"
   },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.30"
+    "Module::Build" => "0.4234"
   },
   "DISTNAME" => "Date-Holidays",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Date::Holidays",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "DateTime" => 0,
-    "Env" => 0,
-    "File::Slurp" => 0,
-    "JSON" => 0,
-    "Locale::Country" => 0,
-    "Module::Load" => 0,
-    "Scalar::Util" => 0,
-    "Try::Tiny" => 0
+    "Carp" => "1.5",
+    "DateTime" => "1.59",
+    "Env" => "1.04",
+    "File::Slurp" => "9999.32",
+    "JSON" => "4.1",
+    "Locale::Country" => "3.74",
+    "Module::Load" => "0.36",
+    "Scalar::Util" => "1.63",
+    "Try::Tiny" => "0.31"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "FindBin" => 0,
+    "FindBin" => "1.53",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::Class" => 0,
-    "Test::Fatal" => 0,
-    "Test::Kwalitee" => "1.21",
+    "Pod::Coverage::TrustPod" => "0.100006",
+    "Test::Class" => "0.52",
+    "Test::Fatal" => "0.017",
+    "Test::Kwalitee" => "1.28",
     "Test::MockModule" => "0.13",
-    "Test::More" => 0,
-    "Test::Pod" => 0,
-    "Test::Pod::Coverage" => 0
+    "Test::More" => "1.302195",
+    "Test::Pod" => "1.52",
+    "Test::Pod::Coverage" => "1.1"
   },
-  "VERSION" => "1.34",
+  "VERSION" => "1.35",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,28 +53,28 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "DateTime" => 0,
-  "Env" => 0,
-  "File::Slurp" => 0,
+  "Carp" => "1.5",
+  "DateTime" => "1.59",
+  "Env" => "1.04",
+  "File::Slurp" => "9999.32",
   "File::Spec" => 0,
-  "FindBin" => 0,
+  "FindBin" => "1.53",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "JSON" => 0,
-  "Locale::Country" => 0,
-  "Module::Build" => "0.30",
-  "Module::Load" => 0,
-  "Pod::Coverage::TrustPod" => 0,
-  "Scalar::Util" => 0,
-  "Test::Class" => 0,
-  "Test::Fatal" => 0,
-  "Test::Kwalitee" => "1.21",
+  "JSON" => "4.1",
+  "Locale::Country" => "3.74",
+  "Module::Build" => "0.4234",
+  "Module::Load" => "0.36",
+  "Pod::Coverage::TrustPod" => "0.100006",
+  "Scalar::Util" => "1.63",
+  "Test::Class" => "0.52",
+  "Test::Fatal" => "0.017",
+  "Test::Kwalitee" => "1.28",
   "Test::MockModule" => "0.13",
-  "Test::More" => 0,
-  "Test::Pod" => 0,
-  "Test::Pod::Coverage" => 0,
-  "Try::Tiny" => 0
+  "Test::More" => "1.302195",
+  "Test::Pod" => "1.52",
+  "Test::Pod::Coverage" => "1.1",
+  "Try::Tiny" => "0.31"
 );
 
 

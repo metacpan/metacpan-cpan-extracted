@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::suxcor;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUXCOR - correlation with user-supplied filter			
+ PERL PROGRAM NAME:  SUXCOR - correlation with user-supplied filter			
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:
@@ -70,7 +70,8 @@ package App::SeismicUnixGui::sunix::statsMath::suxcor;
  suwind itmin=nsweep itmax=nsweep+nsout | sushw key=delrt a=0.0 |...   
 
  sweep=vibroseis sweep in SU format, nsweep=number of samples on	
- the vibroseis sweep, nsout=desired number of samples on output	
+ the vibroseis sweep, nsout eqis equal to the
+ desired number of samples on output	
 
  or									
  suxcor < data sufile=sweep |						
@@ -484,7 +485,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 12;
+    my $max_index = 7;
 
     return ($max_index);
 }

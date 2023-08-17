@@ -16,7 +16,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,12 +31,12 @@ requires:
   Getopt::Long: '0'
   JSON: '0'
   Pod::Usage: '0'
-  perl: '5.008005'
+  perl: '5.012005'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.27'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

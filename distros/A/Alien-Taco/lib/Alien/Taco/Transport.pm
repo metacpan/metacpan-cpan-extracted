@@ -1,5 +1,5 @@
 # Taco Perl transport module.
-# Copyright (C) 2013-2014 Graham Bell
+# Copyright (C) 2013-2023 Graham Bell
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ use JSON;
 
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 METHODS
 
@@ -50,10 +50,14 @@ sub new {
 
     my $json = new JSON();
     $json->convert_blessed(1);
+    $json->ascii(1);
 
     if (exists $opts{'filter_single'}) {
         $json->filter_json_single_key_object(@{$opts{'filter_single'}});
     }
+
+    binmode $opts{'in'}, ':encoding(UTF-8)';
+    binmode $opts{'out'}, ':encoding(UTF-8)';
 
     my $self = {
         in => $opts{'in'},

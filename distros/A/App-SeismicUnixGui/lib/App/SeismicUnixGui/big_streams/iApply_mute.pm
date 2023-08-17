@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iApply_mute;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iApply_mute
+ PERL PROGRAM NAME: iApply_mute
  AUTHOR: Juan Lorenzo
 
  DESCRIPTION:

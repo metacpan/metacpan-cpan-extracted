@@ -43,8 +43,11 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'English' => '0',
                                    'ExtUtils::MakeMaker' => '0',
+                                   'Feature::Compat::Class' => '0.006',
                                    'File::Spec' => '0',
+                                   'Scalar::Util' => '0',
                                    'Test2::V0' => '0.000111',
                                    'Test::More' => '0',
                                    'Test::UseAllModules' => '0.17'

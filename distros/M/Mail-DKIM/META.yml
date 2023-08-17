@@ -24,6 +24,7 @@ name: Mail-DKIM
 requires:
   Carp: '0'
   Crypt::OpenSSL::RSA: '0'
+  Crypt::PK::Ed25519: '0'
   Digest::SHA: '0'
   MIME::Base64: '0'
   Mail::Address: '0'
@@ -36,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/fastmail/mail-dkim/issues
   repository: git://github.com/fastmail/mail-dkim.git
-version: '1.20230212'
+version: '1.20230630'
 x_contributors:
   - 'Aaron Thompson <dev@aaront.org>'
   - 'Bron Gondwana <brong@fastmail.fm>'
@@ -47,6 +48,7 @@ x_contributors:
   - 'Marc Bradshaw <marc@fastmailteam.com>'
   - 'Martijn van de Streek <martijn@vandestreek.net>'
   - 'Martin H. Sluka <martin@sluka.de>'
+  - 'Matthäus Wander <mail@wander.science>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

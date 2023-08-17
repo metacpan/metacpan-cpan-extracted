@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use C::Tokenize '0.18', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';

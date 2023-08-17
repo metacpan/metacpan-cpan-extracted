@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 45 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
@@ -34,7 +34,11 @@ my @module_files = (
     'Data/Sah/Filter/perl/Float/floor.pm',
     'Data/Sah/Filter/perl/Float/round.pm',
     'Data/Sah/Filter/perl/Str/check.pm',
+    'Data/Sah/Filter/perl/Str/check_lowercase.pm',
+    'Data/Sah/Filter/perl/Str/check_oneline.pm',
+    'Data/Sah/Filter/perl/Str/check_uppercase.pm',
     'Data/Sah/Filter/perl/Str/downcase.pm',
+    'Data/Sah/Filter/perl/Str/ensure_trailing_newline.pm',
     'Data/Sah/Filter/perl/Str/lc.pm',
     'Data/Sah/Filter/perl/Str/lcfirst.pm',
     'Data/Sah/Filter/perl/Str/lowercase.pm',

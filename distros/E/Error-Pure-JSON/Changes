@@ -1,3 +1,14 @@
+0.08 2023-06-27T10:41:50+02:00
+ [Common]
+ - Fix Makefile.PL which fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bug tracker to GitHub.
+ - Rewrite from IO::CaptureOutput to Capture::Tiny.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.07 2015-09-27T10:12:02+02:00
  [Common]
  - Improve SEE ALSO section in doc.

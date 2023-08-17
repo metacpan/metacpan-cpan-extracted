@@ -15,23 +15,29 @@ my $escape = {
     "\\" => "\\\\",
 };
 
+sub pr_invalid {
+    my ($self, $o) = @_;
+    Dump($o, "Don't know how to print perl (non Lingy::* object) value '$o'");
+}
+
 sub pr_str {
-    my ($o, $raw) = (@_, 0);
+    my ($self, $o, $raw) = (@_, 0);
+    $o //= '';
     my $type = ref $o;
 
     # Hack to allow map key strings to print like symbols:
-    if (not $type and $o =~ /$symbol_re$/) {
-        $type = 'Lingy::Lang::KeySymbol';
+    if (not $type and $o =~ /^($symbol_re|$namespace_re)$/) {
+        $type = 'Lingy::KeySymbol';
     }
 
-    $type or XXX $o, "Don't know how to print internal value '$o'";
+    $type or return warn $self->pr_invalid($o);
 
-    $type eq ATOM ? "(atom ${\pr_str($o->[0], $raw)})" :
+    $type eq ATOM ? "(atom ${\ $self->pr_str($o->[0], $raw)})" :
     $type eq STRING ? $raw ? $$o :
         qq{"${local $_ = $$o; s/([\n\t\"\\])/$escape->{$1}/ge; \$_}"} :
     $type eq REGEX ? $raw ? $$o :
-        qq{#"${local $_ = $$o; s/([\n\t\"\\])/$escape->{$1}/ge; \ substr($_, 4, length($_) - 5)}"} :
-    $type eq 'Lingy::Lang::KeySymbol' ? $o :
+        qq{#"${local $_ = $$o; \ substr($_, 4, length($_) - 5)}"} :
+    $type eq 'Lingy::KeySymbol' ? $o :
     $type eq SYMBOL ? $$o :
     $type eq KEYWORD ? $$o :
     $type eq NUMBER ? $$o :
@@ -44,31 +50,31 @@ sub pr_str {
     $type eq FUNCTION ? '#<Function>' :
     $type eq MACRO ? '#<Macro>' :
     $type eq LIST ?
-        "(${\ join(' ', map pr_str($_, $raw), @$o)})" :
+        "(${\ join(' ', map $self->pr_str($_, $raw), @$o)})" :
     $type eq VECTOR ?
-        "[${\ join(' ', map pr_str($_, $raw), @$o)}]" :
+        "[${\ join(' ', map $self->pr_str($_, $raw), @$o)}]" :
     $type eq HASHMAP ?
         "{${\ join(', ', map {
             my ($key, $val) = ($_, $o->{$_});
-            if ($key =~ /^:/) {
-                $key = keyword($key);
-            } elsif ($key =~ s/^\"//) {
-                $key = string($key);
-            } elsif ($key =~ s/^(\S+) $/$1/) {
-                $key = symbol($key);
-            }
-            (pr_str($key, $raw) . ' ' . pr_str($val, $raw))
+            $key =
+                ($key =~ /^:/) ? KEYWORD->new($key) :
+                ($key =~ s/^\"//) ? STRING->new($key) :
+                ($key =~ s/^(\S+) $/$1/) ? SYMBOL->new($key) :
+                $key;
+            ($self->pr_str($key, $raw) . ' ' . $self->pr_str($val, $raw))
+        } keys %$o)}}" :
+    $type eq HASHSET ?
+        "#{${\ join(' ', map {
+            my $val = $o->{$_};
+            $self->pr_str($val, $raw);
         } keys %$o)}}" :
     $type =~ /^(?:(?:quasi|(?:splice_)?un)?quote|deref)$/ ?
-        "(${$type=~s/_/-/g;\$type} ${\ pr_str($o->[0], $raw)})" :
+        "(${$type=~s/_/-/g;\$type} ${\ $self->pr_str($o->[0], $raw)})" :
     $type eq 'Lingy::Env' ? '#<Env>' :
     $type eq 'lingy-internal' ? "" :
-    not(blessed($o)) ? do {
-        WWW($o);
-        err "Tried to print the unblessed internal reference above";
-    } :
-    $o->isa('Lingy::Namespace') ? qq(#<Namespace ${\ $o->NAME}>) :
-    die "Don't know how to pr_str: '$o'";
+    (blessed($o) and $o->isa(NAMESPACE)) ?
+        qq(#<Namespace ${\ $o->_name}>) :
+    $self->pr_invalid($o);
 }
 
 1;

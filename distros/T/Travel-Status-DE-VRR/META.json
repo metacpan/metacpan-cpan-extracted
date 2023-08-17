@@ -1,10 +1,10 @@
 {
    "abstract" : "unofficial VRR departure monitor.",
    "author" : [
-      "Copyright (C) 2013-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+      "Copyright (C) 2013-2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -42,23 +42,23 @@
    "provides" : {
       "Travel::Status::DE::EFA" : {
          "file" : "lib/Travel/Status/DE/EFA.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       },
       "Travel::Status::DE::EFA::Line" : {
          "file" : "lib/Travel/Status/DE/EFA/Line.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       },
       "Travel::Status::DE::EFA::Result" : {
          "file" : "lib/Travel/Status/DE/EFA/Result.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       },
       "Travel::Status::DE::EFA::Stop" : {
          "file" : "lib/Travel/Status/DE/EFA/Stop.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       },
       "Travel::Status::DE::VRR" : {
          "file" : "lib/Travel/Status/DE/VRR.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-VRR"
       }
    },
-   "version" : "1.20",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.21",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

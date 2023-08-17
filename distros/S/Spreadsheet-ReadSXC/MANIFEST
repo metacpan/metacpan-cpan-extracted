@@ -70,6 +70,7 @@ t/t.sxc
 t/test_spreadsheet_import.ods
 t/text-outside-cell.xml
 t/wide.ods
+testrules.yml
 Todo.pod
 xt/99-changes.t
 xt/99-compile.t

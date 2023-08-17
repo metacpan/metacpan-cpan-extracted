@@ -15,12 +15,21 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'App::cpanminus' => '1.7044',
+                                      'Carp' => '0',
+                                      'Carton' => 'v1.0.35',
                                       'Getopt::Long::Descriptive' => '0',
-                                      'POE' => '0',
+                                      'POE' => '1.368',
+                                      'POE::Filter::JSONMaybeXS' => '0',
+                                      'POE::Filter::Line' => '0',
                                       'POE::Filter::Reference' => '0',
+                                      'POE::Filter::Stackable' => '0',
+                                      'POE::Session::PlainCall' => '0.0301',
                                       'POE::Wheel::Run' => '0',
+                                      'POE::Wheel::SocketFactory' => '0',
+                                      'Try::Tiny' => '0',
                                       'YAML::XS' => '0',
-                                      'perl' => '5.010001'
+                                      'perl' => '1.028'
                                     }
                     },
        'test' => {

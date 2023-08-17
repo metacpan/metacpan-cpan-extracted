@@ -30,6 +30,7 @@ my %params = (
         BIN_DEPS => 'Test::Catch',
         CLIB     => {
             DIR          => 'clib',
+            CMAKE_OPTIONS => qq{-DPANDALIB_TESTS=ON},
             CMAKE_TARGET => $cmake_tests,
             FILE         => "lib${cmake_tests}.a",
         },

@@ -1,5 +1,10 @@
 Revision history for Monitoring-Sneck
 
+0.2.0   2023-06-15/17:15
+		- Documentation cleanup
+		- convert to use src_bin
+
+
 0.1.0   2022-08-03/17:15
         -Add -b to base64+gzip output from -c
 

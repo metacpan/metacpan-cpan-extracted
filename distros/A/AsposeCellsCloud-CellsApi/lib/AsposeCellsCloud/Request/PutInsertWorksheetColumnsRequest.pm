@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PutInsertWorksheetColumnsRequest.name :   ,
-# PutInsertWorksheetColumnsRequest.sheetName :   ,
-# PutInsertWorksheetColumnsRequest.columnIndex :   ,
-# PutInsertWorksheetColumnsRequest.columns :   ,
-# PutInsertWorksheetColumnsRequest.updateReference :   ,
-# PutInsertWorksheetColumnsRequest.folder :   ,
-# PutInsertWorksheetColumnsRequest.storageName :    
+# PutInsertWorksheetColumnsRequest.name : The workbook name.  ,
+# PutInsertWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PutInsertWorksheetColumnsRequest.columnIndex : The column index.  ,
+# PutInsertWorksheetColumnsRequest.columns : The number of columns.  ,
+# PutInsertWorksheetColumnsRequest.updateReference : Indicates if references in other worksheets will be updated.  ,
+# PutInsertWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PutInsertWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_insert_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Insert worksheet columns.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -147,49 +147,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'column_index' => {
      	datatype => 'int',
      	base_name => 'columnIndex',
-     	description => '',
+     	description => 'The column index.',
      	format => '',
      	read_only => '',
      		},
      'columns' => {
      	datatype => 'int',
      	base_name => 'columns',
-     	description => '',
+     	description => 'The number of columns.',
      	format => '',
      	read_only => '',
      		},
      'update_reference' => {
      	datatype => 'string',
      	base_name => 'updateReference',
-     	description => '',
+     	description => 'Indicates if references in other worksheets will be updated.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

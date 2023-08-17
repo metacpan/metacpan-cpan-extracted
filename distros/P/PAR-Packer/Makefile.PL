@@ -54,8 +54,8 @@ WriteMakefile1(
     TEST_REQUIRES => {
       'Test::More'            => 0,
       'IPC::Run3'             => '0.048',
-      if_win(
-        'Win32::Exe'          => '0.17'),
+      # if_win(
+      # 'Win32::Exe'          => '0.17'),
     },
 
     MAN1PODS => {
@@ -70,7 +70,7 @@ WriteMakefile1(
         'script/pp',
         'script/tkpp',
     ],
-    DIR                       => $have_cc ? [ 'myldr' ] : [],
+    DIR                       => [ 't/data', $have_cc ? 'myldr' : () ],
     NEEDS_LINKING	      => $have_cc,
 
     META_MERGE      => {

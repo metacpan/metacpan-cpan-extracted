@@ -5,8 +5,6 @@ use warnings;
 use strict;
 use 5.014;
 
-use File::Basename qw( basename );
-
 use DBI qw();
 
 use Term::Choose::Util qw();
@@ -74,7 +72,7 @@ sub get_db_handle {
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
     my $dsn;
-    my $show_sofar = 'DB '. basename( $db );
+    my $show_sofar = 'DB '. $db;
     # DBD::DB2 - Data Source Names:
     # Cataloged database connections can be done by passing the database alias, username, and password as parameters.
     # This method does not allow entering the host name, port number, etc but will require you to catalog the database

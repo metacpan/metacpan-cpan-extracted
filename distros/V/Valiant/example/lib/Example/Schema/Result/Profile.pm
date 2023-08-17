@@ -106,10 +106,6 @@ sub valid_status($self, $attribute_name, $value, $opt) {
   }
 }
 
-sub status_options($self) {
-  return [map { [ucfirst($_) => $_] } $self->status_list ];
-}
-
 1;
 
 __END__

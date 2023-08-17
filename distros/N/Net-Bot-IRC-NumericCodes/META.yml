@@ -1,22 +1,23 @@
---- #YAML:1.0
-name:               Net-Bot-IRC-NumericCodes
-version:            0.05
-abstract:           A module for abstracting IRC numeric codes.
+---
+abstract: 'A module for abstracting IRC numeric codes.'
 author:
-    - Mark Caudill <mcaudill@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Mark Caudill <mcaudill@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::More:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Bot-IRC-NumericCodes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

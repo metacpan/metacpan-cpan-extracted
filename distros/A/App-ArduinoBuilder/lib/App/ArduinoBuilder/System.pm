@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use utf8;
 
+use App::ArduinoBuilder::Logger ':all_logger';
 use Cwd;
 use Exporter 'import';
 use File::Spec::Functions 'catdir', 'rel2abs', 'canonpath';
 use List::Util 'first';
 
-our @EXPORT_OK = qw(find_arduino_dir system_cwd system_canonpath);
+our @EXPORT_OK = qw(find_arduino_dir system_cwd system_canonpath execute_cmd);
 
 sub find_arduino_dir {
   my @tests;
@@ -49,4 +50,17 @@ sub system_canonpath {
     chomp($canon);
   }
   return $canon;
+}
+
+sub execute_cmd {
+  my ($cmd, %options) = @_;
+  log_cmd $cmd;
+  if (exists $options{capture_output}) {
+    my $out = `${cmd}`;
+    fatal "Can’t execute the following command: $!\n\t${cmd}" unless defined $out;
+    ${$options{capture_output}} = $out;
+  } else {
+    system($cmd) and fatal "Can’t execute the following command: $!\n\t${cmd}";
+  }
+  return 1;
 }

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Syntax/Operator/Matches.pm
+lib/Syntax/Operator/Matches.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/basic.t
+t/mismatches.t
+t/more.t
+t/tt.t

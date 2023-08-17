@@ -1,101 +1,50 @@
-SPECIFICATION VERSION
+NAME
+    TableDef - Table data definition
 
-     1
+VERSION
+    This document describes version 1.0.9 of TableDef (from Perl
+    distribution TableDef), released on 2023-05-24.
 
-ABSTRACT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/TableDef>.
 
-    This document describes TableDef, a way to define table data.
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-TableDef>.
 
-SPECIFICATION
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    In this document, hashes are written in JSON or pseudo-JSON (e.g.
-    contains ellipsis ... or JavaScript-style comments // ...).
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
 
-    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL "NOT",
-    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-    document are to be interpreted as described in RFC 2119.
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
 
-    A TableDef spec is written in DefHash. It can be used to describe the
-    structure of a relational database table, a CSV file, or an array of
-    hashes. Tools can be written to convert a TableDef hash to SQL's CREATE
-    TABLE statement, or to utilize information in the TableDef hash to
-    format an HTML table, to view a DB grid on the web browser, etc.
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
 
- Properties
+     % prove -l
 
-  summary => str
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
-    From DefHash. Table summary.
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2016, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
 
-  description => str
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
-    From DefHash. Table longer description.
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=TableDef>
 
-  tags => array
-
-    From DefHash.
-
-  fields => hash
-
-    A hash, where the keys are field names and the values field
-    specification. See "FIELD SPECIFICATION".
-
-  pk => str | array
-
-    Specify the primary key for the table. Either a string containing a
-    single field name, or an array of field names (for multi-field key).
-
-FIELD SPECIFICATION
-
-    A DefHash.
-
- Properties
-
-  schema* => str | array
-
-    Sah schema. This property is required.
-
-  summary => str
-
-    From DefHash. Field summary.
-
-  description => str
-
-    From DefHash. Field longer description.
-
-  tags => array
-
-    From DefHash.
-
-  pos => int
-
-    Specify the order of field. Must start from 0 and be contiguous.
-
-  req => bool (default: 0)
-
-    Whether this field is mandatory to be present. If 0, then function can
-    choose to omit the field.
-
-  sortable => bool (default: 1)
-
-    Specify whether this field can be sorted.
-
-  filterable => bool (default: 1)
-
-    Specify whether this field can be used as a filter.
-
-  unique => bool
-
-    Specify whether this field must contain unique values.
-
-  include_by_default => bool (default: 1)
-
-    This specifies that this field should be shown or included on "default
-    view". What default view is will depend on the context or
-    implementation. Usually you can set this to 0 if the field content is
-    too long or wide. For example, in Perl module
-    Perinci::Sub::Gen::AccessTable, if you give detail => 1 to the
-    generated function, it will include all fields except fields that has
-    this property set to 0. To include such fields, you'll need to
-    explicitly issue with.FIELDNAME => 1.
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

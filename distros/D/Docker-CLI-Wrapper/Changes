@@ -1,5 +1,9 @@
 Revision history for Docker-CLI-Wrapper
 
+0.0.7       2023-07-30
+    - added calc_docker_cmd()
+        - hoping to use it to implement support for snapshots.
+
 0.0.6       2020-08-15
     - Correct missing end-delimiter in the code in the synopses.
         - Thanks to metacpan.

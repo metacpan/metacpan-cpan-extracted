@@ -4,7 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Infix::Builder: '0.26'
@@ -16,14 +16,17 @@ meta-spec:
   version: '1.4'
 name: Syntax-Operator-Equ
 provides:
+  Syntax::Operator::Eqr:
+    file: lib/Syntax/Operator/Eqr.pm
+    version: '0.06'
   Syntax::Operator::Equ:
     file: lib/Syntax/Operator/Equ.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   XS::Parse::Infix: '0.26'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

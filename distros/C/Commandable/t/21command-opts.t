@@ -15,6 +15,8 @@ package MyTest::Command::one {
       { name => "verbose|v", description => "verbose option", mode => "inc" },
       { name => "target|t=", description => "target option" },
       { name => "multi",     description => "multi option", multi => 1 },
+      { name => "hyphenated-name|h", description => "option with hyphen in its name" },
+      { name => "number|n=i", description => "number option" },
    );
    sub run {}
 }
@@ -71,6 +73,17 @@ my $finder = Commandable::Finder::Packages->new(
 
    is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
       '$cmd->parse_invocation with shortname' );
+   ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# hyphen converts to underscore
+{
+   my $cmd = $finder->find_command( "one" );
+
+   my $inv = Commandable::Invocation->new( "-h" );
+
+   is( [ $cmd->parse_invocation( $inv ) ], [ { hyphenated_name => 1 } ],
+      '$cmd->parse_invocation with hyphenated name' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
 
@@ -149,6 +162,35 @@ my $finder = Commandable::Finder::Packages->new(
    is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 3 } ],
       '$cmd->parse_invocation with repeated incrementable option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
+}
+
+# incrementable opts can't take values
+{
+   my $cmd = $finder->find_command( "one" );
+
+   my $inv = Commandable::Invocation->new( "-v3" );
+
+   like( dies { $cmd->parse_invocation( $inv ) },
+      qr/^Unexpected value for parameter verbose/,
+      '$cmd->parse_invocation fails with value to incrementable option' );
+}
+
+# i-typed options check for numerical
+{
+   my $cmd = $finder->find_command( "one" );
+
+   my $inv = Commandable::Invocation->new( "-n1" );
+
+   ok( lives {
+      is( [ $cmd->parse_invocation( $inv ) ], [ { number => 1 } ],
+         '$cmd->parse_invocation with integer-numerical option' );
+      } );
+
+   $inv = Commandable::Invocation->new( "-nBAD" );
+
+   like( dies { $cmd->parse_invocation( $inv ) },
+      qr/^Value for parameter number must be an integer/,
+      '$cmd->parse_invocation fails with non-integer value' );
 }
 
 done_testing;

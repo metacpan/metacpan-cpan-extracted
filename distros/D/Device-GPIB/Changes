@@ -6,3 +6,6 @@ Revision history for Perl extension Device::GPIB.
 1.0   2023-03-30
       - Integrated with much previously existing code, ready for publication on CPAN.
       
+1.1   2023-07-03
+      - Added support for HP5342A Microwave Frequency Counter
+      - Added support for HP8904 Multifunction Synthesizer, including some example command scripts

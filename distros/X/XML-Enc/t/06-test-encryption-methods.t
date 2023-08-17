@@ -18,7 +18,7 @@ my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc aes128-g
 my @oaep_mgf_algs   = qw/mgf1sha1 mgf1sha224 mgf1sha256 mgf1sha384 mgf1sha512/;
 
 my $xmlsec = get_xmlsec_features();
-my $lax_key_search = $xmlsec->{lax_key_search} ? '--lax_key_search': '';
+my $lax_key_search = $xmlsec->{lax_key_search} ? '--lax-key-search': '';
 
 foreach my $km (@key_methods) {
     foreach my $dm (@data_methods) {
@@ -33,9 +33,9 @@ foreach my $km (@key_methods) {
         );
 
         my $encrypted = $encrypter->encrypt($xml);
-        ok($encrypted  =~ /EncryptedData/, "Successfully Encrypted: Key Method $km Data Method $dm");
+        like($encrypted, qr/EncryptedData/, "Successfully Encrypted: Key Method $km Data Method $dm");
 
-        ok($encrypter->decrypt($encrypted) =~ /XML-SIG_1/, "Successfully Decrypted with XML::Enc");
+        like($encrypter->decrypt($encrypted), qr/XML-SIG_1/, "Successfully Decrypted with XML::Enc");
 
         SKIP: {
             skip "xmlsec1 not installed", 2 unless $xmlsec->{installed};
@@ -48,7 +48,7 @@ foreach my $km (@key_methods) {
             print XML $encrypted;
             close XML;
             my $verify_response = `xmlsec1 --decrypt $lax_key_search --privkey-pem t/sign-private.pem tmp.xml 2>&1`;
-            ok( $verify_response =~ m/XML-SIG_1/, "Successfully decrypted with xmlsec1" )
+            like($verify_response, qr/XML-SIG_1/, "Successfully decrypted with xmlsec1" )
                 or warn "calling xmlsec1 failed: '$verify_response'\n";
             unlink 'tmp.xml';
         }
@@ -69,9 +69,9 @@ foreach my $om (@oaep_mgf_algs) {
         );
 
         my $encrypted = $encrypter->encrypt($xml);
-        ok($encrypted  =~ /EncryptedData/, "Successfully Encrypted: Key Method 'rsa-oaep' with $om Data Method $dm");
+        like($encrypted, qr/EncryptedData/, "Successfully Encrypted: Key Method 'rsa-oaep' with $om Data Method $dm");
 
-        ok($encrypter->decrypt($encrypted) =~ /XML-SIG_1/, "Successfully Decrypted with XML::Enc");
+        like($encrypter->decrypt($encrypted), qr/XML-SIG_1/, "Successfully Decrypted with XML::Enc");
     }
 }
 done_testing;

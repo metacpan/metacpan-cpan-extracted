@@ -55,13 +55,13 @@ $logger->add($logger_output);
 is_deeply(
     [ sort map { $_->name } Step1->dependencies ],
     [qw( input_file1 input_file2)],
-    'Step1->dependencies returns the expected attributes'
+    'Step1->dependencies returns the expected attributes',
 );
 
 is_deeply(
     [ sort map { $_->name } Step1->productions ],
     [qw( output_file1 output_file2)],
-    'Step1->productions returns the expected attributes'
+    'Step1->productions returns the expected attributes',
 );
 
 {
@@ -147,21 +147,21 @@ for my $class (qw( FileStep PathTinyFileStep)) {
 
         is(
             $step->last_run_time, undef,
-            q{no last run time when output files don't exist}
+            q{no last run time when output files don't exist},
         );
 
         $step->run;
         is(
             $step->last_run_time,
             ( stat $step->output_file2 )[9],
-            'last_run_time matches mtime of $step->output_file2'
+            'last_run_time matches mtime of $step->output_file2',
         );
 
         my $message = shift @{ $logger_output->array };
         is(
             $message->{message},
             "[$class] Touching file",
-            'expected log message'
+            'expected log message',
         );
         is( $message->{level}, 'debug', 'expected log level' );
     };
@@ -203,7 +203,7 @@ for my $class (qw( FileStep PathTinyFileStep)) {
             \QStepford::Role::Step::FileGenerator role but contains \E
             \Qthe following productions which are not a supported file type: output1 output2\E
            /x,
-        'FileStep::Bad->new dies because it has productions which are not files'
+        'FileStep::Bad->new dies because it has productions which are not files',
     );
 }
 

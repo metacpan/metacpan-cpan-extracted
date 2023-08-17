@@ -19,7 +19,7 @@ ok tests if modules compile well
 =cut
 
 my $SeismicUnixGui;
-use Test::Compile::Internal tests => 25;
+use Test::Compile::Internal tests => 26;
 
 my $test=Test::Compile::Internal->new();
 

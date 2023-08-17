@@ -7,20 +7,20 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
   Test::Warnings: '0'
-  XS::Framework: v1.5.3
+  XS::Framework: v1.5.5
   XS::libdwarf: '20201123.0'
-  XS::libpanda: v1.5.8
+  XS::libpanda: v1.5.9
   XS::libpanda::backtrace: v1.0.2
   next::XS: v1.0.7
 configure_requires:
-  XS::Framework: v1.5.3
+  XS::Framework: v1.5.5
   XS::Install: v1.3.5
   XS::libdwarf: '20201123.0'
-  XS::libpanda: v1.5.8
+  XS::libpanda: v1.5.9
   XS::libpanda::backtrace: v1.0.2
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,12 +31,12 @@ no_index:
     - t
     - inc
 requires:
-  XS::Framework: v1.5.3
+  XS::Framework: v1.5.5
   XS::Install: v1.3.5
   XS::libdwarf: '20201123.0'
-  XS::libpanda: v1.5.8
+  XS::libpanda: v1.5.9
   XS::libpanda::backtrace: v1.0.2
   next::XS: v1.0.7
   perl: '5.020000'
-version: v1.1.2
+version: v1.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

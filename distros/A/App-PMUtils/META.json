@@ -40,7 +40,7 @@
             "App::ThisDist" : "0.012",
             "AppBase::Grep" : "0.010",
             "Browser::Open" : "0",
-            "Complete::Module" : "0.262",
+            "Complete::Module" : "0.263",
             "Config" : "0",
             "Cwd" : "0",
             "Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard" : "0",
@@ -52,6 +52,7 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Data::Sah::Filter::perl::Perl::normalize_perl_modname" : "0",
             "Data::Sah::Value::perl::Perl::these_mods" : "0",
+            "Devel::EndStats" : "0.210",
             "Dist::Util" : "0.070",
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir" : "0",
@@ -103,15 +104,15 @@
    "provides" : {
       "App::ModuleUtils" : {
          "file" : "lib/App/ModuleUtils.pm",
-         "version" : "0.743"
+         "version" : "0.744"
       },
       "App::PMUtils" : {
          "file" : "lib/App/PMUtils.pm",
-         "version" : "0.743"
+         "version" : "0.744"
       },
       "App::pmgrep" : {
          "file" : "lib/App/pmgrep.pm",
-         "version" : "0.743"
+         "version" : "0.744"
       }
    },
    "release_status" : "stable",
@@ -126,7 +127,7 @@
          "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.743",
+   "version" : "0.744",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -170,7 +171,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
             "name" : "InsertExecsList",
-            "version" : "0.02"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
@@ -389,7 +390,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
             "name" : "@Author::PERLANCAR/OurDate",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDist",
@@ -528,7 +529,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.784"
+                        "version" : "0.786"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

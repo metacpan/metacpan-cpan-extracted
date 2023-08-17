@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteVerticalPageBreaksRequest.name :   ,
-# DeleteVerticalPageBreaksRequest.sheetName :   ,
-# DeleteVerticalPageBreaksRequest.column :   ,
-# DeleteVerticalPageBreaksRequest.folder :   ,
-# DeleteVerticalPageBreaksRequest.storageName :    
+# DeleteVerticalPageBreaksRequest.name : The workbook name.  ,
+# DeleteVerticalPageBreaksRequest.sheetName : The worksheet name.  ,
+# DeleteVerticalPageBreaksRequest.column : Column index, zero based.  ,
+# DeleteVerticalPageBreaksRequest.folder : Original workbook folder.  ,
+# DeleteVerticalPageBreaksRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_vertical_page_breaks' } = { 
-    	summary => '',
+    	summary => 'Delete vertical page breaks in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Column index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

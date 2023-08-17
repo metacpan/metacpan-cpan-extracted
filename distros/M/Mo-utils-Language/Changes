@@ -1,0 +1,8 @@
+0.02 2023-06-12T10:46:58+02:00
+ - Add EXAMPLES to doc.
+ - Add minimal version of Locale::Languages, removed from Perl core.
+ - Add Wikibase datatype utilities to SEE ALSO section in doc.
+ - Regen README file.
+
+0.01 2023-06-10T18:38:21+02:00
+ - First version.

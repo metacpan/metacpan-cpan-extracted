@@ -7,17 +7,16 @@ exit $app->run();
 
 __END__
 
+
 =head1 NAME
 
 txdmean - find means in textual data files
-
 
 =head1 SYNOPSIS
 
 	txdmean < data.dat
 
 =head1 DESCRIPTION
-
 
 should result in a line with the mean values being printed
 
@@ -27,13 +26,13 @@ These are the general rules for specifying parameters to this program:
 
 	txdmean -s -xyz -s=value --long --long=value [--] [files/stuff]
 
-You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+You mention the options to change parameters in any order or even multiple times. They are processed in the oder given, later operations overriding/extending earlier settings. Using the separator "--" stops option parsing
 An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
 Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
 
 There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
-	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
 
@@ -80,8 +79,7 @@ fill value for undefined data (from Text::NumericData)
 
 	0
 
-show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
-
+Show the help message. Value 1..9: help level, par: help for paramter par (long name) only.
 
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
@@ -154,6 +152,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2023 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

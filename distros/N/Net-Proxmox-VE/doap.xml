@@ -52,6 +52,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Martijn Lievaart</foaf:name>
+      <foaf:mbox rdf:resource="mailto:m@rtij.nl" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Mohammad S Anwar</foaf:name>
       <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
     </foaf:Person>
@@ -82,6 +88,7 @@
   </helper>
   <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />
   <homepage rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl" />
+  <bug-database rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl/issues" />
   <repository>
     <GitRepository>
       <browse rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl" />

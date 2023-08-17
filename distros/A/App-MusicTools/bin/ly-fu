@@ -4,32 +4,30 @@
 #
 #   ly-fu c des ees c des bes c aes
 #
-# NOTE this utility assumes Mac OS X and timidity by default; set the
-# MIDI_EDITOR and SCORE_VIEWER environment variables, or adjust this code as
-# necessary, or create suitably named programs that DTRT.
+# NOTE set the MIDI_EDITOR and SCORE_VIEWER environment variables to
+# programs that can play *.midi files and open *.pdf on your system.
 #
 # Run perldoc(1) on this file for additional documentation.
 #
 # A ZSH completion script is available in the zsh-compdef/ directory of the
 # App::MusicTools distribution.
 
-use strict;
+use 5.14.0;
 use warnings;
+use File::Spec::Functions 'tmpdir';
+use File::Temp ();
+use Getopt::Long 'GetOptions';
+use POSIX 'setsid';
+use IPC::Run3 'run3';
+use Text::ParseWords 'shellwords';
 
-use File::Basename qw/basename/;
-use File::Spec     ();
-use File::Temp     ();
-use Getopt::Long   qw/GetOptions/;
-use IO::Handle;
-use IPC::Run3 qw/run3/;
+my @Lilypond_Cmd = qw/lilypond -dno-point-and-click/;
+# these can be found under https://thrig.me/src/scripts.git
+my @MIDI_Player  = qw/midiplay/;
+my @Score_Reader = qw/mopen/;
 
-my $Prog_Name = basename $0;
-
-my @Lilypond_Cmd = qw/lilypond/;
-my @MIDI_Player  = qw/timidity/;
-my @Score_Reader = qw/open/;
-
-my $LILYPOND_VERSION = '2.18.2';
+# as found in OpenBSD 7.3
+my $LILYPOND_VERSION = '2.22.2';
 
 my $instrument = "acoustic grand";
 my $partial    = q{};
@@ -42,14 +40,9 @@ my $tempo      = 130;
 #
 # MAIN
 
-if ( exists $ENV{'MIDI_EDITOR'} ) {
-    @MIDI_Player = map { s{(?<!\\)\\}{}g; $_ } split /(?<!\\)\s+/,
-      $ENV{'MIDI_EDITOR'};
-}
-if ( exists $ENV{'SCORE_VIEWER'} ) {
-    @Score_Reader = map { s{(?<!\\)\\}{}g; $_ } split /(?<!\\)\s+/,
-      $ENV{'SCORE_VIEWER'};
-}
+@Lilypond_Cmd = shellwords( $ENV{LILYPOND} )     if exists $ENV{LILYPOND};
+@MIDI_Player  = shellwords( $ENV{MIDI_EDITOR} )  if exists $ENV{MIDI_EDITOR};
+@Score_Reader = shellwords( $ENV{SCORE_VIEWER} ) if exists $ENV{SCORE_VIEWER};
 
 GetOptions(
     'absolute|abs|a'   => \my $is_absolute,
@@ -69,7 +62,7 @@ GetOptions(
     'sleep|S=i'        => \my $Flag_Sleep_Kluge,
     'tempo|t=s'        => \$tempo,
     'verbose'          => \my $Flag_Verbose,
-) or do { warn "could not parse options\n"; emit_help() };
+) or exit 64;
 
 undef $relative if $is_absolute;
 
@@ -105,7 +98,6 @@ if ( $repeats > 1 ) {
     $score_bar    = qq{\\bar "|."};
 }
 
-# Assume they want both the score and MIDI bits on standard out
 if ($Flag_Show_Code) {
     $Flag_Generate_Score = 1;
     $Flag_No_MIDI        = 0;
@@ -161,17 +153,17 @@ if ($Flag_Show_Code) {
     exit 0;
 }
 
-my $work_dir = File::Spec->tmpdir;
-chdir $work_dir or die "$Prog_Name: could not chdir() to '$work_dir': $!\n";
+my $work_dir = tmpdir();
+chdir $work_dir or die "ly-fu: chdir failed '$work_dir': $!\n";
 
-# NOTE a dedicated directory for output would be safer on a shared tmp dir
-# system, as I am unsure of how well lilypond defends against /tmp attacks. I
-# use a TMPDIR that is not the system one.
+# NOTE a dedicated directory for output would be safer with a shared tmp
+# dir, as I am unsure of how well lilypond defends against /tmp attacks.
+# (I use a TMPDIR that is not the system one.)
 my $tmp_ly = File::Temp->new(
     DIR      => $work_dir,
     SUFFIX   => '.ly',
-    TEMPLATE => "$Prog_Name.XXXXXXXXXX",
-    UNLINK   => 0
+    TEMPLATE => 'ly-fu.XXXXXXXXXX',
+    UNLINK   => 0,
 );
 $tmp_ly->print($lilypond_input);
 $tmp_ly->flush;
@@ -180,8 +172,9 @@ $tmp_ly->sync;
 my $ly_filename = $tmp_ly->filename;
 ( my $score_filename = $ly_filename ) =~ s/\.ly/\.pdf/;
 ( my $midi_filename  = $ly_filename ) =~ s/\.ly/\.midi/;
+close $tmp_ly;
 
-print $ly_filename, "\n" if $Flag_Generate_Score;
+say $ly_filename if $Flag_Generate_Score;
 
 my ( $stdout, $stderr );
 
@@ -189,63 +182,59 @@ eval {
     my $stdin;
     push @Lilypond_Cmd, $ly_filename;
     run3 \@Lilypond_Cmd, \$stdin, \$stdout, \$stderr;
-};
-if ($@) {
+    1;
+} or do {
     chomp $@;
-    die "$Prog_Name: run3() of '@Lilypond_Cmd' failed: $@\n";
-}
-if ( $? >> 8 != 0 ) {
-    warn "$Prog_Name: non-zero exit from '@Lilypond_Cmd'\n";
-    # something awry, so show everything lilypond said for debugging
+    die "ly-fu: run3() of '@Lilypond_Cmd' failed: $@\n";
+};
+if ($?) {
+    warn "ly-fu: non-zero exit from '@Lilypond_Cmd'\n";
     warn $stderr;
     print $stdout;
     exit $?;
 }
 print $stdout if $Flag_Verbose;
 
-if ($Flag_Show_Score) {
-    die "error: score not created: $score_filename\n" unless -f $score_filename;
+# the files might be shared, so open up the permissions
+chmod 0644, $ly_filename, $midi_filename, $score_filename;
 
+if ($Flag_Show_Score) {
     local $SIG{CHLD} = 'IGNORE';
-    if ( fork() ) {
+    my $pid = fork();
+    die "ly-fu: could not fork score reader: $!\n" unless defined $pid;
+    unless ($pid) {
+        # a vague effort at daemonization; may be necessary if the PDF
+        # view being open holds ly-fu open which then prevents a text
+        # editor from moving on
+        open( STDIN,  '<', '/dev/null' );
+        open( STDOUT, '>', '/dev/null' );
+        ( setsid() == -1 ) and die "ly-fu: setsid failed: $!\n";
+        open( STDERR, '>&', STDOUT );
         exec( @Score_Reader, $score_filename )
-          or die "$Prog_Name: could not exec score reader '@Score_Reader': $!\n";
+          or die "ly-fu: could not exec score reader '@Score_Reader': $!\n";
     }
 }
 
 unless ($Flag_No_MIDI) {
-    die "error: MIDI not created: $midi_filename\n" unless -f $midi_filename;
-
-    my $stdin;
-    push @MIDI_Player, $midi_filename;
-    run3 \@MIDI_Player, \$stdin, \$stdout, \$stderr;
-    if ($@) {
-        chomp $@;
-        die "$Prog_Name: run3() of '@MIDI_Player' failed: $@\n";
+    if ($Flag_Generate_Score) {
+        # we're keeping the files, so there's nothing more this script
+        # needs to do
+        exec( @MIDI_Player, $midi_filename )
+          or die
+          "ly-fu: could not exec MIDI player '@MIDI_Player $midi_filename': $!\n";
+    } else {
+        system( @MIDI_Player, $midi_filename ) == 0
+          or die "ly-fu: could not run MIDI player '@MIDI_Player $midi_filename': $!\n";
     }
-    if ( $? >> 8 != 0 ) {
-        warn "$Prog_Name: non-zero exit from '@MIDI_Player'\n";
-        warn $stderr;
-        print $stdout;
-        exit $?;
-    }
-    print $stdout if $Flag_Verbose;
 }
 
-if ( !$Flag_Generate_Score ) {
-    # Due to some applications being slow to start and thus complaining or
-    # blowing up should say the MIDI be unlinked from out underneath them.
+unless ($Flag_Generate_Score) {
+    # Preview.app got increasingly slower to actually start over time,
+    # hence this kluge. Eventually I switched to mupdf, and eventually
+    # the 2009 macbook died in late 2022.
     sleep $Flag_Sleep_Kluge if $Flag_Sleep_Kluge > 0;
     unlink $ly_filename, $midi_filename, $score_filename;
-
-} else {
-    # Might want to share the files, so avoid the whoops-perm-denied-chmod-
-    # a+r phase of that process, given that tmp files otherwise have locked-
-    # down perms.
-    chmod 0644, $ly_filename, $midi_filename, $score_filename;
 }
-
-exit 0;
 
 ########################################################################
 #
@@ -275,7 +264,6 @@ clash with various shell metacharacters.
 END_HELP
     exit 64;
 }
-
 __END__
 
 =head1 NAME
@@ -283,6 +271,10 @@ __END__
 ly-fu - play or display lilypond snippets
 
 =head1 SYNOPSIS
+
+Set the MIDI_EDITOR and SCORE_VIEWER environment variables to
+suitable MIDI playing and PDF opening utilities, or adjust the source
+to your liking.
 
   $ export MIDI_EDITOR=timidity
   $ export SCORE_VIEWER=xpdf
@@ -294,18 +286,15 @@ Or, to instead save the generated lilypond somewhere:
 
   $ ly-fu --show-code e e e c1 > masterpiece.ly
 
-This utility assumes Mac OS X and timidity by default; set the MIDI_EDITOR and
-SCORE_VIEWER environment variables, or adjust this code as necessary.
-
 =head1 DESCRIPTION
 
-Plays and possibly displays lilypond snippets entered at the command line. The
-C<MIDI_EDITOR> environment variable should be set to a program that can play
-MIDI files, and the C<SCORE_VIEWER> optionally set to a PDF viewer. (Or edit
-the source code as necessary.)
+Plays and possibly displays lilypond snippets entered at the command
+line. The C<MIDI_EDITOR> environment variable should be set to a program
+that can play MIDI files, and the C<SCORE_VIEWER> optionally set to a
+PDF viewer. (Or edit the source code as necessary.)
 
-L<http://www.lilypond.org/> and in particular the Learning and Notation manuals
-should be consulted to understand the lilypond syntax.
+L<https://www.lilypond.org/> and in particular the Learning and Notation
+manuals should be consulted to understand the lilypond syntax.
 
 =head1 OPTIONS
 
@@ -323,13 +312,13 @@ Set MIDI instrument (see lilypond docs and ZSH compdef script).
 
 =item B<--language>=I<language>
 
-Specify the lilypond language to use, by default the C<lilypond> default of
-C<nederlands>. If using note names from L<Music::PitchNum::German>, 
+Specify the lilypond language to use, by default the C<lilypond> default
+of C<nederlands>. If using note names from L<Music::PitchNum::German>,
 
   ... | ly-fu --language=deutsch ...
 
-may be of some use. "Note names in other languages" in the lilypond notation
-reference contains the full list of supported languages.
+may be of some use. "Note names in other languages" in the lilypond
+notation reference contains the full list of supported languages.
 
 =item B<--layout>
 
@@ -357,8 +346,8 @@ Make the staff a lilypond C<RhythmicStaff> instead of the usual one.
 
 =item B<--show-code>
 
-Prints the generated lilypond data to standard out, then exits the program. The
-score is not shown, nor the music played.
+Prints the generated lilypond data to standard out, then exits the
+program. The score is not shown, nor the music played.
 
 =item B<--silent>
 
@@ -366,8 +355,8 @@ Do not play the MIDI.
 
 =item B<--sleep>=I<seconds>
 
-Kluge sleep before unlinking temporary files (might be handy if C<SCORE_VIEWER>
-is slow to start).
+Kluge sleep before unlinking temporary files (might be handy if
+C<SCORE_VIEWER> is slow to start).
 
 =item B<--tempo>=I<tempo>
 
@@ -381,32 +370,26 @@ Show output from lilypond and the MIDI player.
 
 =head1 FILES
 
-NOTE This program makes heavy use of temporary files. On a shared system, the
-lilypond generated output files might introduce /tmp security problems
-(arbitrary file clobber or unlink against the user running the code). These can
-be avoided by employing a private temporary directory, for example by pointing
-the C<TMPDIR> environment variable to such a directory.
+NOTE This program makes heavy use of temporary files. On a shared
+system, the lilypond generated output files might introduce /tmp
+security problems (arbitrary file clobber or unlink against the user
+running the code). These can be avoided by employing a private temporary
+directory, for example by pointing the C<TMPDIR> environment variable to
+such a directory.
 
-A ZSH completion script is available in the C<zsh-compdef/> directory of 
-the L<App::MusicTools> distribution. Install this to a C<$fpath> 
+A ZSH completion script is available in the C<zsh-compdef/> directory of
+the L<App::MusicTools> distribution. Install this to a C<$fpath>
 directory.
-
-=head1 BUGS
-
-If the bug is in the latest version, send a report to the author. Patches that
-fix problems or add new features are welcome.
-
-L<https://thrig.me/src/App-MusicTools.git>
 
 =head1 SEE ALSO
 
-L<http://www.lilypond.org/>
+L<https://www.lilypond.org/>
 
 =head1 COPYRIGHT
 
 Copyright 2012 Jeremy Mates
 
 This program is distributed under the (Revised) BSD License:
-L<http://www.opensource.org/licenses/BSD-3-Clause>
+L<https://opensource.org/license/bsd-3-clause/>
 
 =cut

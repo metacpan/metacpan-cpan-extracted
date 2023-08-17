@@ -1,3 +1,2 @@
 package YAMLTest;
-
-our $VERSION = '0.0.4';
+our $VERSION = '0.1.0';

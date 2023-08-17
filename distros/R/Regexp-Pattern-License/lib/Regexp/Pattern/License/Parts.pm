@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.10.1
+Version v3.11.1
 
 =cut
 
-our $VERSION = version->declare("v3.10.1");
+our $VERSION = version->declare("v3.11.1");
 
 =head STATUS
 
@@ -285,6 +285,14 @@ our %RE = (
 	discl_name_warranties =>
 		{ pat => '[word][ word]{0,14} DISCLAIMS? ALL WARRANTIES' },
 	permission_use_fee_agree => { pat => 'and without a written agreement' },
+
+	# versioning
+	at_option =>
+		{ pat => '(?:[(] ?)?(?:at )?your (?:option|choice)(?: ?[)])?' },
+	version_number_prefix =>
+		{ pat => '(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?' },
+	version_number        => { pat => '\d(?:\.\d+){0,2}[a-f]?\b' },
+	version_number_suffix => { pat => ' ?(?:(?:of the )?Licen[cs]e)?' },
 );
 
 $RE{perm_granted}{pat} = 'Permission ' . $RE{granted}{pat} . ',? ';
@@ -433,6 +441,10 @@ $RE{discl_liability_claim}{pat}
 	. ', WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE'
 	. ', ARISING FROM, OUT OF OR IN CONNEC[-]TION WITH THE SOFTWARE'
 	. ' OR THE USE OR OTHER DEALINGS IN THE SOFTWARE';
+$RE{version_plural_infix}{pat}
+	= '(?:,(?: or)?|or)(?:,? ' . $RE{at_option}{pat} . ',?)? ?';
+$RE{version_plural_suffix}{pat}
+	= '(?: ?' . $RE{at_option}{pat} . ')?';
 
 =encoding UTF-8
 

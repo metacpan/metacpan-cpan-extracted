@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension to access a variety of generic and specific GPIB devices, via a number of supported GPIB interfaces.'
+abstract: 'Perl extension to access a variety of generic and specific GPIB devices, via a number of supported GPIB interfaces. Device::GPIB does not do anything specific except to make a place for documentation and as a wrapper for all included modules. '
 author:
   - 'Mike McCauley <mikem@>'
 build_requires:
@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

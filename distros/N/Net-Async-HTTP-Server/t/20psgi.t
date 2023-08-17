@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -67,13 +66,13 @@ my $C = IO::Socket::INET->new(
    ok( defined(delete $received_env->{'psgi.input'}), "psgi.input exists" );
    ok( defined(delete $received_env->{'psgi.errors'}), "psgi.errors exists" );
 
-   isa_ok( delete $received_env->{'psgix.io'}, "IO::Socket", 'psgix.io' );
+   isa_ok( delete $received_env->{'psgix.io'}, [ "IO::Socket" ], 'psgix.io' );
 
-   identical( delete $received_env->{'net.async.http.server'}, $server, "net.async.http.server is \$server" );
+   ref_is( delete $received_env->{'net.async.http.server'}, $server, "net.async.http.server is \$server" );
    can_ok( delete $received_env->{'net.async.http.server.req'}, "header" );
-   identical( delete $received_env->{'io.async.loop'}, $loop, "io.async.loop is \$loop" );
+   ref_is( delete $received_env->{'io.async.loop'}, $loop, "io.async.loop is \$loop" );
 
-   is_deeply( $received_env,
+   is( $received_env,
       {
          PATH_INFO       => "",
          QUERY_STRING    => "",

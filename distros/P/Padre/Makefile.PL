@@ -5,8 +5,14 @@
 use 5.010000;
 use strict;
 use lib 'privinc';
-use inc::Module::Install 1.06;
+use inc::Module::Install 1.12;
 use POSIX qw(locale_h);
+
+BEGIN {
+	if (! defined $Module::Install::VERSION or $Module::Install::VERSION < 1.08) {
+		die "Need to install Module::Install 1.08 before we can continue";
+	}
+}
 
 # Workaround for the fact that Module::Install loads the modules
 # into memory and when Test::NoWarnings is loaded it will hide
@@ -19,7 +25,7 @@ eval {
 
 BEGIN {
 	if ( author_context and not eval("use Locale::Msgfmt 0.15; 1;") ) {
-		die("Install Locale::Msgfmt version 0.15 or higher to build from SVN");
+		die("Install Locale::Msgfmt version 0.15 or higher to build from Git");
 	}
 }
 
@@ -28,6 +34,8 @@ BEGIN {
 # WON'T load modules to determine the version.
 # This _SHOULD_ theoretically make the "require Test::NoWarnings".
 # stuff above here no longer needed.
+# NOTE: IF YOU GET A BAREWORD ERROR HERE IT MAY BE DUE TO A PARTIALL BROKEN COMPILE.
+# NOTE: DELETE THE blib AND inc DIRECTORIES AND TRY AGAIN.
 configure_requires 'ExtUtils::MakeMaker' => '6.52';
 
 # Force an explicit configure_requires dependency on module that is
@@ -59,7 +67,6 @@ if ( '2.009000' eq Alien::wxWidgets->version ) {
 	print STDERR "wxWidgets. This is known to cause Padre to crash.\n";
 	exit 0;
 }
-
 
 
 
@@ -119,13 +126,14 @@ requires 'IPC::Open2'               => 0;
 requires 'IPC::Open3'               => 0;
 requires 'JSON::XS'                 => '2.29';
 requires 'List::Util'               => '1.18';
+requires 'Parse::Functions'         => '0.01';
 requires 'List::MoreUtils'          => '0.22';
 requires 'LWP'                      => '5.815';
 requires 'LWP::UserAgent'           => '5.815';
 requires 'Module::Build'            => '0.3603';
 requires 'Module::CoreList'         => '2.22';
 requires 'Module::Manifest'         => '0.07';
-requires 'Module::Starter'          => '1.60';
+requires 'Module::Starter'          => '1.60' if not win32;
 requires 'ORLite'                   => '1.98';
 requires 'ORLite::Migrate'          => '1.10';
 requires 'Params::Util'             => '0.33';
@@ -136,10 +144,10 @@ requires 'Pod::POM'                 => '0.17';
 requires 'Pod::Simple'              => '3.07';
 requires 'Pod::Simple::XHTML'       => '3.04';
 requires 'Pod::Abstract'            => '0.16';
-requires 'Pod::Perldoc'             => '3.15';
+requires 'Pod::Perldoc'             => '3.23';
 requires 'POD2::Base'               => '0.043';
 requires 'POSIX'                    => 0;
-requires 'PPI'                      => '1.215';
+requires 'PPI'                      => '1.218';
 requires 'PPIx::EditorTools'        => '0.18';
 requires 'PPIx::Regexp'             => '0.011';
 requires 'Probe::Perl'              => '0.01';
@@ -156,21 +164,21 @@ requires 'threads'                  => '1.71';
 requires 'threads::shared'          => '1.33';
 requires 'URI'                      => '0';
 requires 'version'                  => '0.80';
-requires 'Win32'              => '0.31' if win32;
-requires 'Win32::Shortcut'    => '0.07' if win32;
-requires 'Win32::TieRegistry' => '0.26' if win32;
-requires 'Wx'                 => '0.9916';
-requires 'Wx::Perl::ProcessStream' => '0.32';
-requires 'Wx::Scintilla'           => '0.39';
-requires 'YAML::Tiny'              => '1.32';
-test_requires 'Test::More'         => '0.98';
+requires 'Win32'                    => '0.31' if win32;
+requires 'Win32::Shortcut'          => '0.07' if win32;
+requires 'Win32::TieRegistry'       => '0.26' if win32;
+requires 'Wx'                       => '0.9916';
+requires 'Wx::Perl::ProcessStream'  => '0.32';
+requires 'Wx::Scintilla'            => '0.39';
+requires 'YAML::Tiny'               => '1.32';
+test_requires 'Test::More'          => '0.98';
 
 # Ticket #1419: Padre and the soon to be Perl 5.16
-test_requires 'Test::Warn'       => '0.24';
-test_requires 'Test::MockObject' => '1.09';
-test_requires 'Test::Script'     => '1.07';
-test_requires 'Test::Exception'  => '0.27';
-test_requires 'Test::NoWarnings' => '1.04';
+test_requires 'Test::Warn'          => '0.24';
+test_requires 'Test::MockObject'    => '1.09';
+test_requires 'Test::Script'        => '1.07';
+test_requires 'Test::Exception'     => '0.27';
+test_requires 'Test::NoWarnings'    => '1.04';
 
 # Special dependencies
 
@@ -209,57 +217,58 @@ tests join ' ', @TESTS;
 no_index 'directory' => qw{ t xt eg share inc privinc };
 homepage 'http://padre.perlide.org/';
 bugtracker 'http://padre.perlide.org/trac/';
-repository 'http://svn.perlide.org/padre/trunk/Padre/';
+repository 'https://github.com/PadreIDE/Padre/';
 
-Meta->add_metadata(
-    x_contributors => [
-        'Aaron Trevena (TEEJAY)',
-        'Adam Kennedy (ADAMK) <adamk@cpan.org>',
-        'Ahmad Zawawi أحمد محمد زواوي (AZAWAWI)',
-        'Andrew Shitov',
-        'Alexandr Ciornii (CHORNY)',
-        'Amir E. Aharoni - אמיר א. אהרוני',
-        'Blake Willmarth (BLAKEW)',
-        'BlueT - Matthew Lien - 練喆明 (BLUET) <bluet@cpan.org>',
-        'Breno G. de Oliveira (GARU)',
-        'Brian Cassidy (BRICAS)',
-        'Burak Gürsoy (BURAK) <burak@cpan.org>',
-        'Cezary Morga (THEREK) <cm@therek.net>',
-        'Chris Dolan (CHRISDOLAN)',
-        'Claudio Ramirez (NXADM) <nxadm@cpan.org>',
-        'Dirk De Nijs (ddn123456)',
-        'Enrique Nell (ENELL)',
-        'Fayland Lam (FAYLAND) <fayland@gmail.com>',
-        'Gabriel Vieira (GABRIELMAD)',
-        'Gábor Szabó - גאבור סבו (SZABGAB) <szabgab@cpan.org>',
-        'György Pásztor (GYU)',
-        'Heiko Jansen (HJANSEN) <heiko_jansen@web.de>',
-        'Jérôme Quelin (JQUELIN) <jquelin@cpan.org>',
-        'Kaare Rasmussen (KAARE) <kaare@cpan.org>',
-        'Keedi Kim - 김도형 (KEEDI)',
-        'Kenichi Ishigaki - 石垣憲一 (ISHIGAKI) <ishigaki@cpan.org>',
-        'Kevin Dawson (BOWTIE) <bowtie@cpan.org>',
-        'Kjetil Skotheim (KJETIL)',
-        'Marcela Mašláňová (mmaslano)',
-        'Marek Roszkowski (EviL) <evil@evil.devil.is-my.name>',
-        'Mark Grimes <mgrimes@cpan.org>',
-        'Max Maischein (CORION)',
-        'Olivier MenguE<eacute> (DOLMEN)',
-        'Omer Zak  - עומר זק',
-        'Paco Alguacil (PacoLinux)',
-        'Patrick Donelan (PDONELAN) <pat@patspam.com>',
-        'Paweł Murias (PMURIAS)',
-        'Petar Shangov (PSHANGOV)',
-	'Peter Lavender (PLAVEN)',
-        'Ryan Niebur (RSN) <rsn@cpan.org>',
-        'Sebastian Willing (SEWI)',
-        'Shlomi Fish  - שלומי פיש (SHLOMIF)',
-        'Simone Blandino (SBLANDIN)',
-        'Steffen Müller (TSEE) <smueller@cpan.org>',
-        'Zeno Gantner (ZENOG)',
-        'Chuanren Wu',
-    ],
-);
+# NOTE: Disabled due to Unicode parsing problems on Win32
+#Meta->add_metadata(
+#	x_contributors => [
+#		'Aaron Trevena (TEEJAY)',
+#		'Adam Kennedy (ADAMK) <adamk@cpan.org>',
+#		'Ahmad Zawawi أحمد محمد زواوي (AZAWAWI)',
+#		'Andrew Shitov',
+#		'Alexandr Ciornii (CHORNY)',
+#		'Amir E. Aharoni - אמיר א. אהרוני',
+#		'Blake Willmarth (BLAKEW)',
+#		'BlueT - Matthew Lien - 練喆明 (BLUET) <bluet@cpan.org>',
+#		'Breno G. de Oliveira (GARU)',
+#		'Brian Cassidy (BRICAS)',
+#		'Burak Gürsoy (BURAK) <burak@cpan.org>',
+#		'Cezary Morga (THEREK) <cm@therek.net>',
+#		'Chris Dolan (CHRISDOLAN)',
+#		'Claudio Ramirez (NXADM) <nxadm@cpan.org>',
+#		'Dirk De Nijs (ddn123456)',
+#		'Enrique Nell (ENELL)',
+#		'Fayland Lam (FAYLAND) <fayland@gmail.com>',
+#		'Gabriel Vieira (GABRIELMAD)',
+#		'Gábor Szabó - גאבור סבו (SZABGAB) <szabgab@cpan.org>',
+#		'György Pásztor (GYU)',
+#		'Heiko Jansen (HJANSEN) <heiko_jansen@web.de>',
+#		'Jérôme Quelin (JQUELIN) <jquelin@cpan.org>',
+#		'Kaare Rasmussen (KAARE) <kaare@cpan.org>',
+#		'Keedi Kim - 김도형 (KEEDI)',
+#		'Kenichi Ishigaki - 石垣憲一 (ISHIGAKI) <ishigaki@cpan.org>',
+#		'Kevin Dawson (BOWTIE) <bowtie@cpan.org>',
+#		'Kjetil Skotheim (KJETIL)',
+#		'Marcela Mašláňová (mmaslano)',
+#		'Marek Roszkowski (EviL) <evil@evil.devil.is-my.name>',
+#		'Mark Grimes <mgrimes@cpan.org>',
+#		'Max Maischein (CORION)',
+#		'Olivier MenguE<eacute> (DOLMEN)',
+#		'Omer Zak  - עומר זק',
+#		'Paco Alguacil (PacoLinux)',
+#		'Patrick Donelan (PDONELAN) <pat@patspam.com>',
+#		'Paweł Murias (PMURIAS)',
+#		'Petar Shangov (PSHANGOV)',
+#		'Peter Lavender (PLAVEN)',
+#		'Ryan Niebur (RSN) <rsn@cpan.org>',
+#		'Sebastian Willing (SEWI)',
+#		'Shlomi Fish  - שלומי פיש (SHLOMIF)',
+#		'Simone Blandino (SBLANDIN)',
+#		'Steffen Müller (TSEE) <smueller@cpan.org>',
+#		'Zeno Gantner (ZENOG)',
+#		'Chuanren Wu',
+#	],
+#);
 
 keywords(
 	"auto-completion",
@@ -299,6 +308,10 @@ install_script 'script/padre';
 
 build_padre_exe if win32;
 
+# This enhanced version of install_share is provided by Locale::Msgfmt
+# Without Locale::Msgfmt you will get a bareword error for this line.
+# Without running install_share_with_mofiles Padre won't have a share
+# directory and now you have bigger problems.
 install_share_with_mofiles;
 
 auto_provides if -f 'MANIFEST';

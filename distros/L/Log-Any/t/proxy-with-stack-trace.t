@@ -2,9 +2,10 @@
 use strict;
 use warnings;
 use Test::More;
+use List::Util qw( any );
 use Log::Any;
 
-plan tests => 48;
+plan tests => 61;
 
 use FindBin;
 use lib $FindBin::RealBin;
@@ -18,46 +19,60 @@ BEGIN {
     if ( $@ ) {
         plan skip_all => 'Devel::StackTrace >= 2.00 is required for this test';
     }
-    else {
-        eval {
-            require Storable;
-            Storable->VERSION( 3.08 );
-        };
-        if ( $@ ) {
-            plan skip_all => 'Storable >= 3.08 is required for this test';
-        }
+    eval {
+        require Storable;
+        Storable->VERSION( 3.08 );
+    };
+    if ( $@ ) {
+        plan skip_all => 'Storable >= 3.08 is required for this test';
+    }
+    eval {
+        require Devel::StackTrace::Extract;
+    };
+    if ( $@ ) {
+        plan skip_all => 'Devel::StackTrace::Extract is required for this test';
     }
 }
 
 use Log::Any::Proxy::WithStackTrace;    # necessary?
 
-my $default_log = Log::Any->get_logger;
-my $log         = Log::Any->get_logger( proxy_class => 'WithStackTrace' );
+my $default_log   = Log::Any->get_logger;
+my $log           = Log::Any->get_logger( proxy_class => 'WithStackTrace' );
+my $log_show_args = Log::Any->get_logger( proxy_class => 'WithStackTrace', proxy_show_stack_trace_args => 1);
 
-is ref $default_log, 'Log::Any::Proxy::Null',
+is ref $default_log,   'Log::Any::Proxy::Null',
     'no adapter default proxy is Null';
-is ref $log,         'Log::Any::Proxy::WithStackTrace',
+is ref $log,           'Log::Any::Proxy::WithStackTrace',
     'no adapter explicit proxy is WithStackTrace';
+is ref $log_show_args, 'Log::Any::Proxy::WithStackTrace',
+    'no adapter explicit proxy with proxy_show_stack_trace_args flag is WithStackTrace';
 
-$default_log->info("test");
-$log        ->info("test");
+$default_log  ->info("test");
+$log          ->info("test");
+$log_show_args->info("test");
 
-is ref $default_log, 'Log::Any::Proxy::Null',
+is ref $default_log,   'Log::Any::Proxy::Null',
     'no adapter default proxy is still Null after logging';
-is ref $log,         'Log::Any::Proxy::WithStackTrace',
+is ref $log,           'Log::Any::Proxy::WithStackTrace',
     'no adapter explicit proxy is still WithStackTrace after logging';
+is ref $log_show_args, 'Log::Any::Proxy::WithStackTrace',
+    'no adapter explicit proxy with proxy_show_stack_trace_args flag is still WithStackTrace after logging';
 
 Log::Any->set_adapter('+TestAdapters::Structured');
 
-is ref $default_log, 'Log::Any::Proxy',
+is ref $default_log,   'Log::Any::Proxy',
     'existing default proxy is reblessed after adapter';
-is ref $log,         'Log::Any::Proxy::WithStackTrace',
+is ref $log,           'Log::Any::Proxy::WithStackTrace',
     'existing explicit proxy is still WithStackTrace after adapter';
+is ref $log_show_args, 'Log::Any::Proxy::WithStackTrace',
+    'existing explicit proxy with proxy_show_stack_trace_args flag is still WithStackTrace after adapter';
 
-is ref $default_log->adapter, 'TestAdapters::Structured',
+is ref $default_log->adapter,   'TestAdapters::Structured',
     'existing default proxy has correct adapter';
-is ref $log->adapter,         'TestAdapters::Structured',
+is ref $log->adapter,           'TestAdapters::Structured',
     'existing explicit proxy has correct adapter';
+is ref $log_show_args->adapter, 'TestAdapters::Structured',
+    'existing explicit proxy with proxy_show_stack_trace_args flag has correct adapter';
 
 my @test_cases = (
     [
@@ -132,6 +147,27 @@ sub check_test_cases {
             is_deeply $more_data, $args->[1],
                 "expected structured data from $type logger";
         }
+        foreach my $frame ($trace->frames) {
+            is scalar @{ $frame->{args} }, 0,
+                "stack_trace frame does not have args by default";
+        }
+
+        @TestAdapters::STRUCTURED_LOG = ();
+        $log_show_args->$method(@$args);
+        $msgs = \@TestAdapters::STRUCTURED_LOG;
+        $msg = $msgs->[0]->{data}->[0];  # "data" for non-text
+
+        $trace = $msg->stack_trace;
+
+        ok(
+            any (
+                sub {
+                    ($_->args >= 1);
+                },
+                $trace->frames
+            ),
+            "stack_trace frame has args if proxy_show_stack_trace_args => 1 is passed to logger",
+        );
     }
 }
 

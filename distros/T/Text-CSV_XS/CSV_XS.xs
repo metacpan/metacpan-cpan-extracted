@@ -276,6 +276,7 @@ static const xs_error_t xs_errors[] =  {
     { 2012, "EOF - End of data in parsing input stream"				},
     { 2013, "ESP - Specification error for fragments RFC7111"			},
     { 2014, "ENF - Inconsistent number of fields"				},
+    { 2015, "ERW - Empty row"							},
 
     /*  EIQ - Error Inside Quotes */
     { 2021, "EIQ - NL char inside quotes, binary off"				},
@@ -735,7 +736,6 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	csv->decode_utf8		= bool_opt ("decode_utf8");
 	csv->always_quote		= bool_opt ("always_quote");
 	csv->strict			= bool_opt ("strict");
-	csv->skip_empty_rows		= bool_opt ("skip_empty_rows");
 	csv->quote_empty		= bool_opt ("quote_empty");
 	csv->quote_space		= bool_opt_def ("quote_space",  1);
 	csv->escape_null		= bool_opt_def ("escape_null",  1);
@@ -751,6 +751,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	csv->auto_diag			= num_opt ("auto_diag");
 	csv->diag_verbose		= num_opt ("diag_verbose");
 	csv->keep_meta_info		= num_opt ("keep_meta_info");
+	csv->skip_empty_rows		= num_opt ("skip_empty_rows");
 	csv->formula			= num_opt ("formula");
 
 	unless (csv->escape_char) csv->escape_null = 0;
@@ -951,6 +952,79 @@ static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
     return NULL;
     } /* _formula */
 
+#define SkipEmptyRow	{\
+    int ser = csv->skip_empty_rows;					\
+									\
+    if (ser == 3) { (void)SetDiag (csv, 2015); die   ("Empty row"); }	\
+    if (ser == 4) { (void)SetDiag (csv, 2015); croak ("Empty row"); }	\
+    if (ser == 5) { (void)SetDiag (csv, 2015); return FALSE;        }	\
+									\
+    if (ser <= 2) {	/* skip & eof */				\
+	csv->fld_idx = 0;						\
+	c = CSV_GET;							\
+	if (c == EOF || ser == 2) {					\
+	    sv_free (sv);						\
+	    sv = NULL;							\
+	    waitingForField = 0;					\
+	    if (ser == 2) return FALSE;					\
+	    break;							\
+	    }								\
+	}								\
+									\
+    if (ser == 6) {							\
+	int  result, n, i;						\
+	SV  *rv, **svp = hv_fetchs (csv->self, "_EMPTROW_CB", FALSE);	\
+	AV  *avp;							\
+	unless (svp && _is_coderef (*svp))				\
+	    return FALSE; /* A callback is wanted, but none found */	\
+									\
+	dSP;								\
+	ENTER;								\
+	SAVE_DEFSV; /* local $_ */					\
+	DEFSV = sv;							\
+	PUSHMARK (SP);							\
+	PUTBACK;							\
+	result = call_sv (*svp, G_SCALAR);				\
+	SPAGAIN;							\
+	unless (result) {						\
+	    /* A false return will stop the parsing */			\
+	    sv_free (sv);						\
+	    sv = NULL;							\
+	    waitingForField = 0;					\
+	    return FALSE;						\
+	    }								\
+									\
+	PUTBACK;							\
+	LEAVE;								\
+									\
+	rv = POPs;							\
+	/* Result should be a ref to a list. */				\
+	unless (_is_arrayref (rv))					\
+	    return FALSE;						\
+									\
+	avp = (AV *)SvRV (rv);						\
+									\
+	unless (avp) return FALSE;					\
+	n = av_len (avp);						\
+	if (n <= 0)  return TRUE;					\
+									\
+	if (csv->is_bound && csv->is_bound < n)				\
+	    n = csv->is_bound - 1;					\
+									\
+	for (i = 0; i <= n; i++) {					\
+	    SV **svp = av_fetch (avp, i, FALSE);			\
+	    sv = svp && *svp ? *svp : NULL;				\
+	    if (sv) {							\
+		SvREFCNT_inc (sv);					\
+		/* upgrade IV to IVPV if needed */			\
+		(void)SvPV_nolen (sv);					\
+		}							\
+	    AV_PUSH;							\
+	    }								\
+	return TRUE;							\
+	}								\
+    }
+
 #define Combine(csv,dst,fields)	cx_Combine (aTHX_ csv, dst, fields)
 static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
     SSize_t i, n;
@@ -958,7 +1032,7 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
     int     aq  = (int)csv->always_quote;
     int     qe  = (int)csv->quote_empty;
     int     kmi = (int)csv->keep_meta_info;
-    AV     *qm = NULL;
+    AV     *qm  = NULL;
 
     n = (IV)av_len (fields);
     if (n < 0 && csv->is_bound) {
@@ -1288,11 +1362,13 @@ int CSV_GET_ (pTHX_ csv_t *csv, SV *src, int l) {
 #endif
 
 #define AV_PUSH { \
+    int svc;								\
     *SvEND (sv) = (char)0;						\
+    svc = SvCUR (sv);							\
     SvUTF8_off (sv);							\
-    if (csv->formula && SvCUR (sv) && *(SvPV_nolen (sv)) == '=')	\
+    if (svc && csv->formula && *(SvPV_nolen (sv)) == '=')		\
 	(void)_formula (csv, sv, NULL, fnum);				\
-    if (SvCUR (sv) == 0 && (						\
+    if (svc == 0 && (							\
 	    csv->empty_is_undef ||					\
 	    (!(f & CSV_FLAGS_QUO) && csv->blank_is_undef)))		\
 	SvSetUndef (sv);						\
@@ -1679,14 +1755,7 @@ EOLX:
 		_pretty_strl (csv->bptr + csv->used));
 #endif
 	    if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
-		csv->fld_idx = 0;
-		c = CSV_GET;
-		if (c == EOF) {
-		    sv_free (sv);
-		    sv = NULL;
-		    waitingForField = 0;
-		    break;
-		    }
+		SkipEmptyRow;
 		goto restart;
 		}
 
@@ -1814,14 +1883,7 @@ EOLX:
 			csv->used--;
 			csv->has_ahead++;
 			if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
-			    csv->fld_idx = 0;
-			    c = CSV_GET;
-			    if (c == EOF) {
-				sv_free (sv);
-				sv = NULL;
-				waitingForField = 0;
-				break;
-				}
+			    SkipEmptyRow;
 			    goto restart;
 			    }
 			AV_PUSH;
@@ -1879,14 +1941,7 @@ EOLX:
 			csv->used--;
 			csv->has_ahead++;
 			if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
-			    csv->fld_idx = 0;
-			    c = CSV_GET;
-			    if (c == EOF) {
-				sv_free (sv);
-				sv = NULL;
-				waitingForField = 0;
-				break;
-				}
+			    SkipEmptyRow;
 			    goto restart;
 			    }
 			AV_PUSH;
@@ -2008,8 +2063,11 @@ EOLX:
     if (f & CSV_FLAGS_QUO)
 	ERROR_INSIDE_QUOTES (2027);
 
-    if (sv)
+    if (sv) {
 	AV_PUSH;
+	}
+    else if (f == 0 && fnum == 1 && csv->skip_empty_rows == 1)
+	return FALSE;
     return TRUE;
     } /* Parse */
 
@@ -2276,9 +2334,7 @@ BOOT:
     Perl_load_module (aTHX_ PERL_LOADMOD_NOIMPORT, newSVpvs ("IO::Handle"), NULL, NULL, NULL);
 
 void
-SetDiag (self, xse, ...)
-    SV		*self
-    int		 xse
+SetDiag (SV *self, int xse, ...)
 
   PPCODE:
     HV		*hv;
@@ -2303,8 +2359,7 @@ SetDiag (self, xse, ...)
     /* XS SetDiag */
 
 void
-error_input (self)
-    SV		*self
+error_input (SV *self)
 
   PPCODE:
     if (self && SvOK (self) && SvROK (self) && SvTYPE (SvRV (self)) == SVt_PVHV) {
@@ -2322,11 +2377,7 @@ error_input (self)
     /* XS error_input */
 
 void
-Combine (self, dst, fields, useIO)
-    SV		*self
-    SV		*dst
-    SV		*fields
-    bool	 useIO
+Combine (SV *self, SV *dst, SV *fields, bool useIO)
 
   PPCODE:
     HV	*hv;
@@ -2339,11 +2390,7 @@ Combine (self, dst, fields, useIO)
     /* XS Combine */
 
 void
-Parse (self, src, fields, fflags)
-    SV		*self
-    SV		*src
-    SV		*fields
-    SV		*fflags
+Parse (SV *self, SV *src, SV *fields, SV *fflags)
 
   PPCODE:
     HV	*hv;
@@ -2359,10 +2406,7 @@ Parse (self, src, fields, fflags)
     /* XS Parse */
 
 void
-print (self, io, fields)
-    SV		*self
-    SV		*io
-    SV		*fields
+print (SV *self, SV *io, SV *fields)
 
   PPCODE:
     HV	 *hv;
@@ -2383,9 +2427,7 @@ print (self, io, fields)
     /* XS print */
 
 void
-getline (self, io)
-    SV		*self
-    SV		*io
+getline (SV *self, SV *io)
 
   PPCODE:
     HV	*hv;
@@ -2402,9 +2444,7 @@ getline (self, io)
     /* XS getline */
 
 void
-getline_all (self, io, ...)
-    SV		*self
-    SV		*io
+getline_all (SV *self, SV *io, ...)
 
   PPCODE:
     HV	*hv;
@@ -2420,10 +2460,7 @@ getline_all (self, io, ...)
     /* XS getline_all */
 
 void
-_cache_set (self, idx, val)
-    SV		*self
-    int		 idx
-    SV		*val
+_cache_set (SV *self, int idx, SV *val)
 
   PPCODE:
     HV	*hv;
@@ -2434,8 +2471,7 @@ _cache_set (self, idx, val)
     /* XS _cache_set */
 
 void
-_cache_diag (self)
-    SV		*self
+_cache_diag (SV *self)
 
   PPCODE:
     HV	*hv;

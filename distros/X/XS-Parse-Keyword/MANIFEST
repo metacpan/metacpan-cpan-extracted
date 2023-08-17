@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/force_list_keeping_pushmark.c.inc
@@ -40,9 +41,10 @@ t/35pieces-lexvar.t
 t/36pieces-attrs.t
 t/37pieces-vstring.t
 t/38pieces-infix.t
+t/39pieces-warning.t
 t/40build.t
 t/41structures.t
-t/42scopes.t
+t/42containers.t
 t/43probing.t
 t/50flags-autosemi.t
 t/60line.t

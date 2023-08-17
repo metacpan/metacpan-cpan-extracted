@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.name :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.sheetName :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.listObjectIndex :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.destsheetName :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.createPivotTableRequest :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.folder :   ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.storageName :    
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.name : The workbook name.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.sheetName : The worksheet name.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.listObjectIndex : List object index.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.destsheetName : Target work sheet name.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.createPivotTableRequest : Create pivot table request.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.folder : Original workbook folder.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_summarize_with_pivot_table' } = { 
-    	summary => '',
+    	summary => 'Creates pivot table with list object in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,49 +149,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => '',
+     	description => 'List object index.',
      	format => '',
      	read_only => '',
      		},
      'destsheet_name' => {
      	datatype => 'string',
      	base_name => 'destsheetName',
-     	description => '',
+     	description => 'Target work sheet name.',
      	format => '',
      	read_only => '',
      		},
      'create_pivot_table_request' => {
      	datatype => 'CreatePivotTableRequest',
      	base_name => 'createPivotTableRequest',
-     	description => '',
+     	description => 'Create pivot table request.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

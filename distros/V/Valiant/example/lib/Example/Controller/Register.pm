@@ -6,20 +6,22 @@ use Example::Syntax;
 
 extends 'Example::Controller';
 
-sub new_entity :Via('*Public') At('register/...') ($self, $c, $user) {
-  return $c->redirect_to_action('#home') && $c->detach if $user->registered;
-  $c->view('HTML::Register', registration => $user);
+sub root :At('$path_end/...') Via('../public')  ($self, $c, $user) {
+  return $c->redirect_to_action('/home/user_show') && $c->detach if $user->registered;
   $c->action->next($user);
 }
 
-  sub init :GET Via('new_entity') At('init') ($self, $c, $user) {
-    return $c->view->set_http_ok;
+  sub prepare_build :At('...') Via('root') ($self, $c, $user) {
+    $self->view_for('build', registration => $user); 
+    $c->action->next($user);
   }
 
-  sub create :POST Via('new_entity') At('') BodyModel(RegistrationRequest) ($self, $c, $user, $request) {
-    return $user->register($request) ?
-      $c->redirect_to_action('*Login') :
-        $c->view->set_http_bad_request;
-  }
+    # GET /register/new
+    sub build :Get('new') Via('prepare_build') ($self, $c, $user) { return }
+
+    # POST /register
+    sub create :Post('') Via('prepare_build') BodyModel ($self, $c, $user, $bm) {
+      return $c->redirect_to_action('/session/build') if $user->register($bm);
+    }
 
 __PACKAGE__->meta->make_immutable; 

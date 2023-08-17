@@ -39,6 +39,7 @@ my @files = (
     't/022_sign_no_xml_declaration.t',
     't/023_hmac.t',
     't/024-sign-wide-char.t',
+    't/025_verify-xml-with-id.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

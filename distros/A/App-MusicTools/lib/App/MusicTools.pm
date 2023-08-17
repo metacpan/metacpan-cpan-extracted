@@ -1,10 +1,8 @@
 # -*- Perl -*-
-#
-# Of more interest may be the scripts listed as EXE_FILES in Makefile.PL.
 
 package App::MusicTools;
 use 5.014000;
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 1;
 
 __END__

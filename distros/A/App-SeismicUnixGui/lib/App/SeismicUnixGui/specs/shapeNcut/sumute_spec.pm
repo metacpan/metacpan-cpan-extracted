@@ -19,7 +19,7 @@ my $flow_type           = $get->flow_type_href();
 
 my $DATA_SEISMIC_BIN  	= $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_SEGY  	= $Project->DATA_SEISMIC_SEGY();
-my $DATA_SEISMIC_SU  	= $Project->DATA_SEISMIC_SU();   # output data directory
+my $DATA_SEISMIC_SU  	= $Project->DATA_SEISMIC_SU();    # output data directory
 my $DATA_SEISMIC_TXT  	= $Project->DATA_SEISMIC_TXT();   # output data directory
 my $PL_SEISMIC		    = $Project->PL_SEISMIC();
 my $PS_SEISMIC  		= $Project->PS_SEISMIC();
@@ -109,7 +109,7 @@ one type of dialog for each index
 	my @index      = @$index_aref;
 
 	# bound index will look for data
-	$type[$index[0]] = $file_dialog_type->{_Data_PL_SEISMIC};
+	$type[$index[0]] = $file_dialog_type->{_Data_SEISMIC_TXT};
 	$type[$index[1]] = $file_dialog_type->{_Data};
 	$type[$index[2]] = $file_dialog_type->{_Data_PL_SEISMIC};
 	$type[$index[3]] = $file_dialog_type->{_Data_PL_SEISMIC};
@@ -344,22 +344,22 @@ are filtered by sunix_pl
 	my $index_aref = get_binding_index_aref();
 	my @index       = @$index_aref;
 
-	# label 3 in GUI is input/output xx_file and needs a home directory
-	$prefix[ $index[0] ] =  '$PL_SEISMIC' . ".'/'.";
- 
 	# label 4 in GUI is input/output xx_file and needs a home directory
+	$prefix[ $index[0] ] =  '$DATA_SEISMIC_TXT' . ".'/'.";
+ 
+	# label 5 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[1] ] =  '$DATA_SEISMIC_SU' . ".'/'.";
  
-	# label 8 in GUI is input/output xx_file and needs a home directory
+	# label 9 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[2] ] =  '$PL_SEISMIC' . ".'/'.";
  
-	# label 9 in GUI is input/output xx_file and needs a home directory
+	# label 10 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[3] ] =  '$PL_SEISMIC' . ".'/'.";
  
-	# label 12 in GUI is input/output xx_file and needs a home directory
+	# label 13 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[4] ] =  '$PL_SEISMIC' . ".'/'.";
  
-	# label 15 in GUI is input/output xx_file and needs a home directory
+	# label 16 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[5] ] =  '$PL_SEISMIC' . ".'/'.";
 
 	$sumute_spec ->{_prefix_aref} = \@prefix;
@@ -390,22 +390,22 @@ values
 	my $index_aref = get_binding_index_aref();
 	my @index       = @$index_aref;
 
-	# label 3 in GUI is input/ouput xx_file and needs a home directory
-	$suffix[ $index[0] ] =  ''.'' . '';
- 
 	# label 4 in GUI is input/ouput xx_file and needs a home directory
+	$suffix[ $index[0] ] =  ''.'' . '$suffix_txt';
+ 
+	# label 5 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[1] ] =  ''.'' . '$suffix_su';
  
-	# label 8 in GUI is input/ouput xx_file and needs a home directory
+	# label 9 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[2] ] =  ''.'' . '';
  
-	# label 9 in GUI is input/ouput xx_file and needs a home directory
+	# label 10 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[3] ] =  ''.'' . '';
  
-	# label 12 in GUI is input/ouput xx_file and needs a home directory
+	# label 13 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[4] ] =  ''.'' . '';
  
-	# label 15 in GUI is input/ouput xx_file and needs a home directory
+	# label 16 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[5] ] =  ''.'' . '';
 
  

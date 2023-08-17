@@ -1,10 +1,10 @@
-# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2023 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
 # Perl itself.
 
-use common::sense;
+use strict;
 
 use Test::More tests => 43;
 
@@ -31,27 +31,27 @@ ok $matcher->match('hello.pl'), 'full path match';
 ok !$matcher->match('path/to/hello.pl'), 'match in subdirectory';
 
 SKIP: {
-    skip "unclear git behavior", 3 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
+	skip "unclear git behavior", 3 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
 
-    $input = <<EOF;
+	$input = <<EOF;
 *.o
 !o.o
 EOF
-    $matcher = File::Globstar::ListMatch->new(\$input);
-    ok $matcher->match('path/to/compiled.o'), 'wildcard match';
-    ok !$matcher->match('o.o'), 'negated match';
-    ok !$matcher->match('path/to/o.o'), 'negated match in subdirectory';
+	$matcher = File::Globstar::ListMatch->new(\$input);
+	ok $matcher->match('path/to/compiled.o'), 'wildcard match';
+	ok !$matcher->match('o.o'), 'negated match';
+	ok !$matcher->match('path/to/o.o'), 'negated match in subdirectory';
 }
 
 SKIP: {
-    skip "cannot test ignore case with real git", 3 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
-    $input = <<EOF;
+	skip "cannot test ignore case with real git", 3 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
+	$input = <<EOF;
 FooBar
 EOF
-    $matcher = File::Globstar::ListMatch->new(\$input, ignoreCase => 1);
-    ok $matcher->match('FooBar'), 'ignoreCase exact';
-    ok $matcher->match('foobar'), 'ignoreCase lower';
-    ok $matcher->match('FOOBAR'), 'ignoreCase upper';
+	$matcher = File::Globstar::ListMatch->new(\$input, ignoreCase => 1);
+	ok $matcher->match('FooBar'), 'ignoreCase exact';
+	ok $matcher->match('foobar'), 'ignoreCase lower';
+	ok $matcher->match('FOOBAR'), 'ignoreCase upper';
 }
 
 $input = <<EOF;
@@ -122,15 +122,15 @@ ok $matcher->match('node_modules/'), 'implicit directory match';
 ok $matcher->match('node_modules/', 0), 'implicit override directory match';
 
 SKIP: {
-    skip "avoid git warning", 2 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
+	skip "avoid git warning", 2 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
 
-    $input = <<EOF;
+	$input = <<EOF;
 /
 EOF
-    $matcher = File::Globstar::ListMatch->new(\$input);
-    # Leading slashes are invalid.  The pattern can never match.
-    ok !$matcher->match('/'), 'slash';
-    ok !$matcher->match('/top-level'), 'top-level';
+	$matcher = File::Globstar::ListMatch->new(\$input);
+	# Leading slashes are invalid.  The pattern can never match.
+	ok !$matcher->match('/'), 'slash';
+	ok !$matcher->match('/top-level'), 'top-level';
 }
 
 $input =<<EOF;
@@ -165,13 +165,13 @@ $matcher = File::Globstar::ListMatch->new(\$input);
 ok $matcher->match('nested/dir/deep/inside'), 'trailing globstar inside';
 ok $matcher->match('nested/dir/'), 'trailing globstar, trailing slash';
 SKIP: {
-    # This should match but does not in git.  The documentation
-    # in gitignore(5) is a little vague there, saying that '"/**"
-    # matches everything inside' but does not say wether it matches
-    # the directory itself or not.  Bash globstar does match, and so
-    # do we.
-    skip "git bug", 1 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
-    ok $matcher->match('nested/dir'), 'trailing globstar, empty';
+	# This should match but does not in git.  The documentation
+	# in gitignore(5) is a little vague there, saying that '"/**"
+	# matches everything inside' but does not say wether it matches
+	# the directory itself or not.  Bash globstar does match, and so
+	# do we.
+	skip "git bug", 1 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
+	ok $matcher->match('nested/dir'), 'trailing globstar, empty';
 }
 
 # This file gets required by the git test!

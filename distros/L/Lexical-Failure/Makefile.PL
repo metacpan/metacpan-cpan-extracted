@@ -14,7 +14,6 @@ WriteMakefile(
         'Test::More'            => 0,
         'Test::Effects'         => 0,
         'Scope::Upper'          => 0,
-#        'PadWalker'             => 0,
         'Keyword::Simple'       => 0.02,
         'Hash::Util::FieldHash' => 0,
     },

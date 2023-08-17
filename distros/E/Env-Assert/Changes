@@ -1,5 +1,9 @@
 Revision history for Env-Assert
 
+0.008     2023-08-13 13:25:41+02:00 Europe/Berlin
+          * Fix dist.ini Run::AfterRelease action.
+          * Create CLI option --exact
+
 0.007     2023-04-23 22:45:02+02:00 Europe/Stockholm
           * Replace say with print
           * Add envassert.self-contained to MANIFEST.SKIP.

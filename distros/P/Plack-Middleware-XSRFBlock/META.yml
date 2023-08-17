@@ -45,14 +45,16 @@ requires:
   Plack::Util: '0'
   Plack::Util::Accessor: '0'
   parent: '0'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://github.com/chiselwright/Plack-Middleware-XSRFBlock/issues
   repository: git://github.com/chiselwright/plack-middleware-xsrfblock.git
-version: 0.0.17
+version: 0.0.19
 x_contributors:
   - 'Andrey Khozov <andrey@rydlab.ru>'
+  - 'Ashley Pond V <ashley.pond.v@gmail.com>'
   - 'Chisel <chisel.wright@net-a-porter.com>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
   - 'Gianni Ceccarelli <dakkar@thenautilus.net>'

@@ -1,0 +1,1449 @@
+Package: adwaita-icon-theme
+Status: install ok installed
+Architecture: all
+Depends: hicolor-icon-theme, gtk-update-icon-cache
+Recommends: librsvg2-common
+
+Package: alsa-topology-conf
+Status: install ok installed
+Architecture: all
+
+Package: alsa-ucm-conf
+Status: install ok installed
+Architecture: all
+Depends: libasound2 (>= 1.2.4)
+
+Package: alsa-utils
+Status: install ok installed
+Architecture: amd64
+Depends: kmod (>= 17-1~), lsb-base (>= 3.0-9), libasound2 (>= 1.2.6.1), libatopology2 (>= 1.2.2), libc6 (>= 2.34), libfftw3-single3 (>= 3.3.5), libncursesw6 (>= 6), libsamplerate0 (>= 0.1.7), libtinfo6 (>= 6)
+Suggests: dialog
+
+Package: at-spi2-common
+Status: install ok installed
+Architecture: all
+
+Package: bubblewrap
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libcap2 (>= 1:2.10), libselinux1 (>= 3.1~)
+Recommends: procps
+
+Package: chromium-common
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdouble-conversion3 (>= 2.0.0), libjsoncpp25 (>= 1.9.5), libstdc++6 (>= 12), libx11-6, libxnvctrl0, zlib1g (>= 1:1.2.2), x11-utils, xdg-utils
+Recommends: upower, libu2f-udev, libgl1-mesa-dri, chromium-sandbox, fonts-liberation, notification-daemon, system-config-printer
+
+Package: dash
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Depends: debianutils (>= 5.6-0.1), dpkg (>= 1.19.1)
+Pre-Depends: libc6 (>= 2.34)
+
+Package: dconf-gsettings-backend
+Status: install ok installed
+Architecture: amd64
+Depends: dconf-service (<< 0.40.0-4.1~), dconf-service (>= 0.40.0-4), libdconf1 (= 0.40.0-4), libc6 (>= 2.14), libglib2.0-0 (>= 2.55.2)
+
+Package: dconf-service
+Status: install ok installed
+Architecture: amd64
+Depends: default-dbus-session-bus | dbus-session-bus, libdconf1 (= 0.40.0-4), procps, libc6 (>= 2.34), libglib2.0-0 (>= 2.55.2)
+Recommends: dconf-gsettings-backend
+
+Package: debconf
+Status: install ok installed
+Architecture: all
+Recommends: apt-utils, debconf-i18n
+Suggests: debconf-doc, debconf-kde-helper, debconf-utils, libgtk3-perl, libnet-ldap-perl, libterm-readline-gnu-perl, perl, whiptail | dialog
+
+Package: debianutils
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Pre-Depends: libc6 (>= 2.34)
+
+Package: dpkg
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Depends: tar (>= 1.28-1)
+Pre-Depends: libbz2-1.0, libc6 (>= 2.34), liblzma5 (>= 5.4.0), libmd0 (>= 0.0.0), libselinux1 (>= 3.1~), libzstd1 (>= 1.5.2), zlib1g (>= 1:1.1.4)
+Suggests: apt, debsig-verify
+
+Package: evince
+Status: install ok installed
+Architecture: amd64
+Depends: evince-common (>= 43.1-2), gsettings-desktop-schemas, libevdocument3-4 (= 43.1-2+b1), libevview3-3 (= 43.1-2+b1), shared-mime-info, dconf-gsettings-backend | gsettings-backend, libatk1.0-0 (>= 1.12.4), libc6 (>= 2.34), libcairo-gobject2 (>= 1.10.0), libcairo2 (>= 1.14.0), libgdk-pixbuf-2.0-0 (>= 2.40), libglib2.0-0 (>= 2.61.2), libgnome-desktop-3-20 (>= 3.17.92), libgtk-3-0 (>= 3.22.0), libhandy-1-0 (>= 1.5.90), libpango-1.0-0 (>= 1.37.5), libpangocairo-1.0-0 (>= 1.14.0), libsecret-1-0 (>= 0.7)
+Recommends: default-dbus-session-bus | dbus-session-bus
+Suggests: gvfs, nautilus-sendto, poppler-data, unrar
+Enhances: nautilus
+
+Package: evince-common
+Status: install ok installed
+Architecture: all
+
+Package: fontconfig
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libfontconfig1 (>= 2.13.0), libfreetype6 (>= 2.2.1), fontconfig-config
+
+Package: fontconfig-config
+Status: install ok installed
+Architecture: amd64
+Depends: debconf (>= 0.5) | debconf-2.0, fonts-dejavu-core | ttf-bitstream-vera | fonts-liberation | fonts-liberation2 | fonts-croscore | fonts-freefont-otf | fonts-freefont-ttf | fonts-urw-base35 | fonts-texgyre
+
+Package: fonts-croscore
+Status: install ok installed
+Architecture: all
+Suggests: fonts-crosextra-caladea, fonts-crosextra-carlito
+
+Package: fonts-dejavu-core
+Status: install ok installed
+Architecture: all
+
+Package: fonts-freefont-otf
+Status: install ok installed
+Architecture: all
+
+Package: fonts-freefont-ttf
+Status: install ok installed
+Architecture: all
+
+Package: fonts-liberation
+Status: install ok installed
+Architecture: all
+
+Package: fonts-liberation2
+Status: install ok installed
+Architecture: all
+
+Package: fonts-texgyre
+Status: install ok installed
+Architecture: all
+Recommends: fonts-texgyre-math (= 20180621-6)
+
+Package: fonts-urw-base35
+Status: install ok installed
+Architecture: all
+Depends: xfonts-utils
+Suggests: fonts-freefont-otf | fonts-freefont-ttf, fonts-texgyre
+
+Package: gcc-12-base
+Status: install ok installed
+Architecture: amd64
+
+Package: gnome-desktop3-data
+Status: install ok installed
+Architecture: all
+
+Package: gsettings-desktop-schemas
+Status: install ok installed
+Architecture: all
+Depends: dconf-gsettings-backend | gsettings-backend
+
+Package: gstreamer1.0-plugins-base
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libcdparanoia0 (>= 3.10.2+debian), libglib2.0-0 (>= 2.67.3), libgstreamer-plugins-base1.0-0 (>= 1.22.0), libgstreamer1.0-0 (>= 1.22.0), libogg0 (>= 1.0rc3), libopus0 (>= 1.1), liborc-0.4-0 (>= 1:0.4.25), libtheora0 (>= 1.1), libvisual-0.4-0 (>= 0.4.0), libvorbis0a (>= 1.3.1), libvorbisenc2 (>= 1.3.1)
+Suggests: gvfs
+
+Package: gtk-update-icon-cache
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgdk-pixbuf-2.0-0 (>= 2.40.0), libglib2.0-0 (>= 2.57.2)
+
+Package: hicolor-icon-theme
+Status: install ok installed
+Architecture: all
+
+Package: init-system-helpers
+Essential: yes
+Status: install ok installed
+Architecture: all
+Depends: usrmerge | usr-is-merged
+
+Package: iso-codes
+Status: install ok installed
+Architecture: all
+Suggests: isoquery
+
+Package: libacl1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libarchive13
+Status: install ok installed
+Architecture: amd64
+Depends: libacl1 (>= 2.2.23), libbz2-1.0, libc6 (>= 2.36), liblz4-1 (>= 0.0~r130), liblzma5 (>= 5.2.2), libnettle8, libxml2 (>= 2.7.4), libzstd1 (>= 1.5.2), zlib1g (>= 1:1.1.4)
+Suggests: lrzip
+
+Package: libasound2
+Status: install ok installed
+Architecture: amd64
+Depends: libasound2-data (>= 1.2.8-1), libc6 (>= 2.34)
+Suggests: libasound2-plugins (>= 1.0.24)
+
+Package: libasound2-data
+Status: install ok installed
+Architecture: all
+Recommends: alsa-ucm-conf, alsa-topology-conf
+Suggests: alsa-utils
+
+Package: libaspell15
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libstdc++6 (>= 11)
+Recommends: aspell-en | aspell-dictionary | aspell6a-dictionary
+Suggests: aspell
+
+Package: libasyncns0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libatk-bridge2.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libatk1.0-0 (>= 2.33.1), libatspi2.0-0 (>= 2.9.90), libc6 (>= 2.7), libdbus-1-3 (>= 1.9.14), libglib2.0-0 (>= 2.62)
+
+Package: libatk1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libglib2.0-0 (>= 2.62), at-spi2-common
+
+Package: libatomic1
+Status: install ok installed
+Architecture: amd64
+Depends: gcc-12-base (= 12.2.0-14), libc6 (>= 2.14)
+
+Package: libatspi2.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.7), libdbus-1-3 (>= 1.9.14), libglib2.0-0 (>= 2.62), libx11-6 (>= 2:1.2.99.901), libxi6 (>= 2:1.2.99.4)
+Recommends: at-spi2-core (= 2.46.0-5)
+
+Package: libattr1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libaudit-common
+Status: install ok installed
+Architecture: all
+
+Package: libaudit1
+Status: install ok installed
+Architecture: amd64
+Depends: libaudit-common (>= 1:3.0.9-1), libc6 (>= 2.33), libcap-ng0 (>= 0.7.9)
+
+Package: libavahi-client3
+Status: install ok installed
+Architecture: amd64
+Depends: libavahi-common3 (= 0.8-8), libc6 (>= 2.34), libdbus-1-3 (>= 1.9.14)
+
+Package: libavahi-common-data
+Status: install ok installed
+Architecture: amd64
+
+Package: libavahi-common3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libavahi-common-data (= 0.8-8)
+
+Package: libblkid1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libbrotli1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29)
+
+Package: libbsd0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libmd0 (>= 1.0.3-2)
+
+Package: libbz2-1.0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libc-bin
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>> 2.36), libc6 (<< 2.37)
+Recommends: manpages
+
+Package: libc6
+Status: install ok installed
+Architecture: amd64
+Depends: libgcc-s1
+Recommends: libidn2-0 (>= 2.0.5~)
+Suggests: glibc-doc, debconf | debconf-2.0, libc-l10n, locales, libnss-nis, libnss-nisplus
+
+Package: libc6
+Status: install ok installed
+Architecture: i386
+Depends: libgcc-s1
+Recommends: libidn2-0 (>= 2.0.5~)
+Suggests: glibc-doc, debconf | debconf-2.0, libc-l10n, locales, libnss-nis, libnss-nisplus
+
+Package: libcairo-gobject2
+Status: install ok installed
+Architecture: amd64
+Depends: libcairo2 (= 1.16.0-7), libglib2.0-0 (>= 2.14.0)
+
+Package: libcairo2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.35), libfontconfig1 (>= 2.12.6), libfreetype6 (>= 2.9.1), libpixman-1-0 (>= 0.30.0), libpng16-16 (>= 1.6.2-1), libx11-6, libxcb-render0, libxcb-shm0, libxcb1 (>= 1.6), libxext6, libxrender1, zlib1g (>= 1:1.1.4)
+
+Package: libcap-ng0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libcap2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libcap2-bin
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libcap2 (>= 1:2.63)
+Recommends: libpam-cap
+
+Package: libcdparanoia0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.17)
+
+Package: libcolord2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29), libglib2.0-0 (>= 2.58), liblcms2-2 (>= 2.6), libudev1 (>= 196)
+Suggests: colord
+
+Package: libcom-err2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.17)
+
+Package: libcom-err2
+Status: install ok installed
+Architecture: i386
+Depends: libc6 (>= 2.28)
+
+Package: libcrypt1
+Protected: yes
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.36)
+Important: yes
+
+Package: libcups2
+Status: install ok installed
+Architecture: amd64
+Depends: libavahi-client3 (>= 0.6.16), libavahi-common3 (>= 0.6.16), libc6 (>= 2.34), libgnutls30 (>= 3.7.5), libgssapi-krb5-2 (>= 1.17), zlib1g (>= 1:1.2.0)
+Suggests: cups-common
+
+Package: libdatrie1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libdbus-1-3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libsystemd0
+Recommends: dbus
+
+Package: libdconf1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libglib2.0-0 (>= 2.55.2)
+
+Package: libdeflate0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libdjvulibre-text
+Status: install ok installed
+Architecture: all
+
+Package: libdjvulibre21
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.0), libjpeg62-turbo (>= 1.3.1), libstdc++6 (>= 5), libdjvulibre-text (>= 3.5.28-2)
+
+Package: libdouble-conversion3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libgcc-s1 (>= 3.0), libstdc++6 (>= 4.1.1)
+
+Package: libdrm-amdgpu1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdrm2 (>= 2.4.108)
+
+Package: libdrm-common
+Status: install ok installed
+Architecture: all
+
+Package: libdrm-intel1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdrm2 (>= 2.4.108), libpciaccess0
+
+Package: libdrm-nouveau2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libdrm2 (>= 2.4.108)
+
+Package: libdrm-nouveau2
+Status: install ok installed
+Architecture: i386
+Depends: libc6 (>= 2.4), libdrm2 (>= 2.4.108)
+
+Package: libdrm-radeon1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libdrm2 (>= 2.4.108)
+
+Package: libdrm2
+Status: install ok installed
+Architecture: amd64
+Depends: libdrm-common (>= 2.4.114-1), libc6 (>= 2.33)
+
+Package: libdw1
+Status: install ok installed
+Architecture: amd64
+Depends: libbz2-1.0, libc6 (>= 2.34), libelf1 (= 0.188-2.1), liblzma5 (>= 5.1.1alpha+20120614), zlib1g (>= 1:1.2.2.3)
+
+Package: libedit2
+Status: install ok installed
+Architecture: amd64
+Depends: libbsd0 (>= 0.1.3), libc6 (>= 2.33), libtinfo6 (>= 6)
+
+Package: libelf1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), zlib1g (>= 1:1.1.4)
+
+Package: libenchant-2-2
+Status: install ok installed
+Architecture: amd64
+Depends: hunspell-en-us | hunspell-dictionary | myspell-dictionary | aspell-dictionary | ispell-dictionary, libaspell15 (>= 0.60.8), libc6 (>= 2.33), libgcc-s1 (>= 3.0), libglib2.0-0 (>= 2.28.0), libhunspell-1.7-0, libstdc++6 (>= 5.2), zlib1g (>= 1:1.1.4)
+Recommends: enchant-2
+Suggests: libenchant-2-voikko
+
+Package: libepoxy0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.7)
+
+Package: libevdocument3-4
+Status: install ok installed
+Architecture: amd64
+Depends: libarchive13 (>= 3.6.0), libc6 (>= 2.35), libcairo2 (>= 1.14.0), libdjvulibre21 (>= 3.5.28), libgdk-pixbuf-2.0-0 (>= 2.40), libglib2.0-0 (>= 2.55.1), libgtk-3-0 (>= 3.22.0), libgxps2 (>= 0.2.1), libkpathsea6 (>= 2022.20220321.62855), libpango-1.0-0 (>= 1.18.0), libpoppler-glib8 (>= 22.02.0), libspectre1 (>= 0.2.3), libsynctex2 (>= 2022.20220321.62855), libtiff6 (>= 4.0.3), libxml2 (>= 2.7.4)
+
+Package: libevent-2.1-7
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libevview3-3
+Status: install ok installed
+Architecture: amd64
+Depends: gstreamer1.0-plugins-base, libatk1.0-0 (>= 1.12.4), libc6 (>= 2.29), libcairo2 (>= 1.14.0), libevdocument3-4 (>= 43~alpha), libglib2.0-0 (>= 2.38), libgspell-1-2 (>= 1.8.2), libgstreamer-plugins-base1.0-0 (>= 1.0.0), libgstreamer1.0-0 (>= 1.0.0), libgtk-3-0 (>= 3.22.0), libpango-1.0-0 (>= 1.14.0)
+
+Package: libexpat1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.25)
+
+Package: libffi8
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libfile-find-rule-perl
+Status: install ok installed
+Architecture: all
+Depends: perl:any, libnumber-compare-perl, libtext-glob-perl
+
+Package: libflac12
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libogg0 (>= 1.0rc3)
+
+Package: libfontconfig1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libexpat1 (>= 2.0.1), libfreetype6 (>= 2.9.1), fontconfig-config (>= 2.14.1-4)
+
+Package: libfontenc1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), zlib1g (>= 1:1.1.4)
+
+Package: libfreetype6
+Status: install ok installed
+Architecture: amd64
+Depends: libbrotli1 (>= 0.6.0), libc6 (>= 2.33), libpng16-16 (>= 1.6.2-1), zlib1g (>= 1:1.1.4)
+
+Package: libfribidi0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.3.4)
+
+Package: libgbm1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdrm2 (>= 2.4.75), libexpat1 (>= 2.0.1), libwayland-server0 (>= 1.15.0)
+
+Package: libgcc-s1
+Protected: yes
+Status: install ok installed
+Architecture: amd64
+Depends: gcc-12-base (= 12.2.0-14), libc6 (>= 2.35)
+Important: yes
+
+Package: libgcrypt20
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgpg-error0 (>= 1.27)
+Suggests: rng-tools
+
+Package: libgdk-pixbuf-2.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libgdk-pixbuf2.0-common (>= 2.42.10+dfsg-1), shared-mime-info, libc6 (>= 2.34), libglib2.0-0 (>= 2.59.0), libjpeg62-turbo (>= 1.3.1), libpng16-16 (>= 1.6.2-1), libtiff6 (>= 4.0.3)
+Recommends: libgdk-pixbuf2.0-bin
+
+Package: libgdk-pixbuf2.0-common
+Status: install ok installed
+Architecture: all
+
+Package: libgl1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libglvnd0 (= 1.6.0-1), libglx0 (= 1.6.0-1)
+
+Package: libgl1-mesa-dri
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdrm-amdgpu1 (>= 2.4.110), libdrm-intel1 (>= 2.4.38), libdrm-nouveau2 (>= 2.4.66), libdrm-radeon1 (>= 2.4.31), libdrm2 (>= 2.4.75), libelf1 (>= 0.142), libexpat1 (>= 2.0.1), libgcc-s1 (>= 3.4), libglapi-mesa (= 22.3.5-1), libllvm15, libsensors5 (>= 1:3.5.0), libstdc++6 (>= 11), libxcb-dri3-0 (>= 1.13), libzstd1 (>= 1.5.2), zlib1g (>= 1:1.1.4)
+
+Package: libglapi-mesa
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libglib2.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libffi8 (>= 3.4), libmount1 (>= 2.35.2-7~), libpcre2-8-0 (>= 10.22), libselinux1 (>= 3.1~), zlib1g (>= 1:1.2.2)
+Recommends: libglib2.0-data, shared-mime-info, xdg-user-dirs
+Suggests: low-memory-monitor
+
+Package: libglvnd0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libglx-mesa0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libdrm2 (>= 2.4.75), libexpat1 (>= 2.0.1), libglapi-mesa (= 22.3.5-1), libx11-6 (>= 2:1.4.99.1), libx11-xcb1 (>= 2:1.8.3), libxcb-dri2-0 (>= 1.8), libxcb-dri3-0 (>= 1.13), libxcb-glx0 (>= 1.8), libxcb-present0, libxcb-randr0, libxcb-shm0, libxcb-sync1, libxcb-xfixes0, libxcb1 (>= 1.9.2), libxext6, libxfixes3, libxshmfence1, libxxf86vm1, libgl1-mesa-dri
+
+Package: libglx0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libglvnd0 (= 1.6.0-1), libx11-6 (>= 2:1.4.99.1), libglx-mesa0
+
+Package: libgmp10
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libgnome-desktop-3-20
+Status: install ok installed
+Architecture: amd64
+Depends: bubblewrap, gnome-desktop3-data (>= 43.1-1), gnome-desktop3-data (<< 44~), gsettings-desktop-schemas (>= 3.27.0), iso-codes, libc6 (>= 2.33), libcairo2 (>= 1.2.4), libgdk-pixbuf-2.0-0 (>= 2.36.5), libglib2.0-0 (>= 2.70.0), libgtk-3-0 (>= 3.9.10), libseccomp2 (>= 1.0.1), libsystemd0, libudev1 (>= 196), libxkbregistry0 (>= 1.0.0)
+Recommends: locales | locales-all
+
+Package: libgnutls30
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgmp10 (>= 2:6.2.1+dfsg1), libhogweed6 (>= 3.6), libidn2-0 (>= 2.0.0), libnettle8 (>= 3.7~), libp11-kit0 (>= 0.23.18.1), libtasn1-6 (>= 4.14), libunistring2 (>= 0.9.7)
+Suggests: gnutls-bin
+
+Package: libgpg-error0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+Recommends: libgpg-error-l10n
+
+Package: libgraphite2-3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libgs-common
+Status: install ok installed
+Architecture: all
+
+Package: libgs10
+Status: install ok installed
+Architecture: amd64
+Depends: libgs10-common (= 10.0.0~dfsg-9), poppler-data, libc6 (>= 2.34), libcups2 (>= 2.3~b6), libfontconfig1 (>= 2.12.6), libfreetype6 (>= 2.10.1), libidn12 (>= 1.13), libijs-0.35 (>= 0.35), libjbig2dec0 (>= 0.16+20190905), libjpeg62-turbo (>= 1.3.1), liblcms2-2 (>= 2.6), libopenjp2-7 (>= 2.0.0), libpaper1, libpng16-16 (>= 1.6.2-1), libtiff6 (>= 4.0.3), libx11-6, libxt6, zlib1g (>= 1:1.2.0)
+
+Package: libgs10-common
+Status: install ok installed
+Architecture: all
+Depends: fonts-urw-base35 (>= 20200910), libgs-common
+Recommends: fonts-droid-fallback
+
+Package: libgspell-1-2
+Status: install ok installed
+Architecture: amd64
+Depends: libgspell-1-common (>= 1.12.0-1), libatk1.0-0 (>= 1.12.4), libc6 (>= 2.4), libcairo-gobject2 (>= 1.10.0), libcairo2 (>= 1.2.4), libenchant-2-2 (>= 2.2.3), libgdk-pixbuf-2.0-0 (>= 2.22.0), libglib2.0-0 (>= 2.44), libgtk-3-0 (>= 3.20), libharfbuzz0b (>= 0.6.0), libicu72 (>= 72.1~rc-1~), libpango-1.0-0 (>= 1.18.0), libpangocairo-1.0-0 (>= 1.14.0)
+
+Package: libgspell-1-common
+Status: install ok installed
+Architecture: all
+
+Package: libgssapi-krb5-2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libcom-err2 (>= 1.43.9), libk5crypto3 (>= 1.20), libkrb5-3 (= 1.20.1-1), libkrb5support0 (>= 1.15~beta1)
+Suggests: krb5-doc, krb5-user
+
+Package: libgstreamer-plugins-base1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libglib2.0-0 (>= 2.67.3), libgstreamer1.0-0 (>= 1.22.0), liborc-0.4-0 (>= 1:0.4.25), zlib1g (>= 1:1.1.4), iso-codes
+Recommends: gstreamer1.0-plugins-base
+Suggests: libvisual-0.4-plugins
+
+Package: libgstreamer1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libcap2 (>= 1:2.10), libdw1 (>= 0.126), libglib2.0-0 (>= 2.70.0), libunwind8, libcap2-bin
+Suggests: gstreamer1.0-tools
+
+Package: libgtk-3-0
+Status: install ok installed
+Architecture: amd64
+Depends: adwaita-icon-theme, hicolor-icon-theme, shared-mime-info, libatk-bridge2.0-0 (>= 2.15.1), libatk1.0-0 (>= 2.35.1), libc6 (>= 2.34), libcairo-gobject2 (>= 1.14.0), libcairo2 (>= 1.14.0), libcolord2 (>= 0.1.10), libcups2 (>= 1.7.0), libepoxy0 (>= 1.4.3), libfontconfig1 (>= 2.12.6), libfribidi0 (>= 0.19.7), libgdk-pixbuf-2.0-0 (>= 2.40.0), libglib2.0-0 (>= 2.59.0), libharfbuzz0b (>= 2.2.0), libpango-1.0-0 (>= 1.45.5), libpangocairo-1.0-0 (>= 1.44.0), libpangoft2-1.0-0 (>= 1.44.0), libwayland-client0 (>= 1.20.0), libwayland-cursor0 (>= 1.14.91), libwayland-egl1 (>= 1.15.0), libx11-6 (>= 2:1.4.99.1), libxcomposite1 (>= 1:0.4.5), libxcursor1 (>> 1.1.2), libxdamage1 (>= 1:1.1), libxext6, libxfixes3, libxi6 (>= 2:1.2.99.4), libxinerama1 (>= 2:1.1.4), libxkbcommon0 (>= 0.5.0), libxrandr2 (>= 2:1.5.0), libgtk-3-common (>= 3.24.36-3)
+Recommends: libgtk-3-bin, librsvg2-common
+Suggests: gvfs
+
+Package: libgtk-3-common
+Status: install ok installed
+Architecture: all
+Depends: dconf-gsettings-backend | gsettings-backend
+Recommends: libgtk-3-0
+
+Package: libgxps2
+Status: install ok installed
+Architecture: amd64
+Depends: libarchive13 (>= 3.0.4), libc6 (>= 2.35), libcairo2 (>= 1.10.0), libfreetype6 (>= 2.2.1), libglib2.0-0 (>= 2.37.3), libjpeg62-turbo (>= 1.3.1), liblcms2-2 (>= 2.2+git20110628), libpng16-16 (>= 1.6.2-1), libtiff6 (>= 4.0.3)
+
+Package: libhandy-1-0
+Status: install ok installed
+Architecture: amd64
+Depends: libatk1.0-0 (>= 1.12.4), libc6 (>= 2.29), libcairo2 (>= 1.14.0), libfribidi0 (>= 0.19.2), libgdk-pixbuf-2.0-0 (>= 2.22.0), libglib2.0-0 (>= 2.59.0), libgtk-3-0 (>= 3.23.1), libpango-1.0-0 (>= 1.14.0)
+
+Package: libharfbuzz0b
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libfreetype6 (>= 2.11.0), libglib2.0-0 (>= 2.31.8), libgraphite2-3 (>= 1.2.2)
+
+Package: libhogweed6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libgmp10 (>= 2:6.2.1+dfsg1), libnettle8
+
+Package: libhunspell-1.7-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libgcc-s1 (>= 3.0), libstdc++6 (>= 11)
+Recommends: hunspell-en-us | hunspell-dictionary | myspell-dictionary
+
+Package: libice6
+Status: install ok installed
+Architecture: amd64
+Depends: libbsd0 (>= 0.2.0), libc6 (>= 2.14), x11-common
+
+Package: libicu72
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.0), libstdc++6 (>= 12)
+
+Package: libidn12
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libidn2-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libunistring2 (>= 0.9.7)
+
+Package: libijs-0.35
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libjbig0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libjbig2dec0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libjpeg62-turbo
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libjsoncpp25
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libgcc-s1 (>= 3.0), libstdc++6 (>= 11)
+
+Package: libk5crypto3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libkrb5support0 (>= 1.16)
+Suggests: krb5-doc, krb5-user
+
+Package: libkeyutils1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libkpathsea6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libkrb5-3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libcom-err2 (>= 1.43.9), libk5crypto3 (>= 1.20), libkeyutils1 (>= 1.5.9), libkrb5support0 (= 1.20.1-1), libssl3 (>= 3.0.0)
+Recommends: krb5-locales
+Suggests: krb5-doc, krb5-user
+
+Package: libkrb5support0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: liblcms2-2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29)
+Suggests: liblcms2-utils
+
+Package: liblerc4
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29), libgcc-s1 (>= 3.0), libstdc++6 (>= 11)
+
+Package: libllvm15
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.36), libedit2 (>= 2.11-20080614-0), libffi8 (>= 3.4), libgcc-s1 (>= 3.3), libstdc++6 (>= 12), libtinfo6 (>= 6), libxml2 (>= 2.7.4), libz3-4 (>= 4.8.12), zlib1g (>= 1:1.2.0)
+
+Package: liblz4-1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: liblzma5
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libmd0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libminizip1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), zlib1g (>= 1:1.1.4)
+
+Package: libmount1
+Status: install ok installed
+Architecture: amd64
+Depends: libblkid1 (>= 2.17.2), libc6 (>= 2.34), libselinux1 (>= 3.1~)
+Suggests: cryptsetup-bin
+
+Package: libmp3lame0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29)
+
+Package: libmpg123-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libncursesw6
+Status: install ok installed
+Architecture: amd64
+Depends: libtinfo6 (= 6.4-2), libc6 (>= 2.34)
+Recommends: libgpm2
+
+Package: libnettle8
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libnspr4
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libnss3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libnspr4 (>= 2:4.34), libsqlite3-0 (>= 3.5.9)
+
+Package: libnumber-compare-perl
+Status: install ok installed
+Architecture: all
+
+Package: libogg0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libopenjp2-7
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libopus0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29)
+Suggests: opus-tools
+
+Package: liborc-0.4-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libp11-kit0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libffi8 (>= 3.4)
+
+Package: libpam0g
+Status: install ok installed
+Architecture: amd64
+Depends: libaudit1 (>= 1:2.2.1), libc6 (>= 2.34), debconf (>= 0.5) | debconf-2.0
+Suggests: libpam-doc
+
+Package: libpango-1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: fontconfig (>= 2.13.0), libc6 (>= 2.14), libfribidi0 (>= 1.0.6), libglib2.0-0 (>= 2.67.3), libharfbuzz0b (>= 5.1.0), libthai0 (>= 0.1.25)
+
+Package: libpangocairo-1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libcairo2 (>= 1.12.10), libfontconfig1 (>= 2.13.0), libglib2.0-0 (>= 2.62.0), libharfbuzz0b (>= 2.6.0), libpango-1.0-0 (= 1.50.12+ds-1), libpangoft2-1.0-0 (= 1.50.12+ds-1)
+
+Package: libpangoft2-1.0-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libfontconfig1 (>= 2.13.0), libfreetype6 (>= 2.2.1), libglib2.0-0 (>= 2.67.3), libharfbuzz0b (>= 5.1.0), libpango-1.0-0 (= 1.50.12+ds-1)
+
+Package: libpaper1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), debconf (>= 0.5) | debconf-2.0, ucf (>= 0.28), dpkg (>= 1.17.2)
+Recommends: libpaper-utils
+
+Package: libpciaccess0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), zlib1g (>= 1:1.1.4)
+Suggests: pciutils
+
+Package: libpcre2-8-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libpixman-1-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29)
+
+Package: libpng16-16
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29), zlib1g (>= 1:1.2.11.dfsg)
+
+Package: libpoppler-glib8
+Status: install ok installed
+Architecture: amd64
+Depends: libpoppler126 (= 22.12.0-2+b1), libc6 (>= 2.34), libcairo2 (>= 1.12.0), libfreetype6 (>= 2.2.1), libglib2.0-0 (>= 2.67.1), libstdc++6 (>= 11)
+
+Package: libpoppler126
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.35), libfontconfig1 (>= 2.12.6), libfreetype6 (>= 2.2.1), libjpeg62-turbo (>= 1.3.1), liblcms2-2 (>= 2.7), libnspr4 (>= 2:4.9-2~), libnss3 (>= 2:3.16), libopenjp2-7 (>= 2.0.0), libpng16-16 (>= 1.6.2-1), libstdc++6 (>= 11), libtiff6 (>= 4.0.3), zlib1g (>= 1:1.1.4)
+Recommends: poppler-data
+
+Package: libproc2-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libsystemd0 (>= 209)
+
+Package: libpulse0
+Status: install ok installed
+Architecture: amd64
+Depends: libasyncns0 (>= 0.3), libc6 (>= 2.34), libdbus-1-3 (>= 1.9.14), libsndfile1 (>= 1.0.20), libsystemd0, libx11-6, libx11-xcb1 (>= 2:1.8.1), libxcb1
+Suggests: pulseaudio
+
+Package: libpulsedsp
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libpulse0 (= 16.1+dfsg1-2+b1)
+
+Package: libre2-9
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.0), libstdc++6 (>= 11)
+Built-Using: unicode-data (= 15.0.0-1)
+
+Package: libseccomp2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libsecret-1-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libgcrypt20 (>= 1.10.0), libglib2.0-0 (>= 2.59.0), libsecret-common
+
+Package: libsecret-common
+Status: install ok installed
+Architecture: all
+
+Package: libselinux1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libpcre2-8-0 (>= 10.22)
+
+Package: libsensors-config
+Status: install ok installed
+Architecture: all
+Suggests: lm-sensors
+
+Package: libsensors5
+Status: install ok installed
+Architecture: amd64
+Depends: libsensors-config, libc6 (>= 2.33)
+Suggests: lm-sensors
+
+Package: libsm6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libice6 (>= 1:1.0.0), libuuid1 (>= 2.16)
+
+Package: libsmartcols1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33)
+
+Package: libsnappy1v5
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libstdc++6 (>= 5.2)
+
+Package: libsndfile1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libflac12 (>= 1.3.0), libmp3lame0 (>= 3.100), libmpg123-0 (>= 1.28.0), libogg0 (>= 1.3.0), libopus0 (>= 1.1), libvorbis0a (>= 1.2.3), libvorbisenc2 (>= 1.1.2)
+
+Package: libspectre1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libgs10 (>= 9.53.0~dfsg)
+
+Package: libsqlite3-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libssl3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libstdc++6
+Status: install ok installed
+Architecture: amd64
+Depends: gcc-12-base (= 12.2.0-14), libc6 (>= 2.36), libgcc-s1 (>= 4.2)
+
+Package: libsynctex2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), zlib1g (>= 1:1.1.4)
+
+Package: libsystemd0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libcap2 (>= 1:2.10), libgcrypt20 (>= 1.10.0), liblz4-1 (>= 0.0~r122), liblzma5 (>= 5.1.1alpha+20120614), libzstd1 (>= 1.5.2)
+
+Package: libtasn1-6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)
+
+Package: libtext-glob-perl
+Status: install ok installed
+Architecture: all
+
+Package: libthai-data
+Status: install ok installed
+Architecture: all
+
+Package: libthai0
+Status: install ok installed
+Architecture: amd64
+Depends: libthai-data (>= 0.1.10), libc6 (>= 2.14), libdatrie1 (>= 0.2.0)
+Enhances: libqtcore4, libqtgui4
+
+Package: libtheora0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libcairo2 (>= 1.2.4), libogg0 (>= 1.1.0)
+
+Package: libtiff6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libdeflate0 (>= 1.0), libjbig0 (>= 2.0), libjpeg62-turbo (>= 1.3.1), liblerc4 (>= 3.0), liblzma5 (>= 5.1.1alpha+20120614), libwebp7 (>= 1.2.4), libzstd1 (>= 1.5.2), zlib1g (>= 1:1.1.4)
+
+Package: libtinfo6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libudev1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libunistring2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libunwind8
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), liblzma5 (>= 5.1.1alpha+20110809)
+
+Package: libuuid1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.25)
+Recommends: uuid-runtime
+
+Package: libvisual-0.4-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+Suggests: libvisual-0.4-plugins
+
+Package: libvorbis0a
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29), libogg0 (>= 1.1.0)
+
+Package: libvorbisenc2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libvorbis0a (= 1.3.7-1)
+
+Package: libwayland-client0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.28), libffi8 (>= 3.4)
+
+Package: libwayland-cursor0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.28), libwayland-client0 (>= 1.20.0)
+
+Package: libwayland-egl1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.2.5)
+
+Package: libwayland-server0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libffi8 (>= 3.4)
+
+Package: libwebp7
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: libwebpdemux2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libwebp7 (>= 1.2.4)
+
+Package: libwebpmux3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.29), libwebp7 (>= 1.2.4)
+
+Package: libwoff1
+Status: install ok installed
+Architecture: amd64
+Depends: libbrotli1 (>= 0.6.0), libc6 (>= 2.14), libgcc-s1 (>= 3.0), libstdc++6 (>= 11)
+
+Package: libx11-6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libxcb1 (>= 1.11.1), libx11-data
+
+Package: libx11-data
+Status: install ok installed
+Architecture: all
+
+Package: libx11-xcb1
+Status: install ok installed
+Architecture: amd64
+Depends: libx11-6 (= 2:1.8.3-3)
+
+Package: libxau6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4)
+
+Package: libxaw7
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.15), libx11-6, libxext6, libxmu6 (>= 2:1.1.3), libxpm4, libxt6
+
+Package: libxcb-dri2-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1
+
+Package: libxcb-dri3-0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1 (>= 1.12)
+
+Package: libxcb-glx0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1
+
+Package: libxcb-present0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1
+
+Package: libxcb-randr0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1 (>= 1.9.2)
+
+Package: libxcb-render0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libxcb1 (>= 1.8)
+
+Package: libxcb-shape0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1
+
+Package: libxcb-shm0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1 (>= 1.12)
+
+Package: libxcb-sync1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libxcb1
+
+Package: libxcb-xfixes0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libxcb1
+
+Package: libxcb1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libxau6 (>= 1:1.0.9), libxdmcp6
+
+Package: libxcomposite1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6 (>= 2:1.4.99.1)
+
+Package: libxcursor1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6 (>= 2:1.4.99.1), libxfixes3, libxrender1
+
+Package: libxdamage1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6 (>= 2:1.4.99.1)
+
+Package: libxdmcp6
+Status: install ok installed
+Architecture: amd64
+Depends: libbsd0 (>= 0.2.0), libc6 (>= 2.4)
+
+Package: libxext6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0)
+
+Package: libxfixes3
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0)
+
+Package: libxft2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libfontconfig1 (>= 2.12.6), libfreetype6 (>= 2.3.5), libx11-6, libxrender1
+
+Package: libxi6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0), libxext6
+
+Package: libxinerama1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6 (>= 2:1.6.0), libxext6
+
+Package: libxkbcommon0
+Status: install ok installed
+Architecture: amd64
+Depends: xkb-data, libc6 (>= 2.33)
+
+Package: libxkbfile1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6
+
+Package: libxkbregistry0
+Status: install ok installed
+Architecture: amd64
+Depends: libxkbcommon0 (= 1.5.0-1), libc6 (>= 2.33), libxml2 (>= 2.7.4)
+
+Package: libxml2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libicu72 (>= 72.1~rc-1~), liblzma5 (>= 5.1.1alpha+20120614), zlib1g (>= 1:1.2.3.3)
+
+Package: libxmu6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6, libxext6, libxt6
+
+Package: libxmuu1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6
+
+Package: libxnvctrl0
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.4.99.1), libxext6
+
+Package: libxpm4
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libx11-6
+
+Package: libxrandr2
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0), libxext6, libxrender1
+
+Package: libxrender1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0)
+
+Package: libxshmfence1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.27)
+
+Package: libxslt1.1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libgcrypt20 (>= 1.10.0), libxml2 (>= 2.9.0)
+
+Package: libxt6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libice6 (>= 1:1.0.0), libsm6, libx11-6
+
+Package: libxtst6
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.4), libx11-6 (>= 2:1.6.0), libxext6, x11-common
+
+Package: libxv1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libx11-6 (>= 2:1.6.0), libxext6
+
+Package: libxxf86dga1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libx11-6 (>= 2:1.6.0), libxext6
+
+Package: libz3-4
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.4), libstdc++6 (>= 12)
+
+Package: libzstd1
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: lsb-base
+Status: install ok installed
+Architecture: all
+Depends: sysvinit-utils (>= 3.05-4~)
+
+Package: poppler-data
+Status: install ok installed
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Suggests: poppler-utils, ghostscript, fonts-japanese-mincho | fonts-ipafont-mincho, fonts-japanese-gothic | fonts-ipafont-gothic, fonts-arphic-ukai, fonts-arphic-uming, fonts-nanum (>= 20131007~)
+Enhances: ghostscript
+
+Package: procps
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libncursesw6 (>= 6), libproc2-0 (>= 2:4.0.2), libtinfo6 (>= 6), init-system-helpers (>= 1.29~)
+Recommends: psmisc
+
+Package: pulseaudio-utils
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34), libpulse0 (= 16.1+dfsg1-2+b1), libsndfile1 (>= 1.0.20), libx11-6, libx11-xcb1 (>= 2:1.8.1), libxcb1, libpulsedsp
+Suggests: avahi-daemon, pulseaudio
+
+Package: sensible-utils
+Status: install ok installed
+Architecture: all
+
+Package: shared-mime-info
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.33), libglib2.0-0 (>= 2.35.9), libxml2 (>= 2.7.4)
+
+Package: sysvinit-utils
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+
+Package: tar
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Pre-Depends: libacl1 (>= 2.2.23), libc6 (>= 2.34), libselinux1 (>= 3.1~)
+Suggests: bzip2, ncompress, xz-utils, tar-scripts, tar-doc
+
+Package: ucf
+Status: install ok installed
+Architecture: all
+Depends: debconf (>= 0.5) | debconf-2.0, sensible-utils
+
+Package: usrmerge
+Status: install ok installed
+Architecture: all
+Depends: perl:any, libfile-find-rule-perl
+
+Package: util-linux
+Essential: yes
+Status: install ok installed
+Architecture: amd64
+Depends: util-linux-extra
+Pre-Depends: libblkid1 (>= 2.37.2), libc6 (>= 2.34), libcap-ng0 (>= 0.7.9), libcrypt1 (>= 1:4.1.0), libmount1 (>= 2.38), libpam0g (>= 0.99.7.1), libselinux1 (>= 3.1~), libsmartcols1 (>= 2.38), libsystemd0, libtinfo6 (>= 6), libudev1 (>= 183), libuuid1 (>= 2.16), zlib1g (>= 1:1.1.4)
+Recommends: sensible-utils
+Suggests: dosfstools, kbd, util-linux-locales
+
+Package: util-linux-extra
+Status: install ok installed
+Architecture: amd64
+Depends: libaudit1 (>= 1:2.2.1), libc6 (>= 2.34), libsmartcols1 (>= 2.38)
+
+Package: x11-common
+Status: install ok installed
+Architecture: all
+Depends: lsb-base (>= 1.3-9ubuntu2)
+
+Package: x11-utils
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.15), libfontconfig1 (>= 2.12.6), libfontenc1, libgl1, libx11-6, libx11-xcb1 (>= 2:1.6.9), libxaw7, libxcb-shape0, libxcb1 (>= 1.6), libxcomposite1 (>= 1:0.3-1), libxext6, libxft2 (>> 2.1.1), libxi6, libxinerama1, libxkbfile1, libxmu6, libxmuu1, libxrandr2 (>= 2:1.2.0), libxrender1, libxt6 (>= 1:1.1.0), libxtst6, libxv1, libxxf86dga1, libxxf86vm1
+Suggests: mesa-utils
+
+Package: xdg-utils
+Status: install ok installed
+Architecture: all
+Recommends: libfile-mimeinfo-perl, libnet-dbus-perl, libx11-protocol-perl, x11-utils, x11-xserver-utils
+
+Package: xfonts-encodings
+Status: install ok installed
+Architecture: all
+Depends: x11-common
+
+Package: xfonts-utils
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14), libfontenc1, libfreetype6 (>= 2.2.1), zlib1g (>= 1:1.1.4), x11-common, xfonts-encodings
+
+Package: xkb-data
+Status: install ok installed
+Architecture: all
+
+Package: zlib1g
+Status: install ok installed
+Architecture: amd64
+Depends: libc6 (>= 2.14)

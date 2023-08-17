@@ -66,7 +66,7 @@ sub new_result {
 
   if(grep { defined $_ } values %found) {
     my $related = join(', ', grep { $found{$_} } keys %found);
-    die "You are trying to create a relationship ($related) without setting 'accept_nested_for'";
+    die "You are trying to create a relationship ($related) on @{[$self->result_source->name ]} without setting 'accept_nested_for'";
   }
 
   my $result = $self->next::method($fields, @args);

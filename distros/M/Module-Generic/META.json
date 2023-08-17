@@ -49,7 +49,7 @@
             "File::Copy" : "0",
             "File::DosGlob" : "0",
             "File::Glob" : "0",
-            "File::MMagic::XS" : "0.09008",
+            "File::MMagic" : "1.30",
             "File::Spec" : "3.73",
             "IO::Dir" : "1.41",
             "IO::File" : "1.41",
@@ -107,6 +107,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.30.4",
+   "version" : "v0.31.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

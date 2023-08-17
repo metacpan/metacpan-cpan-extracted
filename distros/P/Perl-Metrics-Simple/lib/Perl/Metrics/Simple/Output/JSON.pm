@@ -1,12 +1,12 @@
 package Perl::Metrics::Simple::Output::JSON;
 
-our $VERSION = 'v1.0.1';
-
 use strict;
 use warnings;
 
 use parent qw(Perl::Metrics::Simple::Output);
 use JSON::PP qw(encode_json);
+
+our $VERSION = 'v1.0.3';
 
 sub make_report {
     my ($self) = @_;
@@ -74,3 +74,4 @@ sub make_complexity_section {
     };
 }
 
+1;

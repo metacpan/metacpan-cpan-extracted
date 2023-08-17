@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perl Documentation - Perldoc Browser</title>
+    <link rel="search" href="/opensearch.xml" type="application/opensearchdescription+xml" title="Perldoc Browser">
+    <link rel="canonical" href="https://perldoc.perl.org/">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/stackoverflow-light.min.css" integrity="sha512-cG1IdFxqipi3gqLmksLtuk13C+hBa57a6zpWxMeoY3Q9O6ooFxq50DayCdm0QrDgZjMUn23z/0PMZlgft7Yp5Q==" crossorigin="anonymous" />
+    <style>
+      body {
+        background: #f4f4f5;
+        color: #020202;
+      }
+      .navbar-dark {
+        background-image: -webkit-linear-gradient(top, #005f85 0, #002e49 100%);
+        background-image: -o-linear-gradient(top, #005f85 0, #002e49 100%);
+        background-image: linear-gradient(to bottom, #005f85 0, #002e49 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff005f85', endColorstr='#ff002e49', GradientType=0);
+        background-repeat: repeat-x;
+      }
+      .navbar-dark .navbar-nav .nav-link,
+      .navbar-dark .navbar-nav .nav-link:focus { color: #fff }
+      .navbar-dark .navbar-nav .nav-link:hover { color: #ffef68 }
+      #wrapperlicious {
+        margin: 0 auto;
+        font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
+        font-weight: normal;
+        line-height: 1.5em;
+        margin: 0;
+        padding: 0;
+      }
+      #wrapperlicious h1 { font-size: 1.5em }
+      #wrapperlicious h2 { font-size: 1.3em }
+      #wrapperlicious h3 { font-size: 1.1em }
+      #wrapperlicious h4 { font-size: 0.9em }
+      #wrapperlicious h1, #wrapperlicious h2, #wrapperlicious h3,
+      #wrapperlicious h4, #wrapperlicious dt {
+        color: #020202;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        position: relative;
+        font-weight: bold;
+      }
+      #wrapperlicious a { color: inherit; text-decoration: underline }
+      #wrapperlicious #toc { text-decoration: none }
+      #wrapperlicious a:hover { color: #2a2a2a }
+      #wrapperlicious a img { border: 0 }
+      #wrapperlicious :not(pre) > code {
+        color: inherit;
+        background-color: rgba(0, 0, 0, 0.04);
+        border-radius: 3px;
+        font: 0.9em Consolas, Menlo, Monaco, monospace;
+        padding: 0.3em;
+      }
+      #wrapperlicious dd {
+        margin: 0;
+        margin-left: 2em;
+      }
+      #wrapperlicious dt {
+        color: #2a2a2a;
+        font-weight: bold;
+        margin-left: 0.9em;
+      }
+      #wrapperlicious p {
+        margin-bottom: 1em;
+        margin-top: 1em;
+      }
+      #wrapperlicious li > p {
+        margin-bottom: 0;
+        margin-top: 0;
+      }
+      #wrapperlicious pre {
+        border: 1px solid #c1c1c1;
+        border-radius: 3px;
+        font: 100% Consolas, Menlo, Monaco, monospace;
+        margin-bottom: 1em;
+        margin-top: 1em;
+      }
+      #wrapperlicious pre > code {
+        display: block;
+        background-color: #f6f6f6;
+        font: 0.9em Consolas, Menlo, Monaco, monospace;
+        line-height: 1.5em;
+        text-align: left;
+        white-space: pre;
+        padding: 1em;
+      }
+      #wrapperlicious dl, #wrapperlicious ol, #wrapperlicious ul {
+        margin-bottom: 1em;
+        margin-top: 1em;
+      }
+      #wrapperlicious ul {
+        list-style-type: square;
+      }
+      #wrapperlicious ul ul {
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+      #footer {
+        font-size: 0.8em;
+        padding-top: 0.5em;
+        text-align: center;
+      }
+      #more {
+        display: inline;
+        font-size: 0.8em;
+      }
+      #perldocdiv {
+        background-color: #fff;
+        border: 1px solid #c1c1c1;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 3em;
+        padding-top: 1em;
+        max-width: 960px;
+      }
+      #moduleversion { float: right }
+      #wrapperlicious .leading-notice {
+        font-style: italic;
+        padding-left: 1em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+      #wrapperlicious .permalink {
+        display: none;
+        left: -0.75em;
+        position: absolute;
+        padding-right: 0.25em;
+        text-decoration: none;
+      }
+      #wrapperlicious h1:hover .permalink, #wrapperlicious h2:hover .permalink,
+      #wrapperlicious h3:hover .permalink, #wrapperlicious h4:hover .permalink,
+      #wrapperlicious dt:hover .permalink {
+        display: block;
+      }
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KVNWBNT5FB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-KVNWBNT5FB');
+      gtag('config', 'UA-50555-3');
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark justify-content-between">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="/">Perldoc Browser</a>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item dropdown text-nowrap">
+        <a class="nav-link dropdown-toggle" href="#" id="dropdownlink-stable" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">5.36.1</a>
+        <div class="dropdown-menu" aria-labelledby="dropdownlink-stable">
+          <a class="dropdown-item" href="/">Latest</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item active" href="/5.36.1/">5.36.1</a>
+          <a class="dropdown-item" href="/5.36.0/">5.36.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.34.1/">5.34.1</a>
+          <a class="dropdown-item" href="/5.34.0/">5.34.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.32.1/">5.32.1</a>
+          <a class="dropdown-item" href="/5.32.0/">5.32.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.30.3/">5.30.3</a>
+          <a class="dropdown-item" href="/5.30.2/">5.30.2</a>
+          <a class="dropdown-item" href="/5.30.1/">5.30.1</a>
+          <a class="dropdown-item" href="/5.30.0/">5.30.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.28.3/">5.28.3</a>
+          <a class="dropdown-item" href="/5.28.2/">5.28.2</a>
+          <a class="dropdown-item" href="/5.28.1/">5.28.1</a>
+          <a class="dropdown-item" href="/5.28.0/">5.28.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.26.3/">5.26.3</a>
+          <a class="dropdown-item" href="/5.26.2/">5.26.2</a>
+          <a class="dropdown-item" href="/5.26.1/">5.26.1</a>
+          <a class="dropdown-item" href="/5.26.0/">5.26.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.24.4/">5.24.4</a>
+          <a class="dropdown-item" href="/5.24.3/">5.24.3</a>
+          <a class="dropdown-item" href="/5.24.2/">5.24.2</a>
+          <a class="dropdown-item" href="/5.24.1/">5.24.1</a>
+          <a class="dropdown-item" href="/5.24.0/">5.24.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.22.4/">5.22.4</a>
+          <a class="dropdown-item" href="/5.22.3/">5.22.3</a>
+          <a class="dropdown-item" href="/5.22.2/">5.22.2</a>
+          <a class="dropdown-item" href="/5.22.1/">5.22.1</a>
+          <a class="dropdown-item" href="/5.22.0/">5.22.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.20.3/">5.20.3</a>
+          <a class="dropdown-item" href="/5.20.2/">5.20.2</a>
+          <a class="dropdown-item" href="/5.20.1/">5.20.1</a>
+          <a class="dropdown-item" href="/5.20.0/">5.20.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.18.4/">5.18.4</a>
+          <a class="dropdown-item" href="/5.18.3/">5.18.3</a>
+          <a class="dropdown-item" href="/5.18.2/">5.18.2</a>
+          <a class="dropdown-item" href="/5.18.1/">5.18.1</a>
+          <a class="dropdown-item" href="/5.18.0/">5.18.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.16.3/">5.16.3</a>
+          <a class="dropdown-item" href="/5.16.2/">5.16.2</a>
+          <a class="dropdown-item" href="/5.16.1/">5.16.1</a>
+          <a class="dropdown-item" href="/5.16.0/">5.16.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.14.4/">5.14.4</a>
+          <a class="dropdown-item" href="/5.14.3/">5.14.3</a>
+          <a class="dropdown-item" href="/5.14.2/">5.14.2</a>
+          <a class="dropdown-item" href="/5.14.1/">5.14.1</a>
+          <a class="dropdown-item" href="/5.14.0/">5.14.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.12.5/">5.12.5</a>
+          <a class="dropdown-item" href="/5.12.4/">5.12.4</a>
+          <a class="dropdown-item" href="/5.12.3/">5.12.3</a>
+          <a class="dropdown-item" href="/5.12.2/">5.12.2</a>
+          <a class="dropdown-item" href="/5.12.1/">5.12.1</a>
+          <a class="dropdown-item" href="/5.12.0/">5.12.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.10.1/">5.10.1</a>
+          <a class="dropdown-item" href="/5.10.0/">5.10.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.8.9/">5.8.9</a>
+          <a class="dropdown-item" href="/5.8.8/">5.8.8</a>
+          <a class="dropdown-item" href="/5.8.7/">5.8.7</a>
+          <a class="dropdown-item" href="/5.8.6/">5.8.6</a>
+          <a class="dropdown-item" href="/5.8.5/">5.8.5</a>
+          <a class="dropdown-item" href="/5.8.4/">5.8.4</a>
+          <a class="dropdown-item" href="/5.8.3/">5.8.3</a>
+          <a class="dropdown-item" href="/5.8.2/">5.8.2</a>
+          <a class="dropdown-item" href="/5.8.1/">5.8.1</a>
+          <a class="dropdown-item" href="/5.8.0/">5.8.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.6.2/">5.6.2</a>
+          <a class="dropdown-item" href="/5.6.1/">5.6.1</a>
+          <a class="dropdown-item" href="/5.6.0/">5.6.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.005_04/">5.005_04</a>
+          <a class="dropdown-item" href="/5.005_03/">5.005_03</a>
+          <a class="dropdown-item" href="/5.005_02/">5.005_02</a>
+          <a class="dropdown-item" href="/5.005_01/">5.005_01</a>
+          <a class="dropdown-item" href="/5.005/">5.005</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown text-nowrap">
+        <a class="nav-link dropdown-toggle" href="#" id="dropdownlink-dev" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dev</a>
+        <div class="dropdown-menu" aria-labelledby="dropdownlink-dev">
+          <a class="dropdown-item" href="/blead/">blead</a>
+          <a class="dropdown-item" href="/5.38.0-RC2/">5.38.0-RC2</a>
+          <a class="dropdown-item" href="/5.38.0-RC1/">5.38.0-RC1</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.37.11/">5.37.11</a>
+          <a class="dropdown-item" href="/5.37.10/">5.37.10</a>
+          <a class="dropdown-item" href="/5.37.9/">5.37.9</a>
+          <a class="dropdown-item" href="/5.37.8/">5.37.8</a>
+          <a class="dropdown-item" href="/5.37.7/">5.37.7</a>
+          <a class="dropdown-item" href="/5.37.6/">5.37.6</a>
+          <a class="dropdown-item" href="/5.37.5/">5.37.5</a>
+          <a class="dropdown-item" href="/5.37.4/">5.37.4</a>
+          <a class="dropdown-item" href="/5.37.3/">5.37.3</a>
+          <a class="dropdown-item" href="/5.37.2/">5.37.2</a>
+          <a class="dropdown-item" href="/5.37.1/">5.37.1</a>
+          <a class="dropdown-item" href="/5.37.0/">5.37.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.36.1-RC3/">5.36.1-RC3</a>
+          <a class="dropdown-item" href="/5.36.1-RC2/">5.36.1-RC2</a>
+          <a class="dropdown-item" href="/5.36.1-RC1/">5.36.1-RC1</a>
+          <a class="dropdown-item" href="/5.36.0-RC3/">5.36.0-RC3</a>
+          <a class="dropdown-item" href="/5.36.0-RC2/">5.36.0-RC2</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.35.11/">5.35.11</a>
+          <a class="dropdown-item" href="/5.35.10/">5.35.10</a>
+          <a class="dropdown-item" href="/5.35.9/">5.35.9</a>
+          <a class="dropdown-item" href="/5.35.8/">5.35.8</a>
+          <a class="dropdown-item" href="/5.35.7/">5.35.7</a>
+          <a class="dropdown-item" href="/5.35.6/">5.35.6</a>
+          <a class="dropdown-item" href="/5.35.5/">5.35.5</a>
+          <a class="dropdown-item" href="/5.35.4/">5.35.4</a>
+          <a class="dropdown-item" href="/5.35.3/">5.35.3</a>
+          <a class="dropdown-item" href="/5.35.2/">5.35.2</a>
+          <a class="dropdown-item" href="/5.35.1/">5.35.1</a>
+          <a class="dropdown-item" href="/5.35.0/">5.35.0</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/5.33.9/">5.33.9</a>
+          <a class="dropdown-item" href="/5.33.8/">5.33.8</a>
+          <a class="dropdown-item" href="/5.33.7/">5.33.7</a>
+          <a class="dropdown-item" href="/5.33.6/">5.33.6</a>
+          <a class="dropdown-item" href="/5.33.5/">5.33.5</a>
+          <a class="dropdown-item" href="/5.33.4/">5.33.4</a>
+          <a class="dropdown-item" href="/5.33.3/">5.33.3</a>
+          <a class="dropdown-item" href="/5.33.2/">5.33.2</a>
+          <a class="dropdown-item" href="/5.33.1/">5.33.1</a>
+          <a class="dropdown-item" href="/5.33.0/">5.33.0</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown text-nowrap">
+        <a class="nav-link dropdown-toggle" href="#" id="dropdownlink-nav" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Documentation</a>
+        <div class="dropdown-menu" aria-labelledby="dropdownlink-nav">
+          <a class="dropdown-item" href="/perl">Perl</a>
+          <a class="dropdown-item" href="/perlintro">Intro</a>
+          <a class="dropdown-item" href="/perl#Tutorials">Tutorials</a>
+          <a class="dropdown-item" href="/perlfaq">FAQs</a>
+          <a class="dropdown-item" href="/perl#Reference-Manual">Reference</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/perlop">Operators</a>
+          <a class="dropdown-item" href="/functions">Functions</a>
+          <a class="dropdown-item" href="/variables">Variables</a>
+          <a class="dropdown-item" href="/modules">Modules</a>
+          <a class="dropdown-item" href="/perlutil">Utilities</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/perlcommunity">Community</a>
+          <a class="dropdown-item" href="/perlhist">History</a>
+        </div>
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+      <script>
+        function set_expand (expand) {
+          var perldocdiv = document.getElementById('perldocdiv');
+          var width = window.getComputedStyle(perldocdiv).getPropertyValue('max-width');
+          var expanded = (width == '' || width == 'none') ? true : false;
+          if (expand === null) {
+            expand = !expanded;
+          }
+          if ((expand && !expanded) || (!expand && expanded)) {
+            perldocdiv.style.setProperty('max-width', expand ? 'none' : '960px');
+            var button_classlist = document.getElementById('content-expand-button').classList;
+            if (expand) {
+              button_classlist.add('btn-light');
+              button_classlist.remove('btn-outline-light');
+            } else {
+              button_classlist.add('btn-outline-light');
+              button_classlist.remove('btn-light');
+            }
+          }
+          return expand;
+        }
+        function toggle_expand () {
+          var expand = set_expand(null);
+          document.cookie = 'perldoc_expand=' + (expand ? 1 : 0) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 UTC';
+        }
+        function read_expand () {
+          return document.cookie.split(';').some(function (item) { return item.indexOf('perldoc_expand=1') >= 0 });
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            if (read_expand()) {
+              set_expand(true);
+            }
+          });
+        } else if (read_expand()) {
+          set_expand(true);
+        }
+      </script>
+      <button id="content-expand-button" type="button" class="btn btn-outline-light d-none d-lg-inline-block mr-2" onclick="toggle_expand()">Expand</button>
+    <ul>
+    <form class="form-inline" method="get" action="/search">
+      <input class="form-control mr-3" type="search" name="q" placeholder="Search" aria-label="Search">
+    </form>
+  </div>
+</nav>
+
+    <div id="wrapperlicious" class="container-fluid">
+      <div id="perldocdiv">
+      <h1 id="Perl-5.36.1-Documentation"><a class="permalink" href="#Perl-5.36.1-Documentation">#</a><a id="Perl"></a>Perl 5.36.1 Documentation</h1>
+
+<p>The <i>perldoc</i> program gives you access to all the documentation that comes with Perl. You can get more documentation, tutorials and community support online at <a href="https://www.perl.org/">https://www.perl.org/</a>.</p>
+
+<p>If you&#39;re new to Perl, you should start by running <a href="/perlintro"><code>perldoc perlintro</code></a>, which is a general intro for beginners and provides some background to help you navigate the rest of Perl&#39;s extensive documentation. Run <a href="/perldoc"><code>perldoc perldoc</code></a> to learn more things you can do with <i>perldoc</i>.</p>
+
+<p>For ease of access, the Perl manual has been split up into several sections.</p>
+
+<ul>
+
+<li><p><a href="/perl#Overview">Overview</a></p>
+
+</li>
+<li><p><a href="/perl#Tutorials">Tutorials</a></p>
+
+</li>
+<li><p><a href="/perl#Reference-Manual">Reference Manual</a></p>
+
+</li>
+<li><p><a href="/perl#Internals-and-C-Language-Interface">Internals and C Language Interface</a></p>
+
+</li>
+<li><p><a href="/perl#History">History</a></p>
+
+</li>
+<li><p><a href="/perl#Miscellaneous">Miscellaneous</a></p>
+
+</li>
+<li><p><a href="/perl#Language-Specific">Language-Specific</a></p>
+
+</li>
+<li><p><a href="/perl#Platform-Specific">Platform-Specific</a></p>
+
+</li>
+<li><p><a href="/perl#Stubs-for-Deleted-Documents">Stubs for Deleted Documents</a></p>
+
+</li>
+</ul>
+
+<p><i>Full perl(1) documentation: <a href="/perl">perl</a></i></p>
+
+<h2 id="Reference-Lists"><a class="permalink" href="#Reference-Lists">#</a><a id="Reference"></a>Reference Lists</h2>
+
+<ul>
+
+<li><p><a href="/perlop">Operators</a></p>
+
+</li>
+<li><p><a href="/functions">Functions</a></p>
+
+</li>
+<li><p><a href="/variables">Variables</a></p>
+
+</li>
+<li><p><a href="/modules">Modules</a></p>
+
+</li>
+<li><p><a href="/perlutil">Utilities</a></p>
+
+</li>
+</ul>
+
+<h2 id="About-Perl"><a class="permalink" href="#About-Perl">#</a><a id="About"></a>About Perl</h2>
+
+<p>Perl officially stands for Practical Extraction and Report Language, except when it doesn&#39;t.</p>
+
+<p>Perl was originally a language optimized for scanning arbitrary text files, extracting information from those text files, and printing reports based on that information. It quickly became a good language for many system management tasks. Over the years, Perl has grown into a general-purpose programming language. It&#39;s widely used for everything from quick &quot;one-liners&quot; to full-scale application development.</p>
+
+<p>The language is intended to be practical (easy to use, efficient, complete) rather than beautiful (tiny, elegant, minimal). It combines (in the author&#39;s opinion, anyway) some of the best features of <b>sed</b>, <b>awk</b>, and <b>sh</b>, making it familiar and easy to use for Unix users to whip up quick solutions to annoying problems. Its general-purpose programming facilities support procedural, functional, and object-oriented programming paradigms, making Perl a comfortable language for the long haul on major projects, whatever your bent.</p>
+
+<p>Perl&#39;s roots in text processing haven&#39;t been forgotten over the years. It still boasts some of the most powerful regular expressions to be found anywhere, and its support for Unicode text is world-class. It handles all kinds of structured text, too, through an extensive collection of extensions. Those libraries, collected in the CPAN, provide ready-made solutions to an astounding array of problems. When they haven&#39;t set the standard themselves, they steal from the best -- just like Perl itself.</p>
+
+
+      </div>
+      <div id="footer">
+        <p>Perldoc Browser is maintained by Dan Book (<a href="https://metacpan.org/author/DBOOK">DBOOK</a>). Please contact him via the <a href="https://github.com/Grinnz/perldoc-browser/issues">GitHub issue tracker</a> or <a href="mailto:dbook@cpan.org">email</a> regarding any issues with the site itself, search, or rendering of documentation.</p>
+
+<p>The Perl documentation is maintained by the Perl 5 Porters in the development of Perl. Please contact them via the <a href="https://github.com/Perl/perl5/issues">Perl issue tracker</a>, the <a href="https://lists.perl.org/list/perl5-porters.html">mailing list</a>, or <a href="https://kiwiirc.com/client/irc.perl.org/p5p">IRC</a> to report any issues with the contents or format of the documentation.</p>
+
+
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js" integrity="sha512-/DXTXr6nQodMUiq+IUJYCt2PPOUjrHJ9wFrqpJ3XkgPNOZVfMok7cRw6CSxyCQxXn6ozlESsSh1/sMCTF1rL/g==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" integrity="sha512-ubuT8Z88WxezgSqf3RLuNi5lmjstiJcyezx34yIU2gAHonIi27Na7atqzUZCOoY4CExaoFumzOsFQ2Ch+I/HCw==" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="/highlight.pack.js"></script>
+    <script>hljs.highlightAll();</script>
+  </body>
+</html>

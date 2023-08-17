@@ -4,19 +4,20 @@
       "Piotr Roszatycki <dexter@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-TrafficLog",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0"
          }
       },
       "runtime" : {
@@ -25,12 +26,18 @@
             "Plack" : "0",
             "perl" : "5.008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::More" : "0.88"
+         }
       }
    },
    "provides" : {
       "Plack::Middleware::TrafficLog" : {
          "file" : "lib/Plack/Middleware/TrafficLog.pm",
-         "version" : "0.0401"
+         "version" : "0.0404"
       }
    },
    "release_status" : "stable",
@@ -45,5 +52,6 @@
          "url" : "http://github.com/dex4er/perl-Plack-Middleware-TrafficLog"
       }
    },
-   "version" : "0.0401"
+   "version" : "0.0404",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

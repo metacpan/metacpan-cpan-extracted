@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use base qw(Test::Class);
 use Test::More;
-use Date::Holidays::Produceral qw(holidays is_holiday);
+use Date::Holidays::Produceral;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 my $day   = 24;
 my $month = 12;
@@ -22,7 +22,7 @@ sub test_produceral_interface : Test(13) {
 
     # bare
 
-    use_ok('Date::Holidays::Produceral', qw(holidays is_holiday));
+    use_ok('Date::Holidays::Produceral');
 
     can_ok('Date::Holidays::Produceral', qw(holidays is_holiday));
 

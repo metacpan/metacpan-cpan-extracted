@@ -14,9 +14,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-18'; # DATE
+our $DATE = '2023-06-20'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.349'; # VERSION
+our $VERSION = '0.350'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -1224,9 +1224,13 @@ our %year_holidays;
 # superseded mar 29, 2023 (SKB No 327/2023, 1/2023, 1/2023)
 # ref:
 # - https://setkab.go.id/pemerintah-terbitkan-skb-perubahan-libur-nasional-dan-cuti-bersama-2023/
+#
+# superseded jun 16, 2023 (SKB No 624/2023, 2/2023, 2/2023)
+# ref:
+# -
 {
     # 2023 holidays
-    my ($chnewyear2023, $nyepi2023, $eidulf2023, $vesakha2023, $christmas);
+    my ($chnewyear2023, $nyepi2023, $eidulf2023, $eidula2023, $vesakha2023, $christmas);
     $year_holidays{2023} = [
         # - new year
         ($chnewyear2023 = _h_chnewyear ({_expand_dm("22-01")}, {hyear=>2574})),
@@ -1239,7 +1243,7 @@ our %year_holidays;
         _h_ascension ({_expand_dm("18-05")}),
         # - pancasila day
         _h_vesakha   ({_expand_dm("04-06")}, {hyear=>2567}),
-        _h_eidula    ({_expand_dm("29-06")}, {hyear=>1444}),
+        ($eidula2023 = _h_eidula    ({_expand_dm("29-06")}, {hyear=>1444})),
         _h_hijra     ({_expand_dm("19-07")}, {hyear=>1445}),
         # - independence day
         _h_mawlid({_expand_dm("28-09")}, {hyear=>1445}),
@@ -1255,6 +1259,8 @@ our %year_holidays;
         _jointlv     ({_expand_dm("24-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("25-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("02-06")}, {holiday=>$vesakha2023}),
+        _jointlv     ({_expand_dm("28-06")}, {holiday=>$eidula2023}),
+        _jointlv     ({_expand_dm("30-06")}, {holiday=>$eidula2023}),
         _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
     );
 }
@@ -1657,7 +1663,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.349 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-04-18.
+This document describes version 0.350 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-06-20.
 
 =head1 SYNOPSIS
 

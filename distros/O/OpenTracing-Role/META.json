@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::GUID" : "0",
+            "List::Util" : "0",
             "Moo::Role" : "0",
             "MooX::Enumeration" : "0",
             "MooX::HandlesVia" : "0",
@@ -41,6 +42,7 @@
             "MooX::Should" : "v0.1.4",
             "OpenTracing::Interface" : "v0.206.1",
             "OpenTracing::Types" : "0",
+            "Ref::Util" : "0",
             "Role::Declare::Should" : "0",
             "Sub::Trigger::Lock" : "0",
             "Time::HiRes" : "0",
@@ -53,6 +55,7 @@
       "test" : {
          "requires" : {
             "Devel::StrictMode" : "0",
+            "Moo" : "0",
             "Test::Deep" : "1.130",
             "Test::Interface" : "0",
             "Test::MockObject::Extends" : "0",
@@ -64,6 +67,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.86.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perceptyx/perl-opentracing-roles/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Perceptyx/perl-opentracing-roles.git",
+         "web" : "https://github.com/Perceptyx/perl-opentracing-roles"
+      }
+   },
+   "version" : "v0.86.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

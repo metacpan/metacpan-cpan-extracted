@@ -1,3 +1,11 @@
+1.999839 2023-07-14
+
+ * Update documentation. Remove/update obsolete URLs.
+
+ * Fix CPAN RT #148953 regarding loss of precision when using "log" in
+   "bignum". The issue was related to broken upgrading and downgrading in
+   Math::BigFloat.
+
 1.999838 2023-03-30
 
  * Fix CPAN RT #146411 regarding infinite recursion in bitwise operations. This

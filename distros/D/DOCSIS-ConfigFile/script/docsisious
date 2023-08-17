@@ -1,0 +1,506 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+use Mojo::File 'path';
+use Mojo::Util 'steady_time';
+use DOCSIS::ConfigFile qw(decode_docsis encode_docsis);
+use File::Basename;
+use File::Spec::Functions qw(catdir catfile);
+use FindBin;
+use YAML::XS;
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+my $STORAGE = $ENV{DOCSIS_STORAGE} || ($ENV{HOME} ? catdir $ENV{HOME}, '.docsisious' : '');
+die "DOCSIS_STORAGE=/path/to/docsis/files need to be set" unless $STORAGE;
+mkdir $STORAGE or die "mkdir $STORAGE: $!" unless -d $STORAGE;
+app->log->info("Will store DOCSIS config files in $STORAGE");
+
+get '/' => {layout => 'default'} => 'editor';
+get '/parameters' => {links => {}, tree => $DOCSIS::ConfigFile::CONFIG_TREE, layout => 'default'} => 'parameters';
+get '/css/docsis/:version' => [format => ['css']] => {template => 'css/docsis'};
+get '/js/docsis/:version'  => [format => ['js']]  => {template => 'js/docsis'};
+
+my $download = sub {
+  my $c = shift;
+
+  eval {
+    my $config = YAML::XS::Load($c->param('config'));
+    delete $config->{$_} for qw(CmMic CmtsMic);
+    my $binary = encode_docsis $config, {shared_secret => $c->param('shared_secret')};
+    my $filename = $c->param('filename') || $config->{filename} || sprintf '%s.bin', $c->paste_id;
+    $filename =~ s![^\w\.-]!-!g;
+    $c->res->headers->content_disposition("attachment; filename=$filename");
+    $c->render(data => $binary, format => 'binary');
+  } or do {
+    my $err = $@;
+    chomp $err;
+    $c->app->log->warn("Could not encode_docsis: $err");
+    $err =~ s! at \S+.*$!!s;
+    $c->render(error => "Cannot encode config file: $err", status => 400);
+  };
+};
+
+my $save = sub {
+  my $c      = shift;
+  my $id     = $c->paste_id;
+  my $config = $c->param('config');
+  my %data;
+
+  eval {
+    die 'Empty config' unless length $config;
+    $data{filename}      = $c->param('filename');
+    $data{shared_secret} = $c->param('shared_secret');
+    $data{ts}            = Mojo::Date->new->to_datetime;
+    $data{config}        = YAML::XS::Load($config);
+    path($STORAGE, "$id.yaml")->spurt(YAML::XS::Dump(\%data));
+    $c->redirect_to('edit' => id => $id);
+  } or do {
+    my $err = $@;
+    chomp $err;
+    $err =~ s! at \S+.*$!!s;
+    $c->app->log->debug("Cannot encode config file: $err");
+    $c->render(error => "Cannot encode config file: $err", status => 400);
+  };
+};
+
+my $upload = sub {
+  my $c      = shift;
+  my $binary = $c->req->upload('binary');
+
+  eval {
+    my $config = decode_docsis($binary->slurp);
+    $c->param(config   => YAML::XS::Dump($config));
+    $c->param(filename => basename $binary->filename);
+  } or do {
+    my $err = $@;
+    chomp $err;
+    $err =~ s! at \S+.*$!!s;
+    $c->render(error => "Cannot decode config file: $err", status => 400);
+  };
+};
+
+get(
+  '/edit/example' => {layout => 'default', template => 'editor'} => sub {
+    my $c = shift;
+    $c->param(config => Mojo::Loader::data_section(__PACKAGE__, 'example.yaml'));
+    $c->param(filename => 'example.bin');
+  },
+  'example',
+);
+
+get(
+  '/edit/:id' => {layout => 'default', template => 'editor'} => sub {
+    my $c    = shift;
+    my $id   = $c->paste_id;
+    my $data = YAML::XS::Load(path($STORAGE, "$id.yaml")->slurp);
+    $c->param(config        => YAML::XS::Dump($data->{config}));
+    $c->param(filename      => $data->{filename});
+    $c->param(shared_secret => $data->{shared_secret});
+  },
+  'edit'
+);
+
+post(
+  '/' => {layout => 'default', template => 'editor'} => sub {
+    my $c = shift;
+    return $c->$save     if $c->param('save');
+    return $c->$download if $c->param('download');
+    return $c->$upload   if $c->req->upload('binary');
+    return $c->render(text => "Either download, binary or save need to be present.\n", status => 400);
+  },
+  'save'
+);
+
+helper paste_id => sub {
+  my $c = shift;
+  my $id = $c->param('id') || Mojo::Util::md5_sum($^T . $$ . steady_time);
+  die "Invalid id: $id" unless $id =~ /^\w+$/;
+  die "Invalid id: $id" if $id eq 'example';
+  return $id;
+};
+
+helper sort_parameters => sub {
+  my ($c, $p) = @_;
+
+  return sort { $p->{$a}{code} <=> $p->{$b}{code} } keys %$p;
+};
+
+$ENV{X_REQUEST_BASE} and hook before_dispatch => sub {
+  my $c = shift;
+  return unless my $base = $c->req->headers->header('X-Request-Base');
+  $c->req->url->base(Mojo::URL->new($base));
+};
+
+app->defaults(error => '', VERSION => DOCSIS::ConfigFile->VERSION);
+app->defaults->{VERSION} =~ s!\W+!-!g;
+app->start;
+
+__DATA__
+@@ js/docsis.js.ep
+window.addEventListener('load', function() {
+  var buttons = document.getElementsByTagName('button');
+  var editor = document.querySelector('textarea');
+  var help = document.getElementById('help');
+  var settings = document.getElementById('settings');
+  var titleBox = document.getElementById('title_box');
+
+  for (var i = 0; i < buttons.length; i++) {
+    (function(btn) {
+      btn._title = btn.title || '';
+      btn.title = '';
+      btn.addEventListener('mouseover', function(e) { titleBox.innerHTML = btn._title; });
+      btn.addEventListener('mouseout', function(e) { titleBox.innerHTML = '&nbsp;'; });
+
+      if (btn.className.indexOf('help') > 0) {
+        btn.addEventListener('click', function(e) {
+          settings.style.display = 'none';
+          help.style.display = help.style.display == 'block' ? 'none' : 'block';
+        });
+      }
+      else if (btn.className.indexOf('settings') > 0) {
+        btn.addEventListener('click', function(e) {
+          help.style.display = 'none';
+          settings.style.display = settings.style.display == 'block' ? 'none' : 'block';
+        });
+      }
+      else if (btn.className.indexOf('upload') > 0) {
+        btn.addEventListener('click', function(e) {
+          document.querySelector('[name="binary"]').click();
+        });
+      }
+    })(buttons[i]);
+  }
+
+  editor.focus();
+  document.querySelector('[name="binary"]').addEventListener('change', function(e) {
+    document.querySelector("form").submit();
+  });
+
+  var resize = function() {
+    editor.style.height = window.innerHeight - document.getElementById('header').offsetHeight - 60 + 'px';
+  };
+  window.addEventListener('resize', resize);
+  resize();
+});
+@@ css/docsis.css.ep
+* { box-sizing: border-box; }
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4em;
+}
+a {
+  color: #4C79B3;
+}
+h1, h1 a {
+  color: #4C79B3;
+  text-decoration: none;
+}
+h1 {
+  margin: 0.8em 0;
+  padding: 0;
+  font-size: 2em;
+}
+h1 a:hover {
+  text-decoration: underline;
+}
+label {
+  display: block;
+  margin: 0.8em 0 0.25em 0;
+}
+button, textarea, input {
+  font-size: 14px;
+  font-family: "Lucida Console", monospace;
+}
+input {
+  padding: 0.5em 0.6em;
+  border: 1px solid #ccc;
+  box-shadow: inset 1px 1px 3px #ddd;
+  width: 100%;
+  max-width: 40em;
+}
+textarea {
+  background: #fafafa;
+  width: 100%;
+  height: 400px;
+  padding: 1em;
+  border: 0;
+  outline: 0;
+  resize: none;
+  border-top: 1px solid #4C79B3;
+  border-bottom: 1px solid #4C79B3;
+  margin-bottom: 1em;
+  line-height: 1.4em;
+}
+.btn {
+  color: #fff;
+  background-color: #4C79B3;
+  border-color: #263E5D;
+  padding: 0.5em 0.9em;
+  margin: 0 1px;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 0.2em;
+  text-decoration: none;
+}
+.btn:hover {
+  background-color: #6791C7;
+}
+.error {
+  padding: 1em;
+  border-top: 1em solid #fff;
+  background: #FF935B;
+  clear: both;
+}
+.icon {
+  font-size: 18px;
+}
+.parameters {
+  margin-bottom: 3rem;
+}
+.parameters h2,
+.parameters h3,
+.parameters h4,
+.parameters h5 {
+  margin: 0.8em 0 0.2em 0;
+  padding: 0;
+}
+.parameters h2 a,
+.parameters h3 a,
+.parameters h4 a,
+.parameters h5 a {
+  text-decoration: none;
+}
+.parameters p {
+  margin: 0;
+}
+.parameters ul {
+  margin: 0;
+  margin-left: 1.5rem;
+  padding: 0;
+}
+.wrapper {
+  max-width: 70em;
+  margin: 0 auto;
+}
+#header { padding: 3em 1em 2em 1em; overflow: hidden; }
+#header h1 { float: right; margin: 0; padding-top: 0.3em; }
+#header .btn { float: left; }
+#settings { display: none; clear: both; padding-top: 1em; }
+#help { display: none; clear: both; padding-top: 1em; }
+@media (max-width: 40em) {
+  #header { padding-top: 0.1em; }
+  #header h1 { padding-bottom: 0.5em; float: none; }
+}
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DOCSIS config file editor</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  %= stylesheet "/css/docsis/$VERSION.css"
+</head>
+<body>
+<div class="wrapper">
+  %= content
+  %= javascript "/js/docsis/$VERSION.js"
+</div>
+</body>
+</html>
+@@ editor.html.ep
+%= form_for "save", enctype => "multipart/form-data", begin
+  <div id="header">
+    <div id="title_box">&nbsp;</div>
+    <h1><%= link_to 'DOCSIS config file editor', 'editor' %></h1>
+    <button class="btn" name="save" value="1" title="Save for later."><i class="fa fa-save"></i></button>
+    <button class="btn settings" type="button" title="Settings."><i class="fa fa-cog"></i></a>
+    <button class="btn" name="download" value="1" title="Download binary config."><i class="fa fa-download"></i></a>
+    <button class="btn upload" type="button" title="Upload binary config."><i class="fa fa-upload"></i></button>
+    <button class="btn help" type="button" title="Help and about."><i class="fa fa-question"></i></button>
+  % if ($error) {
+    <div class="error"><%= $error %></div>
+  % }
+    <div id="help">
+      <p>
+        This web application is an online <a href="http://en.wikipedia.com/wiki/DOCSIS">DOCSIS</a>
+        config file text editor.
+      </p>
+      <p>
+        Feature list:
+      </p>
+      <ul>
+        <li>Can edit any DOCSIS config file.</li>
+        <li>Compatible with DOCSIS 1.x, 2.x and 3.x.</li>
+        <li>Can download/upload binary format.</li>
+        <li>Can save config for later use.</li>
+        <li>Allow setting of shared secret.</li>
+        <li><a href="https://metacpan.org/pod/DOCSIS::ConfigFile">Open source</a>.</li>
+      </ul>
+      <p>
+        The program is built on top of the powerful <a href="http://perl.org">Perl</a> based
+        <a href="https://metacpan.org/pod/DOCSIS::ConfigFile">DOCSIS::ConfigFile</a> library.
+        Have a look at the complete <%= link_to 'configuration parameters', 'parameters' %>
+        to see what is possible or simply try out an <%= link_to 'example config', 'example' %>
+        and start editing.
+      </p>
+      <p>
+        Please report any bugs to the <a href="https://github.com/jhthorsen/docsis-configfile/issues">github</a>
+        issue tracker.
+      </p>
+    </div>
+    <div id="settings">
+      %= hidden_field id => stash('id') || '';
+      <label>Filename</label>
+      %= text_field 'filename'
+      <label>Shared secret</label>
+      %= text_field 'shared_secret'
+    </div>
+  </div>
+  %= text_area 'config', id => 'config', placeholder => 'Enter your DOCSIS config here'
+  %= file_field 'binary', style => 'visibility:hidden;'
+% end
+@@ example.yaml
+---
+MaxCPE: '3'
+MaxClassifiers: '20'
+NetworkAccess: '1'
+DocsisTwoEnable: 1
+DsPacketClass:
+- ActivationState: '1'
+  ClassifierRef: '4'
+  IpPacketClassifier:
+    DstPortEnd: '2427'
+    DstPortStart: '2427'
+    IpDstAddr: 0.0.0.0
+    IpDstMask: 0.0.0.0
+    IpProto: '17'
+    IpSrcAddr: 0.0.0.0
+    IpSrcMask: 0.0.0.0
+  RulePriority: '1'
+  ServiceFlowRef: '4'
+- ActivationState: '1'
+  ClassifierRef: '5'
+  IpPacketClassifier:
+    IpDstAddr: 10.160.0.0
+    IpDstMask: 255.254.0.0
+    IpProto: '17'
+    IpSrcAddr: 0.0.0.0
+    IpSrcMask: 0.0.0.0
+  RulePriority: '32'
+  ServiceFlowRef: '6'
+DsServiceFlow:
+- DsServiceFlowRef: '3'
+  MaxRateSustained: '10240000'
+  QosParamSetType: '7'
+  TrafficPriority: '3'
+- DsServiceFlowRef: '4'
+  MaxRateSustained: '8000000'
+  QosParamSetType: '7'
+  TrafficPriority: '4'
+- DsServiceFlowRef: '6'
+  MaxRateSustained: '5000000'
+  QosParamSetType: '7'
+  TrafficPriority: '5'
+SnmpMibObject:
+- oid: 1.3.6.1.4.1.1.77.1.6.1.1.6.2
+  INTEGER: 1
+- oid: 1.3.6.1.4.1.1429.77.1.6.1.1.6.2
+  STRING: bootfile.bin
+UsPacketClass:
+- ActivationState: '1'
+  ClassifierRef: '1'
+  IpPacketClassifier:
+    IpDstAddr: 0.0.0.0
+    IpDstMask: 0.0.0.0
+    IpProto: '17'
+    IpSrcAddr: 0.0.0.0
+    IpSrcMask: 0.0.0.0
+    SrcPortEnd: '2727'
+    SrcPortStart: '2727'
+  RulePriority: '64'
+  ServiceFlowRef: '2'
+- ActivationState: '1'
+  ClassifierRef: '2'
+  LLCPacketClassifier:
+    EtherType: 0x030f16
+  RulePriority: '3'
+  ServiceFlowRef: '2'
+- ActivationState: '1'
+  ClassifierRef: '3'
+  IpPacketClassifier:
+    IpDstAddr: 0.0.0.0
+    IpDstMask: 0.0.0.0
+    IpProto: '17'
+    IpSrcAddr: 10.160.0.0
+    IpSrcMask: 255.254.0.0
+  RulePriority: '32'
+  ServiceFlowRef: '5'
+UsServiceFlow:
+- IpTosOverwrite: 0x0017
+  MaxRateSustained: '1024000'
+  QosParamSetType: '7'
+  SchedulingType: '2'
+  TrafficPriority: '3'
+  UsServiceFlowRef: '1'
+- MaxRateSustained: '512000'
+  QosParamSetType: '7'
+  SchedulingType: '2'
+  TrafficPriority: '4'
+  UsServiceFlowRef: '2'
+- MaxRateSustained: '512000'
+  QosParamSetType: '7'
+  SchedulingType: '2'
+  TrafficPriority: '5'
+  UsServiceFlowRef: '5'
+- MaxConcatenatedBurst: 3044
+  MaxRateSustained: 128000
+  MaxTrafficBurst: 3044
+  QosParamSetType: 7
+  SchedulingType: 2
+  TrafficPriority: 3
+  UsServiceFlowRef: 2
+  UsVendorSpecific:
+    id: 0x00100a
+    options:
+    - 4
+    - 0x0100a3123a8f4a50
+@@ parameter.html.ep
+% my $path = length $parent ? "$parent-$param->{code}" : $param->{code};
+% my $link = lc "param-$path-$name"; $link =~ s!\W+!-!g;
+<h<%= $level %> id="<%= $link %>"><a href="#<%= $link %>"><%= $path %> - <%= $name %></a></h<%= $level %>>
+% unless ($param->{func} eq 'nested') {
+  <p>
+    Type: <%= $param->{func} %>.
+    % if ($param->{limit}[0] or $param->{limit}[1]) {
+      Limit: <%= $param->{limit}[0] %> &lt;=&gt; <%= $param->{limit}[1] %>.
+    % }
+  </p>
+% }
+% if ($param->{nested}) {
+  <ul>
+  % for my $name (sort_parameters $param->{nested}) {
+    <li>
+      %= include 'parameter', level => $level + 1, name => $name, param => $param->{nested}{$name}, parent => $path
+    </li>
+  % }
+  </ul>
+% }
+@@ parameters.html.ep
+<h1>DOCSIS config parameters</h1>
+<p>
+  Here is a complete list of the parameters supported by 
+  <a href="https://metacpan.org/pod/DOCSIS::ConfigFile">DOCSIS::ConfigFile</a> and
+  <%= link_to 'Docsisious', 'editor' %>.
+</p>
+<div class="parameters">
+  % for my $name (sort_parameters $tree) {
+    %= include 'parameter', level => 2, name => $name, param => $tree->{$name}, parent => ''
+  % }
+</parameters>

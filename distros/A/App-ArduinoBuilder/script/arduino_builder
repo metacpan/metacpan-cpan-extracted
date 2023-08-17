@@ -29,11 +29,86 @@ arduino_builder - Build system for Arduino programs
 
 =head1 SYNOPSIS
 
-  arduino_builder [options] command
+  arduino_builder [options] command ...
 
 =head1 DESCRIPTION
 
+=head1 COMMANDS
+
+The following commands can be passed to the tool. If several commands are
+present, they will all be executed in the order in which they are listed below
+(not in the order in which they are passed). Passing a command more than once
+has no effect.
+
+=over 4
+
+=item B<clean>
+
+Clean the content of the build directory (without removing the build directory
+itself). This command can be used only if the C<builder.default_build_directory>
+configuration value is set in the project config. Otherwise, you should manually
+run the C<rm -fr directory> command.
+
+=item B<build>
+
+Build the project and all its dependencies (Arduino core and libraries).
+
+The command tries to not rebuild unecessary parts of the binary and of its
+dependencies if their sources have not changed. In some circumstance we may not
+detect correctly all dependencies so it may be useful to run the B<clean>
+command (in particular if you have deleted a source file).
+
+=item B<discover>
+
+Run the board discovery to detect your board. This command is implied by the
+B<upload> and/or B<monitor> commands.
+
+=item B<upload>
+
+Upload the compiled binary to your board. If the B<build> command is not
+executed, the binary must already exist and no new version will be compiled
+before the upload.
+
+Note that the end of the compilation phase will report whether your binary can
+hold in your board memory (and will abort the program if not) but the B<upload>
+command itself does not perform such a check.
+
+=item B<monitor>
+
+Open a connection to the board that allows to interract with a running program.
+This is usually, but not necessarily, done through a serial port.
+
+=back
+
 =head1 OPTIONS
+
+=over 4
+
+=item C<--help>, C<-h>
+
+=item C<--project-dir I<dir>>, C<-p>
+
+=item C<--build-dir I<dir>>, C<-b>
+
+=item C<--log-level I<level>>, C<-l>
+
+=item C<--parallelize I<N>>, C<-j>
+
+=item C<--config I<k=v>>, C<-c>
+
+=item C<--menu I<m=v>>, C<-m>
+
+=item C<--skip I<step>>
+
+=item C<--force I<step>>
+
+=item C<--only I<step>>
+
+=item C<--stack-trace-on-error>, C<--stack>
+
+=item C<--target-port I<port>>, C<--port>
+
+=back
 
 =head1 CONFIGURATION FILE SYNTAX
 
@@ -52,8 +127,8 @@ key in brackets. For examples:
 
 =head1 CONFIGURATION FILES
 
-When you start `arduino_builder` it will read a set of configuration files. Once
-a key is defined by a given file it will not be overriden by other files
+When you start C<arduino_builder> it will read a set of configuration files.
+Once a key is defined by a given file it will not be overriden by other files
 defining the same key. So the most specific configuration should be loaded
 first.
 
@@ -74,6 +149,16 @@ precedance over any other configuration files that will be read afterward.
 
 =item - F<boards.txt> file in the platform package directory.
 
+This file and the previous ones are treated specially: once they are read,
+configuration properties are filtered to keep only thoses prefixed by the name
+of the board specified by the C<builder.package.board> configuration (that is
+expected to be present in the F<arduino_builder.config> file). And that prefix
+is removed from the configuration keys.
+
+After that step, the L</"Menu Resolution"> happens and the resulting
+configuration values will override those read in the F<boards.local.txt> and
+F<boards.txt> files (but not those read in previous files).
+
 =item - F<platform.local.txt> file in the platform package directory.
 
 =item - F<platform.txt> file in the platform package directory.
@@ -86,17 +171,30 @@ precedance over any other configuration files that will be read afterward.
 
 =head1 CONFIGURATION VALUES
 
+Note that all paths set in configuration values must be absolute path (they will
+not be interpreted as relative path to the config file for example). However you
+can make these paths be relative by using another configuration value to provide
+the absolute part. For example:
+
+  builder.default_build_dir={builder.project_dir}/_build
+
+In the list below, the configuration names followed by an asterisk C<*> are
+those that should usually be in F<arduino_builder.local> file rather than in the
+F<arduino_builder.config> one.
+
 =over 4
 
 =item C<builder.project_name>
 
 =item C<builder.package.name>
 
-=item C<builder.package.path>
+=item C<builder.package.path>*
 
 =item C<builder.package.arch>
 
 =item C<builder.package.board>
+
+=item C<builder.arduino.install_dir>
 
 =item C<builder.default_build_dir>
 
@@ -106,13 +204,47 @@ precedance over any other configuration files that will be read afterward.
 
 =item C<builder.menu.XXX>
 
-=item C<builder.parallelize>
+=item C<builder.library.XXX>
+
+=item C<builder.parallelize>*
+
+=item C<builder.config.append.XXX>
+
+=item C<builder.upload.port>*
+
+The port to use to upload and/or monitor the board. The passed value should be
+the label of a port found by the B<monitor> command (typically the name of the
+serial port to use). You can run C<arduino_builder monitor -l debug> to see
+which ports are found by the command.
+
+You can also use a comma separated list for this configuration value in case
+your board can appear under different ports.
+
+=item C<builder.project_dir>
+
+The path to the root directory of the project (typically the directory that
+contains the F<arduino_builder.config> file). In general, you should not set
+this value and it will be set automatically. However this value is commonly used
+as part of other values to defines paths relative to your project directory (see
+the example at the top of this section).
 
 =back
 
 Other standard properties of the Arduino build system,
 L<documented here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#global-predefined-properties>,
 are also implemented and can be used when defining the config of your project.
+
+=head1 MENU RESOLUTION
+
+=head1 BINARY UPLOAD
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item C<ARDUINO_BUILDER_LOG_LEVEL>
+
+=back
 
 =head1 CAVEATS
 
@@ -126,20 +258,48 @@ features are the following ones:
 For now, you have to specify explicitly all the libraries that are used by your
 program as well as where these libraries are installed.
 
+=item Core and libraries download
+
+Arduino Builder can’t (yet) download missing core and libraries. They must all
+be installed on your system before compiling.
+
 =item Pre-compiled libraries
 
 The Arduino GUI can use pre-compiled libraries for closed source code. This is
 not supported yet by this tool.
 
-=item Program size calculation
+=item Core, variant and library reference
 
-The Arduino GUI displays the program size compared to your micro-controller
-flash size.
+The configuration syntax to reference other packages (documented
+L<here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#referencing-another-core-variant-or-tool>)
+is not yet supported.
 
-=item Program upload to micro-controller
+=item Non MS-Windows systems
 
-The Arduino GUI can upload (flash) your program on your micro-controller.
+Only the basic features of the tool have been tested on Linux and, for now, no
+tests have been performed on MacOS. Please report any bug that you encounter
+with these OSs with as much details as you can.
 
+=item Automatic board detection
+
+There are some mechanism in the Arduino software to identify a connected board.
+For now we require that the user specifies the port used to communicate with the
+board.
+
+=item Upload verification
+
+The verification step, documented
+L<here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#upload-verification>,
+is not yet implemented.
+
+Similarly uploads using external programmers and bootloader burning are not
+handled.
+
+=item 1200bps bootloader reset
+
+If the reset to bootloader is not performed by the upload tools used, Arduino
+Builder cannot yet perform this reset itself (documented
+L<here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#1200-bps-bootloader-reset>).
 =back
 
 =head1 AUTHOR

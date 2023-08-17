@@ -35,11 +35,11 @@ ok(!defined $f->part('1'));
 #print Dumper $f;
 
 is($f->fetchBody(0)."\n", <<__BODY, '...body');
-("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2)
+("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2)
 __BODY
 
 is($f->fetchBody(1)."\n", <<__BODYSTRUCT, '...bodystruct');
-("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL)
+("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL)
 __BODYSTRUCT
 
 is($f->fetchEnvelope."\n", <<__ENVELOPE, '...envelope');
@@ -75,11 +75,11 @@ isa_ok($f, $msif);
 ok($f->part() == $f);
 
 is($f->fetchBody(0)."\n", <<__BODY, '...body');
-(("TEXT" "PLAIN" ("charset" "utf-8") NIL NIL "8BIT" 10 2)("AUDIO" "MPEG3" () NIL NIL "BASE64" 5 1) "MIXED")
+(("TEXT" "PLAIN" ("charset" "us-ascii") NIL NIL "8BIT" 10 2)("AUDIO" "MPEG3" () NIL NIL "BASE64" 5 1) "MIXED")
 __BODY
 
 is($f->fetchBody(1)."\n", <<__BODYSTRUCT, '...bodystruct');
-(("TEXT" "PLAIN" ("charset" "utf-8") NIL NIL "8BIT" 10 2 NIL ("inline") NIL)("AUDIO" "MPEG3" () NIL NIL "BASE64" 5 1 NIL ("attachment") NIL) "MIXED")
+(("TEXT" "PLAIN" ("charset" "us-ascii") NIL NIL "8BIT" 10 2 NIL ("inline") NIL)("AUDIO" "MPEG3" () NIL NIL "BASE64" 5 1 NIL ("attachment") NIL) "MIXED")
 __BODYSTRUCT
 
 is($f->fetchEnvelope."\n", <<__ENVELOPE, '...envelope');
@@ -181,11 +181,11 @@ isa_ok($f, $msif);
 #$b->print(\*STDERR);
 
 is($f->fetchBody(0)."\n", <<__BODY, "...body");
-("MESSAGE" "RFC822" () "<newid>" NIL "8BIT" 212 ("now" "Life of Brian" ("I myself and me" NIL "me" "localhost") NIL NIL (NIL NIL "you" "example.com") NIL NIL NIL "<unique>") ("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2) 11)
+("MESSAGE" "RFC822" () "<newid>" NIL "8BIT" 215 ("now" "Life of Brian" ("I myself and me" NIL "me" "localhost") NIL NIL (NIL NIL "you" "example.com") NIL NIL NIL "<unique>") ("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2) 11)
 __BODY
 
 is($f->fetchBody(1)."\n", <<__BODYSTRUCT, "...bodystruct");
-("MESSAGE" "RFC822" () "<newid>" NIL "8BIT" 212 ("now" "Life of Brian" ("I myself and me" NIL "me" "localhost") NIL NIL (NIL NIL "you" "example.com") NIL NIL NIL "<unique>") ("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL) 11 NIL ("inline") NIL)
+("MESSAGE" "RFC822" () "<newid>" NIL "8BIT" 215 ("now" "Life of Brian" ("I myself and me" NIL "me" "localhost") NIL NIL (NIL NIL "you" "example.com") NIL NIL NIL "<unique>") ("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL) 11 NIL ("inline") NIL)
 __BODYSTRUCT
 
 is($f->fetchEnvelope."\n", <<__ENVELOPE, "...envelope");
@@ -201,11 +201,11 @@ isa_ok($g, $msif);
 ok($f != $g);
 
 is($g->fetchBody(0)."\n", <<__BODY, "...body");
-("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2)
+("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2)
 __BODY
 
 is($g->fetchBody(1)."\n", <<__BODYSTRUCT, "...bodystruct");
-("TEXT" "PLAIN" ("charset" "utf-8") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL)
+("TEXT" "PLAIN" ("charset" "us-ascii") "<unique>" NIL "8BIT" 10 2 NIL ("inline") NIL)
 __BODYSTRUCT
 
 is($g->fetchEnvelope."\n", <<__ENVELOPE, "...envelope");

@@ -1,10 +1,10 @@
 package Types::ElasticSearch;
 # ABSTRACT: Types for working with ElasticSearch
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use Type::Library -base;
 use Type::Tiny;
@@ -30,7 +30,7 @@ Types::ElasticSearch - Types for working with ElasticSearch
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 AUTHOR
 

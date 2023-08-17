@@ -4,7 +4,17 @@ NAME
 
 SYNOPSIS
 
-       TODO
+       use Text::Treesitter;
+    
+       my $ts = Text::Treesitter->new(
+          lang_name => "perl",
+       );
+    
+       my $tree = $ts->parse_string( $input );
+    
+       my $root = $tree->root_node;
+    
+       ...
 
 DESCRIPTION
 
@@ -111,6 +121,24 @@ METHODS
     Parses a given input string using the internal parser, returning a node
     tree as an instance of Text::Treesitter::Tree.
 
+ parse_string_range
+
+       $tree = $ts->parse_string_range( $str, %options );
+
+    Since version 0.10.
+
+    Parses a given input string using the internal parser, within the given
+    byte range. Returns a node tree as an instance of
+    Text::Treesitter::Tree.
+
+    Takes the following named options:
+
+    start_byte
+
+    end_byte
+
+      The start and end position within the string, in byte counts.
+
  load_query_string
 
        $query = $ts->load_query_string( $str );
@@ -119,15 +147,21 @@ METHODS
     patterns given in the source string for the language used by the
     parser.
 
+ query_file_path
+
+       $path = %ts->query_file_path( $name );
+
+    If a file exists of the given path, then it is returned directly.
+    Otherwise, returns a path within the language directory given by
+    lang_dir; either directly or within a subdirectory called queries/.
+
  load_query_file
 
-       $query = $ts->load_query_file( $path );
+       $query = $ts->load_query_file( $name );
 
     Creates a Text::Treesitter::Query instance by loading the text from the
-    given path, and then compiling it as per "load_query_string". $path may
-    be specified as relative to the current working directory, or relative
-    to the language directory given by lang_dir. The first one found will
-    be loaded.
+    given path, and then compiling it as per "load_query_string". The name
+    is resolved into a path by using "query_file_path".
 
 TODO
 

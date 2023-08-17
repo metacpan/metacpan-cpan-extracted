@@ -123,11 +123,11 @@ ok $state->id;
       "Credit Cards has too few rows (minimum is 2)",
       "Credit Cards Is Invalid",
     ],
-    "credit_cards.0.card_number" => [
+    "credit_cards[0].card_number" => [
       "Credit Cards Card Number is too short (minimum is 13 characters)",
       "Credit Cards Card Number does not look like a credit card",
     ],
-    "credit_cards.0.expiration" => [
+    "credit_cards[0].expiration" => [
       "Credit Cards Expiration does not look like a datetime value",
     ],
     password => [
@@ -305,7 +305,7 @@ ok $state->id;
     credit_cards => [
       "Credit Cards Is Invalid",
     ],
-    "credit_cards.1.expiration" => [
+    "credit_cards[1].expiration" => [
       "Credit Cards Expiration must be in the future",
     ],
     username => [
@@ -550,11 +550,11 @@ ok $state->id;
     credit_cards => [
       "Is Invalid",
     ],
-    "credit_cards.0.card_number" => [
+    "credit_cards[0].card_number" => [
       "is too short (minimum is 13 characters)",
       "does not look like a credit card",
     ],
-    "credit_cards.0.expiration" => [
+    "credit_cards[0].expiration" => [
       "does not look like a datetime value",
     ],
     first_name => [

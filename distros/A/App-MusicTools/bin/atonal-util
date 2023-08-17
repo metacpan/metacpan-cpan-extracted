@@ -16,10 +16,7 @@
 # (Or more likely scrap and rewrite from scratch, eesh.)
 
 use 5.14.0;
-use strict;
 use warnings;
-
-use File::Basename       qw/basename/;
 use Getopt::Long         qw/GetOptionsFromArray/;
 use List::Util           qw/sum/;
 use Music::AtonalUtil    ();
@@ -32,8 +29,6 @@ use Music::Tension::Cope ();
 #use Music::Tension::PlompLevelt ();
 use Parse::Range qw/parse_range/;
 use Scalar::Util qw/looks_like_number/;
-
-my $PROG_NAME = basename($0);
 
 my %modes = (
     adjacent_interval_content => \&adjacent_interval_content,
@@ -213,7 +208,7 @@ sub _ms2abbr_time {
     $temp .= ($minutes) ? "${minutes}m " : q{};
     $temp .= ($seconds) ? "${seconds}s " : q{};
     $temp .= ($ms) ? "${ms}ms" : q{};
-	$temp =~ s/\s+$//;
+    $temp =~ s/\s+$//;
     return $temp;
 }
 
@@ -234,7 +229,7 @@ sub _fit_scale {
 
             my $scale_fmt   = join '', ('%-6s') x @scale_nums;
             my $scale_notes = sprintf $scale_fmt, $Lyu->p2ly(@scale_nums);
-			$scale_notes =~ s/\s+$//;
+            $scale_notes =~ s/\s+$//;
             printf "%-3s%-18s%-8s%s\n", "\u$tonic", "\u$scale", $dsc_flag, $scale_notes;
         }
     }
@@ -647,8 +642,8 @@ sub _findps {
 
             my $s = sprintf "%s\tTi(%d)\t%-${ps_width}s%s", $fnum, $i,
               join( ',', @pitches ), $tstr;
-			$s =~ s/\s+$//;
-			say $s;
+            $s =~ s/\s+$//;
+            say $s;
         }
     }
 }
@@ -670,8 +665,8 @@ sub fnums {
 
         my $s = sprintf "%s\t%-16s\t%-8s%s", $fn, join( ',', @$pset ),
           join( '', @$icc ), $tstr;
-		$s =~ s/\s+$//;
-		say $s;
+        $s =~ s/\s+$//;
+        say $s;
     }
 }
 
@@ -1127,7 +1122,7 @@ sub prime_form {
 
 sub print_help {
     warn <<"END_USAGE";
-Usage: $PROG_NAME [options] mode mode-args
+Usage: atonal-util [options] mode mode-args
 
 Atonal music analysis utilities. Options:
 
@@ -1169,7 +1164,7 @@ interval class content (and Forte Number, if possible):
 
   $0 --ly basic c e g
 
-Run perldoc(1) on $PROG_NAME for additional documentation.
+Run perldoc(1) on atonal-util for additional documentation.
 
 END_USAGE
     exit 64;

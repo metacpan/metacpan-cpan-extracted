@@ -1,4 +1,4 @@
-package BioX::Seq 0.008007;
+package BioX::Seq 0.008008;
 
 use 5.016;
 use strict;
@@ -156,12 +156,14 @@ sub range {
     my $qual = defined $self->{qual}
         ? substr $self->{qual}, $start-1, $end-$start+1
         : undef;
-    return __PACKAGE__->new(
+    my $new =  __PACKAGE__->new(
         $seq,
         "$self->{id}_$start-$end",
         $self->{desc},
         $qual,
     );
+    $new->{_input_format} = $self->{_input_format};
+    return $new;
 
 }
 
@@ -254,12 +256,14 @@ sub rev_com {
     }
 
     # else return a new sequence object
-    return __PACKAGE__->new(
+    my $new = __PACKAGE__->new(
         $seq,
         $self->{id},
         $self->{desc},
         $qual,
     );
+    $new->{_input_format} = $self->{_input_format};
+    return $new;
 
 }
 

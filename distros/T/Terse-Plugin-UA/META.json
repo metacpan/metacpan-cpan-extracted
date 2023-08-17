@@ -34,7 +34,7 @@
          "requires" : {
             "LWP::UserAgent" : "0",
             "Scalar::Util" : "0",
-            "Terse" : "0",
+            "Terse" : "0.19",
             "URI" : "0",
             "perl" : "5.006"
          }
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

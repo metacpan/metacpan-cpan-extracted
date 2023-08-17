@@ -1,0 +1,46 @@
+# PODNAME: Emailvalidation
+# ABSTRACT: Emailvalidation - Look up & verify any email address
+
+=head1 SYNOPSIS
+
+    use Emailvalidation;
+
+    my $api = Emailvalidation->new(apikey => 'YOUR-APIKEY');
+    my $data = $api->info('john@doe.com');
+    print $data;
+
+=head1 DESCRIPTION
+
+Emailvalidation is a Perl module that validates any email address and verifies it's existence.
+The usage of the module requires an API key. You can get your API key here: L<https://app.emailvalidation.io/register>.
+
+Learn more about the product here: L<https://emailvalidation.io>
+
+=head1 METHODS
+
+=head2 new( $apikey )
+
+Creates a new Emailvalidation instance.
+You can get your API key here: L<https://app.emailvalidation.io/register>
+
+
+=head2 info( $email )
+
+Given an email address, this function returns all available information about this IP address.
+Example response:
+
+         {
+             "email": "john@doe.com",
+             "user": "support",
+             "domain": "doe.com",
+             "smtp_check": true,
+             "mx_found": true,
+             "did_you_mean": "",
+             "role": true,
+             "disposable": false,
+             "score": 0.64,
+             "free": false,
+             "format_valid": true,
+             "catch_all": false
+         }
+=cut

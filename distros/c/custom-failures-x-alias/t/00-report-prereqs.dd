@@ -73,7 +73,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '0',
-                                      'custom::failures' => '0'
+                                      'custom::failures' => '0',
+                                      'perl' => '5.012'
                                     }
                     },
        'test' => {
@@ -86,6 +87,8 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test2::V0' => '0',
+                                   'Test::CleanNamespaces' => '0',
+                                   'Test::Lib' => '0',
                                    'Test::More' => '0'
                                  }
                  }

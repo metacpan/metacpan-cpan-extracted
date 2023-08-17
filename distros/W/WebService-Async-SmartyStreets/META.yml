@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,10 +36,10 @@ no_index:
 provides:
   WebService::Async::SmartyStreets:
     file: lib/WebService/Async/SmartyStreets.pm
-    version: '0.001'
+    version: '0.002'
   WebService::Async::SmartyStreets::Address:
     file: lib/WebService/Async/SmartyStreets/Address.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Future::AsyncAwait: '0.21'
   IO::Async::Notifier: '0'
@@ -60,14 +60,15 @@ resources:
   bugtracker: https://github.com/binary-com/perl-WebService-Async-SmartyStreets/issues
   homepage: https://github.com/binary-com/perl-WebService-Async-SmartyStreets
   repository: https://github.com/binary-com/perl-WebService-Async-SmartyStreets.git
-version: '0.001'
+version: '0.002'
 x_authority: cpan:DERIV
 x_contributors:
-  - 'chylli-binary <chylli@binary.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Abdalla Mourad <abdullah.f98m@gmail.com>'
   - 'Brandon <52795236+brandon-binary@users.noreply.github.com>'
-  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'chylli-deriv <chylli@binary.com>'
   - 'felipe-binary <64797927+felipe-binary@users.noreply.github.com>'
+  - 'felipe-deriv <64797927+felipe-deriv@users.noreply.github.com>'
   - 'limchengyang <45479072+limchengyang@users.noreply.github.com>'
   - 'Luis Bobadilla <108674246+luis-bobadilla-deriv@users.noreply.github.com>'
   - 'Tom Molesworth <tom@binary.com>'

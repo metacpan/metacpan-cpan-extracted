@@ -1,9 +1,9 @@
 
                             IO-Compress-Zstd
 
-                         Version 2.204
+                         Version 2.206
 
-                         8 February 2023
+                               25 July 2023
 
         Copyright (c) 2019-2023 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -49,8 +49,7 @@ SUPPORT
 -------
 
 General feedback/questions/bug reports should be sent to
-https://github.com/pmqs/IO-Compress-Zstd/issues (preferred) or
-https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Zstd.
+https://github.com/pmqs/IO-Compress-Zstd/issues
 
 FEEDBACK
 --------
@@ -85,7 +84,7 @@ To help me help you, I need all of the following information:
         If you haven't installed IO-Compress-Zstd then search IO::Compress::Zstd.pm
         for a line like this:
 
-          $VERSION = "2.204" ;
+          $VERSION = "2.206" ;
 
  2. If you are having problems building IO-Compress-Zstd, send me a
     complete log of what happened. Start by unpacking the IO-Compress-Zstd

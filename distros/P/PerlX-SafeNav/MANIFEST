@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+lib/PerlX/SafeNav.pm
+lib/safenav.pm
+t/arrayref.t
+t/hashref.t
+t/mix.t
+t/safenav.t
+t/synopsis.t

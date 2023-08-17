@@ -1,5 +1,7 @@
 Revision history for OpenSky-API
 
+0.005     2023-06-01 10:33:56 CEST
+
 0.004     2023-05-29 11:25:32 CEST
           - Fixed iterator bug and wrote tests for it (thanks, toreau)
 

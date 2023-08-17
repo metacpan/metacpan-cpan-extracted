@@ -1,3 +1,14 @@
+0.006   2023-06-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: dupe_ci, dupeint (and uniqint).
+
+
+0.005   2023-06-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions dupe, dupenum, dupestr (as well as uniq, uniqnum,
+          uniqstr).
+
+
 0.004   2021-07-31  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

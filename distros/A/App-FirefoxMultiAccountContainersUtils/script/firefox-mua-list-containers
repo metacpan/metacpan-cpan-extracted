@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FirefoxMultiAccountContainersUtils/firefox_mua_list_containers
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-04'; # DATE
+our $DATE = '2023-06-06'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxMultiAccountContainersUtils/firefox_mua_list_containers",
@@ -41,11 +41,15 @@ firefox-mua-list-containers - List Firefox Multi-Account Containers add-on's con
 
 =head1 VERSION
 
-This document describes version 0.015 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
+This document describes version 0.017 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
 
 =head1 SYNOPSIS
 
-B<firefox-mua-list-containers> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<profile>E<gt>
+B<firefox-mua-list-containers> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<firefox-mua-list-containers> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<firefox-mua-list-containers> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<profile|/"--profile=s">>]
 
 =head1 OPTIONS
 
@@ -55,7 +59,10 @@ C<*> marks required options.
 
 =over
 
-=item B<--profile>=I<s>*
+=item B<--profile>=I<s>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -240,7 +247,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

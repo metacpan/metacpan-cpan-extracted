@@ -4,12 +4,11 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
-  Test::Refcount: '0'
+  Test2::V0: '0.000148'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +17,10 @@ name: Sentinel
 provides:
   Sentinel:
     file: lib/Sentinel.pm
-    version: '0.06'
+    version: '0.07'
 requires:
-  perl: '5.008008'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

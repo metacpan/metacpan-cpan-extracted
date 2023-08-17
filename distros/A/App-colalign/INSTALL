@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::colalign
+
+
+## UNINSTALL 
+
+cpanm -U App::colalign
+

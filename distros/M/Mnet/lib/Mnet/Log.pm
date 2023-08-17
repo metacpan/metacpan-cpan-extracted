@@ -66,6 +66,8 @@ Note that timestamps and other varying data are filtered out of log outputs
 when the --record, --replay, or --test cli options are enabled or if the
 L<Mnet::Log::Test> module is otherwise loaded.
 
+The signal handlers used in this module require perl 5.8 or newer.
+
 =head1 METHODS
 
 Mnet::Log implements the methods listed below.
@@ -73,8 +75,9 @@ Mnet::Log implements the methods listed below.
 =cut
 
 # required modules
-#   perl 5.8 required for decent signal handling, refer to man perlipc
 #   note that Mnet modules should use Mnet::Log::Conditional, not this module
+#   perl 5.8 for signal handling functionality, see man perlipc
+#       update Mnet.pm and this perldoc if changed
 use warnings;
 use strict;
 use 5.008;

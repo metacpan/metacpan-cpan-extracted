@@ -9,7 +9,7 @@ use Getopt::Std ;
 use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; # GetOptionsFromArray ] ;
 use List::Util qw [ max min sum sum0 reduce shuffle uniq ] ;
 use Cwd qw [ getcwd abs_path ] ;
-use App::dirdir ; 
+use App::dirstrata ; 
 
 my $time_start = [ gettimeofday ] ; 
 GetOptions ( 'pattern=s' => \my$ptn ) ; #  ファイル名(末端)でパターンに当てはまる物だけを数える(例には影響しない)。
@@ -50,7 +50,7 @@ END{
   my $s = tv_interval $time_start , [ gettimeofday ] ; 
   say STDERR BOLD FAINT ITALIC " --  " , "Proc. time: " , sprintf( "%.3f", $s ) , " sec." . ($s>1 ? 's' : '' ) 
     . " ; Random seed to shuffle : " . $o{s} . " " 
-    . ". ($0 App::dirdir\@$App::dirdir::VERSION)"  ; 
+    . ". ($0 App::dirstrata\@$App::dirstrata::VERSION)"  ; 
 }
 
 sub open_dir_error_message ( $ ) { 

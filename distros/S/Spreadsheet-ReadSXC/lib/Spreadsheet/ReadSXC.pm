@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Archive::Zip ':ERROR_CODES';
 use Carp qw(croak);
@@ -474,7 +474,7 @@ Max Maischein, L<mailto:corion@cpan.org>
 
 Copyright 2005-2019 by Christoph Terhechte
 
-Copyright 2019- by Max Maischein
+Copyright 2019-2023 by Max Maischein
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

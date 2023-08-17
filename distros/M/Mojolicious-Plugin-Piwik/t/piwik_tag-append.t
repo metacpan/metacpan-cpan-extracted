@@ -27,7 +27,7 @@ ok(any('/piwik/tracker.js')->piwik('track_script'), 'Track script is set');
 
 $t->get_ok('/piwik/tracker.js')
   ->status_is(200)
-  ->content_like(qr!'http://sojolicious\.example/piwik/piwik\.php'!)
+  ->content_like(qr!'http://sojolicious\.example/piwik/matomo\.php'!)
   ->content_like(qr!'setSiteId',2!)
   ->content_like(qr!;console\.log\(\"check\"\)!)
   ->header_is('Content-Type','application/javascript')

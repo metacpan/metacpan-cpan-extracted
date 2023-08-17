@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_merge' } = { 
-    	summary => '',
+    	summary => 'Merge cells in worksheet.',
         params => $params,
         returns => 'FileInfo',
     };

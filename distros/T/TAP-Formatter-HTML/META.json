@@ -4,7 +4,7 @@
       "Steve Purkis <spurkis@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.113640",
+   "generated_by" : "Module::Build version 0.4214",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -40,22 +40,25 @@
    "provides" : {
       "App::Prove::Plugin::HTML" : {
          "file" : "lib/App/Prove/Plugin/HTML.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "TAP::Formatter::HTML" : {
          "file" : "lib/TAP/Formatter/HTML.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "TAP::Formatter::HTML::Session" : {
          "file" : "lib/TAP/Formatter/HTML/Session.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/spurkis/TAP-Formatter-HTML"
+      }
    },
-   "version" : "0.11"
+   "version" : "0.13"
 }

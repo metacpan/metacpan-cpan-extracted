@@ -5,7 +5,7 @@ use warnings;
 
 our $VERSION = '9999.99.99_99'; # VERSION
 
-use Test::More tests => 8;
+use Test::More;
 use Test::Exception;
 
 use File::Spec;
@@ -19,13 +19,21 @@ $::QUIET = 1;
 
 my $git = can_run('git');
 
-if ( !defined $git ) {
+if ( defined $git ) {
+  plan tests => 8;
+}
+else {
   plan skip_all => 'Can not find git command';
 }
 
+my $git_environment = {
+  GIT_CONFIG_GLOBAL => File::Spec->devnull(),
+  GIT_CONFIG_SYSTEM => File::Spec->devnull(),
+};
+
 ok( $git, "Found git command at $git" );
 
-my $git_version = i_run 'git version';
+my $git_version = i_run 'git version', env => $git_environment;
 ok( $git_version, qq(Git version returned as '$git_version') );
 
 my $test_repo_dir = tempdir( CLEANUP => 1 );
@@ -74,12 +82,16 @@ subtest 'clone into existing directory', sub {
 sub prepare_test_repo {
   my $directory = shift;
 
-  i_run qq(git -C $directory init);
+  i_run 'git init', cwd => $directory, env => $git_environment;
 
-  i_run qq(git -C $directory config user.name Rex);
-  i_run qq(git -C $directory config user.email noreply\@rexify.org);
+  i_run 'git config user.name Rex', cwd => $directory, env => $git_environment;
+  i_run 'git config user.email noreply@rexify.org',
+    cwd => $directory,
+    env => $git_environment;
 
-  i_run qq(git -C $directory commit --allow-empty -m commit);
+  i_run 'git commit --allow-empty -m commit',
+    cwd => $directory,
+    env => $git_environment;
 
   return;
 }
@@ -93,7 +105,9 @@ sub git_repo_ok {
     "$directory has .git subdirectory"
   );
 
-  lives_ok { i_run qq(git -C $directory rev-parse --git-dir) }
+  lives_ok {
+    i_run 'git rev-parse --git-dir', cwd => $directory, env => $git_environment
+  }
   "$directory looks like a git repository now";
 
   return;

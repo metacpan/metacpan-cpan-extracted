@@ -3,7 +3,6 @@ package App::ListOrgHeadlines;
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use App::OrgUtils;
@@ -14,9 +13,9 @@ use Exporter 'import';
 use List::MoreUtils qw(uniq);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-06'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.485'; # VERSION
+our $VERSION = '0.486'; # VERSION
 
 our @EXPORT_OK = qw(list_org_headlines);
 
@@ -43,13 +42,13 @@ sub _process_hl {
     if ($args->{has_tags} || $args->{lacks_tags}) {
         my $tags = [$hl->get_tags];
         if ($args->{has_tags}) {
-            for (@{ $args->{has_tags} }) {
-                return unless $_ ~~ @$tags;
+            for my $tag (@{ $args->{has_tags} }) {
+                return unless grep { $_ eq $tag } @$tags;
             }
         }
         if ($args->{lacks_tags}) {
-            for (@{ $args->{lacks_tags} }) {
-                return if $_ ~~ @$tags;
+            for my $tag (@{ $args->{lacks_tags} }) {
+                return if grep { $_ eq $tag } @$tags;
             }
         }
     }
@@ -396,7 +395,7 @@ sub list_org_headlines {
                 if ($tag eq '') {
                     next if @{$_->[3]};
                 } else {
-                    next unless $tag ~~ @{$_->[3]};
+                    next unless grep { $_ eq $tag } @{$_->[3]};
                 }
                 next if !$args{allow_duplicates} && $seen{$_->[0]}++;
                 push @{ $res->{$tag} }, $_->[0];
@@ -424,7 +423,7 @@ App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.485 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2023-04-06.
+This document describes version 0.486 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2023-07-12.
 
 =head1 SYNOPSIS
 

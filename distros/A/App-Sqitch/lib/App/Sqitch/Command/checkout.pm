@@ -16,7 +16,7 @@ use namespace::autoclean;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::RevertDeployCommand';
 
-our $VERSION = 'v1.3.1'; # VERSION
+our $VERSION = 'v1.4.0'; # VERSION
 
 has client => (
     is       => 'ro',
@@ -55,8 +55,6 @@ sub execute {
     my $git    = $self->client;
     my $engine = $target->engine;
     $engine->with_verify( $self->verify );
-    $engine->no_prompt( $self->no_prompt );
-    $engine->prompt_accept( $self->prompt_accept );
     $engine->log_only( $self->log_only );
     $engine->lock_timeout( $self->lock_timeout );
 
@@ -114,7 +112,7 @@ sub execute {
     $engine->set_variables( $self->_collect_revert_vars($target) );
     $engine->plan( $from_plan );
     try {
-        $engine->revert( $last_common_change->id );
+        $engine->revert( $last_common_change->id, ! $self->no_prompt, $self->prompt_accept );
     } catch {
         # Rethrow unknown errors or errors with exitval > 1.
         die $_ if ! eval { $_->isa('App::Sqitch::X') }
@@ -199,7 +197,7 @@ The Sqitch command-line client.
 
 =head1 License
 
-Copyright (c) 2012-2022 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2023 iovation Inc., David E. Wheeler
 
 Copyright (c) 2012-2013 Ronan Dunklau
 

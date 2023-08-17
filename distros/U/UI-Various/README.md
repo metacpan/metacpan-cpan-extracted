@@ -114,6 +114,10 @@ between versions in an incompatible way!
 We (try to) use US English for identifiers while using GB English for the
 documentation.  This is intended and not a bug!
 
+Some CPAN smoke testers fail some of the test scripts (notably #11, #14, #20
+and #41) when the size of their virtual terminal is too small (height less
+than 12 lines)
+
 # METHODS
 
 ## **import** - import and initialisation of UI::Various package

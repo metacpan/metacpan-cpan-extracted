@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CHI-Driver-SharedMem",
    "no_index" : {
@@ -22,7 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CHI::Test" : "0",
+            "CHI::Test::Util" : "0",
+            "Date::Parse" : "0",
+            "Test::Class" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Requires" : "0",
+            "Test::Warn" : "0"
          }
       },
       "configure" : {
@@ -33,21 +40,33 @@
       "runtime" : {
          "requires" : {
             "CHI" : "0.54",
-            "CHI::Test" : "0",
-            "CHI::Test::Util" : "0",
             "Config" : "0",
             "Fcntl" : "0",
             "IPC::SharedMem" : "0",
             "IPC::SysV" : "0",
+            "JSON::MaybeXS" : "0",
             "Moose" : "0",
-            "Storable" : "0",
-            "Test::Class" : "0",
-            "Test::Most" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Warn" : "0"
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Carp" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.14"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/CHI-Driver-SharedMem/issues",
+         "x_url" : "https://github.com/nigelhorne/CHI-Driver-SharedMem/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/CHI-Driver-SharedMem.git",
+         "web" : "https://github.com/nigelhorne/CHI-Driver-SharedMem"
+      }
+   },
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

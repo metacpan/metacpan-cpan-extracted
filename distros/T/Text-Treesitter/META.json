@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -38,42 +38,42 @@
       "test" : {
          "requires" : {
             "File::Slurper" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Text::Treesitter" : {
          "file" : "lib/Text/Treesitter.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::Language" : {
          "file" : "lib/Text/Treesitter/Language.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::Node" : {
          "file" : "lib/Text/Treesitter/Node.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::Parser" : {
          "file" : "lib/Text/Treesitter/Parser.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::Query" : {
          "file" : "lib/Text/Treesitter/Query.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::QueryCursor" : {
          "file" : "lib/Text/Treesitter/QueryCursor.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::QueryMatch" : {
          "file" : "lib/Text/Treesitter/QueryMatch.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "Text::Treesitter::Tree" : {
          "file" : "lib/Text/Treesitter/Tree.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

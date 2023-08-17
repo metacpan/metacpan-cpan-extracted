@@ -97,11 +97,13 @@ OSM: {
 
 		my ($maine, $oregon);
 		foreach my $state(map { $_->{'address'}->{'state'} } @locations) {
-			# diag($state);
-			if($state eq 'Maine') {
-				$maine++;
-			} elsif($state eq 'Oregon') {
-				$oregon++;
+			if(defined($state)) {
+				# diag($state);
+				if($state eq 'Maine') {
+					$maine++;
+				} elsif($state eq 'Oregon') {
+					$oregon++;
+				}
 			}
 		}
 

@@ -1,5 +1,16 @@
 Revision history for DBIx-Class-PseudoEnum
 
+1.0003 2023-06-30T08:36:59-04:00 America/New_York
+ [BUG FIXES]
+ - Unenumerated columns were being tested for valid values!
+
+ [DOCUMENTATION]
+ - documented a quirk where, on enumeration failure, object column remains
+   "dirty".
+
+ [STATISTICS]
+ - code churn: 7 files changed, 54 insertions(+), 15 deletions(-)
+
 1.0002 2022-11-13T13:06:48-05:00 America/New_York
  [DOCUMENTATION]
  - Misquoted mahself.  Send an arrayref, not hashref!

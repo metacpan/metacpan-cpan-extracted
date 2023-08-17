@@ -6,12 +6,13 @@ LICENSE.md
 Makefile.PL
 MANIFEST
 README.md
-t/00_use_ok.t
-t/01_constructor_new.t
-t/02_redis_noop.t
-t/03_dispatch.t
-t/04_context_awareness.t
-t/05_create_traces.t
+t/Redis/OpenTracing.t
+t/Redis/OpenTracing/00_use_ok.t
+t/Redis/OpenTracing/01_constructor_new.t
+t/Redis/OpenTracing/02_redis_noop.t
+t/Redis/OpenTracing/03_dispatch.t
+t/Redis/OpenTracing/04_context_awareness.t
+t/Redis/OpenTracing/05_create_traces.t
 t/lib/Test/Mock/Redis/NoOp.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,6 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Net::Async::HTTP',
    requires => {
+      'perl' => '5.014',
+
       'Future' => '0.28', # ->set_label
       'Future::Utils' => '0.16',
       'HTTP::Request' => 0,
@@ -20,7 +23,6 @@ my $build = Module::Build->new(
       'Struct::Dumb' => '0.07',
       'Time::HiRes' => 0,
       'URI' => 0,
-      'perl' => '5.010', #  //
    },
    recommends => {
       'Compress::Raw::Zlib' => '2.057', # Fails with Compress::Raw::Zlib 2.056 or before
@@ -28,10 +30,8 @@ my $build = Module::Build->new(
    build_requires => {
       'HTTP::Cookies' => 0,
       'IO::Async::Test' => 0,
-      'Test::Identity' => 0,
       'Test::Metrics::Any' => 0,
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000147',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

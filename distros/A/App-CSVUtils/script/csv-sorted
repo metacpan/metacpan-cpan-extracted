@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-01'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.024'; # VERSION
+our $VERSION = '1.030'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_sorted_rows/csv_sorted_rows",
@@ -26,7 +26,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Check that CSV rows are sorted
+# ABSTRACT: Check that CSV rows are sorted (shorter name for csv-sorted-rows)
 # PODNAME: csv-sorted
 
 __END__
@@ -37,11 +37,11 @@ __END__
 
 =head1 NAME
 
-csv-sorted - Check that CSV rows are sorted
+csv-sorted - Check that CSV rows are sorted (shorter name for csv-sorted-rows)
 
 =head1 VERSION
 
-This document describes version 1.024 of csv-sorted (from Perl distribution App-CSVUtils), released on 2023-04-01.
+This document describes version 1.030 of csv-sorted (from Perl distribution App-CSVUtils), released on 2023-07-25.
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,17 @@ argument.
 =item B<--quiet-arg>, B<-q>
 
 If set to true, do not show messages.
+
+Normally a message will be printed to stdout saying whether the rows are sorted
+or not, i.e. one of:
+
+ Rows are sorted
+ Rows are NOT sorted
+
+If this option is specified, then no message will be printed. Instead, you can
+find out whether things are sorted via exit code (or status code in the
+enveloped result, if you request JSON or call this utility as a Perl function).
+
 
 =item B<--reverse>, B<-r>
 

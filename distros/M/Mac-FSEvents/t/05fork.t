@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use autodie;
 
 use IO::Select;
 use File::Temp;
@@ -22,6 +21,7 @@ sub subprocess (&) {
     my ( $action ) = @_;
 
     my $pid = fork;
+    die "failed to fork: $!" if !defined $pid;
 
     if($pid) {
         waitpid $pid, 0;
@@ -48,6 +48,7 @@ subtest 'subprocess events' => sub {
 
     # our subprocess will call DESTROY on the Mac::FSEvents object!
     my $pid = fork;
+    die "failed to fork: $!" if !defined $pid;
     unless($pid) {
         exit 0;
     }

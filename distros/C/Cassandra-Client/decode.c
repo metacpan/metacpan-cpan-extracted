@@ -353,13 +353,9 @@ void decode_varint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type,
 
         Newxz(tmpout, (len*4)+2, char);
 
-        if (!IS_BIG_ENDIAN) {
-            Newxz(tmp, len, unsigned char);
-            for (i = 0; i < len; i++) {
-                tmp[len-i-1] = (unsigned char)input[i];
-            }
-        } else {
-            tmp = input;
+        Newxz(tmp, len, unsigned char);
+        for (i = 0; i < len; i++) {
+            tmp[len-i-1] = (unsigned char)input[i];
         }
 
         cc_bignum_init_bytes(&bn, tmp, len);
@@ -368,9 +364,7 @@ void decode_varint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type,
         sv_setpv(output, tmpout);
 
         cc_bignum_destroy(&bn);
-        if (!IS_BIG_ENDIAN) {
-            Safefree(tmp);
-        }
+        Safefree(tmp);
         Safefree(tmpout);
     }
 }

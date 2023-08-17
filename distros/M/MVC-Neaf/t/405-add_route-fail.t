@@ -3,29 +3,34 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 use MVC::Neaf;
 
 my $n = MVC::Neaf->new;
 
-eval {
+throws_ok {
     $n->add_route( "/" );
-};
-like $@, qr#[Oo]dd number of#, "Odd args = no go";
+} qr([Oo]dd number of), "Odd args = no go";
 
-eval {
+throws_ok {
+    $n->add_route( "/", "foobar" );
+} qr(handler.*code), 'Code must be code';
+
+throws_ok {
+    $n->add_route( "/", [] );
+} qr(handler.*code.*not ARRAY), 'Code must be code';
+
+throws_ok {
     $n->add_route( foo => sub { }, default => [] );
-};
-like $@, qr#default.*hash#, "Defaults must be hash";
+} qr(default.*hash), "Defaults must be hash";
 
-eval {
+throws_ok {
     $n->add_route( foo => sub { }, foobar => 42 );
-};
-like $@, qr#[Uu]nexpected.*foobar#, "Unknown keys = no go";
+} qr([Uu]nexpected.*foobar), "Unknown keys = no go";
 
-eval {
-    $n->add_route( foo => sub { }, param_regex => qr#missed_me# );
-};
-like $@, qr#param_regex#, "Param regex must be hash";
+throws_ok {
+    $n->add_route( foo => sub { }, param_regex => qr(missed_me) );
+} qr(param_regex), "Param regex must be hash";
 
 done_testing;

@@ -1594,3 +1594,21 @@ Revision history for Graphics-Framebuffer
       as the C accelerated routines.
 
       Sped up the Splash screen for Perl only drawing.
+
+6.51  Apr 11, 2023
+
+      Fixed a clipping width/height bug in clip_reset
+
+      Added new parameter to ignore X-Windows check
+	  ( IGNORE_X_WINDOWS => TRUE )
+
+      Fixed YouTube link and description in documentation
+
+6.52  Jul 12, 2023
+
+      Terminfo method has changed and tput call needed to be changed for
+	  turning the cursor on and off.
+
+      Examples given extra option to ignore the X-Windows check
+	  " --ignore-x-windows "
+

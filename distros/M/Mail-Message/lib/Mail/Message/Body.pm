@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Body;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Reporter';
 
@@ -104,8 +104,8 @@ sub init($)
 
     # Set the content info
 
-    my ($transfer, $disp, $charset, $descr, $cid) = @$args{
-       qw/transfer_encoding disposition charset description content_id/ }; 
+    my ($transfer, $disp, $descr, $cid) = @$args{
+       qw/transfer_encoding disposition description content_id/ };
 
     if(defined $filename)
     {   $disp //= Mail::Message::Field->new
@@ -120,11 +120,11 @@ sub init($)
     }
 
     if(defined(my $based = $args->{based_on}))
-    {   $mime     = $based->type             unless defined $mime;
-        $transfer = $based->transferEncoding unless defined $transfer;
-        $disp     = $based->disposition      unless defined $disp;
-        $descr    = $based->description      unless defined $descr;
-        $cid      = $based->contentId        unless defined $cid;
+    {   $mime     //= $based->type;
+        $transfer //= $based->transferEncoding;
+        $disp     //= $based->disposition;
+        $descr    //= $based->description;
+        $cid      //= $based->contentId;
 
         $self->{MMB_checked}
           = defined $args->{checked} ? $args->{checked} : $based->checked;
@@ -136,8 +136,12 @@ sub init($)
 
     $mime ||= 'text/plain';
     $mime = $self->type($mime);
-    $mime->attribute(charset => ($charset || 'PERL'))
-        if $mime =~ m!^text/!i && !$mime->attribute('charset');
+
+    my $default_charset = exists $args->{charset} ? $args->{charset} : 'PERL';
+    $mime->attribute(charset => $default_charset)
+        if $default_charset
+        && $mime =~ m!^text/!i
+        && !$mime->attribute('charset');
 
     $self->transferEncoding($transfer) if defined $transfer;
     $self->disposition($disp)          if defined $disp;
@@ -185,7 +189,7 @@ sub eol(;$)
     if(@$lines)
     {   # sometimes texts lack \n on last line
         $lines->[-1] .= "\n";
-       
+
 
            if($eol eq 'CR')   {s/[\015\012]+$/\015/     for @$lines}
         elsif($eol eq 'LF')   {s/[\015\012]+$/\012/     for @$lines}
@@ -235,7 +239,7 @@ sub type(;$)
     return $self->{MMB_type} if !@_ && defined $self->{MMB_type};
 
     delete $self->{MMB_mime};
-    my $type = defined $_[0] ? shift : 'text/plain';
+    my $type =  shift // 'text/plain';
 
     $self->{MMB_type} = ref $type ? $type->clone
       : Mail::Message::Field->new('Content-Type' => $type);
@@ -276,7 +280,7 @@ sub description(;$)
 
     my $disp = defined $_[0] ? shift : 'none';
     $self->{MMB_description} = ref $disp ? $disp->clone
-       : Mail::Message::Field->new('Content-Description' => $disp);
+      : Mail::Message::Field->new('Content-Description' => $disp);
 }
 
 
@@ -287,7 +291,7 @@ sub disposition(;$)
     my $disp = defined $_[0] ? shift : 'none';
 
     $self->{MMB_disposition} = ref $disp ? $disp->clone
-       : Mail::Message::Field->new('Content-Disposition' => $disp);
+      : Mail::Message::Field->new('Content-Disposition' => $disp);
 }
 
 
@@ -297,7 +301,7 @@ sub contentId(;$)
 
     my $cid = defined $_[0] ? shift : 'none';
     $self->{MMB_id} = ref $cid ? $cid->clone
-       : Mail::Message::Field->new('Content-ID' => $cid);
+      : Mail::Message::Field->new('Content-ID' => $cid);
 }
 
 
@@ -448,7 +452,7 @@ sub AUTOLOAD(@)
 
 	# AUTOLOAD inheritance is a pain
 	confess "Method $call() is not defined for a ", ref $self;
-}   
+}
 
 #------------------------------------------
 

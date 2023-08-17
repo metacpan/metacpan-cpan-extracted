@@ -1,5 +1,3 @@
-# $Id: Password.pm,v 1.14 2003/12/03 15:35:21 autarch Exp $
-
 package Net::SSH::Perl::Auth::Password;
 
 use strict;

@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::ShareDir" => 0,
     "Log::ger" => "0.038",
-    "Module::Load::Util" => "0.004",
+    "Module::Load::Util" => "0.009",
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
     "TableDataRole::Spec::Basic" => "0.2.0",
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Module::Load::Util" => "0.004",
+  "Module::Load::Util" => "0.009",
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
   "TableDataRole::Spec::Basic" => "0.2.0",

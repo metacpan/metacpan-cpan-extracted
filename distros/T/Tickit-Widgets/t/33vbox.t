@@ -2,8 +2,9 @@
 
 use v5.14;
 use warnings;
+use utf8;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -110,15 +111,33 @@ is_display( [ [TEXT("A new Static"), TEXT("")],
               [TEXT("New Widget"), TEXT("")] ],
             'Display after force_size' );
 
+$widget->set_style(
+   spacing    => 1,
+   line_style => Tickit::RenderBuffer::LINE_SINGLE,
+);
+
+flush_tickit;
+
+is_display( [ [TEXT("A new Static"), TEXT("")],
+              [TEXT("─"x100)],
+              [TEXT("Widget 1"), TEXT("")],
+              BLANKLINES(21),
+              [TEXT("─"x100)],
+              [TEXT("Widget 2"), TEXT("")],
+              BLANKLINES(2),
+              [TEXT("─"x100)],
+              [TEXT("New Widget"), TEXT("")] ],
+            'Display after set_style line_style' );
+
 # add with options
 {
    my $child = Tickit::Widget::Static->new( text => "" );
 
    $widget->add_children( { child => $child, force_size => 20 } );
 
-   is_deeply( { $widget->child_opts( $child ) },
-      { expand => 0, force_size => 20 },
-      '->add_children accepts hashes with extra opts' );
+   is( { $widget->child_opts( $child ) },
+       { expand => 0, force_size => 20 },
+       '->add_children accepts hashes with extra opts' );
 }
 
 $widget->set_window( undef );

@@ -5,12 +5,12 @@ use FindBin;
 
 my $plan;
 BEGIN {
-    my %count = (constructs => 90,
+    my %count = (constructs => 97,
                  removed    => 7,
-                 aliases    => 75,
+                 aliases    => 77,
                  old        => 4);
     $plan = 5 * $count{constructs} + 3 * $count{removed}
-          + 5 * $count{aliases} + $count{old} + 1;
+          + 6 * $count{aliases} + $count{old} + 1;
 }
 
 use FindBin;
@@ -112,4 +112,6 @@ for my $alias (keys %aliases) {
     is(keys %{ $aliases{$alias}{alias} }, 1, "$alias is unique");
     is((values %{ $aliases{$alias}{alias} })[0], 1,
        "$alias is declared once");
+    ok(exists $constructs{ (keys %{ $aliases{$alias}{alias} })[0] },
+       "$alias resolves");
 }

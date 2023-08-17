@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::Keyword::Accessor 0.01;
+package Object::Pad::Keyword::Accessor 0.02;
 
 use v5.14;
 use warnings;
@@ -160,6 +160,11 @@ whatever field just changed.
 sub import
 {
    $^H{"Object::Pad::Keyword::Accessor"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::Keyword::Accessor"};
 }
 
 =head1 TODO

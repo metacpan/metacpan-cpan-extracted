@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Source::CSVInDATA';
 
@@ -26,7 +26,7 @@ TableData::Test::Source::CSVInDATA - Number from 1-5 with English and Indonesian
 
 =head1 VERSION
 
-This document describes version 0.015 of TableData::Test::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableData::Test::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 HOMEPAGE
 

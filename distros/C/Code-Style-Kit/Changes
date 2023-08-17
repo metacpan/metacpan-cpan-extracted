@@ -1,3 +1,6 @@
+1.0.3     2023-07-31 17:02:20+01:00 Europe/London
+ - fix for 5.39
+
 1.0.2     2019-05-29 12:00:31+01:00 Europe/London
  - really skip tests against old Mojolicious, thanks again SREZIC for
    the CPAN Testers work

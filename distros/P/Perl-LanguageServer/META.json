@@ -38,6 +38,7 @@
             "Compiler::Lexer" : "0.23",
             "Coro" : "0",
             "Data::Dump" : "0",
+            "Encode::Locale" : "0",
             "Hash::SafeKeys" : "0",
             "IO::AIO" : "0",
             "JSON" : "0",
@@ -50,12 +51,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/richterger/Perl-LanguageServer/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/richterger/Perl-LanguageServer.git",
          "web" : "https://github.com/richterger/Perl-LanguageServer"
       }
    },
-   "version" : "v2.5.0",
+   "version" : "v2.6.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

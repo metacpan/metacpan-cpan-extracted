@@ -17,6 +17,9 @@ SEE ALSO
     Curses::UI::Calendar
         Create and manipulate calendar widgets
 
+    Curses::UI::Char
+        Create and manipulate character widgets.
+
     Curses::UI::Checkbox
         Create and manipulate checkbox widgets
 
@@ -134,12 +137,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2020 Michal Josef Špaček
+    © 2015-2023 Michal Josef Špaček
 
     Artistic License
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

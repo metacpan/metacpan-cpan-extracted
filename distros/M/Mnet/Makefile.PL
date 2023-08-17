@@ -19,7 +19,7 @@
 #       perl Makefile.PL && make distcheck, skip Mnet-*.tar.gz and README.md
 #       make test, commit any fixes made so far, then we're ready for release
 #       vim Changes, update w/date and new <RELEASE> number, 5.09, 5.10, etc
-#       note: for cpan development, <RELEASE> =~ /^\d+\.\d+(_\d+|-TRIAL\d*)$/
+#       note: for cpan development, <RELEASE> =~ /^\d+\.\d+_\d+$/
 #       vim lib/Mnet.pm, update $VERSION variable to the new <RELEASE> number
 #       git rm Mnet-*.tar.gz, to remove old distribution when new is committed
 #       make realclean && perl Makefile.PL && make dist && make realclean
@@ -30,9 +30,9 @@
 #       wait for email that file has been indexed and on cpan, unless trial ver
 #       git add Changes Mnet-*.tar.gz && git commit -m 'latest release'
 #       git push origin master
-#       git tag -a "v<RELEASE>" `git log -1 --pretty=%H`
+#       git tag -a "v<RELEASE>" -m latest release' `git log -1 --pretty=%H`
 #       git push origin "v<RELEASE>"
-#       git push --delete origin "v<RELEASE>", to PERMANENTLY delete old tag
+#       git push --delete origin "v<RELEASE>", to PERMANENTLY delete if desired
 #       git restore lib/Mnet.pm, to restore $VERSION variable to "dev"
 
 # required modules
@@ -60,6 +60,7 @@ if (-f "README.md") {
 
 # create make file
 #   metacpan will use cpan v2 spec meta_merge github links
+#   update Mnet.pm if minimum perl version changes
 WriteMakefile(
     ABSTRACT_FROM       => 'lib/Mnet.pm',
     AUTHOR              => 'Mike Menza <mmenza@cpan.org>',
@@ -74,7 +75,7 @@ WriteMakefile(
             },
         },
     },
-    MIN_PERL_VERSION    => '5.10.0',
+    MIN_PERL_VERSION    => '5.12.0',
     NAME                => 'Mnet',
     PREREQ_PM           => {
         'Expect'     => 0,

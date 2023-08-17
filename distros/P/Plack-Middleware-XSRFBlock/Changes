@@ -1,5 +1,15 @@
 Revision history for Plack-Middleware-XSRFBlock
 
+0.0.19    2023-07-14 10:17:10+01:00 Europe/London
+ - SECURITY FIX! when *not* using signed cookies, it was possible to
+   bypass XSRFBlock by POSTing an empty form value and an empty cookie
+ - bump minimum perl version to 5.12, most dependencies already
+   require it
+
+0.0.18    2023-07-13 10:16:20+01:00 Europe/London
+ - when invoking the `blocked` callback/app, log as `info` instead of
+   `error` (@pangyre) (#27)
+
 0.0.17    2022-10-17 10:57:09+01:00 Europe/London
  - remove internal _token_generator (wasn't documented, couldn't
    really be changed without also changing invalid_signature, and

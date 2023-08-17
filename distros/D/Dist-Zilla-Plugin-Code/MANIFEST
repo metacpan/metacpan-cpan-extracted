@@ -55,6 +55,7 @@ t/lib/Local/PluginBundleEasy/BuildRunner.pm
 t/lib/Local/PluginBundleEasy/FileConsumer.pm
 t/lib/Local/PluginBundleEasy/RetVal.pm
 t/lib/Local/PluginBundleError.pm
+t/lib/Local/Test/TempDir.pm
 t/license_provider.t
 t/meta_provider.t
 t/name_provider.t

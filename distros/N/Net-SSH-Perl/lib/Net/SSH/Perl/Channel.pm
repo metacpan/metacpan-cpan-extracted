@@ -1,5 +1,3 @@
-# $Id: Channel.pm,v 1.18 2003/12/03 15:35:21 autarch Exp $
-
 package Net::SSH::Perl::Channel;
 use strict;
 use warnings;

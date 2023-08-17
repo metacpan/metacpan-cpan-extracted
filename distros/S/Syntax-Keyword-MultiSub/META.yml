@@ -4,8 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Sublike::Builder: '0.15'
@@ -19,12 +18,12 @@ name: Syntax-Keyword-MultiSub
 provides:
   Syntax::Keyword::MultiSub:
     file: lib/Syntax/Keyword/MultiSub.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   XS::Parse::Sublike: '0.15'
   perl: '5.026'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

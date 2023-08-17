@@ -19,7 +19,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Config;
-$WebFetch::Data::Config::VERSION = '0.15.5';
+$WebFetch::Data::Config::VERSION = '0.15.9';
 use Carp qw(croak confess);
 use base 'Class::Singleton';
 
@@ -117,7 +117,7 @@ WebFetch::Data::Config - WebFetch configuration data management
 
 =head1 VERSION
 
-version 0.15.5
+version 0.15.9
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ Ian Kluft <https://github.com/ikluft>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 1998-2022 by Ian Kluft.
+This software is Copyright (c) 1998-2023 by Ian Kluft.
 
 This is free software, licensed under:
 

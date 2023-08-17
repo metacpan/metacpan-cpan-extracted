@@ -4,6 +4,9 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Loaded: '0'
+  OpenTracing::Interface::Tracer: '0'
+  Role::Tiny::With: '0'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
@@ -24,5 +27,5 @@ requires:
   OpenTracing::GlobalTracer: '0'
   Role::Declare::Should: '0'
   Types::Standard: '0'
-version: v0.32.0
+version: v0.33.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

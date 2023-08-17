@@ -1,5 +1,9 @@
 Revision history for Perl module Math::MPFR
 
+4.27
+ - Remove stray '}' from Rmpfr_add_z
+ - Simplify overloading of '++' and '--'
+
 4.26
  - Alter t/out_str.t and t/printf.t to accommodate sisyphus' MSVC-built perls.
 

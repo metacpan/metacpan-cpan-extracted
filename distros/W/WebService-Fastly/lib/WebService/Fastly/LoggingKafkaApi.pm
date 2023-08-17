@@ -55,9 +55,9 @@ sub new {
 # @param int $version_id Integer identifying a service version. (required)
 # @param string $name The name for the real-time logging configuration. (optional)
 # @param string $placement Where in the generated VCL the logging call should be placed. If not set, endpoints with &#x60;format_version&#x60; of 2 are placed in &#x60;vcl_log&#x60; and those with &#x60;format_version&#x60; of 1 are placed in &#x60;vcl_deliver&#x60;.  (optional)
-# @param int $format_version The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;.  (optional, default to 2)
 # @param string $response_condition The name of an existing condition in the configured endpoint, or leave blank to always execute. (optional)
 # @param string $format A Fastly [log format string](https://docs.fastly.com/en/guides/custom-log-formats). (optional, default to '%h %l %u %t "%r" %&gt;s %b')
+# @param int $format_version The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;.  (optional, default to 2)
 # @param string $tls_ca_cert A secure certificate to authenticate a server with. Must be in PEM format. (optional, default to 'null')
 # @param string $tls_client_cert The client certificate used to make authenticated requests. Must be in PEM format. (optional, default to 'null')
 # @param string $tls_client_key The client private key used to make authenticated requests. Must be in PEM format. (optional, default to 'null')
@@ -94,11 +94,6 @@ sub new {
         description => 'Where in the generated VCL the logging call should be placed. If not set, endpoints with &#x60;format_version&#x60; of 2 are placed in &#x60;vcl_log&#x60; and those with &#x60;format_version&#x60; of 1 are placed in &#x60;vcl_deliver&#x60;. ',
         required => '0',
     },
-    'format_version' => {
-        data_type => 'int',
-        description => 'The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;. ',
-        required => '0',
-    },
     'response_condition' => {
         data_type => 'string',
         description => 'The name of an existing condition in the configured endpoint, or leave blank to always execute.',
@@ -107,6 +102,11 @@ sub new {
     'format' => {
         data_type => 'string',
         description => 'A Fastly [log format string](https://docs.fastly.com/en/guides/custom-log-formats).',
+        required => '0',
+    },
+    'format_version' => {
+        data_type => 'int',
+        description => 'The version of the custom logging format used for the configured endpoint. The logging call gets placed by default in &#x60;vcl_log&#x60; if &#x60;format_version&#x60; is set to &#x60;2&#x60; and in &#x60;vcl_deliver&#x60; if &#x60;format_version&#x60; is set to &#x60;1&#x60;. ',
         required => '0',
     },
     'tls_ca_cert' => {
@@ -183,10 +183,10 @@ sub new {
     __PACKAGE__->method_documentation->{ 'create_log_kafka' } = {
         summary => 'Create a Kafka log endpoint',
         params => $params,
-        returns => 'LoggingKafkaResponse',
+        returns => 'LoggingKafkaResponsePost',
         };
 }
-# @return LoggingKafkaResponse
+# @return LoggingKafkaResponsePost
 #
 sub create_log_kafka {
     my ($self, %args) = @_;
@@ -241,11 +241,6 @@ sub create_log_kafka {
     }
 
     # form params
-    if ( exists $args{'format_version'} ) {
-                $form_params->{'format_version'} = $self->{api_client}->to_form_value($args{'format_version'});
-    }
-
-    # form params
     if ( exists $args{'response_condition'} ) {
                 $form_params->{'response_condition'} = $self->{api_client}->to_form_value($args{'response_condition'});
     }
@@ -253,6 +248,11 @@ sub create_log_kafka {
     # form params
     if ( exists $args{'format'} ) {
                 $form_params->{'format'} = $self->{api_client}->to_form_value($args{'format'});
+    }
+
+    # form params
+    if ( exists $args{'format_version'} ) {
+                $form_params->{'format_version'} = $self->{api_client}->to_form_value($args{'format_version'});
     }
 
     # form params
@@ -336,7 +336,7 @@ sub create_log_kafka {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('LoggingKafkaResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('LoggingKafkaResponsePost', $response);
     return $_response_object;
 }
 
@@ -628,6 +628,109 @@ sub list_log_kafka {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ARRAY[LoggingKafkaResponse]', $response);
+    return $_response_object;
+}
+
+#
+# update_log_kafka
+#
+# Update the Kafka log endpoint
+#
+# @param string $service_id Alphanumeric string identifying the service. (required)
+# @param int $version_id Integer identifying a service version. (required)
+# @param string $logging_kafka_name The name for the real-time logging configuration. (required)
+{
+    my $params = {
+    'service_id' => {
+        data_type => 'string',
+        description => 'Alphanumeric string identifying the service.',
+        required => '1',
+    },
+    'version_id' => {
+        data_type => 'int',
+        description => 'Integer identifying a service version.',
+        required => '1',
+    },
+    'logging_kafka_name' => {
+        data_type => 'string',
+        description => 'The name for the real-time logging configuration.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_log_kafka' } = {
+        summary => 'Update the Kafka log endpoint',
+        params => $params,
+        returns => 'LoggingKafkaResponse',
+        };
+}
+# @return LoggingKafkaResponse
+#
+sub update_log_kafka {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'service_id' is set
+    unless (exists $args{'service_id'}) {
+      croak("Missing the required parameter 'service_id' when calling update_log_kafka");
+    }
+
+    # verify the required parameter 'version_id' is set
+    unless (exists $args{'version_id'}) {
+      croak("Missing the required parameter 'version_id' when calling update_log_kafka");
+    }
+
+    # verify the required parameter 'logging_kafka_name' is set
+    unless (exists $args{'logging_kafka_name'}) {
+      croak("Missing the required parameter 'logging_kafka_name' when calling update_log_kafka");
+    }
+
+    # parse inputs
+    my $_resource_path = '/service/{service_id}/version/{version_id}/logging/kafka/{logging_kafka_name}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/x-www-form-urlencoded');
+
+    # path params
+    if ( exists $args{'service_id'}) {
+        my $_base_variable = "{" . "service_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'service_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'version_id'}) {
+        my $_base_variable = "{" . "version_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'version_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'logging_kafka_name'}) {
+        my $_base_variable = "{" . "logging_kafka_name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'logging_kafka_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(token )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('LoggingKafkaResponse', $response);
     return $_response_object;
 }
 

@@ -1,9 +1,10 @@
 package PDF::Collage::Template;
 use v5.24;
 use warnings;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.002' }
 
 use Carp;
+use English;
 use Template::Perlish ();
 use Data::Resolver    ();
 use PDF::Builder;
@@ -69,8 +70,41 @@ sub _expand ($self, $command, @keys) {
    } ## end for my $key (sort { $a ...})
    return \%retval;
 } ## end sub _expand
+
 sub __pageno ($input)   { return $input eq 'last' ? 0 : $input }
-sub _font    ($s, $key) { $s->_fonts->{$key} //= $s->_pdf->font($key) }
+
+sub __fc_list ($key) {
+   my @command = ('fc-list', $key, qw< file style >);
+   open my $fh, '-|', @command or croak "fc-list: $OS_ERROR";
+   my @candidates = map {
+      s{\s+\z}{}mxs;
+      my ($filename, $style) = m{\A (.*?): \s* :style=(.*)}mxs
+         or croak "fc-list: unexpected line '$_'";
+      my %style = map { $_ => 1 } split m{,}mxs, $style;
+      {filename => $filename, style => \%style};
+   } <$fh>;
+   return unless @candidates;
+   return $candidates[0]{filename} if @candidates == 1;
+
+   # get Regular/Normal if exists
+   for my $candidate (@candidates) {
+      return $candidate->{filename}
+         if $candidate->{style}{Regular} || $candidate->{style}{Normal};
+   }
+
+   # bail out, request more data
+   croak "fc-list: too many outputs for '$key'";
+}
+
+sub _font    ($s, $key) {
+   if (! defined($s->_fonts->{$key})) {
+      $key = $key =~ m{\A fc: (.*) \z}mxs ? __fc_list($1)
+         : $key =~ m{\A file: (.*) \z}mxs ? $1
+         :                                  $key;
+      $s->_fonts->{$key} = $s->_pdf->font($key);
+   }
+   return $s->_fonts->{$key};
+}
 
 sub _op_add_image ($self, $command) {
    my $opts  = $self->_expand($command, qw< page path x y width height >);
@@ -93,17 +127,26 @@ sub _op_add_page ($self, $command) {
 
 sub _op_add_text ($self, $command) {
    my $opts =
-     $self->_expand($command, qw< page font font_family font_size x y >);
-   my $page = $self->_pdf->open_page(__pageno($opts->{page} // 'last'));
-   my $text = $page->text;
-
-   my $font = $self->_font($opts->{font} // $opts->{font_family});
-   $text->font($font, $opts->{font_size});
-
-   $text->position(map { $_ // 0 } $opts->@{qw< x y >});
+     $self->_expand($command, qw< align page font font_family font_size x y >);
 
    my $content =
      $self->_render_text($opts->@{qw< text text_template text_var >});
+
+   my $font = $self->_font($opts->{font} // $opts->{font_family});
+   my $font_size = $opts->{font_size};
+
+   my ($x, $y) = map { $_ // 0 } $opts->@{qw< x y >};
+
+   my $align = $opts->{align} // 'start';
+   if ($align ne 'start') {
+      my $width = $font_size * $font->width($content);
+      $x -= $align eq 'end' ? $width : ($width / 2);
+   }
+
+   my $page = $self->_pdf->open_page(__pageno($opts->{page} // 'last'));
+   my $text = $page->text;
+   $text->position($x, $y);
+   $text->font($font, $opts->{font_size});
    $text->text($content // '');
 
    return $self;

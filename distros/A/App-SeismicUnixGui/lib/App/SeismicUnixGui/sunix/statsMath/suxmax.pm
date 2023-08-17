@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::suxmax;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME:  SUXMAX - X-windows graph of the MAX, min, or absolute max value on	
+PERL PROGRAM NAME:  SUXMAX - X-windows graph of the MAX, min, or absolute max value on	
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.36';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -14,6 +14,8 @@ use parent 'Neo4j::Driver::Result';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::Bolt Neo4j::Driver::Result);
+
+use Neo4j::Driver::Net::Bolt;
 
 
 our $gather_results = 0;  # 1: detach from the stream immediately (yields JSON-style result; used for testing)
@@ -62,13 +64,13 @@ sub _gather_results {
 	while ( my @row = $stream->fetch_next ) {
 		
 		croak 'next true and failure/success mismatch: ' . $stream->failure . '/' . $stream->success unless $stream->failure == -1 || $stream->success == -1 || ($stream->failure xor $stream->success);  # assertion
-		$self->{cxn}->_trigger_bolt_error( $stream, $self->{error_handler} ) if $stream->failure && $stream->failure != -1;
+		Neo4j::Driver::Net::Bolt->_trigger_bolt_error( $stream, $self->{error_handler}, $self->{cxn} ) if $stream->failure && $stream->failure != -1;
 		
 		push @data, { row => \@row, meta => [] };
 	}
 	
 	croak 'next false and failure/success mismatch: ' . $stream->failure . '/' . $stream->success unless  $stream->failure == -1 || $stream->success == -1 || ($stream->failure xor $stream->success);  # assertion
-	$self->{cxn}->_trigger_bolt_error( $stream, $self->{error_handler} ) if $stream->failure && $stream->failure != -1;
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error( $stream, $self->{error_handler}, $self->{cxn} ) if $stream->failure && $stream->failure != -1;
 	
 	$self->{stream} = undef;
 	$self->{cxn} = undef;
@@ -93,7 +95,7 @@ sub _fetch_next {
 	unless ($self->{stream}->success) {
 		# success() == -1 is not an error condition; it simply
 		# means that there are no more records on the stream
-		$self->{cxn}->_trigger_bolt_error( $self->{stream}, $self->{error_handler} );
+		Neo4j::Driver::Net::Bolt->_trigger_bolt_error( $self->{stream}, $self->{error_handler}, $self->{cxn} );
 	}
 	
 	return $self->_init_record( $record );

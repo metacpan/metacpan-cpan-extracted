@@ -4,7 +4,7 @@ Stepford - A vaguely Rake/Make/Cake-like thing for Perl - create steps and let a
 
 # VERSION
 
-version 0.006000
+version 0.006001
 
 # SYNOPSIS
 
@@ -65,15 +65,15 @@ Stepfile, etc.
 With Stepford, each step is represented by a class you create. That class
 should consume one of the available Step roles. Those are:
 
-- [Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford::Role::Step::FileGenerator)
+- [Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep%3A%3AFileGenerator)
 
     For steps that generate files.
 
-- [Stepford::Role::Step](https://metacpan.org/pod/Stepford::Role::Step)
+- [Stepford::Role::Step](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep)
 
     For steps that _don't_ generate files.
 
-- [Stepford::Role::Step::FileGenerator::Atomic](https://metacpan.org/pod/Stepford::Role::Step::FileGenerator::Atomic)
+- [Stepford::Role::Step::FileGenerator::Atomic](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep%3A%3AFileGenerator%3A%3AAtomic)
 
     For a step that wants to generate a single file atomically.
 
@@ -81,17 +81,17 @@ Steps declare both their dependencies (required inputs) and productions
 (outputs) as attributes. These attributes should be given either the
 `StepDependency` or `StepProduction` trait as appropriate.
 
-The [Stepford::Runner](https://metacpan.org/pod/Stepford::Runner) class analyzes the dependencies and productions for
+The [Stepford::Runner](https://metacpan.org/pod/Stepford%3A%3ARunner) class analyzes the dependencies and productions for
 each step to figure out what steps it needs to run in order to satisfy the
 dependencies of the final steps you specify.
 
 Each step can specify a `last_run_time` method (or get one from the
-[Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford::Role::Step::FileGenerator) role). The runner uses this to skip
+[Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep%3A%3AFileGenerator) role). The runner uses this to skip
 steps that are up to date.
 
-See [Stepford::Runner](https://metacpan.org/pod/Stepford::Runner), [Stepford::Role::Step](https://metacpan.org/pod/Stepford::Role::Step), and
-[Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford::Role::Step::FileGenerator), and
-[Stepford::Role::Step::FileGenerator::Atomic](https://metacpan.org/pod/Stepford::Role::Step::FileGenerator::Atomic) for more details.
+See [Stepford::Runner](https://metacpan.org/pod/Stepford%3A%3ARunner), [Stepford::Role::Step](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep), and
+[Stepford::Role::Step::FileGenerator](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep%3A%3AFileGenerator), and
+[Stepford::Role::Step::FileGenerator::Atomic](https://metacpan.org/pod/Stepford%3A%3ARole%3A%3AStep%3A%3AFileGenerator%3A%3AAtomic) for more details.
 
 # CONCEPTS AND DESIGN
 
@@ -120,7 +120,7 @@ step (they can also be supplied to the runner manually).
 The flip side of a dependency is a production. This is a value that the step
 will generate as needed.
 
-Steps are run by a [Stepford::Runner](https://metacpan.org/pod/Stepford::Runner) object. To create this object, you give
+Steps are run by a [Stepford::Runner](https://metacpan.org/pod/Stepford%3A%3ARunner) object. To create this object, you give
 it a list of step namespaces and the class(es) of the final step(s) you want
 to run. The runner looks at the final steps' dependencies and uses this
 information to figure out what other steps to run. It looks for steps with
@@ -138,7 +138,7 @@ that satisfies the dependency (in terms of the value's type, content, etc.).
 
 If multiple classes have a production of the same name, then the first class
 that Stepford sees "wins". This can be useful if you want to override a step
-for testing, for example. See the documentation of the [Stepford::Runner](https://metacpan.org/pod/Stepford::Runner)
+for testing, for example. See the documentation of the [Stepford::Runner](https://metacpan.org/pod/Stepford%3A%3ARunner)
 class's `new` method for more details on step namespaces.
 
 It is not possible for a class to have an attribute that is simultaneously a
@@ -175,13 +175,14 @@ Dave Rolsky <drolsky@maxmind.com>
 - José Joaquín Atria <jjatria@gmail.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Mark Fowler <mfowler@maxmind.com>
+- Nick Logan <nlogan@maxmind.com>
 - Olaf Alders <oalders@maxmind.com>
 - Ran Eilam <reilam@maxmind.com>
 - vti <viacheslav.t@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2023 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

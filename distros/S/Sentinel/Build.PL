@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -19,12 +20,11 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
    },
-   test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
-   },
    requires => {
-      perl => '5.008008',
+      perl => '5.014',
+   },
+   test_requires => {
+      'Test2::V0' => '0.000148',
    },
    ( $build_xs ? () : ( xs_files => {} ) ),
    license => 'perl',

@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::transform::suifft;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

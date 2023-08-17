@@ -4,13 +4,18 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 # standard perl
 use Carp;
 use Data::Dumper;
 use Digest::MD5 qw(md5_base64);
 use Scalar::Util qw(refaddr weaken);
+use Time::HiRes qw();
+
+*mono_time = eval { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) }
+    ? sub () { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) }
+    : \&Time::HiRes::time;
 
 # cpan
 use JSON::MaybeXS qw();
@@ -45,7 +50,7 @@ sub call {
 		unless ref $args eq 'ARRAY' or ref $args eq 'HASH';
 	croak 'no callback?' unless $cb;
 	croak 'callback should be a code reference' if ref $cb ne 'CODE';
-	my $id = md5_base64($self->{next_id}++ . $name . $self->{json}->encode($args) . refaddr($cb));
+	my $id = md5_base64(mono_time() . rand . refaddr($args));
 	croak 'duplicate call id' if $self->{calls}->{$id};
 	my $request = $self->{json}->encode({
 		jsonrpc => '2.0',
@@ -65,7 +70,7 @@ sub callraw {
 	croak 'request should be a array or hash reference'
 		unless ref $request eq 'HASH';
 	croak 'callback should be a code reference' if ref $cb ne 'CODE';
-	my $id = md5_base64($self->{next_id}++ . $self->{json}->encode($request) . refaddr($cb));
+	my $id = md5_base64(mono_time() . rand . refaddr($request));
 	croak 'duplicate call id' if $self->{calls}->{$id};
 	$request->{jsonrpc} = '2.0';
 	$request->{id} = $id;

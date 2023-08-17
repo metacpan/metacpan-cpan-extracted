@@ -57,6 +57,7 @@ SKIP:
 	{
         $tz = DateTime::TimeZone->new( name => 'UTC' );
 	}
+	diag( "Using time zone '", $tz->name, "'" ) if( $ENV{AUTOMATED_TESTING} );
 	
 	my $fmt = DateTime::Format::Strptime->new(
 		locale => 'en_GB',
@@ -83,11 +84,15 @@ SKIP:
 		hour => 0,
 		minute => 0,
 		second => 0,
-		time_zone => 'GMT',
+		time_zone => 'UTC',
+		# time_zone => $tz,
 	);
 	$check_t->set_time_zone( $tz->name );
-	## e.g. 1970-03-31T09:00:00
-	is( $sql->_from_days(719617 ), "$check_t", "Checking from_days()" );
+	$check_t->set_year(1970);
+	$check_t->set_month(3);
+	$check_t->set_day(31);
+	# e.g. 1970-03-31T09:00:00
+	is( $sql->_from_days(719617), "$check_t", "Checking from_days()" );
 	is( $sql->_from_unixtime( $dt->epoch ), $dt->strftime( '%Y-%m-%d %T%z' ), "Checking from unix_time()" );
 	is( $sql->_hour( "$dt" ), $dt->hour, "Checking hour()" );
 	is( $sql->_lcase( "CamEl WRiTing" ), 'camel writing', "Checking lcase()" );

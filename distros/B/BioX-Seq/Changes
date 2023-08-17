@@ -1,5 +1,9 @@
 Revision history for BioX-Seq
 
+0.008008 2023-08-01
+         Fix bug where input format is not passed through to objects created
+         by range() and rev_com()
+
 0.008007 2023-01-20
          Use multi-argument form of piped opens, for security and to handle
          filenames with spaces

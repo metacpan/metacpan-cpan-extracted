@@ -1,10 +1,11 @@
 package WebService::Async::SmartyStreets;
+
 # ABSTRACT: Access SmartyStreet API
 
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -178,16 +179,20 @@ async sub get_decoded_data {
             my ($payload) = $e->details;
 
             if (blessed($payload) && $payload->can('content')) {
-                my $resp    = decode_json_utf8($payload->content);
-                my $errors  = $resp->{errors} // [];
-                my ($error) = $errors->@*;
+                if (my $resp = eval { decode_json_utf8($payload->content) }) {
+                    my $errors = $resp->{errors} // [];
+                    my ($error) = $errors->@*;
 
-                if ($error && $error->{message}) {
-                    $log->warnf(sprintf("SmartyStreets HTTP status %d error: %s", $payload->code, $error->{message}));
+                    if ($error && $error->{message}) {
+
+                        # structured response may be useful for further processing
+                        die $e;
+                    }
                 }
             }
         }
 
+        # throw a generic error
         die 'Unable to retrieve response.';
     };
 

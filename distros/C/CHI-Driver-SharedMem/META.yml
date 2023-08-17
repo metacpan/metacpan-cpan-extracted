@@ -3,32 +3,39 @@ abstract: 'Cache data in shared memory'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  CHI::Test: '0'
+  CHI::Test::Util: '0'
+  Date::Parse: '0'
+  Test::Carp: '0'
+  Test::Class: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::Requires: '0'
+  Test::Warn: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CHI-Driver-SharedMem
 no_index:
   directory:
     - t
     - inc
 requires:
-  CHI: 0.54
-  CHI::Test: 0
-  CHI::Test::Util: 0
-  Config: 0
-  Fcntl: 0
-  IPC::SharedMem: 0
-  IPC::SysV: 0
-  Moose: 0
-  Storable: 0
-  Test::Class: 0
-  Test::Most: 0
-  Test::NoWarnings: 0
-  Test::Warn: 0
-version: 0.14
+  CHI: '0.54'
+  Config: '0'
+  Fcntl: '0'
+  IPC::SharedMem: '0'
+  IPC::SysV: '0'
+  JSON::MaybeXS: '0'
+  Moose: '0'
+  perl: '5.006002'
+resources:
+  bugtracker: https://github.com/nigelhorne/CHI-Driver-SharedMem/issues
+  repository: git://github.com/nigelhorne/CHI-Driver-SharedMem.git
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

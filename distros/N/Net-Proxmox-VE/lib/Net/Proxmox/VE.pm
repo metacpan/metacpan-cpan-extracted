@@ -1,4 +1,5 @@
 #!/bin/false
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE
 # ABSTRACT: Pure perl API for Proxmox virtualisation
 
@@ -6,12 +7,12 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.36';
+$Net::Proxmox::VE::VERSION = '0.37';
 
 use Carp qw( croak );
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
-use JSON qw(decode_json);
+use JSON::MaybeXS qw(decode_json);
 use LWP::UserAgent;
 
 # done
@@ -158,13 +159,13 @@ sub debug {
     my $d = shift;
 
     if ($d) {
-        $self->{debug} = 1;
+        $self->{params}->{debug} = 1;
     }
     elsif ( defined $d ) {
-        $self->{debug} = 0;
+        $self->{params}->{debug} = 0;
     }
 
-    return 1 if $self->{debug};
+    return 1 if $self->{params}->{debug};
     return
 
 }
@@ -274,7 +275,7 @@ sub post {
 
 sub put {
 
-    my $self      = shift or return;
+    my $self = shift or return;
     my $post_data;
     $post_data = pop
         if ref $_[-1];
@@ -310,6 +311,8 @@ sub url_prefix {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -320,7 +323,7 @@ Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -468,20 +471,20 @@ Enabling debugging of this API (not related to proxmox debugging in any way). De
 =head2 post
 
 An action helper method that takes two parameters: $path, \%post_data
-$path to post to,  hash ref to %post_data
+$path to post to, hash ref to %post_data
 
 You are returned what action() with the POST method returns
 
 =head2 put
 
 An action helper method that takes two parameters:
-path
-hash ref to post data
-your returned what post returns
+$path, hash ref to \%put_data
+
+You are returned what action() with the PUT method returns
 
 =head2 url_prefix
 
-returns the url prefix used in the rest api calls
+Returns the url prefix used in the rest api calls
 
 =head1 SEE ALSO
 
@@ -493,7 +496,7 @@ http://www.proxmox.com
 
 =item API reference
 
-http://pve.proxmox.com/pve2-api-doc
+https://pve.proxmox.com/pve-docs/api-viewer/
 
 =back
 
@@ -503,14 +506,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

@@ -5,7 +5,8 @@ WriteMakefile(
   VERSION_FROM      => 'lib/List/Insertion.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
   PREREQ_PM         => {
     "Template::Plex"=>"v0.5.0",
-    "Data::Combination"=>0
+    "Data::Combination"=>0,
+    #"Error::Show"   => 0
   }, 
   MIN_PERL_VERSION => "5.24.0",
   ABSTRACT_FROM     => 'lib/List/Insertion.pod', # retrieve abstract from module
@@ -19,8 +20,8 @@ WriteMakefile(
     resources=> {
       repository =>{
         type => "git",
-        url => "git://github.com/drclaw1394/perl5-list-insertion.git",
-        web => "http://github.com/drclaw1394/perl5-list-insertion",
+        url => "git://github.com/drclaw1394/perl-list-insertion.git",
+        web => "http://github.com/drclaw1394/perl-list-insertion",
       }
     }
   }

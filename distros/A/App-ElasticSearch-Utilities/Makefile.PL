@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.013002;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -22,6 +22,8 @@ my %WriteMakefileArgs = (
     "scripts/es-daily-index-maintenance.pl",
     "scripts/es-graphite-dynamic.pl",
     "scripts/es-index-blocks.pl",
+    "scripts/es-index-fields.pl",
+    "scripts/es-index-scan.pl",
     "scripts/es-nodes.pl",
     "scripts/es-open.pl",
     "scripts/es-search.pl",
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     "scripts/es-storage-overview.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.013002",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "App::ElasticSearch::Utilities",
   "PREREQ_PM" => {
     "CHI" => 0,
@@ -85,7 +87,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "8.5",
+  "VERSION" => "8.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

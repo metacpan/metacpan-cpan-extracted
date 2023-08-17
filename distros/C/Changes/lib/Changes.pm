@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/09
-## Modified 2023/01/30
+## Modified 2023/07/30
 ## All rights reserved
 ## 
 ## 
@@ -49,7 +49,7 @@ BEGIN
     (?<r_tz_space>[[:blank:]\h]+)
     (?<r_tz>\S+)
     /x;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -71,6 +71,7 @@ sub init
     $self->{type}       = undef;
     $self->{wrapper}    = undef;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_init_params_order} = [qw( preset )];
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
@@ -100,14 +101,6 @@ sub add_preamble
         return( $self->error( "No text was provided to add a premable." ) );
     }
     $self->preamble( $text );
-    unless( $text =~ /[\015\012]$/ms )
-    {
-        $self->preamble->append( $self->nl // "\n" );
-    }
-    unless( $text =~ /[\015\012]{2,}$/ms )
-    {
-        $self->preamble->append( $self->nl // "\n" );
-    }
     return( $self );
 }
 
@@ -160,7 +153,6 @@ sub as_string
     
     $self->elements->foreach(sub
     {
-        $self->message( 4, "Calling as_string on $_" );
         my $str;
         $str = $_->as_string if( $self->_can( $_ => 'as_string' ) );
         if( defined( $str ) )
@@ -176,6 +168,7 @@ sub as_string
 }
 
 {
+    no warnings 'once';
     *serialize = \&as_string;
     *serialise = \&as_string;
 }
@@ -192,7 +185,6 @@ sub delete_release
         if( $self->_is_a( $rel => 'Changes::Release' ) )
         {
             my $pos = $elements->pos( $rel );
-            $self->message( 4, "No release object found for object $rel (", overload::StrVal( $rel ), ")" ) if( !defined( $pos ) );
             my $until = 1;
             while( defined( $elements->[ $pos + $until ] ) && $self->_is_a( $elements->[ $pos + $until ] => 'Changes::NewLine' ) )
             {
@@ -233,12 +225,10 @@ sub file { return( shift->_set_get_file( 'file', @_ ) ); }
 sub freeze
 {
     my $self = shift( @_ );
-    $self->messagef( 5, "Freezing the state for all %d objects.", $self->elements->length );
     $self->elements->foreach(sub
     {
         if( $self->_can( $_ => 'freeze' ) )
         {
-            $self->message( 5, "Calling freeze on $_" );
             $_->freeze;
         }
     });
@@ -391,17 +381,14 @@ sub parse
     my $wrapper = $self->wrapper;
     my $tz = $self->time_zone;
     my $defaults = $self->defaults;
-    $self->messagef( 4, "Parsing %d lines of data.", $lines->length );
     # Cache it
     unless( defined( $DATETIME_RE ) )
     {
         $DATETIME_RE = $self->_get_datetime_regexp( 'all' );
     }
-    # $self->message( 4, "Using datetime regular expression:\n$DATETIME_RE" );
     for( my $i = 0; $i < scalar( @$lines ); $i++ )
     {
         my $l = $lines->[$i];
-        $self->message( 5, "Checking line '$l'" );
         # DistZilla release line
         # 0.01 2022-12-11 08:07:12 Asia/Tokyo
         if( $l =~ /^
@@ -414,7 +401,6 @@ sub parse
             /msx )
         {
             my $re = { %+ };
-            $self->message( 4, "Found a release line of type DistZilla with regexp data: ", sub{ $self->dump( $re ) } );
             # Create the DateTime object
             $self->_load_class( 'DateTime' ) || return( $self->pass_error );
             $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
@@ -426,7 +412,6 @@ sub parse
             }
             catch( $e where { /The[[:blank:]\h]+timezone[[:blank:]\h]+'(?:.*?)'[[:blank:]\h]+could[[:blank:]\h]+not[[:blank:]\h]+be[[:blank:]\h]+loaded/i } )
             {
-                $self->message( 5, "Error instantiating DateTime::TimeZone with time zone '$re->{r_tz}': $e" );
                 warn( "Warning only: invalid time zone '$re->{r_tz}' specified in release at line ", ( $i + 1 ), "\n" ) if( $self->_warnings_is_enabled );
                 $tz = DateTime::TimeZone->new( name => 'UTC' );
             }
@@ -436,7 +421,6 @@ sub parse
                 $tz = DateTime::TimeZone->new( name => 'UTC' );
             }
             
-            $self->message( 5, "Time zone set to '", $tz->name, "'" );
             
             try
             {
@@ -470,7 +454,6 @@ sub parse
                 warn( "Warning only: error trying to instantiate a DateTime value based on the date and time of the release at line ", ( $i + 1 ), ": $e\n" ) if( $self->_warnings_is_enabled );
                 $dt = DateTime->now( time_zone => $tz );
             }
-            $self->message( 5, "DateTime object time zone set to '", $dt->time_zone->name, "'" );
             
             if( !$nls->is_empty )
             {
@@ -518,7 +501,6 @@ sub parse
             $/msx ) 
         {
             my $re = { %+ };
-            $self->message( 4, "Found a release line with regexp data: ", sub{ $self->dump( $re ) } );
             my $dt = $self->_parse_timestamp( $re->{r_date} ) ||
                 return( $self->pass_error( "Cannot parse datetime timestamp although the regular expression matched: ", $self->error->message ) );
             if( !$nls->is_empty )
@@ -527,7 +509,6 @@ sub parse
                 $nls->reset;
             }
             undef( $group );
-            $self->message( 5, "Datetime object from parsing is '", overload::StrVal( $dt ), " ($dt)" );
             $release = $self->new_release(
                 version => $re->{r_vers},
                 # datetime => $re->{r_date},
@@ -561,7 +542,6 @@ sub parse
             /msx )
         {
             my $re = { %+ };
-            $self->message( 4, "Found a release line with no datetime and regexp data: ", sub{ $self->dump( $re ) } );
             if( !$nls->is_empty )
             {
                 $elements->push( $nls->list );
@@ -592,13 +572,11 @@ sub parse
         elsif( $l =~ /^(?<g_space>[[:blank:]\h]+)(?<data>(?:\[(?<g_name>[^\]]+)\]|(?<g_name_colon>\w[^\:]+)\:))[[:blank:]\h]*(?<g_nl>[\015\012]+)?$/ms )
         {
             my $re = { %+ };
-            $self->message( 4, "Found a group line with regexp data: ", sub{ $self->dump( $re ) } );
             # Depending on where we are we treat this either as a group, or as a mere comment of a release change
             # 1) This is a continuity of the previous change line
             #    We assert this by checking if the space before is longer than the prefix of the change, which would imply an indentation that would put it below the change, and thus not a group
             if( defined( $change ) && length( $re->{g_space} // '' ) > $change->prefix->length )
             {
-                $self->messagef( 4, "Group text has a leading space length (%d) longer than the previous change prefix (%d)", length( $re->{g_space} // '' ), $change->prefix->length );
                 $change->text->append( $re->{data} );
                 # Since this is a wrapped line, we remove any excessive leading spaces and replace them by just one space
                 $l =~ s/^[[:blank:]\h]+/ /g;
@@ -606,7 +584,6 @@ sub parse
             }
             else
             {
-                $self->message( 4, "Creating a new group object with name '", ( $re->{g_name} // $re->{g_name_colon} ), "'" );
                 # A group is above a change, so if we already have an ongoing change object, we stop using it
                 undef( $change );
                 $group = $self->new_group(
@@ -646,7 +623,6 @@ sub parse
                $l =~ /^(?<c_space1>[[:blank:]\h]*)(?<marker>(?:[^\w[:blank:]\h]|[\_\x{30FC}]))(?<c_space2>[[:blank:]\h]+)(?<c_text>.+?)(?<c_nl>[\015\012]+)?$/ms )
         {
             my $re = { %+ };
-            $self->message( 4, "Found a change line with regexp data: ", sub{ $self->dump( $re ) } );
             $change = $self->new_change(
                 ( defined( $re->{c_space1} ) ? ( spacer1 => $re->{c_space1} ) : () ),
                 ( defined( $re->{c_space2} ) ? ( spacer2 => $re->{c_space2} ) : () ),
@@ -669,7 +645,6 @@ sub parse
                     $group->elements->push( $nls->list );
                     $nls->reset;
                 }
-                $self->message( 5, "Adding change object '$change' to group" );
                 $group->elements->push( $change );
             }
             elsif( defined( $release ) )
@@ -679,7 +654,6 @@ sub parse
                     $release->elements->push( $nls->list );
                     $nls->reset;
                 }
-                $self->message( 5, "Adding change object '$change' directly to release" );
                 $release->elements->push( $change );
             }
             else
@@ -690,7 +664,6 @@ sub parse
                     $elements->push( $nls->list );
                     $nls->reset;
                 }
-                $self->message( 5, "Adding change object '$change' directly to top Changes object" );
                 $elements->push( $change );
             }
         }
@@ -698,11 +671,9 @@ sub parse
         elsif( $l =~ /^(?<space>[[:blank:]\h]+)(?<data>\S+.*?)(?<c_nl>[\015\012]+)?$/ms )
         {
             my $re = { %+ };
-            $self->message( 4, "Found the continuity of a change wrapped line with regexp data: ", sub{ $self->dump( $re ) } );
             # We have an ongoing change, so this is likely a wrapped line. We append the text
             if( defined( $change ) )
             {
-                $self->message( 4, "Appending '$l' to previous change object." );
                 $change->text->append( ( $change->nl // $self->nl ) . ( $re->{space} . $re->{data} ) );
                 # Which might be undef if, for example, this is the last line and there is no trailing crlf
                 $change->nl( $re->{c_nl} );
@@ -711,7 +682,6 @@ sub parse
             # Ok, then some weirdly formatted change text
             else
             {
-                $self->message( 4, "Treating this line as a new change line, albeit with some non-standard formatting." );
                 $change = $self->new_change(
                     ( defined( $re->{c_space1} ) ? ( spacer1 => $re->{c_space1} ) : () ),
                     ( defined( $re->{c_space2} ) ? ( spacer2 => $re->{c_space2} ) : () ),
@@ -748,18 +718,15 @@ sub parse
         elsif( $l =~ /^(?<space>[[:blank:]\h]*)(?<nl>[\015\012]+)?$/ )
         {
             my $re = { %+ };
-            $self->message( 4, "Found a blank line with regexp data: ", sub{ $self->dump( $re ) } );
             # If we are still in the preamble, this might just be a multi lines preamble
             if( $elements->is_empty )
             {
-                $self->message( 4, "Adding the blank line as part of the preamble." );
                 # $preamble->append( "$l\n" );
                 $preamble->append( $l );
             }
             # Otherwise, this is a blank line, which separates elements
             elsif( defined( $release ) )
             {
-                $self->message( 4, "Resetting change and group object, and adding a new line to the latest release list of changes." );
                 undef( $change );
                 undef( $group );
                 # We do not undef the latest release object, because we could have blank lines inside a release section
@@ -785,7 +752,6 @@ sub parse
         # Preamble
         elsif( $elements->is_empty )
         {
-            $self->message( 4, "Adding line as part of the preamble." );
             $preamble->append( $l );
         }
         # Epilogue
@@ -799,10 +765,8 @@ sub parse
                !$elements->is_empty )
         {
             my $re = { %+ };
-            $self->message( 4, "Found an epilogue line with regexp data: ", sub{ $self->dump( $re ) } );
             if( !$nls->is_empty )
             {
-                $self->message( 4, "This is our first epilogue line." );
                 $elements->push( $nls->list );
                 $nls->reset;
                 undef( $release );
@@ -813,7 +777,6 @@ sub parse
             }
             else
             {
-                $self->message( 4, "This is a follow-on epilogue line." );
                 $epilogue->append( $l );
             }
         }
@@ -827,7 +790,66 @@ sub parse
     return( $self );
 }
 
-sub preamble { return( shift->_set_get_scalar_as_object( 'preamble', @_ ) ); }
+sub preamble { return( shift->_set_get_scalar_as_object( { field => 'preamble', callbacks => 
+{
+    set => sub
+    {
+        my( $self, $text ) = @_;
+        if( defined( $text ) && $text->defined )
+        {
+            unless( $text =~ /[\015\012]$/ms )
+            {
+                $text->append( $self->nl // "\n" );
+            }
+            unless( $text =~ /[\015\012]{2,}$/ms )
+            {
+                $text->append( $self->nl // "\n" );
+            }
+        }
+        return( $text );
+   },
+} }, @_ ) ); }
+
+sub preset
+{
+    my $self = shift( @_ );
+    my $set  = shift( @_ ) || return( $self->error( "No set name was provided." ) );
+    my $sets =
+    {
+        standard =>
+        {
+            # for Changes::Release
+            datetime_formatter => sub
+            {
+                my $dt = shift( @_ ) || DateTime->now;
+                require DateTime::Format::Strptime;
+                my $fmt = DateTime::Format::Strptime->new(
+                    pattern => '%FT%T%z',
+                    locale => 'en_GB',
+                );
+                $dt->set_formatter( $fmt );
+                my $tz = $self->time_zone;
+                $dt->set_time_zone( $tz ) if( $tz );
+                return( $dt );
+            },
+            # No need to provide it if it is just a space though, because it will default to it anyway
+            spacer => ' ',
+            # for Changes::Change
+            spacer1 => "\t",
+            spacer2 => ' ',
+            marker => '-',
+            max_width => 72,
+            # wrapper => $code_reference,
+            # for Changes::Group
+            group_spacer => "\t",
+            group_type => 'bracket', # [Some group]
+        }
+    };
+    return( $self->error( "Set requested ($set) is not supported." ) ) if( !exists( $sets->{ $set } ) );
+    my $def = $sets->{ $set };
+    $self->defaults( $def );
+    return( $self );
+}
 
 sub releases
 {
@@ -837,6 +859,21 @@ sub releases
 }
 
 sub remove_release { return( shift->delete_release( @_ ) ); }
+
+sub reset
+{
+    my $self = shift( @_ );
+    if( (
+            !exists( $self->{_reset} ) ||
+            !defined( $self->{_reset} ) ||
+            !CORE::length( $self->{_reset} ) 
+        ) && scalar( @_ ) )
+    {
+        $self->{_reset} = scalar( @_ );
+        $self->{_reset_normalise} = 1;
+    }
+    return( $self );
+}
 
 sub time_zone
 {
@@ -861,7 +898,7 @@ sub time_zone
                 return( $self->error( "Error setting time zone for '$v': $e" ) );
             }
         }
-        $self->reset(1);
+        # $self->reset(1);
     }
     if( !defined( $self->{time_zone} ) )
     {
@@ -946,7 +983,7 @@ Changes - Changes file management
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -1151,6 +1188,14 @@ It returns the current object it was called with upon success, and returns an L<
 =head2 preamble
 
 Sets or gets the text of the preamble. A preamble is a chunk of text, possibly multi line, that appears at the top of the Changes file before any release information.
+
+=head2 preset
+
+Provided with a preset name, and this will set all its defaults.
+
+Currently, the only preset supported is C<standard>
+
+Returns the current object upon success, or sets an L<error object|Module::Generic/error> and return C<undef> or empty list, depending on the context, otherwise.
 
 =head2 releases
 

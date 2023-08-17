@@ -9,7 +9,7 @@ like $@, qr/prompt\(\): Missing value for -timeout \(expected number of seconds\
     => '-timeout missing value exception';
 
 eval { my $val = prompt "Enter line 1", -timeout=>'yes' };
-like $@, qr/prompt\(\): Invalid value for -timeout \(expected number of seconds\)/
+like $@, qr/prompt\(\): Invalid value for -timeout \(expected number of seconds, but found 'yes'\)/
     => '-timeout invalid value exception';
 
 

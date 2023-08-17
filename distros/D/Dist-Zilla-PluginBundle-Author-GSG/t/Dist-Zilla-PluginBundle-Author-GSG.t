@@ -98,9 +98,9 @@ subtest 'Build a basic dist' => sub {
        't/00-compile.t',
        't/00-report-prereqs.t',
        't/00-report-prereqs.dd',
+       't/author-has-version.t',
        't/author-pod-coverage.t',
        't/author-pod-syntax.t',
-       't/release-has-version.t',
      ], "Gathered the files we expect";
 
     my $built = $tzil->slurp_file('build/lib/External/Package.pm');

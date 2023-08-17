@@ -15,40 +15,30 @@ License: perl
 use strict;
 use Getopt::Std;
 
-my ($VERSION) = '1.2';
+my ($VERSION) = '1.3';
 
-# Get the options.
-
-# Print a usuage message on a unknown option.
-# Requires my patch to Getopt::Std of 25 Feb 1999.
-$SIG {__WARN__} = sub {
-    if (substr ($_ [0], 0, 14) eq "Unknown option") {
-        $0 =~ s{.*/}{};
-        print <<EOF;
-$0 (Perl bin utils) $VERSION
+getopts ('benstuv?', \my %options)  or do {
+	$0 =~ s{.*/}{};
+	print <<EOF;
+$0 (PerlPowerTools) $VERSION
 $0 [-benstuv] [files ...]
 EOF
-        exit;
-    }
+
+	exit 1;
 };
-
-getopts ('benstuv?', \my %options);
-
-$SIG {__WARN__} = 'DEFAULT';
 
 my ($tabs, $ends, $nonprinting);
 
-if (exists $options {e}) {$ends = $nonprinting = 1;}
-if (exists $options {t}) {$tabs = $nonprinting = 1;}
-if (exists $options {v}) {        $nonprinting = 1;}
+if (exists $options{'e'}) {$ends = $nonprinting = 1;}
+if (exists $options{'t'}) {$tabs = $nonprinting = 1;}
+if (exists $options{'v'}) {        $nonprinting = 1;}
 
-my $squeeze_empty     = exists $options {s};
-my $number_lines      = exists $options {n};
-my $number_non_blanks = exists $options {b};
+my $squeeze_empty     = exists $options{'s'};
+my $number_lines      = exists $options{'n'};
+my $number_non_blanks = exists $options{'b'};
 
 # Unbuffer output for -u.
-
-$| = exists $options {u};
+$| = exists $options{'u'};
 
 my $was_empty = 0;
 my $count     = 0;
@@ -66,14 +56,14 @@ while (<>) {
     $_ = sprintf "%6d  %s", ++ $count, $_ if $number_lines ||
                                              $number_non_blanks && /\S/;
 
-    $_ =~ s/$/\$/   if $ends;
+    s/$/\$/ if $ends;
     if ($nonprinting) {
-        $_ =~ s/([\x80-\xFF])/"M-" . ("\x7F" & $1)/ge;
-        $_ =~ s/([\x00-\x08\x0B-\x1F])/"^" . chr (0100 + ord $1)/ge;
-        $_ =~ s/\x7F/^?/g;
+        s/([\x80-\xFF])/"M-" . ("\x7F" & $1)/ge;
+        s/([\x00-\x08\x0B-\x1F])/"^" . chr (0100 + ord $1)/ge;
+        s/\x7F/^?/g;
     }
     if ($tabs) {
-        $_ =~ s/\x09/^I/g;
+        s/\x09/^I/g;
     }
 
     print;

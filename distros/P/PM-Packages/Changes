@@ -1,0 +1,6 @@
+Revision history for Perl extension PM::Packages.
+
+0.01  Fri Jun 23 13:05:46 2023
+	- original version; created by h2xs 1.23 with options
+		-b5.004.05 -AXc --use-new-tests --skip-exporter --skip-autoloader PM::Packages
+

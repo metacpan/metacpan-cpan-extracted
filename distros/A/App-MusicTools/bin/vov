@@ -16,9 +16,8 @@
 # XXX the code is something of a mess, and should be simplified and
 # rewritten. But that takes time and energy.
 
-use strict;
+use 5.14.0;
 use warnings;
-
 use Carp;
 use Getopt::Long qw/GetOptions/;
 use List::Util   qw/sum/;

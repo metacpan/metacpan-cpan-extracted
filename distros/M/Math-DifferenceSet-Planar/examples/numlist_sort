@@ -69,6 +69,7 @@ else {
 }
 
 __END__
+
 =head1 NAME
 
 numlist_sort - sort a list of lists of numbers
@@ -94,7 +95,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 =head1 DISCLAIMER OF WARRANTY
 

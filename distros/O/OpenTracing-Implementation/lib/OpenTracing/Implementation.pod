@@ -5,17 +5,29 @@ OpenTracing::Implementation - Use OpenTracing with a specific implementation
 
 =head1 VERSION
 
-'v0.32.0'
+'v0.33.2'
 
 =head1 SYNOPSIS
 
+    use OpenTracing::Implementation;
+    
+    OpenTracing::Implementation->bootstrap_global_default_tracer();
+
+The above is the recommended usecase, which will instantiate the default tracer
+from C<PERL_OPENTRACING_IMPLEMENTATION> environment variable and set the
+C<OpenTracing::GlobalTracer> for general usage.
+
+But you can still do the below:
+
     use OpenTracing::Implementation 'YourBackend', option_one => 'foo';
+
+Which instantiates the C<OpenTracing::GlobalTracer>.
 
 Or if you like
 
     use OpenTracing::Implementation;
 
-And one can then do a manual bootstrap
+Which will only use the module. And then one can do a manual bootstrap
 
     OpenTracing::Implementation->bootstrap_global_tracer( '+My::Implementation',
         option_one => 'foo',
@@ -93,7 +105,8 @@ specifications and documentation.
 =head2 C<bootstrap_default_tracer>
 
 Same as C<bootstrap_tracer>, except that it will use whatever is specified in
-the C<OPENTRACING_IMPLEMENTATION> environment variable, Or C<NoOp> if not set.
+the C<PERL_OPENTRACING_IMPLEMENTATION> environment variable, Or C<NoOp> if not
+set.
 
 Do not pass in the name as first argument.
 
@@ -106,13 +119,50 @@ L<OpenTracing::GlabalTracer>.
 
 
 
+=head2 C<bootstrap_global_default_tracer>
+
+Same as C<bootstrap_global_tracer> combined with C<bootstrap_default_tracer>, it
+sets the 'singleton' inside L<OpenTracing::GlabalTracer> with the default tracer
+from C<PERL_OPENTRACING_IMPLEMENTATION>.
+
+NB: it is considdered that (after years) this should be the ONLY method made
+available, and that all configuration SHOULD be done throughout environment
+variables, and not via code.
+
+
+
 =head1 ENVIRONMENT VARIABLES
 
 
 
-=head2 C<OPENTRACING_IMPLEMENTATION>
+=head2 C<PERL_OPENTRACING_IMPLEMENTATION>
 
-Will be used when calling C<bootstrap_default_tracer>.
+Will be used when calling C<bootstrap_default_tracer> or
+C<bootstrap_global_default_tracer>.
+
+NB: C<OPENTRACING_IMPLEMENTATION> is being depricated.
+
+When neither is set, and either C<bootstrap_default_tracer> or
+C<bootstrap_global_default_tracer> is called, instantiation will try to fall
+back to the C<OpenTracing::Implementation::NoOp> Tracer.
+
+
+
+=head2 C<PERL_OPENTRACING_DEBUG>
+
+This controls at OpenTracing level weather or not to enable or disable debugging
+messages. Its value being set will override a more generic C<DEBUG> varaible.
+
+NB: C<OPENTRACING_DEBUG> is being depricated.
+
+
+
+=head2 C<DEBUG>
+
+This module respects the generic C<DEBUG> environment variable. But it will be
+(locally) overridden by the C<PERL_OPENTRACING_DEBUG> envirtonment variable.
+
+
 
 =head1 AUTHOR
 

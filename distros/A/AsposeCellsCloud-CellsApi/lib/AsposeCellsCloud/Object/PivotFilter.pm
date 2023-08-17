@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a PivotFilter in PivotFilter Collection.',
                                   class => 'PivotFilter',
                                   required => [], # TODO
 }                                 );
@@ -128,63 +128,63 @@ __PACKAGE__->method_documentation({
      'auto_filter' => {
      	datatype => 'AutoFilter',
      	base_name => 'AutoFilter',
-     	description => '',
+     	description => 'Gets the autofilter of the pivot filter.',
      	format => '',
      	read_only => '',
      		},
      'evaluation_order' => {
      	datatype => 'int',
      	base_name => 'EvaluationOrder',
-     	description => '',
+     	description => 'Gets the Evaluation Order of the pivot filter.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'FieldIndex',
-     	description => '',
+     	description => 'Gets the field index of the pivot filter.',
      	format => '',
      	read_only => '',
      		},
      'filter_type' => {
      	datatype => 'string',
      	base_name => 'FilterType',
-     	description => '',
+     	description => 'Gets the autofilter type of the pivot filter.',
      	format => '',
      	read_only => '',
      		},
      'measure_fld_index' => {
      	datatype => 'int',
      	base_name => 'MeasureFldIndex',
-     	description => '',
+     	description => 'Gets the measure field index of the pivot filter.            ',
      	format => '',
      	read_only => '',
      		},
      'member_property_field_index' => {
      	datatype => 'int',
      	base_name => 'MemberPropertyFieldIndex',
-     	description => '',
+     	description => 'Gets the member property field index of the pivot filter.            ',
      	format => '',
      	read_only => '',
      		},
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Gets the name of the pivot filter.',
      	format => '',
      	read_only => '',
      		},
      'value1' => {
      	datatype => 'string',
      	base_name => 'Value1',
-     	description => '',
+     	description => 'Gets the string value1 of the label pivot filter.            ',
      	format => '',
      	read_only => '',
      		},
      'value2' => {
      	datatype => 'string',
      	base_name => 'Value2',
-     	description => '',
+     	description => 'Gets the string value2 of the label pivot filter.            ',
      	format => '',
      	read_only => '',
      		},    

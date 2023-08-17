@@ -8,9 +8,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-25'; # DATE
+our $DATE = '2023-05-20'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.153'; # VERSION
+our $VERSION = '0.154'; # VERSION
 
 our %SPEC;
 
@@ -65,7 +65,7 @@ dist2deb - Convert dist name to Debian package name
 
 =head1 VERSION
 
-This document describes version 0.153 of dist2deb (from Perl distribution App-DistUtils), released on 2023-02-25.
+This document describes version 0.154 of dist2deb (from Perl distribution App-DistUtils), released on 2023-05-20.
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,7 @@
 package Finance::Bank::SentinelBenefits::Csv401kConverter::QifWriter;
-$Finance::Bank::SentinelBenefits::Csv401kConverter::QifWriter::VERSION = '1.0';
-use Modern::Perl;
+$Finance::Bank::SentinelBenefits::Csv401kConverter::QifWriter::VERSION = '1.3';
+use Modern::Perl '2015';
+use feature 'signatures';
 
 =head1 NAME
 
@@ -10,17 +11,16 @@ and writes them out to a QIF file
 
 =head1 VERSION
 
-version 1.0
+version 1.3
 
 =head1 SYNOPSIS
 
 This class is responsible for taking a set of Lines and writing them out
 to QIF format.  We use the class C<Finance::QIF> to do the acutal writing to disk.  If you pass it a secondary set of account information, it will also take any company matches, reverse their values, and write them to a secondary file.  This is to allow you to keep track of your unvested balance.
 
-=cut
+=cut 
 
 use Moose;
-use MooseX::Method::Signatures;
 
 use Finance::QIF;
 use Finance::Bank::SentinelBenefits::Csv401kConverter::Line;
@@ -38,7 +38,7 @@ use Finance::Bank::SentinelBenefits::Csv401kConverter::Line;
 
   Constructs a new QifWriter for the given trade date and account.  Each qif writer can only generate to one trade date and account, and one main file.
 
-=cut
+=cut 
 
 ####
 # BUILDARGS initializes the QIF reader based on the passed in filename
@@ -58,6 +58,12 @@ around BUILDARGS => sub {
       return $hashref;
 };
 
+
+=head2 BUILD
+
+Called by Moose infrastructure
+
+=cut
 ####
 # BUILD sets up the QIF reader by writing out the header
 ####
@@ -83,7 +89,7 @@ sub BUILD {
 
 The account of the transactions
 
-=cut
+=cut 
 
 has 'account'=> (
     is        => 'ro',
@@ -95,7 +101,7 @@ has 'account'=> (
 
 The output file name that the QIF lines are written to.
 
-=cut
+=cut 
 
 has 'output_file' => (
     is        => 'ro',
@@ -117,9 +123,9 @@ has 'qif_output' => (
 Writes one line out to the QIF file.  Line is of type
 C<Finance::Bank::SentinelBenefits::Csv401kConverter::Line>
 
-=cut
+=cut 
 
-method output_line(Finance::Bank::SentinelBenefits::Csv401kConverter::Line $line){
+sub output_line($self, $line){
 
     # my %security_transaction = ( header => 'Type:Invst',
     # 				 date => $date,
@@ -151,14 +157,14 @@ method output_line(Finance::Bank::SentinelBenefits::Csv401kConverter::Line $line
   $self->_get_qif_output()->write(\%transaction);
 }
 
-=head $l->close()
+=head2 $l->close()
 
 Closes the writer, ensuring that data is flushed to disk.  Calling output_line
 after this is an error.
 
-=cut
+=cut 
 
-method close(){
+sub close($self){
     $self->_get_qif_output()->close();
 }
 
@@ -166,18 +172,21 @@ no Moose;
 
 __PACKAGE__->meta->make_immutable;
 
-# Copyright 2009-2011 David Solimano
-# This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
+=head1 LICENSE AND COPYRIGHT
+Copyright 2009-2023 David Solimano
+This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-# You should have received a copy of the GNU General Public License
-# along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/
+
+=cut

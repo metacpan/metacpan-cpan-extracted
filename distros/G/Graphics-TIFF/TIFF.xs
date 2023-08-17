@@ -97,6 +97,8 @@ BOOT:
 
     newCONSTSUB(stash, "TIFFTAG_XRESOLUTION", newSViv(TIFFTAG_XRESOLUTION));
     newCONSTSUB(stash, "TIFFTAG_YRESOLUTION", newSViv(TIFFTAG_YRESOLUTION));
+    newCONSTSUB(stash, "TIFFTAG_XPOSITION", newSViv(TIFFTAG_XPOSITION));
+    newCONSTSUB(stash, "TIFFTAG_YPOSITION", newSViv(TIFFTAG_YPOSITION));
 
     newCONSTSUB(stash, "TIFFTAG_PLANARCONFIG", newSViv(TIFFTAG_PLANARCONFIG));
     newCONSTSUB(stash, "PLANARCONFIG_CONTIG", newSViv(PLANARCONFIG_CONTIG));
@@ -516,6 +518,8 @@ tiff_SetField (tif, tag, ...)
                     /* single float */
 		    case TIFFTAG_XRESOLUTION:
 		    case TIFFTAG_YRESOLUTION:
+		    case TIFFTAG_XPOSITION:
+		    case TIFFTAG_YPOSITION:
                         f = SvNV(ST(2));
                         XPUSHs(sv_2mortal(newSViv(TIFFSetField (tif, tag, f))));
                         break;

@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -20,7 +19,7 @@ my $http = Net::Async::HTTP->new(
 );
 
 ok( defined $http, 'defined $http' );
-isa_ok( $http, "Net::Async::HTTP", '$http isa Net::Async::HTTP' );
+isa_ok( $http, [ "Net::Async::HTTP" ], '$http isa Net::Async::HTTP' );
 
 $loop->add( $http );
 
@@ -118,10 +117,10 @@ sub do_test_req
       }
    }
 
-   identical( $response->request, $request, "\$response->request is \$request for $name" );
+   ref_is( $response->request, $request, "\$response->request is \$request for $name" );
 
    ok( $future->is_ready, "\$future is now ready after response given for $name" );
-   identical( scalar $future->get, $response, "\$future->get yields \$response for $name" );
+   ref_is( scalar $future->get, $response, "\$future->get yields \$response for $name" );
 
    if( exists $args{expect_res_code} ) {
       is( $response->code, $args{expect_res_code}, "Result code for $name" );
@@ -134,7 +133,7 @@ sub do_test_req
    if( exists $args{expect_res_headers} ) {
       my %h = map { $_ => $response->header( $_ ) } $response->header_field_names;
 
-      is_deeply( \%h, $args{expect_res_headers}, "Result headers for $name" );
+      is( \%h, $args{expect_res_headers}, "Result headers for $name" );
    }
 }
 

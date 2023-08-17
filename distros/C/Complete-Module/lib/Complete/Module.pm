@@ -1,19 +1,21 @@
 package Complete::Module;
 
-our $DATE = '2021-02-06'; # DATE
-our $VERSION = '0.262'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Log::ger;
 
 use Complete::Common qw(:all);
+use Exporter qw(import);
 use List::Util qw(uniq);
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-03-19'; # DATE
+our $DIST = 'Complete-Module'; # DIST
+our $VERSION = '0.263'; # VERSION
+
 our %SPEC;
-require Exporter;
-our @ISA       = qw(Exporter);
+
 our @EXPORT_OK = qw(complete_module);
 
 our $OPT_SHORTCUT_PREFIXES;
@@ -159,8 +161,8 @@ sub complete_module {
     my %args = @_;
 
     my $word = $args{word} // '';
-    #$log->tracef('[compmod] Entering complete_module(), word=<%s>', $word);
-    #$log->tracef('[compmod] args=%s', \%args);
+    #log_trace('[compmod] Entering complete_module(), word=<%s>', $word);
+    #log_trace('[compmod] args=%s', \%args);
 
     # convenience: allow Foo/Bar.{pm,pod,pmc}
     $word =~ s/\.(pm|pmc|pod)\z//;
@@ -201,7 +203,7 @@ sub complete_module {
         $ns_prefix //= '';
         $ns_prefix =~ s/(::)+\z//;
 
-        #$log->tracef('[compmod] invoking complete_path, word=<%s>', $word);
+        #log_trace('[compmod] invoking complete_path, word=<%s>', $word);
         my $cp_res = Complete::Path::complete_path(
             word => $word,
             starting_path => $ns_prefix,
@@ -245,10 +247,25 @@ sub complete_module {
         $res = $res_dedup;
     }
 
+  FILTER_WITH_SCHEMA: {
+        my $sch = $args{_schema};
+        last unless $sch;
+
+        my $fres = [];
+        for my $word (@$res) {
+            log_trace("[compmod] Validating word %s with validator ...", $word);
+            if ($sch->[1]{in} && !(grep { index($_, $word)==0 } @{ $sch->[1]{in} })) {
+                next;
+            }
+            push @$fres, $word;
+        }
+        $res = $fres;
+    }
+
     for (@$res) { s/::/$sep/g }
 
     $res = { words=>$res, path_sep=>$sep };
-    #$log->tracef('[compmod] Leaving complete_module(), result=<%s>', $res);
+    #log_trace('[compmod] Leaving complete_module(), result=<%s>', $res);
     $res;
 }
 
@@ -267,7 +284,7 @@ Complete::Module - Complete with installed Perl module names
 
 =head1 VERSION
 
-This document describes version 0.262 of Complete::Module (from Perl distribution Complete-Module), released on 2021-02-06.
+This document describes version 0.263 of Complete::Module (from Perl distribution Complete-Module), released on 2023-03-19.
 
 =head1 SYNOPSIS
 
@@ -295,8 +312,9 @@ Shortcut prefixes. The default is:
    pwr => "Pod/Weaver/Role/",
    pws => "Pod/Weaver/Section/",
    rp  => "Regexp/Pattern/",
+   ss  => "Sah/Schema/",
+   sss => "Sah/Schemas/",
  }
-
 If user types one of the keys, it will be replaced with the matching value from
 this hash.
 
@@ -332,7 +350,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<exclude_dir> => I<bool>
 
+(No description)
+
 =item * B<exclude_leaf> => I<bool>
+
+(No description)
 
 =item * B<find_pm> => I<bool> (default: 1)
 
@@ -379,7 +401,11 @@ to avoid word-breaking by bash.
 
 =item * B<recurse> => I<bool>
 
+(No description)
+
 =item * B<recurse_matching> => I<str> (default: "level-by-level")
+
+(No description)
 
 =item * B<word>* => I<str> (default: "")
 
@@ -411,14 +437,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-M
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Module>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Complete-Module/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Complete::Perl>
@@ -427,11 +445,43 @@ L<Complete::Perl>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Module>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

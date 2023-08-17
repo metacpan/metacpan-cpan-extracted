@@ -1,7 +1,14 @@
+0.013   2023-05-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Edit Changes file.
+
+
 0.012   2023-03-19  Released-By: PERLANCAR; Urgency: medium
 
         - Provide a _schema (normalized Sah schema) argument for completion
-          routine instead.
+          routine.
 
 
 0.011   2023-01-28  Released-By: PERLANCAR; Urgency: low

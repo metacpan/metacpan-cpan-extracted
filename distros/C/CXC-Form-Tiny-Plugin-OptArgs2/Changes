@@ -1,0 +1,32 @@
+Revision history for CXC-Form-Tiny-Plugin-OptArgs2
+
+0.04      2023-08-05 16:32:47-04:00 America/New_York
+
+  [BUG FIX]
+
+    * incorrectly used Form::Tiny::FieldDefinition 'data' attribute to
+      store plugin data instead of the 'addons' attribute. ++BRTASTIC
+
+0.03      2023-08-04 12:08:30-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * The OptArgs2 type can optionally (mostly) be deduced from the
+      associated field's type
+
+    * OptArgs2 'required' attribute is deduced from the field's
+      'required' attribute.
+
+0.02      2023-08-03 16:21:38-04:00 America/New_York
+
+  [BUG FIX]
+
+    * subforms now work
+
+  [ENHANCEMENT]
+
+    * document using nested forms.
+
+0.01      2023-08-03 00:49:03-04:00 America/New_York
+
+* First release upon an unsuspecting world.

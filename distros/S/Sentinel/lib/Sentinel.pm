@@ -1,21 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
-package Sentinel;
+package Sentinel 0.07;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.06';
 
 use Exporter 'import';
 our @EXPORT = qw( sentinel );
 
 eval {
    require XSLoader;
-   XSLoader::load( __PACKAGE__, $VERSION );
+   XSLoader::load( __PACKAGE__, our $VERSION );
 } or do {
    # pureperl fallback
    no warnings 'redefine';

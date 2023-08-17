@@ -62,10 +62,11 @@ do { my $x = {
                                       'Carp' => '0',
                                       'DBIx::Class::Candy::Exports' => '0',
                                       'DBIx::Class::Row' => '0',
-                                      'Modern::Perl' => '0',
                                       'Sub::Quote' => '0',
                                       'parent' => '0',
-                                      'perl' => '5.010'
+                                      'perl' => '5.010',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -80,6 +81,7 @@ do { my $x = {
                                    'FindBin' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Modern::Perl' => '0',
                                    'Test2::Plugin::ExitSummary' => '0',
                                    'Test2::Plugin::NoWarnings' => '0',
                                    'Test2::Plugin::Times' => '0',
@@ -88,9 +90,7 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'base' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.010',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'perl' => '5.010'
                                  }
                  }
      };

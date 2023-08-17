@@ -1189,6 +1189,16 @@ omitted libvirt will auto-generate suitable default URI. It is typically
 only necessary to specify this URI if the destination host has multiple
 interfaces and a specific interface is required to transmit storage data.
 
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_ZLIB_LEVEL>
+
+The level of compression for zlib. Accepted values are in range 0-9. 0 is no
+compression, 1 is maximum speed and 9 is maximum compression.
+
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_ZSTD_LEVEL>
+
+The level of compression for zstd. Accepted values are in range 0-20. 0 is no
+compression, 1 is maximum speed and 20 is maximum compression.
+
 =back
 
 =item $ddom = $dom->migrate(destcon, flags=0, dname=undef, uri=undef, bandwidth=0)

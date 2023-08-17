@@ -12,7 +12,7 @@ use App::Followme::FIO;
 use App::Followme::NestedText;
 use App::Followme::Web;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -149,12 +149,12 @@ sub fetch_sections {
     my ($self, $text) = @_;
 
     my %section;
-    my $divider = qr(-{3,}\s*\n);
+    my $divider = qr(\.{3,}\s*\n);
 
-    if ($text =~ /^$divider/) {
-        my @sections = split($divider, $text, 3);
-        $section{body} = $sections[2];
-        $section{metadata} = $sections[1];
+    if ($text =~ /^$divider/m) {
+        my @sections = split($divider, $text, 2);
+        $section{body} = $sections[1];
+        $section{metadata} = $sections[0];
 
     } else {
         $section{body} = $text;

@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Sereal::Encoder" => 0,
     "Sub::HandlesVia" => 0,
     "Symbol::Get" => "0.10",
-    "TOML::Tiny" => 0,
+    "TOML::Tiny" => "0.16",
     "Text::Diff" => 0,
     "Text::SimpleTable::AutoWidth" => 0,
     "Try::Tiny" => 0,
@@ -74,7 +74,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.000050",
+  "VERSION" => "0.000051",
   "test" => {
     "TESTS" => "t/*.t t/ExportInspector/*.t t/cpan-modules/*.t"
   }
@@ -115,7 +115,7 @@ my %FallbackPrereqs = (
   "Sub::Exporter" => 0,
   "Sub::HandlesVia" => 0,
   "Symbol::Get" => "0.10",
-  "TOML::Tiny" => 0,
+  "TOML::Tiny" => "0.16",
   "Test::Differences" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,

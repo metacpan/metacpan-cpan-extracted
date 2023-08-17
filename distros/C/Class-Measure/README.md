@@ -148,10 +148,15 @@ Class-Measure GitHub issue tracker:
 
 [https://github.com/bluefeet/Class-Measure/issues](https://github.com/bluefeet/Class-Measure/issues)
 
-# AUTHORS
+# AUTHOR
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>
+```
+
+# CONTRIBUTORS
+
+```
 Roland van Ipenburg <roland@rolandvanipenburg.com>
 ```
 

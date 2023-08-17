@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::FLORA;
 our $AUTHORITY = 'cpan:FLORA';
 # ABSTRACT: Build your distributions like FLORA does
-$Dist::Zilla::PluginBundle::FLORA::VERSION = '0.17';
+$Dist::Zilla::PluginBundle::FLORA::VERSION = '0.18';
 use Moose 1.00;
 use Method::Signatures::Simple;
 use Moose::Util::TypeConstraints;
@@ -320,7 +320,6 @@ method configure {
         ['Test::NoTabs' => {
             ':version' => '0.09',
         }],
-        ['Test::NewVersion'],
         [ 'Test::ReportPrereqs' => { ':version' => '0.019', verify_prereqs => 1 } ],
     );
 
@@ -374,7 +373,6 @@ It is roughly equivalent to:
   [PodCoverageTests]
   [Test::NoTabs]
   [Test::EOL]
-  [Test::NewVersion]
 
   [Test::ReportPrereqs]
   :version = 0.019

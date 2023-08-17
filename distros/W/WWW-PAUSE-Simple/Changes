@@ -1,3 +1,10 @@
+0.456   2023-07-12  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch to avoid warning under perl 5.38.
+
+
 0.455   2022-11-03  Released-By: PERLANCAR; Urgency: medium
 
         - Tweak regex for warning.

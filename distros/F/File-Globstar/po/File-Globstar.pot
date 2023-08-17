@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: guido.flohr@cantanea.com\n"
-"POT-Creation-Date: 2017-11-03 16:10+0200\n"
+"POT-Creation-Date: 2023-07-12 09:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,16 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/File/Globstar/ListMatch.pm:163 ../lib/File/Globstar/ListMatch.pm:176
+#: ../lib/File/Globstar/ListMatch.pm:165 ../lib/File/Globstar/ListMatch.pm:178
 #, perl-brace-format
 msgid "Error reading '{filename}': {error}!\n"
 msgstr ""
 
-#: ../lib/File/Globstar.pm:226
+#: ../lib/File/Globstar.pm:214
 #, perl-brace-format
 msgid "invalid pattern '{pattern}'\n"
 msgstr ""
 
-#: ../lib/File/Globstar.pm:239
+#: ../lib/File/Globstar.pm:227
 msgid "invalid use of double asterisk"
 msgstr ""

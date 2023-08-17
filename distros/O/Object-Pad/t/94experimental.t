@@ -34,16 +34,4 @@ BEGIN {
    $warnings = "";
 }
 
-my $one = 1;
-class C3 {
-   BEGIN { $LINE = __LINE__+1 }
-   field $x = $one + 1;
-}
-
-BEGIN {
-   like( $warnings, qr/^Non-constant field initialiser expression is experimental .* at \S+ line $LINE\./,
-      'field = EXPR raises warning' );
-   $warnings = "";
-}
-
 done_testing;

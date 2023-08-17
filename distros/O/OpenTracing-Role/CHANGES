@@ -1,6 +1,17 @@
 CHANGE LOG
 ==========
 
+
+2023-03-28 - v0.86.1
+--------------------
+
+### Added
+    -GitHub Workflow
+
+### Fixed
+    - cpanfile was missing dependencies
+
+
 2023-03-28 - v0.86.0
 --------------------
 

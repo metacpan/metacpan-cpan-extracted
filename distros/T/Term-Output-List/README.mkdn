@@ -1,0 +1,54 @@
+
+[![Windows](https://github.com/Corion/Term-Output-List/workflows/windows/badge.svg)](https://github.com/Corion/Term-Output-List/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Term-Output-List/workflows/macos/badge.svg)](https://github.com/Corion/Term-Output-List/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Term-Output-List/workflows/linux/badge.svg)](https://github.com/Corion/Term-Output-List/actions?query=workflow%3Alinux)
+
+# NAME
+
+Term::Output::List - output an updateable list of ongoing jobs
+
+# SYNOPSIS
+
+    my $printer = Term::Output::List->new();
+    my @ongoing_tasks = ('file1: frobnicating', 'file2: bamboozling', 'file3: frobnicating');
+    $printer->output_list(@ongoing_tasks);
+
+    $printer->output_permanent("Frobnicated gizmos"); # appears above the list
+
+# METHODS
+
+## `Term::Output::List->new()`
+
+## `->scroll_up`
+
+Helper method to place the cursor at the top of the updateable list.
+
+## `->output_permanent`
+
+    $o->output_permanent("Frobnicated 3 items for job 2");
+    $o->output_list("Frobnicating 9 items for job 1",
+                    "Frobnicating 2 items for job 3",
+    );
+
+Outputs items that should go on the permanent record. It is expected to
+output the (remaining) list of ongoing jobs after that.
+
+## `->output_list @items`
+
+    $o->output_list("Frobnicating 9 items for job 1",
+                    "Frobnicating 2 items for job 3",
+    );
+
+Outputs items that can be updated later, as long as no intervening output
+(like from `print`, `say` or `warn`) has happened. If you want to output
+lines that should not be overwritten later, see `</-`output\_permanent>>
+
+## `->fresh_output`
+
+    $o->fresh_output();
+
+Helper subroutine to make all items from the last output list remain as is.
+
+For compatibility between output to a terminal and output without a terminal,
+you should use `->output_permanent` for things that should be permanent
+instead.

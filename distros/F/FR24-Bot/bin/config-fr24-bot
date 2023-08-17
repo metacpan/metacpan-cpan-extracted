@@ -1,0 +1,342 @@
+#!/usr/bin/env perl
+#ABSTRACT: Configuration for FR24-Bot, create update or read your configuration file
+#PODNAME: config-fr24-bot
+
+use v5.24;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Data::Dumper;
+use File::Basename;
+use JSON::PP;
+use Term::ANSIColor qw(:constants);
+if (-e "$RealBin/../dist.ini") {
+    use lib "$RealBin/../lib";
+}
+use FR24::Utils;
+
+# Define version
+our $VERSION = $FR24::Utils::VERSION;
+my $config_file = "$ENV{HOME}/.config/fr24-bot.ini";
+my $verbose = 0;
+my $opt_api_key;
+my $opt_IP;
+my $fr24default_port = 8754;
+my $opt_port = $fr24default_port;
+my $opt_no_write = 0;
+my @opt_users;
+my @opt_banned_users;
+my $opt_quiet = 0;
+if (not GetOptions(
+    'a|api-key=s'  => \$opt_api_key,    
+    'i|ip=s'       => \$opt_IP,
+    'p|port=i'     => \$opt_port,
+    'c|config=s'   => \$config_file,
+    'u|users=s'    => \@opt_users,
+    'b|ban=s'      => \@opt_banned_users,
+    'no-write'     => \$opt_no_write,
+    'quiet'        => \$opt_quiet,
+    'verbose'      => \$verbose,
+    'version'      => sub { say basename($0). " " . $VERSION; exit 0;},
+    'h|help'       => sub { usage(); exit 0;},
+)) { 
+    usage(); 
+    die "ERROR: Invalid options\n";
+}
+
+my $config = FR24::Utils::loadconfig($config_file);
+
+# Config to json 
+
+if ($verbose) {
+    my $json = JSON::PP->new->utf8->pretty->canonical;
+    my $json_text = $json->encode($config);
+    say STDERR "------- Config File -------\n", $json_text;
+}
+
+
+## ===== API KEY =====
+my $NEW_API_KEY = undef;
+if (not defined $opt_api_key) {
+    # Not user supplied
+    say STDERR GREEN, "> API KEY ", RESET, $config->{"telegram"}->{"apikey"} if (defined $config->{"telegram"}->{"apikey"} and not $opt_quiet);
+    $NEW_API_KEY = getInfoFromUser("Provide API key for Telegram", $config->{"telegram"}->{"apikey"}) if not defined $config->{"telegram"}->{"apikey"};
+} else {
+    # User supplied: overwrite or keep default
+    if ($opt_api_key eq 'default') {
+        #TODO: If missing in config, force prompt
+        say STDERR YELLOW, "> Keeping default API KEY: ", $config->{"telegram"}->{"apikey"}, RESET if $verbose;
+        $NEW_API_KEY = $config->{"telegram"}->{"apikey"};
+    } else {
+        say STDERR YELLOW, "> Overwriting API KEY: ", $config->{"telegram"}->{"apikey"}, RESET if $verbose;
+        $NEW_API_KEY = $opt_api_key;
+    }
+}
+
+## ===== IP =====
+my $NEW_IP = undef;
+if (not defined $opt_IP) {
+    say STDERR GREEN, "> FR24 Server IP ", RESET, $config->{"server"}->{"ip"} if (defined $config->{"server"}->{"ip"} and not $opt_quiet);
+    $NEW_IP = getInfoFromUser("Provide IP address for FR24", $config->{"server"}->{"ip"}) if not defined $config->{"server"}->{"ip"};
+} else {
+    if ($opt_IP eq 'default') {
+        say STDERR YELLOW, "> Keeping default IP: ", $config->{"server"}->{"ip"}, RESET if $verbose;
+        $NEW_IP = $config->{"server"}->{"ip"};
+    } else {
+        say STDERR YELLOW, "> Overwriting IP: ", $config->{"server"}->{"ip"}, RESET if $verbose;
+        $NEW_IP = $opt_IP;
+    }
+}
+
+## ===== port =====
+ 
+my $config_port = $config->{"server"}->{"port"} if defined $config->{"server"}->{"port"};
+if (defined $config_port) {
+    # It was defined
+    if (defined $opt_port and $opt_port != $fr24default_port) {
+        say STDERR YELLOW, "> Overwriting port: ", $opt_port, RESET if $verbose;
+        $config->{"server"}->{"port"} = $opt_port;
+    } else {
+        say STDERR GREEN, "> Port ", RESET, $config_port if $verbose;
+    }
+} else {
+    # It was not defined
+    if (defined $opt_port and $opt_port != $fr24default_port) {
+        say STDERR YELLOW, "> Setting port: ", $opt_port, RESET if $verbose;
+        $config->{"server"}->{"port"} = $opt_port;
+    } else {
+        $config->{"server"}->{"port"} = getInfoFromUser("Provide port for FR24 server", $fr24default_port);
+
+    }
+}
+## ===== USERS =====
+say STDERR GREEN , "> Authorized users", RESET if $verbose;
+for my $u (keys %{$config->{"users"}}) {
+    say STDERR YELLOW, "> User ", RESET, $u, " is ", $config->{"users"}->{$u} ? "authorized" : "NOT authorized" if $verbose;
+    
+}
+for my $u (@opt_users) {
+    # Check integer
+    if ($u =~ /^\d+$/) {
+        say STDERR GREEN, "> Adding user ", RESET, $u if $verbose;
+        $config->{"users"}->{"$u"} = 1;
+    } else {
+        say STDERR RED, "> Invalid user ", RESET, $u;
+    }
+}
+for my $u (@opt_banned_users) {
+    # Check integer
+    if ($u =~ /^\d+$/) {
+        say STDERR GREEN, "> Adding user ", RESET, $u if $verbose;
+        $config->{"users"}->{"$u"} = 0;
+    } else {
+        say STDERR RED, "> Invalid user ", RESET, $u;
+    }
+}
+# If there are AUTHORIZED users, set "everyone" to 0
+my $auth_count = 0;
+for my $u (keys %{$config->{"users"}}) {
+    next if $u eq "everyone";
+    $auth_count++ if $config->{"users"}->{$u};
+}
+if ($auth_count > 0) {
+    say STDERR YELLOW, "> Setting everyone to NOT authorized", RESET if $verbose;
+    $config->{"users"}->{"everyone"} = 0;
+}
+# UPDATE CONFIG
+$config->{"telegram"}->{"apikey"} = $NEW_API_KEY if defined $NEW_API_KEY;
+$config->{"server"}->{"ip"} = $NEW_IP if defined $NEW_IP;
+
+
+
+
+if ($opt_no_write) {
+    # Print as json
+    my $json = JSON::PP->new->utf8->pretty->canonical;
+    my $json_text = $json->encode($config);
+    say $json_text;
+    exit 0;
+} elsif  ($verbose) {
+    my $json = JSON::PP->new->utf8->pretty->canonical;
+    my $json_text = $json->encode($config);
+    say STDERR "------- New Config File -------\n", $json_text;
+}
+eval {
+    FR24::Utils::saveconfig($config_file, $config);
+};
+if ($@) {
+    say STDERR "ERROR SAVING to $config_file:\n$@";
+    exit 1;
+} else {
+    say STDERR "Config saved to $config_file" if $verbose;
+    exit 0;
+}
+
+
+
+sub usage {
+    say "Usage: $0 [-a|--api-key API_KEY] [-c|--config CONFIG_FILE] [-h|--help] [-v|--version]";
+    say "Default config file: $ENV{HOME}/.config/fr24-bot.ini";
+    say "\nOptions:";
+    say " -c, --config CONFIG_FILE Set config file";
+    say " -a, --api-key API_KEY    Set API key for Telegram";
+    say " -i, --ip IP              Set IP address for FR24";
+    say " -p, --port PORT          Set port for FR24 (default: 8754)";
+    say " -u, --users USER1        Authorize user ID (multiple allowed)";
+    say " -b, --ban USER1          Ban user ID (multiple allowed)";
+    say "     --no-write           Do not write config file";
+    say "     --verbose            Verbose output";
+    say "     --help               This help message";
+}
+
+sub getInfoFromUser {
+    my ($prompt, $default) = @_;
+    $default = "" if not defined $default;
+    print BOLD $prompt, RESET, " [$default]: ";
+    my $answer = <STDIN>;
+    chomp $answer;
+    # Loop to confirm with "y"
+    while (1) {
+        my $msg = "Do you confirm your answer";
+        if (length($answer) < 1) {
+            $answer = $default;
+            my $msg =  "No answer given. Do you want to keep the default?";
+        }
+
+        say UNDERLINE "$msg [$answer]", RESET, BOLD," (y/n): ", RESET;
+        my $confirm = <STDIN>;
+        chomp $confirm;
+        if ($confirm  =~ m/^[yY]$/) {
+            return $answer;
+        } elsif ($confirm eq "n") {
+            return getInfoFromUser($prompt, $default);
+        }
+    }    
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+config-fr24-bot - Configuration for FR24-Bot, create update or read your configuration file
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 SYNOPSIS
+
+  config-fr24-bot [OPTIONS]
+
+=head1 DESCRIPTION
+
+The C<config-fr24-bot> script is used to configure the FR24-Bot by modifying the configuration file. 
+It provides command-line options to change the API key and FR24 server IP address.
+
+Example configuration:
+
+  [telegram]
+  apikey=7908487915:AEEQFftvQtEbavBGcB81iF1cF2koliWFxJE
+  
+  [server]
+  ip=localhost
+  port=8754
+  
+  [users]
+  # Authorized users (1=authorized, 0=not authorized).
+  # Add "everyone=1" to allow everyone to use the bot, exept users set to 0
+  0912401240=1
+  1827498712=0
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item B<-a, --api-key API_KEY>
+
+Sets the API key for Telegram. If not provided, the script will use an B<interactive> prompt for the API key.
+
+You can specify C<default> to keep the current API key (if any).
+
+=item B<-i, --ip IP>
+
+Sets the FR24 server IP address. If not provided, the script will use an B<interactive> prompt for the IP address.
+
+You can specify C<default> to keep the current API key (if any).
+
+=item B<-u, --users USER1>
+
+Authorizes the user ID C<USER1>. Multiple users can be authorized by specifying this option multiple times.
+The Telegram ID must be an integer.
+
+B<NOTE>: If no users are present in the config file, everyone is allowed to use the bot.
+
+=item B<-b, --ban USER1>
+
+Bans the user ID C<USER1>. Multiple users can be banned by specifying this option multiple times.
+The Telegram ID must be an integer.
+
+=item B<-c, --config CONFIG_FILE>
+
+Specifies the path to the configuration file. The default configuration file is C<$ENV{HOME}/.config/fr24-bot.ini>.
+
+=item B<--no-write>
+
+Prints the updated configuration without saving it to the file.
+
+=item B<--verbose>
+
+Enables verbose output, showing the original and updated configuration.
+
+=item B<-h, --help>
+
+Displays the help message and usage instructions.
+
+=item B<-v, --version>
+
+Displays the version of the C<config-fr24-bot> script.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The C<config-fr24-bot> script reads and modifies a configuration file in the INI format. 
+The default configuration file is C<$ENV{HOME}/.config/fr24-bot.ini>.
+
+The configuration file has the following sections:
+
+=over 4
+
+=item B<[telegram]>
+
+This section contains the configuration options related to the Telegram API.
+
+It currently has only one option: B<apikey>.
+
+=item B<[server]>
+
+This section contains the configuration options related to the FR24 server.
+
+It currently has only one option: B<ip>.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

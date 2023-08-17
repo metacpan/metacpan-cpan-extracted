@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorkbookNameRequest.name :   ,
-# DeleteWorkbookNameRequest.nameName :   ,
-# DeleteWorkbookNameRequest.folder :   ,
-# DeleteWorkbookNameRequest.storageName :    
+# DeleteWorkbookNameRequest.name : The workbook name.  ,
+# DeleteWorkbookNameRequest.nameName : the Aspose.Cells.Name element name.  ,
+# DeleteWorkbookNameRequest.folder : Original workbook folder.  ,
+# DeleteWorkbookNameRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_workbook_name' } = { 
-    	summary => '',
+    	summary => 'Gets workbook`s name description.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'name_name' => {
      	datatype => 'string',
      	base_name => 'nameName',
-     	description => '',
+     	description => 'the Aspose.Cells.Name element name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

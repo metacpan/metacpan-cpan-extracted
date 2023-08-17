@@ -118,7 +118,7 @@ use PApp::DataRef ();
 use Convert::Scalar qw(:utf8 weaken);
 
 BEGIN {
-   our $VERSION = 2.2;
+   our $VERSION = 2.3;
 
    use base Exporter::;
 
@@ -796,8 +796,8 @@ sub postpone(&;@) {
 
 =item $ahref = slink contents,[ module,] arg => value, ...
 
-This is just "alink shift, &url", that is, it returns a link with the
-given contants, and a url created by C<surl> (see above). For example, to create
+This is just "alink shift, &surl", that is, it returns a link with the
+given contents, and a url created by C<surl> (see above). For example, to create
 a link to the view_game module for a given game, do this:
 
  <? slink "Click me to view game #$gamenr", "view_game", gamenr => $gamenr :>
@@ -1797,8 +1797,11 @@ sub _handler {
             || ($pathinfo =~ s%/([\-.a-zA-Z0-9]{22,22})$%% && $1);
 
       if ($state) {
-         ($userid, $prevstateid, $alternative, $sessionid) =
-            unpack "VVVxxxx", $cipher_d->decrypt(PApp::X64::dec $state);
+         ($userid, $prevstateid, $alternative, my $cookie) =
+            unpack "VVVV", $cipher_d->decrypt(PApp::X64::dec $state);
+
+         $cookie == 0x55555555
+            or fancydie "state cookie mismatch", "possible session tampering detected";
 
          $st_fetchstate->execute($prevstateid);
          $state = $st_fetchstate->fetchrow_arrayref;
@@ -1843,7 +1846,7 @@ sub _handler {
 
          if ($state->[2] != $userid) {
             if ($state->[2] != $state{papp_switch_newuserid}) {
-               fancydie "user id mismatch ($state->[2] <> $state{papp_switch_newuserid}", "maybe someone is tampering?";
+               fancydie "user id mismatch ($state->[2] <> $state{papp_switch_newuserid}", "possible session tampering detected";
             } else {
                $userid = $state{papp_switch_newuserid};
             }

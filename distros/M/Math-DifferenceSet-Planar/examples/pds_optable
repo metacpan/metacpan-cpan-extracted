@@ -6,6 +6,17 @@ use warnings;
 
 $| = 1;
 
+my $mod = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if $opt eq '-';
+    $mod = $1, next if $opt =~ /^m([1-9][0-9]*)\z/;
+    $mod = $1, next
+        if $opt eq 'm' && @ARGV && shift(@ARGV) =~ /^([1-9][0-9]*)\z/;
+    die "usage: pds_optable [-m modulus] [file]...\n";
+}
+
 while (<<>>) {
     s/^\s+//;
     my @e = split /\s+/;
@@ -14,7 +25,7 @@ while (<<>>) {
         next;
     }
 
-    my $m = (@e - 1) * @e + 1;
+    my $m = $mod || (@e - 1) * @e + 1;
     my $fmt = $m < 1000? '%4d': '%4x';
     print
         '+--+---', '----' x @e, "-+\n",
@@ -30,6 +41,7 @@ while (<<>>) {
 }
 
 __END__
+
 =head1 NAME
 
 pds_optable - print difference table for planar difference sets
@@ -50,7 +62,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

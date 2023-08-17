@@ -4,7 +4,9 @@ use warnings;
 use DBI;
 use Module::Load 'load';
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -19,11 +21,13 @@ DBIx::RunSQL - run SQL from a file
     use DBIx::RunSQL;
 
     my $test_dbh = DBIx::RunSQL->create(
-        dsn     => 'dbi:SQLite:dbname=:memory:',
-        sql     => 'sql/create.sql',
-        force   => 1,
-        verbose => 1,
+        dsn       => 'dbi:SQLite:dbname=:memory:',
+        sql       => 'sql/create.sql',
+        force     => 1,
+        verbose   => 1,
         formatter => 'Text::Table',
+        rotate    => 1,
+        null      => '(Null)',
     );
 
     # now run your tests with a DB setup fresh from setup.sql
@@ -175,6 +179,14 @@ headers
 
 C<formatter> - see the C<<formatter>> option of C<< ->format_results >>
 
+=item *
+
+C<rotate> - rotate the table by 90° , outputting columns as rows
+
+=item *
+
+C<null> - string to replace SQL C<NULL> columns by
+
 =back
 
 =cut
@@ -253,6 +265,14 @@ C<output_string> - whether to output the (one) row and column, without any heade
 =item *
 
 C<formatter> - see the C<<formatter>> option of C<< ->format_results >>
+
+=item *
+
+C<rotate> - rotate the table by 90° , outputting columns as rows
+
+=item *
+
+C<null> - string to replace SQL C<NULL> columns by
 
 =back
 
@@ -352,6 +372,18 @@ In fact, the module will use anything other than C<tab>
 as the class name and assume that the interface is compatible
 to C<Text::Table>.
 
+=item *
+
+C<no_header_when_empty> - don't print anything if there are no results
+
+=item *
+
+C<rotate> - rotate the table by 90° , outputting columns as rows
+
+=item *
+
+C<null> - string to replace SQL C<NULL> columns by
+
 =back
 
 Note that the query results are returned as one large string,
@@ -359,6 +391,11 @@ so you really do not want to run this for large(r) result
 sets.
 
 =cut
+
+sub _nullstr {
+    my $str = shift;
+    map { defined $_ ? $_ : $str } @_
+}
 
 sub format_results {
     my( $self, %options )= @_;
@@ -372,10 +409,26 @@ sub format_results {
         };
     };
 
+    my $nullstr = $options{ null } // ''; # / , for Filter::Simple
+
     my @columns= @{ $sth->{NAME} };
+    my $res= $sth->fetchall_arrayref();
+    my @rows = map { [ _nullstr( $nullstr, @$_ ) ] } @$res;
+
     my $no_header_when_empty = $options{ no_header_when_empty };
     my $print_header = not exists $options{ header } || $options{ header };
-    my $res= $sth->fetchall_arrayref();
+    my $rotate = $options{ rotate };
+
+    if( $rotate ) {
+        # Rotate our output
+        my @new_rows = map {
+            my $i = $_;
+            [$columns[$i], map { $_->[$i] } @rows]
+        } (0..$#columns);
+        @rows = @new_rows;
+        @columns = @{shift @rows};
+    }
+
     my $result='';
     if( @columns ) {
         # Output as print statement
@@ -385,7 +438,7 @@ sub format_results {
         } elsif( 'tab' eq $options{ formatter } ) {
             $result = join "\n",
                           $print_header ? join( "\t", @columns ) : (),
-                          map { join( "\t", @$_ ) } @$res
+                          map { join( "\t", @$_ ) } @rows
                       ;
 
         } else {
@@ -401,13 +454,13 @@ sub format_results {
             # Now dispatch according to the apparent type
             if( !$class->isa('Text::Table') and my $table = $class->can('table') ) {
                 # Text::Table::Any interface
-                $result = $table->( header_row => 1,
-                    rows => [\@columns, @$res ],
+                $result = $table->( header_row => $print_header,
+                    rows => [\@columns,  @rows ],
                 );
             } else {;
                 # Text::Table interface
                 my $t= $options{formatter}->new(@columns);
-                $t->load( @$res );
+                $t->load( @rows );
                 $result= $t;
             };
         };
@@ -489,16 +542,18 @@ sub parse_command_line {
     if (! $argv) { $argv = \@ARGV };
 
     if (GetOptionsFromArray( $argv,
-        'user:s'     => \my $user,
-        'password:s' => \my $password,
-        'dsn:s'      => \my $dsn,
+        'user=s'     => \my $user,
+        'password=s' => \my $password,
+        'dsn=s'      => \my $dsn,
         'verbose'    => \my $verbose,
         'force|f'    => \my $force,
-        'sql:s'      => \my $sql,
+        'sql=s'      => \my $sql,
         'bool'       => \my $output_bool,
         'string'     => \my $output_string,
         'quiet'      => \my $no_header_when_empty,
-        'format:s'   => \my $formatter_class,
+        'format=s'   => \my $formatter_class,
+        'rotate'     => \my $rotate,
+        'null=s'     => \my $nullstr,
         'help|h'     => \my $help,
         'man'        => \my $man,
     )) {
@@ -524,6 +579,8 @@ sub parse_command_line {
         output_bool          => $output_bool,
         output_string        => $output_string,
         formatter            => $formatter_class,
+        rotate               => $rotate,
+        null                 => $nullstr,
         help                 => $help,
         man                  => $man,
         };
@@ -567,6 +624,8 @@ passes the following command line arguments and options to C<< ->create >>:
   --verbose
   --bool
   --string
+  --rotate
+  --null
 
 In addition, it handles the following switches through L<Pod::Usage>:
 
@@ -589,7 +648,7 @@ your database" into a module. In some situations you want to give the
 setup SQL to a database admin, but in other situations, for example testing,
 you want to run the SQL statements against an in-memory database. This
 module abstracts away the reading of SQL from a file and allows for various
-command line parameters to be passed in. A skeleton C<create-db.sql>
+command line parameters to be passed in. A skeleton C<create-db.pl>
 looks like this:
 
     #!/usr/bin/perl -w

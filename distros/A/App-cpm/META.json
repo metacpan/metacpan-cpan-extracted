@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,22 +19,12 @@
             "Module::Build::Tiny" : "0.034"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Archive::Tar" : "0",
-            "Archive::Zip" : "1.68",
-            "CPAN::Mirror::Tiny" : "0.20",
-            "Capture::Tiny" : "0",
-            "Path::Tiny" : "0",
-            "Test::More" : "0.98"
-         }
-      },
       "runtime" : {
          "recommends" : {
             "Carton" : "0"
          },
          "requires" : {
-            "CPAN::02Packages::Search" : "0",
+            "CPAN::02Packages::Search" : "0.100",
             "CPAN::DistnameInfo" : "0",
             "CPAN::Meta" : "0",
             "CPAN::Meta::Requirements" : "2.130",
@@ -52,6 +42,7 @@
             "Module::cpmfile" : "0.001",
             "Parallel::Pipes::App" : "0.100",
             "Parse::PMFile" : "0.43",
+            "Proc::ForkSafe" : "0.001",
             "local::lib" : "2.000018",
             "parent" : "0",
             "perl" : "5.008001",
@@ -62,7 +53,7 @@
    "provides" : {
       "App::cpm" : {
          "file" : "lib/App/cpm.pm",
-         "version" : "0.997011"
+         "version" : "0.997014"
       },
       "App::cpm::CLI" : {
          "file" : "lib/App/cpm/CLI.pm"
@@ -105,6 +96,9 @@
       },
       "App::cpm::Resolver::Custom" : {
          "file" : "lib/App/cpm/Resolver/Custom.pm"
+      },
+      "App::cpm::Resolver::Fixed" : {
+         "file" : "lib/App/cpm/Resolver/Fixed.pm"
       },
       "App::cpm::Resolver::MetaCPAN" : {
          "file" : "lib/App/cpm/Resolver/MetaCPAN.pm"
@@ -155,7 +149,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "0.997011",
+   "version" : "0.997014",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Dave Rolsky <autarch@urth.org>",
@@ -171,8 +165,8 @@
       "Shoichi Kaji <skaji@outlook.com>",
       "Will Sheppard <will.sheppard.uk@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

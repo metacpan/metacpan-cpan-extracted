@@ -2,8 +2,22 @@
 Changes
 clib/CMakeLists.txt
 clib/doc/CallbackDispatcher.md
+clib/doc/error.md
 clib/doc/function.md
+clib/doc/log.md
+clib/doc/log/formatter.md
+clib/doc/log/modules.md
 clib/doc/refcnt.md
+clib/doc/reference/backtrace.md
+clib/doc/reference/ErrorCode.md
+clib/doc/reference/excepted.md
+clib/doc/reference/exception.md
+clib/doc/reference/expected.md
+clib/doc/reference/log.md
+clib/doc/reference/memory.md
+clib/doc/reference/PANDA_PP_VFUNC.md
+clib/doc/string.md
+clib/FetchDeps.cmake
 clib/LICENSE
 clib/panda-lib-config.cmake
 clib/README.md
@@ -93,6 +107,7 @@ INSTALL.SKIP
 lib/XS/libpanda.pm
 lib/XS/libpanda.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/trun.plx
@@ -121,5 +136,6 @@ t/to_chars.t
 t/traits.t
 t/valgrind.t
 t/varint.t
+XS-libpanda-1.5.9.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

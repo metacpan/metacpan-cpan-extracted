@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Match;
 
@@ -41,7 +41,7 @@ use Syntax::Keyword::Match;
          case("x,y") { "x", "y" }
       }
    };
-   is_deeply( \@ret, [ "x", "y" ], 'match/case in list context' );
+   is( \@ret, [ "x", "y" ], 'match/case in list context' );
 }
 
 # as final-expr

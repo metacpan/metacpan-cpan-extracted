@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+#
+# Author, Copyright and License: see end of file
+
+=head1 NAME
+
+lxc-app-update - update configuration for an LXC application container
+
+=head1 SYNOPSIS
+
+    lxc-app-update <container>...
+
+=head1 ABSTRACT
+
+main script used to update the configuration an LXC application container
+
+=head1 DESCRIPTION
+
+This script takes an meta-configuration for an LXC application container and
+transforms it into a concrete configuration for LXC itself.  If you combine
+more than one meta-configuration (e.g. one with some applications and
+another one with available users) they will be combined into one concrete
+configuration with the name of the last one.  Note that in the case of
+conflicting definitions the later overwrite the former.
+
+=cut
+
+#########################################################################
+
+##################
+# load packages: #
+##################
+
+use v5.14;
+use strictures 2;
+no indirect 'fatal';
+no multidimensional;
+use warnings 'once';
+
+use Cwd;
+
+BEGIN {
+    ($_ = $0) =~ s|[^/]+/[^/]+$|lib|;
+    unshift @INC, $_  if  cwd() =~ m!/App-LXC-Container(?:-\d\.\d+)?(?:/|$)!;
+}
+
+use App::LXC::Container;
+use App::LXC::Container::Texts;
+#debug(4);			# FIXME: remove for release!
+
+#################################################
+# all work is done in the corresponding module: #
+#################################################
+
+1 <= @ARGV  or  fatal 'usage__1_container__2', $0, '';
+App::LXC::Container::update(@ARGV);
+
+#########################################################################
+
+=head1 SEE ALSO
+
+C<L<App::LXC::Container>>, C<L<App::LXC::Container::Update>>
+
+=head1 LICENSE
+
+Copyright (C) Thomas Dorner.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.  See LICENSE file for more details.
+
+=head1 AUTHOR
+
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
+
+=cut

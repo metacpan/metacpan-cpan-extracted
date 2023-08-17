@@ -5,7 +5,7 @@ use warnings;
 
 use App::PYX::Optimization;
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 # Run.
 exit App::PYX::Optimization->new->run;
@@ -41,19 +41,19 @@ comment sections.
 
 =item * C<-h>
 
- Print help.
+Print help.
 
 =item * C<--version>
 
- Print version of script.
+Print version of script.
 
 =item * C<filename>
 
- PYX filename.
+PYX filename.
 
 =item * C<->
 
- STDIN with PYX code.
+STDIN with PYX code.
 
 =back
 
@@ -73,12 +73,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2020 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.04
 
 =cut

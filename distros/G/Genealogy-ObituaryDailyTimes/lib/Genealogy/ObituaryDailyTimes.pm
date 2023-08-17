@@ -14,11 +14,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -37,16 +37,25 @@ Takes an optional argument, directory, that is the directory containing obituari
 =cut
 
 sub new {
-	my($proto, %param) = @_;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Use Genealogy::ObituaryDailyTimes->new, not Genealogy::ObituaryDailyTimes::new
-	return unless($class);
+	if(!defined($class)) {
+		# Use Genealogy::ObituaryDailyTimes->new, not Genealogy::ObituaryDailyTimes::new
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
-	my $directory = $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
+
+	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
-	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'), %param);
+	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
 	return bless { }, $class;
 }
 
@@ -97,8 +106,8 @@ sub _create_url {
 	my $page = $obit->{'page'};
 
 	if(!defined($page)) {
-		use Data::Dumper;
-		::diag(Data::Dumper->new([$obit])->Dump());
+		# use Data::Dumper;
+		# ::diag(Data::Dumper->new([$obit])->Dump());
 		Carp::croak(__PACKAGE__, ': undefined $page');
 	}
 	if(!defined($source)) {
@@ -142,17 +151,9 @@ L<https://metacpan.org/release/Genealogy-ObituaryDailyTimes>
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ObituaryDailyTimes>
 
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/Genealogy-ObituaryDailyTimes>
-
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=Genealogy-ObituaryDailyTimes>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Genealogy-ObituaryDailyTimes>
 
 =item * CPAN Testers Dependencies
 

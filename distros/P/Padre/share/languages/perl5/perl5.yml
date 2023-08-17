@@ -1,5 +1,5 @@
 ---
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2014 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.
@@ -36,7 +36,7 @@ chmod:
 chomp:
  cmd: (STRING)   or (ARRAY)
  exp: Remove the newline from the end of the STRING or from the end of every string in the ARRAY.
-chomp:
+chop:
  cmd: (STRING)
  exp: Remove last character from STRING. (Usually better to use chomp than chop.)
 chown:

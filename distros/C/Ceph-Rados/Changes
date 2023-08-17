@@ -1,5 +1,12 @@
 Revision history for Perl extension Ceph::Rados.
 
+
+0.22  Fri  4 Aug 11:55:27 BST 2023
+    - fixes install under Linux, broken by previous version
+
+0.21  Thu  3 Aug 2023 14:45:20 EEST
+    - C::Scan::Constants moved to eval/require block, since it won't be installed on Darwin
+
 0.20  Wed 31 May 2023 19:13:56 EEST
     - cpan rejected last build due to stupid, pointless versioning requirement of each submodule
 

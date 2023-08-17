@@ -30,10 +30,10 @@ DEVELOPERS NOTE
        yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.config -f MyExe && ./solo/work/myexe foo bar
        
        # Debug run
-       yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules --OPTIMIZE="-O0 -g"  && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.debug.config -f MyExe && ./solo/work/myexe foo bar
+       yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules --OPTIMIZE="-O0 -g" && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.debug.config -f MyExe && ./solo/work/myexe foo bar
        
        # Debug run - Print memory count
-       yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules --OPTIMIZE="-O0 -g"  && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.debug_memory_count.config -f MyExe && ./solo/work/myexe foo bar
+       yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules --OPTIMIZE="-O0 -g" && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.debug_memory_count.config -f MyExe && ./solo/work/myexe foo bar
 
        # Debug run - Print AST, package information, operaion codes
        yacc/bison.sh && perl Makefile.PL --no-build-spvm-modules --OPTIMIZE="-O0 -g" --DEFINE=SPVM_DEBUG_COMPILE && make && perl -Mblib blib/script/spvmcc -B solo/.spvm_build -I solo/lib/SPVM -o solo/work/myexe --config solo/myexe.debug.config -f MyExe
@@ -45,11 +45,14 @@ DEVELOPERS NOTE
        rm solo/work/myexe
 
     See batcktrace of core dump
-
+      
+      # Compiliation time stack trace
+      gdb perl core
+      
+      # Runtime stack trace
       gdb solo/work/myexe core
       
       bt
-
       
     If core file is not output, set the following.
       
@@ -93,6 +96,22 @@ DEVELOPERS NOTE
   
   UTILITIES
   
+    Gets SPVM Core Perl module files
+    
+      find lib | grep -P '(Builder|BlessedObject|ExchangeAPI|Global|SPVM\.pm)' | grep '\.pm' | perl -p -e 's|lib/||' | sort
+      
+    Gets SPVM header files
+    
+      find lib | grep Builder | grep -P '\.h$' | perl -p -e 's|lib/SPVM/Builder/include/||' | sort
+    
+    Gets SPVM source files
+    
+      find lib | grep Builder | grep -P '\.c$' | perl -p -e 's|lib/SPVM/Builder/src/||' | sort
+
+    Gets SPVM Compilation and Rintime module files
+    
+      find lib | grep -P '(Native\b)' | grep -P '\.(spvm|c)$' | perl -p -e 's|lib/||' | sort
+
     Print config 
       
       # All config
@@ -110,34 +129,22 @@ DEVELOPERS NOTE
       # dlext
       perl -MConfig -MData::Dumper -e 'local $Data::Dumper::Sortkeys = 1; print Dumper \%Config;' | grep dlext
   
-    Get all keywords
+    Gets all keywords
     
       perl -n -e 'if (/strcmp\s*\(\s*symbol_name\s*,\s*"(.+?)"/) { print "$1\n" } ' lib/SPVM/Builder/src/spvm_toke.c
     
-    Get the definition of syntax parsing
+    Gets the definition of syntax parsing
     
       perl -n -e 'if (/^(%token|%type|%right|%nonassoc|%left|[a-zA-Z]|\s+:|\s+\|)(.+)/) { my $line = "$1$2"; if ($line =~ /^[a-zA-Z]/) { print "\n"; } print "$line\n" } ' yacc/spvm_yacc.y
     
-    Get SPVM::Builder module files
-    
-      find lib | grep Builder | grep '\.pm' | perl -p -e 's|lib/||' | sort
-
-    Get the linkgs of SPVM modules for POD
+    Gets the linkgs of SPVM modules for POD
     
       find lib | grep -P '\.pm$' | grep -v 'SPVM\.pm$' | perl -p -e 's/\.pm$//' | sort | grep -v -P '^lib/SPVM(\.pm|/(ExchangeAPI|Document|Builder|BlessedObject|Dist))' | perl -p -e 'chomp;s|lib/SPVM/||; s|/|::|g; $_ = "=item * L<$_|SPVM::$_>\n\n";'
 
-    Get SPVM source files
-    
-      find lib | grep Builder | grep -P '\.c$' | perl -p -e 's|lib/SPVM/Builder/src/||' | sort
-
-    Get SPVM header files
-    
-      find lib | grep Builder | grep -P '\.h$' | perl -p -e 's|lib/SPVM/Builder/include/||' | sort
-    
-    Create compile error test module
+    Creates compile error test module
     
       spvmdist --genlib TestCase::CompileError::Foo t/default/lib
     
-    Create a SPVM distribution
+    Creates a SPVM distribution
       
       spvmdist Foo

@@ -3,9 +3,9 @@ NAME
     ported from (or inspired by) Python libraries
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Acme::CPANModules::PortedFrom::Python (from Perl distribution
-    Acme-CPANModules-PortedFrom-Python), released on 2023-01-31.
+    Acme-CPANModules-PortedFrom-Python), released on 2023-04-23.
 
 DESCRIPTION
     If you know of others, please drop me a message.
@@ -31,6 +31,13 @@ ACME::CPANMODULES ENTRIES
 
         Quoted from the module's documentation: "The implementation of this
         module is highly inspired from Python's FastXLSX library."
+
+    Dash
+        Author: PABLROD <https://metacpan.org/author/PABLROD>
+
+        From the module's documentation: "This package is a port of Plotly's
+        Dash to Perl. Dash makes building analytical web applications very
+        easy. No JavaScript required."
 
 FAQ
   What is an Acme::CPANModules::* module?

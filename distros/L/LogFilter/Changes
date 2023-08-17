@@ -1,0 +1,62 @@
+Revision history for LogFilter
+0.13  2023-06-18
+    - Added ability to provide interval for log file reading
+    - Added POD documentation with example usage
+
+0.12 2023-06-17
+    - Added documentation (POD)
+    - Changed the way how files in the 'share' directory are used
+    - Fixed issue with File::ShareDir::Install and ShareDir parameters in Makefile.PL
+    - Added installation instructions
+
+0.11 2023-06-17
+    - Moved test files to the 'share' directory for proper file referencing
+    - Updated the 'Makefile.PL' for File::ShareDir::Install integration
+    - Updated tests to use File::ShareDir to find test files
+
+0.10 2023-06-15
+    - Added 'interval' parameter to constructor for setting read interval in File::Tail
+    - Default read interval is 1 second if no 'interval' parameter is provided
+
+0.09 2023-06-14
+    - Fixed the test script to correctly handle relative file paths.
+    - Updated the test script to correctly start and kill the child process.
+    - Updated the test script to correctly capture and check the output of the filter method.
+    - Corrected the plan in the test script to accurately reflect the number of tests being run.
+
+0.08 2023-06-14
+    - Fixed the issue where test log was created in the wrong directory.
+    - Updated test cases to verify the contents of the log file directly, instead of relying on the filter method.
+    - Test cases now verify that the correct paths are set for the keyword, exclude, and log files.
+    - Removed test cases that check the functionality of the filter method, it is recommended to add these back in separate test cases.
+
+0.07 2023-06-14
+    -Fixed issue in the testing script where relative paths were used to create and update log files, causing the files to be created at unintended locations. Now, the script uses absolute paths which ensures the log files are created and updated at the correct locations.
+    - Updated the test script to output an error message if it fails to open the log file.
+
+0.06 2023-06-14
+    - Fixed a bug in test script where log file was being created in unexpected location due to use of relative path.
+    - Switched to using absolute path for creating and updating log file in the test script.
+
+0.05 2023-06-14
+    - Fixed issue with locating test data files in test script
+    - Used File::Spec in test script to generate full paths to test data files
+
+0.04 2023-06-14
+    - Added error handling for file opening in the constructor of LogFilter.pm.
+    - Fixed a bug where calling 'close' on an undefined filehandle would cause an error.
+    - Tests updated to incorporate the changes.
+
+0.03 2023-06-14
+    - Moved test files (test_keywords.txt, test_exclude.txt, test_log.txt) to the 't' directory.
+    - This change ensures that the test script can correctly locate these files during test execution.
+
+0.02 2023-06-14
+    - Modified test file (01_basic.t) to handle real-time log monitoring.
+      Now, the test script starts a child process to update the test log periodically. 
+      The filter method in the test is given a timeout, and it terminates after a set period of time.
+    - This change allows us to perform real-time log analysis while ensuring that the tests don't run indefinitely.
+
+0.01 2023-06-12
+    - Initial release. 
+    - Basic log filtering capabilities using a keywords file, an exclude file, and a log file.

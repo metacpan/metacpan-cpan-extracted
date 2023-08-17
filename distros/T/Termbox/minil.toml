@@ -1,10 +1,10 @@
 name = "Termbox"
 badges = ["github-actions/ci.yaml", "metacpan"]
-authority="cpan:SANKO"
 module_maker="ModuleBuildTiny"
 static_install = "auto"
 license="artistic_2"
-requires_external_bin=["make');chdir 'termbox';`make;make install prefix='../share';`;chdir '..';\n('1"]
+authority="cpan:SANKO"
+requires_external_bin=["make');`make -C termbox2 prefix=../share install_lib`;\n('1"]
 markdown_maker = "Pod::Markdown::Github"
 
 [release]

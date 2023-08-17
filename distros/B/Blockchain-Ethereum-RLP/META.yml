@@ -4,11 +4,10 @@ author:
   - 'Reginaldo Costa <refeco@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.70'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '1.50'
+  Object::PAD: '0.79'
   perl: '5.026000'
 resources:
   repository: https://github.com/refeco/perl-RLP.git
-version: '0.001'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

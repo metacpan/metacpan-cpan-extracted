@@ -6,8 +6,7 @@ use URI::URL;
 use Data::Dumper;
 use Encode;
 
-use vars '$VERSION';
-$VERSION = '0.01';
+our $VERSION = '0.05';
 
 =head1 NAME
 

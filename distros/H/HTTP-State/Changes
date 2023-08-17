@@ -1,0 +1,6 @@
+Revision history for Perl extension HTTP::State.
+
+0.01  Sat Apr 15 21:54:53 2023
+	- original version; created by h2xs 1.23 with options
+		--name HTTP::State -X -P
+

@@ -1,4 +1,5 @@
 #!perl
+# the actual perl version requirement may be higher due to other modules
 use 5.8.0;
 use strict;
 use warnings;
@@ -15,7 +16,7 @@ if ( $^O =~ /MSWin32/ ) {
 my $builder = Module::Build->new(
     module_name        => 'Net::Gemini',
     license            => 'bsd',
-    dist_author        => q{Jeremy Mates <jeremy.mates@gmail.com>},
+    dist_author        => q{Jeremy Mates <jmates@thrig.me>},
     dist_version_from  => 'lib/Net/Gemini.pm',
     release_status     => 'stable',
     create_license     => 0,
@@ -23,6 +24,10 @@ my $builder = Module::Build->new(
     dynamic_config     => 0,
     configure_requires => { 'Module::Build' => '0.4004', },
     test_requires      => {
+        'Data::Dumper'          => '0',
+        'IO::Socket::IP'        => '0',
+        'IO::Socket::SSL'       => '0',
+        'Parse::MIME'           => '0',
         'Test2::Tools::Command' => '0.11',
         'Test2::V0'             => '0.000060',
         'perl'                  => '5.8.0',
@@ -31,10 +36,12 @@ my $builder = Module::Build->new(
     requires => {
         'Carp'             => '0',
         'Cpanel::JSON::XS' => '0',
+        'Digest::SHA'      => '0',
         'File::Path'       => '0',
         'File::Slurper'    => '0',
         'File::Spec'       => '0',
-        'IO::Socket::SSL'  => '1.985',    # can_ipv6
+        'IO::Socket::IP'   => '0',
+        'IO::Socket::SSL'  => '0',
         'Net::SSLeay'      => '0',
         'Parse::MIME'      => '0',
         'URI'              => '0',
@@ -51,8 +58,9 @@ my $builder = Module::Build->new(
             },
         },
     },
-    meta_merge =>
-      { resources => { repository => 'https://thrig.me/src/Net-Gemini.git' } },
+    meta_merge => {
+        resources => { repository => 'https://thrig.me/src/Net-Gemini.git' }
+    },
 );
 
 $builder->create_build_script();

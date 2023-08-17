@@ -1,4 +1,9 @@
 
+v5.25   2023-06-13
+
+  - added new Mnet::IP module, for parsing ipv4 and ipv6 addresses
+
+
 v5.24   2023-04-07
 
   - output perl warn/die stderr without log prefix when --quiet is enabled

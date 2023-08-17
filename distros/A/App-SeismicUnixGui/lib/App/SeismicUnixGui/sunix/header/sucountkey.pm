@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::header::sucountkey;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

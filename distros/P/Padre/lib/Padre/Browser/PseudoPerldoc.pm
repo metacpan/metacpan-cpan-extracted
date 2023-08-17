@@ -6,7 +6,7 @@ use warnings;
 use Pod::Perldoc        ();
 use Pod::Perldoc::ToPod ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 our @ISA     = 'Pod::Perldoc';
 
 sub new {
@@ -20,6 +20,7 @@ sub find_good_formatter_class {
 	$_[0]->{'formatter_class'} = 'Pod::Perldoc::ToPod';
 	return;
 }
+
 
 # Even worse than monkey patching , copy paste from Pod::Perldoc w/ edits
 # to avoid untrappable calls to 'exit'
@@ -59,7 +60,7 @@ sub process {
 	$self->find_good_formatter_class;
 	$self->formatter_sanity_check;
 
-	$self->maybe_diddle_INC;
+	$self->maybe_extend_searchpath;
 
 	# for when we're apparently in a module or extension directory
 
@@ -80,7 +81,7 @@ sub process {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

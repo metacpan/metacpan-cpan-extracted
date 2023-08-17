@@ -4,6 +4,7 @@
 BEGIN { $|=1; }
 use warnings;
 use strict;
+use open qw/:std :encoding(UTF-8)/; # avoid 'Wide character in print' warnings
 use Test;
 use Tcl::pTk;
 

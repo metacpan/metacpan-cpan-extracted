@@ -12,7 +12,7 @@ my $simpl = PDL::Opt::Simplex::Simple->new(
         vars => {
                 x => 30
 	},
-	ssize => 3,
+	opts => { ssize => 3 },
 	max_iter => 100,
 	tolerance => 1e-6,
         f => sub {

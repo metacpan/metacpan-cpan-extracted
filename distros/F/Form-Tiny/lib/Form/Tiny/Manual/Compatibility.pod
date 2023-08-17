@@ -11,6 +11,24 @@ of Form::Tiny, together with recipes on how to fix them.
 
 =head1 CHANGES
 
+=head2 Subform adjustment no longer requires an explicit call to subform's C<fields>
+
+I<Changed in 2.18 - considered mostly backward compatible>
+
+Previous versions of Form::Tiny automatically inserted an adjustment for
+subform fields, which caused the correct behavior of including subform's
+C<fields> in main form's C<fields>. Overriding the C<adjust> subroutine
+required explicitly taking C<fields> from the subform.
+
+This adjustment is no longer injected and correct behavior is achieved
+internally by the validator. Any forms which used explicit adjustments of
+subform before should now have a redundant but harmless call to C<fields>,
+which can be safely removed.
+
+The only scenario in which it breaks backward compatibility is when subform
+field adjustment did not call C<fields>. In this case, an explicit call to
+subform's C<input> is required to retain old behavior.
+
 =head2 Form::Tiny::Filter has been moved to Form::Tiny::Plugin::Filtered::Filter
 
 I<Changed in 2.17>

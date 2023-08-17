@@ -3,9 +3,9 @@ package Acme::CPANModules::BrowsingTableInteractively;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2023-06-15'; # DATE
 our $DIST = 'Acme-CPANModules-BrowsingTableInteractively'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => 'List of modules/tools for browsing table data interactively',
@@ -87,6 +87,26 @@ table (using modules like <pm:Text::Table::More>, <pm:Text::ANSITable>, or
 it. At least with *less* you can scroll horizontally or perform incremental
 searching (though not interactive filtering of rows).
 
+
+6) **SQLite browser**, **SQLiteStudio**, or other SQLite-based front-ends
+
+Another way to browse your table data interactively is to export it to SQLite
+database then use one of the many front-ends (desktop GUI, web-based, TUI, as
+well as CLI) to browse it. If you have your table data as a CSV, you can use the
+<prog:csv2sqlite> script from <pm:App::SQLiteUtils> to convert it to SQLite
+database.
+
+<https://sqlitebrowser.org>
+
+<http://sqlitestudio.pl>
+
+
+6) **Microsoft Excel**, **LibreOffice**, or other spreadsheet programs
+
+Yet another way to browse your table data interactively is to use a spreadsheet,
+which offers a rich way to view and manipulate data. You can generate a CSV from
+your table data; all spreadsheets support opening CSV files.
+
 _
     entries => [
         {
@@ -99,6 +119,10 @@ _
 
         {
             module => 'Text::Table::HTML::DataTables',
+        },
+
+        {
+            module => 'App::SQLiteUtils',
         },
     ],
 };
@@ -118,7 +142,7 @@ Acme::CPANModules::BrowsingTableInteractively - List of modules/tools for browsi
 
 =head1 VERSION
 
-This document describes version 0.007 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2022-04-15.
+This document describes version 0.009 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2023-06-15.
 
 =head1 DESCRIPTION
 
@@ -193,19 +217,41 @@ L<Text::Table::Any> for more formats to choose from) then pipe the output to
 it. At least with I<less> you can scroll horizontally or perform incremental
 searching (though not interactive filtering of rows).
 
+6) B<SQLite browser>, B<SQLiteStudio>, or other SQLite-based front-ends
+
+Another way to browse your table data interactively is to export it to SQLite
+database then use one of the many front-ends (desktop GUI, web-based, TUI, as
+well as CLI) to browse it. If you have your table data as a CSV, you can use the
+L<csv2sqlite> script from L<App::SQLiteUtils> to convert it to SQLite
+database.
+
+L<https://sqlitebrowser.org>
+
+L<http://sqlitestudio.pl>
+
+6) B<Microsoft Excel>, B<LibreOffice>, or other spreadsheet programs
+
+Yet another way to browse your table data interactively is to use a spreadsheet,
+which offers a rich way to view and manipulate data. You can generate a CSV from
+your table data; all spreadsheets support opening CSV files.
+
 =head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Tickit::Widget::Table> - table widget with support for scrolling/paging
+=item L<Tickit::Widget::Table>
 
 Author: L<TEAM|https://metacpan.org/author/TEAM>
 
-=item * L<Term::TablePrint> - Print a table to the terminal and browse it interactively.
+=item L<Term::TablePrint>
 
 Author: L<KUERBIS|https://metacpan.org/author/KUERBIS>
 
-=item * L<Text::Table::HTML::DataTables> - Generate HTML table with jQuery and DataTables plugin
+=item L<Text::Table::HTML::DataTables>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::SQLiteUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
@@ -256,6 +302,9 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Bro
 
 =head1 SEE ALSO
 
+Related lists: L<Acme::CPANModules::TextTable>,
+L<Acme::CPANModules::WorkingWithCSV>.
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -277,13 +326,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

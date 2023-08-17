@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostUnhideWorksheetColumnsRequest.name :   ,
-# PostUnhideWorksheetColumnsRequest.sheetName :   ,
-# PostUnhideWorksheetColumnsRequest.startColumn :   ,
-# PostUnhideWorksheetColumnsRequest.totalColumns :   ,
-# PostUnhideWorksheetColumnsRequest.width :   ,
-# PostUnhideWorksheetColumnsRequest.folder :   ,
-# PostUnhideWorksheetColumnsRequest.storageName :    
+# PostUnhideWorksheetColumnsRequest.name : The workbook name.  ,
+# PostUnhideWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostUnhideWorksheetColumnsRequest.startColumn : The begin column index to be operated.  ,
+# PostUnhideWorksheetColumnsRequest.totalColumns : Number of columns to be operated.  ,
+# PostUnhideWorksheetColumnsRequest.width : Gets and sets the column width in unit of characters.  ,
+# PostUnhideWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PostUnhideWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_unhide_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Unhide worksheet columns.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The begin column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'total_columns' => {
      	datatype => 'int',
      	base_name => 'totalColumns',
-     	description => '',
+     	description => 'Number of columns to be operated.',
      	format => '',
      	read_only => '',
      		},
      'width' => {
      	datatype => 'double',
      	base_name => 'width',
-     	description => '',
+     	description => 'Gets and sets the column width in unit of characters.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

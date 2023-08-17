@@ -6,7 +6,7 @@ use Scalar::Util;
 use Carp;
 
 # All modules in dist share a version
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 require X11::Xlib::Screen;
 require X11::Xlib::Colormap;
@@ -45,7 +45,10 @@ sub connection_fh {
 
    for (0 .. $display->screen_count - 1) { ... }
 
-Number of screens available on this display.
+Number of screens available on this display.  Note that this is an antiquated
+concept of a "screen" and is always C<1> on modern desktop systems, no matter
+how many monitors you have connected.  Adding support for the xrandr extension
+is a TODO.
 
 =head2 screen
 
@@ -229,6 +232,30 @@ sub flush              { shift->XFlush }
 sub flush_sync         { shift->XSync }
 sub flush_sync_discard { shift->XSync(1) }
 
+=head3 warp_pointer
+
+  $display->warp_pointer($dest_win, $dest_x, $dest_y);
+  $display->warp_pointer($dest_win, $dest_x, $dest_y, $src_win, $src_rect);
+
+Move the pointer to C<< ($dest_x,$dest_y) >> relative to C<$dest_win>, or relative to current
+position if C<$dest_win> is undef.  If the C<$src_> parameters are defined, the operation only
+proceeds if the pointer is currently within that rectangle of the source window.  If the width
+or height of the rectangle are zero, they are treated as the remaining width/height of the
+window beyond the (x,y).
+
+C<$src_rect> can be given as C<< [ $x, $y, $width, $height ] >> or an object with those
+attributes, such as L<X11::Xlib::XRectangle>.
+
+=cut
+
+sub warp_pointer {
+    my ($self, $dest_win, $dest_x, $dest_y, $src_win, $src_rect)= @_;
+    my ($src_x, $src_y, $src_width, $src_height)= !defined $src_rect? (0,0,0,0)
+        : ref $src_rect eq 'ARRAY'? @$src_rect
+        : ($src_rect->x, $src_rect->y, $src_rect->width, $src_rect->height);
+    X11::Xlib::XWarpPointer($self, $src_win, $dest_win, $src_x, $src_y, $src_width, $src_height, $dest_x, $dest_y);
+}
+
 =head3 fake_motion
 
   $display->fake_motion($screen, $x, $y, $send_delay = 10);
@@ -264,7 +291,7 @@ sub fake_key    { shift->XTestFakeKeyEvent(@_) }
   say $_ for $display->atom(1..50);
 
 This is a wrapper around L<XInternAtom|X11::Xlib/XInternAtom> and
-L<XGetAtomName|X11::Xlib/XGetAtomName> which operates on lits and returns
+L<XGetAtomName|X11::Xlib/XGetAtomName> which operates on lists and returns
 L<dualvar values|Scalar::Util/dualvar> that show a helpful string for debugging but still
 work in numeric contexts.  It only finds existing atoms, returning C<undef> for each element
 that was not found.
@@ -448,7 +475,7 @@ sub XCreateColormap {
   my $pix= $display->new_pixmap($drawable, $width, $height, $color_depth);
 
 Create a new L<Pixmap|X11::Xlib/Pixmap> on the server, and wrap it with a
-L<X11::Xlib::Pixmap> object to track its lifespan.  If the object does
+L<X11::Xlib::Pixmap> object to track its lifespan.  If the object goes
 out of scope it calls L<XFreePixmap|X11::Xlib/XFreePixmap>.
 
 C<$drawable>'s only purpose is to determine which screen to use, and so it
@@ -782,7 +809,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2021 by Michael Conrad
+Copyright (C) 2017-2023 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

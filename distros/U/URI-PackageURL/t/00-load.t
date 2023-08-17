@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 
 use_ok('URI::PackageURL');
+use_ok('URI::PackageURL::Util');
+use_ok('URI::PackageURL::CLI');
 
 done_testing();
 

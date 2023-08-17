@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -54,9 +54,7 @@ $loop->listen(
 
    on_listen_error => sub { die "Test failed early - $_[-1]" },
    on_resolve_error => sub { die "Test failed early - $_[-1]" },
-);
-
-wait_for { defined $port };
+)->get;
 
 my @local_uris = map { URI->new( "http://127.0.0.1:$port/page/$_" ) } 1 .. 2;
 

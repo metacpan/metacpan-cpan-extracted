@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230307181417;
+our $VERSION = 1.20230614174401;
 
 my $formatters = [
                 {
@@ -83,44 +83,44 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2252734", "San\-Pédro",
-"2252724", "Abobo\,\ Abidjan",
-"2252736", "Korhogo",
-"2252720", "Plateau\,\ Abidjan",
-"2252733", "Man",
-"22527222", "Abidjan\-sud",
-"2252723", "Banco\,\ Abidjan",
-"2252730", "Yamoussoukro",
-"2252134", "San\-Pédro",
-"2252534", "San\-Pédro",
-"2252124", "Abobo\,\ Abidjan",
+$areanames{en} = {"2252730", "Yamoussoukro",
+"2252721", "Abidjan\-sud",
 "2252524", "Abobo\,\ Abidjan",
-"2252133", "Man",
+"2252733", "Man",
+"2252134", "San\-Pédro",
+"2252735", "Abengourou",
 "2252536", "Korhogo",
+"2252530", "Yamoussoukro",
+"22527224", "Cocody\,\ Abidjan",
+"2252521", "Abidjan\-sud",
+"2252522", "Cocody\,\ Abidjan",
+"2252123", "Banco\,\ Abidjan",
+"2252724", "Abobo\,\ Abidjan",
 "2252120", "Plateau\,\ Abidjan",
 "2252533", "Man",
-"2252136", "Korhogo",
-"2252520", "Plateau\,\ Abidjan",
-"2252130", "Yamoussoukro",
-"2252123", "Banco\,\ Abidjan",
-"2252523", "Banco\,\ Abidjan",
-"2252530", "Yamoussoukro",
-"2252131", "Bouaké",
-"2252735", "Abengourou",
-"2252531", "Bouaké",
-"2252121", "Abidjan\-sud",
-"2252521", "Abidjan\-sud",
-"22527225", "Cocody\,\ Abidjan",
-"2252132", "Daloa",
-"2252532", "Daloa",
-"2252122", "Cocody\,\ Abidjan",
-"2252522", "Cocody\,\ Abidjan",
 "2252535", "Abengourou",
-"22527224", "Cocody\,\ Abidjan",
+"2252736", "Korhogo",
+"22527225", "Cocody\,\ Abidjan",
+"2252131", "Bouaké",
+"2252132", "Daloa",
+"2252534", "San\-Pédro",
+"2252732", "Daloa",
+"2252136", "Korhogo",
 "2252731", "Bouaké",
+"2252720", "Plateau\,\ Abidjan",
+"2252723", "Banco\,\ Abidjan",
+"2252124", "Abobo\,\ Abidjan",
 "2252135", "Abengourou",
-"2252721", "Abidjan\-sud",
-"2252732", "Daloa",};
+"2252133", "Man",
+"2252734", "San\-Pédro",
+"2252532", "Daloa",
+"2252531", "Bouaké",
+"2252520", "Plateau\,\ Abidjan",
+"22527222", "Abidjan\-sud",
+"2252122", "Cocody\,\ Abidjan",
+"2252121", "Abidjan\-sud",
+"2252523", "Banco\,\ Abidjan",
+"2252130", "Yamoussoukro",};
 $areanames{fr} = {};
 
     sub new {

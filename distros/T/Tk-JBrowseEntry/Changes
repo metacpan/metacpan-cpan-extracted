@@ -218,5 +218,30 @@ Revision history for "ptkftp".
       - Also fixed minor issue with the archaic "-colorstate" option.
 5.25  Fri Dec 2, 2022
       - Fix bug causing right-arrow list search in text field to always fail.
-      - Clarify -fixedlist focus behaviour & how a list can be set to both 
-      "fixed" and "bouncy" at the same time.
+      - Fix failure of setPalette to properly update the "-highlightcolor" in 
+      the text field.
+5.30  Sat Jun 24, 2022
+      - Fix entry-field up and down-arrow bindings to properly traverse the 
+      values in the listbox value list - wasn't always working properly 
+      particularly with the up-arrow option.
+      - Fix broken handling of hash-refs (name/value pairs) when used as 
+      the -choices list.
+      - Fix -listrelief option not accepting reconfiguration.
+      - Improve and clarify "Tab=KeepList" & "Tab=Popup" altbindings.  
+      KeepList will also now keep list popped up if <spacebar> used to select.
+      - Add "-tabcomplete => 3" option to just update the text field to 
+      what is selected in the listbox when tabbing off of it back to the text 
+      field (The other 2 tabcomplete options also do this).
+      - Tweak the button icons' height slightly to make the widget height 
+      consistant with standard text entry fields (Linux versions, as this was 
+      already correct on M$-Windows systems.
+      - Tweak widget frame width to make "fixed" listboxes more properly align 
+      in width with that of the text entry field width.
+      - Stop copying the active listbox item to the text field until the user 
+      actually selects it.
+      - Remove some redundant listbox activation code plus some other small 
+      code optimizations and cleanups.
+      - Fix a few more "use strict" nanny-warnings about undefined variable 
+      values (found or observed during coding and testing).  None of them 
+      were bugs (as Perl was already defaulting to zero or '' as needed).
+      - Some general pod doc. cleanups.

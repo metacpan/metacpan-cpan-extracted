@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_unlock' } = { 
-    	summary => '',
+    	summary => 'Unprotect password protected Excel file.',
         params => $params,
         returns => 'FilesResult',
     };

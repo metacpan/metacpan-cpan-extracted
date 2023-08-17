@@ -12,8 +12,9 @@ use threads; # we launch a thread for each watched tree to keep the logic simple
 use Thread::Queue;
 use Encode 'decode';
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 our $is_cygwin = $^O eq 'cygwin';
+our $bufsize = 65520;
 
 =head1 NAME
 
@@ -142,7 +143,7 @@ sub _unpack_file_notify_information( $buf ) {
 }
 
 sub _ReadDirectoryChangesW( $hDirectory, $watchSubTree, $filter ) {
-    my $buffer = "\0" x 65500;
+    my $buffer = "\0" x $bufsize;
     my $returnBufferSize = 0;
     my $r = ReadDirectoryChangesW(
         $hDirectory,
@@ -169,8 +170,8 @@ sub _ReadDirectoryChangesW( $hDirectory, $watchSubTree, $filter ) {
 sub _watcher($winpath,$orgpath,$hPath,$subtree,$queue) {
     my $running = 1;
     while($running) {
-        # 0x1b means 'DIR_NAME|FILE_NAME|LAST_WRITE|SIZE' = 2|1|0x10|8
-        my $res = _ReadDirectoryChangesW($hPath, $subtree, 0x1b);
+        # 0x1b means 'DIR_NAME|FILE_NAME|LAST_WRITE|SIZE|CHANGE_ATTRIBUTES' = 2|1|0x10|8|4
+        my $res = _ReadDirectoryChangesW($hPath, $subtree, 0x1f);
 
         if( ! defined $res ) {
             my $err = Win32::GetLastError();
@@ -351,6 +352,19 @@ a third, synthetic event is generated, C<renamed>.
       old_name => 'old-name.example',
       new_name => 'new-name.example',
   }
+
+=back
+
+=head1 GLOBAL VARIABLES
+
+=over 4
+
+=item C<$bufsize>
+
+  local $Filesys::Notify::Win32::ReadDirectoryChanges::bufsize = 1024*1024;
+
+This variable is the buffer for the directory changes that get read from
+Windows. The default size is 65520 bytes.
 
 =back
 

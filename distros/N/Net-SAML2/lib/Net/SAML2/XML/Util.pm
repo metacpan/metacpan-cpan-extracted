@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::XML::Util;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use XML::LibXML;
 
@@ -16,7 +16,7 @@ use base qw/Exporter/;
 # Export list - to allow fine tuning of export table
 @EXPORT_OK = qw( no_comments );
 
-# ABSTRACT: Net::SAML2::XML::Util - XML Util class
+# ABSTRACT: XML Util class
 
 
 
@@ -48,11 +48,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::XML::Util - Net::SAML2::XML::Util - XML Util class
+Net::SAML2::XML::Util - XML Util class
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Library to manage Sub Processes as Objects",
    "author" : [
       "Bodo (Hugo) Barwich <b.barwich@hotmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,12 +27,24 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
          }
       },
       "runtime" : {
          "requires" : {
+            "Data::Dump" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "JSON" : "0",
+            "Path::Tiny" : "0",
+            "YAML" : "0",
             "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -47,6 +59,6 @@
          "web" : "https://github.com/bodo-hugo-barwich/Process"
       }
    },
-   "version" : "v2.0.2",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

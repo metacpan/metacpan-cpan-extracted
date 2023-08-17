@@ -5,7 +5,7 @@ package MarpaX::Java::ClassFile::Role::Parser;
 
 # ABSTRACT: Parsing engine role for .class file parsing
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -601,7 +601,7 @@ MarpaX::Java::ClassFile::Role::Parser - Parsing engine role for .class file pars
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,10 @@
 Revision history for Perl module Sys::Binmode
 
-0.04
+0.05 Thu, 20 Jul 2023
+- Fix builds with MSVC.
+- Fix symlink test in recent Win32/Perl combos.
+
+0.04 Sun, 21 March 2021
 - This now handles the TO argument to send().
 - This now handles ioctl().
 - Document autodie incompatibility. :(

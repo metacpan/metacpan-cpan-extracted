@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostRenameWorksheetRequest.name :   ,
-# PostRenameWorksheetRequest.sheetName :   ,
-# PostRenameWorksheetRequest.newname :   ,
-# PostRenameWorksheetRequest.folder :   ,
-# PostRenameWorksheetRequest.storageName :    
+# PostRenameWorksheetRequest.name : The workbook name.  ,
+# PostRenameWorksheetRequest.sheetName : The worksheet name.  ,
+# PostRenameWorksheetRequest.newname : New worksheet name.  ,
+# PostRenameWorksheetRequest.folder : Original workbook folder.  ,
+# PostRenameWorksheetRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_rename_worksheet' } = { 
-    	summary => '',
+    	summary => 'Rename worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'newname' => {
      	datatype => 'string',
      	base_name => 'newname',
-     	description => '',
+     	description => 'New worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -20,6 +20,10 @@
 #include "newOP_CUSTOM.c.inc"
 #include "op_sibling_splice.c.inc"
 
+#if HAVE_PERL_VERSION(5,37,7)
+#  define HAVE_PL_INFIX_PLUGIN
+#endif
+
 #if HAVE_PERL_VERSION(5,32,0)
 #  define HAVE_OP_ISA
 #endif

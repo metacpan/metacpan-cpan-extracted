@@ -3,8 +3,14 @@ INSTALL.txt
 lib/Sys/Tlock.pm
 lib/Sys/Tlock/Config.pm
 MANIFEST			This list of files
+PERL.html
+PERL.md
 README.html
+README.md
 script/tlock
+t/tlock-1.t
+t/tlock-2.t
+t/tlock.conf
 tlock.conf
 META.yml
 META.json

@@ -127,8 +127,8 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				{ "machine@ge95142-vm1|FS|::SWAP::Partition@dm-1" [
-					label="SWAP\nDevice: /dev/vgdata/swap\nSize: 10.00 GiB\nFree: 9.89 GiB\nUsed: 117 MiB";
-					shape=rectangle;style=striped;fillcolor="pink;0.011452.2:green"
+					label="SWAP\nDevice: /dev/vgdata/swap\nSize: 10.00 GiB\nFree: 6.35 GiB\nUsed: 3.65 GiB";
+					shape=rectangle;style=striped;fillcolor="pink;0.365060.2:green"
 				]; }
 				subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/" {
 					style=filled;
@@ -136,245 +136,29 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 					fillcolor=lightgrey;
 					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 					{ "machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" [
-						label="/\nDevice: /dev/vgdata/root\next4\nSize: 29.4 GiB\nFree: 7.63 GiB\nUsed: 20.3 GiB";
-						shape=rectangle;style=striped;fillcolor="pink;0.691089.2:green;0.260016.2:orange"
+						label="/\nDevice: /dev/vgdata/root\next4\nSize: 29.4 GiB\nFree: 6.98 GiB\nUsed: 20.9 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.713433.2:green;0.237672.2:orange"
 					]; }
 					subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/" {
 						color=white;
 						fillcolor=white;
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" [
-								label="/sys (sysfs)";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys" {
-								color=white;
-								fillcolor=white;
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [
-									label="/sys/kernel/security (securityfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@30@/sys/fs/selinux" [
-									label="/sys/fs/selinux (selinuxfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@32@/sys/fs/cgroup" [
-									label="/sys/fs/cgroup (cgroup2)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@33@/sys/fs/pstore" [
-									label="/sys/fs/pstore (pstore)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@34@/sys/firmware/efi/efivars" [
-									label="/sys/firmware/efi/efivars (efivarfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@35@/sys/fs/bpf" [
-									label="/sys/fs/bpf (bpf)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@39@/sys/kernel/debug" [
-									label="/sys/kernel/debug (debugfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@40@/sys/kernel/tracing" [
-									label="/sys/kernel/tracing (tracefs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@41@/sys/kernel/config" [
-									label="/sys/kernel/config (configfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@42@/sys/fs/fuse/connections" [
-									label="/sys/fs/fuse/connections (fusectl)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::FS@FS@22@/proc" [
-								label="/proc (proc)";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc" {
-								color=white;
-								fillcolor=white;
-								subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc" {
-									style=filled;
-									color=lightgrey;
-									fillcolor=lightgrey;
-									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-									{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::FS@FS@36@/proc/sys/fs/binfmt_misc" [
-										label="/proc/sys/fs/binfmt_misc\nSource: systemd-1\nautofs";
-										shape=rectangle;style=striped;fillcolor="yellow"
-									]; }
-									subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::C@36@/proc/sys/fs/binfmt_misc" {
-										color=white;
-										fillcolor=white;
-										{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::C@36@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@105@/proc/sys/fs/binfmt_misc" [
-											label="/proc/sys/fs/binfmt_misc (binfmt_misc)";
-											shape=rectangle;style=striped;fillcolor="yellow"
-										]; }
-										label="";
-									}
-									label="";
-								}
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" [
-								label="/dev\nSource: udev\ndevtmpfs\nSize: 59.8 GiB\nFree: 59.8 GiB\nUsed: 0 B";
-								shape=rectangle;style=striped;fillcolor="green"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev" {
-								color=white;
-								fillcolor=white;
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@24@/dev/pts" [
-									label="/dev/pts (devpts)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@29@/dev/shm" [
-									label="/dev/shm\ntmpfs\nSize: 59.9 GiB\nFree: 59.9 GiB\nUsed: 0 B";
-									shape=rectangle;style=striped;fillcolor="green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@37@/dev/mqueue" [
-									label="/dev/mqueue (mqueue)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@38@/dev/hugepages" [
-									label="/dev/hugepages (hugetlbfs)";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" [
-								label="/run\ntmpfs\nSize: 12.0 GiB\nFree: 12.0 GiB\nUsed: 5.61 MiB";
-								shape=rectangle;style=striped;fillcolor="pink;0.000458.2:green"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run" {
-								color=white;
-								fillcolor=white;
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@31@/run/lock" [
-									label="/run/lock\ntmpfs\nSize: 5.00 MiB\nFree: 5.00 MiB\nUsed: 4.00 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000781.2:green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@43@/run/rpc_pipefs" [
-									label="/run/rpc_pipefs\nSource: sunrpc\nrpc_pipefs";
-									shape=rectangle;style=striped;fillcolor="yellow"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@238@/run/user/378721" [
-									label="/run/user/378721\ntmpfs\nSize: 12.0 GiB\nFree: 12.0 GiB\nUsed: 100 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000008.2:green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@437@/run/user/533781" [
-									label="/run/user/533781\ntmpfs\nSize: 12.0 GiB\nFree: 12.0 GiB\nUsed: 100 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000008.2:green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@472@/run/user/565525" [
-									label="/run/user/565525\ntmpfs\nSize: 12.0 GiB\nFree: 12.0 GiB\nUsed: 100 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000008.2:green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@489@/run/user/5000" [
-									label="/run/user/5000\ntmpfs\nSize: 12.0 GiB\nFree: 12.0 GiB\nUsed: 100 kiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.000008.2:green"
-								]; }
-								label="";
-							}
-							label="";
-						}
 						{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@93@/srv/scratch" [
-							label="/srv/scratch\nDevice: /dev/vgdata/scratch\next4\nSize: 4.92 TiB\nFree: 855 GiB\nUsed: 3.88 TiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.788001.2:green;0.169767.2:orange"
+							label="/srv/scratch\nDevice: /dev/vgdata/scratch\next4\nSize: 4.92 TiB\nFree: 45.1 GiB\nUsed: 4.67 TiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.948817.2:green;0.008950.2:orange"
 						]; }
 						{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@96@/home" [
-							label="/home\nDevice: /dev/vgdata/home\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.902870.2:green;0.051738.2:orange"
+							label="/home\nDevice: /dev/vgdata/home\next4\nSize: 29.4 GiB\nFree: 4.29 GiB\nUsed: 23.8 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.808934.2:green;0.145674.2:orange"
 						]; }
 						{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@99@/tmp" [
 							label="/tmp\nDevice: /dev/vgdata/home
-Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
-							shape=rectangle;style=striped;fillcolor="pink;0.902870.2:green;0.051738.2:orange"
+Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 4.29 GiB\nUsed: 23.8 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.808934.2:green;0.145674.2:orange"
 						]; }
 						{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@102@/boot/efi" [
 							label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 92.5 MiB\nFree: 89.2 MiB\nUsed: 3.38 MiB";
 							shape=rectangle;style=striped;fillcolor="pink;0.036487.2:green"
 						]; }
-						{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@574@/srv/cifs" [
-							label="/srv/cifs\nSource: /etc/auto.smbkrb\nautofs";
-							shape=rectangle;style=striped;fillcolor="yellow"
-						]; }
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::FS@FS@591@/srv/net" [
-								label="/srv/net\nSource: /etc/auto.nfs4\nautofs";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::C@591@/srv/net" {
-								color=white;
-								fillcolor=white;
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::C@591@/srv/net|FS::MP::FS@FS@438@/srv/net/ngs-stockage.example.com" [
-									label="/srv/net/ngs-stockage.example.com\nSource: ngs-stockage.example.com:/\nnfs4\nSize: 1.81 PiB\nFree: 189 TiB\nUsed: 1.63 PiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.898229.2:green"
-								]; }
-								label="";
-							}
-							label="";
-						}
-						subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs" {
-							style=filled;
-							color=lightgrey;
-							fillcolor=lightgrey;
-							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-							{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::FS@FS@608@/srv/shared-gfs" [
-								label="/srv/shared-gfs\nSource: /etc/auto.ngs-glfs\nautofs";
-								shape=rectangle;style=striped;fillcolor="yellow"
-							]; }
-							subgraph "cluster_machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs" {
-								color=white;
-								fillcolor=white;
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@571@/srv/shared-gfs/ge-r0" [
-									label="/srv/shared-gfs/ge-r0\nSource: ge95142:/gvol-ge-r0\nfuse.glusterfs\nSize: 3.09 TiB\nFree: 3.02 TiB\nUsed: 66.8 GiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.021072.2:green;0.977654.2:orange"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@626@/srv/shared-gfs/ge-r1" [
-									label="/srv/shared-gfs/ge-r1\nSource: ge95142:/gvol-ge-r1\nfuse.glusterfs\nSize: 3.00 TiB\nFree: 2.95 TiB\nUsed: 52.0 GiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.016951.2:green"
-								]; }
-								{ "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@678@/srv/shared-gfs/san-partage" [
-									label="/srv/shared-gfs/san-partage\nSource: di6181su:/gvol-san-partage\nfuse.glusterfs\nSize: 20.0 TiB\nFree: 3.48 TiB\nUsed: 16.5 TiB";
-									shape=rectangle;style=striped;fillcolor="pink;0.826010.2:green"
-								]; }
-								label="";
-							}
-							label="";
-						}
 						label="";
 					}
 					label="";
@@ -396,58 +180,6 @@ Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
 			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch"
 			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda1" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch"
 			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@swap"
-			// Links from FS::MP::FS@FS@21@/sys
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" [style=invis]
-			// Links from FS::MP::FS@FS@28@/sys/kernel/security
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [style=invis]
-			// Links from FS::MP::FS@FS@30@/sys/fs/selinux
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@30@/sys/fs/selinux" [style=invis]
-			// Links from FS::MP::FS@FS@32@/sys/fs/cgroup
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@32@/sys/fs/cgroup" [style=invis]
-			// Links from FS::MP::FS@FS@33@/sys/fs/pstore
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@33@/sys/fs/pstore" [style=invis]
-			// Links from FS::MP::FS@FS@34@/sys/firmware/efi/efivars
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@34@/sys/firmware/efi/efivars" [style=invis]
-			// Links from FS::MP::FS@FS@35@/sys/fs/bpf
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@35@/sys/fs/bpf" [style=invis]
-			// Links from FS::MP::FS@FS@39@/sys/kernel/debug
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@39@/sys/kernel/debug" [style=invis]
-			// Links from FS::MP::FS@FS@40@/sys/kernel/tracing
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@40@/sys/kernel/tracing" [style=invis]
-			// Links from FS::MP::FS@FS@41@/sys/kernel/config
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@41@/sys/kernel/config" [style=invis]
-			// Links from FS::MP::FS@FS@42@/sys/fs/fuse/connections
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@42@/sys/fs/fuse/connections" [style=invis]
-			// Links from FS::MP::FS@FS@22@/proc
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::FS@FS@22@/proc" [style=invis]
-			// Links from FS::MP::FS@FS@36@/proc/sys/fs/binfmt_misc
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::FS@FS@22@/proc" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::FS@FS@36@/proc/sys/fs/binfmt_misc" [style=invis]
-			// Links from FS::MP::FS@FS@105@/proc/sys/fs/binfmt_misc
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::FS@FS@36@/proc/sys/fs/binfmt_misc" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@36@/proc/sys/fs/binfmt_misc|::C@36@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@105@/proc/sys/fs/binfmt_misc" [style=invis]
-			// Links from FS::MP::FS@FS@23@/dev
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" [style=invis]
-			// Links from FS::MP::FS@FS@24@/dev/pts
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@24@/dev/pts" [style=invis]
-			// Links from FS::MP::FS@FS@29@/dev/shm
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@29@/dev/shm" [style=invis]
-			// Links from FS::MP::FS@FS@37@/dev/mqueue
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@37@/dev/mqueue" [style=invis]
-			// Links from FS::MP::FS@FS@38@/dev/hugepages
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@38@/dev/hugepages" [style=invis]
-			// Links from FS::MP::FS@FS@25@/run
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" [style=invis]
-			// Links from FS::MP::FS@FS@31@/run/lock
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@31@/run/lock" [style=invis]
-			// Links from FS::MP::FS@FS@43@/run/rpc_pipefs
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@43@/run/rpc_pipefs" [style=invis]
-			// Links from FS::MP::FS@FS@238@/run/user/378721
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@238@/run/user/378721" [style=invis]
-			// Links from FS::MP::FS@FS@437@/run/user/533781
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@437@/run/user/533781" [style=invis]
-			// Links from FS::MP::FS@FS@472@/run/user/565525
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@472@/run/user/565525" [style=invis]
-			// Links from FS::MP::FS@FS@489@/run/user/5000
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@489@/run/user/5000" [style=invis]
 			// Links from FS::MP::FS@FS@93@/srv/scratch
 			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@93@/srv/scratch" [style=invis]
 			// Links from FS::MP::FS@FS@96@/home
@@ -456,20 +188,6 @@ Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
 			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@99@/tmp" [style=invis]
 			// Links from FS::MP::FS@FS@102@/boot/efi
 			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@102@/boot/efi" [style=invis]
-			// Links from FS::MP::FS@FS@574@/srv/cifs
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@574@/srv/cifs" [style=invis]
-			// Links from FS::MP::FS@FS@591@/srv/net
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::FS@FS@591@/srv/net" [style=invis]
-			// Links from FS::MP::FS@FS@438@/srv/net/ngs-stockage.example.com
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::FS@FS@591@/srv/net" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@591@/srv/net|::C@591@/srv/net|FS::MP::FS@FS@438@/srv/net/ngs-stockage.example.com" [style=invis]
-			// Links from FS::MP::FS@FS@608@/srv/shared-gfs
-			"machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::FS@FS@608@/srv/shared-gfs" [style=invis]
-			// Links from FS::MP::FS@FS@571@/srv/shared-gfs/ge-r0
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::FS@FS@608@/srv/shared-gfs" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@571@/srv/shared-gfs/ge-r0" [style=invis]
-			// Links from FS::MP::FS@FS@626@/srv/shared-gfs/ge-r1
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::FS@FS@608@/srv/shared-gfs" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@626@/srv/shared-gfs/ge-r1" [style=invis]
-			// Links from FS::MP::FS@FS@678@/srv/shared-gfs/san-partage
-			"machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::FS@FS@608@/srv/shared-gfs" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP@608@/srv/shared-gfs|::C@608@/srv/shared-gfs|FS::MP::FS@FS@678@/srv/shared-gfs/san-partage" [style=invis]
 			// Links for Partition::GPT@sda
 			// TARGET LINK: ge95142-vm1 5497558138880 sda "machine@ge95142-vm1|Partition::GPT@sda"
 			// Links for Partition::Table
@@ -509,42 +227,6 @@ Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
 			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@root" -> "machine@ge95142-vm1|FS|::MP@27@/|::FS@FS@27@/"
 			// Links for FS::MP::FS@FS@27@/
 			// Links for FS::MP::C@27@/
-			// Links for FS::MP@21@/sys
-			// Links for FS::MP::FS@FS@21@/sys
-			// Links for FS::MP::C@21@/sys
-			// Links for FS::MP::FS@FS@28@/sys/kernel/security
-			// Links for FS::MP::FS@FS@30@/sys/fs/selinux
-			// Links for FS::MP::FS@FS@32@/sys/fs/cgroup
-			// Links for FS::MP::FS@FS@33@/sys/fs/pstore
-			// Links for FS::MP::FS@FS@34@/sys/firmware/efi/efivars
-			// Links for FS::MP::FS@FS@35@/sys/fs/bpf
-			// Links for FS::MP::FS@FS@39@/sys/kernel/debug
-			// Links for FS::MP::FS@FS@40@/sys/kernel/tracing
-			// Links for FS::MP::FS@FS@41@/sys/kernel/config
-			// Links for FS::MP::FS@FS@42@/sys/fs/fuse/connections
-			// Links for FS::MP@22@/proc
-			// Links for FS::MP::FS@FS@22@/proc
-			// Links for FS::MP::C@22@/proc
-			// Links for FS::MP@36@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::FS@FS@36@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::C@36@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP::FS@FS@105@/proc/sys/fs/binfmt_misc
-			// Links for FS::MP@23@/dev
-			// Links for FS::MP::FS@FS@23@/dev
-			// Links for FS::MP::C@23@/dev
-			// Links for FS::MP::FS@FS@24@/dev/pts
-			// Links for FS::MP::FS@FS@29@/dev/shm
-			// Links for FS::MP::FS@FS@37@/dev/mqueue
-			// Links for FS::MP::FS@FS@38@/dev/hugepages
-			// Links for FS::MP@25@/run
-			// Links for FS::MP::FS@FS@25@/run
-			// Links for FS::MP::C@25@/run
-			// Links for FS::MP::FS@FS@31@/run/lock
-			// Links for FS::MP::FS@FS@43@/run/rpc_pipefs
-			// Links for FS::MP::FS@FS@238@/run/user/378721
-			// Links for FS::MP::FS@FS@437@/run/user/533781
-			// Links for FS::MP::FS@FS@472@/run/user/565525
-			// Links for FS::MP::FS@FS@489@/run/user/5000
 			// Links for FS::MP::FS@FS@93@/srv/scratch
 			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@93@/srv/scratch"
 			// Links for FS::MP::FS@FS@93@/srv/scratch
@@ -557,17 +239,6 @@ Subdir: /tmp\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
 			// Links for FS::MP::FS@FS@102@/boot/efi
 			"machine@ge95142-vm1|Partition::GPT@sdb":"1" -> "machine@ge95142-vm1|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@102@/boot/efi"
 			// Links for FS::MP::FS@FS@102@/boot/efi
-			// Links for FS::MP::FS@FS@574@/srv/cifs
-			// Links for FS::MP@591@/srv/net
-			// Links for FS::MP::FS@FS@591@/srv/net
-			// Links for FS::MP::C@591@/srv/net
-			// Links for FS::MP::FS@FS@438@/srv/net/ngs-stockage.example.com
-			// Links for FS::MP@608@/srv/shared-gfs
-			// Links for FS::MP::FS@FS@608@/srv/shared-gfs
-			// Links for FS::MP::C@608@/srv/shared-gfs
-			// Links for FS::MP::FS@FS@571@/srv/shared-gfs/ge-r0
-			// Links for FS::MP::FS@FS@626@/srv/shared-gfs/ge-r1
-			// Links for FS::MP::FS@FS@678@/srv/shared-gfs/san-partage
 			// Links for Libvirt Virtual Machines
 		label="ge95142-vm1";
 	}

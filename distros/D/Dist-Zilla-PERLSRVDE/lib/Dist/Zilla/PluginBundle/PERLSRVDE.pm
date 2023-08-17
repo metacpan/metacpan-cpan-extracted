@@ -7,7 +7,7 @@ use v5.24;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 
 use namespace::autoclean;
 
@@ -25,7 +25,7 @@ use Dist::Zilla::Plugin::OurPkgVersion;
 use Dist::Zilla::Plugin::PodWeaver;
 use Dist::Zilla::Plugin::Git::Contributors;
 use Dist::Zilla::Plugin::PodSyntaxTests;
-use Dist::Zilla::Plugin::PodCoverageTests;
+use Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable;
 use Dist::Zilla::Plugin::Test::NoTabs;
 use Dist::Zilla::Plugin::Test::NoBOM;
 use Dist::Zilla::Plugin::Test::Perl::Critic;
@@ -115,6 +115,48 @@ has 'bugtracker' => (
     },
 );
 
+has 'pod_class' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub {
+        my $pl = $_[0]->payload;
+        exists $pl->{pod_class} ? $pl->{pod_class} : 'Pod::Coverage::TrustPod';
+    },
+);
+
+has 'pod_skip' => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub {
+        my $pl = $_[0]->payload;
+        exists $pl->{pod_skip} ?
+               ref $pl->{pod_skip} ? $pl->{pod_skip} : [ $pl->{pod_skip} ]
+        : [];
+    },
+);
+
+has 'pod_trustme' => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub {
+        my $pl = $_[0]->payload;
+        exists $pl->{pod_trustme} ?
+               ref $pl->{pod_trustme} ? $pl->{pod_trustme} : [ $pl->{pod_trustme} ]
+        : [];
+    },
+);
+
+has 'pod_also_private' => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub {
+        my $pl = $_[0]->payload;
+        exists $pl->{pod_also_private} ?
+               ref $pl->{pod_also_private} ? $pl->{pod_also_private} : [ $pl->{pod_also_private} ]
+        : [];
+    },
+);
+
 has 'fake_release' => (
     is      => 'ro',
     isa     => 'Bool',
@@ -128,12 +170,45 @@ has 'fake_release' => (
     },
 );
 
+has exclude_from_basic => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    lazy    => 1,
+    default => sub {
+        my $pl = $_[0]->payload;
+        my $exclude = $pl->{exclude_from_basic};
+        $exclude ?
+            ref $exclude ? $exclude : [ $exclude ]
+            : []
+    },
+);
+
+sub mvp_multivalue_args {
+    return qw( pod_skip pod_trustme pod_also_private exclude_from_basic );
+}
+
 sub configure {
     my ($self) = @_;
 
-    my @remove_from_basic;
+    my %remove_from_basic;
     if ( $self->fake_release ) {
-        push @remove_from_basic, 'UploadToCPAN';
+        $remove_from_basic{UploadToCPAN}++;
+    }
+
+    for my $exclude ( @{ $self->exclude_from_basic || [] } ) {
+        $remove_from_basic{$exclude}++;
+    }
+
+    my %pod_coverage_opts;
+    for my $opt_name ( qw/class skip trustme also_private/ ) {
+        my $method = $self->can('pod_' . $opt_name);
+        next if !$method;
+
+        my $value = $self->$method();
+        next if !$value;
+        next if ref $value && !@{ $value };
+
+        $pod_coverage_opts{$opt_name} = $value;
     }
 
     $self->add_plugins(
@@ -158,9 +233,11 @@ sub configure {
                 include_authors => 1,
             },
         ],
+        [
+        'Test::Pod::Coverage::Configurable' => \%pod_coverage_opts,
+        ],
         qw/
             PodSyntaxTests
-            PodCoverageTests
 
             Test::NoTabs
             Test::NoBOM
@@ -176,7 +253,7 @@ sub configure {
     $self->add_bundle(
         '@Filter' => {
             '-bundle' => '@Basic',
-            '-remove' => [ 'Readme', @remove_from_basic ],
+            '-remove' => [ 'Readme', 'PodCoverageTest', sort keys %remove_from_basic ],
         },
     );
 
@@ -299,7 +376,7 @@ Dist::Zilla::PluginBundle::PERLSRVDE - The plugin bundle we use at Perl-Services
 
 =head1 VERSION
 
-version 1.0.1
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -349,7 +426,7 @@ It is roughly equivalent to the following dist.ini:
     include_authors = 1
     
     [PodSyntaxTests]
-    [PodCoverageTests]
+    [Test::Pod::Coverage::Configurable]
     [Test::NoTabs]
     [Test::NoBOM]
     [Test::Perl::Critic]
@@ -376,7 +453,30 @@ These options can be used:
 
 =item * repository_type
 
+This is used to generate the links to the repository and bugtracker (if bugtracker isn't set).
+
+Valid values:
+
+=over 4
+
+=item * github
+
+If you host your project on github.com
+
+=item * gitlab
+
+If you host your project on gitlab.com
+
+=item * internal
+
+If you host your project somewhere else.
+
+=back
+
 =item * repository_path
+
+The path of the repository. For this project it is I<perlservices/Dist-Zilla-PERLSRVDE>. The path is used
+to generate the links to the repository and bugtracker.
 
 =item * internal_type
 
@@ -385,6 +485,32 @@ These options can be used:
 =item * bugtracker
 
 =item * fake_release
+
+=item * exclude_from_basic
+
+List plugins that should be removed from the L<Dist::Zilla::PluginBundle::Basic|@Basic> plugin bundle.
+
+=back
+
+These options are used to configure L<Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable>:
+
+=over 4
+
+=item * pod_class
+
+(see L<Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable/class>)
+
+=item * pod_skip
+
+(see L<Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable/skip>)
+
+=item * pod_trustme
+
+(see L<Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable/trustme>)
+
+=item * pod_also_private
+
+(see L<Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable/also_private>)
 
 =back
 

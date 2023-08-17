@@ -28,6 +28,6 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Corion/HTML-Selector-XPath.git
-version: '0.26'
+version: '0.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

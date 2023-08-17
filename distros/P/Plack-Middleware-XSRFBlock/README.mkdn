@@ -4,7 +4,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 # VERSION
 
-version 0.0.17
+version 0.0.19
 
 # SYNOPSIS
 
@@ -299,7 +299,7 @@ Chisel <chisel@chizography.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Chisel Wright.
+This software is copyright (c) 2023 by Chisel Wright.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -307,6 +307,7 @@ the same terms as the Perl 5 programming language system itself.
 # CONTRIBUTORS
 
 - Andrey Khozov <andrey@rydlab.ru>
+- Ashley Pond V <ashley.pond.v@gmail.com>
 - Chisel <chisel.wright@net-a-porter.com>
 - Daniel Perrett <dp13@sanger.ac.uk>
 - Gianni Ceccarelli <dakkar@thenautilus.net>

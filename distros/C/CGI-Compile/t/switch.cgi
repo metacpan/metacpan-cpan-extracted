@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Switch;
+use lib 't';
+use SimpleFilter;
 
-switch (42) {
-    case 42 { print "switch works\n" }
-}
+tnirp "filter works\n";

@@ -1,2 +1,10 @@
+0.02 2023-07-21
+    * Support other output filename formats in duplicate detection
+    * Better stale recording detection
+    * More caching to hit the network less often
+    * By default, record lower resolution video
+    * Fix prerequisites in META.*
+    * Various test suite updates
+
 0.01 2022-03-08
     * Released on an unsuspecting world

@@ -1,0 +1,22 @@
+.editorconfig
+bin/perl-distrolint
+Build.PL
+Changes
+lib/App/perl/distrolint.pm
+lib/App/perl/distrolint/Check/Editorconfig.pm
+lib/App/perl/distrolint/Check/HardTabs.pm
+lib/App/perl/distrolint/Check/POD.pm
+lib/App/perl/distrolint/Check/StrictAndWarnings.pm
+lib/App/perl/distrolint/Check/Unimport.pm
+lib/App/perl/distrolint/Check/UseTest2.pm
+lib/App/perl/distrolint/Check/UseVERSION.pm
+lib/App/perl/distrolint/Check/VersionVar.pm
+lib/App/perl/distrolint/CheckRole/EachFile.pm
+lib/App/perl/distrolint/CheckRole/TreeSitterPerl.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/99pod.t

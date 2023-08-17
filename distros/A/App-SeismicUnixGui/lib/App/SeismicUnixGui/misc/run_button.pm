@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::run_button;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: run_button.pm
+ PERL PERL PROGRAM NAME: run_button.pm
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 16 2018 
 

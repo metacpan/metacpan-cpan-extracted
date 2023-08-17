@@ -72,13 +72,11 @@ sub from_col_by_col {
                 if ( ! $col_count ) {
                     return;
                 }
-                $col_names = [ map { 'col_' . $_ } 1 .. $col_count ];
-                my $col_number = 0;
-                my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$col_names ];
+                my $fields = [ map { [ $_, '' ] } 1 .. $col_count ];
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => 'Column names:', auto_up => 2, confirm => $confirm, back => $back . '   ' }
+                    { info => $info, prompt => 'Column names:', confirm => $confirm, back => $back . '   ' }
                 );
                 if ( ! $form ) {
                     next COL_COUNT;
@@ -89,7 +87,7 @@ sub from_col_by_col {
             }
         }
         else {
-            $col_names = $sql->{insert_into_cols};
+            $col_names = $sql->{insert_col_names};
         }
         my $default;
 
@@ -127,7 +125,7 @@ sub from_col_by_col {
                     }
                 }
                 else {
-                    $sql->{insert_into_args} = $aoa;
+                    $sql->{insert_args} = $aoa;
                     return 1;
                 }
             }
@@ -137,7 +135,7 @@ sub from_col_by_col {
                 # Fill_form
                 my $data = $tf->fill_form(
                     $fields,
-                    { info => $info, auto_up => 1, confirm => $confirm, back => $back . '   ', prompt => 'Enter Data:' }
+                    { info => $info, confirm => $confirm, back => $back . '   ', prompt => 'Enter Data:' }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $data ) {
@@ -221,7 +219,7 @@ sub __new_search_dir {
     my $default_dir = $sf->{d}{default_search_dir} // $sf->{i}{home_dir};
     # Choose
     my $dir = $tu->choose_a_directory(
-        { init_dir => $default_dir, decoded => 1, clear_screen => 1 }
+        { init_dir => $default_dir, decoded => 1, clear_screen => 1, confirm => '-OK-', back => '<<' }
     );
     if ( $dir ) {
         $sf->{d}{default_search_dir} = $dir;

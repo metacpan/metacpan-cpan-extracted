@@ -1,5 +1,8 @@
 Revision history for Perl extension Proc::ProcessTable.
 
+0.636 2023-06-23
+  - Fix compilation with MinGW32 runtime (redefine WINVER if too low)
+
 0.635 2023-05-08
   - Do not try to scan /dev/.lxd-mounts
 

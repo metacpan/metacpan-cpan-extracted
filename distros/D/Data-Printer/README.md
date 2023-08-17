@@ -1,7 +1,6 @@
 Data::Printer
 =============
 
-[![Build status](https://travis-ci.org/garu/Data-Printer.svg?branch=master)](https://travis-ci.org/garu/Data-Printer)
 [![Coverage Status](https://coveralls.io/repos/garu/Data-Printer/badge.png)](https://coveralls.io/r/garu/Data-Printer)
 [![CPAN version](https://badge.fury.io/pl/Data-Printer.png)](http://badge.fury.io/pl/Data-Printer)
 
@@ -104,7 +103,7 @@ bugs and wishlists :)
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright (C) 2011-2021 Breno G. de Oliveira
+Copyright (C) 2011-2023 Breno G. de Oliveira
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

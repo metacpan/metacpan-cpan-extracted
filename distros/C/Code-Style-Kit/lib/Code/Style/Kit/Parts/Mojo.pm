@@ -1,7 +1,7 @@
 package Code::Style::Kit::Parts::Mojo;
 use strict;
 use warnings;
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: Mojo-based OO
 
 
@@ -50,7 +50,7 @@ Code::Style::Kit::Parts::Mojo - Mojo-based OO
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

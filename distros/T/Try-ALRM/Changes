@@ -43,3 +43,7 @@ Revision history for Perl extension Try::ALRM.
 0.7  Tue Nov 29 11:00:00 2022
         - updated POD, mainly to add 8 tiny reindeer at the
           end
+
+0.8  Tue Jul 26 11:05:12 2022
+        - fixed mispeeling in error message
+        - maintenance release, no functional changes

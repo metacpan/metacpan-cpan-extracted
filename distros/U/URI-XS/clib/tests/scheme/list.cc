@@ -1,7 +1,7 @@
 #include "../test.h"
 
 static void test (const URISP& uri, uint16_t port, bool secure, string friend_scheme = "") {
-    SECTION(uri->scheme()) {
+    SECTION(std::string(uri->scheme().c_str())) {
         char sign = friend_scheme ? friend_scheme[0] : 0;
         friend_scheme.erase(0, 1);
 

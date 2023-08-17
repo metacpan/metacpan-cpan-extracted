@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::xwigb;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  XWIGB - X WIGgle-trace plot of f(x1,x2) via Bitmap			
+ PERL PROGRAM NAME:  XWIGB - X WIGgle-trace plot of f(x1,x2) via Bitmap			
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.10.1
+    Version v3.11.1
 
 SYNOPSIS
         use Regexp::Pattern::License;
@@ -252,35 +252,63 @@ PATTERNS
 
         *Since v3.1.92.*
 
-    *   or_at_option
-
-        *Since v3.1.92.*
-
     *   usage_rfn
 
         *Since v3.2.0.*
 
     *   version
 
-        *Since v3.1.92.*
+        Optionally provides the following numbered and named captures:
+
+            "Under GPL, v2 or later of the license."
+                      [                          ]  # -> $&
+                         I                          # -> $1, $-{version_number}
+                           [      ]                 # -> $2, $-{version_later}
+
+            "Under version 2 or 3 only of the GPL."
+                  [                      ]  # -> $&
+                           I                # -> $1, $-{version_number}
+                                I           # -> $3, $-{version_number_2}
+                                  [  ]      # -> $4, $-{version_only}
+                                       []   # -> $5, $-{version_of}
+
+        *Captures stable since v3.11.0.*
 
     *   version_later
 
-    *   version_later_paragraph
+        Optionally provides the following numbered and named captures:
 
-    *   version_later_postfix
+            "Under GPLv2, or later of the license."
+                        [        ]  # -> $&
+                          [      ]  # -> $1, $-{version_later}
 
-    *   version_number
-
-    *   version_number_suffix
-
-    *   version_only
-
-    *   version_prefix
+        *Captures stable since v3.11.0.*
 
     *   version_numberstring
 
-        *Since v3.1.92.*
+        Optionally provides the following numbered and named captures:
+
+            "Under GPL, v2 or later of the license."
+                      [   ]  # -> $&
+                         I   # -> $1, $-{version_number}
+
+            "Under version 2 or 3 only of the GPL."
+                   [        ]  # -> $&
+                           I   # -> $1, $-{version_number}
+
+        *Since v3.1.92.* *Captures stable since v3.11.0.*
+
+    *   version_only
+
+        Optionally provides the following numbered and named captures:
+
+            "Under GPL version 2 only of the license."
+                                 [  ]  # -> $&
+                                 [  ]  # -> $1, $-{version_only}
+
+        *Captures stable since v3.11.0.*
+
+    *   version_prefix
 
   Single licenses
     Patterns each covering a single license.
@@ -1919,6 +1947,26 @@ STRUCTURE
   OBSOLETE OBJECTS
     License objects obsoleted by improved coverage of other objects, and
     provided only as dummy objects.
+
+    *   or_at_option
+
+        *Since v3.11.0.*
+
+    *   version_later_paragraph
+
+        *Since v3.11.0.*
+
+    *   version_later_postfix
+
+        *Since v3.11.0.*
+
+    *   version_number
+
+        *Since v3.11.0.*
+
+    *   version_number_suffix
+
+        *Since v3.11.0.*
 
     *   python
 

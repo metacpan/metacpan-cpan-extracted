@@ -44,7 +44,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef
 	  },
@@ -57,13 +58,15 @@ my $response = {
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifier' => 40,
 	    'NodeId_identifierType' => 0,
-	    'NodeId_namespaceIndex' => 0
+	    'NodeId_namespaceIndex' => 0,
+	    'NodeId_print' => "i=40",
 	  },
 	  'ReferenceDescription_typeDefinition' => {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifierType' => 0,
 	      'NodeId_identifier' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=0",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef,
 	    'ExpandedNodeId_serverIndex' => 0
@@ -77,7 +80,8 @@ my $response = {
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifier' => 35,
 	    'NodeId_identifierType' => 0,
-	    'NodeId_namespaceIndex' => 0
+	    'NodeId_namespaceIndex' => 0,
+	    'NodeId_print' => "i=35",
 	  },
 	  'ReferenceDescription_typeDefinition' => {
 	    'ExpandedNodeId_serverIndex' => 0,
@@ -85,7 +89,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    }
 	  },
 	  'ReferenceDescription_browseName' => {
@@ -97,7 +102,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 85,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=85",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef
 	  },
@@ -116,7 +122,8 @@ my $response = {
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifierType' => 0,
 	    'NodeId_identifier' => 35,
-	    'NodeId_namespaceIndex' => 0
+	    'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=35",
 	  },
 	  'ReferenceDescription_typeDefinition' => {
 	    'ExpandedNodeId_serverIndex' => 0,
@@ -124,7 +131,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    }
 	  },
 	  'ReferenceDescription_isForward' => 1,
@@ -139,7 +147,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 86,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=86",
 	    }
 	  }
 	},
@@ -148,7 +157,8 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_namespaceIndex' => 0,
 	      'NodeId_identifier' => 87,
-	      'NodeId_identifierType' => 0
+	      'NodeId_identifierType' => 0,
+	      'NodeId_print' => "i=87",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef,
 	    'ExpandedNodeId_serverIndex' => 0
@@ -164,14 +174,16 @@ my $response = {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    },
 	    'ExpandedNodeId_serverIndex' => 0
 	  },
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_namespaceIndex' => 0,
 	    'NodeId_identifierType' => 0,
-	    'NodeId_identifier' => 35
+	    'NodeId_identifier' => 35,
+	    'NodeId_print' => "i=35",
 	  },
 	  'ReferenceDescription_browseName' => {
 	    'QualifiedName_name' => 'Views',
@@ -208,7 +220,8 @@ my $response = {
 	'ExtensionObject_content_typeId' => {
 	  'NodeId_identifier' => 0,
 	  'NodeId_identifierType' => 0,
-	  'NodeId_namespaceIndex' => 0
+	  'NodeId_namespaceIndex' => 0,
+	  'NodeId_print' => "i=0",
 	},
 	'ExtensionObject_content_body' => undef,
       },

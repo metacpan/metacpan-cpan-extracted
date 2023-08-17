@@ -1,0 +1,96 @@
+=encoding utf8
+
+=head1 NAME
+
+pds_71.db - larger database with planar difference set samples
+
+=head1 VERSION
+
+This is version 3.0 of the database, created on Jan 03, 2023.
+
+=head1 DESCRIPTION
+
+This file is a slightly larger sample database only used for testing.
+
+It contains 71 cyclic planar difference set planes with orders ranging
+from 2 to 257.  The sample sets are generated from Conway polynomials.
+Reference sets and space metadata are omitted to facilitate testing
+their absence.
+
+=head1 FILE FORMAT
+
+SQLite 3.x database.
+
+=head1 SCHEMA
+
+  CREATE TABLE difference_set (
+    order_      integer NOT NULL PRIMARY KEY,
+    base        integer NOT NULL,
+    ref_std     integer NOT NULL,
+    ref_lex     integer NOT NULL,
+    ref_gap     integer NOT NULL,
+    delta_main  blob    NOT NULL
+  );
+
+  CREATE TABLE difference_set_space (
+    order_      integer NOT NULL PRIMARY KEY,
+    mul_radix   integer NOT NULL,
+    mul_depth   integer NOT NULL,
+    rot_radices blob    NOT NULL,
+    rot_depths  blob    NOT NULL
+  );
+
+  CREATE TABLE database_version (
+    table_name varchar NOT NULL PRIMARY KEY,
+    major      integer NOT NULL,
+    minor      integer NOT NULL
+  );
+
+=head1 DATA REPRESENTATION
+
+If I<D = { d_1, d_2, ..., d_k } (mod m)> is a canonical cyclic planar
+difference set of order I<k - 1> with I<d_1 E<8801> 0> and I<d_2 E<8801>
+1 (mod m)>, and I<M = { m_1, m_2, ..., m_n } (mod m)> is the set of
+main elements of its plane, I<delta_main> is a sequence of I<m> numeric
+values packed in C<'w*'> format, calculated as differences of consecutive
+residue values of I<M> starting with I<m_1>, I<m_2 - m_1>, I<m_3 - m_2>,
+... up to I<m_n - m_(n-1)>.  I<D> can be recovered from I<M> by adding
+derived and fill elements.
+
+In addition to an arbitrary sample the database can hold various types of
+reference sets for each order.  They are encoded by a rotation value with
+respect to the sample set.  If a standard set, a lexically minimal set,
+or a top-to-bottom lexically minimal set are known, nonzero I<ref_std>,
+I<ref_lex>, or I<ref_gap> values refer to them, otherwise zero values
+indicate their respective lack.
+
+If a multiplier set of the form I<{b^k | 0 E<8804> k E<lt> e}>
+with a radix I<b> and depth I<e>, and a rotator base of the form
+I<{r_1^j_1E<183>r_2^j_2E<183>...E<183>r_n^j_n>
+I<| 0 E<8804> j_k E<lt> e_k, 1 E<8804> k E<8804> n}>
+with I<n> radices I<r_k> and I<n> depths I<e_k> describe the
+multiplicative space of difference set planes of a given order,
+I<rot_radices> and I<rot_depths> are vectors of rotation radices and
+depths packed in C<'w*'> format.
+
+For both difference set data tables, the database_version table contains
+schema version information to facilitate quick compatibility checks.
+A schema version of x.y is represented as major = x and minor = y.
+
+=head1 PROVIDER
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The contents of this database are mathematically defined entities.
+The provider believes mathematical constants not to be proprietary or
+subject to copyright legislation, although the software used to calculate
+them and the accompanying documentation certainly are.
+
+=cut

@@ -26,6 +26,36 @@ sub data {
     return $self->wireformat;
 }
 
+sub answer {
+    my ( $self ) = @_;
+
+    my @records = $self->answer_unfiltered;
+
+    for ( my $i = $#records ; $i >= 0 ; --$i ) {
+        if ( $records[$i]->type() eq 'DNSKEY' && $records[$i]->keysize() == -1 ) {
+            splice @records, $i, 1;
+        }
+    }
+
+    return @records;
+}
+
+sub authority {
+    my ( $self ) = @_;
+
+    my @records = $self->authority_unfiltered;
+
+    return @records;
+}
+
+sub additional {
+    my ( $self ) = @_;
+
+    my @records = $self->additional_unfiltered;
+
+    return @records;
+}
+
 1;
 
 =head1 NAME

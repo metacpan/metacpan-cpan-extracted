@@ -8,7 +8,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 Travel::Status::DE::EFA::Stop->mk_ro_accessors(
 	qw(arr_date arr_time dep_date dep_time name name_suf platform));
@@ -48,7 +48,7 @@ in a Travel::Status::DE::EFA::Result's route
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ Travel::Status::DE::EFA(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

@@ -1,5 +1,15 @@
 Revision history for Comics
 
+1.20	2023-06-29
+
+	Fix site for all comics.com plugins.
+	Fix patterns for QuestionableContent.
+	Fix patterns for Buttersafe, CyanideAndHappiness, Nozzman,
+	PBFComics, ToonHole.
+	Fix patterns for Sinfest, Glasbergen, CommitStrip, CSectionComics.
+	Add Claw, CatsCafe, WrongHands.
+	Disabled Dilbert.
+
 1.19	2021-09-13
 
 	Fix patterns for Sinfest, GeekAndPoke, SlackWyrm, Nozzman,

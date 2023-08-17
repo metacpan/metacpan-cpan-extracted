@@ -14,7 +14,7 @@ plan skip_all => 'no local nameserver' unless $resolver->nameservers;
 plan tests    => 4;
 
 
-my $qname = 'ns.net-dns.org';
+my $qname = 'www.net-dns.org';
 
 my $ub_ctx = $resolver->{ub_ctx};
 my $secure = $ub_ctx->mock_resolve( $qname, 1, 0 );

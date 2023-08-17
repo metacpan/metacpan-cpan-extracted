@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::Protocol;
+package Net::Async::HTTP::Server::Protocol 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Stream );
-
-our $VERSION = '0.13';
 
 use Carp;
 use Scalar::Util qw( weaken );

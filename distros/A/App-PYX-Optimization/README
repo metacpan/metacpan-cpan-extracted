@@ -11,19 +11,19 @@ DESCRIPTION
 ARGUMENTS
     *       "-h"
 
-             Print help.
+            Print help.
 
     *       "--version"
 
-             Print version of script.
+            Print version of script.
 
     *       "filename"
 
-             PYX filename.
+            PYX filename.
 
     *       "-"
 
-             STDIN with PYX code.
+            STDIN with PYX code.
 
 EXAMPLE
      pyx-optimization __PYX_FILE__
@@ -37,10 +37,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2020 Michal Josef Špaček
+    © 2015-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.04
 

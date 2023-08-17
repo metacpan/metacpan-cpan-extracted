@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+9.4.0 2023-06-02
+
+ - Add VIR_MIGRATE_PARAM_COMPRESSION_ZLIB_LEVEL and
+   VIR_MIGRATE_PARAM_COMPRESSION_ZSTD_LEVEL constants
+
 9.2.0 2023-04-17
 
  - Add VIR_DOMAIN_PAUSED_API_ERROR constant

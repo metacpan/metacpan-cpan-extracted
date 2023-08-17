@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.210';
+our $VERSION = '1.211';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -144,9 +144,18 @@ sub transferImages {
 
     my $p = Quiq::Path->new;
 
+    if (!-e $srcDir) {
+        $class->throw(
+            'EOG-00099: Source directory does not exist',
+            Dir => $srcDir,
+        );
+    }
+
     if (!-e $destDir) {
-        say "Creating directory: $destDir";
-        $p->mkdir($destDir);
+        $class->throw(
+            'EOG-00099: Destination directory does not exist',
+            Dir => $destDir,
+        );
     }
 
     # Optionen
@@ -197,7 +206,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.210
+1.211
 
 =head1 AUTHOR
 

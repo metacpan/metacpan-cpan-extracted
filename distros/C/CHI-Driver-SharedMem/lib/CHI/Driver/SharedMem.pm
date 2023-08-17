@@ -6,25 +6,25 @@ package CHI::Driver::SharedMem;
 
 use warnings;
 use strict;
+use CHI::Constants qw(CHI_Meta_Namespace);
 use Moose;
 use IPC::SysV qw(S_IRUSR S_IWUSR IPC_CREAT);
 use IPC::SharedMem;
-use Storable qw(freeze thaw);
-use Data::Dumper;
-use Digest::MD5;
+use JSON::MaybeXS;
 use Carp;
 use Config;
 use Fcntl;
 
 extends 'CHI::Driver';
 
-has 'shmkey' => (is => 'ro', isa => 'Int');
+has 'shm_key' => (is => 'ro', isa => 'Int');
 has 'shm' => (is => 'ro', builder => '_build_shm', lazy => 1);
-has 'size' => (is => 'ro', isa => 'Int', default => 8 * 1024);
+has 'shm_size' => (is => 'rw', isa => 'Int', default => 8 * 1024);
 has 'lock' => (
 	is => 'ro',
 	builder => '_build_lock',
 );
+has 'lock_file' => (is => 'rw', isa => 'Str|Undef');
 has '_data_size' => (
 	is => 'rw',
 	isa => 'Int',
@@ -33,7 +33,8 @@ has '_data_size' => (
 );
 has '_data' => (
 	is => 'rw',
-	isa => 'ArrayRef[ArrayRef]',
+	# isa => 'ArrayRef[ArrayRef]',	# For Storable, now using JSON
+	isa => 'Str',
 	reader => '_get_data',
 	writer => '_set_data'
 );
@@ -46,18 +47,18 @@ CHI::Driver::SharedMem - Cache data in shared memory
 
 =head1 VERSION
 
-Version 0.14
+Version 0.18
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 # FIXME - get the pod documentation right so that the layout of the memory
 # area looks correct in the man page
 
 =head1 SYNOPSIS
 
-L<CHI> driver which stores data in shared memory objects for persistently
+L<CHI> driver which stores data in shared memory objects for persistence
 over processes.
 Size is an optional parameter containing the size of the shared memory area,
 in bytes.
@@ -68,8 +69,9 @@ See L<IPC::SharedMem> for more information.
     use CHI;
     my $cache = CHI->new(
 	driver => 'SharedMem',
-	size => 8 * 1024,
-	shmkey => 12344321,	# Choose something unique, but the same across
+	max_size => 2 * 1024,	# Size of the cache
+	shm_size => 32 * 1024,	# Size of the shared memory area
+	shm_key => 12344321,	# Choose something unique, but the same across
 				# all caches so that namespaces will be shared,
 				# but we won't step on any other shm areas
     );
@@ -96,7 +98,8 @@ The shared memory area is stored thus:
 
 =head2 store
 
-Stores an object in the cache
+Stores an object in the cache.
+The data are serialized into JSON.
 
 =cut
 
@@ -106,6 +109,9 @@ sub store {
 	$self->_lock(type => 'write');
 	my $h = $self->_data();
 	$h->{$self->namespace()}->{$key} = $value;
+	# if($self->{'is_size_aware'}) {
+		# $h->{CHI_Meta_Namespace()}->{'last_used_time'}->{$key} = time;
+	# }
 	$self->_data($h);
 	$self->_unlock();
 }
@@ -119,9 +125,21 @@ Retrieves an object from the cache
 sub fetch {
 	my($self, $key) = @_;
 
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip __LINE__, "\n";
 	$self->_lock(type => 'read');
+	# print $tulip __LINE__, "\n";
 	my $rc = $self->_data()->{$self->namespace()}->{$key};
+	# print $tulip __LINE__, "\n";
+	if($self->{is_size_aware}) {
+		$self->_lock(type => 'write');
+		my $h = $self->_data();
+		$h->{CHI_Meta_Namespace()}->{last_used_time}->{$key} = time;
+		$self->_data($h);
+	}
 	$self->_unlock();
+	# print $tulip __LINE__, "\n";
+	# close $tulip;
 	return $rc;
 }
 
@@ -137,8 +155,12 @@ sub remove {
 	$self->_lock(type => 'write');
 	my $h = $self->_data();
 	delete $h->{$self->namespace()}->{$key};
+	delete $h->{CHI_Meta_Namespace()}->{last_used_time}->{$key};
 	$self->_data($h);
 	$self->_unlock();
+
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip "remove: $key\n";
 }
 
 =head2 clear
@@ -155,6 +177,9 @@ sub clear {
 	delete $h->{$self->namespace()};
 	$self->_data($h);
 	$self->_unlock();
+
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip "clear ", $self->namespace(), "\n";
 }
 
 =head2 get_keys
@@ -189,18 +214,52 @@ sub get_namespaces {
 	return @rc;
 }
 
+=head2 default_discard_policy
+
+Use an LRU algorithm to discard items when the cache can't add anything
+
+=cut
+
+sub default_discard_policy { 'lru' }
+
+=head2 discard_policy_lru
+
+When the Shared memory area is getting close to full, discard the least recently used objects
+
+=cut
+
+sub discard_policy_lru {
+	# return;	# debugging why I get uninitialized values in the sort
+	my $self = shift;
+
+	$self->_lock(type => 'read');
+	my $last_used_time = $self->_data()->{CHI_Meta_Namespace()}->{last_used_time};
+	$self->_unlock();
+	my @keys_in_lru_order =
+		sort { $last_used_time->{$a} <=> $last_used_time->{$b} } $self->get_keys();
+	return sub {
+		shift(@keys_in_lru_order);
+	};
+}
+
 # Internal routines
 
 # The area must be locked by the caller
 sub _build_shm {
 	my $self = shift;
+	my $shm_size = $self->shm_size();
 
-	my $shm = IPC::SharedMem->new($self->shmkey(), $self->size(), S_IRUSR|S_IWUSR);
+	if((!defined($shm_size)) || ($shm_size == 0)) {
+		# Probably some strange condition in cleanup
+		# croak 'Size == 0';
+		return;
+	}
+	my $shm = IPC::SharedMem->new($self->shm_key(), $shm_size, S_IRUSR|S_IWUSR);
 	unless($shm) {
-		$shm = IPC::SharedMem->new($self->shmkey(), $self->size(), S_IRUSR|S_IWUSR|IPC_CREAT);
+		$shm = IPC::SharedMem->new($self->shm_key(), $shm_size, S_IRUSR|S_IWUSR|IPC_CREAT);
 		unless($shm) {
-			croak 'Couldn\'t create a shared memory area with key ' .
-				$self->shmkey() . ": $!";
+			croak "Couldn't create a shared memory area of $shm_size bytes with key ",
+				$self->shm_key(), ": $!";
 			return;
 		}
 		$shm->write(pack('I', 0), 0, $Config{intsize});
@@ -210,20 +269,53 @@ sub _build_shm {
 }
 
 sub _build_lock {
-	open(my $fd, '<', $0);
+	return;
+
+	my $self = shift;
+
+	# open(my $fd, '<', $0) || croak("$0: $!");
+	# FIXME: make it unique for each object, not a singleton
+	$self->lock_file('/tmp/' . __PACKAGE__);
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip "build_lock\n", $self->lock_file(), "\n";
+	open(my $fd, '>', $self->lock_file()) || croak($self->lock_file(), ": $!");
 	return $fd;
 }
 
 sub _lock {
+	return;
+
 	my ($self, %params) = @_;
 
-	flock($self->lock(), ($params{type} eq 'read') ? Fcntl::LOCK_SH : Fcntl::LOCK_EX);
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip $params{'type'}, ' lock ', $self->lock_file(), "\n";
+	# my $i = 0;
+	# while((my @call_details = (caller($i++)))) {
+		# print $tulip "\t", $call_details[1], ':', $call_details[2], ' in function ', $call_details[3], "\n";
+	# }
+	return unless $self->lock_file();
+
+	if(my $lock = $self->lock()) {
+		flock($lock, ($params{type} eq 'read') ? Fcntl::LOCK_SH : Fcntl::LOCK_EX);
+	} else {
+		# print $tulip 'lost lock ', $self->lock_file(), "\n";
+		croak('Lost lock: ', $self->lock_file());
+	}
 }
 
 sub _unlock {
+	return;
+
 	my $self = shift;
 
-	flock($self->lock(), Fcntl::LOCK_UN);
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip 'unlock ', $self->lock_file(), "\n";
+	if(my $lock = $self->lock()) {
+		flock($lock, Fcntl::LOCK_UN);
+	} else {
+		# print $tulip 'lost lock for unlock ', $self->lock_file(), "\n";
+		croak('Lost lock for unlock: ', $self->lock_file());
+	}
 }
 
 # The area must be locked by the caller
@@ -248,18 +340,37 @@ sub _data_size {
 sub _data {
 	my($self, $h) = @_;
 
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip __LINE__, "\n";
 	if(defined($h)) {
-		my $f = freeze($h);
+		my $f = JSON::MaybeXS->new()->ascii()->encode($h);
 		my $cur_size = length($f);
+		# print $tulip __LINE__, "cmp $cur_size > ", $self->size(), "\n";
+		if($cur_size > ($self->shm_size() - $Config{intsize})) {
+			croak("sharedmem set failed - value too large? ($cur_size bytes) > ", $self->shm_size());
+		}
 		$self->shm()->write($f, $Config{intsize}, $cur_size);
 		$self->_data_size($cur_size);
+		# print $tulip "set: $cur_size bytes\n";
+		# close $tulip;
 		return $h;
 	}
 	my $cur_size = $self->_data_size();
-	unless($cur_size) {
-		return {};
+	# print $tulip "get: $cur_size bytes\n";
+	# close $tulip;
+	if($cur_size) {
+		my $rc;
+		eval {
+			$rc = JSON::MaybeXS->new()->ascii()->decode($self->shm()->read($Config{intsize}, $cur_size));
+		};
+		if($@) {
+			$self->_data_size(0);
+			croak($@);
+		}
+		return $rc;
+		# return JSON::MaybeXS->new()->ascii()->decode($self->shm()->read($Config{intsize}, $cur_size));
 	}
-	return thaw($self->shm()->read($Config{intsize}, $cur_size));
+	return {};
 }
 
 =head2 BUILD
@@ -271,9 +382,10 @@ Constructor - validate arguments
 sub BUILD {
 	my $self = shift;
 
-	unless($self->shmkey()) {
+	unless($self->shm_key()) {
 		croak 'CHI::Driver::SharedMem - no key given';
 	}
+	$| = 1;
 }
 
 =head2 DEMOLISH
@@ -284,28 +396,56 @@ it's safe to remove it and reclaim the memory.
 =cut
 
 sub DEMOLISH {
+	# if(defined($^V) && ($^V ge 'v5.14.0')) {
+		# return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
+	# }
 	my $self = shift;
 
-	if($self->shmkey()) {
+	# open(my $tulip, '>>', '/tmp/tulip');
+	# print $tulip "DEMOLISH\n";
+	if($self->shm_key() && $self->shm()) {
 		my $cur_size;
-		if(scalar($self->get_namespaces())) {
-			$self->_lock(type => 'read');
-			$cur_size = $self->_data_size();
-			$self->_unlock();
-		} else {
-			$self->_lock(type => 'write');
-			$self->_data_size(0);
-			$self->_unlock();
-			$cur_size = 0;
-		}
-		$self->shm()->detach();
-		# We could scan the cache and see if all has expired.
-		# If it has, then the cache could be removed if nattch = 0.
-		unless($cur_size) {
-			my $stat = $self->shm()->stat();
-			if(defined($stat) && ($stat->nattch() == 0)) {
+		$self->_lock(type => 'write');
+		$cur_size = $self->_data_size();
+		# print $tulip "DEMOLISH: $cur_size bytes\n";
+		my $can_remove = 0;
+		my $stat = $self->shm()->stat();
+		if($cur_size == 0) {
+			if(defined($stat) && ($stat->nattch() == 1)) {
+				$self->shm()->detach();
 				$self->shm()->remove();
+				$can_remove = 1;
 			}
+		# } elsif(defined($stat) && ($stat->nattch() == 1)) {
+			# # Scan the cache and see if all has expired.
+			# # If it has, then the cache can be removed if nattch = 1
+			# $can_remove = 1;
+			# foreach my $namespace($self->get_namespaces()) {
+				# print $tulip "DEMOLISH: namespace = $namespace\n";
+				# foreach my $key($self->get_keys($namespace)) {
+					# # May give substr error in CHI
+					# print $tulip "DEMOLISH: key = $key\n";
+					# if($self->is_valid($key)) {
+					# print $tulip "DEMOLISH: is_valid\n";
+						# $can_remove = 0;
+						# last;
+					# }
+				# }
+			# }
+			# $self->shm()->detach();
+			# if($can_remove) {
+				# $self->shm()->remove();
+			# }
+		} else {
+			$self->shm()->detach();
+		}
+		$self->_unlock();
+		if($can_remove && (my $lock_file = $self->lock_file())) {
+			$self->lock_file(undef);
+			close $self->lock();
+			unlink $lock_file;
+			# print $tulip "unlink $lock_file\n";
+			# close $tulip;
 		}
 	}
 }
@@ -320,51 +460,52 @@ Please report any bugs or feature requests to C<bug-chi-driver-sharedmem at rt.c
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CHI-Driver-SharedMem>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+Max_size is handled, but if you're not consistent across the calls to each cache,
+the results are unpredictable because it's used to create the size of the shared memory
+area.
+
+The shm_size argument should be deprecated and only the max_size argument used.
 
 =head1 SEE ALSO
 
-CHI, IPC::SharedMem
+L<CHI>, L<IPC::SharedMem>
 
+=cut
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc CHI::Driver::SharedMem
-
+    perldoc CHI::Driver::SharedMemory
 
 You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/dist/CHI-Driver-SharedMem>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-SharedMem>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-SharedMemory>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * CPAN Testers' Matrix
 
-L<http://annocpan.org/dist/CHI-Driver-SharedMem-Info>
+L<http://matrix.cpantesters.org/?dist=CHI-Driver-SharedMemory>
 
-=item * CPAN Ratings
+=item * CPAN Testers Dependencies
 
-L<http://cpanratings.perl.org/d/CHI-Driver-SharedMem>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/CHI-Driver-SharedMem>
+L<http://deps.cpantesters.org/?module=CHI::Driver::SharedMemory>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2014 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 
-1; # End of CHI::Driver::SharedMem
+1;

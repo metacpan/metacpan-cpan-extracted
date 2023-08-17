@@ -54,7 +54,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::NoTabs' => '0',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
                                       'Dist::Zilla::Plugin::Test::TrailingSpace' => '0',
-                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::UseAllModules' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::Plugin::TestRelease' => '0',

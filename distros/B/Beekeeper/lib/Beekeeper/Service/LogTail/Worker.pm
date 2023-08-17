@@ -3,7 +3,7 @@ package Beekeeper::Service::LogTail::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -25,6 +25,7 @@ sub authorize_request {
 
 sub on_startup {
     my $self = shift;
+    weaken $self;
 
     $self->{max_entries} = $self->{config}->{buffer_entries} || 20000;
     $self->{log_level}   = $self->{config}->{log_level}      || LOG_DEBUG;
@@ -35,12 +36,19 @@ sub on_startup {
         '_bkpr.logtail.tail' => 'tail',
     );
 
+    # Ping backend brokers to avoid disconnections due to inactivity
+    $self->{ping_timer} = AnyEvent->timer(
+        after    => 60 * rand(),
+        interval => 60,
+        cb       => sub { $self->_ping_backend_brokers },
+    );
+
     log_info "Ready";
 }
 
 sub _connect_to_all_brokers {
     my $self = shift;
-    weaken($self);
+    weaken $self;
 
     my $own_bus = $self->{_BUS};
     my $group_config = Beekeeper::Config->get_bus_group_config( bus_id => $own_bus->bus_id );
@@ -59,12 +67,8 @@ sub _connect_to_all_brokers {
 
         my $bus; $bus = Beekeeper::MQTT->new( 
             %$config,
-            bus_id     => $bus_id,
-            timeout    => 300,
-            on_connect => sub {
-                # Setup subscriptions
-                $self->_collect_log($bus);
-            },
+            bus_id   => $bus_id,
+            timeout  => 300,
             on_error => sub {
                 # Reconnect
                 my $errmsg = $_[0] || ""; $errmsg =~ s/\s+/ /sg;
@@ -72,14 +76,27 @@ sub _connect_to_all_brokers {
                 my $delay = $self->{connect_err}->{$bus_id}++;
                 $self->{reconnect_tmr}->{$bus_id} = AnyEvent->timer(
                     after => ($delay < 10 ? $delay * 3 : 30),
-                    cb    => sub { $bus->connect },
+                    cb => sub {
+                        $bus->connect(
+                            on_connack => sub {
+                                # Setup subscriptions
+                                log_warn "Reconnected to $bus_id";
+                                $self->_collect_log($bus);
+                            }
+                        );
+                    },
                 );
             },
         );
 
         push @{$self->{_BUS_GROUP}}, $bus;
 
-        $bus->connect;
+        $bus->connect(
+            on_connack => sub {
+                # Setup subscriptions
+                $self->_collect_log($bus);
+            }
+        );
     }
 }
 
@@ -119,12 +136,22 @@ sub _collect_log {
     }
 }
 
+sub _ping_backend_brokers {
+    my $self = shift;
+
+    foreach my $bus (@{$self->{_BUS_GROUP}}) {
+
+        next unless $bus->{is_connected};
+        $bus->pingreq;
+    }
+}
+
 sub on_shutdown {
     my ($self, %args) = @_;
 
-     foreach my $bus (@{$self->{_BUS_GROUP}}) {
+    foreach my $bus (@{$self->{_BUS_GROUP}}) {
 
-        next unless ($bus->{is_connected});
+        next unless $bus->{is_connected};
         $bus->disconnect;
     }
 
@@ -242,7 +269,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

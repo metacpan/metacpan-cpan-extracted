@@ -5,7 +5,7 @@ use JSON qw(to_json);
 
 # ABSTRACT: Repeatable autcomplete value-builder for Koha
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 sub build_builder_inline {
     my $class = shift;
@@ -146,7 +146,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

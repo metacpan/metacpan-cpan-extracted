@@ -3,21 +3,22 @@
 use strict;
 use warnings;
 
-BEGIN { delete $ENV{http_proxy} };
+BEGIN { delete $ENV{http_proxy}; delete $ENV{https_proxy} }
 
-# workaround for HTTP::Tiny + Test::TCP
-BEGIN { $INC{'threads.pm'} = 0 };
-sub threads::tid { }
-
-use HTTP::Tiny;
+use FindBin;
+use LWP::UserAgent;
 use Test::TCP;
 use Test::More;
-use FindBin;
 
 use Starlight::Server;
 
 if ($^O eq 'MSWin32' and $] >= 5.016 and $] < 5.019005 and not $ENV{PERL_TEST_BROKEN}) {
     plan skip_all => 'Perl with bug RT#119003 on MSWin32';
+    exit 0;
+}
+
+if ($^O eq 'MSWin32' and $] < 5.014 and not $ENV{PERL_TEST_BROKEN}) {
+    plan skip_all => 'Too old Perl on MSWin32';
     exit 0;
 }
 
@@ -31,17 +32,22 @@ if (not eval { require IO::Socket::SSL; }) {
     exit 0;
 }
 
+if (not eval { require LWP::Protocol::https; }) {
+    plan skip_all => 'LWP::Protocol::https required';
+    exit 0;
+}
+
 if (not eval { require Net::SSLeay; Net::SSLeay->VERSION(1.49); }) {
     plan skip_all => 'Net::SSLeay >= 1.49 required';
     exit 0;
 }
 
-if (eval { require Acme::Override::INET; } ) {
+if (eval { require Acme::Override::INET; }) {
     plan skip_all => 'Acme::Override::INET is not supported';
     exit 0;
 }
 
-my $ca_crt     = "$FindBin::Bin/../examples/ca.crt";
+my $ca_crt = "$FindBin::Bin/../examples/ca.crt";
 my $client_crt = "$FindBin::Bin/../examples/client.crt";
 my $client_key = "$FindBin::Bin/../examples/client.key";
 my $server_crt = "$FindBin::Bin/../examples/localhost.crt";
@@ -51,34 +57,40 @@ test_tcp(
     client => sub {
         my $port = shift;
         sleep 1;
-        my $ua = HTTP::Tiny->new(
-            verify_SSL => 1,
-            SSL_options => {
-                SSL_ca_file   => $ca_crt,
-                SSL_cert_file => $client_crt,
-                SSL_key_file  => $client_key,
-                SSL_use_cert  => 0,
-           }
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(10);
+        $ua->ssl_opts(
+            verify_hostname => 1,
+            SSL_ca_file     => $ca_crt,
+            SSL_cert_file   => $client_crt,
+            SSL_key_file    => $client_key,
+            SSL_verify_mode => IO::Socket::SSL->SSL_VERIFY_PEER,
         );
         my $res = $ua->get("https://127.0.0.1:$port/");
-        ok $res->{success};
-        like $res->{headers}{server}, qr/Starlight/;
-        is $res->{content}, 'https';
+
+        ok $res->is_success, 'is_success';
+        is $res->code, '200', 'code';
+        is $res->message, 'OK', 'message';
+        like $res->header('server'), qr/Starlight/, 'server in headers';
+        is $res->content, 'https', 'content';
+
         sleep 1;
     },
     server => sub {
         my $port = shift;
         Starlight::Server->new(
-            quiet              => 1,
-            host               => '127.0.0.1',
-            port               => $port,
-            ssl                => 1,
-            ssl_key_file       => $server_key,
-            ssl_cert_file      => $server_crt,
-            ssl_ca_file        => $ca_crt,
-            ssl_verify_mode    => IO::Socket::SSL->SSL_VERIFY_PEER,
+            quiet           => 1,
+            host            => '127.0.0.1',
+            port            => $port,
+            ipv6            => 0,
+            ssl             => 1,
+            ssl_key_file    => $server_key,
+            ssl_cert_file   => $server_crt,
+            ssl_ca_file     => $ca_crt,
+            ssl_verify_mode => IO::Socket::SSL->SSL_VERIFY_PEER,
         )->run(
-            sub { [ 200, [], [$_[0]->{'psgi.url_scheme'}] ] },
+            sub { [200, [], [$_[0]->{'psgi.url_scheme'}]] },
         );
     }
 );

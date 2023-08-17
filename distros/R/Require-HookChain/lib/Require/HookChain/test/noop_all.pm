@@ -8,9 +8,9 @@ package Require::HookChain::test::noop_all;
 #use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-07-23'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -21,7 +21,7 @@ sub Require::HookChain::test::noop_all::INC {
     my ($self, $r) = @_;
 
     #print "Loading ", $r->filename, " ...\n";
-    $self->src("1;");
+    $r->src("1;");
 }
 
 1;
@@ -39,7 +39,7 @@ Require::HookChain::test::noop_all - Make module loading a no-op
 
 =head1 VERSION
 
-This document describes version 0.011 of Require::HookChain::test::noop_all (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.015 of Require::HookChain::test::noop_all (from Perl distribution Require-HookChain), released on 2023-07-23.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ This document describes version 0.011 of Require::HookChain::test::noop_all (fro
 
 For testing only.
 
-This hook returns a source code of C<<1;>> for all modules, effectively making
+This hook returns a source code of C<< 1; >> for all modules, effectively making
 all module loading a no-op. On subsequent loading for a module, perl sees that
 the source code has been applied and will not load the source again, which is
 the regular "no-op" upon re-loading a module.

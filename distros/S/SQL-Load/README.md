@@ -4,7 +4,7 @@ SQL::Load - This module is a simple SQL file loader
 
 # VERSION
 
-0.05
+0.06
 
 # SYNOPSIS
 

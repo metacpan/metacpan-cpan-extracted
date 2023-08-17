@@ -6,6 +6,7 @@ SYNOPSIS
 
      my $obj = Tags::HTML->new(%params);
      $obj->cleanup(@params);
+     $obj->prepare(@params);
      $obj->init(@params);
      $obj->process;
      $obj->process_css;
@@ -20,20 +21,20 @@ METHODS
 
     *       "css"
 
-            'CSS::Struct::Output' object for process_css processing.
+            'CSS::Struct::Output' object for "process_css" processing.
 
             Default value is undef.
 
     *       "no_css"
 
-            No CSS support flag. If this flag is set to 1, process_css()
-            returns undef.
+            No CSS support flag. If this flag is set to 1, "process_css"
+            don't process CSS style.
 
             Default value is 0.
 
     *       "tags"
 
-            'Tags::Output' object for process processing.
+            'Tags::Output' object for "process" processing.
 
             Default value is undef.
 
@@ -47,7 +48,16 @@ METHODS
   "init"
      $obj->init(@params);
 
-    Process initialization before page run.
+    Process initialization in page run. It's useful in e.g.
+    Plack::App::Tags::HTML.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare(@params);
+
+    Process initialization before page run. It's useful in e.g.
+    Plack::App::Tags::HTML.
 
     Returns undef.
 
@@ -103,7 +113,8 @@ EXAMPLE1
      sub _cleanup {
              my $self = shift;
 
-             delete $self->{'_data'};
+             delete $self->{'_dynamic_data'};
+             delete $self->{'_static_data'};
 
              return;
      }
@@ -111,7 +122,15 @@ EXAMPLE1
      sub _init {
              my ($self, @variables) = @_;
 
-             $self->{'_data'} = \@variables;
+             $self->{'_dynamic_data'} = \@variables;
+
+             return;
+     }
+
+     sub _prepare {
+             my ($self, @variables) = @_;
+
+             $self->{'_static_data'} = \@variables;
 
              return;
      }
@@ -122,9 +141,18 @@ EXAMPLE1
              $self->{'tags'}->put(
                      ['b', 'div'],
              );
-             foreach my $variable (@{$self->{'_data'}}) {
+             foreach my $variable (@{$self->{'_static_data'}}) {
                      $self->{'tags'}->put(
                              ['b', 'div'],
+                             ['a', 'class', 'static'],
+                             ['d', $variable],
+                             ['e', 'div'],
+                     );
+             }
+             foreach my $variable (@{$self->{'_dynamic_data'}}) {
+                     $self->{'tags'}->put(
+                             ['b', 'div'],
+                             ['a', 'class', 'dynamic'],
                              ['d', $variable],
                              ['e', 'div'],
                      );
@@ -146,8 +174,11 @@ EXAMPLE1
              'tags' => $tags,
      );
 
-     # Init data.
-     $obj->init('foo', 'bar', 'baz');
+     # Init static data.
+     $obj->prepare('foo', 'bar');
+
+     # Init dynamic data.
+     $obj->init('baz', 'bax');
 
      # Process.
      $obj->process;
@@ -159,14 +190,17 @@ EXAMPLE1
      # Output:
      # HTML
      # <div>
-     #   <div>
+     #   <div class="static">
      #     foo
      #   </div>
-     #   <div>
+     #   <div class="static">
      #     bar
      #   </div>
-     #   <div>
+     #   <div class="dynamic">
      #     baz
+     #   </div>
+     #   <div class="dynamic">
+     #     bax
      #   </div>
      # </div>
 
@@ -255,10 +289,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2022 Michal Josef Špaček
+    © 2021-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.08
 

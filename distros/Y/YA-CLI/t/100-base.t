@@ -93,6 +93,12 @@ my @usage_tests = (
         cmp  => { },
         output => "You called me with foo=foo",
         name => "Called something with --foo foo",
+    },
+    {
+        args => [qw(something --foobar foo)],
+        cmp  => { },
+        output => "You called me with foobar=foo",
+        name => "Called something with --foobar foo",
     }
 
 );

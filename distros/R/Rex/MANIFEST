@@ -217,6 +217,7 @@ lib/Rex/Pkg/SuSE.pm
 lib/Rex/Pkg/SunOS.pm
 lib/Rex/Pkg/SunOS/OpenCSW.pm
 lib/Rex/Pkg/SunOS/pkg.pm
+lib/Rex/Pkg/Test.pm
 lib/Rex/Pkg/Ubuntu.pm
 lib/Rex/Pkg/VoidLinux.pm
 lib/Rex/PkgConf.pm

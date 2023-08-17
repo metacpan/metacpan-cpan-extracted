@@ -1,0 +1,303 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use SNMP_Session;
+use BER;
+use Socket;
+
+my $version = '1';
+my $port = 161;
+my $debug = 0;
+my $group;
+my $numericp = 0;
+
+### Prototypes
+sub msdp_list_duplicate_sas ($ );
+sub msdp_collect_sas ($ );
+sub msdp_fill_in_duplicates ($$);
+sub msdp_report_duplicate_sas ($$$$);
+sub msdp_duplicate_report_header ($$$$);
+sub msdp_duplicate_report_trailer ($ );
+sub msdp_map_group ($$$$);
+sub msdp_map_sg ($$$$$ );
+sub msdp_list_group ($$);
+sub pretty_ip_html ($ );
+sub pretty_ip ($ );
+sub usage ($ );
+
+while (defined $ARGV[0] && $ARGV[0] =~ /^-/) {
+    if ($ARGV[0] =~ /^-v/) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] eq '1') {
+	    $version = '1';
+	} elsif ($ARGV[0] eq '2c') {
+	    $version = '2c';
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] =~ /^-p/) {
+	if ($ARGV[0] eq '-p') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] =~ /^[0-9]+$/) {
+	    $port = $ARGV[0];
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] eq '-d') {
+	++$debug;
+    } elsif ($ARGV[0] eq '-n') {
+	++$numericp;
+    } elsif ($ARGV[0] eq '-h') {
+	usage (0);
+	exit 0;
+    } elsif ($ARGV[0] eq '-g') {
+	shift @ARGV;
+	$group = $ARGV[0] or usage (1);
+    } else {
+	usage (1);
+    }
+    shift @ARGV;
+}
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || "public";
+usage (1) if $#ARGV >= $[;
+my $session =
+    ($version eq '1' ? SNMPv1_Session->open ($host, $community, $port)
+     : $version eq '2c' ? SNMPv2c_Session->open ($host, $community, $port)
+     : die "Unknown SNMP version $version")
+  || die "Opening SNMP_Session";
+$session->debug (1) if $debug;
+$session->{max_repetitions} = 100;
+
+my $msdpSACachePeerLearnedFrom = [1,3,6,1,3,92,1,1,6,1,4];
+my $msdpSACacheRPFPeer = [1,3,6,1,3,92,1,1,6,1,5];
+my $msdpSACacheInSAs = [1,3,6,1,3,92,1,1,6,1,6];
+my $msdpSACacheInDataPackets = [1,3,6,1,3,92,1,1,6,1,7];
+my $msdpSACacheUpTime = [1,3,6,1,3,92,1,1,6,1,8];
+my $msdpSACacheExpiryTime = [1,3,6,1,3,92,1,1,6,1,9];
+my $msdpSACacheStatus = [1,3,6,1,3,92,1,1,6,1,10];
+
+if (defined $group) {
+    msdp_list_group ($session, inet_aton ($group));
+} else {
+    msdp_list_duplicate_sas ($session);
+}
+1;
+
+sub msdp_list_duplicate_sas ($ ) {
+    my ($session) = @_;
+    my ($announcements, $nsas, $nsgs, $ndups);
+    ($announcements, $nsas) = msdp_collect_sas ($session);
+    $nsgs = keys %{$announcements};
+    ($announcements, $ndups) = msdp_fill_in_duplicates ($session, $announcements);
+    msdp_report_duplicate_sas ($announcements, $nsas, $nsgs, $ndups);
+}
+
+sub msdp_collect_sas ($ ) {
+    my ($session) = @_;
+    my @oids = ($msdpSACacheStatus);
+    my $nsa = 0;
+    my %announcements;
+    $session->map_table
+	(\@oids,
+	 sub () {
+	     my ($index, $sa_status) = @_;
+	     die "index: $index"
+		 unless $index =~ /^(\d+\.\d+\.\d+\.\d+)\.(\d+\.\d+\.\d+\.\d+)\.(\d+\.\d+\.\d+\.\d+)$/;
+	     my ($group, $source, $rp) = ($1, $2, $3);
+	     warn ("S/G/RP entry (status): $group $source $rp ("
+		   .pretty_print ($sa_status).")\n")
+		 if $debug;
+	     return 0 unless pretty_print ($sa_status) == 1; # active(1)
+	     ++$nsa;
+	     push @{$announcements{$source,$group}}, {rp => $rp};
+	 });
+    (\%announcements, $nsa);
+}
+
+sub msdp_fill_in_duplicates ($$) {
+    my ($session, $announcements) = @_;
+    my %result = ();
+    my ($oldreps, $key, $anns, $dupannouncements, $nrps);
+    $oldreps = $session->{max_repetitions};
+    $session->{max_repetitions} = 5;
+    $dupannouncements = 0;
+    foreach $key (keys %{$announcements}) {
+	my ($source, $group) = split ($;,$key);
+	$anns = $announcements->{$key};
+	if ($#{$anns} > 0) {
+	    $nrps = 0;
+	    my @newanns = ();
+	    msdp_map_sg ($session, $group, $source,
+			 [$msdpSACachePeerLearnedFrom,
+			  $msdpSACacheRPFPeer,
+			  $msdpSACacheInSAs,
+			  $msdpSACacheInDataPackets,
+			  $msdpSACacheUpTime,
+			  $msdpSACacheExpiryTime,
+			  $msdpSACacheStatus],
+			 sub () {
+			     my ($rp,
+				 $peer_learned_from,$rpf_peer,
+				 $in_sas,$in_data_packets,
+				 $up_time,$expiry_time,$status) = @_;
+			     return 1 unless $status == 1; # active(1)
+			     push @newanns, {rp => $rp,
+					     ## peer_learned_from => $peer_learned_from,
+					     ## rpf_peer => $rpf_peer,
+					     in_sas => $in_sas,
+					     in_data_packets => $in_data_packets,
+					     up_time => $up_time,
+					     expiry_time => $expiry_time,
+					 };
+			     ++$nrps;
+			 });
+	    if ($nrps > 1) {
+		++$dupannouncements;
+		$result{$key} = \@newanns;
+	    }
+	}
+    }
+    $session->{max_repetitions} = $oldreps;
+    (\%result, $dupannouncements);
+}
+
+sub msdp_report_duplicate_sas ($$$$) {
+    my ($announcements, $nsas, $nsgs, $ndups) = @_;
+    msdp_duplicate_report_header ($announcements, $nsas, $nsgs, $ndups);
+    foreach my $key (sort keys %{$announcements}) {
+	my ($source, $group) = split ($;,$key);
+	my $announcements = $announcements->{$key};
+	if ($#{$announcements} > 0) {
+	    printf STDOUT ("<tr><th colspan=\"3\">(%s,%s)</th></tr>\n",
+			   pretty_ip_html ($source),
+			   pretty_ip_html ($group));
+	    foreach my $announcement (@{$announcements}) {
+		printf STDOUT ("<tr><td>%s</td><td align=\"right\">%d</td><td align=\"right\">%d</td></tr>\n",
+			       pretty_ip_html ($announcement->{rp}),
+			       $announcement->{in_sas},
+			       $announcement->{in_data_packets});
+	    }
+	}
+    }
+    msdp_duplicate_report_trailer ($announcements);
+}
+
+sub msdp_duplicate_report_header ($$$$) {
+    my ($announcements, $nsas, $nsgs, $ndups) = @_;
+    print STDOUT ("<html><head><title>MSDP Duplicate SA Report</title></head>\n");
+    print STDOUT <<EOM;
+<style type="text/css">    <!--
+ body{background-color:#ffffff; color:black; font-family:helvetica }
+ tt{font-family:courier,lucidatypewriter }
+ th{font-family:helvetica,arial }
+ td{font-family:helvetica,arial }
+ pre{font-family:courier,lucidatypewriter,monaco,monospaced }
+    -->
+</style>
+EOM
+    print STDOUT ("<body><h1>MSDP Duplicate SA Report</h1>\n");
+    printf STDOUT ("<p> %d (S,G) pairs found in %d SAs in <tt>%s</tt>'s cache. \n",
+		   $nsgs, $nsas, $host);
+    printf STDOUT ("Total number of (S,G) pairs with multiple RPs: %d </p>\n",
+		   $ndups);
+    printf STDOUT ("<table border=\"0\">\n<tr><th>RP</th><th>#SAs</th><th>#data pkts</th></tr>\n");
+}
+
+sub msdp_duplicate_report_trailer ($ ) {
+    my ($announcements) = @_;
+    print STDOUT "</table>\n</body></html>\n";
+}
+
+sub msdp_map_group ($$$$) {
+    my ($session, $group, $cols, $mapfn) = @_;
+    my @group_subids = split (/\./, inet_ntoa ($group), 4);
+    my @oids = map { $_ = [@{$_},@group_subids] } @{$cols};
+    $session->map_table
+	(\@oids,
+	 sub () {
+	     my ($index, @colvals) = @_;
+	     map { $_ = pretty_print $_ if defined $_ } (@colvals);
+	     my ($source,$rp);
+	     (($source,$rp) = ($index =~ /^([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$/))
+		 || die "?";
+	     &$mapfn ($source,$rp,@colvals);
+});
+}
+
+sub msdp_map_sg ($$$$$ ) {
+    my ($session, $group, $source, $cols, $mapfn) = @_;
+    my @group_subids = split (/\./, $group, 4);
+    my @source_subids = split (/\./, $source, 4);
+    my @oids = map { $_ = [@{$_},@group_subids,@source_subids] } @{$cols};
+    $session->map_table
+	(\@oids,
+	 sub () {
+	     my ($index, @colvals) = @_;
+	     map { $_ = pretty_print $_ if defined $_ } (@colvals);
+	     my ($rp);
+	     (($rp) = ($index =~ /^([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$/))
+		 || die "?";
+	     &$mapfn ($rp,@colvals);
+});
+}
+
+sub msdp_list_group ($$) {
+    my ($session, $group) = @_;
+    msdp_map_group ($session,$group,
+		    [$msdpSACachePeerLearnedFrom,
+		     $msdpSACacheRPFPeer,
+		     $msdpSACacheInSAs,
+		     $msdpSACacheInDataPackets,
+		     $msdpSACacheUpTime,
+		     $msdpSACacheExpiryTime,
+		     $msdpSACacheStatus],
+		    sub () {
+			my ($source,$rp,
+			    $peer_learned_from,$rpf_peer,
+			    $in_sas,$in_data_packets,
+			    $up_time,$expiry_time,$status) = @_;
+			#return unless $in_data_packets;
+			print "  ",pretty_ip ($source)," $in_data_packets pkts\n";
+			print " $peer_learned_from (learned-from) != $rpf_peer (RPF peer)\n"
+			    if $peer_learned_from ne $rpf_peer;
+		    });
+}
+
+sub pretty_ip_html ($ ) {
+    return "<tt>".pretty_ip ($_[0])."</tt>";
+}
+
+sub pretty_ip ($ ) {
+    my ($ip) = @_;
+    my ($name);
+
+    !$numericp && ($name = gethostbyaddr (inet_aton ($ip),AF_INET))
+	? "$name [$ip]"
+	: "$ip";
+}
+
+sub usage ($ ) {
+    print STDERR
+	("Usage: $0 [OPTIONS...] ROUTER [COMMUNITY]\n\n",
+	 "  OPTIONS:\n\n",
+	 "    -v 1|2c    select SNMPv1 or SNMPv2c (community-based SNMPv2)\n",
+	 "    -p PORT    specify an alternate UDP port to contact SNMP agent\n",
+	 "    -g GROUP   list sources for a specific group\n",
+	 "    -d         print debugging output\n",
+	 "    -n         don't resolve hostnames\n",
+	 "\n",
+	 "  ROUTER     which agent to contact - must implement the MSDP MIB\n",
+	 "  COMMUNITY  specifies the SNMP community string, defaults to \"public\"\n");
+    exit $_[0];
+}

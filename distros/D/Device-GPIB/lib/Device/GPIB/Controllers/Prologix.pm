@@ -494,7 +494,8 @@ sub srq($)
 {
     my ($self) = @_;
 
-    $self->sendControllerCommand('++srq');   
+    $self->sendControllerCommand('++srq');
+    # Hmmm, on HP8904A, this will return the status byte!
     return $self->read_to_eol();
 }
 

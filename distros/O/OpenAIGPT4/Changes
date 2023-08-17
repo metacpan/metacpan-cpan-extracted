@@ -1,4 +1,15 @@
 Revision history for Perl module OpenAIGPT4
+0.18 2023-07-04
+    - Support perl v5.26
+
+0.17 2023-06-14
+    - Change default model from gpt-3.5-turbo to gpt-3.5-turbo-0613
+0.15 2023-06-05
+    - Debug flag and corresponding debug functionality to the `OpenAIGPT4` Perl module. This feature provides detailed logging of HTTP requests and responses when interacting with the OpenAI API. It helps developers to troubleshoot issues and understand the behavior of the API calls.
+
+0.14 2023-06-04
+    - Updated the generate_text method in OpenAIGPT4 module to include response body in the error message when API request fails.
+
 0.13 2023-05-28
     - Edited Makefile.PL.
 

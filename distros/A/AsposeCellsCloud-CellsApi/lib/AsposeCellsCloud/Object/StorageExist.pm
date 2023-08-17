@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Storage exists',
                                   class => 'StorageExist',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'exists' => {
      	datatype => 'boolean',
      	base_name => 'Exists',
-     	description => '',
+     	description => 'Shows that the storage exists.            ',
      	format => '',
      	read_only => '',
      		},    

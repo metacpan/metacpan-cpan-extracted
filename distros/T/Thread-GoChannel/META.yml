@@ -3,13 +3,12 @@ abstract: 'Fast thread queues with go-like semantics'
 author:
   - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
-  Module::Build: '0.4004'
   Test::Fatal: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build: '0.4004'
+  Module::Build::Tiny: '0.046'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +17,7 @@ name: Thread-GoChannel
 provides:
   Thread::GoChannel:
     file: lib/Thread/GoChannel.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   XSLoader: '0'
   strict: '0'
@@ -26,7 +25,9 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Thread-GoChannel
   repository: git://github.com/Leont/thread-gochannel.git
-version: '0.001'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.003'
+x_contributors:
+  - 'Ed Sabol <esabol@users.noreply.github.com>'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

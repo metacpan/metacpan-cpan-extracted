@@ -1,3 +1,21 @@
+0.08 2023-07-06
+
+    - No changes from 0.07_03
+
+0.07_03 2023-06-30
+
+    - Tests upgrade deep recursion warning to fatal
+
+0.07_02 2023-03-15
+
+    - Fix logout + login as new user (RT 147136)
+
+0.07_01 2023-02-23
+
+    - Add fork method
+    - Add ability to change contact ID in update_contact
+    - Add ability to move a domain to a different registrant with update_domain
+
 0.07 2022-12-23
 
     - No changes from 0.06_03

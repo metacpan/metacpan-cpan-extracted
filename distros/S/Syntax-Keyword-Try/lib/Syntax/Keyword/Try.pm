@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.28;
+package Syntax::Keyword::Try 0.29;
 
 use v5.14;
 use warnings;
@@ -353,38 +353,49 @@ L<https://rt.cpan.org/Ticket/Display.html?id=123918>.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
+}
+
+sub unimport
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
 }
 
 my @EXPERIMENTAL = qw( typed );
 
-sub import_into
+sub import_into   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport_into { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
+
+sub apply
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my ( $cb, $caller, @syms ) = @_;
 
    @syms or @syms = qw( try );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
+   $cb->( "Syntax::Keyword::Try/try" ) if delete $syms{try};
 
    # Largely for Feature::Compat::Try's benefit
-   $^H{"Syntax::Keyword::Try/no_finally"}++    if delete $syms{"-no_finally"};
-   $^H{"Syntax::Keyword::Try/require_catch"}++ if delete $syms{"-require_catch"};
-   $^H{"Syntax::Keyword::Try/require_var"}++   if delete $syms{"-require_var"};
+   $cb->( "Syntax::Keyword::Try/no_finally" )    if delete $syms{"-no_finally"};
+   $cb->( "Syntax::Keyword::Try/require_catch" ) if delete $syms{"-require_catch"};
+   $cb->( "Syntax::Keyword::Try/require_var" )   if delete $syms{"-require_var"};
 
    # stablised experiments
    delete $syms{":experimental($_)"} for qw( var );
 
    foreach ( @EXPERIMENTAL ) {
-      $^H{"Syntax::Keyword::Try/experimental($_)"}++ if delete $syms{":experimental($_)"};
+      $cb->( "Syntax::Keyword::Try/experimental($_)" ) if delete $syms{":experimental($_)"};
    }
 
    if( delete $syms{":experimental"} ) {
-      $^H{"Syntax::Keyword::Try/experimental($_)"}++ for @EXPERIMENTAL;
+      $cb->( "Syntax::Keyword::Try/experimental($_)" ) for @EXPERIMENTAL;
    }
 
    # Ignore requests for these, as they come automatically with `try`

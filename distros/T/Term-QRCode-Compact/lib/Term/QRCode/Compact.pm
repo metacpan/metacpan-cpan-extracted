@@ -9,7 +9,7 @@ use Imager::QRCode;
 
 our @EXPORT_OK = ('qr_code_as_text');
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =encoding utf8
 
@@ -198,18 +198,28 @@ The number of pixels per returned character.
 Currently for ASCII the dimensions the dimensions
 are C<2x1> for ascii and C<2x1> for C<utf8>.
 
+=item B<level>
+
+Optional
+
+  level => 'L',
+
+The level of error correction, 'H', 'M' or 'L'.
+Default is 'M'.
+
 =back
 
 =cut
 
 sub qr_code_as_text( %options ) {
     $options{charset} //= 'utf8';
+    $options{ level } //= 'H';
 
     my $qrcode = Imager::QRCode->new(
         size          => 2,
         margin        => 2,
         version       => 1,
-        level         => 'M',
+        level         => $options{ level },
         casesensitive => 1,
         lightcolor    => Imager::Color->new(255, 255, 255),
         darkcolor     => Imager::Color->new(0, 0, 0),

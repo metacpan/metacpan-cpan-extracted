@@ -1,34 +1,58 @@
-# no code
-## no critic: TestingAndDebugging::RequireUseStrict
 package Acme::CPANModules::PickingRandomItemsFromList;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-18'; # DATE
+our $DATE = '2023-06-20'; # DATE
 our $DIST = 'Acme-CPANModules-PickingRandomItemsFromList'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
-    summary => 'Picking random items from a list',
+    summary => 'List of modules to pick random items from a list',
     description => <<'_',
 
 If you are picking random lines from a file, there's a separate CPANModules list
 for it: <pm:Acme::CPANModules::PickingRandomLinesFromFile>.
 
+**1. Picking a single item, with equal probability**
+
+If you only want to pick a single item, with equal probability, you can simply
+get a random element from an array using the `$ary[rand @ary]` idiom.
+
+**2. Picking multiple items, with equal probability**
+
+**2a. Picking multiple items, with equal probability, duplicates allowed**
+
 If you want to allow duplicates, you can repeatedly pick random elements from an
 array using the `$ary[rand @ary]` idiom.
 
-If you do not want to allow duplicates:
+**2b. Picking multiple items, with equal probability, duplicates not allowed**
+
+If you do not want to allow duplicates, there are several alternatives:
 
 <pm:List::Util> (from version 1.54, 2020-02-02) provides `sample()`. If you use
 an older version, you can use `shuffle()` then get as many number of samples as
-you need using slice (`@shuffled[0..$num_wanted-1]`) or `head()`.
+you need from the first elements of the array using slice
+(`@shuffled[0..$num_wanted-1]`) or `head()`.
 
-<pm:List::MoreUtils> provides `samples()`.
+<pm:List::MoreUtils> also provides `samples()`.
 
 Keywords: sample, sampling.
 
+**3. Picking item(s), with weights**
+
+If you want to assign different weights to different items (so one item might be
+picked more likely), you can use one of these modules:
+
+<pm:Array::Sample::WeightedRandom> offers sampling without replacement (not
+allowing duplicates) or with replacement (allowing duplicates).
+
+<pm:Random::Skew>.
+
+<pm:Data::Random::Weighted> currently can only pick a single item.
+
 _
-    tags => ['task'],
+    tags => ['task', 'sampling', 'random'],
     entries => [
         {
             module=>'List::Util',
@@ -36,11 +60,20 @@ _
         {
             module=>'List::MoreUtils',
         },
+        {
+            module=>'Array::Sample::WeightedRandom',
+        },
+        {
+            module=>'Random::Skew',
+        },
+        {
+            module=>'Data::Random::Weighted',
+        },
     ],
 };
 
 1;
-# ABSTRACT: Picking random items from a list
+# ABSTRACT: List of modules to pick random items from a list
 
 __END__
 
@@ -50,37 +83,75 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PickingRandomItemsFromList - Picking random items from a list
+Acme::CPANModules::PickingRandomItemsFromList - List of modules to pick random items from a list
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution Acme-CPANModules-PickingRandomItemsFromList), released on 2021-09-18.
+This document describes version 0.005 of Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution Acme-CPANModules-PickingRandomItemsFromList), released on 2023-06-20.
 
 =head1 DESCRIPTION
 
 If you are picking random lines from a file, there's a separate CPANModules list
 for it: L<Acme::CPANModules::PickingRandomLinesFromFile>.
 
+B<1. Picking a single item, with equal probability>
+
+If you only want to pick a single item, with equal probability, you can simply
+get a random element from an array using the C<$ary[rand @ary]> idiom.
+
+B<2. Picking multiple items, with equal probability>
+
+B<2a. Picking multiple items, with equal probability, duplicates allowed>
+
 If you want to allow duplicates, you can repeatedly pick random elements from an
 array using the C<$ary[rand @ary]> idiom.
 
-If you do not want to allow duplicates:
+B<2b. Picking multiple items, with equal probability, duplicates not allowed>
+
+If you do not want to allow duplicates, there are several alternatives:
 
 L<List::Util> (from version 1.54, 2020-02-02) provides C<sample()>. If you use
 an older version, you can use C<shuffle()> then get as many number of samples as
-you need using slice (C<@shuffled[0..$num_wanted-1]>) or C<head()>.
+you need from the first elements of the array using slice
+(C<@shuffled[0..$num_wanted-1]>) or C<head()>.
 
-L<List::MoreUtils> provides C<samples()>.
+L<List::MoreUtils> also provides C<samples()>.
 
 Keywords: sample, sampling.
 
-=head1 ACME::MODULES ENTRIES
+B<3. Picking item(s), with weights>
+
+If you want to assign different weights to different items (so one item might be
+picked more likely), you can use one of these modules:
+
+L<Array::Sample::WeightedRandom> offers sampling without replacement (not
+allowing duplicates) or with replacement (allowing duplicates).
+
+L<Random::Skew>.
+
+L<Data::Random::Weighted> currently can only pick a single item.
+
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<List::Util>
+=item L<List::Util>
 
-=item * L<List::MoreUtils>
+Author: L<PEVANS|https://metacpan.org/author/PEVANS>
+
+=item L<List::MoreUtils>
+
+Author: L<REHSACK|https://metacpan.org/author/REHSACK>
+
+=item L<Array::Sample::WeightedRandom>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Random::Skew>
+
+=item L<Data::Random::Weighted>
+
+Author: L<GEISTBERG|https://metacpan.org/author/GEISTBERG>
 
 =back
 
@@ -132,6 +203,8 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Pic
 L<Bencher::Scenario::SamplingFromList> for the benchmark, which we will probably
 include in the future.
 
+Related lists: L<Acme::CPANModules::Sampling>
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -153,13 +226,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

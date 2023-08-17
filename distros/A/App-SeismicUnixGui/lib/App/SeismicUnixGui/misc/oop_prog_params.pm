@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::oop_prog_params;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: oop_prog_params
+ PERL PERL PROGRAM NAME: oop_prog_params
  AUTHOR: 	Juan Lorenzo
  DATE: 		2018
 
@@ -589,7 +589,7 @@ sub get_a_section {
 			elsif ( !($suffix) && !($prefix) ) {
 
  # CASE 5
- #				print(" oop_prog_params, get_a_section = CASE 5; neither suffix nor prefix\n ");
+# 				print(" oop_prog_params, get_a_section = CASE 5; neither suffix nor prefix\n ");
  # OUTPUT TEXT is set here
 #				$oop_prog_params[$j] =
 #					" \t " . '$'

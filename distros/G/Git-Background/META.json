@@ -24,7 +24,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "runtime" : {
@@ -35,7 +35,7 @@
             "Proc::Background" : "1.30",
             "Scalar::Util" : "0",
             "parent" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,7 +51,7 @@
             "Test::More" : "0.88",
             "lib" : "0",
             "overload" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
@@ -67,6 +67,6 @@
          "web" : "https://github.com/skirmess/Git-Background"
       }
    },
-   "version" : "0.006"
+   "version" : "0.007"
 }
 

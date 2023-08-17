@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing an array of table
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -59,7 +59,7 @@ MarpaX::Java::ClassFile::BNF::TableArray - Parsing an array of table
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

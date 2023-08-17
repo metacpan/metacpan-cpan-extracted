@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +24,7 @@ name: Sys-Virt
 provides:
   Sys::Virt:
     file: lib/Sys/Virt.pm
-    version: v9.2.0
+    version: v9.4.0
   Sys::Virt::Domain:
     file: lib/Sys/Virt/Domain.pm
   Sys::Virt::DomainCheckpoint:
@@ -62,5 +62,5 @@ resources:
   homepage: http://libvirt.org/
   license: http://www.gnu.org/licenses/gpl.html
   repository: https://gitlab.com/libvirt/libvirt-perl
-version: v9.2.0
+version: v9.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

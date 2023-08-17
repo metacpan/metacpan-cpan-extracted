@@ -17,12 +17,12 @@ User-built flows ( 4 colors) diverge from 'grey_flow.pm', pink_flow.pm, etc.
 
 sunix_select.pm uses exclusively 'neutral_flow.pm' 
 
-Superflows diverge from L_SU via pre_built-superflow.pm
+Superflows diverge from user-build flows in L_SU via pre_built_superflow.pm
 
 User-built flows can be of 4 colors.
 
-The namespaces for each color flow and superflows are independent 
-for the most part of other parts of the program. 
+The namespaces for each color flow and superflows are independent,
+for the most part (TODO), of other parts of the program. 
 
 There are two sets of dialogs for interacting with files and directories.
 
@@ -38,7 +38,12 @@ If there are superflow bindings for opening data files, then these use
 	L_SU, pre_built_superflows,
  			pre_built_big_stream->select( )
  			_FileDialog_button,
- 			pre_built_superflow,select,binding->set() (where actual binding takes place!)
+ 			pre_built_big_stream,select,binding->set() (where actual binding takes place!)
+ 			
+ 			sub _FileDialog {
+ 			
+In file_dialog,
+       iFile->get_Path gets directory path binding uses.
 
 BINDINGS-for DEVELOPERS
 User-built programs containing bindings (e.g., MB3) (e.g.,those that use sunix programs) 
@@ -49,7 +54,7 @@ sunix programs use _FileDialog_button to find files.
 		2) data files e.g. su, binary, par, and plain text files {_Data} [_Data_PL_SEISMIC}
 		and (3) pre_built superflows and directories {_Path}
 		
-For a sunix program with a binding how does the FileDialog get activated?
+Q. For a sunix program with a binding how does the FileDialog get activated?
  
  Individual programs can have bindings, e.g. segyread has the file|tape option
  bound to automatically open the directories that contain segy files 
@@ -60,11 +65,11 @@ For a sunix program with a binding how does the FileDialog get activated?
  A. Superflows use L_SU->save_button
  A. user-built flows use color_flow.pm->save_button
  
- Q. What is the sequence of programs during a 'Save'?
+     The sequence of programs during a 'Save' is as follows:
  
-   main
-    L_SU
-     color_flow.pm->save_button
+      main
+       L_SU
+       color_flow.pm->save_button
  
  Q. What are MB1 bindings for colored listboxes?
  Q. How are colored flow listboxes selected?
@@ -82,6 +87,7 @@ whereami: temporarily establish the widget you are in
   and determine which condition you are using in a namespace 
   outside that of the main program
  
+(inherited by gui_history)
 conditions_gui: temporarily establishes the widget in a private hash 
   within the namespace of the main program and hence accessible to all 
   local methods
@@ -95,13 +101,12 @@ decisions:
   the namespace.
   
 Big streams/Superflows/Tools read configuration files and write configuration files
-   using internal libraries, i.e. no longer using 3rd-party library like Config-Simple
-   configuration parameters are found in arrays and not in hashes as for
-   the outside libraries of Config-Simple.  Former version of L_SU used Config-Simple
- 
+   using internal libraries.
+   Configuration parameters are found in arrays.
+   3rd-party library like Config-Simple is now deprecated.
  
  Other superflows can have a local configuration file( i.e., iSpectralAnalysis.config)
- Make sure that your local configuration file also gets updated accordingly if you change
+ For example, make sure that your local configuration file also gets updated accordingly if you change
  the master iSpectralAnalysis.config
  
 Main, _L_SU_superflows calls pre_built_superflow
@@ -119,7 +124,7 @@ Main, _L_SU_superflows calls pre_built_superflow
  		calls param_widgets sets the variables for duplicated in a separate namespace too
  
  
- Question: How do I add individual parameters to the GUI for a single specific superflow, 
+Question: How do I add individual parameters to the GUI for a single specific superflow, 
 Example 1: parameter "geopsy" in "Project"
  
  
@@ -493,13 +498,14 @@ after:
 
 - Update to the output perl flow:
 
-Q. What programs are used to generate a perl script which uses
+Q. What programs are used to generate a perl script that uses
   the parameters from the GUI:
   
-A. Saving a perl-based file, involves:
-How do I save a perl-based flow built by user (user-built)?
 
-N.B. files_LSU,save,  handles ultimate writing of .pl
+Q. How do I save a perl-based flow built by user (user-built)?
+A. Saving a perl-based file, involves:
+
+N.B. files_LSU,save, handles ultimate writing of *.pl file
 
 main
 L_SU 
@@ -579,35 +585,40 @@ main,
 
 Opening a Data file from within a superflow can follow two routes:
 
-Route 1:  Directly from the GUI menu selection of "File/Data" 
+Route 1:  Directly from the GUI menu selection of "File/Data" (deprecated)
 
 Route 2: Indirectly, via bindings defined in spec files:
 	L_SU, _FileDialog_button (for MB3 bindings)
 	
-Superflow bindings use this subroutine exclusively
+Superflow bindings use this subroutine exclusively:
 
-binding, set calls this subroutine when the dialog type = Data and we are dealing with a superflow
+binding, set 
+    binding is called when the dialog type = Data and we are dealing with a superflow
 
 How do we separate namespaces between pre-built superflow usage and user-built flows?
-Some dialog widgets are used exclusively for superflows ( superflow selection) 
 
+Some dialog widgets are used exclusively for superflows ( superflow selection) 
 Other widgets are used exclusively for user-built flows (sunix selection,add2flow ), Flows and SaveAs
 
 Color distinguishes regular user-built flows where sunix-selection is marked with a neutral color.
 
 Some options have no color (Flow) but do have a flow-type assigned within LSU.
 
+Dialog types
 Dialog types can be Data (superflow and user-built flows, directly selected or bound)
-Flow or 'SaveAs'( are exclusively for user-built perl flow) Save can be for superflows or user-built flows.
+Flow or 'SaveAs'( are exclusively for user-built perl flow) 
+Save can be for superflows or user-built flows.
 
+Flow types
 Flow types can be flow_type can be 'user_built' or 'pre_built_superflow'
 
 L_SU sets flow types and colors plus listbox logicals (e.g., _is_listobox_grey_w = 0 or false)
 
-N.B., Historically, some conditions are repeated using different variable names, e.g. 
+N.B., Historically, some conditions are repeated using different variable names, e.g., 
 is_pre_built_superflow, is_superflow and is_superflow_select_button
 
 
+Q: (NOW DEPRECATED and AUTOMATED-- See perldoc of ~/developer/code/sunix/README.pm)
 10.06.21 Q: How do we add another seismic unix module or seismic unix program to L_SU?
 run (1) sudoc2pm.pl followed by (2) sudoc2pm_updates.pl 
 
@@ -782,7 +793,7 @@ Access to the help instructions of the
  
  
 Q. How does LSU_project_selector create new Project directories?
-  
+
 				
     1 big_streams_param, which extends su_param::get, provides  e.g., HOME /home/gom PROJECT_HOME /home/gom/jj site San_Acacia spare_dir '' date 
     
@@ -846,7 +857,7 @@ Q. How does LSU_project_selector create new Project directories?
 	
 	Q. How are input parameters from GUI selected before writing to an output perl flow file?
 	 
-	A.  NOT directly from the GUI, but actually from the namespace kept by param_flow_grey (example for grey listbox flows) 
+	A. NOT directly from the GUI, but actually from the namespace kept by param_flow_grey (example for grey listbox flows) 
 
 	 By using get_good_labels_aref2 method as follows: $param_flow_color_i->get_good_labels_aref2
 
@@ -1083,8 +1094,9 @@ Q. How does Project Tool update the gui parameter values?
      FileDialog_button is mainly used for user-built flows but directs superflows
 	 to _FileDialog_button
 	 
-[	 binding to the dialog types for each MB3 click takes place within
-L_SU	 
+[	 binding to the dialog types for each MB3 click takes place within L_SU
+
+  L_SU.pm	 
 	 pre_built_superflows
    		# for binding to file dialog options
 		my $sub_ref = \&_FileDialog_button;

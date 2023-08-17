@@ -1,4 +1,4 @@
-package Acme::Color::Rust 0.04 {
+package Acme::Color::Rust 0.05 {
 
   use warnings;
   use 5.020;
@@ -43,7 +43,7 @@ Acme::Color::Rust - Color example class using Rust + FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

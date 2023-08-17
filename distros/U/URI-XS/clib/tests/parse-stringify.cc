@@ -1,11 +1,12 @@
 #include "test.h"
+#include <string>
 
 #define TEST(name) TEST_CASE("parse-stringify: " name, "[parse-stringify]")
 
 static int flags;
 
 URI test (string url, string scheme, string uinfo, string host, uint16_t port = 0, string path = "", string qstr = "", string fragment = "", string checkstr = "") {
-    string testname = "test url " + url;
+    std::string testname = "test url " + url;
     if (flags) testname += " (flags=" + panda::to_string(flags) + ")";
     if (!checkstr) checkstr = url;
 
@@ -26,7 +27,7 @@ URI test (string url, string scheme, string uinfo, string host, uint16_t port = 
 }
 
 void test_wrong (string url) {
-    SECTION("test bad url " + url) {
+    SECTION("test bad url " + std::string(url.c_str())) {
         CHECK(URI(url) == URI());
     }
 }

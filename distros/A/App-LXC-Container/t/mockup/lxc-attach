@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# mockup lxc-attach for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+root="${0%/*/*}/tmp"
+counter="$root/.lxc-attach-counter"
+n=$(cat "$counter")
+n=$((n + 1))
+echo "$n" >"$counter"
+[ -n "$ALC_DEBUG_MOCKUP" ]  &&  echo "lxc-attach '$n'" >/dev/tty
+case $n in
+    1)
+	[ "$1" = "--rcfile"    ]  ||  Die 'unexpected lxc-execute command' "$@"
+	case $2 in
+	    */run-test-1.conf)	;;
+	    *)			Die 'unexpected lxc-execute command' "$@"
+	esac
+	[ "$3" = "--name"      ]  ||  Die 'unexpected lxc-execute command' "$@"
+	[ "$4" = "run-test-1"  ]  ||  Die 'unexpected lxc-execute command' "$@"
+	[ "$5" = "--"          ]  ||  Die 'unexpected lxc-execute command' "$@"
+	[ "$6" = "/lxc-run.sh" ]  ||  Die 'unexpected lxc-execute command' "$@"
+	;;
+    *)		Die "unexpected state '$n' in mocked lxc-attach"
+esac

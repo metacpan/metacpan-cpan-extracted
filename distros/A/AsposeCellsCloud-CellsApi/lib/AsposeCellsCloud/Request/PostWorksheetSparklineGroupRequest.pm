@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetSparklineGroupRequest.name :   ,
-# PostWorksheetSparklineGroupRequest.sheetName :   ,
-# PostWorksheetSparklineGroupRequest.sparklineGroupIndex :   ,
-# PostWorksheetSparklineGroupRequest.sparklineGroup :   ,
-# PostWorksheetSparklineGroupRequest.folder :   ,
-# PostWorksheetSparklineGroupRequest.storageName :    
+# PostWorksheetSparklineGroupRequest.name : The workbook name.  ,
+# PostWorksheetSparklineGroupRequest.sheetName : The worksheet name.  ,
+# PostWorksheetSparklineGroupRequest.sparklineGroupIndex : The zero based index of the element.  ,
+# PostWorksheetSparklineGroupRequest.sparklineGroup : Spark line group description.  ,
+# PostWorksheetSparklineGroupRequest.folder : Original workbook folder.  ,
+# PostWorksheetSparklineGroupRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_sparkline_group' } = { 
-    	summary => '',
+    	summary => 'Post worksheet sparkline group description.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'sparkline_group_index' => {
      	datatype => 'int',
      	base_name => 'sparklineGroupIndex',
-     	description => '',
+     	description => 'The zero based index of the element.',
      	format => '',
      	read_only => '',
      		},
      'sparkline_group' => {
      	datatype => 'SparklineGroup',
      	base_name => 'sparklineGroup',
-     	description => '',
+     	description => 'Spark line group description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

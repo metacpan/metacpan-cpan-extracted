@@ -5,7 +5,7 @@ use warnings;
 use XS::libpanda::backtrace;
 use Exception::Backtrace::Wrapper;
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.1.3';
 
 
 require XS::Loader;

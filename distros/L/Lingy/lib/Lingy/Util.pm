@@ -1,41 +1,73 @@
 use strict; use warnings;
 package Lingy::Util;
 
-use Lingy::Namespace;
-use base 'Lingy::Namespace';
 use Lingy::Common;
 
-use constant NAME => 'lingy.util';
+sub identical {
+    BOOLEAN->new(refaddr($_[0]) == refaddr($_[1]));
+}
 
-our %ns = (
-    fn('eval-perl'   => 1 => sub { eval("$_[0]") },
-                     => 2 => sub { eval("$_[0]"); $_[1] }),
+#------------------------------------------------------------------------------
+# Devel functions:
+#------------------------------------------------------------------------------
 
-    fn('x-carp-off'  => 0 => sub { eval "no Carp::Always"; nil }),
-    fn('x-carp-on'   => 0 => sub { eval "use Carp::Always"; nil }),
-    fn('x-core'      => 0 => sub { Lingy::RT->rt->core }),
-    fn('x-env'       => 0 => sub { Lingy::RT->rt->env }),
-    fn('x-ns'        => 0 => sub { Lingy::RT->rt->ns }),
-    fn('x-refer'     => 0 => sub { Lingy::RT->rt->refer }),
-    fn('x-user'      => 0 => sub { Lingy::RT->rt->user }),
+sub applyTo {
+    my ($method, $args) = @_;
+    no strict 'refs';
+    &{"$method"}(@$args);
+}
 
-    fn('x-pp-env' => '*' => sub {
-        my $env = $Lingy::Eval::ENV;
-        my $www = {};
-        my $w = $www;
-        my $e = $env;
-        while ($e) {
-            $w->{'+'} = join ' ', sort CORE::keys %{$e->space};
-            $w->{'^'} = {};
-            $w = $w->{'^'};
-            $e = $e->{outer};
+sub eval_perl {
+    my $ret = eval("$_[0]");
+    $_[1] // $ret;
+}
+
+sub rt_internal { my $m = "$_[0]"; RT->$m }
+
+sub env_data {
+    my $env = $Lingy::Evaluator::ENV;
+    my $www = {};
+    my $w = $www;
+    my $e = $env;
+    while ($e) {
+        $w->{'+'} = join ' ', sort CORE::keys %{$e->space};
+        $w->{'^'} = {};
+        $w = $w->{'^'};
+        $e = $e->{outer};
+    }
+    bless $www, 'lingy-internal';
+}
+
+sub equiv {
+    my ($x, $y) = @_;
+    return false
+        unless
+            (
+                $x->isa(LISTTYPE) and
+                $y->isa(LISTTYPE)
+            ) or ref($x) eq ref($y);
+    if ($x->isa(LISTTYPE)) {
+        return false unless @$x == @$y;
+        for (my $i = 0; $i < @$x; $i++) {
+            my $bool = equiv($x->[$i], $y->[$i]);
+            return false if "$bool" eq '0';
         }
-        bless $www, 'lingy-internal';
-    }),
+        return true;
+    }
+    if ($x->isa(HASHMAP)) {
+        my @xkeys = sort map "$_", keys %$x;
+        my @ykeys = sort map "$_", keys %$y;
+        return false unless @xkeys == @ykeys;
+        my @xvals = map $x->{$_}, @xkeys;
+        my @yvals = map $y->{$_}, @ykeys;
+        for (my $i = 0; $i < @xkeys; $i++) {
+            return false unless "$xkeys[$i]" eq "$ykeys[$i]";
+            my $bool = equiv($xvals[$i], $yvals[$i]);
+            return false if "$bool" eq '0';
+        }
+        return true;
+    }
+    BOOLEAN->new($$x eq $$y);
+}
 
-    fn('PPP' => '*' => \&PPP),
-    fn('WWW' => '*' => \&WWW),
-    fn('XXX' => '*' => \&XXX),
-    fn('YYY' => '*' => \&YYY),
-    fn('ZZZ' => '*' => \&ZZZ),
-);
+1;

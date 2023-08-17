@@ -16,7 +16,7 @@ name: Net-CVE
 provides: 
   Net::CVE: 
     file: lib/Net/CVE.pm
-    version: '0.004'
+    version: '0.006'
 recommends: 
   Data::Peek: '0.52'
   HTTP::Tiny: '0.082'
@@ -36,4 +36,4 @@ resources:
   bugtracker: https://github.com/Tux/Net-CVE/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Net-CVE
-version: '0.004'
+version: '0.006'

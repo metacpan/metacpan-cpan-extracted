@@ -51,6 +51,13 @@
 
 #include "deflate.h"
 
+/*
+  Perl-specific change to allow building with C++
+  The 'register' keyword not allowed from C++17
+  see https://github.com/pmqs/Compress-Raw-Zlib/issues/23
+*/
+#define register
+
 const char deflate_copyright[] =
    " deflate 1.2.13 Copyright 1995-2022 Jean-loup Gailly and Mark Adler ";
 /*

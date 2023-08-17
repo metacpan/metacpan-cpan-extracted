@@ -3,14 +3,14 @@
 #
 #       $Id: 00checkver.t 518 2016-05-18 16:33:37Z hayashi $
 #
-#       Copyright (c) 2017 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 2023 Hiroo Hayashi.  All rights reserved.
 #
 #       This program is free software; you can redistribute it and/or
 #       modify it under the same terms as Perl itself.
 
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use vars qw($loaded);
 
 BEGIN {
@@ -32,6 +32,12 @@ my $t = new Term::ReadLine 'ReadLineTest';
 isa_ok($t, 'Term::ReadLine::Stub');
 
 print  "# \$TERM=$ENV{TERM}\n";
+
+my $e = eval "new Term::ReadLine 'The 2nd new'; 1";
+{
+    no warnings;
+    ok($e != 1, 'reject the 2nd "new Term::ReadLine"');
+}
 
 exit 0;
 

@@ -5,12 +5,12 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   ExtUtils::ParseXS: '3.16'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   ExtUtils::CChecker: '0.11'
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,19 +19,19 @@ name: XS-Parse-Keyword
 provides:
   XS::Parse::Infix:
     file: lib/XS/Parse/Infix.pm
-    version: '0.33'
+    version: '0.38'
   XS::Parse::Infix::Builder:
     file: lib/XS/Parse/Infix/Builder.pm
-    version: '0.33'
+    version: '0.38'
   XS::Parse::Keyword:
     file: lib/XS/Parse/Keyword.pm
-    version: '0.33'
+    version: '0.38'
   XS::Parse::Keyword::Builder:
     file: lib/XS/Parse/Keyword/Builder.pm
-    version: '0.33'
+    version: '0.38'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.33'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

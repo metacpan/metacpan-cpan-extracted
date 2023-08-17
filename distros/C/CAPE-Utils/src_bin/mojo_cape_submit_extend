@@ -1,0 +1,262 @@
+#!perl
+
+=head1 NAME
+
+mojo_cape_submit_extend - Compute stats for mojo_cape_submit based on incoming JSONs
+
+=head1 SYNOPSIS
+
+mojo_cape_submit_extend [B<-Z>] [B<-m> <incoming JSON dir>]
+
+=head1 DESCRIPTION
+
+Computes the stats for mojo_cape_submit based on the incoming JSON files.
+
+=head1 SWITCHES
+
+=head2 -m <dir>
+
+The incoming JSON dir.
+
+Default: /malware/incoming-json/
+
+=head2 -Z
+
+Do not optionally GZip+Base64 compress the results.
+
+=head1 Generated JSON
+
+The generated JSON is a standard LibreNMS style return. For more
+information on that see L<https://docs.librenms.org/Developing/Application-Notes/>.
+
+    - .changed_hashes[] :: A array of IDs that has had the hashes changed from between
+        being checksumed prior to sending and after being received.
+
+All stats generated are gauges, just displaying the value for the current time slot.
+
+Totals hash...
+
+    - .totals.app_proto.$app_proto :: '.totals.app_proto' is a hash of totals for files
+        extracted using that app proto.
+
+    - .totals.hash_changed :: Total of hashes that changed.
+
+    - .totals.size_max :: Max submitted file size.
+
+    - .totals.size_mean :: Mean size of submitted files.
+
+    - .totals.size_median :: Median size of submitted files.
+
+    - .totals.size_min :: Min size of submitted files.
+
+    - .totals.size_mode :: Mode of the size of submitted files.
+
+    - .totals.size_stddev :: Standard deviation of the size of submitted files.
+
+    - .totals.size_sum :: Sum of the size of submitted files.
+
+    - .totals.slug_count :: Total number of submitted files.
+
+    - .totals.sub_count :: Total number of submitted files.
+
+Slugs hash...
+
+    - .slugs.$slug :: A per slug hash that is the same as the totals hash,
+        but only for the that specific slug. This only includes slug seen
+        during the current time slot.
+
+=cut
+
+use File::Find::Rule;
+use warnings;
+use strict;
+use Config::Tiny;
+use Time::Piece;
+use File::Slurp qw(read_file);
+use JSON;
+use Getopt::Long;
+use Statistics::Lite qw(:all);
+use Gzip::Faster;
+use MIME::Base64;
+
+my $extend_version = 1;
+
+my $version;
+my $help;
+my $rewind_by         = 300;
+my $dont_compress     = 0;
+my $incoming_json_dir = '/malware/incoming-json/';
+GetOptions(
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version,
+	'version' => \$version,
+	'Z'       => \$dont_compress,
+	'm=s'     => \$incoming_json_dir,
+);
+
+sub version {
+	print "mojo_cape_submit_extend v. 0.0.1\n";
+}
+
+if ($help) {
+	version;
+
+	print '
+
+-m <dir>   Incoming JSON dir.
+           Default :: /malware/incoming-json/
+
+-Z         Do not gzip+base64 compress the results.
+
+-h         Print help.
+--help     Print help.
+-v         Print version info.
+--version  Print version info.
+';
+
+	exit;
+} ## end if ($help)
+
+my $t           = localtime;
+my $target_time = $t->epoch - $rewind_by;
+
+my @files = File::Find::Rule->file()->name(qr/^[0-9]+\.json$/)->ctime( '>=' . $target_time )->in($incoming_json_dir);
+
+my $data = {
+	totals => {
+		hash_changed => 0,
+		size_min     => 0,
+		size_mean    => 0,
+		size_median  => 0,
+		size_mode    => 0,
+		size_max     => 0,
+		size_stddev  => 0,
+		size_sum     => 0,
+		sub_count    => 0,
+		app_proto    => {},
+		app_protos   => 0,
+	},
+	slugs          => {},
+	changed_hashes => [],
+};
+
+my @all_sizes;
+my $slug_sizes;
+
+my $errorString = '';
+my $error       = 0;
+foreach my $file (@files) {
+	my $slug;
+	my $hash_changed = 0;
+
+	$data->{totals}{sub_count}++;
+
+	my $short_file = $file;
+	$short_file =~ s/.*\///;
+
+	eval {
+		my $json = decode_json( read_file($file) );
+
+		push( @all_sizes, $json->{cape_submit}{size} );
+
+		$slug = $json->{suricata_extract_submit}{slug};
+		if ( !defined( $data->{slugs}{$slug} ) ) {
+			$data->{slugs}{$slug} = {
+				hash_changed => 0,
+				size_min     => 0,
+				size_mean    => 0,
+				size_median  => 0,
+				size_mode    => 0,
+				size_max     => 0,
+				size_stddev  => 0,
+				size_sum     => 0,
+				sub_count    => 0,
+				app_proto    => {},
+				app_protos   => 0,
+			};
+			$slug_sizes->{$slug} = [];
+		} ## end if ( !defined( $data->{slugs}{$slug} ) )
+
+		push( @{ $slug_sizes->{$slug} }, $json->{cape_submit}{size} );
+
+		if ( $json->{cape_submit}{sha256} ne $json->{suricata_extract_submit}{sha256} ) {
+			$hash_changed = 1;
+			push( @{ $data->{changed_hashes} }, $short_file );
+		}
+		if ( defined( $data->{slugs}{$slug} ) ) {
+			$data->{slugs}{$slug}{hash_changed} += $hash_changed;
+		}
+		$data->{totals}{hash_changed} += $hash_changed;
+
+		$data->{slugs}{$slug}{sub_count}++;
+
+		if ( defined( $json->{app_proto} ) ) {
+			my $app_proto = $json->{app_proto};
+			if ( !defined( $data->{totals}{app_proto}{$app_proto} ) ) {
+				$data->{totals}{app_protos}++;
+				$data->{totals}{app_proto}{$app_proto} = 0;
+			}
+			$data->{totals}{app_proto}{$app_proto}++;
+
+			if ( !defined( $data->{slugs}{$slug}{app_proto}{$app_proto} ) ) {
+				$data->{slugs}{$slug}{app_protos}++;
+				$data->{slugs}{$slug}{app_proto}{$app_proto} = 0;
+			}
+			$data->{slugs}{app_proto}{$app_proto}++;
+		} ## end if ( defined( $json->{app_proto} ) )
+	};
+	if ($@) {
+		$errorString = $errorString . $short_file . ': ' . $@;
+		$error       = 1;
+	}
+} ## end foreach my $file (@files)
+
+# only do this if we have values, otherwise they will end up as null
+# which will make the display very suboptimal for LibreNMS
+if ( defined( $all_sizes[0] ) ) {
+	$data->{totals}{size_min}    = min(@all_sizes);
+	$data->{totals}{size_max}    = max(@all_sizes);
+	$data->{totals}{size_mean}   = mean(@all_sizes);
+	$data->{totals}{size_median} = median(@all_sizes);
+	$data->{totals}{size_mode}   = mode(@all_sizes);
+	$data->{totals}{size_stddev} = stddev(@all_sizes);
+	$data->{totals}{size_sum}    = sum(@all_sizes);
+
+	my @slugs = keys( %{$slug_sizes} );
+	foreach my $item (@slugs) {
+		$data->{slugs}{$item}{size_min}    = min(@all_sizes);
+		$data->{slugs}{$item}{size_max}    = max(@all_sizes);
+		$data->{slugs}{$item}{size_mean}   = mean(@all_sizes);
+		$data->{slugs}{$item}{size_median} = median(@all_sizes);
+		$data->{slugs}{$item}{size_mode}   = mode(@all_sizes);
+		$data->{slugs}{$item}{size_stddev} = stddev(@all_sizes);
+		$data->{slugs}{$item}{size_sum}    = sum(@all_sizes);
+	}
+} ## end if ( defined( $all_sizes[0] ) )
+
+my $json_string = encode_json(
+	{
+		data        => $data,
+		version     => $extend_version,
+		error       => $error,
+		errorString => $errorString,
+	}
+);
+
+if ( !$dont_compress ) {
+	# gzip and print encode in base64
+	# base64 is needed as snmp does not like
+	my $compressed = encode_base64( gzip($json_string) );
+	$compressed =~ s/\n//g;
+	$compressed = $compressed . "\n";
+
+	# check which is smaller and prints it
+	if ( length($compressed) > length($json_string) ) {
+		print $json_string. "\n";
+	} else {
+		print $compressed;
+	}
+} else {
+	print $json_string. "\n";
+}

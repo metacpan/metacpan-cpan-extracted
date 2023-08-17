@@ -1,0 +1,60 @@
+---
+abstract: 'Find or download and install popt library'
+author:
+  - 'Michal Josef Špaček <skim@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.32'
+  Archive::Tar: '0'
+  ExtUtils::MakeMaker: '6.76'
+  HTTP::Tiny: '0.044'
+  IO::Zlib: '0'
+  Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
+  Sort::Versions: '0'
+  Test::Alien: '0'
+  Test::Alien::Diag: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::Make: '0.99'
+  Alien::Build::Plugin::PkgConfig::Negotiate: '0'
+  ExtUtils::MakeMaker: '6.76'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libpopt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0'
+  Alien::Build: '0.25'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Alien-libpopt/issues
+  repository: https://github.com/michal-josef-spacek/Alien-libpopt
+version: '0.01'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.80'
+  requires:
+    share:
+      Archive::Tar: '0'
+      HTTP::Tiny: '0.044'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

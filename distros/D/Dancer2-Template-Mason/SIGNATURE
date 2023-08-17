@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 09ebd690c9e11db83266e81f55152abc31114beb36d585762eed6c53d9181794 AUTHOR_PLEDGE
+SHA256 6238bb7d4a4e1028777feb605f4f3253efe2baf2b24635f255a18bc51ea63be7 CODE_OF_CONDUCT.md
+SHA256 4e6409139a0d412ffb3a3a0a76d22d1ac1850c8f60f6ae438aa487392cb2c66c CONTRIBUTORS
+SHA256 b6ae560ecda5a7ffa1f94efd36f962e2caa6dcf3aab16868060cf5fcbd36ca37 Changes
+SHA256 dfa062909044fa5b0414c93a7dd97947a61762a5abcaf8cbbc83aa4acf92aba1 INSTALL
+SHA256 08a65f64b584f97c72f0cd60dcb71909d145d643bd7f86d41a574fae876d30f9 LICENSE
+SHA256 59ad77700761dcca0c06f8a69730ec40bed9740690ec188c4b1cbae1e3048d19 MANIFEST
+SHA256 f0865d541b9cb99c48f62c015ce2a355a6db8120b466fd8135cdb54275ee31fc META.json
+SHA256 665c75e95952a4385bb95a4b9c512f533d70c6b73595ee5464b9a357653205c7 META.yml
+SHA256 964a1e895e2e16a89aa010dfb6ab71bf2131dc082e6f7306839c03c4e83158ca Makefile.PL
+SHA256 7ad24124426283527618cf47d2b60ccafa4109845a8b5d0c0a8b06f5cfaec955 README.mkdn
+SHA256 ed9e2202182bd40a01efe5ba4d0c7c6607e3993c81874c2a36c7602d5d99ade7 cpanfile
+SHA256 84d979358575a5a7f95d2ec5151e32f11894ddcde064e5abe3e0d8e0f04004aa doap.xml
+SHA256 8f70737c7c7fcf8a38cd98a1f400cc03de6de44760f9aa3a3c596583b4c3af82 inc/Devel/AssertOS.pm
+SHA256 7afe3ca4cf8bf82ab594d7e499978218fd7299b5eef1b9dfb9596895db83f0b3 inc/Devel/AssertOS/Alias/MacOS.pm
+SHA256 cc9b6e60367bcfc77d23888486d92f11c5331e0f527e41bae2d3ca9f4dce62b7 inc/Devel/CheckOS.pm
+SHA256 df3f47a3897f8fd2877c6ed1d362c49958f2a1ac0cd61b1b82d5dcc4747a91cc lib/Dancer2/Template/Mason.pm
+SHA256 cf7053fa34491264c2a9a97cea8f4a0c6c1481dd2fdf4b0e00c3a0a4fb1c7af1 t/00-compile.t
+SHA256 d8905750cf0d00630123f13b59f8ab067497ab348595946f1a8669bf20b4c446 t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 40bfd60c54d0427854baba3b76930ed560375d9d60125d442f93ba21f67c2729 t/01-basic.t
+SHA256 967d96f45a87089025542953b9ead0e3f33d4be2c624d220e016598fa4e4f05b t/views/index
+SHA256 246078ec2823b37deddd4c48c4058bf2b143b7114da7fb765cf941f96f91df92 t/views/index.m
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCZNqatQAKCRDfgfB/4bAL
+jAZLAJ0ccpvS3v4Sipn6dGYFY1gK8hk0xACgwtJPw0ZSM7MndHVkDfVe5Mci1HY=
+=iDhg
+-----END PGP SIGNATURE-----

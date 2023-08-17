@@ -1,4 +1,25 @@
 Revision history for Perl extension Hustle::Table
+v0.6.0  2023-06-07
+  [improvements]
+    - Regular expressions from non core regexp engines are now processed as a
+      regexp directly. Previously these would not be detected, and assumed a
+      string to then be compiled into a core regexp
+    - Added github actions to repo
+  [tests]
+    - Added test for regexp matching with a no capture groups
+    - Added test for regexp matching with a capture group not capturing
+    
+  [fixes]
+    - captures are now copied into a new array and not a shared array across the table.
+    - captures are now returned as per the documentation for regexps with no
+      captured items (i.e ref to empty array, instead of undef)
+    - Turn off 'not numeric' warnings in main table code to remove noise when
+      testing a string input against a numeric matcher
+
+  [pod]
+    - Typo fixes.
+    - Add a section on new non core Regexp improvements
+
 
 0.5.5 	Wed 17 Aug 2022 15:14:43 AEST
 	- Added subroutine matching type. A CODE ref can be used to match the input.
@@ -44,7 +65,7 @@ Revision history for Perl extension Hustle::Table
 	- Table entry stores any scalar value, not just code references
 	- Regex, begin, end, exact and numeric matchers
 	- Dispatcher returns matching table entry and regex captures
-	- Caching always enabled. external management by user application
+	- Caching always enabled. External management by user application
 
 
 0.4.1   Mon  7 Mar 2022 17:27:52 AEST

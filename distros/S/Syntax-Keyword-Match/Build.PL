@@ -9,16 +9,16 @@ use XS::Parse::Infix::Builder;
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::Match",
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => '0.000147',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.23',
+      'XS::Parse::Keyword::Builder' => '0.36',
       'XS::Parse::Infix::Builder' => '0',
    },
    requires => {
       'perl' => '5.016', # Perl_do_ncmp(), pad_add_name_pvs()
-      'XS::Parse::Keyword' => '0.23',
+      'XS::Parse::Keyword' => '0.36',
    },
    license => 'perl',
    create_license => 1,

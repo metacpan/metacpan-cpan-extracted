@@ -1,6 +1,8 @@
 use Test::More;
 use Lingua::EN::Inflexion;
-no if $] >= 5.018, warnings => "experimental::smartmatch";   # Grrrrrrr!!!
+
+use if $] < 5.012, 'Test::More', skip_all => 'No regex coercions in Perl 5.10 or earlier';
+BEGIN { exit if $] < 5.012 }
 
 sub should_pass {
     my ($test, $desc) = @_;
@@ -12,7 +14,7 @@ sub should_fail {
     ok !$test => "$desc\t(should fail)";
 }
 
-while (my $test_case= readline(*DATA)) {
+while (my $test_case = readline(*DATA)) {
     my ($should_match, @words) = split /\s+/, $test_case;
 
 
@@ -23,19 +25,12 @@ while (my $test_case= readline(*DATA)) {
         my $ok    = $should_match eq '+' || $word1 eq $word2 ? \&should_pass : \&should_fail;
         my $ok_eq =                         $word1 eq $word2 ? \&should_pass : \&should_fail;
 
-        subtest "Smartmatching: $word1 ~~ $word2" => sub {
-            $ok->(          (noun($word1) ~~ noun($word2) )  => "noun('$word1') ~~ noun('$word2')" );
-            $ok->(          (     $word1  ~~ noun($word2) )  => "     '$word1'  ~~ noun('$word2')" );
-            $ok->(          (noun($word1) ~~      $word2  )  => "noun('$word1') ~~      '$word2' " );
-            done_testing();
-        };
-
         subtest "Regex matching: $word1 =~ $word2" => sub {
             $ok->(    scalar(noun($word1) =~ noun($word2) )  => "noun('$word1') =~ noun('$word2')" );
             $ok->(    scalar(     $word1  =~ noun($word2) )  => "     '$word1'  =~ noun('$word2')" );
             $ok_eq->( scalar(noun($word1) =~    /^$word2$/)  => "noun('$word1') =~      '$word2' " );
             done_testing();
-        } if $[ >= 5.012;
+        } if $] >= 5.012;
     }}
 }
 

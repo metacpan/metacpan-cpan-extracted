@@ -21,6 +21,9 @@ allow_import_of = utf8
 # ability to have proper method conflict resolution.
 [Moose::ProhibitMultipleWiths]
 
+# MacOS file system is case-insensitive, damn it.
+[Modules::RequireFilenameMatchesPackage]
+
 #--------------------------------------------------------------
 # I do not agree with these at all, so never load them
 

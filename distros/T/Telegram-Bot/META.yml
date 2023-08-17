@@ -2,11 +2,12 @@
 abstract: 'A base class to make your very own Telegram bot'
 author:
   - 'Justin Hawkins <justin@eatmorecode.com>'
+  - 'James Green <jkg@earth.li>'
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +19,10 @@ requires:
   Mojolicious: '8.00'
   Test::Exception: '0.43'
 resources:
-  bugtracker: https://github.com/EatMoreCode/Telegram-Bot/issues
-  homepage: https://github.com/EatMoreCode/Telegram-Bot
-  repository: https://github.com/EatMoreCode/Telegram-Bot.git
-version: '0.021'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  bugtracker: https://github.com/jkg/Telegram-Bot/issues
+  homepage: https://github.com/jkg/Telegram-Bot
+  repository: https://github.com/jkg/Telegram-Bot.git
+version: '0.023'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

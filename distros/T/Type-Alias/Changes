@@ -1,0 +1,31 @@
+Revision history for Perl extension Type-Alias
+
+0.06 2023-08-14T09:18:42Z
+    [IMPROVEMENTS]
+    - Convert scalar value to Eq,NumEq,Undef,Bool #8
+
+0.05 2023-08-13T06:56:42Z
+    [IMPROVEMENTS]
+    - set specific dependencies #7
+
+0.04 2023-07-31T08:25:57Z
+    [IMPROVEMENTS]
+    - improve docs and external tests. #5 #6
+    - improve type alias prototype. #3
+
+    [INCOMPATIBLE CHANGE]
+    - add `type` option and remove -type_alias option. #4
+    - remove -declare option and add -alias and -fun options. #3
+
+0.03 2023-07-30T23:26:34Z
+    [INCOMPATIBLE CHANGE]
+    - Remove -export_ok option. #2
+
+0.02 2023-07-30T12:43:50Z
+    [BUG FIXES]
+    - push `@type_aliases` after `@EXPORT_OK` is set. #1
+
+0.01 2023-07-30T05:43:32Z
+
+    - original version
+

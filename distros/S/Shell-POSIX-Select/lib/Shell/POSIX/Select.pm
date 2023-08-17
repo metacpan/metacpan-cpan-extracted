@@ -1,6 +1,6 @@
 package Shell::POSIX::Select;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # TODO: Portable-ize tput stuff
 
@@ -68,8 +68,8 @@ $U_DEBUG=0;
 $DEBUG_FILT=4;
 # $DEBUG_FILT=0;
 
-$DEBUG=1; # force verbosity level for debugging messages
-# $DEBUG=0; # force verbosity level for debugging messages
+# $DEBUG=1; # force verbosity level for debugging messages
+$DEBUG=0; # force verbosity level for debugging messages
 
 $REPORT=1; # report subroutines when entered
 # $REPORT=0; # report subroutines when entered
@@ -1260,7 +1260,7 @@ sub show_subs {
 		 my $start=(shift || 0);
 		 my $length=(shift || 9999);
 
-		 $string =~ s/[^[:alpha:\d\s]]/-/g;	# control-chars screw up printing
+		 $string =~ s/[^[[:alpha:]\d\s]]/-/g;	# control-chars screw up printing
 # warn "Calling substr for parms $string/$start/$length\n";
 		 warn "$msg", $ON, substr ($string, $start, $length), $OFF, "\n";
 }

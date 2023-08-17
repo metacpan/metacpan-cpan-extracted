@@ -15,7 +15,7 @@ use StorageDisplay::Collect;
 
 package StorageDisplay::Collect::CMD::Replay;
 # ABSTRACT: Use cached command output to collect data
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 
 use parent -norequire => "StorageDisplay::Collect::CMD";
@@ -129,7 +129,7 @@ StorageDisplay::Collect::CMD::Replay - Use cached command output to collect data
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 This module is mainly useful for debug or test only. It allows
 one to replace real data collect on machine by the recorded

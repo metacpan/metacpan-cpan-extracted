@@ -4,7 +4,7 @@ use Test::More();
 use XS::libcatch();
 use Test::Builder();
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.1';
 
 XS::Loader::load();
 
@@ -14,7 +14,7 @@ sub import {
         run(@_);
         Test::More::done_testing();
     }
-    
+
     my $pkg = caller();
     no strict 'refs';
     *{"${pkg}::catch_run"} = \&run;

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -75,25 +75,15 @@ $loop->SSL_listen(
    on_listen_error => sub { die "Test failed early - $_[-1]" },
    on_resolve_error => sub { die "Test failed early - $_[-1]" },
    on_ssl_error     => sub { die "Test failed early - $_[-1]" },
-);
-
-wait_for { defined $port };
+)->get;
 
 my $local_uri = URI->new( "https://127.0.0.1:$port/" );
 
-my $response;
-
-$http->do_request(
+my $response = $http->do_request(
    uri => $local_uri,
 
-   on_response => sub {
-      $response = $_[0];
-   },
-
    on_error => sub { die "Test failed early - $_[-1]" },
-);
-
-wait_for { defined $response };
+)->get;
 
 is( $response->content_type, "text/plain", '$response->content_type' );
 is( $response->content, "OK", '$response->content' );

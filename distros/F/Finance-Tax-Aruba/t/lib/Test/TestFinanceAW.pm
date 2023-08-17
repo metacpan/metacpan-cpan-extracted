@@ -1,33 +1,37 @@
-package # no indexing
+package    # no indexing
     Test::TestFinanceAW;
 use warnings;
 use strict;
 use Finance::Tax::Aruba::Income;
 use Test::More 0.96;
+use Math::BigInt;
 
 # ABSTRACT: Testing module for Finance::Tax::Aruba
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(test_yearly_income);
 
-our %EXPORT_TAGS = (
-  all => \@EXPORT_OK
-);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 my %mapping = (
-    wervingskosten    => "Wervingskosten",
-    aov_yearly_income => "AOV yearly income",
-    azv_yearly_income => "AZV yearly income",
-    taxfree_max       => "Tax free amount",
-    pension_employee  => "Employee pension amount",
-    pension_employer  => "Employer pension amount",
-    net_yearly_income => "Yearly income (net)",
-    tax_fixed         => "Income tax (fixed)",
-    tax_variable      => "Income tax (variable)",
-    tax_rate          => "Tax rate",
-    net_income        => "Net income",
-    tax_free_wage     => "Income after taxes",
-    child_deductions  => "Child deductions",
+  aov_yearly_income   => "AOV yearly income",
+  azv_yearly_income   => "AZV yearly income",
+  child_deductions    => "Child deductions",
+  company_costs       => "Company costs",
+  government_costs    => "Government premiums",
+  net_income          => "Net income",
+  net_yearly_income   => "Yearly income (net)",
+  pension_employee    => "Employee pension amount",
+  pension_employer    => "Employer pension amount",
+  social_costs        => "Social costs",
+  tax_fixed           => "Income tax (fixed)",
+  tax_free_wage       => "Income after taxes",
+  tax_rate            => "Tax rate",
+  tax_variable        => "Income tax (variable)",
+  taxable_wage        => "Taxeable income",
+  taxfree_max         => "Tax free amount",
+  wervingskosten      => "Wervingskosten",
+  yearly_income_gross => "Yearly gross income",
 );
 
 sub test_yearly_income {
@@ -48,20 +52,36 @@ sub test_yearly_income {
     #
 
     my $yearly_income_gross = $monthly * 12;
-    $yearly_income_gross += ($args{fringe} // 0) * 12;
 
-    is($calc->yearly_income_gross,
-        $yearly_income_gross, "Yearly gross income: $yearly_income_gross");
+    $args{$_} //= 0 foreach qw(fringe bonus);
 
-    check_optional_results($calc, $results, 'wervingskosten');
+    my $pension_income = $yearly_income_gross;
+
+    $yearly_income_gross += $args{fringe} * 12;
+    $yearly_income_gross += $args{bonus};
+
+
+    if (!check_optional_results($calc, $results, 'yearly_income_gross')) {
+        is($calc->yearly_income_gross,
+            $yearly_income_gross, "Yearly gross income: $yearly_income_gross");
+    }
+
+
+    if (!check_optional_results($calc, $results, 'wervingskosten')) {
+        my $amount = get_perc_for($yearly_income_gross / 100 * $calc->pension_employer_perc);
+        $amount = $calc->wervingskosten_max if $amount > $calc->wervingskosten_max;
+        is($calc->wervingskosten, $amount, "Wervingskosten: $amount");
+    }
 
     if (!check_optional_results($calc, $results, 'pension_employer')) {
-        my $amount = $yearly_income_gross / 100 * $calc->pension_employer_perc;
-        is($calc->pension_employer, $amount, "Pension employer: $amount");
+        my $amount
+          = get_perc_for($pension_income / 100 * $calc->pension_employer_perc);
+        is($calc->pension_employer, $amount,
+          "Pension employer: $amount");
     }
 
     if (!check_optional_results($calc, $results, 'pension_employee')) {
-        my $amount = $yearly_income_gross / 100 * $calc->pension_employee_perc;
+        my $amount = get_perc_for($pension_income / 100 * $calc->pension_employee_perc);
         is($calc->pension_employee, $amount, "Pension employee: $amount");
     }
 
@@ -69,8 +89,7 @@ sub test_yearly_income {
         my $yearly_income
             = $yearly_income_gross
             - $calc->wervingskosten
-            - $calc->pension_employee
-            + $calc->bonus;
+            - $calc->pension_employee;
 
         is($calc->yearly_income, $yearly_income,
             "Yearly income: $yearly_income");
@@ -112,8 +131,7 @@ sub test_yearly_income {
 
     # This is the actual zuiver jaarloon, aka net yearly income
     if (!check_optional_results($calc, $results, 'net_yearly_income')) {
-        my $amount
-            = $calc->yearly_income - $calc->aov_employee - $calc->azv_employee;
+        my $amount = $calc->yearly_income - $calc->aov_employee - $calc->azv_employee;
 
         is($calc->net_yearly_income, $amount, "Net yearly income: $amount");
     }
@@ -130,15 +148,15 @@ sub test_yearly_income {
     # taxable amount is the taxeable wage minus the minimum of the tax bracket
     # Over difference the tax rate is applied
     if (!check_optional_results($calc, $results, 'taxable_amount')) {
-        my $amount = sprintf("%.02f", $calc->taxable_wage - $calc->tax_minimum) + 0;
+        my $amount = get_perc_for($calc->taxable_wage - $calc->tax_minimum);
         is($calc->taxable_amount, $amount, "Taxable amount: $amount");
     }
 
     if (!check_optional_results($calc, $results, 'tax_variable')) {
-        my $amount
-            = sprintf("%.02f", $calc->taxable_amount / 100 * $calc->tax_rate)
-            + 0;
-        is($calc->tax_variable, $amount, "Income tax (variable): $amount");
+        my $amount = get_perc_for($calc->taxable_amount / 100 * $calc->tax_rate);
+
+        is(Math::BigInt->new($calc->tax_variable),
+          Math::BigInt->new($amount), "Income tax (variable): $amount");
     }
 
     {
@@ -149,22 +167,31 @@ sub test_yearly_income {
 
     check_required_results($calc, $results, 'tax_rate');
 
-    if (!check_optional_results($calc, $results, 'employee_income_deductions')) {
-        my $amount = $calc->aov_employee + $calc->azv_employee + $calc->income_tax;
-        is($calc->employee_income_deductions, $amount, "Employee income deducations: $amount");
+    if (!check_optional_results($calc, $results, 'employee_income_deductions'))
+    {
+        my $amount
+            = $calc->aov_employee + $calc->azv_employee + $calc->income_tax;
+        is($calc->employee_income_deductions,
+            $amount, "Employee income deducations: $amount");
     }
 
 
     if (!check_optional_results($calc, $results, 'tax_free_wage')) {
-        my $amount = $calc->yearly_income - $calc->employee_income_deductions - $calc->taxfree_amount - $calc->fringe;
+        my $amount
+            = $calc->yearly_income
+            - $calc->employee_income_deductions
+            - $calc->taxfree_amount
+            - $calc->fringe;
         is($calc->tax_free_wage, $amount, "Tax free wages: $amount");
     }
 
     foreach (sort keys %$results) {
         check_required_results($calc, $results, $_);
     }
+}
 
-
+sub get_perc_for {
+    return sprintf("%.02f", shift) +0
 }
 
 sub check_required_results {

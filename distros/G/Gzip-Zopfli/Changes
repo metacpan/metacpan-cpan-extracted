@@ -1,5 +1,9 @@
 Revision history for Perl module Gzip::Zopfli
 
+0.02 2023-07-27
+
+- Fixed error in test code which shows up for Perl 39.1
+
 0.01 2021-03-01
 
 - Initial version

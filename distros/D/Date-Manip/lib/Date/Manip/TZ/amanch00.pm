@@ -6,9 +6,9 @@ Date::Manip::TZ::amanch00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Dec  2 12:31:47 EST 2022
-#    Data version: tzdata2022g
-#    Code version: tzcode2022g
+#    Generated on: Wed Jun  7 12:24:43 EDT 2023
+#    Data version: tzdata2023c
+#    Code version: tzcode2023c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.91';
+$VERSION='6.92';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -1186,6 +1186,15 @@ END { undef $VERSION; }
         [ [2092,11,2,10,0,0],[2092,11,2,1,0,0],'-09:00:00',[-9,0,0],
           'AKST',0,[2093,3,8,10,59,59],[2093,3,8,1,59,59],
           '2092110210:00:00','2092110201:00:00','2093030810:59:59','2093030801:59:59' ],
+     ],
+   2093 =>
+     [
+        [ [2093,3,8,11,0,0],[2093,3,8,3,0,0],'-08:00:00',[-8,0,0],
+          'AKDT',1,[2093,11,1,9,59,59],[2093,11,1,1,59,59],
+          '2093030811:00:00','2093030803:00:00','2093110109:59:59','2093110101:59:59' ],
+        [ [2093,11,1,10,0,0],[2093,11,1,1,0,0],'-09:00:00',[-9,0,0],
+          'AKST',0,[2094,3,14,10,59,59],[2094,3,14,1,59,59],
+          '2093110110:00:00','2093110101:00:00','2094031410:59:59','2094031401:59:59' ],
      ],
 );
 

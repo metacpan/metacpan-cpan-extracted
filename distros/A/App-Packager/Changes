@@ -1,17 +1,22 @@
 Revision history for App-Packager
 
-1.430	Jul 05 2018
+1.440	2023-08-03
 
-	Improve abstractions.
-	By default, export 'getresource' that mostly DWIMs.
-	'use App::Packager' now requires a ':name' and the package
-	name, e.g.
+	* Add support for PPL, Docker and AppImage.
 
-	use App::Packager qw( :name My::App );
+1.430	2018-07-05
 
-1.420   Apr 07 2017
+	* Improve abstractions.
 
-	First official release as an independent package.
+	* By default, export 'getresource' that mostly DWIMs.
+	  'use App::Packager' now requires a ':name' and the package
+	  name, e.g.
+
+         use App::Packager qw( :name My::App );
+
+1.420   2017-04-07
+
+	* First official release as an independent package.
 
 
 

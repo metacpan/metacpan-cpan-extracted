@@ -1,5 +1,11 @@
 Changelog for Catmandu-PICA
 
+1.16 2023-08-11T07:06:23Z
+  - Add Fix: pica_update (#82)
+
+1.15 2023-08-09T19:03:38Z
+  - Update PICA::Data to support parsing PICA Import format (#88)
+
 1.14 2023-05-26T06:13:27Z
   - pica_add creates missing record (#77)
 

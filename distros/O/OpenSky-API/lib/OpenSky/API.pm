@@ -4,7 +4,7 @@ package OpenSky::API;
 
 # ABSTRACT: Perl interface to the OpenSky Network API
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose;
 use OpenSky::API::Types qw(
   ArrayRef
@@ -30,6 +30,8 @@ use Mojo::URL;
 use Mojo::JSON qw( decode_json );
 use Type::Params -sigs;
 use experimental qw( signatures );
+
+warnings::warnif( 'deprecated', 'OpenSky::API is deprecated and should no longer be used. Please use WebService::OpenSky instead.' );
 
 has config => (
     is      => 'ro',
@@ -318,7 +320,7 @@ OpenSky::API - Perl interface to the OpenSky Network API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -335,6 +337,11 @@ version 0.004
     }
 
 =head1 DESCRIPTION
+
+B<WARNING>: This module is deprecated in favor of L<WebService::OpenSky>. This
+was an experiment to see how easy it would be to create this module using
+Github Copilot. It was a fun experiment, but there were some design flaws.
+Those are largely fixed in L<WebService::OpenSky>.
 
 This is a Perl interface to the OpenSky Network API. It provides a simple, object-oriented
 interface, but also allows you to fetch raw results for performance.

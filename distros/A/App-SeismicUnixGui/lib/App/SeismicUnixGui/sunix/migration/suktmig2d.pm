@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::migration::suktmig2d;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

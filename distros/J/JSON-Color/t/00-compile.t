@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'ColorTheme/JSON/Color/bright256.pm',
     'ColorTheme/JSON/Color/default_ansi.pm',
     'ColorTheme/JSON/Color/default_rgb.pm',
     'JSON/Color.pm'

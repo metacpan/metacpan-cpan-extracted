@@ -1,0 +1,8 @@
+0.002   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Bencher-Scenario-{ScalarCmp,Scalar-Cmp}.
+
+
+0.001   2018-12-06  Released-By: PERLANCAR
+
+        - First release.

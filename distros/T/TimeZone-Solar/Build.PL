@@ -18,13 +18,13 @@ my %module_build_args = (
     "Ian Kluft <ian.kluft+github\@gmail.com>"
   ],
   "dist_name" => "TimeZone-Solar",
-  "dist_version" => "0.2.1",
+  "dist_version" => "0.2.2",
   "license" => "perl",
   "module_name" => "TimeZone::Solar",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
-    "DateTime::TimeZone" => 0,
+    "DateTime::TimeZone" => "v0.80.0",
     "Modern::Perl" => 0,
     "Readonly" => 0,
     "Try::Tiny" => 0,

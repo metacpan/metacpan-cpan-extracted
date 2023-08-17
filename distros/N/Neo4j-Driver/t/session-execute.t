@@ -5,13 +5,16 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 # The execute_... group of methods are used to run managed transactions
 # that can perform retries automatically for certain kinds of errors.
 
 use Scalar::Util qw(weaken);
+use Time::HiRes ();
 
 use Neo4j::Driver;
 use Neo4j::Error;
@@ -19,7 +22,7 @@ use Neo4j_Test;
 use Neo4j_Test::EchoHTTP;
 use Neo4j_Test::MockQuery;
 
-plan tests => 8 + 1;
+plan tests => 8 + $no_warnings;
 
 
 my ($d, $s, $r, @r);
@@ -71,23 +74,38 @@ subtest 'server error no retry' => sub {
 
 
 subtest 'server error with retry' => sub {
-	plan tests => 2 + 3;
 	$mock = Neo4j_Test::MockQuery->new;
 	$mock->query_result('foo' => 'bar');
 	$mock->query_result('error' => Neo4j::Error->new( Server => {
 		code => 'Neo.TransientError.Database.DatabaseUnavailable',
 	}));
+	
+	# Establish baseline timing
 	$d = Neo4j::Driver->new->plugin($mock);
-	$s = $d->config(max_transaction_retry_time => 0.03)->session;
-	$s->{retry_sleep} = 0.001;
-	# 1/1000 of default sleep/timeout, to speed up testing
+	$s = $d->config(max_transaction_retry_time => 0)->session;
+	my $sleep = - Time::HiRes::time;
+	eval { $s->execute_read(sub { shift->run('error') }) };
+	Time::HiRes::sleep 0.001;  # 1/1000 of default
+	$sleep += Time::HiRes::time;
+	my $timeout = $sleep * 30;
+	
+	# limit: retry speed 5 ms
+	diag sprintf "retry speed %.1f ms", $sleep * 1000 if $ENV{AUTOMATED_TESTING};
+	plan skip_all => "(test too slow)" unless $ENV{EXTENDED_TESTING} || $timeout < 0.15;
+	plan tests => 2 + 3;
+	
+	$d = Neo4j::Driver->new->plugin($mock);
+	$s = $d->config(max_transaction_retry_time => $timeout)->session;
+	$s->{retry_sleep} = $sleep;
 	
 	# Temporary error, retry keeps failing
+	my $start = Time::HiRes::time;
 	my $try = 0;
 	throws_ok {
 		$s->execute_read(sub { $try++; shift->run('error'); });
 	} qr/\.DatabaseUnavailable\b/, 'retry dies';
-	ok $try > 2, 'yes retry';
+	ok $try > 2, 'yes retry'
+		or diag sprintf "on try %i after %.1f ms, timeout %.1f ms", $try, map {$_ * 1000} Time::HiRes::time - $start, $timeout;
 	
 	# Temporary error, retry eventually succeeds
 	$try = 0;
@@ -205,7 +223,7 @@ subtest 'live server' => sub {
 	plan skip_all => "(no session)" unless $session;
 	plan skip_all => '(not implemented in simulator)' if $Neo4j_Test::sim;
 	plan tests => 7;
-	$session->{driver}->{max_transaction_retry_time} = 0;  # speed up testing
+	$session->{driver}->{config}->{max_transaction_retry_time} = 0;  # speed up testing
 	my $count = $r = $session->run('MATCH (a:Test) WHERE a.test IS NOT NULL RETURN a')->size;
 	
 	throws_ok {

@@ -50,19 +50,19 @@
    "provides" : {
       "Mutex" : {
          "file" : "lib/Mutex.pm",
-         "version" : "1.007"
+         "version" : "1.009"
       },
       "Mutex::Channel" : {
          "file" : "lib/Mutex/Channel.pm",
-         "version" : "1.007"
+         "version" : "1.009"
       },
       "Mutex::Flock" : {
          "file" : "lib/Mutex/Flock.pm",
-         "version" : "1.007"
+         "version" : "1.009"
       },
       "Mutex::Util" : {
          "file" : "lib/Mutex/Util.pm",
-         "version" : "1.007"
+         "version" : "1.009"
       }
    },
    "release_status" : "stable",
@@ -78,5 +78,5 @@
          "url" : "https://github.com/marioroy/mutex-perl.git"
       }
    },
-   "version" : "1.007"
+   "version" : "1.009"
 }

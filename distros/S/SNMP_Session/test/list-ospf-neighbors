@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl -w
+
+require 5.002;
+use strict;
+use SNMP_Session "0.59";
+use BER;
+use Socket;
+
+sub usage ();
+
+my $ospfNbrIpAddr = [1,3,6,1,2,1,14,10,1,1];
+my $ospfNbrRtrId = [1,3,6,1,2,1,14,10,1,3];
+my $ospfNbrState = [1,3,6,1,2,1,14,10,1,6];
+
+my $hostname = $ARGV[0] || usage ();
+my $community = $ARGV[1] || "public";
+
+my $session;
+
+die "Couldn't open SNMP session to $hostname"
+    unless ($session = SNMP_Session->open ($hostname, $community, 161));
+$session->map_table ([$ospfNbrIpAddr, $ospfNbrRtrId, $ospfNbrState],
+		     sub () {
+			 my ($index, $addr, $router_id, $state) = @_;
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($addr, $router_id, $state));
+			 my $pretty_state = (qw(? down attempt init twoWay
+						exchangeStart exchange
+						loading full))[$state];
+			 print STDOUT (pretty_addr ($addr)," ",
+				       pretty_addr ($router_id),
+				       " (",$pretty_state,")\n");
+		     });
+$session->close ();
+
+1;
+
+sub pretty_addr ($ ) {
+    my ($addr) = @_;
+    my ($hostname,$aliases,$addrtype,$length,@addrs)
+	= gethostbyaddr (inet_aton ($addr), AF_INET);
+    $hostname ? $hostname." [".$addr."]" : $addr;
+}
+
+sub usage () {
+  die "usage: $0 host [community]";
+}

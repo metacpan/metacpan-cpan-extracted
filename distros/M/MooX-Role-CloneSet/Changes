@@ -1,5 +1,11 @@
 Revision history for Perl extension MooX-Role-CloneSet
 
+v0.1.1 2023-07-25T05:49:32Z
+
+    - Add Perl 5.22, 5.24, and 5.26 to the Travis CI testing.
+    - Fix a test module's package/Exporter structure bug exposed by
+      Perl 5.39.1.
+
 v0.1.0 2016-09-13T08:36:48Z
 
     - Initial version.

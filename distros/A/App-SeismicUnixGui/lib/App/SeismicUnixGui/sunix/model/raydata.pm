@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::model::raydata;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

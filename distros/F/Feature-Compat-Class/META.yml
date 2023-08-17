@@ -3,7 +3,6 @@ abstract: 'make C<class> syntax available'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,11 +16,11 @@ name: Feature-Compat-Class
 provides:
   Feature::Compat::Class:
     file: lib/Feature/Compat/Class.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Object::Pad: '0.78'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

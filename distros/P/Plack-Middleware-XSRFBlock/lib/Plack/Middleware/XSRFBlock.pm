@@ -3,7 +3,7 @@ package Plack::Middleware::XSRFBlock;
 {
   $Plack::Middleware::XSRFBlock::DIST = 'Plack-Middleware-XSRFBlock';
 }
-$Plack::Middleware::XSRFBlock::VERSION = '0.0.17';
+$Plack::Middleware::XSRFBlock::VERSION = '0.0.19';
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
@@ -89,7 +89,7 @@ sub detect_xsrf {
     # We can say for certain that if we don't have the header_name set
     # it's a missing form parameter
     # If it is set ... well, either could be missing
-    if (not defined $val and not length $val) {
+    if (!defined $val || !length $val) {
         # no X- headers expected
         return 'form field missing'
             if not defined $self->header_name;
@@ -340,11 +340,12 @@ sub xsrf_detected {
         ? sprintf('XSRF detected [%s]', $args->{msg})
         : 'XSRF detected';
 
-    $self->log(error => "$msg, returning HTTP_FORBIDDEN");
-
     if (my $app_for_blocked = $self->blocked) {
+        $self->log(info => "$msg, invoking `blocked` coderef");
         return $app_for_blocked->($env, $msg, app => $self->app);
     }
+
+    $self->log(error => "$msg, returning HTTP_FORBIDDEN");
 
     return [
         HTTP_FORBIDDEN,
@@ -393,7 +394,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 =head1 VERSION
 
-version 0.0.17
+version 0.0.19
 
 =head1 SYNOPSIS
 
@@ -724,20 +725,24 @@ Chisel <chisel@chizography.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Chisel Wright.
+This software is copyright (c) 2023 by Chisel Wright.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrey Khozov Chisel Daniel Perrett Gianni Ceccarelli Karen Etheridge Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert Sterling Hanenkamp William Wolf
+=for stopwords Andrey Khozov Ashley Pond V Chisel Daniel Perrett Gianni Ceccarelli Karen Etheridge Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert Sterling Hanenkamp William Wolf
 
 =over 4
 
 =item *
 
 Andrey Khozov <andrey@rydlab.ru>
+
+=item *
+
+Ashley Pond V <ashley.pond.v@gmail.com>
 
 =item *
 

@@ -1,0 +1,104 @@
+#!/usr/local/bin/perl -w
+
+## Print dot1dTpFdbTable from RFC 1493
+
+use strict;
+use SNMP_Session;
+use BER;
+
+my $dot1dTpFdbAddress = [1,3,6,1,2,1,17,4,3,1,1];
+my $dot1dTpFdbPort    = [1,3,6,1,2,1,17,4,3,1,2];
+my $dot1dTpFdbStatus  = [1,3,6,1,2,1,17,4,3,1,3];
+
+my $host = shift @ARGV || die "Usage: $0 host [community]";
+my $community = shift @ARGV || 'public';
+
+my $session = SNMP_Session->open ($host, $community, 161)
+    || die "open SNMP session to $community\@$host: $!";
+$session->map_table ([$dot1dTpFdbPort, $dot1dTpFdbStatus],
+		     sub () {
+			 my ($addr, $port, $status) = @_;
+			 $addr = ether_hex (hex_string_aux (pack ("C6", split ('\.', $addr))));
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($port, $status));
+			 note_fdb ($addr, $port, $status);
+		     });
+$session->close
+    || warn "close SNMP session: $!";
+
+list_fdbs ();
+1;
+
+my %all_fdbs;
+
+sub fdb_addr ($) { defined $_[1] ? $_[0]->{addr} = $_[1] : $_[0]->{addr}; }
+sub fdb_port ($) { defined $_[1] ? $_[0]->{port} = $_[1] : $_[0]->{port}; }
+sub fdb_status ($) { defined $_[1] ? $_[0]->{status} = $_[1] : $_[0]->{status}; }
+
+sub make_fdb ($@) {
+    my ($addr, $port, $status) = @_;
+    {
+	addr => $addr, port => $port, status => $status,
+    };
+}
+
+sub note_fdb ($$@) {
+    my ($addr, @other_args) = @_;
+    my $fdb = make_fdb ($addr, @other_args);
+    $all_fdbs{$addr} = $fdb;
+    $fdb;
+}
+
+sub list_fdbs () {
+    print_fdbs_table_header ();
+    foreach my $fdb (sort { $a->{port} <=> $b->{port} || $a->{addr} cmp $b->{addr} }
+		      values %all_fdbs) {
+	my $addr = fdb_addr ($fdb);
+	my $port = fdb_port ($fdb);
+	my $status = fdb_status ($fdb);
+	printf STDOUT ("%4d %-20s %s\n", 
+		       $port, $addr, pretty_fdb_status ($status));
+    }
+}
+
+sub print_fdbs_table_header () {
+    printf STDOUT ("%-4s %-20s %s\n",
+		   "port",
+		   "MAC addr.",
+		   "status");
+    print STDOUT (("=" x 35),"\n");
+}
+
+sub pretty_fdb_status ($) {
+    my ($status) = @_;
+    if ($status == 1) {
+	return "other";
+    } elsif ($status == 2) {
+	return "invalid";
+    } elsif ($status == 3) {
+	return "learned";
+    } elsif ($status == 4) {
+	return "self";
+    } elsif ($status == 5) {
+	return "mgmt";
+    } else {
+	return "ILLEGAL".$status;
+    }
+}
+
+sub ether_hex ($) {
+  my ($string) = @_;
+  $string =~ s/([0-9a-f][0-9a-f])/$1:/g;
+  $string =~ s/:$//;
+  $string;
+}
+
+sub hex_string_aux ($) {
+    my ($binary_string) = @_;
+    my ($c, $result);
+    $result = '';
+    for $c (unpack "C*", $binary_string) {
+	$result .= sprintf "%02x", $c;
+    }
+    $result;
+}

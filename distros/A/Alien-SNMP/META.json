@@ -4,7 +4,7 @@
       "Eric A. Miller <emiller AT cpan DOT org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "bsd"
    ],
@@ -51,11 +51,14 @@
    "provides" : {
       "Alien::SNMP" : {
          "file" : "lib/Alien/SNMP.pm",
-         "version" : "2.002000"
+         "version" : "3.0509030000"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ollyg/Alien-SNMP/issues"
+      },
       "license" : [
          "http://opensource.org/licenses/BSD-3-Clause"
       ],
@@ -63,6 +66,6 @@
          "url" : "http://github.com/ollyg/Alien-SNMP"
       }
    },
-   "version" : "2.002000",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.0509030000",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

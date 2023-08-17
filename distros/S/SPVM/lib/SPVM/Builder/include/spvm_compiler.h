@@ -15,70 +15,83 @@ struct spvm_compiler {
   SPVM_LIST* ops;
   
   // Class paths
-  SPVM_LIST* class_paths;
-
+  SPVM_LIST* include_dirs;
+  
   // Class loading stack
   SPVM_LIST* op_use_stack;
-
+  
   // Types
   SPVM_LIST* op_types;
   
   // Directory of curreparsed file
-  const char* cur_dir;
+  const char* current_class_dir;
   
   // Current parsed file name
-  const char* cur_file;
+  const char* current_file;
   
   // Current parsed file relative name
-  const char* cur_rel_file;
-
-  // Current parsed class name
-  const char* cur_rel_file_class_name;
-
+  const char* current_class_rel_file;
+  
+  // Current parsed basic type name
+  const char* current_class_name;
+  
   // Current parsed source
-  char* cur_src;
-
+  char* current_class_content;
+  
   // Current parsed source
-  int32_t cur_src_length;
-
+  int32_t current_class_content_length;
+  
   // Current line number
-  int32_t cur_line;
+  int32_t current_line;
+  
+  // Current temporary variables length
+  int32_t current_tmp_vars_length;
   
   // Allocator
-  SPVM_ALLOCATOR* allocator;
-
+  SPVM_ALLOCATOR* global_allocator;
+  
+  SPVM_LIST* each_compile_allocators;
+  
+  SPVM_ALLOCATOR* current_each_compile_allocator;
+  
+  SPVM_ALLOCATOR* error_message_allocator;
+  
+  SPVM_ALLOCATOR* class_file_allocator;
+  
   // Line start position
-  char* line_start_ptr;
+  char* line_begin_ptr;
   
-  // Current buffer position
-  char* bufptr;
+  // Char pointer of current source
+  char* ch_ptr;
   
-  // Before buffer position
-  char* befbufptr;
-
+  // Char pointer of current source just before
+  char* before_ch_ptr;
+  
   // Next double quote start position
-  char* next_string_literal_bufptr;
-
+  char* next_string_literal_ch_ptr;
+  
   // Expect method name
   int8_t expect_method_name;
-
+  
   // Expect field name
   int8_t expect_field_name;
   
   // Before token is arrow
   int8_t before_token_is_arrow;
   
-  // Parsing is not started
-  int8_t parse_not_started;
-
+  // End of file
+  int8_t end_of_file;
+  
   // State of variable expansion
   int8_t var_expansion_state;
   
   // Current enum value
   int32_t current_enum_value;
-
-  // Current class base;
-  int32_t cur_class_base;
+  
+  // Current basic type base;
+  int32_t basic_types_base_id;
+  
+  int32_t constant_strings_base_id;
   
   // Starting file the starting class is loaded
   const char* start_file;
@@ -89,91 +102,102 @@ struct spvm_compiler {
   // Syntax error count
   SPVM_LIST* error_messages;
   
-  // Strings - string literals and symbol names
+  SPVM_LIST* class_files;
+  
+  SPVM_LIST* class_file_class_names;
+  
   SPVM_LIST* constant_strings;
   
   // String symtable
   SPVM_HASH* constant_string_symtable;
-
-  // String Buffer
-  SPVM_STRING_BUFFER* constant_strings_buffer;
   
-  // Used class symtable
-  SPVM_HASH* used_class_symtable;
-
+  SPVM_LIST* global_strings;
+  
+  // String symtable
+  SPVM_HASH* global_string_symtable;
+  
   // Fail load class symtable
-  SPVM_HASH* not_found_class_class_symtable;
+  SPVM_HASH* if_require_not_found_basic_type_name_symtable;
   
-  // Operation codes
-  SPVM_OPCODE_ARRAY* opcode_array;
+  SPVM_LIST* current_anon_op_types;
   
   // Basic types
   SPVM_LIST* basic_types;
   
   // Basic type symbol table
   SPVM_HASH* basic_type_symtable;
-
-  // Types
-  SPVM_LIST* types;
   
-  // Types symbol table
-  SPVM_HASH* type_symtable;
-  
-  // Classes
-  SPVM_LIST* classes;
-
-  // OP class symtable
-  SPVM_HASH* class_symtable;
-
-  // Anon methods
-  SPVM_LIST* anon_methods;
-  
-  // Method ops
-  SPVM_LIST* methods;
-
-  // Argments
-  SPVM_LIST* args;
-
-  // OP our symtable
-  SPVM_LIST* class_vars;
-
-  // Field ops
-  SPVM_LIST* fields;
-  
-  // Switch 
-  SPVM_LIST* switch_infos;
-  
-  // class source symtable
-  SPVM_HASH* class_source_symtable;
-  
-  // SPVM 32bit codes
-  int32_t* runtime_codes;
+  SPVM_RUNTIME* runtime;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
+
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
+
+SPVM_CLASS_FILE* SPVM_COMPILER_get_class_file(SPVM_COMPILER* compiler, const char* basic_type_name);
+
+void SPVM_COMPILER_set_class_file(SPVM_COMPILER* compiler, const char* basic_type_name, SPVM_CLASS_FILE* class_file);
+
+void SPVM_COMPILER_add_class_file(SPVM_COMPILER* compiler, const char* class_name);
+
+void SPVM_COMPILER_delete_class_file(SPVM_COMPILER* compiler, const char* class_name);
+
+void SPVM_COMPILER_free_class_file(SPVM_COMPILER* compiler, SPVM_CLASS_FILE* class_file);
+
+void SPVM_COMPILER_add_basic_type_core(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t basic_type_category);
+
+SPVM_BASIC_TYPE* SPVM_COMPILER_add_basic_type(SPVM_COMPILER* compiler, const char* basic_type_name);
+
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
+
 SPVM_RUNTIME* SPVM_COMPILER_new_object(SPVM_COMPILER* compiler);
+
 void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message, ...);
 
 void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh);
 
 const char* SPVM_COMPILER_get_start_file(SPVM_COMPILER* compiler);
+
 void SPVM_COMPILER_set_start_file(SPVM_COMPILER* compiler, const char* start_file);
+
 int32_t SPVM_COMPILER_get_start_line(SPVM_COMPILER* compiler);
+
 void SPVM_COMPILER_set_start_line(SPVM_COMPILER* compiler, int32_t start_line);
 
-void SPVM_COMPILER_add_class_path(SPVM_COMPILER* compiler, const char* class_path);
-int32_t SPVM_COMPILER_get_class_paths_length(SPVM_COMPILER* compiler);
-const char* SPVM_COMPILER_get_class_path(SPVM_COMPILER* compiler, int32_t index);
-void SPVM_COMPILER_clear_class_paths(SPVM_COMPILER* compiler);
+void SPVM_COMPILER_add_include_dir(SPVM_COMPILER* compiler, const char* include_dir);
+
+int32_t SPVM_COMPILER_get_include_dirs_length(SPVM_COMPILER* compiler);
+
+const char* SPVM_COMPILER_get_include_dir(SPVM_COMPILER* compiler, int32_t index);
+
+void SPVM_COMPILER_clear_include_dirs(SPVM_COMPILER* compiler);
 
 int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler);
+
 const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index);
 
-int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* class_name);
+int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_name);
 
-int32_t SPVM_COMPILER_calculate_runtime_codes_length(SPVM_COMPILER* compiler);
-int32_t* SPVM_COMPILER_create_runtime_codes(SPVM_COMPILER* compiler, SPVM_ALLOCATOR* allocator);
+SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler);
+
+SPVM_RUNTIME* SPVM_COMPILER_get_runtime(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_use_default_loaded_classes(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_set_default_loaded_class_file(SPVM_COMPILER* compiler, const char* class_name, const char* rel_file, const char* content);
+
+void SPVM_COMPILER_assert_check_basic_type_ids(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_assert_check_basic_type_id(SPVM_COMPILER* compiler, int32_t basic_type_id);
+
+void free_memory_each_compile(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_use(SPVM_COMPILER* compiler, const char* basic_type_name, const char* file, int32_t line);
+
+void SPVM_COMPILER_free_memory_tmp_each_compile(SPVM_COMPILER* compiler);
+
+void SPVM_COMPILER_clear_error_messages(SPVM_COMPILER* compiler);
 
 #endif

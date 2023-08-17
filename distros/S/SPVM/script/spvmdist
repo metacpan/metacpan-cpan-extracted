@@ -67,7 +67,7 @@ spvmdist - Generating SPVM Distribution
 
 =head1 Usage
 
-  usage: spvmdist [<options>] <class_name> [<dir>]
+  usage: spvmdist [<options>] <class name> [<dir>]
     
     spvmdist Foo
     spvmdist Foo My-Foo

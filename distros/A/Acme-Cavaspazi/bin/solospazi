@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# PODNAME: solo
+# PODNAME: solospazi
 # ABSTRACT: a simple script made only of spaces [requires Acme::Bleach]
 use Acme::Bleach;
 
@@ -11,11 +11,11 @@ __END__
 
 =head1 NAME
 
-solo - a simple script made only of spaces [requires Acme::Bleach]
+solospazi - a simple script made only of spaces [requires Acme::Bleach]
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.3
 
 =head1 AUTHOR
 
@@ -23,7 +23,7 @@ Andrea Telatin <proch@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Andrea Telatin, Nicola Vitulo.
+This software is Copyright (c) 2023 by Andrea Telatin, Nicola Vitulo.
 
 This is free software, licensed under:
 

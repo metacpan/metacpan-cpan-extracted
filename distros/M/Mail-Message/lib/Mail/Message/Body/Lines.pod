@@ -68,7 +68,7 @@ Inherited, see L<Mail::Message::Body/"Constructors">
 
  -Option           --Defined in         --Default
   based_on           Mail::Message::Body  undef
-  charset            Mail::Message::Body  'PERL' or <undef>
+  charset            Mail::Message::Body  'PERL'
   checked            Mail::Message::Body  <false>
   content_id         Mail::Message::Body  undef
   data               Mail::Message::Body  undef
@@ -88,7 +88,7 @@ Inherited, see L<Mail::Message::Body/"Constructors">
 
 =item based_on => BODY
 
-=item charset => CHARSET|'PERL'
+=item charset => CHARSET|'PERL'|<undef>
 
 =item checked => BOOLEAN
 
@@ -132,6 +132,14 @@ Extends L<"Constructing a body" in Mail::Message::Body|Mail::Message::Body/"Cons
 
 Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
+=item $obj-E<gt>B<charsetDetect>(%options)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item Mail::Message::Body::Lines-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
 =item $obj-E<gt>B<check>()
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
@@ -148,7 +156,7 @@ Inherited, see L<Mail::Message::Body/"Constructing a body">
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
-=item $obj-E<gt>B<encoded>()
+=item $obj-E<gt>B<encoded>(%options)
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
@@ -464,12 +472,12 @@ but it is impossible to read that file to retrieve the lines within.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.012,
-built on February 11, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.013,
+built on June 24, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

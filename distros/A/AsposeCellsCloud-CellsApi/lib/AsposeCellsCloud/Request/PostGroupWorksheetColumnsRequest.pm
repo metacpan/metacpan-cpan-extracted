@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostGroupWorksheetColumnsRequest.name :   ,
-# PostGroupWorksheetColumnsRequest.sheetName :   ,
-# PostGroupWorksheetColumnsRequest.firstIndex :   ,
-# PostGroupWorksheetColumnsRequest.lastIndex :   ,
-# PostGroupWorksheetColumnsRequest.hide :   ,
-# PostGroupWorksheetColumnsRequest.folder :   ,
-# PostGroupWorksheetColumnsRequest.storageName :    
+# PostGroupWorksheetColumnsRequest.name : The workbook name.  ,
+# PostGroupWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostGroupWorksheetColumnsRequest.firstIndex : The first column index to be operated.  ,
+# PostGroupWorksheetColumnsRequest.lastIndex : The last column index to be operated.  ,
+# PostGroupWorksheetColumnsRequest.hide : columns visible state  ,
+# PostGroupWorksheetColumnsRequest.folder : Original workbook folder.  ,
+# PostGroupWorksheetColumnsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_group_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Group worksheet columns.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'first_index' => {
      	datatype => 'int',
      	base_name => 'firstIndex',
-     	description => '',
+     	description => 'The first column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'last_index' => {
      	datatype => 'int',
      	base_name => 'lastIndex',
-     	description => '',
+     	description => 'The last column index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'hide' => {
      	datatype => 'string',
      	base_name => 'hide',
-     	description => '',
+     	description => 'columns visible state',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

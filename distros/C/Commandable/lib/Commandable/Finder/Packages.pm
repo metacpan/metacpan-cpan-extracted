@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.10;
+package Commandable::Finder::Packages 0.11;
 
 use v5.14;
 use warnings;
@@ -243,6 +243,7 @@ sub _commands
 
             package => $pkg,
             code    => $code,
+            config  => $self->{config},
          );
       }
 

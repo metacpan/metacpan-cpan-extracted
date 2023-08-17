@@ -8,17 +8,20 @@
 [stdout](#stdout)<br>
 [Fallback stringifier](#fallback-stringifier)<br>
 [Default reporter](#default-reporter)<br>
+[Bazel support](#bazel-support)<br>
 [C++11 toggles](#c11-toggles)<br>
 [C++17 toggles](#c17-toggles)<br>
 [Other toggles](#other-toggles)<br>
-[Windows header clutter](#windows-header-clutter)<br>
 [Enabling stringification](#enabling-stringification)<br>
 [Disabling exceptions](#disabling-exceptions)<br>
 [Overriding Catch's debug break (`-b`)](#overriding-catchs-debug-break--b)<br>
+[Static analysis support](#static-analysis-support)<br>
 
-Catch is designed to "just work" as much as possible. For most people the only configuration needed is telling Catch which source file should host all the implementation code (```CATCH_CONFIG_MAIN```).
-
-Nonetheless there are still some occasions where finer control is needed. For these occasions Catch exposes a set of macros for configuring how it is built.
+Catch2 is designed to "just work" as much as possible, and most of the
+configuration options below are changed automatically during compilation,
+according to the detected environment. However, this detection can also
+be overridden by users, using macros documented below, and/or CMake options
+with the same name.
 
 
 ## Prefixing Catch macros
@@ -30,19 +33,18 @@ To keep test code clean and uncluttered Catch uses short macro names (e.g. ```TE
 
 ## Terminal colour
 
-    CATCH_CONFIG_COLOUR_NONE      // completely disables all text colouring
-    CATCH_CONFIG_COLOUR_WINDOWS   // forces the Win32 console API to be used
-    CATCH_CONFIG_COLOUR_ANSI      // forces ANSI colour codes to be used
+    CATCH_CONFIG_COLOUR_WIN32     // Force enables compiling colouring impl based on Win32 console API
+    CATCH_CONFIG_NO_COLOUR_WIN32  // Force disables ...
 
-Yes, I am English, so I will continue to spell "colour" with a 'u'.
+Yes, Catch2 uses the british spelling of colour.
 
-When sending output to the terminal, if it detects that it can, Catch will use colourised text. On Windows the Win32 API, ```SetConsoleTextAttribute```, is used. On POSIX systems ANSI colour escape codes are inserted into the stream.
+Catch2 attempts to autodetect whether the Win32 console colouring API,
+`SetConsoleTextAttribute`, is available, and if it is available it compiles
+in a console colouring implementation that uses it.
 
-For finer control you can define one of the above identifiers (these are mutually exclusive - but that is not checked so may behave unexpectedly if you mix them):
+This option can be used to override Catch2's autodetection and force the
+compilation either ON or OFF.
 
-Note that when ANSI colour codes are used "unistd.h" must be includable - along with a definition of ```isatty()```
-
-Typically you should place the ```#define``` before #including "catch.hpp" in your main source file - but if you prefer you can define it for your whole project by whatever your IDE or build system provides for you to do so.
 
 ## Console width
 
@@ -96,6 +98,20 @@ This means that defining `CATCH_CONFIG_DEFAULT_REPORTER` to `"console"`
 is equivalent with the out-of-the-box experience.
 
 
+## Bazel support
+
+Compiling Catch2 with `CATCH_CONFIG_BAZEL_SUPPORT` force-enables Catch2's
+support for Bazel's environment variables (normally Catch2 looks for
+`BAZEL_TEST=1` env var first).
+
+This can be useful if you are using older versions of Bazel, that do not
+yet have `BAZEL_TEST` env var support.
+
+> `CATCH_CONFIG_BAZEL_SUPPORT` was [introduced](https://github.com/catchorg/Catch2/pull/2399) in Catch2 3.0.1.
+
+> `CATCH_CONFIG_BAZEL_SUPPORT` was [deprecated](https://github.com/catchorg/Catch2/pull/2459) in Catch2 3.1.0.
+
+
 ## C++11 toggles
 
     CATCH_CONFIG_CPP11_TO_STRING // Use `std::to_string`
@@ -140,12 +156,19 @@ by using `_NO_` in the macro, e.g. `CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS`.
     CATCH_CONFIG_USE_ASYNC                  // Force parallel statistical processing of samples during benchmarking
     CATCH_CONFIG_ANDROID_LOGWRITE           // Use android's logging system for debug output
     CATCH_CONFIG_GLOBAL_NEXTAFTER           // Use nextafter{,f,l} instead of std::nextafter
+    CATCH_CONFIG_GETENV                     // System has a working `getenv`
 
 > [`CATCH_CONFIG_ANDROID_LOGWRITE`](https://github.com/catchorg/Catch2/issues/1743) and [`CATCH_CONFIG_GLOBAL_NEXTAFTER`](https://github.com/catchorg/Catch2/pull/1739) were introduced in Catch2 2.10.0
+
+> `CATCH_CONFIG_GETENV` was [introduced](https://github.com/catchorg/Catch2/pull/2562) in Catch2 3.2.0
 
 Currently Catch enables `CATCH_CONFIG_WINDOWS_SEH` only when compiled with MSVC, because some versions of MinGW do not have the necessary Win32 API support.
 
 `CATCH_CONFIG_POSIX_SIGNALS` is on by default, except when Catch is compiled under `Cygwin`, where it is disabled by default (but can be force-enabled by defining `CATCH_CONFIG_POSIX_SIGNALS`).
+
+`CATCH_CONFIG_GETENV` is on by default, except when Catch2 is compiled for
+platforms that lacks working `std::getenv` (currently Windows UWP and
+Playstation).
 
 `CATCH_CONFIG_WINDOWS_CRTDBG` is off by default. If enabled, Windows's
 CRT is used to check for memory leaks, and displays them after the tests
@@ -178,13 +201,6 @@ This toggle removes most of Catch from given file. This means that `TEST_CASE`s 
 This feature is considered experimental and might change at any point.
 
 _Inspired by Doctest's `DOCTEST_CONFIG_DISABLE`_
-
-## Windows header clutter
-
-On Windows Catch includes `windows.h`. To minimize global namespace clutter in the implementation file, it defines `NOMINMAX` and `WIN32_LEAN_AND_MEAN` before including it. You can control this behaviour via two macros:
-
-    CATCH_CONFIG_NO_NOMINMAX            // Stops Catch from using NOMINMAX macro 
-    CATCH_CONFIG_NO_WIN32_LEAN_AND_MEAN // Stops Catch from using WIN32_LEAN_AND_MEAN macro
 
 
 ## Enabling stringification
@@ -247,6 +263,31 @@ not know your platform, or your platform is misdetected.
 
 The macro will be used as is, that is, `CATCH_BREAK_INTO_DEBUGGER();`
 must compile and must break into debugger.
+
+
+## Static analysis support
+
+> Introduced in Catch2 X.Y.Z.
+
+Some parts of Catch2, e.g. `SECTION`s, can be hard for static analysis
+tools to reason about. Catch2 can change its internals to help static
+analysis tools reason about the tests.
+
+Catch2 automatically detects some static analysis tools (initial
+implementation checks for clang-tidy and Coverity), but you can override
+its detection (in either direction) via
+
+```
+CATCH_CONFIG_EXPERIMENTAL_STATIC_ANALYSIS_SUPPORT     // force enables static analysis help
+CATCH_CONFIG_NO_EXPERIMENTAL_STATIC_ANALYSIS_SUPPORT  // force disables static analysis help
+```
+
+_As the name suggests, this is currently experimental, and thus we provide
+no backwards compatibility guarantees._
+
+**DO NOT ENABLE THIS FOR BUILDS YOU INTEND TO RUN.** The changed internals
+are not meant to be runnable, only "scannable".
+
 
 
 ---

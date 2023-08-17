@@ -22,7 +22,7 @@ client for BigBlueButton API
 
 # VERSION
 
-version 0.013
+version 0.015
 
 # METHODS
 
@@ -50,9 +50,9 @@ version 0.013
 
 # SEE ALSO
 
-[API::BigBlueButton::Requests](https://metacpan.org/pod/API::BigBlueButton::Requests)
+[API::BigBlueButton::Requests](https://metacpan.org/pod/API%3A%3ABigBlueButton%3A%3ARequests)
 
-[API::BigBlueButton::Response](https://metacpan.org/pod/API::BigBlueButton::Response)
+[API::BigBlueButton::Response](https://metacpan.org/pod/API%3A%3ABigBlueButton%3A%3AResponse)
 
 [BigBlueButton API](https://code.google.com/p/bigbluebutton/wiki/API)
 

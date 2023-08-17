@@ -5,7 +5,7 @@ use Carp;
 use parent 'X11::Xlib::XID';
 
 # All modules in dist share a version
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub width  { croak "read-only" if @_ > 1; $_[0]{width} }
 sub height { croak "read-only" if @_ > 1; $_[0]{height} }
@@ -68,7 +68,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2021 by Michael Conrad
+Copyright (C) 2017-2023 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

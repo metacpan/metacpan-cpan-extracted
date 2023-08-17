@@ -23,7 +23,7 @@ no_index:
 provides:
   Text::ASCIITable::EasyTable:
     file: lib/Text/ASCIITable/EasyTable.pm
-    version: '1.004'
+    version: '1.005'
 requires:
   JSON: '0'
   List::Util: '1.29'
@@ -31,5 +31,5 @@ requires:
   perl: '5.016'
 resources:
   repository: git://github.com/rlauer6/Text-ASCIITable-EasyTable.git
-version: '1.004'
+version: '1.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package App::SeismicUnixGui::developer::code::sunix::sustkvel_changes;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: sustkvel_changes
+PERL PROGRAM NAME: sustkvel_changes
 
 AUTHOR:  
 

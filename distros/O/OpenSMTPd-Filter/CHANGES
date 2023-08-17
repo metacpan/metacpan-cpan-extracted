@@ -1,6 +1,12 @@
 Changelog for OpenSMTPd-Filter
 
-v0.0.2 2021-05-18T02:26:50
+v0.0.3 2023-06-29T02:01:33
+ - Mention which API protocol we support (Andrew Hewus Fresh)
+ - Support report smtp-in link-auth 0.7 protocol (Andrew Hewus Fresh)
+ - Don't reuse instance in test (Andrew Hewus Fresh)
+ - Support field callbacks (Andrew Hewus Fresh)
+
+v0.0.2 2021-05-18T02:26:42
  - Update README (Andrew Hewus Fresh)
  - Require version of Test2::Suite with Mock tracking (Andrew Hewus Fresh)
 

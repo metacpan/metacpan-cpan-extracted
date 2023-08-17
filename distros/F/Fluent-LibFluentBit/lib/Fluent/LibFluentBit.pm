@@ -1,5 +1,5 @@
 package Fluent::LibFluentBit;
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -191,7 +191,7 @@ Fluent::LibFluentBit - Perl interface to libfluent-bit.so
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -21,15 +21,15 @@ produces output
     風 太郎
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.09/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.12/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::JA::Name::Splitter version 0.09
-corresponding to git commit L<6d4f8e9a4a14238d2f8f6df16b51bce9e952804d|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/commit/6d4f8e9a4a14238d2f8f6df16b51bce9e952804d> released on Sat Jul 29 12:54:55 2017 +0900.
+This documents Lingua::JA::Name::Splitter version 0.12
+corresponding to git commit L<1b29819c126aab5760768591bf2a3f1fca61f520|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/commit/1b29819c126aab5760768591bf2a3f1fca61f520> released on Thu Jul 13 17:04:07 2023 +0900.
 
-This module is based on the L</Enamdict> data released on 2017-01-28.
+This module is based on the L</Enamdict> data released on 2023-07-08.
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,13 @@ This module attempts to split the names of Japanese people into given
 and family names. 
 
 =head1 FUNCTIONS
+
+=head2 kkname
+
+    my $iskk = kkname ($kanjiname);
+
+This returns a true value if C<$kanjiname> appears to be a kanji/kana
+name, and false if not.
 
 =head2 split_kanji_name
 
@@ -87,7 +94,7 @@ produces output
     Risa Yoshiki
 
 
-(This example is included as L<F<katsu-yoshiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.09/examples/katsu-yoshiki.pl> in the distribution.)
+(This example is included as L<F<katsu-yoshiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.12/examples/katsu-yoshiki.pl> in the distribution.)
 
 
 =head1 DEPENDENCIES
@@ -138,11 +145,12 @@ The following build scripts are used by the module.
 
 
 
-The script which makes the dictionary, L<F<enamdict-counter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/6d4f8e9a4a14238d2f8f6df16b51bce9e952804d/enamdict-counter.pl>, is in the module's repository, but it is not provided in the
-distribution itself. The script L<F<failures.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/6d4f8e9a4a14238d2f8f6df16b51bce9e952804d/failures.pl> counts the
-number of failed matches with Enamdict. The script L<F<test-splitter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/6d4f8e9a4a14238d2f8f6df16b51bce9e952804d/test-splitter.pl> is used to compute a probability factor used
-in the module. The module L<F<Enamdict.pm>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/6d4f8e9a4a14238d2f8f6df16b51bce9e952804d/Enamdict.pm> handles reading and
+The script which makes the dictionary, L<F<enamdict-counter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/1b29819c126aab5760768591bf2a3f1fca61f520/enamdict-counter.pl>, is in the module's repository, but it is not provided in the
+distribution itself. The script L<F<failures.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/1b29819c126aab5760768591bf2a3f1fca61f520/failures.pl> counts the
+number of failed matches with Enamdict. The script L<F<test-splitter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/1b29819c126aab5760768591bf2a3f1fca61f520/test-splitter.pl> is used to compute a probability factor used
+in the module. The module L<F<Enamdict.pm>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/1b29819c126aab5760768591bf2a3f1fca61f520/Enamdict.pm> handles reading and
 parsing Enamdict.
+
 
 
 =head1 AUTHOR
@@ -152,7 +160,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2023
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -20,7 +20,7 @@ name: DBIx-AutoUpgrade-NativeStrings
 provides:
   DBIx::AutoUpgrade::NativeStrings:
     file: lib/DBIx/AutoUpgrade/NativeStrings.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   DBI: '0'
   Encode: '0'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/damil/DBIx-AutoUpgrade-NativeStrings/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/DBIx-AutoUpgrade-NativeStrings
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

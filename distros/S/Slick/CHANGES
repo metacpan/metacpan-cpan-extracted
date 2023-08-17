@@ -1,0 +1,33 @@
+0.006  2023-08-03
+  - Alpha release #6
+  - Add Slick::Annotation
+  - Add route based caching based on "annotation"
+  - Various POD fixes
+
+0.005  2023-08-03
+  - Alpha release #5
+  - Add Slick::Cache, Slick::CacheExecutor{,::Redis,::Memcached}
+  - Add a very basic version of the CLI (WIP)
+  - Various POD changes
+
+0.004  2023-08-02
+  - Alpha release #4
+  - Add error handling for routes and events
+  - Add the Slick::Error class
+  - Various POD changes
+
+0.003  2023-08-01
+  - Alpha release #3
+  - Add routers allowing for easier use in multi-file projects
+  - Add the RouteManager role
+  - Fix POD
+  - Routes now do not need a preceding '/' to be considered valid
+
+0.002  2023-07-31
+  - Alpha release #2
+  - Includes fixes to documentation
+
+0.001  2023-07-31
+  - Alpha release #1
+  - Includes migrations, helpers, routing (routers and direct), and database management
+  - Supports PostgreSQL and MySQL

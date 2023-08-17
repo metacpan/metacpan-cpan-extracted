@@ -5,19 +5,25 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Remove whitespaces from string',
+        description => <<'_',
+
+Tabs and newlines will also be removed.
+
+_
         args => {
         },
         examples => [
             {value=>"foo"},
             {value=>"foo  bar ", filtered_value=>"foobar"},
+            {value=>"  foo \t bar \n ", filtered_value=>"foobar", summary=>"Tabs and newlines will also be removed"},
         ],
     };
 }
@@ -52,7 +58,7 @@ Data::Sah::Filter::perl::Str::remove_whitespace - Remove whitespaces from string
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Str::remove_whitespace (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Str::remove_whitespace (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -79,8 +85,13 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Str::remove_wh
 
  "foo" # valid, unchanged
  "foo  bar " # valid, becomes "foobar"
+ "  foo \t bar \n " # valid, becomes "foobar" (Tabs and newlines will also be removed)
 
 =for Pod::Coverage ^(meta|filter)$
+
+=head1 DESCRIPTION
+
+Tabs and newlines will also be removed.
 
 =head1 HOMEPAGE
 

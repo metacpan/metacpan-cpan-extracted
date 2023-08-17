@@ -1,12 +1,12 @@
 {
-   "abstract" : "Convert between braille character sets.",
+   "abstract" : "Convert between braille display tables defined in Liblouis.",
    "author" : [
-      "Lars BjÃ¸rndal"
+      "Lars Bjørndal <lars@lamasti.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_1"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,21 +27,41 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.11"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "1.104",
             "Getopt::Long" : "0",
             "open" : "0",
-            "perl" : "5.008004",
+            "perl" : "5.006",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/larsbjorndal/App-Brl2Brl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/larsbjorndal/App-Brl2Brl.git",
+         "web" : "https://github.com/larsbjorndal/App-Brl2Brl"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

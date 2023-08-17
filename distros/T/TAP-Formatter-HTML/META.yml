@@ -3,35 +3,36 @@ abstract: 'TAP Test Harness output delegate for html output'
 author:
   - 'Steve Purkis <spurkis@cpan.org>'
 build_requires:
-  Module::Build: 0.20
-  Test::More: 0.01
+  Module::Build: '0.20'
+  Test::More: '0.01'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.113640'
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: TAP-Formatter-HTML
 provides:
   App::Prove::Plugin::HTML:
     file: lib/App/Prove/Plugin/HTML.pm
-    version: 0.11
+    version: '0.13'
   TAP::Formatter::HTML:
     file: lib/TAP/Formatter/HTML.pm
-    version: 0.11
+    version: '0.13'
   TAP::Formatter::HTML::Session:
     file: lib/TAP/Formatter/HTML/Session.pm
-    version: 0.11
+    version: '0.13'
 requires:
-  File::Temp: 0.17
-  TAP::Parser: 3.10
-  Template: 2.14
-  Test::Harness: 3.17
-  URI: 1.35
-  accessors: 0.02
+  File::Temp: '0.17'
+  TAP::Parser: '3.10'
+  Template: '2.14'
+  Test::Harness: '3.17'
+  URI: '1.35'
+  accessors: '0.02'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.11
+  repository: https://github.com/spurkis/TAP-Formatter-HTML
+version: '0.13'

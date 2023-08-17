@@ -1,40 +1,44 @@
 {
-   "abstract" : "backend for Plack::App::Proxy",
+   "abstract" : "Backend for Plack::App::Proxy",
    "author" : [
       "Piotr Roszatycki <dexter@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-App-Proxy-Backend-HTTP-Tiny",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0",
+            "Software::License" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "HTTP::Tiny" : "0",
+            "HTTP::Tiny::PreserveHostHeader" : "0",
             "Plack" : "0",
             "Plack::App::Proxy" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Plack::App::Proxy::Backend::HTTP::Tiny" : {
          "file" : "lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm",
-         "version" : "0.0100"
-      },
-      "Plack::App::Proxy::Backend::HTTP::Tiny::PreserveHeaders" : {
-         "file" : "lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm"
+         "version" : "0.0204"
       }
    },
    "release_status" : "stable",
@@ -49,5 +53,6 @@
          "url" : "http://github.com/dex4er/perl-Plack-App-Proxy-Backend-HTTP-Tiny"
       }
    },
-   "version" : "0.0100"
+   "version" : "0.0204",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

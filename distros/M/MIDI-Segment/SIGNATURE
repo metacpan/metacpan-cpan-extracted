@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 db57253677ec12b4e51eb3e918568889ea34a2a28905f360fe631a4cebd76a5a Build.PL
+SHA256 f96d199bce8a21dff8536ec64b22f52f40d5f9b9be0b7306ef15913f75d9f741 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 9229e404d0db4fde3418d47842ab0ab60acb9eae2e6f08bdb90d260a6609870f MANIFEST
+SHA256 37c0216c1ea880e8f4c5789cbabf1053ff57ad41ee8b553320c11a19dfd110ee META.json
+SHA256 9e2a32e51ceef6f8ba32fedb991e5e7f4abf14b526aaf03a2894606f42f85e05 META.yml
+SHA256 ae8f206bd84562635f8a07891a255ab9155bf0764dff13f27d2a34fb6c38df2f README
+SHA256 f5327b8c80bc867a5bea6a9f9f611f69b68fa2ebfc5a39b6bd54c9dc938ec94d eg/melody-shuffle
+SHA256 4a15b0ca10495c97ec28e848c23ae9c32dc7b54b6b464440e67fd0a2819462e8 eg/midi-dump
+SHA256 485b1378e15e6d4e4f45de0b34b25308303e8ddb92f13002592faa034d906a1b lib/MIDI/Segment.pm
+SHA256 91a86de54f219910c301fbdd29c17faddb3f8cc300dea5e774bb5c32f7bea768 t/00-load.t
+SHA256 21475c32e3927f6d71f526988942c27f6aaec018a3eb7ddfe6e9dd71b5667956 t/cowbell.midi
+SHA256 f99590acb85da858fd8b7800fa65008834532fdf2bc23b4513c4ee474eb49a14 t/cowprime.midi
+SHA256 75431c3da64e1ff63be97305d6216857fa9c3c0105e5d04d2d948c412c2c6fa9 t/lilypond.midi
+SHA256 3298b9b6fd3d6839acf9d3a273ce5f86d58cdacbaadf69f2cd723c779e1bdf0d t/midisegment.t
+SHA256 e6d9462c550e9e4fb82ab19823c8c5421ca0ce0fa077c01b9fac03a11e0a87f9 t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+SHA256 5dc7073a332fa4ec9bfab3a51dc2e7287fb8f37bd756341c631ba6e4d1ad0dbc t/ragged.midi
+SHA256 5b400b3dfad0ce0c1453319b991238935f619401780ee448a3d4c924ef3d5e5f t/vague.midi
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmS4CdUACgkQs1lvXE/r
+yKeXBgv9H7EelUr9bax6kMBwodsAVOSlQY5WIJlBSB1ZtZ00fS7dlE+4xo9CoIYH
+JvSsHIs3M0plvCOvfEZZQEN6AJoYTx09HaCSRwasWC1AKvn4qJjRhccHNBj3CBuJ
+oobg9HPo1D0gVNzeLltM8GiXzqfz3Pq3/WSlMYcZpTdBICr8rET+DVpkmRxqMPJs
+GQpusWKO9fbjOontwyRC1/bZxgiiXu27PpzrIJZYLJX9IzpoAVz9fvTy/n8M7U+e
+8B5zLAE/Fcgkr4S1qz/oyLwhozMGEJFMNyqIxrRt+q+eilK/l/2aS8gdGWCkL3Vm
+Nst/pGXC1nqhtYX54LDYpCzNvPPgLo95OPmrWg5PVjER4izxNi8cADiwLZLttuba
+6m/hV7ev4ykJbsRp/njHgWOpptKvwXuN9okGt2zOVV2/jAU1e7Nd8G2EfDfOwPvv
+kLVVymBt6h2ZNpfcoD2n799h6z3+4RiFfi8N/PBF8HHpxxf/1DvnKe/sKLQ/LkCd
+FBvZUf8L
+=E58N
+-----END PGP SIGNATURE-----

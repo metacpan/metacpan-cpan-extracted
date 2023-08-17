@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Frequently Asked Questions (FAQ) on SNMP_Session.pm</title>
+</head>
+
+<body bgcolor="#ffffff">
+<h1>Frequently Asked Questions (FAQ) on <tt>SNMP_Session.pm</tt></h1>
+
+<hr>
+
+<h2> <a name="snmpv3"></a>When will MRTG/<tt>SNMP_Session.pm</tt>
+support SNMPv3? </h2>
+
+<p> MRTG 2.13 and higher includes support for SNMPv3, using the
+<tt>Net::SNMP</tt> library.  See the sections about <a
+href="http://oss.oetiker.ch/mrtg/doc/mrtg-reference.en.html#enablesnmpv3"><tt>EnableSnmpV3</tt></a>,
+<a
+href="http://oss.oetiker.ch/mrtg/doc/mrtg-reference.en.html#target"><tt>Target</tt></a>,
+and <a
+href="http://oss.oetiker.ch/mrtg/doc/mrtg-reference.en.html#snmpoptions"><tt>SnmpOptions</tt></a>,
+in the MRTG Reference Manual. </p>
+
+<p> <tt>SNMP_Session.pm</tt> only supports SNMPv1 and
+(community-based) SNMPv2 ("SNMPv2c").  There are no plans to add
+SNMPv3 support to <tt>SNMP_Session.pm</tt>.  I'd recommend looking at
+<a href="http://search.cpan.org/dist/Net-SNMP/">Net::SNMP</a> instead,
+which has been supporting SNMPv3 for quite a while.  <a
+href="http://search.cpan.org/dist/Net-SNMP/">Net::SNMP</a> is also
+written much cleaner than <tt>SNMP_Session.pm</tt>, and like
+<tt>SNMP_Session.pm</tt> doesn't require any external binaries.  Some
+non-standard (crypto) Perl modules might be required to use SNMP's
+security features, however. </p>
+
+<p> A nice project would be to write a variant of
+<tt>SNMP_util.pm</tt> that sits on top of <a
+href="http://search.cpan.org/dist/Net-SNMP/">Net::SNMP</a> rather than
+on top of <tt>SNMP_Session.pm</tt>.  Since <a
+href="http://www.mrtg.org/">MRTG</a> uses the <tt>SNMP_util.pm</tt>
+layer, that should make it work with SNMPv3. </p>
+
+<p> However, since SNMPv3 doesn't have communities, MRTG's target
+syntax would have to be changed to accomodate SNMPv3 targets.  The
+current syntax of <samp>community{at}host[:options]</samp> would have
+to be modified (I think it should be changed, rather than further
+extended, because it already looks too ugly because of its multiple
+extensions. </p>
+
+<p> For the target syntax, one should probably look at the SNMP URI
+syntax (<a
+href="ftp://ftp.rfc-editor.org/in-notes/rfc4088.txt"><tt>RFC&nbsp;4088</tt></a>. </p>
+
+<p> Anther issue with SNMPv3 is that it uses engine IDs, which are
+usually "discovered" using a well-defined discovery mechanism.  It
+would be good to cache discovered engine IDs somewhere, to avoid
+repeating the discovery process for every round of MRTG.  If MRTG is
+run from cron every five minutes, then such an engine ID cache should
+be written to disk between runs.  I'm not sure whether Net::SNMP
+already supports this.  If MRTG is run as a long-running "daemon"
+process, making the cache persistent might not be necessary. </p>
+
+<hr>
+<!-- hhmts start -->
+2007/10/13 19:15:00
+<!-- hhmts end -->
+<address>
+
+ <a href="http://www.switch.ch/misc/leinen/">
+  Simon Leinen &lt;simon.leinen@switch.ch&gt;
+ </a>
+</address>
+
+</body> </html>

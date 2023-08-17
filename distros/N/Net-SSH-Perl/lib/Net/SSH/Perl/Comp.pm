@@ -1,5 +1,3 @@
-# $Id: Comp.pm,v 1.5 2001/04/18 06:36:57 btrott Exp $
-
 package Net::SSH::Perl::Comp;
 
 use strict;

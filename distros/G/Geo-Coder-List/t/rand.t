@@ -33,7 +33,7 @@ RAND: {
 
 			my $geocoderlist = new_ok('Geo::Coder::List');
 			$geocoderlist->push(new_ok('Geo::Coder::RandMcnally'));
-		
+
 			TODO: {
 				local $TODO = 'Geo::Coder::RandMcnally seems to have stopped working';
 

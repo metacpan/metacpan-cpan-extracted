@@ -6,10 +6,9 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($bin $ps $segy $su $suffix_bin $suffix_ps $suffix_segy $suffix_su $suffix_txt $txt);
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
-use aliased 'App::SeismicUnixGui::sunix::filter::sucddecon';
-my $get       = L_SU_global_constants->new();
-my $Project   = Project_config->new();
-my $sucddecon = sucddecon->new();
+
+my $get     = L_SU_global_constants->new();
+my $Project = Project_config->new();
 
 my $var = $get->var();
 
@@ -73,9 +72,7 @@ sub binding_index_aref {
 	# first binding index (index=0)
 	# connects to second item (index=1)
 	# in the parameter list
-	#	$index[0] = 1; # inbound item is  bound
-	#	$index[1]	= 2; # inbound item is  bound
-	#	$index[2]	= 8; # outbound item is  bound
+	$index[0] = 3;    # inbound item is  bound
 
 	$sucddecon_spec->{_binding_index_aref} = \@index;
 	return ();
@@ -100,9 +97,7 @@ sub file_dialog_type_aref {
 	# bound index will look for data
 	$type[0] = '';
 
-	#	$type[$index[0]] = $file_dialog_type->{_Data};
-	#	$type[$index[1]]	=  $file_dialog_type->{_Data};
-	#	$type[$index[2]]	=  $file_dialog_type->{_Data};
+	$type[ $index[0] ] = $file_dialog_type->{_Data};
 
 	$sucddecon_spec->{_file_dialog_type_aref} = \@type;
 	return ();
@@ -333,17 +328,11 @@ sub prefix_aref {
 
 	}
 
-	#	my $index_aref = get_binding_index_aref();
-	#	my @index       = @$index_aref;
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
 
-	# label 2 in GUI is input xx_file and needs a home directory
-	#	$prefix[ $index[0] ] = '$DATA_SEISMIC_BIN' . ".'/'.";
-
-	# label 3 in GUI is input yy_file and needs a home directory
-	#	$prefix[ $index[1] ] = '$DATA_SEISMIC_TXT' . ".'/'.";
-
-	# label 9 in GUI is input zz_file and needs a home directory
-	#	$prefix[ $index[2] ] = '$DATA_SEISMIC_SU' . ".'/'.";
+	# label 4 in GUI is input xx_file and needs a home directory
+	$prefix[ $index[0] ] = '$DATA_SEISMIC_SU' . ".'/'.";
 
 	$sucddecon_spec->{_prefix_aref} = \@prefix;
 	return ();
@@ -369,17 +358,11 @@ sub suffix_aref {
 
 	}
 
-	#	my $index_aref = get_binding_index_aref();
-	#	my @index       = @$index_aref;
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
 
-	# label 2 in GUI is input xx_file and needs a home directory
-	#	$suffix[ $index[0] ] = ''.'' . '$suffix_bin';
-
-	# label 3 in GUI is input yy_file and needs a home directory
-	#	$suffix[ $index[1] ] = ''.'' . '$suffix_bin';
-
-	# label 9 in GUI is output zz_file and needs a home directory
-	#	$suffix[ $index[2] ] = ''.'' . '$suffix_su';
+	# label 4 in GUI is input xx_file and needs a home directory
+	$suffix[ $index[0] ] = '' . '' . '$suffix_su';
 
 	$sucddecon_spec->{_suffix_aref} = \@suffix;
 	return ();

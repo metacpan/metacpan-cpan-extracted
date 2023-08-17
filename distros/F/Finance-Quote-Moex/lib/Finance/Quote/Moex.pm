@@ -26,7 +26,7 @@ use warnings;
 use vars qw($VERSION);
 
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 our %bond_group_urls = (tplus => "58", # Т+: Основной режим - безадрес.
                     tplus_usd => "193", # 	Т+: Основной режим (USD) - безадрес. 	0 	1
@@ -45,13 +45,6 @@ our %bond_group_urls = (tplus => "58", # Т+: Основной режим - бе
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-sub methods { return ( micex => \&micex ); }
-
-{
-	my @labels = qw/name last open low high close waprica date isodate currency/;
-	
-	sub labels { return ( micex => \@labels ); }
-}
 
 sub methods { return (moex_stock => \&moex_stock,
                                             

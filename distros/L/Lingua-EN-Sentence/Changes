@@ -105,7 +105,7 @@ Revision history for Perl extension Lingua::EN::Sentence.
     Declared min version of Perl. Fix for RT bug #124686 
 	
 0.32 July 2022
-	fixed bug causing abbreviation followed by '(' to break sentnece, reported in github
+	fixed bug causing abbreviation followed by '(' to break sentence, reported in github
 	dot following an abbreviation now explicitly marked up
 	added more acronyms
 	improved documentation
@@ -113,4 +113,7 @@ Revision history for Perl extension Lingua::EN::Sentence.
 	added verbose moe for debugging
 	
 0.33 July 05 2022
-	fixed version numbersin Build.PL and Makefile.PL
+	fixed version numbers in Build.PL and Makefile.PL
+	
+0.34 June 20 2023
+	fixed version numbers in Build.PL and Makefile.PL

@@ -58,7 +58,7 @@
          "web" : "https://github.com/Corion/Term-QRCode-Compact"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

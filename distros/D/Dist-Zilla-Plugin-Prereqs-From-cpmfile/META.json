@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,16 +21,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla" : "6.023",
-            "Module::cpmfile" : "0.003",
-            "perl" : "v5.34.0"
+            "Dist::Zilla" : "6.030",
+            "Module::cpmfile" : "0.006",
+            "perl" : "v5.38.0"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::Plugin::Prereqs::From::cpmfile" : {
          "file" : "lib/Dist/Zilla/Plugin/Prereqs/From/cpmfile.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -45,9 +45,9 @@
          "web" : "https://github.com/skaji/Dist-Zilla-Plugin-Prereqs-From-cpmfile"
       }
    },
-   "version" : "v0.0.3",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "v0.0.5",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

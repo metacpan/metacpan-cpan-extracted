@@ -6,7 +6,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS
 
-  PACKAGE NAME:su_spectral_analysis.pm
+  PERL PROGRAM NAME:su_spectral_analysis.pm
   Purpose: Spectral analysis 
            of spectral_analysised  waveforms in su format 
   AUTHOR:  Juan M. Lorenzo

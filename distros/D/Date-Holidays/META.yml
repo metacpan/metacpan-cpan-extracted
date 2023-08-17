@@ -4,21 +4,21 @@ author:
   - 'Jonas B. <jonasbn@cpan.org>'
 build_requires:
   File::Spec: '0'
-  FindBin: '0'
+  FindBin: '1.53'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Module::Build: '0.30'
-  Pod::Coverage::TrustPod: '0'
-  Test::Class: '0'
-  Test::Fatal: '0'
-  Test::Kwalitee: '1.21'
+  Module::Build: '0.4234'
+  Pod::Coverage::TrustPod: '0.100006'
+  Test::Class: '0.52'
+  Test::Fatal: '0.017'
+  Test::Kwalitee: '1.28'
   Test::MockModule: '0.13'
-  Test::More: '0'
-  Test::Pod: '0'
-  Test::Pod::Coverage: '0'
+  Test::More: '1.302195'
+  Test::Pod: '1.52'
+  Test::Pod::Coverage: '1.1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  Module::Build: '0.30'
+  Module::Build: '0.4234'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -29,115 +29,116 @@ name: Date-Holidays
 provides:
   Date::Holidays:
     file: lib/Date/Holidays.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter:
     file: lib/Date/Holidays/Adapter.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::AT:
     file: lib/Date/Holidays/Adapter/AT.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::AU:
     file: lib/Date/Holidays/Adapter/AU.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::AW:
     file: lib/Date/Holidays/Adapter/AW.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::BQ:
     file: lib/Date/Holidays/Adapter/BQ.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::BR:
     file: lib/Date/Holidays/Adapter/BR.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::BY:
     file: lib/Date/Holidays/Adapter/BY.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::CA:
     file: lib/Date/Holidays/Adapter/CA.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::CA_ES:
     file: lib/Date/Holidays/Adapter/CA_ES.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::CN:
     file: lib/Date/Holidays/Adapter/CN.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::CZ:
     file: lib/Date/Holidays/Adapter/CZ.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::DE:
     file: lib/Date/Holidays/Adapter/DE.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::DK:
     file: lib/Date/Holidays/Adapter/DK.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::ES:
     file: lib/Date/Holidays/Adapter/ES.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::FR:
     file: lib/Date/Holidays/Adapter/FR.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::GB:
     file: lib/Date/Holidays/Adapter/GB.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::JP:
     file: lib/Date/Holidays/Adapter/JP.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::KR:
     file: lib/Date/Holidays/Adapter/KR.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::KZ:
     file: lib/Date/Holidays/Adapter/KZ.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::Local:
     file: lib/Date/Holidays/Adapter/Local.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::NL:
     file: lib/Date/Holidays/Adapter/NL.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::NO:
     file: lib/Date/Holidays/Adapter/NO.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::NZ:
     file: lib/Date/Holidays/Adapter/NZ.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::PL:
     file: lib/Date/Holidays/Adapter/PL.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::PT:
     file: lib/Date/Holidays/Adapter/PT.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::RU:
     file: lib/Date/Holidays/Adapter/RU.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::SK:
     file: lib/Date/Holidays/Adapter/SK.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::UA:
     file: lib/Date/Holidays/Adapter/UA.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::UK:
     file: lib/Date/Holidays/Adapter/UK.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::US:
     file: lib/Date/Holidays/Adapter/US.pm
-    version: '1.34'
+    version: '1.35'
   Date::Holidays::Adapter::USFederal:
     file: lib/Date/Holidays/Adapter/USFederal.pm
-    version: '1.34'
+    version: '1.35'
 requires:
-  Carp: '0'
-  DateTime: '0'
-  Env: '0'
-  File::Slurp: '0'
-  JSON: '0'
-  Locale::Country: '0'
-  Module::Load: '0'
-  Scalar::Util: '0'
-  Try::Tiny: '0'
+  Carp: '1.5'
+  DateTime: '1.59'
+  Env: '1.04'
+  File::Slurp: '9999.32'
+  JSON: '4.1'
+  Locale::Country: '3.74'
+  Module::Load: '0.36'
+  Scalar::Util: '1.63'
+  Try::Tiny: '0.31'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/jonasbn/perl-date-holidays/issues
   homepage: https://jonasbn.github.io/perl-date-holidays/
   repository: https://github.com/jonasbn/perl-date-holidays.git
-version: '1.34'
+version: '1.35'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

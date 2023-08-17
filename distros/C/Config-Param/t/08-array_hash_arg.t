@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use Test::More tests => 28;
 use Config::Param;

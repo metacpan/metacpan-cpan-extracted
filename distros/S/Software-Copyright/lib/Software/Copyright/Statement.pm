@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.009';
+$Software::Copyright::Statement::VERSION = '0.010';
 use 5.20.0;
 use warnings;
 
@@ -104,8 +104,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
             $span->set_range_as_string($year, $owner->identifier // 'unknown');
         };
         if ($@) {
-            warn "Invalid year span: '$year' found in statement '$c': $@";
-            last;
+            warn "Invalid year span: '$year' found in statement '$c'\n";
         }
     }
     $span->consolidate();
@@ -178,7 +177,7 @@ Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

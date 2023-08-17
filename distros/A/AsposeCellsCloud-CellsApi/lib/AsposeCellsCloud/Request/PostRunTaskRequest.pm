@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_run_task' } = { 
-    	summary => '',
+    	summary => 'Run tasks.',
         params => $params,
         returns => 'string',
     };

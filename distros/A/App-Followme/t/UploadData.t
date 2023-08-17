@@ -23,12 +23,12 @@ require App::Followme::UploadData;
 my $test_dir = catdir(@path, 'test');
 my $state_dir = catdir(@path, 'test', '_state');
 
-rmtree($test_dir)  if -e $test_dir;
-mkdir $test_dir or die $!;
-chmod 0755, $test_dir;
+rmtree($test_dir, 0, 1)  if -e $test_dir;
+mkdir($test_dir) unless -e $test_dir;
+ 
 
 mkdir $state_dir or die $!;
-chmod 0755, $state_dir;
+  
 chdir $test_dir or die $!;
 
 my %configuration = (
@@ -65,7 +65,7 @@ foreach my $dir (@dirs) {
     if ($dir) {
         $dir = catfile($test_dir, $dir);
         mkdir $dir or die $!;
-        chmod 0755, $dir;
+          
         push(@folders_ok, $dir);
     } else {
         $dir = $test_dir;

@@ -7,17 +7,17 @@ use XS::Parse::Sublike::Builder;
 
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::MultiSub",
+   requires => {
+      'perl' => '5.026', # parse_subsignature()
+
+      'XS::Parse::Sublike' => '0.15',
+   },
    test_requires => {
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Sublike::Builder' => '0.15',
-   },
-   requires => {
-      'perl' => '5.026', # parse_subsignature()
-      'XS::Parse::Sublike' => '0.15',
    },
    extra_compiler_flags => [qw( -I. -Ihax -ggdb )],
    license => 'perl',

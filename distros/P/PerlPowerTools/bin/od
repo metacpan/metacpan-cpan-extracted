@@ -13,23 +13,23 @@ License: perl
 
 
 use strict;
-use Getopt::Std;
-use vars qw/ $opt_A $opt_b $opt_c $opt_d $opt_f $opt_h $opt_i $opt_l $opt_o
-$opt_v $opt_x $opt_s /;
 
-my ($offset1, $radix, $data, @arr, $len);
-my ($lastline, $upformat, $pffmt, $strfmt, $skip, $ml);
-my $retval;
-local *FH;
+use File::Basename qw(basename);
+use Getopt::Std qw(getopts);
+
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
+use constant LINESZ => 16;
+use constant PRINTMAX => 126;
+
+use vars qw/ $opt_A $opt_b $opt_c $opt_d $opt_f $opt_i $opt_j $opt_l $opt_N
+$opt_o $opt_v $opt_x /;
+
+my ($offset1, $radix, $data, @arr, $len, $fh, $lim);
+my ($lastline, $upformat, $pffmt, $strfmt, $ml);
 
 my %charescs = (
     0  => ' \0',
-    1  => '001',
-    2  => '002',
-    3  => '003',
-    4  => '004',
-    5  => '005',
-    6  => '006',
     7  => ' \a',
     8  => ' \b',
     9  => ' \t',
@@ -37,188 +37,215 @@ my %charescs = (
     11 => ' \v',
     12 => ' \f',
     13 => ' \r',
-    14 => '014',
-    15 => '015',
-    16 => '016',
-    17 => '017',
-    18 => '018',
-    19 => '019',
-    20 => '020',
-    21 => '021',
-    22 => '022',
-    23 => '023',
-    24 => '024',
-    25 => '025',
-    26 => '026',
-    27 => '027',
-    28 => '028',
-    29 => '029',
-    30 => '030',
-    31 => '031',
+    92 => ' \\\\',
 );
 
 $offset1 = 0;
 $lastline = '';
 
-getopts('A:bcdfhilovxs:');
-    defined $opt_h && &help;
-    defined $opt_A ? ($radix = $opt_A) : ($radix = 'o');
-    defined $opt_s && ($offset1 = $opt_s);
+my $Program = basename($0);
 
-open(FH, '<', $ARGV[0]) || die "Can't open $ARGV[0] for read: $!";
+getopts('A:bcdfij:lN:ovx') or help();
+if (defined $opt_A) {
+    if ($opt_A !~ m/\A[doxn]\z/) {
+	warn "$Program: unexpected radix: '$opt_A'\n";
+	exit EX_FAILURE;
+    }
+    if ($opt_A ne 'n') {
+	$radix = $opt_A;
+    }
+}
+else {
+    $radix = 'o';
+}
 
-binmode(FH);
-seek(FH,$offset1,0);
+if (defined $opt_j) {
+    if ($opt_j =~ m/\D/) {
+	warn "$Program: bad argument to -j: '$opt_j'\n";
+	exit EX_FAILURE;
+    }
+    $offset1 = $opt_j;
+}
+if (defined $opt_N) {
+    if ($opt_N =~ m/\D/) {
+	warn "$Program: bad argument to -N: '$opt_N'\n";
+	exit EX_FAILURE;
+    }
+    $lim = $opt_N;
+}
+
+if (defined $ARGV[0] && $ARGV[0] ne '-') {
+    unless (open $fh, '<', $ARGV[0]) {
+	warn "$Program: cannot open '$ARGV[0]': $!\n";
+	exit EX_FAILURE;
+    }
+}
+else {
+    $fh = *STDIN;
+}
+
+binmode $fh;
+if ($offset1) {
+    foreach (1 .. $offset1) {
+	$len = read $fh, $data, 1;
+	if ($len == 0) {
+	    warn "$Program: cannot skip past end of input\n";
+	    exit EX_FAILURE;
+	}
+	unless (defined $len) {
+	    warn "$Program: read error: $!\n";
+	    exit EX_FAILURE;
+	}
+	undef $data;
+    }
+}
+if (defined($lim) && $lim == 0) {
+    printf("%.8$radix\n", $offset1) if $radix;
+    close $fh;
+    exit EX_SUCCESS;
+}
 
 $opt_o = 1 if ! ($opt_b || $opt_c || $opt_d || $opt_f || $opt_i ||
 		 $opt_l || $opt_o || $opt_x);
 
-while ($len = read(FH,$data,16)) {
-    $ml = ''; # multi-line indention
-
-    if ( &diffdata || $opt_v) {
-	printf("%.8$radix ", $offset1);
-	defined $opt_b && do { &octal1; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_c && do { &char1; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_d && do { &udecimal; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_f && do { &float; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_i && do { &decimal; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_l && do { &long; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_o && do { &octal2; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-	defined $opt_x && do { &hex; printf("%s$strfmt\n", $ml, @arr);
-			       $ml = '         ' };
-   }
-
-    else {
-	print "*\n";
-    }
-
-    $offset1 += $len;
-    $lastline = $data . '|';
+my $fmt;
+if ($opt_b) {
+    $fmt = \&octal1;
+}
+elsif ($opt_c) {
+    $fmt = \&char1;
+}
+elsif ($opt_d) {
+    $fmt = \&udecimal;
+}
+elsif ($opt_f) {
+    $fmt = \&float;
+}
+elsif ($opt_i) {
+    $fmt = \&decimal;
+}
+elsif ($opt_l) {
+    $fmt = \&long;
+}
+elsif ($opt_o) {
+    $fmt = \&octal2;
+}
+elsif ($opt_x) {
+    $fmt = \&hex;
+}
+else {
+    help();
 }
 
-printf("%.8$radix\n", $offset1);
-close FH;
-exit 0;
+my $buf;
+my $nread = 0;
+while ($len = read($fh, $buf, 1)) {
+    $data .= $buf;
+    $nread++;
+
+    my $is_limit = defined($lim) && $nread == $lim;
+    if (length($data) == LINESZ || $is_limit || eof($fh)) {
+	$ml = ''; # multi-line indention
+	if (&diffdata || $opt_v) {
+	    printf("%.8$radix ", $offset1) if $radix;
+	    &$fmt;
+	    printf("%s$strfmt\n", $ml, @arr);
+	    $ml = ' ' x 9;
+	}
+	else {
+	    print "*\n";
+	}
+	$lastline = $data . '|';
+	undef $data;
+    }
+
+    $offset1++;
+    last if $is_limit;
+}
+unless (defined $len) {
+    warn "$Program: read error: $!\n";
+    exit EX_FAILURE;
+}
+
+printf("%.8$radix\n", $offset1) if $radix;
+close $fh;
+exit EX_SUCCESS;
 
 sub octal1 {
-    $upformat = 'c*'; # for -b
+    $upformat = 'C*'; # for -b
     $pffmt = '%.3o ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x $len;
 }
 
 sub char1 {
-    $upformat = 'c*'; # for -c
+    $upformat = 'C*'; # for -c
     $pffmt = '%s';
     $strfmt = $pffmt;
 
     @arr = ();
-    my $val = undef;
-    my $val1 = undef;
-
     my @arr1 = unpack($upformat,$data);
     for my $val (@arr1) {
         if (exists $charescs{$val}) {
 	    $arr[0] .= $charescs{$val} . " ";
 	}
-
+	elsif ($val > PRINTMAX || chr($val) !~ m/[[:print:]]/) {
+	    $arr[0] .= sprintf(' %03o', $val);
+	}
 	else {
-	    $val1 = "  " . chr($val) . " " ;
-	    $arr[0] .=  $val1;
+	    $arr[0] .= "  " . chr($val) . " ";
 	}
     }
 }
 
 sub udecimal {
     $upformat = 'S*'; # for -d
+    $data .= "\0" if ($len & 1); # zero-fill 16 bit input
     $pffmt = '%5u ';
     @arr = unpack($upformat,$data);
-    $strfmt = $pffmt x ($len / 2);
-    my $remainder = $len - ((scalar @arr) * 2);
-    ($remainder) && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("N", pack("B32", substr($rest, -32)));
-	$strfmt .= '%5u';
-    };
+    $strfmt = $pffmt x (scalar @arr);
 }
 
 sub float {
     $upformat = 'f*'; # for -f
+    my $remain = $len % 4;
+    $data .= "\0" x $remain if ($remain); # zero-fill 32 bit input
     $pffmt = '%6.6e ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x (scalar @arr);
-    my $remainder = $len - ((scalar @arr) * 4);
-    ($remainder) && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("f", pack("B32", substr($rest, -32)));
-	$strfmt .= '%6.6e';
-    };
 }
 
 sub decimal {
     $upformat = 's*'; # for -i
+    $data .= "\0" if ($len & 1); # zero-fill 16 bit input
     $pffmt = '%5d ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x (scalar @arr);
-    my $remainder = $len - ((scalar @arr) * 2);
-    ($remainder) && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("N", pack("B32", substr($rest, -32)));
-	$strfmt .= '%5d';
-    };
 }
 
 sub long {
     $upformat = 'L*'; # for -l
+    my $remain = $len % 4;
+    $data .= "\0" x $remain if ($remain); # zero-fill 32 bit input
     $pffmt = '%10ld ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x (scalar @arr);
-    my $remainder = $len - ((scalar @arr) * 4);
-    $remainder && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("N", pack("B32", substr($rest, -32)));
-	$strfmt .= '%10ld';
-    };
 }
 
 sub octal2 {
-    $upformat = 's*'; # for -o
+    $upformat = 'S*'; # for -o
+    $data .= "\0" if ($len & 1); # zero-fill 16 bit input
     $pffmt = '%.6o ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x (scalar @arr);
-    my $remainder = $len - ((scalar @arr) * 2);
-    ($remainder) && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("N", pack("B32", substr($rest, -32)));
-	$strfmt .= '%.6o';
-    };
 }
 
 sub hex {
-    $upformat = 's*'; # for -x
+    $upformat = 'S*'; # for -x
+    $data .= "\0" if ($len & 1); # zero-fill 16 bit input
     $pffmt = '%.4x ';
     @arr = unpack($upformat,$data);
     $strfmt = $pffmt x (scalar @arr);
-    my $remainder = $len - ((scalar @arr) * 2);
-    ($remainder) && do {
-	my $offset = $len - $remainder;
-	my $rest = "0" x 32 . substr($data, $offset, $remainder);
-	push @arr, unpack("N", pack("B32", substr($rest, -32)));
-	$strfmt .= '%.4x';
-    };
 }
 
 sub diffdata {
@@ -227,8 +254,8 @@ sub diffdata {
 }
 
 sub help {
-    print "od [-abcdfhiloxv] [-A radix] filename\n";
-    exit 0;
+    print "usage: od [-bcdfiloxv] [-A radix] [-j skip_bytes] [-N limit_bytes] filename\n";
+    exit EX_FAILURE;
 }
 __END__
 
@@ -238,7 +265,7 @@ od - dump files in octal and other formats
 
 =head1 SYNOPSIS
 
-B<od.pl> [ I<-abcdfhiloxv> ] [ I<-A radix> ]  F<filename>
+B<od> [ I<-abcdfiloxv> ] [I<-j skip_n_bytes>] [I<-N read_n_bytes>] [ I<-A radix> ]  F<filename>
 
 =head1 DESCRIPTION
 
@@ -264,4 +291,3 @@ This program is copyright (c) Mark Kahn 1999.
 This program is free and open software. You may use, modify, distribute,
 and sell this program (and any modified variants) in any way you wish,
 provided you do not restrict others from doing the same.
-

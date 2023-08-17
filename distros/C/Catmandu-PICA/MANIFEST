@@ -16,6 +16,7 @@ lib/Catmandu/Fix/pica_occurrence.pm
 lib/Catmandu/Fix/pica_remove.pm
 lib/Catmandu/Fix/pica_set.pm
 lib/Catmandu/Fix/pica_tag.pm
+lib/Catmandu/Fix/pica_update.pm
 lib/Catmandu/Importer/PICA.pm
 lib/Catmandu/Importer/SRU/Parser/picaxml.pm
 lib/Catmandu/Importer/SRU/Parser/ppxml.pm
@@ -28,6 +29,7 @@ t/04-exporter.t
 t/06-sru.t
 t/07-pica-each.t
 t/08-pica-add.t
+t/09-pica-update.t
 t/10-validator.t
 t/20-pica-diff.t
 t/30-modify.t

@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutWorkbookWaterMarkerRequest.name :   ,
-# PutWorkbookWaterMarkerRequest.textWaterMarkerRequest :   ,
-# PutWorkbookWaterMarkerRequest.folder :   ,
-# PutWorkbookWaterMarkerRequest.storageName :    
+# PutWorkbookWaterMarkerRequest.name : The workbook name.  ,
+# PutWorkbookWaterMarkerRequest.textWaterMarkerRequest : Text water marker request  ,
+# PutWorkbookWaterMarkerRequest.folder : Original workbook folder.  ,
+# PutWorkbookWaterMarkerRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_workbook_water_marker' } = { 
-    	summary => '',
+    	summary => 'Set workbook water marker.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'text_water_marker_request' => {
      	datatype => 'TextWaterMarkerRequest',
      	base_name => 'textWaterMarkerRequest',
-     	description => '',
+     	description => 'Text water marker request',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

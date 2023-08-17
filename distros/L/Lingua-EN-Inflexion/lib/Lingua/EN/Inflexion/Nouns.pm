@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Nouns;
 use 5.010; use strict; use warnings; use re q{eval};
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20211130.043929;
+our $VERSION = 20230704.182645;
 
 my $modern_plural_of = {
   " ox"                    => " oxen",
@@ -968,8 +968,8 @@ my $modern_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "Lapith"                 => "Lapiths",
   "lapith"                 => "lapiths",
+  "Lapith"                 => "Lapiths",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lars",
   "larnax"                 => "larnakes",
@@ -1383,8 +1383,8 @@ my $modern_plural_of = {
   "palpus"                 => "palpi",
   "palus"                  => "pali",
   "Panaman"                => "Panamans",
-  "pangasinan"             => "pangasinans",
   "Pangasinan"             => "Pangasinans",
+  "pangasinan"             => "pangasinans",
   "panino"                 => "panini",
   "panorpa"                => "panorpae",
   "pant"                   => "pants",
@@ -1725,8 +1725,8 @@ my $modern_plural_of = {
   "rite de passage"        => "rites de passage",
   "rococo"                 => "rococos",
   "roe"                    => "roes",
-  "rom"                    => "roms",
   "Rom"                    => "Roma",
+  "rom"                    => "roms",
   "Romagnese"              => "Romagnese",
   "Roman"                  => "Romans",
   "Romanese"               => "Romanese",
@@ -2599,8 +2599,8 @@ my $classical_plural_of = {
   "asylum"                 => "asyla",
   "asyndeton"              => "asyndeta",
   "ataman"                 => "atamans",
-  "Atlas"                  => "Atlantes",
   "atlas"                  => "atlantes",
+  "Atlas"                  => "Atlantes",
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "aurorae",
@@ -3143,8 +3143,8 @@ my $classical_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "galla"                  => "galla",
   "Galla"                  => "Galla",
+  "galla"                  => "galla",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglia",
@@ -3564,8 +3564,8 @@ my $classical_plural_of = {
   "mare"                   => "maria",
   "maremma"                => "maremme",
   "marquis"                => "marquises",
-  "Mary"                   => "Marys",
   "mary"                   => "maries",
+  "Mary"                   => "Marys",
   "mater lectionis"        => "matres lectionis",
   "math"                   => "maths",
   "matin"                  => "matins",
@@ -3831,8 +3831,8 @@ my $classical_plural_of = {
   "palpus"                 => "palpi",
   "palus"                  => "pali",
   "Panaman"                => "Panamans",
-  "pangasinan"             => "pangasinanes",
   "Pangasinan"             => "Pangasinanes",
+  "pangasinan"             => "pangasinanes",
   "panino"                 => "panini",
   "panorpa"                => "panorpae",
   "pant"                   => "pants",
@@ -4088,8 +4088,8 @@ my $classical_plural_of = {
   "punto blanco"           => "punti blanchi",
   "pupa"                   => "pupae",
   "purlieu"                => "purlieux",
-  "purum"                  => "purum",
   "Purum"                  => "Purum",
+  "purum"                  => "purum",
   "putto"                  => "putti",
   "puttony"                => "puttonys",
   "pycnidium"              => "pycnidia",
@@ -5079,15 +5079,15 @@ my $singular_of = {
   "asylums"               => "asylum",
   "asyndeta"              => "asyndeton",
   "atamans"               => "ataman",
-  "Atlantes"              => "Atlas",
   "atlantes"              => "atlas",
+  "Atlantes"              => "Atlas",
   "atlases"               => "atlas",
   "atmas"                 => "atman",
   "aurei"                 => "aureus",
   "aurorae"               => "aurora",
   "auroras"               => "aurora",
-  "Auslesen"              => "Auslese",
   "auslesen"              => "auslese",
+  "Auslesen"              => "Auslese",
   "ausleses"              => "auslese",
   "auspices"              => "auspex",
   "auto de fes"           => "auto de fe",
@@ -5756,10 +5756,10 @@ my $singular_of = {
   "furiosos"              => "furioso",
   "fuzzes"                => "fuzz",
   "Gabunese"              => "Gabunese",
-  "Galla"                 => "Galla",
   "galla"                 => "galla",
-  "Gallas"                => "Galla",
+  "Galla"                 => "Galla",
   "gallas"                => "galla",
+  "Gallas"                => "Galla",
   "gallows"               => "gallows",
   "gametangia"            => "gametangium",
   "ganglia"               => "ganglion",
@@ -6077,8 +6077,8 @@ my $singular_of = {
   "laminae"               => "lamina",
   "lapithae"              => "lapith",
   "Lapithae"              => "Lapith",
-  "Lapiths"               => "Lapith",
   "lapiths"               => "lapith",
+  "Lapiths"               => "Lapith",
   "Lapponese"             => "Lapponese",
   "lares"                 => "lar",
   "larnakes"              => "larnax",
@@ -6597,8 +6597,8 @@ my $singular_of = {
   "Panamans"              => "Panaman",
   "Pangasinanes"          => "Pangasinan",
   "pangasinanes"          => "pangasinan",
-  "pangasinans"           => "pangasinan",
   "Pangasinans"           => "Pangasinan",
+  "pangasinans"           => "pangasinan",
   "panini"                => "panino",
   "panorpae"              => "panorpa",
   "pantos"                => "panto",
@@ -6907,10 +6907,10 @@ my $singular_of = {
   "pupae"                 => "pupa",
   "purlieus"              => "purlieu",
   "purlieux"              => "purlieu",
-  "Purum"                 => "Purum",
   "purum"                 => "purum",
-  "purums"                => "purum",
+  "Purum"                 => "Purum",
   "Purums"                => "Purum",
+  "purums"                => "purum",
   "putti"                 => "putto",
   "puttonys"              => "puttony",
   "pycnia"                => "pycnium",
@@ -7943,112 +7943,112 @@ sub convert_to_modern_plural {
     return $modern_plural_of->{lc $word}  if exists $modern_plural_of->{lc $word};
     return $modern_plural_of->{tc $word}  if exists $modern_plural_of->{tc $word};
     return $word                     if is_plural($word) && !is_singular($word);
-    given ($word) {
-        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->plural)}"; }
-        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
-        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
-        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2"; }
-        when (m{\A(.*)stave$}i) { return "${1}staves"; }
-        when (m{\A(.*)staff$}i) { return "${1}staffs"; }
-        when (m{\A(.*)genus$}i) { return "${1}genera"; }
-        when (m{\A(.*)person$}i) { return "${1}people"; }
-        when (m{\A(.*)hertz$}i) { return "${1}hertz"; }
-        when (m{\A(.*)lux$}i) { return "${1}lux"; }
-        when (m{\A(.*)siemens$}i) { return "${1}siemens"; }
-        when (m{\A(.*)brother$}i) { return "${1}brothers"; }
-        when (m{\A(.*)child$}i) { return "${1}children"; }
-        when (m{\A(.*)cow$}i) { return "${1}cows"; }
-        when (m{\A(.+)-ox$}i) { return "${1}-oxen"; }
-        when (m{\A(.*)mensch$}i) { return "${1}menschen"; }
-        when (m{\A(.*)elf$}i) { return "${1}elves"; }
-        when (m{\A(.*)hoof$}i) { return "${1}hoofs"; }
-        when (m{\A(.*)knife$}i) { return "${1}knives"; }
-        when (m{\A(.*)leaf$}i) { return "${1}leaves"; }
-        when (m{\A(.*)life$}i) { return "${1}lives"; }
-        when (m{\A(.*)loaf$}i) { return "${1}loaves"; }
-        when (m{\A(.*)shelf$}i) { return "${1}shelves"; }
-        when (m{\A(.*)thief$}i) { return "${1}thieves"; }
-        when (m{\A(.*)wife$}i) { return "${1}wives"; }
-        when (m{\A(.*)wolf$}i) { return "${1}wolves"; }
-        when (m{\A(.*)human$}i) { return "${1}humans"; }
-        when (m{\A(.*)foot$}i) { return "${1}feet"; }
-        when (m{\A(.*)goose$}i) { return "${1}geese"; }
-        when (m{\A(.*)louse$}i) { return "${1}lice"; }
-        when (m{\A(.*)man$}i) { return "${1}men"; }
-        when (m{\A(.*)mouse$}i) { return "${1}mice"; }
-        when (m{\A(.*)tooth$}i) { return "${1}teeth"; }
-        when (m{\A(.*)buzz$}i) { return "${1}buzzes"; }
-        when (m{\A(.*)fizz$}i) { return "${1}fizzes"; }
-        when (m{\A(.*)frizz$}i) { return "${1}frizzes"; }
-        when (m{\A(.*)fuzz$}i) { return "${1}fuzzes"; }
-        when (m{\A(.*)jazz$}i) { return "${1}jazzes"; }
-        when (m{\A(.*)proboscis$}i) { return "${1}proboscises"; }
-        when (m{\A(.*)bema$}i) { return "${1}bemas"; }
-        when (m{\A(.*)drama$}i) { return "${1}dramas"; }
-        when (m{\A(.*)edema$}i) { return "${1}edemas"; }
-        when (m{\A(.*)lemma$}i) { return "${1}lemmas"; }
-        when (m{\A(.*)sarcoma$}i) { return "${1}sarcomas"; }
-        when (m{\A(.*)stoma$}i) { return "${1}stomas"; }
-        when (m{\A(.*)nova$}i) { return "${1}novas"; }
-        when (m{\A(.*)umbra$}i) { return "${1}umbras"; }
-        when (m{\A(.*)lumen$}i) { return "${1}lumens"; }
-        when (m{\A(.*)datum$}i) { return "${1}data"; }
-        when (m{\A(.*)stratum$}i) { return "${1}stratums"; }
-        when (m{\A(.*)bacillus$}i) { return "${1}bacilli"; }
-        when (m{\A(.*)nucleus$}i) { return "${1}nuclei"; }
-        when (m{\A(.*)hedron$}i) { return "${1}hedrons"; }
-        when (m{\A(.*)helion$}i) { return "${1}helions"; }
-        when (m{\A(.*)legomenon$}i) { return "${1}legomena"; }
-        when (m{\A(.*)phenomenon$}i) { return "${1}phenomena"; }
-        when (m{\A(.*)helix$}i) { return "${1}helices"; }
-        when (m{\A(.*)measles$}i) { return "${1}measles"; }
-        when (m{\A(.*)pox$}i) { return "${1}pox"; }
-        when (m{\A(.*)bass$}i) { return "${1}basses"; }
-        when (m{\A(.*)deer$}i) { return "${1}deer"; }
-        when (m{\A(.*)fish$}i) { return "${1}fish"; }
-        when (m{\A(.*)fowl$}i) { return "${1}fowls"; }
-        when (m{\A(.*)sheep$}i) { return "${1}sheep"; }
-        when (m{\A(.*)wildebeest$}i) { return "${1}wildebeests"; }
-        when (m{\A(.*)craft$}i) { return "${1}craft"; }
-        when (m{\A(.*)gas$}i) { return "${1}gases"; }
-        when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
-        when (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
-        when (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
-        when (m{\A(.+[aiy])nx$}i) { return "${1}nxes"; }
-        when (m{\A(.+)arf$}i) { return "${1}arves"; }
-        when (m{\A(.+)ceps$}i) { return "${1}ceps"; }
-        when (m{\A(.+[cs])h$}i) { return "${1}hes"; }
-        when (m{\A(.+)eaf$}i) { return "${1}eaves"; }
-        when (m{\A(.+)eau$}i) { return "${1}eaus"; }
-        when (m{\A(.+)ieu$}i) { return "${1}ieus"; }
-        when (m{\A(.+)nife$}i) { return "${1}nives"; }
-        when (m{\A(.+)oe$}i) { return "${1}oes"; }
-        when (m{\A(.+)o$}i) { return "${1}oes"; }
-        when (m{\A(.+)quy$}i) { return "${1}quies"; }
-        when (m{\A(.+[aeiou])y$}i) { return "${1}ys"; }
-        when (m{\A(.+)ss$}i) { return "${1}sses"; }
-        when (m{\A(.+)orse$}i) { return "${1}orses"; }
-        when (m{\A(.+[au])orse$}i) { return "${1}orses"; }
-        when (m{\A(.+)nse$}i) { return "${1}nses"; }
-        when (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
-        when (m{\A(.+)trix$}i) { return "${1}trixes"; }
-        when (m{\A(.+)us$}i) { return "${1}uses"; }
-        when (m{\A(.+)x$}i) { return "${1}xes"; }
-        when (m{\A(.+)y$}i) { return "${1}ies"; }
-        when (m{\A(.+)z$}i) { return "${1}zzes"; }
-        when (m{\A(.+)zoon$}i) { return "${1}zoa"; }
-        when (m{\A(.+)s$}i) { return "${1}ses"; }
-        when (m{\A(.+)$}i) { return "${1}s"; }
+    for ($word) {
+        if (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->plural)}"; }
+        if (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
+        if (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
+        if (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
+        if (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
+        if (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
+        if (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2-$3"; }
+        if (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2 $3"; }
+        if (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
+        if (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
+        if (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-errant"; }
+        if (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} errant"; }
+        if (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2"; }
+        if (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2"; }
+        if (m{\A(.*)stave$}i) { return "${1}staves"; }
+        if (m{\A(.*)staff$}i) { return "${1}staffs"; }
+        if (m{\A(.*)genus$}i) { return "${1}genera"; }
+        if (m{\A(.*)person$}i) { return "${1}people"; }
+        if (m{\A(.*)hertz$}i) { return "${1}hertz"; }
+        if (m{\A(.*)lux$}i) { return "${1}lux"; }
+        if (m{\A(.*)siemens$}i) { return "${1}siemens"; }
+        if (m{\A(.*)brother$}i) { return "${1}brothers"; }
+        if (m{\A(.*)child$}i) { return "${1}children"; }
+        if (m{\A(.*)cow$}i) { return "${1}cows"; }
+        if (m{\A(.+)-ox$}i) { return "${1}-oxen"; }
+        if (m{\A(.*)mensch$}i) { return "${1}menschen"; }
+        if (m{\A(.*)elf$}i) { return "${1}elves"; }
+        if (m{\A(.*)hoof$}i) { return "${1}hoofs"; }
+        if (m{\A(.*)knife$}i) { return "${1}knives"; }
+        if (m{\A(.*)leaf$}i) { return "${1}leaves"; }
+        if (m{\A(.*)life$}i) { return "${1}lives"; }
+        if (m{\A(.*)loaf$}i) { return "${1}loaves"; }
+        if (m{\A(.*)shelf$}i) { return "${1}shelves"; }
+        if (m{\A(.*)thief$}i) { return "${1}thieves"; }
+        if (m{\A(.*)wife$}i) { return "${1}wives"; }
+        if (m{\A(.*)wolf$}i) { return "${1}wolves"; }
+        if (m{\A(.*)human$}i) { return "${1}humans"; }
+        if (m{\A(.*)foot$}i) { return "${1}feet"; }
+        if (m{\A(.*)goose$}i) { return "${1}geese"; }
+        if (m{\A(.*)louse$}i) { return "${1}lice"; }
+        if (m{\A(.*)man$}i) { return "${1}men"; }
+        if (m{\A(.*)mouse$}i) { return "${1}mice"; }
+        if (m{\A(.*)tooth$}i) { return "${1}teeth"; }
+        if (m{\A(.*)buzz$}i) { return "${1}buzzes"; }
+        if (m{\A(.*)fizz$}i) { return "${1}fizzes"; }
+        if (m{\A(.*)frizz$}i) { return "${1}frizzes"; }
+        if (m{\A(.*)fuzz$}i) { return "${1}fuzzes"; }
+        if (m{\A(.*)jazz$}i) { return "${1}jazzes"; }
+        if (m{\A(.*)proboscis$}i) { return "${1}proboscises"; }
+        if (m{\A(.*)bema$}i) { return "${1}bemas"; }
+        if (m{\A(.*)drama$}i) { return "${1}dramas"; }
+        if (m{\A(.*)edema$}i) { return "${1}edemas"; }
+        if (m{\A(.*)lemma$}i) { return "${1}lemmas"; }
+        if (m{\A(.*)sarcoma$}i) { return "${1}sarcomas"; }
+        if (m{\A(.*)stoma$}i) { return "${1}stomas"; }
+        if (m{\A(.*)nova$}i) { return "${1}novas"; }
+        if (m{\A(.*)umbra$}i) { return "${1}umbras"; }
+        if (m{\A(.*)lumen$}i) { return "${1}lumens"; }
+        if (m{\A(.*)datum$}i) { return "${1}data"; }
+        if (m{\A(.*)stratum$}i) { return "${1}stratums"; }
+        if (m{\A(.*)bacillus$}i) { return "${1}bacilli"; }
+        if (m{\A(.*)nucleus$}i) { return "${1}nuclei"; }
+        if (m{\A(.*)hedron$}i) { return "${1}hedrons"; }
+        if (m{\A(.*)helion$}i) { return "${1}helions"; }
+        if (m{\A(.*)legomenon$}i) { return "${1}legomena"; }
+        if (m{\A(.*)phenomenon$}i) { return "${1}phenomena"; }
+        if (m{\A(.*)helix$}i) { return "${1}helices"; }
+        if (m{\A(.*)measles$}i) { return "${1}measles"; }
+        if (m{\A(.*)pox$}i) { return "${1}pox"; }
+        if (m{\A(.*)bass$}i) { return "${1}basses"; }
+        if (m{\A(.*)deer$}i) { return "${1}deer"; }
+        if (m{\A(.*)fish$}i) { return "${1}fish"; }
+        if (m{\A(.*)fowl$}i) { return "${1}fowls"; }
+        if (m{\A(.*)sheep$}i) { return "${1}sheep"; }
+        if (m{\A(.*)wildebeest$}i) { return "${1}wildebeests"; }
+        if (m{\A(.*)craft$}i) { return "${1}craft"; }
+        if (m{\A(.*)gas$}i) { return "${1}gases"; }
+        if (m{\A(.*)glottis$}i) { return "${1}glottises"; }
+        if (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
+        if (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
+        if (m{\A(.+[aiy])nx$}i) { return "${1}nxes"; }
+        if (m{\A(.+)arf$}i) { return "${1}arves"; }
+        if (m{\A(.+)ceps$}i) { return "${1}ceps"; }
+        if (m{\A(.+[cs])h$}i) { return "${1}hes"; }
+        if (m{\A(.+)eaf$}i) { return "${1}eaves"; }
+        if (m{\A(.+)eau$}i) { return "${1}eaus"; }
+        if (m{\A(.+)ieu$}i) { return "${1}ieus"; }
+        if (m{\A(.+)nife$}i) { return "${1}nives"; }
+        if (m{\A(.+)oe$}i) { return "${1}oes"; }
+        if (m{\A(.+)o$}i) { return "${1}oes"; }
+        if (m{\A(.+)quy$}i) { return "${1}quies"; }
+        if (m{\A(.+[aeiou])y$}i) { return "${1}ys"; }
+        if (m{\A(.+)ss$}i) { return "${1}sses"; }
+        if (m{\A(.+)orse$}i) { return "${1}orses"; }
+        if (m{\A(.+[au])orse$}i) { return "${1}orses"; }
+        if (m{\A(.+)nse$}i) { return "${1}nses"; }
+        if (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
+        if (m{\A(.+)trix$}i) { return "${1}trixes"; }
+        if (m{\A(.+)us$}i) { return "${1}uses"; }
+        if (m{\A(.+)x$}i) { return "${1}xes"; }
+        if (m{\A(.+)y$}i) { return "${1}ies"; }
+        if (m{\A(.+)z$}i) { return "${1}zzes"; }
+        if (m{\A(.+)zoon$}i) { return "${1}zoa"; }
+        if (m{\A(.+)s$}i) { return "${1}ses"; }
+        if (m{\A(.+)$}i) { return "${1}s"; }
         default { return $_; }
     }
 }
@@ -8059,112 +8059,112 @@ sub convert_to_classical_plural {
     return $classical_plural_of->{lc $word}  if exists $classical_plural_of->{lc $word};
     return $classical_plural_of->{tc $word}  if exists $classical_plural_of->{tc $word};
     return $word                     if is_plural($word) && !is_singular($word);
-    given ($word) {
-        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->classical->plural)}"; }
-        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
-        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
-        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2"; }
-        when (m{\A(.*)stave$}i) { return "${1}staves"; }
-        when (m{\A(.*)staff$}i) { return "${1}staves"; }
-        when (m{\A(.*)genus$}i) { return "${1}genera"; }
-        when (m{\A(.*)person$}i) { return "${1}persons"; }
-        when (m{\A(.*)hertz$}i) { return "${1}hertz"; }
-        when (m{\A(.*)lux$}i) { return "${1}lux"; }
-        when (m{\A(.*)siemens$}i) { return "${1}siemens"; }
-        when (m{\A(.*)brother$}i) { return "${1}brethren"; }
-        when (m{\A(.*)child$}i) { return "${1}children"; }
-        when (m{\A(.*)cow$}i) { return "${1}kine"; }
-        when (m{\A(.+)-ox$}i) { return "${1}-oxen"; }
-        when (m{\A(.*)mensch$}i) { return "${1}menschen"; }
-        when (m{\A(.*)elf$}i) { return "${1}elves"; }
-        when (m{\A(.*)hoof$}i) { return "${1}hooves"; }
-        when (m{\A(.*)knife$}i) { return "${1}knives"; }
-        when (m{\A(.*)leaf$}i) { return "${1}leaves"; }
-        when (m{\A(.*)life$}i) { return "${1}lives"; }
-        when (m{\A(.*)loaf$}i) { return "${1}loaves"; }
-        when (m{\A(.*)shelf$}i) { return "${1}shelves"; }
-        when (m{\A(.*)thief$}i) { return "${1}thieves"; }
-        when (m{\A(.*)wife$}i) { return "${1}wives"; }
-        when (m{\A(.*)wolf$}i) { return "${1}wolves"; }
-        when (m{\A(.*)human$}i) { return "${1}humans"; }
-        when (m{\A(.*)foot$}i) { return "${1}feet"; }
-        when (m{\A(.*)goose$}i) { return "${1}geese"; }
-        when (m{\A(.*)louse$}i) { return "${1}lice"; }
-        when (m{\A(.*)man$}i) { return "${1}men"; }
-        when (m{\A(.*)mouse$}i) { return "${1}mice"; }
-        when (m{\A(.*)tooth$}i) { return "${1}teeth"; }
-        when (m{\A(.*)buzz$}i) { return "${1}buzzes"; }
-        when (m{\A(.*)fizz$}i) { return "${1}fizzes"; }
-        when (m{\A(.*)frizz$}i) { return "${1}frizzes"; }
-        when (m{\A(.*)fuzz$}i) { return "${1}fuzzes"; }
-        when (m{\A(.*)jazz$}i) { return "${1}jazzes"; }
-        when (m{\A(.*)proboscis$}i) { return "${1}proboscides"; }
-        when (m{\A(.*)bema$}i) { return "${1}bemata"; }
-        when (m{\A(.*)drama$}i) { return "${1}dramas"; }
-        when (m{\A(.*)edema$}i) { return "${1}edemata"; }
-        when (m{\A(.*)lemma$}i) { return "${1}lemmata"; }
-        when (m{\A(.*)sarcoma$}i) { return "${1}sarcomata"; }
-        when (m{\A(.*)stoma$}i) { return "${1}stomata"; }
-        when (m{\A(.*)nova$}i) { return "${1}novae"; }
-        when (m{\A(.*)umbra$}i) { return "${1}umbrae"; }
-        when (m{\A(.*)lumen$}i) { return "${1}lumina"; }
-        when (m{\A(.*)datum$}i) { return "${1}data"; }
-        when (m{\A(.*)stratum$}i) { return "${1}strata"; }
-        when (m{\A(.*)bacillus$}i) { return "${1}bacilli"; }
-        when (m{\A(.*)nucleus$}i) { return "${1}nuclei"; }
-        when (m{\A(.*)hedron$}i) { return "${1}hedra"; }
-        when (m{\A(.*)helion$}i) { return "${1}helia"; }
-        when (m{\A(.*)legomenon$}i) { return "${1}legomena"; }
-        when (m{\A(.*)phenomenon$}i) { return "${1}phenomena"; }
-        when (m{\A(.*)helix$}i) { return "${1}helices"; }
-        when (m{\A(.*)measles$}i) { return "${1}measles"; }
-        when (m{\A(.*)pox$}i) { return "${1}pox"; }
-        when (m{\A(.*)bass$}i) { return "${1}bass"; }
-        when (m{\A(.*)deer$}i) { return "${1}deer"; }
-        when (m{\A(.*)fish$}i) { return "${1}fish"; }
-        when (m{\A(.*)fowl$}i) { return "${1}fowl"; }
-        when (m{\A(.*)sheep$}i) { return "${1}sheep"; }
-        when (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
-        when (m{\A(.*)craft$}i) { return "${1}craft"; }
-        when (m{\A(.*)gas$}i) { return "${1}gases"; }
-        when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
-        when (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
-        when (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
-        when (m{\A(.+[aiy])nx$}i) { return "${1}nges"; }
-        when (m{\A(.+)arf$}i) { return "${1}arves"; }
-        when (m{\A(.+)ceps$}i) { return "${1}ceps"; }
-        when (m{\A(.+[cs])h$}i) { return "${1}hes"; }
-        when (m{\A(.+)eaf$}i) { return "${1}eaves"; }
-        when (m{\A(.+)eau$}i) { return "${1}eaux"; }
-        when (m{\A(.+)ieu$}i) { return "${1}ieux"; }
-        when (m{\A(.+)nife$}i) { return "${1}nives"; }
-        when (m{\A(.+)oe$}i) { return "${1}oes"; }
-        when (m{\A(.+)o$}i) { return "${1}oes"; }
-        when (m{\A(.+)quy$}i) { return "${1}quies"; }
-        when (m{\A(.+[aeiou])y$}i) { return "${1}ys"; }
-        when (m{\A(.+)ss$}i) { return "${1}sses"; }
-        when (m{\A(.+)orse$}i) { return "${1}orses"; }
-        when (m{\A(.+[au])orse$}i) { return "${1}orses"; }
-        when (m{\A(.+)nse$}i) { return "${1}nses"; }
-        when (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
-        when (m{\A(.+)trix$}i) { return "${1}trices"; }
-        when (m{\A(.+)us$}i) { return "${1}uses"; }
-        when (m{\A(.+)x$}i) { return "${1}xes"; }
-        when (m{\A(.+)y$}i) { return "${1}ies"; }
-        when (m{\A(.+)z$}i) { return "${1}zzes"; }
-        when (m{\A(.+)zoon$}i) { return "${1}zoa"; }
-        when (m{\A(.+)s$}i) { return "${1}ses"; }
-        when (m{\A(.+)$}i) { return "${1}s"; }
+    for ($word) {
+        if (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->classical->plural)}"; }
+        if (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
+        if (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
+        if (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
+        if (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
+        if (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
+        if (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2-$3"; }
+        if (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2 $3"; }
+        if (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
+        if (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
+        if (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-errant"; }
+        if (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} errant"; }
+        if (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2"; }
+        if (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2"; }
+        if (m{\A(.*)stave$}i) { return "${1}staves"; }
+        if (m{\A(.*)staff$}i) { return "${1}staves"; }
+        if (m{\A(.*)genus$}i) { return "${1}genera"; }
+        if (m{\A(.*)person$}i) { return "${1}persons"; }
+        if (m{\A(.*)hertz$}i) { return "${1}hertz"; }
+        if (m{\A(.*)lux$}i) { return "${1}lux"; }
+        if (m{\A(.*)siemens$}i) { return "${1}siemens"; }
+        if (m{\A(.*)brother$}i) { return "${1}brethren"; }
+        if (m{\A(.*)child$}i) { return "${1}children"; }
+        if (m{\A(.*)cow$}i) { return "${1}kine"; }
+        if (m{\A(.+)-ox$}i) { return "${1}-oxen"; }
+        if (m{\A(.*)mensch$}i) { return "${1}menschen"; }
+        if (m{\A(.*)elf$}i) { return "${1}elves"; }
+        if (m{\A(.*)hoof$}i) { return "${1}hooves"; }
+        if (m{\A(.*)knife$}i) { return "${1}knives"; }
+        if (m{\A(.*)leaf$}i) { return "${1}leaves"; }
+        if (m{\A(.*)life$}i) { return "${1}lives"; }
+        if (m{\A(.*)loaf$}i) { return "${1}loaves"; }
+        if (m{\A(.*)shelf$}i) { return "${1}shelves"; }
+        if (m{\A(.*)thief$}i) { return "${1}thieves"; }
+        if (m{\A(.*)wife$}i) { return "${1}wives"; }
+        if (m{\A(.*)wolf$}i) { return "${1}wolves"; }
+        if (m{\A(.*)human$}i) { return "${1}humans"; }
+        if (m{\A(.*)foot$}i) { return "${1}feet"; }
+        if (m{\A(.*)goose$}i) { return "${1}geese"; }
+        if (m{\A(.*)louse$}i) { return "${1}lice"; }
+        if (m{\A(.*)man$}i) { return "${1}men"; }
+        if (m{\A(.*)mouse$}i) { return "${1}mice"; }
+        if (m{\A(.*)tooth$}i) { return "${1}teeth"; }
+        if (m{\A(.*)buzz$}i) { return "${1}buzzes"; }
+        if (m{\A(.*)fizz$}i) { return "${1}fizzes"; }
+        if (m{\A(.*)frizz$}i) { return "${1}frizzes"; }
+        if (m{\A(.*)fuzz$}i) { return "${1}fuzzes"; }
+        if (m{\A(.*)jazz$}i) { return "${1}jazzes"; }
+        if (m{\A(.*)proboscis$}i) { return "${1}proboscides"; }
+        if (m{\A(.*)bema$}i) { return "${1}bemata"; }
+        if (m{\A(.*)drama$}i) { return "${1}dramas"; }
+        if (m{\A(.*)edema$}i) { return "${1}edemata"; }
+        if (m{\A(.*)lemma$}i) { return "${1}lemmata"; }
+        if (m{\A(.*)sarcoma$}i) { return "${1}sarcomata"; }
+        if (m{\A(.*)stoma$}i) { return "${1}stomata"; }
+        if (m{\A(.*)nova$}i) { return "${1}novae"; }
+        if (m{\A(.*)umbra$}i) { return "${1}umbrae"; }
+        if (m{\A(.*)lumen$}i) { return "${1}lumina"; }
+        if (m{\A(.*)datum$}i) { return "${1}data"; }
+        if (m{\A(.*)stratum$}i) { return "${1}strata"; }
+        if (m{\A(.*)bacillus$}i) { return "${1}bacilli"; }
+        if (m{\A(.*)nucleus$}i) { return "${1}nuclei"; }
+        if (m{\A(.*)hedron$}i) { return "${1}hedra"; }
+        if (m{\A(.*)helion$}i) { return "${1}helia"; }
+        if (m{\A(.*)legomenon$}i) { return "${1}legomena"; }
+        if (m{\A(.*)phenomenon$}i) { return "${1}phenomena"; }
+        if (m{\A(.*)helix$}i) { return "${1}helices"; }
+        if (m{\A(.*)measles$}i) { return "${1}measles"; }
+        if (m{\A(.*)pox$}i) { return "${1}pox"; }
+        if (m{\A(.*)bass$}i) { return "${1}bass"; }
+        if (m{\A(.*)deer$}i) { return "${1}deer"; }
+        if (m{\A(.*)fish$}i) { return "${1}fish"; }
+        if (m{\A(.*)fowl$}i) { return "${1}fowl"; }
+        if (m{\A(.*)sheep$}i) { return "${1}sheep"; }
+        if (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
+        if (m{\A(.*)craft$}i) { return "${1}craft"; }
+        if (m{\A(.*)gas$}i) { return "${1}gases"; }
+        if (m{\A(.*)glottis$}i) { return "${1}glottises"; }
+        if (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
+        if (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
+        if (m{\A(.+[aiy])nx$}i) { return "${1}nges"; }
+        if (m{\A(.+)arf$}i) { return "${1}arves"; }
+        if (m{\A(.+)ceps$}i) { return "${1}ceps"; }
+        if (m{\A(.+[cs])h$}i) { return "${1}hes"; }
+        if (m{\A(.+)eaf$}i) { return "${1}eaves"; }
+        if (m{\A(.+)eau$}i) { return "${1}eaux"; }
+        if (m{\A(.+)ieu$}i) { return "${1}ieux"; }
+        if (m{\A(.+)nife$}i) { return "${1}nives"; }
+        if (m{\A(.+)oe$}i) { return "${1}oes"; }
+        if (m{\A(.+)o$}i) { return "${1}oes"; }
+        if (m{\A(.+)quy$}i) { return "${1}quies"; }
+        if (m{\A(.+[aeiou])y$}i) { return "${1}ys"; }
+        if (m{\A(.+)ss$}i) { return "${1}sses"; }
+        if (m{\A(.+)orse$}i) { return "${1}orses"; }
+        if (m{\A(.+[au])orse$}i) { return "${1}orses"; }
+        if (m{\A(.+)nse$}i) { return "${1}nses"; }
+        if (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
+        if (m{\A(.+)trix$}i) { return "${1}trices"; }
+        if (m{\A(.+)us$}i) { return "${1}uses"; }
+        if (m{\A(.+)x$}i) { return "${1}xes"; }
+        if (m{\A(.+)y$}i) { return "${1}ies"; }
+        if (m{\A(.+)z$}i) { return "${1}zzes"; }
+        if (m{\A(.+)zoon$}i) { return "${1}zoa"; }
+        if (m{\A(.+)s$}i) { return "${1}ses"; }
+        if (m{\A(.+)$}i) { return "${1}s"; }
         default { return $_; }
     }
 }
@@ -8175,136 +8175,136 @@ sub convert_to_singular {
     return $singular_of->{lc $word}  if exists $singular_of->{lc $word};
     return $singular_of->{tc $word}  if exists $singular_of->{tc $word};
     return $word                     if is_singular($word);
-    given ($word) {
-        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->singular)}"; }
-        when (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) them$}i) { return "$1 it"; }
-        when (m{\Asons-of-(.*?)$}i) { return "son-of-a-${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
-        when (m{\Asons of (.*?)$}i) { return "son of a ${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2"; }
-        when (m{\A(.*)staves$}i) { return "${1}stave"; }
-        when (m{\A(.*)staffs$}i) { return "${1}staff"; }
-        when (m{\A(.*)staves$}i) { return "${1}staff"; }
-        when (m{\A(.*)genera$}i) { return "${1}genus"; }
-        when (m{\A(.*)people$}i) { return "${1}person"; }
-        when (m{\A(.*)persons$}i) { return "${1}person"; }
-        when (m{\A(.*)hertz$}i) { return "${1}hertz"; }
-        when (m{\A(.*)lux$}i) { return "${1}lux"; }
-        when (m{\A(.*)siemens$}i) { return "${1}siemens"; }
-        when (m{\A(.*)brothers$}i) { return "${1}brother"; }
-        when (m{\A(.*)brethren$}i) { return "${1}brother"; }
-        when (m{\A(.*)children$}i) { return "${1}child"; }
-        when (m{\A(.*)cows$}i) { return "${1}cow"; }
-        when (m{\A(.*)kine$}i) { return "${1}cow"; }
-        when (m{\A(.+)-oxen$}i) { return "${1}-ox"; }
-        when (m{\A(.*)menschen$}i) { return "${1}mensch"; }
-        when (m{\A(.*)elves$}i) { return "${1}elf"; }
-        when (m{\A(.*)hoofs$}i) { return "${1}hoof"; }
-        when (m{\A(.*)hooves$}i) { return "${1}hoof"; }
-        when (m{\A(.*)knives$}i) { return "${1}knife"; }
-        when (m{\A(.*)leaves$}i) { return "${1}leaf"; }
-        when (m{\A(.*)lives$}i) { return "${1}life"; }
-        when (m{\A(.*)loaves$}i) { return "${1}loaf"; }
-        when (m{\A(.*)shelves$}i) { return "${1}shelf"; }
-        when (m{\A(.*)thieves$}i) { return "${1}thief"; }
-        when (m{\A(.*)wives$}i) { return "${1}wife"; }
-        when (m{\A(.*)wolves$}i) { return "${1}wolf"; }
-        when (m{\A(.*)humans$}i) { return "${1}human"; }
-        when (m{\A(.*)feet$}i) { return "${1}foot"; }
-        when (m{\A(.*)geese$}i) { return "${1}goose"; }
-        when (m{\A(.*)lice$}i) { return "${1}louse"; }
-        when (m{\A(.*)men$}i) { return "${1}man"; }
-        when (m{\A(.*)mice$}i) { return "${1}mouse"; }
-        when (m{\A(.*)teeth$}i) { return "${1}tooth"; }
-        when (m{\A(.*)buzzes$}i) { return "${1}buzz"; }
-        when (m{\A(.*)fizzes$}i) { return "${1}fizz"; }
-        when (m{\A(.*)frizzes$}i) { return "${1}frizz"; }
-        when (m{\A(.*)fuzzes$}i) { return "${1}fuzz"; }
-        when (m{\A(.*)jazzes$}i) { return "${1}jazz"; }
-        when (m{\A(.*)proboscises$}i) { return "${1}proboscis"; }
-        when (m{\A(.*)proboscides$}i) { return "${1}proboscis"; }
-        when (m{\A(.*)bemas$}i) { return "${1}bema"; }
-        when (m{\A(.*)bemata$}i) { return "${1}bema"; }
-        when (m{\A(.*)dramas$}i) { return "${1}drama"; }
-        when (m{\A(.*)edemas$}i) { return "${1}edema"; }
-        when (m{\A(.*)edemata$}i) { return "${1}edema"; }
-        when (m{\A(.*)lemmas$}i) { return "${1}lemma"; }
-        when (m{\A(.*)lemmata$}i) { return "${1}lemma"; }
-        when (m{\A(.*)sarcomas$}i) { return "${1}sarcoma"; }
-        when (m{\A(.*)sarcomata$}i) { return "${1}sarcoma"; }
-        when (m{\A(.*)stomas$}i) { return "${1}stoma"; }
-        when (m{\A(.*)stomata$}i) { return "${1}stoma"; }
-        when (m{\A(.*)novas$}i) { return "${1}nova"; }
-        when (m{\A(.*)novae$}i) { return "${1}nova"; }
-        when (m{\A(.*)umbras$}i) { return "${1}umbra"; }
-        when (m{\A(.*)umbrae$}i) { return "${1}umbra"; }
-        when (m{\A(.*)lumens$}i) { return "${1}lumen"; }
-        when (m{\A(.*)lumina$}i) { return "${1}lumen"; }
-        when (m{\A(.*)data$}i) { return "${1}datum"; }
-        when (m{\A(.*)stratums$}i) { return "${1}stratum"; }
-        when (m{\A(.*)strata$}i) { return "${1}stratum"; }
-        when (m{\A(.*)bacilli$}i) { return "${1}bacillus"; }
-        when (m{\A(.*)nuclei$}i) { return "${1}nucleus"; }
-        when (m{\A(.*)hedrons$}i) { return "${1}hedron"; }
-        when (m{\A(.*)hedra$}i) { return "${1}hedron"; }
-        when (m{\A(.*)helions$}i) { return "${1}helion"; }
-        when (m{\A(.*)helia$}i) { return "${1}helion"; }
-        when (m{\A(.*)legomena$}i) { return "${1}legomenon"; }
-        when (m{\A(.*)phenomena$}i) { return "${1}phenomenon"; }
-        when (m{\A(.*)helices$}i) { return "${1}helix"; }
-        when (m{\A(.*)measles$}i) { return "${1}measles"; }
-        when (m{\A(.*)pox$}i) { return "${1}pox"; }
-        when (m{\A(.*)basses$}i) { return "${1}bass"; }
-        when (m{\A(.*)bass$}i) { return "${1}bass"; }
-        when (m{\A(.*)deer$}i) { return "${1}deer"; }
-        when (m{\A(.*)fish$}i) { return "${1}fish"; }
-        when (m{\A(.*)fowls$}i) { return "${1}fowl"; }
-        when (m{\A(.*)fowl$}i) { return "${1}fowl"; }
-        when (m{\A(.*)sheep$}i) { return "${1}sheep"; }
-        when (m{\A(.*)wildebeests$}i) { return "${1}wildebeest"; }
-        when (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
-        when (m{\A(.*)craft$}i) { return "${1}craft"; }
-        when (m{\A(.*)gases$}i) { return "${1}gas"; }
-        when (m{\A(.*)glottises$}i) { return "${1}glottis"; }
-        when (m{\A(.+[aeiou])os$}i) { return "${1}o"; }
-        when (m{\A(.+[aeo])lves$}i) { return "${1}lf"; }
-        when (m{\A(.+[aiy])nxes$}i) { return "${1}nx"; }
-        when (m{\A(.+[aiy])nges$}i) { return "${1}nx"; }
-        when (m{\A(.+)arves$}i) { return "${1}arf"; }
-        when (m{\A(.+)ceps$}i) { return "${1}ceps"; }
-        when (m{\A(.+[cs])hes$}i) { return "${1}h"; }
-        when (m{\A(.+)eaves$}i) { return "${1}eaf"; }
-        when (m{\A(.+)eaus$}i) { return "${1}eau"; }
-        when (m{\A(.+)eaux$}i) { return "${1}eau"; }
-        when (m{\A(.+)ieus$}i) { return "${1}ieu"; }
-        when (m{\A(.+)ieux$}i) { return "${1}ieu"; }
-        when (m{\A(.+)nives$}i) { return "${1}nife"; }
-        when (m{\A(.+)oes$}i) { return "${1}oe"; }
-        when (m{\A(.+)oes$}i) { return "${1}o"; }
-        when (m{\A(.+)quies$}i) { return "${1}quy"; }
-        when (m{\A(.+[aeiou])ys$}i) { return "${1}y"; }
-        when (m{\A(.+)sses$}i) { return "${1}ss"; }
-        when (m{\A(.+)orses$}i) { return "${1}orse"; }
-        when (m{\A(.+[au])orses$}i) { return "${1}orse"; }
-        when (m{\A(.+)nses$}i) { return "${1}nse"; }
-        when (m{\A(.+[^ns])ses$}i) { return "${1}sis"; }
-        when (m{\A(.+)trixes$}i) { return "${1}trix"; }
-        when (m{\A(.+)trices$}i) { return "${1}trix"; }
-        when (m{\A(.+)uses$}i) { return "${1}us"; }
-        when (m{\A(.+)xes$}i) { return "${1}x"; }
-        when (m{\A(.+)ies$}i) { return "${1}y"; }
-        when (m{\A(.+)zzes$}i) { return "${1}z"; }
-        when (m{\A(.+)zoa$}i) { return "${1}zoon"; }
-        when (m{\A(.+)ses$}i) { return "${1}s"; }
-        when (m{\A(.+)s$}i) { return "${1}"; }
+    for ($word) {
+        if (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->singular)}"; }
+        if (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
+        if (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
+        if (m{\A($PREP_PAT) them$}i) { return "$1 it"; }
+        if (m{\Asons-of-(.*?)$}i) { return "son-of-a-${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
+        if (m{\Asons of (.*?)$}i) { return "son of a ${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
+        if (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2-$3"; }
+        if (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2 $3"; }
+        if (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
+        if (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
+        if (m{\A(.*?)-errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-errant"; }
+        if (m{\A(.*?) errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} errant"; }
+        if (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2"; }
+        if (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2"; }
+        if (m{\A(.*)staves$}i) { return "${1}stave"; }
+        if (m{\A(.*)staffs$}i) { return "${1}staff"; }
+        if (m{\A(.*)staves$}i) { return "${1}staff"; }
+        if (m{\A(.*)genera$}i) { return "${1}genus"; }
+        if (m{\A(.*)people$}i) { return "${1}person"; }
+        if (m{\A(.*)persons$}i) { return "${1}person"; }
+        if (m{\A(.*)hertz$}i) { return "${1}hertz"; }
+        if (m{\A(.*)lux$}i) { return "${1}lux"; }
+        if (m{\A(.*)siemens$}i) { return "${1}siemens"; }
+        if (m{\A(.*)brothers$}i) { return "${1}brother"; }
+        if (m{\A(.*)brethren$}i) { return "${1}brother"; }
+        if (m{\A(.*)children$}i) { return "${1}child"; }
+        if (m{\A(.*)cows$}i) { return "${1}cow"; }
+        if (m{\A(.*)kine$}i) { return "${1}cow"; }
+        if (m{\A(.+)-oxen$}i) { return "${1}-ox"; }
+        if (m{\A(.*)menschen$}i) { return "${1}mensch"; }
+        if (m{\A(.*)elves$}i) { return "${1}elf"; }
+        if (m{\A(.*)hoofs$}i) { return "${1}hoof"; }
+        if (m{\A(.*)hooves$}i) { return "${1}hoof"; }
+        if (m{\A(.*)knives$}i) { return "${1}knife"; }
+        if (m{\A(.*)leaves$}i) { return "${1}leaf"; }
+        if (m{\A(.*)lives$}i) { return "${1}life"; }
+        if (m{\A(.*)loaves$}i) { return "${1}loaf"; }
+        if (m{\A(.*)shelves$}i) { return "${1}shelf"; }
+        if (m{\A(.*)thieves$}i) { return "${1}thief"; }
+        if (m{\A(.*)wives$}i) { return "${1}wife"; }
+        if (m{\A(.*)wolves$}i) { return "${1}wolf"; }
+        if (m{\A(.*)humans$}i) { return "${1}human"; }
+        if (m{\A(.*)feet$}i) { return "${1}foot"; }
+        if (m{\A(.*)geese$}i) { return "${1}goose"; }
+        if (m{\A(.*)lice$}i) { return "${1}louse"; }
+        if (m{\A(.*)men$}i) { return "${1}man"; }
+        if (m{\A(.*)mice$}i) { return "${1}mouse"; }
+        if (m{\A(.*)teeth$}i) { return "${1}tooth"; }
+        if (m{\A(.*)buzzes$}i) { return "${1}buzz"; }
+        if (m{\A(.*)fizzes$}i) { return "${1}fizz"; }
+        if (m{\A(.*)frizzes$}i) { return "${1}frizz"; }
+        if (m{\A(.*)fuzzes$}i) { return "${1}fuzz"; }
+        if (m{\A(.*)jazzes$}i) { return "${1}jazz"; }
+        if (m{\A(.*)proboscises$}i) { return "${1}proboscis"; }
+        if (m{\A(.*)proboscides$}i) { return "${1}proboscis"; }
+        if (m{\A(.*)bemas$}i) { return "${1}bema"; }
+        if (m{\A(.*)bemata$}i) { return "${1}bema"; }
+        if (m{\A(.*)dramas$}i) { return "${1}drama"; }
+        if (m{\A(.*)edemas$}i) { return "${1}edema"; }
+        if (m{\A(.*)edemata$}i) { return "${1}edema"; }
+        if (m{\A(.*)lemmas$}i) { return "${1}lemma"; }
+        if (m{\A(.*)lemmata$}i) { return "${1}lemma"; }
+        if (m{\A(.*)sarcomas$}i) { return "${1}sarcoma"; }
+        if (m{\A(.*)sarcomata$}i) { return "${1}sarcoma"; }
+        if (m{\A(.*)stomas$}i) { return "${1}stoma"; }
+        if (m{\A(.*)stomata$}i) { return "${1}stoma"; }
+        if (m{\A(.*)novas$}i) { return "${1}nova"; }
+        if (m{\A(.*)novae$}i) { return "${1}nova"; }
+        if (m{\A(.*)umbras$}i) { return "${1}umbra"; }
+        if (m{\A(.*)umbrae$}i) { return "${1}umbra"; }
+        if (m{\A(.*)lumens$}i) { return "${1}lumen"; }
+        if (m{\A(.*)lumina$}i) { return "${1}lumen"; }
+        if (m{\A(.*)data$}i) { return "${1}datum"; }
+        if (m{\A(.*)stratums$}i) { return "${1}stratum"; }
+        if (m{\A(.*)strata$}i) { return "${1}stratum"; }
+        if (m{\A(.*)bacilli$}i) { return "${1}bacillus"; }
+        if (m{\A(.*)nuclei$}i) { return "${1}nucleus"; }
+        if (m{\A(.*)hedrons$}i) { return "${1}hedron"; }
+        if (m{\A(.*)hedra$}i) { return "${1}hedron"; }
+        if (m{\A(.*)helions$}i) { return "${1}helion"; }
+        if (m{\A(.*)helia$}i) { return "${1}helion"; }
+        if (m{\A(.*)legomena$}i) { return "${1}legomenon"; }
+        if (m{\A(.*)phenomena$}i) { return "${1}phenomenon"; }
+        if (m{\A(.*)helices$}i) { return "${1}helix"; }
+        if (m{\A(.*)measles$}i) { return "${1}measles"; }
+        if (m{\A(.*)pox$}i) { return "${1}pox"; }
+        if (m{\A(.*)basses$}i) { return "${1}bass"; }
+        if (m{\A(.*)bass$}i) { return "${1}bass"; }
+        if (m{\A(.*)deer$}i) { return "${1}deer"; }
+        if (m{\A(.*)fish$}i) { return "${1}fish"; }
+        if (m{\A(.*)fowls$}i) { return "${1}fowl"; }
+        if (m{\A(.*)fowl$}i) { return "${1}fowl"; }
+        if (m{\A(.*)sheep$}i) { return "${1}sheep"; }
+        if (m{\A(.*)wildebeests$}i) { return "${1}wildebeest"; }
+        if (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
+        if (m{\A(.*)craft$}i) { return "${1}craft"; }
+        if (m{\A(.*)gases$}i) { return "${1}gas"; }
+        if (m{\A(.*)glottises$}i) { return "${1}glottis"; }
+        if (m{\A(.+[aeiou])os$}i) { return "${1}o"; }
+        if (m{\A(.+[aeo])lves$}i) { return "${1}lf"; }
+        if (m{\A(.+[aiy])nxes$}i) { return "${1}nx"; }
+        if (m{\A(.+[aiy])nges$}i) { return "${1}nx"; }
+        if (m{\A(.+)arves$}i) { return "${1}arf"; }
+        if (m{\A(.+)ceps$}i) { return "${1}ceps"; }
+        if (m{\A(.+[cs])hes$}i) { return "${1}h"; }
+        if (m{\A(.+)eaves$}i) { return "${1}eaf"; }
+        if (m{\A(.+)eaus$}i) { return "${1}eau"; }
+        if (m{\A(.+)eaux$}i) { return "${1}eau"; }
+        if (m{\A(.+)ieus$}i) { return "${1}ieu"; }
+        if (m{\A(.+)ieux$}i) { return "${1}ieu"; }
+        if (m{\A(.+)nives$}i) { return "${1}nife"; }
+        if (m{\A(.+)oes$}i) { return "${1}oe"; }
+        if (m{\A(.+)oes$}i) { return "${1}o"; }
+        if (m{\A(.+)quies$}i) { return "${1}quy"; }
+        if (m{\A(.+[aeiou])ys$}i) { return "${1}y"; }
+        if (m{\A(.+)sses$}i) { return "${1}ss"; }
+        if (m{\A(.+)orses$}i) { return "${1}orse"; }
+        if (m{\A(.+[au])orses$}i) { return "${1}orse"; }
+        if (m{\A(.+)nses$}i) { return "${1}nse"; }
+        if (m{\A(.+[^ns])ses$}i) { return "${1}sis"; }
+        if (m{\A(.+)trixes$}i) { return "${1}trix"; }
+        if (m{\A(.+)trices$}i) { return "${1}trix"; }
+        if (m{\A(.+)uses$}i) { return "${1}us"; }
+        if (m{\A(.+)xes$}i) { return "${1}x"; }
+        if (m{\A(.+)ies$}i) { return "${1}y"; }
+        if (m{\A(.+)zzes$}i) { return "${1}z"; }
+        if (m{\A(.+)zoa$}i) { return "${1}zoon"; }
+        if (m{\A(.+)ses$}i) { return "${1}s"; }
+        if (m{\A(.+)s$}i) { return "${1}"; }
         default { return $_; }
     }
 }
@@ -8317,134 +8317,134 @@ sub is_plural {
     return 0 if exists $is_singular->{$word};
     return 0 if exists $is_singular->{lc $word};
     return 0 if exists $is_singular->{tc $word};
-    given ($word) {
-        when (m{'$})  { return 1 }
-        when (m{'s$}) { return is_plural(substr($word,0,-2)) }
-        when (m{\A.*'s?$}i) { return 1 }
-        when (m{\A(.*?)-general$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?) general$}i) { return is_plural($1);return 1 }
-        when (m{\A($PREP_PAT) them$}i) { return 1 }
-        when (m{\Asons-of-(.*?)$}i) { return is_plural($1);return 1 }
-        when (m{\Asons of (.*?)$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_plural($1);return 1 }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return is_plural($2);return 1 }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return is_plural($2);return 1 }
-        when (m{\A(.*?)-errant$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?) errant$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return is_plural($1);return 1 }
-        when (m{\A(.*)staves$}i) { return 1 }
-        when (m{\A(.*)staffs$}i) { return 1 }
-        when (m{\A(.*)genera$}i) { return 1 }
-        when (m{\A(.*)people$}i) { return 1 }
-        when (m{\A(.*)persons$}i) { return 1 }
-        when (m{\A(.*)hertz$}i) { return 1 }
-        when (m{\A(.*)lux$}i) { return 1 }
-        when (m{\A(.*)siemens$}i) { return 1 }
-        when (m{\A(.*)brothers$}i) { return 1 }
-        when (m{\A(.*)brethren$}i) { return 1 }
-        when (m{\A(.*)children$}i) { return 1 }
-        when (m{\A(.*)cows$}i) { return 1 }
-        when (m{\A(.*)kine$}i) { return 1 }
-        when (m{\A(.+)-oxen$}i) { return 1 }
-        when (m{\A(.*)menschen$}i) { return 1 }
-        when (m{\A(.*)elves$}i) { return 1 }
-        when (m{\A(.*)hoofs$}i) { return 1 }
-        when (m{\A(.*)hooves$}i) { return 1 }
-        when (m{\A(.*)knives$}i) { return 1 }
-        when (m{\A(.*)leaves$}i) { return 1 }
-        when (m{\A(.*)lives$}i) { return 1 }
-        when (m{\A(.*)loaves$}i) { return 1 }
-        when (m{\A(.*)shelves$}i) { return 1 }
-        when (m{\A(.*)thieves$}i) { return 1 }
-        when (m{\A(.*)wives$}i) { return 1 }
-        when (m{\A(.*)wolves$}i) { return 1 }
-        when (m{\A(.*)humans$}i) { return 1 }
-        when (m{\A(.*)feet$}i) { return 1 }
-        when (m{\A(.*)geese$}i) { return 1 }
-        when (m{\A(.*)lice$}i) { return 1 }
-        when (m{\A(.*)men$}i) { return 1 }
-        when (m{\A(.*)mice$}i) { return 1 }
-        when (m{\A(.*)teeth$}i) { return 1 }
-        when (m{\A(.*)buzzes$}i) { return 1 }
-        when (m{\A(.*)fizzes$}i) { return 1 }
-        when (m{\A(.*)frizzes$}i) { return 1 }
-        when (m{\A(.*)fuzzes$}i) { return 1 }
-        when (m{\A(.*)jazzes$}i) { return 1 }
-        when (m{\A(.*)proboscises$}i) { return 1 }
-        when (m{\A(.*)proboscides$}i) { return 1 }
-        when (m{\A(.*)bemas$}i) { return 1 }
-        when (m{\A(.*)bemata$}i) { return 1 }
-        when (m{\A(.*)dramas$}i) { return 1 }
-        when (m{\A(.*)edemas$}i) { return 1 }
-        when (m{\A(.*)edemata$}i) { return 1 }
-        when (m{\A(.*)lemmas$}i) { return 1 }
-        when (m{\A(.*)lemmata$}i) { return 1 }
-        when (m{\A(.*)sarcomas$}i) { return 1 }
-        when (m{\A(.*)sarcomata$}i) { return 1 }
-        when (m{\A(.*)stomas$}i) { return 1 }
-        when (m{\A(.*)stomata$}i) { return 1 }
-        when (m{\A(.*)novas$}i) { return 1 }
-        when (m{\A(.*)novae$}i) { return 1 }
-        when (m{\A(.*)umbras$}i) { return 1 }
-        when (m{\A(.*)umbrae$}i) { return 1 }
-        when (m{\A(.*)lumens$}i) { return 1 }
-        when (m{\A(.*)lumina$}i) { return 1 }
-        when (m{\A(.*)data$}i) { return 1 }
-        when (m{\A(.*)stratums$}i) { return 1 }
-        when (m{\A(.*)strata$}i) { return 1 }
-        when (m{\A(.*)bacilli$}i) { return 1 }
-        when (m{\A(.*)nuclei$}i) { return 1 }
-        when (m{\A(.*)hedrons$}i) { return 1 }
-        when (m{\A(.*)hedra$}i) { return 1 }
-        when (m{\A(.*)helions$}i) { return 1 }
-        when (m{\A(.*)helia$}i) { return 1 }
-        when (m{\A(.*)legomena$}i) { return 1 }
-        when (m{\A(.*)phenomena$}i) { return 1 }
-        when (m{\A(.*)helices$}i) { return 1 }
-        when (m{\A(.*)measles$}i) { return 1 }
-        when (m{\A(.*)pox$}i) { return 1 }
-        when (m{\A(.*)basses$}i) { return 1 }
-        when (m{\A(.*)bass$}i) { return 1 }
-        when (m{\A(.*)deer$}i) { return 1 }
-        when (m{\A(.*)fish$}i) { return 1 }
-        when (m{\A(.*)fowls$}i) { return 1 }
-        when (m{\A(.*)fowl$}i) { return 1 }
-        when (m{\A(.*)sheep$}i) { return 1 }
-        when (m{\A(.*)wildebeests$}i) { return 1 }
-        when (m{\A(.*)wildebeest$}i) { return 1 }
-        when (m{\A(.*)craft$}i) { return 1 }
-        when (m{\A(.*)gases$}i) { return 1 }
-        when (m{\A(.*)glottises$}i) { return 1 }
-        when (m{\A(.+[aeiou])os$}i) { return 1 }
-        when (m{\A(.+[aeo])lves$}i) { return 1 }
-        when (m{\A(.+[aiy])nxes$}i) { return 1 }
-        when (m{\A(.+[aiy])nges$}i) { return 1 }
-        when (m{\A(.+)arves$}i) { return 1 }
-        when (m{\A(.+)ceps$}i) { return 1 }
-        when (m{\A(.+[cs])hes$}i) { return 1 }
-        when (m{\A(.+)eaves$}i) { return 1 }
-        when (m{\A(.+)eaus$}i) { return 1 }
-        when (m{\A(.+)eaux$}i) { return 1 }
-        when (m{\A(.+)ieus$}i) { return 1 }
-        when (m{\A(.+)ieux$}i) { return 1 }
-        when (m{\A(.+)nives$}i) { return 1 }
-        when (m{\A(.+)oes$}i) { return 1 }
-        when (m{\A(.+)quies$}i) { return 1 }
-        when (m{\A(.+[aeiou])ys$}i) { return 1 }
-        when (m{\A(.+)sses$}i) { return 1 }
-        when (m{\A(.+)orses$}i) { return 1 }
-        when (m{\A(.+[au])orses$}i) { return 1 }
-        when (m{\A(.+)nses$}i) { return 1 }
-        when (m{\A(.+[^ns])ses$}i) { return 1 }
-        when (m{\A(.+)trixes$}i) { return 1 }
-        when (m{\A(.+)trices$}i) { return 1 }
-        when (m{\A(.+)uses$}i) { return 1 }
-        when (m{\A(.+)xes$}i) { return 1 }
-        when (m{\A(.+)ies$}i) { return 1 }
-        when (m{\A(.+)zzes$}i) { return 1 }
-        when (m{\A(.+)zoa$}i) { return 1 }
+    for ($word) {
+        if (m{'$})  { return 1 }
+        if (m{'s$}) { return is_plural(substr($word,0,-2)) }
+        if (m{\A.*'s?$}i) { return 1 }
+        if (m{\A(.*?)-general$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?) general$}i) { return is_plural($1);return 1 }
+        if (m{\A($PREP_PAT) them$}i) { return 1 }
+        if (m{\Asons-of-(.*?)$}i) { return is_plural($1);return 1 }
+        if (m{\Asons of (.*?)$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_plural($1);return 1 }
+        if (m{\A($PREP_PAT)-(.*?)$}i) { return is_plural($2);return 1 }
+        if (m{\A($PREP_PAT) (.*?)$}i) { return is_plural($2);return 1 }
+        if (m{\A(.*?)-errant$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?) errant$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?)-($PREP_PAT)$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*?) ($PREP_PAT)$}i) { return is_plural($1);return 1 }
+        if (m{\A(.*)staves$}i) { return 1 }
+        if (m{\A(.*)staffs$}i) { return 1 }
+        if (m{\A(.*)genera$}i) { return 1 }
+        if (m{\A(.*)people$}i) { return 1 }
+        if (m{\A(.*)persons$}i) { return 1 }
+        if (m{\A(.*)hertz$}i) { return 1 }
+        if (m{\A(.*)lux$}i) { return 1 }
+        if (m{\A(.*)siemens$}i) { return 1 }
+        if (m{\A(.*)brothers$}i) { return 1 }
+        if (m{\A(.*)brethren$}i) { return 1 }
+        if (m{\A(.*)children$}i) { return 1 }
+        if (m{\A(.*)cows$}i) { return 1 }
+        if (m{\A(.*)kine$}i) { return 1 }
+        if (m{\A(.+)-oxen$}i) { return 1 }
+        if (m{\A(.*)menschen$}i) { return 1 }
+        if (m{\A(.*)elves$}i) { return 1 }
+        if (m{\A(.*)hoofs$}i) { return 1 }
+        if (m{\A(.*)hooves$}i) { return 1 }
+        if (m{\A(.*)knives$}i) { return 1 }
+        if (m{\A(.*)leaves$}i) { return 1 }
+        if (m{\A(.*)lives$}i) { return 1 }
+        if (m{\A(.*)loaves$}i) { return 1 }
+        if (m{\A(.*)shelves$}i) { return 1 }
+        if (m{\A(.*)thieves$}i) { return 1 }
+        if (m{\A(.*)wives$}i) { return 1 }
+        if (m{\A(.*)wolves$}i) { return 1 }
+        if (m{\A(.*)humans$}i) { return 1 }
+        if (m{\A(.*)feet$}i) { return 1 }
+        if (m{\A(.*)geese$}i) { return 1 }
+        if (m{\A(.*)lice$}i) { return 1 }
+        if (m{\A(.*)men$}i) { return 1 }
+        if (m{\A(.*)mice$}i) { return 1 }
+        if (m{\A(.*)teeth$}i) { return 1 }
+        if (m{\A(.*)buzzes$}i) { return 1 }
+        if (m{\A(.*)fizzes$}i) { return 1 }
+        if (m{\A(.*)frizzes$}i) { return 1 }
+        if (m{\A(.*)fuzzes$}i) { return 1 }
+        if (m{\A(.*)jazzes$}i) { return 1 }
+        if (m{\A(.*)proboscises$}i) { return 1 }
+        if (m{\A(.*)proboscides$}i) { return 1 }
+        if (m{\A(.*)bemas$}i) { return 1 }
+        if (m{\A(.*)bemata$}i) { return 1 }
+        if (m{\A(.*)dramas$}i) { return 1 }
+        if (m{\A(.*)edemas$}i) { return 1 }
+        if (m{\A(.*)edemata$}i) { return 1 }
+        if (m{\A(.*)lemmas$}i) { return 1 }
+        if (m{\A(.*)lemmata$}i) { return 1 }
+        if (m{\A(.*)sarcomas$}i) { return 1 }
+        if (m{\A(.*)sarcomata$}i) { return 1 }
+        if (m{\A(.*)stomas$}i) { return 1 }
+        if (m{\A(.*)stomata$}i) { return 1 }
+        if (m{\A(.*)novas$}i) { return 1 }
+        if (m{\A(.*)novae$}i) { return 1 }
+        if (m{\A(.*)umbras$}i) { return 1 }
+        if (m{\A(.*)umbrae$}i) { return 1 }
+        if (m{\A(.*)lumens$}i) { return 1 }
+        if (m{\A(.*)lumina$}i) { return 1 }
+        if (m{\A(.*)data$}i) { return 1 }
+        if (m{\A(.*)stratums$}i) { return 1 }
+        if (m{\A(.*)strata$}i) { return 1 }
+        if (m{\A(.*)bacilli$}i) { return 1 }
+        if (m{\A(.*)nuclei$}i) { return 1 }
+        if (m{\A(.*)hedrons$}i) { return 1 }
+        if (m{\A(.*)hedra$}i) { return 1 }
+        if (m{\A(.*)helions$}i) { return 1 }
+        if (m{\A(.*)helia$}i) { return 1 }
+        if (m{\A(.*)legomena$}i) { return 1 }
+        if (m{\A(.*)phenomena$}i) { return 1 }
+        if (m{\A(.*)helices$}i) { return 1 }
+        if (m{\A(.*)measles$}i) { return 1 }
+        if (m{\A(.*)pox$}i) { return 1 }
+        if (m{\A(.*)basses$}i) { return 1 }
+        if (m{\A(.*)bass$}i) { return 1 }
+        if (m{\A(.*)deer$}i) { return 1 }
+        if (m{\A(.*)fish$}i) { return 1 }
+        if (m{\A(.*)fowls$}i) { return 1 }
+        if (m{\A(.*)fowl$}i) { return 1 }
+        if (m{\A(.*)sheep$}i) { return 1 }
+        if (m{\A(.*)wildebeests$}i) { return 1 }
+        if (m{\A(.*)wildebeest$}i) { return 1 }
+        if (m{\A(.*)craft$}i) { return 1 }
+        if (m{\A(.*)gases$}i) { return 1 }
+        if (m{\A(.*)glottises$}i) { return 1 }
+        if (m{\A(.+[aeiou])os$}i) { return 1 }
+        if (m{\A(.+[aeo])lves$}i) { return 1 }
+        if (m{\A(.+[aiy])nxes$}i) { return 1 }
+        if (m{\A(.+[aiy])nges$}i) { return 1 }
+        if (m{\A(.+)arves$}i) { return 1 }
+        if (m{\A(.+)ceps$}i) { return 1 }
+        if (m{\A(.+[cs])hes$}i) { return 1 }
+        if (m{\A(.+)eaves$}i) { return 1 }
+        if (m{\A(.+)eaus$}i) { return 1 }
+        if (m{\A(.+)eaux$}i) { return 1 }
+        if (m{\A(.+)ieus$}i) { return 1 }
+        if (m{\A(.+)ieux$}i) { return 1 }
+        if (m{\A(.+)nives$}i) { return 1 }
+        if (m{\A(.+)oes$}i) { return 1 }
+        if (m{\A(.+)quies$}i) { return 1 }
+        if (m{\A(.+[aeiou])ys$}i) { return 1 }
+        if (m{\A(.+)sses$}i) { return 1 }
+        if (m{\A(.+)orses$}i) { return 1 }
+        if (m{\A(.+[au])orses$}i) { return 1 }
+        if (m{\A(.+)nses$}i) { return 1 }
+        if (m{\A(.+[^ns])ses$}i) { return 1 }
+        if (m{\A(.+)trixes$}i) { return 1 }
+        if (m{\A(.+)trices$}i) { return 1 }
+        if (m{\A(.+)uses$}i) { return 1 }
+        if (m{\A(.+)xes$}i) { return 1 }
+        if (m{\A(.+)ies$}i) { return 1 }
+        if (m{\A(.+)zzes$}i) { return 1 }
+        if (m{\A(.+)zoa$}i) { return 1 }
         default { return $word =~ m{ s \Z }ixms; }
     }
 }
@@ -8457,112 +8457,112 @@ sub is_singular {
     return 0 if exists $is_plural->{$word};
     return 0 if exists $is_plural->{lc $word};
     return 0 if exists $is_plural->{tc $word};
-    given ($word) {
-        when (m{'$})  { return 0 }
-        when (m{'s$}) { return is_singular(substr($word,0,-2)) }
-        when (m{\A.*'s?$}i) { return 1 }
-        when (m{\A(.*?)-general$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?) general$}i) { return is_singular($1);return 1 }
-        when (m{\A($PREP_PAT) it$}i) { return 1 }
-        when (m{\Ason-of-a-(.*?)$}i) { return is_singular($1);return 1 }
-        when (m{\Ason of a (.*?)$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_singular($1);return 1 }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return is_singular($2);return 1 }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return is_singular($2);return 1 }
-        when (m{\A(.*?)-errant$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?) errant$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return is_singular($1);return 1 }
-        when (m{\A(.*)stave$}i) { return 1 }
-        when (m{\A(.*)staff$}i) { return 1 }
-        when (m{\A(.*)genus$}i) { return 1 }
-        when (m{\A(.*)person$}i) { return 1 }
-        when (m{\A(.*)hertz$}i) { return 1 }
-        when (m{\A(.*)lux$}i) { return 1 }
-        when (m{\A(.*)siemens$}i) { return 1 }
-        when (m{\A(.*)brother$}i) { return 1 }
-        when (m{\A(.*)child$}i) { return 1 }
-        when (m{\A(.*)cow$}i) { return 1 }
-        when (m{\A(.+)-ox$}i) { return 1 }
-        when (m{\A(.*)mensch$}i) { return 1 }
-        when (m{\A(.*)elf$}i) { return 1 }
-        when (m{\A(.*)hoof$}i) { return 1 }
-        when (m{\A(.*)knife$}i) { return 1 }
-        when (m{\A(.*)leaf$}i) { return 1 }
-        when (m{\A(.*)life$}i) { return 1 }
-        when (m{\A(.*)loaf$}i) { return 1 }
-        when (m{\A(.*)shelf$}i) { return 1 }
-        when (m{\A(.*)thief$}i) { return 1 }
-        when (m{\A(.*)wife$}i) { return 1 }
-        when (m{\A(.*)wolf$}i) { return 1 }
-        when (m{\A(.*)human$}i) { return 1 }
-        when (m{\A(.*)foot$}i) { return 1 }
-        when (m{\A(.*)goose$}i) { return 1 }
-        when (m{\A(.*)louse$}i) { return 1 }
-        when (m{\A(.*)man$}i) { return 1 }
-        when (m{\A(.*)mouse$}i) { return 1 }
-        when (m{\A(.*)tooth$}i) { return 1 }
-        when (m{\A(.*)buzz$}i) { return 1 }
-        when (m{\A(.*)fizz$}i) { return 1 }
-        when (m{\A(.*)frizz$}i) { return 1 }
-        when (m{\A(.*)fuzz$}i) { return 1 }
-        when (m{\A(.*)jazz$}i) { return 1 }
-        when (m{\A(.*)proboscis$}i) { return 1 }
-        when (m{\A(.*)bema$}i) { return 1 }
-        when (m{\A(.*)drama$}i) { return 1 }
-        when (m{\A(.*)edema$}i) { return 1 }
-        when (m{\A(.*)lemma$}i) { return 1 }
-        when (m{\A(.*)sarcoma$}i) { return 1 }
-        when (m{\A(.*)stoma$}i) { return 1 }
-        when (m{\A(.*)nova$}i) { return 1 }
-        when (m{\A(.*)umbra$}i) { return 1 }
-        when (m{\A(.*)lumen$}i) { return 1 }
-        when (m{\A(.*)datum$}i) { return 1 }
-        when (m{\A(.*)stratum$}i) { return 1 }
-        when (m{\A(.*)bacillus$}i) { return 1 }
-        when (m{\A(.*)nucleus$}i) { return 1 }
-        when (m{\A(.*)hedron$}i) { return 1 }
-        when (m{\A(.*)helion$}i) { return 1 }
-        when (m{\A(.*)legomenon$}i) { return 1 }
-        when (m{\A(.*)phenomenon$}i) { return 1 }
-        when (m{\A(.*)helix$}i) { return 1 }
-        when (m{\A(.*)measles$}i) { return 1 }
-        when (m{\A(.*)pox$}i) { return 1 }
-        when (m{\A(.*)bass$}i) { return 1 }
-        when (m{\A(.*)deer$}i) { return 1 }
-        when (m{\A(.*)fish$}i) { return 1 }
-        when (m{\A(.*)fowl$}i) { return 1 }
-        when (m{\A(.*)sheep$}i) { return 1 }
-        when (m{\A(.*)wildebeest$}i) { return 1 }
-        when (m{\A(.*)craft$}i) { return 1 }
-        when (m{\A(.*)gas$}i) { return 1 }
-        when (m{\A(.*)glottis$}i) { return 1 }
-        when (m{\A(.+[aeiou])o$}i) { return 1 }
-        when (m{\A(.+[aeo])lf$}i) { return 1 }
-        when (m{\A(.+[aiy])nx$}i) { return 1 }
-        when (m{\A(.+)arf$}i) { return 1 }
-        when (m{\A(.+)ceps$}i) { return 1 }
-        when (m{\A(.+[cs])h$}i) { return 1 }
-        when (m{\A(.+)eaf$}i) { return 1 }
-        when (m{\A(.+)eau$}i) { return 1 }
-        when (m{\A(.+)ieu$}i) { return 1 }
-        when (m{\A(.+)nife$}i) { return 1 }
-        when (m{\A(.+)oe$}i) { return 1 }
-        when (m{\A(.+)o$}i) { return 1 }
-        when (m{\A(.+)quy$}i) { return 1 }
-        when (m{\A(.+[aeiou])y$}i) { return 1 }
-        when (m{\A(.+)ss$}i) { return 1 }
-        when (m{\A(.+)orse$}i) { return 1 }
-        when (m{\A(.+[au])orse$}i) { return 1 }
-        when (m{\A(.+)nse$}i) { return 1 }
-        when (m{\A(.+[^ns])sis$}i) { return 1 }
-        when (m{\A(.+)trix$}i) { return 1 }
-        when (m{\A(.+)us$}i) { return 1 }
-        when (m{\A(.+)x$}i) { return 1 }
-        when (m{\A(.+)y$}i) { return 1 }
-        when (m{\A(.+)z$}i) { return 1 }
-        when (m{\A(.+)zoon$}i) { return 1 }
+    for ($word) {
+        if (m{'$})  { return 0 }
+        if (m{'s$}) { return is_singular(substr($word,0,-2)) }
+        if (m{\A.*'s?$}i) { return 1 }
+        if (m{\A(.*?)-general$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?) general$}i) { return is_singular($1);return 1 }
+        if (m{\A($PREP_PAT) it$}i) { return 1 }
+        if (m{\Ason-of-a-(.*?)$}i) { return is_singular($1);return 1 }
+        if (m{\Ason of a (.*?)$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_singular($1);return 1 }
+        if (m{\A($PREP_PAT)-(.*?)$}i) { return is_singular($2);return 1 }
+        if (m{\A($PREP_PAT) (.*?)$}i) { return is_singular($2);return 1 }
+        if (m{\A(.*?)-errant$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?) errant$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?)-($PREP_PAT)$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*?) ($PREP_PAT)$}i) { return is_singular($1);return 1 }
+        if (m{\A(.*)stave$}i) { return 1 }
+        if (m{\A(.*)staff$}i) { return 1 }
+        if (m{\A(.*)genus$}i) { return 1 }
+        if (m{\A(.*)person$}i) { return 1 }
+        if (m{\A(.*)hertz$}i) { return 1 }
+        if (m{\A(.*)lux$}i) { return 1 }
+        if (m{\A(.*)siemens$}i) { return 1 }
+        if (m{\A(.*)brother$}i) { return 1 }
+        if (m{\A(.*)child$}i) { return 1 }
+        if (m{\A(.*)cow$}i) { return 1 }
+        if (m{\A(.+)-ox$}i) { return 1 }
+        if (m{\A(.*)mensch$}i) { return 1 }
+        if (m{\A(.*)elf$}i) { return 1 }
+        if (m{\A(.*)hoof$}i) { return 1 }
+        if (m{\A(.*)knife$}i) { return 1 }
+        if (m{\A(.*)leaf$}i) { return 1 }
+        if (m{\A(.*)life$}i) { return 1 }
+        if (m{\A(.*)loaf$}i) { return 1 }
+        if (m{\A(.*)shelf$}i) { return 1 }
+        if (m{\A(.*)thief$}i) { return 1 }
+        if (m{\A(.*)wife$}i) { return 1 }
+        if (m{\A(.*)wolf$}i) { return 1 }
+        if (m{\A(.*)human$}i) { return 1 }
+        if (m{\A(.*)foot$}i) { return 1 }
+        if (m{\A(.*)goose$}i) { return 1 }
+        if (m{\A(.*)louse$}i) { return 1 }
+        if (m{\A(.*)man$}i) { return 1 }
+        if (m{\A(.*)mouse$}i) { return 1 }
+        if (m{\A(.*)tooth$}i) { return 1 }
+        if (m{\A(.*)buzz$}i) { return 1 }
+        if (m{\A(.*)fizz$}i) { return 1 }
+        if (m{\A(.*)frizz$}i) { return 1 }
+        if (m{\A(.*)fuzz$}i) { return 1 }
+        if (m{\A(.*)jazz$}i) { return 1 }
+        if (m{\A(.*)proboscis$}i) { return 1 }
+        if (m{\A(.*)bema$}i) { return 1 }
+        if (m{\A(.*)drama$}i) { return 1 }
+        if (m{\A(.*)edema$}i) { return 1 }
+        if (m{\A(.*)lemma$}i) { return 1 }
+        if (m{\A(.*)sarcoma$}i) { return 1 }
+        if (m{\A(.*)stoma$}i) { return 1 }
+        if (m{\A(.*)nova$}i) { return 1 }
+        if (m{\A(.*)umbra$}i) { return 1 }
+        if (m{\A(.*)lumen$}i) { return 1 }
+        if (m{\A(.*)datum$}i) { return 1 }
+        if (m{\A(.*)stratum$}i) { return 1 }
+        if (m{\A(.*)bacillus$}i) { return 1 }
+        if (m{\A(.*)nucleus$}i) { return 1 }
+        if (m{\A(.*)hedron$}i) { return 1 }
+        if (m{\A(.*)helion$}i) { return 1 }
+        if (m{\A(.*)legomenon$}i) { return 1 }
+        if (m{\A(.*)phenomenon$}i) { return 1 }
+        if (m{\A(.*)helix$}i) { return 1 }
+        if (m{\A(.*)measles$}i) { return 1 }
+        if (m{\A(.*)pox$}i) { return 1 }
+        if (m{\A(.*)bass$}i) { return 1 }
+        if (m{\A(.*)deer$}i) { return 1 }
+        if (m{\A(.*)fish$}i) { return 1 }
+        if (m{\A(.*)fowl$}i) { return 1 }
+        if (m{\A(.*)sheep$}i) { return 1 }
+        if (m{\A(.*)wildebeest$}i) { return 1 }
+        if (m{\A(.*)craft$}i) { return 1 }
+        if (m{\A(.*)gas$}i) { return 1 }
+        if (m{\A(.*)glottis$}i) { return 1 }
+        if (m{\A(.+[aeiou])o$}i) { return 1 }
+        if (m{\A(.+[aeo])lf$}i) { return 1 }
+        if (m{\A(.+[aiy])nx$}i) { return 1 }
+        if (m{\A(.+)arf$}i) { return 1 }
+        if (m{\A(.+)ceps$}i) { return 1 }
+        if (m{\A(.+[cs])h$}i) { return 1 }
+        if (m{\A(.+)eaf$}i) { return 1 }
+        if (m{\A(.+)eau$}i) { return 1 }
+        if (m{\A(.+)ieu$}i) { return 1 }
+        if (m{\A(.+)nife$}i) { return 1 }
+        if (m{\A(.+)oe$}i) { return 1 }
+        if (m{\A(.+)o$}i) { return 1 }
+        if (m{\A(.+)quy$}i) { return 1 }
+        if (m{\A(.+[aeiou])y$}i) { return 1 }
+        if (m{\A(.+)ss$}i) { return 1 }
+        if (m{\A(.+)orse$}i) { return 1 }
+        if (m{\A(.+[au])orse$}i) { return 1 }
+        if (m{\A(.+)nse$}i) { return 1 }
+        if (m{\A(.+[^ns])sis$}i) { return 1 }
+        if (m{\A(.+)trix$}i) { return 1 }
+        if (m{\A(.+)us$}i) { return 1 }
+        if (m{\A(.+)x$}i) { return 1 }
+        if (m{\A(.+)y$}i) { return 1 }
+        if (m{\A(.+)z$}i) { return 1 }
+        if (m{\A(.+)zoon$}i) { return 1 }
         default { return !is_plural($word); }
     }
 }

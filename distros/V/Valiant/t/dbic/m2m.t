@@ -41,16 +41,16 @@ Schema->resultset("Role")->populate([
     person_roles => [
       "Person Roles Is Invalid",
     ],
-    "person_roles.1.role" => [
+    "person_roles[1].role" => [
       "Person Roles Role Is Invalid",
     ],
-    "person_roles.1.role.label" => [
+    "person_roles[1].role.label" => [
       "Person Roles Role Label adminx is not a valid",
     ],
     roles => [
       "Roles Is Invalid",
     ],
-    "roles.1.label" => [
+    "roles[1].label" => [
       "Roles Label adminx is not a valid",
     ],
   }, 'Got expected errors';
@@ -94,16 +94,16 @@ Schema->resultset("Role")->populate([
     person_roles => [
       "Person Roles Is Invalid",
     ],
-    "person_roles.0.role" => [
+    "person_roles[0].role" => [
       "Person Roles Role Is Invalid",
     ],
-    "person_roles.0.role.label" => [
+    "person_roles[0].role.label" => [
       "Person Roles Role Label superuserX is not a valid",
     ],
     roles => [
       "Roles Is Invalid",
     ],
-    "roles.0.label" => [
+    "roles[0].label" => [
       "Roles Label superuserX is not a valid",
     ],
   }, 'Got expected errors';

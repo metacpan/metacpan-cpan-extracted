@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS
 
-PACKAGE NAME:  supswigp - PostScript Bit-mapped WIGgle plot of a segy data set	
+PERL PROGRAM NAME:  supswigp - PostScript Bit-mapped WIGgle plot of a segy data set	
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:

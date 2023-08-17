@@ -22,28 +22,6 @@ sub before_each_compile_cbs {
   }
 }
 
-sub no_precompile {
-  my $self = shift;
-  if (@_) {
-    $self->{no_precompile} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{no_precompile};
-  }
-}
-
-sub no_compiler_api {
-  my $self = shift;
-  if (@_) {
-    $self->{no_compiler_api} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{no_compiler_api};
-  }
-}
-
 sub config_spvm_core {
   my $self = shift;
   if (@_) {
@@ -78,14 +56,6 @@ sub new {
   
   unless (defined $self->before_each_compile_cbs) {
     $self->before_each_compile_cbs([]);
-  }
-  
-  unless (defined $self->no_precompile) {
-    $self->no_precompile(0);
-  }
-  
-  unless (defined $self->no_compiler_api) {
-    $self->no_compiler_api(0);
   }
   
   unless (defined $self->config_spvm_core) {
@@ -132,24 +102,6 @@ The SPVM::Builder::Config::Exe class has methods to manipulate a config to gener
 
 =head1 Fields
 
-=head2 no_precompile
-
-  my $no_precompile = $config_exe->no_precompile;
-  $config_exe->no_precompile($no_precompile);
-
-Gets and sets the C<no_precompile> field.
-
-If this field is a true value, precompiling is not performed.
-
-=head2 no_compiler_api
-
-  my $no_compiler_api = $config_exe->no_compiler_api;
-  $config_exe->no_compiler_api($no_compiler_api);
-
-Gets and sets the C<no_precompile> field.
-
-If this field is a true value, the source codes of the L<compiler native APIs|SPVM::Document::NativeAPI::Compiler> and the L<precompile native APIs|SPVM::Document::NativeAPI::Precompile> is not linked.
-
 =head2 config_spvm_core
 
   my $config_exe_spvm_core = $config_exe->config_spvm_core;
@@ -191,14 +143,6 @@ If a field is not defined, the field is set to the following default value.
 =item * L</"before_each_compile_cbs">
 
 []
-
-=item * L</"no_precompile">
-
-0
-
-=item * L</"no_compiler_api">
-
-0
 
 =item * L</"config_spvm_core">
 

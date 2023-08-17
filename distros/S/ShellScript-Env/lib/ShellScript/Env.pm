@@ -115,9 +115,9 @@ sub save {
     warn "Can't write $csh_file: $!";
   }
 
-  my $sh_file = "$self->{prefix}sh";
+  my $sh_file = "$self->{prefix}.sh";
   if (open(SH, ">$sh_file")) {
-    print "Writing $sh_file.\n";
+    print "Writing $sh_file\n";
     print SH $self->sh();
     close(SH);
   } else {
@@ -142,7 +142,7 @@ sub sh {
   my $output = '';
   my $export = 'export ';
 
-  for (@{$self->{'order'}}) {
+  for (sort @{$self->{'order'}}) {
     $export .= "$_ ";
 
     if ($self->{'utok'}->{$_}) {

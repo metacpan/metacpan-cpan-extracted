@@ -71,8 +71,8 @@ to constants:
 
 # DESCRIPTION
 
-Performs the similar tasks as `use constant`, but adds features to assign
-values of constants from the command line or environment variables.
+Performs similar tasks as `use constant`, but adds features to assign values
+of constants from the command line or environment variables.
 
 In addition, constants are only defined/set if they don't exist already, making
 configuring and overriding constants defined in sub modules possible. A module
@@ -82,10 +82,10 @@ by the top level script.
 [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) option specification is used for processing command line
 options to give flexibility in how and what switches are used.  To save on
 memory, [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) is only loaded if option processing is wanted (i.e. the
-`opt` field is specified).
+`opt` field non disabled).
 
-In advanced form, a user subroutine can be supplied to give control
-of processing. This is used by [Log::OK](https://metacpan.org/pod/Log%3A%3AOK) for example to generate multiple
+In advanced form, a user subroutine can be supplied to give control of
+processing. This is used by [Log::OK](https://metacpan.org/pod/Log%3A%3AOK) for example to generate multiple
 constants from a single input level.
 
 # MOTIVATION

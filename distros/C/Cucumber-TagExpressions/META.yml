@@ -4,11 +4,13 @@ author:
   - 'Erik Huelsmann <ehuels@gmail.com>'
   - 'Cucumber Ltd'
 build_requires:
+  Test2::Tools::Exception: '0'
   Test2::V0: '0'
+  YAML: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,32 +19,33 @@ name: Cucumber-TagExpressions
 provides:
   Cucumber::TagExpressions:
     file: lib/Cucumber/TagExpressions.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::AndNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::ExpressionNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::LiteralNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::Node:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::NotNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
   Cucumber::TagExpressions::OrNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v4.1.0
+    version: v5.0.6
 requires:
+  List::Util: '1.63'
   Moo: '0'
-  perl: v5.14.0
+  perl: v5.14.4
 resources:
-  bugtracker: https://github.com/cucumber/common/issues
-  repository: https://github.com/cucumber/common.git
-version: 4.1.0
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  bugtracker: https://github.com/cucumber/tag-expressions/issues
+  repository: https://github.com/cucumber/tag-expressions.git
+version: 5.0.6
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

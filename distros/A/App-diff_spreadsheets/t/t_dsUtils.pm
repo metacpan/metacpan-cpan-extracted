@@ -33,11 +33,17 @@ sub runtest($$$$$$;@) {
   
   my $show_output = $debug || ($exp_err eq "" && $exp_out eq "");
 
+  unshift @extraargs, "--output-encoding", "UTF-8";
   unshift @extraargs, "--verbose" if $verbose;
   unshift @extraargs, "--debug" if $debug;
   #unshift @extraargs, "--silent" if $silent;
   # Suppress waiting-for-lockfile messages
   unshift @extraargs, "--silent" unless $verbose or $debug;
+confess "unexpected" if $verbose or $debug;
+
+  # Translate *nix /path to Windows \path
+  $in1 = path($in1)->canonpath;
+  $in2 = path($in2)->canonpath;
   
   my ($out, $err, $wstat);
   if ($show_output) {

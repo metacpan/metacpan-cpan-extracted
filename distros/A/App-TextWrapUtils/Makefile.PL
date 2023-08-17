@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::TextWrapUtils",
   "PREREQ_PM" => {
     "Clipboard::Any" => "0.009",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::int" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Clipboard::Any" => "0.009",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::int" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,

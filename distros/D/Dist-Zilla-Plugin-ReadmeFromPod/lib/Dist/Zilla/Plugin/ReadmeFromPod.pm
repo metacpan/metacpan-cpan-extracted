@@ -1,13 +1,13 @@
 package Dist::Zilla::Plugin::ReadmeFromPod;
-our $AUTHORITY = 'cpan:FAYLAND';
-$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.37';
+our $AUTHORITY = 'cpan:AVAR';
+$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.38';
 use Moose;
 use List::Util 1.33 qw( first );
 with 'Dist::Zilla::Role::InstallTool' => { -version => 5 }; # after PodWeaver
 with 'Dist::Zilla::Role::FilePruner';
 
 use IO::String;
-use Pod::Readme 'v1.2.0';
+use Pod::Readme v1.2.0;
 use Path::Tiny 0.004;
 
 has filename => (

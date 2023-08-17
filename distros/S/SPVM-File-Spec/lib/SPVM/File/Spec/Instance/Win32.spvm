@@ -424,7 +424,7 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
         if (length $drive) {
           eval { $base = Cwd->getdcwd($drive); };
           if ($@) {
-            unless (error == class_id Error::System) {
+            unless (eval_error_id == basic_type_id Error::System) {
               die $@;
             }
           }

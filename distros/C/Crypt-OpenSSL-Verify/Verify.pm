@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Crypt::OpenSSL::X509;
 
@@ -225,9 +225,9 @@ otherwise.
 
 =over
 
-=item Copyright 2020 Timothy Legge
+=item Copyright 2020-2023 Timothy Legge
 
-=item Copyright 2020 Wesley Schwengle
+=item Copyright 2020-2023 Wesley Schwengle
 
 =back
 

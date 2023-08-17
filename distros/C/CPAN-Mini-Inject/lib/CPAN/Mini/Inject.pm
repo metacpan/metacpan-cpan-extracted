@@ -3,7 +3,7 @@ package CPAN::Mini::Inject;
 use strict;
 use warnings;
 
-use CPAN::Checksums qw( updatedir );
+use CPAN::Checksums 2.13 qw( updatedir );
 use CPAN::Mini;
 use CPAN::Mini::Inject::Config;
 use Carp;
@@ -22,11 +22,11 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
@@ -424,9 +424,10 @@ sub inject {
   }
 
   for my $dir ( keys( %updatedir ) ) {
-    my $authdir = $self->config->get( 'local' ) . "/authors/id/$dir";
+    my $root    = $self->config->get( 'local' ) . "/authors/id";
+    my $authdir = "$root/$dir";
 
-    updatedir( $authdir );
+    updatedir( $authdir, $root );
     $self->_updperms( "$authdir/CHECKSUMS" );
   }
 

@@ -1,5 +1,16 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.17  2023-06-20  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+ - Minor tweak.
+
+1.16_01  2023-06-18  <schubiger@cpan.org>
+
+ - Fix parse_datetime_duration doesn't understand hours
+   with no minutes, anymore. [github #19 - Giovanni Pensa]
+
 1.16  2023-02-04  <schubiger@cpan.org>
 
  - Merged development version to stable.

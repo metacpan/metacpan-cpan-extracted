@@ -1,2 +1,14 @@
+0.03 2023-08-04T01:18:06+02:00
+ - Fix dependencies.
+
+0.02 2023-08-04T01:10:06+02:00
+ - Add description to tool doc.
+ - Add detection of DWG file version and add to dwgwrite command.
+ - Add example to doc.
+ - Add link to another script to doc.
+ - Fix description of class in doc.
+ - Fix typo in doc.
+ - Update Module::Install to 1.21 version.
+
 0.01 2023-03-30T01:53:21+02:00
  - First version.

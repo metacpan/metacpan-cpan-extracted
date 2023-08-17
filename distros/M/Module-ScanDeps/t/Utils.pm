@@ -2,169 +2,141 @@ package Utils;
 
 use strict;
 use warnings;
-use vars qw( $VERSION @ISA @EXPORT );
+
 require Exporter;
 use Module::ScanDeps qw(path_to_inc_name);
 
 use Test::More;
+use Data::Dumper;
 
-@ISA=qw(Exporter);
-$VERSION   = '0.1';
-@EXPORT = qw( generic_scandeps_rv_test compare_scandeps_rvs generic_abs_path );
+our @ISA = qw(Exporter);
+our $VERSION   = '0.1';
+our @EXPORT = qw( check_rv compare_rv generic_abs_path dump_rv );
 
-my $test = Test::More->builder;
+# runs 1 (toplevel) test
+sub check_rv {
+    my ($rv, $input_keys, $known_deps, $name) = @_;
+    $name ||= "Check rv";
 
-sub import {
-    my($self) = shift;
-    my $pack = caller;
+    return subtest($name, sub {
 
-    $test->exported_to($pack);
-    $self->export_to_level(1, $self, @EXPORT);
-}
+        # sanity check input
+        {
+            my %i = map { ($_, 1) } @$input_keys;
+            die "\@input_keys overlaps with \@known_deps\n" if grep { $i{$_} } @$known_deps;
+        }
 
-sub generic_scandeps_rv_test {
-    my $rv = shift;
-    my $array_ref = shift;
-    my @input_keys = sort @$array_ref;
-       $array_ref = shift;
-    my @known_deps = sort @$array_ref;
-    my @used_by;
-    my ($used_by_ok, $i);
+        isa_ok($rv, "HASH", "\$rv is a HASH") or return;
 
-    # sanity check input
-    foreach my $input (@input_keys) {
-      !(grep {$_ eq $input} @known_deps) or die "\@input_keys overlaps with \@known_deps\n";
-    }
+        # check all input files and known deps correspond to an entry in rv
+        my @input_keys = map { path_to_inc_name($_, 1) } @$input_keys;
+        my @known_deps = @$known_deps;      # make a copy 
+        map {$_ =~ s:\\:/:g} (@input_keys, @known_deps);
+        ok(exists $rv->{$_}, "$_ is in \$rv") foreach (@input_keys, @known_deps);
 
-    $test->ok(ref($rv) eq "HASH", "\$rv is a ref") or return;
+        # Check general properties of the keys
+        foreach my $k (keys %$rv) {
+            my $v = $rv->{$k};
+            ok(exists($v->{key}) && $k eq $v->{key},
+               qq[key $k matches field "key"]);
+            ok(exists($v->{file}) && 
+               $v->{file} =~ /(?:^|[\/\\])\Q$k\E$/ && 
+               File::Spec->file_name_is_absolute($v->{file}),
+               qq[key $k: field "file" has been verified]);
+            ok(exists($v->{type}) && 
+               $v->{type} =~ /^(?:module|autoload|data|shared)$/,
+               qq[key $k: field "type" matches module|autoload|data|shared]);
 
-    # check all input files and known deps correspond to an entry in rv
-    map {$_ = path_to_inc_name($_, 1)} @input_keys;
-    map {$_ =~ s|\\|\/|go} (@input_keys, @known_deps);
-    $test->ok(exists $rv->{$_}, "$_ is in rv") foreach (@input_keys, @known_deps);
+            if (exists($v->{used_by})) {
+                ok(@{$v->{used_by}} > 0, 
+                   qq[key $k: field "used_by" isn't empty if it exists]);
 
-    # Check general properties of the keys
-    foreach my $key (keys %$rv) {
-        $test->ok(exists($rv->{$key}{key})  && $key eq $rv->{$key}{key}, "For $key: the sub-key matches");
-        $test->ok(exists($rv->{$key}{file}) && $rv->{$key}{file} =~ /(?:^|[\/\\])\Q$key\E$/
-                                            && File::Spec->file_name_is_absolute($rv->{$key}{file}), "For $key: the file has been verified");
-        $test->ok(exists($rv->{$key}{type}) && $rv->{$key}{type} =~ /^(?:module|autoload|data|shared)$/, "For $key: the type matches module|autoload|data|shared");
+                my %dup;
+                ok(!(grep { ++$dup{$_} > 1 } @{$v->{used_by}}), 
+                   qq[key $k: field "used by" has no duplicates]);
 
-        if (exists($rv->{$key}{used_by})) {
-            @used_by = sort @{$rv->{$key}{used_by}};
-            if (scalar @used_by > 0) {
-                $used_by_ok = 1;
-                if (scalar @used_by > 1) {
-                    for ($i=0; $i<$#used_by; $i++) {
-                        if ($used_by[$i] eq $used_by[$i+1]) { # relies on @used_by being sorted earlier
-                             $used_by_ok = 0;
-                             last;
-                        }
-                    }
-                }
-                $test->ok($used_by_ok, "$key\'s used_by has no duplicates");
+                ok(!(grep { !exists $rv->{$_} } @{$v->{used_by}}),
+                   qq[key $k: all entries in field "used by" are themselves in \$rv]);
 
-                $used_by_ok = 1;
-                foreach my $used_by (@used_by) {
-                    $used_by_ok &= exists($rv->{$used_by});
-                }
-                $test->ok($used_by_ok, "All entries in $key\'s used_by are themselves described in \$rv");
+                foreach my $u (@{$v->{used_by}}) {
+                    # check corresponding uses field
+                    ok(exists($rv->{$u}{uses}),
+                       qq[\$rv contains a matching "uses" field for the "used_by" entry $u for key $k])
+                       or next;
 
-                # check corresponding uses field
-                foreach my $used_by (@used_by) {
-                    if (exists($rv->{$used_by}{uses})) {
-                        $test->ok(scalar(grep { $_ eq $key } @{$rv->{$used_by}{uses}}), "\$rv contains a matching uses field for the used_by entry $used_by for key $key");
-                    } else {
-                        $test->ok(0, "\$rv contains a matching uses field for the used_by entry $used_by for key $key");
-                    }
+                    ok(scalar(grep { $_ eq $k } @{$rv->{$u}{uses}}),
+                       qq[\$rv contains a matching "uses" field for the "used_by" entry $u for key $k]);
                 }
             } else {
-                $test->ok(0, "$key\'s used_by exists and isn't empty");
+                ok(scalar(grep { $_ eq $k} @input_keys), # XXX || $k =~ /Plugin/, 
+                   qq[key $k: field "used by" doesn't exist so $k must be one of the input files])
             }
-        } else {
-            $test->ok((grep {$_ eq $key} @input_keys) | ($key =~ m/Plugin/o), "used-by not defined so $key must be one of the input files or is a plugin");
-        }
 
-        if (exists($rv->{$key}{uses})) {
-            # check corresponding used_by field
-            foreach my $uses (@{$rv->{$key}{uses}}) {
-                if (exists($rv->{$uses}{used_by})) {
-                    $test->ok(scalar(grep { $_ eq $key } @{$rv->{$uses}{used_by}}), "\$rv contains a matching used_by field for the uses entry $uses for key $key");
-                } else {
-                    $test->ok(0, "\$rv contains a matching used_by field for the uses entry $uses for key $key");
+            if (exists($v->{uses})) {
+                # check corresponding used_by field
+                foreach my $u (@{$v->{uses}}) {
+                    ok(exists($rv->{$u}{used_by}),
+                       qq[\$rv contains a matching "used_by" field for the "uses" entry $u for key $k])
+                       or next;
+                    ok(scalar(grep { $_ eq $k } @{$rv->{$u}{used_by}}), 
+                       qq[\$rv contains a matching "used_by" field for the "uses" entry $u for key $k]);
                 }
-            }
-         }
-    }
+             }
+        }
+    });
 }
 
-sub compare_scandeps_rvs {
-    my $rv_to_test = shift;
-    my $rv_to_match = shift;
-    my $array_ref = shift;
-    my @input_keys = @$array_ref;
+# runs 1 (toplevel) test
+sub compare_rv {
+    my ($rv_got, $rv_expected, $input_keys, $name) = @_;
+    $name ||= "Compare rvs";
 
-    my (@used_by_test, @used_by_match);
-    my (@uses_test, @uses_match);
-    my ($used_by_ok, $uses_ok);
-    my ($compare_ok, $i);
+    return subtest($name, sub {
 
-    generic_scandeps_rv_test($rv_to_match, \@input_keys, []); # validate test data
+        check_rv($rv_expected, $input_keys, []); # validate test data
 
-    $test->ok(ref($rv_to_test) eq "HASH", "\$rv_to_test is a ref") or return;
+        isa_ok($rv_got, "HASH", "\$rv_got is a HASH") or return;
 
-    my @rv_to_match_keys = sort keys %{$rv_to_match};
-    my @rv_to_test_keys  = sort keys %{$rv_to_test};
-    $test->cmp_ok(scalar @rv_to_test_keys, '==', scalar @rv_to_match_keys, "Number of keys in \$rv_to_test == Number of keys in \$rv_to_match") or return;
-    $compare_ok = 1;
-    for ($i=0; $i<=$#rv_to_match_keys; $i++) {
-        $compare_ok &= ($rv_to_match_keys[$i] eq $rv_to_test_keys[$i]);
-    }
-    $test->ok($compare_ok, "Keys in \$rv_to_test all eq keys in \$rv_to_match");
-
-    foreach my $key (@rv_to_match_keys) {
-        $test->ok(exists($rv_to_test->{$key}{key})  && $rv_to_test->{$key}{key}  eq $rv_to_match->{$key}{key}, "For $key: sub-key matches the expected");
-        $test->ok(exists($rv_to_test->{$key}{file}) && $rv_to_test->{$key}{file} eq $rv_to_match->{$key}{file}, "For $key: file matches the expected");
-        $test->ok(exists($rv_to_test->{$key}{type}) && $rv_to_test->{$key}{type} eq $rv_to_match->{$key}{type}, "For $key: type matches the expected");
-
-        if (exists($rv_to_match->{$key}{used_by})) {
-            $test->ok(exists($rv_to_test->{$key}{used_by}), "For $key: used_by exists as expected") or next;
-
-            @used_by_test  = sort @{$rv_to_test->{$key}{used_by}}; # order isn't important
-            @used_by_match = sort @{$rv_to_match->{$key}{used_by}}; # order isn't important   
-            $test->cmp_ok(scalar @used_by_test, '==', scalar @used_by_match, "For $key: number of used_by in \$rv_to_test == Number of used_by in \$rv_to_match") or next;
-
-            $used_by_ok = 1;
-            for ($i=0; $i < scalar @used_by_match; $i++) {
-                $used_by_ok &= ($used_by_match[$i] eq $used_by_test[$i]);
-            }
-            $test->ok($used_by_ok, "For $key: used_by in \$rv_to_test all eq used_by in \$rv_to_match");
+        if (( my @missing = grep { !exists $rv_got->{$_} } keys %$rv_expected ) ||
+            ( my @surplus = grep { !exists $rv_expected->{$_} } keys %$rv_got )) {
+            fail("missing keys in \$rv_got: @missing") if @missing;
+            fail("surplus keys in \$rv_got: @surplus") if @surplus;
+            return;
         }
 
-        if (exists($rv_to_match->{$key}{uses})) {
-            $test->ok(exists($rv_to_test->{$key}{uses}), "For $key: uses exists as expected") or next;
+        foreach my $k (keys %$rv_expected) {
+            my $expected = $rv_expected->{$k};
+            my $got = $rv_got->{$k};
 
-            @uses_test  = sort @{$rv_to_test->{$key}{uses}}; # order isn't important
-            @uses_match = sort @{$rv_to_match->{$key}{uses}}; # order isn't important
-            $test->cmp_ok(scalar @uses_test, '==', scalar @uses_match, "For $key: number of uses in \$rv_to_test == Number of uses in \$rv_to_match") or next;
-
-            $uses_ok = 1;
-            for ($i=0; $i < scalar @uses_match; $i++) {
-                $uses_ok &= ($uses_match[$i] eq $uses_test[$i]);
+            for (qw( key file type )) {
+                ok((exists $got->{$_}) && $got->{$_} eq $expected->{$_},
+                   qq[key $k: field "$_" matches]);
             }
-            $test->ok($uses_ok, "For $key: uses in \$rv_to_test all eq uses in \$rv_to_match");
+
+            for (qw( used_by uses )) {
+                if (exists $expected->{$_}) {
+                    ok(exists($got->{$_}), qq[key $k: field "$_" exists]) or next;
+                    is_deeply( [sort @{$got->{$_}}], [sort @{$expected->{$_}}],
+                        qq[key $k: field "$_" matches]);
+                }
+            }
         }
-    }
+    });
 }
 
 sub generic_abs_path {
-  my $file = shift @_;
-  $file = File::Spec->rel2abs($file);
-  $file =~ s|\\|\/|go;
-  return $file;
+    my ($file) = @_;
+
+    $file = File::Spec->rel2abs($file);
+    $file =~ s:\\:/:g;
+
+    return $file;
 }
 
+sub dump_rv {
+    my ($name, $rv) = @_;
+
+    return Data::Dumper->Dump([$rv], [$name]);
+}
 
 1;
-# Marks the end of any code. Any symbols after this are ignored. Use for documentation
-__END__

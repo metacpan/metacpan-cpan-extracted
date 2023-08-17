@@ -1,4 +1,7 @@
+.travis.yml
 Artistic
+Build_locallib_debian_ubuntu14.10.md
+Build_perlbrew_debian_ubuntu14.10.md
 Changes
 COPYING
 eg/actionscript/helloworld.as
@@ -51,6 +54,7 @@ inc/Module/Install/Share.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/With.pm
 inc/Module/Install/WriteAll.pm
+install_on_ubuntu
 lib/Padre.pm
 lib/Padre/Autosave.pm
 lib/Padre/Breakpoints.pm
@@ -357,10 +361,11 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+PACKAGING.md
 Padre.fbp
 padre.yml
 privinc/Module/Install/PRIVATE/Padre.pm
-README
+README.md
 script/padre
 script/padre-client
 share/doc/perlopquick/Artistic

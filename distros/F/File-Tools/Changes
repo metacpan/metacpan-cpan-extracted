@@ -1,5 +1,8 @@
 Revision history for Perl module File::Tools
 
+0.10 2023-06-02
+    - Add link to Bugtracker
+
 0.09 2013-10-17
 
     - Update bloody changes file.

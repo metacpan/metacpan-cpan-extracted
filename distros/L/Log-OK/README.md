@@ -8,25 +8,23 @@ Log::OK -  Disable inactive logging statements from the command line
 
 Choose your logging framework ([Log::ger](https://metacpan.org/pod/Log%3A%3Ager) shown). (1)
 
-Then `use Log::OK`  to setup a default logging level and/or specify a command
-line option (or environment variable) to set logging level. (2)
+Setup your adaptor/dispatchers/output like usual (2)
 
-Setup your adaptor/dispatchers/output like usual (3)
+Then `use Log::OK`  to setup a default logging level and/or specify a command
+line option (or environment variable) to set logging level. (3)
 
 ```perl
-    use strict;
-    use warnings;
+# Top level application
+      use Log::ger;                                 #(1)
+      use Log::ger::Output "Screen";  #(2)
 
-    use Log::ger;                                 #(1)
+      use Log::OK {                                 #(3)
+              lvl=>"info",            
+              opt=>"verbose"          
+      };
 
-    use Log::OK {                                 #(2)
-            lvl=>"info",            
-            opt=>"verbose"          
-    };
 
-    use Log::ger::Output "Screen";  #(3)
-
-    My_Module::do_module_stuff();
+      My_Module::do_module_stuff();
 ```
 
 ## Module
@@ -43,25 +41,24 @@ Use a constant together with a logical "and" and your
 logging statement for perl to optimise away inactive levels. (3)
 
 ```perl
-    package My_Module;
-    use strict;
-    use warnings;
+# Module ...
+      package My_Module;
 
-    use Log::ger;   #(1)
-    use Log::OK;    #(2)
+      use Log::ger;   #(1)
+      use Log::OK;    #(2)
 
-    sub do_module_stuff {
-                            #(3)
+      sub do_module_stuff {
+                              #(3)
 
-            Log::OK::FATAL and log_fatal("Fatal");
-            Log::OK::ERROR and log_error("Error");
-            Log::OK::WARN and log_warn("Warning");
-            Log::OK::INFO and log_info("Information");
-            Log::OK::DEBUG and log_debug("Debug");
-            Log::OK::TRACE and log_trace("Trace");
-    }
+              Log::OK::FATAL and log_fatal("Fatal");
+              Log::OK::ERROR and log_error("Error");
+              Log::OK::WARN and log_warn("Warning");
+              Log::OK::INFO and log_info("Information");
+              Log::OK::DEBUG and log_debug("Debug");
+              Log::OK::TRACE and log_trace("Trace");
+      }
 
-    1;
+      1;
 ```
 
 ## Run the program
@@ -161,8 +158,11 @@ Represents a [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) option na
 options.  It has a `":s"` appended to it to allow [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) to process
 just a switch or a switch with a value.
 
-For example if `opt=>'verbose'`, the logging level will be set to
-"debug" with the following:
+**From v0.2.0:** If not specified it defaults to `"verbose"`. If you want no
+command line options procssing, explicitly set to `undef`.
+
+For example if `opt=>'verbose'`, (the default) the logging level will be
+set to "debug" with the following:
 
 ```perl
             perl my_app.pl --verbose debug
@@ -305,7 +305,7 @@ Ruben Westerberg, <drclaw@mac.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 Licensed under MIT
 

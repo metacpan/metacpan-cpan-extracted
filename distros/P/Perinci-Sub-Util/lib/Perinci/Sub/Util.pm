@@ -1,16 +1,17 @@
 package Perinci::Sub::Util;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-20'; # DATE
-our $DIST = 'Perinci-Sub-Util'; # DIST
-our $VERSION = '0.470'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-02'; # DATE
+our $DIST = 'Perinci-Sub-Util'; # DIST
+our $VERSION = '0.471'; # VERSION
+
 our @EXPORT_OK = qw(
                        err
                        caller
@@ -169,6 +170,8 @@ Rinci metadata will be searched in `%SPEC` package variable.
 
 Alternatively, you can also specify `base_code` and `base_meta`.
 
+Either `base_name` or `base_code` + `base_meta` are required.
+
 _
         },
         base_code => {
@@ -192,12 +195,13 @@ _
             schema  => 'str*',
             description => <<'_',
 
-Subroutine will be put in the specified name. If the name is not qualified with
-package name, will use caller's package. If no `output_code` is specified, the
-base subroutine reference will be assigned here.
+Output subroutine will be put in the specified name. If the name is not
+qualified with package name, will use caller's package. If the name is not
+specified, the base name will be used and must not be from the caller's package.
 
 Note that this argument is optional.
 
+To prevent installing subroutine, set `install_sub` to false.
 _
         },
         output_code => {
@@ -273,6 +277,10 @@ _
             default => 1,
         },
     },
+    args_rels => {
+        req_one => [qw/base_name base_code/],
+        choose_all => [qw/base_code base_meta/],
+    },
     result => {
         schema => ['hash*' => {
             keys => {
@@ -288,19 +296,22 @@ sub gen_modified_sub {
     my %args = @_;
 
     # get base code/meta
+    my $caller_pkg = CORE::caller();
     my ($base_code, $base_meta);
+    my ($base_pkg, $base_leaf);
     if ($args{base_name}) {
-        my ($pkg, $leaf);
         if ($args{base_name} =~ /(.+)::(.+)/) {
-            ($pkg, $leaf) = ($1, $2);
+            ($base_pkg, $base_leaf) = ($1, $2);
         } else {
-            $pkg  = CORE::caller();
-            $leaf = $args{base_name};
+            $base_pkg  = $caller_pkg;
+            $base_leaf = $args{base_name};
         }
-        no strict 'refs';
-        $base_code = \&{"$pkg\::$leaf"};
-        $base_meta = ${"$pkg\::SPEC"}{$leaf};
-        die "Can't find Rinci metadata for $pkg\::$leaf" unless $base_meta;
+        {
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+            $base_code = \&{"$base_pkg\::$base_leaf"};
+            $base_meta = ${"$base_pkg\::SPEC"}{$base_leaf};
+        }
+        die "Can't find Rinci metadata for $base_pkg\::$base_leaf" unless $base_meta;
     } elsif ($args{base_meta}) {
         $base_meta = $args{base_meta};
         $base_code = $args{base_code}
@@ -357,18 +368,24 @@ sub gen_modified_sub {
     }
 
     # install
-    if ($args{output_name}) {
-        my ($pkg, $leaf);
-        if ($args{output_name} =~ /(.+)::(.+)/) {
-            ($pkg, $leaf) = ($1, $2);
-        } else {
-            $pkg  = CORE::caller();
-            $leaf = $args{output_name};
-        }
-        no strict 'refs';
-        no warnings 'redefine';
-        *{"$pkg\::$leaf"}       = $output_code if $args{install_sub} // 1;
-        ${"$pkg\::SPEC"}{$leaf} = $output_meta;
+    my ($output_pkg, $output_leaf);
+    if (!defined $args{output_name}) {
+        $output_pkg  = $caller_pkg;
+        $output_leaf = $base_leaf;
+        return [412, "Won't override $base_pkg\::$base_leaf"]
+            if $base_pkg eq $output_pkg;
+    } elsif ($args{output_name} =~ /(.+)::(.+)/) {
+        ($output_pkg, $output_leaf) = ($1, $2);
+    } else {
+        $output_pkg  = $caller_pkg;
+        $output_leaf = $args{output_name};
+    }
+    {
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+        no warnings 'redefine', 'once';
+        log_trace "Installing modified sub to $output_pkg\::$output_leaf ...";
+        *{"$output_pkg\::$output_leaf"} = $output_code if $args{install_sub} // 1;
+        ${"$output_pkg\::SPEC"}{$output_leaf} = $output_meta;
     }
 
     [200, "OK", {code=>$output_code, meta=>$output_meta}];
@@ -403,6 +420,8 @@ _
         set_args => {
             summary => 'Arguments to set',
             schema  => 'hash*',
+            req => 1,
+            pos => 1,
         },
         output_name => {
             summary => 'Where to install the modified sub',
@@ -410,10 +429,10 @@ _
             description => <<'_',
 
 Subroutine will be put in the specified name. If the name is not qualified with
-package name, will use caller's package.
+package name, will use caller's package. If the name is not specified, will use
+the base name which must not be in the caller's package.
 
 _
-            req => 1,
             pos => 2,
         },
     },
@@ -434,7 +453,11 @@ sub gen_curried_sub {
     }
 
     my ($output_pkg, $output_leaf);
-    if ($output_name =~ /(.+)::(.+)/) {
+    if (!defined $output_name) {
+        die "Won't override $base_pkg\::$base_leaf" if $base_pkg eq $caller;
+        $output_pkg = $caller;
+        $output_leaf = $base_leaf;
+    } elsif ($output_name =~ /(.+)::(.+)/) {
         ($output_pkg, $output_leaf) = ($1, $2);
     } else {
         $output_pkg  = $caller;
@@ -447,7 +470,7 @@ sub gen_curried_sub {
         base_name   => "$base_pkg\::$base_leaf",
         output_name => "$output_pkg\::$output_leaf",
         output_code => sub {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             $base_sub->(@_, %$set_args);
         },
         remove_args => [keys %$set_args],
@@ -475,7 +498,7 @@ Perinci::Sub::Util - Helper when writing functions
 
 =head1 VERSION
 
-This document describes version 0.470 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2020-10-20.
+This document describes version 0.471 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2023-07-02.
 
 =head1 SYNOPSIS
 
@@ -546,7 +569,7 @@ Example for gen_curried_sub():
 
 Usage:
 
- gen_curried_sub( [ \%optional_named_args ] , $base_name, $output_name) -> any
+ gen_curried_sub($base_name, $set_args, $output_name) -> any
 
 Generate curried subroutine (and its metadata).
 
@@ -570,14 +593,15 @@ Subroutine name (either qualified or not).
 If not qualified with package name, will be searched in the caller's package.
 Rinci metadata will be searched in C<%SPEC> package variable.
 
-=item * B<$output_name>* => I<str>
+=item * B<$output_name> => I<str>
 
 Where to install the modified sub.
 
 Subroutine will be put in the specified name. If the name is not qualified with
-package name, will use caller's package.
+package name, will use caller's package. If the name is not specified, will use
+the base name which must not be in the caller's package.
 
-=item * B<set_args> => I<hash>
+=item * B<$set_args>* => I<hash>
 
 Arguments to set.
 
@@ -592,7 +616,7 @@ Return value:  (any)
 
 Usage:
 
- gen_modified_sub(%args) -> [status, msg, payload, meta]
+ gen_modified_sub(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate modified metadata (and subroutine) based on another.
 
@@ -638,11 +662,15 @@ Rinci metadata will be searched in C<%SPEC> package variable.
 
 Alternatively, you can also specify C<base_code> and C<base_meta>.
 
+Either C<base_name> or C<base_code> + C<base_meta> are required.
+
 =item * B<description> => I<str>
 
 Description for the mod subroutine.
 
 =item * B<install_sub> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<modify_args> => I<hash>
 
@@ -669,11 +697,13 @@ C<base_code> (which will then be required) as the modified subroutine's code.
 
 Where to install the modified sub.
 
-Subroutine will be put in the specified name. If the name is not qualified with
-package name, will use caller's package. If no C<output_code> is specified, the
-base subroutine reference will be assigned here.
+Output subroutine will be put in the specified name. If the name is not
+qualified with package name, will use caller's package. If the name is not
+specified, the base name will be used and must not be from the caller's package.
 
 Note that this argument is optional.
+
+To prevent installing subroutine, set C<install_sub> to false.
 
 =item * B<remove_args> => I<array>
 
@@ -707,12 +737,12 @@ C<base_code> (which will then be required) as the modified subroutine's code.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (hash)
 
@@ -777,14 +807,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Util>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Util>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci>
@@ -793,11 +815,43 @@ L<Perinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

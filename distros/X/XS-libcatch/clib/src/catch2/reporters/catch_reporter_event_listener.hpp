@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -13,18 +13,17 @@
 namespace Catch {
 
     /**
-     * Base class identifying listeners.
+     * Base class to simplify implementing listeners.
      *
-     * Provides empty default implementation for all IStreamingReporter member
-     * functions, so that listeners implementations can pick which
+     * Provides empty default implementation for all IEventListener member
+     * functions, so that a listener implementation can pick which
      * member functions it actually cares about.
      */
-    class EventListenerBase : public IStreamingReporter {
+    class EventListenerBase : public IEventListener {
     public:
-        EventListenerBase( ReporterConfig const& config ):
-            IStreamingReporter( config.fullConfig() ) {}
+        using IEventListener::IEventListener;
 
-        void reportInvalidArguments( StringRef unmatchedSpec ) override;
+        void reportInvalidTestSpec( StringRef unmatchedSpec ) override;
         void fatalErrorEncountered( StringRef error ) override;
 
         void benchmarkPreparing( StringRef name ) override;
@@ -37,6 +36,8 @@ namespace Catch {
 
         void listReporters(
             std::vector<ReporterDescription> const& descriptions ) override;
+        void listListeners(
+            std::vector<ListenerDescription> const& descriptions ) override;
         void listTests( std::vector<TestCaseHandle> const& tests ) override;
         void listTags( std::vector<TagInfo> const& tagInfos ) override;
 
@@ -52,7 +53,6 @@ namespace Catch {
         void testCaseEnded( TestCaseStats const& testCaseStats ) override;
         void testRunEnded( TestRunStats const& testRunStats ) override;
         void skipTest( TestCaseInfo const& testInfo ) override;
-
     };
 
 } // end namespace Catch

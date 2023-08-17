@@ -1,0 +1,31 @@
+^\.git\b
+^\.github\b
+(^|/)\.gitignore$
+^MANIFEST\.bak$
+^Makefile$
+^blib/
+^pm_to_blib\.ts$
+^pm_to_blib$
+^blibdirs\.ts$         # 6.18 through 6.25 generated this
+^_eumm/                # 7.05_05 and above
+
+~$
+\.old$
+\#$
+(^|/)\.#
+\.bak$
+\.tmp$
+\.rej$
+\..*\.sw.?$
+
+(^|/)\.DS_Store
+(^|/)\._
+\.i[cC]loud$
+
+^cover_db/
+
+^MYMETA\.
+^META_new\.(?:json|yml)
+
+^Mozilla-CA-.+/
+^Mozilla-CA-.+\.tar(\.gz)?$

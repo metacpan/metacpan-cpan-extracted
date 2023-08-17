@@ -1,11 +1,15 @@
 ---
-abstract: 'backend for Plack::App::Proxy'
+abstract: 'Backend for Plack::App::Proxy'
 author:
   - 'Piotr Roszatycki <dexter@cpan.org>'
 build_requires:
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,16 +18,15 @@ name: Plack-App-Proxy-Backend-HTTP-Tiny
 provides:
   Plack::App::Proxy::Backend::HTTP::Tiny:
     file: lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm
-    version: '0.0100'
-  Plack::App::Proxy::Backend::HTTP::Tiny::PreserveHeaders:
-    file: lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm
+    version: '0.0204'
 requires:
-  HTTP::Tiny: '0'
+  HTTP::Tiny::PreserveHostHeader: '0'
   Plack: '0'
   Plack::App::Proxy: '0'
-  perl: '5.006'
+  perl: '5.008'
 resources:
   bugtracker: http://github.com/dex4er/perl-Plack-App-Proxy-Backend-HTTP-Tiny/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dex4er/perl-Plack-App-Proxy-Backend-HTTP-Tiny
-version: '0.0100'
+version: '0.0204'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

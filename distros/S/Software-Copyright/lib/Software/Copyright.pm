@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright;
-$Software::Copyright::VERSION = '0.009';
+$Software::Copyright::VERSION = '0.010';
 use 5.20.0;
 use warnings;
 use utf8;
@@ -174,7 +174,7 @@ Software::Copyright - Copyright class
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

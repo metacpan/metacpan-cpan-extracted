@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeValueRequest.name :   ,
-# PostWorksheetCellsRangeValueRequest.sheetName :   ,
-# PostWorksheetCellsRangeValueRequest.range :   ,
-# PostWorksheetCellsRangeValueRequest.Value :   ,
-# PostWorksheetCellsRangeValueRequest.isConverted :   ,
-# PostWorksheetCellsRangeValueRequest.setStyle :   ,
-# PostWorksheetCellsRangeValueRequest.folder :   ,
-# PostWorksheetCellsRangeValueRequest.storageName :    
+# PostWorksheetCellsRangeValueRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeValueRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangeValueRequest.range : range in worksheet   ,
+# PostWorksheetCellsRangeValueRequest.Value : Input value  ,
+# PostWorksheetCellsRangeValueRequest.isConverted : True: converted to other data type if appropriate.  ,
+# PostWorksheetCellsRangeValueRequest.setStyle : True: set the number format to cell`s style when converting to other data type  ,
+# PostWorksheetCellsRangeValueRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangeValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_value' } = { 
-    	summary => '',
+    	summary => 'Puts a value into the range, if appropriate the value will be converted to other data type and cell`s number format will be reset.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -152,56 +152,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'Range',
      	base_name => 'range',
-     	description => '',
+     	description => 'range in worksheet ',
      	format => '',
      	read_only => '',
      		},
      'value' => {
      	datatype => 'string',
      	base_name => 'Value',
-     	description => '',
+     	description => 'Input value',
      	format => '',
      	read_only => '',
      		},
      'is_converted' => {
      	datatype => 'string',
      	base_name => 'isConverted',
-     	description => '',
+     	description => 'True: converted to other data type if appropriate.',
      	format => '',
      	read_only => '',
      		},
      'set_style' => {
      	datatype => 'string',
      	base_name => 'setStyle',
-     	description => '',
+     	description => 'True: set the number format to cell`s style when converting to other data type',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

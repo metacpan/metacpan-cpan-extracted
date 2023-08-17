@@ -22,3 +22,5 @@ my $app = Plack::App::Tags::HTML->new(
         'title' => decode_utf8('Přihlašovací tlačítko'),
 )->to_app;
 Plack::Runner->new->run($app);
+
+# Output screenshot is in images/ directory.

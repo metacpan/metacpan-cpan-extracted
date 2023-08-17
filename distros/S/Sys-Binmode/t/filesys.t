@@ -155,7 +155,19 @@ do {
     ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
     SKIP: {
-        skip "No symlink() in $^O", 1 if !$Config{'d_symlink'};
+        my $why_skip;
+
+        if (!$Config{'d_symlink'}) {
+            $why_skip = "No symlink() in $^O";
+        }
+        elsif ($^O eq 'MSWin32') {
+            require Win32;
+            if (!Win32::IsSymlinkCreationAllowed()) {
+                $why_skip = 'Symlink creation isn’t currently allowed';
+            }
+        }
+
+        skip $why_skip, 1 if $why_skip;
 
         symlink 'haha', _get_path_up() . '-symlink' or diag "symlink: $!";
         is(

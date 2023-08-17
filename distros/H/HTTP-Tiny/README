@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.082
+    version 0.088
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -79,11 +79,17 @@ METHODS
         open, read or write takes longer than the timeout, the request
         response status code will be 599.
 
-    *   "verify_SSL" — A boolean that indicates whether to validate the SSL
-        certificate of an "https" — connection (default is false)
+    *   "verify_SSL" — A boolean that indicates whether to validate the
+        TLS/SSL certificate of an "https" — connection (default is true).
+        Changed from false to true in version 0.083.
 
     *   "SSL_options" — A hashref of "SSL_*" — options to pass through to
         IO::Socket::SSL
+
+    *   $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT} - Changes the default
+        certificate verification behavior to not check server identity if
+        set to 1. Only effective if "verify_SSL" is not set. Added in
+        version 0.083.
 
     An accessor/mutator method exists for each attribute.
 
@@ -305,11 +311,11 @@ METHODS
     Note: This method cannot reliably be used to discover whether the remote
     host has closed its end of the socket.
 
-SSL SUPPORT
+TLS/SSL SUPPORT
     Direct "https" connections are supported only if IO::Socket::SSL 1.56 or
     greater and Net::SSLeay 1.49 or greater are installed. An error will
     occur if new enough versions of these modules are not installed or if
-    the SSL encryption fails. You can also use "HTTP::Tiny::can_ssl()"
+    the TLS encryption fails. You can also use "HTTP::Tiny::can_ssl()"
     utility function that returns boolean to see if the required modules are
     installed.
 
@@ -317,32 +323,23 @@ SSL SUPPORT
     CONNECT command (i.e. RFC 2817). You may not proxy "https" via a proxy
     that itself requires "https" to communicate.
 
-    SSL provides two distinct capabilities:
+    TLS/SSL provides two distinct capabilities:
 
     *   Encrypted communication channel
 
     *   Verification of server identity
 
-    By default, HTTP::Tiny does not verify server identity.
+    By default, HTTP::Tiny verifies server identity.
 
-    Server identity verification is controversial and potentially tricky
-    because it depends on a (usually paid) third-party Certificate Authority
-    (CA) trust model to validate a certificate as legitimate. This
-    discriminates against servers with self-signed certificates or
-    certificates signed by free, community-driven CA's such as CAcert.org
-    <http://cacert.org>.
+    This was changed in version 0.083 due to security concerns. The previous
+    default behavior can be enabled by setting
+    $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT} to 1.
 
-    By default, HTTP::Tiny does not make any assumptions about your trust
-    model, threat level or risk tolerance. It just aims to give you an
-    encrypted channel when you need one.
-
-    Setting the "verify_SSL" attribute to a true value will make HTTP::Tiny
-    verify that an SSL connection has a valid SSL certificate corresponding
-    to the host name of the connection and that the SSL certificate has been
-    verified by a CA. Assuming you trust the CA, this will protect against a
-    man-in-the-middle attack
-    <http://en.wikipedia.org/wiki/Man-in-the-middle_attack>. If you are
-    concerned about security, you should enable this option.
+    Verification is done by checking that that the TLS/SSL connection has a
+    valid certificate corresponding to the host name of the connection and
+    that the certificate has been verified by a CA. Assuming you trust the
+    CA, this will protect against machine-in-the-middle attacks
+    <http://en.wikipedia.org/wiki/Machine-in-the-middle_attack>.
 
     Certificate verification requires a file containing trusted CA
     certificates.
@@ -351,10 +348,7 @@ SSL SUPPORT
     try to find a CA certificate file in that location.
 
     If the Mozilla::CA module is installed, HTTP::Tiny will use the CA file
-    included with it as a source of trusted CA's. (This means you trust
-    Mozilla, the author of Mozilla::CA, the CPAN mirror where you got
-    Mozilla::CA, the toolchain used to install it, and your operating system
-    security, right?)
+    included with it as a source of trusted CA's.
 
     If that module is not available, then HTTP::Tiny will search several
     system-specific default locations for a CA certificate file:
@@ -365,13 +359,23 @@ SSL SUPPORT
 
     *   /etc/ssl/ca-bundle.pem
 
+    *   /etc/openssl/certs/ca-certificates.crt
+
+    *   /etc/ssl/cert.pem
+
+    *   /usr/local/share/certs/ca-root-nss.crt
+
+    *   /etc/pki/tls/cacert.pem
+
+    *   /etc/certs/ca-certificates.crt
+
     An error will be occur if "verify_SSL" is true and no CA certificate
     file is available.
 
-    If you desire complete control over SSL connections, the "SSL_options"
-    attribute lets you provide a hash reference that will be passed through
-    to "IO::Socket::SSL::start_SSL()", overriding any options set by
-    HTTP::Tiny. For example, to provide your own trusted CA file:
+    If you desire complete control over TLS/SSL connections, the
+    "SSL_options" attribute lets you provide a hash reference that will be
+    passed through to "IO::Socket::SSL::start_SSL()", overriding any options
+    set by HTTP::Tiny. For example, to provide your own trusted CA file:
 
         SSL_options => {
             SSL_ca_file => $file_path,
@@ -379,7 +383,7 @@ SSL SUPPORT
 
     The "SSL_options" attribute could also be used for such things as
     providing a client certificate for authentication to a server or
-    controlling the choice of cipher used for the SSL connection. See
+    controlling the choice of cipher used for the TLS/SSL connection. See
     IO::Socket::SSL documentation for details.
 
 PROXY SUPPORT
@@ -494,16 +498,16 @@ SEE ALSO
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/chansen/p5-http-tiny/issues>. You will be notified
-    automatically of any progress on your issue.
+    <https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues>. You will be
+    notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/chansen/p5-http-tiny>
+    <https://github.com/Perl-Toolchain-Gang/HTTP-Tiny>
 
-      git clone https://github.com/chansen/p5-http-tiny.git
+      git clone https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git
 
 AUTHORS
     *   Christian Hansen <chansen@cpan.org>
@@ -589,6 +593,8 @@ CONTRIBUTORS
 
     *   Steve Grazzini <steve.grazzini@grantstreet.com>
 
+    *   Stig Palmquist <git@stig.io>
+
     *   Syohei YOSHIDA <syohex@gmail.com>
 
     *   Tatsuhiko Miyagawa <miyagawa@bulknews.net>
@@ -600,7 +606,7 @@ CONTRIBUTORS
     *   Xavier Guimard <yadd@debian.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by Christian Hansen.
+    This software is copyright (c) 2023 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

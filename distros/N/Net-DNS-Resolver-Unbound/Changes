@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.21  Jun 9, 2023
+	Emulate Net::DNS::Resolver send($packet).
+
+
 **** 1.20  Nov 1, 2022
 	Include -I flags from Config{cppflags}.
 	Make feature detection work for XS package.

@@ -8,12 +8,16 @@
 #include "spvm_compiler.h"
 #include "spvm_basic_type.h"
 #include "spvm_allocator.h"
-#include "spvm_class.h"
 #include "spvm_list.h"
 #include "spvm_hash.h"
 #include "spvm_method.h"
+#include "spvm_string_buffer.h"
+#include "spvm_string.h"
+#include "spvm_op.h"
+#include "spvm_type.h"
+#include "spvm_var_decl.h"
 
-const char* const* SPVM_NATIVE_C_BASIC_TYPE_ID_NAMES(void) {
+const char* const* SPVM_BASIC_TYPE_C_ID_NAMES(void) {
 
   static const char* const id_names[] = {
     "unknown",
@@ -35,6 +39,8 @@ const char* const* SPVM_NATIVE_C_BASIC_TYPE_ID_NAMES(void) {
     "Double",
     "Bool",
     "Error",
+    "Error::System",
+    "Error::NotSupported",
     "CommandInfo",
     "Address",
   };
@@ -42,11 +48,10 @@ const char* const* SPVM_NATIVE_C_BASIC_TYPE_ID_NAMES(void) {
   return id_names;
 }
 
-const char* const* SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NAMES(void) {
+const char* const* SPVM_BASIC_TYPE_C_CATEGORY_NAMES(void) {
 
   static const char* const id_names[] = {
     "unknown"
-    "not_found_class",
     "undef"
     "void"
     "numeric"
@@ -61,59 +66,46 @@ const char* const* SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NAMES(void) {
 }
 
 SPVM_BASIC_TYPE* SPVM_BASIC_TYPE_new(SPVM_COMPILER* compiler) {
-  SPVM_BASIC_TYPE* basic_type = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, sizeof(SPVM_BASIC_TYPE));
+  SPVM_BASIC_TYPE* basic_type = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->current_each_compile_allocator, sizeof(SPVM_BASIC_TYPE));
+  
+  basic_type->constant_strings = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 128);
+  basic_type->constant_string_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 128);
+  basic_type->string_pool = SPVM_STRING_BUFFER_new(compiler->current_each_compile_allocator, 8192, SPVM_ALLOCATOR_C_ALLOC_TYPE_PERMANENT);
+  
+  // Fields
+  basic_type->unmerged_fields = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->unmerged_field_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  basic_type->field_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  // Class variables
+  basic_type->class_vars = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->class_var_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  // Methods
+  basic_type->methods = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->method_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  // Interfaces
+  basic_type->interface_basic_types = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->interface_basic_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  basic_type->allows = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->interface_decls = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->anon_unresolved_basic_type_names = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->anon_basic_types = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
+  basic_type->alias_symtable = SPVM_HASH_new_hash_permanent(compiler->current_each_compile_allocator, 0);
+  
+  basic_type->use_basic_type_names = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 0);
   
   return basic_type;
 }
 
-const char* SPVM_BASIC_TYPE_get_basic_type_name(int32_t basic_type_id) {
-  return (SPVM_NATIVE_C_BASIC_TYPE_ID_NAMES())[basic_type_id];
-}
-
-int32_t SPVM_TYPE_get_category(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-
-int32_t SPVM_BASIC_TYPE_get_category(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  
-  int32_t category;
-  if (SPVM_BASIC_TYPE_is_void_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID;
-  }
-  else if (SPVM_BASIC_TYPE_is_numeric_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC;
-  }
-  else if (SPVM_BASIC_TYPE_is_mulnum_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM;
-  }
-  else if (SPVM_BASIC_TYPE_is_string_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING;
-  }
-  else if (SPVM_BASIC_TYPE_is_class_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS;
-  }
-  else if (SPVM_BASIC_TYPE_is_interface_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE;
-  }
-  else if (SPVM_BASIC_TYPE_is_any_object_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT;
-  }
-  else if (SPVM_BASIC_TYPE_is_undef_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF;
-  }
-  else if (SPVM_BASIC_TYPE_is_unknown_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN;
-  }
-  else if (SPVM_BASIC_TYPE_is_not_found_class_type(compiler, basic_type_id)) {
-    category = SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NOT_FOUND_CLASS;
-  }
-  else {
-    assert(0);
-  }
-  
-  return category;
+const char* SPVM_BASIC_TYPE_get_basic_type_name(SPVM_COMPILER* compiler, int32_t basic_type_id) {
+  return (SPVM_BASIC_TYPE_C_ID_NAMES())[basic_type_id];
 }
 
 int32_t SPVM_BASIC_TYPE_is_void_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_VOID) {
     return 1;
@@ -126,7 +118,6 @@ int32_t SPVM_BASIC_TYPE_is_void_type(SPVM_COMPILER* compiler, int32_t basic_type
 }
 
 int32_t SPVM_BASIC_TYPE_is_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
     return 1;
@@ -140,57 +131,24 @@ int32_t SPVM_BASIC_TYPE_is_numeric_type(SPVM_COMPILER* compiler, int32_t basic_t
 
 
 int32_t SPVM_BASIC_TYPE_is_mulnum_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
   
-  int32_t is_mulnum_t;
-  const char* basic_type_name = basic_type->name;
-  SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
-  // Class
-  if (class) {
-    if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
-      is_mulnum_t = 1;
-    }
-    else {
-      is_mulnum_t = 0;
-    }
-  }
-  // Numeric type
-  else {
-    is_mulnum_t = 0;
-  }
+  int32_t is_mulnum_type = (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM);
   
-  return is_mulnum_t;
+  return is_mulnum_type;
 }
 
 int32_t SPVM_BASIC_TYPE_is_string_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   return basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_STRING;
 }
 
 int32_t SPVM_BASIC_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
   
-  int32_t is_class_type;
-  const char* basic_type_name = basic_type->name;
-  SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
-  // Class
-  if (class) {
-    if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
-      is_class_type = 1;
-    }
-    else {
-      is_class_type = 0;
-    }
-  }
-  // Numeric type
-  else {
-    is_class_type = 0;
-  }
+  int32_t is_class_type = (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS);
   
   return is_class_type;
 }
@@ -198,35 +156,18 @@ int32_t SPVM_BASIC_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_typ
 int32_t SPVM_BASIC_TYPE_is_interface_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
   
-  int32_t is_interface_type;
-  const char* basic_type_name = basic_type->name;
-  SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
-  // Class
-  if (class) {
-    if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-      is_interface_type = 1;
-    }
-    else {
-      is_interface_type = 0;
-    }
-  }
-  // Numeric type
-  else {
-    is_interface_type = 0;
-  }
+  int32_t is_interface_type = (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE);
   
   return is_interface_type;
 }
 
 int32_t SPVM_BASIC_TYPE_is_any_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   return basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT;
 }
 
 
 int32_t SPVM_BASIC_TYPE_is_undef_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF) {
     return 1;
@@ -238,7 +179,6 @@ int32_t SPVM_BASIC_TYPE_is_undef_type(SPVM_COMPILER* compiler, int32_t basic_typ
 
 
 int32_t SPVM_BASIC_TYPE_is_unknown_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN) {
     return 1;
@@ -249,28 +189,7 @@ int32_t SPVM_BASIC_TYPE_is_unknown_type(SPVM_COMPILER* compiler, int32_t basic_t
 }
 
 
-int32_t SPVM_BASIC_TYPE_is_not_found_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
-  
-  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
-  
-  int32_t is_not_found_class_type;
-  const char* basic_type_name = basic_type->name;
-  SPVM_CLASS* class = SPVM_HASH_get(compiler->not_found_class_class_symtable, basic_type_name, strlen(basic_type_name));
-  // Class
-  if (class) {
-    is_not_found_class_type = 1;
-  }
-  // Numeric type
-  else {
-    is_not_found_class_type = 0;
-  }
-
-  return is_not_found_class_type;
-}
-
 int32_t SPVM_BASIC_TYPE_is_numeric_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS) {
     return 1;
@@ -281,7 +200,6 @@ int32_t SPVM_BASIC_TYPE_is_numeric_object_type(SPVM_COMPILER* compiler, int32_t 
 }
 
 int32_t SPVM_BASIC_TYPE_is_integer_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
     return 1;
@@ -292,7 +210,6 @@ int32_t SPVM_BASIC_TYPE_is_integer_type(SPVM_COMPILER* compiler, int32_t basic_t
 }
 
 int32_t SPVM_BASIC_TYPE_is_integer_type_within_int(SPVM_COMPILER* compiler, int32_t basic_type_id) {
-  (void)compiler;
   
   if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
     return 1;
@@ -302,38 +219,100 @@ int32_t SPVM_BASIC_TYPE_is_integer_type_within_int(SPVM_COMPILER* compiler, int3
   }
 }
 
-int32_t SPVM_BASIC_TYPE_has_interface(SPVM_COMPILER* compiler, int32_t class_basic_type_id, int32_t interface_basic_type_id) {
-  (void)compiler;
+int32_t SPVM_BASIC_TYPE_has_interface(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t interface_basic_type_id) {
   
-  SPVM_BASIC_TYPE* class_basic_type = SPVM_LIST_get(compiler->basic_types, class_basic_type_id);
-  SPVM_CLASS* class = class_basic_type->class;
-
+  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
+  
   SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(compiler->basic_types, interface_basic_type_id);
-  SPVM_CLASS* interface = interface_basic_type->class;
+  
+  if (!(interface_basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
+    return 0;
+  }
+  
+  if (!(basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS || basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
+    return 0;
+  }
+  
+  for (int32_t interface_method_index = 0; interface_method_index < interface_basic_type->methods->length; interface_method_index++) {
+    SPVM_METHOD* interface_method = SPVM_LIST_get(interface_basic_type->methods, interface_method_index);
+    
+    for (int32_t method_index = 0; method_index < basic_type->methods->length; method_index++) {
+      SPVM_METHOD* method = SPVM_HASH_get(basic_type->method_symtable, interface_method->name, strlen(interface_method->name));
+      
+      int32_t method_compatibility = SPVM_BASIC_TYPE_check_method_compatibility(compiler, basic_type, method, interface_basic_type, interface_method, "interface");
+      
+      if (method_compatibility == 0) {
+        return 0;
+      }
+    }
+  }
+  
+  return 1;
+}
 
-  assert(interface->required_method);
-  SPVM_METHOD* method_interface = interface->required_method;
+int32_t SPVM_BASIC_TYPE_check_method_compatibility(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method, SPVM_BASIC_TYPE* dist_basic_type, SPVM_METHOD* dist_method, const char* type_desc) {
+  
+  if (dist_method->is_required && !method) {
+    if (!dist_method->is_class_method) {
+      SPVM_COMPILER_error(compiler, "The \"%s\" class must implement the \"%s\" method. This is defined as a required interface method in the \"%s\" %s.\n  at %s line %d", basic_type->name, dist_method->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
+      return 0;
+    }
+  }
+  
+  if (method) {
+    if (method->is_class_method) {
+      if (!dist_method->is_class_method) {
+        SPVM_COMPILER_error(compiler, "The \"%s\" method in the \"%s\" class must be an instance method. This is defined as an interface method in the \"%s\" %s.\n  at %s line %d", method->name, basic_type->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
+        return 0;
+      }
+    }
+    
+    SPVM_LIST* method_var_decls = method->var_decls;
+    
+    SPVM_LIST* dist_method_var_decls = dist_method->var_decls;
+    
+    if (!(method->required_args_length == dist_method->required_args_length)) {
+      
+      SPVM_COMPILER_error(compiler, "The length of the required arguments of the \"%s\" method in the \"%s\" class must be equal to the length of the required arguments of the \"%s\" method in the \"%s\" %s.\n  at %s line %d", method->name, basic_type->name, dist_method->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
+      return 0;
+    }
 
-  SPVM_CLASS* parent_class = class;
-  while (1) {
-    if (!parent_class) {
+    if (!(method->args_length >= dist_method->args_length)) {
+      SPVM_COMPILER_error(compiler, "The length of the arguments of the \"%s\" method in the \"%s\" class must be greather than or equal to the length of the arguments of the \"%s\" method in the \"%s\" %s.\n  at %s line %d", method->name, basic_type->name, dist_method->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
       return 0;
     }
     
-    SPVM_METHOD* method_class = SPVM_HASH_get(parent_class->method_symtable, method_interface->name, strlen(method_interface->name));
-    if (method_class) {
-      return 1;
+    for (int32_t arg_index = 1; arg_index < dist_method->args_length; arg_index++) {
+      SPVM_VAR_DECL* method_var_decl = SPVM_LIST_get(method_var_decls, arg_index);
+      SPVM_VAR_DECL* dist_method_var_decl = SPVM_LIST_get(dist_method_var_decls, arg_index);
+      
+      SPVM_TYPE* method_var_decl_type = method_var_decl->type;
+      SPVM_TYPE* dist_method_var_decl_type = dist_method_var_decl->type;
+      
+      int32_t assignability_for_method = SPVM_TYPE_can_assign_for_method_definition(compiler, method_var_decl_type->basic_type->id, method_var_decl_type->dimension, method_var_decl_type->flag, dist_method_var_decl_type->basic_type->id, dist_method_var_decl_type->dimension, dist_method_var_decl_type->flag);
+      
+      if (!assignability_for_method) {
+        SPVM_COMPILER_error(compiler, "The type of the %dth argument of the \"%s\" method in the \"%s\" class must be equal to the type of the %dth argument of the \"%s\" method in the \"%s\" %s.\n  at %s line %d", arg_index, method->name, basic_type->name, arg_index, dist_method->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
+        return 0;
+      }
     }
     
-    const char* parent_class_name = parent_class->parent_class_name;
-    if (parent_class_name) {
-      parent_class = SPVM_HASH_get(compiler->class_symtable, parent_class_name, strlen(parent_class_name));
-      assert(parent_class);
-    }
-    else {
-      parent_class = NULL;
+    SPVM_TYPE* method_return_type = method->return_type;
+    SPVM_TYPE* dist_method_return_type = dist_method->return_type;
+    
+    int32_t assignability_for_method_definition = SPVM_TYPE_can_assign_for_method_definition(
+      compiler,
+      dist_method_return_type->basic_type->id, dist_method_return_type->dimension, dist_method_return_type->flag,
+      method_return_type->basic_type->id, method_return_type->dimension, method_return_type->flag
+    );
+    
+    if (!assignability_for_method_definition) {
+      SPVM_COMPILER_error(compiler, "The return type of the \"%s\" method in the \"%s\" class must be able to be assigned to the return type of the \"%s\" method in the \"%s\" %s.\n  at %s line %d", method->name, basic_type->name, dist_method->name, dist_basic_type->name, type_desc, basic_type->op_class->file, basic_type->op_class->line);
+      return 0;
     }
   }
+  
+  return 1;
 }
 
 int32_t SPVM_BASIC_TYPE_is_super_class(SPVM_COMPILER* compiler, int32_t super_basic_type_id, int32_t child_basic_type_id) {
@@ -341,23 +320,44 @@ int32_t SPVM_BASIC_TYPE_is_super_class(SPVM_COMPILER* compiler, int32_t super_ba
   SPVM_BASIC_TYPE* super_basic_type = SPVM_LIST_get(compiler->basic_types, super_basic_type_id);
   SPVM_BASIC_TYPE* child_basic_type = SPVM_LIST_get(compiler->basic_types, child_basic_type_id);
   
-  SPVM_CLASS* super_class = super_basic_type->class;
-  SPVM_CLASS* child_class = child_basic_type->class;
-  
-  const char* cur_parent_class_name = child_class->parent_class_name;
+  const char* current_parent_basic_type_name = child_basic_type->parent_name;
   while (1) {
-    if (cur_parent_class_name) {
-      if (strcmp(super_class->name, cur_parent_class_name) == 0) {
+    if (current_parent_basic_type_name) {
+      if (strcmp(super_basic_type->name, current_parent_basic_type_name) == 0) {
         return 1;
       }
       else {
-        SPVM_CLASS* cur_parent_class = SPVM_HASH_get(compiler->class_symtable, cur_parent_class_name, strlen(cur_parent_class_name));
-        assert(cur_parent_class);
-        cur_parent_class_name = cur_parent_class->parent_class_name;
+        SPVM_BASIC_TYPE* current_parent_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, current_parent_basic_type_name, strlen(current_parent_basic_type_name));
+        assert(current_parent_basic_type);
+        current_parent_basic_type_name = current_parent_basic_type->parent_name;
       }
     }
     else {
       return 0;
     }
+  }
+}
+
+SPVM_STRING* SPVM_BASIC_TYPE_add_constant_string(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, const char* value, int32_t length) {
+  
+  SPVM_STRING* found_string = SPVM_HASH_get(basic_type->constant_string_symtable, value, length);
+  if (found_string) {
+    return found_string;
+  }
+  else {
+    int32_t string_pool_index = basic_type->string_pool->length;
+    
+    SPVM_STRING_BUFFER_add_len_nullstr(basic_type->string_pool, (char*)value, length);
+    
+    SPVM_STRING* string = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->current_each_compile_allocator, sizeof(SPVM_STRING));
+    string->value = value;
+    string->length = length;
+    string->index = basic_type->constant_strings->length;
+    string->string_pool_index = string_pool_index;
+    
+    SPVM_LIST_push(basic_type->constant_strings, string);
+    SPVM_HASH_set(basic_type->constant_string_symtable, string->value, length, string);
+    
+    return string;
   }
 }

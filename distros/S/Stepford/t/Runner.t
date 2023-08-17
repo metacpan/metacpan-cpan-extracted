@@ -21,14 +21,12 @@ my $tempdir = tempdir( CLEANUP => 1 );
 {
     my @messages;
     my $logger = Log::Dispatch->new(
-        outputs => [
-            [
-                'Array',
-                name      => 'array',
-                array     => \@messages,
-                min_level => 'debug',
-            ]
-        ]
+        outputs => [ [
+            'Array',
+            name      => 'array',
+            array     => \@messages,
+            min_level => 'debug',
+        ] ]
     );
 
     require Test1::Step::CombineFiles;
@@ -50,7 +48,7 @@ EOF
         'Test1::Step',
         ['CombineFiles'],
         $plan_graph,
-        'runner comes up with the right plan for simple steps'
+        'runner comes up with the right plan for simple steps',
     );
 
     @messages = ();
@@ -68,7 +66,7 @@ EOF
     is(
         scalar @dep_messages,
         4,
-        'logged four dependency resolution messages'
+        'logged four dependency resolution messages',
     );
 
     my $graph_message = first { $_->{message} =~ /Graph for/ } @messages;
@@ -76,13 +74,13 @@ EOF
     is(
         $graph_message->{message},
         "Graph for Test1::Step::CombineFiles:\n" . $plan_graph,
-        'logged plan when ->run was called'
+        'logged plan when ->run was called',
     );
 
     is(
         $graph_message->{level},
         'debug',
-        'log level for graph description is debug'
+        'log level for graph description is debug',
     );
 
     my @object_constructor_messages
@@ -91,19 +89,19 @@ EOF
     is(
         scalar @object_constructor_messages,
         5,
-        'logged five object construction messages'
+        'logged five object construction messages',
     );
 
     is(
         $object_constructor_messages[0]{message},
         'Test1::Step::CreateA1->new',
-        'logged a message indicating that a step was being created'
+        'logged a message indicating that a step was being created',
     );
 
     is(
         $object_constructor_messages[0]{level},
         'debug',
-        'log level for object creation is debug'
+        'log level for object creation is debug',
     );
 
     for my $file ( map { $tempdir->file($_) } qw( a1 a2 combined ) ) {
@@ -123,13 +121,13 @@ EOF
                 $_->{message} =~ /^\QTest1::Step::CombineFiles is up to date./
             } @messages
         ),
-        'logged a message when skipping a step'
+        'logged a message when skipping a step',
     );
 
     is(
         $messages[-1]{level},
         'info',
-        'log level for skipping a step is info'
+        'log level for skipping a step is info',
     );
 
     my %expect_run = (
@@ -145,7 +143,7 @@ EOF
         is(
             $class->run_count,
             $expect_run{$suffix},
-            "$class->run was called the expected number of times - skipped when up to date"
+            "$class->run was called the expected number of times - skipped when up to date",
         );
     }
 }
@@ -252,7 +250,7 @@ EOF
         'Test2::Step',
         'D',
         $plan_graph,
-        'repeated steps correctly show up in plan'
+        'repeated steps correctly show up in plan',
     );
 }
 
@@ -309,7 +307,7 @@ EOF
     like(
         $e,
         qr/cyclic/,
-        'cyclical dependencies cause the Planner constructor to die'
+        'cyclical dependencies cause the Planner constructor to die',
     );
 }
 
@@ -348,7 +346,7 @@ EOF
               \QCannot resolve a dependency for Test4::Step::A. \E
               \QThere is no step that produces the thing_b attribute.\E
           /x,
-        'unresolved dependencies cause the runner constructor to die'
+        'unresolved dependencies cause the runner constructor to die',
     );
 }
 
@@ -379,7 +377,7 @@ EOF
     like(
         $e,
         qr/\QA dependency (thing_a) for Test5::Step::A resolved to the same step/,
-        'cannot have an attribute that is both a dependency and production'
+        'cannot have an attribute that is both a dependency and production',
     );
 }
 
@@ -422,7 +420,7 @@ EOF
     is(
         $builder->_production_map->{thing_a},
         'Test6::Step::A1',
-        'when two steps have the same production, choose the one that sorts first'
+        'when two steps have the same production, choose the one that sorts first',
     );
 }
 
@@ -469,7 +467,7 @@ EOF
     is(
         scalar $tempdir->file('test7-step-a')->slurp,
         'new content',
-        'config passed to $runner->run is passed to step constructor'
+        'config passed to $runner->run is passed to step constructor',
     );
 }
 
@@ -640,7 +638,7 @@ EOF
         'Test8::Step',
         [ 'Final1', 'Final2' ],
         $plan_graph,
-        'runner comes up with an optimized plan for multiple final steps'
+        'runner comes up with an optimized plan for multiple final steps',
     );
 }
 
@@ -670,7 +668,7 @@ EOF
     like(
         $e,
         qr/\QFound a class which doesn't do the Stepford::Role::Step role: Test9::Step::A/,
-        'cannot have an attribute that is both a dependency and production'
+        'cannot have an attribute that is both a dependency and production',
     );
 }
 
@@ -694,7 +692,7 @@ sub _test_plan {
     eq_or_diff(
         $got_str,
         $expect,
-        $desc
+        $desc,
     );
 }
 

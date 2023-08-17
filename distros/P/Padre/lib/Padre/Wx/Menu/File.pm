@@ -10,10 +10,14 @@ use Padre::Wx::Menu ();
 use Padre::Constant ();
 use Padre::Current  ();
 use Padre::Feature  ();
+use Padre::Util     ();
 use Padre::Logger;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 our @ISA     = 'Padre::Wx::Menu';
+
+# We only check for the existance of Module::Starter once at startup
+our $MODULE_STARTER = Padre::Util::module_available('Module::Starter');
 
 
 
@@ -75,12 +79,13 @@ sub new {
 	# Split projects from files
 	$file_new->AppendSeparator;
 
-
-	#ToDo Not yet finished
-	$self->add_menu_action(
-		$file_new,
-		'file.p5_modulestarter',
-	);
+	# TODO: Not yet finished
+	if ($MODULE_STARTER and $MODULE_STARTER->{VERSION} >= 1.60) {
+		$self->add_menu_action(
+			$file_new,
+			'file.p5_modulestarter',
+		);
+	}
 
 	# Open things
 
@@ -410,7 +415,7 @@ sub on_recent {
 
 1;
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

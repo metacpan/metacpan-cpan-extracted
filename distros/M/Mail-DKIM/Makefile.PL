@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Crypt::OpenSSL::RSA" => 0,
+    "Crypt::PK::Ed25519" => 0,
     "Digest::SHA" => 0,
     "MIME::Base64" => 0,
     "Mail::Address" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "YAML::XS" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20230212",
+  "VERSION" => "1.20230630",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Crypt::OpenSSL::RSA" => 0,
+  "Crypt::PK::Ed25519" => 0,
   "Data::Dumper" => 0,
   "Digest::SHA" => 0,
   "MIME::Base64" => 0,

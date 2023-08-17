@@ -11,8 +11,10 @@ use strict;
 use warnings;
 use Test::More;
 
-package ParentForm
 {
+
+	package ParentForm;
+
 	use Form::Tiny -nomoo;
 
 	form_field 'f1';
@@ -24,8 +26,10 @@ package ParentForm
 	}
 }
 
-package ChildForm
 {
+
+	package ChildForm;
+
 	use Form::Tiny -nomoo;
 
 	use parent -norequire, 'ParentForm';

@@ -30,7 +30,7 @@ sub ATTR {
 
   $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -58,7 +58,7 @@ sub BASE {
 
   $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -78,16 +78,17 @@ sub BLESS {
   # defined in each attached role.
 
   # If one (or more) roles use reflection (i.e. calls "META") to introspect the
-  # package's configuration, that could cause a performance problem given that
+  # package's configuration, which could cause a performance problem given that
   # the Venus::Meta class uses recursion to introspect all superclasses and
-  # roles in order to determine and present aggregate lists of package members.
+  # roles to determine and present aggregate lists of package members.  It's
+  # your classic n+1 problem.
 
   # The solution to this is to cache the associated Venus::Meta object which
   # itself caches the results of its recursive lookups. The cache is stored on
-  # the subclass (i.e. on the calling package) the cache wil go away whenever
-  # the package does, e.g. Venus::Space#unload.
+  # the subclass (i.e. on the calling package) and the cache will go away
+  # whenever the package does.
 
-  ${"${name}::@{[$self->METAOBJECT]}"} ||= Venus::Meta->new(name => $name)
+  ${"${name}::@{[$self->METACACHE]}"} ||= Venus::Meta->new(name => $name)
     if $name ne 'Venus::Meta';
 
   return $anew;
@@ -145,6 +146,12 @@ sub FROM {
   return $self;
 }
 
+sub GET {
+  my ($self, $name) = @_;
+
+  return $self->{$name};
+}
+
 sub IMPORT {
   my ($self, $into) = @_;
 
@@ -155,8 +162,8 @@ sub ITEM {
   my ($self, $name, @args) = @_;
 
   return undef if !$name;
-  return $self->{$name} if !@args;
-  return $self->{$name} = $args[0];
+  return $self->GET($name) if !@args;
+  return $self->SET($name, $args[0]);
 }
 
 sub META {
@@ -168,14 +175,14 @@ sub META {
 
   my $name = $self->NAME;
 
-  return ${"${name}::@{[$self->METAOBJECT]}"}
+  return ${"${name}::@{[$self->METACACHE]}"}
     || Venus::Meta->new(name => $name);
 }
 
-sub METAOBJECT {
+sub METACACHE {
   my ($self) = @_;
 
-  return 'METAOBJECT';
+  return 'METACACHE';
 }
 
 sub MIXIN {
@@ -197,7 +204,7 @@ sub MIXIN {
 
   $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -227,9 +234,15 @@ sub ROLE {
 
   $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
+}
+
+sub SET {
+  my ($self, $name, $data) = @_;
+
+  return $self->{$name} = $data;
 }
 
 sub SUBS {
@@ -249,6 +262,18 @@ sub TEST {
   $self->ROLE($role);
 
   $role->AUDIT($self->NAME) if $role->can('AUDIT');
+
+  return $self;
+}
+
+sub UNIMPORT {
+  my ($self, $into, @args) = @_;
+
+  return $self;
+}
+
+sub USE {
+  my ($self, $into, @args) = @_;
 
   return $self;
 }
@@ -917,11 +942,15 @@ I<Since C<1.00>>
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -947,11 +976,15 @@ I<Since C<1.00>>
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -1080,6 +1113,40 @@ I<Since C<1.00>>
   my $user = User->BLESS;
 
   # bless({}, 'User')
+
+=back
+
+=cut
+
+=head2 get
+
+  GET(Str $name) (Any)
+
+The GET method is a class instance lifecycle hook which is responsible for
+I<"getting"> instance items (or attribute values). By default, all class
+attributes I<"getters"> are dispatched to this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item get example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $get = $user->GET('title');
+
+  # "Engineer"
 
 =back
 
@@ -1223,6 +1290,44 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 mixin
+
+  MIXIN(Str $name) (Str | Object)
+
+The MIXIN method is a class building lifecycle hook which consumes the mixin
+provided, automatically invoking the mixin's L</IMPORT> hook. The role
+composition semantics are as follows: Routines to be consumed must be
+explicitly declared via the L</EXPORT> hook. Routines will be copied to the
+consumer even if they already exist. If multiple roles are consumed having
+routines with the same name (i.e. naming collisions) the last routine copied
+wins.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixin example 1
+
+  package Action;
+
+  use base 'Venus::Core';
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MIXIN('Action');
+
+  package main;
+
+  my $admin = User->DOES('Action');
+
+  # 0
+
+=back
+
+=cut
+
 =head2 name
 
   NAME() (Str)
@@ -1338,6 +1443,38 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 set
+
+  SET(Str $name, Any @args) (Any)
+
+The SET method is a class instance lifecycle hook which is responsible for
+I<"setting"> instance items (or attribute values). By default, all class
+attributes I<"setters"> are dispatched to this method.
+
+=over 4
+
+=item set example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $set = $user->SET('title', 'Manager');
+
+  # "Manager"
+
+=back
+
+=cut
+
 =head2 subs
 
   SUBS() (ArrayRef)
@@ -1413,6 +1550,33 @@ I<Since C<1.00>>
   my $user = User->BLESS;
 
   # bless({}, 'User')
+
+=back
+
+=cut
+
+=head2 unimport
+
+  UNIMPORT(Str $into, Any @args) (Any)
+
+The UNIMPORT method is a class building lifecycle hook which is invoked
+whenever the L<perlfunc/no> declaration is used.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item unimport example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  User->UNIMPORT;
+
+  # 'User'
 
 =back
 

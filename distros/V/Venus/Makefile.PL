@@ -13,11 +13,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Venus",
+  "EXE_FILES" => [
+    "bin/vns"
+  ],
   "LICENSE" => "apache",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Venus",
   "PREREQ_PM" => {},
-  "VERSION" => "2.91",
+  "VERSION" => "3.55",
   "test" => {
     "TESTS" => "t/*.t"
   }

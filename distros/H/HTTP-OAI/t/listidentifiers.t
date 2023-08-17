@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 2;
 
 use strict;
 use HTTP::OAI;
@@ -13,14 +13,10 @@ my $str = <<EOF;
 EOF
 chomp($str);
 
-$r->parse_string($str);
-
-ok(1);
+ok($r->parse_string($str), 'Parse ListIdentifiers');
 
 my $ha = HTTP::OAI::Harvester->new(baseURL=>'http://domain.invalid/');
-$r = $ha->ListRecords(metadataPrefix=>'oai_dc', from=>'2005-01-01');
-my $uri = URI->new($r->request->uri);
+my $r2 = $ha->ListRecords(metadataPrefix=>'oai_dc', from=>'2005-01-01');
+my $uri = URI->new($r2->request->uri);
 my %args = $uri->query_form;
 ok($args{metadataPrefix} eq 'oai_dc' && $args{'from'} eq '2005-01-01','Request arguments');
-
-ok(1);

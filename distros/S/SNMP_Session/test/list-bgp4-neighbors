@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl -w
+
+require 5.002;
+use strict;
+use SNMP_Session "0.59";
+use BER;
+use Socket;
+
+sub usage ();
+
+my $bgpPeerState = [1,3,6,1,2,1,15,3,1,2];
+my $bgpPeerRemoteAs = [1,3,6,1,2,1,15,3,1,9];
+
+my $hostname = $ARGV[0] || usage ();
+my $community = $ARGV[1] || "public";
+
+my $session;
+
+die "Couldn't open SNMP session to $hostname"
+    unless ($session = SNMP_Session->open ($hostname, $community, 161));
+$session->map_table ([$bgpPeerState, $bgpPeerRemoteAs],
+		     sub () {
+			 my ($index, $state, $as) = @_;
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($state, $as));
+			 my $pretty_state = (qw(? idle connect active
+						opensent openconfirm
+						established))[$state];
+			 printf "%-15s %-12s %32s AS%-5s\n",
+				 $index, $pretty_state,
+				 hostname ($index), $as;
+		     });
+$session->close ();
+
+1;
+
+sub pretty_addr ($ ) {
+    my ($addr) = @_;
+    my ($hostname,$aliases,$addrtype,$length,@addrs)
+	= gethostbyaddr (inet_aton ($addr), AF_INET);
+    $hostname ? $hostname." [".$addr."]" : $addr;
+}
+
+sub hostname ($ ) {
+    my ($addr) = @_;
+    my ($hostname,$aliases,$addrtype,$length,@addrs)
+	= gethostbyaddr (inet_aton ($addr), AF_INET);
+    $hostname || "[".$addr."]";
+}
+
+sub usage () {
+  die "usage: $0 host [community]";
+}

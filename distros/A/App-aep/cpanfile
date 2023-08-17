@@ -1,6 +1,16 @@
-requires    'perl' => '5.010001';
+requires    'perl' => '1.028';
+requires    'Carton' => '1.0.35';
+requires    'App::cpanminus' => '1.7044';
+requires    'POE' => '1.368';
+requires    'POE::Session::PlainCall' => '0.0301';
+requires    'POE::Wheel::Run';
+requires    'POE::Wheel::SocketFactory';
+requires    'POE::Filter::Reference';
+requires    'POE::Filter::JSONMaybeXS';
+requires    'POE::Filter::Stackable';
+requires    'POE::Filter::Line';
+requires    'Try::Tiny';
+requires    'Carp';
 requires    'YAML::XS';
 requires    'Getopt::Long::Descriptive';
-requires    'POE';
-requires    'POE::Filter::Reference';
-requires    'POE::Wheel::Run';
+

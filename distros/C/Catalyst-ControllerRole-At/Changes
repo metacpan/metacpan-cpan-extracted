@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::ControllerRole::At
 
+0.008   15 July 2023
+        - Added aliases for HTTP methods: Get, Post, Put, Patch, Delete,
+          Options, Head.
+
 0.007   07 April 2023
         - Allow quotes in Via (Both Via(root) and Via('root') should
         work as expected).  Tests included.

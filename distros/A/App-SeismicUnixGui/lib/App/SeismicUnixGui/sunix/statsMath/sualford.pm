@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::statsMath::sualford;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

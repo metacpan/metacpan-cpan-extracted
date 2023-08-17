@@ -1453,6 +1453,10 @@ sub DistinctQuery {
     my $self = shift;
     my $statementref = shift;
     my $sb = shift;
+    my %args = (
+        Wrap => 0,
+        @_
+    );
 
     my $QueryHint = $sb->QueryHint;
     $QueryHint = $QueryHint ? " /* $QueryHint */ " : " ";
@@ -1460,6 +1464,9 @@ sub DistinctQuery {
     # Prepend select query for DBs which allow DISTINCT on all column types.
     $$statementref = "SELECT" . $QueryHint . "DISTINCT main.* FROM $$statementref";
     $$statementref .= $sb->_GroupClause;
+    if ( $args{'Wrap'} ) {
+        $$statementref = "SELECT * FROM ($$statementref) main";
+    }
     $$statementref .= $sb->_OrderClause;
 }
 
@@ -1475,18 +1482,21 @@ sub DistinctQueryAndCount {
     my $statementref = shift;
     my $sb = shift;
 
-    $self->DistinctQuery($statementref, $sb);
+    # order by clause should be on outer most query
+    # SQL standard: ORDER BY command cannot be used in a Subquery
+    # mariadb explanation: https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/
+    # pg: actually keeps order of a subquery as long as some conditions in outer query are met, but
+    #     it's just a coincidence, not a feature
+    # SQL server: https://learn.microsoft.com/en-us/sql/t-sql/queries/select-order-by-clause-transact-sql?view=sql-server-ver16
+    #             The ORDER BY clause is not valid in views, ... and *subqueries*, unless ...
 
-    # Add the count part.
-    if ( $sb->_OrderClause !~ /(?<!main)\./ ) {
-        # Wrap it with another SELECT to get distinct count.
-        $$statementref
-            = 'SELECT main.*, COUNT(main.id) OVER() AS search_builder_count_all FROM (' . $$statementref . ') main';
-    }
-    else {
-        # if order by other tables, then DistinctQuery already has an outer SELECT, which we can reuse
-        $$statementref =~ s!(?= FROM)!, COUNT(main.id) OVER() AS search_builder_count_all!;
-    }
+    my $order = $sb->_OrderClause;
+    my $wrap = $order !~ /(?<!main)\./;
+
+    $self->DistinctQuery($statementref, $sb, Wrap => $wrap);
+
+    # DistinctQuery already has an outer SELECT, which we can reuse
+    $$statementref =~ s!(?= FROM)!, COUNT(main.id) OVER() AS search_builder_count_all!;
 }
 
 

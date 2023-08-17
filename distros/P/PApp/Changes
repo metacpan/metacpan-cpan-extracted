@@ -2,6 +2,26 @@ Revision history for Perl extension PApp
 
 TODO: more xs for _obj_member_add
 
+2.3  Thu 03 Aug 2023 00:27:34 CEST
+	- Agni::agni_exec would local'ize $PApp::NOW, which would incorrectly
+          disassociate from any imported versions.
+	- use sessionid to strengthen crypto check for state keys.
+        - PApp::SCGI::Worker destroys and recreates the EV default loop. That's
+          a bit dirty, but there is no way to save and restore a signal handler in
+          pure perl, so the alternatives seem all worse.
+	- PApp::SCGI: run PApp handler in a Coro thread instead
+          of in an event handler, to allow handlers to block.
+        - PApp::SCGI: allow exit code to be provided by overwriting
+          $PApp::SCGI::Worker::WORKER_EXIT.
+	- PApp::SCGI: slight performance optimisations for papp-scgid.
+        - PApp::CGI warns did not print a trailing newline.
+        - add HTTP_AUTHORIZATION header suppoort to PApp::CGI.
+        - PApp::XSQL::Sablotron marked as deprecated.
+        - PApp::XSQL::Sablotron now increases Coro's cctx stack because
+          sablotron uses a lot of stack space.
+        - setting environment variable PAPP_INSTALL_SKIP_CONFIG=1 will skip
+          config installation and questions during make install.
+
 2.2  Mon Feb 17 11:20:25 CET 2020
 	- greatly improved papp-scgid implementation and worker management.
 	- rewrite PApp::SCGI implementation.
@@ -278,7 +298,7 @@ last_1x_version Sun May 20 02:08:56 CEST 2012
         - PApp::Event now saves/restores the DBH.
 
 0.142 Tue Apr 16 19:17:14 CEST 2002
-        - removed first sublink and suburl argument 
+        - removed first sublink and suburl argument
 	- WARNING: You need to either re-run papp-install, or
           run "alter table papp.grp add unique key (name)" before using this
           version.

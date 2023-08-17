@@ -513,6 +513,7 @@ $Data{'language'}{'iana'}{'orig'}{'name'} = {
    "Juǀʼhoansi"                                    => "Ju|'hoansi",
    "Meänkieli"                                      => "Meankieli",
    "Lengua de señas Albarradas"                     => "Lengua de senas Albarradas",
+   "Língua Gestual Guineense"                      => "Lingua Gestual Guineense",
 };
 
 $Data{'language'}{'iana'}{'ignore'} = {

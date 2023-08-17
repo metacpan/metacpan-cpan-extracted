@@ -1,7 +1,56 @@
 package Catalyst::ControllerRole::At;
 
 use Moose::Role;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
+
+sub _parse_Get_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'GET';
+  return %attributes;
+}
+
+sub _parse_Post_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'POST';
+  return %attributes;
+}
+
+sub _parse_Put_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'PUT';
+  return %attributes;
+}
+
+sub _parse_Delete_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'DELETE';
+  return %attributes;
+}
+
+sub _parse_Head_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'HEAD';
+  return %attributes;
+}
+
+sub _parse_Options_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'OPTIONS';
+  return %attributes;
+}
+
+sub _parse_Patch_attr {
+  my ($self, $app, $action_subname, $value) = @_;
+  my %attributes = $self->_parse_At_attr($app, $action_subname, $value);
+  $attributes{Method} = 'PATCH';
+  return %attributes;
+}
 
 sub _parse_At_attr {
   my ($self, $app, $action_subname, $value) = @_;
@@ -19,6 +68,9 @@ sub _parse_At_attr {
     '$action' => '/' . join('/', @controller_path_parts, $action_subname),
     '$affix' =>  '/' . ($affix||''),
   );
+
+  $expansions{'$path_prefix'} = $expansions{'$controller'}; # Backwards compatibility
+  $expansions{'$path_end'} = $expansions{'$affix'}; # Backwards compatibility
 
   $value = ($value||'') . '';
   my ($path, $query) = ($value=~/^([^?]*)\??(.*)$/);
@@ -124,6 +176,10 @@ Catalyst::ControllerRole::At - A new approach to building Catalyst actions
     sub list   :At($action?{q:Str}) { ... }       # http://localhost/user/list?q=$string
 
     sub find   :At($controller/{id:Int}) { ... }  # http://localhost/user/$integer
+
+    # Define an action with an HTTP Method match at the same time
+
+    sub update :Get($controller/{id:Int}) { ... } # GET http://localhost/user/$integer
 
     __PACKAGE__->meta->make_immutable;
 
@@ -300,6 +356,13 @@ example:
 
 =head2 Expansion Variables in your Path
 
+B<NOTE> Over the years since this role was first written I have found in general that
+these expansions seem to add more confusion then they are worth.  I find I really don't
+need them.  Your results may vary.  I won't remove them for back compat reasons, but
+I recommend using them sparingly.  '$affix' appears to have some value but the name isn't
+very good.  I Added an alias '$path_end' which is slightly better I think.   Recommendations
+welcomed.
+
 Generally you would prefer not to hardcode the full path of your actions, as in the
 examples given so far.  General Catalyst best practice is to have your actions live
 under the namespace of the controller in which they are defined.  That makes things
@@ -308,6 +371,7 @@ to make this and other common action template patterns easier, we support the fo
 variable expansions in your URL template specification:
 
     $controller: Your controller namespace (as an absolute path)
+    $path_prefix: Alias for $controller
     $action: The action namespace (same as $controller/$name)
     $up: The namespace of the controller containing this controller
     $name The name of your action (the subroutine name)
@@ -623,6 +687,41 @@ With an action execution flow as follows:
       /thingstodo/init
         /thingstodo/item/init
         /thingstodo/item/delete
+
+=head2 Method Shortcuts
+
+Its common today to want to be able to match a URL to a specific HTTP method.  For example
+you might want to match a GET request to one action and a POST request to another.  L<Catalyst>
+offers the C<Method> attribute as well as shortcuts: C<GET>, C<POST>, C<PUT>, C<DELETE>, C<HEAD>,
+C<OPTIONS>.  To tidy your method declarations you can use C<Get>, C<Post>, C<Put>, C<Delete>, C<Head>,
+C<Options> in place of C<At>:
+
+    package MyApp::Controller::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+    with 'Catalyst::ControllerRole::At';
+
+    sub get :Get($controller/...) { ... }
+    sub post :Post($controller/...) { ... }
+    sub put :Put($controller/...) { ... }
+    sub delete :Delete($controller/...) { ... }
+    sub head :Head($controller/...) { ... }
+    sub options :Options($controller/...) { ... }
+
+    __PACKAGE__->meta->make_immutable;
+
+Basically:
+
+    sub get :Get($controller/...) { ... }
+
+Is the same as:
+
+    sub get :GET At($controller/...) { ... }
+
+You may find the few characters saved worth it or not.   The choice is yours.
 
 =head1 COOKBOOK
 

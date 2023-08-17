@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2015, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2023 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -46,9 +46,9 @@ App::Chart::setup_source_help
   ($pred, __p('manual-node','Thrift Savings Plan'));
 
 App::Chart::FinanceQuote->setup (pred => $pred,
-                                suffix => '.TSP',
-                                modules => ['TSP'],
-                                method => 'tsp');
+                                 suffix => '.TSP',
+                                 modules => ['TSP'],
+                                 method => 'tsp');
 
 
 #------------------------------------------------------------------------------
@@ -68,25 +68,43 @@ App::Chart::Weblink->new
 #-----------------------------------------------------------------------------
 # download
 #
-# This uses the historical prices page:
+# This uses the historical prices page
+#     https://www.tsp.gov/share-price-history/
+#
+# The site won't even speak to you without a right User-Agent header.
+# This is recent site breakage, as it was happy with anything in the past.
+# Here follow Finance::Quote::TSP which uses the following,
+#
+use constant TSP_USER_AGENT => 
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36';
+#
+# The download button is URL parameters after a base:
 #
 use constant TSP_SHARE_PRICES_URL =>
-  'https://www.tsp.gov/InvestmentFunds/FundPerformance/index.html';
+  'https://www.tsp.gov/data/fund-price-history.csv';
 #
-# The CSV format is a POST like (buried in some flamin javascript)
+# The parameters on the page are buried in some unhelpful script, eg.
+# 
+#     https://www.tsp.gov/data/fund-price-history.csv?startdate=$2023-01-01&enddate=2023-02-01&Lfunds=1&InvFunds=1&download=1
 #
+# The check boxes select individual funds for the display but seem to have
+# effect on the download, so the download gets all funds at once, in the
+# date range.
+#
+# Seems no limit to the size of the date range.  In the past there it was 30
+# days per request (and had made it 20 business days here).  Data used to go
+# back to 2003-06-02.
+#
+# --------
+#   Old POST:
+#   https://www.tsp.gov/InvestmentFunds/FundPerformance/index.html
 #   reloaded=1&startdate=04%2F27%2F2015&enddate=06%2F02%2F2015&fundgroup=L2020&fundgroup=G&fundgroup=C&whichButton=CSV
-#
-# In the past the data on each request was limited to 30 days at time, but
-# there seems no limit now.  Data used to go back to 2003-06-02.
 #
 #   Old POST:
 #   startdate=20030801&enddate=20031128&submit=Retrieve+Share+Prices&prev=0&next=30&whichButton=CSV
 # 
 #   Old page (now 403 redirects):
 #   https://www.tsp.gov/investmentfunds/shareprice/sharePriceHistory.shtml
-
-use constant CHUNK_SIZE => 20;
 
 App::Chart::DownloadHandler->new
   (name            => __('TSP'),
@@ -141,23 +159,18 @@ sub get_chunk {
 
   my ($lo_year, $lo_month, $lo_day) = App::Chart::tdate_to_ymd ($lo_tdate);
   my ($hi_year, $hi_month, $hi_day) = App::Chart::tdate_to_ymd ($hi_tdate);
-  my $startdate = sprintf "%02d/%02d/%04d", $lo_month, $lo_day, $lo_year;
-  my $enddate   = sprintf "%02d/%02d/%04d", $hi_month, $hi_day, $hi_year;
-  my $fundgroups = join('', map {
-    my $symbol = App::Chart::symbol_sans_suffix($_);
-    if ($symbol eq 'LINCOME') { $symbol = 'Linc'; }
-    "&fundgroup=$symbol"
-  } @$symbol_list);
+  my $startdate = sprintf "%04d-%02d-%02d", $lo_year, $lo_month, $lo_day;
+  my $enddate   = sprintf "%04d-%02d-%02d", $hi_year, $hi_month, $hi_day;
 
   return App::Chart::Download->get
-    (TSP_SHARE_PRICES_URL,
-     method => 'POST',
-     data => "reloaded=1&startdate=$startdate&enddate=$enddate$fundgroups&whichButton=CSV");
+    (TSP_SHARE_PRICES_URL
+     . "?startdate=$startdate&enddate=$enddate&Lfunds=1&InvFunds=1&download=1",
+     user_agent => TSP_USER_AGENT);
 }
 
 # $resp is a HTTP::Response object, return a hashref of data
 sub parse {
-  my ($resp) = @_;
+  my ($resp, $symbol_list) = @_;
 
   # From 1 Jul 2008 prices are 4 decimal places, and old data is padded with
   # zeros.  Could prefer_decimals to strip them, but may as well leave at
@@ -188,14 +201,15 @@ sub parse {
                    "\U$symbol.TSP" }
     @symbols;
   ### @symbols
-
-  my @names = map {symbol_to_name($_)} @symbols;
+  $symbol_list //= \@symbols;
+  my %symbol_list = map {$_ => 1} @$symbol_list;
 
   foreach my $line (@lines) {
     my ($date, @prices) = split /,/, $line;
     foreach my $c (0 .. $#prices) {
-      push @data, { symbol => $symbols[$c],
-                    name   => $names[$c],
+      my $symbol = $symbols[$c];
+      next unless exists $symbol_list{$symbol};
+      push @data, { symbol => $symbol,
                     date   => $date,
                     close  => $prices[$c],
                   };
@@ -209,26 +223,27 @@ sub parse {
   return $h;
 }
 
-# $symbol is like "L2050.TSP", return a name from the table in
-# Finance::Quote::TSP, or undef if unknown.  The names table there is not a
-# documented feature, so guard with an eval.
-#
-sub symbol_to_name {
-  my ($symbol) = @_;
-  # eg. "TSPL2050" or "TSPGFUND"
-  $symbol = 'TSP'.App::Chart::symbol_sans_suffix($symbol);
-  return eval {
-    require Finance::Quote::TSP;
-    $Finance::Quote::TSP::TSP_FUND_NAMES{$symbol}
-      || $Finance::Quote::TSP::TSP_FUND_NAMES{$symbol.'FUND'}
-  };
-}
-
 1;
 __END__
 
 
 
+# Finance::Quote::TSP no longer has a %TSP_FUND_NAMES table.
+#
+# # $symbol is like "L2050.TSP", return a name from the table in
+# # Finance::Quote::TSP, or undef if unknown.  The names table there is not a
+# # documented feature, so guard with an eval.
+# #
+# sub symbol_to_name {
+#   my ($symbol) = @_;
+#   # eg. "TSPL2050" or "TSPGFUND"
+#   $symbol = 'TSP'.App::Chart::symbol_sans_suffix($symbol);
+#   return eval {
+#     require Finance::Quote::TSP;
+#     $Finance::Quote::TSP::TSP_FUND_NAMES{$symbol}
+#       || $Finance::Quote::TSP::TSP_FUND_NAMES{$symbol.'FUND'}
+#   };
+# }
 
 
 

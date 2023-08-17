@@ -10,7 +10,7 @@ use HTTP::Tiny;
 use List::Util qw(first);
 use namespace::clean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has repo_root => (
   is         => 'ro',
@@ -43,7 +43,7 @@ sub before_release {
   # time when you ran the build.
   my $per_page = 50;
   my $page     = 1;
-  my $http     = HTTP::Tiny->new;
+  my $http     = HTTP::Tiny->new(verify_SSL => 1);
   $self->log_debug("Checking GitHub Actions for successful run of $head_sha");
   while (1) {
     my $url = $self->api . "/repos/$repo_name/actions/runs?per_page=$per_page&page=$page";

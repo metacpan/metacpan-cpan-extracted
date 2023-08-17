@@ -1,0 +1,16 @@
+.editorconfig
+Build.PL
+Changes
+lib/Object/Pad/FieldAttr/Checked.pm
+lib/Object/Pad/FieldAttr/Checked.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01checked.t
+t/02checked+weak.t
+t/10types-standard.t
+t/20croak-apply.t
+t/99pod.t

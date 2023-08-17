@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCellRequest.name :   ,
-# GetWorksheetCellRequest.sheetName :   ,
-# GetWorksheetCellRequest.cellOrMethodName :   ,
-# GetWorksheetCellRequest.folder :   ,
-# GetWorksheetCellRequest.storageName :    
+# GetWorksheetCellRequest.name : Document name.  ,
+# GetWorksheetCellRequest.sheetName : The worksheet name.  ,
+# GetWorksheetCellRequest.cellOrMethodName : The cell`s or method name. (Method name like firstcell, endcell etc.)  ,
+# GetWorksheetCellRequest.folder : Document`s folder.  ,
+# GetWorksheetCellRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_cell' } = { 
-    	summary => '',
+    	summary => 'Gets cell data by cell or method name in worksheet.',
         params => $params,
         returns => 'string',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'Document name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_or_method_name' => {
      	datatype => 'string',
      	base_name => 'cellOrMethodName',
-     	description => '',
+     	description => 'The cell`s or method name. (Method name like firstcell, endcell etc.)',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Document`s folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

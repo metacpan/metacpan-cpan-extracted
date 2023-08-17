@@ -1,0 +1,10 @@
+0.002   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Bencher-Scenarios-{DateTimeFormatDurationISO8601,DateTime-Format-
+          Duration-ISO8601}.
+
+
+0.001   2018-07-15  Released-By: PERLANCAR
+
+        - First release.

@@ -843,9 +843,9 @@ sub get_good_sunix_params {
 		$first = $sunix_pl->{_start_prog_lines}[$prog_count];
 		$last  = $sunix_pl->{_end_prog_lines}[$prog_count];
 
-		# print("1. sunix_pl, get_good_sunix_params, prog num: $prog_count, name: $all_prog_names[$prog_count]\n");
-		# print("sunix_pl, get_good_sunix_params,first line : $first\n");
-		# print("sunix_pl, get_good_sunix_params,last line : $last\n");
+#		print("1. sunix_pl, get_good_sunix_params, prog num: $prog_count, name: $all_prog_names[$prog_count]\n");
+#		print("sunix_pl, get_good_sunix_params,first line : $first\n");
+#		print("sunix_pl, get_good_sunix_params,last line : $last\n");
 
 		# monotonically increasing line numbers are an error check
 		if ( $last >= $first ) {
@@ -891,7 +891,7 @@ sub get_good_sunix_params {
 			my @labels = ();
 			my ( $line1, $line2 );
 
-#			print(" 893: sunix_pl,get_good_sunix_params_values,line:--$line\n");
+			# print(" 893: sunix_pl,get_good_sunix_params_values,line:--$line\n");
 
 			# from start ^ to end $ of the string
 			# matches label names, e.g., ->(agc) with
@@ -989,7 +989,7 @@ sub get_good_sunix_params {
 				$label_index++;
 
 				# if($values[0]) { print("1. sunix_pl,get_good_sunix_params,values[0]:--$values[0]--\n")};
-				#
+				# if($labels[0]) { print("1. sunix_pl,get_good_sunix_params,labels[0]:--$labels[0]--\n")};
 				# print("1. sunix_pl,get_good_sunix_params,values_holder:--@values_holder\n");
 				# print("1. sunix_pl,get_good_sunix_params,values_holder:--@values_holder----prog_count:$prog_count\n");
 			} else {
@@ -997,7 +997,7 @@ sub get_good_sunix_params {
 			}
 
 			# USER ERRORS
-			# CASE 1 : label that is not 'clear' and  is empty
+			# CASE 1 : label that is not 'clear' but is is empty
 			# print("1. sunix_pl,get_good_sunix_params,labels[0]:--$labels[0]--\n");
 			if ( $labels[0] ne 'clear'
 				and ( !$labels[0] or $labels[0] eq $empty_string ) ) {

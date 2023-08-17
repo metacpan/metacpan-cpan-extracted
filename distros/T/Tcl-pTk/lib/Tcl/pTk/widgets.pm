@@ -26,9 +26,11 @@ I<Tcl::pTk::widget> is a module for loading multiple widgets, without having to 
 
 
 package Tcl::pTk::widgets;
+use warnings;
+use strict;
 use Carp;
 
-our ($VERSION) = ('1.10');
+our ($VERSION) = ('1.11');
 
 sub import
 {
@@ -37,6 +39,7 @@ sub import
   {
    local $SIG{__DIE__} = \&Carp::croak;
    # carp "$_ already loaded" if (exists $INC{"Tk/$_.pm"});
+   next if ref $$Tcl::pTk::Widget::_ptk2tcltk{$_} eq 'ARRAY';
    require "Tcl/pTk/$_.pm";
   }
 }

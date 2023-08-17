@@ -68,7 +68,9 @@ Options for the referenced hash include:
 =item B<-hidden> => 1 | 0 
 
 Specifies whether or not the entry should be visible or hidden:  (0 (false) 
-for visible, 1 (true) for hidden).  Default:  0 - visible.
+for visible, 1 (true) for hidden).
+
+Default:  B<0> (visible).
 
 =item B<-indicatoritemtype> => ['text' | 'image' | 'imagetext']
 
@@ -87,15 +89,17 @@ specified in the entry).
 =item B<-itemtype> => ['text' | 'image' | 'imagetext']
 
 Specifies the type of display item of this entry.  Can be 
-I<"text">, I<"image">, or I<"imagetext">.  Default:  Whatever is specified, if 
-anything, for the widget, (see B<-itemtype> under B<WIDGET OPTIONS> below).  
-If not specified there, then the default is I<"text">, though I<"imagetext"> 
-allows for either or both an image or text.
+I<"text">, I<"image">, or I<"imagetext">.
+
+Default:  Whatever is specified, if anything, for the widget, (see B<-itemtype> 
+under B<WIDGET OPTIONS> below).  If not specified there, then the default is 
+I<"text">, though I<"imagetext"> allows for either or both an image or text.
 
 =item B<-textanchor> => ['n', 's', 'e', 'w']
 
-Side of text the IMAGE is displayed on.  Default: I<'w'> (West / left, ie. 
-image before text)
+Side of text the IMAGE is displayed on.
+
+Default: I<'w'> (West / left, ie. image before text)
 
 =item B<-style> => $ImageStyleObject
 
@@ -142,7 +146,7 @@ the text cursor is on).  This entry is also shown with a hashed box around it.
 The "activebackground" color, however, is always fixed as the same color as the 
 the widget's background.  
 
-Default:  same color as the widget's foreground color.
+Default:  Same color as the widget's foreground color.
 
 =item Name:	B<browsecmd>
 
@@ -167,7 +171,7 @@ entry by double-clicking it or pressing the Return key.
 
 The amount of space between the image and text in rows that have both.
 
-Default: 4 (pixels)
+Default: B<4> (pixels)
 
 =item Name:	B<height>
 
@@ -208,7 +212,7 @@ Subroutine reference to be invoked when an indicator image is clicked.
 Specify horizontal padding style in pixels around the image 
 for the rows in the listbox which are type I<image> or I<imagetext>.
 
-Default:  B<0>
+Default:  B<0> (no padding added)
 
 =item Name: B<-ipady>
 
@@ -216,7 +220,8 @@ Specify vertical padding style in pixels around the image
 for the rows in the listbox which are type I<image> or I<imagetext>.
 NOTE:  This changes the height of the affected rows.
 
-Default:  B<1> (and setting to B<0> is the same as B<1>).
+Default:  B<1> (pixels added to both top and bottom, and setting to B<0> 
+is the same as B<1>).
 
 =item Name:	B<itemType>
 
@@ -225,8 +230,10 @@ Default:  B<1> (and setting to B<0> is the same as B<1>).
 =item Switch:	B<-itemtype>
 
 Specifies the default type of display item.  Can be "text", "image", or 
-"imagetext".  The default is "text", though "imagetext" allows for either 
-or both an image or text.
+"imagetext".
+
+Default:  B<"text">, though I<"imagetext"> allows for either or both an image 
+or text.
 
 =item Name:	B<listVariable>
 
@@ -252,7 +259,7 @@ has done: "tie @listvariable, 'Tk::HListbox', $HListboxwidget,
 
 Specifies an alternate background color for item(s) currently "selected".  
 
-Default:  a slightly brighter shade of the widget's current background color.
+Default:  A slightly brighter shade of the widget's current background color.
 
 =item Name:	B<selectForeground>
 
@@ -262,7 +269,7 @@ Default:  a slightly brighter shade of the widget's current background color.
 
 Specifies an alternate foreground color for item(s) currently "selected".
 
-Default:  the widget's current foreground color.
+Default:  The widget's current foreground color.
 
 =item Name:	B<selectMode>
 
@@ -318,7 +325,7 @@ the keyboard focus.
 Specify horizontal padding style in pixels around the text for the rows in 
 the listbox which are type I<text>.
 
-Default:  B<2>
+Default:  B<2> (pixels - added to both left and right side)
 
 =item Name: B<-tpady> => I<number>
 
@@ -441,7 +448,8 @@ that are not visible.
 
 Returns a list containing the numerical indices of all of the elements in the 
 HListbox that are currently selected.  If there are no elements selected in 
-the listbox then an empty list is returned.
+the listbox then an empty list is returned.  This method is the complement 
+(opposite) of I<selectionSet()> in functionality.
 
 NOTE:  Not supported by I<Tk::HList>.
 
@@ -631,6 +639,8 @@ the index of the (visible) listbox element nearest to the B<I<index>>.
 If there is no visible bounding box associated with the 
 zero-based B<I<index>>, then I<undef> is returned.
 
+NOTE:  Not supported by I<Tk::HList> or I<Tk::Listbox>.
+
 =item I<$listbox>-E<gt>B<scan>(I<option, >?I<arg(s), ...>?)
 
 This command is used to implement scanning on listboxes.  It has two forms, 
@@ -715,7 +725,8 @@ I<curselection()> method provided both here and in I<Tk::Listbox>.
 
 Selects all of the elements in the range between 
 I<first-index> and I<last-index>, inclusive, without affecting 
-the selection state of elements outside that range.
+the selection state of elements outside that range.  This is the complement 
+(opposite) of I<curselection()> in functionality.
 
 NOTE:  Prior to v2.7, if more than two indices were passed 
 to I<selectionSet()>, then the element of each index in the list 
@@ -802,7 +813,7 @@ appears at the top of the window.  I<Fraction> is a fraction between 0 and 1;
 0 indicates the first element in the listbox, 0.33 indicates the element 
 one-third the way through the listbox, and so on.
 
-=item I<$listbox>-E<gt>B<yviewScroll>( I<number, what> );
+=item I<$listbox>-E<gt>B<yviewScroll>(I<number, what>);
 
 This command adjusts the view in the window up or down according to I<number> 
 and I<what>.  I<Number> must be an integer.  I<What> must be either B<units> 
@@ -1285,7 +1296,7 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed $DEFAULTFONT);
-$VERSION = '2.70';
+$VERSION = '2.71';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1363,6 +1374,8 @@ sub Populate {
 			-activeforeground => [qw/METHOD activeForeground ActiveForeground/, undef],
 			-selectforeground => [qw/METHOD selectForeground SelectForeground/, undef],
 			-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, undef],
+			#HList's DEFAULT HIGHLIGHTTHICKNESS IS 2, WE WANT IT 1 (LIKE Listbox) FOR PROPER ALIGNMENT!:
+			-highlightthickness => [['SELF', 'DESCENDANTS'], qw/highlightThickness HighlightThickness/, 1],
 			-updatecommand => ['CALLBACK'],
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],

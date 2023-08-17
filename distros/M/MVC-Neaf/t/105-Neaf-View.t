@@ -4,14 +4,17 @@ use strict;
 use warnings;
 use Test::More;
 use MVC::Neaf::Util qw(JSON encode_json decode_json);
+use Cwd qw(abs_path);
+use File::Basename qw(dirname);
 
 use MVC::Neaf::View;
 use MVC::Neaf::View::TT;
 use MVC::Neaf::View::JS;
 
 my $tt = MVC::Neaf::View::TT->new(
-    INCLUDE_PATH => ".",
-    POST_CHOMP => 1,
+    neaf_base_dir   => abs_path(dirname(__FILE__)),
+    INCLUDE_PATH    => ".",
+    POST_CHOMP      => 1,
 );
 
 eval {

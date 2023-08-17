@@ -1,5 +1,6 @@
 Changes
 clib/CMakeLists.txt
+clib/FetchDeps.cmake
 clib/panda-protocol-websocket-config.cmake
 clib/src/panda/protocol/websocket.h
 clib/src/panda/protocol/websocket/ClientParser.cc
@@ -83,6 +84,7 @@ lib/Protocol/WebSocket/Fast/Parser.pod
 lib/Protocol/WebSocket/Fast/ServerParser.pm
 lib/Protocol/WebSocket/Fast/ServerParser.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/bench.plx

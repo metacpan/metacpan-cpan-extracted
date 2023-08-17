@@ -24,25 +24,9 @@ no_index:
     - t
     - inc
 requires:
-  APR::Base64: '0'
-  APR::Pool: '0'
-  APR::Request::Apache2: '0'
-  APR::Request::Cookie: '0'
-  APR::Socket: '0'
-  APR::UUID: '0'
-  Apache2::Connection: '0'
-  Apache2::Const: '0'
-  Apache2::Log: '0'
+  Apache2::API: v0.1.1
   Apache2::Reload: '0'
-  Apache2::Request: '0'
-  Apache2::RequestIO: '0'
-  Apache2::RequestRec: '0'
-  Apache2::RequestUtil: '0'
-  Apache2::Response: '0'
-  Apache2::ServerUtil: '0'
-  Apache2::SubRequest: '0'
   Compress::Raw::Zlib: '2.091'
-  Cookie::Baker: '0'
   Crypt::AuthEnc::GCM: '0.064'
   Crypt::KeyWrap: '0.024'
   Crypt::Mac::HMAC: '0.064'
@@ -50,28 +34,23 @@ requires:
   Crypt::PK::ECC: '0.064'
   Crypt::PK::RSA: '0.064'
   Crypt::PRNG: '0.064'
-  DateTime: '0'
   Devel::Confess: '0'
-  Encode: '3.01'
-  HTTP::AcceptLanguage: '0.02'
-  IO::File: '0'
   JSON: '0'
   MIME::Base64: '3.15'
-  Module::Generic: v0.29.3
+  Module::Generic: v0.30.5
   Nice::Try: v1.3.1
   Regexp::Common: '0'
   Scalar::Util: '0'
   URI: '0'
-  URI::Escape: '3.31'
-  URI::Query: '0.16'
   common::sense: '0'
   curry: '1.001000'
   parent: '0'
   perl: '5.006000'
   strict: '0'
+  utf8: '0'
   version: '0'
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Net-API-REST/issues
   repository: https://gitlab.com/jackdeguest/Net-API-REST
-version: v0.8.1
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

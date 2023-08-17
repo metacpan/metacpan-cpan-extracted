@@ -12,6 +12,7 @@ lib/TableData/AOH.pm
 lib/TableData/DBI.pm
 lib/TableData/Munge/Concat.pm
 lib/TableData/Munge/Filter.pm
+lib/TableData/Munge/MungeColumns.pm
 lib/TableData/Munge/Reverse.pm
 lib/TableData/Sample/DeNiro.pm
 lib/TableData/Test/Source/AOA.pm
@@ -24,6 +25,7 @@ lib/TableData/Test/Source/DBI.pm
 lib/TableData/Test/Source/Iterator.pm
 lib/TableDataRole/Munge/Concat.pm
 lib/TableDataRole/Munge/Filter.pm
+lib/TableDataRole/Munge/MungeColumns.pm
 lib/TableDataRole/Munge/Reverse.pm
 lib/TableDataRole/Source/AOA.pm
 lib/TableDataRole/Source/AOH.pm

@@ -23,11 +23,11 @@ my $meta = {
                             requires   => {
                                             "Array::IntSpan"           => 0,
                                             "Feature::Compat::Class"   => 0.04,
-                                            "List::SomeUtils"          => 0,
+                                            "List::Util"               => 1.45,
                                             "Log::Any"                 => 0,
                                             "namespace::clean"         => 0,
                                             "Path::Tiny"               => 0.062,
-                                            "perl"                     => "5.012000",
+                                            "perl"                     => "5.020000",
                                             "Regexp::Pattern"          => "v0.2.12",
                                             "Regexp::Pattern::License" => "v3.4.0",
                                           },
@@ -43,10 +43,10 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "String::License"                 => { file => "lib/String/License.pm", version => "v0.0.5" },
-                          "String::License::Naming"         => { file => "lib/String/License/Naming.pm", version => "v0.0.5" },
-                          "String::License::Naming::Custom" => { file => "lib/String/License/Naming/Custom.pm", version => "v0.0.5" },
-                          "String::License::Naming::SPDX"   => { file => "lib/String/License/Naming/SPDX.pm", version => "v0.0.5" },
+                          "String::License"                 => { file => "lib/String/License.pm", version => "v0.0.9" },
+                          "String::License::Naming"         => { file => "lib/String/License/Naming.pm", version => "v0.0.9" },
+                          "String::License::Naming::Custom" => { file => "lib/String/License/Naming/Custom.pm", version => "v0.0.9" },
+                          "String::License::Naming::SPDX"   => { file => "lib/String/License/Naming/SPDX.pm", version => "v0.0.9" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -61,8 +61,8 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/String-License/project",
                         },
-  "version"          => "v0.0.5",
-  "x_help_wanted"    => ["tester", "documenter"],
+  "version"          => "v0.0.9",
+  "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };
 

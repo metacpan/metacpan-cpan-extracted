@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Full;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message::Field';
 
@@ -122,11 +122,13 @@ sub unfoldedBody($;$)
     }
 
     $body = $self->foldedBody;
-    $body =~ s/^ //;
 
-	# remove FWS, also required within quoted strings.
-    $body =~ s/\r?\n\s?/ /g;
-    $body =~ s/ +$//;
+    for($body)
+    {   s/\r?\n(\s)/$1/g;
+        s/\r?\n/ /g;
+        s/^\s+//;
+        s/\s+$//;
+    }
     $body;
 }
 
@@ -362,7 +364,7 @@ sub consumePhrase($)
     if($string =~ s/^\s*\" ((?:[^"\r\n\\]*|\\.)*) (?:\"|\s*$)//x )
     {   ($phrase = $1) =~ s/\\\"/"/g;
     }
-    elsif($string =~ s/^\s*((?:\=\?.*\?\=|[${atext}${atext_ill}\ \t.])+)//o )
+    elsif($string =~ s/^\s*((?:\=\?.*?\?\=|[${atext}${atext_ill}\ \t.])+)//o )
     {   ($phrase = $1) =~ s/\s+$//;
         CORE::length($phrase) or undef $phrase;
     }
@@ -375,23 +377,32 @@ sub consumePhrase($)
 
 sub consumeComment($)
 {   my ($thing, $string) = @_;
+    # Backslashes are officially not permitted in comments, but not everyone
+    # knows that.  Nested parens are supported.
 
     return (undef, $string)
-        unless $string =~ s/^\s*\(((?:[^)\\]+|\\.)*)\)//;
+        unless $string =~ s/^\s* \( ((?:\\.|[^)])*) (?:\)|$) //x;
+        # allow unterminated comments
 
     my $comment = $1;
+
+    # Continue consuming characters until we have balanced parens, for
+    # nested comments which are permitted.
     while(1)
     {   (my $count = $comment) =~ s/\\./xx/g;
+        last if +( $count =~ tr/(// ) == ( $count =~ tr/)// );
 
-        last if $count =~ tr/(//  ==  $count =~ tr/)//;
-
-        return (undef, $_[1])
-            unless $string =~ s/^((?:[^)\\]+|\\.)*)\)//;
+        last if $string !~ s/^((?:\\.|[^)])*) \)//x;  # cannot satisfy
 
         $comment .= ')'.$1;
     }
 
-    $comment =~ s/\\([()])/$1/g;
+    for($comment)
+    {   s/^\s+//;
+        s/\s+$//;
+        s/\\ ( [()] )/$1/gx; # Remove backslashes before nested comment.
+    }
+
     ($comment, $string);
 }
 

@@ -14,14 +14,9 @@ use Test::More;
 BEGIN {
    
    eval 'require HTML::FormatText';
-
-   if($@)
-   {   plan skip_all => "requires HTML::FormatText.\n";
-       exit 0;
-   }
+   $@ and plan skip_all => "requires HTML::FormatText";
 
    require Mail::Message::Convert::HtmlFormatText;
-   plan tests => 7;
 }
 
 my $html  = Mail::Message::Convert::HtmlFormatText->new;
@@ -80,4 +75,4 @@ is($f->string, <<'EXPECTED');
      * list item 2
 EXPECTED
 
-exit 0;
+done_testing;

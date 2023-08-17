@@ -522,7 +522,7 @@ Revision history for StreamFinder
         - Fix failure to fetch channel art on 
         first episode if given a podcast page; misc. cleanups.
 2.12    2023/03/06
-        - StreamFinder::PodcastAddict - When given a podcast page, refactor to 
+        - StreamFinder::Podchaser - When given a podcast page, refactor to 
         1) avoid a 2nd fetch of the latest episode page if we are able to get 
         all the needed metadata from the podcast page code; and 2) Fix failure 
         to fetch with just a podcast-ID or podcast-ID/episode-ID (without a 
@@ -533,3 +533,5 @@ Revision history for StreamFinder
 2.14    2023/04/20
         - StreamFinder::PodcastAddict - Fix failure to fetch podcasts and
         episodes due to slight changes in their site.
+2.15    2023/07/28
+        - Added StreamFinder::LinkTV to fetch linktv.org video shows.

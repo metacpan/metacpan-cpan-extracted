@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "23.5"
+         "version" : "23.7"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -851,6 +851,15 @@
       "AsposeCellsCloud::Object::BatchConvertRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/BatchConvertRequest.pm"
       },
+      "AsposeCellsCloud::Object::BatchLockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/BatchLockRequest.pm"
+      },
+      "AsposeCellsCloud::Object::BatchProtectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/BatchProtectRequest.pm"
+      },
+      "AsposeCellsCloud::Object::BatchSplitRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/BatchSplitRequest.pm"
+      },
       "AsposeCellsCloud::Object::ColorFilterRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/ColorFilterRequest.pm"
       },
@@ -1211,6 +1220,18 @@
       "AsposeCellsCloud::Request::PostBatchConvertRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostBatchConvertRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostBatchProtectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostBatchProtectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostBatchLockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostBatchLockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostBatchUnlockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostBatchUnlockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostBatchSplitRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetExtractBarcodesRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm"
       },
@@ -1541,6 +1562,9 @@
       "AsposeCellsCloud::Request::PostReverseRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostReverseRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostRepairRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostRepairRequest.pm"
+      },
       "AsposeCellsCloud::Request::PostRotateRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostRotateRequest.pm"
       },
@@ -1739,11 +1763,11 @@
       "AsposeCellsCloud::Request::GetDocumentPropertiesRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetDocumentPropertiesRequest.pm"
       },
-      "AsposeCellsCloud::Request::GetDocumentPropertyRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm"
-      },
       "AsposeCellsCloud::Request::PutDocumentPropertyRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PutDocumentPropertyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::GetDocumentPropertyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm"
       },
       "AsposeCellsCloud::Request::DeleteDocumentPropertyRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentPropertyRequest.pm"
@@ -2119,6 +2143,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "23.5",
+   "version" : "23.7",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

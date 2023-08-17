@@ -1,7 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use 5.020;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -627,7 +628,7 @@ paths:
               required: ['key']
 YAML
 
-  $request = request('GET', 'http://example.com/foo?query1={corrupt json',
+  $request = request('GET', 'http://example.com/foo?query1={corrupt json',  # } to mollify vim
     [ 'Header1' => '{corrupt json' ]);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -787,7 +788,7 @@ YAML
 $openapi_preamble
 paths:
   /foo:
-    get:
+    post:
       requestBody:
         required: true
         content:
@@ -820,6 +821,7 @@ paths:
 YAML
 
   # note: no content!
+  $request = request('POST', 'http://example.com/foo');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -827,8 +829,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody required)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody required)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody required)))->to_string,
           error => 'request body is required but missing',
         },
       ],
@@ -836,7 +838,7 @@ YAML
     'request body is missing',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -844,8 +846,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
           error => 'incorrect Content-Type "text/bloop"',
         },
       ],
@@ -853,7 +855,7 @@ YAML
     'Content-Type not allowed by the schema',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -861,8 +863,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain schema const)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain schema const)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
           error => 'value does not match',
         },
       ],
@@ -870,7 +872,7 @@ YAML
     'us-ascii text can be decoded and matched',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -878,8 +880,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content blOOp/HTml)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content blOOp/HTml)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml)))->to_string,
           error => 'EXCEPTION: unsupported Content-Type "bloop/html": add support with $openapi->add_media_type(...)',
         },
       ],
@@ -898,8 +900,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content blOOp/HTml schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content blOOp/HTml schema not)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)))->to_string,
           error => 'subschema is valid',
         },
       ],
@@ -910,7 +912,7 @@ YAML
 
   $openapi->add_media_type('unknown/*' => sub ($value) { $value });
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'unknown/encodingtype' ], 'binary');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unknown/encodingtype' ], 'binary');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -918,8 +920,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content unknown/encodingtype schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content unknown/encodingtype schema not)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)))->to_string,
           error => 'subschema is valid',
         },
       ],
@@ -931,7 +933,7 @@ YAML
   # this will match against the document at image/*
   # but we have no media-type registry for image/*, only image/jpeg
   $openapi->add_media_type('image/jpeg' => sub ($value) { $value });
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'image/jpeg' ], 'binary');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'image/jpeg' ], 'binary');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -939,8 +941,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content iMAgE/* schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content iMAgE/* schema not)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)))->to_string,
           error => 'subschema is valid',
         },
       ],
@@ -948,7 +950,7 @@ YAML
     'Content-Type header is matched to a wildcard entry in the document, then matched to a media-type implementation',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -957,8 +959,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
         },
       ],
@@ -966,7 +968,7 @@ YAML
     'errors during charset decoding are detected',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
     chr(0xe9).'clair');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -974,7 +976,7 @@ YAML
     'latin1 content can be successfully decoded',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -983,8 +985,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
         },
       ],
@@ -992,7 +994,7 @@ YAML
     'errors during charset decoding are detected',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1001,8 +1003,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed UTF-8 character in JSON string/),
         },
       ],
@@ -1010,8 +1012,8 @@ YAML
     'charset encoding errors in json are decoded in the main decoding step',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
-    '{corrupt json');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+    '{corrupt json'); # } to mollify vim
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -1019,8 +1021,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: \'"\' expected, at character offset 1/),
         },
       ],
@@ -1028,7 +1030,7 @@ YAML
     'errors during media-type decoding are detected',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1036,7 +1038,7 @@ YAML
     'application/json is utf-8 encoded',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1044,7 +1046,7 @@ YAML
     'charset is ignored for application/json',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "foo", "gamma": "o.o"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1053,20 +1055,20 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body/alpha',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json schema properties alpha pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json schema properties alpha pattern)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties alpha pattern)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties alpha pattern)))->to_string,
           error => 'pattern does not match',
         },
         {
           instanceLocation => '/request/body/gamma',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json schema properties gamma const)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json schema properties gamma const)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)))->to_string,
           error => 'value does not match',
         },
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json schema properties)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json schema properties)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties)))->to_string,
           error => 'not all properties are valid',
         },
       ],
@@ -1076,7 +1078,7 @@ YAML
 
 
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "gamma": "'.$disapprove.'"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1091,7 +1093,7 @@ YAML
 $openapi_preamble
 paths:
   /foo:
-    get:
+    post:
       requestBody:
         required: true
         content:
@@ -1099,8 +1101,7 @@ paths:
             schema:
               minLength: 10
 YAML
-
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'unsupported/unsupported' ], '!!!');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unsupported/unsupported' ], '!!!');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -1108,8 +1109,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content */* schema minLength)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content */* schema minLength)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
           error => 'length is less than 10',
         },
       ],
@@ -1124,14 +1125,14 @@ YAML
 $openapi_preamble
 paths:
   /foo:
-    get:
+    post:
       requestBody:
         required: true
         content:
           text/plain: {}
 YAML
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!!!');
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!!!');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
@@ -1462,8 +1463,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo post parameters 0), ('$ref')x16),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/bar')->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0), ('$ref')x17),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/bar/$ref')->to_string,
           error => 'EXCEPTION: maximum evaluation depth exceeded',
         },
       ],

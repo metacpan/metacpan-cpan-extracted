@@ -16,11 +16,60 @@ METHODS
 
     Returns instance of object.
 
+    *       "author"
+
+            Author string to HTML head.
+
+            Default value is undef.
+
+    *       "content_type"
+
+            Content type for output.
+
+            Default value is 'text/html; charset=__ENCODING__'.
+
     *       "css"
 
             Instance of CSS::Struct::Output object.
 
             Default value is CSS::Struct::Output::Raw instance.
+
+    *       "css_init"
+
+            Reference to array with CSS::Struct structure.
+
+            Default value is CSS initialization from Tags::HTML::Page::Begin
+            like
+
+             * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+             }
+
+    *       "encoding"
+
+            Set encoding for output.
+
+            Default value is 'utf-8'.
+
+    *       "favicon"
+
+            Link to favicon.
+
+            Default value is undef.
+
+    *       "flag_begin"
+
+            Flag that means begin of html writing via
+            Tags::HTML::Page::Begin.
+
+            Default value is 1.
+
+    *       "flag_end"
+
+            Flag that means end of html writing via Tags::HTML::Page::End.
+            Default value is 1.
 
     *       "generator"
 
@@ -28,11 +77,80 @@ METHODS
 
             Default value is 'Plack::App::Login; Version: __VERSION__'.
 
+    *       "login_cb"
+
+            Callback for main login. Arguments for callback are: $env,
+            "username" and $password. Returns 0/1 for (un)successful login.
+
+            Default value is undef.
+
+    *       "logo_image_url"
+
+            URL to logo image.
+
+            Default value is undef.
+
+    *       "message_cb"
+
+            Callback to process message from application. Arguments for
+            callback are: $env, $message_type and $message. Returns undef.
+
+            Default value is undef.
+
+    *       "psgi_app"
+
+            PSGI application to run instead of normal process. Intent of
+            this is change application in "_process_actions" method.
+
+            Default value is undef.
+
+    *       "redirect_login"
+
+            Redirect URL after successful login.
+
+            Default value is undef.
+
+    *       "redirect_error"
+
+            Redirect URL after error in login.
+
+            Default value is undef.
+
+    *       "register_link"
+
+            URL to registering page.
+
+            Default value is undef.
+
+    *       "script_js"
+
+            Reference to array with Javascript code strings.
+
+            Default value is [].
+
+    *       "script_js_src"
+
+            Reference to array with Javascript URLs.
+
+            Default value is [].
+
+    *       "status_code"
+
+            HTTP status code.
+
+            Default value is 200.
+
     *       "tags"
 
             Instance of Tags::Output object.
 
-            Default value is Tags::Output::Raw->new('xml' => 1) instance.
+            Default value is
+
+             Tags::Output::Raw->new(
+                     'xml' => 1,
+                     'no_simple' => ['script', 'textarea'],
+                     'preserved' => ['pre', 'style'],
+             );
 
     *       "title"
 
@@ -177,7 +295,8 @@ EXAMPLE
      # </html>
 
 DEPENDENCIES
-    Plack::Util::Accessor, Plack::Component::Tags::HTML,
+    Plack::Component::Tags::HTML, Plack::Request, Plack::Response,
+    Plack::Session, Plack::Util::Accessor, Tags::HTML::Container,
     Tags::HTML::Login::Password.
 
 SEE ALSO
@@ -198,5 +317,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

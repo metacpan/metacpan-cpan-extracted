@@ -1,64 +1,194 @@
-Tk-JDialog
+NAME
+    Tk::JDialog - a translation of `tk_dialog' from Tcl/Tk to TkPerl (based
+    on John Stoffel's idea).
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+VERSION
+    Version 1.01
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
+     use Tk::JDialog;
 
+     my $Dialog = $mw->JDialog( -option => value, ...  );
+     ...
+     my $button_label = $Dialog->Show;
 
-INSTALLATION
+DESCRIPTION
+     This is an OO implementation of `tk_dialog'.  First, create all your Dialog
+     objects during program initialization.  When it's time to use a dialog, 
+     invoke the `show' method on a dialog object; the method then displays 
+     the dialog, waits for a button to be invoked, and returns the text 
+     label of the selected button.
 
-To install this module, run the following commands:
+     A Dialog object essentially consists of two subwidgets: a Label widget for
+     the bitmap and a Label wigdet for the text of the dialog.  If required, you 
+     can invoke the `configure' method to change any characteristic of these 
+     subwidgets.
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+     Because a Dialog object is a Toplevel widget all the 'composite' base class
+     methods are available to you.
 
-SUPPORT AND DOCUMENTATION
+EXAMPLE
+     #!/usr/bin/perl
 
-After installing, you can find documentation for this module with the
-perldoc command.
+     use Tk::JDialog;
 
-    perldoc Tk::JDialog
+     my $mw = MainWindow->new;
+     my $Dialog = $mw->JDialog(
+         -title          => 'Choose!',   #DISPLAY A WINDOW TITLE
+         -text           => 'Press Ok to Continue',  #DISPLAY A CAPTION
+         -bitmap         => 'info',      #DISPLAY BUILT-IN info BITMAP.
+         -default_button => '~Ok',
+         -escape_button  => '~Cancel',
+         -buttons        => ['~Ok', '~Cancel', '~Quit'], #DISPLAY 3 BUTTONS
+         -images         => ['/tmp/ok.xpm', '', ''],     #EXAMPLE WITH IMAGE FILE
+     );
+     my $button_label = $Dialog->Show( );
+     print "..You pressed [$button_label]!\n";
+     exit(0);
 
-You can also look for information at:
+OPTIONS
+    -title
+             (string) - Title to display in the dialog's decorative window frame.
+             Default:  ''.
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-JDialog
+    -text
+             (string) - Message to display in the dialog widget.  Default:  ''.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Tk-JDialog
+    -bitmap
+             (string) - Bitmap to display in the dialog.
+             If non-empty, specifies a bitmap to display in the top portion of
+             the Dialog, to the left of the text.  If this is an empty string
+             then no bitmap is displayed in the Dialog.
+             There are several built-in Tk bitmaps: 'error', 'hourglass', 'info', 
+             'questhead', 'question', 'warning', 'Tk', and 'transparent'.
+             You can also use a bitmap file name, ie. '@/path/to/my/bitmap'
+             Default:  ''.
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Tk-JDialog
+    -default_button
+             (string) - Text label of the button that is to display the
+             default border and is to be selected if the user presses [Enter].  
+             (''signifies no default button).  Default:  ''.
 
-    Search CPAN
-        http://search.cpan.org/dist/Tk-JDialog/
+    -escape_button
+             (string) - Text label of the button that is to be invoked when the 
+             user presses the <Esc> key.  Default:  ''.
 
+    -button_labels
+             (Reference) - A reference to a list of one or more strings to
+             display in buttons across the bottom of the dialog.  These strings 
+             (labels) are also returned by the Show() method corresponding to 
+             the button selected.  NOTE:  A tilde ("~") can be placed before a 
+             letter in a label string to indicate the <Alt-<letterkey>> that 
+             the user can also press to select the button, for example:
+             "~Ok" means select this button if the user presses <Alt-<O>>.  
+             The tilde is not displayed for the button text.  The text is also 
+             not displayed if an image file is specified in the corresponding 
+             optional -images array, but is returned if the button is pressed.
+             If this option is not given, a single button labeled "OK" is created.
+
+    -images
+             (Reference) - Specify the optional path and file id for an image 
+             for each button to display an image in lieu of the label text 
+             ('' if a corresponding button is to use text).  NOTE: button
+             will use text if the image file is not found.  Also the 
+             "-button_labels" option MUST ALWAYS be specified anyway to provide 
+             the required return string.
+
+    -noballoons
+             (boolean) - if true (1) then no balloon displaying the "button_labels" 
+             label text value will be displayed when the mouse hovers over the 
+             corresponding buttons which display imiages.  If false (0), then 
+             text balloons will be displayed when hovering.  Default: 0.
+
+METHODS
+    Show ( [ -global | -nograb ] )
+         $answer = $dialog->B<Show>( [ -global | -nograb ] );
+
+         This method displays the Dialog box, waits for the user's response, and
+         stores the text string of the selected Button in $answer.  This allows 
+         the programmer to determine which button the user selected.
+ 
+         NOTE:  Execution goes into a wait-loop here until the the user makes a 
+         selection!
+ 
+         If -global is specified a global (rather than local) grab is
+         performed (No other window or widget can be minipulated via the keyboard 
+         or mouse until a button is selected) making the dialog "modal".  
+         Default: "-nograb" (the dialog is "non-modal" while awaiting input).
+
+         The actual Dialog is shown using the Popup method. Any other
+         options supplied to Show are passed to Popup, and can be used to
+         position the Dialog on the screen. Please read L<Tk::Popup> for
+         details.
+
+    Populate ( -option => value, ... )
+         (Constructor) - my $Dialog = $mw->JDialog( -option => value, ... );
+
+ADVERTISED WIDGETS
+     Tk::JDialog inherits all the Tk::Dialog exposed widgets and methods plus 
+     the following two subwidgets:
+
+    message
+             The dialog's Label widget containing the message text.
+
+    bitmap
+             The dialog's Label widget containing the bitmap image.
+
+AUTHOR
+    Jim Turner, "<turnerjw784 at yahoo.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-tk-jdialog at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tk-JDialog>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Tk::JDialog
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-JDialog>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Tk-JDialog>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Tk-JDialog>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Tk-JDialog/>
+
+ACKNOWLEDGEMENTS
+     Tk::JDialog derived from the L<Tk::Dialog> wiget from Tcl/Tk to TkPerl 
+     (based on John Stoffel's idea).  It addes the options:  -escape_button 
+     and -images,
 
 LICENSE AND COPYRIGHT
+    Copyright 1997-2023 Jim Turner.
 
-Copyright (C) 2015 Jim Turner
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-You should have received a copy of the GNU Lesser General Public
-License along with this program; if not, write to the Free
-Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+SEE ALSO
+     L<Tk::Dialog>, L<Tk::Label>, L<Tk::Widget>, L<Tk>
 

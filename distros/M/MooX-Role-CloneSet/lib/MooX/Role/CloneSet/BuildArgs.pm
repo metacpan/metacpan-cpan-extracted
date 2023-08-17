@@ -4,7 +4,7 @@ use 5.012;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare("v0.1.0");
+use version; our $VERSION = version->declare("v0.1.1");
 
 use Moo::Role;
 use namespace::clean;

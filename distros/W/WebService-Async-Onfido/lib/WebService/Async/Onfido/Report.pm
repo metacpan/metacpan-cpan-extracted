@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(WebService::Async::Onfido::Base::Report);
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.006';    # VERSION
 
 =head1 NAME
 

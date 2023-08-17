@@ -45,3 +45,9 @@ Revision history for experimentals
 
         Documented auto-utf8 behaviour.
 
+
+
+0.020  Tue Jul  4 15:53:22 2023
+
+    - Removed deprecation warnings for all use of smartmatching and given/when
+      under Perl 5.38 and 5.40

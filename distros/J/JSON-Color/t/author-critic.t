@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/ColorTheme/JSON/Color/default_ansi.pm','lib/ColorTheme/JSON/Color/default_rgb.pm','lib/JSON/Color.pm'];
+my $filenames = ['lib/ColorTheme/JSON/Color/bright256.pm','lib/ColorTheme/JSON/Color/default_ansi.pm','lib/ColorTheme/JSON/Color/default_rgb.pm','lib/JSON/Color.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.69
+    version 0.73
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -83,7 +83,7 @@ DESCRIPTION
     GSuite (Google)
     Jump
     Keycloak
-    Mircosoft ADFS (not recently tested)
+    Mircosoft ADFS
     Okta
     OneLogin
     PingIdentity (requires Net::SAML2 >=0.54)

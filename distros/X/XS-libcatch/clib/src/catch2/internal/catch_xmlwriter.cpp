@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -11,6 +11,7 @@
 #include <catch2/internal/catch_enforce.hpp>
 #include <catch2/internal/catch_xmlwriter.hpp>
 
+#include <cstdint>
 #include <iomanip>
 #include <type_traits>
 
@@ -87,7 +88,7 @@ namespace {
         // (see: http://www.w3.org/TR/xml/#syntax)
 
         for( std::size_t idx = 0; idx < m_str.size(); ++ idx ) {
-            unsigned char c = m_str[idx];
+            unsigned char c = static_cast<unsigned char>(m_str[idx]);
             switch (c) {
             case '<':   os << "&lt;"; break;
             case '&':   os << "&amp;"; break;
@@ -147,7 +148,7 @@ namespace {
                 bool valid = true;
                 uint32_t value = headerValue(c);
                 for (std::size_t n = 1; n < encBytes; ++n) {
-                    unsigned char nc = m_str[idx + n];
+                    unsigned char nc = static_cast<unsigned char>(m_str[idx + n]);
                     valid &= ((nc & 0xC0) == 0x80);
                     value = (value << 6) | (nc & 0x3F);
                 }

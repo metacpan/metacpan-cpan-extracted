@@ -2,11 +2,11 @@ package Sim::OPT::Modish;
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-
+$VERSION = '0.5';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # An intermediate version of the subroutine createconstrdbfile has been modified by ESRU (2038),
 # University of Strathclyde, Glasgow.
-# All rights reserved, 2015-21.
+# All rights reserved, 2015-23.
 # This is free software.  You can redistribute it and/or modify it under the terms of the
 # GNU General Public License, version 3, as published by the Free Software Foundation.
 
@@ -18,6 +18,8 @@ package Sim::OPT::Modish;
 # In versions 0.321 to 0.325 (17.10.2020): bug fixes.
 # In versions 0.4 (20.12.2021): adapted code to changes in the e2r interaction;
 # reintroduced the possibility of non-embedded use; added the possibility of choosing which zones and surfaces to operate on.
+# In versions 0.4.1 (28.09.2022): bug fix.
+# In versions 0.4.2.1 (12.06.2023): updated the subprocedure "createfictgeofile "for creating fictitious obstruction files to the new obstruction file format.
 
 use v5.14;
 use Exporter;
@@ -35,7 +37,6 @@ use Storable qw(store retrieve dclone);
 use feature 'say';
 no strict;
 no warnings;
-$VERSION = '0.4';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw( modish );
@@ -275,7 +276,7 @@ if ( not ( defined( $max_processes ) ) ) { $max_processes = 1; }
 
 if ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 {
-  #say "\nSorry, this procedure works only on Linux and OSX." and die;
+  say "\nSorry, this procedure works only on Linux and OSX." and die;
 }
 
 my ( @zoneshds, @winsdata );
@@ -1925,7 +1926,7 @@ YYY
   if ( ( not ( -e $shdafile ) ) and ( not ( "embedded" ~~ @calcprocedures ) ) )
   {
     say MONITOR "\nExiting. A file \".shda\" must be present in the model folders for the operation to be performed. Now it isn't. To obtain that, a shading and insolation calculation must have been performed.";
-    #say "\nExiting. A file \".shda\" must be present in the model folders for the operation to be performed. Now it isn't. To obtain that, a shading and insolation calculation must have been performed." and die;
+    say "\nExiting. A file \".shda\" must be present in the model folders for the operation to be performed. Now it isn't. To obtain that, a shading and insolation calculation must have been performed." and die;
   }
 
   if ( "bbembedded" ~~ @calcprocedures )
@@ -2315,8 +2316,8 @@ sub setrad
 
     unless ( "embedded" ~~ @calcprocedures )
     {
-      #say "\nConfiguration file: $conffile"; say REPORT "\$conffile: $conffile";
-      #say "$message";
+      say "\nConfiguration file: $conffile"; say REPORT "\$conffile: $conffile";
+      say "$message";
     }
 
   my %paths = %{ $paths_ref };
@@ -3003,14 +3004,14 @@ sub pursue
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) )
               {
 
-                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # #say "IMPOSED \$alt = 0.0001;"; #IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # say "IMPOSED \$alt = 0.0001;"; #IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
                 {
 
                   if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; }
-                  if ( $diff == 0 ){ $diff = 0.0001; say REPORT "IMPOSED \$diff = 0.0001;"; } ##say "IMPOSED \$dir = 0.0001;";
+                  if ( $diff == 0 ){ $diff = 0.0001; say REPORT "IMPOSED \$diff = 0.0001;"; } #say "IMPOSED \$dir = 0.0001;";
                 }
                 # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
@@ -3178,8 +3179,8 @@ solar source sun
                   }
                   unless ( "embedded" ~~ @calcprocedures )
                   {
-                    #say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                    #say "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                   }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -3208,13 +3209,13 @@ solar source sun
                   and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( "plain" ~~ @calcprocedures ) ) )
               {
 
-                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } ##say "IMPOSED \$alt = 0.0001;";  # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } #say "IMPOSED \$alt = 0.0001;";  # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
                 {
-                  if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; }  # #say "IMPOSED \$dir = 0.0001;";
-                  if ( $diff == 0 ){ $diff = 0.0001; say REPORT "IMPOSED \$diff = 0.0001;"; } # #say "IMPOSED \$diff = 0.0001;";
+                  if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; }  # say "IMPOSED \$dir = 0.0001;";
+                  if ( $diff == 0 ){ $diff = 0.0001; say REPORT "IMPOSED \$diff = 0.0001;"; } # say "IMPOSED \$diff = 0.0001;";
                 }
                 # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
@@ -3420,8 +3421,8 @@ solar source sun
                   }
                   unless ( "embedded" ~~ @calcprocedures )
                   {
-                    #say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                    #say "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                   }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -3447,13 +3448,13 @@ solar source sun
                 or ( ( "radical" ~~ @calcprocedures ) and ( ( $countrad == 5 ) or ( $countrad == 6 ) ) ) )
               {
 
-                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # #say "IMPOSED \$alt = 0.0001;"; # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # say "IMPOSED \$alt = 0.0001;"; # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
                 {
-                  if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; } # #say "IMPOSED \$dir = 0.0001;";
-                  if ( $diff == 0 ){ $diff = 0.0001;  say REPORT "IMPOSED \$diff = 0.0001;"; } # #say "IMPOSED \$diff = 0.0001;";
+                  if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; } # say "IMPOSED \$dir = 0.0001;";
+                  if ( $diff == 0 ){ $diff = 0.0001;  say REPORT "IMPOSED \$diff = 0.0001;"; } # say "IMPOSED \$diff = 0.0001;";
                 }
                 # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
@@ -3660,8 +3661,8 @@ solar source sun
                   }
                   unless ( "embedded" ~~ @calcprocedures )
                   {
-                    #say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                    #say "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                   }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -4056,7 +4057,7 @@ no obs: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_d
 
               unless ( ( "noreflections" ~~ @calcprocedures ) or ( "plain" ~~ @calcprocedures ) or ( "embedded" ~~ @calcprocedures ) )
               {
-                #say "model 1 diff: $meanvaluesurf_diff1, model 1 tot: $meanvaluesurf1, model 1 dir: $meanvaluesurf_dir1. \nmodel 2 diff $meanvaluesurf_diff2, model 2 tot: $meanvaluesurf2, model 2 dir: $meanvaluesurf_dir2\n";
+                say "model 1 diff: $meanvaluesurf_diff1, model 1 tot: $meanvaluesurf1, model 1 dir: $meanvaluesurf_dir1. \nmodel 2 diff $meanvaluesurf_diff2, model 2 tot: $meanvaluesurf2, model 2 dir: $meanvaluesurf_dir2\n";
               }
             }
           }
@@ -5291,8 +5292,8 @@ sub modifyshda
                         unless ( "embedded" ~~ @calcprocedures )
                         {
                           print REPORT "For $radtype radiation, obtained: zone number: $zonenum; month number $monthnum; surface number: $surfnum; hour: $hour; old shading factor: $el, new shading factor: $newshadingvalue; irradiance ratio: $irrratio\n";
-                          #say "Radiation type: $radtype; surface: $surfnum, month: $monthname, hour: $hour";
-                          #say "new shading factor: $newshadingvalue; irradiance ratio: $irrratio; old shading factor: $el\n";
+                          say "Radiation type: $radtype; surface: $surfnum, month: $monthname, hour: $hour";
+                          say "new shading factor: $newshadingvalue; irradiance ratio: $irrratio; old shading factor: $el\n";
                         }
                         push ( @newhourvals, $newshadingvalue );
                         push ( @newhourvals2, $irrratio );
@@ -5410,7 +5411,7 @@ sub createfictgeofile
 
   my %obsinf;
 
-  unless ( -e $modishloock )
+  unless ( -e $modishlock )
   {
     open( GEOFILE_F, ">$geofile_f" ) or die;
   }
@@ -5421,58 +5422,103 @@ sub createfictgeofile
     {
       chomp $line;
       my @elts = split ( /,|\s+/, $geoline );
+      
+      if ( scalar( @elts ) < 15 )
+      {
+	  if ( $count == 0 )
+	  {
+	    $obsinf{$elts[13]}{name} = $elts[9];
+	    $obsinf{$elts[13]}{mlc} = $elts[10];
+	  }
 
-      if ( $count == 0 )
-      {
-        $obsinf{$elts[13]}{name} = $elts[9];
-        $obsinf{$elts[13]}{mlc} = $elts[10];
-      }
+	  unless ( $elts[10] =~ /^f_/ )
+	  {
+	    $elts[10] = "f_" . $elts[10] ;
+	    chop $elts[10] ;
+	    chop $elts[10] ;
+	    $obsinf{$elts[13]}{newmlc} = $elts[10];
+	  }
+	  else
+	  {
+	    $obsinf{$elts[13]}{newmlc} = $elts[10];
+	  }
 
-      unless ( $elts[10] =~ /^f_/ )
-      {
-        $elts[10] = "f_" . $elts[10] ;
-        chop $elts[10] ;
-	chop $elts[10] ;
-        $obsinf{$elts[13]}{newmlc} = $elts[10];
+	  unless ( -e $modishloock )
+	  {
+	     if ( length( $elts[13] ) == 1 )
+	  {
+	     $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
+		    $elts[10] . "  " . $elts[11] . " " . $elts[12] . "   " . $elts[13] . "\n";
+	  }
+	  elsif ( length( $elts[13] ) == 2 )
+	  {
+	     $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
+		    $elts[10] . "  " . $elts[11] . " " . $elts[12] . "  " . $elts[13] . "\n";chop
+	  }
+	     elsif ( length( $elts[13] ) == 3 )
+	  {
+	     $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
+		    $elts[10] . "  " . $elts[11] . " " . $elts[12] . " " . $elts[13] . "\n";
+	  }
+	}
       }
-      else
+      elsif ( scalar( @elts ) >= 15 )
       {
-        $obsinf{$elts[13]}{newmlc} = $elts[10];
-      }
+	  if ( $count == 0 )
+	  {
+	    $obsinf{$elts[13]}{name} = $elts[11];
+	    $obsinf{$elts[13]}{mlc} = $elts[12];
+	  }
 
-      unless ( -e $modishloock )
-      {
-        if ( length( $elts[13] ) == 1 )
-        {
-          $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
-            $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
-            $elts[10] . "  " . $elts[11] . " " . $elts[12] . "   " . $elts[13] . "\n";
-        }
-        elsif ( length( $elts[13] ) == 2 )
-        {
-          $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
-            $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
-            $elts[10] . "  " . $elts[11] . " " . $elts[12] . "  " . $elts[13] . "\n";chop
-        }
-        elsif ( length( $elts[13] ) == 3 )
-        {
-          $geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
-            $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . " " .
-            $elts[10] . "  " . $elts[11] . " " . $elts[12] . " " . $elts[13] . "\n";
-        }
+	  unless ( $elts[10] =~ /^f_/ )
+	  {
+	    $elts[12] = "f_" . $elts[12] ;
+	    chop $elts[12] ;
+	    chop $elts[12] ;
+	    $obsinf{$elts[13]}{newmlc} = $elts[12];
+	  }
+	  else
+	  {
+	    $obsinf{$elts[13]}{newmlc} = $elts[12];
+	  }
+
+	  unless ( -e $modishlock )
+	  {
+	    if ( length( $elts[13] ) == 1 )
+	    {
+		$geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . "," . $elts[10] . "," . $elts[11] . " " .
+		    $elts[12] . "  " . $elts[13] . " " . $elts[14] . "   " . $elts[15] . "\n";
+	    }
+	    elsif ( length( $elts[13] ) == 2 )
+	    {
+		$geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . "," . $elts[10] . "," . $elts[11] . " " .
+		    $elts[12] . "  " . $elts[13] . " " . $elts[14] . "  " . $elts[15] . "\n";
+	    }
+	    elsif ( length( $elts[13] ) == 3 )
+	    {
+		$geoline = $elts[0] . "," . $elts[1] . "," . $elts[2] . "," . $elts[3] . "," . $elts[4] . "," .
+		    $elts[5] . "," . $elts[6] . "," . $elts[7] . "," . $elts[8] . "," . $elts[9] . "," . $elts[10] . "," . $elts[11] . " " .
+		    $elts[12] . "  " . $elts[13] . " " . $elts[14] . " " . $elts[15] . "\n";
+	    }
+	  }
       }
     }
-    unless ( -e $modishloock )
+    unless ( -e $modishlock )
     {
       print GEOFILE_F $geoline;
     }
   }
-  unless ( -e $modishloock )
+  unless ( -e $modishlock )
   {
     close GEOFILE_F;
   }
 
-  unless ( -e $modishloock )
+  unless ( -e $modishlock )
   {
     my ( $shortgeofile_f, $shortgeofile_f1, $geofile_f1 );
     if ( ( "radical" ~~ @calcprocedures ) or ( "composite" ~~ @calcprocedures ) or ( "noreflections" ~~ @calcprocedures ) )
@@ -5495,7 +5541,7 @@ sub createfictgeofile
           $elts[4] = 0.01;
           $elts[5] = 0.01;
           $elts[6] = 0.01;
-          $line_f = "$elts[0],$elts[1],$elts[2],$elts[3],$elts[4],$elts[5],$elts[6],$elts[7],$elts[8],$elts[9],$elts[10]";
+          $line_f = "$elts[0],$elts[1],$elts[2],$elts[3],$elts[4],$elts[5],$elts[6],$elts[7],$elts[8],$elts[9],$elts[10],$elts[11]";
           $line_f =~ s/^,//;
           $line_f =~ s/,$//;
         }
@@ -6551,7 +6597,7 @@ sub getsolar
       $c++;
     }
     $countline++;
-  } ##say "TS: " . dump ( \%ts );
+  } #say "TS: " . dump ( \%ts );
 
   if ( $c <= 8776 )
   {
@@ -6586,7 +6632,7 @@ sub getsolar
     {
       foreach my $h ( sort { $a <=> $b} ( keys %{ $t{vals}{$dd}{$m} } ) )
       {
-        ##say "h: " . dump ( $h );
+        #say "h: " . dump ( $h );
         my @ddvals = @{ $t{vals}{$dd}{$m}{$h} };
         my $ddval = mean( @ddvals );
         $t{avg}{$dd}{$m}{$h} = $ddval;
@@ -6606,16 +6652,16 @@ sub getsolar
       my $declrad = deg2rad($decl);
                                                        #A                                                                          #B
       #my $timeq = ( 0.1645 *          sin( deg2rad( ( 1.978 * $daynums{$m}  )- 160.22 ) )        ) - ( 0.1255 *            cos( #deg2rad( ( 0.989 * $daynums{$m} )- 80.11 ) )          )               #B
-      #  - ( 0.025 *                       sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  ##say "\$timeq: $timeq";
+      #  - ( 0.025 *                       sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  #say "\$timeq: $timeq";
 
       my $timeq = ( 9.87 * sin( deg2rad( ( 1.978 * $daynums{$m}  )- 160.22 ) ) ) - ( 7.53 * cos( deg2rad( ( 0.989 * $daynums{$m} )- 80.11 ) ) )
-        - ( 1.5 * sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  ##say "\$timeq: $timeq";
+        - ( 1.5 * sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  #say "\$timeq: $timeq";
 
-      my $tcf = ( 4 * ( $lstm - $long ) ) + $timeq; ##say "\$tcf: $tcf";
+      my $tcf = ( 4 * ( $lstm - $long ) ) + $timeq; #say "\$tcf: $tcf";
 
-      #my $solartime = ( $h + ( $longdiff / 15 ) + $timeq ); ##say "\$solartime1: $solartime";
+      #my $solartime = ( $h + ( $longdiff / 15 ) + $timeq ); #say "\$solartime1: $solartime";
 
-      my $solartime = ( $h + ( $tcf / 60 ) ); ##say "\$solartime2: $solartime";
+      my $solartime = ( $h + ( $tcf / 60 ) ); #say "\$solartime2: $solartime";
 
       my $hourangle = ( 15 * ( 12 - $solartime ) );
       my $houranglerad = deg2rad($hourangle);
@@ -6734,11 +6780,11 @@ sub getaltaz
   my $declrad = deg2rad($decl);
 
   my $timeq = ( 9.87 * sin( deg2rad( ( 1.978 * $year{$month}{$day}  )- 160.22 ) ) ) - ( 7.53 * cos( deg2rad( ( 0.989 * $year{$month}{$day} )- 80.11 ) ) )
-    - ( 1.5 * sin( deg2rad( ( 0.989 * $year{$month}{$day}  ) - 80.11 ) ) );  ##say "\$timeq: $timeq";
+    - ( 1.5 * sin( deg2rad( ( 0.989 * $year{$month}{$day}  ) - 80.11 ) ) );  #say "\$timeq: $timeq";
 
-  my $tcf = ( 4 * ( $lstm - $long ) ) + $timeq; ##say "\$tcf: $tcf";
+  my $tcf = ( 4 * ( $lstm - $long ) ) + $timeq; #say "\$tcf: $tcf";
 
-  my $solartime = ( $h + ( $tcf / 60 ) ); ##say "\$solartime2: $solartime";
+  my $solartime = ( $h + ( $tcf / 60 ) ); #say "\$solartime2: $solartime";
 
   my $hourangle = ( 15 * ( 12 - $solartime ) );
   my $houranglerad = deg2rad($hourangle);
@@ -6941,7 +6987,7 @@ sub modish
         `mv -f ./modish_defaults.pl ./_modish_defaults.pl`;
       }
     }
-    elsif ( $news[0] eq "3" )
+    #elsif ( $news[0] eq "3" )
     #{ # shading factor correction
     #  open(FIL, "./modish_defaults.pl" ) or die;
     #  my @lins = <FIL>;
@@ -7578,7 +7624,7 @@ sub modish
   }
   else
   {
-    #say "A \"modish_defaults.pl\" file must be present in the cfg model folder. Now it is not. Halting.";
+    say "A \"modish_defaults.pl\" file must be present in the cfg model folder. Now it is not. Halting.";
     exit;
     #require "/opt/esp-r/bin/modish/modish_defaults.pl";
   }
@@ -7796,7 +7842,7 @@ sub modish
       }
     }
 
-    if ( scalar( @restpars ) == 0 ) { #say "NO ZONE HAS BEEN SPECIFIED. EXITING." and die; }
+    if ( scalar( @restpars ) == 0 ) { say "NO ZONE HAS BEEN SPECIFIED. EXITING." and die; }
 
     $zonenum = $restpars[0];
     @transpsurfs = @restpars[ 1..$#restpars ];
@@ -7846,7 +7892,7 @@ sub modish
 
   my $zoneletter = $zonenumname{$zonenum};
 
-  #say "Processing reflections...\n";
+  say "Processing reflections...\n";
 
   say MONITOR "\$launchfile $launchfile";
   say MONITOR "\$cfgfile $cfgfile";
@@ -8942,6 +8988,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "creat
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

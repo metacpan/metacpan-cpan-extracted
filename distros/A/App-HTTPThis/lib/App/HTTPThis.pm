@@ -1,5 +1,5 @@
 package App::HTTPThis;
-$App::HTTPThis::VERSION = '0.006';
+$App::HTTPThis::VERSION = '0.009';
 # ABSTRACT: Export the current directory over HTTP
 
 use strict;
@@ -8,15 +8,37 @@ use Plack::App::DirectoryIndex;
 use Plack::Runner;
 use Getopt::Long;
 use Pod::Usage;
+use Config::Tiny;
 
 
 sub new {
   my $class = shift;
   my $self = bless {port => 7007, root => '.'}, $class;
 
-  GetOptions($self, "help", "man", "port=i", "name=s", "autoindex") || pod2usage(2);
+  my $default_config_file = '.http_thisrc';
+
+  GetOptions(
+    $self, "help", "man", "config=s", "port=i", "name=s", "autoindex", "pretty"
+  ) || pod2usage(2);
   pod2usage(1) if $self->{help};
   pod2usage(-verbose => 2) if $self->{man};
+
+  my $config_file = $self->{config} || $ENV{HTTP_THIS_CONFIG};
+  for my $dir ('.', $ENV{HOME}) {
+    if (!$config_file && -f "$dir/$default_config_file") {
+      $config_file = "$dir/$default_config_file";
+      last;
+    }
+  }
+
+  if ($config_file) {
+    my $config = Config::Tiny->read($config_file)
+      or die "FATAL: failed to read config file '$config_file'\n";
+    for my $key (qw(port name autoindex pretty)) {
+      $self->{$key} = $config->{_}->{$key} if $config->{_}->{$key};
+    }
+    delete $self->{config};
+  }
 
   if (@ARGV > 1) {
     pod2usage("$0: Too many roots, only single root supported");
@@ -38,9 +60,13 @@ sub run {
     '--env'          => 'production',
     '--server_ready' => sub { $self->_server_ready(@_) },
     '--autoindex'    => 0,
+    '--pretty'       => 0,
   );
 
-  my $app_config = { root => $self->{root} };
+  my $app_config = {
+    root   => $self->{root},
+    pretty => $self->{pretty},
+  };
   $app_config->{dir_index} = 'index.html' if $self->{autoindex};
 
   eval {
@@ -93,7 +119,7 @@ App::HTTPThis - Export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.006
+version 0.009
 
 =head1 SYNOPSIS
 

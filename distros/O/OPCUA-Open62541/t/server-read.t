@@ -40,6 +40,7 @@ my %dataValue_datatype = (
 	    NodeId_identifier => NS0ID_UTCTIME,
 	    NodeId_identifierType => 0,
 	    NodeId_namespaceIndex => 0,
+	    NodeId_print => "i=".NS0ID_UTCTIME,
 	},
 	Variant_type => TYPES_NODEID,
     },

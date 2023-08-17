@@ -1,9 +1,9 @@
 This archive contains the distribution ZMQ-FFI,
-version 1.18:
+version 1.19:
 
   version agnostic Perl bindings for zeromq using ffi
 
-This software is copyright (c) 2022 by Dylan Cali.
+This software is copyright (c) 2023 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

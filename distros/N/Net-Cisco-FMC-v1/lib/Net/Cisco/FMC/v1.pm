@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.008000';
+$Net::Cisco::FMC::v1::VERSION = '0.009002';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -94,14 +94,15 @@ sub _get ($self, $url, $query_params = {}) {
     return $data;
 }
 
-sub _update ($self, $url, $object, $object_data) {
+sub _update ($self, $url, $object, $object_data, $query_params = {}) {
     my $updated_data = clone($object);
     delete $updated_data->{links};
     delete $updated_data->{metadata};
     delete $updated_data->{error};
     $updated_data = { %$updated_data, %$object_data };
 
-    my $res = $self->put($url, $updated_data);
+    my $params = $self->user_agent->www_form_urlencode( $query_params );
+    my $res = $self->put("$url?$params", $updated_data);
     my $code = $res->code;
     my $data = $res->data;
     my $errmsg = ref $data eq 'HASH'
@@ -226,6 +227,26 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
         object   => 'policyassignments',
         singular => 'policyassignment',
     },
+    {
+        path     => 'object',
+        object   => 'realms',
+        singular => 'realm',
+    },
+    {
+        path     => 'object',
+        object   => 'realmusers',
+        singular => 'realmuser',
+    },
+    {
+        path     => 'object',
+        object   => 'realmusergroups',
+        singular => 'realmusergroup',
+    },
+    {
+        path     => 'policy',
+        object   => 'identitypolicies',
+        singular => 'identitypolicy',
+    },
 ]);
 
 
@@ -247,7 +268,10 @@ sub login($self) {
             $res->response->header('x-auth-access-token'));
     }
     else {
-        croak($res->data->{error}->{messages}[0]->{description});
+        my $errmsg = ref $res->data eq 'HASH'
+            ? $res->data->{error}->{messages}[0]->{description}
+            : $res->data;
+        croak($errmsg);
     }
 }
 
@@ -311,12 +335,8 @@ sub get_accessrule ($self, $accesspolicy_id, $id, $query_params = {}) {
 }
 
 
-sub update_accessrule ($self, $accesspolicy_id, $object, $object_data) {
+sub update_accessrule ($self, $accesspolicy_id, $object, $object_data, $query_params = {}) {
     my $id = $object->{id};
-    my $fmc_rule = clone($object);
-    for my $user ($fmc_rule->{users}->{objects}->@*) {
-        delete $user->{realm};
-    }
     return $self->_update(join('/',
         '/api/fmc_config/v1/domain',
         $self->domain_uuid,
@@ -325,7 +345,7 @@ sub update_accessrule ($self, $accesspolicy_id, $object, $object_data) {
         $accesspolicy_id,
         'accessrules',
         $id
-    ), $fmc_rule, $object_data);
+    ), $object, $object_data, $query_params);
 }
 
 
@@ -704,7 +724,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.008000
+version 0.009002
 
 =head1 SYNOPSIS
 
@@ -732,7 +752,7 @@ version 0.008000
 
 This module is a client library for the Cisco Firepower Management
 Center (FMC) REST API version 1.
-Currently it is developed and tested against FMC version 6.2.3.6.
+Currently it is developed and tested against FMC version 7.2.0.1.
 
 =head1 ATTRIBUTES
 
@@ -778,8 +798,8 @@ rule.
 
 =head2 update_accessrule
 
-Takes an access policy id, rule object and a hashref of the rule and returns
-a hashref of the updated access rule.
+Takes an access policy id, rule object, a hashref of the rule and an optional
+hashref of query parameters and returns a hashref of the updated access rule.
 
 =head2 delete_accessrule
 

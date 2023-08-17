@@ -1,0 +1,61 @@
+{
+   "abstract" : "A command-line tool to deal with bcrypt password hashing",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-bcrypt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Bcrypt" : "0",
+            "Crypt::Urandom" : "0",
+            "Encode" : "0",
+            "perl" : "5.030"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::Open3" : "0",
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/app-bcrypt/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/app-bcrypt",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/app-bcrypt",
+         "web" : "https://github.com/briandfoy/app-bcrypt"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

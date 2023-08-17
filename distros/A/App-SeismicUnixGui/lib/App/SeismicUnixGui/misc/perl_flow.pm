@@ -423,14 +423,13 @@ sub parse {
 
 			my $a_label = $labels[$k];
 
-			# print("perl_flow, parse, a_label $a_label\n");
-
 			for ( my $j = 0; $j < $num_good_params; $j++ ) {
 
 				my @good_labels     = @{ @{ $perl_flow->{_good_labels_aref2} }[$prog_idx] };
 				my @good_values     = @{ @{ $perl_flow->{_good_values_aref2} }[$prog_idx] };
 				my $this_good_label = $good_labels[$j];
 				my $this_good_value = $good_values[$j];
+#				print("perl_flow, parse,-0-$good_values[0],-1-$good_values[1]\n");
 
 				# compare the label (first module in the case of multiple versions separated by a pipe)
 				# in the standard program config files  ( a_label)

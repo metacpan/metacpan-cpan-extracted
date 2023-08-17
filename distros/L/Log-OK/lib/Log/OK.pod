@@ -8,22 +8,20 @@ Log::OK -  Disable inactive logging statements from the command line
 
 Choose your logging framework (L<Log::ger> shown). (1)
 
+Setup your adaptor/dispatchers/output like usual (2)
+
 Then C<use Log::OK>  to setup a default logging level and/or specify a command
-line option (or environment variable) to set logging level. (2)
+line option (or environment variable) to set logging level. (3)
 
-Setup your adaptor/dispatchers/output like usual (3)
-
-	use strict;
-	use warnings;
-
+  # Top level application
 	use Log::ger;			              #(1)
+	use Log::ger::Output "Screen";  #(2)
 
-	use Log::OK {			              #(2)
+	use Log::OK {			              #(3)
 		lvl=>"info",		
 		opt=>"verbose"		
 	};
 
-	use Log::ger::Output "Screen";  #(3)
 
 	My_Module::do_module_stuff();
 
@@ -40,9 +38,8 @@ converted to upper case.
 Use a constant together with a logical "and" and your
 logging statement for perl to optimise away inactive levels. (3)
 
+  # Module ...
 	package My_Module;
-	use strict;
-	use warnings;
 
 	use Log::ger;	#(1)
 	use Log::OK;	#(2)
@@ -150,8 +147,11 @@ Represents a L<GetOpt::Long> option name to use in processing the command line
 options.  It has a C<":s"> appended to it to allow L<GetOpt::Long> to process
 just a switch or a switch with a value.
 
-For example if C<opt=E<gt>'verbose'>, the logging level will be set to
-"debug" with the following:
+B<From v0.2.0:> If not specified it defaults to C<"verbose">. If you want no
+command line options procssing, explicitly set to C<undef>.
+
+For example if C<opt=E<gt>'verbose'>, (the default) the logging level will be
+set to "debug" with the following:
 
 		perl my_app.pl --verbose debug
 
@@ -296,7 +296,7 @@ Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 Licensed under MIT
 

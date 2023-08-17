@@ -1,6 +1,6 @@
 package Apache::Session::Browseable;
 
-our $VERSION = '1.3.11';
+our $VERSION = '1.3.13';
 
 print STDERR "Use a sub module of Apache::Session::Browseable such as Apache::Session::Browseable::File";
 
@@ -62,6 +62,8 @@ chosen module documentation carefully to set the indexes.
 =over
 
 =item L<Apache::Session::Browseable::Redis>
+
+=item L<Apache::Session::Browseable::Cassandra>
 
 =back
 

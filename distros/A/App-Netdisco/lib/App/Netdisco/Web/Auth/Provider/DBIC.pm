@@ -46,10 +46,11 @@ sub get_user_details {
 
     # each of these settings permits no user in the database
     # so create a pseudo user entry instead
-    if (not $user and not setting('validate_remote_user')
-                  and (setting('trust_remote_user')
-                    or setting('trust_x_remote_user')
-                    or setting('no_auth'))) {
+    if (not $user and
+        (setting('no_auth') or
+          (not setting('validate_remote_user')
+           and (setting('trust_remote_user') or setting('trust_x_remote_user')) ))) {
+
         $user = $database->resultset($users_table)
           ->new_result({username => $username});
     }
@@ -73,7 +74,7 @@ sub validate_api_token {
       $database->resultset($users_table)->find({ $token_column => $token });
     };
 
-    return $user->username
+    return $user
       if $user and $user->in_storage and $user->token_from
         and $user->token_from > (time - setting('api_token_lifetime'));
     return undef;
@@ -95,9 +96,19 @@ sub get_user_roles {
     my $roles       = $settings->{roles_relationship} || 'roles';
     my $role_column = $settings->{role_column}        || 'role';
 
+    # this method returns a list of current user roles
+    # but for API with trust_remote_user, trust_x_remote_user, and no_auth
+    # we need to fake that there is a valid API key
+
+    my $api_requires_key =
+      (setting('trust_remote_user') or setting('trust_x_remote_user') or setting('no_auth'))
+        eq '1' ? 'false' : 'true';
+
     return [ try {
-      $user->$roles->search({}, { bind => [setting('api_token_lifetime'), setting('api_token_lifetime')] })
-        ->get_column( $role_column )->all;
+      $user->$roles->search({}, { bind => [
+          $api_requires_key, setting('api_token_lifetime'),
+          $api_requires_key, setting('api_token_lifetime'),
+        ] })->get_column( $role_column )->all;
     } ];
 }
 
@@ -236,20 +247,40 @@ sub _ldap_search {
 
 sub match_with_radius {
   my($self, $pass, $user) = @_;
-  return unless setting('radius') and ref [] eq ref setting('radius');
+  return unless setting('radius') and ref {} eq ref setting('radius');
 
   my $conf = setting('radius');
-  my $radius = Authen::Radius->new(@$conf);
+  my $servers = (ref [] eq ref $conf->{'server'}
+    ? $conf->{'server'} : [$conf->{'server'}]);
+  my $radius = Authen::Radius->new(
+    NodeList => $servers,
+    Secret   => $conf->{'secret'},
+    TimeOut  => $conf->{'timeout'} || 15,
+  );
   my $dict_dir = Path::Class::Dir->new( dist_dir('App-Netdisco') )
     ->subdir('contrib')->subdir('raddb')->file('dictionary')->stringify;
   Authen::Radius->load_dictionary($dict_dir);
 
   $radius->add_attributes(
      { Name => 'User-Name',         Value => $user },
-     { Name => 'User-Password',     Value => $pass },
-     { Name => 'h323-return-code',  Value => '0' }, # Cisco AV pair
-     { Name => 'Digest-Attributes', Value => { Method => 'REGISTER' } }
+     { Name => 'User-Password',     Value => $pass }
   );
+
+  if ($conf->{'vsa'}) {
+    foreach my $vsa (@{$conf->{'vsa'}}) {
+      $radius->add_attributes(
+        {
+          Name   => $vsa->{'name'},
+          Value  => $vsa->{'value'},
+          Type   => $vsa->{'type'},
+          Vendor => $vsa->{'vendor'},
+          Tag    => $vsa->{'tag'}
+        },
+      );
+    }
+  }
+
+
   $radius->send_packet(ACCESS_REQUEST);
 
   my $type = $radius->recv_packet();

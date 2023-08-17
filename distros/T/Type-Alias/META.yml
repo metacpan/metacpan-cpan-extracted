@@ -1,0 +1,44 @@
+---
+abstract: 'type alias for type constraints'
+author:
+  - 'kobaken <kfly@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Type-Alias
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Type::Alias:
+    file: lib/Type/Alias.pm
+    version: '0.06'
+requires:
+  Type::Tiny: '1.010002'
+  Types::Equal: '0.02'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/kfly8/Type-Alias/issues
+  homepage: https://github.com/kfly8/Type-Alias
+  repository: https://github.com/kfly8/Type-Alias.git
+version: '0.06'
+x_authority: cpan:KFLY
+x_contributors:
+  - 'kobaken <kentafly88@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

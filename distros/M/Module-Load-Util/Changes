@@ -1,3 +1,8 @@
+0.009   2023-06-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: load.
+
+
 0.008   2022-02-11  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Show error message if module is found but has compilation

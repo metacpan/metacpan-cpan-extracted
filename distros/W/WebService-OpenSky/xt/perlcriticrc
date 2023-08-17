@@ -1,0 +1,40 @@
+severity = 4
+# Avoid Perl::Critic errors from Freenode, if it is installed
+exclude = Freenode
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moose Test::Most MooseX::Extended::Custom WebService::OpenSky::Moose
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moose Test::Most MooseX::Extended::Custom WebService::OpenSky::Moose
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures experimental::postderef _disabled_warnings
+
+[InputOutput::RequireBriefOpen]
+lines = 20
+
+[Modules::RequireExplicitPackage]
+allow_import_of = utf8
+
+# having more than one 'with' statement to consume roles negates our
+# ability to have proper method conflict resolution.
+[Moose::ProhibitMultipleWiths]
+
+# MacOS file system is case-insensitive, damn it.
+[Modules::RequireFilenameMatchesPackage]
+
+#--------------------------------------------------------------
+# I do not agree with these at all, so never load them
+
+[-Subroutines::RequireFinalReturn]
+[-Modules::ProhibitMultiplePackages]
+[-Subroutines::RequireArgUnpacking]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+# perlcritic thinks signatures are prototypes
+[-Subroutines::ProhibitSubroutinePrototypes] 
+
+# MooseX::Extended provides these, so skip 'em
+[-Moose::RequireMakeImmutable]
+[-Modules::RequireEndWithOne]

@@ -11,7 +11,7 @@ our @EXPORT_OK = qw( GetUserFile GetResource SetResourceName );
 
 # Implementation agnostic packager support.
 
-our $VERSION   = "1.430";
+our $VERSION   = "1.440";
 our $PACKAGED  = 0;
 our $RESNAME   = "";
 
@@ -30,6 +30,39 @@ if ( $ENV{PAR_0} ) {
     *GetUserFile      = sub { $ENV{PAR_TEMP} . "/inc/user/" . $_[0] };
     *Packager         = sub { "PAR" };
     *Version          = sub { "$PAR::VERSION" };
+}
+
+elsif ( $ENV{PPL_PACKAGED} ) {
+    $VERSION          = $ENV{PPL_PACKAGED};
+    $PACKAGED         = 1;
+    *Packager         = sub { "PPL" };
+    *Version          = sub { "$VERSION" };
+    *IsPackaged       = sub { 1 };
+    *GetResourcePath  = \&U_GetResourcePath;
+    *GetResource      = \&U_GetResource;
+    *GetUserFile      = \&U_GetUserFile;
+}
+
+elsif ( $ENV{DOCKER_PACKAGED} ) {
+    $VERSION          = $ENV{DOCKER_PACKAGED};
+    $PACKAGED         = 1;
+    *Packager         = sub { "Docker" };
+    *Version          = sub { "$VERSION" };
+    *IsPackaged       = sub { 1 };
+    *GetResourcePath  = \&U_GetResourcePath;
+    *GetResource      = \&U_GetResource;
+    *GetUserFile      = \&U_GetUserFile;
+}
+
+elsif ( $ENV{APPIMAGE_PACKAGED} ) {
+    $VERSION          = $ENV{APPIMAGE_PACKAGED};
+    $PACKAGED         = 1;
+    *Packager         = sub { "AppImage" };
+    *Version          = sub { "$VERSION" };
+    *IsPackaged       = sub { 1 };
+    *GetResourcePath  = \&U_GetResourcePath;
+    *GetResource      = \&U_GetResource;
+    *GetUserFile      = \&U_GetUserFile;
 }
 
 # Cava::Packager.

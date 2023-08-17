@@ -13,6 +13,7 @@ lib/App/DBBrowser/DB/Firebird.pm
 lib/App/DBBrowser/DB/Informix.pm
 lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm
+lib/App/DBBrowser/DB/Oracle.pm
 lib/App/DBBrowser/DB/Pg.pm
 lib/App/DBBrowser/DB/SQLite.pm
 lib/App/DBBrowser/GetContent.pm
@@ -29,8 +30,11 @@ lib/App/DBBrowser/Subqueries.pm
 lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/CommitWriteSQL.pm
 lib/App/DBBrowser/Table/Extensions.pm
-lib/App/DBBrowser/Table/Functions.pm
-lib/App/DBBrowser/Table/Functions/SQL.pm
+lib/App/DBBrowser/Table/Extensions/Case.pm
+lib/App/DBBrowser/Table/Extensions/Maths.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/SQL.pm
+lib/App/DBBrowser/Table/Extensions/WindowFunctions.pm
 lib/App/DBBrowser/Table/InsertUpdateDelete.pm
 lib/App/DBBrowser/Table/Substatements.pm
 lib/App/DBBrowser/Table/Substatements/Operators.pm

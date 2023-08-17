@@ -15,7 +15,7 @@ use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.13;
+our $VERSION = 0.15;
 
 sub call {
 	my ($self, $env) = @_;
@@ -34,12 +34,12 @@ sub call {
 	if (defined $self->{'_page_begin'}) {
 		$self->{'_page_begin'}->process_css;
 	}
-	$self->_css;
+	$self->_css($env);
 
 	# Process 'Tags' for page.
-	$self->_tags;
+	$self->_tags($env);
 	$self->tags->finalize;
-	$self->_cleanup;
+	$self->_cleanup($env);
 
 	return [
 		$self->status_code,
@@ -59,13 +59,13 @@ sub prepare_app {
 }
 
 sub _cleanup {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	return;
 }
 
 sub _css {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	return;
 }
@@ -156,19 +156,19 @@ sub _process_actions {
 }
 
 sub _tags_middle {
-	my $self = shift;
+	my ($self, $env) = @_;
 
 	return;
 }
 
 sub _tags {
-	my $self = shift;
+	my ($self, $env)= @_;
 
 	if ($self->flag_begin) {
 		$self->{'_page_begin'}->process;
 	}
 
-	$self->_tags_middle;
+	$self->_tags_middle($env);
 
 	if ($self->flag_end) {
 		Tags::HTML::Page::End->new(
@@ -198,13 +198,13 @@ Plack::Component::Tags::HTML - Plack component for Tags with HTML output.
  use base qw(Plack::Component::Tags::HTML);
 
  sub _cleanup {
-        my $self = shift;
+        my ($self, $env) = @_;
         # Cleanup about call().
         return;
  }
 
  sub _css {
-        my $self = shift;
+        my ($self, $env) = @_;
         $self->{'css'}->put(
                 # Structure defined by CSS::Struct
         );
@@ -224,7 +224,7 @@ Plack::Component::Tags::HTML - Plack component for Tags with HTML output.
  }
 
  sub _tags_middle {
-        my $self = shift;
+        my ($self, $env) = @_;
         $self->{'tags'}->put(
                 # Structure defined by Tags
         );
@@ -333,12 +333,12 @@ Default value is
 =head2 C<_cleanup>
 
 Method to cleanup after C<call()>.
-Argument is C<$self> only.
+Arguments are C<$self> and C<$env>.
 
 =head2 C<_css>
 
 Method to set css via C<$self-E<gt>{'css'}> object.
-Argument is C<$self> only.
+Arguments are C<$self> and C<$env>.
 
 =head2 C<_prepare_app>
 
@@ -363,12 +363,12 @@ C<$self->SUPER::_prepare_app()> to this.
 =head2 C<_process_actions>
 
 Method to set app processing part. Called in each call before creating of
-output. Argument is C<$self> and C<$env>.
+output. Arguments are C<$self> and C<$env>.
 
 =head2 C<_tags_middle>
 
 Method to set tags via C<$self-E<gt>{'tags'}> object.
-Argument is C<$self> only.
+Arguments are C<$self> and C<$env>.
 
 =head1 METHODS IMPLEMENTED
 
@@ -378,9 +378,9 @@ Inherited from L<Plack::Component>.
 There is run of:
 
  $self->_process_actions($env);
- $self->_css;
- $self->_tags;
- $self->_cleanup;
+ $self->_css($env);
+ $self->_tags($env);
+ $self->_cleanup($env);
 
 After it Generate and encode output from Tags to output with HTTP code.
 HTTP status code is defined by C<status_code()> method and Content-Type is
@@ -407,7 +407,7 @@ Call C<_prepare_app()>.
  use warnings;
 
  sub _tags_middle {
-         my $self = shift;
+         my ($self, $env) = @_;
 
          $self->{'tags'}->put(
                  ['d', 'Hello world'],
@@ -456,7 +456,7 @@ Call C<_prepare_app()>.
  use warnings;
 
  sub _tags_middle {
-         my $self = shift;
+         my ($self, $env) = @_;
 
          $self->{'tags'}->put(
                  ['d', 'Hello world'],
@@ -531,6 +531,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.15
 
 =cut

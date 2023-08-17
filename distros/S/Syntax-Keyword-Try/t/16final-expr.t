@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Try;
 
@@ -19,7 +19,7 @@ use Syntax::Keyword::Try;
       try { 1, 2, 3 }
       catch ($e) { 4, 5, 6 }
    };
-   is_deeply(\@list, [1, 2, 3], 'do { try } in list context');
+   is(\@list, [1, 2, 3], 'do { try } in list context');
 }
 
 # catch as final expression yields correct value
@@ -34,7 +34,7 @@ use Syntax::Keyword::Try;
       try { die "Oops" }
       catch ($e) { 4, 5, 6 }
    };
-   is_deeply(\@list, [4, 5, 6], 'do { try/catch } in list context');
+   is(\@list, [4, 5, 6], 'do { try/catch } in list context');
 
    $scalar = do {
       try { die "Oops" }

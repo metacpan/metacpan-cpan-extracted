@@ -7,7 +7,7 @@ use JSON;
 use Colouring::In;
 use Image::Scale;
 use Cwd qw/abs_path/;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our (%TOOL, %MANIFEST_SCHEMA);
 BEGIN {
 	%TOOL = (
@@ -434,7 +434,7 @@ Progressive::Web::Application - Utility for making an application 'progressive'
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

@@ -6,145 +6,196 @@ use Test::Net::SAML2;
 use Net::SAML2::Protocol::AuthnRequest;
 use Net::SAML2::XML::Sig;
 
-my $ar = Net::SAML2::Protocol::AuthnRequest->new(
-    issuer        => 'http://some/sp',
-    destination   => 'http://some/idp',
-    nameid_format => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-    nameid_allow_create => 1,
-);
-
-isa_ok($ar, "Net::SAML2::Protocol::AuthnRequest");
-
 my $override
     = Sub::Override->override(
     'Net::SAML2::Protocol::AuthnRequest::issue_instant' =>
         sub { return 'myissueinstant' });
 
-my $xml = $ar->as_xml;
+$override->override('Net::SAML2::Protocol::AuthnRequest::_build_id' =>
+        sub { return 'NETSAML2_fake_id' });
 
-my $xp = get_xpath(
-    $xml,
-    samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
-    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
-);
+{
+    my ($ar, $xp) = net_saml2_authnreq(
+        nameid        => 'mynameid',
+        nameid_format =>
+            'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        nameid_allow_create  => 1,
+        issuer_namequalifier => 'bar',
+        issuer_format        => 'foo',
+    );
 
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@ID', qr/^NETSAML2_/);
+    my %attributes = (
+        Destination  => 'http://some/idp',
+        ID           => 'NETSAML2_fake_id',
+        IssueInstant => 'myissueinstant',
+        Version      => '2.0',
+    );
 
-test_xml_attribute_ok($xp,
-    '/samlp:AuthnRequest/@IssueInstant',
-    'myissueinstant'
-);
+    test_node_attributes_ok($xp, '/samlp:AuthnRequest', \%attributes);
 
-test_xml_attribute_ok(
-    $xp,
-    '/samlp:AuthnRequest/samlp:NameIDPolicy/@Format',
-    'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
-);
+    my $node = get_single_node_ok($xp, '/samlp:AuthnRequest/saml:Issuer');
+    is($node->textContent, 'http://some/sp', '... and has the correct value');
+    is($node->getAttribute('Format'), 'foo', '.. and Format attribute is ok');
+    is($node->getAttribute('NameQualifier'),
+        'bar', ".. and NameQualifier attribute is ok");
 
-test_xml_attribute_ok($xp,
-    '/samlp:AuthnRequest/samlp:NameIDPolicy/@AllowCreate', '1');
+    test_xml_attribute_ok($xp,
+        '/samlp:AuthnRequest/saml:Subject/saml:NameID/@NameQualifier',
+        'mynameid');
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@ForceAuthn', 0);
+    %attributes = (
+        Format      => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        AllowCreate => 1,
+    );
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@IsPassive', 0);
+    test_node_attributes_ok($xp, '/samlp:AuthnRequest/samlp:NameIDPolicy',
+        \%attributes);
 
-my $signer = Net::SAML2::XML::Sig->new({
-    key => 't/sign-nopw-cert.pem',
-    cert => 't/sign-nopw-cert.pem',
-});
+    ok(!$xp->exists('/samlp:AuthnRequest/samlp:RequestedAuthnContext'),
+        "We don't have RequestedAuthnContext");
 
-isa_ok($signer, "Net::SAML2::XML::Sig");
+    ### TODO: Does this really belong here?
+    my $signer = Net::SAML2::XML::Sig->new(
+        {
+            key  => 't/sign-nopw-cert.pem',
+            cert => 't/sign-nopw-cert.pem',
+        }
+    );
 
-my $signed = $signer->sign($xml);
-ok($signed);
+    isa_ok($signer, "Net::SAML2::XML::Sig");
 
-my $verify = $signer->verify($signed);
-ok($verify);
+    my $signed = $signer->sign($xp->getContextNode->toString);
+    ok($signed, "Signed with XML::Sig");
 
-$ar = Net::SAML2::Protocol::AuthnRequest->new(
-    issuer        => 'http://some/sp',
-    destination   => 'http://some/idp',
-    nameid_format => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-    nameid_allow_create => 1,
-    force_authn   => '1',
-    is_passive    => '1'
+    my $verify = $signer->verify($signed);
+    ok($verify, "Verified with XML::Sig");
+    ### END TODO
+}
 
-);
 
-isa_ok($ar, "Net::SAML2::Protocol::AuthnRequest");
+{
+    my ($ar, $xp) = net_saml2_authnreq(
+        force_authn => '1',
+        is_passive  => '1'
+    );
+    my %attributes = (
+        Destination  => ignore(),
+        ForceAuthn   => 'true',
+        ID           => ignore(),
+        IsPassive    => 'true',
+        IssueInstant => 'myissueinstant',
+        Version      => '2.0',
+    );
+    test_node_attributes_ok($xp, '/samlp:AuthnRequest', \%attributes);
+}
 
-$xml = $ar->as_xml;
+{
+    my ($ar, $xp) = net_saml2_authnreq(
+        force_authn => '0',
+        is_passive  => '0'
+    );
 
-$xp = get_xpath(
-    $xml,
-    samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
-    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
-);
+    my %attributes = (
+        Destination  => ignore(),
+        ID           => ignore(),
+        IssueInstant => ignore(),
+        Version      => ignore(),
+        ForceAuthn   => 'false',
+        IsPassive    => 'false',
+    );
+    test_node_attributes_ok($xp, '/samlp:AuthnRequest', \%attributes);
+}
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@ForceAuthn', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@ForceAuthn', 'true');
+{
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@IsPassive', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@IsPassive', 'true');
+    my ($ar, $xp) = net_saml2_authnreq(
+        assertion_url    => 'https://foo.bar/assertion',
+        assertion_index  => 1,
+        attribute_index  => 42,
+        protocol_binding => 'HTTP-POST',
+    );
 
-$ar = Net::SAML2::Protocol::AuthnRequest->new(
-    issuer        => 'http://some/sp',
-    destination   => 'http://some/idp',
-    nameid_format => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-    nameid_allow_create => 1,
-    force_authn   => '0',
-    is_passive    => '0'
+    my %attributes = (
+        Destination                    => ignore(),
+        ID                             => ignore(),
+        IssueInstant                   => ignore(),
+        Version                        => ignore(),
+        AssertionConsumerServiceURL    => 'https://foo.bar/assertion',
+        AssertionConsumerServiceIndex  => 1,
+        AttributeConsumingServiceIndex => 42,
+        ProtocolBinding => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+    );
 
-);
+    test_node_attributes_ok($xp, '/samlp:AuthnRequest', \%attributes);
 
-isa_ok($ar, "Net::SAML2::Protocol::AuthnRequest");
+}
 
-$xml = $ar->as_xml;
+{
+    my ($ar, $xp) = net_saml2_authnreq(AuthnContextClassRef => [qw(foo bar)],);
 
-$xp = get_xpath(
-    $xml,
-    samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
-    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
-);
+    my @nodes
+        = $xp->findnodes(
+        '/samlp:AuthnRequest/samlp:RequestedAuthnContext/saml:AuthnContextClassRef'
+        );
+    is(@nodes, 2, "and has two AuthnContextClassRef nodes");
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@ForceAuthn', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@ForceAuthn', 'false');
+    is($nodes[0]->textContent(),
+        "foo", "... and the correct content for node 1");
+    is($nodes[1]->textContent(),
+        "bar", "... and the correct content for node 2");
+}
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@IsPassive', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@IsPassive', 'false');
+{
+    my ($ar, $xp) = net_saml2_authnreq(AuthnContextDeclRef => [qw(foo bar)],);
 
-my $sp = net_saml2_sp(
-    authnreq_signed        => 0,
-    want_assertions_signed => 0,
-    slo_url_post           => '/sls-post-response',
-    slo_url_soap           => '/slo-soap',
-);
+    my @nodes
+        = $xp->findnodes(
+        '/samlp:AuthnRequest/samlp:RequestedAuthnContext/saml:AuthnContextDeclRef'
+        );
+    is(@nodes, 2, "and has two AuthnContextDeclRef nodes");
 
-my %params = (
-    force_authn => 1,
-    is_passive => 0,
-);
+    is($nodes[0]->textContent(),
+        "foo", "... and the correct content for node 1");
+    is($nodes[1]->textContent(),
+        "bar", "... and the correct content for node 2");
+}
 
-my $req = $sp->authn_request(
-    $sp->id,
-    '',
-    %params,
-);
+{
 
-$xml = $req->as_xml;
+    my $sp = net_saml2_sp(
+        authnreq_signed        => 0,
+        want_assertions_signed => 0,
+        slo_url_post           => '/sls-post-response',
+        slo_url_soap           => '/slo-soap',
+    );
 
-$xp = get_xpath(
-    $xml,
-    samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
-    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
-);
+    my %params = (
+        force_authn => 1,
+        is_passive  => 0,
+    );
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@ForceAuthn', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@ForceAuthn', 'true');
+    my $req = $sp->authn_request($sp->id, '', %params,);
 
-test_xml_attribute_exists($xp, '/samlp:AuthnRequest/@IsPassive', 1);
-test_xml_attribute_ok($xp, '/samlp:AuthnRequest/@IsPassive', 'false');
+    my $xp = get_xpath(
+        $req->as_xml,
+        samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
+        saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
+    );
+}
 
-$xml = $ar->as_xml;
+{
+
+    my ($ar, $xp) = net_saml2_authnreq(
+        identity_providers => [qw(one two three)]
+    );
+
+    my $nodes = $xp->findnodes(
+        '/samlp:AuthnRequest/samlp:Scoping/samlp:IDPList/samlp:IDPEntry');
+    is($nodes->size, 3, "Found three IDP entries");
+
+    cmp_deeply([$nodes->map(sub { return $_->getAttribute('ProviderID') })],
+        [qw(one two three)], "... and the correct provider IDs found");
+
+}
 
 done_testing;

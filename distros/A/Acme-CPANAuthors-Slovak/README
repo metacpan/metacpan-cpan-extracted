@@ -22,7 +22,7 @@ EXAMPLE1
      use Acme::CPANAuthors;
 
      # Create object.
-     my $authors = Acme::CPANAuthors->new('Slovak);
+     my $authors = Acme::CPANAuthors->new('Slovak');
 
      # Get number of Slovak CPAN authors.
      my $count = $authors->count;
@@ -31,7 +31,7 @@ EXAMPLE1
      print "Count of Slovak CPAN authors: $count\n";
 
      # Output:
-     # Count of Slovak CPAN authors: 3
+     # Count of Slovak CPAN authors: 6
 
 EXAMPLE2
      use strict;
@@ -53,7 +53,10 @@ EXAMPLE2
      # [
      #     [0]  "BARNEY",
      #     [1]  "JKUTEJ",
-     #     [2]  "PALI",
+     #     [2]  "KOZO",
+     #     [3]  "LKUNDRAK",
+     #     [4]  "PALI",
+     #     [5]  "SAMSK",
      # ]
 
 DEPENDENCIES
@@ -68,10 +71,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020 Michal Josef Špaček
+    © 2020-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.28
 

@@ -1,5 +1,14 @@
 Revision history for Perl extension PHP-DateTime.
 
+0.09 2023-06-06T16:57:19Z
+
+ - Fix double version declaration.
+
+0.08 2023-06-06T16:52:04Z
+
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.07 2019-02-18T06:07:45Z
 
  - Migrate all the tests from Test::More to Test2::V0.

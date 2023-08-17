@@ -1,9 +1,9 @@
 
                             Compress-Raw-Lzma
 
-                              Version 2.204
+                              Version 2.206
 
-                              8 February 2023
+                               25 July 2023
 
         Copyright (c) 2009-2023 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -53,6 +53,26 @@ To install Compress-Raw-Lzma, run the command below:
 
 TROUBLESHOOTING
 ---------------
+
+Build fails on Debian/Ubuntu
+----------------------------
+
+If you are running a Debian/Ubuntu derivative you need to install the
+liblzma-dev package.
+
+There is a similarly named package called lzma-dev that will not work
+with this code.
+
+You will get this error if you have the wrong (or neither) package installed
+
+    Lzma.xs:18:10: fatal error: lzma.h: No such file or directory
+       18 | #include "lzma.h"
+          |          ^~~~~~~~
+    compilation terminated.
+
+Install liblzma-dev by running
+
+    sudo apt install liblzma-dev
 
 Test harness fails with: Undefined symbol "lzma_properties_size"
 ----------------------------------------------------------------
@@ -157,8 +177,7 @@ SUPPORT
 -------
 
 General feedback/questions/bug reports should be sent to
-https://github.com/pmqs/Compress-Raw-Lzma/issues (preferred) or
-https://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Raw-Lzma.
+https://github.com/pmqs/Compress-Raw-Lzma/issues
 
 FEEDBACK
 --------
@@ -193,7 +212,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.204" ;
+          $VERSION = "2.206" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner

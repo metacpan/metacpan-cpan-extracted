@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+# mockup dpkg for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+[ $# -gt 0 ]  ||  Die 'missing parameter(s)'
+root="${0%/*/*}/tmp"
+
+case $1 in
+    --listfiles)
+	case $2 in
+	    chromium)
+		echo "$root/usr/bin/1chromium"
+		echo "$root/usr/bin/3link"
+		;;
+	    coreutils)
+		echo "$root/usr/bin/2something"
+		;;
+	    dash)
+		echo "$root/usr/bin"
+		echo "$root/usr/bin/missing"
+		echo "package diverts others to: $root/bin/sh.distrib"
+		;;
+	    evince)
+		for n in 1 2 3 4 5 6 7 8 9; do
+		    echo "$root/usr/lib/some/directory/with/file-$n.txt"
+		done
+		echo "$root/lib/somelink"
+		echo "/lib/ld-linux.so.2"
+		;;
+	    pulseaudio-utils)
+		echo "$root/usr/bin/3link"
+		;;
+	    mockup-1)
+		echo "package diverts others to: $root/usr/bin/1chromium"
+		echo "diverted by something-else to: $root/usr/bin/1chromium"
+		echo "$root/usr/bin/1chromium"
+		echo "diverted by something-else to: $root/usr/bin/missing"
+		;;
+	    mockup-2)
+		echo 'bad entry: fatal mockup'
+		;;
+	    mockup-3*)
+		exit 2
+		;;
+	    *)
+		echo "$root/usr/bin/2something"
+	esac
+	;;
+    --search)
+	[ $# -gt 1 ]  ||  Die 'missing parameter(s) for --search'
+	echo 'dummy: /something'
+	output=''
+	case $2 in
+	    /bin/dash)		output='dash: /bin/dash';;
+	    /bin/ls)		echo 'coreutils: /bin/ls';;
+	    /bin/sh)		echo 'dash: /bin/sh';;
+	    /usr/bin/dash)	output='dash: /usr/bin/dash';;
+	    /usr/bin/ldd)	echo 'libc-bin: /usr/bin/ldd';;
+	    */1chromium)	echo "chromium: $2";;
+	    */ip)		output="iproute2: $2";;
+	    */pactl)		output="pulseaudio-utils: $2";;
+	    */su)		output="util-linux: $2";;
+	    *)			Die "mocked --search error for '$2'"
+	esac
+	if [ -z "$ALC_MINIMAL_SEARCH" ]; then
+	    if [ -n "$output" ]; then
+		echo "$output"
+	    fi
+	fi
+	;;
+    *)
+	Die "unknown option '$1'"
+esac

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetConditionalFormattingRequest.name :   ,
-# GetWorksheetConditionalFormattingRequest.sheetName :   ,
-# GetWorksheetConditionalFormattingRequest.index :   ,
-# GetWorksheetConditionalFormattingRequest.folder :   ,
-# GetWorksheetConditionalFormattingRequest.storageName :    
+# GetWorksheetConditionalFormattingRequest.name : The workbook name.  ,
+# GetWorksheetConditionalFormattingRequest.sheetName : The worksheet name.  ,
+# GetWorksheetConditionalFormattingRequest.index : The conditional formatting index.  ,
+# GetWorksheetConditionalFormattingRequest.folder : Original workbook folder.  ,
+# GetWorksheetConditionalFormattingRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_conditional_formatting' } = { 
-    	summary => '',
+    	summary => 'Gets conditional formatting description in worksheet.',
         params => $params,
         returns => 'ConditionalFormattingResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => '',
+     	description => 'The conditional formatting index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

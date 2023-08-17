@@ -1,0 +1,77 @@
+{
+   "abstract" : "Highlight code",
+   "author" : [
+      "Andreas V\u00f6gele <voegelas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Statocles-Plugin-Highlight-Kamelon",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.26",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Statocles::Base" : "0",
+            "Statocles::Plugin" : "0",
+            "Statocles::Plugin::Highlight" : "0",
+            "Syntax::Kamelon" : "0",
+            "perl" : "5.016",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojo::DOM" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Statocles::Plugin::Highlight::Kamelon" : {
+         "file" : "lib/Statocles/Plugin/Highlight/Kamelon.pm",
+         "version" : "1.000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon/issues"
+      },
+      "homepage" : "https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon.git",
+         "web" : "https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon"
+      }
+   },
+   "version" : "1.000",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

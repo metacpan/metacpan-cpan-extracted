@@ -31,6 +31,9 @@ WriteMakefile (
           url  => 'https://github.com/szabgab/File-Tools.git',
           web  => 'https://github.com/szabgab/File-Tools',
       },
+      bugtracker => {
+          web => 'https://github.com/szabgab/File-Tools/issues'
+      },
     }
   },
 );

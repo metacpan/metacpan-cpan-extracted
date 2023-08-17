@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -75,15 +76,15 @@ sub connect_client
    is( $req->path, "/path", '$req->path' );
 
    is( $req->query_string, "var=value", '$req->query_string' );
-   is_deeply( [ $req->query_form ], [ var => "value" ], '$req->query_form' );
-   is_deeply( [ $req->query_param_names ], [qw( var )], '$req->query_param_names' );
+   is( [ $req->query_form ], [ var => "value" ], '$req->query_form' );
+   is( [ $req->query_param_names ], [qw( var )], '$req->query_param_names' );
    is( $req->query_param( "var" ), "value", '$req->query_param' );
 
    is( $req->header( "User-Agent" ), "unit-test", '$req->header' );
 
-   is_deeply( [ $req->headers ],
-              [ [ "User-Agent" => "unit-test" ] ],
-              '$req->headers' );
+   is( [ $req->headers ],
+       [ [ "User-Agent" => "unit-test" ] ],
+       '$req->headers' );
 
    is( $req->response_status_line, "HTTP/1.1 200 OK", '$req->response_status_line' );
    is( $req->response_status_code, 200, '$req->response_status_code' );

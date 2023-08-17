@@ -10,7 +10,7 @@ use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-our $VERSION = '2.128';
+our $VERSION = '2.131';
 
 =encoding utf8
 
@@ -102,14 +102,14 @@ sub check_vcs {
 		}
 
 	$self->_die( "\nERROR: Subversion is not up-to-date ($count files): Can't release!\n" )
-    	if $count;
+		if $count;
 
 =pod
 
 	if($question_count)
 		{
-    	$self->_print "\nWARNING: Subversion is not up-to-date ($question_count files unknown); ",
-      "continue anyway? [Ny] " ;
+		$self->_print "\nWARNING: Subversion is not up-to-date ($question_count files unknown); ",
+			"continue anyway? [Ny] " ;
 		die "Exiting\n" unless <> =~ /^[yY]/;
 		}
 
@@ -258,7 +258,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

@@ -49,6 +49,6 @@
          "web" : "https://github.com/LilithSec/Time-Piece-Guess"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

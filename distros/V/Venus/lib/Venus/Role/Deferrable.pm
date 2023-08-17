@@ -12,7 +12,7 @@ use Venus::Role 'fault';
 sub defer {
   my ($self, $name, @args) = @_;
 
-  return sub {} if !$name;
+  return sub {$self} if !$name;
 
   my $code = $self->can($name)
     or fault "Unable to defer $name: can't find $name in @{[ref $self]}";
@@ -108,7 +108,7 @@ I<Since C<1.80>>
 
   $example = Example->new;
 
-  # bless({}, 'Example1')
+  # bless({}, 'Example')
 
   # my $result = $example->defer('test', 1..4);
 
@@ -128,13 +128,33 @@ I<Since C<1.80>>
 
   $example = Example->new;
 
-  # bless({}, 'Example1')
+  # bless({}, 'Example')
 
   # my $result = $example->defer('test', 1..4);
 
   # $result->(1..4);
 
   # [1..4, 1..4]
+
+=back
+
+=over 4
+
+=item defer example 3
+
+  # given: synopsis
+
+  package main;
+
+  $example = Example->new;
+
+  # bless({}, 'Example')
+
+  # my $result = $example->defer;
+
+  # $result->();
+
+  # bless({}, 'Example')
 
 =back
 

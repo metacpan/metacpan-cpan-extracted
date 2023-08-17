@@ -9,9 +9,9 @@ use Fcntl;
 use File::MoreUtil qw(file_exists l_abs_path);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-06'; # DATE
+our $DATE = '2023-08-07'; # DATE
 our $DIST = 'File-Trash-FreeDesktop'; # DIST
-our $VERSION = '0.200'; # VERSION
+our $VERSION = '0.205'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -121,12 +121,14 @@ sub list_trashes {
     my @res = map { l_abs_path($_) }
         grep {-d} (
             $self->_home_trash,
-            (map { (
-                "$_/.Trash-$>",
-                "$_/tmp/.Trash-$>",
-                "$_/.Trash/$>",
-                "$_/tmp/.Trash/$>",
+            (
+                $self->{home_only} ? () : (map { (
+                    "$_/.Trash-$>",
+                    "$_/tmp/.Trash-$>",
+                    "$_/.Trash/$>",
+                    "$_/tmp/.Trash/$>",
                 ) } @mp)
+            )
         );
 
     List::Util::uniq(@res);
@@ -135,16 +137,19 @@ sub list_trashes {
 sub _parse_trashinfo {
     require Time::Local;
 
+    # we use regex parsing instead of INI to be simpler
     my ($self, $content) = @_;
     $content =~ /\A\[Trash Info\]/m or return "No header line";
     my $res = {};
     $content =~ /^Path=(.+)/m or return "No Path line";
     $res->{path} = $1;
-    $content =~ /^DeletionDate=(\d{4})-?(\d{2})-?(\d{2})T(\d\d):(\d\d):(\d\d)$/m
-        or return "No/invalid DeletionDate line";
-    $res->{deletion_date} = Time::Local::timelocal(
-        $6, $5, $4, $3, $2-1, $1-1900)
-        or return "Invalid date: $1-$2-$3T$4-$5-$6";
+  PARSE_DELETIONDATE: {
+        $content =~ /^DeletionDate=(\d{4})-?(\d{2})-?(\d{2})T(\d\d):(\d\d):(\d\d)$/m
+            or do { warn "No/invalid DeletionDate line for path $res->{path}"; last PARSE_DELETIONDATE };
+        $res->{deletion_date} = Time::Local::timelocal(
+            $6, $5, $4, $3, $2-1, $1-1900)
+            or do { warn "Invalid deletion date: $1-$2-$3T$4-$5-$6 when parsing trashinfo for path $res->{path}"; last PARSE_DELETIONDATE };
+    }
     $res;
 }
 
@@ -161,12 +166,14 @@ sub list_contents {
 
     my @trash_dirs = $trash_dir0 ? ($trash_dir0) : ($self->list_trashes);
     my @res;
+    my ($path_wc_re, $filename_wc_re);
   L1:
     for my $trash_dir (@trash_dirs) {
         #next unless -d $trash_dir;
         #next unless -d "$trash_dir/info";
         opendir my($dh), "$trash_dir/info"
-            or do { warn "Can't read trash info dir $trash_dir/info: $!";next };
+            or do { warn "Can't read trash info dir $trash_dir/info: $!"; next };
+      ENTRY:
         for my $e (readdir $dh) {
             next unless $e =~ /\.trashinfo$/;
             local $/;
@@ -175,23 +182,52 @@ sub list_contents {
                 or die "Can't open trash info file $e: $!";
             my $content = <$fh>;
             close $fh;
-            my $pres = $self->_parse_trashinfo($content);
-            die "Can't parse trash info file $e: $pres" unless ref($pres);
-            if (defined $opts->{search_path}) {
-                next unless $pres->{path} eq $opts->{search_path};
-            }
+            my $parse_res = $self->_parse_trashinfo($content);
+            die "Can't parse trash info file $e: $parse_res" unless ref($parse_res);
+
+          FILTER: {
+                if (defined $opts->{path}) {
+                    next ENTRY unless $parse_res->{path} eq $opts->{path};
+                }
+                if (defined $opts->{path_wildcard}) {
+                    unless (defined $path_wc_re) {
+                        require String::Wildcard::Bash;
+                        $path_wc_re = String::Wildcard::Bash::convert_wildcard_to_re({globstar=>1}, $opts->{path_wildcard});
+                    }
+                    next ENTRY unless $parse_res->{path} =~ $path_wc_re;
+                }
+                if (defined $opts->{path_re}) {
+                    next ENTRY unless $parse_res->{path} =~ $opts->{path_re};
+                }
+              FILTER_FILENAME: {
+                    (my $filename = $parse_res->{path}) =~ s!.+/!!;
+                    if (defined $opts->{filename}) {
+                        next ENTRY unless $filename eq $opts->{filename};
+                    }
+                    if (defined $opts->{filename_wildcard}) {
+                        unless (defined $filename_wc_re) {
+                            require String::Wildcard::Bash;
+                            $filename_wc_re = String::Wildcard::Bash::convert_wildcard_to_re({globstar=>1}, $opts->{filename_wildcard});
+                        }
+                        next ENTRY unless $filename =~ $filename_wc_re;
+                    }
+                    if (defined $opts->{filename_re}) {
+                        next ENTRY unless $filename =~ $opts->{filename_re};
+                    }
+                } # FILTER_FILENAME
+            } # FILTER
+
             my $afile = "$trash_dir/files/$e"; $afile =~ s/\.trashinfo\z//;
             if (defined $opts->{mtime}) {
                 my @st = lstat($afile);
-                next unless !@st || $st[9] == $opts->{mtime};
+                next ENTRY unless !@st || $st[9] == $opts->{mtime};
             }
             if (defined $opts->{suffix}) {
-                next unless $afile =~ /\.\Q$opts->{suffix}\E\z/;
+                next ENTRY unless $afile =~ /\.\Q$opts->{suffix}\E\z/;
             }
-            $pres->{trash_dir} = $trash_dir;
-            $e =~ s/\.trashinfo//; $pres->{entry} = $e;
-            push @res, $pres;
-            last L1 if defined $opts->{search_path};
+            $parse_res->{trash_dir} = $trash_dir;
+            $e =~ s/\.trashinfo//; $parse_res->{entry} = $e;
+            push @res, $parse_res;
         }
     }
 
@@ -266,73 +302,76 @@ sub recover {
     }
     $opts->{on_not_found}     //= 'die';
     $opts->{on_target_exists} //= 'die';
-    my ($file0, $trash_dir0) = @_;
+    my ($file0, $trash_dir) = @_;
 
-    if (file_exists($file0)) {
-        if ($opts->{on_target_exists} eq 'ignore') {
-            return 0;
-        } else {
-            die "Restore target already exists: $file0";
+    $opts->{filename} //= $file0;
+    my @ct = $self->list_contents($opts, $trash_dir);
+
+  ENTRY:
+    for my $e (@ct) {
+        if (file_exists($e->{path})) {
+            if ($opts->{on_target_exists} eq 'ignore') {
+                next ENTRY;
+            } else {
+                die "Restore target already exists: $e->{path}";
+            }
         }
-    }
-    my $afile = l_abs_path($file0);
-
-    my @res = $self->list_contents({
-        search_path => $afile,
-        mtime       => $opts->{mtime},
-        suffix      => $opts->{suffix},
-    }, $trash_dir0);
-    unless (@res) {
-        if ($opts->{on_not_found} eq 'ignore') {
-            return 0;
-        } else {
-            die "File not found in trash: $file0";
+        my $afile = l_abs_path($e->{path});
+        my $ifile = "$e->{trash_dir}/info/$e->{entry}.trashinfo";
+        my $tfile = "$e->{trash_dir}/files/$e->{entry}";
+        log_trace("Recovering from trash %s -> %s ...", $tfile, $afile);
+        unless (rename($tfile, $afile)) {
+            die "Can't rename $tfile to $afile: $!";
         }
+        unlink($ifile);
     }
-
-    my $trash_dir = $res[0]{trash_dir};
-    my $ifile = "$trash_dir/info/$res[0]{entry}.trashinfo";
-    my $tfile = "$trash_dir/files/$res[0]{entry}";
-    log_trace("Recovering from trash %s -> %s ...", $tfile, $afile);
-    unless (rename($tfile, $afile)) {
-        die "Can't rename $tfile to $afile: $!";
-    }
-    unlink($ifile);
 }
 
 sub _erase {
     require File::Remove;
 
-    my ($self, $file0, $trash_dir) = @_;
-    my $afile = defined($file0) ? l_abs_path($file0) : undef;
+    my ($self, $opts, $trash_dir) = @_;
 
-    my @ct = $self->list_contents({search_path=>$afile}, $trash_dir);
-
+    my @ct = $self->list_contents($opts, $trash_dir);
     my @res;
-    for (@ct) {
-        my $f = "$_->{trash_dir}/info/$_->{entry}.trashinfo";
+    for my $e (@ct) {
+        my $f = "$e->{trash_dir}/info/$e->{entry}.trashinfo";
         unlink $f or die "Can't remove $f: $!";
         # XXX File::Remove interprets wildcard, what if filename contains
         # wildcard?
-        File::Remove::remove(\1, "$_->{trash_dir}/files/$_->{entry}");
-        push @res, $_->{path};
+        File::Remove::remove(\1, "$e->{trash_dir}/files/$e->{entry}");
+        push @res, $e->{path};
     }
     @res;
 }
 
 sub erase {
-    my ($self, $file, $trash_dir) = @_;
+    my $self = shift;
+    my $opts = ref($_[0]) eq 'HASH' ? {%{shift(@_)}} : {};
+    my ($file, $trash_dir) = @_;
+    $opts->{filename} //= $file;
 
-    die "Please specify file" unless defined $file;
-    $self->_erase($file, $trash_dir);
+    # make sure user specifies at least one of filename
+    # option/$file/filename_wildcard/filename_re/path/path_wildcard/path_re.
+    # specifying no files will include all entries. for that user should be more
+    # explicit and call empty().
+    unless (defined $file or
+            defined $opts->{filename} or
+            defined $opts->{filename_wildcard} or
+            defined $opts->{filename_re} or
+            defined $opts->{path} or
+            defined $opts->{path_wildcard} or
+            defined $opts->{path_re}) {
+        die "Please specify at least file/filename/filename_wildcard/filename_re ".
+            "or path/path_wildcard/path_re";
+    }
+    $self->_erase($opts, $trash_dir);
 }
 
-# XXX currently empty calls _erase, which parses .trashinfo files. this is
-# useless overhead.
 sub empty {
     my ($self, $trash_dir) = @_;
 
-    $self->_erase(undef, $trash_dir);
+    $self->_erase({}, $trash_dir);
 }
 
 1;
@@ -350,7 +389,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.200 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2022-05-06.
+This document describes version 0.205 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2023-08-07.
 
 =head1 SYNOPSIS
 
@@ -394,7 +433,7 @@ This module lets you trash/erase/restore files, also list the contents of trash
 directories. This module follows the freedesktop.org trash specification [1],
 with some notes/caveats:
 
-=over 4
+=over
 
 =item * For home trash, $HOME/.local/share/Trash is used instead of $HOME/.Trash
 
@@ -412,13 +451,28 @@ It should not matter though, because trash directories are per-filesystem.
 
 =back
 
-Some other notes:
+Keywords: recycle bin
 
-=over 4
+=head1 THE TRASH STRUCTURE
 
-=item *
+The following is a short description of the trash structure.
 
-=back
+A trash directory is a per-filesystem, per-user directory structure to allow
+files to be "trashed", i.e. to be put inside and to be recovered to its original
+location later should a user changes his/her mind and wants the files back.
+Otherwise, user can "empty" the trash to delete files permanently.
+
+A trash directory, e.g. C</home/USER1/.local/share/Trash>, contains two
+subdirectories: C<info> and C<files>. The C<files> contain the actual trashed
+files and their name must be unique. Thus if C</home/USER1/foo.txt> is trashed
+and then another C</home/USER1/foo.txt> is trashed again, the second file must
+be renamed to C</home/USER1/foo (1).txt> or something else.
+
+The C<info> subdirectory contains the metadata for each trashed file, with each
+metadata put in an INI of the same name of the correspoonding file in C<files>
+with C<.trashinfo> suffix, under the INI C<Trash Info> section. Known INI
+parameters include: C<Path> (the original name/path of the trashed file) and
+C<DeletionDate> (date and time, in ISO8601 format).
 
 =head1 NOTES
 
@@ -431,7 +485,17 @@ Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How about
 
 Constructor.
 
-Currently there are no known options.
+Known options:
+
+=over
+
+=item * home_only
+
+Bool. If set to true, instruct the module to just look for trash directory under
+the home directory and not search other filesystem mountpoints for possible
+trash directories.
+
+=back
 
 =head2 $trash->list_trashes() => LIST
 
@@ -442,13 +506,13 @@ Return a list of trash directories. Sample output:
  ("/home/mince/.local/share/Trash",
   "/tmp/.Trash-1000")
 
-=head2 $trash->list_contents([$trash_dir]) => LIST
+=head2 $trash->list_contents([ \%opts ], [ $trash_dir ]) => LIST
 
 List contents of trash director(y|ies).
 
-If $trash_dir is not specified, list contents from all existing trash
-directories. Die if $trash_dir does not exist or inaccessible or corrupt. Return
-a list of records like the sample below:
+If C<$trash_dir> is not specified, list contents from all existing trash
+directories. Die if C<$trash_dir> does not exist or inaccessible or corrupt.
+Return a list of records like the sample below:
 
  ({entry=>"file1", path=>"/home/mince/file1", deletion_date=>1342061508,
    trash_dir=>"/home/mince/.local/share/Trash"},
@@ -456,6 +520,53 @@ a list of records like the sample below:
    trash_dir=>"/home/mince/.local/share/Trash"},
   {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
    trash_dir=>"/tmp/.Trash-1000"})
+
+The C<path> key is the original path of the file before it is put into the
+trash.
+
+Known options:
+
+=over
+
+=item * suffix
+
+Str.
+
+=item * path_wildcard
+
+Wildcard pattern to be matched against path. Only matching entries will be
+returned.
+
+=item * path_re
+
+Regexp pattern to be matched against path. Only matching entries will be
+returned.
+
+=item * path
+
+Exact matching against path. Only matching entries will be returned.
+
+=item * filename_wildcard
+
+Wildcard pattern to be matched against the filename part of path. Only matching
+entries will be returned.
+
+=item * filename_re
+
+Regexp pattern to be matched against the filename part of path. Only matching
+entries will be returned.
+
+=item * filename
+
+Exact matching against filename part of path. Only matching entries will be
+returned.
+
+=item * mtime
+
+Int. Only return entries where the trashed file's modification time matches this
+<value.
+
+=back
 
 =head2 $trash->trash([\%opts, ]$file) => STR
 
@@ -493,19 +604,42 @@ pick a unique suffix.
 
 =head2 $trash->recover([\%opts, ]$file[, $trash_dir])
 
-Recover a file from trash.
+Recover a file or multiple files from trash.
 
-Unless $trash_dir is specified, will search in all existing user's trash dirs.
-Will die on errors.
+Unless C<$trash_dir> is specified, will search in all existing user's trash
+dirs. Will die on errors.
 
 If first argument is a hashref, it will be accepted as options. Known options:
 
 =over 4
 
-=item * on_not_found => STR (default 'die')
+=item * filename
 
-Specify what to do when file is not found in the trash. The default is 'die',
-but can also be set to 'ignore' and return immediately.
+See C<list_contents()>.
+
+=item * filename_wildcard
+
+See C<list_contents()>.
+
+=item * filename_re
+
+See C<list_contents()>.
+
+=item * path
+
+See C<list_contents()>.
+
+=item * path_wildcard
+
+See C<list_contents()>.
+
+=item * path_re
+
+See C<list_contents()>.
+
+=item * mtime
+
+See C<list_contents()>.
 
 =item * on_target_exists => STR (default 'die')
 
@@ -531,12 +665,15 @@ Only recover file having the specified suffix, chosen previously during trash().
 
 =back
 
-=head2 $trash->erase($file[, $trash_dir]) => LIST
+=head2 $trash->erase([ \%opts, ] $file[, $trash_dir]) => LIST
 
-Erase (unlink()) a file in trash.
+Erase (unlink()) a file or multiple files in trash.
 
-Unless $trash_dir is specified, will empty all existing user's trash dirs. Will
-ignore if file does not exist in trash. Will die on errors.
+Unless C<$trash_dir> is specified, will empty all existing user's trash dirs.
+Will ignore if file does not exist in trash. Will die on errors.
+
+To erase multiple files based on wilcard or regexp pattern, use the options. See
+C<list_contents()>.
 
 Return list of files erased.
 
@@ -566,11 +703,35 @@ Source repository is at L<https://github.com/perlancar/perl-File-Trash-FreeDeskt
 
 =head1 SEE ALSO
 
-[1] http://freedesktop.org/wiki/Specifications/trash-spec
+=head2 Specification
 
-Related modules on CPAN:
+L<https://freedesktop.org/wiki/Specifications/trash-spec>
 
-=over 4
+=head2 CLI utilities
+
+=over
+
+=item * App::TrashUtils
+
+A set of CLI's written in Perl: L<trash-empty>, L<trash-list>,
+L<trash-list-trashes>, L<trash-put>, L<trash-restore>, L<trash-rm>.
+
+=item * L<trash-u> (from App::trash::u)
+
+An alternative CLI, with undo support.
+
+=item * trash-cli
+
+A set of CLI's written in Python: C<trash-empty>, C<trash-list>, C<trash-put>,
+C<trash-restore>, C<trash-rm>.
+
+L<https://github.com/andreafrancia/trash-cli>
+
+=back
+
+=head2 Related CPAN modules
+
+=over
 
 =item * L<Trash::Park>
 
@@ -613,13 +774,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2017, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2017, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

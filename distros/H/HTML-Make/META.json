@@ -4,7 +4,7 @@
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,6 +17,9 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "file" : [
+         "t/HMT.pm"
       ]
    },
    "prereqs" : {
@@ -33,7 +36,7 @@
       "runtime" : {
          "requires" : {
             "HTML::Valid::Tagset" : "0",
-            "JSON::Parse" : "0.60",
+            "JSON::Parse" : "0.62",
             "perl" : "5.006001"
          }
       }
@@ -47,6 +50,6 @@
          "url" : "https://github.com/benkasminbullock/HTML-Make"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

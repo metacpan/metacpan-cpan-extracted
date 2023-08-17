@@ -14,6 +14,7 @@ dist.ini
 doap.ttl
 lib/Regexp/Pattern/License.pm
 lib/Regexp/Pattern/License/Parts.pm
+precious.toml
 t/01-basic.t
 t/02-regexp-pattern.t
 t/02-regexp-pattern_RE2.t
@@ -43,3 +44,4 @@ t/coverage-trove.t
 t/coverage-wikidata.t
 t/lib/Test2/Tools/LicenseObject.pm
 t/lib/Test2/Tools/LicenseRegistry.pm
+t/version.t

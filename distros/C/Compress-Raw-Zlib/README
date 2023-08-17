@@ -1,9 +1,9 @@
 
                             Compress-Raw-Zlib
 
-                               Version 2.204
+                              Version 2.206
 
-                               8 February 2023
+                               25 July 2023
 
         Copyright (c) 2005-2023 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -323,8 +323,7 @@ SUPPORT
 -------
 
 General feedback/questions/bug reports should be sent to
-https://github.com/pmqs/Compress-Raw-Zlib/issues (preferred) or
-https://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Raw-Zlib.
+https://github.com/pmqs/Compress-Raw-Zlib/issues
 
 FEEDBACK
 --------
@@ -359,7 +358,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Zlib then search Compress::Raw::Zlib.pm
         for a line like this:
 
-          $VERSION = "2.204" ;
+          $VERSION = "2.206" ;
 
      c. The version of zlib you have used.
         If you have successfully installed Compress-Raw-Zlib, this one-liner

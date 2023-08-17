@@ -5,6 +5,9 @@ use warnings;
 use Math::Prime::Util qw(is_prime_power);
 use Math::DifferenceSet::Planar;
 
+die "usage: A333852.pl [max_order [max_terms]]\n"
+    if 2 < @ARGV || grep {!/^[1-9][0-9]*\z/} @ARGV;
+
 my $LIM_ORDER = Math::DifferenceSet::Planar->available_max_order;
 my $MAX_ORDER = @ARGV? shift @ARGV: 32;
 my $MAX_TERMS = @ARGV? shift @ARGV: 20_000;
@@ -23,12 +26,12 @@ print "# order 1: 1 set\n";
 emit(0, 1);
 
 my $order = 1;
-while ($n < $MAX_TERMS && ++$order < $MAX_ORDER) {
+while ($n < $MAX_TERMS && ++$order <= $MAX_ORDER) {
     next if !is_prime_power($order);
     if ($order > $LIM_ORDER) {
         print
             "# orders >= $order left out ",
-           "due to implementation restriction\n";
+            "due to implementation restriction\n";
         last;
     }
     my $s0 = Math::DifferenceSet::Planar->new($order);
@@ -49,6 +52,7 @@ while ($n < $MAX_TERMS && ++$order < $MAX_ORDER) {
 }
 
 __END__
+
 =head1 NAME
 
 A333852.pl - generate OEIS A333852
@@ -95,7 +99,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

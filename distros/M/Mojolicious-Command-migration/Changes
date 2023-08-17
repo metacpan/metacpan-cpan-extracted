@@ -25,3 +25,8 @@ Revision history for Perl module Mojolicious::Command::migration
 
 0.17 2020-03-04
     - mysql host and port params use
+
+0.18 2023-06-26
+    - add quote to all field names
+    - add drop field to upgrade
+    - readme for rm and diff

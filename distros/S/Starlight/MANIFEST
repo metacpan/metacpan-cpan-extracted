@@ -1,5 +1,7 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/ca.crt
 examples/ca.key
 examples/client.crt
@@ -9,19 +11,13 @@ examples/hello.psgi
 examples/localhost.crt
 examples/localhost.key
 examples/mojo.pl
-examples/test_fork_exit.pl
 examples/test_proxy.sh
-examples/test_rt40565.pl
 inc/Module/Build/My.pm
 lib/Plack/Handler/Starlight.pm
 lib/Starlight.pm
 lib/Starlight/Server.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 README
 README.md
 script/starlight.pl
@@ -32,6 +28,7 @@ t/03post.t
 t/04-bumpy-life.t
 t/05server-header.t
 t/06harakiri.t
+t/06non_harakiri.t
 t/07remote_port.t
 t/08chunked_req.t
 t/09chunked_zero_length.t
@@ -42,6 +39,7 @@ t/61ssl_largebody.t
 t/62ssl_client_cert.t
 xt/check_changes.t
 xt/consistent_version_numbers.t
+xt/copyright.t
 xt/cover.pl
 xt/cpan_changes.t
 xt/cpan_meta.t
@@ -51,10 +49,13 @@ xt/eol.t
 xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
-xt/pod_coverage.t
+xt/perlcritic.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t
 xt/portability_files.t
 xt/signature.t
-SIGNATURE    Added here by Module::Build
+Makefile.PL
+LICENSE
+META.yml
+META.json

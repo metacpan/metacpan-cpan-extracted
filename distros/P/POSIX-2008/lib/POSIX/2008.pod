@@ -6,8 +6,7 @@ POSIX::2008 - Perl interface to POSIX.1-2008
 
 =head1 SYNOPSIS
 
-  use Fcntl;
-  use POSIX::2008 qw(openat pwrite);
+  use POSIX::2008 qw(:fcntl openat pwrite);
 
   sysopen my $dh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW or die 'Dafuq?';
   my $fh = openat($dh, 'foobar', O_RDWR|O_CREAT);
@@ -16,21 +15,18 @@ POSIX::2008 - Perl interface to POSIX.1-2008
 =head1 DESCRIPTION
 
 POSIX::2008 contains many of the interfaces specified by
-L<POSIX.1-2008|http://pubs.opengroup.org/onlinepubs/9699919799/> that the core
-POSIX module withholds, implements in Perl or fucked up.
+L<POSIX.1-2008|https://pubs.opengroup.org/onlinepubs/9699919799/> that the
+core POSIX module withholds, implements in Perl or fucked up.
+
+It also contains a few nonstandard interfaces present in Linux, BSD and Solaris
+that are extensions of the POSIX interfaces.
 
 This module is provided "as is" unless someone volunteers to maintain it.
-
-=head1 INCOMPATIBLE PARAMETER CHANGE
-
-Since version 0.13, the parameter order of pread/pwrite is (count, offset) as
-with the actual system calls instead of (offset, count). Good luck.
 
 =head1 FILE DESCRIPTORS AND HANDLES
 
 Since version 0.05, all I/O functions that take numeric file descriptors also
-accept Perl file or directory handles. L<C<openat()>|"openat"> even returns a
-handle if you passed it one.
+accept Perl file or directory handles.
 
 =head1 SYSTEM CALL RETURN VALUES
 
@@ -39,337 +35,350 @@ A system call return value of -1 meaning "error" is mapped to undef.
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
 For system calls where 0 does not just mean "success", 0 is returned
-unchanged. These are C<open()>, C<read()>, C<write()>, C<readv()>,
-C<writev()>, C<pread()>, C<pwrite()>, C<preadv()>, C<pwritev()>. C<openat()>
-gets a special treatment in this module, see below.
+unchanged. These are L<C<open()>|"open">, L<C<read()>|"read">,
+L<C<write()>|"write">, L<C<readv()>|"readv">, L<C<writev()>|"writev">,
+L<C<pread()>|"pread">, L<C<pwrite()>|"pwrite">, L<C<preadv()>|"preadv">,
+L<C<pwritev()>|"pwritev">, L<C<preadv2()>|"preadv2">,
+L<C<pwritev2()>|"pwritev2">, L<C<getpriority()>|"getpriority">.
+L<C<openat()>|"openat"> gets a special treatment in this regard, see below.
 
 =head1 FUNCTIONS
 
 =over 4
 
-=item a64l
+=item C<a64l>
 
 l = a64l(s);
 
-=item abort
+=item C<abort>
 
 abort();
 
-=item abs
+=item C<abs>
 
 ui = abs(i);
 
-=item access
+Calls C<llabs()>, C<labs()>, or C<abs()>, whichever is the maximum supported
+by your system.
+
+Note that the library functions use signed integers, so C<abs(~0)> is 1.
+If you don't want that, use C<CORE::abs()>.
+
+=item C<access>
 
 ret = access(path, mode);
 
-=item acos
+=item C<acos>
 
 y = acos(x);
 
-=item acosh
+=item C<acosh>
 
 y = acosh(x);
 
-=item alarm
+=item C<alarm>
 
 remaining_sec = alarm(sec);
 
-=item asin
+=item C<asin>
 
 y = asin(x);
 
-=item asinh
+=item C<asinh>
 
 y = asinh(x);
 
-=item atan2
+=item C<atan2>
 
 z = atan2(y, x);
 
-=item atan
+=item C<atan>
 
 y = atan(x);
 
-=item atanh
+=item C<atanh>
 
 y = atanh(x);
 
-=item atof
+=item C<atof>
 
 f = atof(s);
 
-=item atoi
+=item C<atoi>
 
 i = atoi(s);
 
-=item atol
+Calls C<atoll()>, C<atol()>, or C<atoi()>, whichever is the maximum supported 
+by your system. This is of course silly because you could just use C<int()>.
 
-l = atol(s);
-
-=item basename
+=item C<basename>
 
 s = basename(path);
 
-=item cabs
+=item C<cabs>
 
 r = cabs(re, im);
 
-=item cacos
+=item C<cacos>
 
 (re, im) = cacos(re, im);
 
-=item cacosh
+=item C<cacosh>
 
 (re, im) = cacosh(re, im);
 
-=item carg
+=item C<carg>
 
 phi = carg(re, im);
 
-=item casinh
+=item C<casinh>
 
 (re, im) = casinh(re, im);
 
-=item catan
+=item C<catan>
 
 (re, im) = catan(re, im);
 
-=item catanh
+=item C<catanh>
 
 (re, im) = catanh(re, im);
 
-=item catclose
+=item C<catclose>
 
 ret = catclose(catd);
 
-=item catgets
+=item C<catgets>
 
 s = catgets(catd, set_id, msg_id, dflt_string);
 
-=item catopen
+=item C<catopen>
 
-catd = catopen(name, oflag);
+catd = catopen(name, flag);
 
-=item cbrt
+=item C<cbrt>
 
 y = cbrt(x);
 
-=item ccos
+=item C<ccos>
 
 (re, im) = ccos(re, im);
 
-=item ccosh
+=item C<ccosh>
 
 (re, im) = ccosh(re, im);
 
-=item ceil
+=item C<ceil>
 
 y = ceil(x);
 
-=item cexp
+=item C<cexp>
 
 (re, im) = cexp(re, im);
 
-=item chdir
+=item C<chdir>
 
-ret = chdir(path);
+ret = chdir(dir);
 
-=item chmod
+C<dir> can be a path, a Perl file handle or a file descriptor.
 
-ret = chmod(path, mode);
+=item C<chmod>
 
-=item chown
+ret = chmod(what, mode);
 
-ret = chown(path, uid, gid);
+C<what> can be a path, a Perl file handle or a file descriptor.
 
-=item cimag
+=item C<chown>
+
+ret = chown(what, uid, gid);
+
+C<what> can be a path, a Perl file handle or a file descriptor.
+
+=item C<cimag>
 
 im = cimag(re, im);
 
-=item clock
+=item C<clock>
 
 t = clock()
 
-=item clock_getcpuclockid
+=item C<clock_getcpuclockid>
 
 clock_id = clock_getcpuclockid(pid);
 
-pid defaults to $$. Returns undef on error.
+pid defaults to C<$$>. Returns undef on error.
 
-=item clock_getres
+=item C<clock_getres>
 
 (sec, nsec) = clock_getres(clock_id);
 
-clock_id defaults to CLOCK_REALTIME. Returns empty list on error.
+clock_id defaults to C<CLOCK_REALTIME>. Returns empty list on error.
 
-=item clock_gettime
+=item C<clock_gettime>
 
 (sec, nsec) = clock_gettime(clock_id);
 
-clock_id defaults to CLOCK_REALTIME. Returns empty list on error.
+clock_id defaults to C<CLOCK_REALTIME>. Returns empty list on error.
 
-=item clock_nanosleep
+=item C<clock_nanosleep>
 
 (rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
 
 In scalar context returns the remaining seconds as a floating point number.
 
-=item clock_settime
+=item C<clock_settime>
 
 ret = clock_settime(clock_id, sec, nsec);
 
-=item clog
+=item C<clog>
 
 (re, im) = clog(re, im);
 
-=item close
+=item C<close>
 
 ret = close(fd);
 
-=item confstr
+=item C<confstr>
 
 s = confstr(name);
 
-I<name> is one of the _CS_ integer constants.
+I<name> is one of the C<_CS_*> integer constants.
 
-=item conj
+=item C<conj>
 
 (re, im) = conj(re, im);
 
-=item copysign
+=item C<copysign>
 
 xs = copysign(x, y);
 
-=item cos
+=item C<cos>
 
 y = cos(x);
 
-=item cosh
+=item C<cosh>
 
 y = cosh(x);
 
-=item cpow
+=item C<cpow>
 
 (re, im) = cpow(re_x, im_x, re_y, im_y);
 
-=item cproj
+=item C<cproj>
 
 (re, im) = cproj(re, im);
 
-=item creal
+=item C<creal>
 
 re = creal(re, im);
 
-=item csin
+=item C<csin>
 
 (re, im) = csin(re, im);
 
-=item csinh
+=item C<csinh>
 
 (re, im) = csinh(re, im);
 
-=item csqrt
+=item C<csqrt>
 
 (re, im) = csqrt(re, im);
 
-=item ctan
+=item C<ctan>
 
 (re, im) = ctan(re, im);
 
-=item ctanh
+=item C<ctanh>
 
 (re, im) = ctanh(re, im);
 
-=item dirname
+=item C<dirname>
 
 name = dirname(path);
 
-=item div
+=item C<div>
 
 (quot, rem) = div(numer, denom);
 
-=item dlclose
+Calls C<lldiv()>, C<ldiv()>, or C<div()>, whichever is the maximum supported
+by your system.
+
+Note that the library functions use signed integers, so C<div(~0, 1)> is
+C<(-1, 0)>. If you don't want that, use Perls C<int()>, C</> and C<%>.
+
+=item C<dlclose>
 
 dlclose(dlhandle);
 
-=item dlerror
+=item C<dlerror>
 
 dlerror();
 
-=item dlopen
+=item C<dlopen>
 
 dlhandle = dlopen(file, mode);
 
-=item dlsym
+=item C<dlsym>
 
 addr = dlsym(dlhandle, name);
 
-=item drand48
+=item C<drand48>
 
 r = drand48();
 
-=item endutxent
+=item C<endutxent>
 
 endutxent();
 
-=item erand48
+=item C<erand48>
 
 (r, X0, X1, X2) = erand48(X0, X1, X2);
 
-=item erf
+=item C<erf>
 
 y = erf(x);
 
-=item erfc
+=item C<erfc>
 
 y = erfc(x);
 
-=item exp2
+=item C<exp>
+
+y = exp(x);
+
+=item C<exp2>
 
 y = exp2(x);
 
-=item expm1
+=item C<expm1>
 
 y = expm1(x);
 
-=item faccessat
+=item C<faccessat>
 
 ret = faccessat(dirfd, path, amode, flags=0);
 
-I<flags> is the bitwise OR of zero or more of AT_EACCESS, AT_SYMLINK_NOFOLLOW.
+I<flags> is the bitwise OR of zero or more of C<AT_EACCESS>,
+C<AT_SYMLINK_NOFOLLOW>.
 
-=item fchdir
-
-ret = fchdir(dirfd);
-
-=item fchmod
-
-ret = fchmod(fd, mode);
-
-=item fchmodat
+=item C<fchmodat>
 
 ret = fchmodat(dirfd, path, mode, flags=0);
 
-I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>.
 
-=item fchown
-
-ret = fchown(fd, uid, gid);
-
-=item fchownat
+=item C<fchownat>
 
 ret = fchownat(dirfd, path, uid, gid, flags=0);
 
-I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>.
 
-=item fdatasync
+=item C<fdatasync>
 
 ret = fdatasync(fd);
 
-=item fdopen
+=item C<fdopen>
 
-ret = fdopen(fd, mode)
+ret = fdopen(fd, mode);
 
 Returns a file handle associated with the file descriptor I<fd> or undef on
 error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with an optional
@@ -383,16 +392,16 @@ It's similar to C<IO::Handle::new_from_fd()> with the following improvements:
 It I<really> calls C<fdopen(3)>.
 
 =item *
-It expects POSIX  mode strings (e.g. C<"r">, not C<"<">).
+It expects POSIX mode strings (e.g. C<"r">, not C<"<">).
 
 =item *
-It fails I<mode> is not compatible with the flags of I<fd>.
+It fails if I<mode> is not compatible with the flags of I<fd>.
 
 =back
 
-=item fdopendir
+=item C<fdopendir>
 
-ret = fdopendir(fd)
+ret = fdopendir(fd);
 
 Returns a directory handle associated with the file descriptor I<fd> or undef
 on error. Usage example:
@@ -405,391 +414,485 @@ on error. Usage example:
   };
   my @files = readdir $dh;  # this would fail with $fh from sysopen
 
-=item fdim
+=item C<fdim>
 
 d = fdim(double x, double y);
 
-=item fegetround
+=item C<feclearexcept>
 
-round = fegetround();
+ret = feclearexcept(excepts);
 
-=item fesetround
+Returns C<0 but true> on success, undef on error.
+
+=item C<fegetround>
+
+rounding_mode = fegetround();
+
+=item C<feraiseexcept>
+
+ret = feraiseexcept(excepts);
+
+Returns C<0 but true> on success, undef on error.
+
+=item C<fesetround>
 
 ret = fesetround(round);
 
-=item ffs
+Returns C<0 but true> on success, undef on error.
+
+=item C<fetestexcept>
+
+excepts_currently_set = fetestexcept(excepts);
+
+=item C<ffs>
 
 pos = ffs(i);
 
-=item floor
+Calls C<ffsll()>, C<ffsl()>, or C<ffs()>, whichever is the maximum available
+on your system.
+
+=item C<floor>
 
 y = floor(x);
 
-=item fma
+=item C<fma>
 
 r = fma(x, y, z);
 
-=item fmax
+=item C<fmax>
 
 m = fmax(x, y);
 
-=item fmin
+=item C<fmin>
 
 m = fmin(x, y);
 
-=item fmod
+=item C<fmod>
 
 m = fmod(x, y);
 
-=item fnmatch
+=item C<fnmatch>
 
 ret = fnmatch(pattern, string, flags);
 
-Returns 0 if I<string> matches I<pattern>, FNM_NOMATCH if there is no match,
-undef if there is an error.
+Returns 0 if I<string> matches I<pattern>, C<FNM_NOMATCH> if there is no
+match, undef if there is an error.
 
-I<flags> is the bitwise OR of zero or more of FNM_NOESCAPE, FNM_PATHNAME,
-FNM_PERIOD, FNM_FILE_NAME, FNM_LEADING_DIR, FNM_CASEFOLD.
+I<flags> is the bitwise OR of zero or more of C<FNM_NOESCAPE>,
+C<FNM_PATHNAME>, C<FNM_PERIOD>, C<FNM_FILE_NAME>, C<FNM_LEADING_DIR>,
+C<FNM_CASEFOLD>.
 
-=item fpclassify
+=item C<fpclassify>
 
 fpclassify(x);
 
-Returns one of FP_NAN, FP_INFINITE, FP_ZERO, FP_SUBNORMAL, FP_NORMAL.
+Returns one of C<FP_NAN>, C<FP_INFINITE>, C<FP_ZERO>, C<FP_SUBNORMAL>,
+C<FP_NORMAL>.
 
-=item fstatat
+=item C<fstatat>
 
 (dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
 blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = fstatat(dirfd, path,
 flags = 0);
 
-I<flags> is the bitwise OR of zero or more of AT_SYMLINK_NOFOLLOW,
-AT_NO_AUTOMOUNT.
+I<flags> is the bitwise OR of zero or more of C<AT_SYMLINK_NOFOLLOW>,
+C<AT_NO_AUTOMOUNT>.
 
-=item fsync
+See L<C<stat()>|"stat"> for notes on the return values and bugs in C<CORE::stat()>.
+
+Returns an empty list on error.
+
+=item C<fsync>
 
 ret = fsync(fd);
 
-=item ftruncate
-
-ret = ftruncate(fd, length);
-
-=item futimens
+=item C<futimens>
 
 ret = futimens(fd, atime_sec, atime_nsec, mtime_sec, mtime_nsec);
 
 atime_sec and mtime_sec default to 0, atime_nsec and mtime_nsec default to
-UTIME_NOW.
+C<UTIME_NOW>.
 
-=item getdate
+=item C<getdate>
 
 (sec, min, hour, mday, mon, year, wday, yday, isdst) = getdate(string);
 
-=item getdate_err
+=item C<getdate_err>
 
 getdate_err() returns the value of the getdate_err variable.
 
-=item getegid
+=item C<getegid>
 
 egid = getegid();
 
-=item geteuid
+=item C<geteuid>
 
 euid = geteuid();
 
-=item getgid
+=item C<getgid>
 
 gid = getgid();
 
-=item gethostid
+=item C<gethostid>
 
 hostid = gethostid();
 
-=item gethostname
+=item C<gethostname>
 
 hostname = gethostname();
 
-=item getitimer
+=item C<getitimer>
 
 (int_sec, int_usec, val_sec, val_usec) = getitimer(which);
 
-I<which> is one of ITIMER_REAL, ITIMER_VIRTUAL, ITIMER_PROF.
+I<which> is one of C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>.
 
-=item getpriority
+=item C<getpriority>
 
-prio = getpriority(which, who);
+prio = getpriority(which=PRIO_PROCESS, who=0);
 
-I<which> can be one of PRIO_PROCESS, PRIO_PGRP, PRIO_USER, defaults to
-PRIO_PROCESS.
-
-I<who> defaults to 0.
+I<which> can be one of C<PRIO_PROCESS>, C<PRIO_PGRP>, C<PRIO_USER>, defaults
+to C<PRIO_PROCESS>. I<who> defaults to 0.
 
 Returns undef on error.
 
-=item getsid
+=item C<getsid>
 
 sid = getsid(pid);
 
 I<pid> defaults to 0.
 
-=item getuid
+=item C<getuid>
 
 uid = getuid();
 
-=item getutxent
+=item C<getutxent>
 
 (user, id, line, pid, type, sec, usec) = getutxent();
 
 getutxent() reads a line from the current file position in the utmp file.
 
-=item getutxid
+=item C<getutxid>
 
 (user, id, line, pid, type, sec, usec) = getutxid(ut_type, ut_id);
 
 getutxid() searches forward from the current file position in the utmp file
-based upon I<ut_type> and I<ut_id>. If I<ut_type> is one of RUN_LVL,
-BOOT_TIME, NEW_TIME, or OLD_TIME, getutxid() will find the first entry whose
-I<ut_type> field matches I<ut_type>. If I<ut_type> is one of INIT_PROCESS,
-LOGIN_PROCESS, USER_PROCESS, or DEAD_PROCESS, getutxid() will find the first
-entry whose I<ut_id> field matches I<ut_id>.
+based upon I<ut_type> and I<ut_id>. If I<ut_type> is one of C<RUN_LVL>,
+C<BOOT_TIME>, C<NEW_TIME>, or C<OLD_TIME>, getutxid() will find the first
+entry whose I<ut_type> field matches I<ut_type>. If I<ut_type> is one of
+C<INIT_PROCESS>, C<LOGIN_PROCESS>, C<USER_PROCESS>, or C<DEAD_PROCESS>,
+getutxid() will find the first entry whose I<ut_id> field matches I<ut_id>.
 
-=item getutxline
+=item C<getutxline>
 
 (user, id, line, pid, type, sec, usec) = getutxline(ut_line);
 
 getutxline() searches forward from the current file position in the utmp file.
-It scans entries whose I<ut_type> is USER_PROCESS or LOGIN_PROCESS and returns
-the first one whose I<ut_line> field matches I<ut_line>.
+It scans entries whose I<ut_type> is C<USER_PROCESS> or C<LOGIN_PROCESS> and
+returns the first one whose I<ut_line> field matches I<ut_line>.
 
-=item hypot
+=item C<hypot>
 
 r = hypot(x, y);
 
-=item ilogb
+=item C<ilogb>
 
 y = ilogb(x);
 
-=item isalpha
+=item C<isalnum>
+
+ret = isalnum(charstring);
+
+Like POSIX::isalnum() but returns 0 for the empty string.
+
+=item C<isalpha>
+
+ret = isalpha(charstring);
 
 Like POSIX::isalpha() but returns 0 for the empty string.
 
-=item isatty
+=item C<isascii>
 
-ret = isatty(fd)
+ret = isascii(charstring);
 
-=item isblank
+POSIX.1-2008 marks it as obsolete, but I include it anyway.
 
-ret = isblank(charstring)
+=item C<isatty>
 
-Returns 1 if I<charstring> consists only of blank characters (i.e. spaces
-and/or tabs). Returns 0 otherwise (also for the empty string).
+ret = isatty(fd);
 
-=item iscntrl
+=item C<isblank>
+
+ret = isblank(charstring);
+
+Like POSIX::isblank() but returns 0 for the empty string.
+
+=item C<iscntrl>
+
+ret = iscntrl(charstring);
 
 Like POSIX::iscntrl() but returns 0 for the empty string.
 
-=item isdigit
+=item C<isdigit>
+
+ret = isdigit(charstring);
 
 Like POSIX::isdigit() but returns 0 for the empty string.
 
-=item isfinite
+=item C<isfinite>
 
-isfinite(x);
+ret = isfinite(x);
 
-=item isgraph
+=item C<isgraph>
+
+ret = isgraph(charstring);
 
 Like POSIX::isgraph() but returns 0 for the empty string.
 
-=item isinf
+=item C<isinf>
 
-isinf(x);
+ret = isinf(x);
 
-=item islower
+=item C<islower>
+
+ret = islower(charstring);
 
 Like POSIX::islower() but returns 0 for the empty string.
 
-=item isnan
+=item C<isnan>
 
-isnan(x);
+ret = isnan(x);
 
-=item isnormal
+=item C<isnormal>
 
-isnormal(x);
+ret = isnormal(x);
 
-=item isprint
+=item C<isprint>
+
+ret = isprint(charstring);
 
 Like POSIX::isprint() but returns 0 for the empty string.
 
-=item ispunct
+=item C<ispunct>
+
+ret = ispunct(charstring);
 
 Like POSIX::ispunct() but returns 0 for the empty string.
 
-=item isspace
+=item C<isspace>
+
+ret = isspace(charstring);
 
 Like POSIX::isspace() but returns 0 for the empty string.
 
-=item isupper
+=item C<isupper>
+
+ret = isupper(charstring);
 
 Like POSIX::isupper() but returns 0 for the empty string.
 
-=item isxdigit
+=item C<isxdigit>
+
+ret = isxdigit(charstring);
 
 Like POSIX::isxdigit() but returns 0 for the empty string.
 
-=item j0
+=item C<j0>
 
 y = j0(x);
 
-j0() is the Bessel function of the first kind of order 0.
+C<j0()> is the Bessel function of the first kind of order 0.
 
-=item j1
+=item C<j1>
 
 y = j1(x);
 
-j1() is the Bessel function of the first kind of order 1.
+C<j1()> is the Bessel function of the first kind of order 1.
 
-=item jn
+=item C<jn>
 
 y = jn(n, x);
 
-jn() is the Bessel function of the first kind of order I<n>.
+C<jn()> is the Bessel function of the first kind of order I<n>.
 
-=item jrand48
+=item C<jrand48>
 
 (r, X0, X1, X2) = jrand48(X0, X1, X2);
 
-=item killpg
+=item C<killpg>
 
 ret = killpg(pgrp, sig);
 
-=item l64a
+=item C<l64a>
 
 s = l64a(n);
 
-=item lchown
+=item C<lchown>
 
-ret = lchown(path, uid, gid)
+ret = lchown(path, uid, gid);
 
-=item ldexp
+=item C<ldexp>
 
 y = ldexp(x, exp);
 
-=item ldiv
-
-(quot, rem) = ldiv(numer, denom);
-
-=item lgamma
+=item C<lgamma>
 
 y = lgamma(x);
 
-=item link
+=item C<link>
 
 ret = link(path1, path2);
 
-=item linkat
+=item C<linkat>
 
 ret = linkat(fd1, path1, fd2, path2, flags=0);
 
-I<flags> can be 0 or AT_SYMLINK_FOLLOW.
+I<flags> can be 0 or C<AT_SYMLINK_FOLLOW>.
 
-=item log1p
+=item C<log1p>
 
 y = log1p(x);
 
-=item log2
+=item C<log2>
 
 y = log2(x);
 
-=item logb
+=item C<logb>
 
 y = logb(x);
 
-=item lrand48
+=item C<lrand48>
 
 r = lrand48();
 
-=item lround
+=item C<lround>
 
-l = lround(x)
+l = lround(x);
 
-=item lstat
+Calls C<llround()> or C<lround()> whichever is the maximum available on your
+system. If the rounded value is outside Perl's internal signed integer range,
+it is returned as a string. If the rounded value is too large to be stored in
+a long long or long, undef is returned.
 
-ret = lstat(path);
+=item C<lstat>
 
-=item mkdir
+(dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
+blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = lstat(path);
 
-ret = mkdir(path, mode);
+C<path> is assumed to be a string (or will be converted to a string).
 
-=item mkdirat
+See L<C<stat()>|"stat"> for notes on the return values and bugs in C<CORE::stat()>.
+
+Returns an empty list on error.
+
+=item C<mkdir>
+
+ret = mkdir(path, [mode = 0777]);
+
+=item C<mkdirat>
 
 ret = mkdirat(fd, path, mode);
 
-=item mkdtemp
+=item C<mkdtemp>
 
 name = mkdtemp(template);
 
-=item mkfifo
+=item C<mkfifo>
 
 ret = mkfifo(path, mode);
 
-=item mkfifoat
+=item C<mkfifoat>
 
 ret = mkfifoat(fd, path, mode);
 
-=item mknod
+=item C<mknod>
 
 ret = mknod(path, mode, dev);
 
-=item mknodat
+=item C<mknodat>
 
 ret = mknodat(fd, path, mode, dev);
 
-=item mkstemp
+=item C<mkstemp>
 
 (fd, name) = mkstemp(template);
 
-=item mrand48
+=item C<mrand48>
 
 mrand48();
 
-=item nanosleep
+=item C<nanosleep>
 
 (rem_sec, rem_nsec) = nanosleep(sec, nsec);
 
 In scalar context returns the remaining seconds as a floating point number.
 
-=item nearbyint
+=item C<nearbyint>
 
 y = nearbyint(x);
 
-=item nextafter
+=item C<nextafter>
 
 z = nextafter(x, y);
 
-=item nrand48
+=item C<nexttoward>
 
-r = nrand48()
+z = nexttoward(x, y);
 
-=item open
+=item C<nice>
 
-ret = open(path, oflag[, mode]);
-
-I<oflag> defaults to O_RDONLY, I<mode> defaults to 0600.
-
-=item openat
-
-ret = openat(fd, path, oflag[, mode]);
-
-I<oflag> defaults to O_RDONLY, I<mode> defaults to 0600.
-
-If I<fd> is numeric (i.e. a file descriptor), C<openat()> returns a file
-descriptor. If I<fd> is a file or directory handle the return value is also a
-handle whose type depends on the file type of I<path>: If path is a directory,
-the return value is a directory handle, otherwise it's a file handle.
+ret = nice(incr);
 
 Returns undef on error.
 
-=item posix_fadvise
+=item C<nrand48>
+
+r = nrand48()
+
+=item C<open>
+
+ret = open(path, flags=O_RDONLY, mode=0666);
+
+=item C<openat>
+
+ret = openat(dirfd, path, flags=O_RDONLY, mode=0666);
+
+If I<dirfd> is numeric (i.e. a file descriptor), C<openat()> returns a file
+descriptor. If I<dirfd> is a file or directory handle, the return value is
+also a handle whose type depends on the file type of I<path>: If I<path> is a
+directory, the return value is a directory handle, otherwise it's a file
+handle.
+
+To get a handle even for the special numeric I<dirfd> value C<AT_FDCWD>, you
+can pass a reference to that value instead, i.e. C<openat(\AT_FDCWD, ...)>.
+
+Returns undef on error.
+
+=item C<openat2>
+
+ret = openat2(dirfd, path, how);
+
+The C<openat2()> system call is an extension of L<C<openat()>|"openat"> and
+provides a superset of its functionality. It is Linux-specific and thus not
+part of POSIX, but I include it anyway.
+
+The I<how> parameter is a hash reference corresponding to the I<struct
+open_how>. It currently supports the keys I<flags>, I<mode> and
+I<resolve>. Missing keys are treated as having a zero value.
+
+Example:
+
+  my $fh = openat2(
+    \AT_FDCWD, '/foobar',
+    {flags => O_RDWR|O_CREAT, mode => 0600, resolve => RESOLVE_IN_ROOT}
+  );
+
+Note that, unlike L<C<open()>|"open"> or L<C<openat()>|"openat">, C<openat2()>
+is very picky about I<flags> and I<mode>. See the manpage for details.
+
+Returns undef on error.
+
+=item C<posix_fadvise>
 
 ret = posix_fadvise(fd, offset, len, advice);
 
@@ -797,13 +900,13 @@ I<advice> is one of the C<POSIX_FADV_> constants.
 
 Returns undef on error
 
-=item posix_fallocate
+=item C<posix_fallocate>
 
 ret = posix_fallocate(fd, offset, len);
 
-=item pread
+=item C<pread>
 
-bytes_read = pread(fd, buf, count, [offset, buf_offset]);
+bytes_read = pread(fd, buf, count, offset=0, buf_offset=0);
 
 C<pread()> reads I<count> bytes (not characters) of data from the file
 descriptor I<fd> at file offset I<offset> into the scalar I<buf> without
@@ -820,9 +923,9 @@ the last byte of I<buf> after the read.
 
 Returns the number of bytes read, 0 at EOF, undef on error.
 
-=item preadv
+=item C<preadv>
 
-bytes_read = preadv(fd, buffers, sizes, [offset])
+bytes_read = preadv(fd, buffers, sizes, offset=0);
 
 C<preadv()> behaves like L<C<readv()>|"readv"> but adds an optional I<offset>
 argument, which specifies the file position at which the data is to be
@@ -831,15 +934,27 @@ read. I<offset> is set to 0 if omitted or undef.
 The file offset is not changed by this system call. The file referred to by
 I<fd> must be capable of seeking.
 
-=item ptsname
+This syscall is present in Linux and BSD.
+
+=item C<preadv2>
+
+bytes_read = preadv2(fd, buffers, sizes, offset=0, flags=0);
+
+C<preadv()> is similar to L<C<preadv()>|"preadv"> but adds an optional I<flags>
+argument, which is a bitwise OR of zero or more of the C<RWF_*> flags (see the
+manpage for details). I<flags> is set to 0 if omitted or undef.
+
+This syscall is Linux-specific.
+
+=item C<ptsname>
 
 name = ptsname(fd);
 
-=item pwrite
+=item C<pwrite>
 
-bytes_written = pwrite(fd, buf, [count, offset, buf_offset]);
+bytes_written = pwrite(fd, buf, count=undef, offset=0, buf_offset=0);
 
-pwrite() writes I<count> bytes of data from the scalar I<buf> to the file
+C<pwrite()> writes I<count> bytes of data from the scalar I<buf> to the file
 descriptor I<fd> at file offset I<offset> without changing the file
 offset. The file referenced by I<fd> must be capable of seeking.
 
@@ -854,12 +969,13 @@ I<offset> and I<buf_offset> are set to 0 if omitted or undef.
 
 Returns the number of bytes written, undef on error.
 
-On Linux, if a file is opened with O_APPEND, pwrite() appends data to the end
-of the file, regardless of the value of offset (in violation of POSIX).
+On Linux, if a file is opened with C<O_APPEND>, C<pwrite()> appends data to
+the end of the file, regardless of the value of I<offset> (in violation of
+POSIX).
 
-=item pwritev
+=item C<pwritev>
 
-bytes_written = pwritev(fd, buffers, [offset])
+bytes_written = pwritev(fd, buffers, offset=0);
 
 C<pwritev()> behaves like L<C<writev()>|"writev"> but adds an optional
 I<offset> argument, which specifies the file position at which the data is to
@@ -868,30 +984,50 @@ be written. I<offset> is set to 0 if omitted or undef.
 The file offset is not changed by this system call. The file referred to by
 I<fd> must be capable of seeking.
 
-=item random
+On Linux, if a file is opened with C<O_APPEND>, C<pwritev()> appends data to
+the end of the file, regardless of the value of I<offset> (in violation of
+POSIX).
+
+This syscall is present in Linux and BSD.
+
+=item C<pwritev2>
+
+bytes_written = pwritev2(fd, buffers, offset=0, flags=0);
+
+C<pwritev()> is similar to L<C<writev()>|"writev"> but adds an optional I<flags>
+argument, which is a bitwise OR of zero or more of the C<RWF_*> flags (see the
+manpage for details). I<flags> is set to 0 if omitted or undef.
+
+This syscall is Linux-specific.
+
+=item C<random>
 
 r = random();
 
-=item read
+=item C<read>
 
 bytes_read = read(fd, buf, count);
 
-Like POSIX::read() but returns 0 at EOF instead of "0 but true".
+Like C<POSIX::read()> but returns 0 at EOF instead of I<"0 but true">.
 
-=item readv
+=item C<readv>
 
 bytes_read = readv(fd, buffers, sizes);
 
 Example:
 
-  sysopen my $fh, '/tmp/foobar', O_RDWR|O_CREAT|O_TRUNC;
+  my $fh = openat(\AT_FDCWD, '/tmp/foobar', O_RDWR|O_CREAT|O_TRUNC);
   pwrite($fh, 'foobar', 6, 0);
   readv($fh, my @buf, [4, 0, 4, 4]);
   # -> @buf is ('foob', '', 'ar')
 
 C<readv()> reads from the file descriptor I<fd> into I<buffers> as many
-strings as there are elements in I<sizes>. I<buffers> must be a variable
-holding an array or an array reference. I<sizes> must be an array reference.
+strings as there are elements in I<sizes>.
+
+I<buffers> must be a I<variable> holding either an array or an array
+reference, i.e. C<@buf> or C<$buf>.
+
+I<sizes> must be an array reference, i.e. C<\@sizes>, C<$sizes>, or C<[...]>.
 
 I<sizes> is expected to hold unsigned integers that specify how many bytes are
 to be read into each buffer. A byte count of 0 or undef creates an empty
@@ -909,142 +1045,195 @@ elements in I<sizes>.
 C<readv()> returns the number of bytes read (which may be less than the total
 bytes in I<sizes>) or undef on error.
 
-=item readlink
+=item C<readlink>
 
 name = readlink(path);
 
 Returns undef on error.
 
-=item readlinkat
+=item C<readlinkat>
 
 name = readlinkat(dirfd, path);
 
 Returns undef on error.
 
-=item remainder
+=item C<realpath>
 
-r = remainder(x, y);
+resolved_path = realpath(path);
 
-=item remove
+Calls the actual C library fuction C<realpath()> and relies on it to be able
+to allocate memory for the resolved path automatically (as required by
+POSIX-2008).
+
+Returns undef on error.
+
+=item C<remainder>
+
+rem = remainder(x, y);
+
+Returns  undef on error.
+
+=item C<remove>
 
 ret = remove(path);
 
 Calls the actual C library function C<remove()>.
 
-Note that POSIX::remove() fails if I<path> is a symlink to a directory because
-someone "couldn't read the plans right and did a piss-poor job of putting it
-together" as C<(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])>. Quote
-from Armageddon.
+Note that core C<POSIX::remove()> fails if I<path> is a symlink to a directory
+because someone "couldn't read the plans right and did a piss-poor job of
+putting it together" as C<(-d $_[0]) ? CORE::rmdir($_[0]) :
+CORE::unlink($_[0])>. Quote from Armageddon.
 
-=item rename
+This could be fixed like this: C<unlink $_[0] or ($!{EISDIR} || $!{EPERM} ?
+rmdir $_[0] : undef)> (correct errno check depends on OS), or by using the
+library call right away.
+
+=item C<remquo>
+
+(rem, quo) = remquo(x, y);
+
+Returns an empty list on error.
+
+=item C<rename>
 
 ret = rename(old, new);
 
-=item renameat
+=item C<renameat>
 
 ret = renameat(olddirfd, oldpath, newdirfd, newpath);
 
-=item round
+=item C<round>
 
 r = round(x);
 
-=item scalbn
+=item C<scalbn>
 
 y = scalbn(x, n);
 
-=item seed48
+Calls C<scalbln()> or C<scalbn()>, whichever is the maximum supported by your
+system.
+
+=item C<seed48>
 
 (old_seed1, old_seed2, old_seed3) = seed48(seed1, seed2, seed3);
 
-=item setegid
+=item C<setegid>
 
 ret = setegid(gid);
 
-=item seteuid
+=item C<seteuid>
 
 ret = seteuid(uid);
 
-=item setgid
+=item C<setgid>
 
 ret = setgid(gid);
 
-=item setitimer
+=item C<setitimer>
 
 (old_int_sec, old_int_usec, old_val_sec, old_val_usec) = setitimer(which, int_sec, int_usec, val_sec, val_usec);
 
-I<which> is one of ITIMER_REAL, ITIMER_VIRTUAL, ITIMER_PROF.
+I<which> is one of C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>.
 
-=item setpriority
+=item C<setpriority>
 
-ret = setpriority(value, which, who);
+ret = setpriority(prio, which=PRIO_PROCESS, who=0);
 
-I<which> can be one of PRIO_PROCESS, PRIO_PGRP, PRIO_USER, defaults to
-PRIO_PROCESS.
+I<which> can be one of C<PRIO_PROCESS>, C<PRIO_PGRP>, C<PRIO_USER>, defaults
+to C<PRIO_PROCESS>. I<who> defaults to 0.
+
+Note that due to the support of default values for I<which> and I<who>,
+I<prio> is the first call parameter, whereas in the actual syscall it is the
+last.
 
 Returns true on success, undef on error.
 
-I<who> defaults to 0.
-
-=item setregid
+=item C<setregid>
 
 ret = setregid(rgid, egid);
 
-=item setreuid
+=item C<setreuid>
 
 ret = setreuid(ruid, euid);
 
-=item setuid
+=item C<setsid>
+
+sid = setsid();
+
+=item C<setuid>
 
 ret = setuid(uid);
 
-=item setutxent
+=item C<setutxent>
 
 setutxent();
 
-=item sighold
+=item C<sighold>
 
 ret = sighold(sig);
 
-=item sigignore
+=item C<sigignore>
 
 ret = sigignore(sig);
 
-=item signbit
+=item C<signbit>
 
 b = signbit(x);
 
-=item sigpause
+=item C<sigpause>
 
 sigpause(sig);
 
-=item sigrelse
+=item C<sigrelse>
 
 ret = sigrelse(sig);
 
-=item sinh
+=item C<sin>
+
+y = sin(x);
+
+=item C<sinh>
 
 y = sinh(x);
 
-=item srand48
+=item C<srand48>
 
 srand48(seedval);
 
-=item srandom
+=item C<srandom>
 
 srandom(seed);
 
-=item stat
+=item C<stat>
 
 (dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
-blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = stat(path);
+blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = stat(what);
 
-=item strptime
+C<what> can be a path, a Perl file handle or a file descriptor.
+
+C<ctim_sec>, C<blksize>, C<blocks> and nanoseconds may not be available on
+your system. Values outside Perl's internal integer range are returned as
+strings, i.e. if you need the exact values you should, for example, use C<eq>
+instead of C<==> for comparisons.
+
+Note that C<CORE::stat()> lies to you in some cases: It returns I<rdev> as a
+signed integer even if your OS's C<dev_t> is unsigned. It returns I<size> as
+a floating point number if your OS's C<off_t> is bigger than Perl's integer
+size. It returns the times as floating point numbers if your OS's C<time_t>
+is unsigned.
+
+C<POSIX::2008::stat()> doesn't mimic these bugs and uses the correct data types
+for all values.
+
+Returns an empty list on error.
+
+=item C<strptime>
 
 (sec, min, hour, mday, mon, year, wday, yday, isdst) = strptime(s, format[,
 sec, min, hour, mday, mon, year, wday, yday, isdst]);
 
-strptime() converts the string I<s> into a broken-down time according to the
-format string I<format>. The time fields may optionally be initialized in
+C<strptime()> converts the string I<s> into a broken-down time according to
+the format string I<format>. The time fields may optionally be initialized in
 whole or in part and will be returned as initialized if they are not affected
 by the format string. Unprocessed uninitialized or undef fields are returned
 as undef.
@@ -1055,128 +1244,143 @@ In scalar context returns the index of the first byte in I<s> that was not
 processed or the byte length of I<s> if the whole string was consumed or undef
 on error.
 
-As strptime() acts on null-terminated strings, strings containing NUL bytes
+As C<strptime()> acts on null-terminated strings, strings containing NUL bytes
 will only be processed up to the first NUL byte.
 
-=item symlink
+=item C<symlink>
 
-symlink(old, new);
+ret = symlink(target, linkpath);
 
-=item symlinkat
+=item C<symlinkat>
 
-ret = symlinkat(old, dirfd, new);
+ret = symlinkat(target, dirfd, linkpath);
 
-=item sync
+=item C<sync>
 
 sync();
 
-=item tan
+=item C<tan>
 
 y = tan(x);
 
-=item tanh
+=item C<tanh>
 
 y = tanh(x);
 
-=item tgamma
+=item C<tgamma>
 
 y = tgamma(x);
 
-=item timer_create
+=item C<timer_create>
 
 timerid = timer_create(clockid, signal);
 
 Returns undef on error.
 
-=item timer_delete
+=item C<timer_delete>
 
-timer_delete(timerid);
+ret = timer_delete(timerid);
 
-Returns '0 but true' on success, undef on error.
+Returns C<0 but true> on success, undef on error.
 
-=item timer_getoverrun
+=item C<timer_getoverrun>
 
 count = timer_getoverrun(timerid);
 
 Returns undef on error.
 
-=item timer_gettime
+=item C<timer_gettime>
 
 (interval_sec, interval_nsec, initial_sec, initial_nsec) = timer_gettime(timerid);
 
 Returns an empty list on error.
 
-=item timer_settime
+=item C<timer_settime>
 
 (old_int_sec, old_int_nsec, old_init_sec, old_init_nsec) = timer_settime(timerid, flags, int_sec, int_nsec, [init_sec, init_nsec]);
 
 I<flags> may be 0 or C<TIMER_ABSTIME>. If the I<init> values are omitted, they
 are set to the I<int> values.
 
-=item truncate
+=item C<truncate>
 
 ret = truncate(path, length);
 
-=item trunc
+=item C<trunc>
 
 y = trunc(x);
 
-=item unlinkat
+=item C<ttyname>
 
-ret = unlinkat(dirfd, path, flags=0);
+name = ttyname(fd);
 
-I<flags> can be 0 or AT_REMOVEDIR.
-
-=item unlink
+=item C<unlink>
 
 ret = unlink(path);
 
-=item utimensat
+Calls the actual C library function C<unlink()>.
+
+Note that core C<POSIX::unlink()> calls C<CORE::unlink()>, which, unless you
+start Perl with C<-U>, a) is prone to time-of-check/time-of-use race
+conditions due to an additional lstat(), and b) blindly fails with C<EISDIR>
+for directories (due to said lstat()), ignoring that some OSes use C<EPERM> in
+this case (as required by POSIX).
+
+=item C<unlinkat>
+
+ret = unlinkat(dirfd, path, flags=0);
+
+I<flags> can be 0 or C<AT_REMOVEDIR>.
+
+=item C<utimensat>
 
 ret = utimensat(dirfd, path, flags, atime_sec, atime_nsec, mtime_sec,
 mtime_nsec);
 
-I<flags> can be 0 or AT_SYMLINK_NOFOLLOW, defaults to 0.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>, defaults to 0.
 
 I<atime_sec> and I<mtime_sec> default to 0. I<atime_nsec> and I<mtime_nsec>
-default to UTIME_NOW.
+default to C<UTIME_NOW>.
 
-=item write
+=item C<write>
 
-bytes_written = write(fd, buf[, count]);
+bytes_written = write(fd, buf, count=undef);
 
-Like POSIX::write() but returns 0 instead of "0 but true" if 0 bytes were
-written, and it does not write more bytes than I<buf> contains.
+Like C<POSIX::write()> but returns 0 instead of C<0 but true> if 0 bytes were
+written, and never writes more bytes than I<buf> contains even if I<count>
+exceeds the length of I<buf>.
 
 If I<count> is omitted or undef, it defaults to the length of I<buf>.
 
-=item writev
+=item C<writev>
 
 bytes_written = writev(fd, buffers);
 
-writev() writes multiple buffers from I<buffers> to the file associated with
-the file descriptor I<fd>. I<buffers> must be an array reference. The buffers
-are processed in array order. Undefined or empty elements are skipped.
+C<writev()> writes multiple I<buffers> of data to the file associated with the
+file descriptor I<fd>.
+
+I<buffers> must be an array reference, i.e. C<\@buf>, C<$buf> or C<[...]>. The
+buffers are processed in array order. Undefined or empty elements are skipped.
 
 Returns the number of bytes written or undef on error.
 
-=item y0
+=item C<y0>
 
 y = y0(x);
 
-y0() is the Bessel function of the second kind of order 0.
+C<y0()> is the Bessel function of the second kind of order 0.
 
-=item y1
+=item C<y1>
 
 y = y1(x);
 
-y1() is the Bessel function of the second kind of order 1.
+C<y1()> is the Bessel function of the second kind of order 1.
 
-=item yn
+=item C<yn>
 
 y = yn(n, x);
 
-yn() is the Bessel function of the second kind of order n.
+C<yn()> is the Bessel function of the second kind of order n.
 
 =back
 
@@ -1185,21 +1389,25 @@ yn() is the Bessel function of the second kind of order n.
 This module does not export anything by default. The following export tags are
 available:
 
- :at     All *at() functions like openat() etc. plus all AT_ constants
+ :at     All *at() functions like openat() and all AT_/RESOLVE_ constants
  :id     All get/set*id() functions like getuid() etc.
  :is     All is* functions like isdigit() etc.
  :rw     read(), readv(), write(), writev()
- :prw    pread(), preadv(), pwrite(), pwritev()
+ :prw    pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
  :clock  All clock* functions and all CLOCK* constants
- :fcntl  All F_, FD_, O_, POSIX_FADV_ and SEEK_ constants (for AT_ use :at)
- :fnm    C<fnmatch()> and all FNM_ constants
+ :fcntl  All F_, FD_, O_, POSIX_FADV_, SEEK_ and _OK constants (for AT_ use :at)
+ :fenv_h All FE_ constants and fe* functions
+ :fnm    fnmatch() and all FNM_ constants
+ :stat_h All S_I* and UTIME_ constants
  :time_h All CLOCK_ and TIMER_ constants
  :timer  All timer_ functions and TIMER_ constants
 
 =head1 CONSTANTS
 
 C<AT_EACCESS> C<AT_EMPTY_PATH> C<AT_FDCWD> C<AT_NO_AUTOMOUNT> C<AT_REMOVEDIR>
-C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW>
+C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW> C<RESOLVE_BENEATH>
+C<RESOLVE_CACHED> C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS>
+C<RESOLVE_NO_SYMLINKS> C<RESOLVE_NO_XDEV>
 
 C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS> C<INIT_PROCESS>
 C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
@@ -1217,6 +1425,8 @@ C<F_DUPFD> C<F_DUPFD_CLOEXEC> C<F_GETFD> C<F_SETFD> C<F_GETFL>
 C<F_SETFL> C<F_GETLK> C<F_SETLK> C<F_SETLKW> C<F_GETOWN> C<F_SETOWN>
 C<F_RDLCK> C<F_UNLCK> C<F_WRLCK>
 
+C<FE_TONEAREST> C<FE_TOWARDZERO> C<FE_UPWARD> C<FE_DOWNWARD>
+
 C<FD_CLOEXEC>
 
 C<FNM_CASEFOLD> C<FNM_FILE_NAME> C<FNM_LEADING_DIR> C<FNM_NOESCAPE>
@@ -1226,24 +1436,51 @@ C<FP_INFINITE> C<FP_NAN> C<FP_NORMAL> C<FP_SUBNORMAL> C<FP_ZERO>
 
 C<TIMER_ABSTIME> C<ITIMER_PROF> C<ITIMER_REAL> C<ITIMER_VIRTUAL>
 
-C<O_ACCMODE> C<O_APPEND> C<O_CLOEXEC> C<O_CREAT> C<O_DIRECTORY> C<O_DSYNC>
-C<O_EXEC> C<O_NOCTTY> C<O_NOFOLLOW> C<O_NONBLOCK> C<O_RDONLY> C<O_RDWR>
-C<O_RSYNC> C<O_SEARCH> C<O_SYNC> C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT>
-C<O_WRONLY>
+C<O_ACCMODE> C<O_APPEND> C<O_ASYNC> C<O_CLOEXEC> C<O_CREAT> C<O_DIRECT>
+C<O_DIRECTORY> C<O_DSYNC> C<O_EXCL> C<O_EXEC> C<O_LARGEFILE> C<O_NDELAY>
+C<O_NOATIME> C<O_NOCTTY> C<O_NOFOLLOW> C<O_NONBLOCK> C<O_PATH> C<O_RDONLY>
+C<O_RDWR> C<O_RSYNC> C<O_SEARCH> C<O_SYNC> C<O_TMPFILE> C<O_TRUNC>
+C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
 
 C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
 C<POSIX_FADV_NOREUSE> C<POSIX_FADV_WILLNEED> C<POSIX_FADV_DONTNEED>
 
+C<PRIO_PROCESS> C<PRIO_PGRP> C<PRIO_USER>
+
 C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_NOW>
 
-C<SEEK_SET> C<SEEK_CUR> C<SEEK_END>
+C<RWF_APPEND> C<RWF_DSYNC> C<RWF_HIPRI> C<RWF_NOWAIT> C<RWF_SYNC>
+
+C<SEEK_SET> C<SEEK_CUR> C<SEEK_END> C<SEEK_DATA> C<SEEK_HOLE> C<F_OK> C<R_OK>
+C<W_OK> C<X_OK>
+
+C<S_IFMT> C<S_IFBLK> C<S_IFCHR> C<S_IFIFO> C<S_IFREG> C<S_IFDIR> C<S_IFLNK>
+C<S_IFSOCK> C<S_ISUID> C<S_ISGID> C<S_IRWXU> C<S_IRUSR> C<S_IWUSR> C<S_IXUSR>
+C<S_IRWXG> C<S_IRGRP> C<S_IWGRP> C<S_IXGRP> C<S_IRWXO> C<S_IROTH> C<S_IWOTH>
+C<S_IXOTH> C<S_ISVTX> 
 
 C<UTIME_NOW> C<UTIME_OMIT>
 
 =head1 NOTES
 
-For whatever reason, C<preadv()> and C<pwritev()> are not part of POSIX. They
-are included anyway.
+C<preadv()> and C<pwritev()> are nonstandard extensions present in Linux and
+BSD.
+
+C<openat2()>, C<preadv2()> and C<pwritev2()> are nonstandard extensions
+present in Linux.
+
+C<fstatat()>, C<lstat()> and C<stat()> do not set the special underscore
+filehandle C<_> (mostly because I have no clue how that works).
+
+C<open()>, C<openat()> and C<openat2()> do not set the C<O_CLOEXEC> flag
+automatically. You have to take care of that yourself if needed.
+
+C<isalnum()> and friends were cowardly removed from the POSIX module with Perl
+5.24.0. They have found a cozy home here with a fix for a long-standing bug.
+
+C<SEEK_DATA> and C<SEEK_HOLE> are nonstandard extensions present in Linux,
+Solaris, FreeBSD, and DragonFly BSD; they are proposed for inclusion in the
+next POSIX revision (Issue 8).
 
 =head1 AUTHOR
 
@@ -1253,7 +1490,7 @@ Initially hacked together by Carsten Gaebler.
 
 This library is free software. You can redistribute and/or modify it under the
 terms of the Do What The Fuck You Want To Public License, Version 2, as
-published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/ for
+published by Sam Hocevar. See the COPYING file or L<http://www.wtfpl.net/> for
 more details.
 
 =cut

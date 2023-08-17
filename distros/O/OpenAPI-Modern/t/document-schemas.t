@@ -1,5 +1,6 @@
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -174,72 +175,72 @@ subtest 'identify subschemas' => sub {
         path => '',
         canonical_uri => str('http://localhost:1234/api'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/beta' => {
         path => '/components/schemas/beta_schema',
         canonical_uri => str('http://localhost:1234/beta'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/gamma' => {
         path => '/components/schemas/beta_schema/not',
         canonical_uri => str('http://localhost:1234/gamma'),
         specification_version => 'draft2019-09',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData) ], # overridden "$schema" keyword
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData)), # overridden "$schema" keyword
         configs => {},
       },
       'http://localhost:1234/parameter1_id' => {
         path => '/components/parameters/my_param1/schema',
         canonical_uri => str('http://localhost:1234/parameter1_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/parameter2_id' => {
         path => '/components/parameters/my_param2/content/media_type_0/schema',
         canonical_uri => str('http://localhost:1234/parameter2_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/pathItem0_param_id' => {
         path => '/components/pathItems/path0/parameters/0/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_param_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/pathItem0_get_param_id' => {
         path => '/components/pathItems/path0/get/parameters/0/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_param_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       'http://localhost:1234/pathItem0_get_requestBody_id' => {
         path => '/components/pathItems/path0/get/requestBody/content/media_type_1/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_requestBody_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       },
       map +('http://localhost:1234/pathItem0_get_responses'.$_.'_id' => {
         path => '/components/pathItems/path0/get/responses/200/content/media_type_'.$_.'/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_responses'.$_.'_id'),
         specification_version => 'draft2020-12',
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
         configs => {},
       }), 2..3,
     },

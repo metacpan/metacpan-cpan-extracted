@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::project_selector;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME:  project_selector
+ PERL PERL PROGRAM NAME:  project_selector
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 3, 2018
  VERSION:   1.0.1

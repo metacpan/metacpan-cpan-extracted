@@ -1,0 +1,13 @@
+2023-07-14   0.0.3
+
+* BUGFIX: Test mode was enabled by default even when -test => 0 was passed
+
+2023-07-13   0.0.2
+
+* BUGFIX: test mode was not programmable by the user
+* Added -test option to enable test mode in the Bot class
+* Updated POD
+
+2023-07-10   0.0.1
+
+* Initial release

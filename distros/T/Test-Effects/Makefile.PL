@@ -11,7 +11,8 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Test/Effects.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::Trap' => 0.002001,
+        'Test::Trap'   => 0.002001,
+        'match::smart' => 0.010,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Test-Effects-*' },

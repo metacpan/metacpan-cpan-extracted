@@ -12,7 +12,7 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
-Version 0.07
+Version 0.09
 
 # SYNOPSIS
 
@@ -63,17 +63,9 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ObituaryDailyTimes](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ObituaryDailyTimes)
 
-- CPANTS
-
-    [http://cpants.cpanauthors.org/dist/Genealogy-ObituaryDailyTimes](http://cpants.cpanauthors.org/dist/Genealogy-ObituaryDailyTimes)
-
 - CPAN Testers' Matrix
 
     [http://matrix.cpantesters.org/?dist=Genealogy-ObituaryDailyTimes](http://matrix.cpantesters.org/?dist=Genealogy-ObituaryDailyTimes)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Genealogy-ObituaryDailyTimes](http://cpanratings.perl.org/d/Genealogy-ObituaryDailyTimes)
 
 - CPAN Testers Dependencies
 

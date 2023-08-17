@@ -1,6 +1,6 @@
 Cleanup:
   * drop undocumented gen option 'anchorleft'
-    when App::Licensecheck no longer use it
+    when String::License no longer use it
     and require newer R::P::License anyway
 
 Options:
@@ -93,10 +93,7 @@ Misc.
   * Turn most possible into seed patterns.
 
 Document new features:
-  * Add SYNOPSIS
-  * Document options:
-    + subject - including enabling multiple subjects.
-    + capture
+  * Document gen option "capture"
   * Add note about "re" use...:
     adaptable by passing option C<subject> to L<Regexp::Pattern::re>.
   * Maybe reference https://rightsstatements.org/

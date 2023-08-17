@@ -9,7 +9,7 @@ use SQL::Load::Util qw/
 /;
 use SQL::Load::Method;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my ($class, $path, $end) = @_;
@@ -137,7 +137,7 @@ sub _generate_key {
 sub _get_tmp {
     my ($self, $key) = @_;
     
-    return SQL::Load::Method->new($self->{_data}->{$key}->{content}) 
+    return SQL::Load::Method->new($self->{_data}->{$key}->{content}, $self->{_end}) 
         if exists $self->{_data}->{$key}->{content};
     
     return;

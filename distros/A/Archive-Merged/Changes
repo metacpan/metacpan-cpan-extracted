@@ -1,3 +1,6 @@
+0.03 2023-07-21
+    * Various test suite fixes, no code changes, no need to upgrade
+
 0.02 2018-10-28
     * Re-release with proper META.* information
     * No update necessary

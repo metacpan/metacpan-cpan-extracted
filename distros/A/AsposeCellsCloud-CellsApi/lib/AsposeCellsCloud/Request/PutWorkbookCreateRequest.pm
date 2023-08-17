@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PutWorkbookCreateRequest.name :   ,
-# PutWorkbookCreateRequest.templateFile :   ,
-# PutWorkbookCreateRequest.dataFile :   ,
-# PutWorkbookCreateRequest.isWriteOver :   ,
-# PutWorkbookCreateRequest.folder :   ,
-# PutWorkbookCreateRequest.storageName :   ,
+# PutWorkbookCreateRequest.name : The new document name.  ,
+# PutWorkbookCreateRequest.templateFile : The template file, if the data not provided default workbook is created.  ,
+# PutWorkbookCreateRequest.dataFile : Smart marker data file, if the data not provided the request content is checked for the data.  ,
+# PutWorkbookCreateRequest.isWriteOver : Specifies whether to write over targer file.  ,
+# PutWorkbookCreateRequest.folder : Original workbook folder.  ,
+# PutWorkbookCreateRequest.storageName : Storage name.  ,
 # PutWorkbookCreateRequest.checkExcelRestriction :    
 
 {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_workbook_create' } = { 
-    	summary => '',
+    	summary => 'Creates new workbook using deferent methods.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -143,42 +143,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The new document name.',
      	format => '',
      	read_only => '',
      		},
      'template_file' => {
      	datatype => 'string',
      	base_name => 'templateFile',
-     	description => '',
+     	description => 'The template file, if the data not provided default workbook is created.',
      	format => '',
      	read_only => '',
      		},
      'data_file' => {
      	datatype => 'string',
      	base_name => 'dataFile',
-     	description => '',
+     	description => 'Smart marker data file, if the data not provided the request content is checked for the data.',
      	format => '',
      	read_only => '',
      		},
      'is_write_over' => {
      	datatype => 'string',
      	base_name => 'isWriteOver',
-     	description => '',
+     	description => 'Specifies whether to write over targer file.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

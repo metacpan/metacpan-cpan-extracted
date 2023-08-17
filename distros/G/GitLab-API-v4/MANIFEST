@@ -57,6 +57,7 @@ author/sections/protected_branches.yml
 author/sections/protected_tags.yml
 author/sections/release_links.yml
 author/sections/releases.yml
+author/sections/remote_mirrors.yml
 author/sections/repositories.yml
 author/sections/repository_files.yml
 author/sections/resource_label_events.yml

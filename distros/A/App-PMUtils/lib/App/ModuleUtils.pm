@@ -3,9 +3,9 @@
 package App::ModuleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-28'; # DATE
+our $DATE = '2023-05-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.743'; # VERSION
+our $VERSION = '0.744'; # VERSION
 
 1;
 # ABSTRACT: Alias for App::PMUtils
@@ -22,7 +22,7 @@ App::ModuleUtils - Alias for App::PMUtils
 
 =head1 VERSION
 
-This document describes version 0.743 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2023-01-28.
+This document describes version 0.744 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2023-05-12.
 
 =head1 HOMEPAGE
 

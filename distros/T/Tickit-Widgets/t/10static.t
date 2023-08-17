@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -116,7 +115,7 @@ pressmouse( "press", 1, 0, 12 );
 
 flush_tickit;
 
-identical( $clicked, $static, '$self for Static on_click event' );
+ref_is( $clicked, $static, '$self for Static on_click event' );
 is( $line, 0, '$line for Static on_click event' );
 is( $col, 12, '$col for Static on_click event' );
 
@@ -130,11 +129,11 @@ is( $col, 12, '$col for Static on_click event' );
       },
    );
 
-   is_deeply( { $static->pen->getattrs }, { fg => 1 }, 'Styled Static pen initially' );
+   is( { $static->pen->getattrs }, { fg => 1 }, 'Styled Static pen initially' );
 
    $static->set_style_tag( active => 1 );
 
-   is_deeply( { $static->pen->getattrs }, { fg => 7 }, 'Styled Static pen with tag' );
+   is( { $static->pen->getattrs }, { fg => 7 }, 'Styled Static pen with tag' );
 }
 
 done_testing;

@@ -13,6 +13,7 @@ my $c = Text::Amuse::Compile->new(extra => {
                                             mainfont => 'Amiri',
                                            },
                                   sl_pdf => !!$ENV{TEST_WITH_LATEX},
+                                  luatex => 1,
                                   sl_tex => 1);
 
 my $muse_fa =<<EOF;
@@ -42,7 +43,7 @@ my $muse_en = <<EOF;
 
 ** Test
 
- - <<<دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛>>>
+ - <[fa]>دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛</[fa]>
  - <[fa]>دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛</[fa]>
 EOF
 
@@ -53,8 +54,8 @@ my $muse_fa_en = <<EOF;
 
 ** دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛
 
- - >>>english text, left to right<<<
- - <<<دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛>>
+ - <[en]>english text, left to right</[en]>
+ - <[fa]>دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛</[fa]>
 
 EOF
 
@@ -93,10 +94,10 @@ foreach my $test (@tests) {
     }
     ok $tex->exists;
     if ($test->{bidi}) {
-        like $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;
+        like $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=(default|basic|bidi-(r|l))/;
     }
     else {
-        unlike $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;
+        unlike $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=(default|basic|bidi-(r|l))/;
     }
     if ($test->{rtl}) {
         like $tex->slurp_utf8, qr/\{frametitle\}\[default\]\[right\]/;

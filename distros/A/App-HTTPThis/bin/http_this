@@ -22,7 +22,7 @@ http_this - export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.006
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,12 @@ version 0.006
 
     ## Start the server using index.html for directory requests
     $ http_this --autoindex
+
+    ## Start the server using prettier CSS for index pages
+    $ http_this --pretty
+
+    ## Load config from a file
+    $ http_this --config /path/to/configrc
 
     ## Show documentation about our options
     $ http_this --help
@@ -90,6 +96,14 @@ By default, if the server gets a request that ends in / then it displays
 a listing of that directory. With the C<--autoindex> flag, it will serve
 the C<index.html> file from that directory (if it exists).
 
+=item --pretty
+
+Creates default index listings using a prettier cascading stylesheet.
+
+=item --config FILE
+
+Read configuration options from C<FILE>. See L<CONFIGURATION FILE> below.
+
 =item --help
 
 Print information about the script usage and its options.
@@ -97,6 +111,31 @@ Print information about the script usage and its options.
 =item --man
 
 Print the entire man page for the command.
+
+=back
+
+=head2 CONFIGURATION FILE
+
+The script can read configuration options from a file. By default, it
+looks for a file named C<.http_thisrc> in the current directory or
+your home directory. You can specify a different file with the C<--config>
+option or by setting the C<HTTP_THIS_CONFIG> environment variable.
+
+The config file consists of lines in the format C<key=value>. The valid
+keys are:
+
+=over 4
+
+=item B<port>: The port to use for the HTTP server.
+
+=item B<name>: The name to use when announcing the server over Bonjour.
+
+=item B<autoindex>: If set to a true value, the server will serve the
+C<index.html> file from a directory when it gets a request that ends in
+/ (instead of displaying a listing of that directory).
+
+=item B<pretty>: If set to a true value, the server will use a prettier
+cascading stylesheet for directory listings.
 
 =back
 

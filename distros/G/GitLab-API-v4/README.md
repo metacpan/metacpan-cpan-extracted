@@ -1463,6 +1463,28 @@ See [https://docs.gitlab.com/ce/api/groups.html](https://docs.gitlab.com/ce/api/
 
     Sends a `DELETE` request to `groups/:group_id/ldap_group_links/:provider/:cn`.
 
+- share\_group\_with\_group
+
+    ```
+    $api->share_group_with_group(
+        $group_id,
+        \%params,
+    );
+    ```
+
+    Sends a `POST` request to `groups/:group_id/share`.
+
+- unshare\_group\_with\_group
+
+    ```
+    $api->unshare_group_with_group(
+        $group_id,
+        $shared_with_group_id,
+    );
+    ```
+
+    Sends a `DELETE` request to `groups/:group_id/share/:shared_with_group_id`.
+
 ## Group access requests
 
 See [https://docs.gitlab.com/ce/api/access\_requests.html](https://docs.gitlab.com/ce/api/access_requests.html).
@@ -2357,6 +2379,30 @@ See [https://docs.gitlab.com/ce/api/merge\_requests.html](https://docs.gitlab.co
     ```
 
     Sends a `PUT` request to `projects/:project_id/merge_requests/:merge_request_iid/merge` and returns the decoded response content.
+
+- approve\_merge\_request
+
+    ```perl
+    my $merge_request = $api->approve_merge_request(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+    ```
+
+    Sends a `POST` request to `projects/:project_id/merge_requests/:merge_request_iid/approve` and returns the decoded response content.
+
+- unapprove\_merge\_request
+
+    ```perl
+    my $merge_request = $api->unapprove_merge_request(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+    ```
+
+    Sends a `POST` request to `projects/:project_id/merge_requests/:merge_request_iid/unapprove` and returns the decoded response content.
 
 - cancel\_merge\_when\_pipeline\_succeeds
 
@@ -3632,6 +3678,17 @@ See [https://docs.gitlab.com/ce/api/pipeline\_schedules.html](https://docs.gitla
 
     Sends a `POST` request to `projects/:project_id/pipeline_schedules/:pipeline_schedule_id/take_ownership` and returns the decoded response content.
 
+- run\_pipeline\_schedule
+
+    ```perl
+    my $variable = $api->run_pipeline_schedule(
+        $project_id,
+        $pipeline_schedule_id,
+    );
+    ```
+
+    Sends a `POST` request to `projects/:project_id/pipeline_schedules/:pipeline_schedule_id/play` and returns the decoded response content.
+
 - delete\_pipeline\_schedule
 
     ```perl
@@ -4519,6 +4576,43 @@ See [https://docs.gitlab.com/ce/api/releases/links.html](https://docs.gitlab.com
 
     Sends a `DELETE` request to `projects/:project_id/releases/:tag_name/assets/links/:link_id` and returns the decoded response content.
 
+## Remote Mirrors
+
+See [https://docs.gitlab.com/ce/api/remote\_mirrors.html](https://docs.gitlab.com/ce/api/remote_mirrors.html).
+
+- remote\_mirrors
+
+    ```perl
+    my $mirrors = $api->remote_mirrors(
+        $project_id,
+    );
+    ```
+
+    Sends a `GET` request to `projects/:project_id/remote_mirrors` and returns the decoded response content.
+
+- create\_remote\_mirror
+
+    ```perl
+    my $mirror = $api->create_remote_mirror(
+        $project_id,
+        \%params,
+    );
+    ```
+
+    Sends a `POST` request to `projects/:project_id/remote_mirrors` and returns the decoded response content.
+
+- edit\_remote\_mirror
+
+    ```perl
+    my $mirror = $api->edit_remote_mirror(
+        $project_id,
+        $mirror_id,
+        \%params,
+    );
+    ```
+
+    Sends a `PUT` request to `projects/:project_id/remote_mirrors/:mirror_id` and returns the decoded response content.
+
 ## Repositories
 
 See [https://docs.gitlab.com/ce/api/repositories.html](https://docs.gitlab.com/ce/api/repositories.html).
@@ -5336,6 +5430,66 @@ See [https://docs.gitlab.com/ce/api/users.html](https://docs.gitlab.com/ce/api/u
 
     Sends a `POST` request to `users/:user_id/unblock` and returns the decoded response content.
 
+- approve\_user
+
+    ```perl
+    $api->approve_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/approve`.
+
+- reject\_user
+
+    ```perl
+    $api->reject_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/reject`.
+
+- activate\_user
+
+    ```perl
+    $api->activate_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/activate`.
+
+- deactivate\_user
+
+    ```perl
+    $api->deactivate_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/deactivate`.
+
+- ban\_user
+
+    ```perl
+    $api->ban_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/ban`.
+
+- unban\_user
+
+    ```perl
+    $api->unban_user(
+        $user_id,
+    );
+    ```
+
+    Sends a `POST` request to `users/:user_id/unban`.
+
 - user\_impersonation\_tokens
 
     ```perl
@@ -5510,17 +5664,15 @@ GitLab-API-v4 GitHub issue tracker:
 
 [https://github.com/bluefeet/GitLab-API-v4/issues](https://github.com/bluefeet/GitLab-API-v4/issues)
 
-# ACKNOWLEDGEMENTS
-
-Thanks to [ZipRecruiter](https://www.ziprecruiter.com/)
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
-
-# AUTHORS
+# AUTHOR
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>
+```
+
+# CONTRIBUTORS
+
+```
 Dotan Dimet <dotan@corky.net>
 Nigel Gregoire <nigelgregoire@gmail.com>
 trunov-ms <trunov.ms@gmail.com>
@@ -5535,21 +5687,14 @@ Kieren Diment <kieren.diment@staples.com.au>
 Dmitry Frolov <dmitry.frolov@gmail.com>
 Thomas Klausner <domm@plix.at>
 Graham Knop <haarg@haarg.org>
+Stig Palmquist <git@stig.io>
+Dan Book <grinnz@grinnz.com>
+James Wright <jwright@ecstuning.com>
+Jonathan Taylor <jon@stackhaus.com>
+g0t mi1k <have.you.g0tmi1k@gmail.com>
 ```
 
-# COPYRIGHT AND LICENSE
+# LICENSE
 
-Copyright (C) 2014 Aran Clary Deltac
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -4,7 +4,7 @@ use strict;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.01';
+	$VERSION = '1.07';
 }
 
 die "Dying with A SPECIFIC ERROR";

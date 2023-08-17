@@ -23,7 +23,8 @@ requires:
   JSON::MaybeXS: '0'
   Moose: '0'
   MooseX::Singleton: '0'
+  SemVer: '0'
 resources:
   repository: https://salsa.debian.org/wouter/media-convert.git
-version: v1.0.4
+version: v1.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

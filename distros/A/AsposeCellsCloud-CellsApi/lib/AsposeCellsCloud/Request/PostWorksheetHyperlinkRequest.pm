@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetHyperlinkRequest.name :   ,
-# PostWorksheetHyperlinkRequest.sheetName :   ,
-# PostWorksheetHyperlinkRequest.hyperlinkIndex :   ,
-# PostWorksheetHyperlinkRequest.hyperlink :   ,
-# PostWorksheetHyperlinkRequest.folder :   ,
-# PostWorksheetHyperlinkRequest.storageName :    
+# PostWorksheetHyperlinkRequest.name : The workbook name.  ,
+# PostWorksheetHyperlinkRequest.sheetName : The worksheet name.  ,
+# PostWorksheetHyperlinkRequest.hyperlinkIndex : The hyperlink`s index.  ,
+# PostWorksheetHyperlinkRequest.hyperlink : Hyperlink object  ,
+# PostWorksheetHyperlinkRequest.folder : Original workbook folder.  ,
+# PostWorksheetHyperlinkRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_hyperlink' } = { 
-    	summary => '',
+    	summary => 'Updates hyperlink by index in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'hyperlink_index' => {
      	datatype => 'int',
      	base_name => 'hyperlinkIndex',
-     	description => '',
+     	description => 'The hyperlink`s index.',
      	format => '',
      	read_only => '',
      		},
      'hyperlink' => {
      	datatype => 'Hyperlink',
      	base_name => 'hyperlink',
-     	description => '',
+     	description => 'Hyperlink object',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

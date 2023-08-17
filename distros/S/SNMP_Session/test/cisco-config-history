@@ -1,0 +1,170 @@
+#!/usr/local/bin/perl -w
+###
+### Print history of configuration management actions on Cisco router
+### using CISCO-CONFIG-MAN-MIB.my.
+###
+use strict;
+
+use BER "0.72";
+use SNMP_Session "0.67";
+use Time::HiRes;
+
+use Getopt::Long;
+
+my $version = '1';
+
+while (defined $ARGV[0] && $ARGV[0] =~ /^-/) {
+    if ($ARGV[0] =~ /^-v/) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] eq '1') {
+	    $version = '1';
+	} elsif ($ARGV[0] eq '2c') {
+	    $version = '2c';
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] eq '-h') {
+	usage (0);
+	exit 0;
+    } else {
+	usage (1);
+    }
+    shift @ARGV;
+}
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || "public";
+usage (1) if $#ARGV >= $[;
+
+my $ccmHistoryEventTime = [1,3,6,1,4,1,9,9,43,1,1,6,1,2];
+my $ccmHistoryEventCommandSource = [1,3,6,1,4,1,9,9,43,1,1,6,1,3];
+my $ccmHistoryEventConfigSource = [1,3,6,1,4,1,9,9,43,1,1,6,1,4];
+my $ccmHistoryEventConfigDestination = [1,3,6,1,4,1,9,9,43,1,1,6,1,5];
+my $ccmHistoryEventTerminalType = [1,3,6,1,4,1,9,9,43,1,1,6,1,6];
+my $ccmHistoryEventTerminalNumber = [1,3,6,1,4,1,9,9,43,1,1,6,1,7];
+my $ccmHistoryEventTerminalUser = [1,3,6,1,4,1,9,9,43,1,1,6,1,8];
+my $ccmHistoryEventTerminalLocation = [1,3,6,1,4,1,9,9,43,1,1,6,1,9];
+my $ccmHistoryEventCommandSourceAddress = [1,3,6,1,4,1,9,9,43,1,1,6,1,10];
+my $ccmHistoryEventVirtualHostName = [1,3,6,1,4,1,9,9,43,1,1,6,1,11];
+my $ccmHistoryEventServerAddress = [1,3,6,1,4,1,9,9,43,1,1,6,1,12];
+my $ccmHistoryEventFile = [1,3,6,1,4,1,9,9,43,1,1,6,1,13];
+my $ccmHistoryEventRcpUser = [1,3,6,1,4,1,9,9,43,1,1,6,1,14];
+
+my $session =
+    ($version eq '1' ? SNMPv1_Session->open ($host, $community, 161)
+     : $version eq '2c' ? SNMPv2c_Session->open ($host, $community, 161)
+     : die "Unknown SNMP version $version")
+  || die "Opening SNMP_Session";
+
+my $router_boottime = router_boottime ($session);
+
+$session->map_table ([$ccmHistoryEventTime,
+		      $ccmHistoryEventConfigSource,
+		      $ccmHistoryEventConfigDestination],
+		     sub () {
+			 my ($index, $time, $source, $dest) = @_;
+			 local $BER::pretty_print_timeticks = 0;
+			 grep (defined $_ && ($_=pretty_print $_),
+			       ($time, $source, $dest));
+			 my ($action);
+
+			 if ($source == 3 && $dest == 2) {
+			     $action = "show running-config";
+			 } elsif ($source == 4 && $dest == 2) {
+			     $action = "show configuration";
+			 } elsif ($source == 3 && $dest == 4) {
+			     $action = "write memory";
+			 } elsif ($source == 2 && $dest == 3) {
+			     $action = "configure terminal";
+			 } elsif ($source == 6 && $dest == 3) {
+			     $action = "configure network tftp:";
+			 } elsif ($source == 3 && $dest == 6) {
+			     $action = "write network tftp:";
+			 } else {
+			     $source = pretty_HistoryEventMedium ($source);
+			     $dest = pretty_HistoryEventMedium ($dest);
+			     $action = "$source -> $dest";
+			 }
+			 my $localtime = localtime ($time * 1e-2+$router_boottime);
+			 print $localtime," ",$action,"\n";
+			 
+		     });
+$session->close ()
+    || die "close SNMP session";
+1;
+
+sub pretty_HistoryEventMedium ($) {
+    my ($medium) = @_;
+    if ($medium == 1) {
+	return 'erase';
+    } elsif ($medium == 2) {
+	return 'commandSource';
+    } elsif ($medium == 3) {
+	return 'running';
+    } elsif ($medium == 4) {
+	return 'startup';
+    } elsif ($medium == 5) {
+	return 'local';
+    } elsif ($medium == 6) {
+	return 'networkTftp';
+    } elsif ($medium == 7) {
+	return 'networkRcp';
+    } else {
+	return "$medium???";
+    }
+}
+
+sub usage ($) {
+    warn <<EOM;
+Usage: $0 [-v (1|2c)] router [community]
+       $0 -h
+
+  -h           print this usage message and exit.
+
+  -v version   can be used to select the SNMP version.  The default
+   	       is SNMPv1, which is what most devices support.  If your box
+   	       supports SNMPv2c, you should enable this by passing "-v 2c"
+   	       to the script.  SNMPv2c is much more efficient for walking
+   	       tables, which is what this tool does.
+
+  router       hostname or IP address of a Cisco IOS device
+
+  community    SNMP community string to use.  Defaults to "public".
+EOM
+    exit (1) if $_[0];
+}
+
+### router_boottime SESSION
+###
+### Returns the boot time of the SNMP agent reachable through SESSION
+### in Unix seconds 
+###
+sub router_boottime ($) {
+    my ($session) = @_;
+
+    my $uptime = uptime_hundredths ($session);
+    my ($seconds,$microseconds) = Time::HiRes::gettimeofday ();
+    return $seconds + $microseconds * 1e-6 - $uptime * 1e-2;
+}
+
+sub uptime_hundredths ($) {
+    my ($session) = @_;
+    local $BER::pretty_print_timeticks = 0;
+    if ($session->get_request_response (encode_oid (1,3,6,1,2,1,1,3,0))) {
+	my $response = $session->pdu_buffer;
+	my ($bindings) = $session->decode_get_response ($response);
+	my $binding;
+	while ($bindings ne '') {
+	    ($binding,$bindings) = decode_sequence ($bindings);
+	    my ($oid,$value) = decode_by_template ($binding, "%O%@");
+	    my ($uptime) = pretty_print ($value);
+	    return $uptime;
+	}
+    } else {
+	die "cannot get sysUpTime.0 from $host";
+    }
+}

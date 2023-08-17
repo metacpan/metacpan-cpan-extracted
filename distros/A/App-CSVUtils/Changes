@@ -1,3 +1,48 @@
+1.030   2023-07-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli csv-freqtable] Add option --with-data-rows.
+
+
+1.029   2023-07-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] [cli csv-fill-cells] Tweak example.
+
+
+1.028   2023-07-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Indicate alias utilities with "(shorter name for ...)" in
+          Abstract.
+
+        - [doc] [ux] [cli csv-fill-cells] Add illustration to show how
+          different layouts fill cells differently.
+
+        - [doc] [cli csv-sorted-rows] Add description to --quiet.
+
+
+1.027   2023-06-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix][cli csv-fill-cells] Forgot to update schema in function
+          metadata.
+
+
+1.026   2023-06-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli csv-fill-cells] Add tests, fix bug, implement 'layout'
+          option.
+
+
+1.025   2023-06-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: csv-pick-cells, csv-fill-cells.
+
+        - [doc] Forgot to list {input,ouput}_{fields,fields_idx} in
+          documentation on stash keys.
+
+
 1.024   2023-04-01  Released-By: PERLANCAR; Urgency: low
 
         - [cli list-csvutils] [doc] Add examples, tweak Perinci::CmdLine

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -60,9 +60,9 @@ local *IO::Async::Handle::connect = sub {
 
    wait_for_future( $req_f );
 
-   is_deeply( \@written,
-              [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
-              'on_body_write invoked per body write call' );
+   is( \@written,
+       [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+       'on_body_write invoked per body write call' );
 }
 
 done_testing;

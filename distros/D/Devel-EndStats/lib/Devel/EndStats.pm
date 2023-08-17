@@ -1,48 +1,19 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package Devel::EndStats;
 
-our $DATE = '2015-03-26'; # DATE
-our $VERSION = '0.20'; # VERSION
+# we avoid loading any module
+#use strict;
+#use warnings;
 
-use strict;
-use warnings;
-use Time::HiRes qw(gettimeofday tv_interval);
-
-# exclude modules which we use ourselves
-my %excluded = map {$_=>1} (
-    "strict.pm",
-    "Devel/EndStats.pm",
-    "warnings.pm",
-    "warnings/register.pm",
-
-    # from Time::HiRes
-    "AutoLoader.pm",
-    "Config_git.pl",
-    "Config_heavy.pl",
-    "Config.pm",
-    "DynaLoader.pm",
-    "Exporter/Heavy.pm",
-    "Exporter.pm",
-    "Time/HiRes.pm",
-    "vars.pm",
-
-    # ?
-    "subs.pm",
-    "overload.pm",
-);
-
-# if we use Module::CoreList
-my %excluded_hide_core = map {$_=>1} (
-    "Module/CoreList.pm",
-    "XSLoader.pm",
-    "version.pm",
-    "version/regex.pm",
-    "Module/CoreList/TieHashDelta.pm",
-    "version/vxs.pm",
-);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-05-12'; # DATE
+our $DIST = 'Devel-EndStats'; # DIST
+our $VERSION = '0.212'; # VERSION
 
 our %opts = (
     verbose      => 0,
-    sort         => '-time',
+    debug        => 0,
+    sort         => 'caller',
     _quiet       => 0,
     force        => 0,
     hide_core    => 0,
@@ -88,26 +59,19 @@ sub import {
     my ($class, %args) = @_;
 
     $opts{verbose} = $ENV{VERBOSE} if defined($ENV{VERBOSE});
-    if ($ENV{DEVELENDSTATS_OPTS}) {
-        while ($ENV{DEVELENDSTATS_OPTS} =~ /(\w+)=(\S+)/g) {
+    if ($ENV{PERL_DEVEL_ENDSTATS_OPTS}) {
+        while ($ENV{PERL_DEVEL_ENDSTATS_OPTS} =~ /(\w+)=(\S+)/g) {
             $opts{$1} = $2;
         }
     }
     $opts{$_} = $args{$_} for keys %args;
 
-    my @loaded = grep {!$excluded{$_}} keys(%INC);
-    warn join(
-        "",
-        "There are already a bunch of modules loaded",
-        (" (".join(", ", @loaded).")") x !!$opts{verbose},
-        " before Devel::EndStats has a chance to install its require hook. ",
-        "For better results, it is recommended that you load ",
-        __PACKAGE__, " before others.\n",
-    ) if @loaded > 5;
-
     if ($opts{hide_core} || $opts{hide_noncore}) {
         require Module::CoreList;
-        $excluded{$_} = 1 for keys %excluded_hide_core;
+    }
+
+    if ($opts{time_hires}) {
+        require Time::HiRes;
     }
 
     #unshift @INC, \&_inc_handler;
@@ -124,10 +88,10 @@ sub import {
         };
 
         my $memsize1 = _get_memsize() if $opts{show_memsize};
-        my $st = [gettimeofday];
+        my $st = $opts{time_hires} ? [Time::HiRes::gettimeofday()] : time();
         my $res;
         if (wantarray) { $res = [CORE::require $arg] } else { $res = CORE::require $arg }
-        my $iv = tv_interval($st);
+        my $iv = $opts{time_hires} ? Time::HiRes::tv_interval($st) : time()-$st;
         my $memsize2 = _get_memsize() if $opts{show_memsize};
 
         # still can't make exclusive time work
@@ -149,13 +113,14 @@ sub import {
         if (wantarray) { return @$res } else { return $res }
     };
 
-    $start_time = [gettimeofday];
+    $start_time = $opts{time_hires} ? [Time::HiRes::gettimeofday()] : time();
 }
 
 my $begin_success;
 {
     # shut up warning about too late to run INIT block
-    no warnings;
+    #no warnings;
+
     INIT {
         $begin_success++;
     }
@@ -163,7 +128,19 @@ my $begin_success;
 
 our $stats;
 END {
-    my $secs = $start_time ? tv_interval($start_time) : (time()-$^T);
+    if ($INC{"Dist/Zilla.pm"}) {
+        # there is no environment variable to mark when we are building, so we
+        # check this by the presence of Dist::Zilla in the loaded modules, which
+        # might be a false positive in some cases.
+        warn "We are building ourselves (Dist::Zilla is loaded), skipping displaying results\n" if $opts{debug};
+        return;
+    }
+
+    my $secs = $start_time ?
+        ($opts{time_hires} ? Time::HiRes::tv_interval($start_time) : time()-$start_time) :
+        (time()-$^T);
+
+    warn "DEBUG: Devel::EndStats is loaded with these options: ".join(" ", map {"$_=$opts{$_}"} sort keys %opts)."\n" if $opts{debug};
 
     $stats = "";
 
@@ -174,7 +151,9 @@ END {
 
         $stats .= "\n";
         $stats .= "# Start stats from Devel::EndStats:\n";
-        $stats .= sprintf "# Program runtime duration: %.3fms\n", $secs*1000;
+        $stats .= $opts{time_hires} ?
+            (sprintf "# Program runtime duration: %.3fms\n", $secs*1000) :
+            (sprintf "# Program runtime duration: %ds\n", $secs);
 
         my $files = 0;
         my $lines = 0;
@@ -184,7 +163,6 @@ END {
         my $lines_noncore = 0;
         local *F;
         for my $r (keys %INC) {
-            next if $excluded{$r};
             $files++;
             next unless $INC{$r}; # skip modules that failed to be require()-ed
             next if $INC{$r} eq '-e';
@@ -218,7 +196,7 @@ END {
         }
 
         if ($opts{verbose}) {
-            my $s = $opts{sort} || 'caller';
+            my $s = $opts{sort};
             my $sortsub;
             my $reverse;
             if ($s =~ /^(-?)l(?:ines)?/) {
@@ -254,8 +232,8 @@ END {
                 $ii->{time} ||= 0;
                 $ii->{memsize} ||= 0;
                 $stats .= sprintf(
-                    "# %3s  %5d  %8.3fms(%3d%%)  ".($sm ? "%6.0fK" : "%s")."  %s (loaded by %s)\n",
-                    $ii->{order} || '?', $ii->{lines}, $ii->{time}*1000, $secs ? $ii->{time}/$secs*100 : 0,
+                    "# %3s  %5d  ".($opts{time_hires} ? "%8.3fms":"%8d s")."(%3d%%)  ".($sm ? "%6.0fK" : "%s")."  %s (loaded by %s)\n",
+                    $ii->{order} || '?', $ii->{lines}, ($opts{time_hires} ? $ii->{time}*1000 : $ii->{time}), $secs ? $ii->{time}/$secs*100 : 0,
                     ($sm ? $ii->{memsize} : ""),
                     $r,
                     ($ii->{caller} || "?"),
@@ -285,12 +263,12 @@ Devel::EndStats - Display run time and dependencies after running code
 
 =head1 VERSION
 
-This document describes version 0.20 of Devel::EndStats (from Perl distribution Devel-EndStats), released on 2015-03-26.
+This document describes version 0.212 of Devel::EndStats (from Perl distribution Devel-EndStats), released on 2023-05-12.
 
 =head1 SYNOPSIS
 
  # from the command line
- % perl -MDevel::EndStats script.pl
+ % perl -MDevel::EndStats=time_hires,1 script.pl
 
  ##### sample output #####
  <normal script output, if any...>
@@ -301,7 +279,7 @@ This document describes version 0.20 of Devel::EndStats (from Perl distribution 
  # Total number of required lines loaded: 48772
  # END stats
 
- ##### sample output (with verbose=1, some cut) #####
+ ##### sample output (with verbose=1 & time_hires=1, some cut) #####
  <normal script output, if any...>
 
  # BEGIN stats from Devel::EndStats
@@ -331,10 +309,16 @@ program, such as:
 
 =back
 
+It works by installing a hook in C<@INC> to record the loading of modules.
+
 Some notes/caveats:
 
 Devel::EndStats should be loaded before other modules, for example by running it
 on the command-line, as shown in the SYNOPSIS.
+
+=head1 KNOWN ISSUES
+
+* Timing and memory usage is inclusive instead of exclusive.
 
 =head1 OPTIONS
 
@@ -346,42 +330,63 @@ Some options are accepted. They can be passed via the B<use> statement:
  # from script
  use Devel::EndStats verbose=>1;
 
-or via the DEVELENDSTATS_OPTS environment variable:
+or via the L</PERL_DEVEL_ENDSTATS_OPTS> environment variable:
 
- % DEVELENDSTATS_OPTS='verbose=1' perl -MDevel::EndStats script.pl
+ % PERL_DEVEL_ENDSTATS_OPTS='verbose=1' perl -MDevel::EndStats script.pl
 
-=over 4
+If you use the later, you will need to use C<use> and not C<require> to load
+C<Devel::EndStats>, because reading the environment variable is done in the
+C<import()> hook of the module.
 
-=item * verbose => BOOL (default: 0)
+=over
 
-Can also be set via VERBOSE environment variable. If set to true, display more
-statistics (like per-module statistics).
+=item * verbose
 
-=item * sort => STR (default: '-time')
+Bool, default 0. Can also be set via L</VERBOSE> environment variable. If set to
+true, display more statistics (like per-module statistics).
 
-Set how to sort the list of loaded modules ('file' = by file, 'time' = by load
-time, 'caller' = by first caller's package, 'order' = by order of loading,
-'lines' = by number of lines). Only relevant when 'verbose' is on.
+=item * debug
 
-=item * force => BOOL (default: 0)
+Bool, default 0. Can also be set via L</DEBUG> environment variable. If set to
+true, display debugging messages to stderr.
 
-By default, if BEGIN phase did not succeed, stats will not be shown. This option
-forces displaying the stats.
+=item * time_hires
 
-=item * hide_core => BOOL (default: 0)
+Bool, default 0. By default, time is measured using the builtin C<time()> which
+only has 1-second precision. To enable subsecond precision, set this option to
+true. Setting this option to true will load L<Time::HiRes> and affect the
+results.
 
-Whether to hide core modules while listing modules in C<verbose> mode.
+=item * sort
 
-=item * hide_noncore => BOOL (default: 0)
+String, default C<caller>. Set how to sort the list of loaded modules ('file' =
+by file, 'time' = by load time, 'caller' = by first caller's package, 'order' =
+by order of loading, 'lines' = by number of lines). Only relevant when 'verbose'
+is on.
 
-Whether to hide non-core modules while listing modules in C<verbose> mode.
+=item * force
 
-=item * show_memsize => BOOL (default: 0)
+Bool, default 0. By default, if BEGIN phase did not succeed, stats will not be
+shown. This option forces displaying the stats.
 
-Whether to show memory usage information. Currently this is done by probing
-C</proc/$$/statm> because some other memory querying modules are unusable (e.g.
-L<Devel::SizeMe> currently segfaults on my system, C<Devel::InterpreterSize> is
-too heavy).
+=item * hide_core
+
+Bool, default 0. Whether to hide core modules while listing modules in
+C<verbose> mode. When this is set to true, will load L<Module::CoreList>, so
+that will affect the results.
+
+=item * hide_noncore
+
+Bool, default 0. Whether to hide non-core modules while listing modules in
+C<verbose> mode. When this is set to true, will load L<Module::CoreList>, so
+that will affect the results.q
+
+=item * show_memsize
+
+Bool, default 0. Whether to show memory usage information. Currently this is
+done by probing C</proc/$$/statm> because some other memory querying modules are
+unusable (e.g. L<Devel::SizeMe> currently segfaults on my system,
+C<Devel::InterpreterSize> is too heavy).
 
 =back
 
@@ -394,19 +399,54 @@ trying to reduce startup overhead of a command line application, by looking at
 how many modules the app has loaded and try to avoid loading modules whenever
 it's unnecessary.
 
+=head2 Why are some modules always shown as being already loaded despite me not having loaded any of such modules?
+
+These are C<Devel::EndStats> itself and modules that are loaded by
+C<Devel::EndStats>, e.g. C<Time::HiRes>, C<Module::CoreList>, and modules that
+are loaded by I<those> modules.
+
+=head2 Why are some modules have 'Seq' (sequence) value of '?'
+
+These are modules that are loaded before C<Devel::EndStats> and had not been
+traced by C<Devel::EndStats>'s C<@INC> hook.
+
+=head2 PERL_DEVEL_ENDSTATS_OPTS is not observed!
+
+Make sure you load C<Devel::EndStats> using C<use> and not C<require>, or make
+sure you C<import()> the module, because reading of the environment variable is
+done in the C<import()> hook.
+
+=head2 How to measure subsecond times?
+
+Set option C<time_hires> to true. Either from the C<use> line:
+
+ # in perl code
+ use Devel::EndStats time_hires=>1;
+
+ # on the command line
+ % perl -MDevel::EndStats=time_hires,1
+
+or from the environment variable L</PERL_DEVEL_ENDSTATS_OPTS>:
+
+ % PERL_DEVEL_ENDSTATS_OPTS="time_hires=1" perl -MDevel::EndStats ...
+
 =head2 Can you add (so and so) information to the stats?
 
 Sure, if it's useful. As they say, (comments|patches) are welcome.
 
-=head1 SEE ALSO
+=head1 ENVIRONMENT
 
-There are many modules on CPAN that can be used to generate dependency
-information for your code. Neil Bowers has written a
-L<review|http://neilb.org/reviews/dependencies.html> that covers most of them.
+=head2 VERBOSE
 
-=head1 KNOWN ISSUES
+Bool. If set to true, will set C<verbose> option to true.
 
-* Timing and memory usage is inclusive instead of exclusive.
+=head2 DEBUG
+
+Bool. If set to true, will set C<debug> option to true.
+
+=head2 PERL_DEVEL_ENDSTATS_OPTS
+
+String. A space-separated key-value pairs to set options.
 
 =head1 HOMEPAGE
 
@@ -416,6 +456,57 @@ Please visit the project's homepage at L<https://metacpan.org/release/Devel-EndS
 
 Source repository is at L<https://github.com/perlancar/perl-Devel-EndStats>.
 
+=head1 SEE ALSO
+
+There are many modules on CPAN that can be used to generate dependency
+information for your code. Neil Bowers has written a
+L<review|http://neilb.org/reviews/dependencies.html> that covers most of them.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Neil Bowers Steven Haryanto
+
+=over 4
+
+=item *
+
+Neil Bowers <neil@bowers.com>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2015, 2014, 2013, 2012, 2010 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-EndStats>
@@ -423,16 +514,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

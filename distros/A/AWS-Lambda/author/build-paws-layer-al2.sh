@@ -3,12 +3,10 @@
 ROOT=$(cd "$(dirname "$0")/../" && pwd)
 
 if [[ $# -eq 0 ]]; then
-    $0 5.36.0 5-36 x86_64
-    $0 5.36.0 5-36 arm64
-    $0 5.34.1 5-34 x86_64
-    $0 5.34.1 5-34 arm64
-    $0 5.32.1 5-32 x86_64
-    $0 5.32.1 5-32 arm64
+    $0 5.38.0 5-38 x86_64
+    $0 5.38.0 5-38 arm64
+    $0 5.36.1 5-36 x86_64
+    $0 5.36.1 5-36 arm64
     exit 0
 fi
 
@@ -41,7 +39,7 @@ docker run \
     -v "$OPT-$PLATFORM/lib/perl5/site_perl:/opt/lib/perl5/site_perl" \
     -v "$OPT-$PLATFORM/lib:/opt-lib" \
     --platform "$DOCKER_PLATFORM" \
-    "public.ecr.aws/shogo82148/lambda-provided:build-al2-$PLATFORM" \
+    "public.ecr.aws/sam/build-provided.al2:1-$PLATFORM" \
     ./author/build-paws-al2.sh "$TAG"
 
 find "$OPT-$PLATFORM" -type f -a -name '*.pm' -print0 | parallel -0 -j 32 "$ROOT/author/perlstrip.sh"

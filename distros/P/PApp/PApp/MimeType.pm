@@ -32,7 +32,7 @@ package PApp::MimeType;
 
 use base Exporter;
 
-$VERSION = 2.2;
+$VERSION = 2.3;
 @EXPORT_OK = qw(by_extension by_filename by_mimetype clear_mimedb load_mimedb);
 
 my %by_extension;

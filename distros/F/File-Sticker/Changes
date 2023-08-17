@@ -1,6 +1,22 @@
 Revision History for File-Sticker
 =================================
 
+v3.0101 2023-07-08
+------------------
+
+* 2023-07-08 16:35:52 +1000
+  Fixing MANIFEST.SKIP
+* 2023-07-08 16:32:34 +1000
+  Merge branch 'master' of github.com:rubykat/File-Sticker
+* 2023-07-08 16:24:47 +1000
+  Making AND OR NOT case-sensitive to remove ambiguity
+* 2023-07-08 15:14:21 +1000
+  Preserve tag order by using uniq to check for duplicates
+* 2023-05-23 02:10:27 +1000
+  updating MANIFEST.SKIP
+* 2023-05-23 02:06:18 +1000
+  adding MANIFEST.SKIP
+
 v3.0008 2023-05-21
 ------------------
 

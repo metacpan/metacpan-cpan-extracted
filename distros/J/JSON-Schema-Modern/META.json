@@ -98,12 +98,13 @@
             "Sub::Install" : "0",
             "Types::Standard" : "1.016003",
             "constant" : "0",
-            "experimental" : "0",
+            "experimental" : "0.026",
             "if" : "0",
             "namespace::clean" : "0",
             "open" : "0",
             "overload" : "0",
             "perl" : "v5.20.0",
+            "stable" : "0.031",
             "strict" : "0",
             "strictures" : "2",
             "warnings" : "0"
@@ -229,63 +230,63 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.566"
+         "version" : "0.569"
       }
    },
    "release_status" : "stable",
@@ -300,10 +301,10 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.566",
+   "version" : "0.569",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.037011"
+         "version" : "5.038000"
       },
       "plugins" : [
          {
@@ -956,7 +957,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20230423"
+                  "Module::CoreList" : "5.20230520"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1174,7 +1175,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.566",
+                  "tag" : "v0.569",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1444,8 +1445,8 @@
    "x_breaks" : {
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : "< 0.017"
    },
-   "x_generated_by_perl" : "v5.37.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0

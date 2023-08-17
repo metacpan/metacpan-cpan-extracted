@@ -1,10 +1,5 @@
 package Lingua::EN::Sentence;
 
-#==============================================================================
-#
-# Start of POD
-#
-#==============================================================================
 
 =head1 NAME
 
@@ -12,30 +7,32 @@ Lingua::EN::Sentence - split text into sentences
 
 =head1 SYNOPSIS
 
-	use Lingua::EN::Sentence qw( get_sentences add_acronyms );
-	
-	add_acronyms('lt','gen');		## adding support for 'Lt. Gen.'
-	my $text = q{
-	A sentence usually ends with a dot, exclamation or question mark optionally followed by a space!
-	A string followed by 2 carriage returns denotes a sentence, even though it doesn't end in a dot
-	
-	Dots after single letters such as U.S.A. or in numbers like -12.34 will not cause a split
-	as well as common abbreviations such as Dr. I. Smith, Ms. A.B. Jones, Apr. Calif. Esq.
-	and (some text) ellipsis such as ... or . . are ignored.
-	Some valid cases canot be deteected, such as the answer is X. It cannot easily be
-	differentiated from the single letter-dot sequence to abbreviate a person's given name.
-	Numbered points within a sentence will not cause a split 1. Like this one.
-	See the code for all the rules that apply.
-	This string has 7 sentences.
-	};
-	
-	my $sentences=get_sentences($text);	# Get the sentences.
+use Lingua::EN::Sentence qw( get_sentences add_acronyms );
+
+add_acronyms('lt','gen');		## adding support for 'Lt. Gen.'
+my $text = q{
+A sentence usually ends with a dot, exclamation or question mark optionally followed by a space!
+A string followed by 2 carriage returns denotes a sentence, even though it doesn't end in a dot
+
+Dots after single letters such as U.S.A. or in numbers like -12.34 will not cause a split
+as well as common abbreviations such as Dr. I. Smith, Ms. A.B. Jones, Apr. Calif. Esq.
+and (some text) ellipsis such as ... or . . are ignored.
+Some valid cases canot be deteected, such as the answer is X. It cannot easily be
+differentiated from the single letter-dot sequence to abbreviate a person's given name.
+Numbered points within a sentence will not cause a split 1. Like this one.
+See the code for all the rules that apply.
+This string has 7 sentences.
+};
+
+if (defined($sentences))
+{
+	my $sentences = get_sentences($text);
 	foreach my $sent (@$sentences)
 	{
 		$i++;
 		print("SENTENCE $i:$sent\n");
 	}
-
+}
 
 =head1 DESCRIPTION
 
@@ -87,7 +84,8 @@ The get_sentences function takes a scalar containing ascii text as an argument
 and returns a reference to an array of sentences that the text has been split
 into. Returned sentences will be trimmed (beginning and end of sentence) of
 white space. Strings with no alpha-numeric characters in them, won't be
-returned as sentences.
+returned as sentences. If no text is supplied, a reference to an empty array
+is returned.
 
 =item add_acronyms( @acronyms )
 
@@ -189,13 +187,6 @@ it under the same terms as Perl itself.
 
 #==============================================================================
 #
-# End of POD
-#
-#==============================================================================
-
-
-#==============================================================================
-#
 # Pragmas
 #
 #==============================================================================
@@ -219,7 +210,7 @@ use vars qw/$VERSION @ISA @EXPORT_OK $EOS $LOC $AP $P $PAP @ABBREVIATIONS/;
 use Carp qw/cluck/;
 use English;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 our $LOC;
 if ($OSNAME ne 'android') {
@@ -234,7 +225,7 @@ use locale;
 @EXPORT_OK = qw( get_sentences add_acronyms get_acronyms set_acronyms get_EOS set_EOS set_locale);		
 
 our $VERBOSE = 0; # echo intermediate data transforms, useful for debugging
-our $EOS = "\001"; #"__EOS__";
+our $EOS = "\001";
 our $EOA = '__EOA__';
 
 our $P = q/[\.!?]/;			    # PUNCTUATION
@@ -280,7 +271,12 @@ our @ABBREVIATIONS = (@PEOPLE, @TITLE_SUFFIXES, @MILITARY, @INSTITUTES, @COMPANI
 #------------------------------------------------------------------------------
 sub get_sentences {
 	my ($text) = @_;
-	return [] unless defined $text;
+	
+	unless (defined($text))
+	{
+		return [];
+	}
+	
 	$VERBOSE and print("ORIGINAL\n$text\n");
 	
 	$text = mark_up_abbreviations($text);
@@ -395,15 +391,11 @@ sub set_locale {
 # Private methods
 #
 #==============================================================================
-
-
-## Please email me any suggestions for optimizing these RegExps.
 sub remove_false_end_of_sentence {
 	my ($marked_segment) = @_;
 	
 	
-##	## don't do U.S.A., U.K.
-##	$marked_segment=~s/(\.\w$PAP)$EOS/$1/sg; 
+	# don't split U.S.A., U.K.
 	$marked_segment=~s/([^-\w]\w$PAP\s)$EOS/$1/sg;
 	$marked_segment=~s/([^-\w]\w$P)$EOS/$1/sg;         
 
@@ -434,33 +426,14 @@ sub split_unsplit_stuff {
 	my ($text) = @_;
 	
 
-	# $text=~s/(\D\d+)($P)(\s+)/$1$2$EOS$3/sg; # breaks numbered points, such as {EOL}1. point one
-
+	# breaks numbered points, such as {EOL}1. point one
 	$text=~s/([\w $P]\d)($P)(\s+)/$1$2$EOS$3/sg;
 	
 	# eg 'end. (' -> 'end. $EOS ('
-	$text=~s/($PAP\s)(\s*\()/$1$EOS$2/gs; # open bracket
-	
+	$text=~s/($PAP\s)(\s*\()/$1$EOS$2/gs; # open bracket	
 	$text=~s/('\w$P)(\s)/$1$EOS$2/gs;
 
-
 	$text=~s/(\sno\.)(\s+)(?!\d)/$1$EOS$2/gis;
-
-	# split where single capital letter followed by dot makes sense to break.
-	# notice these are exceptions to the general rule NOT to split on single
-	# letter.
-	# notice also that single letter M is missing here, due to French 'mister'
-	# which is represented as M.
-	#
-	# the rule will not split on names beginning or containing 
-	# single capital letter dot in the first or second name
-	# assuming 2 or three word name.
-	
-	# NOT WORKING , it breaks up U.S.A. after U.
-	# Valid cases if single letter thrn dot are rare, such as 'The answer is F'.
-	# Can't decipher meaning of this regex
-	# $text=~s/(\s[[:lower:]]\w+\s+[^[[:^upper:]M]\.)(?!\s+[[:upper:]]\.)/$1$EOS/sg;
-	
 
 	# add EOS when you see "a.m." or "p.m." followed by a capital letter.
 	$text=~s/([ap]\.m\.\s+)([[:upper:]])/$1$EOS$2/gs;
@@ -484,7 +457,7 @@ sub clean_sentences {
 	return $cleaned_sentences;
 }
 
-# Replace seuence such as Mr. A. Smith Jnr. with Mr__EOA__ A__EOA__ etc
+# Replace sequence such as Mr. A. Smith Jnr. with Mr__EOA__ A__EOA__ etc
 # This simplifies the code that detects end of sentnees. The marker is
 # replaced with the original dot adter sentence slitting
 
@@ -512,12 +485,5 @@ sub first_sentence_breaking {
 	$text=~s/(\s\w$P)/$1$EOS/gs; # break also when single letter comes before punc.
 	return $text;
 }
-
-
-#==============================================================================
-#
-# Return TRUE
-#
-#==============================================================================
 
 1;

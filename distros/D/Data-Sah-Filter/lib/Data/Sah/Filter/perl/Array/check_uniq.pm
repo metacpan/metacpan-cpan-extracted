@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
@@ -41,12 +41,12 @@ sub filter {
     my $dt = $fargs{data_term};
     my $gen_args = $fargs{args} // {};
     my $res = {};
-    $res->{modules}{'List::Util'} = 1.54;
+    $res->{modules}{'List::Util::Uniq'} = "0.005";
+    $res->{modules}{'Data::Dmp'} = "0.242";
     $res->{expr_filter} = join(
         "",
-        # TODO: [ux] report the duplicate element(s) in error message
-        "do { my \$tmp=$dt; my \@uniq = List::Util::uniq(\@\$tmp); ",
-        ($gen_args->{reverse} ? "@\$tmp != \@uniq ? [undef,\$tmp] : [\"Array does not have duplicate element(s)\"]" : "@\$tmp == \@uniq ? [undef,\$tmp] : [\"Array has duplicate element(s)\"]"),
+        "do { my \$tmp=$dt; my \@dupes = List::Util::Uniq::uniq( List::Util::Uniq::dupe(\@\$tmp) ); ",
+        ($gen_args->{reverse} ? "\@dupes ? [undef,\$tmp] : [\"Array does not have duplicate element(s)\"]" : "!\@dupes ? [undef,\$tmp] : [\"Array has duplicate element(s): \".join(', ', map { Data::Dmp::dmp(\$_) } \@dupes)]"),
         "}",
     );
 
@@ -68,7 +68,7 @@ Data::Sah::Filter::perl::Array::check_uniq - Check that an array has unique elem
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_uniq (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Array::check_uniq (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_u
 
  [] # valid, unchanged
  ["a","b"] # valid, unchanged
- ["a","b","a"] # INVALID (Array has duplicate element(s)), becomes undef
+ ["a","b","a"] # INVALID (Array has duplicate element(s): "a"), becomes undef
  ["a","b","A"] # valid, unchanged (Use Array::check_uniqstr filter for case insensitivity option)
  [] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate element(s)), becomes undef
  ["a","b"] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate element(s)), becomes undef
@@ -104,6 +104,12 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Array::check_u
  ["a","b","A"] # filtered with args {reverse=>1}, INVALID (Array does not have duplicate element(s)), becomes undef (Use Array::check_uniqstr filter for case insensitivity option)
 
 =for Pod::Coverage ^(meta|filter)$
+
+=head1 FAQ
+
+=head2 How to check that array contains a duplicate?
+
+Use the C<reverse> argument and set it to 1.
 
 =head1 HOMEPAGE
 

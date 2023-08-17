@@ -4,25 +4,26 @@ package SPVM::Float;
 
 =head1 Name
 
-SPVM::Float - Float Class
+SPVM::Float - The float Object
+
+=head1 Description
+
+The Float class has methods to manipulate an object that has a float value.
+
+This class is immutable.
+
+This class is automatically loaded.
 
 =head1 Usage
   
   my $float_object = Float->new(5);
   my $float_value = $float_object->value;
-  $float_object->set_value(10);
-
-=head1 Description
-
-C<Float> is the class to hold a value of the C<float> type.
-
-This class is automatically loaded.
 
 =head1 Fields
 
 =head2 value
 
-  has value : rw float;
+  has value : ro float;
 
 The value.
 

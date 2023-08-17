@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,17 @@ no_index:
 provides:
   MooseX::Types::Data::Serializer:
     file: lib/MooseX/Types/Data/Serializer.pm
-    version: '0.03'
+    version: '0.05'
 requires:
   Data::Serializer: '0.54'
   Moose: '1.23'
   MooseX::Types: '0.37'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-Types-Data-Serializer/issues
   homepage: https://github.com/bluefeet/MooseX-Types-Data-Serializer
-  repository: git://github.com/bluefeet/MooseX-Types-Data-Serializer.git
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: https://github.com/bluefeet/MooseX-Types-Data-Serializer.git
+version: '0.05'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

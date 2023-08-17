@@ -9,8 +9,6 @@ lib/Net/API/REST/JWT.pm
 lib/Net/API/REST/Query.pm
 lib/Net/API/REST/RC.pod
 lib/Net/API/REST/Request.pm
-lib/Net/API/REST/Request/Params.pod
-lib/Net/API/REST/Request/Upload.pod
 lib/Net/API/REST/Response.pm
 lib/Net/API/REST/Status.pm
 LICENSE
@@ -24,6 +22,7 @@ t/01.routes.t
 t/02.pod.t
 t/03.uri_query.t
 t/90.coverage.t
+t/92.signature.t
 t/99.kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

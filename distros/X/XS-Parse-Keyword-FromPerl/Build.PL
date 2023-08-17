@@ -4,16 +4,19 @@ use warnings;
 
 use Module::Build;
 use XS::Parse::Keyword::Builder;
+use XS::Parse::Infix::Builder;
 
 my $build = Module::Build->new(
    module_name => "XS::Parse::Keyword::FromPerl",
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.33',
+      'XS::Parse::Keyword::Builder' => '0.35',
+      'XS::Parse::Infix::Builder' => 0,
    },
    requires => {
       'perl' => '5.026',
-      'XS::Parse::Keyword' => '0.33',
+      'XS::Parse::Keyword' => '0.35',
+      'XS::Parse::Infix' => '0.35',
    },
    test_requires => {
       'Test2::V0' => 0,
@@ -35,5 +38,6 @@ if( eval { require Devel::MAT::Dumper::Helper and
 }
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );
+XS::Parse::Infix::Builder->extend_module_build( $build );
 
 $build->create_build_script;

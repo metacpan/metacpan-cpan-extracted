@@ -31,7 +31,7 @@ EXAMPLE1
      print "Count of Czech CPAN authors: $count\n";
 
      # Output:
-     # Count of Czech CPAN authors: 44
+     # Count of Czech CPAN authors: 48
 
 EXAMPLE2
      use strict;
@@ -51,50 +51,54 @@ EXAMPLE2
 
      # Output:
      # [
-     #     [0]  "CHOROBA",
-     #     [1]  "CONTYK",
-     #     [2]  "DANIELR",
-     #     [3]  "DANPEDER",
-     #     [4]  "DOUGLISH",
-     #     [5]  "HIHIK",
-     #     [6]  "HOLCAPEK",
-     #     [7]  "HPA",
-     #     [8]  "JANPAZ",
-     #     [9]  "JANPOM",
-     #     [10]  "JENDA",
-     #     [11] "JIRA",
-     #     [12] "JSPICAK",
-     #     [13] "KLE",
-     #     [14] "KOLCON",
-     #     [15] "MAJLIS",
-     #     [16] "MICHALS",
-     #     [17] "MILSO",
-     #     [18] "MJFO",
-     #     [19] "PAJAS",
-     #     [20] "PASKY",
-     #     [21] "PCIMPRICH",
-     #     [22] "PEK",
-     #     [23] "PETRIS",
-     #     [24] "PKUBANEK",
-     #     [25] "POPEL",
-     #     [26] "PSME",
-     #     [27] "RUR",
-     #     [28] "RVASICEK",
-     #     [29] "SARFY",
-     #     [30] "SEIDLJAN",
-     #     [31] "SKIM",
-     #     [32] "SMRZ",
-     #     [33] "STRAKA",
-     #     [34] "TKR",
-     #     [35] "TPODER",
-     #     [36] "TRIPIE",
-     #     [37] "TYNOVSKY",
-     #     [38] "VARISD",
-     #     [39] "VASEKD",
-     #     [40] "YENYA",
-     #     [41] "ZABA",
-     #     [42] "ZEMAN",
-     #     [43] "ZOUL"
+     #     [0]  "ATG",
+     #     [1]  "BULB",
+     #     [2]  "CHOROBA",
+     #     [3]  "CONTYK",
+     #     [4]  "DANIELR",
+     #     [5]  "DANPEDER",
+     #     [6]  "DOUGLISH",
+     #     [7]  "DPOKORNY",
+     #     [8]  "HIHIK",
+     #     [9]  "HOLCAPEK",
+     #     [10] "HPA",
+     #     [11] "JANPAZ",
+     #     [12] "JANPOM",
+     #     [13] "JENDA",
+     #     [14] "JIRA",
+     #     [15] "JSPICAK",
+     #     [16] "KLE",
+     #     [17] "KOLCON",
+     #     [18] "MAJLIS",
+     #     [19] "MICHALS",
+     #     [20] "MILSO",
+     #     [21] "MJFO",
+     #     [22] "PAJAS",
+     #     [23] "PAJOUT",
+     #     [24] "PASKY",
+     #     [25] "PCIMPRICH",
+     #     [26] "PEK",
+     #     [27] "PETRIS",
+     #     [28] "PKUBANEK",
+     #     [29] "POPEL",
+     #     [30] "PSME",
+     #     [31] "RUR",
+     #     [32] "RVASICEK",
+     #     [33] "SARFY",
+     #     [34] "SEIDLJAN",
+     #     [35] "SKIM",
+     #     [36] "SMRZ",
+     #     [37] "STRAKA",
+     #     [38] "TKR",
+     #     [39] "TPODER",
+     #     [40] "TRIPIE",
+     #     [41] "TYNOVSKY",
+     #     [42] "VARISD",
+     #     [43] "VASEKD",
+     #     [44] "YENYA",
+     #     [45] "ZABA",
+     #     [46] "ZEMAN",
+     #     [47] "ZOUL"
      # ]
 
 DEPENDENCIES
@@ -109,10 +113,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2021 Michal Josef Špaček
+    © 2011-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.30
+    0.31
 

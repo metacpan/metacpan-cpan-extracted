@@ -2,7 +2,7 @@ Changes
 lib/File/Tools.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/01-load.t
 t/02-small.t
 t/10-all.t

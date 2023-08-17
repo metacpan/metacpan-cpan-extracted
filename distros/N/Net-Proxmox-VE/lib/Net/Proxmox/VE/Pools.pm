@@ -1,4 +1,5 @@
 #!/bin/false
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Pools
 # ABSTRACT: Presents a pool object
 
@@ -6,8 +7,10 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Pools;
-$Net::Proxmox::VE::Pools::VERSION = '0.36';
+$Net::Proxmox::VE::Pools::VERSION = '0.37';
 use parent 'Exporter';
+
+use Carp qw( croak );
 
 
 our @EXPORT  = qw( pools get_pool create_pool delete_pool update_pool );
@@ -28,8 +31,8 @@ sub get_pool {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No poolid for get_pool()';
-    die 'poolid must be a scalar for get_pool()' if ref $a;
+    my $a = shift or croak 'No poolid for get_pool()';
+    croak 'poolid must be a scalar for get_pool()' if ref $a;
 
     return $self->get( $base, $a );
 
@@ -41,16 +44,16 @@ sub create_pool {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_pool()' unless @p;
+    croak 'No arguments for create_pool()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_pool()'
+        croak 'Single argument not a hash for create_pool()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_pool()'
+        croak 'Odd number of arguments for create_pool()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -63,7 +66,7 @@ sub create_pool {
 sub delete_pool {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_pool()';
+    my $a    = shift or croak 'No argument given for delete_pool()';
 
     return $self->delete( $base, $a );
 
@@ -73,20 +76,20 @@ sub delete_pool {
 sub update_pool {
 
     my $self   = shift or return;
-    my $poolid = shift or die 'No poolid provided for update_pool()';
-    die 'poolid must be a scalar for update_pool()' if ref $poolid;
+    my $poolid = shift or croak 'No poolid provided for update_pool()';
+    croak 'poolid must be a scalar for update_pool()' if ref $poolid;
     my @p = @_;
 
-    die 'No arguments for update_pool()' unless @p;
+    croak 'No arguments for update_pool()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_pool()'
+        croak 'Single argument not a hash for update_pool()'
           unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_pool()'
+        croak 'Odd number of arguments for update_pool()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -98,6 +101,8 @@ sub update_pool {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -108,7 +113,7 @@ Net::Proxmox::VE::Pools - Presents a pool object
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -224,14 +229,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

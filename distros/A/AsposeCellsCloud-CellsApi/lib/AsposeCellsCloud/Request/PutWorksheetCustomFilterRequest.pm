@@ -59,19 +59,19 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetCustomFilterRequest.name :   ,
-# PutWorksheetCustomFilterRequest.sheetName :   ,
-# PutWorksheetCustomFilterRequest.range :   ,
-# PutWorksheetCustomFilterRequest.fieldIndex :   ,
-# PutWorksheetCustomFilterRequest.operatorType1 :   ,
-# PutWorksheetCustomFilterRequest.criteria1 :   ,
-# PutWorksheetCustomFilterRequest.isAnd :   ,
+# PutWorksheetCustomFilterRequest.name : The workbook name.  ,
+# PutWorksheetCustomFilterRequest.sheetName : The worksheet name.  ,
+# PutWorksheetCustomFilterRequest.range : Represents the range to which the specified AutoFilter applies.  ,
+# PutWorksheetCustomFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
+# PutWorksheetCustomFilterRequest.operatorType1 : The filter operator type  ,
+# PutWorksheetCustomFilterRequest.criteria1 : The custom criteria.  ,
+# PutWorksheetCustomFilterRequest.isAnd : true/false  ,
 # PutWorksheetCustomFilterRequest.operatorType2 :   ,
-# PutWorksheetCustomFilterRequest.criteria2 :   ,
-# PutWorksheetCustomFilterRequest.matchBlanks :   ,
-# PutWorksheetCustomFilterRequest.refresh :   ,
-# PutWorksheetCustomFilterRequest.folder :   ,
-# PutWorksheetCustomFilterRequest.storageName :    
+# PutWorksheetCustomFilterRequest.criteria2 : The custom criteria.  ,
+# PutWorksheetCustomFilterRequest.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
+# PutWorksheetCustomFilterRequest.refresh : If true, hide the filtered rows.  ,
+# PutWorksheetCustomFilterRequest.folder : Original workbook folder.  ,
+# PutWorksheetCustomFilterRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -82,7 +82,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_custom_filter' } = { 
-    	summary => '',
+    	summary => 'Filters a list with a custom criteria in worksheet.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -175,49 +175,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'string',
      	base_name => 'range',
-     	description => '',
+     	description => 'Represents the range to which the specified AutoFilter applies.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).',
      	format => '',
      	read_only => '',
      		},
      'operator_type1' => {
      	datatype => 'string',
      	base_name => 'operatorType1',
-     	description => '',
+     	description => 'The filter operator type',
      	format => '',
      	read_only => '',
      		},
      'criteria1' => {
      	datatype => 'string',
      	base_name => 'criteria1',
-     	description => '',
+     	description => 'The custom criteria.',
      	format => '',
      	read_only => '',
      		},
      'is_and' => {
      	datatype => 'string',
      	base_name => 'isAnd',
-     	description => '',
+     	description => 'true/false',
      	format => '',
      	read_only => '',
      		},
@@ -231,35 +231,35 @@ __PACKAGE__->method_documentation({
      'criteria2' => {
      	datatype => 'string',
      	base_name => 'criteria2',
-     	description => '',
+     	description => 'The custom criteria.',
      	format => '',
      	read_only => '',
      		},
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => '',
+     	description => 'Match all blank or  not blank cell in the list.(true/false)',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => '',
+     	description => 'If true, hide the filtered rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

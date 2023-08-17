@@ -13,8 +13,8 @@ plan tests => 9;
 ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
-ok( $resolver,		'create stub resolver instance' );
-ok( $resolver->print(), '$resolver->print' );
+ok( $resolver,		 'create stub resolver instance' );
+ok( $resolver->string(), '$resolver->string' );
 
 
 my $recursive = Net::DNS::Resolver::Unbound->new( nameservers => [] );

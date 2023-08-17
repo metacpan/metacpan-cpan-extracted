@@ -1,0 +1,35 @@
+CHANGES
+CONTRIBUTING.md
+lib/Data/Pretty.pm
+lib/Data/Pretty/FilterContext.pm
+lib/Data/Pretty/Filtered.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+SIGNATURE
+t/001_load.t
+t/002_dd.t
+t/003_dollar-one.t
+t/004_dump.t
+t/005_eval.t
+t/006_filtered.t
+t/007_glob.t
+t/008_hash.t
+t/009_quote.t
+t/010_quote-unicode.t
+t/011_ref.t
+t/012_regexp.t
+t/013_scalar-obj.t
+t/014_scalar.t
+t/015_tied.t
+t/016_vstring.t
+t/900_pod.t
+t/910_coverage.t
+t/920_manifest.t
+t/930_signature.t
+t/999_kwalitee.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

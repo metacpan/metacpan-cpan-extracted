@@ -18,7 +18,7 @@ is_deeply(
 		'reference' => './LLVM-exception.json',
 		'isDeprecatedLicenseId' => $false,
 		'detailsUrl' => './LLVM-exception.html',
-		'referenceNumber' => 17,
+		'referenceNumber' => 14,
 		'name' => 'LLVM Exception',
 		'licenseExceptionId' => 'LLVM-exception',
 		'seeAlso' => [

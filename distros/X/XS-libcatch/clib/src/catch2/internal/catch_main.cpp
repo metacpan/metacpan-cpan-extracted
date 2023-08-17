@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -14,9 +14,12 @@
 namespace Catch {
     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
     CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS
-    LeakDetector leakDetector;
+    static LeakDetector leakDetector;
     CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
 }
+
+// Allow users of amalgamated .cpp file to remove our main and provide their own.
+#if !defined(CATCH_AMALGAMATED_CUSTOM_MAIN)
 
 #if defined(CATCH_CONFIG_WCHAR) && defined(CATCH_PLATFORM_WINDOWS) && defined(_UNICODE) && !defined(DO_NOT_USE_WMAIN)
 // Standard C/C++ Win32 Unicode wmain entry point
@@ -32,3 +35,5 @@ int main (int argc, char * argv[]) {
 
     return Catch::Session().run( argc, argv );
 }
+
+#endif // !defined(CATCH_AMALGAMATED_CUSTOM_MAIN

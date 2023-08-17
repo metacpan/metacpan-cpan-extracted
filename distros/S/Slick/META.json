@@ -1,0 +1,69 @@
+{
+   "abstract" : "A PSGI framework for building REST api's in Perl.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Slick",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBI" : "1.643",
+            "JSON" : "4.10",
+            "JSON::Tiny" : "0.58",
+            "Module::Runtime" : "0.016",
+            "Moo" : "2.005005",
+            "Plack" : "1.0050",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "2.004000",
+            "URI" : "5.19",
+            "URI::Query" : "0.16",
+            "URL::Encode" : "0.03",
+            "YAML::Tiny" : "1.74",
+            "perl" : "5.036"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rawleyfowler/Slick/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rawleyfowler/Slick"
+      }
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,11 +1,7 @@
-#
-# $Id: 0-useme.t,v 0.2 2007/03/25 21:39:11 dankogai Exp $
-#
+use Test::More;
 
-use strict;
-use Test::More tests => 2;
+my $class = 'Unicode::Unihan';
+use_ok( $class );
+isa_ok( $class->new, $class );
 
-use_ok('Unicode::Unihan', 'use');
-is(ref(Unicode::Unihan->new) => 'Unicode::Unihan', 'class');
-
-__END__
+done_testing();

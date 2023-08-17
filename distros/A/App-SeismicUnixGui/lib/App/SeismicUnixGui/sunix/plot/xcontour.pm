@@ -5,7 +5,7 @@
 
 =head2 SYNOPSIS
 
-PACKAGE NAME:  XCONTOUR - X CONTOUR plot of f(x1,x2) via vector plot call		
+PERL PROGRAM NAME:  XCONTOUR - X CONTOUR plot of f(x1,x2) via vector plot call		
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:

@@ -3,7 +3,7 @@ package Stepford;
 use strict;
 use warnings;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.006001';
 
 1;
 
@@ -21,7 +21,7 @@ Stepford - A vaguely Rake/Make/Cake-like thing for Perl - create steps and let a
 
 =head1 VERSION
 
-version 0.006000
+version 0.006001
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Greg Oschwald José Joaquín Atria Kevin Phair Mark Fowler Olaf Alders Ran Eilam vti
+=for stopwords Greg Oschwald José Joaquín Atria Kevin Phair Mark Fowler Nick Logan Olaf Alders Ran Eilam vti
 
 =over 4
 
@@ -214,6 +214,10 @@ Mark Fowler <mfowler@maxmind.com>
 
 =item *
 
+Nick Logan <nlogan@maxmind.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
 
 =item *
@@ -228,7 +232,7 @@ vti <viacheslav.t@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2023 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

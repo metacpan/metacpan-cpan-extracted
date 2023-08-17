@@ -9,7 +9,8 @@ BEGIN {
 
 use Test::More tests => 4;
 use File::Spec::Functions ':ALL';
-use t::lib::Test;
+use lib 't/lib';
+use LocalTest;
 
 
 #####################################################################
@@ -29,7 +30,7 @@ package Foo::Bar;
 use strict;
 use ORLite {
 	file    => '$file',
-	cleanup => 'VACUUM ANALYZE',
+	cleanup => 'VACUUM; ANALYZE',
 };
 
 1;

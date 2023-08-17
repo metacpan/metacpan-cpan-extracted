@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Box::Parser::Perl;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Box::Parser';
 
@@ -177,8 +177,7 @@ sub _read_stripped_lines(;$$)
         }
     }
     else # File without separators.
-    {   $lines = ref $file eq 'Mail::Box::FastScalar'
-               ? $file->getlines : [ $file->getlines ];
+    {   $lines = ref $file eq 'Mail::Box::FastScalar' ? $file->getlines : [ $file->getlines ];
     }
 
     my $bodyend = $file->tell;
@@ -193,7 +192,6 @@ sub _read_stripped_lines(;$$)
             # conflicts with this assumption. [Markus Spann]
         }
     }
-#warn "($bodyend, $msgend, ".@$lines, ")\n";
 
     ($bodyend, $lines, $msgend);
 }

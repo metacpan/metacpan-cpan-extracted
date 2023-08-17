@@ -11,7 +11,7 @@ use List::MoreUtils qw(uniq);
 use Rose::HTML::Util();
 use Rose::HTML::Object::Message::Localizer;
 
-our $VERSION = '0.618';
+our $VERSION = '0.626';
 
 our $Debug = undef;
 
@@ -652,6 +652,9 @@ sub html_attrs_string
   my $required_attrs = $self->required_html_attrs_hash;
   my %boolean_attrs  = map { $_ => 1 } $self->boolean_html_attrs;
 
+  local $self->{'html_attrs'}{'required'} = $self->required
+    if ($boolean_attrs{'required'});
+  
   foreach my $attr (sort(uniq(keys(%{$self->{'html_attrs'}}), keys(%$required_attrs))))
   {
     my $value;
@@ -700,6 +703,9 @@ sub xhtml_attrs_string
   local $_;
   my $required_attrs = $self->required_html_attrs_hash;
   my %boolean_attrs  = map { $_ => 1 } $self->boolean_html_attrs;
+
+  local $self->{'html_attrs'}{'required'} = $self->required
+    if ($boolean_attrs{'required'});
 
   foreach my $attr (sort(uniq(keys(%{$self->{'html_attrs'}}), keys(%$required_attrs))))
   {

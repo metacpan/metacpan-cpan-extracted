@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use Net::Cloudflare::DNS::Teal; 
+
+print Net::Cloudflare::DNS::Teal->new_from_env->get_live_color();

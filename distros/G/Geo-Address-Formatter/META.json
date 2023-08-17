@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Clone" : "0.45",
+            "Clone" : "0.46",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find::Rule" : "0",
@@ -29,7 +29,7 @@
             "Scalar::Util" : "0",
             "Text::Hogan" : "2.03",
             "Try::Catch" : "0",
-            "YAML::LibYAML" : "0.82",
+            "YAML::LibYAML" : "0.86",
             "perl" : "5.012"
          }
       },
@@ -47,7 +47,7 @@
    "provides" : {
       "Geo::Address::Formatter" : {
          "file" : "lib/Geo/Address/Formatter.pm",
-         "version" : "1.997"
+         "version" : "1.9982"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter"
       }
    },
-   "version" : "1.997",
+   "version" : "1.9982",
    "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -81,6 +81,7 @@ my $build = $class->new(
     'Test::More' => '0',
     'Test::Perl::Critic' => '0',
     'Test::Pod' => '1.00',
+    'Test::Synopsis::Expectation' => '0',
     'Test::Warn' => '0.11',
     'boolean' => '0',
     'lib' => '0'

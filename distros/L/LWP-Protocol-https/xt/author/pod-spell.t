@@ -136,6 +136,7 @@ drieux
 ether
 gianni
 gisle
+git
 github
 gpeters
 grinnz
@@ -155,6 +156,7 @@ mohammad
 murphy
 olaf
 ondrej
+openstrike
 phrstbrn
 randy
 rg

@@ -181,7 +181,7 @@ sub header {
 
 	$h_lines[$i]     = ("\n\n=head1 DOCUMENTATION\n\n");
 	$h_lines[ ++$i ] = ("=head2 SYNOPSIS\n\n");
-	$h_lines[ ++$i ] = ("PACKAGE NAME: $name\n");
+	$h_lines[ ++$i ] = ("PERL PROGRAM NAME: $name\n");
 	$h_lines[ ++$i ] = ("AUTHOR: Juan Lorenzo\n");
 	$h_lines[ ++$i ] = ("DATE:   \n");
 	$h_lines[ ++$i ] = ("DESCRIPTION:\n");

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::Elem;
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
@@ -28,9 +28,18 @@ ok("Y" elem XtoZ(), 'Y is in XtoZ()');
 ok(!("1.0" elem (1, 2, 3)), 'match is done stringly, not numerically');
 
 # stack discipline
-is_deeply( [ 1, 2, ("+" elem ("+", "-")), 3, 4 ],
+is( [ 1, 2, ("+" elem ("+", "-")), 3, 4 ],
    [ 1, 2, 1, 3, 4 ],
    'elem preserves stack' );
+
+# unimport
+{
+   no Syntax::Operator::Elem;
+
+   sub elem { return "normal function" }
+
+   is( elem, "normal function", 'elem() parses as a normal function call' );
+}
 
 ok(!$warnings, 'no warnings');
 

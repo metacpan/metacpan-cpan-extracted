@@ -1,0 +1,19 @@
+Revision history for Syntax-Infix-Smartmatch
+
+0.005     2023-07-11 22:56:49+02:00 Europe/Brussels
+          - Fix compilation issue on unthreaded perl
+          - Move bugtracker to github
+
+0.004     2023-07-10 20:50:30+02:00 Europe/Brussels
+          - Eliminate boolean match
+          - Make array match do any instead
+
+0.003     2023-07-08 18:23:10+02:00 Europe/Brussels
+          - Fix minimum perl version
+          - Change classification from equality to match
+
+0.002     2023-07-07 16:08:00+02:00 Europe/Brussels
+          - Fix documentation mistakes
+
+0.001     2023-07-07 15:28:41+02:00 Europe/Brussels
+          Initial release to an unsuspecting world

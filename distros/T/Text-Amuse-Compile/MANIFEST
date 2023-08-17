@@ -35,6 +35,7 @@ t/asian/zh.tex
 t/bcor-sides.t
 t/beamer.t
 t/bidi-slides.t
+t/bidi.t
 t/changes.t
 t/check-compile.t
 t/check-compile/ruby-2.muse

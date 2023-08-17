@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableFieldHideItemRequest.name :   ,
-# PostPivotTableFieldHideItemRequest.sheetName :   ,
-# PostPivotTableFieldHideItemRequest.pivotTableIndex :   ,
-# PostPivotTableFieldHideItemRequest.pivotFieldType :   ,
-# PostPivotTableFieldHideItemRequest.fieldIndex :   ,
-# PostPivotTableFieldHideItemRequest.itemIndex :   ,
-# PostPivotTableFieldHideItemRequest.isHide :   ,
-# PostPivotTableFieldHideItemRequest.needReCalculate :   ,
-# PostPivotTableFieldHideItemRequest.folder :   ,
-# PostPivotTableFieldHideItemRequest.storageName :    
+# PostPivotTableFieldHideItemRequest.name : The workbook name.  ,
+# PostPivotTableFieldHideItemRequest.sheetName : The worksheet name.  ,
+# PostPivotTableFieldHideItemRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableFieldHideItemRequest.pivotFieldType : Represents PivotTable field type(Undefined/Row/Column/Page/Data).  ,
+# PostPivotTableFieldHideItemRequest.fieldIndex : Gets the PivotField Object at the specific index.  ,
+# PostPivotTableFieldHideItemRequest.itemIndex : The index of the pivotItem in the pivotField.  ,
+# PostPivotTableFieldHideItemRequest.isHide : Whether the specific PivotItem is hidden(true/false).  ,
+# PostPivotTableFieldHideItemRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# PostPivotTableFieldHideItemRequest.folder : Original workbook folder.  ,
+# PostPivotTableFieldHideItemRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_field_hide_item' } = { 
-    	summary => '',
+    	summary => 'Hides pivot field item in pivot table.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -162,70 +162,70 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_type' => {
      	datatype => 'string',
      	base_name => 'pivotFieldType',
-     	description => '',
+     	description => 'Represents PivotTable field type(Undefined/Row/Column/Page/Data).',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'Gets the PivotField Object at the specific index.',
      	format => '',
      	read_only => '',
      		},
      'item_index' => {
      	datatype => 'int',
      	base_name => 'itemIndex',
-     	description => '',
+     	description => 'The index of the pivotItem in the pivotField.',
      	format => '',
      	read_only => '',
      		},
      'is_hide' => {
      	datatype => 'string',
      	base_name => 'isHide',
-     	description => '',
+     	description => 'Whether the specific PivotItem is hidden(true/false).',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

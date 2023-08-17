@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::checkvmc;
 # ABSTRACT: Check an VMC for validation
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -77,7 +77,7 @@ Mail::BIMI::App::Command::checkvmc - Check an VMC for validation
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 DESCRIPTION
 

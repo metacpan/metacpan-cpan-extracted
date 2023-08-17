@@ -31,20 +31,19 @@ my $authnreq = $sp->authn_request(
     $idp->format('persistent')
 )->as_xml;
 
-my $xp = get_xpath($authnreq);
-
 my $post = $sp->sp_post_binding($idp, 'SAMLRequest');
 isa_ok($post, 'Net::SAML2::Binding::POST');
 
 my $post_request = $post->sign_xml($authnreq);
 
 my $request = decode_base64($post_request);
-
-like(
+my $xp = get_xpath(
     $request,
-    qr#\Q<saml2:Issuer>Some%20entity%20ID</saml2:Issuer>\E#,
-    "Authn request checks out"
+    saml2p => 'urn:oasis:names:tc:SAML:2.0:protocol',
+    saml   => 'urn:oasis:names:tc:SAML:2.0:assertion',
 );
+
+test_xml_value_ok($xp, '/samlp:AuthnRequest/saml:Issuer', 'Some%20entity%20ID');
 
 my $signer = XML::Sig->new();
 ok($signer->verify($request), "Valid Signature");
@@ -64,11 +63,12 @@ $post = $sp->sp_post_binding($idp, 'SAMLRequest');
 $post_request = $post->sign_xml($logoutreq);
 $request = decode_base64($post_request);
 
-like(
+$xp = get_xpath(
     $request,
-    qr#\Q<samlp:SessionIndex>94750270472009384017107023022</samlp:SessionIndex>\E#,
-    "LogoutRequest checks out"
+    saml2p => 'urn:oasis:names:tc:SAML:2.0:protocol',
+    saml   => 'urn:oasis:names:tc:SAML:2.0:assertion',
 );
+test_xml_value_ok($xp, '//samlp:SessionIndex', '94750270472009384017107023022');
 
 $signer = XML::Sig->new();
 ok($signer->verify($request), "Valid Signature");

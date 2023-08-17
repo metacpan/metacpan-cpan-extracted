@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More 'no_plan';
 use Encode;
-use NOLookup::RDAP::RDAPLookup 1.29.0
+use NOLookup::RDAP::RDAPLookup
     qw / $RDAP_LOOKUP_ERR_NO_MATCH $RDAP_LOOKUP_ERR_FORBIDDEN /;
 
 # Use ipv4 only sockets for easier config
@@ -25,13 +25,12 @@ my %ns_ips;
 
 my (%iptested, %idtested, %ehtested, %nsntested, %nsniptested, %dnnsntested);
 
-# A couple of test domains that need to be registered.
+# A test domain that need to be registered.
 my @doms = (
     qw/
     norid.no
     /
     );
-#    øl.no
 
 #############
 #
@@ -41,33 +40,16 @@ my @doms = (
 #   trigged.
 #    
 # Test pass 2):
-# - Test GDPR access layer access. Access is open only for
-#   users who have received a valid access token from Norid.
-# - The tests are activated and should be successful if
-#   $ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN} is set to a gdpr layer access
-#   token, and if the rate limiting is not trigged.
-#
-# Test pass 3):
-# - Test GDPR access layer access and also Norid proxy access.
-#   Access needs both a GDPR layer access token and
-#   proxy access configuration granted for the calling ip-address,
-#   Proxy access is only given to Norid.
-# - The tests are activated and should be successful if
-#   $ENV{RDAP_GDPR_NORID_PROXY} is set along with a valid
-#   $ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN},
-#   and if the rate limiting is not trigged.
-#
-# Test pass 4):
-# - Test basic auth layer access fo registrar layer.
+# - Test basic auth layer access for 'registrar' layer.
 #   Access uses a username and a password, and requires configuration
 #   granted for the calling ip-address, username and password.
 # - The tests are activated and should be successful if
 #   $ENV{RDAP_REGISTRAR_BASIC_AUTH_USER} is set along with
-#   $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD} and and if the rate
+#   $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD} and if the rate
 #   limiting is not trigged.
 #
-# Test pass 5):
-# - Test basic auth layer access fo registry layer.
+# Test pass 3):
+# - Test basic auth layer access for 'registry' layer.
 #   Access uses a username and a password, and requires configuration
 #   granted for the calling ip-address, username and password.
 # - The tests are activated and should be successful if
@@ -103,39 +85,25 @@ ok(1 , "=== Pass 1: Testing '$layer_anonymous' layer");
 &run_tests($layer_anonymous, 1);
 
 # Pass 2:
-if ($ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN} && $ENV{RDAP_GDPR_NORID_PROXY}) {
-    # Pass 2: Secret auth: Registry
-    $test_secret = $ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN};
-    $test_proxy  = 1;
-    ok($test_secret, "=== Pass 2: GDPR access layer secret set - running layer tests with secret: $test_secret");
-    ok(1 , "=== Pass 2: Testing secret/proxy '$layer_registry' layer");
+if ($ENV{RDAP_REGISTRAR_BASIC_AUTH_USER} && $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD}) {
+    #### Pass 2: Basic auth: Registrar layer
+    ok(1 , "=== Pass 2: Testing basic auth '$layer_registrar' layer");
+    $bauth_username = $ENV{RDAP_REGISTRAR_BASIC_AUTH_USER};
+    $bauth_password = $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD};
     &run_tests($layer_registry, 2);
-    undef $test_secret;
-    undef $test_proxy;
 } else {
-    ok(1, "=== Pass 2: SKIP Testing secret/proxy '$layer_registry' layer");
+    ok(1 , "=== Pass 2: SKIP testing basic auth '$layer_registrar' layer");
 }
 
 # Pass 3:
-if ($ENV{RDAP_REGISTRAR_BASIC_AUTH_USER} && $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD}) {
-    #### Pass 3: Basic auth: Registrar layer
-    ok(1 , "=== Pass 3: Testing basic auth '$layer_registrar' layer");
-    $bauth_username = $ENV{RDAP_REGISTRAR_BASIC_AUTH_USER};
-    $bauth_password = $ENV{RDAP_REGISTRAR_BASIC_AUTH_PASSWORD};
-    &run_tests($layer_registry, 3);
-} else {
-    ok(1 , "=== Pass 3: SKIP testing basic auth '$layer_registrar' layer");
-}
-
-# Pass 4:
 if ($ENV{RDAP_REGISTRY_BASIC_AUTH_USER} && $ENV{RDAP_REGISTRY_BASIC_AUTH_PASSWORD}) {
-    #### Pass 4: Basic auth: Registry layer
-    ok(1 , "=== Pass 4: Testing basic auth '$layer_registry' layer");
+    #### Pass 3: Basic auth: Registry layer
+    ok(1 , "=== Pass 3: Testing basic auth '$layer_registry' layer");
     $bauth_username = $ENV{RDAP_REGISTRY_BASIC_AUTH_USER};
     $bauth_password = $ENV{RDAP_REGISTRY_BASIC_AUTH_PASSWORD};
-    &run_tests($layer_registry, 4);
+    &run_tests($layer_registry, 3);
 } else {
-    ok(1 , "=== Pass 4: SKIP Testing basic auth '$layer_registry' layer");
+    ok(1 , "=== Pass 3: SKIP Testing basic auth '$layer_registry' layer");
 }
 
 
@@ -1137,5 +1105,7 @@ sub ro_obj {
 	    type                => $type,
 	    fieldset            => $fieldset,
 	    nopages             => $nopages,
+	    # force ipv4 usage for static ip, as ipv6 addresses may be changed
+	    force_ipv           => 4,
 	});
 }

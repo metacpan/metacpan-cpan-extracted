@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/File-Listing/issues
   homepage: https://metacpan.org/pod/File::Listing
   repository: git://github.com/PerlAlien/File-Listing.git
-version: '6.15'
+version: '6.16'
 x_contributors:
   - 'Gisle Aas'
   - 'Graham Ollis <plicease@cpan.org>'
@@ -47,6 +47,7 @@ x_contributors:
   - 'Father Chrysostomos'
   - 'Gavin Peters'
   - 'Graeme Thompson'
+  - 'Grant Street Group'
   - 'Hans-H. Froehlich'
   - 'Ian Kilgore'
   - 'Jacob J'
@@ -78,7 +79,7 @@ x_contributors:
   - ruff
   - sasao
   - uid39246
-x_generated_by_perl: v5.35.10
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

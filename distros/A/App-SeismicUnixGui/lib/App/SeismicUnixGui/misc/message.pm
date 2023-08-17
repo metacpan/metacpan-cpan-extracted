@@ -252,6 +252,7 @@ sub command_line {
 
 }
 
+
 =head2 subroutine file 
 
  send message to file 
@@ -260,6 +261,9 @@ sub command_line {
 
 sub file {
 	my ( $message, $text ) = @_;
+	
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+                                            localtime(time);
 
 	$message->{_text} = $text if defined($text);
 	my $PATH    = $message->get_PATH();
@@ -315,6 +319,29 @@ sub screen {
 
 	$message->{_text} = $text if defined($text);
 	print ("message,screen:\n$text\n\n");
+}
+
+
+
+=head2 subroutine time 
+
+ send time to file 
+
+=cut
+
+sub time {
+	my ($message) = @_;
+	
+    my $text = localtime;
+
+	my $PATH    = $message->get_PATH();
+	my $PATH_n_file = $PATH . '/' . $log_file_txt;
+#	print("\nmessage, file, PATH_n_file=$PATH_n_file\n");
+
+	open( message_STDOUT, '>>', $PATH_n_file ) or die $!;
+	print message_STDOUT $text . "\n\n";
+	close(message_STDOUT);
+
 }
 
 # a 1 is sent to perl to signify the end of the package

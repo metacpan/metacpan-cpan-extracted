@@ -1,6 +1,6 @@
 package App::dirstrata ;  
-our $VERSION = '0.030' ; 
-our $DATE = '2023-03-241T13:20+09:00' ; 
+our $VERSION = '0.032' ; 
+our $DATE = '2023-08-111T21:15+09:00' ; 
 
 =encoding utf8
 

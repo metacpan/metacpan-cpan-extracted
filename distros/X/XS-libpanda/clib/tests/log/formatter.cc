@@ -181,3 +181,15 @@ TEST("set formatter string") {
         CHECK(c.fstr == "MSG=!\nMSG=!");
     }
 }
+
+TEST_CASE("formatter synopsis", "[.]") {
+    struct Formatter : IFormatter {
+        string format (std::string& msg, const Info& info) const override {
+            std::stringstream ss;
+            ss << info.file <<  ":" << to_string(info.line) << "\t" << msg << std::endl;
+            auto ret = ss.str();
+            return string(ret.data(), ret.size());
+        }
+    };
+    set_formatter(new Formatter());
+}

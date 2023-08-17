@@ -10,7 +10,7 @@ use HTTP::OAI::Metadata;
 use vars qw( @ISA );
 @ISA = qw( HTTP::OAI::Metadata );
 
-our $VERSION = '4.12';
+our $VERSION = '4.13';
 
 sub new {
 	my $self = shift->SUPER::new(@_);

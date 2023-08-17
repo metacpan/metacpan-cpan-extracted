@@ -23,25 +23,25 @@
          "requires" : {
             "Module::Build" : "0.4004",
             "XS::Parse::Infix::Builder" : "0",
-            "XS::Parse::Keyword::Builder" : "0.23"
+            "XS::Parse::Keyword::Builder" : "0.36"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Keyword" : "0.23",
+            "XS::Parse::Keyword" : "0.36",
             "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0.000147"
          }
       }
    },
    "provides" : {
       "Syntax::Keyword::Match" : {
          "file" : "lib/Syntax/Keyword/Match.pm",
-         "version" : "0.10"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.10",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

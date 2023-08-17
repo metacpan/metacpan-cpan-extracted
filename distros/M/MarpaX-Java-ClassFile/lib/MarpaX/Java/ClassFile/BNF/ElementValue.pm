@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a element_value
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -82,7 +82,7 @@ MarpaX::Java::ClassFile::BNF::ElementValue - Parsing of a element_value
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

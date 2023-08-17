@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.07"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.07",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

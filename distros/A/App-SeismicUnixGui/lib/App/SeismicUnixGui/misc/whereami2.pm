@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::whereami2;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: whereami.pm 
+ PERL PERL PROGRAM NAME: whereami.pm 
  AUTHOR: Juan Lorenzo
  DATE: June 22 2017 
 

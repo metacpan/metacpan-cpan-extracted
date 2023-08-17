@@ -6,11 +6,12 @@ use Dancer qw/:syntax :script/;
 
 use Scalar::Util qw/blessed reftype/;
 use NetAddr::IP::Lite ':lower';
+
 use App::Netdisco::Util::DNS 'hostname_from_ip';
 
 use base 'Exporter';
 our @EXPORT = ();
-our @EXPORT_OK = qw/acl_matches acl_matches_only/;
+our @EXPORT_OK = qw/check_acl check_acl_no check_acl_only acl_matches acl_matches_only/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 =head1 NAME
@@ -201,8 +202,86 @@ sub check_acl {
           next RULE;
       }
 
+      if ($rule =~ m/^tag:(.+)$/) {
+          my $tag = $1;
+          my $found = false;
+
+          ITEM: foreach my $item (@$things) {
+              if (blessed $item and $item->can('tags')) {
+                  if ($neg xor scalar grep {$_ eq $tag} @{ $item->tags || [] }) {
+                    return true if not $all;
+                    $found = true;
+                    last ITEM;
+                  }
+              }
+              elsif (ref {} eq ref $item and exists $item->{'tags'}) {
+                  if ($neg xor scalar grep {$_ eq $tag} @{ $item->{'tags'} || [] }) {
+                    return true if not $all;
+                    $found = true;
+                    last ITEM;
+                  }
+              }
+          }
+
+          return false if $all and not $found;
+          next RULE;
+      }
+
+      # cf:customfield:val
+      if ($rule =~ m/^cf:([^:]+):(.*)$/) {
+          my $prop  = $1;
+          my $match = $2 || '';
+          my $found = false;
+
+          # custom field exists, undef is allowed to match empty string
+          ITEM: foreach my $item (@$things) {
+              my $cf = {};
+              if (blessed $item and $item->can('custom_fields')) {
+                  $cf = from_json ($item->custom_fields || '{}');
+              }
+              elsif (ref {} eq ref $item and exists $item->{'custom_fields'}) {
+                  $cf = from_json ($item->{'custom_fields'} || '{}');
+              }
+
+              if ($neg xor (ref {} eq ref $cf and exists $cf->{$prop} and
+                      ((!defined $cf->{$prop} and $match eq q{})
+                       or
+                       (defined $cf->{$prop} and ref $cf->{$prop} eq q{} and $cf->{$prop} =~ m/^$match$/)) )) {
+                return true if not $all;
+                $found = true;
+                last ITEM;
+              }
+          }
+
+          # missing custom field matches empty string
+          # (which is done in a second pass to allow all @$things to be
+          # inspected for existing custom fields)
+          ITEM: foreach my $item (@$things) {
+              last ITEM if $found;
+
+              my $cf = {};
+              if (blessed $item and $item->can('custom_fields')) {
+                  $cf = from_json ($item->custom_fields || '{}');
+              }
+              elsif (ref {} eq ref $item and exists $item->{'custom_fields'}) {
+                  $cf = from_json ($item->{'custom_fields'} || '{}');
+              }
+
+              # empty or missing property
+              if ($neg xor ($match eq q{} and ! exists $cf->{$prop})) {
+                return true if not $all;
+                $found = true;
+                last ITEM;
+              }
+          }
+
+          return false if $all and not $found;
+          next RULE;
+      }
+
       # prop:val
-      if ($rule =~ m/^([^:]+):([^:]*)$/) {
+      # with a check that prop isn't just the first part of a v6 addr
+      if ($rule =~ m/^([^:]+):(.*)$/ and $1 !~ m/^[a-f0-9]+$/i) {
           my $prop  = $1;
           my $match = $2 || '';
           my $found = false;
@@ -254,7 +333,7 @@ sub check_acl {
               }
           }
 
-          return false if $all;
+          return false if $all and not $found;
           next RULE;
       }
 
@@ -317,6 +396,7 @@ sub check_acl {
       else {
         return false if $all;
       }
+
       next RULE;
   }
 

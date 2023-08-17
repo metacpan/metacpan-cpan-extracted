@@ -9,28 +9,29 @@
 #   trustworthy does not get caught, but the evil cannot pass through."
 
 package Net::Gemini::Server;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 use strict;
 use warnings;
 # the below code mostly cargo culted from example/ssl_server.pl
+use IO::Socket::IP;
 use IO::Socket::SSL;
 
 DESTROY { undef $_[0]{_context}; undef $_[0]{_socket} }
 
 sub new {
     my ( $class, %param ) = @_;
-    $param{listen}{LocalPort} = 1965 unless defined $param{listen}{LocalPort};
+    $param{listen}{LocalPort} = 1965
+      unless defined $param{listen}{LocalPort};
     my %obj;
-    my $ioclass = IO::Socket::SSL->can_ipv6 || 'IO::Socket::INET';
-    $obj{_socket} = $ioclass->new(
+    $obj{_socket} = IO::Socket::IP->new(
         Listen => 5,
         Reuse  => 1,
         %{ $param{listen} },
-        SSL_startHandshake => 0,
     ) or die "server failed: $!";
     # server default is not to perform any verification
     $obj{_context} =
-      IO::Socket::SSL::SSL_Context->new( %{ $param{context} }, SSL_server => 1, )
+      IO::Socket::SSL::SSL_Context->new( %{ $param{context} },
+        SSL_server => 1, )
       or die "context failed: $SSL_ERROR";
     $obj{_port} = $obj{_socket}->sockport;
     bless \%obj, $class;
@@ -68,7 +69,8 @@ sub withforks {
                 )
             ) {
                 warn "ssl handshake failed: $SSL_ERROR\n";
-                next;
+                close $client;
+                exit;
             }
         }
         if ( $param{close_before_read} ) {

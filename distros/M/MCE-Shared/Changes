@@ -1,6 +1,26 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.885 Fri Jun 09 08:00:00 EST 2023
+
+  * Fix typo in Queue dequeue_timed documentation.
+    Thank you, Łukasz Strzelecki.
+
+1.884 Thu Jun 08 04:00:00 EST 2023
+
+  * Add missing return statement(s) in Condvar and Queue.
+  * Move tests for condvar timedwait to xt/condvar_timedwait.t
+
+1.883 Tue Jun 06 18:00:00 EST 2023
+
+  * Remove unused Queue vars in MCE::Shared::Server, since 1.867.
+
+1.882 Tue Jun 06 12:00:00 EST 2023
+
+  * Bump MCE dependency to 1.886.
+  * Added dequeue_timed method to MCE::Shared::Queue.
+  * Fixed taint mode in MCE::Shared::Sequence _sprintf.
+
 1.881 Tue May 30 20:00:00 EST 2023
 
   * Bump MCE dependency to 1.885.

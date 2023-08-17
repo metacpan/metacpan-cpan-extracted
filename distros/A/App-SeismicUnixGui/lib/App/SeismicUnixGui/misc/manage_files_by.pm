@@ -266,7 +266,7 @@ sub read_par {
 
      3. read contents of parameter file
 
-     4. odd-numbered lines contain tnmo and even contain vnmo
+     4. odd-numbered lines contain time and even contain vnmo/xmute etc.
      
 
 =cut
@@ -280,7 +280,7 @@ sub read_par {
 
 	while ( $line = <FILE> ) {
 
-		# print("manage_files_by,read_par, $line");
+#		print("manage_files_by,read_par, $line");
 
 =pod
 

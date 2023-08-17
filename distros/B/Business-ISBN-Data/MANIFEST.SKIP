@@ -72,4 +72,4 @@ hacks/
 \.gitattributes\b
 
 lib/Business/ISBN/RangeMessage.xml.new
-util/range_messages_differ.pl
+util/

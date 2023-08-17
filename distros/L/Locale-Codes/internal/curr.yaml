@@ -167,7 +167,7 @@ country:
       nf: Norfolk Island
       ng: Nigeria
       ni: Nicaragua
-      nl: Netherlands
+      nl: Netherlands (Kingdom of the)
       "no": Norway
       np: Nepal
       nr: Nauru
@@ -720,9 +720,9 @@ country:
       nepal: 
         - np
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - nl
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - nc
         - New Caledonia
@@ -1167,7 +1167,7 @@ country:
       nga: Nigeria
       nic: Nicaragua
       niu: Niue
-      nld: Netherlands
+      nld: Netherlands (Kingdom of the)
       nor: Norway
       npl: Nepal
       nru: Nauru
@@ -1719,9 +1719,9 @@ country:
       nepal: 
         - npl
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - nld
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - ncl
         - New Caledonia
@@ -2165,7 +2165,7 @@ country:
       nf: Norfolk Island
       ng: Nigeria
       ni: Nicaragua
-      nl: Netherlands
+      nl: Netherlands (Kingdom of the)
       "no": Norway
       np: Nepal
       nr: Nauru
@@ -2718,9 +2718,9 @@ country:
       nepal: 
         - np
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - nl
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - nc
         - New Caledonia
@@ -6446,7 +6446,7 @@ country:
       516: Namibia
       520: Nauru
       524: Nepal
-      528: Netherlands
+      528: Netherlands (Kingdom of the)
       531: Curacao
       533: Aruba
       534: Sint Maarten (Dutch part)
@@ -7014,9 +7014,9 @@ country:
       nepal: 
         - 524
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - 528
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - 540
         - New Caledonia
@@ -7461,7 +7461,7 @@ country:
       NGA: Nigeria
       NIC: Nicaragua
       NIU: Niue
-      NLD: Netherlands
+      NLD: Netherlands (Kingdom of the)
       NOR: Norway
       NPL: Nepal
       NRU: Nauru
@@ -8012,9 +8012,9 @@ country:
       nepal: 
         - NPL
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - NLD
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - NCL
         - New Caledonia
@@ -8439,7 +8439,7 @@ country:
       516: Namibia
       520: Nauru
       524: Nepal
-      528: Netherlands
+      528: Netherlands (Kingdom of the)
       531: Curacao
       533: Aruba
       534: Sint Maarten (Dutch part)
@@ -9008,9 +9008,9 @@ country:
       nepal: 
         - 524
         - Nepal
-      netherlands: 
+      netherlands (kingdom of the): 
         - 528
-        - Netherlands
+        - Netherlands (Kingdom of the)
       new caledonia: 
         - 540
         - New Caledonia
@@ -10725,9 +10725,8 @@ langext:
       aen: Armenian Sign Language
       afb: Gulf Arabic
       afg: Afghan Sign Language
-      ajp: South Levantine Arabic
       ajs: Algerian Jewish Sign Language
-      apc: North Levantine Arabic
+      apc: Levantine Arabic
       apd: Sudanese Arabic
       arb: Standard Arabic
       arq: Algerian Arabic
@@ -10836,6 +10835,7 @@ langext:
       lbs: Libyan Sign Language
       lce: Loncong
       lcf: Lubu
+      lgs: Guinea-Bissau Sign Language
       liw: Col
       lls: Lithuanian Sign Language
       lsb: Burundian Sign Language
@@ -11171,6 +11171,9 @@ langext:
       guatemalan sign language: 
         - gsm
         - Guatemalan Sign Language
+      guinea-bissau sign language: 
+        - lgs
+        - Guinea-Bissau Sign Language
       guinean sign language: 
         - gus
         - Guinean Sign Language
@@ -11309,6 +11312,9 @@ langext:
       latvian sign language: 
         - lsl
         - Latvian Sign Language
+      levantine arabic: 
+        - apc
+        - Levantine Arabic
       libyan arabic: 
         - ayl
         - Libyan Arabic
@@ -11432,9 +11438,6 @@ langext:
       nigerian sign language: 
         - nsi
         - Nigerian Sign Language
-      north levantine arabic: 
-        - apc
-        - North Levantine Arabic
       north mesopotamian arabic: 
         - ayp
         - North Mesopotamian Arabic
@@ -11561,9 +11564,6 @@ langext:
       south african sign language: 
         - sfs
         - South African Sign Language
-      south levantine arabic: 
-        - ajp
-        - South Levantine Arabic
       southern ping chinese: 
         - csp
         - Southern Ping Chinese
@@ -12637,7 +12637,6 @@ language:
       ajg: Aja (Benin)
       aji: Ajie
       ajn: Andajin
-      ajp: South Levantine Arabic
       ajs: Algerian Jewish Sign Language
       aju: Judeo-Moroccan Arabic
       ajw: Ajawa
@@ -12765,7 +12764,7 @@ language:
       aoz: Uab Meto
       apa: Apache languages
       apb: Sa'a
-      apc: North Levantine Arabic
+      apc: Levantine Arabic
       apd: Sudanese Arabic
       ape: Bukiyip
       apf: Pahanan Agta
@@ -13946,6 +13945,7 @@ language:
       cwe: Kwere
       cwg: Chewong
       cwt: Kuwaataay
+      cxh: Cha'ari
       cya: Nopala Chatino
       cyb: Cayubaba
       cyo: Cuyonon
@@ -14182,6 +14182,7 @@ language:
       dse: Dutch Sign Language
       dsh: Daasanach
       dsi: Disa
+      dsk: Dokshi
       dsl: Danish Sign Language
       dsn: Dusner
       dso: Desiya
@@ -14243,9 +14244,11 @@ language:
       dym: Yanda Dom Dogon
       dyn: Dyangadi
       dyo: Jola-Fonyi
+      dyr: Dyarim
       dyu: Dyula
       dyy: Djabugay
       dza: Tunzu
+      dzd: Daza
       dze: Djiwarli
       dzg: Dazaga
       dzl: Dzalakha
@@ -14368,6 +14371,7 @@ language:
       etu: Ejagham
       etx: Eten
       etz: Semimi
+      eud: Eudeve
       euq: Basque (family)
       eve: Even
       evh: Uvbie
@@ -15081,6 +15085,7 @@ language:
       ijo: Ijo languages
       ijs: Southeast Ijo
       ike: Eastern Canadian Inuktitut
+      ikh: Ikhin-Arokho
       iki: Iko
       ikk: Ika
       ikl: Ikulu
@@ -15195,6 +15200,7 @@ language:
       iyo: Mesaka
       iyx: Yaka (Congo)
       izh: Ingrian
+      izm: Kizamani
       izr: Izere
       izz: Izii
       jaa: Jamamadi
@@ -15496,7 +15502,6 @@ language:
       kgj: Gamale Kham
       kgk: Kaiwa
       kgl: Kunggari
-      kgm: Karipuna
       kgn: Karingani
       kgo: Krongo
       kgp: Kaingang
@@ -15775,7 +15780,7 @@ language:
       krl: Karelian
       krn: Sapo
       kro: Kru languages
-      krp: Korop
+      krp: Durop
       krr: Krung
       krs: Gbaya (Sudan)
       krt: Tumari Kanuri
@@ -15785,7 +15790,6 @@ language:
       krx: Karon
       kry: Kryts
       krz: Sota Kanum
-      ksa: Shuwa-Zamani
       ksb: Shambala
       ksc: Southern Kalinga
       ksd: Kuanua
@@ -15989,7 +15993,7 @@ language:
       lad: Ladino
       lae: Pattani
       laf: Lafofa
-      lag: Langi
+      lag: Rangi
       lah: Lahnda
       lai: Lambya
       laj: Lango (Uganda)
@@ -16093,6 +16097,7 @@ language:
       lgo: Lango (South Sudan)
       lgq: Logba
       lgr: Lengo
+      lgs: Guinea-Bissau Sign Language
       lgt: Pahi
       lgu: Longgu
       lgz: Ligenza
@@ -16216,7 +16221,7 @@ language:
       loe: Saluan
       lof: Logol
       log: Logo
-      loh: Narim
+      loh: Laarim
       loi: Loma (Cote d'Ivoire)
       loj: Lou
       lok: Loko
@@ -16309,6 +16314,7 @@ language:
       lva: Maku'a
       lvi: Lavi
       lvk: Lavukaleve
+      lvl: Lwel
       lvs: Standard Latvian
       lvu: Levuka
       lwa: Lwalu
@@ -17286,7 +17292,6 @@ language:
       noj: Nonuya
       nok: Nooksack
       nol: Nomlaki
-      nom: Nocaman
       non: Old Norse
       nop: Numanggang
       noq: Ngongo
@@ -17461,6 +17466,7 @@ language:
       nzi: Nzima
       nzk: Nzakara
       nzm: Zeme Naga
+      nzr: Dir-Nyamzak-Mbarimi
       nzs: New Zealand Sign Language
       nzu: Teke-Nzikou
       nzy: Nzakambay
@@ -17804,7 +17810,6 @@ language:
       plg: Pilaga
       plh: Paulohi
       pli: Pali
-      plj: Polci
       plk: Kohistani Shina
       pll: Shwe Palaung
       pln: Palenquero
@@ -17826,7 +17831,6 @@ language:
       pmh: Maharastri Prakrit
       pmi: Northern Pumi
       pmj: Southern Pumi
-      pmk: Pamlico
       pml: Lingua Franca
       pmm: Pomo
       pmn: Pam
@@ -17914,7 +17918,6 @@ language:
       prm: Kibiri
       prn: Prasuni
       pro: Old Provencal (to 1500)
-      prp: Parsi
       prq: Asheninka Perene
       prr: Puri
       prs: Dari
@@ -17992,6 +17995,7 @@ language:
       pyu: Puyuma
       pyx: Pyu (Myanmar)
       pyy: Pyen
+      pze: Pesse
       pzh: Pazeh
       pzn: Jejara Naga
       qtz: Reserved for local use
@@ -18183,6 +18187,7 @@ language:
       rsl: Russian Sign Language
       rsm: Miriwoong Sign Language
       rsn: Rwandan Sign Language
+      rsw: Rishiwa
       rtc: Rungtu Chin
       rth: Ratahan
       rtm: Rotuman
@@ -18463,7 +18468,6 @@ language:
       sln: Salinan
       slo: Slovak
       slp: Lamaholot
-      slq: Salchuq
       slr: Salar
       sls: Singapore Sign Language
       slt: Sila
@@ -18736,7 +18740,6 @@ language:
       sza: Semelai
       szb: Ngalum
       szc: Semaq Beri
-      szd: Seru
       sze: Seze
       szg: Sengele
       szl: Silesian
@@ -19003,7 +19006,6 @@ language:
       tmh: Tamashek
       tmi: Tutuba
       tmj: Samarokena
-      tmk: Northwestern Tamang
       tml: Tamnim Citak
       tmm: Tai Thanh
       tmn: Taman (Indonesia)
@@ -19081,7 +19083,6 @@ language:
       tpt: Tlachichilco Tepehua
       tpu: Tampuan
       tpv: Tanapag
-      tpw: Tupi
       tpx: Acatepec Me'phaa
       tpy: Trumai
       tpz: Tinputz
@@ -19201,6 +19202,7 @@ language:
       tva: Vaghua
       tvd: Tsuvadi
       tve: Te'un
+      tvi: Tulai
       tvk: Southeast Ambrym
       tvl: Tuvalu
       tvm: Tela-Masbuar
@@ -19333,6 +19335,7 @@ language:
       uln: Unserdeutsch
       ulu: Uma' Lung
       ulw: Ulwa
+      uly: Buli
       uma: Umatilla
       umb: Umbundu
       umc: Marrucinian
@@ -19448,6 +19451,7 @@ language:
       vis: Vishavan
       vit: Viti
       viv: Iduna
+      vjk: Bajjika
       vka: Kariyarra
       vkj: Kujarge
       vkk: Kaur
@@ -19641,7 +19645,7 @@ language:
       wmt: Walmajarri
       wmw: Mwani
       wmx: Womo
-      wnb: Wanambre
+      wnb: Mokati
       wnc: Wantoat
       wnd: Wandarang
       wne: Waneci
@@ -19699,6 +19703,7 @@ language:
       wss: Wasa
       wsu: Wasu
       wsv: Wotapuri-Katarqalai
+      wtb: Matambwe
       wtf: Watiwa
       wth: Wathawurrung
       wti: Berta
@@ -19978,7 +19983,6 @@ language:
       xsp: Silopi
       xsq: Makhuwa-Saka
       xsr: Sherpa
-      xss: Assan
       xsu: Sanuma
       xsv: Sudovian
       xsy: Saisiyat
@@ -20092,6 +20096,7 @@ language:
       ycl: Lolopo
       ycn: Yucuna
       ycp: Chepya
+      ycr: Yilan Creole
       yda: Yanda
       ydd: Eastern Yiddish
       yde: Yangum Dey
@@ -20144,6 +20149,7 @@ language:
       yiz: Azhe
       yka: Yakan
       ykg: Northern Yukaghir
+      ykh: Khamnigan Mongol
       yki: Yoke
       ykk: Yakaikeke
       ykl: Khlula
@@ -20325,6 +20331,7 @@ language:
       zea: Zeeuws
       zeg: Zenag
       zeh: Eastern Hongshuihe Zhuang
+      zem: Zeem
       zen: Zenaga
       zga: Kinga
       zgb: Guibei Zhuang
@@ -20348,7 +20355,6 @@ language:
       ziw: Zigula
       ziz: Zizilivakan
       zka: Kaimbulawa
-      zkb: Koibal
       zkd: Kadu
       zkg: Koguryo
       zkh: Khorezmian
@@ -20368,6 +20374,7 @@ language:
       zln: Lianshan Zhuang
       zlq: Liuqian Zhuang
       zls: South Slavic languages
+      zlu: Zul
       zlw: West Slavic languages
       zma: Manda (Australia)
       zmb: Zimba
@@ -20459,7 +20466,6 @@ language:
       ztu: Guila Zapotec
       ztx: Zaachila Zapotec
       zty: Yatee Zapotec
-      zua: Zeem
       zuh: Tokano
       zul: Zulu
       zum: Kumzari
@@ -21708,9 +21714,6 @@ language:
       assamese: 
         - asm
         - Assamese
-      assan: 
-        - xss
-        - Assan
       assangori: 
         - sjg
         - Assangori
@@ -22200,6 +22203,9 @@ language:
       bajelani: 
         - bjm
         - Bajelani
+      bajjika: 
+        - vjk
+        - Bajjika
       baka (cameroon): 
         - bkc
         - Baka (Cameroon)
@@ -23652,6 +23658,9 @@ language:
       bulgebi: 
         - bmp
         - Bulgebi
+      buli: 
+        - uly
+        - Buli
       buli (ghana): 
         - bwu
         - Buli (Ghana)
@@ -24237,6 +24246,9 @@ language:
       cerma: 
         - cme
         - Cerma
+      cha'ari: 
+        - cxh
+        - Cha'ari
       chabu: 
         - sbf
         - Chabu
@@ -25131,6 +25143,9 @@ language:
       dayi: 
         - dax
         - Dayi
+      daza: 
+        - dzd
+        - Daza
       dazaga: 
         - dzg
         - Dazaga
@@ -25359,6 +25374,9 @@ language:
       dinka: 
         - din
         - Dinka
+      dir-nyamzak-mbarimi: 
+        - nzr
+        - Dir-Nyamzak-Mbarimi
       dirasha: 
         - gdl
         - Dirasha
@@ -25470,6 +25488,9 @@ language:
       doko-uyanga: 
         - uya
         - Doko-Uyanga
+      dokshi: 
+        - dsk
+        - Dokshi
       dolgan: 
         - dlg
         - Dolgan
@@ -25632,6 +25653,9 @@ language:
       duriankere: 
         - dbn
         - Duriankere
+      durop: 
+        - krp
+        - Durop
       duruma: 
         - dug
         - Duruma
@@ -25689,6 +25713,9 @@ language:
       dyangadi: 
         - dyn
         - Dyangadi
+      dyarim: 
+        - dyr
+        - Dyarim
       dyirbal: 
         - dbl
         - Dyirbal
@@ -26268,6 +26295,9 @@ language:
       etulo: 
         - utr
         - Etulo
+      eudeve: 
+        - eud
+        - Eudeve
       evant: 
         - bzz
         - Evant
@@ -27255,6 +27285,9 @@ language:
       guinea kpelle: 
         - gkp
         - Guinea Kpelle
+      guinea-bissau sign language: 
+        - lgs
+        - Guinea-Bissau Sign Language
       guinean sign language: 
         - gus
         - Guinean Sign Language
@@ -28146,6 +28179,9 @@ language:
       ikaranggal: 
         - ikr
         - Ikaranggal
+      ikhin-arokho: 
+        - ikh
+        - Ikhin-Arokho
       ikizu: 
         - ikz
         - Ikizu
@@ -29922,6 +29958,9 @@ language:
       khamba: 
         - kbg
         - Khamba
+      khamnigan mongol: 
+        - ykh
+        - Khamnigan Mongol
       khams tibetan: 
         - khg
         - Khams Tibetan
@@ -30207,6 +30246,9 @@ language:
       kiunum: 
         - wei
         - Kiunum
+      kizamani: 
+        - izm
+        - Kizamani
       kla-dan: 
         - lda
         - Kla-Dan
@@ -30303,9 +30345,6 @@ language:
       koi: 
         - kkt
         - Koi
-      koibal: 
-        - zkb
-        - Koibal
       koireng: 
         - nkd
         - Koireng
@@ -30552,9 +30591,6 @@ language:
       koroni: 
         - xkq
         - Koroni
-      korop: 
-        - krp
-        - Korop
       koropo: 
         - xxr
         - Koropo
@@ -31254,6 +31290,9 @@ language:
       laari: 
         - ldi
         - Laari
+      laarim: 
+        - loh
+        - Laarim
       laba: 
         - lau
         - Laba
@@ -31485,9 +31524,6 @@ language:
       langbashe: 
         - lna
         - Langbashe
-      langi: 
-        - lag
-        - Langi
       langnian buyang: 
         - yln
         - Langnian Buyang
@@ -31779,6 +31815,9 @@ language:
       leti (indonesia): 
         - lti
         - Leti (Indonesia)
+      levantine arabic: 
+        - apc
+        - Levantine Arabic
       levuka: 
         - lvu
         - Levuka
@@ -32325,6 +32364,9 @@ language:
       lwalu: 
         - lwa
         - Lwalu
+      lwel: 
+        - lvl
+        - Lwel
       lycian: 
         - xlc
         - Lycian
@@ -33315,6 +33357,9 @@ language:
       matal: 
         - mfh
         - Matal
+      matambwe: 
+        - wtb
+        - Matambwe
       matbat: 
         - xmt
         - Matbat
@@ -34128,6 +34173,9 @@ language:
       mok: 
         - mqt
         - Mok
+      mokati: 
+        - wnb
+        - Mokati
       moken: 
         - mwt
         - Moken
@@ -34896,9 +34944,6 @@ language:
       nari nari: 
         - rnr
         - Nari Nari
-      narim: 
-        - loh
-        - Narim
       naro: 
         - nhr
         - Naro
@@ -35631,9 +35676,6 @@ language:
       nobonob: 
         - gaw
         - Nobonob
-      nocaman: 
-        - nom
-        - Nocaman
       nocte naga: 
         - njb
         - Nocte Naga
@@ -35736,9 +35778,6 @@ language:
       north junin quechua: 
         - qvn
         - North Junin Quechua
-      north levantine arabic: 
-        - apc
-        - North Levantine Arabic
       north marquesan: 
         - mrq
         - North Marquesan
@@ -36024,9 +36063,6 @@ language:
       northwestern ojibwa: 
         - ojb
         - Northwestern Ojibwa
-      northwestern tamang: 
-        - tmk
-        - Northwestern Tamang
       northwestern tasmanian: 
         - xpw
         - Northwestern Tasmanian
@@ -36987,9 +37023,6 @@ language:
       pambia: 
         - pmb
         - Pambia
-      pamlico: 
-        - pmk
-        - Pamlico
       pamona: 
         - pmf
         - Pamona
@@ -37179,9 +37212,6 @@ language:
       parkwa: 
         - pbi
         - Parkwa
-      parsi: 
-        - prp
-        - Parsi
       parsi-dari: 
         - prd
         - Parsi-Dari
@@ -37335,6 +37365,9 @@ language:
       peruvian sign language: 
         - prl
         - Peruvian Sign Language
+      pesse: 
+        - pze
+        - Pesse
       petapa zapotec: 
         - zpe
         - Petapa Zapotec
@@ -37617,9 +37650,6 @@ language:
       polari: 
         - pld
         - Polari
-      polci: 
-        - plj
-        - Polci
       polish: 
         - pol
         - Polish
@@ -38019,6 +38049,9 @@ language:
       rang: 
         - rax
         - Rang
+      rangi: 
+        - lag
+        - Rangi
       rangkas: 
         - rgk
         - Rangkas
@@ -38202,6 +38235,9 @@ language:
       ririo: 
         - rri
         - Ririo
+      rishiwa: 
+        - rsw
+        - Rishiwa
       ritharrngu: 
         - rit
         - Ritharrngu
@@ -38347,7 +38383,7 @@ language:
         - rue
         - Rusyn
       ruthenian: 
-        - rue
+        - rsk
         - Ruthenian
       rutul: 
         - rut
@@ -38508,9 +38544,6 @@ language:
       salawati: 
         - xmx
         - Salawati
-      salchuq: 
-        - slq
-        - Salchuq
       saleman: 
         - sau
         - Saleman
@@ -39165,9 +39198,6 @@ language:
       serrano: 
         - ser
         - Serrano
-      seru: 
-        - szd
-        - Seru
       serua: 
         - srw
         - Serua
@@ -39360,9 +39390,6 @@ language:
       shuswap: 
         - shs
         - Shuswap
-      shuwa-zamani: 
-        - ksa
-        - Shuwa-Zamani
       shwai: 
         - shw
         - Shwai
@@ -39846,9 +39873,6 @@ language:
       south lembata: 
         - lmf
         - South Lembata
-      south levantine arabic: 
-        - ajp
-        - South Levantine Arabic
       south marquesan: 
         - mqm
         - South Marquesan
@@ -41919,6 +41943,9 @@ language:
       tula: 
         - tul
         - Tula
+      tulai: 
+        - tvi
+        - Tulai
       tulehu: 
         - tlu
         - Tulehu
@@ -42003,9 +42030,6 @@ language:
       tupari: 
         - tpr
         - Tupari
-      tupi: 
-        - tpw
-        - Tupi
       tupi languages: 
         - tup
         - Tupi languages
@@ -42942,9 +42966,6 @@ language:
       wan: 
         - wan
         - Wan
-      wanambre: 
-        - wnb
-        - Wanambre
       wanap: 
         - wnp
         - Wanap
@@ -44127,6 +44148,9 @@ language:
       yil: 
         - yll
         - Yil
+      yilan creole: 
+        - ycr
+        - Yilan Creole
       yimas: 
         - yee
         - Yimas
@@ -44422,7 +44446,7 @@ language:
         - jaj
         - Zazao
       zeem: 
-        - zua
+        - zem
         - Zeem
       zeeuws: 
         - zea
@@ -44508,6 +44532,9 @@ language:
       zou: 
         - zom
         - Zou
+      zul: 
+        - zlu
+        - Zul
       zula: 
         - zla
         - Zula
@@ -46506,6 +46533,8 @@ langvar:
       barla: The Barlavento dialect group of Kabuverdianu
       basiceng: Basic English
       bauddha: Buddhist Hybrid Sanskrit
+      bciav: BCI Blissymbolics AV
+      bcizbl: BCI Blissymbolics
       biscayan: Biscayan dialect of Basque
       biske: The San Giorgio dialect of Resian
       bohoric: Slovene in Bohoric alphabet
@@ -46621,6 +46650,12 @@ langvar:
       basic english: 
         - basiceng
         - Basic English
+      bci blissymbolics: 
+        - bcizbl
+        - BCI Blissymbolics
+      bci blissymbolics av: 
+        - bciav
+        - BCI Blissymbolics AV
       belarusian in taraskievica orthography: 
         - tarask
         - Belarusian in Taraskievica orthography

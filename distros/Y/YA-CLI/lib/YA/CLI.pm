@@ -1,5 +1,5 @@
 package YA::CLI;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 
 # ABSTRACT: Yet another CLI framework
@@ -111,7 +111,7 @@ YA::CLI - Yet another CLI framework
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

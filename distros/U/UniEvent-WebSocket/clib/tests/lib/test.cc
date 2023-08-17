@@ -12,8 +12,10 @@
 // #include <catch2/reporters/catch_reporter_registrars.hpp>
 // #include <catch2/reporters/catch_reporter_event_listener.hpp>
 
-// using panda::unievent::Timer;
-// using panda::unievent::TimerSP;
+using panda::unievent::Timer;
+using panda::unievent::TimerSP;
+using unievent::Pipe;
+using unievent::Tcp;
 
 bool secure = false;
 int TServer::dcnt;
@@ -89,11 +91,11 @@ SslContext TClient::get_context(string cert_name, const string& ca_name) {
 
 ServerPair::ServerPair (const LoopSP& loop, Server::Config cfg, bool unixsock) {
     server = make_server(loop, cfg);
-    
+
     server->connection_event.add([this](auto, auto& cli, auto){
         this->sconn = cli;
     });
-    
+
     TcpSP tcp;
     PipeSP pipe;
     if (unixsock) { pipe = new Pipe(loop); conn = pipe; }
@@ -105,8 +107,8 @@ ServerPair::ServerPair (const LoopSP& loop, Server::Config cfg, bool unixsock) {
             printf("server pair connect error: %s\n", err.what().c_str());
             throw err;
         }
-        
-        websocket::ConnectRequestSP req = new protocol::websocket::ConnectRequest();
+
+        ConnectRequestSP req = new protocol::websocket::ConnectRequest();
         req->uri = new URI("ws://example.com");
         conn->write(parser.connect_request(req));
     });
@@ -119,7 +121,7 @@ ServerPair::ServerPair (const LoopSP& loop, Server::Config cfg, bool unixsock) {
         auto res = parser.connect(str);
         if (!res) return;
         conn->read_event.remove(self);
-        
+
         conn->loop()->stop();
     });
     if (unixsock) pipe->connect(panda::dyn_cast<Pipe*>(server->listeners()[0].get())->sockname().value());
@@ -197,7 +199,7 @@ void ServerPair::send (const string& str, Opcode opcode) {
 //     return r;
 // }
 
-// ResponseSP await_response (const RequestSP& req, const LoopSP& loop) { return await_responses({req}, loop)[0]; } 
+// ResponseSP await_response (const RequestSP& req, const LoopSP& loop) { return await_responses({req}, loop)[0]; }
 
 
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Language 0.06;
+package Text::Treesitter::Language 0.10;
 
 use v5.14;
 use warnings;
@@ -16,7 +16,16 @@ C<Text::Treesitter::Language> - represents a F<tree-sitter> language grammar
 
 =head1 SYNOPSIS
 
-   TODO
+Usually accessed indirectly, via C<Text::Treesitter>. Can also be used
+directly.
+
+   use Text::Treesitter::Language;
+
+   my $language_lib = "path/to/the/tree-sitter-perl.so";
+
+   my $lang = Text::Treesitter::Language::load( $language_lib, "perl" );
+
+   printf "This language defines %d symbols\n", $lang->symbol_count;
 
 =head1 DESCRIPTION
 
@@ -94,6 +103,8 @@ sub _compile
       "-fPIC",
       "-c", $source,
    );
+
+   push @args, "-ggdb";
 
    print join( " ", @args ), "\n";
    system( @args ) == 0 or
@@ -243,7 +254,7 @@ sub fields
    return $count unless wantarray;
 
    my @fields;
-   foreach my $id ( 0 .. $count - 1 ) {
+   foreach my $id ( 1 .. $count ) { # fields are 1-indexed
       push @fields, Text::Treesitter::Language::_Field->new(
          $id, $self->field_name_for_id( $id ),
       );

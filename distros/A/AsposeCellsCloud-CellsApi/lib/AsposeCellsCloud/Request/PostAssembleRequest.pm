@@ -61,7 +61,7 @@ sub new {
 # Run Operation Request
 # PostAssembleRequest.File : File to upload  ,
 # PostAssembleRequest.datasource :   ,
-# PostAssembleRequest.format :   ,
+# PostAssembleRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostAssembleRequest.password :   ,
 # PostAssembleRequest.checkExcelRestriction :    
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
-    	summary => '',
+    	summary => 'Combine data files and template files to kinds of format files. ',
         params => $params,
         returns => 'FilesResult',
     };
@@ -152,7 +152,7 @@ __PACKAGE__->method_documentation({
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},

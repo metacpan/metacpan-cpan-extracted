@@ -2,9 +2,9 @@ package Class::Meta::Express;
 
 use strict;
 use vars qw($VERSION);
-use Class::Meta '0.60';
+use Class::Meta 0.60;
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 my %meta_for;
 
@@ -161,7 +161,7 @@ Class::Meta::Express - Concise, expressive creation of Class::Meta classes
 This module provides an interface to concisely yet expressively create classes
 with L<Class::Meta|Class::Meta>. It does so by temporarily exporting magical
 functions into a package that uses it, thereby providing a declarative
-alternative to L<Class::Meta|Class::Meta>'s verbose object-oriented syntax.a
+alternative to L<Class::Meta|Class::Meta>'s verbose object-oriented syntax.
 
 =head1 Interface
 
@@ -190,7 +190,7 @@ the class.
 
   meta 'thingy';
 
-This function creates and returns the C<Class::Meta|Class::Meta> object that
+This function creates and returns the L<Class::Meta|Class::Meta> object that
 creates the class. Calling it is optional; if you don't use it to identify the
 basic meta data of your class, Class::Meta::Express will create the
 Class::Meta object for you, passing the last part of the class name -- with
@@ -743,12 +743,11 @@ method that's already installed in a module.
 =head1 Support
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/class-meta-express/>. Feel free to fork and
+repository|https://github.com/theory/class-meta-express/>. Feel free to fork and
 contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/class-meta-express/issues/> or by sending mail to
-L<bug-Class-Meta-Express.cpan.org|mailto:bug-Class-Meta-Express.cpan.org>.
+Issues|https://github.com/theory/class-meta-express/issues/>.
 
 =head1 Author
 
@@ -756,7 +755,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2006-2011 David E. Wheeler Some Rights Reserved.
+Copyright (c) 2006-2023 David E. Wheeler Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

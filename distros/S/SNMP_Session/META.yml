@@ -1,14 +1,16 @@
 ---
-abstract: unknown
+abstract: 'SNMPv1/v2 Protocol Handling'
 author:
-  - unknown
+  - 'Simon Leinen <simon.leinen@gmail.com>'
+  - 'Mike Mitchell'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,5 +19,21 @@ no_index:
   directory:
     - t
     - inc
-version: '1.15'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Socket: '0'
+  IO::Socket::INET6: '0'
+  Net::SNMP: '0'
+  Socket: '0'
+  Socket6: '0'
+  perl: '5.006000'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/sleinen/snmp-session/issues
+  repository: https://github.com/sleinen/snmp-session
+version: '1.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_test_requires:
+  Test::More: 0

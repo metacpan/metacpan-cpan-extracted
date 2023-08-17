@@ -66,17 +66,22 @@ DESCRIPTION
     a application basis.
 
   API Change
+    From v0.6.0: Regexp from non core Regexp engines are now usable as a
+    matcher directly. In previous versions, these where not detected and
+    processed as a string to be converted into a Perl core Regexp
+    internally.
+
     In version v0.5.3 and earlier, the dispatcher would always return a two
-    element list. The first being the match entry, and the second the a
-    array ref of any captures from a regexp match. If the matcher type was
-    'begin', 'end', 'exact', or 'numeric', the second element would always
-    be an reference to an empty array.
+    element list. The first being the match entry, and the second array ref
+    of any captures from a regexp match. If the matcher type was 'begin',
+    'end', 'exact', or 'numeric', the second element would always be an
+    reference to an empty array.
 
     From v0.5.4 onwards to optimise performance of non regex matching, this
     is no longer the case. Only regex type matching will generate this
     second element. Other matching types will not.
 
-    In otherwords when calling the dispatcher:
+    In other words when calling the dispatcher:
 
                     my ($entry, $captures)=$dispatcher->($input)
 
@@ -208,7 +213,7 @@ USING A DISPATCHER
             my ($entry, $captures)=$dispatcher->("input");
             my $value=$entry->[1];
 
-    The return from the dispatcher is a list of upto two elements.
+    The return from the dispatcher is a list of up to two elements.
 
     The first is the array reference to the table entry that matched (or the
     default entry if no match was found). The value associated with the
@@ -221,8 +226,8 @@ USING A DISPATCHER
     ref to an empty array even if the matcher was not a regex.
 
 COMPARISON TO OTHER MODULES
-    Solid performance compared to other perl routing/dispatch modules.
-    Faster in basic tests then other perl modules:
+    Solid performance compared to other Perl routing/dispatch modules.
+    Faster in basic tests then other Perl modules:
 
     Smart::Dispatch Router::Simple Router::Boom
 

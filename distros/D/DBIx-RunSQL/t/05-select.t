@@ -14,7 +14,7 @@ if (not $can_run) {
     exit;
 }
 
-plan tests => 6;
+plan tests => 10;
 
 my $sql= <<'SQL';
     create table foo (
@@ -24,6 +24,7 @@ my $sql= <<'SQL';
     insert into foo (name,age) values ('bar',100);
     insert into foo (name,age) values ('baz',1);
     insert into foo (name,age) values ('Some loong string',1000);
+    insert into foo (name,age) values ('No age',null);
 SQL
 
 my $test_dbh = DBIx::RunSQL->create(
@@ -37,7 +38,7 @@ SQL
 $sth->execute;
 my $result= DBIx::RunSQL->format_results( sth => $sth );
 
-isn't $result, undef, "We got some kind of result";
+isnt $result, undef, "We got some kind of result";
 like $result, qr/\bname\b.*?\bage\b/m, "Things that look like 'name' and 'age' appear in the string";
 like $result, qr/\bbar\b.*?\b100\b/m, "Things that look like 'bar' and '100' appear in the string";
 
@@ -47,7 +48,24 @@ SQL
 $sth->execute;
 $result= DBIx::RunSQL->format_results( sth => $sth );
 
-isn't $result, undef, "We got some kind of result";
+isnt $result, undef, "We got some kind of result";
 like $result, qr/\bname\b.*?\bage\b/m, "An empty resultset still outputs the column titles";
 unlike $result, qr/\bbar\b.*?\b100\b/m, "(but obviously, no values)";
 
+my $sth= $test_dbh->prepare(<<'SQL');
+    select * from foo order by name, age;
+SQL
+$sth->execute;
+my $result= DBIx::RunSQL->format_results( sth => $sth, rotate => 1 );
+
+isnt $result, undef, "We got some kind of result";
+like $result, qr/\bname\b.*?\bbar\s+baz\b/m, "The name row exists";
+like $result, qr/\bage\b.*?\b100\b\s+1\b/m, "The age row exists";
+
+my $sth= $test_dbh->prepare(<<'SQL');
+    select * from foo
+    where age is null
+SQL
+$sth->execute;
+my $result= DBIx::RunSQL->format_results( sth => $sth, null => '<null>' );
+like $result, qr/<null>/m, "We can set custom strings for NULL";

@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Body::Multipart;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Message::Body';
 
@@ -264,9 +264,16 @@ sub read($$$$)
 
     # Get the parts.
 
-    my @parts;
+    my ($has_epilogue, @parts);
     while(my $sep = $parser->readSeparator)
-    {   last if $sep eq "--$boundary--\n";
+    {   if($sep =~ m/--\Q$boundary\E--[ \t]*\n?/)
+        {   # Per RFC 2046, a CRLF after the close-delimiter marks the presence
+            # of an epilogue.  Preserve the epilogue, even if empty, so that the
+            # printed multipart body will also have the CRLF.
+            # This, however, is complicated w.r.t. mbox folders.
+            $has_epilogue = $sep =~ /\n/;
+            last;
+        }
 
         my $part = Mail::Message::Part->new
          ( @msgopts
@@ -291,7 +298,7 @@ sub read($$$$)
             :                      $begin;
     $self->fileLocation($begin, $end);
 
-   $epilogue->nrLines
+    $has_epilogue || $epilogue->nrLines
         or undef $epilogue;
 
     $self->{MMBM_epilogue} = $epilogue
@@ -403,13 +410,15 @@ sub part($) { shift->{MMBM_parts}[shift] }
 
 sub partNumberOf($)
 {   my ($self, $part) = @_;
-    my @parts = $self->parts('ACTIVE');
     my $msg   = $self->message;
     unless($msg)
     {   $self->log(ERROR => 'multipart is not connected');
         return 'ERROR';
     }
+
     my $base  = $msg->isa('Mail::Message::Part') ? $msg->partNumber.'.' : '';
+
+    my @parts = $self->parts('ACTIVE');
     foreach my $partnr (0..@parts)
     {   return $base.($partnr+1)
             if $parts[$partnr] == $part;

@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -87,37 +87,38 @@
    "provides" : {
       "Finance::Calendar" : {
          "file" : "lib/Finance/Calendar.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/chylli-deriv/perl-Finance-Calendar/issues"
+         "web" : "https://github.com/binary-com/perl-Finance-Calendar/issues"
       },
-      "homepage" : "https://github.com/chylli-deriv/perl-Finance-Calendar",
+      "homepage" : "https://github.com/binary-com/perl-Finance-Calendar",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/chylli-deriv/perl-Finance-Calendar.git",
-         "web" : "https://github.com/chylli-deriv/perl-Finance-Calendar"
+         "url" : "https://github.com/binary-com/perl-Finance-Calendar.git",
+         "web" : "https://github.com/binary-com/perl-Finance-Calendar"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Jun Bon <junbon@binary.com>",
       "Shahrizal Shaari <shahrizal@binary.com>",
-      "chylli-binary <chylli@binary.com>",
       "Tom Molesworth <tom@binary.com>",
       "Jean-Yves Sireau <jy@binary.com>",
       "Torsten F\u00f6rtsch <torsten@binary.com>",
       "Arash <61218785+arash-binary@users.noreply.github.com>",
       "Arun Venkataraman <arun@regentmarkets.com>",
+      "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>",
       "qiangliu <52957232+qiangliu-binary@users.noreply.github.com>",
+      "Tanvir Faisal <126654333+tanvir-deriv@users.noreply.github.com>",
       "yngshan-binary <yngshan@binary.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

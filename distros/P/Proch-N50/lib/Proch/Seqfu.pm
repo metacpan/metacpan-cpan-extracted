@@ -8,12 +8,12 @@ use Data::Dumper;
 use Term::ANSIColor qw(:constants);
 require Exporter;
 
-$Proch::Seqfu::VERSION = '1.5.6';
+$Proch::Seqfu::VERSION     = '1.6.1';
 $Proch::Seqfu::fu_linesize = 0;
 $Proch::Seqfu::fu_verbose  = 0;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(rc fu_printfasta fu_printfastq verbose has_seqfu seqfu_version);
+our @ISA       = qw(Exporter);
+our @EXPORT    = qw(rc fu_printfasta fu_printfastq verbose has_seqfu seqfu_version);
 our @EXPORT_OK = qw($fu_linesize $fu_verbose);  # symbols to export on request
 
 
@@ -51,7 +51,11 @@ sub verbose {
 sub rc {
     my   $sequence = reverse($_[0]);
     if (is_seq($sequence)) {
-        $sequence =~tr/ACGTacgt/TGCAtgca/;
+        if ($sequence =~ /U/i) {
+            $sequence =~ tr/ACGURYSWKMBDHVacguryswkmbdhv/UGCAYRSWMKVHDBugcayrswmkvhdb/;
+        } else {                      
+            $sequence =~ tr/ACGTRYSWKMBDHVacgtryswkmbdhv/TGCAYRSWMKVHDBtgcayrswmkvhdb/;
+        }
         return $sequence;
     }
 }
@@ -59,7 +63,7 @@ sub rc {
 
 sub is_seq {
     my $string = $_[0];
-    if ($string =~/[^ACGTRYSWKMBDHVN]/i) {
+    if ($string =~/[^ACGTRYSWKMBDHVNU]/i) {
         return 0;
     } else {
         return 1;
@@ -118,7 +122,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 =head1 VERSION
 
-version 1.5.6
+version 1.5.8
 
 =head1 Proch::Seqfu
 
@@ -163,7 +167,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
+This software is Copyright (c) 2018-2023 by Andrea Telatin.
 
 This is free software, licensed under:
 

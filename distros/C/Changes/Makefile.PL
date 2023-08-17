@@ -16,8 +16,8 @@ my %WriteMakefileArgs = (
         'version'       => 0,
         'warnings'      => 0,
         'DateTime'      => '1.57',
-        'Module::Generic'    => 'v0.29.1',
-        'Nice::Try'     => 'v1.3.1',
+        'Module::Generic'    => 'v0.31.0',
+        'Nice::Try'     => 'v1.3.4',
         'Want'          => '0.29',
     },
     TEST_REQUIRES =>

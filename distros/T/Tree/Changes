@@ -1,5 +1,10 @@
 Revision history for Perl distribution Tree.
 
+1.16  2023-07-24T09:43:00
+	- Patch t/Tree/008_weak_refs.t to remove the 2nd paramater in the call to use_ok().
+		This issue was found by CPAN testers using a recent Perl
+		and reported by Graham Knop, who kindly supplied a patch.
+
 1.15  2021-02-02T10:29:00
 	- Update Makefile.PL and POD to change RT to github.
 
@@ -97,3 +102,4 @@ Revision history for Perl distribution Tree.
 
 0.99  2005-10-24T10:30:00
 	- Initial revision
+

@@ -1,6 +1,8 @@
 Access.pm
 Changes
+examples/plack_app_login_access.pl
 examples/print_block_html_and_css.pl
+images/plack_app_login_access.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -20,5 +22,8 @@ README
 SIGNATURE
 t/Tags-HTML-Login-Access/01-use.t
 t/Tags-HTML-Login-Access/02-version.t
+t/Tags-HTML-Login-Access/03-new.t
+t/Tags-HTML-Login-Access/04-process.t
+t/Tags-HTML-Login-Access/05-process_css.t
 xt/Tags-HTML-Login-Access/01-pod_coverage.t
 xt/Tags-HTML-Login-Access/02-pod.t

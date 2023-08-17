@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.881';
+our $VERSION = '1.885';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -106,6 +106,7 @@ sub new {
 
    # --------------------------------------------------------------------------
 
+   $_Q->{_qr_mutex} = MCE::Mutex->new();
    $_Q->{_init_pid} = $_tid ? $$ .'.'. $_tid : $$;
    $_Q->{_dsem}     = 0;
 
@@ -207,8 +208,8 @@ sub enqueuep {
    return;
 }
 
-# dequeue ( count )
 # dequeue ( )
+# dequeue ( count )
 
 sub dequeue {
    my ($_Q, $_cnt) = @_;
@@ -243,14 +244,47 @@ sub dequeue {
    goto \&dequeue;
 }
 
-# dequeue_nb ( count )
 # dequeue_nb ( )
+# dequeue_nb ( count )
 
 sub dequeue_nb {
    my ($_Q, $_cnt) = @_;
 
    if (defined $_cnt && $_cnt ne '1') {
-      _croak('Queue: (dequeue count argument) is not valid')
+      _croak('Queue: (dequeue_nb count argument) is not valid')
+         if (!looks_like_number($_cnt) || int($_cnt) != $_cnt || $_cnt < 1);
+
+      my $_pending = @{ $_Q->{_datq} };
+
+      if ($_pending < $_cnt && scalar @{ $_Q->{_heap} }) {
+         for my $_h (@{ $_Q->{_heap} }) {
+            $_pending += @{ $_Q->{_datp}->{$_h} };
+         }
+      }
+
+      $_cnt = $_pending if $_pending < $_cnt;
+
+      return map { $_Q->_dequeue() } 1 .. $_cnt;
+   }
+
+   my $_buf = $_Q->_dequeue();
+
+   return defined($_buf) ? $_buf : ();
+}
+
+# dequeue_timed ( timeout )
+# dequeue_timed ( timeout, count )
+
+sub dequeue_timed {
+   my ($_Q, $_timeout, $_cnt) = @_;
+
+   if (defined $_timeout) {       
+      _croak('Queue: (dequeue_timed timeout argument) is not valid')
+         if (!looks_like_number($_timeout));
+   }
+
+   if (defined $_cnt && $_cnt ne '1') {
+      _croak('Queue: (dequeue_timed count argument) is not valid')
          if (!looks_like_number($_cnt) || int($_cnt) != $_cnt || $_cnt < 1);
 
       my $_pending = @{ $_Q->{_datq} };
@@ -620,6 +654,7 @@ sub _heap_insert_high {
       SHR_O_QUA => 'O~QUA',  # Queue await
       SHR_O_QUD => 'O~QUD',  # Queue dequeue
       SHR_O_QUN => 'O~QUN',  # Queue dequeue non-blocking
+      SHR_O_QUT => 'O~QUT',  # Queue dequeue timed
    };
 
    my (
@@ -637,6 +672,7 @@ sub _heap_insert_high {
 
          my $_Q = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
+            return;
          };
          $_Q->{_tsem} = $_t;
 
@@ -763,6 +799,23 @@ sub _heap_insert_high {
          return;
       },
 
+      SHR_O_QUT.$LF => sub {                      # Queue dequeue timed
+         $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
+
+         chomp($_id = <$_DAU_R_SOCK>);
+
+         my $_Q = $_obj->{ $_id } || do {
+            print {$_DAU_R_SOCK} $LF;
+            return;
+         };
+
+         $_Q->{_dsem} -= 1 if $_Q->{_dsem};
+
+         print {$_DAU_R_SOCK} $LF;
+
+         return;
+      },
+
    );
 
    sub _init_mgr {
@@ -862,8 +915,7 @@ sub dequeue {
    if (defined $_cnt && $_cnt ne '1') {
       _croak('Queue: (dequeue count argument) is not valid')
          if (!looks_like_number($_cnt) || int($_cnt) != $_cnt || $_cnt < 1);
-   }
-   else {
+   } else {
       $_cnt = 1;
    }
 
@@ -889,8 +941,7 @@ sub dequeue_nb {
    if (defined $_cnt && $_cnt ne '1') {
       _croak('Queue: (dequeue_nb count argument) is not valid')
          if (!looks_like_number($_cnt) || int($_cnt) != $_cnt || $_cnt < 1);
-   }
-   else {
+   } else {
       $_cnt = 1;
    }
 
@@ -898,9 +949,60 @@ sub dequeue_nb {
 
    return if ($_len < 0);
 
-   ($_cnt == 1)
-      ? $_thaw->($_buf)[0]
-      : @{ $_thaw->($_buf) };
+   ($_cnt == 1) ? $_thaw->($_buf)[0] : @{ $_thaw->($_buf) };
+}
+
+sub dequeue_timed {
+   my ($self, $_timeout, $_cnt) = @_;
+   my $_id = $self->[0];
+   my $_start;
+
+   return unless ( my $_Q = $_obj->{ $_id } );
+   return unless ( exists $_Q->{_qr_sock} );
+
+   if (defined $_timeout) {
+      _croak('Queue: (dequeue_timed timeout argument) is not valid')
+         if (!looks_like_number($_timeout) || $_timeout < 0);
+      $_start = MCE::Util::_time();
+   }
+
+   if (defined $_cnt && $_cnt ne '1') {
+      _croak('Queue: (dequeue_timed count argument) is not valid')
+         if (!looks_like_number($_cnt) || int($_cnt) != $_cnt || $_cnt < 1);
+   } else {
+      $_cnt = 1;
+   }
+
+   if (! $_timeout || $_timeout < 0.0) {
+      _req_queue('O~QUN', $_id.$LF . $_cnt.$LF, my($_len), my($_buf));
+      return if ($_len < 0);
+      return ($_cnt == 1) ? $_thaw->($_buf)[0] : @{ $_thaw->($_buf) };
+   }
+
+   _req_queue('O~QUD', $_id.$LF . $_cnt.$LF, my($_len), my($_buf));
+
+   return $_thaw->($_buf)[0]   if ($_len > 0 && $_cnt == 1);
+   return @{ $_thaw->($_buf) } if ($_len > 0);
+   return                      if ($_len == -2);
+
+   $_Q->{_qr_mutex}->lock();
+   $_timeout = $_timeout - (MCE::Util::_time() - $_start) - 0.045;
+   $_timeout = 0.0 if $_timeout < 0.045;
+
+   CORE::vec(my $_r, CORE::fileno($_Q->{_qr_sock}), 1) = 1;
+   if (CORE::select($_r, undef, undef, $_timeout) > 0) {
+      MCE::Util::_sysread($_Q->{_qr_sock}, my($_next), 1);
+      $_Q->{_qr_mutex}->unlock();
+      _req_queue('O~QUN', $_id.$LF . $_cnt.$LF, my($_len), my($_buf));
+      return if ($_len < 0);
+      return ($_cnt == 1) ? $_thaw->($_buf)[0] : @{ $_thaw->($_buf) };
+   }
+
+   $_Q->{_qr_mutex}->unlock();
+   _req1('O~QUT', $_id.$LF);
+   MCE::Util::_sleep(0.045); # yield
+
+   return ();
 }
 
 sub pending {
@@ -923,7 +1025,7 @@ MCE::Shared::Queue - Hybrid-queue helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Queue version 1.881
+This document describes MCE::Shared::Queue version 1.885
 
 =head1 DESCRIPTION
 
@@ -977,6 +1079,8 @@ the shared-manager process, otherwise locally.
  @items = $qu->dequeue( $count );
  $item  = $qu->dequeue_nb();
  @items = $qu->dequeue_nb( $count );
+ $item  = $qu->dequeue_timed( $timeout );
+ @items = $qu->dequeue_timed( $timeout, $count );
 
  $qu->insert( $index, $item [, $item, ... ] );
  $qu->insertp( $priority, $index, $item [, $item, ... ] );
@@ -1126,8 +1230,8 @@ Appends a list of items onto the end of the priority queue with priority.
 Returns the requested number of items (default 1) from the queue. Priority
 data will always dequeue first before any data from the normal queue.
 
+ $q->dequeue;
  $q->dequeue( 2 );
- $q->dequeue; # default 1
 
 The method will block if the queue contains zero items. If the queue contains
 fewer than the requested number of items, the method will not block, but
@@ -1155,8 +1259,22 @@ Returns the requested number of items (default 1) from the queue. Like with
 dequeue, priority data will always dequeue first. This method is non-blocking
 and returns C<undef> in the absence of data.
 
+ $q->dequeue_nb;
  $q->dequeue_nb( 2 );
- $q->dequeue_nb; # default 1
+
+=head2 dequeue_timed ( timeout [, $count ] )
+
+Returns the requested number of items (default 1) from the queue. Like with
+dequeue, priority data will always dequeue first. This method is blocking
+until the timeout is reached and returns C<undef> in the absence of data.
+Current API available since MCE::Shared 1.882.
+
+ $q->dequeue_timed( 300 );    # timeout after 5 minutes
+ $q->dequeue_timed( 300, 2 );
+
+The timeout may be specified as fractional seconds. If timeout is missing,
+undef, less than or equal to 0, or a non-shared object, then this call behaves
+like dequeue_nb.
 
 =head2 insert ( index, item [, item, ... ] )
 

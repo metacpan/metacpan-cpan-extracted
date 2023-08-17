@@ -1,11 +1,15 @@
-/*
- *  Distributed under the Boost Software License, Version 1.0. (See accompanying
- *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- */
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/internal/catch_config_wchar.hpp>
+#include <catch2/internal/catch_windows_h_proxy.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic ignored "-Wc++98-compat"
@@ -227,16 +231,6 @@ TEST_CASE( "send a single char to INFO", "[failing][.]" ) {
     REQUIRE(false);
 }
 
-TEST_CASE( "atomic if", "[failing][0]") {
-    std::size_t x = 0;
-
-    if( x )
-        REQUIRE(x > 0);
-    else
-        REQUIRE(x == 0);
-}
-
-
 TEST_CASE( "Factorials are computed", "[factorial]" ) {
   REQUIRE( Factorial(0) == 1 );
   REQUIRE( Factorial(1) == 1 );
@@ -432,10 +426,6 @@ TEST_CASE("not allowed", "[!throws]") {
     SUCCEED();
 }
 
-//TEST_CASE( "Is big endian" ) {
-//    CHECK( Catch::Detail::Endianness::which() == Catch::Detail::Endianness::Little );
-//}
-
 TEST_CASE( "Tabs and newlines show in output", "[.][whitespace][failing]" ) {
 
     // Based on issue #242
@@ -485,10 +475,15 @@ TEST_CASE( "# A test name that starts with a #" ) {
     SUCCEED( "yay" );
 }
 
-TEST_CASE( "#835 -- errno should not be touched by Catch", "[.][failing][!shouldfail]" ) {
+TEST_CASE( "#835 -- errno should not be touched by Catch2", "[.][failing][!shouldfail]" ) {
     errno = 1;
+    // Check that reporting failed test doesn't change errno.
     CHECK(f() == 0);
-    REQUIRE(errno == 1); // Check that f() doesn't touch errno.
+    // We want to avoid expanding `errno` macro in assertion, because
+    // we capture the expression after macro expansion, and would have
+    // to normalize the ways different platforms spell `errno`.
+    const auto errno_after = errno;
+    REQUIRE(errno_after == 1);
 }
 
 TEST_CASE( "#961 -- Dynamically created sections should all be reported", "[.]" ) {
@@ -512,3 +507,47 @@ TEMPLATE_TEST_CASE_SIG("#1954 - 7 arg template test case sig compiles", "[regres
 
 TEST_CASE("Same test name but with different tags is fine", "[.approvals][some-tag]") {}
 TEST_CASE("Same test name but with different tags is fine", "[.approvals][other-tag]") {}
+
+// MinGW doesn't support __try, and Clang has only very partial support
+#if defined(_MSC_VER)
+void throw_and_catch()
+{
+    __try {
+        RaiseException(0xC0000005, 0, 0, NULL);
+    }
+    __except (1)
+    {
+
+    }
+}
+
+
+TEST_CASE("Validate SEH behavior - handled", "[approvals][FatalConditionHandler][CATCH_PLATFORM_WINDOWS]")
+{
+    // Validate that Catch2 framework correctly handles tests raising and handling SEH exceptions.
+    throw_and_catch();
+}
+
+void throw_no_catch()
+{
+    RaiseException(0xC0000005, 0, 0, NULL);
+}
+
+TEST_CASE("Validate SEH behavior - unhandled", "[.approvals][FatalConditionHandler][CATCH_PLATFORM_WINDOWS]")
+{
+    // Validate that Catch2 framework correctly handles tests raising and not handling SEH exceptions.
+    throw_no_catch();
+}
+
+static LONG CALLBACK dummyExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+TEST_CASE("Validate SEH behavior - no crash for stack unwinding", "[approvals][!throws][!shouldfail][FatalConditionHandler][CATCH_PLATFORM_WINDOWS]")
+{
+    // Trigger stack unwinding with SEH top-level filter changed and validate the test fails expectedly with no application crash
+    SetUnhandledExceptionFilter(dummyExceptionFilter);
+    throw 1;
+}
+
+#endif // _MSC_VER

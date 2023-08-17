@@ -17,7 +17,7 @@ is $first->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
 is_deeply $first->{record}->[11],
     ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'], 'sub field with $';
 
-foreach my $type (qw(Plain Plus JSON Binary XML PPXML PIXML)) {
+foreach my $type (qw(Plain Plus JSON Binary XML PPXML PIXML Import)) {
     my $module = "PICA::Parser::$type";
     my $file   = 't/files/pica.' . lc($type);
 
@@ -26,10 +26,14 @@ foreach my $type (qw(Plain Plus JSON Binary XML PPXML PIXML)) {
     is ref($parser), "PICA::Parser::$type", "parser from file";
 
     my $record = $parser->next;
-    is_deeply $record, $first;
+    is_deeply $record, $first, 'first record';
+    is $parser->count, 1, 'count';
 
-    ok $parser->next()->{_id} eq '67890', 'next record';    
+    #note explain $record if $type eq 'Import';
+
+    ok $parser->next()->{_id} eq '67890', 'next record';
     ok !$parser->next, 'parsed all records';
+    is $parser->count, 2, 'count';
 
     foreach my $mode ('<', '<:utf8') {
         next
@@ -87,18 +91,18 @@ note 'error handling';
     my $plus
         = "X01A \x{1F}01\x{1E}001A/0 \x{1F}01\x{1E}001A/AB \x{1F}01\x{1E}";
     warnings_exist {PICA::Parser::Plus->new(\$plus)->next}[
-        qr{no valid PICA field structure},
-        qr{no valid PICA field structure},
-        qr{no valid PICA field structure}
+        qr{invalid PICA field structure},
+        qr{invalid PICA field structure},
+        qr{invalid PICA field structure}
     ],
         'skip faulty fields with warnings';
     dies_ok {PICA::Parser::Plus->new(\$plus, strict => 1)->next}
     'die on faulty fields with option strict';
     my $plain = "X01@ \$01\n\n001@/0 \$01\n\n001@/AB \$01";
     warnings_exist {PICA::Parser::Plain->new(\$plain)->next}[
-        qr{no valid PICA field structure},
-        qr{no valid PICA field structure},
-        qr{no valid PICA field structure}
+        qr{invalid PICA field structure},
+        qr{invalid PICA field structure},
+        qr{invalid PICA field structure}
     ],
         'skip faulty fields with warnings';
     dies_ok {PICA::Parser::Plain->new(\$plain, strict => 1)->next}

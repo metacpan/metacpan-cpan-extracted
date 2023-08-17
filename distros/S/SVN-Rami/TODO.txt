@@ -1,5 +1,6 @@
 The TODO list for Rami
 
-Fix bug when script is invoked with no arguments.
 Add file CONTRIBUTING or CONTRIBUTING.md
-Have the script checkout its configuration from SVN.
+Allow the merging of multiple revisions
+  as explained here: https://stackoverflow.com/questions/2692381/is-there-any-way-to-svn-diff-or-svn-merge-across-multiple-non-sequential-revisio/2906146
+  We must ensure that all the revisions are on the same branch

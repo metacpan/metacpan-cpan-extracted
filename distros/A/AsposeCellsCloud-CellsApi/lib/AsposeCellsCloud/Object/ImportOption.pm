@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'destination_worksheet' => {
      	datatype => 'string',
      	base_name => 'DestinationWorksheet',
-     	description => '',
+     	description => 'Destination worksheet name.  ',
      	format => '',
      	read_only => '',
      		},

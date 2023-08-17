@@ -1,3 +1,9 @@
+1.5.8	2023-07-22
+	* POD documentation fix
+
+1.5.7	2023-01-22
+	* Minor updates on Seqfu.pm, which is a legacy module and should not be adopted for new projects
+
 1.5.6	2023-01-18
 	* Uniform support for "-" as Standard Input in accessory utilities
 	

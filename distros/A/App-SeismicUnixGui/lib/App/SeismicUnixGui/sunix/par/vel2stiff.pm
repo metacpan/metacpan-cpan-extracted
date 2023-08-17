@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::par::vel2stiff;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

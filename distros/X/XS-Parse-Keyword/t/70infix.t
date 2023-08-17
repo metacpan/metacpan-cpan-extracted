@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-use Test::More;
+use Test2::V0;
 
 use B::Deparse;
 my $deparser = B::Deparse->new( "-p" );
@@ -26,15 +26,15 @@ BEGIN { $^H{"t::infix/permit"} = 1; }
    is( $result, 27, 'xor infix operator' );
 
    my $aref = ["|" intersperse qw( a b c )];
-   is_deeply( $aref, [qw( a | b | c )],
+   is( $aref, [qw( a | b | c )],
       'intersperse infix operator' );
 
    my @list = qw( x y z );
    $aref = ["|" intersperse @list];
-   is_deeply( $aref, [qw( x | y | z )],
+   is( $aref, [qw( x | y | z )],
       'intersperse infix operator on PADAV' );
 
-   is_deeply( [ (2, 4, 6) addpairs (1, 1, 1) ],
+   is( [ (2, 4, 6) addpairs (1, 1, 1) ],
       [ 3, 5, 7 ], 'addpairs infix operator' );
 }
 

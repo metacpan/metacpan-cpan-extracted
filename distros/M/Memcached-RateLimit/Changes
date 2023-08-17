@@ -1,5 +1,10 @@
 Revision history for Memcached-RateLimit
 
+0.09      2023-06-14 17:18:02 -0600
+  - Use `*std::os::raw::c_char` instead of `*i8` for C strings.
+    This fixes the build on Linux Arm64, and possibly other
+    platforms (gh#18)
+
 0.08      2023-04-11 12:15:27 -0600
   - Remove ffi/Cargo.lock from git and not distribute, which
     is recommended for rust crate libraries (gh#15, gh#17, Dylan++)

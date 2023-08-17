@@ -1,5 +1,7 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/headers_only.psgi
 examples/log4perl.psgi
 examples/traffic.l4p
@@ -23,16 +25,13 @@ xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
 xt/perlcritic.t
-xt/perlcriticrc
 xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t
 xt/portability_files.t
-xt/profile.pl
 xt/signature.t
 Makefile.PL
 LICENSE
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

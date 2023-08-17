@@ -10,9 +10,9 @@ use Complete::Util qw(combine_answers complete_array_elem hashify_answer);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-19'; # DATE
+our $DATE = '2023-05-26'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %SPEC;
 our @EXPORT_OK = qw(complete_from_schema);
@@ -379,7 +379,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.012 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-03-19.
+This document describes version 0.013 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-05-26.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.33;
+package XS::Parse::Keyword 0.38;
 
 use v5.14;
 use warnings;
@@ -84,6 +84,13 @@ The syntax forms a complete statement, which should be followed by a statement
 separator semicolon (C<;>). This semicolon is optional at the end of a block.
 
 The semicolon, if present, will be consumed automatically.
+
+=item C<XPK_FLAG_BLOCKSCOPE>
+
+The entire parse and build process will be wrapped in a pair of
+C<block_start()> and C<block_end()> calls. This ensures that, for example, any
+newly-introduced lexical variables do not escape from the scope of the syntax
+created by the keyword.
 
 =back
 
@@ -549,6 +556,38 @@ expected keyword-like behaviour is preserved. For example, given the input
 C<"keyword">, the piece C<XPK_LITERAL("key")> would match it, whereas
 C<XPK_KEYWORD("key")> would not because of the subsequent C<"w"> character.
 
+=head2 XPK_INTRO_MY
+
+I<atomic, emits nothing.>
+
+Calls the core perl C<intro_my()> function immediately. No input is consumed
+and no output value is generated. This is often useful after C<XPK_LEXVAR_MY>.
+
+=head2 XPK_WARNING
+
+I<atomic, emits nothing.>
+
+   XPK_WARNING("message here")
+
+Emits a warning by calling the core perl C<warn()> function on the given
+string literal. This is equivalent to simply calling C<warn()> from the build
+function, except that it is emitted immediately at parse time, so line
+numbering will be more accurate. Also, by placing it as part of an optional or
+choice sequence, the warning will only be emitted conditionally if that part
+of the grammar structure is encountered.
+
+=head2 XPK_WARNING_...
+
+Several variants of C<XPK_WARNING> exist that are conditional on particular
+warning categories being enabled. These are ones that are likely to be useful
+at parse time:
+
+   XPK_WARNING_AMBIGUOUS
+   XPK_WARNING_DEPRECATED
+   XPK_WARNING_EXPERIMENTAL
+   XPK_WARNING_PRECEDENCE
+   XPK_WARNING_SYNTAX
+
 =head2 XPK_SEQUENCE
 
 I<structural, might support probe, emits nothing.>
@@ -638,43 +677,43 @@ probe (the comma itself is sufficient to indicate a repeat).
 An C<XPK_COMMALIST> supports probe if its first contained piece does; i.e.
 is transparent to probing.
 
-=head2 XPK_PARENSCOPE
+=head2 XPK_PARENS
 
 I<structural, can probe, emits nothing.>
 
-   XPK_PARENSCOPE(pieces ...)
+   XPK_PARENS(pieces ...)
 
 A structural type which expects to find a sequence of pieces, all contained in
 parentheses as C<( ... )>. This will pass no extra arguments.
 
-=head2 XPK_ARGSCOPE
+=head2 XPK_ARGS
 
 I<structural, emits nothing.>
 
-   XPK_ARGSCOPE(pieces ...)
+   XPK_ARGS(pieces ...)
 
-A structural type similar to C<XPK_PARENSCOPE>, except that the parentheses
+A structural type similar to C<XPK_PARENS>, except that the parentheses
 themselves are optional; much like Perl's parsing of calls to known functions.
 
 If parentheses are encountered in the input, they will be consumed by this
-piece and it will behave identically to C<XPK_PARENSCOPE>. If there is no open
+piece and it will behave identically to C<XPK_PARENS>. If there is no open
 parenthesis, this piece will behave like C<XPK_SEQUENCE> and consume all the
 pieces inside it, without expecting a closing parenthesis.
 
-=head2 XPK_BRACKETSCOPE
+=head2 XPK_BRACKETS
 
 I<structural, can probe, emits nothing.>
 
-   XPK_BRACKETSCOPE(pieces ...)
+   XPK_BRACKETS(pieces ...)
 
 A structural type which expects to find a sequence of pieces, all contained in
 square brackets as C<[ ... ]>. This will pass no extra arguments.
 
-=head2 XPK_BRACESCOPE
+=head2 XPK_BRACES
 
 I<structural, can probe, emits nothing.>
 
-   XPK_BRACESCOPE(pieces ...)
+   XPK_BRACES(pieces ...)
 
 A structural type which expects to find a sequence of pieces, all contained in
 braces as C<{ ... }>. This will pass no extra arguments.
@@ -683,11 +722,11 @@ Note that this is not necessary to use with C<XPK_BLOCK> or C<XPK_ANONSUB>;
 those will already consume a set of braces. This is intended for special
 constrained syntax that should not just accept an arbitrary block.
 
-=head2 XPK_CHEVRONSCOPE
+=head2 XPK_CHEVRONS
 
 I<structural, can probe, emits nothing.>
 
-   XPK_CHEVRONSCOPE(pieces ...)
+   XPK_CHEVRONS(pieces ...)
 
 A structural type which expects to find a sequence of pieces, all contained in
 angle brackets as C<< < ... > >>. This will pass no extra arguments.
@@ -696,19 +735,19 @@ Remember that expressions like C<< a > b >> are valid term expressions, so the
 contents of this scope shouldn't allow arbitrary expressions or the closing
 bracket will be ambiguous.
 
-=head2 XPK_PARENSCOPE_OPT, XPK_BRACKETSCOPE_OPT, XPK_BRACESCOPE_OPT, XPK_CHEVRONSCOPE_OPT
+=head2 XPK_PARENS_OPT, XPK_BRACKETS_OPT, XPK_BRACES_OPT, XPK_CHEVRONS_OPT
 
 I<structural, can probe, emits i.>
 
-   XPK_PARENSCOPE_OPT(pieces ...)
-   XPK_BRACKETSCOPE_OPT(pieces ...)
-   XPK_BRACESCOPE_OPT(pieces ...)
-   XPK_CHEVERONSCOPE_OPT(pieces ...)
+   XPK_PARENS_OPT(pieces ...)
+   XPK_BRACKETS_OPT(pieces ...)
+   XPK_BRACES_OPT(pieces ...)
+   XPK_CHEVERONS_OPT(pieces ...)
 
-Each of the four C<XPK_...SCOPE> macros above has an optional variant, whose
-name is suffixed by C<_OPT>. These pass an argument whose I<i> field is either
-true or false, indicating whether the scope was found, followed by the values
-from the scope itself.
+Each of the four contained structure macros above has an optional variant,
+whose name is suffixed by C<_OPT>. These pass an argument whose I<i> field is
+either true or false, indicating whether the scope was found, followed by the
+values from the scope itself.
 
 This is a convenient shortcut to nesting the scope within a C<XPK_OPTIONAL>
 macro.

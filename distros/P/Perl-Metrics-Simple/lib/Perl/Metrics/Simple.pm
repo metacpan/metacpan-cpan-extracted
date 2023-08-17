@@ -14,10 +14,10 @@ use Perl::Metrics::Simple::Analysis;
 use Perl::Metrics::Simple::Analysis::File;
 use Readonly 1.03;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
-Readonly::Scalar our $PERL_FILE_SUFFIXES => qr{ \. (:? pl | pm | t ) }sxmi;
-Readonly::Scalar our $SKIP_LIST_REGEX    => qr{ \.svn | \. git | _darcs | CVS }sxmi;
+Readonly::Scalar our $PERL_FILE_SUFFIXES => qr{ [.] (:? pl | pm | t ) }sxmi;
+Readonly::Scalar our $SKIP_LIST_REGEX    => qr{ [.]svn | [.]git | _darcs | CVS }sxmi;
 Readonly::Scalar my $PERL_SHEBANG_REGEX  => qr/ \A [#] ! .* perl /sxm;
 Readonly::Scalar my $DOT_FILE_REGEX      => qr/ \A [.] /sxm;
 
@@ -31,8 +31,8 @@ sub new {
 sub analyze_files {
     my ( $self, @dirs_and_files ) = @_;
     my @results = ();
-    my @objects = grep { ref $_ } @dirs_and_files;
-    @dirs_and_files = grep { not ref $_ } @dirs_and_files;
+    my @objects = grep { ref } @dirs_and_files;
+    @dirs_and_files = grep { not ref } @dirs_and_files;
     foreach my $file ( (scalar(@dirs_and_files)?@{ $self->find_files(@dirs_and_files) }:()),@objects ) {
         my $file_analysis =
           Perl::Metrics::Simple::Analysis::File->new( path => $file );
@@ -213,7 +213,7 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Metrics-Simple
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006-2009 by Eigenstate Consulting, LLC.
+Copyright (c) 2006-2021 by Eigenstate Consulting, LLC.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

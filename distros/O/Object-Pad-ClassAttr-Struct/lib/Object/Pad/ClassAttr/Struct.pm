@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ClassAttr::Struct 0.05;
+package Object::Pad::ClassAttr::Struct 0.06;
 
 use v5.14;
 use warnings;
@@ -26,9 +26,9 @@ C<Object::Pad::ClassAttr::Struct> - declare an C<Object::Pad> class to be struct
 
    class Colour :Struct {
       # These get :param :mutator automatically
-      has $red   = 0;
-      has $green = 0;
-      has $blue  = 0;
+      field $red   = 0;
+      field $green = 0;
+      field $blue  = 0;
 
       # Additional methods are still permitted
       method lightness {
@@ -86,6 +86,11 @@ rather than C<:mutator>.
 sub import
 {
    $^H{"Object::Pad::ClassAttr::Struct/Struct"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::ClassAttr::Struct/Struct"};
 }
 
 sub _post_seal

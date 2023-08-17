@@ -11,7 +11,8 @@ BEGIN {
 use Test::More tests => 9;
 use File::Spec::Functions ':ALL';
 use File::Remove 'clear';
-use t::lib::Test;
+use lib 't/lib';
+use LocalTest;
 
 # Where will the cache file be written to
 my $orlite_version = $t::lib::Test::VERSION;

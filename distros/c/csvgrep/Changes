@@ -1,5 +1,12 @@
 Revision history for Perl script csvgrep
 
+0.12 2023-06-20 NEILB
+    - Can give the input as '-' for STDIN
+    - Added -t to specify tab separator (e.g. if reading STDIN)
+    - Added --back N with -N as a shortcut for specifying number
+      of files to go back, when using -d. Useful for looking at
+      "yesterday's file", for example.
+
 0.11 2023-05-27 NEILB
     - Clarified description of -d option, saying it will also look for .tsv
     - You can now use column name with the -mc option as well

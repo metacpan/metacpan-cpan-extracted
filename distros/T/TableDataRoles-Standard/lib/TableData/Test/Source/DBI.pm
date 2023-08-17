@@ -3,9 +3,9 @@
 package TableData::Test::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use alias::module 'TableData::DBI';
 
@@ -24,7 +24,7 @@ TableData::Test::Source::DBI - Alias package for TableData::DBI
 
 =head1 VERSION
 
-This document describes version 0.015 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 METHODS
 

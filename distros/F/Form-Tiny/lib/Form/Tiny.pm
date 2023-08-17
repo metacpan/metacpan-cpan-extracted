@@ -1,5 +1,5 @@
 package Form::Tiny;
-$Form::Tiny::VERSION = '2.17';
+$Form::Tiny::VERSION = '2.19';
 use v5.10;
 use strict;
 use warnings;
@@ -353,6 +353,12 @@ calling L<Form::Tiny::Utils::trim> on them.
 =head1 AUTHOR
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head2 Contributors
+
+In no particular order:
+
+Diab Jerius (CPAN: DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

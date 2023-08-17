@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
-            "Alien::CFITSIO" : "v4.2.0",
+            "Alien::CFITSIO" : "v4.3.0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -39,6 +39,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.17",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pratzlaff/Astro-FITS-CFITSIO.git",
+         "web" : "https://github.com/pratzlaff/Astro-FITS-CFITSIO"
+      }
+   },
+   "version" : "1.18",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

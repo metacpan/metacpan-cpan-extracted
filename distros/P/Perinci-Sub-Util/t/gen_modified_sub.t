@@ -36,6 +36,7 @@ my $res = gen_modified_sub(
     rename_args  => {d => 'j'},
     modify_args  => {e => sub { my $as=shift; $as->{_e}=2 }},
     modify_meta  => sub { my $m=shift; $m->{_mod}=1 },
+    install      => 0,
 );
 
 is($res->[0], 200);
@@ -54,10 +55,19 @@ is_deeply($meta, {
     _mod => 1,
 }) or diag explain $meta;
 
+subtest "arg:output_name not specified -> installed to same name in caller\'s package" => sub {
+    my $res = gen_modified_sub(
+        base_name    => 'Foo::bar',
+    );
+    is($res->[0], 200);
+    is_deeply(bar(), [200, "OK", "bar"]);
+};
+
 subtest "arg:output_code" => sub {
     my $res = gen_modified_sub(
         base_name    => 'Foo::bar',
         output_code  => sub { [200, "OK", "bar mod"] },
+        install      => 0,
     );
     is($res->[0], 200);
     my $code = $res->[2]{code};
@@ -69,6 +79,7 @@ subtest "arg:wrap_code" => sub {
     my $res = gen_modified_sub(
         base_name    => 'Foo::bar',
         wrap_code  => sub { my $orig = shift; my $res = $orig->(); $res->[2] .= " mod " . $_[0]; $res },
+        install      => 0,
     );
     is($res->[0], 200);
     my $code = $res->[2]{code};

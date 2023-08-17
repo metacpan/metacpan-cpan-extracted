@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -15,6 +15,8 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#include "hax/perl-backcompat.c.inc"
+
 #if HAVE_PERL_VERSION(5,32,0)
 #  define HAVE_OP_ISA
 #endif
@@ -25,14 +27,6 @@
 
 #if HAVE_PERL_VERSION(5,35,9)
 #  define HAVE_SV_NUMEQ_FLAGS
-#endif
-
-#ifndef block_start
-#  define block_start(flags)  Perl_block_start(aTHX_ flags)
-#endif
-
-#ifndef block_end
-#  define block_end(floor, op)  Perl_block_end(aTHX_ floor, op)
 #endif
 
 #include "dispatchop.h"
@@ -170,7 +164,10 @@ static OP *pp_dispatch_isa(pTHX)
 
 struct MatchCaseBlock {
   int n_cases;
-  OP **case_exprs;
+  struct MatchCase {
+    bool is_if;
+    OP *expr;
+  } *cases;
 
   OP *op;
 };
@@ -185,11 +182,14 @@ static OP *build_cases_nondispatch(pTHX_ XSParseInfixInfo *matchinfo, PADOFFSET 
 
   U32 i;
   for(i = 0; i < n_cases; i++) {
-    OP *caseop = block->case_exprs[i];
+    bool is_if = block->cases[i].is_if;
+    OP *caseop = block->cases[i].expr;
 
     OP *thistestop;
 
-    switch(matchinfo->opcode) {
+    if(is_if)
+      thistestop = caseop;
+    else switch(matchinfo->opcode) {
 #ifdef HAVE_OP_ISA
       case OP_ISA:
 #endif
@@ -281,7 +281,11 @@ static OP *build_cases_dispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t 
     n_cases -= this_n_cases;
 
     for(U32 casei = 0; casei < this_n_cases; casei++) {
-      OP *caseop = block->case_exprs[casei];
+      bool is_if = block->cases[casei].is_if;
+      OP *caseop = block->cases[casei].expr;
+
+      if(is_if)
+        croak("TODO: case if dispatch");
 
       assert(caseop->op_type == OP_CONST);
       values[idx] = SvREFCNT_inc(cSVOPx(caseop)->op_sv);
@@ -322,7 +326,7 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
    *   [1]: match type
    *   [2]: count of blocks
    *     [3]: count of case exprs = $N
-   *     [4...]: $N * case exprs
+   *     [4,5...]: $N * [if, case expr]s
    *     []: block
    *   [LAST]: default case if present
    */
@@ -346,11 +350,13 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
 
     block->n_cases = n_cases;
 
-    Newx(block->case_exprs, n_cases, OP *);
-    SAVEFREEPV(block->case_exprs);
+    Newx(block->cases, n_cases, struct MatchCase);
+    SAVEFREEPV(block->cases);
 
-    for(int i = 0; i < n_cases; i++)
-      block->case_exprs[i] = args[argi++]->op;
+    for(int i = 0; i < n_cases; i++) {
+      block->cases[i].is_if = args[argi++]->i;
+      block->cases[i].expr  = args[argi++]->op;
+    }
 
     block->op = args[argi++]->op;
   }
@@ -362,15 +368,16 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
 
   bool use_dispatch = hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::Match/experimental(dispatch)", 0);
 
-  I32 floor_ix = block_start(0);
   /* The name is totally meaningless and never used, but if we don't set a
    * name and instead use pad_alloc(SVs_PADTMP) then the peephole optimiser
    * for aassign will crash
    */
   PADOFFSET padix = pad_add_name_pvs("$(Syntax::Keyword::Match/topic)", 0, NULL, NULL);
+  intro_my();
 
   OP *startop = newBINOP(OP_SASSIGN, 0,
-    topic, newPADSVOP(OP_PADSV, OPf_MOD, padix));
+    topic, newPADSVOP(OP_PADSV, OPf_MOD|OPf_REF|(OPpLVAL_INTRO << 8), padix));
+  PL_hints |= HINT_BLOCK_SCOPE; /* ensures that op_scope() creates a full ENTER+LEAVE pair */
 
   int n_dispatch = 0;
 
@@ -389,8 +396,13 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     bool this_block_dispatch = use_dispatch;
 
     for(U32 casei = 0; casei < n_cases; casei++) {
+      if(block->cases[casei].is_if) {
+        this_block_dispatch = false;
+        continue;
+      }
+
       /* TODO: forbid the , operator in the case label */
-      OP *caseop = block->case_exprs[casei];
+      OP *caseop = block->cases[casei].expr;
 
       switch(matchinfo->opcode) {
 #ifdef HAVE_OP_ISA
@@ -431,29 +443,32 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     o = build_cases_dispatch(aTHX_ matchinfo->opcode, padix,
         n_dispatch, blocks, o);
 
-  *out = block_end(floor_ix, newLISTOP(OP_LINESEQ, 0, startop, o));
+  *out = newLISTOP(OP_LINESEQ, 0, startop, o);
 
   return KEYWORD_PLUGIN_STMT;
 }
 
 static const struct XSParseKeywordHooks hooks_match = {
+  .flags = XPK_FLAG_BLOCKSCOPE,
   .permit_hintkey = "Syntax::Keyword::Match/match",
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_PARENSCOPE( /* ( EXPR : OP ) */
+    XPK_PARENS(     /* ( EXPR : OP ) */
       XPK_TERMEXPR_SCALARCTX,
       XPK_COLON,
       XPK_INFIX_MATCH_NOSMART
     ),
-    XPK_BRACESCOPE( /* { blocks... } */
+    XPK_INTRO_MY,
+    XPK_BRACES(     /* { blocks... } */
       XPK_REPEATED(     /* case (EXPR) {BLOCK} */
         XPK_COMMALIST(
           XPK_KEYWORD("case"),
-          XPK_PARENSCOPE( XPK_TERMEXPR_SCALARCTX )
+          XPK_OPTIONAL( XPK_KEYWORD("if") ),
+          XPK_PARENS( XPK_TERMEXPR_SCALARCTX )
         ),
         XPK_BLOCK
       ),
-      XPK_OPTIONAL( /* default { ... } */
+      XPK_OPTIONAL(     /* default { ... } */
         XPK_KEYWORD("default"),
         XPK_BLOCK
       )
@@ -463,10 +478,85 @@ static const struct XSParseKeywordHooks hooks_match = {
   .build = &build_match,
 };
 
+#ifndef HAVE_OP_ISA
+#include "hax/newOP_CUSTOM.c.inc"
+
+/* Can't use sv_isa_sv() because that was only added in 5.32 */
+static bool S_sv_isa_sv(pTHX_ SV *sv, SV *namesv)
+{
+  if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
+    return FALSE;
+
+  /* Also can't use GV_NOUNIVERSAL here because that also only turned up in 5.32 */
+  GV *isagv = gv_fetchmeth_pvn(SvSTASH(SvRV(sv)), "isa", 3, -1, 0);
+  /* This probably finds UNIVERSAL::isa; if so we can avoid it and just do it
+   * directly ourselves by calling sv_derived_from_sv()
+   */
+  if(isagv && !strEQ(HvNAME(GvSTASH(isagv)), "UNIVERSAL")) {
+    dSP;
+    CV *isacv = isGV(isagv) ? GvCV(isagv) : MUTABLE_CV(isagv);
+
+    PUTBACK;
+
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHs(sv);
+    PUSHs(namesv);
+    PUTBACK;
+
+    call_sv((SV *)isacv, G_SCALAR);
+
+    SPAGAIN;
+    SV *retsv = POPs;
+    bool ret = SvTRUE(retsv);
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+  }
+
+  return sv_derived_from_sv(sv, namesv, 0);
+}
+
+static OP *pp_isa(pTHX)
+{
+  dSP;
+  SV *rhs = POPs;
+  SV *lhs = TOPs;
+
+  SETs(boolSV(S_sv_isa_sv(aTHX_ lhs, rhs)));
+  RETURN;
+}
+
+static OP *newop_isa(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void *hookdata)
+{
+  /* Avoid strictness failure on bareword RHS */
+  if(rhs->op_type == OP_CONST && rhs->op_private & OPpCONST_BARE)
+    rhs->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
+
+  return newBINOP_CUSTOM(&pp_isa, flags, lhs, rhs);
+}
+
+static const struct XSParseInfixHooks hooks_isa = {
+  .flags = 0,
+  .cls   = XPI_CLS_ISA,
+
+  .new_op = &newop_isa,
+};
+#endif
+
 MODULE = Syntax::Keyword::Match    PACKAGE = Syntax::Keyword::Match
 
 BOOT:
-  boot_xs_parse_keyword(0.23);
+  boot_xs_parse_keyword(0.36);
   boot_xs_parse_infix(0);
 
   register_xs_parse_keyword("match", &hooks_match, NULL);
+#ifndef HAVE_OP_ISA
+  register_xs_parse_infix("isa", &hooks_isa, NULL);
+#endif

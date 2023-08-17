@@ -1,3 +1,4 @@
+use lib '.';
 use strict;
 use warnings;
 
@@ -26,7 +27,7 @@ test_requires 'File::Object' => 0.07;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

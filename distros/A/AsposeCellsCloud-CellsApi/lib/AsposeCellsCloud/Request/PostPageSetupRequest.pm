@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostPageSetupRequest.name :   ,
-# PostPageSetupRequest.sheetName :   ,
-# PostPageSetupRequest.pageSetup :   ,
-# PostPageSetupRequest.folder :   ,
-# PostPageSetupRequest.storageName :    
+# PostPageSetupRequest.name : The workbook name.  ,
+# PostPageSetupRequest.sheetName : The worksheet name.  ,
+# PostPageSetupRequest.pageSetup : Page Setup description.  ,
+# PostPageSetupRequest.folder : Original workbook folder.  ,
+# PostPageSetupRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_page_setup' } = { 
-    	summary => '',
+    	summary => 'Updates page setup in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'page_setup' => {
      	datatype => 'PageSetup',
      	base_name => 'pageSetup',
-     	description => '',
+     	description => 'Page Setup description.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

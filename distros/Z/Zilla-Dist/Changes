@@ -1,3 +1,9 @@
+0.1.18 Sat Jul 22 07:39:03 PM PDT 2023
+ - Add Dist::Zilla::Plugin::MakeMaker::Awesome to requires
+
+0.1.17 Tue Jun 27 09:29:55 AM EDT 2023
+ - Update Meta and YAML::PP dependency
+
 0.1.16 Fri May 26 09:57:53 PM PDT 2023
  - Make Meta merge be RIGHT_PRECEDENT
 

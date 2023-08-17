@@ -38,8 +38,16 @@ print $tags->flush."\n";
 
 # Output:
 # CSS
-# .table table, .table th, .table td {
-#         border: 1px solid black;
+# .table, .table td, .table th {
+#         border: 1px solid #ddd;
+#         text-align: left;
+# }
+# .table {
+#         border-collapse: collapse;
+#         width: 100%;
+# }
+# .table th, .table td {
+#         padding: 15px;
 # }
 #
 # HTML

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -9,9 +9,7 @@
 
 #include "XSParseInfix.h"
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
-
+#include "perl-backcompat.c.inc"
 #include "newOP_CUSTOM.c.inc"
 #include "OP_HELEMEXISTSOR.c.inc"
 

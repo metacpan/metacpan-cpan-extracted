@@ -11,8 +11,7 @@ use PerlX::Maybe;
 use POSIX qw/ ceil floor /;
 use MooX::Aliases;
 use MooX::TypeTiny;
-use Types::Common::Numeric qw/ PositiveOrZeroInt PositiveInt /;
-use Types::Standard qw/ is_Int Int ArrayRef is_HashRef /;
+use Types::Common 2.000000 qw/ is_Int Int ArrayRef is_HashRef PositiveOrZeroInt PositiveInt /;
 
 
 use asa 'Data::Page';
@@ -22,7 +21,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Type::Tiny::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.3.3';
 
 
 has total_entries => (
@@ -329,7 +328,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 =head1 VERSION
 
-version v0.3.2
+version v0.3.3
 
 =head1 SYNOPSIS
 
@@ -505,6 +504,12 @@ exponent is set to C<1>:
     pages_per_set      => 10,
   );
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.10.1 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 =head1 SEE ALSO
 
 =over
@@ -541,7 +546,7 @@ Test code was adapted from L<Data::Page> to ensure compatability.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

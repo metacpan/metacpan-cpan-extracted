@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Dec  2 12:34:19 EST 2022
-#    Data version: tzdata2022g
-#    Code version: tzcode2022g
+#    Generated on: Wed Jun  7 12:25:41 EDT 2023
+#    Data version: tzdata2023c
+#    Code version: tzcode2023c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.91';
+$VERSION='6.92';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,11 +37,11 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2022g';
-$TzcodeVersion = 'tzcode2022g';
+$TzdataVersion = 'tzdata2023c';
+$TzcodeVersion = 'tzcode2023c';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
-$LastYear      = '2092';
+$LastYear      = '2093';
 
 
 %Module = (
@@ -184,7 +184,6 @@ $LastYear      = '2092';
   'america/whitehorse'                 => 'amwhit00',
   'america/winnipeg'                   => 'amwinn00',
   'america/yakutat'                    => 'amyaku00',
-  'america/yellowknife'                => 'amyell00',
   'antarctica/casey'                   => 'ancase00',
   'antarctica/davis'                   => 'andavi00',
   'antarctica/macquarie'               => 'anmacq00',
@@ -557,7 +556,6 @@ $LastYear      = '2092';
   'america/whitehorse'                 => 'America/Whitehorse',
   'america/winnipeg'                   => 'America/Winnipeg',
   'america/yakutat'                    => 'America/Yakutat',
-  'america/yellowknife'                => 'America/Yellowknife',
   'antarctica/casey'                   => 'Antarctica/Casey',
   'antarctica/davis'                   => 'Antarctica/Davis',
   'antarctica/macquarie'               => 'Antarctica/Macquarie',
@@ -931,7 +929,6 @@ $LastYear      = '2092';
   'america/whitehorse'                 => 'america/whitehorse',
   'america/winnipeg'                   => 'america/winnipeg',
   'america/yakutat'                    => 'america/yakutat',
-  'america/yellowknife'                => 'america/yellowknife',
   'antarctica/casey'                   => 'antarctica/casey',
   'antarctica/davis'                   => 'antarctica/davis',
   'antarctica/macquarie'               => 'antarctica/macquarie',
@@ -1243,6 +1240,7 @@ $LastYear      = '2092';
   'america/thunder_bay'                => 'america/toronto',
   'america/tortola'                    => 'america/puerto_rico',
   'america/virgin'                     => 'america/puerto_rico',
+  'america/yellowknife'                => 'america/edmonton',
   'antarctica/dumontdurville'          => 'pacific/port_moresby',
   'antarctica/mcmurdo'                 => 'pacific/auckland',
   'antarctica/south_pole'              => 'pacific/auckland',
@@ -1524,6 +1522,7 @@ $LastYear      = '2092';
   'america/thunder_bay'                => 'america/toronto',
   'america/tortola'                    => 'america/puerto_rico',
   'america/virgin'                     => 'america/puerto_rico',
+  'america/yellowknife'                => 'america/edmonton',
   'antarctica/dumontdurville'          => 'pacific/port_moresby',
   'antarctica/mcmurdo'                 => 'pacific/auckland',
   'antarctica/south_pole'              => 'pacific/auckland',
@@ -2146,6 +2145,7 @@ $LastYear      = '2092';
                      'europe/chisinau',
                      'asia/gaza',
                      'asia/hebron',
+                     'africa/cairo',
                      'europe/helsinki',
                      'asia/famagusta',
                      'asia/nicosia',
@@ -2157,7 +2157,6 @@ $LastYear      = '2092';
                      'asia/damascus',
                      'asia/amman',
                      'europe/istanbul',
-                     'africa/cairo',
                      'europe/simferopol',
                      'europe/kaliningrad',
                      'europe/minsk',
@@ -2321,7 +2320,6 @@ $LastYear      = '2092';
                      'america/ciudad_juarez',
                      'america/boise',
                      'america/cambridge_bay',
-                     'america/yellowknife',
                      'america/inuvik',
                      'america/chihuahua',
                      'america/mazatlan',
@@ -2354,9 +2352,10 @@ $LastYear      = '2092';
                      'america/north_dakota/center',
                      'america/north_dakota/new_salem',
                      'america/regina',
-                     'america/swift_current',
-                     'america/yellowknife' ],
+                     'america/swift_current' ],
   'msd'         => [ 'europe/moscow',
+                     'europe/volgograd',
+                     'europe/kirov',
                      'europe/simferopol',
                      'europe/chisinau',
                      'europe/kyiv',
@@ -2367,6 +2366,8 @@ $LastYear      = '2092';
                      'europe/vilnius' ],
   'msk'         => [ 'europe/moscow',
                      'europe/simferopol',
+                     'europe/volgograd',
+                     'europe/kirov',
                      'europe/minsk',
                      'europe/kyiv',
                      'europe/chisinau',
@@ -2382,7 +2383,6 @@ $LastYear      = '2092';
                      'america/hermosillo',
                      'america/mazatlan',
                      'america/boise',
-                     'america/yellowknife',
                      'america/dawson_creek',
                      'america/inuvik',
                      'america/fort_nelson',
@@ -2408,7 +2408,6 @@ $LastYear      = '2092';
                      'america/north_dakota/new_salem',
                      'america/regina',
                      'america/swift_current',
-                     'america/yellowknife',
                      'america/phoenix' ],
   'n'           => [ 'n' ],
   'nddt'        => [ 'america/st_johns' ],

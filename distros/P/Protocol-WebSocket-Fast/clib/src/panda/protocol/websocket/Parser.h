@@ -148,6 +148,8 @@ struct Parser : virtual panda::Refcnt {
         if (!_flags[ESTABLISHED]) _deflate_cfg.reset();
     }
 
+    bool should_deflate(Opcode opcode, size_t payload_length) const;
+
     virtual ~Parser () {}
 
 protected:

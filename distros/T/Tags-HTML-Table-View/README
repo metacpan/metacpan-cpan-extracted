@@ -20,7 +20,7 @@ METHODS
 
     *       "css"
 
-            'CSS::Struct::Output' object for process_css processing.
+            'CSS::Struct::Output' object for "process_css" processing.
 
             Default value is undef.
 
@@ -38,7 +38,7 @@ METHODS
 
     *       "tags"
 
-            'Tags::Output' object.
+            'Tags::Output' object for "process" processing.
 
             Default value is undef.
 
@@ -52,9 +52,13 @@ METHODS
   "init"
      $obj->init($data_ar, $no_data_value);
 
-    Process initialization before page run. Variable $data_ar are data for
-    table. Variable $no_data_value contain information for situation when
-    data in table not exists.
+    Process initialization before page run.
+
+    Variable $data_ar are data for table. Each item in array could be
+    scalar, array with scalars or Data::HTML::A instance.
+
+    Variable $no_data_value contain information for situation when data in
+    table not exists.
 
     Returns undef.
 
@@ -128,8 +132,16 @@ EXAMPLE1
 
      # Output:
      # CSS
-     # .table table, .table th, .table td {
-     #         border: 1px solid black;
+     # .table, .table td, .table th {
+     #         border: 1px solid #ddd;
+     #         text-align: left;
+     # }
+     # .table {
+     #         border-collapse: collapse;
+     #         width: 100%;
+     # }
+     # .table th, .table td {
+     #         padding: 15px;
      # }
      #
      # HTML
@@ -179,7 +191,9 @@ EXAMPLE2
      );
 
      # Table data.
-     my $table_data_ar = [];
+     my $table_data_ar = [
+             ['Country', 'Capital'],
+     ];
 
      # Process login button.
      $obj->init($table_data_ar, 'No data.');
@@ -197,15 +211,15 @@ EXAMPLE2
 
      # Output:
      # CSS
-     # table, td, th {
+     # .table, .table td, .table th {
      #         border: 1px solid #ddd;
      #         text-align: left;
      # }
-     # table {
+     # .table {
      #         border-collapse: collapse;
      #         width: 100%;
      # }
-     # th, td {
+     # .table th, .table td {
      #         padding: 15px;
      # }
      #
@@ -213,10 +227,104 @@ EXAMPLE2
      # <body>
      #   <table class="table">
      #     <tr>
+     #       <th>
+     #         Country
+     #       </th>
+     #       <th>
+     #         Capital
+     #       </th>
      #     </tr>
      #     <tr>
-     #       <td colspan="0">
+     #       <td colspan="2">
      #         No data.
+     #       </td>
+     #     </tr>
+     #   </table>
+     # </body>
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Data::HTML::A;
+     use Tags::HTML::Table::View;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Table::View->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Table data.
+     my $prague = Data::HTML::A->new(
+             'data' => ['Prague'],
+             'url' => 'https://prague.cz',
+     );
+     my $table_data_ar = [
+             ['Country', 'Capital'],
+             ['Czech Republic', $prague],
+             ['Russia', 'Moscow'],
+     ];
+
+     # Process login button.
+     $obj->init($table_data_ar, 'No data.');
+     $obj->process_css;
+     $tags->put(['b', 'body']);
+     $obj->process;
+     $tags->put(['e', 'body']);
+     $obj->cleanup;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .table, .table td, .table th {
+     #         border: 1px solid #ddd;
+     #         text-align: left;
+     # }
+     # .table {
+     #         border-collapse: collapse;
+     #         width: 100%;
+     # }
+     # .table th, .table td {
+     #         padding: 15px;
+     # }
+     # 
+     # HTML
+     # <body>
+     #   <table class="table">
+     #     <tr>
+     #       <th>
+     #         Country
+     #       </th>
+     #       <th>
+     #         Capital
+     #       </th>
+     #     </tr>
+     #     <tr>
+     #       <td>
+     #         Czech Republic
+     #       </td>
+     #       <td>
+     #         <a href="https://prague.cz">
+     #           Prague
+     #         </a>
+     #       </td>
+     #     </tr>
+     #     <tr>
+     #       <td>
+     #         Russia
+     #       </td>
+     #       <td>
+     #         Moscow
      #       </td>
      #     </tr>
      #   </table>
@@ -234,10 +342,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2022 Michal Josef Špaček
+    © 2021-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

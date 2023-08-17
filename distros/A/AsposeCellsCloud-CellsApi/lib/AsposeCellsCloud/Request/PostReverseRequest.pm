@@ -60,8 +60,8 @@ sub new {
 
 # Run Operation Request
 # PostReverseRequest.File : File to upload  ,
-# PostReverseRequest.rotateType :   ,
-# PostReverseRequest.format :   ,
+# PostReverseRequest.rotateType : rows/cols/both  ,
+# PostReverseRequest.format : CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers  ,
 # PostReverseRequest.password :   ,
 # PostReverseRequest.checkExcelRestriction :    
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_reverse' } = { 
-    	summary => '',
+    	summary => 'Reverse rows or columns of Excel files, save as kinds of format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -145,14 +145,14 @@ __PACKAGE__->method_documentation({
      'rotate_type' => {
      	datatype => 'string',
      	base_name => 'rotateType',
-     	description => '',
+     	description => 'rows/cols/both',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers',
      	format => '',
      	read_only => '',
      		},

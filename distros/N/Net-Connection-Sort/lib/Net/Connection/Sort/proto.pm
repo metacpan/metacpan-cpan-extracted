@@ -157,14 +157,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-Sort>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Connection-Sort>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Net-Connection-Sort>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Net-Connection-Sort>

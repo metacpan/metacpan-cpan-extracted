@@ -1,0 +1,55 @@
+{
+   "abstract" : "match::simple but as a real infix operator",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Syntax-Operator-Matches",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "XS::Parse::Infix::Builder" : "0.26"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XS::Parse::Infix" : "0.26",
+            "match::simple" : "0.012",
+            "perl" : "5.038"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Operator::Matches" : {
+         "file" : "lib/Syntax/Operator/Matches.pm",
+         "version" : "0.000003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.000003",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

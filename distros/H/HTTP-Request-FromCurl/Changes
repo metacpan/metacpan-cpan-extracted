@@ -1,3 +1,6 @@
+0.51 2023-07-21
+    * Various test suite and build updates, no code changes, no need to upgrade
+
 0.50 2023-04-22
     * Don't accept "--form" for wget - it doesn't exist there
     * Fix test count when skipping tests

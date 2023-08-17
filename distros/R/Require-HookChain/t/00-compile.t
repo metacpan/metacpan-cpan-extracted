@@ -6,20 +6,26 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'RHC.pm',
     'Require/HookChain.pm',
+    'Require/HookChain/debug/dump_source/logger.pm',
+    'Require/HookChain/debug/dump_source/stderr.pm',
     'Require/HookChain/log/logger.pm',
     'Require/HookChain/log/stderr.pm',
     'Require/HookChain/munge/prepend.pm',
+    'Require/HookChain/source/test/code.pm',
+    'Require/HookChain/source/test/str.pm',
     'Require/HookChain/test/fail.pm',
     'Require/HookChain/test/noop.pm',
     'Require/HookChain/test/noop_all.pm',
     'Require/HookChain/test/random_fail.pm',
     'Require/HookChain/timestamp/hires.pm',
-    'Require/HookChain/timestamp/std.pm'
+    'Require/HookChain/timestamp/std.pm',
+    'Require/HookChainTest/One.pm',
+    'Require/HookChainTest/Two.pm'
 );
 
 

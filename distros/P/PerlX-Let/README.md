@@ -4,7 +4,7 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 # VERSION
 
-version v0.2.8
+version v0.3.0
 
 # SYNOPSIS
 
@@ -90,27 +90,6 @@ variable as read-only, particularly for deeper data structures.
 However, the tradeoff for using this is that the variables remain
 allocated until the process exits.
 
-# DEPRECATED SYNTAX
-
-Adding a code block after the let assignment is deprecated:
-
-```
-let $x = "foo" {
-  ...
-}
-```
-
-Instead, put the assignment inside of the block.
-
-Specifying multiple assignments is also deprecated:
-
-```
-let $x = "foo",
-    $y = "bar";
-```
-
-Instead, use multiple let statements.
-
 # KNOWN ISSUES
 
 A let assignment will enable the state feature inside of the current
@@ -125,13 +104,19 @@ Because this modifies the source code during compilation, the line
 numbers may be changed, particularly if the let assignment(s) are on
 multiple lines.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+The this module requires Perl v5.12 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
 # SEE ALSO
 
 [feature](https://metacpan.org/pod/feature)
 
-[Const::Fast](https://metacpan.org/pod/Const::Fast)
+[Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
 
-[Keyword::Simple](https://metacpan.org/pod/Keyword::Simple)
+[Keyword::Simple](https://metacpan.org/pod/Keyword%3A%3ASimple)
 
 # AUTHOR
 
@@ -139,7 +124,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Robert Rothenberg.
+This software is Copyright (c) 2019-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

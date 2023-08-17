@@ -41,7 +41,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 =head1 NAME
 
@@ -240,13 +240,13 @@ sub _error_handling {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
-                $logger->fatal($error);
+                $logger->fatal($error->message());
 
               # must stop processing the HTML for this report and move to next
                 return 1;
             }
             else {
-                $logger->error($error);
+                $logger->error($error->message());
             }
 
         }
@@ -391,7 +391,7 @@ sub main_loop {
         if ( @{$warns_ref} ) {
 
             foreach my $warning ( @{$warns_ref} ) {
-                $logger->warn( $warning->message );
+                $logger->warn( $warning->message() );
             }
 
         }
@@ -404,13 +404,13 @@ sub main_loop {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
-                $logger->fatal( $error->message );
+                $logger->fatal( $error->message() );
 
               # must stop processing the HTML for this report and move to next
                 return 0;
             }
             else {
-                $logger->error( $error->message );
+                $logger->error( $error->message() );
             }
 
         }

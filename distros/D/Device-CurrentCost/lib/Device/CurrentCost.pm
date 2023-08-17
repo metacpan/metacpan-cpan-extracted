@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Device::CurrentCost;
-$Device::CurrentCost::VERSION = '1.142240';
+$Device::CurrentCost::VERSION = '1.232151';
 # ABSTRACT: Perl modules for Current Cost energy monitors
 
 
@@ -10,7 +10,7 @@ use constant DEBUG => $ENV{DEVICE_CURRENT_COST_DEBUG};
 use Carp qw/croak carp/;
 use Device::CurrentCost::Constants;
 use Device::CurrentCost::Message;
-use Device::SerialPort qw/:PARAM :STAT 0.07/;
+use Device::SerialPort;
 use Fcntl;
 use IO::Handle;
 use IO::Select;
@@ -183,7 +183,7 @@ Device::CurrentCost - Perl modules for Current Cost energy monitors
 
 =head1 VERSION
 
-version 1.142240
+version 1.232151
 
 =head1 SYNOPSIS
 

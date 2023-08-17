@@ -3,14 +3,14 @@ use strict;
 use Carp qw(croak);
 use Moo 2;
 use Filter::signatures;
+use XML::Simple qw(:strict);
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Net::Fritz::PhonebookEntry::Number;
 use Net::Fritz::PhonebookEntry::Mail;
 
-use vars '$VERSION';
-$VERSION = '0.05';
+our $VERSION = '0.07';
 
 our $has_DeletePhonebookEntryUID = 1;
 
@@ -341,9 +341,14 @@ sub delete( $self, %options ) {
 }
 
 sub save( $self ) {
-    my $payload = $self->build_structure;
+    my $payload = XMLout(
+        $self->build_structure,
+        RootName => 'contact',
+        XMLDecl  => 1,
+        KeyAttr  => [],
+    );
 
-    $self->phonebook->service->call('AddPhonebookEntry',
+    $self->phonebook->service->call('SetPhonebookEntry',
         NewPhonebookID => $self->phonebook->id,
         NewPhonebookEntryID => $self->uniqueid,
         NewPhonebookEntryData => $payload,
@@ -374,7 +379,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2017-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

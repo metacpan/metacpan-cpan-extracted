@@ -335,6 +335,8 @@ no Moose;
 
 package Media::Convert::Asset::ProfileFactory;
 
+use Module::Runtime qw/require_module/;
+
 sub create {
 	my $class = shift;
 	my $profile = shift;
@@ -346,12 +348,11 @@ sub create {
 	}
 
 	if(!exists($profiles->{$profile})) {
-		eval "require Media::Convert::Asset::Profile::$profile;"; ## no critic(StringyEval)
-
+		require_module("Media::Convert::Asset::Profile::$profile");
 		return "Media::Convert::Asset::Profile::$profile"->new(url => '', reference => $ref);
 	} else {
 		my $parent = $profiles->{$profile}{parent};
-		eval "require Media::Convert::Asset::Profile::$parent;"; ## no critic(StringyEval)
+		require_module("Media::Convert::Asset::Profile::$parent");
 		my $rv = "Media::Convert::Asset::Profile::$parent"->new(url => '', reference => $ref);
 		foreach my $param(keys %{$profiles->{$profile}{settings}}) {
 			$rv->meta->find_attribute_by_name($param)->set_value($rv, $profiles->{$profile}{settings}{$param});

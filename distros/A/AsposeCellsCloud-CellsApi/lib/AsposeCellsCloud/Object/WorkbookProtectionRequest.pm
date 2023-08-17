@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Used by workbook protection requests.',
                                   class => 'WorkbookProtectionRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'protection_type' => {
      	datatype => 'string',
      	base_name => 'ProtectionType',
-     	description => '',
+     	description => 'Protection type. Can be ALL, CONTENTS, NONE, OBJECTS, SCENARIOS, STRUCTURE, WINDOWS  ',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'Password',
-     	description => '',
+     	description => 'Encription password.',
      	format => '',
      	read_only => '',
      		},    

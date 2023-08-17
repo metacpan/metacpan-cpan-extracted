@@ -1,5 +1,5 @@
 package Math::Currency::ja_JP;
-$Math::Currency::ja_JP::VERSION = '0.52';
+$Math::Currency::ja_JP::VERSION = '0.53';
 # ABSTRACT: ja_JP Locale Module for Math::Currency
 
 use utf8;
@@ -36,23 +36,29 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Math::Currency::ja_JP - ja_JP Locale Module for Math::Currency
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/perl-math-currency>
-and may be cloned from L<git://github.com/mschout/perl-math-currency.git>
+The development version is on github at L<https://https://github.com/mschout/perl-math-currency>
+and may be cloned from L<git://https://github.com/mschout/perl-math-currency.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-math-currency@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Currency
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-math-currency/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

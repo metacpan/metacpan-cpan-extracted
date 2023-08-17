@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Modern
 
+0.046     2023-06-24 21:56:39Z
+          - extra validation for Transfer-Encoding response header
+
+0.045     2023-06-06 04:15:18Z
+          - fix test for changes in JSON::Schema::Modern 0.567
+          - now ensuring that $ref locations are to the correct entity type
+
 0.044     2023-05-23 02:08:54Z
           - revert changes to YAML parsing in 0.043, pending fixes to YAML::XS
 

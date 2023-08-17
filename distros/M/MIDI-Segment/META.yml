@@ -1,0 +1,28 @@
+---
+abstract: 'means to segment MIDI by equal duration'
+author:
+  - 'Jeremy Mates <jmates@thrig.me>'
+build_requires:
+  MIDI: '0'
+  Test2::V0: '0.000060'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIDI-Segment
+provides:
+  MIDI::Segment:
+    file: lib/MIDI/Segment.pm
+    version: '0.03'
+requires:
+  MIDI: '0'
+  perl: v5.10.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://thrig.me/src/MIDI-Segment.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

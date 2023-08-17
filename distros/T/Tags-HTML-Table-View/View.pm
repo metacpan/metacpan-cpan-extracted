@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -45,10 +45,6 @@ sub _cleanup {
 sub _init {
 	my ($self, $data_ar, $no_data_value) = @_;
 
-	if (exists $self->{'_data'}) {
-		return;
-	}
-
 	$self->{'_data'} = $data_ar;
 	$self->{'_no_data'} = $no_data_value;
 
@@ -58,6 +54,10 @@ sub _init {
 # Process 'Tags'.
 sub _process {
 	my $self = shift;
+
+	if (! exists $self->{'_data'}) {
+		return;
+	}
 
 	# Main content.
 	$self->{'tags'}->put(
@@ -128,20 +128,20 @@ sub _process_css {
 	my $self = shift;
 
 	$self->{'css'}->put(
-		['s', 'table'],
-		['s', 'td'],
-		['s', 'th'],
+		['s', '.'.$self->{'css_table'}],
+		['s', '.'.$self->{'css_table'}.' td'],
+		['s', '.'.$self->{'css_table'}.' th'],
 		['d', 'border', '1px solid #ddd'],
 		['d', 'text-align', 'left'],
 		['e'],
 
-		['s', 'table'],
+		['s', '.'.$self->{'css_table'}],
 		['d', 'border-collapse', 'collapse'],
 		['d', 'width', '100%'],
 		['e'],
 
-		['s', 'th'],
-		['s', 'td'],
+		['s', '.'.$self->{'css_table'}.' th'],
+		['s', '.'.$self->{'css_table'}.' td'],
 		['d', 'padding', '15px'],
 		['e'],
 	);
@@ -163,7 +163,7 @@ sub _tags_a {
 	);
 	if ($value->data_type eq 'plain') {
 		$self->{'tags'}->put(
-			['d', $value->data],
+			['d', @{$value->data}],
 		);
 	} elsif ($value->data_type eq 'tags') {
 		$self->{'tags'}->put($value->data);
@@ -229,7 +229,7 @@ Returns instance of object.
 
 =item * C<css>
 
-'CSS::Struct::Output' object for L<process_css> processing.
+'L<CSS::Struct::Output>' object for L</process_css> processing.
 
 Default value is undef.
 
@@ -247,7 +247,7 @@ Default value is 1.
 
 =item * C<tags>
 
-'Tags::Output' object.
+'L<Tags::Output>' object for L</process> processing.
 
 Default value is undef.
 
@@ -266,7 +266,10 @@ Returns undef.
  $obj->init($data_ar, $no_data_value);
 
 Process initialization before page run.
-Variable C<$data_ar> are data for table.
+
+Variable C<$data_ar> are data for table. Each item in array could be scalar,
+array with scalars or L<Data::HTML::A> instance.
+
 Variable C<$no_data_value> contain information for situation when data in table not
 exists.
 
@@ -276,7 +279,7 @@ Returns undef.
 
  $obj->process;
 
-Process Tags structure for table view.
+Process L<Tags> structure for table view.
 
 Returns undef.
 
@@ -284,7 +287,7 @@ Returns undef.
 
  $obj->process_css;
 
-Process CSS::Struct structure for output.
+Process L<CSS::Struct> structure for output.
 
 Returns undef.
 
@@ -348,8 +351,16 @@ Returns undef.
 
  # Output:
  # CSS
- # .table table, .table th, .table td {
- #         border: 1px solid black;
+ # .table, .table td, .table th {
+ #         border: 1px solid #ddd;
+ #         text-align: left;
+ # }
+ # .table {
+ #         border-collapse: collapse;
+ #         width: 100%;
+ # }
+ # .table th, .table td {
+ #         padding: 15px;
  # }
  #
  # HTML
@@ -422,15 +433,15 @@ Returns undef.
 
  # Output:
  # CSS
- # table, td, th {
+ # .table, .table td, .table th {
  #         border: 1px solid #ddd;
  #         text-align: left;
  # }
- # table {
+ # .table {
  #         border-collapse: collapse;
  #         width: 100%;
  # }
- # th, td {
+ # .table th, .table td {
  #         padding: 15px;
  # }
  #
@@ -448,6 +459,97 @@ Returns undef.
  #     <tr>
  #       <td colspan="2">
  #         No data.
+ #       </td>
+ #     </tr>
+ #   </table>
+ # </body>
+
+=head1 EXAMPLE3
+
+=for comment filename=print_table_with_data_object.pl
+
+ use strict;
+ use warnings;
+
+ use CSS::Struct::Output::Indent;
+ use Data::HTML::A;
+ use Tags::HTML::Table::View;
+ use Tags::Output::Indent;
+
+ # Object.
+ my $css = CSS::Struct::Output::Indent->new;
+ my $tags = Tags::Output::Indent->new;
+ my $obj = Tags::HTML::Table::View->new(
+         'css' => $css,
+         'tags' => $tags,
+ );
+
+ # Table data.
+ my $prague = Data::HTML::A->new(
+         'data' => ['Prague'],
+         'url' => 'https://prague.cz',
+ );
+ my $table_data_ar = [
+         ['Country', 'Capital'],
+         ['Czech Republic', $prague],
+         ['Russia', 'Moscow'],
+ ];
+
+ # Process login button.
+ $obj->init($table_data_ar, 'No data.');
+ $obj->process_css;
+ $tags->put(['b', 'body']);
+ $obj->process;
+ $tags->put(['e', 'body']);
+ $obj->cleanup;
+
+ # Print out.
+ print "CSS\n";
+ print $css->flush."\n\n";
+ print "HTML\n";
+ print $tags->flush."\n";
+
+ # Output:
+ # CSS
+ # .table, .table td, .table th {
+ #         border: 1px solid #ddd;
+ #         text-align: left;
+ # }
+ # .table {
+ #         border-collapse: collapse;
+ #         width: 100%;
+ # }
+ # .table th, .table td {
+ #         padding: 15px;
+ # }
+ # 
+ # HTML
+ # <body>
+ #   <table class="table">
+ #     <tr>
+ #       <th>
+ #         Country
+ #       </th>
+ #       <th>
+ #         Capital
+ #       </th>
+ #     </tr>
+ #     <tr>
+ #       <td>
+ #         Czech Republic
+ #       </td>
+ #       <td>
+ #         <a href="https://prague.cz">
+ #           Prague
+ #         </a>
+ #       </td>
+ #     </tr>
+ #     <tr>
+ #       <td>
+ #         Russia
+ #       </td>
+ #       <td>
+ #         Moscow
  #       </td>
  #     </tr>
  #   </table>
@@ -473,12 +575,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

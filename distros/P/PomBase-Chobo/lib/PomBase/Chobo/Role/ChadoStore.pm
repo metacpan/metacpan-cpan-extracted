@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.038'; # VERSION
+our $VERSION = '0.039'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -295,6 +295,7 @@ my %row_makers = (
 
       my $helper = sub {
         my $id = shift;
+
         my $is_for_definition = shift;
 
         my $cvterm_id = $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
@@ -308,21 +309,21 @@ my %row_makers = (
 
         my $key = "$cvterm_id - $dbxref_id";
         if (exists $seen_cvterm_dbxrefs{$key}) {
-          warn "not storing duplicate cvterm_dbxref for ", $dbxref_details->{termid};
           ()
         } else {
-          if ($is_for_definition) {
-            $seen_cvterm_dbxrefs{$key} = 1;
-          }
+          $seen_cvterm_dbxrefs{$key} = 1;
           [$cvterm_id, $dbxref_id, $is_for_definition]
         }
       };
 
-      my @ret = map { $helper->($_->{id}, 0) } $term->alt_ids();
+      my @ret = ();
 
       if ($term->def()) {
         push @ret, map { $helper->($_, 1) } @{$term->def()->{dbxrefs}}
       }
+
+      push @ret, map { $helper->($_->{id}, 0) } $term->alt_ids();
+      push @ret, map { $helper->($_, 0) } $term->xrefs();
 
       @ret;
     } $ontology_data->get_terms();

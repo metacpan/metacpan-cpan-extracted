@@ -60,7 +60,7 @@ sub new {
 
 # Run Operation Request
 # PostClearObjectsRequest.File : File to upload  ,
-# PostClearObjectsRequest.objecttype :   ,
+# PostClearObjectsRequest.objecttype : chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background  ,
 # PostClearObjectsRequest.sheetname :   ,
 # PostClearObjectsRequest.outFormat :   ,
 # PostClearObjectsRequest.password :   ,
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_clear_objects' } = { 
-    	summary => '',
+    	summary => 'Clear excel internal elements for excel files',
         params => $params,
         returns => 'FilesResult',
     };
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'objecttype' => {
      	datatype => 'string',
      	base_name => 'objecttype',
-     	description => '',
+     	description => 'chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background',
      	format => '',
      	read_only => '',
      		},

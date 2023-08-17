@@ -119,6 +119,10 @@ For handler, L<curry> is very handy and much better than to write a bunch of ano
         _handler => sub{ $self->user_pm( @_ ) },
     }
 
+=head2 is_method_allowed
+
+Provided with an HTTP method name, such as C<POST> or C<GET>, and this will return true, if this method is allowed for this endpoint, or false otherwise.
+
 =head2 methods
 
 Sets or gets the array reference of allowed methods for this endpoint. For example C<GET>, C<POST>, C<PUT>, C<DELETE>

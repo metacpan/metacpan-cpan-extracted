@@ -25,6 +25,10 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
+    # Curses::UI on Cygwin already fails to get the terminal size (at least
+    # on Smokers), so:
+    $^O =~ m/^(?:cygwin)$/
+	and  plan skip_all => "Curses::UI' doesn't work properly on $^O";
     plan tests => 65;
 
     # define fixed environment for unit tests:

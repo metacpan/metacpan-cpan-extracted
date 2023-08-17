@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 0.018 of
+This documentation refers to version 1.000 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 =cut
 
-our $VERSION = '0.018';
+our $VERSION = '1.000';
 
 =head1 TABLE: C<difference_set>
 
@@ -39,22 +39,22 @@ __PACKAGE__->table("difference_set");
   data_type: 'integer'
   is_nullable: 0
 
-=head2 exponent
+=head2 ref_std
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 modulus
+=head2 ref_lex
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 n_planes
+=head2 ref_gap
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 deltas
+=head2 delta_main
 
   data_type: 'blob'
   is_nullable: 0
@@ -66,33 +66,33 @@ __PACKAGE__->add_columns(
   { accessor => "order", data_type => "integer", is_nullable => 0 },
   "base",
   { data_type => "integer", is_nullable => 0 },
-  "exponent",
+  "ref_std",
   { data_type => "integer", is_nullable => 0 },
-  "modulus",
+  "ref_lex",
   { data_type => "integer", is_nullable => 0 },
-  "n_planes",
+  "ref_gap",
   { data_type => "integer", is_nullable => 0 },
-  "deltas",
+  "delta_main",
   { data_type => "blob", is_nullable => 0 },
 );
 
-=head2 elements
+=head2 main_elements
 
-I<elements> is a wrapper for I<deltas> generating an array of elements
-values from the deltas raw data.  It returns an array reference if
-deltas is defined, otherwise undef.
+I<main_elements> is a wrapper for I<delta_main> generating an array of
+elements values from the deltas raw data.  It returns an array reference
+if deltas are defined, otherwise undef.
 
-Unpacking deltas raw data into elements is part of the resultset API,
-as different implementations may employ different packing mechanisms.
+Unpacking delta_main raw data into element values is part of the resultset
+API, as different implementations may employ different packing mechanisms.
 
 =cut
 
-sub elements {
+sub main_elements {
     my ($this) = @_;
-    my $deltas = $this->deltas;
-    return undef if !defined $deltas;
+    my $delta_main = $this->delta_main;
+    return undef if !defined $delta_main;
     my $sum = 0;
-    my @elements = map { $sum += $_ } 0, 1, unpack 'w*', $deltas;
+    my @elements = map { $sum += $_ } unpack 'w*', $delta_main;
     return \@elements;
 }
 
@@ -118,6 +118,10 @@ __PACKAGE__->set_primary_key("order_");
 
 L<Math::DifferenceSet::Planar::Schema> - schema class.
 
+=item *
+
+L<Math::DifferenceSet::Planar::Data> - higher level data interface.
+
 =back
 
 =head1 AUTHOR
@@ -126,7 +130,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

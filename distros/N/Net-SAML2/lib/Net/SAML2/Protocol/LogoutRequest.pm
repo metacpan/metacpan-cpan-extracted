@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::LogoutRequest;
 use Moose;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -154,7 +154,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

@@ -30,15 +30,18 @@ sub checked {
 around 'label', sub {
   my ($orig, $self, $attrs) = @_;
   $attrs = +{} unless defined($attrs);
-  return $self->$orig($self->value, $attrs, $self->text);
+  my $text = $self->human_name_for_label($self->text);
+  return $self->$orig($self->value, $attrs, $text);
 };
 
 around 'radio_button', sub {
   my ($orig, $self, $attrs) = @_;
+  my $attribute = $self->options->{attribute};
   $attrs = +{} unless defined($attrs);
   $attrs->{name} = $self->name;
   $attrs->{checked} = $self->checked;
   $attrs->{id} = $self->tag_id_for_attribute($self->value);
+
   $attrs = $self->merge_theme_field_opts(radio_button=>$attrs->{attribute}, $attrs);
 
   my $has_error = 0;
@@ -52,7 +55,7 @@ around 'radio_button', sub {
   $attrs->{class} = join(' ', (grep { defined $_ } $attrs->{class}, $errors_classes))
     if $errors_classes && $has_error;
 
-  return $self->$orig($self->options->{attribute}, $self->value, $attrs);
+  return $self->$orig($attribute, $self->value, $attrs);
 };
 
 1;

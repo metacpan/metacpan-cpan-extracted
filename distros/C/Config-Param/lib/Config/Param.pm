@@ -30,7 +30,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '4.000004';
+our $VERSION = '4.000005';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -2733,7 +2733,9 @@ for feel more like a good old program with hand-crafted option parsing.
 
 =head3 help parameter values
 
-The 
+The B<help> parameter interprets given values is specific
+ways, to squeeze out more functionality of that precious
+predefined name.
 
 =over 4
 
@@ -2767,12 +2769,12 @@ List parameter names, one on each line.
 
 List parametter names without the built-ins, one on each line.
 
-=item B<-10,>I<name>B<[,>I<name> ...B<]>
+=item B<-10[,]>I<name>B<[,>I<name> ...B<]>
 
 Dump values of the provided parameters in a way suitable for evaluation in Perl,
 as a comma-separated list.
 
-=item B<-11>I<name>B<[,>I<name> ...B<]>
+=item B<-11[,]>I<name>B<[,>I<name> ...B<]>
 
 Dump values in a line-oriented format.
 

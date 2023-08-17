@@ -5,6 +5,11 @@ use Test::Net::SAML2;
 use Net::SAML2::IdP;
 use Test::Mock::One;
 
+delete $ENV{'PERL_LWP_SSL_CA_FILE'};
+delete $ENV{'HTTPS_CA_FILE'};
+delete $ENV{'PERL_LWP_SSL_CA_PATH'};
+delete $ENV{'HTTPS_CA_DIR'};
+
 my $xml = <<XML;
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EntityDescriptor entityID="http://sso.dev.venda.com/opensso" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">

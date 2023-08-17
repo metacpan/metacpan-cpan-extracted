@@ -53,11 +53,11 @@
    "provides" : {
       "Validate::CodiceFiscale" : {
          "file" : "lib/Validate/CodiceFiscale.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "0.004",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

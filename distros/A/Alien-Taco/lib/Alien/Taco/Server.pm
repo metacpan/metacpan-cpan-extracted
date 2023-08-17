@@ -40,7 +40,7 @@ use Alien::Taco::Util qw/filter_struct/;
 
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 SUBROUTINES
 

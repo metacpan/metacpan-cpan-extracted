@@ -4,7 +4,7 @@
       "Oliver Gorwits <oliver@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "bsd"
    ],
@@ -29,6 +29,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "Alien::SNMP" : "3.0509030000",
             "Graph" : "0",
             "GraphViz" : "0"
          },
@@ -93,7 +94,7 @@
             "Pod::Usage" : "0",
             "Regexp::Common" : "2017060201",
             "Role::Tiny" : "1.002005",
-            "SNMP::Info" : "3.92",
+            "SNMP::Info" : "3.94",
             "SQL::Abstract" : "1.85",
             "SQL::Translator" : "0.11024",
             "Scope::Guard" : "0",
@@ -135,7 +136,7 @@
    "provides" : {
       "App::Netdisco" : {
          "file" : "lib/App/Netdisco.pm",
-         "version" : "2.062000"
+         "version" : "2.065001"
       },
       "App::Netdisco::AnyEvent::Nbtstat" : {
          "file" : "lib/App/Netdisco/AnyEvent/Nbtstat.pm"
@@ -157,7 +158,7 @@
       },
       "App::Netdisco::DB" : {
          "file" : "lib/App/Netdisco/DB.pm",
-         "version" : "78"
+         "version" : "81"
       },
       "App::Netdisco::DB::ExplicitLocking" : {
          "file" : "lib/App/Netdisco/DB/ExplicitLocking.pm"
@@ -474,6 +475,9 @@
       "App::Netdisco::Transport::SSH" : {
          "file" : "lib/App/Netdisco/Transport/SSH.pm"
       },
+      "App::Netdisco::Util::CustomFields" : {
+         "file" : "lib/App/Netdisco/Util/CustomFields.pm"
+      },
       "App::Netdisco::Util::DNS" : {
          "file" : "lib/App/Netdisco/Util/DNS.pm"
       },
@@ -521,6 +525,9 @@
       },
       "App::Netdisco::Util::SNMP" : {
          "file" : "lib/App/Netdisco/Util/SNMP.pm"
+      },
+      "App::Netdisco::Util::Snapshot" : {
+         "file" : "lib/App/Netdisco/Util/Snapshot.pm"
       },
       "App::Netdisco::Util::Statistics" : {
          "file" : "lib/App/Netdisco/Util/Statistics.pm"
@@ -798,6 +805,12 @@
       "App::Netdisco::Worker::Plugin::Discover::Properties" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Discover/Properties.pm"
       },
+      "App::Netdisco::Worker::Plugin::Discover::Properties::Tags" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/Discover/Properties/Tags.pm"
+      },
+      "App::Netdisco::Worker::Plugin::Discover::Snapshot" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/Discover/Snapshot.pm"
+      },
       "App::Netdisco::Worker::Plugin::Discover::VLANs" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Discover/VLANs.pm"
       },
@@ -833,6 +846,9 @@
       },
       "App::Netdisco::Worker::Plugin::Hook::HTTP" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Hook/HTTP.pm"
+      },
+      "App::Netdisco::Worker::Plugin::Internal::SNMPFastDiscover" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/Internal/SNMPFastDiscover.pm"
       },
       "App::Netdisco::Worker::Plugin::LoadMIBs" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/LoadMIBs.pm"
@@ -923,7 +939,7 @@
       },
       "homepage" : "http://netdisco.org/",
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
          "url" : "https://github.com/netdisco/netdisco"
@@ -931,6 +947,6 @@
       "x_IRC" : "irc://irc.libera.chat/#netdisco",
       "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/netdisco-users"
    },
-   "version" : "2.062000",
+   "version" : "2.065001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

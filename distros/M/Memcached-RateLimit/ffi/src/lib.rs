@@ -9,6 +9,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
+use std::os::raw::c_char;
 use std::str;
 use std::time::Duration;
 use std::time::SystemTime;
@@ -110,7 +111,7 @@ thread_local!(
 );
 
 #[no_mangle]
-pub extern "C" fn rl_new(url: *const i8) -> u64 {
+pub extern "C" fn rl_new(url: *const c_char) -> u64 {
     if url.is_null() {
         return 0;
     }
@@ -138,13 +139,13 @@ pub extern "C" fn rl_new(url: *const i8) -> u64 {
 #[no_mangle]
 pub extern "C" fn rl__rate_limit(
     index: u64,
-    prefix: *const i8,
+    prefix: *const c_char,
     size: u32,
     rate_max: u32,
     rate_seconds: u32,
 ) -> i32 {
     let prefix = if prefix.is_null() {
-        unsafe { CStr::from_ptr(b"\0".as_ptr() as *const i8) }
+        unsafe { CStr::from_ptr(b"\0".as_ptr() as *const c_char) }
     } else {
         unsafe { CStr::from_ptr(prefix) }
     };
@@ -168,11 +169,11 @@ pub extern "C" fn rl__rate_limit(
 }
 
 #[no_mangle]
-pub extern "C" fn rl__error(index: u64) -> *const i8 {
+pub extern "C" fn rl__error(index: u64) -> *const c_char {
     STORE.with(|it| {
         let error = match it.borrow().get(&index) {
             Some(rl) => rl.error.as_ptr(),
-            None => b"Invalid object index\0".as_ptr() as *const i8,
+            None => b"Invalid object index\0".as_ptr() as *const c_char,
         };
 
         error

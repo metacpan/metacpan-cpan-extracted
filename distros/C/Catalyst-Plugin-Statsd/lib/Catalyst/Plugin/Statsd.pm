@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.2';
 
 
 sub statsd_client {
@@ -99,7 +99,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.2
 
 =head1 SYNOPSIS
 
@@ -234,6 +234,16 @@ grow quite large.
 Your database storage and retention settings should be adjusted
 accordingly.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.8.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.10, please use one of the v0.7.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 =over
@@ -281,7 +291,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

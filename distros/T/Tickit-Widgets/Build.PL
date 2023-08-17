@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -11,6 +12,7 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.020', # experimental.pm; postderef
+
       'List::Util' => '1.33',
       'Object::Pad' => '0.75',
       'Parser::MGC' => 0,
@@ -21,9 +23,7 @@ my $build = Module::Build->new(
       'Tickit::Window' => '0.57', # $win->bind_event
    },
    test_requires => {
-      'Test::Identity' => 0,
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

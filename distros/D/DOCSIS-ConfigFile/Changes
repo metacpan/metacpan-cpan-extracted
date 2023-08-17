@@ -1,5 +1,18 @@
 Revision history for perl distribution DOCSIS-ConfigFile
 
+1.01 2023-07-24T11:09:45
+ - docsis-configfile will detect unknown arguments
+
+1.00 2023-07-22T09:37:59
+ - Add support for docsis-configfile --version and -V
+ - Add support for piping data in/out from docsis-configfile
+ - Improved exceptions by using croak and confess
+
+0.77 2023-07-21T20:15:34
+ - Bundled docsisious with this distribution
+ - Add /parameters to docsisious
+ - Add support for docsis-configfile -c option=value
+
 0.76 2018-10-03T20:01:31+0900
  - Remove DOCSIS::ConfigFile::Syminfo
  - Add missing "ushort_list" encode and decode function

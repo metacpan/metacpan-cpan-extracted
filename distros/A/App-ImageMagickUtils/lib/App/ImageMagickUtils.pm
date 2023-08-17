@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-01'; # DATE
+our $DATE = '2023-06-26'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -293,8 +293,8 @@ sub downsize_image {
             next FILE;
         }
 
+        log_info "Running $convert_path with args %s ...", \@convert_args;
         IPC::System::Options::system(
-            {log=>1},
             $convert_path, @convert_args,
         );
         if ($?) {
@@ -517,7 +517,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.020 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
+This document describes version 0.021 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2023-06-26.
 
 =head1 DESCRIPTION
 

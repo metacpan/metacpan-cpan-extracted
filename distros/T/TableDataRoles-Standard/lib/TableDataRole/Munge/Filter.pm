@@ -8,9 +8,9 @@ use Log::ger;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -33,10 +33,11 @@ sub new {
             die if $@;
         }
     }
+    my $load = delete($args{load}) // 1;
     die "Unknown argument(s): ". join(", ", sort keys %args)
         if keys %args;
 
-    $tabledata = Module::Load::Util::instantiate_class_with_optional_args({ns_prefix=>"TableData"}, $tabledata);
+    $tabledata = Module::Load::Util::instantiate_class_with_optional_args({load=>$load, ns_prefix=>"TableData"}, $tabledata);
     my $column_names = $tabledata->get_column_names;
 
     bless {
@@ -130,7 +131,7 @@ TableDataRole::Munge::Filter - Role to filter rows from another tabledata
 
 =head1 VERSION
 
-This document describes version 0.015 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 SYNOPSIS
 
@@ -197,6 +198,10 @@ A coderef to filter the rows. Will be passed a B<hashref> which is the row to
 filter. Must return true if the row should be included, or false if otherwise.
 
 Either C<filter> B<or> C<filter_hashref> must be specified.
+
+=item * load
+
+Passed to L<Module::Load::Util>'s C<instantiate_class_with_optional_args>.
 
 =back
 

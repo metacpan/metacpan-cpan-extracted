@@ -1,5 +1,7 @@
-# If Math::MPFR is available, use it to
-# run checks on Rmpz_set_NV and Rmpz_cmp_NV
+# If Math::MPFR is available, use it to run
+# checks on Rmpz_set_NV and Rmpz_cmp_NV.
+# Requires Math-MPFR-4.07 - as that's when
+# %Math::MPFR::NV_properties was added to MPFR.pm
 
 use strict;
 use warnings;
@@ -9,6 +11,12 @@ use Test::More;
 eval {require Math::MPFR};
 if($@) {
   warn "Math::MPFR unavailable";
+  cmp_ok(1, '==', 1, "dummy test");
+  done_testing();
+  exit 0;
+}
+elsif($Math::MPFR::VERSION < 4.07) {
+  warn "Math-MPFR-4.07 (or later) is needed - you have only $Math::MPFR::VERSION";
   cmp_ok(1, '==', 1, "dummy test");
   done_testing();
   exit 0;

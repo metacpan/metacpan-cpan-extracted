@@ -18,7 +18,7 @@
 
 =head1 NAME
 
-news - a web fron-end to a local news server
+news - a web front-end to a local news server
 
 =head1 SYNOPSIS
 
@@ -29,17 +29,58 @@ B<news>
 C<news> connects to the local news server via NNTP on port 119 and offers a
 web interface for it.
 
-For each group, only the most recent posts are shown. The From field is stripped
-of anything in angled brackets in an effort to remove email addresses:
-C<\s*<.*>> and C<\s*"\S+@\S+">.
+There are a number of views available:
 
-For each article, an attempt is made to scrip email addresses by removing
-anything in angled brackets: C<\s*<\S*?@.*?>> and  C<\s*"\S*?@.*?">.
+=over
+
+=item * the list of newsgroups available ("server view");
+
+=item * the list of articles available in a particular newsgroup ("group view");
+
+=item * a list of articles with a particular tag in a newsgroup ("tag view");
+
+=item * an article ("article view");
+
+=item * a reply;
+
+=item * a new post.
+
+=back
+
+When showing From fields, the value is stripped of things that look like email
+addresses in angled brackets such as <alex@gnu.org> or in double quotes such as
+"alex@gnu.org"; if an email address is followed by a real name in parenthesis
+such as alex@gnu.org (Alex Schroeder), the address and the parenthesis are
+stripped. If no full name is provided, "Anonymous" is used.
+
+In the article view, email addresses in angled brackets such as <alex@gnu.org>
+or in double quotes such as "alex@gnu.org" are also stripped. Other things that
+might look like email addresses are not stripped.
+
+=head2 Threading
+
+Technically, articles only have references back in time. In order to show links
+to replies, the article view relies on a cache of the group view. If the group
+view isn't in the cache, replies cannot be shown.
+
+=head2 Caching
+
+All the NNTP requests are cached for 5min. The cache relies on L<Mojo::Cache>.
+That cache only holds 100 items by default, so on a busy server, NNTP requests
+might get cached for less time. The cache isn't written to disk, so if you're a
+developer, you can restart the server to empty the cache instead of waiting for
+5min.
+
+=head2 Tags
+
+When an article's subject contains a string in square brackets C<[like this]>,
+then this is treated as a tag. Click on the tag to see the tag view containing
+articles with the same tag, irrespective of threading.
 
 =head2 Authentication
 
 When posting or replying, the username and password provided by the user are
-passed along to the news server. If that allows the user to post, it just works.
+passed along to the news server. If that allows the user to post, it works.
 
 =head2 Environment variables
 
@@ -54,6 +95,12 @@ message number (that would require a group, too).
 C<NEWS_MODE> can be set to "NOAUTH" in order to hide username and password on
 the post form in case your newsserver isn't public and requires no
 authorisation; if set to "NOPOST" then posting links are hidden.
+
+C<NEWS_GROUPS> can be set to a comma-separated list of patterns in the WILDMAT
+format. The details are in RFC 3977. Usually it means: names separated by
+commas, prefixed by C<!> if negated and C<*> used as a wildcard. Support for
+this varies. The C<sn> server only accepts a single pattern, no negation. You
+might have to experiment.
 
 =head2 Systemd
 
@@ -75,26 +122,68 @@ To install as a service, use a C<news.service> file like the following:
     Environment="NEWS_INTRO_ID=<u4d0i0$n72d$1@sibirocobombus.campaignwiki>"
     ExecStart=/home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/perl /home/alex/perl5/perlbrew/perls/perl-5.32.0/bin/news daemon
 
+=head2 Cookies
+
+The web app stores name, username and password in an encrypted cookie which
+expires one week after posting an article.
+
+=head2 Caching
+
+The web app caches all the data it gets from the news server in a cache, using
+L<Mojo::Cache>. By default, this cache is small (100 items). Each cached item is
+cached with a timestamp and cache hits are only used if they aren't older than
+5min.
+
+=head2 Superseding
+
+The web app allows superseding. It's up to the newsserver to allow or deny this.
+There's currently no way for the user to supply their own cancel secret.
+
 =head1 EXAMPLES
+
+A remote news server.
+
+    NNTPSERVER=cosmic.voyage news daemon
+
+The remote news server but only the C<campaignwiki.*> groups, with the pattern
+in quotes to prevent shell expansion:
+
+    NNTPSERVER=campaignwiki.org "NEWS_GROUPS=campaignwiki.*" news daemon
+
+The remote news server with all the groups except any C<*.test> groups, with the
+pattern in quotes to prevent shell expansion. The C<sn> server can't parse this
+pattern, unfortunately.
+
+    NNTPSERVER=campaignwiki.org "NEWS_GROUPS=*,!*.test" news daemon
 
 The local news server requires no authorisation.
 
     NNTPSERVER=localhost NEWS_MODE=NOAUTH news daemon
 
-As a developer, run it under C<morbo> so that we can make changes to the script.
-Provide the path to the script. This time with regular authorisation.
-
-    NNTPSERVER=localhost morbo script/news
-
-The remote news server requires authorisation and we want to point visitors to a
-first post. We assume that NNTPSERVER or NEWSHOST is set.
+The news server requires authorisation and we want to point visitors to a first
+post. We assume that NNTPSERVER or NEWSHOST is already set.
 
     NEWS_INTRO_ID='<u4d0i0$n72d$1@sibirocobombus.campaignwiki>' news daemon
 
+As a developer, run it under C<morbo> so that we can make changes to the script.
+Provide the path to the script. This time with regular authorisation.
+
+    PERL5LIB=lib NNTPSERVER=localhost morbo script/news
+
 =head1 SEE ALSO
 
-The Tildeverse also runs news.
-L<https://news.tildeverse.org/>
+The Tildeverse also runs news. L<https://news.tildeverse.org/>
+
+L<RFC 3977|https://www.rfc-editor.org/rfc/rfc3977>: Network News Transfer
+Protocol (NNTP).
+
+L<RFC 5536|https://www.rfc-editor.org/rfc/rfc5536>: Netnews Article Format.
+
+L<RFC 5537|https://www.rfc-editor.org/rfc/rfc5537>: Netnews Architecture and
+Protocols.
+
+L<RFC 8315|https://www.rfc-editor.org/rfc/rfc8315>: Cancel-Locks in Netnews
+Articles
 
 =head1 LICENSE
 
@@ -111,6 +200,8 @@ use Mojo::Cache;
 use DateTime::Format::Mail;
 use List::Util qw(first);
 use utf8;
+# our own
+use App::news qw(wrap html_unwrap ranges);
 
 my $cache = Mojo::Cache->new;
 
@@ -122,9 +213,9 @@ under 'news';
 
 get '/' => sub {
   my $c = shift;
-  my $list = cached("list", sub {
+  my $list = cached("active " . ($ENV{NEWS_GROUPS} || "*"), sub {
     my $nntp = Net::NNTP->new() or return 'error';
-    my $value = $nntp->list();
+    my $value = $nntp->active($ENV{NEWS_GROUPS} || "*");
     $nntp->quit;
     return $value });
   return $c->render(template => 'noserver') if $list eq 'error';
@@ -152,6 +243,7 @@ sub cached {
 }
 
 my $per_page = 50;
+my $per_search = 500;
 
 get '/group/#group' => sub {
   my $c = shift;
@@ -180,14 +272,17 @@ get '/group/#group' => sub {
     for my $num (sort { $b <=> $a } keys %$messages) {
       my ($subject, $from, $date, $id, $references) = @{$messages->{$num}};
       $subject = decode("MIME-Header", $subject) || "?";
-      $from = decode("MIME-Header", $from) || "Anonymous";
-      $from =~ s/\s*<.*>//; # remove email addresses
-      $from =~ s/\s*"\S+@\S+"//; # remove email addresses
+      my ($tag) = $subject =~ /\[(.*?)\]/;
+      $from = no_email(decode("MIME-Header", $from));
       $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
       my $dt = DateTime::Format::Mail->parse_datetime($date);
+      my $url = $c->url_for('article', group => $group, id => $num);
+      $url = $url->query(edit => $edit) if $edit;
       push(@$articles, {
         id => $id,
         num => $num,
+        tag => $tag,
+        url => $url,
         from => $from,
         subject => $subject,
         date => [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)],
@@ -212,6 +307,119 @@ get '/group/#group' => sub {
              list => $data->{articles}, pagination => $data->{pagination});
 } => 'group';
 
+sub no_email {
+  my $from = shift;
+  $from =~ s/\s*<.*>//;
+  $from =~ s/\s*"\S+@\S+"//;
+  $from =~ s/\S+@\S+\s+\((.*?)\)/$1/;
+  return $from || "Anonymous";
+}
+
+get '/tag/#group/#tag' => sub {
+  my $c = shift;
+  my $group = $c->param('group');
+  my $edit = $c->param('edit');
+  my $tag = $c->param('tag');
+  # We start counting in the back… This is different from the /group list.
+  # There, we take the first and last message numbers and compute page numbers
+  # based on that. Starting at the front makes this stable. The same articles
+  # stay on the same pages. Given first and last article numbers and a search
+  # pattern, we can't do this. Therefore, we start at the present and scan into
+  # the past until we have the page we want.
+  my $page = $c->param('page') // 0;
+  my $include = $c->param('include') // 0;
+  my $nntp; # only created on demand
+  my $data = cached("$group tag $tag", sub {
+    $nntp ||= Net::NNTP->new() or return 'error';
+    my ($nums, $first, $last) = $nntp->group($group) or return [];
+    app->log->debug("$group has $first-$last");
+    my $seen = 0; # set when we have seen $include
+    my $to = $last;
+    my $from = $to - $per_search;
+    $from = $first if $from < $first;
+    my $pattern = "*\\[$tag\\]*";
+    $pattern =~ s/ /?/g;
+    my $result = $nntp->xpat("Subject", $pattern, [$from, $to]);
+    my @nums = sort keys %$result;
+    app->log->debug("Searching pattern $pattern $from-$to found " . scalar(@nums) . " articles");
+    $seen = grep { $_ == $include } @nums if $include;
+    # keep checking more, if necessary
+    while (($page and @nums / $per_page < $page
+            or $include and not $seen)
+           and $from > $first) {
+      $to -= $per_search;
+      $from -= $per_search;
+      $from = $first if $from < $first;
+      $result = $nntp->xpat("Subject", $pattern, [$from, $to]);
+      app->log->debug("Searching pattern $pattern $from-$to found " . scalar(@nums) . " articles");
+      $seen = grep { $_ == $include } keys %$result if $include;
+      unshift(@nums, sort keys %$result);
+    }
+    # add pagination
+    if ($page) {
+      @nums = @nums[(-$page-1) * $per_page + 1, -$page * $per_page];
+    } elsif ($include) {
+      my @page;
+      while (@nums > $per_page and not grep { $_ == $include } @page) {
+        @page = splice(@nums, -$per_page);
+        $page++;
+      }
+      @nums = @page if @page;
+    }
+    my $ranges = ranges(@nums);
+    my $fmt = $nntp->overview_fmt;
+    my $re = quotemeta($tag);
+    my $articles = [];
+    for my $range (@$ranges) {
+      app->log->debug("Getting $group " . (ref $range ? join("-", @$range) : $range));
+      my $messages = $nntp->xover($range);
+      app->log->debug("Received " . scalar(keys %$messages) . " messages");
+      for my $num (sort keys %$messages) {
+        my ($subject, $from, $date, $id, $references) = @{$messages->{$num}};
+        $subject = decode("MIME-Header", $subject) || "?";
+        $subject =~ s/\[$re\]\s*//;
+        $from = no_email(decode("MIME-Header", $from));
+        $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
+        my $dt = DateTime::Format::Mail->parse_datetime($date);
+        my $url = $c->url_for('article', group => $group, id => $num);
+        $url = $url->query(edit => $edit) if $edit;
+        push(@$articles, {
+          id => $id,
+          num => $num,
+          url => $url,
+          from => $from,
+          subject => $subject,
+          date => [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)],
+          references => [split(/\s+/, decode("MIME-Header", $references))],
+          replies => [] });
+      }
+    }
+    # link replies based on references but only the articles on the same page (!)
+    for my $article (@$articles) {
+      for my $reference (@{$article->{references}}) {
+        my $original = first { $reference eq $_->{id} } @$articles;
+        next unless $original;
+        push(@{$original->{replies}}, $article->{id});
+        app->log->debug("$article->{id} is a reply to $original->{id}");
+      }
+    }
+    # reverse the list of articles, latest ones come first
+    return [reverse @$articles]});
+  return $c->render(template => 'noserver') if 'error' eq $data;
+  $nntp->quit if $nntp;
+  # If the cached data did not include our article, delete the cache and retry.
+  # This could be optimized to extend the existing data…
+  if ($include and (@$data == 0 or $include < $data->[$#$data]->{num})) {
+    my $seen = grep { $_->{num} == $include } @$data;
+    if (not $seen) {
+      app->log->debug("$include was not seen in the cached data");
+      $cache->set("$group tag $tag" => undef);
+      return $c->redirect_to('tag');
+    }
+  }
+  $c->render(template => 'tag', group => $group, tag => $tag, edit => $edit, list => $data);
+} => 'tag';
+
 # This only works for message-ids, not for message numbers (since they require a
 # group).
 get '/article/#id' => sub {
@@ -230,10 +438,10 @@ sub show_article {
   # message-id and $group is only used for the reply form.
   my ($c, $id_or_num, $group) = @_;
   my $article = cached("$group article $id_or_num", sub {
-    my $nntp = Net::NNTP->new() or return 'error';
+    my $nntp = Net::NNTP->new() or return 'noserver';
     $nntp->group($group) if $group;
     my $article = $nntp->article($id_or_num);
-    return $c->render(template => 'unknown') unless $article;
+    return 'unknown' unless $article;
     # app->log->trace(join("", @$article));
     # $article is header lines, an empty line, and body lines
     my $headers = Mojo::Headers->new;
@@ -242,9 +450,7 @@ sub show_article {
     }
     my $id = $headers->header("message-id");
     my $subject = decode("MIME-Header", $headers->header("subject")) || "?";
-    my $from = decode("MIME-Header", $headers->header("from")) || "Anonymous";
-    $from =~ s/\s*<.*>//; # remove email addresses
-    $from =~ s/\s*"\S+@\S+"//; # remove email addresses
+    my $from = no_email(decode("MIME-Header", $headers->header("from")));
     my $date = $headers->header("date");
     $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
     my $dt = DateTime::Format::Mail->parse_datetime($date);
@@ -267,6 +473,7 @@ sub show_article {
       date => $date,
       newsgroups => $newsgroups,
       references => $references,
+      html_body => html_unwrap($body),
       body => $body,
     };
     # perhaps we have cached replies from looking at the group (space and no page number at the end)
@@ -279,55 +486,70 @@ sub show_article {
     # the same article but following a reference.
     $cache->set("$group article $id" => [time, $value]) if $id_or_num ne $id;
     return $value });
-  return $c->render(template => 'noserver') if 'error' eq $article;
+  return $c->render(template => $article) unless ref $article;
   $c->render(template => 'article', article => $article, edit => $c->param('edit'));
 }
 
-post '/post/#group' => sub {
+get '/post/#group' => sub {
   my $c = shift;
-  $c->param(username => $c->session->{username});
-  $c->param(password => $c->session->{password});
-  $c->param(name => $c->session->{name});
+  # copy from the cookie
+  $c->param($_ => $c->session->{$_}) for qw(name username password);
   $c->render(template => 'post',
+             id => '',
              subject => '',
+             supersedes => '',
              references => '');
-} => 'post_group';
+} => 'new';
 
 post '/reply' => sub {
   my $c = shift;
-  $c->param(username => $c->session->{username});
-  $c->param(password => $c->session->{password});
-  $c->param(name => $c->session->{name});
+  # copy from the cookie
+  $c->param($_ => $c->session->{$_}) for qw(name username password);
   $c->render(template => 'post',
              id => $c->param('id'),
              group => $c->param('group'),
              subject => $c->param('subject'),
+             supersedes => '',
              references => $c->param('references'));
-} => 'post_reply';
+} => 'reply';
+
+post '/supersede' => sub {
+  my $c = shift;
+  # copy from the cookie
+  $c->param($_ => $c->session->{$_}) for qw(name username password);
+  $c->render(template => 'post',
+             id => '',
+             body => $c->param('body'),
+             group => $c->param('group'),
+             subject => $c->param('subject'),
+             supersedes => $c->param('supersedes'),
+             references => $c->param('references'));
+} => 'supersede';
 
 post '/post' => sub {
   my $c = shift;
-  $c->session(expiration => 7 * 24 * 60 * 60); # one week
-
+  $c->session(expiration => time + 7 * 24 * 60 * 60); # one week
   my $username = $c->param('username');
   return $c->error("No username") unless $username or $ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOAUTH";
-  $c->session->{username} = $username;
+  $c->session(username => $username);
 
   my $password = $c->param('password');
   return $c->error("No password") unless $password or $ENV{NEWS_MODE} and $ENV{NEWS_MODE}eq "NOAUTH";
-  $c->session->{password} = $password;
+  $c->session(password => $password);
 
   my $name = $c->param('name');
-  $name =~ s/[^[:graph:] ]//g;
   return $c->error("No from address specified") unless $name;
+  $name =~ s/[^[:graph:] ]//g;
   return $c->error("From address does not have the format 'Your Name <mail\@example.org>'") unless $name =~ /<\S+@\S+\.\S+>/;
-  $c->session->{name} = $name;
+  $c->session(name => $name);
 
   my $group = $c->param('group');
+  return $c->error("No group") unless $group;
   $group =~ s/[^[:graph:]]//g;
   return $c->error("No group") unless $group;
 
   my $references = $c->param('references');
+  my $supersedes = $c->param('supersedes');
 
   my $subject = $c->param('subject');
   return $c->error("No subject") unless $subject;
@@ -336,6 +558,8 @@ post '/post' => sub {
   my $body = $c->param('body');
   return $c->error("No body") unless $body;
 
+  $body = wrap($body) if $c->param('wrap');
+
   my $nntp = Net::NNTP->new() or return $c->render(template => 'noserver');
   $nntp->authinfo($username, $password) if $username and $password;
   my $article = [];
@@ -343,6 +567,7 @@ post '/post' => sub {
   push(@$article, "Subject: $subject\r\n");
   push(@$article, "Newsgroups: $group\r\n");
   push(@$article, "References: $references\r\n") if $references;
+  push(@$article, "Supersedes: $supersedes\r\n") if $supersedes;
   push(@$article, "MIME-Version: 1.0\r\n");
   push(@$article, "Content-Type: text/plain; charset=UTF-8\r\n");
   push(@$article, "Content-Transfer-Encoding: 8bit\r\n");
@@ -434,7 +659,7 @@ Renamed: Posts will get moved to a different group.
 <%= link_to url_for('group', group => $group) => begin %>Last<% end %>
 % }
 % unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOPOST" or $edit and $edit eq "no") {
-<%= link_to url_for('post_group', group => $group) => begin %>Add post<% end %> (requires account)
+<%= link_to url_for('new', group => $group) => begin %>Add post<% end %> (requires account)
 % }
 % if (@$list) {
 <table>
@@ -445,11 +670,39 @@ Renamed: Posts will get moved to a different group.
 %       $date = $article->{date}->[0];
 <tr><td class="day"><%= $date %></td><td></td><td></td></tr>
 %     }
-%     if ($edit and $edit eq "no") {
-<tr><td class="time"><%= link_to url_for('article', group => $group, id => $article->{num})->query(edit => $edit) => begin %><%= $article->{date}->[1] %><% end %></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
+%     if ($article->{tag}) {
+%       my $re = quotemeta($article->{tag});
+%       my @part = split(/$re/, $article->{subject}, 2);
+<tr><td class="time"><a href="<%= $article->{url} %>"><%= $article->{date}->[1] %></a></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $part[0] %><%= link_to url_for('tag', group => $group, tag => $article->{tag})->query(include => $article->{num}) =>begin %><%= $article->{tag} %><% end %><%= $part[1] %></td></tr>
 %     } else {
-<tr><td class="time"><%= link_to url_for('article', group => $group, id => $article->{num}) => begin %><%= $article->{date}->[1] %><% end %></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
+<tr><td class="time"><a href="<%= $article->{url} %>"><%= $article->{date}->[1] %></a></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
 %     }
+%   }
+</table>
+% } else {
+<p>This group is empty.
+% }
+
+@@ tag.html.ep
+% layout "default";
+% title "$group: $tag";
+<h1><%= $group %>: <%= $tag %></h1>
+<p>
+<%= link_to url_for('index') => begin %>List all groups<% end %>
+<%= link_to url_for('group', group => $group) => begin %>List all posts<% end %>
+% unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOPOST" or $edit and $edit eq "no") {
+<%= link_to url_for('new', group => $group) => begin %>Add post<% end %> (requires account)
+% }
+% if (@$list) {
+<table>
+<tr><th class="date">Date</th><th class="from">From</th><th class="subject">Subject</th></tr>
+%   my $date = "";
+%   for my $article (@$list) {
+%     if ($article->{date}->[0] ne $date) {
+%       $date = $article->{date}->[0];
+<tr><td class="day"><%= $date %></td><td></td><td></td></tr>
+%     }
+<tr><td class="time"><a href="<%= $article->{url} %>"><%= $article->{date}->[1] %></a></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
 %   }
 </table>
 % } else {
@@ -470,29 +723,40 @@ Renamed: Posts will get moved to a different group.
 <%= link_to url_for('article', id => $id) => (class => "value references") => begin %>ref<% end %>
 %   }
 % }
+% if (@{$article->{references}} and @{$article->{replies}}) {
+(this post)
+% }
 % if (@{$article->{replies}}) {
 %   for my $id (reverse @{$article->{replies}}) {
 <%= link_to url_for('article', id => $id) => (class => "value replies") => begin %>reply<% end %>
 %   }
 % }
-<pre class="body"><%= $article->{body} %></pre>
+<pre class="body"><%== $article->{html_body} %></pre>
 % unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOPOST" or $edit and $edit eq "no") {
 % my $subject = $article->{subject};
 % $subject = "Re: $subject" unless $subject =~ /^Re:/i;
 % my $body = "$article->{from}, @{$article->{date}}:\n$article->{body}";
-% $body =~ s/\s+$//;
-% $body =~ s/\n(>*)/\n>$1 /g;
+% $body =~ s/\s+$//mg;
+% $body =~ s/\n(>*) */\n>$1 /g;
 % $body .= "\n";
 % my @references = (@{$article->{references}}, $article->{id});
-%= form_for post_reply => begin
+%= form_for reply => (class => "button") => begin
 %= hidden_field id => $article->{id}
 %= hidden_field group => "@{$article->{newsgroups}}"
 %= hidden_field references => "@references"
 %= hidden_field subject => $subject
 %= hidden_field body => $body
 %= submit_button 'Reply'
-(Requires account.)
 %= end
+%= form_for supersede => (class => "button") => begin
+%= hidden_field supersedes => $article->{id}
+%= hidden_field group => "@{$article->{newsgroups}}"
+%= hidden_field references => "@references"
+%= hidden_field subject => $article->{subject}
+%= hidden_field body => $article->{body}
+%= submit_button 'Supersede'
+%= end
+(Both require an account.)
 % }
 
 @@ unknown.html.ep
@@ -512,15 +776,19 @@ server.
 @@ post.html.ep
 % layout 'default';
 % title 'Post';
-% if ($subject) {
+% if ($supersedes) {
+<h1><%= $subject %></h1>
+<p>(This article supersedes a <%= link_to url_for('article', group => $group, id => $supersedes) => begin %>another<% end %>.)
+% } elsif ($subject) {
 <h1><%= $subject %></h1>
 <p>(This is a <%= link_to url_for('article', group => $group, id => $id) => begin %>reply<% end %>.)
 % } else {
-<h1>New post for <%= $group %></h1>
+<h1>New article for <%= $group %></h1>
 % }
 %= form_for post => begin
 %= hidden_field group => $group
 %= hidden_field references => $references
+%= hidden_field supersedes => $supersedes
 % unless ($ENV{NEWS_MODE} and $ENV{NEWS_MODE} eq "NOAUTH") {
 %= label_for username => 'Username'
 %= text_field 'username', required => undef
@@ -538,7 +806,9 @@ server.
 %= label_for body => 'Article'
 %= text_area 'body', required => undef
 <p>
-%= submit_button 'Post'
+%= check_box wrap => 1, checked => 1, id => 'wrap'
+%= label_for wrap => 'Wrap'
+%= submit_button 'Post', id => 'post'
 % end
 
 @@ posted.html.ep
@@ -580,9 +850,12 @@ body {
 .time, .status { text-align: center; }
 td { min-width: 10ch; padding: 0 0.5ch; }
 label { display: inline-block; min-width: 10ch; }
+label[for=wrap] { display: inline; }
 input[type=password], input[type=text] { width: 30ch; }
 textarea { width: 100%; height: 20ch; }
+.button { display: inline-block; }
 pre { white-space: pre-wrap; }
+blockquote { border-left: 0.5ch solid gray; padding-left: 0.5ch; margin: 0; margin-top: 0.5ch; }
 % end
 <meta name="viewport" content="width=device-width">
 </head>

@@ -1,6 +1,6 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.82.9';
+$VERSION = '0.85.5';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ App::SeismicUnixGui - A graphical user interface for Seismic Unix
 
 =head1 DESCRIPTION
 
-SeismicUnixGui (alpha) is a graphical user interface (GUI) 
+SeismicUnixGui (beta) is a graphical user interface (GUI) 
 to select parameters for Seismic Unix (SU) modules. 
 Seismic Unix (Stockwell, 1999) is a widely distributed 
 free software package for processing seismic reflection 

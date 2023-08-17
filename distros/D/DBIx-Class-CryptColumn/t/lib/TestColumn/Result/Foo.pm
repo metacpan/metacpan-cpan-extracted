@@ -16,13 +16,8 @@ __PACKAGE__->add_columns(
     passphrase => {
         data_type          => 'text',
         inflate_passphrase => {
-			encoder                   => {
-				module => 'Pepper::Simple',
-				inner  => 'Reversed',
-				peppers => {
-					1 => 'abcd',
-				},
-			},
+			encoder                   => 'Reversed',
+			validators                => [ 'SHA1::Hex' ],
 			verify_method             => 'verify_passphrase',
 			rehash_method             => 'passphrase_needs_rehash',
 			verify_and_rehash_method  => 'verify_and_rehash_password',

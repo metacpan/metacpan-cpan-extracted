@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test2::V0;
-use Test::Refcount;
+use Test2::V0 0.000148;  # is_refcount
 
 use List::Keywords 'first';
 
@@ -86,6 +85,15 @@ ok( !(first { $_ > 10 } 1 .. 9), 'list does not contain a value above ten' );
 
    undef $result;
    is_oneref( $arr, '$arr has one reference at end of test' );
+}
+
+# unimport
+{
+   no List::Keywords 'first';
+
+   sub first { return "normal function" }
+
+   is( first, "normal function", 'first() parses as a normal function call' );
 }
 
 done_testing;

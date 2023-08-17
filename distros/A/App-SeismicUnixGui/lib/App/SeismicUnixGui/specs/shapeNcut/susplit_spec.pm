@@ -17,10 +17,10 @@ my $false            = $var->{_false};
 my $file_dialog_type = $get->file_dialog_type_href();
 my $flow_type        = $get->flow_type_href();
 
-my $DATA_SEISMIC_SU =
-  $Project->DATA_SEISMIC_SU();    # output data directory
-my $PL_SEISMIC = $Project->PL_SEISMIC();
-my $max_index  = 3;
+my $DATA_SEISMIC_SU  =  $Project->DATA_SEISMIC_SU();    # output data directory
+my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();
+my $PL_SEISMIC       = $Project->PL_SEISMIC();
+my $max_index        = 8;
 
 my $susplit_spec = {
 	_CONFIG                => $PL_SEISMIC,
@@ -34,6 +34,7 @@ my $susplit_spec = {
 	_flow_type_aref        => '',
 	_has_infile            => $true,
 	_has_pipe_in           => $true,
+	_has_outpar            => $false,
 	_has_pipe_out          => $true,
 	_has_redirect_in       => $true,
 	_has_redirect_out      => $true,
@@ -61,7 +62,11 @@ sub binding_index_aref {
 
 	my @index;
 
-	$index[0] = 0;
+	# e.g., first binding index (index=0)
+	# connects to second item (index=1)
+	# in the parameter list
+	$index[0] = 2;    # inbound item is  bound
+	$index[1] = 6;    # inbound item is  bound
 
 	$susplit_spec->{_binding_index_aref} = \@index;
 	return ();
@@ -80,7 +85,13 @@ sub file_dialog_type_aref {
 
 	my @type;
 
-	$type[0] = '';
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# bound index will look for data
+	#	$type[0]	= '';
+	$type[ $index[0] ] = $file_dialog_type->{_Data};
+	$type[ $index[1] ] = $file_dialog_type->{_Data};
 
 	$susplit_spec->{_file_dialog_type_aref} = \@type;
 	return ();
@@ -310,6 +321,13 @@ sub prefix_aref {
 		$prefix[$i] = $empty_string;
 
 	}
+	
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# labels 3 and 7 in GUI are input xx_files and need a home directory
+	$prefix[ $index[0] ] = '$DATA_SEISMIC_TXT' . ".'/'.";	
+	$prefix[ $index[1] ] = '$DATA_SEISMIC_SU' . ".'/'.";
 	$susplit_spec->{_prefix_aref} = \@prefix;
 	return ();
 
@@ -333,6 +351,14 @@ sub suffix_aref {
 		$suffix[$i] = $empty_string;
 
 	}
+	
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# labels 3 and 7 in GUI are input xx_files and need a home directory
+	$suffix[ $index[0] ] = '' . '' . '$suffix_txt';	
+	$suffix[ $index[1] ] = '' . '' . '$suffix_su';
+	
 	$susplit_spec->{_suffix_aref} = \@suffix;
 	return ();
 

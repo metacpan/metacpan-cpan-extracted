@@ -1,39 +1,29 @@
 ;------------------------------------------------------------------------------
 ; Define dynamic variables:
 ;------------------------------------------------------------------------------
-(def! *lingy-version*
-  {
-    :major       0
-    :minor       1
-    :incremental 8
-    :qualifier   nil
-  })
-
-(def! *clojure-version*
-  {
-    :major       1
-    :minor       11
-    :incremental 1
-    :qualifier   nil
-  })
-
-(def! *clojure-repl* false)
+(def *clojure-repl* false)
+(def *print-dup* true)
+(def *print-readably* true)
 
 ;------------------------------------------------------------------------------
 ; Create standard calls from special forms:
 ;------------------------------------------------------------------------------
 (defmacro! defmacro
   (fn* [name & body]
-    `(defmacro! ~name (fn* ~@body))))
-
-(defmacro def [& xs] (cons 'def! xs))
+    `(defmacro! ~name
+      (fn* ~@body))))
 
 (defmacro fn [& xs] (cons 'fn* xs))
 
 (defmacro defn [name & body]
-  `(def ~name (fn ~@body)))
+  `(def ~name (fn* ~@body)))
 
 (defmacro let [& xs] (cons 'let* xs))
+
+; XXX Using the same code as 'let' (for now) which isn't quite right.
+(defmacro binding [& xs] (cons 'let* xs))
+
+(defmacro import [& xs] (cons 'import* xs))
 
 ; (defmacro assert-args
 ;   [& pairs]
@@ -60,151 +50,40 @@
 ;------------------------------------------------------------------------------
 ; Lingy specific functions:
 ;------------------------------------------------------------------------------
-(defn clojure-repl-on [] (def *clojure-repl* true) nil)
+(defn clojure-repl-on  [] (def *clojure-repl* true ) nil)
 (defn clojure-repl-off [] (def *clojure-repl* false) nil)
-
-;------------------------------------------------------------------------------
-; Basic math ops:
-;------------------------------------------------------------------------------
-(defn +
-  ([] 0)
-  ([x] x)
-  ([x y] (lingy.lang.Numbers/add x y))
-  ([x y & more]
-    (reduce + (+ x y) more)))
-
-(defn -
-  ([] 0)
-  ([x] (lingy.lang.Numbers/minus 0 x))
-  ([x y] (lingy.lang.Numbers/minus x y))
-  ([x y & more]
-    (reduce - (- x y) more)))
-
-(defn *
-  ([x] x)
-  ([x y] (lingy.lang.Numbers/multiply x y))
-  ([x y & more]
-    (reduce * (* x y) more)))
-
-(defn /
-  ([x] (lingy.lang.Numbers/divide 1 x))
-  ([x y] (lingy.lang.Numbers/divide x y))
-  ([x y & more]
-    (reduce / (/ x y) more)))
-
-(defn == ([& xs] (apply = xs)))
-
-(defn =
-  ([x] true)
-  ([x y] (lingy.lang.Numbers/equiv x y))
-  ([x y & more]
-    (if (= x y)
-      (if (next more)
-        (recur y (first more) (next more))
-        (= y (first more)))
-      false)))
-
-(defn <
-  ([x] true)
-  ([x y] (lingy.lang.Numbers/lt x y))
-  ([x y & more]
-    (if (< x y)
-      (if (next more)
-        (recur y (first more) (next more))
-        (< y (first more)))
-      false)))
-
-(defn <=
-  ([x] true)
-  ([x y] (lingy.lang.Numbers/lte x y))
-  ([x y & more]
-    (if (<= x y)
-      (if (next more)
-        (recur y (first more) (next more))
-        (<= y (first more)))
-      false)))
-
-(defn >
-  ([x] true)
-  ([x y] (lingy.lang.Numbers/gt x y))
-  ([x y & more]
-    (if (> x y)
-      (if (next more)
-        (recur y (first more) (next more))
-        (> y (first more)))
-      false)))
-
-(defn >=
-  ([x] true)
-  ([x y] (lingy.lang.Numbers/gte x y))
-  ([x y & more]
-    (if (>= x y)
-      (if (next more)
-        (recur y (first more) (next more))
-        (>= y (first more)))
-      false)))
 
 ;------------------------------------------------------------------------------
 ; Other macros and functions:
 ;------------------------------------------------------------------------------
-(defmacro ->
-  [x & forms]
-  (loop [x x, forms forms]
-    (if forms
-      (let [form (first forms)
-            threaded (
-              if (seq? form)
-                `(~(first form) ~x ~@(next form))
-                (list form x))]
-        (recur threaded (next forms)))
-      x)))
+; (defn all-ns [] (lingy.lang.Namespace/all))
+(defn all-ns [] (lingy.lang.RT/all_ns))
 
-(defmacro ->>
-  [x & forms]
-  (loop [x x, forms forms]
-    (if forms
-      (let [form (first forms)
-            threaded (
-              if (seq? form)
-                `(~(first form) ~@(next form) ~x)
-                (list form x))]
-        (recur threaded (next forms)))
-      x)))
+(defn apply [f & args] (. lingy.lang.RT (apply f args)))
 
-(defn all-ns [] (. lingy.lang.RT (all_ns)))
+; XXX This needs recur in fn
+(defn assoc
+  ([map key val] (lingy.lang.RT/assoc map key val))
+  ; XXX use recur when available in fn
+  ([map key val & kvs]
+    (let [ret (assoc map key val)]
+      (apply assoc ret (first kvs) (second kvs) (nnext kvs)))))
 
-(defmacro and
-  ([] true)
-  ([x] x)
-  ([x & next]
-   `(let [and# ~x]
-      (if and# (and ~@next) and#))))
+; XXX This needs special_new
+(defn atom [x] (. lingy.lang.RT (atom x)))
+; XXX Should be:
+; (defn atom [x] (new lingy.lang.Atom x))
 
-(defn apply [fn & args] (. lingy.lang.RT (apply fn args)))
+(defn clojure-require [& xs]
+  (let [
+    . Clojure/dot
+    def Clojure/def]
+    (apply lingy.lang.Clojure/require xs)
+    nil))
 
-(defn assoc [& args] (apply lingy.lang.RT/assoc args))
-
-(defn atom [value] (. lingy.lang.RT (atom_ value)))
-
-(defn atom? [value] (. lingy.lang.RT (atom_Q value)))
-
-(defn boolean? [value] (apply lingy.lang.RT/boolean_Q value))
-
-(defn char [x] (. lingy.lang.RT (charCast x)))
-
-(defn class? [value] (. lingy.lang.RT (class_Q value)))
-
-(defn clojure-version []
-  (str
-    (:major *clojure-version*)
-    "."
-    (:minor *clojure-version*)
-    (when-let [i (:incremental *clojure-version*)]
-      (str "." i))
-    (when-let [q (:qualifier *clojure-version*)]
-      (when (pos? (count q)) (str "-" q)))
-    (when (:interim *clojure-version*)
-      "-SNAPSHOT")))
+(defn clojure-use [ns]
+  (clojure-require ns)
+  (refer ns))
 
 (defn concat [& args] (apply lingy.lang.RT/concat args))
 
@@ -216,35 +95,34 @@
         (throw "odd number of forms to cond"))
       (cons 'cond (rest (rest xs))))))
 
-(defmacro comment [& body] nil)
-
 (defn conj [& args] (apply lingy.lang.RT/conj args))
-
-(defn contains? [map key] (. lingy.lang.RT (contains_Q map key)))
-
-(defn count [list] (. lingy.lang.RT (count list)))
 
 (defn create-ns [symbol] (. lingy.lang.RT (create_ns symbol)))
 
-(defn dec [value] (. lingy.lang.RT (dec value)))
+(defmacro declare [& names]
+  `(do
+    ~@(map
+      #(list 'def %)
+      names)))
 
-(defn deref [value] (. lingy.lang.RT (deref value)))
+(defn deref [x] (. lingy.lang.RT (deref x)))
 
 (defn dissoc [& args] (apply lingy.lang.RT/dissoc args))
 
-(defn empty? [coll] (not (seq coll)))
+(defmacro doto
+  [x & forms]
+    (let [gx (gensym)]
+      `(let [~gx ~x]
+        ~@(map (fn [f]
+          (if (seq? f)
+            `(~(first f) ~gx ~@(next f))
+            `(~f ~gx)))
+          forms)
+        ~gx)))
 
-(defn false? [value] (. lingy.lang.RT (false_Q value)))
-
-(defn ffirst [x] (first (first x)))
+(defn double [n] (* n 1.0))
 
 (defn find-ns [name] (. lingy.lang.RT (find_ns name)))
-
-(defn first [list] (. lingy.lang.RT (first list)))
-
-(defn fn? [fn] (. lingy.lang.RT (fn_Q fn)))
-
-(defn fnext [x] (first (next x)))
 
 (defn get [map key & default] (apply lingy.lang.RT/get map key default))
 
@@ -259,21 +137,13 @@
           prefix-string
           (str (. lingy.lang.RT (nextID))))))))
 
-(defn hash-map [& args] (apply lingy.lang.RT/hash_map_ args))
+(defn hash-map [& args] (apply lingy.lang.RT/hash_map args))
 
-(defmacro import [& mods] `(. lingy.lang.RT (import_ '~mods)))
+(defn hash-set [& args] (apply lingy.lang.RT/hash_set args))
 
 (defn in-ns [name] (. lingy.lang.RT (in_ns name)))
 
-(defn inc [num] (. lingy.lang.RT (inc num)))
-
-(defn instance? [c x] (. c (isInstance x)))
-
-(defn keys [map] (. lingy.lang.RT (keys_ map)))
-
-(defn keyword [string] (. lingy.lang.RT (keyword_ string)))
-
-(defn keyword? [value] (. lingy.lang.RT (keyword_Q value)))
+(defn keyword [string] (. lingy.lang.RT (keyword string)))
 
 (defn lingy-version []
   (str
@@ -288,8 +158,6 @@
       "-SNAPSHOT")))
 
 (defn list [& args] (apply lingy.lang.RT/list_ args))
-
-(defn list? [value] (. lingy.lang.RT (list_Q value)))
 
 (defn list*
   ([args] (seq args))
@@ -309,15 +177,16 @@
         (slurp f)
         "\nnil)"))))
 
-(defn macro? [value] (. lingy.lang.RT (macro_Q value)))
+(defn macro? [x] (instance? lingy.lang.Macro x))
 
 (defn macroexpand [macro] (. lingy.lang.RT (macroexpand macro)))
 
 (defn map [fn list] (. lingy.lang.RT (map fn list)))
 
-(defn map? [map] (. lingy.lang.RT (map_Q map)))
+(defn merge [& maps]
+  (apply conj {} maps))
 
-(defn meta [object] (. lingy.lang.RT (meta object)))
+(defn meta [object] (. lingy.lang.RT (meta_get 'object)))
 
 (defn mod
   [num div]
@@ -331,14 +200,6 @@
 (defn namespace [symbol] (. lingy.lang.RT (namespace symbol)))
 
 (defn next [x] (seq (rest x)))
-
-(defn nfirst [x] (next (first x)))
-
-(defn nil? [x] (. lingy.lang.RT (nil_Q x)))
-
-(defn nnext [x] (next (next x)))
-
-(defn not [a] (if a false true))
 
 (defmacro ns [name & xs] `(lingy.lang.RT/ns '~name '~xs))
 
@@ -364,18 +225,9 @@
       (nth list index)
       default)))
 
-(defmacro or
-  ([] nil)
-  ([x] x)
-  ([x & next]
-   `(let [or# ~x]
-      (if or# or# (or ~@next)))))
+(defn number [string] (. lingy.lang.RT (number string)))
 
-(defn number [string] (. lingy.lang.RT (number_ string)))
-
-(defn number? [value] (. lingy.lang.RT (number_Q value)))
-
-(defn pos? [num] (. lingy.lang.Numbers (isPos num)))
+(defn perl [string] (. lingy.lang.RT (eval_perl string)))
 
 (defn pr-str [& xs] (apply lingy.lang.RT/pr_str xs))
 
@@ -383,11 +235,7 @@
 
 (defn prn [& args] (apply lingy.lang.RT/prn args))
 
-(defn quot [x y] (. lingy.lang.RT (quot x y)))
-
 (defn range [& args] (apply lingy.lang.Numbers/range args))
-
-(defn read-string [string] (. lingy.lang.RT (read_string string)))
 
 (defn readline [] (. lingy.lang.RT (readline)))
 
@@ -406,19 +254,17 @@
           v1
           (recur v1 (first xs) (rest xs)))))))
 
+(def reduce1 reduce)
+
 (defn re-find [re s] (lingy.lang.Regex/find re s))
 
 (defn re-matches [re s] (lingy.lang.Regex/matches re s))
 
 (defn re-pattern [s] (lingy.lang.Regex/pattern s))
 
-(defn refer [& xs]
-  (apply lingy.lang.RT/refer xs)
+(defn refer [ns]
+  (. *ns* refer ns)
   nil)
-
-(defn rem
-  [num div]
-    (. lingy.lang.Numbers (remainder num div)))
 
 (defn require [& xs]
   (apply lingy.lang.RT/require xs)
@@ -428,15 +274,11 @@
 
 (defn resolve [symbol] (. lingy.lang.RT (resolve symbol)))
 
-(defn rest [list] (. lingy.lang.RT (rest list)))
-
-(defn second [x] (first (next x)))
-
 (defn seq [list] (. lingy.lang.RT (seq list)))
 
-(defn seq? [value] (. lingy.lang.RT (seq_Q value)))
+(defn seq? [x] (instance? lingy.lang.ListClass x))
 
-(defn sequential? [value] (. lingy.lang.RT (sequential_Q value)))
+(defn sequential? [x] (instance? lingy.lang.Sequential x))
 
 (defn slurp [file] (. lingy.lang.RT (slurp file)))
 
@@ -444,45 +286,25 @@
 
 (defn str [& args] (apply lingy.lang.RT/str args))
 
-(defn string? [value] (. lingy.lang.RT (string_Q value)))
-
 (defn swap! [atom fn & args] (. lingy.lang.RT (swap_BANG atom fn args)))
 
 (defn symbol [string] (. lingy.lang.RT (symbol_ string)))
 
-(defn symbol? [value] (. lingy.lang.RT (symbol_Q value)))
-
 (defn the-ns [ns] (. lingy.lang.RT (the_ns ns)))
-
-(defn throw [string] (. lingy.lang.RT (throw string)))
 
 (defn time-ms [] (. lingy.lang.RT (time_ms)))
 
-(defn true? [value] (. lingy.lang.RT (true_Q value)))
-
-(defn type [object] (. lingy.lang.RT (type_ object)))
+(defn type [object] (. lingy.lang.RT (type object)))
 
 (defn use [ns]
   (require ns)
   (refer ns))
 
-(defmacro when
-  [test & body]
-  (list 'if test (cons 'do body)))
-
-(defmacro when-not
-  [test & body]
-  (list 'if test nil (cons 'do body)))
-
-(defn vals [value] (. lingy.lang.RT (vals value)))
-
 (defn var [value] (. lingy.lang.RT (var value)))
 
 (defn vec [value] (. lingy.lang.RT (vec value)))
 
-(defn vector [& args] (apply lingy.lang.RT/vector_ args))
-
-(defn vector? [value] (. lingy.lang.RT (vector_Q value)))
+(defn vector [& args] (apply lingy.lang.RT/vector args))
 
 (defmacro when-let [bindings & body]
   (let [
@@ -496,10 +318,12 @@
 (defn with-meta [object meta]
   (. lingy.lang.RT (with_meta object meta)))
 
-(defn zero?
-  [num] (. lingy.lang.Numbers (isZero num)))
-
 ; Private functions:
+
+; user=> (apply + 3 4 [5 6])
+; 18
+; user=> (eval (cons + (spread [3 4 [5 6]])))
+; 18
 (defn -spread [arglist]
   (cond
     (nil? arglist) nil

@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of an array of bootstrap method
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -64,7 +64,7 @@ MarpaX::Java::ClassFile::BNF::BootstrapMethodArray - Parsing of an array of boot
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

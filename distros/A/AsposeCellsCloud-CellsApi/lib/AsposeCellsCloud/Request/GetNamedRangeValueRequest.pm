@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetNamedRangeValueRequest.name :   ,
-# GetNamedRangeValueRequest.namerange :   ,
-# GetNamedRangeValueRequest.folder :   ,
-# GetNamedRangeValueRequest.storageName :    
+# GetNamedRangeValueRequest.name : The workbook name.  ,
+# GetNamedRangeValueRequest.namerange : Range name.  ,
+# GetNamedRangeValueRequest.folder : Original workbook folder.  ,
+# GetNamedRangeValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_named_range_value' } = { 
-    	summary => '',
+    	summary => 'Get range values.',
         params => $params,
         returns => 'RangeValueResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'namerange' => {
      	datatype => 'string',
      	base_name => 'namerange',
-     	description => '',
+     	description => 'Range name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetValidationRequest.name :   ,
-# PutWorksheetValidationRequest.sheetName :   ,
-# PutWorksheetValidationRequest.range :   ,
-# PutWorksheetValidationRequest.folder :   ,
-# PutWorksheetValidationRequest.storageName :    
+# PutWorksheetValidationRequest.name : The workbook name.  ,
+# PutWorksheetValidationRequest.sheetName : The worksheet name.  ,
+# PutWorksheetValidationRequest.range : Specified cells area  ,
+# PutWorksheetValidationRequest.folder : Original workbook folder.  ,
+# PutWorksheetValidationRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_validation' } = { 
-    	summary => '',
+    	summary => 'Adds a validation at index in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range' => {
      	datatype => 'string',
      	base_name => 'range',
-     	description => '',
+     	description => 'Specified cells area',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

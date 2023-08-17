@@ -1,6 +1,6 @@
 use Test2::V0;
 
-use Test2::Require::Module 're::engine::RE2';
+use Test2::Require::Module 're::engine::RE2' => '0.18';
 
 use Regexp::Pattern;
 use re::engine::RE2;

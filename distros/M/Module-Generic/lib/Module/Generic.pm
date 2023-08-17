@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.30.4
+## Version v0.31.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2023/05/25
+## Modified 2023/07/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.30.4';
+    our $VERSION     = 'v0.31.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -141,7 +141,10 @@ $stderr_raw->autoflush( 1 );
 }
 
 # for sub in `egrep -E '^sub ' ./lib/Module/Generic.pm| awk '{print $2 }' | perl -pe 's/\;$//' | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
+sub AUTOLOAD;
 sub DEBUG;
+sub FREEZE;
+sub THAW;
 sub VERBOSE;
 sub as_hash;
 sub clear;
@@ -192,6 +195,7 @@ sub new_number;
 sub new_scalar;
 sub new_tempdir;
 sub new_tempfile;
+sub new_version;
 sub noexec;
 sub pass_error;
 sub printer;
@@ -206,8 +210,10 @@ sub verbose;
 sub will;
 sub _autoload_subs;
 sub _can;
+sub _can_overload;
 sub _get_args_as_array;
 sub _get_args_as_hash;
+sub _get_datetime_regexp;
 sub _get_stack_trace;
 sub _has_base64;
 sub _implement_freeze_thaw;
@@ -217,18 +223,28 @@ sub _is_array;
 sub _is_class_loadable;
 sub _is_class_loaded;
 sub _is_code;
+sub _is_empty;
 sub _is_glob;
 sub _is_hash;
 sub _is_integer;
 sub _is_ip;
 sub _is_number;
 sub _is_object;
+sub _is_overloaded;
 sub _is_scalar;
 sub _is_uuid;
+sub _is_warnings_enabled;
 sub _load_class;
 sub _load_classes;
 sub _lvalue;
+sub _message;
+sub _messagef;
+sub _message_check;
+sub _message_frame;
+sub _message_log;
+sub _message_log_io;
 sub _obj2h;
+sub _on_error;
 sub _parse_timestamp;
 sub _refaddr;
 sub _set_get;
@@ -238,6 +254,7 @@ sub _set_get_boolean;
 sub _set_get_callback;
 sub _set_get_class;
 sub _set_get_class_array;
+sub _set_get_class_array_object;
 sub _set_get_code;
 sub _set_get_datetime;
 sub _set_get_file;
@@ -263,6 +280,7 @@ sub _set_get_scalar_as_object;
 sub _set_get_scalar_or_object;
 sub _set_get_uri;
 sub _set_get_uuid;
+sub _set_get_version;
 sub _to_array_object;
 sub _warnings_is_enabled;
 sub _warnings_is_registered;
@@ -691,7 +709,7 @@ sub deserialise
                 }
                 catch( $err )
                 {
-                    return( $self->error( "Error trying to deserialise with $class ", CORE::length( $opts->{data} ), " bytes of data (", ( ( CORE::length( $opts->{data} ) > 128 ? ( substr( $opts->{data}, 0, 128 ) . '(trimmed)' ) : $opts->{data} ) ), ": $err" ) );
+                    return( $self->error( "Error trying to deserialise with $class ", CORE::length( $opts->{data} ), " bytes of data (", ( CORE::length( $opts->{data} ) > 128 ? ( substr( $opts->{data}, 0, 128 ) . '(trimmed)' ) : $opts->{data} ), ": $err" ) );
                 }
             }
             else
@@ -876,6 +894,46 @@ sub error
     my $o;
     no strict 'refs';
     no warnings 'once';
+    my $want_return = 
+    {
+        array => sub
+        {
+            return( [] );
+        },
+        code => sub
+        {
+            return( sub{} );
+        },
+        'glob' => sub
+        {
+            open( my $tmp, '>', \undef );
+            return( $tmp );
+        },
+        hash => sub
+        {
+            return( {} );
+        },
+        object => sub
+        {
+            require Module::Generic::Null;
+            my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1, wants => 'object' });
+            return( $null );
+        },
+        'scalar' => sub
+        {
+            my $dummy = undef;
+            return( \$dummy );
+        },
+    };
+    
+    my $want_what = Want::wantref();
+    
+    # Ensure this is lowercase and at the same time that this is defined
+    $want_what = lc( $want_what // '' );
+    # What type of expected value we support to prevent perl error upon undef.
+    # By default: object
+    my $want_ok = [qw( object )];
+
     if( @_ )
     {
         my $args = {};
@@ -905,6 +963,24 @@ sub error
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
         $self->_message( 5, "Called with error message '", $args->{message}, "'" );
+        # What type of expected value we support to prevent perl error upon undef.
+        # By default: object
+        if( exists( $args->{want} ) && 
+            Scalar::Util::reftype( $args->{want} // '' ) eq 'ARRAY' )
+        {
+            $want_ok = CORE::delete( $args->{want} );
+        }
+        
+        if( scalar( grep( $_ eq 'all', @$want_ok ) ) )
+        {
+            foreach my $t ( keys( %$want_return ) )
+            {
+                push( @$want_ok, $t ) unless( scalar( grep( /^$t$/i, @$want_ok ) ) );
+            }
+        }
+        
+        push( @$want_ok, 'OBJECT' ) unless( scalar( grep( /^object$/i, @$want_ok ) ) );
+        
         if( defined( $o ) )
         {
             $this->{error} = ${ $class . '::ERROR' } = $o;
@@ -931,6 +1007,18 @@ sub error
             $o = $this->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
         }
         
+        my $err_callback = $self->_on_error;
+        if( defined( $err_callback ) && 
+            ref( $err_callback ) eq 'CODE' )
+        {
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            eval
+            {
+                $err_callback->( $self, $o );
+            };
+        }
+        
         # Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
         # This can be changed by using 'no warnings'
         my $should_display_warning = 0;
@@ -941,7 +1029,7 @@ sub error
             $should_display_warning = $self->_warnings_is_enabled;
             $no_use_warnings = 0;
         
-            ## If no warnings are registered for our package, we display warnings.
+            # If no warnings are registered for our package, we display warnings.
             if( $no_use_warnings && !defined( $warnings::Bits{ $class } ) )
             {
                 $no_use_warnings = 0;
@@ -1053,12 +1141,21 @@ sub error
         # 2020-05-12: Added the no_return_null_object to instruct not to return a null object
         # This is especially needed when an error is called from TIEHASH that returns a special object.
         # A Null object would trigger a fatal perl segmentation fault
-        elsif( !$args->{no_return_null_object} && ( want( 'OBJECT' ) || $args->{object} ) )
+        elsif( !$args->{no_return_null_object} && 
+               (
+                   ( $want_what && CORE::exists( $want_return->{ $want_what } ) && scalar( grep( /^$want_what$/i, @$want_ok ) ) ) || 
+                   $args->{object}
+               ) )
         {
-            $self->_message( 5, "Caller is in object context, returning a Null object." );
-            require Module::Generic::Null;
-            my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1 });
-            rreturn( $null );
+            if( $args->{object} )
+            {
+                $self->_message( 5, "Caller is in object context, returning a Null object." );
+                rreturn( $want_return->{object}->() );
+            }
+            else
+            {
+                rreturn( $want_return->{ $want_what }->() );
+            }
         }
         elsif( $args->{lvalue} && want( 'RVALUE' ) )
         {
@@ -1068,13 +1165,17 @@ sub error
         $self->_message( 5, "Returning nothing (undef or empty list)." );
         return;
     }
+    
     # To avoid the perl error of 'called on undefined value' and so the user can do
     # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
-    if( !$this->{error} && want( 'OBJECT' ) )
+    if( !$this->{error} )
     {
-        require Module::Generic::Null;
-        my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, wants => 'object' });
-        rreturn( $null );
+        if( $want_what && 
+            CORE::exists( $want_return->{ $want_what } ) &&
+            scalar( grep( /^$want_what$/i, @$want_ok ) ) )
+        {
+            rreturn( $want_return->{ $want_what }->() );
+        }
     }
     $self->_message( 5, "Returning error object -> ", overload::StrVal( ref( $self ) ? ( $this->{error} // '' ) : ( ${ $class . '::ERROR' } // '' ) ) );
     return( ref( $self ) ? $this->{error} : ${ $class . '::ERROR' } );
@@ -1225,6 +1326,9 @@ sub init
         {
             my $name = $vals->[ $i ];
             my $val  = $vals->[ ++$i ];
+            # Ensure the name has any dash ("-") converted to underscore ("_")
+            my $orig = $name;
+            my $transformed = ( $name =~ tr/-/_/ );
             my $meth = $self->can( $name );
             if( defined( $meth ) )
             {
@@ -1240,16 +1344,14 @@ sub init
             }
             elsif( $this->{_init_strict_use_sub} )
             {
-                $self->_message( 3, "Unknown method '$name' in class $pkg -> ", sub
-                {
-                    $self->_get_stack_trace->as_string;
-                });
+                $self->_message( 3, "Unknown method '$name' in class $pkg -> ", sub{ $self->_get_stack_trace->as_string });
                 $self->error( "Unknown method $name in class $pkg" );
                 next;
             }
-            elsif( exists( $data->{ $name } ) )
+            elsif( exists( $data->{ $name } ) ||
+                   exists( $data->{ $orig } ) )
             {
-                ## Pre-existing field value looks like a module package and that package is already loaded
+                # Pre-existing field value looks like a module package and that package is already loaded
                 if( ( index( $data->{ $name }, '::' ) != -1 || $data->{ $name } =~ /^[a-zA-Z][a-zA-Z\_]*[a-zA-Z]$/ ) &&
                     $self->_is_class_loaded( $data->{ $name } ) )
                 {
@@ -1265,17 +1367,32 @@ sub init
                 }
                 elsif( $this->{_init_strict} )
                 {
-                    if( ref( $data->{ $name } ) eq 'ARRAY' )
+                    if( exists( $data->{ $orig } ) && ref( $data->{ $orig } ) eq 'ARRAY' )
                     {
-                        return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'ARRAY' );
+                        return( $self->error( "$orig parameter expects an array reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'ARRAY' );
                     }
-                    elsif( ref( $data->{ $name } ) eq 'HASH' )
+                    elsif( exists( $data->{ $orig } ) && ref( $data->{ $orig } ) eq 'HASH' )
                     {
-                        return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'HASH' );
+                        return( $self->error( "$orig parameter expects an hash reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'HASH' );
                     }
-                    elsif( ref( $data->{ $name } ) eq 'SCALAR' )
+                    elsif( exists( $data->{ $orig } ) && ref( $data->{ $orig } ) eq 'SCALAR' )
                     {
-                        return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'SCALAR' );
+                        return( $self->error( "$orig parameter expects a scalar reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'SCALAR' );
+                    }
+                    elsif( $transformed )
+                    {
+                        if( exists( $data->{ $name } ) && ref( $data->{ $name } ) eq 'ARRAY' )
+                        {
+                            return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'ARRAY' );
+                        }
+                        elsif( exists( $data->{ $name } ) && ref( $data->{ $name } ) eq 'HASH' )
+                        {
+                            return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'HASH' );
+                        }
+                        elsif( exists( $data->{ $name } ) && ref( $data->{ $name } ) eq 'SCALAR' )
+                        {
+                            return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'SCALAR' );
+                        }
                     }
                 }
             }
@@ -1358,27 +1475,39 @@ sub new_json
 sub new_null
 {
     my $self = shift( @_ );
-    my $what = Want::want( 'LIST' )
-        ? 'LIST'
-        : Want::want( 'HASH' )
-            ? 'HASH'
-            : Want::want( 'ARRAY' )
-                ? 'ARRAY'
-                : Want::want( 'OBJECT' )
-                    ? 'OBJECT'
-                    : Want::want( 'CODE' )
-                        ? 'CODE'
-                        : Want::want( 'REFSCALAR' )
-                            ? 'REFSCALAR'
-                            : Want::want( 'BOOLEAN' )
-                                ? 'BOOLEAN'
-                                : Want::want( 'GLOB' )
-                                    ? 'GLOB'
-                                    : Want::want( 'SCALAR' )
-                                        ? 'SCALAR'
-                                        : Want::want( 'VOID' )
-                                            ? 'VOID'
-                                            : '';
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $what;
+    if( CORE::exists( $opts->{type} ) &&
+        CORE::length( $opts->{type} // '' ) &&
+        $opts->{type} =~ /^(array|code|hash|object|refscalar)$/i )
+    {
+        $what = $opts->{type};
+    }
+    else
+    {
+        $what = Want::want( 'LIST' )
+            ? 'LIST'
+            : Want::want( 'HASH' )
+                ? 'HASH'
+                : Want::want( 'ARRAY' )
+                    ? 'ARRAY'
+                    : Want::want( 'OBJECT' )
+                        ? 'OBJECT'
+                        : Want::want( 'CODE' )
+                            ? 'CODE'
+                            : Want::want( 'REFSCALAR' )
+                                ? 'REFSCALAR'
+                                : Want::want( 'BOOLEAN' )
+                                    ? 'BOOLEAN'
+                                    : Want::want( 'GLOB' )
+                                        ? 'GLOB'
+                                        : Want::want( 'SCALAR' )
+                                            ? 'SCALAR'
+                                            : Want::want( 'VOID' )
+                                                ? 'VOID'
+                                                : '';
+    }
+    
     if( $what eq 'OBJECT' )
     {
         require Module::Generic::Null;
@@ -1529,6 +1658,17 @@ sub pass_error
     {
         $this->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $this->{error}->code( $code ) if( defined( $code ) );
+        my $err_callback = $self->_on_error;
+        if( defined( $err_callback ) && 
+            ref( $err_callback ) eq 'CODE' )
+        {
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            eval
+            {
+                $err_callback->( $self, $this->{error} );
+            };
+        }
         if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
             die( $this->{error} );
@@ -1905,6 +2045,30 @@ sub __instantiate_object
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $o;
+    my $callback;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object" ) ) if( !length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+
     try
     {
         # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
@@ -1912,7 +2076,16 @@ sub __instantiate_object
         # Either it passes and returns the class loaded or it raises an error trapped in catch
         my $rc = Class::Load::load_class( $class );
         @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        $o = scalar( @_ ) ? $class->new( @_ ) : $class->new;
+        if( defined( $callback ) )
+        {
+            $o = $callback->(
+                $class => [@_],
+            );
+        }
+        else
+        {
+            $o = scalar( @_ ) ? $class->new( @_ ) : $class->new;
+        }
         return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
         $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
     }
@@ -2044,10 +2217,10 @@ sub _get_args_as_hash
     return( $need_list ? ( $ref, $order ) : $ref );
 }
 
-## Call to the actual method doing the work
-## The reason for doing so is because _instantiate_object() may be inherited, but
-## _set_get_class or _set_get_hash_as_object created dynamic class which requires to call _instantiate_object
-## If _instantiate_object is inherited, it will yield unpredictable results
+# Call to the actual method doing the work
+# The reason for doing so is because _instantiate_object() may be inherited, but
+# _set_get_class or _set_get_hash_as_object created dynamic class which requires to call _instantiate_object
+# If _instantiate_object is inherited, it will yield unpredictable results
 sub _instantiate_object { return( shift->__instantiate_object( @_ ) ); }
 
 sub _get_stack_trace
@@ -2721,6 +2894,12 @@ sub _set_get_array
     if( @_ )
     {
         my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+        if( !defined( $data->{ $field } ) && want( 'ARRAY' ) )
+        {
+            # The call context is an array reference.
+            # To avoid the perl of 'Not an ARRAY reference', we return an empty array
+            return( [] );
+        }
         $data->{ $field } = $val;
     }
     return( $data->{ $field } );
@@ -2734,9 +2913,12 @@ sub _set_get_array_as_object : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $def = {};
+    # If this is set to true, this method will return a list in list context
+    $def->{wantlist} //= 0;
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -2754,6 +2936,7 @@ sub _set_get_array_as_object : lvalue
         get => sub
         {
             my $self = shift( @_ );
+            my $ctx = $_;
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
             {
@@ -2761,11 +2944,20 @@ sub _set_get_array_as_object : lvalue
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
-            return( $data->{ $field } );
+            
+            if( $def->{wantlist} && $ctx->{list} )
+            {
+                return( $data->{ $field } ? $data->{ $field }->list : () );
+            }
+            else
+            {
+                return( $data->{ $field } );
+            }
         },
         set => sub
         {
             my $self = shift( @_ );
+            my $ctx = $_;
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
             require Module::Generic::Array;
@@ -2784,12 +2976,23 @@ sub _set_get_array_as_object : lvalue
             {
                 $o = Module::Generic::Array->new( $val );
                 $data->{ $field } = $o;
-                if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+                if( scalar( keys( %$callbacks ) ) && 
+                    ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
                 {
-                    my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                    my $coderef;
+                    foreach my $t ( qw( add set ) )
+                    {
+                        if( CORE::exists( $callbacks->{ $t } ) )
+                        {
+                            $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                                ? $callbacks->{ $t }
+                                : $self->can( $callbacks->{ $t } );
+                            last if( defined( $coderef ) );
+                        }
+                    }
                     if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
                     {
-                        $coderef->( $self );
+                        $coderef->( $self, $data->{ $field } );
                     }
                 }
             }
@@ -2800,7 +3003,15 @@ sub _set_get_array_as_object : lvalue
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
-            return( $data->{ $field } );
+            
+            if( $def->{wantlist} && $ctx->{list} )
+            {
+                return( $data->{ $field } ? $data->{ $field }->list : () );
+            }
+            else
+            {
+                return( $data->{ $field } );
+            }
         },
         field => $field,
     }, @_ ) );
@@ -2814,9 +3025,10 @@ sub _set_get_boolean : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -2837,7 +3049,8 @@ sub _set_get_boolean : lvalue
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             # If there is a value set, like a default value and it is not an object or at least not one we recognise
             # We transform it into a Module::Generic::Boolean object
-            if( CORE::length( $data->{ $field } ) && 
+            if( defined( $data->{ $field } ) &&
+                CORE::length( $data->{ $field } ) && 
                 ( 
                     !Scalar::Util::blessed( $data->{ $field } ) || 
                     ( 
@@ -2849,6 +3062,13 @@ sub _set_get_boolean : lvalue
             {
                 my $val = $data->{ $field };
                 $data->{ $field } = $val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
+            }
+            elsif( defined( $data->{ $field } ) &&
+                   CORE::length( $data->{ $field } ) &&
+                   Scalar::Util::reftype( $data->{ $field } // '' ) eq 'SCALAR' )
+            {
+                my $val = $data->{ $field };
+                $data->{ $field } = $$val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
             }
             return( $data->{ $field } );
         },
@@ -2882,13 +3102,24 @@ sub _set_get_boolean : lvalue
                     ? Module::Generic::Boolean->true
                     : Module::Generic::Boolean->false;
             }
-        
-            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
             {
-                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
                 if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
                 {
-                    $coderef->( $self );
+                    $coderef->( $self, $data->{ $field } );
                 }
             }
             
@@ -2938,6 +3169,7 @@ sub _set_get_callback : lvalue
         $setter = sub{};
     }
     die( "Field value specified is empty." ) if( defined( $field ) && !CORE::length( "$field" ) );
+    # $self->_message( 4, "Called with stack trace -> ", sub{ $self->_get_stack_trace->as_string } );
     my $context = {};
     my $args;
     my @rv;
@@ -3114,7 +3346,7 @@ sub _set_get_callback : lvalue
     }
     else
     {
-        $self->_message( 5, "No error, all is well, accessor callback returned ", scalar( @rv ), " values." );
+        $self->_message( 5, "No error, all is well, accessor callback returned ", scalar( @rv ), " value(s)." );
         if( $context->{rvalue} )
         {
             $self->_message( 5, "We are in rvalue context." );
@@ -3180,7 +3412,7 @@ sub _set_get_class
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     if( ref( $def ) ne 'HASH' )
     {
-        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
+        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference." );
         return;
     }
     
@@ -3211,12 +3443,12 @@ sub _set_get_class_array
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     if( ref( $def ) ne 'HASH' )
     {
-        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
+        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference." );
         return;
     }
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
-    ## return( $self->_set_get_object_array( $field, $class, @_ ) );
+    # return( $self->_set_get_object_array( $field, $class, @_ ) );
     if( @_ )
     {
         my $ref = shift( @_ );
@@ -3229,8 +3461,8 @@ sub _set_get_class_array
                 return( $self->error( "Array offset $i is not a hash reference. I was expecting a hash reference to instantiate an object of class $class." ) );
             }
             my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
-            ## If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
-            ## And the caller needs to know there has been some errors
+            # If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
+            # And the caller needs to know there has been some errors
             CORE::push( @$arr, $o );
         }
         $data->{ $field } = $arr;
@@ -3406,7 +3638,7 @@ sub _set_get_hash : lvalue
                     $arg = shift( @_ );
                 }
             }
-            if( ref( $arg ) ne 'HASH' )
+            if( defined( $arg ) && ref( $arg ) ne 'HASH' )
             {
                 return( $self->error( "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported" ) );
             }
@@ -3445,9 +3677,18 @@ sub _set_get_hash_as_mix_object : lvalue
         get => sub
         {
             my $self = shift( @_ );
+            my $ctx = $_;
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( !defined( $data->{ $field } ) )
             {
+                # If the call context is either an hash or an object, we instantiate an empty object, and return it,
+                # but we do not affect the current property value of our object
+                if( $ctx->{object} || $ctx->{hash} )
+                {
+                    require Module::Generic::Hash;
+                    my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    return( $o );
+                }
                 return;
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
@@ -3461,6 +3702,7 @@ sub _set_get_hash_as_mix_object : lvalue
         set => sub
         {
             my $self = shift( @_ );
+            my $ctx = $_;
             my $arg;
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) && !$opts->{undef_ok} );
@@ -3502,8 +3744,17 @@ sub _set_get_hash_as_mix_object : lvalue
                 require Module::Generic::Hash;
                 $data->{ $field } = Module::Generic::Hash->new( $val );
             }
+            
             if( !defined( $data->{ $field } ) )
             {
+                # If the call context is either an hash or an object, we instantiate an empty object, and return it,
+                # but we do not affect the current property value of our object
+                if( $ctx->{object} || $ctx->{hash} )
+                {
+                    require Module::Generic::Hash;
+                    my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    return( $o );
+                }
                 return;
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
@@ -3629,12 +3880,23 @@ sub _set_get_number : lvalue
     
     my $do_callback = sub
     {
-        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        if( scalar( keys( %$callbacks ) ) && 
+            ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
         {
-            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            my $coderef;
+            foreach my $t ( qw( add set ) )
+            {
+                if( CORE::exists( $callbacks->{ $t } ) )
+                {
+                    $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                        ? $callbacks->{ $t }
+                        : $self->can( $callbacks->{ $t } );
+                    last if( defined( $coderef ) );
+                }
+            }
             if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
             {
-                $coderef->( $self );
+                $coderef->( $self, $data->{ $field } );
             }
         }
     };
@@ -3670,7 +3932,7 @@ sub _set_get_number : lvalue
             }
             $do_callback->();
 
-            if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
+            if( CORE::length( $data->{ $field } // '' ) && !ref( $data->{ $field } ) )
             {
                 my $v = Module::Generic::Number->new( $data->{ $field } );
                 $data->{ $field } = $v if( defined( $v ) );
@@ -3692,9 +3954,10 @@ sub _set_get_number_as_scalar : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     
     my $callbacks = {};
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -3710,12 +3973,23 @@ sub _set_get_number_as_scalar : lvalue
     
     my $do_callback = sub
     {
-        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        if( scalar( keys( %$callbacks ) ) && 
+            ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
         {
-            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            my $coderef;
+            foreach my $t ( qw( add set ) )
+            {
+                if( CORE::exists( $callbacks->{ $t } ) )
+                {
+                    $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                        ? $callbacks->{ $t }
+                        : $self->can( $callbacks->{ $t } );
+                    last if( defined( $coderef ) );
+                }
+            }
             if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
             {
-                $coderef->( $self );
+                $coderef->( $self, $data->{ $field } );
             }
         }
     };
@@ -3785,6 +4059,8 @@ sub _set_get_object
     no overloading;
 
     my $def = {};
+    # no_init
+    my $callback;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -3799,6 +4075,12 @@ sub _set_get_object
             $field = undef;
         }
         return( $self->error( "No property 'field' was provided in the parameters of _set_get_object" ) ) if( !length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
     }
     
     # Parameters are provided to instantiate the object
@@ -3836,7 +4118,7 @@ sub _set_get_object
             else
             {
                 $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
                 {
                     if( $class->can( 'error' ) )
                     {
@@ -3863,7 +4145,7 @@ sub _set_get_object
                 warn( "Re-setting existing object '", overload::StrVal( $data->{ $field } ), "' for field '$field' and class '$class'\n" );
             }
             
-            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
             {
                 if( $class->can( 'error' ) )
                 {
@@ -3890,7 +4172,7 @@ sub _set_get_object
         else
         {
             $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
             {
                 if( $class->can( 'error' ) )
                 {
@@ -3978,6 +4260,31 @@ sub _set_get_object_without_init
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     no overloading;
+    
+    my $def = {};
+    my $callback;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object" ) ) if( !length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+
     if( @_ )
     {
         if( scalar( @_ ) == 1 )
@@ -4012,7 +4319,7 @@ sub _set_get_object_without_init
             else
             {
                 # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
-                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
                 {
                     if( $class->can( 'error' ) )
                     {
@@ -4029,7 +4336,7 @@ sub _set_get_object_without_init
         else
         {
             # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
-            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
             {
                 if( $class->can( 'error' ) )
                 {
@@ -4055,6 +4362,31 @@ sub _set_get_object_array2
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    
+    my $def = {};
+    my $callback;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object" ) ) if( !length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+    
     if( @_ )
     {
         my $data_to_process = shift( @_ );
@@ -4078,7 +4410,7 @@ sub _set_get_object_array2
                     elsif( ref( $ref->[$i] ) eq 'HASH' )
                     {
                         #$o = $class->new( $h, $ref->[$i] );
-                        $o = $self->_instantiate_object( $field, $class, $ref->[$i] );
+                        $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, $ref->[$i] );
                     }
                     else
                     {
@@ -4088,7 +4420,7 @@ sub _set_get_object_array2
                 else
                 {
                     #$o = $class->new( $h );
-                    $o = $self->_instantiate_object( $field, $class );
+                    $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class );
                 }
                 return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
                 # $o->{_parent} = $self->{_parent};
@@ -4109,6 +4441,33 @@ sub _set_get_object_array
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+
+    my $def = {};
+    my $callback;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object_array" ) ) if( !CORE::length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+    $def->{empty_ok} //= 0;
+    $def->{skip_empty} //= 0;
+    
     my $process = sub
     {
         my $ref = shift( @_ );
@@ -4116,7 +4475,7 @@ sub _set_get_object_array
         my $arr = [];
         for( my $i = 0; $i < scalar( @$ref ); $i++ )
         {
-            if( defined( $ref->[$i] ) )
+            if( defined( $ref->[$i] ) || $def->{empty_ok} )
             {
 #                 return( $self->error( "Array offset $i is not a reference. I was expecting an object of class $class or an hash reference to instantiate an object." ) ) if( !ref( $ref->[$i] ) );
                 if( Scalar::Util::blessed( $ref->[$i] ) )
@@ -4124,27 +4483,25 @@ sub _set_get_object_array
                     return( $self->error( "Array offset $i contains an object from class ", $ref->[$i], ", but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
                     push( @$arr, $ref->[$i] );
                 }
-#                 elsif( ref( $ref->[$i] ) eq 'HASH' )
-#                 {
-#                     #$o = $class->new( $h, $ref->[$i] );
-#                     $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
-#                     push( @$arr, $o );
-#                 }
-#                 else
-#                 {
-#                     $self->error( "Warning only: data provided to instantiate object of class $class is not a hash reference" );
-#                 }
+                elsif( $self->_is_empty( $ref->[$i] ) && $def->{skip_empty} )
+                {
+                    next;
+                }
                 else
                 {
-                    my $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
+                    my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, $ref->[$i] ) || return( $self->pass_error );
                     push( @$arr, $o );
                 }
+            }
+            elsif( $def->{skip_empty} )
+            {
+                next;
             }
             else
             {
                 return( $self->error( "Array offset $i contains an undefined value. I was expecting an object of class $class." ) );
-                my $o = $self->_instantiate_object( $field, $class ) || return( $self->pass_error );
-                push( @$arr, $o );
+                # my $o = $self->_instantiate_object( $field, $class ) || return( $self->pass_error );
+                # push( @$arr, $o );
             }
         }
         return( $arr );
@@ -4171,10 +4528,39 @@ sub _set_get_object_array_object
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     require Module::Generic::Array;
+    
+    my $def = {};
+    my $callback;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object_array" ) ) if( !CORE::length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+    else
+    {
+        $def = { field => $field };
+    }
+    
     my $process = sub
     {
         my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return( $self->pass_error );
+        my $ref = $self->_set_get_object_array( $def, $class, $that ) || return( $self->pass_error );
         return( Module::Generic::Array->new( $ref ) );
     };
     
@@ -4195,10 +4581,35 @@ sub _set_get_object_variant
 {
     my $self  = shift( @_ );
     my $field = shift( @_ );
-    ## The class precisely depends on what we find looking ahead
+    # The class precisely depends on what we find looking ahead
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    
+    my $def = {};
+    my $callback;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        return( $self->error( "No property 'field' was provided in the parameters of _set_get_object_array" ) ) if( !CORE::length( $field // '' ) );
+        if( CORE::exists( $def->{callback} ) &&
+            defined( $def->{callback} ) &&
+            ref( $def->{callback} ) eq 'CODE' )
+        {
+            $callback = $def->{callback};
+        }
+    }
+    
     my $process = sub
     {
         if( ref( $_[0] ) eq 'HASH' )
@@ -4213,7 +4624,7 @@ sub _set_get_object_variant
             my $res = [];
             foreach my $data ( @$arr )
             {
-                my $o = $self->_instantiate_object( $field, $class, $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
+                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
                 push( @$res, $o );
             }
             return( $res );
@@ -4266,9 +4677,10 @@ sub _set_get_scalar_as_object : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -4294,6 +4706,14 @@ sub _set_get_scalar_as_object : lvalue
                 $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
             }
             my $v = $data->{ $field };
+            # If we have a callback, call it and get the resulting value
+            if( scalar( keys( %$callbacks ) ) && 
+                CORE::exists( $callbacks->{get} ) &&
+                ref( $callbacks->{get} ) eq 'CODE' )
+            {
+                $v = $callbacks->{get}->( $self, $v );
+            }
+            
             if( !$v->defined )
             {
                 # We might have need to specify, because I found a race condition where
@@ -4350,12 +4770,26 @@ sub _set_get_scalar_as_object : lvalue
             {
                 require Module::Generic::Scalar;
                 $data->{ $field } = Module::Generic::Scalar->new( $val );
-                if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+                # $self->_message( 4, "Do we have a callback set? ", ( scalar( keys( %$callbacks ) ) ? 'yes' : 'no' ) );
+                if( scalar( keys( %$callbacks ) ) && 
+                    ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
                 {
-                    my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                    my $coderef;
+                    foreach my $t ( qw( add set ) )
+                    {
+                        if( CORE::exists( $callbacks->{ $t } ) )
+                        {
+                            $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                                ? $callbacks->{ $t }
+                                : $self->can( $callbacks->{ $t } );
+                            last if( defined( $coderef ) );
+                        }
+                    }
                     if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
                     {
-                        $coderef->( $self );
+                        # $self->_message( 4, "Executing callback passing new value" );
+                        $coderef->( $self, $data->{ $field } );
+                        # $self->_message( 4, "Callback done." );
                     }
                 }
             }
@@ -4735,7 +5169,7 @@ sub as_hash
     $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
     my $class = ref( $this );
     no strict 'refs';
-    my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
+    my @methods = grep( !/^(?:new|init|TO_JSON|FREEZE|THAW|AUTOLOAD|DESTROY)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
 
     use strict 'refs';
     my $ref = {};
@@ -5761,11 +6195,17 @@ sub __create_class
         boolean     => '_set_get_boolean',
         class       => '_set_get_class',
         class_array => '_set_get_class_array',
+        code        => '_set_get_code',
         datetime    => '_set_get_datetime',
         decimal     => '_set_get_number',
+        file        => '_set_get_file',
+        float       => '_set_get_number',
+        glob        => '_set_get_glob',
         hash        => '_set_get_hash',
         hash_as_object => '_set_get_hash_as_mix_object',
         integer     => '_set_get_number',
+        ip          => '_set_get_ip',
+        long        => '_set_get_number',
         number      => '_set_get_number',
         object      => '_set_get_object',
         object_array => '_set_get_object_array',
@@ -5774,6 +6214,8 @@ sub __create_class
         scalar_as_object => '_set_get_scalar_as_object',
         scalar_or_object => '_set_get_scalar_or_object',
         uri         => '_set_get_uri',
+        uuid        => '_set_get_uuid',
+        version     => '_set_get_version',
         };
         # Alias
         $type2func->{string} = $type2func->{scalar};
@@ -5794,8 +6236,23 @@ EOT
         my $code_lines = [];
         foreach my $f ( sort( keys( %$def ) ) )
         {
-            my $info = $def->{ $f };
-            ## Convenience
+            my $info;
+            # Allow for lazy field => $type_value definition instead of field => { type => $type_value }
+            # Also helps trap if the definition is not an hash as we expect and avoid a perl error
+            if( !ref( $def->{ $f } // '' ) )
+            {
+                if( !defined( $def->{ $f } ) )
+                {
+                    warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" has value 'undef', so we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                    next;
+                }
+                $info = { type => $def->{ $f } };
+            }
+            else
+            {
+                $info = $def->{ $f };
+            }
+            # Convenience
             $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
             my $type = lc( $info->{type} );
             if( !CORE::exists( $type2func->{ $type } ) )
@@ -5817,7 +6274,7 @@ EOT
                 my $this_class = $info->{class} || $info->{package};
                 CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', '$this_class', \@_ ) ); }" );
             }
-            elsif( $type eq 'class' || $type eq 'class_array' )
+            elsif( $type eq 'class' || $type eq 'class_array' || $type eq 'class_array_object' )
             {
                 my $this_def = $info->{definition} // $info->{def};
                 if( !CORE::exists( $info->{definition} ) && !CORE::exists( $info->{def} ) )
@@ -5840,6 +6297,12 @@ EOT
                 my $hash_str = Data::Dump::dump( $this_def );
                 CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
             }
+            elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
+            {
+                my $this_def = $info->{definition} // $info->{def};
+                my $hash_str = Data::Dump::dump( $this_def );
+                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
+            }
             else
             {
                 CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', \@_ ) ); }" );
@@ -5849,6 +6312,7 @@ EOT
 
         $perl .= <<EOT;
 
+sub TO_JSON { return( shift->as_hash ); }
 
 1;
 
@@ -5857,6 +6321,30 @@ EOT
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
     return( $class );
+}
+PERL
+    # NOTE: _can_overload
+    _can_overload => <<'PERL',
+sub _can_overload
+{
+    my $self = shift( @_ );
+    no overloading;
+    # Nothing provided
+    return if( !scalar( @_ ) );
+    return if( !defined( $_[0] ) );
+    return if( !Scalar::Util::blessed( $_[0] ) );
+    if( $self->_is_array( $_[1] ) )
+    {
+        foreach my $op ( @{$_[1]} )
+        {
+            return(0) unless( overload::Method( $_[0] => $op ) );
+        }
+        return(1);
+    }
+    else
+    {
+        return( overload::Method( $_[0] => $_[1] ) );
+    }
 }
 PERL
     # NOTE: _get_datetime_regexp
@@ -6379,6 +6867,33 @@ sub _implement_freeze_thaw
         }
     }
 }
+PERL
+    # NOTE: _is_empty()
+    _is_empty => <<'PERL',
+sub _is_empty
+{
+    my $self = shift( @_ );
+    return(1) if( !@_ );
+    return(1) if( !defined( $_[0] ) || ( defined( $_[0] ) && Scalar::Util::reftype( $_[0] ) eq 'SCALAR' && Scalar::Util::blessed( $_[0] ) && $_[0]->can( 'defined' ) && !$_[0]->defined ) || !CORE::length( $_[0] // '' ) );
+    return(0);
+}
+PERL
+    # NOTE: _is_overloaded()
+    _is_overloaded => <<'PERL',
+sub _is_overloaded
+{
+    my $self = shift( @_ );
+    no overloading;
+    # Nothing provided
+    return if( !scalar( @_ ) );
+    return if( !defined( $_[0] ) );
+    return if( !Scalar::Util::blessed( $_[0] ) );
+    return( overload::Overloaded( $_[0] ) ? 1 : 0 );
+}
+PERL
+    # NOTE: _on_error()
+    _on_error => <<'PERL',
+sub _on_error { return( shift->_set_get_code( '_on_error', @_ ) ); }
 PERL
     # NOTE: _parse_timestamp()
     _parse_timestamp => <<'PERL',
@@ -7016,6 +7531,32 @@ sub _parse_timestamp
     }
 }
 PERL
+    # NOTE: _set_get_class_array_object
+    _set_get_class_array_object => <<'PERL',
+sub _set_get_class_array_object
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $ref = $self->_set_get_class_array( $field, @_ );
+    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
+    {
+        require Module::Generic::Array;
+        my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
+        $data->{ $field } = $o;
+    }
+    
+    if( $def->{wantlist} && want( 'LIST' ) )
+    {
+        return( $data->{ $field } ? $data->{ $field }->list : () );
+    }
+    else
+    {
+        return( $data->{ $field } );
+    }
+}
+PERL
     # NOTE: _set_get_datetime()
     _set_get_datetime => <<'PERL',
 sub _set_get_datetime : lvalue
@@ -7380,14 +7921,6 @@ sub AUTOLOAD : lvalue
         $meth  = substr( $meth, $idx + 2 );
     }
     
-    if( $self && $self->can( 'autoload' ) )
-    {
-        if( my $code = $self->autoload( $meth ) )
-        {
-            return( $code->( $self, @_ ) ) if( $code );
-        }
-    }
-    
     # printf( STDERR __PACKAGE__ . "::AUTOLOAD: %d autoload subs found.\n", scalar( keys( %$AUTOLOAD_SUBS ) ) ) if( $DEBUG >= 4 );
     unless( scalar( keys( %$AUTOLOAD_SUBS ) ) )
     {
@@ -7426,6 +7959,14 @@ sub AUTOLOAD : lvalue
         return( &$AUTOLOAD( @_ ) );
     }
     
+    if( $self && $self->can( 'autoload' ) )
+    {
+        if( my $code = $self->autoload( $meth ) )
+        {
+            return( $code->( $self, @_ ) ) if( $code );
+        }
+    }
+    
     $meth = lc( $meth );
     my $this;
     $this = $self->_obj2h if( defined( $self ) );
@@ -7434,6 +7975,9 @@ sub AUTOLOAD : lvalue
     {
         $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     }
+    # Check if the object has a property some-thing for a given call to method some_thing
+    my $meth_dashed = $meth;
+    $meth_dashed =~ tr/_/-/;
     if( $data && CORE::exists( $data->{ $meth } ) )
     {
         if( @_ )
@@ -7459,6 +8003,33 @@ sub AUTOLOAD : lvalue
         else
         {
             return( $data->{ $meth } );
+        }
+    }
+    elsif( $data && CORE::exists( $data->{ $meth_dashed } ) )
+    {
+        if( @_ )
+        {
+            my $val = ( @_ == 1 ) ? shift( @_ ) : [ @_ ];
+            $data->{ $meth_dashed } = $val;
+        }
+        if( wantarray() )
+        {
+            if( ref( $data->{ $meth_dashed } ) eq 'ARRAY' )
+            {
+                return( @{ $data->{ $meth_dashed } } );
+            }
+            elsif( ref( $data->{ $meth_dashed } ) eq 'HASH' )
+            {
+                return( %{ $data->{ $meth_dashed } } );
+            }
+            else
+            {
+                return( ( $data->{ $meth_dashed } ) );
+            }
+        }
+        else
+        {
+            return( $data->{ $meth_dashed } );
         }
     }
     # Because, if it does not exist in the caller's package, 
@@ -7667,7 +8238,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.30.4
+    v0.31.1
 
 =head1 DESCRIPTION
 
@@ -7995,6 +8566,44 @@ Note, however, that if the class specified cannot be loaded for some reason, L<M
 =item I<message>
 
 The error message.
+
+=item I<want>
+
+An array reference of data types that you allow this method to return when such data type is expected by the original caller.
+
+Supported data types are: C<ARRAY>, C<CODE>, C<GLOB>, C<HASH>, C<OBJECT>, C<SCALAR>
+
+Note that, actually, the data type you provide is case insensitive.
+
+For example, you have a method that returns an array, but an error occurs, and it returns C<undef> instead:
+
+    sub your_method
+    {
+        my $self = shift( @_ );
+        return( $self->error( "Something is wrong" ) ) if( $self->something_is_missing );
+        return( $self->{array} );
+    }
+
+    my $array = $obj->your_method; # array is undef
+
+If the user does:
+
+    $obj->your_method->[0]; # perl error occurs
+
+This would trigger a perl error C<Can't use an undefined value as an ARRAY reference>, which may be fine if this is what you want, but if you want instead to ensure the user does not get an error, but instead an empty array, in your method C<your_method>, you could write this C<your_method> this way instead, passing the C<want> parameter:
+
+    sub your_method
+    {
+        my $self = shift( @_ );
+        return( $self->error( { message => "Something is wrong", want => [qw( array )] ) ) if( $self->something_is_missing );
+        return( $self->{array} );
+    }
+
+Then, if the user calls this method in array context and an error occurs, it would now return instead an empty array.
+
+    my $array = $obj->your_method->[0]; # undef
+
+Note that, by default, the C<object> call context is always activated, so you do not have to specify it.
 
 =back
 
@@ -8355,6 +8964,8 @@ By default it enables the following L<JSON> object properties:
 
 Returns a null value based on the expectations of the caller and thus without breaking the caller's call flow.
 
+You can also optionally provide an hash or hash reference containing the option C<type> with a value being either C<ARRAY>, C<CODE>, C<HASH>, C<OBJECT> or C<SCALARREF> to force C<new_null> to return the corresponding data without using the caller's context.
+
 If the caller wants an hash reference, it returns an empty hash reference.
 
 If the caller wants an array reference, it returns an empty array reference.
@@ -8369,7 +8980,7 @@ Without using L</new_null>, if you return simply undef, like:
 
     my $val = $object->return_false->[0];
     
-    sub return_false{ return }
+    sub return_false { return }
 
 The above would trigger an error that the value returned by C<return_false> is not an array reference.
 Instead of checking on the recipient end what kind of returned value was returned, the caller only need to check if it is defined or not, no matter the context in which it is called.
@@ -8702,9 +9313,33 @@ Using the resulting object C<$prod>, we can access this dynamically created clas
 
 =head2 __instantiate_object
 
-Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using L<Class::Load/"load_class">. Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an L</"error">
+    my $o = $self->__instantiate_object( 'emails', 'Some::Module', @_ );
+    # or, with a callback
+    my $o = $self->__instantiate_object({ field => 'emails', callback => sub
+    {
+        my( $class, $args ) = @_;
+        return( $class->parse_bare_address( $args->[0] ) );
+    }}, 'Email::Address::XS', @_ );
+
+Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using L<Class::Load/load_class>. Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an L</error>
 
 This is a support method used by L</"_instantiate_object">
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
 
 =head2 _instantiate_object
 
@@ -8736,6 +9371,20 @@ than to write:
     {
         # ...
     }
+
+=head2 _can_overload
+
+    my $rv = $self->_can_overload( undef, '""' ); # false
+    my $rv = $self->_can_overload( '', '""' ); # false
+    my $rv = $self->_can_overload( $some_object_not_overloaded, '""' ); # false
+    # In this example, it would return false, because, although it is an overloaded value provided, that object has no support for the operators specified.
+    my $rv = $self->_can_overload( $some_object_overloaded, '""' ); # false
+    my $rv = $self->_can_overload( $some_good_object_overloaded, '""' ); # true
+    my $rv = $self->_can_overload( $some_good_object_overloaded, [ '""', 'bool' ] ); # true
+
+Provided with some value and a string representing an operator, or an array reference of operators, and this will return true if the value is an object that has the specified operator, or operators in case of an array reference of operators provided, overloaded.
+
+It returns false otherwise.
 
 =head2 _get_args_as_array
 
@@ -8813,11 +9462,11 @@ This will return a L<Devel::StackTrace> object initiated with the following opti
 
 =over 4
 
-=item I<indent> 1
+=item C<indent> 1
 
 This will set an initial indent tab
 
-=item I<skip_frames> 1
+=item C<skip_frames> 1
 
 This is set to 1 so this very method is not included in the frames stack
 
@@ -8859,18 +9508,6 @@ Of course, if you are sure the object is actually an object, then you can direct
         # Do something
     }
 
-=head2 _is_class_loadable
-
-Takes a module name and an optional version number and this will check if the module exist and can be loaded by looking at the C<@INC> and using L<version> to compare required version and existing version.
-
-It returns true if the module can be loaded or false otherwise.
-
-=head2 _is_class_loaded
-
-Provided with a class/package name, this returns true if the module is already loaded or false otherwise.
-
-It performs this test by checking if the module is already in C<%INC>.
-
 =head2 _is_array
 
 Provided with some data, this checks if the data is of type array, even if it is an object.
@@ -8898,6 +9535,18 @@ It would rather return the module package name: C<My::Module>
 
 =head2 _is_class_loadable
 
+Takes a module name and an optional version number and this will check if the module exist and can be loaded by looking at the C<@INC> and using L<version> to compare required version and existing version.
+
+It returns true if the module can be loaded or false otherwise.
+
+=head2 _is_class_loaded
+
+Provided with a class/package name, this returns true if the module is already loaded or false otherwise.
+
+It performs this test by checking if the module is already in C<%INC>.
+
+=head2 _is_class_loadable
+
 Provided with a package name, a.k.a. a class, and an optional version and this will endeavour to check if that class is installed and if a version is provided, if it is greater or equal to the version provided.
 
 If the module is not already loaded and a version was provided, it uses L<Module::Metadata> to get that module version.
@@ -8915,6 +9564,12 @@ If you are running under mod_perl, this method will use L<Apache2::Module/loaded
 =head2 _is_code
 
 Provided with some value, possibly, undefined, and this returns true if it is a C<CODE>, such as a subroutine reference or an anonymous subroutine, or false otherwise.
+
+=head2 _is_empty
+
+This checks if a value was provided, and if it is defined, or if it has a positive length, or is a scalar object that has the method C<defined>, which returns false.
+
+Based on those checks, it returns true (1) if it appears the value is undefined or empty, and false (0) otherwise.
 
 =head2 _is_glob
 
@@ -8941,6 +9596,10 @@ Returns true if the provided value looks like a number, false otherwise.
 =head2 _is_object
 
 Provided with some data, this checks if the data is an object. It uses L<Scalar::Util/"blessed"> to achieve that purpose.
+
+=head2 _is_overloaded
+
+Provided with some value, presumably an object, and this will return true if it is overloaded in some way, or false if it is not.
 
 =head2 _is_scalar
 
@@ -9006,6 +9665,14 @@ As of version C<0.29.6>, this is an alias for L</_set_get_callback>, which provi
 =head2 _obj2h
 
 This ensures the module object is an hash reference, such as when the module object is based on a file handle for example. This permits L<Module::Generic> to work no matter what is the underlying data type blessed into an object.
+
+=head2 _on_error
+
+Sets or gets a code reference, acting as a callback that will be triggered upon call to L</error> or L</pass_error> with an error.
+
+    return( $self->error( "Oops" ) ) if( $something_bad_happened );
+    # or
+    return( $self->pass_error( $another_error_object ) ) if( $something_bad_happened );
 
 =head2 _parse_timestamp
 
@@ -9152,13 +9819,17 @@ This hash reference can contain the following properties:
 
 =over 4
 
+=item callbacks
+
+An hash reference of operation type C<add> (or C<set>)) to callback subroutine name or code reference pairs.
+
 =item field
 
 The object property name
 
-=item callbacks
+=item wantlist
 
-An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+Boolean. If true, then it will return a list in list context instead of the array object.
 
 =back
 
@@ -9168,8 +9839,7 @@ For example:
         field => 'children',
         callbacks => 
         {
-            add => '_some_add_callback',
-            remove => 'som_remove_callback',
+            set => '_some_add_callback',
         },
     }), @_ ); }
 
@@ -9203,7 +9873,7 @@ The object property name
 
 =item callbacks
 
-An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
 
 =back
 
@@ -9213,8 +9883,7 @@ For example:
         field => 'is_valid',
         callbacks => 
         {
-            add => '_some_add_callback',
-            remove => 'som_remove_callback',
+            set => '_some_add_callback',
         },
     }), @_ ); }
 
@@ -9450,6 +10119,8 @@ For example, consider the following:
         return( shift->_set_get_class( 'setup',
         {
         name => { type => 'scalar' },
+        # or being lazy:
+        # name => 'scalar',
         age => { type => 'number' },
         metadata => { type => 'hash' },
         rgb => { type => 'array' },
@@ -9503,6 +10174,12 @@ Then your script would call this method like this :
     ]);
 
 And this would store an array reference containing 2 objects with the above data.
+
+=head2 _set_get_class_array_object
+
+Same as L</=head2 _set_get_class_array>, but this returns an L<array object|Module::Generic::Array> instead of just a perl array.
+
+When called in list context, it will return its values as a list, otherwise it will return an L<array object|Module::Generic::Array>
 
 =head2 _set_get_code
 
@@ -9635,7 +10312,7 @@ This hash reference can contain the following properties:
 
 =item * C<callbacks>
 
-An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
 
 =item * C<field>
 
@@ -9653,8 +10330,7 @@ For example:
         field => 'length',
         callbacks => 
         {
-            add => '_some_add_callback',
-            remove => 'som_remove_callback',
+            set => '_some_add_callback',
         },
     }), @_ ); }
 
@@ -9668,6 +10344,16 @@ Provided with an object property name and a number or an object and this call th
 
     sub myobject { return( shift->_set_get_object({ field => 'myobject', no_init => 1 }, My::Class, @_ ) ); }
 
+    sub myobject { return( shift->_set_get_object({
+        field => 'myobject',
+        no_init => 1,
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+    }, My::Class, @_ ) ); }
+
     sub myobject { return( shift->_set_get_object( 'myobject', My::Class, @_ ) ); }
 
 Provided with an object property name, a class/package name and some data and this will initiate a new object of the given class passing it the data.
@@ -9676,11 +10362,19 @@ The property name can also be an hash reference that will be used to provide mor
 
 =over 4
 
-=item C<field>
+=item * C<callback>
+
+A callback code reference that will be passed the module class name and the arguments as an array reference.
+
+This is used to instantiate the module object in a particular way and/or to have finer control about object instantiation.
+
+Any fatal error during object instantiation is caught and an L<error|Module::Generic::Exception> would be set and C<undef> would be returned in scalar context, or an empty list in list context.
+
+=item * C<field>
 
 The actual property name
 
-=item C<no_init>
+=item * C<no_init>
 
 Boolean that, when set, instruct to not instantiate a class object if one is not instantiated yet.
 
@@ -9700,25 +10394,148 @@ Same as L</_set_get_object_without_init> but with the possibility of setting the
 
 =head2 _set_get_object_without_init
 
-Sets or gets an object, but countrary to L</_set_get_object> this method will not try to instantiate the object.
+    sub mymethod { return( shift->_set_get_object_without_init( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_without_init({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+    }, 'Some::Module', @_ ) ); }
+    # then
+    my $this = $obj->mymethod; # possibly undef if it was never instantiated
+    # return the C<Some::Module> object after having instantiated it
+    my $this = $obj->mymethod( some => parameters );
+
+Sets or gets an object, but contrary to L</_set_get_object> this method will not try to instantiate the object, unless of course you pass it some values.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+Whatever this returns will set the value for this object property.
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
 
 =head2 _set_get_object_array2
 
+    sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_array2({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+    }, 'Some::Module', @_ ) ); }
+
 Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
 
 =head2 _set_get_object_array
 
-Provided with an object property name and a class/package name and similar to L</"_set_get_object_array2"> this will create an array reference of objects.
+    sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_array({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+    }, 'Some::Module', @_ ) ); }
+
+Provided with an object property name and a class/package name and similar to L</_set_get_object_array2> this will create an array reference of objects.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
+
+    sub emails { return( shift->_set_get_object_array({
+        field => 'emails',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->parse_bare_address( $args->[0] ) );
+        },
+    }, 'Email::Address::XS', @_ ) ); }
 
 =head2 _set_get_object_array_object
 
-Provided with an object property name, a class/package name and some data and this will create an array of object similar to L</"_set_get_object_array">, except the array produced is a L<Module::Generic::Array>
+Provided with an object property name, a class/package name and some data and this will create an array of object similar to L</_set_get_object_array>, except the array produced is a L<Module::Generic::Array>
+
+This method accepts the same arguments as L</_set_get_object_array>
 
 =head2 _set_get_object_variant
 
 Provided with an object property name, a class/package name and some data, and depending whether the data provided is an hash reference or an array reference, this will either instantiate an object for the given hash reference or an array of objects with the hash references in the given array.
 
 This means the value stored for the object property will vary between an hash or array reference.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
+
+    sub emails { return( shift->_set_get_object_variant({
+        field => 'emails',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->parse_bare_address( $args->[0] ) );
+        },
+    }, 'Email::Address::XS', @_ ) ); }
 
 =head2 _set_get_scalar
 
@@ -9761,7 +10578,7 @@ The object property name
 
 =item callbacks
 
-An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
 
 =back
 
@@ -9771,8 +10588,7 @@ For example:
         field => 'name',
         callbacks => 
         {
-            add => '_some_add_callback',
-            remove => 'som_remove_callback',
+            set => '_some_add_callback',
         },
     }), @_ ); }
 

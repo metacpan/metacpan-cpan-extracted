@@ -1,5 +1,6 @@
 Changes
 examples/print_table_with_data.pl
+examples/print_table_with_data_object.pl
 examples/print_table_without_data.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

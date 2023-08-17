@@ -3,25 +3,40 @@ package SPVM::Builder::Compiler;
 use strict;
 use warnings;
 
-sub compiler {
+### Fields
+
+sub get_runtime { shift->{runtime} }
+
+sub env_api {
   my $self = shift;
   if (@_) {
-    $self->{compiler} = $_[0];
+    $self->{env_api} = $_[0];
     return $self;
   }
   else {
-    return $self->{compiler};
+    return $self->{env_api};
   }
 }
 
-sub class_paths {
+sub pointer {
   my $self = shift;
   if (@_) {
-    $self->{class_paths} = $_[0];
+    $self->{pointer} = $_[0];
     return $self;
   }
   else {
-    return $self->{class_paths};
+    return $self->{pointer};
+  }
+}
+
+sub include_dirs {
+  my $self = shift;
+  if (@_) {
+    $self->{include_dirs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{include_dirs};
   }
 }
 
@@ -41,15 +56,23 @@ sub new {
   
   bless $self, $class;
   
-  $self->create_compiler;
+  my $env_api = SPVM::Builder::Env->new;
+  
+  $self->env_api($env_api);
+  
+  $self->create_native_compiler;
+  
+  my $runtime = $self->get_runtime;
+  
+  $runtime->env_api($env_api);
   
   return $self;
 }
 
-sub use {
-  my ($self, $class_name, $file, $line) = @_;
+sub compile_with_exit {
+  my ($self, $basic_type_name, $file, $line) = @_;
   
-  my $success = $self->compile($class_name, __FILE__, __LINE__);
+  my $success = $self->compile($basic_type_name, __FILE__, __LINE__);
   unless ($success) {
     $self->print_error_messages(*STDERR);
     exit(255);

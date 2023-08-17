@@ -38,7 +38,7 @@ sub get_login {
         # Readline
         my $new = $tr->readline(
             $prompt,
-            { info => $show_sofar, no_echo => $no_echo }
+            { info => $show_sofar, no_echo => $no_echo, history => [] }
         );
         return $new;
     }

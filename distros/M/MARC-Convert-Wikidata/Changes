@@ -1,3 +1,12 @@
+0.04 2023-06-11T18:24:52+02:00
+ - Add publication date use case.
+ - Improve clean_publication_date() code.
+
+0.03 2023-06-09T20:14:12+02:00
+ - Add edition number use case.
+ - Regen example with output.
+ - Warning could be in utf8.
+
 0.02 2023-05-27T11:07:17+02:00
  - Add doc for Utils.
  - Add example to doc.

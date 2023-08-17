@@ -14,4 +14,5 @@ print encode_utf8("Edition number: $edition_number\n");
 print "Cleaned edition number: $cleaned_edition_number\n";
 
 # Output:
-# TODO
+# Edition number: Druhé vydání
+# Cleaned edition number: 2

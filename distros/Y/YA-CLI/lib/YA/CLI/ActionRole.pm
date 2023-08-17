@@ -1,5 +1,5 @@
 package YA::CLI::ActionRole;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -14,12 +14,29 @@ requires qw(
     run
 );
 
+has _cli_args => (
+  is        => 'ro',
+  predicate => '_has_cli_args',
+  writer    => '_set_cli_args',
+  init_args => undef,
+  default   => sub { {} },
+);
+
 sub cli_options {
     return;
 }
 
 sub usage_pod {
     return;
+}
+
+sub BUILD {
+    my ($self, $args) = @_;
+
+    foreach (keys %$args) {
+        delete $args->{$_} if $self->can($_);
+    }
+    $self->_set_cli_args($args) if %$args;
 }
 
 sub new_from_args {
@@ -88,13 +105,16 @@ YA::CLI::ActionRole - Action handler role
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
     package Foo;
     use Moo;
     with qw(YA::CLI::ActionRole);
+
+    sub usage_pod { 1 } # 1 Usage is provided by this module's POD
+    sub cli_options { return qw(foo=s) }
 
     sub action { "action" }
     sub run { ...; }
@@ -148,6 +168,12 @@ Checks if the supplied action is supported by the sub command
 =head2 new_from_args
 
 Instantiates the class with the CLI args that were given to them
+
+=head2 _cli_args
+
+For all cli options which do not have attributes in the module, you can access them via
+
+    $self->_cli_args->{'your-name-here'}
 
 =head1 AUTHOR
 

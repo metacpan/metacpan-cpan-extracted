@@ -1,10 +1,12 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strictures 2;
-
 use Test2::V0;
 
 {
     package Foo;
+    use 5.008001;
+    use strictures 2;
 
     use Moo;
     use MooX::ChainedAttributes;
@@ -60,6 +62,8 @@ is( $f->set_foo5(77), $f, 'rwp chained writer' );
 
 {
     package Foo2;
+    use 5.008001;
+    use strictures 2;
 
     use Moo;
     use MooX::ChainedAttributes;

@@ -1,0 +1,7 @@
+Revision history for SQL-Inserter
+
+0.02    2023-06-30
+        Duplicates handling for hash inserts.
+
+0.01    2023-06-26
+        First public release.

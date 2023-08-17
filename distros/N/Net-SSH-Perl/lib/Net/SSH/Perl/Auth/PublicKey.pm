@@ -1,5 +1,3 @@
-# $Id: PublicKey.pm,v 1.23 2009/01/26 01:22:55 turnstep Exp $
-
 package Net::SSH::Perl::Auth::PublicKey;
 
 use strict;

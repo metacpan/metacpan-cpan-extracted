@@ -1,6 +1,6 @@
 package Mail::BIMI::Error;
 # ABSTRACT: Class to represent an error condition
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -28,6 +28,7 @@ my %ERROR_MAP = (
   MULTIPLE_LOCATIONS       => { description => 'Multiple entries for l found' },
   MULTI_BIMI_RECORD        => { description => 'Multiple BIMI records found' },
   NO_BIMI_RECORD           => { description => 'No BIMI records found', result => 'none' },
+  NO_DKIM                  => { description => 'Insufficient authentication, DKIM required', result => 'skipped' },
   NO_DMARC                 => { description => 'No DMARC', result => 'skipped' },
   SPF_PLUS_ALL             => { description => 'SPF +all detected', result => 'skipped' },
   SVG_FETCH_ERROR          => { description => 'Could not fetch SVG', result => 'temperror' },
@@ -74,7 +75,7 @@ Mail::BIMI::Error - Class to represent an error condition
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 DESCRIPTION
 

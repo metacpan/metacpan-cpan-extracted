@@ -3,15 +3,13 @@ package PerlX::Let;
 # ABSTRACT: Syntactic sugar for lexical state constants
 
 use v5.12;
-
-use strict;
 use warnings;
 
 use Const::Fast ();
 use Keyword::Simple 0.04;
 use Text::Balanced ();
 
-our $VERSION = 'v0.2.8';
+our $VERSION = 'v0.3.0';
 
 
 sub import {
@@ -27,50 +25,35 @@ sub _rewrite_let {
 
     my $let = "";
 
-    do {
+    my ( $name, $val );
 
-        my ( $name, $val );
+    ( $name, $$ref ) = Text::Balanced::extract_variable($$ref);
+    die "A variable name is required for let" unless defined $name;
+    $$ref =~ s/^\s*\=>?\s*// or die "An assignment is required for let";
+    ( $val, $$ref ) = Text::Balanced::extract_quotelike($$ref);
+    ( $val, $$ref ) = Text::Balanced::extract_bracketed( $$ref, '({[' )
+        unless defined $val;
 
-        ( $name, $$ref ) = Text::Balanced::extract_variable($$ref);
-        die "A variable name is required for let" unless defined $name;
-        $$ref =~ s/^\s*\=>?\s*// or die "An assignment is required for let";
-        ( $val, $$ref ) = Text::Balanced::extract_quotelike($$ref);
-        ( $val, $$ref ) = Text::Balanced::extract_bracketed( $$ref, '({[' )
-          unless defined $val;
+    unless ( defined $val ) {
+        ($val) = $$ref =~ /^(\S+)/;
+        $$ref =~ s/^\S+//;
+    }
 
-        unless ( defined $val ) {
-            ($val) = $$ref =~ /^(\S+)/;
-            $$ref =~ s/^\S+//;
-        }
+    die "A value is required for let" unless defined $val;
 
-        die "A value is required for let" unless defined $val;
+    if ($val !~ /[\$\@\%\&]/ && ($] >= 5.028 || substr($name, 0, 1) eq '$')) {
 
-        if ($val !~ /[\$\@\%\&]/ && ($] >= 5.028 || substr($name, 0, 1) eq '$')) {
+        # We can't use Const::Fast on state variables, so we use this workaround.
 
-            # We can't use Const::Fast on state variables, so we use
-            # this workaround.
+        $let .= "use feature 'state'; state $name = $val; unless (state \$__perlx_let_state_is_set = 0) { Const::Fast::_make_readonly(\\$name); \$__perlx_let_state_is_set = 1; };";
 
-            $let .= "use feature 'state'; state $name = $val; unless (state \$__perlx_let_state_is_set = 0) { Const::Fast::_make_readonly(\\$name); \$__perlx_let_state_is_set = 1; };";
-
-        }
-        else {
-
-            $let .= "Const::Fast::const my $name => $val; ";
-        }
-
-    } while ( $$ref =~ s/^\s*,\s*// );
-
-    my $code;
-
-    ( $code, $$ref ) = Text::Balanced::extract_codeblock( $$ref, '{' );
-
-    if ($code) {
-        substr( $code, index( $code, '{' ) + 1, 0 ) = $let;
-        substr( $$ref, 0, 0 ) = $code;
     }
     else {
-        substr( $$ref, 0, 0 ) = $let;
+
+        $let .= "Const::Fast::const my $name => $val; ";
     }
+
+    substr( $$ref, 0, 0 ) = $let;
 
 }
 
@@ -90,7 +73,7 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 =head1 VERSION
 
-version v0.2.8
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -166,23 +149,6 @@ variable as read-only, particularly for deeper data structures.
 However, the tradeoff for using this is that the variables remain
 allocated until the process exits.
 
-=head1 DEPRECATED SYNTAX
-
-Adding a code block after the let assignment is deprecated:
-
-  let $x = "foo" {
-    ...
-  }
-
-Instead, put the assignment inside of the block.
-
-Specifying multiple assignments is also deprecated:
-
-  let $x = "foo",
-      $y = "bar";
-
-Instead, use multiple let statements.
-
 =head1 KNOWN ISSUES
 
 A let assignment will enable the state feature inside of the current
@@ -196,6 +162,12 @@ you may get unusual error messages for syntax errors, e.g.
 Because this modifies the source code during compilation, the line
 numbers may be changed, particularly if the let assignment(s) are on
 multiple lines.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+The this module requires Perl v5.12 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
 
@@ -211,7 +183,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Robert Rothenberg.
+This software is Copyright (c) 2019-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

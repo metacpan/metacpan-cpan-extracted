@@ -7,7 +7,7 @@ BEGIN { use_ok('RPM::Query') };
 my $rpm  = RPM::Query->new;
 isa_ok($rpm, 'RPM::Query');
 
-my $skip = not qx{rpm --version > /dev/null ; echo $?};
+my $skip = $^O eq 'linux' ? do {qx{rpm --version}; $?} : 1;
 
 SKIP: {
   skip 'rpm command not found', 3 if $skip;

@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Commandable.pm
@@ -23,5 +24,6 @@ t/13finder-methodattributes.t
 t/20command-args.t
 t/21command-opts.t
 t/30finder-invoke.t
+t/31finder-config.t
 t/50builtin-help.t
 t/99pod.t

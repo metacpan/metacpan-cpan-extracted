@@ -1,7 +1,7 @@
 This archive contains the distribution Audit-Log,
-version 0.003:
+version 0.005:
 
-  auditd log parser with no external dependencies, using no perl features past 5.12
+  auditd log parser with minimal dependencies, using no perl features past 5.12
 
 This software is Copyright (c) 2022 by Troglodyne LLC.
 

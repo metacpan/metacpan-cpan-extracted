@@ -49,9 +49,9 @@ while(@tests)
  , 'this'                      => [ undef, 'this' ]
  , ' (a(b)c) <tux>'            => [ 'a(b)c', ' <tux>' ]
  , '((a)b(c)) <tux>'           => [ '(a)b(c)', ' <tux>' ]
- , '((a)b(c) <tux>'            => [ undef, '((a)b(c) <tux>' ]
+ , '((a)b(c) <tux>'            => [ '(a)b(c', ' <tux>' ]
  , '(a\(b) <tux>'              => [ 'a(b', ' <tux>' ]
- , '(a <tux>'                  => [ undef, '(a <tux>' ]
+ , '(a <tux>'                  => [ 'a <tux>', '' ]
  , 'a) <tux>'                  => [ undef, 'a) <tux>' ]
  );
 

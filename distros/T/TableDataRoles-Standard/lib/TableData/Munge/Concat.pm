@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Munge::Concat';
 
@@ -42,7 +42,7 @@ TableData::Munge::Concat - Access a series of other tabledata instances
 
 =head1 VERSION
 
-This document describes version 0.015 of TableData::Munge::Concat (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableData::Munge::Concat (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 SYNOPSIS
 

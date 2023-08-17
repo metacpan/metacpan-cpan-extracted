@@ -111,6 +111,14 @@ sub default {
   return '';
 }
 
+sub format {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::sprintf($data, @args);
+}
+
 sub hex {
   my ($self) = @_;
 
@@ -232,7 +240,6 @@ sub render {
 
   while (my($key, $value) = each(%$tokens)) {
     my $token = quotemeta $key;
-
     $data =~ s/\{\{\s*$token\s*\}\}/$value/g;
   }
 
@@ -322,6 +329,16 @@ sub substr {
     my $result = CORE::substr($data, $offset // 0, $length // 0);
     return wantarray ? ($result, $data) : $result;
   }
+}
+
+sub template {
+  my ($self, $code, @args) = @_;
+
+  require Venus::Template;
+
+  my $template = Venus::Template->new($self->get);
+
+  return $code ? $template->$code(@args) : $template;
 }
 
 sub titlecase {
@@ -1005,6 +1022,49 @@ I<Since C<0.08>>
   my $result = $lvalue->eq($rvalue);
 
   # 1
+
+=back
+
+=cut
+
+=head2 format
+
+  format(Any @args) (Str)
+
+The format method performs a L<perlfunc/sprintf> operation using the underlying
+string and arguments provided and returns the result.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item format example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello %s');
+
+  my $format = $string->format('world');
+
+  # "hello world"
+
+=back
+
+=over 4
+
+=item format example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('id number %08d');
+
+  my $format = $string->format(10);
+
+  # "id number 00000010"
 
 =back
 
@@ -2991,6 +3051,51 @@ I<Since C<0.01>>
   my ($result, $subject) = $string->substr(6, 5, 'universe');
 
   # ("world", "hello universe")
+
+=back
+
+=cut
+
+=head2 template
+
+  template(Str | CodeRef $code, Any @args) (Any)
+
+The template method uses the underlying string value to build and return a
+L<Venus::Template> object, or dispatches to the coderef or method provided.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item template example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template;
+
+  # bless({...}, "Venus::Template")
+
+=back
+
+=over 4
+
+=item template example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template('render', undef, {
+    name => 'user',
+  });
+
+  # "hello user"
 
 =back
 

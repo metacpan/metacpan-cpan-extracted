@@ -15,6 +15,7 @@ XSizeHints *          O_X11_Xlib_Struct
 XRectangle *          O_X11_Xlib_Struct
 XRenderPictFormat *   O_X11_Xlib_Struct
 Window                O_X11_Xlib_XID
+WindowOrNull          O_X11_Xlib_XIDorNull
 Pixmap                O_X11_Xlib_XID
 Cursor                O_X11_Xlib_XID
 Colormap              O_X11_Xlib_XID
@@ -77,6 +78,15 @@ O_X11_Xlib_XID
 
 OUTPUT
 O_X11_Xlib_XID
+    // Always return unsigned integer.  X11::Xlib::* can override this as needed.
+    sv_setuv( $arg, $var );
+
+INPUT
+O_X11_Xlib_XIDorNull
+    $var = SvOK($arg)? PerlXlib_sv_to_xid($arg) : 0;
+
+OUTPUT
+O_X11_Xlib_XIDorNull
     // Always return unsigned integer.  X11::Xlib::* can override this as needed.
     sv_setuv( $arg, $var );
 

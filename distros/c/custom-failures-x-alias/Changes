@@ -1,5 +1,21 @@
 Revision history for custom-failures-x-alias
 
+0.04      2023-06-02 21:45:34-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * add missing test dependencies
+    * bump minimum Perl to 5.12 for test dependencies
+
+
+0.03      2023-06-02 15:28:35-04:00 America/New_York
+
+  [BUG FIX]
+
+    * alias wrappers are now created in the caller's package, rather than in
+      in the custom::failures::x::alias package. this led to namespace
+      issues.
+
 0.02      2021-06-23 16:09:51-04:00 America/New_York
 
   [BUG FIX]

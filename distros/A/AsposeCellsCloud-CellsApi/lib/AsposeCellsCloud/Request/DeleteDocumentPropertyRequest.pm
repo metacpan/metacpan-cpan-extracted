@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteDocumentPropertyRequest.name :   ,
-# DeleteDocumentPropertyRequest.propertyName :   ,
+# DeleteDocumentPropertyRequest.name : The workbook name.  ,
+# DeleteDocumentPropertyRequest.propertyName : The property name.  ,
 # DeleteDocumentPropertyRequest.type :   ,
-# DeleteDocumentPropertyRequest.folder :   ,
-# DeleteDocumentPropertyRequest.storageName :    
+# DeleteDocumentPropertyRequest.folder : Original workbook folder.  ,
+# DeleteDocumentPropertyRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_document_property' } = { 
-    	summary => '',
+    	summary => 'Deletes a document property.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,14 +135,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'property_name' => {
      	datatype => 'string',
      	base_name => 'propertyName',
-     	description => '',
+     	description => 'The property name.',
      	format => '',
      	read_only => '',
      		},
@@ -156,14 +156,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

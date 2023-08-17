@@ -11,7 +11,7 @@ use Math::Currency qw($LC_MONETARY);
 # monetary_locale testing
 use POSIX;
 
-plan tests => 2;
+plan tests => 3;
 
 my $format = {};
 
@@ -65,6 +65,28 @@ subtest 'en_US locale' => sub {
     like $format->{INT_CURR_SYMBOL}, qr/\bUSD\b/, 'Intl currency symbol set properly';
 
     check_params('en_US');
+};
+
+# See https://github.com/mschout/perl-math-currency/issues/3
+subtest 'perl 5.37.7+ localeconv changes' => sub {
+    # We should proceed here even if the locale is not available to excercise the bugfix
+    POSIX::setlocale(&POSIX::LC_ALL, 'C');
+
+    my $localeconv = POSIX::localeconv();
+    note "Curency Symbol: " . $localeconv->{currency_symbol};
+    if (!exists $localeconv->{currency_symbol} || $localeconv->{currency_symbol} ne '') {
+        plan skip_all => 'localeconv omits empty currency symbol as in perl < 5.37.7';
+        return;
+    }
+
+    plan tests => 2;
+
+    $format = {};
+    Math::Currency->localize(\$format);
+    ok( !defined $format->{FRAC_DIGITS}, 'localize() correctly detected that localeconv failed' );
+
+    # Sanity test that as_float() works as expected
+    is( Math::Currency->new("1.10")->as_float, "1.10" );
 };
 
 sub check_params {

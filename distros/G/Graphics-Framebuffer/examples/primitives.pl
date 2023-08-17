@@ -20,18 +20,20 @@ my $new_x;
 my $new_y;
 my $dev      = 0;
 my $psize    = 1;
-my $noaccel  = 0;
-my $nosplash = 0;
-my $delay    = 5;
+my $noaccel  = FALSE;
+my $nosplash = FALSE;
+my $delay    = 3;
+my $ignore_x = FALSE;
 
 GetOptions(
-    'x=i'      => \$new_x,
-    'y=i'      => \$new_y,
-    'dev=i'    => \$dev,
-    'pixel=i'  => \$psize,
-    'noaccel'  => \$noaccel,
-    'nosplash' => \$nosplash,
-    'delay=i'  => \$delay,
+    'x=i'              => \$new_x,
+    'y=i'              => \$new_y,
+    'dev=i'            => \$dev,
+    'pixel=i'          => \$psize,
+    'noaccel'          => \$noaccel,
+    'nosplash'         => \$nosplash,
+    'delay=i'          => \$delay,
+	'ignore-x-windows' => \$ignore_x,
 );
 
 $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
@@ -49,9 +51,9 @@ our @IMAGES;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE, 'IGNORE_X_WINDOWS' => $ignore_x);
 } else {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE, 'IGNORE_X_WINDOWS' => $ignore_x);
 }
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $F->text_mode(); exec('reset'); };
 

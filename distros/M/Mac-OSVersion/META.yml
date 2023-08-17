@@ -21,6 +21,6 @@ requires:
   perl: '5.008'
 resources:
   homepage: https://github.com/briandfoy/mac-osversion
-  repository: https://github.com/briandfoy/mac-osversion.git
-version: '1.008'
+  repository: https://github.com/briandfoy/mac-osversion
+version: '1.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -109,7 +109,7 @@ gate-trace.pl - Measure a gate trace
 
 =head1 VERSION
 
-version 3.872
+version 3.881
 
 =head1 COPYRIGHT AND LICENSE
 

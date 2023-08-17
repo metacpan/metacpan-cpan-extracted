@@ -1,0 +1,28 @@
+---
+abstract: 'ITree based document list'
+author:
+  - 'Hans Jeuken <hanje at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-DocumentTree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: '0'
+  Test::Tk: '3.01'
+  Tk: '800.024'
+  Tk::ITree: '0.01'
+resources:
+  repository: git://github.com/haje61/Tk-DocumentTree.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

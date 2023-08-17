@@ -12,7 +12,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.75
+Version 0.77
 
 # SYNOPSIS
 
@@ -428,10 +428,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
-
-- CPANTS
-
-    [http://cpants.cpanauthors.org/dist/CGI-Info](http://cpants.cpanauthors.org/dist/CGI-Info)
 
 - CPAN Testers' Matrix
 

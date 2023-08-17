@@ -1,3 +1,13 @@
+0.8.6 2023-06-19
+
+    - Implementing is_ring_atom().
+    - No longer removing chiral centers from atoms in rings.
+    - Accepting coloring subroutine references in
+      is_unimportant_double_bond() and mark_all_double_bonds().
+    - Returning false instead of undefined value.
+    - Exporting %bond_order_to_symbol and %bond_symbol_to_order to simplify
+      conversion between bond symbols and orders.
+
 0.8.5 2023-01-26
 
     - Fixing incorrect chirality handling code as it did not consider all

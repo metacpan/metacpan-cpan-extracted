@@ -25,7 +25,7 @@ package Rex::Group::Lookup::File;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.2'; # VERSION
+our $VERSION = '1.14.3'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

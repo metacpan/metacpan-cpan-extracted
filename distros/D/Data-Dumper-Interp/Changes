@@ -1,6 +1,38 @@
-Revision history for Perl extension Data-Dumper-Interp
+(Recent) Revision history for Perl extension Data-Dumper-Interp
 
-{{$NEXT}}
+6.001 - Added set_addrvis_digits() & addrvis_forget()
 
-    - original version
+6.000 - 1. Option Refaddr() added to show abbreviated ref addresses.
+
+        2. Shortcut function/method names can now include 'r' to imply
+           Refaddr(1) and any number to imply Maxdepth(number).
+
+        3. Shortcut functions/methods are now auto-generated using a naming
+           convention: "Modifier" characters are glued onto one of the 5 basic
+           method names (ivis, dvis, vis, avis, or hvis) in any order
+           with optional underscore separators.  For example using 'viso'
+           or 'ovis' or 'vis_o' will generate code to call 'vis' with
+           option Objects(0) to show object internals.  Another example is
+           dvisr3, dvis3r, dvis_r_3, etc. which calls 'dvis' configured to
+           show the abbreviated addresses of any refs in interpolated
+           variables, and to show at most 3 levels of structured data.
+
+           This eliminates memory bloat rarely unused subs.  In fact,
+           a fixed repertoire of variations is no longer really feasible.
+
+           Methods are created when first called using the AUTOLOAD mechanism.
+
+           import() generates stub declarations for imported functions so
+           that prototypes are properly checked; the bodies are generated only
+           if/when actually called.
+
+        4. The names 'alvis' and 'hlvis' are deprecated but still supported
+           as special cases.  Please use avisl, etc. instead (i.e. place
+           the modifier 'l' before or after the basic method name).
+
+5.029 - Implement ravis,ravisq,rhvis,rhvisq which prefix object and
+        non-blessed container contents with type<abbrevatedaddress>
+        ala addrvis().
+
+5.025 - qsh() now quotes for cmd.com on windows (instead of /bin/sh)
 

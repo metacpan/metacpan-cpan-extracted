@@ -1,5 +1,10 @@
 Revision history for Perl extension Class-Measure.
 
+0.10 2023-06-07T19:00:47Z
+
+ - Do not modify source objects when doing math.
+ - Minor metadata and boilerplate updates.
+
 0.09 2021-01-30T19:53:47Z
 
  - Minor build update.
@@ -44,7 +49,7 @@ Revision history for Perl extension Class-Measure.
  - Overloads division and multipliation operators.
  - Added META.yml and renamed 00_class.t to 00_measure.t.
 
-0.01  Mon Aug 08 2005
+0.01 2005-08-08
 
  - First version.
 

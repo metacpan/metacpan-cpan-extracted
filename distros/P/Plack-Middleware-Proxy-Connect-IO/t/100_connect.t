@@ -17,21 +17,17 @@ test_tcp(
         test_tcp(
             client => sub {
                 my $port_orig = shift;
-                my $sock = IO::Socket::INET->new(
-                    PeerPort => $port_proxy,
-                    PeerAddr => '127.0.0.1',
-                    Proto    => 'tcp',
-                ) or die $!;
+                my $sock = IO::Socket::INET->new(PeerPort => $port_proxy, PeerAddr => '127.0.0.1', Proto => 'tcp',)
+                    or die $!;
 
                 # Perform the handshake.
-                print $sock "CONNECT 127.0.0.1:$port_orig HTTP/1.0\015\012",
-                            "\015\012";
-                like scalar <$sock>, qr(^HTTP/1\.[01] 2\d\d );
-                while (<$sock>){ /^\015\012$/ and last; }  # skip headers
+                print $sock "CONNECT 127.0.0.1:$port_orig HTTP/1.0\015\012", "\015\012";
+                like scalar <$sock>, qr(^HTTP/1\.[01] 2\d\d ), "response";
+                while ($_ = <$sock>) { /^\015\012$/ and last; }
 
                 # Send ping to the original server.
                 print $sock "PING\015\012";
-                is scalar <$sock>, "PONG\015\012";
+                is scalar <$sock>, "PONG\015\012", "response";
 
                 $sock->close;
             },
@@ -47,24 +43,21 @@ test_tcp(
                     (($^O eq 'MSWin32') ? () : (ReuseAddr => 1)),
                 ) or die $!;
 
-                while (my $remote = $sock->accept){
+                while (my $remote = $sock->accept) {
                     if (my $data = scalar <$remote>) {
-                        if ($data =~ /^PING/){
+                        if ($data =~ /^PING/) {
                             print $remote "PONG\015\012";
                         }
                     }
-                };
+                }
             },
         );
     },
     server => sub {
         my $port = shift;
-        my $server = Plack::Loader->auto( port => $port, host => '127.0.0.1' );
+        my $server = Plack::Loader->auto(port => $port, host => '127.0.0.1');
         $server->run(
-           Plack::Middleware::Proxy::Connect::IO->wrap(
-                sub { [200, ['Content-Type' => 'plain/text'], ['Hi']] }
-           )
-        );
+            Plack::Middleware::Proxy::Connect::IO->wrap(sub { [200, ['Content-Type' => 'plain/text'], ['Hi']] }));
     },
 );
 

@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.1",
-            "DynaLoader" : "1.04",
+            "DynaLoader" : "1.09",
             "Exporter" : "5.56",
             "File::Spec" : "3.29",
             "IO::File" : "1.14",
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.20",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 4.08"
 }

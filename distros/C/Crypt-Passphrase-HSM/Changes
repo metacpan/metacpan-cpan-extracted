@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-HSM
 
+0.006     2023-07-03 19:21:08+0200
+          - Eliminate warning when skipping test
+
 0.005     2023-05-08 14:09:07+0200
           - Take salt length into account for rehashing need
 

@@ -1,0 +1,26 @@
+0.06 2023-06-29T19:49:02+02:00
+ - Add second example to doc with image.
+
+0.05 2023-06-26T00:13:09+02:00
+ - Add second message type to CSS test.
+ - Fix minimal dependency for Tags::HTML::Messages message types.
+
+0.04 2023-06-25T16:06:19+02:00
+ - Add autofocus to username.
+
+0.03 2023-06-25T11:51:17+02:00
+ - Add another error check for message array.
+ - Add missing error to process() about missing text.
+ - Add tests for process().
+ - Add tests for process_css().
+ - Change error for bad message object to common sentence.
+ - Fix test message.
+ - Move lang attribute after class attribute.
+ - Rewrite messages to use Tags::HTML::Messages helper.
+
+0.02 2023-06-24T17:34:48+02:00
+ - Add messages bellow button.
+ - Add tests for constructor.
+
+0.01 2023-06-21T12:38:27+02:00
+ - First version.

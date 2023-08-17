@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::suxmovie;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME:  SUXMOVIE - X MOVIE plot of a 2D or 3D segy data set 			
+PERL PROGRAM NAME:  SUXMOVIE - X MOVIE plot of a 2D or 3D segy data set 			
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:
@@ -63,7 +63,7 @@ Version:
  respective sampling parameters.			        	
  See the xmovie selfdoc for the remaining parameters and X functions.
 
-PACKAGE NAME:  XMOVIE - image one or more frames of a uniformly sampled function f(x1,x2)
+PERL PROGRAM NAME:  XMOVIE - image one or more frames of a uniformly sampled function f(x1,x2)
 AUTHOR: Juan Lorenzo
 DATE:   
 DESCRIPTION:

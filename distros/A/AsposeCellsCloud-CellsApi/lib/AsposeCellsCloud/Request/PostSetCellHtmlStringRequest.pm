@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostSetCellHtmlStringRequest.name :   ,
-# PostSetCellHtmlStringRequest.sheetName :   ,
-# PostSetCellHtmlStringRequest.cellName :   ,
-# PostSetCellHtmlStringRequest.folder :   ,
-# PostSetCellHtmlStringRequest.storageName :    
+# PostSetCellHtmlStringRequest.name : The workbook name.  ,
+# PostSetCellHtmlStringRequest.sheetName : The worksheet name.  ,
+# PostSetCellHtmlStringRequest.cellName : The cell name.  ,
+# PostSetCellHtmlStringRequest.folder : Original workbook folder.  ,
+# PostSetCellHtmlStringRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_set_cell_html_string' } = { 
-    	summary => '',
+    	summary => 'Sets the html string which contains data and some formats in this cell.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'cellName',
-     	description => '',
+     	description => 'The cell name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

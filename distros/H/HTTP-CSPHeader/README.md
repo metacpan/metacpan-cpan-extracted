@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -27,7 +27,7 @@ my $h = HTTP::Headers->new;
 
 $csp->reset;
 
-$h->amend(
+$csp->amend(
   "+script-src" => "https://captcha.example.com",
   "+style-src"  => "https://captcha.example.com",
 );

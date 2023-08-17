@@ -2,6 +2,12 @@ Revision history for Perl distribution Task-BeLike-RWP
 
 This is a changelog file in addition to git commit messages.
 
+0.231770  2023-06-26 21:45:06+02:00 Europe/Budapest
+
+0.231750  2023-06-24 21:31:46+02:00 Europe/Budapest
+
+0.231740  2023-06-23 12:32:40+02:00 Europe/Budapest
+
 0.230470  2023-02-16 18:37:53+04:00 Asia/Baku
   - Fix Log-Log4perl module name
   - Pod improvements for module list

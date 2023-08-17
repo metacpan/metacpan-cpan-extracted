@@ -1,20 +1,21 @@
-requires 'Catalyst', '5.90130';
+requires 'Catalyst',
+  git => 'https://github.com/perl-catalyst/catalyst-runtime.git';
+
+  
 requires 'Catalyst::Model::DBIC::Schema', '0.65';
 requires 'Catalyst::Plugin::ConfigLoader', '0.34';
 requires 'Catalyst::Plugin::RedirectTo', '0.004';
-requires 'Catalyst::ControllerRole::At', '0.007';
+requires 'Catalyst::ControllerRole::At', '0.008';
 requires 'Catalyst::Plugin::URI', '0.005';
-requires 'Catalyst::View::MojoTemplate', '0.004';
 requires 'Catalyst::Plugin::Session';
-requires 'Catalyst::Action::RenderView';
-requires 'Catalyst::TraitFor::Request::StructuredParameters', '0.006';
 requires 'Catalyst::Plugin::CurrentComponents', '0.010';
 requires 'Catalyst::Plugin::ServeFile', '0.004';
-requires 'Catalyst::Plugin::CSRFToken', '0.001';
+requires 'Catalyst::Plugin::CSRFToken', '0.006';
 requires 'CatalystX::Errors', '0.001009';
-requires 'CatalystX::RequestModel', '0.014';
-requires 'Catalyst::ControllerPerContext', '0.003';
+requires 'CatalystX::RequestModel', '0.018';
+requires 'Catalyst::ControllerPerContext', '0.005';
 requires 'Catalyst::View::BasePerRequest', '0.010';
+requires 'Catalyst::View::MojoTemplate::PerContext', '0.005';
 requires 'Catalyst::ActionRole::RenderView', '0.001';
 
 requires 'DBIx::Class', '0.082840';
@@ -28,20 +29,17 @@ requires 'DBIx::Class::ResultClass::TrackColumns', '0.001002';
 requires 'Gazelle', '0.46';
 requires 'Module::Runtime';
 requires 'experimental', '0.020';
-requires 'DBIx::Class::EncodedColumn';
 requires 'Catalyst::Plugin::InjectionHelpers';
 requires 'Catalyst::Plugin::Session::Store::Cookie', '0.005';
 requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'App::Sqitch';
-requires 'DBD::Pg';
+requires 'DBD::SQLite';
 requires 'DateTime::Format::Strptime';
 requires 'DateTime';
 requires 'Digest::MD5';
-requires 'Mojo::ByteStream';
 requires 'Plack::Runner';
-requires 'SQL::Translator';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
-requires 'WWW::CSRF';
+
 
 

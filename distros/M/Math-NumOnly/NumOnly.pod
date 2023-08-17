@@ -1,0 +1,59 @@
+
+=pod
+
+=head1 NAME
+
+  Math::NumOnly - Disallow numeric operations that don't involve an IV or NV
+
+=head1 DESCRIPTION
+
+  This disallowance of numeric operations applies only to operations that
+  involve one (or more) Math::NumOnly objects.
+  Arithmetic in which none of the operands are Math::NumOnly objects will still
+  proceed as per the normal rules.
+  It's unclear to me whether an operation between a Math::NumOnly object and some
+  other object (eg Math::BigInt, Math::GMP, Math::MPFR) should be allowed.
+  As it currently stands, such operations are not permitted.
+  It's just a silly, fun diversion - probably of little (if any) value.
+
+=head1 SYNOPSIS
+
+  use Math::NumOnly;
+
+  # my $a = Math::NumOnly->new('123.5') # Fatal error - given arg is a string.
+  my $a = Math::NumOnly->new(123.5); # $a holds value of 123.5
+  my $b = $a + 42; # $b holds value of 165.5
+  # $b += '34.5';  # Fatal error - '34.5' is a string
+  $b += 34.5;      # $b holds value of 200
+  print $b, "\n";  # prints 200
+
+  $pv = '3';
+  $iv = $pv + 7; # $iv is an IV, value 10.
+  $c = Math::NumOnly($iv); # $c holds value of 10
+  #$c += $pv;  # Fatal error - $pv is still recognized as a string.
+
+=head1 FUNCTIONS
+
+  my $ok = is_ok($arg); # used internally.
+
+    This function is not exported but can be accessed as Math::NumOnly($arg).
+    It returns true if $arg is allowed to be used in an arithmetic
+    operation with a Math::NumOnly object.
+    Else it returns false.
+
+  No other functions are provided, except for the subs that are responsible
+  for overloading the  '+', '-', '*', '/', '**', '++', '--', '>=', '<=',
+  '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=', '**=' and
+  perhaps other operations.
+
+=head1 LICENSE
+
+  This program is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+  Copyright 2023, Sisyphus
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

@@ -21,15 +21,15 @@ subtest bad_id => sub {
 subtest good_list => sub {
     my $result = $api->country->competitors_list( id_country => 138 );
 
-    is scalar keys %$result, 3, 'Number of athletes listed should be 3';
+    is scalar keys %$result, 2, 'Number of athletes listed should be 2';
 
-    is $result->{7764},
+    is $result->{9730},
         {
         categories       => E,
-        family_name      => 'SAYWELL',
+        family_name      => 'BEZZINA',
         folder           => E,
-        given_name       => 'Jeremy',
-        id_person        => 7764,
+        given_name       => 'Isaac',
+        id_person        => 9730,
         id_weight        => E,
         name             => E,
         order_cat_number => E,
@@ -40,7 +40,7 @@ subtest good_list => sub {
         weight_name      => E,
         wrl              => E,
         },
-        'Jeremy Saywell';
+        'Isaac Bezzina';
 };
 
 done_testing;

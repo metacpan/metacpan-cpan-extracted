@@ -6,13 +6,13 @@ use strict;
 
 use Test::More;
 use Test::Exception;
-use Test::Consul;
+use Test::Consul 0.011;
 
 use AnyEvent;
 use AnyEvent::Consul;
 use AnyEvent::Consul::Exec;
 
-my $tc = eval { Test::Consul->start };
+my $tc = eval { Test::Consul->start(enable_remote_exec => 1) };
 
 SKIP: {
   skip "consul test environment not available", 5, unless $tc;
@@ -50,8 +50,8 @@ SKIP: {
     },
 
     on_error => sub {
-      my ($err) = @_;
-      die $err;
+      diag @_;
+      $cv->send;
     },
   );
 

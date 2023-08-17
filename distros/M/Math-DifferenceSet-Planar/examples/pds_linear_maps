@@ -2,13 +2,12 @@
 
 use strict;
 use warnings;
-use Math::ModInt qw(mod);
-use Math::DifferenceSet::Planar;
+use Math::DifferenceSet::Planar 0.016;
 
 $| = 1;
 
 my $full      = 0;
-my $max_elems = 0;
+my $max_elems = 5;
 while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
     my $opt = $1;
     shift @ARGV;
@@ -62,6 +61,7 @@ sub fmt_set {
 }
 
 __END__
+
 =head1 NAME
 
 pds_linear_maps - find linear map functions between planar difference sets
@@ -81,7 +81,7 @@ mapping for each combination of two different input lines is displayed.
 
 With option B<-E> and a parameter I<max_elements>, sets with more
 than I<max_elements> elements will be abbreviated.  A zero value of
-I<max_elements> means no limitation.
+I<max_elements> means no limitation.  Default is 5 elements.
 
 Sets in the input must be equally long.
 
@@ -91,17 +91,13 @@ The existence and frequency of linear mappings between planar difference
 sets, as well as our algorithms, depend partly on conjectures.  This tool
 thus may fail to find some solutions.
 
-This tool has a size limitation depending on the database of sample sets
-on your platform.  It will always support orders up to 2**12 but rarely
-much more than 2**17.
-
 =head1 AUTHOR
 
 Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

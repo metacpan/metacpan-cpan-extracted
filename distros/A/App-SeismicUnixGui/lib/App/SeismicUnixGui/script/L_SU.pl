@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: L_SUV0.82.9.pl 
+ PERL PROGRAM NAME: L_SUV0.85.5.pl 
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 22 2017 
 
@@ -1601,7 +1601,7 @@ $main_href->{_flow_name_grey_w} = $flow_control_frame_names4top_row->Label(
 	-padx               => $var->{_five_pixels},
 	-relief             => 'flat',
 	-state              => 'disabled',
-	-text               => 'grey name',
+	-text               => 'flow name',
 	-width              => $var->{_18_characters},
 );
 
@@ -1619,7 +1619,7 @@ $main_href->{_flow_name_pink_w} = $flow_control_frame_names4top_row->Label(
 	-padx               => $var->{_five_pixels},
 	-relief             => 'flat',
 	-state              => 'disabled',
-	-text               => 'pink name',
+	-text               => 'flow name',
 	-width              => $var->{_18_characters},
 );
 
@@ -1637,7 +1637,7 @@ $main_href->{_flow_name_green_w} = $flow_control_frame_names4bottom_row->Label(
 	-padx               => $var->{_five_pixels},
 	-relief             => 'flat',
 	-state              => 'disabled',
-	-text               => 'green name',
+	-text               => 'flow name',
 	-width              => $var->{_18_characters},
 );
 
@@ -1654,7 +1654,7 @@ $main_href->{_flow_name_blue_w} = $flow_control_frame_names4bottom_row->Label(
 	-padx               => $var->{_five_pixels},
 	-relief             => 'flat',
 	-state              => 'disabled',
-	-text               => 'blue name',
+	-text               => 'flow name',
 	-width              => $var->{_18_characters},
 );
 
@@ -2336,7 +2336,7 @@ sub _L_SU_flow_bindings {
 
 		$gui_history->set_flow_select_color($color);
 
-		#			print("1. main,_L_SU_flow_bindings,color:$color\n");
+#					print("1. main,_L_SU_flow_bindings,color:$color\n");
 
 		$L_SU->set_hash_ref($main_href);
 

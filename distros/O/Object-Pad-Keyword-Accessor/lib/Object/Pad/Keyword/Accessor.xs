@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -11,6 +11,17 @@
 
 #include "XSParseKeyword.h"
 #include "object_pad.h"
+
+#ifndef newSVsv_nomg
+static SV *S_newSVsv_nomg(pTHX_ SV *osv)
+{
+  SV *nsv = newSV(0);
+  sv_setsv_nomg(nsv, osv);
+  return nsv;
+}
+
+#  define newSVsv_nomg(osv)  S_newSVsv_nomg(aTHX_ (osv))
+#endif
 
 struct AccessorCtx {
   CV *getcv;
@@ -215,7 +226,7 @@ static const struct XSParseKeywordHooks kwhooks_accessor = {
 
   .pieces = (const struct XSParseKeywordPieceType []) {
     XPK_IDENT,
-    XPK_BRACESCOPE(
+    XPK_BRACES(
       XPK_REPEATED(
         XPK_TAGGEDCHOICE(
           /* A `get` block is just a regular anon method */
@@ -227,7 +238,7 @@ static const struct XSParseKeywordHooks kwhooks_accessor = {
               OPXPK_ANONMETHOD_START,
               /* TODO: This is rather hacky; using a code block to do some
                * parsing. Ideally we'd like to use
-               *   XPK_PARENSCOPE(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR))
+               *   XPK_PARENS(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR))
                * for it, but that leaves us not knowing the padix for the new
                * variable when we come to END+WRAP the method into a CV. We'd
                * need some way to interrupt and put more code in there.
@@ -248,7 +259,7 @@ static const struct XSParseKeywordHooks kwhooks_accessor = {
 MODULE = Object::Pad::Keyword::Accessor    PACKAGE = Object::Pad::Keyword::Accessor
 
 BOOT:
-  boot_xs_parse_keyword(0.30);
+  boot_xs_parse_keyword(0.35);
 
   /* TODO: Consider if this needs to be done via O:P directly */
   register_xs_parse_keyword("accessor", &kwhooks_accessor, NULL);

@@ -1,5 +1,3 @@
-# $Id: Config.pm,v 1.22 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::Config;
 use strict;
 use warnings;
@@ -25,6 +23,7 @@ use Carp qw( croak );
     HostKeyAlgorithms       => [ \&_set_str, 'host_key_algorithms', KEX_DEFAULT_PK_ALG, KEX_ALL_PK_ALG ],
     HostName                => [ \&_set_str, 'hostname' ],
     IdentityFile            => [ \&_identity_file ],
+    IdentitiesOnly          => [ \&_set_yesno, 'identities_only' ],
     KexAlgorithms           => [ \&_set_str, 'kex_algorithms', KEX_DEFAULT_KEX, KEX_ALL_KEX ],
     MACs                    => [ \&_set_str, 'macs', KEX_DEFAULT_MAC, KEX_ALL_MAC ],
     NumberOfPasswordPrompts => [ \&_set_str, 'number_of_password_prompts' ],

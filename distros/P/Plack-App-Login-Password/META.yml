@@ -29,14 +29,17 @@ no_index:
     - t
     - xt
 requires:
-  Plack::Component::Tags::HTML: 0.13
+  Plack::Component::Tags::HTML: 0.15
+  Plack::Request: 0
+  Plack::Response: 0
+  Plack::Session: 0
   Plack::Util::Accessor: 0
   Tags::HTML::Container: 0
-  Tags::HTML::Login::Access: 0
+  Tags::HTML::Login::Access: 0.05
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-Login-Password/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login-Password
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login-Password
-version: '0.01'
+version: '0.02'

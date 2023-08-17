@@ -14,7 +14,7 @@ use JSON;
 
 use Data::Dumper;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -361,7 +361,7 @@ sub issues_and_comments( $self, $since ) {
              , i.number as issue_number
           from comment c
           join issue i on c.issue_url=i.url
-         where i.updated_at >= ?
+         where c.updated_at >= ?
       order by i.updated_at, html_url
 SQL
 }

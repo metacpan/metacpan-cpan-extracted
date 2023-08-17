@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = "5.24";
+our $VERSION = "5.25";
 
 =head1 NAME
 
@@ -31,6 +31,7 @@ Mnet - Testable network automation and reporting
     use strict;
     use Mnet::Batch;
     use Mnet::Expect::Cli::Ios;
+    use Mnet::IP;
     use Mnet::Log qw(DEBUG INFO WARN FATAL);
     use Mnet::Opts::Cli;
     use Mnet::Report::Table;
@@ -103,12 +104,15 @@ Mnet - Testable network automation and reporting
     #   see perldoc Mnet::Stanza for more ios config templating info
     my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
-    # parse primary ip address from loopback config stanza
-    my $ip = undef;
-    $ip = $1 if $loop and $loop =~ /^ ip address (\S+) \S+$/m;
+    # parse primary ip address and mask from loopback config stanza
+    my ($ip, $mask) = (undef, undef);
+    ($ip, $mask) = ($1, $2) if $loop =~ /^ ip address (\S+) (\S+)$/m;
 
-    # report on parsed loopback0 interface ip addres
-    $report->row({ device => $cli->device, ip => $ip });
+    # calculate cidr value from dotted decimal mask
+    my $cidr = Mnet::IP::cidr($mask);
+
+    # report on parsed loopback0 interface ip address and cidr value
+    $report->row({ device => $cli->device, ip => $ip, cidr => $cidr });
 
     # finished
     exit;
@@ -171,7 +175,8 @@ for more detail.
 
 =head1 INSTALLATION
 
-The L<Mnet> perl modules should work in just about any unix perl environment.
+The L<Mnet> perl modules should work in just about any unix perl environment,
+some modules require perl 5.12 or newer.
 
 The latest release can be installed from CPAN
 
@@ -296,6 +301,8 @@ L<Mnet::Expect::Cli>
 
 L<Mnet::Expect::Cli::Ios>
 
+L<Mnet::IP>
+
 L<Mnet::Log>
 
 L<Mnet::Opts::Cli>
@@ -310,12 +317,13 @@ L<Mnet::Test>
 
 # required modules
 #   note that cpan complians if use strict is missing
-#   perl 5.10 or higer required for all Mnet modules, they all use this module
-#       perl 5.10 may be requried for tie to capture stdout and stderr
+#   perl 5.12 or higer required for some Mnet modules, they all use this module
 #       perl 5.8.9 warning: use of "shift" without parentheses is ambiguous
+#       see 'use x.xxx' commands in other modules for additional info
+#       update Makefile.PL and INSTALLATION in this perldoc if changed
 use warnings;
 use strict;
-use 5.010;
+use 5.012;
 
 # normal end of package
 1;

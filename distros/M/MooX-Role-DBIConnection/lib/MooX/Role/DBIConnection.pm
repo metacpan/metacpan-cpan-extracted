@@ -5,7 +5,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use DBI;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -121,7 +121,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2019-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2019-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

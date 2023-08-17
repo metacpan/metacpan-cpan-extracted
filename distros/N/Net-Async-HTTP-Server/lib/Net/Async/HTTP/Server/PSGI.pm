@@ -1,18 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::PSGI;
+package Net::Async::HTTP::Server::PSGI 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
 
 use base qw( Net::Async::HTTP::Server );
-
-our $VERSION = '0.13';
 
 use HTTP::Response;
 
@@ -140,14 +138,10 @@ sub on_request
    $path_info = "" if $path_info eq "/";
 
    my %env = (
-      SERVER_PORT         => $socket->sockport,
-      SERVER_NAME         => $socket->sockhost,
       SERVER_PROTOCOL     => $req->protocol,
       SCRIPT_NAME         => '',
       PATH_INFO           => $path_info,
       QUERY_STRING        => $req->query_string // "",
-      REMOTE_ADDR         => $socket->peerhost,
-      REMOTE_PORT         => $socket->peerport,
       REQUEST_METHOD      => $req->method,
       REQUEST_URI         => $req->path,
       'psgi.version'      => [1,0],
@@ -167,6 +161,22 @@ sub on_request
       'net.async.http.server.req' => $req,
       'io.async.loop'             => $self->get_loop,
    );
+
+   if( $socket->can( "sockport" ) ) { # INET or IP
+      %env = ( %env,
+         SERVER_PORT => $socket->sockport,
+         SERVER_NAME => $socket->sockhost,
+         REMOTE_ADDR => $socket->peerhost,
+         REMOTE_PORT => $socket->peerport,
+      );
+   }
+   elsif( $socket->can( "hostpath" ) ) { # UNIX
+      %env = ( %env,
+         SERVER_PORT => $socket->hostpath,
+         SERVER_NAME => "localhost",  # not really but we can lie
+         # no REMOTE_*
+      );
+   }
 
    foreach ( $req->headers ) {
       my ( $name, $value ) = @$_;
@@ -190,7 +200,7 @@ sub on_request
       my $has_content_length = 0;
       my $use_chunked_transfer;
       while( my ( $key, $value ) = splice @$headers, 0, 2 ) {
-         $response->header( $key, $value );
+         $response->push_header( $key, $value );
 
          $has_content_length = 1 if $key eq "Content-Length";
          $use_chunked_transfer++ if $key eq "Transfer-Encoding" and $value eq "chunked";

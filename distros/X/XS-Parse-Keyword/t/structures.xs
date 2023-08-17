@@ -107,52 +107,52 @@ static const struct XSParseKeywordHooks hooks_commalist = {
   .build = &build_constiv,
 };
 
-static const struct XSParseKeywordHooks hooks_scope_paren = {
+static const struct XSParseKeywordHooks hooks_parens = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_PARENSCOPE( XPK_TERMEXPR ),
+    XPK_PARENS( XPK_TERMEXPR ),
     {0}
   },
   .build = &build_op,
 };
 
-static const struct XSParseKeywordHooks hooks_scope_args = {
+static const struct XSParseKeywordHooks hooks_args = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_ARGSCOPE( XPK_TERMEXPR ),
+    XPK_ARGS( XPK_TERMEXPR ),
     {0}
   },
   .build = &build_op,
 };
 
-static const struct XSParseKeywordHooks hooks_scope_bracket = {
+static const struct XSParseKeywordHooks hooks_brackets = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_BRACKETSCOPE( XPK_TERMEXPR ),
+    XPK_BRACKETS( XPK_TERMEXPR ),
     {0}
   },
   .build = &build_op,
 };
 
-static const struct XSParseKeywordHooks hooks_scope_brace = {
+static const struct XSParseKeywordHooks hooks_braces = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_BRACESCOPE( XPK_TERMEXPR ),
+    XPK_BRACES( XPK_TERMEXPR ),
     {0}
   },
   .build = &build_op,
 };
 
-static const struct XSParseKeywordHooks hooks_scope_chevron = {
+static const struct XSParseKeywordHooks hooks_chevrons = {
   .permit_hintkey = hintkey,
 
   .pieces = (const struct XSParseKeywordPieceType []){
     /* A TERMEXPR inside chevrons is ambiguous, because of the < 2 > 1 > problem */
-    XPK_CHEVRONSCOPE( XPK_IDENT ),
+    XPK_CHEVRONS( XPK_IDENT ),
     {0}
   },
   .build = &build_constsv,
@@ -170,8 +170,8 @@ BOOT:
   register_xs_parse_keyword("structtagged", &hooks_tagged, NULL);
   register_xs_parse_keyword("structcommalist", &hooks_commalist, NULL);
 
-  register_xs_parse_keyword("scopeparen",   &hooks_scope_paren,   NULL);
-  register_xs_parse_keyword("scopeargs",    &hooks_scope_args,    NULL);
-  register_xs_parse_keyword("scopebracket", &hooks_scope_bracket, NULL);
-  register_xs_parse_keyword("scopebrace",   &hooks_scope_brace,   NULL);
-  register_xs_parse_keyword("scopechevron", &hooks_scope_chevron, NULL);
+  register_xs_parse_keyword("parens",   &hooks_parens,   NULL);
+  register_xs_parse_keyword("args",     &hooks_args,     NULL);
+  register_xs_parse_keyword("brackets", &hooks_brackets, NULL);
+  register_xs_parse_keyword("braces",   &hooks_braces,   NULL);
+  register_xs_parse_keyword("chevrons", &hooks_chevrons, NULL);

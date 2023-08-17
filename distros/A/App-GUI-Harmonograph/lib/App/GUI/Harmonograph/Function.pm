@@ -69,6 +69,6 @@ sub cosh { exp($_[0]) + exp(-$_[0]) } # exp $x + exp (- $x)
 sub tanh { my $ep = exp($_[0]); my $em = exp(-$_[0]); ($ep - $em) / ($ep + $em) } # sinh / cosh
 sub coth { my $ep = exp($_[0]); my $em = exp(-$_[0]); ($ep + $em) / ($ep - $em) } # coth / sinh
 sub sech { 1 / (exp($_[0]) + exp(-$_[0])) } # 1 / cosh
-sub csch { 1 / (exp($_[0]) - exp(-$_[0])) } # 1 / sinh
+sub csch { my $e = (exp($_[0]) - exp(-$_[0])); $e ? 1 / $e : 10 } # 1 / sinh
 
 1;

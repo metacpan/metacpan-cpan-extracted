@@ -8,7 +8,7 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 # VERSION
 
-Version 0.23
+Version 0.25
 
 # DESCRIPTION
 

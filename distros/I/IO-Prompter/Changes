@@ -189,3 +189,25 @@ Revision history for IO-Prompter
 
     * Added warning about prompt() returning object not string
       (Merci, Mirod!)
+
+
+0.005000  Tue Jul  4 17:17:35 2023
+
+    * Added -monitor option
+
+    * Added -prefill option
+
+    * Added -cancel option
+
+    * Added support for 'ansiNNN' and 'rgbNNN' colour specifications
+      within -style and -echostyle arguments
+
+    * Improved error messages (some now indicate what the wrong argument was)
+
+    * Removed all uses of given/when and smartmatching for compatibility with Perl 5.38+
+
+
+0.005001  Mon Jul 17 06:54:17 2023
+
+    * Removed all uses of continue;
+      (Thanks, Alexander!)

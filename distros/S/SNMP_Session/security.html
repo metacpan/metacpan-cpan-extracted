@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+ <head>
+  <title>SNMP support for Perl 5 - Notes on Security</title>
+ </head>
+ <body bgcolor="#ffffff">
+<div align=center>
+  <h1>SNMP support for Perl 5 - Notes on Security</h1>
+</div>
+
+<p> On February 12, 2002, the Computer Emergency Response Team issued
+<em><a
+href="http://www.cert.org/advisories/CA-2002-03.html">CERT&trade;
+Advisory CA-2002-03 Multiple Vulnerabilities in Many Implementations
+of the Simple Network Management Protocol (SNMP)</a></em>.  The <a
+href="http://www.ee.oulu.fi/research/ouspg/index.html">OUSPG</a> at
+the University of Oulu in Finland had written an SNMPv1 test suite
+that uncovered difficulties in numerous SNMP implementations with
+respect to improperly encoded SNMP PDUs (Protocol Data Units).
+Possible effects of these vulnerabilities included program crashes as
+well as remote exploitabilities.</p>
+
+<h2> Why <tt>SNMP_Session.pm</tt>/<tt>BER.pm</tt> Users Shouldn't Be
+Too Concerned </h2>
+
+<p> My SNMP support for Perl 5 is written entirely in Perl.  When it
+decodes BER-encoded SNMP PDUs, it parses them from left to right and
+splits them into sub-items as it goes, usually using
+<tt>substr()</tt> or <tt>unpack()</tt>. </p>
+
+<hr>
+<address>
+<!-- hhmts start -->
+2002/04/07 21:43:11
+<!-- hhmts end -->
+<a href="http://www.switch.ch/misc/leinen/">
+ Simon Leinen &lt;simon.leinen@switch.ch&gt;</A>
+
+</address>
+
+</body>
+</html>

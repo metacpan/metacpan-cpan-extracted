@@ -28,22 +28,15 @@ sub build_arg {
   my ($self, $data) = @_;
 
   return {
-    level => $self->level_name($data) || $self->level_name(1),
+    level => $data,
   };
-}
-
-sub build_args {
-  my ($self, $data) = @_;
-
-  $data->{level} ||= $self->level_name(1);
-
-  return $data;
 }
 
 sub build_self {
   my ($self, $data) = @_;
 
-  $self->handler(sub{CORE::print(STDOUT @_, "\n")}) if !$self->handler;
+  $self->level($self->level_name($self->level) || $self->level_name(1));
+  $self->handler(sub{shift; CORE::print(STDOUT @_, "\n")}) if !$self->handler;
   $self->separator(" ") if !$self->separator;
 
   return $self;
@@ -58,7 +51,7 @@ sub commit {
   my $set_level = $self->level_code($self->level);
 
   return ($req_level && $set_level && ($req_level >= $set_level))
-    ? $self->write($self->output($self->input(@args)))
+    ? $self->write($level, $self->output($self->input(@args)))
     : $self;
 }
 
@@ -97,6 +90,8 @@ sub level_code {
 
   $data = $data ? lc $data : $self->level;
 
+  return undef if !defined $data;
+
   return $$NAME{$data} || ($$CODE{$data} && $$NAME{$$CODE{$data}});
 }
 
@@ -104,6 +99,8 @@ sub level_name {
   my ($self, $data) = @_;
 
   $data = $data ? lc $data : $self->level;
+
+  return undef if !defined $data;
 
   return $$CODE{$data} || ($$NAME{$data} && $$CODE{$$NAME{$data}});
 }
@@ -171,9 +168,9 @@ sub warn {
 }
 
 sub write {
-  my ($self, @args) = @_;
+  my ($self, $level, @args) = @_;
 
-  $self->handler->(@args);
+  $self->handler->($level, @args);
 
   return $self;
 }
@@ -215,6 +212,9 @@ Log Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for logging information using various log levels.
+The default log level is L<trace>. Acceptable log levels are C<trace>,
+C<debug>, C<info>, C<warn>, C<error>, and C<fatal>, and the set log level will
+handle events for its level and any preceding levels in the order specified.
 
 =cut
 
@@ -228,7 +228,8 @@ This package has the following attributes:
 
   handler(CodeRef $code) (CodeRef)
 
-The handler attribute holds the callback that handles logging.
+The handler attribute holds the callback that handles logging. The handler is
+passed the log level and the log messages.
 
 I<Since C<1.68>>
 
@@ -244,7 +245,7 @@ I<Since C<1.68>>
 
   my $events = [];
 
-  $handler = $log->handler(sub{push @$events, [@_]});
+  $handler = $log->handler(sub{shift; push @$events, [@_]});
 
 =back
 
@@ -254,7 +255,9 @@ I<Since C<1.68>>
 
   level(Str $name) (Str)
 
-The level attribute holds the current log level.
+The level attribute holds the current log level. Valid log levels are C<trace>,
+C<debug>, C<info>, C<warn>, C<error> and C<fatal>, and will emit log messages
+in that order. Invalid log levels effectively disable logging.
 
 I<Since C<1.68>>
 
@@ -687,7 +690,7 @@ I<Since C<1.68>>
 
 =head2 write
 
-  write(Any @data) (Log)
+  write(Str $level, Any @data) (Log)
 
 The write method invokes the log handler, i.e. L</handler>, and returns the invocant.
 
@@ -701,7 +704,7 @@ I<Since C<1.68>>
 
   package main;
 
-  # $log = $log->write(time, 'Something failed!');
+  # $log = $log->write('info', time, 'Something failed!');
 
   # bless(..., "Venus::Log")
 

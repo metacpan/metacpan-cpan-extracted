@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '1.38';
+our $VERSION = '1.43';
 
 sub IDENTIFIER { return 'element-6066-11e4-a52e-4f735466cecf' }
 
@@ -33,6 +33,16 @@ sub TO_JSON {
         $json->{ IDENTIFIER() } = $self->uuid();
     }
     return $json;
+}
+
+sub aria_label {
+    my ($self) = @_;
+    return $self->browser()->aria_label($self);
+}
+
+sub aria_role {
+    my ($self) = @_;
+    return $self->browser()->aria_role($self);
 }
 
 sub uuid {
@@ -350,7 +360,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 1.38
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -367,7 +377,21 @@ Version 1.38
 
 This module handles the implementation of a Firefox Element using the Marionette protocol
 
+=head1 CONSTANTS
+
+=head2 IDENTIFIER
+
+returns the L<web element identifier|https://www.w3.org/TR/webdriver/#elements>
+
 =head1 SUBROUTINES/METHODS
+
+=head2 aria_label
+
+returns the L<ARIA label|https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label> for the L<element|Firefox::Marionette::Element>.
+
+=head2 aria_role
+
+returns the L<ARIA role|https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles> for the L<element|Firefox::Marionette::Element>.
 
 =head2 attribute 
 
@@ -718,10 +742,6 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     }
 
 If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_partial|Firefox::Marionette::Element#find_partial> method.
-
-=head2 IDENTIFIER
-
-returns the L<web element identifier|https://www.w3.org/TR/webdriver/#elements>
 
 =head2 is_enabled
 

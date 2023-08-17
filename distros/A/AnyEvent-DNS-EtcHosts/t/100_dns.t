@@ -19,7 +19,7 @@ use File::Temp 'tempfile';
 my ($fh, $filename) = tempfile TMPDIR => 1, UNLINK => 1;
 ok $filename;
 
-print { $fh } << 'END';
+print {$fh} << 'END';
 1.2.3.4 example.com
 5.6.7.8 example.com
 fe00::1234 example.com
@@ -39,8 +39,8 @@ use AnyEvent::DNS;
     ok my $cv = AE::cv;
 
     AnyEvent::DNS::any 'example.com', sub {
-        cmp_deeply [ map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_ ],
-                   [ qw(1.2.3.4 5.6.7.8 fe00::1234) ];
+        cmp_deeply [map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_],
+            [qw(1.2.3.4 5.6.7.8 fe00::1234)];
         $cv->send;
     };
 
@@ -52,8 +52,8 @@ use AnyEvent::DNS;
     ok my $cv = AE::cv;
 
     AnyEvent::DNS::a 'example.com', sub {
-        cmp_deeply [ @_ ],
-                   [ qw(1.2.3.4 5.6.7.8) ];
+        cmp_deeply [@_],
+            [qw(1.2.3.4 5.6.7.8)];
         $cv->send;
     };
 
@@ -65,8 +65,8 @@ use AnyEvent::DNS;
     ok my $cv = AE::cv;
 
     AnyEvent::DNS::aaaa 'example.com', sub {
-        cmp_deeply [ @_ ],
-                   [ qw(fe00::1234) ];
+        cmp_deeply [@_],
+            [qw(fe00::1234)];
         $cv->send;
     };
 
@@ -77,8 +77,8 @@ use AnyEvent::DNS;
 {
     ok my $cv = AE::cv;
     AnyEvent::DNS::srv 'http', 'tcp', 'example.com', sub {
-        cmp_deeply [ map { $_->[3] } @_ ],
-                   [ qw(example.com) ];
+        cmp_deeply [map { $_->[3] } @_],
+            [qw(example.com)];
         $cv->send;
     };
 

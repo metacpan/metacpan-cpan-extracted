@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use 5.012;
-use lib 't';
+use lib 't/lib';
 use XLog;
 use MyTest;
 use Test::More;
@@ -19,6 +19,6 @@ if ($ENV{LOGGER}) {
     XLog::set_level(XLog::DEBUG);
 }
 
-catch_run($tname) for (1..$cnt);
+test_catch($tname) for (1..$cnt);
 
 done_testing();

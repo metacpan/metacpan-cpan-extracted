@@ -6,7 +6,7 @@ use warnings;
 use Mo::utils qw(check_required);
 
 my $self = {
-        'key' => 'value',
+ 'key' => 'value',
 };
 check_required($self, 'key');
 

@@ -22,7 +22,8 @@ sub new {
 sub _cleanup {
         my $self = shift;
 
-        delete $self->{'_data'};
+        delete $self->{'_dynamic_data'};
+        delete $self->{'_static_data'};
 
         return;
 }
@@ -30,7 +31,15 @@ sub _cleanup {
 sub _init {
         my ($self, @variables) = @_;
 
-        $self->{'_data'} = \@variables;
+        $self->{'_dynamic_data'} = \@variables;
+
+        return;
+}
+
+sub _prepare {
+        my ($self, @variables) = @_;
+
+        $self->{'_static_data'} = \@variables;
 
         return;
 }
@@ -41,9 +50,18 @@ sub _process {
         $self->{'tags'}->put(
                 ['b', 'div'],
         );
-        foreach my $variable (@{$self->{'_data'}}) {
+        foreach my $variable (@{$self->{'_static_data'}}) {
                 $self->{'tags'}->put(
                         ['b', 'div'],
+                        ['a', 'class', 'static'],
+                        ['d', $variable],
+                        ['e', 'div'],
+                );
+        }
+        foreach my $variable (@{$self->{'_dynamic_data'}}) {
+                $self->{'tags'}->put(
+                        ['b', 'div'],
+                        ['a', 'class', 'dynamic'],
                         ['d', $variable],
                         ['e', 'div'],
                 );
@@ -65,8 +83,11 @@ my $obj = Foo->new(
         'tags' => $tags,
 );
 
-# Init data.
-$obj->init('foo', 'bar', 'baz');
+# Init static data.
+$obj->prepare('foo', 'bar');
+
+# Init dynamic data.
+$obj->init('baz', 'bax');
 
 # Process.
 $obj->process;
@@ -78,13 +99,16 @@ print $tags->flush."\n";
 # Output:
 # HTML
 # <div>
-#   <div>
+#   <div class="static">
 #     foo
 #   </div>
-#   <div>
+#   <div class="static">
 #     bar
 #   </div>
-#   <div>
+#   <div class="dynamic">
 #     baz
+#   </div>
+#   <div class="dynamic">
+#     bax
 #   </div>
 # </div>

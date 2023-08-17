@@ -1,6 +1,7 @@
 package Media::Convert::FfmpegInfo;
 
 use MooseX::Singleton;
+use SemVer;
 
 has 'codecs' => (
 	is => 'ro',
@@ -41,6 +42,22 @@ sub _build_codecs {
 		$rv->{$name} = $h;
 	};
 	return $rv;
+}
+
+has version => (
+	is => 'ro',
+	isa => 'SemVer',
+	lazy => 1,
+	builder => '_build_version',
+);
+
+sub _build_version {
+	open my $ffmpeg, "-|", "ffmpeg -version 2>/dev/null";
+	foreach my $line(<$ffmpeg>) {
+		if($line =~ /ffmpeg version ([0-9.]+)/) {
+			return SemVer->new($1);
+		}
+	}
 }
 
 1;

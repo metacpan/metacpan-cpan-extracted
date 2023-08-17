@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::conditions4big_streams;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: conditions4big_streams.pm
+ PERL PERL PROGRAM NAME: conditions4big_streams.pm
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 16 2018 
 

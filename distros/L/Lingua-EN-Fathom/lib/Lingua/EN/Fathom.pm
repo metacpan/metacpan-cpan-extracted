@@ -1,48 +1,77 @@
 =head1 NAME
 
-Lingua::EN::Fathom - Measure readability of English text
-
+    Lingua::EN::Fathom - Measure readability of English text
+    
 =head1 SYNOPSIS
-
+    
     use Lingua::EN::Fathom;
-
+    
     my $text = Lingua::EN::Fathom->new();
     
-    # Analyse contents of a text file
     $text->analyse_file("sample.txt"); # Analyse contents of a text file
-
+    
     $accumulate = 1;
-    # Analyse contents of a text string
-    $text->analyse_block($text_string,$accumulate);
-
-    # TO Do, remove repetition
-    $num_chars             = $text->num_chars;
-    $num_words             = $text->num_words;
-    $percent_complex_words = $text->percent_complex_words;
-    $num_sentences         = $text->num_sentences;
-    $num_text_lines        = $text->num_text_lines;
-    $num_blank_lines       = $text->num_blank_lines;
-    $num_paragraphs        = $text->num_paragraphs;
-    $syllables_per_word    = $text->syllables_per_word;
-    $words_per_sentence    = $text->words_per_sentence;
-
-   # comment needed
+    my $text_string = q{
+    Returns the number of words in the analysed text file or block. A word must
+    consist of letters a-z with at least one vowel sound, and optionally an
+    apostrophe or hyphen.
+    
+    ##########################################
+    Items such as "&, K108, NSW" are not counted as words.
+    Common abbreviations such a U.S. or numbers like 1.23 will not denote the end of
+    a sentence.
+    };
+    
+    $text->analyse_block($text_string,$accumulate); # Analyse contents of a text string
+    
+    print($text->report);  # Create a formatted report  
+       
+        Number of characters       : 312
+        Number of words            : 54
+        Percent of complex words   : 7.41
+        Average syllables per word : 1.4259
+        Number of sentences        : 4
+        Average words per sentence : 13.5000
+        Number of text lines       : 6
+        Number of non-text lines   : 1
+        Number of blank lines      : 2
+        Number of paragraphs       : 2   
+    
+        READABILITY INDICES
+        
+        Fog                        : 8.3630
+        Flesch                     : 72.4992
+        Flesch-Kincaid             : 6.5009    
+    
+    # Methods to return statistics on the analysed text
+    $text->num_chars;
+    $text->num_words;
+    $text->percent_complex_words;
+    $text->num_sentences;
+    $text->num_text_lines;
+    $text->num_non_text_lines;
+    $text->num_blank_lines; # trailing EOLs are ignored
+    $text->num_paragraphs;
+    $text->syllables_per_word;
+    $text->words_per_sentence;
+    $text->unique_words;
+    $text->fog;
+    $text->flesch;
+    $text->kincaid;
+    
+    # get a hash of unique words, keyed by word  and occurrence as the value
+    $text->unique_words
+    
+    # Print a list of unique words
     %words = $text->unique_words;
     foreach $word ( sort keys %words )
     {
-      print("$words{$word} :$word\n");
+        print("$words{$word} :$word\n");
     }
-
-    $fog     = $text->fog;
-    $flesch  = $text->flesch;
-    $kincaid = $text->kincaid;
-
-    print($text->report);
-
-
+    
 =head1 REQUIRES
 
-Perl, version 5.001 or higher, Lingua::EN::Syllable
+Lingua::EN::Syllable, Lingua::EN::Sentence
 
 
 =head1 DESCRIPTION
@@ -89,7 +118,7 @@ C<analyse_file> are prerequisites for all the following methods. An optional
 argument may be supplied to control accumulation of statistics. If set to
 a non zero value, all statistics are accumulated with each successive call.
 
-    $text->analyse_block($text_str);
+    $text->analyse_block($text_str,$accumulate);
 
 =head2 num_chars
 
@@ -114,15 +143,19 @@ Returns the number of sentences in the analysed text file or block. A sentence
 is any group of words and non words terminated with a single full stop. Spaces
 may occur before and after the full stop.
 
-
 =head2 num_text_lines
 
 Returns the number of lines containing some text in the analysed
 text file or block.
 
+=head2 num_non_text_lines
+
+Returns the number of lines containing no text in the analysed
+text file or block.
+
 =head2 num_blank_lines
 
-Returns the number of lines NOT containing any text in the analysed
+Returns the number of empty lines in the analysed
 text file or block.
 
 =head2 num_paragraphs
@@ -138,7 +171,6 @@ text file or block.
 
 Returns the average number of words per sentence in the analysed 
 text file or block.
-
 
 
 =head2 READABILITY
@@ -191,7 +223,6 @@ This score rates text on U.S. grade school level. So a score of 8.0 means
 that the document can be understood by an eighth grader. A score of 7.0 to
 8.0 is considered to be optimal.
 
-
 =head2 unique_words
 
 Returns a hash of unique words. The words (in lower case) are held in
@@ -212,6 +243,7 @@ Average syllables per word : 1.7704
 Number of sentences        : 12
 Average words per sentence : 11.2500
 Number of text lines       : 13
+Number of non text lines   : 0
 Number of blank lines      : 8
 Number of paragraphs       : 4
 
@@ -232,21 +264,16 @@ L<Lingua::EN::Syllable>,L<Lingua::EN::Sentence>,L<B::Fathom>
 
 =head1 POSSIBLE EXTENSIONS
 
-   Count white space and punctuation characters
-   Allow user control over what strictly defines a word 
+Count white space and punctuation characters
+Allow user control over what strictly defines a word 
 
 =head1 LIMITATIONS
 
 The syllable count provided in Lingua::EN::Syllable is about 90% accurate
-
 Acronyms that contain vowels, like GPO, will be counted as words.
-
 The fog index should exclude proper names
 
 
-=head1 BUGS
-
-None known
 
 =head1 AUTHOR
 
@@ -254,7 +281,7 @@ Lingua::EN::Fathom was written by Kim Ryan <kimryan at cpan dot org>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Kim Ryan. All rights reserved.
+Copyright (c) 2023 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -270,7 +297,7 @@ use Lingua::EN::Sentence;
 use strict;
 use warnings;
 
-our $VERSION = '1.22';
+our $VERSION = '1.27';
 
 #------------------------------------------------------------------------------
 # Create a new instance of a text object.
@@ -281,6 +308,7 @@ sub new
 
    my $text = {};
    bless($text,$class);
+   $text = &_initialize($text);
    return($text);
 }
 #------------------------------------------------------------------------------
@@ -293,7 +321,7 @@ sub analyse_file
 
    unless ( $accumulate )
    {
-      $text = &_initialize($text);
+      $text = _initialize($text);
    }
 
    $text->{file_name} = $file_name;
@@ -312,12 +340,12 @@ sub analyse_file
    {
       my $one_line = $_;
       $all_text .= $one_line;
-      ($in_paragraph,$text) = &_analyse_line($text,$one_line,$in_paragraph);
+      ($in_paragraph,$text) = _analyse_line($text,$one_line,$in_paragraph);
    }
    close(IN_FH);
    
    my $sentences= Lingua::EN::Sentence::get_sentences($all_text);     
-   $text->{num_sentences} = scalar(@$sentences);   
+   $text->{num_sentences} += scalar(@$sentences);   
    $text->_calculate_readability;
 
    return($text);
@@ -333,7 +361,7 @@ sub analyse_block
 
    unless ( $accumulate )
    {
-      $text = &_initialize($text);
+      $text = _initialize($text);
    }
 
    unless ( $block )
@@ -343,17 +371,22 @@ sub analyse_block
 
    my $in_paragraph = 0;
 
-   # by setting split limit to -1, we prevent split from stripping
-   # trailing line terminators
-   my @all_lines = split(/\n/,$block,-1);
+   # Split on EOL character 
+   # repeating trailing line terminators are stripped
+   my @all_lines = split(/\n/,$block);
    my $one_line;
    foreach $one_line ( @all_lines )
    {
-      ($in_paragraph,$text) = &_analyse_line($text,$one_line,$in_paragraph);
+      ($in_paragraph,$text) = _analyse_line($text,$one_line,$in_paragraph);
    }
    
-   my $sentences= Lingua::EN::Sentence::get_sentences($block);        
-   $text->{num_sentences} = scalar(@$sentences);      
+   my $sentences= Lingua::EN::Sentence::get_sentences($block);
+   if (defined($sentences))
+   {
+       $text->{num_sentences} += scalar(@$sentences);
+   }
+   
+         
    $text->_calculate_readability;
    
    return($text);
@@ -376,7 +409,6 @@ sub percent_complex_words
    my $text = shift;
    return($text->{percent_complex_words});
 }
-
 #------------------------------------------------------------------------------
 sub num_sentences
 {
@@ -388,6 +420,12 @@ sub num_text_lines
 {
    my $text = shift;
    return($text->{num_text_lines});
+}
+#------------------------------------------------------------------------------
+sub num_non_text_lines
+{
+   my $text = shift;
+   return($text->{num_non_text_lines});
 }
 #------------------------------------------------------------------------------
 sub num_blank_lines
@@ -412,6 +450,18 @@ sub words_per_sentence
 {
    my $text = shift;
    return($text->{words_per_sentence});
+}
+#------------------------------------------------------------------------------
+sub num_syllables
+{
+   my $text = shift;
+   return($text->{num_syllables});
+}
+#------------------------------------------------------------------------------
+sub complex_words
+{
+   my $text = shift;
+   return($text->{num_complex_words});
 }
 #------------------------------------------------------------------------------
 sub fog
@@ -454,8 +504,8 @@ sub unique_words
 sub report
 {
    my $text = shift;
-
    my $report = '';
+   
 
    $text->{file_name} and
    $report .= sprintf("File name                  : %s\n",$text->{file_name} );
@@ -467,6 +517,7 @@ sub report
    $report .= sprintf("Number of sentences        : %d\n",  $text->num_sentences);
    $report .= sprintf("Average words per sentence : %.4f\n",$text->words_per_sentence);
    $report .= sprintf("Number of text lines       : %d\n",  $text->num_text_lines);
+   $report .= sprintf("Number of non-text lines   : %d\n",  $text->num_non_text_lines);
    $report .= sprintf("Number of blank lines      : %d\n",  $text->num_blank_lines);
    $report .= sprintf("Number of paragraphs       : %d\n",  $text->num_paragraphs);
 
@@ -489,18 +540,20 @@ sub _initialize
    $text->{num_syllables} = 0;
    $text->{num_words} = 0;
    $text->{num_complex_words} = 0;
+   $text->{syllables_per_word} = 0;
+   $text->{words_per_sentence} = 0;
+   $text->{percent_complex_words} = 0;
    $text->{num_text_lines} = 0;
+   $text->{num_non_text_lines} = 0;
    $text->{num_blank_lines} = 0;
    $text->{num_paragraphs} = 0;
    $text->{num_sentences} = 0;
    $text->{unique_words} = ();
    $text->{file_name} = '';
 
-
    $text->{fog} = 0;
    $text->{flesch} = 0;
    $text->{kincaid} = 0;
-
 
    return($text);
 }
@@ -510,12 +563,12 @@ sub _initialize
 sub _analyse_line
 {
    my $text = shift;
+   
    my ($one_line,$in_paragraph) = @_;
-
    if ( $one_line =~ /\w/ )
    {
       chomp($one_line);
-      $text = &_analyse_words($text,$one_line);
+      $text = _analyse_words($text,$one_line);
       $text->{num_text_lines}++;
    
       unless ( $in_paragraph )
@@ -524,9 +577,14 @@ sub _analyse_line
          $in_paragraph = 1;
       }
    }
-   else # empty or blank line
-   {
+   elsif ($one_line eq '' ) # empty line
+   {    
       $text->{num_blank_lines}++;
+      $in_paragraph = 0;
+   }
+   elsif ($one_line =~ /^\W+$/ ) # non text
+   {
+      $text->{num_non_text_lines}++;
       $in_paragraph = 0;
    }
    return($in_paragraph,$text);
@@ -545,7 +603,7 @@ sub _analyse_words
    
    # Ignore words like  'Mr.', K12, &, X.Y.Z ...
    # It could be argued that Mr. is a word, but this approach should detect most of the non words
-   # whivh have punctuation or numbers in them
+   # which have punctuation or numbers in them
    
    while ( $one_line =~ /\b([a-z][-'a-z]*)\b/ig )
    {
@@ -577,40 +635,6 @@ sub _analyse_words
          $text->{num_complex_words}++;
       }
    }
-   ## Remove full stops to denote common abbreviations. By requiring a following space
-   ## we know the '.' is not also ending the sentence.
-   #
-   ## People's titles
-   #$one_line =~ s/Mr\. /Mr /ig;
-   #$one_line =~ s/Mrs\. /Mrs /ig;
-   #$one_line =~ s/Ms\. /Ms /ig;
-   #$one_line =~ s/M\/s\. /M\/s /ig;
-   #$one_line =~ s/Dr\. /Dr /ig;
-   #$one_line =~ s/Prof\. /Prof /ig;
-   #$one_line =~ s/Det\. /Det /ig;
-   #$one_line =~ s/Insp\. /Insp /ig;
-   #
-   ## Commercial abbreviations
-   #$one_line =~ s/Pty\. /Pty /ig;
-   #$one_line =~ s/PLC\. /PLC /ig;
-   #$one_line =~ s/Ltd\. /Ltd /ig;
-   #$one_line =~ s/Inc\. /Inc /ig;
-   #
-   ## Other abbreviations
-   #$one_line =~ s/etc\. /etc /ig;
-   #$one_line =~ s/vs\. /vs /ig;
-   #
-   #
-   ## Remove quotation marks as a quote followed by a full stop will not be
-   ## correctly detected by the following regexps.
-   #$one_line =~ s/"//g;
-   #$one_line =~ s/'//g;
-
-   # Now search for '.', '?' or '!'  at the end of the normalised sentence.
-   # while ( $one_line =~ /\b\s*[.!?]\s*\b/g ) { $text->{num_sentences}++ }
-   # Check for final sentence, with no following words.
-   # $one_line =~ /\b\s*[.!?]\s*$/g and $text->{num_sentences}++;
-
 
    return($text);
 }
@@ -623,7 +647,6 @@ sub _calculate_readability
 
    if ( $text->{num_sentences} and $text->{num_words} )
    {
-
       $text->{words_per_sentence} = $text->{num_words} / $text->{num_sentences};
       $text->{syllables_per_word} = $text->{num_syllables} / $text->{num_words};
       $text->{percent_complex_words} =
@@ -641,6 +664,7 @@ sub _calculate_readability
    {
       $text->{words_per_sentence} = 0;
       $text->{syllables_per_word} = 0;
+      $text->{num_complex_words} = 0;
       $text->{fog} = 0;
       $text->{flesch} = 0;
       $text->{kincaid} = 0;

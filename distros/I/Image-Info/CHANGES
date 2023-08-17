@@ -1,5 +1,17 @@
 Revision history for Image::Info
 
+2023-08-03  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.44
+
+    Stable release with the change in 1.43_50
+
+2023-07-25  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.43_50
+
+    Support for AVIF files (PR #12, thanks to Zefram and Michael Kroell)
+
 2022-10-03  Slaven Rezic  <slaven@rezic.de>
 
     Release 1.43

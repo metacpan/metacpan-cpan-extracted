@@ -1,14 +1,52 @@
 =head1 Change Log
 
+=head2 2.6.1   C<2023-07-26>
+
+=over
+
+=item * Fix: Formatting with perltidy was broken in 2.6.0
+
+=back
+
+=head2 2.6.0   C<2023-07-23>
+
+=over
+
+=item * Add debug setting for running as different user. See sudoUser setting. (#174) [wielandp]
+
+=item * Allow to use a string for debuggee arguments. (#149, #173) [wielandp]
+
+=item * Add stdin redirection (#166) [wielandp]
+
+=item * Add link to issues to META files (#168) [szabgab/issues]
+
+=item * Add support for podman
+
+=item * Add support for run Perl::LanguageServer outside, but debugger inside a container
+
+=item * Add setting useTaintForSyntaxCheck. If true, use taint mode for syntax check (#172) [wielandp]
+
+=item * Add setting useTaintForDebug. If true, use taint mode inside debugger (#181) [wielandp]
+
+=item * Add debug adapter request C<source>, which allows to display source of eval or file that are not available to vscode (#180) [wielandp]
+
+=item * Fix: Spelling (#170, #171) [pkg-perl-tools]
+
+=item * Fix: Convert charset encoding of debugger output according to current locale (#167) [wielandp]
+
+=item * Fix: Fix diagnostic notifications override on clients (based on #185) [bmeneg]
+
+=back
+
 =head2 2.5.0   C<2023-02-05>
 
 =over
 
 =item * Set minimal Perl version to 5.16 (#91)
 
-=item * Per default enviroment from vscode will be passed to debuggee, syntax check and perltidy.
+=item * Per default environment from vscode will be passed to debuggee, syntax check and perltidy.
 
-=item * Add configuration C<disablePassEnv> to not pass enviroment variables.
+=item * Add configuration C<disablePassEnv> to not pass environment variables.
 
 =item * Support for C<logLevel> and C<logFile> settings via LanguageServer protocol and
 not only via command line options (#97) [schellj]
@@ -29,7 +67,7 @@ not only via command line options (#97) [schellj]
 
 =item * Choose a different port for debugAdapterPort if it is already in use. This
 avoids trouble with starting C<Perl::LanguageServer> if another instance
-of C<Perl::LanguageServer> is runing on the same machine (thanks to hakonhagland)
+of C<Perl::LanguageServer> is running on the same machine (thanks to hakonhagland)
 
 =item * Add configuration C<debugAdapterPortRange>, for choosing range of port for dynamic
 port assignment
@@ -86,7 +124,7 @@ so watchs and code from the debug console is not expanded properly
 =item * Fix: sshArgs parameter was not declared as array (#109)
 
 =item * Disable syntax check on windows, because it blocks the whole process when running on windows,
-until handling of childs processes is fixed
+until handling of child's processes is fixed
 
 =item * Fixed spelling (#86,#96,#101) [chrstphrchvz,davorg,aluaces]
 

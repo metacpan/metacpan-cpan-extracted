@@ -9,10 +9,10 @@ SYNOPSIS
        use Object::Pad::FieldAttr::Final;
     
        class Rectangle {
-          has $width  :param :reader :Final;
-          has $height :param :reader :Final;
+          field $width  :param :reader :Final;
+          field $height :param :reader :Final;
     
-          has $area :reader :Final;
+          field $area :reader :Final;
     
           ADJUST {
              $area = $width * $height;
@@ -35,25 +35,25 @@ FIELD ATTRIBUTES
 
  :Final
 
-       has $field :Final ...;
-       has $field :Final ... = DEFAULT;
+       field $name :Final ...;
+       field $name :Final ... = DEFAULT;
 
     Declares that the field variable will be set readonly at the end of the
     constructor, after any assignments from :param declarations or ADJUST
     blocks. At this point, the value cannot otherwise be modified by
     directly writing into the field variable.
 
-       has $field :Final;
+       field $x :Final;
     
-       ADJUST { $field = 123; }    # this is permitted
+       ADJUST { $x = 123; }    # this is permitted
     
-       method m { $field = 456; }  # this will fail
+       method m { $x = 456; }  # this will fail
 
     Note that this is only a shallow readonly setting; if the field
     variable contains a reference to a data structure, that structure
     itself remains mutable.
 
-       has $aref :Final;
+       field $aref :Final;
        ADJUST { $aref = []; }
     
        method more { push @$aref, "another"; }   # this is permitted

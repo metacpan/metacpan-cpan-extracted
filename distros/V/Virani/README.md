@@ -34,10 +34,28 @@ For more information on the config file, see the POD for Virani.
 
 ## Usage
 
-A example grabbing port 53 traffic below can be done like the following.
+A example grabbing port 53 traffic below can be done like the
+following.
 
 ```shell
-    virani -s 2023-02-27T11:00:18 -e 2023-02-27T11:31:18 -f 'port 53' 
+    virani -s 2023-02-27T11:00:18 -e 2023-02-27T11:31:18 port 53
+```
+
+The time may also be specified like below.
+
+```
+now       current time
+now-30    30 seconds ago
+now-30m   30 minutes ago
+now-30h   30 hours ago
+now-30w   30 weeks ago
+```
+
+So if you wanted to find all port 53 traffic in the last minute, you
+could do somethiing like below.
+
+```shell
+    virani -s now-1m -e now port 53
 ```
 
 The help info for virani is as below. For more info check out the POD
@@ -86,4 +104,3 @@ This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
 This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
-

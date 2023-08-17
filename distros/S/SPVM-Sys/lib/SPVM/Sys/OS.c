@@ -244,15 +244,15 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     int32_t e = 0;
     
-    if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_INT, 1)) {
+    if (env->is_type(env, stack, obj_value_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_INT), 1)) {
       int32_t* value_ref = env->get_elems_int(env, stack, obj_value_ref);
       *value_ref = ival;
     }
-    else if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG, 1)) {
+    else if (env->is_type(env, stack, obj_value_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG), 1)) {
       int64_t* value_ref = env->get_elems_long(env, stack, obj_value_ref);
       *value_ref = lval;
     }
-    else if (env->is_type(env, stack, obj_value_ref, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE, 1)) {
+    else if (env->is_type(env, stack, obj_value_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE), 1)) {
       double* value_ref = env->get_elems_double(env, stack, obj_value_ref);
       *value_ref = dval;
     }

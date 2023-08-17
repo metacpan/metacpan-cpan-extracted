@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,40 +25,40 @@
       },
       "configure" : {
          "requires" : {
-            "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v2.0.0",
-            "XS::Framework" : "v1.5.2",
+            "Export::XS" : "v3.0.6",
+            "Test::Catch" : "v2.0.1",
+            "XS::Framework" : "v1.5.5",
             "XS::Install" : "v1.3.5",
-            "XS::libcatch" : "v3.0.0.3",
-            "XS::libpanda" : "v1.5.8",
+            "XS::libcatch" : "v3.0.1",
+            "XS::libpanda" : "v1.5.9",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Export::XS" : "v3.0.5",
-            "XS::Framework" : "v1.5.2",
+            "Export::XS" : "v3.0.6",
+            "XS::Framework" : "v1.5.5",
             "XS::Install" : "v1.3.5",
-            "XS::libpanda" : "v1.5.8",
+            "XS::libpanda" : "v1.5.9",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
-            "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v2.0.0",
+            "Export::XS" : "v3.0.6",
+            "Test::Catch" : "v2.0.1",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.5.2",
-            "XS::libcatch" : "v3.0.0.3",
-            "XS::libpanda" : "v1.5.8",
+            "XS::Framework" : "v1.5.5",
+            "XS::libcatch" : "v3.0.1",
+            "XS::libpanda" : "v1.5.9",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v2.1.5",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v2.1.6",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

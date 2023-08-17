@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use Carp qw(confess cluck);
 use Encode qw(encode);
@@ -563,38 +563,10 @@ sub get_efa_urls {
 			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
 			shortname => 'NVBW',
 		},
-
-		# HTTPS not supported
-		{
-			url       => 'http://efa.svv-info.at/sbs/XSLT_DM_REQUEST',
-			name      => 'Salzburger Verkehrsverbund',
-			shortname => 'SVV',
-		},
-
-		# HTTPS: invalid certificate
-		{
-			url  => 'http://www.travelineeastmidlands.co.uk/em/XSLT_DM_REQUEST',
-			name => 'Traveline East Midlands',
-			shortname => 'TLEM',
-		},
 		{
 			url       => 'https://efa.vagfr.de/vagfr3/XSLT_DM_REQUEST',
 			name      => 'Freiburger Verkehrs AG',
 			shortname => 'VAG',
-		},
-
-		# HTTPS: unsupported protocol
-		{
-			url       => 'http://mobil.vbl.ch/vblmobil/XML_DM_REQUEST',
-			name      => 'Verkehrsbetriebe Luzern',
-			shortname => 'VBL',
-		},
-
-		# HTTPS not supported
-		{
-			url       => 'http://fahrplan.verbundlinie.at/stv/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Steiermark',
-			shortname => 'Verbundlinie',
 		},
 		{
 			url       => 'https://efa.vgn.de/vgnExt_oeffi/XML_DM_REQUEST',
@@ -609,15 +581,7 @@ sub get_efa_urls {
 			shortname => 'VMV',
 		},
 		{
-			url       => 'https://efa.vor.at/wvb/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Ost-Region',
-			shortname => 'VOR',
-			encoding  => 'iso-8859-15',
-		},
-
-		# HTTPS not supported
-		{
-			url       => 'http://fahrplanauskunft.vrn.de/vrn/XML_DM_REQUEST',
+			url       => 'https://www.vrn.de/mngvrn//XML_DM_REQUEST',
 			name      => 'Verkehrsverbund Rhein-Neckar',
 			shortname => 'VRN',
 		},
@@ -631,10 +595,13 @@ sub get_efa_urls {
 			name      => 'Verkehrsverbund Rhein-Ruhr (alternative)',
 			shortname => 'VRR2',
 		},
-
-		# HTTPS not supported
 		{
-			url       => 'http://efa.vvo-online.de:8080/dvb/XSLT_DM_REQUEST',
+			url       => 'https://efa.vrr.de/rbgstd3/XML_DM_REQUEST',
+			name      => 'Verkehrsverbund Rhein-Ruhr (alternative alternative)',
+			shortname => 'VRR3',
+		},
+		{
+			url       => 'https://efa.vvo-online.de/VMSSL3/XSLT_DM_REQUEST',
 			name      => 'Verkehrsverbund Oberelbe',
 			shortname => 'VVO',
 		},
@@ -673,7 +640,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 
@@ -815,7 +782,7 @@ efa-m(1), Travel::Status::DE::EFA::Result(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

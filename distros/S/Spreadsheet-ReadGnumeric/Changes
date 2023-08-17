@@ -1,5 +1,9 @@
 Revision history for Spreadsheet-ReadGnumeric
 
+0.4	- 08 Jun 2023
+    * Fourth public release
+    * Add an option to populate all formulas ("ExprID").
+
 0.3	- 09 Mar 2023
     * Third public release.
     * Add missing runtime dependencies (thanks to srezic).

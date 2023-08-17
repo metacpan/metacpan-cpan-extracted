@@ -22,7 +22,7 @@ name: Complete-Sah
 provides:
   Complete::Sah:
     file: lib/Complete/Sah.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Complete::Common: '0.22'
   Complete::Util: '0.616'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sah
   homepage: https://metacpan.org/release/Complete-Sah
   repository: git://github.com/perlancar/perl-Complete-Sah.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -323,7 +323,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.785'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

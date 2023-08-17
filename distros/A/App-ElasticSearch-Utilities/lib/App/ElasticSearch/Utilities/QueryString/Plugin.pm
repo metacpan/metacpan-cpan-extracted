@@ -1,10 +1,10 @@
 package App::ElasticSearch::Utilities::QueryString::Plugin;
 # ABSTRACT: Moo::Role for implementing QueryString Plugins
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
@@ -87,7 +87,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 ATTRIBUTES
 

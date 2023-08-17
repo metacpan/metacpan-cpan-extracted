@@ -1,3 +1,9 @@
+0.011   2023-05-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [cli rename-add-prefix-datestamp] First argument
+          inadvertently lost.
+
+
 0.010   2023-03-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add script: rename-add-prefix-number.

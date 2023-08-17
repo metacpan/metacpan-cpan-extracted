@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Type/Tiny/Eq.pm
+lib/Type/Tiny/Equ.pm
+lib/Type/Tiny/NumEq.pm
+lib/Type/Tiny/NumEqu.pm
+lib/Types/Equal.pm
+minil.toml
+t/Types-Equal/basic.t
+t/Types-Equal/synopsis.t
+META.yml
+MANIFEST

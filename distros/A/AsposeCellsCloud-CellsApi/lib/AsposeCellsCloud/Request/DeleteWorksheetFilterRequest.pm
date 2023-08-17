@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetFilterRequest.name :   ,
-# DeleteWorksheetFilterRequest.sheetName :   ,
-# DeleteWorksheetFilterRequest.fieldIndex :   ,
-# DeleteWorksheetFilterRequest.criteria :   ,
-# DeleteWorksheetFilterRequest.folder :   ,
-# DeleteWorksheetFilterRequest.storageName :    
+# DeleteWorksheetFilterRequest.name : The workbook name.  ,
+# DeleteWorksheetFilterRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
+# DeleteWorksheetFilterRequest.criteria : The custom criteria.  ,
+# DeleteWorksheetFilterRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetFilterRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_filter' } = { 
-    	summary => '',
+    	summary => 'Deletes a filter for a filter column in worksheet.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).',
      	format => '',
      	read_only => '',
      		},
      'criteria' => {
      	datatype => 'string',
      	base_name => 'criteria',
-     	description => '',
+     	description => 'The custom criteria.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

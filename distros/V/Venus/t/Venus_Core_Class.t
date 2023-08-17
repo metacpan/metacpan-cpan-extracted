@@ -36,9 +36,11 @@ $test->for('abstract');
 
 =includes
 
+method: import
 method: does
 method: meta
 method: new
+method: unimport
 
 =cut
 
@@ -88,6 +90,35 @@ Venus::Core
 =cut
 
 $test->for('inherits');
+
+=method import
+
+The import method invokes the C<IMPORT> lifecycle hook and is invoked whenever
+the L<perlfunc/use> declaration is used.
+
+=signature import
+
+  import(Any @args) (Any)
+
+=metadata import
+
+{
+  since => '2.91',
+}
+
+=example-1 import
+
+  package main;
+
+  use User;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'import', sub {
+  1
+});
 
 =method does
 
@@ -221,6 +252,37 @@ $test->for('example', 2, 'new', sub {
   $result
 });
 
+=method unimport
+
+The unimport method invokes the C<UNIMPORT> lifecycle hook and is invoked
+whenever the L<perlfunc/no> declaration is used.
+
+=signature unimport
+
+  unimport(Any @args) (Any)
+
+=metadata unimport
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 unimport
+
+  package main;
+
+  no User;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'unimport', sub {
+  1
+});
+
 =partials
 
 t/Venus.t: pdml: authors
@@ -232,6 +294,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Core/Class.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Core/Class.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

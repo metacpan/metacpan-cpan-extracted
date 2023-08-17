@@ -7,7 +7,8 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
-  XS::Parse::Keyword::Builder: '0.33'
+  XS::Parse::Infix::Builder: '0'
+  XS::Parse::Keyword::Builder: '0.35'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -16,14 +17,21 @@ meta-spec:
   version: '1.4'
 name: XS-Parse-Keyword-FromPerl
 provides:
+  Optree::Generate:
+    file: lib/Optree/Generate.pm
+    version: '0.07'
+  XS::Parse::Infix::FromPerl:
+    file: lib/XS/Parse/Infix/FromPerl.pm
+    version: '0.07'
   XS::Parse::Keyword::FromPerl:
     file: lib/XS/Parse/Keyword/FromPerl.pm
-    version: '0.04'
+    version: '0.07'
 requires:
-  XS::Parse::Keyword: '0.33'
+  XS::Parse::Infix: '0.35'
+  XS::Parse::Keyword: '0.35'
   perl: '5.026'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

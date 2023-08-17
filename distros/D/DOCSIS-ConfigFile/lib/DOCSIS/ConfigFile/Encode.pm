@@ -2,7 +2,7 @@ package DOCSIS::ConfigFile::Encode;
 use strict;
 use warnings;
 use bytes;
-use Carp 'confess';
+use Carp qw(confess);
 use Math::BigInt;
 use Socket;
 
@@ -26,7 +26,7 @@ sub bigint {
   $int64->is_nan and confess "$value is not a number";
 
   my $negative = $int64 < 0;
-  my @bytes = $negative ? (0x80) : ();
+  my @bytes    = $negative ? (0x80) : ();
 
   while ($int64) {
     my $value = $int64 & 0xff;
@@ -103,10 +103,10 @@ sub objectid {
 }
 
 sub snmp_object {
-  my $obj = _test_value(snmp_object => $_[0]);
-  my $type = $SNMP_TYPE{uc($obj->{type})} or confess "Unknown SNMP type: @{[$obj->{type}||'']}";
+  my $obj   = _test_value(snmp_object => $_[0]);
+  my $type  = $SNMP_TYPE{uc($obj->{type})} or confess "Unknown SNMP type: @{[$obj->{type}||'']}";
   my @value = $type->[1]->({value => $obj->{value}, snmp => 1});
-  my @oid = _snmp_oid($obj->{oid});
+  my @oid   = _snmp_oid($obj->{oid});
 
   unless (@value) {
     confess 'Failed to decode SNMP value: ' . $obj->{value};
@@ -118,8 +118,8 @@ sub snmp_object {
 
   return (
     #-type--------length----------value-----type---
-    0x30, @total_length,        # object
-    0x06, @oid_length, @oid,    # oid
+    0x30,       @total_length,            # object
+    0x06,       @oid_length,   @oid,      # oid
     $type->[0], @value_length, @value,    # value
   );
 }
@@ -140,7 +140,7 @@ sub stringz {
 sub uchar { _test_value(uchar => $_[0], qr/\+?\d{1,3}$/) }
 
 sub uint {
-  my $obj = $_[0];
+  my $obj  = $_[0];
   my $uint = _test_value(uint => $obj, qr{^\+?\d{1,10}$});
   my @bytes;
 
@@ -164,7 +164,7 @@ sub uint {
 }
 
 sub ushort {
-  my $obj = $_[0];
+  my $obj    = $_[0];
   my $ushort = _test_value(ushort => $obj, qr{^\+?\d{1,5}$});
   my @bytes;
 
@@ -205,11 +205,11 @@ sub vendorspec {
 
   confess "vendor({ nested => ... }) is not an array ref" unless ref $obj->{nested} eq 'ARRAY';
 
-  @vendor = ether($obj);                       # will extract value=>$hexstr. might confess
-  @bytes = (8, CORE::int(@vendor), @vendor);
+  @vendor = ether($obj);                        # will extract value=>$hexstr. might confess
+  @bytes  = (8, CORE::int(@vendor), @vendor);
 
   for my $tlv (@{$obj->{nested}}) {
-    my @value = hexstr($tlv);                  # will extract value=>$hexstr. might confess
+    my @value = hexstr($tlv);                   # will extract value=>$hexstr. might confess
     push @bytes, uchar({value => $tlv->{type}});
     push @bytes, CORE::int(@value);
     push @bytes, @value;
@@ -280,7 +280,8 @@ sub _test_value {
   my ($name, $obj, $test) = @_;
 
   confess "$name({ value => ... }) received undefined value" unless defined $obj->{value};
-  confess "$name({ value => " . $obj->{value} . " }) does not match $test" if $test and not $obj->{value} =~ $test;
+  confess "$name({ value => " . $obj->{value} . " }) does not match $test"
+    if $test and not $obj->{value} =~ $test;
   $obj->{value};
 }
 

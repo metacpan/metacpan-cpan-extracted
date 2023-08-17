@@ -10,7 +10,7 @@ use File::Share ':all';
 use List::Util qw(first);
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -164,7 +164,7 @@ License::SPDX - Object for SPDX licenses handling.
 =head1 DESCRIPTION
 
 Object for SPDX licenses handling is using license data from L<https://github.com/spdx/license-list-data> repository.
-Actual version is 3.20.
+Actual version is 3.21.
 
 =head1 METHODS
 
@@ -371,6 +371,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

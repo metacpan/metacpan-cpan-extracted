@@ -7,6 +7,4 @@ use Test::More;
 
 use Test::Pod::Coverage 1.04;
 
-all_pod_coverage_ok({
-    also_private => [ qr/^(unimport|BUILD|call|prepare_app)$/ ],
-});
+all_pod_coverage_ok({ also_private => [qr/^(unimport|BUILD|call|prepare_app|build_headers_from_env)$/], });

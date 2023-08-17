@@ -6,6 +6,22 @@ Changes - Apache::SizeLimit change logfile
 
 =over 6
 
+=item 0.98 August 06, 2023
+
+Overhaul $VERSION numbering scheme to align with other mod_perl modules and
+avoid warnings from ExtUtils::MakeMaker.
+[Steve Hay]
+
+Remove use of Linux::Smaps - it is slow and uses wrong statistics anyway.
+[Zefram <zefram@fysh.org>, CPAN RT#93757]
+
+Fix unshared memory values when using /proc/self/statm.
+[Zefram <zefram@fysh.org>, CPAN RT#73752]
+
+Fix unnecessary FAIL reports on CPAN Testers by checking for mod_perl or
+mod_perl2.
+[Andreas Koenig <ANDK@cpan.org>; Steve Hay]
+
 =item 0.97 2012-04-02
 
 Set the -apxs argument correctly when building from mod_perl.

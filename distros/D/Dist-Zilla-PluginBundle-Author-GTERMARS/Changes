@@ -1,5 +1,11 @@
 Revision history for Perl extension Dist::Zilla::PluginBundle::Author::GTERMARS
 
+0.06      2023-06-05 13:34:39-07:00 America/Vancouver
+    - Add "CheckIssues" dependency to "dist.ini"; forgot to add this here when
+      I added the pre-release check back in 0.03
+    - Update config for "Git::CheckFor::CorrectBranch", to tell it to treat
+      "main" as my release branch.
+
 0.05      2021-06-21 10:20:50-07:00 America/Vancouver
     - Bump minimum Perl to v5.20 (matching DZil upstream)
 

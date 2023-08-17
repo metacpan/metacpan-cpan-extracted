@@ -10,7 +10,7 @@ my $data_ref = {};
 my @keys = keys %{$data_ref};
 
 for my $next (pairs $data_ref) {
-    ok $next->key     ~~ $data_ref               => 'key method correct';
+    ok exists $data_ref->{$next->key}            => 'key method correct';
     ok $next->value   eq $data_ref->{$next->key} => 'value method correct';
     delete $data_ref->{$next->key};
 }

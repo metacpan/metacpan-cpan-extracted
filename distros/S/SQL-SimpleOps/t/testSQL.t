@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2023.111.1";
+	our $VERSION = "2023.221.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -130,7 +130,36 @@
 		t=> 'Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ \'t1.a\' => \'t2.b\' ] )',
 		r=> "SELECT t1.a, t2.b FROM t1, t2 WHERE t1.a = t2.b",
 	);
+	&my_cmd
+	(
+		f=> "046",
+		s=> sub { $mymod->Select( table=>"t1", fields => [ {"a"=>"aa"} ], where => [ 'a' => '0' ], make_only=>1) },
+		t=> 'Select( table=>"t1", fields => [ {"a"=>"aa"} ], where => [ \'a\' => \'0\' ] )',
+		r=> "SELECT a aa FROM t1 WHERE a = '0'",
+	);
+	&my_cmd
+	(
+		f=> "047",
+		s=> sub { $mymod->Select( table=>"t1", fields => [ {"t1.a"=>"aa"} ], where => [ 't1.a' => '0' ], make_only=>1) },
+		t=> 'Select( table=>"t1", fields => [ {"t1.a"=>"aa"} ], where => [ \'t1.a\' => \'0\' ] )',
+		r=> "SELECT t1.a aa FROM t1 WHERE t1.a = '0'",
+	);
+	&my_cmd
+	(
+		f=> "048",
+		s=> sub { $mymod->Select( table=>["t1","t2"], fields => [ {"t1.a"=>"aa"} , {"t2.b"=>"bb"} ], where => [ 't1.a' => 't2.b' ], make_only=>1) },
+		t=> 'Select( table=>["t1","t2"], fields => [ {"t1.a"=>"aa"}, {"t2.b"=>"bb"} ], where => [ \'t1.a\' => \'t2.b\' ] )',
+		r=> "SELECT t1.a aa, t2.b bb FROM t1, t2 WHERE t1.a = t2.b",
+	);
+	&my_cmd
+	(
+		f=> "049",
+		s=> sub { $mymod->Select( table=>"t1", fields => [ {"sum(a)"=>"a1"}, {"sum(t1.a)"=>"a2"}, {"\\sum(a)"=>"a3"} ], where => [ 'a' => '0' ], make_only=>1) },
+		t=> 'Select( table=>"t1", fields => [ {"sum(a)"=>"a1"}, {"sum(t1.a)"=>"a2"}, {"\\sum(a)"=>"a3"} ], where => [ \'a\' => \'0\' ] )',
+		r=> "SELECT sum(a) a1, sum(t1.a) a2, sum(a) a3 FROM t1 WHERE a = '0'",
+	);
 	my %cursor;
+
 	&my_cmd
 	(
 		f=> "050",
@@ -286,6 +315,55 @@
 		n=> "SQL_SAVE enabled",
 		w=> 1,
 	);
+	&my_cmd
+	(
+		f=> "071",
+		s=> sub { $mymod->Select( table=>"t1", order_by => "t1.a",  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => "t1.a" )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a",
+	);
+	&my_cmd
+	(
+		f=> "072",
+		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "asc"} ] ,  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "asc"} ] )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a ASC",
+	);
+	&my_cmd
+	(
+		f=> "073",
+		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "desc"} ] ,  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "desc"} ] )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a DESC",
+	);
+	&my_cmd
+	(
+		f=> "074",
+		s=> sub { $mymod->Select( table=>"t1", order_by => [ "t1.a", "t1.b" ] ,  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => [ "t1.a", "t1.b" ] )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a, t1.b",
+	);
+	&my_cmd
+	(
+		f=> "075",
+		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "asc"}, "t1.b" ] ,  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "asc"}, "t1.b" ] )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a ASC, t1.b",
+	);
+	&my_cmd
+	(
+		f=> "076",
+		s=> sub { $mymod->Select( table=>"t1", order_by => [ "t1.a",{"t1.b"=>"desc"} ] ,  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => [ "t1.a", {"t1.b"=>"desc"} ] )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.a, t1.b DESC",
+	);
+	&my_cmd
+	(
+		f=> "077",
+		s=> sub { $mymod->Select( table=>"t1", order_by => {"t1.b"=>"desc"},  make_only=>1) },
+		t=> 'Select( table=>"t1", order_by => {"t1.b"=>"desc"} )', 
+		r=> "SELECT * FROM t1 ORDER BY t1.b DESC",
+	);
 
 	diag("################################################################");
 	fail($er." error") if ($er);
@@ -310,6 +388,7 @@ sub my_cmd()
 
 	diag("################################################################");
 	diag("test: ".$argv->{f});
+	diag("format: ".$argv->{t});
 
 	&{$argv->{s}};
 	my $buffer = $mymod->getLastSQL();
@@ -317,7 +396,6 @@ sub my_cmd()
 
 	diag("rc: ".$myrc);
 	diag("msg: ".$mymod->getMessage()) if ($myrc);
-	diag("format: ".$argv->{t});
 	diag("note: ".$argv->{n}) if (defined($argv->{n}));
 
 	if ($argv->{w})

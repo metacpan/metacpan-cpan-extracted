@@ -1,0 +1,61 @@
+SignalWire-ML version 1.12
+=============================
+
+SignalWire::ML is a small module for creating SignalWire ML
+
+ML documents:
+
+    Example 1:
+    use SignalWire::ML;
+
+    my $swml = SignalWire::ML->new({version => '1.0.1', voice => 'en-US-Neural2-J'});
+    $swml->addAIlanguage({name => 'English', code => 'en-US', voice => 'en-US-Neural2-F'});
+    $swml->addAIlanguage({name => 'French', code => 'fr-FR', voice => 'fr-FR-Neural2-E'});
+    $swml->setAIparams({direction => 'outbound', waitForUser => 1, callFromNumber => '+19184238080', callEnabled => 'false', smsEnabled => 'false'});
+    $swml->addAIparams({smsFromNumber => '+19184588888'});
+    $swml->addAIparams({languagesEnabled => 'true'});
+    $swml->addAIparams({languageMode => 'normal'});
+    $swml->setAIprompt({text => "Your name is Franklin and you are an expert at Star Wars. Introduce yourself and see if I have any questions."});
+    $swml->setAIpostPrompt({text => "Please summarize the conversation."});
+    $swml->addAIhints("foo", "bar");
+    $swml->addAISWAIGdefaults({ webHookURL => "$ENV{webHookURL}", authUser => 'me', authPass => 'secret' });
+    $swml->addAISWAIGfunction({function => 'get_weather', purpose => 'To determine what the current weather is in a provided location.',
+			       argument => 'The location or name of the city to get the weather from.' });
+    $swml->addAIhints("foo", "bard");
+    $swml->setAIpostPromptURL({postPromptURL => "http://some.server.com/rest/post.cgi", postPromptAuthUser => "me", postPromptAuthPassword => "secret"});
+    $swml->addAIApplication("main");
+    print $swml->renderJSON;
+
+Example 2:
+    use SignalWire::ML;
+
+    my $swml = new SignalWire::ML({version => '1.0.1', voice => 'en-US-Neural2-J' });
+    $swml->addApplication("test", "play",
+			  { urls => ['https://github.com/freeswitch/freeswitch-sounds/raw/master/fr/ca/june/voicemail/48000/vm-goodbye.wav'] });
+    $swml->addApplication("test", "hangup", "NORMAL_CLEARING");
+    $swml->addApplication("main", "play",
+			  { urls => ['https://github.com/freeswitch/freeswitch-sounds/raw/master/en/us/callie/ivr/48000/ivr-welcome_to_freeswitch.wav'] });
+    $swml->addApplication("main", "transfer", "test");
+    print $swml->renderJSON;
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2023 by Brian West
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

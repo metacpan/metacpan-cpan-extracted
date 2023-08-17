@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.5.5");
+use version; our $VERSION=version->declare("v0.6.0");
 
 use strict;
 use warnings;
@@ -109,29 +109,38 @@ sub _prepare_online_cached {
 	@{[do {
 		my $do_capture;
 		my $d="";
+
+    my $pack=ref $item->[Hustle::Table::matcher_];
+    my $is_regex;
+
+    if($pack){
+      $is_regex= ($pack eq "Regexp" or grep /^Regexp$/, @{$pack."::ISA"});
+    }
+
+
 		for($item->[Hustle::Table::type_]){
-                        if(ref($item->[Hustle::Table::matcher_]) eq "Regexp"){
-			$d.=\'(@$capture=$input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
+      if($is_regex){
+			  $d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
 				$do_capture=1;
-                        }
+      }
 			elsif(ref($item->[Hustle::Table::matcher_]) eq "CODE"){
 
 				$d.=\'($table->[\'.$index.\'][Hustle::Table::matcher_]->($input, ($table->[\'.$index.\'][1])))\';
 			}
-                        elsif(/exact/){
+      elsif(/exact/){
 				$d.=\'($input eq "\'. $item->[Hustle::Table::matcher_]. \'")\';
-                        }
-                        elsif(/begin/){
-                                $d.=\'(index($input, "\' . $item->[Hustle::Table::matcher_]. \'")==0)\';
-                        }
-                        elsif(/end/){
-                                $d.=\'(index(reverse($input), reverse("\'. $item->[Hustle::Table::matcher_].\'"))==0)\';
-                        }
-                        elsif(/numeric/){
-                                $d.=\'(\' . $item->[Hustle::Table::matcher_] . \'== $input)\';
-                        }
-                        else{
-                                #assume a regex
+      }
+      elsif(/begin/){
+              $d.=\'(index($input, "\' . $item->[Hustle::Table::matcher_]. \'")==0)\';
+      }
+      elsif(/end/){
+              $d.=\'(index(reverse($input), reverse("\'. $item->[Hustle::Table::matcher_].\'"))==0)\';
+      }
+      elsif(/numeric/){
+              $d.=\'(\' . $item->[Hustle::Table::matcher_] . \'== $input)\';
+      }
+      else{
+        #assume a regex - even if a basic string
 				$item->[Hustle::Table::matcher_]=qr{$item->[Hustle::Table::matcher_]};
 				$item->[Hustle::Table::type_]=undef;
 				$do_capture=1;
@@ -141,7 +150,7 @@ sub _prepare_online_cached {
 
 
 		if($do_capture){
-			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\'], @{^CAPTURE}?$capture:());\';
+			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\'], [@{^CAPTURE}]);\';
 		}	
 		else {
 			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\']);\';
@@ -155,7 +164,7 @@ sub _prepare_online_cached {
 	'
 	my \$input;
 	my \$entry;
-	my \$capture;
+  no warnings "numeric";
 	sub {
 		\$input=shift;
 		\$entry=\$cache->{\$input};
@@ -164,8 +173,8 @@ sub _prepare_online_cached {
 		#\$entry
 			\$entry->[Hustle::Table::type_]
 			? return \$entry
-			: (\@\$capture=\$input=~ \$entry->[Hustle::Table::matcher_])
-				and return (\$entry, \@{^CAPTURE}?\$capture:())
+			: (\$input=~ \$entry->[Hustle::Table::matcher_])
+				and return (\$entry, [\@{^CAPTURE}])
 
 
 			if \$entry;

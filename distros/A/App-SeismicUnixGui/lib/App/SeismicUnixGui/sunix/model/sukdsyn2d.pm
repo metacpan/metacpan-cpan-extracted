@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::model::sukdsyn2d;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

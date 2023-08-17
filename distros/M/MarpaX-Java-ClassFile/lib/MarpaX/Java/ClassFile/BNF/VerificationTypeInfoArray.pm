@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a verification_type_info
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -135,7 +135,7 @@ MarpaX::Java::ClassFile::BNF::VerificationTypeInfoArray - Parsing of a verificat
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

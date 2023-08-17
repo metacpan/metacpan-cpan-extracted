@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-use Carp qw(cluck);
+use Carp   qw(cluck);
 use Encode qw(encode);
 use Travel::Routing::DE::EFA::Route;
 use Travel::Routing::DE::EFA::Route::Message;
@@ -42,7 +42,7 @@ use Exception::Class (
 	},
 );
 
-our $VERSION = '2.19';
+our $VERSION = '2.21';
 
 sub set_time {
 	my ( $self, %conf ) = @_;
@@ -682,6 +682,7 @@ sub parse_xml_part {
 			departure_stime    => $self->itdtime_str($e_dstime),
 			departure_stop     => $e_dep->getAttribute('name'),
 			departure_platform => $e_dep->getAttribute('platformName'),
+			occupancy          => $e_dep->getAttribute('occupancy'),
 			train_line         => $e_mot->getAttribute('name'),
 			train_product      => $e_mot->getAttribute('productName'),
 			train_destination  => $e_mot->getAttribute('destination'),
@@ -819,7 +820,7 @@ sub check_ambiguous_xml {
 
 	if ( $s_place eq 'list' ) {
 		Travel::Routing::DE::EFA::Exception::Ambiguous->throw(
-			post_key => 'place',
+			post_key   => 'place',
 			post_value =>
 			  ( $e_place->findnodes($xp_place_input) )[0]->textContent,
 			possibilities => join( q{ | },
@@ -829,7 +830,7 @@ sub check_ambiguous_xml {
 	}
 	if ( $s_name eq 'list' ) {
 		Travel::Routing::DE::EFA::Exception::Ambiguous->throw(
-			post_key => 'name',
+			post_key   => 'name',
 			post_value =>
 			  ( $e_name->findnodes($xp_name_input) )[0]->textContent,
 			possibilities => join( q{ | },
@@ -898,39 +899,10 @@ sub get_efa_urls {
 			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
 			shortname => 'NVBW',
 		},
-
-		# HTTPS not supported
-		{
-			url       => 'http://efa.svv-info.at/sbs/XSLT_TRIP_REQUEST2',
-			name      => 'Salzburger Verkehrsverbund',
-			shortname => 'SVV',
-		},
-
-		# HTTPS: invalid certificate
-		{
-			url =>
-			  'http://www.travelineeastmidlands.co.uk/em/XSLT_TRIP_REQUEST2',
-			name      => 'Traveline East Midlands',
-			shortname => 'TLEM',
-		},
 		{
 			url       => 'https://efa.vagfr.de/vagfr3/XSLT_TRIP_REQUEST2',
 			name      => 'Freiburger Verkehrs AG',
 			shortname => 'VAG',
-		},
-
-		# HTTPS: unsupported protocol
-		{
-			url       => 'http://mobil.vbl.ch/vblmobil/XML_TRIP_REQUEST2',
-			name      => 'Verkehrsbetriebe Luzern',
-			shortname => 'VBL',
-		},
-
-		# HTTPS not supported
-		{
-			url  => 'http://fahrplan.verbundlinie.at/stv/XSLT_TRIP_REQUEST2',
-			name => 'Verkehrsverbund Steiermark',
-			shortname => 'Verbundlinie',
 		},
 		{
 			url       => 'https://efa.vgn.de/vgnExt_oeffi/XML_TRIP_REQUEST2',
@@ -945,15 +917,7 @@ sub get_efa_urls {
 			shortname => 'VMV',
 		},
 		{
-			url       => 'https://efa.vor.at/wvb/XSLT_TRIP_REQUEST2',
-			name      => 'Verkehrsverbund Ost-Region',
-			shortname => 'VOR',
-			encoding  => 'iso-8859-15',
-		},
-
-		# HTTPS not spported
-		{
-			url       => 'http://fahrplanauskunft.vrn.de/vrn/XML_TRIP_REQUEST2',
+			url       => 'https://www.vrn.de/mngvrn/XML_TRIP_REQUEST2',
 			name      => 'Verkehrsverbund Rhein-Neckar',
 			shortname => 'VRN',
 		},
@@ -967,10 +931,13 @@ sub get_efa_urls {
 			name      => 'Verkehrsverbund Rhein-Ruhr (alternative)',
 			shortname => 'VRR2',
 		},
-
-		# HTTPS not supported
 		{
-			url       => 'http://efa.vvo-online.de:8080/dvb/XSLT_TRIP_REQUEST2',
+			url       => 'https://efa.vrr.de/rbgstd3/XSLT_TRIP_REQUEST2',
+			name      => 'Verkehrsverbund Rhein-Ruhr (alternative alternative)',
+			shortname => 'VRR3',
+		},
+		{
+			url       => 'https://efa.vvo-online.de/VMSSL3/XSLT_TRIP_REQUEST2',
 			name      => 'Verkehrsverbund Oberelbe',
 			shortname => 'VVO',
 		},
@@ -1014,7 +981,7 @@ Travel::Routing::DE::EFA - unofficial interface to EFA-based itinerary services
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 DESCRIPTION
 
@@ -1285,7 +1252,7 @@ None known.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2009-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

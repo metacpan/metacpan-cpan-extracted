@@ -1,7 +1,24 @@
 use strict;
+use warnings;
+use Test::More tests => 4;
+use Test::Tk;
 use Tk;
-BEGIN { $^W=1; $| = 1; print "1..1\n"; }
-END {print "not ok 1\n" unless $::loaded;}
-use Tk::Axis;
-$::loaded = 1;
-print "ok 1\n";
+
+BEGIN { use_ok('Tk::Axis') };
+
+createapp;
+
+my $axis;
+if (defined $app) {
+	$axis = $app->Axis(
+	)->pack(
+		-fill => 'both',
+	);
+}
+
+push @tests, (
+	[ sub { return defined $axis }, 1, 'Axis widget created' ],
+);
+
+
+starttesting;

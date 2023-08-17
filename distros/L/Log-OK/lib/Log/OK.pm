@@ -2,12 +2,12 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.6");
+use version; our $VERSION=version->declare("v0.2.0");
 
 use Carp qw<croak carp>;
 use constant::more ();
 
-use constant DEBUG_=>0;		#Heh...
+use constant::more DEBUG_=>0;
 
 use feature qw"say state";
 
@@ -20,7 +20,7 @@ my %systems=(
 
 
 my $sub;
-use constant::more();
+#use constant::more();
 sub import {
 	#arguments are lvl , opt, env, cat in hash ref
 	my $p=shift;
@@ -43,7 +43,18 @@ sub import {
 	constant::more->import({
 			logging=>{
 				val=>$hr->{lvl},
-				opt=>$hr->{opt}?$hr->{opt}.":s" : undef,
+
+        # Changed in v0.2.0
+        # If the opt field is DOES NOT EXIST, we assume user wants to use
+        # default of  "verbose" if opt field DOES EXIST, we use the user
+        # supplied value. If if is undef, we do not process any command line
+        # options.
+				opt=>exists($hr->{opt})      
+          ?$hr->{opt}
+            ?$hr->{opt}.":s" 
+            :undef 
+          :"verbose:s",
+
 				env=>$hr->{env},
 				sys=>$hr->{sys},
 				sub=>$sub,
@@ -95,7 +106,7 @@ sub log_any {
 		else{
 		
 			$level=$lookup->{$_};	
-			carp "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			croak "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -147,7 +158,7 @@ sub log_ger {
 		}
 		else{
 			$level=$lookup->{$_};	
-			carp "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			croak "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -213,7 +224,7 @@ sub log_dispatch {
 		else{
 		
 			$level=$lookup->{$_};	
-			carp "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			croak "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -277,13 +288,13 @@ sub log_log4perl {
 			$index=0 if $index< 0;
 			$index=@$levels-1 if $index > @$levels-1;
 			$level=$levels->[$index];
-			carp "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @$levels;
+			croak "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @$levels;
 
 		}
 		else{
 			$level=$lookup->{$_};	
 
-			carp "Log::OK: unknown level \"$value\" for Log::Log4perl. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			croak "Log::OK: unknown level \"$value\" for Log::Log4perl. Valid options: ".join ', ', keys %$lookup unless defined $level;
 			($index)=grep $levels->[$_]==$level, 0..@$levels-1;
 		}
 	}

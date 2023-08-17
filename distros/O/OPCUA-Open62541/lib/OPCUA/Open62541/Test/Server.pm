@@ -105,17 +105,22 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_VARIABLE_TYPE",
+	    NodeId_print		=> "ns=$namespace;s=SOME_VARIABLE_TYPE",
 	},
 	parentNodeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=>
 		OPCUA::Open62541::NS0ID_BASEDATAVARIABLETYPE,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_BASEDATAVARIABLETYPE,
 	},
 	referenceTypeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_HASSUBTYPE,
 	},
 	browseName => {
 	    QualifiedName_namespaceIndex	=> $namespace,
@@ -125,6 +130,7 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=> 0,
+	    NodeId_print		=> "i=0",
 	},
 	attributes => {
 	    VariableTypeAttributes_dataType	=> TYPES_INT32,
@@ -142,17 +148,22 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_OBJECT_TYPE",
+	    NodeId_print		=> "ns=$namespace;s=SOME_OBJECT_TYPE",
 	},
 	parentNodeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=>
 		OPCUA::Open62541::NS0ID_BASEOBJECTTYPE,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_BASEOBJECTTYPE,
 	},
 	referenceTypeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_HASSUBTYPE,
 	},
 	browseName => {
 	    QualifiedName_namespaceIndex	=> $namespace,
@@ -172,12 +183,15 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_VARIABLE_0",
+	    NodeId_print		=> "ns=$namespace;s=SOME_VARIABLE_0",
 	},
 	parentNodeId			=> $nodes{some_object_type}{nodeId},
 	referenceTypeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASCOMPONENT,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_HASCOMPONENT,
 	},
 	browseName => {
 	    QualifiedName_namespaceIndex	=> $namespace,
@@ -187,6 +201,7 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_VARIABLE_TYPE",
+	    NodeId_print		=> "ns=$namespace;s=SOME_VARIABLE_TYPE",
 	},
 	attributes => {
 	    VariableAttributes_dataType	=> TYPES_INT32,
@@ -210,17 +225,22 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_OBJECT_0",
+	    NodeId_print		=> "ns=$namespace;s=SOME_OBJECT_0",
 	},
 	parentNodeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=>
 		OPCUA::Open62541::NS0ID_OBJECTSFOLDER,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_OBJECTSFOLDER,
 	},
 	referenceTypeId => {
 	    NodeId_namespaceIndex	=> 0,
 	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
 	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_ORGANIZES,
+	    NodeId_print		=> "i=".
+		OPCUA::Open62541::NS0ID_ORGANIZES,
 	},
 	browseName => {
 	    QualifiedName_namespaceIndex	=> $namespace,
@@ -230,6 +250,7 @@ sub setup_complex_objects {
 	    NodeId_namespaceIndex	=> $namespace,
 	    NodeId_identifierType	=> NODEIDTYPE_STRING,
 	    NodeId_identifier		=> "SOME_OBJECT_TYPE",
+	    NodeId_print		=> "ns=$namespace;s=SOME_OBJECT_TYPE",
 	},
 	attributes => {
 	    ObjectAttributes_description => {

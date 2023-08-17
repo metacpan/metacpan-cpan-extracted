@@ -44,7 +44,8 @@ my $responses = [{
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef
 	  },
@@ -57,13 +58,15 @@ my $responses = [{
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifier' => 40,
 	    'NodeId_identifierType' => 0,
-	    'NodeId_namespaceIndex' => 0
+	    'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=40",
 	  },
 	  'ReferenceDescription_typeDefinition' => {
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifierType' => 0,
 	      'NodeId_identifier' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=0",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef,
 	    'ExpandedNodeId_serverIndex' => 0
@@ -103,7 +106,8 @@ my $responses = [{
 	'ExtensionObject_content_typeId' => {
 	  'NodeId_identifier' => 0,
 	  'NodeId_identifierType' => 0,
-	  'NodeId_namespaceIndex' => 0
+	  'NodeId_namespaceIndex' => 0,
+	  'NodeId_print' => "i=0",
 	},
 	'ExtensionObject_content_body' => undef,
       },
@@ -119,7 +123,8 @@ my $responses = [{
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifier' => 35,
 	    'NodeId_identifierType' => 0,
-	    'NodeId_namespaceIndex' => 0
+	    'NodeId_namespaceIndex' => 0,
+	    'NodeId_print' => "i=35",
 	  },
 	  'ReferenceDescription_typeDefinition' => {
 	    'ExpandedNodeId_serverIndex' => 0,
@@ -127,7 +132,8 @@ my $responses = [{
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 61,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=61",
 	    }
 	  },
 	  'ReferenceDescription_browseName' => {
@@ -139,7 +145,8 @@ my $responses = [{
 	    'ExpandedNodeId_nodeId' => {
 	      'NodeId_identifier' => 85,
 	      'NodeId_identifierType' => 0,
-	      'NodeId_namespaceIndex' => 0
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_print' => "i=85",
 	    },
 	    'ExpandedNodeId_namespaceUri' => undef
 	  },
@@ -180,7 +187,8 @@ my $responses = [{
 	'ExtensionObject_content_typeId' => {
 	  'NodeId_identifier' => 0,
 	  'NodeId_identifierType' => 0,
-	  'NodeId_namespaceIndex' => 0
+	  'NodeId_namespaceIndex' => 0,
+	  'NodeId_print' => "i=0",
 	},
 	'ExtensionObject_content_body' => undef,
       },

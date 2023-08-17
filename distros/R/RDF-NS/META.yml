@@ -1,12 +1,12 @@
 ---
-abstract: 'Just use popular RDF namespace prefixes from prefix.cc'
+abstract: 'quickly get common URI namespaces'
 author:
-  - 'Jakob Voß'
+  - '- by Jakob Voß.'
 build_requires: {}
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +20,24 @@ no_index:
     - share
     - eg
     - examples
+    - author
+    - builder
+provides:
+  App::rdfns:
+    file: lib/App/rdfns.pm
+    version: '20230619'
+  RDF::NS:
+    file: lib/RDF/NS.pm
+    version: '20230619'
+  RDF::NS::Trine:
+    file: lib/RDF/NS/Trine.pm
+    version: '20230619'
+  RDF::NS::URIS:
+    file: lib/RDF/NS/URIS.pm
+    version: '20230619'
+  RDF::SN:
+    file: lib/RDF/SN.pm
+    version: '20230619'
 requires:
   File::ShareDir: '1.00'
   perl: v5.12.0
@@ -27,10 +45,12 @@ resources:
   bugtracker: https://github.com/nichtich/RDF-NS/issues
   homepage: https://github.com/nichtich/RDF-NS
   repository: https://github.com/nichtich/RDF-NS.git
-version: '20190227'
+version: '20230619'
 x_contributors:
   - 'Andreas Koenig <andk@cpan.org>'
-  - 'Jakob Voss <jakob@nichtich.de>'
   - 'Jakob Voss <voss@gbv.de>'
+  - 'Jakob Voß <jakob@nichtich.de>'
   - 'Kjetil Kjernsmo <kjetil@kjernsmo.net>'
   - 'Sergey Romanov <complefor@rambler.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

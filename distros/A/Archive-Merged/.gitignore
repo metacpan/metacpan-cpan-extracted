@@ -2,6 +2,7 @@ Makefile
 Makefile.old
 *.tar.gz
 *.bak
+*.swp
 pm_to_blib
 blib/
 Archive-Merged-*/
@@ -9,3 +10,6 @@ Archive-Merged-*
 .releaserc
 cover_db
 MYMETA.*
+*.pl
+.prove
+*.patch

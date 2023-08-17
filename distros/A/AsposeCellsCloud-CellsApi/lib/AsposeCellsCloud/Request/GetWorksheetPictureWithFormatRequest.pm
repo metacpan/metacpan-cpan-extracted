@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPictureWithFormatRequest.name :   ,
-# GetWorksheetPictureWithFormatRequest.sheetName :   ,
-# GetWorksheetPictureWithFormatRequest.pictureNumber :   ,
-# GetWorksheetPictureWithFormatRequest.format :   ,
-# GetWorksheetPictureWithFormatRequest.folder :   ,
-# GetWorksheetPictureWithFormatRequest.storageName :    
+# GetWorksheetPictureWithFormatRequest.name : The workbook name.  ,
+# GetWorksheetPictureWithFormatRequest.sheetName : The worksheet name.  ,
+# GetWorksheetPictureWithFormatRequest.pictureNumber : The picture number.  ,
+# GetWorksheetPictureWithFormatRequest.format : Picture conversion format(PNG/TIFF/JPEG/GIF/EMF/BMP).  ,
+# GetWorksheetPictureWithFormatRequest.folder : Original workbook folder.  ,
+# GetWorksheetPictureWithFormatRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_picture_with_format' } = { 
-    	summary => '',
+    	summary => 'Gets a picture by number in worksheet.',
         params => $params,
         returns => 'string',
     };
@@ -142,42 +142,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'picture_number' => {
      	datatype => 'int',
      	base_name => 'pictureNumber',
-     	description => '',
+     	description => 'The picture number.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'Picture conversion format(PNG/TIFF/JPEG/GIF/EMF/BMP).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

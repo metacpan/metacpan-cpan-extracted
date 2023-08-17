@@ -4,7 +4,7 @@ Mojolicious::Command::migration — MySQL migration tool for Mojolicious
 
 # VERSION
 
-version 0.17
+version 0.18
 
 # SYNOPSIS
 
@@ -18,6 +18,8 @@ version 0.17
        prepare    : Makes deployment files for your database
        upgrade    : Upgrade the database.
        downgrade  : Downgrade the database.
+       diff       : Show differences not commited.
+       rm         : Remove version.
     
 
 # DESCRIPTION
@@ -132,6 +134,20 @@ Use flag --force to set current database to schema version without changes datab
     Schema version: 21
     Database version: 8
     Force downgrade to 21
+
+## diff
+
+    $ app migration diff
+    Schema version: 20
+    Deployed database is 20
+    ==== BEGIN SQL ====
+    ALTER TABLE test DROP COLUMN `name4`;
+    ==== END SQL ====
+
+## rm
+
+    $ app migration rm --version 20
+
 
 # Custom upgrade and downgrade
 

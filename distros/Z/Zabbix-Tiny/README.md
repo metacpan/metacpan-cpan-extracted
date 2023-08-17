@@ -123,7 +123,7 @@ The Zabbix::Tiny `do` method contains a very succinct arrayref that should conta
 
 - my $post\_response = $zabbix->post\_response;
 
-    The [HTTP::Response](https://metacpan.org/pod/HTTP::Response) from the Zabbix server for the most recent request.
+    The [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) from the Zabbix server for the most recent request.
 
 # BUGS and CAVEATS
 
@@ -164,6 +164,10 @@ This module is free software; you can redistribute it and/or modify it under the
 
 This program is distributed in the hope that it will be useful, but it is provided 'as is' and without any express or implied warranties.
 
-# AUTHOR
+# AUTHORS
 
 Ben Kaufman
+
+Richlv
+
+Ihor Siroshtan

@@ -71,6 +71,13 @@ PARSE HOOKS
 
       The semicolon, if present, will be consumed automatically.
 
+    XPK_FLAG_BLOCKSCOPE
+
+      The entire parse and build process will be wrapped in a pair of
+      block_start() and block_end() calls. This ensures that, for example,
+      any newly-introduced lexical variables do not escape from the scope
+      of the syntax created by the keyword.
+
  The permit Stage
 
        const char *permit_hintkey;
@@ -535,6 +542,39 @@ PIECES AND PIECE TYPES
     whereas XPK_KEYWORD("key") would not because of the subsequent "w"
     character.
 
+ XPK_INTRO_MY
+
+    atomic, emits nothing.
+
+    Calls the core perl intro_my() function immediately. No input is
+    consumed and no output value is generated. This is often useful after
+    XPK_LEXVAR_MY.
+
+ XPK_WARNING
+
+    atomic, emits nothing.
+
+       XPK_WARNING("message here")
+
+    Emits a warning by calling the core perl warn() function on the given
+    string literal. This is equivalent to simply calling warn() from the
+    build function, except that it is emitted immediately at parse time, so
+    line numbering will be more accurate. Also, by placing it as part of an
+    optional or choice sequence, the warning will only be emitted
+    conditionally if that part of the grammar structure is encountered.
+
+ XPK_WARNING_...
+
+    Several variants of XPK_WARNING exist that are conditional on
+    particular warning categories being enabled. These are ones that are
+    likely to be useful at parse time:
+
+       XPK_WARNING_AMBIGUOUS
+       XPK_WARNING_DEPRECATED
+       XPK_WARNING_EXPERIMENTAL
+       XPK_WARNING_PRECEDENCE
+       XPK_WARNING_SYNTAX
+
  XPK_SEQUENCE
 
     structural, might support probe, emits nothing.
@@ -628,46 +668,45 @@ PIECES AND PIECE TYPES
     An XPK_COMMALIST supports probe if its first contained piece does; i.e.
     is transparent to probing.
 
- XPK_PARENSCOPE
+ XPK_PARENS
 
     structural, can probe, emits nothing.
 
-       XPK_PARENSCOPE(pieces ...)
+       XPK_PARENS(pieces ...)
 
     A structural type which expects to find a sequence of pieces, all
     contained in parentheses as ( ... ). This will pass no extra arguments.
 
- XPK_ARGSCOPE
+ XPK_ARGS
 
     structural, emits nothing.
 
-       XPK_ARGSCOPE(pieces ...)
+       XPK_ARGS(pieces ...)
 
-    A structural type similar to XPK_PARENSCOPE, except that the
-    parentheses themselves are optional; much like Perl's parsing of calls
-    to known functions.
+    A structural type similar to XPK_PARENS, except that the parentheses
+    themselves are optional; much like Perl's parsing of calls to known
+    functions.
 
     If parentheses are encountered in the input, they will be consumed by
-    this piece and it will behave identically to XPK_PARENSCOPE. If there
-    is no open parenthesis, this piece will behave like XPK_SEQUENCE and
-    consume all the pieces inside it, without expecting a closing
-    parenthesis.
+    this piece and it will behave identically to XPK_PARENS. If there is no
+    open parenthesis, this piece will behave like XPK_SEQUENCE and consume
+    all the pieces inside it, without expecting a closing parenthesis.
 
- XPK_BRACKETSCOPE
+ XPK_BRACKETS
 
     structural, can probe, emits nothing.
 
-       XPK_BRACKETSCOPE(pieces ...)
+       XPK_BRACKETS(pieces ...)
 
     A structural type which expects to find a sequence of pieces, all
     contained in square brackets as [ ... ]. This will pass no extra
     arguments.
 
- XPK_BRACESCOPE
+ XPK_BRACES
 
     structural, can probe, emits nothing.
 
-       XPK_BRACESCOPE(pieces ...)
+       XPK_BRACES(pieces ...)
 
     A structural type which expects to find a sequence of pieces, all
     contained in braces as { ... }. This will pass no extra arguments.
@@ -677,11 +716,11 @@ PIECES AND PIECE TYPES
     special constrained syntax that should not just accept an arbitrary
     block.
 
- XPK_CHEVRONSCOPE
+ XPK_CHEVRONS
 
     structural, can probe, emits nothing.
 
-       XPK_CHEVRONSCOPE(pieces ...)
+       XPK_CHEVRONS(pieces ...)
 
     A structural type which expects to find a sequence of pieces, all
     contained in angle brackets as < ... >. This will pass no extra
@@ -691,20 +730,19 @@ PIECES AND PIECE TYPES
     contents of this scope shouldn't allow arbitrary expressions or the
     closing bracket will be ambiguous.
 
- XPK_PARENSCOPE_OPT, XPK_BRACKETSCOPE_OPT, XPK_BRACESCOPE_OPT,
- XPK_CHEVRONSCOPE_OPT
+ XPK_PARENS_OPT, XPK_BRACKETS_OPT, XPK_BRACES_OPT, XPK_CHEVRONS_OPT
 
     structural, can probe, emits i.
 
-       XPK_PARENSCOPE_OPT(pieces ...)
-       XPK_BRACKETSCOPE_OPT(pieces ...)
-       XPK_BRACESCOPE_OPT(pieces ...)
-       XPK_CHEVERONSCOPE_OPT(pieces ...)
+       XPK_PARENS_OPT(pieces ...)
+       XPK_BRACKETS_OPT(pieces ...)
+       XPK_BRACES_OPT(pieces ...)
+       XPK_CHEVERONS_OPT(pieces ...)
 
-    Each of the four XPK_...SCOPE macros above has an optional variant,
-    whose name is suffixed by _OPT. These pass an argument whose i field is
-    either true or false, indicating whether the scope was found, followed
-    by the values from the scope itself.
+    Each of the four contained structure macros above has an optional
+    variant, whose name is suffixed by _OPT. These pass an argument whose i
+    field is either true or false, indicating whether the scope was found,
+    followed by the values from the scope itself.
 
     This is a convenient shortcut to nesting the scope within a
     XPK_OPTIONAL macro.

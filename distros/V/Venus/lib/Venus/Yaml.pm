@@ -76,7 +76,7 @@ sub config {
   my ($self, $package) = @_;
 
   $package ||= $self->package
-    or $self->throw('error_on_config')->error;
+    or $self->error({throw => 'error_on_config'});
 
   # YAML::XS
   if ($package eq 'YAML::XS') {
@@ -228,6 +228,7 @@ sub error_on_config {
   return {
     name => 'on.config',
     message => 'No suitable YAML package',
+    raise => true,
   };
 }
 
@@ -383,7 +384,11 @@ B<example 1>
 
   # given: synopsis;
 
-  my $error = $yaml->throw('error_on_config')->catch('error');
+  my $input = {
+    throw => 'error_on_config',
+  };
+
+  my $error = $yaml->catch('error', $input);
 
   # my $name = $error->name;
 

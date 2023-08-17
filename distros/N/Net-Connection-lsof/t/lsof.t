@@ -11,7 +11,7 @@ BEGIN {
 }
 
 
-my $output_raw=`lsof -i UDP -i TCP -n -l -P`;
+my $output_raw=`lsof -i UDP -i TCP -n -l -P 2> /dev/null`;
 if (
 	( $? eq 0 ) ||
 	(

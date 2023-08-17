@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellSetValueRequest.name :   ,
-# PostWorksheetCellSetValueRequest.sheetName :   ,
-# PostWorksheetCellSetValueRequest.cellName :   ,
-# PostWorksheetCellSetValueRequest.value :   ,
-# PostWorksheetCellSetValueRequest.type :   ,
-# PostWorksheetCellSetValueRequest.formula :   ,
-# PostWorksheetCellSetValueRequest.folder :   ,
-# PostWorksheetCellSetValueRequest.storageName :    
+# PostWorksheetCellSetValueRequest.name : The workbook name.  ,
+# PostWorksheetCellSetValueRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellSetValueRequest.cellName : The cell name.  ,
+# PostWorksheetCellSetValueRequest.value : The cell value.  ,
+# PostWorksheetCellSetValueRequest.type : The value type.  ,
+# PostWorksheetCellSetValueRequest.formula : Formula for cell  ,
+# PostWorksheetCellSetValueRequest.folder : The document folder.  ,
+# PostWorksheetCellSetValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cell_set_value' } = { 
-    	summary => '',
+    	summary => 'Sets cell value by cell name in worksheet.',
         params => $params,
         returns => 'CellResponse',
     };
@@ -152,56 +152,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'cellName',
-     	description => '',
+     	description => 'The cell name.',
      	format => '',
      	read_only => '',
      		},
      'value' => {
      	datatype => 'string',
      	base_name => 'value',
-     	description => '',
+     	description => 'The cell value.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'The value type.',
      	format => '',
      	read_only => '',
      		},
      'formula' => {
      	datatype => 'string',
      	base_name => 'formula',
-     	description => '',
+     	description => 'Formula for cell',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The document folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

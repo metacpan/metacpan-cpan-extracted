@@ -4,7 +4,7 @@ use warnings;
 return {
     NAME               => 'HTML::Blitz',
     AUTHOR             => q{Lukas Mai <l.mai@web.de>},
-    LICENSE            => 'agpl_3',
+    LICENSE            => 'gpl_3',
 
     MIN_PERL_VERSION   => '5.24.0',
     CONFIGURE_REQUIRES => {},
@@ -28,9 +28,8 @@ return {
         'List::Util'           => '1.33',
         'Scalar::Util'         => 0,
     },
-    DEVELOP_REQUIRES   => {
-        'Test::Pod' => 1.22,
-    },
 
-    REPOSITORY         => [ github => 'mauke' ],
+    REPOSITORY => [ github => 'mauke' ],
+
+    HARNESS_OPTIONS => ['j4'],
 };

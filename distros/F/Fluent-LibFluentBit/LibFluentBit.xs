@@ -6,13 +6,18 @@
 #include "PerlFluentBit.h"
 
 #ifndef newSVivpv
-static SV *newSVivpv(IV ival, const char *pval) {
+static SV *PerlFluentBit_newSVivpv(pTHX_ IV ival, const char *pval) {
    SV *s= newSVpv(pval, 0);
    SvUPGRADE(s, SVt_PVIV);
    SvIV_set(s, ival);
    SvIOK_on(s);
    return s;
 }
+#  ifdef USE_ITHREADS
+#  define newSVivpv(a,b) PerlFluentBit_newSVivpv(aTHX,a,b)
+#  else
+#  define newSVivpv PerlFluentBit_newSVivpv
+#  endif
 #endif
 
 //#define TRACE warn

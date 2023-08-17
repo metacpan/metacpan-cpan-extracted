@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::DistUtils",
   "PREREQ_PM" => {
     "Complete::Dist" => 0,
-    "Complete::Module" => "0.262",
+    "Complete::Module" => "0.263",
     "Cwd" => 0,
     "Dist::Util" => "0.070",
     "Dist::Util::Debian" => "0.006",
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.153",
+  "VERSION" => "0.154",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Dist" => 0,
-  "Complete::Module" => "0.262",
+  "Complete::Module" => "0.263",
   "Cwd" => 0,
   "Dist::Util" => "0.070",
   "Dist::Util::Debian" => "0.006",

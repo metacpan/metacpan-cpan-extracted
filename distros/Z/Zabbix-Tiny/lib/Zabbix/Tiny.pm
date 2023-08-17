@@ -5,8 +5,9 @@ use Moo;
 use Carp;
 use LWP;
 use JSON;
+use version;
 
-our $VERSION = "1.11";
+our $VERSION = "2.0.1";
 
 has 'server' => (
     is       => 'rw',
@@ -40,6 +41,7 @@ has 'request'         => ( is => 'ro' );
 has 'json_prepared'   => ( is => 'ro' );
 has 'json_executed'   => ( is => 'ro', default => sub { 0 } );
 has 'redo'            => ( is => 'ro' );
+has 'version'         => ( is => 'lazy' );
 
 my @content_type = ( 'content-type', 'application/json', );
 
@@ -47,6 +49,7 @@ sub BUILD {
     my $self      = shift;
     my $ua        = $self->ua;
     my $url       = $self->server;
+
     my $json_data = {
         jsonrpc => '2.0',
         id      => $self->id,
@@ -56,6 +59,7 @@ sub BUILD {
             password => $self->password,
         },
     };
+
     if ( $self->verify_hostname == 0 ) {
         $ua->ssl_opts( verify_hostname => 0 );
     }
@@ -65,29 +69,72 @@ sub BUILD {
     }
 }
 
+
+sub _build_version {
+    my $self      = shift;
+    my $id        = $self->id;
+    my $ua        = $self->ua;
+    my $url       = $self->server;
+
+    my $json_data = {
+        jsonrpc => '2.0',
+        id      => $self->id,
+        method  => 'apiinfo.version',
+        params  => {
+        },
+    };
+
+    my $encoded_json = encode_json ($json_data);
+
+    my $post_response = $ua->post(
+        $self->server, 
+        @content_type,
+        Content => $encoded_json
+    );
+
+    _validate_http_response($post_response);
+
+    my $response_content = decode_json( $post_response->{_content} );
+
+    if ( $response_content->{error} ) {
+        my $error = $response_content->{error}->{data};
+        croak("Error: $error");
+    }
+    else {
+        my $version = version->new($response_content->{'result'});
+        return($version);
+    }
+}
+
+
 sub login {
     my $self      = shift;
     my $id        = $self->id;
     my $ua        = $self->ua;
     my $url       = $self->server;
-    my $json_data = {
+
+    my $json_data =  {
         jsonrpc => '2.0',
         id      => $id,
         method  => 'user.login',
-        params  => {
+    };
+
+    if ( $self->version lt "6.0" ) {
+        $json_data->{params} = {
             user     => $self->user,
             password => $self->password,
-        },
-    };
+        };
+    } else {
+        $json_data->{params} = {
+            username => $self->user,
+            password => $self->password,
+        };
+    }
+
     my $json = encode_json($json_data);
     my $response = $ua->post( $url, @content_type, Content => $json );
 
-    if ( $response->{_rc} !~ /2\d\d/ ) {
-        my $error_message = "HTTP error ";
-        $error_message   .= "(code $response->{_rc}) ";
-        $error_message   .= $response->{_msg} // q{};
-        croak($error_message);
-    }
+    _validate_http_response($response);
 
     my $content = decode_json( $response->{_content} ) or die($!);
 
@@ -100,6 +147,18 @@ sub login {
     }
 
     $self->{auth} = $content->{'result'};
+}
+
+
+sub _validate_http_response {
+    my $response = shift;
+
+    if ( $response->{_rc} !~ /2\d\d/ ) {
+        my $error_message = "HTTP error ";
+        $error_message   .= "(code $response->{_rc}) ";
+        $error_message   .= $response->{_msg} // q{};
+        croak($error_message);
+    }
 }
 
 sub prepare {
@@ -187,9 +246,9 @@ sub DEMOLISH {
     my $ua        = $self->ua;
     my $auth      = $self->auth;
     my $url       = $self->server;
-	
-	return unless ($ua);
-	
+    
+    return unless ($ua);
+    
     my $json_data = {
         jsonrpc => '2.0',
         id      => ++$self->{ id },
@@ -384,6 +443,10 @@ This module is free software; you can redistribute it and/or modify it under the
 
 This program is distributed in the hope that it will be useful, but it is provided 'as is' and without any express or implied warranties.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Ben Kaufman
+
+Richlv
+
+Ihor Siroshtan

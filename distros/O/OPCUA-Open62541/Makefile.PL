@@ -36,6 +36,31 @@ check_lib(
 ) and push @have, uc('UA_ServerConfig_serverUrls');
 check_lib(
     function		=> "
+	UA_ServerConfig serverConfig;
+	(void)UA_AccessControl_setCallback(&serverConfig, NULL, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/plugin/accesscontrol_default.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_AccessControl_setCallback');
+check_lib(
+    function		=> 'crypt_checkpass("", "");',
+    lib			=> 'c',
+    header		=> [qw(pwd.h unistd.h)],
+) and push @have, uc('crypt_checkpass');
+check_lib(
+    function		=> "
+	UA_ClientConfig clientConfig;
+	(void)clientConfig.applicationUri;",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/client.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_ClientConfig_applicationUri');
+check_lib(
+    function		=> "
 	UA_SessionlessInvokeRequestType requestType;
 	(void)requestType.urisVersionSize;",
     not_execute		=> 1,

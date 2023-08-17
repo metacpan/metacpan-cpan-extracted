@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.071 2023-06-26
+
+  - koha-dump-biblio pour 22.11 et supérieur
+
 0.070 2022-11-29
 
   - Fix for Koha 22.11

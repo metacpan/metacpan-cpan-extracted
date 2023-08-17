@@ -6,6 +6,7 @@
 
 typedef Display* DisplayOrNull; /* Used by typemap for stricter conversion */
 typedef Visual* VisualOrNull;
+typedef Window WindowOrNull;
 typedef int ScreenNumber; /* used by typemap to coerce X11::Xlib::Screen */
 
 #define PerlXlib_OR_NULL    0

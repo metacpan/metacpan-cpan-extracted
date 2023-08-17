@@ -77,7 +77,7 @@ sub parse_with_Text_CSV {
     while ( my $cols = $csv->getline( $fh ) ) {
         push @$rows_of_cols, $cols;
     }
-    $sql->{insert_into_args} = $rows_of_cols;
+    $sql->{insert_args} = $rows_of_cols;
     return 1;
 }
 
@@ -102,7 +102,7 @@ sub parse_with_split {
                 $_
             } split /$sf->{o}{split}{field_sep}/, $row, -1 ]; # negative LIMIT (-1) to preserve trailing empty fields
     }
-    $sql->{insert_into_args} = $rows_of_cols;
+    $sql->{insert_args} = $rows_of_cols;
     return 1;
 }
 
@@ -201,8 +201,7 @@ sub parse_with_template {
             # Fill_form
             my $form_set = $tf->fill_form(
                 $fields_set,
-                { info => $info, prompt => 'Settings:', auto_up => 2,
-                confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
+                { info => $info, prompt => 'Settings:', confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
             );
             $ax->print_sql_info( $info );
             if ( ! $form_set ) {
@@ -243,8 +242,7 @@ sub parse_with_template {
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => $prompt, auto_up => 2,
-                    confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+                    { info => $info, prompt => $prompt, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! $form ) {
@@ -308,7 +306,7 @@ sub parse_with_template {
                     @$fields = @$form;
                     next COL_WIDTHS;
                 }
-                $sql->{insert_into_args} = $rows_of_cols;
+                $sql->{insert_args} = $rows_of_cols;
                 return 1;
             }
         }
@@ -385,7 +383,7 @@ sub parse_with_Spreadsheet_Read {
         );
         return 1;
     }
-    $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
+    $sql->{insert_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
     if ( ! -T $file_fs && length $book->[$sheet_idx]{label} ) {
         $source->{sheet_name} = $book->[$sheet_idx]{label};
     }

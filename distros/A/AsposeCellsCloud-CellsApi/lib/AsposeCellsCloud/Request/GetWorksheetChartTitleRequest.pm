@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetChartTitleRequest.name :   ,
-# GetWorksheetChartTitleRequest.sheetName :   ,
-# GetWorksheetChartTitleRequest.chartIndex :   ,
-# GetWorksheetChartTitleRequest.folder :   ,
-# GetWorksheetChartTitleRequest.storageName :    
+# GetWorksheetChartTitleRequest.name : The workbook name.  ,
+# GetWorksheetChartTitleRequest.sheetName : The worksheet name.  ,
+# GetWorksheetChartTitleRequest.chartIndex : The chart index.  ,
+# GetWorksheetChartTitleRequest.folder : Original workbook folder.  ,
+# GetWorksheetChartTitleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_chart_title' } = { 
-    	summary => '',
+    	summary => 'Gets chart title description in worksheet.',
         params => $params,
         returns => 'TitleResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'chart_index' => {
      	datatype => 'int',
      	base_name => 'chartIndex',
-     	description => '',
+     	description => 'The chart index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

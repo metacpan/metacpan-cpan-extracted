@@ -1,0 +1,66 @@
+#! /usr/bin/env perl
+use v5.36;
+use FindBin;
+use Cwd;
+use Mojo::File 'path';
+use Log::Any '$log';
+use Log::Any::Adapter 'Daemontools',
+	-init => { argv => 1, env => 1, signals => ['USR1','USR2'] };
+BEGIN {
+	# Allow running from project dir
+	push @INC, "$FindBin::RealBin/../lib"
+		if -f "$FindBin::RealBin/../lib/App/SlideServer.pm";
+}
+use App::SlideServer 'mojo2logany';
+
+#PODNAME: slide-server
+#ABSTRACT: Run a HTTP server that serves the slides and websocket
+our $VERSION = '0.002'; #VERSION
+
+# in case running in Docker, need signal handlers installed
+$SIG{INT}= $SIG{TERM}= sub { exit 0; };
+
+my %opts= (
+	log => mojo2logany(),
+	serve_dir => path($ENV{APP_SLIDESERVER_SERVE_DIR} || Cwd::getcwd()),
+);
+$opts{share_dir}= path($ENV{APP_SLIDESERVER_SHARE_DIR})
+	if length ($ENV{APP_SLIDESERVER_SHARE_DIR} // '');
+$opts{presenter_key}= $ENV{APP_SLIDESERVER_PRESENTER_KEY}
+	if length ($ENV{APP_SLIDESERVER_PRESENTER_KEY} // '');
+
+my $app= App::SlideServer->new(\%opts);
+eval {
+	$app->monitor_source_changes(1);
+	$log->info("Monitoring ".$app->slides_source_file." for changes");
+}
+or $log->warn("Can't monitor for changes, install Linux::Inotify2: $@");
+push @ARGV, qw( daemon -l http://*:2000 ) unless @ARGV;
+$app->start(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+slide-server - Run a HTTP server that serves the slides and websocket
+
+=head1 VERSION
+
+version 0.002
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

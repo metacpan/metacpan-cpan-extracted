@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the color settings of the data bars for negative values that are   defined by a data bar conditional formating rule.            ',
                                   class => 'NegativeBarFormat',
                                   required => [], # TODO
 }                                 );
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'border_color' => {
      	datatype => 'Color',
      	base_name => 'BorderColor',
-     	description => '',
+     	description => 'Gets or sets a FormatColor object that you can use to specify the border   color for negative data bars.            ',
      	format => '',
      	read_only => '',
      		},
      'border_color_type' => {
      	datatype => 'string',
      	base_name => 'BorderColorType',
-     	description => '',
+     	description => 'Gets whether to use the same border color as positive data bars.            ',
      	format => '',
      	read_only => '',
      		},
      'color' => {
      	datatype => 'Color',
      	base_name => 'Color',
-     	description => '',
+     	description => 'Gets or sets a FormatColor object that you can use to specify the fill color   for negative data bars.            ',
      	format => '',
      	read_only => '',
      		},
      'color_type' => {
      	datatype => 'string',
      	base_name => 'ColorType',
-     	description => '',
+     	description => 'Gets or sets whether to use the same fill color as positive data bars.',
      	format => '',
      	read_only => '',
      		},    

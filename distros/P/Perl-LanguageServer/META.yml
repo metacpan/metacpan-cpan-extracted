@@ -24,6 +24,7 @@ requires:
   Compiler::Lexer: '0.23'
   Coro: '0'
   Data::Dump: '0'
+  Encode::Locale: '0'
   Hash::SafeKeys: '0'
   IO::AIO: '0'
   JSON: '0'
@@ -32,6 +33,7 @@ requires:
   Scalar::Util: '0'
   perl: '5.016'
 resources:
+  bugtracker: https://github.com/richterger/Perl-LanguageServer/issues
   repository: https://github.com/richterger/Perl-LanguageServer.git
-version: v2.5.0
+version: v2.6.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

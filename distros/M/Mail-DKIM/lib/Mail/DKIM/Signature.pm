@@ -1,7 +1,7 @@
 package Mail::DKIM::Signature;
 use strict;
 use warnings;
-our $VERSION = '1.20230212'; # VERSION
+our $VERSION = '1.20230630'; # VERSION
 # ABSTRACT: represents a DKIM-Signature header
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -14,6 +14,7 @@ our $VERSION = '1.20230212'; # VERSION
 use Mail::DKIM::PublicKey;
 use Mail::DKIM::Algorithm::rsa_sha1;
 use Mail::DKIM::Algorithm::rsa_sha256;
+use Mail::DKIM::Algorithm::ed25519_sha256;
 
 use base 'Mail::DKIM::KeyValueList';
 use Carp;
@@ -36,8 +37,8 @@ sub new {
     $self->identity( $prms{'Identity'} )     if exists $prms{'Identity'};
     $self->timestamp( $prms{'Timestamp'} )   if defined $prms{'Timestamp'};
     $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
+    $self->tags( $prms{'Tags'} ) if defined $prms{'Tags'};
     $self->key( $prms{'Key'} )               if defined $prms{'Key'};
-
     return $self;
 }
 
@@ -322,6 +323,17 @@ sub expiration {
     return $self->get_tag('x');
 }
 
+sub tags {
+    my $self = shift;
+    my $tags = shift;
+
+    for my $tag (sort keys %$tags) {
+      $self->set_tag( $tag, $tags->{$tag} );
+    }
+    (@_)
+
+}
+
 # allows the type of signature to determine what "algorithm" gets used
 sub get_algorithm_class {
     my $self = shift;
@@ -331,6 +343,7 @@ sub get_algorithm_class {
     my $class =
         $algorithm eq 'rsa-sha1'   ? 'Mail::DKIM::Algorithm::rsa_sha1'
       : $algorithm eq 'rsa-sha256' ? 'Mail::DKIM::Algorithm::rsa_sha256'
+      : $algorithm eq 'ed25519-sha256' ? 'Mail::DKIM::Algorithm::ed25519_sha256'
       :                              undef;
     return $class;
 }
@@ -413,6 +426,7 @@ sub hash_algorithm {
     return
         $algorithm eq 'rsa-sha1'   ? 'sha1'
       : $algorithm eq 'rsa-sha256' ? 'sha256'
+      : $algorithm eq 'ed25519-sha256' ? 'sha256'
       :                              undef;
 }
 
@@ -602,7 +616,7 @@ Mail::DKIM::Signature - represents a DKIM-Signature header
 
 =head1 VERSION
 
-version 1.20230212
+version 1.20230630
 
 =head1 CONSTRUCTORS
 
@@ -639,8 +653,11 @@ of the as_string method.
 
 =head2 algorithm() - get or set the algorithm (a=) field
 
-The algorithm used to generate the signature. Should be either "rsa-sha1",
-an RSA-signed SHA-1 digest, or "rsa-sha256", an RSA-signed SHA-256 digest.
+The algorithm used to generate the signature. Should be one of the
+following:
+- "rsa-sha1",an RSA-signed SHA-1 digest
+- "rsa-sha256", an RSA-signed SHA-256 digest
+- "ed25519-sha256", an Ed25519-signed SHA-256 digest
 
 See also hash_algorithm().
 

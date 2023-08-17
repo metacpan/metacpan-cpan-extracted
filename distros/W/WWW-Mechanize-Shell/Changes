@@ -13,6 +13,17 @@ Todo:
     * Add set-cookie and delete-cookie commands
     * Add (optional) HTTP::Cookies::Find support
 
+0.62 2023-07-21
+    * Test stability fix
+
+0.61 2023-07-21
+    * Various test suite updates, no code updates, no need to upgrade
+    * Test suite now runs in parallel
+
+0.60 2021-12-06
+    * Delete proxy-related environment variables when testing
+      Upstreamed from Debian by gregor hermann, thanks!
+
 0.59 2020-05-04
     * HTML::Form::find_input() has a 1-based index
       Reported by the CPAN testers, thanks!

@@ -1,0 +1,5 @@
+#!include_default
+PerlX-SafeNav-.*
+README.pod
+dist.json
+metamerge.json

@@ -57,7 +57,7 @@ HOSTNAMES: {
 	delete $ENV{'SCRIPT_URI'};
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 
-	$i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
+	$i = new_ok('CGI::Info' => [{ logger => MyLogger->new() }]);
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path

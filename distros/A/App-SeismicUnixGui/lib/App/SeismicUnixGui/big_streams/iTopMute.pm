@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iTopMute;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iTopMute.pm 
+ PERL PROGRAM NAME: iTopMute.pm 
  AUTHOR: Juan Lorenzo
  DATE:  Sept. 14 2015 
          
@@ -67,7 +67,7 @@ use App::SeismicUnixGui::misc::SeismicUnix
   qw($on $off $in $to $go $itop_mute_par_ $itop_mute_check_pickfile_ $false $true );
   
 my $Project           = Project_config->new();
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT)= $Project->DATA_SEISMIC_TXT();
 my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
 my ($date)            = $Project->date();
 
@@ -440,7 +440,7 @@ sub icp_sorted2oldpicks {
     # sort file names
     $sortfile_in = $XTpicks_in;
     $inbound =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $sortfile_in . '_'
       . $iTopMute->{_file_in} . '_'
       . $iTopMute->{_gather_num_suffix};
@@ -448,7 +448,7 @@ sub icp_sorted2oldpicks {
     # TX write file names
     $writefile_out = $XTpicks_out;
     $outbound =
-        $PL_SEISMIC . '/'
+        $DATA_SEISMIC_TXT . '/'
       . $writefile_out . '_'
       . $iTopMute->{_file_in} . '_'
       . $iTopMute->{_gather_num_suffix};

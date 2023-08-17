@@ -8,7 +8,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Text::Minify::XS v0.6.2 ();
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.4';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.4
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,12 @@ You can also use of the minifier conditional on the application mode
 Note that this is naive minifier which does not understand markup, so
 newlines will still be collapsed in HTML elements where whitespace is
 meaningful, e.g. C<pre> or C<textarea>.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.16, which is the same minimum version that the current version of L<Mojolicious> requires.
+
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
 
@@ -90,7 +96,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2022 by Robert Rothenberg.
+This software is Copyright (c) 2021-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

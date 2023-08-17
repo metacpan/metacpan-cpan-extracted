@@ -53,10 +53,7 @@ struct ClassHookFuncs {
 struct ClassHook {
   const struct ClassHookFuncs *funcs;
   void *funcdata;
-  union {
-    SV *attrdata;
-    SV *hookdata; // old name
-  };
+  SV *attrdata; /* used to be called 'hookdata' */
 };
 
 struct FieldHookFuncs {
@@ -84,10 +81,7 @@ struct FieldHook {
   FieldMeta *fieldmeta;
   const struct FieldHookFuncs *funcs;
   void *funcdata;
-  union {
-    SV *attrdata;
-    SV *hookdata; // old name
-  };
+  SV *attrdata; /* used to be called 'hookdata' */
 };
 
 enum MetaType {
@@ -187,6 +181,12 @@ void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodna
 
 #define mop_class_apply_attribute(classmeta, name, value)  ObjectPad_mop_class_apply_attribute(aTHX_ classmeta, name, value)
 void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value);
+
+#define mop_class_get_attribute(classmeta, name)  ObjectPad_mop_class_get_attribute(aTHX_ classmeta, name)
+struct ClassHook *ObjectPad_mop_class_get_attribute(pTHX_ ClassMeta *classmeta, const char *name);
+
+#define mop_class_get_attribute_values(classmeta, name)  ObjectPad_mop_class_get_attribute_values(aTHX_ classmeta, name)
+AV *ObjectPad_mop_class_get_attribute_values(pTHX_ ClassMeta *classmeta, const char *name);
 
 #define register_class_attribute(name, funcs, funcdata)  ObjectPad_register_class_attribute(aTHX_ name, funcs, funcdata)
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata);

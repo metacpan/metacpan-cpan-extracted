@@ -28,17 +28,26 @@ sub checked {
   return $self->options->{checked};
 }
 
+#around 'label', sub {
+#  my ($orig, $self, $attrs) = @_;
+#  $attrs = +{} unless defined($attrs);
+#  return $self->$orig($self->options->{attribute_value_method}, $attrs, $self->text);
+#};
+
 around 'label', sub {
   my ($orig, $self, $attrs) = @_;
   $attrs = +{} unless defined($attrs);
-  return $self->$orig($self->options->{attribute_value_method}, $attrs, $self->text);
+  my $text = $self->human_name_for_label($self->text);
+  return $self->$orig($self->value, $attrs, $text);
 };
 
 around 'checkbox', sub {
   my ($orig, $self, $attrs) = @_;
   $attrs = +{} unless defined($attrs);
-  $attrs->{name} = $self->tag_name_for_attribute($self->options->{attribute_value_method});
-  $attrs->{id} = $self->tag_id_for_attribute($self->options->{attribute_value_method});
+  #$attrs->{name} = $self->tag_name_for_attribute($self->options->{attribute_value_method});
+   $attrs->{name} = $self->name;
+
+  $attrs->{id} = $self->tag_id_for_attribute($self->value); # $self->options->{attribute_value_method}
   $attrs->{include_hidden} = 0;
   $attrs->{checked} = $self->checked;
   $attrs = $self->merge_theme_field_opts(checkbox=>$attrs->{attribute}, $attrs);
@@ -62,7 +71,11 @@ around 'checkbox', sub {
   $attrs->{class} = join(' ', (grep { defined $_ } $attrs->{class}, $errors_classes))
     if $errors_classes && $has_error;
 
-  return $self->$orig($self->options->{value_method}, $attrs, $self->value);
+  my $value = $self->options->{is_spec_attribute} ?
+    +{$self->options->{attribute_value_method} => $self->value}: 
+    $self->value;
+
+  return $self->$orig($self->options->{value_method}, $attrs, $value);
 };
 
 

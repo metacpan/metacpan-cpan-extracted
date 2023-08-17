@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Net::Songkick" : {
          "file" : "lib/Net/Songkick.pm",
-         "version" : "v1.0.7"
+         "version" : "v1.0.8"
       },
       "Net::Songkick::Artist" : {
          "file" : "lib/Net/Songkick/Artist.pm"
@@ -74,10 +74,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/net-songkick/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/net-songkick.git",
+         "web" : "https://github.com/davorg/net-songkick"
+      }
    },
-   "version" : "v1.0.7",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.0.8",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,6 +2,12 @@ Revision history for Pod-AsciiDoctor
 
 NOT USED - Please use github http://github.com/benignbala/pod-asciidoctor
 
+0.101003    2023-07-03
+
+    - avoid packaging *.old files.
+        - https://github.com/shlomif/Pod-AsciiDoctor/issues/2
+        - Thanks to @perlpunk
+
 0.101002    2023-02-08
 
     Further Fix for https://github.com/shlomif/Pod-AsciiDoctor/issues/1 .

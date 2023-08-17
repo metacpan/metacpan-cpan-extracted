@@ -22,14 +22,16 @@ $config = Net::Upwork::API::Config->new(
     'client_id'     => 'xxxxxxxx',
     'client_secret' => 'xxxxxxxx',
     'redirect_uri'  => 'https://your-call-back-url.here',
+#    'grant_type' => 'client_credentials', # used for Client Credentials Grant
 #    'access_token'  => 'xxxxxxxx',
-#    'refresh_token' => 'xxxxxxxx',
+#    'refresh_token' => 'xxxxxxxx', # used by Code Authorization Grant
 #    'expires_in' => 86399 # TTL. `expires_at` should be enough for basic usage but you may find this option useful for own needs
 #    'expires_at' => 1234567890 # timestamp, either get from the Net::OAuth2::AccessToken object or set like time()+actual_expires_in
 );
 
 $api = Net::Upwork::API->new($config);
 if (!$api->has_access_token()) {
+  # start Code Authorization Grant
     my $authz_url = $api->get_authorization_url();
 
     print "Visit the authorization url and provide oauth_verifier for further authorization\n";
@@ -38,6 +40,8 @@ if (!$api->has_access_token()) {
     $code = <STDIN>;
     
     my $session = $api->get_access_token($code);
+  # end Code Authorization Grant
+    #my $session = $api->get_access_token(); # Client Credentials Grant
     #print Dumper $session; # Net::OAuth2::AccessToken object
     #print Dumper $session->access_token;
     #print Dumper $session->refresh_token;

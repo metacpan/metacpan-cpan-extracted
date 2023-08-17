@@ -1,41 +1,15 @@
-Tk-JFileDialog
-==============
-
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
-
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
-
-INSTALLATION
-
-To install this module type the following:
-
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-DEPENDENCIES
-    Perl 5, Cwd, File::Glob, Tk, Tk::Dialog Tk::JBrowseEntry
-
 NAME
     Tk::JFileDialog - A highly configurable File and Directory Dialog widget
     for Perl/Tk.
 
 AUTHOR
-    (c) 1996-2019, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
+    (c) 1996-2023, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
 
 ACKNOWLEDGEMENTS
     This is a derived work from Tk::FileDialog, Tk::Listbox and Tk::HList.
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 1996-2019 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
+    Copyright (c) 1996-2023 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
     rights reserved.
 
     Tk::JFileDialog is free software; you can redistribute it and/or modify
@@ -80,11 +54,11 @@ EXAMPLE
                     -Create => 0
             );
 
-            $LoadDialog->configure(-FPat => '*pl',
+            $LoadDialog->configure(-FPat => '*.pl',
                     -ShowAll => 0
             );
 
-            $main->Entry(-textvariable => \$fname)
+            $main->Entry(-textvariable => \$fname, -width => 30)
                     ->pack(-expand => 1,
                     -fill => 'x'
             )->pack;
@@ -93,7 +67,7 @@ EXAMPLE
                     -command => sub {
                             $fname = $LoadDialog->Show(-Horiz => $Horiz);
                             if (!defined($fname)) {
-                                    $fname = "Fine,Cancel, but no ShowDirList anymore!!!";
+                                    $fname = "Fine,Cancel, but no Dir. List anymore!!!";
                                     $LoadDialog->configure(-ShowDirList => 0);
                             }
                     }
@@ -113,7 +87,7 @@ EXAMPLE
 
             MainLoop;
 
-            print "Exit Stage right!\n";
+            print "Exiting!\n";
 
             exit(0);
 
@@ -139,25 +113,31 @@ WIDGET OPTIONS
         will be shown informing the user of the error (This Dialog Box is
         configurable via the EDlg* switches, described below). If set to
         *-1*, user can not create a new file nor type in a name, only select
-        from the list. Default: *1* (enable user to enter a "new"
-        (non-existant) file name).
+        from the list.
+
+        Default: *1* (enable user to enter a "new" (non-existant) file
+        name).
 
     -DisableFPat
         Disables the ability of the user to change the file selection
         pattern (the user is by default allowed to change the status).
+
         Default: *FALSE* (enable user to change the file selection pattern).
 
     -DisableShowAll
         Disables the ability of the user to change the status of the ShowAll
-        flag (the user is by default allowed to change the status). Default:
-        *FALSE* (enable user to toggle showing of hidden files and
+        flag (the user is by default allowed to change the status).
+
+        Default: *FALSE* (enable user to toggle showing of hidden files and
         directories).
 
     -File
         The default file name. If specified and the file exists in the
         currently-selected path, it will be highlighted and selected; and
         pressing the [Reset] button will reset the selected file to be this
-        one. Default: none (no default file name is initially shown).
+        one.
+
+        Default: *none* (no default file name is initially shown).
 
     -FNameList
         Optional reference to a list of specific file names to be displayed
@@ -168,9 +148,10 @@ WIDGET OPTIONS
         paths, ie. *"/home/user/file.ext"*, or relative paths, ie.
         *"user/file.ext"* or I"<c:file.ext>. The files will be compared
         against the current path and, if matching (and existing, if -Create
-        < 1), will be shown in the drop-down list. Default: none (show all
-        files otherwise matching any other filters found in the current
-        path.
+        < 1), will be shown in the drop-down list.
+
+        Default: *none* (show all files otherwise matching any other filters
+        found in the current path.
 
         NOTE: File-names are case-sensitive and paths should be forward
         slashes ("/"), even on M$-Windows.
@@ -179,15 +160,26 @@ WIDGET OPTIONS
         Sets the default file selection pattern. Only files matching this
         pattern will be displayed in the File List Box. It can also be
         multiple extensions separated by the pipe symbol ("|"), ie.
-        "*.jpg|*.gif|*.png". Default: *''* (*).
+        "*.jpg|*.gif|*.png".
+
+        NOTE: The "pattern" is a psuedo-regex that gets converted into a
+        Perl regex, but "*" is converted into ".*", "." is converted into
+        "\." (match literal *dot*, "\." is converted to ".", and "|" used in
+        a pattern must be escaped ("\|") as "|" is the separator character
+        in pattern lists!
+
+        Default: *''* (*).
 
     -FPatList
         Specifies a reference to a list of valid file extensions composing
         the drop-down list for the "Filter" field for selecting a file
-        selection pattern. Default is empty. Example: -FPatList =>
-        ['*.jpg|*.gif|*.png', '*.pl|*.pm', '*.exe']. NOTE: If -Fpat is also
-        specified, but is NOT in the -FPatList list, it will automatically
-        be appended to the top of the list.
+        selection pattern.
+
+        Default: *empty ('')*.
+
+        Example: -FPatList => ['*.jpg|*.gif|*.png', '*.pl|*.pm', '*.exe'].
+        NOTE: If -Fpat is also specified, but is NOT in the -FPatList list,
+        it will automatically be appended to the top of the list.
 
     -FPatOnly
         Compares all files selected or typed in against the file selection
@@ -197,17 +189,21 @@ WIDGET OPTIONS
     -Geometry
         Sets the geometry of the File Dialog. Setting the size is a
         dangerous thing to do. If not configured, or set to '', the File
-        Dialog will be centered. Default: undef (window-manager sets the
-        popup window's geometry).
+        Dialog will be centered.
+
+        Default: *undef* (window-manager sets the popup window's geometry).
 
     -Grab
         Enables the File Dialog to do an application Grab when displayed.
-        Default: 1 (file dialog will grab focus and be "modal").
+
+        Default: *1* (file dialog will grab focus and be "modal").
 
     -HistDeleteOk
         If set, allows user to delete items from the history dropdown list
-        and thus the history file. Default 0 (do not allow user to remove
-        items in history).
+        and thus the history file.
+
+        Default: *0* (false)> (do not allow user to remove items in
+        history).
 
         NOTE: requires Tk::JBrowseEntry v5.0 or later to work.
 
@@ -216,6 +212,7 @@ WIDGET OPTIONS
         selected. The file specified must be writable. If specified, a
         history of up to "-History" number of files will be kept and will be
         displayed in a "JBrowseEntry" combo-box permitting user selection.
+
         Default: *undef* (no history file or drop-down).
 
     -History
@@ -228,23 +225,30 @@ WIDGET OPTIONS
         history. If set to something other than 1 or 0, a checkbox will
         appear to the right of the history dropdown labeled "Keep Path" to
         allow user to control this. If set to a string, then that will be
-        used for the checkbox label in lieu of "Keep Path". Default: *undef*
-        (not set).
+        used for the checkbox label in lieu of "Keep Path".
+
+        Default: *undef* (not set).
 
     -HistUsePathButton
         Set (check or uncheck) the "Keep Path" checkbox created if
         "-HistUsePath" option is set, otherwise, ignored. The state of this
         button can also be fetched by calling the getHistUsePathButton()
-        method, which returns 1 or 0. Default: *FALSE* (unchecked).
+        method, which returns 1 or 0.
+
+        Default: *0 (false)* (unchecked).
 
     -Horiz
         *TRUE* sets the File List box to be to the right of the Directory
         List Box. If 0, the File List box will be below the Directory List
-        box. Default: *TRUE* (display the listboxes side-by-side).
+        box.
+
+        Default: *true* (display the listboxes side-by-side).
 
     -maxwidth
         Specifies the maximum width in avg. characters the width of the text
-        entry fields are allowed to expand to. Default: *60* (characters).
+        entry fields are allowed to expand to.
+
+        Default: *60* (characters).
 
     -nonLatinFilenames
         NEW with Version 2.11+:
@@ -253,9 +257,10 @@ WIDGET OPTIONS
         Perl doesn't, by default, seem to handle properly as of 5.28.1, as
         it wants to convert them to utf-8 internally, but then fails to find
         / match them with the underling file-system names (they likely won't
-        show up in the file / directory lists). Default: *0* (unset - only
-        handle normal (ANSI chars < 128) characters in file-names, as was
-        the case pre-v2.11).
+        show up in the file / directory lists).
+
+        Default: *0* (unset - only handle normal (ANSI chars < 128)
+        characters in file-names, as was the case pre-v2.11).
 
         This was added due to Perl's current failure to convert it's UTF-8
         strings back to ASCII bytes when interfacing with the underlying
@@ -290,38 +295,45 @@ WIDGET OPTIONS
         If set to 0, user must invoke the "OK" button to complete selection
         from the listbox. If 1 or 2, double-clicking or single-clicking
         (respectively) an item in the file list automatically completes the
-        selection. NOTE: If set to 2 (single-click) and *-SelectMode* is
-        "multiple" or "extended" then it will be forced to 1 (double-click),
-        since single-click will just add the file to the list to be
-        selected. This also affects the history and favorite path dropdown
-        lists. If 1 or 2, clicking an item from these lists invokes
-        selection. Default: *1*.
+        selection.
+
+        NOTE: If set to 2 (single-click) and *-SelectMode* is "multiple" or
+        "extended" then it will be forced to 1 (double-click), since
+        single-click will just add the file to the list to be selected. This
+        also affects the history and favorite path dropdown lists. If 1 or
+        2, clicking an item from these lists invokes selection.
+
+        Default: *1*.
 
     -SelDir
         If 1 or 2, enables selection of a directory rather than a file, and
         disables the actions of the File List Box. Setting to 2 allows
         selection of either a file OR a directory. If -1, the directory
         listbox, etc. are disabled and the user is forced to select file(s)
-        from the initially-specified path. NOTE: This will NOT prevent the
-        user from typing an alternate path in front of the file name
-        entered, so the application must still verify the path returned and
-        handle as desired, ie. display an error dialog and force them to
-        reenter, strip the path, etc. Default: *0* (only file(s) may be
-        selected).
+        from the initially-specified path.
+
+        NOTE: This will NOT prevent the user from typing an alternate path
+        in front of the file name entered, so the application must still
+        verify the path returned and handle as desired, ie. display an error
+        dialog and force them to reenter, strip the path, etc.
+
+        Default: *0* (only file(s) may be selected).
 
     -SelectMode
         Sets the selectmode of the File Dialog. If not configured it will be
         defaulted to 'browse' (single). If set to 'multiple' or 'extended',
         then the user may select more than one file and a comma-delimited
         list of all selected files is returned. Otherwise, only a single
-        file may be selected. Default: *'browse'* (selecting only a single
-        file from the list allowed).
+        file may be selected.
+
+        Default: *'browse'* (selecting only a single file from the list
+        allowed).
 
     -SelHook
         SelHook is configured with a reference to a routine that will be
-        called when a file is chosen. The file is called with a sole
+        called when a fileis chosen. The function is called with a sole
         parameter of the full path and file name of the file chosen. If the
-        Create flag is disabled (and the user is not allowed to specify new
+        Create flag is disabled (and the user is not allowedto specify new
         files), the file will be known to exist at the time that SelHook is
         called. Note that SelHook will also be called with directories if
         the SelDir Flag is enabled, and that the JFileDialog box will still
@@ -336,26 +348,32 @@ WIDGET OPTIONS
         There may be only one SelHook routine active at any time.
         Configuring the SelHook routine replaces any existing SelHook
         routine. Configuring the SelHook routine with 0 removes the SelHook
-        routine. Default: *undef* (no callback function).
+        routine.
+
+        Default: *undef* (no callback function).
 
     -ShowAll
         Determines whether hidden files and directories (.* and those with
         the M$-Windows "hidden" attribute set, on Windows) are displayed in
         the File and Directory Listboxes. The Show All Checkbox reflects the
-        setting of this switch. Default: *0* (do not show hidden files or
-        directories).
+        setting of this switch.
+
+        Default: *0* (do not show hidden files or directories).
 
     -ShowDirList
         Enable the user to change directories. If disabled, the directory
         list box will not be shown. Generally, *-SelDir* should also be set
         to -1, otherwise, user can still change directories by typing them
-        in. Default: *TRUE* (enable).
+        in.
+
+        Default: *true* (enable).
 
     -ShowFileList
         Enable the user to select file(s) from a list. If disabled, the file
         list box will not be shown. Generally, *-SelDir* should also be set
         to 1, otherwise, user can still select files by typing them in.
-        Default: *TRUE* (enable).
+
+        Default: *true* (enable).
 
     -Title
         The Title of the dialog box. Default: *'Select File:'*.
@@ -365,57 +383,86 @@ WIDGET OPTIONS
     may be changed.
 
     -CancelButtonLabel
-        The text for the Cancel button. Default: *'Cancel'*.
+        The text for the Cancel button.
+
+        Default: *'Cancel'*.
 
     -CdoutButtonLabel
         The text for the JFM4 Filemanager "Current" Directory button.
+
         Default: *'C~dout'*.
 
     -CWDButtonLabel
-        The text for the Cdout Directory button. Default: *'C~WD'*.
+        The text for the Cdout Directory button.
+
+        Default: *'C~WD'*.
 
     -DirLBCaption
-        The Caption above the Directory List Box. Default: *'Folders:'* on
-        Windows sytems, *'Directories:'* on all others.
+        The Caption above the Directory List Box.
+
+        Default: *'Folders:'* on Windows sytems, *'Directories:'* on all
+        others.
 
     -FileEntryLabel
-        The label to the left of the File Entry. Default: *'File:'*.
+        The label to the left of the File Entry.
+
+        Default: *'File:'*.
 
     -FltEntryLabel
-        The label to the left of the Filter entry. Default: *'Filter:'*.
+        The label to the left of the Filter entry.
+
+        Default: *'Filter:'*.
 
     -FileLBCaption
-        The Caption above the File List Box. Default: *'Files'*.
+        The Caption above the File List Box.
+
+        Default: *'Files'*.
 
     -HomeButtonLabel
-        The text for the Home directory button. Default: *'Home'*.
+        The text for the Home directory button.
+
+        Default: *'Home'*.
 
     -OKButtonLabel
-        The text for the OK button. Default: *'Ok'*.
+        The text for the OK button.
+
+        Default: *'Ok'*.
 
     -PathEntryLabel
-        The label to the left of the Path Entry. Default: *'Path:'*.
+        The label to the left of the Path Entry.
+
+        Default: *'Path:'*.
 
     -RescanButtonLabel
-        The text for the Rescan button. Default: *'Refresh'*.
+        The text for the Rescan button.
+
+        Default: *'Refresh'*.
 
     -ResetButtonLabel
-        The text for the Reset button. Default: *'Re~set'*.
+        The text for the Reset button.
+
+        Default: *'Re~set'*.
 
     -ShowAllLabel
-        The text of the Show All Checkbutton. Default: *'Show All'*.
+        The text of the Show All Checkbutton.
+
+        Default: *'Show All'*.
 
     -SortButton
         Whether or not to display a checkbox to change file box list sort
-        order. Default: *TRUE* (show).
+        order.
+
+        Default: *TRUE* (show).
 
     -SortButtonLabel
         The text for the Sort/Atime button. Default: *'Atime'*.
 
     -SortOrder
-        Order to display files in the file list box ('Name' or 'Date')
-        Default: *Name*. If *'Date'*, then the day and time is displayed in
-        the box before the name, (but not included when selected)
+        Order to display files in the file list box ('Name' or 'Date') If
+        *'Date'*, then the day and time is displayed in the box before the
+        name, (but not included when selected)
+
+        Default: *Name*.
 
   Error Dialog Switches
     If the -Create switch is set to *0*, and the user specifies a file that
@@ -425,12 +472,15 @@ WIDGET OPTIONS
     -EDlgText
         DEPRECIATED (now ignored)! - The message of the Error Dialog Box.
         The variables $path, $file, and $filename (the full path and
-        filename of the selected file) are available. Default: *"You must
-        specify an existing file.\n(\$filename not found)"*.
+        filename of the selected file) are available.
+
+        Default: *"You must specify an existing file.\n($filename not
+        found)"*.
 
     -EDlgTitle
-        The title of the Error Dialog Box. Default: *'Incorrect entry or
-        selection!'*.
+        The title of the Error Dialog Box.
+
+        Default: *'Incorrect entry or selection!'*.
 
 WIDGET METHODS
     The following non-standard methods may be used with a JFileDialog object
@@ -457,7 +507,9 @@ WIDGET METHODS
         function after the JFileDialog widget is closed when the user last
         selected a file, etc., then using that variable as the
         *HistUsePathButton* argument when JFileDialog is opened again within
-        the application. Returns integer (1 or 0).
+        the application.
+
+        Returns integer (1 or 0).
 
     getLastPath()
         Fetches the current path as it was when the JFileDialog wiget last
@@ -466,10 +518,13 @@ WIDGET METHODS
         JFileDialog widget by fetching it's status via this function after
         the JFileDialog widget is closed when the user last selected a file,
         etc., then using that variable as the *-Path* argument when
-        JFileDialog is opened again within the application. Returns *string*
-        (last path user selected, if known, otherwise the path specified by
-        -Path, if specified, or the current working directory).
+        JFileDialog is opened again within the application.
+
+        Returns *string* (last path user selected, if known, otherwise the
+        path specified by -Path, if specified, or the current working
+        directory).
 
 DEPENDS
-    Cwd, File::Glob, Tk, Tk::Dialog Tk::JBrowseEntry
+    Cwd, File::Glob, Tk, Tk::Dialog (or Tk::JDialog if installed),
+    Tk::JBrowseEntry
 

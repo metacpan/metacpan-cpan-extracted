@@ -11,7 +11,6 @@ use Term::Choose::Util qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::CommitWriteSQL;
 #use App::DBBrowser::GetContent; # required
-#use App::DBBrowser::Opt::Set;   # required
 use App::DBBrowser::Table::Substatements;
 
 
@@ -44,34 +43,28 @@ sub table_write_access {
     if ( ! @stmt_types ) {
         return;
     }
-    my $old_idx = 1;
+    my $old_idx = 0;
 
     STMT_TYPE: while ( 1 ) {
-        my $hidden = 'Choose SQL type:';
-        my @pre = ( $hidden, undef );
+        my $prompt = 'Choose SQL type:';
+        my @pre = ( undef );
         my $menu = [ @pre, map( "- $_", @stmt_types ) ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 1;
+                $old_idx = 0;
                 next STMT_TYPE;
             }
             $old_idx = $idx;
         }
         my $stmt_type = $menu->[$idx];
-        if ( $stmt_type eq $hidden ) {
-            require App::DBBrowser::Opt::Set;
-            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $opt_set->set_options( 'import' );
-            next STMT_TYPE;
-        }
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
@@ -164,7 +157,7 @@ sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sql->{insert_into_cols} = [];
+    $sql->{insert_col_names} = [];
     my @cols = ( @{$sql->{cols}} );
     if ( $sf->__first_column_is_autoincrement( $sql ) ) {
         shift @cols;
@@ -181,17 +174,18 @@ sub __insert_into_stmt_columns {
     if ( ! defined $idxs ) {
         return;
     }
-    $sql->{insert_into_cols} = [ @cols[@$idxs] ];
+    $sql->{insert_col_names} = [ @cols[@$idxs] ];
     return 1;
 }
 
 
-sub __first_column_is_autoincrement {
+sub __first_column_is_autoincrement { ##
     my ( $sf, $sql ) = @_;
     my $dbh = $sf->{d}{dbh};
     my $schema = $sf->{d}{schema};
     my $table = $sf->{d}{tables_info}{$sf->{d}{table_key}}[2];
-    if ( $sf->{i}{driver} eq 'SQLite' ) {
+    my $driver = $sf->{i}{driver};
+    if ( $driver eq 'SQLite' ) {
         my $stmt = "SELECT sql FROM sqlite_master WHERE name = ?";
         my ( $row ) = $sf->{d}{dbh}->selectrow_array( $stmt, {}, $table );
         my $qt_table = $sql->{table};
@@ -202,7 +196,7 @@ sub __first_column_is_autoincrement {
             return 1;
         }
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
         my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
                     TABLE_SCHEMA = ?
                 AND TABLE_NAME = ?
@@ -214,7 +208,7 @@ sub __first_column_is_autoincrement {
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $sf->{i}{driver} eq 'Pg' ) {
+    elsif ( $driver eq 'Pg' ) {
         my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
                     TABLE_SCHEMA = ?
                 AND TABLE_NAME = ?
@@ -228,7 +222,7 @@ sub __first_column_is_autoincrement {
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+    elsif ( $driver eq 'Firebird' ) {
         my $stmt = "SELECT COUNT(*) FROM RDB\$RELATION_FIELDS WHERE
                 RDB\$RELATION_NAME = ?
             AND RDB\$FIELD_POSITION = 0
@@ -239,7 +233,7 @@ sub __first_column_is_autoincrement {
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $sf->{i}{driver} eq 'DB2' ) {
+    elsif ( $driver eq 'DB2' ) {
         my $stmt = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
                 TABSCHEMA = ?
             AND TABNAME = ?
@@ -249,6 +243,17 @@ sub __first_column_is_autoincrement {
             AND KEYSEQ = 1
             AND GENERATED = 'A'
             AND IDENTITY = 'Y'";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        return $first_col_is_autoincrement;
+    }
+    elsif ( $driver eq 'Oracle' ) {
+        my $stmt = "SELECT COUNT(*) FROM SYS.ALL_TAB_COLUMNS WHERE
+                OWNER = ?
+            AND TABLE_NAME = ?
+            AND DATA_TYPE = 'NUMBER'
+            AND NULLABLE = 'N'
+            AND COLUMN_ID = 1
+            AND IDENTITY_COLUMN = 'YES'";
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
         return $first_col_is_autoincrement;
     }

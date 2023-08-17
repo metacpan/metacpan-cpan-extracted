@@ -17,7 +17,10 @@ use Test::BOM;
 my @files = (
     'lib/Module/Znuny/CoreList.pm',
     'lib/Module/Znuny/CoreList.pod',
-    't/001_basic_tests.t'
+    't/001_shipped.t',
+    't/002_changed_tickets_dashboard.t',
+    't/003_modules.t',
+    't/004_cpan.t'
 );
 
 ok(file_hasnt_bom($_)) for @files;

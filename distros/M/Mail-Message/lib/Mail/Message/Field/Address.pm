@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Address;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Identity';
 
@@ -22,10 +22,10 @@ my $format = 'Mail::Message::Field::Full';
 
 
 use overload
-      '""' => 'string'
-    , bool => sub {1}
-    , cmp  => sub { lc($_[0]->address) eq lc($_[1]) }
-    ;
+    '""' => 'string'
+  , bool => sub {1}
+  , cmp  => sub { lc($_[0]->address) cmp lc($_[1]) }
+  ;
 
 #------------------------------------------
 

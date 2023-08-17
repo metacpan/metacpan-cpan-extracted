@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Martin Becker, Blaubeuren.
+# Copyright (c) 2022-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -14,7 +14,7 @@ use Config;
 use Math::DifferenceSet::Planar;
 use constant MDP => Math::DifferenceSet::Planar::;
 
-use Test::More tests => 75;
+use Test::More tests => 91;
 
 #########################
 
@@ -38,6 +38,17 @@ foreach my $i (0 .. $#sets) {
         my $cmp = $sets[$i]->compare($sets[$j]);
         my $rel = qw( == > < )[$i <=> $j];
         is($cmp, $i <=> $j, "$fmtd[$i] $rel $fmtd[$j]");
+    }
+}
+
+my @sets2 = @sets[1, 0, 2, 3];
+my @fmtd2 = @fmtd[1, 0, 2, 3];
+
+foreach my $i (0 .. $#sets2) {
+    foreach my $j (0 .. $#sets2) {
+        my $cmp = $sets2[$i]->compare_topdown($sets2[$j]);
+        my $rel = qw( == > < )[$i <=> $j];
+        is($cmp, $i <=> $j, "$fmtd2[$i] $rel $fmtd2[$j] (topdown)");
     }
 }
 
@@ -83,6 +94,9 @@ foreach my $ab (@tlm) {
     ($f, $d) = $a->find_linear_map($B);
     ok(exists $md{$f}, 'factor');
     is($d, $md{$f}, 'delta');
+    my $x = $a->multiply($f);
+    $x = $x->translate($d);
+    my $c = $x->compare($b);
     is($a->multiply($f)->translate($d)->compare($b), 0, 'map');
 }
 

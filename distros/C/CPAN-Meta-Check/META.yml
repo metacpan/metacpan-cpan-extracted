@@ -5,6 +5,9 @@ author:
 build_requires:
   CPAN::Meta: '2.120920'
   Env: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Scalar::Util: '0'
   Test::More: '0.88'
   lib: '0'
@@ -13,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +25,7 @@ name: CPAN-Meta-Check
 provides:
   CPAN::Meta::Check:
     file: lib/CPAN/Meta/Check.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   CPAN::Meta::Prereqs: '2.132830'
   CPAN::Meta::Requirements: '2.121'
@@ -33,14 +36,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Check
+  bugtracker: https://github.com/Leont/cpan-meta-check/issues
   repository: git://github.com/Leont/cpan-meta-check.git
-version: '0.017'
-x_contributors:
-  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'Graham Knop <haarg@haarg.org>'
-  - 'Karen Etheridge <ether@cpan.org>'
-  - 'Leon Timmermans <fawaka@gmail.com>'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.018'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

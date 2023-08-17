@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib "t";
 use testcase "t::pieces";
@@ -19,10 +19,10 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    my @ret;
    # scalar reverse will join() strings
    @ret = pieceblock_scalar { reverse "abc", "def" };
-   is_deeply( \@ret, [ "fedcba" ], 'pieceblock_scalar forces scalar context' );
+   is( \@ret, [ "fedcba" ], 'pieceblock_scalar forces scalar context' );
 
    @ret = pieceblock_list { reverse "abc", "def" };
-   is_deeply( \@ret, [ "def,abc" ], 'pieceblock_list forces list context' );
+   is( \@ret, [ "def,abc" ], 'pieceblock_list forces list context' );
 }
 
 {

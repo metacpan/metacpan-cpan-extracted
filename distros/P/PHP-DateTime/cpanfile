@@ -1,3 +1,4 @@
+requires 'perl' => '5.008001';
 requires 'Time::DaysInMonth' => '99.1117';
 requires 'Time::Timezone' =>'2006.0814';
 requires 'Time::HiRes' => '1.9721';

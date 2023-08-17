@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Fill 0.36;
+package Tickit::Widget::Fill 0.37;
 class Tickit::Widget::Fill
    :strict(params)
    :isa(Tickit::Widget);

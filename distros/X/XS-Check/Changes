@@ -1,5 +1,9 @@
 Revision history for Perl module XS::Check
 
+0.14 2023-07-24
+
+- Remove errors from testing module, for future Perls (HAARG)
+
 0.13 2021-05-26
 
 - Document additions of version 0.12

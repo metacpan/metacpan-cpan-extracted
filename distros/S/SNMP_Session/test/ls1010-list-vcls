@@ -1,0 +1,258 @@
+#!/usr/local/bin/perl -w
+###
+### ls1010-list-vcls
+###
+### Author:       Simon Leinen  <simon@switch.ch>
+### Date Created: 24-Feb-1999
+###
+### Real-time full-screen display of the cell counts on VCLs (Virtual
+### Channel Links) and VPLs (Virtual Path Links) on a Cisco LS1010 ATM
+### switch.
+###
+### Description: 
+###
+### Call this script with "-h" to learn about command usage.
+###
+### The script will poll an LS1010's ciscoAtmVplTable and
+### ciscoAtmVclTable (from CISCO-ATM-CONN-MIB) at specified intervals
+### (default is every five seconds).
+###
+### For each VCL except for the standard signaling and ILMI VCs (0/5
+### and 0/16, respectively), a line is written to the terminal which
+### lists the VCL's connection info, as well as the input and output
+### transfer rates, as computed from the deltas of the respective cell
+### counts since the last sample.
+###
+### When a VCL is found to have had only output, but no input traffic
+### in the last sampling interval, it is shown in inverse video.  In
+### addition, when a VCL changes state (from normal to inverse or vice
+### versa), a bell character is sent to the terminal.
+###
+### Note that on the very first display, the actual SNMP counter
+### values are displayed.  THOSE ABSOLUTE COUNTER VALUES HAVE NO
+### DEFINED SEMANTICS WHATSOEVER.  However, in some versions of
+### Cisco's software, the values seem to correspond to the total
+### number of counted items since system boot (modulo 2^32).  This can
+### be useful for certain kinds of slowly advancing counters (such as
+### CRC errors, hopefully).
+###
+### The topmost screen line shows the name of the managed node, as
+### well as a few hard-to-explain items I found useful while debugging
+### the script.
+###
+### Please send any patches and suggestions for improvement to the
+### author (see e-mail address above).  Hope you find this useful!
+###
+require 5.003;
+
+use strict;
+
+use BER;
+use SNMP_Session "0.67";	# requires map_table_4
+use POSIX;			# for exact time
+use Curses;
+
+my $version = '1';
+
+my $desired_interval = 5.0;
+
+while (defined $ARGV[0] && $ARGV[0] =~ /^-/) {
+    if ($ARGV[0] =~ /^-v/) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] eq '1') {
+	    $version = '1';
+	} elsif ($ARGV[0] eq '2c') {
+	    $version = '2c';
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] =~ /^-t/) {
+	if ($ARGV[0] eq '-t') {
+	    shift @ARGV;
+	    usage (1) unless defined $ARGV[0];
+	} else {
+	    $ARGV[0] = substr($ARGV[0], 2);
+	}
+	if ($ARGV[0] =~ /^[0-9]+(\.[0-9]+)?$/) {
+	    $desired_interval = $ARGV[0];
+	} else {
+	    usage (1);
+	}
+    } elsif ($ARGV[0] eq '-h') {
+	usage (0);
+	exit 0;
+    } else {
+	usage (1);
+    }
+    shift @ARGV;
+}
+my $host = shift @ARGV || usage (1);
+my $community = shift @ARGV || "public";
+usage (1) if $#ARGV >= $[;
+
+my $ciscoAtmVclInCells = [1,3,6,1,4,1,9,10,13,1,2,1,1,13];
+my $ciscoAtmVclOutCells = [1,3,6,1,4,1,9,10,13,1,2,1,1,14];
+my $ciscoAtmVclCrossIfIndex = [1,3,6,1,4,1,9,10,13,1,2,1,1,15];
+my $ciscoAtmVclCrossVpi = [1,3,6,1,4,1,9,10,13,1,2,1,1,16];
+my $ciscoAtmVclCrossVci = [1,3,6,1,4,1,9,10,13,1,2,1,1,17];
+
+my $ciscoAtmVplInCells = [1,3,6,1,4,1,9,10,13,1,1,1,1,12];
+my $ciscoAtmVplOutCells = [1,3,6,1,4,1,9,10,13,1,1,1,1,13];
+my $ciscoAtmVplCrossIfIndex = [1,3,6,1,4,1,9,10,13,1,1,1,1,14];
+my $ciscoAtmVplCrossVpi = [1,3,6,1,4,1,9,10,13,1,1,1,1,15];
+
+my $clock_ticks = POSIX::sysconf( &POSIX::_SC_CLK_TCK );
+
+my $win = new Curses;
+
+my %old;
+my $sleep_interval = $desired_interval + 0.0;
+my $interval;
+my $linecount;
+
+sub out_vpl {
+    my ($index, $xif, $xvpi, $incells, $outcells) = @_;
+    my ($if, $vpi) = split (/\./, $index);
+    grep (defined $_ && ($_=pretty_print $_),
+	  ($xif, $xvpi, $incells, $outcells));
+    return out_vxl ($if, $vpi, undef,
+		    $xif, $xvpi, undef,
+		    $incells, $outcells);
+}
+sub out_vcl {
+    my ($index, $xif, $xvpi, $xvci, $incells, $outcells) = @_;
+    my ($if, $vpi, $vci) = split (/\./, $index);
+    grep (defined $_ && ($_=pretty_print $_),
+	  ($xif, $xvpi, $xvci, $incells, $outcells));
+    return out_vxl ($if, $vpi, $vci,
+		    $xif, $xvpi, $xvci,
+		    $incells, $outcells);
+}
+
+sub out_vxl {
+    my ($if, $vpi, $vci, $xif, $xvpi, $xvci, $incells, $outcells) = @_;
+    my $index = join ('.', $if, $vpi, defined $vci ? $vci : '-');
+
+    my ($clock) = POSIX::times();
+    my $alarm = 0;
+    $win->clrtoeol ();
+    ## Ignore signaling VCs
+    return if defined $vpi && $vpi == 0 && defined $vci && ($vci == 5 || $vci == 16);
+    return if defined $xvpi && $xvpi == 0 && defined $xvci && ($xvci == 5 || $xvci == 16);
+
+    return unless defined $incells && defined $outcells;
+    if (!defined $old{$index}) {
+	$win->addstr ($linecount, 0,
+		      sprintf ("%2d %3d/%-3s %2d %3d/%-3s %10s %10s\n",
+			       $if, $vpi, defined $vci ? $vci : '-',
+			       $xif, $xvpi, defined $xvci ? $xvci : '-',
+			       $incells, $outcells));
+    } else {
+	my $old = $old{$index};
+
+	$interval = ($clock-$old->{'clock'}) * 1.0 / $clock_ticks;
+	my $d_in = ($incells-$old->{'incells'})*8*53/$interval;
+	my $d_out = ($outcells-$old->{'outcells'})*8*53/$interval;
+	$alarm = (($d_out > 0) && ($d_in == 0));
+	print STDERR "\007" if $alarm && !$old->{'alarm'};
+	print STDERR "\007" if !$alarm && $old->{'alarm'};
+	$win->standout() if $alarm;
+	$win->addstr ($linecount, 0,
+		      sprintf ("%2d %3d/%-3s %2d %3d/%-3s %10.0f %10.0f\n\n",
+			       $if, $vpi, defined $vci ? $vci : '-',
+			       $xif, $xvpi, defined $xvci ? $xvci : '-',
+			       $d_in, $d_out));
+	$win->standend() if $alarm;
+    }
+    $old{$index} = {'incells' => $incells,
+		    'outcells' => $outcells,
+		    'clock' => $clock,
+		    'alarm' => $alarm};
+    ++$linecount;
+    $win->refresh ();
+}
+
+$win->erase ();
+my $session =
+    ($version eq '1' ? SNMPv1_Session->open ($host, $community, 161)
+     : $version eq '2c' ? SNMPv2c_Session->open ($host, $community, 161)
+     : die "Unknown SNMP version $version")
+  || die "Opening SNMP_Session";
+
+### max_vcl_repetitions, max_vpl_repetitions:
+###
+### We try to be smart about the value of maxRepetitions.  Starting
+### with the session default, we use the number of rows in the table
+### (returned from map_table_4) to compute the next value.  It should
+### be one more than the number of rows in the table, because
+### map_table needs an extra set of bindings to detect the end of the
+### table.
+###
+my $max_vcl_repetitions = $session->default_max_repetitions;
+my $max_vpl_repetitions = $session->default_max_repetitions;
+while (1) {
+    $win->addstr (0, 0, sprintf ("%-20s interval %4.1fs %d VCLs %d VPLs",
+				 $host,
+				 $interval || $desired_interval,
+				 $max_vcl_repetitions,
+				 $max_vpl_repetitions));
+    $win->standout();
+    $win->addstr (1, 0,
+		  sprintf ("%2s %3s/%-3s %2s %3s/%-3s %10s %10s",
+			   "if", "VPI", "VCI",
+			   "if", "VPI", "VCI",
+			   "bits/s", "bits/s"));
+    $win->addstr (2, 0,
+		  sprintf ("%2s %3s %-3s %2s %3s %-3s %10s %10s\n",
+			   "", "", "", "", "", "",
+			   "in", "out",
+			   ""));
+    $win->clrtoeol ();
+    $win->standend();
+    $linecount = 3;
+    my $vcls = $session->map_table_4
+	([$ciscoAtmVclCrossIfIndex, $ciscoAtmVclCrossVpi, $ciscoAtmVclCrossVci,
+	  $ciscoAtmVclInCells, $ciscoAtmVclOutCells],
+	 \&out_vcl,
+	 $max_vcl_repetitions);
+    $max_vcl_repetitions = $vcls + 1
+	if $vcls > 0;
+    my $vpls = $session->map_table_4
+	([$ciscoAtmVplCrossIfIndex, $ciscoAtmVplCrossVpi,
+	  $ciscoAtmVplInCells, $ciscoAtmVplOutCells],
+	 \&out_vpl,
+	 $max_vpl_repetitions);
+    $max_vpl_repetitions = $vpls + 1
+	if $vpls > 0;
+    $sleep_interval -= ($interval - $desired_interval)
+	if defined $interval;
+    select (undef, undef, undef, $sleep_interval);
+}
+1;
+
+sub usage ($) {
+    warn <<EOM;
+Usage: $0 [-t secs] [-v (1|2c)] switch [community]
+       $0 -h
+
+  -h           print this usage message and exit.
+
+  -t secs      specifies the sampling interval.  Defaults to 5 seconds.
+
+  -v version   can be used to select the SNMP version.  The default
+   	       is SNMPv1, which is what most devices support.  If your box
+   	       supports SNMPv2c, you should enable this by passing "-v 2c"
+   	       to the script.  SNMPv2c is much more efficient for walking
+   	       tables, which is what this tool does.
+
+  switch       hostname or IP address of an LS1010 switch
+
+  community    SNMP community string to use.  Defaults to "public".
+EOM
+    exit (1) if $_[0];
+}

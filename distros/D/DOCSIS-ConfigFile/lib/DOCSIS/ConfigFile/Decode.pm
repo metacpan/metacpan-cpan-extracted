@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use bytes;
 
-use Carp 'confess';
+use Carp qw(confess);
 use Math::BigInt;
 use Socket;
 
@@ -64,7 +64,7 @@ sub int {
   return $int;
 }
 
-sub ip { inet_ntoa($_[0]) || confess 'inet_ntoa(...) failed to unpack binary string' }
+sub ip       { inet_ntoa($_[0]) || confess 'inet_ntoa(...) failed to unpack binary string' }
 sub mic      {&hexstr}
 sub no_value {''}
 
@@ -73,7 +73,7 @@ sub snmp_object {
   my ($byte, $length, $oid, $type, $value);
 
   # message
-  $type = _truncate_and_unpack(\$bin, 'C1');    # 0x30
+  $type   = _truncate_and_unpack(\$bin, 'C1');    # 0x30
   $length = _snmp_length(\$bin);
 
   # oid
@@ -100,7 +100,7 @@ sub string {
 }
 
 sub stringz { my $str = string(@_); $str =~ s/%00$//; $str; }
-sub uchar { unpack 'C', _test_length(uchar => $_[0], 'char') }
+sub uchar   { unpack 'C', _test_length(uchar => $_[0], 'char') }
 
 sub uint {
   my @bytes = unpack 'C*', _test_length(uint => $_[0], 'int');
@@ -143,7 +143,7 @@ sub vendorspec {
 }
 
 sub vendor {
-  my $bin = shift || '';
+  my $bin    = shift || '';
   my $length = $bin =~ s/^.(.)//s ? unpack 'C', $1 : 0;
   my ($id, @options);
 
@@ -233,7 +233,8 @@ sub _snmp_oid {
     $oid[1] -= 80;
   }
 
-  return SNMP::translateObj(join '.', @oid) || join '.', @oid if DOCSIS::ConfigFile::CAN_TRANSLATE_OID;
+  return SNMP::translateObj(join '.', @oid) || join '.', @oid
+    if DOCSIS::ConfigFile::CAN_TRANSLATE_OID;
   return join '.', @oid;
 }
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'A small module to eliminate boilerplate overhead when using the Zabbix API'
 author:
-  - ', Ben Kaufman.'
+  - 'Ben Kaufman'
 build_requires:
   Test::Exception: '0.35'
   Test::LWP::UserAgent: '0'
@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Zabbix::Tiny:
     file: lib/Zabbix/Tiny.pm
-    version: '1.11'
+    version: v2.0.1
 requires:
   JSON: '0'
   LWP: '0'
@@ -37,14 +37,18 @@ requires:
   Module::Build: '0'
   Moo: '0'
   perl: '5.008001'
+  version: '0'
 resources:
   bugtracker: https://github.com/whosgonna/Zabbix-Tiny.pm/issues
   homepage: https://github.com/whosgonna/Zabbix-Tiny.pm
-  repository: git://github.com/whosgonna/Zabbix-Tiny.pm.git
-version: '1.11'
+  repository: https://github.com/whosgonna/Zabbix-Tiny.pm.git
+version: 2.0.1
 x_contributors:
+  - 'Ben Kaufman <ben.whosgonna.com@gmail.com>'
   - 'Ben Kaufman <whosgonna@users.noreply.github.com>'
+  - 'Ihor Siroshtan <69244095+ISiroshtan@users.noreply.github.com>'
+  - 'Ihor Siroshtan <ihor.siroshtan@adjust.com>'
   - 'Richlv <richlv@nakts.net>'
   - 'ben <ben.kaufman@altigen.com>'
-  - 'whosgonna <ben.whosgonna.com@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

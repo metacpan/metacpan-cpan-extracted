@@ -5,14 +5,15 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use List::Util qw(none);
 use Readonly;
 use Scalar::Util qw(blessed);
 
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_code check_isa check_length check_number check_number_of_items
-	check_required);
+	check_regexp check_required check_string_begin check_strings);
 
-our $VERSION = 0.14;
+our $VERSION = 0.17;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -146,11 +147,68 @@ sub check_number_of_items {
 	return;
 }
 
+sub check_regexp {
+	my ($self, $key, $regexp) = @_;
+
+	_check_key($self, $key) && return;
+
+	if (! defined $regexp) {
+		err "Parameter '$key' must have defined regexp.";
+	}
+	if ($self->{$key} !~ m/^$regexp/ms) {
+		err "Parameter '$key' does not match the specified regular expression.",
+			'String', $self->{$key},
+			'Regexp', $regexp,
+		;
+	}
+
+	return;
+}
+
 sub check_required {
 	my ($self, $key) = @_;
 
 	if (! exists $self->{$key} || ! defined $self->{$key}) {
 		err "Parameter '$key' is required.";
+	}
+
+	return;
+}
+
+sub check_string_begin {
+	my ($self, $key, $string_base) = @_;
+
+	_check_key($self, $key) && return;
+
+	if (! defined $string_base) {
+		err "Parameter '$key' must have defined string base.";
+	}
+	if ($self->{$key} !~ m/^$string_base/) {
+		err "Parameter '$key' must begin with defined string base.",
+			'String', $self->{$key},
+			'String base', $string_base,
+		;
+	}
+
+	return;
+}
+
+sub check_strings {
+	my ($self, $key, $strings_ar) = @_;
+
+	_check_key($self, $key) && return;
+
+	if (! defined $strings_ar) {
+		err "Parameter '$key' must have strings definition.";
+	}
+	if (ref $strings_ar ne 'ARRAY') {
+		err "Parameter '$key' must have right string definition.";
+	}
+	if (none { $self->{$key} eq $_ } @{$strings_ar}) {
+		err "Parameter '$key' must be one of defined strings.",
+			'String', $self->{$key},
+			'Possible strings', (join ', ', @{$strings_ar}),
+		;
 	}
 
 	return;
@@ -180,7 +238,8 @@ Mo::utils - Mo utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_array check_array_object check_bool check_code check_isa check_length check_number check_number_of_items check_required);
+ use Mo::utils qw(check_array check_array_object check_bool check_code check_isa check_length check_number
+         check_number_of_items check_regexp check_required check_string_begin check_strings);
 
  check_array($self, $key);
  check_array_object($self, $key, $class, $class_name);
@@ -190,7 +249,10 @@ Mo::utils - Mo utilities.
  check_length($self, $key, $max_length);
  check_number($self, $key);
  check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+ check_regexp($self, $key, $regexp);
  check_required($self, $key);
+ check_string_begin($self, $key, $string_base);
+ check_strings($self, $key, $strings_ar);
 
 =head1 DESCRIPTION
 
@@ -282,12 +344,44 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_regexp>
+
+ check_regexp($self, $key, $regexp);
+
+Check parameter defined by C<$key> via regular expression defined by c<$regexp>.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_required>
 
  check_required($self, $key);
 
 Check required parameter defined by C<$key>.
 
+Put error if check isn't ok.
+
+Returns undef.
+
+=head2 C<check_string_begin>
+
+ check_string_begin($self, $key, $string_base);
+
+Check parameter if it is correct string which begins with base.
+
+Put error if string base doesn't exist.
+Put error string base isn't present in string on begin.
+
+Returns undef.
+
+=head2 C<check_strings>
+
+ check_strings($self, $key, $strings_ar);
+
+Check parameter if it is correct string from strings list.
+
+Put error if strings definition is undef or not list of strings.
 Put error if check isn't ok.
 
 Returns undef.
@@ -318,7 +412,7 @@ Returns undef.
 
  check_length():
          Parameter '%s' has length greater than '%s'.
-			Value: %s
+                 Value: %s
 
  check_number():
          Parameter '%s' must a number.
@@ -327,8 +421,27 @@ Returns undef.
  check_number_of_items():
          %s for %s '%s' has multiple values.
 
+ check_regexp():
+         Parameter '%s' must have defined regexp.
+         Parameter '%s' does not match the specified regular expression.
+                 String: %s
+                 Regexp: %s
+
  check_required():
          Parameter '%s' is required.
+
+ check_string_begin():
+         Parameter '%s' must have defined string base.
+         Parameter '%s' must begin with defined string base.
+                 String: %s
+                 String base: %s
+
+ check_strings():
+         Parameter '%s' must have strings definition.
+         Parameter '%s' must have right string definition.
+         Parameter '%s' must be one of defined strings.
+                 String: %s
+                 Possible strings: %s
 
 =head1 EXAMPLE1
 
@@ -654,24 +767,24 @@ Returns undef.
  # Item object #1.
  my $item1 = Test::MockObject->new;
  $item1->mock('value', sub {
- 	return 'value1',
+         return 'value1',
  });
 
  # Item object #1.
  my $item2 = Test::MockObject->new;
  $item2->mock('value', sub {
- 	return 'value2',
+         return 'value2',
  });
 
  # Tested object.
  my $self = Test::MockObject->new({
- 	'key' => [],
+         'key' => [],
  });
  $self->mock('list', sub {
- 	return [
- 		$item1,
- 		$item2,
- 	];
+         return [
+                 $item1,
+                 $item2,
+         ];
  });
 
  # Check number of items.
@@ -699,24 +812,24 @@ Returns undef.
  # Item object #1.
  my $item1 = Test::MockObject->new;
  $item1->mock('value', sub {
- 	return 'value1',
+         return 'value1',
  });
 
  # Item object #2.
  my $item2 = Test::MockObject->new;
  $item2->mock('value', sub {
- 	return 'value1',
+         return 'value1',
  });
 
  # Tested object.
  my $self = Test::MockObject->new({
- 	'key' => [],
+         'key' => [],
  });
  $self->mock('list', sub {
- 	return [
- 		$item1,
- 		$item2,
- 	];
+         return [
+                 $item1,
+                 $item2,
+         ];
  });
 
  # Check number of items.
@@ -730,6 +843,49 @@ Returns undef.
 
 =head1 EXAMPLE17
 
+=for comment filename=check_regexp_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_regexp);
+
+ my $self = {
+         'key' => 'https://example.com/1',
+ };
+ check_regexp($self, 'key', qr{^https://example\.com/\d+$});
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE18
+
+=for comment filename=check_regexp_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_regexp);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'https://example.com/bad',
+ };
+ check_regexp($self, 'key', qr{^https://example\.com/\d+$});
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
+
+=head1 EXAMPLE19
+
 =for comment filename=check_required_ok.pl
 
  use strict;
@@ -738,7 +894,7 @@ Returns undef.
  use Mo::utils qw(check_required);
 
  my $self = {
-         'key' => 'value',
+	 'key' => 'value',
  };
  check_required($self, 'key');
 
@@ -748,7 +904,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE18
+=head1 EXAMPLE20
 
 =for comment filename=check_required_fail.pl
 
@@ -761,7 +917,7 @@ Returns undef.
  $Error::Pure::TYPE = 'Error';
 
  my $self = {
-         'key' => undef,
+	 'key' => undef,
  };
  check_required($self, 'key');
 
@@ -771,11 +927,100 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' is required.
 
+
+=head1 EXAMPLE21
+
+=for comment filename=check_string_begin_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_string_begin);
+
+ my $self = {
+         'key' => 'http://example.com/foo',
+ };
+ check_string_begin($self, 'key', 'http://example.com/');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE22
+
+=for comment filename=check_string_begin_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_string_begin);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'http://example/foo',
+ };
+ check_string_begin($self, 'key', 'http://example.com/');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
+
+=head1 EXAMPLE23
+
+=for comment filename=check_strings_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_strings);
+
+ my $self = {
+         'key' => 'value',
+ };
+ check_strings($self, 'key', ['value', 'foo']);
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE24
+
+=for comment filename=check_strings_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_strings);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bar',
+ };
+ check_strings($self, 'key', ['foo', 'value']);
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' must be one of defined strings.
+
 =head1 DEPENDENCIES
 
 L<Exporter>,
 L<Error::Pure>,
-L<Readonly>.
+L<List::Utils>,
+L<Readonly>,
+L<Scalar::Util>.
 
 =head1 SEE ALSO
 
@@ -784,6 +1029,14 @@ L<Readonly>.
 =item L<Mo>
 
 Micro Objects. Mo is less.
+
+=item L<Mo::utils::Language>
+
+Mo language utilities.
+
+=item L<Wikibase::Datatype::Utils>
+
+Wikibase datatype utilities.
 
 =back
 
@@ -799,12 +1052,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.17
 
 =cut

@@ -623,10 +623,10 @@ Schema->resultset("Role")->populate([
     person_roles => [
       "Person Roles Is Invalid",
     ],
-    "person_roles.0.role" => [
+    "person_roles[0].role" => [
       "Person Roles Role Is Invalid",
     ],
-    "person_roles.0.role.label" => [
+    "person_roles[0].role.label" => [
       "Person Roles Role Label adminxx is not a valid",
     ],
   }, 'Got expected errors';
@@ -699,10 +699,10 @@ Schema->resultset("Role")->populate([
     children => [
       "Children Is Invalid",
     ],
-    "children.0.value" => [
+    "children[0].value" => [
       "Children Value is too short (minimum is 5 characters)",
     ],
-    "children.1.value" => [
+    "children[1].value" => [
       "Children Value is too short (minimum is 5 characters)",
     ],
   }, 'Got expected errors';

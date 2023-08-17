@@ -203,6 +203,9 @@ is  $tags->hr({omit=>1}) +
 is  $tags->hr({omit=>sub {1}}) +
     $tags->div({omit=>sub{shift}}, 'Hello World!'), 'Hello World!';
 
+is $tags->input({value=>'&amp;'}), '<input value="&amp;amp;"/>';
+is $tags->input({value=>$tb->raw('&amp;')}), '<input value="&amp;"/>';
+
 done_testing;
 
 __END__

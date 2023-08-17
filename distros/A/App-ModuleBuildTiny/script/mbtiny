@@ -3,15 +3,17 @@
 use strict;
 use warnings;
 use App::ModuleBuildTiny;
+use File::Basename 'basename';
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 print_help() if ($ARGV[0] // 'help') eq 'help';
 
 modulebuildtiny(@ARGV);
 
 sub print_help {
-	print "Usage: $0 <command> [arguments ...]\n\nAvailable commands:\n\n";
+	my $program = basename($0);
+	print "Usage: $program <command> [arguments ...]\n\nAvailable commands:\n\n";
 	App::ModuleBuildTiny::Help->filter(__FILE__);
 	print "\n";
 	exit !@ARGV;
@@ -328,6 +330,10 @@ Create a distribution tarball.
 =head2 distdir
 
 Create a directory containing all of the files of the distribution.
+
+=head2 version
+
+This prints the version of C<mbtiny>.
 
 =head1 INPUTS
 

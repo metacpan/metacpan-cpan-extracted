@@ -1,0 +1,152 @@
+Revision history for Synth-Config
+
+0.0040 2023-07-04 21:23:24
+    - Add the missing Top=100% value.
+    - Require a name field for setting insert.
+    - Improve documentation.
+
+0.0039 2023-07-04 21:06:11
+    - Improve eg/synth-config-mojo.pl.
+    - Pin Mojo::SQLite 2.000.
+    - Comment-out possibly goofy db file cleanup tests.
+
+0.0038 2023-07-03 08:08:06
+    - Fix search sort.
+
+0.0037 2023-07-02 15:55:59
+    - Improve eg/mojo-ui.pl.
+
+0.0036 2023-07-02 14:36:31
+    - Improve documentation.
+
+0.0035 2023-07-02 13:57:20
+    - Improve documentation.
+    - Rename the automation scripts..
+
+0.0034 2023-07-02 12:43:48
+    - Sort search results by parameter as well.
+    - Improve eg/mojo-ui.pl.
+
+0.0033 2023-07-02 01:05:42
+    - Improve the eg/mojo-ui.pl program.
+    - Add another bottom and top value to the initial settings.
+
+0.0032 2023-07-01 18:44:51
+    - Add mojo-ui tests.
+
+0.0031 2023-07-01 18:12:32
+    - Fix mojo-ui tests.
+
+0.0030 2023-07-01 18:04:06
+    - Add mojo-ui tests.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0029 2023-07-01 11:39:38
+    - Adjust make_setting() logic.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0028 2023-07-01 10:39:18
+    - Improve the eg/mojo-ui.pl program.
+
+0.0027 2023-07-01 01:43:35
+    - Improve the eg/mojo-ui.pl program.
+    - Simplify the remove_model() method.
+    - Improve documentation.
+
+0.0026 2023-06-30 18:27:06
+    - Fix SQLite single quote escaping.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0025 2023-06-30 17:50:07
+    - Improve the eg/mojo-ui.pl program.
+
+0.0024 2023-06-30 17:32:42
+    - Improve the eg/mojo-ui.pl program.
+
+0.0023 2023-06-30 16:45:31
+    - SQLite does not like JSON key values with single quotes, apparently. :\
+    - Improve the eg/mojo-ui.pl program.
+    - Improve documentation.
+
+0.0022 2023-06-30 15:31:35
+    - Doubleplusugh. Include public/!
+
+0.0021 2023-06-30 15:27:11
+    - Ugh. Exclude public/.
+
+0.0020 2023-06-30 15:08:23
+    - Work around broken Mojo::SQLite behavior.
+    - Add the recall_models() method.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0019 2023-06-30 13:45:17
+    - Improve documentation.
+    - Do not require a model.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0018 2023-06-30 11:44:11
+    - Add the remove_model() method.
+
+0.0017 2023-06-30 11:29:15
+    - Do not require a model name in the constructor.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0016 2023-06-29 18:54:49
+    - Remove the now redundant recall_settings() method.
+    - Fix the make_setting() logic.
+    - Improve documentation.
+
+0.0015 2023-06-29 18:00:09
+    - Fix search_settings() again!
+    - Further adjust name column handling.
+
+0.0014 2023-06-29 15:50:05
+    - Add the recall_all() method.
+    - Improve the eg/mojo-ui.pl program significantly.
+    - Actually test and fix the search_settings() method.
+
+0.0013 2023-06-29 01:20:32
+    - Fix the search_settings() logic.
+    - Improve the eg/mojo-ui.pl program.
+
+0.0012 2023-06-29 00:45:33
+    - Make SQLite use the JSON datatype in db creation.
+    - Add the search_settings() method.
+    - Add the very much WIP eg/mojo-ui.pl program.
+
+0.0011 2023-06-28 21:16:56
+    - Improve the eg/synth-config.pl program.
+
+0.0010 2023-06-28 17:15:48
+    - Fix tests.
+    - Partially fleshed-out the eg/synth-config.pl program.
+
+0.0009 2023-06-28 00:38:45
+    - Add the remove_setting() and remove_settings() methods.
+
+0.0008 2023-06-27 21:34:54
+    - Improve documentation.
+
+0.0007 2023-06-27 21:26:38
+    - Add the recall_names() method.
+
+0.0006 2023-06-27 17:40:08
+    - Clean code, tests, and docs.
+
+0.0005 2023-06-27 15:54:01
+    - Add the recall_settings() method.
+    - Improve documentation.
+
+0.0004 2023-06-27 13:57:50
+    - WIP: Add a name column!
+    - Improve documentation.
+
+0.0003 2023-06-27 10:30:44
+    - Improve documentation.
+
+0.0002 2023-06-27 10:23:24
+    - Fix documentation.
+
+0.0001 2023-06-27 07:49:23
+    - Shoe-horn the basics into place.
+    - Mint with Dist::Zilla.

@@ -4,7 +4,7 @@ DateTime::Format::Text - Find a Date in Text
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 

@@ -49,6 +49,7 @@ do { my $x = {
                                    'Moo' => '0',
                                    'Moose' => '0',
                                    'Net::Statsd::Tiny' => 'v0.3.0',
+                                   'Plack::Middleware::MethodOverride' => '0',
                                    'Term::Size::Any' => '0',
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',

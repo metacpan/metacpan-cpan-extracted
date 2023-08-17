@@ -1,7 +1,8 @@
 SVN::Pusher changelog:
 
-0.10        2020-10-18
-    - Remove stale link.
+0.11        2023-07-22
+    - use_ok fix
+    - Cleanups
 
 0.09        2015-12-06
     - Change old E-mail address.

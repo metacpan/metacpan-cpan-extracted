@@ -39,7 +39,7 @@
          "url" : "https://git.sr.ht/~rgrjr/Spreadsheet-ReadGnumeric"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

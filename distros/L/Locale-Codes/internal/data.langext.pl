@@ -17,6 +17,7 @@ $Data{'langext'}{'iana'}{'orig'}{'name'} = {
    "Yolŋu Sign Language"             => "Yolnu Sign Language",
    "Yan-nhaŋu Sign Language"         => "Yan-nhanu Sign Language",
    "Lengua de señas Albarradas"      => "Lengua de senas Albarradas",
+   "Língua Gestual Guineense"        => "Lingua Gestual Guineense",
 };
 
 $Data{'langext'}{'iana'}{'ignore'} = {

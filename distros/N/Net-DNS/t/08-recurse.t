@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1910 2023-03-30 19:16:30Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1925 2023-05-31 11:58:59Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -21,20 +21,20 @@ eval {
 	my $resolver = Net::DNS::Resolver->new();
 	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
-	my $reply = $resolver->send(qw(. NS IN)) || die;
+	my $reply = $resolver->send(qw(. NS IN)) || die $!;
 
 	my @ns = grep { $_->type eq 'NS' } $reply->answer, $reply->authority;
 	exit plan skip_all => 'Local nameserver broken' unless scalar @ns;
 
 	1;
-} || exit( plan skip_all => 'Non-responding local nameserver' );
+} || exit( plan skip_all => "Non-responding local nameserver: $@" );
 
 
 eval {
 	my $resolver = Net::DNS::Resolver->new( nameservers => [@hints] );
 	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
-	my $reply = $resolver->send(qw(. NS IN)) || die;
+	my $reply = $resolver->send(qw(. NS IN)) || die $!;
 	my $from  = $reply->from();
 
 	my @ns = grep { $_->type eq 'NS' } $reply->answer;
@@ -43,7 +43,7 @@ eval {
 	exit plan skip_all => "Non-authoritative response from $from" unless $reply->header->aa;
 
 	1;
-} || exit( plan skip_all => 'Unable to reach global root nameservers' );
+} || exit( plan skip_all => "Cannot access global root nameservers: $@" );
 
 
 plan tests => 10;

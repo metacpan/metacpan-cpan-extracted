@@ -44,12 +44,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-URI-PackageURL/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/giterlizzi/perl-URI-PackageURL",
          "web" : "https://github.com/giterlizzi/perl-URI-PackageURL"
       }
    },
-   "version" : "1.10",
+   "version" : "2.00",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

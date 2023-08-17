@@ -4,7 +4,7 @@
       "Jurij Fajnberg <fajnbergj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,20 +39,17 @@
             "File::chdir" : "0",
             "Importer" : "0",
             "PadWalker" : "0",
-            "Path::Tiny" : "0.122",
+            "Path::Tiny" : "0.125",
             "Scalar::Readonly" : "0",
             "Test2::Tools::Basic" : "0",
             "Test2::Tools::Explain" : "0",
             "Test2::V0" : "0",
-            "Test::Files" : "0",
-            "Test::Output" : "0",
-            "Test::Warn" : "0",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Clone" : "0",
+            "FindBin" : "0",
             "Test::Simple" : "0"
          }
       }
@@ -64,10 +61,10 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jsf116/Test-Expander.git",
+         "url" : "git://github.com/jsf116/Test-Expander.git",
          "web" : "https://github.com/jsf116/Test-Expander"
       }
    },
-   "version" : "v1.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v2.1.5",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

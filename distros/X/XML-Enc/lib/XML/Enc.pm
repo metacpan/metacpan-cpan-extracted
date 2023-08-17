@@ -2,18 +2,20 @@ use strict;
 use warnings;
 
 package XML::Enc;
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # ABSTRACT: XML::Enc Encryption Support
 
 use Carp;
-use XML::LibXML;
-use Crypt::PK::RSA;
-use Crypt::Mode::CBC;
 use Crypt::AuthEnc::GCM 0.062;
-use MIME::Base64 qw/decode_base64 encode_base64/;
+use Crypt::Mode::CBC;
+use Crypt::PK::RSA;
 use Crypt::PRNG qw( random_bytes );
+use MIME::Base64 qw/decode_base64 encode_base64/;
+use XML::LibXML;
 
+# state means perl 5.10
+use feature 'state';
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 our $DEBUG = 0;
@@ -23,39 +25,66 @@ our $DEBUG = 0;
 # 5.2.1 Triple DES - 64 bit Initialization Vector (IV) (8 bytes)
 # 5.2.2 AES - 128 bit initialization vector (IV) (16 bytes)
 
-my %encmethods = (
+sub _assert_symmetric_algorithm {
+    my $algo = shift;
+
+    state $SYMMETRIC = {
         'http://www.w3.org/2001/04/xmlenc#tripledes-cbc' => {
-                                                            ivsize => 8,
-                                                            keysize => 24,
-                                                            modename => 'DES_EDE' },
+            ivsize   => 8,
+            keysize  => 24,
+            modename => 'DES_EDE'
+        },
         'http://www.w3.org/2001/04/xmlenc#aes128-cbc' => {
-                                                            ivsize => '16',
-                                                            keysize => 16,
-                                                            modename => 'AES' },
+            ivsize   => '16',
+            keysize  => 16,
+            modename => 'AES'
+        },
         'http://www.w3.org/2001/04/xmlenc#aes192-cbc' => {
-                                                            ivsize => '16',
-                                                            keysize => 24,
-                                                            modename => 'AES' },
+            ivsize   => '16',
+            keysize  => 24,
+            modename => 'AES'
+        },
         'http://www.w3.org/2001/04/xmlenc#aes256-cbc' => {
-                                                            ivsize => '16',
-                                                            keysize => 32,
-                                                            modename => 'AES' },
+            ivsize   => '16',
+            keysize  => 32,
+            modename => 'AES'
+        },
         'http://www.w3.org/2009/xmlenc11#aes128-gcm' => {
-                                                            ivsize   => '12',
-                                                            keysize  => 16,
-                                                            modename => 'AES',
-                                                            tagsize  => 16 },
+            ivsize   => '12',
+            keysize  => 16,
+            modename => 'AES',
+            tagsize  => 16
+        },
         'http://www.w3.org/2009/xmlenc11#aes192-gcm' => {
-                                                            ivsize   => '12',
-                                                            keysize  => 24,
-                                                            modename => 'AES',
-                                                            tagsize  => 16 },
+            ivsize   => '12',
+            keysize  => 24,
+            modename => 'AES',
+            tagsize  => 16
+        },
         'http://www.w3.org/2009/xmlenc11#aes256-gcm' => {
-                                                            ivsize   => '12',
-                                                            keysize  => 32,
-                                                            modename => 'AES',
-                                                            tagsize  => 16 },
-        );
+            ivsize   => '12',
+            keysize  => 32,
+            modename => 'AES',
+            tagsize  => 16
+        },
+    };
+
+    die "Unsupported symmetric algo $algo" unless $SYMMETRIC->{ $algo };
+    return $SYMMETRIC->{$algo}
+}
+
+sub _assert_encryption_digest {
+    my $algo = shift;
+
+    state $ENC_DIGEST = {
+        'http://www.w3.org/2000/09/xmldsig#sha1' => 'SHA1',
+        'http://www.w3.org/2001/04/xmlenc#sha256' => 'SHA256',
+    };
+
+    die "Unsupported encryption digest algo $algo" unless $ENC_DIGEST->{ $algo };
+    return $ENC_DIGEST->{ $algo };
+}
+
 
 
 sub new {
@@ -93,10 +122,9 @@ sub new {
 
 
 sub decrypt {
-    my $self    = shift;
-    my ($xml)   = @_;
-
-    die "You cannot decrypt XML without a private key." unless $self->{key};
+    my $self = shift;
+    my $xml  = shift;
+    my %options = @_;
 
     local $XML::LibXML::skipXMLDeclaration = $self->{ no_xml_declaration };
 
@@ -105,46 +133,200 @@ sub decrypt {
     my $xpc = XML::LibXML::XPathContext->new($doc);
     $xpc->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
     $xpc->registerNs('xenc', 'http://www.w3.org/2001/04/xmlenc#');
+    $xpc->registerNs('xenc11', 'http://www.w3.org/2009/xmlenc11#');
     $xpc->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
 
-    my $data;
+    return $doc unless $xpc->exists('//xenc:EncryptedData');
 
-    for my $encryptednode ($xpc->findnodes('//xenc:EncryptedData')) {
-        my $type         = $self->_getEncryptionType($xpc, $encryptednode);
-        my $method       = $self->_getEncryptionMethod($xpc, $encryptednode);
-        my $keymethod    = $self->_getKeyEncryptionMethod($xpc, $encryptednode);
-        my $encryptedkey = $self->_getKeyEncryptedData($xpc, $encryptednode);
+    die "You cannot decrypt XML without a private key." unless $self->{key_obj};
 
-        # Decrypt the key using specified method
-        my $key = $self->_DecryptKey($keymethod, decode_base64($encryptedkey));
-
-        my $encrypteddata = $self->_getEncryptedData($xpc, $encryptednode);
-
-        # Decrypt the data using the decrypted key
-        $data = $self->_DecryptData($method, $key, decode_base64($encrypteddata));
-
-        # Load the decrypted XML text content and replace the EncryptedData
-        # in the original XML with the decrypted XML nodes
-        if ($type eq 'http://www.w3.org/2001/04/xmlenc#Element') {
-            # Check to see whether the decrypted data is really XML
-            # xmlsec has uses Element for encrypted Content
-            my $parser = XML::LibXML->new();
-            my $newnode = eval { $parser->load_xml(string => $data)->findnodes('//*')->[0] };
-
-            if (defined $newnode) {
-                $encryptednode->addSibling($newnode);
-                $encryptednode->unbindNode();
-            }
-        } else {
-            # http://www.w3.org/2001/04/xmlenc#Content
-            my $parent = $encryptednode->parentNode;
-            $parent->removeChildNodes;
-            $parent->appendText($data);
-        }
-    }
+    my $parser = XML::LibXML->new();
+    $self->_decrypt_encrypted_key_nodes($xpc, $parser, %options);
+    $self->_decrypt_uri_nodes($xpc, $parser, %options);
 
     return $doc->serialize();
 }
+
+sub _decrypt_encrypted_key_nodes {
+    my $self = shift;
+    my $xpc = shift;
+    my $parser = shift;
+    my %options = @_;
+
+    my $k = $self->_get_named_key_nodes(
+        '//xenc:EncryptedData/dsig:KeyInfo/xenc:EncryptedKey',
+        $xpc, $options{key_name}
+    );
+
+    $k->foreach(
+        sub {
+            my $key = $self->_get_key_from_node($_, $xpc);
+            return unless $key;
+            my $encrypted_node = $_->parentNode->parentNode;
+            $self->_decrypt_encrypted_node($encrypted_node,
+                $key, $xpc, $parser);
+        }
+    );
+}
+
+sub _decrypt_uri_nodes {
+    my $self = shift;
+    my $xpc  = shift;
+    my $parser = shift;
+    my %options = @_;
+
+    my $uri_nodes = $xpc->findnodes('//dsig:KeyInfo/dsig:RetrievalMethod/@URI');
+    my @uri_nodes = $uri_nodes->map(sub { my $v = $_->getValue; $v =~ s/^#//; return $v; });
+
+    foreach my $uri (@uri_nodes) {
+        my $encrypted_key_nodes = $self->_get_named_key_nodes(
+            sprintf('//xenc:EncryptedKey[@Id="%s"]', $uri),
+            $xpc, $options{key_name});
+
+        $encrypted_key_nodes->foreach(
+            sub {
+
+                my $key = $self->_get_key_from_node($_, $xpc);
+                return unless $key;
+
+                my $encrypted_nodes = $xpc->findnodes(sprintf('//dsig:KeyInfo/dsig:RetrievalMethod[@URI="#%s"]/../..', $uri));
+                return unless $encrypted_nodes->size;
+
+                $encrypted_nodes->foreach(sub {
+                    $self->_decrypt_encrypted_node(
+                        $_,
+                        $key,
+                        $xpc,
+                        $parser
+                    );
+                });
+
+                # We don't need the encrypted key here
+                $_->removeChildNodes();
+            }
+        );
+    }
+}
+
+sub _get_named_key_nodes {
+    my $self = shift;
+    my $xpath = shift;
+    my $xpc = shift;
+    my $name = shift;
+
+    my $nodes = $xpc->findnodes($xpath);
+    return $nodes unless $name;
+    return $nodes->grep(
+        sub {
+            $xpc->findvalue('dsig:KeyInfo/dsig:KeyName', $_) eq $name;
+        }
+    );
+}
+
+sub _decrypt_encrypted_node {
+    my $self = shift;
+    my $node = shift;
+    my $key  = shift;
+    my $xpc  = shift;
+    my $parser = shift;
+
+    my $algo         = $self->_get_encryption_algorithm($node, $xpc);
+    my $cipher_value = $self->_get_cipher_value($node, $xpc);
+    my $oaep         = $self->_get_oaep_params($node, $xpc);
+
+    my $decrypted_data = $self->_DecryptData($algo, $key, $cipher_value);
+
+    # Sooo.. parse_balanced_chunk breaks when there is a <xml version="1'>
+    # bit in the decrypted data and thus we have to remove it.
+    # We try parsing the XML here and if that works we get all the nodes
+    my $new = eval { $parser->load_xml(string => $decrypted_data)->findnodes('//*')->[0]; };
+
+    if ($new) {
+        $node->addSibling($new);
+        $node->unbindNode();
+        return;
+    }
+
+    $decrypted_data = $parser->parse_balanced_chunk($decrypted_data);
+    if (($node->parentNode->localname //'') eq 'EncryptedID') {
+        $node->parentNode->replaceNode($decrypted_data);
+        return;
+    }
+    $node->replaceNode($decrypted_data);
+    return;
+}
+
+sub _get_key_from_node {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $algo         = $self->_get_encryption_algorithm($_, $xpc);
+    my $cipher_value = $self->_get_cipher_value($_, $xpc);
+    my $digest_name  = $self->_get_digest_method($_, $xpc);
+    my $oaep         = $self->_get_oaep_params($_, $xpc);
+    my $mgf          = $self->_get_mgf($_, $xpc);
+
+    return $self->_decrypt_key(
+        $cipher_value,
+        $algo,
+        $digest_name,
+        $oaep,
+        $mgf,
+    );
+}
+
+sub _get_encryption_algorithm {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $nodes = $xpc->findnodes('./xenc:EncryptionMethod/@Algorithm', $node);
+    return $nodes->get_node(1)->getValue if $nodes->size;
+    confess "Unable to determine encryption method algorithm from " . $node->nodePath;
+}
+
+sub _get_cipher_value {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $nodes = $xpc->findnodes('./xenc:CipherData/xenc:CipherValue', $node);
+    return decode_base64($nodes->get_node(1)->textContent) if $nodes->size;
+    confess "Unable to get the CipherValue from " . $node->nodePath;
+}
+
+sub _get_mgf {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $value = $xpc->findvalue('./xenc:EncryptionMethod/xenc11:MGF/@Algorithm', $node);
+    return $value if $value;
+    return;
+}
+
+sub _get_oaep_params {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $value = $xpc->findvalue('./xenc:EncryptionMethod/xenc:OAEPparams', $node);
+    return decode_base64($value) if $value;
+    return;
+}
+
+sub _get_digest_method {
+    my $self = shift;
+    my $node = shift;
+    my $xpc  = shift;
+
+    my $value = $xpc->findvalue(
+        './xenc:EncryptionMethod/dsig:DigestMethod/@Algorithm', $node);
+    return _assert_encryption_digest($value) if $value;
+    return;
+}
+
 
 sub encrypt {
     my $self    = shift;
@@ -160,6 +342,7 @@ sub encrypt {
     my $xpc = XML::LibXML::XPathContext->new($encrypted);
     $xpc->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
     $xpc->registerNs('xenc', 'http://www.w3.org/2001/04/xmlenc#');
+    $xpc->registerNs('xenc11', 'http://www.w3.org/2009/xmlenc11#');
     $xpc->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
 
     # Encrypt the data an empty key is passed by reference to allow
@@ -188,22 +371,6 @@ sub encrypt {
     $self->_setKeyEncryptedData($encrypted, $xpc, $base64_key);
 
     return $encrypted->serialize();
-}
-
-sub _getEncryptionType {
-    my $self    = shift;
-    my $xpc     = shift;
-    my $context = shift;
-
-    return $xpc->findvalue('@Type', $context)
-}
-
-sub _getEncryptionMethod {
-    my $self    = shift;
-    my $xpc     = shift;
-    my $context = shift;
-
-    return $xpc->findvalue('xenc:EncryptionMethod/@Algorithm', $context)
 }
 
 sub _setEncryptionMethod {
@@ -240,72 +407,43 @@ sub _setOAEPAlgorithm {
     my $self    = shift;
     my $method  = shift;
 
-    my %methods = (
-                    'mgf1sha1' => 'http://www.w3.org/2009/xmlenc11#mgf1sha1',
-                    'mgf1sha224' => 'http://www.w3.org/2009/xmlenc11#mgf1sha224',
-                    'mgf1sha256' => 'http://www.w3.org/2009/xmlenc11#mgf1sha256',
-                    'mgf1sha384' => 'http://www.w3.org/2009/xmlenc11#mgf1sha384',
-                    'mgf1sha512' => 'http://www.w3.org/2009/xmlenc11#mgf1sha512',
-                );
+    state $setOAEPAlgorithm = {
+        'mgf1sha1'   => 'http://www.w3.org/2009/xmlenc11#mgf1sha1',
+        'mgf1sha224' => 'http://www.w3.org/2009/xmlenc11#mgf1sha224',
+        'mgf1sha256' => 'http://www.w3.org/2009/xmlenc11#mgf1sha256',
+        'mgf1sha384' => 'http://www.w3.org/2009/xmlenc11#mgf1sha384',
+        'mgf1sha512' => 'http://www.w3.org/2009/xmlenc11#mgf1sha512',
+    };
 
-    return exists($methods{$method}) ? $methods{$method} : $methods{'mgf1sha1'};
+    return $setOAEPAlgorithm->{$method} // $setOAEPAlgorithm->{'rsa-oaep-mgf1p'};
 }
 
 sub _getOAEPAlgorithm {
     my $self    = shift;
     my $method  = shift;
 
-    my %methods = (
-                    'http://www.w3.org/2009/xmlenc11#mgf1sha1'   => 'SHA1',
-                    'http://www.w3.org/2009/xmlenc11#mgf1sha224' => 'SHA224',
-                    'http://www.w3.org/2009/xmlenc11#mgf1sha256' => 'SHA256',
-                    'http://www.w3.org/2009/xmlenc11#mgf1sha384' => 'SHA384',
-                    'http://www.w3.org/2009/xmlenc11#mgf1sha512' => 'SHA512',
-                  );
+    state $OAEPAlgorithm = {
+        'http://www.w3.org/2009/xmlenc11#mgf1sha1'   => 'SHA1',
+        'http://www.w3.org/2009/xmlenc11#mgf1sha224' => 'SHA224',
+        'http://www.w3.org/2009/xmlenc11#mgf1sha256' => 'SHA256',
+        'http://www.w3.org/2009/xmlenc11#mgf1sha384' => 'SHA384',
+        'http://www.w3.org/2009/xmlenc11#mgf1sha512' => 'SHA512',
+    };
 
-    return exists($methods{$method}) ? $methods{$method} : $methods{'http://www.w3.org/2009/xmlenc11#mgf1sha1'};
-}
-
-sub _getKeyEncryptionMethod {
-    my $self    = shift;
-    my $xpc     = shift;
-    my $context = shift;
-
-    my %method;
-    if ($xpc->findvalue('dsig:KeyInfo/dsig:RetrievalMethod/@Type', $context)
-                eq 'http://www.w3.org/2001/04/xmlenc#EncryptedKey')
-    {
-        my $id = $xpc->findvalue('dsig:KeyInfo/dsig:RetrievalMethod/@URI', $context);
-        $id    =~ s/#//g;
-
-        my $keyinfo = $xpc->find('//*[@Id=\''. $id . '\']', $context);
-        if (! $keyinfo ) {
-            die "Unable to find EncryptedKey";
-        }
-        $method{Algorithm} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context);
-        $method{KeySize}   = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:KeySize', $context);
-        $method{OAEPparams} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams', $context);
-        $method{MGF} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:MGF/@Algorithm', $context);
-        return \%method;
-    }
-    $method{Algorithm} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context);
-    $method{KeySize}   = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:KeySize', $context);
-    $method{OAEPparams} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams', $context);
-    $method{MGF} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:MGF/@Algorithm', $context);
-    return \%method;
+    return $OAEPAlgorithm->{$method} // 'SHA1';
 }
 
 sub _setKeyEncryptionMethod {
     my $self    = shift;
     my $method  = shift;
 
-    my %methods = (
-                    'rsa-1_5'           => 'http://www.w3.org/2001/04/xmlenc#rsa-1_5',
-                    'rsa-oaep-mgf1p'    => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p',
-                    'rsa-oaep'          => 'http://www.w3.org/2009/xmlenc11#rsa-oaep',
-                );
+    state $enc_methods = {
+        'rsa-1_5'        => 'http://www.w3.org/2001/04/xmlenc#rsa-1_5',
+        'rsa-oaep-mgf1p' => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p',
+        'rsa-oaep'       => 'http://www.w3.org/2009/xmlenc11#rsa-oaep',
+    };
 
-    return exists($methods{$method}) ? $methods{$method} : $methods{'rsa-oaep-mgf1p'};
+    return $enc_methods->{$method} // $enc_methods->{'rsa-oaep-mgf1p'};
 }
 
 sub _DecryptData {
@@ -314,35 +452,31 @@ sub _DecryptData {
     my $key             = shift;
     my $encrypteddata   = shift;
 
-    my $iv;
-    my $encrypted;
-    my $plaintext;
+    my $method_vars = _assert_symmetric_algorithm($method);
 
-    my $ivsize   = $encmethods{$method}->{ivsize};
-    my $tagsize  = $encmethods{$method}->{tagsize};
+    my $ivsize   = $method_vars->{ivsize};
+    my $tagsize  = $method_vars->{tagsize};
 
-    $iv          = substr $encrypteddata, 0, $ivsize;
-    $encrypted   = substr $encrypteddata, $ivsize;
+    my $iv          = substr $encrypteddata, 0, $ivsize;
+    my $encrypted   = substr $encrypteddata, $ivsize;
 
     # XML Encryption 5.2 Block Encryption Algorithms
     # The resulting cipher text is prefixed by the IV.
-    if (defined $encmethods{$method} & $method !~ /gcm/ ){
-        my $cbc     = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
-        $plaintext  = $self->_remove_padding($cbc->decrypt($encrypted, $key, $iv));
-    } elsif (defined $encmethods{$method} & $method =~ /gcm/ ){
-        my $gcm     = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
-
-        # Note that GCM support for additional authentication
-        # data is not used in the XML specification.
-        my $tag     = substr $encrypted, - $tagsize;
-        $encrypted  = substr $encrypted, 0, (length $encrypted) - $tagsize;
-        $plaintext  = $gcm->decrypt_add($encrypted);
-        if ( ! $gcm->decrypt_done($tag) ) {
-            die "Tag expected did not match returned Tag";
-        }
-    } else {
-        die "Unsupported Encryption Algorithm";
+    if ($method !~ /gcm/ ){
+        my $cbc = Crypt::Mode::CBC->new($method_vars->{modename}, 0);
+        return $self->_remove_padding($cbc->decrypt($encrypted, $key, $iv));
     }
+
+    my $gcm = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
+
+    # Note that GCM support for additional authentication
+    # data is not used in the XML specification.
+    my $tag = substr $encrypted, -$tagsize;
+    $encrypted = substr $encrypted, 0, (length $encrypted) - $tagsize;
+    my $plaintext = $gcm->decrypt_add($encrypted);
+
+    die "Tag expected did not match returned Tag"
+        unless $gcm->decrypt_done($tag);
 
     return $plaintext;
 }
@@ -353,54 +487,79 @@ sub _EncryptData {
     my $data    = shift;
     my $key     = shift;
 
-    my $cipherdata;
-    my $ivsize  = $encmethods{$method}->{ivsize};
-    my $keysize = $encmethods{$method}->{keysize};
 
-    my $iv      = random_bytes ( $ivsize);
-    ${$key}     = random_bytes ( $keysize);
+    my $method_vars = _assert_symmetric_algorithm($method);
 
-    if (defined $encmethods{$method} & $method !~ /gcm/ ){
-        my $cbc = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
-        # XML Encryption 5.2 Block Encryption Algorithms
-        # The resulting cipher text is prefixed by the IV.
-        $data       = $self->_add_padding($data, $ivsize);
-        $cipherdata = $iv . $cbc->encrypt($data, ${$key}, $iv);
-    } elsif (defined $encmethods{$method} & $method =~ /gcm/ ){
-        my $gcm = Crypt::AuthEnc::GCM->new($encmethods{$method}->{modename}, ${$key}, $iv);
+    my $ivsize   = $method_vars->{ivsize};
+    my $keysize  = $method_vars->{keysize};
+
+    my $iv = random_bytes($ivsize);
+    ${$key} = random_bytes($keysize);
+
+    if ($method =~ /gcm/ ){
+        my $gcm
+            = Crypt::AuthEnc::GCM->new($method_vars->{modename}, ${$key}, $iv);
 
         # Note that GCM support for additional authentication
         # data is not used in the XML specification.
-        my $encrypted   = $gcm->encrypt_add($data);
-        my $tag         = $gcm->encrypt_done();
+        my $encrypted = $gcm->encrypt_add($data);
+        my $tag       = $gcm->encrypt_done();
 
-        $cipherdata     = $iv . $encrypted . $tag;
-    } else {
-        die "Unsupported Encryption Algorithm";
+        return $iv . $encrypted . $tag;
     }
 
-    return $cipherdata;
+    my $cbc = Crypt::Mode::CBC->new($method_vars->{modename}, 0);
+    # XML Encryption 5.2 Block Encryption Algorithms
+    # The resulting cipher text is prefixed by the IV.
+    $data = $self->_add_padding($data, $ivsize);
+    return $iv . $cbc->encrypt($data, ${$key}, $iv);
 }
 
-sub _DecryptKey {
-    my $self            = shift;
-    my $keymethod       = shift;
-    my $encryptedkey    = shift;
+sub _decrypt {
+    my $sub = shift;
+    my $decrypt;
+    eval { $decrypt = $sub->() };
+    return $decrypt unless $@;
+    return;
+}
 
-    if ($keymethod->{Algorithm} eq 'http://www.w3.org/2001/04/xmlenc#rsa-1_5') {
-        return $self->{key_obj}->decrypt($encryptedkey, 'v1.5');
-    }
-    elsif ($keymethod->{Algorithm} eq 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p') {
-        return $self->{key_obj}->decrypt($encryptedkey, 'oaep', 'SHA1', decode_base64($keymethod->{OAEPparams}));
-    }
-    elsif ($keymethod->{Algorithm} eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
-        return $self->{key_obj}->decrypt($encryptedkey, 'oaep', $self->_getOAEPAlgorithm($keymethod->{MGF}), decode_base64($keymethod->{OAEPparams}));
-    } else {
-        die "Unsupported Key Encryption Method";
+sub _decrypt_key {
+    my $self        = shift;
+    my $key         = shift;
+    my $algo        = shift;
+    my $digest_name = shift;
+    my $oaep        = shift;
+    my $mgf         = shift;
+
+    if ($algo eq 'http://www.w3.org/2001/04/xmlenc#rsa-1_5') {
+        return _decrypt(sub{$self->{key_obj}->decrypt($key, 'v1.5')});
     }
 
-    print "Decrypted key: ", encode_base64($self->{key_obj}->decrypt($encryptedkey)) if $DEBUG;
-    return $self->{key_obj}->decrypt($encryptedkey);
+    if ($algo eq 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p') {
+        return _decrypt(
+            sub {
+                $self->{key_obj}->decrypt(
+                    $key, 'oaep',
+                    $digest_name // 'SHA1',
+                    $oaep  // ''
+                );
+            }
+        );
+    }
+
+    if ($algo eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
+        return _decrypt(
+            sub {
+                $self->{key_obj}->decrypt(
+                    $key, 'oaep',
+                    $self->_getOAEPAlgorithm($mgf),
+                    $oaep // '',
+                );
+            }
+        );
+    }
+
+    die "Unsupported algorithm for key decryption: $algo";
 }
 
 sub _EncryptKey {
@@ -419,18 +578,10 @@ sub _EncryptKey {
     elsif ($keymethod eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
         ${$key} = $rsa_pub->encrypt(${$key}, 'oaep', $self->_getOAEPAlgorithm($self->{oaep_mgf_alg}), $self->{oaep_params});
     } else {
-        die "Unsupported Key Encryption Method";
+        die "Unsupported algorithm for key encyption $keymethod}";
     }
 
     print "Encrypted key: ", encode_base64(${$key}) if $DEBUG;
-}
-
-sub _getEncryptedData {
-    my $self    = shift;
-    my $xpc     = shift;
-    my $context = shift;
-
-    return $xpc->findvalue('xenc:CipherData/xenc:CipherValue', $context);
 }
 
 sub _setEncryptedData {
@@ -444,28 +595,6 @@ sub _setEncryptedData {
     $node->[0]->removeChildNodes();
     $node->[0]->appendText($cipherdata);
     return $context;
-}
-
-sub _getKeyEncryptedData {
-    my $self    = shift;
-    my $xpc     = shift;
-    my $context = shift;
-
-    if ($xpc->findvalue('dsig:KeyInfo/dsig:RetrievalMethod/@Type', $context)
-                eq 'http://www.w3.org/2001/04/xmlenc#EncryptedKey')
-    {
-        my $id = $xpc->findvalue('dsig:KeyInfo/dsig:RetrievalMethod/@URI', $context);
-        $id    =~ s/#//g;
-
-        my $keyinfo = $xpc->find('//*[@Id=\''. $id . '\']', $context);
-        if (! $keyinfo ) {
-            die "Unable to find EncryptedKey";
-        }
-
-        return $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:CipherData/xenc:CipherValue', $context);
-    }
-
-    return $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:CipherData/xenc:CipherValue', $context);
 }
 
 sub _setKeyEncryptedData {
@@ -684,30 +813,25 @@ sub _load_cert_file {
         require Crypt::OpenSSL::X509;
     };
 
-    confess "Crypt::OpenSSL::X509 needs to be installed so that we can handle X509 certs." if $@;
+    die "Crypt::OpenSSL::X509 needs to be installed so that we can handle X509 certs.\n" if $@;
 
     my $file = $self->{ cert };
-    if ( open my $CERT, '<', $file ) {
-        my $text = '';
-        local $/ = undef;
-        $text = <$CERT>;
-        close $CERT;
-
-        my $cert = Crypt::PK::RSA->new(\$text);
-        if ( $cert ) {
-            $self->{ cert_obj } = $cert;
-            my $cert_text = $cert->export_key_pem('public_x509');
-            $cert_text =~ s/-----[^-]*-----//gm;
-            $self->{KeyInfo} = "<dsig:KeyInfo><dsig:X509Data><dsig:X509Certificate>\n"._trim($cert_text)."\n</dsig:X509Certificate></dsig:X509Data></dsig:KeyInfo>";
-        }
-        else {
-            confess "Could not load certificate from $file";
-        }
+    if (!-r $file) {
+        die "Could not find certificate file $file";
     }
-    else {
-        confess "Could not find certificate file $file";
-    }
+    open my $CERT, '<', $file  or die "Unable to open $file\n";
+    my $text = '';
+    local $/ = undef;
+    $text = <$CERT>;
+    close $CERT;
 
+    my $cert = Crypt::PK::RSA->new(\$text);
+    die "Could not load certificate from $file" unless $cert;
+
+    $self->{ cert_obj } = $cert;
+    my $cert_text = $cert->export_key_pem('public_x509');
+    $cert_text =~ s/-----[^-]*-----//gm;
+    $self->{KeyInfo} = "<dsig:KeyInfo><dsig:X509Data><dsig:X509Certificate>\n"._trim($cert_text)."\n</dsig:X509Certificate></dsig:X509Data></dsig:KeyInfo>";
     return;
 }
 
@@ -719,6 +843,7 @@ sub _create_encrypted_data_xml {
 
     my $xencns = 'http://www.w3.org/2001/04/xmlenc#';
     my $dsigns = 'http://www.w3.org/2000/09/xmldsig#';
+    my $xenc11ns = 'http://www.w3.org/2009/xmlenc11#';
 
     my $encdata = $self->_create_node($doc, $xencns, $doc, 'xenc:EncryptedData',
                             {
@@ -774,9 +899,9 @@ sub _create_encrypted_data_xml {
     if ($self->{key_transport} eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
         my $oaepmethod = $self->_create_node(
                             $doc,
-                            $xencns,
+                            $xenc11ns,
                             $kencmethod,
-                            'xenc:MGF',
+                            'xenc11:MGF',
                             {
                                 Algorithm => $self->{oaep_mgf_alg},
                             }
@@ -862,27 +987,27 @@ XML::Enc - XML::Enc Encryption Support
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
     my $decrypter = XML::Enc->new(
-                                {
-                                    key                         => 't/sign-private.pem',
-                                    no_xml_declaration          => 1,
-                                },
-                            );
+        {
+            key                => 't/sign-private.pem',
+            no_xml_declaration => 1,
+        },
+    );
     $decrypted = $enc->decrypt($xml);
 
     my $encrypter = XML::Enc->new(
-                                {
-                                    cert                => 't/sign-certonly.pem',
-                                    no_xml_declaration  => 1,
-                                    data_enc_method     => 'aes256-cbc',
-                                    key_transport       => 'rsa-1_5',
+        {
+            cert               => 't/sign-certonly.pem',
+            no_xml_declaration => 1,
+            data_enc_method    => 'aes256-cbc',
+            key_transport      => 'rsa-1_5',
 
-                                },
-                            );
+        },
+    );
     $encrypted = $enc->encrypt($xml);
 
 =head1 NAME

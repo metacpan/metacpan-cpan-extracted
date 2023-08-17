@@ -1,16 +1,20 @@
 ---
-abstract: 'a light and pure-Perl PSGI/Plack HTTP server with pre-forks'
+abstract: 'Light and pure-Perl PSGI/Plack HTTP server with pre-forks'
 author:
   - 'Piotr Roszatycki <dexter@cpan.org>'
   - 'Piotr Roszatycki <dexter@cpan.org>'
   - 'Jeremy Howard <j+daemonize@howard.fm>'
   - 'Paul Seamons <paul@seamons.com>'
 build_requires:
-  HTTP::Tiny: '0'
+  LWP: '0'
   Test::More: '0.88'
   Test::TCP: '0.15'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,19 +23,22 @@ name: Starlight
 provides:
   Plack::Handler::Starlight:
     file: lib/Plack/Handler/Starlight.pm
-    version: '0.0400'
+    version: '0.0503'
   Starlight:
     file: lib/Starlight.pm
-    version: '0.0400'
+    version: '0.0503'
   Starlight::Server:
     file: lib/Starlight/Server.pm
-    version: '0.0400'
+    version: '0.0503'
+recommends:
+  IO::Socket::IP: '0'
+  Time::HiRes: '0'
 requires:
-  Plack: '0.992'
+  Plack: '0.9920'
   perl: '5.008001'
 resources:
   bugtracker: http://github.com/dex4er/Starlight/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dex4er/Starlight
-version: '0.0400'
+version: '0.0503'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

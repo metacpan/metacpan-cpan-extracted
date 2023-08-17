@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -126,21 +126,27 @@ sub _process($)
 {
     my ($self) = @_;
     my ($h, $selection) = ($self->height, $self->selection);
-    my $entries = ();
-    my ($head, $prompt) = ('', '');
-    my $pre_active = '<%' . int(1 + $h / 10) . 'd> ';
+    my $entries = 0;
+    my ($head, $prompt, $logh) = ('', '', 1);
+    local $_ = $h;
+    while ($_ >= 10)
+    {   $logh++;   $_ /= 10;   }
+    my $pre_active_base = '<%' . $logh . 'd> ';
+    my $pre_active = $pre_active_base;
     my $re_selection = ($selection == 0 ? qr/(0)/ :
 			$selection == 1 ? qr/(\d+)/ :
 			qr/(\d+)(?:,\s*\d+)*/);
     $self->{_modified} = 1;
-    local $_ = '';
+    $_ = '';
     while ($_ ne '0')
     {
 	if (defined $self->{_modified})
 	{
 	    $entries = @{$self->texts};
 	    $head = $entries > $h ? '<+/-> ' : '      ';
-	    $head .= ' ' x (($selection > 0) * int($h / 10));
+	    $pre_active = $pre_active_base;
+	    my $diff = $logh + 5 - length($head);
+	    $head .= ' ' x $diff if $diff > 0;
 	    $prompt = msg('enter_selection');
 	    $entries > $h  and  $prompt .= ' (' . msg('scrolls') . ')';
 	    $prompt .= ': ';
@@ -153,6 +159,7 @@ sub _process($)
 	      $entries ? ($i + 1 . '-' . $last . '/' . $entries) : '0/0',
 	      "\n");
 	$_ = 0;
+	my $empty = 0;
 	while ($_ < $h)
 	{
 	    $_++;
@@ -169,7 +176,10 @@ sub _process($)
 		$i++;
 	    }
 	    else
-	    {   print "\n";   }
+	    {
+		print "\n" unless $empty > 2;
+		$empty++;
+	    }
 	}
 	print sprintf($pre_active, 0), '  ', msg('leave_listbox'), "\n";
 	$_ = '';

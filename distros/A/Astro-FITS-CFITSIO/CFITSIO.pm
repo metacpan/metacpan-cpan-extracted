@@ -1,5 +1,5 @@
 package Astro::FITS::CFITSIO;
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 use strict;
 use Carp;
@@ -22,6 +22,13 @@ my @__names_no_short = qw(
                           fits_translate_keywords
                           fits_copy_cell2image
                           fits_copy_image2cell
+                          fits_copy_pixlist2image
+                          fits_write_keys_histo
+                          fits_rebin_wcs
+                          fits_rebin_wcsd
+                          fits_make_hist
+                          fits_make_histd
+                          fits_make_histde
 		         );
 
 # perl -nle "next unless /^\s*#define\s+fits_/; (undef,\$l,\$s) = split ' '; print \"\$s => '\$l',\"" /usr/local/cfitsio/longnam.h
@@ -160,7 +167,9 @@ my %__names = (
 	       ffgkyc => 'fits_read_key_cmp',
 	       ffgkym => 'fits_read_key_dblcmp',
 	       ffgkyt => 'fits_read_key_triple',
+	       ffgkcsl => 'fits_get_key_com_strlen',
 	       ffgkls => 'fits_read_key_longstr',
+	       ffgskyc => 'fits_read_string_key_com',
 	       fffree => 'fits_free_memory',
 	       ffhdr2str => 'fits_hdr2str',
 	       ffcnvthdr2str => 'fits_convert_hdr2str',

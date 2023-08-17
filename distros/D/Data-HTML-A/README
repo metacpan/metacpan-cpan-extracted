@@ -1,0 +1,169 @@
+NAME
+    Data::HTML::A - Data object for HTML a element.
+
+SYNOPSIS
+     use Data::HTML::A;
+
+     my $obj = Data::HTML::A->new(%params);
+     my $css_class = $obj->css_class;
+     my $data = $obj->data;
+     my $data_type = $obj->data_type;
+     my $url = $obj->url;
+
+METHODS
+  "new"
+     my $obj = Data::HTML::A->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "css_class"
+
+            Form CSS class.
+
+            Default value is undef.
+
+    *       "data"
+
+            Data content. It's reference to array.
+
+            Data type of data is described in 'data_type' parameter.
+
+            Default value is [].
+
+    *       "data_type"
+
+            Data type for content.
+
+            Possible value are: plain tags
+
+            The 'plain' content are string(s). The 'tags' content is
+            structure described in Tags.
+
+            Default value is 'plain'.
+
+    *       "url"
+
+            URL of link.
+
+            Default value is undef.
+
+  "css_class"
+     my $css_class = $obj->css_class;
+
+    Get CSS class for form.
+
+    Returns string.
+
+  "data"
+     my $data = $obj->data;
+
+    Get data inside button element.
+
+    Returns reference to array.
+
+  "data_type"
+     my $data_type = $obj->data_type;
+
+    Get button data type.
+
+    Returns string.
+
+  "url"
+     my $url = $obj->url;
+
+    Get URL of link.
+
+    Returns string.
+
+ERRORS
+     new():
+             Parameter 'data' must be a array.
+                    Value: %s
+                    Reference: %s
+             Parameter 'data' in 'plain' mode must contain reference to array with scalars.
+             Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
+             Parameter 'data_type' has bad value.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::HTML::A;
+
+     my $obj = Data::HTML::A->new(
+             'css_class' => 'link',
+             'data' => ['Michal Josef Spacek homepage'],
+             'url' => 'https://skim.cz',
+     );
+
+     # Print out.
+     print 'CSS class: '.$obj->css_class."\n";
+     print 'Data: '.(join '', @{$obj->data})."\n";
+     print 'Data type: '.$obj->data_type."\n";
+     print 'URL: '.$obj->url."\n";
+
+     # Output:
+     # CSS class: link
+     # Data: Michal Josef Spacek homepage
+     # Data type: plain
+     # URL: https://skim.cz
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::HTML::A;
+     use Tags::Output::Raw;
+
+     my $obj = Data::HTML::A->new(
+             'css_class' => 'link',
+             # Tags(3pm) structure.
+             'data' => [
+                     ['b', 'span'],
+                     ['a', 'class', 'span-link'],
+                     ['d', 'Link'],
+                     ['e', 'span'],
+             ],
+             'data_type' => 'tags',
+             'url' => 'https://skim.cz',
+     );
+
+     my $tags = Tags::Output::Raw->new;
+
+     # Serialize data to output.
+     $tags->put(@{$obj->data});
+     my $data = $tags->flush(1);
+
+     # Print out.
+     print 'CSS class: '.$obj->css_class."\n";
+     print 'Data (serialized): '.$data."\n";
+     print 'Data type: '.$obj->data_type."\n";
+     print 'URL: '.$obj->url."\n";
+
+     # Output:
+     # CSS class: link
+     # Data (serialized): <span class="span-link">Link</span>
+     # Data type: tags
+     # URL: https://skim.cz
+
+DEPENDENCIES
+    Error::Pure, List::Util, Mo, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-HTML-A>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

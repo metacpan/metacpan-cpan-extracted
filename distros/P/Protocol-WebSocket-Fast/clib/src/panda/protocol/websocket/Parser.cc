@@ -35,6 +35,13 @@ void Parser::reset () {
     _suggested_close_code = 0;
 }
 
+bool Parser::should_deflate(Opcode opcode, size_t payload_length) const {
+    return _deflate_cfg &&
+           _deflate_cfg->compression_threshold <= payload_length &&
+           (opcode == Opcode::TEXT || _deflate_cfg->default_compress_binary) &&
+           payload_length > 0;
+}
+
 bool Parser::_parse_frame (Frame& frame) {
     if (!frame.parse(_buffer)) {
         _buffer.clear();

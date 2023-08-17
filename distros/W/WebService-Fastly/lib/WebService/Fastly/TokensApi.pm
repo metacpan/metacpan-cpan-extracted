@@ -47,6 +47,178 @@ sub new {
 
 
 #
+# bulk_revoke_tokens
+#
+# Revoke multiple tokens
+#
+# @param HASH[string,object] $request_body  (optional)
+{
+    my $params = {
+    'request_body' => {
+        data_type => 'HASH[string,object]',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'bulk_revoke_tokens' } = {
+        summary => 'Revoke multiple tokens',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub bulk_revoke_tokens {
+    my ($self, %args) = @_;
+
+    # parse inputs
+    my $_resource_path = '/tokens';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept();
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/vnd.api+json; ext=bulk');
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'request_body'}) {
+        $_body_data = $args{'request_body'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(token )];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
+# create_token
+#
+# Create a token
+#
+{
+    my $params = {
+    };
+    __PACKAGE__->method_documentation->{ 'create_token' } = {
+        summary => 'Create a token',
+        params => $params,
+        returns => 'TokenCreatedResponse',
+        };
+}
+# @return TokenCreatedResponse
+#
+sub create_token {
+    my ($self, %args) = @_;
+
+    # parse inputs
+    my $_resource_path = '/tokens';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/x-www-form-urlencoded');
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(token username_and_password )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TokenCreatedResponse', $response);
+    return $_response_object;
+}
+
+#
+# get_token
+#
+# Get a token
+#
+# @param string $token_id Alphanumeric string identifying a token. (required)
+{
+    my $params = {
+    'token_id' => {
+        data_type => 'string',
+        description => 'Alphanumeric string identifying a token.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_token' } = {
+        summary => 'Get a token',
+        params => $params,
+        returns => 'TokenResponse',
+        };
+}
+# @return TokenResponse
+#
+sub get_token {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'token_id' is set
+    unless (exists $args{'token_id'}) {
+      croak("Missing the required parameter 'token_id' when calling get_token");
+    }
+
+    # parse inputs
+    my $_resource_path = '/tokens/{token_id}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type();
+
+    # path params
+    if ( exists $args{'token_id'}) {
+        my $_base_variable = "{" . "token_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'token_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(token )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TokenResponse', $response);
+    return $_response_object;
+}
+
+#
 # get_token_current
 #
 # Get the current token

@@ -3,7 +3,7 @@ use utf8;
 use strict;
 use warnings;
 use Moo;
-use Types::Standard qw/InstanceOf Enum/;
+use Types::Standard qw/InstanceOf Enum Bool/;
 
 =head1 NAME
 
@@ -20,6 +20,10 @@ All are read-only instances of L<Text::Amuse::Compile::Fonts::Family>.
 =head2 mono
 
 =head2 size
+
+=head2 luatex
+
+Boolean if running under luatex
 
 =head2 all_fonts
 
@@ -49,6 +53,10 @@ The other languages as arrayref
 
 Boolean if bidirectional
 
+=item main_is_rtl
+
+Boolean if main language is RTL
+
 =item is_slide
 
 Boolean if for beamer
@@ -70,7 +78,7 @@ has sans => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile:
 has main => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Family']);
 has size => (is => 'ro', default => sub { 10 }, isa => Enum[9..14]);
 has all_fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts']);
-
+has luatex => (is => 'ro', default => sub { 0 }, isa => Bool);
 
 sub compose_polyglossia_fontspec_stanza {
     my ($self, %args) = @_;
@@ -130,7 +138,11 @@ HYPERREF
     my $main_lang = $args{lang} || 'english';
     my @langs = (@{ $args{others} || [] }, $main_lang);
     my $babel_langs = join(',', @langs) . ",shorthands=off";
-    my $bidi = $args{bidi} ? ", bidi=default" : "";
+    my $bidi_schema = 'basic';
+    unless ($self->luatex) {
+        $bidi_schema = $args{main_is_rtl} ? 'bidi-r' : 'bidi-l';
+    }
+    my $bidi = $args{bidi} ? ", bidi=$bidi_schema" : "";
     BABELFONTS: {
         if (Text::Amuse::Utils::has_babel_ldf($main_lang)) {
             # one or more is missing, load the main from ldf, others from ini

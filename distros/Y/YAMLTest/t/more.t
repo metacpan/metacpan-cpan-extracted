@@ -1,41 +1,56 @@
 #!/usr/bin/env yamltest
 
-- plan: 8
+plan: 11
 
-- pass: This test will always 'pass'
+pass: "This test will always 'pass'"
 
-- todo:
-  - Testing 'todo'
-  - fail: This test will always 'fail'
+note: "The next test has no label:"
 
-- note: "NOTE: This is awesome"
+pass: []
 
-- diag: This is a WARNING!
+todo:
+- "Testing 'todo'"
+- fail: "This test will always 'fail'"
 
-- ok:
-  - true
-  - Testing 'ok'
+note: "NOTE: This is awesome"
 
-- is:
-  - add: [2, 2]
-  - 4
-  - 2 + 2 'is' 4
+diag: "This is a WARNING!"
 
-- isnt:
-  - add: [2, 2]
-  - 5
-  - 2 + 2 'isnt' 5
+ok: true "Testing 'ok'"
 
-- like:
-  - I like pie!
-  - /\blike\b/
-  - Testing 'like'
+is:
+  (2 + 2)
+  4
+  "2 + 2 'is' 4"
 
-- unlike:
-  - Please like me on Facebook
-  - /\bunlike\b/
-  - Testing 'unlike'
+isnt:
+  (2 + 2)
+  5
+  "2 + 2 'isnt' 5"
 
-- skip:
-  - Skipping - Highway to the danger zone
-  - danger: zone
+like:
+- "I like pie!"
+- /\blike\b/
+- "Testing 'like'"
+
+unlike:
+- "Please like me on Facebook"
+- /\bunlike\b/
+- "Testing 'unlike'"
+
+skip:
+- "Skipping - Highway to the danger zone"
+- danger: zone
+
+subtest:
+- "Testing skip-all in subtest"
+- skip-all: "Skipping all these subtests"
+- pass: "I wanna pass..."
+- fail: "Gonna fail..."
+
+subtest:
+- "Testing 'subtests'"
+- pass: "Subtest 1"
+- pass: "Subtest 2"
+- pass: "Subtest 3"
+- done-testing: 3

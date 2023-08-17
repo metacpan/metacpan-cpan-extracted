@@ -1,5 +1,8 @@
 Revision history for Perl module Ma::OSVersion
 
+1.009 2023-06-07T02:20:04Z
+	* Update for macOS 14, Sonoma
+
 1.008 2022-06-07T01:05:22Z
 	* Update macOS 13 to "Ventura"
 

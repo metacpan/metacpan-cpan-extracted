@@ -1,7 +1,7 @@
 #
 #       Makefile.PL for Term::ReadLine::Gnu
 #
-#       Copyright (c) 1996-2022 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1996-2023 Hiroo Hayashi.  All rights reserved.
 #               <hiroo.hayashi@computer.org>
 #
 #       This program is free software; you can redistribute it and/or
@@ -188,7 +188,7 @@ WriteMakefile
       ) : () ),
      INC          => "@RLINC",
      dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-     clean        => { FILES => "rlver.c rlver$Config{_exe} rlmalloc.c rlmalloc$Config{_exe} .history_test" },
+     clean        => { FILES => "rlver.c rlver$Config{_exe} rlmalloc.c rlmalloc$Config{_exe} *.dSYM .history_test" },
 );
 
 if ($Config{usesfio} eq 'true') {

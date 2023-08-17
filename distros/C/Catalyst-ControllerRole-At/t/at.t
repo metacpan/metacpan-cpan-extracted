@@ -25,8 +25,23 @@
 
     sub entities :Via(root) At() {
       my ($self, $c) = @_;
-      return $c->body('entities');
+      return $c->res->body('entities');
     }
+
+    sub entities_get :Get('get') Via(root) {
+      my ($self, $c) = @_;
+      return $c->res->body('entities_get');
+    }
+
+    sub entities_post :Post('post') Via('root') {
+      my ($self, $c) = @_;
+      return $c->res->body('entities_post');
+    }
+
+    sub entities_put :Put('put') Via(root) {
+      my ($self, $c) = @_;
+      return $c->res->body('entities_put');
+    } 
 
     sub not_found :Via('root') At({*}) {
       my ($self, $c, @args) = @_;
@@ -76,7 +91,7 @@
   with 'MyApp::BaseController';
   
 
-  sub places :Via($up/people) :At($affix/{name:Str}?{p=11:Int}{?rows:Int}) {
+  sub places :Via($up/people) :At($path_end/{name:Str}?{p=11:Int}{?rows:Int}) {
     $_->res->body($_{p}.($_{rows}||'na'));
   }
 
@@ -224,6 +239,24 @@ use Catalyst::Test 'MyApp';
   ok my $res = request GET "/people/places/newyork?p=2";
   is $res->code, 200;
   is $res->content, '2na';
+}
+
+{
+  ok my $res = request POST "/post";
+  is $res->code, 200;
+  is $res->content, 'entities_post';
+}
+
+{
+  ok my $res = request GET "/get";
+  is $res->code, 200;
+  is $res->content, 'entities_get';
+}
+
+{
+  ok my $res = request PUT "/put";
+  is $res->code, 200;
+  is $res->content, 'entities_put';
 }
 
 done_testing;

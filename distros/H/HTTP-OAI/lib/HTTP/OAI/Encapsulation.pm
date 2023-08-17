@@ -8,7 +8,7 @@ use HTTP::OAI::SAXHandler qw( :SAX );
 use vars qw(@ISA);
 @ISA = qw(XML::SAX::Base);
 
-our $VERSION = '4.12';
+our $VERSION = '4.13';
 
 sub new {
 	my $class = shift;

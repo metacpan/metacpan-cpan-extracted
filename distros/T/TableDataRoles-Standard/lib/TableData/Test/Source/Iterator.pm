@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-06-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'TableDataRole::Source::Iterator';
 
@@ -45,7 +45,7 @@ TableData::Test::Source::Iterator - A test table
 
 =head1 VERSION
 
-This document describes version 0.015 of TableData::Test::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2023-02-24.
+This document describes version 0.016 of TableData::Test::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
 
 =head1 SYNOPSIS
 

@@ -16,11 +16,12 @@ name: IO-Socket-IP
 provides:
   IO::Socket::IP:
     file: lib/IO/Socket/IP.pm
-    version: '0.41'
+    version: '0.42'
 requires:
   IO::Socket: '0'
   Socket: '1.97'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ use Types::Common::Numeric qw/PositiveInt/;
 
 # ABSTRACT: Type helpers
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -322,7 +322,7 @@ MarpaX::Java::ClassFile::Struct::_Types - Type helpers
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

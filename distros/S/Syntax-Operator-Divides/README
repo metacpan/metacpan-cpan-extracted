@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-    On a suitable perl version:
+    On Perl v5.38 or later:
 
        use Syntax::Operator::Divides;
     
        say "Multiple of 10" if $x %% 10;
 
-    Or, on a standard perl via Syntax::Keyword::Match:
+    Or via Syntax::Keyword::Match on Perl v5.14 or later:
 
        use v5.14;
        use Syntax::Keyword::Match;
@@ -31,15 +31,16 @@ DESCRIPTION
     divides test which returns true if the lefthand operand is a whole
     multiple of the righthand.
 
-    Current stable versions of perl do not directly support custom infix
-    operators, but the ability was added in the 5.37.x development cycle
-    and is available from perl v5.37.7 onwards. The documentation of
-    XS::Parse::Infix describes the situation in more detail. This module is
-    therefore almost entirely useless on stable perl builds. While the
-    regular parser does not support custom infix operators, they are
-    supported via XS::Parse::Infix and hence XS::Parse::Keyword, and so
-    custom keywords which attempt to parse operator syntax may be able to
-    use it.
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+    While Perl versions before this do not support custom infix operators,
+    they can still be used via XS::Parse::Infix and hence
+    XS::Parse::Keyword. Custom keywords which attempt to parse operator
+    syntax may be able to use these. One such module is
+    Syntax::Keyword::Match; see the SYNOPSIS example given above.
 
 OPERATORS
 

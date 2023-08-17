@@ -12,24 +12,22 @@ A YAMLScript program C<99-bottles.ys>:
 
     #!/usr/bin/env yamlscript
 
-    main(number=99):
-      map:
-      - println
-      - map:
-        - paragraph
-        - range(number, 0, -1)
+    defn main(number=99):
+      map(say):
+        map(paragraph):
+          (number .. 1)
 
-    paragraph(num): |
+    defn paragraph(num): |
       $(bottles num) of beer on the wall,
       $(bottles num) of beer.
       Take one down, pass it around.
       $(bottles (num - 1)) of beer on the wall.
 
-    bottles(n):
-      cond: [
-        (n == 0), "No more bottles",
-        (n == 1), "1 bottle",
-        :else,    "$n bottles" ]
+    defn bottles(n):
+      ???:
+        (n == 0) : "No more bottles"
+        (n == 1) : "1 bottle"
+        :else    : "$n bottles"
 
 Run: C<yamlscript 99-bottles.ys 3>
 
@@ -53,18 +51,18 @@ Use the YAMLScript REPL:
     $ yamlscript
     Welcome to YAMLScript [perl]
 
-    user=> nums =: range(1 4)
+    user=> nums =: (1 .. 3)
     user/nums
     user=> nums
     (1 2 3)
     user=> map(inc nums)
     (2 3 4)
-    user=> <ctrl-D>         # to exit
+    user=> <CTL-D>         # to exit
     $
 
 =head1 STATUS
 
-This is very ALPHA software. Expect things to change.
+This is ALPHA software. Expect things to change.
 
 =head1 DESCRIPTION
 
@@ -72,11 +70,11 @@ B<YAMLScript> is a programming language that uses YAML as a base syntax. It feel
 
 In fact, YAMLScript I<is> a Lisp. It's a YAML-based specialized syntax reader for the B<Clojure> programming language. Clojure is a Lisp hosted by the Java JVM and also by JavaScript where it's called B<ClojureScript>.
 
-YAMLScript (in its current early stages) is only available in Perl where it targets a I<Perl port of Clojure> called B<Lingy>.
+YAMLScript (in its current early stages) is only available in Perl where it targets a I<Clojure Platform for Perl> called B<Lingy>.
 
-L<Lingy|https://metacpan.org/pod/Lingy> intends to be ported to many other host programming languages. YAMLScript intends to work anywhere there is a Clojure or Lingy available.
+L<Lingy|https://metacpan.org/pod/Lingy> intends to be ported to many other host programming languages. YAMLScript intends to work anywhere there is a Clojure Platform available (including Lingy, Clojure and ClojureScript).
 
-For the remainder of this document when we say B<Clojure> it also means B<Lingy>.
+For the remainder of this document when we say B<Clojure> it means any B<Clojure Platform> (including B<Lingy>).
 
 =head1 INSTALLATION
 
@@ -104,6 +102,57 @@ Once installed you will have access to the C<yamlscript> CLI command.
 
 =back
 
+=head1 REPL USAGE
+
+YAMLScript has REPL that is a modified version of the Lingy REPL.
+
+The main difference is that YAML and thus YAMLScript are line oriented. It is likely you'll want to enter multiple lines to complete one expression.
+
+Here is an example of how to do that:
+
+    user=> ---
+      #_=> say:
+      #_=> - "Hello"
+      #_=> - "world"
+      #_=> ...
+    Hello world
+    nil
+    user=>
+
+You enter multi-line mode with the line C<---> and end it with C<...>. After you end it, the entire input will be evaluated.
+
+The REPL considers the entire entry to be a single value. In other words, when you press up-arrow, the entire multi-line value will come up for editing and re-evaluation.
+
+=head1 YAMLSCRIPT CORE LIBRARY
+
+YAMLScript has it's own core library with a small set of functions that differ from Clojure and Lingy core. This library is automatically required by the YAMLScript Runtime.
+
+The YAMLScript Core Functions are:
+
+=over
+
+=item * C<read-file-ys>
+
+Reads and evaluates a YAMLScript C<.ys> file.
+
+=item * C<read-string-ys>
+
+Reads and evaluates a YAMLScript code string.
+
+=item * C<say>
+
+An alias for C<println>.
+
+=item * C<yamlscript-version>
+
+Returns the YAMLScript version mapping.
+
+=item * C<..>
+
+The YAMLScript infix range operator. Described below.
+
+=back
+
 =head1 YAMLSCRIPT DOCUMENTATION
 
 Since the YAMLScript programming language is just a different syntax for the Clojure programming language, you should read the Clojure documentation to see what it can do.
@@ -118,7 +167,7 @@ To be good at programming in YAMLScript you need to be fairly well versed in 3 t
 
 =back
 
-Many people see YAML as obvious and trivial, but YAMLScript takes advantage of some aspects of YAML that you might not be aware of. We'll cover those things in the following sections.
+Many people see YAML as obvious and trivial, but YAMLScript takes advantage of some aspects of YAML that you might not be aware of. We'll cover many of those things in the following sections.
 
 =over
 
@@ -189,7 +238,7 @@ This probably looks more like a YAML file to you. There's a few interesting thin
 
 =item * YAMLScript supports string interpolation in double quoted strings. See the C<$name> variable in C<"Hello, $name">.
 
-=item * The program is written as one mapping but it represents 2 Clojure statements. Also key/pair order must be honored here, obviously. YAML mappings don't guarantee key order. This will be explained more below in "YAMLScript Implementation Details".
+=item * The program is written as one mapping but it represents 2 Clojure statements. Also key/pair order must be honored here, obviously. Mappings loaded into the YAML data model don't guarantee key order, but YAMLScript mappings do. This will be explained more below in "YAMLScript Implementation Details".
 
 =back
 
@@ -232,9 +281,9 @@ Another thing you'll likely run into is places where Clojure syntax collides wit
 
     - (def vec1 [5 7 9])                # Define a variable bound to a vector
     - vec2: [5 7 9]                     # Bad. YAML sees it as `["5 7 9"]`
-    - vec3: \[5 7 9]                    # Good. Backslash makes value a YAML scalar
+    - vec3: .[5 7 9]                    # Good. The period makes value a YAML scalar
 
-Use a backslash at the start of a value so that YAML will consider the value to be a scalar, thus interpreted as a Clojure expression.
+Use a period at the start of a value so that YAML will consider the value to be a scalar, thus interpreted as a Clojure expression.
 
 What if you want to use YAML to define an actual data structure in your YAMLScript program?
 
@@ -256,13 +305,13 @@ Syntactically Clojure is a Lisp. This means that all code expressions are writte
 
 In each of the nested expression lists here, the function name comes first (C<println>, C<str>, C<+>) followed by its arguments. When an expression is evaluated, its arguments are evaluated first.
 
-Note: Some Clojure expressions are "Macros" or "Special Forms" rather than functions, and evaluation happens differently. That's a more advanced Clojure topic and not covered here.
+Note: Some Clojure expressions are "Macros" or "Special Forms" rather than functions, and evaluation happens differently. That's a more advanced Clojure topic and not covered here. But macros and special forms look the same as function call expressions and you can mostly think of them as the same thing.
 
 Mostly Clojure code is not affected by whitespace; a program can possibly be joined together onto a single line and still work. An exception is comments which start with a semicolon and consume the rest of the line.
 
     ; A full line comment
 
-    (prn "ok")  ; A comment after code
+    (say "ok")  ; A comment after code
 
 A logical unit in Clojure is called a "form". Clojure forms include:
 
@@ -282,7 +331,7 @@ Here's a list of the common Clojure tokens:
 
 =item * Symbol
 
-A word like C<foo> that acts like a variable and is bound to other values. Symbol words can contain many non-word characters like C<->, C<.>, C</>, C<:> and C<?>. For instance C<user/is-boolean?> is a valid Clojure symbol. Also math operators like C<+> and C<-> are symbols. YAMLScript and Lingy are more strict about symbols and use a subset of the combinations that are valid in Clojure.
+A word like C<foo> that acts like a variable and is bound to other values. Symbol words can contain many non-word characters like C<->, C<.>, C</>, C<:> and C<?>. For instance C<user/is-boolean?> is a valid Clojure symbol. Also math operators like C<+> and C<-> are symbols. YAMLScript and Lingy are more strict about symbols and use a subset of the combinations that are valid in Clojure. Essentially all the symbols you'll see in real world Clojure are allowed in YAMLScript and Lingy.
 
 =item * Number
 
@@ -294,9 +343,13 @@ Like C<"foo">. Always double quoted.
 
 =item * Character
 
-A character is expressed as a sequence using a backslash followed by the character, like C<\a \b \c>. A few special characters like tab and newline have the forms C<\tab> and C<\newline>. Strings are sequences of characters (using the C<yamlscript> REPL):
+A character is expressed by using a backslash followed by the character, like C<\a \b \c>.
 
-    user=> (seq "Hello\n")
+A few special characters like tab and newline have the forms C<\tab> and C<\newline>.
+
+Strings are sequences of characters (using the C<yamlscript> REPL):
+
+    user=> seq: "Hello\n"
     (\H \e \l \l \o \newline)
 
 =item * Keyword
@@ -305,7 +358,7 @@ A keyword starts with a colon like C<:foo> and is commonly used for HashMap keys
 
 =item * Regular Expression (Regex)
 
-A regex is written like C<#"^foo.*bar">; a string preceded by a hash mark. YAMLScript lets you write them like C</^foo.*bar/> as described later.
+A Clojure regex is written like C<#"^foo.*bar">; a string preceded by a hash mark. YAMLScript lets you write them like C</^foo.*bar/> as described later.
 
 =back
 
@@ -320,6 +373,10 @@ An array using square brackets: C<[1 foo :whee]>. Commas (whitespace) can be use
 =item * HashMap
 
 A hashmap is a set of pairs in curly braces: C<{:foo 1, :bar x}>.
+
+=item * HashSet
+
+A hashset is like a hashmap with only the keys: C<#{:foo :bar}>.
 
 =item * Quoted list
 
@@ -340,6 +397,20 @@ As was just said single quote is used (in all Lisps) to cause whatever follows t
     x
 
 We won't go deeper into Clojure here but it has lots of great documentation online.
+
+See:
+
+=over
+
+=item * L<https://clojure.org/api/cheatsheet|https://clojure.org/api/cheatsheet>
+
+=item * L<https://clojuredocs.org/|https://clojuredocs.org/>
+
+=item * L<https://clojure-doc.org/|https://clojure-doc.org/>
+
+=item * L<https://www.braveclojure.com/|https://www.braveclojure.com/>
+
+=back
 
 =head2 YAMLSCRIPT TO CLOJURE TRANSFORMATIONS
 
@@ -386,17 +457,17 @@ Unquoted words are treated as Clojure symbols.
 
 Plain (unquoted) scalars are treated as Clojure syntax. Scalars starting with C<(> are Clojure expressions.
 
-    prn: (+ (* 2 3) 4)
+    say: (+ (* 2 3) 4)
 
-    (prn (+ (* 2 3) 4))
+    (say (+ (* 2 3) 4))
 
 =item * Yes Expressions
 
 YAMLScript allows you to write many Clojure expressions in forms more familiar in common non-Lisp languages.
 
-    prn: abs(inc(41) * 9)
+    say: abs(inc(41) * 9)
 
-    (prn (abs (* (inc 41) 9)))
+    (say (abs (* (inc 41) 9)))
 
 This includes function symbol before opening paren, and infix math operators.
 
@@ -406,47 +477,62 @@ This includes function symbol before opening paren, and infix math operators.
 
 YAMLScript strings need to be quoted, since plain (unquoted) strings are seen as Clojure symbols (variables) or syntax.
 
-Clojure symbols or expressions preceded by a C<$> are interpolated into double quoted and literal style YAML scalars.
+Clojure symbols or expressions preceded by a C<$> are interpolated inside double quoted and literal style YAML scalars.
 
     # Double quoted strings are interpolated
-    - prn: "Hello, $name!"
+    - say: "Hello, $name!"
     # Multiline literal scalars are interpolated
-    - prn: |
+    - say: |
         Hello, $name.
         Goodbye, $name.
     # Single quoted strings are NOT interpolated
-    - prn: 'Hello, $name!'
+    - say: 'Hello, $name!'
 
-    (prn (str "Hello, " name "!"))
-    (prn (str "Hello, " name ".\nGoodbye, " name ".\n"))
-    (prn "Hello, $name!")
+    (say (str "Hello, " name "!"))
+    (say (str "Hello, " name ".\nGoodbye, " name ".\n"))
+    (say "Hello, $name!")
 
 =item * Function Calls
 
-    prn:
+    say:
       join: [' ', "Hello", "world!"]
 
-    (prn (join " " ["Hello" "world!"]))
+    (say (join " " ["Hello" "world!"]))
 
 A YAML mapping pair with a symbol for a key (unquoted word) and a sequence of arguments. If a single argument is used then it doesn't need to be in a sequence.
 
-    - foo:
-    - bar: []
-    - baz()
+Below are 3 different ways to call a function with no arguments.
+
+    - foo: []
+    - bar()
+    - baz():
 
     (foo) (bar) (baz)
 
-Above are 3 different ways to call a function with no arguments.
+=item * YAMLScript has many styles to write the semantically equivalent function calls.
+
+These all do the same thing:
+
+    - (say "Hello world!")
+    - say("Hello world!")
+    - say("Hello world!"):
+    - say:
+      - "Hello world!"
+    - say: ["Hello world!"]
+    - say: "Hello world!"
+    - say("Hello"): "world!"
+    - say: ["Hello", "world!"]
+    - say: ."Hello", "world!"
 
 =item * Function Definition
 
-    double-and-add(x, y): ((x * 2) + y)
+    defn double-and-add(x, y): ((x * 2) + y)
 
     (defn double-and-add [x y] (+ (* x 2) y))
 
 =item * Define multiple arity functions
 
-    sum:
+    defn sum:
       (): 0
       (x): x
       (x, y): (x + y)
@@ -458,34 +544,68 @@ Above are 3 different ways to call a function with no arguments.
       ([x y] (+ x y))
       ([x y & z] (+ x y (apply sum z))))
 
-=item * Conditionals
+=item * Conditional Forms
+
+C<if> expressions:
 
     if (x > 50):          # condition
-    - prn("$x wins :)")   # then
-    - prn("$x loses :(")  # else
+    - say("$x wins :)")   # then
+    - say("$x loses :(")  # else
 
-    (is (> x 50)
-      (prn (str x " wins :)"))
-      (prn (str x " loses :(")))
+    (if (> x 50)
+      (say (str x " wins :)"))
+      (say (str x " loses :(")))
+
+C<when> and C<when-not> expressions:
+
+    - (x > 50) ?: say("big")
+    - (x > 50) |: say("small")
+
+    (when (> x 50) (say "big"))
+    (when-not (> x 50) (say "small"))
+
+C<cond> expressions:
+
+    ???:
+      (x > 50) : "big"
+      (x < 50) : "small"
+      :else    : "just right"
+
+    (cond
+      (> x 50) "big"
+      (< x 50) "small"
+      :else    "just right")
 
 =item * Try / Catch
 
     - try: (42 / 0)
       catch(Exception e):
-        prn: "Caught error '$e'"
+        say: "Caught error '$e'"
 
     (try (/ 42 0)
       (catch Exception e
-        (prn (str "Caught error '" e "'"))))
+        (say (str "Caught error '" e "'"))))
 
 =item * Iteration
 
     for (name):
     - ! [Alice, Bob, Curly]
-    - prn: "Hello, $name!"
+    - say: "Hello, $name!"
 
     (for [name ["Alice", "Bob", "Curly"]]
-      (prn (str "Hello, " name "!")))
+      (say (str "Hello, " name "!")))
+
+=item * Looping
+
+    loop [x 1]:
+      say: x
+      if (x < 5):
+        ^^^: (x + 1)
+
+    (loop [x 1]
+      (say x)
+      (if (< x 5)
+        (recur (+ x 1))))
 
 =item * Namespacing and Importing Modules
 
@@ -508,14 +628,14 @@ Perl YAMLScript modules may be written in YAMLScript, Lingy or Perl.
 =item * Method Invocation
 
     obj =: Foo::Bar->new()
-    prn: obj->method(42)
+    say: obj->method(42)
 
     (def obj (.new Foo.Bar))
-    (prn (. obj (method 42))
+    (say (. obj (method 42))
 
 =back
 
-=head3 yexprs - "Yes Expressions"
+=head3 ysexprs - "Yes Expressions"
 
 Coming from non-Lisp programming languages, Lisp "sexpr" (S Expression) syntax can feel awkward with the function name going inside the parens and the math operators coming first.
 
@@ -531,7 +651,7 @@ They are just a set of simple transformations that we'll describe here.
 
     (foo 123 "xyz")
 
-The funtion word can come before the opening paren instead of after it. It's a simple switcheroo. Note: there should be no space between the function name and the C<(>.
+The function word can come before the opening paren instead of after it. It's a simple switcheroo. Note: there can be no space between the function name and the C<(>.
 
 =item * Nested calls
 
@@ -539,7 +659,7 @@ The funtion word can come before the opening paren instead of after it. It's a s
 
     (foo 123, (bar 456), (baz))
 
-Just as you would expect. Commas were added for readability in this example.
+Just as you would expect. Commas were added for readability in this example; but they are just whitespace characters as we said above.
 
 =item * Infix Operators
 
@@ -556,6 +676,16 @@ This doesn't work for longer expressions:
     (a + (b * c))     # OK
 
     (+ a (* b c))     # Clojure
+
+=item * Infix Range Operator
+
+There is a special operator C<..> that only works infix. It auto-detects descending ranges and includes the terminating number in the range.
+
+    r =: (1 .. 10)
+    s =: (10 .. 1)
+
+    (def r (range 1 11))
+    (def s (range 10 0 -1))
 
 =item * Keep Prefix
 
@@ -589,13 +719,13 @@ Most people use YAML to C<load> YAML files or strings into native data structure
 
     data = yaml.load-file("foo.yaml")
 
-But the YAML load process is far from simple. It goes something like this:
+But the YAMLScript load process is far from simple. It goes something like this:
 
 =over
 
-=item * Read YAML text from a file
+=item * Read YAMLScript text from a file
 
-=item * Parse YAML text into a stream of events
+=item * Parse YAMLScript text into a stream of events
 
 =item * Compose the events into a graph
 
@@ -621,15 +751,15 @@ These include:
 
 =item * Mapping Key Order
 
-The YAML parser reports all the info (parse events) it creates in the same order as it was parsed from the YAML source, including mapping keys. Since YAMLScript is not trying to turn this info into a normal mapping, it is ok for the reader to make use of and preserve this order int the Clojure AST it is making.
+The YAML parser reports all the info (parse events) it creates in the same order as it was parsed from the YAML source, including mapping keys. Since YAMLScript is not trying to turn this info into a normal mapping, it is ok for the reader to make use of and preserve this order in the Clojure AST it is making.
 
 =item * Mapping Key Duplication
 
 In the same regard, YAMLScript doesn't care if you use the same key, as long as it makes sense to YAMLScript.
 
     # Execute in order:
-    prn: "one"
-    prn: "two"
+    say: "one"
+    say: "two"
 
 =item * Scalar Quoting Style
 
@@ -672,17 +802,23 @@ The result is a data structure of the same form that Lingy::Reader would produce
 
 =head1 YAMLSCRIPT PROGRAMS
 
-The YAMLScript source repository contains L<example YAMLScript programs|https://github.com/yaml/yamlscript/tree/main/eg>.
+The YAMLScript source repository contains L<example YAMLScript programs|https://github.com/yaml/yamlscript/tree/main/perl/eg>.
+
+These programs are also available on RosettaCode.org L<here|https://rosettacode.org/wiki/Category:YAMLScript>.
 
 =head2 TEST::MORE::YAMLSCRIPT
 
 YAMLScript (like Clojure) is designed to both use the host language and be used by the host language.
 
-An great example is the CPAN module L<Test::More::YAMLScript|https://metacpan.org/pod/Test::More::YAMLScript>. This module lets Perl programmers write their unit tests in YAMLScript.
+A great example is the CPAN module L<Test::More::YAMLScript|https://metacpan.org/pod/Test::More::YAMLScript>. This module lets Perl programmers write their unit tests in YAMLScript.
 
 The L<module itself|https://metacpan.org/dist/Test-More-YAMLScript/source/lib/Test/More/YAMLScript.ys> is also written in YAMLScript!
 
 And of course, its tests are written in YAMLScript.
+
+=head2 YAMLTEST
+
+L<YAMLTest|https://metacpan.org/pod/YAMLTest> is another CPAN module that extends the basic functionality of Test::More::YAMLScript.
 
 =head1 SEE ALSO
 
@@ -695,6 +831,8 @@ And of course, its tests are written in YAMLScript.
 =item * L<Lingy|https://metacpan.org/pod/Lingy>
 
 =item * L<Test::More::YAMLScript|https://metacpan.org/pod/Test::More::YAMLScript>
+
+=item * L<YAMLTest|https://metacpan.org/pod/YAMLTest>
 
 =back
 

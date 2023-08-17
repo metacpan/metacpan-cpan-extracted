@@ -4,14 +4,15 @@ use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.1.3};
+our $VERSION = q{1.2.0};
 
 our @_OMP_VARS = (
-    qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE
+    qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE OMP_NUM_TEAMS
       OMP_DYNAMIC OMP_MAX_ACTIVE_LEVELS OMP_MAX_TASK_PRIORITY OMP_NESTED
       OMP_NUM_THREADS OMP_PROC_BIND OMP_PLACES OMP_STACKSIZE OMP_SCHEDULE
       OMP_TARGET_OFFLOAD OMP_THREAD_LIMIT OMP_WAIT_POLICY GOMP_CPU_AFFINITY
-      GOMP_DEBUG GOMP_STACKSIZE GOMP_SPINCOUNT GOMP_RTEMS_THREAD_POOLS/
+      GOMP_DEBUG GOMP_STACKSIZE GOMP_SPINCOUNT GOMP_RTEMS_THREAD_POOLS
+      OMP_TEAMS_THREAD_LIMIT/
 );
 
 # capture state of %ENV
@@ -24,16 +25,18 @@ sub new {
     my $validate_rules = {
         fields  => \@_OMP_VARS,
         filters => [
-            [qw/OMP_CANCELLATION OMP_DYNAMIC OMP_NESTED OMP_DISPLAY_ENV OMP_TARGET_OFFLOAD OMP_WAIT_POLICY/] => filter('uc'),    # force to upper case for convenience
+            [qw/OMP_CANCELLATION OMP_NESTED OMP_DISPLAY_ENV OMP_TARGET_OFFLOAD OMP_WAIT_POLICY/] => filter('uc'),    # force to upper case for convenience
         ],
         checks => [
-            [qw/OMP_CANCELLATION OMP_DYNAMIC OMP_NESTED/]                => is_in( [qw/TRUE FALSE/],                 q{Expected values are: 'TRUE' or 'FALSE'} ),
+            [qw/OMP_DYNAMIC OMP_NESTED/]                                 => is_in( [qw/TRUE true 1 FALSE false 0/],  q{Expected values are: 'true', 1, 'false', or 0} ),
+            [qw/OMP_CANCELLATION/]                                       => is_in( [qw/TRUE FALSE/],                 q{Expected values are: 'TRUE' or 'FALSE'} ),
             OMP_DISPLAY_ENV                                              => is_in( [qw/TRUE VERBOSE FALSE/],         q{Expected values are: 'TRUE', 'VERBOSE', or 'FALSE'} ),
             OMP_TARGET_OFFLOAD                                           => is_in( [qw/MANDATORY DISABLED DEFAULT/], q{Expected values are: 'MANDATORY', 'DISABLED', or 'DEFAULT'} ),
             OMP_WAIT_POLICY                                              => is_in( [qw/ACTIVE PASSIVE/],             q{Expected values are: 'ACTIVE' or 'PASSIVE'} ),
             GOMP_DEBUG                                                   => is_in( [qw/0 1/],                        q{Expected values are: 0 or 1} ),
             [qw/OMP_MAX_TASK_PRIORITY OMP_DEFAULT_DEVICE/]               => sub { return _is_ge_if_set( 0, @_ ) },
             [qw/OMP_NUM_THREADS OMP_MAX_ACTIVE_LEVELS OMP_THREAD_LIMIT/] => sub { return _is_ge_if_set( 1, @_ ) },
+            [qw/OMP_NUM_TEAMS OMP_TEAMS_THREAD_LIMIT/]                   => sub { return _is_ge_if_set( 1, @_ ) },
 
             #-- the following are not current validated due to the complexity of the rules associated with their values
             OMP_PROC_BIND           => _no_validate(),
@@ -188,7 +191,14 @@ sub unset_omp_default_device {
 sub omp_dynamic {
     my ( $self, $value ) = @_;
     my $ev = q{OMP_DYNAMIC};
-    return $self->_get_set_assert( $ev, $value );
+    my $old = $ENV{OMP_DYNAMIC};
+    if (not $value or $value eq q{false} or $value eq q{FALSE}) {
+     $self->unset_omp_dynamic();
+     return $old;
+    }
+    else {
+      return $self->_get_set_assert( $ev, $value );
+    }
 }
 
 sub unset_omp_dynamic {
@@ -224,7 +234,14 @@ sub unset_omp_max_task_priority {
 sub omp_nested {
     my ( $self, $value ) = @_;
     my $ev = q{OMP_NESTED};
-    return $self->_get_set_assert( $ev, $value );
+    my $old = $ENV{OMP_NESTED};
+    if (not $value or $value eq q{false} or $value eq q{FALSE}) {
+     $self->unset_omp_nested();
+     return $old;
+    }
+    else {
+      return $self->_get_set_assert( $ev, $value );
+    }
 }
 
 sub unset_omp_nested {
@@ -242,6 +259,18 @@ sub omp_num_threads {
 sub unset_omp_num_threads {
     my ( $self, $value ) = @_;
     my $ev = q{OMP_NUM_THREADS};
+    return delete $ENV{$ev};
+}
+
+sub omp_num_teams {
+    my ( $self, $value ) = @_;
+    my $ev = q{OMP_NUM_TEAMS};
+    return $self->_get_set_assert( $ev, $value );
+}
+
+sub unset_omp_num_teams {
+    my ( $self, $value ) = @_;
+    my $ev = q{OMP_NUM_TEAMS};
     return delete $ENV{$ev};
 }
 
@@ -314,6 +343,18 @@ sub omp_thread_limit {
 sub unset_omp_thread_limit {
     my ( $self, $value ) = @_;
     my $ev = q{OMP_THREAD_LIMIT};
+    return delete $ENV{$ev};
+}
+
+sub omp_teams_thread_limit {
+    my ( $self, $value ) = @_;
+    my $ev = q{OMP_TEAMS_THREAD_LIMIT};
+    return $self->_get_set_assert( $ev, $value );
+}
+
+sub unset_omp_teams_thread_limit {
+    my ( $self, $value ) = @_;
+    my $ev = q{OMP_TEAMS_THREAD_LIMIT};
     return delete $ENV{$ev};
 }
 
@@ -565,7 +606,8 @@ Extended benchmarking, affecting C<OMP_SCHEDULE> in addition toC<OMP_NUM_THREADS
         my $chunk = get_baby_ruth($i);
         
         # set schedule using prescribed format
-        $env->set_omp_schedule(qq{$sched;$chunk}); # Note: Not validated
+        $env->set_omp_schedule(qq{$sched,$chunk});
+        # Note: format is OMP_SCHED_T[,CHUNK] where OMP_SCHED_T is: 'static', 'dynamic', 'guided', or 'auto'; CHUNK is an integer >0 
         
         my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
          
@@ -848,6 +890,13 @@ Setter/getter for C<OMP_CANCELLATION>.
 
 Validated.
 
+B<Note:> it appears that the OpenMP Specification (any version) does not define a runtime
+method to set this. When used with L<OpenMP::Simple>, which makes it a little easier
+to deal with C<Inline::C>'d OpenMP routines, this must be set before the shared libraries
+are loaded from C<Inline::C>. The only real opportunity to do this is in the C<BEGIN>
+block. However, if dealing with a standalone binary executable; this environmental variable
+will do what you mean when updated between calls to the external executable.
+
 =item C<unset_omp_cancellation>
 
 Unsets C<OMP_CANCELLATION>, deletes it from localized C<%ENV>.
@@ -881,7 +930,18 @@ Unsets C<OMP_DEFAULT_DEVICE>, deletes it from localized C<%ENV>.
 
 Setter/getter for C<OMP_DYNAMIC>.
 
-Validated.
+Validated. If set to a I<falsy> value, the key C<$ENV{OMP_DYNAMIC}> is deleted
+entirely, because this seems to be how GCC's GOMP needs it to be presented.
+Simply setting it to C<0> or C<false> will not work. It has to be I<unset>.
+So setting it to a I<falsy> value is the same as calling C<unset_omp_dynamic>.
+
+=over 4
+
+=item B<'true'> | 1
+
+=item B<'false'> | 0 | I<unset>
+
+=back
 
 B<Note:> The other environmental variables presented in this module
 do not have run time I<setters>. Dealing with tese dynamically
@@ -945,9 +1005,32 @@ function associated with it. Therefore, the approach of I<rereading> the
 environment demostrated in L<Example 5> may be used to use this module
 for affecting this setting at run time.
 
+For more information on this environmental variable, please see:
+
+L<https://gcc.gnu.org/onlinedocs/libgomp/openmp-environment-variables/ompnumthreads.html>
+
 =item C<unset_omp_num_threads>
 
 Unsets C<OMP_NUM_THREADS>, deletes it from localized C<%ENV>.
+
+=item C<omp_num_teams>
+
+Setter/getter for C<OMP_NUM_TEAMS>.
+
+Validated.
+
+B<Note:> This environmental variable has a I<Standards> defined run time
+function associated with it. Therefore, the approach of I<rereading> the
+environment demostrated in L<Example 5> may be used to use this module
+for affecting this setting at run time.
+
+For more information on this environmental variable, please see:
+
+L<https://gcc.gnu.org/onlinedocs/libgomp/openmp-environment-variables/ompnumteams.html>
+
+=item C<unset_omp_num_teams>
+
+Unsets C<OMP_NUM_TEAMS>, deletes it from localized C<%ENV>.
 
 =item C<omp_proc_bind>
 
@@ -985,6 +1068,25 @@ Setter/getter for C<OMP_SCHEDULE>.
 
 Not validated.
 
+B<Note:> The format for the environmental variable is C<omp_sched_t[,chunk]> where
+B<omp_sched_t> is: 'static', 'dynamic', 'guided', or 'auto'; B<chunk> is an integer >0
+
+For contrast to the value of C<OMP_SCHEDULE>, the runtime function used to set this in an
+OpenMP program, C<set_omp_schedule> that expects constant values not exposed via the environmental
+variable C<OMP_SCHEDULE>.
+
+E.g.,
+
+  #include<omp.h>
+  ...
+  set_omp_schedule(omp_sched_static, 10); // Note: this is the C runtime function call
+
+For more information on this particular environmental variable please see:
+
+L<https://gcc.gnu.org/onlinedocs/libgomp/openmp-environment-variables/ompschedule.html>
+
+Also, see the tests in L<OpenMP::Simple>.
+
 B<Note:> The other environmental variables presented in this module
 do not have run time I<setters>. Dealing with tese dynamically
 presents some additional hurdles and considerations; this will be
@@ -1013,6 +1115,16 @@ Validated.
 =item C<unset_omp_thread_limit>
 
 Unsets C<OMP_THREAD_LIMIT>, deletes it from localized C<%ENV>.
+
+=item C<omp_teams_thread_limit>
+
+Setter/getter for C<OMP_TEAMS_THREAD_LIMIT>.
+
+Validated.
+
+=item C<unset_omp_teams_thread_limit>
+
+Unsets C<OMP_TEAMS_THREAD_LIMIT>, deletes it from localized C<%ENV>.
 
 =item C<omp_wait_policy>
 
@@ -1261,6 +1373,14 @@ the number of threads is not limited.
 
 This variable is validated via setter.
 
+=item C<OMP_TEAMS_THREAD_LIMIT>
+
+Specifies the number of threads to use for the whole program. The
+value of this variable shall be a positive integer. If undefined,
+the number of threads is not limited.
+
+This variable is validated via setter.
+
 =item C<OMP_WAIT_POLICY>
 
 Specifies whether waiting threads should be active or passive. If
@@ -1372,10 +1492,19 @@ This module provides access to, but does NOT validate this variable.
 
 =head1 SEE ALSO
 
+L<OpenMP::Simple> is a module that aims at making it easier to bootstrap
+Perl+OpenMP programs. It is designed to work together with this module.
+
 This module heavily favors the C<GOMP> implementation of the OpenMP
-specification within gcc.
+specification within gcc. In fact, it has not been tested with any
+other implementations.
 
 L<https://gcc.gnu.org/onlinedocs/libgomp/index.html>
+
+Please also see the C<rperl> project for a glimpse into the potential
+future of Perl+OpenMP, particularly in regards to thread-safe data structures.
+
+L<https://www.rperl.org>
 
 =head1 AUTHOR
 
@@ -1391,7 +1520,7 @@ time versus run time; and when the environment is initialized.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by oodler577
+Copyright (C) 2021-2023 by oodler577
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.30.0

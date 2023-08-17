@@ -24,5 +24,6 @@ José Pedro Oliveira <jpo@di.uminho.pt>	XBM/XPM/TIFF bug reports and patches
 					Testing on Mac and PPC
 Phil Harvey <phil@owl.phy.queensu.ca>	Panasonic Exif MakerNotes
 Ralf Steines <metamonk@yahoo.com> 	GIF fixes
+Zefram and Michael Kröll		AVIF support
 Slaven Rezić <srezic@cpan.org>		Maintainer from 2008 on
 Tels <http://www.bloodgate.com>		Maintainer between 2006 and 2008

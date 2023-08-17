@@ -98,7 +98,7 @@ class Fn {
     return $utf8_char;
   }
   
-  static method contains : int ($string : string, $substring : string, $string_offset = 0 : int, $string_length = -1 : int) {
+  static method contains : int ($string : string, $substring : string, $string_offset : int = 0, $string_length : int = -1) {
     return &index($string, $substring, $string_offset, $string_length) >= 0;
   }
   
@@ -188,7 +188,7 @@ class Fn {
     return $value;
   }
   
-  precompile static method index : int ($string : string, $substring : string, $begin = 0 : int, $end = -1 : int) {
+  precompile static method index : int ($string : string, $substring : string, $begin : int = 0, $end : int = -1) {
     
     unless ($string) {
       die "The \$string must be defined.";
@@ -250,68 +250,7 @@ class Fn {
   }
   
 
-  precompile static method index_v2 : int ($string : string, $substring : string, $begin = 0 : int, $end = -1 : int) {
-    
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($substring) {
-      die "The \$substring must be defined.";
-    }
-    
-    unless ($begin >= 0 && $begin <= length $string) {
-      die "The \$begin must be between 0 and the length of the \$string.";
-    }
-    
-    my $string_length = length $string;
-    
-    if ($end < 0) {
-      $end = $string_length;
-    }
-    
-    unless ($end <= length $string) {
-      die "The \$end must be less than or equal to the length of the \$string.";
-    }
-    
-    unless ($end >= $begin) {
-      die "The \$end must be greater than or equal to \$begin.";
-    }
-    
-    my $substring_length = length $substring;
-    
-    if ($substring_length == 0) {
-      return $begin;
-    }
-    
-    if ($end == $string_length) {
-      $end--;
-    }
-    
-    for (my $i = $begin; $i <= $end; $i++) {
-      my $match = 1;
-      for (my $k = 0; $k < $substring_length; $k++) {
-        
-        if ($i + $k > $end) {
-          $match = 0;
-          last;
-        }
-        
-        unless ($string->[$i + $k] == $substring->[$k]) {
-          $match = 0;
-          last;
-        }
-      }
-      
-      if ($match) {
-        return $i;
-      }
-    }
-    
-    return -1;
-  }
-  
-  precompile static method init_string : void ($string : mutable string, $ascii_code = 0 : int, $offset = 0 : int, $length = -1 : int) {
+  precompile static method init_string : void ($string : mutable string, $ascii_code : int = 0, $offset : int = 0, $length : int = -1) {
     unless ($string) {
       die "The \$string must be defined.";
     }
@@ -661,7 +600,7 @@ class Fn {
     return $ret;
   }
   
-  static method rand : double ($seed : int*, $max = 1 : int) {
+  static method rand : double ($seed : int*, $max : int = 1) {
     
     # 0 <= random_number < 1
     my $random_number = (double)&crand($seed) / ((double)&RAND_MAX() + 1);
@@ -704,7 +643,7 @@ class Fn {
     }
   }
 
-  precompile static method rindex : int ($string : string, $substring : string, $end = -1 : int, $begin = 0 : int) {
+  precompile static method rindex : int ($string : string, $substring : string, $end : int = -1, $begin : int = 0) {
     
     unless ($string) {
       die "The \$string must be defined.";
@@ -765,67 +704,6 @@ class Fn {
     return -1;
   }
 
-  precompile static method rindex_v2 : int ($string : string, $substring : string, $end = -1 : int, $begin = 0 : int) {
-    
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($substring) {
-      die "The \$substring must be defined.";
-    }
-    
-    unless ($begin >= 0 && $begin <= length $string) {
-      die "The \$begin must be between 0 and the length of the \$string.";
-    }
-    
-    my $string_length = length $string;
-    
-    if ($end < 0) {
-      $end = $string_length;
-    }
-    
-    unless ($end <= length $string) {
-      die "The \$end must be less than or equal to the length of the \$string.";
-    }
-    
-    unless ($end >= $begin) {
-      die "The \$end must be greater than or equal to \$begin.";
-    }
-    
-    my $substring_length = length $substring;
-    
-    if ($substring_length == 0) {
-      return $end;
-    }
-    
-    if ($end == $string_length) {
-      $end--;
-    }
-    
-    my $match_chars_count = 0;
-    for (my $i = $end; $i >= $begin; $i--) {
-      my $match = 1;
-      for (my $k = 0; $k < $substring_length; $k++) {
-        if ($i + $k > $end) {
-          $match = 0;
-          last;
-        }
-        
-        unless ($string->[$i + $k] == $substring->[$k]) {
-          $match = 0;
-          last;
-        }
-      }
-      
-      if ($match) {
-        return $i;
-      }
-    }
-    
-    return -1;
-  }
-  
   native static method sizeof_native_int : int ();
   
   native static method sizeof_native_pointer : int ();
@@ -852,7 +730,7 @@ class Fn {
     }
   }
   
-  precompile static method split : string[] ($separator : string, $string : string, $limit = 0 : int) {
+  precompile static method split : string[] ($separator : string, $string : string, $limit : int = 0) {
     unless ($separator) {
       die "The \$separator must be defined.";
     }
@@ -912,7 +790,7 @@ class Fn {
     return $parts;
   }
   
-  static method substr : string ($string : string, $offset : int, $length = -1 : int) {
+  static method substr : string ($string : string, $offset : int, $length : int = -1, $replacement : string = undef) {
     
     unless ($string) {
       die "The \$string must be defined.";
@@ -931,9 +809,15 @@ class Fn {
       die "The \$offset + the \$length must be less than or equal to the length of the \$string.";
     }
     
-    my $substring = (mutable string)new_string_len($length);
-    
-    Fn->memcpy($substring, 0, $string, $offset, $length);
+    my $substring = (string)undef;
+    if ($replacement) {
+      my $replacement_length = length $replacement;
+      $substring = Fn->substr($string, 0, $offset) . $replacement . Fn->substr($string, $offset + $length);
+    }
+    else {
+      $substring = (mutable string)new_string_len($length);
+      Fn->memcpy($substring, 0, $string, $offset, $length);
+    }
     
     return $substring;
   }
@@ -1099,45 +983,45 @@ class Fn {
     }
     
     my $length = length $string;
-    my $start_string_index = -1;
-    my $end_string_index = -1;
+    my $begin_index = -1;
+    my $end_index = -1;
     
     for (my $i = 0; $i < $length; $i++) {
-      if ($start_string_index == -1) {
+      if ($begin_index == -1) {
         if (&is_space($string->[$i])) {
           # Skip
         }
         else {
-          $start_string_index = $i;
+          $begin_index = $i;
           last;
         }
       }
     }
     
     for (my $i = $length - 1; $i >= 0; $i--) {
-      if ($end_string_index == -1) {
+      if ($end_index == -1) {
         if (&is_space($string->[$i])) {
           # Skip
         }
         else {
-          $end_string_index = $i;
+          $end_index = $i;
           last;
         }
       }
     }
     
     my $trimed_string : string;
-    if ($start_string_index == -1 && $end_string_index == -1) {
+    if ($begin_index == -1 && $end_index == -1) {
       return "";
     }
-    elsif ($end_string_index == -1) {
-      $trimed_string = &substr($string, $start_string_index, $length - $start_string_index);
+    elsif ($end_index == -1) {
+      $trimed_string = &substr($string, $begin_index, $length - $begin_index);
     }
-    elsif ($end_string_index == -1) {
-      $trimed_string = &substr($string, 0, $end_string_index + 1);
+    elsif ($end_index == -1) {
+      $trimed_string = &substr($string, 0, $end_index + 1);
     }
     else {
-      $trimed_string = &substr($string, $start_string_index, $end_string_index - $start_string_index + 1);
+      $trimed_string = &substr($string, $begin_index, $end_index - $begin_index + 1);
     }
     
     return $trimed_string;
@@ -1211,7 +1095,7 @@ class Fn {
   }
   
 
-  precompile static method utf8_substr : string ($string : string, $utf8_offset : int, $utf8_length = -1 : int) {
+  precompile static method utf8_substr : string ($string : string, $utf8_offset : int, $utf8_length : int = -1) {
     
     unless ($string) {
       die "The \$string must be defined.";
@@ -1393,7 +1277,7 @@ class Fn {
   
   native static method get_spvm_version_number : double ();
   
-  native static method get_version_string : string ($class_name : string);
+  native static method get_version_string : string ($basic_type_name : string);
   
-  native static method get_version_number : double ($class_name : string);
+  native static method get_version_number : double ($basic_type_name : string);
 }

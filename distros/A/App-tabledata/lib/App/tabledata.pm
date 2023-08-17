@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-04-19'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -57,7 +57,8 @@ $SPEC{tabledata} = {
             schema  => ['str*', {in=>[
                 'list_actions',
                 'list_installed',
-                #'list_cpan',
+                'list_cpan',
+                'list_lcpan',
                 'dump_as_aoaos',
                 'dump_as_aohos',
                 'dump_as_csv',
@@ -85,11 +86,16 @@ _
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'list_installed' },
                 },
-                #C => {
-                #    summary=>'List TableData::* on CPAN',
-                #    is_flag => 1,
-                #    code => sub { my $args=shift; $args->{action} = 'list_cpan' },
-                #},
+                c => {
+                    summary=>'List TableData::* on local CPAN mirror',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'list_lcpan' },
+                },
+                C => {
+                    summary=>'List TableData::* on CPAN',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'list_cpan' },
+                },
                 H => {
                     summary=>'Get the first N row(s) (alias for --action=head)',
                     is_flag => 1,
@@ -117,10 +123,6 @@ _
             default => 1,
             cmdline_aliases => {n=>{}},
         },
-        #lcpan => {
-        #    schema => 'bool',
-        #    summary => 'Use local CPAN mirror first when available (for -C)',
-        #},
     },
     links => [
         {url=>'prog:td'},
@@ -144,6 +146,50 @@ sub tabledata {
             push @rows, $args{detail} ? $row : $row->{name};
         }
         return [200, "OK", \@rows];
+    }
+
+    if ($action eq 'list_cpan' || $action eq 'list_lcpan') {
+
+        my @methods = $args{lcpan} ?
+            ('lcpan', 'metacpan') : ('metacpan', 'lcpan');
+
+      METHOD:
+        for my $method (@methods) {
+            if ($method eq 'lcpan') {
+                unless (eval { require App::lcpan::Call; 1 }) {
+                    warn "App::lcpan::Call is not installed, skipped listing ".
+                        "modules from local CPAN mirror\n";
+                    next METHOD;
+                }
+                my $res = App::lcpan::Call::call_lcpan_script(
+                    argv => [qw/mods --namespace TableData/],
+                );
+                return $res if $res->[0] != 200;
+                return [200, "OK",
+                        [map {my $w = $_; $w =~ s/\ATableData:://; $w }
+                             grep {/TableData::/} sort @{$res->[2]}]];
+            } elsif ($method eq 'metacpan') {
+                unless (eval { require MetaCPAN::Client; 1 }) {
+                    warn "MetaCPAN::Client is not installed, skipped listing ".
+                        "modules from MetaCPAN\n";
+                    next METHOD;
+                }
+                my $mcpan = MetaCPAN::Client->new;
+                my $rs = $mcpan->module({
+                        'module.name'=>'TableData::*',
+                    });
+                my @res;
+                while (my $row = $rs->next) {
+                    my $mod = $row->module->[0]{name};
+                    say "D: mod=$mod" if $ENV{DEBUG};
+                    $mod =~ s/\ATableData:://;
+                    push @res, $mod unless grep {$mod eq $_} @res;
+                }
+                warn "Empty result from MetaCPAN\n" unless @res;
+                return [200, "OK", \@res];
+            }
+        }
+        return [412, "Can't find a way to list from CPAN/local CPAN"];
     }
 
     return [400, "Please specify module"] unless defined $args{module};
@@ -259,7 +305,7 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.006 of App::tabledata (from Perl distribution App-tabledata), released on 2023-02-12.
+This document describes version 0.007 of App::tabledata (from Perl distribution App-tabledata), released on 2023-04-19.
 
 =head1 SYNOPSIS
 

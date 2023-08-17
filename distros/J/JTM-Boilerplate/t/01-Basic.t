@@ -8,23 +8,10 @@
 
 # Basic testing
 
-use Test::More tests => 17;
+use Test::More tests => 16;
 
 # Instantiate the object
 require_ok('JCM::Boilerplate');
-
-# Verify switch statement works
-# (This is turned on in the boilerplate)
-eval {
-    use JCM::Boilerplate;
-
-    my $test = 1;
-    given ($test) {
-        when (/1/) {
-            pass('Boilerplate works!');
-        }
-    }
-} or fail('Boilerplate fails');
 
 eval {
     package foo_script {
@@ -47,7 +34,7 @@ eval {
     pass('Boilerplate role tag works');
 } or fail('Boilerplate role tag works');
 
-$ret = eval {
+my $ret = eval {
     my $x = 'abc';
     local $SIG{__WARN__} = sub { };
     eval(
@@ -69,17 +56,6 @@ require_ok('JTM::Boilerplate');
 
 # Verify switch statement works
 # (This is turned on in the boilerplate)
-eval {
-    use JTM::Boilerplate;
-
-    my $test = 1;
-    given ($test) {
-        when (/1/) {
-            pass('Boilerplate works!');
-        }
-    }
-} or fail('Boilerplate fails');
-
 eval {
     package foo_script {
         use JTM::Boilerplate 'script';
@@ -214,20 +190,36 @@ SKIP: {
 }
 
 # Verify try/catch
-SKIP: {
-    skip "try/catch only woks on >= 5.34", 1 if $PERL_VERSION lt v5.34.0;
-    $ret = eval '
-        use JTM::Boilerplate;
+$ret = eval '
+    use JTM::Boilerplate;
 
-        try {
-            my $foo = 1 / 0;    # Div by zero
-        } catch ($e) {
-            return 1;
-        }
-    ';
-    if (defined $ret and $ret == 1) {
-        pass('try/catch working');
-    } else {
-        fail('try/catch not working');
+    my $c;
+    try {
+        my $foo = 1 / 0;    # Div by zero
+    } catch ($e) {
+        $c = 1;
     }
+    $c;
+';
+if (defined $ret and $ret == 1) {
+    pass('try/catch working');
+} else {
+    fail('try/catch not working');
 }
+
+
+# Verify class
+$ret = eval '
+    use JTM::Boilerplate;
+
+    class bar;
+    field $x;
+
+    1;
+';
+if (defined $ret and $ret == 1) {
+    pass('class definition working');
+} else {
+    fail('class definiton not working');
+}
+

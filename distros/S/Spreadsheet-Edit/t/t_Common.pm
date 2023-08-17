@@ -38,15 +38,15 @@ sub import {
     # some non-default pragma is in effect.  I can't figure any other
     # reason why we would be imported twice, with non-default settings
     # the 2nd time.
-    
+
     # Check that the user did not already say "no warnings ..." or somesuch
-    # I was confused about how to this before, 
+    # I was confused about how to this before,
     # see https://rt.cpan.org/Ticket/Display.html?id=147618
     my $users_warnbits = ${^WARNING_BITS}//"u";
     my $users_pragmas = ($^H//"u").":".hash2str(\%^H);
     carp "Detected 'use/no warnings/strict' done before importing ",
           __PACKAGE__, "\n(they might be un-done)\n"
-      if ($users_pragmas ne $default_pragmas 
+      if ($users_pragmas ne $default_pragmas
             || $users_warnbits ne $default_warnbits);
   }
   strict->import::into($target);
@@ -100,7 +100,7 @@ sub import {
   require File::Spec::Functions;
   File::Spec::Functions->import::into($target, qw/
     canonpath catdir catfile curdir rootdir updir
-    no_upwards file_name_is_absolute devnull tmpdir splitpath splitdir 
+    no_upwards file_name_is_absolute devnull tmpdir splitpath splitdir
     abs2rel rel2abs case_tolerant/);
 
   require Path::Tiny;
@@ -112,7 +112,7 @@ sub import {
 
 
   require Scalar::Util;
-  Scalar::Util->import::into($target, qw/blessed reftype looks_like_number 
+  Scalar::Util->import::into($target, qw/blessed reftype looks_like_number
                                          weaken isweak refaddr/);
 
   require Cwd;
@@ -121,7 +121,7 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) { 
+  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing this
     require Data::Dumper::Interp;
     Data::Dumper::Interp->import::into($target);

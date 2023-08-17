@@ -4,9 +4,9 @@ use strict 'subs', 'vars';
 use Regexp::Pattern::Perl::Module ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-11'; # DATE
+our $DATE = '2023-06-13'; # DATE
 our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -59,13 +59,14 @@ sub load_module_with_optional_args {
             $module_with_prefix = $module;
         }
 
-        # XXX option load=0?
-        (my $module_with_prefix_pm = "$module_with_prefix.pm") =~ s!::!/!g;
-        if ($try_all) {
-            eval { require $module_with_prefix_pm }; last unless $@;
-            warn $@ if $@ !~ /\ACan't locate/;
-        } else {
-            require $module_with_prefix_pm;
+        if ($opts->{load} // 1) {
+            (my $module_with_prefix_pm = "$module_with_prefix.pm") =~ s!::!/!g;
+            if ($try_all) {
+                eval { require $module_with_prefix_pm }; last unless $@;
+                warn $@ if $@ !~ /\ACan't locate/;
+            } else {
+                require $module_with_prefix_pm;
+            }
         }
     }
     if ($@) {
@@ -118,7 +119,7 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.008 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2022-02-11.
+This document describes version 0.009 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2023-06-13.
 
 =head1 SYNOPSIS
 
@@ -265,6 +266,11 @@ Str. Like in L</load_module_with_optional_args>.
 
 Array of str. Like in L</load_module_with_optional_args>.
 
+=item * load
+
+Boolean. Default true. Whether to C<require> the class module. Sometimes you do
+not want to C<require()>, e.g. when the class is already defined somewhere else.
+
 =back
 
 =head1 HOMEPAGE
@@ -300,13 +306,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

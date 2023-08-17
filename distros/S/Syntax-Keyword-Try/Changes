@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Try
 
+0.29    2023-07-13
+        [CHANGES]
+         * Updates to compile cleanly on perl v5.38
+         * Remember to implement `no Syntax::Keyword::Try` to disable the
+           syntax
+         * Swap all the unit tests to `Test2::V0`
+
 0.28    2022-12-08
         [CHANGES]
          * Account for the new structure of ->cop_warnings in perl v5.37.6

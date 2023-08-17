@@ -1,3 +1,11 @@
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/internal/catch_enum_values_registry.hpp>
 
@@ -78,7 +86,7 @@ TEST_CASE( "Enums can quickly have stringification enabled using REGISTER_ENUM" 
     REQUIRE( stringify( EnumClass3::Value3 ) == "Value3" );
     REQUIRE( stringify( EnumClass3::Value4 ) == "{** unexpected enum value **}" );
 
-    EnumClass3 ec3 = EnumClass3 ::Value2;
+    EnumClass3 ec3 = EnumClass3::Value2;
     REQUIRE( stringify( ec3 ) == "Value2" );
 }
 

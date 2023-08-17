@@ -14,7 +14,7 @@ use POSIX 'strftime';
 use Text::Markdown;
 use HTML::Entities 'encode_entities';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -134,3 +134,10 @@ sub update_file( $fn, $content ) {
 }
 
 update_file( $output_file, $feed->as_xml );
+
+=head1 LIVE DEMO
+
+This RSS feed is live at L<https://corion.net/github-rss/Perl-perl5-issues.rss>
+if you just want to read the Perl 5 issues as RSS feed.
+
+=cut

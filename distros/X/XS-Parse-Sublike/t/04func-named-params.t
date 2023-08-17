@@ -3,11 +3,10 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
-use Test::Fatal;
 
 use feature 'signatures';
 no warnings 'experimental';
@@ -21,13 +20,14 @@ use testcase "t::func";
    nfunc withx(:$x, %rest) { %was_rest = %rest; return $x }
 
    is( withx( x => 123 ), 123, 'named param extracts value' );
-   is_deeply( \%was_rest, {},  'named param not visible in %rest' );
+   is( \%was_rest, {},  'named param not visible in %rest' );
 
    withx( x => 1, y => 2 );
-   is_deeply( \%was_rest, { y => 2 }, 'other params still visible in %rest' );
+   is( \%was_rest, { y => 2 }, 'other params still visible in %rest' );
 
-   ok( !defined eval { withx(); 1 }, 'named param complains if missing' );
-   like( $@, qr/^Missing argument 'x' for subroutine main::withx /, 'complaint from missing named param' );
+   like( dies { withx() },
+      qr/^Missing argument 'x' for subroutine main::withx /,
+      'complaint from missing named param' );
 }
 
 # named params can still have defaults
@@ -44,8 +44,9 @@ use testcase "t::func";
 
    is( withz( z => 789 ), 789, 'named param without slurpy' );
 
-   ok( !defined eval { withz( z => 1, w => 1 ); 1 }, 'without slurpy complains if unknown' );
-   like( $@, qr/^Unrecognised argument 'w' for subroutine main::withz /, 'complaint from unknown' );
+   like( dies { withz( z => 1, w => 1 ); 1 },
+      qr/^Unrecognised argument 'w' for subroutine main::withz /,
+      'complaint from unknown param' );
 }
 
 done_testing;

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::suacor;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUACOR - auto-correlation						
+ PERL PROGRAM NAME:  SUACOR - auto-correlation						
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

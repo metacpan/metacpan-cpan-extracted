@@ -42,7 +42,7 @@ package Alien::Taco::Object;
 
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 # new($taco_client, $object_number)
 #

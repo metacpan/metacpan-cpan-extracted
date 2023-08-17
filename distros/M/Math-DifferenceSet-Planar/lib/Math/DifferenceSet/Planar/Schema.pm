@@ -5,19 +5,20 @@ use warnings;
 
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '0.018';
+our $VERSION = '1.000';
 
 __PACKAGE__->load_namespaces;
 
 1;
 __END__
+
 =head1 NAME
 
 Math::DifferenceSet::Planar::Schema - data schema for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.018 of
+This documentation refers to version 1.000 of
 Math::DifferenceSet::Planar::Schema.
 
 =head1 SYNOPSIS
@@ -27,6 +28,7 @@ Math::DifferenceSet::Planar::Schema.
   $schema = Math::DifferenceSet::Planar::Schema->connect(...);
   $pds    = $schema->resultset('DifferenceSet')->search(...);
   $spc    = $schema->resultset('DifferenceSetSpace')->search(...);
+  $dbv    = $schema->resultset('DatabaseVersion')->search(...);
 
 =head1 DESCRIPTION
 
@@ -51,6 +53,11 @@ L<Math::DifferenceSet::Planar::Schema::Result::DifferenceSet> - result class.
 L<Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace> -
 another result class.
 
+=item *
+
+L<Math::DifferenceSet::Planar::Schema::Result::DatabaseVersion> -
+yet another result class.
+
 =back
 
 =head1 AUTHOR
@@ -59,7 +66,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

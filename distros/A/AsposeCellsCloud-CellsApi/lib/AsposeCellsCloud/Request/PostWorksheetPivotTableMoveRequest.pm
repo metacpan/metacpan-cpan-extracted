@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetPivotTableMoveRequest.name :   ,
-# PostWorksheetPivotTableMoveRequest.sheetName :   ,
-# PostWorksheetPivotTableMoveRequest.pivotTableIndex :   ,
-# PostWorksheetPivotTableMoveRequest.row :   ,
-# PostWorksheetPivotTableMoveRequest.column :   ,
-# PostWorksheetPivotTableMoveRequest.destCellName :   ,
-# PostWorksheetPivotTableMoveRequest.folder :   ,
-# PostWorksheetPivotTableMoveRequest.storageName :    
+# PostWorksheetPivotTableMoveRequest.name : The workbook name.  ,
+# PostWorksheetPivotTableMoveRequest.sheetName : The worksheet name.  ,
+# PostWorksheetPivotTableMoveRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostWorksheetPivotTableMoveRequest.row : Row index.  ,
+# PostWorksheetPivotTableMoveRequest.column : Column index.  ,
+# PostWorksheetPivotTableMoveRequest.destCellName : The dest cell name.  ,
+# PostWorksheetPivotTableMoveRequest.folder : Original workbook folder.  ,
+# PostWorksheetPivotTableMoveRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_pivot_table_move' } = { 
-    	summary => '',
+    	summary => 'Moves pivot table in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -152,56 +152,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'Row index.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Column index.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'destCellName',
-     	description => '',
+     	description => 'The dest cell name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

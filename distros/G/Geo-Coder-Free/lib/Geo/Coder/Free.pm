@@ -1,13 +1,13 @@
 package Geo::Coder::Free;
 
 # TODO: Don't have Maxmind as a separate database
-# TODO: Rename openaddresses.sql as geo_code_free.sql
+# TODO: Rename openaddresses.sql as geo_coder_free.sql
 # TODO: Consider Data::Dumper::Names instead of Data::Dumper
 
 use strict;
 use warnings;
 
-use lib '.';
+# use lib '.';
 
 use Config::Auto;
 use Geo::Coder::Abbreviations;
@@ -22,11 +22,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 our $alternatives;
 our $abbreviations;
@@ -265,10 +265,12 @@ sub reverse_geocode {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%param = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$param{location} = shift;
+	} else {
+		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
 	}
 
 	# The drivers don't yet support it
@@ -285,9 +287,8 @@ sub reverse_geocode {
 		if(wantarray) {
 			my @rc = $self->{'maxmind'}->geocode(\%param);
 			return @rc;
-		} else {
-			return $self->{'maxmind'}->geocode(\%param);
 		}
+		return $self->{'maxmind'}->geocode(\%param);
 	}
 
 	Carp::croak('Reverse lookup is not yet supported');
@@ -455,10 +456,6 @@ L<http://cpants.cpanauthors.org/dist/Geo-Coder-Free>
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=Geo-Coder-Free>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Geo-Coder-Free>
 
 =item * CPAN Testers Dependencies
 

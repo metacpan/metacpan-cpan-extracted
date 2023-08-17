@@ -14,7 +14,7 @@ ok my $reporter = App::cpanminus::reporter->new(
 my $current_report_id = 0;
 my @reports = (
   {
-    fetch    => 'http://www.cpan.org/authors/id/J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz',
+    fetch    => 'https://cpan.metacpan.org/authors/id/J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz',
     resource => 'J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz',
     dist     => 'IO-Capture-Extended-0.13',
     result   => 'PASS',

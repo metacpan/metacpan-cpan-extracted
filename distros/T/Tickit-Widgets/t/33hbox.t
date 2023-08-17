@@ -2,8 +2,9 @@
 
 use v5.14;
 use warnings;
+use utf8;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -158,15 +159,31 @@ is_display( [ [BLANK(2),
                TEXT("New Widget")] ],
             'Display after set_child' );
 
+$widget->set_style( line_style => Tickit::RenderBuffer::LINE_SINGLE );
+
+flush_tickit;
+
+is_display( [ [BLANK(2),
+               TEXT("Widget 1"),
+               BLANK(21),
+               TEXT("│ "),
+               TEXT("Widget 2"),
+               BLANK(7),
+               TEXT("│ "),
+               TEXT("New Widget")],
+               ( [ BLANK(2+8+21), TEXT("│ "), BLANK(8+7), TEXT("│ "), ] ) x 29
+            ],
+            'Display after set_style line_style' );
+
 # add with options
 {
    my $child = Tickit::Widget::Static->new( text => "" );
 
    $widget->add_children( { child => $child, force_size => 20 } );
 
-   is_deeply( { $widget->child_opts( $child ) },
-      { expand => 0, force_size => 20 },
-      '->add_children accepts hashes with extra opts' );
+   is( { $widget->child_opts( $child ) },
+       { expand => 0, force_size => 20 },
+       '->add_children accepts hashes with extra opts' );
 }
 
 $widget->set_window( undef );

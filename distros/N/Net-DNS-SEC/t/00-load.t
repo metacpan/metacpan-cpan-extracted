@@ -1,11 +1,12 @@
 #!/usr/bin/perl
-# $Id: 00-load.t 1872 2022-09-16 09:33:02Z willem $	-*-perl-*-
+# $Id: 00-load.t 1924 2023-05-17 13:56:25Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 use Test::More tests => 3;
+use TestToolkit;
 
 my @module = qw(
 		Net::DNS
@@ -51,13 +52,8 @@ ok( eval { Net::DNS::SEC::libcrypto->VERSION }, 'XS component SEC.xs loaded' )
 use_ok('Net::DNS::SEC');
 
 
-eval {
-	# Exercise checkerr() response to failed OpenSSL operation
-	Net::DNS::SEC::libcrypto::checkerr(0);
-};
-my ($exception) = split /\n/, "$@\n";
-ok( $exception, "XS libcrypto error\t[$exception]" );
-
+# Exercise checkerr() response to failed OpenSSL operation
+exception( 'XS libcrypto error', sub { Net::DNS::SEC::libcrypto::checkerr(0) } );
 
 exit;
 

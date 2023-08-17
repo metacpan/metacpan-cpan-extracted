@@ -1,10 +1,10 @@
 package Koha::Contrib::Tamil::Authority::EditorsUpdater;
-$Koha::Contrib::Tamil::Authority::EditorsUpdater::VERSION = '0.071';
+$Koha::Contrib::Tamil::Authority::EditorsUpdater::VERSION = '0.072';
 use Moose;
 
 extends 'AnyEvent::Processor';
 
-use C4::AuthoritiesMarc;
+use C4::AuthoritiesMarc qw(AddAuthority);
 
 has verbose => ( is => 'rw', isa => 'Bool' );
 
@@ -68,7 +68,7 @@ Koha::Contrib::Tamil::Authority::EditorsUpdater
 
 =head1 VERSION
 
-version 0.071
+version 0.072
 
 =head1 AUTHOR
 
@@ -76,7 +76,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Démians.
+This software is Copyright (c) 2023 by Fréderic Démians.
 
 This is free software, licensed under:
 

@@ -42,8 +42,9 @@ requires:
   URI::URL: '0'
   perl: '5.008'
 resources:
+  bugtracker: https://github.com/Corion/Test-HTTP-LocalServer/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Test-HTTP-LocalServer.git
-version: '0.74'
+version: '0.75'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

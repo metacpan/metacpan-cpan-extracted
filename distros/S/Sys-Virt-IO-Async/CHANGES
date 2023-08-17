@@ -1,0 +1,31 @@
+Revision history for Sys-Virt-IO-Async
+
+0.0.5    2023-06-11
+         * Remove closed Sys::Virt::IO::Async from parent
+         * Fix POD failure
+
+0.0.4    2023-06-11
+         * Prepare for Sys::Virt::EventImpl being split out of
+           Sys::Virt::Event soonish (and backward compatibility to
+           remain in place "only" until mid 2025)
+         * Rename Sys::Virt::IO::Async::Event to
+           Sys::Virt::IO::Async::EventImpl
+         * Make the event implementation a notifier, making it
+           a container for handles and timers
+         * Add Sys::Virt::IO::Async, a notifier & wrapper
+           around Sys::Virt
+         * Add domain life cycle event examples
+
+0.0.3    2023-06-05
+         * Fix POD error
+         * Always pass HANDLE_ERROR and HANDLE_HANGUP events,
+           even when the caller didn't ask for them
+         * Clean up the $opaque value after remove_{handle,timeout}
+           returned, fixing a mutex deadlock (thanks DANBERR)
+
+0.0.2    2023-06-03
+         * Fix dist not being indexed
+         * Add $VERSION variable to modules
+
+0.0.1    2023-06-03
+         * Initial release

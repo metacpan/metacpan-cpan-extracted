@@ -5,11 +5,14 @@ use Carp;
 use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/zopfli_compress zopfli_compress_file/;
+our @EXPORT_OK = qw/
+    zopfli_compress
+    zopfli_compress_file
+/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load ('Gzip::Zopfli', $VERSION);
 

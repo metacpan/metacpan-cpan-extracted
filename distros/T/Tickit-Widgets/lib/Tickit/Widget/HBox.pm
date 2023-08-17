@@ -3,14 +3,16 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.57;
 
-package Tickit::Widget::HBox 0.51;
+package Tickit::Widget::HBox 0.52;
 class Tickit::Widget::HBox
    :strict(params)
    :isa(Tickit::Widget::LinearBox);
 
 use Tickit::Style;
+use Tickit::RenderBuffer qw( CAP_BOTH );
 
 use List::Util qw( sum max );
 
@@ -46,9 +48,23 @@ horizontal row. Its height will be the height of the tallest child, and its
 width will be the sum of the widths of all the children, plus the inter-child
 spacing.
 
+Optionally, if given a non-zero spacing between child widgets and a style to
+draw in, a vertical dividing line will be drawn between each child.
+
 =head1 STYLE
 
-The default style pen is used as the widget pen.
+The default style pen is used as the widget pen. The following style pen
+prefixes are also used:
+
+=over 4
+
+=item line => PEN
+
+I<Since version 0.52.>
+
+The pen used to render a dividing line between child widgets.
+
+=back
 
 Note that while the widget pen is mutable and changes to it will result in
 immediate redrawing, any changes made will be lost if the widget style is
@@ -62,14 +78,24 @@ The following style keys are used:
 
 The number of columns of spacing between children
 
+=item line_style => INT
+
+I<Since version 0.52.>
+
+If set, the style to draw a dividing line between each child widget. Must be
+one of the C<LINE_*> constants from L<Tickit::RenderBuffer>.
+
 =back
 
 =cut
 
 style_definition base =>
-   spacing => 0;
+   spacing => 0,
+   line_style => 0;
 
 style_reshape_keys qw( spacing );
+
+style_redraw_keys qw( line_style );
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
@@ -116,6 +142,20 @@ method set_child_window
          $childwin->close;
       }
    }
+}
+
+method render_dividing_line
+{
+   my ( $rb, $prev_win, $next_win, $style, $pen ) = @_;
+
+   my $top        = 0;
+   my $gap_left   = $prev_win->right;
+   my $gap_right  = $next_win->left - 1;
+   my $bottom     = $next_win->bottom;
+
+   my $line_col = int( ( $gap_left + $gap_right ) / 2 );
+
+   $rb->vline_at( $top, $bottom, $line_col, $style, $pen, CAP_BOTH );
 }
 
 =head1 AUTHOR

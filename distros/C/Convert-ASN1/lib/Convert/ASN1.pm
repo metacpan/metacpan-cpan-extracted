@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-$Convert::ASN1::VERSION = '0.33';
+$Convert::ASN1::VERSION = '0.34';
 use 5.004;
 use strict;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS @opParts @opName $AUTOLOAD);

@@ -145,5 +145,5 @@ while ( my ( $desc, $cfg ) = splice @error, 0, 2 ) {
 	my ( $h ) = eval { Config::INI::Tiny->new->to_hash( $cfg ) }, my $l = __LINE__;
 	if ( defined $h ) { fail $desc; diag join ' ', 'got:', explain $h; next }
 	$cfg =~ s/"/\\"/g;
-	like $@, qr/\ABad INI syntax at line 1: "\Q$cfg\E" at ${\__FILE__} line $l\.?\n\z/, $desc;
+	like $@, qr/\ABad INI syntax at line 1: "\Q$cfg\E" at \Q${\__FILE__}\E line $l\.?\n\z/, $desc;
 }

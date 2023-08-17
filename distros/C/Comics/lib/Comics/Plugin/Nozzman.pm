@@ -13,10 +13,12 @@ our $name    = "Nozzman";
 our $url     = "https://nozzman.nl/persoonlijk-werk";
 
 our $pattern =
-  qr{ <meta \s+ property="og:image" \s+
-       content="(?<url>https://pro2-bar-s3-cdn-cf1.myportfolio.com/
-		[-_0-9a-z]+/
-		(?<image>[^./]+\.\w+))(?:"|\?)
+  qr{ <div \s+ class="grid__image-wrapper"> \s*
+      <img \s+
+       src="(?<url>https?://cdn.myportfolio.com/
+	   [a-f0-9---]+/
+	   (?<image>[a-f0-9---]+_rw_\d+\.\w+)
+	   \?h=[0-9a-f]+)"
     }ix;
 
 # Important: Return the package name!

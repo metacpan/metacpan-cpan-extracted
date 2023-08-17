@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Term::ANSIColor qw(:constants);
+use App::FileComposer;
+use feature 'say';
+
+=head1 NAME
+
+Mkscript - dumps pre defined files
+
+=head1 SYNOPSIS
+
+mkscript [OPTION]... [FILE]...
+
+=head1 USAGE
+
+ will look for some script file in .app-mkscript
+ and copy its contents to the new foo.sh file:
+
+% mkscript foo.sh   
+
+=head1 DESCRIPTION
+
+I wrote this program with intention of making
+life easier for programmers who work with many 
+languages and technologies and often forget the
+unique syntax of each one.
+
+=head2 --version
+
+output version info and exit.
+
+=head2 --reconf
+
+reload the default configurations and create  a /home/user/.app-filecomposer directory!
+
+=head1 AUTHOR
+
+written by Ariel G. Vieira.
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Ariel Vieira.
+
+This is free software, licensed under:
+
+The GNU General Public License, Version 2, June 1991
+
+
+=cut 
+
+#run scripts
+&withparameters(@ARGV) if $ARGV[0] =~ /\b(\w+\.\w{1,4})\b/i;
+
+#reload directory configuration
+&reconf() if $ARGV[0] =~ /(--reconf)/;
+
+#//Display version number
+&version() if $ARGV[0] =~ /((-v)|(--version))/;
+
+
+sub withparameters {
+    my $newfile = shift;
+
+   die "Error: Invalid parameter, you forgot to load the file extension."
+   unless $newfile =~ /(\.\w+)\b/i;
+
+            my $obj = App::FileComposer->new(filename => $newfile);
+            my $source_file = $obj->load(); 
+
+            &postmsg($obj->get_sourcePath, $source_file) if $source_file;
+            $obj->write();
+
+}
+
+
+sub postmsg {
+  my ($path, $file) = @_;
+  my $file_comand = qx/file $path\/$file/;
+  
+        say "source sample file: ", CYAN, "$file \n", RESET,
+        "Type: ", GREEN, $file_comand, RESET;
+
+}
+sub version {
+	say "Mkscript 1.0.1";
+}
+
+sub reconf {
+  my $home = "$ENV{\"HOME\"}/.app-filecomposer";
+  mkdir $home 
+    or die BRIGHT_YELLOW ,"direcotry already exists \n", RESET,"system: $!\n";
+
+      say BRIGHT_YELLOW, "Default directory created in: ", RESET, $home;
+}

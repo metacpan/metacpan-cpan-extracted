@@ -1,13 +1,12 @@
 {
-   "abstract" : "Mozilla's CA cert bundle in PEM format",
+   "abstract" : "unknown",
    "author" : [
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown",
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -17,28 +16,20 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.006"
-         }
-      },
+      "runtime" : {},
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.94"
          }
       }
    },
@@ -54,8 +45,9 @@
          "type" : "git",
          "url" : "https://github.com/libwww-perl/Mozilla-CA.git",
          "web" : "https://github.com/libwww-perl/Mozilla-CA"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#lwp"
    },
-   "version" : "20221114",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "20230807",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

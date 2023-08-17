@@ -4,7 +4,6 @@ use v5.14;
 use warnings;
 
 use Test::More;
-use Test::Fatal;
 
 use Feature::Compat::Class;
 
@@ -18,14 +17,14 @@ class Test1 {
 }
 
 {
-   ok( exception { Test1->clear },
+   ok( !defined eval { Test1->clear },
       'method on non-instance fails' );
 }
 
 {
    my $obj = bless [], "DifferentClass";
 
-   ok( exception { $obj->Test1::clear },
+   ok( !defined eval { $obj->Test1::clear },
       'method on wrong class fails' );
 }
 

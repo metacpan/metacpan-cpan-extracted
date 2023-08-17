@@ -1,0 +1,106 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::DifferenceSet::Planar::Computation - planar difference set computation
+
+=head1 DESCRIPTION
+
+The L<Math::DifferenceSet::Planar> library and its data extensions
+are bundled with databases of sample sets to make sets within certain
+size boundaries readily available and speed up tasks of enumerating,
+validating, or identifying planar difference sets.
+
+Providing these sample sets, as well as studying the structure of their
+spaces, can thus be left out of run-time code, saving lots of CPU cycles.
+
+This section of the documentation discusses the steps performed at
+pre-calculation time for providing this data.  They could be repeated
+to verify the data or applied to larger orders to obtain more sets.
+
+Currently, some steps use code that is not yet available in Perl
+libraries.  The author is working on closing this gap, however, so that
+eventually the distribution package should be capable of completely
+reproducing itself alone from Perl code.
+
+=head2 Producing samples
+
+Singer-type difference sets can be obtained from logarithms in a Galois
+field like this (for sets of order I<k>, all operations are performed
+in the Galois field of order I<k>):
+
+Find a monic primitive polynomial in GF(I<k>) of degree 3.  Iterate
+through powers of I<x> modulo this polynomial from exponent zero up to
+exponent I<kE<178>+k>.  The exponents yielding a remainder with degree
+less than two will be a planar difference set containing zero and one.
+
+The git repository of this library has a Pari/GP script
+F<prime_order_samples.gp> working like this, employing modular integers.
+It can only handle prime orders, though.
+
+For orders that are prime powers with an exponent greater than one,
+the same algorithm is valid, but it needs Galois field arithmetic rather
+than simple modular integer arithmetic.  It can be found in the examples
+collection of the separate perl library Math-GaloisField (due to be
+published around the same time as this library).
+
+=head2 Obtaining space information
+
+Enumerating all planar difference set planes of a given order can be sped
+up with knowledge about generators of subspaces of their multiplicative
+space.  Finding such generators is related to finding generators
+of reduced residue systems of modular integers, which is covered in
+algebraic libriaries like Pari/GP (see the I<znstar> function there).
+
+The script F<pds_find_space> in the examples directrory is a pure perl
+algorithm employing a search for such generators.  It is not particularly
+efficient, though, and would have to be improved to handle larger spaces.
+Contributions are welcome.
+
+=head2 Finding reference sets
+
+There are different algorithms to generate the three types of reference
+sets this library supports.  For lex-canonical and gap-canonical reference
+sets, all rotations of a set are considered, canonized and compared
+lexically to find the lexicographically first one.  For zeta-canonical
+reference sets, a substantially smaller set of rotations needs to be
+considered, as the I<lambda> value of any given set with order not
+equal to four is equal to one of the principal elements of its plane,
+which means only as many rotations as there are principal elements
+have to be calculated.  At most one third of the points of a plane
+are principal elements.  Order four is special in that it permits no
+principal elements, but there are only two order four planes and thus
+two zeta-canonical sets to choose from anyway.
+
+The example script F<pds_find_std_ref> generates zeta-canonical reference
+sets from arbitrary samples.  The example script F<pds_find_any_ref>
+generates all three types of reference sets employing the search over
+all rotations of its input sets.  For standard reference sets, this is
+of course less efficient than F<pds_find_std_ref>, but can be used for
+independent verification.
+
+=head2 Creating databases
+
+Scripts in the F<maint> directory of the git repository can populate
+the databases from plaintext input and conversely dump their contents
+in text form.  There is also a script to generate the POD documents
+describing each of the databases.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

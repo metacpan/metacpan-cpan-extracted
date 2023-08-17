@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.8
+## Version v0.6.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/05/16
+## Modified 2023/07/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.8';
+    our $VERSION = 'v0.6.1';
 };
 
 use strict;
@@ -1798,6 +1798,7 @@ sub load
     my $file = $self->filename;
     return if( $self->is_dir );
     $opts->{binmode} //= '';
+    $opts->{want_object} //= 0;
     my $binmode = $opts->{binmode};
     $binmode =~ s/^\://g;
     try
@@ -1833,7 +1834,15 @@ sub load
             # Restore cursor position in file
             $fh->seek( $pos, 0 );
         }
-        return( $buf );
+        
+        if( $opts->{want_object} || want( 'OBJECT' ) )
+        {
+            return( $self->new_scalar( \$buf ) );
+        }
+        else
+        {
+            return( $buf );
+        }
     }
     catch( $e )
     {
@@ -1844,14 +1853,46 @@ sub load
 sub load_json
 {
     my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     # Inherited from Module::Generic
     my $j = $self->new_json || return( $self->pass_error );
+    if( exists( $opts->{boolean_values} ) && 
+        $self->_is_array( $opts->{boolean_values} ) )
+    {
+        $j->boolean_values( @{$opts->{boolean_values}} );
+    }
+    if( exists( $opts->{filter_json_object} ) && 
+        ref( $opts->{filter_json_object} ) eq 'CODE' )
+    {
+        $j->filter_json_object( $opts->{filter_json_object} );
+    }
+    if( exists( $opts->{filter_json_single_key_object} ) && 
+        ref( $opts->{filter_json_single_key_object} ) eq 'HASH' &&
+        scalar( keys( %{$opts->{filter_json_single_key_object}} ) ) &&
+        ref( $opts->{filter_json_single_key_object}->{ [keys( %{$opts->{filter_json_single_key_object}} ) ]->[0] } ) eq 'CODE' )
+    {
+        $j->filter_json_single_key_object( %{$opts->{filter_json_single_key_object}} );
+    }
+    if( exists( $opts->{decode_prefix} ) && 
+        defined( $opts->{decode_prefix} ) && 
+        CORE::length( $opts->{decode_prefix} ) )
+    {
+        $j->decode_prefix( $opts->{decode_prefix} );
+    }
     my $json = $self->load_utf8;
     return( $self->pass_error ) if( !CORE::defined( $json ) );
     return( '' ) if( !CORE::length( $json ) );
     try
     {
-        return( $j->decode( $json ) );
+        if( want( 'OBJECT' ) )
+        {
+            my $buf = $j->decode( $json );
+            return( $self->new_scalar( \$buf ) );
+        }
+        else
+        {
+            return( $j->decode( $json ) );
+        }
     }
     catch( $e )
     {
@@ -1887,6 +1928,10 @@ sub load_utf8
     my $opts = $self->_get_args_as_hash( @_ );
     return if( $self->is_dir );
     $opts->{binmode} = 'utf8';
+    if( want( 'OBJECT' ) )
+    {
+        $opts->{want_object} = 1;
+    }
     return( $self->load( $opts ) );
 }
 
@@ -3166,6 +3211,7 @@ sub unload_json
     my $j = $self->new_json || return( $self->pass_error );
     my $equi =
     {
+        order => 'canonical',
         ordered => 'canonical',
         sorted => 'canonical',
         sort => 'canonical',
@@ -3206,11 +3252,20 @@ sub unload_perl
     my $opts = $self->_get_args_as_hash( @_ );
     try
     {
-        require Data::Dump;
-        local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
-        local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
-        local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
-        $self->unload_utf8( Data::Dump::dump( $data ) ) || return( $self->pass_error );
+        my $callback;
+        if( $opts->{callback} && ref( $opts->{callback} ) eq 'CODE' )
+        {
+            $callback = $opts->{callback};
+        }
+        else
+        {
+            require Data::Dump;
+            local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
+            local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
+            local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
+            $callback = sub{ return( Data::Dump::dump( @_ ) ); };
+        }
+        $self->unload_utf8( $callback->( $data ) ) || return( $self->pass_error );
     }
     catch( $e )
     {
@@ -4240,7 +4295,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.8
+    v0.6.1
 
 =head1 DESCRIPTION
 
@@ -5143,6 +5198,28 @@ This requires the L<JSON> module to be installed or it will set an L<error|Modul
 
 If an eror occurs during decoding, this will set an L<error|Module::Generic/error> and return undef.
 
+You can provide the following options to change the way C<JSON> will decode the data:
+
+=over 4
+
+=item * C<boolean_values>
+
+See L<JSON/boolean_values>
+
+=item * C<filter_json_object>
+
+See L<JSON/filter_json_object>
+
+=item * C<filter_json_single_key_object>
+
+See L<JSON/filter_json_single_key_object>
+
+=item * C<decode_prefix>
+
+See L<JSON/decode_prefix>
+
+=back
+
 =head2 load_perl
 
 This will load perl's data structure from file using L<perlfunc/do> and return the resulting perl data.
@@ -5205,11 +5282,11 @@ Sets or gets the maximum recursion limit.
 
 =head2 mkpath
 
-This takes a code reference that is used as a callback.
+This takes an optional code reference that is used as a callback.
 
 It will create the path corresponding to the element, or to the list of path fragments provided as optional arguments.
 
-For each path fragments, this will call the callback and provided it with an hash reference containing the following keys:
+For each path fragments, this will call the callback and provide it with an hash reference containing the following keys:
 
 =over 4
 
@@ -5230,6 +5307,8 @@ The current full path as a regular string
 On Windows, this would contain the volume name as a string.
 
 =back
+
+The return value of the callback is ignored and any fatal exception occurring during the callback will be trapped, an error object set, and C<undef> returned.
 
 For example:
 
@@ -5908,13 +5987,17 @@ Boolean. This option is ignored, because the JSON data are saved to file using U
 
 =head2 unload_perl
 
-Just like L</unload>, this takes some perl data structure (most likely an hash or an array), and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the perl data structure to it using L<Data::Dump>
+Just like L</unload>, this takes some perl data structure (most likely an hash or an array), and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the perl data structure to it using either L<Data::Dump> or a callback code if one is provided.
 
-If L<Data::Dump> is not installed, this will return an error.
+If no callback option is specified and L<Data::Dump> is not installed, this will return an error.
 
 The following options are supported:
 
 =over 4
+
+=item C<callback>
+
+A code reference. This is a callback code that will be called with the data to format, and the returned value will be saved to file. If a fatal error occurs during the callback, it will be trapped and this method will return C<undef> in scalar context or an empty list in list context after having set an L<error object|Module::Generic/error>
 
 =item C<indent>
 
@@ -5926,7 +6009,7 @@ Integer. This is the size threshold of binary data above which it will be conver
 
 =item C<max_width>
 
-Integer. This is the line width threshold after which a new line will be inserted by L<Data::Dump>
+Integer. This is the line width threshold after which a new line will be inserted by L<Data::Dump>. The default is 60.
 
 =back
 

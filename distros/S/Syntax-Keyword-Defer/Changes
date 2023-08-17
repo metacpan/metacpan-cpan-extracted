@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Defer
 
+0.09    2023-07-13
+        [CHANGES]
+         * Updates to compile cleanly on perl v5.38
+         * Remember to implement `no Syntax::Keyword::Defer` to disable the
+           syntax
+         * Swap all the unit tests to `Test2::V0`
+
 0.08    2022-12-15
         [CHANGES]
          * Permit safe forms of `goto` entirely within the defer block

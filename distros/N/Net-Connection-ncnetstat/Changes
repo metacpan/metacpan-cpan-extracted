@@ -1,5 +1,8 @@
 Revision history for Net-Connection-ncnetstat
 
+0.8.0	 2023-06-01/13:15
+		 - Don't try to sort by default now.
+
 0.7.1	 2021-02-19/08:00
 		 - Bump the min version of Text::ANSITable required to 0.601. Thanks SREZIC / #134375.
 		 - Fix some typos in bin/ncnetstat docs. Thanks RSAVAGE / #134382.

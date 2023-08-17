@@ -1,0 +1,32 @@
+Path-Find version 0.01
+======================
+
+Finding files in a directory and its subdirectories.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::More
+    Text::Glob
+    File::Spec
+    Scalar::Util
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2023 by Philip Gwyn.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

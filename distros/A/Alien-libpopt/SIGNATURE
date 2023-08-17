@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 af7bd521e2b603ff45367aaebf68a264ea7cd3f4f74daebfe6bc1e70083df2d6 Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 c576e28bd7689efd771a6a4c3c3bdcc83dbab27b7fa8ce68f43ff68246d1c801 MANIFEST
+SHA256 7f88034696abdd01797621ea1c39daee300aa3562878cd4107aa56486d4e5846 META.json
+SHA256 7649b3ec4a86fe3a02ae95176c9741370cd4de564d3023f22783ba019126720c META.yml
+SHA256 4a9d0d66ca2184da5391c6c9961b33abcc00e7172f22e165fef42a5485732242 Makefile.PL
+SHA256 65776eea4d211f90f3f8d28f9d54f972f61ab20913b12bd76b0fce1b2f89c9c3 README
+SHA256 5b44ffe05af9abf842b566435423206d8a67fbbee8d9f943e10210a34dc96022 alienfile
+SHA256 c63f78b9ea6697f123721423c25541e8d95b4b3bf7b69828130c31a88cd6ec51 examples/alien_libpopt_variables.pl
+SHA256 ac4314b0d8ac4b28dbb980b8f8d12b4f4831e675ae0cdc645ff9aee3f328bee7 libpopt.pm
+SHA256 5f7619e3a070d4e6fb36c539c28baf87438328bdb694e6572467010ae537d107 t/Alien-libpopt/01-use.t
+SHA256 36100ee26af538fa8220b00161dfb43a0111e28f25fab6e3d159fa8421238f78 t/Alien-libpopt/02-version.t
+SHA256 105d0f3e5d5bf73d49aa6fa08b3945191dd0733ec4e7b5a3f2ac67325b685015 t/Alien-libpopt/03-diag.t
+SHA256 4614ce466b78453f149a42f0e3a9af1abf8cfde414c3a6a17699aac68f041d1f xt/Alien-libpopt/01-pod_coverage.t
+SHA256 c2b4ad294809ab6f39a882d10ab8aecca3b55857156ded7a45830b76b9fce696 xt/Alien-libpopt/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmSWh90ACgkQojV9Rpe/
+B8tQ+Q//VE2GBykShshZGSK5zIlUNv3/62qsdsSzz8KCZdza15p4IKG7nwUv8b6j
+MD81e1Fk7Y6V/UNPZDEd9gpTkg4R0MblCjpAQNh42nGDWOaJph5Msf9bMhMDo4cV
+E766m1p0soWIWK12e66bOGvXqMPQrFv1IB/JW11Q3H7zRkgHtEjMfnzmjywzqnn2
+P5IsvNNjO4n7yRoLHmM6i9w5qdZr3ebM3+Gh6KwJg74xRd1szeoeMVuvWWTUA4Vl
+1BgWLhVI1GmUm3SqmrvMn8aXcAgwG6BpaM/xGqQocZcj4NBU1P1MonfOe4/6aW6h
+Y+kJN7JSv5NSFEAoFp488NL9kT0TzjoN+9Z3mBptSlTk4Jaf5OVd0Dy29DKU2j0F
+rpcS+CirWn1uIT3/rkqfAtMPvBGMLrpuFPdAwu413/rcDoaIhw2jSvaXwn/MrnM5
+T4s3gzm2mfOzXXFdEsnQLMWcjv1SOGy0EwgT5egoMAHX+77u1e07L+baqboJggOB
+ULp8KM2HTo1QBVuckMilpy59+ratl1kHiUahiOrRqUQzcBDxG3+7wgDFakSrlc2c
+El2t7YmDRDr6gF/4h9KLjcgN+o5yAOQFpmhJNSDvUk7oh6LESPR72n8GTzVi0YGp
+phQrgahZL7kx7zihcJPE2ecdDgesV9uOJ21vgvyHzS+DhrhbOdE=
+=OKPM
+-----END PGP SIGNATURE-----

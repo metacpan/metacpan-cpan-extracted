@@ -35,8 +35,7 @@ Note that output captured by this module is stored in memory during script
 execution. That could be a problem for scripts that generate gigabytes of
 stdout and/or stderr output.
 
-The perl tie command is used to implement the functionality of this module
-and requires perl 5.010 or newer.
+The perl tie command used in this module requires perl 5.010 or newer.
 
 =head1 FUNCTIONS
 
@@ -45,6 +44,8 @@ Mnet::Tee implements the functions listed below.
 =cut
 
 # required modules
+#   perl 5.10 for tie to capture stdout/stderr
+#       update Mnet.pm and this perldoc if changed
 use warnings;
 use strict;
 use 5.010;

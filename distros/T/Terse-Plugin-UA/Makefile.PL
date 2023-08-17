@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'Terse' => 0,
+	'Terse' => '0.19',
 	'LWP::UserAgent' => 0,
 	'URI' => 0,
 	'Scalar::Util' => 0

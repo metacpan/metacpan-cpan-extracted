@@ -90,7 +90,6 @@ my $seed = time();
     ok(SPVM::TestCase::Module::Fn->get_code_point);
     ok(SPVM::TestCase::Module::Fn->hex);
     ok(SPVM::TestCase::Module::Fn->index);
-    ok(SPVM::TestCase::Module::Fn->index_v2);
     ok(SPVM::TestCase::Module::Fn->init_string);
     ok(SPVM::TestCase::Module::Fn->is_alnum);
     ok(SPVM::TestCase::Module::Fn->is_alpha);
@@ -126,7 +125,6 @@ my $seed = time();
     ok(SPVM::TestCase::Module::Fn->repeat);
     ok(SPVM::TestCase::Module::Fn->replace_chars);
     ok(SPVM::TestCase::Module::Fn->rindex);
-    ok(SPVM::TestCase::Module::Fn->rindex_v2);
     ok(SPVM::TestCase::Module::Fn->sizeof_native_int);
     {
       is(SPVM::Fn->sizeof_native_pointer, $Config{ptrsize});
@@ -160,7 +158,7 @@ my $seed = time();
     {
       my $spvm_version_string = SPVM::Fn->get_spvm_version_string;
       warn "[Test Output]The version of the SPVM language:$spvm_version_string";
-      ok(SPVM::Builder::Util::file_contains("lib/SPVM/Builder/include/spvm_api.h", $spvm_version_string));
+      ok(SPVM::Builder::Util::file_contains("lib/SPVM/Builder/include/spvm_native.h", $spvm_version_string));
     }
     {
       my $spvm_version_string = $SPVM::VERSION;

@@ -1,5 +1,5 @@
 class TestCase::Simple : public {
-  version "1.001_009000";
+  version "1.001009000";
   
   use TestCase::Minimal;
   use Hash;
@@ -75,7 +75,7 @@ class TestCase::Simple : public {
     return "interface_shared1 $num";
   }
   
-  static method new_options : TestCase::Simple ($options = undef : object[]) {
+  static method new_options : TestCase::Simple ($options : object[] = undef) {
     my $options_h = Hash->new($options);
     
     my $x = $options_h->delete_or_default_int("x", 0);
@@ -88,5 +88,21 @@ class TestCase::Simple : public {
     $self->{y} = $y;
     
     return $self;
+  }
+  
+  # https://github.com/yuki-kimoto/SPVM/issues/369
+  method issues_369 : int () {
+    
+    if (1 || "") {
+      
+    }
+    elsif ("") {
+      
+    }
+    unless ($self) {
+      return 0;
+    }
+    
+    return 1;
   }
 }

@@ -1,2 +1,26 @@
+0.07 2023-06-29T19:51:27+02:00
+ - Remove lastpass buttons from image in doc.
+
+0.06 2023-06-29T19:42:23+02:00
+ - Improve second example in doc.
+
+0.05 2023-06-26T00:14:14+02:00
+ - Add link for Tags::HTML::Login::Register to doc.
+ - Add support of logo.
+ - Add tests.
+ - Fix api for messages in doc.
+ - Fix minimal dependency for Tags::HTML::Messages message types.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+
+0.04 2023-06-25T16:02:56+02:00
+ - Add autofocus to username.
+
+0.03 2023-06-25T12:14:33+02:00
+ - Add messages bellow button.
+
+0.02 2023-06-10T18:27:10+02:00
+ - Add constructor tests.
+ - Add example plack application to doc.
+
 0.01 2023-05-29T23:59:33+02:00
  - First version.

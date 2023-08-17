@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.2
+    version v0.0.3
 
 SYNOPSIS
 
@@ -26,6 +26,8 @@ DESCRIPTION
 
     This module is a helper to make writing OpenSMTPd
     <https://opensmtpd.org> filters in perl easier.
+
+    It should support smtpd API protocol version 0.7 and earlier.
 
 METHODS
 
@@ -265,9 +267,9 @@ REPORT AND FILTER STREAMS
 
       link-auth
 
-	username
-
 	result
+
+	username
 
       protocol-client
 

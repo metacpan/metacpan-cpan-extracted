@@ -1,5 +1,5 @@
 package Fluent::LibFluentBit::Input;
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 use parent 'Fluent::LibFluentBit::Component';
 
 # ABSTRACT: Fluent-Bit input
@@ -29,7 +29,7 @@ Fluent::LibFluentBit::Input - Fluent-Bit input
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

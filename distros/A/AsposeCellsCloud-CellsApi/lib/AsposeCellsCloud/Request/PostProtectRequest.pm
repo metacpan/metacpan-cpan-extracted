@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_protect' } = { 
-    	summary => '',
+    	summary => 'Protect MS Excel and OpenDocument Spreadsheet by making them password protected.',
         params => $params,
         returns => 'FilesResult',
     };

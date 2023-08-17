@@ -5,17 +5,23 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-25'; # DATE
+our $DATE = '2023-06-21'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Trim whitespaces at the end of string',
+        description => <<'_',
+
+Trailing tabs and newlines will also be trimmed.
+
+_
         examples => [
             {value=>'foo'},
             {value=>' foo ', filtered_value=>' foo'},
+            {value=>" foo  \t  \n", filtered_value=>' foo', summary=>"Trailing tabs and newlines will also be trimmed"},
         ],
     };
 }
@@ -49,7 +55,7 @@ Data::Sah::Filter::perl::Str::rtrim - Trim whitespaces at the end of string
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Filter::perl::Str::rtrim (from Perl distribution Data-Sah-Filter), released on 2023-04-25.
+This document describes version 0.021 of Data::Sah::Filter::perl::Str::rtrim (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
 
 =head1 SYNOPSIS
 
@@ -76,8 +82,13 @@ This document describes version 0.016 of Data::Sah::Filter::perl::Str::rtrim (fr
 
  "foo" # valid, unchanged
  " foo " # valid, becomes " foo"
+ " foo  \t  \n" # valid, becomes " foo" (Trailing tabs and newlines will also be trimmed)
 
 =for Pod::Coverage ^(meta|filter)$
+
+=head1 DESCRIPTION
+
+Trailing tabs and newlines will also be trimmed.
 
 =head1 HOMEPAGE
 

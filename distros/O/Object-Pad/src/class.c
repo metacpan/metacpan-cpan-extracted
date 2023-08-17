@@ -20,6 +20,7 @@
 #include "sv_setrv.c.inc"
 
 #include "perl-additions.c.inc"
+#include "forbid_outofblock_ops.c.inc"
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
@@ -170,7 +171,79 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
   croak("Unrecognised class attribute :%s", name);
 }
 
-/* TODO: get attribute */
+static ClassAttributeRegistration *get_active_registration(pTHX_ const char *name)
+{
+  COPHH *cophh = CopHINTHASH_get(PL_curcop);
+
+  for(ClassAttributeRegistration *reg = classattrs; reg; reg = reg->next) {
+    if(!strEQ(name, reg->name))
+      continue;
+
+    if(reg->funcs->permit_hintkey &&
+        !cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
+      continue;
+
+    return reg;
+  }
+
+  return NULL;
+}
+
+struct ClassHook *ObjectPad_mop_class_get_attribute(pTHX_ ClassMeta *classmeta, const char *name)
+{
+  /* First, work out what hookfuncs the name maps to */
+  ClassAttributeRegistration *reg = get_active_registration(aTHX_ name);
+
+  if(!reg)
+    return NULL;
+
+  /* Now lets see if classmeta has one */
+
+  if(!classmeta->hooks)
+    return NULL;
+
+  U32 hooki;
+  for(hooki = 0; hooki < av_count(classmeta->hooks); hooki++) {
+    struct ClassHook *hook = (struct ClassHook *)AvARRAY(classmeta->hooks)[hooki];
+
+    if(hook->funcs == reg->funcs)
+      return hook;
+  }
+
+  return NULL;
+}
+
+AV *ObjectPad_mop_class_get_attribute_values(pTHX_ ClassMeta *classmeta, const char *name)
+{
+  /* First, work out what hookfuncs the name maps to */
+
+  ClassAttributeRegistration *reg = get_active_registration(aTHX_ name);
+
+  if(!reg)
+    return NULL;
+
+  /* Now lets see if classmeta has one */
+
+  if(!classmeta->hooks)
+    return NULL;
+
+  AV *ret = NULL;
+
+  U32 hooki;
+  for(hooki = 0; hooki < av_count(classmeta->hooks); hooki++) {
+    struct ClassHook *hook = (struct ClassHook *)AvARRAY(classmeta->hooks)[hooki];
+
+    if(hook->funcs != reg->funcs)
+      continue;
+
+    if(!ret)
+      ret = newAV();
+
+    av_push(ret, newSVsv(hook->attrdata));
+  }
+
+  return ret;
+}
 
 ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash)
 {
@@ -752,6 +825,9 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 {
   if(meta->sealed)
     croak("Cannot add an ADJUST(PARAMS) block to an already-sealed class");
+
+  warn_outofblock_ops(CvROOT(cv), "Using %s to leave an ADJUST block is discouraged and will be removed in a later version");
+
   if(!meta->adjustblocks)
     meta->adjustblocks = newAV();
 

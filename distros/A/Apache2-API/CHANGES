@@ -1,0 +1,8 @@
+Revision history for Perl module Apache2::API
+
+v0.1.1 2023-06-10T20:29:58+0900
+    - Minor modification to init() in Apache2::API
+    - Updated method headers() in Apache2::API::Request and Apache2::API::Response to return an empty hash in HASH context when no headers
+
+v0.1.0 2023-05-30T21:45:10+0900
+    - Initial release

@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutPivotTableFieldRequest.name :   ,
-# PutPivotTableFieldRequest.sheetName :   ,
-# PutPivotTableFieldRequest.pivotTableIndex :   ,
-# PutPivotTableFieldRequest.pivotFieldType :   ,
-# PutPivotTableFieldRequest.pivotTableFieldRequest :   ,
-# PutPivotTableFieldRequest.needReCalculate :   ,
-# PutPivotTableFieldRequest.folder :   ,
-# PutPivotTableFieldRequest.storageName :    
+# PutPivotTableFieldRequest.name : The workbook name.  ,
+# PutPivotTableFieldRequest.sheetName : The worksheet name.  ,
+# PutPivotTableFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PutPivotTableFieldRequest.pivotFieldType : The fields area type.  ,
+# PutPivotTableFieldRequest.pivotTableFieldRequest : Dto that conrains field indexes  ,
+# PutPivotTableFieldRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# PutPivotTableFieldRequest.folder : Original workbook folder.  ,
+# PutPivotTableFieldRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_pivot_table_field' } = { 
-    	summary => '',
+    	summary => 'Adds a pivot field in pivot table',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -154,56 +154,56 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_type' => {
      	datatype => 'string',
      	base_name => 'pivotFieldType',
-     	description => '',
+     	description => 'The fields area type.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_field_request' => {
      	datatype => 'PivotTableFieldRequest',
      	base_name => 'pivotTableFieldRequest',
-     	description => '',
+     	description => 'Dto that conrains field indexes',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

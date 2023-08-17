@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( html_to_muse html_file_to_muse );
 
-our $VERSION = '0.59';
+our $VERSION = '0.67';
 
 =encoding utf8
 
@@ -39,8 +39,10 @@ needed if there are tables or complicated structures.
 
 use IO::HTML qw/html_file/;
 use HTML::PullParser;
+use Text::Amuse::Utils;
 
-my %preserved = (
+sub _preserve  {
+  my %keeptag = (
 		 "em" => [["<em>"], ["</em>"]],
 		 "i"  => [["<em>"], ["</em>"]],
 		 "u"  => [["<em>"], ["</em>"]],
@@ -76,8 +78,9 @@ my %preserved = (
 		 "div" => ["\n\n", "\n\n"],
 		 "center" => ["\n\n<center>\n", "\n</center>\n\n"],
 		 "right"  => ["\n\n<right>\n", "\n</right>\n\n"],
-		 
-);
+                );
+  return %keeptag;
+}
 
 =head1 FUNCTIONS
 
@@ -93,21 +96,27 @@ The first argument must be a filename.
 =cut
 
 sub html_to_muse {
-  my ($rawtext) = @_;
+  my ($rawtext, $opts) = @_;
   return unless defined $rawtext;
   # pack the things like hello<em> there</em> with space. Be careful
   # with recursions.
-  return _html_to_muse(\$rawtext);
+  return _html_to_muse(\$rawtext, $opts);
 }
 
 sub html_file_to_muse {
-  my ($text) = @_;
+  my ($text, $opts) = @_;
   die "$text is not a file" unless (-f $text);
-  return _html_to_muse(html_file($text));
+  return _html_to_muse(html_file($text), $opts);
 }
 
 sub _html_to_muse {
-  my $text = shift;
+  my ($text, $options) = @_;
+  $options ||= {};
+  my %preserved = _preserve();
+  my $is_rtl = Text::Amuse::Utils::lang_code_is_rtl($options->{lang});
+  if ($is_rtl) {
+    delete $preserved{right};
+  }
   my %opts = (
               start => '"S", tagname, attr',
               end   => '"E", tagname',
@@ -151,7 +160,7 @@ sub _html_to_muse {
 	push @lists, $tag;
       }
       elsif (($tag eq 'p') or ($tag eq 'div')) {
-	$tag = _pars_process_attr($tag, $attr);
+	$tag = _pars_process_attr($tag, $attr, { rtl => $is_rtl });
 	push @parspile, $tag;
       }
       # see if we want to skip it.
@@ -318,13 +327,13 @@ sub _span_process_attr {
 }
 
 sub _pars_process_attr {
-  my ($tag, $attr) = @_;
+  my ($tag, $attr, $opts) = @_;
   # warn Dumper($attr);
   if (my $style = $attr->{style}) {
     if ($style =~ m/text-align:\s*center/i) {
       $tag = 'center';
     }
-    if ($style =~ m/text-align:\s*right/i) {
+    if (!$opts->{rtl} and $style =~ m/text-align:\s*right/i) {
       $tag = 'right';
     }
     if ($style =~ m/padding-left:\s*\d/si) {
@@ -335,7 +344,7 @@ sub _pars_process_attr {
     if ($align =~ m/center/i) {
       $tag = 'center';
     }
-    if ($align =~ m/right/i) {
+    if (!$opts->{rtl} and $align =~ m/right/i) {
       $tag = 'right';
     }
   }

@@ -11,7 +11,6 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use JSON::MaybeXS;
 use List::MoreUtils;	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
@@ -26,11 +25,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.75
+Version 0.77
 
 =cut
 
-our $VERSION = '0.75';
+our $VERSION = '0.77';
 
 =head1 SYNOPSIS
 
@@ -645,6 +644,9 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
+				require JSON::MaybeXS;
+				JSON::MaybeXS->import();
+
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
 						warning => 'read failed: something else may have read STDIN'
@@ -1061,10 +1063,8 @@ sub is_mobile {
 		# Save loading and calling HTTP::BrowserDetect
 		my $remote = $ENV{'REMOTE_ADDR'};
 		if(defined($remote) && $self->{cache}) {
-			my $is_mobile = $self->{cache}->get("is_mobile/$remote/$agent");
-			if(defined($is_mobile)) {
-				$self->{is_mobile} = $is_mobile;
-				return $is_mobile;
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_mobile} = ($type eq 'mobile');
 			}
 		}
 
@@ -1077,11 +1077,10 @@ sub is_mobile {
 		if($self->{browser_detect}) {
 			my $device = $self->{browser_detect}->device();
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
-			if($self->{cache} && defined($remote)) {
-				$self->{cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
+			if($is_mobile && $self->{cache} && defined($remote)) {
+				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
 			}
-			$self->{is_mobile} = $is_mobile;
-			return $is_mobile;
+			return $self->{is_mobile} = $is_mobile;
 		}
 	}
 
@@ -1349,10 +1348,12 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse/i) {
+	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor 1.0/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
+
+	my $key = "$remote/$agent";
 
 	if(my $referrer = $ENV{'HTTP_REFERER'}) {
 		# https://agency.ohow.co/google-analytics-implementation-audit/google-analytics-historical-spam-list/
@@ -1400,18 +1401,19 @@ sub is_robot {
 			if($self->{logger}) {
 				$self->{logger}->debug("is_robot: blocked trawler $referrer");
 			}
+			if($self->{cache}) {
+				$self->{cache}->set($key, 'robot', '1 day');
+			}
 			$self->{is_robot} = 1;
 			return 1;
 		}
 	}
 
-	my $key;
-
 	if($self->{cache}) {
-		$key = "is_robot/$remote/$agent";
-		if(defined(my $is_robot = $self->{cache}->get($key))) {
-			$self->{is_robot} = $is_robot;
-			return $is_robot;
+		if(defined($remote) && $self->{cache}) {
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_robot} = ($type eq 'robot');
+			}
 		}
 	}
 
@@ -1433,7 +1435,7 @@ sub is_robot {
 
 		if($is_robot) {
 			if($self->{cache}) {
-				$self->{cache}->set($key, $is_robot, '1 day');
+				$self->{cache}->set($key, 'robot', '1 day');
 			}
 			$self->{is_robot} = $is_robot;
 			return $is_robot;
@@ -1441,7 +1443,7 @@ sub is_robot {
 	}
 
 	if($self->{cache}) {
-		$self->{cache}->set($key, 0, '1 day');
+		$self->{cache}->set($key, 'unknown', '1 day');
 	}
 	$self->{is_robot} = 0;
 	return 0;
@@ -1479,12 +1481,11 @@ sub is_search_engine {
 	my $key;
 
 	if($self->{cache}) {
-		$key = "is_search/$remote/$agent";
-
-		my $is_search = $self->{cache}->get($key);
-		if(defined($is_search)) {
-			$self->{is_search_engine} = $is_search;
-			return $is_search;
+		$key = "$remote/$agent";
+		if(defined($remote) && $self->{cache}) {
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_search} = ($type eq 'search');
+			}
 		}
 	}
 
@@ -1492,7 +1493,7 @@ sub is_search_engine {
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 1, '1 day');
+			$self->{cache}->set($key, 'search', '1 day');
 		}
 		return 1;
 	}
@@ -1508,11 +1509,10 @@ sub is_search_engine {
 		if((!$is_search) && $agent =~ /SeznamBot\//) {
 			$is_search = 1;
 		}
-		if($self->{cache}) {
-			$self->{cache}->set($key, $is_search, '1 day');
+		if($is_search && $self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
 		}
-		$self->{is_search_engine} = $is_search;
-		return $is_search;
+		return $self->{is_search_engine} = $is_search;
 	}
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
@@ -1520,15 +1520,12 @@ sub is_search_engine {
 
 	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 1, '1 day');
+			$self->{cache}->set($key, 'search', '1 day');
 		}
 		$self->{is_search_engine} = 1;
 		return 1;
 	}
 
-	if($self->{cache}) {
-		$self->{cache}->set($key, 0, '1 day');
-	}
 	$self->{is_search_engine} = 0;
 	return 0;
 }
@@ -1786,10 +1783,6 @@ L<https://metacpan.org/release/CGI-Info>
 =item * RT: CPAN's request tracker
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
-
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/CGI-Info>
 
 =item * CPAN Testers' Matrix
 

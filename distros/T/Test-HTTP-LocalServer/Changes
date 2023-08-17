@@ -1,3 +1,6 @@
+0.75 2023-07-21
+    * Various build and test upgrades, no code changes, no need to upgrade
+
 0.74 2021-10-24
     * Restore compatibility with Perl 5.8.x
 

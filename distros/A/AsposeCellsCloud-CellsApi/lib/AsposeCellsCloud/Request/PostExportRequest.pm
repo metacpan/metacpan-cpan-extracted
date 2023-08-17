@@ -60,8 +60,8 @@ sub new {
 
 # Run Operation Request
 # PostExportRequest.File : File to upload  ,
-# PostExportRequest.objectType :   ,
-# PostExportRequest.format :   ,
+# PostExportRequest.objectType : workbook/worksheet/chart/comment/picture/shape/listobject/oleobject  ,
+# PostExportRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostExportRequest.password :   ,
 # PostExportRequest.checkExcelRestriction :    
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
-    	summary => '',
+    	summary => 'Export excel internal elements or itself to kinds of format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -145,14 +145,14 @@ __PACKAGE__->method_documentation({
      'object_type' => {
      	datatype => 'string',
      	base_name => 'objectType',
-     	description => '',
+     	description => 'workbook/worksheet/chart/comment/picture/shape/listobject/oleobject',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},

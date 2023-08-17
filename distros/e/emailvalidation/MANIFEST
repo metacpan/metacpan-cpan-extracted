@@ -1,0 +1,8 @@
+Build.PL
+example.pl
+lib/emailvalidation.pm
+lib/emailvalidation.pod
+MANIFEST			This list of files
+META.yml
+META.json
+README.md

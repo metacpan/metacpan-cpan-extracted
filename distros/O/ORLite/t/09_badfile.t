@@ -11,7 +11,8 @@ BEGIN {
 use Test::More tests => 2;
 use Test::Script;
 use File::Remove;
-use t::lib::Test;
+use lib 't/lib';
+use LocalTest;
 
 # Where the test file will be
 my $file = test_db();

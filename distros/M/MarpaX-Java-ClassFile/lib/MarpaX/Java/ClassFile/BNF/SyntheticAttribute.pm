@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a Signature_attribute
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -57,7 +57,7 @@ MarpaX::Java::ClassFile::BNF::SyntheticAttribute - Parsing of a Signature_attrib
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

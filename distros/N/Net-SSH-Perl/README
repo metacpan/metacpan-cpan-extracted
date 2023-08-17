@@ -32,7 +32,7 @@ your CPAN shell is set up, you should just be able to do
 If you don't like that, you can download the distribution; the
 latest version on CPAN can be found at
 
-	http://search.cpan.org/dist/Net-SSH-Perl/
+	https://metacpan.org/module/Net::SSH::Perl
 
 Download it, unpack it, then build it as per the usual:
 

@@ -3,7 +3,7 @@
 use v5.14;  # package NAME {BLOCK}
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any '$metrics', strict => 0;
 
@@ -44,7 +44,7 @@ my %expect = (
    'main/timer'        => 0.1,
 );
 
-is_deeply( \%metrics1, \%expect, 'Metrics reported to first adapter' );
-is_deeply( \%metrics2, \%expect, 'Metrics reported to second adapter' );
+is( \%metrics1, \%expect, 'Metrics reported to first adapter' );
+is( \%metrics2, \%expect, 'Metrics reported to second adapter' );
 
 done_testing;

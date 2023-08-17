@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# GetWorkbookDefaultStyleRequest.name :   ,
-# GetWorkbookDefaultStyleRequest.folder :   ,
-# GetWorkbookDefaultStyleRequest.storageName :    
+# GetWorkbookDefaultStyleRequest.name : The workbook name.  ,
+# GetWorkbookDefaultStyleRequest.folder : Original workbook folder.  ,
+# GetWorkbookDefaultStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_default_style' } = { 
-    	summary => '',
+    	summary => 'Gets workbook default style description.',
         params => $params,
         returns => 'StyleResponse',
     };
@@ -123,21 +123,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

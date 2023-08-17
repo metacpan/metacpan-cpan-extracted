@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,6 @@
 #include <catch2/internal/catch_unique_ptr.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <vector>
 #include <cmath>
 
@@ -29,27 +28,30 @@ namespace Catch {
             template <typename Clock>
             std::vector<double> resolution(int k) {
                 std::vector<TimePoint<Clock>> times;
-                times.reserve(k + 1);
-                std::generate_n(std::back_inserter(times), k + 1, now<Clock>{});
+                times.reserve(static_cast<size_t>(k + 1));
+                for ( int i = 0; i < k + 1; ++i ) {
+                    times.push_back( Clock::now() );
+                }
 
                 std::vector<double> deltas;
-                deltas.reserve(k);
-                std::transform(std::next(times.begin()), times.end(), times.begin(),
-                    std::back_inserter(deltas),
-                    [](TimePoint<Clock> a, TimePoint<Clock> b) { return static_cast<double>((a - b).count()); });
+                deltas.reserve(static_cast<size_t>(k));
+                for ( size_t idx = 1; idx < times.size(); ++idx ) {
+                    deltas.push_back( static_cast<double>(
+                        ( times[idx] - times[idx - 1] ).count() ) );
+                }
 
                 return deltas;
             }
 
-            const auto warmup_iterations = 10000;
-            const auto warmup_time = std::chrono::milliseconds(100);
-            const auto minimum_ticks = 1000;
-            const auto warmup_seed = 10000;
-            const auto clock_resolution_estimation_time = std::chrono::milliseconds(500);
-            const auto clock_cost_estimation_time_limit = std::chrono::seconds(1);
-            const auto clock_cost_estimation_tick_limit = 100000;
-            const auto clock_cost_estimation_time = std::chrono::milliseconds(10);
-            const auto clock_cost_estimation_iterations = 10000;
+            constexpr auto warmup_iterations = 10000;
+            constexpr auto warmup_time = std::chrono::milliseconds(100);
+            constexpr auto minimum_ticks = 1000;
+            constexpr auto warmup_seed = 10000;
+            constexpr auto clock_resolution_estimation_time = std::chrono::milliseconds(500);
+            constexpr auto clock_cost_estimation_time_limit = std::chrono::seconds(1);
+            constexpr auto clock_cost_estimation_tick_limit = 100000;
+            constexpr auto clock_cost_estimation_time = std::chrono::milliseconds(10);
+            constexpr auto clock_cost_estimation_iterations = 10000;
 
             template <typename Clock>
             int warmup() {
@@ -83,10 +85,12 @@ namespace Catch {
                 auto&& r = run_for_at_least<Clock>(std::chrono::duration_cast<ClockDuration<Clock>>(clock_cost_estimation_time), iters, time_clock);
                 std::vector<double> times;
                 int nsamples = static_cast<int>(std::ceil(time_limit / r.elapsed));
-                times.reserve(nsamples);
-                std::generate_n(std::back_inserter(times), nsamples, [time_clock, &r] {
-                    return static_cast<double>((time_clock(r.iterations) / r.iterations).count());
-                });
+                times.reserve(static_cast<size_t>(nsamples));
+                for ( int s = 0; s < nsamples; ++s ) {
+                    times.push_back( static_cast<double>(
+                        ( time_clock( r.iterations ) / r.iterations )
+                            .count() ) );
+                }
                 return {
                     FloatDuration<Clock>(mean(times.begin(), times.end())),
                     classify_outliers(times.begin(), times.end()),

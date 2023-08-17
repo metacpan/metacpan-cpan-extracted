@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Final 0.05;
+package Object::Pad::FieldAttr::Final 0.06;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.50;
+use Object::Pad 0.66;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -23,10 +23,10 @@ C<Object::Pad::FieldAttr::Final> - declare C<Object::Pad> fields readonly after 
    use Object::Pad::FieldAttr::Final;
 
    class Rectangle {
-      has $width  :param :reader :Final;
-      has $height :param :reader :Final;
+      field $width  :param :reader :Final;
+      field $height :param :reader :Final;
 
-      has $area :reader :Final;
+      field $area :reader :Final;
 
       ADJUST {
          $area = $width * $height;
@@ -47,25 +47,25 @@ future. As a result, this module should be considered equally experimental.
 
 =head2 :Final
 
-   has $field :Final ...;
-   has $field :Final ... = DEFAULT;
+   field $name :Final ...;
+   field $name :Final ... = DEFAULT;
 
 Declares that the field variable will be set readonly at the end of the
 constructor, after any assignments from C<:param> declarations or C<ADJUST>
 blocks. At this point, the value cannot otherwise be modified by directly
 writing into the field variable.
 
-   has $field :Final;
+   field $x :Final;
 
-   ADJUST { $field = 123; }    # this is permitted
+   ADJUST { $x = 123; }    # this is permitted
 
-   method m { $field = 456; }  # this will fail
+   method m { $x = 456; }  # this will fail
 
 Note that this is only a I<shallow> readonly setting; if the field variable
 contains a reference to a data structure, that structure itself remains
 mutable.
 
-   has $aref :Final;
+   field $aref :Final;
    ADJUST { $aref = []; }
 
    method more { push @$aref, "another"; }   # this is permitted
@@ -75,6 +75,11 @@ mutable.
 sub import
 {
    $^H{"Object::Pad::FieldAttr::Final/Final"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::FieldAttr::Final/Final"};
 }
 
 =head1 AUTHOR

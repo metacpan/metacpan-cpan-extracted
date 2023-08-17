@@ -3,7 +3,7 @@ Locale::Codes::Country_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Mon Mar  6 13:16:35 EST 2023
+#    Generated on: Wed Jun  7 11:46:18 EDT 2023
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.73';
+$VERSION='3.74';
 
 $Locale::Codes::Data{'country'}{'id'} = '0280';
 
@@ -605,10 +605,8 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       q(Nepal),
       ],
    q(0156) => [
+      q(Netherlands (Kingdom of the)),
       q(Netherlands),
-      q(The Netherlands),
-      q(Netherlands, The),
-      q(Netherlands (The)),
       ],
    q(0157) => [
       q(New Caledonia),
@@ -2169,15 +2167,11 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(netherlands) => [
       q(0156),
+      q(1),
+      ],
+   q(netherlands (kingdom of the)) => [
+      q(0156),
       q(0),
-      ],
-   q(netherlands (the)) => [
-      q(0156),
-      q(3),
-      ],
-   q(netherlands, the) => [
-      q(0156),
-      q(2),
       ],
    q(new caledonia) => [
       q(0157),
@@ -2745,10 +2739,6 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(the marshall islands) => [
       q(0138),
-      q(1),
-      ],
-   q(the netherlands) => [
-      q(0156),
       q(1),
       ],
    q(the niger) => [
@@ -6799,7 +6789,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(NL) => [
          q(0156),
-         q(0),
+         q(1),
          ],
       q(NO) => [
          q(0166),
@@ -7901,7 +7891,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(NLD) => [
          q(0156),
-         q(0),
+         q(1),
          ],
       q(NOR) => [
          q(0166),
@@ -8915,7 +8905,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(528) => [
          q(0156),
-         q(0),
+         q(1),
          ],
       q(531) => [
          q(0056),

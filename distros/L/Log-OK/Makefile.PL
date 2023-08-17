@@ -3,7 +3,7 @@ WriteMakefile(
 	NAME              => 'Log::OK',
 	VERSION_FROM      => 'lib/Log/OK.pm',
 	PREREQ_PM         => {
-		"constant::more"=>0
+		"constant::more"=>"v0.2.0"
 	}, 
 	ABSTRACT_FROM     => 'lib/Log/OK.pod', # retrieve abstract from module
 	AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
@@ -19,7 +19,10 @@ WriteMakefile(
 				url => "git://github.com/drclaw1394/perl-log-ok.git",
 				web => "http://github.com/drclaw1394/perl-log-ok",
 			}
-		}
+		},
+		bugtracker => {
+			web => 'https://github.com/drclaw1394/perl-log-ok/issues'
+    },
 	}
 
 );

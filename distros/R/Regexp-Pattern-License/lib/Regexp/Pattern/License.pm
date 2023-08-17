@@ -19,11 +19,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.10.1
+Version v3.11.1
 
 =cut
 
-our $VERSION = version->declare("v3.10.1");
+our $VERSION = version->declare("v3.11.1");
 
 =head1 SYNOPSIS
 
@@ -179,13 +179,6 @@ my $cc_intro
 	. '(?: \S+)?[  ])?License[  ]'
 	. $cc_work_protected
 	. $cc_auth_lic_copylaw_prohib;
-my $cc_intro_cc0
-	= '(?:(?:\S+ )?'
-	. $cc_no_law_firm
-	. $cc_dist_no_rel_doc
-	. $cc_info_asis_discl_doc
-	. '(?: \S+)?[  ])?Statement of Purpose[  ]'
-	. $laws_confer;
 
 my $cc_by_exercising_you_accept_this
 	= '(?:By exercising the Licensed Rights [(]?defined below[)]?, You accept and agree to be bound by the terms and conditions of this '
@@ -1771,22 +1764,6 @@ $RE{licensed_under} = {
 		. ')[:]? ',
 };
 
-=item * or_at_option
-
-I<Since v3.1.92.>
-
-=cut
-
-$RE{or_at_option} = {
-	caption => 'license grant "or at your option" phrase',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_or_at_option>(?:and|or)(?: ?[(]?at your (?:option|choice)[)]?)?)',
-};
-
 =item * usage_rfn
 
 I<Since v3.2.0.>
@@ -1804,7 +1781,21 @@ $RE{usage_rfn} = {
 
 =item * version
 
-I<Since v3.1.92.>
+Optionally provides the following numbered and named captures:
+
+    "Under GPL, v2 or later of the license."
+              [                          ]  # -> $&
+                 I                          # -> $1, $-{version_number}
+                   [      ]                 # -> $2, $-{version_later}
+
+    "Under version 2 or 3 only of the GPL."
+          [                      ]  # -> $&
+                   I                # -> $1, $-{version_number}
+                        I           # -> $3, $-{version_number_2}
+                          [  ]      # -> $4, $-{version_only}
+                               []   # -> $5, $-{version_of}
+
+I<Captures stable since v3.11.0.>
 
 =cut
 
@@ -1816,9 +1807,13 @@ $RE{version} = {
 
 =item * version_later
 
-=item * version_later_paragraph
+Optionally provides the following numbered and named captures:
 
-=item * version_later_postfix
+    "Under GPLv2, or later of the license."
+                [        ]  # -> $&
+                  [      ]  # -> $1, $-{version_later}
+
+I<Captures stable since v3.11.0.>
 
 =cut
 
@@ -1827,68 +1822,47 @@ $RE{version_later} = {
 	tags    => [
 		'type:trait',
 	],
+
+	'pat.alt.subject.trait' =>
+		'(?:[.]?[ ]|,? )?(?P<version_later>(?:[(] ?)?(?:and|or)(?: '
+		. $P{at_option}
+		. ')?(?: any)? (?:later|above|newer|higher)(?: version)?(?: '
+		. $P{at_option} . ')?)',
 };
 
-$RE{version_later_paragraph} = {
-	caption => 'version "or later" postfix (paragraphs)',
-	tags    => [
-		'type:trait',
-	],
+=item * version_numberstring
 
-	'pat.alt.subject.trait.scope.paragraph' =>
-		'(?P<_version_later_paragraph>Later versions are permitted)',
-};
+Optionally provides the following numbered and named captures:
 
-$RE{version_later_postfix} = {
-	caption => 'version "or later" (postfix)',
-	tags    => [
-		'type:trait',
-	],
+    "Under GPL, v2 or later of the license."
+              [   ]  # -> $&
+                 I   # -> $1, $-{version_number}
 
-	'pat.alt.subject.trait' => '[(]?(?P<_version_later_postfix>'
-		. $RE{or_at_option}{'pat.alt.subject.trait'}
-		. '(?: any)? (?:later|above|newer)(?: version)?'
-		. '|or any later at your option)[)]?',
-};
+    "Under version 2 or 3 only of the GPL."
+           [        ]  # -> $&
+                   I   # -> $1, $-{version_number}
 
-$RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= '(?:,? )?(?P<version_later>'
-	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
-$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
-	= '(?:[.]?[ ])?(?P<version_later>'
-	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
-	. ')';
-$RE{version_later}{'pat.alt.subject.trait'} = _join_pats(
-	{ label => 'version_later', prefix => '(?:[.]?[ ]|,? )?' },
-	$RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'},
-	$RE{version_later_postfix}{'pat.alt.subject.trait'},
-);
-
-=item * version_number
-
-=item * version_number_suffix
+I<Since v3.1.92.>
+I<Captures stable since v3.11.0.>
 
 =cut
 
-$RE{version_number} = {
-	caption => 'version number',
+$RE{version_numberstring} = {
+	caption => 'version numberstring',
 	tags    => [
 		'type:trait',
 	],
-
-	'pat.alt.subject.trait' => '(?P<version_number>\d(?:\.\d+)*\b)',
-};
-
-$RE{version_number_suffix} = {
-	caption => 'version "of the License" suffix',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' => ' ?(?:(?:of the )?Licen[cs]e)?',
 };
 
 =item * version_only
+
+Optionally provides the following numbered and named captures:
+
+    "Under GPL version 2 only of the license."
+                         [  ]  # -> $&
+                         [  ]  # -> $1, $-{version_only}
+
+I<Captures stable since v3.11.0.>
 
 =cut
 
@@ -1899,7 +1873,7 @@ $RE{version_only} = {
 	],
 
 	'pat.alt.subject.trait' =>
-		' ?(?P<_version_only>(?:only|[(]no other versions[)]))',
+		' ?(?P<_version_only>only|[(]no other versions?(?: is allowed)?!?[)])',
 };
 
 =item * version_prefix
@@ -1913,55 +1887,48 @@ $RE{version_prefix} = {
 	],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		'(?:[-]|[;]? ?(?:(?:only |either )?)?|[ - ])?[(]?(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?',
-	'pat.alt.subject.trait.scope.paragraph' =>
-		'[:]?[ ][(]?(?:Version [Vv]?|VERSION )?',
+		'(?:[-]|[;]? ?(?:only |either )?|[ - ])?[(]? ?'
+		. $P{version_number_prefix},
+	'pat.alt.subject.trait.scope.paragraph' => '[:]?[ ][(]? ?'
+		. $P{version_number_prefix},
 	'pat.alt.subject.trait' =>
-		'(?:[-]|[;](?: (?:either )?)?|[ - ]|[:]?[ ])?[(]?(?:[Vv]ersion [Vv]?|VERSION |[Vv]\.? ?)?',
+		'(?:[-]|[;]? ?(?:either|only)? ?|[ - ]|[:]?[ ])?[(]? ?'
+		. $P{version_number_prefix},
 };
 
-=item * version_numberstring
+my $version_numberstring_suffix
+	= '(?P<version_number>'
+	. $P{version_number} . ')'
+	. $P{version_number_suffix};
+$RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. $version_numberstring_suffix;
+$RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
+	= $RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
+	. $version_numberstring_suffix;
+$RE{version_numberstring}{'pat.alt.subject.trait'}
+	= $RE{version_prefix}{'pat.alt.subject.trait'}
+	. $version_numberstring_suffix;
 
-I<Since v3.1.92.>
-
-=cut
-
-$RE{version_numberstring} = {
-	caption => 'version numberstring',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		$RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-		. $RE{version_number}{'pat.alt.subject.trait'}
-		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
-	'pat.alt.subject.trait.scope.paragraph' =>
-		$RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
-		. $RE{version_number}{'pat.alt.subject.trait'}
-		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
-	'pat.alt.subject.trait' => $RE{version_prefix}{'pat.alt.subject.trait'}
-		. $RE{version_number}{'pat.alt.subject.trait'}
-		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
-};
-
+my $version_suffix
+	= '(?:'
+	. $RE{version_later}{'pat.alt.subject.trait'} . '|'
+	. $P{version_plural_infix}
+	. $P{version_number_prefix}
+	. '(?P<version_number_2>'
+	. $P{version_number} . ')'
+	. $P{version_number_suffix} . '(?:'
+	. $RE{version_only}{'pat.alt.subject.trait'} . ')?'
+	. $P{version_plural_suffix}
+	. ')?(?: ?[)])? ?(?P<_version_of>of\b)? ?';
 $RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}
-	{'pat.alt.subject.trait.scope.line.scope.sentence'} . '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. ')?)[)]?(?: of)? ?';
+	= $RE{version_numberstring}
+	{'pat.alt.subject.trait.scope.line.scope.sentence'} . $version_suffix;
 $RE{version}{'pat.alt.subject.trait.scope.paragraph'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
-	. '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
-	. ')?)[)]?';
+	= $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
+	. $version_suffix;
 $RE{version}{'pat.alt.subject.trait'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}{'pat.alt.subject.trait'} . '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait'}
-	. ')?)[)]?(?: of)? ?';
+	= $RE{version_numberstring}{'pat.alt.subject.trait'} . $version_suffix;
 
 =back
 
@@ -3461,6 +3428,7 @@ $RE{bsd_2_clause} = {
 	'caption.alt.org.wikipedia.iri.bsd' =>
 		'2-clause license ("Simplified BSD License" or "FreeBSD License")',
 	'caption.alt.misc.parens'     => 'BSD (2 clause)',
+	'caption.alt.misc.ruby'       => '2-clause BSDL',
 	'caption.alt.misc.simplified' => 'Simplified BSD License',
 	'caption.alt.misc.qemu'       =>
 		'BSD Licence (without advertising or endorsement clauses)',
@@ -3658,6 +3626,7 @@ $RE{bsd_3_clause} = {
 	'caption.alt.misc.modified'   => 'Modified BSD License',
 	'caption.alt.misc.new_lower'  => 'new BSD License',
 	'caption.alt.misc.new_parens' => '(new) BSD License',
+	'caption.alt.misc.no_license' => '3-clause BSD',
 	'caption.alt.misc.parens'     => 'BSD (3 clause)',
 	'caption.alt.misc.qemu'  => 'BSD Licence (without advertising clause)',
 	'summary.alt.org.fedora' => 'BSD License (no advertising)',
@@ -4396,6 +4365,8 @@ $RE{cc_by_1} = {
 	],
 	licenseversion => '1.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution 1.0[  ]' . $cc_intro_1,
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
@@ -4430,6 +4401,8 @@ $RE{cc_by_2} = {
 	],
 	licenseversion => '2.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution 2.0[  ]' . $cc_intro,
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
@@ -4467,6 +4440,8 @@ $RE{cc_by_2_5} = {
 	],
 	licenseversion => '2.5',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution 2.5[  ]' . $cc_intro,
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
@@ -4508,6 +4483,8 @@ $RE{cc_by_3} = {
 	],
 	licenseversion => '3.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution 3.0 Unported[  ]' . $cc_intro,
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_collections_keep_intact_notices
@@ -4627,6 +4604,9 @@ $RE{cc_by_nc_1} = {
 		'type:singleversion:cc_by_nc',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial 1.0[  ]' . $cc_intro_1,
 };
 
 $RE{cc_by_nc_2} = {
@@ -4658,6 +4638,9 @@ $RE{cc_by_nc_2} = {
 		'type:singleversion:cc_by_nc',
 	],
 	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial 2.0[  ]' . $cc_intro,
 };
 
 $RE{cc_by_nc_2_5} = {
@@ -4686,6 +4669,9 @@ $RE{cc_by_nc_2_5} = {
 		'type:singleversion:cc_by_nc',
 	],
 	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial 2.5[  ]' . $cc_intro,
 };
 
 $RE{cc_by_nc_3} = {
@@ -4721,6 +4707,10 @@ $RE{cc_by_nc_3} = {
 		'type:singleversion:cc_by_nc',
 	],
 	licenseversion => '3.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial 3.0 Unported[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_4} = {
@@ -4839,6 +4829,10 @@ $RE{cc_by_nc_nd_1} = {
 		'type:singleversion:cc_by_nc_nd',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NoDerivs-NonCommercial 1.0[  ]'
+		. $cc_intro_1,
 };
 
 $RE{cc_by_nc_nd_2} = {
@@ -4868,6 +4862,10 @@ $RE{cc_by_nc_nd_2} = {
 		'type:singleversion:cc_by_nc_nd',
 	],
 	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.0[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_nd_2_5} = {
@@ -4897,6 +4895,10 @@ $RE{cc_by_nc_nd_2_5} = {
 		'type:singleversion:cc_by_nc_nd',
 	],
 	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.5[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_nd_3} = {
@@ -4930,6 +4932,10 @@ $RE{cc_by_nc_nd_3} = {
 		'type:singleversion:cc_by_nc_nd',
 	],
 	licenseversion => '3.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_nd_4} = {
@@ -5043,6 +5049,10 @@ $RE{cc_by_nc_sa_1} = {
 		'type:singleversion:cc_by_nc_sa',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 1.0[  ]'
+		. $cc_intro_1,
 };
 
 $RE{cc_by_nc_sa_2} = {
@@ -5072,6 +5082,10 @@ $RE{cc_by_nc_sa_2} = {
 		'type:singleversion:cc_by_nc_sa',
 	],
 	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.0[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_sa_2_5} = {
@@ -5101,6 +5115,10 @@ $RE{cc_by_nc_sa_2_5} = {
 		'type:singleversion:cc_by_nc_sa',
 	],
 	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.5[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_sa_3} = {
@@ -5134,6 +5152,10 @@ $RE{cc_by_nc_sa_3} = {
 		'type:singleversion:cc_by_nc_sa',
 	],
 	licenseversion => '3.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_nc_sa_4} = {
@@ -5247,6 +5269,9 @@ $RE{cc_by_nd_1} = {
 		'type:singleversion:cc_by_nd',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NoDerivs 1.0[  ]' . $cc_intro_1,
 };
 
 $RE{cc_by_nd_2} = {
@@ -5275,6 +5300,9 @@ $RE{cc_by_nd_2} = {
 		'type:singleversion:cc_by_nd',
 	],
 	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NoDerivs 2.0[  ]' . $cc_intro,
 };
 
 $RE{cc_by_nd_2_5} = {
@@ -5303,6 +5331,9 @@ $RE{cc_by_nd_2_5} = {
 		'type:singleversion:cc_by_nd',
 	],
 	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NoDerivs 2.5[  ]' . $cc_intro,
 };
 
 $RE{cc_by_nd_3} = {
@@ -5335,6 +5366,9 @@ $RE{cc_by_nd_3} = {
 		'type:singleversion:cc_by_nd',
 	],
 	licenseversion => '3.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-NoDerivs 3.0 Unported[  ]' . $cc_intro,
 };
 
 $RE{cc_by_nd_4} = {
@@ -5446,6 +5480,9 @@ $RE{cc_by_sa_1} = {
 		'type:singleversion:cc_by_sa',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-ShareAlike 1.0[  ]' . $cc_intro_1,
 };
 
 $RE{cc_by_sa_2} = {
@@ -5474,6 +5511,9 @@ $RE{cc_by_sa_2} = {
 		'type:singleversion:cc_by_sa',
 	],
 	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-ShareAlike 2.0[  ]' . $cc_intro,
 };
 
 $RE{cc_by_sa_2_5} = {
@@ -5504,6 +5544,9 @@ $RE{cc_by_sa_2_5} = {
 		'type:singleversion:cc_by_sa',
 	],
 	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-ShareAlike 2.5[  ]' . $cc_intro,
 };
 
 $RE{cc_by_sa_3} = {
@@ -5538,6 +5581,10 @@ $RE{cc_by_sa_3} = {
 		'type:singleversion:cc_by_sa',
 	],
 	licenseversion => '3.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Attribution-ShareAlike 3.0 Unported[  ]'
+		. $cc_intro,
 };
 
 $RE{cc_by_sa_4} = {
@@ -5635,6 +5682,12 @@ $RE{cc_cc0_1} = {
 
 	'pat.alt.subject.grant' =>
 		'has waived all copyright and related or neighboring rights',
+	'pat.alt.subject.license.scope.sentence.synth.cc' => '(?:(?:\S+ )?'
+		. $cc_no_law_firm
+		. $cc_dist_no_rel_doc
+		. $cc_info_asis_discl_doc
+		. '(?: \S+)?[  ])?Statement of Purpose[  ]'
+		. $laws_confer,
 };
 
 =item * cc_devnations
@@ -5676,6 +5729,8 @@ END
 	],
 	licenseversion => '2.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Developing Nations 2.0[  ]' . $cc_intro_1,
 	'pat.alt.subject.license.scope.sentence.part.definition_c' =>
 		'["]Developing Nation["] means any nation that is not classified',
 };
@@ -5716,6 +5771,9 @@ $RE{cc_nc_1} = {
 		'type:singleversion:cc_nc',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons NonCommercial 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_nc_sa
@@ -5757,6 +5815,9 @@ END
 		'type:singleversion:cc_nc_sa',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons NonCommercial-ShareAlike 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_nc_sp
@@ -5798,6 +5859,9 @@ END
 		'type:singleversion:cc_nc_sp',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons NonCommercial 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_nd_nc
@@ -5843,6 +5907,9 @@ END
 		'type:singleversion:cc_nd_nc',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons NoDerivs-NonCommercial 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_nd
@@ -5883,6 +5950,9 @@ END
 		'type:singleversion:cc_nd',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons NoDerivs 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_pd
@@ -5997,6 +6067,9 @@ END
 		'type:singleversion:cc_sa',
 	],
 	licenseversion => '1.0',
+
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons ShareAlike 1.0[  ]' . $cc_intro_1,
 };
 
 =item * cc_sampling
@@ -6044,6 +6117,8 @@ END
 	],
 	licenseversion => '1.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Sampling 1.0[  ]' . $cc_intro_1,
 	'pat.alt.subject.license.scope.line.scope.paragraph.part.part3a' =>
 		'Re-creativity[. ]You may',
 };
@@ -6095,6 +6170,8 @@ END
 	],
 	licenseversion => '1.0',
 
+	'pat.alt.subject.license.scope.multisection.part.intro' =>
+		'Creative Commons Sampling Plus 1.0[  ]' . $cc_intro_1,
 	'pat.alt.subject.license.scope.line.scope.sentence.part.part3a' =>
 		'Re-creativity permitted',
 };
@@ -8356,6 +8433,8 @@ $RE{gpl_2} = {
 
 	'pat.alt.subject.license.scope.sentence.part.preamble' =>
 		'[(]Some other Free Software Foundation software is covered by t?he GNU (Library|Lesser)',
+	'pat.alt.subject.license.scope.line.scope.paragraph.part.title' =>
+		'GNU General Public License [(]GPL[)]. Version 2, June 1991',
 	'pat.alt.subject.license.scope.multisection.part.tail_sample' =>
 		'[<]?name of author[>]?[  ]'
 		. 'This program is free software[;]? '
@@ -10110,6 +10189,7 @@ $RE{mit_new} = {
 	'name.alt.org.tldr'                             => 'mit-license',
 	'name.alt.org.tldr.path.short'                  => 'mit',
 	'name.alt.org.wikidata.synth.nogrant'           => 'Q18526198',
+	'name.alt.misc.mit'                             => 'MIT/Expat',
 	caption                                         => 'MIT License',
 	'caption.alt.org.debian'                        => 'Expat License',
 	'caption.alt.org.fedora'            => 'MIT license (also X11)',
@@ -10120,13 +10200,12 @@ $RE{mit_new} = {
 	'caption.alt.org.tldr'              => 'MIT License (Expat)',
 	'summary.alt.org.fedora.iri.mit'    =>
 		'MIT-style license, Modern Style with sublicense',
-	'caption.alt.org.wikidata'    => 'Expat license',
-	'caption.alt.org.wikipedia'   => 'MIT License',
-	'caption.alt.misc.wayland'    => 'the MIT Expat license',
-	'caption.alt.misc.mono'       => 'the MIT X11 license',
-	'caption.alt.misc.mono_slash' => 'the MIT/X11 license',
-	iri                           => 'http://www.jclark.com/xml/copying.txt',
-	description                   => <<'END',
+	'caption.alt.org.wikidata'   => 'Expat license',
+	'caption.alt.org.wikipedia'  => 'MIT License',
+	'caption.alt.misc.mit_expat' => 'MIT Expat',
+	'caption.alt.misc.wayland'   => 'the MIT Expat license',
+	iri                          => 'http://www.jclark.com/xml/copying.txt',
+	description                  => <<'END',
 Origin: X11 Licene
 
 Identical to X11 License, except...
@@ -10868,7 +10947,7 @@ $RE{naumen} = {
 	'pat.alt.subject.license.scope.multisection.part.part2_3' =>
 		$P{repro_copr_cond_discl}
 		. '[.][  ]' . '[*)]'
-		. 'The name Zope Corporation[tm] must not '
+		. 'The name NAUMEN[tm] must not '
 		. $P{used_endorse_deriv}
 		. $P{without_prior_written},
 	'pat.alt.subject.license.scope.sentence.part.part3' =>
@@ -11879,7 +11958,8 @@ END
 		. '[.][  ]' . '[*)]?'
 		. $P{ad_mat_ack_this}
 		. 'the OpenSSL Project for use in the OpenSSL Toolkit[. ][(][http://]www\.openssl\.org[/][)]["]'
-		. '[  ]' . '[*)]?'
+		. '[  ]'
+		. '[*)]?'
 		. $P{nopromo_neither}
 		. '[. ]For written permission, please contact openssl[-]core[@]openssl\.org'
 		. '[.][  ]' . '[*)]?'
@@ -12032,7 +12112,17 @@ $RE{osl_1} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		'["]Licensed under the Open Software License version 1\.0["][  ]'
-		. 'License Terms'
+		. 'License Terms',
+	'pat.alt.subject.license.scope.multisection.part.part1_with_grant' =>
+		'["]Licensed under the Open Software License version 1\.0["][  ]'
+		. '[*)]Grant of Copyright License[.] '
+		. 'Licensor hereby grants You a world-wide, royalty-free, '
+		. 'non-exclusive, perpetual, non-sublicenseable license to do the following[:][  ]'
+		. '[*)]to reproduce the Original Work in copies;[  ]'
+		. '[*)]to prepare derivative works [(]["]Derivative Works["][)] based upon the Original Work;[  ]'
+		. '[*)]to distribute copies of the Original Work and Derivative Works to the public, '
+		. 'with the proviso that copies of Original Work or Derivative Works '
+		. 'that You distribute shall be licensed under the Open Software License;'
 };
 
 $RE{osl_1_1} = {
@@ -12053,7 +12143,17 @@ $RE{osl_1_1} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		'Licensed under the Open Software License version 1\.1[  ]'
-		. '[*)]Grant of Copyright License[.]'
+		. '[*)]Grant of Copyright License[.]',
+	'pat.alt.subject.license.scope.multisection.part.part1_with_grant' =>
+		'Licensed under the Open Software License version 1\.1[  ]'
+		. '[*)]Grant of Copyright License[.] '
+		. 'Licensor hereby grants You a world-wide, royalty-free, '
+		. 'non-exclusive, perpetual, non-sublicenseable license to do the following[:][  ]'
+		. '[*)]to reproduce the Original Work in copies;[  ]'
+		. '[*)]to prepare derivative works [(]["]Derivative Works["][)] based upon the Original Work;[  ]'
+		. '[*)]to distribute copies of the Original Work and Derivative Works to the public, '
+		. 'with the proviso that copies of Original Work or Derivative Works '
+		. 'that You distribute shall be licensed under the Open Software License;'
 };
 
 $RE{osl_2} = {
@@ -12074,6 +12174,16 @@ $RE{osl_2} = {
 	'pat.alt.subject.license.scope.multisection.part.part1' =>
 		'Licensed under the Open Software License version 2\.0[  ]'
 		. '[*)]Grant of Copyright License[.]',
+	'pat.alt.subject.license.scope.multisection.part.part1_with_grant' =>
+		'Licensed under the Open Software License version 2\.0[  ]'
+		. '[*)]Grant of Copyright License[.] '
+		. 'Licensor hereby grants You a world-wide, royalty-free, '
+		. 'non-exclusive, perpetual, sublicenseable license to do the following[:][  ]'
+		. '[*)]to reproduce the Original Work in copies;[  ]'
+		. '[*)]to prepare derivative works [(]["]Derivative Works["][)] based upon the Original Work;[  ]'
+		. '[*)]to distribute copies of the Original Work and Derivative Works to the public, '
+		. 'with the proviso that copies of Original Work or Derivative Works '
+		. 'that You distribute shall be licensed under the Open Software License;',
 	'pat.alt.subject.license.scope.multisection.part.part10' =>
 		'its terms and conditions[.][  ]'
 		. 'This License shall terminate immediately '
@@ -12106,7 +12216,17 @@ $RE{osl_2_1} = {
 
 	'pat.alt.subject.license.scope.multisection.part.part1' =>
 		'Licensed under the Open Software License version 2\.1[  ]'
-		. '[*)]Grant of Copyright License[.]'
+		. '[*)]Grant of Copyright License[.]',
+	'pat.alt.subject.license.scope.multisection.part.part1_with_grant' =>
+		'Licensed under the Open Software License version 2\.1[  ]'
+		. '[*)]Grant of Copyright License[.] '
+		. 'Licensor hereby grants You a world-wide, royalty-free, '
+		. 'non-exclusive, perpetual, sublicenseable license to do the following[:][  ]'
+		. '[*)]to reproduce the Original Work in copies;[  ]'
+		. '[*)]to prepare derivative works [(]["]Derivative Works["][)] based upon the Original Work;[  ]'
+		. '[*)]to distribute copies of the Original Work and Derivative Works to the public, '
+		. 'with the proviso that copies of Original Work or Derivative Works '
+		. 'that You distribute shall be licensed under the Open Software License;'
 };
 
 $RE{osl_3} = {
@@ -12564,7 +12684,9 @@ $RE{rpl_1_5} = {
 	licenseversion => '1.5',
 
 	'pat.alt.subject.license.scope.multisection.part.part1' =>
-		'This Reciprocal Public License Version 1\.5 [(]["]License["][)] applies to any programs'
+		'This Reciprocal Public License Version 1\.5 [(]["]License["][)] applies to any programs',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.exhibit_a' =>
+		'All software distributed under the RPL is provided strictly',
 };
 
 =item * rpsl
@@ -12629,8 +12751,12 @@ $RE{rpsl_1} = {
 	],
 	licenseversion => '1.0',
 
-	'pat.alt.subject.license' =>
+	'pat.alt.subject.license.scope.sentence.part.part1' =>
 		'General Definitions[. ]This License applies to any program or other work',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.exhibit_b' =>
+		'Compatible Source Licenses for the RealNetworks Public Source License',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.note' =>
+		'Covered Code may only be licensed under the RealNetworks Public Source License',
 };
 
 =item * ruby
@@ -12860,6 +12986,8 @@ END
 
 	'pat.alt.subject.license.scope.line.scope.sentence.part.intro' =>
 		'The SimPL applies to the software[\']s source and',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.pseudo_grant' =>
+		'prevents you from distributing the software under the terms of the SimPL',
 };
 
 =item * simple_w3c
@@ -13920,9 +14048,11 @@ $RE{x11} = {
 	'name.alt.org.spdx.since.date_20130117.synth.nogrant' => 'X11',
 	'name.alt.org.tldr.path.short'                        => 'x11',
 	'name.alt.org.wikidata.synth.nogrant'                 => 'Q18526202',
+	'caption.alt.misc.mit'                                => 'MIT/X11',
 	caption                                               => 'X11 License',
 	'caption.alt.org.tldr'                                => 'X11 License',
 	'caption.alt.org.wikidata'                            => 'X11 license',
+	'caption.alt.misc.mit_no_license'                     => 'MIT X11',
 	'caption.alt.misc.wayland' => 'the MIT X11 license',
 	description                => <<'END',
 Origin: By MIT Laboratory for Computer Science (MIT–LCS) in 1984 for PC/IP.
@@ -14846,13 +14976,14 @@ my %_SERIES;
 my %_USAGE;
 
 for (
-	qw(license_label_spdx license_label_trove license_label licensed_under version_number_suffix version_only version_later)
+	qw(license_label_spdx license_label_trove license_label licensed_under version_only version_later)
 	)
 {
 	$_ANNOTATIONS{"(:$_:)"} = $RE{$_}{'pat.alt.subject.trait'};
 	$_ANNOTATIONS{"(:$_:)"} =~ s/\[.+?\]/
 		exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
 }
+$_ANNOTATIONS{"(:version_number_suffix:)"} = $P{version_number_suffix};
 $_ANNOTATIONS{"(:version_prefix:)"}
 	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'};
 $_ANNOTATIONS{"(:version_prefix:)"} =~ s/\[.+?\]/
@@ -15070,7 +15201,11 @@ for my $id (@_OBJECTS) {
 	# synthesize patterns: iri from metadata iri
 	unless ( $RE{$id}{'pat.alt.subject.iri'} ) {
 		my @subpat;
-		for ( sort grep {/^iri(?:[.(]|\z)/} keys %{ $RE{$id} } ) {
+		for (
+			sort { length($b) <=> length($a) || $a cmp $b }
+			grep {/^iri(?:[.(]|\z)/} keys %{ $RE{$id} }
+			)
+		{
 			my $val = $RE{$id}{$_};
 
 			$val =~ s/\./\\./g;
@@ -15158,7 +15293,8 @@ for my $id (@_OBJECTS) {
 			{   prefix => "(?: ?[(](?:$the)?" . '["]?',
 				suffix => "(?:$version)?" . '(?: [Ll]icen[cs]e)?["]?[)])?'
 			},
-			sort keys %singleword_pat
+			sort { length($b) <=> length($a) || $a cmp $b }
+				keys %singleword_pat
 		);
 		my $shortname_z_re = $shortname;
 		$shortname_z_re =~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/
@@ -15213,7 +15349,6 @@ for my $id (@_OBJECTS) {
 				$val =~ s/$shortname_z_re//;
 			}
 			$val =~ s/^$the//;
-			$val =~ s/ [Ll]icen[cs]e$//;
 
 			# mangle and annotate metadata
 			$val =~ tr/–/-/;
@@ -15226,22 +15361,23 @@ for my $id (@_OBJECTS) {
 			$val =~ s{ / }{[ / ]}g;
 
 			# generalize commonly varying words
-			$val =~ s/^(?:[Aa]n? )/(?:[Aa]n? )?/;            # relax (not add)
-			$val =~ s/ [Ll]icen[cs]e/(?: [Ll]icen[cs]e)?/;
+			$val =~ s/^(?:[Aa]n? )/(?:[Aa]n? )?/;       # relax (not add)
+			$val =~ s/ [Ll]icen[cs]e/ [Ll]icen[cs]e/;
 
 			$multiword_pat{$val} = undef;
 		}
-
 		my $stem = _join_pats(
 			{ prefix => "$the?", suffix => '(?: [Ll]icen[cs]e)?' },
-			sort keys %multiword_pat,
+			sort( { length($b) <=> length($a) || $a cmp $b }
+				keys %multiword_pat ),
 			_join_pats(
 				{ prefix => '\b', suffix => $version ? '' : '\b' },
 
 				# TODO: use { s/-/[-]/gr } when needing perl 5.14 anyway
 				map      { my $s = $_; $s =~ s/-/[-]/g; $s; }
 					grep { not exists $multiword_pat{$_} }
-					sort keys %singleword_pat,
+					sort { length($b) <=> length($a) || $a cmp $b }
+					keys %singleword_pat,
 			),
 		);
 
@@ -15284,7 +15420,8 @@ for my $id (@_OBJECTS) {
 				{   assign => [ $id, '_pat.alt.subject.grant.synth.name' ],
 					prefix => '(:license_label:) ?'
 				},
-				sort keys %name_pat
+				sort { length($b) <=> length($a) || $a cmp $b }
+					keys %name_pat
 			);
 		}
 
@@ -15294,7 +15431,8 @@ for my $id (@_OBJECTS) {
 				{   assign => [ $id, '_pat.alt.subject.grant.synth.spdx' ],
 					prefix => '(:license_label_spdx:) ?'
 				},
-				sort keys %spdx_pat
+				sort { length($b) <=> length($a) || $a cmp $b }
+					keys %spdx_pat
 			);
 		}
 
@@ -15304,7 +15442,8 @@ for my $id (@_OBJECTS) {
 				{   assign => [ $id, '_pat.alt.subject.grant.synth.trove' ],
 					prefix => '(:license_label_trove:) ?'
 				},
-				sort keys %trove_pat
+				sort { length($b) <=> length($a) || $a cmp $b }
+					keys %trove_pat
 			);
 		}
 
@@ -15318,31 +15457,6 @@ for my $id (@_OBJECTS) {
 				},
 				@{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} }
 			);
-		}
-
-		# synthesize CC subject pattern license from metadata caption
-		if ( $id eq 'cc_cc0_1' ) {
-			$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-				//= "(?:$RE{$id}{caption})?" . "[  ]$cc_intro_cc0";
-		}
-		elsif ( $id =~ /^cc.*_1$/ ) {
-			$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-				//= $RE{$id}{caption} . "[  ]$cc_intro_1";
-		}
-		elsif ( $id =~ /^cc.*_(?:2|2_5)$/ ) {
-			$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-				//= $RE{$id}{caption} . "[  ]$cc_intro";
-		}
-		elsif ( $id =~ /^cc.*_3$/ ) {
-			$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-				//= $RE{$id}{caption} . ' Unported' . "[  ]$cc_intro";
-		}
-		elsif ( $id =~ /^cc.*_4$/ ) {
-			$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-				//= $RE{$id}{caption}
-				. '(?: Public License)?[  ]'
-				. $cc_by_exercising_you_accept_this
-				. $RE{$id}{caption};
 		}
 	}
 
@@ -15363,8 +15477,9 @@ for my $id (@_OBJECTS) {
 		$RE{$id}{"pat.alt.subject.$subject"}
 			//= _join_pats( $RE{$id}{"_pat.alt.subject.$subject"} )
 			|| _join_pats(
-			map { $RE{$id}{$_} }
-			sort keys %{ $subject_pat{$subject} }
+			map      { $RE{$id}{$_} }
+				sort { length($b) <=> length($a) || $a cmp $b }
+				keys %{ $subject_pat{$subject} }
 			) or delete $RE{$id}{"pat.alt.subject.$subject"};
 	}
 
@@ -15506,6 +15621,48 @@ License objects obsoleted by improved coverage of other objects,
 and provided only as dummy objects.
 
 =over
+
+=item * or_at_option
+
+I<Since v3.11.0.>
+
+=item * version_later_paragraph
+
+I<Since v3.11.0.>
+
+=item * version_later_postfix
+
+I<Since v3.11.0.>
+
+=item * version_number
+
+I<Since v3.11.0.>
+
+=item * version_number_suffix
+
+I<Since v3.11.0.>
+
+=cut
+
+$RE{or_at_option} = {
+	pat => qr/^this should never match (except itself) psionvaitabbersh$/,
+};
+
+$RE{version_later_paragraph} = {
+	pat => qr/^this should never match (except itself) ggesionercuterck$/,
+};
+
+$RE{version_later_postfix} = {
+	pat => qr/^this should never match (except itself) ickazaldssuniscu$/,
+};
+
+$RE{version_number} = {
+	pat => qr/^this should never match (except itself) dercharapiquissi$/,
+};
+
+$RE{version_number_suffix} = {
+	pat => qr/^this should never match (except itself) hottesssonsonthe$/,
+};
 
 =item * python
 

@@ -1,5 +1,3 @@
-# $Id: Cipher.pm,v 1.12 2008/09/24 19:21:20 turnstep Exp $
-
 package Net::SSH::Perl::Cipher;
 
 use strict;

@@ -17,6 +17,7 @@ WriteMakefile(
 		'JSON::MaybeXS' => 0,
 		'Moose' => 0,
 		'MooseX::Singleton' => 0,
+		'SemVer' => 0,
 	},
 	EXE_FILES => [
 		'scripts/mc-encode',

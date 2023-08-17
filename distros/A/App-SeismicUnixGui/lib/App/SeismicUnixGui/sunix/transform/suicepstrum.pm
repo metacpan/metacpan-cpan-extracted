@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::transform::suicepstrum;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUICEPSTRUM - fft of complex log frequency traces to real time traces
+ PERL PROGRAM NAME:  SUICEPSTRUM - fft of complex log frequency traces to real time traces
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

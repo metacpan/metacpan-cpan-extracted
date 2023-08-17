@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iApply_top_mute;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iApply_top_mute
+ PERL PROGRAM NAME: iApply_top_mute
  AUTHOR: Juan Lorenzo
 
  DESCRIPTION:
@@ -81,7 +81,7 @@ my $SuMessages = SuMessages->new();
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($itemp_top_mute_picks_sorted_par_);
 
-my ($PL_SEISMIC)      = $Project->PL_SEISMIC();
+my ($DATA_SEISMIC_TXT)= $Project->DATA_SEISMIC_TXT();
 my ($DATA_SEISMIC_SU) = $Project->DATA_SEISMIC_SU();
 
 =head2
@@ -275,7 +275,7 @@ sub calcNdisplay {
 =cut
 
 	$sumute->clear();
-	$sumute->par_directory('PL_SEISMIC');
+	$sumute->par_directory('DATA_SEISMIC_TXT');
 	$sumute->par_file( $iApply_top_mute->{_parfile_in} );
 	$sumute->offset_word( $iApply_top_mute->{_offset_type} );
 

@@ -39,6 +39,7 @@ require 5.004;
 
 use strict;
 use vars qw(@ISA @EXPORT $VERSION);
+use warnings;
 use Exporter;
 use Carp;
 
@@ -46,7 +47,7 @@ use BER "1.02";
 use SNMP_Session "1.00";
 use Socket;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 @ISA = qw(Exporter);
 

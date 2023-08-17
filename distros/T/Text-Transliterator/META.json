@@ -4,13 +4,13 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Transliterator",
    "prereqs" : {
@@ -34,15 +34,18 @@
    "provides" : {
       "Text::Transliterator" : {
          "file" : "lib/Text/Transliterator.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Text::Transliterator::Unaccent" : {
          "file" : "lib/Text/Transliterator/Unaccent.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/damil/Text-Transliterator/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -50,5 +53,6 @@
          "url" : "https://github.com/damil/Text-Transliterator"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

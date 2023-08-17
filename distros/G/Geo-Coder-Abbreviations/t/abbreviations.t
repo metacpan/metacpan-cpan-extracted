@@ -11,7 +11,7 @@ BEGIN {
 
 BASICS: {
 	SKIP: {
-		skip('Test requires Internet access', 20) unless(-e 't/online.enabled');
+		skip('Online tests disabled', 20) unless(-e 't/online.enabled');
 		if(my $abbr = new_ok('Geo::Coder::Abbreviations')) {
 			cmp_ok($abbr->abbreviate('Road'), 'eq', 'RD', 'Road => RD');
 			# I think it should abbreviate to AVE

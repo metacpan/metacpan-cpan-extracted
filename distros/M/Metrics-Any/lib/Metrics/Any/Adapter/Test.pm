@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Test 0.09;
+package Metrics::Any::Adapter::Test 0.10;
 
 use v5.14;
 use warnings;
@@ -20,7 +20,7 @@ C<Metrics::Any::Adapter::Test> - a metrics reporting adapter for unit testing
 
 =head1 SYNOPSIS
 
-   use Test::More;
+   use Test2::V0;
    use Metrics::Any::Adapter 'Test';
 
    {

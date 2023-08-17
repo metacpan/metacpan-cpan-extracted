@@ -25,8 +25,11 @@ require Cwd;
 require File::Spec;
 require POSIX;
 
-state $GETCWD = Cwd->getcwd;
-state $MAPSIG = {%SIG};
+our $CWD = Cwd->getcwd;
+our $MAPSIG = {%SIG};
+our $PATH = $CWD;
+our $PID = $$;
+our $PPID;
 
 # ATTRIBUTES
 
@@ -58,6 +61,10 @@ sub _forkable {
   $Config::Config{d_pseudofork} ? 0 : 1;
 }
 
+sub _serve {
+  true;
+}
+
 sub _kill {
   CORE::kill(@_);
 }
@@ -66,16 +73,30 @@ sub _open {
   CORE::open(shift, shift, shift);
 }
 
-sub _pid {
-  $$;
+sub _ping {
+  _kill(0, @_);
 }
 
 sub _setsid {
   POSIX::setsid();
 }
 
+sub _time {
+  CORE::time();
+}
+
 sub _waitpid {
   CORE::waitpid(shift, shift);
+}
+
+# BUILD
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $PID = $self->value if $self->value;
+
+  return $self;
 }
 
 # METHODS
@@ -90,12 +111,82 @@ sub assertion {
   return $assert;
 }
 
+sub async {
+  my ($self, $code, @args) = @_;
+
+  require Venus::Path;
+
+  my $path = $PATH;
+
+  $PATH = Venus::Path->mktemp_dir->absolute->value;
+
+  my $parent = $self->class->new;
+
+  $parent->{directory} = $PATH;
+
+  $parent->register;
+
+  $parent->work(sub{
+    my ($process) = @_;
+
+    $process->untrap;
+
+    $process->{directory} = $PATH;
+
+    $process->register;
+
+    my $result = $process->try($code, @args)->any->result;
+
+    $process->sendall($result) if defined $result;
+
+    return;
+  });
+
+  $parent->trap(INT => sub {
+    $parent->killall;
+  });
+
+  $parent->trap(TERM => sub {
+    $parent->killall;
+  });
+
+  $PATH = $path;
+
+  return $parent;
+}
+
+sub await {
+  my ($self, $timeout) = @_;
+
+  my $path = $PATH;
+
+  $PATH = $self->{directory};
+
+  my $result;
+
+  if (defined $timeout) {
+    (my $error, $result) = $self->catch('poll', $timeout, 'recvall');
+  }
+  else {
+    do{$result = $self->recvall} while !@{$result};
+  }
+
+  $PATH = $path;
+
+  return wantarray ? ($result ? (@{$result}) : ()) : $result;
+}
+
 sub chdir {
   my ($self, $path) = @_;
 
-  $path ||= $GETCWD;
+  $path ||= $CWD;
 
-  _chdir($path) or $self->throw('error_on_chdir', $path, _pid())->error;
+  _chdir($path) or $self->error({
+    throw => 'error_on_chdir',
+    path => $path,
+    pid => $PID,
+    error => $!
+  });
 
   return $self;
 }
@@ -131,8 +222,40 @@ sub daemon {
   }
 }
 
+sub data {
+  my ($self, @args) = @_;
+
+  my @pids = @args ? @args : ($self->watchlist);
+
+  return 0 if !@pids;
+
+  my $result = 0;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  for my $pid (@pids) {
+    next if !(my $pdir = $path->child($self->recv_key($pid)))->exists;
+
+    $result += 1 for CORE::glob($pdir->child('*.data')->absolute);
+  }
+
+  return $result;
+}
+
+sub decode {
+  my ($self, $data) = @_;
+
+  require Venus::Dump;
+
+  return Venus::Dump->new->decode($data);
+}
+
 sub default {
-  return _pid();
+  return $PID;
 }
 
 sub disengage {
@@ -145,6 +268,14 @@ sub disengage {
   return $self;
 }
 
+sub encode {
+  my ($self, $data) = @_;
+
+  require Venus::Dump;
+
+  return Venus::Dump->new($data)->encode;
+}
+
 sub engage {
   my ($self) = @_;
 
@@ -153,6 +284,12 @@ sub engage {
   $self->$_ for qw(stdin stdout stderr);
 
   return $self;
+}
+
+sub exchange {
+  my ($self, $name) = @_;
+
+  return $name ? ($self->{exchange} = $name) : $self->{exchange};
 }
 
 sub exit {
@@ -167,21 +304,31 @@ sub explain {
   return $self->get;
 }
 
+sub followers {
+  my ($self) = @_;
+
+  my $leader = $self->leader;
+
+  my $result = [sort grep {$_ != $leader} $self->others_active, $self->pid];
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub fork {
   my ($self, $code, @args) = @_;
 
   if (not(_forkable())) {
-    $self->throw('error_on_fork_support', _pid())->error;
+    $self->error({throw => 'error_on_fork_support', pid => $PID});
   }
   if (defined(my $pid = _fork())) {
-    my $process;
-
     if ($pid) {
       $self->watch($pid);
       return wantarray ? (undef, $pid) : undef;
     }
 
-    $process = $self->class->new;
+    $PPID = $PID;
+    $PID = $$;
+    my $process = $self->class->new;
 
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
@@ -194,10 +341,10 @@ sub fork {
       $process->$code(@args);
     }
 
-    return wantarray ? ($process, _pid()) : $process;
+    return wantarray ? ($process, $PID) : $process;
   }
   else {
-    $self->throw('error_on_fork_process', _pid())->error;
+    $self->error({throw => 'error_on_fork_process', error => $!, pid => $PID});
   }
 }
 
@@ -221,6 +368,59 @@ sub forks {
   return wantarray ? ($process ? ($process, []) : ($process, [@pids]) ) : $process;
 }
 
+sub is_dyadic {
+  my ($self) = @_;
+
+  my $directory = $self->{directory};
+
+  my $path = $PATH;
+
+  my $temporary = $PATH = $directory if $directory;
+
+  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->ppid || $self->count == 1)
+    ? true : false;
+
+  $PATH = $path;
+
+  return $is_dyadic;
+}
+
+sub is_leader {
+  my ($self) = @_;
+
+  return $self->leader == $self->pid ? true : false;
+}
+
+sub is_follower {
+  my ($self) = @_;
+
+  return $self->is_leader ? false : true;
+}
+
+sub is_registered {
+  my ($self) = @_;
+
+  return (grep {$_ == $self->pid} $self->registrants) ? true : false;
+}
+
+sub is_unregistered {
+  my ($self) = @_;
+
+  return $self->is_registered ? false : true;
+}
+
+sub join {
+  my ($self, $name) = @_;
+
+  $self->exchange($name) if $name;
+
+  $self->register;
+
+  @{$self->watchlist} = ();
+
+  return $self;
+}
+
 sub kill {
   my ($self, $name, @pids) = @_;
 
@@ -237,10 +437,73 @@ sub killall {
   return wantarray ? @{$result} : $result;
 }
 
-sub pid {
+sub leader {
   my ($self) = @_;
 
-  return $self->value;
+  my $leader = (sort $self->others_active, $self->pid)[0];
+
+  return $leader;
+}
+
+sub leave {
+  my ($self, $name) = @_;
+
+  $self->unregister;
+
+  delete $self->{exchange};
+  delete $self->{watchlist};
+
+  return $self;
+}
+
+sub limit {
+  my ($self, $count) = @_;
+
+  if ($self->count >= $count) {
+    $self->prune while $self->count >= $count;
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+sub others {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep {$_ != $pid} $self->registrants];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub others_active {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep $self->ping($_), $self->others];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub others_inactive {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep !$self->ping($_), $self->others];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pid {
+  my ($self, @data) = @_;
+
+  return $self->value if !@data;
+
+  return $self->value((($PID) = @data));
 }
 
 sub pids {
@@ -251,10 +514,83 @@ sub pids {
   return wantarray ? @{$result} : $result;
 }
 
+sub ppid {
+  my ($self, @data) = @_;
+
+  my $pid = @data ? (($PPID) = @data) : $PPID;
+
+  return $pid;
+}
+
 sub ping {
   my ($self, @pids) = @_;
 
-  return $self->kill(0, @pids);
+  return _ping(@pids);
+}
+
+sub poll {
+  my ($self, $timeout, $code, @args) = @_;
+
+  if (!$code) {
+    $code = 'recvall';
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my $result = [];
+
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $seen = 0;
+
+  while (time <= $then) {
+    last if $seen = (@{$result} = grep defined, $self->$code(@args));
+  }
+
+  if (!$seen) {
+    $self->error({
+      throw => 'error_on_timeout_poll',
+      timeout => $timeout,
+      code => $code
+    });
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pool {
+  my ($self, $count, $timeout) = @_;
+
+  if (!$count) {
+    $count = 1;
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my @pids;
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $seen = 0;
+
+  while (time <= $then) {
+    last if ($seen = (@pids = $self->others_active)) >= $count;
+  }
+
+  if ($seen < $count) {
+    $self->error({
+      throw => 'error_on_timeout_pool',
+      timeout => $timeout,
+      pool_size => $count
+    });
+  }
+
+  @{$self->watchlist} = @pids;
+
+  return $self;
 }
 
 sub prune {
@@ -263,6 +599,132 @@ sub prune {
   $self->unwatch($self->stopped);
 
   return $self;
+}
+
+sub read {
+  my ($self, $key) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  my $file = (CORE::glob($path->child('*.data')->absolute))[0];
+
+  return undef if !$file;
+
+  $path = Venus::Path->new($file);
+
+  my $data = $path->read;
+
+  $path->unlink;
+
+  return $data;
+}
+
+sub recall {
+  my ($self, $pid) = @_;
+
+  ($pid) = grep {$_ == $pid} $self->others_inactive if $pid;
+
+  return undef if !$pid;
+
+  my $key = $self->send_key($pid);
+
+  my $string = $self->read($key);
+
+  return undef if !defined $string;
+
+  my $data = $self->decode($string);
+
+  return $data;
+}
+
+sub recallall {
+  my ($self) = @_;
+
+  my $result = [];
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    my $data = $self->recall($pid);
+    push @{$result}, $data if defined $data;
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub recv {
+  my ($self, $pid) = @_;
+
+  return undef if !$pid;
+
+  my $key = $self->recv_key($pid);
+
+  my $string = $self->read($key);
+
+  return undef if !defined $string;
+
+  my $data = $self->decode($string);
+
+  return $data;
+}
+
+sub recvall {
+  my ($self) = @_;
+
+  my $result = [];
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    my $data = $self->recv($pid);
+    push @{$result}, $data if defined $data;
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub recv_key {
+  my ($self, $pid) = @_;
+
+  return CORE::join '.', $pid, $self->pid;
+}
+
+sub register {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $key = $self->send_key($self->pid);
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  return $self;
+}
+
+sub registrants {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $result = [
+    map /(\d+)$/, grep /(\d+)\.\1$/, CORE::glob($path->child('*.*')->absolute)
+  ];
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub restart {
@@ -277,10 +739,49 @@ sub restart {
   return wantarray ? @{$result} : $result;
 }
 
+sub send {
+  my ($self, $pid, $data) = @_;
+
+  return $self if !$pid;
+
+  my $string = $self->encode($data);
+
+  my $key = $self->send_key($pid);
+
+  $self->write($key, $string);
+
+  return $self;
+}
+
+sub sendall {
+  my ($self, $data) = @_;
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    $self->send($pid, $data);
+  }
+
+  return $self;
+}
+
+sub send_key {
+  my ($self, $pid) = @_;
+
+  return CORE::join '.', $self->pid, $pid;
+}
+
+sub serve {
+  my ($self, $count, $code) = @_;
+
+  do {$self->work($code) until $self->limit($count)} while _serve;
+
+  return $self;
+}
+
 sub setsid {
   my ($self) = @_;
 
-  return _setsid != -1 || $self->throw('error_on_setid', _pid())->error;
+  return _setsid != -1
+    || $self->error({throw => 'error_on_setid', pid => $PID, error => $!});
 }
 
 sub started {
@@ -321,8 +822,12 @@ sub stderr {
     _open(\*STDERR, '>&', $STDERR);
   }
   else {
-    _open(\*STDERR, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stderr', $path, _pid())->error;
+    _open(\*STDERR, '>&', IO::File->new($path, 'w')) or $self->error({
+      throw => 'error_on_stderr',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -340,8 +845,12 @@ sub stdin {
     _open(\*STDIN, '<&', $STDIN);
   }
   else {
-    _open(\*STDIN, '<&', IO::File->new($path, 'r'))
-      or $self->throw('error_on_stdin', $path, _pid())->error;
+    _open(\*STDIN, '<&', IO::File->new($path, 'r')) or $self->error({
+      throw => 'error_on_stdin',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -359,8 +868,12 @@ sub stdout {
     _open(\*STDOUT, '>&', $STDOUT);
   }
   else {
-    _open(\*STDOUT, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stdout', $path, _pid())->error;
+    _open(\*STDOUT, '>&', IO::File->new($path, 'w')) or $self->error({
+      throw => 'error_on_stdout',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -378,12 +891,42 @@ sub stopped {
   return wantarray ? @{$result} : $result;
 }
 
+sub sync {
+  my ($self, $count, $timeout) = @_;
+
+  if (!$count) {
+    $count = 1;
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $msgs = 0;
+
+  while (time <= $then) {
+    last if ($msgs = (scalar grep $self->data($_), $self->pool->watchlist)) >= $count;
+  }
+
+  if ($msgs < $count) {
+    $self->error({
+      throw => 'error_on_timeout_sync',
+      timeout => $timeout,
+      pool_size => $count
+    });
+  }
+
+  return $self;
+}
+
 sub trap {
   my ($self, $name, $expr) = @_;
 
   $SIG{uc($name)} = !ref($expr) ? uc($expr) : sub {
     local($!, $?);
-    return $expr->(@_);
+    return $self->$expr->(uc($name), @_);
   };
 
   return $self;
@@ -448,6 +991,46 @@ sub works {
   return wantarray ? @{$result} : $result;
 }
 
+sub write {
+  my ($self, $key, $data) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  require Time::HiRes;
+
+  $path = $path->child(CORE::join '.', Time::HiRes::gettimeofday(), 'data');
+
+  $path->write($data);
+
+  return $self;
+}
+
+sub unregister {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $key = $self->recv_key($self->pid);
+
+  $path = $path->child($key);
+
+  $path->rmdirs if $path->exists;
+
+  return $self;
+}
+
 sub untrap {
   my ($self, $name) = @_;
 
@@ -473,94 +1056,233 @@ sub unwatch {
   return wantarray ? @{$watchlist} : $watchlist;
 }
 
+# DESTROY
+
+sub DESTROY {
+  my ($self, @data) = @_;
+
+  $self->SUPER::DESTROY(@data);
+
+  require Venus::Path;
+
+  Venus::Path->new($self->{directory})->rmdirs if $self->is_dyadic && $self->is_leader;
+
+  return $self;
+}
+
 # ERRORS
 
 sub error_on_chdir {
-  my ($self, $path, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.chdir',
-    message => "Can't chdir \"$path\": $!",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $message = 'Can\'t chdir "{{path}}": {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.chdir',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_fork_process {
-  my ($self, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.fork.process',
-    message => "Can't fork process $pid: $!",
-    stash => {
-      pid => $pid,
-    }
+  my $message = 'Can\'t fork process {{pid}}: {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.fork.process',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_fork_support {
-  my ($self, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.fork.support',
-    message => "Can't fork process $pid: Fork emulation not supported",
-    stash => {
-      pid => $pid,
-    }
+  my $message = 'Can\'t fork process {{pid}}: Fork emulation not supported';
+
+  my $stash = {
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.fork.support',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_setid {
-  my ($self, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.setid',
-    message => "Can't start a new session: $!",
-    stash => {
-      pid => $pid,
-    }
+  my $message = 'Can\'t start a new session: {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.setid',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stderr {
-  my ($self, $path, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.stderr',
-    message => "Can't redirect STDERR to \"$path\": $!",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $message = 'Can\'t redirect STDERR to "{{path}}": {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stderr',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stdin {
-  my ($self, $path, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.stdin',
-    message => "Can't redirect STDIN to \"$path\": $!",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $message = 'Can\'t redirect STDIN to "{{path}}": {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stdin',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stdout {
-  my ($self, $path, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.stdout',
-    message => "Can't redirect STDOUT to \"$path\": $!",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $message = 'Can\'t redirect STDOUT to "{{path}}": {{error}}';
+
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stdout',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
+}
+
+sub error_on_timeout_poll {
+  my ($self, $data) = @_;
+
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while polling {{name}}';
+
+  my $stash = {
+    code => $data->{code},
+    exchange => $self->exchange,
+    name => (ref $data->{code} eq 'CODE' ? '__ANON__' : $data->{code}),
+    pid => $self->pid,
+    timeout => $data->{timeout},
+  };
+
+  my $result = {
+    name => 'on.timeout.poll',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
+}
+
+sub error_on_timeout_pool {
+  my ($self, $data) = @_;
+
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while pooling';
+
+  my $stash = {
+    pool_size => $data->{pool_size},
+    exchange => $self->exchange,
+    pid => $self->pid,
+    timeout => $data->{timeout},
+  };
+
+  my $result = {
+    name => 'on.timeout.pool',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
+}
+
+sub error_on_timeout_sync {
+  my ($self, $data) = @_;
+
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while syncing';
+
+  my $stash = {
+    pool_size => $data->{pool_size},
+    exchange => $self->exchange,
+    pid => $self->pid,
+    timeout => $data->{timeout},
+  };
+
+  my $result = {
+    name => 'on.timeout.sync',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;
@@ -678,6 +1400,161 @@ L<Venus::Role::Valuable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 async
+
+  async(CodeRef $code, Any @args) (Process)
+
+The async method creates a new L<Venus::Process> object and asynchronously runs
+the callback provided via the L</work> method. Both process objects are
+configured to be are dyadic, i.e. representing an exclusing bi-directoral
+relationship. Additionally, the callback return value will be automatically
+made available via the L</await> method unless it's undefined. This method
+returns the newly created L<"dyadic"|/is_dyadic> process object.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item async example 1
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 await
+
+  await(Int $timeout) (Any)
+
+The await method expects to operate on a L<"dyadic"|/is_dyadic> process object
+and blocks the execution of the current process until a value is received from
+its couterpart. If a timeout is provided, execution will be blocked until a
+value is received or the wait time expires. If a timeout of C<0> is provided,
+execution will not be blocked. If no timeout is provided at all, execution will
+block indefinitely.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item await example 1
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my $await = $async->await;
+
+  # ['done']
+
+=back
+
+=over 4
+
+=item await example 2
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my $await = $async->await;
+
+  # [{status => 'done'}]
+
+=back
+
+=over 4
+
+=item await example 3
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my ($await) = $async->await;
+
+  # 'done'
+
+=back
+
+=over 4
+
+=item await example 4
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my ($await) = $async->await;
+
+  # {status => 'done'}
+
+=back
+
+=over 4
+
+=item await example 5
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    $process->sendall('send 1');
+    $process->sendall('send 2');
+    $process->sendall('send 3');
+    return;
+  });
+
+  my $await;
+
+  my $results = [];
+
+  push @$results, $async->await;
+
+  # 'send 1'
+
+  push @$results, $async->await;
+
+  # 'send 2'
+
+  push @$results, $async->await;
+
+  # 'send 3'
+
+  $results;
+
+  # ['send 1', 'send 2', 'send 3']
+
+=back
 
 =cut
 
@@ -899,6 +1776,167 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 data
+
+  data(Int @pids) (Int)
+
+The data method returns the number of messages sent to the current process,
+from the PID or PIDs provided (if any). If no PID list is provided, the count
+returned is based on the PIDs returned from L</watchlist>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $parent->data;
+
+  # 0
+
+=back
+
+=over 4
+
+=item data example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  my $data = $process_1->data;
+
+  # 2
+
+=back
+
+=over 4
+
+=item data example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  $process_1->recvall;
+
+  my $data = $process_1->data;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 decode
+
+  decode(Str $data) (Any)
+
+The decode method accepts a string representation of a Perl value and returns
+the Perl value.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item decode example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $decode = $parent->decode("{ok=>1}");
+
+  # { ok => 1 }
+
+=back
+
+=cut
+
 =head2 disengage
 
   disengage() (Process)
@@ -924,6 +1962,31 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 encode
+
+  encode(Any $data) (Str)
+
+The encode method accepts a Perl value and returns a string representation of
+that Perl value.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item encode example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $encode = $parent->encode({ok=>1});
+
+  # "{ok=>1}"
+
+=back
+
+=cut
+
 =head2 engage
 
   engage() (Process)
@@ -944,6 +2007,66 @@ I<Since C<0.06>>
   $parent = $parent->engage;
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 exchange
+
+  exchange(Str $name) (Any)
+
+The exchange method gets and/or sets the name of the data exchange. The
+exchange is the ontext in which processes can register and cooperate. Process
+can cooperate in different exchanges (or contexts) and messages sent to a
+process in one context are not available to be retrieved will operating in
+another exchange (or context).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item exchange example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange;
+
+  # undef
+
+=back
+
+=over 4
+
+=item exchange example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+=back
+
+=over 4
+
+=item exchange example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+  $exchange = $parent->exchange;
+
+  # "procs"
 
 =back
 
@@ -978,6 +2101,59 @@ I<Since C<0.06>>
   my $exit = $parent->exit(1);
 
   # 1
+
+=back
+
+=cut
+
+=head2 followers
+
+  followers() (ArrayRef)
+
+The followers method returns the list of PIDs registered under the current
+L</exchange> who are not the L</leader>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item followers example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $followers = $parent->followers;
+
+  # []
+
+=back
+
+=over 4
+
+=item followers example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $followers = $process_1->followers;
+
+  # [12346, 12347]
 
 =back
 
@@ -1205,6 +2381,310 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 is_follower
+
+  is_follower() (Bool)
+
+The is_follower method returns true if the process is not the L</leader>, otherwise
+returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_follower example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_follower = $process->is_follower;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_follower example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_follower = $process_1->is_follower;
+
+  # false
+
+  # my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_follower example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_follower = $process_1->is_follower;
+
+  # false
+
+  my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_leader
+
+  is_leader() (Bool)
+
+The is_leader method returns true if the process is the L</leader>, otherwise
+returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_leader example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_leader = $process->is_leader;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_leader example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_leader = $process_1->is_leader;
+
+  # true
+
+  # my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_leader example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_leader = $process_1->is_leader;
+
+  # true
+
+  my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_registered
+
+  is_registered() (Bool)
+
+The is_registered method returns true if the process has registered using the
+L</register> method, otherwise returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_registered example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_registered = $process->is_registered;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_registered example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_registered = $process->is_registered;
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_unregistered
+
+  is_unregistered() (Bool)
+
+The is_unregistered method returns true if the process has unregistered using
+the L</unregister> method, or had never registered at all, otherwise returns
+false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_unregistered example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_unregistered example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345);
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_unregistered example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # false
+
+=back
+
+=cut
+
+=head2 join
+
+  join(Str $name) (Process)
+
+The join method sets the L</exchange>, registers the process with the exchange
+using L</register>, and clears the L</watchlist>, then returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item join example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item join example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
 =head2 kill
 
   kill(Str $signal, Int @pids) (Int)
@@ -1279,6 +2759,307 @@ I<Since C<2.40>>
   my $killall = $parent->killall('term', 1001..1004);
 
   # [1, 1, 1, 1]
+
+=back
+
+=cut
+
+=head2 leader
+
+  leader() (Int)
+
+The leader method uses a simple leader election algorithm to determine the
+process leader and returns the PID for that process. The leader is always the
+lowest value active PID (i.e. that responds to L</ping>).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item leader example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->leader;
+
+  # 12345
+
+=back
+
+=over 4
+
+=item leader example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $leader = $process_3->leader;
+
+  # 12345
+
+=back
+
+=over 4
+
+=item leader example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->register->leader;
+
+  # 12345
+
+=back
+
+=cut
+
+=head2 leave
+
+  leave(Str $name) (Process)
+
+The leave method sets the L</exchange> to undefined, unregisters the process
+using L</unregister>, and clears the L</watchlist>, then returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item leave example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item leave example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 limit
+
+  limit(Int $count) (Bool)
+
+The limit method blocks the execution of the current process until the number
+of processes in the L</watchlist> falls bellow the count specified. The method
+returns true once execution continues if execution was blocked, and false if
+the limit has yet to be reached.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item limit example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->work(sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # false
+
+=back
+
+=over 4
+
+=item limit example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->works(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # true
+
+=back
+
+=cut
+
+=head2 others
+
+  others() (ArrayRef)
+
+The others method returns all L</registrants> other than the current process,
+i.e. all other registered process PIDs whether active or inactive.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $others = $parent->others;
+
+  # []
+
+=back
+
+=over 4
+
+=item others example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others = $process_1->others;
+
+  # [12346, 12347]
+
+=back
+
+=cut
+
+=head2 others_active
+
+  others_active() (ArrayRef)
+
+The others_active method returns all L</registrants> other than the current
+process which are active, i.e. all other registered process PIDs that responds
+to L</ping>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others_active example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others_active = $process_1->others_active;
+
+  # [12346, 12347]
+
+=back
+
+=cut
+
+=head2 others_inactive
+
+  others_inactive() (ArrayRef)
+
+The others_inactive method returns all L</registrants> other than the current
+process which are inactive, i.e. all other registered process PIDs that do not
+respond to L</ping>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others_inactive example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1 (assuming all processes exited)
+
+  my $others_inactive = $process_1->others_inactive;
+
+  # [12346, 12347]
 
 =back
 
@@ -1383,6 +3164,207 @@ I<Since C<2.01>>
 
 =cut
 
+=head2 poll
+
+  poll(Int $timeout, Str | CodeRef $code, Any @args) (ArrayRef)
+
+The poll method continuously calls the named method or coderef and returns the
+result that's not undefined, or throws an exception on timeout. If no method
+name is provided this method will default to calling L</recvall>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item poll example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'ping', $parent->pid);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item poll example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, 'ping', $parent->pid);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item poll example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'recv', $parent->pid);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_poll)
+
+=back
+
+=over 4
+
+=item poll example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, sub {
+    int(rand(2)) ? "" : ()
+  });
+
+  # [""]
+
+=back
+
+=cut
+
+=head2 pool
+
+  pool(Int $count, Int $timeout) (Process)
+
+The pool method blocks the execution of the current process until the number of
+L</other> processes are registered and pingable. This method returns the
+invocant when successful, or throws an exception if the operation timed out.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item pool example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item pool example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2);
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item pool example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_pool)
+
+=back
+
+=cut
+
+=head2 ppid
+
+  ppid() (Int)
+
+The ppid method returns the PID of the parent process (i.e. the process which
+forked the current process, if any).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item ppid example 1
+
+  # given: synopsis;
+
+  my $ppid = $parent->ppid;
+
+  # undef
+
+=back
+
+=over 4
+
+=item ppid example 2
+
+  # given: synopsis;
+
+  $process = $parent->fork;
+
+  # in child process
+
+  my $ppid = $process->ppid;
+
+  # 00000
+
+=back
+
+=cut
+
 =head2 prune
 
   prune() (Process)
@@ -1456,6 +3438,302 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 recall
+
+  recall(Int $pid) (Any)
+
+The recall method returns the earliest message, sent by the current process to
+the process specified by the PID provided, which is no longer active (i.e.
+responding to L</ping>).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  # in process 1 (process 2)
+
+  my $recall = $process_1->recall($process_2->pid);
+
+  # {from => 12345}
+
+=back
+
+=cut
+
+=head2 recallall
+
+  recallall() (ArrayRef)
+
+The recallall method performs a L</recall> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recallall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  $process_1->send($process_3->pid, {from => $process_1->pid});
+
+  $process_1->watch($process_2->pid, $process_3->pid);
+
+  # in process 1 (process 2 and 3 died)
+
+  my $recallall = $process_1->recallall;
+
+  # [{from => 12345}, {from => 12345}]
+
+=back
+
+=cut
+
+=head2 recv
+
+  recv(Int $pid) (Any)
+
+The recv method returns the earliest message found from the process specified
+by the PID provided.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recv example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $recv = $parent->recv;
+
+  # undef
+
+=back
+
+=over 4
+
+=item recv example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  my $recv = $process_1->recv($process_2->pid);
+
+  # undef
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => 'hello'});
+
+  # in process 1
+
+  $recv = $process_1->recv($process_2->pid);
+
+  # {from => 12346, said => 'hello'}
+
+=back
+
+=cut
+
+=head2 recvall
+
+  recvall() (ArrayRef)
+
+The recvall method performs a L</recv> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recvall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+=back
+
+=over 4
+
+=item recvall example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 1
+
+  $recvall = $process_1->recvall;
+
+  # [{from => 12346}]
+
+=back
+
+=cut
+
+=head2 register
+
+  register() (Process)
+
+The register method declares that the process is willing to cooperate with
+others (e.g. L</send> nad L</recv> messages), in a way that's discoverable by
+other processes, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item register example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $register = $parent->register;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 registrants
+
+  registrants() (ArrayRef)
+
+The registrants method returns the PIDs for all the processes that registered
+using the L</register> method whether they're currently active or not.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item registrants example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $registrants = $process_1->registrants;
+
+  # [12345, 12346, 12347]
+
+=back
+
+=cut
+
 =head2 restart
 
   restart(CodeRef $callback) (ArrayRef)
@@ -1486,6 +3764,161 @@ I<Since C<2.40>>
   });
 
   # [[1001, 1001, 255]]
+
+=back
+
+=cut
+
+=head2 send
+
+  send(Int $pid, Any $data) (Process)
+
+The send method makes the data provided available to the process specified by
+the PID provided.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item send example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $send = $parent->send;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item send example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  $process_1 = $process_1->send($process_2->pid, {
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
+
+  # in process 2
+
+  # $process_2->recv($process_1->pid);
+
+  # {from => 12345, said => 'hello'}
+
+=back
+
+=cut
+
+=head2 sendall
+
+  sendall(Any $data) (Process)
+
+The sendall method performs a L</send> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item sendall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 serve
+
+  serve(Int $count, CodeRef $callback) (Process)
+
+The serve method executes the callback using L</work> until L</limit> blocks
+the execution of the current process, indefinitely. It has the effect of
+serving the callback and maintaining the desired number of forks until killed
+or gracefully shutdown.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item serve example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
+
+=back
+
+=over 4
+
+=item serve example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(10, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
 
 =back
 
@@ -1584,21 +4017,22 @@ I<Since C<2.40>>
 
 =item status example 1
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 is still running (not terminated)
-
+    # assuming PID 12346 is still running (not terminated)
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 0, -1]]
+  # [[12346, 0, -1]]
 
 =back
 
@@ -1606,21 +4040,22 @@ I<Since C<2.40>>
 
 =item status example 2
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 1001, 255]]
+  # [[12346, 12346, 255]]
 
 =back
 
@@ -1628,21 +4063,22 @@ I<Since C<2.40>>
 
 =item status example 3
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my @status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # ([1001, 1001, 255])
+  # ([12346, 12346, 255])
 
 =back
 
@@ -1799,6 +4235,109 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 sync
+
+  sync(Int $count, Int $timeout) (Process)
+
+The sync method blocks the execution of the current process until the number of
+L</other> processes are registered, pingable, and have each sent at-least one
+message to the current process. This method returns the invocant when
+successful, or throws an exception if the operation timed out.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item sync example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item sync example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(2);
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item sync example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_sync)
+
+=back
+
+=cut
+
 =head2 trap
 
   trap(Str $name, Str | CodeRef $expr) (Process)
@@ -1821,6 +4360,32 @@ I<Since C<0.06>>
   $parent = $parent->trap(term => sub{
     die 'Something failed!';
   });
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 unregister
+
+  unregister() (Process)
+
+The unregister method declares that the process is no longer willing to
+cooperate with others (e.g. L</send> nad L</recv> messages), and will no longer
+be discoverable by other processes, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item unregister example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $unregister = $parent->unregister;
 
   # bless({...}, 'Venus::Process')
 
@@ -2299,15 +4864,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_chdir',
+    error => $!,
+    path => '/nowhere',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_chdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't chdir \"$path\": $!"
 
@@ -2331,15 +4901,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_process',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_process"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: $!"
 
@@ -2359,15 +4933,18 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_support',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_support"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: Fork emulation not supported"
 
@@ -2387,15 +4964,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_setid',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_setid"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't start a new session: $!"
 
@@ -2415,15 +4996,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere", 123);
+  my $input = {
+    throw => 'error_on_stderr',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stderr', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stderr"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDERR to \"/nowhere\": $!"
 
@@ -2447,15 +5033,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdin',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdin"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDIN to \"$path\": $!"
 
@@ -2479,15 +5070,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ( '/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdout',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdout"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDOUT to \"$path\": $!"
 
@@ -2498,6 +5094,138 @@ B<example 1>
   # my $pid = $error->stash('pid');
 
   # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_poll>
+
+This package may raise an error_on_timeout_poll exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_timeout_poll',
+    code => sub{},
+    timeout => 0,
+  };
+
+  my $error = $parent->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_timeout_poll"
+
+  # my $message = $error->render;
+
+  # "Timed out after 0 seconds in process 12345 while polling __ANON__"
+
+  # my $code = $error->stash('code');
+
+  # sub{}
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_pool>
+
+This package may raise an error_on_timeout_pool exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_timeout_pool',
+    pool_size => 2,
+    timeout => 0,
+  };
+
+  my $error = $parent->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_timeout_pool"
+
+  # my $message = $error->render;
+
+  # "Timed out after 0 seconds in process 12345 while pooling"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_sync>
+
+This package may raise an error_on_timeout_sync exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_timeout_sync',
+    pool_size => 2,
+    timeout => 0,
+  };
+
+  my $error = $parent->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_timeout_sync"
+
+  # my $message = $error->render;
+
+  # "Timed out after 0 seconds in process 12345 while syncing"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
 
 =back
 

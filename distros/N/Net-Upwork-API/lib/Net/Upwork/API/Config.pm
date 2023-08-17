@@ -43,6 +43,7 @@ sub new {
     my %opts = @_;
     $opts{client_id} ||= "";
     $opts{client_secret} ||= "";
+    $opts{grant_type} ||= "code_authorization";
     $opts{access_token} ||= "";
     $opts{refresh_token} ||= "";
     $opts{expires_in} ||= "";

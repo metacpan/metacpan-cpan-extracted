@@ -1,12 +1,12 @@
 {
-   "abstract" : "Minify, Compress, Cache-control and Serve static files from Plack applications",
+   "abstract" : "Fully-featured static file server.",
    "author" : [
       "Ido Perlmuter <ido@ido50.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,62 +16,49 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::DistManifest" : "0"
          }
       },
       "runtime" : {
          "recommends" : {
-            "CSS::Minifier::XS" : "0.08",
-            "IO::Compress::Gzip" : "0",
-            "JavaScript::Minifier::XS" : "0.09"
+            "CSS::Minifier::XS" : "0.13",
+            "IO::Compress::Zstd" : "2.206",
+            "JavaScript::Minifier::XS" : "0.15"
          },
          "requires" : {
-            "Cwd" : "0",
-            "Fcntl" : "0",
-            "File::Spec::Unix" : "0",
-            "Getopt::Long" : "0",
-            "HTTP::Date" : "0",
-            "Module::Load::Conditional" : "0",
-            "Plack::Component" : "0",
-            "Plack::MIME" : "0",
-            "Plack::Middleware" : "0",
-            "Plack::Runner" : "0",
-            "Plack::Util" : "0",
-            "Plack::Util::Accessor" : "0",
-            "autodie" : "0",
-            "parent" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "HTTP::Date" : "6.06",
+            "Plack" : "1.0050",
+            "Text::Gitignore" : "0.04",
+            "perl" : "v5.36.0"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : "0",
-            "HTTP::Request" : "0",
-            "HTTP::Request::Common" : "0",
-            "HTTP::Response" : "0",
-            "Plack::Builder" : "0",
-            "Plack::Test" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "HTTP::Message" : "6.44",
+            "Test2::Suite" : "0.000122"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ido50/Plack-App-MCCS/issues"
+         "web" : "https://github.com/ido50/mccs/issues"
       },
       "homepage" : "http://search.cpan.org/dist/Plack-App-MCCS",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ido50/Plack-App-MCCS.git",
-         "web" : "https://github.com/ido50/Plack-App-MCCS"
+         "url" : "git://github.com/ido50/mccs.git",
+         "web" : "https://github.com/ido50/mccs"
       }
    },
-   "version" : "1.000000",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0113"
+   "version" : "2.002000",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

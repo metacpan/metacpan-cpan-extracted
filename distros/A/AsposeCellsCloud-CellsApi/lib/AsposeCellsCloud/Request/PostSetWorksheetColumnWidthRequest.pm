@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostSetWorksheetColumnWidthRequest.name :   ,
-# PostSetWorksheetColumnWidthRequest.sheetName :   ,
-# PostSetWorksheetColumnWidthRequest.columnIndex :   ,
-# PostSetWorksheetColumnWidthRequest.width :   ,
+# PostSetWorksheetColumnWidthRequest.name : The workbook name.  ,
+# PostSetWorksheetColumnWidthRequest.sheetName : The worksheet name.  ,
+# PostSetWorksheetColumnWidthRequest.columnIndex : The column index.  ,
+# PostSetWorksheetColumnWidthRequest.width : Gets and sets the column width in unit of characters.  ,
 # PostSetWorksheetColumnWidthRequest.count :   ,
-# PostSetWorksheetColumnWidthRequest.folder :   ,
-# PostSetWorksheetColumnWidthRequest.storageName :    
+# PostSetWorksheetColumnWidthRequest.folder : Original workbook folder.  ,
+# PostSetWorksheetColumnWidthRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_set_worksheet_column_width' } = { 
-    	summary => '',
+    	summary => 'Sets worksheet column width.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -147,28 +147,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'column_index' => {
      	datatype => 'int',
      	base_name => 'columnIndex',
-     	description => '',
+     	description => 'The column index.',
      	format => '',
      	read_only => '',
      		},
      'width' => {
      	datatype => 'double',
      	base_name => 'width',
-     	description => '',
+     	description => 'Gets and sets the column width in unit of characters.',
      	format => '',
      	read_only => '',
      		},
@@ -182,14 +182,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

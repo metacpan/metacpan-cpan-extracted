@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates a collection of Aspose.Cells.Charts.SparklineGroup objects.            ',
                                   class => 'SparklineGroups',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'sparkline_group_list' => {
      	datatype => 'ARRAY[SparklineGroup]',
      	base_name => 'SparklineGroupList',
-     	description => '',
+     	description => 'Encapsulates a collection of Aspose.Cells.Charts.SparklineGroup objects.            ',
      	format => '',
      	read_only => '',
      		},    

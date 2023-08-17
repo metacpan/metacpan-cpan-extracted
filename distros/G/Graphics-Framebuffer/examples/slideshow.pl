@@ -21,20 +21,22 @@ my $dev         = FALSE;
 my $noaccel     = FALSE;
 my $diagnostics = FALSE;
 my $showname    = FALSE;
+my $ignore_x    = FALSE;
 my $delay       = 3;
 
 GetOptions(
-    'auto'         => \$auto,
-    'errors'       => \$errors,
-    'full'         => \$fullscreen,
-    'showall|all'  => \$showall,
-    'help'         => \$help,
-    'delay|wait=i' => \$delay,
-    'nosplash'     => \$nosplash,
-    'dev=i'        => \$dev,
-    'noaccel'      => \$noaccel,
-    'diagnostics'  => \$diagnostics,
-    'showname'     => \$showname,
+    'auto'             => \$auto,
+    'errors'           => \$errors,
+    'full'             => \$fullscreen,
+    'showall|all'      => \$showall,
+    'help'             => \$help,
+    'delay|wait=i'     => \$delay,
+    'nosplash'         => \$nosplash,
+    'dev=i'            => \$dev,
+    'noaccel'          => \$noaccel,
+    'diagnostics'      => \$diagnostics,
+    'showname'         => \$showname,
+	'ignore-x-windows' => \$ignore_x,
 );
 my @paths = (scalar(@ARGV)) ? @ARGV : ($default_dir);
 
@@ -49,12 +51,13 @@ if ($help) {
 my $splash = ($nosplash) ? 0 : 2;
 
 our $FB = Graphics::Framebuffer->new(
-    'SHOW_ERRORS' => $errors,
-    'RESET'       => 1,
-    'SPLASH'      => $splash,
-    'ACCELERATED' => !$noaccel,
-    'FB_DEVICE'   => "/dev/fb$dev",
-    'DIAGNOSTICS' => $diagnostics,
+    'SHOW_ERRORS'      => $errors,
+    'RESET'            => 1,
+    'SPLASH'           => $splash,
+    'ACCELERATED'      => !$noaccel,
+    'FB_DEVICE'        => "/dev/fb$dev",
+    'DIAGNOSTICS'      => $diagnostics,
+	'IGNORE_X_WINDOWS' => $ignore_x,
 );
 
 $SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { $FB->text_mode(); exec('reset'); };
@@ -62,15 +65,16 @@ $SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { $
 if ($errors) {
     system('clear');
     print STDERR qq{
-AUTO            = $auto
-ERRORS          = $errors
-FULL            = $fullscreen
-SHOWALL         = $showall
-DELAY           = $delay
-NOSPLASH        = $nosplash
-DEVICE          = /dev/fb$dev
-ACCELERATION    = $FB->{'ACCELERATED'}
-PATH(s)         = }, join('; ', @paths), "\n";
+AUTO             = $auto
+ERRORS           = $errors
+FULL             = $fullscreen
+SHOWALL          = $showall
+DELAY            = $delay
+NOSPLASH         = $nosplash
+DEVICE           = /dev/fb$dev
+ACCELERATION     = $FB->{'ACCELERATED'}
+IGNORE-X-WINDOWS = $ignore_x
+PATH(s)          = }, join('; ', @paths), "\n";
 
     sleep 1;
 } ## end if ($errors)

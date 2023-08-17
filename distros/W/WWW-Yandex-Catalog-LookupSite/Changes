@@ -1,5 +1,11 @@
 Revision history for WWW-Yandex-Catalog-LookupSite
 
+This module is DEPRECATED.
+Yandex services it was working with are no longer available.
+
+0.12  August 14, 2023
+    - Added deprecation notice.
+
 0.11  July 27, 2014
     - Renamed punycode_utf8() to _punycode_utf8() to fix failing POD coverage test.
 

@@ -15,8 +15,10 @@ PDL::Opt::Simplex::Simple - A simplex optimizer for the rest of us
                         x => 1 
                 },
                 f => sub { 
+                                my $vars = shift;
+
                                 # Parabola with minima at x = -3
-                                return (($_->{x}+3)**2 - 5) 
+                                return (($vars->{x}+3)**2 - 5)
                         }
         );
 
@@ -37,12 +39,17 @@ PDL::Opt::Simplex::Simple - A simplex optimizer for the rest of us
                 f => sub { 
                                 my ($vec1, $vec2) = ($_->{vec1}, $_->{vec2});
                                 
-                                # do something with $vec1 and $vec2
-                                # and return() the result to be minimized by simplex.
+                                 # do something with $vec1 and $vec2
+                                 # and return() the result to be minimized by simplex.
                         },
-                log => sub { }, # log callback
-                ssize => 0.1,   # initial simplex size, smaller means less perturbation
-                max_iter => 100 # max iterations
+                log => sub { },  # log callback
+                max_iter => 100, # max iterations
+
+                # simplex-specific options:
+                opts => {
+                        # initial simplex size, smaller means less perturbation
+                        ssize => 0.1,   
+                },
         );
 
 
@@ -100,6 +107,13 @@ callback function.
     Useful for calling simplex again with refined values
 
 - $self->scale\_ssize($scale) - Multiply the current `ssize` by `$scale`
+- dumpify($vars)
+
+    This is for debugging:
+
+    Builds a tree from `$vars` that is suitable for passing to [Data::Dumper](https://metacpan.org/pod/Data::Dumper).  This is
+    neccesary because PDL's need to be stringified since Dumper() will dump at the
+    object itself.
 
 # ARGUMENTS
 
@@ -151,6 +165,11 @@ Expanded format:
 - `minmax`:  a double-array of min-max pairs (per index for vectors)
 
     Min-max pairs are clamped before being evaluated by simplex.
+
+    Note: for internal PDL::Opt::Simplex reasons, the `max` value is increased as
+    `$var_max*1.0001`, or one ten-thousandth bigger than the max value you
+    request.  See the comment at the top of
+    `PDL::Opt::Simplex::Simple->_simplex_f()` for details
 
 - `round_result`:  Round the value to the nearest increment of this value upon completion
 
@@ -258,7 +277,8 @@ values are available in the `$state` hashref:
         'best_pass' =>  3,              # the pass# that had the best goal result
         'best_minima' => 0.2345         # The least value so far, returned by "f"
         'best_vars' => { x=>1, ...}     # The vars associated with "best_minima"
-        'log_count' => 22,              # number of times log has been called
+        'log_count' => 22,              # number of times log has been called in this pass
+        'iter_count' => 123,            # number of f() has been called (including cache hits)
         'prev_minima_count' => 10,      # number of same minima's in a row
         'cancel' =>     0,              # true if the simplex iteration is being cancelled
         'all_vars' => [{x=>1},...],     # multiple var options from simplex are logged here
@@ -288,7 +308,11 @@ the best result as the input to the next simplex iteration in an attempt
 to find increasingly better results.  For example, 4 iterations with each
 `ssize` one-half of the previous:
 
-        ssize => [ 4, 2, 1, 0.5 ]
+Note: `ssize` is a simplex-specific option that must be placed in `{opts}`:
+
+        opts => {
+                ssize => [ 4, 2, 1, 0.5 ]
+        }
 
 Default: 1
 
@@ -365,6 +389,13 @@ accurate but will take longer to complete.  However, it is still useful if you h
 computation (`f`) and want to converge sooner for an initial first pass.  It is still recommended
 to run a final pass without `reduce_search`.
 
+Note: `reduce_search` is a simplex-specific option that must be placed in `{opts}`:
+
+        opts => {
+                reduce_search => 1,
+                ...
+        }
+
 # BEST PRACTICES AND USE CASES
 
 ## Antenna Geometry: Use an array for the `ssize` parameter from coarse to fine perturbation.
@@ -396,7 +427,9 @@ previous iteration finds a "good" (but not "great") result; the best minima
 from across all simplex passes is kept as the final result in case latter passes
 do not perform as well:
 
-        ssize => [ 0.090, 0.075, 0.050, 0.025, 0.012 ]
+        opts => {
+                ssize => [ 0.090, 0.075, 0.050, 0.025, 0.012 ]
+        }
 
 This allows us to optimize antenna gain from 10.2 dBi with a single pass to
 11.3 dBi after 5 passes, in addition to a much improved VSWR value.
@@ -423,7 +456,9 @@ that define its behavior (Kp, Ki, and Kd),  and the satellite tracking is
                         ki => 120,
                         kd => 5
                 },
-                ssize => 1,
+                opts => {
+                        ssize => 1,
+                },
                 f => sub { 
                                 my $vars = shift;
                                 
@@ -462,7 +497,9 @@ this we used the extended variable format as follows:
                                 perturb_scale => 1,
                         },
                 },
-                ssize => 1, # <- ssize is still set to 1 !
+                opts => {
+                        ssize => 1, # <- ssize is still set to 1 !
+                },
                 f => sub { 
                                 my $vars = shift;
                                 
@@ -534,15 +571,23 @@ Patches welcome ;)
 
 ## Upstream modules:
 
-- Video about how optimization algorithms like Simplex work, visually: [https://youtu.be/NI3WllrvWoc](https://youtu.be/NI3WllrvWoc)
-- Wikipedia Article: [https://en.wikipedia.org/wiki/Simplex\_algorithm](https://en.wikipedia.org/wiki/Simplex_algorithm),
 - PDL Implementation of Simplex: [PDL::Opt::Simplex](https://metacpan.org/pod/PDL::Opt::Simplex), [http://pdl.perl.org/](http://pdl.perl.org/)
 - This modules github repository: [https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple](https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple)
 
-## Example links:
+## References:
+
+- Wikipedia Article: [https://en.wikipedia.org/wiki/Simplex\_algorithm](https://en.wikipedia.org/wiki/Simplex_algorithm)
+- Video about how optimization algorithms like Simplex work, visually: [https://youtu.be/NI3WllrvWoc](https://youtu.be/NI3WllrvWoc)
+
+## Examples:
 
 - Antenna Geometry Optimization: [https://github.com/KJ7LNW/xnec2c-optimize](https://github.com/KJ7LNW/xnec2c-optimize)
 - PID Controller Optimization: [https://github.com/KJ7NLL/space-ham/blob/master/optimize-pid.pl](https://github.com/KJ7NLL/space-ham/blob/master/optimize-pid.pl)
+
+## Other Optimization Implementations:
+
+- [PDL::Opt::ParticleSwarm](https://metacpan.org/pod/PDL::Opt::ParticleSwarm) - A PDL implementation of Particle Swarm
+- [PDL::Opt::ParticleSwarm::Simple](https://metacpan.org/pod/PDL::Opt::ParticleSwarm::Simple) - Use names for Particle Swarm-optimized values
 
 # AUTHOR
 

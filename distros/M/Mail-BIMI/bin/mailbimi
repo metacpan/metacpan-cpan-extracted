@@ -5,7 +5,7 @@ use warnings;
 use Mail::BIMI::Prelude;
 # ABSTRACT: BIMI Helper
 # PODNAME: mailbimi
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use Mail::BIMI::App;
 
 Mail::BIMI::App->run;
@@ -22,7 +22,7 @@ mailbimi - BIMI Helper
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 AUTHOR
 

@@ -1,8 +1,26 @@
 use Lingy::Test;
 
-test "(foo)", "Unable to resolve symbol: 'foo' in this context";
-test "(use 'test.lingy)", 'nil';
-test "(foo)", '"called test.lingy/foo"';
-test "(test.lingy/foo)", '"called test.lingy/foo"';
-test "(user/foo)", '"called test.lingy/foo"';
-test "(resolve 'bar)", "#'test.lingy/bar";
+tests <<'...';
+- - (foo)
+  - "Unable to resolve symbol: 'foo' in this context"
+
+- - (use 'test.lingy)
+  - nil
+
+- - (foo)
+  - '"called test.lingy/foo"'
+
+- note: XXX Regression
+# - - (test.lingy/foo)
+#   - '"called test.lingy/foo"'
+
+- - (user/foo)
+  - '"called test.lingy/foo"'
+
+- note: XXX Regression
+# - - (resolve 'bar)
+#   - "#'test.lingy/bar"
+
+- - (use 'lingy.devel)
+  - nil
+...

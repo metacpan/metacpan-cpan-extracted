@@ -32,7 +32,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      unless (error == class_id Error::System) {
+      unless (eval_error_id == basic_type_id Error::System) {
         return 0;
       }
     }
@@ -271,7 +271,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      unless (error == class_id Error::System) {
+      unless (eval_error_id == basic_type_id Error::System) {
         return 0;
       }
     }
@@ -305,7 +305,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      unless (error == class_id Error::System) {
+      unless (eval_error_id == basic_type_id Error::System) {
         return 0;
       }
     }

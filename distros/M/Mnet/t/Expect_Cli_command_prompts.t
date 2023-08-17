@@ -31,11 +31,11 @@ Mnet::T::test_perl({
     name    => 'command method prompt response text',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;  read INPUT
-            echo -n prompt%;  read INPUT
-            echo -n question; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "question"; read INPUT
             echo output
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -51,11 +51,11 @@ Mnet::T::test_perl({
     name    => 'command method prompt response undef',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;  read INPUT
-            echo -n prompt%;  read INPUT
-            echo -n question; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "question"; read INPUT
             echo output
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -71,12 +71,12 @@ Mnet::T::test_perl({
     name    => 'command method prompt code response text',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;  read INPUT
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo preamble
-            echo -n question; read INPUT
+            printf "question"; read INPUT
             echo output
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -94,12 +94,12 @@ Mnet::T::test_perl({
     name    => 'command method prompt code response undef',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%;  read INPUT
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo preamble
-            echo -n question; read INPUT
+            printf "question"; read INPUT
             echo output
-            echo -n prompt%;  read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -117,11 +117,11 @@ Mnet::T::test_perl({
     name    => 'command method output with extra prompt',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
             echo prompt%
             echo output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
@@ -137,12 +137,12 @@ Mnet::T::test_perl({
     name    => 'command method with multiple prompts',
     pre     => <<'    pre-eof',
         export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-            echo -n prompt%; read INPUT
-            echo -n prompt%; read INPUT
-            echo -n one;     read INPUT
-            echo -n two;     read INPUT
+            printf "prompt%%"; read INPUT
+            printf "prompt%%"; read INPUT
+            printf "one";      read INPUT
+            printf "two";      read INPUT
             echo output
-            echo -n prompt%; read INPUT
+            printf "prompt%%"; read INPUT
         ' >$EXPECT
     pre-eof
     perl    => $perl . '

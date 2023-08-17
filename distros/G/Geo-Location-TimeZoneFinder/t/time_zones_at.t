@@ -11,7 +11,7 @@ use Test::More;
 use File::Spec::Functions qw(catfile);
 
 BEGIN {
-    use_ok 'Geo::Location::TimeZoneFinder', qw(new);
+    use_ok 'Geo::Location::TimeZoneFinder';
 }
 
 my $file_base = catfile(qw(shapereader tests data polygon));

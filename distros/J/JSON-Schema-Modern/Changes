@@ -1,5 +1,17 @@
 Revision history for JSON-Schema-Modern
 
+0.569     2023-07-08 23:36:06Z
+          - fixed some edge cases with ipv6 format validation
+
+0.568     2023-06-17 07:16:54Z
+          - add media-type support for application/x-ndjson and
+            application/x-www-form-urlencoded
+
+0.567     2023-06-03 22:11:23Z
+          - vocabularies are now evaluated in a different order: Validation
+            and Format vocabularies now come before Applicator, in order to
+            allow faster short circuiting when errors are encountered.
+
 0.566     2023-05-11 03:34:59Z
           - treat ambiguous types as a normal error, rather than an exception
             which may provide incorrect location data

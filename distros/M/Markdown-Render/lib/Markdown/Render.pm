@@ -12,7 +12,7 @@ use JSON;
 use LWP::UserAgent;
 use List::Util qw(none);
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 use parent qw(Class::Accessor::Fast);
 
@@ -181,22 +181,22 @@ sub _render_with_text_markdown {
 ########################################################################
   my ($self) = @_;
 
-  eval { require Text::Markdown; };
+  eval { require Text::Markdown::Discount; };
 
   if ($EVAL_ERROR) {
-    croak "no Text::Markdown available...try using GitHub API.\n$EVAL_ERROR";
+    carp
+      "no Text::Markdown::Discount available...using GitHub API.\n$EVAL_ERROR";
+    return $self->_render_with_github;
   }
 
-  my $tm = Text::Markdown->new( trust_list_start_value => 1 );
-
   my $markdown = $self->get_markdown;
-  my $html     = Text::Markdown::markdown($markdown);
+  my $html     = Text::Markdown::Discount::markdown($markdown);
 
   if ( $self->get_raw ) {
     $self->set_html($html);
   }
   else {
-    $self->fix_anchors( Text::Markdown::markdown($markdown) );
+    $self->fix_anchors( Text::Markdown::Discount::markdown($markdown) );
   }
 
   return $self;
@@ -478,12 +478,29 @@ Markdown::Render - Render markdown as HTML
 
  $md->render_markdown->print_html;
 
+...or from the command line to create HTML
+
+ md-utils.pl -r README.md > README.html
+
+...or from the command line to replace render custom tags
+
+ md-utils.pl README.md.in > README.md
+
 =head1 DESCRIPTION
 
-Renders markdown as HTML using either GitHub's API or L<Text::Markdown>. Optionally adds
-additional metadata to markdown document using custom tags.
+Renders markdown as HTML using either GitHub's API or
+L<Text::Markdown::Discount>. Optionally adds additional metadata to markdown
+document using custom tags.
 
-See L<README.md|https://github.com/rlauer6/markdown-utils/blob/master/README.md> for more details.
+See
+L<README.md|https://github.com/rlauer6/markdown-utils/blob/master/README.md>
+for more details.
+
+I<Note: This module originally used L<Text::Markdown> as an
+alternative to using the GitHub API however, there are too many bugs
+and idiosyncracies in that module. This module will now use
+L<Text::Markdown::Discount> which is not only faster, but seems to be
+more compliant with GFM.>
 
 =head1 METHODS AND SUBROUTINES
 
@@ -512,7 +529,7 @@ Name of the git user that is used in the C<GIT_USER> tag.
 
 =item git_email
 
-Email address of the git user is used in the C<GIT_EMAIL> tag.
+Email address of the git user that is used in the C<GIT_EMAIL> tag.
 
 =item infile
 
@@ -530,7 +547,8 @@ default: markdown
 
 =item no_title
 
-Boolean that indicates that no title should be added to the table of contents.
+Boolean that indicates that no title should be added to the table of
+contents.
 
 default: false
 
@@ -572,7 +590,7 @@ Outputs the fully rendered HTML page.
 URL of a CSS style sheet to include in the head section. If no CSS
 file option is passed a default CSS file will b used. If a CSS element
 is passed but it is undefined or empty, then no CSS will be specified
-i the final document.
+in the final document.
 
 =item title
 
@@ -585,10 +603,11 @@ will be added to the document.
 
 =head1 AUTHOR
 
-Rob Lauer - rclauer@gmail.com
+Rob Lauer - rlauer6@comcast.net
 
 =head1 SEE OTHER
 
 L<GitHub Markdown API|https://docs.github.com/en/rest/markdown>
+L<Text::Markdown::Discount>
 
 =cut

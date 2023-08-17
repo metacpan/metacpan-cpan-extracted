@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Game;
-$Telegram::Bot::Object::Game::VERSION = '0.021';
+$Telegram::Bot::Object::Game::VERSION = '0.023';
 # ABSTRACT: The base class for Telegram message 'Game' type.
 
 
@@ -39,20 +39,30 @@ Telegram::Bot::Object::Game - The base class for Telegram message 'Game' type.
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 DESCRIPTION
 
 See L<https://core.telegram.org/bots/api#game> for details of the
 attributes available for L<Telegram::Bot::Object::Game> objects.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Justin Hawkins <justin@eatmorecode.com>
 
+=item *
+
+James Green <jkg@earth.li>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Justin Hawkins.
+This software is copyright (c) 2023 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

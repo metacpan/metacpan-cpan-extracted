@@ -1,0 +1,221 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::BigInt try => 'GMP';
+use Math::Prime::Util qw(
+    next_prime is_prime mulmod powmod divisors euler_phi factor_exp lcm gcd
+);
+
+use constant _MAX_INT        => (~0)>>1;
+use constant _LOG_MAX_ORDER  => 131/6;
+use constant _MAX_MAIN_TRIES => 512;
+use constant _MIN_OTH_TRIES  => 8;
+use constant _MAX_OTH_TRIES  => 128;
+use constant _MAX_ITERATIONS => 1024*1024*1024;
+
+$| = 1;
+
+my $USAGE   = "usage: pds_find_space [-v] p n\n";
+my $VERBOSE = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/) {
+    my $opt = $1;
+    shift @ARGV;
+    last               if $opt eq '-';
+    $VERBOSE = 1, next if $opt eq 'v';
+    die $USAGE;
+}
+if (2 != @ARGV || grep {!/^[1-9][0-9]*\z/} @ARGV) {
+    die $USAGE;
+}
+my ($base, $exponent) = @ARGV;
+if (!is_prime($base)) {
+    die "$base: p is not a prime\n";
+}
+if (log(0+$base)*$exponent > _LOG_MAX_ORDER) {
+    die "$base^$exponent: order too large\n";
+}
+my $order    = Math::BigInt->new($base)->bpow($exponent);
+my $modulus  = ($order + 1) * $order + 1;
+if ($modulus <= _MAX_INT) {
+    print "# working with native integers\n" if $VERBOSE;
+    $order   = $order->numify;
+    $modulus = $modulus->numify;
+}
+my $n_planes = euler_phi($modulus) / (3 * $exponent);
+my $max_exp  = _max_exp($modulus, $n_planes);
+print "# order = $order, modulus = $modulus, n_planes = $n_planes\n"
+    if $VERBOSE;
+print "# max_exp = $max_exp\n" if $VERBOSE;
+
+# choose dominant radix
+my @mult = _multipliers($base, $exponent, $modulus);
+my %is_mult = map {($_ => 1)} @mult;
+print "# multipliers: @mult\n" if $VERBOSE;
+my @div = divisors($n_planes);
+my $n_rot = 1;
+my $tries = _MAX_MAIN_TRIES;
+my $main = 0;
+my $main_exp = 0;
+for (my $elem = 2; $elem < $modulus; $elem = next_prime($elem)) {
+    next if $modulus % $elem == 0;
+    my $exp = 0;
+    foreach my $d (@div) {
+        if ($is_mult{ powmod($elem, $d, $modulus) }) {
+            $exp = $d;
+            last;
+        }
+    }
+    die 'assertion failed' if !$exp;
+    if ($exp > $main_exp) {
+        $main = $elem;
+        $main_exp = $exp;
+        last if $main_exp == $max_exp;
+    }
+    last if !--$tries;
+}
+if ($main_exp == $n_planes) {
+    print "$base $exponent [$main^$main_exp]\n";
+    exit 0;
+}
+die 'assertion failed' if $n_planes % $main_exp;
+my $to_do = $n_planes / $main_exp;
+print "# radix = $main, depth = $main_exp, to_do = $to_do\n" if $VERBOSE;
+
+# choose other radices
+my %reached = (1 => 1);
+my @elems = (1);
+_add_reached($base, 3*$exponent);
+my @rot_base = ([$main, $main_exp]);
+my $max_tries = int _MAX_ITERATIONS / $main_exp / @div;
+$max_tries = _MIN_OTH_TRIES if $max_tries < _MIN_OTH_TRIES;
+$max_tries = _MAX_OTH_TRIES if $max_tries > _MAX_OTH_TRIES;
+while (1) {
+    my $best = 0;
+    my $best_exp = 0;
+    my $tries = $max_tries;
+    NELEM:
+    for (my $elem = 2; $elem < $modulus; $elem = next_prime($elem)) {
+        next if exists $reached{$elem};
+        next if $modulus % $elem == 0;
+        my $exp = 0;
+        EXP:
+        foreach my $d (@div) {
+            my $prod = powmod($elem, $d, $modulus);
+            for (my $k = 0; $k < $main_exp; ++$k) {
+                if (exists $reached{$prod}) {
+                    $exp = $d;
+                    last EXP;
+                }
+                $prod = mulmod($prod, $main, $modulus);
+            }
+        }
+        die 'assertion failed' if !$exp;
+        if ($exp > $best_exp) {
+            $best = $elem;
+            $best_exp = $exp;
+            last if $best_exp == $to_do;
+        }
+        last if !--$tries;
+    }
+    push @rot_base, [$best, $best_exp];
+    if ($best_exp == $to_do) {
+        print
+            "$base $exponent [",
+            join(q[ ], map { $_->[0] . q[^] . $_->[1] } @rot_base),
+            "]\n";
+        last;
+    }
+    die 'assertion failed' if $to_do % $best_exp;
+    $to_do /= $best_exp;
+    _add_reached($best, $best_exp);
+    print "# radix = $best, depth = $best_exp, to_do = $to_do\n" if $VERBOSE;
+}
+
+# calculate powers of p (mod m)
+sub _multipliers {
+    my ($base, $exponent, $modulus) = @_;
+    my @mult = (1);
+    my $n = 3 * $exponent;
+    my $x = $base;
+    while (@mult < $n && $x != 1) {
+        push @mult, $x;
+        $x = mulmod($x, $base, $modulus);
+    }
+    push @mult, q[...] if $x != 1;
+    die 'assertion failed' if @mult != $n;
+    return @mult;
+}
+
+# extend @elems and %reached by radix and depth
+sub _add_reached {
+    my ($radix, $depth) = @_;
+    my $x = 1;
+    my @el = @elems;
+    while (--$depth) {
+        $x = mulmod($x, $radix, $modulus);
+        foreach my $elem (@el) {
+            my $prod = mulmod($elem, $x, $modulus);
+            push @elems, $prod;
+            die 'assertion failed' if $reached{$prod}++;
+        }
+    }
+}
+
+sub _max_exp {
+    my ($modulus, $n_planes) = @_;
+    my @fact =
+        map {
+            my ($p, $n) = @{$_};
+            Math::BigInt->new($p)->bpow($n - 1) * ($p - 1)
+        }
+        factor_exp($modulus);
+    return gcd(lcm(@fact), $n_planes);
+}
+
+__END__
+
+=head1 NAME
+
+pds_find_space - find generators of difference set spaces
+
+=head1 SYNOPSIS
+
+  pds_find_space [-v] p n
+
+=head1 DESCRIPTION
+
+This example program finds generators of the multiplicative space of
+planar difference sets of a given prime power order.
+
+It takes a prime number I<p> and an exponent I<n> as arguments specifying
+the prime power order.  The modulus will be I<p ** (2*n) + p ** n + 1>.
+
+It employs a search algorithm with trial exponentiations, first looking
+for a large subspace, then exhausting the remaining subspaces.  This can
+take some time if the modulus is large and not a prime number.  As it
+has to enumerate the complete set of units it is not time efficient and
+will thus work well only for small orders.  This script is included only
+as a stand-in for a more serious solution still in development.
+
+Option B<-v> (for verbose) adds lines beginning with '#' showing
+intermediate results to the output.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

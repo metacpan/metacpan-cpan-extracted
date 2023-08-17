@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetDocumentPropertyRequest.name :   ,
-# GetDocumentPropertyRequest.propertyName :   ,
-# GetDocumentPropertyRequest.folder :   ,
-# GetDocumentPropertyRequest.storageName :    
+# GetDocumentPropertyRequest.name : The workbook name.  ,
+# GetDocumentPropertyRequest.propertyName : The property name.  ,
+# GetDocumentPropertyRequest.folder : Original workbook folder.  ,
+# GetDocumentPropertyRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_document_property' } = { 
-    	summary => '',
+    	summary => 'Gets document property by name.',
         params => $params,
         returns => 'CellsDocumentPropertyResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'property_name' => {
      	datatype => 'string',
      	base_name => 'propertyName',
-     	description => '',
+     	description => 'The property name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

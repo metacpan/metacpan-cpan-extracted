@@ -20,7 +20,8 @@ my $encrypter = XML::Enc->new(
 );
 
 my $encrypted = $encrypter->encrypt($xml);
-ok($encrypted  =~ /EncryptedData/, "Successfully Encrypted");
 
-ok($encrypter->decrypt($encrypted) =~ /XML-SIG_1/, "Successfully Decrypted");
+like($encrypted, qr/EncryptedData/, "Successfully Encrypted");
+
+like($encrypter->decrypt($encrypted), qr/XML-SIG_1/, "Successfully Decrypted");
 done_testing;

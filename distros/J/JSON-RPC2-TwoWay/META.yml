@@ -14,12 +14,13 @@ meta-spec:
 name: JSON-RPC2-TwoWay
 requires:
   JSON::MaybeXS: '0'
+  Time::HiRes: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/a6502/JSON-RPC2-TwoWay/issues
   homepage: https://github.com/a6502/JSON-RPC2-TwoWay
   repository: https://github.com/a6502/JSON-RPC2-TwoWay.git
-version: '0.07'
+version: '0.08'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -3,8 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Object::Pad::Keyword::Accessor" );
+require Object::Pad::Keyword::Accessor;
 
+pass( "Modules loaded" );
 done_testing;

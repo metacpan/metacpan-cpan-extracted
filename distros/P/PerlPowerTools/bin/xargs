@@ -51,6 +51,7 @@ while (1) {
 	last if $o{l} and $totlines >= $o{l};
     }
     my @run = @ARGV;
+    push @run, 'echo' unless (@run);
     if ($o{I}) {
 	exit(0) unless length $line;
 	for (@run) { s/\Q$o{I}\E/$line/g; }
@@ -65,7 +66,10 @@ while (1) {
 	@args = ();
     }
     if ($o{t}) { local $" = "', '"; warn "exec '@run'\n"; }
-    system(@run) == 0 or exit($? >> 8);
+    if (system(@run) != 0) {
+	warn "$0: $run[0]: $!\n";
+	exit($? >> 8);
+    }
 }
 
 =encoding utf8

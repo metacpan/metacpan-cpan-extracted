@@ -8,17 +8,11 @@
 # A ZSH completion script is available in the zsh-compdef/ directory of
 # the App::MusicTools distribution.
 
-use strict;
+use 5.14.0;
 use warnings;
-use feature qw(say);
-
-use File::Basename qw/basename/;
-use Getopt::Long   qw/GetOptionsFromArray/;
-
+use Getopt::Long        qw/GetOptionsFromArray/;
 use Music::Canon        ();
 use Music::LilyPondUtil ();
-
-my $PROG_NAME = basename($0);
 
 # XXX too much repeated code between these, alas!
 my %Modes = (
@@ -57,7 +51,7 @@ emit_help() if !defined $mode or !exists $Modes{$mode};
 my $ret;
 eval { $ret = $Modes{$mode}->(@ARGV) };
 if ($@) {
-    warn "$PROG_NAME: $@";
+    warn "canonical: $@";
     $ret = 65;    # assume input data error
 }
 exit $ret;
@@ -256,7 +250,7 @@ sub do_modal {
 
 sub emit_help {
     warn <<"EOH";
-Usage: $PROG_NAME [global opts] mode [mode opts] args
+Usage: canonical [global opts] mode [mode opts] args
 
 Compute canon voices via the Music::Canon module. The modes are:
 
@@ -266,11 +260,11 @@ Compute canon voices via the Music::Canon module. The modes are:
 Raw pitch numbers or lilypond note names (though only in the default
 "nederlands" language) are accepted. Examples:
 
-  \$ $PROG_NAME --contrary --retrograde exact c cis d
-  \$ $PROG_NAME --transpose=12 exact c ees g
-  \$ $PROG_NAME --raw --contrary exact 1 2 3
+  \$ canonical --contrary --retrograde exact c cis d
+  \$ canonical --transpose=12 exact c ees g
+  \$ canonical --raw --contrary exact 1 2 3
 
-  \$ $PROG_NAME modal --input=lydian --output=locrian c e g
+  \$ canonical modal --input=lydian --output=locrian c e g
 
 Global options (which may also be given to the mode) include:
 
@@ -284,7 +278,7 @@ Global options (which may also be given to the mode) include:
   --retrograde   Reverse the output voice.
   --transpose=N  Transpose output voice by semitones or to a lilypond note.
 
-Run perldoc(1) on $PROG_NAME for additional documentation.
+Run perldoc(1) on canonical for additional documentation.
 
 EOH
     exit 64;
@@ -292,7 +286,7 @@ EOH
 
 sub emit_help_exact {
     warn <<"EOH";
-Usage: $PROG_NAME [opts] exact [exactopts] note1 note2 .. noteN
+Usage: canonical [opts] exact [exactopts] note1 note2 .. noteN
 
 Exact interval mapping. Options include:
 
@@ -309,7 +303,7 @@ Exact interval mapping. Options include:
 Raw pitch numbers or lilypond note names (though only in the default
 "nederlands" language) are accepted.
 
-Run perldoc(1) on $PROG_NAME for additional documentation.
+Run perldoc(1) on canonical for additional documentation.
 
 EOH
     exit 64;
@@ -317,7 +311,7 @@ EOH
 
 sub emit_help_modal {
     warn <<"EOH";
-Usage: $PROG_NAME [opts] modal --input=mode --output=mode notes...
+Usage: canonical [opts] modal --input=mode --output=mode notes...
 
 Modal interval mapping. In particular:
 
@@ -349,7 +343,7 @@ General options include:
 Raw pitch numbers or lilypond note names (though only in the default
 "nederlands" language) are accepted.
 
-Run perldoc(1) on $PROG_NAME for additional documentation.
+Run perldoc(1) on canonical for additional documentation.
 
 EOH
     exit 64;

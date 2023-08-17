@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Most' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::PerlTidy' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Config::INI::Reader' => '0',
+                                      'Mojo::JSON' => '0',
+                                      'Mojo::URL' => '0',
+                                      'Mojo::UserAgent' => '0',
+                                      'MooseX::Extended' => '0.35',
+                                      'MooseX::Extended::Custom' => '0',
+                                      'PerlX::Maybe' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Params' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Common::Numeric' => '0',
+                                      'Types::Common::String' => '0',
+                                      'Types::Standard' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0',
+                                   'Carp' => '0',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'experimental' => '0',
+                                   'lib' => '0',
+                                   'parent' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

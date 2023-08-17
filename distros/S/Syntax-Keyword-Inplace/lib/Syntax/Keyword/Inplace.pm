@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Inplace 0.01;
+package Syntax::Keyword::Inplace 0.02;
 
 use v5.14;
 use warnings;
@@ -69,19 +69,30 @@ side-effects involved in generating it only happen once.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport_into { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $cb, $caller, @syms ) = @_;
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Keyword::Inplace/inplace"}++;
+   $cb->( "Syntax::Keyword::Inplace/inplace" );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

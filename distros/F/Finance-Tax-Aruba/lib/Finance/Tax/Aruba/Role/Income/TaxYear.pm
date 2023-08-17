@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -110,23 +110,6 @@ has tax_free => (
     isa     => 'Num',
     default => 0,
 );
-
-sub _get_max {
-    my ($max, $value) = @_;
-    return $value > $max ? $max : $value;
-}
-
-sub _build_pension_employee {
-    my $self = shift;
-    return $self->get_cost($self->yearly_income_gross - $self->fringe,
-        $self->pension_employee_perc);
-}
-
-sub _build_pension_employer {
-    my $self = shift;
-    return $self->get_cost($self->yearly_income_gross - $self->fringe,
-        $self->pension_employer_perc);
-}
 
 has yearly_income_gross => (
     is        => 'ro',
@@ -286,15 +269,32 @@ has taxable_amount => (
     builder => '_get_taxable_amount',
 );
 
+sub _get_max {
+    my ($max, $value) = @_;
+    return $value > $max ? $max : $value;
+}
+
+sub _build_pension_employee {
+    my $self = shift;
+    return $self->get_cost($self->yearly_income_gross - $self->fringe - $self->bonus,
+        $self->pension_employee_perc);
+}
+
+sub _build_pension_employer {
+    my $self = shift;
+    return $self->get_cost($self->yearly_income_gross - $self->fringe - $self->bonus,
+        $self->pension_employer_perc);
+}
+
 sub _build_yearly_income_gross {
     my $self = shift;
-    return $self->income + $self->fringe;
+    return $self->income + $self->fringe + $self->bonus;
 }
 
 sub _build_yearly_income {
     my $self = shift;
     return $self->yearly_income_gross - $self->wervingskosten
-        - $self->pension_employee + $self->bonus;
+        - $self->pension_employee;
 }
 
 sub _get_tax_bracket {
@@ -327,8 +327,7 @@ sub _get_tax_maximum {
 
 sub _get_taxable_amount {
     my $self = shift;
-
-    return sprintf("%.02f", $self->taxable_wage - $self->tax_minimum) + 0;
+    return _format_perc($self->taxable_wage - $self->tax_minimum);
 }
 
 sub _get_tax_variable {
@@ -350,7 +349,11 @@ sub _build_wervingskosten {
 
 sub get_cost {
     my ($self, $costs, $perc) = @_;
-    return sprintf("%.02f", $costs * ($perc / 100)) + 0;
+    return _format_perc($costs * ($perc / 100));
+}
+
+sub _format_perc {
+    return sprintf("%.02f", shift) + 0;
 }
 
 sub _build_taxfree_amount {
@@ -381,7 +384,7 @@ sub aov_employer {
 
 sub pension_premium {
     my $self = shift;
-    return $self->get_cost($self->yearly_income_gross - $self->fringe,
+    return $self->get_cost($self->yearly_income_gross - $self->fringe - $self->bonus,
         $self->pension_employee_perc + $self->pension_employer_perc);
 }
 
@@ -499,7 +502,6 @@ around BUILDARGS => sub {
     }
 
     if ($args{as_np}) {
-
         $args{pension_employer_perc} = 0;
         $args{pension_employee_perc} = 0;
 
@@ -510,27 +512,12 @@ around BUILDARGS => sub {
         return $self->$orig(%args);
     }
 
-
-    if ($args{no_pension}) {
-        $args{pension_employer_perc} = 0;
-        $args{pension_employee_perc} = 0;
-    }
-    elsif (exists $args{pension_employee_perc}) {
-            $self->_offset_values('pension_employee_perc',
-                $args{pension_employee_perc},
-                'pension_employer_perc', \%args);
-    }
-    elsif (exists $args{pension_employer_perc}) {
-        $self->_offset_values('pension_employer_perc',
-            $args{pension_employer_perc},
-            'pension_employee_perc', \%args);
-    }
-
     if ($args{premiums_employer}) {
         $self->_offset_values('aov_percentage_employee', 0,
             'aov_percentage_employer', \%args);
         $self->_offset_values('azv_percentage_employee', 0,
             'azv_percentage_employer', \%args);
+        $args{pension_by_employer} = 1;
     }
     else {
         if ($args{azv_by_employer}) {
@@ -546,6 +533,27 @@ around BUILDARGS => sub {
                 'aov_percentage_employer', \%args
             );
         }
+    }
+
+    if ($args{no_pension}) {
+        $args{pension_employer_perc} = 0;
+        $args{pension_employee_perc} = 0;
+    }
+    elsif ($args{pension_by_employer}) {
+            $self->_offset_values(
+                'pension_employee_perc', 0,
+                'pension_employer_perc', \%args
+            );
+    }
+    elsif (exists $args{pension_employee_perc}) {
+            $self->_offset_values('pension_employee_perc',
+                $args{pension_employee_perc},
+                'pension_employer_perc', \%args);
+    }
+    elsif (exists $args{pension_employer_perc}) {
+        $self->_offset_values('pension_employer_perc',
+            $args{pension_employer_perc},
+            'pension_employee_perc', \%args);
     }
 
     return $self->$orig(%args);
@@ -581,7 +589,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

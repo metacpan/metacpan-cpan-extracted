@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-BEGIN { delete $ENV{http_proxy} };
+BEGIN { delete $ENV{http_proxy} }
 
 use Test::More;
 use Plack::Test::Suite;
@@ -20,14 +20,14 @@ if ($^O eq 'cygwin' and not eval { require Win32::Process; }) {
 
 push @Plack::Test::Suite::TEST,
     [
-        'sleep',
-        sub {
-            sleep 1;
-            pass;
-        },
-        sub {
-            # nothing
-        },
+    'sleep',
+    sub {
+        sleep 1;
+        pass 'sleep';
+    },
+    sub {
+        # nothing
+    },
     ];
 
 Plack::Test::Suite->run_server_tests('Starlight', undef, undef, quiet => 1);

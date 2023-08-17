@@ -60,8 +60,10 @@ do { my $x = {
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => 'v5.20.0',
+                                      'stable' => '0.031',
                                       'strict' => '0',
                                       'strictures' => '2',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     },
                       'suggests' => {
@@ -91,8 +93,7 @@ do { my $x = {
                                    'YAML::PP' => '0.005',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => 'v5.20.0',
-                                   'utf8' => '0'
+                                   'perl' => 'v5.20.0'
                                  }
                  },
        'x_Dist_Zilla' => {

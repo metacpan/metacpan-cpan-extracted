@@ -22,14 +22,14 @@ require App::Followme::CreateIndex;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir) if -e $test_dir;
-mkdir $test_dir  or die $!;
-chmod 0755, $test_dir;
+rmtree($test_dir, 0, 1) if -e $test_dir;
+mkdir($test_dir) unless -e $test_dir;
+ 
 chdir $test_dir or die $!;
 
 my $archive_dir = catfile(@path, 'test', 'archive');
 mkdir($archive_dir) unless -e $archive_dir;
-chmod 0755, $archive_dir;
+  
 
 #----------------------------------------------------------------------
 # Create object

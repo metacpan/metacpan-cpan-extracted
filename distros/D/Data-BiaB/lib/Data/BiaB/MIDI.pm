@@ -3,10 +3,11 @@
 package Data::BiaB::MIDI;
 
 BEGIN {
-our $VERSION = '0.10';
+our $VERSION = 0.11;
 }
 
-use Data::BiaB $VERSION;
+use Data::BiaB;
+BEGIN { Data::BiaB->VERSION($VERSION) }
 
 =head1 NAME
 

@@ -137,6 +137,14 @@ You can skip any number of array values by using a positive integer.
 
 You can define default values for variables. Currently the default must be a single token (string, number, variable). Also there must not be whitespace on either side of the C<=>.
 
+=item * C<my [ $a, $b, @rest ] = $array_ref>
+
+Slurp remaining elements into an array variable.
+
+=item * C<my [ $a, $b, @$rest ] = $array_ref>
+
+Slurp remaining elements into an array reference variable (C<$rest>).
+
 =back
 
 =head2 TO DO
@@ -145,13 +153,13 @@ There are many more forms that are intended to work, and many more cases we have
 
 Here's the current list of things intended to be added soon:
 
-    my [ $x1, @xs ] = $d;               # Set remaining into an array
-    my [ $x1, @xs, $x2 ] $d;            # Set all but first and last into array
-    my [ $first, [], $last ] = $d;      # Ignore middle
-    my [ $x1, $x2, -25 ] = $d;          # Take -27 and -26
+    my [ $x1, $xs->[5], $xs[10] ] = $d;
+    my [ $a, @middle, $z ] = $d;        # Set all but first and last into array
+    my [ $first, @-, $last ] = $d;      # Ignore middle
+    my [ $x1, $x2, @-25 ] = $d;          # Take -27 and -26
 
     my [ @a => @b => @c ] = $d;         # Evenly distribute values over multiple arrays
-    my [ @a => @ => @ ] = $d;           # Take every third element (0, 3, 6, ...)
+    my [ @a => @- => @- ] = $d;           # Take every third element (0, 3, 6, ...)
     my [ @a => @19 ] = $d;              # Take every 19th element
 
     my [ @a, @b, @c ] = $d;             # Split into thirds
@@ -234,11 +242,21 @@ Destructuring assignment is available in many common languages. The C<assign> mo
 
 =back
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<DestructAssign|https://metacpan.org/pod/DestructAssign>
+
+=back
+
 =head1 AUTHORS
 
 =over
 
 =item * Ingy döt Net C<<<ingy@ingy.net>>>
+
+=item * Kang-min Liu C<<<gugod@gugod.org>>>
 
 =back
 
@@ -246,8 +264,8 @@ Destructuring assignment is available in many common languages. The C<assign> mo
 
 Copyright 2023 by Ingy döt Net
 
-This is free software, licensed under:
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-The MIT (X11) License
+See L<http://www.perl.com/perl/misc/Artistic.html|http://www.perl.com/perl/misc/Artistic.html>
 
 =cut

@@ -6,6 +6,20 @@ sub cmd {
     is $got, $want, "Program works: '$cmd'";
 }
 
+cmd "$yamlscript $eg/hello-world.ys", "Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+";
+
+cmd "$yamlscript $eg/factorial.ys", "3628800\n";
+
 my $want1 = <<'...';
 3 bottles of beer on the wall,
 3 bottles of beer.
@@ -48,3 +62,17 @@ FizzBuzz
 cmd "$yamlscript $eg/fizzbuzz.ys 16 1", $want2;
 cmd "$yamlscript $eg/fizzbuzz.ys 16 2", $want2;
 cmd "$yamlscript $eg/fizzbuzz.ys 16 3", $want2;
+
+my $want3 ="0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+";
+
+cmd "$yamlscript $eg/fibonacci-sequence.ys", $want3;

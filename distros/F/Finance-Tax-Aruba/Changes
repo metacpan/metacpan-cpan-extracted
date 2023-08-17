@@ -4,7 +4,17 @@ TODO:
 
     * Add support for elderly deductions
     * Support dual household income tax calculations
-    * Convert to Object::Pad
+    * Convert to Object::Pad / Corina
+    * Add SVB fees
+    * Add BBO
+    * Add Profit tax
+    * Add tourist levy
+
+0.009     2023-08-05 19:42:51Z
+
+    * Maintainer release: Release unwanted code bits
+    * Premium employers triggers also pension premiums paid by employer
+    * Add bonus to gross income for propper taxes support
 
 0.008     2023-03-05 14:30:45Z
 

@@ -88,7 +88,7 @@ SEE ALSO
     Date::Manip::Interfaces
         A complete description of the functional interfaces available. NOTE:
         it is recommended that you use the OO interface wherever possible as
-        the functional interfaces have some imitations.
+        the functional interfaces have some limitations.
 
   A description of the functional interfaces:
     Date::Manip::DM5

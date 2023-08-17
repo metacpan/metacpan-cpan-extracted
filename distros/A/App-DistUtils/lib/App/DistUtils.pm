@@ -5,14 +5,19 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-25'; # DATE
+our $DATE = '2023-05-20'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.153'; # VERSION
+our $VERSION = '0.154'; # VERSION
 
 our %dist_arg_single = (
     dist => {
-        schema => 'perl::distname*',
-        req => 1,
+        summary => 'Distribution name, defaults to "this dist"',
+        schema => 'perl::distname::default_this_dist*',
+        description => <<'_',
+
+See the <prog:this-dist> utility for how to guess for "this distribution".
+
+_
         pos => 0,
         completion => sub {
             require Complete::Dist;
@@ -51,7 +56,7 @@ App::DistUtils - Collection of utilities related to Perl distributions
 
 =head1 VERSION
 
-This document describes version 0.153 of App::DistUtils (from Perl distribution App-DistUtils), released on 2023-02-25.
+This document describes version 0.154 of App::DistUtils (from Perl distribution App-DistUtils), released on 2023-05-20.
 
 =head1 SYNOPSIS
 

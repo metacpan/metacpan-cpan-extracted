@@ -1,5 +1,24 @@
 Revision history for App-VTide
 
+1.0.4   2023-07-29
+        Updating for release of version 1.0.4
+        Fixing isse when no session present (Ivan Wills)
+
+1.0.3   2023-06-25
+        Updating for release of version 1.0.3
+        Making default local file be more environment safe (Ivan Wills)
+        Trying alternate title setting (Ivan Wills)
+        New sessions default config (Ivan Wills)
+        Adding saving current session (Ivan Wills)
+        Adding missing param docs (Ivan Wills)
+        Adding missing param docs (Ivan Wills)
+        Fixing incorrect versions (Ivan Wills)
+
+1.0.2   2023-05-31
+        Updating for release of version 1.0.2
+        Updating the manifest (Ivan Wills)
+        Adding missing tests (Ivan Wills)
+
 1.0.1   2023-04-01
         Updating for release of version 1.0.1
         Adding missing new files (Ivan Wills)

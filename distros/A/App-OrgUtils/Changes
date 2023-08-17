@@ -1,3 +1,10 @@
+0.486   2023-07-11  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch to avoid warning under perl 5.38.
+
+
 0.485   2023-04-06  Released-By: PERLANCAR; Urgency: medium
 
         - Make output of list-org-headlines and list-org-headlines-fast

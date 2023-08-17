@@ -6,7 +6,7 @@ use base 'Tree';
 use strict;
 use warnings;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use Scalar::Util qw(blessed);
 

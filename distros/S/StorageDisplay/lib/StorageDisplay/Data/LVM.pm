@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::LVM;
 # ABSTRACT: Handle LVM data for StorageDisplay
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 1;
 
@@ -585,7 +585,7 @@ StorageDisplay::Data::LVM - Handle LVM data for StorageDisplay
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Zabbix-Tiny
 
+2.0.1 2023-07-27T20:00:19Z
+    - Remove Carp::Always from tests
+
+2.0 2023-07-26T16:20:24Z
+    - GitHub Issue #31 - Add support for Zabbix 6.4 - Zabbix API login changes 
+
 1.11 2018-03-23T13:41:08Z
 	- GitHub Issue #27 - CORRECTLY fix the issue. (Thanks to dimir)
 

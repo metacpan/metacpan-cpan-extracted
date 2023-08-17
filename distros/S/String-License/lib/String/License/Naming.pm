@@ -1,8 +1,10 @@
-use Feature::Compat::Class 0.04;
-
-use v5.12;
+use v5.20;
 use utf8;
 use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use Feature::Compat::Class 0.04;
 
 =head1 NAME
 
@@ -10,7 +12,7 @@ String::License::Naming - base class for names of licenses and license naming sc
 
 =head1 VERSION
 
-Version v0.0.5
+Version v0.0.9
 
 =head1 DESCRIPTION
 
@@ -23,26 +25,19 @@ e.g. L<String::License::Naming::SPDX>.
 
 =cut
 
-package String::License::Naming v0.0.5;
+package String::License::Naming v0.0.9;
 
 use namespace::clean;
 
 class String::License::Naming;
 
-method list_schemes
-{
-	...;
-}
+method list_schemes () {...}
 
-method list_licenses
-{
-	...;
-}
+method list_licenses () {...}
 
-sub resolve_shortnames
+sub resolve_shortnames ( $keys, $schemes, $bootstrap = undef )
 {
-	my ( $keys, $schemes, $bootstrap ) = @_;
-	my ( @schemes, $fallback, %names );
+	my ( @schemes, $fallback, %names, @result );
 
 	$keys = [ sort keys %Regexp::Pattern::License::RE ]
 		unless defined $keys and scalar @$keys;
@@ -63,8 +58,9 @@ sub resolve_shortnames
 			: ()
 			)
 		{
-			my %attr;
-			my @attr = split /[.]/, $key2;
+			my ( %attr, @attr );
+
+			@attr = split /[.]/, $key2;
 
 			next unless $attr[0] eq 'name';
 
@@ -95,7 +91,7 @@ sub resolve_shortnames
 		}
 	}
 
-	my @result = $bootstrap ? sort keys %names : sort { lc $a cmp lc $b }
+	@result = $bootstrap ? sort keys %names : sort { lc $a cmp lc $b }
 		values %names;
 
 	return @result;

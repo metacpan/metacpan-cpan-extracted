@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.10;
+package List::Keywords 0.11;
 
 use v5.14;
 use warnings;
@@ -128,10 +128,13 @@ my %KEYWORD_OK = map { $_ => 1 } qw(
    ngrep nmap
 );
 
-sub import
+sub import   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
+
+sub apply
 {
    shift;
-   my @syms = @_;
+   my ( $cb, @syms ) = @_;
 
    foreach ( @syms ) {
       if( $_ eq ":all" ) {
@@ -141,7 +144,7 @@ sub import
 
       $KEYWORD_OK{$_} or croak "Unrecognised import symbol '$_'";
 
-      $^H{"List::Keywords/$_"}++;
+      $cb->( "List::Keywords/$_" );
    }
 }
 

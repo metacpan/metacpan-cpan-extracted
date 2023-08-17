@@ -4,7 +4,7 @@
       "Pascal Pixel Rigaux <pixel@rigaux.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Digest::MD5" : "0",
-            "Graphics::Magick" : "0",
             "HTML::Form" : "0",
             "HTML::Parser" : "0",
             "HTTP::Cookies" : "0",
@@ -42,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "9.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "9.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -111,22 +111,22 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.082"
+         "version" : "0.088"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/chansen/p5-http-tiny/issues"
+         "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues"
       },
-      "homepage" : "https://github.com/chansen/p5-http-tiny",
+      "homepage" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/chansen/p5-http-tiny.git",
-         "web" : "https://github.com/chansen/p5-http-tiny"
+         "url" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git",
+         "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny"
       }
    },
-   "version" : "0.082",
+   "version" : "0.088",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",
@@ -168,6 +168,7 @@
       "SkyMarshal <skymarshal1729@gmail.com>",
       "S\u00f6ren Kornetzki <soeren.kornetzki@delti.com>",
       "Steve Grazzini <steve.grazzini@grantstreet.com>",
+      "Stig Palmquist <git@stig.io>",
       "Syohei YOSHIDA <syohex@gmail.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Tom Hukins <tom@eborcom.com>",

@@ -1,0 +1,18 @@
+CHANGES
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+cpanfile
+lib/DBIx/SQLstate/wikipedia.pm
+lib/DBIx/SQLstate.pm
+t/DBIx/SQLstate/00_use_ok.t
+t/DBIx/SQLstate/10_fall_through_messages.t
+t/DBIx/SQLstate/10_regression_tests.t
+t/DBIx/SQLstate/11_message.t
+t/DBIx/SQLstate/12_token.t
+t/DBIx/SQLstate/13_constant.t
+t/DBIx/SQLstate/15_predicates.t
+t/DBIx/SQLstate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

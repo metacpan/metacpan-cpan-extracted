@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.566';
+our $VERSION = '0.569';
 
 use 5.020;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -95,7 +96,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.566
+version 0.569
 
 =head1 SYNOPSIS
 
@@ -123,12 +124,12 @@ The keyword that produced the error; might be C<undef>.
 =head2 instance_location
 
 The path in the instance where the error occurred; encoded as per the JSON Pointer specification
-(L<RFC 6901|https://tools.ietf.org/html/rfc6901>).
+(L<RFC 6901|https://datatracker.ietf.org/doc/html/rfc6901>).
 
 =head2 keyword_location
 
 The schema path taken during evaluation to arrive at the error; encoded as per the JSON Pointer
-specification (L<RFC 6901|https://tools.ietf.org/html/rfc6901>).
+specification (L<RFC 6901|https://datatracker.ietf.org/doc/html/rfc6901>).
 
 =head2 absolute_keyword_location
 

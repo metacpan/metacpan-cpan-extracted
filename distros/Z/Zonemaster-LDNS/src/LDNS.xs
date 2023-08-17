@@ -1064,7 +1064,7 @@ packet_timestamp(obj,...)
         RETVAL
 
 SV *
-packet_answer(obj)
+packet_answer_unfiltered(obj)
     Zonemaster::LDNS::Packet obj;
     PPCODE:
     {
@@ -1092,7 +1092,7 @@ packet_answer(obj)
     }
 
 SV *
-packet_authority(obj)
+packet_authority_unfiltered(obj)
     Zonemaster::LDNS::Packet obj;
     PPCODE:
     {
@@ -1120,7 +1120,7 @@ packet_authority(obj)
     }
 
 SV *
-packet_additional(obj)
+packet_additional_unfiltered(obj)
     Zonemaster::LDNS::Packet obj;
     PPCODE:
     {
@@ -1930,50 +1930,6 @@ rr_ds_verify(obj,other)
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::DNSKEY           PREFIX=rr_dnskey_
 
-U32
-rr_dnskey_keysize(obj)
-    Zonemaster::LDNS::RR::DNSKEY obj;
-    CODE:
-    {
-        U8 algorithm = D_U8(obj,2);
-        ldns_rdf *rdf = ldns_rr_rdf(obj,3);
-        uint8_t *data = ldns_rdf_data(rdf);
-        size_t total = ldns_rdf_size(rdf);
-
-        /* RSA variants */
-        if(algorithm==1||algorithm==5||algorithm==7||algorithm==8||algorithm==10)
-        {
-            size_t ex_len;
-
-            if(data[0] == 0)
-            {
-                ex_len = 3+(U16)data[1];
-            }
-            else
-            {
-                ex_len = 1+(U8)data[0];
-            }
-            RETVAL = 8*(total-ex_len);
-        }
-        /* DSA variants */
-        else if(algorithm==3||algorithm==6)
-        {
-            RETVAL = (U8)data[0]; /* First octet is T value */
-        }
-        /* Diffie-Hellman */
-        else if(algorithm==2)
-        {
-            RETVAL = (U16)data[4];
-        }
-        /* No idea what this is */
-        else
-        {
-            RETVAL = 0;
-        }
-    }
-    OUTPUT:
-        RETVAL
-
 U16
 rr_dnskey_flags(obj)
     Zonemaster::LDNS::RR::DNSKEY obj;
@@ -2003,8 +1959,15 @@ rr_dnskey_keydata(obj)
     Zonemaster::LDNS::RR::DNSKEY obj;
     CODE:
     {
-        ldns_rdf *rdf = ldns_rr_rdf(obj,3);
-        RETVAL = newSVpvn((char*)ldns_rdf_data(rdf), ldns_rdf_size(rdf));
+        if (ldns_rr_rd_count(obj)>3)
+        {
+            ldns_rdf *rdf = ldns_rr_rdf(obj,3);
+            RETVAL = newSVpvn((char*)ldns_rdf_data(rdf), ldns_rdf_size(rdf));
+        }
+        else
+        {
+            RETVAL = newSVpvn("",0);
+        }
     }
     OUTPUT:
         RETVAL
@@ -2452,6 +2415,18 @@ MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::CNAME          
 char *
 rr_cname_cname(obj)
     Zonemaster::LDNS::RR::CNAME obj;
+    CODE:
+        RETVAL = randomize_capitalization(D_STRING(obj,0));
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        free(RETVAL);
+
+MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::DNAME            PREFIX=rr_dname_
+
+char *
+rr_dname_dname(obj)
+    Zonemaster::LDNS::RR::DNAME obj;
     CODE:
         RETVAL = randomize_capitalization(D_STRING(obj,0));
     OUTPUT:

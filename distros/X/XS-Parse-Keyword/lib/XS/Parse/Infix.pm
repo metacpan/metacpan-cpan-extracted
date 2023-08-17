@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.33;
+package XS::Parse::Infix 0.38;
 
 use v5.14;
 use warnings;
@@ -28,9 +28,8 @@ and subject to change. Later versions may break ABI compatibility, requiring
 changes or at least a rebuild of any module that depends on it.
 
 In addition, the places this functionality can be used are relatively small.
-No current release of perl actually supports custom infix operators, though it
-has now been merged to C<blead>, the main development branch, and will be
-present in development release C<v5.37.7> onwards.
+Support for custom infix operators as added in Perl development release
+C<v5.37.7>, and is therefore present in Perl C<v5.38.0>.
 
 In addition, the various C<XPK_INFIX_*> token types of L<XS::Parse::Keyword>
 support querying on this module, so some syntax provided by other modules may

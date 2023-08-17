@@ -1,0 +1,317 @@
+#!/usr/bin/env perl
+#ABSTRACT: Run a job in the cluster using NBI::Slurm
+#PODNAME: runjob
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Data::Dumper;
+use File::Basename;
+use File::Spec;
+use Term::ANSIColor qw(:constants);
+my $BIN = basename($0);
+$Data::Dumper::Sortkeys = 1;
+
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+} 
+
+use NBI::Slurm;
+use Cwd;
+
+my $user_home_dir = $ENV{HOME};
+my @afterok;
+my $user_current_dir = getcwd();
+my $username = $ENV{USER};
+my $config = NBI::Slurm::load_config("$user_home_dir/.nbislurm.config");
+my $version = $NBI::Slurm::VERSION;
+my $queue = $config->{'queue'} // 'qib-short,nbi-short';
+my $threads = $config->{'threads'} // 1;
+my $memory = $config->{'memory'} // 8000;
+my $time = $config->{'time'} // "2h";
+my $tmpdir = $config->{'tmpdir'} // "/tmp";
+my $name;
+my $email_address = $config->{'email'} // undef;
+my $mail_type = $config->{'email_type'} // "none";
+my $command;
+my $verbose;
+my $debug;
+my $run;
+GetOptions(
+    'm|memory=s'    => \$memory,
+    'c|cores|threads=i' => \$threads,
+    'q|queue=s'     => \$queue,
+    't|time=s'      => \$time,
+    'w|tmpdir=s'    => \$tmpdir,
+    'n|name=s'      => \$name,
+    'r|run'         => \$run,
+    'a|email-address=s' => \$email_address,
+    'e|mail-type=s' => \$mail_type, # 'BEGIN,END,FAIL,REQUEUE,ALL'
+    'after=s'       => \@afterok,
+    'verbose'       => \$verbose,
+    'version'       => sub { say "runjob v", $NBI::Slurm::VERSION; exit },
+    'debug'         => \$debug,
+    'help'          => sub { usage() },
+) or usage(1);
+
+$debug = 1 if ($ENV{"DEBUG"});
+# Update queue based on time
+my $time_hours = NBI::Opts::_time_to_hour($time);
+$queue = update_queue($queue, $time_hours);
+$command = join(" ", @ARGV);
+usage(1) unless ( $command);
+
+# Check threadshours
+if (-d $time) {
+    say STDERR RED, BOLD, "ERROR:", RESET, " did you mean \"--tmpdir $time\"  instead of $threads threads?";
+    usage();
+}
+
+# Sanitize tempdir
+if (-d $tmpdir) {
+    $tmpdir = File::Spec->rel2abs($tmpdir);
+} else {
+    # Check if it was meant to be a TIME instead
+    if ($tmpdir =~/ / or $tmpdir =~/(\d+)[dh]/) {
+        say STDERR RED, BOLD, "WARNING:", RESET, " $tmpdir looks like a time string, not a directory!";
+    }
+    mkdir($tmpdir) or die "Cannot create $tmpdir: $!";
+}
+
+# Sanitize memory
+if ($memory =~/^(\d+)$/ and $1 < 200) {
+    say STDERR RED, BOLD, "WARNING:", RESET, " $memory is in Mb but <200, autoscaling to $memory GB";
+    $memory = $1 * 1000;
+}
+$name = autoname($command) unless (defined $name);
+
+my $afterok_string = defined $afterok[0] ? "-d afterok:" . join(":", @afterok) : undef;
+
+# 
+if (not NBI::Slurm::valid_queue($queue)) {
+    my @valid_queues = NBI::Slurm::queues(1);
+    if (scalar @valid_queues) {
+        say STDERR RED, BOLD, "WARNING:", RESET, " $queue is not a valid queue: ", join(", ", @valid_queues); 
+    } else {
+        if ($run) {
+            say STDERR RED, BOLD, "ERROR:", RESET, " You might be outside a slurm cluster. Run without --run to see the script.";
+            exit 1;
+        } else {
+            say STDERR RED, BOLD, "WARNING:", RESET, " You might be outside a slurm cluster";
+        }
+        
+        
+    }
+    
+}
+
+my $opts = NBI::Opts->new(
+    -queue => $queue,
+    -threads => $threads,
+    -memory => $memory,
+    -time   => $time,
+    -tmpdir => $tmpdir,
+    -email_address => $email_address,
+    -email_type => $mail_type,
+    -opts => [$afterok_string],
+);
+
+
+if ($verbose) {
+    say STDERR "CONFIG:\n", Dumper($config);
+    say STDERR $opts->view();
+}
+
+my $job = NBI::Job->new(
+    -name => $name,
+    -command =>  "cd \"$user_current_dir\"",
+    -opts => $opts
+);
+if ($debug) {
+    say STDERR "JOB:\n", Dumper($job);
+}
+$job->append_command($command);
+if ($verbose and not $run) {
+    say STDERR $job->script();
+}
+
+if ($run) {
+    if (my $j = $job->run()) {
+        say STDERR GREEN, "Job sumbitted", RESET;
+        say "$j";
+    } else {
+        say STDERR RED, "Job not submitted: $j", RESET;
+        exit 1;
+    }
+} else {
+    say $job->script();
+}
+
+sub usage {
+    say STDERR <<END;
+
+ Options:
+    -n, --name       Job name [optional]
+    -q, --queue      Queue name [default: nbi-short]
+    -m, --memory     Memory to use [default: 8Gb]
+    -c, --cores      Number of threads [default: 1]
+    -T, --time       Time string [default: "0d 8h"]
+    --after  INT     Job ID to wait for [can be used multiple times]
+    -w, --tmpdir     Temporary directory [default: /tmp]
+    -r, --run        Run the job (otherwise, just print the script)
+    --verbose        Verbose output
+    --help           This help message
+ ----------------------------------------------------------
+END
+    exit() if ($_[0]);
+}
+
+sub autoname {
+    my $string = shift;
+    my @parts = split(/\s+/, $string);
+    my @ints = ["bash", "perl", "python", "python3", "R", "Rscript", "sh", "zsh"];
+    # If the first part is in ints, use the second item as name
+    if (grep {$_ eq $parts[0]} @ints) {
+        return $parts[1];
+    } else {
+        return $parts[0];
+    }
+}
+
+
+sub update_queue {
+    my ($queue, $time) = @_;
+    # If the queue has a star, it can be updated
+    if ($queue !~ /\*/) {
+        return $queue;
+    }
+    # Get time in hours
+    my $mock_opt = NBI::Opts->new(-time => $time);
+    my $time_h = $mock_opt->hours;
+    
+    if ($time <= 2 ) {
+        # Replace * with short
+        $queue =~ s/\*/short/g;
+    } elsif ($time_h <= 48) {
+        # Replace * with medium
+        $queue =~ s/\*/medium/g;
+    } else {
+        # Replace * with long
+        $queue =~ s/\*/long/g;
+    }
+    return $queue;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+runjob - Run a job in the cluster using NBI::Slurm
+
+=head1 VERSION
+
+version 0.5.0
+
+=head1 SYNOPSIS
+
+  runjob [options] "Command to run"
+
+=head1 DESCRIPTION
+
+The C<runjob> script allows you to submit a job to the cluster using the NBI::Slurm module. 
+
+It provides a command-line interface for setting the job parameters, including the queue, memory, threads, and execution time.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n, --name> STR
+
+Specifies the name of the job (optional). If not provided, an automatic name will be generated based on the command being run.
+
+=item B<-q, --queue> STR
+
+Specifies the queue name for the job. The default value is "nbi-short".
+Note that if you put a "*", it will be replaced by 'short', 'medium', or 'long' depending on the time specified with '--time'.
+
+=item B<-m, --memory> INT (Mb)
+
+Specifies the amount of memory to use for the job. The default value is 8Gb. You can add a suffix like "900Mb" or "12Gb" (floats are not supported).
+An integer is interpreted as Mb if > 200, otherwise it is interpreted as Gb.
+
+=item B<-c, --cores, --threads> INT
+
+Specifies the number of threads (cores) to use for the job. The default value is 1.
+
+=item B<-T, --time> STR
+
+Specifies the B<time string> for the job. The default value is "C<0d 8h>". 
+The format should be in the format of "C<Xd Xh Xm>" where X represents the number of days (d), hours (h), and minutes (m) respectively.
+
+=item B<--after> INT
+
+Specifies the job ID to wait for before running the job. This option can be used multiple times to specify multiple jobs to wait for.
+
+=item B<-w, --tmpdir> PATH
+
+Specifies the temporary (working) directory for the job. The default value is "/tmp".
+
+=item B<-r, --run>
+
+Runs the job immediately after submitting. If not specified, the script will only print the job script without running it.
+
+=item B<--verbose>
+
+Enables verbose output, displaying additional information about the job and its options.
+
+=item B<--help>
+
+Displays the help message for the script.
+
+=back
+
+=head1 CONFIGURATION
+
+The script will look for a configuration file in the user's home directory at C<~/.nbislurm.config>.
+
+  queue=qib-*,nbi-*
+  email=my@address
+  tmpdir=/home/user/slurm
+  memory=8000
+  time=3h
+
+=head1 EXAMPLES
+
+Submitting a job to the default queue with 4Gb memory and running the job:
+
+    runjob -m 4Gb -r "ls -l"
+
+Submitting a job with a custom name, 2 threads, and running a Python script:
+
+    runjob -n "my-job" -c 2 -r "python script.py"
+
+Chaining jobs together:
+
+    JOB1=$(runjob "echo 'Hello, world!'")
+    runjob --after $JOB1 "echo 'Goodbye, world!'"
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

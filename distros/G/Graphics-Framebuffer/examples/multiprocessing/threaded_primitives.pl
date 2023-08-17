@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 
 ##############################################################################
-# This script shows you how each graphics primitive and operation works.  It #
-# has not been optimized on purpose, so you can see how each is written.     #
+# This script shows you how each graphics primitive and operation works with #
+# threads..  It has not been optimized on purpose, so you can see how each   #
+# is written.                                                                #
 ##############################################################################
 
 use strict;
@@ -24,9 +25,10 @@ use Sys::CPU;
 
 my $dev      = 0;
 my $psize    = 1;
-my $noaccel  = 0;
-my $nosplash = 0;
-my $delay    = 5;
+my $noaccel  = FALSE;
+my $nosplash = FALSE;
+my $ignore_x = FALSE;
+my $delay    = 3;
 my $threads  = Sys::CPU::cpu_count();
 $threads    -= 1 if ($threads > 1);
 
@@ -36,6 +38,7 @@ GetOptions(
     'noaccel'  => \$noaccel,
     'nosplash' => \$nosplash,
     'delay=i'  => \$delay,
+	'ignore-x-windows' => \$ignore_x,
 );
 
 $noaccel = ($noaccel) ? TRUE : FALSE;    # Only 1 or 0 please
@@ -62,7 +65,7 @@ our $RUNNING : shared = TRUE;
 our @IMAGES;
 our $STAMP = sprintf('%.1', time);
 
-my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE);
+my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x);
 
 $SIG{'HUP'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = \&finish;
 

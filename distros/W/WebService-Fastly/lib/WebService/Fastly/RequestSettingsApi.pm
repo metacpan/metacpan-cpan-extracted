@@ -47,6 +47,91 @@ sub new {
 
 
 #
+# create_request_settings
+#
+# Create a Request Settings object
+#
+# @param string $service_id Alphanumeric string identifying the service. (required)
+# @param int $version_id Integer identifying a service version. (required)
+{
+    my $params = {
+    'service_id' => {
+        data_type => 'string',
+        description => 'Alphanumeric string identifying the service.',
+        required => '1',
+    },
+    'version_id' => {
+        data_type => 'int',
+        description => 'Integer identifying a service version.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_request_settings' } = {
+        summary => 'Create a Request Settings object',
+        params => $params,
+        returns => 'RequestSettingsResponse',
+        };
+}
+# @return RequestSettingsResponse
+#
+sub create_request_settings {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'service_id' is set
+    unless (exists $args{'service_id'}) {
+      croak("Missing the required parameter 'service_id' when calling create_request_settings");
+    }
+
+    # verify the required parameter 'version_id' is set
+    unless (exists $args{'version_id'}) {
+      croak("Missing the required parameter 'version_id' when calling create_request_settings");
+    }
+
+    # parse inputs
+    my $_resource_path = '/service/{service_id}/version/{version_id}/request_settings';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/x-www-form-urlencoded');
+
+    # path params
+    if ( exists $args{'service_id'}) {
+        my $_base_variable = "{" . "service_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'service_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'version_id'}) {
+        my $_base_variable = "{" . "version_id" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'version_id'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(token )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('RequestSettingsResponse', $response);
+    return $_response_object;
+}
+
+#
 # delete_request_settings
 #
 # Delete a Request Settings object
@@ -346,17 +431,17 @@ sub list_request_settings {
 # @param int $version_id Integer identifying a service version. (required)
 # @param string $request_settings_name Name for the request settings. (required)
 # @param string $action Allows you to terminate request handling and immediately perform an action. (optional)
-# @param int $bypass_busy_wait Disable collapsed forwarding, so you don&#39;t wait for other objects to origin. (optional)
 # @param string $default_host Sets the host header. (optional)
+# @param string $hash_keys Comma separated list of varnish request object fields that should be in the hash key. (optional)
+# @param string $name Name for the request settings. (optional)
+# @param string $request_condition Condition which, if met, will select this configuration during a request. Optional. (optional)
+# @param string $xff Short for X-Forwarded-For. (optional)
+# @param int $bypass_busy_wait Disable collapsed forwarding, so you don&#39;t wait for other objects to origin. (optional)
 # @param int $force_miss Allows you to force a cache miss for the request. Replaces the item in the cache if the content is cacheable. (optional)
 # @param int $force_ssl Forces the request use SSL (redirects a non-SSL to SSL). (optional)
 # @param int $geo_headers Injects Fastly-Geo-Country, Fastly-Geo-City, and Fastly-Geo-Region into the request headers. (optional)
-# @param string $hash_keys Comma separated list of varnish request object fields that should be in the hash key. (optional)
 # @param int $max_stale_age How old an object is allowed to be to serve stale-if-error or stale-while-revalidate. (optional)
-# @param string $name Name for the request settings. (optional)
-# @param string $request_condition Condition which, if met, will select this configuration during a request. Optional. (optional)
 # @param int $timer_support Injects the X-Timer info into the request for viewing origin fetch durations. (optional)
-# @param string $xff Short for X-Forwarded-For. (optional)
 {
     my $params = {
     'service_id' => {
@@ -379,14 +464,34 @@ sub list_request_settings {
         description => 'Allows you to terminate request handling and immediately perform an action.',
         required => '0',
     },
-    'bypass_busy_wait' => {
-        data_type => 'int',
-        description => 'Disable collapsed forwarding, so you don&#39;t wait for other objects to origin.',
-        required => '0',
-    },
     'default_host' => {
         data_type => 'string',
         description => 'Sets the host header.',
+        required => '0',
+    },
+    'hash_keys' => {
+        data_type => 'string',
+        description => 'Comma separated list of varnish request object fields that should be in the hash key.',
+        required => '0',
+    },
+    'name' => {
+        data_type => 'string',
+        description => 'Name for the request settings.',
+        required => '0',
+    },
+    'request_condition' => {
+        data_type => 'string',
+        description => 'Condition which, if met, will select this configuration during a request. Optional.',
+        required => '0',
+    },
+    'xff' => {
+        data_type => 'string',
+        description => 'Short for X-Forwarded-For.',
+        required => '0',
+    },
+    'bypass_busy_wait' => {
+        data_type => 'int',
+        description => 'Disable collapsed forwarding, so you don&#39;t wait for other objects to origin.',
         required => '0',
     },
     'force_miss' => {
@@ -404,34 +509,14 @@ sub list_request_settings {
         description => 'Injects Fastly-Geo-Country, Fastly-Geo-City, and Fastly-Geo-Region into the request headers.',
         required => '0',
     },
-    'hash_keys' => {
-        data_type => 'string',
-        description => 'Comma separated list of varnish request object fields that should be in the hash key.',
-        required => '0',
-    },
     'max_stale_age' => {
         data_type => 'int',
         description => 'How old an object is allowed to be to serve stale-if-error or stale-while-revalidate.',
         required => '0',
     },
-    'name' => {
-        data_type => 'string',
-        description => 'Name for the request settings.',
-        required => '0',
-    },
-    'request_condition' => {
-        data_type => 'string',
-        description => 'Condition which, if met, will select this configuration during a request. Optional.',
-        required => '0',
-    },
     'timer_support' => {
         data_type => 'int',
         description => 'Injects the X-Timer info into the request for viewing origin fetch durations.',
-        required => '0',
-    },
-    'xff' => {
-        data_type => 'string',
-        description => 'Short for X-Forwarded-For.',
         required => '0',
     },
     };
@@ -503,13 +588,33 @@ sub update_request_settings {
     }
 
     # form params
-    if ( exists $args{'bypass_busy_wait'} ) {
-                $form_params->{'bypass_busy_wait'} = $self->{api_client}->to_form_value($args{'bypass_busy_wait'});
+    if ( exists $args{'default_host'} ) {
+                $form_params->{'default_host'} = $self->{api_client}->to_form_value($args{'default_host'});
     }
 
     # form params
-    if ( exists $args{'default_host'} ) {
-                $form_params->{'default_host'} = $self->{api_client}->to_form_value($args{'default_host'});
+    if ( exists $args{'hash_keys'} ) {
+                $form_params->{'hash_keys'} = $self->{api_client}->to_form_value($args{'hash_keys'});
+    }
+
+    # form params
+    if ( exists $args{'name'} ) {
+                $form_params->{'name'} = $self->{api_client}->to_form_value($args{'name'});
+    }
+
+    # form params
+    if ( exists $args{'request_condition'} ) {
+                $form_params->{'request_condition'} = $self->{api_client}->to_form_value($args{'request_condition'});
+    }
+
+    # form params
+    if ( exists $args{'xff'} ) {
+                $form_params->{'xff'} = $self->{api_client}->to_form_value($args{'xff'});
+    }
+
+    # form params
+    if ( exists $args{'bypass_busy_wait'} ) {
+                $form_params->{'bypass_busy_wait'} = $self->{api_client}->to_form_value($args{'bypass_busy_wait'});
     }
 
     # form params
@@ -528,33 +633,13 @@ sub update_request_settings {
     }
 
     # form params
-    if ( exists $args{'hash_keys'} ) {
-                $form_params->{'hash_keys'} = $self->{api_client}->to_form_value($args{'hash_keys'});
-    }
-
-    # form params
     if ( exists $args{'max_stale_age'} ) {
                 $form_params->{'max_stale_age'} = $self->{api_client}->to_form_value($args{'max_stale_age'});
     }
 
     # form params
-    if ( exists $args{'name'} ) {
-                $form_params->{'name'} = $self->{api_client}->to_form_value($args{'name'});
-    }
-
-    # form params
-    if ( exists $args{'request_condition'} ) {
-                $form_params->{'request_condition'} = $self->{api_client}->to_form_value($args{'request_condition'});
-    }
-
-    # form params
     if ( exists $args{'timer_support'} ) {
                 $form_params->{'timer_support'} = $self->{api_client}->to_form_value($args{'timer_support'});
-    }
-
-    # form params
-    if ( exists $args{'xff'} ) {
-                $form_params->{'xff'} = $self->{api_client}->to_form_value($args{'xff'});
     }
 
     my $_body_data;

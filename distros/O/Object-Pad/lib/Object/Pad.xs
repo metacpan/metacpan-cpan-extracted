@@ -440,6 +440,14 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   int argi = 0;
   HV *hints = GvHV(PL_hintgv);
 
+  int imported_version = 0;
+  {
+    SV **svp;
+    if(hints &&
+        (svp = hv_fetchs(hints, "Object::Pad/imported-version", 0)))
+      imported_version = SvNV(*svp) * 1000;
+  }
+
   SV *packagename = args[argi++]->sv;
   /* Grrr; XPK bug */
   if(!packagename)
@@ -452,11 +460,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   SV *superclassname = NULL;
 
   if(args[argi++]->i) {
-    /* extends */
-    if(!args[argi]->i)
-      croak("'extends' modifier keyword is no longer supported; use :isa() attribute instead");
-    warn_deprecated("'isa' modifier keyword is deprecated; use :isa() attribute instead");
-    argi++; /* ignore the XPK_CHOICE() integer; `extends` and `isa` are synonyms */
+    /* isa */
     if(type != METATYPE_CLASS)
       croak("Only a class may extend another");
 
@@ -493,10 +497,6 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(nimplements) {
     int i;
     for(i = 0; i < nimplements; i++) {
-      if(!args[argi]->i)
-        croak("'implements' modifier keyword is no longer supported; use :does() attribute instead");
-      warn_deprecated("'does' modifier keyword is deprecated; use :does() attribute instead");
-      argi++; /* ignore the XPK_CHOICE() integer; `implements` and `does` are synonyms */
       int nroles = args[argi++]->i;
       while(nroles--) {
         SV *rolename = args[argi++]->sv;
@@ -561,6 +561,15 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     croak("Expected a block or ';'");
 
   if(!hv_fetchs(hints, "Object::Pad/configure(no_implicit_pragmata)", 0)) {
+    bool was_explicit_strict =
+      (PL_hints & HINT_STRICT_REFS) &&
+      (PL_hints & HINT_STRICT_SUBS) &&
+      (PL_hints & HINT_STRICT_VARS);
+
+    bool was_explicit_warnings =
+      PL_compiling.cop_warnings != pWARN_STD;
+      /* TODO: might be set to something custom? */
+
     import_pragma("strict", NULL);
     import_pragma("warnings", NULL);
 #if HAVE_PERL_VERSION(5, 31, 9)
@@ -571,6 +580,15 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 #ifdef HAVE_PARSE_SUBSIGNATURE
     import_pragma("experimental", "signatures");
 #endif
+
+    if(imported_version >= 800) {
+      const char *kwname = (type == METATYPE_ROLE) ? "role" : "class";
+
+      if(!was_explicit_strict)
+        warn("%s keyword enabled 'use strict' but this will be removed in a later version", kwname);
+      if(!was_explicit_warnings)
+        warn("%s keyword enabled 'use warnings' but this will be removed in a later version", kwname);
+    }
   }
 
   /* CARGOCULT from perl/op.c:Perl_package() */
@@ -631,13 +649,17 @@ static const struct XSParseKeywordPieceType pieces_classlike[] = {
   XPK_PACKAGENAME,
   XPK_VSTRING_OPT,
   XPK_OPTIONAL(
-    XPK_CHOICE( XPK_LITERAL("extends"), XPK_LITERAL("isa") ), XPK_PACKAGENAME, XPK_VSTRING_OPT
+    XPK_LITERAL("isa"),
+    XPK_WARNING_DEPRECATED("'isa' modifier keyword is deprecated; use :isa() attribute instead"),
+    XPK_PACKAGENAME, XPK_VSTRING_OPT
   ),
   /* This should really a repeated (tagged?) choice of a number of things, but
    * right now there's only one thing permitted here anyway
    */
   XPK_REPEATED(
-    XPK_CHOICE( XPK_LITERAL("implements"), XPK_LITERAL("does") ), XPK_COMMALIST( XPK_PACKAGENAME, XPK_VSTRING_OPT )
+    XPK_LITERAL("does"),
+    XPK_WARNING_DEPRECATED("'does' modifier keyword is deprecated; use :does() attribute instead"),
+    XPK_COMMALIST( XPK_PACKAGENAME, XPK_VSTRING_OPT )
   ),
   XPK_ATTRIBUTES,
   {0}
@@ -709,7 +731,6 @@ static void check_field(pTHX_ void *hookdata)
 static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
-  HV *hints = GvHV(PL_hintgv);
 
   SV *name = args[argi++]->sv;
   char sigil = SvPV_nolen(name)[0];
@@ -747,8 +768,7 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     }
   }
 
-  bool is_block = FALSE,
-       warn_init_expr = !hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0);
+  bool is_block = FALSE;
 
   /* It would be nice to just yield some OP to represent the has field here
    * and let normal parsing of normal scalar assignment accept it. But we can't
@@ -830,23 +850,6 @@ field_array_hash_common:
         fieldmeta->def_if_undef = true;
       if(inittype == FIELD_INIT_OREXPR)
         fieldmeta->def_if_false = true;
-
-      if(warn_init_expr &&
-          !is_block && /* We already warned about blocks */
-          !optree_is_const(fieldmeta->defaultexpr)) {
-        ENTER;
-        SAVEI32(CopLINE(PL_curcop));
-
-        SV **svp;
-        if((svp = hv_fetchs(hints, "Object::Pad/fieldcopline", 0))) {
-          CopLINE(PL_curcop) = SvUV(*svp);
-        }
-
-        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-            "Non-constant field initialiser expression is experimental and may be changed or removed without notice");
-
-        LEAVE;
-      }
     }
     break;
   }
@@ -935,6 +938,7 @@ static const struct XSParseKeywordHooks kwhooks_has = {
   .check = &check_field,
 
   .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_WARNING_DEPRECATED("'has' is deprecated; use 'field' instead"),
     XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
     XPK_CHOICE(
@@ -1561,8 +1565,6 @@ static int build_requires(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t na
 {
   SV *mname = args[0]->sv;
 
-  warn_deprecated("'requires' is now discouraged; use an empty 'method NAME;' declaration instead");
-
   mop_class_add_required_method(compclassmeta, mname);
 
   *out = newOP(OP_NULL, 0);
@@ -1577,6 +1579,7 @@ static const struct XSParseKeywordHooks kwhooks_requires = {
   .check = &check_requires,
 
   .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_WARNING_DEPRECATED("'requires' is now discouraged; use an empty 'method NAME;' declaration instead"),
     XPK_IDENT,
     {0}
   },
@@ -2111,7 +2114,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.29); /* XPK_PREFIXED_TERMEXPR_ENTERLEAVE */
+  boot_xs_parse_keyword(0.37); /* XPK_WARNING_DEPRECATED */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);

@@ -1,7 +1,13 @@
 Revision history for Perl extension HTTP::Any.
 
+1.05  2023-07-17
+	- default timeout option for Net::Curl::Multi::EV
+
+1.04  2023-07-15
+	- set timeout option to Net::Curl::Multi::EV
+
 1.03  2022-08-19
-	- do not parse responce headers two time when on_header used in HTTP::Any::Curl
+	- do not parse response headers two time when on_header used in HTTP::Any::Curl
 
 1.02  2022-04-20
 	- fixed URL for HTTP::Any::Curl when redirect via proxy

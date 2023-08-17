@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 
@@ -2898,6 +2898,52 @@ sub delete_ldap_provider_group_link {
     return;
 }
 
+=item share_group_with_group
+
+    $api->share_group_with_group(
+        $group_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<groups/:group_id/share>.
+
+=cut
+
+sub share_group_with_group {
+    my $self = shift;
+    croak 'share_group_with_group must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($group_id) to share_group_with_group must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to share_group_with_group must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'groups/:group_id/share', [@_], $options );
+    return;
+}
+
+=item unshare_group_with_group
+
+    $api->unshare_group_with_group(
+        $group_id,
+        $shared_with_group_id,
+    );
+
+Sends a C<DELETE> request to C<groups/:group_id/share/:shared_with_group_id>.
+
+=cut
+
+sub unshare_group_with_group {
+    my $self = shift;
+    croak 'unshare_group_with_group must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to unshare_group_with_group must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($shared_with_group_id) to unshare_group_with_group must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'groups/:group_id/share/:shared_with_group_id', [@_], $options );
+    return;
+}
+
 =back
 
 =head2 Group access requests
@@ -4622,6 +4668,54 @@ sub accept_merge_request {
     my $options = {};
     $options->{content} = $params if defined $params;
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid/merge', [@_], $options );
+}
+
+=item approve_merge_request
+
+    my $merge_request = $api->approve_merge_request(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/merge_requests/:merge_request_iid/approve> and returns the decoded response content.
+
+=cut
+
+sub approve_merge_request {
+    my $self = shift;
+    croak 'approve_merge_request must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to approve_merge_request must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to approve_merge_request must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to approve_merge_request must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/approve', [@_], $options );
+}
+
+=item unapprove_merge_request
+
+    my $merge_request = $api->unapprove_merge_request(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/merge_requests/:merge_request_iid/unapprove> and returns the decoded response content.
+
+=cut
+
+sub unapprove_merge_request {
+    my $self = shift;
+    croak 'unapprove_merge_request must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to unapprove_merge_request must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to unapprove_merge_request must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to unapprove_merge_request must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/unapprove', [@_], $options );
 }
 
 =item cancel_merge_when_pipeline_succeeds
@@ -7086,6 +7180,26 @@ sub take_ownership_of_pipeline_schedule {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/take_ownership', [@_], $options );
 }
 
+=item run_pipeline_schedule
+
+    my $variable = $api->run_pipeline_schedule(
+        $project_id,
+        $pipeline_schedule_id,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/pipeline_schedules/:pipeline_schedule_id/play> and returns the decoded response content.
+
+=cut
+
+sub run_pipeline_schedule {
+    my $self = shift;
+    croak 'run_pipeline_schedule must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to run_pipeline_schedule must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($pipeline_schedule_id) to run_pipeline_schedule must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/play', [@_], $options );
+}
+
 =item delete_pipeline_schedule
 
     my $schedule = $api->delete_pipeline_schedule(
@@ -8825,6 +8939,78 @@ sub delete_release_link {
 
 =back
 
+=head2 Remote Mirrors
+
+See L<https://docs.gitlab.com/ce/api/remote_mirrors.html>.
+
+=over
+
+=item remote_mirrors
+
+    my $mirrors = $api->remote_mirrors(
+        $project_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/remote_mirrors> and returns the decoded response content.
+
+=cut
+
+sub remote_mirrors {
+    my $self = shift;
+    croak 'remote_mirrors must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($project_id) to remote_mirrors must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/remote_mirrors', [@_], $options );
+}
+
+=item create_remote_mirror
+
+    my $mirror = $api->create_remote_mirror(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/remote_mirrors> and returns the decoded response content.
+
+=cut
+
+sub create_remote_mirror {
+    my $self = shift;
+    croak 'create_remote_mirror must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to create_remote_mirror must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to create_remote_mirror must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/remote_mirrors', [@_], $options );
+}
+
+=item edit_remote_mirror
+
+    my $mirror = $api->edit_remote_mirror(
+        $project_id,
+        $mirror_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/remote_mirrors/:mirror_id> and returns the decoded response content.
+
+=cut
+
+sub edit_remote_mirror {
+    my $self = shift;
+    croak 'edit_remote_mirror must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to edit_remote_mirror must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($mirror_id) to edit_remote_mirror must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to edit_remote_mirror must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'projects/:project_id/remote_mirrors/:mirror_id', [@_], $options );
+}
+
+=back
+
 =head2 Repositories
 
 See L<https://docs.gitlab.com/ce/api/repositories.html>.
@@ -10445,6 +10631,126 @@ sub unblock_user {
     return $self->_call_rest_client( 'POST', 'users/:user_id/unblock', [@_], $options );
 }
 
+=item approve_user
+
+    $api->approve_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/approve>.
+
+=cut
+
+sub approve_user {
+    my $self = shift;
+    croak 'approve_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to approve_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/approve', [@_], $options );
+    return;
+}
+
+=item reject_user
+
+    $api->reject_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/reject>.
+
+=cut
+
+sub reject_user {
+    my $self = shift;
+    croak 'reject_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to reject_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/reject', [@_], $options );
+    return;
+}
+
+=item activate_user
+
+    $api->activate_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/activate>.
+
+=cut
+
+sub activate_user {
+    my $self = shift;
+    croak 'activate_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to activate_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/activate', [@_], $options );
+    return;
+}
+
+=item deactivate_user
+
+    $api->deactivate_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/deactivate>.
+
+=cut
+
+sub deactivate_user {
+    my $self = shift;
+    croak 'deactivate_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to deactivate_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/deactivate', [@_], $options );
+    return;
+}
+
+=item ban_user
+
+    $api->ban_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/ban>.
+
+=cut
+
+sub ban_user {
+    my $self = shift;
+    croak 'ban_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to ban_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/ban', [@_], $options );
+    return;
+}
+
+=item unban_user
+
+    $api->unban_user(
+        $user_id,
+    );
+
+Sends a C<POST> request to C<users/:user_id/unban>.
+
+=cut
+
+sub unban_user {
+    my $self = shift;
+    croak 'unban_user must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($user_id) to unban_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'POST', 'users/:user_id/unban', [@_], $options );
+    return;
+}
+
 =item user_impersonation_tokens
 
     my $tokens = $api->user_impersonation_tokens(
@@ -10772,16 +11078,12 @@ GitLab-API-v4 GitHub issue tracker:
 
 L<https://github.com/bluefeet/GitLab-API-v4/issues>
 
-=head1 ACKNOWLEDGEMENTS
-
-Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
-
-=head1 AUTHORS
+=head1 AUTHOR
 
     Aran Clary Deltac <bluefeet@gmail.com>
+
+=head1 CONTRIBUTORS
+
     Dotan Dimet <dotan@corky.net>
     Nigel Gregoire <nigelgregoire@gmail.com>
     trunov-ms <trunov.ms@gmail.com>
@@ -10796,23 +11098,16 @@ development this distribution would not exist.
     Dmitry Frolov <dmitry.frolov@gmail.com>
     Thomas Klausner <domm@plix.at>
     Graham Knop <haarg@haarg.org>
+    Stig Palmquist <git@stig.io>
+    Dan Book <grinnz@grinnz.com>
+    James Wright <jwright@ecstuning.com>
+    Jonathan Taylor <jon@stackhaus.com>
+    g0t mi1k <have.you.g0tmi1k@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2014 Aran Clary Deltac
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

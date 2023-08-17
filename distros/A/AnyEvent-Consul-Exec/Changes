@@ -1,5 +1,9 @@
 Revision history for AnyEvent-Consul-Exec
 
+0.004     2023-07-18 07:56:45+10:00 Australia/Melbourne
+- Enable remote exec in Test::Consul (0.011)
+- Add min_node_count option
+
 0.003     2017-08-06 10:11:42+10:00 Australia/Melbourne
 - Improve session and KV acquisition and cleanup
 - Support for running commands in remote datacenters

@@ -1,5 +1,3 @@
-# $Id: Hosts.pm,v 1.10 2008/10/21 15:41:02 turnstep Exp $
-
 package Net::SSH::Perl::Util::Hosts;
 use strict;
 use warnings;
@@ -92,7 +90,7 @@ sub _all_keys_for_host {
                     next
                 }
                 my $salt = $1;
-    
+
                 my $rawsalt = decode_b64($salt);
                 my $hash = encode_b64(hmac('SHA1',$rawsalt,$host));
                 $checkhost = "|1|$salt|$hash";
@@ -189,7 +187,7 @@ sub _remove_host_from_hostfile {
                     next;
                 }
                 my $salt = $1;
-    
+
                 my $rawsalt = decode_b64($salt);
                 my $hash = encode_b64(hmac('SHA1',$rawsalt,$checkhost));
                 $checkhost = "|1|$salt|$hash";

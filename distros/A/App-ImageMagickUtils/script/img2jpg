@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-01'; # DATE
+our $DATE = '2023-06-26'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to_jpg",
@@ -41,7 +41,7 @@ img2jpg - Alias for convert-image-to-jpg
 
 =head1 VERSION
 
-This document describes version 0.020 of img2jpg (from Perl distribution App-ImageMagickUtils), released on 2023-03-01.
+This document describes version 0.021 of img2jpg (from Perl distribution App-ImageMagickUtils), released on 2023-06-26.
 
 =head1 SYNOPSIS
 

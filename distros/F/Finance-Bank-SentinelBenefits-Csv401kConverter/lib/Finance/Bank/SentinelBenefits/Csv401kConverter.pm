@@ -1,29 +1,39 @@
 package Finance::Bank::SentinelBenefits::Csv401kConverter;
-$Finance::Bank::SentinelBenefits::Csv401kConverter::VERSION = '1.0';
-use Modern::Perl;
+$Finance::Bank::SentinelBenefits::Csv401kConverter::VERSION = '1.3';
+use Modern::Perl '2015';
+use feature 'signatures';
 
 use DateTime;
 use DateTime::Format::Flexible;
 
 =head1 NAME
 
+
+
 Finance::Bank::SentinelBenefits::Csv401kConverter - Takes a series of lines in Sentinel Benefits format and writes them out as QIF files, subject to the symbol mappings specified.
+
+
 
 =head1 VERSION
 
-version 1.0
+version 1.3
 
 =head1 SYNOPSIS
 
 
+
+
 =head1 DESCRIPTION
+
+
 
 This module takes a CSV file in the format "provided" i.e. copy-pasted from the Sentinel Benefits website.  It also takes a description->symbol mapping, and one or two filenames to write out.  The first file is a list of the transactions in QIF format.  The second file, if provided, is a list of the company matches with the signs reversed, which can be useful if you want to keep unvested company contributions from showing up in your net worth calculations.
 
-=cut
+
+
+=cut 
 
 use Moose;
-use MooseX::Method::Signatures;
 use MooseX::StrictConstructor;
 
 use Finance::Bank::SentinelBenefits::Csv401kConverter::SymbolMap;
@@ -34,11 +44,17 @@ use Finance::Bank::SentinelBenefits::Csv401kConverter::SideReverser;
 
 =head1 Accessors
 
+
+
 =head2 $p->trade_input()
+
+
 
 A file handle that supplies the trade data
 
-=cut
+
+
+=cut 
 
 has 'trade_input'  => (
     is       => 'ro',
@@ -60,11 +76,17 @@ has 'symbol_map' => (
 
 =head2 $p->trade_date()
 
+
+
 Used if you wish to override the trade date specified in the input file, or if no trade date is available in the files.
+
+
 
 If no dates are specified here or in the files, an exception will be thrown.
 
-=cut
+
+
+=cut 
 
 has 'trade_date' => (
     is       => 'ro',
@@ -93,7 +115,14 @@ has '_side_reverser' => (
     }
     );
 
-method write_output(){
+
+=head2 p->write_output()
+
+Writes the output to the output file
+
+=cut
+
+sub write_output($self){
     my $parser = Finance::Bank::SentinelBenefits::Csv401kConverter::LineParser->new
 	(
 	 symbol_map => $self->symbol_map()
@@ -170,18 +199,21 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-# Copyright 2009-2011 David Solimano
-# This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+=head1 LICENSE AND COPYRIGHT
+Copyright 2009-2023 David Solimano
+This file is part of Finance::Bank::SentinelBenefits::Csv401kConverter
 
-# Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+Finance::Bank::SentinelBenefits::Csv401kConverter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>.
+Finance::Bank::SentinelBenefits::Csv401kConverter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Finance::Bank::SentinelBenefits::Csv401kConverter.  If not, see <http://www.gnu.org/licenses/>
+=cut

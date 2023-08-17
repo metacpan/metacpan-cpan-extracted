@@ -2,7 +2,7 @@ package Acme::Cow;
 
 use strict;
 
-$Acme::Cow::VERSION = '0.2';
+$Acme::Cow::VERSION = '0.2.1';
 
 # Preloaded methods go here.
 

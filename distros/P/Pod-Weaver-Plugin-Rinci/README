@@ -2,9 +2,9 @@ NAME
     Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 VERSION
-    This document describes version 0.785 of Pod::Weaver::Plugin::Rinci
+    This document describes version 0.786 of Pod::Weaver::Plugin::Rinci
     (from Perl distribution Pod-Weaver-Plugin-Rinci), released on
-    2023-03-02.
+    2023-04-14.
 
 SYNOPSIS
     In your weaver.ini:
@@ -127,6 +127,11 @@ ENVIRONMENT
   PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES
     String (regex pattern). Used to set the default value for the
     "/exclude_modules" configuration option.
+
+    By default, if this is not specified, then some modules are by default
+    skipped:
+
+     '\\A(Sah::SchemaR::.+|Pod::Weaver::Plugin::Rinci)\\z'
 
   PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_FILES
     String (regex pattern). Used to set the default value for the

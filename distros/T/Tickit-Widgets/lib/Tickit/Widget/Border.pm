@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Border 0.36;
+package Tickit::Widget::Border 0.37;
 class Tickit::Widget::Border
    :strict(params)
    :isa(Tickit::SingleChildWidget);

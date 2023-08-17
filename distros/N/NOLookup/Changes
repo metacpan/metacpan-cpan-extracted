@@ -1,5 +1,12 @@
 Revision history for Perl extension NOLookup
 
+1.38.0 2023-06-15
+     - Remove support for the following stuff that the Norid RDAP
+       server does not support any more:
+       - norid_secret auth method in header request
+       - norid_header_proxy in header request
+       - access_layer / x-access-layer in header response 
+
 1.37.20 2023-05-23
      - Fix tests to work better from cpan.
 

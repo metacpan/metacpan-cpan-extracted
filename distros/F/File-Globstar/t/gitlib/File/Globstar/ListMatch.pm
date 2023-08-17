@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2023 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
@@ -9,51 +9,51 @@
 
 package File::Globstar::ListMatch;
 
-use common::sense;
+use strict;
 
 use File::Temp;
 use Git;
 
 sub new {
-    my ($class, $input, %options) = @_;
+	my ($class, $input, %options) = @_;
 
-    my $self = {
-        __gitignore => $$input,
-    };
+	my $self = {
+		__gitignore => $$input,
+	};
 
-    $self->{__ignore_case} = delete $options{ignoreCase};
+	$self->{__ignore_case} = delete $options{ignoreCase};
 
-    bless $self, $class;
+	bless $self, $class;
 }
 
 sub match {
-    my ($self, $path, $is_directory) = @_;
+	my ($self, $path, $is_directory) = @_;
 
-    $is_directory = 1 if $path =~ s{/$}{};
+	$is_directory = 1 if $path =~ s{/$}{};
 
-    $path .= '/' if $is_directory;
+	$path .= '/' if $is_directory;
 
-    $path =~ s{^/+}{};
+	$path =~ s{^/+}{};
 
-    my $dir = File::Temp::newdir;
-    my $status = Git::command_oneline(init => $dir);
-    my $repo = Git->repository(Directory => $dir);
+	my $dir = File::Temp::newdir;
+	my $status = Git::command_oneline(init => $dir);
+	my $repo = Git->repository(Directory => $dir);
 
-    open my $fh, '>', "$dir/.gitignore"
-        or die "cannot open '$dir/.gitignore': $!";
-    $fh->print($self->{__gitignore});
+	open my $fh, '>', "$dir/.gitignore"
+		or die "cannot open '$dir/.gitignore': $!";
+	$fh->print($self->{__gitignore});
 
-    # git-check-ignore exits with status code 1 if the file does not get
-    # ignored, and that throws an exception.  We use that as the indicator
-    # instead of the path name returned;
-    eval { $repo->command('check-ignore', $path) };
-    return if $@;
+	# git-check-ignore exits with status code 1 if the file does not get
+	# ignored, and that throws an exception.  We use that as the indicator
+	# instead of the path name returned;
+	eval { $repo->command('check-ignore', $path) };
+	return if $@;
 
-    return $self;
+	return $self;
 }
 
 sub matchExclude {
-    &match;
+	&match;
 }
 
 package main;

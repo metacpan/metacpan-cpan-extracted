@@ -66,11 +66,11 @@ sub main {
 
     local $ENV{PERL5LIB} = join(":",@INC);
     for my $test ( @$tests ) {
-	# Given
+        # Given
         my ($verbosity, $script, $expect_output, $expect_executing) = @$test;
         my $cmd = "$^X $0 $verbosity $script";
 
-	# When
+        # When
         my @output = `$cmd 2>&1`;
 
         my $found_executing = 0;
@@ -80,7 +80,7 @@ sub main {
             }
         }
 
-	# Then
+        # Then
         is($found_executing, $expect_executing, "$verbosity Executing: $found_executing");
 
         if ( $expect_output eq "output" ) {

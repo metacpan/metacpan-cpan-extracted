@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+ethereum-raw-tx
+
+=head1 SYNOPSIS
+
+ethereum-raw-tx [options]
+
+Options:
+
+    --txtype=legacy/eip1559 (Required)
+    --chain-id (Required, if not give default is 1)
+    --nonce (Required)
+    --max-fee-per-gas (Required for eip1559 transactions)
+    --max-priority-fee-per-gas (Required for eip1559 transactions)
+    --gas-price (Required for legacy transactions)
+    --gas-limit (Required)
+    --to (Optional, for contract deployment transactions)
+    --value (Optional)
+    --data (Optional)
+
+Example:
+
+    ethereum-raw-tx --tx-type=legacy --chain-id=0x1 --nonce=0x9 --gas-price=0x4A817C800 --gas-limit=0x5208 --to=0x3535353535353535353535353535353535353535 --value=0xDE0B6B3A7640000 --pk=0x4646464646464646464646464646464646464646464646464646464646464646
+
+=head1 DESCRIPTION
+
+Standalone version for decoding and encoding RLP
+
+=cut
+
+use strict;
+use warnings;
+
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+
+use Blockchain::Ethereum::Transaction::Legacy;
+use Blockchain::Ethereum::Transaction::EIP1559;
+use Blockchain::Ethereum::Keystore::Key;
+
+my ($tx_type, $chain_id, $nonce, $max_fee_per_gas, $max_priority_fee_per_gas, $gas_price, $gas_limit, $to, $value, $data, $private_key);
+GetOptions(
+    "tx-type=s"                => \$tx_type,
+    "chain-id=s"               => \$chain_id,
+    "nonce=s"                  => \$nonce,
+    "max-fee-per-gas=s"        => \$max_fee_per_gas,
+    "max-priority-fee-per-gas" => \$max_priority_fee_per_gas,
+    "gas-price=s"              => \$gas_price,
+    "gas-limit=s"              => \$gas_limit,
+    "to=s"                     => \$to,
+    "value=s"                  => \$value,
+    "data=s"                   => \$data,
+    "pk=s"                     => \$private_key
+);
+
+my %transaction_versions = (
+    legacy  => "Blockchain::Ethereum::Transaction::Legacy",
+    eip1559 => "Blockchain::Ethereum::Transaction::EIP1519",
+);
+
+pod2usage(1) unless $tx_type && $transaction_versions{$tx_type} && $nonce && $gas_limit;
+
+my %params = (
+    chain_id  => $chain_id,
+    nonce     => $nonce,
+    gas_limit => $gas_limit,
+    to        => $to,
+    value     => $value,
+    data      => $data,
+);
+
+if ($tx_type eq 'eip1559') {
+    $params{max_fee_per_gas}          = $max_fee_per_gas;
+    $params{max_priority_fee_per_gas} = $max_priority_fee_per_gas;
+} else {
+    $params{gas_price} = $gas_price;
+}
+
+my $tx = $transaction_versions{$tx_type}->new(%params);
+
+$private_key =~ s/^0x//g;
+
+my $key = Blockchain::Ethereum::Keystore::Key->new(
+    private_key => pack "H*",
+    $private_key
+);
+
+$key->sign_transaction($tx);
+
+printf("%s\n", unpack("H*", $tx->serialize));

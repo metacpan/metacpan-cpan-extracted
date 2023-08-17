@@ -1,7 +1,7 @@
 clib/build/
 clib/cmake_props/
 
-#!start included /home/syber/perl5/perlbrew/perls/5.36.0g/lib/5.36.0/ExtUtils/MANIFEST.SKIP
+#!start included /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -77,5 +77,5 @@ clib/cmake_props/
 
 # Avoid AppVeyor file
 ^\.?appveyor.yml
-#!end included /home/syber/perl5/perlbrew/perls/5.36.0g/lib/5.36.0/ExtUtils/MANIFEST.SKIP
+#!end included /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/MANIFEST.SKIP
 

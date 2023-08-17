@@ -1,5 +1,3 @@
-# $Id: Packet.pm,v 1.25 2008/09/24 19:21:20 turnstep Exp $
-
 package Net::SSH::Perl::Packet;
 
 use strict;
@@ -367,7 +365,7 @@ sub send_ssh2 {
         my $data = $mac->etm ? $out : $buffer->bytes;
         $macbuf = $mac->hmac(pack("N", $seqnr) . $data);
     }
- 
+
     my $output = Net::SSH::Perl::Buffer->new( MP => 'SSH2' );
     $output->append($out);
     $output->append($macbuf) if $mac && $mac->enabled;

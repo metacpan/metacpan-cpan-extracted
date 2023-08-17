@@ -15,9 +15,9 @@ use Test::More tests => 19;
 
 
 my $src = "märkøv\n";  # fragile!  must be utf8, not latin1
-ok(utf8::is_utf8($src));
+ok utf8::is_utf8($src), 'string with utf8';
 
-my $dec = Mail::Message::Body->new(data => $src);
+my $dec = Mail::Message::Body->new(data => $src)->decoded;
 
 isa_ok($dec, 'Mail::Message::Body');
 is($dec->charset, 'PERL', 'default charset PERL');

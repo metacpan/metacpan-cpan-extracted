@@ -8,7 +8,7 @@ use base qw(Net::DNS::Resolver DynaLoader);
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.20';
+	$VERSION = '1.21';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -77,11 +77,11 @@ Returns a new Net::DNS::Resolver::Unbound resolver object.
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new();
+	my ( $class, @argument ) = @_;
+	my $self = $class->SUPER::new();
 	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
-	while ( my $attr = shift ) {
-		my $value = shift;
+	while ( my $attr = shift @argument ) {
+		my $value = shift @argument;
 		$self->$attr( ref($value) ? @$value : $value );
 	}
 	return $self;
@@ -124,24 +124,34 @@ See L<Net::DNS::Resolver>.
 =cut
 
 sub send {
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 	$self->_finalise_config;
 	$self->_reset_errorstring;
 
-	my $query = $self->_make_query_packet(@_);
-	my ($q) = $query->question;
-	my $reply = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
-	return $self->_decode_result($reply);
+	my ($packet) = @argument;
+	my $query = $self->_make_query_packet(@argument);
+	my $result;
+	if ( UB_SEND && ref($packet) ) {
+		$result = $self->{ub_ctx}->ub_send( $query->encode );
+	} else {
+		my ($q) = $query->question;
+		$result = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
+	}
+
+	my $reply = $self->_decode_result($result);
+	$query->header->id( $reply->header->id );
+	return $reply;
 }
 
 sub bgsend {
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 	$self->_finalise_config;
 	$self->_reset_errorstring;
 
-	my $query = $self->_make_query_packet(@_);
-	my ($q) = $query->question;
-	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass} );
+	my $query = $self->_make_query_packet(@argument);
+	my $ident = $query->header->id;
+	my ($q)	  = $query->question;
+	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass}, $ident );
 }
 
 sub bgbusy {
@@ -159,9 +169,10 @@ sub bgread {
 
 	$self->{ub_ctx}->ub_wait if &bgbusy;
 
-	my $query_id = $handle->query_id;
 	$self->errorstring( $handle->err );
-	return $self->_decode_result( $handle->result );
+	my $reply = $self->_decode_result( $handle->result ) || return;
+	$reply->header->id( $handle->query_id );
+	return $reply;
 }
 
 
@@ -289,8 +300,8 @@ in RFC1035 zonefile format.
 =cut
 
 sub add_ta {
-	my $self = shift;
-	return $self->{ub_ctx}->add_ta( Net::DNS::RR->new(@_)->plain );
+	my ( $self, @argument ) = @_;
+	return $self->{ub_ctx}->add_ta( Net::DNS::RR->new(@argument)->plain );
 }
 
 
@@ -396,10 +407,6 @@ Prints the resolver state on the standard output.
 
 =cut
 
-sub print {
-	return print shift->string;
-}
-
 sub string {
 	my $self = shift;
 	$self = $self->_defaults unless ref($self);
@@ -429,7 +436,7 @@ sub _decode_result {
 	$self->errorstring( $result->why_bogus ) if $result->bogus;
 
 	my $buffer = $result->answer_packet || return;
-	my $packet = Net::DNS::Packet->decode(\$buffer);
+	my $packet = Net::DNS::Packet->decode( \$buffer );
 	$self->errorstring($@);
 	$packet->print if $self->debug;
 
@@ -466,7 +473,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (c)2022 Dick Franks
+Copyright (c)2022,2023 Dick Franks
 
 All Rights Reserved
 

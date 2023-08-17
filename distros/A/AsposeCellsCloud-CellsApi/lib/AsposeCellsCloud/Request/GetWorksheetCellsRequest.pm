@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCellsRequest.name :   ,
-# GetWorksheetCellsRequest.sheetName :   ,
-# GetWorksheetCellsRequest.offest :   ,
-# GetWorksheetCellsRequest.count :   ,
-# GetWorksheetCellsRequest.folder :   ,
-# GetWorksheetCellsRequest.storageName :    
+# GetWorksheetCellsRequest.name : Document name.  ,
+# GetWorksheetCellsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetCellsRequest.offest : Begginig offset.  ,
+# GetWorksheetCellsRequest.count : Maximum amount of cells in the response.  ,
+# GetWorksheetCellsRequest.folder : Document`s folder name.  ,
+# GetWorksheetCellsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_cells' } = { 
-    	summary => '',
+    	summary => 'Gets cells description in some format.',
         params => $params,
         returns => 'CellsResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'Document name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'offest' => {
      	datatype => 'int',
      	base_name => 'offest',
-     	description => '',
+     	description => 'Begginig offset.',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => '',
+     	description => 'Maximum amount of cells in the response.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Document`s folder name.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

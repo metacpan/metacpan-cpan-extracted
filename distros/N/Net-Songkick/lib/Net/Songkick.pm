@@ -44,7 +44,7 @@ package Net::Songkick;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.7';
+our $VERSION = '1.0.8';
 
 use Moose;
 
@@ -253,7 +253,7 @@ L<http://www.songkick.com/developer/event-search>.
 In addition, this method takes an extra parameter, B<format>, which control
 the format of the data returned. This can be either I<xml>, I<json> or
 I<perl>. If it is either I<xml> or I<json> then the method will return the
-raw XML or JSON from the Songkick API. If ii is I<perl> then this method
+raw XML or JSON from the Songkick API. If it is I<perl> then this method
 will return a list of L<Net::Songkick::Event> objects. If this parameter is
 omitted, then I<perl> is assumed.
 

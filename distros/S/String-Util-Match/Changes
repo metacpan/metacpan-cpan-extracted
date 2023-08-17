@@ -1,11 +1,16 @@
-0.002   2017-12-10 (PERLANCAR)
+0.003   2023-06-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: num_occurs().
+
+
+0.002   2017-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Remove extraneous code in Synopsis.
 
 
-0.001   2017-12-09 (PERLANCAR)
+0.001   2017-12-09  Released-By: PERLANCAR
 
         - First release, repackaging of some functions from
           SHARYANTO::Array::Util.

@@ -1,5 +1,8 @@
 Revision history for Module::Build::Tiny
 
+0.046     2023-06-01 19:31:21+02:00 Europe/Amsterdam
+          - Add src/ to include paths
+
 0.045     2023-04-30 11:52:20+02:00 Europe/Brussels
           - Fix compilation issue on Windows
 

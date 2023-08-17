@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.5.1'; # VERSION
+our $VERSION = 'v0.5.2'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -285,7 +285,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.5.1
+version v0.5.2
 
 =head1 SYNOPSIS
 

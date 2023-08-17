@@ -8,7 +8,7 @@ extern "C" {
 }
 #endif
 
-#include "fitsio.h"
+#include "fitsio2.h"
 #include "util.h"
 
 /* use the C std lib malloc/free */
@@ -1670,8 +1670,8 @@ ffcpsr(infptr,outfptr,firstrow,nrows,row_status,status)
 	logical * row_status
 	int &status
 	ALIAS:
-		Astro::FITS::CFITSIO::fits_copy_select_rows = 1
-		fitsfilePtr::copy_select_rows = 2
+		Astro::FITS::CFITSIO::fits_copy_selrows = 1
+		fitsfilePtr::copy_selrows = 2
 	OUTPUT:
 		status
 
@@ -2975,7 +2975,7 @@ ffhdr2str(fptr, nocomments, header, nkeys, status)
 		RETVAL=fits_hdr2str(fptr->fptr,nocomments,NULL,0,&header,&nkeys,&status);
 		if (ST(2)!=&PL_sv_undef) unpackScalar(ST(2), header, TSTRING);
 		if (ST(3)!=&PL_sv_undef) unpackScalar(ST(3), &nkeys, TINT);
-		free(header);
+		fffree(header, &status);
 	OUTPUT:
 		status
 		RETVAL
@@ -2994,7 +2994,7 @@ ffcnvthdr2str(fptr, nocomments, header, nkeys, status)
 		RETVAL=fits_hdr2str(fptr->fptr,nocomments,NULL,0,&header,&nkeys,&status);
 		if (ST(2)!=&PL_sv_undef) unpackScalar(ST(2), header, TSTRING);
 		if (ST(3)!=&PL_sv_undef) unpackScalar(ST(3), &nkeys, TINT);
-		free(header);
+		fffree(header, &status);
 	OUTPUT:
 		status
 		RETVAL
@@ -7765,6 +7765,7 @@ ffgsky(fptr,keyname,firstchar,maxchar,value,valuelen,comm,status)
 		value
 		comm
 		status
+		RETVAL
 
 int
 ffdstr(fptr, string, status)
@@ -7846,6 +7847,21 @@ ffgunt(fptr,keyname,unit,status)
 		RETVAL
 
 int
+ffgkcsl(fptr, keyname, length, comlength, status)
+	fitsfile * fptr
+	const char * keyname
+	int &length
+	int &comlength
+	int &status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_get_key_com_strlen = 1
+		fitsfilePtr::get_key_com_strlen = 2
+	OUTPUT:
+		length
+		comlength
+		status
+
+int
 ffgkls(fptr,keyname,longstr,comment,status)
 	fitsfile * fptr
 	char * keyname
@@ -7859,9 +7875,36 @@ ffgkls(fptr,keyname,longstr,comment,status)
 		comment=(ST(3)!=&PL_sv_undef) ? get_mortalspace(FLEN_COMMENT,TBYTE) : NULL;
 		RETVAL=ffgkls(fptr,keyname,&longstr,comment,&status);
 		sv_setpv(ST(2),longstr);
-		free(longstr);
+		fffree(longstr, &status);
 	OUTPUT:
 		comment
+		status
+		RETVAL
+
+int
+ffgskyc(fptr,keyname,firstchar,maxchar,maxcomchar,value,valuelen,comm,comlen,status)
+	fitsfile *fptr
+	const char *keyname
+	int firstchar
+	int maxchar
+	int maxcomchar
+	char * value = NO_INIT
+	int valuelen = NO_INIT
+	char * comm = NO_INIT
+	int comlen = NO_INIT
+	int status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_read_string_key_com = 1
+		fitsfilePtr::read_string_key_com = 2
+	CODE:
+		value = (ST(5) != &PL_sv_undef) ? get_mortalspace(maxchar+1,TBYTE) : NULL;
+		comm = (ST(7) != &PL_sv_undef) ? get_mortalspace(maxcomchar+1,TBYTE) : NULL;
+		RETVAL=ffgskyc(fptr,keyname,firstchar,maxchar,maxcomchar,value,&valuelen,comm,&comlen,&status);
+		if (ST(6) != &PL_sv_undef) sv_setiv(ST(6),valuelen);
+		if (ST(8) != &PL_sv_undef) sv_setiv(ST(8),comlen);
+	OUTPUT:
+		value
+		comm
 		status
 		RETVAL
 
@@ -7871,7 +7914,6 @@ fffree(value, status)
 	int &status
 	ALIAS:
 		Astro::FITS::CFITSIO::fits_free_memory = 1
-		fitsfilePtr::read_free_memory = 2
 	OUTPUT:
 		status
 
@@ -12245,7 +12287,7 @@ ffgiwcs(fptr,header,status)
 		if (status == 0) {
 			if (ST(1) != &PL_sv_undef)
 				unpackScalar(ST(1),header,TSTRING);
-			free(header);
+			fffree(header, &status);
 		}
 	OUTPUT:
 		RETVAL
@@ -12266,7 +12308,7 @@ ffgtwcs(fptr,xcol,ycol,header,status)
 		if (status == 0) {
 			if (ST(3)!=&PL_sv_undef)
 				unpackScalar(ST(3),header,TSTRING);
-			free(header);
+			fffree(header, &status);
 		}
 	OUTPUT:
 		RETVAL
@@ -12644,3 +12686,117 @@ ffppxnll(fptr, dtype, fpix, nelem, array, nulval, status)
 		RETVAL
 		status
 
+int
+fits_copy_pixlist2image(infptr, outfptr, firstkey, naxis, colnum, status)
+	fitsfile *infptr
+	fitsfile *outfptr
+	int firstkey
+	int naxis
+	int *colnum
+	int &status
+	ALIAS:
+		fitsfilePtr::copy_pixlist2image = 1
+	OUTPUT:
+		status
+
+int
+fits_write_keys_histo(fptr, histptr, naxis, colnum, status)
+	fitsfile *fptr
+	fitsfile *histptr
+	int naxis
+	int *colnum
+	int &status
+	ALIAS:
+		fitsfilePtr::write_keys_histo = 1
+	OUTPUT:
+		status
+
+int
+fits_rebin_wcs(fptr, naxis, amin, binsize, status)
+	fitsfile *fptr
+	int naxis
+	float *amin
+	float *binsize
+	int &status
+	ALIAS:
+		fitsfilePtr::rebin_wcs = 1
+	OUTPUT:
+		status
+
+int
+fits_rebin_wcsd(fptr, naxis, amin, binsize, status)
+	fitsfile *fptr
+	int naxis
+	double *amin
+	double *binsize
+	int &status
+	ALIAS:
+		fitsfilePtr::rebin_wcsd = 1
+	OUTPUT:
+		status
+
+int
+fits_make_hist(fptr,histptr,bitpix,naxis,naxes,colnum,amin,amax,binsize,weight,wtcolnum,recip,selectrow,status)
+	fitsfile *fptr
+	fitsfile *histptr
+	int bitpix
+	int naxis
+	long *naxes
+	int *colnum
+	float *amin
+	float *amax
+	float *binsize
+	float weight
+	int wtcolnum
+	int recip
+	logical *selectrow
+	int &status
+	ALIAS:
+		fitsfilePtr::make_hist = 1
+	OUTPUT:
+		status
+
+int
+fits_make_histd(fptr,histptr,bitpix,naxis,naxes,colnum,amin,amax,binsize,weight,wtcolnum,recip,selectrow,status)
+	fitsfile *fptr
+	fitsfile *histptr
+	int bitpix
+	int naxis
+	long *naxes
+	int *colnum
+	double *amin
+	double *amax
+	double *binsize
+	double weight
+	int wtcolnum
+	int recip
+	logical *selectrow
+	int &status
+	ALIAS:
+		fitsfilePtr::make_histd = 1
+	OUTPUT:
+		status
+
+int
+fits_make_histde(fptr,histptr,datatypes,bitpix,naxis,naxes,colnum,colexpr,amin,amax,binsize,weight,wtcolnum,wtexpr,recip,selectrow,status)
+	fitsfile *fptr
+	fitsfile *histptr
+	int *datatypes
+	int bitpix
+	int naxis
+	long *naxes
+	int *colnum
+	char **colexpr
+	double *amin
+	double *amax
+	double *binsize
+	double weight
+	int wtcolnum
+	char *wtexpr
+	int recip
+	logical *selectrow
+	int &status
+	ALIAS:
+		fitsfilePtr::make_histde = 1
+	OUTPUT:
+		status

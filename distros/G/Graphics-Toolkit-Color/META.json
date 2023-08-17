@@ -4,7 +4,7 @@
       "Herbert Breunung <lichtkind@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
             "perl" : "v5.12.0"
          },
          "suggests" : {
-            "Graphics::ColorNames" : "0"
+            "Bundle::Graphics::ColorNames" : "0"
          }
       },
       "test" : {
@@ -49,15 +49,47 @@
    "provides" : {
       "Graphics::Toolkit::Color" : {
          "file" : "lib/Graphics/Toolkit/Color.pm",
-         "version" : "1.08"
+         "version" : "1.53"
       },
       "Graphics::Toolkit::Color::Constant" : {
          "file" : "lib/Graphics/Toolkit/Color/Constant.pm",
-         "version" : "1.08"
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Space" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::SpaceBasis" : {
+         "file" : "lib/Graphics/Toolkit/Color/SpaceBasis.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Util" : {
+         "file" : "lib/Graphics/Toolkit/Color/Util.pm",
+         "version" : "1.53"
       },
       "Graphics::Toolkit::Color::Value" : {
          "file" : "lib/Graphics/Toolkit/Color/Value.pm",
-         "version" : "1.08"
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Value::CMY" : {
+         "file" : "lib/Graphics/Toolkit/Color/Value/CMY.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Value::CMYK" : {
+         "file" : "lib/Graphics/Toolkit/Color/Value/CMYK.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Value::HSL" : {
+         "file" : "lib/Graphics/Toolkit/Color/Value/HSL.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Value::HSV" : {
+         "file" : "lib/Graphics/Toolkit/Color/Value/HSV.pm",
+         "version" : "1.53"
+      },
+      "Graphics::Toolkit::Color::Value::RGB" : {
+         "file" : "lib/Graphics/Toolkit/Color/Value/RGB.pm",
+         "version" : "1.53"
       }
    },
    "release_status" : "stable",
@@ -68,9 +100,9 @@
          "web" : "https://github.com/lichtkind/Graphics-Color-Toolkit"
       }
    },
-   "version" : "1.08",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "1.53",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

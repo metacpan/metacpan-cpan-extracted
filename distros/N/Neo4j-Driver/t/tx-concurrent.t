@@ -5,7 +5,9 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 # Concurrent transactions within the same session (in the context of Bolt
@@ -13,12 +15,11 @@ use Test::Warnings qw(warning);
 # but are actually supported just fine when implemented via the
 # Transactional HTTP API, which this driver can use for network communication.
 # Therefore, this driver supports concurrent transactions for HTTP sessions.
-# As of 0.30, this is an experimental feature (but expected to be mainlined).
 
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-plan tests => 14 + 1;
+plan tests => 14 + $no_warnings;
 
 
 my ($w, $d, $s, $t, $r);
@@ -74,19 +75,19 @@ subtest 'config for bolt: uri' => sub {
 	plan tests => 6;
 	# config 1
 	$d = Neo4j::Driver->new;
-	$d->{net_module} = 'Local::Bolt';
+	$d->{config}->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:', concurrent_tx => 1 ); } 'config on lives';
 	throws_ok {
 		$d->session(database => 'dummy');
 	} qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'bolt session on dies';
 	# config 0
 	$d = Neo4j::Driver->new;
-	$d->{net_module} = 'Local::Bolt';
+	$d->{config}->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:', concurrent_tx => 0 ); } 'config off lives';
 	lives_ok { $d->session(database => 'dummy'); } 'bolt session off lives';
 	# config undef
 	$d = Neo4j::Driver->new;
-	$d->{net_module} = 'Local::Bolt';
+	$d->{config}->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:' ); } 'config undef lives';
 	lives_ok { $d->session(database => 'dummy'); } 'bolt session undef lives';
 };
@@ -108,7 +109,7 @@ subtest 'config for http: uri' => sub {
 	$d = Neo4j::Driver->new->plugin($mock_plugin);
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => undef ); } 'config undef lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session undef lives';
-	ok $s->{net}{want_concurrent}, 'concurrent tx http default on';
+	ok ! $s->{net}{want_concurrent}, 'concurrent tx http default off';
 };
 
 
@@ -128,14 +129,14 @@ subtest 'config for https: uri' => sub {
 	$d = Neo4j::Driver->new->plugin($mock_plugin);
 	lives_ok { $d->config( uri => 'https:', concurrent_tx => undef ); } 'config undef lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session undef lives';
-	ok $s->{net}{want_concurrent}, 'concurrent tx https default on';
+	ok ! $s->{net}{want_concurrent}, 'concurrent tx https default off';
 };
 
 
 subtest 'bolt explicit' => sub {
 	plan tests => 8;
 	$d = Neo4j::Driver->new({ uri => 'bolt:' });
-	$d->{net_module} = 'Local::Bolt';
+	$d->{config}->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin 1';
 	throws_ok {
@@ -158,7 +159,7 @@ subtest 'bolt explicit' => sub {
 subtest 'bolt autocommit' => sub {
 	plan tests => 6;
 	$d = Neo4j::Driver->new({ uri => 'bolt:' });
-	$d->{net_module} = 'Local::Bolt';
+	$d->{config}->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin 1';
 	throws_ok {
@@ -277,16 +278,18 @@ subtest 'live: explicit (REST)' => sub {
 	my $session = eval { Neo4j_Test->driver->session };
 	plan skip_all => "(no session)" unless $session;
 	plan skip_all => '(currently testing Bolt)' if $Neo4j_Test::bolt;
-	plan tests => 4 if ! $Neo4j_Test::bolt;
-	my ($t1, $t2);
+	plan tests => 5;
+	my ($t1, $t2, $w2);
 	lives_ok {
 		$t1 = $session->begin_transaction;
 		$t1->run("CREATE (nested1:Test)");
 	} 'explicit nested transactions: 1st';
 	lives_ok {
 		$t2 = $session->begin_transaction;
-		$t2->run("CREATE (nested2:Test)");
+		$w2 = warning { $t2->run("CREATE (nested2:Test)"); };
 	} 'explicit nested transactions: 2nd';
+	like $w2, qr/\bConcurrent transactions\b/i, 'explicit in explicit warns'
+		or diag 'got warning(s): ', explain $w2;
 	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
 	lives_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
 };
@@ -319,7 +322,7 @@ subtest 'live: autocommit' => sub {
 	my $t = $session->begin_transaction;
 	$t->run("CREATE (explicit1:Test)");
 	lives_ok {
-		$value = $session->run("RETURN 42")->single->get(0);
+		warning { $value = $session->run("RETURN 42")->single->get(0); };
 		$t->run("CREATE (explicit2:Test)");
 		$t->rollback;
 	} 'nested autocommit transactions: success' if ! $Neo4j_Test::bolt;

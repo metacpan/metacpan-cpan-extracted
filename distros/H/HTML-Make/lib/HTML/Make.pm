@@ -1,10 +1,11 @@
 package HTML::Make;
 use warnings;
 use strict;
-our $VERSION = '0.15';
+require Exporter;
+our $VERSION = '0.17';
 use Carp;
 use HTML::Valid::Tagset ':all';
-use JSON::Parse '0.60', 'read_json';
+use JSON::Parse '0.62', 'read_json';
 
 my $dir = __FILE__;
 $dir =~ s/Make\.pm/Make/;
@@ -20,9 +21,9 @@ my %isBlock = %HTML::Valid::Tagset::isBlock;
 our $texttype = 'text';
 our $blanktype = 'blank';
 
-# This is for checking %options for stray stuff.
-
-my %validoptions = (qw/text 1 nocheck 1 attr 1 class 1 id 1 href 1/);
+sub op
+{
+}
 
 sub new
 {
@@ -46,40 +47,65 @@ sub new
 	    croak "text field must be a scalar";
 	}
 	$obj->{text} = $options{text};
+	return $obj;
     }
-    else {
-	if (! $options{nocheck} && $type ne $blanktype && ! $tags{lc $type}) {
-	    carp "Unknown tag type '$type'";
-	}
-	elsif (! $options{nocheck} && ! $isHTML5{lc $type}) {
-	    carp "<$type> is not HTML5";
-	}
-	if ($options{text}) {
-            $obj->add_text ($options{text});
-        }
-	if ($options{attr}) {
-	    $obj->add_attr (%{$options{attr}});
-	}
-	# Convenience shortcuts
-	if ($options{id}) {
-	    $obj->add_attr (id => $options{id});
-	}
-	if ($options{class}) {
-	    $obj->add_attr (class => $options{class});
-	}
-	if ($options{href}) {
-	    if ($type ne 'a') {
-		carp "href is only allowed with an 'a' element";
+    if ($options{nocheck}) {
+	# We won't check when the user adds attributes later.
+	$obj->{nocheck} = 1;
+	delete $options{nocheck};
+    }
+    if (! $obj->{nocheck}) {
+	if ($type ne $blanktype) {
+	    if (! $tags{lc $type}) {
+		carp "Unknown tag type '$type'";
 	    }
-	    else {
-		$obj->add_attr (href => $options{href});
+	    elsif (! $isHTML5{lc $type}) {
+		carp "<$type> is not HTML5";
 	    }
 	}
-	for my $k (keys %options) {
-	    if (! $validoptions{$k}) {
-		carp "Unknown option '$k'";
-	    }
+    }
+    if (exists $options{text}) {
+	if (! defined $options{text}) {
+	    carp "Undefined value for text";
+	    $options{text} = '';
 	}
+	$obj->add_text ($options{text});
+	delete $options{text};
+    }
+    if ($options{attr}) {
+	$obj->add_attr (%{$options{attr}});
+	delete $options{attr};
+    }
+    # Convenience shortcuts
+    if ($options{id}) {
+	$obj->add_attr (id => $options{id});
+	delete $options{id};
+    }
+    if ($options{class}) {
+	$obj->add_attr (class => $options{class});
+	delete $options{class};
+    }
+    if ($options{href}) {
+	if ($type ne 'a' && $type ne 'link') {
+	    carp "href is only allowed with an 'a' or 'link' element";
+	}
+	else {
+	    $obj->add_attr (href => $options{href});
+	}
+	delete $options{href};
+    }
+    if ($options{src}) {
+	if ($type ne 'img' && $type ne 'image') {
+	    carp "src is only allowed with an 'img' element";
+	}
+	else {
+	    $obj->add_attr (src => $options{src});
+	}
+	delete $options{src};
+    }
+    for my $k (keys %options) {
+	carp "Unknown option '$k'";
+	delete $options{$k};
     }
     return $obj;
 }
@@ -87,6 +113,9 @@ sub new
 sub check_attributes
 {
     my ($obj, %attr) = @_;
+    if ($obj->{nocheck}) {
+	return;
+    }
     if ($attr{id}) {
 	# This is a bit of a bug since \s matches more things than the
 	# 5 characters disallowed in HTML IDs.
@@ -247,12 +276,17 @@ sub opening_tag
 
 sub HTML::Make::push
 {
+    if (scalar (@_) % 2 != 0) {
+	carp "Usage: ->push ('el', class => 'a', );";
+	return;
+    }
     my ($obj, $el, %options) = @_;
     my $x;
     if (ref $el eq __PACKAGE__) {
 	$x = $el;
 	if ($x->{parent}) {
 	    carp "Pushed element of type $x->{type} already has a parent of type $x->{parent}{type}";
+	    return;
 	}
     }
     else {
@@ -271,24 +305,22 @@ sub text
     if (! $type) {
         croak "No type";
     }
-    my $text;
     if ($type eq $texttype) {
-        $text = $obj->{text};
+        return $obj->{text};
     }
-    else {
-	if ($type ne $blanktype) {
-	    $text = $obj->opening_tag ();
-	    if ($isBlock{$type} || $type eq 'tr') {
-		$text .= "\n";
-	    }
+    my $text = '';
+    if ($type ne $blanktype) {
+	$text = $obj->opening_tag ();
+	if ($isBlock{$type} || $type eq 'tr') {
+	    $text .= "\n";
 	}
-	# Recursively add text
-        for my $child (@{$obj->{children}}) {
-            $text .= $child->text ();
-        }
-	if ($type ne $blanktype && ! $noCloseTags{$type}) {
-	    $text .= "</$type>\n";
-	}
+    }
+    # Recursively add text
+    for my $child (@{$obj->{children}}) {
+	$text .= $child->text ();
+    }
+    if ($type ne $blanktype && ! $noCloseTags{$type}) {
+	$text .= "</$type>\n";
     }
     return $text;
 }

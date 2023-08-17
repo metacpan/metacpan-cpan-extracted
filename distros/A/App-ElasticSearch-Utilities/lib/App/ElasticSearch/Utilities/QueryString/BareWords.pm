@@ -1,10 +1,10 @@
 package App::ElasticSearch::Utilities::QueryString::BareWords;
 # ABSTRACT: Mostly fixing case and tracking dangling words
 
-use strict;
+use v5.16;
 use warnings;
 
-our $VERSION = '8.5'; # VERSION
+our $VERSION = '8.6'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::BareWords - Mostly fixing case and t
 
 =head1 VERSION
 
-version 8.5
+version 8.6
 
 =head1 SYNOPSIS
 

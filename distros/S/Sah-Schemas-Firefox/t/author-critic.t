@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Filter/perl/Firefox/check_profile_name_exists.pm','lib/Perinci/Sub/XCompletion/firefox_profile_name.pm','lib/Sah/Schema/firefox/local_profile_name.pm','lib/Sah/Schema/firefox/profile_name.pm','lib/Sah/SchemaR/firefox/local_profile_name.pm','lib/Sah/SchemaR/firefox/profile_name.pm','lib/Sah/Schemas/Firefox.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/Firefox/check_profile_name_exists.pm','lib/Data/Sah/Value/perl/Firefox/first_local_profile_name.pm','lib/Perinci/Sub/XCompletion/firefox_profile_name.pm','lib/Sah/Schema/firefox/local_profile_name.pm','lib/Sah/Schema/firefox/local_profile_name/default_first.pm','lib/Sah/Schema/firefox/profile_name.pm','lib/Sah/SchemaR/firefox/local_profile_name.pm','lib/Sah/SchemaR/firefox/local_profile_name/default_first.pm','lib/Sah/SchemaR/firefox/profile_name.pm','lib/Sah/Schemas/Firefox.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

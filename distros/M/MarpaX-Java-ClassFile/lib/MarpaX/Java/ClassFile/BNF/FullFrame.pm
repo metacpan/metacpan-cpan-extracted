@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a full_frame
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -67,7 +67,7 @@ MarpaX::Java::ClassFile::BNF::FullFrame - Parsing of a full_frame
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

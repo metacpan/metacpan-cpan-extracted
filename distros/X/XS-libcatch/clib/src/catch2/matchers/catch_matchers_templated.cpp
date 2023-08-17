@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,7 @@ namespace Matchers {
             for ( auto desc = descriptions_begin; desc != descriptions_end; ++desc ) {
                 combined_size += desc->size();
             }
-            combined_size += (descriptions_end - descriptions_begin - 1) * combine.size();
+            combined_size += static_cast<size_t>(descriptions_end - descriptions_begin - 1) * combine.size();
 
             description.reserve(combined_size);
 

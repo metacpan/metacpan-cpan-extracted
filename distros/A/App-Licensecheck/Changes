@@ -7,6 +7,22 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.9	2023-07-04
+
+ [ Bug Fixes ]
+ - fix: properly catch second decoding error, to try raw as fallback of
+   both explicit and iso-8859-1 encoding (broken since v3.3.1)
+
+ [ Test Suite ]
+ - relax encoding tests to cover String::License v0.0.6
+ - relax stderr for a few encoding tests
+ - skip encoding tests on cygwin
+
+ [ Other ]
+ - log failure error before retry notice
+ - use Feature::Compat::Class after core features, to support newer perl;
+   thanks to Jitka Plesníková and Graham Knop (see RT#148507)
+
 v3.3.8	2023-01-18
 
  [ Test Suite ]

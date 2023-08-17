@@ -8,7 +8,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Form;
 use Tags::Output::Structure;
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -63,7 +63,40 @@ is_deeply(
 		['e', 'p'],
 		['e', 'form'],
 	],
-	'Form HTML code (only submit button with custom text).',
+	'Form HTML code (only submit button with custom tags text).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Form->new(
+	'submit' => Data::HTML::Button->new(
+		'data' => [
+			'foo',
+			'bar',
+		],
+		'data_type' => 'plain',
+		'type' => 'submit',
+	),
+	'tags' => $tags,
+);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'form'],
+		['a', 'class', 'form'],
+		['a', 'method', 'get'],
+		['b', 'p'],
+		['b', 'button'],
+		['a', 'type', 'submit'],
+		['d', 'foo'],
+		['d', 'bar'],
+		['e', 'button'],
+		['e', 'p'],
+		['e', 'form'],
+	],
+	'Form HTML code (only submit button with custom plain text).',
 );
 
 # Test.

@@ -1,5 +1,12 @@
 Revision history for App-cpanminus-reporter
 
+0.21 2023-07-19
+    BUG FIXES:
+      - fix tarball issue that prevented installation on FreeBSD
+        (thanks jkeenan for reporting)
+    OTHER:
+      - improved test suite
+
 0.20  2023-05-07
     BUG FIXES:
       - send compilation errors as UNKNOWN, not FAIL, so reports

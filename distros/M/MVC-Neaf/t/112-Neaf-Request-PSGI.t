@@ -29,4 +29,6 @@ ok (!$capture_req->is_post, "is_post is false");
 
 is ($capture_req->upload_raw("masha"), undef, "No uploads");
 
+is ($capture_req->http_version, '1.0', 'got http version');
+
 done_testing;

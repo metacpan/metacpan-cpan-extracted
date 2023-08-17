@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1923 2023-05-09 08:06:25Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1925 2023-05-31 11:58:59Z willem $)[2];
 
 
 =head1 NAME
@@ -118,7 +118,6 @@ sub ReadZoneFile {
 
 sub ReplyHandler {
 	my ( $self, $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
-	my $opcode = $query->header->opcode;
 	my $RRhash = $self->{index};
 	my $rcode;
 	my %headermask;
@@ -134,26 +133,27 @@ sub ReplyHandler {
 		} else {
 			$rcode = 'NOTAUTH';
 		}
+		return ( $rcode, \@ans, [], [], {}, {} );
 	}
 
+	my @RRname = @{$self->{namelist}};			# pre-sorted, longest first
 	{
 		my $RRlist = $RRhash->{lc $qname} || [];	# hash, then linear search
 		my @match  = @$RRlist;				# assume $qclass always 'IN'
 		if ( scalar(@match) ) {				# exact match
 			$rcode = 'NOERROR';
-		} elsif ( grep {/\.$qname$/i} keys %$RRhash ) { # empty non-terminal
+		} elsif ( grep {/\.$qname$/i} @RRname ) {	# empty non-terminal
 			$rcode = 'NOERROR';			# [NODATA]
 		} else {
-			my @namelist = @{$self->{namelist}};	# pre-sorted, longest first
 			$rcode = 'NXDOMAIN';
-			foreach ( grep {/^[*][.]/} @namelist ) {
+			foreach ( grep {/^[*][.]/} @RRname ) {
 				my $wildcard = $_;		# match wildcard per RFC4592
 				s/^\*//;			# delete leading asterisk
 				s/([.?*+])/\\$1/g;		# escape dots and regex quantifiers
 				next unless $qname =~ /[.]?([^.]+$_)$/i;
 				my $encloser = $1;		# check no ENT encloses qname
 				$rcode = 'NOERROR';
-				last if grep {/(^|\.)$encloser$/i} @namelist;	 # [NODATA]
+				last if grep {/(^|\.)$encloser$/i} @RRname;    # [NODATA]
 
 				my ($q) = $query->question;	# synthesise RR at qname
 				foreach my $rr ( @{$RRhash->{$wildcard}} ) {
@@ -167,7 +167,9 @@ sub ReplyHandler {
 		push @ans, my @cname = grep { $_->type eq 'CNAME' } @match;
 		$qname = $_->cname for @cname;
 		redo if @cname;
-		unless ( push @ans, grep { $_->type eq $qtype } @match ) {
+		push @ans, @match if $qtype eq 'ANY';		# traditional, now out of favour
+		push @ans, grep { $_->type eq $qtype } @match;
+		unless (@ans) {
 			foreach ( @{$self->{zonelist}} ) {
 				s/([.?*+])/\\$1/g;		# escape dots and regex quantifiers
 				next unless $qname =~ /[^.]+[.]$_[.]?$/i;
@@ -266,9 +268,9 @@ sub make_reply {
 
 		$header->rcode($rcode);
 
-		$reply->{answer}     = [@$ans]	if $ans;
-		$reply->{authority}  = [@$auth] if $auth;
-		$reply->{additional} = [@$add]	if $add;
+		push @{$reply->{answer}},     @$ans  if $ans;
+		push @{$reply->{authority}},  @$auth if $auth;
+		push @{$reply->{additional}}, @$add  if $add;
 	}
 
 	while ( my ( $key, $value ) = each %{$headermask || {}} ) {
@@ -374,13 +376,13 @@ sub UDP_connection {
 	my $reply = $self->make_reply( $query, $socket );
 	die 'Failed to create reply' unless defined $reply;
 
-	my $max_len = ( $query && $self->{Truncate} ) ? $query->edns->UDPsize : undef;
+	my @UDPsize = ( $query && $self->{Truncate} ) ? $query->edns->UDPsize : ();
 	if ($verbose) {
-		my $response = $reply->data($max_len);
+		my $response = $reply->data(@UDPsize);
 		print 'UDP response (', length($response), ' octets) - ';
 		print $socket->send($response) ? "sent" : "failed: $!", "\n";
 	} else {
-		$socket->send( $reply->data($max_len) );
+		$socket->send( $reply->data(@UDPsize) );
 	}
 	alarm 0;
 	close $socket;
@@ -549,8 +551,9 @@ sub main_loop {
 	local $SIG{CHLD} = \&reaper;
 	my @pid = shift->start_server;
 	local $SIG{TERM} = sub { kill( 'TERM', @pid ) };
-	1 while waitpid( -1, 0 ) > 0;	## park main process until
-	return;				## user CTRL_C kills the children
+	1 while waitpid( -1, 0 ) > 0;
+	logmsg "@pid terminated";
+	return;
 }
 
 

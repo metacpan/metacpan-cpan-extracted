@@ -1,2 +1,18 @@
+0.03 2023-07-09T02:08:36+02:00
+ - Add example with usage of Data::HTML::A to doc.
+ - Add tests.
+ - Fix processing of Data::HTML::A object in plain mode.
+ - Improve links in doc.
+
+0.02 2023-07-08T18:04:00+02:00
+ - Implement 'css_table' parameter to CSS style.
+ - Improve init() method in doc.
+ - In Tags processing returns without HTML code in case of undefined table
+   data.
+ - Regen README file.
+ - Remove check for existing data in init().
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.01 2022-11-09T16:08:46+01:00
  - First version.

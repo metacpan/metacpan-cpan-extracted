@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::Artifact;
-our $VERSION = '0.69'; # VERSION
+our $VERSION = '0.73'; # VERSION
 
 use Moose;
 use MooseX::Types::DateTime qw/ DateTime /;
@@ -11,7 +11,7 @@ use XML::LibXML;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
-# ABSTRACT: Net::SAML2::Protocol::Artifact - SAML2 artifact object
+# ABSTRACT: SAML2 artifact object
 
 
 has 'issue_instant'   => (isa => DateTime,  is => 'ro', required => 1);
@@ -110,11 +110,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Protocol::Artifact - Net::SAML2::Protocol::Artifact - SAML2 artifact object
+Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 VERSION
 
-version 0.69
+version 0.73
 
 =head1 SYNOPSIS
 

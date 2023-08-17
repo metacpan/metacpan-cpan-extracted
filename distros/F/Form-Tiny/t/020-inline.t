@@ -19,6 +19,16 @@ subtest 'legacy inline form' => sub {
 	ok(!$form->valid, "not strict anymore");
 };
 
+subtest 'legacy inline form with dynamic fields' => sub {
+	my $form = Form::Tiny::Inline->new(
+		field_defs => [sub { {name => "test"} }],
+		input => {test => "asd"},
+	);
+
+	ok($form->valid, "validation ok");
+	is($form->fields->{test}, "asd", "field ok");
+};
+
 subtest 'inline form' => sub {
 	my $form = Form::Tiny::Inline->is(qw(Filtered))->new(
 		fields => {test => {}},

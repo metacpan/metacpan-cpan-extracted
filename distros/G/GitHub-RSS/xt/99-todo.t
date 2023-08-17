@@ -33,7 +33,7 @@ sub wanted {
 sub source_file_ok {
     my $file = shift;
 
-    open( my $fh, "<$file" ) or die "Can't open $file: $!";
+    open( my $fh, '<', $file ) or die "Can't open $file: $!";
     my @lines = <$fh>;
     close $fh;
 

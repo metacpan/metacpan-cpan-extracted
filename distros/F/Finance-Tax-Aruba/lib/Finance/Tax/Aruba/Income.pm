@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use warnings;
 use strict;
 
@@ -23,11 +23,12 @@ sub _years {
 }
 
 sub tax_year {
-    my ($self, $year, @args) = @_;
+    my $self = shift;
+    my $year = shift;
 
     my @years = $self->_years();
     my $module = first { $_->is_year($year) } @years;
-    return $module->new(@args) if $module;
+    return $module->new(@_) if $module;
     croak("Unable to find module for year $year");
 }
 
@@ -45,7 +46,7 @@ Finance::Tax::Aruba::Income - Income tax calculations for Aruba
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

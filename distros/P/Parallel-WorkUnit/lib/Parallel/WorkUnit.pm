@@ -1,10 +1,10 @@
-
-# Copyright (C) 2015-2020 Joelle Maslak
+#
+# Copyright (C) 2015-2023 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '2.202270';
+$Parallel::WorkUnit::VERSION = '2.232180';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -23,8 +23,6 @@ use POSIX ':sys_wait_h';
 use Scalar::Util qw(blessed reftype weaken);
 use Storable;
 use Try::Tiny;
-
-use namespace::autoclean;
 
 
 my @ALL_WU;    # Holds all active work units so child processes can't
@@ -50,6 +48,7 @@ sub use_anyevent {
         confess("Invalid call");
     }
 }
+
 
 # XXX: Add validation that _cv is a Maybe[AnyEvent::CondVar]
 sub _cv {
@@ -269,7 +268,7 @@ sub async {
         my $selfref = $self;
         weaken $selfref;
         $callback = sub {
-            if ( defined $selfref ) {    # Incase this went away
+            if ( defined $selfref ) {    # In case this went away
                 @{ $selfref->_ordered_responses }[$cbnum] = shift;
             }
         };
@@ -294,7 +293,7 @@ sub async {
 
         $self->_subprocs()->{$pid} = {
             fh       => $pipe,
-            anyevent => undef,
+            watcher  => undef,
             callback => $callback,
             caller   => [ caller() ],
         };
@@ -367,7 +366,7 @@ sub waitall {
         return $self->_get_and_reset_ordered_responses();
     }
 
-    # Using AnyEvent?
+    # Using cv?
     if ( defined( $self->_cv ) ) {
         $self->_cv->recv();
         if ( defined( $self->_last_error ) ) {
@@ -550,7 +549,12 @@ sub _send {
     if ( $#_ != 3 ) { confess 'invalid call'; }
     my ( $self, $fh, $type, $data ) = @_;
 
-    my $msg = Storable::freeze( \$data );
+    my $msg;
+    if ( blessed($data) && ($data->can('FREEZE')) && ($data->can('THAW')) ) {
+        $msg = ref($data) . "!::!" . $data->FREEZE();
+    } else {
+        $msg = "!::!" . Storable::freeze( \$data );
+    }
 
     if ( !defined($msg) ) {
         die 'freeze() returned undef for child return value';
@@ -571,6 +575,65 @@ sub _send {
 }
 
 sub _read_result {
+    if ( $#_ != 1 ) { confess 'invalid call'; }
+    my ( $self, $child ) = @_;
+
+    my $cinfo = $self->_subprocs()->{$child};
+    if (defined($cinfo->{rawbuff})) {
+        return $self->_read_result_from_buffer($child);
+    } else {
+        return $self->_read_result_from_fh($child);
+    }
+}
+
+sub _read_result_from_buffer {
+    if ( $#_ != 1 ) { confess 'invalid call'; }
+    my ( $self, $child ) = @_;
+
+    my $cinfo = $self->_subprocs()->{$child};
+    $cinfo->{fh}->close();
+
+    my ($type, $size, $buffer) = split /\n/, $cinfo->{rawbuff}, 3;
+    delete $cinfo->{rawbuff};
+
+    if ( !defined($type) ) { die 'Could not read child data'; }
+    if ( !defined($size) ) { die 'Could not read child data'; }
+
+    my ($class, $frozen) = split("!::!", $buffer, 2);
+    my $data;
+    if ($class eq "") {
+        $data = ${ Storable::thaw($frozen) };
+    } else {
+        $data = $class->THAW($frozen);
+    }
+
+
+    my $caller = $self->_subprocs()->{$child}{caller};
+    delete $self->_subprocs()->{$child};
+
+    if ( $type eq 'RESULT' ) {
+        $cinfo->{callback}->($data);
+    } else {
+        my $err =
+            "Child (created at "
+          . $caller->[1]
+          . " line "
+          . $caller->[2]
+          . ") died with error: $data";
+
+        if ( $self->use_anyevent ) {
+            # Can't throw events with anyevent
+            $self->_last_error($err);
+        } else {
+            # Otherwise we do throw it
+            die($err);
+        }
+    }
+
+    return;
+}
+
+sub _read_result_from_fh {
     if ( $#_ != 1 ) { confess 'invalid call'; }
     my ( $self, $child ) = @_;
 
@@ -597,7 +660,13 @@ sub _read_result {
         if ( defined($ret) ) { $result .= $part; }
     }
 
-    my $data = ${ Storable::thaw($result) };
+    my ($class, $frozen) = split("!::!", $result, 2);
+    my $data;
+    if ($class eq "") {
+        $data = ${ Storable::thaw($frozen) };
+    } else {
+        $data = $class->THAW($frozen);
+    }
 
     my $caller = $self->_subprocs()->{$child}{caller};
     delete $self->_subprocs()->{$child};
@@ -679,7 +748,7 @@ sub _set_anyevent {
             foreach my $pid ( keys %{ $self->_subprocs() } ) {
                 my $proc = $self->_subprocs()->{$pid};
 
-                $proc->{anyevent} = undef;
+                $proc->{watcher} = undef;
             }
         }
 
@@ -695,7 +764,7 @@ sub _add_anyevent_watcher {
 
     my $proc = $self->_subprocs()->{$pid};
 
-    $proc->{anyevent} = AnyEvent->io(
+    $proc->{watcher} = AnyEvent->io(
         fh   => $proc->{fh},
         poll => 'r',
         cb   => sub {
@@ -795,7 +864,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.202270
+version 2.232180
 
 =head1 SYNOPSIS
 
@@ -842,7 +911,8 @@ version 2.202270
 
   $wu->use_anyevent(1);
   $wu->async( sub { ... }, \&callback );
-  $wu->waitall();  # Not strictly necessary
+  $wu->waitall();  # Not strictly necessary, callbacks happen within event loop
+
 
   #
   # Just spawn something into another process, don't capture return
@@ -1055,13 +1125,22 @@ Note that the child inherits all open file descriptors.
 Not also that the child process will be part of the same process group as the
 parent process.  Additional work is required to daemonize the child.
 
+=head1 CAVEATS
+
+This module uses L<Storable> to serialize objects, except for objects
+that have a C<FREEZE> and C<THAW> method defined, in which case those
+methods are used.  As a result, it cannot serialize some objects, such
+as C<REGEXP> (sometimes), C<CODE>, or C<OBJECT> (I.E. Corinna objects
+created with the C<class> statement in Perl 5.38+), unless these
+objects also have a C<FREEZE> and C<THAW> method defined.
+
 =head1 AUTHOR
 
 Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Joelle Maslak.
+This software is copyright (c) 2015-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,4 @@
+The first two arguments to snmptrap are the trap destination and the
+community string.  The next argument is the Trap OID, the source's
+hostname or IP address as a dotted-quad, the generic trap ID, the
+specific trap ID, then the variable bindings (OID and value pairs).

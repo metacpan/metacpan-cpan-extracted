@@ -5,9 +5,9 @@ use parent 'ColorThemeBase::Static::FromStructColors';
 use Graphics::ColorNamesLite::WWW;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-24'; # DATE
+our $DATE = '2023-07-02'; # DATE
 our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.133'; # VERSION
+our $VERSION = '0.134'; # VERSION
 
 my $t = $Graphics::ColorNamesLite::WWW::NAMES_RGB_TABLE;
 
@@ -44,7 +44,7 @@ ColorTheme::JSON::Color::default_rgb - The default color theme for JSON::Color, 
 
 =head1 VERSION
 
-This document describes version 0.133 of ColorTheme::JSON::Color::default_rgb (from Perl distribution JSON-Color), released on 2021-11-24.
+This document describes version 0.134 of ColorTheme::JSON::Color::default_rgb (from Perl distribution JSON-Color), released on 2023-07-02.
 
 =head1 HOMEPAGE
 
@@ -71,13 +71,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2016, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2016, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

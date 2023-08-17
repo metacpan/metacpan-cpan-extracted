@@ -1,3 +1,9 @@
+0.05 2023-07-06T22:50:48+02:00
+ - Add $pages_hr variable to arguments in 'url_page_cb' callback.
+ - Fix name of variable in doc.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.04 2022-10-06T17:31:58+02:00
  - Add utilities for pager.
  - Rename example for Pager.

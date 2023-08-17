@@ -1,6 +1,11 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.5.1 2023-05-11T18:33:42
+v0.5.2 2023-06-01T16:55:19
+ - Pull request #21: SM-4192 - Make has-version an author test (Andrew
+   Hewus Fresh)
+ - Make has-version an author test (Andrew Hewus Fresh)
+
+v0.5.1 2023-05-11T18:33:06
  - Update README (Andrew Hewus Fresh)
  - Pull request #20: SM-4192 - Add a custom HasVersionTests Plugin (Andrew
    Hewus Fresh)
@@ -213,8 +218,8 @@ v0.0.1 2019-03-27T01:48:40
  - Support main_module from dist.ini in Makefile (Andrew Fresh)
  - Use perl instead of sed to parse dist.ini (Andrew Fresh)
  - Simple explanation in CONTRIBUTING about how (Andrew Fresh)
- - More documentation improvmenets (Andrew Fresh)
  - Update README.md (Andrew Fresh)
+ - More documentation improvmenets (Andrew Fresh)
  - Rearrange Plugins to make documentation clearer (Andrew Fresh)
  - Initial stab at the beginnings of CONTRIBUTING doc (Andrew Fresh)
  - Add a clean and realclean targets (Andrew Fresh)

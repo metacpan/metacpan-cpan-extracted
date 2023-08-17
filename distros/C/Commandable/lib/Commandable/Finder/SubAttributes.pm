@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.10;
+package Commandable::Finder::SubAttributes 0.11;
 
 use v5.14;
 use warnings;
@@ -273,6 +273,7 @@ sub _commands
          options     => $opts,
          package     => $self->{package},
          code        => $self->_wrap_code( $code ),
+         config      => $self->{config},
       );
    }
 

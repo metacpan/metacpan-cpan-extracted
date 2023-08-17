@@ -1,6 +1,9 @@
 Revision history for Perl extension SMS::Send
 
-1.06 Wed 9 Nov 2011
+1.07      2023-07-16 03:51:23Z
+        - removed the use of Module::Install
+
+1.06    2011-11-09
 	- No functional changes
 	- Moved to production version
 	- Updating to Module::Install::DSL 1.04
@@ -12,26 +15,26 @@ Revision history for Perl extension SMS::Send
 	- Removed the use of base.pm
 	- Updated bundled author tests and moved to xt
 
-0.05 Wed 14 Nov 2007
+0.05    2007-11-14
 	- No functional changes
 	- Updating to Module::Install 0.68
 
-0.04 Mon  2 Oct 2006
+0.04    2006-10-02
 	- Upgraded to Module::Install 0.64
 	- Some minor kwalitee nigglies fixed
 
-0.03 Fri May 12 2005
+0.03    2005-05-12
 	- Upgraded to Module::Install 0.62
 	- Removed auto_install
 	- Improvements to Params::Util::_CLASS made a case that
 	  previous errored, now pass. Fixed and updated Params::Util dep.
 
-0.02 Tue Dec 27 2005
+0.02    2005-12-27
 	- Fixed various bugs
 	- Added the public/private param scheme to ->new as well.
 	- Added more tests for error conditions
 	- Other teensy changes to support for first real live driver.
 
-0.01 Mon Dec 26 2005
+0.01    2005-12-26
 	- Completed the first implementation
 	- Contains no drivers other than test drivers intentionally

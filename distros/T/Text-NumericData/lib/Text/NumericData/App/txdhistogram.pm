@@ -32,9 +32,11 @@ sub new
 		}
 	,	pardef=>[
 			'binwidth', 0, 'w', 'width of one bin represented by one histogram point (overrides bincount)'
+		,	'binpoint', -1, 'p', 'align fixed-width bins to this value if >= 0; align to beginning of range if < 0'
 		,	'bincount', 10, 'n', 'specify fixed number of bins (dividing min-max range)'
 		,	'discrete', 0, 'd', 'do not use binning, count on discrete points (text string comparison, no rounding!)'
 		,	'weightcol', 0, 'W', 'column containing weights to add instead of simple counting'
+		,	'cumulative', 0, 'c', 'add columns with cumulative counts at/below and at/above the current bin'
 		]
 	,	filemode=>1
 	,	pipemode=>1
@@ -104,13 +106,22 @@ sub process_file
 
 	# Got a real range, got to get out some bins.
 	my $binwidth = $param->{binwidth};
-	unless($binwidth > 0)
+	my $binpoint = $min;
+	if($binwidth > 0)
+	{
+		$binpoint = $param->{binpoint}
+			unless $param->{binpoint} < 0;
+	} else
 	{
 		return unless $param->{bincount} > 0;
 		$binwidth = $range / $param->{bincount};
 	}
 	return unless $binwidth > 0;
 
+	my $align = int(($min-$binpoint)/$binwidth);
+	++$align
+		if($binpoint+$align*$binwidth > $min);
+	$binpoint += $align*$binwidth;
 
 	my @hist; # list of bin sums, coordinates added later
 	my @points;
@@ -155,7 +166,7 @@ sub process_file
 				# Rather paranoid, that.
 				next unless (defined $_->[$col] and defined $_->[$wc]);
 				# Compute zero-based bin index.
-				my $bin = int(($_->[$col]-$min)/$binwidth);
+				my $bin = int(($_->[$col]-$binpoint)/$binwidth);
 				# Add weight to that bin.
 				$hist[$bin] += $_->[$wc];
 			}
@@ -166,15 +177,27 @@ sub process_file
 			for(@{$txd->{data}})
 			{
 				next unless defined $_->[$col];
-				my $bin = int(($_->[$col]-$min)/$binwidth);
+				my $bin = int(($_->[$col]-$binpoint)/$binwidth);
 				++$hist[$bin];
 			}
 		}
 
 		for(my $i=0; $i<@hist; ++$i)
 		{
-			$points[$i] = $min+(0.5+$i)*$binwidth;
+			$points[$i] = $binpoint+(0.5+$i)*$binwidth;
 		}
+	}
+
+	my @below;
+	my @above;
+	my $asum = 0;
+	my $bsum = 0;
+	for(my $i=0; $i<@hist; ++$i)
+	{
+		$bsum += $hist[$i];
+		$asum += $hist[$#hist-$i];
+		$below[$i] = $bsum;
+		$above[$#hist-$i] = $asum;
 	}
 
 	# Got the bin values, construct data lines out of them.
@@ -184,7 +207,10 @@ sub process_file
 		# Ensure that zero is zero and not just some empty string.
 		$mass = 0 unless defined $mass;
 		my $point = $points[$i];
-		print {$self->{out}} ${$txd->data_line([$point,$mass])};
+		my @line = ($point, $mass);
+		push(@line, $below[$i], $above[$i])
+			if $param->{cumulative};
+		print {$self->{out}} ${$txd->data_line(\@line)};
 	}
 }
 

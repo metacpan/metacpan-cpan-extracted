@@ -1,6 +1,6 @@
 package Net::OpenSSH;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use strict;
 use warnings;
@@ -2222,10 +2222,9 @@ sub _scp_get_args {
     my $prefix = $self->{_host_squared};
     $prefix = "$self->{_user}\@$prefix" if defined $self->{_user};
 
-    my $src = "$prefix:". join(" ", $self->_quote_args({quote_args => 1,
-                                                        glob_quoting => $glob},
-                                                       @_));
-    ($self, \%opts, $target, $src);
+    my @src = map "$prefix:". $self->_quote_args({quote_args => 1,
+                                                  glob_quoting => $glob}, $_), @_;
+    ($self, \%opts, $target, @src);
 }
 
 sub scp_get {
@@ -5113,6 +5112,18 @@ B<A>: Just call the C<system> method with an empty argument list:
 
    my $ssh = Net::OpenSSH->new(...);
    $ssh->system;
+
+B<Q>: How about running an interactive C<sftp> session?
+
+B<A>: Programs that use an underlying ssh connection usually provide
+some way (for instance, command line option C<-o>) to pass additional
+options for the C<ssh> command used to run that connection. We just
+need to use such mechanism to pass the path to the control socket.
+
+For instance, for the particular case of C<sftp>:
+
+  $cp = $ssh->get_ctl_path;
+  system "sftp", "-oControlPath=$cp", $host;
 
 =back
 

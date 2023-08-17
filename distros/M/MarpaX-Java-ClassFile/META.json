@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,20 +30,23 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
             "Test::Version" : "1"
@@ -68,6 +71,7 @@
             "Import::Into" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Log4perl" : "0",
             "Log::Log4perl" : "0",
             "Marpa::R2" : "0",
             "Math::BigFloat" : "0",
@@ -101,7 +105,6 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.010"
          }
       }
@@ -109,1591 +112,1591 @@
    "provides" : {
       "MarpaX::Java::ClassFile" : {
          "file" : "lib/MarpaX/Java/ClassFile.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::Annotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/Annotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::AnnotationArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/AnnotationArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::AnnotationDefaultAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/AnnotationDefaultAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::AppendFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/AppendFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ArrayValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ArrayValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::AttributesArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/AttributesArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::BootstrapMethodArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/BootstrapMethodArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::BootstrapMethodsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/BootstrapMethodsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::CatchTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/CatchTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ChopFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ChopFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ClassFile" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ClassFile.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ClassInfoIndex" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ClassInfoIndex.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ClassesArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ClassesArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::CodeAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/CodeAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstValueIndex" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstValueIndex.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantClassInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantClassInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantDoubleInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantDoubleInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantFieldrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantFieldrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantFloatInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantFloatInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantIntegerInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantIntegerInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantInterfaceMethodrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantInterfaceMethodrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantInvokeDynamicInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantInvokeDynamicInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantLongInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantLongInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantMethodHandleInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantMethodHandleInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantMethodTypeInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantMethodTypeInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantMethodrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantMethodrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantNameAndTypeInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantNameAndTypeInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantPoolArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantPoolArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantStringInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantStringInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantUtf8Info" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantUtf8Info.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ConstantValueAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ConstantValueAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::DeprecatedAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/DeprecatedAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ElementValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ElementValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ElementValueArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ElementValueArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ElementValuePairArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ElementValuePairArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::EnclosingMethodAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/EnclosingMethodAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::EnumConstValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/EnumConstValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ExceptionTableArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ExceptionTableArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ExceptionsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ExceptionsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::FieldsArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/FieldsArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::FormalParameterTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/FormalParameterTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::FullFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/FullFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::InnerClassesAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/InnerClassesAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::InterfacesArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/InterfacesArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LineNumberArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LineNumberArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LineNumberTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LineNumberTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LocalVariableArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LocalVariableArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LocalVariableTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LocalVariableTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LocalVariableTypeArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LocalVariableTypeArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LocalVariableTypeTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LocalVariableTypeTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::LocalvarTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/LocalvarTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::MethodParametersAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/MethodParametersAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::MethodsArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/MethodsArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::OffsetTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/OffsetTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::OpCodeArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/OpCodeArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ParameterAnnotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ParameterAnnotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ParameterAnnotationArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ParameterAnnotationArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ParameterArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ParameterArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::PathArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/PathArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeInvisibleAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeInvisibleAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeInvisibleParameterAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeInvisibleParameterAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeInvisibleTypeAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeInvisibleTypeAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeVisibleAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeVisibleAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeVisibleParameterAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeVisibleParameterAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::RuntimeVisibleTypeAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/RuntimeVisibleTypeAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SameFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SameFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SameFrameExtended" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SameFrameExtended.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SameLocals1StackItemFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SameLocals1StackItemFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SameLocals1StackItemFrameExtended" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SameLocals1StackItemFrameExtended.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SignatureAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SignatureAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SourceDebugExtensionAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SourceDebugExtensionAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SourceFileAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SourceFileAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::StackMapFrameArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/StackMapFrameArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::StackMapTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/StackMapTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SupertypeTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SupertypeTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::SyntheticAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/SyntheticAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TableArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TableArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::ThrowsTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/ThrowsTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypeAnnotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypeAnnotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypeAnnotationArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypeAnnotationArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypeArgumentTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypeArgumentTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypeParameterBoundTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypeParameterBoundTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypeParameterTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypeParameterTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::TypePath" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/TypePath.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::UnmanagedAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/UnmanagedAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::BNF::VerificationTypeInfoArray" : {
          "file" : "lib/MarpaX/Java/ClassFile/BNF/VerificationTypeInfoArray.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Role::Parser" : {
          "file" : "lib/MarpaX/Java/ClassFile/Role/Parser.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Role::Parser::Actions" : {
          "file" : "lib/MarpaX/Java/ClassFile/Role/Parser/Actions.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Role::Parser::InnerGrammar" : {
          "file" : "lib/MarpaX/Java/ClassFile/Role/Parser/InnerGrammar.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::Annotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/Annotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::AnnotationDefaultAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/AnnotationDefaultAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::AppendFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/AppendFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ArrayValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ArrayValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::BootstrapMethod" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/BootstrapMethod.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::BootstrapMethodsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/BootstrapMethodsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::CatchTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/CatchTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ChopFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ChopFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::Class" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/Class.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ClassFile" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ClassFile.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ClassInfoIndex" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ClassInfoIndex.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::CodeAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/CodeAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstValueIndex" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstValueIndex.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantClassInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantClassInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantDoubleInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantDoubleInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantFieldrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantFieldrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantFloatInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantFloatInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantIntegerInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantIntegerInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantInterfaceMethodrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantInterfaceMethodrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantInvokeDynamicInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantInvokeDynamicInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantLongInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantLongInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantMethodHandleInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantMethodHandleInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantMethodTypeInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantMethodTypeInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantMethodrefInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantMethodrefInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantNameAndTypeInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantNameAndTypeInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantStringInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantStringInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantUtf8Info" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantUtf8Info.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ConstantValueAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ConstantValueAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::DeprecatedAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/DeprecatedAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::DoubleVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/DoubleVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ElementValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ElementValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ElementValuePair" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ElementValuePair.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::EmptyTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/EmptyTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::EnclosingMethodAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/EnclosingMethodAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::EnumConstValue" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/EnumConstValue.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ExceptionTable" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ExceptionTable.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ExceptionsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ExceptionsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::FieldInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/FieldInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::FloatVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/FloatVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::FormalParameterTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/FormalParameterTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::FullFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/FullFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::InnerClassesAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/InnerClassesAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::IntegerVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/IntegerVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LineNumber" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LineNumber.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LineNumberTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LineNumberTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LocalVariable" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LocalVariable.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LocalVariableTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LocalVariableTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LocalVariableType" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LocalVariableType.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LocalVariableTypeTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LocalVariableTypeTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LocalvarTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LocalvarTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::LongVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/LongVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::MethodInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/MethodInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::MethodParametersAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/MethodParametersAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::NullVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/NullVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ObjectVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ObjectVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OffsetTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OffsetTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aaload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aconst_null" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aload_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aload_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aload_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Aload_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Anewarray" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Areturn" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Arraylength" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Astore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Astore_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Astore_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Astore_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Astore_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Athrow" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Baload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Bastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Bipush" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Caload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Castore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Checkcast" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::D2f" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::D2i" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::D2l" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dadd" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Daload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dcmpg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dcmpl" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dconst_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dconst_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ddiv" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dload_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dload_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dload_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dload_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dmul" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dneg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Drem" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dreturn" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dstore_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dstore_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dstore_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dstore_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dsub" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup2_x1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup2_x2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup_x1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Dup_x2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::F2d" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::F2i" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::F2l" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fadd" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Faload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fcmpg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fcmpl" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fconst_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fconst_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fconst_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fdiv" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fload_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fload_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fload_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fload_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fmul" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fneg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Frem" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Freturn" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fstore_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fstore_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fstore_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fstore_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Fsub" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Getfield" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Getstatic" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Goto" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Goto_w" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2b" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2c" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2d" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2f" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2l" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::I2s" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iadd" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iaload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iand" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_4" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_5" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iconst_m1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Idiv" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_acmpeq" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_acmpne" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmpeq" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmpge" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmpgt" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmple" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmplt" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::If_icmpne" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifeq" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifge" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifgt" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifle" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iflt" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifne" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifnonnull" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ifnull" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iinc" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iload_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iload_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iload_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iload_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Imul" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ineg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Instanceof" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Invokedynamic" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Invokeinterface" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Invokespecial" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Invokestatic" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Invokevirtual" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ior" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Irem" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ireturn" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ishl" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ishr" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Istore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Istore_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Istore_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Istore_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Istore_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Isub" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Iushr" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ixor" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Jsr" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Jsr_w" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::L2d" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::L2f" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::L2i" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ladd" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Laload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Land" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lcmp" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lconst_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lconst_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ldc" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ldc2_w" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ldc_w" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ldiv" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lload_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lload_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lload_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lload_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lmul" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lneg" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lookupswitch" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lor" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lrem" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lreturn" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lshl" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lshr" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lstore_0" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lstore_1" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lstore_2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lstore_3" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lsub" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lushr" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Lxor" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Monitorenter" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Monitorexit" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Multianewarray" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::New" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Newarray" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Nop" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Pop" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Pop2" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Putfield" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Putstatic" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Ret" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Return" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Saload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Sastore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Sipush" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Swap" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Tableswitch" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_aload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_astore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_dload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_dstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_fload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_fstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_iinc" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_iload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_istore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_lload" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_lstore" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::OpCode::Wide_ret" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/OpCode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::Parameter" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/Parameter.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ParameterAnnotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ParameterAnnotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::Path" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/Path.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeInvisibleAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeInvisibleAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeInvisibleParameterAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeInvisibleParameterAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeInvisibleTypeAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeInvisibleTypeAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeVisibleAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeVisibleAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeVisibleParameterAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeVisibleParameterAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::RuntimeVisibleTypeAnnotationsAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/RuntimeVisibleTypeAnnotationsAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SameFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SameFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SameFrameExtended" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SameFrameExtended.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SameLocals1StackItemFrame" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SameLocals1StackItemFrame.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SameLocals1StackItemFrameExtended" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SameLocals1StackItemFrameExtended.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SignatureAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SignatureAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SourceDebugExtensionAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SourceDebugExtensionAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SourceFileAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SourceFileAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::StackMapTableAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/StackMapTableAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SupertypeTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SupertypeTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::SyntheticAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/SyntheticAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::Table" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/Table.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::ThrowsTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/ThrowsTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TopVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TopVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TypeAnnotation" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TypeAnnotation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TypeArgumentTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TypeArgumentTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TypeParameterBoundTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TypeParameterBoundTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TypeParameterTarget" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TypeParameterTarget.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::TypePath" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/TypePath.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::UninitializedThisVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/UninitializedThisVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::UninitializedVariableInfo" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/UninitializedVariableInfo.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Struct::UnmanagedAttribute" : {
          "file" : "lib/MarpaX/Java/ClassFile/Struct/UnmanagedAttribute.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::AccessFlagsStringification" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/AccessFlagsStringification.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::ArrayRefWeakenisation" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/ArrayRefWeakenisation.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::ArrayStringification" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/ArrayStringification.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::BNF" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/BNF.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::FrameTypeStringification" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/FrameTypeStringification.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::MarpaTrace" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/MarpaTrace.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "MarpaX::Java::ClassFile::Util::ProductionMode" : {
          "file" : "lib/MarpaX/Java/ClassFile/Util/ProductionMode.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -1709,7 +1712,13 @@
          "web" : "https://github.com/jddurand/marpax-java-classfile"
       }
    },
-   "version" : "0.008",
-   "x_authority" : "cpan:JDDPAUSE"
+   "version" : "0.009",
+   "x_authority" : "cpan:JDDPAUSE",
+   "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

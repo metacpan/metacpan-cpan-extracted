@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::par::unif2aniso;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

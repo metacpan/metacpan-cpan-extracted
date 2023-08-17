@@ -1,0 +1,33 @@
+---
+abstract: 'output an updateable list of ongoing jobs'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Output-List
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Load: '0'
+  Moo: '2'
+  Term::Cap: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/Corion/Term-Output-List/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Term-Output-List.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

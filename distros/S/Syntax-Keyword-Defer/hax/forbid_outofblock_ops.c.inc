@@ -146,7 +146,8 @@ forbid:
   }
 }
 
-#define forbid_outofblock_ops(o, blockname)  S_forbid_outofblock_ops(aTHX_ o, blockname)
+#ifndef forbid_outofblock_ops
+#  define forbid_outofblock_ops(o, blockname)  S_forbid_outofblock_ops(aTHX_ o, blockname)
 static void S_forbid_outofblock_ops(pTHX_ OP *o, const char *blockname)
 {
   ENTER;
@@ -164,3 +165,4 @@ static void S_forbid_outofblock_ops(pTHX_ OP *o, const char *blockname)
 
   LEAVE;
 }
+#endif

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Try;
 
@@ -31,7 +31,7 @@ sub outer
    return @result;
 }
 
-is_deeply [ outer() ], [ 1, 123 ], "No extra data in return";
+is [ outer() ], [ 1, 123 ], "No extra data in return";
 
 done_testing;
 

@@ -1,14 +1,14 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
 #ifndef CATCH_TOTALS_HPP_INCLUDED
 #define CATCH_TOTALS_HPP_INCLUDED
 
-#include <cstddef>
+#include <cstdint>
 
 namespace Catch {
 
@@ -16,13 +16,14 @@ namespace Catch {
         Counts operator - ( Counts const& other ) const;
         Counts& operator += ( Counts const& other );
 
-        std::size_t total() const;
+        std::uint64_t total() const;
         bool allPassed() const;
         bool allOk() const;
 
-        std::size_t passed = 0;
-        std::size_t failed = 0;
-        std::size_t failedButOk = 0;
+        std::uint64_t passed = 0;
+        std::uint64_t failed = 0;
+        std::uint64_t failedButOk = 0;
+        std::uint64_t skipped = 0;
     };
 
     struct Totals {
@@ -32,7 +33,6 @@ namespace Catch {
 
         Totals delta( Totals const& prevTotals ) const;
 
-        int error = 0;
         Counts assertions;
         Counts testCases;
     };

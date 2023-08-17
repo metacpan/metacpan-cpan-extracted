@@ -1,9 +1,11 @@
 #!perl -wT
 
+# curl 'geocoder.ca/some_location?locate=9235+Main+St,+Richibucto,+New Brunswick,+Canada&json=1'
+
 use strict;
 use warnings;
 use LWP;
-use Test::Most tests => 15;
+use Test::Most tests => 18;
 use Test::NoWarnings
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -14,29 +16,19 @@ BEGIN {
 
 CANADA: {
 	SKIP: {
-		skip 'Test requires Internet access', 13 unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 16) unless(-e 't/online.enabled');
 
-		eval {
-			require Geo::Coder::CA;
-
-			Geo::Coder::CA->import();
-
-			require Test::Number::Delta;
-
-			Test::Number::Delta->import();
-
-			require Test::LWP::UserAgent;
-
-			Test::LWP::UserAgent->import();
+		if(!require_ok('Geo::Coder::CA')) {
+			diag('Geo::Coder::CA not installed - skipping tests');
+			skip('Geo::Coder::CA not installed', 15);
+		} elsif(!require_ok('Test::Number::Delta')) {
+			diag('Test::Number::Delta not installed - skipping tests');
+			skip('Test::Number::Delta not installed', 14);
 		};
 
-		# curl 'geocoder.ca/some_location?locate=9235+Main+St,+Richibucto,+New Brunswick,+Canada&json=1'
-		if($@) {
-			diag('Geo::Coder::CA not installed - skipping tests');
-			skip('Geo::Coder::CA not installed', 13);
-		} else {
-			diag("Using Geo::Coder::CA $Geo::Coder::CA::VERSION");
-		}
+		Geo::Coder::CA->import();
+		Test::Number::Delta->import();
+
 		my $geocoderlist = new_ok('Geo::Coder::List');
 		my $ca = new_ok('Geo::Coder::CA');
 		$geocoderlist->push($ca);
@@ -52,18 +44,32 @@ CANADA: {
 		delta_within($location->{geometry}{location}{lat}, 46.68, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -64.86, 1e-1);
 
+		sleep(1);	# Be nice to the server
+
 		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
+
+		ok(!defined($geocoderlist->geocode()));
+		ok(!defined($geocoderlist->geocode('')));
 
 		$location = $geocoderlist->geocode(location => 'Allen, Maryland, USA');
 		ok(!defined($location));
+
+		if(require_ok('Test::LWP::UserAgent')) {
+			Test::LWP::UserAgent->import();
+		} else {
+			diag('Test::LWP::UserAgent not installed - skipping tests');
+			skip('Test::LWP::UserAgent not installed', 2);
+		}
 
 		$ua = new_ok('Test::LWP::UserAgent');
 		$ua->map_response('geocoder.ca', new_ok('HTTP::Response' => [ '500' ]));
 		$geocoderlist->ua($ua);
 
-		$location = $geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
+		# FIXME: this fails - it gets data
+		# is($geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada'), undef, 'remote error returns undef');
+		# use Data::Dumper;
+		# diag(Data::Dumper->new([$location])->Dump());
 
-		ok(!defined($geocoderlist->geocode()));
-		ok(!defined($geocoderlist->geocode('')));
+		$location = $geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 	}
 }

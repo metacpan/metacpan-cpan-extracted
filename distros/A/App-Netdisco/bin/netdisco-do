@@ -49,7 +49,7 @@ use App::Netdisco::Util::Device 'get_device';
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 
-my ($port, $extra, $debug, $quiet, $queue_only, $rollback);
+my ($port, $extra, $debug, $quiet, $queue_only, $force, $rollback);
 my ($devices, $infotrace, $snmptrace, $sqltrace) = ([], 0, 0, 0);
 
 my $result = GetOptions(
@@ -58,6 +58,7 @@ my $result = GetOptions(
   'extra|e=s'  => \$extra,
   'debug|D'    => \$debug,
   'enqueue'    => \$queue_only,
+  'force'      => \$force,
   'quiet'      => \$quiet,
   'rollback|R' => \$rollback,
   'infotrace|I+' => \$infotrace,
@@ -114,7 +115,7 @@ foreach my $device (@$devices) {
 my @job_specs = ();
 my $exitstatus =  0;
 
-if (scalar @hostlist > 512) {
+if (not $force and scalar @hostlist > 512) {
     info sprintf '%s: aborted - unwise to attempt %s jobs at once', $action, (scalar @hostlist);
     exit 1;
 }
@@ -123,7 +124,9 @@ if (scalar @hostlist > 512) {
 @hostlist = (undef) if 0 == scalar @hostlist;
 
 foreach my $host (@hostlist) {
-  my $dev = $host ? get_device($host->addr) : undef;
+  my $dev = $host
+            ? ((not ($queue_only and $force)) ? get_device($host->addr) : $host->addr)
+            : undef;
   if ($dev and not (blessed $dev and $dev->in_storage) and $action !~ m/^(?:discover|addpseudodevice)/) {
     info sprintf "%s: error - Don't know device: %s", $action, $host->addr;
     next;
@@ -188,7 +191,7 @@ netdisco-do - Run any Netdisco job from the command-line.
 
 =head1 SYNOPSIS
 
- ~/bin/netdisco-do <action> [-DISQR] [--enqueue] [--quiet] [-d <device> [-p <port>] [-e <extra>]]
+ ~/bin/netdisco-do <action> [-DISQR] [--enqueue] [--force] [--quiet] [-d <device> [-p <port>] [-e <extra>]]
 
 =head1 DESCRIPTION
 
@@ -202,7 +205,8 @@ to do much when you trigger them. Everything else happens in real-time.
 
 However the "C<--enqueue>" option will force the queueing of the job,
 regardless of type. This may be useful for cron-driven actions, or for actions
-working across large IP spaces.
+working across large IP spaces. Netdisco will refuse to queue more than 512
+jobs at once unless you also add the "C<--force>" option.
 
 For any action, if you wish to run one of its individual worker stages, then
 pass C<action::stage> as the first argument to C<netdisco-do>, for example
@@ -319,36 +323,33 @@ create a directory for the output files.
 
 =head2 show
 
-Dump the content of an SNMP MIB leaf, which is useful for diagnostics and
-troubleshooting. You should provide the "C<-e>" option which is the name of
-the leaf (such as C<interfaces> or C<uptime>).
+Dump the content of an SNMP MIB Object or an L<SNMP::Info> method, useful for
+diagnostics and troubleshooting.
 
-If you wish to test with a device class other than that discovered, prefix the
-leaf with the class short name, for example "C<Layer3::C3550::interfaces>" or
-"C<Layer2::HP::uptime>". Using "C<::>" as the start of the prefix will test
-against the base "C<SNMP::Info>" class.
+You should provide the "C<-e>" option which is the name of the method or
+object, such as C<interfaces> or C<uptime> or C<ifDescr>.
 
-As well, SNMP OID names can be used as an argument for "C<-e>", so you can
-use C<ifName> for example, which will use the netdisco-mibs files for
-translations.
+If you wish to specify the SNMP MIB to load and find the Object in, then
+you can qualify the "C<-e>" parameter, such as C<IF-MIB::ifDescr>.
+
+If you wish to test with a specific L<SNMP::Info> device class other than the
+one discovered, pass this in the "C<-p>" parameter, such as C<Layer3> or
+C<SNMP::Info::Layer3> (the C<SNMP::Info> prefix is optional).
 
 All "C<-e>" parameters are case sensitive.
 
  ~/bin/netdisco-do show -d 192.0.2.1 -e interfaces
- ~/bin/netdisco-do show -d 192.0.2.1 -e Layer2::HP::interfaces
- ~/bin/netdisco-do show -d 192.0.2.1 -e ::interfaces
- ~/bin/netdisco-do show -d 192.0.2.1 -e ifName
-
-A parameter may be passed to the C<SNMP::Info> method or SNMP object in the
-"C<-p>" parameter:
-
- ~/bin/netdisco-do show -d 192.0.2.1 -e has_layer -p 3
- ~/bin/netdisco-do show -d 192.0.2.1 -e ifName -p 2
+ ~/bin/netdisco-do show -d 192.0.2.1 -e IF-MIB::ifDescr
+ ~/bin/netdisco-do show -d 192.0.2.1 -e interfaces -p SNMP::Info::Layer2::HP
+ ~/bin/netdisco-do show -d 192.0.2.1 -e ifName -p Layer3::Arista
 
 The "C<-e>" parameter C<specify> will show the used configuration for the
 specified device.
 
  ~/bin/netdisco-do show -d 192.0.2.1 -e specify
+
+This command works well with the "C<-I>" debug flag on L<SNMP::Info> (or
+"C<-II>").
 
 =head2 psql
 
@@ -432,24 +433,37 @@ Pass a device in C<-d> to display them:
 
  ~/bin/netdisco-do dumpconfig -d 192.0.2.1 -e device_auth
 
+=head2 loadmibs
+
+A requirement for web browsing of SNMP data (see C<snapshot> command), run
+this to load Netdisco MIBs into the database. It only needs to be done once.
+
 =head2 snapshot
 
-Performs snmp walks from C<.1.3.6.1>, C<1.0.8802.1.1>, and C<1.3.111.2.802> on
-the device and builds a data structure which SNMP::Info can use to mimic the
-device.  The structure is saved into the C<device_snapshot> database table.
+Builds and saves a data structure which Netdisco can use to mimic the device
+(if shared) and also browse the SNMP Objects in the web.
 
-Optionally, pass a value to the C<-p> parameter (mnemonic: persist) and the
-base64 encoded data will also be saved to L<NETDISCO_HOME/logs/snapshots/IP>
-(where C<IP> is the canonical IP of the device passed). Netdisco will load
-this for any pseudo device with the same canonical IP.
+By default the command will gather Objects for web browsing. Use the C<-p>
+parameter (mnemonic: persist) to save the cache at
+L<NETDISCO_HOME/logs/snapshots/IP> (where C<IP> is the canonical IP of the
+device). You can share the file and it can be used to create a realistic
+pseudo device in another installation.
 
- ~/bin/netdisco-do snapshot -d 192.0.2.1 -p yes
+ ~/bin/netdisco-do snapshot -d 192.0.2.1 -p file
 
-Optionally, pass a value to the L<-e> parameter (mnemonic: explore> and the
-data is also saved into the Netdisco database for web browsing (under
-Device->SNMP tab).
+Optionally use the C<-e> parameter to request MIB Objects other than the
+defaults. This parameter takes a comma-separated list and supports three
+types of item: MIB names (the file name in netdisco-mibs), MIB vendor (in
+netdisco-mibs, will load all the MIBs within), or SNMP::Info class (loads all
+MIBs needed).
 
- ~/bin/netdisco-do snapshot -d 192.0.2.1 -e yes
+ ~/bin/nedisco-do snapshot -d 192.0.2.1 -e SNMP::Info::Layer3::Arista
+ ~/bin/nedisco-do snapshot -d 192.0.2.1 -e PICA-PRIVATE-MIB
+ ~/bin/nedisco-do snapshot -d 192.0.2.1 -e cisco,net-snmp
+ ~/bin/nedisco-do snapshot -d 192.0.2.1 -e SNMP::Info::Layer3,PICA-PRIVATE-MIB,net-snmp
+
+Note that to web browse the gathered SNMP data, you also first need to run
+the C<loadmibs> command.
 
 =head2 addpseudodevice
 

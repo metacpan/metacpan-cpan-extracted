@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutDocumentPropertyRequest.name :   ,
-# PutDocumentPropertyRequest.property :   ,
-# PutDocumentPropertyRequest.folder :   ,
-# PutDocumentPropertyRequest.storageName :    
+# PutDocumentPropertyRequest.name : The workbook name.  ,
+# PutDocumentPropertyRequest.property : Gets or sets the value of the property.  ,
+# PutDocumentPropertyRequest.folder : Original workbook folder.  ,
+# PutDocumentPropertyRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_document_property' } = { 
-    	summary => '',
+    	summary => 'Sets/creates a sdocument property.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -85,7 +85,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/documentproperties/{propertyName}';
+    my $_resource_path = '/cells/{name}/documentproperties';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'property' => {
      	datatype => 'CellsDocumentProperty',
      	base_name => 'property',
-     	description => '',
+     	description => 'Gets or sets the value of the property.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

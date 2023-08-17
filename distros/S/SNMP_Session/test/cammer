@@ -1,0 +1,245 @@
+#! /usr/sepp/bin/perl
+# -*- mode: Perl -*-
+##################################################################
+# Cammer 1.0
+##################################################################
+# Created by Tobias Oetiker <oetiker@ee.ethz.ch>
+#
+# Cammer needs the address of your local cisco switch and the address
+# of your router. With this it can produce a list of which machine
+# is currently active on which Switch interface
+##################################################################
+# Distributed under the GNU copyleft
+# Copyright 2000 by Tobias Oetiker
+##################################################################
+
+
+require 5.005;
+use strict;
+my $DEBUG = 0;
+BEGIN {
+    # Automatic OS detection ... do NOT touch
+    if ( $^O =~ /^(?:(ms)?(dos|win(32|nt)?))/i ) {
+        $main::OS = 'NT';
+        $main::SL = '\\';
+        $main::PS = ';';
+    } elsif ( $^O =~ /^VMS$/i ) {
+        $main::OS = 'VMS';
+        $main::SL = '.';
+        $main::PS = ':';
+    } else {
+        $main::OS = 'UNIX';
+        $main::SL = '/';
+        $main::PS = ':';
+    }
+}
+
+use FindBin;
+use lib "${FindBin::Bin}";
+use lib "${FindBin::Bin}${main::SL}..${main::SL}lib${main::SL}mrtg2";
+
+use SNMP_Session "0.78";
+use BER "0.77";
+use SNMP_util "0.77";
+use Getopt::Long;
+use Pod::Usage;
+use Socket;
+
+
+my %OID = ('vlanIndex' =>             [1,3,6,1,4,1,9,5,1,9,2,1,1],
+           'vmVlan' =>                [1,3,6,1,4,1,9,9,68,1,2,2,1,2],
+	   'dot1dTpFdbPort' =>        [1,3,6,1,2,1,17,4,3,1,2],
+	   'dot1dBasePortIfIndex' =>  [1,3,6,1,2,1,17,1,4,1,2],
+	   'sysObjectID' =>           [1,3,6,1,2,1,1,2,0],
+           'CiscolocIfDescr' =>       [1,3,6,1,4,1,9,2,2,1,1,28],
+	   'ifAlias' =>               [1,3,6,1,2,1,31,1,1,1,18],
+           'ifName' =>                [1,3,6,1,2,1,31,1,1,1,1],
+           'ipNetToMediaPhysAddress' => [1,3,6,1,2,1,4,22,1,2],
+          );
+
+
+sub main {
+    my %opt;
+    options(\%opt);
+    # which vlans do exist on the device
+    my @vlans;
+    my $vlani;
+    my %vlan;
+    my $sws = SNMPv2c_Session->open ($opt{sw},$opt{swco},161)
+                || die "Opening SNMP_Session\n";
+
+    
+    warn "* Gather VLAN index Table from Switch\n";
+    my $sysdesc = (snmpget($opt{swco}.'@'.$opt{sw},'sysDescr'))[0];
+     
+    if ($sysdesc =~ /2900/){
+        warn "* Going into Cisco 2900 Mode\n";
+	$sws->map_table_4 ( [$OID{'vmVlan'}],
+           sub {    my($x,$value) = pretty(@_);
+        	    $vlan{$x} = $value; # catalyst 2900
+	            print "if: $x, vlan: $value\n" if $DEBUG;
+	            if (not scalar grep {$_ eq $value} @vlans) {
+		       push @vlans, $value;
+                       print "vlan: $value\n" if $DEBUG;
+	            }
+               }
+	,100);
+    } else {
+	$sws->map_table_4 ([$OID{'vlanIndex'}], 
+           sub {
+	       my($x,$value) = pretty(@_);
+	       push @vlans, $value;
+               print "vlan: $value\n" if $DEBUG;
+	   }
+        ,100 );
+    }
+    # which ifNames
+    my %name;
+    warn "* Gather Interface Name Table from Switch\n";
+    $sws->map_table_4 ([$OID{'ifName'}],
+        sub { my($if,$name) = pretty(@_);
+	      print "if: $if, name: $name\n" if $DEBUG;
+	      $name{$if}=$name;
+        }
+    ,100);
+    $sws->close();
+    # get mac to ip from router
+    my $ros = SNMPv2c_Session->open ($opt{ro},$opt{roco},161)
+                || die "Opening SNMP_Session\n";
+
+    my %ip;
+    warn "* Gather Arp Table from Router\n";
+    $ros->map_table_4 ([$OID{'ipNetToMediaPhysAddress'}],
+        sub {
+   	     my($ip,$mac) = pretty(@_);
+             $mac = unpack 'H*', pack 'a*',$mac;
+             $mac =~ s/../$&:/g;
+             $mac =~ s/.$//;
+             $ip =~ s/^.+?\.//;
+    	     push @{$ip{$mac}}, $ip;
+ 	     print "ip: $ip, mac: $mac\n" if $DEBUG;
+         }
+    ,100);
+    $ros->close();
+    # walk CAM table for each VLAN
+    my %if;
+    my %port;
+    warn "* Gather Mac 2 Port and Port 2 Interface table for all VLANS\n";
+    foreach my $vlan (@vlans){
+        # catalist 2900 does not use com@vlan hack
+        my $sws = SNMPv2c_Session->open ($opt{sw},$opt{swco}.'@'.$vlan,161)
+                || die "Opening SNMP_Session\n";
+    	$sws->map_table_4 ([$OID{'dot1dTpFdbPort'}],
+          sub {
+             my($mac,$port) = pretty(@_);
+   	     next if $port == 0;
+       	     $mac = sprintf "%02x:%02x:%02x:%02x:%02x:%02x", (split /\./, $mac);
+             print "mac: $mac,port: $port\n" if $DEBUG;
+	     $port{$vlan}{$mac}=$port;
+          }
+        ,100);
+	$sws->map_table_4 ( [$OID{'dot1dBasePortIfIndex'}],
+          sub {  my($port,$if) = pretty(@_);
+	         next if $port == 0;
+                 print "port: $port, if: $if\n" if $DEBUG;
+	         $if{$vlan}{$port} = $if;
+	  }
+        ,100);
+        $sws->close();
+    }
+    my %output;
+    foreach my $vlan (@vlans){
+        foreach my $mac (keys %{$port{$vlan}}){
+           my @ip = $ip{$mac} ? @{$ip{$mac}} : ();
+           my @host;
+           foreach my $ip (@ip) {
+                my $host = gethostbyaddr(pack('C4',split(/\./,$ip)),AF_INET);
+                $host =~ s/\.ethz\.ch//;
+                push @host, ($host or $ip);
+           }
+           my $name = $name{$if{$vlan}{$port{$vlan}{$mac}}};
+           my $truevlan = $vlan eq 'none' ? $vlan{$if{$vlan}{$port{$vlan}{$mac}}} : $vlan;
+           my $quest = scalar @ip > 1 ? "(Multi If Host)":"";
+	   push @{$output{$name}}, sprintf "%4s  %-17s  %-15s  %s %s",$truevlan,$mac,$ip[0],$host[0],$quest;
+        }
+    }
+    foreach my $name (sort keys %output){
+        foreach my $line (@{$output{$name}}) {
+                printf "%-4s  %s\n", $name , $line;
+        }
+    }
+}
+
+main;
+exit 0;
+
+                                 
+sub options () {
+   my $opt = shift;
+   GetOptions( $opt,
+   	'help|?',
+	'man') or pod2usage(2);
+   pod2usage(-verbose => 1) if $$opt{help} or scalar @ARGV != 2;
+   $opt->{sw} = shift @ARGV;
+   $opt->{ro} = shift @ARGV;
+   pod2usage(-exitstatus => 0, -verbose => 2) if $$opt{man};
+
+   $opt->{sw} =~ /^(.+)@(.+?)$/;
+   $opt->{sw} = $2;
+   $opt->{swco} = $1;
+   $opt->{ro} =~ /^(.+)@(.+?)$/;
+   $opt->{ro} = $2;
+   $opt->{roco} = $1;
+}
+
+sub pretty(@){
+  my $index = shift;
+  my @ret = ($index);
+  foreach my $x (@_){
+        push @ret, pretty_print($x);
+  };
+  return @ret;
+}
+
+__END__
+
+=head1 NAME
+
+cammer - list switch ports with associated IP-addresses
+
+=head1 SYNOPSIS
+
+cammer [--help|--man] community@switch community@router
+
+
+=head1 DESCRIPTION
+
+B<Cammer> is a script which polls a switch and a router in order to produce
+a list of machines attached (and currently online) at each port of the
+switch.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000 ETH Zurich, All rights reserved.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+=head1 AUTHOR
+
+Tobias Oetiker E<lt>oetiker@ee.ethz.chE<gt>
+
+=cut

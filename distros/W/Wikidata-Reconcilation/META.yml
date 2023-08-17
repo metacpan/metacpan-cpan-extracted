@@ -26,7 +26,7 @@ requires:
   Class::Utils: 0
   Error::Pure: 0
   LWP::UserAgent: 0
-  Unicode::UTf8: 0
+  Unicode::UTF8: 0
   WQS::SPARQL: 0
   WQS::SPARQL::Result: 0.02
   perl: 5.6.2
@@ -35,4 +35,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikidata-Reconcilation
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikidata-Reconcilation
-version: '0.02'
+version: '0.03'

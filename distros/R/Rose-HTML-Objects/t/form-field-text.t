@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 33;
+use Test::More tests => 35;
 
 BEGIN 
 {
@@ -117,6 +117,18 @@ ok(!$field->validate, 'validate UTF-8 maxlength 1');
 Rose::HTML::Form::Field::Text->force_utf8(1);
 
 ok($field->validate, 'validate UTF-8 maxlength 2');
+
+
+ $field = Rose::HTML::Form::Field::Text->new(
+  label       => 'Name', 
+  description => 'Your name',
+  name        => 'name',
+  maxlength   => 20,
+  required    => 1,
+);
+
+is($field->html_field, '<input maxlength="20" name="name" required size="15" type="text" value="">', 'html_field() 1');
+is($field->xhtml_field, '<input maxlength="20" name="name" required="required" size="15" type="text" value="" />', 'xhtml_field() 1');
 
 BEGIN
 {

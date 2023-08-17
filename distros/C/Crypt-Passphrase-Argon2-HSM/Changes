@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-Argon2-HSM
 
+0.004     2023-07-03 19:10:35+0200
+          - Eliminate warning when skipping test
+
 0.003     2023-05-05 12:51:11+0200
           - Adapt tests to latest Crypt::Passphrase::Argon2::Encrypted
 

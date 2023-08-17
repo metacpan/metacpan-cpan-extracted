@@ -2,15 +2,20 @@ NAME
     String::Util::Match - String utilities related to matching
 
 VERSION
-    This document describes version 0.002 of String::Util::Match (from Perl
-    distribution String-Util-Match), released on 2017-12-10.
+    This document describes version 0.003 of String::Util::Match (from Perl
+    distribution String-Util-Match), released on 2023-06-19.
 
 SYNOPSIS
-     use String::Util::Match qw(match_array_or_regex);
+     use String::Util::Match qw(match_array_or_regex num_occurs);
 
      match_array_or_regex('bar',  ['foo', 'bar', qr/[xyz]/]); # true, matches string
      match_array_or_regex('baz',  ['foo', 'bar', qr/[xyz]/]); # true, matches regex
      match_array_or_regex('oops', ['foo', 'bar', qr/[xyz]/]); # false
+
+     print num_occurs("foobarbaz", "a"); # => 2
+     print num_occurs("foobarbaz", "A"); # => 0
+     print num_occurs("foobarbaz", qr/a/i); # => 2
+     print num_occurs("foobarbaz", qr/[aeiou]/); # => 4
 
 DESCRIPTION
 FUNCTIONS
@@ -57,9 +62,35 @@ FUNCTIONS
 
     *   $haystack* => *re|str|array[re|str]*
 
+        (No description)
+
     *   $needle* => *str*
 
+        (No description)
+
     Return value: (any)
+
+  num_occurs
+    Usage:
+
+     num_occurs($string, $substring) -> uint
+
+    Count how many times a substring occurs (or a regex pattern matches) a
+    string.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $string* => *str*
+
+        (No description)
+
+    *   $substring* => *re|str*
+
+        (No description)
+
+    Return value: (uint)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -69,19 +100,36 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-String-Util-Match>.
 
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2017 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Util-Match>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

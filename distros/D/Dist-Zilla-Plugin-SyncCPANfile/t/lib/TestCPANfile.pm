@@ -30,7 +30,7 @@ sub check_cpanfile {
 
     my $from_cpanfile = $env->prereqs->as_cpan_meta->as_string_hash;
 
-    my $ok    = 1;
+    my $ok = 1;
     while ( my $plugin = shift @prereqs ) {
         next if !$plugin;
 
@@ -60,7 +60,7 @@ sub check_cpanfile {
 
         MODULE:
         while ( my $module = shift @requirements ) {
-            shift @requirements if $requirements[0] =~ m{\A\d};
+            shift @requirements if $requirements[0] =~ m{\A\d} || $requirements[0] =~ m{(>|<|>=|<=|!=|==)};
 
             if ( $module =~ m{\A-} ) {
                 $stage = shift @requirements if $module eq '-phase';
@@ -82,7 +82,9 @@ sub skip_without_encoding {
 
 sub build_dist {
     my @prereqs = @{ shift || [] };
-    my $config  = shift || { filename => 'cpanfile' };
+    my $config  = shift || {};
+
+    $config->{filename} ||= 'cpanfile';
 
     my $test   = {
         content => 'requires Moo => 1;',

@@ -155,6 +155,7 @@ sub _apply_form_for_options {
       class => $as ? "${action}_${as}" : $self->_dom_class($model, $action),
       id => join(_DEFAULT_ID_DELIM, ( $as ? (grep { defined $_ } $namespace, $action, $as)  :  (grep { defined $_ } ($namespace, $self->_dom_id($model, $action))) )),
       method => $method,
+      (( lc($method) ne 'post') ? (data =>{tunneled_method => $method}) : ()),
     },
   );
 

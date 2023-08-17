@@ -118,6 +118,7 @@ ignored and additional parameters are passed to the parser's constructor:
 - [PICA::Parser::Binary](https://metacpan.org/pod/PICA%3A%3AParser%3A%3ABinary) for type `binary` (binary PICA+)
 - [PICA::Parser::Plain](https://metacpan.org/pod/PICA%3A%3AParser%3A%3APlain) for type `plain` or `picaplain` (human-readable PICA+)
 - [PICA::Parser::Plus](https://metacpan.org/pod/PICA%3A%3AParser%3A%3APlus) for type `plus` or `picaplus` (normalized PICA+)
+- [PICA::Parser::Import](https://metacpan.org/pod/PICA%3A%3AParser%3A%3AImport) for type `import` (PICA Import format)
 - [PICA::Parser::JSON](https://metacpan.org/pod/PICA%3A%3AParser%3A%3AJSON) for type `json` (PICA JSON)
 - [PICA::Parser::XML](https://metacpan.org/pod/PICA%3A%3AParser%3A%3AXML) for type `xml` or `picaxml` (PICA-XML)
 - [PICA::Parser::PPXML](https://metacpan.org/pod/PICA%3A%3AParser%3A%3APPXML) for type `ppxml` (PicaPlus-XML)

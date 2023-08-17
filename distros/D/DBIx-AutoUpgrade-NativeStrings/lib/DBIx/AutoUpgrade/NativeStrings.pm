@@ -7,7 +7,7 @@ use Scalar::Util qw/looks_like_number/;
 use Encode       qw/decode/;
 use DBI          (),
 
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 my @default_dbh_methods = qw/do
                              prepare
@@ -83,10 +83,27 @@ sub inject_callbacks {
     return if $_ eq 'bind_param' && $_[3] && !$self->{bind_type_is_string}->($_[3]);
 
     # vars to be used in the loop
-    my $debug      = $self->{debug};          # copy just for easier reference
-    my $debug_msg  = "$_ callback";
     my $do_upgrade = $self->{native} eq 'default' ? sub {utf8::upgrade($_[0])}
                                                   : sub {$_[0] = decode($self->{native}, $_[0], $self->{decode_check})};
+    my $dbi_method = $_;
+    my $sql        = !ref($_[1]) && $_[1];    # for $dbh methods, SQL is in this position; otherwise undef
+    my $debug      = sub {
+      return if !$self->{debug}; # client wants no debugging
+
+      my ($arg_pos, $end_msg) = @_;
+      my $start_msg = "triggering '$dbi_method' callback";
+      $start_msg   .= " for [$sql]" if $sql and $arg_pos > 1;
+
+      # try to find the 1st stack frame above DBI and DBIx
+      my $stack_level = 0;
+      while (my ($package, $file, $line) = caller $stack_level) {
+        $start_msg .= " in $package at $file line $line" and last if $package !~ /^DBI/;
+        $stack_level += 1;
+      }
+
+      $self->{debug}->("$start_msg; $end_msg");
+    };
+
 
     # loop over members of @_; start only at 1 because $_[0] is the DBI handle
   ARG:
@@ -98,14 +115,14 @@ sub inject_callbacks {
       # if arg is a scalar and needs upgrading, do it
       if (! ref $_[$i]) {
         next ARG if dont_need_upgrade($_[$i]);
-        $debug->("$debug_msg: upgrading arg [$i] ($_[$i])") if $debug;
+        $debug->($i, "upgrading arg [$i] ($_[$i])");
         $do_upgrade->($_[$i]);
       }
 
       # if arg is an arrayref (used by the *_array methods), upgrade strings in that array
       elsif (ref $_[$i] eq 'ARRAY') {
         for my $val (grep {!dont_need_upgrade($_)} @{$_[$i]}) {
-          $debug->("$debug_msg: upgrading string in array arg [$i] ($val)") if $debug;
+          $debug->($i, "upgrading string in array arg [$i] ($val)");
           $do_upgrade->($val);
         }
       }

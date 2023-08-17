@@ -1,0 +1,65 @@
+{
+   "abstract" : "Ethereum keystorage utilities",
+   "author" : [
+      "Reginaldo Costa <refeco@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Blockchain-Ethereum-Keystore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Blockchain::Ethereum::Transaction" : "0.004",
+            "Crypt::PBKDF2" : "0.161520",
+            "Crypt::PK::ECC" : "0.078",
+            "Crypt::PRNG" : "0.078",
+            "Crypt::Perl" : "0.38",
+            "Crypt::ScryptKDF" : "0.010",
+            "Digest::Keccak" : "0.05",
+            "File::Slurp" : "9999.32",
+            "JSON::MaybeXS" : "1.004005",
+            "Net::SSH::Perl" : "2.14",
+            "Object::Pad" : "0.79",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/refeco/perl-ethereum-keystore.git",
+         "web" : "https://github.com/refeco/perl-ethereum-keystore]"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

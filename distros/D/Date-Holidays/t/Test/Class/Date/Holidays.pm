@@ -12,7 +12,7 @@ use Locale::Country; # all_country_codes
 use Test::MockModule;
 use English qw(-no_match_vars);
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {

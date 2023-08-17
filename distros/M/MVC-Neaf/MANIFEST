@@ -34,7 +34,6 @@ lib/MVC/Neaf/Request/FakeWriter.pm
 lib/MVC/Neaf/Request/PSGI.pm
 lib/MVC/Neaf/Route.pm
 lib/MVC/Neaf/Route/Main.pm
-lib/MVC/Neaf/Route/Null.pm
 lib/MVC/Neaf/Route/PreRoute.pm
 lib/MVC/Neaf/Upload.pm
 lib/MVC/Neaf/Util.pm
@@ -89,6 +88,9 @@ t/143-static-cache.t
 t/144-util-container.t
 t/145-set_path_defaults.t
 t/146-Request-header_in.t
+t/147-null-route.t
+t/150-caller_info.t
+t/151-neaf_base_dir.t
 t/201-Neaf.t
 t/202-Neaf-content-length.t
 t/203-Neaf-alias.t
@@ -139,6 +141,12 @@ t/249-load_resources-by-require.t
 t/249-load_resources-by-require.t.1.psgi
 t/249-load_resources-by-require.t.2.psgi
 t/250-set_error_template.t
+t/251-neaf-view.t
+t/252-options-before-handler.t
+t/253-distro-via-pm.t
+t/253-distro-via-pm.t.lib/My/Project.pm
+t/253-distro-via-pm.t.lib/My/Project/static/robots.txt
+t/253-distro-via-pm.t.lib/My/Project/tpl/index.tt
 t/301-default-view.t
 t/401-pre-logic-403-tpl.t
 t/402-error-logged.t
@@ -146,7 +154,13 @@ t/403-non-hash-return.t
 t/404-exception-in-hook.t
 t/405-add_route-fail.t
 t/406-resource-load-fail.t
+t/406-resource-load-fail.t.res
 t/407-session-garb.t
+t/408-bad-routes.t
+t/409-Neaf-new-badopt.t
+t/410-bad-hooks.t
+t/411-bad-helper.t
+t/412-error-handling-failed.t
 t/801-cli.t
 t/802-X-Form.t
 t/803-X-Form-LIVR.t
@@ -168,6 +182,7 @@ t/911-Apache2-0.30.t
 t/912-check_path-0.30.t
 t/913-add_route-view-0.30.t
 t/914-preload-tpl.t
+t/915-Request-deprecated-0.30.t
 t/README
 t/todo.t
 TODO

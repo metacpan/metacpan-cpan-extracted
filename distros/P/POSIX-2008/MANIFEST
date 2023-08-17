@@ -2,16 +2,15 @@ Changes
 COPYING
 Makefile.PL
 MANIFEST
-ppport.h
 README
-typemap
+ppport.h
 2008.xs
-const-c.inc
-const-xs.inc
 lib/POSIX/2008.pm
 lib/POSIX/2008.pod
 t/01_use.t
-t/02_at.t
+t/02_fs.t
 t/03_rw.t
+t/04_at.t
+t/05_is.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

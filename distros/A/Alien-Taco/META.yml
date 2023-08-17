@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,22 +18,22 @@ name: Alien-Taco
 provides:
   Alien::Taco:
     file: lib/Alien/Taco.pm
-    version: '0.002'
+    version: '0.003'
   Alien::Taco::Object:
     file: lib/Alien/Taco/Object.pm
-    version: '0.002'
+    version: '0.003'
   Alien::Taco::Server:
     file: lib/Alien/Taco/Server.pm
-    version: '0.002'
+    version: '0.003'
   Alien::Taco::Transport:
     file: lib/Alien/Taco/Transport.pm
-    version: '0.002'
+    version: '0.003'
   Alien::Taco::Util:
     file: lib/Alien/Taco/Util.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   JSON: '0'
 resources:
   license: http://opensource.org/licenses/gpl-3.0.html
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

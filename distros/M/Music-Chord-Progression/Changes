@@ -1,5 +1,18 @@
 Revision history for Music-Chord-Progression
 
+0.0609 2023-06-04 20:54:48
+    - Use all minors for a chromatic scale.
+    - Improve documentation.
+
+0.0608 2023-06-04 20:10:06
+    - Honor the scale mode when building the chord_map.
+
+0.0607 2023-06-04 15:50:16
+    - Show the scale name in verbose mode.
+
+0.0606 2023-06-04 15:36:03
+    - Add an inelegant loop in the scale builder routine, to avoid weird notes.
+
 0.0605 2022-10-23 12:28:31
     - Avoid implicit imports.
 

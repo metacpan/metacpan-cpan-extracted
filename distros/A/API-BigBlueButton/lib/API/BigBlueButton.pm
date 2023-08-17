@@ -31,7 +31,7 @@ use strict;
 use warnings;
 
 use Carp qw/ confess /;
-use LWP::UserAgent '6.05';
+use LWP::UserAgent;
 
 use API::BigBlueButton::Response;
 
@@ -39,11 +39,11 @@ use base qw/ API::BigBlueButton::Requests /;
 
 use constant REQUIRE_PARAMS => qw/ secret server /;
 
-our $VERSION = "0.013";
+our $VERSION = "0.015";
 
 =head1 VERSION
  
-version 0.013
+version 0.015
 
 =cut
 

@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Reporter';
 
@@ -572,14 +572,14 @@ sub readFromParser($;$)
 {   my ($self, $parser, $bodytype) = @_;
 
     my $head = $self->readHead($parser)
-            || Mail::Message::Head::Complete->new
-                 ( message     => $self
-                 , field_type  => $self->{MM_field_type}
-                 , $self->logSettings
-                 );
+     || Mail::Message::Head::Complete->new
+          ( message     => $self
+          , field_type  => $self->{MM_field_type}
+          , $self->logSettings
+          );
 
     my $body = $self->readBody($parser, $head, $bodytype)
-       or return;
+        or return;
 
     $self->head($head);
     $self->storeBody($body);
@@ -601,15 +601,11 @@ sub readHead($;$)
 }
 
 
-my $mpbody = 'Mail::Message::Body::Multipart';
-my $nbody  = 'Mail::Message::Body::Nested';
-my $lbody  = 'Mail::Message::Body::Lines';
-
 sub readBody($$;$$)
 {   my ($self, $parser, $head, $getbodytype) = @_;
 
     my $bodytype
-      = ! $getbodytype   ? ($self->{MM_body_type} || $lbody)
+      = ! $getbodytype   ? ($self->{MM_body_type} || 'Mail::Message::Body::Lines')
       : ref $getbodytype ? $getbodytype->($self, $head)
       :                    $getbodytype;
 
@@ -617,7 +613,7 @@ sub readBody($$;$$)
     if($bodytype->isDelayed)
     {   $body = $bodytype->new
           ( message => $self
-          , charset => 'us-ascii'
+          , charset => undef     # we do not know, autodetect after transfer decode
           , $self->logSettings
           );
     }
@@ -627,14 +623,18 @@ sub readBody($$;$$)
 
         # Be sure you have acceptable bodies for multiparts and nested.
         if(substr($type, 0, 10) eq 'multipart/' && !$bodytype->isMultipart)
-        {   $bodytype = $mpbody }
-        elsif($type eq 'message/rfc822' && !$bodytype->isNested)
-        {   $bodytype = $nbody  }
+        {   $bodytype = 'Mail::Message::Body::Multipart';
+        }
+        elsif($type eq 'message/rfc822')
+        {   my $enc = $head->get('Content-Transfer-Encoding') || 'none';
+            $bodytype = 'Mail::Message::Body::Nested'
+                if lc($enc) eq 'none' && ! $bodytype->isNested;
+        }
 
         $body = $bodytype->new
           ( message => $self
           , checked => $self->{MM_trusted}
-          , charset => 'us-ascii'
+          , charset => undef
           , $self->logSettings
           );
 

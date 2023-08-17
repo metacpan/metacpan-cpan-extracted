@@ -7,12 +7,13 @@
 #include "spvm_typedecl.h"
 
 struct spvm_runtime_field {
-  int32_t id;
-  int32_t name_id;
+  const char* name;
+  SPVM_RUNTIME_BASIC_TYPE* current_basic_type;
+  SPVM_RUNTIME_BASIC_TYPE* basic_type;
   int32_t index;
   int32_t offset;
-  int32_t type_id;
-  int32_t class_id;
+  int32_t type_dimension;
+  int32_t type_flag;
 };
 
 #endif

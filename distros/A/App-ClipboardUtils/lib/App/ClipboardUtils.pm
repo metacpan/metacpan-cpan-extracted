@@ -3,9 +3,9 @@ package App::ClipboardUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-08'; # DATE
+our $DATE = '2023-04-13'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to clipboard
@@ -22,7 +22,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.006 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2022-12-08.
+This document describes version 0.007 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2023-04-13.
 
 =head1 DESCRIPTION
 
@@ -30,21 +30,23 @@ This distribution contains the following CLI utilities related to clipboard:
 
 =over
 
-=item * L<add-clipboard-content>
+=item 1. L<add-clipboard-content>
 
-=item * L<clear-clipboard-content>
+=item 2. L<clear-clipboard-content>
 
-=item * L<clear-clipboard-history>
+=item 3. L<clear-clipboard-history>
 
-=item * L<clipadd>
+=item 4. L<clipadd>
 
-=item * L<clipget>
+=item 5. L<clipget>
 
-=item * L<detect-clipboard-manager>
+=item 6. L<detect-clipboard-manager>
 
-=item * L<get-clipboard-content>
+=item 7. L<get-clipboard-content>
 
-=item * L<list-clipboard-history>
+=item 8. L<get-clipboard-history-item>
+
+=item 9. L<list-clipboard-history>
 
 =back
 
@@ -80,7 +82,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

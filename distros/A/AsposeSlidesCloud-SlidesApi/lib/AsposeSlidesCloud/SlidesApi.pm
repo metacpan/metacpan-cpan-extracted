@@ -6078,6 +6078,120 @@ sub create_table_row {
 }
 
 #
+# create_vba_module
+#
+# Append module to VBA project             
+# 
+# @param string $name Document name. (required)
+# @param VbaModule $module_dto VBA module DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'module_dto' => {
+        data_type => 'VbaModule',
+        description => 'VBA module DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_vba_module' } = { 
+    	summary => 'Append module to VBA project             ',
+        params => $params,
+        returns => 'VbaModule',
+        };
+}
+# @return VbaModule
+#
+sub create_vba_module {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_vba_module");
+    }
+
+    # verify the required parameter 'module_dto' is set
+    unless (exists $args{'module_dto'} && $args{'module_dto'}) {
+      croak("Missing the required parameter 'module_dto' when calling create_vba_module");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/vbaProject/modules';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'module_dto'} && $args{'module_dto'}) {
+        $_body_data = $args{'module_dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VbaModule', $response);
+    return $_response_object;
+}
+
+#
 # create_watermark
 #
 # Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
@@ -13513,6 +13627,122 @@ sub delete_unused_master_slides_online {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# delete_vba_module
+#
+# Delete module from VBA project.
+# 
+# @param string $name Document name. (required)
+# @param int $module_index The index of the macros module to remove. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'module_index' => {
+        data_type => 'int',
+        description => 'The index of the macros module to remove.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_vba_module' } = { 
+    	summary => 'Delete module from VBA project.',
+        params => $params,
+        returns => 'VbaProject',
+        };
+}
+# @return VbaProject
+#
+sub delete_vba_module {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_vba_module");
+    }
+
+    # verify the required parameter 'module_index' is set
+    unless (exists $args{'module_index'}) {
+      croak("Missing the required parameter 'module_index' when calling delete_vba_module");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/vbaProject/modules/{moduleIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'module_index'}) {
+        my $_base_variable = "{" . "moduleIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'module_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VbaProject', $response);
     return $_response_object;
 }
 
@@ -23856,6 +24086,220 @@ sub get_theme {
 }
 
 #
+# get_vba_module
+#
+# Get VBA module info.
+# 
+# @param string $name Document name. (required)
+# @param int $module_index The index of the macros module to remove. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'module_index' => {
+        data_type => 'int',
+        description => 'The index of the macros module to remove.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_vba_module' } = { 
+    	summary => 'Get VBA module info.',
+        params => $params,
+        returns => 'VbaModule',
+        };
+}
+# @return VbaModule
+#
+sub get_vba_module {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_vba_module");
+    }
+
+    # verify the required parameter 'module_index' is set
+    unless (exists $args{'module_index'}) {
+      croak("Missing the required parameter 'module_index' when calling get_vba_module");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/vbaProject/modules/{moduleIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'module_index'}) {
+        my $_base_variable = "{" . "moduleIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'module_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VbaModule', $response);
+    return $_response_object;
+}
+
+#
+# get_vba_project
+#
+# Get VBA project info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_vba_project' } = { 
+    	summary => 'Get VBA project info.',
+        params => $params,
+        returns => 'VbaProject',
+        };
+}
+# @return VbaProject
+#
+sub get_vba_project {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_vba_project");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/vbaProject';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VbaProject', $response);
+    return $_response_object;
+}
+
+#
 # get_view_properties
 #
 # Read presentation view properties.
@@ -27071,6 +27515,284 @@ sub replace_slide_text_online {
     if ( exists $args{'document'} && $args{'document'}) {
         push(@$files, $args{'document'});
     }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# replace_text_formatting
+#
+# Finds and replaces text in presentation with given format.
+# 
+# @param string $name Document name. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param PortionFormat $portion_format Portion format. (optional)
+# @param boolean $with_masters Text replacement includes master slides. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'portion_format' => {
+        data_type => 'PortionFormat',
+        description => 'Portion format.',
+        required => '0',
+    },
+    'with_masters' => {
+        data_type => 'boolean',
+        description => 'Text replacement includes master slides.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_text_formatting' } = { 
+    	summary => 'Finds and replaces text in presentation with given format.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub replace_text_formatting {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling replace_text_formatting");
+    }
+
+    # verify the required parameter 'old_value' is set
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
+      croak("Missing the required parameter 'old_value' when calling replace_text_formatting");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling replace_text_formatting");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/replaceTextFormatting';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'old_value'} && defined $args{'old_value'}) {
+        $query_params->{'oldValue'} = $self->{api_client}->to_query_value($args{'old_value'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'with_masters'} && defined $args{'with_masters'}) {
+        $query_params->{'withMasters'} = $self->{api_client}->to_boolean_query_value($args{'with_masters'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'portion_format'} && $args{'portion_format'}) {
+        $_body_data = $args{'portion_format'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Document', $response);
+    return $_response_object;
+}
+
+#
+# replace_text_formatting_online
+#
+# Finds and replaces text in presentation with given format.
+# 
+# @param File $document Document data. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param PortionFormat $portion_format Portion format. (optional)
+# @param boolean $with_masters Text replacement includes master slides. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'portion_format' => {
+        data_type => 'PortionFormat',
+        description => 'Portion format.',
+        required => '0',
+    },
+    'with_masters' => {
+        data_type => 'boolean',
+        description => 'Text replacement includes master slides.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_text_formatting_online' } = { 
+    	summary => 'Finds and replaces text in presentation with given format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_text_formatting_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling replace_text_formatting_online");
+    }
+
+    # verify the required parameter 'old_value' is set
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
+      croak("Missing the required parameter 'old_value' when calling replace_text_formatting_online");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling replace_text_formatting_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/replaceTextFormatting';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'old_value'} && defined $args{'old_value'}) {
+        $query_params->{'oldValue'} = $self->{api_client}->to_query_value($args{'old_value'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'with_masters'} && defined $args{'with_masters'}) {
+        $query_params->{'withMasters'} = $self->{api_client}->to_boolean_query_value($args{'with_masters'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # body params
+    if ( exists $args{'portion_format'} && $args{'portion_format'}) {
+        $_body_data = $args{'portion_format'};
+    }
+
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -36113,6 +36835,138 @@ sub update_table_row {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('TableRow', $response);
+    return $_response_object;
+}
+
+#
+# update_vba_module
+#
+# Update VBA module.
+# 
+# @param string $name Document name. (required)
+# @param int $module_index The index of the macros module to remove. (required)
+# @param VbaModule $module_dto VBA module DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'module_index' => {
+        data_type => 'int',
+        description => 'The index of the macros module to remove.',
+        required => '1',
+    },
+    'module_dto' => {
+        data_type => 'VbaModule',
+        description => 'VBA module DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_vba_module' } = { 
+    	summary => 'Update VBA module.',
+        params => $params,
+        returns => 'VbaModule',
+        };
+}
+# @return VbaModule
+#
+sub update_vba_module {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling update_vba_module");
+    }
+
+    # verify the required parameter 'module_index' is set
+    unless (exists $args{'module_index'}) {
+      croak("Missing the required parameter 'module_index' when calling update_vba_module");
+    }
+
+    # verify the required parameter 'module_dto' is set
+    unless (exists $args{'module_dto'} && $args{'module_dto'}) {
+      croak("Missing the required parameter 'module_dto' when calling update_vba_module");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/vbaProject/modules/{moduleIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'module_index'}) {
+        my $_base_variable = "{" . "moduleIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'module_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'module_dto'} && $args{'module_dto'}) {
+        $_body_data = $args{'module_dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('VbaModule', $response);
     return $_response_object;
 }
 

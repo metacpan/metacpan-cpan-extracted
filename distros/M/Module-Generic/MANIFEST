@@ -10,7 +10,6 @@ lib/Module/Generic/DateTime/Interval.pod
 lib/Module/Generic/Dynamic.pm
 lib/Module/Generic/Dynamic.pod
 lib/Module/Generic/Exception.pm
-lib/Module/Generic/Exception.pod
 lib/Module/Generic/File.pm
 lib/Module/Generic/File/Cache.pm
 lib/Module/Generic/File/IO.pm

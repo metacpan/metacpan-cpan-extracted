@@ -1,3 +1,12 @@
+
+//              Copyright Catch2 Authors
+// Distributed under the Boost Software License, Version 1.0.
+//   (See accompanying file LICENSE.txt or copy at
+//        https://www.boost.org/LICENSE_1_0.txt)
+
+// SPDX-License-Identifier: BSL-1.0
+// Adapted from donated nonius code.
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/benchmark/catch_constructor.hpp>
@@ -7,21 +16,23 @@
 
 namespace {
     std::uint64_t Fibonacci(std::uint64_t number) {
-        return number < 2 ? 1 : Fibonacci(number - 1) + Fibonacci(number - 2);
+        return number < 2 ? number : Fibonacci(number - 1) + Fibonacci(number - 2);
     }
 }
 
 TEST_CASE("Benchmark Fibonacci", "[!benchmark]") {
-    CHECK(Fibonacci(0) == 1);
+    CHECK(Fibonacci(0) == 0);
     // some more asserts..
-    CHECK(Fibonacci(5) == 8);
+    CHECK(Fibonacci(5) == 5);
     // some more asserts..
 
-    BENCHMARK("Fibonacci 20") {
+    REQUIRE( Fibonacci( 20 ) == 6'765 );
+    BENCHMARK( "Fibonacci 20" ) {
         return Fibonacci(20);
     };
 
-    BENCHMARK("Fibonacci 25") {
+    REQUIRE( Fibonacci( 25 ) == 75'025 );
+    BENCHMARK( "Fibonacci 25" ) {
         return Fibonacci(25);
     };
 
@@ -142,4 +153,21 @@ TEST_CASE("Benchmark containers", "[!benchmark]") {
             meter.measure([&](int i) { storage[i].destruct(); });
         };
     }
+}
+
+TEST_CASE("Skip benchmark macros", "[!benchmark]") {
+    std::vector<int> v;
+    BENCHMARK("fill vector") {
+        v.emplace_back(1);
+        v.emplace_back(2);
+        v.emplace_back(3);
+    };
+    REQUIRE(v.size() == 0);
+
+    std::size_t counter{0};
+    BENCHMARK_ADVANCED("construct vector")(Catch::Benchmark::Chronometer meter) {
+        std::vector<Catch::Benchmark::storage_for<std::string>> storage(meter.runs());
+        meter.measure([&](int i) { storage[i].construct("thing"); counter++; });
+    };
+    REQUIRE(counter == 0);
 }

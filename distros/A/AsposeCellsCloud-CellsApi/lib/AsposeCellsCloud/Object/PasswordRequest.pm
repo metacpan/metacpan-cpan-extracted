@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Used for password data transfer.',
                                   class => 'PasswordRequest',
                                   required => [], # TODO
 }                                 );

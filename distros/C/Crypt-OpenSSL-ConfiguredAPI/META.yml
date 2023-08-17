@@ -1,0 +1,34 @@
+---
+abstract: 'Get the Configured API level if it is defined'
+author:
+  - 'Timothy Legge <timlegge@cpan.org>'
+build_requires:
+  Crypt::OpenSSL::Guess: '0'
+  Test::More: '0'
+configure_requires:
+  Crypt::OpenSSL::Guess: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-ConfiguredAPI
+provides:
+  Crypt::OpenSSL::ConfiguredAPI:
+    file: lib/Crypt/OpenSSL/ConfiguredAPI.pm
+    version: '0.03'
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-ConfiguredAPI/issues
+  repository: git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-ConfiguredAPI.git
+version: '0.03'
+x_generated_by_perl: v5.36.1
+x_maintainers:
+  - 'Timothy Legge <timlegge@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Apache-2.0

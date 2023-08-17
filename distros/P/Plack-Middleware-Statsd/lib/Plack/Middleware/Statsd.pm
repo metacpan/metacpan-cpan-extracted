@@ -12,15 +12,15 @@ use warnings;
 
 use parent qw/ Plack::Middleware /;
 
-use Feature::Compat::Try;
 use List::Util qw/ first /;
 use Plack::Util;
 use Plack::Util::Accessor
     qw/ client sample_rate histogram increment set_add catch_errors /;
 use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
+use Try::Tiny;
 
-our $VERSION = 'v0.6.2';
+our $VERSION = 'v0.6.3';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -49,7 +49,8 @@ sub prepare_app {
                     try {
                         $client->$method( grep { defined $_ } @args );
                     }
-                    catch($e) {
+                    catch {
+                        my ($e) = $_;
                         if (my $logger = $env->{'psgix.logger'}) {
                             $logger->( { message => $e, level => 'error' } );
                         }
@@ -102,8 +103,8 @@ sub call {
         try {
             $res = $self->app->($env);
         }
-        catch($e) {
-            $res = $catch->( $env, $e );
+        catch {
+            $res = $catch->( $env, $_ );
         }
     }
     else {
@@ -208,7 +209,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.6.2
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -460,7 +461,7 @@ L<Plack::Middleware::SizeLimit> version 0.11 supports callbacks that
 allow you to monitor process size information.  In your F<app.psgi>:
 
   use Net::Statsd::Tiny;
-  use Feature::Compat::Try;
+  use Try::Tiny;
 
   my $statsd = Net::Statsd::Tiny->new( ... );
 
@@ -481,14 +482,16 @@ allow you to monitor process size information.  In your F<app.psgi>:
               $statsd->timing_ms('psgi.proc.shared', $shared);
               $statsd->timing_ms('psgi.proc.unshared', $unshared);
           }
-          catch($e) {
-              warn $e;
+          catch {
+              warn $_;
           };
       };
 
 =head1 KNOWN ISSUES
 
 =head2 Non-standard HTTP status codes
+
+=head2 Unknown Status Codes
 
 If your application is returning a status code that is not handled by
 L<HTTP::Status>, then the metrics may not be logged for that reponse.
@@ -502,6 +505,8 @@ need to add metrics logging yourself.
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
 Since v0.6.0, the this module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 If you need this module on Perl v5.10, please use one of the v0.5.x
 versions of this module.  Significant bug or security fixes may be
@@ -538,7 +543,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

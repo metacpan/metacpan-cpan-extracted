@@ -1,0 +1,89 @@
+NAME
+    "Syntax::Operator::Matches" - match::simple but as a real infix operator
+
+SYNOPSIS
+    On Perl v5.38 or later:
+
+       use v5.38;
+       use Syntax::Operator::Matches;
+
+       if ( $x matches $y ) {
+          ...;
+       }
+
+DESCRIPTION
+    This module implements a "matches" infix operator using match::simple.
+
+    There's also a "mismatches" operator which returns the inverse. This
+    needs to be requested explicitly.
+
+       use v5.38;
+       use Syntax::Operator::Matches qw( matches mismatches );
+   
+       unless ( $x mismatches $y ) {
+          ...;
+       }
+
+  What matches what?
+    As a reminder of what match::simple's matching rules are:
+
+    *   If the right hand side is "undef", then there is only a match if the
+        left hand side is also "undef".
+
+    *   If the right hand side is a non-reference, then the match is a
+        simple string match.
+
+    *   If the right hand side is a reference to a regexp, then the left
+        hand is evaluated.
+
+    *   If the right hand side is a code reference, then it is called in a
+        boolean context with the left hand side being passed as an argument.
+
+    *   If the right hand side is an object which provides a "MATCH" method,
+        then it this is called as a method, with the left hand side being
+        passed as an argument.
+
+    *   If the right hand side is an object which overloads "~~", then this
+        will be used.
+
+    *   If the right hand side is an arrayref, then the operator recurses
+        into the array, with the match succeeding if the left hand side
+        matches any array element.
+
+    *   If any other value appears on the right hand side, the operator will
+        croak.
+
+  Use with Type::Tiny
+    Type::Tiny type constraints overload the "~~" operator, so the following
+    will work:
+
+      use Types::Standard qw( Str ArrayRef );
+      use Syntax::Operator::Matches;
+  
+      if ( $x matches Str ) {
+        say $x;
+      }
+      elsif ( $x matches ArrayRef[Str] ) {
+        say $_ for $x->@*;
+      }
+      else {
+        warn "Unexpected input";
+      }
+
+SEE ALSO
+    match::simple.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

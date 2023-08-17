@@ -3,12 +3,10 @@
 ROOT=$(cd "$(dirname "$0")/../" && pwd)
 
 if [[ $# -eq 0 ]]; then
-    $0 5.36.0 5-36 x86_64
-    $0 5.36.0 5-36 arm64
-    $0 5.34.1 5-34 x86_64
-    $0 5.34.1 5-34 arm64
-    $0 5.32.1 5-32 x86_64
-    $0 5.32.1 5-32 arm64
+    $0 5.38.0 5-38 x86_64
+    $0 5.38.0 5-38 arm64
+    $0 5.36.1 5-36 x86_64
+    $0 5.36.1 5-36 arm64
     exit 0
 fi
 
@@ -38,7 +36,7 @@ docker run \
     -v "$ROOT:/var/task" \
     -v "$OPT-$PLATFORM:/opt" \
     --rm --platform "$DOCKER_PLATFORM" \
-    "public.ecr.aws/shogo82148/lambda-provided:build-al2-$PLATFORM" \
+    "public.ecr.aws/sam/build-provided.al2:1-$PLATFORM" \
     ./author/build-perl-al2.sh "$PERL_VERSION"
 
 # sanity check the perl binary works on the emulation images
@@ -46,7 +44,7 @@ docker run \
     -v "$OPT-$PLATFORM:/opt" \
     --rm --platform "$DOCKER_PLATFORM" \
     --entrypoint /opt/bin/perl \
-    "public.ecr.aws/shogo82148/lambda-provided:al2-$PLATFORM" \
+    "public.ecr.aws/lambda/provided:al2-$PLATFORM" \
     -MJSON::XS -MYAML::XS -MNet::SSLeay -MIO::Socket::SSL -MMozilla::CA \
     -MAWS::XRay -MAWS::Lambda -MAWS::Lambda::PSGI -e ''
 

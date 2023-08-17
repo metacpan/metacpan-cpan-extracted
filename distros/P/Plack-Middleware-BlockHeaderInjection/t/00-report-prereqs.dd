@@ -25,8 +25,7 @@ do { my $x = {
                       'requires' => {
                                       'Plack::Middleware' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.8.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.12.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -44,7 +43,8 @@ do { my $x = {
                                    'Plack::Response' => '0',
                                    'Plack::Test' => '0',
                                    'Test::Differences' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

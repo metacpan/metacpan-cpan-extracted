@@ -26,6 +26,10 @@ sub new
 	    'the column to use as coordiante'
 	, 'shift', 0.25, 's',
 	    'shift the viewport by that value (nearest existing data point), direction is subject to misunderstandings'
+	, 'smother', 0, 'm',
+	    'compute arithmetic mean of initial outer boundaries that are supposed to be identical, but are not'
+	, 'smother-except', [], 'x',
+	    'list of columns to extempt from smothering (in addition to the coordinate column)'
 	);
 	return $class->SUPER::new
 	({
@@ -159,6 +163,17 @@ sub recycle_block
 	# The data got moved one pace back, adjust coordinate.
 	$_->[$self->{col}] -= $dir*$period for (@{$self->{block}});
 	# Shove in the unchanged remaining data, plus the new boundary.
+	# $a[0] is supposed to the identical to $a[$#a]. But in might not be so,
+	# for a DG model, for example. Let's smother it a bit.
+	if($param->{smother})
+	{
+		my @except = ($self->{col}, @{$param->{'smother-except'}});
+		for(my $i = 0; $i< @{$a[0]}; ++$i)
+		{
+			$a[0][$i] = 0.5*($a[0][$i] + $a[$#a][$i])
+				if(not grep { $_ == $i } @except and $a[0][$i] != $a[$#a][$i]);
+		}
+	}
 	push(@{$self->{block}}, @a[0 .. $i-1]);
 	push(@{$self->{block}}, \@boundary);
 	# Bring the coordinates back into a sane range.

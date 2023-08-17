@@ -1,0 +1,38 @@
+SQL-Inserter
+
+SQL::Inserter - Fast insert SQL builder, buffered DBI inserting
+
+INSTALLATION
+
+Normally you would expect to use a package manager like cpanm to install as:
+
+    cpanm SQL::Inserter
+
+Otherwise, to install this module manually, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+CPAN:
+    https://metacpan.org/pod/SQL::Inserter
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SQL::Inserter
+
+Source code and issues on GitHub:
+    https://github.com/SpareRoom/SQL-Inserter
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by SpareRoom.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Martin Becker, Blaubeuren.
+# Copyright (c) 2020-2023 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -9,11 +9,16 @@
 
 use strict;
 use warnings;
-use File::Spec;
 use Math::DifferenceSet::Planar;
 use constant MDP => Math::DifferenceSet::Planar::;
 
-use Test::More tests => 22;
+use Test::More;
+if (MDP->can('check_elements')) {
+    plan tests => 22;
+}
+else {
+    plan skip_all => 'check_elements no longer available';
+}
 
 #########################
 

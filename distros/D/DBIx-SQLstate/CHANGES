@@ -1,0 +1,47 @@
+CHANGE LOG
+==========
+
+
+2023-07-05 - v0.0.5
+-------------------
+
+### Added
+  - predicate functions for 'success', 'warning', 'no data' or 'exception'
+
+
+
+2023-06-29 - v0.0.4
+  -------------------
+  
+  ### Added
+    - functionality to return ALL_CAPS_SNAKE_CASE, for more consistency
+  
+### Fixed
+  - typo in 'Unknown SQL-state' default message
+
+### Improved
+  - test coverage
+
+
+
+2023-06-28 - v0.0.3
+-------------------
+
+### Fixed
+- compatabilility with Perl 5.8
+
+### Improved
+- test coverage
+
+2023-06-18 - v0.0.2
+-------------------
+
+### Fixed
+  - typo in `MANIFEST`
+
+
+
+2023-05-23 - v0.0.1
+-------------------
+
+Initial Release

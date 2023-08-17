@@ -5,20 +5,16 @@ export PERL5LIB=lib
 checks="BSVG Braunschweig Hbf
 DING Ulm Hbf
 KVV Karlsruhe Hbf
-LinzAG Linz Hbf
+LinzAG Linz/Donau Hbf
 MVV München Hackerbrücke
 NVBW Stuttgart Hbf (A.-Klett-Pl.)
-SVV Salzburg Hbf
-TLEM London Waterloo East
 VAG Schallstadt Bf
-VBL Luzern Bf
-Verbundlinie Graz Hbf
 VGN Nürnberg Hbf
 VMV Schwerin Hbf
-VOR Wien Hbf
 VRN Mannheim Hbf
 VRR Essen Hbf
 VRR2 Essen Hbf
+VRR3 Essen Hbf
 VVO Dresden Hbf
 VVS Stuttgart Schwabstraße"
 

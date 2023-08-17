@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iPick;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iPick.pm 
+ PERL PROGRAM NAME: iPick.pm 
  AUTHOR: Juan Lorenzo
  DATE:  Sept. 14 2015 
          
@@ -101,7 +101,6 @@ use App::SeismicUnixGui::misc::SeismicUnix qw($on $off $in $to $go $ipicks_par_
 	$itemp_picks_ $itemp_picks_sorted_);
 
 my $Project            = Project_config->new();
-my ($PL_SEISMIC)       = $Project->PL_SEISMIC();
 my ($DATA_SEISMIC_SU)  = $Project->DATA_SEISMIC_SU();
 my ($DATA_SEISMIC_TXT) = $Project->DATA_SEISMIC_TXT();
 my ($date)             = $Project->date();

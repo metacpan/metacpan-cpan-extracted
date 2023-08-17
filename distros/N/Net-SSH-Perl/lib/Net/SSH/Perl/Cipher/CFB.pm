@@ -1,5 +1,3 @@
-# $Id: CFB.pm,v 1.5 2001/04/03 19:44:47 btrott Exp $
-
 # This code based in part on the Systemics Crypt::CFB.
 # Parts Copyright (C) 1995, 1996 Systemics Ltd (http://www.systemics.com/)
 # All rights reserved.

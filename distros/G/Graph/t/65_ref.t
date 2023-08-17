@@ -63,6 +63,8 @@ sub test_adjmap {
     isnt( $m->${ \$map->{has} }(@$path_maybe_id), undef, $label );
     $m->${ \$map->{set} }(@$path_maybe_id); # second time
     is( $m->_get_path_count($path), $maybe_count, $label );
+    my @ids = $m->ids;
+    isnt 0+@ids, 0, $label;
     ok( $m->${ \$map->{del} }(@$path_maybe_id), $label ) for 1..$maybe_count;
     ok( !$m->has_any_paths, $label ) or diag explain $m;
     is( $m->${ \$map->{has} }(@$path_maybe_id), undef, $label );
@@ -80,6 +82,8 @@ sub test_adjmap {
 	is_deeply( $got, [ [$path] ], $label ) or diag explain $got;
 	$got = [ $m->get_ids_by_paths([ [$path, $path] ], 0, 1) ];
 	is_deeply $got, [ [1, 1] ], $label or diag explain $got;
+	$got = [ $m->get_paths_by_ids([ [[1,1]] ], 1) ];
+	is_deeply $got, [ [[$path, $path]] ], $label or diag explain $got;
     }
     eval { $m->stringify };
     is $@, '', $label;
@@ -284,46 +288,30 @@ my $o6a = bless \*foo, 'G';
 my $o6b = bless \*bar, 'G';
 { package G; use overload '""' => sub { "g" } }
 
-for my $i ($o1a, $o2a, $o3a, $o4a, $o5a, $o6a) {
+for my $d (1, 0) {
+  for my $i ($o1a, $o2a, $o3a, $o4a, $o5a, $o6a) {
     for my $j ($o1b, $o2b, $o3b, $o4b, $o5b, $o6b) {
-	note "i = $i, j = $j";
-
-	my $g1 = Graph->new(refvertexed => 1, directed => 1);
-
-	ok( $g1->add_edge($i, $j));
-	note "g1 = $g1";
-	ok( $g1->has_vertex($i));
-	ok( $g1->has_vertex($j));
-	ok( $g1->has_edge($i, $j));
-	ok( $g1->delete_vertex($i));
-	note "g1 = $g1";
-	ok(!$g1->has_vertex($i));
-	ok( $g1->has_vertex($j));
-	ok(!$g1->has_edge($i, $j));
-	ok($g1->delete_vertex($j));
-	note "g1 = $g1, i=$i, j=$j";
-	ok(!$g1->has_vertex($i));
-	ok(!$g1->has_vertex($j));
-	ok(!$g1->has_edge($i, $j));
-
-	my $g2 = Graph->new(refvertexed => 1, directed => 0);
-
-	ok( $g2->add_edge($i, $j));
-	note "g2 = $g2";
-	ok( $g2->has_vertex($i));
-	ok( $g2->has_vertex($j));
-	ok( $g2->has_edge($i, $j));
-	ok( $g2->delete_vertex($i));
-	note "g2 = $g2";
-	ok(!$g2->has_vertex($i));
-	ok( $g2->has_vertex($j));
-	ok(!$g2->has_edge($i, $j));
-	ok($g2->delete_vertex($j));
-	note "g2 = $g2, i=$i, j=$j";
-	ok(!$g2->has_vertex($i));
-	ok(!$g2->has_vertex($j));
-	ok(!$g2->has_edge($i, $j));
+      note "d = $d, i = $i, j = $j";
+      my $g = Graph->new(refvertexed => 1, directed => $d);
+      ok( $g->add_edge($i, $j));
+      note "g = $g";
+      ok( $g->has_vertex($i));
+      ok( $g->has_vertex($j));
+      ok( $g->has_edge($i, $j));
+      if (!$d) { # bridges only for undirected
+        eval {ok $g->has_vertex($_) for map @$_, $g->bridges}; is $@, '';
+      }
+      ok( $g->delete_vertex($i));
+      note "g = $g";
+      ok(!$g->has_vertex($i));
+      ok( $g->has_vertex($j));
+      ok(!$g->has_edge($i, $j));
+      ok($g->delete_vertex($j));
+      ok(!$g->has_vertex($i));
+      ok(!$g->has_vertex($j));
+      ok(!$g->has_edge($i, $j));
     }
+  }
 }
 
 my $g_ref = Graph->new(refvertexed => 1);

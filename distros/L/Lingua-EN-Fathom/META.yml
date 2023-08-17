@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Lingua-EN-Fathom
 provides:
   Lingua::EN::Fathom:
     file: lib/Lingua/EN/Fathom.pm
-    version: '1.22'
+    version: '1.27'
 requires:
   Lingua::EN::Sentence: '0.28'
   Lingua::EN::Syllable: '0.28'
@@ -27,5 +27,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kimryan/Readability
-version: '1.22'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '1.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

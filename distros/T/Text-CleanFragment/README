@@ -52,6 +52,10 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-CleanFragment>
 or via mail to L<text-cleanfragment-Bugs@rt.cpan.org>.
 
 
+SEE ALSO
+
+L<Mojo::Util> - the C<slugify> subroutine does something comparable but
+does not squish repeating characters and removes dashes.
 
 AUTHOR
 
@@ -63,4 +67,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2012-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2012-2023 by Max Maischein C<corion@cpan.org>.

@@ -1,0 +1,14 @@
+.perltidyrc
+lib/Mojo/CouchDB.pm
+lib/Mojo/CouchDB/DB.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+README
+README.md
+t/01-local-integration.t
+t/02-promises.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

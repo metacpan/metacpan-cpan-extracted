@@ -6,16 +6,16 @@ use Example::Syntax;
 extends 'Catalyst::View::Errors::HTML';
 
 sub http_default($self, $c, $code, %args) {
-  return $c->view('HTML::Errors::Default', status_code=>$code, %args);
+   $c->view('HTML::Errors::Default', status_code=>$code, %args)->respond($code);
 }
 
 sub http_404($self, $c, %args) {
-  return $c->view('HTML::Errors::NotFound', %args);
+   $c->view('HTML::Errors::NotFound', %args)->respond(404);
 }
 
 sub http_403($self, $c, %args) {
-  $c->user->errors->add(undef, 'You must be logged in to see this page.');
-  return $c->view('HTML::Login', user=>$c->user, post_login_redirect=>$c->req->uri);
+   $c->view('HTML::Errors::Forbidden', %args)->respond(403);
 }
+
 
 __PACKAGE__->meta->make_immutable;

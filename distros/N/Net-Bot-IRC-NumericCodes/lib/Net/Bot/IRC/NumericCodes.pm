@@ -11,18 +11,18 @@ Net::Bot::IRC::NumericCodes - A module for abstracting IRC numeric codes.
 
 =head1 VERSION
 
-Version 0.05
+Version 1.0.0
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '1.0.0';
 
 =head1 SYNOPSIS
 
     use Net::Bot::IRC::NumericCodes;
-    
+
     my $nc = IRC::NumericCodes->new();
-    
+
     # Lookup the numeric based on the code string.
     if ($code == $nc->str2num("RPL_WELCOME")) {
         # Do something.
@@ -32,7 +32,7 @@ our $VERSION = '0.05';
     if ($strcode eq $nc->num2str(001)) {
         # Do some other stuff.
     }
-    
+
 For a full list of codes please read L<< http://tools.ietf.org/html/rfc2812 >>.
 
 =head1 FUNCTIONS
@@ -218,11 +218,11 @@ You can find documentation for this module with the perldoc command.
 
 =head1 DEVELOPMENT
 
-You can find the current sources for this at L<< git://github.com/flakblas/Net-Bot-IRC-NumericCodes.git >>.
+You can find the current sources for this at L<< git://github.com/markcaudill/Net-Bot-IRC-NumericCodes.git >>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Caudill, Mark.
+Copyright 2023 Caudill, Mark.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.66;
 
-package Tickit::WidgetRole::SingleChildContainer 0.36;
+package Tickit::WidgetRole::SingleChildContainer 0.37;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;

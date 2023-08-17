@@ -116,7 +116,7 @@ do
     }
 
 }
-while (defined $main::opt_loop && ($main::opt_loop < 0 || ++$loop_count < $main::opt_loop));
+while (defined $main::opt_loop && ($main::opt_loop == 0 || (++$loop_count < $main::opt_loop)));
 
 if (defined $main::opt_errors)
 {

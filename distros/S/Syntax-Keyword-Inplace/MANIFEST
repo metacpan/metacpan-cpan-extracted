@@ -1,15 +1,16 @@
+.editorconfig
 Build.PL
 Changes
 hax/perl-backcompat.c.inc
 lib/Syntax/Keyword/Inplace.pm
 lib/Syntax/Keyword/Inplace.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01inplace.t
 t/02funcs.t
 t/03targets.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

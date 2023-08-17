@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookExportXMLRequest.name :   ,
-# PostWorkbookExportXMLRequest.password :   ,
-# PostWorkbookExportXMLRequest.folder :   ,
-# PostWorkbookExportXMLRequest.storageName :   ,
-# PostWorkbookExportXMLRequest.outPath :   ,
-# PostWorkbookExportXMLRequest.outStorageName :   ,
-# PostWorkbookExportXMLRequest.checkExcelRestriction :    
+# PostWorkbookExportXMLRequest.name : The workbook(Excel/ODS/...) name.  ,
+# PostWorkbookExportXMLRequest.password : password  ,
+# PostWorkbookExportXMLRequest.folder : Original workbook folder.  ,
+# PostWorkbookExportXMLRequest.storageName : Storage name.  ,
+# PostWorkbookExportXMLRequest.outPath : Output file path.  ,
+# PostWorkbookExportXMLRequest.outStorageName : Storage name for output file.  ,
+# PostWorkbookExportXMLRequest.checkExcelRestriction : check excel restriction.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_export_xml' } = { 
-    	summary => '',
+    	summary => 'Export XML data from Excel file. When there are Xml Maps in Excel file, export xml data. When there is not xml map in Excel file, convert Excel file to xml file. ',
         params => $params,
         returns => 'string',
     };
@@ -143,49 +143,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook(Excel/ODS/...) name.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'password',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => '',
+     	description => 'Output file path.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => '',
+     	description => 'Storage name for output file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'check excel restriction.',
      	format => '',
      	read_only => '',
      		},    

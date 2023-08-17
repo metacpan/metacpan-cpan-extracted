@@ -1,4 +1,10 @@
 Revision history for Syntax-Operator-ExistsOr
 
+0.02    2023-07-21
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Adjusted documentation for release of Perl v5.38
+         * Remember to implement `no Syntax::Operator::*` to disable the syntax
+
 0.01    2022-12-25
         First version, released on an unsuspecting world.

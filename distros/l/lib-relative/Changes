@@ -1,3 +1,6 @@
+1.002     2023-07-23 21:17:44 EDT
+  - Fix checking whether symlinks are available for testing on Win32 and msys (#4, genio)
+
 1.001     2022-06-15 14:13:17 EDT
   - Skip symlink tests on msys as symlinks are broken on this platform (#2, pauloscustodio)
 

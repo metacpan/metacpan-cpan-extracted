@@ -46,9 +46,6 @@ use vars qw(@ISA @EXPORT_OK);
 		  %rdap_get_method_args
 		  $sepln
 
-		  $RDAP_LAYER_UNSET_OR_UNKNOWN
-		  %RDAP_REGISTERED_LAYERS
-
 		  %RDAP_FIELDSETS
 
 		  $RDAP_PAGE_SIZE
@@ -64,7 +61,6 @@ my @methods = qw /
     error
     status
     description
-    access_layer
     is_a_search
 
     size
@@ -107,17 +103,6 @@ our $RDAP_LOOKUP_ERR_FORBIDDEN       = 107;
 our $RDAP_LOOKUP_NOT_AUTHORIZED      = 108;
 our $RDAP_LOOKUP_ERR_INVALID         = 109;
 
-# Layer data
-our $RDAP_LAYER_UNSET_OR_UNKNOWN = 'unset-or-unknown';
-
-# expected and known layers
-our %RDAP_REGISTERED_LAYERS = (
-    anonymous   => 1,
-    registrar   => 1,
-    registry    => 1,
-    specialuser => 1
-    );
-
 # known fieldsets, default is empty, which does the same as 'id'
 our %RDAP_FIELDSETS = (
     'id'    => 1,
@@ -141,10 +126,6 @@ our $RDAP_ENTITY_QUOTA_PAGES =  16;
 my $URI_ARG_COUNT    = '1';    # 'true' or empty
 
 # 'brief' => 0,  # Not yet implemented 
-
-my %default_matchspec = (
-	"m_header__X-Access-Layer" => [ keys %RDAP_REGISTERED_LAYERS ]
-	);
 
 my $RDAP_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
 
@@ -252,13 +233,10 @@ new handles the following parameters:
     use_cache           => <0|1>,
     debug               => <0..8>,
     service_url         => <0|service_url,
-    norid_header_secret => <0|test_secret>,
-    norid_header_proxy  => <0|1>,
     norid_referral_ip   => <0|1|ip-address>,
     bauth_username      => <0|bauth_username>,
     bauth_password      => <0|bauth_password>,
     fieldset            => <0|fieldset>
-    access_layers       => { layer1=>1, layer2=>2, .. }
     page_size           => <0|page size>, default $RDAP_PAGE_SIZE
     cursor              => <0|cursor>
     nopages             => <0|nopages>, default $RDAP_ENTITY_QUOTA_PAGES
@@ -285,15 +263,6 @@ new handles the following parameters:
      be accessed. 
    - default is $SERVICE_URL above.
 
- * norid_header_secret: 
-   - access token for layered access, and
-     the token is sent in the 'X-RDAP-Secret' header.
-
- * norid_header_proxy : 
-   - Norid internal use only. 
-   - true if the calling client can act as a proxy,
-     and the header 'X-RDAP-Web-Proxy' is then set to 1.
-
  * norid_referral_ip : 
    - Norid internal use only.
    - set if the calling client ip address argument shall be sent. When set:
@@ -319,10 +288,6 @@ new handles the following parameters:
      should be returned for search hits
      If rate limiting becomes a problem, fieldset='full' could be
      considered.
-
- * access_layers:
-   - Optional. Access_layers to be expected and handled. Replaces the
-     preconfigered and default ones in %RDAP_REGISTERED_LAYERS.
 
  Paging parameters:
 
@@ -377,11 +342,6 @@ sub new {
 	my $ip = get_my_ip_address();
 	$args->{norid_referral_ip} = $ip if ($ip);
     }
-
-    # If both secret and basic auth params are set, select basic auth,
-    # delete secret
-    # FIXME: Remove secret support when totally replaced by auth rules.
-    delete $args->{norid_header_secret} if ($args->{bauth_username});
 
     # This debug dumps everything using $Net::RDAP::UA::DEBUG
     if ($args->{'debug'} && $args->{debug} == 3) {
@@ -498,34 +458,8 @@ sub _lookup_rdap {
 	    );
     }
 
-    ####
-    # Catching response header values are a pain, must be done by a handler,
-    # which only catches known values, not unknown or unexpected,
-    # like if a new layer name suddenly comes into question.
-    # https://metacpan.org/pod/HTTP::Config#Matching
-    unless ($self->{access_layers}) {
-	$ua->add_handler( response_header => \&_ua_callback, %default_matchspec );
-	#print STDERR "Using default access_layers: ", Dumper \%default_matchspec;
-    } else {
-	my %passed_matchspec = (
-	    "m_header__X-Access-Layer" => [ keys %{$self->{access_layers}} ]
-	    );
-	$ua->add_handler( response_header => \&_ua_callback, %passed_matchspec );
-	#print STDERR "Using application passed access_layers: ", Dumper \%passed_matchspec;
-    }
-
     $ua->default_header( Charset           => "UTF-8");
     $ua->default_header( 'Content-Type'    => "application/rdap+json");
-
-    if ($self->{norid_header_secret}) {
-	# Use Norid RDAP layer secret header
-	$ua->default_header( 'X-RDAP-Secret' => $self->{norid_header_secret});
-    }
-
-    if ($self->{norid_header_proxy}) {
-	# Use Norid RDAP proxy headers
-	$ua->default_header( 'X-RDAP-Web-Proxy' => 1);
-    }
 
     my $URL = $self->{service_url} . "/$uri";
 
@@ -544,8 +478,6 @@ sub _lookup_rdap {
 	print STDERR $sepln;
 	print STDERR "RDAPLookup: _lookup_rdap (v$VERSION) called with:\n";
  	print STDERR "  URL           : '$URL'\n"; 
-	print STDERR "  norid proxy is: ", $self->{norid_header_proxy} , "\n" if ($self->{norid_header_proxy});
-	print STDERR "  secret is     : ", $self->{norid_header_secret}, "\n" if ($self->{norid_header_secret});
 	print STDERR "  bauth_username: ", $self->{bauth_username}, "\n" if ($self->{bauth_username});
 	print STDERR "  referral_ip   : ", $self->{norid_referral_ip}  , "\n" if ($self->{norid_referral_ip});
 	print STDERR "  is_a_search   : ", $self->is_a_search || 0, "\n";
@@ -559,11 +491,6 @@ sub _lookup_rdap {
 	# so call it via the already created UA
 	$resp = $ua->head($URL);
 
-	my $access_layer = $self->ua->{response_headers}->{'x-access-layer'} ||
-	    $RDAP_LAYER_UNSET_OR_UNKNOWN;
-
-	$self->access_layer($access_layer);
-	
 	unless ($resp->is_success) {
 	    $self->error(_map_rdap_error($query, $resp->code));
 	    $self->status($resp->status_line);
@@ -644,16 +571,10 @@ sub _fetch_get_pages {
 	
 	my $resp = $self->fetch(URI->new($FURL), %BA_OPTIONS );
 
-	my $access_layer = $self->ua->{response_headers}->{'x-access-layer'} ||
-	    $RDAP_LAYER_UNSET_OR_UNKNOWN;
-
 	if ($debug == 1) {
 	    print STDERR " RDAPLookup search, pcnt: '$pcnt', lookup on FURL: $FURL\n";
 	    print STDERR "  pcnt: '$pcnt', max_pg_to_fetch: '$max_pg_to_fetch'\n";
-	    print STDERR "  returned x-access-layer header: ", $access_layer, "\n" ;
 	}
-
-	$self->access_layer($access_layer);
 
 	if ($self->{debug} == 100) {
 	    #print STDERR "Net::RDAP self for GET: ", Dumper $self, "\n";
@@ -671,7 +592,6 @@ sub _fetch_get_pages {
 	    return $self;
 	}
 
-	#print STDERR "Acccess layer: ", $self->access_layer, "\n";
 	#print STDERR "resp pcnt: '$pcnt': ", Dumper $resp, "\n";
 	#print STDERR "ua: ", Dumper $ua, "\n";
 	#print STDERR "ua: ", Dumper $ua->{handlers}->{response_header}, "\n";
@@ -951,27 +871,6 @@ sub get_href_page_cursor {
     }
     return $cursor;
 }
-
-=head2 _ua_callback
-
-UA callback function to collect relevant info from the HTTP response.
-
-For now, we want the response headers.
-
-=cut
-
-sub _ua_callback {
-    my($response, $ua, $handler) = @_;
-
-    #print STDERR "callback response: ", Dumper $response, "n";
-    #print STDERR "callback response headers: ", Dumper $response->headers->{'x-access-layer'}, "n";
-    #print STDERR "callback ua      : ", Dumper $ua, "n";
-    #print STDERR "handler          : ", Dumper $handler, "n";
-
-    $ua->{response_headers} = $response->headers;
-			   
-}
-
 
 =head2 _map_rdap_error
 
@@ -1844,8 +1743,6 @@ sub rdap_obj_as_string {
 		    service_url         => $self->{service_url},
 		    debug               => $self->{debug},
 		    use_cache           => $self->{use_cache},
-		    norid_header_secret => $self->{norid_header_secret},
-		    norid_header_proxy  => $self->{norid_header_proxy},
 		    bauth_username      => $self->{bauth_username},
 		    bauth_password      => $self->{bauth_password},
 		    force_ipv           => $self->{force_ipv},
@@ -2125,8 +2022,6 @@ sub rdap_get_entities_by_entity_handle {
 	    service_url         => $self->{service_url},
 	    debug               => $self->{debug},
 	    use_cache  	        => $self->{use_cache},
-	    norid_header_secret => $self->{norid_header_secret},
-	    norid_header_proxy  => $self->{norid_header_proxy},
 	    bauth_username      => $self->{bauth_username},
 	    bauth_password      => $self->{bauth_password},
 	    force_ipv           => $self->{force_ipv},
@@ -2184,8 +2079,6 @@ sub rdap_get_domains_by_entity_handle {
 	    service_url         => $self->{service_url},
 	    debug               => $self->{debug},
 	    use_cache  	        => $self->{use_cache},
-	    norid_header_secret => $self->{norid_header_secret},
-	    norid_header_proxy  => $self->{norid_header_proxy},
 	    bauth_username      => $self->{bauth_username},
 	    bauth_password      => $self->{bauth_password},
 	    force_ipv           => $self->{force_ipv},
@@ -2236,8 +2129,6 @@ sub rdap_get_entities_by_domain_name {
 	    service_url         => $self->{service_url},
 	    debug               => $self->{debug},
 	    use_cache           => $self->{use_cache},
-	    norid_header_secret => $self->{norid_header_secret},
-	    norid_header_proxy  => $self->{norid_header_proxy},
 	    bauth_username      => $self->{bauth_username},
 	    bauth_password      => $self->{bauth_password},
 	    force_ipv           => $self->{force_ipv},
@@ -2289,16 +2180,6 @@ RDAP service.
 
     my $q = 'norid.no';
     #$q = decode('ISO8859-1', 'øl.no');
-
-    # Authenticate with secret and be a proxy (Norid only) 
-    my $bo = NOLookup::RDAP::RDAPLookup->new(
-     {
-	service_url         => 'https://rdap.norid.no',
-	debug               => 0,
-	use_cache  	    => 0,
-	norid_header_secret => '<secret>',
-	norid_header_proxy  => 1,
-     });
 
     # Authenticate with basic authentication 
     my $bo = NOLookup::RDAP::RDAPLookup->new(

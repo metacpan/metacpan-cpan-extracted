@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetBackgroundRequest.name :   ,
-# PutWorksheetBackgroundRequest.sheetName :   ,
-# PutWorksheetBackgroundRequest.picPath :   ,
-# PutWorksheetBackgroundRequest.folder :   ,
-# PutWorksheetBackgroundRequest.storageName :   ,
+# PutWorksheetBackgroundRequest.name : The workbook name.  ,
+# PutWorksheetBackgroundRequest.sheetName : The worksheet name.  ,
+# PutWorksheetBackgroundRequest.picPath : picture full filename.  ,
+# PutWorksheetBackgroundRequest.folder : Original workbook folder.  ,
+# PutWorksheetBackgroundRequest.storageName : Storage name.  ,
 # PutWorksheetBackgroundRequest.File : File to upload   
 
 {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_background' } = { 
-    	summary => '',
+    	summary => 'Sets background image in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,35 +145,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pic_path' => {
      	datatype => 'string',
      	base_name => 'picPath',
-     	description => '',
+     	description => 'picture full filename.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

@@ -1,3 +1,8 @@
+0.341   2023-05-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Log output of system() and run(), in addition to readpipe().
+
+
 0.340   2021-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Log::ger 0.038: Log::ger::Plugin::MultilevelLog is

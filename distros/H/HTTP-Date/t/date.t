@@ -1,10 +1,9 @@
-#!perl -w
+#!perl
 
 use strict;
-use Test;
+use warnings;
 
-plan tests => 136;
-
+use Test::More tests => 141;
 use HTTP::Date;
 
 # test str2time for supported dates.  Test cases with 2 digit year
@@ -36,6 +35,7 @@ my (@tests) = (
     'Feb  3 1994',    # Unix 'ls -l' format
 
     "02-03-94  12:00AM",    # Windows 'dir' format
+    "02-03-1994  12:00AM",  # Windows 'dir' format with four-digit year
 
     # ISO 8601 formats
     '1994-02-03 00:00:00 +0000',
@@ -68,15 +68,15 @@ for (@tests) {
     my $t2 = str2time( lc($_), "GMT" );
     my $t3 = str2time( uc($_), "GMT" );
 
-    print "\n# '$_'\n";
+    note "\n'$_'";
 
-    ok( $t,  $time );
-    ok( $t2, $time );
-    ok( $t3, $time );
+    is( $t,  $time );
+    is( $t2, $time );
+    is( $t3, $time );
 }
 
 # test time2str
-ok( time2str($time), 'Thu, 03 Feb 1994 00:00:00 GMT' );
+is( time2str($time), 'Thu, 03 Feb 1994 00:00:00 GMT' );
 
 # test the 'ls -l' format with missing year$
 # round to nearest minute 3 days ago.
@@ -122,68 +122,75 @@ for (
             $bad++;
         }
     };
-    print defined($_) ? "\n# '$_'\n" : "\n# undef\n";
+    note defined($_) ? "\n'$_'" : "undef";
     ok( !$@ );
     ok( !$bad );
 }
 
-print "Testing AM/PM gruff...\n";
+note "Testing AM/PM gruff...";
 
 # Test the str2iso routines
 use HTTP::Date qw(time2iso time2isoz);
 
-print "Testing time2iso functions\n";
+note "Testing time2iso functions";
 
 my $t = time2iso( str2time("11-12-96  0:00AM") );
-ok( $t, "1996-11-12 00:00:00" );
+is( $t, "1996-11-12 00:00:00" );
 
 $t = time2iso( str2time("11-12-96 12:00AM") );
-ok( $t, "1996-11-12 00:00:00" );
+is( $t, "1996-11-12 00:00:00" );
 
 $t = time2iso( str2time("11-12-96  0:00PM") );
-ok( $t, "1996-11-12 12:00:00" );
+is( $t, "1996-11-12 12:00:00" );
 
 $t = time2iso( str2time("11-12-96 12:00PM") );
-ok( $t, "1996-11-12 12:00:00" );
+is( $t, "1996-11-12 12:00:00" );
 
 $t = time2iso( str2time("11-12-96  1:05AM") );
-ok( $t, "1996-11-12 01:05:00" );
+is( $t, "1996-11-12 01:05:00" );
 
 $t = time2iso( str2time("11-12-96 12:05AM") );
-ok( $t, "1996-11-12 00:05:00" );
+is( $t, "1996-11-12 00:05:00" );
 
 $t = time2iso( str2time("11-12-96  1:05PM") );
-ok( $t, "1996-11-12 13:05:00" );
+is( $t, "1996-11-12 13:05:00" );
 
 $t = time2iso( str2time("11-12-96 12:05PM") );
-ok( $t, "1996-11-12 12:05:00" );
+is( $t, "1996-11-12 12:05:00" );
+
+$t = time2iso( str2time("11-12-01 12:00PM") );
+is( $t, "2001-11-12 12:00:00" );
+
+$t = time2iso( str2time("11-12-1996 12:00AM") );
+is( $t, "1996-11-12 00:00:00" );
+
+$t = time2iso( str2time("11-12-2022 12:00AM") );
+is( $t, "2022-11-12 00:00:00" );
 
 $t = str2time("2000-01-01 00:00:01.234");
-print "FRAC $t = ", time2iso($t), "\n";
-ok( abs( ( $t - int($t) ) - 0.234 ) < 0.000001 );
+note "FRAC $t = ", time2iso($t);
+cmp_ok( abs( ( $t - int($t) ) - 0.234 ), '<', 0.000001 );
 
 $a = time2iso;
 $b = time2iso(500000);
-print "LOCAL $a  $b\n";
+note "LOCAL $a  $b";
 my $az = time2isoz;
 my $bz = time2isoz(500000);
-print "GMT   $az $bz\n";
+note "GMT   $az $bz";
 
-for ( $a,  $b )  { ok(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/); }
-for ( $az, $bz ) { ok(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\dZ$/); }
+for ( $a,  $b )  { like($_, qr/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/); }
+for ( $az, $bz ) { like($_, qr/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\dZ$/); }
 
 # Test the parse_date interface
 use HTTP::Date qw(parse_date);
 
 my @d = parse_date("Jan 1 2001");
-
-ok( !defined( pop(@d) ) );
-ok( "@d", "2001 1 1 0 0 0" );
+is_deeply( \@d, [2001, 1, 1, 0, 0, 0, undef] );
 
 # This test will break around year 2070
-ok( parse_date("03-Feb-20"), "2020-02-03 00:00:00" );
+is( parse_date("03-Feb-20"), "2020-02-03 00:00:00" );
 
 # This test will break around year 2048
-ok( parse_date("03-Feb-98"), "1998-02-03 00:00:00" );
+is( parse_date("03-Feb-98"), "1998-02-03 00:00:00" );
 
-print "HTTP::Date $HTTP::Date::VERSION\n";
+note "HTTP::Date $HTTP::Date::VERSION";

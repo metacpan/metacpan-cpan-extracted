@@ -3,11 +3,10 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
-use Test::Fatal;
 
 use feature 'signatures';
 no warnings 'experimental';
@@ -56,7 +55,7 @@ use testcase "t::func";
    func noparams() { return "constant" }
 
    is( noparams, "constant", 'func with no params' );
-   like( exception { noparams( 1, 2, 3 ) },
+   like( dies { noparams( 1, 2, 3 ) },
       # message was extended somewhere in perl 5.33
       qr/^Too many arguments for subroutine 'main::noparams' (\(.*\) )?at /,
       'Exception thrown from empty signature validation failure' );

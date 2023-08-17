@@ -48,11 +48,9 @@ my $logger
     my $pm = Parallel::ForkManager->new(1);
 
     my ( $exit_code, $message );
-    $pm->run_on_finish(
-        sub {
-            ( $exit_code, $message ) = @_[ 1, 5 ];
-        }
-    );
+    $pm->run_on_finish( sub {
+        ( $exit_code, $message ) = @_[ 1, 5 ];
+    } );
 
     my $signal_file = $tempdir->file('signal');
     if ( my $pid = $pm->start ) {
@@ -69,7 +67,7 @@ my $logger
     is_deeply(
         $message,
         { error => q{} },
-        'no error message from child process'
+        'no error message from child process',
     );
 
     if ( -f $file ) {

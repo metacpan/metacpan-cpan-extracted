@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 27;
+use Test::More tests => 28;
 
 BEGIN 
 {
@@ -127,3 +127,10 @@ is($field->error, 'Foo is a required field.', 'error en');
 $field->locale('de');
 
 is($field->error, 'Foo ist ein Pflichtfeld.', 'error de');
+
+$field->maxlength(123);
+$field->minlength(5);
+
+is($field->html_field, 
+   '<textarea class="error" cols="50" maxlength="123" minlength="5" name="foo" rows="6"></textarea>',
+   'html_field() 7');

@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.024 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-04-01.
+    This document describes version 1.030 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-07-25.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -21,52 +21,54 @@ DESCRIPTION
     11. csv-delete-fields
     12. csv-dump
     13. csv-each-row
-    14. csv-fill-template
-    15. csv-find-values
-    16. csv-freqtable
-    17. csv-gen
-    18. csv-get-cells
-    19. csv-grep
-    20. csv-info
-    21. csv-intrange
-    22. csv-list-field-names
-    23. csv-lookup-fields
-    24. csv-ltrim
-    25. csv-map
-    26. csv-munge-field
-    27. csv-munge-rows
-    28. csv-pick
-    29. csv-pick-fields
-    30. csv-pick-rows
-    31. csv-quote
-    32. csv-replace-newline
-    33. csv-rtrim
-    34. csv-select-fields
-    35. csv-select-rows
-    36. csv-setop
-    37. csv-shuf
-    38. csv-shuf-fields
-    39. csv-shuf-rows
-    40. csv-sort
-    41. csv-sort-fields
-    42. csv-sort-rows
-    43. csv-sorted
-    44. csv-sorted-fields
-    45. csv-sorted-rows
-    46. csv-split
-    47. csv-sum
-    48. csv-transpose
-    49. csv-trim
-    50. csv-uniq
-    51. csv-unquote
-    52. csv2ltsv
-    53. csv2paras
-    54. csv2td
-    55. csv2tsv
-    56. csv2vcf
-    57. list-csvutils
-    58. paras2csv
-    59. tsv2csv
+    14. csv-fill-cells
+    15. csv-fill-template
+    16. csv-find-values
+    17. csv-freqtable
+    18. csv-gen
+    19. csv-get-cells
+    20. csv-grep
+    21. csv-info
+    22. csv-intrange
+    23. csv-list-field-names
+    24. csv-lookup-fields
+    25. csv-ltrim
+    26. csv-map
+    27. csv-munge-field
+    28. csv-munge-rows
+    29. csv-pick
+    30. csv-pick-cells
+    31. csv-pick-fields
+    32. csv-pick-rows
+    33. csv-quote
+    34. csv-replace-newline
+    35. csv-rtrim
+    36. csv-select-fields
+    37. csv-select-rows
+    38. csv-setop
+    39. csv-shuf
+    40. csv-shuf-fields
+    41. csv-shuf-rows
+    42. csv-sort
+    43. csv-sort-fields
+    44. csv-sort-rows
+    45. csv-sorted
+    46. csv-sorted-fields
+    47. csv-sorted-rows
+    48. csv-split
+    49. csv-sum
+    50. csv-transpose
+    51. csv-trim
+    52. csv-uniq
+    53. csv-unquote
+    54. csv2ltsv
+    55. csv2paras
+    56. csv2td
+    57. csv2tsv
+    58. csv2vcf
+    59. list-csvutils
+    60. paras2csv
+    61. tsv2csv
 
 FUNCTIONS
   gen_csv_util
@@ -220,6 +222,11 @@ FUNCTIONS
 
     *   "input_parser", a Text::CSV_XS instance for input parsing.
 
+    *   "input_fields", array of str. Input CSV's field names.
+
+    *   "input_fields_idx", hash with field name as keys and field index
+        (0-based integer) as values.
+
     *   "input_filenames", array of str.
 
     *   "input_filename", str. The name of the current input file being read
@@ -261,6 +268,15 @@ FUNCTIONS
     following keys will be available:
 
     *   "output_emitter", a Text::CSV_XS instance for output.
+
+    *   "output_fields", array of str. Should be set to list of output field
+        names. If unset, will be set to be the same as "input_fields".
+
+    *   "output_fields_idx", hash with field names as keys and field indexes
+        (0-based integer) as values. Normally you do not need to set this
+        manually; you just need to set "output_fields" and this hash will be
+        computed automatically for you just before the first output row is
+        outputted.
 
     *   "output_filenames", array of str.
 

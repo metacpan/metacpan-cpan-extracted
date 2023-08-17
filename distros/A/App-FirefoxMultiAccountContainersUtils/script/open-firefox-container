@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FirefoxMultiAccountContainersUtils/open_firefox_container
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-04'; # DATE
+our $DATE = '2023-06-06'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxMultiAccountContainersUtils/open_firefox_container",
@@ -41,11 +41,15 @@ open-firefox-container - CLI to open URL in a new Firefox tab, in a specific mul
 
 =head1 VERSION
 
-This document describes version 0.015 of open-firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
+This document describes version 0.017 of open-firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
 
 =head1 SYNOPSIS
 
-B<open-firefox-container> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--profile>=I<firefox::local_profile_name>] [(B<--url>=I<str>)+|B<--urls-json>=I<json>] -- E<lt>I<container>E<gt> [I<url>] ...
+B<open-firefox-container> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<open-firefox-container> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<open-firefox-container> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--extra-firefox-options-after|/"--extra-firefox-options-after=s@">>=I<str>)+|B<L<--extra-firefox-options-after-json|/"--extra-firefox-options-after=s@">>=I<json>|(B<L<-a|/"--extra-firefox-options-after=s@">>=I<str>)+] [(B<L<--extra-firefox-options-before|/"--extra-firefox-options-before=s@">>=I<str>)+|B<L<--extra-firefox-options-before-json|/"--extra-firefox-options-before=s@">>=I<json>|(B<L<-b|/"--extra-firefox-options-before=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--profile|/"--profile=s">>=I<L<firefox::local_profile_name::default_first|Sah::Schema::firefox::local_profile_name::default_first>>] [(B<L<--url|/"--urls-json=s">>=I<str>)+|B<L<--urls-json|/"--urls-json=s">>=I<json>] -- E<lt>I<L<container|/"--container=s*">>E<gt> [I<L<url|/"--urls-json=s">>] ...
 
 
 
@@ -77,11 +81,44 @@ C<*> marks required options.
 
 =item B<--container>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
+
+=item B<--extra-firefox-options-after-json>=I<s>, B<-a>
+
+Additional options (arguments) to put after the URLs (JSON-encoded).
+
+See C<--extra-firefox-options-after>.
+
+=item B<--extra-firefox-options-after>=I<s@>
+
+Additional options (arguments) to put after the URLs.
+
+Can be specified multiple times.
+
+=item B<--extra-firefox-options-before-json>=I<s>, B<-b>
+
+Additional options (arguments) to put before the URLs (JSON-encoded).
+
+See C<--extra-firefox-options-before>.
+
+=item B<--extra-firefox-options-before>=I<s@>
+
+Additional options (arguments) to put before the URLs.
+
+Can be specified multiple times.
 
 =item B<--profile>=I<s>
 
+(No description)
+
+
 =item B<--url>=I<s@>
+
+(No description)
+
 
 Can also be specified as the 2nd command-line argument and onwards.
 
@@ -252,6 +289,12 @@ For fish and zsh, install L<shcompgen> as described above.
 
  % open-firefox-container mycontainer
 
+=head2 Open URL in a new tab in a new window
+
+ % open-firefox-container mycontainer www.example.com -b --new-window
+
+This command passes the C<--new-window> option to C<firefox>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-FirefoxMultiAccountContainersUtils>.
@@ -288,7 +331,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

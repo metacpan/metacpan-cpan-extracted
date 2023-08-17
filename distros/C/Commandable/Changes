@@ -1,5 +1,21 @@
 Revision history for Commandable
 
+0.11    2023-06-08
+        [CHANGES]
+         * Added `$finder->find_and_invoke_list` convenience
+         * Print information about `[no-]` prefix for negatable options in
+           `help` output
+         * Optionally require that options all come before non-option
+           arguments
+         * Optionally allow bundling of single-letter boolean options
+         * Convert hyphens in option names to underscores when inserting their
+           value into the options hash
+         * Support integer-type checking in options
+         * Added various docs
+
+        [BUGFIXES]
+         * Ensure that `$cinv->putback_tokens` escapes quotes
+
 0.10    2023-04-29
         [CHANGES]
          * Add more types of option - negatable, incrementable, multi-value

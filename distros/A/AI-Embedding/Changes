@@ -1,0 +1,38 @@
+Revision history for AI-Embedding
+
+1.01	 10th June 2023
+	  Corrected minor errors in POD including version number
+
+1.0      9th June 2023
+	  First release version
+	  
+	  Added acknowledgments to Ken Cotterill and Hugo van der Sanden
+	  
+0.1_4    8th June 2023
+	  NOTE - This is still a development release - DO NOT USE IN PRODUCTION
+	  
+	  Corrected badly declared dependency and opted for the core JSON::PP module	  
+
+0.1_3    8th June 2023
+	  NOTE - This is still a development release - DO NOT USE IN PRODUCTION
+	  
+	  Changed the implementation of the 'comparator' method so it can be used multiple times
+	  
+	  Corrected typos in POD
+	  
+	  Updated POD to reflect changes
+	  
+	  Added new tests to test updated 'camparator' method
+
+0.1_2	 2nd June 2023
+	  NOTE - This is still a development release - DO NOT USE IN PRODUCTION
+	  
+	  Added 'test_embedding' method to allow code testing without calling the chargable API
+	  
+	  Corrected authentication issues with OpenAI
+	  
+	  Corrected issues causing CPAN Tests to fail
+
+0.1_1    30th May 2023
+          First development version, released on an unsuspecting world.
+

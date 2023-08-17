@@ -1,12 +1,154 @@
 Revision history for Perl module PerlPowerTools
 
+1.037 2023-07-31T17:09:18Z
+	* adjusted several tests 
+	- find.t checks that its local::lib guess actually exists
+	- #220
+	- rm tests squash a warning about a redefined exit #216
+	- bc tests checked for English error messages, which is
+	- not always the case #215
+	- bc tests allow for different levels of perl precision
+	- (long double and quadmath) #214
+	* Michael Mikonos enhanced ed is many ways:
+	- Add -s for quieter operation #212
+	- Make -j act like the real ed #213
+	- better argument checking #217
+	- add list (l) command #218
+	- fix an edge case with "r file" #219
+	- fix range-specific write #221
+
+1.036_002 2023-07-29T20:26:25Z
+	* Improve the find.t test to not mistakenly use a non-existent
+	path for find2perl #220
+
+1.036_001 2023-07-24T22:11:32Z
+	* Clean up some test oddities that CPAN Testers found: #214, #215, #216
+
+1.036 2023-07-22T02:55:31Z
+	* All contributions are from Michael Mikonos unless otherwise noted.
+	* arithmetic
+		- fix a disappearing prompt #183
+	* base64
+		- improve detection of bad file arguments #202
+	* bc
+		- various fixes and more intensive testing (Gary Puckering) #167
+	* bcd
+		- new program #206
+	* cp
+		- handle many files at one #180
+		- completely rewritten by brian d foy
+	* ed
+		- implement t command (for copy) #207
+		- implement m command (move) #205
+		- save buffer on SIGHUP #197
+		- allow filenames that include a dash #188
+		- make opening a directory an error #178
+		- implement join command #176
+		- fix ed search direction #170
+	* expr
+		- fix broken >= #181
+	* grep
+		- disallow directories as argument to -f #192
+		- don't implicitly set -r #185
+	* install
+		- ignore directory is source file list #179
+	* od
+		- handles non-printables better #208
+		- validates radix argument from -A #204
+		- add -N switch to limit the input bytes #203
+	* printf
+		- support \v #186
+		- use the standard meaning of %c, not Perl's meaning.
+		- This is now the first character of the string #194
+	* rm
+		- exit with right error code on failure #200
+		- ignore directories with no -r #198
+	* sleep
+		- non-zero exit code on error #182
+	* split
+		- support reading from standard input #195
+	* test
+		- improved error messages #184
+	* unlink
+		- new command #201
+
+1.035 2023-06-15T09:57:49Z
+	* Gary Puckering fixed several issues with the units program. These
+	were GitHub #161, #162, and #163.
+
+1.034 2023-06-02T14:19:44Z
+	* turn on the ed prompt (#160, Michael Mikonos)
+
+1.033_04 2023-05-08T23:57:34Z
+	* mimedecoder now requires v5.12 since MIME::Tools uses Test::Deep,
+	which recently updated to v5.12
+	* Several enhancements from Michael Mikonos
+	* ed
+		- can report line numbers on print
+		- can insert empty buffer
+		- can no longer insert before line 0
+	* sum
+		- now correctly reports 32-bit checksums on 64-bit perls
+		- can read from standard input
+	* od
+		- zero fill input to required byte length
+	* bc
+		- use Math::BigFloat again
+	* echo
+		- emit newline by default
+
+
+1.033_03 2023-04-05T11:43:15Z
+	* echo with no arguments now emits a newline, from Michael Mikonos
+
+1.033_02 2023-04-01T20:42:05Z
+	* added tests for rev
+	* lots of fixes from Michael Mikonos
+	* install - now copies by default
+	* expr - fixed || bug
+	* ed - various fixes for error and value reporting
+	* od, rev, head can now read from STDIN
+	* rev - fix split before chomp bug
+	* morse - re-imagined by Michael Mikonos
+
+1.033_01 2023-03-21T15:23:29Z
+	* Added license files for all licenses that appear in the repo
+	* lots of fixes from Michael Mikonos
+	* od
+		- unpack bytes as unsigned in both hex and octal formats
+		- -s is renamed to -j (skip offset)
+		- exit with error for bad options
+	* bc
+		- remove feature for evaling arbitrary Perl expressions (very dangerous)
+		- autoinit simple variables (instead of warning or dying)
+	* xargs
+		- make echo the default command if you don't specify one
+		- reports system failure in exit
+	* grep - support - to mean stdin
+	* head - support - to mean stdin
+	* dc - remove ! command to run something in a shell
+	* hexdump - new tool!
+
+1.032 2023-02-06T15:39:43Z
+	* bc will immediately exit when it reads "quit", in line with
+	the GNU, and *BSD versions. From Michael Mikonos.
+
+1.031 2023-02-05T16:18:10Z
+	* remove t/pod.t from MANIFEST, since that is now in xt/
+
+1.029 2023-02-05T15:53:32Z
+	* several enhancements from Michael Mikonos to make exit values come
+	in line with the original tool. This one fixes up nl, cat, and whoami
+	* Michael Mikonos also fixed a problem in ed where a command was
+	doing the wrong thing.
+
 1.028 2022-01-19T05:43:47Z
 	* Try to fix Windows's handling of %Z in date - GitHub #98
 	* If you find problems, try adjusting the data in script/date and
 	open an issue with your changes
 
 1.027 2021-10-11T14:15:02Z
-	* Add whoami, originally from Oğuz Ersen. Let me know if you find 
+	* Add whoami, originally from Oğuz Ersen. Let me know if you find
 	problems with this.
 	* Fix a problem with the - special filename in bc, from Michael Mikonos
 	* Various improvements to make date work better on Windows (but still
@@ -23,7 +165,7 @@ Revision history for Perl module PerlPowerTools
 	* A fix for `grep -v` from Ed Avis (#69)
 
 1.022 2021-01-11T06:59:31Z
-	* Remove the make program and its dependencies, which recently 
+	* Remove the make program and its dependencies, which recently
 	became much heavier. Strawberry Perl comes with gmake and it's
 	to find make tools for Windows.
 	https://github.com/graphviz-perl/Graph/issues/17

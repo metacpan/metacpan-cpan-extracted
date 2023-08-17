@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::data::suunpack1;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

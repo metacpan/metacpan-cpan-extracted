@@ -45,7 +45,7 @@
             "File::Spec" : "0.7",
             "File::Temp" : "0",
             "IO::Scalar" : "0",
-            "Mail::Message" : "3.008",
+            "Mail::Message" : "3.013",
             "Mail::Transport" : "3.003",
             "Object::Realize::Later" : "0.19",
             "POSIX" : "0",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box"
       }
    },
-   "version" : "3.009",
+   "version" : "3.010",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.4.2
+version v0.5.0
 
 # SYNOPSIS
 
@@ -76,10 +76,14 @@ The keys are network blocks, and the values are an array reference of rates and 
 separated values can be used instead, to make it easier to directly use the configuration from something like
 [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral).)
 
-The rates are either the maximum number of requests per minute, or "whitelist" to not limit the network block, or
-"blacklist" to always forbid a network block.
+The rates are either the maximum number of requests per minute, or "whitelist" or "allowed" to not limit the network
+block, or "blacklist" or "rejected" to always forbid a network block.
 
-(The rate "-1" corresponds to "whitelist", and the rate "0" corresponds to "blacklist".)
+(The rate "-1" corresponds to "allowed", and the rate "0" corresponds to "rejected".)
+
+A special rate code of "norobots" will reject all requests except for `/robots.txt`, which is allowed at a rate of 60
+per minute.  This will allow you to block a robot but still allow the robot to access the robot rules that say it is
+disallowed.
 
 The tracking type defaults to "ip", which applies limits to individual ips. You can also use "netblock" to apply the
 limits to all hosts in that network block, or use a name so that limits are applied to all hosts in network blocks
@@ -127,6 +131,23 @@ e.g. one minute.  If you use a different time interval, then you may need to adj
 This does not try and enforce any consistency or block overlapping netblocks.  It trusts [Net::IP::Match::Trie](https://metacpan.org/pod/Net%3A%3AIP%3A%3AMatch%3A%3ATrie) to
 handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
 
+When configuring the ["greylist"](#greylist) netblocks from a configuration file using [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral), duplicate netblocks may
+be merged in unexpected ways, for example
+
+```
+10.0.0.0/16   60 group-1
+
+...
+
+10.0.0.0/16  120 group-2
+```
+
+may be merged as something like
+
+```perl
+'10.0.0.0/16' => [ '60 group-1', '120 group-2' ],
+```
+
 Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
 exception for trusted networks that gives them a higher rate than the default.
 
@@ -142,11 +163,9 @@ requests. This is probably not something that you want.
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.4.0, the this module requires Perl v5.12 or later.
+This module requires Perl v5.12 or later.
 
-If you need this module on Perl v5.10, please use one of the v0.3.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
+Future releases may only support Perl versions released in the last ten years
 
 # SOURCE
 

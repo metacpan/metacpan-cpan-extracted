@@ -43,7 +43,7 @@ sub mylog($msg, $when=time) {
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Function default parameters get converted";
-sub mylog { my ($msg,$when)=@_;$when=time if @_ <= 1;();
+sub mylog { my ($msg,$when)=@_;$when = time if @_ <= 1;();
     print "[$when] $msg\n";
 };
 RESULT
@@ -210,7 +210,7 @@ sub f ($a = \$b, $c=\@d, $e=\%f, $g=\&h, $i=\*j ) {
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Argument lists containing scalar references";
-sub f { my ($a,$c,$e,$g,$i)=@_;$a = \$b if @_ <= 0;$c=\@d if @_ <= 1;$e=\%f if @_ <= 2;$g=\&h if @_ <= 3;$i=\*j if @_ <= 4;();
+sub f { my ($a,$c,$e,$g,$i)=@_;$a = \$b if @_ <= 0;$c = \@d if @_ <= 1;$e = \%f if @_ <= 2;$g = \&h if @_ <= 3;$i = \*j if @_ <= 4;();
 ...
 }
 RESULT
@@ -333,7 +333,7 @@ sub f ($a = /\,/, $b=1) {
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Commas within regular expression matches don't split the argument lists";
-sub f { my ($a,$b)=@_;$a = /\,/ if @_ <= 0;$b=1 if @_ <= 1;();
+sub f { my ($a,$b)=@_;$a = /\,/ if @_ <= 0;$b = 1 if @_ <= 1;();
 ...
 }
 RESULT
@@ -345,7 +345,7 @@ sub f ($a = /\,/, $b=1) {
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Commas within regular expression matches don't split the argument lists";
-sub f { my ($a,$b)=@_;$a = /\,/ if @_ <= 0;$b=1 if @_ <= 1;();
+sub f { my ($a,$b)=@_;$a = /\,/ if @_ <= 0;$b = 1 if @_ <= 1;();
 ...
 }
 RESULT

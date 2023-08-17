@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/demo-border.pl
@@ -31,6 +32,7 @@ lib/Tickit/Widget/Fill.pm
 lib/Tickit/Widget/Frame.pm
 lib/Tickit/Widget/GridBox.pm
 lib/Tickit/Widget/HBox.pm
+lib/Tickit/Widget/HLine.pm
 lib/Tickit/Widget/HSplit.pm
 lib/Tickit/Widget/LinearBox.pm
 lib/Tickit/Widget/LinearSplit.pm
@@ -39,6 +41,7 @@ lib/Tickit/Widget/RadioButton.pm
 lib/Tickit/Widget/Spinner.pm
 lib/Tickit/Widget/Static.pm
 lib/Tickit/Widget/VBox.pm
+lib/Tickit/Widget/VLine.pm
 lib/Tickit/Widget/VSplit.pm
 lib/Tickit/WidgetRole.pm
 lib/Tickit/WidgetRole/Alignable.pm
@@ -75,4 +78,6 @@ t/33vbox.t
 t/34gridbox.t
 t/35hsplit.t
 t/35vsplit.t
+t/36hline.t
+t/36vline.t
 t/99pod.t

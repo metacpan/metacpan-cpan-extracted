@@ -1,0 +1,102 @@
+# Copyright (c) 2023 [--user-name]
+# MIT License
+
+class Native::BasicType {
+  use Native::Runtime;
+  use Native::ClassVar;
+  use Native::Field;
+  use Native::Method;
+  
+  use StringList;
+  
+  has runtime : Native::Runtime;
+  
+  native method get_id : int ();
+  
+  native method get_name : string ();
+  
+  native method get_class_dir : string ();
+  
+  native method get_class_rel_file : string ();
+  
+  native method get_parent : Native::BasicType ();
+  
+  native method get_category : int ();
+  
+  native method get_version_string : string ();
+  
+  native method is_pointer : int ();
+  
+  native method is_anon : int ();
+  
+  native method get_class_var_by_index : Native::ClassVar ($class_var_index : int);
+  
+  native method get_class_var_by_name : Native::ClassVar ($class_var_name : string);
+  
+  native method get_class_vars_length : int ();
+  
+  native method get_field_by_index : Native::Field ($field_index : int);
+  
+  native method get_field_by_name : Native::Field ($field_name : string);
+  
+  native method get_fields_length : int ();
+  
+  native method get_method_by_index : Native::Method ($method_index : int);
+  
+  native method get_method_by_name : Native::Method ($method_name : string);
+  
+  native method get_methods_length : int ();
+  
+  native method get_anon_basic_type_by_index : Native::BasicType ($anon_basic_type_index : int);
+  
+  native method get_anon_basic_types_length : int ();
+  
+  # Private Instance Methods - Only used in core.
+  method _get_native_method_names : string[] () {
+    
+    my $methods_length = $self->get_methods_length;
+    
+    my $native_method_names_list = StringList->new;
+    for (my $index = 0; $index < $methods_length; $index++) {
+      my $method = $self->get_method_by_index($index);
+      
+      if ($method->is_native) {
+        $native_method_names_list->push($method->get_name);
+      }
+    }
+    
+    return $native_method_names_list->to_array;
+  }
+  
+  method _get_precompile_method_names : string[] () {
+    
+    my $methods_length = $self->get_methods_length;
+    
+    my $precompile_method_names_list = StringList->new;
+    for (my $index = 0; $index < $methods_length; $index++) {
+      my $method = $self->get_method_by_index($index);
+      
+      if ($method->is_precompile) {
+        $precompile_method_names_list->push($method->get_name);
+      }
+    }
+    
+    return $precompile_method_names_list->to_array;
+  }
+  
+  method _get_class_file : string () {
+    
+    my $class_dir = $self->get_class_dir;
+    
+    unless ($class_dir) {
+      die "The class_dir field must be defined.";
+    }
+    
+    my $class_rel_file = $self->get_class_rel_file;
+    
+    my $class_file = "$class_dir/$class_rel_file";
+    
+    return $class_file;
+  }
+
+}

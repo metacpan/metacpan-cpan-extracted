@@ -27,14 +27,19 @@ my %WriteMakefileArgs = (
     "Log::Log4perl" => 0,
     "Net::DNS" => 0,
     "Net::IP::XS" => 0,
+    "Number::Bytes::Human" => 0,
     "PadWalker" => 0,
     "Path::Tiny" => 0,
+    "Rex" => 0,
     "SQL::Abstract" => 0,
+    "Syntax::Keyword::Match" => 0,
+    "Syntax::Operator::In" => 0,
     "System::Command" => 0,
     "URI" => 0,
-    "XML::RSS" => 0
+    "XML::RSS" => 0,
+    "YAML::XS" => 0
   },
-  "VERSION" => "0.230470",
+  "VERSION" => "0.231770",
   "test" => {
     "TESTS" => ""
   }
@@ -52,12 +57,17 @@ my %FallbackPrereqs = (
   "Log::Log4perl" => 0,
   "Net::DNS" => 0,
   "Net::IP::XS" => 0,
+  "Number::Bytes::Human" => 0,
   "PadWalker" => 0,
   "Path::Tiny" => 0,
+  "Rex" => 0,
   "SQL::Abstract" => 0,
+  "Syntax::Keyword::Match" => 0,
+  "Syntax::Operator::In" => 0,
   "System::Command" => 0,
   "URI" => 0,
-  "XML::RSS" => 0
+  "XML::RSS" => 0,
+  "YAML::XS" => 0
 );
 
 

@@ -1,0 +1,12 @@
+Revision history for DBIx-Class-MoreHelpers
+
+1.0001 2023-07-10T10:37:45-04:00 America/New_York
+ [STATISTICS]
+ - code churn: 1 file changed, 6 insertions(+), 1 deletion(-)
+
+1.0000 2023-07-10T10:36:50-04:00 America/New_York
+ [MAJOR]
+ - First version.
+
+ [STATISTICS]
+ - code churn: 14 files changed, 352 insertions(+), 54 deletions(-)

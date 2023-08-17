@@ -9,7 +9,8 @@ BEGIN {
 
 use Test::More tests => 6;
 use File::Spec::Functions ':ALL';
-use t::lib::Test;
+use lib 't/lib';
+use LocalTest;
 
 
 #####################################################################

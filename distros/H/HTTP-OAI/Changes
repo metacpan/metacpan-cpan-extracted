@@ -1,5 +1,8 @@
 Revision history for HTTP-OAI
 
+4.13  2023-06-06 11:43:51 CEST
+  - Fixing use lib bug [ppisar]
+  
 4.12  2022-09-13 10:05:28 CEST
   - Adding a HTTP_OAI_AGENT environment variable
 

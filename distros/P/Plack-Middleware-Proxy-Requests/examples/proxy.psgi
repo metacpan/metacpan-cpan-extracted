@@ -2,6 +2,9 @@
 
 # plackup -s Starlet -E Proxy proxy.psgi
 
+use strict;
+use warnings;
+
 use lib '../lib', 'lib';
 
 use Plack::Builder;

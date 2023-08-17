@@ -1,5 +1,35 @@
 Revision history for Perl extension XML::Enc.
 
+0.13 -- Tue Jul 04 18:57:34 ADT 2023
+
+    [ Major change since 0.11 ]
+
+    So... 326d823 fixes an issue introduced in 0.11.  You can ignore my
+    comments in the 0.11 Changes...
+
+    [Change Log]
+    - 7321de2 Indent SYNOPIS
+    - 326d823 Fix disappearing namespace bug in _decrypt_encrypted_node
+    - 2038d04 v0.12
+
+0.12 -- Mon Jul 03 16:12:56 ADT 2023
+
+    [ Major change since 0.11 ]
+
+    Major refactoring of the decrypt function and code improvements.
+    There should be no impact on existing application but it will
+    support more XML than previously.
+
+    - 3367a90 Be Perl 5.12 compatible
+    - 0419da9 No longer 5.8 compatible
+    - 4c5099e Fix the namespace of MGF
+    - 36480e5 Refactor the decrypt function
+    - 04734fc Change weird regexp ok to like
+    - 9934d81 Fix determination of aes_gcm for xmlsec1
+    - bf7298c Verify that xmlsec can decrypt XML::Enc XML with OAEPparams
+    - a0d296c Fix bitwise & versus logical &&
+    - c083828 v0.11
+
 0.11 -- Sun Mar 19 09:39:31 ADT 2023
 
     [ Major change since 0.08 ]

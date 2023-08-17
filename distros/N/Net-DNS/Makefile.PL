@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1921 2023-05-08 18:39:59Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1925 2023-05-31 11:58:59Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -22,7 +22,7 @@ my %metadata = (
 	ABSTRACT_FROM	   => $module,
 	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
-	MIN_PERL_VERSION   => '5.008009',
+	MIN_PERL_VERSION   => 5.008009,
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.48,
 		'Getopt::Long'	      => 2.43,
@@ -215,14 +215,14 @@ exit;
 
 package MY;				## customise generated Makefile
 
-sub test {
-	return join '', shift->SUPER::test(), <<'END' if $^O =~ /MSWin/i;
+sub constants {
+	return join "\n", shift->SUPER::constants(), <<'END' if $^O =~ /MSWin/i;
+#	include test directory
 TEST_DIR = t
 FULLPERLRUN = $(FULLPERL) "-I$(TEST_DIR)"
 END
-
-	return join '', shift->SUPER::test(), <<'END';
-# suppress parallel test execution	include test directory
+	return join "\n", shift->SUPER::constants(), <<'END';
+#	suppress parallel test execution	include test directory
 TEST_DIR = t
 FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL) "-I$(TEST_DIR)"
 END
@@ -230,8 +230,7 @@ END
 
 
 sub dist {
-	return join '', shift->SUPER::dist(), <<'END';
-
+	return join "\n", shift->SUPER::dist(), <<'END';
 # $(PERM_RWX) raises security issues downstream
 PREOP = $(CHMOD) $(PERM_RW) $(DISTVNAME)$(DFSEP)contrib$(DFSEP)* $(DISTVNAME)$(DFSEP)demo$(DFSEP)*
 END

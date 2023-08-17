@@ -8,7 +8,7 @@ use warnings;
 
 use Scalar::Util qw( blessed );
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 sub _init {
     my $self = shift;

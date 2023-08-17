@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -20,9 +20,10 @@
 
 namespace Catch {
 
-    struct TeamCityReporter final : StreamingReporterBase {
-        TeamCityReporter( ReporterConfig const& _config )
-        :   StreamingReporterBase( _config )
+    class TeamCityReporter final : public StreamingReporterBase {
+    public:
+        TeamCityReporter( ReporterConfig&& _config )
+        :   StreamingReporterBase( CATCH_MOVE(_config) )
         {
             m_preferences.shouldRedirectStdOut = true;
         }
@@ -52,7 +53,6 @@ namespace Catch {
     private:
         void printSectionHeader(std::ostream& os);
 
-    private:
         bool m_headerPrintedForThisSection = false;
         Timer m_testTimer;
     };

@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetChartAreaBorderRequest.name :   ,
-# GetChartAreaBorderRequest.sheetName :   ,
-# GetChartAreaBorderRequest.chartIndex :   ,
-# GetChartAreaBorderRequest.folder :   ,
+# GetChartAreaBorderRequest.name : The workbook name.  ,
+# GetChartAreaBorderRequest.sheetName : The worksheet name.  ,
+# GetChartAreaBorderRequest.chartIndex : The chart index.  ,
+# GetChartAreaBorderRequest.folder : Original workbook folder.  ,
 # GetChartAreaBorderRequest.storageName :    
 
 {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_chart_area_border' } = { 
-    	summary => '',
+    	summary => 'Gets chart area border description.',
         params => $params,
         returns => 'LineResponse',
     };
@@ -137,28 +137,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'chart_index' => {
      	datatype => 'int',
      	base_name => 'chartIndex',
-     	description => '',
+     	description => 'The chart index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},

@@ -1,97 +1,88 @@
-NAME
-    Device::CurrentCost - Perl modules for Current Cost energy monitors
-
-VERSION
-    version 1.142240
-
 SYNOPSIS
+
       use Device::CurrentCost;
       my $envy = Device::CurrentCost->new(device => '/dev/ttyUSB0');
-
+    
       $|=1; # don't buffer output
-
+    
       while (1) {
         my $msg = $envy->read() or next;
         print $msg->summary, "\n";
       }
-
+    
       use Device::CurrentCost::Constants;
       my $classic = Device::CurrentCost->new(device => '/dev/ttyUSB1',
                                              type => CURRENT_COST_CLASSIC);
       # ...
-
+    
       open my $cclog, '<', 'currentcost.log' or die $!;
       my $cc = Device::CurrentCost->new(filehandle => $cclog);
-
+    
       while (1) {
         my $msg = $cc->read() or next;
         print $msg->summary, "\n";
       }
 
 DESCRIPTION
+
     Module for reading from Current Cost energy meters.
 
     IMPORTANT: This is an early release and the API is still subject to
     change.
 
     The API for history is definitely not complete. This will change soon
-    and an mechanism for aggregating the history (which is split across many
-    messages) should be added.
+    and an mechanism for aggregating the history (which is split across
+    many messages) should be added.
 
-METHODS
-  "new(%parameters)"
-    This constructor returns a new Current Cost device object. The supported
-    parameters are:
+    This constructor returns a new Current Cost device object. The
+    supported parameters are:
 
     device
-        The name of the device to connect to. The value should be a tty
-        device name, e.g. "/dev/ttyUSB0" but a pipe or plain file should
-        also work. This parameter is mandatory if filehandle is not given.
+
+      The name of the device to connect to. The value should be a tty
+      device name, e.g. /dev/ttyUSB0 but a pipe or plain file should also
+      work. This parameter is mandatory if filehandle is not given.
 
     filehandle
-        A filehandle to read from. This parameter is mandatory if device is
-        not given.
+
+      A filehandle to read from. This parameter is mandatory if device is
+      not given.
 
     type
-        The type of the device. Currently either "CURRENT_COST_CLASSIC" or
-        "CURRENT_COST_ENVY". The default is "CURRENT_COST_ENVY".
+
+      The type of the device. Currently either CURRENT_COST_CLASSIC or
+      CURRENT_COST_ENVY. The default is CURRENT_COST_ENVY.
 
     baud
-        The baud rate for the device. The default is derived from the type
-        and is either 57600 (for Envy) or 9600 (for classic).
+
+      The baud rate for the device. The default is derived from the type
+      and is either 57600 (for Envy) or 9600 (for classic).
 
     history_callback
-        A function, taking a sensor id, a time interval and a hash reference
-        of data as arguments, to be called every time a new complete set of
-        history data becomes available. The data hash reference has keys of
-        the number of intervals ago and values of the reading at that time.
 
-  "device()"
+      A function, taking a sensor id, a time interval and a hash reference
+      of data as arguments, to be called every time a new complete set of
+      history data becomes available. The data hash reference has keys of
+      the number of intervals ago and values of the reading at that time.
+
     Returns the path to the device.
 
-  "type()"
     Returns the type of the device.
 
-  "baud()"
     Returns the baud rate.
 
-  "filehandle()"
     Returns the filehandle being used to read from the device.
 
-  "serial_port()"
     Returns the Device::SerialPort object for the device.
 
-  "open()"
     This method opens the serial port and configures it.
 
-  "read($timeout)"
     This method blocks until a new message has been received by the device.
     When a message is received a data structure is returned that represents
     the data received.
 
     IMPORTANT: This API is still subject to change.
 
-  "read_one(\$buffer)"
     This method attempts to remove a single Current Cost message from the
     buffer passed in via the scalar reference. When a message is removed a
     data structure is returned that represents the data received. If
@@ -99,7 +90,6 @@ METHODS
 
     IMPORTANT: This API is still subject to change.
 
-  "sensor_history($sensor, $interval)"
     This method returns the most recent complete sensor data for the given
     sensor and the given interval (where interval must be one of 'hours',
     'days', 'months' or 'years'). The return value is a hash reference with
@@ -109,12 +99,48 @@ METHODS
 
     It returns undef if no history data has been received yet.
 
-AUTHOR
-    Mark Hindess <soft-cpan@temporalanomaly.com>
+POD ERRORS
 
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Mark Hindess.
+    Hey! The above document had some coding errors, which are explained
+    below:
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    Around line 37:
+
+      Unknown directive: =method
+
+    Around line 74:
+
+      Unknown directive: =method
+
+    Around line 78:
+
+      Unknown directive: =method
+
+    Around line 82:
+
+      Unknown directive: =method
+
+    Around line 86:
+
+      Unknown directive: =method
+
+    Around line 90:
+
+      Unknown directive: =method
+
+    Around line 94:
+
+      Unknown directive: =method
+
+    Around line 98:
+
+      Unknown directive: =method
+
+    Around line 106:
+
+      Unknown directive: =method
+
+    Around line 115:
+
+      Unknown directive: =method
 

@@ -8,7 +8,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: data_in 
+ PERL PROGRAM NAME: data_in 
  AUTHOR: Juan Lorenzo
  DATE:   Nov 29 2017,
 

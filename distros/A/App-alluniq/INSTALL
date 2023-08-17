@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::alluniq
+
+
+## UNINSTALL 
+
+cpanm -U App::alluniq
+

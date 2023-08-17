@@ -11,6 +11,7 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateDropAttach::CreateTable; # required
 #use App::DBBrowser::CreateDropAttach::DropTable;   # required
 use App::DBBrowser::DB;
+#use App::DBBrowser::Opt::DBSet;                    # required
 #use App::DBBrowser::Opt::Set;                      # required
 
 
@@ -28,12 +29,11 @@ sub create_drop_or_attach {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    state $old_idx_cda = 1;
+    state $old_idx_cda = 0;
 
     CREATE_DROP_ATTACH: while ( 1 ) {
-        my $hidden = $sf->{d}{db_string};
-        my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
-          '- Create TABLE', '- Drop   TABLE', '- Create VIEV', '- Drop   VIEW', '- Attach DB',     '- Detach DB',
+        my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases, $db_setting ) = (
+             '- Create TABLE', '- Drop TABLE',   '- Create VIEV', '- Drop VIEW',   '- Attach DB',     '- Detach DB',     '  DB Settings'
         );
         my @entries;
         push @entries, $create_table if $sf->{o}{enable}{create_table};
@@ -44,34 +44,30 @@ sub create_drop_or_attach {
             push @entries, $attach_databases;
             push @entries, $detach_databases;
         }
+        push @entries, $db_setting   if $sf->{o}{enable}{db_settings};
         if ( ! @entries ) {
             return;
         }
-        my @pre = ( $hidden, undef );
+        my $prompt = $sf->{d}{db_string};
+        my @pre = ( undef );
         my $menu = [ @pre, @entries ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_cda, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_cda, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx_cda == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx_cda = 1;
+                $old_idx_cda = 0;
                 next CREATE_DROP_ATTACH;
             }
             $old_idx_cda = $idx;
         }
         my $choice = $menu->[$idx];
-        if ( $choice eq $hidden ) {
-            require App::DBBrowser::Opt::Set;
-            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $opt_set->set_options( 'import' );
-            next CREATE_DROP_ATTACH;
-        }
-        elsif ( $choice =~ /^-\ Create/i ) {
+        if ( $choice =~ /^-\ Create/i ) {
             require App::DBBrowser::CreateDropAttach::CreateTable;
             my $ct = App::DBBrowser::CreateDropAttach::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
@@ -117,6 +113,20 @@ sub create_drop_or_attach {
             }
             if ( $changed ) {
                 return 2;
+            }
+        }
+        elsif ( $choice eq $db_setting ) {
+            my $changed;
+            if ( ! eval {
+                require App::DBBrowser::Opt::DBSet;
+                my $db_opt_set = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
+                $changed = $db_opt_set->database_setting( $sf->{d}{db} );
+                1 }
+            ) {
+                $ax->print_error_message( $@ );
+            }
+            if ( $changed ) {
+                return 3;
             }
         }
     }

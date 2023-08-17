@@ -117,14 +117,18 @@ SYNOPSIS
         }
 
 VERSION
-        v0.8.1
+        v1.0.0
 
 DESCRIPTION
     The purpose of this module is to provide a powerful, yet simple
     framework to implement a RESTful API under Apache2 mod_perl.
 
+    As of version 1.0.0, this module inherits from Apache2::API. Please
+    check its documentation. Other methods specific to this module are
+    documented here.
+
 METHODS
-  new( hash )
+  new
     This initiates the package and take the following parameters:
 
     *   "request"
@@ -137,28 +141,11 @@ METHODS
         Optional. If set with a positive integer, this will activate verbose
         debugging message
 
-  apache_request()
-    Returns the Apache2::RequestRec object.
-
   api_uri()
     Returns the api URI as a "URI" object.
 
   api_version( integer or decimal )
     Get or sets the current api version on the server.
-
-  bailout( error string )
-    Given an error message, this will prepare the http header and response
-    accordingly.
-
-    It will call gettext to get the localised version of the error message,
-    so this method is expected to be overriden by inheriting package.
-
-    If the outgoing content type set is "application/json" then this will
-    return a properly formatted standard json error, such as:
-
-        { "error": { "code": 401, "message": "Something went wrong" } }
-
-    Otherwise, it will send to the client the message as is.
 
   base_path( path )
     If in the Directory directive of the Apache Virtual Host, a
@@ -168,97 +155,13 @@ METHODS
     The number of bytes threshold beyond which, the reply method will gzip
     compress the data returned to the client.
 
-  decode_base64( data )
-    Given some data, this will decode it using base64 algorithm. It uses
-    APR::Base64::decode in the background, because MIME::Decoder may have
-    some issue under mod_perl.
-
-  decode_json( data )
-    This decode from utf8 some data into a perl structure.
-
-    If an error occurs, it will return undef and set an exception that can
-    be accessed with the error method.
-
-  decode_uri( $string )
-    Provided with an uri encoded string, and this uses URI::Escape to return
-    its decoded form.
-
-    See also "encode_uri"
-
-  decode_url( $string )
-    Given a url-encoded string, this returns the decoded string
-
-    This uses APR::Request XS method.
-
-  decode_utf8( data )
-    Decode some data from ut8 into perl internal utf8 representation.
-
-    If an error occurs, it will return undef and set an exception that can
-    be accessed with the error method.
-
   default_methods( [ qw( GET POST ... ) ] )
     This sets or gets the default methods supported by an endpoint.
-
-  encode_base64( data )
-    Given some data, this will encode it using base64 algorithm. It uses
-    APR::Base64::encode in the background, because MIME::Decoder may have
-    some issue under mod_perl.
-
-  encode_json( hash reference )
-    Given a hash reference, this will encode it into a json data
-    representation.
-
-    However, this will not utf8 encode it, because this is done upon
-    printing the data and returning it to the client.
-
-  encode_uri( $string )
-    Provided with a string, and this uses URI::Escape to return an uri
-    encoded string.
-
-    See also "decode_uri"
-
-  encode_url( $string )
-    Given a string, this returns its url-encoded version
-
-    This uses APR::Request XS method.
-
-  encode_utf8( data )
-    This encode in ut8 the data provided and return it.
-
-    If an error occurs, it will return undef and set an exception that can
-    be accessed with the error method.
 
   endpoint( [ Net::API::REST::Endpoint object ] )
     This gets or sets an Net::API::REST::Endpoint object.
 
-  generate_uuid()
-    Generates an uuid string and return it.
-
-  get_auth_bearer()
-    Checks whether an "Authorization" http header was provided, and get the
-    Bearer value.
-
-    If no header was found, it returns an empty string.
-
-    If an error occurs, it will return undef and set an exception that can
-    be accessed with the error method.
-
-  get_handlers()
-    Returns a reference to a list of handlers enabled for a given phase.
-
-        $handlers_list = $res->get_handlers( $hook_name );
-
-    A list of handlers configured to run at the child_exit phase:
-
-        @handlers = @{ $res->get_handlers( 'PerlChildExitHandler' ) || []};
-
-  gettext( 'string id' )
-    Get the localised version of the string passed as an argument.
-
-    This is supposed to be superseded by the package inheriting from
-    Net::API::REST
-
-  handler()
+  handler
     This is the main method called by Apache to handle the response. To make
     this work, in the Apache configuration, you must set the handler to your
     package and have your package inherit from Net::API::REST. For example:
@@ -292,11 +195,6 @@ METHODS
     If the endpoint handler returns undef(), handler will return a "500
     Server Error", otherwise it will pass the return value back to Apache.
     The return value should be an Apache2::Const return code.
-
-  header_datetime( DateTime object )
-    Given a "DateTime" object, this sets it to GMT time zone and set the
-    proper formatter (Net::API::REST::DateTime) so that the stringification
-    is compliant with http headers standard.
 
   http_cors()
     Checks http request context and set the proper CORS http headers.
@@ -418,13 +316,6 @@ METHODS
                 }
             });
 
-  is_perl_option_enabled()
-    Checks if perl option is enabled in the Virtual Host and returns a
-    boolean value
-
-  json()
-    Returns a JSON object.
-
   jwt_accepted_algo( string )
     Get or set the algorithm supported for the JWT tokens.
 
@@ -505,48 +396,6 @@ METHODS
   jwt_verify
   jwt_verify_audience
   key
-  lang( string )
-    Set or get the current language
-
-  lang_unix( string )
-    Given a language, this returns a language code formatted the unix way,
-    ie en-GB would become en_GB
-
-  lang_web( string )
-    Given a language, this returns a language code formatted the web way, ie
-    en_GB would become en-GB
-
-  log_error( string )
-    Given a string, this will log the data into the error log.
-
-    When log_error is accessed with the Apache2::RequestRec the error gets
-    logged into the Virtual Host log, but when log_error gets accessed via
-    the Apache2::ServerUtil object, the error get logged into the Apache
-    main error log.
-
-  print( list )
-    print out the list of strings and returns the number of bytes sent.
-
-  push_handlers
-  reply( http code, message | hash reference )
-    Given an http code and a message, or just a hash reference, reply will
-    find out if the code provided is an error and format the replied json
-    appropriately like:
-
-        { "error": { "code": 400, "message": "Some error" } }
-
-    It will json encode the returned data and print it out back to the
-    client after setting the http returned code.
-
-    If a "cleanup" hash property is provided with a callback code reference
-    as a value, it will be set as a cleanup callback by calling
-    "$r->pool->cleanup_register". See
-    <https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHan
-    dler>
-
-    The Net::API::REST object will be passed as the first and only argument
-    to the callback routine.
-
   request()
     Returns the Net::API::REST::Request object. This object is set early
     during the instantiation in the handler method.
@@ -573,13 +422,6 @@ METHODS
     This sets the routes for all the endpoints proposed by the RESTful
     server
 
-  server()
-    Returns a Apache2::Server object
-
-  server_version()
-    Tries hard to find out the version number of the Apache server.
-
-  set_handlers()
   supported_api_versions( array reference )
     Get or set the list of supported api versions
 
@@ -588,11 +430,6 @@ METHODS
     ja_JP, zh_TW, etc
 
   supported_methods( array reference )
-    Get or set the list of supported http methods.
-
-  warn( list )
-    Given a list of string, this sends a warning.
-
   well_known()
     If the http request is for /.well-know, then we simply decline to
     process it.
@@ -610,48 +447,15 @@ METHODS
     program should be in control of the flow and decide whether to interrupt
     abruptly the execution, not some sub routines.
 
-Net::API::REST::Endpoint methods
-  access()
-    This specifies the level of access: private or restricted
-
-  handler()
-    Returns the handler found to handle the endpoint
-
-  is_method_allowed()
-    Returns a boolean on whether the given method is allowed.
-
-  methods()
-    Returns an array reference of the methods allowed for this endpoint.
-
-  path_info()
-    Returns a string for this path info, if any.
-
-  supported_content_types
-    Sets or gets an array of supported content types
-
-  variables()
-    Returns a hash reference of name => value pairs for the variables found
-    in the endpoint sought by in the http request. For example:
-
-        /org/jp/llc/12/directors/23/profile
-
-    In this case, llc has an id value of 12 and the director an id value of
-    23. They will be recorded as variables as instructed by the route map
-    set by the package using Net::API::REST
-
 AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
-    CPAN ID: jdeguest
-
-    https://gitlab.com/jackdeguest/Net-API-REST
-
 SEE ALSO
-    Net::API::REST::Cookie, Net::API::REST::DateTime, Net::API::REST::JWT,
-    Net::API::REST::Endpoint, Net::API::REST::Query,
-    Net::API::REST::Request, Net::API::REST::Request::Params,
-    Net::API::REST::Request::Upload, Net::API::REST::Response,
-    Net::API::REST::Status
+    Net::API::REST::JWT, Net::API::REST::Endpoint, Net::API::REST::Request,
+    Net::API::REST::Response
+
+    Apache2::API::DateTime, Apache2::API::Query, Apache2::API::Request,
+    Apache2::API::Response, Apache2::API::Status
 
     Apache2::Request, Apache2::RequestRec, Apache2::RequestUtil
 

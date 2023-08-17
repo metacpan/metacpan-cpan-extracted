@@ -3,9 +3,9 @@ package Acme::CPANModules::PortedFrom::Python;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-31'; # DATE
+our $DATE = '2023-04-23'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Python'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -49,6 +49,19 @@ highly inspired from Python's FastXLSX library."
 
 _
         },
+        {
+            module => 'Dash',
+            python_package => 'dash',
+            python_url => 'https://dash.plotly.com/',
+            tags => ['web'],
+            description => <<'_',
+
+From the module's documentation: "This package is a port of Plotly's Dash to
+Perl. Dash makes building analytical web applications very easy. No JavaScript
+required."
+
+_
+        },
     ],
 };
 
@@ -67,7 +80,7 @@ Acme::CPANModules::PortedFrom::Python - Modules/applications that are ported fro
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2023-01-31.
+This document describes version 0.007 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2023-04-23.
 
 =head1 DESCRIPTION
 
@@ -101,6 +114,15 @@ Author: L<ACIDLEMON|https://metacpan.org/author/ACIDLEMON>
 
 Quoted from the module's documentation: "The implementation of this module is
 highly inspired from Python's FastXLSX library."
+
+
+=item L<Dash>
+
+Author: L<PABLROD|https://metacpan.org/author/PABLROD>
+
+From the module's documentation: "This package is a port of Plotly's Dash to
+Perl. Dash makes building analytical web applications very easy. No JavaScript
+required."
 
 
 =back

@@ -3,6 +3,8 @@ use strict;
 use warnings;
 
 load_module($_) for qw(DOCSIS::ConfigFile YAML::PP);
+my $pp = YAML::PP->new;
+
 run(@ARGV);
 
 sub load_module {
@@ -10,61 +12,74 @@ sub load_module {
 }
 
 sub run {
-  my $self = bless {}, __PACKAGE__;
+  my $self = bless {args => {}}, __PACKAGE__;
+  my @unknown;
   while (@_) {
     my $arg = shift;
-    @$self{qw(action file)} = (run_decode => shift) if $arg =~ /^-d/;
-    @$self{qw(action file)} = (run_encode => shift) if $arg =~ /^-e/;
-    $self->{output} = shift if $arg =~ /^-o/;
-    $self->{config} = shift if $arg =~ /^-c/;
+    if ($arg =~ /^-d/)                   { @$self{qw(action file)} = (run_decode => shift); next }
+    if ($arg =~ /^-e/)                   { @$self{qw(action file)} = (run_encode => shift); next }
+    if ($arg =~ /^-c/)                   { $self->parse_config(shift); next }
+    if ($arg =~ /^-o/)                   { $self->{output} = shift; next }
+    if ($arg =~ /^-+h/)                  { $self->{help} = 1; next }
+    if ($arg =~ /^-V/ or $arg =~ /^--v/) { $self->{version} = 1; next }
+    push @unknown, $arg;
   }
 
+  die sprintf "Unknown argument%s: %s\n", @unknown == 1 ? '' : 's', join ', ', @unknown if @unknown;
+  return print "docsis-configfile version $DOCSIS::ConfigFile::VERSION\n" if $self->{version};
   die $self->usage unless $self->{action};
   $self->can($self->{action})->($self);
 }
 
+sub parse_config {
+  my ($self, $param) = @_;
+  die "Example usage: docsis-configfile -c shared_secret=mysecret\n" unless $param;
+  return $self->{args}{$1} = $2 if $param =~ /^(.*?)=(.*)$/;
+  my $args = $pp->load_file($param);
+  $self->{args}{$_} = $args->{$_} for keys %$args;
+}
+
 sub run_encode {
-  my $self = shift;
-  die "File missing.\n" unless $self->{file};
-  my $args = $self->{config} ? YAML::PP->new->load_file($self->{config}) : {};
-  my $data = YAML::PP->new->load_file($self->{file});
-  $self->_write(DOCSIS::ConfigFile::encode_docsis($data, $args));
+  my ($self) = @_;
+  die "Usage: docsis-configfile -e path/to/file.yaml\n" unless $self->{file};
+  my $data = $self->{file} eq '-' ? $pp->load_string(stdin()) : $pp->load_file($self->{file});
+  $self->_write(DOCSIS::ConfigFile::encode_docsis($data, $self->{args}));
 }
 
 sub run_decode {
-  my $self = shift;
-  die "File missing.\n" unless $self->{file};
-  $self->_write(YAML::PP->new->dump_string(DOCSIS::ConfigFile::decode_docsis(\$self->{file})));
+  my ($self) = @_;
+  die "Usage: docsis-configfile -d path/to/file.bin\n" unless $self->{file};
+  my $data = $self->{file} eq '-' ? stdin() : \$self->{file};
+  $self->_write($pp->dump_string(DOCSIS::ConfigFile::decode_docsis($data)));
+}
+
+sub stdin() {
+  return do { local $/; <STDIN> };
 }
 
 sub usage {
-  my $self = shift;
-  return <<"HERE";
-# Decode file to YAML
+  my ($self) = @_;
+  return <<'HERE';
+Decode DOCSIS binary file to YAML:
 
-docsis-configfile -d path/to/binary.file > out.yaml
-docsis-configfile -d path/to/binary.file -o out.yaml
+  $ docsis-configfile -d cm.bin > cm.yaml
+  $ docsis-configfile -d mta.bin -o mta.yaml
 
-# Encode YAML file
+Encode YAML file to DOCSIS config file:
 
-docsis-configfile -e path/to/yaml.file > out.bin
-docsis-configfile -e path/to/yaml.file -o out.bin
-docsis-configfile -e path/to/yaml.file -c myconfig.yaml
+  $ docsis-configfile -e cm.yaml > cm.bin
+  $ docsis-configfile -e mta.yaml -o mta.bin
+  $ docsis-configfile -e cm.yaml -o cm.bin -c shared_secret=mysecret
+  $ docsis-configfile -e mta.yaml -o mta.bin -c mta_algorithm=md5
+  $ docsis-configfile -e cm.yaml -o mta.bin -c mta_algorithm=sha1
 
-# Example myconfig.yaml
+Options:
 
----
-mta_algorithm: sha1
-shared_secret: supersecretstring
-
-# Options
-
-  -e in.yaml     - YAML DOCSIS file to encode
-  -d in.bin      - Binary DOCSIS file to decode
-  -o out.file    - Which file to write output to. Default is to write to STDOUT
-  -c config.yaml - Extra config parameters for encoding
-
-# See also
+  -e in.yaml      - YAML DOCSIS file to encode
+  -d in.bin       - Binary DOCSIS file to decode
+  -o out.bin      - Which file to write output to. Default is to write to STDOUT
+  -c option=value - Extra config parameters for encoding
+  -V, --version   - Show version number
 
 See https://metacpan.org/pod/DOCSIS::ConfigFile for more information.
 
@@ -76,5 +91,5 @@ sub _write {
   return print $data unless $self->{output};
   open my $FH, '>', $self->{output} or die "Can't write to $self->{output}: $!\n";
   my $written = syswrite $FH, $data;
-  die "Can't write to $self->{output}: $!\n" unless defined $written and $written != length $data;
+  die "Can't write to $self->{output}: $!\n" if !defined $written or $written != length $data;
 }

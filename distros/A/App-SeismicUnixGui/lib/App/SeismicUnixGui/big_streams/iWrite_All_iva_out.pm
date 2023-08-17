@@ -9,7 +9,7 @@ our $VERSION = '0.0.1';
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iWrite_All_iva_out 
+ PERL PROGRAM NAME: iWrite_All_iva_out 
  AUTHOR: Juan Lorenzo
  DATE: April 9 2009 
          sept. 13 2013

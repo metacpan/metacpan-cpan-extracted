@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -257,7 +257,7 @@ my %actions = (
 		my @arguments = @_;
 		$AUTHOR_TESTING = 1;
 		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
-			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING, 'jobs=i' => \my $jobs, 'inc|I=s@' => \my @inc)
+			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING, 'jobs|j=i' => \my $jobs, 'inc|I=s@' => \my @inc)
 			or return 2;
 		my @tests;
 		push @tests, 't' if -e 't';
@@ -504,6 +504,9 @@ my %actions = (
 		}
 
 		return 0;
+	},
+	version => sub {
+		say $VERSION;
 	},
 );
 

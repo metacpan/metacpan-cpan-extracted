@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker '6.56';
 WriteMakefile(
     NAME                => 'Data::BiaB',
     AUTHOR              => 'Johan Vromans <jv@cpan.org>',
-    VERSION             => '0.10.3',
+    VERSION             => '0.11',
 #    VERSION_FROM        => 'lib/Data/BiaB.pm',
     ABSTRACT_FROM       => 'lib/Data/BiaB.pm',
     PL_FILES            => {},

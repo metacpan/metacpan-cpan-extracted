@@ -1,0 +1,26 @@
+---
+abstract: 'Easily find files in a directory tree'
+author:
+  - 'Philip Gwyn <gwyn@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Find
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: '3'
+  Scalar::Util: '1.5'
+  Test::More: '0'
+  Text::Glob: '0.11'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

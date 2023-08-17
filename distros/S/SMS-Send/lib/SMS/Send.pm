@@ -1,4 +1,4 @@
-package SMS::Send;
+package SMS::Send; # git description: 11275f2
 
 =pod
 
@@ -65,10 +65,7 @@ use Module::Pluggable 3.7
 	except      => [ 'SMS::Send::Driver' ],
 	sub_name    => '_installed_drivers';
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.06';
-}
+our $VERSION = '1.07';
 
 # Private driver cache
 my @DRIVERS = ();

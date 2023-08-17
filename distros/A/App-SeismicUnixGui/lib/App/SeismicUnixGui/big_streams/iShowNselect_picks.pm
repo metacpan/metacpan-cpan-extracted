@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iShowNselect_picks;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iShowNselect_picks
+ PERL PROGRAM NAME: iShowNselect_picks
  AUTHOR: Juan Lorenzo
 
  DESCRIPTION:

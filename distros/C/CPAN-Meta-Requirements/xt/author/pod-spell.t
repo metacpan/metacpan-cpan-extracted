@@ -16,11 +16,13 @@ Ed
 Etheridge
 Golden
 Graham
+Howarth
 Karen
 Knop
 Leon
 Meta
 Miyagawa
+Paul
 Range
 Requirements
 Ricardo
@@ -37,6 +39,7 @@ invocant
 lib
 miyagawa
 mohawk2
+paul
 rjbs
 robario
 webmaster

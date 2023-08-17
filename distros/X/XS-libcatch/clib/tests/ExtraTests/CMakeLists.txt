@@ -2,7 +2,7 @@
 # Build extra tests.
 #
 
-cmake_minimum_required( VERSION 3.5 )
+cmake_minimum_required( VERSION 3.10 )
 
 project( Catch2ExtraTests LANGUAGES CXX )
 
@@ -12,6 +12,10 @@ message( STATUS "Extra tests included" )
 add_test(
   NAME TestShardingIntegration
   COMMAND ${PYTHON_EXECUTABLE} ${CATCH_DIR}/tests/TestScripts/testSharding.py $<TARGET_FILE:SelfTest>
+)
+set_tests_properties(TestShardingIntegration
+  PROPERTIES
+    LABELS "uses-python"
 )
 
 add_test(
@@ -121,6 +125,53 @@ set_tests_properties(
     FAIL_REGULAR_EXPRESSION "abort;terminate;fatal"
 )
 
+add_executable( BazelReporter ${TESTS_DIR}/X30-BazelReporter.cpp )
+target_compile_definitions( BazelReporter PRIVATE CATCH_CONFIG_BAZEL_SUPPORT )
+target_link_libraries(BazelReporter Catch2_buildall_interface)
+add_test(NAME CATCH_CONFIG_BAZEL_REPORTER-1
+  COMMAND
+  "${PYTHON_EXECUTABLE}" "${CATCH_DIR}/tests/TestScripts/testBazelReporter.py" $<TARGET_FILE:BazelReporter> "${CMAKE_CURRENT_BINARY_DIR}"
+)
+set_tests_properties(CATCH_CONFIG_BAZEL_REPORTER-1
+  PROPERTIES
+    LABELS "uses-python"
+)
+
+# We must now test this works without the build flag.
+add_executable( BazelReporterNoCatchConfig ${TESTS_DIR}/X30-BazelReporter.cpp )
+target_link_libraries(BazelReporterNoCatchConfig Catch2WithMain)
+add_test(NAME NO_CATCH_CONFIG_BAZEL_REPORTER-1
+  COMMAND
+  "${PYTHON_EXECUTABLE}" "${CATCH_DIR}/tests/TestScripts/testBazelReporter.py" $<TARGET_FILE:BazelReporterNoCatchConfig> "${CMAKE_CURRENT_BINARY_DIR}"
+)
+set_tests_properties(NO_CATCH_CONFIG_BAZEL_REPORTER-1
+  PROPERTIES
+    LABELS "uses-python"
+    ENVIRONMENT "BAZEL_TEST=1"
+)
+
+add_test(NAME BazelEnv::TESTBRIDGE_TEST_ONLY
+  COMMAND
+      $<TARGET_FILE:BazelReporterNoCatchConfig>
+)
+set_tests_properties(BazelEnv::TESTBRIDGE_TEST_ONLY
+  PROPERTIES
+    ENVIRONMENT "BAZEL_TEST=1;TESTBRIDGE_TEST_ONLY=Passing test case"
+    PASS_REGULAR_EXPRESSION "All tests passed \\(1 assertion in 1 test case\\)"
+)
+
+
+add_test(NAME BazelEnv::Sharding
+  COMMAND
+    "${PYTHON_EXECUTABLE}" "${CATCH_DIR}/tests/TestScripts/testBazelSharding.py"
+      $<TARGET_FILE:BazelReporterNoCatchConfig>
+      "${CMAKE_CURRENT_BINARY_DIR}"
+)
+set_tests_properties(BazelEnv::Sharding
+  PROPERTIES
+    LABELS "uses-python"
+)
+
 
 # The default handler on Windows leads to the just-in-time debugger firing,
 # which makes this test unsuitable for CI and headless runs, as it opens
@@ -159,7 +210,7 @@ add_test(NAME DeferredStaticChecks COMMAND DeferredStaticChecks -r compact)
 set_tests_properties(
     DeferredStaticChecks
   PROPERTIES
-    PASS_REGULAR_EXPRESSION "Failed 1 test case, failed all 3 assertions."
+    PASS_REGULAR_EXPRESSION "test cases: 1 \\| 1 failed\nassertions: 3 \\| 3 failed"
 )
 
 
@@ -191,9 +242,6 @@ set_tests_properties(
 if (MSVC)
     # This test fails if it does not compile and succeeds otherwise
     add_executable(WindowsHeader ${TESTS_DIR}/X90-WindowsHeaderInclusion.cpp)
-    set_property( TARGET WindowsHeader PROPERTY CXX_STANDARD 14 )
-    set_property( TARGET WindowsHeader PROPERTY CXX_STANDARD_REQUIRED ON )
-    set_property( TARGET WindowsHeader PROPERTY CXX_EXTENSIONS OFF )
     target_link_libraries( WindowsHeader Catch2WithMain )
     add_test(NAME WindowsHeader COMMAND WindowsHeader -r compact)
     list(APPEND CATCH_WARNING_TARGETS ${EXTRA_TEST_BINARIES} WindowsHeader)
@@ -206,6 +254,10 @@ add_test(
   NAME PartialTestCaseEvents
   COMMAND ${PYTHON_EXECUTABLE} ${CATCH_DIR}/tests/TestScripts/testPartialTestCaseEvent.py $<TARGET_FILE:PartialTestCaseEvents>
 )
+set_tests_properties(PartialTestCaseEvents
+  PROPERTIES
+    LABELS "uses-python"
+)
 
 add_executable(BenchmarksInCumulativeReporter ${TESTS_DIR}/X22-BenchmarksInCumulativeReporter.cpp)
 target_link_libraries(BenchmarksInCumulativeReporter PRIVATE Catch2::Catch2WithMain)
@@ -217,6 +269,7 @@ set_tests_properties(
     BenchmarksInCumulativeReporter
   PROPERTIES
     PASS_REGULAR_EXPRESSION "1\n2\n3\n4\n5\n"
+    COST 30
 )
 
 
@@ -239,6 +292,117 @@ set_tests_properties(
     Reporters::selection-is-case-insensitive
   PROPERTIES
     PASS_REGULAR_EXPRESSION "TestReporter constructed"
+)
+
+add_executable(CapturedStdoutInTestCaseEvents ${TESTS_DIR}/X27-CapturedStdoutInTestCaseEvents.cpp)
+target_link_libraries(CapturedStdoutInTestCaseEvents PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME Reporters::CapturedStdOutInEvents
+  COMMAND CapturedStdoutInTestCaseEvents
+    --reporter test-reporter
+)
+set_tests_properties(
+    Reporters::CapturedStdOutInEvents
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "X27 - TestReporter constructed"
+    FAIL_REGULAR_EXPRESSION "X27 ERROR"
+)
+
+
+if (MSVC)
+  set(_NullFile "NUL")
+else()
+  set(_NullFile "/dev/null")
+endif()
+
+add_executable(ListenerStdoutCaptureInMultireporter ${TESTS_DIR}/X24-ListenerStdoutCaptureInMultireporter.cpp)
+target_link_libraries(ListenerStdoutCaptureInMultireporter PRIVATE Catch2::Catch2WithMain)
+
+# This test checks that there is nothing written out from the process,
+# but if CMake is running the tests under Valgrind or similar tool, then
+# that will write its own output to stdout and the test would fail.
+if (NOT MEMORYCHECK_COMMAND)
+  add_test(
+    NAME MultiReporter::NoncapturingListenerDoesntCauseStdoutPassThrough
+    COMMAND ListenerStdoutCaptureInMultireporter
+      --reporter xml::out=${_NullFile}
+      --reporter junit::out=${_NullFile}
+  )
+
+  set_tests_properties(
+      MultiReporter::NoncapturingListenerDoesntCauseStdoutPassThrough
+    PROPERTIES
+      PASS_REGULAR_EXPRESSION "X24 - NonCapturingListener initialized"
+      FAIL_REGULAR_EXPRESSION "X24 - FooBarBaz"
+  )
+endif()
+
+
+add_executable(ListenerCanAskForCapturedStdout ${TESTS_DIR}/X25-ListenerCanAskForCapturedStdout.cpp)
+target_link_libraries(ListenerCanAskForCapturedStdout PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME MultiReporter::CapturingListenerCausesStdoutCapture
+  COMMAND ListenerCanAskForCapturedStdout
+    --reporter compact::out=${_NullFile}
+    --reporter console::out=${_NullFile}
+)
+set_tests_properties(
+    MultiReporter::CapturingListenerCausesStdoutCapture
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "CapturingListener initialized"
+    FAIL_REGULAR_EXPRESSION "X25 - ERROR"
+)
+
+add_executable(ReporterPreferencesForPassingAssertionsIsRespected ${TESTS_DIR}/X26-ReporterPreferencesForPassingAssertionsIsRespected.cpp)
+target_link_libraries(ReporterPreferencesForPassingAssertionsIsRespected PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME Reporters::PreferencesForPassingAssertionsIsRespected
+  COMMAND ReporterPreferencesForPassingAssertionsIsRespected
+    --reporter test-reporter
+)
+set_tests_properties(
+    Reporters::PreferencesForPassingAssertionsIsRespected
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "X26 - TestReporter constructed"
+    FAIL_REGULAR_EXPRESSION "X26 - assertionEnded"
+)
+add_test(
+  NAME MultiReporter::PreferencesForPassingAssertionsIsRespected
+  COMMAND ReporterPreferencesForPassingAssertionsIsRespected
+    --reporter test-reporter
+    --reporter console::out=${_NullFile}
+)
+set_tests_properties(
+    MultiReporter::PreferencesForPassingAssertionsIsRespected
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "X26 - TestReporter constructed"
+    FAIL_REGULAR_EXPRESSION "X26 - assertionEnded"
+)
+
+add_executable(ListenersGetEventsBeforeReporters ${TESTS_DIR}/X28-ListenersGetEventsBeforeReporters.cpp)
+target_link_libraries(ListenersGetEventsBeforeReporters PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME ListenersGetEventsBeforeReporters
+  COMMAND ListenersGetEventsBeforeReporters --reporter test-reporter
+)
+set_tests_properties(
+    ListenersGetEventsBeforeReporters
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "X28 - TestReporter constructed"
+    FAIL_REGULAR_EXPRESSION "X28 - ERROR"
+)
+
+add_executable(CustomArgumentsForReporters ${TESTS_DIR}/X29-CustomArgumentsForReporters.cpp)
+target_link_libraries(CustomArgumentsForReporters PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME CustomArgumentsForReporters
+  COMMAND CustomArgumentsForReporters
+    --reporter "test-reporter::Xa b=c 1::Xz:e = 1234"
+)
+set_tests_properties(
+    CustomArgumentsForReporters
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "Xa b=c 1::Xz:e = 1234"
 )
 
 
@@ -290,6 +454,31 @@ set_tests_properties(
     FAIL_REGULAR_EXPRESSION "error: .* already defined\\."
 )
 
+
+add_executable(DuplicatedReporters ${TESTS_DIR}/X35-DuplicatedReporterNames.cpp)
+target_link_libraries(DuplicatedReporters PRIVATE Catch2::Catch2WithMain)
+add_test(
+  NAME Reporters::RegistrationErrorsAreCaught
+  COMMAND $<TARGET_FILE:DuplicatedReporters>
+)
+set_tests_properties(
+    Reporters::RegistrationErrorsAreCaught
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "Errors occurred during startup!"
+)
+
+
+add_executable(AssertionStartingEventGoesBeforeAssertionIsEvaluated
+  X20-AssertionStartingEventGoesBeforeAssertionIsEvaluated.cpp
+)
+target_link_libraries(AssertionStartingEventGoesBeforeAssertionIsEvaluated
+  PRIVATE Catch2::Catch2WithMain
+)
+add_test(
+  NAME ReporterEvents::AssertionStartingHappensBeforeAssertionIsEvaluated
+  COMMAND $<TARGET_FILE:AssertionStartingEventGoesBeforeAssertionIsEvaluated>
+)
+
 #add_executable(DebugBreakMacros ${TESTS_DIR}/X12-CustomDebugBreakMacro.cpp)
 #target_link_libraries(DebugBreakMacros Catch2)
 #add_test(NAME DebugBreakMacros COMMAND DebugBreakMacros --break)
@@ -299,7 +488,43 @@ set_tests_properties(
 #    PASS_REGULAR_EXPRESSION "Pretty please, break into debugger"
 #)
 
+add_executable(NoTests ${TESTS_DIR}/X92-NoTests.cpp)
+target_link_libraries(NoTests PRIVATE Catch2::Catch2WithMain)
+
+add_test(
+  NAME TestSpecs::EmptySpecWithNoTestsFails
+  COMMAND $<TARGET_FILE:NoTests>
+)
+set_tests_properties(TestSpecs::EmptySpecWithNoTestsFails
+  PROPERTIES
+    WILL_FAIL ON
+)
+
+add_test(
+  NAME TestSpecs::OverrideFailureWithEmptySpec
+  COMMAND $<TARGET_FILE:NoTests> --allow-running-no-tests
+)
+
+add_test(
+  NAME List::Listeners::WorksWithoutRegisteredListeners
+  COMMAND $<TARGET_FILE:NoTests> --list-listeners
+)
+
+
+add_executable(AllSkipped ${TESTS_DIR}/X93-AllSkipped.cpp)
+target_link_libraries(AllSkipped PRIVATE Catch2::Catch2WithMain)
+
+add_test(
+  NAME TestSpecs::SkippingAllTestsFails
+  COMMAND $<TARGET_FILE:AllSkipped>
+)
+set_tests_properties(TestSpecs::SkippingAllTestsFails
+  PROPERTIES
+    WILL_FAIL ON
+)
+
 set( EXTRA_TEST_BINARIES
+    AllSkipped
     PrefixedMacros
     DisabledMacros
     DisabledExceptions-DefaultHandler
@@ -310,15 +535,10 @@ set( EXTRA_TEST_BINARIES
     DuplicatedTestCases-SameNameAndTags
     DuplicatedTestCases-SameNameDifferentTags
     DuplicatedTestCases-DuplicatedTestCaseMethods
+    NoTests
+    ListenersGetEventsBeforeReporters
 #    DebugBreakMacros
 )
-
-# Shared config
-foreach( test ${EXTRA_TEST_BINARIES} )
-    set_property( TARGET ${test} PROPERTY CXX_STANDARD 14 )
-    set_property( TARGET ${test} PROPERTY CXX_STANDARD_REQUIRED ON )
-    set_property( TARGET ${test} PROPERTY CXX_EXTENSIONS OFF )
-endforeach()
 
 # Notice that we are modifying EXTRA_TEST_BINARIES destructively, do not
 # use it after this point!
@@ -336,9 +556,6 @@ add_executable(AmalgamatedTestCompilation
   ${CATCH_DIR}/extras/catch_amalgamated.cpp
 )
 target_include_directories(AmalgamatedTestCompilation PRIVATE ${CATCH_DIR}/extras)
-set_property( TARGET AmalgamatedTestCompilation PROPERTY CXX_STANDARD 14 )
-set_property( TARGET AmalgamatedTestCompilation PROPERTY CXX_STANDARD_REQUIRED ON )
-set_property( TARGET AmalgamatedTestCompilation PROPERTY CXX_EXTENSIONS OFF )
 
 add_test(NAME AmalgamatedFileTest COMMAND AmalgamatedTestCompilation)
 set_tests_properties(

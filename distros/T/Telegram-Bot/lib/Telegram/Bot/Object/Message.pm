@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Message;
-$Telegram::Bot::Object::Message::VERSION = '0.021';
+$Telegram::Bot::Object::Message::VERSION = '0.023';
 # ABSTRACT: The base class for the Telegram type "Message".
 
 
@@ -27,6 +27,7 @@ use Telegram::Bot::Object::Venue;
 use Telegram::Bot::Object::SuccessfulPayment;
 use Telegram::Bot::Object::PassportData;
 use Telegram::Bot::Object::InlineKeyboardMarkup;
+use Telegram::Bot::Object::ReplyKeyboardMarkup;
 
 use Data::Dumper;
 
@@ -81,7 +82,7 @@ has 'invoice'; # Invoice
 has 'successful_payment'; # SuccessfulPayment
 has 'connected_website';
 has 'passport_data'; # PassportData
-has 'reply_markup'; # Array of InlineKeyboardMarkup
+has 'reply_markup'; # Array of InlineKeyboardMarkup/ReplyKeyboardMarkup
 
 sub fields {
   return {
@@ -119,6 +120,7 @@ sub fields {
           'Telegram::Bot::Object::SuccessfulPayment'    => [qw/successful_payment/],
           'Telegram::Bot::Object::PassportData'         => [qw/passport_data/],
           'Telegram::Bot::Object::InlineKeyboardMarkup' => [qw/reply_markup/],
+          'Telegram::Bot::Object::ReplyKeyboardMarkup'  => [qw/reply_markup/],
 
   };
 }
@@ -148,7 +150,7 @@ Telegram::Bot::Object::Message - The base class for the Telegram type "Message".
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 DESCRIPTION
 
@@ -164,13 +166,23 @@ A convenience method to reply to a message with text.
 Will return the L<Telegram::Bot::Object::Message> object representing the message
 sent.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Justin Hawkins <justin@eatmorecode.com>
 
+=item *
+
+James Green <jkg@earth.li>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Justin Hawkins.
+This software is copyright (c) 2023 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

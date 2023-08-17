@@ -125,6 +125,20 @@ static int build_infix_opname(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *h
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static int build_lexvar_intro(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  PADOFFSET padix = args[0]->padix;
+  OP *expr = args[1]->op;
+
+  OP *varop = newOP(OP_PADSV, OPf_MOD|OPf_REF | (OPpLVAL_INTRO << 8));
+  varop->op_targ = padix;
+
+  OP *assignop = newASSIGNOP(OPf_WANT_VOID, varop, 0, newSVOP(OP_CONST, 0, newSViv(1)));
+
+  *out = newLISTOP(OP_LINESEQ, 0, assignop, expr);
+  return KEYWORD_PLUGIN_EXPR;
+}
+
 static void setup_block_VAR(pTHX_ void *hookdata)
 {
   char *varname = hookdata;
@@ -294,6 +308,20 @@ static const struct XSParseKeywordHooks hooks_lexvar_my = {
   .build1 = &build_constpadix,
 };
 
+static const struct XSParseKeywordHooks hooks_lexvar_my_intro = {
+  .flags = XPK_FLAG_BLOCKSCOPE,
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_LEXVAR_MY(XPK_LEXVAR_ANY),
+    XPK_KEYWORD("in"),
+    XPK_INTRO_MY,
+    XPK_TERMEXPR,
+    0
+  },
+  .build = &build_lexvar_intro,
+};
+
 static const struct XSParseKeywordHooks hooks_attrs = {
   .permit_hintkey = hintkey,
 
@@ -360,6 +388,20 @@ static const struct XSParseKeywordHooks hooks_autosemi = {
   .build1 = &build_literal,
 };
 
+static const struct XSParseKeywordHooks hooks_warning = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_WARNING("A warning here\n"),
+  .build1 = &build_literal,
+};
+
+static const struct XSParseKeywordHooks hooks_warning_deprecated = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_WARNING_DEPRECATED("A deprecated warning here\n"),
+  .build1 = &build_literal,
+};
+
 MODULE = t::pieces  PACKAGE = t::pieces
 
 BOOT:
@@ -389,6 +431,7 @@ BOOT:
   register_xs_parse_keyword("piecelexvarname", &hooks_lexvar_name, NULL);
   register_xs_parse_keyword("piecelexvar",     &hooks_lexvar,      NULL);
   register_xs_parse_keyword("piecelexvarmy",   &hooks_lexvar_my,   NULL);
+  register_xs_parse_keyword("piecelexvarmyintro", &hooks_lexvar_my_intro, NULL);
 
   register_xs_parse_keyword("pieceattrs", &hooks_attrs, NULL);
 
@@ -404,3 +447,6 @@ BOOT:
   register_xs_parse_keyword("piecekw",  &hooks_kw,  newSVpvs("bar"));
 
   register_xs_parse_keyword("pieceautosemi", &hooks_autosemi, newSVpvs("EOS"));
+
+  register_xs_parse_keyword("piecewarning", &hooks_warning, &PL_sv_undef);
+  register_xs_parse_keyword("piecewarndep", &hooks_warning_deprecated, &PL_sv_undef);

@@ -1,5 +1,3 @@
-# $Id: Mac.pm,v 1.6 2001/04/20 23:23:40 btrott Exp $
-
 package Net::SSH::Perl::Mac;
 
 use strict;

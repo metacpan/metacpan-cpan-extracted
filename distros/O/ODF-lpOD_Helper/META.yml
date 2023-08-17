@@ -8,6 +8,7 @@ build_requires:
   Data::Dumper: '0'
   Encode: '0'
   English: '0'
+  Env: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Path: '0'
@@ -56,7 +57,7 @@ resources:
   bugtracker: https://github.com/jimav/ODF-lpOD_Helper/issues
   homepage: https://github.com/jimav/ODF-lpOD_Helper
   repository: https://github.com/jimav/ODF-lpOD_Helper.git
-version: '5.011'
+version: '5.012'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

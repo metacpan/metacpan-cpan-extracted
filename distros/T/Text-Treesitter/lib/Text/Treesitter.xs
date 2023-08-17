@@ -17,9 +17,13 @@ typedef TSLanguage    *Text__Treesitter__Language;
 typedef TSNode         Text__Treesitter___Node;
 typedef TSParser      *Text__Treesitter__Parser;
 typedef TSQuery       *Text__Treesitter__Query;
-typedef TSQueryCursor *Text__Treesitter__QueryCursor;
-typedef TSQueryMatch   Text__Treesitter__QueryMatch;
+typedef TSQueryCursor *Text__Treesitter___QueryCursor;
+typedef TSQueryMatch   Text__Treesitter___QueryMatch;
 typedef TSTree        *Text__Treesitter___Tree;
+
+#ifndef av_count
+#  define av_count(av)  (AvFILL(av)+1)
+#endif
 
 static SV *S_newSVnode(pTHX_ TSNode node)
 {
@@ -31,7 +35,7 @@ static SV *S_newSVnode(pTHX_ TSNode node)
 
 static SV *S_newSVquerymatch(pTHX_ TSQueryMatch *match)
 {
-  return sv_setref_pvn(newSV(0), "Text::Treesitter::QueryMatch", (void *)match, sizeof(*match));
+  return sv_setref_pvn(newSV(0), "Text::Treesitter::_QueryMatch", (void *)match, sizeof(*match));
 }
 #define newSVquerymatch(match)  S_newSVquerymatch(aTHX_ match)
 
@@ -64,6 +68,35 @@ static void S_extract_line_col(pTHX_ const char *s, STRLEN len, STRLEN offset, i
   }
 }
 #define extract_line_col(s, len, offset, line, col, linebuf)  S_extract_line_col(aTHX_ s, len, offset, line, col, linebuf)
+
+static void S_croaksv_from_caller(pTHX_ SV *msg_sv)
+{
+  I32 count = 0;
+  const PERL_CONTEXT *cx;
+  while((cx = caller_cx(count, NULL))) {
+    count++;
+
+    /* TODO: Skip internal call frames? */
+    /* warn("TODO: maybe croak from caller where caller stash is %s\n",
+     *   HvNAME(CopSTASH(cx->blk_oldcop)));
+     */
+    PL_curcop = cx->blk_oldcop;
+    break;
+  }
+
+  croak_sv(msg_sv);
+}
+
+#define croak_from_caller(fmt, ...)  S_croak_from_caller(aTHX_ fmt, __VA_ARGS__)
+static void S_croak_from_caller(pTHX_ const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  SV *msg_sv = sv_2mortal(vnewSVpvf(fmt, &args));
+  va_end(args);
+
+  S_croaksv_from_caller(aTHX_ msg_sv);
+}
 
 MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::Language  PREFIX = ts_language_
 
@@ -132,7 +165,18 @@ bool ts_node_has_changes(Text::Treesitter::_Node self)
 
 bool ts_node_has_error(Text::Treesitter::_Node self)
 
-Text::Treesitter::_Node ts_node_parent(Text::Treesitter::_Node self)
+SV *
+parent(Text::Treesitter::_Node self)
+  CODE:
+  {
+    TSNode child = ts_node_parent(self);
+    if(!ts_node_is_null(child))
+      RETVAL = newSVnode(child);
+    else
+      RETVAL = &PL_sv_undef;
+  }
+  OUTPUT:
+    RETVAL
 
 U32 ts_node_child_count(Text::Treesitter::_Node self)
 
@@ -160,6 +204,28 @@ void child_nodes(Text::Treesitter::_Node self)
     XSRETURN(retcount);
   }
 
+SV *
+child_by_field_name(Text::Treesitter::_Node self, SV *field_name)
+  ALIAS:
+    child_by_field_name     = 0
+    try_child_by_field_name = 1
+  CODE:
+  {
+    STRLEN namelen;
+    const char *namepv = SvPVutf8(field_name, namelen);
+
+    TSNode child = ts_node_child_by_field_name(self, namepv, namelen);
+    if(!ts_node_is_null(child))
+      RETVAL = newSVnode(child);
+    else if(ix)
+      RETVAL = &PL_sv_undef;
+    else
+      croak_from_caller("Node of type '%s' has no child named '%" SVf "'",
+        ts_node_type(self), SVfARG(field_name));
+  }
+  OUTPUT:
+    RETVAL
+
 MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::Parser  PREFIX = ts_parser_
 
 Text::Treesitter::Parser new(SV *cls)
@@ -171,6 +237,38 @@ Text::Treesitter::Parser new(SV *cls)
 void DESTROY(Text::Treesitter::Parser self)
   CODE:
     ts_parser_delete(self);
+
+bool set_included_ranges(Text::Treesitter::Parser self, ...)
+  CODE:
+  {
+    U32 rangecount = items - 1;
+    if(!rangecount) {
+      ts_parser_set_included_ranges(self, NULL, 0);
+      XSRETURN_YES;
+    }
+
+    TSRange *ranges;
+    Newx(ranges, rangecount, TSRange);
+    SAVEFREEPV(ranges);
+
+    for(int i = 0; i < rangecount; i++) {
+      SV *range = ST(1+i);
+      if(!(SvROK(range) && SvTYPE(SvRV(range)) == SVt_PVAV))
+        croak("Expected an ARRAY ref for a range");
+      AV *rangeav = (AV *)SvRV(range);
+      if(av_count(rangeav) != 2)
+        croak("Expected a 2-element ARRAY ref for a range");
+
+      ranges[i] = (TSRange){
+        .start_byte = SvUV(*av_fetch(rangeav, 0, FALSE)),
+        .end_byte   = SvUV(*av_fetch(rangeav, 1, FALSE)),
+      };
+    }
+
+    RETVAL = ts_parser_set_included_ranges(self, ranges, rangecount);
+  }
+  OUTPUT:
+    RETVAL
 
 bool ts_parser_set_language(Text::Treesitter::Parser self, Text::Treesitter::Language lang)
 
@@ -255,6 +353,8 @@ SV *capture_name_for_id(Text::Treesitter::Query self, U32 id)
   OUTPUT:
     RETVAL
 
+U32 ts_query_capture_quantifier_for_id(Text::Treesitter::Query self, U32 pattern_index, U32 capture_index)
+
 SV *string_value_for_id(Text::Treesitter::Query self, U32 id)
   CODE:
   {
@@ -309,23 +409,23 @@ void predicates_for_pattern(Text::Treesitter::Query self, U32 pattern_index)
     XSRETURN(retcount);
   }
 
-MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::QueryCursor  PREFIX = ts_query_cursor_
+MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::_QueryCursor  PREFIX = ts_query_cursor_
 
-Text::Treesitter::QueryCursor new(SV *cls)
+Text::Treesitter::_QueryCursor new(SV *cls)
   CODE:
     RETVAL = ts_query_cursor_new();
   OUTPUT:
     RETVAL
 
-void DESTROY(Text::Treesitter::QueryCursor self)
+void DESTROY(Text::Treesitter::_QueryCursor self)
   CODE:
     ts_query_cursor_delete(self);
 
-void _exec(Text::Treesitter::QueryCursor self, Text::Treesitter::Query query, Text::Treesitter::_Node node)
+void _exec(Text::Treesitter::_QueryCursor self, Text::Treesitter::Query query, Text::Treesitter::_Node node)
   CODE:
     ts_query_cursor_exec(self, query, node);
 
-SV *next_match(Text::Treesitter::QueryCursor self)
+SV *_next_match(Text::Treesitter::_QueryCursor self)
   CODE:
   {
     TSQueryMatch match;
@@ -337,27 +437,27 @@ SV *next_match(Text::Treesitter::QueryCursor self)
   OUTPUT:
     RETVAL
 
-MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::QueryMatch
+MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::_QueryMatch
 
-U32 id(Text::Treesitter::QueryMatch self)
+U32 id(Text::Treesitter::_QueryMatch self)
   CODE:
     RETVAL = self.id;
   OUTPUT:
     RETVAL
 
-U32 pattern_index(Text::Treesitter::QueryMatch self)
+U32 pattern_index(Text::Treesitter::_QueryMatch self)
   CODE:
     RETVAL = self.pattern_index;
   OUTPUT:
     RETVAL
 
-U32 capture_count(Text::Treesitter::QueryMatch self)
+U32 capture_count(Text::Treesitter::_QueryMatch self)
   CODE:
     RETVAL = self.capture_count;
   OUTPUT:
     RETVAL
 
-Text::Treesitter::_Node node_for_capture(Text::Treesitter::QueryMatch self, U32 capture_index)
+Text::Treesitter::_Node node_for_capture(Text::Treesitter::_QueryMatch self, U32 capture_index)
   CODE:
     if(capture_index >= self.capture_count)
       croak("index_for_capture: capture index out of bounds");
@@ -365,7 +465,7 @@ Text::Treesitter::_Node node_for_capture(Text::Treesitter::QueryMatch self, U32 
   OUTPUT:
     RETVAL
 
-U32 index_for_capture(Text::Treesitter::QueryMatch self, U32 capture_index)
+U32 index_for_capture(Text::Treesitter::_QueryMatch self, U32 capture_index)
   CODE:
     if(capture_index >= self.capture_count)
       croak("index_for_capture: capture index out of bounds");
@@ -403,3 +503,11 @@ BOOT:
   DO_CONSTANT(TSSymbolTypeRegular);
   DO_CONSTANT(TSSymbolTypeAnonymous);
   DO_CONSTANT(TSSymbolTypeAuxiliary);
+
+  stash = Perl_gv_stashpvn(aTHX_ STR_WITH_LEN("Text::Treesitter::Query"), TRUE);
+
+  DO_CONSTANT(TSQuantifierZero);
+  DO_CONSTANT(TSQuantifierZeroOrOne);
+  DO_CONSTANT(TSQuantifierZeroOrMore);
+  DO_CONSTANT(TSQuantifierOne);
+  DO_CONSTANT(TSQuantifierOneOrMore);

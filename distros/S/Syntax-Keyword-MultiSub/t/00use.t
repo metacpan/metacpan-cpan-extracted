@@ -3,8 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Syntax::Keyword::MultiSub" );
+require Syntax::Keyword::MultiSub;
 
+pass "Modules loaded";
 done_testing;

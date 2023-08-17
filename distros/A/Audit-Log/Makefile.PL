@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "auditd log parser with no external dependencies, using no perl features past 5.12",
+  "ABSTRACT" => "auditd log parser with minimal dependencies, using no perl features past 5.12",
   "AUTHOR" => "George S. Baugh <george\@troglodyne.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Audit::Log",
   "PREREQ_PM" => {
+    "File::Which" => 0,
     "List::Util" => "1.45",
+    "UUID::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,9 +37,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Which" => 0,
   "List::Util" => "1.45",
   "Test::Deep" => 0,
   "Test::More" => 0,
+  "UUID::Tiny" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0

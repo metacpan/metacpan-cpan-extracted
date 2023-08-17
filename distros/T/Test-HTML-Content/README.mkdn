@@ -1,0 +1,146 @@
+
+[![Windows](https://github.com/Corion/Test-HTML-Content/workflows/windows/badge.svg)](https://github.com/Corion/Test-HTML-Content/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Test-HTML-Content/workflows/macos/badge.svg)](https://github.com/Corion/Test-HTML-Content/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Test-HTML-Content/workflows/linux/badge.svg)](https://github.com/Corion/Test-HTML-Content/actions?query=workflow%3Alinux)
+
+# NAME
+
+Test::HTML::Content - Perl extension for testing HTML output
+
+# SYNOPSIS
+
+    use Test::HTML::Content( tests => 13 );
+
+    $HTML = "<html><title>A test page</title><body><p>Home page</p>
+             <img src='http://www.perl.com/camel.png' alt='camel'>
+             <a href='http://www.perl.com'>Perl</a>
+             <img src='http://www.perl.com/camel.png' alt='more camel'>
+             <!--Hidden message--></body></html>";
+
+    link_ok($HTML,"http://www.perl.com","We link to Perl");
+    no_link($HTML,"http://www.pearl.com","We have no embarassing typos");
+    link_ok($HTML,qr"http://[a-z]+\.perl.com","We have a link to perl.com");
+
+    title_count($HTML,1,"We have one title tag");
+    title_ok($HTML,qr/test/);
+
+    tag_ok($HTML,"img", {src => "http://www.perl.com/camel.png"},
+                          "We have an image of a camel on the page");
+    tag_count($HTML,"img", {src => "http://www.perl.com/camel.png"}, 2,
+                          "In fact, we have exactly two camel images on the page");
+    no_tag($HTML,"blink",{}, "No annoying blink tags ..." );
+
+    # We can check the textual contents
+    text_ok($HTML,"Perl");
+
+    # We can also check the contents of comments
+    comment_ok($HTML,"Hidden message");
+
+    # Advanced stuff
+
+    # Using a regular expression to match against
+    # tag attributes - here checking there are no ugly styles
+    no_tag($HTML,"p",{ style => qr'ugly$' }, "No ugly styles" );
+
+    # REs also can be used for substrings in comments
+    comment_ok($HTML,qr"[hH]idden\s+mess");
+
+    # and if you have XML::LibXML or XML::XPath, you can
+    # even do XPath queries yourself:
+    xpath_ok($HTML,'/html/body/p','HTML is somewhat wellformed');
+    no_xpath($HTML,'/html/head/p','HTML is somewhat wellformed');
+
+# DESCRIPTION
+
+This is a module to test the HTML output of your programs in simple
+test scripts. It can test a scalar (presumably containing HTML) for
+the presence (or absence, or a specific number) of tags having (or
+lacking) specific attributes. Unspecified attributes are ignored,
+and the attribute values can be specified as either scalars (meaning
+a match succeeds if the strings are identical) or regular expressions
+(meaning that a match succeeds if the actual attribute value is matched
+by the given RE) or undef (meaning that the attribute must not
+be present).
+
+If you want to specify or test the deeper structure
+of the HTML (for example, META tags within the BODY) or the (textual)
+content of tags, you will have to resort to `xpath_ok`,`xpath_count`
+and `no_xpath`, which take an XPath expression. If you find yourself crafting
+very complex XPath expression to verify the structure of your output, it is
+time to rethink your testing process and maybe use a template based solution
+or simply compare against prefabricated files as a whole.
+
+The used HTML parser is HTML::TokeParser, the used XPath module
+is XML::XPath or XML::LibXML. XML::XPath needs valid xHTML, XML::LibXML
+will try its best to force your code into xHTML, but it is best to
+supply valid xHTML (snippets) to the test functions.
+
+If no XPath parsers/interpreters are available, the tests will automatically
+skip, so your users won't need to install XML::XPath or XML::LibXML. The module
+then falls back onto a crude implementation of the core functions for tags,
+links, comments and text, and the diagnostic output of the tests varies a bit.
+
+The test functionality is derived from [Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder), and the export
+behaviour is the same. When you use Test::HTML::Content, a set of
+HTML testing functions is exported into the namespace of the caller.
+
+## EXPORT
+
+Exports the bunch of test functions :
+
+    link_ok() no_link() link_count()
+    tag_ok() no_tag() tag_count()
+    text_ok no_text() text_count()
+    comment_ok() no_comment() comment_count()
+    xpath_ok() no_xpath() xpath_count()
+    has_declaration() no_declaration()
+
+## CONSIDERATIONS
+
+The module reparses the HTML string every time a test function is called.
+This will make running many tests over the same, large HTML stream relatively
+slow. A possible speedup could be simple minded caching mechanism that keeps the most
+recent HTML stream in a cache.
+
+## CAVEATS
+
+The test output differs between XPath and HTML parsing, because XML::XPath
+delivers the complete node including the content, where my HTML parser only
+delivers the start tag. So don't make your tests depend on the \_exact\_
+output of my tests. It was a pain to do so in my test scripts for this module
+and if you really want to, take a look at the included test scripts.
+
+The title functions `title_ok` and `no_title` rely on the XPath functionality
+and will thus skip if XPath functionality is unavailable.
+
+## BUGS
+
+Currently, if there is text split up by comments, the text will be seen
+as two separate entities, so the following dosen't work :
+
+    is_text( "Hello<!-- brave new--> World", "Hello World" );
+
+Whether this is a real bug or not, I don't know at the moment - most likely,
+I'll modify text\_ok() and siblings to ignore embedded comments.
+
+## TODO
+
+My things on the todo list for this module. Patches are welcome !
+
+- Refactor the code to fold some of the internal routines
+- Implement a cache for the last parsed tree / token sequence
+- Possibly diag() the row/line number for failing tests
+- Allow RE instead of plain strings in the functions (for tags themselves). This
+one is most likely useless.
+
+# LICENSE
+
+This code may be distributed under the same terms as Perl itself.
+
+# AUTHOR
+
+Max Maischein <corion@cpan.org>
+
+# SEE ALSO
+
+perl(1), [Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder),[Test::Simple](https://metacpan.org/pod/Test%3A%3ASimple),[Test::HTML::Lint](https://metacpan.org/pod/Test%3A%3AHTML%3A%3ALint).

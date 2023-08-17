@@ -267,9 +267,13 @@ $Data{'country'}{'genc'}{'orig'}{'name'} = {
 };
 
 $Data{'country'}{'genc'}{'ignore'} = {
-   'name'           => {'Unknown' => 1},
-   'genc-alpha-2'   => {},
-   'genc-alpha-3'   => {},
+   'name'           => {
+                        'Unknown'  => 1,
+                       },
+   'genc-alpha-2'   => {
+                       },
+   'genc-alpha-3'   => {
+                       },
    'genc-numeric'   => {},
 };
 

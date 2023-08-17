@@ -8,9 +8,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-28'; # DATE
+our $DATE = '2023-07-20'; # DATE
 our $DIST = 'Ubuntu-Releases'; # DIST
-our $VERSION = '20221228.0'; # VERSION
+our $VERSION = '20230720.0'; # VERSION
 
 our @EXPORT_OK = qw(
                        list_ubuntu_releases
@@ -61,7 +61,7 @@ our $data = do {
      perl_version         => "5.8.4",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => " ()",
+     python_version       => "2.3.4",
      reldate              => "2004-10-20",
      ruby_version         => undef,
      version              => "4.10",
@@ -79,7 +79,7 @@ our $data = do {
      perl_version         => "5.8.4",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.3.4",
+     python_version       => "2.4.1",
      reldate              => "2005-04-08",
      ruby_version         => undef,
      version              => 5.04,
@@ -97,7 +97,7 @@ our $data = do {
      perl_version         => "5.8.7",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.4.1",
+     python_version       => "2.4.2",
      reldate              => "2005-10-13",
      ruby_version         => undef,
      version              => "5.10",
@@ -115,7 +115,7 @@ our $data = do {
      perl_version         => "5.8.7",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.4.2",
+     python_version       => "2.4.3",
      reldate              => "2006-06-01",
      ruby_version         => undef,
      version              => "6.06 LTS",
@@ -133,7 +133,7 @@ our $data = do {
      perl_version         => "5.8.8",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.4.3",
+     python_version       => "2.4.4",
      reldate              => "2006-10-26",
      ruby_version         => undef,
      version              => "6.10",
@@ -151,7 +151,7 @@ our $data = do {
      perl_version         => "5.8.8",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.4.4",
+     python_version       => "2.5.1rc1",
      reldate              => "2007-04-19",
      ruby_version         => undef,
      version              => 7.04,
@@ -169,7 +169,7 @@ our $data = do {
      perl_version         => "5.8.8",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.5.1rc1",
+     python_version       => "2.5.1",
      reldate              => "2007-10-18",
      ruby_version         => undef,
      version              => "7.10",
@@ -187,7 +187,7 @@ our $data = do {
      perl_version         => "5.8.8",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.5.1",
+     python_version       => "2.5.2",
      reldate              => "2008-04-24",
      ruby_version         => undef,
      version              => "8.04 LTS",
@@ -223,7 +223,7 @@ our $data = do {
      perl_version         => "5.10.0",
      php_version          => "--",
      postgresql_version   => "--",
-     python_version       => "2.5.2",
+     python_version       => "2.6.2",
      reldate              => "2009-04-23",
      ruby_version         => undef,
      version              => 9.04,
@@ -241,7 +241,7 @@ our $data = do {
      perl_version         => "5.10.0",
      php_version          => "5.2.10",
      postgresql_version   => "8.4.1",
-     python_version       => "2.6.2",
+     python_version       => "2.6.4rc2",
      reldate              => "2009-10-29",
      ruby_version         => undef,
      version              => "9.10",
@@ -259,7 +259,7 @@ our $data = do {
      perl_version         => "5.10.1",
      php_version          => "5.3.2",
      postgresql_version   => "8.4.3",
-     python_version       => "2.6.4rc2",
+     python_version       => "2.6.5",
      reldate              => "2010-04-29",
      ruby_version         => undef,
      version              => "10.04 LTS",
@@ -277,7 +277,7 @@ our $data = do {
      perl_version         => "5.10.1",
      php_version          => "5.3.3",
      postgresql_version   => "8.4.4",
-     python_version       => "2.6.5",
+     python_version       => "2.6.6",
      reldate              => "2010-10-10",
      ruby_version         => undef,
      version              => "10.10",
@@ -295,7 +295,7 @@ our $data = do {
      perl_version         => "5.10.1",
      php_version          => "5.3.5",
      postgresql_version   => "8.4.8",
-     python_version       => "2.6.6",
+     python_version       => "2.7.1",
      reldate              => "2011-04-28",
      ruby_version         => undef,
      version              => 11.04,
@@ -313,7 +313,7 @@ our $data = do {
      perl_version         => "5.12.4",
      php_version          => "5.3.6",
      postgresql_version   => "9.1.1",
-     python_version       => "2.7.1",
+     python_version       => "2.7.2",
      reldate              => "2011-10-13",
      ruby_version         => undef,
      version              => "11.10",
@@ -331,7 +331,7 @@ our $data = do {
      perl_version         => "5.14.2",
      php_version          => "5.3.10",
      postgresql_version   => "9.1.3",
-     python_version       => "2.7.2",
+     python_version       => "2.7.3",
      reldate              => "2012-04-26",
      ruby_version         => undef,
      version              => "12.04 LTS",
@@ -694,7 +694,7 @@ our $data = do {
      python_version       => "3.10.4",
      reldate              => "2022-04-21",
      ruby_version         => undef,
-     version              => 22.04,
+     version              => "22.04 LTS",
    },
    {
      animal               => "kudu",
@@ -713,6 +713,24 @@ our $data = do {
      reldate              => "2022-10-20",
      ruby_version         => undef,
      version              => "22.10",
+   },
+   {
+     animal               => "lobster",
+     apache_httpd_version => "--",
+     bash_version         => "5.2.15",
+     code_name            => "lunar",
+     eoldate              => "2024-01",
+     linux_version        => 6.2,
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.36.0",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.11.2",
+     reldate              => "2023-04-20",
+     ruby_version         => undef,
+     version              => 23.04,
    },
  ]
 };
@@ -740,7 +758,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 20221228.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2022-12-28.
+This document describes version 20230720.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2023-07-20.
 
 =head1 SYNOPSIS
 
@@ -1577,7 +1595,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

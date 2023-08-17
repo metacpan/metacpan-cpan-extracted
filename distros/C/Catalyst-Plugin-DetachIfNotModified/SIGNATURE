@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 8e730d20670b5cd15045e9af5b96093a87134d4208062124b3c98e201cff7ba8 Changes
+SHA256 3cef2b3367e766f17c7511fc87860ef139e34c1a36d24fa7e3ed69a46c767480 INSTALL
+SHA256 16b35b64a70f99768a8460a0955e94de84609ca41ea710a88053526696402996 LICENSE
+SHA256 0b814d0e95bec0e056113706ebd284c0f27cfb43c02001bd0b227ec3010e81dd MANIFEST
+SHA256 33716c9e24795df6e1de820903b3fac3c91f3bb23e23429d0e2bdd6eb9bc398f MANIFEST.SKIP
+SHA256 4bb915cbc624a47c24a9adf126cf28a23ab5ec1dea5a9c7edc86c831521f2354 META.json
+SHA256 7bfae2cc0fa193377ffcee59794e6be2eafa32494cc20855aa95a1c156866fe9 META.yml
+SHA256 76a1a349d961ca6201a7c0bfd2e7a4ea25410353c94a0c1da8283f58e2afdbb3 Makefile.PL
+SHA256 d03821cb137bf9e5077d66513dc06870572d1d4136ffd908347c194b203ff808 README.md
+SHA256 2cdb8237b94727ec0c3488e0cb86cd7a90dc5a18e096273f0922a47464855ec2 cpanfile
+SHA256 6fbd29b72599827ab720b4991b6c7d0e1006866facfaef9f78122d64d0e2b493 dist.ini
+SHA256 9292cc40839af27615ac9eb1b3db08e848496d68c1db4814c3e6b47709bbea60 lib/Catalyst/Plugin/DetachIfNotModified.pm
+SHA256 de7755da1807b8c31841fda659061dffa92943231451f3b107e73e2c0375d2dc t/00-report-prereqs.dd
+SHA256 66fb112d30424ac9787706db3791b750a2509ee554833eca0f06cd5e16673d85 t/00-report-prereqs.t
+SHA256 61a14ea2c1ee44e1e2a109847f7734a53a757073b698b27107edae4b13d58cf2 t/100-basic.t
+SHA256 72b1fd92691fbf47ba031bd3c386e3b26a525f3625b573417a85ea99422bec2c t/author-clean-namespaces.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 98bd51d79953ff2ac98c6263a2afb1a10fde64cc8a76fa06c3edd23f2b39b2fe t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 612b5e590ec6b64cdad7a4709b2d272ebd878a37c065d26801f8122ec982b765 t/author-no-tabs.t
+SHA256 1ee64d4f8248deb3541453ec521ac8057c9a4ba365946b6a02ee760ad28ce164 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 c1f29c0000903a78a9a6f6d4d84f375740d5bb333d532c0502bedbe613918127 t/author-portability.t
+SHA256 4c7aa24d727b46d228d0fca8581628984345a500d78c859700876156a6e307af t/lib/App.pm
+SHA256 6ce2cf92f6eb1a3b6753abd7f3f0629d0376eb23721323a965d2d562f0735259 t/lib/App/Controller/Root.pm
+SHA256 b5232d273bbe74d423210cfa2a2a12e583900fa420f1c093e1147e9625db790c t/release-check-manifest.t
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 31b04c4b94fc05dbbe052789c2ce433e96e50ad34d3f66b97d53a576917da35b weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmSUMUYACgkQHmWrcYGD
+C6xSrQv/QnuEH00oaWGWZtfedNvkWgb3nr/MhHvFumkXrRyPf/VgxlLmaldUvDQ+
+1NrPXJ8Cu50iuFEZcEWQq7nC2pxLPDTMrXo+6TlmWN2IiDodYQqzvUiv+P4I0twm
+mJlOOIRon8gzgq+3vIgC6p+5WbpKV3pGCe/qGW+VXwPr9+VjgvW89dFeLzm/rD9R
+l6EUyddk4Pi6/EVJujIUrxH4O1LWe30YYEYzm57U5NubNQi75G8LRpGhVfdBEkwM
+KOtNF1nlsnPwHzqvkt54aoOHuThH+lJaxjwzbY8ZWwZSaFTQmDt+GI014qFuC6Am
+bcMSKfN21N6GEpLamnblUA4NaGRlKpvEBILzAFvYFfswM9Bgr+tKBsrSbKDEXhPg
+ubbJycbRoA/kHyJIUZ73776XeHeQprCk0gm5R3A02lzNOO6nnQUDbftJgq9tg4pi
+WuXDTBKiEji213znaaN6UTyxXXLTU+LLtRcBYIXGk+PnUQb9obMz4L4xBDkz0ghP
+ZAcKbuY6
+=YAVt
+-----END PGP SIGNATURE-----

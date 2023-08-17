@@ -25,11 +25,11 @@ The Fn class of L<SPVM> has methods for numbers, strings, general utilities.
   
   # Split
   my $csv = "foo,bar,baz";
-  my $items = Fn->split(",", $string);
+  my $args_width = Fn->split(",", $string);
   
   # Join
-  my $items = ["foo", "bar", "baz"];
-  my $csv = Fn->join(",", $items);
+  my $args_width = ["foo", "bar", "baz"];
+  my $csv = Fn->join(",", $args_width);
   
   # Constant values
   my $byte_max = Fn->BYTE_MAX();
@@ -261,7 +261,7 @@ Removes C<\r\n> or C<\n> at the end of the $string.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 chompr
 
@@ -271,7 +271,7 @@ Copies the $string and removes C<\r\n> or C<\n> at the end of the copied string 
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 chr
 
@@ -283,7 +283,7 @@ If the $code_point is not a Unicode scalar value, return undef.
 
 =head2 contains
 
-  static method contains : int ($string : string, $substring : string, $string_offset = 0 : int, $string_length = -1 : int);
+  static method contains : int ($string : string, $substring : string, $string_offset : int = 0, $string_length : int = -1);
 
 The alias for the following code using L</"index>.
 
@@ -324,13 +324,13 @@ If the $length is 0, returns 1.
 
 Exceptions:
 
-The $string1 must be defined. Otherwize an exception is thrown.
+The $string1 must be defined. Otherwise an exception is thrown.
 
-The $string2 must be defined. Otherwize an exception is thrown.
+The $string2 must be defined. Otherwise an exception is thrown.
 
-The $string1_offset must be greater than or equal to 0. Otherwize an exception is thrown.
+The $string1_offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $string2_offset must be greater than or equal to 0. Otherwize an exception is thrown.
+The $string2_offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 get_code_point
 
@@ -346,9 +346,9 @@ If the UTF-8 character is invalid, return the value of L</"GET_CODE_POINT_ERROR_
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
+The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 hex
 
@@ -358,15 +358,15 @@ Converts the $hex_string to the C<int> value and return it.
 
 Exceptions:
 
-The $hex string must be defined. Otherwize an exception is thrown.
+The $hex string must be defined. Otherwise an exception is thrown.
 
-The length of the $hex string must be 1 to 8. Otherwize an exception is thrown.
+The length of the $hex string must be 1 to 8. Otherwise an exception is thrown.
 
-The $hex string must contain only hex characters C<0-9a-zA-Z>. Otherwize an exception is thrown.
+The $hex string must contain only hex characters C<0-9a-zA-Z>. Otherwise an exception is thrown.
 
 =head2 index
 
-  static method index : int ($string : string, $substring : string, $begin = 0 : int, $end = -1 : int);
+  static method index : int ($string : string, $substring : string, $begin : int = 0, $end : int = -1);
 
 Searches for the $substring in the range of the $string from the $begin to the $end.
 
@@ -378,23 +378,17 @@ If the $end is less than 0, the $end is set to the length of the $string minus 1
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $substring must be defined. Otherwize an exception is thrown.
+The $substring must be defined. Otherwise an exception is thrown.
 
-The $begin must be greater than or equal to 0. Otherwize an exception is thrown.
+The $begin must be greater than or equal to 0. Otherwise an exception is thrown.
 
 The $end must be less than the length of the $string.
 
-=head2 index_v2
-
-  static method index_v2 : int ($string : string, $substring : string, $begin = 0 : int, $end = -1 : int);
-
-The same as L</"index">. The index_v2 method will be removed.
-
 =head2 init_string
 
-  static method init_string : void ($string : mutable string, $ascii_code = 0 : int, $offset = 0 int, $length = -1);
+  static method init_string : void ($string : mutable string, $ascii_code : int = 0, $offset = 0 int, $length = -1);
 
 Sets the characters in the $string from the $offset to the position proceeded by the $length to the $ascii_code.
 
@@ -402,7 +396,7 @@ If the $length is less than 0, the $length is set to the length of the $string -
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 The $offset + the $length must be less than or equal to the length of the $string.
 
@@ -556,9 +550,9 @@ Concatenates the $strings with the $separater and return it.
 
 Exceptions:
 
-The $strings must be defined. Otherwize an exception is thrown.
+The $strings must be defined. Otherwise an exception is thrown.
 
-The $separator must be defined. Otherwize an exception is thrown.
+The $separator must be defined. Otherwise an exception is thrown.
 
 =head2 labs
 
@@ -574,7 +568,7 @@ Converts the ASCII uppercase characters C<A-Z> in the $string to the correspondi
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 lcfirst
 
@@ -584,7 +578,7 @@ If the first character of the $string is an ASCII uppercase character C<A-Z>, it
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 look_code_point
 
@@ -608,21 +602,21 @@ If the range of the $source and the range of the $dest overlap, the result is B<
 
 Exceptions:
 
-The $dest must be defined. Otherwize an exception is thrown.
+The $dest must be defined. Otherwise an exception is thrown.
 
-The type of the $dest must be the C<string> type, the numeric array type, or the multi-numeric array type. Otherwize an exception is thrown.
+The type of the $dest must be the C<string> type, the numeric array type, or the multi-numeric array type. Otherwise an exception is thrown.
 
-The $source must be defined. Otherwize an exception is thrown.
+The $source must be defined. Otherwise an exception is thrown.
 
-The type of the $source must be the C<string> type, the numeric array type, or the multi-numeric array type. Otherwize an exception is thrown.
+The type of the $source must be the C<string> type, the numeric array type, or the multi-numeric array type. Otherwise an exception is thrown.
 
 The $dest must not be a read-only string. Otherwise an exception is thrown.
 
-The $length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $length must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwise an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwise an exception is thrown.
 
 =head2 memmove
 
@@ -647,7 +641,7 @@ Calculates the exponentiation from the $base number and the $exponant number.
 
 Exceptions:
 
-The $exponant number must be greater than or equal to 0. Otherwize an exception is thrown.
+The $exponant number must be greater than or equal to 0. Otherwise an exception is thrown.
 
 If the $base number is 0, the $exponant number cannnot be 0.
 
@@ -659,13 +653,13 @@ Calculates the exponentiation from the $base number and the $exponant number.
 
 Exceptions:
 
-The $exponant number must be greater than or equal to 0. Otherwize an exception is thrown.
+The $exponant number must be greater than or equal to 0. Otherwise an exception is thrown.
 
 If the $base number is 0, the $exponant number cannnot be 0.
 
 =head2 rand
 
-  static method rand : double ($seed : int*, $max = 1 : int);
+  static method rand : double ($seed : int*, $max : int = 1);
 
 Gets a 64bit floating point random number that is greater than or equal to 0 and less than 1 using the $seed.
 
@@ -690,7 +684,7 @@ Concatenates the $string the number of times specified in the $count and return 
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 The $repeat count must be greater than or equal to 0.
 
@@ -707,11 +701,11 @@ Replaces all characters specified by the second argument in the $string with the
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 rindex
 
-  static method rindex : int ($string : string, $substring : string, $end = -1 : int, $begin = 0 : int);
+  static method rindex : int ($string : string, $substring : string, $end : int = -1, $begin : int = 0);
 
 Searches for the $substring in the range of the $string from the $begin to the $end.
 
@@ -723,19 +717,13 @@ If the $end is less than 0, the $end is set to the length of the $string minus 1
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $substring must be defined. Otherwize an exception is thrown.
+The $substring must be defined. Otherwise an exception is thrown.
 
-The $begin must be greater than or equal to 0. Otherwize an exception is thrown.
+The $begin must be greater than or equal to 0. Otherwise an exception is thrown.
 
 The $end must be less than the length of the $string.
-
-=head2 rindex_v2
-
-  static method rindex_v2 : int ($string : string, $substring : string, $end = -1 : int, $begin = 0 : int);
-
-The same as L<rindex>. The rindex_v2 method will be removed.
 
 =head2 sizeof_native_int
 
@@ -761,7 +749,7 @@ Exceptions:
 
 The $string must be defined.
 
-The $length must be greater than or equal to 0. Otherwize an exception is thrown.
+The $length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 shorten_null_char
 
@@ -773,7 +761,7 @@ If null characters is not found, do nothing.
 
 Exceptions:
 
-The $string must be defined.  Otherwize an exception is thrown.
+The $string must be defined.  Otherwise an exception is thrown.
 
 B<Example:>
   
@@ -784,7 +772,7 @@ B<Example:>
   
 =head2 split
 
-  static method split : string[] ($separator : string, $string : string, $limit = -1 : int);
+  static method split : string[] ($separator : string, $string : string, $limit : int = -1);
 
 If the $limit is less than 0, split the $string by the specific $separator and convert them to an string array and return it.
 
@@ -792,19 +780,33 @@ If the $limit is greater than than 0, the limit becomes the length of the maxima
 
 Exceptions:
 
-The $separator must be defined. Otherwize an exception is thrown.
+The $separator must be defined. Otherwise an exception is thrown.
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $limit cannnot be 0. Otherwize an exception is thrown.
+The $limit cannnot be 0. Otherwise an exception is thrown.
 
 =head2 substr
 
-  static method substr : string ($string : string, $offset : int, $length = -1 : int);
+  static method substr : string ($string : string, $offset : int, $length : int = -1, $replacement : string = undef);
 
-Gets the substring from the $string. The extracting range of the string is from the $offset to the position proceeded by the $length, and returns it.
+Cuts a substring of the $length from the $offset of the $string, and returns it.
+
+If the $length is ommited, the $length is the length of the $string minus $offset.
 
 If the length is less than 0, the length to the end of the string is calculated from the length of the $string and the $offset.
+
+Replacement:
+
+If The $replacement is given, returns a string that is the replacement string $replacement of the $string from the $offset to the $length.
+
+Exceptions:
+
+The $string must be defined. Otherwise an exception is thrown.
+
+The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
+
+The $offset + the $length must be less than or equal to the length of the $string. Otherwise an exception is thrown.
 
 =head2 to_code_points
 
@@ -814,9 +816,9 @@ Converts the $string to the Unicode code points, and returns it.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $string contains an invalid Unicode code point. Otherwize an exception is thrown.
+The $string contains an invalid Unicode code point. Otherwise an exception is thrown.
 
 =head2 to_double
 
@@ -826,11 +828,11 @@ Converts the $string to the C<double> value using C<strtod> in the C language.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $string must be the string that can be parsed as a double number. Otherwize an exception is thrown.
+The $string must be the string that can be parsed as a double number. Otherwise an exception is thrown.
 
-The $string must be a double number in the $correct range. Otherwize an exception is thrown.
+The $string must be a double number in the $correct range. Otherwise an exception is thrown.
 
 Examples:
 
@@ -845,11 +847,11 @@ Converts the $string to the C<double> value using C<strtof> in the C language.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $string must be the string that can be parsed as a float number. Otherwize an exception is thrown.
+The $string must be the string that can be parsed as a float number. Otherwise an exception is thrown.
 
-The $string must be a float number in the $correct range. Otherwize an exception is thrown.
+The $string must be a float number in the $correct range. Otherwise an exception is thrown.
 
 Examples:
 
@@ -870,11 +872,11 @@ Converts the $string to the C<int> value with $digit using C<strtol> in the C la
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $string must be the string that can be parsed as an int number. Otherwize an exception is thrown.
+The $string must be the string that can be parsed as an int number. Otherwise an exception is thrown.
 
-The $string must be an int number in the $correct range. Otherwize an exception is thrown.
+The $string must be an int number in the $correct range. Otherwise an exception is thrown.
 
 Examples:
 
@@ -897,13 +899,13 @@ Converts the $string to the C<long> value with $digit using C<strtoll> in the C 
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $digit must be one of 2, 8, 10, or 16. Otherwize an exception is thrown.
+The $digit must be one of 2, 8, 10, or 16. Otherwise an exception is thrown.
 
-The $string must be the string that can be parsed as a long number. Otherwize an exception is thrown.
+The $string must be the string that can be parsed as a long number. Otherwise an exception is thrown.
 
-The $string must be a long number in the $correct range. Otherwize an exception is thrown.
+The $string must be a long number in the $correct range. Otherwise an exception is thrown.
 
 Examples:
 
@@ -934,9 +936,9 @@ Converts the $string to UTF-8 characters, and returns it.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $string contains an invalid Unicode code point. Otherwize an exception is thrown.
+The $string contains an invalid Unicode code point. Otherwise an exception is thrown.
 
 Examples:
 
@@ -963,19 +965,19 @@ The range must be the format C<a-z> or C<a>. If the format is C<a>, it is conver
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-The $pattern must be defined. Otherwize an exception is thrown.
+The $pattern must be defined. Otherwise an exception is thrown.
 
-The $replace must be defined. Otherwize an exception is thrown.
+The $replace must be defined. Otherwise an exception is thrown.
 
 If the $string contains an invalid Unicode code point, an exception is thrown.
 
-The range format of the (pattern|replace) cannnot be contain an invalid Unicode code point. If it cannot, an exception is thrown. If it cannot, an exception is thrown.
+The range format of the (pattern|replace) cannnot be contain an invalid Unicode code point. If so, an exception is thrown. If so, an exception is thrown.
 
-The second character ot the range format of the (pattern|replace) must be \"-\". Otherwize an exception is thrown.
+The second character ot the range format of the (pattern|replace) must be \"-\". Otherwise an exception is thrown.
 
-The range format of the (pattern|replace) must be 1 or 3 characters. Otherwize an exception is thrown.
+The range format of the (pattern|replace) must be 1 or 3 characters. Otherwise an exception is thrown.
 
 The exceptions of the L<"/get_code_point"> method can be thrown.
 
@@ -1010,7 +1012,7 @@ The removed spaces is the same as the spaces L</"is_space"> method returns 1.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 uc
 
@@ -1020,7 +1022,7 @@ Converts the ASCII lowercase characters C<a-z> in the $string to the correspondi
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 ucfirst
 
@@ -1030,7 +1032,7 @@ If the first character of the $string is an ASCII lowercase characters C<a-z>, i
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 =head2 utf8_length
 
@@ -1040,7 +1042,7 @@ Gets the length as a UTF-8 string from the $string, and returns it.
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 If the $string contains an invalid Unicode code point, an exception is thrown.
 
@@ -1051,7 +1053,7 @@ Examples:
 
 =head2 utf8_substr
 
-  static method utf8_substr : string ($string : string, $utf8_offset : int, $utf8_length = -1 : int);
+  static method utf8_substr : string ($string : string, $utf8_offset : int, $utf8_length : int = -1);
 
 Gets the substring from the $string. The extracting range of the string is from the $utf8_offset to the position proceeded by the $utf8_length, and returns it.
 
@@ -1059,11 +1061,11 @@ If the length is less than 0, the length to the end of the string is calculated 
 
 Exceptions:
 
-The $string must be defined. Otherwize an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
 If the $string contains an invalid Unicode code point, an exception is thrown.
 
-The $utf8_offset + the $utf8_length must be less than or equal to the UTF-8 length of the $string. Otherwize an exception is thrown.
+The $utf8_offset + the $utf8_length must be less than or equal to the UTF-8 length of the $string. Otherwise an exception is thrown.
 
 Examples:
 
@@ -1128,15 +1130,15 @@ Returns the L<version number|SPVM::Document::Language/"Version Number"> of the S
 
 =head2 get_version_number
 
-  static method get_version_number : double ($class_name : string);
+  static method get_version_number : double ($basic_type_name : string);
 
 Returns the L<version number|SPVM::Document::Language/"Version Number"> of a class.
 
 Exceptions:
 
-The $class_name must be defined. Otherwise an exception is thrown.
+The $basic_type_name must be defined. Otherwise an exception is thrown.
 
-The class specified by the $class_name must be loaded. Otherwise an exception is thrown.
+The class specified by the $basic_type_name must be loaded. Otherwise an exception is thrown.
 
 =head1 Copyright & License
 

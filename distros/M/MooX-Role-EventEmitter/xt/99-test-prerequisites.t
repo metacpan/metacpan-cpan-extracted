@@ -71,8 +71,6 @@ my $scanner = Perl::PrereqScanner::Lite->new;
 for my $test_file (@tests) {
     my $implicit_test_prereqs = $scanner->scan_file($test_file)->as_string_hash;
     my %missing = %{ $implicit_test_prereqs };
-    use Data::Dumper;
-    warn Dumper \%missing;
 
     for my $p ( keys %missing ) {
         # remove core modules

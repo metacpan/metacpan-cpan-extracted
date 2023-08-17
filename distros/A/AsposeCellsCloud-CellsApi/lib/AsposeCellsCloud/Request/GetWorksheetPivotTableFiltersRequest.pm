@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPivotTableFiltersRequest.name :   ,
-# GetWorksheetPivotTableFiltersRequest.sheetName :   ,
-# GetWorksheetPivotTableFiltersRequest.pivotTableIndex :   ,
-# GetWorksheetPivotTableFiltersRequest.folder :   ,
-# GetWorksheetPivotTableFiltersRequest.storageName :    
+# GetWorksheetPivotTableFiltersRequest.name : The workbook name.  ,
+# GetWorksheetPivotTableFiltersRequest.sheetName : The worksheet name.  ,
+# GetWorksheetPivotTableFiltersRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# GetWorksheetPivotTableFiltersRequest.folder : Original workbook folder.  ,
+# GetWorksheetPivotTableFiltersRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_table_filters' } = { 
-    	summary => '',
+    	summary => 'Gets pivot table filters in worksheet.',
         params => $params,
         returns => 'PivotFiltersResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -105,7 +105,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016-2019  Erik Huelsmann
+ (C) 2016-2023  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

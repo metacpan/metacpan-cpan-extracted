@@ -1,5 +1,17 @@
 Revision history for Net::SSH::Perl
 
+2.142 2023-08-07T18:22:52Z
+	* Yank out the SIGNATURES stuff. This is something you can do locally
+	if you need that.
+	(#63)
+	* Update the license files for those in Perl (#67, Paul Howart)
+
+2.141 2023-07-25T19:00:02Z
+	3
+	* Add IdentitiesOnly patch from Craig Votava
+	* The code in now hosted at https://github.com/briandfoy/net-ssh-perl ,
+	with all of the open/unresolved RT issues imported
+
 2.14 2017.07.03
     - DSA key bugfix: verify would fail if r had unnecessary leading zeros
 

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 28;
+use Test::Most tests => 30;
 use Test::NoWarnings;
 use Data::Dumper;
 use lib 't/lib';
@@ -23,13 +23,12 @@ ROBOT: {
 
 		CHI->import;
 	};
-		my $hash = {};
+	my $hash = {};
 	if($@) {
-		diag("CHI not installed");
+		diag('CHI not installed');
 		$cache = undef;
 	} else {
 		diag("Using CHI $CHI::VERSION");
-		# my $hash = {};
 		$cache = CHI->new(driver => 'Memory', datastore => $hash);
 	}
 
@@ -43,7 +42,6 @@ ROBOT: {
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
-diag($i->browser_type());
 	ok($i->browser_type() eq 'search');
 
 	$ENV{'REMOTE_ADDR'} = '119.63.196.107';
@@ -69,15 +67,15 @@ diag($i->browser_type());
 
 	$ENV{'REMOTE_ADDR'} = '74.92.149.57';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
-	$i = new_ok('CGI::Info' => [
+	$i = new_ok('CGI::Info' => [{
 		cache => $cache,
-	]);
+	}]);
 	$i->set_logger({ logger => MyLogger->new() });
 	ok($i->is_robot() == 0);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
-		ok(defined($cache->get("is_robot/74.92.149.57/$ENV{HTTP_USER_AGENT}")));
-		ok(!defined($cache->get("is_robot/74.92.149.58/$ENV{HTTP_USER_AGENT}")));
+		cmp_ok($cache->get("74.92.149.57/$ENV{HTTP_USER_AGENT}"), 'eq', 'unknown', 'cache sets unknown');
+		ok(!defined($cache->get("74.92.149.58/$ENV{HTTP_USER_AGENT}")));
 	}
 	$ENV{'REMOTE_ADDR'} = '66.249.83.131';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.4.4; SAMSUNG-SGH-I337 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.89 Mobile Safari/537.36';
@@ -90,6 +88,11 @@ diag($i->browser_type());
 	]);
 	$i->set_logger(logger => MyLogger->new());
 	ok($i->is_robot() == 1);
+	SKIP: {
+		skip 'Test requires CHI access', 2 unless($cache);
+		cmp_ok($cache->get("66.249.83.131/$ENV{HTTP_USER_AGENT}"), 'eq', 'robot', 'cache sets robot');
+		ok(!defined($cache->get("74.92.149.58/$ENV{HTTP_USER_AGENT}")));
+	}
 
 	$ENV{'HTTP_REFERER'} = 'http://0.tqn.com/d/d/spae.gif)';
 	$i = new_ok('CGI::Info' => [

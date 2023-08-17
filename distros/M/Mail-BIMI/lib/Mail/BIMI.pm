@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: BIMI object
-our $VERSION = '3.20210512'; # VERSION
+our $VERSION = '3.20230607'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -129,8 +129,14 @@ sub _build_result($self) {
     return $result;
   }
   if ( $self->dmarc_result_object->result ne 'pass' ) {
-      $result->set_result( Mail::BIMI::Error->new(code=>'DMARC_NOT_PASS',detail=>$self->dmarc_result_object->result));
-      return $result;
+    $result->set_result( Mail::BIMI::Error->new(code=>'DMARC_NOT_PASS',detail=>$self->dmarc_result_object->result));
+    return $result;
+  }
+
+  # If we are configured to require DKIM, was this satisfied
+  if ( $self->options->require_dkim && $self->dmarc_result_object->dkim ne 'pass' ) {
+    $result->set_result( Mail::BIMI::Error->new(code=>'NO_DKIM'));
+    return $result;
   }
 
   # Is DMARC enforcing?
@@ -260,7 +266,7 @@ Mail::BIMI - BIMI object
 
 =head1 VERSION
 
-version 3.20210512
+version 3.20230607
 
 =head1 DESCRIPTION
 

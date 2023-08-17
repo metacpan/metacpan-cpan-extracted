@@ -4,6 +4,8 @@ use 5.010; use warnings; use Carp;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 use strict;
 
+use match::smart 'match';
+
 use Hash::Util 'fieldhash';
 
 fieldhash my %term_of;
@@ -82,7 +84,7 @@ use overload (
 
                 # Otherwise just smartmatch against TERM as regex....
                 else {
-                    return $other_arg ~~ $term->as_regex;
+                    return match($other_arg, $term->as_regex);
                 }
              },
 

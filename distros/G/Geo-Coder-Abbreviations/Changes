@@ -1,5 +1,10 @@
 Revision history for Geo::Coder::Abbreviations
 
+0.06	Thu Jun  8 10:26:44 EDT 2023
+	Use JSON::MaybeXS instead of JSON
+	Fix code for online/offline testing
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.05	Fri Jul 22 10:05:38 EDT 2022
 	Use LWP::Simple::WithCache instead of LWP::Simple
 	Better die message when the file can't be downloaded

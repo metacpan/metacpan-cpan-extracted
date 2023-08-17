@@ -1,6 +1,15 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.21 Jun 1, 2023
+
+	Add new t/TestToolkit.pm
+	Rework pre-installation test scripts.
+
+Fix: rt.cpan.org #148367 	
+	libressl-3.7.1 breaks DSA verify
+
+
 **** 1.20 Oct 4, 2022
 
 	Circumvent failure of EdDSA test on EBCDIC platforms.
@@ -657,4 +666,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1882 2022-10-04 19:53:44Z willem $
+$Id: Changes 1928 2023-06-01 11:33:52Z willem $

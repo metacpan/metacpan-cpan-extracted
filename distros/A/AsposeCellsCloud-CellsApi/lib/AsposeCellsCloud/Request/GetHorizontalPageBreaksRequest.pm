@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetHorizontalPageBreaksRequest.name :   ,
-# GetHorizontalPageBreaksRequest.sheetName :   ,
-# GetHorizontalPageBreaksRequest.folder :   ,
-# GetHorizontalPageBreaksRequest.storageName :    
+# GetHorizontalPageBreaksRequest.name : The workbook name.  ,
+# GetHorizontalPageBreaksRequest.sheetName : The worksheet name.  ,
+# GetHorizontalPageBreaksRequest.folder : Original workbook folder.  ,
+# GetHorizontalPageBreaksRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_horizontal_page_breaks' } = { 
-    	summary => '',
+    	summary => 'Get horizontal page breaks descripton in worksheet.',
         params => $params,
         returns => 'HorizontalPageBreaksResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

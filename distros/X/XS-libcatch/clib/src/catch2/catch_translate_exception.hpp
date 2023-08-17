@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,10 @@
 #include <exception>
 
 namespace Catch {
+    namespace Detail {
+        void registerTranslatorImpl(
+            Detail::unique_ptr<IExceptionTranslator>&& translator );
+    }
 
     class ExceptionTranslatorRegistrar {
         template<typename T>
@@ -48,9 +52,9 @@ namespace Catch {
     public:
         template<typename T>
         ExceptionTranslatorRegistrar( std::string(*translateFunction)( T const& ) ) {
-            getMutableRegistryHub().registerTranslator(
-                Detail::make_unique<ExceptionTranslator<T>>(translateFunction)
-            );
+            Detail::registerTranslatorImpl(
+                Detail::make_unique<ExceptionTranslator<T>>(
+                    translateFunction ) );
         }
     };
 

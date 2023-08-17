@@ -1,3 +1,9 @@
+0.04 2023-07-22
+    * More test suite fixes
+
+0.03 2023-07-21
+    * Various test suite fixes, no code changes, no need to upgrade
+
 0.02 2023-04-16
     * Fix synopsis
       No code changes, no need to upgrade

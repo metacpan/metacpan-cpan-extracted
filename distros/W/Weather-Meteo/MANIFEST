@@ -1,3 +1,4 @@
+bin/weather
 Changes
 lib/Weather/Meteo.pm
 LICENSE

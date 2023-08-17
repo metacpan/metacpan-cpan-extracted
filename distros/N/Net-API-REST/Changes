@@ -1,5 +1,13 @@
 Revision history for Perl module Net::API::REST
 
+v1.0.1 2023-06-10T19:56:22+0900
+    - Minor documentation update
+    - Minor enhancement of method in Net::API::REST::Endpoint
+    - Correcting missing method variables() in Net::API::REST::Request
+
+v1.0.0 2023-06-10T15:49:55+0900
+    - Major design change by inheriting from Apache2::API for a lot of the methods and focusing here on the RESTful related ones.
+
 v0.8.1 2023-03-24T16:24:44+0900
     - Changing approach in method reply() in Net::API::REST for post-response callback using $r->pool->cleanup_register
     - Corrected method route() for using per HTTP method class method, such as _get => My::Module->list

@@ -5,9 +5,12 @@ lib/Test/HTML/Content/NoXPath.pm
 lib/Test/HTML/Content/XPathExtensions.pm
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.skip
+MANIFEST.SKIP
+META.json
 META.yml
 README
+README.mkdn
+t/00-load.t
 t/00-prerequisites.t
 t/01-fallback-libxml.t
 t/01-fallback-pureperl.t
@@ -28,14 +31,20 @@ t/10-errors.text.t
 t/12-title-fallback.t
 t/12-title.t
 t/13-xpath-gracefull-errors.t
-t/99-changes.t
-t/99-manifest.t
-t/99-Pod.t
-t/99-todo.t
-t/99-unix-text.t
-t/99-versions.t
 t/embedded-Test-HTML-Content-NoXPath.t
 t/embedded-Test-HTML-Content-XPathExtensions.t
 t/embedded-Test-HTML-Content.t
 t/testlib.pm
-META.json                                Module JSON meta-data (added by MakeMaker)
+testrules.yml
+xt/99-changes.t
+xt/99-compile.t
+xt/99-manifest.t
+xt/99-minimumversion.t
+xt/99-pod.t
+xt/99-synopsis.t
+xt/99-test-prerequisites.t
+xt/99-todo.t
+xt/99-unix-text.t
+xt/99-versions.t
+xt/copyright.t
+xt/meta-lint.t

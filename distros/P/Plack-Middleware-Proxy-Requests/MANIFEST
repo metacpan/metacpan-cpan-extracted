@@ -1,19 +1,16 @@
+.perlcriticrc
 Build.PL
 Changes
+cpanfile
 examples/apt-proxy.psgi
 examples/proxy.psgi
 lib/Plack/Middleware/Proxy/Requests.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 README
 README.md
 t/010_use.t
 t/100_proxy_url.t
-t/test.pl
 xt/check_changes.t
 xt/consistent_version_numbers.t
 xt/copyright.t
@@ -27,10 +24,13 @@ xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
 xt/perlcritic.t
-xt/perlcriticrc
 xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t
+xt/portability_files.t
 xt/signature.t
-SIGNATURE    Added here by Module::Build
+Makefile.PL
+LICENSE
+META.yml
+META.json

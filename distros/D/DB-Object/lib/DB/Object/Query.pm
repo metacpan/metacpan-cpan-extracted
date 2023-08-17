@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.5.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.5.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2023/06/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $VERBOSE );
     use Devel::Confess;
-    $VERSION = 'v0.5.1';
+    $VERSION = 'v0.5.2';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -1039,7 +1039,11 @@ sub select
             my @aliases = ();
             foreach my $f ( keys( %$alias ) )
             {
-                if( CORE::exists( $ok_ref->{ $f } ) && $prefix )
+                if( ref( $alias->{ $f } ) eq 'SCALAR' )
+                {
+                    CORE::push( @aliases, "$f AS " . ${$alias->{ $f }} );
+                }
+                elsif( CORE::exists( $ok_ref->{ $f } ) && $prefix )
                 {
                     CORE::push( @aliases, "${prefix}.${f} AS \"" . $alias->{ $f } . "\"" );
                 }
@@ -1797,22 +1801,6 @@ sub _where_having
                                 $cl->bind->types->push( '' );
                             }
                         }
-#                         if( $f->binded )
-#                         {
-#                             $f->types->foreach(sub
-#                             {
-#                                 my $f_type = shift( @_ );
-#                                 # Change this from data type string to a driver constant
-#                                 if( $f_type )
-#                                 {
-#                                     $cl->bind->types->push( $self->database_object->get_sql_type( $f_type ) );
-#                                 }
-#                                 else
-#                                 {
-#                                     $cl->bind->types->push( '' );
-#                                 }
-#                             });
-#                         }
                         push( @list, $cl );
                         
                         # If this field value assignment is followed (as a pair) by just a regular field, this is likely a typo.
@@ -1833,6 +1821,12 @@ sub _where_having
                     elsif( ( scalar( @arg ) % 2 ) && !ref( $arg[0] ) )
                     {
                         push( @list, $self->new_clause({ value => shift( @arg ), type => 'where' }) );
+                        next;
+                    }
+                    elsif( ( scalar( @arg ) % 2 ) && ref( $arg[0] ) eq 'SCALAR' )
+                    {
+                        my $scalar = shift( @arg );
+                        push( @list, $self->new_clause({ value => $$scalar, type => 'where' }) );
                         next;
                     }
                     # Catching some typical typo errors for the benefit of the coder (from experience)
@@ -2189,7 +2183,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.5.1
+    v0.5.2
 
 =head1 DESCRIPTION
 
@@ -2764,7 +2758,7 @@ Actually this method is not used anymore and really qui dangerous because parsin
 
 =head2 _where_having
 
-This is used to format C<where> and C<having> clause.
+This is used to format C<WHERE> and C<HAVING> clause.
 
 Provided with a query type and clause property name such as C<having> or C<where> and other parameters and this will format the C<where> or C<having> clause and return a new L<DB::Object::Query::Clause> object.
 
@@ -2778,7 +2772,25 @@ If the parameter is a L<DB::Object::Operator> object like L<DB::Object::AND>, L<
 
 If the parameter is a L<DB::Object::Query::Clause> object, it will be added to the stack of elements.
 
+If the parameter is a L<DB::Object::Expression> object, it will be added to the stack of elements.
+
 If the parameter is a L<DB::Object::Fields::Field::Overloaded> object, it will be added as a new L<DB::Object::Query::Clause> to the stack.
+
+If the parameter is a litteral represented as a string or a scalar reference, then it will be added to the list as-is. For example:
+
+    $tbl->where(
+        $tbl->fo->status eq 'active',
+        "LENGTH(?) > 12"
+    );
+
+or
+
+    $tbl->where(
+        $tbl->fo->status eq 'active',
+        \"LENGTH(?) > 12"
+    );
+
+However, make sure to put this expression at the end.
 
 It then checks parameters two by two, the first one being the column and the second being its value.
 
@@ -2790,7 +2802,9 @@ If the value is a scalar reference, it will be added as is in a new clause objec
 
 If the value is a L<DB::Object::Statement>, L<DB::Object::Statement/fetchrow> will be called and the value fetched will be added as a new clause object to the stack.
 
-If the value is a perl Regexp object, then it will be formatted in a way suitable to the driver and added to a new clause object to the stack.
+If the value is a perl Regexp object, then it will be formatted in a way suitable to the driver and added to a new clause object and onto the stack.
+
+If the value looks like some table field embedded inside some SQL function, then it will be added to a new clause object and onto the stack.
 
 See L<Postgres documentation for more information|https://www.postgresql.org/docs/9.5/functions-matching.html>
 

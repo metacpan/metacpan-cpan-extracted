@@ -156,13 +156,13 @@ Date: <removed>
 MIME-Version: 1.0
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 just checking
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 greetings!
@@ -187,7 +187,7 @@ Date: <removed>
 MIME-Version: 1.0
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 just checking
@@ -197,7 +197,7 @@ Content-Type: message/rfc822
 
 To: you
 X-Loop: yes
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 Message-Id: <removed>
 Date: <removed>
@@ -231,13 +231,13 @@ Date: <removed>
 MIME-Version: 1.0
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 just checking
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 this is the first
@@ -277,7 +277,7 @@ Date: <removed>
 MIME-Version: 1.0
 
 --boundary-<removed>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
 Prelude

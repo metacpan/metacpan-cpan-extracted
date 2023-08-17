@@ -37,8 +37,6 @@ BEGIN
     use Crypt::Mac::HMAC qw(hmac);
     use Compress::Raw::Zlib;
     use Scalar::Util qw(looks_like_number);
-    # For debugging
-    use Data::Dumper;
     # Crypt::JWT version 0.024
     our $VERSION = 'v0.100.2';
 };

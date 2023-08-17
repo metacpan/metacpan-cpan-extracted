@@ -1,0 +1,37 @@
+---
+abstract: 'Highlight code'
+author:
+  - 'Andreas Vögele <voegelas@cpan.org>'
+build_requires:
+  Mojo::DOM: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statocles-Plugin-Highlight-Kamelon
+provides:
+  Statocles::Plugin::Highlight::Kamelon:
+    file: lib/Statocles/Plugin/Highlight/Kamelon.pm
+    version: '1.000'
+requires:
+  Statocles::Base: '0'
+  Statocles::Plugin: '0'
+  Statocles::Plugin::Highlight: '0'
+  Syntax::Kamelon: '0'
+  perl: '5.016'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon/issues
+  homepage: https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon/wiki
+  repository: https://github.com/voegelas/Statocles-Plugin-Highlight-Kamelon.git
+version: '1.000'
+x_generated_by_perl: v5.36.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

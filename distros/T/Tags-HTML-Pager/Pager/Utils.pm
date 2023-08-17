@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(adjust_actual_page compute_index_values
 	pages_num);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub adjust_actual_page {
 	my ($input_actual_page, $pages) = @_;
@@ -236,12 +236,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

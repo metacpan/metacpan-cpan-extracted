@@ -23,12 +23,13 @@ my $build = Module::Build->new(
     },
     create_makefile_pl => 'traditional',
     script_files       => [ 'bin/gigs' ],
-    meta_merge         => {
+    meta_merge => {
+        'meta-spec' => { version => 2 },
         resources => {
             repository => {
                 type => 'git',
-                web => 'https://github.com/davorg/net-songkick',
                 url => 'https://github.com/davorg/net-songkick.git',
+                web => 'https://github.com/davorg/net-songkick',
             },
             bugtracker => {
                 web => 'https://github.com/davorg/net-songkick/issues',

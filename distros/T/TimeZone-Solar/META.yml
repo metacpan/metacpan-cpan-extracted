@@ -19,7 +19,7 @@ meta-spec:
 name: TimeZone-Solar
 requires:
   Carp: '0'
-  DateTime::TimeZone: '0'
+  DateTime::TimeZone: v0.80.0
   Modern::Perl: '0'
   Readonly: '0'
   Try::Tiny: '0'
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: https://github.com/ikluft/LongitudeTZ/issues
   repository: git://github.com/ikluft/LongitudeTZ.git
-version: 0.2.1
-x_generated_by_perl: v5.36.0
+version: 0.2.2
+x_generated_by_perl: v5.36.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

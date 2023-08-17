@@ -9,9 +9,9 @@ use Cwd qw(abs_path);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-25'; # DATE
+our $DATE = '2023-05-20'; # DATE
 our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.153'; # VERSION
+our $VERSION = '0.154'; # VERSION
 
 our %SPEC;
 
@@ -78,7 +78,7 @@ dir2mod - Convert directory name to module name
 
 =head1 VERSION
 
-This document describes version 0.153 of dir2mod (from Perl distribution App-DistUtils), released on 2023-02-25.
+This document describes version 0.154 of dir2mod (from Perl distribution App-DistUtils), released on 2023-05-20.
 
 =head1 SYNOPSIS
 
@@ -354,6 +354,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DistUt
 Source repository is at L<https://github.com/perlancar/perl-App-DistUtils>.
 
 =head1 SEE ALSO
+
+L<this-mod>
 
 L<dir2dist>
 

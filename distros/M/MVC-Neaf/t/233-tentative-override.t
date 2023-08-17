@@ -8,7 +8,7 @@ use Test::Warn;
 use MVC::Neaf;
 
 # portable carp pointers
-my @line = map { __FILE__.' line '.(__LINE__ + $_) } 0..4;
+my @line = map { file_line( __LINE__ + $_ ) } 0..4;
 get      '/my'  => sub { +{-content => "OLD"} };
 post+put '/my'  => sub { +{-content => "OLD"} };
 patch    '/my'  => sub { +{-content => "OLD"} };
@@ -32,11 +32,13 @@ warnings_like{
     };
     ok !$@, "No exception for override"
         or diag "override dies: $@";
-} [qr#Overriding.*/my.*at $line[2]#], "override still with a warning";
+    # NOTE `put` is executed before `patch`, therefore warnings in that order
+} [qr(Overriding.*/my.*at $line[2]), qr(Overriding.*/my.*at $line[3])],
+     "override still with a warning";
 
 warnings_like {
     eval {
-        push @line, __FILE__." line ".(__LINE__+1);
+        push @line, file_line( __LINE__+1 );
         put '/our' => sub { +{-content => 'NEW' } };
     };
     ok !$@, "No exception for tentative"
@@ -73,3 +75,9 @@ warnings_like {
 } [], "...and still no warnings";
 
 done_testing;
+
+sub file_line {
+    my $line = shift;
+    my $str = __FILE__." line ".$line;
+    return qr/\Q$str\E/;
+};

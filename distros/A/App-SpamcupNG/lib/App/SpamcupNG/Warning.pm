@@ -2,7 +2,7 @@ package App::SpamcupNG::Warning;
 use strict;
 use warnings;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 =head1 NAME
 

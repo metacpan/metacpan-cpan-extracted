@@ -5,13 +5,15 @@ class TestCase::NativeAPI {
   use TestCase::Pointer;
   use TestCase::PointerChild;
   use TestCase::PointerEmpty;
-  use TestCase::Callback::Callback;
-  use TestCase::Callback::ImplementCallback1;
-  use TestCase::Callback::ImplementCallback2;
+  use TestCase::AnonMethod::AnonMethod;
+  use TestCase::AnonMethod::ImplementAnonMethod1;
+  use TestCase::AnonMethod::ImplementAnonMethod2;
   use Fn;
   use Array;
   use Error;
   use Complex_2d;
+  use Point;
+  use TestCase::PrecompileClassAttribute;
   
   INIT {
     # Call native method in INIT block
@@ -45,15 +47,16 @@ class TestCase::NativeAPI {
   native static method new_memory_apis : int ();
 
   native static method check_native_api_indexes : int ();
-  native static method check_native_api_precompile_indexes : int ();
   native static method check_native_api_string_buffer_indexes : int ();
   native static method check_native_api_allocator_indexes : int ();
   native static method check_native_api_compiler_indexes : int ();
   native static method check_native_api_runtime_indexes : int ();
   native static method check_native_api_constant_values : int ();
-
+  
+  native static method get_class_var : int ();
+  
   static method get_class_var_byte_by_name : int () {
-
+    
     $BYTE_VALUE = (byte)Fn->INT8_MIN;
     
     my $value = TestCase::NativeAPI->get_class_var_byte_by_name_test();
@@ -378,7 +381,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method set_class_var_double_by_name_test_exception : double ();
-
+  
   static method set_class_var_object_by_name : int () {
     
     TestCase::NativeAPI->set_class_var_object_by_name_test();
@@ -391,7 +394,7 @@ class TestCase::NativeAPI {
     return 0;
   }
   native static method set_class_var_object_by_name_test : void ();
-
+  
   static method set_class_var_object_by_name_exception : int () {
     
     eval { TestCase::NativeAPI->set_class_var_object_by_name_test_exception(); };
@@ -403,34 +406,13 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method set_class_var_object_by_name_test_exception : object ();
-
-  native static method has_interface_test : int ($object : object);
-  static method has_interface : int () {
-    my $impl1 = TestCase::Callback::ImplementCallback1->new;
-    my $impl1s = new TestCase::Callback::ImplementCallback1[3];
-    my $minimal = TestCase::Minimal->new;
-
-    unless (TestCase::NativeAPI->has_interface_test($impl1)) {
-      return 0;
-    }
-    
-    unless (!TestCase::NativeAPI->has_interface_test($impl1s)) {
-      return 0;
-    }
-    
-    unless (!TestCase::NativeAPI->has_interface_test($minimal)) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
+  
   native static method is_type_test_minimals : int ($object : object);
   static method is_type : int () {
     my $minimals = new TestCase::Minimal[3];
     my $minimal = TestCase::Minimal->new;
     my $simples = new TestCase::Simple[3];
-
+    
     unless (TestCase::NativeAPI->is_type_test_minimals($minimals)) {
       return 0;
     }
@@ -445,7 +427,7 @@ class TestCase::NativeAPI {
     
     return 1;
   }
-
+  
   native static method ref_byte_sum : byte ($x_in : byte, $x_in2 : byte, $x_out : byte*);
   static method ref_byte : int () {
     my $out : byte;
@@ -459,7 +441,7 @@ class TestCase::NativeAPI {
     
     return 0;
   }
-
+  
   native static method ref_short_sum : short ($x_in : short, $x_in2 : short, $x_out : short*);
   static method ref_short : int () {
     my $out : short;
@@ -473,7 +455,7 @@ class TestCase::NativeAPI {
     
     return 0;
   }
-
+  
   native static method ref_int_sum : int ($x_in : int, $x_in2 : int, $x_out : int*);
   static method ref_int : int () {
     my $out : int;
@@ -487,7 +469,7 @@ class TestCase::NativeAPI {
     
     return 0;
   }
-
+  
   native static method ref_long_sum : long ($x_in : long, $x_in2 : long, $x_out : long*);
   static method ref_long : int () {
     my $out : long;
@@ -515,7 +497,7 @@ class TestCase::NativeAPI {
     
     return 0;
   }
-
+  
   native static method ref_double_sum : double ($x_in : double, $x_in2 : double, $x_out : double*);
   static method ref_double : int () {
     my $out : double;
@@ -529,7 +511,7 @@ class TestCase::NativeAPI {
     
     return 0;
   }
-
+  
   static method set_field_byte_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -542,7 +524,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_byte_by_name : void ($simple : TestCase::Simple);
-
+  
   static method set_field_byte_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -557,7 +539,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_byte_by_name_exception : void ($simple : TestCase::Simple);
-
+  
   static method set_field_short_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -570,7 +552,7 @@ class TestCase::NativeAPI {
     return 0;
   }
   native static method native_set_field_short_by_name : void ($simple : TestCase::Simple);
-
+  
   static method set_field_short_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -584,7 +566,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_short_by_name_exception : void ($simple : TestCase::Simple);
-
+  
   static method set_field_int_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -597,7 +579,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_int_by_name : void ($simple : TestCase::Simple);
-
+  
   static method set_field_int_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -611,7 +593,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_int_by_name_exception : void ($simple : TestCase::Simple);
-
+  
   static method set_field_long_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -624,7 +606,7 @@ class TestCase::NativeAPI {
     return 0;
   }
   native static method native_set_field_long_by_name : void ($simple : TestCase::Simple);
-
+  
   static method set_field_long_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -638,7 +620,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_long_by_name_exception : void ($simple : TestCase::Simple);
-
+  
   static method set_field_float_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -651,7 +633,7 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method native_set_field_float_by_name : void ($simple : TestCase::Simple);
-
+  
   static method set_field_float_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -660,13 +642,13 @@ class TestCase::NativeAPI {
     unless ($@) {
       return 0;
     }
-
+    
     $@ = undef;
     
     return 1;
   }
   native static method native_set_field_float_by_name_exception : void ($simple : TestCase::Simple);
-
+  
   static method set_field_double_by_name : int () {
     my $simple = TestCase::Simple->new;
     
@@ -1109,6 +1091,7 @@ class TestCase::NativeAPI {
   
   static method my_value : int ($value : int) { return $value; }
   
+  native static method native_call_method_no_mortal : int ();
   native static method native_call_method : int ();
   native static method native_call_class_method_by_name : int ();
   native static method native_call_class_method_by_name_exception : int ();
@@ -1219,19 +1202,19 @@ class TestCase::NativeAPI {
   }
   native static method native_new_pointer_object_by_name_exception : TestCase::Pointer ();
 
-  static method get_instance_method_id_static : int () {
+  static method get_instance_method_static : int () {
     
     my $minimal = TestCase::Minimal->new;
     $minimal->set_x(4);
     
-    my $x = &get_instance_method_id_static_native($minimal);
+    my $x = &get_instance_method_static_native($minimal);
     unless ($x == 4) {
       return 0;
     }
     
     return 1;
   }
-  native static method get_instance_method_id_static_native : int ($minimal : TestCase::Minimal);
+  native static method get_instance_method_static_native : int ($minimal : TestCase::Minimal);
   
   static method get_bool_object_value : int () {
     
@@ -1257,30 +1240,28 @@ class TestCase::NativeAPI {
   }
   native static method get_bool_object_value_native : int ($bool_object : Bool);
 
-  native static method new_string_raw : int ();
+  native static method new_string_no_mortal : int ();
 
   native static method new_string : int ();
 
-  native static method new_string_nolen_raw : int ();
+  native static method new_string_nolen_no_mortal : int ();
 
   native static method new_string_nolen : int ();
   
-  native static method get_class_id : int ();
-  native static method get_class_id_by_name : int ();
-  native static method get_basic_type_id_by_name : int ();
+  native static method get_basic_type_id : int ();
 
   native static method strerror_value : string ($errno_value : int);
   native static method strerror_nolen_value : string ($errno_value : int);
   native static method strerror_string_value : string ($errno_value : int);
   native static method strerror_string_nolen_value : string ($errno_value : int);
-  native static method new_object_array_raw : int ();
+  native static method new_object_array_no_mortal : int ();
   native static method new_object_array : int ();
   native static method new_string_array : int ();
   native static method new_string_array_value : string[] ();
   
-  static method get_args_stack_length : int () {
+  static method args_width : int () {
     {
-      my $args_length = &get_args_stack_length_0;
+      my $args_length = &args_width_0;
       unless ($args_length == 0) {
         return 0;
       }
@@ -1288,21 +1269,21 @@ class TestCase::NativeAPI {
     
     
     {
-      my $args_length = &get_args_stack_length_1(0);
+      my $args_length = &args_width_1(0);
       unless ($args_length == 1) {
         return 0;
       }
     }
     
     {
-      my $args_length = &get_args_stack_length_2(0);
+      my $args_length = &args_width_2(0);
       unless ($args_length == 1) {
         return 0;
       }
     }
     
     {
-      my $args_length = &get_args_stack_length_2(0, 0);
+      my $args_length = &args_width_2(0, 0);
       unless ($args_length == 2) {
         return 0;
       }
@@ -1310,7 +1291,7 @@ class TestCase::NativeAPI {
 
     {
       my $z : Complex_2d;
-      my $args_length = &get_args_stack_length_4($z, 0, 0);
+      my $args_length = &args_width_4($z, 0, 0);
       unless ($args_length == 4) {
         return 0;
       }
@@ -1318,7 +1299,7 @@ class TestCase::NativeAPI {
 
     {
       my $z : Complex_2d;
-      my $args_length = &get_args_stack_length_4($z);
+      my $args_length = &args_width_4($z);
       unless ($args_length == 2) {
         return 0;
       }
@@ -1326,63 +1307,38 @@ class TestCase::NativeAPI {
     
     return 1;
   }
-  native static method get_args_stack_length_0 : int ();
-  native static method get_args_stack_length_1 : int ($args0 : int);
-  native static method get_args_stack_length_2 : int ($args0 : int, $args1 = 0 : int);
-  native static method get_args_stack_length_4 : int ($args_2d : Complex_2d, $args0 = 0 : int, $args1 = 0 : int);
+  native static method args_width_0 : int ();
+  native static method args_width_1 : int ($args0 : int);
+  native static method args_width_2 : int ($args0 : int, $args1 : int = 0);
+  native static method args_width_4 : int ($args_2d : Complex_2d, $args0 : int = 0, $args1 : int = 0);
 
-  static method items : int () {
-    {
-      my $args_length = &items_0;
-      unless ($args_length == 0) {
-        return 0;
-      }
-    }
-    
-    
-    {
-      my $args_length = &items_1(0);
-      unless ($args_length == 1) {
-        return 0;
-      }
-    }
-    
-    {
-      my $args_length = &items_2(0);
-      unless ($args_length == 1) {
-        return 0;
-      }
-    }
-    
-    {
-      my $args_length = &items_2(0, 0);
-      unless ($args_length == 2) {
-        return 0;
-      }
-    }
+  native static method default_all_types_native : int (
+    $value_byte : byte = -128,
+    $value_short : short = -32768,
+    $value_int : int = -2147483648,
+    $value_long : long = -9223372036854775808L,
+    $value_float : float = 1.5f,
+    $value_double : double = -2147483648.5,
+    $value_object : object = undef,
+  );
 
+  static method default_all_types : int () {
     {
-      my $z : Complex_2d;
-      my $args_length = &items_4($z, 0, 0);
-      unless ($args_length == 4) {
+      my $success = &default_all_types_native(1, 2, 3, 4, 5.5f, 6.5, Int->new(1));
+      unless ($success) {
         return 0;
       }
     }
-
+    
     {
-      my $z : Complex_2d;
-      my $args_length = &items_4($z);
-      unless ($args_length == 2) {
+      my $success = &default_all_types_native();
+      unless ($success) {
         return 0;
       }
     }
     
     return 1;
   }
-  native static method items_0 : int ();
-  native static method items_1 : int ($args0 : int);
-  native static method items_2 : int ($args0 : int, $args1 = 0 : int);
-  native static method items_4 : int ($args_2d : Complex_2d, $args0 = 0 : int, $args1 = 0 : int);
 
   native static method dumpc : int ();
 
@@ -1410,4 +1366,35 @@ class TestCase::NativeAPI {
   }
   
   native method get_string_field_native : int ();
+  
+  static method floating_point_constant : int () {
+    
+    {
+      my $float_value1 = 1.02f;
+      my $dobule_value1 = 1.5e+300;
+      my $success = &floating_point_constant_native($float_value1, $dobule_value1);
+      unless ($success) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  native static method floating_point_constant_native : int (
+    $float_value1 : float,
+    $double_value1 : double,
+  );
+  
+  static method call_method_in_precompile_class : int () {
+    my $ret = TestCase::PrecompileClassAttribute->foo;
+    
+    unless ($ret == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  native static method get_object_basic_type_name : int ();
 }

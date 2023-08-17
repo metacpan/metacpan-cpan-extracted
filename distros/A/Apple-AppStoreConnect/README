@@ -1,0 +1,33 @@
+Apple-AppStoreConnect
+
+Apple::AppStoreConnect - Simple Apple WeatherKit REST API client
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+CPAN:
+    https://metacpan.org/pod/Apple::AppStoreConnect
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Apple::AppStoreConnect
+
+Source code and issues on GitHub:
+    https://github.com/dkechag/Apple-AppStoreConnect
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

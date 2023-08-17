@@ -1,0 +1,10 @@
+Revision history for Perl extension Tk::ListEntry.
+
+0.03  Mon Jun 6 2023
+	Fixed bug in method Show
+
+0.02  Mon Jun 6 2023
+	Fixed bug in method Show
+
+0.01  Mon Jun 5 2023
+	Initial version

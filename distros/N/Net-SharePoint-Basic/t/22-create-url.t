@@ -55,17 +55,17 @@ sub make_url ($$;$) {
 }
 
 for (qw(upload download makedir delete list chunk)) {
-	when ('list') {
+	if ($_ eq 'list') {
 		for my $st (qw(files folders)) {
 			make_url($sp, 'list', $st);
 		}
 	}
-	when ('chunk') {
+	elsif ($_ eq 'chunk') {
 		for my $st (qw(start continue finish)) {
 			make_url($sp, 'chunk', $st);
 		}
 	}
-	default {
+	else {
 		make_url($sp, $_);
 	}
 }

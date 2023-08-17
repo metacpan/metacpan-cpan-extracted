@@ -46,7 +46,7 @@ class TestCase::Sys::Process {
     my $status = -1;
     eval { $status = Sys::Process->setpriority(PROCESS->PRIO_PROCESS, 0, 0); };
     
-    if ($@ && error == class_id Error::System) {
+    if ($@ && eval_error_id == basic_type_id Error::System) {
       warn "\n[Test Output]setpriority:setpriority failed on this environment";
     }
     else {

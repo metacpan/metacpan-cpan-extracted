@@ -6,7 +6,7 @@ use strict;
 # information
 #
 # ABSTRACT: Query the Dutch Chamber of Commerce via the CLI
-# PODNAME: query_kvk.pl
+# PODNAME: query-kvk.pl
 
 use Data::Dumper;
 use Getopt::Long;
@@ -19,6 +19,7 @@ GetOptions(
     \%options, qw(
         help|h
         man|m
+        hostname=s
 
         spoof
         profile|profiel|basic-profile=i
@@ -63,6 +64,7 @@ if (!$api_key && !$options{spoof}) {
 }
 
 my $api = WebService::KvKAPI->new(
+    $options{hostname} ? (api_host => $options{hostname}) : (),
     $options{spoof} ? (spoof => 1) : ( api_key => $api_key ),
 );
 delete $options{spoof};
@@ -111,15 +113,15 @@ __END__
 
 =head1 NAME
 
-query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
+query-kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.103
+version 0.105
 
 =head1 SYNOPSIS
 
-query_kvk.pl [ OPTIONS ]
+query-kvk.pl [ OPTIONS ]
 
 =head1 DESCRIPTION
 
@@ -132,7 +134,7 @@ information on how to use the API.
 
 =head1 NAME
 
-query_kvk.pl - Query the KvK API from the CLI
+query-kvk.pl - Query the KvK API from the CLI
 
 =head1 OPTIONS
 
@@ -145,6 +147,10 @@ This help
 =item * --spoof
 
 Use the test API from the KvK, does not require an API key
+
+=item * --hostname
+
+Use a different hostname instead of the B<api.kvk.nl>.
 
 =item * --api-key | --apikey | --apiKey
 
@@ -232,11 +238,11 @@ Select the amount of results you get back. Defaults to 10.
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@mintlab.nl>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl / xxllnc, see CONTRIBUTORS file for others.
 
 This is free software, licensed under:
 

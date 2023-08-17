@@ -2,40 +2,37 @@ package CPAN::02Packages::Search;
 use strict;
 use warnings;
 
-use IO::Handle;
 use Search::Dict ();
+use Symbol ();
 use Tie::Handle::SkipHeader;
 
-our $VERSION = '0.002';
+our $VERSION = '0.100';
 
 sub new {
     my ($class, %argv) = @_;
-    my $file = $argv{file};
-    my $skip_header = exists $argv{skip_header} ? $argv{skip_header} : 1;
-    my $self = bless { file => $file, skip_header => $skip_header }, $class;
-    $self->_fh;
-    $self;
+    my $fh = $argv{fh};
+    if (!$fh) {
+        my $file = $argv{file};
+        my $skip_header = exists $argv{skip_header} ? $argv{skip_header} : 1;
+        $fh = $class->_open($file, $skip_header);
+    }
+    bless { fh => $fh }, $class;
 }
 
-sub _fh {
-    my $self = shift;
-    return $self->{fh} if defined $self->{pid} && $self->{pid} == $$;
-    my $file = $self->{file};
-    if ($self->{skip_header}) {
-        my $fh = IO::Handle->new;
+sub _open {
+    my ($class, $file, $skip_header) = @_;
+    if ($skip_header) {
+        my $fh = Symbol::gensym;
         tie *$fh, 'Tie::Handle::SkipHeader', '<', $file or die "$!: $file\n";
-        $self->{fh} = $fh;
-    } else {
-        open my $fh, "<", $file or die "$!: $file\n";
-        $self->{fh} = $fh;
+        return $fh;
     }
-    $self->{pid} = $$;
-    $self->{fh};
+    open my $fh, "<", $file or die "$!: $file\n";
+    $fh;
 }
 
 sub search {
     my ($self, $package) = @_;
-    my $fh = $self->_fh;
+    my $fh = $self->{fh};
     seek $fh, 0, 0;
     my $pos = Search::Dict::look $fh, $package, { xfrm => \&_xform_package, fold => 1 };
     return if $pos == -1 || eof $fh;
@@ -86,12 +83,12 @@ So I ended up extracting functionality of searching packages from CPAN::Common::
 =head1 PERFORMANCE
 
 CPAN::Common::Index::Mirror and CPAN::02Packages::Search use L<Search::Dict>, which implements binary search.
-A simple benchmark shows that CPAN::02Packages::Search is 422 times faster than I<naive> search.
+A simple benchmark shows that CPAN::02Packages::Search is 322 times faster than I<linear> search.
 
   ❯ perl bench/bench.pl
-                 Rate naive_search   our_search
-  naive_search 4.13/s           --        -100%
-  our_search   1752/s       42291%           --
+                  Rate linear_search    our_search
+  linear_search 4.85/s            --         -100%
+  our_search    1570/s        32244%            --
 
 See L<bench/bench.pl|https://github.com/skaji/CPAN-02Packages-Search/blob/main/bench/bench.pl> for details.
 

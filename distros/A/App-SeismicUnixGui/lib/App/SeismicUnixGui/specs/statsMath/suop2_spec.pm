@@ -355,11 +355,12 @@ sub suffix_aref {
 	for ( my $i = 0; $i < $max_index; $i++ ) {
 
 		$suffix[$i] = $empty_string;
-		if ( $suffix[$i] ) {
-
-			# print("suop2_spec,suffix: $suffix[$i]\n");
-
-		}
+		
+#		if ( $suffix[$i] ) {
+#
+#			# print("suop2_spec,suffix: $suffix[$i]\n");
+#
+#		}
 	}
 	my $index_aref = get_binding_index_aref();
 	my @index      = @$index_aref;

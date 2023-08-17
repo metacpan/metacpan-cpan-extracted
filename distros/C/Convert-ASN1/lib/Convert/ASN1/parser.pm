@@ -5,7 +5,7 @@
 ;# modify it under the same terms as Perl itself.
 
 package Convert::ASN1::parser;
-$Convert::ASN1::parser::VERSION = '0.33';
+$Convert::ASN1::parser::VERSION = '0.34';
 use strict;
 use Convert::ASN1 qw(:all);
 use vars qw(

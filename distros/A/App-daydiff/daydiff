@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Time::Piece ;  
+use Getopt::Std ; getopts "ais:u=,:+:~" , \my%o  ;
+
+# $o{s} ; strftime 形式の日付形式。読取りに用いる。
+# $o{'~'} ; 差をとる順番の指定。-~ があるかどうかでマイナス1倍になる。
+# $o{'+'} ; 最後に、日付をずらしたい時に、指定する。
+# $o{','} ; 入出力の区切り文字の指定
+# $o{'='} ; 最初の行を処理の対象にするかどうか( ! 未実装) 
+# $o{a} : 入力を出力するかどうか
+
+my $outputProc ; 
+&ChoreOpt ; 
+&MainCore ; 
+exit 0 ;
+
+# 引数についての処理
+sub ChoreOpt { 
+    $o{','} //= "\t" ; 
+    $o{'+'} //= 0 ;
+    $o{s} //= '%Y-%m-%d' ;
+    $o{u} //= 'undef' ;
+
+    # 引数は、1番目は1列目の2014年末日からの日数、2番目は2列目の2014年末日からの日数、それ以降は元の文字列をタブで分けたもの
+    $outputProc = 
+        $o{i} ? 
+            $o{'~'} ? 
+                sub ($$@) { &numdiff ($_[1] , $_[0]) , @_[4 .. $#_] } : 
+                sub ($$@) { &numdiff ($_[0] , $_[1]) , @_[4 .. $#_] } :
+        $o{a} ? 
+            $o{'~'} ? 
+                sub ($$@) { &numdiff ($_[1] , $_[0]) , @_[2 .. $#_] } : 
+                sub ($$@) { &numdiff ($_[0] , $_[1]) , @_[2 .. $#_] } :
+            $o{'~'} ? 
+                sub ($$@) { &numdiff ($_[1] , $_[0]) } : 
+                sub ($$@) { &numdiff ($_[0] , $_[1]) } ;
+}
+
+# 各入力行を処理する部分
+sub MainCore { 
+    while ( <> ) { 
+        chomp ; 
+        my @F = split /$o{','}/ , $_ , 3 ;  
+        my $D1 = &DsYe2014 ( $F[0] ) ; 
+        my $D2 = &DsYe2014 ( $F[1] ) ; 
+        my @res = $outputProc -> ( $D1, $D2 , @F ) ; 
+        print join ( $o{','} , @res  ) , "\n" ; 
+    }
+}
+
+# 2014年の末日からの日付の差を求める。後になる程、大きな数になる。
+sub DsYe2014 ($) { 
+    state $mem ; # 複数回呼び出されたときは以前の結果を使うことで、高速化。 
+    return $mem -> { $_[0] } if exists $mem -> { $_[0] } ; 
+    state $d0 = Time::Piece -> strptime ( "2014-12-31" , "%Y-%m-%d" ) ; 
+    my $d1 = eval { Time::Piece -> strptime ( $_[0] , $o{s} ) } ; 
+    $mem -> { $_[0] } =  defined $d1 ? ( $d1 - $d0 ) / 86400 : undef ; 
+}
+
+# 2個の数の差を計算し、調整量を加算する。どちらかの数が未定義なら、未定義であることを示す値を返す。
+sub numdiff ( $$ ) { defined $_[0] && defined $_[1] ? $_[0] - $_[1] + $o{'+'} : $o{u} } 
+
+# --helpに対する処理
+sub VERSION_MESSAGE {} 
+sub HELP_MESSAGE { 
+    $0 =~ s|.*/|| ; 
+    $ARGV[1] //= '' ;
+    while ( <DATA> ) { 
+        s/\$0/$0/g ; 
+        print $_ if $ARGV[1] =~ /opt/ ? m/^\ +\-/ : s/^=head1(.*)\n/$1/ .. s/^=cut(.*)\n/$1/ ; 
+        #print $_ if s/^=head1(.*)\n/$1/ .. s/^=cut(.*)\n/$1/ ;
+    }
+    exit 0 ; 
+}
+
+__END__
+
+=encoding utf8
+
+=head1
+
+  $0 
+
+    先頭2列の YYYY-MM-DD 形式の日付に対して、
+    日数の差を出力する。
+
+ オプション: 
+    -a 日付の差を表す数を、入力の前につける。
+    -i 日付2列を、日付の差で置き換える。-aは無効化される。(結果的に出力は入力よりも1列減る。)
+    -s format : 日付の読取り形式を指定。strftimeの形式。未指定なら %Y-%m-%d
+    -u str : 日付として読み取れない場合に出力する文字列
+
+    -, str : 入出力の区切り文字をタブ文字でなくて str に変更する。
+    -~     : 出力の符号を反転する。 
+    -+ num : 調整用。計算した日数差に対して、加算する値 num を指定する。
+
+=cut
+

@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.06';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -66,6 +66,21 @@ List of possible values.
 
 =back
 
+=head1 KEYBINDINGS
+
+=over 4
+
+ <Down>       Moves selection to the next item in the list.
+ <End>        Moves selection to the last item in the list.
+ <Escape>     Hides the poplist.
+ <Home>       Moves selection to the first item in the list.
+ <Return>     Selects the current selection and hides the poplist.
+ <Up>         Moves selection to the previous item in the list.
+
+=back
+
+=cut
+
 =head1 METHODS
 
 =over 4
@@ -85,22 +100,25 @@ sub Populate {
 	$self->{VALUES} = [];
 	
 	my $listbox = $self->Scrolled('Listbox',
+		-selectmode => 'single',
 		-scrollbars => 'oe',
 		-listvariable => $self->{LIST},
+		-xscrollcommand => sub {},
 	)->pack(-fill => 'both');
 	$self->Advertise('Listbox', $listbox);
+	$listbox->bind('<ButtonRelease-1>', [$self, 'Select']);
+	$listbox->bind('<Down>', [$self, 'NavDown']);
 	$listbox->bind('<Escape>', [$self, 'popDown']);
+	$listbox->bind('<End>', [$self, 'NavLast']);
+	$listbox->bind('<Home>', [$self, 'NavFirst']);
 	$listbox->bind('<Return>', [$self, 'Select']);
-	$listbox->bind('<ButtonRelease-1>', [$self, 'Select', Ev('x'), Ev('y')]);
-	$self->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
+	$listbox->bind('<Up>', [$self, 'NavUp']);
+	$listbox->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDATNS'],
-		-borderwidth => ['SELF'],
 		-filter => ['PASSIVE', undef, undef, 0],
-		-foreground => ['SELF', 'DESCENDATNS'],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
-		-relief => ['SELF'],
 		'-values' => ['METHOD', undef, undef, []],
 		DEFAULT => [ $listbox ],
 	);
@@ -144,7 +162,9 @@ sub MotionSelect {
 	my ($self, $x, $y) = @_;
 	my $list = $self->Subwidget('Listbox');
 	$list->selectionClear(0, 'end');
-	$list->selectionSet('@' . "$x,$y");
+	my $i = $list->index('@' . "$x,$y");
+	$list->selectionSet($i);
+	$list->selectionAnchor($i);
 }
 
 sub popDown {
@@ -157,6 +177,53 @@ sub popDown {
 		$self->{FE} = undef;
 	}
 	$self->SUPER::popDown;
+}
+
+sub NavDown {
+	my $self = shift;
+	my $l = $self->Subwidget('Listbox');
+	my $val = $self->{VALUES};
+	my ($sel) = $l->curselection;
+	$sel ++;
+	unless ($sel >= @$val) {
+		$l->selectionClear(0, 'end');
+		$l->selectionSet($sel);
+		$l->selectionAnchor($sel);
+		$l->see($sel);
+	}
+}
+
+sub NavFirst {
+	my $self = shift;
+	my $l = $self->Subwidget('Listbox');
+	$l->selectionClear(0, 'end');
+	$l->selectionSet(0);
+	$l->selectionAnchor(0);
+	$l->see(0);
+}
+
+sub NavLast {
+	my $self = shift;
+	my $l = $self->Subwidget('Listbox');
+	my $val = $self->{VALUES};
+	my $last = $l->index('end') - 1;
+	$l->selectionClear(0, 'end');
+	$l->selectionSet($last);
+	$l->selectionAnchor($last);
+	$l->see($last);
+}
+
+sub NavUp {
+	my $self = shift;
+	my $l = $self->Subwidget('Listbox');
+	my ($sel) = $l->curselection;
+	$sel--;
+	unless ($self < 0) { 
+		$l->selectionClear(0, 'end');
+		$l->selectionSet($sel);
+		$l->selectionAnchor($sel);
+		$l->see($sel);
+	}
 }
 
 sub popUp {
@@ -202,7 +269,7 @@ sub popUp {
 }
 
 sub Select {
-	my ($self, $x, $y) = @_;
+	my $self = shift;
 
 	my $list = $self->Subwidget('Listbox');
 

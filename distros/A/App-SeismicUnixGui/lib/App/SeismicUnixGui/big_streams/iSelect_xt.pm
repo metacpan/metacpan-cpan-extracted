@@ -4,7 +4,7 @@ package App::SeismicUnixGui::big_streams::iSelect_xt;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iSelect_xt.pm
+ PERL PROGRAM NAME: iSelect_xt.pm
  AUTHOR: Juan Lorenzo
  DATE:   June 16 2019
 

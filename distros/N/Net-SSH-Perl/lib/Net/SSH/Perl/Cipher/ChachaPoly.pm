@@ -22,7 +22,7 @@ sub new {
     $ciph;
 }
 
-sub keysize { 64 } 
+sub keysize { 64 }
 sub blocksize { 8 }
 sub authlen { 16 }
 sub ivlen { 0 }
@@ -60,7 +60,7 @@ sub encrypt {
         $ciph->{header}->ivsetup($seqnr,'');
         $aadenc = $ciph->{header}->encrypt(substr($data,0,$aadlen));
     }
-    
+
     # set chacha's block counter to 1
     $ciph->{main}->ivsetup($seqnr,ONE);
     my $enc = $aadenc . $ciph->{main}->encrypt(substr($data,$aadlen));
@@ -139,7 +139,7 @@ with Poly1305 Authentication support for I<Net::SSH::Perl>.
 =head1 DESCRIPTION
 
 I<Net::SSH::Perl::Cipher::Chacha> provides Chacha20 encryption
-with Poly1305 support for I<Net::SSH::Perl>. 
+with Poly1305 support for I<Net::SSH::Perl>.
 
 This module requires I<Crypt::OpenSSH::ChachaPoly> which provides
 a wrapper to the OpenSSH Chacha and Poly1305 functions.

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Query 0.06;
+package Text::Treesitter::Query 0.10;
 
 use v5.14;
 use warnings;
@@ -14,13 +14,29 @@ use List::Util qw( any );
 
 require Text::Treesitter::_XS;
 
+use Exporter 'import';
+our @EXPORT_OK = qw(
+   TSQuantifierZero TSQuantifierZeroOrOne TSQuantifierZeroOrMore
+   TSQuantifierOne  TSQuantifierOneOrMore
+);
+
 =head1 NAME
 
 C<Text::Treesitter::Query> - represents a set of F<tree-sitter> query patterns
 
 =head1 SYNOPSIS
 
-   TODO
+Usually accessed indirectly, via C<Text::Treesitter>.
+
+   use Text::Treesitter;
+
+   my $ts = Text::Treesitter->new(
+      lang_name => "perl",
+   );
+
+   my $query = $ts->load_query_string( "path/to/query.scm" );
+
+   ...
 
 =head1 DESCRIPTION
 
@@ -110,7 +126,14 @@ where, in this case, the C<@name> capture had the capture index 123.
 
 =head2 test_predicates_for_match
 
+   $ok = $query->test_predicates_for_match( $match );
+
+An older form is also accepted:
+
    $ok = $query->test_predicates_for_match( $tree, $match );
+
+The I<$tree> argument is ignored if it is C<undef> or a
+C<Text::Treesitter::Tree> instance.
 
 Returns true if all the predicate tests in the given query match instance are
 successful (or if there are no predicates). Returns false if any predicate
@@ -122,7 +145,7 @@ argument can be passed containing it, for efficient reuse and avoiding
 creating a second copy of the list.
 
    my @captures = $match->captures;
-   my $ok = $query->test_predicates_for_match( $tree, $match, \@captures );
+   my $ok = $query->test_predicates_for_match( $match, \@captures );
 
 The following predicate functions are recognised. Each also has an inverted
 variant whose name is preceeded by C<not-> to invert the logic.
@@ -168,6 +191,24 @@ string values.
 
 (This predicate is inspired by F<nvim>.)
 
+=head3 has-parent?
+
+   (#has-parent? @capture type names)
+
+Accepts if the immediate parent of first argument (which must be a node
+capture) has a type that is any of the subsequent type names.
+
+(This predicate is inspired by F<nvim>.)
+
+=head3 has-ancestor?
+
+   (#has-ancestor? @capture type names)
+
+Accepts if any ancestor of the first argument (which mus be a node capture)
+has a type that is any of the subsequent type names.
+
+(This predicate is inspired by F<nvim>.)
+
 =cut
 
 # Not documented as a method but handy for unit testing
@@ -175,21 +216,41 @@ sub test_predicate ( $self, $func, @args )
 {
    my $invert = $func =~ s/^not-//;
 
+   # Convert args to text
+   my @argtext = map { ref($_) eq "Text::Treesitter::Node" ? $_->text : $_ } @args;
+
    match( $func : eq ) {
       case( "eq?" ) {
-         return $invert ^ ($args[0] eq $args[1]);
+         return $invert ^ ($argtext[0] eq $argtext[1]);
       }
       case( "match?" ) {
          # This is an unanchored match; use ^ and $ to anchor it if required
-         return $invert ^ ($args[0] =~ m/$args[1]/);
+         return $invert ^ ($argtext[0] =~ m/$argtext[1]/);
       }
       case( "contains?" ) {
-         my $str = shift @args;
-         return $invert ^ any { index( $str, $_ ) > -1 } @args;
+         my $str = shift @argtext;
+         return $invert ^ any { index( $str, $_ ) > -1 } @argtext;
       }
       case( "any-of?" ) {
-         my $str = shift @args;
-         return $invert ^ any { $str eq $_ } @args;
+         my $str = shift @argtext;
+         return $invert ^ any { $str eq $_ } @argtext;
+      }
+      case( "has-parent?" ) {
+         my $node = $args[0]->parent; shift @argtext;
+         $node or return $invert;
+         $node->is_named or return $invert;
+         my $type = $node->type;
+         return $invert ^ any { $type eq $_ } @argtext;
+      }
+      case( "has-ancestor?" ) {
+         my $node = $args[0]->parent; shift @argtext;
+         while( $node ) {
+            $node->is_named or next;
+            my $type = $node->type;
+            return !$invert if any { $type eq $_ } @argtext;
+            $node = $node->parent;
+         }
+         return $invert;
       }
       default {
          warn "Unrecognised predicate test '$func'";
@@ -198,8 +259,12 @@ sub test_predicate ( $self, $func, @args )
    }
 }
 
-sub test_predicates_for_match ( $self, $tree, $match, $_captures = undef )
+sub test_predicates_for_match
 {
+   my $self = shift;
+   shift if !defined $_[0] or $_[0]->isa( "Text::Treesitter::Tree" );
+   my ( $match, $_captures ) = @_;
+
    my @predicates = $self->predicates_for_pattern( $match->pattern_index ) 
       or return 1;
 
@@ -210,23 +275,39 @@ sub test_predicates_for_match ( $self, $tree, $match, $_captures = undef )
       my $id   = $capture->capture_id;
       my $node = $capture->node;
 
-      my $start = $tree->byte_to_char( $node->start_byte );
-      my $end   = $tree->byte_to_char( $node->end_byte );
-
-      my $text = $tree->text_substring( $start, $end );
-
-      $captures_by_id{ $capture->capture_id } = $text;
+      $captures_by_id{ $id } = $node;
    }
 
    foreach my $predicate ( @predicates ) {
       my ( $func, @args ) = @$predicate;
       ref $_ and $_ = $captures_by_id{ $$_ } for @args;
 
+      # nvim extended the format to put directives as well as assertions; those
+      # have names ending in ! rather than ?
+      next unless $func =~ m/\?$/;
+
       $self->test_predicate( $func, @args ) or return 0;
    }
 
    return 1;
 }
+
+=head2 capture_quantifier_for_id
+
+   $quant = $query->capture_quantifier_for_id( $pattern_id, $capture_id );
+
+I<Since version 0.09.>
+
+Returns the quantifier associated with the given capture of the given pattern.
+This will match one of the following C<TSQuantifier*> constants
+
+   TSQuantifierZero
+   TSQuantifierZeroOrOne
+   TSQuantifierZeroOrMore
+   TSQuantifierOne
+   TSQuantifierOneOrMore
+
+=cut
 
 =head1 TODO
 
@@ -235,7 +316,6 @@ The following C library functions are currently unhandled:
    ts_query_start_byte_for_pattern
    ts_query_is_pattern_rooted
    ts_query_is_pattern_guaranteed_at_step
-   ts_query_capture_quantifier_for_id
    ts_query_disable_capture
    ts_query_disable_pattern
 

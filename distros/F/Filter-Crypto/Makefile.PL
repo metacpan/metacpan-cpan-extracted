@@ -7,8 +7,8 @@
 #   Top-level makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020 Steve Hay.  All rights
-#   reserved.
+#   Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020, 2021, 2023 Steve Hay.
+#   All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -34,7 +34,7 @@ our($VERSION, $YEAR);
 
 BEGIN {
     $VERSION = '2.10';
-    $YEAR = '2004-2009, 2012, 2014, 2015, 2017, 2020';
+    $YEAR = '2004-2009, 2012, 2014, 2015, 2017, 2020, 2021, 2023';
 }
 
 #===============================================================================
@@ -578,6 +578,10 @@ sub is_win32 {
     return $^O =~ /^MSWin32$/io;
 }
 
+sub is_cygwin {
+    return $^O =~ /^cygwin$/io;
+}
+
 sub quote_str {
     my($self, $string) = @_;
 
@@ -926,8 +930,10 @@ sub determine_ver_num {
         $inc_files_dir = $inc_dir;
     }
 
-    # The version number is now specified by an OPENSSL_VERSION_NUMBER #define
-    # in the opensslv.h header file (0.9.2 onwards).  That #define was in the
+    # The version number is now specified by OPENSSL_VERSION_(MAJOR|MINOR|PATCH)
+    # #defines in the opensslv.h header file (3.0.0 onwards).
+    # The version number was specified by an OPENSSL_VERSION_NUMBER #define in
+    # the opensslv.h header file (0.9.2 onwards).  That #define was in the
     # crypto.h header file (0.9.1s), and was called SSLEAY_VERSION_NUMBER (from
     # 0.6.0 to 0.9.0b inclusive).  Earlier versions do not seem to have a
     # version number defined in this way, but we do not support anything earlier
@@ -950,14 +956,13 @@ sub determine_ver_num {
         );
     }
 
-    my $ver_define;
+    my %version;
     if (open my $ver_fh, '<', $ver_file) {
         while (<$ver_fh>) {
-            if (/^\#\s*define\s+(?:OPENSSL|SSLEAY)_VERSION_NUMBER\s+
-                 0x([0-9a-f]+)/iox)
+            if (/^\#\s*define\s+(?:OPENSSL|SSLEAY)_VERSION_([A-Z]*)\s+
+                 ([^\s].*)/iox)
             {
-                $ver_define = $1;
-                last;
+                $version{$1} = $2;
             }
         }
         close $ver_fh;
@@ -969,8 +974,21 @@ sub determine_ver_num {
         );
     }
 
-    my($major, $minor, $fix, $patch, $status_str);
-    if (defined $ver_define) {
+    my($major, $minor, $fix, $patch, $ver_str, $status_str);
+    if (defined $version{MAJOR} and $version{MAJOR} =~ /\d+/o and
+        defined $version{MINOR} and $version{MINOR} =~ /\d+/o and
+        defined $version{PATCH} and $version{PATCH} =~ /\d+/o and
+        defined $version{STR} and $version{STR} =~ s/^"(.*)"$/$1/)
+    {
+        $major      = int $version{MAJOR};
+        $minor      = int $version{MINOR};
+        $fix        = 0;
+        $patch      = int $version{PATCH};
+        $ver_str    = $version{STR};
+        $status_str = '';
+    }
+    elsif (defined $version{NUMBER} and $version{NUMBER} =~ /0x([0-9a-f]+)/io) {
+        my $ver_define = $1;
         if (length $ver_define == 8 and
             $ver_define =~ /^([0-9a-f])([0-9a-f]{2})([0-9a-f]{2})/io)
         {
@@ -1034,9 +1052,11 @@ sub determine_ver_num {
     }
 
     my $ver_num = $major * 1000000 + $minor * 10000 + $fix * 100 + $patch;
-    my $ver_str = "$major.$minor.$fix";
-    $ver_str .= ('', 'a' .. 'y', 'za' .. 'zz')[$patch];
-    $ver_str .= $status_str;
+    if (not defined $ver_str) {
+        $ver_str = "$major.$minor.$fix";
+        $ver_str .= ('', 'a' .. 'y', 'za' .. 'zz')[$patch];
+        $ver_str .= $status_str;
+    }
 
     my $package = $ver_num >= 90100 ? 'OpenSSL' : 'SSLeay';
 
@@ -1189,12 +1209,13 @@ sub probe_for_lib_file {
     my $self = shift;
     my $candidate_lib_dir = shift;
 
-    # The libraries on UNIX-type platforms (which includes Cygwin) are called
-    # libssl.a (which contains the SSL and TLS implmentations) and libcrypto.a
-    # (which contains the ciphers, digests, etc) and are specified as -lssl and
-    # -lcrypto respectively.  Solaris 10 discourages static linking and Solaris
-    # 11 doesn't even ship static libraries for OpenSSL, so libcrypto.so must be
-    # used instead where that exists in place of libcrypto.a.
+    # The libraries on UNIX-type platforms are called libssl.a (which contains
+    # the SSL and TLS implmentations) and libcrypto.a (which contains the
+    # ciphers, digests, etc) and are specified as -lssl and -lcrypto
+    # respectively. Cygwin is similar but names the libraries libssl.dll.a and
+    # libcrypto.dll.a respectively. Solaris 10 discourages static linking and
+    # Solaris 11 doesn't even ship static libraries for OpenSSL, so libcrypto.so
+    # must be used instead where that exists in place of libcrypto.a.
     # On "native" Windows platforms built with Visual C++ (cl) or Borland C++
     # (bcc32) they were called ssleay32.lib and libeay32.lib and were specified
     # as -lssleay32 and -llibeay32 but from 1.1.0 onwards are now called
@@ -1249,6 +1270,12 @@ sub probe_for_lib_file {
                 $lib_file = $file;
                 $lib_name = 'libcrypto';
             }
+        }
+    }
+    elsif ($self->is_cygwin()) {
+        if (-f ($file = catfile($candidate_lib_dir, 'libcrypto.dll.a'))) {
+            $lib_file = $file;
+            $lib_name = 'crypto';
         }
     }
     else {
@@ -3005,7 +3032,8 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020 Steve Hay.  All rights reserved.
+Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020, 2021, 2023 Steve Hay.
+All rights reserved.
 
 =head1 LICENCE
 
@@ -3019,7 +3047,7 @@ Version 2.10
 
 =head1 DATE
 
-08 Dec 2020
+02 Jul 2023
 
 =head1 HISTORY
 

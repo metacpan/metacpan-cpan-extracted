@@ -1,8 +1,5 @@
 #!perl
 
-our $DATE = '2019-03-26'; # DATE
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -11,10 +8,16 @@ use App::calx;
 use DateTime;
 use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-06-22'; # DATE
+our $DIST = 'App-calx'; # DIST
+our $VERSION = '0.007'; # VERSION
+
 my %args = (
     months => 1,
     caldates_modules => [],
 );
+my $dates = [];
 
 GetOptions(
     'h'   => sub { $args{highlight_today} = 0 },
@@ -22,10 +25,11 @@ GetOptions(
     '3'   => sub { $args{months} = 3  },
     'y'   => sub { $args{months} = 12 },
     'c=s' => $args{caldates_modules},
+    'date=s' => $dates,
     'a'   => sub {
-        require PERLANCAR::Module::List;
+        require Module::List::Tiny;
 
-        my $mods = PERLANCAR::Module::List::list_modules(
+        my $mods = Module::List::Tiny::list_modules(
             "Calendar::Dates::", {list_modules=>1, recurse=>1});
         my @res = sort keys %$mods;
         for (@res) { s/\ACalendar::Dates::// }
@@ -35,7 +39,35 @@ GetOptions(
 
 my $dt = DateTime->now;
 
-if (@ARGV == 1) {
+my $re = qr/\A((\d{4})-(\d{2})-(\d{2}))(?:\t(.+))?\z/;
+if (!(-t STDIN)) { ## no critic: InputOutput::ProhibitInteractiveTest
+    my @dates;
+    while (my $line = <STDIN>) {
+        chomp $line;
+        $line =~ $re or die "Invalid date syntax '$line'\n";
+        push @dates, {
+            date => $1,
+            day => $4,
+            month => $3,
+            year => $2,
+            summary => $5,
+        };
+    }
+    $args{dates} = \@dates;
+} elsif (@$dates) {
+    my @dates;
+    for my $date (@$dates) {
+        $date =~ $re or die "Invalid date syntax '$date'\n";
+        push @dates, {
+            date => $1,
+            day => $4,
+            month => $3,
+            year => $2,
+            summary => $5,
+        };
+    }
+    $args{dates} = \@dates;
+} elsif (@ARGV == 1) {
     $args{year}   = $ARGV[0];
     $args{months} = 12;
 } elsif (@ARGV == 2) {
@@ -58,7 +90,7 @@ die $res->[1] unless $res->[0] == 200;
 say $res->[2];
 
 1;
-# ABSTRACT: Display calendar
+# ABSTRACT: Display calendar with highlighted dates
 # PODNAME: calx
 
 __END__
@@ -69,11 +101,11 @@ __END__
 
 =head1 NAME
 
-calx - Display calendar
+calx - Display calendar with highlighted dates
 
 =head1 VERSION
 
-This document describes version 0.005 of calx (from Perl distribution App-calx), released on 2019-03-26.
+This document describes version 0.007 of calx (from Perl distribution App-calx), released on 2023-06-22.
 
 =head1 SYNOPSIS
 
@@ -92,11 +124,14 @@ This document describes version 0.005 of calx (from Perl distribution App-calx),
  # show calendar for a certain month and year
  % calx 2 2019 -c ID::Holiday
 
+ # echo -e "2023-05-30\n2023-05-31\n2023-06-01\n" | calx
+
 =head1 DESCRIPTION
 
-This command provides a subset of B<cal> functionality for displaying ASCII
-calendar on the command-line. It currently starts the week at Monday and
-highlights (and lists) dates from one or more L<Calendar::Dates>::* modules.
+This command provides a variant of B<cal> utility for displaying ASCII calendar
+on the command-line. It focuses on highlighting certain dates. It currently
+always starts the week at Monday and can get the list of dates from command-line
+option (`--date`) or stdin or one or more L<Calendar::Dates>::* modules.
 
 =head1 OPTIONS
 
@@ -130,6 +165,11 @@ Get dates from a L<Calendar::Dates> module (value is name of module without the
 
 Get dates from all installed C<Calendar::Dates::*> modules.
 
+=head2 --date DATE+
+
+Highlight one or more dates. You can also supply the dates from stdin. The dates
+must be in ISO8601 C<YYYY-MM-DD> format.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-calx>.
@@ -137,14 +177,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-calx>.
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-calx>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-calx>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -156,11 +188,37 @@ L<Calendar::Dates>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-calx>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

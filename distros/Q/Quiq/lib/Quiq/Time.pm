@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.210';
+our $VERSION = '1.211';
 
 use Time::Local ();
 use Quiq::Duration;
@@ -1452,7 +1452,7 @@ sub monthAbbrToNum {
 
 =head1 VERSION
 
-1.210
+1.211
 
 =head1 AUTHOR
 

@@ -3,6 +3,9 @@ Release history for Config-INI-Tiny
 TODO keep_comments keep_empty keep_errors
 TODO unparse from_hash
 
+0.106 Mon 03 Jul 2023
+	- Fix for Windows t/basic.t failures
+
 0.105 Tue 09 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl

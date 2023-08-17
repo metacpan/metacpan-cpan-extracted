@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2021/09/03
+## Modified 2023/06/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -32,17 +32,25 @@ BEGIN
         '>'     => sub{ &_op_overload( @_, '>' ) },
         '<='    => sub{ &_op_overload( @_, '<=' ) },
         '>='    => sub{ &_op_overload( @_, '>=' ) },
-        '!='    => sub{ &_op_overload( @_, '!=' ) },
+        '!='    => sub{ &_op_overload( @_, '<>' ) },
         '<<'    => sub{ &_op_overload( @_, '<<' ) },
         '>>'    => sub{ &_op_overload( @_, '>>' ) },
+        'lt'     => sub{ &_op_overload( @_, '<' ) },
+        'gt'     => sub{ &_op_overload( @_, '>' ) },
+        'le'    => sub{ &_op_overload( @_, '<=' ) },
+        'ge'    => sub{ &_op_overload( @_, '>=' ) },
+        'ne'    => sub{ &_op_overload( @_, '<>' ) },
         '&'     => sub{ &_op_overload( @_, '&' ) },
         '^'     => sub{ &_op_overload( @_, '^' ) },
         '|'     => sub{ &_op_overload( @_, '|' ) },
-        '=='    => sub{ &_op_overload( @_, '==' ) },
+        '=='    => sub{ &_op_overload( @_, '=' ) },
+        'eq'    => sub{ &_op_overload( @_, 'IS' ) },
+        # Full Text Search operator
+        '~~'    => sub{ &_op_overload( @_, '@@' ) },
         fallback => 1,
     );
     use Want;
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 use strict;
@@ -219,7 +227,7 @@ sub _op_overload
     '==' => '=',
     };
     $op = $map->{ $op } if( exists( $map->{ $op } ) );
-    $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
+    # $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
     # If the value specified in the operation is a placeholder, or a field object or a statement object, we do not want to quote process it
     unless( $val eq '?' || 
             ( $self->_is_object( $val ) && 
@@ -368,7 +376,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -535,7 +543,7 @@ Given a field position from 1 to n, this will find and return the field object. 
 
 The following operators are overloaded:
 
-    +, -, *, /, %, <, <=, >, >=, !=, <<, >>, &, |, ^, ==
+    +, -, *, /, %, <, <=, >, >=, !=, <<, >>, lt, gt, le, ge, ne, &, |, ^, ==, eq, ~~
 
 Thus a field named "dummy" could be used like:
 
@@ -554,9 +562,13 @@ Another example, which works in PostgreSQL:
     $ip_tbl->where( 'inet 192.16.1.20' << $ip_tbl->fo->ip_addr );
     my $ref = $ip_tbl->select->fetchrow_hashref;
 
-The equal operator C<==> would become C<IS>:
+The equal operator C<==> would become C<=>:
 
-    $f == 'NULL' # dummy IS NULL
+    $f == 'NULL' # dummy = NULL
+
+but, if you use perl's C<eq> instead of C<==>, you would get:
+
+    $f eq 'NULL' # dummy IS NULL
 
 Note that you have to take care of quotes yourself, because there is no way to tell if the right hand side is a string or a function
 
@@ -564,8 +576,10 @@ Note that you have to take care of quotes yourself, because there is no way to t
 
 or, to insert a placeholder
 
-    $f == '?' # dummy IS ?
-    my $sth = $table->select( $f == '?' ); # SELECT dummy IS ? FROM some_table
+    $f == '?' # dummy = ?
+    # or;
+    $f eq '?' # dummy IS ?
+    my $sth = $table->select( $f eq '?' ); # SELECT dummy IS ? FROM some_table
     my $row = $sth->exec( 'JPY' )->fetchrow;
 
 of course
@@ -585,6 +599,59 @@ If you want to use placeholder in the value provided, you will have to provide a
 Simply provide:
 
     $f == '?'
+
+You can use the search operator C<~~> for SQL Full Text Search and it would be converted into C<@@>:
+
+Let's imagine a table C<articles> in a L<PostgreSQL database|https://www.postgresql.org/docs/current/textsearch.html>, such as:
+
+    CREATE TABLE articles (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        ts TSVECTOR GENERATED ALWAYS AS
+            (setweight(to_tsvector('english', coalesce(title, '')), 'A') || 
+            setweight(to_tsvector('english', coalesce(content, '')), 'B')) STORED
+    );
+
+them you coud do:
+
+    $tbl->where(
+        \"websearch_to_tsquery(?)" ~~ $tbl->fo->ts,
+    );
+
+and this would create a C<WHERE> clause, such as:
+
+    WHERE websearch_to_tsquery(?) @@ ts
+
+See L<PostgreSQL documentation|https://www.postgresql.org/docs/current/textsearch.html> for more details.
+
+but, under L<SQLite|https://www.sqlite.org/fts5.html>, this is not necessary, because the Full Text Search syntax is different:
+
+Create a FTS-enabled virtual table.
+
+    CREATE VIRTUAL TABLE articles 
+    USING FTS5(title, content);
+
+then query it:
+
+    SELECT * FROM articles WHERE articles MATCH(?);
+
+See L<SQLite documentation|https://www.sqlite.org/fts5.html> for more details.
+
+and, in a L<MySQL database|https://dev.mysql.com/doc/refman/8.0/en/fulltext-search.html>, also unnecessary, because a bit different:
+
+    CREATE TABLE articles (
+        id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        FULLTEXT (title,content)
+    ) ENGINE=InnoDB;
+
+then:
+
+    SELECT * FROM articles WHERE MATCH(title,content) AGAINST(? IN NATURAL LANGUAGE MODE);
+
+See L<MySQL documentation|https://dev.mysql.com/doc/refman/8.0/en/fulltext-search.html> for more details.
 
 =head1 SEE ALSO
 

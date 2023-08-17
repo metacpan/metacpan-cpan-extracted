@@ -18,7 +18,7 @@
 	], [
 		doap-deps:on "String::Tagged::Terminal"^^doap-deps:CpanId;
 	];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Term::Choose"^^doap-deps:CpanId ], [ doap-deps:on "Text::Wrap"^^doap-deps:CpanId ], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "URI::Query"^^doap-deps:CpanId ], [ doap-deps:on "DBI"^^doap-deps:CpanId ], [ doap-deps:on "DBD::SQLite"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.54"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Term::Choose"^^doap-deps:CpanId ], [ doap-deps:on "Text::Wrap"^^doap-deps:CpanId ], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "URI::Query"^^doap-deps:CpanId ], [ doap-deps:on "Compress::Bzip2"^^doap-deps:CpanId ], [ doap-deps:on "DBI"^^doap-deps:CpanId ], [ doap-deps:on "DBD::SQLite"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.54"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
 		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
 	], [
@@ -33,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Story-Interact";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001007>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001008>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001009>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001010>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001011>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001007>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001008>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001009>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001010>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001011>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001012>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-story-interact>;
@@ -127,10 +127,10 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
-			rdfs:label "Story::Interact::State->character_class.";
+			rdfs:label "Story::Interact::PageSource::Waterfall.";
 		], [
 			a doap-changeset:Addition;
-			rdfs:label "Story::Interact::PageSource::Waterfall.";
+			rdfs:label "Story::Interact::State->character_class.";
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -196,6 +196,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001011.tar.gz>;
 	doap:revision        "0.001011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001012>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-0.001012"^^xsd:string;
+	dc:issued            "2023-06-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Story::Interact::State's load and dump methods now compress the state with Bzip2. This change should be mostly transparent.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001012.tar.gz>;
+	doap:revision        "0.001012"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

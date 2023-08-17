@@ -4,7 +4,7 @@
       "Matt S. Trout <mst@@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
             "CGI" : "3.31",
             "Catalyst" : "0",
             "Catalyst::Plugin::Static::Simple" : "0",
-            "Catalyst::Runtime" : "0",
+            "Catalyst::Runtime" : "5.70",
             "Catalyst::Test" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -75,7 +75,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "base" : "0",
-            "blib" : "1.01",
             "lib" : "0"
          }
       }
@@ -96,7 +95,10 @@
          "web" : "http://github.com/rkitover/catalyst-controller-wrapcgi"
       }
    },
-   "version" : "0.038",
-   "x_authority" : "cpan:RKITOVER"
+   "version" : "0.039",
+   "x_authority" : "cpan:RKITOVER",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

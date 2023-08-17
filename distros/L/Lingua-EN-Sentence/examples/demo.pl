@@ -22,17 +22,20 @@ See the code for all the rules that apply.
 This string has 7 sentences.
 };
 
-my $sentences=get_sentences($text);     ## Get the sentences.
-my $num_sentences = (@$sentences);
-my $i;
-print("There are: $num_sentences sentences\n" );
-foreach my $sent (@$sentences)
+my $sentences=get_sentences($text);
+if (defined($sentences))
 {
-    $i++;
-    print("SENTENCE $i:$sent\n");
+    my $num_sentences = (@$sentences);
+    my $i;
+    print("There are: $num_sentences sentences\n" );
+    foreach my $sent (@$sentences)
+    {
+        $i++;
+        print("SENTENCE $i:$sent\n");
+    }
 }
 
- $text = q{First sentence.
+$text = q{First sentence.
 12. point 12
 Some numbers 12.46, -.123,3:.
 Some ‘utf quotes wrap this’ “And more”};

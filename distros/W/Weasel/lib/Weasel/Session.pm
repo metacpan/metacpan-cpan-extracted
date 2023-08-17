@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.12
+0.30
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.12';
+our $VERSION = '0.30';
 
 our $MINIMUM_DRIVER_VERSION = '0.03';
 
@@ -718,7 +718,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016-2021  Erik Huelsmann
+ (C) 2016-2023  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

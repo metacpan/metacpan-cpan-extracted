@@ -20,9 +20,11 @@ sub brik_properties {
          output => [ qw(file) ],
          encoding => [ qw(utf8|ascii) ],
          overwrite => [ qw(0|1) ],
+         use_utf8 => [ qw(0|1) ],
         _sj => [ qw(INTERNAL) ],
       },
       attributes_default => {
+         use_utf8 => 1,
          overwrite => 1,
       },
       commands => {
@@ -65,6 +67,7 @@ sub read {
    $self->brik_help_run_undef_arg('read', $input) or return;
 
    my $sj = $self->_sj;
+   $sj->use_utf8($self->use_utf8);
 
    my $data = $self->SUPER::read($input) or return;
 
@@ -79,6 +82,7 @@ sub read_next {
    $self->brik_help_run_undef_arg('read_next', $input) or return;
 
    my $sj = $self->_sj;
+   $sj->use_utf8($self->use_utf8);
 
    my $data = $self->SUPER::read_line($input) or return;
 
@@ -96,6 +100,7 @@ sub write {
    $self->brik_help_run_undef_arg('write', $output) or return;
 
    my $sj = $self->_sj;
+   $sj->use_utf8($self->use_utf8);
 
    # Always make it an ARRAY
    $json_hash = ref($json_hash) eq 'ARRAY' ? $json_hash : [ $json_hash ];
@@ -121,6 +126,7 @@ sub is_valid {
    my $data = $self->SUPER::read($input) or return;
 
    my $sj = $self->_sj;
+   $sj->use_utf8($self->use_utf8);
 
    return $sj->is_valid($data);
 }

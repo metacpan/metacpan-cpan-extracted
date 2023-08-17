@@ -1,4 +1,4 @@
-Test::Effects version 0.001005
+Test::Effects version 0.002000
 
 Test::Effects provides a single exported subroutine: effects_ok();
 

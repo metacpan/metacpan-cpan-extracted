@@ -1,0 +1,14 @@
+###############################################################################
+##
+##    Typemap for Algorithm::Line::Lerp objects
+##
+##    Copyright (c) 2023 Jeremy Mates
+##    All rights reserved.
+##
+##    This typemap is designed specifically to make it easier to handle
+##    Perl-style blessed objects in XS.  In particular, it takes care of
+##    blessing the object into the correct class (even for derived classes).
+##   
+##
+###############################################################################
+## vi:et:sw=4 ts=4

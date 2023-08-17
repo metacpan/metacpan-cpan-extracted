@@ -1,6 +1,7 @@
 severity  = harsh
 verbose = [%p] %m at line %l, column %c. %e (Severity: %s)\n
 include   = RequirePodSections
+exclude   = ValuesAndExpressions::ProhibitVersionStrings
 color-severity-lowest = bright_blue
 color-severity-low = bright_green
 color-severity-medium = bright_yellow

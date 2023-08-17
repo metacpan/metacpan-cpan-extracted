@@ -9,13 +9,13 @@
 struct spvm_field {
   SPVM_OP* op_field;
   SPVM_OP* op_name;
+  SPVM_OP* op_anon_method_field_default;
   const char* name;
   SPVM_TYPE* type;
-  SPVM_CLASS* class;
-  int32_t id;
+  SPVM_BASIC_TYPE* current_basic_type;
   int32_t index;
   int32_t offset;
-  int8_t is_captured;
+  int8_t is_anon_method_field;
   int8_t has_setter;
   int8_t has_getter;
   int8_t access_control_type;

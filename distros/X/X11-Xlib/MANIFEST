@@ -13,6 +13,7 @@ META.json                                Module JSON meta-data (added by MakeMak
 lib/X11/Xlib.pm
 lib/X11/Xlib/Colormap.pm
 lib/X11/Xlib/Display.pm
+lib/X11/Xlib/GC.pm
 lib/X11/Xlib/Keymap.pm
 lib/X11/Xlib/Opaque.pm
 lib/X11/Xlib/Pixmap.pm

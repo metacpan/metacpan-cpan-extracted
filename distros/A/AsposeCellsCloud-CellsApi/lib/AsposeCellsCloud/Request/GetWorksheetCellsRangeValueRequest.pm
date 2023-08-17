@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCellsRangeValueRequest.name :   ,
-# GetWorksheetCellsRangeValueRequest.sheetName :   ,
-# GetWorksheetCellsRangeValueRequest.namerange :   ,
-# GetWorksheetCellsRangeValueRequest.firstRow :   ,
-# GetWorksheetCellsRangeValueRequest.firstColumn :   ,
-# GetWorksheetCellsRangeValueRequest.rowCount :   ,
-# GetWorksheetCellsRangeValueRequest.columnCount :   ,
-# GetWorksheetCellsRangeValueRequest.folder :   ,
-# GetWorksheetCellsRangeValueRequest.storageName :    
+# GetWorksheetCellsRangeValueRequest.name : The workbook name.  ,
+# GetWorksheetCellsRangeValueRequest.sheetName : The worksheet name.  ,
+# GetWorksheetCellsRangeValueRequest.namerange : range name.  ,
+# GetWorksheetCellsRangeValueRequest.firstRow : Gets the index of the first row of the range.  ,
+# GetWorksheetCellsRangeValueRequest.firstColumn : Gets the index of the first columnn of the range.  ,
+# GetWorksheetCellsRangeValueRequest.rowCount : Gets the count of rows in the range.  ,
+# GetWorksheetCellsRangeValueRequest.columnCount : Gets the count of columns in the range.  ,
+# GetWorksheetCellsRangeValueRequest.folder : Original workbook folder.  ,
+# GetWorksheetCellsRangeValueRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_cells_range_value' } = { 
-    	summary => '',
+    	summary => 'Get the value of cells in range.',
         params => $params,
         returns => 'RangeValueResponse',
     };
@@ -155,63 +155,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'namerange' => {
      	datatype => 'string',
      	base_name => 'namerange',
-     	description => '',
+     	description => 'range name.',
      	format => '',
      	read_only => '',
      		},
      'first_row' => {
      	datatype => 'int',
      	base_name => 'firstRow',
-     	description => '',
+     	description => 'Gets the index of the first row of the range.',
      	format => '',
      	read_only => '',
      		},
      'first_column' => {
      	datatype => 'int',
      	base_name => 'firstColumn',
-     	description => '',
+     	description => 'Gets the index of the first columnn of the range.',
      	format => '',
      	read_only => '',
      		},
      'row_count' => {
      	datatype => 'int',
      	base_name => 'rowCount',
-     	description => '',
+     	description => 'Gets the count of rows in the range.',
      	format => '',
      	read_only => '',
      		},
      'column_count' => {
      	datatype => 'int',
      	base_name => 'columnCount',
-     	description => '',
+     	description => 'Gets the count of columns in the range.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

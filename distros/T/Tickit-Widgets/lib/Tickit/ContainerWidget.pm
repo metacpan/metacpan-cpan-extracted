@@ -3,9 +3,10 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
+use v5.20;
 use Object::Pad 0.66;
 
-package Tickit::ContainerWidget 0.57;
+package Tickit::ContainerWidget 0.58;
 class Tickit::ContainerWidget
    :isa(Tickit::Widget);
 

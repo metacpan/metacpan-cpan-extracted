@@ -71,8 +71,9 @@ GMPZ_PV_NV_BUG MATH_GMPz_IV_MAX MATH_GMPz_IV_MIN MATH_GMPz_UV_MAX
 Rmpz_abs Rmpz_add Rmpz_add_ui Rmpz_addmul Rmpz_addmul_ui Rmpz_and Rmpz_bin_ui
 Rmpz_bin_uiui Rmpz_bin_si Rmpz_cdiv_q Rmpz_cdiv_q_2exp Rmpz_cdiv_q_ui Rmpz_cdiv_qr
 Rmpz_cdiv_qr_ui Rmpz_cdiv_r Rmpz_cdiv_r_2exp Rmpz_cdiv_r_ui Rmpz_cdiv_ui
-Rmpz_clear Rmpz_clrbit Rmpz_cmp Rmpz_cmp_d Rmpz_cmp_si Rmpz_cmp_ui Rmpz_cmpabs
-Rmpz_cmpabs_d Rmpz_cmpabs_ui Rmpz_com Rmpz_combit Rmpz_congruent_2exp_p
+Rmpz_clear Rmpz_clrbit Rmpz_cmp Rmpz_cmp_d Rmpz_cmp_si Rmpz_cmp_ui
+Rmpz_cmp_sj Rmpz_cmp_uj Rmpz_cmpabs Rmpz_cmpabs_d Rmpz_cmpabs_ui
+Rmpz_com Rmpz_combit Rmpz_congruent_2exp_p
 Rmpz_congruent_p Rmpz_congruent_ui_p Rmpz_div Rmpz_divmod Rmpz_div_ui
 Rmpz_divmod_ui Rmpz_div_2exp Rmpz_mod_2exp Rmpz_divexact Rmpz_divexact_ui
 Rmpz_divisible_2exp_p Rmpz_divisible_p Rmpz_divisible_ui_p Rmpz_even_p
@@ -120,7 +121,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.56';
+    our $VERSION = '0.58';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -132,6 +133,13 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     $Math::GMPz::utf8_no_croak     = 0; # croak if utf8::downgrade fails in Rmpz_import.
     $Math::GMPz::utf8_no_fail      = 0; # warn  if $Math::GMPz::utf8_no_croak is true &&
                                         #          utf8::downgrade fails in Rmpz_import.
+
+    $Math::GMPz::RETYPE = 0; # set to 1 to enable a Math::GMPz object to be coerced to
+                             # a Math::GMPq or Math::MPFR object in certain overloaded
+                             # operations. (See the 'OPERATOR OVERLOADING' section of
+                             # the POD documentation for details.)
+                             # With this variable set to 0, these "certain overloaded
+                             # operations" alluded to will throw a fatal error.
 
     %Math::GMPz::EXPORT_TAGS =(mpz => \@tagged);
 

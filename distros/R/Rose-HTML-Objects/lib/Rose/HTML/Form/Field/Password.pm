@@ -92,6 +92,7 @@ Boolean attributes:
     checked
     disabled
     readonly
+    required
 
 =head1 CONSTRUCTOR
 

@@ -16,8 +16,12 @@ You should have received a copy of the GNU General Public License
 along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 271, July 2023
+    - TSP web site changes
+    - Yahoo further changed crumb, reported by Brian Sammon
+
 Version 270, January 2023
-    - fix for Yahoo changed crumb form, reported by Brian Sammon
+    - Yahoo changed crumb form, reported by Brian Sammon
 
 Version 269, March 2020
     - need Time::Local 1.27 for timegm_modern(), RT#132154

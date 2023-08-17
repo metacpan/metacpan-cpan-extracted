@@ -1,6 +1,7 @@
 #pragma once
 #include <exception>
 #include <vector>
+#include <cstdint>
 #include "string.h"
 #include "refcnt.h"
 #include "function.h"

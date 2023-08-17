@@ -1,4 +1,19 @@
-Revision history for Net-Cisco-FMC-v1: 0.008000
+Revision history for Net-Cisco-FMC-v1: 0.009002
+
+0.009002  2023-08-10 16:53:48+02:00 Europe/Vienna
+    - fix login error handling of connection errors
+
+0.009001  2023-06-05 13:55:03+02:00 Europe/Vienna
+    - fix update_accessrule when rule contains users
+      This reverts the fix from version 0.004001 which removed the realm of
+      each user object to prevent an 'Unprocessable Entity' error.
+      With FMC version 7.2.0.1 this behaviour is the exact opposite:
+      when the realm of each user is removed the API call fails and unmodified
+      it works.
+
+0.009000  2023-06-05 12:50:14+02:00 Europe/Vienna
+    - add support for query parameters to update_accessrule
+    - add methods for identity policies, realms, realmusers and realmusergroups
 
 0.008000  2023-01-26 16:10:57+01:00 Europe/Vienna
     - add methods for FQDNs

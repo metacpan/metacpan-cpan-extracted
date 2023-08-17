@@ -1,0 +1,16 @@
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=wander.science; s=2023-05-ed25519-does-not-exist; h=Subject:Content-Transfer-Encoding:
+	Content-Type:From:To:MIME-Version:Date:Message-ID:In-Reply-To:Cc:References:
+	Sender:Reply-To; bh=P//FppzGgSSJDjYgpnZ255T9+DxXvu14MiedTEyE5UY=; b=85mI8hH/s
+	TYf2w8vAF3BKeRs/7EMD8yGrrekJNcoZ8LxDd3RnpejvsG43I6vryFIx6xFmVSx65+zmxXu9/kvDg
+	==;
+Message-ID: <505c05af-3dd2-be13-df41-464353251933@wander.science>
+Date: Wed, 10 May 2023 21:54:21 +0200
+MIME-Version: 1.0
+To: echo@mail.town
+From: mail@wander.science
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Test ed25519
+
+This is an elliptic test, with a missing key.

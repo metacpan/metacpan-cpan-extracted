@@ -8,14 +8,12 @@ use Module::Install::Base ();
 
 use vars qw{$VERSION @ISA $ISCORE};
 BEGIN {
-	$VERSION = '1.06';
+	$VERSION = '1.19';
 	@ISA     = 'Module::Install::Base';
 	$ISCORE  = 1;
 }
 
-
-
-
+#line 21
 
 #####################################################################
 # Installer Target
@@ -37,20 +35,20 @@ sub mb {
 #####################################################################
 # Testing and Configuration Contexts
 
-#line 49
+#line 53
 
 sub interactive {
 	# Treat things interactively ONLY based on input
 	!! (-t STDIN and ! automated_testing());
 }
 
-#line 67
+#line 71
 
 sub automated_testing {
 	!! $ENV{AUTOMATED_TESTING};
 }
 
-#line 86
+#line 90
 
 sub release_testing {
 	!! $ENV{RELEASE_TESTING};
@@ -67,13 +65,13 @@ sub author_context {
 #####################################################################
 # Operating System Convenience
 
-#line 114
+#line 118
 
 sub win32 {
 	!! ($^O eq 'MSWin32');
 }
 
-#line 131
+#line 135
 
 sub winlike {
 	!! ($^O eq 'MSWin32' or $^O eq 'cygwin');
@@ -81,4 +79,4 @@ sub winlike {
 
 1;
 
-#line 159
+#line 163

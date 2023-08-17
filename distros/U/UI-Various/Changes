@@ -1,6 +1,22 @@
 Revision history for Perl extension UI-Various
 
-0.38 2023-01-10T12:22:47Z
+0.40 2023-08-02T07:31:57Z
+
+0.40 2023-08-02T07:30:58Z
+
+    - added binary dependencies
+    - fixed bug for deep recursion in _cd for non-accessible root directory
+
+0.39 2023-07-30T07:43:21Z
+
+    - fixed failing test with Term::ReadLine::Gnu >= 1.46 in t/51-rich-term.t
+    - made DoD script useable for other projects
+    - made language support script useable for other projects
+    - removed hopefully obsolete workaround for coverage
+    - fixed typo in message in test 51
+    - skipping some broken tests on Windows/Cygwin
+    - further fixes for display of Listbox in PoorTerm
+    - initial tests now report terminal size as some smokers have very small ones
 
 0.38 2023-01-10T12:21:28Z
 

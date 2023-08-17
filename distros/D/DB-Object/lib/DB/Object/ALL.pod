@@ -1,0 +1,77 @@
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::ALL - ALL Operator Object
+
+=head1 SYNOPSIS
+
+    my $op = $dbh->ALL( 1, 2, 3 );
+    # will produce:
+    ALL ( 1, 2, 3 )
+
+    "'something'" == $dbh->ALL( qw( some other words ) );
+    # 'something' ALL ( some, other, words );
+    "something" != $dbh->ALL( qw( some other words ) );
+    # 'something' NOT ALL ( some, other, words );
+
+    my $tbl = $dbh->my_table || die( $dbh->error );
+    $tbl->as( 't' );
+    my $sth = $tbl->select( 'DISTINCT field' );
+    my $sql = $tbl->fo->somefield == $dbh->ALL( $sth );
+    say $sql;
+    # t.somefield ALL (SELECT DISTINCT t.field FROM my_table t)
+
+=head1 DESCRIPTION
+
+This is the C<ALL> object class inheriting from L<DB::Object::Operator>
+
+=head1 METHODS
+
+=head2 new
+
+Takes a list of values that are saved in the newly created object returned.
+
+=head2 as_string
+
+Returns a string representation of this operator.
+
+For example:
+
+    $dbh->ALL( qw( some other words ) );
+    # ALL ( some, other, words );
+
+=head2 operator
+
+Returns C<ALL>
+
+=head2 value
+
+In list context, returns an array of those values passed to L</new> and in scalar context, it returns those value as array reference.
+
+=head1 OVERLOADING
+
+Objects for this class have their C<==> and C<!=> operators overloaded.
+
+When overloading is called, it returns a new L<DB::Object::Expression> that represents the formatted statement.
+
+=head1 SEE ALSO
+
+L<https://www.postgresql.org/docs/current/arrays.html#ARRAYS-SEARCHING>
+
+L<https://www.postgresql.org/docs/current/functions-comparisons.html#FUNCTIONS-COMPARISONS-IN-SCALAR>
+
+(There is no C<ALL> operator in MySQL or SQLite)
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2023 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

@@ -70,16 +70,16 @@ is_deeply +{ $object->errors->to_hash(full_messages=>1) },
   car => [
     "Car Is Invalid",
   ],
-  "car.0" => [
+  "car[0]" => [
     "Car Is Invalid",
   ],
-  "car.0.make" => [
+  "car[0].make" => [
     "Car Make is not in the list",
   ],
-  "car.0.model" => [
+  "car[0].model" => [
     "Car Model is too short (minimum is 2 characters)",
   ],
-  "car.0.year" => [
+  "car[0].year" => [
     "Car Year must be greater than or equal to 1960",
   ],
   name => [
@@ -88,16 +88,16 @@ is_deeply +{ $object->errors->to_hash(full_messages=>1) },
   status => [
     "Status Is Invalid",
   ],
-  "status.1" => [
+  "status[1]" => [
     "Status is not in the list",
   ],
-  "status.4" => [
+  "status[4]" => [
     "Status is not in the list",
   ],
-  "status.5" => [
+  "status[5]" => [
     "Status is not in the list",
   ],
-  "status.6" => [
+  "status[6]" => [
     "Status is not in the list",
   ],
 };

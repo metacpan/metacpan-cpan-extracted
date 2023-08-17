@@ -1,19 +1,19 @@
 
 ## INSTALL
 
-cpanm App::dirdir
+cpanm App::dirstrata
 
 
 ## UNINSTALL 
 
-cpanm -U App::dirdir
+cpanm -U App::dirstrata
 
 
 
-■ コマンド dirdir を使えるようにする方法 : 
+■ コマンド dirstrata を使えるようにする方法 : 
 
-   インストール:  	cpanm    App::dirdir
-アンインストール: 	cpanm –U App::dirdir
+   インストール:  	cpanm    App::dirstrata
+アンインストール: 	cpanm –U App::dirstrata
 
 cpanmが使えない場合は、cpan でも良いが、インストールしたモジュールの
 アンインストールが難しくなるであろう。

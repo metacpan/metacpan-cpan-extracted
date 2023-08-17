@@ -1,6 +1,13 @@
 Changelog for MarpaX-Java-ClassFile
 
-0.008 2016-03-31T05:15:12
+0.009 2023-07-28T05:39:18
+ [Graham Knop <haarg@haarg.org>]
+ - remove extraneous imports from File::Spec
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/javap: require Log::Any::Adapter::Log4perl
+
+0.008 2016-03-31T05:15:12Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Role/Parser.pm: Fix number of calls to logger is_trace, is _debug etc...
    when setting localized variables

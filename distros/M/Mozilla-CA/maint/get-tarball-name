@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+open my $fh, '<:raw', 'Makefile'
+    or die "can't open Makefile: $!\n";
+
+my $dist;
+my $suffix;
+
+while (my $line = readline $fh) {
+    chomp $line;
+    if ($line =~ /^DISTVNAME\s*=\s*(.*)/) {
+        $dist = $1;
+    }
+    elsif ($line =~ /^SUFFIX\s*=\s*(.*)/) {
+        $suffix = $1;
+    }
+    if (defined $dist && $suffix) {
+        last;
+    }
+}
+
+print "$dist.tar$suffix";

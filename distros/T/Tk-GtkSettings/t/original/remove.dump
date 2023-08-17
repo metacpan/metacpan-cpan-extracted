@@ -4,51 +4,43 @@ Some other section
 ######################################################################
 
 
-!Tk-GtkSettings.t Tk::GtkSettings section
-Tk-GtkSettings.t*activeBackground: #CAB595
-Tk-GtkSettings.t*activeForeground: #000000
-Tk-GtkSettings.t*backPageColor: #CAB595
-Tk-GtkSettings.t*background: #dec9a9
-Tk-GtkSettings.t*font: Noto-Sans   10
-Tk-GtkSettings.t*foreground: #000000
-Tk-GtkSettings.t*highlightBackground: #dec9a9
-Tk-GtkSettings.t*highlightColor: #75511a
-Tk-GtkSettings.t*inactiveBackground: #CAB595
-Tk-GtkSettings.t*insertBackground: #000000
-Tk-GtkSettings.t*selectBackground: #8f6b32
-Tk-GtkSettings.t*selectForeground: #ffffff
-Tk-GtkSettings.t*troughColor: #CAB595
-Tk-GtkSettings.t*CodeText.background: #fffbe2
-Tk-GtkSettings.t*CodeText.highlightColor: #dec9a9
-Tk-GtkSettings.t*Entry.background: #fffbe2
-Tk-GtkSettings.t*Entry.highlightColor: #dec9a9
-Tk-GtkSettings.t*FloatEntry.background: #fffbe2
-Tk-GtkSettings.t*FloatEntry.highlightColor: #dec9a9
-Tk-GtkSettings.t*PodText.background: #fffbe2
-Tk-GtkSettings.t*PodText.highlightColor: #dec9a9
-Tk-GtkSettings.t*Spinbox.background: #fffbe2
-Tk-GtkSettings.t*Spinbox.highlightColor: #dec9a9
-Tk-GtkSettings.t*Text.background: #fffbe2
-Tk-GtkSettings.t*Text.highlightColor: #dec9a9
-Tk-GtkSettings.t*TextUndo.background: #fffbe2
-Tk-GtkSettings.t*TextUndo.highlightColor: #dec9a9
-Tk-GtkSettings.t*TextEditor.background: #fffbe2
-Tk-GtkSettings.t*TextEditor.highlightColor: #dec9a9
-Tk-GtkSettings.t*ROText.background: #fffbe2
-Tk-GtkSettings.t*ROText.highlightColor: #dec9a9
-Tk-GtkSettings.t*Dirlist.background: #fffbe2
-Tk-GtkSettings.t*Dirlist.highlightColor: #dec9a9
-Tk-GtkSettings.t*DirTree.background: #fffbe2
-Tk-GtkSettings.t*DirTree.highlightColor: #dec9a9
-Tk-GtkSettings.t*HList.background: #fffbe2
-Tk-GtkSettings.t*HList.highlightColor: #dec9a9
-Tk-GtkSettings.t*IconList.background: #fffbe2
-Tk-GtkSettings.t*IconList.highlightColor: #dec9a9
-Tk-GtkSettings.t*Listbox.background: #fffbe2
-Tk-GtkSettings.t*Listbox.highlightColor: #dec9a9
-Tk-GtkSettings.t*Tlist.background: #fffbe2
-Tk-GtkSettings.t*Tlist.highlightColor: #dec9a9
-Tk-GtkSettings.t*Tree.background: #fffbe2
-Tk-GtkSettings.t*Tree.highlightColor: #dec9a9
-!Tk-GtkSettings.t Tk::GtkSettings section
+
+
+!Tk-GtkSettings Tk::GtkSettings section
+Tk-GtkSettings*activeBackground: #C0AB8B
+Tk-GtkSettings*activeForeground: #000000
+Tk-GtkSettings*backPageColor: #C0AB8B
+Tk-GtkSettings*background: #dec9a9
+Tk-GtkSettings*font: {Noto Sans} 10 
+Tk-GtkSettings*foreground: #000000
+Tk-GtkSettings*highlightBackground: #dec9a9
+Tk-GtkSettings*highlightColor: #75511a
+Tk-GtkSettings*inactiveBackground: #C0AB8B
+Tk-GtkSettings*insertBackground: #000000
+Tk-GtkSettings*selectBackground: #8f6b32
+Tk-GtkSettings*selectForeground: #ffffff
+Tk-GtkSettings*troughColor: #C0AB8B
+Tk-GtkSettings*Member1.background: #fffbe2
+Tk-GtkSettings*Member1.highlightColor: #dec9a9
+Tk-GtkSettings*Member2.background: #fffbe2
+Tk-GtkSettings*Member2.highlightColor: #dec9a9
+Tk-GtkSettings*Dirlist.background: #fffbe2
+Tk-GtkSettings*Dirlist.highlightColor: #dec9a9
+Tk-GtkSettings*DirTree.background: #fffbe2
+Tk-GtkSettings*DirTree.highlightColor: #dec9a9
+Tk-GtkSettings*HList.background: #fffbe2
+Tk-GtkSettings*HList.highlightColor: #dec9a9
+Tk-GtkSettings*ITree.background: #fffbe2
+Tk-GtkSettings*ITree.highlightColor: #dec9a9
+Tk-GtkSettings*IconList.background: #fffbe2
+Tk-GtkSettings*IconList.highlightColor: #dec9a9
+Tk-GtkSettings*Listbox.background: #fffbe2
+Tk-GtkSettings*Listbox.highlightColor: #dec9a9
+Tk-GtkSettings*Tlist.background: #fffbe2
+Tk-GtkSettings*Tlist.highlightColor: #dec9a9
+Tk-GtkSettings*Tree.background: #fffbe2
+Tk-GtkSettings*Tree.highlightColor: #dec9a9
+Tk-GtkSettings*Menu.borderWidth: 1
+Tk-GtkSettings*NoteBook.borderWidth: 1
+!Tk-GtkSettings Tk::GtkSettings section
 

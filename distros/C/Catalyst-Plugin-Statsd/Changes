@@ -1,5 +1,18 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.8.2    2023-06-22 12:36:45+01:00 Europe/London
+  [Tests]
+  - Added required module for tests to work around broken CPAN Testers environments.
+
+v0.8.1    2023-06-08 20:06:25+01:00 Europe/London
+  [Documentation]
+  - Documented the Perl version support policy.
+
+  - Updated copyright year.
+
+  [Toolchain]
+  - Sign the distribution.
+
 v0.8.0    2022-07-27 12:36:43+01:00 Europe/London
   [Incompatable Changes]
   - Minimum Perl version is v5.14, due to changes in Plack::Middleware::Statsd.

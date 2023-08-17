@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 use MVC::Neaf;
 
@@ -14,6 +15,15 @@ neaf->route( "/first/path", sub {
 }, path_info_regex => '.*');
 
 neaf->alias( "/second/path", "/first/path" );
+
+throws_ok {
+    neaf->alias( "/third/path", "/fourth/path" );
+} qr(alias.*unknown.*/fourth/path), 'unknown path = no go';
+
+throws_ok {
+    neaf->alias( "/second/path", "/first/path" );
+} qr(duplicate.*/second/path), 'already set up = no go';
+
 
 # note explain (neaf->get_routes);
 

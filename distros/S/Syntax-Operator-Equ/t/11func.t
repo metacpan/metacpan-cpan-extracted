@@ -3,9 +3,10 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Operator::Equ qw( is_strequ is_numequ );
+use Syntax::Operator::Eqr qw( is_eqr );
 
 my $warnings = 0;
 $SIG{__WARN__} = sub { $warnings++ };
@@ -26,6 +27,14 @@ $SIG{__WARN__} = sub { $warnings++ };
    ok( is_numequ( undef,  undef ), 'undef is undef');
    ok(!is_numequ(   123,  undef ), 'undef is not a number');
    ok(!is_numequ(     0,  undef ), 'undef is not zero');
+}
+
+# eqr
+{
+   ok( is_eqr( "abc", "abc" ), 'identical strings');
+   ok(!is_eqr( "abc", "def" ), 'different strings');
+   ok( is_eqr( "ghi", qr/h/ ),  'string pattern match');
+   ok(!is_eqr( "ghi", qr/H/ ), 'string pattern non-match');
 }
 
 ok(!$warnings, 'no warnings');

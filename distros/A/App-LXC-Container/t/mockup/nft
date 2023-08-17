@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+# mockup nft for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+[ $# -ge 3 ]  ||  Die 'missing parameter(s)'
+
+root="${0%/*/*}/tmp"
+counter="$root/.nft-counter"
+n=$(cat "$counter")
+n=$((n + 1))
+echo "$n" >"$counter"
+[ -n "$ALC_DEBUG_MOCKUP" ]  &&  echo "nft '$n' $*" >/dev/tty
+case $1 in
+    list)
+	[ "$2" = "ruleset" ]  ||  Die 'unexpected nft command' "$@"
+	[ "$3" = "inet"    ]  ||  Die 'unexpected nft command' "$@"
+	case $n in
+	    6)		# return minimal test configuration:
+		echo '
+table inet lxc {
+	chain forward {
+		type filter hook forward priority filter; policy accept;
+		jump localfilter
+	}
+
+	chain localfilter {
+		# dummy entry for full coverage
+		ip saddr 10.0.3.234 reject with icmp port-unreachable
+	}
+}'
+		;;
+	    1)		exit 1;;
+	    2|7|9|12)	echo '# nothing configured yet';;
+	    *)		Die "unexpected state '$n' in mocked nft ($*)"
+	esac
+	;;
+    add)
+	case $n in
+	    3|10|13)
+		[ "$2" = "chain"       ]  ||  Die 'unexpected nft command' "$@"
+		[ "$3" = "inet"        ]  ||  Die 'unexpected nft command' "$@"
+		[ "$4" = "lxc"         ]  ||  Die 'unexpected nft command' "$@"
+		[ "$5" = "localfilter" ]  ||  Die 'unexpected nft command' "$@"
+		;;
+	    5)
+		[ "$2" = "rule"        ]  ||  Die 'unexpected nft command' "$@"
+		[ "$3" = "inet"        ]  ||  Die 'unexpected nft command' "$@"
+		[ "$4" = "lxc"         ]  ||  Die 'unexpected nft command' "$@"
+		[ "$5" = "localfilter" ]  ||  Die 'unexpected nft command' "$@"
+		[ "$6" = "ip"          ]  ||  Die 'unexpected nft command' "$@"
+		[ "$7" = "saddr"       ]  ||  Die 'unexpected nft command' "$@"
+		;;
+	    8|15)	Die "$@: mockup failed";;
+	    *)		Die "unexpected state '$n' in mocked nft ($*)"
+	esac
+	;;
+    insert)
+	[ "$2" = "rule"        ]  ||  Die 'unexpected nft command' "$@"
+	[ "$3" = "inet"        ]  ||  Die 'unexpected nft command' "$@"
+	[ "$4" = "lxc"         ]  ||  Die 'unexpected nft command' "$@"
+	[ "$5" = "forward"     ]  ||  Die 'unexpected nft command' "$@"
+	[ "$6" = "jump"        ]  ||  Die 'unexpected nft command' "$@"
+	[ "$7" = "localfilter" ]  ||  Die 'unexpected nft command' "$@"
+	case $n in
+	    4|14)	;;	# expected states
+	    11)		Die "$@: mockup failed";;
+	    *)		Die "unexpected state '$n' in mocked nft ($*)"
+	esac
+	;;
+    *)
+	Die "unknown command '$1'"
+esac

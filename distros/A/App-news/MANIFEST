@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING.md
 lib/App/news.pm
 LICENSE
 Makefile.PL
@@ -7,7 +8,12 @@ README.md
 script/news
 t/00-basic.t
 t/01-quit.t
+t/02-wrap.t
+t/04-ranges.t
 t/10-groups.t
+t/20-post.t
+t/30-replies.t
+t/40-tags.t
 t/test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

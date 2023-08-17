@@ -114,7 +114,7 @@ get_attribute_value(self, name)
     if(!hook)
       croak("Field does not have an attribute called %" SVf, SVfARG(name));
 
-    RETVAL = newSVsv(hook->hookdata);
+    RETVAL = newSVsv(hook->attrdata);
   }
   OUTPUT:
     RETVAL

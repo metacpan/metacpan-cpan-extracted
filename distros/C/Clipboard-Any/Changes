@@ -1,3 +1,8 @@
+0.011   2023-04-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli clipadd] Add --tee option.
+
+
 0.010   2023-02-18  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

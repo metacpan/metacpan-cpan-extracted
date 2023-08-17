@@ -2,8 +2,10 @@ use strict;
 use warnings;
 
 use CSS::Struct::Output::Structure;
+use English;
+use Error::Pure::Utils qw(clean);
 use Tags::HTML::Login::Button;
-use Test::More 'tests' => 2;
+use Test::More 'tests' => 3;
 use Test::NoWarnings;
 
 # Test.
@@ -45,3 +47,13 @@ is_deeply(
 	],
 	'Default login button CSS.',
 );
+
+# Test.
+$css = CSS::Struct::Output::Structure->new;
+$obj = Tags::HTML::Login::Button->new;
+eval {
+	$obj->process_css;
+};
+is($EVAL_ERROR, "Parameter 'css' isn't defined.\n",
+	"Parameter 'css' isn't defined.");
+clean();

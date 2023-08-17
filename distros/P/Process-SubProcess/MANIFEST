@@ -1,3 +1,4 @@
+bin/run_subprocess.pl
 cpanfile
 docs/Process.jpg
 lib/Process/ChildProcess.pm
@@ -6,6 +7,8 @@ lib/Process/SubProcess.pm
 lib/Process/SubProcess/Group.pm
 lib/Process/SubProcess/Pool.pm
 LICENSE
+Makefile
+Makefile.PL
 MANIFEST			This list of files
 README.md
 t/exception_script.pl
@@ -14,6 +17,7 @@ t/noexec_script.pl
 t/quiet_script.pl
 t/test_group.t
 t/test_performance.t
+t/test_runner.t
 t/test_script.pl
 t/test_subprocess.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

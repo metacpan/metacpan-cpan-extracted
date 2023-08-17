@@ -1,0 +1,14 @@
+0.0.4 Mon Jun 26 04:22:07 PM EDT 2023
+ - Add immutable::seq support
+
+0.0.3 Sun Jun 25 08:43:17 PM EDT 2023
+ - Fix to make ->set preserve key order
+ - Add install to Makefile
+
+0.0.2 Sun Jun 25 01:25:12 PM EDT 2023
+ - Add dependency modules to Meta
+ - Add the :all export tag to immutable.pm
+ - Write more documentation
+
+0.0.1 Sun Jun 25 11:23:44 AM EDT 2023
+ - Initial release

@@ -1436,11 +1436,14 @@ sub _prepare_tex_tokens {
     }
     # print "SECONDARY FOOTNOTES ENABLED? $enable_secondary_footnotes\n";
 
+    my $main_is_rtl = Text::Amuse::Utils::lang_code_is_rtl($doc->language_code);
+
     my $tex_setup_langs = $fonts
       ->compose_polyglossia_fontspec_stanza(lang => $doc->language,
                                             others => $doc->other_languages || [],
                                             enable_secondary_footnotes => $enable_secondary_footnotes,
                                             bidi => $doc->is_bidi,
+                                            main_is_rtl => $main_is_rtl,
                                             has_ruby => $doc->has_ruby,
                                             is_slide => $is_slide,
                                             captions => Text::Amuse::Utils::language_code_locale_captions($doc->language_code),

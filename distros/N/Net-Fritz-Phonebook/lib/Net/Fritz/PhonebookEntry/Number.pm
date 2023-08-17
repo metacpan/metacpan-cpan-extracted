@@ -6,10 +6,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use PerlX::Maybe;
 
-use Data::Dumper;
-
-use vars '$VERSION';
-$VERSION = '0.05';
+our $VERSION = '0.07';
 
 has entry => (
     is => 'ro',
@@ -93,7 +90,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2017-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

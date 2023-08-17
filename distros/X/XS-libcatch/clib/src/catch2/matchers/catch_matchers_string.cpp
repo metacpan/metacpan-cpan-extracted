@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -31,7 +31,7 @@ namespace Matchers {
     }
 
 
-    StringMatcherBase::StringMatcherBase( std::string const& operation, CasedString const& comparator )
+    StringMatcherBase::StringMatcherBase( StringRef operation, CasedString const& comparator )
     : m_comparator( comparator ),
       m_operation( operation ) {
     }
@@ -48,28 +48,28 @@ namespace Matchers {
         return description;
     }
 
-    StringEqualsMatcher::StringEqualsMatcher( CasedString const& comparator ) : StringMatcherBase( "equals", comparator ) {}
+    StringEqualsMatcher::StringEqualsMatcher( CasedString const& comparator ) : StringMatcherBase( "equals"_sr, comparator ) {}
 
     bool StringEqualsMatcher::match( std::string const& source ) const {
         return m_comparator.adjustString( source ) == m_comparator.m_str;
     }
 
 
-    StringContainsMatcher::StringContainsMatcher( CasedString const& comparator ) : StringMatcherBase( "contains", comparator ) {}
+    StringContainsMatcher::StringContainsMatcher( CasedString const& comparator ) : StringMatcherBase( "contains"_sr, comparator ) {}
 
     bool StringContainsMatcher::match( std::string const& source ) const {
         return contains( m_comparator.adjustString( source ), m_comparator.m_str );
     }
 
 
-    StartsWithMatcher::StartsWithMatcher( CasedString const& comparator ) : StringMatcherBase( "starts with", comparator ) {}
+    StartsWithMatcher::StartsWithMatcher( CasedString const& comparator ) : StringMatcherBase( "starts with"_sr, comparator ) {}
 
     bool StartsWithMatcher::match( std::string const& source ) const {
         return startsWith( m_comparator.adjustString( source ), m_comparator.m_str );
     }
 
 
-    EndsWithMatcher::EndsWithMatcher( CasedString const& comparator ) : StringMatcherBase( "ends with", comparator ) {}
+    EndsWithMatcher::EndsWithMatcher( CasedString const& comparator ) : StringMatcherBase( "ends with"_sr, comparator ) {}
 
     bool EndsWithMatcher::match( std::string const& source ) const {
         return endsWith( m_comparator.adjustString( source ), m_comparator.m_str );

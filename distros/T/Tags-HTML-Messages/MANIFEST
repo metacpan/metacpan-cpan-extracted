@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/html_page_with_messages.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -20,5 +20,8 @@ README
 SIGNATURE
 t/Tags-HTML-Messages/01-use.t
 t/Tags-HTML-Messages/02-version.t
+t/Tags-HTML-Messages/03-new.t
+t/Tags-HTML-Messages/04-process.t
+t/Tags-HTML-Messages/05-process_css.t
 xt/Tags-HTML-Messages/01-pod_coverage.t
 xt/Tags-HTML-Messages/02-pod.t

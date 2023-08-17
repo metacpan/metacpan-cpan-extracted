@@ -14,7 +14,7 @@ configure_requires:
   DBIx::Class: '0.082810'
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: App-Netdisco
 provides:
   App::Netdisco:
     file: lib/App/Netdisco.pm
-    version: '2.062000'
+    version: '2.065001'
   App::Netdisco::AnyEvent::Nbtstat:
     file: lib/App/Netdisco/AnyEvent/Nbtstat.pm
   App::Netdisco::Backend::Job:
@@ -38,7 +38,7 @@ provides:
     file: lib/App/Netdisco/Configuration.pm
   App::Netdisco::DB:
     file: lib/App/Netdisco/DB.pm
-    version: '78'
+    version: '81'
   App::Netdisco::DB::ExplicitLocking:
     file: lib/App/Netdisco/DB/ExplicitLocking.pm
   App::Netdisco::DB::Result:
@@ -249,6 +249,8 @@ provides:
     file: lib/App/Netdisco/Transport/SNMP.pm
   App::Netdisco::Transport::SSH:
     file: lib/App/Netdisco/Transport/SSH.pm
+  App::Netdisco::Util::CustomFields:
+    file: lib/App/Netdisco/Util/CustomFields.pm
   App::Netdisco::Util::DNS:
     file: lib/App/Netdisco/Util/DNS.pm
   App::Netdisco::Util::Device:
@@ -281,6 +283,8 @@ provides:
     file: lib/App/Netdisco/Util/PortMAC.pm
   App::Netdisco::Util::SNMP:
     file: lib/App/Netdisco/Util/SNMP.pm
+  App::Netdisco::Util::Snapshot:
+    file: lib/App/Netdisco/Util/Snapshot.pm
   App::Netdisco::Util::Statistics:
     file: lib/App/Netdisco/Util/Statistics.pm
   App::Netdisco::Util::Web:
@@ -465,6 +469,10 @@ provides:
     file: lib/App/Netdisco/Worker/Plugin/Discover/PortProperties/PortAccessEntity.pm
   App::Netdisco::Worker::Plugin::Discover::Properties:
     file: lib/App/Netdisco/Worker/Plugin/Discover/Properties.pm
+  App::Netdisco::Worker::Plugin::Discover::Properties::Tags:
+    file: lib/App/Netdisco/Worker/Plugin/Discover/Properties/Tags.pm
+  App::Netdisco::Worker::Plugin::Discover::Snapshot:
+    file: lib/App/Netdisco/Worker/Plugin/Discover/Snapshot.pm
   App::Netdisco::Worker::Plugin::Discover::VLANs:
     file: lib/App/Netdisco/Worker/Plugin/Discover/VLANs.pm
   App::Netdisco::Worker::Plugin::Discover::Wireless:
@@ -489,6 +497,8 @@ provides:
     file: lib/App/Netdisco/Worker/Plugin/Hook/Exec.pm
   App::Netdisco::Worker::Plugin::Hook::HTTP:
     file: lib/App/Netdisco/Worker/Plugin/Hook/HTTP.pm
+  App::Netdisco::Worker::Plugin::Internal::SNMPFastDiscover:
+    file: lib/App/Netdisco/Worker/Plugin/Internal/SNMPFastDiscover.pm
   App::Netdisco::Worker::Plugin::LoadMIBs:
     file: lib/App/Netdisco/Worker/Plugin/LoadMIBs.pm
   App::Netdisco::Worker::Plugin::Location:
@@ -544,6 +554,7 @@ provides:
   MySession:
     file: lib/App/Netdisco/Transport/SSH.pm
 recommends:
+  Alien::SNMP: '3.0509030000'
   Graph: '0'
   GraphViz: '0'
 requires:
@@ -607,7 +618,7 @@ requires:
   Pod::Usage: '0'
   Regexp::Common: '2017060201'
   Role::Tiny: '1.002005'
-  SNMP::Info: '3.92'
+  SNMP::Info: '3.94'
   SQL::Abstract: '1.85'
   SQL::Translator: '0.11024'
   Scope::Guard: '0'
@@ -640,7 +651,7 @@ resources:
   MailingList: https://lists.sourceforge.net/lists/listinfo/netdisco-users
   bugtracker: https://github.com/netdisco/netdisco/issues
   homepage: http://netdisco.org/
-  license: http://opensource.org/licenses/bsd-license.php
+  license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/netdisco/netdisco
-version: '2.062000'
+version: '2.065001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

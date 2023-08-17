@@ -1,6 +1,5 @@
 package List::Insertion;
 
-use 5.024000;
 
 use strict;
 use warnings;
@@ -10,7 +9,7 @@ use Data::Combination;
 use Exporter;# qw<import>;
 
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.2';
 
 sub make_search;
 
@@ -40,8 +39,9 @@ sub import {
     $spec->{type}//="string";
     $spec->{duplicate}//="left";
 
-    my $sub=make_search $spec;
+    my ($sub,$code)=make_search $spec;
     *{$package."::".$spec->{name}}=$sub if $sub;
+    #say STDERR $code;
   }
 }
 
@@ -59,12 +59,13 @@ my (\$key, \$array)=\@_;
   \$upper = \@\$array;
 	return 0 unless \$upper;
 
+  use integer;
   # TODO: Run in eval for accessor fall back
   #
-  local \$_;
+  # local \$_;
 	while(\$lower<\$upper){
 		\$middle=(\$upper+\$lower)>>1;
-    \$key $condition->{$fields{type}}{$fields{duplicate}} \$array->[\$middle]$accessor
+    (\$key $condition->{$fields{type}}{$fields{duplicate}} \$array->[\$middle]$accessor)
     $update->{$fields{duplicate}}
   } 
 	\$lower;
@@ -137,12 +138,13 @@ sub make_search {
 
   my $template=Template::Plex->load( \$template_base, {condition=>\%condition, update=>\%update, accessor=>$options->{accessor}}, inject=>['use feature "signatures";']);
   my $code_str=$template->render({duplicate =>$options->{duplicate}, type=>$options->{type}});
-  use feature ":all";
-  use Error::Show;
+
+  #use feature "say";
+  #use Error::Show;
   my $sub=eval($code_str);
   #say STDERR Error::Show::context error=>$@, program=>$code_str if($@ or !$sub);
   #say STDERR $code_str;
-  $sub;
+  wantarray?($sub,$code_str):$sub;
 }
 
 1;

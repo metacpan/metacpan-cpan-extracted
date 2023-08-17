@@ -1,5 +1,21 @@
 Revision history for Log-Dispatchouli
 
+3.006     2023-08-11 10:58:09-04:00 America/New_York
+        - fix a bug in Log::Fmt where an event data value that was a reference
+          to a reference to an array was logged as its 0th element, not a
+          flogged array reference
+
+3.005     2023-06-08 20:41:02-04:00 America/New_York
+        - add parse_event_string_as_hash, which loses duplicate k/v pairs
+          but makes life a little easier
+
+3.004     2023-06-05 21:26:03-04:00 America/New_York
+        - optimization to parsing of quoted strings (thanks, Rob Mueller)
+
+3.003     2023-06-05 08:10:52-04:00 America/New_York
+        - Log::Fmt will now flog ref-refs, meaning you can easily log JSON as
+          log event values
+
 3.002     2022-12-06 09:49:34-05:00 America/New_York
         - restore v5.20 compatibility by turning on "postderef" feature
           explicitly

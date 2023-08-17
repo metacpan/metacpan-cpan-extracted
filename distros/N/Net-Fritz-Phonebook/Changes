@@ -1,3 +1,14 @@
+0.07 2023-07-25
+    . All changes contributed by Andreas Voegele
+    . Fix PhonebookEntry->save() to call 'SetPhonebookEntry' instead of the non-existing 'AddPhonebookEntry'
+    . Updated links to AVM documentation
+    . Fix usage of Test::isn't (now Test::isnt())
+    . Appveyor fixes
+
+0.06 2023-07-21
+    . Fix test suite to use ->VERSION() for version checks
+      Contributed by Graham Knop
+
 0.05 2020-11-23
     . Docfix to link to the proper class/module
     . No code changes, no need to upgrade

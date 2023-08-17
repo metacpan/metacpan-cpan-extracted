@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# mockup lxc-ls for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+root="${0%/*/*}/tmp"
+counter="$root/.lxc-ls-counter"
+n=$(cat "$counter")
+n=$((n + 1))
+echo "$n" >"$counter"
+[ -n "$ALC_DEBUG_MOCKUP" ]  &&  echo "lxc-ls '$n'" >/dev/tty
+case $n in
+    1|4)	;;
+    2)		exit $n;;
+    3)		echo 'run-test-1';;
+    *)		Die "unexpected state '$n' in mocked lxc-ls"
+esac

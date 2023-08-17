@@ -1,5 +1,6 @@
 bin/pyx-optimization
 Changes
+examples/print_help.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -22,5 +23,7 @@ SIGNATURE
 t/App-PYX-Optimization/01-use.t
 t/App-PYX-Optimization/02-version.t
 t/App-PYX-Optimization/03-new.t
+t/App-PYX-Optimization/04-run.t
+t/data/element.pyx
 xt/App-PYX-Optimization/01-pod_coverage.t
 xt/App-PYX-Optimization/02-pod.t

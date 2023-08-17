@@ -1,0 +1,7 @@
+load.t
+compile.t
+unknown_option.t
+help.t
+version.t
+pod.t
+pod_coverage.t

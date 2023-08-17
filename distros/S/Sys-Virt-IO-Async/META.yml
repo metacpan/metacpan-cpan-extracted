@@ -1,0 +1,36 @@
+---
+abstract: 'IO::Async event loop integration for Sys::Virt libvirt bindings'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Virt-IO-Async
+optional_features:
+  examples:
+    description: examples
+    requires:
+      Future::AsyncAwait: '0'
+      Future::Queue: '0'
+requires:
+  Feature::Compat::Try: '0'
+  IO::Async::Handle: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Timer::Periodic: '0'
+  Log::Any: '0'
+  Sys::Virt: '0'
+  Sys::Virt::Event: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/ehuelsmann/Sys-Virt-IO-Async/issues
+  repository: https://github.com/ehuelsmann/Sys-Virt-IO-Async.git
+version: 0.0.5
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

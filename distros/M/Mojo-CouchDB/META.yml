@@ -1,0 +1,32 @@
+---
+abstract: 'CouchDB the Mojo way'
+author:
+  - 'Rawley Fowler <rawleyfowler@proton.me>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-CouchDB
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Mojolicious: '8.50'
+  Test::Exception: '0.43'
+  URI: '5.19'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/rawleyfowler/Mojo-CouchDB/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/rawleyfowler/Mojo-CouchDB
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

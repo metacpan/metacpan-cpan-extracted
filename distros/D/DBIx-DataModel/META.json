@@ -4,7 +4,7 @@
       "Laurent Dami <dami AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -16,6 +16,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "DBD::Mock" : "1.39",
+            "DBD::SQLite" : "1.38",
+            "FindBin" : "0",
+            "SQL::Abstract::Test" : "0",
             "Task::Weaken" : "0"
          }
       },
@@ -43,6 +47,7 @@
             "Module::Build" : "0",
             "Module::Load" : "0",
             "Params::Validate" : "0",
+            "SQL::Abstract::Classic" : "1.91",
             "SQL::Abstract::More" : "1.39",
             "Scalar::Util" : "1.07",
             "Storable" : "0",
@@ -51,19 +56,12 @@
             "perl" : "5.008",
             "version" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "DBD::Mock" : "1.39",
-            "DBD::SQLite" : "1.38",
-            "FindBin" : "0"
-         }
       }
    },
    "provides" : {
       "DBIx::DataModel" : {
          "file" : "lib/DBIx/DataModel.pm",
-         "version" : "3.04"
+         "version" : "3.05"
       },
       "DBIx::DataModel::Compatibility::V0" : {
          "file" : "lib/DBIx/DataModel/Compatibility/V0.pm"
@@ -192,6 +190,6 @@
          "url" : "https://github.com/damil/DBIx-DataModel"
       }
    },
-   "version" : "3.04",
+   "version" : "3.05",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

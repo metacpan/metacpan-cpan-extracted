@@ -7,6 +7,7 @@ WriteMakefile(
 	VERSION_FROM      => 'lib/Test/Tk.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
 	PREREQ_PM         => {
 		'Tk' => 0,
+		'Test::Deep', => 0,
 		'Test::More' => 0,
 	},
 	ABSTRACT_FROM     => 'lib/Test/Tk.pm', # retrieve abstract from module

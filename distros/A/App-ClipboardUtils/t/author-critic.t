@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ClipboardUtils.pm','script/add-clipboard-content','script/clear-clipboard-content','script/clear-clipboard-history','script/clipadd','script/clipget','script/detect-clipboard-manager','script/get-clipboard-content','script/list-clipboard-history'];
+my $filenames = ['lib/App/ClipboardUtils.pm','script/add-clipboard-content','script/clear-clipboard-content','script/clear-clipboard-history','script/clipadd','script/clipget','script/detect-clipboard-manager','script/get-clipboard-content','script/get-clipboard-history-item','script/list-clipboard-history'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

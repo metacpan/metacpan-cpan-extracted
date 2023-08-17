@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::iPick_config;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: iPick_config.pm 
+ PERL PERL PROGRAM NAME: iPick_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: June 16, 2019
  DESCRIPTION: Reads a seismic unix-formatted file

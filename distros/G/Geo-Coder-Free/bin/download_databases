@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Download the databases and create the local SQLite database
+# Be aware that this takes significant disc space
 
 set -ex
 
@@ -15,10 +16,12 @@ export no_proxy=localhost,127.0.0.0/8,192.168.1.0/16,utilite
 export REDIS_SERVER=
 
 cd ~/src/njh/Geo-Coder-Free && git pull
+mkdir -p ~/Downloads
 cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global.zip
 cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global-sa.zip
 cd $OPENADDR_HOME && rm -rf ?? *.txt summary br mx fr it za es pl be jp kr pt fi de by ch dk ru cz nz tw cl at kz co no uy si xk */*.vrt */*/*.vrt && unzip -o ~/Downloads/openaddr-collected-global-sa.zip && unzip -o ~/Downloads/openaddr-collected-global.zip
 
+mkdir -p $WHOSONFIRST_HOME
 # cd $WHOSONFIRST_HOME && ./wof-sqlite-download
 cd $WHOSONFIRST_HOME && ./wof-update
 

@@ -191,7 +191,7 @@ sub set {
 	$package->flow_type_aref();
 	$package->file_dialog_type_aref();
 
-	#  Bind each entry: empty text for only the case of data_in (label) to MB3
+	# Bind each entry: empty text for only the case of data_in (label) to MB3
 	my $values_w_aref = $binding->{_values_w_aref};
 	my @values_w      = @$values_w_aref;
 
@@ -199,7 +199,7 @@ sub set {
 
 	my $binding_index_aref = $package->get_binding_index_aref();
 	my @index              = @$binding_index_aref;
-#	print("binding,set,file_dialog_type,indices : @index\n");
+#	print("binding,set,file_dialog_type,indices for user-flows and big streams: @index\n");
 
 	my $file_dialog_type_aref = $package->get_file_dialog_type_aref();
 	my @file_dialog_type      = @$file_dialog_type_aref;
@@ -214,8 +214,8 @@ sub set {
 
 		my $dial_type = $file_dialog_type[ $index[$i] ];
 
-				# print("3A. binding,set,prog_name: ${$binding->{_prog_name_sref}}\n");
-			    # print("3B. binding,set,file_dialog_type: $dial_type\n");
+#				print("3A. binding,set,prog_name: ${$binding->{_prog_name_sref}}\n");
+#			    print("3B. binding,set,file_dialog_type: $dial_type\n");
 			    # print("3B. binding,set,file_dialog_type: i=$i\n");
 
 		# ACTUAL binding takes place here...
@@ -234,7 +234,7 @@ sub set {
 
 		}
 		else {
-			# print("4. binding,set, no bindings\n");
+			# print("4. binding,set, no bindings NADA\n");
 		}
 	}
 }

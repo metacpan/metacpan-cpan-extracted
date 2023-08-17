@@ -36,7 +36,7 @@
             "JSON" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
-            "perl" : "5.032"
+            "perl" : "5.026"
          }
       }
    },
@@ -48,6 +48,6 @@
          "web" : "https://github.com/kawamurashingo/OpenAIGPT4.git"
       }
    },
-   "version" : "0.13",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

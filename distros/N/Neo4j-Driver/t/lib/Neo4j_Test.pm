@@ -32,7 +32,7 @@ sub driver_maybe {
 	$driver->config(timeout => 2);  # 2 seconds timeout may speed up testing
 	$driver->config(cypher_params => v2);
 	
-	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
+	$bolt = $driver->config('uri') && $driver->config('uri')->scheme eq 'bolt';
 	if ($ENV{TEST_NEO4J_NETMODULE}) {
 		eval "require $ENV{TEST_NEO4J_NETMODULE} unless $ENV{TEST_NEO4J_NETMODULE}->can('new'); 1" or die;
 		$driver->plugin(Neo4j_Test::NetModulePlugin->new($ENV{TEST_NEO4J_NETMODULE}));
@@ -82,7 +82,7 @@ sub driver_no_auth {
 		delete $driver->{plugins}->{handlers}->{http_adapter_factory};
 		$driver->plugin(Neo4j_Test::NetModulePlugin->new( Neo4j_Test::Sim->new({auth => 0}) ));
 	}
-	$driver->{auth} = { scheme => 'basic', principal => "no\tuser", credentials => "no\tpass" };
+	$driver->{config}->{auth} = { scheme => 'basic', principal => "no\tuser", credentials => "no\tpass" };
 	return $driver;
 }
 

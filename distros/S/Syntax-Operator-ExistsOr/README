@@ -26,15 +26,15 @@ DESCRIPTION
     // core perl operator, but which cares about hash element existence
     rather than definedness.
 
-    Current stable versions of perl do not directly support custom infix
-    operators, but the ability was added in the 5.37.x development cycle
-    and is available from perl v5.37.7 onwards. The documentation of
-    XS::Parse::Infix describes the situation in more detail. This module is
-    therefore almost entirely useless on stable perl builds. While the
-    regular parser does not support custom infix operators, they are
-    supported via XS::Parse::Infix and hence XS::Parse::Keyword, and so
-    custom keywords which attempt to parse operator syntax may be able to
-    use it.
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+    While Perl versions before this do not support custom infix operators,
+    they can still be used via XS::Parse::Infix and hence
+    XS::Parse::Keyword. Custom keywords which attempt to parse operator
+    syntax may be able to use these.
 
     This module does not provide wrapper functions for the operators, as
     their inherent short-circuiting behaviour would appear confusing when

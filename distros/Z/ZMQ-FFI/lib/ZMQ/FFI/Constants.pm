@@ -1,5 +1,5 @@
 package ZMQ::FFI::Constants;
-$ZMQ::FFI::Constants::VERSION = '1.18';
+$ZMQ::FFI::Constants::VERSION = '1.19';
 # ABSTRACT: Generated module of zmq constants. All constants, all versions.
 
 # Generated using ZMQ versions v2.1.0-v4.3.4
@@ -477,7 +477,7 @@ ZMQ::FFI::Constants - Generated module of zmq constants. All constants, all vers
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =head1 SYNOPSIS
 
@@ -510,7 +510,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Dylan Cali.
+This software is copyright (c) 2023 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,6 +17,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -52,12 +53,12 @@
          "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify"
       }
    },
-   "version" : "0.35",
-   "x_generated_by_perl" : "v5.34.0",
+   "version" : "0.36",
+   "x_generated_by_perl" : "v5.36.1",
    "x_maintainers" : [
       "Timothy Legge <timlegge@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,0 +1,49 @@
+Revision history for OpenSky-API
+
+0.4       2023-06-12 12:42:54 CEST
+
+          - Remove undeclared dependency on Syntax::Keyword::Try
+
+0.3       2023-06-06 08:05:17 CEST
+          - Convert to MooseX::Extended
+
+0.2       2023-06-06 06:54:56 CEST
+
+          - Add Perl::Critic author tests
+          - Move Perl::Tidy tests to xt
+
+0.1       2023-06-06 06:30:26 CEST
+          - Bump version
+
+0.009     2023-06-05 09:26:38 CEST
+          - Fix case of one module name
+
+0.008     2023-06-04 11:14:43 CEST
+          - Assert minimum Perl version in dist.ini.
+          - Missing config file has a slightly better error message now
+          - Config file no longer required if user/pass is already available
+          - Implement rate limits for get_states and get_my_states
+          - Add support for GET /tracks
+
+0.007     2023-06-01 11:14:56 CEST
+          - Fixed some incorrect code in POD examples.
+
+0.006     2023-06-01 11:05:51 CEST
+          - Fixed some misspelled POD leading to broken links
+
+0.005     2023-06-01 10:26:41 CEST
+          - Renamed to WebService::OpenSky
+
+0.004     2023-05-29 11:25:32 CEST
+          - Fixed iterator bug and wrote tests for it (thanks, toreau)
+
+0.003     2023-05-29 07:27:16 CEST
+          - Doc fixes and remove an unused class.
+
+0.002     2023-05-28 16:18:26 CEST
+          - Doc fixes.
+
+0.001     2023-05-28 15:34:58 CEST
+
+          - First version of OpenSKY::API for Perl
+

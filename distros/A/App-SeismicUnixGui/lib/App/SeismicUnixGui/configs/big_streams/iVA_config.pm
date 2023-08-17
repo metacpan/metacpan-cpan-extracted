@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::iVA_config;
 
 =head2 SYNOPSIS 
 
- PACKAGE NAME: iVA_config.pm 
+ PERL PROGRAM NAME: iVA_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: Aug 18 2016 
        July 19 2017

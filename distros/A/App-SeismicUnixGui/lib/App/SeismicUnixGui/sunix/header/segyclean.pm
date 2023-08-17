@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::header::segyclean;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SEGYCLEAN - zero out unassigned portion of header		
+ PERL PROGRAM NAME:  SEGYCLEAN - zero out unassigned portion of header		
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

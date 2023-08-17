@@ -11,7 +11,7 @@ use Wikibase::Datatype::Print::Item;
 use Wikibase::Datatype::Print::Lexeme;
 use Wikibase::Datatype::Print::Property;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -39,11 +39,11 @@ sub run {
 	};
 	if (! getopts('hl:m:', $self->{'_opts'}) || $self->{'_opts'}->{'h'}) {
 		print STDERR "Usage: $0 [-h] [-l lang] [-m mediawiki_site] [--version] wd_id\n";
-		print STDERR "\t-h\t\tHelp.\n";
-		print STDERR "\t-l lang\t\tLanguage used (default is English = en)\n";
+		print STDERR "\t-h\t\t\tPrint help.\n";
+		print STDERR "\t-l lang\t\t\tLanguage used (default is English = en).\n";
 		print STDERR "\t-m mediawiki_site\tMediaWiki site (default is www.wikidata.org).\n";
-		print STDERR "\t--version\tPrint version.\n";
-		print STDERR "\twd_id\t\tWikidata id (qid or pid or lid).\n";
+		print STDERR "\t--version\t\tPrint version.\n";
+		print STDERR "\twd_id\t\t\tWikidata id (qid or pid or lid).\n";
 		return 1;
 	}
 	my $wd_id = $ARGV[0];
@@ -208,6 +208,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

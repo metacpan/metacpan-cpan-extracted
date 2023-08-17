@@ -1,10 +1,9 @@
-Filters: ~[!nonportable]~[!benchmark]~[approvals] *
+Filters: "*" ~[!nonportable] ~[!benchmark] ~[approvals]
+Randomness seeded to: 1
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<exe-name> is a <version> host application.
+<exe-name> is a Catch2 v<version> host application.
 Run with -? for options
-
-Randomness seeded to: 1
 
 -------------------------------------------------------------------------------
 #1455 - INFO and WARN can start with a linebreak
@@ -27,6 +26,16 @@ Tricky.tests.cpp:<line number>
 Tricky.tests.cpp:<line number>: FAILED:
 explicitly with message:
   1514
+
+-------------------------------------------------------------------------------
+#2615 - Throwing in constructor generator fails test case but does not abort
+-------------------------------------------------------------------------------
+Generators.tests.cpp:<line number>
+...............................................................................
+
+Generators.tests.cpp:<line number>: FAILED:
+due to unexpected exception with message:
+  failure to init
 
 -------------------------------------------------------------------------------
 #748 - captures with unexpected exceptions
@@ -54,7 +63,7 @@ due to unexpected exception with messages:
   expected exception
 
 -------------------------------------------------------------------------------
-#835 -- errno should not be touched by Catch
+#835 -- errno should not be touched by Catch2
 -------------------------------------------------------------------------------
 Misc.tests.cpp:<line number>
 ...............................................................................
@@ -373,6 +382,16 @@ Exception.tests.cpp:<line number>
 Exception.tests.cpp:<line number>: FAILED:
 due to unexpected exception with message:
   custom std exception
+
+-------------------------------------------------------------------------------
+Empty generators can SKIP in constructor
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+explicitly with message:
+  This generator is empty
 
 -------------------------------------------------------------------------------
 EndsWith string matcher
@@ -1166,24 +1185,12 @@ due to unexpected exception with message:
   unexpected exception
 
 -------------------------------------------------------------------------------
-Where the LHS is not a simple value
+a succeeding test can still be skipped
 -------------------------------------------------------------------------------
-Tricky.tests.cpp:<line number>
+Skip.tests.cpp:<line number>
 ...............................................................................
 
-Tricky.tests.cpp:<line number>: warning:
-  Uncomment the code in this test to check that it gives a sensible compiler
-  error
-
--------------------------------------------------------------------------------
-Where there is more to the expression after the RHS
--------------------------------------------------------------------------------
-Tricky.tests.cpp:<line number>
-...............................................................................
-
-Tricky.tests.cpp:<line number>: warning:
-  Uncomment the code in this test to check that it gives a sensible compiler
-  error
+Skip.tests.cpp:<line number>: SKIPPED:
 
 -------------------------------------------------------------------------------
 checkedElse, failing
@@ -1206,6 +1213,87 @@ Misc.tests.cpp:<line number>: FAILED:
   REQUIRE( testCheckedIf( false ) )
 with expansion:
   false
+
+-------------------------------------------------------------------------------
+dynamic skipping works with generators
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+explicitly with message:
+  skipping because answer = 41
+
+-------------------------------------------------------------------------------
+dynamic skipping works with generators
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+explicitly with message:
+  skipping because answer = 43
+
+-------------------------------------------------------------------------------
+failed assertions before SKIP cause test case to fail
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: FAILED:
+  CHECK( 3 == 4 )
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+-------------------------------------------------------------------------------
+failing for some generator values causes entire test case to fail
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: FAILED:
+
+-------------------------------------------------------------------------------
+failing for some generator values causes entire test case to fail
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+-------------------------------------------------------------------------------
+failing for some generator values causes entire test case to fail
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: FAILED:
+
+-------------------------------------------------------------------------------
+failing for some generator values causes entire test case to fail
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+-------------------------------------------------------------------------------
+failing in some unskipped sections causes entire test case to fail
+  skipped
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+-------------------------------------------------------------------------------
+failing in some unskipped sections causes entire test case to fail
+  not skipped
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: FAILED:
 
 loose text artifact
 -------------------------------------------------------------------------------
@@ -1325,6 +1413,19 @@ Misc.tests.cpp:<line number>: FAILED:
 with expansion:
   1 == 2
 
+a!
+b1!
+-------------------------------------------------------------------------------
+nested sections can be skipped dynamically at runtime
+  B
+  B2
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+!
 -------------------------------------------------------------------------------
 not prints unscoped info from previous failures
 -------------------------------------------------------------------------------
@@ -1360,6 +1461,15 @@ with message:
   this SHOULD be seen only ONCE
 
 -------------------------------------------------------------------------------
+sections can be skipped dynamically at runtime
+  skipped
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+
+-------------------------------------------------------------------------------
 send a single char to INFO
 -------------------------------------------------------------------------------
 Misc.tests.cpp:<line number>
@@ -1381,6 +1491,16 @@ Message.tests.cpp:<line number>: FAILED:
 with messages:
   hi
   i := 7
+
+-------------------------------------------------------------------------------
+skipped tests can optionally provide a reason
+-------------------------------------------------------------------------------
+Skip.tests.cpp:<line number>
+...............................................................................
+
+Skip.tests.cpp:<line number>: SKIPPED:
+explicitly with message:
+  skipping because answer = 43
 
 -------------------------------------------------------------------------------
 stacks unscoped info in loops
@@ -1405,15 +1525,12 @@ with messages:
   6
 
 -------------------------------------------------------------------------------
-string literals of different sizes can be compared
+tests can be skipped dynamically at runtime
 -------------------------------------------------------------------------------
-Tricky.tests.cpp:<line number>
+Skip.tests.cpp:<line number>
 ...............................................................................
 
-Tricky.tests.cpp:<line number>: FAILED:
-  REQUIRE( std::string( "first" ) == "second" )
-with expansion:
-  "first" == "second"
+Skip.tests.cpp:<line number>: SKIPPED:
 
 -------------------------------------------------------------------------------
 thrown std::strings are translated
@@ -1426,6 +1543,6 @@ due to unexpected exception with message:
   Why would you throw a std::string?
 
 ===============================================================================
-test cases:  376 |  299 passed |  70 failed |  7 failed as expected
-assertions: 2149 | 1993 passed | 129 failed | 27 failed as expected
+test cases:  409 |  322 passed |  69 failed | 7 skipped | 11 failed as expected
+assertions: 2208 | 2048 passed | 128 failed | 32 failed as expected
 

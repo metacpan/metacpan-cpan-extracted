@@ -1843,6 +1843,9 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
          Rmpq_mul_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+       if(SvIV(get_sv("Math::GMPq::RETYPE", 0)) && strEQ(h, "Math::MPFR")) {
+           _overload_callback("Math::MPFR::overload_mul", "Math::GMPq::overload_mul", newSViv(0));
+       }
      }
 
      SvREFCNT_dec(a);
@@ -1899,6 +1902,9 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
          Rmpq_add_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+       if(SvIV(get_sv("Math::GMPq::RETYPE", 0)) && strEQ(h, "Math::MPFR")) {
+           _overload_callback("Math::MPFR::overload_add", "Math::GMPq::overload_add", newSViv(0));
+       }
      }
 
      SvREFCNT_dec(a);
@@ -1954,6 +1960,9 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          Rmpq_sub_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
+       }
+       if(SvIV(get_sv("Math::GMPq::RETYPE", 0)) && strEQ(h, "Math::MPFR")) {
+           _overload_callback("Math::MPFR::overload_sub", "Math::GMPq::overload_sub", &PL_sv_yes);
        }
      }
 
@@ -2024,6 +2033,9 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
          Rmpq_div_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+       if(SvIV(get_sv("Math::GMPq::RETYPE", 0)) && strEQ(h, "Math::MPFR")) {
+           _overload_callback("Math::MPFR::overload_div", "Math::GMPq::overload_div", &PL_sv_yes);
+       }
      }
 
      SvREFCNT_dec(a);
@@ -2032,11 +2044,20 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
+     SvREFCNT_inc(a);
      if(SvUOK(b) || (SV_IS_IOK(b) && SvIVX(b) >= 0)) {
-       SvREFCNT_inc(a);
        Rmpq_pow_ui(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), (unsigned long)SvUVX(b));
        return a;
      }
+
+     if(sv_isobject(b) && SvIV(get_sv("Math::GMPq::RETYPE", 0))) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::MPFR")) {
+           _overload_callback("Math::MPFR::overload_pow", "Math::GMPq::overload_pow", &PL_sv_yes);
+       }
+     }
+
+     SvREFCNT_dec(a);
      croak("Invalid argument supplied to Math::GMPq::overload_pow_eq function");
 }
 
@@ -2375,28 +2396,24 @@ SV * ___GMP_CFLAGS(pTHX) {
 #endif
 }
 
-SV * overload_inc(pTHX_ SV * p, SV * second, SV * third) {
+void overload_inc(pTHX_ SV * p, SV * second, SV * third) {
      mpq_t one;
 
      mpq_init(one);
      mpq_set_ui(one, 1, 1);
 
-     SvREFCNT_inc(p);
      mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(p)))), one);
      mpq_clear(one);
-     return p;
 }
 
-SV * overload_dec(pTHX_ SV * p, SV * second, SV * third) {
+void overload_dec(pTHX_ SV * p, SV * second, SV * third) {
      mpq_t one;
 
      mpq_init(one);
      mpq_set_ui(one, 1, 1);
 
-     SvREFCNT_inc(p);
      mpq_sub(*(INT2PTR(mpq_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(p)))), one);
      mpq_clear(one);
-     return p;
 }
 
 SV * _wrap_count(pTHX) {
@@ -3684,23 +3701,41 @@ CODE:
 OUTPUT:  RETVAL
 
 
-SV *
+void
 overload_inc (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-CODE:
-  RETVAL = overload_inc (aTHX_ p, second, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        overload_inc(aTHX_ p, second, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
-SV *
+void
 overload_dec (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-CODE:
-  RETVAL = overload_dec (aTHX_ p, second, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        overload_dec(aTHX_ p, second, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 _wrap_count ()

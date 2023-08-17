@@ -1,3 +1,47 @@
+0.09 2023-06-25T19:36:50+02:00
+ - Sort message types in CSS, we need this reproducible for tests.
+
+0.08 2023-06-25T10:54:03+02:00
+ - Add error for bad message types definition in process_css().
+ - Don't return Tags code if messages reference is undefined.
+ - Update README file.
+
+0.07 2023-06-25T09:59:44+02:00
+ - Add message lang attribute to HTML if exists.
+
+0.06 2023-06-20T10:44:00+02:00
+ - Fix minimal version of CSS::Struct::Output::Structure for tests.
+
+0.05 2023-06-18T12:27:54+02:00
+ [API change]
+ - process_css() method accept reference to hash with message type setting.
+
+ [Common]
+ - Add 'flag_no_messages' parameter for possibility to not print anything
+   if messages not present.
+
+0.04 2023-06-12T10:58:01+02:00
+ - Add 'css_messages' parameter.
+ - Fix test dependencies.
+ - Regen README file.
+
+0.03 2023-06-11T11:25:55+02:00
+ [API change]
+ - Rewrite to accept Data::Message::Simple objects only.
+ - Rewrite to Tags::HTML helper. This is API change because 'tags' and
+   'css' parameters could be undef now.
+
+ [Common]
+ - Add <div> for messages block.
+ - Add check for reference of messages array.
+ - Add tests.
+ - Fix <br /> between messages.
+ - Fix/update MANIFEST file.
+ - Fix message type, must be CSS class not id.
+ - Rewrite example to better filename.
+ - Update copyright years.
+ - Update Module::Install to 1.21 version.
+
 0.02 2020-08-16T10:59:22+02:00
  - Add tests for constructor.
  - Change bugtracker to Github.

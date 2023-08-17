@@ -1,3 +1,8 @@
+0.007   2023-04-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add actions: list_cpan (-C) & list_lcpan (-c).
+
+
 0.006   2023-02-12  Released-By: PERLANCAR; Urgency: medium
 
         - Add action 'stream_as_csv'

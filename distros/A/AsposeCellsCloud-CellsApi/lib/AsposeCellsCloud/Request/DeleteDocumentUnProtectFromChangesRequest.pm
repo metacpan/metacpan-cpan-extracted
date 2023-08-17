@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# DeleteDocumentUnProtectFromChangesRequest.name :   ,
-# DeleteDocumentUnProtectFromChangesRequest.folder :   ,
-# DeleteDocumentUnProtectFromChangesRequest.storageName :    
+# DeleteDocumentUnProtectFromChangesRequest.name : The workbook name.  ,
+# DeleteDocumentUnProtectFromChangesRequest.folder : Original workbook folder.  ,
+# DeleteDocumentUnProtectFromChangesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_document_un_protect_from_changes' } = { 
-    	summary => '',
+    	summary => 'Unprotects document from changes.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -123,21 +123,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

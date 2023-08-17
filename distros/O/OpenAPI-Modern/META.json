@@ -1,5 +1,5 @@
 {
-   "abstract" : "Validate HTTP requests and responses against an OpenAPI document",
+   "abstract" : "Validate HTTP requests and responses against an OpenAPI v3.1 document",
    "author" : [
       "Karen Etheridge <ether@cpan.org>"
    ],
@@ -11,6 +11,7 @@
       "JSON",
       "Schema",
       "OpenAPI",
+      "v3.1",
       "Swagger",
       "HTTP",
       "request",
@@ -94,8 +95,10 @@
             "if" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.20.0",
+            "stable" : "0.031",
             "strict" : "0",
             "strictures" : "2",
+            "utf8" : "0",
             "warnings" : "0"
          },
          "suggests" : {
@@ -125,8 +128,7 @@
             "YAML::PP" : "0.005",
             "lib" : "0",
             "open" : "0",
-            "perl" : "v5.20.0",
-            "utf8" : "0"
+            "perl" : "v5.20.0"
          }
       },
       "x_Dist_Zilla" : {
@@ -210,15 +212,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.044"
+         "version" : "0.046"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.044"
+         "version" : "0.046"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.044"
+         "version" : "0.046"
       }
    },
    "release_status" : "stable",
@@ -233,7 +235,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.044",
+   "version" : "0.046",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037011"
@@ -746,6 +748,7 @@
                      "JSON",
                      "Schema",
                      "OpenAPI",
+                     "v3.1",
                      "Swagger",
                      "HTTP",
                      "request",
@@ -1104,7 +1107,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.044",
+                  "tag" : "v0.046",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

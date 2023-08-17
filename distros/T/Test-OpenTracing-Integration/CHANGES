@@ -2,6 +2,48 @@ CHANGE LOG
 ==========
 
 
+2023-07-25 - v0.104.1
+---------------------
+
+### Changed
+    - Various changes, minor bug-fixes, and POD updates.
+
+
+2023-07-25 - v0.104.0
+---------------------
+
+### Added
+    - cmp_spans, more reliable testing all spans in an easy way.
+
+
+2023-07-25 - v0.103.1
+---------------------
+
+### Fixed
+    - weird behaviour, complaining about array refferences.
+
+
+2023-07-24 - v0.103.0
+---------------------
+
+### Fixed
+    - now reports failing test from the intended caller, from your test file
+
+
+2023-07-24 - v0.102.3
+---------------------
+
+### Fixed
+    - cpanfile dependencies
+
+
+2023-07-24 - v0.102.2
+---------------------
+
+### Fixed
+    - cpanfile dependencies
+
+
 2020-07-24 - v0.102.1
 ---------------------
 

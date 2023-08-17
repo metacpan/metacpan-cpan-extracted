@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Inplace;
 
@@ -30,6 +30,14 @@ use Syntax::Keyword::Inplace;
    inplace uc $arr[$count++];
    is( $arr[0], "X", 'inplace uc on aelem with side-effect' );
    is( $count, 1, 'side-effect happened only once' );
+}
+
+{
+   no Syntax::Keyword::Inplace;
+
+   sub inplace { return "normal function" }
+
+   is( inplace, "normal function", 'inplace() parses as a normal function call' );
 }
 
 done_testing;

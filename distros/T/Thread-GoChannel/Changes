@@ -1,5 +1,13 @@
 Revision history for Thread-Channel
 
+0.003     2023-07-05 23:44:19+02:00 Europe/Brussels
+          - Add interpreter pointer to functions initializing/destroying refcounters
+          - Fix incorrect description
+
+0.002     2023-06-01 20:15:02+02:00 Europe/Amsterdam
+          - Update refcount.h
+          - Switch to Module::Build::Tiny
+
 0.001     2023-02-24 17:33:32+01:00 Europe/Amsterdam
           First version, released on an unsuspecting world.
 

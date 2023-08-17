@@ -1,3 +1,7 @@
+3.0509030000 - 2023-07-12
+
+  * Update for net-snmp 5.9.3
+
 2.002000 - 2020-05-01
 
   * Fix Alien dependencies spec (thibaultduponchelle)

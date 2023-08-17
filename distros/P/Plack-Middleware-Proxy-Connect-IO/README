@@ -4,15 +4,15 @@ NAME
 
 SYNOPSIS
 
-      # In app.psgi
-      use Plack::Builder;
-      use Plack::App::Proxy;
+        # In app.psgi
+        use Plack::Builder;
+        use Plack::App::Proxy;
     
-      builder {
-          enable "Proxy::Connect::IO";
-          enable "Proxy::Requests";
-          Plack::App::Proxy->new->to_app;
-      };
+        builder {
+            enable "Proxy::Connect::IO", timeout => 30;
+            enable "Proxy::Requests";
+            Plack::App::Proxy->new->to_app;
+        };
 
 DESCRIPTION
 
@@ -44,7 +44,7 @@ AUTHOR
 
 LICENSE
 
-    Copyright (c) 2014, 2016 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2014, 2016, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

@@ -12,7 +12,7 @@ WriteMakefile1(
     LICENSE         => 'perl_5',
     AUTHOR          => [ 'Audrey Tang <cpan@audreyt.org>' ],
 
-    MIN_PERL_VERSION => '5.008001',
+    MIN_PERL_VERSION => '5.008009',
     PREREQ_PM       => {
       'File::Temp'       => 0,
       'File::Spec'       => 0,

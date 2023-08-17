@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetMatchNonBlanksRequest.name :   ,
-# PostWorksheetMatchNonBlanksRequest.sheetName :   ,
-# PostWorksheetMatchNonBlanksRequest.fieldIndex :   ,
-# PostWorksheetMatchNonBlanksRequest.folder :   ,
-# PostWorksheetMatchNonBlanksRequest.storageName :    
+# PostWorksheetMatchNonBlanksRequest.name : The workbook name.  ,
+# PostWorksheetMatchNonBlanksRequest.sheetName : The worksheet name.  ,
+# PostWorksheetMatchNonBlanksRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
+# PostWorksheetMatchNonBlanksRequest.folder : Original workbook folder.  ,
+# PostWorksheetMatchNonBlanksRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_match_non_blanks' } = { 
-    	summary => '',
+    	summary => 'Match all not blank cell in the list.            ',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -135,35 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => '',
+     	description => 'The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

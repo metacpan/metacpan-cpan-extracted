@@ -1,5 +1,10 @@
 Revision history for Data::Text
 
+0.12	Sat Jul 15 11:02:11 EDT 2023
+	Fix punctuation in error message
+	More useful diagnostic when adding consecutive punctuation
+	Catch more consecutive punctuation
+
 0.11	Thu Dec 22 09:34:32 EST 2022
 	Avoid assert failure in String::Clean
 	Calling new() on an object now returns a clone rather than setting the defaults in the new object

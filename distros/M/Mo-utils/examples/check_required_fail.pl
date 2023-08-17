@@ -9,7 +9,7 @@ use Mo::utils qw(check_required);
 $Error::Pure::TYPE = 'Error';
 
 my $self = {
-        'key' => undef,
+ 'key' => undef,
 };
 check_required($self, 'key');
 

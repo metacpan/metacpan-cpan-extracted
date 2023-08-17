@@ -63,6 +63,6 @@
          "web" : "https://github.com/bluhm/p5-opcua-open62541/"
       }
    },
-   "version" : "2.01",
+   "version" : "2.03",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

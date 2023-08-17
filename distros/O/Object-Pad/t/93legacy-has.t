@@ -5,7 +5,10 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
+
+my @warnings;
+BEGIN { $SIG{__WARN__} = sub { push @warnings, $_[0] }; }
 
 class Counter {
    has $count = 0;
@@ -14,6 +17,13 @@ class Counter {
 
    method describe { "Count is now $count" }
 }
+
+like( $warnings[0], qr/^'has' is deprecated; use 'field' instead at /,
+   'legacy has keyword emits deprecation warning' );
+
+# can't (yet) do 
+#   no warnings 'deprecated';
+# because 'class' will turn them all back on again
 
 {
    my $counter = Counter->new;

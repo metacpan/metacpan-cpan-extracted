@@ -12,4 +12,5 @@ if [ -n "$(git status -s)" ]; then
 	exit 1
 fi
 
+export RELEASE_TESTING=1
 perl Makefile.PL && make && make test && make distcheck && make dist

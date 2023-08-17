@@ -1,5 +1,17 @@
 Revision history for XML-Sig
 
+0.64 -- Mon Jun 26 19:02:28 ADT 2023
+
+  [Notable Changes since 0.64]
+
+  - Implement a form of xmlsec1's "--id-attr" to allow verifying a
+    specific node. (WATERKIP)
+    
+  - 2c28c5b Increment version and Copyright for release
+  - 288addc Simplify getting the ID's from the nodes with ID attributes
+  - b3efb73 Allow verification on one node:
+  - 8cd5c37 v0.63
+
 0.63 -- Sun Mar 19 09:58:59 ADT 2023
 
   [Notable Changes since 0.59]

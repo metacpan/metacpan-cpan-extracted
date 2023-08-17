@@ -1,2 +1,8 @@
+0.02 2023-06-22T10:29:53+02:00
+ - Add tests.
+ - Fix help printing.
+ - Fix minimal version of dependencies.
+ - Update Module::Install to 1.21 version.
+
 0.01 2023-04-28T20:36:21+02:00
  - First version.

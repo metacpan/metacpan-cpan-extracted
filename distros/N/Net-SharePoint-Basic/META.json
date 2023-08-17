@@ -4,7 +4,7 @@
       "Roman Parparov <rparparov@vmware.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "Net::SharePoint::Basic" : {
          "file" : "lib/Net/SharePoint/Basic.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "url" : "https://github.com/vmware/perl-net-sharepoint-basic"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

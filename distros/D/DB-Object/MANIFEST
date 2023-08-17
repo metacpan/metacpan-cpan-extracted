@@ -1,8 +1,11 @@
 CHANGES
 CONTRIBUTING.md
 lib/DB/Object.pm
+lib/DB/Object/ALL.pod
 lib/DB/Object/AND.pod
+lib/DB/Object/ANY.pod
 lib/DB/Object/Cache/Tables.pm
+lib/DB/Object/Expression.pod
 lib/DB/Object/Fields.pm
 lib/DB/Object/Fields/Field.pm
 lib/DB/Object/Fields/Unknown.pm

@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -15,59 +15,114 @@
 #include <catch2/internal/catch_enforce.hpp>
 #include <catch2/internal/catch_errno_guard.hpp>
 #include <catch2/interfaces/catch_interfaces_config.hpp>
-#include <catch2/internal/catch_stream.hpp>
+#include <catch2/internal/catch_istream.hpp>
+#include <catch2/internal/catch_move_and_forward.hpp>
 #include <catch2/internal/catch_context.hpp>
 #include <catch2/internal/catch_platform.hpp>
 #include <catch2/internal/catch_debugger.hpp>
 #include <catch2/internal/catch_windows_h_proxy.hpp>
+#include <catch2/internal/catch_compiler_capabilities.hpp>
 
+#include <cassert>
 #include <ostream>
+#include <utility>
 
 namespace Catch {
+
+    ColourImpl::~ColourImpl() = default;
+
+    ColourImpl::ColourGuard ColourImpl::guardColour( Colour::Code colourCode ) {
+        return ColourGuard(colourCode, this );
+    }
+
+    void ColourImpl::ColourGuard::engageImpl( std::ostream& stream ) {
+        assert( &stream == &m_colourImpl->m_stream->stream() &&
+                "Engaging colour guard for different stream than used by the "
+                "parent colour implementation" );
+        static_cast<void>( stream );
+
+        m_engaged = true;
+        m_colourImpl->use( m_code );
+    }
+
+    ColourImpl::ColourGuard::ColourGuard( Colour::Code code,
+                                          ColourImpl const* colour ):
+        m_colourImpl( colour ), m_code( code ) {
+    }
+    ColourImpl::ColourGuard::ColourGuard( ColourGuard&& rhs ) noexcept:
+        m_colourImpl( rhs.m_colourImpl ),
+        m_code( rhs.m_code ),
+        m_engaged( rhs.m_engaged ) {
+        rhs.m_engaged = false;
+    }
+    ColourImpl::ColourGuard&
+    ColourImpl::ColourGuard::operator=( ColourGuard&& rhs ) noexcept {
+        using std::swap;
+        swap( m_colourImpl, rhs.m_colourImpl );
+        swap( m_code, rhs.m_code );
+        swap( m_engaged, rhs.m_engaged );
+
+        return *this;
+    }
+    ColourImpl::ColourGuard::~ColourGuard() {
+        if ( m_engaged ) {
+            m_colourImpl->use( Colour::None );
+        }
+    }
+
+    ColourImpl::ColourGuard&
+    ColourImpl::ColourGuard::engage( std::ostream& stream ) & {
+        engageImpl( stream );
+        return *this;
+    }
+
+    ColourImpl::ColourGuard&&
+    ColourImpl::ColourGuard::engage( std::ostream& stream ) && {
+        engageImpl( stream );
+        return CATCH_MOVE(*this);
+    }
+
     namespace {
+        //! A do-nothing implementation of colour, used as fallback for unknown
+        //! platforms, and when the user asks to deactivate all colours.
+        class NoColourImpl final : public ColourImpl {
+        public:
+            NoColourImpl( IStream* stream ): ColourImpl( stream ) {}
 
-        struct IColourImpl {
-            virtual ~IColourImpl() = default;
-            virtual void use( Colour::Code _colourCode ) = 0;
+        private:
+            void use( Colour::Code ) const override {}
         };
+    } // namespace
 
-        struct NoColourImpl : IColourImpl {
-            void use( Colour::Code ) override {}
 
-            static IColourImpl* instance() {
-                static NoColourImpl s_instance;
-                return &s_instance;
-            }
-        };
-
-    } // anon namespace
 } // namespace Catch
 
-#if !defined( CATCH_CONFIG_COLOUR_NONE ) && !defined( CATCH_CONFIG_COLOUR_WINDOWS ) && !defined( CATCH_CONFIG_COLOUR_ANSI )
-#   ifdef CATCH_PLATFORM_WINDOWS
-#       define CATCH_CONFIG_COLOUR_WINDOWS
-#   else
-#       define CATCH_CONFIG_COLOUR_ANSI
-#   endif
-#endif
 
-
-#if defined ( CATCH_CONFIG_COLOUR_WINDOWS ) /////////////////////////////////////////
+#if defined ( CATCH_CONFIG_COLOUR_WIN32 ) /////////////////////////////////////////
 
 namespace Catch {
 namespace {
 
-    class Win32ColourImpl : public IColourImpl {
+    class Win32ColourImpl final : public ColourImpl {
     public:
-        Win32ColourImpl() : stdoutHandle( GetStdHandle(STD_OUTPUT_HANDLE) )
-        {
+        Win32ColourImpl(IStream* stream):
+            ColourImpl(stream) {
             CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-            GetConsoleScreenBufferInfo( stdoutHandle, &csbiInfo );
+            GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ),
+                                        &csbiInfo );
             originalForegroundAttributes = csbiInfo.wAttributes & ~( BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_INTENSITY );
             originalBackgroundAttributes = csbiInfo.wAttributes & ~( FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY );
         }
 
-        void use( Colour::Code _colourCode ) override {
+        static bool useImplementationForStream(IStream const& stream) {
+            // Win32 text colour APIs can only be used on console streams
+            // We cannot check that the output hasn't been redirected,
+            // so we just check that the original stream is console stream.
+            return stream.isConsole();
+        }
+
+    private:
+        void use( Colour::Code _colourCode ) const override {
             switch( _colourCode ) {
                 case Colour::None:      return setTextAttribute( originalForegroundAttributes );
                 case Colour::White:     return setTextAttribute( FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE );
@@ -91,45 +146,63 @@ namespace {
             }
         }
 
-    private:
-        void setTextAttribute( WORD _textAttribute ) {
-            SetConsoleTextAttribute( stdoutHandle, _textAttribute | originalBackgroundAttributes );
+        void setTextAttribute( WORD _textAttribute ) const {
+            SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ),
+                                     _textAttribute |
+                                         originalBackgroundAttributes );
         }
-        HANDLE stdoutHandle;
         WORD originalForegroundAttributes;
         WORD originalBackgroundAttributes;
     };
 
-    IColourImpl* platformColourInstance() {
-        static Win32ColourImpl s_instance;
-
-        auto const* config = getCurrentContext().getConfig();
-        UseColour colourMode = config?
-            config->useColour() : UseColour::Auto;
-        if( colourMode == UseColour::Auto )
-            colourMode = UseColour::Yes;
-        return colourMode == UseColour::Yes
-            ? &s_instance
-            : NoColourImpl::instance();
-    }
-
 } // end anon namespace
 } // end namespace Catch
 
-#elif defined( CATCH_CONFIG_COLOUR_ANSI ) //////////////////////////////////////
+#endif // Windows/ ANSI/ None
 
-#include <unistd.h>
+
+#if defined( CATCH_PLATFORM_LINUX ) || defined( CATCH_PLATFORM_MAC )
+#    define CATCH_INTERNAL_HAS_ISATTY
+#    include <unistd.h>
+#endif
 
 namespace Catch {
 namespace {
 
-    // use POSIX/ ANSI console terminal codes
-    // Thanks to Adam Strzelecki for original contribution
-    // (http://github.com/nanoant)
-    // https://github.com/philsquared/Catch/pull/131
-    class PosixColourImpl : public IColourImpl {
+    class ANSIColourImpl final : public ColourImpl {
     public:
-        void use( Colour::Code _colourCode ) override {
+        ANSIColourImpl( IStream* stream ): ColourImpl( stream ) {}
+
+        static bool useImplementationForStream(IStream const& stream) {
+            // This is kinda messy due to trying to support a bunch of
+            // different platforms at once.
+            // The basic idea is that if we are asked to do autodetection (as
+            // opposed to being told to use posixy colours outright), then we
+            // only want to use the colours if we are writing to console.
+            // However, console might be redirected, so we make an attempt at
+            // checking for that on platforms where we know how to do that.
+            bool useColour = stream.isConsole();
+#if defined( CATCH_INTERNAL_HAS_ISATTY ) && \
+    !( defined( __DJGPP__ ) && defined( __STRICT_ANSI__ ) )
+            ErrnoGuard _; // for isatty
+            useColour = useColour && isatty( STDOUT_FILENO );
+#    endif
+#    if defined( CATCH_PLATFORM_MAC ) || defined( CATCH_PLATFORM_IPHONE )
+            useColour = useColour && !isDebuggerActive();
+#    endif
+
+            return useColour;
+        }
+
+    private:
+        void use( Colour::Code _colourCode ) const override {
+            auto setColour = [&out =
+                                  m_stream->stream()]( char const* escapeCode ) {
+                // The escape sequence must be flushed to console, otherwise
+                // if stdin and stderr are intermixed, we'd get accidentally
+                // coloured output.
+                out << '\033' << escapeCode << std::flush;
+            };
             switch( _colourCode ) {
                 case Colour::None:
                 case Colour::White:     return setColour( "[0m" );
@@ -150,89 +223,56 @@ namespace {
                 default: CATCH_INTERNAL_ERROR( "Unknown colour requested" );
             }
         }
-        static IColourImpl* instance() {
-            static PosixColourImpl s_instance;
-            return &s_instance;
-        }
-
-    private:
-        void setColour( const char* _escapeCode ) {
-            // The escape sequence must be flushed to console, otherwise if
-            // stdin and stderr are intermixed, we'd get accidentally coloured output.
-            getCurrentContext().getConfig()->stream()
-                << '\033' << _escapeCode << std::flush;
-        }
     };
-
-    bool useColourOnPlatform() {
-        return
-#if defined(CATCH_PLATFORM_MAC) || defined(CATCH_PLATFORM_IPHONE)
-            !isDebuggerActive() &&
-#endif
-#if !(defined(__DJGPP__) && defined(__STRICT_ANSI__))
-            isatty(STDOUT_FILENO)
-#else
-            false
-#endif
-            ;
-    }
-    IColourImpl* platformColourInstance() {
-        ErrnoGuard guard;
-        auto const* config = getCurrentContext().getConfig();
-        UseColour colourMode = config
-            ? config->useColour()
-            : UseColour::Auto;
-        if( colourMode == UseColour::Auto )
-            colourMode = useColourOnPlatform()
-                ? UseColour::Yes
-                : UseColour::No;
-        return colourMode == UseColour::Yes
-            ? PosixColourImpl::instance()
-            : NoColourImpl::instance();
-    }
 
 } // end anon namespace
 } // end namespace Catch
 
-#else  // not Windows or ANSI ///////////////////////////////////////////////
-
 namespace Catch {
 
-    static IColourImpl* platformColourInstance() { return NoColourImpl::instance(); }
+    Detail::unique_ptr<ColourImpl> makeColourImpl( ColourMode implSelection,
+                                                   IStream* stream ) {
+#if defined( CATCH_CONFIG_COLOUR_WIN32 )
+        if ( implSelection == ColourMode::Win32 ) {
+            return Detail::make_unique<Win32ColourImpl>( stream );
+        }
+#endif
+        if ( implSelection == ColourMode::ANSI ) {
+            return Detail::make_unique<ANSIColourImpl>( stream );
+        }
+        if ( implSelection == ColourMode::None ) {
+            return Detail::make_unique<NoColourImpl>( stream );
+        }
 
-} // end namespace Catch
+        if ( implSelection == ColourMode::PlatformDefault) {
+#if defined( CATCH_CONFIG_COLOUR_WIN32 )
+            if ( Win32ColourImpl::useImplementationForStream( *stream ) ) {
+                return Detail::make_unique<Win32ColourImpl>( stream );
+            }
+#endif
+            if ( ANSIColourImpl::useImplementationForStream( *stream ) ) {
+                return Detail::make_unique<ANSIColourImpl>( stream );
+            }
+            return Detail::make_unique<NoColourImpl>( stream );
+        }
 
-#endif // Windows/ ANSI/ None
-
-namespace Catch {
-
-    Colour::Colour( Code _colourCode ) { use( _colourCode ); }
-    Colour::Colour( Colour&& other ) noexcept {
-        m_moved = other.m_moved;
-        other.m_moved = true;
+        CATCH_ERROR( "Could not create colour impl for selection " << static_cast<int>(implSelection) );
     }
-    Colour& Colour::operator=( Colour&& other ) noexcept {
-        m_moved = other.m_moved;
-        other.m_moved  = true;
-        return *this;
-    }
 
-    Colour::~Colour(){ if( !m_moved ) use( None ); }
-
-    void Colour::use( Code _colourCode ) {
-        static IColourImpl* impl = platformColourInstance();
-        // Strictly speaking, this cannot possibly happen.
-        // However, under some conditions it does happen (see #1626),
-        // and this change is small enough that we can let practicality
-        // triumph over purity in this case.
-        if (impl != nullptr) {
-            impl->use( _colourCode );
+    bool isColourImplAvailable( ColourMode colourSelection ) {
+        switch ( colourSelection ) {
+#if defined( CATCH_CONFIG_COLOUR_WIN32 )
+        case ColourMode::Win32:
+#endif
+        case ColourMode::ANSI:
+        case ColourMode::None:
+        case ColourMode::PlatformDefault:
+            return true;
+        default:
+            return false;
         }
     }
 
-    std::ostream& operator << ( std::ostream& os, Colour const& ) {
-        return os;
-    }
 
 } // end namespace Catch
 

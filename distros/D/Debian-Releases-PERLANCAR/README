@@ -2,9 +2,9 @@ NAME
     Debian::Releases::PERLANCAR - List Debian releases
 
 VERSION
-    This document describes version 20221228.0 of
+    This document describes version 20230713.0 of
     Debian::Releases::PERLANCAR (from Perl distribution
-    Debian-Releases-PERLANCAR), released on 2022-12-28.
+    Debian-Releases-PERLANCAR), released on 2023-07-13.
 
 SYNOPSIS
      use Debian::Releases::PERLANCAR;
@@ -944,8 +944,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2017, 2015 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2015 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

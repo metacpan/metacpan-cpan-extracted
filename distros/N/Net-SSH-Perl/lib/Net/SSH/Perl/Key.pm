@@ -1,5 +1,3 @@
-# $Id: Key.pm,v 1.20 2008/10/02 20:46:17 turnstep Exp $
-
 package Net::SSH::Perl::Key;
 use strict;
 use warnings;
@@ -127,7 +125,7 @@ sub fingerprint {
     my $data = $key->fingerprint_raw;
     $type && $type eq 'bubblebabble' ?
         _fp_bubblebabble($data) :
-        $type && $type eq 'md5' ? 
+        $type && $type eq 'md5' ?
           _fp_md5($data) :
           _fp_sha256($data);
 }
@@ -179,7 +177,7 @@ from the SUPERCOP ref10 implementation.
 Creates a new object of type I<Net::SSH::Perl::Key::$key_type>,
 after loading the class implementing I<$key_type>.
 should be C<DSA>, C<RSA1>, C<RSA>, C<ECDSA256>, C<ECDSA384>, C<ECDSA521>,
-or C<Ed25519>.  
+or C<Ed25519>.
 
 I<$blob>, if present, should be a string representation of the key,
 from which the key object can be initialized. In fact, it should
@@ -214,7 +212,7 @@ denoted by I<$key_type> (C<DSA>, C<RSA1>, C<ECDSA> or C<Ed25519>).
 =head2 Net::SSH::Perl::Key->keygen($key_type, $bits)
 
 $key_type is one of RSA, DSA, or ECDSA256/ECDSA384/ECDSA521.
-Generates a new key and returns that key. The key returned is the 
+Generates a new key and returns that key. The key returned is the
 private key, which (presumably) contains all of the public key
 data, as well. I<$bits> is the number of bits in the key.
 
@@ -287,7 +285,7 @@ Returns the size (in bits) of the key I<$key>.
 
 Returns a fingerprint of I<$key>. The default fingerprint is
 a SHA256 representation.  If I<$type> is equal to C<bubblebabble>,
-the Bubble Babble representation of the fingerprint is used. 
+the Bubble Babble representation of the fingerprint is used.
 If I<$type> is equal to C<hex>, a traditional hex representation
 is returned.
 

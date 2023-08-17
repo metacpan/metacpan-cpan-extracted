@@ -1,5 +1,12 @@
 Revision history for Perl extension Graphics::TIFF.
 
+20  Wed, 7 Jun 2023 00:00 +0000
+        - Add TIFFTAG_XPOSITION and TIFFTAG_YPOSITION
+          Closes RT #148337 (t/1.t fails with ImageMagick-7.1.1.8: Failed test 'tiffcmp')
+          Thanks to Petr Pisar for the patch.
+        - Only run t/92_tiffinfo.t & t/93_tiff2pdf.t as AUTHOR tests
+          Closes RT #148450 (92_tiffinfo.t and 93_tiff2pdf.t failes with perl 5.37.11)
+
 19  Thu, 9 Jun 2022 00:00 +0000
         - Adapt tests to tiff-4.4.0.
           Closes RT #143153 (t/92_tiffinfo.t fails with tiff-4.4.0)

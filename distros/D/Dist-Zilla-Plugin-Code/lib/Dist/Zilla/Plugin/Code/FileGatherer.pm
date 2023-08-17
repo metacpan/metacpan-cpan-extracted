@@ -1,17 +1,33 @@
-package Dist::Zilla::Plugin::Code::FileGatherer;
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2020-2023 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+package Dist::Zilla::Plugin::Code::FileGatherer;
+
+our $VERSION = '0.008';
 
 use Moose;
 use namespace::autoclean;
 
 with 'Dist::Zilla::Role::FileGatherer';
 
-use Config::MVP 2.200012 ();    # https://github.com/rjbs/Config-MVP/issues/13
+use Config::MVP 2.200012 ();            # https://github.com/rjbs/Config-MVP/issues/13
 use MooseX::Types::Moose qw(CodeRef);
 
 has gather_files => (
@@ -44,7 +60,7 @@ Dist::Zilla::Plugin::Code::FileGatherer - something that gathers files into the 
 
 =head1 VERSION
 
-Version 0.007
+Version 0.008
 
 =head1 SYNOPSIS
 
@@ -121,18 +137,8 @@ L<https://github.com/skirmess/Dist-Zilla-Plugin-Code>
 
 Sven Kirmess <sven.kirmess@kzone.ch>
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2020-2021 by Sven Kirmess.
-
-This is free software, licensed under:
-
-  The (two-clause) FreeBSD License
-
 =head1 SEE ALSO
 
 L<Dist::Zilla>, L<Dist::Zilla::Role::FileGatherer>
 
 =cut
-
-# vim: ts=4 sts=4 sw=4 et: syntax=perl

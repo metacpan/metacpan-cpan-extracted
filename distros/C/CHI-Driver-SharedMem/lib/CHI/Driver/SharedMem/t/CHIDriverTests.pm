@@ -16,11 +16,11 @@ CHI::Driver::SharedMem::t::CHIDriverTests
 
 =head1 VERSION
 
-Version 0.14
+Version 0.18
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ Declare the driver being tested
 =cut
 
 sub testing_driver_class {
-	'CHI::Driver::SharedMem'
+	return 'CHI::Driver::SharedMem';
 }
 
 =head2 new_cache_options
@@ -49,8 +49,8 @@ sub new_cache_options {
 	return (
 	    $self->SUPER::new_cache_options(),
 	    driver => '+CHI::Driver::SharedMem',
-	    size => 16 * 1024,
-	    shmkey => 12344321,
+	    shm_size => $main::shm_size,
+	    shm_key => $main::shm_key,
 	);
 }
 
@@ -70,7 +70,7 @@ sub test_shmkey_required : Tests {
 		ok($@ =~ /CHI::Driver::SharedMem - no key given/);
 		ok(!defined($cache));
 	} else {
-		ok(0, 'Allowed shmkey to be undefined');
+		ok(0, 'Allowed shm_key to be undefined');
 	}
 }
 

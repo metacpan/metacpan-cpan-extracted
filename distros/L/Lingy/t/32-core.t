@@ -1,6 +1,16 @@
 use Lingy::Test;
 
-test_list <<'...'
+tests <<'...'
+
+- note: Testing (conj ...)
+- - (conj {:a 1} {:a 2 :b 3})
+  - '{:a 2, :b 3}'
+- - (conj {:a 1} {:a 2 :b 3} {:c 4})
+  - '{:a 2, :b 3, :c 4}'
+
+- note: Testing (merge ...)
+- - (merge {:a 1} {:a 2 :b 3} {:c 4})
+  - '{:a 2, :b 3, :c 4}'
 
 - note: Testing (list* ...)
 - - (list* ())
@@ -31,4 +41,10 @@ test_list <<'...'
   - 'true'
 - - (instance? String 123)
   - 'false'
+
+- - (not= 4 (+ 2 2))
+  - 'false'
+
+- - (binding [x 42] x)
+  - 42
 ...

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.36';
+$Neo4j::Driver::Result::JSON::VERSION = '0.40';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -111,7 +111,7 @@ sub _parse_json {
 		});
 	}
 	
-	$params->{error_handler}->($error) if ref $error;
+	$json->{_error} = $error if ref $error;
 	
 	return $json;
 }

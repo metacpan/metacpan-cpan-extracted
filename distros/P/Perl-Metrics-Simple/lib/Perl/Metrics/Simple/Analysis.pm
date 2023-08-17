@@ -9,7 +9,7 @@ use Statistics::Basic::StdDev;
 use Statistics::Basic::Mean;
 use Statistics::Basic::Median;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
 my %_ANALYSIS_DATA = ();
 my %_FILES         = ();
@@ -399,7 +399,7 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Metrics-Simple
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006-2009 by Eigenstate Consulting, LLC.
+Copyright (c) 2006-2021 by Eigenstate Consulting, LLC.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

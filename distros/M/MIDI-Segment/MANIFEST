@@ -1,0 +1,20 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/melody-shuffle
+eg/midi-dump
+lib/MIDI/Segment.pm
+t/00-load.t
+t/cowbell.midi
+t/cowprime.midi
+t/lilypond.midi
+t/midisegment.t
+t/pod-coverage.t
+t/pod.t
+t/ragged.midi
+t/vague.midi
+SIGNATURE    Added here by Module::Build

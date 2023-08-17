@@ -1,5 +1,17 @@
 Revision history for Perl extension Sys::GNU::ldconfig.
 
+0.03
+    - Bump version for PAUSE indexer
+
+0.02_03
+    - Fix tests for systems that have .so and not .so.13
+
+0.02_02
+    - Fix tests for different versions of libdb or even if libdb is missing
+
+0.02_01 
+    - Added t/00_info.t
+
 0.02  Mon Feb 25, 2013
     - All CPAN testers failed me :-(
       Attempt to get tests to pass

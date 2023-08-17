@@ -10,6 +10,7 @@ MANIFEST
 README.md
 t/00_use_ok.t
 t/01_can_methods.t
+t/10_bootstrap.t
 t/Interface/Bootstrap/00_use_ok.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

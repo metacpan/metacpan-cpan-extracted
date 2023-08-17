@@ -16,6 +16,7 @@ requires 'Carp';
 requires 'Devel::StackTrace', '2.03';
 requires 'Data::Dumper';
 requires 'namespace::autoclean';
+requires 'namespace::clean';
 requires 'overload';
 requires 'DBIx::Class';
 requires 'Sub::Util';
@@ -26,6 +27,7 @@ requires 'Class::Method::Modifiers';
 requires 'Catalyst::View::BasePerRequest';
 requires 'Sub::Util';
 requires 'Attribute::Handlers';
+requires 'JSON::MaybeXS';
 
 on test => sub {
   requires 'Test::Most' => '0.34';

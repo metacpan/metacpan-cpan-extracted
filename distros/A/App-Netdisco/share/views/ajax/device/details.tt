@@ -1,4 +1,4 @@
-[% SET user_can_port_control = user_has_role('port_control') %]
+[% SET user_can_port_control = user_has_role('port_control', d) %]
 <table class="table table-condensed table-striped">
   <tbody>
     <tr>
@@ -78,6 +78,14 @@
     <tr>
       <td>Description</td>
       <td>[% d.description | html_entity | html_line_break %]</td>
+    </tr>
+    <tr>
+      <td>Tags</td>
+      <td>
+        [% FOREACH t IN filtered_tags %]
+        <span class="badge badge-success">[% t | html_entity %]</span>
+        [% END %]
+      </td>
     </tr>
     [% IF settings._extra_device_details.size %]
     [% FOREACH config IN settings._extra_device_details %]
@@ -238,7 +246,7 @@
           <div class="modal-body">
             <blockquote>
               <ul>
-                <li><p>This action is immediate and not reversible</p></li>
+                <li><p>A job will be queued to delete the device</p></li>
                 <li><p>All associated Nodes may be removed from the database</p></li>
               </ul>
             </blockquote>

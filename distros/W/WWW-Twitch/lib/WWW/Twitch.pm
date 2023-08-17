@@ -3,11 +3,13 @@ use Moo 2;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+use Carp 'croak';
+
 use HTTP::Tiny;
 use JSON 'encode_json', 'decode_json';
 use POSIX 'strftime';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -107,7 +109,11 @@ sub fetch_gql( $self, $query ) {
             "Client-ID" => $self->client_id,
         },
     });
-    $res = decode_json( $res->{content} );
+    if( $res->{content}) {
+        $res = decode_json( $res->{content} );
+    } else {
+        return
+    }
 }
 
 =head2 C<< ->schedule( $channel ) >>
@@ -131,12 +137,12 @@ sub schedule( $self, $channel, %options ) {
                                              "startAt" => $options{ start_at },
                                              "endAt"  =>  $options{ end_at }
                                              },
-                                             "extensions" => {
-                                                 "persistedQuery" => {
-                                                     "version" => 1,
-                                                     "sha256Hash" => "d495cb17a67b6f7a8842e10297e57dcd553ea17fe691db435e39a618fe4699cf"
-                                                }
-                                             }
+                             "extensions" => {
+                                 "persistedQuery" => {
+                                    "version" => 1,
+                                    "sha256Hash" => "d495cb17a67b6f7a8842e10297e57dcd553ea17fe691db435e39a618fe4699cf"
+                                 }
+                             }
                             }]
         );
     #use Data::Dumper;
@@ -157,8 +163,7 @@ Check whether a stream is currently live on a channel
 sub is_live( $self, $channel ) {
     my $res =
         $self->fetch_gql([{"operationName" => "WithIsStreamLiveQuery",
-                           "variables" => {"id" => "50985620"},
-                                           "extensions" => {
+                            "extensions" => {
                                                 "persistedQuery" => {
                                                     "version" => 1,
                                                     "sha256Hash" => "04e46329a6786ff3a81c01c50bfa5d725902507a0deb83b0edbf7abe7a3716ea"
@@ -171,7 +176,11 @@ sub is_live( $self, $channel ) {
         ]
         #"Client-Version": "9ea2055a-41f0-43b7-b295-70885b40c41c",
         );
-    return $res->[0]->{data};
+    if( $res ) {
+        return $res->[0]->{data};
+    } else {
+        return
+    }
 }
 
 =head2 C<< ->stream_playback_access_token( $channel ) >>
@@ -184,12 +193,23 @@ Internal method to fetch the stream playback access token
 =cut
 
 sub stream_playback_access_token( $self, $channel ) {
+    my $retries = 10;
+    my $error;
+    while( $retries -->0 ) {
     my $res =
         $self->fetch_gql([{"operationName" => "PlaybackAccessToken_Template",
             "query" => 'query PlaybackAccessToken_Template($login: String!, $isLive: Boolean!, $vodID: ID!, $isVod: Boolean!, $playerType: String!) {  streamPlaybackAccessToken(channelName: $login, params: {platform: "web", playerBackend: "mediaplayer", playerType: $playerType}) @include(if: $isLive) {    value    signature    __typename  }  videoPlaybackAccessToken(id: $vodID, params: {platform: "web", playerBackend: "mediaplayer", playerType: $playerType}) @include(if: $isVod) {    value    signature    __typename  }}',
             "variables" => {"isLive" => $JSON::true,"login" => "$channel","isVod" => $JSON::false,"vodID" => "","playerType" => "site"}},
         ]);
-    return decode_json( $res->[0]->{data}->{streamPlaybackAccessToken}->{value} );
+    if ( $res ) {
+        if( my $v = $res->[0]->{data}->{streamPlaybackAccessToken}->{value} ) {
+            return decode_json( $v )
+        } elsif( $error = $res->{errors} ) {
+            # ...
+        }
+    }
+    }
+    croak $error
 };
 
 =head2 C<< ->live_stream( $channel ) >>
@@ -201,14 +221,22 @@ Internal method to fetch information about a stream on a channel
 =cut
 
 sub live_stream( $self, $channel ) {
-    my $id = $self->stream_playback_access_token( $channel )->{channel_id};
-    my $res =
-        $self->fetch_gql(
-    [{"operationName" => "WithIsStreamLiveQuery","variables" => {"id" => "$id"},
-        "extensions" => {"persistedQuery" => {"version" => 1,"sha256Hash" => "04e46329a6786ff3a81c01c50bfa5d725902507a0deb83b0edbf7abe7a3716ea"}}},
-    ]);
+    my $id = $self->stream_playback_access_token( $channel );
+    my $res;
+    if( $id ) {
+        $id = $id->{channel_id};
+        $res =
+            $self->fetch_gql(
+        [{"operationName" => "WithIsStreamLiveQuery","variables" => {"id" => "$id"},
+            "extensions" => {"persistedQuery" => {"version" => 1,"sha256Hash" => "04e46329a6786ff3a81c01c50bfa5d725902507a0deb83b0edbf7abe7a3716ea"}}},
+        ]);
+    };
 
-    return $res->[0]->{data}->{user}->{stream};
+    if( $res ) {
+        return $res->[0]->{data}->{user}->{stream};
+    } else {
+        return
+    }
 }
 
 #curl 'https://gql.twitch.tv/gql#origin=twilight'

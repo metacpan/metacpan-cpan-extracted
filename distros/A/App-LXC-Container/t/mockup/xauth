@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# mockup xauth for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+root="${0%/*/*}/tmp"
+counter="$root/.xauth-counter"
+n=$(cat "$counter")
+n=$((n + 1))
+echo "$n" >"$counter"
+[ -n "$ALC_DEBUG_MOCKUP" ]  &&  echo "xauth '$n'" >/dev/tty
+case $n in
+    1)	[ "$1" = "list" ]  ||  Die 'unexpected xauth command' "$@";;
+    2|4)
+	[ "$1" = "list" ]  ||  Die 'unexpected xauth command' "$@"
+	# last one found with matching display number will be used:
+	echo 'somewhere/unix:0 MIT-MAGIC-COOKIE-1 deadbeef'
+	echo 'somewhere/unix:0 MIT-MAGIC-COOKIE-1 12345678' # This is the one.
+	echo 'somewhere/unix:1 MIT-MAGIC-COOKIE-1 deadbeef'
+	;;
+    3)	exit $n;;
+    5)
+	[ "$1" = "-b" ]   ||  Die 'unexpected xauth command' "$@"
+	[ "$2" = "-f" ]   ||  Die 'unexpected xauth command' "$@"
+	case $3 in
+	    */lxc/run-test-2/.xauth/.Xauthority)	;;
+	    *)	Die 'unexpected xauth command' "$@"
+	esac
+	[ "$4" = "add" ]		||  Die 'unexpected xauth command' "$@"
+	[ "$5" = "run-test-2/unix:0" ]	||  Die 'unexpected xauth command' "$@"
+	[ "$6" = "MIT-MAGIC-COOKIE-1" ]	||  Die 'unexpected xauth command' "$@"
+	[ "$7" = "12345678" ]		||  Die 'unexpected xauth command' "$@"
+	;;
+    *)		Die "unexpected state '$n' in mocked lxc-ls"
+esac

@@ -19,7 +19,7 @@ use warnings;
 use base qw( TAP::Base );
 use accessors qw( test formatter parser results html_id meta closed );
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 sub _initialize {
     my ($self, $args) = @_;

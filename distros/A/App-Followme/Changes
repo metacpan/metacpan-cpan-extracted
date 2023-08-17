@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Followme
 
+2.03 2023-06-18T13:52:44Z
+    - change metadata separator in md files to a row of dots
+    - use exclude_index in FormatPage to indicate if index page is not a prototype
+    - add BinaryData, a package to handle opaque data sources
+    - force packages that read pages to use web_extension in place of extension
+
 2.02 2021-03-28T13:53:57Z
     - only uae absolute filenames in test scripts
     - additional tests for the existence of files in test scripts

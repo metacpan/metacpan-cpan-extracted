@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/URI/Info.pm','lib/URI/Info/Plugin/Generic.pm','lib/URI/Info/Plugin/SearchQuery/google.pm','lib/URI/Info/Plugin/SearchQuery/thepiratebay.pm','lib/URI/Info/Plugin/SearchQuery/tokopedia.pm','lib/URI/Info/PluginBase.pm'];
+my $filenames = ['lib/URI/Info.pm','lib/URI/Info/Plugin/Generic.pm','lib/URI/Info/Plugin/SearchQuery/amazon.pm','lib/URI/Info/Plugin/SearchQuery/baidu.pm','lib/URI/Info/Plugin/SearchQuery/blibli_com.pm','lib/URI/Info/Plugin/SearchQuery/bukalapak_com.pm','lib/URI/Info/Plugin/SearchQuery/google.pm','lib/URI/Info/Plugin/SearchQuery/lazada_co_id.pm','lib/URI/Info/Plugin/SearchQuery/shopee_co_id.pm','lib/URI/Info/Plugin/SearchQuery/thepiratebay.pm','lib/URI/Info/Plugin/SearchQuery/tokopedia_com.pm','lib/URI/Info/Plugin/SearchQuery/youtube.pm','lib/URI/Info/PluginBase.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

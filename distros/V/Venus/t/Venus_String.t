@@ -50,6 +50,7 @@ method: ge
 method: gele
 method: gt
 method: gtlt
+method: format
 method: hex
 method: index
 method: kebabcase
@@ -76,6 +77,7 @@ method: split
 method: stringified
 method: strip
 method: substr
+method: template
 method: titlecase
 method: trim
 method: tv
@@ -1867,6 +1869,67 @@ $test->for('example', 9, 'gtlt', sub {
   !$result
 });
 
+=method format
+
+The format method performs a L<perlfunc/sprintf> operation using the underlying
+string and arguments provided and returns the result.
+
+=signature format
+
+  format(Any @args) (Str)
+
+=metadata format
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 format
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello %s');
+
+  my $format = $string->format('world');
+
+  # "hello world"
+
+=cut
+
+$test->for('example', 1, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'hello world';
+
+  $result
+});
+
+=example-2 format
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('id number %08d');
+
+  my $format = $string->format(10);
+
+  # "id number 00000010"
+
+=cut
+
+$test->for('example', 2, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'id number 00000010';
+
+  $result
+});
+
 =method hex
 
 The hex method returns the value resulting from interpreting the string as a
@@ -3649,6 +3712,70 @@ $test->for('example', 4, 'substr', sub {
   @result
 });
 
+=method template
+
+The template method uses the underlying string value to build and return a
+L<Venus::Template> object, or dispatches to the coderef or method provided.
+
+=signature template
+
+  template(Str | CodeRef $code, Any @args) (Any)
+
+=metadata template
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 template
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template;
+
+  # bless({...}, "Venus::Template")
+
+=cut
+
+$test->for('example', 1, 'template', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Template';
+  is $result->get, 'hello {{name}}';
+
+  $result
+});
+
+=example-2 template
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template('render', undef, {
+    name => 'user',
+  });
+
+  # "hello user"
+
+=cut
+
+$test->for('example', 2, 'template', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'hello user';
+
+  $result
+});
+
 =method titlecase
 
 The titlecase method returns the string capitalizing the first character of
@@ -4263,6 +4390,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/String.pod') if $ENV{RENDER};
+$test->render('lib/Venus/String.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

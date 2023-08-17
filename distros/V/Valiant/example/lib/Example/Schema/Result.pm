@@ -24,4 +24,10 @@ sub debug_off($self) {
   return $self;
 }
 
+sub set_from_request($self, $request) {
+  $self->set_columns_recursively($request->nested_params)
+      ->insert_or_update;
+  return $self;
+}
+
 1;

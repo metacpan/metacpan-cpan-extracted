@@ -11,7 +11,10 @@ use strict;
 use warnings;
 use Test::More;
 
-use Object::Pad;
+BEGIN {
+	plan skip_all => 'these tests require Object::Pad'
+		unless eval { require Object::Pad; };
+}
 
 class ParentForm :repr(HASH)
 {

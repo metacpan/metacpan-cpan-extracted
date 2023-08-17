@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword::FromPerl 0.04;
+package XS::Parse::Keyword::FromPerl 0.07;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;
@@ -21,22 +21,24 @@ This module provides a Perl-visible API wrapping (some of) the functionality
 provided by L<XS::Parse::Keyword>, allowing extension keywords to be added to
 the Perl language by writing code in Perl itself.
 
-It provides a thin wrapping later over the XS functions provided by XPK
-itself, and additionally provides some extra perl-visible functions for things
-like optree management, which would normally be written directly in C code. No
-real attempt is made here to provide further abstractions on top of the API
-already provided by Perl and XPK, so users will have to be familiar with the
-overall concepts there as well.
+It provides a thin wrapping layer over the XS functions provided by XPK
+itself. No real attempt is made here to provide further abstractions on top of
+the API already provided by Perl and XPK, so users will have to be familiar
+with the overall concepts there as well.
 
 This module is currently experimental, on top of the already-experimental
 nature of C<XS::Parse::Keyword> itself.
 
 =cut
 
-require B; # for the B::OP classes
-
 use Exporter 'import';
 push our @EXPORT_OK, qw(
+   register_xs_parse_keyword
+);
+
+# Most of the optree stuff is imported from Optree::Generate
+require Optree::Generate;
+foreach my $sym (qw(
    opcode
    op_contextualize
    op_scope
@@ -51,51 +53,7 @@ push our @EXPORT_OK, qw(
    newPADxVOP
    newSVOP
    newUNOP
-
-   register_xs_parse_keyword
-);
-
-=head1 UTILITY FUNCTIONS
-
-The following helper functions are provided to allow Perl code to get access
-to various parts of the C-level API that would be useful when building optrees
-for keywords. They are not part of the C<XS::Parse::Keyword> API.
-
-=head2 opcode
-
-   $type = opcode( $opname );
-
-Returns an opcode integer corresponding to the given op name, which should be
-lowercase and without the leading C<OP_...> prefix. As this involves a linear
-search across the entire C<PL_op_name> array you may wish to perform this just 
-once and store the result, perhaps using C<use constant> for convenience.
-
-   use constant OP_CONST => opcode("const");
-
-=head2 op_contextualize
-
-   $op = op_contextualize( $op, $context );
-
-Applies a syntactic context to an optree representing an expression.
-C<$context> must be one of the exported constants C<G_VOID>, C<G_SCALAR>, or
-C<G_LIST>.
-
-=head2 op_scope
-
-   $op = op_scope( $op );
-
-Wraps an optree with some additional ops so that a runtime dynamic scope will
-created.
-
-=head2 new*OP
-
-This family of functions return a new OP of the given class, for the type,
-flags, and other arguments specified.
-
-A suitable C<$type> can be obtained by using the L</opcode> function.
-
-C<$flags> contains the opflags; a bitmask of the following constants.
-
+   G_VOID G_SCALAR G_LIST
    OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
    OPf_KIDS
    OPf_PARENS
@@ -103,91 +61,23 @@ C<$flags> contains the opflags; a bitmask of the following constants.
    OPf_MOD
    OPf_STACKED
    OPf_SPECIAL
+)) {
+   Optree::Generate->import( $sym );
+   push @EXPORT_OK, $sym;
+}
 
-The op is returned as a C<B::OP> instance or a subclass thereof.
+=head1 OPTREE FUNCTIONS
 
-These functions can only be called during the C<build> phase of a keyword
-hook, because they depend on having the correct context set by the
-currently-compiling function.
+The L<Optree::Generate> module contains a selection of helper functions to
+allow Perl code to get access to various parts of the C-level API that would
+be useful when building optrees for keywords. They used to be part of this
+module, and so are currently re-exported for convenience, but a later version
+of this module may start emitting warnings when they are used this way, and
+eventually that may stop being provided at all.
 
-=head3 newOP
+Code needing these should import them directly:
 
-   $op = newOP( $type, $flags );
-
-Returns a new base OP for the given type and flags.
-
-=head3 newASSIGNOP
-
-   $op = newASSIGNOP( $flags, $left, $optype, $right );
-
-Returns a new op representing an assignment operation from the right to the
-left OP child of the given type. Note the odd order of arguments.
-
-=head3 newBINOP
-
-   $op = newBINOP( $type, $flags, $first, $last );
-
-Returns a new BINOP for the given type, flags, and first and last OP child.
-
-=head3 newCONDOP
-
-   $op = newCONDOP( $flags, $first, $trueop, $falseop );
-
-Returns a new conditional expression op for the given condition expression and
-true and false alternatives, all as OP instances.
-
-=head3 newFOROP
-
-   $op = newFOROP( $flags, %svop, $expr, $block, $cont );
-
-Returns a new optree representing a heavyweight C<for> loop, given the
-optional iterator SV op, the list expression, the block, and the optional
-continue block, all as OP instances.
-
-=head3 newGVOP
-
-   $op = newGVOP( $type, $flags, $gvref );
-
-Returns a new SVOP for the given type, flags, and GV given by a GLOB
-reference. The referred-to GLOB will be stored in the SVOP itself.
-
-=head3 newLISTOP
-
-   $op = newLISTOP( $type, $flags, @children );
-
-Returns a new LISTOP for the given type, flags, and child SVs.
-
-Note that an arbitrary number of child SVs can be passed here. This wrapper
-function will automatically perform the C<op_convert_list> conversion from a
-plain C<OP_LIST> if required.
-
-=head3 newLOGOP
-
-   $op = newLOGOP( $type, $flags, $first, $other );
-
-Returns a new LOGOP for the given type, flags, and first and other OP child.
-
-=head3 newPADxVOP
-
-   $op = newPADxVOP( $type, $flags, $padoffset );
-
-Returns a new op for the given type, flags, and pad offset. C<$type> must be
-one of C<OP_PADSV>, C<OP_PADAV>, C<OP_PADHV> or C<OP_PADCV>.
-
-=head3 newSVOP
-
-   $op = newSVOP( $type, $flags, $sv );
-
-Returns a new SVOP for the given type, flags, and SV. A copy of the given
-scalar will be stored in the SVOP itself.
-
-=head3 newUNOP
-
-   $op = newUNOP( $type, $flags, $first );
-
-Returns a new UNOP for the given type, flags, and first OP child.
-
-=cut
+   use Optree::Generate qw( opcode newUNOP ... );
 
 =head1 XPK FUNCTIONS
 
@@ -376,6 +266,11 @@ A literal string match, which requires that the following text does not begin
 with an identifier character (thus avoiding prefix-match problems). No value
 is returned.
 
+=head3 XPK_INTRO_MY
+
+Calls the perl C<intro_my()> function immediately. No input is consumed and no
+output value is generated.
+
 =head3 XPK_SEQUENCE
 
    XPK_SEQUENCE(@pieces)
@@ -422,9 +317,9 @@ Attempting to parse this piece type will immediately cause a compile-time
 failure with the given message. This can be used as the final option in
 C<XPK_CHOICE> to ensure a valid match.
 
-=head3 XPK_PARENSCOPE
+=head3 XPK_PARENS
 
-   XPK_PARENSCOPE(@pieces)
+   XPK_PARENS(@pieces)
 
 Expects to find a sequence of pieces, all surrounded by parentheses (round
 brackets, C<( ... )>).
@@ -432,16 +327,16 @@ brackets, C<( ... )>).
 Nothing extra is returned, beyond the values from the individual contained
 pieces.
 
-=head3 XPK_ARGSCOPE
+=head3 XPK_ARGS
 
-   XPK_ARGSCOPE(@pieces)
+   XPK_ARGS(@pieces)
 
-A scope similar to C<XPK_PARENSCOPE> except that the parentheses themselves
+A container similar to C<XPK_PARENS> except that the parentheses themselves
 are optional, similar to perl's parsing of calls to known functions.
 
-=head3 XPK_BRACKETSCOPE
+=head3 XPK_BRACKETS
 
-   XPK_BRACKETSCOPE(@pieces)
+   XPK_BRACKETS(@pieces)
 
 Expects to find a sequence of pieces, all surrounded by square brackets
 (C<[ ... ]>).
@@ -449,18 +344,18 @@ Expects to find a sequence of pieces, all surrounded by square brackets
 Nothing extra is returned, beyond the values from the individual contained
 pieces.
 
-=head3 XPK_BRACESCOPE
+=head3 XPK_BRACES
 
-   XPK_BRACESCOPE(@pieces)
+   XPK_BRACES(@pieces)
 
 Expects to find a sequence of pieces, all surrounded by braces (C<{ ... }>).
 
 Nothing extra is returned, beyond the values from the individual contained
 pieces.
 
-=head3 XPK_CHEVRONSCOPE
+=head3 XPK_CHEVRONS
 
-   XPK_CHEVRONSCOPE(@pieces)
+   XPK_CHEVRONS(@pieces)
 
 Expects to find a sequence of pieces, all surrounded by chevrons (angle
 brackets, C<< < ... > >>).
@@ -494,13 +389,26 @@ foreach (qw(
 # Structural multiple-value pieces
 foreach (qw(
       SEQUENCE OPTIONAL REPEATED CHOICE
-      PARENSCOPE ARGSCOPE BRACKETSCOPE BRACESCOPE CHEVRONSCOPE
+      PARENS ARGS BRACKETS BRACES CHEVRONS
    )) {
    my $name = "XPK_$_";
    push @EXPORT_OK, $name;
 
    no strict 'refs';
    *$name = sub { bless [$name, [@_]], "XS::Parse::Keyword::FromPerl::_Piece" };
+}
+
+# Back-compat wrappers for the old names
+foreach (qw( PAREN ARG BRACKET BRACE CHEVRON )) {
+   my $macroname = "XPK_${_}S";
+   my $funcname  = "XPK_${_}SCOPE";
+   push @EXPORT_OK, $funcname;
+
+   no strict 'refs';
+   *$funcname = sub {
+      warnings::warnif deprecated => "$funcname is now deprecated; use $macroname instead";
+      bless [$macroname, [@_]], "XS::Parse::Keyword::FromPerl::_Piece";
+   };
 }
 
 =head2 Parser Arguments
@@ -550,23 +458,6 @@ Returns a pad offset index as an integer.
    $line = $arg->line;
 
 Returns the line number of the source text on which the piece was started.
-
-=cut
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-More C<new*OP()> wrapper functions.
-
-=item *
-
-More optree-mangling functions. At least, some way to set the TARG might be
-handy.
-
-=back
 
 =cut
 

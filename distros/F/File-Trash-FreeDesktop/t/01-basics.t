@@ -18,7 +18,7 @@ my $dir = tempdir(CLEANUP=>1);
 
 $ENV{HOME} = $dir;
 $CWD = $dir;
-my $trash = File::Trash::FreeDesktop->new;
+my $trash = File::Trash::FreeDesktop->new(home_only=>1);
 
 write_text("f1", "f1");
 write_text("f2", "f2");
@@ -28,6 +28,51 @@ write_text("sub/f2", "sub/f2");
 
 my $ht = $trash->_home_trash;
 diag "home trash is $ht";
+
+subtest "list_contents" => sub {
+    $trash->trash("f1");
+    $trash->trash("f2");
+
+    my @contents;
+
+    @contents = $trash->list_contents();
+    is(scalar(@contents), 2);
+    is($contents[0]{entry}, "f1");
+    is($contents[1]{entry}, "f2");
+
+    # path filter
+    @contents = $trash->list_contents({path=>"$dir/f1"});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f1");
+
+    # path_wildcard filter
+    @contents = $trash->list_contents({path_wildcard=>"$dir/*2"});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f2");
+
+    # path_re filter
+    @contents = $trash->list_contents({path_re=>qr/[1]$/});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f1");
+
+    # filename filter
+    @contents = $trash->list_contents({filename=>"f2"});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f2");
+
+    # path_wildcard filter
+    @contents = $trash->list_contents({filename_wildcard=>"f[13]"});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f1");
+
+    # path_re filter
+    @contents = $trash->list_contents({filename_re=>qr/^f[24]$/});
+    is(scalar(@contents), 1);
+    is($contents[0]{path}, "$dir/f2");
+
+    $trash->recover("f1");
+    $trash->recover("f2");
+};
 
 subtest "trash" => sub {
     my $tfile = $trash->trash("f1");
@@ -41,22 +86,37 @@ subtest "trash" => sub {
     ok((!(-e "sub/f1")), "sub/f1 removed");
     ok((-f ".local/share/Trash/info/f1.2.trashinfo"), "f1.2.trashinfo created");
     ok((-f ".local/share/Trash/files/f1.2"), "files/f1.2 created");
+
+    $trash->trash("f2");
+    ok((!(-e "f2")), "f2 removed");
+    ok((-f ".local/share/Trash/info/f2.trashinfo"), "f2.trashinfo created");
+    ok((-f ".local/share/Trash/files/f2"), "files/f2 created");
 };
-# state at this point: T(f1 f2)
+# state at this point: T(f1 sub/f1 f2)
 
 subtest "recover" => sub {
     $trash->recover("f1", $ht);
     ok((-f "f1"), "f1 recreated");
+    ok((-f "sub/f1"), "sub/f1 recreated");
 };
-# state at this point: f1 T(f2)
+# state at this point: f1 sub/f1 T(f2)
 
 subtest "erase" => sub {
-    $trash->erase("sub/f1", $ht);
-    ok(!(-e "sub/f1"), "sub/f1 removed");
-    ok(!(-e ".local/share/Trash/info/f1.2.trashinfo"),"f1.2.trashinfo removed");
-    ok(!(-e ".local/share/Trash/files/f1.2"), "files/f1.2 removed");
+    $trash->erase("f2", $ht);
+    ok(!(-e "f2"), "f2 removed");
+    ok(!(-e ".local/share/Trash/info/f1.2.trashinfo"),"f2.trashinfo removed");
+    ok(!(-e ".local/share/Trash/files/f2"), "files/f2 removed");
+
+    write_text("f3", "");
+    $trash->trash("f3");
+    write_text("f4", "");
+    $trash->trash("f4");
+    # opt: filename_pattern
+    $trash->erase({filename_wildcard=>"f[34]"});
+    ok(!(-e "f3"), "f3 removed");
+    ok(!(-e "f4"), "f4 removed");
 };
-# state at this point: f1 T()
+# state at this point: f1 sub/f1 T()
 
 subtest "empty" => sub {
     $trash->trash("sub"); # also test removing directories
@@ -72,10 +132,18 @@ subtest "trash nonexisting file" => sub {
 };
 # state at this point: T()
 
-subtest "recover nonexisting file" => sub {
-    dies_ok  { $trash->recover("f3") } "recover nonexisting file -> dies";
-    lives_ok { $trash->recover({on_not_found=>'ignore'}, "f3") }
-        "on_not_found=ignore";
+# state at this point: T()
+
+subtest "recover" => sub {
+    write_text("f3", "");
+    write_text("f4", "");
+    $trash->trash("f3");
+    $trash->trash("f4");
+    # option: filename_re
+    $trash->recover({filename_re=>qr/f[34]/});
+    ok((-f "f3"), "f3 recovered");
+    ok((-f "f4"), "f4 recovered");
+    unlink "f3", "f4";
 };
 # state at this point: T()
 
@@ -103,7 +171,6 @@ subtest "recover: mtime opt" => sub {
     utime 1, 20, "f10";
     $trash->trash("f10");
 
-    dies_ok { $trash->recover({mtime=>30}, "f10") } "mtime not found -> dies";
     $trash->recover({mtime=>20}, "f10");
     is(read_text("f10"), "f10.20", "f10 (mtime 20) recovered first");
     unlink "f10";
@@ -125,8 +192,6 @@ subtest "recover: suffix opt" => sub {
         "suffix already exists -> dies";
     unlink "f10";
 
-    dies_ok { $trash->recover({suffix=>"c"}, "f10") }
-        "suffix not found -> dies";
     $trash->recover({suffix=>"b"}, "f10");
     is(read_text("f10"), "f10.b", "f10 (suffix b) recovered first");
     unlink "f10";
@@ -161,7 +226,6 @@ subtest "trash symlink" => sub {
 
 # TODO test: {trash,recover,erase} in $topdir/.Trash-$uid
 # TODO test: list_trashes
-# TODO test: list_contents for all trashes
 # TODO test: empty for all trashes
 # TODO test: test errors ...
 #   - die on fail to create $topdir/.Trash-$uid

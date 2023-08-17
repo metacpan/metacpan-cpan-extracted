@@ -1,9 +1,31 @@
 package Starlight::Server;
 
+=head1 NAME
+
+Starlight::Server - Core class for a Starlight server
+
+=head1 SYNOPSIS
+
+=for markdown ```perl
+
+    use Starlight::Server;
+
+    my $server = Starlight::Server->new(port  => $port);
+    $server->run(sub { [200, ['Content-Type', 'text/plain'], ['PSGI app']] });
+
+=for markdown ```
+
+=head1 DESCRIPTION
+
+This is a core class for a Starlight server. It should be used by a
+L<Plack::Handler::Starlight> handler when started with `plackup` command.
+
+=cut
+
 use strict;
 use warnings;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0503';
 
 use Config;
 
@@ -22,76 +44,78 @@ use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 use Try::Tiny;
 
-BEGIN { try { require Time::HiRes; Time::HiRes->import(qw(time)) } }
+BEGIN {
+    try { require Time::HiRes; Time::HiRes->import(qw(time)) }
+}
 
 use constant DEBUG            => $ENV{PERL_STARLIGHT_DEBUG};
 use constant CHUNKSIZE        => 64 * 1024;
 use constant MAX_REQUEST_SIZE => 131072;
 
-use constant HAS_INET6        => eval { AF_INET6 && socket my $ipv6_socket, AF_INET6, SOCK_DGRAM, 0 };
+use constant HAS_INET6        => eval { AF_INET6 && socket my $ipv6_socket, AF_INET6, SOCK_DGRAM, 0 } && 1;
+use constant HAS_IO_SOCKET_IP => eval { require IO::Socket::IP; 1 }                                   && 1;
 
-use constant EINTR            => exists &Errno::EINTR ? &Errno::EINTR : -1;
-use constant EAGAIN           => exists &Errno::EAGAIN ? &Errno::EAGAIN : -1;
-use constant EWOULDBLOCK      => exists &Errno::EWOULDBLOCK ? &Errno::EWOULDBLOCK : -1;
+use constant EINTR       => exists &Errno::EINTR       ? &Errno::EINTR       : -1;    ## no critic
+use constant EAGAIN      => exists &Errno::EAGAIN      ? &Errno::EAGAIN      : -1;    ## no critic
+use constant EWOULDBLOCK => exists &Errno::EWOULDBLOCK ? &Errno::EWOULDBLOCK : -1;    ## no critic
 
-
-my $null_io = do { open my $io, "<", \""; $io }; #"
+## no critic(InputOutput::RequireBriefOpen InputOutput::RequireCheckedOpen)
+my $null_io = do { open my $io, "<", \""; $io };
 
 sub new {
-    my($class, %args) = @_;
+    my ($class, %args) = @_;
 
     my $self = bless {
-        host                 => $args{host},
-        port                 => $args{port},
-        socket               => $args{socket},
-        listen               => $args{listen},
-        listen_sock          => $args{listen_sock},
-        timeout              => $args{timeout} || 300,
-        keepalive_timeout    => $args{keepalive_timeout} || 2,
-        max_keepalive_reqs   => $args{max_keepalive_reqs} || 1,
-        server_software      => $args{server_software} || "Starlight/$VERSION ($^O)",
-        server_ready         => $args{server_ready} || sub {},
-        ssl                  => $args{ssl},
-        ipv6                 => $args{ipv6},
-        ssl_key_file         => $args{ssl_key_file},
-        ssl_cert_file        => $args{ssl_cert_file},
-        ssl_ca_file          => $args{ssl_ca_file},
-        ssl_verify_mode      => $args{ssl_verify_mode},
-        user                 => $args{user},
-        group                => $args{group},
-        umask                => $args{umask},
-        daemonize            => $args{daemonize},
-        pid                  => $args{pid},
-        error_log            => $args{error_log},
-        quiet                => $args{quiet} || $args{q} || $ENV{PLACK_QUIET},
-        min_reqs_per_child   => (
-            defined $args{min_reqs_per_child}
-                ? $args{min_reqs_per_child} : undef,
+        host               => $args{host},
+        port               => $args{port},
+        socket             => $args{socket},
+        listen             => $args{listen},
+        listen_sock        => $args{listen_sock},
+        timeout            => $args{timeout}            || 300,
+        keepalive_timeout  => $args{keepalive_timeout}  || 2,
+        max_keepalive_reqs => $args{max_keepalive_reqs} || 1,
+        server_software    => $args{server_software}    || "Starlight/$VERSION ($^O)",
+        server_ready       => $args{server_ready}       || sub { },
+        ssl                => $args{ssl},
+        ipv6               => $args{ipv6} || HAS_IO_SOCKET_IP,
+        ssl_key_file       => $args{ssl_key_file},
+        ssl_cert_file      => $args{ssl_cert_file},
+        ssl_ca_file        => $args{ssl_ca_file},
+        ssl_client_ca_file => $args{ssl_client_ca_file},
+        ssl_verify_mode    => $args{ssl_verify_mode},
+        user               => $args{user},
+        group              => $args{group},
+        umask              => $args{umask},
+        daemonize          => $args{daemonize},
+        pid                => $args{pid},
+        error_log          => $args{error_log},
+        quiet              => $args{quiet} || $args{q} || $ENV{PLACK_QUIET},
+        min_reqs_per_child => (
+            defined $args{min_reqs_per_child} ? $args{min_reqs_per_child} : undef,
         ),
-        max_reqs_per_child   => (
+        max_reqs_per_child => (
             $args{max_reqs_per_child} || $args{max_requests} || 1000,
         ),
         spawn_interval       => $args{spawn_interval} || 0,
         err_respawn_interval => (
-            defined $args{err_respawn_interval}
-                ? $args{err_respawn_interval} : undef,
+            defined $args{err_respawn_interval} ? $args{err_respawn_interval} : undef,
         ),
-        main_process_delay   => $args{main_process_delay} || 0.1,
-        is_multithread       => Plack::Util::FALSE,
-        is_multiprocess      => Plack::Util::FALSE,
-        _using_defer_accept  => undef,
-        _unlink              => [],
-        _sigint              => 'INT',
+        main_process_delay  => $args{main_process_delay} || 0.1,
+        is_multithread      => Plack::Util::FALSE,
+        is_multiprocess     => Plack::Util::FALSE,
+        _using_defer_accept => undef,
+        _unlink             => [],
+        _sigint             => 'INT',
     }, $class;
 
     # Windows 7 and previous have bad SIGINT handling
     if ($^O eq 'MSWin32') {
         require Win32;
         my @v = Win32::GetOSVersion();
-        if ($v[1]*1000 + $v[2] < 6_002) {
+        if ($v[1] * 1000 + $v[2] < 6_002) {
             $self->{_sigint} = 'TERM';
         }
-    };
+    }
 
     if ($args{max_workers} && $args{max_workers} > 1) {
         die(
@@ -104,74 +128,79 @@ sub new {
 }
 
 sub run {
-    my($self, $app) = @_;
+    my ($self, $app) = @_;
     $self->setup_listener();
     $self->accept_loop($app);
 }
 
 sub prepare_socket_class {
-    my($self, $args) = @_;
+    my ($self, $args) = @_;
 
-    if ($self->{socket} and ($self->{port} or $self->{ipv6})) {
+    if ($self->{socket} and $self->{port}) {
         die "UNIX socket and ether IPv4 or IPv6 are not supported at the same time.\n";
     }
 
-    if ($self->{ssl} and ($self->{socket} or $self->{ipv6})) {
-        die "SSL and either UNIX socket or IPv6 are not supported at the same time.\n";
+    if ($self->{socket} and $self->{ssl}) {
+        die "UNIX socket and SSL are not supported at the same time.\n";
     }
 
     if ($self->{socket}) {
         try { require IO::Socket::UNIX; 1 }
             or die "UNIX socket suport requires IO::Socket::UNIX\n";
-        $args->{Local} =~ s/^@/\0/; # abstract socket address
+        $args->{Local} =~ s/^@/\0/;    # abstract socket address
         return "IO::Socket::UNIX";
-    } elsif ($self->{ssl}) {
-        try { require IO::Socket::SSL; 1 }
-            or die "SSL suport requires IO::Socket::SSL\n";
-        $args->{SSL_key_file}       = $self->{ssl_key_file};
-        $args->{SSL_cert_file}      = $self->{ssl_cert_file};
-        $args->{SSL_ca_file}        = $self->{ssl_ca_file};
-        $args->{SSL_client_ca_file} = $self->{ssl_ca_file};
-        $args->{SSL_verify_mode}    = $self->{ssl_verify_mode};
-        return "IO::Socket::SSL";
-    } elsif ($self->{ipv6}) {
-        try { require IO::Socket::IP; 1 }
-            or die "IPv6 support requires IO::Socket::IP\n";
-        $self->{host}      ||= '::';
-        $args->{LocalAddr} ||= '::';
-        return "IO::Socket::IP";
     }
 
+    if ($self->{ipv6}) {
+        die "IPv6 support requires IO::Socket::IP\n" unless HAS_IO_SOCKET_IP;
+    }
+
+    if ($self->{ssl}) {
+        try { require IO::Socket::SSL; 1 }
+            or die "SSL suport requires IO::Socket::SSL\n";
+        $args->{SSL_key_file} = $self->{ssl_key_file};
+        $args->{SSL_cert_file} = $self->{ssl_cert_file};
+        $args->{SSL_ca_file} = $self->{ssl_ca_file};
+        $args->{SSL_client_ca_file} = $self->{ssl_client_ca_file};
+        $args->{SSL_startHandshake} = 0;
+    }
+
+    return "IO::Socket::SSL" if $self->{ssl};
+    return "IO::Socket::IP"  if $self->{ipv6};
     return "IO::Socket::INET";
 }
 
 sub setup_listener {
     my ($self) = @_;
 
-    my %args = $self->{socket} ? (
-        Listen    => Socket::SOMAXCONN,
-        Local     => $self->{socket},
-    ) : (
+    my %args = $self->{socket}
+        ? (
+        Listen => Socket::SOMAXCONN,
+        Local  => $self->{socket},
+        )
+        : (
         Listen    => Socket::SOMAXCONN,
         LocalPort => $self->{port} || 5000,
-        LocalAddr => $self->{host} || 0,
+        LocalAddr => $self->{host},
         Proto     => 'tcp',
         ReuseAddr => 1,
-    );
+        );
 
     my $proto = $self->{ssl} ? 'https' : 'http';
     my $listening = $self->{socket} ? "socket $self->{socket}" : "port $self->{port}";
 
     my $class = $self->prepare_socket_class(\%args);
     $self->{listen_sock} ||= $class->new(%args)
-        or die "failed to listen to $listening: $!\n";
+        or do {
+        die "failed to listen to $listening: $!\n";
+        };
 
     print STDERR "Starting $self->{server_software} $proto server listening at $listening\n"
         unless $self->{quiet};
 
     my $family = Socket::sockaddr_family(getsockname($self->{listen_sock}));
     $self->{_listen_sock_is_unix} = $family == AF_UNIX;
-    $self->{_listen_sock_is_tcp}  = $family != AF_UNIX;
+    $self->{_listen_sock_is_tcp} = $family != AF_UNIX;
 
     # set defer accept
     if ($^O eq 'linux' && $self->{_listen_sock_is_tcp}) {
@@ -187,8 +216,9 @@ sub setup_listener {
 }
 
 sub accept_loop {
+
     # TODO handle $max_reqs_per_child
-    my($self, $app, $max_reqs_per_child) = @_;
+    my ($self, $app, $max_reqs_per_child) = @_;
     my $proc_req_count = 0;
 
     $self->{can_exit} = 1;
@@ -197,96 +227,120 @@ sub accept_loop {
     local $SIG{$sigint} = local $SIG{TERM} = sub {
         my ($sig) = @_;
         warn "*** SIG$sig received in process $$" if DEBUG;
-        exit 0 if $self->{can_exit};
+        exit 0                                    if $self->{can_exit};
         $self->{term_received}++;
         exit 0
             if ($is_keepalive && $self->{can_exit}) || $self->{term_received} > 1;
+
         # warn "server termination delayed while handling current HTTP request";
     };
 
     local $SIG{PIPE} = 'IGNORE';
 
-    while (! defined $max_reqs_per_child || $proc_req_count < $max_reqs_per_child) {
-        if (my ($conn,$peer) = $self->{listen_sock}->accept) {
-            $self->{_is_deferred_accept} = $self->{_using_defer_accept};
-            $conn->blocking(0)
-                or die "failed to set socket to nonblocking mode:$!\n";
-            my ($peerport, $peerhost, $peeraddr) = (0, undef, undef);
-            if ($self->{_listen_sock_is_tcp}) {
-                if (try { TCP_NODELAY }) {
-                    $conn->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
-                        or die "setsockopt(TCP_NODELAY) failed:$!\n";
-                }
-                local $@;
-                if (HAS_INET6 && Socket::sockaddr_family(getsockname($conn)) == AF_INET6) {
-                    ($peerport, $peerhost) = Socket::unpack_sockaddr_in6($peer);
-                    $peeraddr = Socket::inet_ntop(AF_INET6, $peerhost);
-                } else {
-                    ($peerport, $peerhost) = Socket::unpack_sockaddr_in($peer);
-                    $peeraddr = Socket::inet_ntoa($peerhost);
-                }
-            }
-            my $req_count = 0;
-            my $pipelined_buf = '';
-            while (1) {
-                ++$req_count;
-                ++$proc_req_count;
-                my $env = {
-                    SERVER_PORT => $self->{port} || 0,
-                    SERVER_NAME => $self->{host} || '*',
-                    SCRIPT_NAME => '',
-                    REMOTE_ADDR => $peeraddr,
-                    REMOTE_PORT => $peerport,
-                    'psgi.version' => [ 1, 1 ],
-                    'psgi.errors'  => *STDERR,
-                    'psgi.url_scheme'   => $self->{ssl} ? 'https' : 'http',
-                    'psgi.run_once'     => Plack::Util::FALSE,
-                    'psgi.multithread'  => $self->{is_multithread},
-                    'psgi.multiprocess' => $self->{is_multiprocess},
-                    'psgi.streaming'    => Plack::Util::TRUE,
-                    'psgi.nonblocking'  => Plack::Util::FALSE,
-                    'psgix.input.buffered' => Plack::Util::TRUE,
-                    'psgix.io'          => $conn,
-                    'psgix.harakiri'    => Plack::Util::TRUE,
-                };
+    while (!defined $max_reqs_per_child || $proc_req_count < $max_reqs_per_child) {
+        my ($conn, $peer) = $self->{listen_sock}->accept or do {
+            warn "failed to accept: $!\n";
+            next;
+        };
 
-                my $may_keepalive = $req_count < $self->{max_keepalive_reqs};
-                if ($may_keepalive && $max_reqs_per_child && $proc_req_count >= $max_reqs_per_child) {
-                    $may_keepalive = undef;
-                }
-                $may_keepalive = 1 if length $pipelined_buf;
-                my $keepalive;
-                ($keepalive, $pipelined_buf) = $self->handle_connection($env, $conn, $app,
-                                                                        $may_keepalive, $req_count != 1, $pipelined_buf);
-
-                if ($env->{'psgix.harakiri.commit'}) {
-                    $conn->close;
-                    return;
-                }
-                last unless $keepalive;
-                # TODO add special cases for clients with broken keep-alive support, as well as disabling keep-alive for HTTP/1.0 proxies
+        my ($peerport, $peerhost, $peeraddr) = (0, undef, undef);
+        if ($self->{_listen_sock_is_tcp}) {
+            if (HAS_INET6 && Socket::sockaddr_family(getsockname($conn)) == AF_INET6) {
+                ($peerport, $peerhost) = Socket::unpack_sockaddr_in6($peer);
+                $peeraddr = Socket::inet_ntop(AF_INET6, $peerhost);
+            } else {
+                ($peerport, $peerhost) = Socket::unpack_sockaddr_in($peer);
+                $peeraddr = Socket::inet_ntoa($peerhost);
             }
-            $conn->close;
+            if (try { TCP_NODELAY }) {
+                $conn->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
+                    or do {
+                    warn "setsockopt(TCP_NODELAY) failed for $peeraddr:$peerport: $!\n";
+                    next;
+                    };
+            }
         }
+
+        if ($conn->isa('IO::Socket::SSL')) {
+            $conn->accept_SSL or do {
+                my @err = ();
+                push @err, $!                          if $!;
+                push @err, $IO::Socket::SSL::SSL_ERROR if $IO::Socket::SSL::SSL_ERROR;
+                warn "failed to ssl handshake with $peeraddr:$peerport: @{[join ': ', @err]}\n";
+                next;
+            };
+        }
+
+        $self->{_is_deferred_accept} = $self->{_using_defer_accept};
+        $conn->blocking(0)
+            or do {
+            warn "failed to set socket to nonblocking mode for $peeraddr:$peerport: $!\n";
+            next;
+            };
+
+        my $req_count = 0;
+        my $pipelined_buf = '';
+        while (1) {
+            ++$req_count;
+            ++$proc_req_count;
+            my $env = {
+                SERVER_PORT            => $self->{port} || 0,
+                SERVER_NAME            => $self->{host} || '*',
+                SCRIPT_NAME            => '',
+                REMOTE_ADDR            => $peeraddr,
+                REMOTE_PORT            => $peerport,
+                'psgi.version'         => [1, 1],
+                'psgi.errors'          => *STDERR,
+                'psgi.url_scheme'      => $self->{ssl} ? 'https' : 'http',
+                'psgi.run_once'        => Plack::Util::FALSE,
+                'psgi.multithread'     => $self->{is_multithread},
+                'psgi.multiprocess'    => $self->{is_multiprocess},
+                'psgi.streaming'       => Plack::Util::TRUE,
+                'psgi.nonblocking'     => Plack::Util::FALSE,
+                'psgix.input.buffered' => Plack::Util::TRUE,
+                'psgix.io'             => $conn,
+                'psgix.harakiri'       => Plack::Util::TRUE,
+            };
+
+            my $may_keepalive = $req_count < $self->{max_keepalive_reqs};
+            if ($may_keepalive && $max_reqs_per_child && $proc_req_count >= $max_reqs_per_child) {
+                $may_keepalive = undef;
+            }
+            $may_keepalive = 1 if length $pipelined_buf;
+            my $keepalive;
+            ($keepalive, $pipelined_buf) = $self->handle_connection(
+                $env, $conn, $app,
+                $may_keepalive, $req_count != 1, $pipelined_buf
+            );
+
+            if ($env->{'psgix.harakiri.commit'}) {
+                $conn->close;
+                return;
+            }
+            last unless $keepalive;
+
+# TODO add special cases for clients with broken keep-alive support, as well as disabling keep-alive for HTTP/1.0 proxies
+        }
+        $conn->close;
     }
 }
 
-my $bad_response = [ 400, [ 'Content-Type' => 'text/plain', 'Connection' => 'close' ], [ 'Bad Request' ] ];
+my $bad_response = [400, ['Content-Type' => 'text/plain', 'Connection' => 'close'], ['Bad Request']];
+
 sub handle_connection {
-    my($self, $env, $conn, $app, $use_keepalive, $is_keepalive, $prebuf) = @_;
+    my ($self, $env, $conn, $app, $use_keepalive, $is_keepalive, $prebuf) = @_;
 
     my $buf = '';
-    my $pipelined_buf='';
+    my $pipelined_buf = '';
     my $res = $bad_response;
 
     local $self->{can_exit} = (defined $prebuf) ? 0 : 1;
     while (1) {
         my $rlen;
-        if ( $rlen = length $prebuf ) {
+        if ($rlen = length $prebuf) {
             $buf = $prebuf;
             undef $prebuf;
-        }
-        else {
+        } else {
             $rlen = $self->read_timeout(
                 $conn, \$buf, MAX_REQUEST_SIZE - length($buf), length($buf),
                 $is_keepalive ? $self->{keepalive_timeout} : $self->{timeout},
@@ -295,16 +349,16 @@ sub handle_connection {
         $self->{can_exit} = 0;
         my $reqlen = parse_http_request($buf, $env);
         if ($reqlen >= 0) {
+
             # handle request
             my $protocol = $env->{SERVER_PROTOCOL};
             if ($use_keepalive) {
-                if ( $protocol eq 'HTTP/1.1' ) {
+                if ($protocol eq 'HTTP/1.1') {
                     if (my $c = $env->{HTTP_CONNECTION}) {
                         $use_keepalive = undef
                             if $c =~ /^\s*close\s*/i;
                     }
-                }
-                else {
+                } else {
                     if (my $c = $env->{HTTP_CONNECTION}) {
                         $use_keepalive = undef
                             unless $c =~ /^\s*keep-alive\s*/i;
@@ -314,7 +368,7 @@ sub handle_connection {
                 }
             }
             $buf = substr $buf, $reqlen;
-            my $chunked = do { no warnings; lc delete $env->{HTTP_TRANSFER_ENCODING} eq 'chunked' };
+            my $chunked = do { no warnings 'all'; lc delete $env->{HTTP_TRANSFER_ENCODING} eq 'chunked' };
             if (my $cl = $env->{CONTENT_LENGTH}) {
                 my $buffer = Plack::TempBuffer->new($cl);
                 while ($cl > 0) {
@@ -323,33 +377,30 @@ sub handle_connection {
                         $chunk = $buf;
                         $buf = '';
                     } else {
-                        $self->read_timeout(
-                            $conn, \$chunk, $cl, 0, $self->{timeout})
+                        $self->read_timeout($conn, \$chunk, $cl, 0, $self->{timeout})
                             or return;
                     }
                     $buffer->print($chunk);
                     $cl -= length $chunk;
                 }
                 $env->{'psgi.input'} = $buffer->rewind;
-            }
-            elsif ($chunked) {
+            } elsif ($chunked) {
                 my $buffer = Plack::TempBuffer->new;
                 my $chunk_buffer = '';
                 my $length;
-                DECHUNK: while(1) {
+            DECHUNK: while (1) {
                     my $chunk;
-                    if ( length $buf ) {
+                    if (length $buf) {
                         $chunk = $buf;
                         $buf = '';
-                    }
-                    else {
+                    } else {
                         $self->read_timeout($conn, \$chunk, CHUNKSIZE, 0, $self->{timeout})
                             or return;
                     }
 
                     $chunk_buffer .= $chunk;
-                    while ( $chunk_buffer =~ s/^(([0-9a-fA-F]+).*\015\012)// ) {
-                        my $trailer   = $1;
+                    while ($chunk_buffer =~ s/^(([0-9a-fA-F]+).*\015\012)//) {
+                        my $trailer = $1;
                         my $chunk_len = hex $2;
                         if ($chunk_len == 0) {
                             last DECHUNK;
@@ -365,19 +416,19 @@ sub handle_connection {
                 $env->{CONTENT_LENGTH} = $length;
                 $env->{'psgi.input'} = $buffer->rewind;
             } else {
-                if ( $buf =~ m!^(?:GET|HEAD)! ) { #pipeline
+                if ($buf =~ m!^(?:GET|HEAD)!) {    #pipeline
                     $pipelined_buf = $buf;
-                    $use_keepalive = 1; #force keepalive
-                } # else clear buffer
+                    $use_keepalive = 1;            #force keepalive
+                }    # else clear buffer
                 $env->{'psgi.input'} = $null_io;
             }
 
-            if ( $env->{HTTP_EXPECT} ) {
-                if ( $env->{HTTP_EXPECT} eq '100-continue' ) {
+            if ($env->{HTTP_EXPECT}) {
+                if ($env->{HTTP_EXPECT} eq '100-continue') {
                     $self->write_all($conn, "HTTP/1.1 100 Continue\015\012\015\012")
                         or return;
                 } else {
-                    $res = [417,[ 'Content-Type' => 'text/plain', 'Connection' => 'close' ], [ 'Expectation Failed' ] ];
+                    $res = [417, ['Content-Type' => 'text/plain', 'Connection' => 'close'], ['Expectation Failed']];
                     last;
                 }
             }
@@ -386,8 +437,10 @@ sub handle_connection {
             last;
         }
         if ($reqlen == -2) {
+
             # request is incomplete, do nothing
         } elsif ($reqlen == -1) {
+
             # error, close conn
             last;
         }
@@ -396,9 +449,11 @@ sub handle_connection {
     if (ref $res eq 'ARRAY') {
         $self->_handle_response($env->{SERVER_PROTOCOL}, $res, $conn, \$use_keepalive);
     } elsif (ref $res eq 'CODE') {
-        $res->(sub {
-            $self->_handle_response($env->{SERVER_PROTOCOL}, $_[0], $conn, \$use_keepalive);
-        });
+        $res->(
+            sub {
+                $self->_handle_response($env->{SERVER_PROTOCOL}, $_[0], $conn, \$use_keepalive);
+            }
+        );
     } else {
         die "Bad response $res\n";
     }
@@ -410,7 +465,7 @@ sub handle_connection {
 }
 
 sub _handle_response {
-    my($self, $protocol, $res, $conn, $use_keepalive_r) = @_;
+    my ($self, $protocol, $res, $conn, $use_keepalive_r) = @_;
     my $status_code = $res->[0];
     my $headers = $res->[1];
     my $body = $res->[2];
@@ -430,18 +485,19 @@ sub _handle_response {
             $send_headers{$lck} = $v;
         }
     }
-    if (! exists $send_headers{server}) {
+    if (!exists $send_headers{server}) {
         unshift @lines, "Server: $self->{server_software}\015\012";
     }
-    if (! exists $send_headers{date}) {
+    if (!exists $send_headers{date}) {
         unshift @lines, "Date: @{[HTTP::Date::time2str()]}\015\012";
     }
 
     # try to set content-length when keepalive can be used, or disable it
     my $use_chunked;
     if (defined $protocol and $protocol eq 'HTTP/1.1') {
-        if (defined $send_headers{'content-length'}
-                || defined $send_headers{'transfer-encoding'}) {
+        if (   defined $send_headers{'content-length'}
+            || defined $send_headers{'transfer-encoding'})
+        {
             # ok
         } elsif (!Plack::Util::status_with_no_entity_body($status_code)) {
             push @lines, "Transfer-Encoding: chunked\015\012";
@@ -449,32 +505,39 @@ sub _handle_response {
         }
         push @lines, "Connection: close\015\012" unless $$use_keepalive_r;
     } else {
+
         # HTTP/1.0
         if ($$use_keepalive_r) {
-            if (defined $send_headers{'content-length'}
-                || defined $send_headers{'transfer-encoding'}) {
+            if (   defined $send_headers{'content-length'}
+                || defined $send_headers{'transfer-encoding'})
+            {
                 # ok
-            } elsif (! Plack::Util::status_with_no_entity_body($status_code)
-                     && defined(my $cl = Plack::Util::content_length($body))) {
+            } elsif (!Plack::Util::status_with_no_entity_body($status_code)
+                && defined(my $cl = Plack::Util::content_length($body)))
+            {
                 push @lines, "Content-Length: $cl\015\012";
             } else {
-                $$use_keepalive_r = undef
+                $$use_keepalive_r = undef;
             }
         }
         push @lines, "Connection: keep-alive\015\012" if $$use_keepalive_r;
-        push @lines, "Connection: close\015\012" if !$$use_keepalive_r; #fmm..
+        push @lines, "Connection: close\015\012"      if !$$use_keepalive_r;    #fmm..
     }
 
     unshift @lines, "HTTP/1.1 $status_code @{[ HTTP::Status::status_message($status_code) || 'Unknown' ]}\015\012";
     push @lines, "\015\012";
 
-    if (defined $body && ref $body eq 'ARRAY' && @$body == 1
-            && defined $body->[0] && length $body->[0] < 8192) {
+    if (   defined $body
+        && ref $body eq 'ARRAY'
+        && @$body == 1
+        && defined $body->[0]
+        && length $body->[0] < 8192)
+    {
         # combine response header and small request body
         my $buf = $body->[0];
-        if ($use_chunked ) {
+        if ($use_chunked) {
             my $len = length $buf;
-            $buf = sprintf("%x",$len) . "\015\012" . $buf . "\015\012" . '0' . "\015\012\015\012";
+            $buf = sprintf("%x", $len) . "\015\012" . $buf . "\015\012" . '0' . "\015\012\015\012";
         }
         $self->write_all(
             $conn, join('', @lines, $buf), $self->{timeout},
@@ -494,11 +557,11 @@ sub _handle_response {
                 unless ($failed) {
                     my $buf = $_[0];
                     --$body_count;
-                    if ( $use_chunked ) {
+                    if ($use_chunked) {
                         my $len = length $buf;
                         return unless $len;
-                        $buf = sprintf("%x",$len) . "\015\012" . $buf . "\015\012";
-                        if ( $body_count == 0 ) {
+                        $buf = sprintf("%x", $len) . "\015\012" . $buf . "\015\012";
+                        if ($body_count == 0) {
                             $buf .= '0' . "\015\012\015\012";
                             $completed = 1;
                         }
@@ -510,18 +573,17 @@ sub _handle_response {
         );
         $self->write_all($conn, '0' . "\015\012\015\012", $self->{timeout}) if $use_chunked && !$completed;
     } else {
-        return Plack::Util::inline_object
-            write => sub {
-                my $buf = $_[0];
-                if ( $use_chunked ) {
-                    my $len = length $buf;
-                    return unless $len;
-                    $buf = sprintf("%x",$len) . "\015\012" . $buf . "\015\012"
-                }
-                $self->write_all($conn, $buf, $self->{timeout})
+        return Plack::Util::inline_object write => sub {
+            my $buf = $_[0];
+            if ($use_chunked) {
+                my $len = length $buf;
+                return unless $len;
+                $buf = sprintf("%x", $len) . "\015\012" . $buf . "\015\012";
+            }
+            $self->write_all($conn, $buf, $self->{timeout});
             },
             close => sub {
-                $self->write_all($conn, '0' . "\015\012\015\012", $self->{timeout}) if $use_chunked;
+            $self->write_all($conn, '0' . "\015\012\015\012", $self->{timeout}) if $use_chunked;
             };
     }
 }
@@ -533,7 +595,8 @@ sub do_io {
     unless ($is_write || delete $self->{_is_deferred_accept}) {
         goto DO_SELECT;
     }
- DO_READWRITE:
+DO_READWRITE:
+
     # try to do the IO
     if ($is_write) {
         $ret = syswrite $sock, $buf, $len, $off
@@ -542,12 +605,12 @@ sub do_io {
         $ret = sysread $sock, $$buf, $len, $off
             and return $ret;
     }
-    unless ((! defined($ret)
-                 && ($! == EINTR || $! == EAGAIN || $! == EWOULDBLOCK))) {
+    if (defined($ret) || ($! != EINTR && $! != EAGAIN && $! != EWOULDBLOCK)) {
         return;
     }
+
     # wait for data
- DO_SELECT:
+DO_SELECT:
     while (1) {
         my ($rfd, $wfd);
         my $efd = '';
@@ -560,7 +623,7 @@ sub do_io {
         my $start_at = time;
         my $nfound = select($rfd, $wfd, $efd, $timeout);
         $timeout -= (time - $start_at);
-        last if $nfound;
+        last   if $nfound;
         return if $timeout <= 0;
     }
     goto DO_READWRITE;
@@ -592,7 +655,7 @@ sub write_all {
 
 sub _add_to_unlink {
     my ($self, $filename) = @_;
-    push @{$self->{_unlink}}, File::Spec->rel2abs($filename);
+    push @{ $self->{_unlink} }, File::Spec->rel2abs($filename);
 }
 
 sub _daemonize {
@@ -608,32 +671,32 @@ sub _daemonize {
     if ($self->{pid}) {
         $pidfile = File::Spec->rel2abs($self->{pid});
         if (defined *Fcntl::O_EXCL{CODE}) {
-            sysopen $pidfh, $pidfile, Fcntl::O_WRONLY|Fcntl::O_CREAT|Fcntl::O_EXCL
-                                               or die "Cannot open pid file: $self->{pid}: $!\n";
+            sysopen $pidfh, $pidfile, Fcntl::O_WRONLY | Fcntl::O_CREAT | Fcntl::O_EXCL
+                or die "Cannot open pid file: $self->{pid}: $!\n";
         } else {
-            open $pidfh, '>', $pidfile         or die "Cannot open pid file: $self->{pid}: $!\n";
+            open $pidfh, '>', $pidfile or die "Cannot open pid file: $self->{pid}: $!\n";
         }
     }
 
     if (defined $self->{error_log}) {
-        open STDERR, '>>', $self->{error_log}  or die "Cannot open error log file: $self->{error_log}: $!\n";
+        open STDERR, '>>', $self->{error_log} or die "Cannot open error log file: $self->{error_log}: $!\n";
     }
 
     if ($self->{daemonize}) {
 
-        chdir File::Spec->rootdir              or die "Cannot chdir to root directory: $!\n";
+        chdir File::Spec->rootdir or die "Cannot chdir to root directory: $!\n";
 
-        open my $devnull,  '+>', File::Spec->devnull or die "Cannot open null device: $!\n";
+        open my $devnull, '+>', File::Spec->devnull or die "Cannot open null device: $!\n";
 
-        open STDIN, '>&', $devnull             or die "Cannot dup null device: $!\n";
-        open STDOUT, '>&', $devnull            or die "Cannot dup null device: $!\n";
+        open STDIN, '>&', $devnull  or die "Cannot dup null device: $!\n";
+        open STDOUT, '>&', $devnull or die "Cannot dup null device: $!\n";
 
-        defined(my $pid = fork)                or die "Cannot fork: $!\n";
+        defined(my $pid = fork) or die "Cannot fork: $!\n";
         if ($pid) {
             if ($self->{pid} and $pid) {
-                print $pidfh "$pid\n"          or die "Cannot write pidfile $self->{pid}: $!\n";
+                print $pidfh "$pid\n" or die "Cannot write pidfile $self->{pid}: $!\n";
                 close $pidfh;
-                open STDERR, '>&', $devnull    or die "Cannot dup null device: $!\n";
+                open STDERR, '>&', $devnull or die "Cannot dup null device: $!\n";
             }
             exit;
         }
@@ -641,11 +704,11 @@ sub _daemonize {
         close $pidfh if $pidfh;
 
         if ($Config::Config{d_setsid}) {
-            POSIX::setsid()                    or die "Cannot setsid: $!\n";
+            POSIX::setsid() or die "Cannot setsid: $!\n";
         }
 
         if (not defined $self->{error_log}) {
-            open STDERR, '>&', $devnull        or die "Cannot dup null device: $!\n";
+            open STDERR, '>&', $devnull or die "Cannot dup null device: $!\n";
         }
     }
 
@@ -693,7 +756,14 @@ sub _setup_privileges {
 # Taken from Net::Server::Daemonize
 sub _get_uid {
     my ($self, $user) = @_;
-    my $uid  = ($user =~ /^(\d+)$/) ? $1 : getpwnam($user);
+    my $uid = do {
+        if ($user =~ /^(\d+)$/) {
+            $1;
+        } else {
+            getpwnam($user);
+        }
+    };
+
     die "No such user \"$user\"\n" unless defined $uid;
     return $uid;
 }
@@ -703,10 +773,10 @@ sub _get_gid {
     my ($self, @groups) = @_;
     my @gid;
 
-    foreach my $group ( split( /[, ]+/, join(" ",@groups) ) ){
-        if( $group =~ /^\d+$/ ){
+    foreach my $group (split(/[, ]+/, join(" ", @groups))) {
+        if ($group =~ /^\d+$/) {
             push @gid, $group;
-        }else{
+        } else {
             my $id = getgrnam($group);
             die "No such group \"$group\"\n" unless defined $id;
             push @gid, $id;
@@ -714,7 +784,7 @@ sub _get_gid {
     }
 
     die "No group found in arguments.\n" unless @gid;
-    return join(" ",$gid[0],@gid);
+    return join(" ", $gid[0], @gid);
 }
 
 # Taken from Net::Server::Daemonize
@@ -722,9 +792,9 @@ sub _set_uid {
     my ($self, $user) = @_;
     my $uid = $self->_get_uid($user);
 
-    eval { POSIX::setuid($uid) };
-    if ($UID != $uid || $EUID != $uid) { # check $> also (rt #21262)
-        $UID = $EUID = $uid; # try again - needed by some 5.8.0 linux systems (rt #13450)
+    eval { POSIX::setuid($uid) } or 1;
+    if ($UID != $uid || $EUID != $uid) {    # check $> also (rt #21262)
+        $UID = $EUID = $uid;                # try again - needed by some 5.8.0 linux systems (rt #13450)
         if ($UID != $uid) {
             die "Couldn't become uid \"$uid\": $!\n";
         }
@@ -737,11 +807,11 @@ sub _set_uid {
 sub _set_gid {
     my ($self, @groups) = @_;
     my $gids = $self->_get_gid(@groups);
-    my $gid  = (split /\s+/, $gids)[0];
-    eval { $) = $gids }; # store all the gids - this is really sort of optional
+    my $gid = (split /\s+/, $gids)[0];
+    eval { $EGID = $gids } or 1;    # store all the gids - this is really sort of optional
 
-    eval { POSIX::setgid($gid) };
-    if (! grep {$gid == $_} split /\s+/, $GID) { # look for any valid id in the list
+    eval { POSIX::setgid($gid) } or 1;
+    if (!grep { $gid == $_ } split /\s+/, $GID) {    # look for any valid id in the list
         die "Couldn't become gid \"$gid\": $!\n";
     }
 
@@ -763,8 +833,8 @@ sub _create_process {
         eval {
             $SIG{CHLD} = 'DEFAULT';
             $self->accept_loop($app, $self->_calc_reqs_per_child());
-        };
-        warn $@ if $@;
+        } or 1;
+        warn $@                      if $@;
         warn "*** process $$ ending" if DEBUG;
         exit 0;
     } else {
@@ -776,7 +846,7 @@ sub _calc_reqs_per_child {
     my $self = shift;
     my $max = $self->{max_reqs_per_child};
     if (my $min = $self->{min_reqs_per_child}) {
-        srand((rand() * 2 ** 30) ^ $$ ^ time);
+        srand((rand() * 2**30) ^ $$ ^ time);
         return $max - int(($max - $min + 1) * rand);
     } else {
         return $max;
@@ -785,9 +855,27 @@ sub _calc_reqs_per_child {
 
 sub DESTROY {
     my ($self) = @_;
-    while (my $f = shift @{$self->{_unlink}}) {
+    while (my $f = shift @{ $self->{_unlink} }) {
         unlink $f;
     }
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<starlight>,
+L<Starlight>,
+L<Plack>,
+L<Plack::Runner>.
+
+=head1 LICENSE
+
+Copyright (c) 2013-2016, 2020, 2023 Piotr Roszatycki <dexter@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+
+See L<http://dev.perl.org/licenses/artistic.html>

@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostColumnStyleRequest.name :   ,
-# PostColumnStyleRequest.sheetName :   ,
-# PostColumnStyleRequest.columnIndex :   ,
-# PostColumnStyleRequest.style :   ,
-# PostColumnStyleRequest.folder :   ,
-# PostColumnStyleRequest.storageName :    
+# PostColumnStyleRequest.name : The workbook name.  ,
+# PostColumnStyleRequest.sheetName : The worksheet name.  ,
+# PostColumnStyleRequest.columnIndex : The column index.  ,
+# PostColumnStyleRequest.style : Represents display style of excel document,such as font,color,alignment,border,etc.  ,
+# PostColumnStyleRequest.folder : Original workbook folder.  ,
+# PostColumnStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_column_style' } = { 
-    	summary => '',
+    	summary => 'Sets column style in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,42 +144,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'column_index' => {
      	datatype => 'int',
      	base_name => 'columnIndex',
-     	description => '',
+     	description => 'The column index.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'style',
-     	description => '',
+     	description => 'Represents display style of excel document,such as font,color,alignment,border,etc.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

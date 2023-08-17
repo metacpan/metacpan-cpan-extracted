@@ -18,7 +18,7 @@ configure_requires:
   Test2::Suite: '0.000067'
   perl: '5.010001'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,14 +27,15 @@ name: Alien-SNMP
 provides:
   Alien::SNMP:
     file: lib/Alien/SNMP.pm
-    version: '2.002000'
+    version: '3.0509030000'
 requires:
   Alien::Base: '0.020'
   File::ShareDir: '1.03'
   parent: '0'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/ollyg/Alien-SNMP/issues
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: http://github.com/ollyg/Alien-SNMP
-version: '2.002000'
+version: '3.0509030000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

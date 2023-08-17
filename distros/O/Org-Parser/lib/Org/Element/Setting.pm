@@ -2,16 +2,16 @@ package Org::Element::Setting;
 
 use 5.010001;
 use locale;
+
 use Moo;
-use experimental 'smartmatch';
 extends 'Org::Element';
 with 'Org::ElementRole';
 with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-23'; # DATE
+our $DATE = '2023-07-12'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.558'; # VERSION
+our $VERSION = '0.559'; # VERSION
 
 our @known_settings = qw(
 ARCHIVE
@@ -124,9 +124,9 @@ sub BUILD {
     my $args = $self->args;
     if ($name eq 'DRAWERS') {
         if ($pass == 1) {
-            for (@$args) {
-                push @{ $doc->drawer_names }, $_
-                    unless $_ ~~ @{ $doc->drawer_names };
+            for my $arg (@$args) {
+                push @{ $doc->drawer_names }, $arg
+                    unless grep { $_ eq $arg } @{ $doc->drawer_names };
             }
         }
     } elsif ($name eq 'FILETAGS') {
@@ -134,10 +134,10 @@ sub BUILD {
             no warnings 'once';
             $args->[0] =~ /^$Org::Document::tags_re$/ or
                 die "Invalid argument for FILETAGS: $args->[0]";
-            for (split /:/, $args->[0]) {
-                next unless length;
-                push @{ $doc->tags }, $_
-                    unless $_ ~~ @{ $doc->tags };
+            for my $tag (split /:/, $args->[0]) {
+                next unless length $tag;
+                push @{ $doc->tags }, $tag
+                    unless grep { $_ eq $tag } @{ $doc->tags };
             }
         }
     } elsif ($name eq 'PRIORITIES') {
@@ -160,12 +160,12 @@ sub BUILD {
                 if ($arg eq '|') { $done++; next }
                 $done++ if !$done && @$args > 1 && $i == @$args-1;
                 my $ary = $done ? $doc->done_states : $doc->todo_states;
-                push @$ary, $arg unless $arg ~~ @$ary;
+                push @$ary, $arg unless grep { $_ eq $arg } @$ary;
             }
         }
     } else {
         unless ($self->document->ignore_unknown_settings) {
-            die "Unknown setting $name" unless $name ~~ @known_settings;
+            die "Unknown setting $name" unless grep { $_ eq $name } @known_settings;
         }
     }
 }
@@ -196,7 +196,7 @@ Org::Element::Setting - Represent Org in-buffer settings
 
 =head1 VERSION
 
-This document describes version 0.558 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2022-06-23.
+This document describes version 0.559 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2023-07-12.
 
 =head1 DESCRIPTION
 
@@ -256,13 +256,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

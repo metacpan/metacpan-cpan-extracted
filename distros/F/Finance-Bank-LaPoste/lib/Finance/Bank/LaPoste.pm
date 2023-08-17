@@ -3,14 +3,13 @@ package Finance::Bank::LaPoste;
 use strict;
 
 use Carp qw(carp croak);
-use Graphics::Magick;
 use HTTP::Cookies;
 use LWP::UserAgent;
 use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '9.04';
+our $VERSION = '9.05';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -128,7 +127,7 @@ sub _login {
     $cookie_jar->extract_cookies($response);
     $self->{ua}->cookie_jar($cookie_jar);
 
-    my %mangling_map = _get_number_mangling_map($self, _get_img_map_data($self, $response));
+    my %mangling_map = _get_number_mangling_map($self, $response->content);
     my $password = join('', map { $mangling_map{$_} } split('', $self->{password}));
 
     my $form = HTML::Form->parse($response->content, $first_url);
@@ -176,65 +175,17 @@ sub _rel_fullurl {
 
 sub _output { my $f = shift; open(my $F, ">$f") or die "output in file $f failed: $!\n"; print $F $_ foreach @_; 1 }
 
-# to update %img_md5sum_to_number, set $debug_imgs to 1, 
-# then rename /tmp/img*.xpm into /tmp/[0-9].xpm according to the image
-# then do "md5sum /tmp/[0-9].xpm"
-my $debug_imgs = 0;
-my %img_md5sum_to_number = (
-    '7b0866f479c82ef8cc6c2d599b283644' => 0,
-    'dbe97681a77bd75f811cd318e1b6def3' => 0,
-    '1f15c095fe13e73d341ff1f099925c59' => 1,
-    '264fc8643f2277ce7df738d8bf0d4533' => 1,
-    'af46867b6383a7f4ba563bd493c59163' => 2,
-    'bc09366762776a5bca2161105607302b' => 2,
-    '79215c3e70645d77bee10b57f41397bb' => 3,
-    '71a5e8344d0343928ff077cf292fc7e3' => 3,
-    '6cc8cc78c841a3baa24ea997f5e95372' => 4,
-    '50a363a8d16f6fbba5e8b14432e2d73e' => 4,
-    '424288417b5c56e211dd7e770b7f2a78' => 5,
-    'd8ce75d8bd5c64a2ed10deede9ad7bc9' => 5,
-    '6647804420c37a463b762a3a0d7e247e' => 6,
-    '03c32205bcc9fa135b2a3d105dbb2644' => 6,
-    'a26bac1f76ebffceaeb2eccf5e806ebe' => 7,
-    'ab159c63f95caa870429812c0cd09ea5' => 7,
-    '069cd50cee9e34dff1f17b387122ff5a' => 8,
-    '16454f3fb921be822f379682d0727f3f' => 8,
-    'e74f78fb6d04b5d9f0a814d120a685d8' => 9,    
-    '336809b2bb178abdb8beec26e523af34' => 9,
-    '6110983d937627e8b2c131335c9c73e8' => 'blank',
-);
-
 sub _get_number_mangling_map {
-    my ($self, $img_map_data) = @_;
+    my ($self, $html) = @_;
 
-    my $img_map=Graphics::Magick->new;
-    $img_map->BlobToImage($img_map_data);
-    $img_map->Threshold(threshold => '90%');
-
-    my $size = 64;
-
-    my $i = 0;
     my %map;
-    for my $y (0 .. 3) {
-	for my $x (0 .. 3) {
-
-	    my $newimage = $img_map->Clone;
-	    $newimage->Crop(geometry => 
-			      sprintf("%dx%d+%d+%d",
-				      12, 17,
-				      25+ $x * ($size),
-				      21 + $y * ($size)));
-	    $newimage->Set(magick => 'xpm');
-	    my ($img) = $newimage->ImageToBlob;
-	    if ($debug_imgs) {
-		_output("/tmp/img$x$y.xpm", $img);
-	    }
-	    my $md5sum = Digest::MD5::md5_hex($img);
-	    my $number = $img_md5sum_to_number{$md5sum};
-	    defined($number) or die "missing md5sum, please update \%img_md5sum_to_number (setting \$debug_imgs will help)\n";
-	    $map{$number} = sprintf("%02d", $i);
-	    $i++;
-	}
+    my $i = 0;
+    foreach (split("\n", $html)) {
+        if (/div data-tb-cvd-keys/ ... m!</div>!) {
+            if (m!<button type="button">(\d+)</button>!) {
+                $map{$1} = $i++
+            }
+        }
     }
     %map;
 }
@@ -258,6 +209,15 @@ sub _list_accounts {
     my $html = $response->content;
     my @l = _list_accounts_one_page($self, $html);
 
+    foreach my $account (@l) {
+           if ($account->{type} eq 'cb') {
+               my $html = _GET_content($self, $account->{url});
+               my @urls = $html =~ /<a href="(.*&indexCarte=.*)">/g;
+               if (@urls) {
+                       $account->{url} = _rel_url($response, $urls[-1]); # take last
+               }
+           }
+    }
     if ($self->{all_accounts}) {
         my $html = _GET_content($self, _rel_url($response, '/voscomptes/canalXHTML/comptesCommun/synthese_ep/afficheSyntheseEP-synthese_ep.ea'));
         push @l, _list_accounts_one_page($self, $html, 'savings');
@@ -270,56 +230,38 @@ sub _list_accounts_one_page {
     my @l;
 
     my $flag = '';
-    my ($url, $name, $owner, $account_no, $balance_cb);
+    my ($url, $account_info, $owner, $account_no, $balance_cb);
 
     foreach (split("\n", $html)) {
-        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersPage\(event, '(.*?)'\)!) {
-            $url = $1;
-        } elsif (m!<h3>(.*?)\s*</h3>(?:<span>(.*)</span>)?!) {
-            $name = $1;
-            $owner = $2;
-        } elsif (m!num(?:&#233;|..?)ro de compte">.*</abbr>(.*?)</!) {
-            $account_no = $1;
-        } elsif (m!<div class="amount-euro">([\d\s,.+-]*)! && $url) {
-            my $balance = $normalize_number->($1);
-            push @l, { url => $url, balance => $balance, name => $name, owner => $owner, account_no => $account_no, type => $type } if $url;
-            $url = '';
-        } elsif ($flag eq 'balance_cb' && m!<span class="amount">([\d\s,.+-]*)!) {
-	    $flag = '';
-            $balance_cb = $normalize_number->($1);            
-            $url =~ s/&amp;/&/g;
-            push @l, { url => $url, balance => $balance_cb, name => "Carte bancaire", owner => $owner, account_no => $account_no, type => 'cb' }  if $self->{cb_accounts} || $self->{all_accounts};
+        if ($flag) {
+            if (m!<a href="(.*?)"! || m!redirigerVersPage\(event, '(.*?)'\)!) {
+                $url = $1;
+                $account_info = ''
+            } elsif ($flag eq 'account_resume' && m!<span class="lib sr-only">Solde </span>([\d\s,.+-]*)!) {
+                my $balance = $normalize_number->($1);
+                my $name;
+                ($name, $owner, $account_no) = $account_info =~ m!<span class="pseudo-h3" role="presentation">(.*?)</span><span role="presentation">(.*?)\s*</span><span role="presentation">N&deg;&nbsp;(\w+)</span>!;
+                push @l, { url => $url, balance => $balance, name => $name, owner => $owner, account_no => $account_no, type => $type } if $url;
+                $url = '';
+            } elsif ($flag eq 'balance_cb' && m!<span class="amount">([\d\s,.+-]*)!) {
+                $flag = '';
+                $balance_cb = $normalize_number->($1);            
+                $url =~ s/&amp;/&/g;
+                push @l, { url => $url, balance => $balance_cb, name => "Carte bancaire", owner => $owner, account_no => $account_no, type => 'cb' }  if $self->{cb_accounts} || $self->{all_accounts};
+            } else {
+                s/^\s*//;
+                s/\s*$//;
+                $account_info .= $_;
+            }
         }
-
         if (/account-resume--ccp|account-resume--saving/) {
-            $flag = 'url';
-        } elsif (/D&eacute;bit diff&eacute;r&eacute; en cours/) {
+            $flag = 'account_resume';
+        } elsif (/<div class="additional-data/) {
             $flag = 'balance_cb';
         }
     }
 
     @l;
-}
-
-sub _list_cb_accounts {
-    my ($self, $url) = @_;
-
-    my $response = $self->{ua}->request(HTTP::Request->new(GET => $url));
-    $response->is_success or die "getting $url failed\n" . $response->error_as_HTML;
-
-    my $accounts = $parse_table->($response->content);
-    map {
-	my ($account, $account_no, $balance) = grep { $_ ne '' } @$_;
-	if (ref $account && $account_no) {
-	    my $url = $account->[1];
-	    {
-	        name => $account->[0],
-	        account_no => $account_no, 
-	        balance => $normalize_number->($balance),
-		$url =~ /(releve_ccp|releve_cne|releve_cb|mouvementsCarteDD)\.ea/ ? (url => _rel_url($response, $url)) : (), 
-	    };
-	} else { () }
-    } @$accounts;
 }
 
 sub new {

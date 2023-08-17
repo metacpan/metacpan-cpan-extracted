@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeOutlineBorderRequest.name :   ,
-# PostWorksheetCellsRangeOutlineBorderRequest.sheetName :   ,
-# PostWorksheetCellsRangeOutlineBorderRequest.rangeOperate :   ,
-# PostWorksheetCellsRangeOutlineBorderRequest.folder :   ,
-# PostWorksheetCellsRangeOutlineBorderRequest.storageName :    
+# PostWorksheetCellsRangeOutlineBorderRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeOutlineBorderRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangeOutlineBorderRequest.rangeOperate : Range Set OutlineBorder Request   ,
+# PostWorksheetCellsRangeOutlineBorderRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangeOutlineBorderRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_outline_border' } = { 
-    	summary => '',
+    	summary => 'Sets outline border around a range of cells.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range_operate' => {
      	datatype => 'RangeSetOutlineBorderRequest',
      	base_name => 'rangeOperate',
-     	description => '',
+     	description => 'Range Set OutlineBorder Request ',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

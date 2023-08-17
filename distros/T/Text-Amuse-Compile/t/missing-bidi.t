@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 my $c = Text::Amuse::Compile->new(extra => {
                                             notoc => 1,
@@ -17,7 +17,7 @@ my $c = Text::Amuse::Compile->new(extra => {
 my $muse =<<EOF;
 #lang en
 
-This i just a test. <<<به ویکی‌پدیا خوش‌آمدید>>>
+This i just a test. <[fa]>به ویکی‌پدیا خوش‌آمدید</[fa]>
 EOF
 
 my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});
@@ -35,4 +35,6 @@ SKIP:
 }
 
 ok $tex->exists;
-like $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;
+my $tex_body = $tex->slurp_utf8;
+like $tex_body, qr/\\usepackage\{bidi\}|bidi=default|bidi=basic|bidi=bidi-(l|r)/;
+like $tex_body, qr/\\foreignlanguage\{persian\}\{به ویکی‌پدیا خوش‌آمدید\}/;

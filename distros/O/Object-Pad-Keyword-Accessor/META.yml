@@ -4,11 +4,11 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   Object::Pad::ExtensionBuilder: '0.73'
-  XS::Parse::Keyword::Builder: '0.30'
+  XS::Parse::Keyword::Builder: '0.35'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,12 +19,12 @@ name: Object-Pad-Keyword-Accessor
 provides:
   Object::Pad::Keyword::Accessor:
     file: lib/Object/Pad/Keyword/Accessor.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Object::Pad: '0.60'
-  XS::Parse::Keyword: '0'
-  perl: '5.030'
+  XS::Parse::Keyword: '0.35'
+  perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

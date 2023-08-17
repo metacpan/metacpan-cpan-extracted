@@ -29,7 +29,8 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::Script' => '1.09',
+	# we need at least v1.28 because of script_fails()
+        'Test::Script' => '1.28',
         'Test::Pod' => '1.51',
         'Test::More' => '0',
         'Benchmark' => '0',

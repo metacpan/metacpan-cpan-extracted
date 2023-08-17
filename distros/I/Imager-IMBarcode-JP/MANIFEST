@@ -7,5 +7,6 @@ cpanfile
 lib/Imager/IMBarcode/JP.pm
 minil.toml
 t/00_compile.t
+t/01_validation.t
 META.yml
 MANIFEST

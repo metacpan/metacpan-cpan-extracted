@@ -95,7 +95,7 @@ use constant severity_map => {
 			      5 => 'very-high',
 			     };
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 our $FAKE_WIN32_URIS = 0; # for testing only
 
 sub _initialize {
@@ -278,8 +278,14 @@ sub generate_report {
     my ($self, $r) = @_;
 
     $self->check_uris;
-    $self->slurp_css if $self->force_inline_css;
-    $self->slurp_js if $self->force_inline_js;
+    if($self->force_inline_css) {
+        $self->slurp_css;
+        $self->css_uris([]);
+    }
+    if($self->force_inline_js) {
+        $self->slurp_js;
+        $self->js_uris([]);
+    }
 
     my $params = {
 		  report => $r,
@@ -378,9 +384,8 @@ sub prepare_report {
     }
 
     # do some other handy calcs:
-    $r->{actual_passed} = $r->{passed} + $r->{todo_passed};
     if ($r->{total}) {
-	$r->{percent_passed} = sprintf('%.1f', $r->{actual_passed} / $r->{total} * 100);
+	$r->{percent_passed} = sprintf('%.1f', $r->{passed} / $r->{total} * 100);
     } else {
 	$r->{percent_passed} = 0;
     }
@@ -864,7 +869,7 @@ Unix.  So if you're running under Win32, C<TAP::Formatter::HTML> will look for
 a signature C<'X:\'>, C<'\'> or C<'file:'> at the start of each URI to see if
 you are referring to a file or another type of URI.
 
-Note that you must use 'C<file:///C:\blah>' with I<3 slashes> otherwie 'C<C:>'
+Note that you must use 'C<file:///C:\blah>' with I<3 slashes> otherwise 'C<C:>'
 will become your I<host>, which is probably not what you want.  See
 L<URI::file> for more details.
 

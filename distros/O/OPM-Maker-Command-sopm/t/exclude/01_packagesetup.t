@@ -83,4 +83,15 @@ my $check   = qq~<?xml version="1.0" encoding="utf-8" ?>
 
 is_string $content, $check;
 
+{
+    # check ignore file
+    my @ignored = split /\n/, do { local ( @ARGV, $/) = '.opmbuild_filetest_ignore'; <> };
+    chomp @ignored;
+
+    is_deeply \@ignored, [
+        '.*\.lyx',
+        '.opmbuild_filetest_ignore'
+    ];
+}
+
 done_testing();

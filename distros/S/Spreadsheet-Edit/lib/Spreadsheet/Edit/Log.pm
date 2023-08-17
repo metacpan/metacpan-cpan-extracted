@@ -9,18 +9,23 @@ no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::Log;
 
-our $VERSION = '3.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-05-31'; # DATE from Dist::Zilla::Plugin::OurDate
+# Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
+our $VERSION = '1000.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-06-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Exporter 'import';
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
+our @EXPORT_OK = qw/btw oops/;
+
 use Scalar::Util qw/reftype refaddr blessed weaken/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
 use Carp;
-sub oops(@) { @_=("\n".__PACKAGE__." oops:\n",@_,"\n"); goto &Carp::confess }
+sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
+sub btw(@) { local $_=join("",@_); s/\n\z//s; warn((caller(0))[2].": $_\n"); }
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
 my %backup_defaults = (
@@ -175,6 +180,8 @@ sub _fmt_call($;$$) {
       weaken($prev_obj);
     }
     $msg .= ".";
+  } else {
+    $prev_obj = undef;
   }
 
   $msg .= $subname;
@@ -209,7 +216,7 @@ sub fmt_methcall($;@) {
 sub log_methcall {
   my $opts = &_getoptions;
   my $fh = $opts->{logdest};
-  print $fh &_fmt_methcall($opts, @_);
+  print $fh &fmt_methcall($opts, @_);
 }
 
 1;
@@ -219,11 +226,11 @@ __END__
 
 =head1 NAME
 
-Spreadsheet::Edit::Log - log method/function call, args, and return values
+Spreadsheet::Edit::Log - log method/function calls, args, and return values
 
 =head1 SYNOPSIS
 
-  use Spreadsheet::Edit::Log;
+  use Spreadsheet::Edit::Log qw/:DEFAULT btw oops/;
 
   sub public_method {
     my $self = shift;
@@ -231,8 +238,14 @@ Spreadsheet::Edit::Log - log method/function call, args, and return values
   }
   sub _internal_method {
     my $self = shift;
+
+    oops "zort not set!" unless defined $self->{zort};
+    btw "By the way, the zort is $self->{zort}" if $self->{debug};
+
     my @result = (42, $_[0]*1000);
+
     log_call \@_, [\"Here you go:", @result] if $self->{verbose};
+
     @result;
   }
   ...
@@ -242,13 +255,13 @@ Spreadsheet::Edit::Log - log method/function call, args, and return values
 =head1 DESCRIPTION
 
 (This is generic, no longer specific to Spreadsheet::Edit.  Someday it might
-be published as a stand-alone distribution rather than in Spreadsheet-Edit.)
+be published as a stand-alone distribution rather than packaged in Spreadsheet-Edit.)
 
 This provides perhaps-overkill convenience for "verbose logging" and/or debug
-tracing of subroutein calls.
+tracing of subroutine calls.
 
 The resulting message string includes the location of the
-call to your code, the name of the public function or method called, 
+user's call, the name of the public function or method called, 
 and a representation of the inputs and outputs.
 
 The "public" function/method name shown is not necessarily the immediate caller of the logging function.
@@ -270,37 +283,43 @@ A message string is composed and returned.   The general form is:
  or
   File:linenum Obj<address>->methname input,items,... ==> output,items,...\n
 
-C<[INPUTS]> and C<[RESULTS]> are each a ref to an array of items or
-a single non-aref item, which are used to form a comma-separated list.
+C<[INPUTS]> and C<[RESULTS]> are each a ref to an array of items (or
+a single non-aref item), used to form comma-separated lists.
 
 Each item is formatted like with I<Data::Dumper>, i.e. strings are "quoted"
 and complex structures serialized; printable Unicode characters are shown as
 themselves (rather than hex escapes)
 
-... with one exception:
+... with two exceptions:
 
 =over
 
-If an item is a reference to a a string then the string is inserted as-is (unquoted),
+=item 1. 
+
+If an item is a reference to a string then the string is inserted as-is (unquoted),
 and unless the string is empty, adjacent commas are suppressed.
+This allows concatenating arbitrary text with values formatted by Data::Dumper.
+
+=item 2. 
+
+If an item is an object (blessed reference) then only it's type and
+abbreviated address are shown, unless overridden via
+the C<fmt_object> option described below.
 
 =back
 
-This allows concatenating arbitrary text to regular values formatted with Data::Dumper.
-
-
 B<{OPTIONS}>
 
-(See "Default OPTIONS" below to specify statically)
+(See "Default OPTIONS" below to specify most of these statically)
 
 =over
 
 =item self =E<gt> objref
 
-If your sub is a method, your can pass C<self =E<gt> $self> and the called-upon
-object will be displayed separately before the method name.  
-To reduce clutter, the object is 
-displayed for only the first call in a series of consecutive calls with the 
+If your sub is a method, your can pass C<self =E<gt> $self> and 
+the the invocant will be displayed separately before the method name.
+To reduce clutter, the invocant is 
+displayed for only the first of a series of consecutive calls with the 
 same C<self> value.
 
 =item fmt_object =E<gt> CODE
@@ -308,7 +327,7 @@ same C<self> value.
 Format a reference to a blessed thing, or the value of the C<self> option, if
 passed, whether blessed or not.
 
-The sub is called with args C<($state, $thing)>.  It should return
+The sub is called with args ($state, $thing).  It should return
 either C<$thing> or an alternative representation string.  By default,
 the type/classname is shown and an abbreviated address (see C<addrvis>
 in L<Data::Dumper::Interp>).
@@ -328,18 +347,23 @@ Your sub should return True if the frame represents the call to be described
 in the message.
 
 The default callback is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>,
-which looks for any sub named with an initial [a-z].
+which looks for any sub named with an initial lower-case letter; this
+is based on the convention that internal subs start with an underscore
+or capital letter (such as for constants).
 
 =back
 
 =head2 $string = fmt_methcall {OPTIONS}, $self, [INPUTS], [RESULTS]
 
+A short-hand for
+
+  $string = fmt_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
+
 =head2 log_methcall {OPTIONS}, $self, [INPUTS], [RESULTS]
 
-These are short-hands for 
+A short-hand for
 
-   $string = fmt_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
-   log_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
+  log_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
 
 Usually {OPTIONS} can be omitted, so the short-hand form reduces to
 S<< C<log_methcall $self, [INPUTS], [RESULTS]> >>.
@@ -363,15 +387,46 @@ and C<$subname> omits the Package:: prefix.
 
 =head2 Default OPTIONS
 
-You can provide OPTIONS to use by default in 
+B<our %SpreadsheetEdit_Log_Options = (...);> in your package
+will be used to override the built-in defaults (but are still
+overridden by C<{OPTIONS}> passed in individual calls).
 
-  our %SpreadsheetEdit_Log_Options = (...);
+=head1 Debug Utilities
 
-in your package. 
+Z<>
 
-=head1 AUTHOR / LICENSE
+=head2 btw string,string,...
 
-Jim Avera (jim.avera gmail) / Public Domain or CC0
+For internal debug messages (not related to the other functions).
+
+Prints a message to STDERR preceeded by "linenum:" 
+giving the line number I<of the call to btw>.
+A newline is appended to the message unless the last string
+string already ends with a newline.
+
+This is like C<warn 'message'> when the message omits a final newline;
+but with a nicer presentation.  
+
+Not exported by default.
+
+=head2 oops string,string,...
+
+Prepends "\n<your package name> oops:\n" to the message and then
+chains to Carp::confess for backtrace and death.
+
+Not exported by default.
+
+=head1 SEE ALSO
+
+L<Data::Dumper::Interp>
+
+=head1 AUTHOR
+
+Jim Avera (jim.avera gmail) 
+
+=head1 LICENSE
+
+Public Domain or CC0
 
 =for Pod::Coverage oops
 

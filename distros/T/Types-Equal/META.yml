@@ -1,0 +1,54 @@
+---
+abstract: 'type constraints for single value equality'
+author:
+  - 'kobaken <kfly@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-Equal
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Type::Tiny::Eq:
+    file: lib/Type/Tiny/Eq.pm
+    version: '0.02'
+  Type::Tiny::Equ:
+    file: lib/Type/Tiny/Equ.pm
+    version: '0.02'
+  Type::Tiny::NumEq:
+    file: lib/Type/Tiny/NumEq.pm
+    version: '0.02'
+  Type::Tiny::NumEqu:
+    file: lib/Type/Tiny/NumEqu.pm
+    version: '0.02'
+  Types::Equal:
+    file: lib/Types/Equal.pm
+    version: '0.02'
+requires:
+  Type::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kfly8/Type-Equal/issues
+  homepage: https://github.com/kfly8/Type-Equal
+  repository: https://github.com/kfly8/Type-Equal.git
+version: '0.02'
+x_authority: cpan:KFLY
+x_contributors:
+  - 'kobaken <kentafly88@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

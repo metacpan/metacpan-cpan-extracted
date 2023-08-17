@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Elem 0.04;
+package Syntax::Operator::Elem 0.06;
 
 use v5.14;
 use warnings;
@@ -18,7 +18,7 @@ C<Syntax::Operator::Elem> - element-of-list operators
 
 =head1 SYNOPSIS
 
-On a suitably-patched perl:
+On Perl v5.38 or later:
 
    use Syntax::Operator::Elem;
 
@@ -26,7 +26,7 @@ On a suitably-patched perl:
       say "x is one of the given strings";
    }
 
-Or, on a standard perl:
+Or on Perl v5.14 or later:
 
    use v5.14;
    use Syntax::Operator::Elem qw( elem_str );
@@ -40,15 +40,17 @@ Or, on a standard perl:
 This module provides infix operators that implement element-of-list tests for
 strings and numbers.
 
-Current versions of perl do not directly support custom infix operators. The
-documentation of L<XS::Parse::Infix> describes the situation, with reference
-to a branch experimenting with this new feature. This module is therefore
-I<almost> entirely useless on standard perl builds. While the regular parser
-does not support custom infix operators, they are supported via
-C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>, and so custom keywords
-which attempt to parse operator syntax may be able to use it.
+Support for custom infix operators was added in the Perl 5.37.x development
+cycle and is available from development release v5.37.7 onwards, and therefore
+in Perl v5.38 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail.
 
-Additionally, standard versions of perl can still use the function-like
+While Perl versions before this do not support custom infix operators, they
+can still be used via C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>.
+Custom keywords which attempt to parse operator syntax may be able to use
+these.
+
+Additionally, earlier versions of perl can still use the function-like
 wrapper versions of these operators. Even though the syntax appears like a
 regular function call, the code is compiled internally into the same more
 efficient operator internally, so will run without the function-call overhead
@@ -58,27 +60,44 @@ of a regular function.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( 1, @_ ) }
+sub unimport_into { shift->apply( 0, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $on, $caller, @syms ) = @_;
 
    require Syntax::Operator::In;  # no import
 
-   @syms or @syms = qw( in );
+   @syms or @syms = qw( elem );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Operator::Elem/elem"}++ if delete $syms{in};
+   if( delete $syms{elem} ) {
+      $on ? $^H{"Syntax::Operator::Elem/elem"}++
+          : delete $^H{"Syntax::Operator::Elem/elem"};
+   }
 
    foreach (qw( elem_str elem_num )) {
+      next unless delete $syms{$_};
+
       no strict 'refs';
-      *{"${caller}::$_"} = \&{$_} if delete $syms{$_};
+      $on ? *{"${caller}::$_"} = \&{$_}
+          : warn "TODO: implement unimport of package symbol";
    }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

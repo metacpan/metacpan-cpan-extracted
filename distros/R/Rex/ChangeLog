@@ -1,5 +1,22 @@
 Revision history for Rex
 
+1.14.3 2023-08-05 Ferenc Erki <erkiferenc@gmail.com>
+ - No code changes since the 1.14.2.3-TRIAL release
+
+1.14.2.3-TRIAL 2023-08-03 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix checking command existence
+
+1.14.2.2-TRIAL 2023-07-31 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix checking test git repository
+ - Fix local package installation
+
+1.14.2.1-TRIAL 2023-05-29 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix skipping tests without git
+ - Fix changing directory into git test repository
+
 1.14.2 2023-05-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Fix switching working directory to another drive

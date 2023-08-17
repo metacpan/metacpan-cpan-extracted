@@ -1,5 +1,5 @@
-use warnings;
 use strict;
+use warnings;
 use DOCSIS::ConfigFile;
 use Test::More;
 
@@ -7,7 +7,8 @@ our $AUTOLOAD;
 my @uchar;
 
 @uchar = snmp_object({value => {oid => '1.2.3', type => 'INTEGER', value => 1234567890},});
-is_deeply(\@uchar, [48, 10, 6, 2, 42, 3, 2, 4, 73, 150, 2, 210], 'snmp_object() encoded') or diag "@uchar";
+is_deeply(\@uchar, [48, 10, 6, 2, 42, 3, 2, 4, 73, 150, 2, 210], 'snmp_object() encoded')
+  or diag "@uchar";
 
 @uchar = bigint({value => '123456789123456789'});
 is_deeply(\@uchar, [1, 182, 155, 75, 172, 208, 95, 21], 'bigint() encoded') or diag "@uchar";

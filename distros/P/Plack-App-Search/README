@@ -1,0 +1,182 @@
+NAME
+    Plack::App::Search - Plack search application.
+
+SYNOPSIS
+     use Plack::App::Search;
+
+     my $obj = Plack::App::Search->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::Search->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "css"
+
+            Instance of CSS::Struct::Output object.
+
+            Default value is CSS::Struct::Output::Raw instance.
+
+    *       "generator"
+
+            HTML generator string.
+
+            Default value is 'Plack::App::Search; Version: __VERSION__'
+
+    *       "image_link"
+
+            URL to image above form. Image is centered.
+
+            Default value is undef.
+
+    *       "search_method"
+
+            Search method.
+
+            Default value is 'search'.
+
+    *       "search_title"
+
+            Search title. There will be button with text in this title if is
+            defined. If not, form is without button.
+
+            Default value is undef.
+
+    *       "search_url"
+
+            Search URL.
+
+            Default value is 'https://env.skim.cz'.
+
+    *       "tags"
+
+            Instance of Tags::Output object.
+
+            Default value is Tags::Output::Raw->new('xml' => 1) instance.
+
+    *       "title"
+
+            Page title.
+
+            Default value is 'Login page'.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of search page.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Search;
+     use Plack::Runner;
+     use Tags::Output::Indent;
+
+     # Run application.
+     my $app = Plack::App::Search->new(
+             'css' => CSS::Struct::Output::Indent->new,
+             'generator' => 'Plack::App::Search',
+             'tags' => Tags::Output::Indent->new(
+                     'preserved' => ['style'],
+                     'xml' => 1,
+             ),
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # <!DOCTYPE html>
+     # <html lang="en">
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     #     <meta name="generator" content="Plack::App::Search" />
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     #     <title>
+     #       Search page
+     #     </title>
+     #     <style type="text/css">
+     # * {
+     #      box-sizing: border-box;
+     #      margin: 0;
+     #      padding: 0;
+     # }
+     # .container {
+     #      display: flex;
+     #      align-items: center;
+     #      justify-content: center;
+     #      height: 100vh;
+     # }
+     # .search form {
+     #      display: flex;
+     #      align-items: center;
+     # }
+     # .search input[type="text"] {
+     #      padding: 10px;
+     #      border-radius: 4px;
+     #      border: 1px solid #ccc;
+     # }
+     # .search button {
+     #      margin-left: 10px;
+     #      padding: 10px 20px;
+     #      border-radius: 4px;
+     #      background-color: #4CAF50;
+     #      color: white;
+     #      border: none;
+     #      cursor: pointer;
+     #      display: none;
+     # }
+     # .search button:hover {
+     #      background-color: #45a049;
+     # }
+     # </style>
+     #   </head>
+     #   <body>
+     #     <div class="container">
+     #       <div class="search">
+     #         <form method="get" action="https://env.skim.cz">
+     #           <input type="text" autofocus="autofocus" />
+     #           <button type="submit" />
+     #         </form>
+     #       </div>
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Plack::Component::Tags::HTML, Plack::Util::Accessor,
+    Tags::HTML::Container.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Search>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

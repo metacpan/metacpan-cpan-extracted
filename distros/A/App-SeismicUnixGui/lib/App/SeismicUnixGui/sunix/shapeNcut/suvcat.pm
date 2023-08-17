@@ -2,7 +2,7 @@ package App::SeismicUnixGui::sunix::shapeNcut::suvcat;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: 
+PERL PROGRAM NAME: 
 
 AUTHOR:  
 

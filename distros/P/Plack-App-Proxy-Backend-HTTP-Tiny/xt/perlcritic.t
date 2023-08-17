@@ -7,7 +7,6 @@ use Test::More;
 
 require Test::Perl::Critic;
 
-my $rcfile = File::Spec->catfile( 'xt', 'perlcriticrc' );
-Test::Perl::Critic->import( -profile => $rcfile );
+Test::Perl::Critic->import(-profile => '.perlcriticrc');
 
-all_critic_ok();
+all_critic_ok('examples', 'lib', 't', 'xt', 'Build.PL');

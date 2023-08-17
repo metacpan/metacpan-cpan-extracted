@@ -5,12 +5,11 @@
 Name: ed
 Description: text editor
 Author: George M Jones, gmj@infinet.com
-License: GNU GPL
+License: gpl
 
 =end metadata
 
 =cut
-
 
 # What: A perl version of Unix ed editor.
 #
@@ -21,24 +20,6 @@ License: GNU GPL
 #        - command parsing
 #        - regular expressions (using perl's built in regexps)
 #        - Both regular and extended (-v) error messages
-#        - The following command:
-#            a - append
-#            c - change
-#            d - delete
-#            e - edit file
-#            E - edit file - no questions asked
-#            f - set/show filename
-#            i - insert
-#            p - print
-#            P - print
-#            q - quit
-#            Q - no questions asked
-#            r - read file
-#            s - substitute regexp
-#            w - write file
-#            W - write file append
-#            = - display line number
-#
 #
 # Why?:
 #        - Because ed is "always there" (or supposed to be anyways)
@@ -75,11 +56,7 @@ License: GNU GPL
 # Todo:
 #        - Implement the following commands from the v7 docs:
 #                g - global command
-#                j - join
 #                k - mark
-#                l - "list" lines, show special chars
-#                m - move
-#                t - move/apend
 #                u - undo
 #                v - global command "inVerted"
 #                x - get encryption key
@@ -88,71 +65,92 @@ License: GNU GPL
 #        - Create regression test suite...test against "real" ed.
 #        - add a "-e" flag to allow it to be used in sed(1) like fashion.
 #        - add buffer size limitations for strict compatability
-#        - Save buffer on SIGHUP (meaningless on Windoz ?)
 #        - discard NULS, chars after \n
 #        - refuse to read non-ascii files
 #        - Add BSD/GNU extentions
-#        - add POD documentation
 #
 
-use Getopt::Std;
+use strict;
+
+use Getopt::Std qw(getopts);
 
 # important globals
 
-$maxline = 0;                # lines are numered internally starting at 1
-$CurrentLineNum = 0;        # default to before first line.
-$RememberedFilename = ""; # the default filename for writes, etc.
-$NeedToSave = 0;        # buffer modified
-$UserHasBeenWarned = 0; # has the user been warned about attempt
-                        # to trash buffer/file?
-@lines = ();                # buffer for file being edited.
-$command = "";                # single letter command entered by user
-@adrs = ();                # array of line numbers (1 or 2) for command to operate on
-@args = ();                # command arguments (filenames, search patterns...)
+my $maxline = 0;                # lines are numered internally starting at 1
+my $CurrentLineNum = 0;         # default to before first line.
+my $RememberedFilename = undef; # the default filename for writes, etc.
+my $NeedToSave = 0;             # buffer modified
+my $UserHasBeenWarned = 0;      # warning given regarding modified buffer
+my $Error = undef;              # saved error string for h command
+my $Prompt = undef;             # saved prompt string for -p option
+my $SupressCounts = 0;          # byte counts are printed by default
+my @lines;                      # buffer for file being edited.
+my $command = "";               # single letter command entered by user
+my $commandsuf = "";            # suffix string attached to command
+my @adrs;                       # 1 or 2 line numbers for commands to operate on
+my @args;                       # command arguments (filenames, search patterns...)
 
-# configuration vars
-
-$EXTENDED_MESSAGES = 0; # use useful error messages, not ed compatability messages
+my $EXTENDED_MESSAGES = 0;
 
 # constants
 
-$NO_APPEND_MODE = 0;
-$NO_INSERT_MODE = 0;
-$INSERT_MODE = 1;
-$APPEND_MODE = 2;
-$QUESTIONS_MODE = 1;
-$NO_QUESTIONS_MODE = 0;
+my $NO_APPEND_MODE = 0;
+my $NO_INSERT_MODE = 0;
+my $INSERT_MODE = 1;
+my $APPEND_MODE = 2;
+my $QUESTIONS_MODE = 1;
+my $NO_QUESTIONS_MODE = 0;
+my $PRINT_NUM = 1;
+my $PRINT_BIN = 2;
 
-$VERSION = "0.1";
+my $VERSION = '0.3';
 
+my %ESC = (
+    7  => '\a',
+    8  => '\b',
+    9  => '\t',
+    10 => "\$\n",
+    11 => '\v',
+    12 => '\f',
+    13 => '\r',
+    92 => '\\\\',
+);
+
+$SIG{HUP} = sub {
+    if ($NeedToSave) {
+        my $fh;
+        if (open $fh, '>', 'ed.hup') {
+            shift @lines;
+            print {$fh} join('', @lines);
+            close $fh;
+        }
+    }
+    exit 1;
+};
 #
 # Parse command line ...
 #
 #
 
-$opt_v = 0;
-$opt_d = "";
-$SupressCounts = 0;
 
-unless (getopts('d:v')) {
-    $EXTENDED_MESSAGES = 1;
-    &edDie("Usgae: ed [-v] [-ddebugstring] [-] [filename]","\?",1)
+my %opt;
+getopts('d:p:sv', \%opt) or &Usage;
+if (defined $opt{'p'}) {
+    $Prompt = $opt{'p'};
 }
-
-if ($opt_v) {
+if ($opt{'v'}) {
     $EXTENDED_MESSAGES = 1;
 }
+if ($opt{'s'}) {
+    $SupressCounts = 1;
+}
 
-print "@ARGV\n";
-&edDie("Usgae: ed [-v] [-ddebugstring] [-] [filename]","\?",1)
-    if ($#ARGV > 1);
-
-while ($_ = shift) {
-    if (/-/) {
-        $SupressCounts = 1;
-    } else {
-        $args[0] = $_;
-    }
+&Usage if scalar(@ARGV) > 1;
+my $fname = shift;
+if (!defined($fname) || $fname eq '-') {
+    $SupressCounts = 1;
+} else {
+    $args[0] = $fname;
 }
 
 if ($EXTENDED_MESSAGES) {
@@ -164,13 +162,14 @@ if ($EXTENDED_MESSAGES) {
 # parse commands and execute them...
 #
 
-
-while(<>) {
+while (1) {
+    print $Prompt if defined $Prompt;
+    last unless ($_ = <>);
     chomp;
 
     if (&edParse) {
 
-        if ($opt_d =~ /parse/) {
+        if ($opt{'d'} =~ /parse/) {
             print "command: /$command/ ";
             print "adrs[0]: /$adrs[0]/ " if defined($adrs[0]);
             print "adrs[1]: /$adrs[1]/ " if defined($adrs[1]);
@@ -182,21 +181,21 @@ while(<>) {
 
         if (defined($adrs[0])) {
             if ($adrs[0] > $maxline || $adrs[0] < 0) {
-                edWarn("address out of range","\?");
+                edWarn('address out of range');
                 next;
             }
         }
 
         if (defined($adrs[1])) {
             if ($adrs[1] > $maxline || $adrs[1] < 0) {
-                edWarn("address out of range","\?");
+                edWarn('address out of range');
                 next;
             }
         }
 
         if (defined($adrs[0]) and defined($adrs[1])) {
             unless ($adrs[1] >= $adrs[0]) {
-                edWarn("Second address ($adrs[0]) must be >= first ($adrs[1])","\?");
+                edWarn("Second address ($adrs[0]) must be >= first ($adrs[1])");
                 next;
             }
         }
@@ -213,53 +212,76 @@ while(<>) {
 
         # navigation operations
 
-        if ($command =~ /^$/) {
+        if (!length($command)) {
             &edSetCurrentLine;
-        } elsif ($command =~ /^=$/) {
+        } elsif ($command eq '=') {
             &edPrintLineNum;
 
         # file operations
 
-        } elsif ($command =~ /^[w]$/) {
+        } elsif ($command eq 'w') {
             &edWrite($NO_APPEND_MODE);
-        } elsif ($command =~ /^[W]$/) {
+        } elsif ($command eq 'W') {
             &edWrite($APPEND_MODE);
-        } elsif ($command =~ /^e$/) {
+        } elsif ($command eq 'e') {
             &edEdit($QUESTIONS_MODE,$NO_INSERT_MODE);
-        } elsif ($command =~ /^E$/) {
+        } elsif ($command eq 'E') {
             &edEdit($NO_QUESTIONS_MODE,$NO_INSERT_MODE);
-        } elsif ($command =~ /^r$/) {
+        } elsif ($command eq 'r') {
             &edEdit($QUESTIONS_MODE,$INSERT_MODE);
-        } elsif ($command =~ /^f$/) {
+        } elsif ($command eq 'f') {
             &edFilename;
 
         # text manipulation commands
 
-        } elsif ($command =~ /^[d]$/) {
+        } elsif ($command eq 'd') {
             &edDelete;
-        } elsif ($command =~ /^i$/) {
+        } elsif ($command eq 'i') {
             &edInsert($INSERT_MODE);
-        } elsif ($command =~ /^a$/) {
+        } elsif ($command eq 'a') {
             &edInsert($APPEND_MODE);
-        } elsif ($command =~ /^c$/) {
+        } elsif ($command eq 'c') {
             &edDelete;
             $adrs[1] = undef;
             &edInsert($INSERT_MODE);
-        } elsif ($command =~ /^s$/) {
+        } elsif ($command eq 's') {
             &edSubstitute;
 
         # misc commands
 
-        } elsif ($command =~ /^[pP]$/) {
+        } elsif ($command eq 'p') {
             &edPrint;
+        } elsif ($command eq 'P') {
+            if (defined $Prompt) {
+                $Prompt = undef;
+            } else {
+                $Prompt = defined $opt{'p'} ? $opt{'p'} : '*';
+            }
         } elsif ($command =~ /^q$/) {
             &edQuit($QUESTIONS_MODE);
         } elsif ($command =~ /^Q$/) {
             &edQuit($NO_QUESTIONS_MODE);
+        } elsif ($command eq 'h') {
+            print("$Error\n") if (defined $Error);
+        } elsif ($command eq 'H') {
+            $EXTENDED_MESSAGES ^= 1;
+            if ($EXTENDED_MESSAGES && defined $Error) {
+                print "$Error\n";
+            }
+        } elsif ($command eq 'j') {
+            &edJoin;
+        } elsif ($command eq 'l') {
+            edPrint($PRINT_BIN);
+        } elsif ($command eq 'm') {
+            edMove(1);
+        } elsif ($command eq 'n') {
+            edPrint($PRINT_NUM);
+        } elsif ($command eq 't') {
+            &edMove;
         }
 
     } else {
-        edWarn("unrecognized command", "\?");
+        edWarn('unrecognized command');
     }
 
 
@@ -270,25 +292,147 @@ while(<>) {
 #
 
 sub edPrint {
+    my $mode = shift;
 
     $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $CurrentLineNum unless (defined($adrs[1]));
+    $adrs[1] = $adrs[0] unless (defined($adrs[1]));
 
-    unless ($adrs[1] >= $adrs[0]) {
-        edWarn("Second address must be >= first","\?");
+    if ($adrs[0] == 0 || $adrs[1] == 0) {
+        edWarn('invalid address');
         return;
     }
-
     if (defined($args[0])) {
-        edWarn("Extra arguments detected","\?");
+        edWarn('Extra arguments detected');
         return;
     }
 
-    for my $i ($adrs[0]..$adrs[1]) {
-        print "$lines[$i]";
+    if ($mode == $PRINT_NUM) {
+        for my $i ($adrs[0] .. $adrs[1]) {
+            print $i, "\t", $lines[$i];
+        }
+    } elsif ($mode == $PRINT_BIN) {
+        for my $i ($adrs[0] .. $adrs[1]) {
+            print escape_line($i);
+        }
+    } else {
+        for my $i ($adrs[0] .. $adrs[1]) {
+            print $lines[$i];
+        }
     }
 
     $CurrentLineNum = $adrs[1];
+}
+
+sub escape_line {
+    my $idx = shift;
+
+    my @chars = unpack 'C*', $lines[$idx];
+    if (scalar(@chars) == 0) {
+        die 'internal error: unpack';
+    }
+    my $s = '';
+    foreach my $c (@chars) {
+        if (exists $ESC{$c}) {
+            $s .= $ESC{$c};
+        } elsif (chr($c) !~ m/[[:print:]]/) {
+            $s .= sprintf '\%03o', $c;
+        } else {
+            $s .= chr($c);
+        }
+    }
+    return $s;
+}
+
+# merge lines back into $lines[$adrs[0]]
+sub edJoin {
+    if (defined($args[0])) {
+        edWarn('Extra arguments detected');
+        return;
+    }
+    if (defined($adrs[0]) && $adrs[0] == 0) {
+        edWarn('invalid address');
+        return;
+    }
+    if (defined($adrs[1]) && $adrs[1] == 0) {
+        edWarn('invalid address');
+        return;
+    }
+    if (!defined($adrs[0]) && !defined($adrs[1])) {
+        if ($CurrentLineNum == $maxline) {
+            edWarn('invalid address');
+            return;
+        }
+        $adrs[0] = $CurrentLineNum;
+        $adrs[1] = $CurrentLineNum + 1;
+    }
+    elsif (defined($adrs[0]) && !defined($adrs[1])) { # nop
+        return;
+    }
+    if ($adrs[0] == $adrs[1]) { # nop
+        return;
+    }
+
+    my $buf = $lines[$adrs[0]];
+    my $start = $adrs[0] + 1;
+    for my $i ($start .. $adrs[1]) {
+        chomp $buf;
+        $buf .= $lines[$i];
+    }
+    $lines[$adrs[0]] = $buf;
+    splice @lines, $start, $adrs[1] - $adrs[0];
+    $NeedToSave = 1;
+    $UserHasBeenWarned = 0;
+}
+
+sub edMove {
+    my $delete = shift;
+
+    my $start = $adrs[0];
+    my $end = $adrs[1];
+    unless (defined $start) {
+        $start = $end = $CurrentLineNum;
+    }
+    unless (defined $end) {
+        $end = $start;
+    }
+    if ($start == 0 || $end == 0) { # allowed for $dst only
+        edWarn('invalid address');
+        return;
+    }
+    my $dst = $args[0];
+    unless (defined $dst) {
+        $dst = $CurrentLineNum;
+    }
+    if ($delete) {
+        # move a line to itself
+        if ($start == $dst && $end == $dst) {
+            return;
+        }
+        # move a range into itself
+        if ($dst >= $start && $dst <= $end) {
+            edWarn('invalid destination');
+            return;
+        }
+    }
+
+    my $count = $end - $start + 1;
+    my @copy;
+    if ($count == 1) {
+        push @copy, $lines[$start];
+    } else {
+        @copy = @lines[$start .. $end];
+    }
+    if ($start > $dst && $end > $dst) {
+        splice(@lines, $start, $count) if $delete;
+        splice @lines, $dst + 1, 0, @copy;
+    } else {
+        # avoid $dst referring to the wrong line
+        splice @lines, $dst + 1, 0, @copy;
+        splice(@lines, $start, $count) if $delete;
+    }
+
+    $NeedToSave = 1;
+    $UserHasBeenWarned = 0;
 }
 
 #
@@ -305,15 +449,8 @@ sub edSubstitute {
     $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
     $adrs[1] = $CurrentLineNum unless (defined($adrs[1]));
 
-    $NumLines = $adrs[1]-$adrs[0]+1;
-
-    unless ($adrs[1] >= $adrs[0]) {
-        edWarn("Second address must be >= first","\?");
-        return;
-    }
-
     unless (defined($args[0])) {
-        edWarn("Need a substitution string","\?");
+        edWarn('Need a substitution string');
         return;
     }
 
@@ -335,7 +472,7 @@ sub edSubstitute {
     $LastMatch = $CurrentLineNum;
 
     for my $lineno ($adrs[0]..$adrs[1]) {
-        $evalstring = "\$lines[\$lineno] =~ s$args[0]";
+        my $evalstring = "\$lines[\$lineno] =~ s$args[0]";
 
         if (eval $evalstring) {
             $LastMatch = $lineno;
@@ -357,16 +494,15 @@ sub edSubstitute {
 sub edDelete {
     my($Numlines);
 
-
     $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $CurrentLineNum unless (defined($adrs[1]));
+    $adrs[1] = $adrs[0] unless (defined($adrs[1]));
 
-    $NumLines = $adrs[1]-$adrs[0]+1;
-
-    unless ($adrs[1] >= $adrs[0]) {
-        edWarn("Second address must be >= first","\?");
+    if ($adrs[0] == 0 || $adrs[1] == 0) {
+        edWarn('invalid address');
         return;
     }
+
+    my $NumLines = $adrs[1]-$adrs[0]+1;
 
     splice(@lines,$adrs[0],$NumLines);
 
@@ -381,17 +517,26 @@ sub edDelete {
 #
 
 sub edFilename {
-
+    if (length $commandsuf) {
+        edWarn('unexpected command suffix');
+        return;
+    }
 
     if (defined($adrs[0]) or defined($adrs[1])) {
-        edWarn("too many addresses for command: $#adrs (@adrs)", "\?");
+        edWarn("too many addresses for command: $#adrs (@adrs)");
         return;
     }
 
     if (defined($args[0])) {
         $RememberedFilename = $args[0];
-    } elsif (defined($RememberedFilename)) {
+        return;
+    }
+
+    if (defined($RememberedFilename)) {
         print "$RememberedFilename\n";
+    }
+    else {
+        edWarn('No current filename');
     }
 }
 
@@ -401,8 +546,12 @@ sub edFilename {
 
 sub edWrite {
     my($AppendMode) = @_;
-    my($Numlines,$filename,$chars);
+    my($filename,$chars);
 
+    if (length $commandsuf) {
+        edWarn('unexpected command suffix');
+        return;
+    }
     $chars = 0;
 
     $adrs[0] = 1 unless (defined($adrs[0]));
@@ -410,23 +559,22 @@ sub edWrite {
 
     $filename = defined($args[0]) ? $args[0] : $RememberedFilename;
 
-    if (defined($filename)) {
-        $RememberedFilename = $filename;
-    } else {
-        edWarn("no default filename","\?");
+    if (!defined($filename)) {
+        edWarn('No current filename');
+        return;
     }
-
-    $NumLines = $adrs[1]-$adrs[0]+1;
-
+    $RememberedFilename = $filename;
 
     if ($AppendMode) {
         unless (open(FILE, '>>', $filename)) {
-            edWarn("Unable to open $filename for writing: $!","\?");
+            warn "$filename: $!\n";
+            edWarn('cannot open output file');
             return;
         }
     } else {
         unless (open(FILE, '>', $filename)) {
-            edWarn("Unable to open $filename for writing: $!","\?");
+            warn "$filename: $!\n";
+            edWarn('cannot open output file');
             return;
         }
     }
@@ -455,24 +603,29 @@ sub edWrite {
 
 sub edEdit {
     my($QuestionsMode,$InsertMode) = @_;
-    my(@tmp_lines,@tmp_lines2,$tmp_maxline,$tmp_chars);
+    my(@tmp_lines,@tmp_lines2,$tmp_maxline,$tmp_chars,$chars);
+
+    if (length $commandsuf) {
+        edWarn('unexpected command suffix');
+        return;
+    }
 
     if ($InsertMode) {
         $adrs[0] = $maxline unless (defined($adrs[0]));
 
         if (defined($args[1])) {
-            edWarn("Too many addressses", "\?");
+            edWarn('Too many addressses');
             return;
         }
 
     } else {
         if (defined($adrs[0]) or defined($adrs[1])) {
-            edWarn("too many addresses for command: $#adrs (@adrs)", "\?");
+            edWarn("too many addresses for command: $#adrs (@adrs)");
             return;
         }
     }
 
-    $filename = defined($args[0]) ? $args[0] : $RememberedFilename;
+    my $filename = defined($args[0]) ? $args[0] : $RememberedFilename;
     $RememberedFilename = $filename;
 
     if ($filename eq "" ) {
@@ -483,14 +636,21 @@ sub edEdit {
 
     # suck the file into a temp array
 
+    if (-d $filename) {
+        warn "$filename: is a directory\n";
+        edWarn('cannot read input file');
+        return 0;
+    }
     unless (open(SOURCE, '<', $filename)) {
-        edWarn ("unable to open $filename: $!","\?");
+        warn "$filename: $!\n";
+        edWarn('cannot open input file');
         return 0;
     }
 
     @tmp_lines = ();
     $tmp_maxline = 0;
     $tmp_chars = 0;
+    $chars = 0;
 
     while(<SOURCE>) {
         push(@tmp_lines,$_);
@@ -504,7 +664,7 @@ sub edEdit {
 
     if ($InsertMode) {
 
-        if ($adrs[0] == $maxline) {
+        if ($maxline != 0 && $adrs[0] == $maxline) {
             push(@lines,@tmp_lines);
             $CurrentLineNum += $tmp_maxline;
         } elsif ($adrs[0] == 0) {
@@ -532,7 +692,7 @@ sub edEdit {
             if ($QuestionsMode) {
                 unless ($UserHasBeenWarned) {
                     $UserHasBeenWarned = 1;
-                    edWarn("file modified","\?");
+                    edWarn('file modified');
                     return;
                 }
             }
@@ -566,19 +726,14 @@ sub edInsert {
     my(@tmp_lines,@tmp_lines2,$tmp_maxline,$tmp_chars);
 
     if (defined($args[0])) {
-        edWarn("Extra arguments detected","\?");
+        edWarn('Extra arguments detected');
         return;
     }
 
     $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
 
-    if (defined($args[1])) {
-        edWarn("Too many addressses", "\?");
-        return;
-    }
-
-    if ($adrs[0] == 0 and ($Mode == $INSERT_MODE)) {
-        edWarn("Can't insert before line 0","\?");
+    if (defined($adrs[1])) {
+        edWarn('Too many addresses');
         return;
     }
 
@@ -599,19 +754,17 @@ sub edInsert {
 
     if ($Mode == $INSERT_MODE) {
 
-        if ($adrs[0] == 1) {
-            shift(@lines); # get rid of undefined line
+        shift @lines; # get rid 0 line
+        if ($adrs[0] == 0 || $adrs[0] == 1) {
             unshift(@lines,@tmp_lines);
-            unshift(@lines,undef); # put 0 line back
             $CurrentLineNum = $tmp_maxline;
         } else {
-            shift(@lines); # get rid 0 line
             @tmp_lines2 = splice(@lines,0,$adrs[0]-1);
             unshift(@lines,@tmp_lines);
             unshift(@lines,@tmp_lines2);
             $CurrentLineNum = $adrs[0] + $tmp_maxline - 1;
-            unshift(@lines,undef); # put 0 line back
         }
+        unshift @lines, undef; # put 0 line back
 
     } elsif ($Mode == $APPEND_MODE) {
 
@@ -650,7 +803,7 @@ sub edPrintLineNum {
     my($adr);
 
     if (defined($args[0])) {
-        edWarn("Extra arguments detected","\?");
+        edWarn('Extra arguments detected');
         return;
     }
 
@@ -674,14 +827,14 @@ sub edQuit {
     my($QuestionMode) = @_;
 
     if (defined($args[0])) {
-        edWarn("Extra arguments detected","\?");
+        edWarn('Extra arguments detected');
         return;
     }
 
     if ($QuestionMode) {
         if ($NeedToSave) {
             unless ($UserHasBeenWarned) {
-                edWarn("Current buffer has been modified but not saved","\?");
+                edWarn('Current buffer has been modified but not saved');
                 $UserHasBeenWarned = 1;
                 return;
             }
@@ -709,7 +862,7 @@ sub edSetCurrentLine {
     my $adr;
 
     if (defined($args[0])) {
-        edWarn("Extra arguments detected","\?");
+        edWarn('Extra arguments detected');
         return;
     }
 
@@ -724,7 +877,7 @@ sub edSetCurrentLine {
         if (($adr <= $maxline) && ($adr > 0) && ($maxline > 0)) {
             $CurrentLineNum = $adr;
         } else {
-            edWarn("requested line ($adr) out of range: 1-$maxline","\?");
+            edWarn("requested line ($adr) out of range: 1-$maxline");
             return 0;
         }
 
@@ -735,7 +888,7 @@ sub edSetCurrentLine {
         if ($CurrentLineNum < $maxline) {
             $CurrentLineNum++;
         } else {
-            edWarn("already at end of file","\?");
+            edWarn('already at end of file');
             return 0;
         }
     }
@@ -768,7 +921,7 @@ sub edParse {
 
     @adrs = ();
 
-    @fields =
+    my @fields =
              (/^(
                  (
                   ((\d+)|(\.)|(\$)|([\/\?]([^\/\?+-]+)[\/\?]?))?
@@ -782,7 +935,7 @@ sub edParse {
                   (([+-])?(\d+))?         # [+]num | -num
                   (([\+]+)|([-^]+))?        # + | -
                 )?
-                 ([acdeEfipPqQrswW=])?        # command char
+                 ([acdeEfhHijlmnpPqQrstwW=])?        # command char
                  \s*(\S+)?                # argument (filename, etc.)
                  )$/x);
 
@@ -801,6 +954,8 @@ sub edParse {
     $adrs[0] = &CalculateLine(splice(@fields,1,13));
     $adrs[1] = &CalculateLine(splice(@fields,1,13));
 
+    my @cmd = split /\s+/, $fields[0];
+    $commandsuf = substr $cmd[0], 1;
 
     return 1;
 }
@@ -820,9 +975,7 @@ sub CalculateLine {
 
     my($myline);
 
-    $myline = undef;
-
-    if ($opt_d =~ /parse/) {
+    if ($opt{'d'} =~ /parse/) {
         print "expr1=/$expr1/\n" if (defined($expr1));
         print "decimaladr=/$decimaladr/\n" if (defined($decimaladr));
         print "dotadr=/$dotadr/\n" if (defined($dotadr));
@@ -847,19 +1000,15 @@ sub CalculateLine {
         } elsif (defined($dollaradr)) {
             $myline = $maxline;
         } elsif (defined($searchadr)) {
+            my $pattern = $searchadr;
+            $pattern =~ s/[\?\/]$//;
+            $pattern =~ s/^[\?\/]//;
 
-            $pattern = $searchadr;
-            $pattern =~ s/\/$//;
-            $pattern =~ s/^\///;
-
-
-            if ($wholesearch =~ /^\/.*\/$/) {
+            if ($wholesearch =~ /^\?/) {
+                $myline = edSearchBackward($pattern);
+            } else {
                 $myline = edSearchForward($pattern);
-                } else {
-                    $myline = edSearchBackward($pattern);
-                }
-
-#            $command = "";
+            }
         }
     }
 
@@ -960,45 +1109,202 @@ sub edSearchBackward {
 
 
 #
-# Exit with error
+# Print usage and exit
 #
-# edDie($msg,$status)
+# Usage()
 #
 
-sub edDie {
-    my($useful_msg,$original_ed_msg,$status) = @_;
-
-
-    if ($EXTENDED_MESSAGES) {
-        printf STDERR "$useful_msg\n";
-
-    } else {
-        print STDERR "$original_ed_msg\n";
-    }
-
-    exit $status;
+sub Usage {
+    die "Usage: ed [-p prompt] [-ddebugstring] [-sv] [file]\n";
 }
 
 #
-# Exit with error
+# Print error and save it
 #
-# edWarn($msg,$original_ed_msg)
+# edWarn($msg)
 #
 
 sub edWarn {
-    my($useful_msg,$original_ed_msg) = @_;
+    my $msg = shift;
 
-
+    $Error = $msg;
+    print "?\n";
     if ($EXTENDED_MESSAGES) {
-        printf STDERR "$useful_msg\n";
-    } else {
-        print STDERR "$original_ed_msg\n";
+        print "$msg\n";
     }
 }
 
+__END__
 
 =encoding utf8
 
 =head1 NAME
 
 ed - text editor
+
+=head1 SYNOPSIS
+
+ed [-p prompt] [-ddebugstring] [-sv] [file]
+
+=head1 DESCRIPTION
+
+ed initially reads its input file into a buffer.
+If no file argument is provided the buffer will be empty.
+Commands are then entered to display, modify and save the buffer.
+Line numbers within the buffer are referred to as addresses.
+Address 1 is the first line in the buffer; address 0 is invalid.
+
+ed keeps track of the current line selected in the buffer.
+Commands for modifying the buffer can be entered without an explicit
+address; the current line will be processed.
+Entering a bare address such as "2" first resets the current
+line pointer, then prints the line.
+
+Commands are denoted by a single letter.
+The "p" command prints one or more lines.
+An address can precede a command, so "2p" first resets the current
+line pointer then prints the line.
+This is the same result as for entering the bare address "2";
+however, print is explicit.
+
+A command may operate on a range of addresses at once.
+An address range is entered as two numbers separated by a comma, e.g. "1,10".
+The numbers are included as the first and last number of the range.
+So "1,10" spans from line 1 to 10.
+A range is then used as a command prefix, e.g. "1,2p" will print 2 lines.
+Addressing a line outside the scope of the buffer results in an error.
+
+The commands "a", "c" and "i" allow text to be entered into the buffer.
+Text input is terminated by a line containing the single character ".".
+If an error occurs ed will print "?".
+The "h" command fetches the saved error message and prints it.
+
+=head2 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item -ddebugstring
+
+Print debugging output. debugstring may be set to "parse".
+
+=item -p STRING
+
+Use the specified STRING as a command prompt.
+By default no prompt is displayed.
+
+=item -s
+
+Suppress byte counts
+
+=item -v
+
+Print full error messages; equivalent to the "H" command
+
+=back
+
+=head2 EDITOR COMMANDS
+
+=over 4
+
+=item a
+
+Append text
+
+=item c
+
+Change text
+
+=item d
+
+Delete text
+
+=item E FILE
+
+Forced "e" command; suppress warning prompt
+
+=item e FILE
+
+Load and edit the named FILE argument
+
+=item f [FILE]
+
+Show/set a filename
+
+=item H
+
+Toggle help mode; this causes descriptive errors to be displayed
+
+=item h
+
+Display last error
+
+=item i
+
+Insert text
+
+=item j
+
+Join a range of lines into a single line
+
+=item l
+
+Print lines with escape sequences for non-printable characters
+
+=item m
+
+Move a range of lines to a new address
+
+=item n
+
+Print from buffer with line number prefix
+
+=item P
+
+Toggle command prompt mode.
+A string provided by -p will be used; otherwise, the default is '*'
+
+=item p
+
+Print from buffer
+
+=item Q
+
+Forced "q" command; suppress warning prompt
+
+=item q
+
+Quit program
+
+=item r FILE
+
+Read named FILE into buffer
+
+=item s///
+
+Substitute text with a regular expression
+
+=item t
+
+Copy a range of lines to a destination address
+
+=item W [FILE]
+
+Write buffer to file in append mode
+
+=item w [FILE]
+
+Write buffer to file
+
+=item =
+
+Display current line number
+
+=back
+
+=head1 AUTHOR
+
+Written by George M Jones
+
+=cut

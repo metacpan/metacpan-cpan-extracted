@@ -97,7 +97,7 @@
     94  attribute   text-anchor           middle
     95  attribute   x                     69
     96  attribute   y                     -176.3
-    97  content     text                  Reichwaldstraße
+    97  content     text                  ReichwaldstraÃe
     98  tag         text                  close
     99  content     g                     
 
@@ -164,7 +164,7 @@
    157  attribute   text-anchor           middle
    158  attribute   x                     232
    159  attribute   y                     -176.3
-   160  content     text                  ʎ ʏ ʐ ʑ ʒ ʓ ʙ ʚ
+   160  content     text                  Ê Ê Ê Ê Ê Ê Ê Ê
    161  tag         text                  close
    162  content     g                     
 
@@ -231,7 +231,7 @@
    220  attribute   text-anchor           middle
    221  attribute   x                     82
    222  attribute   y                     -102.3
-   223  content     text                  Böhme
+   223  content     text                  BÃ¶hme
    224  tag         text                  close
    225  content     g                     
 
@@ -298,7 +298,7 @@
    283  attribute   text-anchor           middle
    284  attribute   x                     158
    285  attribute   y                     -14.3
-   286  content     text                  ΔΔΔΔΔΔΔΔΔΔΔΔΔΔΔΔΔ
+   286  content     text                  ÎÎÎÎÎÎÎÎÎÎÎÎÎÎÎÎÎ
    287  tag         text                  close
    288  content     g                     
 
@@ -352,7 +352,7 @@
    335  attribute   text-anchor           middle
    336  attribute   x                     143
    337  attribute   y                     -58.3
-   338  content     text                  Label has a ☃
+   338  content     text                  Label has a â
    339  tag         text                  close
    340  content     g                     
 
@@ -380,7 +380,7 @@
    360  attribute   text-anchor           middle
    361  attribute   x                     225
    362  attribute   y                     -102.3
-   363  content     text                  Πηληϊάδεω Ἀχιλῆος
+   363  content     text                  Î Î·Î»Î·ÏÎ¬Î´ÎµÏ á¼ÏÎ¹Î»á¿Î¿Ï
    364  tag         text                  close
    365  content     g                     
 
@@ -468,7 +468,7 @@
    444  attribute   text-anchor           middle
    445  attribute   x                     237.5
    446  attribute   y                     -58.3
-   447  content     text                  Label has a ✔
+   447  content     text                  Label has a â
    448  tag         text                  close
    449  content     g                     
 

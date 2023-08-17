@@ -95,6 +95,11 @@ subtest chord_map => sub {
     ];
     throws_ok { $obj->generate }
         qr/chord_map length must equal number of net keys/, 'invalid chord_map';
+
+    $obj = new_ok 'Music::Chord::Progression' => [
+        scale_name => 'chromatic',
+    ];
+    is_deeply $obj->chord_map, [('m') x 12], 'chromatic';
 };
 
 done_testing();

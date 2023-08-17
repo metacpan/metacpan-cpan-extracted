@@ -1,16 +1,17 @@
 package Text::NumericData;
 
+use strict;
 use Storable qw(dclone);
 
 # TODO: optimize those regexes, compile once in constructor
 
 # major.minor.bugfix, the latter two with 3 digits each
 # It's not pretty, but I gave up on 1.2.3 style.
-our $VERSION = '2.003003';
+our $VERSION = '2.004001';
 our $version = $VERSION;
 $VERSION = eval $VERSION;
 
-our $years = '2005-2017';
+our $years = '2005-2023';
 our $copyright = 'Copyright (c) '.$years.' Thomas Orgis, Free Software licensed under the same terms as Perl 5.10';
 our $author = 'Thomas Orgis <thomas@orgis.org>';
 
@@ -230,7 +231,7 @@ sub line_check #return 1 and set separator and line ending if data line and 0 ot
 			my $rest = $3;
 			$rest =~ s:$q$::;
 			$sep =~ s:\s+$:\\s+:
-				unless($strict);
+				unless($self->{config}{strict});
 			my @ax = split($q.$sep.$q,$rest);
 			$self->{titles} = \@ax;
 			$self->{config}{lineend} = $5
@@ -371,7 +372,8 @@ sub data_line
 	my $self = shift;
 	my $ar = shift;
 
-	my $wr = shift;
+	my $cols_include = shift;
+	my $cols_exclude = shift;
 	my $l = '';
 	my $zahl = $self->{config}{numregex};
 	my $end = $self->get_end();
@@ -380,19 +382,35 @@ sub data_line
 	my @cols;
 	my $i = -1;
 
-	unless(defined $wr)
+	unless(defined $cols_include)
 	{
 		@vals = @{$ar};
 		@cols = (0..$#vals);
 	}
 	else
 	{
-		for my $k (@{$wr})
+		for my $k (@{$cols_include})
 		{
 			push(@vals, ($k > -1 and $k < @{$ar})
 				? $ar->[$k]
 				: $self->{config}{fill}); 
 			push(@cols, $k > -1 ? $k : 0); # ... for numerformat ... arrg
+		}
+	}
+
+	if(defined $cols_exclude)
+	{
+		my @oldvals = @vals;
+		my @oldcols = @cols;
+		@vals = ();
+		@cols = ();
+		for(my $i=0; $i<=$#oldvals; ++$i)
+		{
+			if(not grep {$_ == $i} @{$cols_exclude})
+			{
+				push(@vals, $oldvals[$i]);
+				push(@cols, $oldcols[$i]);
+			}
 		}
 	}
 
@@ -426,7 +444,22 @@ sub data_line
 sub title_line
 {
 	my $self = shift;
-	my $ar = shift;
+	my $cols_include = shift;
+	my $cols_exclude = shift;
+
+	my @cols = defined $cols_include ? @{$cols_include} : (0..$#{$self->{titles}});
+	if(defined $cols_exclude)
+	{
+		my @oldcols = @cols;
+		@cols = ();
+		for(my $i=0; $i<=$#oldcols; ++$i)
+		{
+			if(not grep {$_ == $i} @{$cols_exclude})
+			{
+				push(@cols, $oldcols[$i]);
+			}
+		}
+	}
 
 	my $end = $self->get_end();
 	my $sep = $self->get_outsep();
@@ -435,21 +468,16 @@ sub title_line
 	my $l = $com.$q;
 	#print STDERR "titles: @{$self->{titles}}\n";
 	#print STDERR "titles for @{$ar}\n" if defined $ar;
-	unless(defined $ar){ $l = $com.$q.join($q.$sep.$q, @{$self->{titles}}).$q.$end; }
-	else
+	foreach my $k (@cols)
 	{
-		foreach my $k (@{$ar})
-		{
-			# should match for title containing $q
-			my $t = $k > -1 ? $self->{titles}->[$k] : undef;
-			$t = "" unless defined $t;
-			$l .= $t.$q.$sep.$q;
-		}
-		$l =~ s/$q$//;
-		$l =~ s/$sep$/$end/;
+		# should match for title containing $q
+		my $t = $k > -1 ? $self->{titles}->[$k] : undef;
+		$t = "" unless defined $t;
+		$l .= $t.$q.$sep.$q;
 	}
+	$l =~ s/$q$//;
+	$l =~ s/$sep$/$end/;
 	return \$l;
-	
 }
 
 sub comment_line
@@ -519,10 +547,6 @@ Text::NumericData - parsing and writing of textual numeric data files
 	
 	print $c->data_line($data);
 
-=head1 TODO
-
-Add description of fill behaviour. Change argument behaviour of line_data to accept the plain string in $_[0] (it's a reference anyway). Return value needs to stay reference for performance reasons (sadly, this indeed makes a difference). Make line_check also take straight string as argument.
-
 =head1 DESCRIPTION
 
 This module (class) contains the basic parsing structure for Text::NumericData. It is intended for use with numerical data sets in text files as commonly produced by data aquisition software - there often called "ASCII file". It's not about arbitary tabular data - the main intention are rows of numbers after some header that ideally contains information about what kind of data is in there. Simple text fields are supported, but beware of any separator-looking characters in there!
@@ -553,17 +577,29 @@ checks if $line appears to have some data (starts with a number followed by a se
 
 input: extract the @data of $line; the return value is undefined for empty lines
 
-=item * data_line(\@data) -> \$line
+=item * data_line(\@data, \@cols_include, \@cols_exclude) -> \$line
 
 output: have @data, produce $line
+
+This also optionally accepts an array reference for zero-based column indices to include and/or
+an array of columns to exclude. If both are given, the exclusion referes to the columns after
+selection by @cols_include. If you just want to exclude, call it like this:
+
+	$c->data_line(\@data, undef, \@cols_exclude)
 
 =item * comment_line($comment) -> \$line
 
 output: have bare comment, produce full $line
 
-=item * title_line(\@colnumbers) -> \$line
+=item * title_line(\@colnumbers, \@exclude_colnumbers) -> \$line
 
-output: form a proper line with the titles matching the specified columns (starting at 0 - plain array index!) or a line for all columns if @colnumbers is unspecified 
+output: form a proper line with the titles matching the specified columns (starting at 0 - plain array index!) or a line for all columns if @colnumbers is unspecified.
+
+You can also hand in a list of columns to exclude, just like with line_data():
+
+	$c->title_line(undef, \@exclude_colnumbers)
+
+Same logic applies if you specify both.
 
 =item * chomp_line($line)
 
@@ -624,6 +660,10 @@ just split at every separator occurence to get the data array (otherwise there i
 
 allow text in data field in non-strict mode (no effect in strict mode)
 
+=item * fill [0/1]
+
+specify a value to fill in if non-present data is demanded (when invoking line_data())
+
 =back
 
 =head2 Output
@@ -664,7 +704,7 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2013, Thomas Orgis.
+Copyright (C) 2004-2023, Thomas Orgis.
 
 This module is free software; you
 can redistribute it and/or modify it under the same terms

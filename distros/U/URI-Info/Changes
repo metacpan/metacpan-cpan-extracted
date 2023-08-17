@@ -1,3 +1,17 @@
+0.004   2023-06-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Add plugins:
+          SearchQuery:{amazon,baidu,bukalapak,lazada_co_id,shopee_co_id,youtube}.
+
+        - Rename some plugins (unless well-known and have many domains, we use
+          the domain name as plugin name, e.g. blibli_com instead of blibli).
+
+
+0.003   2023-06-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add plugin: SearchQuery::blibli.
+
+
 0.002   2021-10-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Add plugin: Generic.

@@ -1,0 +1,204 @@
+#!/usr/bin/env perl
+#ABSTRACT: Test the configuration and FR24 API
+#PODNAME: fr24test
+
+use 5.018;
+use utf8;
+use open qw( :encoding(UTF-8) :std );
+use FindBin qw($RealBin);
+if (-e "$RealBin/../dist.ini") {
+    use lib "$RealBin/../lib";
+}
+use WWW::Telegram::BotAPI;
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+use JSON::PP;
+use Getopt::Long;
+use FR24::Utils;
+our $conf;
+my $width = 60;
+my $opt_config = "$ENV{HOME}/.config/fr24-bot.ini";
+my $opt_verbose;
+my $opt_debug;
+my $opt_token;
+my $opt_ip;
+my $opt_port;
+GetOptions(
+ 'a|api-key=s' => \$opt_token,
+ 'i|ip=s'      => \$opt_ip,
+ 'p|port=i'    => \$opt_port,
+ 'c|config=s'  => \$opt_config,
+ 'verbose'   => \$opt_verbose,
+ 'debug'     => \$opt_debug,
+ 'version'   => sub { say basename($0). " " . $FR24::Utils::VERSION; exit 0;},
+);
+
+$opt_verbose = 1 if $opt_debug;
+
+# Load config
+if ( defined $opt_config and -e $opt_config ) {
+    say STDERR "Reading config from $opt_config" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig($opt_config);
+
+} elsif ( -e "$ENV{HOME}/.config/fr24-bot.ini" ) {
+  	say STDERR "Reading config from ~/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$ENV{HOME}/.config/fr24-bot.ini");
+} elsif ( -e "$RealBin/.config/fr24-bot.ini" ) {
+    say STDERR "Reading config from $RealBin/.config/fr24-bot.ini" if ($opt_verbose);
+    $conf = FR24::Utils::loadconfig("$RealBin/.config/fr24-bot.ini");
+}
+ 
+
+# If API KEY is provided in the command line, use it
+if ( defined $opt_token and $opt_token ne 'default' ) {
+    say STDERR "Using token from command line" if ($opt_verbose);
+    $conf->{telegram}->{apikey} = $opt_token;
+} elsif ( defined $conf->{telegram}->{apikey}) {
+    say STDERR "Using token from config file" if ($opt_verbose);
+    $opt_token = $conf->{telegram}->{apikey};
+} else {
+    say STDERR Dumper $conf if ($opt_verbose);
+    die "APIKey file not found. Can be in:\n - $ENV{HOME}/.config/fr24-bot.ini\n - $RealBin/.config/fr24-bot.ini\n - --token TOKEN\n";
+}
+
+# If API KEY is provided in the command line, use it
+if ( defined $opt_port and $opt_port ne 'default' ) {
+    say STDERR "Using port from command line" if ($opt_verbose);
+    $conf->{server}->{port} = $opt_port;
+} elsif ( defined $conf->{server}->{port}) {
+    say STDERR "Using port from config file" if ($opt_verbose);
+    $opt_port = $conf->{server}->{port};
+} else {
+    say STDERR Dumper $conf if ($opt_verbose);
+    die "Port not found\n";
+}
+
+die "ERROR: No API key provided\n" unless defined $opt_token;
+
+
+# Check telegram bot API KEY
+eval {
+    my $api = WWW::Telegram::BotAPI->new( token => $opt_token );
+    $api->agent->can("inactivity_timeout") and $api->agent->inactivity_timeout(45);
+    my $me = $api->getMe or die;
+};
+ 
+check($@ ? 0 : 1, "API key is valid $opt_token");
+
+sub check {
+    my ($condition, $message) = @_;
+    # Print message in a column large 50 chars:
+    printf "%-${width}s", substr($message, 0, $width);
+    print length("$message") > $width ? "..." : "   ";
+    if ($condition) {
+        print BOLD GREEN, " OK", RESET;
+    } else {
+        print BOLD RED, " ERROR", RESET;
+    }
+    print RESET, "\n";
+}
+
+# Check IP
+
+my %urls = (
+    'test' => 'http://ifconfig.me',
+    'test-https' => 'https://google.com',
+    'fr24-web' => 'https://flightradar24.com/',
+    
+);
+if (defined $conf->{server}->{ip} and defined $conf->{server}->{port}) {
+    $urls{'fr24-antenna'} = 'http://' . $conf->{server}->{ip} . ':' .  $conf->{server}->{port} . '/settings.html';
+}
+
+for my $key (reverse sort  keys %urls) {
+    my $url = $urls{$key};
+    my $check = FR24::Utils::url_exists($url);
+    # Print key (column 10 chars), check (3 chars), url (column 50 chars)
+    printf "%-${width}s", substr("$key ($url)", 0, $width);
+    print length("$key ($url)") > $width ? "..." : "   ";
+    if ($check) {
+        print BOLD GREEN," OK    ", RESET;
+    } else {
+        print BOLD RED,  " ERROR ", RESET;
+    }
+     
+    print RESET, "\n";
+}
+
+my $self = FR24::Utils::systeminfo($conf);
+
+check(defined $self->{"local_ips"} ? 1 : 0, "IP is valid: " . $self->{"local_ips"} // "undef");
+
+check(defined $self->{"feed_alias"} ? 1 : 0, "Antenna alias: " . $self->{"feed_alias"} // "undef");
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fr24test - Test the configuration and FR24 API
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 SYNOPSIS
+
+    fr24test
+
+=head1 DESCRIPTION
+
+Test the configuration and FR24 API and print the results in a terminal table.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c>, B<--config> FILE
+
+Load configuration from FILE. Default: ~/.config/fr24-bot.ini
+
+=item B<-a>, B<--api-key> TOKEN
+
+Use TOKEN as Telegram API key. Default: read from config file
+
+=item B<-i>, B<--ip> IP
+
+Use IP as local IP. Default: read from config file
+
+=item B<-p>, B<--port> PORT
+
+Use IP as local IP. Default: read from config file
+
+=item B<--verbose>
+
+Print debug messages
+
+=back
+
+=head1 EXAMPLE OUTPUT
+
+  API key is valid 0000087905:AAAQFfvvAAAbvvBTcB78iE8wO2zuapWF... OK
+  test-https (https://google.com)                                 OK    
+  test (http://ifconfig.me)                                       OK    
+  fr24-web (https://flightradar24.com/)                           OK    
+  fr24-antenna (http://localhost:8754/settings.html)              OK    
+  IP is valid: 149.125.196.218 172.7.0.1                          OK
+  Antenna alias: T-EGSH255                                        OK
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

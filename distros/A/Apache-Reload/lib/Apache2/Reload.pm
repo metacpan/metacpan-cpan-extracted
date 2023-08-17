@@ -18,7 +18,7 @@ package Apache2::Reload;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Apache2::Const -compile => qw(OK);
 
@@ -363,7 +363,7 @@ a module.
 
   Apache2::Reload->unregister_module('Some::Module');
 
-But be carefull, since unregistering a module in this way will only
+But be careful, since unregistering a module in this way will only
 do so for the current interpreter. This feature should be used with
 care.
 

@@ -1,5 +1,6 @@
 ---
 testing_faketime: 2022-08-30T21:28:00
+# yamllint disable rule:line-length
 files:
   00-basic-sitenews.webfetch:
     - {name: "empty test"}
@@ -41,7 +42,7 @@ files:
     - {op: value, path: [webfetch, dest], expected: "capture"}
     - {op: value, path: [webfetch, dest_format], expected: "capture"}
     - {op: value, path: [webfetch, num_links], expected: 5}
-    - {op: value, path: [webfetch, long_path], expected: "01-webfetch-releases-long.out", path: [webfetch, long_path]}
+    - {op: value, path: [webfetch, long_path], expected: "01-webfetch-releases-long.out"}
     - {op: value, path: [webfetch, short_path], expected: "01-webfetch-releases-short.out"}
     - {op: value, path: [webfetch, source], expected: "t/test-inputs/020-sitenews/01-webfetch-releases.webfetch"}
     - {op: value, path: [webfetch, source_format], expected: "sitenews"}

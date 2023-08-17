@@ -1,0 +1,85 @@
+#!/usr/local/bin/perl -w
+
+use SNMP_util;
+
+sub process_nest ($$);
+
+snmpmapOID ("slotCardName", "1.3.6.1.4.1.2522.1.1.2.1.1.2",
+	    "slotCardType", "1.3.6.1.4.1.2522.1.1.2.1.1.3",
+	    "slotCardStatus", "1.3.6.1.4.1.2522.1.1.2.1.1.4",
+	    "slotIpAddress", "1.3.6.1.4.1.2522.1.1.3.1.1.2",
+	    "cardName", "1.3.6.1.4.1.2522.1.1.3.1.1.3");
+
+my @nestmasters =
+    (['mCE11','public@130.59.48.16'],
+     ['mCE13','public@130.59.48.17'],
+     ['mLS11','public@130.59.48.80'],
+     ['mLS13','public@130.59.48.81'],
+     ['mBE11','public@130.59.48.144'],
+     ['mBE13','public@130.59.48.145'],
+     ['mBA11','public@130.59.48.208'],
+     ['mEZ11','public@130.59.49.16'],
+    );
+
+## Override here if you just want to re-generate the names for one nest.
+# @nestmasters = (['mCE11','public@130.59.48.16']);
+
+my %short_types =
+    qw(GMI-1GSX      c
+       GMI-1GLX      c
+       GMOA-1A       A
+       GMTR-15       c
+       GMTR-25       c
+       GMOX-06       c
+       GMOX-15       c
+       GMOX-25       c
+       GMOX-ER       c
+       GM-GE2        c
+       GM-GE2-2.5G-A c
+       GMGE2-2.5G-M c
+       GM-GE4-2.5G-A c
+       GMCR-10GL-LR  c);
+
+foreach (@nestmasters) {
+    process_nest ($_->[0], $_->[1]);
+}
+1;
+
+sub process_nest ($$) {
+    my ($name, $dest) = @_;
+    my %slot_name = ();
+    my %slot_type = ();
+
+    my ($nest_ip_address) = ($dest =~ /.*@(.*)$/);
+    (out_ip ($name.'-M0', $nest_ip_address, undef),
+     print "$name\t\tIN\tCNAME\t$name-M0\n")
+	if defined $nest_ip_address;
+    snmpmaptable ($dest, sub () {
+	my ($slotCardSlot, $slotCardName, $slotCardType, $slotCardStatus) = @_;
+	return if $slotCardStatus == 3;	# empty
+	$slot_name{$slotCardSlot} = $slotCardName;
+	$slot_type{$slotCardSlot} = $slotCardType;
+    },
+		  qw(slotCardName slotCardType slotCardStatus));
+    snmpmaptable ($dest, sub () {
+	my ($slotIndex, $slotIpAddress, $cardName) = @_;
+	return unless exists $slot_name{$slotIndex};
+	return if $slot_type{$slotIndex} eq 'N.A.';
+
+	my $short_type = $short_types{$slot_type{$slotIndex}};
+	if (!defined $short_type) {
+	    warn "unknown type $slot_type{$slotIndex}";
+	    $short_type = 'other';
+	}
+	out_ip ($name.'-'.$short_type.$slotIndex, $slotIpAddress, $slot_type{$slotIndex});
+	#print "$name: slotIndex $slotIndex (name $slot_name{$slotIndex} type $slot_type{$slotIndex}) ip $slotIpAddress type $cardName\n";
+    },
+		  qw(slotIpAddress cardName));
+    print ";;\n";
+}
+
+sub out_ip ($$$) {
+    my ($name, $ip, $type) = @_;
+    my $comment = $type ? "\t;$type" : '';
+    print "$name\tIN\tA\t$ip$comment\n",
+}

@@ -1,11 +1,12 @@
 #!/usr/bin/perl
-# $Id: 10-keyset.t 1868 2022-08-31 20:13:35Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1924 2023-05-17 13:56:25Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 use Test::More;
+use TestToolkit;
 
 my %prerequisite = (
 	'Net::DNS::SEC' => 1.15,
@@ -232,9 +233,7 @@ ok( Net::DNS::SEC::Keyset->new($packet)->verify(), "Verify keyset extracted from
 ok( Net::DNS::SEC::Keyset->new( [$keyrr2] )->verify(), "Verify keyset with no KSK" );
 
 
-eval { $keyset->writekeyset( File::Spec->rel2abs('nonexdir') ) };
-my ($exception) = split /\n/, "$@\n";
-ok( $exception, "unwritable file\t[$exception]" );
+exception( 'unwritable file', sub { $keyset->writekeyset( File::Spec->rel2abs('nonexdir') ) } );
 
 
 # 0.17 backward compatibility (exercise code for test coverage only)

@@ -1,4 +1,4 @@
-# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,17 +8,18 @@
 
 package Mail::Message::Body;
 use vars '$VERSION';
-$VERSION = '3.012';
+$VERSION = '3.013';
 
 use base 'Mail::Reporter';
 
 use strict;
 use warnings;
+use utf8;
 
 use Carp;
 use MIME::Types    ();
 use File::Basename 'basename';
-use Encode         'find_encoding';
+use Encode         qw/find_encoding from_to encode_utf8/;
 
 use Mail::Message::Field        ();
 use Mail::Message::Field::Full  ();
@@ -30,68 +31,87 @@ define_alias(qr/^unicode-?1-?1-?utf-?([78])$/i => '"UTF-$1"');  # rfc1642
 my $mime_types;
 
 
+sub _char_enc($)
+{   my ($self, $charset) = @_;
+    return undef if !$charset || $charset eq 'PERL';
+
+    my $enc = find_encoding $charset
+        or $self->log(WARNING => "Charset `$charset' is not known.");
+
+    $enc;
+}
+
 sub encode(@)
 {   my ($self, %args) = @_;
 
-    # simplify the arguments
+    my $bodytype  = $args{result_type} || ref $self;
+
+    ### The content type
+
     my $type_from = $self->type;
     my $type_to   = $args{mime_type} || $type_from->clone->study;
     $type_to = Mail::Message::Field::Full->new('Content-Type' => $type_to)
         unless ref $type_to;
 
+    ### Detect specified transfer-encodings
+
     my $transfer = $args{transfer_encoding} || $self->transferEncoding->clone;
-    $transfer    = Mail::Message::Field->new('Content-Transfer-Encoding'
-        => $transfer) unless ref $transfer;
+    $transfer    = Mail::Message::Field->new('Content-Transfer-Encoding' => $transfer)
+        unless ref $transfer;
 
     my $trans_was = lc $self->transferEncoding;
     my $trans_to  = lc $transfer;
 
+    ### Detect specified charsets
+
+    my $is_text = $type_from =~ m!^text/!i;
     my ($char_was, $char_to, $from, $to);
-    if($type_from =~ m!^text/!i)
-    {   $char_was = $type_from->attribute('charset') || 'us-ascii';
-        $char_to  = $type_to->attribute('charset');
+    if($is_text)
+    {   $char_was = $type_from->attribute('charset');  # sometimes missing
+        $char_to  = $type_to->attribute('charset');    # usually missing
 
         if(my $charset = delete $args{charset})
-        {   if(!$char_to || $char_to ne $charset)
+        {   # Explicitly stated output charset
+            if(!$char_to || $char_to ne $charset)
             {   $char_to = $charset;
                 $type_to->attribute(charset => $char_to);
             }
         }
-        elsif(!$char_to)
-        {   $char_to = 'utf8';
+        elsif(!$char_to && $char_was)
+        {   # By default, do not change charset
+            $char_to = $char_was;
             $type_to->attribute(charset => $char_to);
         }
 
-        if($char_was ne 'PERL')
-        {   $from = find_encoding $char_was
-                or $self->log(WARNING => "Charset `$char_was' is not known.");
-        }
-        if($char_to ne 'PERL')
-        {   $to = find_encoding $char_to
-                or $self->log(WARNING => "Charset `$char_to' is not known.");
-        }
-
-        if($trans_to ne 'none' && $char_to eq 'PERL')
+        if($char_to && $trans_to ne 'none' && $char_to eq 'PERL')
         {   # We cannot leave the body into the 'PERL' charset when transfer-
             # encoding is applied.
             $self->log(WARNING => "Transfer-Encoding `$trans_to' requires "
-              . "explicit charset, defaulted to utf8");
-            $char_to = 'utf8';
+              . "explicit charset, defaulted to utf-8");
+            $char_to = 'utf-8';
+        }
+
+        $from = $self->_char_enc($char_was);
+        $to   = $self->_char_enc($char_to);
+
+        if($from && $to)
+        {   if($char_was ne $char_to && $from->name eq $to->name)
+            {   # modify source charset into a different alias
+                $type_from->attribute(charset => $char_to);
+                $char_was = $char_to;
+                $from     = $to;
+            }
+
+            return $self
+                if $trans_was eq $trans_to && $char_was eq $char_to;
         }
     }
-
-
-    # Any changes to be made?
-    if($trans_was eq $trans_to)
-    {   return $self if !$from && !$to;
-        if($from && $to && $from->name eq $to->name)
-        {   # modify charset into an alias, if requested
-            $self->charset($char_to) if $char_was ne $char_to;
-            return $self;
-        }
+    elsif($trans_was eq $trans_to)
+    {   # No changes needed;
+        return $self;
     }
 
-    my $bodytype  = $args{result_type} || ref $self;
+    ### Apply transfer-decoding
 
     my $decoded;
     if($trans_was eq 'none')
@@ -104,15 +124,41 @@ sub encode(@)
         return $self;
     }
 
-    my $new_data
-      = $to   && $char_was eq 'PERL' ? $to->encode($decoded->string)
-      : $from && $char_to  eq 'PERL' ? $from->decode($decoded->string)
-      : $to && $from && $from->name ne $to->name
-      ?    $to->encode($from->decode($decoded->string))
-      : undef;
+    ### Apply character-set recoding
 
-    my $recoded = $new_data ? $bodytype->new(based_on => $decoded
-      , data => $new_data, mime_type => $type_to, checked => 1) : $decoded;
+    my $recoded;
+    if($is_text)
+    {   unless($char_was)
+        {   # When we do not know the character-sets, try to auto-detect
+            my $auto = $args{charset_detect} || $self->charsetDetectAlgorithm;
+            $char_was = $decoded->$auto;
+            $from     = $self->_char_enc($char_was);
+            $decoded->type->attribute(charset => $char_was);
+
+            unless($char_to)
+            {   $char_to = $char_was;
+                $type_to->attribute(charset => $char_to);
+                $to      = $from;
+            }
+        }
+
+        my $new_data
+          = $to   && $char_was eq 'PERL' ? $to->encode($decoded->string)
+          : $from && $char_to  eq 'PERL' ? $from->decode($decoded->string)
+          : $to && $from && $char_was ne $char_to ? $to->encode($from->decode($decoded->string))
+          : undef;
+
+        $recoded
+          = $new_data
+          ? $bodytype->new(based_on => $decoded, data => $new_data,
+               mime_type => $type_to, checked => 1)
+          : $decoded;
+    }
+    else
+    {   $recoded = $decoded;
+    }
+
+    ### Apply transfer-encoding
 
     my $trans;
     if($trans_to ne 'none')
@@ -128,7 +174,38 @@ sub encode(@)
     $encoded;
 }
 
-#------------------------------------------
+
+sub charsetDetectAlgorithm(;$)
+{   my $self = shift;
+    $self->{MMBE_det} = shift if @_;
+    $self->{MMBE_det} || 'charsetDetect';
+}
+
+
+sub charsetDetect(%)
+{   my ($self, %args) = @_;
+    my $text = $self->string;
+
+    # Flagged as UTF8, so certainly created by the Perl program itself:
+    # the content is not octets.
+    if(utf8::is_utf8($text))
+    {   $args{external} or return 'PERL';
+        $text = encode_utf8 $text;
+    }
+
+    # Only look for normal characters, first 1920 unicode characters
+    # When there is any octet in 'utf-encoding'-space, but not an
+    # legal utf8, than it's not utf8.
+    #XXX Use the fact that cp1252 does not define (0x81, 0x8d, 0x8f, 0x90, 0x9d) ?
+    return 'utf-8'
+        if $text =~ m/[\0xC0-\xDF][\x80-\xBF]/   # 110xxxxx, 10xxxxxx
+        && $text !~ m/[\0xC0-\xFF]([^\0x80-\xBF]|$)/;
+
+    # Produce 'us-ascii' when it suffices: it is the RFC compliant
+    # default charset.
+    $text =~ m/[\x80-\xFF]/ ? 'cp1252' : 'us-ascii';
+}
+
 
 
 sub check()
@@ -154,13 +231,18 @@ sub check()
 #------------------------------------------
 
 
-sub encoded()
-{   my $self = shift;
+sub encoded(%)
+{   my ($self, %args) = @_;
 
     $mime_types ||= MIME::Types->new;
     my $mime    = $mime_types->type($self->type->body);
 
-    my $charset = $self->charset || '';
+    my $charset = my $old_charset = $self->charset || '';
+    if(!$charset || $charset eq 'PERL')
+    {   my $auto = $args{charset_detect} || $self->charsetDetectAlgorithm;
+        $charset = $self->$auto(external => 1);
+    }
+
     my $enc_was = $self->transferEncoding;
     my $enc     = $enc_was;
     $enc        = defined $mime ? $mime->encoding : 'base64'
@@ -168,12 +250,9 @@ sub encoded()
 
     # we could (expensively) try to autodetect character-set used,
     # but everything is a subset of utf-8.
-    my $new_charset
-       = (!$mime || $mime !~ m!^text/!i)   ? ''
-       : (!$charset || $charset eq 'PERL') ? 'utf-8'
-       :                                     $charset;
+    my $new_charset = (!$mime || $mime !~ m!^text/!i) ? '' : $charset;
 
-      ($enc_was ne 'none' && $charset eq $new_charset)
+      ($enc_was ne 'none' && $old_charset eq $new_charset)
     ? $self->check
     : $self->encode(transfer_encoding => $enc, charset => $new_charset);
 }
@@ -189,9 +268,9 @@ sub unify($)
     my $transfer = $self->transferEncoding;
 
     my $encoded  = $body->encode
-     ( mime_type         => $mime
-     , transfer_encoding => $transfer
-     );
+      ( mime_type         => $mime
+      , transfer_encoding => $transfer
+      );
 
     # Encode makes the best of it, but is it good enough?
 

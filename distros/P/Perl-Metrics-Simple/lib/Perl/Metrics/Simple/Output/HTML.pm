@@ -1,12 +1,12 @@
 package Perl::Metrics::Simple::Output::HTML;
 
-our $VERSION = 'v1.0.1';
-
 use strict;
 use warnings;
 
 use parent qw(Perl::Metrics::Simple::Output);
 use Readonly 1.03;
+
+our $VERSION = 'v1.0.3';
 
 Readonly my $EMPTY_STRING => q{};
 Readonly my $ONE_SPACE    => q{ };
@@ -217,7 +217,7 @@ sub make_list_of_subs {
 
     my $list_of_subs = '<table><tr><th colspan="4">List of subroutines, with most complex at top</th></tr>' . '<tr><td class="w100">complexity</td><td>sub</td><td>path</td><td class="w100">size</td><tr>';
 
-    foreach my $sub (@$sorted_subs) {
+    foreach my $sub (@{$sorted_subs}) {
         $list_of_subs .= make_list_of_subs_tr($sub);
     }
 

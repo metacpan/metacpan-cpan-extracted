@@ -1,5 +1,13 @@
 Revision history for Hook-Output-Tiny
 
+1.02    2023-07-03
+        - Fix broken CI badge lins
+
+1.01    2023-07-03
+        - Deleted AppVeyor test config
+        - Reworked CI configuration
+        - Commented out include() and exclude(); they're not ready yet
+
 1.00    2020-12-20
         - Completely redesigned stdout() and stderr(). We now auto-generate
           them dynamically within a BEGIN block

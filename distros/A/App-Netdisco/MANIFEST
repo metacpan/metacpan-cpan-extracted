@@ -126,6 +126,7 @@ lib/App/Netdisco/SSHCollector/Platform/PaloAlto.pm
 lib/App/Netdisco/SSHCollector/Platform/VOSS.pm
 lib/App/Netdisco/Transport/SNMP.pm
 lib/App/Netdisco/Transport/SSH.pm
+lib/App/Netdisco/Util/CustomFields.pm
 lib/App/Netdisco/Util/Device.pm
 lib/App/Netdisco/Util/DeviceAuth.pm
 lib/App/Netdisco/Util/DNS.pm
@@ -141,6 +142,7 @@ lib/App/Netdisco/Util/Permission.pm
 lib/App/Netdisco/Util/Port.pm
 lib/App/Netdisco/Util/PortAccessEntity.pm
 lib/App/Netdisco/Util/PortMAC.pm
+lib/App/Netdisco/Util/Snapshot.pm
 lib/App/Netdisco/Util/SNMP.pm
 lib/App/Netdisco/Util/Statistics.pm
 lib/App/Netdisco/Util/Web.pm
@@ -234,6 +236,8 @@ lib/App/Netdisco/Worker/Plugin/Discover/PortPower.pm
 lib/App/Netdisco/Worker/Plugin/Discover/PortProperties.pm
 lib/App/Netdisco/Worker/Plugin/Discover/PortProperties/PortAccessEntity.pm
 lib/App/Netdisco/Worker/Plugin/Discover/Properties.pm
+lib/App/Netdisco/Worker/Plugin/Discover/Properties/Tags.pm
+lib/App/Netdisco/Worker/Plugin/Discover/Snapshot.pm
 lib/App/Netdisco/Worker/Plugin/Discover/VLANs.pm
 lib/App/Netdisco/Worker/Plugin/Discover/Wireless.pm
 lib/App/Netdisco/Worker/Plugin/Discover/WithNodes.pm
@@ -246,6 +250,7 @@ lib/App/Netdisco/Worker/Plugin/Graph.pm
 lib/App/Netdisco/Worker/Plugin/Hook.pm
 lib/App/Netdisco/Worker/Plugin/Hook/Exec.pm
 lib/App/Netdisco/Worker/Plugin/Hook/HTTP.pm
+lib/App/Netdisco/Worker/Plugin/Internal/SNMPFastDiscover.pm
 lib/App/Netdisco/Worker/Plugin/LoadMIBs.pm
 lib/App/Netdisco/Worker/Plugin/Location.pm
 lib/App/Netdisco/Worker/Plugin/Macsuck.pm
@@ -481,7 +486,10 @@ share/schema_versions/App-Netdisco-DB-74-75-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-75-76-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-76-77-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-77-78-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-78-79-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-79-80-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-8-9-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-80-81-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-9-10-PostgreSQL.sql
 share/views/admintask.tt
 share/views/ajax/admintask/duplicatedevices.tt

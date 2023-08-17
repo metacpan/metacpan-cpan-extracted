@@ -1,4 +1,11 @@
 Revision history for Syntax-Keyword-Inplace
 
+0.02    2023-07-13
+        [CHANGES]
+         * Updates to compile cleanly on perl v5.38
+         * Remember to implement `no Syntax::Keyword::Inplace` to disable the
+           syntax
+         * Swap all the unit tests to `Test2::V0`
+
 0.01    2022-03-09
         First version, released on an unsuspecting world.

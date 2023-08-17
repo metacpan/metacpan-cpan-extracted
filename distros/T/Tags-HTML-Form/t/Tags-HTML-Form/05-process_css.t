@@ -24,6 +24,16 @@ is_deeply(
 		['d', 'padding', '20px'],
 		['e'],
 
+		['s', '.form fieldset'],
+		['d', 'padding', '20px'],
+		['d', 'border-radius', '15px'],
+		['e'],
+
+		['s', '.form legend'],
+		['d', 'padding-left', '10px'],
+		['d', 'padding-right', '10px'],
+		['e'],
+
 		['s', '.form textarea'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
@@ -36,6 +46,21 @@ is_deeply(
 
 		['s', '.form-required'],
 		['d', 'color', 'red'],
+		['e'],
+
+		['s', '.form button'],
+		['d', 'width', '100%'],
+		['d', 'background-color', '#4CAF50'],
+		['d', 'color', 'white'],
+		['d', 'padding', '14px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'border', 'none'],
+		['d', 'border-radius', '4px'],
+		['d', 'cursor', 'pointer'],
+		['e'],
+
+		['s', '.form button:hover'],
+		['d', 'background-color', '#45a049'],
 		['e'],
 	],
 	'Form CSS code (stub).',

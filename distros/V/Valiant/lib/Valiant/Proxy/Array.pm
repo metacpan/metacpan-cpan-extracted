@@ -2,11 +2,12 @@ package Valiant::Proxy::Array;
 
 use Moo;
 with 'Valiant::Proxy';
-
 sub read_attribute_for_validation {
   my ($self, $attribute) = @_;
-  if( $attribute=~m/^\d+$/ && defined $self->for->[$attribute]) {
-    return  $self->for->[$attribute];
+  #my $index = $attribute->[-1];
+  my (@index) = $attribute=~m/\[(\d+)\]/g;
+  if( @index && $index[-1] =~m/^\d+$/ && defined $self->for->[$index[-1]]) {
+    return  $self->for->[$index[-1]];
   } else {
     return undef; # TODO Might need a flag to allow die here?
   }

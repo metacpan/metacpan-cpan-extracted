@@ -17,7 +17,7 @@ RHC - Short alias for Require::HookChain
 
 =head1 VERSION
 
-This document describes version 0.011 of RHC (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.015 of RHC (from Perl distribution Require-HookChain), released on 2023-07-23.
 
 =head1 SYNOPSIS
 

@@ -96,3 +96,15 @@ Revision history for Control-CLI-Extreme
 	* Slot/Port detection changed to cater for new EXOS 5720 channelized ports on standalone units
 	* PassportERS NNCLI more prompt adjusted, as the more prompt used by VOSS on command syntax is slightly
 	  different, without the space characters
+
+1.08	2023-06-18
+	* Changes to correctly detect new ISW models : ISW-4W-4WS-4X & ISW-24W-4X
+	* Implemented device_more_paging() for ISW, which can now be used to disable more paging
+	* Added support for Extreme Networks Cloud APs (HiveOS, ex Aerohive)
+	* Added support for Extreme Networks SD-WAN appliance (ex Ipanema)
+	* Added support for new attributes is_fabric_engine and is_switch_engine
+	* Added FabricEngine and SwitchEngine banner patterns to family type login detection 
+
+1.09	2023-08-03
+	* Modifications to support new Ipanema family type "router 1-3" CLI contexts
+	* Improvements to detection of Ipanema family type

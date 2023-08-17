@@ -104,6 +104,7 @@ Guenther
 Gursoy
 Gurusamy
 Gustafsson
+Gutowski
 Hakanson
 Hanak
 Hans
@@ -134,6 +135,7 @@ Jonathan
 Jr
 Julien
 KONISHI
+Kacper
 Kaji
 Kaminsky
 Kapranoff
@@ -387,6 +389,7 @@ michealgong
 michiel
 mmcleric
 murphy
+mwgamera
 nalabelle
 naveedm9
 nawglan

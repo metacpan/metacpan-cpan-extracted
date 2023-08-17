@@ -1,29 +1,35 @@
 ---
-abstract: 'Takes a series of lines in Sentinel Benefits format and writes them out as QIF files, subject to the symbol mappings specified. '
+abstract: 'Takes a series of lines in Sentinel Benefits format and writes them out as QIF files, subject to the symbol mappings specified.'
 author:
   - 'David Solimano <david@solimano.org>'
-build_requires: {}
+build_requires:
+  File::Temp: '0.2311'
+  perl: v5.20.0
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
+  perl: v5.20.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Finance-Bank-SentinelBenefits-Csv401kConverter
 requires:
-  DateTime: '1.08'
-  DateTime::Format::Flexible: '0.25'
+  DateTime: '1.59'
+  DateTime::Format::Flexible: '0.34'
   Finance::QIF: '3.02'
-  Modern::Perl: '1.20140107'
-  Moose: '2.1204'
-  Moose::Util::TypeConstraints: '2.1204'
-  MooseX::Method::Signatures: '0.47'
-  MooseX::StrictConstructor: '0.19'
-  MooseX::Traits: '0.12'
-  Parse::Method::Signatures: '1.003016'
-  Scalar::Util: '1.38'
+  Modern::Perl: '1.20230106'
+  Moose: '2.2203'
+  Moose::Util::TypeConstraints: '2.2203'
+  MooseX::StrictConstructor: '0.21'
+  MooseX::Traits: '0.13'
+  Parse::Method::Signatures: '1.003019'
+  Scalar::Util: '1.63'
+  perl: v5.20.0
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-SentinelBenefits-Csv401kConverter
-version: '1.0'
+version: '1.3'
+x_generated_by_perl: v5.37.11
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-3.0-only

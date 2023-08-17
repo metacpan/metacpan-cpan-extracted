@@ -2,6 +2,7 @@ Changes
 clib/CMakeLists.txt
 clib/misc/generate_uri_component_alphabets.pl
 clib/panda-uri-config.cmake
+clib/README.md
 clib/src/panda/uri.h
 clib/src/panda/uri/all.h
 clib/src/panda/uri/encode.cc
@@ -45,6 +46,7 @@ lib/URI/XS/telnet.pm
 lib/URI/XS/ws.pm
 lib/URI/XS/wss.pm
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/mytest.plx

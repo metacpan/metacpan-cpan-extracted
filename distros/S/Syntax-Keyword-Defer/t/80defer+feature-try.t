@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Syntax::Keyword::Defer >= 0.02 is not available"
@@ -14,13 +14,12 @@ BEGIN {
 
    Syntax::Keyword::Defer->import;
 
-   require feature;
-   feature->import( 'try' );
-   warnings->unimport( 'experimental::try' );
-
    diag( "Syntax::Keyword::Defer $Syntax::Keyword::Defer::VERSION, " .
          "core perl version $^V" );
 }
+
+use feature 'try';
+no warnings 'experimental::try';
 
 # defer inside try
 {

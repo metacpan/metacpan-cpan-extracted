@@ -18,6 +18,7 @@ t/05-multiline-signature.t
 t/06-linenumbers.t
 t/07-empty-block.t
 t/08-argument-parser.t
+t/09-defined-or.t
 testrules.yml
 xt/99-changes.t
 xt/99-compile.t

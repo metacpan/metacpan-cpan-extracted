@@ -19,8 +19,9 @@ name: App-tabledata
 provides:
   App::tabledata:
     file: lib/App/tabledata.pm
-    version: '0.006'
+    version: '0.007'
 requires:
+  App::lcpan::Call: '0.11'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::any: '0.914'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -30,6 +31,7 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::JSON::decode_str: '0'
   Log::ger: '0.038'
+  MetaCPAN::Client: '0'
   Module::Abstract: '0'
   Module::List::More: '0.004007'
   Module::Load::Util: '0.004'
@@ -46,7 +48,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-tabledata
   homepage: https://metacpan.org/release/App-tabledata
   repository: git://github.com/perlancar/perl-App-tabledata.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -224,7 +226,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -336,7 +338,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

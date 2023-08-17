@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,6 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'IO::Async::SSL',
    requires => {
+      'perl' => '5.014',
+
       'Future' => '0.33',
       'IO::Async::Loop' => '0.66', # Listener bugfixes, on_accept_error semantics
       'IO::Async::Handle' => '0.29',

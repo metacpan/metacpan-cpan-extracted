@@ -5541,7 +5541,7 @@ each day.
 @cindex @code{.TSP}
 In Chart symbols are the fund code and a @samp{.TSP} suffix, for example
 @samp{C.TSP} for the common stock fund.  The lifecycle funds are like
-@samp{L2020.TSP}, and the lifecycle income fund is @samp{LINCOME.TSP}.
+@samp{L2050.TSP}, and the lifecycle income fund is @samp{LINCOME.TSP}.
 
 @cindex @code{Finance::Quote}
 @cindex @code{Finance::Quote::TSP}

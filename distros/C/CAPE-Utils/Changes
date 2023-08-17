@@ -1,5 +1,21 @@
 Revision history for CAPE-Utils
 
+2.7.0   2023-06-18/19:30
+		- doc cleanup for suricata_extract_submit_extend
+		- mojo_cape_submit_extend doc update and now update app protos and max size
+
+2.6.0   2023-06-14/21:15
+		- add mojo_cape_submit_extend
+		- Fix sub_size for suricata_extract_submit
+
+
+2.5.0   2023-06-12/14:00
+		- suricata_extract_submit and extend now tracks submitted byte size
+		- suricata_extract_submit now uses Proc::PID::File to make sure only one instance is running
+
+2.4.0   2023-06-03/15:15
+		- Add report munging support.
+
 2.3.0   2023-05-18/18:00
 		- suricata_extract_submit can now use env specified proxies optionally
 		- suricata_extract_submit_extend now recomputes deltas

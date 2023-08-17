@@ -1,4 +1,4 @@
-# This code can be redistributed and modified under the terms of the GNU Affero
+# This code can be redistributed and modified under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
@@ -26,7 +26,7 @@ use constant {
     MAX_NESTED_CONCAT => 100,
 };
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 method new($class: :$_scope = 0, :$name = undef) {
     bless {
@@ -295,7 +295,7 @@ method rescoped_onto($scope) {
             die "Internal error: unknown op type $op->{type}";
         }
     }
-    my $new = ref($self)->new(_scope => $scope, name => $self->{name});
+    my $new = ref($self)->new(_scope => $self->scope + $scope, name => $self->{name});
     $new->{code} = \@code;
     $new
 }
@@ -458,6 +458,8 @@ method assemble(:$data_format, :$data_format_mapping) {
             func    => \my %local_vars_func,
             # typeof => {},
         };
+        !$in_new_scope_env || !exists $gen_vars{$scope}
+            or die "Internal error: attempting to redefine scope $scope";
         local $gen_vars{$scope} = $new_scope_env
             if $in_new_scope_env;
 
@@ -512,6 +514,8 @@ method assemble(:$data_format, :$data_format_mapping) {
             } elsif ($op->{type} eq OP_LOOP) {
                 $last_concat_flush->();
                 my $subscope = $op->{body}->scope;
+                $subscope > $scope
+                    or die "Internal error: $subscope is not a proper sub-scope of $scope";
                 local $needs_iter{$subscope} = 0;
                 my $loop_code = ''
                     . 'for my $env_' . $subscope . ' (@{' . $ref_of_type->('array', $op->{name}) . "}) {\n"

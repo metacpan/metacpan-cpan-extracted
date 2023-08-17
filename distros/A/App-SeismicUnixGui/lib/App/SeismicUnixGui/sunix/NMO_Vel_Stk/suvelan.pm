@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::suvelan;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUVELAN - compute stacking velocity semblance for cdp gathers		     
+ PERL PROGRAM NAME:  SUVELAN - compute stacking velocity semblance for cdp gathers		     
  AUTHOR: Chang Liu , Juan Lorenzo
  DATE:   Dec 1 2013, Nov. 2, 2018
  DESCRIPTION:

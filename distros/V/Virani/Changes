@@ -1,5 +1,40 @@
 Revision history for Virani
 
+1.1.0  2023-08-12/22:00
+       -add ts_is_unixtime and pcap_glob config vars
+       -get the set earlier if need for default for get_pcap_local
+       -bump depend of File::Find::IncludesTimeRange to 0.2.0
+       -misc doc updates
+
+1.0.1  2023-08-07/11:30
+       -bpf translate fix for src/dst with out host
+       -properly reads type from config
+       -log/display padded time
+       -display/log BPF translation
+
+0.3.0  2023-08-03/15:45
+        -add req_start, req_start_s, req_end, req_end_s, and req_time keys to metadata
+        -fix padding handling
+
+0.2.0  2023-08-03/08:45
+        -mojo-virani sets content type to application/x-download
+        -misc verbosity fixes/cleanup
+        -remove needlessly copying the cache file
+        -fix typo in name used for syslog messages
+        -add etime/stime aliases for start/end args for mojo-virani
+        -add --buffer to virani
+        -enable special for Time::Piece::Guess
+        -misc doc cleanups/updates
+
+0.1.1  2023-07-31/17:30
+        -Fix the handling when filter is undef.
+        -Minor doc updates.
+
+0.1.0  2023-07-31/12:00
+        -Add timestamp logging for when getting a PCAP
+        -Support using ARGV for filter info
+        -Support reading filter from a file
+
 0.0.1  2023-03-14/13:30
         -Initial release.
 

@@ -41,7 +41,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Resolver" : "0.002",
+            "Data::Resolver" : "0.006",
             "Image::PNG::Libpng" : "0.57",
             "Moo" : "2.005005",
             "PDF::Builder" : "3.025",
@@ -59,15 +59,15 @@
    "provides" : {
       "PDF::Collage" : {
          "file" : "lib/PDF/Collage.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "PDF::Collage::Template" : {
          "file" : "lib/PDF/Collage/Template.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "PDF::Collage::TemplatesCollection" : {
          "file" : "lib/PDF/Collage/TemplatesCollection.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://codeberg.org/polettix/PDF-Collage"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/bench
+lib/Algorithm/Line/Lerp.pm
+lib/Algorithm/Line/Lerp.xs
+lib/Algorithm/Line/typemap
+ppport.h
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

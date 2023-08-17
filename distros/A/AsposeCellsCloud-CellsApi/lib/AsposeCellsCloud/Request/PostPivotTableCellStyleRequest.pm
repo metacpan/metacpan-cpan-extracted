@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableCellStyleRequest.name :   ,
-# PostPivotTableCellStyleRequest.sheetName :   ,
-# PostPivotTableCellStyleRequest.pivotTableIndex :   ,
-# PostPivotTableCellStyleRequest.column :   ,
-# PostPivotTableCellStyleRequest.row :   ,
-# PostPivotTableCellStyleRequest.style :   ,
-# PostPivotTableCellStyleRequest.needReCalculate :   ,
-# PostPivotTableCellStyleRequest.folder :   ,
-# PostPivotTableCellStyleRequest.storageName :    
+# PostPivotTableCellStyleRequest.name : The workbook name.  ,
+# PostPivotTableCellStyleRequest.sheetName : The worksheet name.  ,
+# PostPivotTableCellStyleRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableCellStyleRequest.column : Column index of the cell.  ,
+# PostPivotTableCellStyleRequest.row : RowIndex of the cell.  ,
+# PostPivotTableCellStyleRequest.style : Style description in request body.  ,
+# PostPivotTableCellStyleRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
+# PostPivotTableCellStyleRequest.folder : Original workbook folder.  ,
+# PostPivotTableCellStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_cell_style' } = { 
-    	summary => '',
+    	summary => 'Updates cell style in pivot table.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -159,63 +159,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => '',
+     	description => 'Column index of the cell.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => '',
+     	description => 'RowIndex of the cell.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'style',
-     	description => '',
+     	description => 'Style description in request body.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => '',
+     	description => 'Whether the specific pivot table calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

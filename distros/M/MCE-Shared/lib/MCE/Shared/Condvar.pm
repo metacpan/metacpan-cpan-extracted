@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.881';
+our $VERSION = '1.885';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -146,6 +146,7 @@ sub len {
 
          my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
+            return;
          };
          for my $_i (1 .. $_var->{_count}) {
             syswrite($_var->{_cw_sock}, $LF);
@@ -163,6 +164,7 @@ sub len {
 
          my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
+            return;
          };
          if ( $_var->{_count} >= 0 ) {
             syswrite($_var->{_cw_sock}, $LF);
@@ -180,6 +182,7 @@ sub len {
 
          my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
+            return;
          };
 
          $_var->{_count} -= 1;
@@ -194,6 +197,7 @@ sub len {
 
          my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
+            return;
          };
 
          $_var->{_count} += 1;
@@ -354,7 +358,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.881
+This document describes MCE::Shared::Condvar version 1.885
 
 =head1 DESCRIPTION
 

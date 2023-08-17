@@ -1,6 +1,7 @@
 package Mac::FSEvents::Event;
 
 use strict;
+use warnings;
 
 sub id                { shift->{id} }
 sub flags             { shift->{flags} }

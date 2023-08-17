@@ -1,5 +1,10 @@
 use Test::Most;
 
+BEGIN {
+    use Module::Loaded;
+    mark_as_loaded( OpenTracing::Implementation::NoOp::Tracer )
+}
+
 use OpenTracing::Implementation;
 
 

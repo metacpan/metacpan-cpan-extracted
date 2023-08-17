@@ -52,9 +52,13 @@ my @relative = (
     { 'jan 1 to 2nd',                                  => [ [ '01.01.2006 00:00:00',     truncated ], [ '02.01.2006 00:00:00',     truncated ] ] },
     { '26 oct {at} 10:00{sec} to 11{min_sec}{ }am',    => [ [ '26.10.2006 10:00:{sec}',  truncated ], [ '26.10.2006 11:{min_sec}', truncated ] ] },
     { '26 oct {at} 10{min_sec}{ }am to 11:00{sec}',    => [ [ '26.10.2006 10:{min_sec}', truncated ], [ '26.10.2006 11:00:{sec}',  truncated ] ] },
+    { '2022-09-01 14:35 to 18',                        => [ [ '01.09.2022 14:35:00',     truncated ], [ '01.09.2022 18:00:00',     truncated ] ] },
+    { '2022-09-01 14 to 18:35',                        => [ [ '01.09.2022 14:00:00',     truncated ], [ '01.09.2022 18:35:00',     truncated ] ] },
+    { '9/1 14:35 to 18',                               => [ [ '01.09.2006 14:35:00',     truncated ], [ '01.09.2006 18:00:00',     truncated ] ] },
+    { '9/1 14 to 18:35',                               => [ [ '01.09.2006 14:00:00',     truncated ], [ '01.09.2006 18:35:00',     truncated ] ] },
 );
 
-_run_tests(160, [ [ \@absolute ], [ \@combined ], [ \@relative ] ], \&compare);
+_run_tests(164, [ [ \@absolute ], [ \@combined ], [ \@relative ] ], \&compare);
 
 sub compare
 {

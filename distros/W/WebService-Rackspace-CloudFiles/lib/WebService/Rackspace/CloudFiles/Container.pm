@@ -102,7 +102,7 @@ sub delete {
         [ 'X-Auth-Token' => $self->cloudfiles->token ] );
     my $response = $self->cloudfiles->_request($request);
     confess 'Not empty' if $response->code == 409;
-    confess 'Unknown error' if $response->code != 204;
+    confess 'Unknown error' if !$response->is_success;
 }
 
 sub purge_cdn {
@@ -113,7 +113,7 @@ sub purge_cdn {
     my $response = $self->cloudfiles->_request($request);
     confess 'Not Found' if $response->code == 404;
     confess 'Unauthorized request' if $response->code == 403;
-    confess 'Unknown error' if $response->code != 204;
+    confess 'Unknown error' if !$response->is_success;
 }
 
 sub objects {
@@ -137,7 +137,7 @@ sub objects {
                 [ 'X-Auth-Token' => $self->cloudfiles->token ] );
             my $response = $self->cloudfiles->_request($request);
             return if $response->code == 204;
-            confess 'Unknown error' if $response->code != 200;
+            confess 'Unknown error' if !$response->is_success;
             return undef unless $response->content;
             my @objects;
 

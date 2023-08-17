@@ -1,5 +1,4 @@
 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Filesys-Notify-Win32-ReadDirectoryChanges?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Filesys-Notify-Win32-ReadDirectoryChanges)
 [![Windows](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/windows/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Awindows)
 [![MacOS](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/macos/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Amacos)
 [![Linux](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/linux/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Alinux)
@@ -127,6 +126,15 @@ The following events are created by ReadDirectoryChangesW resp. this module
             old_name => 'old-name.example',
             new_name => 'new-name.example',
         }
+
+# GLOBAL VARIABLES
+
+- `$bufsize`
+
+        local $Filesys::Notify::Win32::ReadDirectoryChanges::bufsize = 1024*1024;
+
+    This variable is the buffer for the directory changes that get read from
+    Windows. The default size is 65520 bytes.
 
 # HELP WANTED
 

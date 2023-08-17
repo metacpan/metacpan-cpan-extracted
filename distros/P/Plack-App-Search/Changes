@@ -1,0 +1,8 @@
+0.02 2023-06-09T12:39:24+02:00
+ - Add another test for post method.
+ - Add example to doc with button.
+ - Fix minimal version of Plack::Component::Tags::HTML.
+ - Regen META.yml.
+
+0.01 2023-06-08T16:33:31+02:00
+ - First version.

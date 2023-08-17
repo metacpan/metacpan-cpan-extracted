@@ -21,11 +21,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -41,16 +41,32 @@ Geo::Location::Point stores a place.
 
     $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
 
+Takes one optional argument 'key' which is an API key for L<https://timezonedb.com> for looking up timezone data.
+
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = $_[0];
 
-	# Geo::Location::Point->new not Geo::Location::Point::new
-	return unless($class);
+	shift;
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
+	if(ref($_[0]) eq 'HASH') {
+		%args = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
+		return;
+	} elsif(@_ % 2 == 0) {
+		%args = @_;
+	}
+
+	if(!defined($class)) {
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
 	$args{'lat'} //= $args{'latitude'} // $args{'Latitude'};
 	if(!defined($args{'lat'})) {
@@ -126,7 +142,10 @@ returns a L<Class::Measure::Length> object.
 sub distance {
 	my ($self, $location) = @_;
 
-	die unless $location;
+	if(!defined($location)) {
+		Carp::carp('Usage: ', __PACKAGE__, '->distance($location)');
+		return;
+	}
 
 	$self->{'gis'} //= GIS::Distance->new();
 
@@ -165,6 +184,42 @@ sub not_equal {
 	my $self = shift;
 
 	return(!$self->equal(shift));
+}
+
+=head2	tz
+
+Returns the timezone of the location.
+
+=cut
+
+sub tz {
+	my $self = shift;
+
+	if(defined($self->{'key'})) {
+		return $self->{'tz'} if(defined($self->{'tz'}));
+
+		if(!defined($self->{'timezonedb'})) {
+			require TimeZone::TimeZoneDB;
+			TimeZone::TimeZoneDB->import();
+
+			$self->{'timezonedb'} = TimeZone::TimeZoneDB->new(key => $self->{'key'});
+		}
+		$self->{'tz'} = $self->{'timezonedb'}->get_time_zone($self)->{'zoneName'};
+
+		return $self->{'tz'};
+	}
+}
+
+=head2	timezone
+
+Synonym for tz().
+
+=cut
+
+sub timezone {
+	my $self = shift;
+
+	return $self->tz();
 }
 
 =head2	as_string
@@ -294,7 +349,8 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<GIS::Distance>,
-L<Geo::Point>
+L<Geo::Point>,
+L<TimeZone::TimeZoneDB>.
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -13,7 +13,7 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'JSON::Parse' => '0.60',
+	'JSON::Parse' => '0.62',
 	'HTML::Valid::Tagset' => '0',
     },
     META_MERGE => {
@@ -21,6 +21,11 @@ WriteMakefile (
             repository => $repo,
             bugtracker => "$repo/issues",
         },
+	no_index => {
+	    file => [
+		"t/HMT.pm",
+	    ],
+	}
     },
     MIN_PERL_VERSION => '5.006001',
 );

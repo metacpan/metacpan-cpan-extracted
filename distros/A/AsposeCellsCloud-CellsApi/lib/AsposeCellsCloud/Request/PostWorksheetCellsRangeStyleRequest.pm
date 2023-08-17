@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeStyleRequest.name :   ,
-# PostWorksheetCellsRangeStyleRequest.sheetName :   ,
-# PostWorksheetCellsRangeStyleRequest.rangeOperate :   ,
-# PostWorksheetCellsRangeStyleRequest.folder :   ,
-# PostWorksheetCellsRangeStyleRequest.storageName :    
+# PostWorksheetCellsRangeStyleRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeStyleRequest.sheetName : The worksheet name.  ,
+# PostWorksheetCellsRangeStyleRequest.rangeOperate : Range Set Style Request   ,
+# PostWorksheetCellsRangeStyleRequest.folder : Original workbook folder.  ,
+# PostWorksheetCellsRangeStyleRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_style' } = { 
-    	summary => '',
+    	summary => 'Sets the style of the range.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'range_operate' => {
      	datatype => 'RangeSetStyleRequest',
      	base_name => 'rangeOperate',
-     	description => '',
+     	description => 'Range Set Style Request ',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

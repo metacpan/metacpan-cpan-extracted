@@ -7,9 +7,9 @@ package Require::HookChain::log::stderr;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-07-23'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::log::stderr - Log a message to STDERR
 
 =head1 VERSION
 
-This document describes version 0.011 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-02-12.
+This document describes version 0.015 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-07-23.
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,21 @@ A demo (L<nauniq> is a Perl script you can get from CPAN):
  ...
 
 =head1 DESCRIPTION
+
+This hook should be put at the beginning to be able to log before other hooks or
+source loads the module, so it's best to require this hook last, e.g.:
+
+ use Require::HookChain 'other::hook';
+ use Require::HookChain 'other::hook2';
+ ...
+ use Require::HookChain 'log::stderr';
+
+or:
+
+ use Require::HookChain 'log::stderr';
+ use Require::HookChain -end=>1, 'other::hook';
+ use Require::HookChain -end=>1, 'other::hook2';
+ ...
 
 =for Pod::Coverage .+
 

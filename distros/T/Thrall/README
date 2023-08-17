@@ -1,22 +1,22 @@
 NAME
 
-    thrall - a simple PSGI/Plack HTTP server which uses threads
+    thrall - Simple PSGI/Plack HTTP server that uses threads
 
 SYNOPSIS
 
-      $ thrall --workers=20 --max-reqs-per-child=100 app.psgi
+        $ thrall --max-workers=20 --max-reqs-per-child=100 app.psgi
     
-      $ thrall --port=80 --ipv6=1 app.psgi
+        $ thrall --port=80 --ipv6=1 app.psgi
     
-      $ thrall --port=443 --ssl=1 --ssl-key-file=file.key --ssl-cert-file=file.crt app.psgi
+        $ thrall --port=443 --ssl=1 --ssl-key-file=file.key --ssl-cert-file=file.crt app.psgi
     
-      $ thrall --socket=/tmp/thrall.sock app.psgi
+        $ thrall --socket=/tmp/thrall.sock app.psgi
 
 DESCRIPTION
 
     Thrall is a standalone HTTP/1.1 server with keep-alive support. It uses
-    threads instead pre-forking, so it works correctly on Windows. It is
-    pure-Perl implementation which doesn't require any XS package.
+    threads instead pre-forking, so it works correctly on Windows. It is a
+    pure-Perl implementation that doesn't require any XS package.
 
     Thrall was started as a fork of Starlet server. It has almost the same
     code as Starlet and it was adapted to use threads instead fork().
@@ -32,23 +32,23 @@ LIMITATIONS
     applications started with Thrall and check if you encountered a known
     problem.
 
-    Especially, PSGI applications should avoid: changing current working
-    directory, catching signals, starting new processes. Environment
-    variables might (Linux, Unix) or might not (Windows) be shared between
-    threads.
+    Especially, PSGI applications should avoid: changing the current
+    working directory, catching signals, and starting new processes.
+    Environment variables might (Linux, Unix) or might not (Windows) be
+    shared between threads.
 
-    Thrall is very slow on first request for each thread. It is because
-    spawning new thread is slow in Perl itself. Thrall is very fast on
-    another requests and generally is faster than any implementation which
+    Thrall is very slow on the first request for each thread. It is because
+    spawning new threads is slow in Perl itself. Thrall is very fast on
+    another request and generally is faster than any implementation which
     uses fork.
 
 BUGS
 
     There is a problem with Perl threads implementation which occurs on
-    Windows. Some requests can fail with message:
+    Windows. Some requests can fail with the message:
 
-      failed to set socket to nonblocking mode:An operation was attempted on
-      something that is not a socket.
+      failed to set socket to nonblocking mode:An operation was attempted
+      on something that is not a socket.
 
     or
 
@@ -62,12 +62,28 @@ BUGS
     https://github.com/dex4er/Thrall/issues/5 for more information about
     this issue.
 
+ MacOS
+
+    MacOS High Sierra and newer shows error:
+
+      objc[12345]: +[__NSCFConstantString initialize] may have been in
+      progress in another thread when fork() was called. objc[12345]:
+      +[__NSCFConstantString initialize] may have been in progress in
+      another thread when fork() was called. We cannot safely call it or
+      ignore it in the fork() child process. Crashing instead. Set a
+      breakpoint on objc_initializeAfterForkError to debug.
+
+    This error is caused by an added security to restrict multithreading.
+
+    To override the limitation, run export
+    OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES before using this server.
+
  Reporting
 
     If you find the bug or want to implement new features, please report it
-    at https://github.com/dex4er/Starlight/issues
+    at https://github.com/dex4er/Thrall/issues
 
-    The code repository is available at http://github.com/dex4er/Starlight
+    The code repository is available at http://github.com/dex4er/Thrall
 
 AUTHORS
 
@@ -93,7 +109,7 @@ AUTHORS
 
 LICENSE
 
-    Copyright (c) 2013-2017 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2013-2017, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

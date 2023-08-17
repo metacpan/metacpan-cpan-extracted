@@ -7,6 +7,12 @@ use Math::DifferenceSet::Planar;
 
 $| = 1;
 
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    shift @ARGV;
+    last if $1 eq '-';
+    die "usage: pds_enumerate [file]...\n";
+}
+
 while (<<>>) {
     s/^\s+//;
     my @e = split /\s+/;
@@ -26,6 +32,7 @@ while (<<>>) {
 }
 
 __END__
+
 =head1 NAME
 
 pds_enumerate - enumerate all translates of planar difference sets
@@ -46,7 +53,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

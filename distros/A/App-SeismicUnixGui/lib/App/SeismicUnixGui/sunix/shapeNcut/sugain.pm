@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::shapeNcut::sugain;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUGAIN - apply various types of gain				  	
+ PERL PROGRAM NAME:  SUGAIN - apply various types of gain				  	
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:

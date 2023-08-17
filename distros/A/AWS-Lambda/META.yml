@@ -4,6 +4,7 @@ author:
   - 'ICHINOSE Shogo'
 build_requires:
   File::Slurp: '9999.25'
+  Starman: '0'
   Test::Deep: '1.128'
   Test::More: '0.98'
   Test::SharedFork: '0'
@@ -12,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,19 +32,22 @@ no_index:
 provides:
   AWS::Lambda:
     file: lib/AWS/Lambda.pm
-    version: v0.0.39
+    version: v0.2.0
   AWS::Lambda::Bootstrap:
     file: lib/AWS/Lambda/Bootstrap.pm
   AWS::Lambda::Context:
     file: lib/AWS/Lambda/Context.pm
   AWS::Lambda::PSGI:
     file: lib/AWS/Lambda/PSGI.pm
+  AWS::Lambda::ResponseWriter:
+    file: lib/AWS/Lambda/ResponseWriter.pm
 recommends:
   AWS::XRay: '0.09'
 requires:
   HTTP::Tiny: '0.076'
   JSON::Types: '0.05'
   JSON::XS: '4.0'
+  MIME::Base64: '0'
   Plack: '1.0047'
   Plack::Middleware::ReverseProxy: '0.16'
   Try::Tiny: '0.30'
@@ -53,11 +57,12 @@ resources:
   bugtracker: https://github.com/shogo82148/p5-aws-lambda/issues
   homepage: https://github.com/shogo82148/p5-aws-lambda
   repository: https://github.com/shogo82148/p5-aws-lambda.git
-version: 0.0.39
+version: 0.2.0
 x_contributors:
   - 'ICHINOSE Shogo <shogo82148@gmail.com>'
   - 'Jose Luis Martinez <jlmartinez@capside.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
+  - 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

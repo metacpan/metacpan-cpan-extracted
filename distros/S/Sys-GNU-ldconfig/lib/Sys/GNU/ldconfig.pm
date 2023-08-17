@@ -1,5 +1,5 @@
 package Sys::GNU::ldconfig;
-# $Id: ldconfig.pm 1086 2013-02-25 16:53:37Z fil $
+# $Id: ldconfig.pm 2456 2023-07-06 23:06:00Z fil $
 # Copyright 2013 Philip Gwyn - All rights reserved
 
 use 5.00405;
@@ -8,7 +8,7 @@ use warnings;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 require Exporter;
 @ISA = qw( Exporter );
@@ -290,7 +290,7 @@ L</ld_root>.
     ld_root( '/mnt' );
 
 Sets the root directory.  Defaults to C</>.  This is roughly equivalent to
-doing L<chroot>(2) before calling L</ld_lookup>.  Note that if ld_lookup will return
+doing L<chroot>(2) before calling L</ld_lookup>.  Note that C<ld_lookup> will return
 a file path with the root stripped out.
 
 Setting the root directory will clear the list of directories to search.
@@ -331,11 +331,11 @@ L<ldconfig>.
 
 =head1 AUTHOR
 
-Philip Gwyn, E<lt>gwyn -AT- cpan.org<gt>
+Philip Gwyn, E<lt>gwyn -AT- cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 by Philip Gwyn
+Copyright (C) 2013-2023 by Philip Gwyn
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

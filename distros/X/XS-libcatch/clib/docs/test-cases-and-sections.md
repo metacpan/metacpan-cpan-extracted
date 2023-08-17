@@ -25,7 +25,8 @@ _section description_ can be used to provide long form description
 of a section while keeping the _section name_ short for use with the
 [`-c` command line parameter](command-line.md#specify-the-section-to-run).
 
-**Test names must be unique within the Catch executable.**
+**The combination of test names and tags must be unique within the Catch2
+executable.**
 
 For examples see the [Tutorial](tutorial.md#top)
 
@@ -44,7 +45,15 @@ The tag expression, ```"[widget]"``` selects A, B & D. ```"[gadget]"``` selects 
 
 For more detail on command line selection see [the command line docs](command-line.md#specifying-which-tests-to-run)
 
-Tag names are not case sensitive and can contain any ASCII characters. This means that tags `[tag with spaces]` and `[I said "good day"]` are both allowed tags and can be filtered on. Escapes are not supported however and `[\]]` is not a valid tag.
+Tag names are not case sensitive and can contain any ASCII characters.
+This means that tags `[tag with spaces]` and `[I said "good day"]`
+are both allowed tags and can be filtered on. However, escapes are not
+supported however and `[\]]` is not a valid tag.
+
+The same tag can be specified multiple times for a single test case,
+but only one of the instances of identical tags will be kept. Which one
+is kept is functionally random.
+
 
 ### Special Tags
 
@@ -60,11 +69,13 @@ All tag names beginning with non-alphanumeric characters are reserved by Catch. 
 
 * `[!nonportable]` - Indicates that behaviour may vary between platforms or compilers.
 
-* `[#<filename>]` - running with `-#` or `--filenames-as-tags` causes Catch to add the filename, prefixed with `#` (and with any extension stripped), as a tag to all contained tests, e.g. tests in testfile.cpp would all be tagged `[#testfile]`.
+* `[#<filename>]` - these tags are added to test cases when you run Catch2
+                    with [`-#` or `--filenames-as-tags`](command-line.md#filenames-as-tags).
 
 * `[@<alias>]` - tag aliases all begin with `@` (see below).
 
-* `[!benchmark]` - this test case is actually a benchmark. This is an experimental feature, and currently has no documentation. If you want to try it out, look at `projects/SelfTest/Benchmark.tests.cpp` for details.
+* `[!benchmark]` - this test case is actually a benchmark. Currently this only serves to hide the test case by default, to avoid the execution time costs.
+
 
 ## Tag aliases
 
@@ -145,7 +156,7 @@ Scenario : vector can be sized and resized
   Then   : The size changes
 ```
 
-See also [runnable example on godbolt](https://godbolt.org/z/e5vPPM),
+See also [runnable example on godbolt](https://godbolt.org/z/eY5a64r99),
 with a more complicated (and failing) example.
 
 > `AND_GIVEN` was [introduced](https://github.com/catchorg/Catch2/issues/1360) in Catch2 2.4.0.
@@ -158,7 +169,11 @@ Other than the additional prefixes and the formatting in the console reporter th
 
 In addition to `TEST_CASE`s, Catch2 also supports test cases parametrised
 by types, in the form of `TEMPLATE_TEST_CASE`,
-`TEMPLATE_PRODUCT_TEST_CASE` and `TEMPLATE_LIST_TEST_CASE`.
+`TEMPLATE_PRODUCT_TEST_CASE` and `TEMPLATE_LIST_TEST_CASE`. These macros
+are defined in the `catch_template_test_macros.hpp` header, so compiling
+the code examples below also requires
+`#include <catch2/catch_template_test_macros.hpp>`.
+
 
 * **TEMPLATE_TEST_CASE(** _test name_ , _tags_,  _type1_, _type2_, ..., _typen_ **)**
 
@@ -280,7 +295,9 @@ TEMPLATE_LIST_TEST_CASE("Template test case with test types specified inside std
 In addition to [type parametrised test cases](#type-parametrised-test-cases) Catch2 also supports
 signature base parametrised test cases, in form of `TEMPLATE_TEST_CASE_SIG` and `TEMPLATE_PRODUCT_TEST_CASE_SIG`.
 These test cases have similar syntax like [type parametrised test cases](#type-parametrised-test-cases), with one
-additional positional argument which specifies the signature.
+additional positional argument which specifies the signature. These macros are defined in the
+`catch_template_test_macros.hpp` header, so compiling the code examples below also requires
+`#include <catch2/catch_template_test_macros.hpp>`.
 
 ### Signature
 Signature has some strict rules for these tests cases to work properly:

@@ -1,4 +1,6 @@
-2.0.0   xx.xx.2021
+2.0.1   20.07.2023
+         - upgrade Catch2
+2.0.0   26.11.2021
          - upgrade to Catch2 v3
 1.0.16  17.05.2021
          - set min perl version to 5.18

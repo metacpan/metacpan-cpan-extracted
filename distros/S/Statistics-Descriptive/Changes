@@ -1,5 +1,10 @@
 Revision history for Perl extension Statistics::Descriptive.
 
+3.0801      2023-07-02
+    - Correct typos
+        - https://github.com/shlomif/perl-Statistics-Descriptive/pull/8
+        - thanks to @anirvan
+
 3.0800      2020-10-17
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

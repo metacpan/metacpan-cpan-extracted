@@ -1,9 +1,9 @@
 NAME
-    Require::HookChain - Chainable require hook
+    Require::HookChain - Chainable require hooks
 
 VERSION
-    This document describes version 0.011 of Require::HookChain (from Perl
-    distribution Require-HookChain), released on 2023-02-12.
+    This document describes version 0.015 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2023-07-23.
 
 SYNOPSIS
     Say you want to create a require hook to prepend some code to the module
@@ -13,18 +13,28 @@ SYNOPSIS
      package Require::HookChain::munge::prepend;
 
      sub new {
+
+         # our hook accepts one argument: preamble (the string to be prepended)
          my ($class, $preamble) = @_;
+
          bless { preamble => $preamble }, $class;
      }
 
      sub Require::HookChain::munge::prepend::INC {
+
+         # instead a filename like a reguler hook, an hook's INC is called by
+         # Require::HookChain's main INC and will be passed $r stash
          my ($self, $r) = @_;
 
          # safety, in case we are not called by Require::HookChain
          return () unless ref $r;
 
          my $src = $r->src;
+
+         # we only munge source code, when source code has not been loaded by other
+         # hooks, we decline.
          return unless defined $src;
+
          $src = "$self->{preamble};\n$src";
          $r->src($src);
      }
@@ -33,13 +43,14 @@ SYNOPSIS
 
     In a code to use this hook:
 
-     use Require::HookChain 'munge::prepend' => 'use strict';
+     use Require::HookChain -end=>1, 'munge::prepend' => 'use strict';
      use Foo::Bar; # Foo/Bar.pm will be loaded with added 'use strict;' at the start
 
-    Install another hook, but put it at the end of @INC instead of at the
+    Install other hooks, but put it at the end of @INC instead of at the
     beginning:
 
-     use Require::HookChain -end => 1, append => 'some code';
+     use Require::HookChain -end=>1, 'munge::append' => 'some code';
+     use Require::HookChain 'log::stderr'; # log each loading of module to stderr
 
 DESCRIPTION
     This module lets you create chainable require hooks. As one already
@@ -54,7 +65,7 @@ DESCRIPTION
      }
 
     The method is passed itself then filename (which is what is passed to
-    "require()") and is expected to return nothing or a list of up to four
+    require()) and is expected to return nothing or a list of up to four
     values: a scalar reference containing source code, filehandle, reference
     to subroutine, optional state for subroutine (more information can be
     read from the perlfunc manpage). As soon as the first hook in @INC
@@ -79,17 +90,60 @@ DESCRIPTION
     First you create a module under the "Require::HookChain::*" namespace,
     then create a constructor as well as "INC" handler.
 
+  Import options
+    Options must be specified at the beginning, before specifying
+
+    *   -end
+
+        Bool. If set to true, then hooks will be put at the end of @INC
+        instead of at the beginning (after Require::HookChain's own hook).
+        Regardless, Require::HookChain's own hook will be put at the
+        beginning to allow executing all the other hooks.
+
+    *   -debug
+
+        Bool. If set to true, then debug messages will be printed to stderr.
+
+  Hook ordering
+    The order of execution of hooks by Require::HookChain is by their order
+    in @INC, so you should set the ordering yourself by way of the (reverse)
+    ordering of "use Require::HookChain" statements. Each time you do this:
+
+     use Require::HookChain 'hook1';
+
+    then Require::HookChain will (re)install its own hook to the beginning
+    of @INC, then insert "hook1" as the second element in @INC. Then when
+    you load another hook:
+
+     use Require::HookChain 'hook2';
+
+    then Require::HookChain will (re)install its own hook to the beginning
+    of @INC, then insert "hook2" as the second element in @INC, while
+    "hook1" will be at the third element of @INC. So the order of hook
+    execution will be: "hook2, hook1". When another hook, "hook3", is loaded
+    afterwards, the order of execution will be "hook3, hook2, hook1".
+
+    Some hooks should be loaded at the end of other hooks (and sources),
+    e.g. debug::dump_source::stderr, so you should install such hooks using
+    something like:
+
+     use Require::HookChain -end=>1, 'hook4';
+
+    in which case Require::HookChain will again (re)install its own hook to
+    the beginning of @INC, then insert "hook4" as the last element in @INC.
+    The order of execution of hooks will then be: "hook3, hook2, hook1,
+    hook4". If you install another hook at the end:
+
+     use Require::HookChain -end=>1, 'hook5';
+
+    then the order of execution of hooks will then be: "hook3, hook2, hook1,
+    hook4, hook5".
+
   Subnamespace organization
     *   Require::HookChain::debug::
 
         Hooks that do debugging-related stuffs. See also: "log::"
         subnamespace, "timestamp::" subnamespace.
-
-    *   Require::HookChain::filter::
-
-        Hooks that filter module loading due to some criteria. These hooks
-        can fail a module being loaded even though the source is available,
-        if the additional criteria are not met.
 
     *   Require::HookChain::log::
 
@@ -99,6 +153,16 @@ DESCRIPTION
     *   Require::HookChain::munge::
 
         Hooks that modify source code.
+
+    *   Require::HookChain::postcheck::
+
+        Hooks that perform checks after the source code is loaded (eval-ed).
+        See also "precheck::" subnamespace.
+
+    *   Require::HookChain::precheck::
+
+        Hooks that perform checks before the source code is loaded
+        (eval-ed). See also "postcheck::" subnamespace.
 
     *   Require::HookChain::source::
 
@@ -137,7 +201,11 @@ FAQ
 
     instead of:
 
-     use Require::HookChain::hookname; # INCORRECT
+     use Require::HookChain::hookname; # INCORRECT, this does not install the hook to @INC
+
+  The order of execution of hooks is incorrect!
+    You control the ordering by putting the hooks in @INC in your preferred
+    order. See "Hook ordering" for more details.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -149,6 +217,9 @@ SOURCE
 
 SEE ALSO
     RHC for convenience of using on the command-line or one-liners.
+
+    Require::Hook is an older framework and is superseded by
+    Require::HookChain.q
 
 AUTHOR
     perlancar <perlancar@cpan.org>

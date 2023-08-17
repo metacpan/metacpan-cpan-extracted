@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Simple tests => 31;
+use Test::Simple tests => 35;
 
 use Mail::DKIM::Signer;
 
@@ -237,4 +237,56 @@ END_OF_SAMPLE
     my $sigstr = $dkim->signature->as_string;
     ok( $sigstr =~ /subject/i, "subject was signed" );
     ok( $sigstr =~ /from/i,    "from was signed" );
+}
+
+{
+    my $EXPECTED_RE = qr/4goHxydMueA3ev5toKlGLc7sUrwPG/;
+
+    my $tdir    = -f "t/test.ed.key" ? "t" : ".";
+    my $keyfile = "$tdir/test.ed.key";
+    my $dkim    = Mail::DKIM::Signer->new(
+        Algorithm => "ed25519-sha256",
+        Method    => "relaxed",
+        Domain    => "example.org",
+        Selector  => "test",
+        KeyFile   => $keyfile
+    );
+    ok( $dkim, "new() works" );
+
+    my $sample_email = <<END_OF_SAMPLE;
+From: alice <alice\@example.org>
+Date: Wed, 12 May 2023 14:00:00 +0200
+Subject: ed25519
+
+this is an elliptic test.
+END_OF_SAMPLE
+    $sample_email =~ s/\n/\015\012/gs;
+
+    $dkim->PRINT($sample_email);
+    $dkim->CLOSE;
+
+    my $signature = $dkim->signature;
+    ok( $signature, "signature() works" );
+
+    print "# signature=" . $signature->as_string . "\n";
+    ok( $signature->as_string =~ /$EXPECTED_RE/, "got expected signature value" );
+
+    # Modify sample email and sign again
+
+    $sample_email =~ s/Wed, 12/Tue, 11/;
+    $dkim    = Mail::DKIM::Signer->new(
+        Algorithm => "ed25519-sha256",
+        Method    => "relaxed",
+        Domain    => "example.org",
+        Selector  => "test",
+        KeyFile   => $keyfile
+    );
+    $dkim->PRINT($sample_email);
+    $dkim->CLOSE;
+
+    $signature = $dkim->signature;
+
+    print "# signature=" . $signature->as_string . "\n";
+    ok( $signature->as_string !~ /$EXPECTED_RE/, "got expected signature mismatch" );
+
 }

@@ -1,7 +1,7 @@
 package Code::Style::Kit::Parts::Autobox;
 use strict;
 use warnings;
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: add autobox to your kit
 
 
@@ -26,7 +26,7 @@ Code::Style::Kit::Parts::Autobox - add autobox to your kit
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

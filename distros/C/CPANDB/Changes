@@ -1,5 +1,7 @@
 Changes for Perl extension CPANDB
 
+0.19      2023-07-15 18:59:28Z
+
 0.18 Mon 10 Sep 2012
 	- Updated to Module::Install::DSL 1.06
 	- Updated to ORLite 1.92 for correct use of readonly

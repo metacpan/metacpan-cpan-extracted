@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Trait.
 
+0.33 June 2, 2023 (deprecated)
+    - Module marked as deprecated
+
 0.31 Jan 3, 2010 (bug fixes)
     - Normalized version numbers.
     - Fixed lvalue bug which broke the debugger and profiler. [rt#23709]

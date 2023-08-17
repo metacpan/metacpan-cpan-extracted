@@ -1,0 +1,553 @@
+#!/usr/bin/perl -w
+###
+### qosls - list QoS configuration on a Cisco router
+###
+### Author:       Simon Leinen <simon@switch.ch>
+### Date created: 26-Mar-2005
+###
+### This script reads QoS configuration information from the
+### CISCO-CLASS-BASED-QOS-MIB, and constructs an internal
+### representation for it.
+
+use strict;
+use SNMP_util;
+
+## Prototypes
+sub init_mibs ();
+sub collect_qos_information ($ );
+sub print_service_policies ($$);
+sub print_qos_objects ($ );
+sub print_qos_config ($ );
+sub get_if_entries ($ );
+sub get_service_policies ($ );
+sub get_qos_objects ($ );
+sub fixup_parents ($ );
+sub get_qos_object_configs ($ );
+sub get_qos_config ($$$$@);
+sub pretty_traffic_direction ($ );
+sub pretty_interface_type ($ );
+sub pretty_config_type ($ );
+sub pretty_class_info ($ );
+sub pretty_match_info ($ );
+sub pretty_queueing_bandwidth_units ($ );
+sub pretty_queueing_unit_type ($ );
+sub pretty_red_mechanism ($ );
+sub pretty_police_action ($ );
+sub pretty_traffic_shaping_limit ($ );
+sub get_police_action_configs ($$);
+sub decode_truth_value ($ );
+sub snmp_decode_value ($@);
+sub snmp_rows_to_objects ($$$@ );
+sub snmp_map_row_objects ($$$$@ );
+
+my $target = shift @ARGV || die "Usage: $0 target\n";
+
+init_mibs ();
+collect_qos_information ($target);
+1;
+
+sub collect_qos_information ($ ) {
+    my $if_entry = get_if_entries ($target);
+    my $service_policies = get_service_policies ($target);
+    my $qos_objects = get_qos_objects ($target);
+    my $configs = get_qos_object_configs ($target);
+
+    print_service_policies ($service_policies, $if_entry);
+    print_qos_objects ($qos_objects);
+    print_qos_config ($configs);
+}
+
+sub print_service_policies ($$) {
+    my ($service_policies, $if_entry) = @_;
+    print "Service Policies\n\n";
+    foreach my $installed_index (sort keys %{$service_policies}) {
+	my $service_policy = $service_policies->{$installed_index};
+	printf STDOUT
+	  ("%4d %-10s %s\n",
+	   $installed_index,
+	   $if_entry->{$service_policy->{ifIndex}}->{descr},
+	   pretty_traffic_direction ($service_policy->{policyDirection}));
+    }
+    print "\n";
+}
+
+sub print_qos_objects ($ ) {
+    my ($qos_objects) = @_;
+    print "QoS objects\n\n";
+    foreach my $policy_index (sort keys %{$qos_objects}) {
+	foreach my $object_index (sort keys %{$qos_objects->{$policy_index}}) {
+	    my $qos_object = $qos_objects->{$policy_index}->{$object_index};
+	    printf STDOUT
+		("%4d %4d [%4d] %d %-10s\n",
+		 $policy_index,
+		 $object_index,
+		 $qos_object->{parentObjectsIndex},
+		 $qos_object->{configIndex},
+		 pretty_config_type $qos_object->{objectsType});
+	}
+    }
+    print "\n";
+}
+
+sub print_qos_config ($ ) {
+    my ($configs) = @_;
+    print "QoS Configuration\n\n";
+    foreach my $config_index (sort keys %{$configs}) {
+	my $config = $configs->{$config_index};
+	printf STDOUT
+	  ("%4d %-14s %s\n",
+	   $config_index,
+	   ref $config,
+	   $config->tostring ());
+    }
+    print "\n";
+}
+
+### get_if_entries TARGET
+###
+### Read the MIB-II interface table, and construct a hash mapping the
+### interface indices to hashes containing important slots.
+### Currently, only ifDescr and ifAlias are recorded.
+###
+sub get_if_entries ($ ) {
+    my ($target) = @_;
+    return snmp_rows_to_objects
+      ($target, 'MIBII::Interface', 'if', qw(descr alias));
+}
+
+sub get_service_policies ($ ) {
+    return snmp_rows_to_objects
+      ($target, 'CBQM::ServicePolicy',
+       'cbQos', qw(ifType policyDirection ifIndex frDLCI atmVCI));
+}
+
+sub get_qos_objects ($ ) {
+    my ($target) = @_;
+    my $qos_objects = {};
+    snmp_map_row_objects
+      ($target, 'CBQM::QosObject',
+       sub () {
+	   my ($index, $object) = @_;
+	   my ($policy_index, $object_index) = split ('\.', $index);
+	   $qos_objects->{$policy_index}->{$object_index} = $object;
+       },
+       'cbQos',
+       qw(configIndex objectsType parentObjectsIndex));
+    fixup_parents ($qos_objects);
+    return $qos_objects;
+}
+
+sub fixup_parents ($ ) {
+    my ($qos_objects) = @_;
+    foreach my $policy_index (keys %{$qos_objects}) {
+	my $policy = $qos_objects->{$policy_index};
+	foreach my $object_index (keys %$policy) {
+	    my $object = $policy->{$object_index};
+	    my $parent_index = $object->{'parentObjectsIndex'};
+	    if ($parent_index != 0) {
+		die ("missing parent ",$parent_index)
+		    unless $policy->{$parent_index};
+		$object->{'parent'} = $policy->{$parent_index};
+		push @{$policy->{$parent_index}->{'children'}}, $object;
+	    }
+	}
+    }
+}
+
+sub get_qos_object_configs ($ ) {
+    my ($target) = @_;
+    my $configs = {};
+    get_qos_config ($target, 'CBQM::PolicyMapCfg', $configs,
+		    'cbQosPolicyMap', qw(name desc));
+    get_qos_config ($target, 'CBQM::ClassMapCfg', $configs,
+		    'cbQosCM', qw(name desc info));
+    get_qos_config ($target, 'CBQM::MatchStmtCfg', $configs,
+		    'cbQosMatchStmt', qw(name info));
+    get_qos_config ($target, 'CBQM::QueueingCfg', $configs,
+		    'cbQosQueueingCfg',
+		    qw(bandwidth bandwidthUnits flowEnabled priorityEnabled
+		       aggregateQSize individualQSize dynamicQNumber
+		       prioBurstSize qLimitUnits aggregateQLimit));
+    get_qos_config ($target, 'CBQM::REDCfg', $configs,
+		    'cbQosREDCfg',
+		    qw(exponWeight meanQsize dscpPrec eCNEnabled));
+    get_qos_config ($target, 'CBQM::REDClassCfg', $configs,
+		    'cbQosRED',
+		    qw(cfgPktDropProb classCfgThresholdUnit
+		       classCfgMinThreshold classCfgMaxThreshold));
+    get_qos_config ($target, 'CBQM::PoliceCfg', $configs,
+		    'cbQosPoliceCfg',
+		    qw(rate burstSize extBurstSize
+		       conformAction conformSetValue
+		       exceedAction exceedSetValue
+		       violateAction violateSetValue
+		       pir rate64));
+    get_qos_config ($target, 'CBQM::TrafficShaperCfg', $configs,
+		    'cbQosTSCfg',
+		    qw(rate burstSize extBurstSize
+		       adaptiveEnabled adaptiveRate limitType));
+    get_qos_config ($target, 'CBQM::SetCfg', $configs,
+		    'cbQosSetCfg',
+		    qw(feature ipDSCPValue ipPrecedenceValue qosGroupValue
+		       l2CosValue mplsExpValue discardClassValue));
+    get_police_action_configs ($target, $configs);
+    return $configs;
+}
+
+sub get_qos_config ($$$$@) {
+    my ($target, $class, $configs, $prefix, @cols) = @_;
+    snmp_map_row_objects
+      ($target, $class,
+       sub () { my ($index, $object) = @_;
+		$configs->{$index} = $object; },
+       $prefix, @cols);
+    return $configs;
+}
+
+sub get_police_action_configs ($$) {
+    my ($target, $configs) = @_;
+    snmp_map_row_objects
+      ($target, 'CBQM::PoliceActionCfg',
+       sub () {
+	   my ($index, $object) = @_;
+	   my ($config_index, $action_index)
+	     = split ('\.', $index);
+	   $configs->{$config_index}->{'police_action'}->{$action_index}
+	     = $object;
+       },
+       'cbQosPoliceActionCfg',
+       qw(conform conformSetValue exceed exceedSetValue
+	  violate violateSetValue));
+    return $configs;
+}
+
+sub pretty_traffic_direction ($ ) {
+    return snmp_decode_value ($_[0], qw(input output));} 
+sub pretty_interface_type ($ ) {
+    return snmp_decode_value
+      ($_[0], qw(mainInterface subInterface frDLCI atmPVC));}
+sub pretty_config_type ($ ) {
+    return snmp_decode_value
+      ($_[0], qw(policymap classmap matchStatement queueing
+		 randomDetect trafficShaping police set));}
+sub pretty_class_info ($ ) {
+    return snmp_decode_value ($_[0], qw(none matchAll matchAny));} 
+sub pretty_match_info ($ ) {
+    return snmp_decode_value ($_[0], qw(none matchNot));}
+sub pretty_queueing_bandwidth_units ($ ) {
+    return snmp_decode_value ($_[0], qw(kbps percentage percentageRemaining));}
+sub pretty_queueing_unit_type ($ ) {
+    return snmp_decode_value ($_[0], qw(packets cells bytes));}
+sub pretty_red_mechanism ($ ) {
+    return snmp_decode_value ($_[0], qw(precedence dscp));}
+sub pretty_police_action ($ ) {
+    return snmp_decode_value
+      ($_[0], qw(transmit setIpDSCP setIpPrecedence setQosGroup
+		 drop setMplsExp setAtmClp setFrDe setL2Cos setDiscardClass));}
+sub pretty_traffic_shaping_limit ($ ) {
+    return snmp_decode_value ($_[0], qw(average peak));}
+sub pretty_set_feature_type ($ ) {
+    return snmp_decode_value
+      ($_[0], qw(ipDscp ipPrecedence qosGroupNumber
+		 frDeBit atmClpBit l2Cos mplsExp discardClass));}
+
+sub decode_truth_value ($ ) {return snmp_decode_value ($_[0], qw(1 0));}
+
+sub snmp_decode_value ($@) {
+    my ($index, @mapvec) = @_;
+    return $index if $index < 1 or $index > $#mapvec+1;
+    return $mapvec[$index-1];
+}
+
+### snmp_rows_to_objects TARGET, CLASS, PREFIX, COLUMNS...
+###
+### Returns a reference to a hash that maps a table's index to objects
+### created from the set of COLUMNS.  The COLUMNS are partial OID
+### names, to each of which the PREFIX is prepended.  An object is
+### created for each row in the table, by creating a hash reference
+### with a slot for each column, named by the (partial) column name.
+### It is blessed to the CLASS.
+###
+### For example, if we have the following table at $TARGET:
+###
+### index fooBar fooBaz fooBlech
+###
+### 1000  asd    23498  vohdajae
+### 1001  fgh    45824  yaohetoo
+### 1002  jkl    89732  engahghi
+###
+### Then the call:
+###
+###  snmp_rows_to_objects ($TARGET, 'MyFoo', 'foo', 'bar', 'baz', 'blech') 
+###
+### will create a hash reference similar to this:
+###
+###     $result = {};
+###     $result{1000} = bless { 'bar' => 'asd',
+###                             'baz' => 23498,
+###                             'blech' => 'vohdajae' }, 'MyFoo';
+###     $result{1001} = bless { 'bar' => 'fgh',
+###                             'baz' => 45824,
+###                             'blech' => 'yaohetoo' }, 'MyFoo';
+###     $result{1002} = bless { 'bar' => 'jkl',
+###                             'baz' => 89732,
+###                             'blech' => 'engahghi' }, 'MyFoo';
+###
+sub snmp_rows_to_objects ($$$@) {
+    my ($target, $class, $prefix, @cols) = @_;
+    my $result = {};
+    snmp_map_row_objects
+      ($target, $class,
+       sub () {
+	   my ($index, $object) = @_;
+	   $result->{$index} = $object;
+       },
+       $prefix, @cols);
+    return $result;
+}
+
+### snmp_map_row_objects TARGET, CLASS, MAPFN, PREFIX, COLUMNS...
+###
+### This function traverses a table, creating an object for each row,
+### and applying the user-supplied MAPFN to each of these objects.
+###
+### The table is defined by PREFIX and COLUMNS, as described for
+### snmp_rows_to_objects above.  An object is created according to
+### CLASS and COLUMNS, as described above.  The difference is that,
+### rather than putting all objects in a hash, we simply apply the
+### user-supplied MAPFN to each row object.
+###
+sub snmp_map_row_objects ($$$$@) {
+    my ($target, $class, $mapfn, $prefix, @cols) = @_;
+    snmpmaptable ($target,
+		  sub () {
+		      my ($index, @colvals) = @_;
+		      my $object = bless {}, $class;
+		      foreach my $col (@cols) {
+			  $object->{$col} = shift @colvals;
+		      }
+		      &$mapfn ($index, $object);
+		  },
+       map ($prefix.ucfirst $_,@cols));
+}
+
+sub init_mibs () {
+    snmpmapOID
+	(qw(
+cbQosIfType				1.3.6.1.4.1.9.9.166.1.1.1.1.2
+cbQosPolicyDirection			1.3.6.1.4.1.9.9.166.1.1.1.1.3
+cbQosIfIndex				1.3.6.1.4.1.9.9.166.1.1.1.1.4
+cbQosFrDLCI				1.3.6.1.4.1.9.9.166.1.1.1.1.5
+cbQosAtmVPI				1.3.6.1.4.1.9.9.166.1.1.1.1.6
+cbQosAtmVCI				1.3.6.1.4.1.9.9.166.1.1.1.1.7
+cbQosConfigIndex			1.3.6.1.4.1.9.9.166.1.5.1.1.2
+cbQosObjectsType			1.3.6.1.4.1.9.9.166.1.5.1.1.3
+cbQosParentObjectsIndex			1.3.6.1.4.1.9.9.166.1.5.1.1.4
+cbQosPolicyMapName			1.3.6.1.4.1.9.9.166.1.6.1.1.1
+cbQosPolicyMapDesc			1.3.6.1.4.1.9.9.166.1.6.1.1.2
+cbQosCMName				1.3.6.1.4.1.9.9.166.1.7.1.1.1
+cbQosCMDesc				1.3.6.1.4.1.9.9.166.1.7.1.1.2
+cbQosCMInfo				1.3.6.1.4.1.9.9.166.1.7.1.1.3
+cbQosMatchStmtName			1.3.6.1.4.1.9.9.166.1.8.1.1.1
+cbQosMatchStmtInfo			1.3.6.1.4.1.9.9.166.1.8.1.1.2
+));
+    ## configuration
+    snmpmapOID (qw(
+cbQosQueueingCfgBandwidth		1.3.6.1.4.1.9.9.166.1.9.1.1.1
+cbQosQueueingCfgBandwidthUnits		1.3.6.1.4.1.9.9.166.1.9.1.1.2
+cbQosQueueingCfgFlowEnabled		1.3.6.1.4.1.9.9.166.1.9.1.1.3
+cbQosQueueingCfgPriorityEnabled		1.3.6.1.4.1.9.9.166.1.9.1.1.4
+cbQosQueueingCfgAggregateQSize		1.3.6.1.4.1.9.9.166.1.9.1.1.5
+cbQosQueueingCfgIndividualQSize		1.3.6.1.4.1.9.9.166.1.9.1.1.6
+cbQosQueueingCfgDynamicQNumber		1.3.6.1.4.1.9.9.166.1.9.1.1.7
+cbQosQueueingCfgPrioBurstSize		1.3.6.1.4.1.9.9.166.1.9.1.1.8
+cbQosQueueingCfgQLimitUnits		1.3.6.1.4.1.9.9.166.1.9.1.1.9
+cbQosQueueingCfgAggregateQLimit		1.3.6.1.4.1.9.9.166.1.9.1.1.10
+cbQosREDCfgExponWeight			1.3.6.1.4.1.9.9.166.1.10.1.1.1
+cbQosREDCfgMeanQsize			1.3.6.1.4.1.9.9.166.1.10.1.1.2
+cbQosREDCfgDscpPrec			1.3.6.1.4.1.9.9.166.1.10.1.1.3
+cbQosREDCfgECNEnabled			1.3.6.1.4.1.9.9.166.1.10.1.1.4
+cbQosREDValue				1.3.6.1.4.1.9.9.166.1.11.1.1.1
+cbQosREDCfgMinThreshold			1.3.6.1.4.1.9.9.166.1.11.1.1.2
+cbQosREDCfgMaxThreshold			1.3.6.1.4.1.9.9.166.1.11.1.1.3
+cbQosREDCfgPktDropProb			1.3.6.1.4.1.9.9.166.1.11.1.1.4
+cbQosREDClassCfgThresholdUnit		1.3.6.1.4.1.9.9.166.1.11.1.1.5
+cbQosREDClassCfgMinThreshold		1.3.6.1.4.1.9.9.166.1.11.1.1.6
+cbQosREDClassCfgMaxThreshold		1.3.6.1.4.1.9.9.166.1.11.1.1.7
+cbQosPoliceCfgRate			1.3.6.1.4.1.9.9.166.1.12.1.1.1
+cbQosPoliceCfgBurstSize			1.3.6.1.4.1.9.9.166.1.12.1.1.2
+cbQosPoliceCfgExtBurstSize		1.3.6.1.4.1.9.9.166.1.12.1.1.3
+cbQosPoliceCfgConformAction		1.3.6.1.4.1.9.9.166.1.12.1.1.4
+cbQosPoliceCfgConformSetValue		1.3.6.1.4.1.9.9.166.1.12.1.1.5
+cbQosPoliceCfgExceedAction		1.3.6.1.4.1.9.9.166.1.12.1.1.6
+cbQosPoliceCfgExceedSetValue		1.3.6.1.4.1.9.9.166.1.12.1.1.7
+cbQosPoliceCfgViolateAction		1.3.6.1.4.1.9.9.166.1.12.1.1.8
+cbQosPoliceCfgViolateSetValue		1.3.6.1.4.1.9.9.166.1.12.1.1.9
+cbQosPoliceCfgPir			1.3.6.1.4.1.9.9.166.1.12.1.1.10
+cbQosPoliceCfgRate64			1.3.6.1.4.1.9.9.166.1.12.1.1.11
+cbQosTSCfgRate				1.3.6.1.4.1.9.9.166.1.13.1.1.1
+cbQosTSCfgBurstSize			1.3.6.1.4.1.9.9.166.1.13.1.1.2
+cbQosTSCfgExtBurstSize			1.3.6.1.4.1.9.9.166.1.13.1.1.3
+cbQosTSCfgAdaptiveEnabled		1.3.6.1.4.1.9.9.166.1.13.1.1.4
+cbQosTSCfgAdaptiveRate			1.3.6.1.4.1.9.9.166.1.13.1.1.5
+cbQosTSCfgLimitType			1.3.6.1.4.1.9.9.166.1.13.1.1.6
+cbQosSetCfgFeature			1.3.6.1.4.1.9.9.166.1.14.1.1.1
+cbQosSetCfgIpDSCPValue			1.3.6.1.4.1.9.9.166.1.14.1.1.2
+cbQosSetCfgIpPrecedenceValue		1.3.6.1.4.1.9.9.166.1.14.1.1.3
+cbQosSetCfgQosGroupValue		1.3.6.1.4.1.9.9.166.1.14.1.1.4
+cbQosSetCfgL2CosValue			1.3.6.1.4.1.9.9.166.1.14.1.1.5
+cbQosSetCfgMplsExpValue			1.3.6.1.4.1.9.9.166.1.14.1.1.6
+cbQosSetCfgDiscardClassValue		1.3.6.1.4.1.9.9.166.1.14.1.1.7
+cbQosPoliceActionCfgIndex		1.3.6.1.4.1.9.9.166.1.21.1.1.1
+cbQosPoliceActionCfgConform		1.3.6.1.4.1.9.9.166.1.21.1.1.2
+cbQosPoliceActionCfgConformSetValue	1.3.6.1.4.1.9.9.166.1.21.1.1.3
+cbQosPoliceActionCfgExceed		1.3.6.1.4.1.9.9.166.1.21.1.1.4
+cbQosPoliceActionCfgExceedSetValue	1.3.6.1.4.1.9.9.166.1.21.1.1.5
+cbQosPoliceActionCfgViolate		1.3.6.1.4.1.9.9.166.1.21.1.1.6
+cbQosPoliceActionCfgViolateSetValue	1.3.6.1.4.1.9.9.166.1.21.1.1.7
+));
+    ## statistics
+    snmpmapOID (qw(
+cbQosCMPrePolicyPktOverflow		1.3.6.1.4.1.9.9.166.1.15.1.1.1
+cbQosCMPrePolicyPkt			1.3.6.1.4.1.9.9.166.1.15.1.1.2
+cbQosCMPrePolicyPkt64			1.3.6.1.4.1.9.9.166.1.15.1.1.3
+cbQosCMPrePolicyByteOverflow		1.3.6.1.4.1.9.9.166.1.15.1.1.4
+cbQosCMPrePolicyByte			1.3.6.1.4.1.9.9.166.1.15.1.1.5
+cbQosCMPrePolicyByte64			1.3.6.1.4.1.9.9.166.1.15.1.1.6
+cbQosCMPrePolicyBitRate			1.3.6.1.4.1.9.9.166.1.15.1.1.7
+cbQosCMPostPolicyByteOverflow		1.3.6.1.4.1.9.9.166.1.15.1.1.8
+cbQosCMPostPolicyByte			1.3.6.1.4.1.9.9.166.1.15.1.1.9
+cbQosCMPostPolicyByte64			1.3.6.1.4.1.9.9.166.1.15.1.1.10
+cbQosCMPostPolicyBitRate		1.3.6.1.4.1.9.9.166.1.15.1.1.11
+cbQosCMDropPktOverflow			1.3.6.1.4.1.9.9.166.1.15.1.1.12
+cbQosCMDropPkt				1.3.6.1.4.1.9.9.166.1.15.1.1.13
+cbQosCMDropPkt64			1.3.6.1.4.1.9.9.166.1.15.1.1.14
+cbQosCMDropByteOverflow			1.3.6.1.4.1.9.9.166.1.15.1.1.15
+cbQosCMDropByte				1.3.6.1.4.1.9.9.166.1.15.1.1.16
+cbQosCMDropByte64			1.3.6.1.4.1.9.9.166.1.15.1.1.17
+cbQosCMDropBitRate			1.3.6.1.4.1.9.9.166.1.15.1.1.18
+cbQosCMNoBufDropPktOverflow		1.3.6.1.4.1.9.9.166.1.15.1.1.19
+cbQosCMNoBufDropPkt			1.3.6.1.4.1.9.9.166.1.15.1.1.20
+cbQosCMNoBufDropPkt64			1.3.6.1.4.1.9.9.166.1.15.1.1.21
+cbQosMatchPrePolicyPktOverflow		1.3.6.1.4.1.9.9.166.1.16.1.1.1
+cbQosMatchPrePolicyPkt			1.3.6.1.4.1.9.9.166.1.16.1.1.2
+cbQosMatchPrePolicyPkt64		1.3.6.1.4.1.9.9.166.1.16.1.1.3
+cbQosMatchPrePolicyByteOverflow		1.3.6.1.4.1.9.9.166.1.16.1.1.4
+cbQosMatchPrePolicyByte			1.3.6.1.4.1.9.9.166.1.16.1.1.5
+cbQosMatchPrePolicyByte64		1.3.6.1.4.1.9.9.166.1.16.1.1.6
+cbQosMatchPrePolicyBitRate		1.3.6.1.4.1.9.9.166.1.16.1.1.7
+cbQosPoliceConformedPktOverflow		1.3.6.1.4.1.9.9.166.1.17.1.1.1
+cbQosPoliceConformedPkt			1.3.6.1.4.1.9.9.166.1.17.1.1.2
+cbQosPoliceConformedPkt64		1.3.6.1.4.1.9.9.166.1.17.1.1.3
+cbQosPoliceConformedByteOverflow	1.3.6.1.4.1.9.9.166.1.17.1.1.4
+cbQosPoliceConformedByte		1.3.6.1.4.1.9.9.166.1.17.1.1.5
+cbQosPoliceConformedByte64		1.3.6.1.4.1.9.9.166.1.17.1.1.6
+cbQosPoliceConformedBitRate		1.3.6.1.4.1.9.9.166.1.17.1.1.7
+cbQosPoliceExceededPktOverflow		1.3.6.1.4.1.9.9.166.1.17.1.1.8
+cbQosPoliceExceededPkt			1.3.6.1.4.1.9.9.166.1.17.1.1.9
+cbQosPoliceExceededPkt64		1.3.6.1.4.1.9.9.166.1.17.1.1.10
+cbQosPoliceExceededByteOverflow		1.3.6.1.4.1.9.9.166.1.17.1.1.11
+cbQosPoliceExceededByte			1.3.6.1.4.1.9.9.166.1.17.1.1.12
+cbQosPoliceExceededByte64		1.3.6.1.4.1.9.9.166.1.17.1.1.13
+cbQosPoliceExceededBitRate		1.3.6.1.4.1.9.9.166.1.17.1.1.14
+cbQosPoliceViolatedPktOverflow		1.3.6.1.4.1.9.9.166.1.17.1.1.15
+cbQosPoliceViolatedPkt			1.3.6.1.4.1.9.9.166.1.17.1.1.16
+cbQosPoliceViolatedPkt64		1.3.6.1.4.1.9.9.166.1.17.1.1.17
+cbQosPoliceViolatedByteOverflow		1.3.6.1.4.1.9.9.166.1.17.1.1.18
+cbQosPoliceViolatedByte			1.3.6.1.4.1.9.9.166.1.17.1.1.19
+cbQosPoliceViolatedByte64		1.3.6.1.4.1.9.9.166.1.17.1.1.20
+cbQosPoliceViolatedBitRate		1.3.6.1.4.1.9.9.166.1.17.1.1.21
+cbQosQueueingCurrentQDepth		1.3.6.1.4.1.9.9.166.1.18.1.1.1
+cbQosQueueingMaxQDepth			1.3.6.1.4.1.9.9.166.1.18.1.1.2
+cbQosQueueingDiscardByteOverflow	1.3.6.1.4.1.9.9.166.1.18.1.1.3
+cbQosQueueingDiscardByte		1.3.6.1.4.1.9.9.166.1.18.1.1.4
+cbQosQueueingDiscardByte64		1.3.6.1.4.1.9.9.166.1.18.1.1.5
+cbQosQueueingDiscardPktOverflow		1.3.6.1.4.1.9.9.166.1.18.1.1.6
+cbQosQueueingDiscardPkt			1.3.6.1.4.1.9.9.166.1.18.1.1.7
+cbQosQueueingDiscardPkt64		1.3.6.1.4.1.9.9.166.1.18.1.1.8
+cbQosTSStatsDelayedByteOverflow		1.3.6.1.4.1.9.9.166.1.19.1.1.1
+cbQosTSStatsDelayedByte			1.3.6.1.4.1.9.9.166.1.19.1.1.2
+cbQosTSStatsDelayedByte64		1.3.6.1.4.1.9.9.166.1.19.1.1.3
+cbQosTSStatsDelayedPktOverflow		1.3.6.1.4.1.9.9.166.1.19.1.1.4
+cbQosTSStatsDelayedPkt			1.3.6.1.4.1.9.9.166.1.19.1.1.5
+cbQosTSStatsDelayedPkt64		1.3.6.1.4.1.9.9.166.1.19.1.1.6
+cbQosTSStatsDropByteOverflow		1.3.6.1.4.1.9.9.166.1.19.1.1.7
+cbQosTSStatsDropByte			1.3.6.1.4.1.9.9.166.1.19.1.1.8
+cbQosTSStatsDropByte64			1.3.6.1.4.1.9.9.166.1.19.1.1.9
+cbQosTSStatsDropPktOverflow		1.3.6.1.4.1.9.9.166.1.19.1.1.10
+cbQosTSStatsDropPkt			1.3.6.1.4.1.9.9.166.1.19.1.1.11
+cbQosTSStatsDropPkt64			1.3.6.1.4.1.9.9.166.1.19.1.1.12
+cbQosTSStatsActive			1.3.6.1.4.1.9.9.166.1.19.1.1.13
+cbQosTSStatsCurrentQSize		1.3.6.1.4.1.9.9.166.1.19.1.1.14
+cbQosREDRandomDropPktOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.1
+cbQosREDRandomDropPkt			1.3.6.1.4.1.9.9.166.1.20.1.1.2
+cbQosREDRandomDropPkt64			1.3.6.1.4.1.9.9.166.1.20.1.1.3
+cbQosREDRandomDropByteOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.4
+cbQosREDRandomDropByte			1.3.6.1.4.1.9.9.166.1.20.1.1.5
+cbQosREDRandomDropByte64		1.3.6.1.4.1.9.9.166.1.20.1.1.6
+cbQosREDTailDropPktOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.7
+cbQosREDTailDropPkt			1.3.6.1.4.1.9.9.166.1.20.1.1.8
+cbQosREDTailDropPkt64			1.3.6.1.4.1.9.9.166.1.20.1.1.9
+cbQosREDTailDropByteOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.10
+cbQosREDTailDropByte			1.3.6.1.4.1.9.9.166.1.20.1.1.11
+cbQosREDTailDropByte64			1.3.6.1.4.1.9.9.166.1.20.1.1.12
+cbQosREDTransmitPktOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.13
+cbQosREDTransmitPkt			1.3.6.1.4.1.9.9.166.1.20.1.1.14
+cbQosREDTransmitPkt64			1.3.6.1.4.1.9.9.166.1.20.1.1.15
+cbQosREDTransmitByteOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.16
+cbQosREDTransmitByte			1.3.6.1.4.1.9.9.166.1.20.1.1.17
+cbQosREDTransmitByte64			1.3.6.1.4.1.9.9.166.1.20.1.1.18
+cbQosREDECNMarkPktOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.19
+cbQosREDECNMarkPkt			1.3.6.1.4.1.9.9.166.1.20.1.1.20
+cbQosREDECNMarkPkt64			1.3.6.1.4.1.9.9.166.1.20.1.1.21
+cbQosREDECNMarkByteOverflow		1.3.6.1.4.1.9.9.166.1.20.1.1.22
+cbQosREDECNMarkByte			1.3.6.1.4.1.9.9.166.1.20.1.1.23
+cbQosREDECNMarkByte64			1.3.6.1.4.1.9.9.166.1.20.1.1.24
+cbQosREDMeanQSizeUnits			1.3.6.1.4.1.9.9.166.1.20.1.1.25
+cbQosREDMeanQSize			1.3.6.1.4.1.9.9.166.1.20.1.1.26
+	    ));
+}
+
+package MIBII::Interface;
+package CBQM::ServicePolicy;
+package CBQM::QosObject;
+package CBQM::PolicyMapCfg;
+
+sub tostring ($ ) {
+    my $result = $_[0]->{name};
+    $result .= ' ('.$_[0]->{desc}.')'
+	if $_[0]->{desc};
+    return $result;
+}
+
+package CBQM::ClassMapCfg;
+
+sub tostring ($ ) {
+    my $result = $_[0]->{name};
+    $result .= ' ('.$_[0]->{desc}.')'
+	if $_[0]->{desc};
+    return $result;
+}
+
+package CBQM::MatchStmtCfg;
+
+sub tostring ($ ) {
+    my $result = $_[0]->{name};
+    $result .= ' ('.$_[0]->{desc}.')'
+	if $_[0]->{desc};
+    return $result;
+}
+
+package CBQM::QueueingCfg;
+package CBQM::REDCfg;
+package CBQM::REDClassCfg;
+package CBQM::PoliceCfg;
+
+sub tostring ($ ) {
+    my $result = "rate: ".($_[0]->{rate64} || $_[0]->{rate});
+    return $result;
+}
+
+package CBQM::TrafficShaperCfg;
+package CBQM::SetCfg;
+package CBQM::PoliceActionCfg;

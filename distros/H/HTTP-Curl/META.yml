@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Net::Curl: '0.29'
-version: '1.04'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -90,7 +90,7 @@ use Test::More;
       }
       {
         my $source = 'class MyClass { static method main : void () { my $dist : byte = -129; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "int" to "byte" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "int" to "byte" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $dist : short = -32768; } }';
@@ -98,7 +98,7 @@ use Test::More;
       }
       {
         my $source = 'class MyClass { static method main : void () { my $dist : short = -32769; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "int" to "short" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "int" to "short" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $dist : int = -2147483648L; } }';
@@ -106,27 +106,27 @@ use Test::More;
       }
       {
         my $source = 'class MyClass { static method main : void () { my $dist : int = -2147483649L; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "long" to "int" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "long" to "int" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $source : short; my $dist : byte = $source; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "short" to "byte" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "short" to "byte" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $source : int; my $dist : short = $source; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "int" to "short" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "int" to "short" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $source : long; my $dist : int = $source; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "long" to "int" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "long" to "int" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $source : float; my $dist : long = $source; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "float" to "long" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "float" to "long" in the assignment operator is not allowed|);
       }
       {
         my $source = 'class MyClass { static method main : void () { my $source : double; my $dist : float = $source; } }';
-        compile_not_ok($source, q|The implicite narrowing conversion from "double" to "float" in the assignment operator is not allowed|);
+        compile_not_ok($source, q|The implicite type conversion from "double" to "float" in the assignment operator is not allowed|);
       }
     }
   }
@@ -296,7 +296,7 @@ use Test::More;
     }
     {
       my $source = 'class MyClass { static method main : void () { my $source : string; my $dist : mutable string = $source; } }';
-      compile_not_ok($source, q|The non-mutable type cannnot be assign to a mutable type in the assignment operator|);
+      compile_not_ok($source, q|The implicite type conversion from "string" to "mutable string" in the assignment operator is not allowed|);
     }
   }
   
@@ -549,7 +549,7 @@ use Test::More;
         'class MyClass { use Stringable; use MyInterface; static method main : void () { my $source : MyInterface; my $dist : Stringable = $source; } }',
         'class MyInterface : interface_t { required method foo : string (); }',
       ];
-      compile_not_ok($source, q|The implicite type conversion from "MyInterface" to "Stringable" in the assignment operator is not allowed|);
+      compile_not_ok($source, q|The "MyInterface" class must implement the "to_string" method. This is defined as a required interface method in the "Stringable" interface.|);
     }
   }
 }
@@ -733,7 +733,7 @@ use Test::More;
     }
     {
       my $source = 'class MyClass { use Stringable; use Cloneable; static method main : void () { my $source : Stringable[]; my $dist : Cloneable[] = $source; } }';
-      compile_not_ok($source, , qr|implicite type conversion|);
+      compile_not_ok($source, , q|The "Stringable" class must implement the "clone" method. This is defined as a required interface method in the "Cloneable" interface.|);
     }
     {
       my $source = [
@@ -752,7 +752,7 @@ use Test::More;
     }
     {
       my $source = 'class MyClass { use Cloneable; static method main : void () { my $source : Int[]; my $dist : Cloneable[] = $source; } }';
-      compile_not_ok($source, , qr|implicite type conversion|);
+      compile_not_ok($source, , q|The "Int" class must implement the "clone" method. This is defined as a required interface method in the "Cloneable" interface.|);
     }
   }
   
@@ -767,7 +767,7 @@ use Test::More;
   {
     {
       my $source = 'class MyClass { use Stringable; static method main : void () { my $source : Int[]; my $dist : Stringable[] = $source; } }';
-      compile_not_ok($source, , qr|implicite type conversion|);
+      compile_not_ok($source, , q|The "Int" class must implement the "to_string" method. This is defined as a required interface method in the "Stringable" interface.|);
     }
   }
 }

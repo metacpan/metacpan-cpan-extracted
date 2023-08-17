@@ -1,6 +1,14 @@
 Revision history for Perl extension HTML::Selector::XPath
 
-0.27 NEXT
+0.29 NEXT
+
+0.28 2023-08-07
+    * Restore Perl 5.8 compatibility
+
+0.27 2023-08-06
+    * Allow for more whitespace in An+B formulae and in parentheses
+    * Support :nth-child(n-3) to select the first three elements
+    * Fix handling of :nth-of-type to actually respect the type
 
 0.26 2021-12-15
     * Fix typo in documentation for selector_to_xpath.

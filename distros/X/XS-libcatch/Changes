@@ -1,3 +1,5 @@
+3.0.1    20.07.2023
+         - libcatch updated to 3.3.2
 3.0.0.4  28.11.2021
           - remove cmake junk from bundle
 3.0.0.3  26.11.2021

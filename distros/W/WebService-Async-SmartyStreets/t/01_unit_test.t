@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Warnings;
+use Test::Fatal;
 use WebService::Async::SmartyStreets::Address;
 
 subtest 'Parsing test' => sub {
@@ -38,6 +39,69 @@ subtest 'Parsing test' => sub {
     is($parsed_data->accuracy_at_least('locality'),           1,  "Accuracy checking is correct");
     is($parsed_data->accuracy_at_least('administrativearea'), 1,  "Accuracy checking is correct");
     is($parsed_data->accuracy_at_least('deliverypoint'),      '', "Accuracy checking is correct");
+
+    subtest 'undefined accuracy' => sub {
+        my %dummy_data = (
+            input_id     => 12345,
+            organization => 'Beenary',
+            metadata     => {
+                latitude          => 101.2131,
+                longitude         => 180.1223,
+                geocode_precision => "Premise",
+            },
+            analysis => {
+                verification_status => "Partial",
+            });
+
+        my $parsed_data = WebService::Async::SmartyStreets::Address->new(%dummy_data);
+        is($parsed_data->accuracy_at_least('locality'), 0, "Accuracy not defined");
+    };
+
+    subtest 'unknown accuracy' => sub {
+        my %dummy_data = (
+            input_id     => 12345,
+            organization => 'Beenary',
+            metadata     => {
+                latitude          => 101.2131,
+                longitude         => 180.1223,
+                geocode_precision => "Premise",
+            },
+            analysis => {
+                verification_status => "Partial",
+                address_precision   => "IDK"
+            });
+
+        my $parsed_data = WebService::Async::SmartyStreets::Address->new(%dummy_data);
+
+        my $exception = exception {
+            $parsed_data->accuracy_at_least('locality')
+        };
+
+        ok $exception =~ /unknown accuracy idk/;
+    };
+
+    subtest 'unknown target' => sub {
+        my %dummy_data = (
+            input_id     => 12345,
+            organization => 'Beenary',
+            metadata     => {
+                latitude          => 101.2131,
+                longitude         => 180.1223,
+                geocode_precision => "Premise",
+            },
+            analysis => {
+                verification_status => "Partial",
+                address_precision   => "IDK"
+            });
+
+        my $parsed_data = WebService::Async::SmartyStreets::Address->new(%dummy_data);
+
+        my $exception = exception {
+            $parsed_data->accuracy_at_least('idk')
+        };
+
+        ok $exception =~ /unknown target accuracy idk/;
+    };
 };
 
 subtest lc_uninitialie_error => sub {

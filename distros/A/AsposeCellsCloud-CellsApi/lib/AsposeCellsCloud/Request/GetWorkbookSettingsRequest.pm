@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# GetWorkbookSettingsRequest.name :   ,
-# GetWorkbookSettingsRequest.folder :   ,
-# GetWorkbookSettingsRequest.storageName :    
+# GetWorkbookSettingsRequest.name : The workbook name.  ,
+# GetWorkbookSettingsRequest.folder : Original workbook folder.  ,
+# GetWorkbookSettingsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_settings' } = { 
-    	summary => '',
+    	summary => 'Gets workbook settings description.',
         params => $params,
         returns => 'WorkbookSettingsResponse',
     };
@@ -123,21 +123,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

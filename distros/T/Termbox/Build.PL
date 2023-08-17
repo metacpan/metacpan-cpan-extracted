@@ -10,7 +10,7 @@ use Module::Build::Tiny 0.035;
 
 use Devel::CheckBin;
 
-check_bin('make');chdir 'termbox';`make;make install prefix='../share';`;chdir '..';
+check_bin('make');`make -C termbox2 prefix=../share install_lib`;
 ('1');
 
 Build_PL();

@@ -1,0 +1,11 @@
+Revision history for Data-Validate-Mailbox
+
+0.10    2023-6-6
+        first release
+
+0.11    2023-6-6
+        fix a bug for broken SPF
+
+0.12    2023-6-7
+        update POD
+

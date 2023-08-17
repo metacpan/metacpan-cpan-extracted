@@ -23,6 +23,7 @@ t/alias.inc
 t/bare_mbf.t
 t/bare_mbi.t
 t/bare_mif.t
+t/bfround_numify.t
 t/big_pi_e.t
 t/bigfltpm.inc
 t/bigfltpm.t

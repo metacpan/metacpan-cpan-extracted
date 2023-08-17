@@ -1,5 +1,8 @@
 Revision history for Sub-Exporter
 
+0.990     2023-07-22 14:09:26+10:00 Australia/Melbourne
+        - fixes to keep working in v5.39 (thanks, Yves Orton!)
+
 0.989     2022-12-31 19:34:54-05:00 America/New_York
         - update author contact info
 

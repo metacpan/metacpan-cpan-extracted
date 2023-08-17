@@ -1,298 +1,143 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Sys::Tlock - Locking with timeouts.</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
+<h1>tlock</h1>
 
-<body>
+<h3>Locking with timeouts.</h3>
 
-
-
-<ul id="index">
-  <li><a href="#NAME">NAME</a></li>
-  <li><a href="#VERSION">VERSION</a></li>
-  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
-  <li><a href="#DESCRIPTION">DESCRIPTION</a>
-    <ul>
-      <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
-      <li><a href="#TOKENS">TOKENS</a></li>
-      <li><a href="#IN-THE-FILESYSTEM">IN THE FILESYSTEM</a></li>
-    </ul>
-  </li>
-  <li><a href="#FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</a></li>
-  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
-  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
-  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
-  <li><a href="#LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</a></li>
-</ul>
-
-<h1 id="NAME">NAME</h1>
-
-<p>Sys::Tlock - Locking with timeouts.</p>
-
-<h1 id="VERSION">VERSION</h1>
-
-<p>0.12</p>
-
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
-
-<pre><code>    use Sys::Tlock dir =&gt; &#39;/var/myscript/locks/&#39; , qw(tlock_take $patience);
-
-    print &quot;tlock patience is ${patience}\n&quot;;
-
-    # taking a tlock for 5 minutes
-    tlock_take(&#39;logindex&#39;,300) || die &#39;Failed taking the tlock.&#39;;
-    my $token = $_;
-
-    move_old_index();
-
-    # hand over to that other script
-    exec( &quot;/usr/local/loganalyze/loganalyze&quot; , $token );
-
-    -----------------------------------------------------------
-
-    use Sys::Tlock;
-    # /etc/tlock.conf sets dir to &quot;/var/myscript/locks/&quot;
-
-    # checking lock is alive
-    my $t = $ARGV[0];
-    die &#39;Tlock not taken.&#39; if not tlock_alive(&#39;logrotate&#39;,$t);
-
-    do_fancy_log_rotation(547);
-    system( &#39;./clean-up.sh&#39; , $t ) or warn &#39;Clean-up failed.&#39;;
-
-    # releasing the lock
-    tlock_release(&#39;logrotate&#39;,$t);</code></pre>
-
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
-
-<p>This module is handling tlocks, advisory locks with timeouts.</p>
+<p>tlock is handling "tlocks", advisory locks with timeouts.</p>
 
 <p>They are implemented as simple directories that are created and deleted in the lock directory.</p>
 
-<p>A distant predecessor to this module was written many years ago as a kludge to make locking work properly on a Windows server. But it turned out to be very handy to have tlocks in the filesystem, giving you an at-a-glance overview of them. Even the non-scripting sysadmins could easily view and manipulate tlocks.</p>
+<p>A distant predecessor was written many years ago as a kludge to make locking work properly on a Windows server. But it turned out to be very handy to have tlocks in the filesystem, giving you an at-a-glance overview of them. And giving the non-scripting sysadmins easy access to view and manipulate tlocks.</p>
 
-<p>The module is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, tlocks are paired with a lock token.</p>
+<h2>Synopsis</h2>
 
-<h2 id="CONFIGURATION">CONFIGURATION</h2>
+<pre><code># taking a tlock for 5 minutes
+token=$(tlock take 'logwork' 300 || exit 1)
 
-<p>The configuration parameters are set using this process:</p>
+move_old_index
 
-<dl>
+# hand over to that other script
+/usr/local/logrotate/logrotate $token
 
-<dt id="Directly-in-the-use-statement-of-your-script-with-keys-dir-marker-and-patience">1: Directly in the use statement of your script, with keys &quot;dir&quot;, &quot;marker&quot; and &quot;patience&quot;.</dt>
-<dd>
+-----------------------------------------------------------
 
-</dd>
-<dt id="Configuration-file-given-by-a-conf-key-in-the-use-statement-of-your-script">2: Configuration file given by a &quot;conf&quot; key in the use statement of your script.</dt>
-<dd>
+# checking lock is alive
+token=$1
+tlock alive 'logwork' $token || exit 1
 
-</dd>
-<dt id="Environment-variables-tlock_dir-tlock_marker-and-tlock_patience">3: Environment variables &quot;tlock_dir&quot;, &quot;tlock_marker&quot; and &quot;tlock_patience&quot;.</dt>
-<dd>
+# Make time for the fancy rotation task.
+tlock renew 'logwork' 600
 
-</dd>
-<dt id="Configuration-file-given-by-the-environment-variable-tlock_conf">4: Configuration file given by the environment variable &quot;tlock_conf&quot;.</dt>
-<dd>
+do_fancy_log_rotation 547
+/usr/local/cleaning/clean-up-logs.sh $token
 
-</dd>
-<dt id="Configuration-file-etc-tlock.conf">5: Configuration file &quot;/etc/tlock.conf&quot;.</dt>
-<dd>
+# releasing the lock
+tlock release 'logwork' $token
+</code></pre>
 
-</dd>
-<dt id="Default-configuration">6: Default configuration.</dt>
-<dd>
+<h2>Configuration</h2>
 
-</dd>
-</dl>
+<p>There are a number of ways tlock parameters can be set, The prioritized list is:</p>
 
-<p>On top of this, you can import the $dir, $marker and $patience variables and change them in your script. But that is a recipe for disaster, so know what you do, if you go that way.</p>
+<ol>
+<li><p>Directly on the command line with options "-d", "-m", "-o" and "-p".</p></li>
+<li><p>Environment variables "tlock<em>dir", "tlock</em>marker", "tlock<em>owner" and "tlock</em>patience".</p></li>
+<li><p>Configuration file given by the environment variable "tlock_conf".</p></li>
+<li><p>Configuration file "/etc/tlock.conf".</p></li>
+<li><p>Default configuration.</p></li>
+</ol>
 
-<p>Configuration files must start with a &quot;tlock 0&quot; line. Empty lines are allowed and so are comments starting with the # character. There are three directives:</p>
+<h2>In the file system</h2>
 
-<dl>
+<p>Each tlock is a subdirectory of the lock directory. Their names are "$marker.$label". The default value for $marker is "tlock".</p>
 
-<dt id="dir-For-setting-the-lock-directory.-Write-the-full-path"><code>dir</code> For setting the lock directory. Write the full path.</dt>
-<dd>
+<p>All the data for a tlock is in its directory. If it is removed from the lock directory, the tlock is released. If it is moved back in, it is alive again (unless it has timed out). If too much playing around has messed up the lock directory, running tlock_zing on it cleans it up.</p>
 
-</dd>
-<dt id="marker-For-the-marker-prefix-that-all-tlock-directory-names-will-get"><code>marker</code> For the marker (prefix) that all tlock directory names will get.</dt>
-<dd>
+<p>The lock directory also contains shortlived directories named "$marker_.$label". They are per label master locks that help to make changes to the normal locks atomic.</p>
 
-</dd>
-<dt id="patience-For-the-time-that-the-take-method-will-wait-for-a-lock-release"><code>patience</code> For the time that the take method will wait for a lock release.</dt>
-<dd>
+<h2>Command line</h2>
 
-</dd>
-</dl>
+<p>tlock &lbrack;-&lt;option&gt; &lbrack;parameter&rbrack;&rbrack; &lt;command&gt; &lbrack;parameter ...&rbrack;</p>
 
-<pre><code>    tlock 0
-    # Example configuration file for tlock.
-    dir      /var/loglocks/
-    patience 7.5</code></pre>
+<h2>Options</h2>
 
-<h2 id="TOKENS">TOKENS</h2>
+<p>-d &lt;d&gt;  Set the lock directory to &lt;d&gt;.</p>
 
-<p>Safe use of tlocks involve tokens, which are just timestamps of when the lock was taken.</p>
+<p>-h      Show help text.</p>
 
-<p>Without tokens, something like this could happen...</p>
+<p>-m &lt;m&gt;  Set marker to &lt;m&gt;.</p>
 
-<pre><code>    script1 takes lockA
-    script1 freezes
-    lockA times out
-    script2 takes lockA
-    script1 resumes
-    script1 releases lockA
-    script3 takes lockA</code></pre>
+<p>-o &lt;o&gt;  Set tlock owner to &lt;o&gt;.</p>
 
-<p>Now both script2 and script3 &quot;have&quot; lockA!</p>
+<p>-p &lt;p&gt;  Set patience to &lt;p&gt;.</p>
 
-<h2 id="IN-THE-FILESYSTEM">IN THE FILESYSTEM</h2>
+<p>-V      Show the version.</p>
 
-<p>Each tlock is a subdirectory of the lock directory. Their names are &quot;${marker}.${label}&quot;. The default value for $marker is &quot;tlock&quot;.</p>
+<h2>Commands</h2>
 
-<p>Each of the tlock directories has a sub directory named &quot;d&quot;. The mtimes of these two directories saves the token and the timeout. There also are some very shortlived directories named &quot;${marker}_.${label}&quot;. They are per label master locks. They help making changes to the normal locks atomic.</p>
+<p><strong>tlock take &lt;label&gt; &lt;timeout&gt;</strong></p>
 
-<h1 id="FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</h1>
+<p>Takes the specified tlock if possible. Prints the token value.</p>
 
-<p>Loaded by default: <a href="#tlock_take-label-timeout">tlock_take</a>, <a href="#tlock_renew-label-token-timeout">tlock_renew</a>, <a href="#tlock_release-label-token">tlock_release</a>, <a href="#tlock_alive-label-token">tlock_alive</a>, <a href="#tlock_taken-label">tlock_taken</a>, <a href="#tlock_expiry-label">tlock_expiry</a>, <a href="#tlock_zing">tlock_zing</a></p>
+<p><strong>tlock renew &lt;label&gt; &lt;token&gt; &lt;timeout&gt;</strong></p>
 
-<p>Loaded on demand: <a href="#tlock_tstart-label">tlock_tstart</a>, <a href="#tlock_release_careless-label">tlock_release_careless</a>, <a href="#tlock_token-label">tlock_token</a>, <a href="#dir">$dir</a>, <a href="#marker">$marker</a>, <a href="#patience">$patience</a></p>
+<p>Renews the tlock.</p>
 
-<dl>
+<p><strong>tlock release &lt;label&gt; &lt;token&gt;</strong></p>
 
-<dt id="tlock_take-label-timeout">tlock_take( $label , $timeout )</dt>
-<dd>
+<p>Releases the tlock.</p>
 
-<p>Take the tlock with the given label, and set its timeout. The call returns the associated token.</p>
+<p><strong>tlock alive &lt;label&gt; &lt;token&gt;</strong></p>
 
-<p>Labels can be any non-empty string consisting of letters a-z or A-Z, digits 0-9, dashes &quot;-&quot;, underscores &quot;_&quot; and dots &quot;.&quot; (PCRE: [a-zA-Z0-9\-\_\.]+)</p>
+<p>Returns true if the specified tlock is still alive.</p>
 
-<p>It is possible to set a per call special patience value, by adding it as a third variable, like this: tlock_take( &#39;busylock&#39; , $t , 600 )</p>
+<p><strong>tlock taken &lt;label&gt;</strong></p>
 
-<p>The token value is also assigned to the $_ variable.</p>
+<p>Returns true if any tlock with the given label, is alive.</p>
 
-</dd>
-<dt id="tlock_renew-label-token-timeout">tlock_renew( $label , $token , $timeout )</dt>
-<dd>
+<p><strong>tlock expiry &lt;label&gt;</strong></p>
 
-<p>Reset the timeout of the tlock, so that it will time out $timeout seconds from the time that tlock_renew is called.</p>
+<p>Prints the epoch time when the tlock with the given label will expire.</p>
 
-</dd>
-<dt id="tlock_release-label-token">tlock_release( $label , $token )</dt>
-<dd>
+<p><strong>tlock zing</strong></p>
 
-<p>Release the tlock.</p>
+<p>Cleans up the lock directory.</p>
 
-</dd>
-<dt id="tlock_alive-label-token">tlock_alive( $label , $token )</dt>
-<dd>
+<h2>Parameters</h2>
 
-<p>Returns true if the tlock is currently taken.</p>
-
-</dd>
-<dt id="tlock_taken-label">tlock_taken( $label )</dt>
-<dd>
-
-<p>Returns true if a tlock with the given label is currently taken.</p>
-
-<p>The difference between tlock_taken and tlock_alive, is that alive can differentiate between different tlocks with the same label. Different tlocks with the same label can exist at different points in time.</p>
-
-</dd>
-<dt id="tlock_expiry-label">tlock_expiry( $label )</dt>
-<dd>
-
-<p>Returns the time when the current tlock with the given label will expire. It is given in epoch seconds.</p>
-
-</dd>
-<dt id="tlock_zing">tlock_zing()</dt>
-<dd>
-
-<p>Cleans up locks in the lock directory. Takes care not to mess with any lock activity.</p>
-
-</dd>
-<dt id="tlock_tstart-label">tlock_tstart( $label )</dt>
-<dd>
-
-<p>Returns the time for the creation of the current tlock with the given label. It is given in epoch seconds. This function and the token function are identical.</p>
-
-<p>Only loaded on demand.</p>
-
-</dd>
-<dt id="tlock_release_careless-label">tlock_release_careless( $label )</dt>
-<dd>
-
-<p>Carelessly release any tlock with the given label, not caring about the token.</p>
-
-<p>Only loaded on demand.</p>
-
-</dd>
-<dt id="tlock_token-label">tlock_token( $label )</dt>
-<dd>
-
-<p>Returns the token for the current tlock with the given label.</p>
-
-<p>Only loaded on demand.</p>
-
-</dd>
-<dt id="dir">$dir</dt>
-<dd>
+<p><strong>dir</strong></p>
 
 <p>The directory containing the tlocks.</p>
 
-<p>Only loaded on demand.</p>
-
-</dd>
-<dt id="marker">$marker</dt>
-<dd>
+<p><strong>marker</strong></p>
 
 <p>The common prefix of the directory names used for tlocks.</p>
 
-<p>Prefixes can be any non-empty string consisting of letters a-z or A-Z, digits 0-9, dashes &quot;-&quot; and underscores &quot;_&quot; (PCRE: [a-zA-Z0-9\-\_]+). First character has to be a letter, and last character a letter or digit.</p>
+<p>Prefixes can be any non-empty string consisting of letters a-z or A-Z, digits 0-9, dashes "-" and underscores "_" (PCRE: [a-zA-Z0-9-_]+). First character has to be a letter, and last character a letter or digit.</p>
 
-<p>Only loaded on demand.</p>
+<p><strong>owner</strong></p>
 
-</dd>
-<dt id="patience">$patience</dt>
-<dd>
+<p>The UID of the owner of the tlocks.</p>
+
+<p>Will be silently ignored if it cannot be set.</p>
+
+<p>Default value is -1. Which means the owner running the script.</p>
+
+<p><strong>patience</strong></p>
 
 <p>Patience is the time a method will try to take or change a tlock, before it gives up. For example when tlock_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.</p>
 
-<p>Dont confuse patience with timeout.</p>
+<p>Default patience value is 2.5 seconds.,</p>
 
-<p>Default patience value is 2.5 seconds.</p>
+<h2>One tlock, multiple scripts</h2>
 
-<p>Only loaded on demand.</p>
+<p>The point of having tokens is to be able to hand over locks between scripts in a secure way. These scripts can be written in different languages. But they have to use the same dir and marker settings.</p>
 
-</dd>
-</dl>
+<p>If you are using Perl there is a module available. You can read more here: <a href="https://github.com/spragl/Tlock/blob/main/PERL.md">https://github.com/spragl/Tlock/blob/main/PERL.md</a></p>
 
-<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+<h2>License &amp; copyright</h2>
 
-<p>File::Basename</p>
+<p>(c) 2022-2023 Bjoern Hee</p>
 
-<p>Time::HiRes</p>
+<p>Licensed under the Apache License, version 2.0</p>
 
-<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
-
-<p>The author dare not guarantee that the locking is waterproof. But if there are conditions that breaks it, they must be very special. At the least, experience has shown it to be waterproof in practice.</p>
-
-<p>Not tested on Windows, ironically enough.</p>
-
-<h1 id="SEE-ALSO">SEE ALSO</h1>
-
-<p>flock</p>
-
-<h1 id="LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</h1>
-
-<p>(c) 2022-2023 Bjoern Hee Licensed under the Apache License, version 2.0 https://www.apache.org/licenses/LICENSE-2.0.txt</p>
-
-
-</body>
-
-</html>
-
-
+<p>https://www.apache.org/licenses/LICENSE-2.0.txt</p>

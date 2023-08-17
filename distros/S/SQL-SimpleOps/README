@@ -1,4 +1,4 @@
-SQL-SimpleOps version 2023.111.1
+SQL-SimpleOps version 2023.221.1
 ================================
 
  The README is used to introduce the module and provide instructions on
@@ -215,6 +215,7 @@ MAKING ITERACTIVE TEST UNDER SQLITE
 
  (mandatory)
 
+  # export SQL_SIMPLE_DB_SHOW_CREATE=
   # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
   # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
   # export SQL_SIMPLE_SQLITE=1
@@ -240,6 +241,7 @@ MAKING ITERACTIVE TEST UNDER MYSQL/MARIADB (BASED PRE-CREATED DATABASE)
 
  (mandatory)
 
+  # export SQL_SIMPLE_DB_SHOW_CREATE=
   # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
   # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
   # export SQL_SIMPLE_MYSQL=1
@@ -323,6 +325,13 @@ MAKING ITERACTIVE TEST UNDER POSTGRESQL (BASED PRE-CREATED DATABASE)
  IMPORTANT:
 
   a) Postgress must be installed and started.
+  b) Common Error:
+
+     Msg: connection to server at "localhost" (::1), port 5432 failed:
+     See: /var/lib/pgsql/data/pg_hba.conf
+
+     Msg: onnection to server at "x.x.x.x", port 5432 failed: Connection refused
+     See: /var/lib/pgsql/data/pg_hba.conf
 
  (optional)
 
@@ -338,6 +347,7 @@ MAKING ITERACTIVE TEST UNDER POSTGRESQL (BASED PRE-CREATED DATABASE)
 
  (mandatory)
 
+  # export SQL_SIMPLE_DB_SHOW_CREATE=
   # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
   # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
   # export SQL_SIMPLE_PG=1

@@ -3,8 +3,10 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Syntax::Operator::Equ" );
+require Syntax::Operator::Equ;
+require Syntax::Operator::Eqr;
 
+pass( "Modules loaded" );
 done_testing;

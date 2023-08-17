@@ -23,6 +23,7 @@ name: cyanidin 3-O-glucoside-(2\"-O-xyloside) 6''-O-acyltransferase activity
 namespace: molecular_function
 def: "Catalysis of the reaction: cyanidin 3-O-beta-D-sambubioside +4-coumaryl-CoA <=> cyanidin 3-O-[2" [EC:2.3.1.-]
 xref: MetaCyc:RXN-15329
+xref: RHEA:123456
 is_a: GO:0003674
 synonym: "cyanidin 3-O-glucoside-yadda-one" EXACT []
 synonym: "cyanidin 3-O-glucoside-yadda" EXACT []

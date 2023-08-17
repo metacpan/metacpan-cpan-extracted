@@ -1,4 +1,5 @@
 #!/bin/false
+# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Access
 # ABSTRACT: Functions for the 'access' portion of the API
 
@@ -6,10 +7,12 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Access;
-$Net::Proxmox::VE::Access::VERSION = '0.36';
+$Net::Proxmox::VE::Access::VERSION = '0.37';
 use parent 'Exporter';
 
-use JSON qw(decode_json);
+use Carp qw( croak );
+
+use JSON::MaybeXS qw(decode_json);
 
 our @EXPORT =
   qw(
@@ -50,16 +53,16 @@ sub create_access_domains {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_access_domains()' unless @p;
+    croak 'No arguments for create_access_domains()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_access_domains()'
+        croak 'Single argument not a hash for create_access_domains()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_access_domains()'
+        croak 'Odd number of arguments for create_access_domains()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -73,8 +76,8 @@ sub get_access_domains {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No realm for get_access_domains()';
-    die 'realm must be a scalar for get_access_domains()' if ref $a;
+    my $a = shift or croak 'No realm for get_access_domains()';
+    croak 'realm must be a scalar for get_access_domains()' if ref $a;
 
     return $self->get( $base, 'domains', $a )
 
@@ -84,20 +87,20 @@ sub get_access_domains {
 sub update_access_domains {
 
     my $self   = shift or return;
-    my $realm = shift or die 'No realm provided for update_access_domains()';
-    die 'realm must be a scalar for update_access_domains()' if ref $realm;
+    my $realm = shift or croak 'No realm provided for update_access_domains()';
+    croak 'realm must be a scalar for update_access_domains()' if ref $realm;
     my @p = @_;
 
-    die 'No arguments for update_access_domains()' unless @p;
+    croak 'No arguments for update_access_domains()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_access_domains()'
+        croak 'Single argument not a hash for update_access_domains()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_access_domains()'
+        croak 'Odd number of arguments for update_access_domains()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -110,7 +113,7 @@ sub update_access_domains {
 sub delete_access_domains {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_access_domains()';
+    my $a    = shift or croak 'No argument given for delete_access_domains()';
 
     return $self->delete( $base, 'domains', $a )
 
@@ -131,16 +134,16 @@ sub create_access_groups {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_access_groups()' unless @p;
+    croak 'No arguments for create_access_groups()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_access_groups()'
+        croak 'Single argument not a hash for create_access_groups()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_access_groups()'
+        croak 'Odd number of arguments for create_access_groups()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -154,8 +157,8 @@ sub get_access_groups {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No groupid for get_access_groups()';
-    die 'groupid must be a scalar for get_access_groups()' if ref $a;
+    my $a = shift or croak 'No groupid for get_access_groups()';
+    croak 'groupid must be a scalar for get_access_groups()' if ref $a;
 
     return $self->get( $base, 'groups', $a )
 
@@ -165,20 +168,20 @@ sub get_access_groups {
 sub update_access_groups {
 
     my $self   = shift or return;
-    my $realm = shift or die 'No realm provided for update_access_groups()';
-    die 'realm must be a scalar for update_access_groups()' if ref $realm;
+    my $realm = shift or croak 'No realm provided for update_access_groups()';
+    croak 'realm must be a scalar for update_access_groups()' if ref $realm;
     my @p = @_;
 
-    die 'No arguments for update_access_groups()' unless @p;
+    croak 'No arguments for update_access_groups()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_access_groups()'
+        croak 'Single argument not a hash for update_access_groups()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_access_groups()'
+        croak 'Odd number of arguments for update_access_groups()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -191,7 +194,7 @@ sub update_access_groups {
 sub delete_access_groups {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_access_groups()';
+    my $a    = shift or croak 'No argument given for delete_access_groups()';
 
     return $self->delete( $base, 'groups', $a )
 
@@ -213,16 +216,16 @@ sub create_access_roles {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_access_roles()' unless @p;
+    croak 'No arguments for create_access_roles()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_access_roles()'
+        croak 'Single argument not a hash for create_access_roles()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_access_roles()'
+        croak 'Odd number of arguments for create_access_roles()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -236,8 +239,8 @@ sub get_access_roles {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No roleid for get_access_roles()';
-    die 'roleid must be a scalar for get_access_roles()' if ref $a;
+    my $a = shift or croak 'No roleid for get_access_roles()';
+    croak 'roleid must be a scalar for get_access_roles()' if ref $a;
 
     return $self->get( $base, 'roles', $a )
 
@@ -247,20 +250,20 @@ sub get_access_roles {
 sub update_access_roles {
 
     my $self   = shift or return;
-    my $realm = shift or die 'No realm provided for update_access_roles()';
-    die 'realm must be a scalar for update_access_roles()' if ref $realm;
+    my $realm = shift or croak 'No realm provided for update_access_roles()';
+    croak 'realm must be a scalar for update_access_roles()' if ref $realm;
     my @p = @_;
 
-    die 'No arguments for update_access_roles()' unless @p;
+    croak 'No arguments for update_access_roles()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_access_roles()'
+        croak 'Single argument not a hash for update_access_roles()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_access_roles()'
+        croak 'Odd number of arguments for update_access_roles()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -273,7 +276,7 @@ sub update_access_roles {
 sub delete_access_roles {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_access_roles()';
+    my $a    = shift or croak 'No argument given for delete_access_roles()';
 
     return $self->delete( $base, 'roles', $a )
 
@@ -295,16 +298,16 @@ sub create_access_users {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for create_access_users()' unless @p;
+    croak 'No arguments for create_access_users()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for create_access_users()'
+        croak 'Single argument not a hash for create_access_users()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for create_access_users()'
+        croak 'Odd number of arguments for create_access_users()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -318,8 +321,8 @@ sub get_access_users {
 
     my $self = shift or return;
 
-    my $a = shift or die 'No userid for get_access_users()';
-    die 'userid must be a scalar for get_access_users()' if ref $a;
+    my $a = shift or croak 'No userid for get_access_users()';
+    croak 'userid must be a scalar for get_access_users()' if ref $a;
 
     return $self->get( $base, 'users', $a )
 
@@ -329,20 +332,20 @@ sub get_access_users {
 sub update_access_users {
 
     my $self   = shift or return;
-    my $realm = shift or die 'No realm provided for update_access_users()';
-    die 'realm must be a scalar for update_access_users()' if ref $realm;
+    my $realm = shift or croak 'No realm provided for update_access_users()';
+    croak 'realm must be a scalar for update_access_users()' if ref $realm;
     my @p = @_;
 
-    die 'No arguments for update_access_users()' unless @p;
+    croak 'No arguments for update_access_users()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_access_users()'
+        croak 'Single argument not a hash for update_access_users()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_access_users()'
+        croak 'Odd number of arguments for update_access_users()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -355,7 +358,7 @@ sub update_access_users {
 sub delete_access_users {
 
     my $self = shift or return;
-    my $a    = shift or die 'No argument given for delete_access_users()';
+    my $a    = shift or croak 'No argument given for delete_access_users()';
 
     return $self->delete( $base, 'users', $a )
 
@@ -459,16 +462,16 @@ sub update_access_acl {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for update_acl()' unless @p;
+    croak 'No arguments for update_acl()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_acl()'
+        croak 'Single argument not a hash for update_acl()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_acl()'
+        croak 'Odd number of arguments for update_acl()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -483,16 +486,16 @@ sub update_access_password {
     my $self = shift or return;
     my @p = @_;
 
-    die 'No arguments for update_password()' unless @p;
+    croak 'No arguments for update_password()' unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        die 'Single argument not a hash for update_password()'
+        croak 'Single argument not a hash for update_password()'
           unless ref $a eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        die 'Odd number of arguments for update_password()'
+        croak 'Odd number of arguments for update_password()'
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
@@ -504,6 +507,8 @@ sub update_access_password {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -514,7 +519,7 @@ Net::Proxmox::VE::Access - Functions for the 'access' portion of the API
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -540,8 +545,6 @@ Gets a list of access domains (aka the Authentication domain index)
   @pools = $obj->access_domains();
 
 Note: Anyone can access that, because we need that list for the login box (before the user is authenticated).
-
-FIXME: currently this isn't implemented in this library.
 
 =head2 create_access_domains
 
@@ -1000,14 +1003,10 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2023 by Dean Hamstad.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
-
-__END__
-
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab

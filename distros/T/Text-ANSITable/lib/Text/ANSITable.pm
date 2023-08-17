@@ -4,7 +4,6 @@ use 5.010001;
 use Carp;
 use Log::ger;
 use Moo;
-use experimental 'smartmatch';
 
 use ColorThemeUtil::ANSI qw(item_color_to_ansi);
 #use List::Util qw(first);
@@ -12,9 +11,9 @@ use Scalar::Util 'looks_like_number';
 require Win32::Console::ANSI if $^O =~ /Win/;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2023-07-14'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -289,7 +288,7 @@ sub BUILD {
             my $v = $s->{$k};
             croak "Unknown table style '$k' in ANSITABLE_STYLE environment, ".
                 "please use one of [".join(", ", @$STYLES)."]"
-                    unless $k ~~ $STYLES;
+                    unless grep { $_ eq $k } @$STYLES;
             $self->{$k} = $v;
         }
     }
@@ -318,7 +317,7 @@ sub BUILD {
         unless (defined $ENV{UTF8}) {
             require PerlIO;
             my @layers = PerlIO::get_layers(STDOUT);
-            $use_utf8 = 0 unless 'utf8' ~~ @layers;
+            $use_utf8 = 0 unless grep { $_ eq 'utf8' } @layers;
         }
 
         if (defined $ENV{ANSITABLE_BORDER_STYLE}) {
@@ -395,7 +394,7 @@ sub add_row {
 
 sub add_row_separator {
     my ($self) = @_;
-    my $idx = ~~@{$self->{rows}}-1;
+    my $idx = @{$self->{rows}}-1;
     # ignore duplicate separators
     push @{ $self->{_row_separators} }, $idx
         unless @{ $self->{_row_separators} } &&
@@ -458,7 +457,7 @@ sub set_column_style {
     for my $style (keys %sets) {
         my $val = $sets{$style};
         croak "Unknown per-column style '$style', please use one of [".
-            join(", ", @$COLUMN_STYLES) . "]" unless $style ~~ $COLUMN_STYLES;
+            join(", ", @$COLUMN_STYLES) . "]" unless grep { $_ eq $style } @$COLUMN_STYLES;
         $self->{_column_styles}[$col]{$style} = $val;
     }
 }
@@ -489,7 +488,7 @@ sub add_cond_column_style {
 
     for my $style (keys %$styles) {
         croak "Unknown per-column style '$style', please use one of [".
-            join(", ", @$COLUMN_STYLES) . "]" unless $style ~~ $COLUMN_STYLES;
+            join(", ", @$COLUMN_STYLES) . "]" unless grep { $_ eq $style } @$COLUMN_STYLES;
     }
 
     push @{ $self->{_cond_column_styles} }, [$cond, $styles];
@@ -556,7 +555,7 @@ sub set_row_style {
     for my $style (keys %sets) {
         my $val = $sets{$style};
         croak "Unknown per-row style '$style', please use one of [".
-            join(", ", @$ROW_STYLES) . "]" unless $style ~~ $ROW_STYLES;
+            join(", ", @$ROW_STYLES) . "]" unless grep { $_ eq $style } @$ROW_STYLES;
         $self->{_row_styles}[$row]{$style} = $val;
     }
 }
@@ -587,7 +586,7 @@ sub add_cond_row_style {
 
     for my $style (keys %$styles) {
         croak "Unknown per-row style '$style', please use one of [".
-            join(", ", @$ROW_STYLES) . "]" unless $style ~~ $ROW_STYLES;
+            join(", ", @$ROW_STYLES) . "]" unless grep { $_ eq $style } @$ROW_STYLES;
     }
 
     push @{ $self->{_cond_row_styles} }, [$cond, $styles];
@@ -656,7 +655,7 @@ sub set_cell_style {
     for my $style (keys %sets) {
         my $val = $sets{$style};
         croak "Unknown per-cell style '$style', please use one of [".
-            join(", ", @$CELL_STYLES) . "]" unless $style ~~ $CELL_STYLES;
+            join(", ", @$CELL_STYLES) . "]" unless grep { $_ eq $style } @$CELL_STYLES;
         $self->{_cell_styles}[$row][$col]{$style} = $val;
     }
 }
@@ -687,7 +686,7 @@ sub add_cond_cell_style {
 
     for my $style (keys %$styles) {
         croak "Unknown per-cell style '$style', please use one of [".
-            join(", ", @$CELL_STYLES) . "]" unless $style ~~ $CELL_STYLES;
+            join(", ", @$CELL_STYLES) . "]" unless grep { $_ eq $style } @$CELL_STYLES;
     }
 
     push @{ $self->{_cond_cell_styles} }, [$cond, $styles];
@@ -837,7 +836,7 @@ sub _read_style_envs {
             croak "Unknown column style '$k' (for column $col) in ".
                 "ANSITABLE_COLUMN_STYLES environment, ".
                     "please use one of [".join(", ", @$COLUMN_STYLES)."]"
-                        unless $k ~~ $COLUMN_STYLES;
+                        unless grep { $_ eq $k } @$COLUMN_STYLES;
                 $self->{_column_styles}[$ci]{$k} //= $v;
             }
         }
@@ -855,7 +854,7 @@ sub _read_style_envs {
             croak "Unknown row style '$k' (for row $row) in ".
                 "ANSITABLE_ROW_STYLES environment, ".
                     "please use one of [".join(", ", @$ROW_STYLES)."]"
-                        unless $k ~~ $ROW_STYLES;
+                        unless grep { $_ eq $k } @$ROW_STYLES;
                 $self->{_row_styles}[$row]{$k} //= $v;
             }
         }
@@ -879,7 +878,7 @@ sub _read_style_envs {
             croak "Unknown cell style '$k' (for cell $row,$col) in ".
                 "ANSITABLE_CELL_STYLES environment, ".
                     "please use one of [".join(", ", @$CELL_STYLES)."]"
-                        unless $k ~~ $CELL_STYLES;
+                        unless grep { $_ eq $k } @$CELL_STYLES;
                 $self->{_cell_styles}[$row][$ci]{$k} //= $v;
             }
         }
@@ -923,7 +922,7 @@ sub _calc_header_height {
     my $lpad = $self->{cell_lpad} // $self->{cell_pad}; # tbl-lvl leftp
     my $rpad = $self->{cell_rpad} // $self->{cell_pad}; # tbl-lvl rightp
     for my $i (0..@$cols-1) {
-        next unless $cols->[$i] ~~ $fcols;
+        next unless grep { $_ eq $cols->[$i] } @$fcols;
         next if $seen{$cols->[$i]}++;
 
         $fcol_setwidths->[$i] = $self->get_eff_column_style($i, 'width') //
@@ -970,13 +969,13 @@ sub _calc_frows {
         if (ref($rf) eq 'CODE') {
             next unless $rf->($row, $i);
         } elsif ($rf) {
-            next unless $i ~~ $rf;
+            next unless grep { $_ == $i } @$rf;
         }
         $j++;
         push @$frow_setheights, $self->get_eff_row_style($i, 'height') //
             $self->{cell_height};
         push @$frows, [@$row]; # 1-level clone, for storing formatted values
-        push @$frow_separators, $j if $i ~~ $self->{_row_separators};
+        push @$frow_separators, $j if grep { $_ == $i } @{ $self->{_row_separators} };
         push @$frow_tpads, $self->get_eff_row_style($i, 'tpad') //
             $self->get_eff_row_style($i, 'vpad') // $tpad;
         push @$frow_bpads, $self->get_eff_row_style($i, 'bpad') //
@@ -1007,7 +1006,7 @@ sub _detect_column_types {
         $fcol_detect->[$i] = $res;
 
         # optim: skip detecting columns we're not showing
-        next unless $col ~~ $self->{_draw}{fcols};
+        next unless grep { $_ eq $col } @{ $self->{_draw}{fcols} };
 
         # but detect from all rows, not just ones we're showing
         my $type = $self->get_eff_column_style($col, 'type');
@@ -1023,8 +1022,8 @@ sub _detect_column_types {
             require Parse::VarName;
             my @words = map {lc} @{ Parse::VarName::split_varname_words(
                 varname=>$col) };
-            for (qw/date time ctime mtime utime atime stime/) {
-                if ($_ ~~ @words) {
+            for my $w (qw/date time ctime mtime utime atime stime/) {
+                if (grep { $_ eq $w } @words) {
                     $type = 'date';
                     last DETECT;
                 }
@@ -1112,7 +1111,7 @@ sub _apply_column_formats {
 
     my %seen;
     for my $i (0..@$cols-1) {
-        next unless $cols->[$i] ~~ $fcols;
+        next unless grep { $_ eq $cols->[$i] } @$fcols;
         next if $seen{$cols->[$i]}++;
         my @fmts = @{ $self->get_eff_column_style($i, 'formats') //
                           $fcol_detect->[$i]{formats} // [] };
@@ -1146,7 +1145,7 @@ sub _apply_cell_formats {
         my %seen;
         my $origi = $frow_orig_indices->[$i];
         for my $j (0..@$cols-1) {
-            next unless $cols->[$j] ~~ $fcols;
+            next unless grep { $_ eq $cols->[$j] } @$fcols;
             next if $seen{$cols->[$j]}++;
 
             my $fmts = $self->get_eff_cell_style($origi, $j, 'formats');
@@ -1184,7 +1183,7 @@ sub _calc_row_widths_heights {
         my $origi = $frow_orig_indices->[$i];
         my $rsheight = $self->get_eff_row_style($origi, 'height');
         for my $j (0..@$cols-1) {
-            next unless $cols->[$j] ~~ $fcols;
+            next unless grep { $_ eq $cols->[$j] } @$fcols;
             next if $seen{$cols->[$j]}++;
 
             my $wh = $self->_opt_calc_cell_width_height($i,$j,$frows->[$i][$j]);
@@ -1208,7 +1207,7 @@ sub _wrap_wrappable_columns {
 
     my %seen;
     for my $i (0..@$cols-1) {
-        next unless $cols->[$i] ~~ $fcols;
+        next unless grep { $_ eq $cols->[$i] } @$fcols;
         next if $seen{$cols->[$i]}++;
 
         if (($self->get_eff_column_style($i, 'wrap') // $self->{column_wrap} //
@@ -1240,7 +1239,7 @@ sub _calc_table_width_height {
     $w += 1 if length($self->{border_style_obj}->get_border_char(char=>'v_l'));
     my $has_vsep = length($self->{border_style_obj}->get_border_char(char=>'v_i'));
     for my $i (0..@$cols-1) {
-        next unless $cols->[$i] ~~ $fcols;
+        next unless grep { $_ eq $cols->[$i] } @$fcols;
         $w += $fcol_lpads->[$i] + $fcol_widths->[$i] + $fcol_rpads->[$i];
         if ($i < @$cols-1) {
             $w += 1 if $has_vsep;
@@ -1427,7 +1426,7 @@ sub _should_draw_row_separator {
     my ($self, $i) = @_;
 
     return $i < @{$self->{_draw}{frows}}-1 &&
-        (($self->{show_row_separator}==2 && $i~~$self->{_draw}{frow_separators})
+        (($self->{show_row_separator}==2 && (grep { $_ == $i } @{ $self->{_draw}{frow_separators} }))
              || $self->{show_row_separator}==1);
 }
 
@@ -1777,7 +1776,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.608 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2022-02-14.
+This document describes version 0.609 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2023-07-14.
 
 =head1 SYNOPSIS
 
@@ -3358,13 +3357,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

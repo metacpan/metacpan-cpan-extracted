@@ -1,5 +1,3 @@
-# $Id: Blowfish.pm,v 1.14 2001/05/08 02:55:40 btrott Exp $
-
 package Net::SSH::Perl::Cipher::Blowfish;
 
 use strict;
@@ -67,7 +65,7 @@ Net::SSH::Perl::Cipher::Blowfish - Wrapper for SSH Blowfish support
 =head1 DESCRIPTION
 
 I<Net::SSH::Perl::Cipher::Blowfish> provides Blowfish encryption
-support for I<Net::SSH::Perl>. To do so it wraps around 
+support for I<Net::SSH::Perl>. To do so it wraps around
 I<Crypt::Cipher::Blowfish> from the CryptX module.
 
 The blowfish used here is in CBC filter mode with a key length

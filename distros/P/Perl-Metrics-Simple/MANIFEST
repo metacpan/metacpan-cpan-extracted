@@ -27,6 +27,7 @@ t/0100_output.t
 t/0100_output_html.t
 t/0100_output_json.t
 t/0100_output_plain.t
+t/0200_method_modifiers.t
 t/0901_pod.t
 t/0902_pod_coverage.t
 t/lib/Perl/Metrics/Simple/TestData.pm

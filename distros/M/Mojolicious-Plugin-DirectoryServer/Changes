@@ -1,5 +1,12 @@
 Revision history for Mojolicious-Plugin-DirectoryServer
 
+1.004 2023-08-03T05:38:39Z
+	* Improved the embedded CSS for the index.html pages, and allow for
+	an index.css.
+
+1.003 2023-05-28T13:32:10Z
+	* Update documents to use the right namespace (GitHub #3, lbe)
+
 1.002 2023-04-03T08:26:18Z
 	* tobyink added the iniweb.pm so you can type perl -Miniweb to start
 	a server in the local directory.

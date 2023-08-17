@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetMergedCellsRequest.name :   ,
-# GetWorksheetMergedCellsRequest.sheetName :   ,
-# GetWorksheetMergedCellsRequest.folder :   ,
-# GetWorksheetMergedCellsRequest.storageName :    
+# GetWorksheetMergedCellsRequest.name : The workbook name.  ,
+# GetWorksheetMergedCellsRequest.sheetName : The workseet name.  ,
+# GetWorksheetMergedCellsRequest.folder : Original workbook folder.  ,
+# GetWorksheetMergedCellsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_merged_cells' } = { 
-    	summary => '',
+    	summary => 'Get worksheet merged cells.',
         params => $params,
         returns => 'MergedCellsResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The workseet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

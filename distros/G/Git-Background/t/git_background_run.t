@@ -2,7 +2,7 @@
 
 # vim: ts=4 sts=4 sw=4 et: syntax=perl
 #
-# Copyright (c) 2021-2022 Sven Kirmess
+# Copyright (c) 2021-2023 Sven Kirmess
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above

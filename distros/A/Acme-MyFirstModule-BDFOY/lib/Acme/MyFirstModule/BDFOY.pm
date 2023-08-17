@@ -1,6 +1,6 @@
 package Acme::MyFirstModule::BDFOY;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
@@ -12,11 +12,11 @@ Acme::MyFirstModule::BDFOY - The great new Acme::MyFirstModule::BDFOY!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.012
 
 =cut
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 
 =head1 SYNOPSIS

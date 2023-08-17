@@ -13,11 +13,13 @@ DBIx::RunSQL - run SQL from a file
     use DBIx::RunSQL;
 
     my $test_dbh = DBIx::RunSQL->create(
-        dsn     => 'dbi:SQLite:dbname=:memory:',
-        sql     => 'sql/create.sql',
-        force   => 1,
-        verbose => 1,
+        dsn       => 'dbi:SQLite:dbname=:memory:',
+        sql       => 'sql/create.sql',
+        force     => 1,
+        verbose   => 1,
         formatter => 'Text::Table',
+        rotate    => 1,
+        null      => '(Null)',
     );
 
     # now run your tests with a DB setup fresh from setup.sql
@@ -93,6 +95,8 @@ separated with tabs.
 - `output_string` - whether to output the (one) row and column, without any
 headers
 - `formatter` - see the `<formatter`> option of `->format_results`
+- `rotate` - rotate the table by 90° , outputting columns as rows
+- `null` - string to replace SQL `NULL` columns by
 
 ## `DBIx::RunSQL->run_sql ARGS`
 
@@ -123,6 +127,8 @@ separated with tabs, but see the `output_bool` and `output_string` options.
 
 - `output_string` - whether to output the (one) row and column, without any headers
 - `formatter` - see the `<formatter`> option of `->format_results`
+- `rotate` - rotate the table by 90° , outputting columns as rows
+- `null` - string to replace SQL `NULL` columns by
 
 ## `DBIx::RunSQL->format_results %options`
 
@@ -132,7 +138,7 @@ separated with tabs, but see the `output_bool` and `output_string` options.
 
 Executes `$sth->fetchall_arrayref` and returns
 the results either as tab separated string
-or formatted using [Text::Table](https://metacpan.org/pod/Text::Table) if the module is available.
+or formatted using [Text::Table](https://metacpan.org/pod/Text%3A%3ATable) if the module is available.
 
 If you find yourself using this often to create reports,
 you may really want to look at [Querylet](https://metacpan.org/pod/Querylet) instead.
@@ -143,6 +149,9 @@ usage, you can do it through that parameter.
 In fact, the module will use anything other than `tab`
 as the class name and assume that the interface is compatible
 to `Text::Table`.
+- `no_header_when_empty` - don't print anything if there are no results
+- `rotate` - rotate the table by 90° , outputting columns as rows
+- `null` - string to replace SQL `NULL` columns by
 
 Note that the query results are returned as one large string,
 so you really do not want to run this for large(r) result
@@ -163,7 +172,7 @@ This is a helper subroutine to split a sequence of (semicolon-newline-delimited)
 SQL statements into separate statements. It is documented because
 it is not a very smart subroutine and you might want to
 override or replace it. It might also be useful outside the context
-of [DBIx::RunSQL](https://metacpan.org/pod/DBIx::RunSQL) if you need to split up a large blob
+of [DBIx::RunSQL](https://metacpan.org/pod/DBIx%3A%3ARunSQL) if you need to split up a large blob
 of SQL statements into smaller pieces.
 
 The subroutine needs the whole sequence of SQL statements in memory.
@@ -199,8 +208,10 @@ passes the following command line arguments and options to `->create`:
     --verbose
     --bool
     --string
+    --rotate
+    --null
 
-In addition, it handles the following switches through [Pod::Usage](https://metacpan.org/pod/Pod::Usage):
+In addition, it handles the following switches through [Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage):
 
     --help
     --man
@@ -221,7 +232,7 @@ your database" into a module. In some situations you want to give the
 setup SQL to a database admin, but in other situations, for example testing,
 you want to run the SQL statements against an in-memory database. This
 module abstracts away the reading of SQL from a file and allows for various
-command line parameters to be passed in. A skeleton `create-db.sql`
+command line parameters to be passed in. A skeleton `create-db.pl`
 looks like this:
 
     #!/usr/bin/perl -w
@@ -324,14 +335,14 @@ consider looking at [Querylet](https://metacpan.org/pod/Querylet) instead, which
 and even has an interface for Excel or HTML output.
 
 If you find yourself wanting to write parametrized queries as
-`.sql` files, consider looking at [Data::Phrasebook::SQL](https://metacpan.org/pod/Data::Phrasebook::SQL)
-or potentially [DBIx::SQLHandler](https://metacpan.org/pod/DBIx::SQLHandler).
+`.sql` files, consider looking at [Data::Phrasebook::SQL](https://metacpan.org/pod/Data%3A%3APhrasebook%3A%3ASQL)
+or potentially [DBIx::SQLHandler](https://metacpan.org/pod/DBIx%3A%3ASQLHandler).
 
 # SEE ALSO
 
-[ORLite::Migrate](https://metacpan.org/pod/ORLite::Migrate)
+[ORLite::Migrate](https://metacpan.org/pod/ORLite%3A%3AMigrate)
 
-[Test::SQLite](https://metacpan.org/pod/Test::SQLite) - SQLite setup/teardown for tests, mostly geared towards
+[Test::SQLite](https://metacpan.org/pod/Test%3A%3ASQLite) - SQLite setup/teardown for tests, mostly geared towards
 testing, not general database setup
 
 # REPOSITORY
@@ -348,7 +359,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-RunSQL](https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-RunSQL)
-or via mail to [bug-dbix-runsql@rt.cpan.org](https://metacpan.org/pod/bug-dbix-runsql@rt.cpan.org).
+or via mail to [bug-dbix-runsql@rt.cpan.org](https://metacpan.org/pod/bug-dbix-runsql%40rt.cpan.org).
 
 # AUTHOR
 

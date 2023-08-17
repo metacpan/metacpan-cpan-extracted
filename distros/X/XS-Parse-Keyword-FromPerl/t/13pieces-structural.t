@@ -6,11 +6,13 @@ use warnings;
 use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
-   opcode
    KEYWORD_PLUGIN_EXPR
-   XPK_REPEATED XPK_PARENSCOPE XPK_IDENT
-   newSVOP newFOROP newUNOP newLISTOP
+   XPK_REPEATED XPK_PARENS XPK_IDENT
    register_xs_parse_keyword
+);
+use Optree::Generate qw(
+   opcode
+   newSVOP newFOROP newUNOP newLISTOP
 );
 
 use constant {
@@ -43,11 +45,11 @@ BEGIN {
    is( $ret, "one|two|three", 'repeated identifier name' );
 }
 
-# parenscope
+# parens
 BEGIN {
-   register_xs_parse_keyword( parenscope =>
-      permit_hintkey => "main/parenscope",
-      pieces => [XPK_PARENSCOPE(XPK_IDENT)],
+   register_xs_parse_keyword( parens =>
+      permit_hintkey => "main/parens",
+      pieces => [XPK_PARENS(XPK_IDENT)],
       build => sub {
          my ( $outref, $args, $hookdata ) = @_;
 
@@ -60,9 +62,9 @@ BEGIN {
 }
 
 {
-   BEGIN { $^H{"main/parenscope"}++ }
-   my $ret = parenscope ( here );
-   is( $ret, "here", 'identifier inside paren scope' );
+   BEGIN { $^H{"main/parens"}++ }
+   my $ret = parens ( here );
+   is( $ret, "here", 'identifier inside parens' );
 }
 
 done_testing;

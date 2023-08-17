@@ -11,8 +11,6 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
-examples/tidy-libs-and-tests.sh
-examples/tidy-using-config.sh
 git/hooks/pre-commit
 git/setup.sh
 lib/App/perlimports.pm

@@ -33,12 +33,15 @@
       "runtime" : {
          "requires" : {
             "Bytes::Random::Secure" : "0",
-            "HTTP::Headers" : "0",
+            "Carp" : "0",
             "Moo" : "0",
             "OpenTracing::GlobalTracer" : "0.04",
             "OpenTracing::Implementation::Interface::Bootstrap" : "0",
-            "OpenTracing::Implementation::NoOp" : "0",
             "OpenTracing::Role" : "v0.84.0",
+            "PerlX::Maybe" : "0",
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "Test::Deep" : "1.129",
             "Tree" : "0",
             "Types::Standard" : "0",
             "aliased" : "0",
@@ -47,12 +50,17 @@
       },
       "test" : {
          "requires" : {
+            "Carp" : "0",
+            "HTTP::Headers" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Test::Most" : "0",
             "Test::OpenTracing::Interface" : "v0.23.0",
             "Test::Time::HiRes" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.102.1",
+   "version" : "v0.104.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

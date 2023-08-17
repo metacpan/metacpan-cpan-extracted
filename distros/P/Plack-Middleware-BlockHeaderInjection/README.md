@@ -4,7 +4,7 @@ Plack::Middleware::BlockHeaderInjection - block header injections in responses
 
 # VERSION
 
-version v1.0.1
+version v1.1.1
 
 # SYNOPSIS
 
@@ -39,6 +39,15 @@ forging a header used for security (such as a referrer or cookie).
 The status code to return if an invalid header is found. By default,
 this is `500`.
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v1.1.0, this module requires Perl v5.12 or later.
+
+Future releases may only support Perl versions released in the last ten years.
+
+If you need this module on Perl v5.8, please use one of the v1.0.x versions of this module.  Signficant bug or security
+fixes may be backported to those versions.
+
 # SEE ALSO
 
 [https://en.wikipedia.org/wiki/HTTP\_header\_injection](https://en.wikipedia.org/wiki/HTTP_header_injection)
@@ -66,7 +75,7 @@ Foxtons, Ltd [https://www.foxtons.co.uk](https://www.foxtons.co.uk).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2020 by Robert Rothenberg.
+This software is Copyright (c) 2014,2020,2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 304;
+use Test::More tests => 8;
 use lib qw(t t/data/static);
 use Utils;
 use version;
@@ -31,7 +31,7 @@ my $expected_rv1 =
 
 # Functional i/f
 my $rv1 = scan_deps(@roots1);
-compare_scandeps_rvs($rv1, $expected_rv1, \@roots1);
+compare_rv($rv1, $expected_rv1, \@roots1);
 
 
 ##############################################################
@@ -63,7 +63,7 @@ my $expected_rv2 =
 
 # Functional i/f
 my $rv2 = scan_deps(@roots2);
-compare_scandeps_rvs($rv2, $expected_rv2, \@roots2);
+compare_rv($rv2, $expected_rv2, \@roots2);
 
 
 ##############################################################
@@ -147,7 +147,7 @@ my $expected_rv3 =
 
 # Functional i/f
 my $rv3 = scan_deps(@roots3);
-compare_scandeps_rvs($rv3, $expected_rv3, \@roots3);
+compare_rv($rv3, $expected_rv3, \@roots3);
 
 
 ##############################################################
@@ -216,7 +216,7 @@ my $expected_rv4 =
 
 # Functional i/f
 my $rv4 = scan_deps(@roots4);
-compare_scandeps_rvs($rv4, $expected_rv4, \@roots4);
+compare_rv($rv4, $expected_rv4, \@roots4);
 
 
 ##############################################################
@@ -252,7 +252,7 @@ my $expected_rv5 =
 
 # Functional i/f
 my $rv5 = scan_deps(@roots5);
-compare_scandeps_rvs($rv5, $expected_rv5, \@roots5);
+compare_rv($rv5, $expected_rv5, \@roots5);
 
 
 ##############################################################

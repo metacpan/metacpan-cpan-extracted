@@ -4,7 +4,7 @@
       "David Dick <ddick@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -68,6 +68,7 @@
             "URI" : "1.61",
             "URI::Escape" : "0",
             "URI::URL" : "0",
+            "URI::data" : "0",
             "XML::Parser" : "0",
             "base" : "0",
             "overload" : "0",
@@ -86,6 +87,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.38",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "version" : "1.43",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,6 +1,6 @@
 requires 'namespace::clean',   '0.27';
 requires 'perl',               '5.024000';
-requires 'Data::Resolver',     '0.002';
+requires 'Data::Resolver',     '0.006';
 requires 'Image::PNG::Libpng', '0.57';
 requires 'Moo',                '2.005005';
 requires 'PDF::Builder',       '3.025';

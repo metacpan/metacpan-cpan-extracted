@@ -1,0 +1,90 @@
+0.5.0  2023-08-02
+
+* Added `-t` to `lsjobs` (raw tsv output, useful with ` | vd`)
+
+0.4.14  2023-08-01
+
+* Updating `session` defaults to mimic `runjob`'s
+
+0.4.13  2023-07-25
+
+* dist.ini updates metadata
+
+0.4.12  2023-07-22
+
+* Aestetic changes in `shelf`
+
+0.4.11 2023-07-20
+
+* Documentation updates
+* Added `--scramble` in `whojobs`
+
+0.4.10 2023-07-06
+
+* Bugfixes and documentation updates
+* Added `days_since_last_update` method in Slurm for cache check
+  
+0.4.9 2023-07-05
+
+* Added dependency (Storable)
+* Minor changes
+
+0.4.8 2023-07-03
+
+* Bugfix on lsjobs
+
+0.4.7 2023-07-02
+
+* `runjob` print JOBID to STDOUT, allowing easier chaining of jobs. Will warn if queue is not available.
+* Added `has_squeue()` and `@queues = queues()` to NBI::Slurm
+* Bugfixes
+
+0.4.6 2023-06-30
+
+* `lsjobs` updated with colored output, detailed view of single jobs, rearranged columns
+
+0.4.5 2023-06-29
+
+* Changes in `runjob` parameters
+
+0.4.4 2023-06-28
+
+* Bugfixes
+
+0.4.3 2023-06-27
+
+* Added extra binary `session` to start an interactive session (currently not bound to the module itself)
+
+0.4.2 2023-06-25
+
+* Bumped Perl requirement to 5.16, to keep using lvalue subs
+
+0.4.1   2023-06-18
+
+* BUGFIX in setting job options (tmpdir was not working)
+* Fixed documentation
+
+0.4.0   2023-06-12
+
+* Added `--after INT` in `runjobs`
+
+0.3.0   2023-06-10
+
+* Drafted `waitjobs`
+* Drafted `NBI::Queue` to check jobs in queue, saved as `NBI::QueuedJob` objects
+  
+0.2.0   2023-06-08
+
+* Drafted `lsjobs`, `whojobs` 
+
+0.1.2   2023-06-07  
+
+* Added release tests
+
+0.1.1  2023-06-07  
+
+* Releases a prototype binary script (runjob)
+
+0.1.0  2023-06-06
+
+* Initial release

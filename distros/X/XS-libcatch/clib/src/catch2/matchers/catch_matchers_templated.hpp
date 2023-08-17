@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -11,6 +11,7 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/internal/catch_stringref.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
+#include <catch2/internal/catch_logical_traits.hpp>
 
 #include <array>
 #include <algorithm>
@@ -19,11 +20,12 @@
 
 namespace Catch {
 namespace Matchers {
-    struct MatcherGenericBase : MatcherUntypedBase {
+    class MatcherGenericBase : public MatcherUntypedBase {
+    public:
         MatcherGenericBase() = default;
-        virtual ~MatcherGenericBase(); // = default;
+        ~MatcherGenericBase() override; // = default;
 
-        MatcherGenericBase(MatcherGenericBase&) = default;
+        MatcherGenericBase(MatcherGenericBase const&) = default;
         MatcherGenericBase(MatcherGenericBase&&) = default;
 
         MatcherGenericBase& operator=(MatcherGenericBase const&) = delete;
@@ -55,20 +57,6 @@ namespace Matchers {
             return arr;
         }
 
-#if defined( __cpp_lib_logical_traits ) && __cpp_lib_logical_traits >= 201510
-
-        using std::conjunction;
-
-#else // __cpp_lib_logical_traits
-
-        template<typename... Cond>
-        struct conjunction : std::true_type {};
-
-        template<typename Cond, typename... Rest>
-        struct conjunction<Cond, Rest...> : std::integral_constant<bool, Cond::value && conjunction<Rest...>::value> {};
-
-#endif // __cpp_lib_logical_traits
-
         template<typename T>
         using is_generic_matcher = std::is_base_of<
             Catch::Matchers::MatcherGenericBase,
@@ -76,7 +64,7 @@ namespace Matchers {
         >;
 
         template<typename... Ts>
-        using are_generic_matchers = conjunction<is_generic_matcher<Ts>...>;
+        using are_generic_matchers = Catch::Detail::conjunction<is_generic_matcher<Ts>...>;
 
         template<typename T>
         using is_matcher = std::is_base_of<
@@ -119,7 +107,8 @@ namespace Matchers {
 
 
         template<typename... MatcherTs>
-        struct MatchAllOfGeneric final : MatcherGenericBase {
+        class MatchAllOfGeneric final : public MatcherGenericBase {
+        public:
             MatchAllOfGeneric(MatchAllOfGeneric const&) = delete;
             MatchAllOfGeneric& operator=(MatchAllOfGeneric const&) = delete;
             MatchAllOfGeneric(MatchAllOfGeneric&&) = default;
@@ -137,7 +126,11 @@ namespace Matchers {
                 return describe_multi_matcher<MatcherTs...>(" and "_sr, m_matchers, std::index_sequence_for<MatcherTs...>{});
             }
 
-            std::array<void const*, sizeof...(MatcherTs)> m_matchers;
+            // Has to be public to enable the concatenating operators
+            // below, because they are not friend of the RHS, only LHS,
+            // and thus cannot access private fields of RHS
+            std::array<void const*, sizeof...( MatcherTs )> m_matchers;
+
 
             //! Avoids type nesting for `GenericAllOf && GenericAllOf` case
             template<typename... MatchersRHS>
@@ -169,7 +162,8 @@ namespace Matchers {
 
 
         template<typename... MatcherTs>
-        struct MatchAnyOfGeneric final : MatcherGenericBase {
+        class MatchAnyOfGeneric final : public MatcherGenericBase {
+        public:
             MatchAnyOfGeneric(MatchAnyOfGeneric const&) = delete;
             MatchAnyOfGeneric& operator=(MatchAnyOfGeneric const&) = delete;
             MatchAnyOfGeneric(MatchAnyOfGeneric&&) = default;
@@ -187,7 +181,11 @@ namespace Matchers {
                 return describe_multi_matcher<MatcherTs...>(" or "_sr, m_matchers, std::index_sequence_for<MatcherTs...>{});
             }
 
-            std::array<void const*, sizeof...(MatcherTs)> m_matchers;
+
+            // Has to be public to enable the concatenating operators
+            // below, because they are not friend of the RHS, only LHS,
+            // and thus cannot access private fields of RHS
+            std::array<void const*, sizeof...( MatcherTs )> m_matchers;
 
             //! Avoids type nesting for `GenericAnyOf || GenericAnyOf` case
             template<typename... MatchersRHS>
@@ -218,7 +216,10 @@ namespace Matchers {
 
 
         template<typename MatcherT>
-        struct MatchNotOfGeneric final : MatcherGenericBase {
+        class MatchNotOfGeneric final : public MatcherGenericBase {
+            MatcherT const& m_matcher;
+
+        public:
             MatchNotOfGeneric(MatchNotOfGeneric const&) = delete;
             MatchNotOfGeneric& operator=(MatchNotOfGeneric const&) = delete;
             MatchNotOfGeneric(MatchNotOfGeneric&&) = default;
@@ -239,8 +240,6 @@ namespace Matchers {
             friend MatcherT const& operator ! (MatchNotOfGeneric<MatcherT> const& matcher) {
                 return matcher.m_matcher;
             }
-        private:
-            MatcherT const& m_matcher;
         };
     } // namespace Detail
 

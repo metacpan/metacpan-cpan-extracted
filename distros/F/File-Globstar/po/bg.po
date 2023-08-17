@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: File-Globstar 0.2\n"
 "Report-Msgid-Bugs-To: guido.flohr@cantanea.com\n"
-"POT-Creation-Date: 2017-11-03 16:10+0200\n"
-"PO-Revision-Date: 2017-08-23 18:12+0200\n"
+"POT-Creation-Date: 2023-07-12 09:54+0300\n"
+"PO-Revision-Date: 2023-07-12 09:54+0300\n"
 "Last-Translator: Guido Flohr <guido.flohr@cantanea.com>\n"
 "Language-Team: Guido Flohr <guido.flohr@cantanea.com>\n"
 "Language: bg\n"
@@ -16,16 +16,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lib/File/Globstar/ListMatch.pm:163 ../lib/File/Globstar/ListMatch.pm:176
+#: ../lib/File/Globstar/ListMatch.pm:165 ../lib/File/Globstar/ListMatch.pm:178
 #, perl-brace-format
 msgid "Error reading '{filename}': {error}!\n"
 msgstr "Грешка при четене на „{filename}“: {error}!\n"
 
-#: ../lib/File/Globstar.pm:226
+#: ../lib/File/Globstar.pm:214
 #, perl-brace-format
 msgid "invalid pattern '{pattern}'\n"
-msgstr "Невалиден „{pattern}“\n"
+msgstr "невалиден „{pattern}“\n"
 
-#: ../lib/File/Globstar.pm:239
+#: ../lib/File/Globstar.pm:227
 msgid "invalid use of double asterisk"
-msgstr "Невалидно използване на двойна звезда"
+msgstr "невалидно използване на двойна звезда"

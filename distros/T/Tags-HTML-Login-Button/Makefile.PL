@@ -26,12 +26,14 @@ resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Login-Button';
 test_requires 'CSS::Struct::Output::Raw' => 0;
 test_requires 'CSS::Struct::Output::Structure' => 0;
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Tags::Output::Raw' => 0;
 test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

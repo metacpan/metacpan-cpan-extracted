@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetRowRequest.name :   ,
-# GetWorksheetRowRequest.sheetName :   ,
-# GetWorksheetRowRequest.rowIndex :   ,
-# GetWorksheetRowRequest.folder :   ,
-# GetWorksheetRowRequest.storageName :    
+# GetWorksheetRowRequest.name : The workbook name.  ,
+# GetWorksheetRowRequest.sheetName : The worksheet name.  ,
+# GetWorksheetRowRequest.rowIndex : The row index.  ,
+# GetWorksheetRowRequest.folder : The workbook folder.  ,
+# GetWorksheetRowRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_row' } = { 
-    	summary => '',
+    	summary => 'Gets row data by row`s index in worksheet.',
         params => $params,
         returns => 'RowResponse',
     };
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'row_index' => {
      	datatype => 'int',
      	base_name => 'rowIndex',
-     	description => '',
+     	description => 'The row index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

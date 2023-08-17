@@ -65,17 +65,19 @@ use Commandable::Invocation;
 # putback
 {
    my $inv = Commandable::Invocation->new( "c" );
-   $inv->putback_tokens( qw( a b ) );
+   $inv->putback_tokens( qw( a b ), q("quoted string") );
 
    is( $inv->peek_token, "a", '->peek_token after putback' );
    is( $inv->pull_token, "a", '->pull_token after putback' );
 
    is( $inv->pull_token, "b", '->pull_token after putback' );
 
+   is( $inv->pull_token, '"quoted string"', '->pull_token after putback' );
+
    is( $inv->pull_token, "c", '->pull_token after putback' );
 
-   $inv->putback_tokens( "foo", "bar splot" );
-   is( $inv->peek_remaining, q(foo "bar splot"), '->peek_remaining after putback' );
+   $inv->putback_tokens( "foo", "bar splot", '"quoted string"' );
+   is( $inv->peek_remaining, q(foo "bar splot" "\"quoted string\""), '->peek_remaining after putback' );
 }
 
 # new_from_tokens

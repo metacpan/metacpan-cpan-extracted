@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2023/05/30
+## Modified 2023/06/02
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -837,7 +837,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -1388,6 +1388,8 @@ See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/He
 If set to C<None>, L<secure> should be set to true.
 
 See L<rfc 6265|https://datatracker.ietf.org/doc/html/draft-west-first-party-cookies-07> for more information.
+
+See also L<CanIUse|https://caniuse.com/same-site-cookie-attribute>
 
 Returns a L<Module::Generic::Scalar> object.
 

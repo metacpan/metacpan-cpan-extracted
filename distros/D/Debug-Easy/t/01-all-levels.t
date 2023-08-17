@@ -11,6 +11,8 @@ BEGIN {
 my @LogLevel = qw( ERR WARN NOTICE INFO DEBUG DEBUGMAX );
 my @CodeLevel = ('[ ERROR ]', '[WARNING]', '[NOTICE ]', '[ INFO  ]', '[ DEBUG ]', '[-DEBUG-]');
 
+# Legacy "debug" code is used for testing only.  It is not recommended you use "debug" in your code.
+
 SKIP: {
 
     skip 'Perl version < 5.10 skipping tests', 114 if ($] < 5.010000);

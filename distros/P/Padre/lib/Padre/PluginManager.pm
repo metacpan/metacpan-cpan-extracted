@@ -27,7 +27,6 @@ use File::Spec             ();
 use File::Basename         ();
 use Scalar::Util           ();
 use Params::Util           ();
-use Class::Inspector       ();
 use Padre::Constant        ();
 use Padre::Current         ();
 use Padre::Util            ();
@@ -37,7 +36,7 @@ use Padre::Wx              ();
 use Padre::Wx::Menu::Tools ();
 use Padre::Locale::T;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 
 
@@ -572,41 +571,21 @@ sub compatible {
 	my @needs = $plugin->padre_interfaces;
 
 	while (@needs) {
-		my $module = shift @needs;
-		my $need   = shift @needs;
+		my $package = shift @needs;
+		my $need    = shift @needs;
 
-		# We take two different approaches to the capture of the
-		# version and compatibility values depending on whether
-		# the module has been loaded or not.
-		my $version;
-		my $compat;
-		if ( Class::Inspector->loaded($module) ) {
-			no strict 'refs';
-			$version = ${"${module}::VERSION"}    || 0;
-			$compat  = ${"${module}::COMPATIBLE"} || 0;
-
-		} else {
-
-			# Find the unloaded file
-			my $file = Class::Inspector->resolved_filename($module);
-			unless ( defined $file and length $file ) {
-				return "$module is not installed or undetectable";
-			}
-
-			# Scan the unloaded file ala EU:MakeMaker
-			$version = Padre::Util::parse_variable( $file, 'VERSION' );
-			$compat  = Padre::Util::parse_variable( $file, 'COMPATIBLE' );
-
+		# Find the module and its versions
+		my $module = Padre::Util::module_available($package);
+		unless ($module) {
+			return return "$package is not installed or undetectable";
 		}
 
 		# Does the dependency meet the criteria?
-		$version = 0 if $version eq 'undef';
-		$compat  = 0 if $compat  eq 'undef';
-		unless ( $need <= $version ) {
-			return "$module is needed at newer version $need";
+		unless ( $need <= $module->{VERSION} ) {
+			return "$package is needed at newer version $need";
 		}
-		unless ( $need >= $compat ) {
-			return "$module is not back-compatible with $need";
+		unless ( $need >= $module->{COMPATIBLE} ) {
+			return "$package is not back-compatible with $need";
 		}
 	}
 
@@ -1061,7 +1040,7 @@ L<Padre>, L<Padre::Config>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 
 =head1 LICENSE
 
@@ -1070,7 +1049,7 @@ modify it under the same terms as Perl 5 itself.
 
 =cut
 
-# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# Copyright 2008-2016 The Padre development team as listed in Padre.pm.
 # LICENSE
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl 5 itself.

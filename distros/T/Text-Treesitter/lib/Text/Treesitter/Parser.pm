@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Parser 0.06;
+package Text::Treesitter::Parser 0.10;
 
 use v5.14;
 use warnings;
@@ -16,7 +16,22 @@ C<Text::Treesitter::Parser> - parse some input text according to a F<tree-sitter
 
 =head1 SYNOPSIS
 
-   TODO
+Usually accessed indirectly, via C<Text::Treesitter>. Can also be used
+directly.
+
+   use Text::Treesitter::Language;
+   use Text::Treesitter::Parser;
+
+   my $language_lib = "path/to/the/tree-sitter-perl.so";
+
+   my $lang = Text::Treesitter::Language::load( $language_lib, "perl" );
+
+   my $parser = Text::Treesitter::Parser->new;
+   $parser->set_language( $lang );
+
+   my $tree = $parser->parse_string( $input );
+
+   ...
 
 =head1 DESCRIPTION
 
@@ -79,7 +94,6 @@ Resets the internal state of the parser so it can be used again.
 
 The following C library functions are currently unhandled:
 
-   ts_parser_set_included_ranges
    ts_parser_included_ranges
    ts_parser_parse
    ts_parser_set_timeout_micros

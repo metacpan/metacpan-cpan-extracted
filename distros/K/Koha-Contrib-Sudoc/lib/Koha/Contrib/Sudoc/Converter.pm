@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.39';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.40';
 use Moose;
 use utf8;
 use Modern::Perl;
@@ -190,7 +190,7 @@ sub framework {
 sub biblio_modify {
     my ($self, $record, $biblionumber, $framework) = @_;
     $self->log->debug(
-        "  Notice après traitement :\n" . $record->as('Text') );
+        "  Notice après traitement :\n" . $self->sudoc->record_as_text($record) );
     $self->log->notice("  * Remplace $biblionumber\n" );
 }
 
@@ -199,7 +199,7 @@ sub biblio_add {
     my ($self, $record, $biblionumber, $framework) = @_;
 
     $self->log->debug(
-        "  Notice après traitement :\n" . $record->as('Text') );
+        "  Notice après traitement :\n" . $self->sudoc->record_as_text($record) );
     my $plus = '';
     $plus = " $biblionumber $framework" if $biblionumber;
     $self->log->notice( "  * Ajout$plus\n" );
@@ -222,7 +222,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 DESCRIPTION
 
@@ -337,7 +337,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Fréderic Demians.
+This software is Copyright (c) 2023 by Fréderic Demians.
 
 This is free software, licensed under:
 

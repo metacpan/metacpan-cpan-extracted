@@ -4,21 +4,23 @@ PHP::DateTime - Clone of PHP's date and time functions.
 
 # SYNOPSIS
 
-    use PHP::DateTime;
-    
-    if( checkdate($month,$day,$year) ){ print 'The date is good.'; }
-    
-    print date( $format, $time );
-    print date( $format ); # Defaults to the current time.
-    
-    @d = getdate(); # A list at the current time.
-    @d = getdate($time); # A list at the specified time.
-    $d = getdate($time); # An array ref at the specified time.
-    
-    my @g = gettimeofday(); # A list.
-    my $g = gettimeofday(); # An array ref.
-    
-    my $then = mktime( $hour, $min, $sec, $month, $day, $year );
+```perl
+use PHP::DateTime;
+
+if( checkdate($month,$day,$year) ){ print 'The date is good.'; }
+
+print date( $format, $time );
+print date( $format ); # Defaults to the current time.
+
+@d = getdate(); # A list at the current time.
+@d = getdate($time); # A list at the specified time.
+$d = getdate($time); # An array ref at the specified time.
+
+my @g = gettimeofday(); # A list.
+my $g = gettimeofday(); # An array ref.
+
+my $then = mktime( $hour, $min, $sec, $month, $day, $year );
+```
 
 # DESCRIPTION
 
@@ -31,41 +33,53 @@ Neat, eh?
 
 All of these methods should match PHP's methods exactly.
 
-    - Months are 1-12.
-    - Days are 1-31.
-    - Years are in four digit format (1997, not 97).
+```
+- Months are 1-12.
+- Days are 1-31.
+- Years are in four digit format (1997, not 97).
+```
 
 ## checkdate
 
-    if( checkdate($month,$day,$year) ){ print 'The date is good.'; }
+```
+if( checkdate($month,$day,$year) ){ print 'The date is good.'; }
+```
 
 [http://php.net/manual/en/function.checkdate.php](http://php.net/manual/en/function.checkdate.php)
 
 ## date
 
-    print date( $format, $time );
-    print date( $format ); # Defaults to the current time.
+```
+print date( $format, $time );
+print date( $format ); # Defaults to the current time.
+```
 
 [http://php.net/manual/en/function.date.php](http://php.net/manual/en/function.date.php)
 
 ## getdate
 
-    @d = getdate(); # A list at the current time.
-    @d = getdate($time); # A list at the specified time.
-    $d = getdate($time); # An array ref at the specified time.
+```
+@d = getdate(); # A list at the current time.
+@d = getdate($time); # A list at the specified time.
+$d = getdate($time); # An array ref at the specified time.
+```
 
 [http://php.net/manual/en/function.getdate.php](http://php.net/manual/en/function.getdate.php)
 
 ## gettimeofday
 
-    my %g = gettimeofday(); # A hash.
-    my $g = gettimeofday(); # An hash ref.
+```perl
+my %g = gettimeofday(); # A hash.
+my $g = gettimeofday(); # An hash ref.
+```
 
 [http://php.net/manual/en/function.gettimeofday.php](http://php.net/manual/en/function.gettimeofday.php)
 
 ## mktime
 
-    my $then = mktime( $hour, $min, $sec, $month, $day, $year );
+```perl
+my $then = mktime( $hour, $min, $sec, $month, $day, $year );
+```
 
 [http://php.net/manual/en/function.mktime.php](http://php.net/manual/en/function.mktime.php)
 
@@ -75,9 +89,11 @@ All of these methods should match PHP's methods exactly.
 
 # AUTHOR
 
+```
 Aran Clary Deltac <bluefeet@gmail.com>
+```
 
 # LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

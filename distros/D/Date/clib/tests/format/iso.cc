@@ -1,5 +1,6 @@
 #include "../test.h"
 #include <regex>
+#include <string>
 
 #define TEST(name) TEST_CASE("format-iso: " name, "[format-iso]")
 
@@ -8,7 +9,8 @@ static void test (string oname, string ostr, double epoch, string_view tzabbr) {
         string name = oname, str = ostr;
         for (auto i : {1,1}) name.replace(name.find("-"), i, c);
         for (auto i : {1,1}) str.replace(str.find("-"), i, c);
-        SECTION(name) {
+        std::string section(name.c_str());
+        SECTION(section) {
             Date d(str);
             is_approx(d.epoch_mks(), epoch);
             CHECK(d.tzabbr() == tzabbr);

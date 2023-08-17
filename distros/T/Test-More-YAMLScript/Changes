@@ -1,3 +1,21 @@
+0.1.6 Fri Jul  7 11:42:50 AM EDT 2023
+ - Updates for YAMLScript API changes
+
+0.1.5 Tue Jun 27 06:02:51 PM EDT 2023
+ - Tiny refactoring
+
+0.1.4 Thu Jun 22 07:54:31 PM EDT 2023
+ - Use new YAMLScript::Common
+
+0.1.3 Thu Jun  8 08:11:07 AM PDT 2023
+ - origin/main) Lingy::Eval renamed to Lingy::Evaluator
+ - Refactor and simplify Test/More/YAMLScript.ys
+
+0.1.2 Sat Jun  3 03:30:05 PM PDT 2023
+ - Make Test::More::YAMLScript::subtest a method
+ - Make work with Lingy v0.1.9 and YAMLScript v0.1.4
+ - Adjust for recent Lingy refactoring
+
 0.1.1 Thu May 25 04:24:25 PM PDT 2023
  - Rewrite most of the code in Lingy
  - Make Test::More::YAMLScript a YAMLScript file

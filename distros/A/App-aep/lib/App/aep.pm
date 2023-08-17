@@ -1,72 +1,408 @@
+#!/usr/bin/env perl
+
 package App::aep;
 
-# Internal perl
-use 5.028;
-use feature 'say';
-
-# Internal perl modules
+# Core
 use warnings;
 use strict;
-use Data::Dumper;
+use utf8;
+use v5.28;
 
-# External modules 
-use POE qw(Wheel::Run Filter::Reference);
+# Core - Modules
+use Socket;
+use Env qw(PATH HOME TERM);
+
+# Core - Experimental (stable)
+use experimental 'signatures';
+
+# Debug
+use Data::Dumper;
+use Carp qw(cluck longmess shortmess);
+
+# External
+use POE qw(
+  Session::PlainCall
+  Wheel::SocketFactory
+  Wheel::ReadWrite
+  Filter::Stackable
+  Filter::Line
+  Filter::JSONMaybeXS
+);
+use Try::Tiny;
 
 # Version of this software
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
-=head1 NAME
-
-App::aep - Advanced Entry Point (for docker and other containers)
-
-=cut
-
-sub new 
-{
-    my ($class,$callback) = @_;
-
-    if (
-        (!$callback) ||
-        (ref $callback ne 'CODE')
-    )
-    {
-        print STDERR "new() must be called with a reference to a function\n";
-        print STDERR "An example of this would be ->new(\&my_handler)\n";
-        exit 1;
-    }
-
-    my $session = POE::Session->create
-    (
-        inline_states => {
-            _start      => \&start_tasks,
-            sig_child   => \&sig_child,
-        }
-    );
-
-    my $self = bless {
-        callback => $callback
-    }, $class;
-
-    foreach my $signal (keys %SIG) { 
-        $SIG{$signal} = sub { &{$self->{callback}}($signal) };
-    }
-
+# create a new blessed object, we will carry any passed arguments forward.
+sub new ( $class, @args ) {
+    my $self = bless { '_passed_args' => $args[0]->{'_passed_args'}, }, $class;
     return $self;
 }
 
-sub start_tasks {
-  my ($kernel, $heap) = @_[KERNEL, HEAP];
+# POE::Kernel's _start, in this case it also tells the kernel to capture signals
+sub _start ( $self, @args ) {
+    poe->kernel->sig( INT  => 'sig_int' );
+    poe->kernel->sig( TERM => 'sig_term' );
+    poe->kernel->sig( CHLD => 'sig_chld' );
+    poe->kernel->sig( USR  => 'sig_usr' );
+
+    #say STDERR Dumper poe->heap;
+
+    my $debug = poe->heap->{'_'}->{'debug'};
+    $debug->( 'STDERR', __LINE__, 'Signals(INT,TERM,CHLF,USR) trapped.' );
+
+    # What command are we meant to be running?
+    my $opt = poe->heap->{'_'}->{'opt'};
+
+    #say STDERR Dumper $opt;
+
+    # Are we doing a docker check?
+    # TODO
+    if ( $opt->docker_health_check ) {
+        $debug->(
+            'STDERR', __LINE__,
+            'Would spawn a unix socket client to try talk to instance.'
+        );
+    }
+    else {
+        poe->heap->{'services'}->{'unixsocket'} =
+          POE::Session::PlainCall->create(
+            'object_states' => [
+                App::aep->new() => {
+                    '_start'                      => 'unixsocket_server_start',
+                    'unixsocket_client_connected' =>
+                      'unixsocket_client_connected',
+                    'unixsocket_server_error' => 'unixsocket_server_error',
+                    'unixsocket_client_input' => 'unixsocket_client_input',
+                    'unixsocket_client_error' => 'unixsocket_client_error',
+                    'unixsocket_server_send'  => 'unixsocket_server_send'
+                },
+            ],
+            'heap' => poe->heap,
+          );
+    }
+
+    poe->kernel->yield('scheduler');
+
+    return;
 }
 
-# Detect the CHLD signal as each of our children exits.
-sub sig_child {
-  my ($heap, $sig, $pid, $exit_val) = @_[HEAP, ARG0, ARG1, ARG2];
-  #my $details = delete $heap->{$pid};
-  warn "Got sig_child";
+sub unixsocket_server_start {
+    my $socket_path = poe->heap->{'_'}->{'config'}->{'AEP_SOCKETPATH'};
+    poe->heap->{'unixsocket'}->{'socket_path'} = $socket_path;
 
-  # warn "$$: Child $pid exited";
+    if ( -e $socket_path ) {
+        unlink $socket_path;
+    }
+
+    poe->heap->{'unixsocket'}->{'server'} = POE::Wheel::SocketFactory->new(
+        'SocketDomain' => PF_UNIX,
+        'BindAddress'  => $socket_path,
+        'SuccessEvent' => 'unixsocket_client_connected',
+        'FailureEvent' => 'unixsocket_server_error',
+    );
+
+    return;
 }
 
+sub unixsocket_server_error ( $self, $syscall, $errno, $error, $wid ) {
+    my $debug = poe->heap->{'_'}->{'debug'};
+
+    if ( !$errno ) {
+        $error = "Normal disconnection.";
+    }
+
+    $debug->(
+        'STDERR', __LINE__,
+        "Server socket encountered $syscall error $errno: $error"
+    );
+
+    delete poe->heap->{'unixsocket'}->{'server'};
+    return;
+}
+
+sub unixsocket_client_connected ( $self, $socket, @args ) {
+
+    # Generate an ID we can use
+    my $client_id = poe->heap->{'unixsocket'}->{'client'}->{'id'}++;
+
+    # Store the socket within it so it cannot go out of scope
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'socket'} =
+      $socket;
+
+    # Send a debug message for the event of a client connecting
+    my $debug = poe->heap->{'_'}->{'debug'};
+    $debug->( 'STDERR', __LINE__, "Client connected." );
+
+    # Create a stackable filter so we can talk in json
+    my $filter = POE::Filter::Stackable->new();
+    $filter->push( POE::Filter::Line->new(), POE::Filter::JSONMaybeXS->new(), );
+
+    # Create a rw_wheel to deal with the client
+    my $rw_wheel = POE::Wheel::ReadWrite->new(
+        'Handle'     => $socket,
+        'Filter'     => $filter,
+        'InputEvent' => 'unixsocket_client_input',
+        'ErrorEvent' => 'unixsocket_client_error',
+    );
+
+    # Store the wheel next to the socket
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'wheel'} =
+      $rw_wheel;
+
+    # Store the filter so it never falls out of scope
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'filter'} =
+      $filter;
+
+    # Store tx/rx about the connection
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'tx_count'}
+      = 0;
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'rx_count'}
+      = 0;
+
+    # Create a mapping from the wheelid to the client
+    poe->heap->{'unixsocket'}->{'client'}->{'cid2wid'}->{$client_id} =
+      $rw_wheel->ID;
+
+    # And the other way
+    poe->heap->{'unixsocket'}->{'client'}->{'wid2cid'}->{ $rw_wheel->ID } =
+      $client_id;
+
+    # Also make a note under the obj, for cleaning up
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$client_id}->{'wid'} =
+      $rw_wheel->ID;
+
+    # Send a message to the connected client
+    my $msg = { 'event' => 'hello' };
+    poe->kernel->yield( 'unixsocket_server_send', $client_id, $msg );
+
+    return;
+}
+
+sub unixsocket_server_send ( $self, $cid, $pkt ) {
+    my $debug = poe->heap->{'_'}->{'debug'};
+
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$cid}->{'tx_count'}++;
+
+    my $wheel =
+      poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$cid}->{'wheel'};
+
+    # Format the packet, should be small
+    my $packet = Dumper($pkt);
+    $packet =~ s#[\r\n]##g;
+    $packet =~ s#\s+# #g;
+
+    $debug->( 'STDERR', __LINE__, "Client($cid) TX: $packet" );
+
+    $wheel->put($pkt);
+
+    return;
+}
+
+sub unixsocket_client_input ( $self, $input, $wid ) {
+    my $cid   = poe->heap->{'unixsocket'}->{'client'}->{'wid2cid'}->{$wid};
+    my $debug = poe->heap->{'_'}->{'debug'};
+
+    # Increment the received packet count
+    poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$cid}->{'rx_count'}++;
+
+    # Shortcut to the wheel the client is connected to
+    my $wheel =
+      poe->heap->{'unixsocket'}->{'client'}->{'obj'}->{$cid}->{'wheel'};
+
+    # Format the packet, should be small
+    my $packet = Dumper($input);
+    $packet =~ s#[\r\n]##g;
+    $packet =~ s#\s+# #g;
+
+    $debug->( 'STDERR', __LINE__, "Client($cid) RX: $packet" );
+
+    return;
+}
+
+sub unixsocket_client_error ( $self, $syscall, $errno, $error, $wid ) {
+    my $cid   = poe->heap->{'unixsocket'}->{'client'}->{'wid2cid'}->{$wid};
+    my $debug = poe->heap->{'_'}->{'debug'};
+
+    if ( !$errno ) {
+        $error = "Normal disconnection for wheel: $wid, cid: $cid";
+    }
+
+    $debug->(
+        'STDERR', __LINE__,
+        "Server session encountered $syscall error $errno: $error"
+    );
+
+    return;
+}
+
+sub sig_int {
+
+    # Set an appropriate exit
+    poe->heap->{'_'}->{'set_exit'}->( '1', 'sigint' );
+
+    # Announce the event
+    poe->heap->{'_'}->{'debug'}
+      ->( 'STDERR', __LINE__, 'Signal: INT - starting controlled shutdown.' );
+
+    # Tell the kernel to ignore the term we are handling it
+    poe->kernel->sig_handled();
+
+    # Send kill to the child
+    # ... todo ...
+    # Stop the event wheel
+    poe->kernel->stop();
+
+    return;
+}
+
+sub sig_term {
+
+    # Set an appropriate exit
+    poe->heap->{'_'}->{'set_exit'}->( '1', 'sigterm' );
+
+    # Announce the event
+    poe->heap->{'_'}->{'debug'}
+      ->( 'STDERR', __LINE__, 'Signal: TERM - starting controlled shutdown.' );
+
+    # Tell the kernel to ignore the term we are handling it
+    poe->kernel->sig_handled();
+
+    # Send kill to the child
+    # ... todo ...
+    # Stop the event wheel
+    poe->kernel->stop();
+
+    return;
+}
+
+sub sig_chld {
+
+    # Announce the event
+    poe->heap->{'_'}->{'debug'}
+      ->( 'STDERR', __LINE__, 'Signal CHLD, ignoring' );
+
+    return;
+}
+
+sub sig_usr {
+
+    # Announce the event
+    poe->heap->{'_'}->{'debug'}->( 'STDERR', __LINE__, 'Signal USR, ignoring' );
+
+    return;
+}
+
+sub scheduler {
+    if ( poe->heap->{'exit'}++ >= 2000 ) {
+        poe->heap->{'_'}->{'set_exit'}->( '0', 'test' );
+
+        #poe->kernel->yield('set_exit',0,'test');
+    }
+    else {
+        poe->kernel->delay_add( 'scheduler' => 1 );
+    }
+
+    return;
+}
+
+# ABSTRACT: turns baubles into trinkets
+
+# Not sure we need a dedicated runner for such a simple one exec task!
+
+# package INIT::Runner;
+
+# use warnings;
+# use strict;
+# use utf8;
+# use v5.28;
+
+# use experimental 'signatures';
+# use Data::Dumper;
+
+# use POE qw(Session::PlainCall Wheel::Run Filter::Reference);
+
+# sub new ($class, @args) {
+#     say STDERR Dumper \@args;
+#     my $self = bless {
+#         '_passed_args'  =>  \@args,
+#     }, $class;
+# }
+
+# sub _start {
+#     poe->kernel->yield( 'scheduler' );
+# }
+# sub scheduler {
+#     poe->kernel->delay_add('scheduler' => 1);
+#     say STDERR "Runner: ping pong";
+# }
+
+# # Internal perl
+# use 5.028;
+# use feature 'say';
+
+# # Internal perl modules
+# use warnings;
+# use strict;
+# use Data::Dumper;
+
+# # External modules
+# use POE qw(Wheel::Run Filter::Reference);
+
+# # Version of this software
+# our $VERSION = '0.009';
+
+# =head1 NAME
+
+# App::aep - Advanced Entry Point (for docker and other containers)
+
+# =cut
+
+# sub new
+# {
+#     my ($class,$callback) = @_;
+
+#     if (
+#         (!$callback) ||
+#         (ref $callback ne 'CODE')
+#     )
+#     {
+#         print STDERR "new() must be called with a reference to a function\n";
+#         print STDERR "An example of this would be ->new(\&my_handler)\n";
+#         exit 1;
+#     }
+
+#     my $session = POE::Session->create
+#     (
+#         inline_states => {
+#             _start      => \&start_tasks,
+#             sig_child   => \&sig_child,
+#         }
+#     );
+
+#     my $self = bless {
+#         callback => $callback
+#     }, $class;
+
+#     foreach my $signal (keys %SIG) {
+#         $SIG{$signal} = sub { &{$self->{callback}}($signal) };
+#     }
+
+#     return $self;
+# }
+
+# sub start_tasks {
+#   my ($kernel, $heap) = @_[KERNEL, HEAP];
+# }
+
+# # Detect the CHLD signal as each of our children exits.
+# sub sig_child {
+#   my ($heap, $sig, $pid, $exit_val) = @_[HEAP, ARG0, ARG1, ARG2];
+#   #my $details = delete $heap->{$pid};
+#   warn "Got sig_child";
+
+#   # warn "$$: Child $pid exited";
+# }
 
 =head1 SYNOPSIS
 
@@ -304,7 +640,7 @@ For any feature requests or bug reports please visit:
 
 You may also catch up to the author 'daemon' on IRC:
 
-* irc.freenode.net
+* irc.libera.org
 
 * #perl
 
@@ -314,13 +650,11 @@ Paul G Webster <daemon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Paul G Webster.
+This software is copyright (c) 2023 by Paul G Webster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut 
-
-$poe_kernel->run();
 
 1;

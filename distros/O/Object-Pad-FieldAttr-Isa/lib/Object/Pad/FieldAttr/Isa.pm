@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Isa 0.03;
+package Object::Pad::FieldAttr::Isa 0.04;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.51;
+use Object::Pad 0.66;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -23,7 +23,7 @@ C<Object::Pad::FieldAttr::Isa> - apply class type constraints to C<Object::Pad> 
    use Object::Pad::FieldAttr::Isa;
 
    class ListNode {
-      has $next :param :reader :writer :Isa(ListNode) = undef;
+      field $next :param :reader :writer :Isa(ListNode) = undef;
    }
 
    my $first = ListNode->new();
@@ -49,7 +49,7 @@ future. As a result, this module should be considered equally experimental.
 
 =head2 :Isa
 
-   has $field :Isa(CLASSNAME) ...;
+   field $name :Isa(CLASSNAME) ...;
 
 Declares that any value assigned to the field must be an object reference,
 and must be derived from the named class. Attempts to assign a non-conforming
@@ -66,6 +66,11 @@ code within the class.
 sub import
 {
    $^H{"Object::Pad::FieldAttr::Isa/Isa"}++;
+}
+
+sub unimport
+{
+   delete $^H{"Object::Pad::FieldAttr::Isa/Isa"};
 }
 
 =head1 AUTHOR

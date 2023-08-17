@@ -2,7 +2,7 @@ package MVC::Neaf::Route::Main;
 
 use strict;
 use warnings;
-our $VERSION = '0.2701';
+our $VERSION = '0.2901';
 
 =head1 NAME
 
@@ -21,20 +21,36 @@ containing a hash of other routes designated by their path prefixes.
 =cut
 
 use Carp;
+use Cwd qw(cwd abs_path);
 use Encode;
+use File::Basename qw(dirname);
 use Module::Load;
 use Scalar::Util qw( blessed looks_like_number reftype );
 use URI::Escape;
 
 use parent qw(MVC::Neaf::Route);
-use MVC::Neaf::Util qw( run_all run_all_nodie http_date canonize_path check_path
-     maybe_list supported_methods extra_missing encode_b64 decode_b64 data_fh );
-use MVC::Neaf::Util::Container;
 use MVC::Neaf::Request::PSGI;
 use MVC::Neaf::Route::PreRoute;
+use MVC::Neaf::Util qw(
+    caller_info
+    canonize_path
+    check_path
+    data_fh
+    decode_b64
+    encode_b64
+    extra_missing
+    http_date
+    maybe_list
+    run_all
+    run_all_nodie
+    supported_methods
+);
+use MVC::Neaf::Util::Container;
 
+# TODO 0.30 remove
 sub _one_and_true {
     my $self = shift;
+    return $self if ref $self;
 
     my $method = [caller 1]->[3];
     $method =~ s/.*:://;
@@ -50,33 +66,23 @@ sub _one_and_true {
 
 =head2 new()
 
-    new( %options )
+    new( )
 
 This is also called by C<MVC::Neaf-E<gt>new>,
 in case one wants to instantiate a Neaf application object
 instead of using the default L<MVC::Neaf/neaf>.
 
-Options may include:
-
-=over
-
-=item force_view - use that view instead of anything specified by controller.
-See L</load_view> for details about how view is declared.
-Useful for debugging.
-
-=back
+A hash of %options may be added in the future, but isn't supported currently.
 
 =cut
 
 sub new {
     my ($class, %opt) = @_;
 
-    my $force = delete $opt{force_view};
+    croak('MVC::Neaf->new: no options currently supported: '.join ", ", sort keys %opt)
+        if %opt;
 
-    my $self = bless \%opt, $class;
-
-    $self->set_forced_view( $force )
-        if $force;
+    my $self = bless {}, $class;
 
     $self->set_path_defaults( { -status => 200, -view => 'JS' } );
 
@@ -217,7 +223,7 @@ sub add_route {
     $self->my_croak( "Odd number of elements in hash assignment" )
         if @_ % 2;
     my ($path, $sub, %args) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $self->my_croak( "handler must be a coderef, not ".ref $sub )
         unless UNIVERSAL::isa( $sub, "CODE" );
@@ -243,84 +249,55 @@ sub add_route {
     $self->my_croak("Public endpoint must have nonempty description")
         if $args{public} and not $args{description};
 
-    $self->_detect_duplicate( \%args );
+    my @real_method = $self->_detect_duplicate( \%args, $args{method} );
 
     # Do the work
-    my %profile;
-    $profile{parent}    = $self;
-    $profile{code}      = $sub;
-    $profile{tentative} = $args{tentative};
-    $profile{override}  = $args{override};
-    $profile{strict}    = $args{strict};
+    $args{parent}    = $self;
+    $args{code}      = $sub;
 
     # Always have regex defined to simplify routing
-    $profile{path_info_regex} = (defined $args{path_info_regex})
+    $args{path_info_regex} = (defined $args{path_info_regex})
         ? qr#^$args{path_info_regex}$#
         : qr#^$#;
 
     # Just for information
-    $profile{path}        = $path;
-    $profile{description} = $args{description};
-    $profile{public}      = $args{public} ? 1 : 0;
-    $profile{caller}      = $args{caller} || [caller(0)]; # save file,line
+    $args{public}      = $args{public} ? 1 : 0;
+    $args{caller}    ||= [caller(0)]; # save file,line
 
-    if (my $view = $args{view}) {
+    if (exists $args{view}) {
         # TODO 0.30
         carp "NEAF: route(): view argument is deprecated, use -view instead";
-        $args{default}{-view} = $view;
+        $args{default}{-view} = delete $args{view};
     };
 
     # preload view so that we can fail early
     $args{default}{-view} = $self->get_view( $args{default}{-view} )
         if $args{default}{-view};
 
-    # todo_default because some path-based defs will be mixed in later
-    $profile{default} = $args{default};
-
-    # preprocess regular expression for params
-    if ( my $reg = $args{param_regex} ) {
-        my %real_reg;
-        $self->my_croak("param_regex must be a hash of regular expressions")
-            if ref $reg ne 'HASH' or grep { !defined $reg->{$_} } keys %$reg;
-        $real_reg{$_} = qr(^$reg->{$_}$)s
-            for keys %$reg;
-        $profile{param_regex} = \%real_reg;
-    };
-
-    if ( $args{cache_ttl} ) {
-        $self->my_croak("cache_ttl must be a number")
-            unless looks_like_number($args{cache_ttl});
-        # as required by RFC
-        $args{cache_ttl} = -100000 if $args{cache_ttl} < 0;
-        $args{cache_ttl} = $year if $args{cache_ttl} > $year;
-        $profile{cache_ttl} = $args{cache_ttl};
-    };
-
     # ready, shallow copy handler & burn cache
     delete $self->{route_re};
 
-    $self->{route}{ $path }{$_} = MVC::Neaf::Route->new( %profile, method => $_ )
-        for @{ $args{method} };
+    $self->{route}{ $path }{$_} = MVC::Neaf::Route->new( %args, method => $_ )
+        for @real_method;
 
     # This is for get+post sugar
-    $self->{last_added} = \%profile;
+    $self->{last_added} = \%args;
 
     return $self;
 }; # end sub route
 
-# in: { method => [...], path => '/...', tentative => 0|1, override=> 0|1 }
-# out: none
-# spoils $method if tentative
+# in: { path => '/...', tentative => 0|1, override=> 0|1 }, \@method_list
+# out: @real_method_list
 # dies/warns if violations found
 sub _detect_duplicate {
-    my ($self, $profile) = @_;
+    my ($self, $profile, $methods) = @_;
 
     my $path = $profile->{path};
     # Handle duplicate route definitions
     my @dupe = grep {
         exists $self->{route}{$path}{$_}
         and !$self->{route}{$path}{$_}{tentative};
-    } @{ $profile->{method} };
+    } @$methods;
 
     if (@dupe) {
         my %olddef;
@@ -340,16 +317,18 @@ sub _detect_duplicate {
             carp( (ref $self)."->$caller: Overriding old handler for"
                 ." $oldpath defined $oldwhere");
         } elsif( $profile->{tentative} ) {
-            # just skip duplicate methods
+            # if we're tentative, filter out already known method/route pairs
             my %filter;
-            $filter{$_}++ for @{ $profile->{method} };
+            $filter{$_}++ for @{ $methods };
             delete $filter{$_} for @dupe;
-            $profile->{method} = [keys %filter];
+            return keys %filter;
         } else {
             croak( (ref $self)."->$caller: Attempting to set duplicate handler for"
                 ." $oldpath defined $oldwhere");
         };
     };
+
+    return @$methods;
 };
 
 # This is for get+post sugar
@@ -361,11 +340,11 @@ sub _dup_route {
     $profile ||= $self->{last_added};
     my $path = $profile->{path};
 
-    $self->_detect_duplicate($profile);
+    my @real_method = $self->_detect_duplicate($profile, [ $method ]);
 
     delete $self->{route_re};
-    $self->{route}{ $path }{$method} = MVC::Neaf::Route->new(
-        %$profile, method => $method );
+    $self->{route}{ $path }{$_} = MVC::Neaf::Route->new( %$profile, method => $_ )
+        for @real_method;
 };
 
 =head2 static()
@@ -426,7 +405,7 @@ This is not enforced whatsoever.
 
 =back
 
-See L<MVC::Meaf::X::Files> for implementation.
+See L<MVC::Neaf::X::Files> for implementation.
 
 File type detection is based on extentions so far, and the list is quite short.
 This MAY change in the future.
@@ -442,7 +421,7 @@ Not need to set up one for merely testing icons/js/css, though.>
 
 sub static {
     my ($self, $path, $dir, %options) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $options{caller} ||= [caller 0];
 
@@ -458,7 +437,7 @@ sub static {
 
     require MVC::Neaf::X::Files;
     my $xfiles = MVC::Neaf::X::Files->new(
-        %options, root => $dir, base_url => $path );
+        %options, root => $self->dir($dir), base_url => $path );
     return $self->route( $xfiles->make_route, %fwd_opt );
 };
 
@@ -492,7 +471,7 @@ This needs to be fixed in the future.
 # TODO 0.30 add_alias or something
 sub alias {
     my ($self, $new, $old) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $new = canonize_path( $new );
     $old = canonize_path( $old );
@@ -543,7 +522,7 @@ Whatever the controller returns overrides all of these.
 # TODO 0.30 rename defaults => [something]
 sub set_path_defaults {
     my $self = shift;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     # Old form - path => \%hash
     # TODO 0.30 kill
@@ -653,9 +632,11 @@ $hook_phases{$_}++ for qw(pre_route
 
 sub add_hook {
     my ($self, $phase, $code, %opt) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     extra_missing( \%opt, \%add_hook_args );
+    $self->my_croak( "hook must be a coderef, not ".ref $code )
+        unless UNIVERSAL::isa( $code, 'CODE' );
     $self->my_croak( "illegal phase: $phase" )
         unless $hook_phases{$phase};
 
@@ -817,7 +798,7 @@ my %view_alias = (
 );
 sub load_view {
     my ($self, $name, $obj, @param) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $self->my_croak("At least two arguments required")
         unless defined $name and defined $obj;
@@ -832,7 +813,7 @@ sub load_view {
             eval { load $obj; 1 }
                 or $self->my_croak( "Failed to load view $name=>$obj: $@" );
         };
-        $obj = $obj->new( @param );
+        $obj = $obj->new( neaf_base_dir => $self->neaf_base_dir, @param );
     };
 
     $self->my_croak( "view must be a coderef or a MVC::Neaf::View object" )
@@ -858,7 +839,7 @@ Returns self.
 
 sub set_forced_view {
     my ($self, $view) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     delete $self->{force_view};
     return $self unless $view;
@@ -1108,7 +1089,7 @@ The engine MUST provide the following methods
 
 sub set_session_handler {
     my ($self, %opt) = @_; # TODO 0.30 use helpers when ready
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     my $sess = delete $opt{engine};
     my $cook = $opt{cookie} || 'neaf.session';
@@ -1185,7 +1166,7 @@ This is a synonym to C<sub { +{ status =E<gt> $status,  ... } }>.
 
 sub set_error_handler {
     my ($self, $status, $code, %where) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $status =~ /^(?:\d\d\d)$/
         or $self->my_croak( "1st argument must be an http status");
@@ -1227,7 +1208,7 @@ If it dies, only a warning is emitted.
 
 sub on_error {
     my ($self, $code) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     if (defined $code) {
         ref $code eq 'CODE'
@@ -1340,7 +1321,7 @@ L<MVC::Neaf::Request::Apache2>.
 
 sub run {
     my $self = shift;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     # "Magically" load __DATA__ section from calling file
     if ($self->{magic}) {
@@ -1361,6 +1342,7 @@ sub run {
                 unless defined $ENV{SCRIPT_NAME};
             Plack::Handler::CGI->new->run( $self->run );
         };
+        return;
     };
 
     # Do postsetup after CGI/CLI execution
@@ -1422,7 +1404,7 @@ $run_test_allow{$_}++
     for qw( type method cookie body override secure uploads header );
 sub run_test {
     my ($self, $env, %opt) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     my @extra = grep { !$run_test_allow{$_} } keys %opt;
     $self->my_croak( "Extra keys @extra" )
@@ -1519,7 +1501,7 @@ This SHOULD NOT be used by application itself.
 # TODO 0.30 Route->inspect, Route::Main->inspect
 sub get_routes {
     my ($self, $code) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     $code ||= sub { $_[0] };
     scalar $self->run; # burn caches
@@ -1574,7 +1556,7 @@ are for running callbacks, handling corner cases, and substituting sane defaults
 
 sub handle_request {
     my ($self, $req) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     my $data = eval {
         my $hash = $self->dispatch_logic( $req, '', $req->path );
@@ -1620,7 +1602,7 @@ If L</set_forced_view> was called, return its argument instead.
 
 sub get_view {
     my ($self, $view, $lazy) = @_;
-    $self = _one_and_true($self) unless ref $self;
+    $self = _one_and_true($self);
 
     # An object/code means controller knows better
     return $view
@@ -1830,6 +1812,29 @@ sub _get_error_handler {
     return $store->fetch_last( method => $req->method, path => $req->path );
 };
 
+=head2 neaf_base_dir()
+
+Returns the containing directory of the first non-Neaf calling file,
+or cwd() with a warning otherwise.
+
+=cut
+
+# Should we cache? If so, how to determine we're in a different file now?
+sub neaf_base_dir {
+    my $self = shift;
+
+    my $file = caller_info()->[1];
+    if (defined $file and -f $file) {
+        $file = abs_path($file);
+        # TODO actually don't use magic, add use param instead
+        return $file =~ /(.*)\.pm$/ ? $1 : dirname $file;
+    };
+
+    my $cwd = cwd;
+    carp "Unable to determine relative path via caller, consider using absolute paths. Defaulting to cwd='$cwd'";
+    return $cwd;
+};
+
 =head1 DEPRECATED METHODS
 
 Some methods become obsolete during Neaf development.
@@ -1863,7 +1868,7 @@ sub route {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2023 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

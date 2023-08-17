@@ -1,7 +1,7 @@
 package Text::NumericData::Stat;
 
 # TODO: Integrate into Text::NumericData::File already.
-# Also, return something for single data sets; just set non-computable measures to soemthing invalid.
+# Also, return something for single data sets; just set non-computable measures to something invalid.
 
 use Text::NumericData::File;
 
@@ -22,16 +22,29 @@ sub generate
 	my $out = Text::NumericData::File->new($in->{config});
 	my @mean;  # arithmetic mean
 	my @error; # standard error, sqrt(mean sq. error / N-1)
+	my @min; # minimal value
+	my @max; # maximal value
+
+	$out->{title} = 'Statistics';
+	$out->{title} .= ' of '.$in->{title} if defined $in->{title};
+	$out->{titles} = ['column', 'name', 'mean', 'stderr', 'min', 'max'];
 
 	my $N = @{$in->{data}};
-	return $out if $N < 2;
+	return $out if $N < 1;
 	my $S = @{$in->{data}[0]};
 
-	for my $d (@{$in->{data}})
+	for my $i (0 .. $S-1)
 	{
+		$max[$i] = $min[$i] = $mean[$i] = $in->{data}[0][$i];
+	}
+	for(my $j=1; $j<@{$in->{data}}; ++$j)
+	{
+		my $d = $in->{data}[$j];
 		for my $i (0 .. $S-1)
 		{
 			$mean[$i] += $d->[$i];
+			$min[$i] = $d->[$i] if $d->[$i] < $min[$i];
+			$max[$i] = $d->[$i] if $d->[$i] > $max[$i];
 		}
 	}
 	for my $i (0 .. $S-1)
@@ -47,11 +60,8 @@ sub generate
 	}
 	for my $i (0 .. $S-1)
 	{
-		$error[$i] = sqrt($error[$i]/($N-1));
+		$error[$i] = $N > 1 ? sqrt($error[$i]/($N-1)) : 0;
 	}
-	$out->{title} = 'Statistics';
-	$out->{title} .= ' of '.$in->{title} if defined $in->{title};
-	$out->{titles} = ['column', 'name', 'mean', 'stderr'];
 	for my $s (1 .. $S)
 	{
 		my $name = $in->{titles}[$s-1];
@@ -63,7 +73,7 @@ sub generate
 		{
 			$name = "col$s";
 		}
-		$out->{data}[$s-1] = [ $s, $name, $mean[$s-1], $error[$s-1] ];
+		$out->{data}[$s-1] = [ $s, $name, $mean[$s-1], $error[$s-1], $min[$s-1], $max[$s-1] ];
 	}
 	return $out;
 }

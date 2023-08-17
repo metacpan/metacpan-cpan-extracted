@@ -100,6 +100,9 @@ for my $perl (@perls) {
         my $in_yytokentype;
         while(<$in>) {
             next if /PERL_CORE|PERL_IN_TOKE_C/;
+            if ($canon_version =~ /^5\.(?:36|37\.0)/) {
+                s!(YYEMPTY = -2,)!/* $1 */!;
+            }
             print $out $_;
             $perly .= $_;
             if (/enum yytokentype/) {

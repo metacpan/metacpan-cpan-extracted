@@ -1,5 +1,5 @@
-use warnings;
 use strict;
+use warnings;
 use Test::More;
 use DOCSIS::ConfigFile qw(encode_docsis decode_docsis);
 

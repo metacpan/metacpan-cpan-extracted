@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/RHC.pm','lib/Require/HookChain.pm','lib/Require/HookChain/log/logger.pm','lib/Require/HookChain/log/stderr.pm','lib/Require/HookChain/munge/prepend.pm','lib/Require/HookChain/test/fail.pm','lib/Require/HookChain/test/noop.pm','lib/Require/HookChain/test/noop_all.pm','lib/Require/HookChain/test/random_fail.pm','lib/Require/HookChain/timestamp/hires.pm','lib/Require/HookChain/timestamp/std.pm'];
+my $filenames = ['lib/RHC.pm','lib/Require/HookChain.pm','lib/Require/HookChain/debug/dump_source/logger.pm','lib/Require/HookChain/debug/dump_source/stderr.pm','lib/Require/HookChain/log/logger.pm','lib/Require/HookChain/log/stderr.pm','lib/Require/HookChain/munge/prepend.pm','lib/Require/HookChain/source/test/code.pm','lib/Require/HookChain/source/test/str.pm','lib/Require/HookChain/test/fail.pm','lib/Require/HookChain/test/noop.pm','lib/Require/HookChain/test/noop_all.pm','lib/Require/HookChain/test/random_fail.pm','lib/Require/HookChain/timestamp/hires.pm','lib/Require/HookChain/timestamp/std.pm','lib/Require/HookChainTest/One.pm','lib/Require/HookChainTest/Two.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

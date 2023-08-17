@@ -30,12 +30,8 @@ sub handler {
         cmp_ok( $size, '>', 0, 'proc size is reported > 0' );
 
         {
-            # test with USE_SMAPS=0
-            my $smaps = $Apache2::SizeLimit::USE_SMAPS;
-            $Apache2::SizeLimit::USE_SMAPS = 0;
             my ( $size, $shared ) = Apache2::SizeLimit->_check_size();
             cmp_ok( $size, '>', 0, 'proc size is reported > 0' );
-            $Apache2::SizeLimit::USE_SMAPS = $smaps;
         }
 
     SKIP:

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::save_button;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: save_button.pm
+ PERL PERL PROGRAM NAME: save_button.pm
  AUTHOR: 	Juan Lorenzo
  DATE: 		May 16 2018 
 

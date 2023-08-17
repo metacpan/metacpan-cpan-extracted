@@ -25,10 +25,10 @@ no_index:
 provides:
   Validate::CodiceFiscale:
     file: lib/Validate/CodiceFiscale.pm
-    version: '0.001'
+    version: '0.004'
 requires:
   perl: '5.024000'
-version: '0.001'
+version: '0.004'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.36.0

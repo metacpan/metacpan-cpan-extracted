@@ -125,10 +125,10 @@ use Getopt::EX::Hashed; {
     } ;
     has visible_cr  => ' vcr  !  ' , action => sub { $opt_visible{cr} = $_[1] } ;
     has visible_esc => ' vesc !  ' , action => sub { $opt_visible{esc} = $_[1] } ;
-    has context     => ' c       ' , action => sub { push @diffopts, "-c" } ;
-    has unified     => ' u       ' , action => sub { push @diffopts, "-u" } ;
-    has C           => '      =i ' , action => sub { push @diffopts, "-C" . $_[1] } ;
-    has U           => '      =i ' , action => sub { push @diffopts, "-U" . $_[1] } ;
+    has c           => '         ' , action => sub { push @diffopts, "-c" } ;
+    has u           => '         ' , action => sub { push @diffopts, "-u" } ;
+    has context     => ' C    =i ' , action => sub { push @diffopts, "-C" . $_[1] } ;
+    has unified     => ' U    =i ' , action => sub { push @diffopts, "-U" . $_[1] } ;
     has r           => '      =s ' , action => sub { push @rcsopt, "-r$_[1]" } ;
     has q           => '         ' , action => sub { push @rcsopt, "-q" } ;
 
@@ -504,7 +504,6 @@ while (<DIFF>) {
 	    my $old = join '', @old;
 	    my $new = join '', @new;
 	    compare(\$old, \$new) if $app->unit;
-
 
 	    print $c1 if $app->mark;
 	    print color("OTEXT", $old) if $app->show_old;
@@ -894,7 +893,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.26
+Version 4.28
 
 =head1 SYNOPSIS
 

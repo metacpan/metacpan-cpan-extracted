@@ -9,10 +9,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.013002'
+  perl: v5.16.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.013002'
+  perl: v5.16.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -62,14 +62,14 @@ requires:
   feature: '0'
   namespace::autoclean: '0'
   parent: '0'
-  perl: '5.013002'
+  perl: v5.16.0
   strict: '0'
   version: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '8.5'
+version: '8.6'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -99,7 +99,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -182,7 +182,7 @@ x_Dist_Zilla:
               name: -Transformer
               version: '4.018'
       name: PodWeaver
-      version: '4.009'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::ContributorsFromGit
       name: ContributorsFromGit
@@ -326,7 +326,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CheckPrereqsIndexed
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -352,7 +352,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
       name: Git::NextVersion
       version: '2.048'
@@ -377,7 +377,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
       name: Git::Check
       version: '2.048'
@@ -407,7 +407,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -420,11 +420,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-8.5
+          tag: release-8.6
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -448,7 +448,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -462,7 +462,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.0
+          git_version: 2.41.0
           repo_root: .
       name: Git::Push
       version: '2.048'

@@ -7,27 +7,45 @@ use warnings;
 use strict;
 use File::Find;
 use Test::More;
-BEGIN {
-    eval 'use File::Slurp; 1';
-    if ($@) {
-        plan skip_all => "File::Slurp needed for testing";
-        exit 0;
-    };
+
+require './Makefile.PL';
+# Loaded from Makefile.PL
+our %module = get_module_info();
+
+my @files;
+my $blib = File::Spec->catfile(qw(blib lib));
+find(\&wanted, grep { -d } ($blib));
+
+if( my $exe = $module{EXE_FILES}) {
+    push @files, @$exe;
 };
 
-plan 'no_plan';
+sub read_file {
+    open my $fh, '<', $_[0]
+        or die "Couldn't read '$_[0]': $!";
+    binmode $fh;
+    local $/;
+    <$fh>
+}
+
+sub wanted {
+  push @files, $File::Find::name if /\.p(l|m|od)$/;
+}
+
+plan tests => 0+@files;
 
 my $last_version = undef;
 
 sub check {
-      return if (! m{blib/script/}xms && ! m{\.pm \z}xms);
-
       my $content = read_file($_);
 
       # only look at perl scripts, not sh scripts
       return if (m{blib/script/}xms && $content !~ m/\A \#![^\r\n]+?perl/xms);
 
-      my @version_lines = $content =~ m/ ( [^\n]* \$VERSION \s* = [^=] [^\n]* ) /gxms;
+      # what my version numbers look like
+      my $version = qr/\d+\.\d+/;
+      my @version_lines = grep { defined }
+                          $content =~ m/ [^\n]* \$VERSION \s* = \s* ["']($version)['"] | package \s+ \S+ \s+ ($version) \s* ; /gxms;
       if (@version_lines == 0) {
             fail($_);
       }
@@ -44,7 +62,9 @@ sub check {
       }
 }
 
-find({wanted => \&check, no_chdir => 1}, 'blib');
+for (@files) {
+    check();
+};
 
 if (! defined $last_version) {
       fail('Failed to find any files with $VERSION');

@@ -15,6 +15,7 @@ use IPC::Cmd qw(run);
 use Net::Subnet;
 use Sys::Hostname;
 use Sys::Syslog;
+use File::Copy;
 
 =head1 NAME
 
@@ -22,11 +23,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 2.3.0
+Version 2.7.0
 
 =cut
 
-our $VERSION = '2.3.0';
+our $VERSION = '2.7.0';
 
 =head1 SYNOPSIS
 
@@ -790,6 +791,137 @@ sub get_tasks_table {
 	return $tb->draw;
 } ## end sub get_tasks_table
 
+=head2 munge
+
+Munges the specified report file.
+
+    $cape_utils->munge(file=>$report_file);
+
+=cut
+
+sub munge {
+	my ( $self, %opts ) = @_;
+
+	if ( !defined( $opts{file} ) ) {
+		die('No file specified via $opts{file}');
+	}
+
+	if ( !-f $opts{file} ) {
+		die( '"' . $opts{file} . '" is not a file' );
+	}
+
+	# create a backup copy prior to munging
+	# also only create it if it does not exist
+	my $pre_munge_file = $opts{file} . '.pre-cape_utils_munge';
+	if ( !-f $pre_munge_file ) {
+		copy( $opts{file}, $pre_munge_file )
+			|| die( 'Creating pre-munge file for "' . $opts{file} . '" failed... ' . $! );
+	} else {
+		warn( 'Pre-munge file, "' . $pre_munge_file . '", already exists, skippying coppying' );
+	}
+
+	# read the file on in
+	my $report;
+	eval { $report = decode_json( read_file( $opts{file} ) ); };
+	if ($@) {
+		die( 'Failed to parse "' . $opts{file} . '"... ' . $@ );
+	}
+
+	# find the munge keys
+	my @sections = sort( keys( %{ $self->{config} } ) );
+	my @munges;
+	foreach my $item (@sections) {
+		if ( $item =~ /^munge\_/ ) {
+			push( @munges, $item );
+		}
+	}
+
+	# should be set by a munge if it made a change
+	my $changed = 0;
+	# scratch space for between all munges
+	my %all_scratch;
+	foreach my $item (@munges) {
+		# scratch space for the munges to use
+		my %scratch;
+
+		# only process the specified munge if we have both keys
+		if ( defined( $self->{config}{$item}{check} ) && defined( $self->{config}{$item}{munge} ) ) {
+			# now that we know we have the keys, get the full file path if needed
+			my $check_file = $self->{config}{$item}{check};
+			my $munge_file = $self->{config}{$item}{munge};
+			if ( $check_file !~ /^\// && $check_file !~ /^.\// && $check_file !~ /^..\// ) {
+				$check_file = '/usr/local/etc/cape_utils_munge/' . $check_file;
+			}
+			if ( $munge_file !~ /^\// && $munge_file !~ /^.\// && $munge_file !~ /^..\// ) {
+				$munge_file = '/usr/local/etc/cape_utils_munge/' . $munge_file;
+			}
+
+			# figure out if we need to munge it or not
+			my $munge_it = 0;
+			eval {
+				my $check_code = read_file($check_file);
+				eval($check_code);
+				if ($@) {
+					die($@);
+				}
+			};
+			if ($@) {
+				warn( 'Munge "' . $item . '" errored during the check... ' . $@ );
+
+				# override this even if set before dying
+				$munge_it = 0;
+			}
+
+			# if so, try to munge it
+			if ($munge_it) {
+				eval {
+					my $munge_code = read_file($munge_file);
+					eval($munge_code);
+					if ($@) {
+						die($@);
+					}
+				};
+				if ($@) {
+					warn( 'Munge "' . $item . '" errored during the munge... ' . $@ );
+				}
+			} ## end if ($munge_it)
+		} else {
+			warn( 'Section "' . $item . '" missing either the key "check" or munge"' );
+		}
+	} ## end foreach my $item (@munges)
+
+	# save the file if it changed
+	if ($changed) {
+		# if changed, update the malscore
+		my $malscore = 0.0;
+		my $sig_int  = 0;
+		while ( defined( $report->{signatures}[$sig_int] ) ) {
+			if ( $report->{signatures}[$sig_int]{severity} ) {
+				$malscore += $report->{signatures}[$sig_int]{weight} * 0.5
+					* ( $report->{signatures}[$sig_int]{confidence} / 100 );
+			} else {
+				$malscore
+					+= $report->{signatures}[$sig_int]{weight}
+					* ( $report->{signatures}[$sig_int]{weight} - 1 )
+					* ( $report->{signatures}[$sig_int]{confidence} / 100 );
+			}
+
+			$sig_int++;
+		} ## end while ( defined( $report->{signatures}[$sig_int...]))
+		if ( $malscore > 10.0 ) {
+			$malscore = 10.0;
+		}
+		$report->{malscore} = $malscore;
+
+		eval { write_file( $opts{file}, encode_json($report) ); };
+		if ($@) {
+			die( 'Failed to encode updated report post munging and write it to "' . $opts{file} . '"... ' . $@ );
+		}
+	} ## end if ($changed)
+
+	return 1;
+} ## end sub munge
+
 =head2 search
 
 Searches the list of tasks. By default everything will be return ed.
@@ -1491,6 +1623,39 @@ default with CAPEv2 in it's default config.
     eve_look_back=360
     # malscore for changing the event_type for eve from potential_malware_detonation to alert
     malscore=0
+
+=head2 Report Munge Section
+
+INI sections matching /^munge\_/ will be used for report munging. This requires two values for that sections,
+'check' and 'munge'.
+
+'check' is a path to a Perl script that will wrapped in a eval and require to check if the file should be
+munged or not.
+
+'munge' is a path to a Perl script that will wrapped in a eval and require to do the munging.
+
+Below is a example showing the setup for a single script.
+
+    [munge_pdf]
+    check=/usr/local/etc/cape_utils_munge/pdf_check
+    munge=/usr/local/etc/cape_utils_munge/pdf_munge
+
+If more than one munge section exists, they are ran in sorted order.
+
+If the paths specied do not start with a '/', './', or '../', then '/usr/local/etc/cape_utils_munge/' is
+applied to the start.
+
+The scripts are read as evaled strings.
+
+The relevant variables are as below.
+
+    - $munge_it :: Perl boolean for if it should be munged or not. Should be set by the check script.
+
+    - $report :: The hash ref containing the parsed JSON report.
+
+    - $changed :: Perl boolean for if it changed or not.
+
+For some examples see the directory 'munge_examples'.
 
 =head1 CAPEv2 lite.json to EVE handling
 

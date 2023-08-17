@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -23,7 +22,7 @@ my $widget = Tickit::Widget::Box->new
 ok( defined $widget, 'defined $widget' );
 
 is( scalar $widget->children, 1, 'scalar $widget->children' );
-identical( ( $widget->children )[0], $widget->child, '$widget->children[0]' );
+ref_is( ( $widget->children )[0], $widget->child, '$widget->children[0]' );
 
 is( $widget->lines,  3, '$widget->lines with no bounds' );
 is( $widget->cols,  10, '$widget->cols with no bounds' );
@@ -31,8 +30,9 @@ is( $widget->cols,  10, '$widget->cols with no bounds' );
 $widget->set_window( $win );
 flush_tickit;
 
-is( $child_render_rect, Tickit::Rect->new( top => 11, left => 35, lines => 3, cols => 10 ),
-   'child render rect with no bounds' );
+is( $child_render_rect,
+    string(Tickit::Rect->new( top => 11, left => 35, lines => 3, cols => 10 )),
+    'child render rect with no bounds' );
 
 $widget->set_child_lines_min( 5 );
 $widget->set_child_cols_min( 20 );
@@ -42,8 +42,9 @@ is( $widget->cols,  20, '$widget->cols with min bounds' );
 
 flush_tickit;
 
-is( $child_render_rect, Tickit::Rect->new( top => 10, left => 30, lines => 5, cols => 20 ),
-   'child render rect with min bounds' );
+is( $child_render_rect,
+    string(Tickit::Rect->new( top => 10, left => 30, lines => 5, cols => 20 )),
+    'child render rect with min bounds' );
 
 $child_lines = 8; $child_cols = 40;
 $child->resized;
@@ -56,23 +57,26 @@ is( $widget->cols,  30, '$widget->cols with max bounds' );
 
 flush_tickit;
 
-is( $child_render_rect, Tickit::Rect->new( top => 9, left => 25, lines => 6, cols => 30 ),
-   'child render rect with max bounds' );
+is( $child_render_rect,
+    string(Tickit::Rect->new( top => 9, left => 25, lines => 6, cols => 30 )),
+    'child render rect with max bounds' );
 
 $widget->set_child_lines( "80%" );
 
 flush_tickit;
 
-is( $child_render_rect, Tickit::Rect->new( top => 2, left => 25, lines => 20, cols => 30 ),
-   'child render rect with lines at ratio' );
+is( $child_render_rect,
+    string(Tickit::Rect->new( top => 2, left => 25, lines => 20, cols => 30 )),
+    'child render rect with lines at ratio' );
 
 $widget->set_valign( 0.0 );
 $widget->set_align( 0.0 );
 
 flush_tickit;
 
-is( $child_render_rect, Tickit::Rect->new( top => 0, left => 0, lines => 20, cols => 30 ),
-   'child render rect with top-left alignment' );
+is( $child_render_rect,
+    string(Tickit::Rect->new( top => 0, left => 0, lines => 20, cols => 30 )),
+    'child render rect with top-left alignment' );
 
 $widget->set_window( undef );
 $widget->set_child( undef );
@@ -86,7 +90,8 @@ $widget->set_child( undef );
 
    flush_tickit;
 
-   is( $child_render_rect, Tickit::Rect->new( top => 4, left => 20, lines => 17, cols => 40 ),
+   is( $child_render_rect,
+       string(Tickit::Rect->new( top => 4, left => 20, lines => 17, cols => 40 )),
        'child render rect with constructor-set proportions' );
 }
 
@@ -98,7 +103,7 @@ $widget->set_child( undef );
 
    $widget->add( $child );
 
-   is( ( $widget->children )[0], $child, '$widget has one child after ->add' );
+   ref_is( ( $widget->children )[0], $child, '$widget has one child after ->add' );
 
    $widget->remove( $child );
 

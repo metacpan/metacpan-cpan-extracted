@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -14,15 +14,11 @@
 
 namespace Catch {
     StringRef::StringRef( char const* rawChars ) noexcept
-    : StringRef( rawChars, static_cast<StringRef::size_type>(std::strlen(rawChars) ) )
+    : StringRef( rawChars, std::strlen(rawChars) )
     {}
 
-    auto StringRef::operator == ( StringRef const& other ) const noexcept -> bool {
-        return m_size == other.m_size
-            && (std::memcmp( m_start, other.m_start, m_size ) == 0);
-    }
 
-    bool StringRef::operator<(StringRef const& rhs) const noexcept {
+    bool StringRef::operator<(StringRef rhs) const noexcept {
         if (m_size < rhs.m_size) {
             return strncmp(m_start, rhs.m_start, m_size) <= 0;
         }
@@ -50,8 +46,8 @@ namespace Catch {
         }
     }
 
-    auto operator << ( std::ostream& os, StringRef const& str ) -> std::ostream& {
-        return os.write(str.data(), str.size());
+    auto operator << ( std::ostream& os, StringRef str ) -> std::ostream& {
+        return os.write(str.data(), static_cast<std::streamsize>(str.size()));
     }
 
     std::string operator+(StringRef lhs, StringRef rhs) {
@@ -62,7 +58,7 @@ namespace Catch {
         return ret;
     }
 
-    auto operator+=( std::string& lhs, StringRef const& rhs ) -> std::string& {
+    auto operator+=( std::string& lhs, StringRef rhs ) -> std::string& {
         lhs.append(rhs.data(), rhs.size());
         return lhs;
     }

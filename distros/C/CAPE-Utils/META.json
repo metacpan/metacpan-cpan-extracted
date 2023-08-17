@@ -53,6 +53,8 @@
             "Mojolicious::Lite" : "0",
             "Net::Subnet" : "0",
             "POSIX" : "0",
+            "Proc::PID::File" : "1.29",
+            "Statistics::Lite" : "0",
             "Sys::Syslog" : "0",
             "Text::ANSITable" : "0.608",
             "Time::Piece" : "0",
@@ -73,6 +75,6 @@
          "web" : "https://github.com/LilithSec/CAPE-Utils"
       }
    },
-   "version" : "v2.3.0",
+   "version" : "v2.7.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -43,4 +43,4 @@ like($content, qr/\bbergère\b/, 'bergère');
 
 done_testing;
 
-$doc->save_as("02_latin1.doc") if @ARGV;
+$doc->save_as("02_latin1.doc") if $ENV{MWHW_SAVE_TEST_DOCS};

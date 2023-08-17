@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostAutofitWorksheetRowsRequest.name :   ,
-# PostAutofitWorksheetRowsRequest.sheetName :   ,
-# PostAutofitWorksheetRowsRequest.startRow :   ,
-# PostAutofitWorksheetRowsRequest.endRow :   ,
-# PostAutofitWorksheetRowsRequest.onlyAuto :   ,
-# PostAutofitWorksheetRowsRequest.folder :   ,
-# PostAutofitWorksheetRowsRequest.storageName :    
+# PostAutofitWorksheetRowsRequest.name : The workbook name.  ,
+# PostAutofitWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# PostAutofitWorksheetRowsRequest.startRow : Start row index.  ,
+# PostAutofitWorksheetRowsRequest.endRow : End row index.  ,
+# PostAutofitWorksheetRowsRequest.onlyAuto : Autofits all rows in this worksheet.  ,
+# PostAutofitWorksheetRowsRequest.folder : Original workbook folder.  ,
+# PostAutofitWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Autofit rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => '',
+     	description => 'Start row index.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'endRow',
-     	description => '',
+     	description => 'End row index.',
      	format => '',
      	read_only => '',
      		},
      'only_auto' => {
      	datatype => 'string',
      	base_name => 'onlyAuto',
-     	description => '',
+     	description => 'Autofits all rows in this worksheet.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.324';
+our $VERSION = '2.338';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -91,6 +91,19 @@ sub get_schemas {
         }
         elsif ( $driver eq 'Firebird' ) {
             $user_schemas = [];
+        }
+        elsif ( $driver eq 'Oracle' ) {
+            my ( $tmp_user_schemas, $tmp_sys_schemas ) = ( [], [] );
+            for my $sch ( $dbh->selectall_array( "SELECT USERNAME, ORACLE_MAINTAINED FROM ALL_USERS" ) ) {
+                if ( $sch->[1] =~ /^N/i ) {
+                    push @$tmp_user_schemas, $sch->[0];
+                }
+                else {
+                    push @$tmp_sys_schemas, $sch->[0];
+                }
+            }
+            $user_schemas = [ sort @$tmp_user_schemas ];
+            $sys_schemas = [ sort @$tmp_sys_schemas, 'PUBLIC' ];
         }
         else {
             my $table_schem;
@@ -230,7 +243,13 @@ sub tables_info { # not documented
         $table_type  = 'TABLE_TYPE';
     }
     my @keys = ( $table_cat, $table_schem, $table_name, $table_type );
-    my $sth = $dbh->table_info( undef, $schema, '%', '' );
+    my $sth;
+    if ( $driver eq 'Oracle' ) {
+        $sth = $dbh->table_info( undef, $schema, '%', undef );
+    }
+    else {
+        $sth = $dbh->table_info( undef, $schema, '%', '' );
+    }
     my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
@@ -239,7 +258,10 @@ sub tables_info { # not documented
             # Informix: `table_info` returns everything.
             next;
         }
-        if ( $info_table->{$table_type} eq 'INDEX' ) {
+        if ( $driver eq 'SQLite' && $info_table->{$table_type} =~ /^(?:INDEX|TRIGGER)\z/ ) {
+            next;
+        }
+        if ( $driver eq 'Oracle' && $info_table->{$table_type} eq 'SEQUENCE' ) {
             next;
         }
         # The table name in $table_key is used in the tables-menu but not in SQL code.
@@ -279,17 +301,7 @@ sub tables_info { # not documented
 
 
 
-
-# TABLE_CAT:
-# DBD::Pg: The name of the database that the table or view is in (always the current database).
-# DBD::Sybase: TABLE_CAT = TABLE_QUALIFIER (database name)
-# DBD::mysql and DBD::MariaDB: Empty, because MySQL doesn't support catalogs (yet) ''
-# DBD::Firebird: Note that Firebird implementations do not presently support the DBI concepts of 'catalog'
-#                and 'schema', so these parameters are effectively ignored.
-# DBD::SQLite: Always NULL, as SQLite does not have the concept of catalogs.
-
-
-# Oracle and Sybase untested
+# Sybase untested
 
 # Sysbase:
 #   SET quoted_identifier ON
@@ -312,7 +324,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.324
+Version 2.338
 
 =head1 DESCRIPTION
 

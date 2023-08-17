@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::HTML::Scrubber
 
+0.03   2023-07-17
+- Support ignore_params to exempt certain parameters from scrubbing
+- David Precious (BIGPRESH) taking over maintainership
+
 0.02  Fri Jul 09 11:01:45 2010
         - moose-ified
         - support html_scrub method

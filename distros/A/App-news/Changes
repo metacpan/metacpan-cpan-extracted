@@ -1,3 +1,27 @@
+1.07
+
+- Add line-wrapping before posting.
+
+- Add line-wrapping when displaying articles.
+
+- Add tag view.
+
+- Add article superseding.
+
+- Add NEWS_GROUPS variable to specify which newsgroups to list.
+
+1.06
+
+- No user-visible changes. All changes are CPAN related.
+
+1.05
+
+- No user-visible changes. All changes are CPAN related.
+
+1.04
+
+- No user-visible changes. All changes are CPAN related.
+
 1.03
 
 - Error page for missing server.

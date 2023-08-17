@@ -1,5 +1,4 @@
 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Net-Protocol-OBSRemote?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Net-Protocol-OBSRemote)
 [![Windows](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/windows/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Awindows)
 [![MacOS](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/macos/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Amacos)
 [![Linux](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/linux/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Alinux)
@@ -15,7 +14,7 @@ Net::Protocol::OBSRemote - event-loop agnostic protocol to control OBS via the W
 
     my $result = $obs_connection->send_message( $message );
 
-See [Mojo::OBS::Client](https://metacpan.org/pod/Mojo::OBS::Client) for a Mojolicious implementation. This module merely
+See [Mojo::OBS::Client](https://metacpan.org/pod/Mojo%3A%3AOBS%3A%3AClient) for a Mojolicious implementation. This module merely
 abstracts constructing the messages.
 
 # SEE ALSO
@@ -54,7 +53,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2021-2021 by Max Maischein `corion@cpan.org`.
+Copyright 2021-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

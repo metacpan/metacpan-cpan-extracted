@@ -4,7 +4,7 @@ package App::SeismicUnixGui::configs::big_streams::Sucat_config;
 
 =head2 SYNOPSIS 
 
- PERL PACKAGE NAME: Sucat_config.pm 
+ PERL PERL PROGRAM NAME: Sucat_config.pm 
  AUTHOR: Juan Lorenzo
  DATE: June 23 2016 
  	   April 10 2018

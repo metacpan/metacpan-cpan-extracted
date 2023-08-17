@@ -70,7 +70,7 @@
          "web" : "https://github.com/Corion/Spreadsheet-ReadSXC"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

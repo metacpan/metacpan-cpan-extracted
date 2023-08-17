@@ -9,7 +9,7 @@ our @EXPORT_OK = qw/arrayRefWeakenisator/;
 
 # ABSTRACT: Weakens the content of an array reference
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -33,7 +33,7 @@ MarpaX::Java::ClassFile::Util::ArrayRefWeakenisation - Weakens the content of an
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

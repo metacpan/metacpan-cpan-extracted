@@ -1,8 +1,8 @@
-6.49 Jun 04, 2021
+6.52 Jul 12, 2023
 package Graphics::Framebuffer;
 
 ## TEMP COPYRIGHT ##
-#  Copyright 2003 - 2021 Richard Kelsch
+#  Copyright 2003 - 2023 Richard Kelsch
 ## TEMPCOPYRIGHT ##
 
 =head1 NAME
@@ -518,6 +518,11 @@ The splash screen is or is not displayed
 A value other than zero turns on the splash screen, and the value is the wait time to show it (default 2 seconds)
 A zero value turns it off
 
+=item B<IGNORE_X_WINDOWS>
+
+Bypasses the X-Windows check and loads anyway (dangerous).
+Set to 1 to disable X-Windows check. Default is 0.
+
 =item B<FONT_PATH>
 
 Overrides the default font path for TrueType/Type1 fonts
@@ -636,6 +641,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'RAW_BACKGROUND_COLOR'    => undef, # Global Background Color
         'DRAW_MODE'   => NORMAL_MODE,       # Drawing mode (Normal default)
         'DIAGNOSTICS' => FALSE,             # Determines if diagnostics are shown when images are loaded.
+        'IGNORE_X_WINDOWS' => FALSE,        # Forces load inside X-Windows (dangerous)
 
         'SHOW_ERRORS' => FALSE,             # If on, it will output any errors in Imager or elsewhere, else all errors are squelched
 
@@ -755,7 +761,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
           'S2',                            # 16 bits x 2 reserved
 
         # Default values
-        'GARBAGE'     => FALSE,
+        'GARBAGE'     => FALSE,    # Load extra unneeded FB info if true
         'VXRES'       => 640,      # Virtual X resolution
         'VYRES'       => 480,      # Virtual Y resolution
         'BITS'        => 32,       # Bits per pixel
@@ -958,7 +964,9 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         $self->{'CONSOLE'}     += 0;
         $self->{'THIS_CONSOLE'} = $self->{'CONSOLE'};
     };
-    if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
+    my $has_X = FALSE;
+    $has_X = TRUE if (defined($ENV{'DISPLAY'}) && $self->{'IGNORE_X_WINDOWS'} == FALSE);
+    if ( (! $has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                            # We have to be in binary mode first
         $|++;
         if ($self->{'ACCELERATED'}) {
@@ -1278,6 +1286,8 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
 
         bless($self, $class);
     }
+    $self->{'X_FACTOR'} = 3840 / $self->{'XRES'};
+    $self->{'Y_FACTOR'} = 2160 / $self->{'YRES'};
     if ($self->{'RESET'}) {
         $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = \&_reset;
     }
@@ -1798,9 +1808,9 @@ You can add an optional parameter to turn the console cursor on or off too.
 
     unless($self->{'DEVICE'} eq 'EMULATED') { # We only do this stuff to real framebuffers
         if ($cursor =~ /off/i) {
-            system('clear && tput civis -- invisible');
+            system('clear && tput civis');
         } elsif ($cursor =~ /on/i) {
-            system('tput cnorm -- normal && clear');
+            system('tput cnorm && clear');
         }
         select(STDOUT);
         $|++;
@@ -2216,6 +2226,7 @@ Draws a line, in the foreground color, from the last plotted position to the pos
     my $start_x     = $self->{'X'};
     my $start_y     = $self->{'Y'};
     my $antialiased = $params->{'antialiased'} || 0;
+    $size = $params->{'pixel_size'} = 1 if ($antialiased);
     my $XX          = $x_end;
     my $YY          = $y_end;
 
@@ -3539,6 +3550,7 @@ It is up to you to make sure the coordinates are "sane".  Weird things can resul
 
     my $size       = int($params->{'pixel_size'} || 1);
     my $aa         = $params->{'antialiased'} || 0;
+    $size = $params->{'pixel_size'} = 1 if ($aa);
     my $history_on = (exists($self->{'history'})) ? TRUE : FALSE;
 
     if ($params->{'filled'}) {
@@ -5314,8 +5326,8 @@ Turns off clipping, and resets the clipping values to the full size of the scree
     $self->{'Y_CLIP'}  = 0;
     $self->{'XX_CLIP'} = ($self->{'XRES'} - 1);
     $self->{'YY_CLIP'} = ($self->{'YRES'} - 1);
-    $self->{'W_CLIP'}  = $self->{'XX_CLIP'} - $self->{'X_CLIP'};
-    $self->{'H_CLIP'}  = $self->{'YY_CLIP'} - $self->{'Y_CLIP'};
+    $self->{'W_CLIP'}  = $self->{'XRES'};
+    $self->{'H_CLIP'}  = $self->{'YRES'};
     $self->{'CLIPPED'} = FALSE;                                    ## This is merely a flag to see if a clipping
     ## region is defined under the screen dimensions.
 }
@@ -7346,7 +7358,7 @@ Version ## VERSION ## (## VERSION DATE ##)
 
 My thanks go out to those using this module and submitting helpful patches and suggestions for improvement, as well as those who asked for help.  Your requests for help actually gave me ideas.
 
-Thank you Mario Roy for showing how to use MCE to multiprocess instead of threads.  Very handy.  Look for the "get_mce_demos" in the "examples" directory.
+Thank you Mario Roy for showing how to use MCE to multiprocess instead of threads.  Very handy.  Look for the "get_mce_demos" in the "examples" directory.  NOTE: I do not support MCE bug issues.
 
 =head1 TELL ME ABOUT YOUR PROJECT
 
@@ -7358,6 +7370,6 @@ If project has a specific need that the module does not support (or support easy
 
 There is a YouTube channel with demonstrations of the module's capabilities.  Eventually it will have examples of output from a variety of different types of hardware.
 
-L<YouTube Framebuffer::Graphics Channel|https://youtu.be/4Yzs55Wpr7E>
+L<YouTube Graphics::Framebuffer Channel|https://www.youtube.com/@richardkelsch3640>
 
 =cut

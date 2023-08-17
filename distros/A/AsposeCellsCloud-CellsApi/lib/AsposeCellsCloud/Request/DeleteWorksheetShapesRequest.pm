@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetShapesRequest.name :   ,
-# DeleteWorksheetShapesRequest.sheetName :   ,
-# DeleteWorksheetShapesRequest.folder :   ,
-# DeleteWorksheetShapesRequest.storageName :    
+# DeleteWorksheetShapesRequest.name : The workbook name.  ,
+# DeleteWorksheetShapesRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetShapesRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetShapesRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_shapes' } = { 
-    	summary => '',
+    	summary => 'delete all shapes in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -33,14 +33,18 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
+      "Syntax::Operator::Eqr" : {
+         "file" : "lib/Syntax/Operator/Eqr.pm",
+         "version" : "0.06"
+      },
       "Syntax::Operator::Equ" : {
          "file" : "lib/Syntax/Operator/Equ.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

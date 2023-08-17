@@ -19,7 +19,7 @@ use File::Temp 'tempfile';
 my ($fh, $filename) = tempfile TMPDIR => 1, UNLINK => 1;
 ok $filename;
 
-print { $fh } << 'END';
+print {$fh} << 'END';
 1.2.3.4 example.com
 5.6.7.8 example.com
 fe00::1234 example.com
@@ -40,8 +40,8 @@ use AnyEvent::Util 'AF_INET6';
     ok my $cv = AE::cv;
 
     AnyEvent::Socket::resolve_sockaddr 'example.com', 'http=80', 'tcp', 0, undef, sub {
-        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
-                   [ AF_INET6 ? qw(1.2.3.4 5.6.7.8 fe00::1234) : qw(1.2.3.4 5.6.7.8) ];
+        cmp_deeply [map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_],
+            [AF_INET6 ? qw(1.2.3.4 5.6.7.8 fe00::1234) : qw(1.2.3.4 5.6.7.8)];
         $cv->send;
     };
 
@@ -53,8 +53,8 @@ use AnyEvent::Util 'AF_INET6';
     ok my $cv = AE::cv;
 
     AnyEvent::Socket::resolve_sockaddr 'example.com', 80, 'tcp', 0, undef, sub {
-        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
-                   [ AF_INET6 ? qw(1.2.3.4 5.6.7.8 fe00::1234) : qw(1.2.3.4 5.6.7.8) ];
+        cmp_deeply [map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_],
+            [AF_INET6 ? qw(1.2.3.4 5.6.7.8 fe00::1234) : qw(1.2.3.4 5.6.7.8)];
         $cv->send;
     };
 
@@ -66,8 +66,8 @@ use AnyEvent::Util 'AF_INET6';
     ok my $cv = AE::cv;
 
     AnyEvent::Socket::resolve_sockaddr 'example.com', 'http=80', 'tcp', 4, undef, sub {
-        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
-                   [ qw(1.2.3.4 5.6.7.8) ];
+        cmp_deeply [map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_],
+            [qw(1.2.3.4 5.6.7.8)];
         $cv->send;
     };
 
@@ -79,8 +79,8 @@ use AnyEvent::Util 'AF_INET6';
     ok my $cv = AE::cv;
 
     AnyEvent::Socket::resolve_sockaddr 'example.com', 'http=80', 'tcp', 6, undef, sub {
-        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
-                   [ AF_INET6 ? qw(fe00::1234) : qw() ];
+        cmp_deeply [map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_],
+            [AF_INET6 ? qw(fe00::1234) : qw()];
         $cv->send;
     };
 

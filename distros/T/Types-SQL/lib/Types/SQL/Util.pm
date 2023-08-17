@@ -1,6 +1,6 @@
 package Types::SQL::Util;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 5.57 qw/ import /;
@@ -8,7 +8,7 @@ use Exporter 5.57 qw/ import /;
 use PerlX::Maybe qw/ maybe /;
 use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.7.0';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -258,7 +258,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.6.1
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -432,7 +432,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Robert Rothenberg.
+This software is Copyright (c) 2016-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

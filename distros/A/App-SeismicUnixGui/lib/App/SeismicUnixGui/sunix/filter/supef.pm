@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::filter::supef;
 
 =head2 SYNOPSIS
 
- PACKAGE NAME:  SUPEF - Wiener predictive error filtering				
+ PERL PROGRAM NAME:  SUPEF - Wiener predictive error filtering				
  AUTHOR: Juan Lorenzo
  DATE:   
  DESCRIPTION:
@@ -299,9 +299,9 @@ sub showwiener {
     if ($showwiener) {
         $supef->{_showwiener} = $showwiener;
         $supef->{_note} =
-          $supef->{_note} . ' showwiener=' . $supef->{_showwiener};
+          $supef->{_note} . ' wienerout=' . $supef->{_showwiener};
         $supef->{_Step} =
-          $supef->{_Step} . ' showwiener=' . $supef->{_showwiener};
+          $supef->{_Step} . ' wienerout=' . $supef->{_showwiener};
     }
 }
 
@@ -370,7 +370,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 11;
+    my $max_index = 9;
 
     return ($max_index);
 }

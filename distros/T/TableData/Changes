@@ -1,3 +1,11 @@
+0.2.3   2023-04-19  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Mention subnamespaces TableData::Calendar,
+          TableData::Calendar::Date, TableData::Calendar::Date::Holiday.
+
+
 0.2.2   2022-11-29  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

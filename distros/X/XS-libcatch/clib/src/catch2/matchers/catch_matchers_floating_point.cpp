@@ -1,7 +1,7 @@
 
 //              Copyright Catch2 Authors
 // Distributed under the Boost Software License, Version 1.0.
-//   (See accompanying file LICENSE_1_0.txt or copy at
+//   (See accompanying file LICENSE.txt or copy at
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
@@ -150,14 +150,26 @@ namespace Detail {
 
         ret << " ([";
         if (m_type == Detail::FloatingPointKind::Double) {
-            write(ret, step(m_target, static_cast<double>(-INFINITY), m_ulps));
+            write( ret,
+                   step( m_target,
+                         -std::numeric_limits<double>::infinity(),
+                         m_ulps ) );
             ret << ", ";
-            write(ret, step(m_target, static_cast<double>( INFINITY), m_ulps));
+            write( ret,
+                   step( m_target,
+                         std::numeric_limits<double>::infinity(),
+                         m_ulps ) );
         } else {
             // We have to cast INFINITY to float because of MinGW, see #1782
-            write(ret, step(static_cast<float>(m_target), static_cast<float>(-INFINITY), m_ulps));
+            write( ret,
+                   step( static_cast<float>( m_target ),
+                         -std::numeric_limits<float>::infinity(),
+                         m_ulps ) );
             ret << ", ";
-            write(ret, step(static_cast<float>(m_target), static_cast<float>( INFINITY), m_ulps));
+            write( ret,
+                   step( static_cast<float>( m_target ),
+                         std::numeric_limits<float>::infinity(),
+                         m_ulps ) );
         }
         ret << "])";
 
@@ -213,5 +225,17 @@ WithinRelMatcher WithinRel(float target) {
 }
 
 
-} // namespace Matchers
+
+bool IsNaNMatcher::match( double const& matchee ) const {
+    return std::isnan( matchee );
+}
+
+std::string IsNaNMatcher::describe() const {
+    using namespace std::string_literals;
+    return "is NaN"s;
+}
+
+IsNaNMatcher IsNaN() { return IsNaNMatcher(); }
+
+    } // namespace Matchers
 } // namespace Catch

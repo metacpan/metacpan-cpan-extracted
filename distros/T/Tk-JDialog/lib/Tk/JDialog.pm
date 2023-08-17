@@ -14,7 +14,7 @@ Version 1.01
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.20';
 
 
 =head1 SYNOPSIS
@@ -182,9 +182,10 @@ Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-tk-jdialog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tk-JDialog>.  I will be notified, 
-and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-tk-jdialog at rt.cpan.org>, 
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tk-JDialog>.  
+I will be notified, and then you'll automatically be notified of progress on 
+your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -218,12 +219,13 @@ L<http://search.cpan.org/dist/Tk-JDialog/>
 
 =head1 ACKNOWLEDGEMENTS
 
- Tk::JDialog derived from the L<Tk::Dialog> wiget from Tcl/Tk to TkPerl (based on
- John Stoffel's idea).  It addes the options:  -escape_button, images, 
+ Tk::JDialog derived from the L<Tk::Dialog> wiget from Tcl/Tk to TkPerl 
+ (based on John Stoffel's idea).  It addes the options:  -escape_button 
+ and -images, 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Jim Turner.
+Copyright 1997-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -286,9 +288,9 @@ Software Foundation, Inc.,
 
 use Carp;
 #use strict qw(vars);
-our $useBalloon;
+our $useBalloon = 0;
 use Tk ":eventtypes";
-use Tk::Balloon; $useBalloon = 1;
+eval 'use Tk::Balloon; $useBalloon = 1; 1';
 require Tk::Toplevel;
 
 @Tk::JDialog::ISA = qw(Tk::Toplevel);
@@ -309,7 +311,7 @@ sub Populate
 
 	my $buttons = delete $args->{'-buttons'};
 	my $images = delete $args->{'-images'};
-	$buttons = ['OK']  unless (defined $buttons);
+	$buttons = ['~OK']  unless (defined $buttons);
 	my $default_button = delete $args->{-default_button};
 	my $escape_button = delete $args->{-escape_button};
 	my $noballoons = delete $args->{-noballoons};
@@ -326,7 +328,7 @@ sub Populate
 	$cw->withdraw;
 	$cw->iconname('JDialog');
 	$cw->protocol('WM_DELETE_WINDOW' => sub {});
-#?????????????????    $cw->transient($cw->toplevel)  unless ($^O =~ /Win/i);
+	$cw->transient($cw->Parent->toplevel)  unless ($^O =~ /Win/i);
 
 	my $w_top = $cw->Frame(Name => 'top',-relief => 'raised', -borderwidth => 1);
 	my $w_bot = $cw->Frame(Name => 'bot',-relief => 'raised', -borderwidth => 1);
@@ -341,7 +343,7 @@ sub Populate
 	$w_bitmap->pack(@pl, @$pad1);
 	my $w_msg = $w_top->Label(
 			#-wraplength => '3i',    --!!! Removed 2/19 by Jim Turner
-			-justify    => 'left' 
+			-justify    => 'left'
 	);
 
 	$w_msg->pack(-side => 'right', -expand => 1, -fill => 'both', @$pad1);
@@ -433,6 +435,7 @@ sub Populate
 				-foreground => ['ADVERTISED','foreground','Foreground','black'],
 				-bg         => ['DESCENDANTS','background','Background',undef],
 				-background => ['DESCENDANTS','background','Background',undef],
+				-font       => ['message','font','Font','{MS Sans} 14'],
 				DEFAULT     => ['message',undef,undef,undef]
 		);
 	} else {
@@ -444,7 +447,8 @@ sub Populate
 				-bg         => ['DESCENDANTS','background','Background',undef],
 				-background => ['DESCENDANTS','background','Background',undef],
 				# JWT for TNT!  -font       => ['message','font','Font','-*-Times-Medium-R-Normal-*-180-*-*-*-*-*-*'],
-				-font       => ['message','font','Font','-adobe-helvetica-bold-r-normal--17-120-100-100-p-92-iso8859-1'],
+#x				-font       => ['message','font','Font','-adobe-helvetica-bold-r-normal--17-120-100-100-p-92-iso8859-1'],
+				-font       => ['message','font','Font','Helvetica -17 bold'],
 				DEFAULT     => ['message',undef,undef,undef]
 		);
 	}
@@ -457,7 +461,6 @@ sub Show {   	# Dialog object public method - display the dialog.
 	croak "Dialog:  `show' method requires at least 1 argument"
 			if scalar @_ < 1 ;
 
-	my $old_focus = $cw->focusSave;  # don't need (Jim Turner) after fixing BUG!
 	my $old_grab  = $cw->grabSave;
 
 	# Update all geometry information, center the dialog in the display
@@ -472,17 +475,12 @@ sub Show {   	# Dialog object public method - display the dialog.
 		$cw->focus;
 	}
 	unless (!defined($ENV{DESKTOP_SESSION}) || $ENV{DESKTOP_SESSION} =~ /kde/o) {
-		if ($ENV{DESKTOP_SESSION} =~ /AfterStep version 2.2.1[2-9]/io) {  #JWT:ADDED 20140606 B/C TO GET AFTERSTEP TO GIVE "TRANSIENT" WINDOWS THE FOCUS?!
-			Tk::Event::DoOneEvent(ALL_EVENTS);
-			select(undef, undef, undef, 0.25);  #FANCY QUICK-NAP FUNCTION!
-		}
 		if (defined $grab_type && length $grab_type) {
 			$cw->grab($grab_type)  if ($grab_type !~ /no/io);  #JWT: ADDED 20010517 TO ALLOW NON-GRABBING!
 		} else {
 			$cw->grab;
 		}
 	}
-############## $cw->waitVisibility;  #SEEMS TO HANG ON NEWER TK'S.
 	$cw->update;
 
 	# Wait for the user to respond, restore the focus and grab, withdraw
@@ -491,8 +489,7 @@ sub Show {   	# Dialog object public method - display the dialog.
 	$cw->waitVariable(\$cw->{'selected_button'});
 	$cw->grabRelease;
 	$cw->withdraw;
-	&$old_focus  if (defined($ENV{DESKTOP_SESSION}) && $ENV{DESKTOP_SESSION} =~ /AfterStep version 2.2.1[2-9]/io);   #FIXED BUG CAUSING COMPLETE SCREEN LOCKUP IF ANOTHER
-	#MOTIF APP (WINDOW) IS POPPED UP SHORTLY AFTERWARDS!
+	#DIALOG (WINDOW) IS POPPED UP SHORTLY AFTERWARDS!
 	&$old_grab;
 	return $cw->{'selected_button'};
 

@@ -15,7 +15,7 @@ int32_t SPVM__Sys__User__Group__gr_name(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 #if defined(_WIN32)
   env->die(env, stack, "The method \"gr_name\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_group = stack[0].oval;
   
@@ -31,7 +31,7 @@ int32_t SPVM__Sys__User__Group__gr_passwd(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"gr_passwd\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_group = stack[0].oval;
   
@@ -46,7 +46,7 @@ int32_t SPVM__Sys__User__Group__gr_gid(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"gr_gid\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_group = stack[0].oval;
   
@@ -62,7 +62,7 @@ int32_t SPVM__Sys__User__Group__gr_mem(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 #if defined(_WIN32)
   env->die(env, stack, "The method \"gr_mem\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_group = stack[0].oval;
   
@@ -78,7 +78,7 @@ int32_t SPVM__Sys__User__Group__gr_mem(SPVM_ENV* env, SPVM_VALUE* stack) {
     gr_mem++;
   }
   
-  void* obj_gr_mems = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, gr_mem_length);
+  void* obj_gr_mems = env->new_string_array(env, stack, gr_mem_length);
   
   for (int32_t i = 0; i < gr_mem_length; i++) {
     char* gr_mem = gr_mems[i];

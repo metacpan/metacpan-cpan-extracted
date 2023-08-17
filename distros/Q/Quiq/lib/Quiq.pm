@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.210';
+our $VERSION = '1.211';
 
 =encoding utf8
 
@@ -540,6 +540,10 @@ L<Quiq::ImagePool::Sequence> - Bild-Sequenz und -Ranges
 
 =item *
 
+L<Quiq::Imap::Client> - IMAP Client
+
+=item *
+
 L<Quiq::Ipc> - Interprozesskommunikation
 
 =item *
@@ -689,6 +693,10 @@ L<Quiq::Perl> - Erweiterte und abgesicherte Perl-Operationen
 =item *
 
 L<Quiq::PerlModule> - Perl-Modul
+
+=item *
+
+L<Quiq::PhotoStorage> - Foto-Speicher
 
 =item *
 
@@ -974,7 +982,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.210
+1.211
 
 =head1 AUTHOR
 

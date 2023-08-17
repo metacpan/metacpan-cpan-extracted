@@ -1,0 +1,22 @@
+Changes
+lib/Tk/font_icon.png
+lib/Tk/QuickForm.pm
+lib/Tk/QuickForm/CBaseClass.pm
+lib/Tk/QuickForm/CBooleanItem.pm
+lib/Tk/QuickForm/CColorItem.pm
+lib/Tk/QuickForm/CFileItem.pm
+lib/Tk/QuickForm/CFloatItem.pm
+lib/Tk/QuickForm/CFolderItem.pm
+lib/Tk/QuickForm/CFontItem.pm
+lib/Tk/QuickForm/CListItem.pm
+lib/Tk/QuickForm/CRadioItem.pm
+lib/Tk/QuickForm/CScaleItem.pm
+lib/Tk/QuickForm/CSpinItem.pm
+lib/Tk/QuickForm/CTextItem.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/Tk-QuickForm.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

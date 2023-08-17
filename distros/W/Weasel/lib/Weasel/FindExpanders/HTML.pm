@@ -5,19 +5,13 @@ Weasel::FindExpanders::HTML - Weasel FindExpanders HTML
 
 =head1 VERSION
 
-0.02
+0.31
 
 =head1 SYNOPSIS
 
   use Weasel::FindExpanders::HTML;
 
-  my $button = $session->find($session->page, "@button|{text=>\"whatever\"}");
-
-=cut
-
-=head1 DEPENDENCIES
-
-
+  my $button = $session->find($session->page, '*button|{text=>"whatever"}');
 
 =cut
 
@@ -30,6 +24,10 @@ use Weasel::FindExpanders qw/ register_find_expander /;
 
 =head1 DESCRIPTION
 
+This module provides a series of short-cuts for XPath expressions for use
+with Weasel's C<find()> function for testing of HTML pages, geared toward
+standard HTML5 tags.
+
 =cut
 
 =head1 SUBROUTINES/METHODS
@@ -41,11 +39,25 @@ use Weasel::FindExpanders qw/ register_find_expander /;
 Finds button tags or input tags of types submit, reset, button and image.
 
 Criteria:
- * 'id'
- * 'name'
- * 'text' -- button: matches content between open and close tag
-          -- input: matches 'value' attribute (shown on button),
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=item * 'text'
+
+=over
+
+=item * button: matches content between open and close tag
+
+=item * input: matches 'value' attribute (shown on button),
                     or image button's 'alt' attribute
+
+=back
+
+=back
 
 =cut
 
@@ -81,9 +93,16 @@ sub button_expander {
 Finds input tags of type checkbox
 
 Criteria:
- * 'id'
- * 'name'
- * 'value'
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=item * 'value'
+
+=back
 
 =cut
 
@@ -117,8 +136,14 @@ sub contains_expander {
 Finds tags for which a label has been set (using the label tag)
 
 Criteria:
- * 'text': text of the label
- * 'tag': tags for which the label has been set
+
+=over
+
+=item * 'text': text of the label
+
+=item * 'tag': tags for which the label has been set
+
+=back
 
 =cut
 
@@ -130,12 +155,69 @@ sub labeled_expander {
     return ".//${tag}[\@id=//label[normalize-space(text())=normalize-space('$text')]/\@for]";
 }
 
+=item titled_expander
+
+Finds tags for which a title attribute has been set
+
+Criteria:
+
+=over
+
+=item * 'text': text of the title attribute
+
+=item * 'tag': tags for which the title has been set
+
+=back
+
+=cut
+
+sub titled_expander {
+    my %args = @_;
+
+    my $tag = $args{tag_name} // q{*};
+    my $text = $args{text};
+    return ".//${tag}[\@title=normalize-space('$text')]";
+}
+
+=item field_expander
+
+Finds tags for which the id, name or title attribute has been set, or for which
+there's a label
+
+Criteria:
+
+=over
+
+=item * 'text': text of the attribute or label
+
+=item * 'tag': tags for which the attribute or has been set
+
+=back
+
+=cut
+
+sub field_expander {
+    my %args = @_;
+
+    my $tag = $args{tag_name} // q{*};
+    my $text = $args{text};
+    return join("\n|",
+                labeled_expander( %args ),
+                titled_expander( %args ),
+                ".//${tag}[\@id='$text' or \@name='$text']")
+}
+
 =item link_expander
 
 Finds A tags with an href attribute whose text or title matches 'text'
 
 Criteria:
- * 'text'
+
+=over
+
+=item * 'text'
+
+=back
 
 =cut
 
@@ -152,8 +234,14 @@ sub link_expander {
 Finds OPTION tags whose content matches 'text' or value matches 'value'
 
 Criteria:
- * 'text'
- * 'value'
+
+=over
+
+=item * 'text'
+
+=item * 'value'
+
+=back
 
 =cut
 
@@ -170,8 +258,14 @@ sub option_expander {
 Finds input tags of type password
 
 Criteria:
- * 'id'
- * 'name'
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=back
 
 =cut
 
@@ -193,9 +287,16 @@ sub password_expander {
 Finds input tags of type radio
 
 Criteria:
- * 'id'
- * 'name'
- * 'value'
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=item * 'value'
+
+=back
 
 =cut
 
@@ -218,8 +319,14 @@ sub radio_expander {
 Finds select tags
 
 Criteria:
- * 'id'
- * 'name'
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=back
 
 =cut
 
@@ -240,8 +347,14 @@ sub select_expander {
 Finds input tags of type text or without type (which defaults to text)
 
 Criteria:
- * 'id'
- * 'name'
+
+=over
+
+=item * 'id'
+
+=item * 'name'
+
+=back
 
 =cut
 
@@ -262,29 +375,31 @@ register_find_expander($_->{name}, 'HTML', $_->{expander})
     for ({  name => 'button',   expander => \&button_expander   },
          {  name => 'checkbox', expander => \&checkbox_expander },
          {  name => 'contains', expander => \&contains_expander },
-         {  name => 'labeled',  expander => \&labeled_expander },
+         {  name => 'field',    expander => \&field_expander    },
+         {  name => 'labeled',  expander => \&labeled_expander  },
          {  name => 'link',     expander => \&link_expander     },
          {  name => 'option',   expander => \&option_expander   },
          {  name => 'password', expander => \&password_expander },
          {  name => 'radio',    expander => \&radio_expander    },
          {  name => 'select',   expander => \&select_expander   },
-         {  name => 'text',     expander => \&text_expander      },
+         {  name => 'text',     expander => \&text_expander     },
+         {  name => 'titled',   expander => \&titled_expander   },
     );
 
 =back
 
 =head1 AUTHOR
 
-Erik Huelsmann
+  Erik Huelsmann
 
 =head1 CONTRIBUTORS
 
-Erik Huelsmann
-Yves Lavoie
+  Erik Huelsmann
+  Yves Lavoie
 
 =head1 MAINTAINERS
 
-Erik Huelsmann
+  Erik Huelsmann
 
 =head1 BUGS AND LIMITATIONS
 
@@ -294,7 +409,7 @@ Bugs can be filed in the GitHub issue tracker for the Weasel project:
 =head1 SOURCE
 
 The source code repository for Weasel is at
- https://github.com/perl-weasel/weasel
+ L<https://github.com/perl-weasel/weasel>
 
 =head1 SUPPORT
 
@@ -303,7 +418,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2023  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

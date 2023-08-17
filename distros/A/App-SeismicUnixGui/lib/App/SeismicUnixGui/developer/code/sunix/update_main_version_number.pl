@@ -2,7 +2,7 @@ use Moose;
 
 =head2 SYNOPSIS
 
-PACKAGE NAME: update_main_version_number.pl
+PERL PROGRAM NAME: update_main_version_number.pl
 
 AUTHOR:  
 
@@ -39,7 +39,7 @@ my @inbound;
 my @outbound_bck;
 my @outbound;
 my ( @line2find, @replacement );
-my $max_num_files = 4;
+my $max_num_files = 5;
 
 my $up3dirs = '/../../..';
 my $up4dirs = '/../../../..';
@@ -50,8 +50,8 @@ and file
 =cut
 
 my $local       = getcwd();
-my $old_version = '0.82.8';
-my $new_version = '0.82.9';
+my $old_version = '0.85.0';
+my $new_version = '0.85.5';
 
 my $i = 0;
 $line2find[$i]   = ("L_SUV$old_version.pl");
@@ -87,12 +87,22 @@ $replacement[$i] = "VERSION = '$new_version';";
 $file[$i]      = 'SeismicUnixGui.pm';
 $path2file[$i] = $local . $up4dirs;
 
+$i = 4;
+$line2find[$i]     = "'SeismicUnixGuiInstallationGuide$old_version.pdf';";
+print("line2find   = $line2find[$i]\n");
+$replacement[$i] = "'SeismicUnixGuiInstallationGuide$new_version.pdf';";
+print("replacement = $replacement[$i]\n");
+$file[$i]         = 'help_button_messages.pm';
+$path2file[$i]    = $local . $up3dirs . '/messages';
+
 =head2 Set files and paths
 
 =cut
 
 for ( my $count = 0 ; $count < $max_num_files; $count++ ) {
 
+#for ( my $count = 2 ; $count < 3; $count++ ) {
+	
 	$file_bck[$count] = $file[$count] . '_bck';
 	
 	$inbound[$count]      = $path2file[$count] . '/' . $file[$count];
@@ -116,9 +126,11 @@ for ( my $count = 0 ; $count < $max_num_files; $count++ ) {
 
 		#  chomp $string;    # remove all newlines
 		if ( $string =~ m/$line2find[$count]/) {
+			
 			$string =~ s/$line2find[$count]/$replacement[$count]/;
 			print(" substitution successful: $string\n");
 			print(" in file: $file[$count]\n");
+			
 		}
 
 #		print(" string: $string\n");
@@ -126,14 +138,17 @@ for ( my $count = 0 ; $count < $max_num_files; $count++ ) {
 
 	}
 
-	open( OUT, ">$outbound[$count]" )
+	open( OUT, ">","$outbound[$count]" )
 	  or die("File $outbound[$count] not found");
+
+#     open( OUT, ">","junk" )
+#	  or die("File junk not found");
 
 	foreach my $text (@slurp) {
 
-		printf OUT $text . "\n";
+		print OUT $text . "\n";
 
-		#	print("$text \n");
+#		print("$text \n");
 	}
 	close(OUT);
 

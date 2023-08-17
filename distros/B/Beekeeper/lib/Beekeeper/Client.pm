@@ -3,7 +3,7 @@ package Beekeeper::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Beekeeper::AnyEvent;
 use Beekeeper::MQTT;
@@ -11,8 +11,7 @@ use Beekeeper::JSONRPC;
 use Beekeeper::Config;
 
 use JSON::XS;
-use Sys::Hostname;
-use Time::HiRes;
+use Compress::Raw::Zlib ();
 use Digest::MD5 'md5_base64';
 use Carp;
 
@@ -38,6 +37,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = ('worker' => \@EXPORT_OK );
 
 our $singleton;
+my  $INFLATE;
 
 
 sub new {
@@ -90,6 +90,8 @@ sub new {
             }
         }
     }
+
+    $INFLATE = Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0 );
 
     $self->{_CLIENT}->{forward_to} = delete $args{'forward_to'};
     $self->{_CLIENT}->{auth_salt}  = delete $args{'auth_salt'} || $args{'bus_id'};
@@ -456,7 +458,7 @@ sub __do_rpc_request {
     $client->{in_progress}->{$req_id} = $req;
 
     # Ensure that timeout is set properly when the event loop was blocked
-    if ($__now != time) { $__now = time; AnyEvent->now_update }
+    if ($__now != CORE::time) { $__now = CORE::time; AnyEvent->now_update }
 
     # Request timeout timer
     my $timeout = $args{'timeout'} || REQ_TIMEOUT;
@@ -489,8 +491,20 @@ sub __create_response_topic {
         on_publish  => sub {
             my ($payload_ref, $mqtt_properties) = @_;
 
+            my $resp;
             local $@;
-            my $resp = eval { decode_json($$payload_ref) };
+            eval {
+
+                if (substr($$payload_ref,0,1) eq "\x78") {
+                    my $decompressed_json;
+                    $INFLATE->inflate($payload_ref, $decompressed_json);
+                    $INFLATE->inflateReset();
+                    $resp = decode_json($decompressed_json);
+                }
+                else {
+                    $resp = decode_json($$payload_ref);
+                }
+            };
 
             unless (ref $resp eq 'HASH' && $resp->{jsonrpc} eq '2.0') {
                 warn "Received invalid JSON-RPC 2.0 message $at";
@@ -845,7 +859,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2021 José Micó.
+Copyright 2015-2023 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

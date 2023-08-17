@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.566';
+our $VERSION = '0.569';
 
 use 5.020;
 use Moo;
 use strictures 2;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -24,7 +25,7 @@ sub vocabulary {
   'https://json-schema.org/draft/2020-12/vocab/format-assertion' => 'draft2020-12';
 }
 
-sub evaluation_order { 3 }
+sub evaluation_order { 2 }
 
 sub keywords {
   qw(format);
@@ -49,7 +50,7 @@ sub keywords {
     my @o = split(/\./, $_[0], 5);
     @o == 4 && (grep /^(?:0|[1-9][0-9]{0,2})$/, @o) == 4 && (grep $_ < 256, @o) == 4;
   };
-  # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
+  # https://datatracker.ietf.org/doc/html/rfc3339#appendix-A with some additions for the 2000 version
   # as defined in https://en.wikipedia.org/wiki/ISO_8601#Durations
   my $duration_re = do {
     my $num = qr{[0-9]+(?:[.,][0-9]+)?};
@@ -101,7 +102,7 @@ sub keywords {
     'idn-hostname' => sub { $is_hostname->($idn_decode->($_[0])) },
     ipv4 => $is_ipv4,
     ipv6 => sub {
-      ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,7}[[:xdigit:]]{0,4}$/
+      ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,8}[[:xdigit:]]{0,4}$/
         || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){1,6}((?:[0-9]{1,3}\.){3}[0-9]{1,3})$/
             && $is_ipv4->($1))
         && $_[0] !~ /:::/
@@ -110,9 +111,11 @@ sub keywords {
         && do {
           my $double_colons = ()= ($_[0] =~ /::/g);
           my $colon_components = grep length, split(/:+/, $_[0], -1);
-          $double_colons < 2 && ($double_colons > 0
-            || ($colon_components == 8 && !defined $1)
-            || ($colon_components == 7 && defined $1))
+          ($double_colons == 1
+            && ((!defined $1 && $colon_components < 8) || (defined $1 && $colon_components < 7)))
+            ||
+          ($double_colons == 0
+            && ((!defined $1 && $colon_components == 8) || (defined $1 && $colon_components == 7)));
         };
     },
     uri => sub {
@@ -198,7 +201,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.566
+version 0.569
 
 =head1 DESCRIPTION
 

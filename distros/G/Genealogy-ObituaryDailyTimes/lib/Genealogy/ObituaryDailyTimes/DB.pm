@@ -1,6 +1,6 @@
 package Genealogy::ObituaryDailyTimes::DB;
 
-=head1
+=head1 NAME
 
 Genealogy::ObituaryDailyTimes::DB
 

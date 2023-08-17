@@ -28,7 +28,12 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use WebService::Fastly::Object::RelationshipTlsCertificate;
 use WebService::Fastly::Object::RelationshipTlsCertificateTlsCertificate;
+use WebService::Fastly::Object::RelationshipTlsConfiguration;
+use WebService::Fastly::Object::RelationshipTlsConfigurationTlsConfiguration;
+use WebService::Fastly::Object::RelationshipTlsDomain;
+use WebService::Fastly::Object::RelationshipTlsDomainTlsDomain;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -166,14 +171,32 @@ __PACKAGE__->method_documentation({
         format => '',
         read_only => 'false',
             },
+    'tls_configuration' => {
+        datatype => 'RelationshipTlsConfigurationTlsConfiguration',
+        base_name => 'tls_configuration',
+        description => '',
+        format => '',
+        read_only => 'false',
+            },
+    'tls_domain' => {
+        datatype => 'RelationshipTlsDomainTlsDomain',
+        base_name => 'tls_domain',
+        description => '',
+        format => '',
+        read_only => 'false',
+            },
 });
 
 __PACKAGE__->openapi_types( {
-    'tls_certificate' => 'RelationshipTlsCertificateTlsCertificate'
+    'tls_certificate' => 'RelationshipTlsCertificateTlsCertificate',
+    'tls_configuration' => 'RelationshipTlsConfigurationTlsConfiguration',
+    'tls_domain' => 'RelationshipTlsDomainTlsDomain'
 } );
 
 __PACKAGE__->attribute_map( {
-    'tls_certificate' => 'tls_certificate'
+    'tls_certificate' => 'tls_certificate',
+    'tls_configuration' => 'tls_configuration',
+    'tls_domain' => 'tls_domain'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

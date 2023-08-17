@@ -103,7 +103,7 @@ Options:
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Type-Guess](https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Type-Guess)
-or via mail to [sql-type-guess-Bugs@rt.cpan.org](https://metacpan.org/pod/sql-type-guess-Bugs@rt.cpan.org).
+or via mail to [sql-type-guess-Bugs@rt.cpan.org](https://metacpan.org/pod/sql-type-guess-Bugs%40rt.cpan.org).
 
 # AUTHOR
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,67 +17,67 @@ name: App-VTide
 provides:
   App::VTide:
     file: lib/App/VTide.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command:
     file: lib/App/VTide/Command.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Conf:
     file: lib/App/VTide/Command/Conf.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Edit:
     file: lib/App/VTide/Command/Edit.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Grep:
     file: lib/App/VTide/Command/Grep.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Help:
     file: lib/App/VTide/Command/Help.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::History:
     file: lib/App/VTide/Command/History.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Init:
     file: lib/App/VTide/Command/Init.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::List:
     file: lib/App/VTide/Command/List.pm
-    version: v0.1.16
+    version: v1.0.4
   App::VTide::Command::NewWindow:
     file: lib/App/VTide/Command/NewWindow.pm
-    version: v0.1.16
+    version: v1.0.4
   App::VTide::Command::Recent:
     file: lib/App/VTide/Command/Recent.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Refresh:
     file: lib/App/VTide/Command/Refresh.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Run:
     file: lib/App/VTide/Command/Run.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Save:
     file: lib/App/VTide/Command/Save.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Sessions:
     file: lib/App/VTide/Command/Sessions.pm
-    version: v0.1.16
+    version: v1.0.4
   App::VTide::Command::Split:
     file: lib/App/VTide/Command/Split.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Start:
     file: lib/App/VTide/Command/Start.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Command::Who:
     file: lib/App/VTide/Command/Who.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Config:
     file: lib/App/VTide/Config.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Hooks:
     file: lib/App/VTide/Hooks.pm
-    version: v1.0.1
+    version: v1.0.4
   App::VTide::Sessions:
     file: lib/App/VTide/Sessions.pm
-    version: v0.1.20
+    version: v1.0.4
 recommends:
   Term::Title: '0'
 requires:
@@ -101,5 +101,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::VTide
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-VTide.git
-version: v1.0.1
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

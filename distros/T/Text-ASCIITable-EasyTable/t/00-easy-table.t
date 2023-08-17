@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Output qw(output_from);
 
 use lib qw{lib};
@@ -124,6 +124,22 @@ subtest 'custom column values or default' => sub {
 
   is( $row_count, 3, 'just columns transformed' )
     or diag($stdout);
+};
+
+########################################################################
+subtest 'horizontal line' => sub {
+########################################################################
+  my $t = easy_table( data => [ @data[ ( 0, 1, 1, 2 ) ], undef, $data[2] ], );
+
+  my ($stdout) = output_from( sub { print {*STDOUT} $t; } );
+
+  my $line_count = 0;
+
+  while ( $stdout =~ /[+]------[+]------[+]$/gxsm ) {
+    ++$line_count;
+  }
+
+  is( $line_count, 3, '3 lines' );
 };
 
 1;

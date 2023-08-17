@@ -48,6 +48,7 @@ sub handle_data_encoded {
     next unless exists $context->{$data_name}; # required handled by Moo/se required attribute
 
     if( !$indexed && $attr_rules->{indexed}) {
+      $context->{$data_name} = $self->normalize_always_array($context->{$data_name}) if ($attr_rules->{always_array}||'');
 
       # TODO move this into stand alone method and set some sort of condition
       unless((ref($context->{$data_name})||'') eq 'ARRAY') {
@@ -74,7 +75,12 @@ sub handle_data_encoded {
         $response->{$data_name} = [];
       }
 
-    } elsif(my $nested_model = $attr_rules->{model}) { 
+    } elsif(my $nested_model = $attr_rules->{model}) {
+
+
+        $context->{$data_name} = $self->normalize_json($context->{$data_name}, $data_name) if (($attr_rules->{expand}||'') eq 'JSON');
+        $context->{$data_name} = $self->normalize_boolean($context->{$data_name}) if ($attr_rules->{boolean}||'');
+
         $response->{$attr} = $self->{ctx}->model(
           $self->normalize_nested_model_name($nested_model), 
           current_parser=>$self,
@@ -92,15 +98,15 @@ sub handle_data_encoded {
 sub normalize_value {
   my ($self, $param, $value, $key_rules) = @_;
 
+  $value = $self->normalize_json($value, $param) if (($key_rules->{expand}||'') eq 'JSON');
+
   if($key_rules->{always_array}) {
     $value = $self->normalize_always_array($value);
   } elsif($key_rules->{flatten}) {
     $value = $self->normalize_flatten($value);
   }
 
-  $value = $self->normalize_json($value, $param) if (($key_rules->{expand}||'') eq 'JSON');
   $value = $self->normalize_boolean($value) if ($key_rules->{boolean}||'');
-
   return $value;
 }
 
@@ -141,13 +147,11 @@ sub get_json_parser {
 
 sub normalize_json {
   my ($self, $value, $param) = @_;
-
   eval {
     $value = $self->get_json_parser->decode($value);
   } || do {
-    CatalystX::RequestModel::Utils::InvalidJSONForValue->throw(param=>$param, parsing_error=>$@);
+    CatalystX::RequestModel::Utils::InvalidJSONForValue->throw(param=>$param, value=>$value, parsing_error=>$@);
   };
-
   return $value;
 }
 

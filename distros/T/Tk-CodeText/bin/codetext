@@ -1,0 +1,345 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Tk::GtkSettings qw(applyGtkSettings);
+applyGtkSettings;
+
+use Tk;
+require Tk::CodeText;
+require Tk::Dialog;
+use File::Path qw(make_path);
+use Config;
+
+my $configfolder;
+if ($Config{osname} eq 'MSWin32') {
+	$configfolder = $ENV{LOCALAPPDATA} . '/codetext' 
+} else {
+	$configfolder = $ENV{HOME} . '/.local/share/codetext'
+}
+unless (-e $configfolder) {
+	unless (make_path($configfolder)) {
+		die "Could not create path $configfolder";
+	}
+}
+my $settingsfile = "$configfolder/settingsrc";
+my $filename = '';
+
+my %options = (
+	-autoindent => 1,
+	-font => 'Courier 12',
+	-indentstyle => 'tab',
+	-logcall => sub { my $m = shift; print STDERR "$m\n" },
+	-match => '{}()[]',
+	-showfolds => 1,
+	-shownumbers => 1,
+	-showstatus => 1,
+	-tabs => '8m',
+	-wrap => 'none',
+	-xmldir => undef,
+);
+
+my @usersettings = ('-autoindent', '-indentstyle', '-match', '-showfolds', '-shownumbers', '-showstatus', '-tabs', '-wrap');
+&loadSettings if -e $settingsfile;
+
+#main help text
+my $help_main = <<__EOF;
+Usage: codetext [options] [filename]exit
+Options:
+-a -autoindent    1 or 0. Autoindent
+-f -font:         'font string' Specify the editing font.
+-h -help:         Displays this message.
+-m -match:        By default '{}()[]'. 
+-n -shownumbers:  1 or 0. By default 1. 
+-o -showfolds:    1 or 0. By default 1 
+-s -indentstyle:  By default 'tab'. Or a number of spaces.
+-t -tabs:         Tab size. By default '8m' (8 milimeters') 
+-u -showstatus:   1 or 0. By default 1 
+-v -themefile:    Load a theme file with color and font definitions 
+                  for syntax highlighting 
+-w -wrap:         By default 'none'. Can also be 'word' or 'char'. 
+-x -xmldir:       Specifies the XML directory for syntax highlighting.
+__EOF
+
+my %short_args = (
+	'-a' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify autoindent value, 1 or 0\n$help_main" unless defined $value;
+		die "Please specify autoindent value, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
+		$options{'-autoindent'} = $value
+	},
+	'-f' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify font\n$help_main" unless defined $value;
+		$options{'-font'} = $value
+	},
+	'-h' => sub {
+		print $help_main;
+		exit;
+	},
+	'-m' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify match value\n$help_main" unless defined $value;
+		$options{'-match'} = $value
+	},
+	'-n' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify linenumbers, 1 or 0\n$help_main" unless defined $value;
+		die "Please specify linenumbers, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
+		$options{'-shownumbers'} = $value
+	},
+	'-o' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify folds, 1 or 0\n$help_main" unless defined $value;
+		die "Please specify folds, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
+		$options{'-showfolds'} = $value
+	},
+	'-s' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify indent style\n$help_main" unless defined $value;
+		$options{'-indentstyle'} = $value
+	},
+	'-t' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify tabs\n$help_main" unless defined $value;
+		$options{'-tabs'} = $value
+	},
+	'-u' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify status bar, 1 or 0\n$help_main" unless defined $value;
+		die "Please specify status bar, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
+		$options{'-showstatus'} = $value
+	},
+	'-v' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify theme file\n$help_main" unless defined $value;
+		$options{'-themefile'} = $value
+	},
+	'-w' => sub { 
+		my $value = shift @ARGV;
+		die "Please specify wrap\n$help_main" unless defined $value;
+		$options{'-wrap'} = $value
+	},
+	'-x' => sub { 
+		my $value = shift @ARGV;
+		die "please specify xml folder\n$help_main" unless defined $value;
+		$options{'-xmldir'} = $value
+	},
+);
+
+my %main_args = (%short_args,
+	'-autoindent' => $short_args{'-a'},
+	'-font' => $short_args{'-f'},
+	'-help' => $short_args{'-h'},
+	'-indentstyle' => $short_args{'-s'},
+	'-match' => $short_args{'-m'},
+	'-showfolds' => $short_args{'-o'},
+	'-shownumbers' => $short_args{'-n'},
+	'-showstatus' => $short_args{'-u'},
+	'-tabs' => $short_args{'-t'},
+	'-themefile' => $short_args{'-v'},
+	'-wrap' => $short_args{'-w'},
+	'-xmldir' => $short_args{'-x'},
+);
+
+while (@ARGV) {
+	my $o = shift @ARGV;
+	my $call = $main_args{$o};
+	if (defined $call) {
+		&$call;
+	} else {
+		die "File '$o' does not exist\n$help_main" unless -e $o;
+		die "'$o' is a folder\n$help_main" if -d $o;
+		$filename = $o;
+	}
+}
+
+
+my $app = MainWindow->new(-title => 'Codetext');
+
+$app->protocol('WM_DELETE_WINDOW'=> \&quit);
+
+
+
+my $txt = $app->CodeText(%options,
+	-configdir => $configfolder,
+)->pack(-expand => 1, -fill => 'both');
+
+$app->bind('<Control-f>', [$txt, 'FindPopUp']);
+$app->bind('<Control-n>', \&emptyDoc);
+$app->bind('<Control-o>', \&loadDoc);
+$app->bind('<Control-r>', [$txt, 'FindAndReplacePopUp']);
+$app->bind('<Control-s>', \&saveDoc);
+$app->bind('<Control-q>', \&quit);
+
+
+$app->configure(-menu => $app->Menu(
+	-menuitems => [
+		['cascade' => '~File',
+			-menuitems => [
+				['command' => '~New',
+					-command => \&emptyDoc,
+					-accelerator => 'CTRL+N',
+				],
+				['command' => '~Open',
+					-command => \&loadDoc,
+ 					-accelerator => 'CTRL+O',,
+				],
+				['separator' => '-'],
+				['command' => '~Save',
+					-command => \&saveDoc,
+					-accelerator => 'CTRL+S',
+				],
+				['command' => 'S~ave as',
+					-command => \&saveDocAs,
+				],
+				['separator' => '-'],
+				['command' => '~Quit',
+					-command => \&quit,
+					-accelerator => 'CTRL+Q',
+				],
+			],
+		],
+		['cascade' => '~Edit',
+			-menuitems => [ $txt->EditMenuItems
+			],
+		],
+		['cascade' => '~Tools',
+			-menuitems => [ 
+				['command' => '~Find',
+					-accelerator => 'CTRL+F',
+					-command => ['FindPopUp', $txt],
+				],
+				['command' => '~Replace',
+					-accelerator => 'CTRL+R',
+					-command => ['FindAndReplacePopUp', $txt],
+				],
+				['separator' => '-'],
+				['command' => '~Collapse all folds',
+					-command => ['foldCollapseAll', $txt],
+				],
+				['command' => '~Expand all folds',
+					-command => ['foldExpandAll', $txt],
+				],
+				['separator' => '-'],
+				$txt->ViewMenuItems,
+				['separator' => '-'],
+				['command' => '~Save settings',
+					-command => \&saveSettings,
+				],
+			],
+		],
+	],
+));
+
+$app->after(300, sub {
+	&loadDoc($filename) if $filename ne ''
+});
+# my $screenwidth = $app->vrootwidth;
+# print "width $screenwidth\n";
+# my $posx = int($app->vrootwidth / 2) - 400;
+# my $posy = int($app->vrootheight / 2) - 300;
+# print "popping at $posx, $posy\n";
+$app->geometry(sprintf('%dx%d+%d+%d', 800, 600, 250, 250));
+
+	
+$app->MainLoop;
+
+sub docSaved {
+	if ($txt->editModified) {
+		my $msg = $app->Dialog(
+			-text => "Text has been modified.\nWould you like to save?",
+			-buttons => ['Yes', 'No', 'Cancel'],
+		);
+		my $but = $msg->Show(-popover => $app);
+		if ($but eq 'Yes') {
+			return &saveDoc
+		} elsif ($but eq 'No') {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	return 1;
+}
+
+sub emptyDoc {
+	if (&docSaved) {
+		$txt->clear;
+		$filename = '';
+		$app->configure(-title => "Codetext");
+		return 1
+	}
+	return 0
+}
+
+sub loadDoc {
+	my $file = shift;
+ 	$file = $app->getOpenFile(
+# 		-popover => 'mainwindow',
+	) unless defined $file;
+	return 0 unless defined $file;
+	if ((&emptyDoc) and ($txt->load($file))) {
+		$filename = $file;
+		$app->configure(-title => "Codetext - $file");
+		return 1
+	}
+	return 0
+}
+
+sub loadSettings {
+	if (open(OFILE, "<", $settingsfile)) {
+		while (<OFILE>) {
+			my $line = $_;
+			chomp $line;
+			if ($line =~ s/^([^=]+)=//) {
+				my $option = $1;
+				$options{$option} = $line;
+			}
+		}
+		close OFILE;
+		return 1
+	}
+}
+
+sub saveDoc {
+	if ($filename eq '') {
+		return &saveDocAs;
+	}
+	return $txt->save($filename);
+}
+
+sub saveDocAs {
+ 	my $file = $app->getSaveFile(
+# 		-popover => 'mainwindow',
+	);
+	return 0 unless defined $file;
+	if ($txt->save($file)) {
+		$filename = $file;
+		$app->configure(-title => "Codetext - $file");
+		return 1
+	}
+	return 0
+}
+
+sub saveSettings {
+	if (open(OFILE, ">", $settingsfile)) {
+		for (@usersettings) {
+			my $option = $_;
+			my $value = $txt->cget($option);
+			print OFILE $option, '=', $value, "\n";
+		}
+		close OFILE;
+		return 1
+	} else {
+		warn "Could not open '$settingsfile'"
+	}
+	return 0
+}
+
+sub quit {
+	$app->destroy if &docSaved
+}
+
+__END__

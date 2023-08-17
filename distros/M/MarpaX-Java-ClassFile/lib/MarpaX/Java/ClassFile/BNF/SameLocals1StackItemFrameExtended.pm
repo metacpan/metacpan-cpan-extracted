@@ -6,7 +6,7 @@ use Moo;
 
 # ABSTRACT: Parsing of a same_locals_1_stack_item_frame_extended
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -63,7 +63,7 @@ MarpaX::Java::ClassFile::BNF::SameLocals1StackItemFrameExtended - Parsing of a s
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

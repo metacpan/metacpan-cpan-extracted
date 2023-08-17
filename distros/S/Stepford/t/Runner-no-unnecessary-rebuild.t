@@ -122,7 +122,7 @@ my $iteration = 1;
     for my $file ( $file1, $file2, $file3 ) {
         ok(
             -f $file,
-            $file->basename . ' exists after running all steps'
+            $file->basename . ' exists after running all steps',
         );
     }
 
@@ -135,7 +135,7 @@ EOF
     is(
         scalar $file3->slurp,
         $expect,
-        $file3->basename . ' contains expected content'
+        $file3->basename . ' contains expected content',
     );
 
     $runner->run(
@@ -146,7 +146,7 @@ EOF
         scalar $file3->slurp,
         $expect,
         $file3->basename
-            . ' content does not change if file1 is not regenerated on second run'
+            . ' content does not change if file1 is not regenerated on second run',
     );
 
     # The way this test is meant to work is that deleting file1 causes file2
@@ -178,7 +178,7 @@ EOF
         scalar $file3->slurp,
         $expect,
         $file3->basename
-            . ' content does change when file1 is regenerated on third run'
+            . ' content does change when file1 is regenerated on third run',
     );
 
     touch_and_ensure_new_mtime($file2);
@@ -197,7 +197,7 @@ EOF
         scalar $file3->slurp,
         $expect,
         $file3->basename
-            . ' content does change when file3 is regenerated on fourth run'
+            . ' content does change when file3 is regenerated on fourth run',
     );
 
     $runner->run(
@@ -214,7 +214,7 @@ EOF
     is(
         scalar $file3->slurp,
         $expect,
-        'everything changes when we force_step_execution'
+        'everything changes when we force_step_execution',
     );
 }
 

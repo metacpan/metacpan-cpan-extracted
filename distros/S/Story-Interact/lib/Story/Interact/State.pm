@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::State;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001011';
+our $VERSION   = '0.001012';
 
 use Story::Interact::Character ();
 
@@ -79,14 +79,21 @@ sub dump {
 	my ( $self ) = @_;
 	require Storable;
 	require MIME::Base64;
-	return MIME::Base64::encode_base64( Storable::nfreeze( $self ) );
+	require Compress::Bzip2;
+	my $frozen = Compress::Bzip2::memBzip( Storable::nfreeze( $self ) );
+	return MIME::Base64::encode_base64( $frozen );
 }
 
 sub load {
 	my ( $class, $data ) = @_;
 	require Storable;
 	require MIME::Base64;
-	return Storable::thaw( MIME::Base64::decode_base64( $data ) );
+	require Compress::Bzip2;
+	my $frozen = MIME::Base64::decode_base64( $data );
+	if ( my $unzipped = Compress::Bzip2::memBunzip($frozen) ) {
+		return Storable::thaw( $unzipped );
+	}
+	return Storable::thaw( $frozen );
 }
 
 1;

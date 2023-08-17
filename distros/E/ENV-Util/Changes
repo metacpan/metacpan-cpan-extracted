@@ -1,0 +1,15 @@
+Revision history for ENV-Util
+
+0.03    2023-08-11
+    NEW FEATURES:
+        - tcsh/csh support for 'env' and 'setenv' keywords.
+        - variable interpolation support.
+    OTHER:
+        - document .env file format
+
+0.02    2023-08-10
+    OTHER:
+        - add missing files.
+
+0.01    2023-08-10
+    - Initial release!

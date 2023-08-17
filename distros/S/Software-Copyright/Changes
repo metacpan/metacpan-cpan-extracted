@@ -1,3 +1,7 @@
+0.010 2023-06-15
+
+    * reduce verbosity of invalid year range warning
+    
 0.009 2023-05-25
 
     * fix compat wih with < 5.028

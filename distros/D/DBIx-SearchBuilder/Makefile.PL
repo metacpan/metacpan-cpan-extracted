@@ -13,7 +13,7 @@ requires('Cache::Simple::TimedExpiry' => '0.21');
 requires('Clone');
 requires('Scalar::Util');
 build_requires('Test::More' => 0.52);
-build_requires('DBD::SQLite');
+build_requires('DBD::SQLite' => 1.6);
 build_requires('File::Temp');
 features(
 	'Lower case API' => [

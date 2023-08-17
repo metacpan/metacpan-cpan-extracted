@@ -1,3 +1,6 @@
+0.03 - 2023-07-02
+  - Fix ITHREADS compatibility
+
 0.02 - 2023-04-20
   - Use Alien::FluentBit to get an actually-working .so
     (no more need for LD_PRELOAD)

@@ -1,0 +1,717 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+ <HEAD>
+  <TITLE>SNMP support for Perl 5: Changes</TITLE>
+ </HEAD>
+ <BODY bgcolor="#ffffff">
+<DIV ALIGN=CENTER>
+  <H1>SNMP support for Perl 5: Changes</H1>
+
+  <p> Copyright (c) 1995-2023, Simon Leinen<br>
+  All rights reserved </p>
+
+  <em> This program is free software; you can redistribute it under
+  the <a href="http://language.perl.com/misc/Artistic.html">"Artistic
+  License"</a> included in this distribution. </em>
+
+  <p>Author: <A HREF="http://www.switch.ch/misc/leinen/">Simon
+Leinen</A> &lt;<A
+HREF="mailto:simon.leinen@switch.ch">simon.leinen@switch.ch</A>&gt;</p>
+
+</DIV>
+
+<h2> Recent Changes: </h2>
+
+<ul>
+
+<li> SNMP_Session.pm 1.16: Packaging improvements from Michal Josef
+  &Scaron;pa&ccaron;ek. </li>
+
+<li> test/get-cisco-power-usage.pl: New demo script to receive power
+  utilization from Cisco routers using CISCO-ENTITY-SENSOR-MIB. </li>
+
+<li> SNMP_Session.pm 1.15: Apply Socket6 patch from FreeBSD ports. </li>
+
+<li> SNMP_Session.pm 1.14: <tt>open_trap_session</tt> now takes an
+  optional <tt>ipv4only</tt> argument.  It defaults to 1, but by
+  passing 0, you can create a session that accepts traps over IPv6 in
+  addition to IPv4.  The <tt>receive_trap</tt> method has been
+  enhanced by returning an additional value which is the address
+  family.  There is a new <tt>receive_trap_1</tt> method, which
+  differs from <tt>receive_trap</tt> in that it simply returns the
+  trap and a sockaddr structure, rather than the trap, the host
+  address, the port, and the address family. </li>
+
+<li> BER.pm 1.14: Added POD documentation.  Started adding automated
+  unit tests. </li>
+
+<li> SNMP_Session.pm 1.14: Added POD documentation. </li>
+
+<li> SNMP_util.pm 1.13: Parse OIDs in NOTIFICATION-TYPE names.  Change
+ by Mike Mitchell/jaccobs. </li>
+
+<li> SNMP_Session.pm 1.13: Fixed the optional socket-reuse code to
+ handle IPv4 and IPv6 sockets separately. </li>
+
+<li> SNMP_Session.pm 1.12: Upgraded to Artistic License 2.0 upon a
+  suggestion from Tom Callaway. </li>
+
+<li> SNMP_util.pm 1.12: Rewritten MIB parsing code from Mike
+ Mitchell. </li>
+
+<li> SNMP_util.pm 1.11: Improvement to loop detection in snmpwalk.
+  Should cope with more broken agents.  Change by Mike Mitchell. </li>
+
+<li> SNMP_Session.pm 1.10: Mike Fischer reported that on some systems,
+ notably Linux, <tt>recv()</tt> may block even though a
+ preceding <tt>select()</tt> for readability has returned
+ successfully.  Once condition where this can happen is when a UDP
+ checksum on an incoming datagram doesn't verify.  To avoid our
+ library from blocking in this case, we have to
+ pass <tt>MSG_DONTWAIT</tt> to <tt>recv()</tt>.  This behaviour is
+ selected by a new optional argument to <tt>receive_response_3</tt>,
+ and used by <tt>request_response_5</tt>. </li>
+
+<li> SNMP_util.pm 1.09: Fix from Mike Mitchell for parsing qualified
+ symbolic OIDs. </li>
+
+<li> SNMP_Session.pm 1.08: Fixed a bug in the SNMPv2c version of
+<tt>map_table_start_end</tt> that would cause errors when the
+<samp>$end</samp> argument is actually being used.  Thanks to Jan van
+Keulen for submitting the patch. </li>
+
+<li> SNMP_Session.pm 1.07: Fixed <tt>strict&nbsp;subs</tt> error with
+newer versions of Perl.  Thanks to Gerry Dalton for spotting
+this. </li>
+
+<li> SNMP_Session.pm 1.06: <tt>decode_trap_request</tt> now
+understands SNMPv2 inform requests in addition to SNMPv1 traps and
+SNMPv2 traps.  Contributed by Andrew Cornford-Matheson. </li>
+
+<li> SNMP_util.pm 1.06: <tt>snmpwalkhash</tt> fix by Laurent
+Girod. </li>
+
+<li> <tt>index.html</tt>: The code is no longer available from
+<tt>ftp.switch.ch</tt>, but via HTTP from
+<tt>www.switch.ch</tt>. </li>
+
+<li> SNMP_Session.pm 1.05: No change; version incremented for
+<tt>SNMP_util.pm</tt> and <tt>BER.pm</tt>. </li>
+
+<li> BER.pm 1.05: Internal restructuring: The new (BER.pm 1.02)
+pretty-printer registration method is now used for most standard SNMP
+types, too. </li>
+
+<li> SNMP_util.pm 1.04: The subroutines <tt>snmpget</tt>,
+<tt>snmpgetnext</tt> and <tt>snmpset</tt> will now detect when they
+are called in scalar context, and return only the first (and typically
+the only) of the retrieved values in this case. </li>
+
+<li> SNMP_util.pm 1.03: Added a missing part of Mike Mitchell
+pretty-printer registration patch. </li>
+
+<li> BER.pm 1.02: Additional decoders (``pretty printers'') can now be
+registered and unregistered for type codes using the
+<tt>register_pretty_printer</tt> and
+<tt>unregister_pretty_printer</tt> subroutines.  Implemented by Mike
+Mitchell. </li>
+
+<li> BER.pm 1.02: Corrected encoding of large integer-like
+values. </li>
+
+<li> SNMP_util.pm 1.02: <tt>snmpwalkhash</tt> now takes an additional
+optional argument that should be a reference to a hash.  If used,
+<tt>snmpwalkhash</tt> will insert the retrieved values into that
+hash. </li>
+
+<li> BER.pm 1.01: Properly parse the variant length format in
+integers.  Thanks to <a href="mailto:milen@batmbg.com">Milen
+Pavlov</a> for pointing out this bug.  Also, decoding should be
+slightly more efficient in general, because one <tt>substr()</tt>
+operation per (sub-) object has been eliminated. </li>
+
+<li> SNMP_Session 1.00: Added Luc Pauwels' implementation of the
+<tt>use_16bit_request_ids</tt> option.  Some SMC devices seem to
+require this. </li>
+
+<li> SNMP_Session 0.99: Improved request ID generation so that
+<tt>avoid_negative_request_ids</tt> is always obeyed. </li>
+
+<li> SNMP_util 0.99: Added <tt>Gauge32</tt> support to
+<tt>snmpset</tt>.  Thanks to <a
+href="mailto:tengi@CS.Princeton.EDU">Christopher J. Tengi</a> for the
+idea.  Mike Mitchell provided new code that supports all known
+types. </li>
+
+<li> SNMP_Session 0.98: Portability fix in IPv6 support. </li>
+
+<li> SNMP_util 0.98: Support encoding of OIDs containing multiple
+quoted strings. </li>
+
+<li> SNMP_util 0.97: Added support for TimeTicks values in
+<tt>snmpset</tt>.  Patch from <a
+href="mailto:JOERG.KUMMER@Roche.COM">Joerg Kummer</a> </li>
+
+<li> SNMP_Session 0.97: Exported
+<tt>$SNMP_Session::default_avoid_negative_request_ids</tt>, by
+Philippe Simonet. </li>
+
+<li> SNMP_Session 0.97: IPv6 support added by Valerio Bontempi and
+Lorenzo Colitti. </li>
+
+<li> SNMP_Session 0.96: Intermediate version with IPv6 support; not
+published. </li>
+
+<li> BER.pm 0.95: Fixed operator precedence bug in
+decode_sequence(). </li>
+
+<li> SNMP_Session.pm 0.94: A new slot <tt>capture_buffer</tt> has been
+added to the SNMP_Session classes, courtesy <a
+href="mailto:jakob.ilves@oracle.com">Jakob Ilves</a>.  See the sample
+script <tt>test/capturetest.pl</tt> for an example of how to use
+this. </li>
+
+<li> BER.pm 0.94: New subroutines <tt>pretty_generic_sequence</tt>,
+<tt>decode_generic_tlv</tt>, courtesy <a
+href="mailto:jakob.ilves@oracle.com">Jakob Ilves</a>. </li>
+
+<li> BER.pm 0.94: <tt>decode_by_template</tt>, <tt>decode_oid</tt>,
+<tt>decode_sequence</tt>, <tt>decode_string</tt>: Explicitly signal
+error when the PDU is undefined or too short.  This improves error
+handling for some malformed PDUs, as generated by certain test
+suites. </li>
+
+<li> SNMP_Session.pm 0.93: There's a new variable
+<tt>$default_avoid_negative_request_ids</tt>.  If it is set to a
+non-zero value, newly created <tt>SNMP_Session</tt> objects will be
+configured so that only request IDs in the range 0..2<sup>31</sup>-1
+will be used.  This is needed to work around a bug in several SNMP
+agents.  If you sometimes see requests fail, and the error message
+always shows a negative request ID when that happens, please notify
+the vendor of your agent of the bug.  While the vendor fixes the
+problem, you can set the variable mentioned above to work around the
+bug.  The problem has been described in a few mails on the
+<em>mrtg-developers</em> mailing list that can hopefully be found <a
+href="http://www.ee.ethz.ch/~slist/mrtg-developers/msg01609.html">here</a>
+in the archive. </li>
+
+<li> SNMP_util.pm 0.93: <tt>snmpwalk</tt> now will walk multiple OID
+trees simultaneously.  If more than one OID is passed to the function,
+the returned <em>OID:value</em> pairs will contain the entire OID
+instead of just the leaf from the starting point. </li>
+
+<li> SNMP_util.pm 0.93: <tt>snmpwalkhash</tt> now passes the textual
+OID of the starting point as the seventh argument to the passed-in
+hash function. </li>
+
+<li> SNMP_util.pm 0.92: New subroutine <tt>snmpmaptable4</tt>, which
+allows specifying the <em>max-repeaters</em>. </li>
+
+<li> SNMP_util.pm 0.92: New MIB parsing code.  Most MIBs are processed
+in one pass, but if an OID cannot be fully resolved, an extra pass is
+done.  Also, <samp>OBJECT-GROUP</samp> entries are now
+recognized. </li>
+
+<li> SNMP_util.pm 0.92: The string-to-OID conversion routines now
+transparently convert quoted strings to instance indexes.  For
+example, <samp>"/usr"</samp> (including the quotes) would be converted
+to <samp>4.47.118.97.114</samp>.
+
+<li> SNMP_Session.pm 0.91: Fixed a bug in <tt>map_table_start_end</tt>
+for <tt>SNMPv2_Session</tt> (which uses <tt>get-bulk</tt>) which had
+caused a superfluous query after the entire table has already been
+provably traversed.  Thanks to Michael Deegan for pointing this
+out. </li>
+
+<li> SNMP_util.pm 0.90: New version from Mike Mitchell.
+ <tt>snmpwalkhash</tt> and <tt>snmpwalk</tt> now share most
+ code. </li>
+
+<li> SNMP_util.pm 0.90: Corrected handling of the optional port number in
+ <tt>snmpopen</tt>. </li>
+
+<li> test/if-counters.pl: Support 64-bit counters, and use
+<tt>ifAlias</tt> to portably get interface descriptions. </li>
+
+<li> SNMP_util.pm 0.89: New version from Mike Mitchell, with new
+ <tt>snmpwalkhash</tt> subroutine by <a
+ href="mailto:girod.laurent@pmintl.ch">Laurent Girod</a>. </li>
+
+<li> SNMP_Session.pm 0.89: Made <tt>lenient_source_port_matching</tt>
+the default. </li>
+
+<li> SNMP_util.pm 0.89: Fixed a long-standing bug where the code would
+generate PDUs with <tt>request-id</tt>s with large positive values,
+violating the SNMP spec which mandates that <tt>request-id</tt>s be
+<tt>Integer32</tt>s.  Thanks to Sergio Macedo <macedo@tmp.com.br> for
+finding this bug. </li>
+
+<li> SNMP_util.pm 0.88: Added missing <samp>use&nbsp;Carp;</samp>
+statements in packages <samp>SNMPv1_Session</samp> and
+<samp>SNMPv2_Session</samp>.  Thanks to <a
+href="mailto:michael@cnspc18.murdoch.edu.au">Michael Deegan</a>. </li>
+
+<li> SNMP_util.pm 0.87: No change from 0.86, but increased version
+number to reflect change in BER.pm (SNMPv2 exception codes). </li>
+
+<li> BER.pm 0.87: <samp>pretty_print</samp> now silently returns undef
+when decoding SNMPv2 exception codes (<tt>noSuchObject</tt>,
+<tt>noSuchInstance</tt>, or <tt>endOfMibView</tt>, see RFC 1905).
+Original patch by <a href="mailto:driehuis@playbeing.org">Bert
+Driehuis</a>. </li>
+
+<li> BER.pm 0.86: <samp>pretty_print</samp> now silently returns undef
+when given an undefined value, rather than issuing incomprehensible
+warnings. </li>
+
+<li> SNMP_util.pm 0.86: New <samp>snmpmaptable</samp> subroutine.
+This is a more user-friendly version of <samp>map_table</samp> and is
+described in the <a href="dist/README.SNMP_util">README.SNMP_util</a>
+file.  From Mike Mitchell. </li>
+
+<li> SNMP_util.pm 0.86: Support for the awesome <tt>get-bulk</tt>
+operator, both directly through the new <samp>snmpgetbulk</samp>
+subroutine, and transparently via <samp>snmpwalk</samp> when the
+session's SNMP version is &gt;= 2 and the <samp>use_getbulk</samp>
+slot is set (as it is by default).  From Mike Mitchell. </li>
+
+<li> SNMP_Session.pm 0.85: If a local address is specified in
+<samp>snmpopen</samp>, don't convert it using <samp>inet_aton</samp>,
+because this is handled by the Socket library.  Fix from <a
+href="mailto:mikem@open.com.au">Mike McCauley</a>. </li>
+
+<li> SNMP_Session.pm 0.85: Added
+<samp>lenient_source_port_matching</samp> slot to the session object.
+Set this to communicate with weird SNMP agents that send the response
+from a port other than 161.  Suggestion from <a
+href="mailto:hgomez@slib.fr">Henri Gomez</a>. </li>
+
+<li> SNMP_util.pm 0.84: New version from Mike Mitchell.
+<samp>snmpopen</samp> now parses an optional hash argument for
+options.  Also reintroduced defaulting of the UDP port to 161 for
+``normal'' sessions. </li>
+
+<li> SNMP_Session.pm 0.84: Clarified documentation concerning the
+<samp>%pretty_oids</samp> hash, upon a suggestion from <a
+href="mailto:alistair@alizta.com">Alistair Mills</a>. </li>
+
+<li> SNMP_Session.pm 0.83: The source address in response packets is
+now ignored when matching responses against outstanding queries.  In a
+couple of previous revisions, the source address in response packets
+had to match the destination address in the corresponding query.
+Unfortunately some agents may use a different source address in
+responses.  If you want the strict behavior back, you can send the
+<tt>lenient_source_address_matching</tt> slot of the session object to
+zero. </li>
+
+<li> SNMP_Session.pm 0.83: The source address for outgoing packets can
+now be specified as an additional optional argument to
+<tt>open</tt>.  If you don't specify it, the system will choose the
+source address by itself, usually corresponding to the interface on
+which packets are sent. </li>
+
+<li> SNMP_Session.pm 0.83: Fixed a bug which had caused requests to be
+resent upon receipt of packets which don't match the outstanding
+query. </li>
+
+<li> SNMP_Session.pm 0.82: Fixed retry logic to avoid sending a last
+retry without waiting for the response anymore.  Thanks to <a
+href="mailto:wardenb@eluminant.com">Brett T Warden</a> for the
+fix. </li>
+
+<li> BER.pm 0.82: OIDs with only two subids can now be encoded.  The
+most common case is the "null" OID (0.0).  Thanks to <a
+href="mailto:wardenb@eluminant.com">Brett T Warden</a> for pointing out
+that this didn't work. </li>
+
+<li> BER.pm 0.82: pretty_print() now handles UInteger32 objects.
+Patch by <a href="mailto:wardenb@eluminant.com">Brett T
+Warden</a>. </li>
+
+<li> BER.pm 0.81: Subids in the range 2^31 - 2^32-1 are now encoded
+correctly.  Thanks to <a href="mailto:rik.hoorelbeke@pandora.be">Rik
+Hoorelbeke</a> for noticing the problem. </li>
+
+<li> SNMP_Session.pm 0.81: A cosmetic bug in the SNMPv2 version of
+<tt>map_table</tt> (which uses <tt>get-bulk</tt>) was corrected.  The
+user-supplied function is now always called on the same number of
+arguments.  Before this, missing values at the end of a table row
+would lead to the function being called with fewer arguments.  Now
+there will be <tt>undef</tt> values for those, too.  Thanks to <a
+href="mailto:schmid@switch.ch">Ulrich Schmid</a> for pointing this
+out. </li>
+
+<li> SNMP_Session.pm 0.80: A portability bug was fixed in the code
+that matches incoming responses to outstanding requests.  The bug had
+manifested itself, notably on some FreeBSD versions, by timeouts
+waiting for responses, because the library thought the responses came
+from another address than the corresponding requests had been sent
+to. </li>
+
+<li> SNMP_Session.pm 0.79: A new variable
+<tt>$SNMP_Session::recycle_socket</tt> has been introduced.  When this
+variable is set to a non-zero value (the default is zero), all newly
+created SNMP_Session objects will share the same UDP socket.  This
+saves file descriptors and system calls, but will cause problems with
+multiple outstanding SNMP requests on different session objects.
+Applications which don't perform parallel/asynchronous SNMP requests
+can safely set this variable to reduce OS overhead somewhat.
+Suggestion from <a href="mailto:schmid@switch.ch">Ulrich
+Schmid</a>. </li>
+
+<li> SNMP_Session.pm 0.79: The handling of incoming packets from
+unexpected addresses has been cleaned up.  If a packet is received
+from an IP address other than the one to which the request has been
+sent, this packet is silently ignored, as mandated by the SNMP
+standard. </li>
+
+<li> SNMP_Session.pm 0.79: Receive-only session objects (such as the
+ones created by <tt>open_trap_session</tt> now have <samp>undef</samp>
+as the <samp>remote_addr</samp> value, rather than IP address
+<samp>0.0.0.0</samp>. </li>
+
+<li> BER.pm 0.79: There are new exported subroutines for encoding
+different types of values: <samp>encode_uinteger32</samp>,
+<samp>encode_counter32</samp>, <samp>encode_counter64</samp>,
+<samp>encode_gauge32</samp>. </li>
+
+<li> SNMP_Session.pm 0.78: The <tt>map_table</tt> implementation for
+SNMPv2 sessions has been completely rewritten to reliably support
+tables with holes in them.  Note that this hasn't been completely
+validated or tested yet, but at least it has been found to handle
+common cases reasonably. </li>
+
+<li> BER.pm 0.77: Added support for long integers, so that
+<tt>Counter64</tt> values can be handled without risk of losing
+precision (due to automatic coercion to floating-point representation
+by Perl).  When a BER-encoded integer is so long that it might not fit
+in a 32-bit unsigned integer, then we use <tt>Math::BigInt</tt>
+arithmetics to convert it. <b>Warning:</b> code which calls the
+decoding functions should be prepared to handle <tt>Math::BigInt</tt>
+values if <tt>Counter64</tt> values can be accessed.  In most respect,
+those long integers behave just like ordinary integers.  A notable
+exception is that they print with a leading ``<tt>+</tt>'' sign. </li>
+
+<li> SNMP_Session 0.77: The SNMPv2 implementation of
+<tt>map_table_start_end</tt> has been enhanced to cope with the case
+where a response PDU ends with a truncated table row, courtesy <a
+href="mailto:pee@gblx.net">Paul E. Erkkila</a>.  Note that tables with
+missing entries still aren't handled correctly when SNMPv2 (and thus
+the <tt>get-bulk</tt> operator is used). </li>
+
+<li> SNMP_util 0.73: Added a fix from <a
+href="mailto:mcm@unx.sas.com">Mike Mitchell</a> (originally <a
+href="mailto:demel@zid.tuwien.ac.at">Johannes Demel</a>) to treat
+<tt>OBJECT-IDENTITY</tt> like <tt>OBJECT IDENTIFIER</tt>.
+
+<li> SNMP_Session 0.76: Added some debugging support for
+<tt>map_table</tt>, which still doesn't work reliably when the SNMPv2
+<tt>get-bulk</tt> operator is used. </li>
+
+<li> test/if-counters.pl: Added <samp>-c</samp> option to enable
+Cisco-specific variables (which are no longer retrieved by default as
+in previous versions). </li>
+
+<li> SNMP_Session 0.75: Fixed a bug in versions 0.73-0.74 where
+creation of trap listener sockets would fail.  Rather than using
+<tt>bind</tt> to bind to the trap port, we now pass a
+<tt>LocalPort</tt> argument to <tt>INET-&gt;new</tt>. </li>
+
+<li> SNMP_Session 0.75: Parse SNMPv2-Trap-Requests in addition to
+SNMPv1 ones.  A caller can tell whether an SNMPv1 or an SNMPv2 request
+has been received by testing whether the SNMPv1-specific fields are
+defined.  The sample script <tt>test/trap-listener</tt> has been
+updated to understand SNMPv2 Traps. </li>
+
+<li> SNMP_Session 0.75: New subroutine <tt>v2_trap_request_send</tt>
+which sends SNMPv2 Trap PDUs.  The sample script
+<tt>test/trap-send</tt> has been extended to generate either type of
+trap on request. </li>
+
+<li> SNMP_Session 0.74: Put under copyright and Artistic
+License. </li>
+
+<li> SNMP_util 0.72: Changed <tt>snmpgetnext</tt> so it will return
+the next lexicographical larger OID number, even if it is not in the
+same OID tree.  Before the change snmpget would discard the return
+value if the OID wasn't in the same tree.  In <tt>snmpMIB_to_OID</tt>,
+an "unitialized variable" warning was removed. (Changes by <a
+href="mailto:mcm@unx.sas.com">Mike Mitchell</a>, the author) </li>
+
+<li> SNMP_Session 0.73: The UDP socket associated with each SNMP
+session object is now created using <tt>IO::Socket::INET-&gt;new</tt>.
+Before this change, a Perl file descriptor name was generated for each
+new socket.  Apparently this caused a file descriptor leak.  The new
+code is much cleaner and doesn't have that problem anymore.  Hopefully
+the newly introduced dependency on the Socket::IO module is not a
+problem.  Thanks to <a href="mailto:elble@icculus.nsg.nwu.edu">Andrew
+W. Elble</a> for suggesting this change. </li>
+
+<li> BER.pm 0.72: A new variable,
+<tt>$BER::pretty_print_timeticks</tt>, has been introduced to give
+users control over the degree of pretty-printing of <tt>TimeTicks</tt>
+values.  If left at the defaults, <tt>TimeTicks</tt> values will be
+converted to strings such as <samp>14&nbsp;days,&nbsp;6:56:07</samp>.  If you
+set it to zero, the same value will simply pretty-print as
+<samp>123456789</samp>, which should be interpreted in units (ticks)
+of 10ms. </li>
+
+<li> SNMP_util.pm 0.71: New subroutines <tt>snmpLoad_OID_Cache</tt> and
+<tt>snmpQueue_MIB_File</tt> for loading MIBs in compact format. </li>
+
+<li> SNMP_util.pm 0.71: <tt>snmpset</tt> now accepts <tt>ipaddr</tt>
+as a type specifier. </li>
+
+<li> SNMP_util.pm 0.70: <a href="mailto:mcm@unx.sas.com">Mike
+Mitchell</a> added code for parsing MIB files.  See the description of
+<tt>snmpMIB_to_OID</tt> in <a
+href="dist/README.SNMP_util"><tt>README.SNMP_util</tt></a>. </li>
+
+<li> SNMP_util.pm 0.69: Enable parsing of community strings which
+contain <samp>@</samp> characters. </li>
+
+<li> SNMP_util.pm 0.58: Check for errors from <tt>encode_oid</tt>, so
+that illegal OIDs generate error messages.  Allow for suppression of
+warnings by setting <tt>$SNMP_Session::suppress_warnings</tt> to a
+value greater than one. </li>
+
+<li> SNMP_Session.pm 0.68: Added methods <tt>receive_request</tt> and
+<tt>decode_request</tt> to support SNMP agents.  Contributed by <a
+href="mailto:mikem@open.com.au">Mike McCauley</a>. </li>
+
+<li> SNMP_Session.pm 0.67: Implement a <tt>map_table_start_end</tt>
+method for <tt>SNMPv2c_Session</tt> which uses <tt>get-bulk</tt>.  See
+<a href="#map-table-4-use">Walking Tables With <tt>get-bulk</tt></a>
+for more information. </li>
+
+<li> SNMP_Session.pm 0.66: Fix from <a
+href="mailto:Alan.Nichols@Ebay.Sun.COM">Alan Nichols</a> to the
+handling of error replies.  In the last few revisions of SNMP_Session,
+requests to which the agent responded with a non-zero
+<tt>errorStatus</tt> were erroneously retried. </li>
+
+<li> SNMP_Session.pm 0.66: When the <tt>errorStatus</tt> is zero, we
+don't care about the <tt>errorIndex</tt>.  This makes us liberal
+enough to cope with very old versions of the CMU agent code which
+sometimes put a non-zero <tt>errorIndex</tt> in normal response
+packets. </li>
+
+<li> BER.pm 0.66: Changed the <tt>$VERSION</tt> number to be in line
+with SNMP_Session.pm's. </li>
+
+<li> BER.pm 0.66: Changed <tt>encode_oid</tt> so that it signals an
+error when passed an illegal Object ID, such as one whose first subid
+isn't 0, 1 or 2.  This should help people who try to use output from
+CMU/UCD SNMP directly in MRTG. </li>
+
+<li> SNMP_Session.pm 0.65: Fix error message when binding to UDP port
+fails (<a href="mailto:jzhukovs@staff.juno.com">Jonathan
+Zhukovsky</a>). </li>
+
+<li> SNMP_util.pm 0.57: Small change to avoid warnings with "-w" when
+session parameters are defaulted. </li>
+
+<li> SNMP_util.pm 0.56: New subroutine <tt>snmpmapOID</tt>, <a
+href="mailto:mcm@unx.sas.com">Mike Mitchell</a>. </li>
+
+<li> SNMP_Session.pm 0.64: Fix of a bug in the detection of missing
+responses by <a href="mailto:mcm@unx.sas.com">Mike Mitchell</a>. </li>
+
+<li> SNMP_Session.pm 0.63: Fixed response matching logic to ignore
+ out-of-sequence responses.  This has been a long-standing bug which
+ made it very hard to use a single session object for multiple queries
+ to devices that are (sometimes) slow in responding. </li>
+
+<li> SNMP_Session.pm 0.62: Scoping problem with pretty_address()
+ fixed. </li>
+
+<li> Makefile.PL: New file which allows for easy installation
+ according to standard Perl convention.  Kudos to <a
+ href="mailto:clintdw@netcom.com">Clinton Wong</a>. </li>
+
+<li> SNMP_Session.pm 0.61: The sender address of the last response
+ received for a session is stored in
+ <em>$session-&gt;{'last_sender_addr'}</em>.  In connection with
+ broadcast or multicast addresses, this can be used to discover SNMP
+ agents listening to specific communities, as illustrated in
+ <tt>test/discover</tt>. </li>
+
+<li> SNMP_Session.pm 0.60: Added support for <a
+ href="#trap-recv">receiving SNMPv1 traps</a>. </li>
+
+<li> SNMP_session.pm 0.59: Added methods <tt>set_timeout</tt>,
+ <tt>set_retries</tt>, and <tt>set_backoff</tt> that can be used to
+ tune the retransmission algorithm.  Fixed a bug in <tt>map_table</tt>
+ that would cause an index of "0" to terminate the table walk. </li>
+
+<li> SNMP_util.pm 0.54: First version to be distributed with the
+ package, courtesy <a href="mailto:mcm@unx.sas.com">Mike
+ Mitchell</a>. </li>
+
+<li> BER.pm 0.58: Added <tt>encode_timeticks()</tt> subroutine.  This
+ was used in the sample script for <a href="#trap-send">sending
+ traps</a>, but was only defined in <tt>test/trap-test.pl</tt>.
+ Thanks to <a href="mailto:bergerg@att.net">Gary Berger</a> for
+ noticing this. </li>
+
+<li> BER.pm 0.57: Added <tt>encode_ip_address()</tt> subroutine on a
+ suggestion by <a href="mailto:mdiehn@mindspring.net">Mike
+ Diehn</a>. </li>
+
+<li> SNMP_Session 0.58: Added support for generating traps, courtesy
+ <a href="mailto:mcm@unx.sas.com">Mike Mitchell</a>, see <a
+ href="#trap-send">Sending Traps</a>. </li>
+
+<li> <tt>test/ber-test.pl</tt>: Added more test cases contributed by
+ <a href="mailto:mcm@unx.sas.com">Mike Mitchell</a>. </li>
+
+<li> SNMP_Session 0.57: table walking support See ``<a
+ href="#map-table-use">Walking Tables</a>'' below for how this is
+ used. </li>
+
+<li> BER 0.56: New <tt>encode_int()</tt> subroutine contributed by <a
+href="mailto:mcm@unx.sas.com">Mike Mitchell</a>.  Fixes incorrect
+encoding in the range +-2^15-2^23 and generalized to integers of any
+size. </li>
+
+<li> BER 0.55: Fix an arithmetic bug in the uptime
+pretty-printer. Kudos to <a href="mailto:niels@euro.net">Niels
+Bakker</a> for noticing this. </li>
+
+<li> SNMP_Session 0.56: Fix a bug which occurs when an error should be
+signaled while an SNMPv1_Session is being opened.  Noticed by <a
+href="mailto:dcox@lexmark.com">Dan Cox</a> and <a
+href="mailto:pakhomenko@gmd.de">Iouri Pakhomenko</a>. </li>
+
+<li> BER 0.52: Ignore a leading dot when encoding an OID.  This is to
+avoid trouble when people cut&amp;paste OIDs from CMU/UCD SNMP, where
+a leading dot is used to mark a "fully qualified" OID. </li>
+
+<li> SNMP_Session 0.55: The SNMP_Session module no longer calls
+<tt>warn</tt> when the variable
+<tt>$SNMP_Session::suppress_warnings</tt> is set to non-zero (it is
+zero by default).  The error message from SNMP_Session can be
+retrieved as <tt>$SNMP_Session::errmsg</tt>. </li>
+
+<li> SNMP_Session 0.54, BER.pm 0.51: Errors in the BER module are now
+passed upwards by the SNMP_Session module.  Before this change, one
+could not distinguish malformed SNMP responses from no response at
+all.  The BER module now no longer calls die(), but returns undefined
+values. </li>
+
+<li> Added <tt>test/arp</tt> which prints the NetToMedia table from a
+remote host. </li>
+
+<li> SNMP_Session 0.53: Avoid passing numeric IP addresses to
+<tt>inet_ntoa()</tt>, by <a href="mailto:dan_needles@INS.COM">Daniel
+L. Needles</a> </li>
+
+<li> SNMP_Session 0.52: setRequest support based on code contributed
+by <a href="mailto:matter@media.mit.edu">Matthew Trunnell</a>.  See
+``<a href="#set-req-use">Set Requests</a>'' below for how this is
+used. </li>
+
+<li> SNMP_Session 0.51: Improved error messages by printing the
+session in error messages if possible, and the OID and error message
+whenever the agent sends back an error. </li>
+
+<li> SNMP_Session 0.50, BER 0.50: The <b>BER</b> and
+<b>SNMP_Session</b> modules both have version numbers according to the
+convention in <b>Exporter.pm</b>.  That is, you can now insist on a
+minimal version of the modules by saying e.g.
+
+<pre>
+use BER "0.50";
+use SNMP_Session "0.52";
+</pre>
+
+ The initial version numbers are 0.50 for both modules. </li>
+
+<li> The pretty printer should now print unsigned 32-bit values (such
+ as Counters and Gauges) correctly, i.e. values larger than
+ 2<sup><font size="-2">31</font></sup> are printed as large positive
+ numbers rather than negative numbers.  Note that this can cause
+ problems depending on how you handle the output of the pretty
+ printer, since those string representations of large numbers may not
+ be convertible to integers using <b>atoi()</b> or similar
+ functions. </li>
+
+<li> The subroutines in SNMP_Session never call <b>die()</b> anymore
+ if it encouters error situations.  Instead, they issue a warning and
+ return <b>undef</b>.  <a href="mailto:btr@iol.unh.edu">Brad
+ Ritchie</a> managed to convince me that library code should never
+ <b>die</b>.  Unfortunately I haven't revised <b>BER.pm</b> yet, so
+ subroutines related with BER transfer syntax encoding and decoding
+ may still <b>die</b>. </li>
+
+<li> The code has been cleaned up to use more of the standard
+ functionality of the Perl 5 <b>Socket.pm</b> module.  That should
+ have eliminated some potential portability problems (and delegated
+ responsability for potential bugs :-).  Note that this means that the
+ code requires Perl 5.002 or later. </li>
+
+<li> Both source files now make extensive use of <b>strict</b> for
+ better compile-time error checking.  Please notify me in case you
+ have any problems because of this. </li>
+
+<li> The library now attempts to retransmit queries for which no
+ reponse has been received during a given time.  The default
+ parameters for the retransmission logic have been discussed at length
+ in the <em>mrtg</em> mailing list, and seem to work quite well, both
+ against overloaded routers that simply drop some SNMP requests and
+ against routers that are behind slow or lossy links.  If you have
+ feedback on the default parameters, please drop me an e-mail. </li>
+
+<li> When I implemented the retransmission logic, I also fixed
+ handling of request IDs.  In older versions, the request ID was never
+ changed between reqeuest, which could lead to (late) resposes being
+ associated with the wrong request.  Now the request ID is incremented
+ for each request, and mismatching responses are ignored.  For
+ retransmissions, the request ID isn't changed.  If we did change it,
+ we could estimate response time and implement an adaptive
+ retransmission algorithm.  This has been left for further
+ study. </li>
+
+<li> Added code contributed by <em>mrtg</em> users:
+
+ <ul>
+
+  <li> Encoding of larger subids, by <a
+ href="mailto:sip00@vg.swissptt.ch">Philippe Simonet</a> and <a
+ href="mailto:yhu@casc.com">Yufang HU</a> </li>
+
+  <li> Decoding <b>sysUpTime</b>, by <a
+ href="mailto:dlr@Bungi.com">Dave Rand</a> </li>
+
+  <li> Decoding longer (unsigned) integers, by <a
+ href="mailto:tobi@oetiker.ch">Tobias Oetiker</a> </li>
+
+  <li> Decoding longer strings, by <a
+ href="mailto:san@iem.pw.edu.pl">Andrzej Tobola</a> </li>
+
+  <li> More reasonable socket initialization, by <a
+ href="mailto:peters@dkrz.de">Heine Peters</a> </li>
+
+  <li> Correct integer BER-encoding, by <a
+ href="mailto:mcm@unx.sas.com">Mike Mitchell</a> </li>
+
+ </ul> </li>
+
+</ul>
+
+
+<HR>
+<ADDRESS>
+<!-- hhmts start -->20091228
+<!-- hhmts end -->
+<A HREF="http://www.switch.ch/misc/leinen/">
+ Simon Leinen &lt;simon.leinen@switch.ch&gt;</A>
+
+<A HREF="http://validator.w3.org/"><IMG ALIGN=RIGHT BORDER=0
+     SRC="../../images/vh40.gif"
+     ALT="Valid HTML 4.0!" HEIGHT=31 WIDTH=88></A>
+
+</ADDRESS>
+
+</BODY>
+</HTML>

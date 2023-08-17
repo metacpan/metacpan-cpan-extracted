@@ -1,48 +1,91 @@
 package URI::PackageURL;
 
-use strict;
-use warnings;
-use Carp;
-use utf8;
 use feature ':5.10';
+use strict;
+use utf8;
+use warnings;
 
+use Carp;
 use Exporter qw(import);
-
-use constant DEBUG => $ENV{PURL_DEBUG};
+use URI::PackageURL::Util qw(purl_to_urls);
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '1.10';
+our $VERSION = '2.00';
+our @EXPORT  = qw(encode_purl decode_purl);
 
-our @EXPORT = qw(encode_purl decode_purl);
-
-sub encode_purl {
-
-    my (%components) = @_;
-
-    my $purl = URI::PackageURL->new(%components);
-    return $purl->to_string;
-
-}
-
-sub decode_purl {
-    return URI::PackageURL->from_string(shift);
-}
+my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
 
 sub new {
 
-    my ($class, %components) = @_;
+    my ($class, %params) = @_;
 
-    Carp::croak "Invalid PackageURL: 'type' component is required" if (!defined $components{type});
-    Carp::croak "Invalid PackageURL: 'name' component is required" if (!defined $components{name});
+    my $scheme     = delete $params{scheme} // 'pkg';
+    my $type       = delete $params{type} or Carp::croak "Invalid PackageURL: 'type' component is required";
+    my $namespace  = delete $params{namespace};
+    my $name       = delete $params{name} or Carp::croak "Invalid PackageURL: 'name' component is required";
+    my $version    = delete $params{version};
+    my $qualifiers = delete $params{qualifiers} // {};
+    my $subpath    = delete $params{subpath};
 
-    my $self = bless normalize_components(%components), $class;
+    $type = lc $type;
 
-    return $self;
+    if (grep { $_ eq $type } qw(alpm apk bitbucket composer deb github gitlab hex npm oci pypi)) {
+        $name = lc $name;
+    }
+
+    if ($namespace) {
+        if (grep { $_ eq $type } qw(alpm apk bitbucket composer deb github gitlab golang hex rpm)) {
+            $namespace = lc $namespace;
+        }
+    }
+
+    foreach my $qualifier (keys %{$qualifiers}) {
+        Carp::croak "Invalid PackageURL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\s/);
+    }
+
+    $name =~ s/_/-/g  if $type eq 'pypi';
+    $name =~ s/::/-/g if $type eq 'cpan';
+
+    if ($type eq 'swift') {
+        Carp::croak "Invalid PackageURL: Swift 'version' is required"   unless defined $version;
+        Carp::croak "Invalid PackageURL: Swift 'namespace' is required" unless defined $namespace;
+    }
+
+    if ($type eq 'cran') {
+        Carp::croak "Invalid PackageURL: Cran 'version' is required" unless defined $version;
+    }
+
+    if ($type eq 'conan') {
+
+        if ($namespace && $namespace ne '') {
+            if (!defined $qualifiers->{channel}) {
+                Carp::croak "Invalid PackageURL: Conan 'channel' qualifier does not exist for namespace '$namespace'";
+            }
+        }
+        else {
+            if (defined $qualifiers->{channel}) {
+                Carp::croak "Invalid PackageURL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
+            }
+        }
+
+    }
+
+    my $self = {
+        scheme     => $scheme,
+        type       => $type,
+        namespace  => $namespace,
+        name       => $name,
+        version    => $version,
+        qualifiers => $qualifiers,
+        subpath    => $subpath
+    };
+
+    return bless $self, $class;
 
 }
 
-sub scheme     { shift->{scheme} || 'pkg' }
+sub scheme     { shift->{scheme} }
 sub type       { shift->{type} }
 sub namespace  { shift->{namespace} }
 sub name       { shift->{name} }
@@ -50,70 +93,21 @@ sub version    { shift->{version} }
 sub qualifiers { shift->{qualifiers} }
 sub subpath    { shift->{subpath} }
 
-sub normalize_components {
+sub encode_purl {
+    return URI::PackageURL->new(@_)->to_string;
+}
 
-    my (%components) = @_;
-
-    $components{type} = lc $components{type};
-
-    if ($components{type} eq 'cpan') {
-        $components{name} =~ s/-/::/g;
-    }
-
-    if ($components{type} eq 'pypi') {
-        $components{name} =~ s/_/-/g;
-    }
-
-    if (grep { $_ eq $components{type} } qw(bitbucket deb github golang hex npm pypi)) {
-        $components{name} = lc $components{name};
-    }
-
-
-    # Checks
-
-    if (my $qualifiers = $components{qualifiers}) {
-        foreach (keys %{$qualifiers}) {
-            Carp::croak "Invalid PackageURL: '$_' is not a valid qualifier" if ($_ =~ /\s/);
-        }
-    }
-
-    if ($components{type} eq 'swift') {
-        Carp::croak "Invalid PackageURL: Swift 'version' is required"   if (!defined $components{version});
-        Carp::croak "Invalid PackageURL: Swift 'namespace' is required" if (!defined $components{namespace});
-    }
-
-    if ($components{type} eq 'cran') {
-        Carp::croak "Invalid PackageURL: Cran 'version' is required" if (!defined $components{version});
-    }
-
-    if ($components{type} eq 'conan') {
-
-        if (defined $components{namespace} && $components{namespace} ne '') {
-
-            if (!defined $components{qualifiers}->{channel}) {
-                Carp::croak
-                    "Invalid PackageURL: Conan 'channel' qualifier does not exist for namespace '$components{namespace}'";
-            }
-
-        }
-        else {
-
-            if (defined $components{qualifiers}->{channel}) {
-                Carp::croak
-                    "Invalid PackageURL: Conan 'namespace' does not exist for channel '$components{qualifiers}->{channel}'";
-            }
-
-        }
-
-    }
-
-    return \%components;
-
+sub decode_purl {
+    return URI::PackageURL->from_string(shift);
 }
 
 sub from_string {
 
     my ($class, $string) = @_;
+
+    if ($string !~ /$PURL_REGEXP/) {
+        Carp::croak 'Malformed PackageURL string';
+    }
 
     my %components = ();
 
@@ -133,7 +127,7 @@ sub from_string {
 
     if ($s1[1]) {
         $s1[1] =~ s{(^\/|\/$)}{};
-        my @subpath = map { url_decode($_) } grep { $_ ne '' && $_ ne '.' && $_ ne '..' } split /\//, $s1[1];
+        my @subpath = map { _url_decode($_) } grep { $_ ne '' && $_ ne '.' && $_ ne '..' } split /\//, $s1[1];
         $components{subpath} = join '/', @subpath;
     }
 
@@ -158,7 +152,7 @@ sub from_string {
         foreach my $qualifier (@qualifiers) {
 
             my ($key, $value) = split('=', $qualifier);
-            $value = url_decode($value);
+            $value = _url_decode($value);
 
             if ($key eq 'checksums') {
                 $value = [split(',', $value)];
@@ -196,7 +190,7 @@ sub from_string {
     #     This is the version
 
     my @s5 = split('@', $s4[1]);
-    $components{version} = url_decode($s5[1]) if ($s5[1]);
+    $components{version} = _url_decode($s5[1]) if ($s5[1]);
 
 
     # Split the remainder once from right on '/'
@@ -207,7 +201,7 @@ sub from_string {
     #     This is the name
 
     my @s6 = split('/', $s5[0], 2);
-    $components{name} = (scalar @s6 > 1) ? url_decode($s6[1]) : url_decode($s6[0]);
+    $components{name} = (scalar @s6 > 1) ? _url_decode($s6[1]) : _url_decode($s6[0]);
 
 
     # Split the remainder on '/'
@@ -220,7 +214,7 @@ sub from_string {
 
     if (scalar @s6 > 1) {
         my @s7 = split('/', $s6[0]);
-        $components{namespace} = join '/', map { url_decode($_) } @s7;
+        $components{namespace} = join '/', map { _url_decode($_) } @s7;
     }
 
     return $class->new(%components);
@@ -229,28 +223,28 @@ sub from_string {
 
 sub to_string {
 
-    my ($self) = @_;
+    my $self = shift;
 
     my @purl = ('pkg', ':', $self->type, '/');
 
     # Namespace
     if ($self->namespace) {
 
-        my @ns = map { url_encode($_) } split(/\//, $self->namespace);
+        my @ns = map { _url_encode($_) } split(/\//, $self->namespace);
         push @purl, (join('/', @ns), '/');
 
     }
 
     # Name
-    push @purl, url_encode($self->name);
+    push @purl, _url_encode($self->name);
 
     # Version
-    push @purl, ('@', url_encode($self->version)) if ($self->version);
+    push @purl, ('@', _url_encode($self->version)) if ($self->version);
 
     # Qualifiers
     if (my $qualifiers = $self->qualifiers) {
 
-        my @qualifiers = map { sprintf('%s=%s', $_, url_encode($qualifiers->{$_})) } sort keys %{$qualifiers};
+        my @qualifiers = map { sprintf('%s=%s', $_, _url_encode($qualifiers->{$_})) } sort keys %{$qualifiers};
         push @purl, ('?', join('&', @qualifiers)) if (@qualifiers);
 
     }
@@ -262,24 +256,13 @@ sub to_string {
 
 }
 
-sub url_encode {
-    my $string = shift;
-
-    # RFC-3986 (but exclude "/" and ":")
-    $string =~ s/([^A-Za-z0-9\-._~\/:])/sprintf '%%%02X', ord $1/ge;
-    return $string;
-}
-
-
-sub url_decode {
-    my $string = shift;
-    $string =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
-    return $string;
+sub to_urls {
+    purl_to_urls(shift);
 }
 
 sub TO_JSON {
 
-    my ($self) = @_;
+    my $self = shift;
 
     return {
         type       => $self->type,
@@ -292,7 +275,24 @@ sub TO_JSON {
 
 }
 
+sub _url_encode {
+
+    my $string = shift;
+
+    # RFC-3986 (but exclude "/" and ":")
+    $string =~ s/([^A-Za-z0-9\-._~\/:])/sprintf '%%%02X', ord $1/ge;
+    return $string;
+
+}
+
+sub _url_decode {
+    my $string = shift;
+    $string =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
+    return $string;
+}
+
 1;
+
 __END__
 =head1 NAME
 
@@ -305,19 +305,25 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
   # OO-interface
   
   # Encode components in PackageURL string
-  $purl = URI::PackageURL->new(type => cpan, name => 'URI::PackageURL', version => '1.10');
+  $purl = URI::PackageURL->new(
+    type      => cpan,
+    namespace => 'GDT',
+    name      => 'URI-PackageURL',
+    version   => '2.00'
+  );
   
-  say $purl; # pkg:cpan/URI::PackageURL@1.10
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.00
 
   # Parse PackageURL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/URI::PackageURL@1.10');
+  $purl = URI::PackageURL->from_string('pkg:cpan/URI-PackageURL@2.00');
 
   # exported funtions
 
-  $purl = decode_purl('pkg:cpan/URI::PackageURL@1.10');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.00');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '1.10');
+  $purl_string = encode_purl(type => cpan, name => 'URI-PackageURL', version => '2.00');
+  say $purl_string; # pkg:cpan/URI-PackageURL@2.00
 
 =head1 DESCRIPTION
 
@@ -423,13 +429,17 @@ Extra subpath within a package, relative to the package root.
 
 Stringify Package URL components.
 
+=item $purl->to_urls
+
+Return B<download> and/or B<repository> URLs.
+
 =item $purl->TO_JSON
 
 Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>, etc).
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI::PackageURL","namespace":null,"qualifiers":null,"subpath":null,"type":"cpan","version":"1.10"}
+    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.00"}
 
 =back
 
@@ -463,7 +473,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2023 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

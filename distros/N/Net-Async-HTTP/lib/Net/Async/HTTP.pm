@@ -1,18 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP;
+package Net::Async::HTTP 0.49;
 
-use strict;
+use v5.14;
 use warnings;
-use v5.10;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.48';
-
-our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
+our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$Net::Async::HTTP::VERSION";
 our $DEFAULT_MAXREDIR = 3;
 our $DEFAULT_MAX_IN_FLIGHT = 4;
 our $DEFAULT_MAX_CONNS_PER_HOST = $ENV{NET_ASYNC_HTTP_MAXCONNS} // 1;
@@ -249,6 +246,12 @@ regular progress is still being made.
 
 =head2 proxy_port => INT
 
+I<Since version 0.10.>
+
+=head2 proxy_path => PATH
+
+I<Since version 0.49.>
+
 Optional. Default values to apply to each C<request> method.
 
 =head2 cookie_jar => HTTP::Cookies
@@ -425,9 +428,7 @@ sub connect_connection
    my %args = @_;
 
    my $conn = delete $args{conn};
-
-   my $host = delete $args{host};
-   my $port = delete $args{port};
+   my $key = defined $args{path} ? "unix:$args{path}" : "$args{host}:$args{port}";
 
    my $on_error  = $args{on_error};
 
@@ -446,18 +447,23 @@ sub connect_connection
       unshift @{ $args{extensions} }, "SSL";
    }
 
+   if( exists $args{port} ) {
+      $args{service} = delete $args{port};
+   }
+
+   unless( exists $args{host} ) {
+      $args{addr} = { family => $args{family}, path => $args{path} };
+   }
+
    my $f = $conn->connect(
-      host     => $host,
-      service  => $port,
       family   => ( $args{family} || $self->{family} || 0 ),
       ( map { defined $self->{$_} ? ( $_ => $self->{$_} ) : () }
          qw( local_host local_port local_addrs local_addr ) ),
-
       %args,
    )->on_done( sub {
       my ( $stream ) = @_;
       $stream->configure(
-         notifier_name => "$host:$port,fd=" . $stream->read_handle->fileno,
+         notifier_name => "$key,fd=" . $stream->read_handle->fileno,
       );
 
       # Defend against ->setsockopt doing silly things like detecting SvPOK()
@@ -465,10 +471,12 @@ sub connect_connection
 
       $stream->ready;
    })->on_fail( sub {
-      $on_error->( $conn, "$host:$port - $_[0] failed [$_[-1]]" );
+      $on_error->( $conn, "$key - $_[0] failed [$_[-1]]" );
    });
 
-   $f->on_ready( sub { undef $f } ); # intentionally cycle
+   $f->on_ready( sub { undef $f } ) unless $f->is_ready; # intentionally cycle
+
+   return $f;
 }
 
 sub get_connection
@@ -478,10 +486,7 @@ sub get_connection
 
    my $loop = $self->get_loop or croak "Cannot ->get_connection without a Loop";
 
-   my $host = $args{host};
-   my $port = $args{port};
-
-   my $key = "$host:$port";
+   my $key = defined $args{path} ? "unix:$args{path}" : "$args{host}:$args{port}";
    my $conns = $self->{connections}{$key} ||= [];
    my $ready_queue = $self->{ready_queue}{$key} ||= [];
 
@@ -492,7 +497,7 @@ sub get_connection
 
    my $ready = $args{ready};
    $ready or push @$ready_queue, $ready =
-      Ready( $self->loop->new_future->set_label( "[ready $host:$port]" ), 0 );
+      Ready( $self->loop->new_future->set_label( "[ready $key]" ), 0 );
 
    my $f = $ready->future;
 
@@ -502,7 +507,7 @@ sub get_connection
    }
 
    my $conn = Net::Async::HTTP::Connection->new(
-      notifier_name => "$host:$port,connecting",
+      notifier_name => "$key,connecting",
       ready_queue   => $ready_queue,
       ( map { $_ => $self->{$_} }
          qw( max_in_flight read_len write_len decode_content ) ),
@@ -575,10 +580,11 @@ Hostname of the server to connect to
 Optional. Port number or service of the server to connect to. If not defined,
 will default to C<http> or C<https> depending on whether SSL is being used.
 
-=item family => INT
+=item family => INT or STRING
 
 Optional. Restricts the socket family for connecting. If not defined, will
-default to the globally-configured value in the object.
+default to the globally-configured value in the object. The value may either
+be a C<PF_*> constant directly, or the lowercase name of one such as C<inet>.
 
 =item SSL => BOOL
 
@@ -631,7 +637,16 @@ contain an even-sized list of name/value pairs.
 
 =item proxy_port => INT
 
+I<Since version 0.10.>
+
 Optional. Override the hostname or port number implied by the URI.
+
+=item proxy_path => PATH
+
+I<Since version 0.49.>
+
+Optional. Set a UNIX socket path to use as a proxy. To make use of this, also
+set the C<family> argument to C<unix>.
 
 =back
 
@@ -783,10 +798,32 @@ sub _do_one_request
       $metrics->inc_counter( requests => [ method => $request->method ] );
    }
 
+   my %conn_target;
+   my $is_proxy;
+
+   if( defined $args{proxy_host} or ( defined $self->{proxy_host} and not defined $args{proxy_path} ) ) {
+      %conn_target = (
+         host => $args{proxy_host} || $self->{proxy_host},
+         port => $args{proxy_port} || $self->{proxy_port},
+      );
+      $is_proxy = 1;
+   }
+   elsif( defined $args{proxy_path} or defined $self->{proxy_path} ) {
+      %conn_target = (
+         path => $args{proxy_path} || $self->{proxy_path},
+      );
+      $is_proxy = 1;
+   }
+   else {
+      %conn_target = (
+         host => $host,
+         port => $port,
+       );
+   }
+
    return $self->get_connection(
-      host => $args{proxy_host} || $self->{proxy_host} || $host,
-      port => $args{proxy_port} || $self->{proxy_port} || $port,
-      is_proxy => !!( $args{proxy_host} || $self->{proxy_host} ),
+      %conn_target,
+      is_proxy => $is_proxy,
       ( defined $args{family} ? ( family => $args{family} ) : () ),
       $SSL ? (
          SSL  => 1,
@@ -1097,10 +1134,18 @@ sub _make_request_for_uri
 
    $response = await $http->POST( $uri, $content, %args );
 
+I<Since version 0.36.>
+
    $response = await $http->PATCH( $uri, $content, %args );
 
-Convenient wrappers for performing C<GET>, C<HEAD>, C<PUT>, C<POST> or
-C<PATCH> requests with a C<URI> object and few if any other arguments,
+I<Since version 0.48.>
+
+   $response = await $http->DELETE( $uri, %args );
+
+I<Since version 0.49.>
+
+Convenient wrappers for performing C<GET>, C<HEAD>, C<PUT>, C<POST>, C<PATCH>
+or C<DELETE> requests with a C<URI> object and few if any other arguments,
 returning a C<Future>.
 
 Remember that C<POST> with non-form data (as indicated by a plain scalar
@@ -1142,6 +1187,13 @@ sub PATCH
    my $self = shift;
    my ( $uri, $content, @args ) = @_;
    return $self->do_request( method => "PATCH", uri => $uri, content => $content, @args );
+}
+
+sub DELETE
+{
+   my $self = shift;
+   my ( $uri, @args ) = @_;
+   return $self->do_request( method => "DELETE", uri => $uri, @args );
 }
 
 =head1 SUBCLASS METHODS

@@ -59,7 +59,7 @@ do { my $x = {
                                       'Function::Parameters' => '2.001003',
                                       'Future' => '0.48',
                                       'Future::AsyncAwait' => '0.58',
-                                      'Syntax::Keyword::MultiSub' => '0.02',
+                                      'Syntax::Keyword::MultiSub' => '0.03',
                                       'Syntax::Keyword::Try' => '0.027'
                                     }
                     },

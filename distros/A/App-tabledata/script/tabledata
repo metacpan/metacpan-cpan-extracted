@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-04-19'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tabledata/tabledata",
@@ -39,7 +39,7 @@ tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.006 of tabledata (from Perl distribution App-tabledata), released on 2023-02-12.
+This document describes version 0.007 of tabledata (from Perl distribution App-tabledata), released on 2023-04-19.
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ B<tabledata> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<
 
 B<tabledata> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<tabledata> [B<L<--action|/"--actions">>=I<str>|B<L<-H|/"--actions">>|B<L<-L|/"--actions">>|B<L<-R|/"--actions">>|B<L<-S|/"--actions">>|B<L<--actions|/"--actions">>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>|B<L<-n|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<module|/"--module=s">>]
+B<tabledata> [B<L<--action|/"-c">>=I<str>|B<L<-C|/"-c">>|B<L<-H|/"-c">>|B<L<-L|/"-c">>|B<L<-R|/"-c">>|B<L<-S|/"-c">>|B<L<--actions|/"-c">>|B<L<-c|/"-c">>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>|B<L<-n|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<module|/"--module=s">>]
 
 =head1 OPTIONS
 
@@ -59,13 +59,13 @@ C<*> marks required options.
 
 =item B<--action>=I<s>
 
-Default value:
-
- "dump_as_aoaos"
-
 Valid values:
 
- ["list_actions","list_installed","dump_as_aoaos","dump_as_aohos","dump_as_csv","list_columns","count_rows","pick_rows","head","stat"]
+ ["list_actions","list_installed","list_cpan","list_lcpan","dump_as_aoaos","dump_as_aohos","dump_as_csv","stream_as_csv","list_columns","count_rows","pick_rows","head","stat"]
+
+The default is C<dump_as_aoaos> except when the table has infinite rows in which
+case the default action is C<stream_as_csv>.
+
 
 =item B<--actions>
 
@@ -99,6 +99,18 @@ Default value:
 
  1
 
+=item B<-C>
+
+List TableData::* on CPAN.
+
+See C<--action>.
+
+=item B<-c>
+
+List TableData::* on local CPAN mirror.
+
+See C<--action>.
+
 =item B<-H>
 
 Get the first N row(s) (alias for --action=head).
@@ -129,13 +141,15 @@ See C<--action>.
 
 =over
 
-=item B<--config-path>=I<s>, B<-c>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 
 Can actually be specified multiple times to instruct application to read from
 multiple configuration files (and merge them).
 
+
+Can be specified multiple times.
 
 =item B<--config-profile>=I<s>, B<-P>
 
@@ -157,7 +171,7 @@ C<password> to C<beaver>. When you specify C<--config-profile=production>,
 C<username> will be set to C<bar> and C<password> to C<honey>.
 
 
-=item B<--no-config>, B<-C>
+=item B<--no-config>
 
 Do not use any configuration file.
 

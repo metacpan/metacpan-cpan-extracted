@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use YAMLScript 0.1.0;
+use YAMLScript::Common;
 use YAMLScript::RT;
 
 my $file = shift;
 
-YAMLScript::RT->new->init->rep(qq<
+RT->init->rep(qq<
   (use 'Test.More.YAMLScript)
   (eval (read-file-ys "$file"))
 >);

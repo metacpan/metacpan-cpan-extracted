@@ -8,7 +8,7 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has fake_release => (
   is         => 'ro',
@@ -126,7 +126,10 @@ sub configure {
       },
     ],
     [ 'Git::CheckFor::MergeConflicts' ],
-    [ 'Git::CheckFor::CorrectBranch' ],
+    [ 'Git::CheckFor::CorrectBranch' => {
+        release_branch => 'main',
+      },
+    ],
     [ 'EnsureChangesHasContent' ],
     [ 'EnsureMinimumPerl' ],
     [ 'Git::Check' => 'initial check' ],
@@ -276,6 +279,7 @@ It is I<roughly> equivalent to the following:
   skip = ExtUtils::MakeMaker
   [Git::CheckFor::MergeConflicts]
   [Git::CheckFor::CorrectBranch]
+  release_branch = main
   [EnsureChangesHasContent]
   [EnsureMinimumPerl]
   [Git::Check / initial check]

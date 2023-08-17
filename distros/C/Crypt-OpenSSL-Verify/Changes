@@ -1,5 +1,18 @@
 Version History
 
+0.36 -- Mon Jul 03 13:15:06 ADT 2023
+
+    [Minor Packaging Improvements]
+
+    - c936ffa Go back to original list for Windows
+    - 0a97453 Perl 5.38 not available and an action yet
+    - 8f86108 Add Perl 5.38 and otheres for Windows
+    - e098fcc macos-10.15 github action no longer supported
+    - 8f9164d Packaging improvements
+    - dbed1e7 Merge pull request #15 from waterkip/old-perls
+    - 2703365 Use a newer Perl image for the older perls
+    - 508577c (tag: 0.35) v0.35
+
 0.35 -- Tue Jul 19 21:57:11 ADT 2022
 
     - a5a91d7 Increment version for a release

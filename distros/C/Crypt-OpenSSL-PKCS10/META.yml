@@ -3,29 +3,37 @@ abstract: "Perl extension to OpenSSL's PKCS10 API."
 author:
   - 'JoNO <jonozzz@yahoo.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  Test: '0'
+  Crypt::OpenSSL::Guess: '0.11'
+  Crypt::OpenSSL::RSA: '0'
+  Test::More: '0'
 configure_requires:
   Crypt::OpenSSL::Guess: '0.11'
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-OpenSSL-PKCS10
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Crypt::OpenSSL::PKCS10:
+    file: lib/Crypt/OpenSSL/PKCS10.pm
+    version: '0.23'
 recommends:
   Crypt::OpenSSL::Bignum: '0'
 requires:
   Crypt::OpenSSL::RSA: '0'
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10
-  homepage: https://metacpan.org/pod/Crypt::OpenSSL::PKCS10
-  license: http://dev.perl.org/licenses/
-version: '0.19'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  homepage: http://search.cpan.org/dist/Crypt-OpenSSL-PKCS10/
+  repository: git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-PKCS10.git
+version: '0.23'
+x_generated_by_perl: v5.36.1
+x_maintainers:
+  - 'Timothy Legge <timlegge@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

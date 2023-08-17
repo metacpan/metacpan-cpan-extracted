@@ -2,20 +2,26 @@ package Starlight;
 
 =head1 NAME
 
-Starlight - a light and pure-Perl PSGI/Plack HTTP server with pre-forks
+Starlight - Light and pure-Perl PSGI/Plack HTTP server with pre-forks
 
 =head1 SYNOPSIS
 
-  $ plackup -s Starlight --port=80 [options] your-app.psgi
+=for markdown ```console
 
-  $ plackup -s Starlight --port=443 --ssl=1 --ssl-key-file=file.key
-                         --ssl-cert-file=file.crt [options] your-app.psgi
+    $ plackup -s Starlight --port=80 [options] your-app.psgi
 
-  $ plackup -s Starlight --port=80 --ipv6 [options] your-app.psgi
+    $ plackup -s Starlight --port=443 --ssl=1 --ssl-key-file=file.key
+                            --ssl-cert-file=file.crt [options] your-app.psgi
 
-  $ plackup -s Starlight --socket=/tmp/starlight.sock [options] your-app.psgi
+    $ plackup -s Starlight --port=80 --ipv6 [options] your-app.psgi
 
-  $ starlight your-app.psgi
+    $ plackup -s Starlight --socket=/tmp/starlight.sock [options] your-app.psgi
+
+    $ starlight your-app.psgi
+
+    $ starlight --help
+
+=for markdown ```
 
 =head1 DESCRIPTION
 
@@ -30,16 +36,14 @@ options.
 
 =cut
 
-
 use 5.008_001;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0503';
 
 1;
-
 
 __END__
 
@@ -72,7 +76,7 @@ Tatsuhiko Miyagawa
 
 =head1 LICENSE
 
-Copyright (c) 2013-2016, 2020 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2013-2016, 2020, 2023 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

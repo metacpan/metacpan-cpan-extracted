@@ -1,5 +1,8 @@
 {
   en => {
+    labels => {
+    #  super_user => 'Sup user',
+    },
     attributes => {
       username => "User Name",
     },
@@ -15,6 +18,9 @@
             },
           },
         },
+      },
+      labels => {
+        #'example/schema/result/role' => { admin => "God Role" },
       },
       attributes => {
         'example/model/schema/person' => {

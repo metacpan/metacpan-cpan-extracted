@@ -1,3 +1,7 @@
+3.20230607 2023-06-07 UTC
+  - Option to make DKIM authentication required
+    require_dkim / MAIL_BIMI_REQUIRE_DKIM
+
 3.20210512 2021-05-12 UTC
   - Tests: Skip cmd output tests during normal test run
   - VMC: Update Entrust CA Certs

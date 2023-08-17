@@ -3,7 +3,7 @@ package Text::Transliterator::Unaccent;
 use warnings;
 use strict;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use Text::Transliterator;
 use Unicode::UCD        qw(charinfo charscript charblock);
@@ -75,10 +75,12 @@ sub char_map_descr {
   my $map = $class->char_map(@_);
 
   my $txt = "";
-  while (my ($k, $v) = each %$map) {
+  # while (my ($k, $v) = each %$map) {
+  foreach my $k (sort {$a cmp $b} keys %$map) {
+    my $v = $map->{$k};
     my $accented = ord($k);
     my $base     = ord($v);
-    $txt .= sprintf "U+%04x %-40s => U+%04x %s\n", 
+    $txt .= sprintf "U+%04x %-55s => U+%04x %s\n", 
                $accented,
                charinfo($accented)->{name},
                $base,
@@ -284,7 +286,7 @@ L<http://search.cpan.org/dist/Text-Transliterator/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010, 2017 Laurent Dami.
+Copyright 2010, 2017, 2023 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

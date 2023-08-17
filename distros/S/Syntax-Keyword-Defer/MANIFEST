@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/cx_pushblock.c.inc

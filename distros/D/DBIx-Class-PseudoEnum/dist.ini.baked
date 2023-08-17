@@ -4,6 +4,7 @@
 name = DBIx-Class-PseudoEnum
 author = D Ruth Holloway <ruth@hiruthie.me>
 license = Perl_5
+copyright_holder = D Ruth Holloway
 
 [MakeMaker / Dist::Zilla::PluginBundle::GEEKRUTH/MakeMaker]
 

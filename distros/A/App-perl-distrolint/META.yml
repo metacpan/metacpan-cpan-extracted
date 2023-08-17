@@ -1,0 +1,34 @@
+---
+abstract: 'Linting tests for perl distributions'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-perl-distrolint
+provides:
+  App::perl::distrolint:
+    file: lib/App/perl/distrolint.pm
+    version: '0.02'
+requires:
+  File::Basename: '0'
+  File::Find: '0'
+  File::Slurper: '0'
+  List::Util: '1.29'
+  Module::Pluggable::Object: '0'
+  Object::Pad: '0.800'
+  String::Tagged::Terminal: '0'
+  Syntax::Keyword::Match: '0'
+  Text::Treesitter: '0.10'
+  perl: '5.036'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

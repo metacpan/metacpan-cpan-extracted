@@ -22,6 +22,7 @@ SYNOPSIS
         use strict;
         use Mnet::Batch;
         use Mnet::Expect::Cli::Ios;
+        use Mnet::IP;
         use Mnet::Log qw(DEBUG INFO WARN FATAL);
         use Mnet::Opts::Cli;
         use Mnet::Report::Table;
@@ -94,12 +95,15 @@ SYNOPSIS
         #   see perldoc Mnet::Stanza for more ios config templating info
         my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
-        # parse primary ip address from loopback config stanza
-        my $ip = undef;
-        $ip = $1 if $loop and $loop =~ /^ ip address (\S+) \S+$/m;
+        # parse primary ip address and mask from loopback config stanza
+        my ($ip, $mask) = (undef, undef);
+        ($ip, $mask) = ($1, $2) if $loop =~ /^ ip address (\S+) (\S+)$/m;
 
-        # report on parsed loopback0 interface ip addres
-        $report->row({ device => $cli->device, ip => $ip });
+        # calculate cidr value from dotted decimal mask
+        my $cidr = Mnet::IP::cidr($mask);
+
+        # report on parsed loopback0 interface ip address and cidr value
+        $report->row({ device => $cli->device, ip => $ip, cidr => $cidr });
 
         # finished
         exit;
@@ -144,7 +148,8 @@ DESCRIPTION
     more detail.
 
 INSTALLATION
-    The Mnet perl modules should work in just about any unix perl environment.
+    The Mnet perl modules should work in just about any unix perl environment,
+    some modules require perl 5.12 or newer.
 
     The latest release can be installed from CPAN
 
@@ -260,6 +265,8 @@ SEE ALSO
     Mnet::Expect::Cli
 
     Mnet::Expect::Cli::Ios
+
+    Mnet::IP
 
     Mnet::Log
 

@@ -95,6 +95,7 @@ sub brik_properties {
          'Metabrik::Network::Address' => [ ],
       },
       need_packages => {
+         freebsd => [ qw(p5-LWP-Protocol-https) ],
          ubuntu => [ qw(liblwp-protocol-https-perl) ],
          debian => [ qw(liblwp-protocol-https-perl) ],
          kali => [ qw(liblwp-protocol-https-perl) ],

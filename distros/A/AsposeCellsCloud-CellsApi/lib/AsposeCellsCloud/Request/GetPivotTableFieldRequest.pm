@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# GetPivotTableFieldRequest.name :   ,
-# GetPivotTableFieldRequest.sheetName :   ,
-# GetPivotTableFieldRequest.pivotTableIndex :   ,
-# GetPivotTableFieldRequest.pivotFieldIndex :   ,
-# GetPivotTableFieldRequest.pivotFieldType :   ,
-# GetPivotTableFieldRequest.folder :   ,
-# GetPivotTableFieldRequest.storageName :    
+# GetPivotTableFieldRequest.name : The workbook name.  ,
+# GetPivotTableFieldRequest.sheetName : The worksheet name.  ,
+# GetPivotTableFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# GetPivotTableFieldRequest.pivotFieldIndex : The field index in the base fields.  ,
+# GetPivotTableFieldRequest.pivotFieldType : The fields area type(column/row).  ,
+# GetPivotTableFieldRequest.folder : Original workbook folder.  ,
+# GetPivotTableFieldRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_pivot_table_field' } = { 
-    	summary => '',
+    	summary => 'Gets pivot field description in pivot table.',
         params => $params,
         returns => 'PivotFieldResponse',
     };
@@ -147,49 +147,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => '',
+     	description => 'Gets the PivotTable report by index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_index' => {
      	datatype => 'int',
      	base_name => 'pivotFieldIndex',
-     	description => '',
+     	description => 'The field index in the base fields.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_type' => {
      	datatype => 'string',
      	base_name => 'pivotFieldType',
-     	description => '',
+     	description => 'The fields area type(column/row).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

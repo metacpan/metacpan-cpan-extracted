@@ -45,6 +45,7 @@ t/scripts/CVS/Ignore.pm
 t/scripts/CVS/taint2.pl
 t/scripts/datafile
 t/scripts/failure.pl
+t/scripts/Fail.pm
 t/scripts/LethalImport.pm
 t/scripts/messWithLib.pl
 t/scripts/Module2.pm

@@ -70,6 +70,7 @@ Nehren
 Nicolas
 Olaf
 Olivier
+Palmquist
 Pearce
 Petr
 Písař
@@ -81,8 +82,10 @@ Shoichi
 Sinan
 SkyMarshal
 Steve
+Stig
 Syohei
 Sören
+TLS
 Tatsuhiko
 Tiny
 Tom
@@ -114,6 +117,7 @@ ed
 ether
 felipe
 gardner
+git
 haarg
 jkeenan
 jmates

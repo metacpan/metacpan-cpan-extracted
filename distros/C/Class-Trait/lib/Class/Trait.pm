@@ -3,13 +3,15 @@ package Class::Trait;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 use overload   ();
 use File::Spec ();
 
 use B qw/svref_2object/;
 use Scalar::Util qw/blessed/;
+
+warnings::warnif( 'deprecated', 'Class::Trait is deprecated and should no longer be used. Please use Role::Tiny or Role::Basic instead.' );
 
 sub _croak($) {
     my $message = shift;
@@ -1207,6 +1209,13 @@ __END__
 =head1 NAME
 
 Class::Trait - Deprecated.  Please use Moose::Role.
+
+=head1 DEPRECATED
+
+This module has long been deprecated. It was a precursor to Moose::Role and
+other attempts to implement roles/traits in Perl. If you need standalone
+roles, please use L<Role::Basic> or L<Role::Tiny>. If you need full OO, please
+use L<Moose> or L<Moo>.
 
 =head1 SYNOPSIS
 

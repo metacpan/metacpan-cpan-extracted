@@ -1,3 +1,18 @@
+0.07 2023-07-21
+    * Various test suite updates, no code changes, no need to upgrade
+
+0.06 2023-07-07
+    * Make buffer size configurable
+      Suggested by Guido Flohr. This addresses issue GH #3
+    * Pass 0 instead of undef for NULL pointers to Win32::API
+      This fixes "The handle is invalid" errors on ReadDirectoryChangesW
+      Suggested by Guido Flohr. This addresses issue GH #5
+
+0.05 2023-07-03
+    * Also report file attribute changes, since Linux::Inotify2, Mac::FSEvents,
+      and IO::KQueue all seem to support that feature
+      Suggested by Guido Flohr. This addresses issue GH #4
+
 0.04 2022-10-17
     * Actually bail out on Windows XP and Cygwin, instead of just writing
       a function to do so

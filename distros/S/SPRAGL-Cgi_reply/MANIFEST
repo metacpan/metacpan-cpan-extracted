@@ -1,0 +1,17 @@
+Build.PL
+INSTALL.txt
+lib/SPRAGL/Cgi_reply.pm
+MANIFEST			This list of files
+README.html
+README.md
+t/cgi_reply-1.t
+t/cgi_reply-2.t
+t/cgi_reply-3.t
+t/cgi_reply-4.t
+t/cgi_reply-5.t
+t/cgi_reply-6.t
+t/cgi_reply-7.t
+t/cgi_reply-8.t
+t/cgi_reply-8.txt
+META.yml
+META.json

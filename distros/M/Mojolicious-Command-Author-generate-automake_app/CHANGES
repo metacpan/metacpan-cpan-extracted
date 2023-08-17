@@ -1,3 +1,7 @@
+0.7.4 2023-07-24 13:55:13 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - updated to qx 7 compiler
+
 0.7.3 2022-07-12 09:33:05 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fail on qx warnings
