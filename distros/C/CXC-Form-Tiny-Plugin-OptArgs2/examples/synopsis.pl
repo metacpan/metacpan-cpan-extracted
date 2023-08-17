@@ -9,12 +9,16 @@ package My::Form {
 
     use Types::Standard       qw( ArrayRef HashRef Str );
     use Types::Common::String qw( NonEmptyStr );
+    use Types::Path::Tiny     qw( Path );
+
+    # configure plugin; these are the default values
+    optargs_opts( inherit_required => !!1, inherit_optargs => !!0 );
 
     form_field 'file' => ( type => NonEmptyStr, default => sub { 'file.ext' } );
 
     # the 'option' keyword immediately follows the field definition
     option(
-        isa      => 'Str',
+        isa      => 'Str',               # optional, can usually guess from the field
         comment  => 'Query in a file',
         isa_name => 'ADQL in a file',
     );
@@ -24,17 +28,17 @@ package My::Form {
 
     form_field 'arg2' => ( type => ArrayRef, );
     argument(
-        isa     => 'ArrayRef',
+        isa     => 'ArrayRef',           # optional, can guess from the field
         comment => 'every thing else',
         greedy  => 1,
-        order   => 2,
+        order   => 2,                    # this is the second argument on the command line
     );
 
-    form_field 'arg1' => ( type => NonEmptyStr, );
+    form_field 'arg1' => ( type => Path, coerce => 1 );
     argument(
-        isa     => 'Str',
+        isa     => 'Str',                # not optional, can't guess from the field
         comment => 'first argument',
-        order   => 1,
+        order   => 1,                    # this is the second argument on the command line
     );
 
 }

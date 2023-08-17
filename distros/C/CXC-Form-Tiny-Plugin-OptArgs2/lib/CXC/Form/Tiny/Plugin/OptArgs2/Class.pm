@@ -6,7 +6,7 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Hash::Fold ();
 
@@ -15,7 +15,6 @@ use experimental 'signatures', 'postderef';
 
 use namespace::clean;
 
-my $folder = Hash::Fold->new( delimiter => chr( 0 ) );
 
 
 
@@ -39,16 +38,26 @@ sub optargs ( $self ) {
 
 
 sub set_input_from_optargs ( $self, $optargs ) {
-
-    # the options hash coming from OptArgs is a flat (single level) hash.
-    my %flat = $optargs->%*;
-
-    # translate the OptArgs names into that required by the Form::Tiny structure
-    $self->form_meta->rename_options( \%flat );
-
-    # and now inflate the flat hash into the nested structure.
-    $self->set_input( $folder->unfold( \%flat ) );
+    # inflate the flat hash into the nested structure and set the
+    # form's input
+    $self->set_input( $self->inflate_optargs( $optargs ) );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+sub inflate_optargs ( $self, $optargs ) {
+    return $self->form_meta->inflate_optargs( $optargs );
+}
+
 
 #
 # This file is part of CXC-Form-Tiny-Plugin-OptArgs2
@@ -74,7 +83,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Class - Class role for OptArgs2
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -100,6 +109,15 @@ Return an C<OptArgs2> compatible specification for the form fields
 
 Set the input form data from the output of L<OptArgs2>'s C<optargs> or
 C<class_optargs> functions.
+
+=head2 inflate_optargs
+
+  \%options = $self->inflate( \%optargs );
+
+Inflate the "flat" options hash returned by L<OptArgs2> into the full
+hash required to initialize the form.  See
+L<CXC::Form::Tiny::Plugin::OptArgs2::Meta/inflate_optargs> for more
+information.
 
 =head1 SUPPORT
 

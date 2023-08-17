@@ -15,6 +15,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/OptArgs.t',
     't/data/cscquery.csc',
+    't/inherit.t',
     't/lib/My/Test/AutoCleanHash.pm',
     't/nested.t',
     't/required.t'

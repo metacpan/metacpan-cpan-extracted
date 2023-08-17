@@ -16,9 +16,14 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
+
+use open qw(:std :encoding(UTF-8));
+
+use Encode;
+@ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
 
 if ( @ARGV == 1 && $ARGV[0] eq '--version' ) {
     print "git version 2.33.1\n";

@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -40,8 +40,8 @@ $target is the name of the module where resource access methods will be created.
 sub new {
     my ($class, $target) = @_;
     return bless {
-        -target  => $target,
-        -preload => [],
+        target  => $target,
+        preload => [],
     }, $class;
 };
 
@@ -71,12 +71,12 @@ sub add {
         unshift @_, init => $init;
     }
     my (%spec) = @_;
-    my $target = $self->{-target};
+    my $target = $self->{target};
 
     croak "resource: name must be an identifier"
         unless defined $name and !ref $name and $name =~ $ID_REX;
     croak "resource: attempt to redefine resource '$name'"
-        if defined $self->{$name};
+        if defined $self->{resource}{$name};
     croak "resource: attempt to replace existing method '$name' in $target"
         if $target->can($name);
 
@@ -128,10 +128,10 @@ sub add {
         if defined $spec{fork_cleanup} and (reftype $spec{fork_cleanup} // '') ne $CODE;
 
     if ($spec{preload}) {
-        push @{ $self->{-preload} }, $name;
+        push @{ $self->{preload} }, $name;
     };
 
-    $self->{$name} = \%spec;
+    $self->{resource}{$name} = \%spec;
 
     # Move code generation into Resource::Silo::Container
     # so that exceptions via croak() are attributed correctly.
@@ -201,7 +201,7 @@ sub _make_init_class {
         (%pass_args ? { '%pass_args' => \%pass_args, } : {}),
         {
             no_install => 1,
-            package    => $self->{-target},
+            package    => $self->{target},
         }
     );
     $spec->{dependencies} = \@realdeps;
@@ -223,7 +223,7 @@ B<EXPERIMENTAL>. Return value structure is subject to change.
 
 sub list {
     my $self = shift;
-    my @list = sort grep { !/^-/ } keys %$self;
+    my @list = sort grep { !/^-/ } keys %{ $self->{resource} };
     return wantarray ? @list : \@list;
 };
 

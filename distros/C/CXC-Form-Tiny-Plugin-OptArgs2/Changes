@@ -1,5 +1,25 @@
 Revision history for CXC-Form-Tiny-Plugin-OptArgs2
 
+0.05      2023-08-17 11:44:23-04:00 America/New_York
+
+  [REPO FIX]
+
+    * add missing file to repo
+
+  [ENHANCEMENT]
+
+    * expose OptArgs2 to Fold::Tiny hash inflation routine
+
+    * add optargs_opts keyword to handle plugin configuration
+
+    * inheriting the 'required' attribute is now optional, and
+      moderated via the new inherit_required optargs_opts keyword
+
+    * inheriting a parent Form's optargs now moderated by the
+      inherit_optargs plugin config attribute. Which Forms to inherit
+      from are specifid by the inherit_optargs_match plugin config
+      attribute.
+
 0.04      2023-08-05 16:32:47-04:00 America/New_York
 
   [BUG FIX]

@@ -75,7 +75,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Texts;

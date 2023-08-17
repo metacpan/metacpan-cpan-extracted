@@ -141,7 +141,7 @@ sub options {
             upload => {
                 table1 => 't/data/cscquery.csc',
                 table2 => 't/data/cscquery.csc',
-            }
+            },
         },
         arg1 => 'val1',
         arg2 => [ 'val2.1', 'val2.2' ],

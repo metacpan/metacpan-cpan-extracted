@@ -37,10 +37,10 @@ note('workdir does not exist');
 my $dir = tempdir();
 
 my $obj = Git::Background->new( File::Spec->catdir( $dir, 'no_such_directory' ), { git => [ $^X, File::Spec->catdir( $bindir, 'my-git.pl' ) ] } );
-isa_ok( $obj, 'Git::Background', 'new returned object' );
+isa_ok( $obj, 'Git::Background' );
 
 my $f = $obj->run;
-isa_ok( $f, 'Git::Background::Future', 'run() returns a Git::Background::Future' );
+isa_ok( $f, 'Git::Background::Future' );
 
 my ( undef, $category, undef, undef, $rc ) = $f->failure;
 ok( !$f->is_done,  '!is_done' );

@@ -1,5 +1,22 @@
 Revision history for Git-Background
 
+0.008  2023-08-17 12:03:02 UTC
+
+  - No changes from 0.007_02.
+
+0.007_02  2023-08-16 12:44:24 UTC
+
+  - get() now returns 2 additional values, a Path::Tiny object for the
+    files containing stdout and stderr from git.
+  - added 2 new methods, path_stderr, and path_stdout.
+  - Remove dependency on Test2::Plugin::UTF8.
+
+0.007_01  2023-08-05 16:02:13 UTC
+
+  - The git used for the tests now always outputs UTF-8, as the real
+    Git does.
+  - Added a new test to test the UTF-8 handling.
+
 0.007  2023-08-05 12:30:25 UTC
 
   - use binmode($fh, ':encoding(UTF-8)') on the file handles before reading

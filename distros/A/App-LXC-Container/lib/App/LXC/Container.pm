@@ -374,7 +374,7 @@ use warnings 'once';
 
 use File::Path 'make_path';
 
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 
 # TODO: Caller dependent module usage to only include UI::Various for setup
 # and corresponding tests.  Is there a better approach?

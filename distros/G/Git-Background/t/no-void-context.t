@@ -38,11 +38,11 @@ my $e = exception { Git::Background->run( '--version', { git => [ $^X, File::Spe
 like( $e, qr{\A\QCannot use run() in void context. (The git process would immediately get killed.)\E}, 'run throws an error in void context' );
 
 my $future = Git::Background->run( '--version', { git => [ $^X, File::Spec->catdir( $bindir, 'my-git.pl' ) ] } );
-isa_ok( $future, 'Git::Background::Future', '... works in scalar context' );
+isa_ok( $future, 'Git::Background::Future' );
 $future->await;
 
 my @future = Git::Background->run( '--version', { git => [ $^X, File::Spec->catdir( $bindir, 'my-git.pl' ) ] } );
-isa_ok( $future[0], 'Git::Background::Future', '... and list context' );
+isa_ok( $future[0], 'Git::Background::Future' );
 is( scalar @future, 1, '... (returns only one value)' );
 $future->await;
 

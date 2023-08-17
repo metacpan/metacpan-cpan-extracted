@@ -27,7 +27,7 @@ use Git::Background::Future;
 note('new()');
 {
     my $obj = Git::Background::Future->new;
-    isa_ok( $obj, 'Git::Background::Future', 'new returned object' );
+    isa_ok( $obj, 'Git::Background::Future' );
 
     # This is wrong usage, but new() doesn't catch that. This test is only
     # to ensure this behavior doesn't change.
@@ -37,7 +37,7 @@ note('new()');
 note('new()');
 {
     my $obj = Git::Background::Future->new('hello world');
-    isa_ok( $obj, 'Git::Background::Future', 'new returned object' );
+    isa_ok( $obj, 'Git::Background::Future' );
 
     is( $obj->udata('_run'), 'hello world', '_run is set' );
 }

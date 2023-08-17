@@ -64,16 +64,12 @@ sub request_url_whole {
   my $html = $self->request_url( $url, $o{post_data} );
 
   my $info      = $o{info_sub}->( \$html )     || {};
-  print "\r$info->{writer}, $info->{book}, $url\n" if ( $o{verbose} );
-  #print Dumper('info_sub', $info);
   my $data_list = $o{item_list} || $o{item_list_sub}->( \$html ) || [];
-  #print Dumper('data_list_sub', $data_list);
 
   my $i = 1;
   unless ( $o{stop_sub} and $o{stop_sub}->( $info, $data_list, $i, %o ) or defined $o{item_list}) {
     $data_list = [] if ( $o{min_page_num} and $o{min_page_num} > 1 );
     my $page_list = exists $o{page_list_sub} ? $o{page_list_sub}->( \$html ) : undef;
-    #print Dumper('page_list_sub', $page_list);
     while ( 1 ) {
       $i++;
       my $u = 
@@ -85,7 +81,6 @@ sub request_url_whole {
 
       my ( $u_url, $u_post_data ) = ref( $u ) eq 'HASH' ? @{$u}{qw/url post_data/} : ( $u, undef );
       my $c = $self->request_url( $u_url, $u_post_data );
-      #print "item_list: $u_url\n" if ( $o{verbose} );
       my $fs = $o{item_list_sub}->( \$c );
       last unless ( $fs );
 
@@ -109,24 +104,38 @@ sub request_url_whole {
     print "\n\n" if ( $o{term_progress_bar} );
     my $progress;
     $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{term_progress_bar} );
-    for my $r ( @$data_list ) {
+
+    for my $i ( 0 .. $#$data_list ) {
+      my $r = $data_list->[$i];
       $r->{id} //= ++$item_id;
       $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
       next unless ( $self->is_item_in_range( $r->{id}, $o{min_item_num}, $o{max_item_num} ) );
 
-      #print "item_url: $r->{url}\n" if ( $o{verbose} );
       if($r->{url}){
           my $c = $self->request_url( $r->{url}, $r->{post_data} );
-          #print "item content: $c\n";
           my $temp_r = $o{item_sub}->( \$c );
-          $r->{content} = $temp_r->{content};
-          #$r = { %$r,  %$temp_r };
-          #print Dumper($r);
+          $r->{$_} //= $temp_r->{$_} for keys(%$temp_r);
       }else{
           $r = $o{item_sub}->( $r );
       }
+
+      my $next_url = URI->new_abs( $data_list->[$i+1]->{url}, $url )->as_string;
+      while($r->{next_url}){
+          $r->{next_url} = URI->new_abs( $r->{next_url}, $url )->as_string;
+          if($r->{next_url} ne $next_url){
+              my $c = $self->request_url( $r->{next_url}, $r->{post_data} );
+              my $temp_r = $o{item_sub}->( \$c );
+              $r->{content} .= "\n\n".$temp_r->{content};
+              last unless(exists $temp_r->{next_url});
+              $r->{next_url} = $temp_r->{next_url};
+          }else{
+              last;
+          }
+      }
+
            $progress->update( $item_id ) if ( $o{term_progress_bar} );
     }
+
    $progress->update( scalar(@$data_list) ) if ( $o{term_progress_bar} ); 
   }
   print "\n\n" if ( $o{term_progress_bar} );
@@ -232,7 +241,6 @@ sub read_moz_cookie {
     @segment = map { my @c = split /=/; [ $dom, undef, '/', undef, 0, $c[0], $c[1] ] } @ck;
   }
 
-  #print Dumper(\@segment);
 
   @segment = grep { defined $_->[6] and $_->[6] =~ /\S/ } @segment;
 

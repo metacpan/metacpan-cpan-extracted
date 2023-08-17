@@ -20,11 +20,10 @@ use warnings;
 
 package Git::Background;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
-use Carp       ();
-use File::Temp ();
-use Future 0.40;
+use Carp ();
+use Path::Tiny 0.125 ();
 use Proc::Background 1.30;
 use Scalar::Util ();
 
@@ -32,8 +31,11 @@ use Git::Background::Future;
 
 # Git::Background->new;
 # Git::Background->new($dir);
-# Git::Background->new( { dir => $dir, fatal => 0 } );
-# Git::Background->new( $dir, { fatal => 0 } );
+# Git::Background->new( { %options } );
+# Git::Background->new( $dir, { %options } );
+# options:
+#   - dir
+#   - fatal     (default 1)
 sub new {
     my $class = shift;
 
@@ -44,8 +46,17 @@ sub new {
 
         my $dir;
 
-        # first argument is a scalar or object
-        if ( @_ && ( ref $_[0] eq ref q{} || defined Scalar::Util::blessed $_[0] ) ) {
+        if (
+            @_
+            && (
+                # first argument is a scalar
+                !defined Scalar::Util::reftype( $_[0] )
+
+                # or object
+                || defined Scalar::Util::blessed( $_[0] )
+            )
+          )
+        {
             my $arg = shift @_;
 
             # stringify objects (e.g. Path::Tiny)
@@ -54,16 +65,16 @@ sub new {
 
         last NEW if @_ > 1;
 
-        # first/remaining argument is a hash ref
-        if ( @_ && ref $_[0] eq ref {} ) {
+        if (@_) {
+            last NEW if !defined Scalar::Util::reftype( $_[0] ) || Scalar::Util::reftype( $_[0] ) ne 'HASH';
+
+            # first/remaining argument is a hash ref
             my $args = shift @_;
             $self = $class->_process_args($args);
         }
         else {
             $self = $class->_process_args;
         }
-
-        last NEW if @_;
 
         if ( defined $dir ) {
             Carp::croak 'Cannot specify dir as positional argument and in argument hash' if exists $self->{_dir};
@@ -78,13 +89,15 @@ sub new {
     Carp::croak 'usage: new( [DIR], [ARGS] )';
 }
 
+# Git::Background->run( @cmd );
+# Git::Background->run( @cmd, { %options } );
 sub run {
     my ( $self, @cmd ) = @_;
 
     Carp::croak 'Cannot use run() in void context. (The git process would immediately get killed.)' if !defined wantarray;    ## no critic (Community::Wantarray)
 
     my $config;
-    if ( @cmd && ref $cmd[-1] eq ref {} ) {
+    if ( @cmd && defined Scalar::Util::reftype( $cmd[-1] ) && Scalar::Util::reftype( $cmd[-1] ) eq 'HASH' ) {
         my $args = pop @cmd;
         $config = $self->_process_args($args);
     }
@@ -92,16 +105,39 @@ sub run {
         $config = $self->_process_args;
     }
 
-    my $stdout = File::Temp->new;
-    my $stderr = File::Temp->new;
-    binmode $stdout, ':encoding(UTF-8)';    ## no critic (InputOutput::RequireCheckedSyscalls)
-    binmode $stderr, ':encoding(UTF-8)';    ## no critic (InputOutput::RequireCheckedSyscalls)
+    my $stdout;
+    my $stdout_fh;
+    my $stderr;
+    my $stderr_fh;
+    my $e;
+    my $ok;
+    {
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        $ok = eval {
+            $e         = 'Cannot create temporary file for stdout';
+            $stdout    = Path::Tiny->tempfile;
+            $e         = 'Cannot obtain file handle for stdout temp file';
+            $stdout_fh = $stdout->filehandle('>');
+            $e         = 'Cannot create temporary file for stdout';
+            $stderr    = Path::Tiny->tempfile;
+            $e         = 'Cannot obtain file handle for stderr temp file';
+            $stderr_fh = $stderr->filehandle('>');
+            1;
+        };
+
+        if ( !$ok ) {
+            if ( defined $@ && $@ ne q{} ) {
+                $e .= ": $@";
+            }
+        }
+    }
+    Carp::croak $e if !$ok;
 
     # Proc::Background
     my $proc_args = {
         stdin         => undef,
-        stdout        => $stdout,
-        stderr        => $stderr,
+        stdout        => $stdout_fh,
+        stderr        => $stderr_fh,
         command       => [ @{ $config->{_git} }, @cmd ],
         autodie       => 1,
         autoterminate => 1,
@@ -109,7 +145,6 @@ sub run {
     };
 
     my $proc;
-    my $e;
     {
         local @_;    ## no critic (Variables::RequireInitializationForLocalVars)
         local $Carp::Internal{ (__PACKAGE__) } = 1;
@@ -138,8 +173,9 @@ sub version {
     my ( $self, $args ) = @_;
 
     my @cmd = qw(--version);
-
     if ( defined $args ) {
+        Carp::croak 'usage: Git::Background->version([ARGS])' if !defined Scalar::Util::reftype($args) || Scalar::Util::reftype($args) ne 'HASH';
+
         push @cmd, $args;
     }
 
@@ -160,14 +196,14 @@ sub _process_args {
     my ( $self, $args ) = @_;
 
     if ( !defined Scalar::Util::blessed($self) ) {
-        $self = {
-            _fatal => !!1,
-            _git   => ['git'],
-        };
+        $self = {};
     }
 
     my %args_keys = map { $_ => 1 } keys %{$args};
-    my %config;
+    my %config    = (
+        _fatal => !!1,
+        _git   => ['git'],
+    );
 
     # dir
     if ( exists $args->{dir} ) {
@@ -185,17 +221,21 @@ sub _process_args {
         $config{_fatal} = !!$args->{fatal};
         delete $args_keys{fatal};
     }
-    else {
+    elsif ( exists $self->{_fatal} ) {
         $config{_fatal} = $self->{_fatal};
     }
 
     # git
     if ( exists $args->{git} ) {
         my $git = $args->{git};
-        $config{_git} = [ ( defined Scalar::Util::reftype($git) && Scalar::Util::reftype($git) eq Scalar::Util::reftype( [] ) ) ? @{ $args->{git} } : $git ];
+        $config{_git} = [
+            ( defined Scalar::Util::reftype($git) && Scalar::Util::reftype($git) eq 'ARRAY' )
+            ? @{ $args->{git} }
+            : $git,
+        ];
         delete $args_keys{git};
     }
-    else {
+    elsif ( exists $self->{_git} ) {
         $config{_git} = [ @{ $self->{_git} } ];
     }
 
@@ -220,11 +260,11 @@ Git::Background - use Git commands with L<Future>
 
 =head1 VERSION
 
-Version 0.007
+Version 0.008
 
 =head1 SYNOPSIS
 
-    use Git::Background 0.002;
+    use Git::Background 0.008;
 
     my $git = Git::Background->new($dir);
     my $future = $git->run('status', '-s');
@@ -255,6 +295,8 @@ exception.
 
 The following options can be passed in the args hash to new. They are used
 as defaults for calls to C<run>.
+
+Current API available since 0.001.
 
 =head3 dir
 
@@ -288,7 +330,6 @@ or an array ref.
         git => [ qw( /usr/bin/sudo -u nobody git ) ],
     });
 
-
 =head2 run( @CMD, [ARGS] )
 
 This runs the specified Git command in the background by passing it on to
@@ -314,6 +355,8 @@ Git process if the future is destroyed.
 
 Since version 0.004 C<run> C<croaks> if it gets called in void context.
 
+Current API available since 0.004.
+
 =head2 version( [ARGS] )
 
 Returns the version of the used Git binary or undef if no Git command was
@@ -328,6 +371,8 @@ and can be used to check if a Git is available.
     else {
         say "You have Git version $version";
     }
+
+Current API available since 0.001.
 
 =head1 EXAMPLES
 
@@ -355,7 +400,7 @@ Alternatively you can overwrite the directory for the call to clone:
 
     # then use the same object for working with the cloned repository
     my $future = $git->run('status', '-s');
-    my @dstdout = $future->stdout;
+    my @stdout = $future->stdout;
 
 =head1 SEE ALSO
 

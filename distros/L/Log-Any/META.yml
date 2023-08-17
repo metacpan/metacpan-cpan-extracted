@@ -34,63 +34,63 @@ no_index:
 provides:
   Log::Any:
     file: lib/Log/Any.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter:
     file: lib/Log/Any/Adapter.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Base:
     file: lib/Log/Any/Adapter/Base.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Capture:
     file: lib/Log/Any/Adapter/Capture.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::File:
     file: lib/Log/Any/Adapter/File.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Multiplex:
     file: lib/Log/Any/Adapter/Multiplex.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Null:
     file: lib/Log/Any/Adapter/Null.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Stderr:
     file: lib/Log/Any/Adapter/Stderr.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Stdout:
     file: lib/Log/Any/Adapter/Stdout.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Syslog:
     file: lib/Log/Any/Adapter/Syslog.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Test:
     file: lib/Log/Any/Adapter/Test.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Adapter::Util:
     file: lib/Log/Any/Adapter/Util.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Manager:
     file: lib/Log/Any/Manager.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Proxy:
     file: lib/Log/Any/Proxy.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Proxy::Null:
     file: lib/Log/Any/Proxy/Null.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Proxy::Test:
     file: lib/Log/Any/Proxy/Test.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Proxy::WithStackTrace:
     file: lib/Log/Any/Proxy/WithStackTrace.pm
-    version: '1.716'
+    version: '1.717'
   Log::Any::Test:
     file: lib/Log/Any/Test.pm
-    version: '1.716'
+    version: '1.717'
 resources:
   bugtracker: https://github.com/preaction/Log-Any/issues
   homepage: https://github.com/preaction/Log-Any
   repository: https://github.com/preaction/Log-Any.git
-version: '1.716'
+version: '1.717'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Andrew Grechkin <andrew.grechkin@gmail.com>'

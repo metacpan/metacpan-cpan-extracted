@@ -15,25 +15,46 @@ BEGIN {
         unless eval { require Moo };
 };
 
-my $conn = 0;
+my %conn;
+my $id;
 {
     package My::Mixed;
     use Resource::Silo -class;
     use Moo;
 
-    resource foo => sub {
-        [++$conn];
-    };
-    has bar => is => 'lazy', default => sub { $_[0]->foo->[0] };
+    has prefix => is => 'ro', default => sub { 'foo' };
+    resource conn =>
+        init => sub {
+            my $key = join "_", $_[0]->prefix, ++$id;
+            $conn{$key}++;
+            return $key;
+        },
+        cleanup => sub {
+            my $key = shift;
+            delete $conn{$key};
+        };
+    resource over => sub { };
 };
 
-my $mixed = My::Mixed->new;
+subtest 'no parameters' => sub {
+    my $mixed = My::Mixed->new;
 
-is $mixed->bar, 1, "both initialisations worked";
-is $conn, 1, "Counter increased accrodingly";
+    is $mixed->conn, 'foo_1', "both initializers worked";
+    is_deeply \%conn, { foo_1 => 1 }, "Counter increased accrodingly";
 
-# TODO
-# my $witharg = My::Mixed->new( bar => 42 );
-# this would die but it shouldn't
+    undef $mixed;
+    is_deeply \%conn, {}, "Cleanup worked";
+};
+
+subtest 'with parameter' => sub {
+    my $mixed = My::Mixed->new( prefix => 'bar', over => 42 );
+
+    is $mixed->conn, 'bar_2', "both initializers worked";
+    is $mixed->over, 42, "normal override worked, too";
+    is_deeply \%conn, { bar_2 => 1 }, "Counter increased accrodingly";
+
+    undef $mixed;
+    is_deeply \%conn, {}, "Cleanup worked";
+};
 
 done_testing;

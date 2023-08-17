@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -389,8 +389,6 @@ Here is an example:
 =head1 CAVEATS AND CONSIDERATIONS
 
 See L<Resource::Silo::Container> for resource container implementation.
-As of current, it is probably a bad idea to use L<Moose> on the same class
-as L<Resource::Silo>.
 
 =head2 CACHING
 
@@ -414,6 +412,23 @@ those will be simply created upon request.
 
 It is possible to make several resources depend on each other.
 Trying to initialize such resource will cause an expection, however.
+
+=head2 COMPATIBILITY
+
+As of current, using C<Resource::Silo -class> and C<Moose> in the same package
+doesn't work.
+
+Usage together with C<Moo> works, but only if L<Resource::Silo> comes first:
+
+    package My::App;
+    use Resource::Silo -class;
+    use Moo;
+
+    has config_name => is => ro, default => sub { '/etc/myapp/myfile.yaml' };
+
+    resource config => sub { LoadFile( $_[0]->config_name ) };
+
+Compatibility issues are being slowly worked on.
 
 =head1 SEE ALSO
 

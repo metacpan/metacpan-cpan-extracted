@@ -4,9 +4,9 @@ CXC::Form::Tiny::Plugin::OptArgs2
 easier to use Form::Tiny to validate command line options and arguments
 parsed by OptArgs2.
 
-It provides two new keywords to be used alongside Form::Tiny's
-"form_field" keyword which provide OptArgs2 option and argument
-specifications and link them to Form::Tiny fields.
+It provides new keywords to be used alongside Form::Tiny's "form_field"
+keyword to specify OptArgs2 options and arguments and link them to
+Form::Tiny fields.
 
 It adds a method to the form's class which returns the OptArgs2
 compatible "optargs" specification and another which sets the form's

@@ -17,6 +17,7 @@ t/git_background_new-exception.t
 t/git_background_new.t
 t/git_background_run-exception.t
 t/git_background_run.t
+t/git_background_run_utf8.t
 t/lib/Local/Test/Exception.pm
 t/lib/Local/Test/TempDir.pm
 t/lib/Local/Thing.pm
@@ -27,3 +28,4 @@ xt/await-slurp_error.t
 xt/lib/Local/FalseThing.pm
 xt/proc_background_new-exception.t
 xt/proc_background_wait-exception.t
+xt/run-tempfile_error.t

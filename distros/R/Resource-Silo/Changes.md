@@ -1,5 +1,8 @@
 # Revision history for Resource::Silo
 
+- 0.04    Thu Aug 17 2023
+    - Make constructor more compatible with Moo
+
 - 0.03    Tue Aug 15 2023
     - [api] Add 'class' to make Spring-style DI initilizers
       (like in Bread::Board)

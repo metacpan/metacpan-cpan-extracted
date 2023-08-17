@@ -50,7 +50,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use App::LXC::Container::Texts;
 

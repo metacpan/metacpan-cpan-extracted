@@ -135,14 +135,6 @@ my @list =
 $_ = @list;
 is($_, 0, 'non-existing package has no dependencies');
 
-# TODO: remove after smokers are free of failures:
-# special diagnostics for baffling test failure:
-diag('$singleton->{STATUS} has ', scalar(keys(%{$singleton->{STATUS}})) ,
-     ' entries (should be 3883)');
-my $las2d = $singleton->{STATUS}{'libasound2-data'};
-diag("\$singleton->{STATUS}{'libasound2-data'}{$_} == (",
-     join(',', @{$las2d->{$_}}), ')')   foreach   sort keys %$las2d;
-
 @list = App::LXC::Container::Data::depends_on('libasound2-data', 0);
 $_ = @list;
 is($_, 0, 'libasound2-data package has no mandatory dependencies');

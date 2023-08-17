@@ -32,7 +32,6 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
@@ -79,14 +78,12 @@
             "Pod::Weaver::Section::Contributors" : "0",
             "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
-            "Pod::Wordlist" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
-            "Test::Fixme" : "0",
-            "Test::More" : "0.96",
+            "Test::More" : "0.88",
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
@@ -95,31 +92,19 @@
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0",
             "Test::Vars" : "0.015",
-            "Test::Version" : "1",
-            "strict" : "0"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Form::Tiny" : "2.17",
-            "Form::Tiny::Plugin" : "0",
-            "Form::Tiny::Utils" : "0",
             "Hash::Fold" : "1.00",
-            "List::Util" : "0",
-            "Moo::Role" : "0",
+            "List::Util" : "1.29",
             "OptArgs2" : "2.00",
             "Ref::Util" : "0",
             "Scalar::Util" : "0",
-            "Type::Params" : "0",
-            "Types::Common::String" : "0",
             "Types::Standard" : "2.00",
-            "constant" : "0",
-            "experimental" : "0",
-            "namespace::clean" : "0",
-            "parent" : "0",
-            "perl" : "5.020",
-            "warnings" : "0"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -127,32 +112,30 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Form::Tiny" : "2.17",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "OptArgs2" : "2.00",
+            "List::Util" : "1.29",
+            "Ref::Util" : "0",
             "Test2::V0" : "0",
             "Test::Lib" : "0",
-            "Test::More" : "0",
-            "strict" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "CXC::Form::Tiny::Plugin::OptArgs2" : {
          "file" : "lib/CXC/Form/Tiny/Plugin/OptArgs2.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Form::Tiny::Plugin::OptArgs2::Class" : {
          "file" : "lib/CXC/Form/Tiny/Plugin/OptArgs2/Class.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Form::Tiny::Plugin::OptArgs2::Meta" : {
          "file" : "lib/CXC/Form/Tiny/Plugin/OptArgs2/Meta.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -167,7 +150,7 @@
          "web" : "https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"

@@ -69,6 +69,8 @@ is($foo->set_value("abc.int", 100),
 	0,
 	"set integer value - status ok"
 );
+
+# 11st
 is($foo->value("abc.int"),
 	100,
 	"get integer value - status ok"

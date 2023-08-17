@@ -29,12 +29,6 @@ get novel / bbs content from website
 txt : 指定解析txt文件
 
 
-=head2 support raw file
-
-支持处理序列化数据
-
-raw : 指定解析经MessagePack压缩的二进制文件
-
 
 =head1 INIT
 

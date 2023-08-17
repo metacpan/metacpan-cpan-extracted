@@ -4,11 +4,11 @@ NAME
 
 VERSION
 
-    Version 0.007
+    Version 0.008
 
 SYNOPSIS
 
-        use Git::Background 0.002;
+        use Git::Background 0.008;
 
         my $git = Git::Background->new($dir);
         my $future = $git->run('status', '-s');
@@ -39,6 +39,8 @@ USAGE
 
     The following options can be passed in the args hash to new. They are
     used as defaults for calls to run.
+
+    Current API available since 0.001.
 
   dir
 
@@ -97,6 +99,8 @@ USAGE
 
     Since version 0.004 run croaks if it gets called in void context.
 
+    Current API available since 0.004.
+
  version( [ARGS] )
 
     Returns the version of the used Git binary or undef if no Git command
@@ -111,6 +115,8 @@ USAGE
         else {
             say "You have Git version $version";
         }
+
+    Current API available since 0.001.
 
 EXAMPLES
 
@@ -138,7 +144,7 @@ EXAMPLES
 
         # then use the same object for working with the cloned repository
         my $future = $git->run('status', '-s');
-        my @dstdout = $future->stdout;
+        my @stdout = $future->stdout;
 
 SEE ALSO
 

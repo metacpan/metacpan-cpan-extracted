@@ -6,14 +6,14 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Scalar::Util qw( blessed );
-use Ref::Util 'is_plain_hashref';
+use Ref::Util    qw( is_plain_hashref is_arrayref is_regexpref is_ref );
 use Form::Tiny::Utils 'get_package_form_meta';
-use Types::Standard       qw( Bool CodeRef Dict Enum Int Optional Value );
-use Type::Params          qw( signature_for );
-use Types::Common::String qw ( NonEmptySimpleStr );
+use Types::Standard qw( ArrayRef Bool CodeRef Dict Enum Int Optional RegexpRef Tuple Undef Value );
+use Type::Params    qw( signature_for );
+use Types::Common::String qw ( NonEmptySimpleStr NonEmptyStr );
 
 use Moo::Role;
 
@@ -25,6 +25,59 @@ my sub croak {
     require Carp;
     goto \&Carp::croak;
 }
+
+# need to stash which form this field was added to in order to handle
+# inheritance of inherited fields which aren't options, but which
+# contain nested forms which *are* options.
+
+around add_field => sub ( $orig, $self, @parameters ) {
+    # this may return either a FieldDefinition or a FieldDefinition, but
+    # in either case, it has an addons methods.
+    my $field = $self->$orig( @parameters );
+    $field->addons->{ +__PACKAGE__ }{package} = $self->package;
+    return $field;
+};
+
+
+
+
+
+
+
+
+has inherit_required => (
+    is      => 'rwp',
+    isa     => Bool,
+    builder => sub { !!1 },
+);
+
+
+
+
+
+
+
+has inherit_optargs => (
+    is      => 'rwp',
+    isa     => Bool,
+    builder => sub { !!0 },
+);
+
+
+
+
+
+
+
+
+
+has inherit_optargs_match => (
+    is      => 'rwp',
+    isa     => Undef | ArrayRef [ Tuple [ Bool, RegexpRef ] ],
+    builder => sub { undef },
+);
+
+
 
 
 
@@ -69,6 +122,40 @@ sub rename_options ( $self, $opt ) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub inflate_optargs ( $self, $optargs ) {
+
+    state $folder = do {
+        require Hash::Fold;
+        Hash::Fold->new( delimiter => chr( 0 ) );
+    };
+
+    # make a copy of the flattened hash
+    my %flat = $optargs->%*;
+
+    # translate the OptArgs names into that required by the Form::Tiny structure
+    $self->rename_options( \%flat );
+
+    return $folder->unfold( \%flat );
+}
+
+
 sub _build_opt_args ( $self ) {
     my %rename;
 
@@ -85,6 +172,32 @@ sub _build_opt_args ( $self ) {
     return $self;
 }
 
+my sub _match_inherit_optargs ( $matches, $package ) {
+
+    my $excluded = 0;
+
+    for my $match ( $matches->@* ) {
+        my ( $retval, $qr ) = $match->@*;
+        return $retval if $package =~ $qr;
+        $excluded++ unless $retval;
+    }
+
+    # if no exclusions, then user forgot to add the exclude all
+    # catch-all at the end.  just having inclusions doesn't make
+    # sense.
+
+    return $excluded != 0;
+}
+
+sub _inherit_optargs ( $self, $package ) {
+
+    return $package eq $self->package
+      || (
+        $self->inherit_optargs
+        && ( !defined $self->inherit_optargs_match
+            || _match_inherit_optargs( $self->inherit_optargs_match, $package ) ) );
+}
+
 # this has too many arguments
 sub _create_options (
     $self, $rename,
@@ -93,7 +206,6 @@ sub _create_options (
     $blueprint = $self->blueprint( recurse => 0 ),
   )
 {
-
     my @optargs;
 
     for my $field ( sort keys $blueprint->%* ) {
@@ -108,33 +220,40 @@ sub _create_options (
             # unfortunately if the field name is nested, we only get here at the bottom of the
             # hierarchy, so need to backtrack.
 
-            my @paths = ( [ $path->@*, $field ] );
+            my @paths = ( [ $path->@*, $field ], [ $opt_path->@*, $field ] );
 
-            if ( $is_subform
-                and defined( my $name = ( ( $def->addons->{ +__PACKAGE__ } // {} )->{optargs} // {} )->{name} ) )
-            {
-                my @comp  = split( /[.]/, $def->name );
-                my @fixup = $opt_path->@*;
-                if ( @fixup ) {
-                    splice( @fixup, @fixup - @comp, @comp, $name );
+            if ( $is_subform ) {
+
+                my $addons = $def->addons->{ +__PACKAGE__ } // croak( 'no addons for field ' . $def->name );
+
+                # bail if we're not inheriting
+                next unless $self->_inherit_optargs( $addons->{package} );
+
+                if ( defined( my $name = ( $addons->{optargs} // {} )->{name} ) ) {
+
+                    ## no critic (ControlStructures::ProhibitDeepNests)
+                    if ( my @fixup = $opt_path->@* ) {
+                        my @comp = split( /[.]/, $def->name );
+                        splice( @fixup, @fixup - @comp, @comp, $name );
+                        # replace default opt_path
+                        $paths[-1] = \@fixup;
+                    }
+                    else {
+                        $paths[-1] = [$name];
+                    }
                 }
-                else {
-                    @fixup = ( $name );
-                }
-                push @paths, \@fixup;
+
+                push @optargs, get_package_form_meta( blessed $def->type )->_create_options( $rename, @paths )->@*;
             }
+
             else {
-                push @paths, [ $opt_path->@*, $field ];
+                push @optargs, $self->_create_options( $rename, @paths, $def )->@*;
             }
-
-            push @optargs,
-              $is_subform
-              ? get_package_form_meta( blessed $def->type )->_create_options( $rename, @paths )->@*
-              : $self->_create_options( $rename, @paths, $def )->@*;
 
         }
         else {
-            next unless defined( my $orig_optargs = $def->addons->{ +__PACKAGE__ }{optargs} );
+            my $addons = $def->addons->{ +__PACKAGE__ } // croak( 'no addons for field ' . $def->name );
+            next unless defined( my $orig_optargs = $addons->{optargs} );
 
             croak( "optargs initialized, but no option or argument specification for field $field?" )
               if !defined $orig_optargs->{spec};
@@ -179,7 +298,8 @@ sub _create_options (
             $optargs->{default} = $def->default->()
               if $optargs->{show_default} && $def->has_default;
 
-            push @optargs, [ $fq_option_name, $optargs ];
+            push @optargs, [ $fq_option_name, $optargs ]
+              if $self->_inherit_optargs( $addons->{package} );
         }
     }
 
@@ -201,13 +321,14 @@ sub _create_options (
         ) ];
 }
 
-my sub optarg ( $field, $spec ) {
+sub _add_optarg ( $self, $field, $spec ) {
     my $stash   = $field->addons->{ +__PACKAGE__ } //= {};
     my $optargs = ( $stash->{optargs} //= {} );
     croak( sprintf( 'duplicate definition for field %s', $field->name ) )
       if defined $optargs->{spec};
 
-    $spec->{required} //= !!$field->required;
+    $spec->{required} //= !!$field->required
+      if $self->inherit_required;
     $optargs->{spec} = $spec;
     return;
 }
@@ -263,7 +384,7 @@ sub _dsl_add_option ( $self, $context, $spec ) {
     my %spec = $spec->%*;
     $spec{isa} //= _resolve_type( $context, OptionTypeMap )
       // croak( sprintf( q{'isa' attribute not specified or resolved for %s}, $context->name ) );
-    optarg( $context, \%spec );
+    $self->_add_optarg( $context, \%spec );
 }
 
 signature_for _dsl_add_argument => (
@@ -289,7 +410,72 @@ sub _dsl_add_argument ( $self, $context, $spec ) {
     my %spec = $spec->%*;
     $spec{isa} //= _resolve_type( $context, ArgumentTypeMap )
       // croak( sprintf( q{'isa' attribute not specified or resolved for %s}, $context->name ) );
-    optarg( $context, \%spec );
+    $self->_add_optarg( $context, \%spec );
+}
+
+use constant { INCLUDE => q{+}, EXCLUDE => q{-} };
+
+my sub parse_inherit_matches ( $default, $entries ) {
+
+    my @matches;
+    my $include = $default;
+    for my $entry ( $entries->@* ) {
+
+        if ( is_arrayref( $entry ) ) {
+            push @matches, __SUB__->( $include, $entry )->@*;
+        }
+
+        elsif ( is_regexpref( $entry ) ) {
+            push @matches, [ $include eq INCLUDE, $entry ];
+        }
+
+        elsif ( $entry eq EXCLUDE || $entry eq EXCLUDE ) {
+            $include = $entry;
+            next;    # avoid reset of $include to default below
+        }
+
+        # every thing else is a regexp as a string; turn into a regexp
+        else {
+            push @matches, [ $include eq INCLUDE, qr/$entry/ ];
+        }
+
+        # reset include to default
+        $include = $default;
+    }
+
+    return \@matches;
+}
+
+
+signature_for _dsl_optargs_opts => (
+    method => 1,
+    head   => 1,
+    named  => [
+        inherit_required      => Optional [Bool],
+        inherit_optargs       => Optional [Bool],
+        inherit_optargs_match => Optional [ArrayRef],
+    ],
+);
+sub _dsl_optargs_opts ( $self, $context, $args ) {
+
+    croak( q{The 'optargs_opts' directive must be used before any fields are defined} )
+      if defined( $context );
+
+    $self->_set_inherit_required( $args->inherit_required )
+      if $args->has_inherit_required;
+
+    $self->_set_inherit_optargs( $args->inherit_optargs )
+      if $args->has_inherit_optargs;
+
+    if ( $args->has_inherit_optargs_match ) {
+        my $match = $args->inherit_optargs_match;
+        $match = [$match] unless is_arrayref( $match );
+
+        my $matches = parse_inherit_matches( INCLUDE, $match );
+        $self->_set_inherit_optargs_match( $matches );
+    }
+
+
 }
 
 #
@@ -316,14 +502,31 @@ CXC::Form::Tiny::Plugin::OptArgs2::Meta - Form metaclass role for OptArgs2
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
 This role is applied by L<CXC::Form::Tiny::Plugin::OptArgs2> to the
-form's metaclass.  It adds two new DSL directives, C<option> and
-C<argument>.  See L<CXC::Form::Tiny::Plugin::OptArgs2> for further
-information.
+form's metaclass.  It adds new DSL directives, C<optargs_opts>,
+C<option>, and C<argument>.  See L<CXC::Form::Tiny::Plugin::OptArgs2> for
+further information.
+
+=head1 OBJECT ATTRIBUTES
+
+=head2 inherit_required
+
+If I<true>, the option inherits the 'require' attribute from the associated form field.
+It defaults to I<true>.
+
+=head2 inherit_optargs
+
+If true, the output optargs will include those from forms which are superclasses of this one.
+
+=head2 inherit_optargs_match
+
+A regular expression which matches the class names of superclass forms
+to exclude from inheritance.  It defaults to C<undef> which is
+equivalent to matching everything.
 
 =head1 METHODS
 
@@ -340,6 +543,21 @@ the L<OptArgs2> C<optargs> option.
 
 Rename I<in place> the names of the options as returned by
 L<OptArgs2>.
+
+=head2 inflate_optargs
+
+  \%options = $form_meta->inflate( \%optargs );
+
+Inflate the "flat" options hash returned by L<OptArgs2> into the full
+hash required to initialize the form.
+
+When the L<OptArgs2> option specification is generated from the form
+structure via L</optargs>, the form structure is flattened into a one
+dimensional hash.  The hash keys are generated from the hierarchical
+keys and a mapping between the hash keys and the original hierarchy
+is recorded.
+
+This method restores the original structure.
 
 =head1 SUPPORT
 

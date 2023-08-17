@@ -3,17 +3,15 @@ abstract: 'A Plugin to interface Form::Tiny with OptArgs2'
 author:
   - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Form::Tiny: '2.17'
   IO::Handle: '0'
   IPC::Open3: '0'
-  OptArgs2: '2.00'
+  List::Util: '1.29'
+  Ref::Util: '0'
   Test2::V0: '0'
   Test::Lib: '0'
   Test::More: '0'
-  strict: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -34,37 +32,26 @@ no_index:
 provides:
   CXC::Form::Tiny::Plugin::OptArgs2:
     file: lib/CXC/Form/Tiny/Plugin/OptArgs2.pm
-    version: '0.04'
+    version: '0.05'
   CXC::Form::Tiny::Plugin::OptArgs2::Class:
     file: lib/CXC/Form/Tiny/Plugin/OptArgs2/Class.pm
-    version: '0.04'
+    version: '0.05'
   CXC::Form::Tiny::Plugin::OptArgs2::Meta:
     file: lib/CXC/Form/Tiny/Plugin/OptArgs2/Meta.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  Carp: '0'
   Form::Tiny: '2.17'
-  Form::Tiny::Plugin: '0'
-  Form::Tiny::Utils: '0'
   Hash::Fold: '1.00'
-  List::Util: '0'
-  Moo::Role: '0'
+  List::Util: '1.29'
   OptArgs2: '2.00'
   Ref::Util: '0'
   Scalar::Util: '0'
-  Type::Params: '0'
-  Types::Common::String: '0'
   Types::Standard: '2.00'
-  constant: '0'
-  experimental: '0'
-  namespace::clean: '0'
-  parent: '0'
   perl: '5.020'
-  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs
   repository: https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs.git
-version: '0.04'
+version: '0.05'
 x_generated_by_perl: v5.36.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

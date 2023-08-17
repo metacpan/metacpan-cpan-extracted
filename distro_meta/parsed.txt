@@ -86332,3 +86332,10 @@ Z/ZN/ZNMSTR/Zonemaster-CLI-v6.0.2.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-Engine-v4.7.2.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-LDNS-3.2.0.tar.gz
 R/RW/RWP/Zoom-Meeting-0.231740.tar.gz
+D/DO/DORNER/App-LXC-Container-0.15.tar.gz
+C/CN/CNANGEL/Conf-Libconfig-1.0.2.tar.gz
+D/DJ/DJERIUS/CXC-Form-Tiny-Plugin-OptArgs2-0.05.tar.gz
+S/SK/SKIRMESS/Git-Background-0.008.tar.gz
+P/PR/PREACTION/Log-Any-1.717.tar.gz
+A/AB/ABBYPAN/Novel-Robot-0.43.tar.gz
+K/KH/KHEDIN/Resource-Silo-0.04.tar.gz

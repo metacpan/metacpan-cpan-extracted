@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-L<Novel::Robot::Packer> pack novel/bbs content to txt / html / raw, etc
+L<Novel::Robot::Packer> pack novel/bbs content to ebook
 
 小说/贴子 打包引擎
 
@@ -12,11 +12,9 @@ L<Novel::Robot::Packer> pack novel/bbs content to txt / html / raw, etc
 
 支持输出类型
 
-    raw  : 经过MessagePack压缩的二进制文件
+    default : html 单网页格式
 
-    html : html单网页格式
-
-    txt  : txt文本格式
+    others :  txt, epub, mobi, ...
 
 =head1 FUNCTION
 
@@ -39,7 +37,6 @@ L<Novel::Robot::Packer> pack novel/bbs content to txt / html / raw, etc
        ], 
    };
    
-   my $ret = $self->main($book_ref, with_toc => 1);
-
+   my $ret = $packer->main($book_ref, { with_toc => 1 } );
 
 =cut

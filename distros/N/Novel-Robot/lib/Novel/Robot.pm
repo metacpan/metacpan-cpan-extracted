@@ -6,8 +6,11 @@ use utf8;
 
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
+use File::Copy;
+use Encode::Locale;
+use Encode;
 
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 sub new {
   my ( $self, %opt ) = @_;
@@ -51,13 +54,14 @@ sub get_novel {
     scalar( @{ $novel_ref->{item_list} } ) > 0
     ? $novel_ref->{item_list}[-1]{id}
     : ( $novel_ref->{item_num} || scalar( @{ $novel_ref->{item_list} } ) );
-  #print "\rlast_item_num: $last_item_num\n" if ( $o{verbose} );
-  print "\nlast_item_num: $last_item_num\n" if ( $o{verbose} );
 
-  $self->{packer}->format_item_output( $novel_ref, \%o );
-  my $r = $self->{packer}->main( $novel_ref, %o );
-  return wantarray ? ( $r, $novel_ref ) : $r;
+  my $dst_f = $self->{packer}->main( $novel_ref, \%o );
+  $dst_f = decode(locale=>$dst_f);
+  print "info: $novel_ref->{writer}-$novel_ref->{book}-$last_item_num\noutput: $dst_f\nlast_item_num: $last_item_num\n" if ( $o{verbose} );
+    
+  return wantarray ? ( $dst_f, $novel_ref ) : $dst_f;
 } ## end sub get_novel
+
 
 sub split_index {
   my $s = $_[-1];
@@ -71,8 +75,3 @@ sub split_index {
 
 1;
 
-=head1 NAME
-
-Novel::Robot - Download novel /bbs thread
-
-=cut

@@ -248,13 +248,17 @@ $broken->{packages} = [ grep { ! m{^dash$} } @{$broken->{packages}}];
 $broken->_parse_mounts();
 $broken->_parse_filter();
 $broken->{filter}{'/var/log'} = 'copy';
-stderr_like
-{   eval '$broken->_write_lxc_configuration();';   }
+SKIP:{
+    -f '/etc/debian_version'  or
+	skip 'invalid copy directory filter test only works with Debian', 2;
+    stderr_like
+    {   eval '$broken->_write_lxc_configuration();';   }
     qr{ may be inaccessible for LXC container's root account$re_eval},
     'invalid copy directory filter causes correct error message';
-like($@,
-     qr{^INTERNAL ERROR .+: /var/log is directory in COPY$re_eval},
-    'invalid copy directory filter fails');
+    like($@,
+	 qr{^INTERNAL ERROR .+: /var/log is directory in COPY$re_eval},
+	 'invalid copy directory filter fails');
+}
 $broken->{filter}{'/var/opt'} = 'invalid_value';
 eval {   $broken->_write_lxc_configuration();   };
 like($@,
@@ -554,10 +558,6 @@ obj_keys_in_range('mount_entry', 9, 12,
 		  'mounts test 1 has correct entry count');
 obj_keys_in_range('mount_source', 9, 12,
 		  'mounts test 1 has correct source count');
-# TODO: remove after smokers are free of failures:
-# special diagnostics for baffling test failure:
-diag($_, ' => ', $update_object->{mount_source}{$_})
-    foreach   sort keys %{$update_object->{mount_source}};
 is($update_object->{mount_entry}{$path2something},
    $path2something . ' ' . substr($path2something, 1)
    . ' none create=file,ro,bind 0 0',

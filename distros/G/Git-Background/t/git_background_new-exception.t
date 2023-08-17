@@ -53,6 +53,7 @@ note(q{to many/wrong arguments});
     my $dir = tempdir();
     like( exception { Git::Background->new( $dir, { fatal => 0, git => 'my-git' }, 'hello world' ) }, qr{\Qusage: new( [DIR], [ARGS] )\E}, 'new throws an exception with to many arguments' );
     like( exception { Git::Background->new( $dir, 'hello world' ) }, qr{\Qusage: new( [DIR], [ARGS] )\E}, 'new throws an exception with wrong argument' );
+    like( exception { Git::Background->new( {},   {} ) },            qr{\Qusage: new( [DIR], [ARGS] )\E}, 'new throws an exception with wrong argument' );
 }
 
 #

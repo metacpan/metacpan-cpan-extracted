@@ -2,6 +2,16 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.717     2023-08-17 10:52:21-05:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed WithStackTrace proxy to remove arguments in-place instead of
+    always stringifying the exception object immediately. This means we
+    need to handle different exception objects differently, but it also
+    means a better log message. Thanks @larryl and @GrantStreetGroup for
+    submitting this fix! [Github #100]
+
 1.716     2023-06-26 14:14:46-05:00 America/Chicago
 
   [Added]

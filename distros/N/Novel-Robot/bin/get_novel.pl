@@ -1,11 +1,11 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 use strict;
 use warnings;
 use utf8;
 
 use Encode::Locale;
 use Encode;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use Novel::Robot;
 use Data::Dumper;
 
@@ -16,24 +16,25 @@ binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
 GetOptions(
-    \%opt,
-    'site|s=s', 'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
-    'type|t=s', 'output|o=s',
-    'item|i=s', 'page|p=s', 'cookie|c=s',
-    'not_download|D', 'verbose|v',
-    'term_progress_bar', 
+  \%opt,
 
-    'use_chrome', 
-    'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
-    'max_process_num=i', 
-    'chapter_regex=s', 
-    'content_path=s',  'writer_path=s',  'book_path=s', 'item_list_path=s',
-    'content_regex=s', 'writer_regex=s', 'book_regex=s',
+  'site|s=s',       'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
+  'type|t=s',       'output|o=s',
+  'item|i=s',       'page|j=s', 'cookie|c=s',
+  'not_download|D', 'verbose|v',
+  'term_progress_bar',
+
+  'use_chrome',
+  'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
+  'max_process_num=i',
+  'chapter_regex=s',
+  'content_path=s',  'writer_path=s',  'book_path=s', 'item_list_path=s',
+  'content_regex=s', 'writer_regex=s', 'book_regex=s',
+
 );
 
 %opt = read_option( %opt );
 
-#our $xs = Novel::Robot->new( type => $opt{type}, site => $opt{site} );
 our $xs = Novel::Robot->new( %opt );
 if ( $opt{cookie} ) {
   my ( $dom, $base_dom ) = $xs->{parser}->detect_domain( $xs->{parser}->domain() || $opt{url} );
@@ -58,17 +59,17 @@ sub read_option {
   my ( %opt ) = @_;
   $opt{site} ||= $opt{url} || $opt{file};
   $opt{type} ||= 'html';
-  $opt{with_toc}        //= 1;
-  $opt{term_progress_bar}        //= 0;
-  $opt{max_process_num} //= 1;
-  $opt{verbose}         //= 0;
+  $opt{with_toc}          //= 1;
+  $opt{term_progress_bar} //= 0;
+  $opt{max_process_num}   //= 1;
+  $opt{verbose}           //= 0;
 
   for my $k (
     qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path
     chapter_regex
     grep_content filter_content
     /
-    ) {
+  ) {
     next unless ( exists $opt{$k} );
     $opt{$k} = decode( locale => $opt{$k} );
   }

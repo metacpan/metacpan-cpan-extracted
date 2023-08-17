@@ -14,7 +14,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'sbqkPiD', \%opt );
+getopt( 'sbqkjiD', \%opt );
 
 my %opt_out = read_option( %opt );
 our $xs = Novel::Robot->new( type => 'txt', site => $opt_out{site} );
@@ -35,7 +35,7 @@ for my $r ( @$items_ref ) {
   if ( $opt_out{not_download} ) {
     print join( ",", $r->{writer} || $info, $r->{book} || $r->{title}, $r->{url} ), "\n";
   } else {
-    $xs->get_item( $u, %$r, %opt_out );
+    $xs->get_novel( $u, %opt_out );
   }
 }
 
@@ -50,7 +50,7 @@ sub read_option {
     not_download => $opt{D} // 1,
   );
 
-  if ( $opt{P} ) {
+  if ( $opt{j} ) {
     @opt_out{qw/min_page_num max_page_num/} = Novel::Robot::split_index( $opt{P} );
   }
 
