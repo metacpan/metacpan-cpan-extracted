@@ -9,69 +9,80 @@ use Import::Into;
 use Sub::Util 'set_subname';
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
-use feature    ();
-use utf8       ();
-use mro        ();
-use IO::File   ();
-use IO::Handle ();
-use Try::Tiny  ();
-use Carp       qw( croak carp confess cluck );
+use feature      ();
+use utf8         ();
+use mro          ();
+use Carp         qw( croak carp confess cluck );
+use IO::File     ();
+use IO::Handle   ();
+use Try::Tiny    ();
+use PerlX::Maybe ();
 
-my %features = (
-    10 => [ qw( say state switch ) ],
-    12 => ['unicode_strings'],
-    16 => [ qw( unicode_eval evalbytes current_sub fc ) ],
-    18 => ['lexical_subs'],
-    24 => [ qw( postderef postderef_qq ) ],
-    28 => ['bitwise'],
-    32 => [ qw( isa indirect ) ],
-);
-
-my %deprecated = (
-    16 => ['array_base'],
-);
-
-my %experiments = (
-    20 => ['signatures'],
-    22 => ['refaliasing'],
-    26 => ['declared_refs'],
-);
-
-my @function_list = qw(
-    nostrict nowarnings noutf8 noc3 nobundle noexperiments noskipexperimentalwarnings noautoclean nocarp
-    notry trytiny noisa
-);
-
-my @feature_list   = map { @$_ } values %features, values %deprecated, values %experiments;
 my ($perl_version) = $^V =~ /^v5\.(\d+)/;
+
+my $features_available = ( %feature::feature_bundle and $feature::feature_bundle{all} )
+    ? $feature::feature_bundle{all}
+    : [ qw( say state switch unicode_strings ) ];
+
+my $functions_available = [ qw(
+    nostrict nowarnings
+    nofeatures nobundle noskipexperimentalwarnings
+    noutf8 noc3 nocarp notry trytiny nomaybe noautoclean
+) ];
+
+my $functions_deprecated = ['noexperiments'];
 
 my ( $no_parent, $late_parent );
 
 sub import {
     my ( $self, $caller ) = ( shift, caller() );
-    my ( @bundles, @functions, @features, @classes );
 
+    my ( @features, @nofeatures, @functions, @bundles, @classes );
     for (@_) {
         ( my $opt = $_ ) =~ s/^\-//;
 
-        if ( grep { $_ eq $opt } @feature_list ) {
+        if ( $opt eq 'class' ) {
+            push( @classes, $opt );
+        }
+        elsif ( $opt eq 'cor' ) {
+            push( @features, 'class' );
+        }
+        elsif ( $opt eq 'nocor' ) {
+            push( @nofeatures, 'class' );
+        }
+        elsif ( grep { $_ eq $opt } @$features_available ) {
             push( @features, $opt );
         }
-        elsif ( grep { $_ eq $opt } @function_list ) {
-            push( @functions, $opt );
+        elsif ( my ($nofeature) = grep { 'no' . $_ eq $opt } @$features_available ) {
+            push( @nofeatures, $nofeature );
+        }
+        elsif ( grep { $_ eq $opt } @$functions_available, @$functions_deprecated ) {
+            push( @functions, $opt ) if ( grep { $_ eq $opt } @$functions_available );
         }
         elsif ( $opt =~ /^:?v?5?\.?(\d+)/ and $1 >= 10 ) {
             push( @bundles, $1 );
         }
         else {
-            push( @classes, $opt );
+            push( @classes, $opt ) if ( $opt !~ /^no[a-z]{2}/ );
         }
     }
 
-    strict->import unless ( grep { $_ eq 'nostrict' } @functions );
+    strict  ->import unless ( grep { $_ eq 'nostrict'   } @functions );
     warnings->import unless ( grep { $_ eq 'nowarnings' } @functions );
+
+    if (@bundles) {
+        feature->import( ':5.' . $_ ) for (@bundles);
+    }
+    elsif (
+        not grep { $_ eq 'nofeatures' } @functions and
+        not grep { $_ eq 'nobundle'   } @functions
+    ) {
+        feature->import( $perl_version >= 16 ? ':all' : ':5.' . $perl_version );
+    }
+    feature->import($_)   for (@features);
+    feature->unimport($_) for (@nofeatures);
 
     unless ( grep { $_ eq 'noutf8' } @functions ) {
         utf8->import;
@@ -81,49 +92,33 @@ sub import {
 
     mro::set_mro( $caller, 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
 
-    if (@bundles) {
-        my ($bundle) = sort { $b <=> $a } @bundles;
-        feature->import( ':5.' . $bundle );
-    }
-    elsif ( not grep { $_ eq 'nobundle' } @functions ) {
-        feature->import( ':5.' . $perl_version );
-    }
-
-    push( @features, 'isa' ) if (
-        $perl_version >= 32 and
-        not grep { $_ eq 'isa' } @features and
-        not grep { $_ eq 'noisa' } @functions
-    );
-
-    feature->unimport('indirect') if ( $perl_version >= 32 );
-
-    try {
-        feature->import($_) for (@features);
-        my @experiments = map { @{ $experiments{$_} } } grep { $_ <= $perl_version } keys %experiments;
-        feature->import(@experiments) unless ( not @experiments or grep { $_ eq 'noexperiments' } @functions );
-    }
-    catch ($err) {
-        $err =~ s/\s*at .+? line \d+\.\s+//;
-        croak("$err via use of exact");
-    }
-
     monkey_patch( $self, $caller, ( map { $_ => \&{ 'Carp::' . $_ } } qw( croak carp confess cluck ) ) )
         unless ( grep { $_ eq 'nocarp' } @functions );
 
-    my $trytiny = ( grep { $_ eq 'trytiny' } @functions ) ? 1 : 0;
-    my $notry   = ( grep { $_ eq 'notry'   } @functions ) ? 1 : 0;
-
-    Syntax::Keyword::Try->import_into($caller) unless ( $trytiny or $notry );
-
+    feature->unimport('try') if (
+        grep { $_ eq 'try' } @$features_available and
+        (
+            grep { $_ eq 'notry'   } @functions or
+            grep { $_ eq 'trytiny' } @functions
+        )
+    );
+    Syntax::Keyword::Try->import_into($caller) if (
+        $perl_version < 36 and
+        not grep { $_ eq 'notry'   } @functions and
+        not grep { $_ eq 'trytiny' } @functions
+    );
     eval qq{
         package $caller {
             use Try::Tiny;
         };
-    } if ( $trytiny and not $notry );
+    } if ( grep { $_ eq 'trytiny' } @functions );
+
+    monkey_patch( $self, $caller, ( map { $_ => \&{ 'PerlX::Maybe::' . $_ } } qw(
+        maybe provided provided_deref provided_deref_with_maybe
+    ) ) ) unless ( grep { $_ eq 'nomaybe' } @functions );
 
     my @late_parents = ();
-
-    my $use = sub {
+    my $use          = sub {
         my ( $class, $pm, $caller, $params ) = @_;
 
         my $failed_require;
@@ -152,7 +147,6 @@ sub import {
 
         return 1;
     };
-
     for my $class (@classes) {
         my $params = ( $class =~ s/\(([^\)]+)\)// ) ? [$1] : [];
         ( my $pm = $class ) =~ s{::|'}{/}g;
@@ -174,7 +168,6 @@ sub import {
             '(@INC contains: ' . join( ' ', @INC ) . ')'
         );
     }
-
     $self->add_isa(@$_) for @late_parents;
 
     warnings->unimport('experimental')
@@ -279,7 +272,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.19
+version 1.22
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -290,21 +283,17 @@ Instead of this:
 
     use strict;
     use warnings;
+    use feature ':all';
+    no warnings "experimental";
     use utf8;
     use open ':std', ':utf8';
-    use feature ':5.32';
-    use feature qw( signatures refaliasing bitwise isa );
-    no feature 'indirect';
     use mro 'c3';
     use IO::File;
     use IO::Handle;
-    use namespace::autoclean;
     use Carp qw( croak carp confess cluck );
     use Syntax::Keyword::Try;
-
-    no warnings "experimental::signatures";
-    no warnings "experimental::refaliasing";
-    no warnings "experimental::bitwise";
+    use PerlX::Maybe ':all';
+    use namespace::autoclean;
 
 Type this:
 
@@ -312,7 +301,7 @@ Type this:
 
 Or for finer control, add some trailing modifiers like a line of the following:
 
-    use exact -noexperiments, -fc, -signatures;
+    use exact -nofeatures, -signatures, -try, -say, -state;
     use exact 5.16, -nostrict, -nowarnings, -noc3, -noutf8, -noautoclean;
     use exact '5.20';
 
@@ -333,27 +322,15 @@ enable L<strictures> (version 2)
 
 =item *
 
-activate the latest L<feature> bundle supported by the current Perl version
-
-=item *
-
-activate all experimental L<feature>s and switch off experimental warnings
-
-=item *
-
-activate the C<isa> feature (if Perl version is 5.32 or greater)
-
-=item *
-
-deactivate the C<indirect> feature
-
-=item *
-
-set C3 style of L<mro>
+enable all available L<feature>s and switch off experimental warnings
 
 =item *
 
 use utf8 in the source code context and set STDIN, STROUT, and STRERR to handle UTF8
+
+=item *
+
+set C3 style of L<mro>
 
 =item *
 
@@ -365,7 +342,15 @@ import L<Carp>'s 4 methods
 
 =item *
 
-cause L<Syntax::Keyword::Try> to import its methods
+implement a C<try...catch...finally> block solution based on Perl version
+
+=item *
+
+import L<PerlX::Maybe>'s 4 methods
+
+=item *
+
+autoclean the namespace via L<namespace::autoclean>
 
 =back
 
@@ -381,6 +366,17 @@ This skips turning on the L<strict> pragma.
 
 This skips turning on the L<warnings> pragma.
 
+=head2 C<nofeatures>
+
+Normally, L<exact> will enable all available L<feature>s. Applying C<nofeatures>
+causes this behavior to be skipped. You can still explicitly set features and/or
+bundles.
+
+=head2 C<noskipexperimentalwarnings>
+
+Normally, L<exact> will disable experimental warnings. This skips that
+disabling step.
+
 =head2 C<noutf8>
 
 This skips turning on UTF8 in the source code context. Also skips setting
@@ -390,50 +386,39 @@ STDIN, STDOUT, and STDERR to expect UTF8.
 
 This skips setting C3 L<mro>.
 
-=head2 C<nobundle>
+=head2 C<nocarp>
 
-Normally, L<exact> will look at your current version and find the highest
-supported L<feature> bundle and enable it. Applying C<nobundle> causes this
-behavior to be skipped. You can still explicitly set bundles yourself.
+This skips importing the 4 L<Carp> methods: C<croak>, C<carp>, C<confess>, and
+C<cluck>.
 
-=head2 C<noexperiments>
+=head2 C<notry>
 
-This skips enabling all features currently labled experimental by L<feature>.
+This skips setting up C<try...catch...finally> support. This support is provided
+either by the native Perl C<try> feature if available or else by importing the
+functionality of L<Syntax::Keyword::Try> otherwise.
 
-=head2 C<noskipexperimentalwarnings>
+=head2 C<trytiny>
 
-Normally, L<exact> will disable experimental warnings. This skips that
-disabling step.
+If you want to use L<Try::Tiny> instead of either native Perl's C<try> feature
+or L<Syntax::Keyword::Try>, this is how.
+
+=head2 C<nomaybe>
+
+This skips loading the 4 L<namespace::autoclean> methods: C<maybe>, C<provided>,
+C<provided_deref>, and C<provided_deref_with_maybe>.
 
 =head2 C<noautoclean>
 
 This skips using L<namespace::autoclean>.
 
-=head2 C<nocarp>
-
-This skips importing the 4 L<Carp> methods: C<croak>, C<carp>, C<confess>,
-C<cluck>.
-
-=head2 C<notry>
-
-This skips importing the functionality of L<Syntax::Keyword::Try>.
-
-=head2 C<trytiny>
-
-If you want to use L<Try::Tiny> instead of L<Syntax::Keyword::Try>, this is how.
-Note that if you specify both C<trytiny> and C<notry>, the latter will win.
-
-=head2 C<noisa>
-
-The C<isa> feature is activated by default if the Perl version is 5.32 or
-greater. If you want not that, specify C<noisa>.
-
 =head1 BUNDLES
 
-You can always provide a list of explicit features and bundles from L<feature>.
-If provided, these will be enabled regardless of the other import flags set.
+By default, the "all" bundle is enabled. You can skip this by including an
+explicit bundle name or C<nofeatures>. You can enable and disable features.
 
-    use exact -noexperiments, -fc, -signatures;
+    use exact -nofeatures, -signatures, -try, -say, -state;
+    use exact 5.16, -nosay, -nostate;
+    use exact '5.20';
 
 Bundles provided can be exactly like those described in L<feature> or in a
 variety of obvious forms:
@@ -462,13 +447,18 @@ Note that bundles are exactly the same as what's in L<feature>, so for any
 feature not part of a version bundle in L<feature>, you won't pick up that
 feature with a bundle unless you explicitly declare the feature.
 
-The exception to this is C<isa>, which is available in Perl 5.32 and greater but
-not included in the 5.32 bundle. However, C<isa> is explicitly included if your
-Perl version is 5.32 or greater unless you specify C<noisa>.
+=head2 C<class> versus C<cor>
 
-Note also that the C<indirect> feature is unimported by default, which is
-counter to the non-exact default way, which is to import it. You can deunimport
-C<indirect> by explicitly specifying C<indirect>.
+To avoid a conflict between the L<exact::class> extension (see below) and the
+C<class> feature available as of Perl 5.37, the C<class> feature gets handled
+slightly differently from other features. If using Perl 5.37 or newer and
+nothing is specified, the default behavior is to enable the C<class> feature.
+
+To explicitly enable the feature, though, you must use the C<cor> flag.
+
+    use exact -nofeatures, -cor;
+
+To explicitly disable the feature, use the C<nocor> flag.
 
 =head1 EXTENSIONS
 

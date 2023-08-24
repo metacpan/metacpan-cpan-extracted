@@ -17,7 +17,10 @@ my @files = (
     't/data/cscquery.csc',
     't/inherit.t',
     't/lib/My/Test/AutoCleanHash.pm',
+    't/lib/My/Test/Plugin.pm',
+    't/lib/My/Test/Plugin/Meta.pm',
     't/nested.t',
+    't/optargs_opts.t',
     't/required.t'
 );
 

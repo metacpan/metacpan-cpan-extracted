@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use utf8;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
-package App::sdview::Output::Terminal 0.09;
+package App::sdview::Output::Terminal 0.10;
 class App::sdview::Output::Terminal
    :isa(App::sdview::Output::Formatted)
    :strict(params);

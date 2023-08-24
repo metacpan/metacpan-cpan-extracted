@@ -8,7 +8,7 @@ use File::Remove ();
 use File::Spec::Functions ':ALL';
 
 use vars qw{@ISA @EXPORT};
-our $VERSION = '1.99';
+our $VERSION = $ORLite::VERSION;
 BEGIN {
 	@ISA     = 'Exporter';
 	@EXPORT  = qw{ test_db connect_ok create_ok };

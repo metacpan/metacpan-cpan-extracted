@@ -1,5 +1,5 @@
 package Acme::Daily::Fail;
-$Acme::Daily::Fail::VERSION = '1.20';
+$Acme::Daily::Fail::VERSION = '1.22';
 #ABSTRACT: generate random newspaper headlines
 
 use strict;
@@ -86,7 +86,7 @@ my $subjects = [
 	["cancer",3,1],               # Could cancer give you cancer?
 	["binge drinking",3,1],
 	["the house price crash",3,1],# Hahahaha
-	["jihadists",3,1],             # Topical
+	["jihadists",3,2],             # Topical
 	["x factor",3,1],             # Topical
 	["foxes",3,2],
 	["twitter",3,1],            # Topical
@@ -94,6 +94,7 @@ my $subjects = [
   ["judges",3,2],
   ["covid",3,1],              # fuck you, 2020
   ['meghan markle',3,1],
+  ['woke',3,1],
 ];
 
 # Transitive phrases (i.e. bad thing they do)
@@ -147,6 +148,7 @@ my $objects = [
 	"british sovereignty",
 	"common sense and decency",
 	"the queen",    # God bless 'er
+	"the king",     # God bless 'im
 	"the royal family",
 	"the church",
 	"you",
@@ -225,7 +227,7 @@ Acme::Daily::Fail - generate random newspaper headlines
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 SYNOPSIS
 

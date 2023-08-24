@@ -47,7 +47,7 @@ has migrations => (
 
 has _executor => (
     is      => 'ro',
-    handles => [qw(insert update delete select execute dbi)]
+    handles => [qw(insert update delete select select_one execute dbi)]
 );
 
 sub BUILD {

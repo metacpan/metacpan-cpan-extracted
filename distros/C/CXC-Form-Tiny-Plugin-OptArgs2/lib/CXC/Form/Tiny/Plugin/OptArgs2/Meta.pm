@@ -6,7 +6,7 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 use Scalar::Util qw( blessed );
 use Ref::Util    qw( is_plain_hashref is_arrayref is_regexpref is_ref );
@@ -353,6 +353,13 @@ sub _resolve_type ( $field, $type_set ) {
 
     my $type = $field->type;
 
+    # take care of top level Any. Many other types inherit (eventually) from Any,
+    # so the inheritance scan below will resolve types we don't support
+    # if we add Any to OptionTypeMap and ArgumentTypeMap
+
+    return $type_set->{Str}
+      if $type->name eq 'Any';
+
     while ( defined $type ) {
         return $type_set->{ $type->name } if exists $type_set->{ $type->name };
         $type = $type->parent;
@@ -502,7 +509,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Meta - Form metaclass role for OptArgs2
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 DESCRIPTION
 
@@ -563,17 +570,17 @@ This method restores the original structure.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs>
+Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs2@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs2>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs.git
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2.git
 
 =head1 SEE ALSO
 

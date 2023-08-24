@@ -3,7 +3,6 @@ use Test::More;
 use Test::Exception;
 
 use Catmandu::Fix::pica_update as => 'pica_update';
-use Catmandu::Importer::PICA;
 
 my $record = { record => [
   ['021A', '', 'a', 'title'],

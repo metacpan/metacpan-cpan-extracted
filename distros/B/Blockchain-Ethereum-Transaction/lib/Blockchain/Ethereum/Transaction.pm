@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::Transaction 0.005;
+package Blockchain::Ethereum::Transaction 0.008;
 role Blockchain::Ethereum::Transaction;
 
 =encoding utf8
@@ -25,7 +25,7 @@ In most cases you don't want to use this directly, use instead:
 =cut
 
 use Carp;
-use Digest::Keccak qw(keccak_256);
+use Crypt::Digest::Keccak256 qw(keccak256);
 
 use Blockchain::Ethereum::RLP;
 
@@ -97,7 +97,13 @@ Returns the SHA3 transaction hash bytes
 
 method hash {
 
-    return keccak_256($self->serialize);
+    return keccak256($self->serialize);
+}
+
+# In case of Math::BigInt given for any params, get the hex value
+method _equalize_params ($params) {
+
+    return [map { ref $_ eq 'Math::BigInt' ? $_->as_hex : $_ } $params->@*];
 }
 
 1;

@@ -58,7 +58,7 @@ es-index-scan.pl - Scan indexes for potential issues
 
 =head1 VERSION
 
-version 8.6
+version 8.7
 
 =head1 AUTHOR
 

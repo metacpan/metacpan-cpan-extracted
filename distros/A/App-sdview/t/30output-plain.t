@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
 
 # We don't have a "plain" input, but we can input from POD or Markdown and test
 # that we get some expected output

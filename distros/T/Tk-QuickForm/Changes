@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::QuickForm.
 
+0.04  Sun Aug 20 2023
+	Updated dependancies.
+	Made method createForm return the notebook, if any;
+
 0.03  Sat Jul 01 2023
 	Fixed bug with loading item classes.
 

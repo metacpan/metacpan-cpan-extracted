@@ -7,7 +7,7 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
-  Object::Pad::ExtensionBuilder: '0.57'
+  Object::Pad::ExtensionBuilder: '0.802'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,10 +18,10 @@ name: Object-Pad-FieldAttr-LazyInit
 provides:
   Object::Pad::FieldAttr::LazyInit:
     file: lib/Object/Pad/FieldAttr/LazyInit.pm
-    version: '0.06'
+    version: '0.07'
 requires:
-  Object::Pad: '0.66'
+  Object::Pad: '0.802'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

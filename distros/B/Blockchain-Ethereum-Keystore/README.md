@@ -16,11 +16,19 @@ Generating a new address and writing it to a keyfile:
 ```perl
     my $key = Blockchain::Ethereum::Keystore::Key->new;
     # checksummed address
-    print $key->address->prefixed;
+    print $key->address;
     my $keyfile = Blockchain::ethereum::Keystore::Keyfile->new;
 
     $keyfile->import_key($key);
     $keyfile->write_to_file("...");
+```
+
+Generating a new seed and derivating new keys (BIP44):
+
+```perl
+    my $seed = Blockchain::Ethereum::Keystore::Seed->new;
+    my $key = $seed->derive_key(0);
+    print $key->address;
 ```
 
 Importing a keyfile and changing the password:

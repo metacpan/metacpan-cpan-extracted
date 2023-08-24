@@ -1,0 +1,4 @@
+<%INIT>
+$m->comp('/Elements/PinCommentBeforeShowHistory', %ARGS);
+return;
+</%INIT>

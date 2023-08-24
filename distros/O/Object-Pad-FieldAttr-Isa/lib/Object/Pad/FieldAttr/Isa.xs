@@ -46,7 +46,7 @@ static const MGVTBL vtbl = {
   .svt_set = &magic_set,
 };
 
-static bool isa_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool isa_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   struct Data *data;
   Newx(data, 1, struct Data);
@@ -55,22 +55,22 @@ static bool isa_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, 
   data->fieldname = SvREFCNT_inc(mop_field_get_name(fieldmeta));
   data->classname = SvREFCNT_inc(value);
 
-  *hookdata_ptr = (SV *)data;
+  *attrdata_ptr = (SV *)data;
 
   return TRUE;
 }
 
-static void isa_seal(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata)
+static void isa_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata)
 {
-  struct Data *data = (struct Data *)hookdata;
+  struct Data *data = (struct Data *)attrdata;
 
   if(mop_field_get_attribute(fieldmeta, "weak"))
     data->is_weak = true;
 }
 
-static void isa_post_initfield(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, SV *field)
+static void isa_post_makefield(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, SV *field)
 {
-  sv_magicext(field, newSV(0), PERL_MAGIC_ext, &vtbl, (char *)hookdata, 0);
+  sv_magicext(field, newSV(0), PERL_MAGIC_ext, &vtbl, (char *)attrdata, 0);
 }
 
 static const struct FieldHookFuncs isa_hooks = {
@@ -80,7 +80,7 @@ static const struct FieldHookFuncs isa_hooks = {
 
   .apply          = &isa_apply,
   .seal           = &isa_seal,
-  .post_initfield = &isa_post_initfield,
+  .post_makefield = &isa_post_makefield,
 };
 
 MODULE = Object::Pad::FieldAttr::Isa    PACKAGE = Object::Pad::FieldAttr::Isa

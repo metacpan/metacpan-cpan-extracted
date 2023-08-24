@@ -6,7 +6,7 @@ use X11::Xlib;
 use Scalar::Util 'weaken';
 
 # All modules in dist share a version
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ this object.
 While there are always less than 255 hardware scan codes, the set of device-
 independent KeySym codes is huge (including Unicode as a subset).
 Since the KeySym constants can't be practically exported by a Perl module,
-this API mostly tries to let you use the symbolic names of keys, or unicode
+this API mostly tries to let you use the symbolic names of keys, or Unicode
 characters.  Translating KeySym names and characters to/from KeySym values is
 a client-side operation.
 
@@ -63,7 +63,7 @@ Arrayref that maps from a key code (byte) to an arrayref of KeySyms.
 Each KeyCode (up to 255 of them) is used as an index into the outer array,
 and the inner array's elements correspond to different shift/mode states,
 where "mode2" indicates a dynamic switch of key layout of some sort.
-Each key's array can contain additonal vendor-specific elements.
+Each key's array can contain additional vendor-specific elements.
 
 This table is stored exactly as loaded from the X11 server.
 
@@ -113,7 +113,7 @@ On a modern US-English Linux desktop you will likely find:
 but the numbers 3..7 can be re-purposed by your particular key layout.
 Note that X11 has a concept of "mode switching" where a modifier completely
 changes the meaning of every key.  I think this is used by multi-lingual
-setups, but I've not tested/confirmed this.
+setups, but I have not tested/confirmed this.
 
 =cut
 
@@ -180,7 +180,7 @@ sub new {
   my $keycode= $display->find_keycode( $key_sym_or_char );
 
 Return a keycode for the parameter, which is either a KeySym name
-(L<XStringToKeysym|X11::Xlib/XStringToKeysym>) or a string holding a unicode character
+(L<XStringToKeysym|X11::Xlib/XStringToKeysym>) or a string holding a Unicode character
 (L<char_to_keysym|X11::Xlib/char_to_keysym>).  If more than one key code can map to
 the KeySym, this returns an arbitrary one of them.  Returns undef if
 no matches were found.
@@ -317,7 +317,7 @@ sub modmap_sym_list {
 Adds key codes (and remove duplicates) to one of the eight modifier groups.
 C<$modifier> is one of the values listed above.
 
-Throws an exception if C<$modifier> doesn't exist.
+Throws an exception if C<$modifier> does not exist.
 Returns the number of key codes added.
 
 =head2 modmap_add_syms
@@ -365,7 +365,7 @@ sub modmap_add_syms {
 Removes the listed key codes from the named modifier, or from all modifiers
 if C<$modifier> is undef.
 
-Warns if C<$modifier> doesn't exist.
+Warns if C<$modifier> does not exist.
 Silently ignores key codes that don't exist in the modifiers.
 Returns number of key codes removed.
 
@@ -450,7 +450,7 @@ __END__
 
 =head2 Press a Key
 
-Suppose you've got an old DOS game that you're playing in Dosbox, and you
+Suppose you have an old DOS game that you are playing in Dosbox, and you
 find a neat trick to level up your character by pressing 'R' repeatedly.
 You might bang out a quick perl one-liner like this:
 

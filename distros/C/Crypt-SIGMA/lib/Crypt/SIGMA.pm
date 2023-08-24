@@ -3,7 +3,7 @@ package Crypt::SIGMA;
 
 use strict;
 use warnings;
-use bignum;
+#use bignum;
 
 require Exporter;
 
@@ -17,6 +17,8 @@ use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::ECDSA;
 
 #use Smart::Comments;
+
+our $VERSION=0.012;
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw/

@@ -1,9 +1,57 @@
 ==================================================
-Changes from 2021-07-20 00:00:00 +0000 to present.
+Changes from 2021-08-18 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.6 at 2023-07-20 20:26:02 +0000
+version 8.7 at 2023-08-18 17:05:23 +0000
+----------------------------------------
+
+  Change: 498b1b1896ab84bb1248f3c915783cf90a574dd2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-08-18 10:04:19 +0000
+
+    Even better date handling
+
+    Stumbled into some issues with the date handling in the code base. This
+    make it more usable.
+
+    * Removes the `--date-separator|--date-sep` CLI switches * Uses a regex to
+    match `YYYY.MM.DD`, `YYYY-MM-DD`, or `YYYYMMDD` in
+
+    index names to attain the date string of the index 
+
+  Change: fc436cc90fa731ab8313a33c2c3cc6658c1c7daf
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-08-18 10:04:19 +0000
+
+    Tweak the ignore list a bit more 
+
+  Change: 84a05bf482f3489177f0afe689dacce6b8ddc1e1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-08-18 10:04:19 +0000
+
+    Fixes for metrics collected
+
+    * Formatting fixed for metrics ending in `_millis` * Format key names
+    better by removing all non-alphanumeric characters * Update the logic for
+    determining the default ignore list so we do the
+
+    smartest possible thing 
+
+  Change: e82fd69a8abbef0787d7bbf44305da09c0befdf5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-08-18 10:04:19 +0000
+
+    Add Perl::Critic::Nits to authodeps 
+
+  Change: d52dc0d7c7672e57a25a680096397866c61591c6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-08-18 10:04:19 +0000
+
+    Incorporate feedback on removing implicit returns 
+
+----------------------------------------
+version 8.6 at 2023-07-20 15:53:17 +0000
 ----------------------------------------
 
   Change: 69b286e396cc816a60053c94df43713ea390d24a
@@ -277,216 +325,6 @@ version 8.1 at 2021-09-01 00:43:28 +0000
 
     Starting point for aggregation documentation 
 
-----------------------------------------
-version 8.0 at 2021-08-14 22:15:28 +0000
-----------------------------------------
-
-  Change: 40dbb86b7b8d9b98f4572a9f362fdd94f4d57b40
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-14 15:15:28 +0000
-
-    Support OpenSearch 1.0.0
-
-    Add a check to the version lookup for opensearch. If opensearch is
-    discovered, set version to 7.10. 
-
-------------------------------------------
-version 7.9.2 at 2021-08-14 02:17:04 +0000
-------------------------------------------
-
-  Change: 8adedd9d89bdcaac26844547d36813bfc75f511f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-13 19:17:04 +0000
-
-    Fix a warning in the 7.9.1 Release
-
-    I was unable to `Dist::Zilla` to let me tag a `7.10` release, so I went
-    with `7.9.1`. This caused a warning in `::Connection` for formatting the
-    version string. 
-
-  Change: 84dd4b08f113cadc0d8f71ac7bd5448536910f3f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-13 19:07:49 +0000
-
-    Version number fixed in Markdown 
-
-------------------------------------------
-version 7.9.1 at 2021-08-14 01:48:01 +0000
-------------------------------------------
-
-  Change: 3eef2f64709f5b9643c91544b839a1727b7f32c0
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-13 18:48:01 +0000
-
-    Fix POD for xtests 
-
-  Change: bc51180e9f87730ee0d220e5c1c8b22e7e740253
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-13 18:38:33 +0000
-
-    Aggregations Updated
-
-    * Recursive aggregation parsing to flatten records into a row/column format
-    * Documentation updates for the
-    `App::ElasticSearch::Utilities::Aggregations` * Make `es-aggregate.pl` more
-    useful generally and move to `scripts/` * Fix alias handling for simple
-    terms aggs 
-
-  Change: d8c8be912a60156290cb68c046e3b3c8fafbc2ae
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-04 17:26:42 +0000
-
-    Tests started to the aggregations parser 
-
-  Change: 25e3fc64e388b3a84002d594e68516602970eb89
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-04 17:13:23 +0000
-
-    Suss out the es_expand_aggregate syntax
-
-    Now looks like:
-
-    ``` [ALIAS=]AGG:FIELD[:PARAMS]
-
-    PARAMS := [k=v,k1=v1,v1a] ```
-
-    Add a few additional aggregations to the supported list. 
-
-----------------------------------------
-version 7.9 at 2021-07-30 18:19:09 +0000
-----------------------------------------
-
-  Change: f386e7003a442a0419fc62aa30d576312afa9efa
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-30 11:19:09 +0000
-
-    Release 7.9
-
-    * Fix timeout handling * Allow for connection preferences into the `meta`
-    settings section * Allow `_id` to be shown by `es-search.pl` * Look in
-    `~/.config` for `es-utils.yaml` * Started some work on library for handling
-    aggregation queries 
-
-  Change: ba56db091ef15fd365100e034b17a8de530333e6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-14 15:07:21 +0000
-
-    WIP: Substantial progress on the multi level aggregation script 
-
-  Change: 5c2517a1264b4a381b11387125e63dada6fcef2a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-08 14:50:45 +0000
-
-    Adding es-aggregate.pl script
-
-    `es-search.pl` has a lot of cruft. Creating `es-aggregate.pl` as a
-    proof-of-concept starting from a clean slate to see if I can make the code
-    more readable and more reusable. The idea being to push this code back into
-    the library to make working with aggregations easier and cleaner. 
-
-  Change: cfd98ad2e84ee1ea8791debe7f6e1809bd6a9af6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-08 07:34:21 +0000
-
-    Move the aggregation parsing out to it's own sub
-
-    This is a long time coming, the handling of aggregations needs a major
-    cleanup. First step is to break things up into more parseable blocks. 
-
-  Change: ea453e9190173af63adce15b684dcad13e3b13c5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-08 07:15:14 +0000
-
-    Pass timeout to the object creation
-
-    When converting to `App::ElasticSearch::Utilities::Connection`, I
-    mistakenly removed the pass through of the `--timeout` parameter to the
-    object creation. This restores the timeout capability. 
-
-  Change: c8f664cfb09b928831945f82607eab5830faa066
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-08 07:14:50 +0000
-
-    Allow HTTP username/password in meta
-
-    The previous commit allowed overriding the destination for the connection.
-    This allows users to override the HTTP basic auth username/password.
-
-    ```yaml host: es-main.int.example.com meta:
-
-    access:
-
-    timestamp: t
-
-    security:
-
-    timestamp: @timestamp
-
-    host: es-security.int.example.com
-
-    proto: https
-
-    http-username: bob
-
-    password-exec: ~/bin/get-es-security-password.sh ``` 
-
-  Change: 7c56813974cc069a6214daef8667551a8d31de65
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-07-08 06:55:14 +0000
-
-    Added connection details to the meta section
-
-    This update allows the metadata in the `~/.es-utils.yaml` file to include
-    the `host`, `port`, and `proto`.
-
-    Example:
-
-    ```yaml host: es-main.int.example.com port: 80 meta:
-
-    security:
-
-    host: es-security.int.example.com
-
-    port: 443
-
-    proto: https ``` 
-
-  Change: 797199f7af436597ffa67c486d5ea275b825e471
-  Author: Matthew Feinberg <mattf@intex.com>
-  Date : 2021-06-24 14:03:07 +0000
-
-    For es-search.pl allow _id to be shown as a column when using --show and
-    display _id when showing full result records. 
-
-  Change: 6547b9893ad05e7cef565f4a2caf51b321091de0
-  Author: Andrei Grechkin <andrei.grechkin@booking.com>
-  Date : 2021-06-11 10:11:34 +0000
-
-    Add support for the XDG Base Directory Specification
-
-    Support configuration file placed in
-    `$XDG_CONFIG_HOME/es-utils/config.yaml` 
-
-  Change: 0f799636f22bf8bff51c25a890f12341f6f7b9d7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-06-05 14:57:35 +0000
-
-    Fix warning in es_request()
-
-    When the index is undefined, the code throws a warning. 
-
-  Change: fa084386a44bbda1a75ee961f8ea6228ab62fe0c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-03-20 17:17:13 +0000
-
-    The GitHub::Meta plugin stopped working and needed configuration 
-
-  Change: c118b27b05d5e5e75b444b9537362d78e099176f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-10-08 13:42:10 +0000
-
-    Fix warnings when we encounter an unallocated shard 
-
 =================================================
-Plus 85 releases after 2021-07-20 00:00:00 +0000.
+Plus 89 releases after 2021-08-18 00:00:00 +0000.
 =================================================

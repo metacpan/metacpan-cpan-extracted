@@ -1,7 +1,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#define NEED_newCONSTSUB
 #define NEED_newRV_noinc_GLOBAL
 #define NEED_sv_pvn_force_flags_GLOBAL
 #include "ppport.h"
@@ -864,32 +863,72 @@ XGetGeometry(dpy, wnd, root_out=NULL, x_out=NULL, y_out=NULL, width_out=NULL, he
     SV *depth_out
     INIT:
         Window root;
-        int x, y, ret;
+        int x, y;
         unsigned int w, h, bw, d;
     PPCODE:
-        ret = XGetGeometry(dpy, wnd, &root, &x, &y, &w, &h, &bw, &d);
-        if (items > 2) {
-            /* C-style API */
-            warn("C-style XGetGeometry is deprecated; use 2 arguments to return a list, instead");
-            if (root_out)   sv_setuv(root_out, root);
-            if (x_out)      sv_setiv(x_out, x);
-            if (y_out)      sv_setiv(y_out, y);
-            if (width_out)  sv_setuv(width_out, w);
-            if (height_out) sv_setuv(height_out, h);
-            if (border_out) sv_setuv(border_out, bw);
-            if (depth_out)  sv_setuv(depth_out, d);
-            PUSHs(sv_2mortal(newSViv(ret)));
+        if (XGetGeometry(dpy, wnd, &root, &x, &y, &w, &h, &bw, &d)) {
+            if (items > 2) {
+                # C-style API, return via parameters
+                if (root_out)   sv_setuv(root_out, root);
+                if (x_out)      sv_setiv(x_out, x);
+                if (y_out)      sv_setiv(y_out, y);
+                if (width_out)  sv_setuv(width_out, w);
+                if (height_out) sv_setuv(height_out, h);
+                if (border_out) sv_setuv(border_out, bw);
+                if (depth_out)  sv_setuv(depth_out, d);
+                PUSHs(&PL_sv_yes);
+            } else {
+                # Perl-style API, return a list
+                EXTEND(SP, 7);
+                PUSHs(sv_2mortal(newSVuv(root)));
+                PUSHs(sv_2mortal(newSViv(x)));
+                PUSHs(sv_2mortal(newSViv(y)));
+                PUSHs(sv_2mortal(newSVuv(w)));
+                PUSHs(sv_2mortal(newSVuv(h)));
+                PUSHs(sv_2mortal(newSVuv(bw)));
+                PUSHs(sv_2mortal(newSVuv(d)));
+            }
+        } else {
+            if (items > 2) {
+                PUSHs(&PL_sv_undef);
+            }
+            // else return empty list
         }
-        /* perl-style API */
-        else if (ret) {
-            EXTEND(SP, 7);
-            PUSHs(sv_2mortal(newSVuv(root)));
-            PUSHs(sv_2mortal(newSViv(x)));
-            PUSHs(sv_2mortal(newSViv(y)));
-            PUSHs(sv_2mortal(newSVuv(w)));
-            PUSHs(sv_2mortal(newSVuv(h)));
-            PUSHs(sv_2mortal(newSVuv(bw)));
-            PUSHs(sv_2mortal(newSVuv(d)));
+
+void
+XTranslateCoordinates(dpy, src_wnd, dest_wnd, src_x, src_y, dest_x_out= NULL, dest_y_out= NULL, child_out= NULL)
+    Display *dpy
+    Window src_wnd
+    Window dest_wnd
+    int src_x
+    int src_y
+    SV *dest_x_out
+    SV *dest_y_out
+    SV *child_out
+    INIT:
+        int dest_x, dest_y;
+        Window child;
+        Bool success;
+    PPCODE:
+        if (XTranslateCoordinates(dpy, src_wnd, dest_wnd, src_x, src_y, &dest_x, &dest_y, &child)) {
+            if (items > 5) {
+                # C-style API, return via parameters
+                if (dest_x_out) sv_setiv(dest_x_out, dest_x);
+                if (dest_y_out) sv_setiv(dest_y_out, dest_y);
+                if (child_out)  sv_setuv(child_out,  child);
+                PUSHs(&PL_sv_yes);
+            } else {
+                # Perl-style API, return a list
+                EXTEND(SP, 3);
+                PUSHs(sv_2mortal(newSViv(dest_x)));
+                PUSHs(sv_2mortal(newSViv(dest_y)));
+                PUSHs(sv_2mortal(newSViv(child)));
+            }
+        } else {
+            if (items > 5) {
+                PUSHs(&PL_sv_undef);
+            }
+            # else return empty list
         }
 
 void
@@ -942,7 +981,7 @@ XGetWindowProperty(dpy, wnd, prop_atom, long_offset, long_length, delete, req_ty
                 sv_setpvn(data_out, data, 0);
             } else {
                 XFree(data);
-                croak("Un-handled 'actual_format' value %d returned by XGetWindowProperty", actual_format);
+                croak("Unhandled 'actual_format' value %d returned by XGetWindowProperty", actual_format);
             }
             XFree(data);
             sv_setuv(actual_type_out, actual_type);
@@ -972,7 +1011,7 @@ XChangeProperty(dpy, wnd, prop_atom, type, format, mode, data, nelements)
         char *buffer;
     CODE:
         if (bytelen < 0)
-            croak("Un-handled 'format' value %d passed to XChangeProperty", format);
+            croak("Unhandled 'format' value %d passed to XChangeProperty", format);
         buffer= SvPV(data, svlen);
         if (bytelen > svlen)
             croak("'nelements' (%d) exceeds length of data (%d)", (int) nelements, (int) svlen);
@@ -1023,28 +1062,6 @@ XSetWMProtocols(dpy, wnd, proto_av)
         RETVAL
 
 int
-XGetWMSizeHints(dpy, wnd, hints_out, supplied_out, property)
-    Display * dpy
-    Window wnd
-    XSizeHints *hints_out
-    SV *supplied_out
-    Atom property
-    INIT:
-        long supplied;
-    CODE:
-        RETVAL = XGetWMSizeHints(dpy, wnd, hints_out, &supplied, property);
-        sv_setiv(supplied_out, supplied);
-    OUTPUT:
-        RETVAL
-
-void
-XSetWMSizeHints(dpy, wnd, szhints, property)
-    Display * dpy
-    Window wnd
-    XSizeHints *szhints
-    Atom property
-
-int
 XGetWMNormalHints(dpy, wnd, hints_out, supplied_out)
     Display * dpy
     Window wnd
@@ -1072,6 +1089,28 @@ XSetWMNormalHints(dpy, wnd, szhints)
     Display *dpy
     Window wnd
     XSizeHints *szhints
+
+int
+XGetWMSizeHints(dpy, wnd, hints_out, supplied_out, property)
+    Display * dpy
+    Window wnd
+    XSizeHints *hints_out
+    SV *supplied_out
+    Atom property
+    INIT:
+        long supplied= 0;
+    CODE:
+        RETVAL = XGetWMSizeHints(dpy, wnd, hints_out, &supplied, property);
+        sv_setiv(supplied_out, supplied);
+    OUTPUT:
+        RETVAL
+
+void
+XSetWMSizeHints(dpy, wnd, szhints, property)
+    Display * dpy
+    Window wnd
+    XSizeHints *szhints
+    Atom property
 
 int
 XGetWindowAttributes(dpy, wnd, attrs_out)
@@ -1235,23 +1274,6 @@ XRestackWindows(dpy, windows_av)
             wndarray[i]= PerlXlib_sv_to_xid(*elem);
         }
         XRestackWindows(dpy, wndarray, n);
-
-void
-XTranslateCoordinates(dpy, src_wnd, dest_wnd, src_x, src_y)
-    Display *dpy
-    Window src_wnd
-    Window dest_wnd
-    int src_x
-    int src_y
-    INIT:
-        int dest_x, dest_y;
-        Window child;
-    PPCODE:
-        if (XTranslateCoordinates(dpy, src_wnd, dest_wnd, src_x, src_y, &dest_x, &dest_y, &child)) {
-            PUSHs(sv_2mortal(newSViv(dest_x)));
-            PUSHs(sv_2mortal(newSViv(dest_y)));
-            PUSHs(sv_2mortal(newSViv(child)));
-        }
 
 # XTest Functions (fn_xtest) -------------------------------------------------
 
@@ -1432,23 +1454,49 @@ XUngrabKey(dpy, keycode, modifiers, grab_window)
     Window grab_window
 
 void
-XQueryPointer(dpy, wnd)
+XQueryPointer(dpy, wnd, root_out=NULL, child_out=NULL, root_x_out=NULL, root_y_out=NULL, win_x_out=NULL, win_y_out=NULL, mask_out=NULL)
     Display *dpy
     Window wnd
+    SV *root_out
+    SV *child_out
+    SV *root_x_out
+    SV *root_y_out
+    SV *win_x_out
+    SV *win_y_out
+    SV *mask_out
     INIT:
         Window root, child;
         int root_x, root_y, win_x, win_y;
         unsigned mask;
     PPCODE:
         if (XQueryPointer(dpy, wnd, &root, &child, &root_x, &root_y, &win_x, &win_y, &mask)) {
-            EXTEND(SP, 7);
-            PUSHs(sv_2mortal(newSVuv(root)));
-            PUSHs(sv_2mortal(newSVuv(child)));
-            PUSHs(sv_2mortal(newSViv(root_x)));
-            PUSHs(sv_2mortal(newSViv(root_y)));
-            PUSHs(sv_2mortal(newSViv(win_x)));
-            PUSHs(sv_2mortal(newSViv(win_y)));
-            PUSHs(sv_2mortal(newSVuv(mask)));
+            if (items > 2) {
+                if (root_out)   sv_setuv(root_out, root);
+                if (child_out)  sv_setuv(child_out, child);
+                if (root_x_out) sv_setiv(root_x_out, root_x);
+                if (root_y_out) sv_setiv(root_y_out, root_y);
+                if (win_x_out)  sv_setiv(win_x_out, win_x);
+                if (win_y_out)  sv_setiv(win_y_out, win_y);
+                if (mask_out)   sv_setuv(mask_out, mask);
+                EXTEND(SP, 1);
+                PUSHs(&PL_sv_yes);
+            } else {
+                EXTEND(SP, 7);
+                PUSHs(sv_2mortal(newSVuv(root)));
+                PUSHs(sv_2mortal(newSVuv(child)));
+                PUSHs(sv_2mortal(newSViv(root_x)));
+                PUSHs(sv_2mortal(newSViv(root_y)));
+                PUSHs(sv_2mortal(newSViv(win_x)));
+                PUSHs(sv_2mortal(newSViv(win_y)));
+                PUSHs(sv_2mortal(newSVuv(mask)));
+            }
+        } else {
+            if (root_out) {
+                EXTEND(SP, 1);
+                PUSHs(&PL_sv_undef);
+            } else {
+                # return empty list
+            }
         }
 
 int
@@ -1505,6 +1553,11 @@ XAllowEvents(dpy, event_mode, timestamp)
     Display *dpy
     int event_mode
     Time timestamp
+
+void
+XGetKeyboardControl(dpy, state_out)
+    Display *dpy
+    XKeyboardState *state_out
 
 unsigned long
 keyboard_leds(dpy)
@@ -1599,7 +1652,7 @@ load_keymap(dpy, symbolic=2, minkey=0, maxkey=255)
                     sv= PerlXlib_keysym_to_sv(syms[i*nsym+j], symbolic);
                     if (!sv) {
                         XFree(syms);
-                        croak("Your keymap includes KeySym 0x%x that can't be un-ambiguously represented by a string", (unsigned) syms[i*nsym+j]);
+                        croak("Your keymap includes KeySym 0x%x that can't be unambiguously represented by a string", (unsigned) syms[i*nsym+j]);
                     }
                     av_store(row, j, sv);
                 }
@@ -4555,6 +4608,144 @@ y(self, value=NULL)
     }
 
 # END GENERATED X11_Xlib_XRectangle
+# ----------------------------------------------------------------------------
+# BEGIN GENERATED X11_Xlib_XKeyboardState
+
+MODULE = X11::Xlib                PACKAGE = X11::Xlib::XKeyboardState
+
+int
+_sizeof(ignored=NULL)
+    SV* ignored;
+    CODE:
+        RETVAL = sizeof(XKeyboardState);
+    OUTPUT:
+        RETVAL
+
+void
+_initialize(s)
+    SV *s
+    INIT:
+        void *sptr;
+    PPCODE:
+        sptr= PerlXlib_get_struct_ptr(s, 1, "X11::Xlib::XKeyboardState", sizeof(XKeyboardState),
+            (PerlXlib_struct_pack_fn*) &PerlXlib_XKeyboardState_pack
+        );
+        memset((void*) sptr, 0, sizeof(XKeyboardState));
+
+void
+_pack(s, fields, consume=0)
+    XKeyboardState *s
+    HV *fields
+    Bool consume
+    PPCODE:
+        PerlXlib_XKeyboardState_pack(s, fields, consume);
+
+void
+_unpack(s, fields)
+    XKeyboardState *s
+    HV *fields
+    PPCODE:
+        PerlXlib_XKeyboardState_unpack_obj(s, fields, ST(0));
+
+void
+auto_repeats(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      { if (!SvPOK(value) || SvCUR(value) != sizeof(char)*32)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*32), (long)SvCUR(value)); memcpy(s->auto_repeats, SvPVX(value), sizeof(char)*32);}
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSVpvn((void*)s->auto_repeats, sizeof(char)*32)));
+    }
+
+void
+bell_duration(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->bell_duration= SvUV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSVuv(s->bell_duration)));
+    }
+
+void
+bell_percent(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->bell_percent= SvIV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSViv(s->bell_percent)));
+    }
+
+void
+bell_pitch(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->bell_pitch= SvUV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSVuv(s->bell_pitch)));
+    }
+
+void
+global_auto_repeat(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->global_auto_repeat= SvIV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSViv(s->global_auto_repeat)));
+    }
+
+void
+key_click_percent(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->key_click_percent= SvIV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSViv(s->key_click_percent)));
+    }
+
+void
+led_mask(self, value=NULL)
+    XKeyboardState *self
+    SV *value
+  INIT:
+    XKeyboardState *s= self;
+  PPCODE:
+    if (value) {
+      s->led_mask= SvUV(value);
+      PUSHs(value);
+    } else {
+      PUSHs(sv_2mortal(newSVuv(s->led_mask)));
+    }
+
+# END GENERATED X11_Xlib_XKeyboardState
 # ----------------------------------------------------------------------------
 # BEGIN GENERATED X11_Xlib_XRenderPictFormat
 

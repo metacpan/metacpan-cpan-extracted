@@ -255,7 +255,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 8.6
+version 8.7
 
 =head1 FUNCTIONS
 

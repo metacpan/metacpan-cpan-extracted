@@ -3,7 +3,6 @@ abstract: 'Perl Cooklang parser'
 author:
   - 'Kaare Rasmussen <kaare at cpan dot org>'
 build_requires:
-  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Module::Build: '0.28'
@@ -34,7 +33,7 @@ no_index:
 provides:
   CookLang:
     file: lib/CookLang.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Number::Fraction: '0'
   Object::Pad: '0'
@@ -44,10 +43,10 @@ requires:
   warnings: '0'
 resources:
   repository: git://gitlab.com/perl5182717/CookLang.git
-version: '0.11'
+version: '0.12'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GitLab::Update
@@ -61,7 +60,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
       name: Git::NextVersion
       version: '2.048'
@@ -111,7 +110,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: 0
+          bail_out_on_fail: '0'
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -183,9 +182,9 @@ x_Dist_Zilla:
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: 1
-          inherit_version: 1
-          meta_noindex: 1
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -339,11 +338,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-0.11
+          tag: release-0.12
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -361,7 +360,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
       name: '@Git/Check'
       version: '2.048'
@@ -371,7 +370,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: 0
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -379,7 +378,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -392,11 +391,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.11
+          tag: v0.12
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -410,7 +409,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.35.3
           repo_root: .
       name: '@Git/Push'
       version: '2.048'
@@ -461,8 +460,8 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: 0
+      is_trial: '0'
     version: '6.030'
-x_generated_by_perl: v5.36.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

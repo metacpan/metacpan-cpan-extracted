@@ -1,0 +1,42 @@
+---
+abstract: 'Finds subroutines in namespace (attributes included).'
+author:
+  - 'José Manuel Rodríguez D. <nyrdz@cpan.org>'
+build_requires:
+  HTTP::Status: '6.44'
+  Test2::V0: '0.000155'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Namespace-Subroutines
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Namespace::Subroutines:
+    file: lib/Namespace/Subroutines.pm
+    version: '0.02'
+requires:
+  perl: v5.18.0
+resources:
+  bugtracker: https://github.com/nyrdz/Namespace-Subroutines/issues
+  homepage: https://github.com/nyrdz/Namespace-Subroutines
+  repository: https://github.com/nyrdz/Namespace-Subroutines.git
+version: '0.02'
+x_contributors:
+  - 'José Manuel Rodríguez D <jose93rd@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

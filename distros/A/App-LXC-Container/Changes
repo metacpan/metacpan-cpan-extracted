@@ -1,6 +1,27 @@
 Revision history for Perl extension App-LXC-Container
 
-0.15 2023-08-17T08:49:37Z
+0.19 2023-08-24T08:46:40Z
+
+0.19 2023-08-24T08:46:10Z
+
+    - t/08-data.t: test to fix different content in package tests
+    - t/06-update.t: another test to fix different content in package tests
+    - fixed bug for directory option containing whitespace
+
+0.18 2023-08-22T11:39:15Z
+
+    - t/06-update.t: test to fix different content in package tests
+    - t/06-update.t: (again) fixed regular expression for multiple hits
+
+0.17 2023-08-21T10:08:20Z
+
+    - t/06-update.t: again some fixes for different distributions
+    - t/06-update.t: check for "/usr/bin/missing doesn't exist" now optional
+    - t/06-update.t: fix for real /bin, /lib, /sbin ... directories
+
+0.16 2023-08-20T09:32:02Z
+
+    - t/06-update.t: yet some more fixes for non-Debian distributions
 
 0.15 2023-08-17T08:48:07Z
 

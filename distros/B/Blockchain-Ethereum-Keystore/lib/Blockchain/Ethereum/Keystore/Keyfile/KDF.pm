@@ -1,11 +1,11 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Keyfile::KDF 0.002;
+package Blockchain::Ethereum::Keystore::Keyfile::KDF 0.005;
 class Blockchain::Ethereum::Keystore::Keyfile::KDF;
 
-use Crypt::PBKDF2;
-use Crypt::ScryptKDF qw(scrypt_raw);
+use Crypt::KeyDerivation qw(pbkdf2);
+use Crypt::ScryptKDF     qw(scrypt_raw);
 
 field $algorithm :reader :writer :param;
 field $dklen :reader :writer :param;
@@ -24,12 +24,7 @@ method decode ($password) {
 
 method _decode_kdf_pbkdf2 ($password) {
 
-    my $derived_key = Crypt::PBKDF2->new(
-        # currently only hmac-sha256 is supported by keyfiles
-        hash_class => 'HMACSHA2',
-        iterations => $self->c,
-        output_len => $self->dklen,
-    )->PBKDF2(pack("H*", $self->salt), $password);
+    my $derived_key = pbkdf2($password, pack("H*", $self->salt), $self->c, 'SHA256', $self->dklen);
 
     return $derived_key;
 }

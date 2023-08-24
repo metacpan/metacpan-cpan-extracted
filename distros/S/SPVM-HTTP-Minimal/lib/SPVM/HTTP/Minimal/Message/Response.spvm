@@ -1,0 +1,45 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Minimal::Message::Response extends HTTP::Minimal::Message {
+  allow HTTP::Minimal::Socket;
+  
+  use HTTP::Minimal::Headers;
+  
+  # Fields
+  has protocol : ro string;
+  
+  has status : ro string;
+  
+  has reason : ro string;
+  
+  has content_buffer : StringBuffer;
+  
+  # Class Methods
+  private static method new : HTTP::Minimal::Message::Response () {
+    
+    my $self = new HTTP::Minimal::Message::Response;
+    
+    $self->{content_buffer} = StringBuffer->new;
+    
+    $self->{headers} = HTTP::Minimal::Headers->new;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method is_success : int () {
+    my $status = $self->{status};
+    
+    my $success = 0;
+    if ($status && $status->[0] == '2') {
+      $success = 1;
+    }
+    
+    return $success;
+  }
+  
+  method content : string () {
+    return $self->{content_buffer}->to_string;
+  }
+}

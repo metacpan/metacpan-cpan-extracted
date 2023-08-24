@@ -102,7 +102,7 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 ioctl
 
-  method ioctl : int ($request : int, $request_arg : object = undef of Byte|Short|Int|Long|Float|Double|object);
+  static method ioctl : int ($fd : int, $request : int, $request_arg_ref : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef);
 
 =head2 sync
 
@@ -130,19 +130,11 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 write
 
-  method write : int ($buffer : string, $length : int, $offset : int = 0);
+  method write : int ($string : string, $length : int = -1, $offset : int = 0);
 
 =head2 read
 
-  method read : int ($buffer : mutable string, $length : int, $offset : int = 0);
-
-=head2 syswrite
-
-  method syswrite : int ($buffer : string, $length : int, $offset : int = 0);
-
-=head2 sysread
-
-  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0);
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
 
 =head1 Well Known Child Classes
 

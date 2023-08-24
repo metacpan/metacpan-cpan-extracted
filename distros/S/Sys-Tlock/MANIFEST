@@ -8,9 +8,10 @@ PERL.md
 README.html
 README.md
 script/tlock
+t/test-1.conf
+t/test-2.conf
 t/tlock-1.t
 t/tlock-2.t
-t/tlock.conf
 tlock.conf
 META.yml
 META.json

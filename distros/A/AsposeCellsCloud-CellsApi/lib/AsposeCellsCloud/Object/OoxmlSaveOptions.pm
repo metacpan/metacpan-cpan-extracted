@@ -132,6 +132,34 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'update_zoom' => {
+     	datatype => 'boolean',
+     	base_name => 'UpdateZoom',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'enable_zip64' => {
+     	datatype => 'boolean',
+     	base_name => 'EnableZip64',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'embed_ooxml_as_ole_object' => {
+     	datatype => 'boolean',
+     	base_name => 'EmbedOoxmlAsOleObject',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'compression_type' => {
+     	datatype => 'string',
+     	base_name => 'CompressionType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
@@ -192,6 +220,10 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'export_cell_name' => 'boolean',
+    'update_zoom' => 'boolean',
+    'enable_zip64' => 'boolean',
+    'embed_ooxml_as_ole_object' => 'boolean',
+    'compression_type' => 'string',
     'save_format' => 'string',
     'cached_file_folder' => 'string',
     'clear_data' => 'boolean',
@@ -204,6 +236,10 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'export_cell_name' => 'ExportCellName',
+    'update_zoom' => 'UpdateZoom',
+    'enable_zip64' => 'EnableZip64',
+    'embed_ooxml_as_ole_object' => 'EmbedOoxmlAsOleObject',
+    'compression_type' => 'CompressionType',
     'save_format' => 'SaveFormat',
     'cached_file_folder' => 'CachedFileFolder',
     'clear_data' => 'ClearData',

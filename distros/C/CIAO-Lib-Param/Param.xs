@@ -15,8 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the 
- *       Free Software Foundation, Inc. 
+ * along with this program; if not, write to the
+ *       Free Software Foundation, Inc.
  *       51 Franklin Street, Fifth Floor
  *       Boston, MA  02110-1301, USA
  *
@@ -60,7 +60,7 @@ vector paramerract( void (*newact)() );
    was thought that per-object data was required and the code
    was converted to use this structure as the basis for the
    object, rather than simply blessing the pointer to the paramfile
-   structure 
+   structure
 */
 typedef struct PFile
 {
@@ -90,21 +90,23 @@ get_mortalspace( int nbytes )
 static SV*
 carp_shortmess( char* message )
 {
-  SV* sv_message = newSVpv( message, 0 );
   SV* short_message;
   int count;
 
   dSP;
   ENTER ;
   SAVETMPS ;
-    
+
+  /* ensure that Carp is loaded */
+  load_module( PERL_LOADMOD_NOIMPORT, newSVpvn( "Carp", 4 ), (SV*) NULL );
+
   PUSHMARK(SP);
-  XPUSHs( sv_message );
+  XPUSHs( sv_2mortal(newSVpv(message,0)) );
   PUTBACK;
 
   /* make sure there's something to work with */
   count = call_pv( "Carp::shortmess", G_SCALAR );
-    
+
   SPAGAIN ;
 
   if ( 1 != count )
@@ -149,7 +151,6 @@ croak_on_parerr( void )
     char *errstr = paramerrstr();
     char *error = MY_CXT.errmsg ? MY_CXT.errmsg : errstr;
 
-
     /* construct exception object prior to throwing exception */
 
     hv_store( hash, "errno" , 5, newSViv(MY_CXT.parerr), 0 );
@@ -161,17 +162,17 @@ croak_on_parerr( void )
     parerr = MY_CXT.parerr = 0;
     Safefree( MY_CXT.errmsg );
     MY_CXT.errmsg = NULL;
-    
+
     /* setup exception object and throw it*/
     {
       SV* errsv = get_sv("@", TRUE);
       sv_setsv( errsv, sv_bless( newRV_noinc((SV*) hash),
-				 gv_stashpv("CIAO::Lib::Param::Error", 1 ) ) );
+                                 gv_stashpv("CIAO::Lib::Param::Error", 1 ) ) );
     }
     croak( Nullch );
 
   }
-  
+
   /* here if level == 0 */
   if ( MY_CXT.parerr )
   {
@@ -213,7 +214,7 @@ perl_paramerr( int level, char *message, char *name )
 
   /* a level of 0 is non-fatal.  however, it should be passed up to
      the caller to handle, and that's not yet implemented. currently
-     cxcparam only issues a level 0 message prior to prompting for 
+     cxcparam only issues a level 0 message prior to prompting for
      a replacement value of a parameter, and since that always
      goes out to the terminal, we output level 0 messages to
      stderr and reset parerr so that they are not treated
@@ -232,130 +233,130 @@ MODULE = CIAO::Lib::Param::Match	PACKAGE = CIAO::Lib::Param::Match	PREFIX = pmat
 
 void
 DESTROY(mlist)
-	CIAO_Lib_Param_MatchPtr	mlist
+        CIAO_Lib_Param_MatchPtr	mlist
   CODE:
-	pmatchclose(mlist);
+        pmatchclose(mlist);
 
 MODULE = CIAO::Lib::Param::Match	PACKAGE = CIAO::Lib::Param::MatchPtr	PREFIX = pmatch
 
 int
 pmatchlength(mlist)
-	CIAO_Lib_Param_MatchPtr	mlist
+        CIAO_Lib_Param_MatchPtr	mlist
 
 char *
 pmatchnext(mlist)
-	CIAO_Lib_Param_MatchPtr	mlist
+        CIAO_Lib_Param_MatchPtr	mlist
 
 
 void
 pmatchrewind(mlist)
-	CIAO_Lib_Param_MatchPtr	mlist
+        CIAO_Lib_Param_MatchPtr	mlist
 
 
 MODULE = CIAO::Lib::Param		PACKAGE = CIAO::Lib::Param
 
 BOOT:
 {
-  	MY_CXT_INIT;
-	MY_CXT.parerr = 0;
-	MY_CXT.level  = 0;
-	MY_CXT.errmsg = NULL;
-	set_paramerror(0);	/* Don't exit on error */
-	paramerract((vector) perl_paramerr);
+        MY_CXT_INIT;
+        MY_CXT.parerr = 0;
+        MY_CXT.level  = 0;
+        MY_CXT.errmsg = NULL;
+        set_paramerror(0);	/* Don't exit on error */
+        paramerract((vector) perl_paramerr);
 }
 
 CIAO_Lib_ParamPtr
 open(filename, mode, ...)
-	char *	filename
-	const char *	mode
+        char *	filename
+        const char *	mode
   PREINIT:
-	int argc = 0;
-  	char **argv = NULL;
+        int argc = 0;
+        char **argv = NULL;
   CODE:
         argc = items - 2;
-	if ( argc )
-	{
-	  int i;
-	  argv = get_mortalspace( argc * sizeof(*argv) );
-	  for ( i = 2 ; i < items ; i++ )
-	  {
-	    argv[i-2] = SvOK(ST(i)) ? (char*)SvPV_nolen(ST(i)) : (char*)NULL;
-	  }
-	}
-	RETVAL = New( 0, RETVAL, 1, PFile );
-	RETVAL->pf = paramopen(filename, argv, argc, mode);
-	if ( NULL == RETVAL->pf )
-	{
-	  Safefree(RETVAL);
-	  RETVAL = NULL;
-	  croak_on_parerr();
-	}
+        if ( argc )
+        {
+          int i;
+          argv = get_mortalspace( argc * sizeof(*argv) );
+          for ( i = 2 ; i < items ; i++ )
+          {
+            argv[i-2] = SvOK(ST(i)) ? (char*)SvPV_nolen(ST(i)) : (char*)NULL;
+          }
+        }
+        RETVAL = New( 0, RETVAL, 1, PFile );
+        RETVAL->pf = paramopen(filename, argv, argc, mode);
+        if ( NULL == RETVAL->pf )
+        {
+          Safefree(RETVAL);
+          RETVAL = NULL;
+          croak_on_parerr();
+        }
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 char *
 pfind(name, mode, extn, path)
-	char *	name
-	char *	mode
-	char *	extn
-	char *	path
+        char *	name
+        char *	mode
+        char *	extn
+        char *	path
   CODE:
-	RETVAL = paramfind( name, mode, extn, path );
-  	croak_on_parerr();	
+        RETVAL = paramfind( name, mode, extn, path );
+        croak_on_parerr();
   OUTPUT:
-	RETVAL
+        RETVAL
 
 MODULE = CIAO::Lib::Param	PACKAGE = CIAO::Lib::ParamPtr
 
 void
 DESTROY(pfile)
-	CIAO_Lib_ParamPtr	pfile
+        CIAO_Lib_ParamPtr	pfile
   CODE:
-	if ( pfile->pf )
-	  paramclose(pfile->pf);
-	Safefree(pfile);
-  	croak_on_parerr();	
- 	
+        if ( pfile->pf )
+          paramclose(pfile->pf);
+        Safefree(pfile);
+        croak_on_parerr();
+
 void
 info( pfile, name )
-	CIAO_Lib_ParamPtr	pfile
-	char * name
+        CIAO_Lib_ParamPtr	pfile
+        char * name
   PREINIT:
-	char *	mode = get_mortalspace( SZ_PFLINE );
-	char *	type = get_mortalspace( SZ_PFLINE );
-	char *	value = get_mortalspace( SZ_PFLINE );
-	char *	min = get_mortalspace( SZ_PFLINE );
-	char *	max = get_mortalspace( SZ_PFLINE );
-	char *	prompt = get_mortalspace( SZ_PFLINE );
-	int result;
+        char *	mode = get_mortalspace( SZ_PFLINE );
+        char *	type = get_mortalspace( SZ_PFLINE );
+        char *	value = get_mortalspace( SZ_PFLINE );
+        char *	min = get_mortalspace( SZ_PFLINE );
+        char *	max = get_mortalspace( SZ_PFLINE );
+        char *	prompt = get_mortalspace( SZ_PFLINE );
+        int result;
   PPCODE:
-	if ( ParamInfo( pfile->pf, name, mode, type, 
-			    value, min, max, prompt ) )
-	{
-	  EXTEND(SP, 6);
-	  PUSHs(sv_2mortal(newSVpv(mode, 0)));
-	  PUSHs(sv_2mortal(newSVpv(type, 0)));
-	  PUSHs(sv_2mortal(newSVpv(value, 0)));
-	  PUSHs(sv_2mortal(newSVpv(min, 0)));
-	  PUSHs(sv_2mortal(newSVpv(max, 0)));
-	  PUSHs(sv_2mortal(newSVpv(prompt, 0)));
-	}
-	else
-	{
-	  croak( "parameter %s doesn't exist", name );
-	}
-  	croak_on_parerr();	
+        if ( ParamInfo( pfile->pf, name, mode, type,
+                            value, min, max, prompt ) )
+        {
+          EXTEND(SP, 6);
+          PUSHs(sv_2mortal(newSVpv(mode, 0)));
+          PUSHs(sv_2mortal(newSVpv(type, 0)));
+          PUSHs(sv_2mortal(newSVpv(value, 0)));
+          PUSHs(sv_2mortal(newSVpv(min, 0)));
+          PUSHs(sv_2mortal(newSVpv(max, 0)));
+          PUSHs(sv_2mortal(newSVpv(prompt, 0)));
+        }
+        else
+        {
+          croak( "parameter %s doesn't exist", name );
+        }
+        croak_on_parerr();
 
 
 CIAO_Lib_Param_MatchPtr
 match(pfile, ptemplate)
-	CIAO_Lib_ParamPtr	pfile
-	char *	ptemplate
+        CIAO_Lib_ParamPtr	pfile
+        char *	ptemplate
   CODE:
-	RETVAL = pmatchopen( pfile->pf, ptemplate );
-  	croak_on_parerr();	
+        RETVAL = pmatchopen( pfile->pf, ptemplate );
+        croak_on_parerr();
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 
 
@@ -364,228 +365,226 @@ MODULE = CIAO::Lib::Param	PACKAGE = CIAO::Lib::ParamPtr	PREFIX = param
 
 char *
 paramgetpath(pfile)
-	CIAO_Lib_ParamPtr	pfile
+        CIAO_Lib_ParamPtr	pfile
   CODE:
-	paramgetpath( pfile->pf );
+        paramgetpath( pfile->pf );
   CLEANUP:
-	if (RETVAL) Safefree(RETVAL);
-	croak_on_parerr();
+        if (RETVAL) Safefree(RETVAL);
+        croak_on_parerr();
 
 
 MODULE = CIAO::Lib::Param PACKAGE = CIAO::Lib::ParamPtr	PREFIX = p
 
 int
 paccess(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-	paccess( pfile->pf, pname );
+        paccess( pfile->pf, pname );
   CLEANUP:
-  	croak_on_parerr();	
+        croak_on_parerr();
 
 SV*
 pgetb(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-  	ST(0) = sv_newmortal();
-	sv_setsv( ST(0), pgetb( pfile->pf, pname ) ? &PL_sv_yes : &PL_sv_no );
-  	croak_on_parerr();	
+        ST(0) = sv_newmortal();
+        sv_setsv( ST(0), pgetb( pfile->pf, pname ) ? &PL_sv_yes : &PL_sv_no );
+        croak_on_parerr();
 
 short
 pgets(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-	RETVAL = pgets( pfile->pf, pname );
-  	croak_on_parerr();	
+        RETVAL = pgets( pfile->pf, pname );
+        croak_on_parerr();
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 int
 pgeti(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-	RETVAL = pgeti( pfile->pf, pname );
-  	croak_on_parerr();	
+        RETVAL = pgeti( pfile->pf, pname );
+        croak_on_parerr();
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 float
 pgetf(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-	RETVAL = pgetf( pfile->pf, pname );
-  	croak_on_parerr();	
+        RETVAL = pgetf( pfile->pf, pname );
+        croak_on_parerr();
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 double
 pgetd(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   CODE:
-	RETVAL = pgetd( pfile->pf, pname );
-  	croak_on_parerr();	
+        RETVAL = pgetd( pfile->pf, pname );
+        croak_on_parerr();
   OUTPUT:
-  	RETVAL
+        RETVAL
 
 SV*
 get(pfile, pname)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   PREINIT:
-	char type[SZ_PFLINE];
+        char type[SZ_PFLINE];
   CODE:
-  	ST(0) = sv_newmortal();
-	if ( ParamInfo( pfile->pf, pname, NULL, type, NULL, NULL, NULL, NULL ))
-	{
-	  if ( 0 == strcmp( "b", type ) )
-	  {
-	    sv_setsv( ST(0), 
-		      pgetb( pfile->pf, pname ) ? &PL_sv_yes : &PL_sv_no );
-	  }
-	  else
-	  {
-	    char *str;
-	    size_t buflen = 0;
-	    size_t len = 0;
-	    while( len == buflen )
-	    {	    
-	      buflen += SZ_PFLINE;
-	      str = get_mortalspace( buflen );
-	      pgetstr( pfile->pf, pname, str, buflen );
-	      len = strlen( str );
-	    }
-	    sv_setpv(ST(0), str);
-	  }
-	}
-	else
-	  XSRETURN_UNDEF;
+        ST(0) = sv_newmortal();
+        if ( ParamInfo( pfile->pf, pname, NULL, type, NULL, NULL, NULL, NULL ))
+        {
+          if ( 0 == strcmp( "b", type ) )
+          {
+            sv_setsv( ST(0),
+                      pgetb( pfile->pf, pname ) ? &PL_sv_yes : &PL_sv_no );
+          }
+          else
+          {
+            char *str;
+            size_t buflen = 0;
+            size_t len = 0;
+            while( len == buflen )
+            {
+              buflen += SZ_PFLINE;
+              str = get_mortalspace( buflen );
+              pgetstr( pfile->pf, pname, str, buflen );
+              len = strlen( str );
+            }
+            sv_setpv(ST(0), str);
+          }
+        }
+        else
+          XSRETURN_UNDEF;
   CLEANUP:
-  	croak_on_parerr();	
+        croak_on_parerr();
 
 
 char *
 pgetstr(pfile, pname )
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
   PREINIT:
-	char* str;
-	size_t buflen = 0;
-	size_t len = 0;
+        char* str;
+        size_t buflen = 0;
+        size_t len = 0;
   CODE:
-	RETVAL = NULL;
-	while( len == buflen )
-	{	    
-	   buflen += SZ_PFLINE;
-	   str = get_mortalspace( buflen );
-	   pgetstr( pfile->pf, pname, str, buflen );
-	   len = strlen( str );
-	 }
+        RETVAL = NULL;
+        while( len == buflen )
+        {
+           buflen += SZ_PFLINE;
+           str = get_mortalspace( buflen );
+           pgetstr( pfile->pf, pname, str, buflen );
+           len = strlen( str );
+         }
         RETVAL = str;
-  	croak_on_parerr();	
+        croak_on_parerr();
   OUTPUT:
-	RETVAL
+        RETVAL
 
 void
 pputb(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	int	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        int	value
   ALIAS:
-	setb = 1	
+        setb = 1
   CODE:
-	pputb( pfile->pf, pname, value );
-  	croak_on_parerr();	
-	
+        pputb( pfile->pf, pname, value );
+        croak_on_parerr();
+
 
 void
 pputd(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	double	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        double	value
   ALIAS:
-	setd = 1	
+        setd = 1
   CODE:
-	pputd( pfile->pf, pname, value );
-  	croak_on_parerr();	
+        pputd( pfile->pf, pname, value );
+        croak_on_parerr();
 
 void
 pputi(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	int	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        int	value
   ALIAS:
-	seti = 1	
+        seti = 1
   CODE:
-	pputi( pfile->pf, pname, value );
-  	croak_on_parerr();	
+        pputi( pfile->pf, pname, value );
+        croak_on_parerr();
 
 void
 pputs(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	short	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        short	value
   ALIAS:
-	sets = 1	
+        sets = 1
   CODE:
-	pputs( pfile->pf, pname, value );
-  	croak_on_parerr();	
+        pputs( pfile->pf, pname, value );
+        croak_on_parerr();
 
 void
 pputstr(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	char *	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        char *	value
   ALIAS:
-	setstr = 1
+        setstr = 1
   CODE:
-	pputstr( pfile->pf, pname, value );
-  	croak_on_parerr();	
+        pputstr( pfile->pf, pname, value );
+        croak_on_parerr();
 
 void
 put(pfile, pname, value)
-	CIAO_Lib_ParamPtr	pfile
-	char *	pname
-	SV*	value
+        CIAO_Lib_ParamPtr	pfile
+        char *	pname
+        SV*	value
   ALIAS:
-	set = 1
+        set = 1
   PREINIT:
-	char type[SZ_PFLINE];
+        char type[SZ_PFLINE];
   CODE:
         /* if the parameter exists and is a boolean,
-	   translate from numerics to string if it looks like a
-	   number, else let pset handle it
-	*/
-	if ( ParamInfo( pfile->pf, pname, NULL, type, NULL, NULL, NULL, NULL ) &&
-	     0 == strcmp( "b", type ) &&
-	     ( looks_like_number( value ) ||
-	       0 == sv_len(value )
-	       ) 
-	   )
-	{
-	  pputb(pfile->pf, pname, SvTRUE(value) );
-	}
-	else
-	{
-	  pputstr(pfile->pf, pname, SvOK(value) ? (char*)SvPV_nolen(value) : (char*)NULL );
-	}
+           translate from numerics to string if it looks like a
+           number, else let pset handle it
+        */
+        if ( ParamInfo( pfile->pf, pname, NULL, type, NULL, NULL, NULL, NULL ) &&
+             0 == strcmp( "b", type ) &&
+             ( looks_like_number( value ) ||
+               0 == sv_len(value )
+               )
+           )
+        {
+          pputb(pfile->pf, pname, SvTRUE(value) );
+        }
+        else
+        {
+          pputstr(pfile->pf, pname, SvOK(value) ? (char*)SvPV_nolen(value) : (char*)NULL );
+        }
   CLEANUP:
-  	croak_on_parerr();	
+        croak_on_parerr();
 
 
 char *
 evaluateIndir(pfile, name, val)
-	CIAO_Lib_ParamPtr	pfile
-	char *	name
-	char *	val
+        CIAO_Lib_ParamPtr	pfile
+        char *	name
+        char *	val
   CODE:
-	RETVAL = evaluateIndir(pfile->pf, name, val);
+        RETVAL = evaluateIndir(pfile->pf, name, val);
   CLEANUP:
-  	if ( RETVAL ) Safefree( RETVAL );
-  	croak_on_parerr();	
-
-
+        if ( RETVAL ) Safefree( RETVAL );
+        croak_on_parerr();

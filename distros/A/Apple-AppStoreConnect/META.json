@@ -40,8 +40,10 @@
       },
       "test" : {
          "requires" : {
+            "CryptX" : "0",
             "HTTP::Response" : "0",
-            "JSON" : "0",
+            "JSON" : "4.0",
+            "JSON::XS" : "4.0",
             "LWP::UserAgent" : "0",
             "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0"
@@ -56,6 +58,6 @@
          "web" : "https://github.com/dkechag/Apple-AppStoreConnect"
       }
    },
-   "version" : "0.1",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

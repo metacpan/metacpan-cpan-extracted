@@ -13,7 +13,7 @@ use_ok 'Method::Signatures::Simple::ParseKeyword';
         bless {%opts}, $class;
     }
     method first($o) {
-        $self->{first} = $o if @_>1;
+        $self->{first} = $o if @_>0;
         $self->{first};
     }
     method second () {

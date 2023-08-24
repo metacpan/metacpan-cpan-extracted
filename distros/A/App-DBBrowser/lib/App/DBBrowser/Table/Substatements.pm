@@ -505,13 +505,14 @@ sub limit_offset {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $driver = $sf->{i}{driver};
+    my $use_limit = $driver =~ /^(?:SQLite|mysql|MariaDB|Pg|Informix)\z/ ? 1 : 0;
     my @pre = ( undef, $sf->{i}{ok} );
+    my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
     $sql->{limit_stmt}  = '';
     $sql->{offset_stmt} = '';
     my @bu;
 
     LIMIT: while ( 1 ) {
-        my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
         my $info = $ax->get_sql_info( $sql );
         # Choose
         my $choice = $tc->choose(
@@ -532,54 +533,48 @@ sub limit_offset {
         push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
         my $digits = 7;
         if ( $choice eq $limit ) {
-            if ( $driver =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-                # https://www.ibm.com/docs/en/db2-for-zos/12?topic=subselect-fetch-clause
-                $sql->{limit_stmt} = "FETCH NEXT";
+            if ( $use_limit ) {
+                $sql->{limit_stmt} = "LIMIT";
             }
             else {
-                $sql->{limit_stmt} = "LIMIT";
+                $sql->{limit_stmt} = "FETCH NEXT";
             }
             my $info = $ax->get_sql_info( $sql );
             # Choose_a_number
-            my $limit = $tu->choose_a_number( $digits,
-                { info => $info, cs_label => 'LIMIT: ' }
-            );
-            $ax->print_sql_info( $info );
+            my $limit = $tu->choose_a_number( $digits, { info => $info, cs_label => $limit . ': ' } );
             if ( ! defined $limit ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
             }
-            $sql->{limit_stmt} .=  sprintf ' %d', $limit;
-            if ( $driver =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-                $sql->{limit_stmt} .= " ROWS ONLY";
+            if ( $use_limit ) {
+                $sql->{limit_stmt} = "LIMIT " . $limit;
+            }
+            else {
+                $sql->{limit_stmt} = "FETCH NEXT " . $limit . " ROWS ONLY";
             }
         }
-        if ( $choice eq $offset ) {
-            if ( $driver eq 'Informix' ) {
-                $tc->choose( [ 'BACK' ], { prompt => 'Informix: OFFSET not supported.' } );
+        elsif ( $choice eq $offset ) {
+            $sql->{offset_stmt} = "OFFSET";
+            my $info = $ax->get_sql_info( $sql );
+            # Choose_a_number
+            my $offset = $tu->choose_a_number( $digits, { info => $info, cs_label => $offset . ': ' } );
+            if ( ! defined $offset ) {
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
             }
+            if ( $use_limit ) {
+                $sql->{offset_stmt} = "OFFSET " . $offset;
+            }
+            else {
+                $sql->{offset_stmt} = "OFFSET " . $offset . " ROWS";
+            }
+            # Informix: no offset
             if ( ! $sql->{limit_stmt} ) {
                 # SQLite/mysql/MariaDB: no offset without limit
                 $sql->{limit_stmt} = "LIMIT " . '9223372036854775807'  if $driver eq 'SQLite';   # 2 ** 63 - 1
                 $sql->{limit_stmt} = "LIMIT " . '18446744073709551615' if $driver =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
                 # MySQL 8.0 Reference Manual - SQL Statements/Data Manipulation Statements/Select Statement/Limit clause:
                 #    SELECT * FROM tbl LIMIT 95,18446744073709551615;   -> all rows from the 95th to the last
-            }
-            $sql->{offset_stmt} = "OFFSET";
-            my $info = $ax->get_sql_info( $sql );
-            # Choose_a_number
-            my $offset = $tu->choose_a_number( $digits,
-                { info => $info, cs_label => 'OFFSET: ' }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $offset ) {
-                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
-                next LIMIT;
-            }
-            $sql->{offset_stmt} .= sprintf ' %d', $offset;
-            if ( $driver =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-                $sql->{offset_stmt} .= " ROWS";
             }
         }
     }

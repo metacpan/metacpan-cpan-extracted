@@ -1,3 +1,4 @@
+.editorconfig
 bin/avr-updi
 Build.PL
 Changes
@@ -31,6 +32,9 @@ share/ATtiny214.yaml
 share/ATtiny3214.yaml
 share/ATtiny3216.yaml
 share/ATtiny3217.yaml
+share/ATtiny3224.yaml
+share/ATtiny3226.yaml
+share/ATtiny3227.yaml
 share/ATtiny402.yaml
 share/ATtiny404.yaml
 share/ATtiny406.yaml

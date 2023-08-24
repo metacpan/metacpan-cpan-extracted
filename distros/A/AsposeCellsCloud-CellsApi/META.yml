@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 23.7
+    version: 23.8
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::LightCellsApi:
@@ -167,6 +167,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/PasteOptions.pm
   AsposeCellsCloud::Object::PdfSecurityOptions:
     file: lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm
+  AsposeCellsCloud::Object::Protection:
+    file: lib/AsposeCellsCloud/Object/Protection.pm
   AsposeCellsCloud::Object::ProtectSheetParameter:
     file: lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm
   AsposeCellsCloud::Object::Range:
@@ -569,6 +571,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/PasswordRequest.pm
   AsposeCellsCloud::Object::PivotTableFieldRequest:
     file: lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm
+  AsposeCellsCloud::Object::ProtectWorkbookRequst:
+    file: lib/AsposeCellsCloud/Object/ProtectWorkbookRequst.pm
   AsposeCellsCloud::Object::RangeCopyRequest:
     file: lib/AsposeCellsCloud/Object/RangeCopyRequest.pm
   AsposeCellsCloud::Object::RangeSetOutlineBorderRequest:
@@ -587,6 +591,12 @@ provides:
     file: lib/AsposeCellsCloud/Object/WorkbookProtectionRequest.pm
   AsposeCellsCloud::Object::WorksheetMovingRequest:
     file: lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm
+  AsposeCellsCloud::Object::ImageOrPrintOptions:
+    file: lib/AsposeCellsCloud/Object/ImageOrPrintOptions.pm
+  AsposeCellsCloud::Object::RenderingFont:
+    file: lib/AsposeCellsCloud/Object/RenderingFont.pm
+  AsposeCellsCloud::Object::RenderingWatermark:
+    file: lib/AsposeCellsCloud/Object/RenderingWatermark.pm
   AsposeCellsCloud::Object::PivotField:
     file: lib/AsposeCellsCloud/Object/PivotField.pm
   AsposeCellsCloud::Object::PivotFilter:
@@ -701,6 +711,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/TextureFill.pm
   AsposeCellsCloud::Object::TilePicOption:
     file: lib/AsposeCellsCloud/Object/TilePicOption.pm
+  AsposeCellsCloud::Object::DigitalSignature:
+    file: lib/AsposeCellsCloud/Object/DigitalSignature.pm
   AsposeCellsCloud::Object::Axis:
     file: lib/AsposeCellsCloud/Object/Axis.pm
   AsposeCellsCloud::Object::Chart:
@@ -803,8 +815,6 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostBatchUnlockRequest.pm
   AsposeCellsCloud::Request::PostBatchSplitRequest:
     file: lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm
-  AsposeCellsCloud::Request::GetExtractBarcodesRequest:
-    file: lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm
   AsposeCellsCloud::Request::PostClearContentsRequest:
     file: lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm
   AsposeCellsCloud::Request::PostClearFormatsRequest:
@@ -1007,6 +1017,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostMergeRequest.pm
   AsposeCellsCloud::Request::PostUnlockRequest:
     file: lib/AsposeCellsCloud/Request/PostUnlockRequest.pm
+  AsposeCellsCloud::Request::PostLockRequest:
+    file: lib/AsposeCellsCloud/Request/PostLockRequest.pm
   AsposeCellsCloud::Request::PostProtectRequest:
     file: lib/AsposeCellsCloud/Request/PostProtectRequest.pm
   AsposeCellsCloud::Request::PostSplitRequest:
@@ -1157,10 +1169,10 @@ provides:
     file: lib/AsposeCellsCloud/Request/DeleteWorksheetPivotTableFilterRequest.pm
   AsposeCellsCloud::Request::GetDocumentPropertiesRequest:
     file: lib/AsposeCellsCloud/Request/GetDocumentPropertiesRequest.pm
-  AsposeCellsCloud::Request::GetDocumentPropertyRequest:
-    file: lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm
   AsposeCellsCloud::Request::PutDocumentPropertyRequest:
     file: lib/AsposeCellsCloud/Request/PutDocumentPropertyRequest.pm
+  AsposeCellsCloud::Request::GetDocumentPropertyRequest:
+    file: lib/AsposeCellsCloud/Request/GetDocumentPropertyRequest.pm
   AsposeCellsCloud::Request::DeleteDocumentPropertyRequest:
     file: lib/AsposeCellsCloud/Request/DeleteDocumentPropertyRequest.pm
   AsposeCellsCloud::Request::DeleteDocumentPropertiesRequest:
@@ -1430,5 +1442,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 23.7
+version: 23.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

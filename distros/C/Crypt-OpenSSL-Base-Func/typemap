@@ -29,7 +29,7 @@ unsigned char **	T_PV
 const unsigned char **	T_PV
 const void *    T_PV
 unsigned int *    T_PV
-size_t T_PV
+size_t * T_PV
 AV*   T_AVREF_REFCOUNT_FIXED
 
 INPUT

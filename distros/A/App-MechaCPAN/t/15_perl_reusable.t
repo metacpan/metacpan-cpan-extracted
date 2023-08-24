@@ -11,7 +11,7 @@ if ( $^O eq 'MSWin32' )
   plan skip_all => 'Cannot build perl on Win32';
 }
 
-if ( !eval { run(qw/tar --version/) } )
+if ( !eval { App::MechaCPAN::run(qw/tar --version/) } )
 {
   plan skip_all => 'Skipping without a usable tar command';
 }
@@ -28,12 +28,21 @@ my $dir = cwd;
 
 is(
   App::MechaCPAN::main(
-    'perl',
-    '--build-reusable',
+    '--build-reusable-perl',
     "$FindBin::Bin/../test_dists/FakePerl-5.12.0.tar.gz"
   ),
   0,
   'Can install "relocatable perl" from a tar.gz'
+);
+
+is(
+  App::MechaCPAN::main(
+    '--build-reusable-perl',
+    'perl',
+    "$FindBin::Bin/../test_dists/FakePerl-5.12.0.tar.gz"
+  ),
+  0,
+  'Can also give the perl command without issue'
 );
 
 chdir $pwd;

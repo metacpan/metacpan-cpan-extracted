@@ -587,7 +587,7 @@ sub _alias_target
   my $alias  = shift;
   my $cache  = shift;
 
-  my $target = _find_target( $target, $cache );
+  $target = _find_target( $target, $cache );
 
   if ( $alias =~ $ident_re )
   {
@@ -1098,6 +1098,8 @@ It can accept module names in various formats. This includes:
 
                                          # Install from:
   foo-bar.tar.gz                         # * an archive
+  cpanfile                               # * a cpanfile
+  foo/                                   # * a directory that has a cpanfile
   foo::bar                               # * a CPAN module
   foo::bar@1.0                           # * a specific module version
   foo::bar~<1.0                          # * a module with version < 1.0
@@ -1107,7 +1109,7 @@ It can accept module names in various formats. This includes:
   https://example.com/foo-bar.git        # * a git repo
   https://example.com/foo-bar.git@master # * a git branch
 
-L<MetaCPAN|https://metacpan.org> is used to search for modules by name.
+L<MetaCPAN|https://metacpan.org> is used to search for modules by name. If module name is provided, it will attempt to install from the current directory's C<cpanfile>.
 
 =head2 Methods
 

@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>bc35bbe7-506f-43e4-b670-4b37607f8555</MessageSerialNumber>
-  <MessageDate>Fri, 11 Aug 2023 04:41:20 BST</MessageDate>
+  <MessageSerialNumber>a60412b6-6ebd-45aa-b20b-b9906ccec748</MessageSerialNumber>
+  <MessageDate>Tue, 22 Aug 2023 04:41:23 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1323,11 +1323,11 @@
       <Agency>Turkey</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0099999</Range>
+          <Range>0000000-0199999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0100000-3649999</Range>
+          <Range>0200000-3649999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>

@@ -11,7 +11,7 @@ use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-06-22'; # DATE
 our $DIST = 'App-calx'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my %args = (
     months => 1,
@@ -90,7 +90,7 @@ die $res->[1] unless $res->[0] == 200;
 say $res->[2];
 
 1;
-# ABSTRACT: Display calendar with highlighted dates
+# ABSTRACT: Display calendar, with highlighted dates
 # PODNAME: calx
 
 __END__
@@ -101,11 +101,11 @@ __END__
 
 =head1 NAME
 
-calx - Display calendar with highlighted dates
+calx - Display calendar, with highlighted dates
 
 =head1 VERSION
 
-This document describes version 0.007 of calx (from Perl distribution App-calx), released on 2023-06-22.
+This document describes version 0.009 of calx (from Perl distribution App-calx), released on 2023-06-22.
 
 =head1 SYNOPSIS
 
@@ -183,6 +183,10 @@ Source repository is at L<https://github.com/perlancar/perl-App-calx>.
 B<cal> Unix utility
 
 L<Calendar::Dates>
+
+B<cal> Unix utility.
+
+Other B<cal> variants: L<cal-idn> (from L<App::cal::idn>).
 
 =head1 AUTHOR
 

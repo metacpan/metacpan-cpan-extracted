@@ -180,6 +180,35 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 See also L<IO::Socket::Builder|SPVM::IO::Socket::Builder>.
 
+
+=head2 peerport
+
+  method peerport : int ();
+
+This method is implemented in a child class.
+
+Exceptions:
+
+Not implemented.
+
+=head2 peerhost
+
+  method peerhost : string ();
+
+This method is implemented in a child class.
+
+Exceptions:
+
+Not implemented.
+
+=head2 write
+
+  method write : int ($string : string, $length : int = -1, $offset : int = 0);
+
+=head2 read
+
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
+
 =head1 See Also
 
 =head2 Sys::Socket

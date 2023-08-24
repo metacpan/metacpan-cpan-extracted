@@ -1,0 +1,159 @@
+NAME
+    Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
+
+VERSION
+    version 0.0002
+
+SYNOPSIS
+    In your dist.ini:
+
+     [GitHub::CreateRelease]
+     repo = github_repo_name         ; optional
+     branch = main                   ; default = main
+     notes_as_code = 1               ; default = 1 (true)
+     notes_from = SignReleaseNotes   ; default = SignReleaseNotes
+     notes_file = Release-VERSION    ; default = Release-VERSION
+     github_notes = 0                ; default = 0 (false)
+     draft = 0                       ; default = 0 (false)
+     hash_alg = sha256               ; default = sha256
+     add_checksum = 1                ; default = 1 (true)
+     title_template = Version RELEASE - TRIAL CPAN release      ; this is the default
+
+DESCRIPTION
+    This plugin will create a GitHub Release and attach a copy of the cpan
+    release archive to the Release.
+
+    The release notes can be generated based on the notes_from value.
+
+    This plugin should appear after any other AfterBuild plugin in your
+    "dist.ini" file. If you are using SignReleaseNotes as the notes_from it
+    should be after the SignReleaseNotes plugin.
+
+Required Plugins
+    This plugin requires that your Dist::Zilla configuration do the
+    following:
+
+     1. Create a release
+     2. Tag the release in your git repository
+     3. Push the commits (and tags) to GitHub
+
+    There are numerous combinations of Dist::Zilla plugins that can perform
+    those functions.
+
+GITHUB API AUTHENTICATION
+    This module uses Config::Identity::GitHub to access the GitHub API
+    credentials.
+
+    You need to create a file in your home directory named .github-identity.
+    It requires the following fields:
+
+     login github_username
+     token github_....
+
+    The GitHub API has a lot of options for the generation of Personal
+    Access Tokens.
+
+    At minimum you will need a personal access token with "Write" access to
+    "Contents". It allows write access to Repository contents, commits,
+    branches, downloads, releases, and merges.
+
+    Config::Identity::GitHub supports a gpg encrypted .github-identity file.
+    It is recommended that you implement encryption for the .github-identity
+    file. If you have gpg configured you can encrypt the file:
+
+     # Encrypt it to ~/.github-identity.asc
+     gpg -ea -r you@example.com ~/.github-identity
+     # Cat ~/.github-identity.asc to verify it is encrypted
+     cat ~/.github-identity.asc
+     # Verify you can decrypt the file
+     gpg -d ~/.github-identity.asc
+     # Replace the clear text version (uncomment next line)
+     # mv ~/.github-identity.asc ~/.github-identity
+
+ATTRIBUTES
+    hash_alg
+        A string value for the Digest::SHA supported hash algorithm to use
+        for the hash of the cpan upload file.
+
+    repo
+        A string value that specifies the name of the github repository. The
+        module determines the name based on the remote url but this setting
+        can override the name that is detected.
+
+    branch
+        A string value that specifies the branch. It defaults to main if not
+        specified.
+
+    title_template
+        A string value that specifies the format of the Title used for the
+        release. If the title includes VERSION it is replaced with the
+        version number of the release. If the title includes TRIAL it is
+        replaced with Official or Trial depending on whether --trial was
+        specified.
+
+        The default value is "Version VERSION - TRIAL CPAN release"
+
+    notes_as_code
+        An integer value specifying true/false. If the value is true (not 0)
+        the notes are surrounded by the github code markup "```" ... "```".
+
+    github_notes
+        An integer value specifying true/false. If the value is true (not 0)
+        the api call instructs github to add a link to the changes in the
+        release.
+
+    notes_from
+        A string value that specifies how to obtain the Notes for the
+        Release. The valid values are:
+
+        SignReleaseNotes
+        ChangeLog
+        FromFile
+        GitHub::CreateRelease
+
+    notes_file
+        A string value specifying the name template of the notes file that
+        should be read for to obtain the notes. It is used for if the
+        note_from is one of:
+
+         SignReleaseNotes
+         FromFile
+         ChangeLog
+
+        The default is Release-VERSION and VERSION is replaced by the module
+        version number if it exists.
+
+    draft
+        An integer value specifying true/false. If the value is true (not 0)
+        the api call instructs github that the Release is a draft. You must
+        publish it via the github webpage to make it active.
+
+METHODS
+    after_release
+        The main processing function that is called automatically after the
+        release is complete.
+
+    true
+        Boolean true constant
+
+    false
+        Boolean false constant
+
+AUTHOR
+      Timothy Legge <timlegge@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by Timothy Legge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+AUTHOR
+    Timothy Legge
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by Timothy Legge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

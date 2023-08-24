@@ -12,7 +12,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 73;
-use Runtime::Debugger;
+use Runtime::Debugger -nofilter;
 use Term::ANSIColor qw( colorstrip );
 use feature         qw( say );
 

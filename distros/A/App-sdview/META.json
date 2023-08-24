@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,70 +26,72 @@
             "File::Slurper" : "0",
             "List::Keywords" : "0",
             "List::Util" : "0",
-            "Object::Pad" : "0.74",
+            "Object::Pad" : "0.800",
+            "Object::Pad::FieldAttr::Checked" : "0.04",
             "Parse::Man::DOM" : "0.03",
             "Pod::Simple" : "0",
             "String::Tagged" : "0.15",
             "String::Tagged::Markdown" : "0.02",
             "String::Tagged::Terminal" : "0",
             "Term::Size" : "0",
+            "Types::Standard" : "0",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "App::sdview" : {
          "file" : "lib/App/sdview.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output" : {
          "file" : "lib/App/sdview/Output.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Formatted" : {
          "file" : "lib/App/sdview/Output/Formatted.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Man" : {
          "file" : "lib/App/sdview/Output/Man.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Markdown" : {
          "file" : "lib/App/sdview/Output/Markdown.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Plain" : {
          "file" : "lib/App/sdview/Output/Plain.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Pod" : {
          "file" : "lib/App/sdview/Output/Pod.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Output::Terminal" : {
          "file" : "lib/App/sdview/Output/Terminal.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Parser" : {
          "file" : "lib/App/sdview/Parser.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Parser::Man" : {
          "file" : "lib/App/sdview/Parser/Man.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Parser::Markdown" : {
          "file" : "lib/App/sdview/Parser/Markdown.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::sdview::Parser::Pod" : {
          "file" : "lib/App/sdview/Parser/Pod.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -98,6 +100,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

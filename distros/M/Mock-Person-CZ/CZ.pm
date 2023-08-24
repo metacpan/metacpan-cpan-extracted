@@ -10,9 +10,12 @@ use Readonly;
 # Constants.
 Readonly::Scalar our $SPACE => q{ };
 Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
-	last_male last_female middle_male middle_female name);
+	last_male last_female middle_male middle_female name name_female
+	name_male);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
+
+our $STRICT_NUM_NAMES = 0;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -333,10 +336,44 @@ sub middle_female {
 # Get random name.
 sub name {
 	my $sex = shift;
-	if (defined $sex && $sex eq 'female') {
-		return first_female().$SPACE.middle_female().$SPACE.last_female();
+
+	# In case of undefined sex, get random.
+	if (! defined $sex) {
+		if (int(rand(2))) {
+			$sex = 'female';
+		} else {
+			$sex = 'male';
+		}
+	}
+
+	if ($sex eq 'female') {
+		return name_female();
 	} else {
+		return name_male();
+	}
+}
+
+sub name_female {
+	my $strict_num_names = $STRICT_NUM_NAMES;
+	if ($strict_num_names == 0) {
+		$strict_num_names = int(rand(2)) + 2;
+	}
+	if ($strict_num_names == 3) {
+		return first_female().$SPACE.middle_female().$SPACE.last_female();
+	} elsif ($strict_num_names == 2) {
+		return first_female().$SPACE.last_female();
+	}
+}
+
+sub name_male {
+	my $strict_num_names = $STRICT_NUM_NAMES;
+	if ($strict_num_names == 0) {
+		$strict_num_names = int(rand(2)) + 2;
+	}
+	if ($strict_num_names == 3) {
 		return first_male().$SPACE.middle_male().$SPACE.last_male();
+	} elsif ($strict_num_names == 2) {
+		return first_male().$SPACE.last_male();
 	}
 }
 
@@ -346,7 +383,7 @@ __END__
 
 =encoding UTF-8
 
-=cut
+=cut 
 
 =head1 NAME
 
@@ -355,7 +392,7 @@ Mock::Person::CZ - Generate random sets of Czech names.
 =head1 SYNOPSIS
 
  use Mock::Person::CZ qw(first_male first_female last_male last_female
-         middle_male middle_female name);
+         middle_male middle_female name name_female name_male);
 
  my $first_male = first_male();
  my $first_female = first_female();
@@ -364,6 +401,8 @@ Mock::Person::CZ - Generate random sets of Czech names.
  my $middle_male = middle_male();
  my $middle_female = middle_female();
  my $name = name($sex);
+ my $name_female = name_female();
+ my $name_male = name_male();
 
 =head1 DESCRIPTION
 
@@ -428,13 +467,55 @@ Returns random middle name of female person.
 
  my $name = name($sex);
 
-Recieves scalar with sex of the person ('male' or 'female').
+Construct random person name. If a C<$sex> variable is specified, name could be
+male or female.
 
-Default value of $sex variable is 'male'.
+Number of names is 2 or 3. What is created is defined by C<$STRICT_NUM_NAMES>
+variable. See in L</VARIABLES> section.
 
-Returns scalar with generated name.
+Returns string.
+
+=head2 C<name_female>
+
+ my $name_female = name_female();
+
+Construct Czech random female name.
+
+Number of names is 2 or 3. What is created is defined by C<$STRICT_NUM_NAMES>
+variable. See in L</VARIABLES> section.
+
+Returns string.
+
+=head2 C<name_male>
+
+ my $name_male = name_male();
+
+Construct Czech random male name.
+
+Number of names is 2 or 3. What is created is defined by C<$STRICT_NUM_NAMES>
+variable. See in L</VARIABLES> section.
+
+Returns string.
+
+=head1 VARIABLES
+
+=over
+
+=item C<$STRICT_NUM_NAMES>
+
+Variable which control number of generated names.
+
+Possible values:
+
+ 0 - Random between 2 and 3 choice (default value).
+ 2 - First and last name.
+ 3 - First, middle and last name.
+
+=back
 
 =head1 EXAMPLE1
+
+=for comment filename=random_name.pl
 
  use strict;
  use warnings;
@@ -449,6 +530,8 @@ Returns scalar with generated name.
  # Štefan Lukáš Šimek
 
 =head1 EXAMPLE2
+
+=for comment filename=list_last_male_names.pl
 
  use strict;
  use warnings;
@@ -561,12 +644,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2021
+© 2013-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

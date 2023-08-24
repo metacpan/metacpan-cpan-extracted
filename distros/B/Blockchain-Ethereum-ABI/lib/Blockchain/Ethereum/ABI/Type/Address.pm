@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::ABI::Type::Address 0.011;
+package Blockchain::Ethereum::ABI::Type::Address 0.012;
 class Blockchain::Ethereum::ABI::Type::Address
     :isa(Blockchain::Ethereum::ABI::Type)
     :does(Blockchain::Ethereum::ABI::TypeRole);

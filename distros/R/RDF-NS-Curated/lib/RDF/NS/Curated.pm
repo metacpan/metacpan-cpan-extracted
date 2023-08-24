@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '1.004';
+our $VERSION   = '1.006';
 
 sub new {
   my $class = shift;
@@ -36,6 +36,7 @@ sub new {
 						 grddl => 'http://www.w3.org/2003/g/data-view#',
 						 hydra => 'http://www.w3.org/ns/hydra/core#',
 						 ical => 'http://www.w3.org/2002/12/cal/icaltzd#',
+						 jsonld => 'http://www.w3.org/ns/json-ld#',
 						 ldp => 'http://www.w3.org/ns/ldp#',
 						 ma => 'http://www.w3.org/ns/ma-ont#',
 						 oa => 'http://www.w3.org/ns/oa#',
@@ -190,7 +191,7 @@ This will return a hashref with all prefix and URI pairs.
 =head1 BUGS
 
 Please report any bugs to
-L<https://github.com/kjetilk/p5-rdf-ns-curated/issues>.
+L<https://github.com/perlrdf/p5-rdf-ns-curated/issues>.
 
 =head1 SEE ALSO
 
@@ -207,7 +208,7 @@ Harald Jörg
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.
+This software is copyright (c) 2015, 2017, 2018, 2023 by Kjetil Kjernsmo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

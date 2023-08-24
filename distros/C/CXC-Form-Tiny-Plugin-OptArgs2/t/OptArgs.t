@@ -15,7 +15,7 @@ package My::Form {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
 
-    use Types::Standard       qw( ArrayRef Bool Enum HashRef Str );
+    use Types::Standard       qw( Any ArrayRef Bool Enum HashRef Str );
     use Types::Common::String qw( NonEmptyStr );
 
     form_field 'file' => ( type => NonEmptyStr, );
@@ -37,7 +37,6 @@ package My::Form {
     );
 
     option(
-        isa          => 'Str',
         comment      => 'CSC TAP endpoint',
         isa_name     => 'URL',
         show_default => 1,
@@ -46,7 +45,6 @@ package My::Form {
     form_field 'output.file' => ( type => NonEmptyStr, );
     option(
         name     => 'output',
-        isa      => 'Str',
         comment  => 'File to store parsed results',
         isa_name => 'filename',
     );
@@ -54,31 +52,25 @@ package My::Form {
     form_field 'output.encoding' => ( type => Enum [ 'json', 'yaml' ], );
     option(
         name    => 'encoding',
-        isa     => 'Str',
         comment => sprintf( 'encoding format for --output [%s]', join( ' | ', qw( json yaml ) ) ),
     );
 
     form_field 'raw.encoding' => ( type => Enum [ 'foo', 'bar' ], );
     option(
         name    => 'raw-format',
-        isa     => 'Str',
         comment => sprintf( 'requested VO format [%s]', join( ' | ', qw( foo bar ) ) ),
     );
 
     form_field 'raw.file' => ( type => NonEmptyStr, );
     option(
         name     => 'raw-output',
-        isa      => 'Str',
         comment  => 'store raw results from CSC server in this file',
         isa_name => 'filename',
     );
 
 
     form_field 'upload' => ( type => HashRef [NonEmptyStr], );
-    option(
-        isa     => 'HashRef',
-        comment => 'table name/filename pairs to upload',
-    );
+    option( comment => 'table name/filename pairs to upload', );
 
     form_field 'vars' => (
         type    => HashRef [Str],
@@ -86,7 +78,6 @@ package My::Form {
     );
     option(
         name    => 'var',
-        isa     => 'HashRef',
         comment => 'variables to interpolate into query template',
     );
 
@@ -96,9 +87,11 @@ package My::Form {
     );
     option(
         name    => 'db',
-        isa     => 'Flag',
         comment => 'output to database instead of a file',
     );
+
+    form_field 'any_thing_goes' => ( type => Any, );
+    option( comment => 'the world is your oyster', );
 
     # add some arguments, in reverse order
 
@@ -109,7 +102,7 @@ package My::Form {
         order   => 2,
     );
 
-    form_field 'arg1' => ( type => NonEmptyStr, );
+    form_field 'arg1' => ( type => Any, );
     argument(
         comment => 'first argument',
         order   => 1,
@@ -130,8 +123,9 @@ sub options {
             table1 => 't/data/cscquery.csc',
             table2 => 't/data/cscquery.csc',
         },
-        arg1 => 'val1',
-        arg2 => [ 'val2.1', 'val2.2' ],
+        arg1           => 'val1',
+        arg2           => [ 'val2.1', 'val2.2' ],
+        any_thing_goes => 'Uppsala',
     };
 }
 
@@ -163,6 +157,7 @@ my $form = My::Form->new;
 
 argv();
 my $args;
+
 ok( lives { $args = optargs( comment => 'comment', optargs => $form->optargs ) },
     'form->optargs accepted by OptArgs2::optargs' )
   or bail_out( $@ );
@@ -186,6 +181,7 @@ ok( lives { $args = optargs( comment => 'comment', optargs => $form->optargs ) }
                 field $_ => $upload{$_} for keys %upload;
                 end;
             };
+            field any_thing_goes => $options{any_thing_goes};
             end;
         },
         'optargs correctly parsed command line input',
@@ -237,6 +233,7 @@ ok( $form->valid, 'form validated input' )
                 field a => 1;
                 end;
             };
+            field any_thing_goes => $options{any_thing_goes};
             end;
         },
         'form fields match expectations',

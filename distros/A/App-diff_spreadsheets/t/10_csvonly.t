@@ -8,7 +8,11 @@ use t_dsUtils qw/runtest $progname $progpath/;
 
 use File::Which qw/which/;
 
+
 my $tlib = "$Bin/../tlib";
+
+fail("'use FindBin' did not work? \$Bin=".vis($Bin)." tlib=$tlib")
+  unless -d $tlib;
 
 BEGIN {
   $ENV{COLUMNS} = 60;  # for fixed-width test ouput

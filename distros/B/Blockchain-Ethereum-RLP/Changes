@@ -1,4 +1,10 @@
 Revision history for Blockchain-Ethereum-RLP
+0.007
+    [Bug fixes]
+    - Fix dependency list
+0.006
+    [Improvements]
+    - OP recommended file layout
 0.005
     - Major refactoring
 0.004

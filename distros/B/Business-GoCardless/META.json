@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,6 +64,6 @@
          "url" : "https://github.com/Humanstate/business-gocardless"
       }
    },
-   "version" : "0.38",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.39",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

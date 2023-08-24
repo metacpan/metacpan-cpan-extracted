@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.801;
+package Object::Pad 0.802;
 
 use v5.14;
 use warnings;
@@ -454,7 +454,7 @@ I<Since version 0.66.>
 
 Declares that the instances of the class or role have a member field of the
 given name. This member field will be accessible as a lexical variable within
-any C<method> declarations in the class.
+any C<method> declarations and C<ADJUST> blocks in the class.
 
 Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
@@ -835,7 +835,8 @@ initialising fields from calculated values).
 An adjust block is not a subroutine and thus is not permitted to use
 subroutine attributes (except see below). Note that an C<ADJUST> block is a
 named phaser block and not a method; it does not use the C<sub> or C<method>
-keyword.
+keyword. But, like with C<method>, the member fields are accessible within the
+code body, as is the special C<$self> lexical.
 
 Currently, an C<ADJUST> block receives a reference to the hash containing the
 current constructor arguments, as per L</ADJUSTPARAMS> (see below). This was

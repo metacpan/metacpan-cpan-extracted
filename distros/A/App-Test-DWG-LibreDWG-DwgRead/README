@@ -3,7 +3,7 @@ NAME
     command.
 
 SYNOPSIS
-     test-dwg-libredwg-dwgread [-d test_dir] [-h] [-m match_string] [-v level] [--version] directory
+     test-dwg-libredwg-dwgread [-d test_dir] [-h] [-i] [-m match_string] [-v level] [--version] directory
 
 DESCRIPTION
     This tool is used to test libredwg dwgread command on directory with DWG
@@ -21,6 +21,12 @@ ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-i"
+
+            Ignore errors.
+
+            Default value is error reporting.
 
     *       "-m match_string"
 
@@ -63,5 +69,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

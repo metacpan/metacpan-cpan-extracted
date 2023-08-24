@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -48,13 +48,6 @@ through this container and only through it.
 
 The default mode is to create a one-off container for all resources
 and export if into the calling class via C<silo> function.
-
-Note that calling C<use Resource::Silo> from a different module will
-create a I<separate> container instance. You'll have to re-export
-(or otherwise provide access to) the C<silo> function.
-
-I<This is done on purpose so that multiple projects or modules can coexist
-within the same interpreter without interference.>
 
     package My::App;
     use Resource::Silo;
@@ -128,8 +121,6 @@ by default;
 
 =back
 
-=head1 RESOURCE DECLARATION
-
 =head2 resource
 
     resource 'name' => sub { ... };
@@ -137,16 +128,22 @@ by default;
 
 %options may include:
 
-=over
+=head3 init => sub { $self, $name, [$argument] }
 
-=item * init => sub { $self, $name, [$argument] }
-
-A coderef to obtain the resource. Required.
+A coderef to obtain the resource.
+Required, unless C<literal> or C<class> are specified.
 
 If the number of arguments is odd,
 the last one is popped and considered to be the init function.
 
-=item * argument => C<sub { ... }> || C<qr( ... )>
+=head3 literal => $value
+
+Replace initializer with C<sub { $value }>.
+
+In addition, C<derived> flag is set,
+and an empty C<dependencies> list is implied.
+
+=head3 argument => C<sub { ... }> || C<qr( ... )>
 
 If specified, assume that the resource in question may have several instances,
 distinguished by a string argument. Such argument will be passed as the 3rd
@@ -183,10 +180,13 @@ Example:
             );
         };
 
-=item * derivative => 1 | 0
+=head3 derived => 1 | 0
 
 Assume that resource can be derived from its dependencies,
 or that it introduces no extra side effects compared to them.
+
+This also naturally applies to resources with pure initializers,
+i.e. those having no dependencies and adding no side effects on top.
 
 Examples may be L<Redis::Namespace> built on top of a L<Redis> handle
 or L<DBIx::Class> built on top of L<DBI> connection.
@@ -197,18 +197,18 @@ initialized or overridden.
 
 See L<Resource::Silo::Container/lock>.
 
-=item * ignore_cache => 1 | 0
+=head3 ignore_cache => 1 | 0
 
 If set, don't cache resource, always create a fresh one instead.
 See also L<Resource::Silo::Container/fresh>.
 
-=item * preload => 1 | 0
+=head3 preload => 1 | 0
 
 If set, try loading the resource when C<silo-E<gt>ctl-E<gt>preload> is called.
 Useful if you want to throw errors when a service is starting,
 not during request processing.
 
-=item * cleanup => sub { $resource_instance }
+=head3 cleanup => sub { $resource_instance }
 
 Undo the init procedure.
 Usually it is assumed that the resource will do it by itself in the destructor,
@@ -221,7 +221,7 @@ erasing the object from the cache.
 
 See also C<fork_cleanup>.
 
-=item * cleanup_order => $number
+=head3 cleanup_order => $number
 
 The higher the number, the later the resource will get destroyed.
 
@@ -229,21 +229,21 @@ The default is 0, negative numbers are also valid, if that makes sense for
 you application
 (e.g. destroy C<$my_service_main_object> before the resources it consumes).
 
-=item * fork_cleanup => sub { $resource_instance }
+=head3 fork_cleanup => sub { $resource_instance }
 
 Like C<cleanup>, but only in case a change in process ID was detected.
 See L</FORKING>
 
 This may be useful if cleanup is destructive and shouldn't be performed twice.
 
-=item * dependencies => \@list
+=head3 dependencies => \@list
 
 If specified, only allow resources from the list to be fetched
 in the initializer.
 
 This parameter has a different meaning if C<class> parameter is in use (see below).
 
-=item * class => 'Class::Name'
+=head3 class => 'Class::Name'
 
 Turn on Spring-style dependency injection.
 This forbids C<init> and C<argument> parameters
@@ -296,7 +296,27 @@ Is roughly equivalent to:
             );
         };
 
-=back
+=head3 require => 'Module::Name' || \@module_list
+
+Load module(s) specified before calling the initializer.
+
+This is exactly the same as calling require 'Module::Name' in the initializer
+itself except that it's more explicit.
+
+=head2 silo
+
+A re-exportable singleton function returning
+one and true L<Resource::Silo::Container> instance
+associated with the class where the resources were declared.
+
+B<NOTE> Calling C<use Resource::Silo> from a different module will
+create a I<separate> container instance. You'll have to re-export
+(or otherwise provide access to) this function.
+
+I<This is done on purpose so that multiple projects or modules can coexist
+within the same interpreter without interference.>
+
+C<silo-E<gt>new> will create a new instance of the I<same> container class.
 
 =cut
 
@@ -369,7 +389,7 @@ The resources already in cache will still be OK though.
 The C<override> method allows to supply substitutes for resources or
 their initializers.
 
-The C<derivative> flag in the resource definition may be used to indicate
+The C<derived> flag in the resource definition may be used to indicate
 that a resource is safe to instantiate as long as its dependencies are
 either instantiated or mocked, e.g. a L<DBIx::Class> schema is probably fine
 as long as the underlying database connection is taken care of.
@@ -429,6 +449,131 @@ Usage together with C<Moo> works, but only if L<Resource::Silo> comes first:
     resource config => sub { LoadFile( $_[0]->config_name ) };
 
 Compatibility issues are being slowly worked on.
+
+=head1 MORE EXAMPLES
+
+=head2 Resources with just the init
+
+    package My::App;
+    use Resource::Silo;
+
+    resource config => sub {
+        require YAML::XS;
+        YAML::XS::LoadFile( "/etc/myapp.yaml" );
+    };
+
+    resource dbh    => sub {
+        require DBI;
+        my $self = shift;
+        my $conf = $self->config->{database};
+        DBI->connect(
+            $conf->{dbi}, $conf->{username}, $conf->{password}, { RaiseError => 1 }
+        );
+    };
+
+    resource user_agent => sub {
+        require LWP::UserAgent;
+        LWP::UserAgent->new();
+        # set your custom UserAgent header or SSL certificate(s) here
+    };
+
+Note that though lazy-loading the modules is not necessary,
+it may speed up loading support scripts.
+
+=head2 Resources with extra options
+
+    resource logger =>
+        cleanup_order   => 9e9,     # destroy as late as possible
+        require         => [ 'Log::Any', 'Log::Any::Adapter' ],
+        init            => sub {
+            Log::Any::Adapter->set( 'Stderr' );
+            # your rsyslog config could be here
+            Log::Any->get_logger;
+        };
+
+    resource schema =>
+        derived         => 1,        # merely a frontend to dbi
+        require         => 'My::App::Schema',
+        init            => sub {
+            my $self = shift;
+            return My::App::Schema->connect( sub { $self->dbh } );
+        };
+
+=head2 Resource with parameter
+
+An useless but short example:
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use Resource::Silo;
+
+    resource fibonacci =>
+        argument            => qr(\d+),
+        init                => sub {
+            my ($self, $name, $arg) = @_;
+            $arg <= 1 ? $arg
+                : $self->fibonacci($arg-1) + $self->fibonacci($arg-2);
+        };
+
+    print silo->fibonacci(shift);
+
+A more pragmatic one:
+
+    package My::App;
+    use Resource::Silo;
+
+    my %known_namespaces = (
+        lock    => 1,
+        session => 1,
+        user    => 1,
+    );
+
+    resource redis  =>
+        argument        => sub { $known_namespaces{ $_ } },
+        require         => 'Redis::Namespace',
+        init            => sub {
+            my ($self, $name, $ns) = @_;
+            Redis::Namespace->new(
+                redis     => $self->redis,
+                namespace => $ns,
+            );
+        };
+
+    resource redis_conn => sub {
+        my $self = shift;
+        require Redis;
+        Redis->new( server => $self->config->{redis} );
+    };
+
+    # later in the code
+    silo->redis;            # nope!
+    silo->redis('session'); # get a prefixed namespace
+
+=head3 Overriding in test files
+
+    use Test::More;
+    use My::App qw(silo);
+
+    silo->ctl->override( dbh => $temp_sqlite_connection );
+    silo->ctl->lock;
+
+    my $stuff = My::App::Stuff->new();
+    $stuff->frobnicate( ... );        # will only affect the sqlite instance
+
+    $stuff->ping_partner_api();       # oops! the user_agent resource wasn't
+                                      # overridden, so there'll be an exception
+
+=head3 Fetching a dedicated resource instance
+
+    use My::App qw(silo);
+    my $dbh = silo->ctl->fresh('dbh');
+
+    $dbh->begin_work;
+    # Perform a Big Scary Update here
+    # Any operations on $dbh won't interfere with normal usage
+    #     of silo->dbh by other application classes.
 
 =head1 SEE ALSO
 

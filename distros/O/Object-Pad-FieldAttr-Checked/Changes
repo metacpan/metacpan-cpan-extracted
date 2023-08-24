@@ -1,5 +1,16 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.04    2023-08-23
+        [CHANGES]
+         * No longer applies constraint at every modification; only during
+           constructor or `:writer` accessors. Improves performance of
+           internal code, and doesn't over-promise what it can't deliver.
+
+0.03    2023-08-22
+        [BUGFIXES]
+         * Ensure the checker-generating expression is eval()'ed in the right
+           package name, and with the right hints and features enabled
+
 0.02    2023-08-14
         [CHANGES]
          * Various documentation updates and improvements; including

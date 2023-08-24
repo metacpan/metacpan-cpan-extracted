@@ -15,8 +15,10 @@ lilith [B<-c> <config>] B<-a> create_tables
 lilith [B<-c> <config>] B<-a> dump_self
 
 lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id> [B<--raw>]
+[[B<--pcap> <output file>] [B<--virani> <remote>] [B<--buffer> <buffer secodns>]]
 
 lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--event> <event_id> [B<--raw>]
+[[B<--pcap> <output file>] [B<--virani> <remote>] [B<--buffer> <buffer secodns>]
 
 lilith [B<-c> <config>] B<-a> extend [B<-Z>] [B<-m> <minutes>]
 
@@ -86,6 +88,25 @@ Fetch event via row ID.
 =head3 --event <event_id>
 
 Fetch the event via the event ID.
+
+=head3 --pcap <file>
+
+Fetch the remote PCAP via Virani and write it to the file. Only usable for with Suricata tables.
+
+Default :: undef
+
+=head3 --virani <conf>
+
+Virani setting to pass to -r.
+
+Default :: instance name in alert
+
+=head3 --buffer <secs>
+
+How many seconds to pad the start and end time with.
+
+Default :: 60
+
 
 =head2 extend
 
@@ -460,9 +481,10 @@ use MIME::Base64;
 use Gzip::Faster;
 use Data::Dumper;
 use Sys::Syslog;
+use Time::Piece::Guess;
 
 sub version {
-	print "lilith v. 0.2.0\n";
+	print 'lilith v. ' . $Lilith::VERSION . "\n";
 }
 
 sub help {
@@ -492,14 +514,24 @@ Action :: event
 Description :: Fetch the information for the specified event.
                Either --id or --event is needed.
 
---id <row id>  Row ID to fetch.
-               Default :: undef
+--id <row id>   Row ID to fetch.
+                Default :: undef
 
---event <id>   Event ID to fetch.
-               Default :: undef
+--event <id>    Event ID to fetch.
+                Default :: undef
 
---raw          Print the raw EVE JSON.
-               Default :: undef
+--raw           Do not decode the EVE JSON.
+                Default :: undef
+
+--pcap <file>   Fetch the remote PCAP via Virani and write it to the file.
+                Only usable for with Suricata tables.
+                Default :: undef
+
+--virani <conf> Virani setting to pass to -r.
+                Default :: instance name in alert
+
+--buffer <secs> How many seconds to pad the start and end time with.
+                Default :: 60
 
 Action :: extend
 Description :: LibreNMS style SNMP extend.
@@ -688,7 +720,7 @@ String :: A string to check for. May be matched using like or negated via
           the proper options.
 Complex :: A item to match.
 ';
-}
+} ## end sub help
 
 # get the commandline options
 my $help        = 0;
@@ -748,6 +780,9 @@ my $group = 0;
 my $librenms_compress;
 my $dir;
 my $raw;
+my $virani;
+my $pcap;
+my $buffer = 60;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -808,6 +843,9 @@ GetOptions(
 	'group=s'     => \$user,
 	'Z'           => \$librenms_compress,
 	'dir=s'       => \$dir,
+	'pcap=s'      => \$pcap,
+	'virani=s'    => \$virani,
+	'buffer=s'    => \$buffer,
 );
 
 # print version or help if requested
@@ -877,6 +915,10 @@ if ( !-f $config_file ) {
 	die( '"' . $config_file . '" does not exist' );
 }
 
+if ( $buffer !~ /^\d+$/ ) {
+	die( '--buffer is set to "' . $buffer . '" which is non-numeric' );
+}
+
 # read the in or die
 my $toml_raw = read_file($config_file) or die 'Failed to read "' . $config_file . '"';
 
@@ -926,7 +968,7 @@ while ( defined( $toml_keys[$int] ) ) {
 	}
 
 	$int++;
-}
+} ## end while ( defined( $toml_keys[$int] ) )
 
 if ( $action eq 'run' ) {
 	openlog( 'lilith', undef, 'daemon' );
@@ -937,8 +979,7 @@ if ( $action eq 'run' ) {
 	$message = "dsn: ";
 	if ( defined( $toml->{dsn} ) ) {
 		$message = $message . $toml->{dsn} . "\n";
-	}
-	else {
+	} else {
 		$message = $message . "***undefined***\n";
 	}
 	syslog( 'info', $message );
@@ -947,8 +988,7 @@ if ( $action eq 'run' ) {
 	$message = "sagan: ";
 	if ( defined( $toml->{sagan} ) ) {
 		$message = $message . $toml->{sagan} . "\n";
-	}
-	else {
+	} else {
 		$message = $message . "***undefined***\n";
 	}
 	syslog( 'info', $message );
@@ -957,8 +997,7 @@ if ( $action eq 'run' ) {
 	$message = "suricata: ";
 	if ( defined( $toml->{suricata} ) ) {
 		$message = $message . $toml->{suricata} . "\n";
-	}
-	else {
+	} else {
 		$message = $message . "***undefined***\n";
 	}
 	syslog( 'info', $message );
@@ -967,8 +1006,7 @@ if ( $action eq 'run' ) {
 	$message = "user: ";
 	if ( defined( $toml->{user} ) ) {
 		$message = $message . $toml->{user} . "\n";
-	}
-	else {
+	} else {
 		$message = $message . "***undefined***\n";
 	}
 	syslog( 'info', $message );
@@ -977,8 +1015,7 @@ if ( $action eq 'run' ) {
 	$message = "pass: ";
 	if ( defined( $toml->{pass} ) ) {
 		$message = $message . "***defined***\n";
-	}
-	else {
+	} else {
 		$message = $message . "***undefined***\n";
 	}
 	syslog( 'info', $message );
@@ -1004,7 +1041,7 @@ if ( $action eq 'run' ) {
 	}
 
 	$lilith->run( files => \%files, );
-}
+} ## end if ( $action eq 'run' )
 
 if ( $action eq 'extend' ) {
 
@@ -1025,8 +1062,7 @@ if ( $action eq 'extend' ) {
 		$compressed =~ s/\n//g;
 		$compressed = $compressed . "\n";
 		print $compressed;
-	}
-	else {
+	} else {
 		print $raw_json;
 	}
 	if ( !$pretty && !$librenms_compress ) {
@@ -1034,7 +1070,7 @@ if ( $action eq 'extend' ) {
 	}
 
 	exit 0;
-}
+} ## end if ( $action eq 'extend' )
 
 if ( $action eq 'search' ) {
 
@@ -1095,8 +1131,7 @@ if ( $action eq 'search' ) {
 			print "\n";
 		}
 		exit 0;
-	}
-	elsif ( $search_output eq 'table' ) {
+	} elsif ( $search_output eq 'table' ) {
 
 		#
 		# set the columns they had not been manually specified
@@ -1106,45 +1141,36 @@ if ( $action eq 'search' ) {
 				if ( $column_set eq 'default' ) {
 					$columns
 						= 'id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_timestamp' ) {
+				} elsif ( $column_set eq 'default_timestamp' ) {
 					$columns
 						= 'timestamp,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_event' ) {
+				} elsif ( $column_set eq 'default_event' ) {
 					$columns
 						= 'id,event_id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_timestamp_event' ) {
+				} elsif ( $column_set eq 'default_timestamp_event' ) {
 					$columns
 						= 'timestamp,event_id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
-				}
-				else {
+				} else {
 					die( '"' . $column_set . '" is not a known column set' );
 				}
-			}
-			else {
+			} else {
 				if ( $column_set eq 'default' ) {
 					$columns
 						= 'id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_timestamp' ) {
+				} elsif ( $column_set eq 'default_timestamp' ) {
 					$columns
 						= 'timestamp,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_event' ) {
+				} elsif ( $column_set eq 'default_event' ) {
 					$columns
 						= 'id,event_id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
-				}
-				elsif ( $column_set eq 'default_timestamp_event' ) {
+				} elsif ( $column_set eq 'default_timestamp_event' ) {
 					$columns
 						= 'timestamp,event_id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
-				}
-				else {
+				} else {
 					die( '"' . $column_set . '" is not a known column set' );
 				}
-			}
-		}
+			} ## end else [ if ( $table eq 'suricata' ) ]
+		} ## end if ( !defined($columns) )
 
 		# friendly column names
 		my $column_names = {
@@ -1202,7 +1228,7 @@ if ( $action eq 'search' ) {
 			$tb->set_column_style( $header_int, pad => $padding );
 
 			$header_int++;
-		}
+		} ## end foreach my $header (@columns_array)
 
 		$tb->columns( \@headers );
 
@@ -1221,11 +1247,9 @@ if ( $action eq 'search' ) {
 
 				if ( defined( $row->{$column} ) && $column eq 'rule_id' ) {
 					push( @new_line, $row->{gid} . ':' . $row->{sid} . ':' . $row->{rev} );
-				}
-				elsif ( defined( $row->{$column} ) && $column eq 'classification' ) {
+				} elsif ( defined( $row->{$column} ) && $column eq 'classification' ) {
 					push( @new_line, $lilith->get_short_class( $row->{$column} ) );
-				}
-				elsif ( defined( $row->{$column} ) && ( $column eq 'src_ip' || $column eq 'dest_ip' ) ) {
+				} elsif ( defined( $row->{$column} ) && ( $column eq 'src_ip' || $column eq 'dest_ip' ) ) {
 					if ( defined( $ENV{Lilith_IP_color} ) ) {
 						if (   $row->{$column} =~ /^192\.168\./
 							|| $row->{$column} =~ /^10\./
@@ -1248,17 +1272,14 @@ if ( $action eq 'search' ) {
 							|| $row->{$column} =~ /^172\.31/ )
 						{
 							$row->{$column} = color( $ENV{Lilith_IP_private_color} ) . $row->{$column} . color('reset');
-						}
-						elsif ( $row->{$column} =~ /^127\./ ) {
+						} elsif ( $row->{$column} =~ /^127\./ ) {
 							$row->{$column} = color( $ENV{Lilith_IP_local_color} ) . $row->{$column} . color('reset');
-						}
-						else {
+						} else {
 							$row->{$column} = color( $ENV{Lilith_IP_remote_color} ) . $row->{$column} . color('reset');
 						}
-					}
+					} ## end if ( defined( $ENV{Lilith_IP_color} ) )
 					push( @new_line, $row->{$column} );
-				}
-				elsif ( defined( $row->{$column} ) && $column eq 'timestamp' ) {
+				} elsif ( defined( $row->{$column} ) && $column eq 'timestamp' ) {
 					if ( $ENV{Lilith_timesamp_drop_micro} ) {
 						$row->{$column} =~ s/\.[0-9]+//;
 					}
@@ -1266,8 +1287,7 @@ if ( $action eq 'search' ) {
 						$row->{$column} =~ s/\-[0-9]+$//;
 					}
 					push( @new_line, $row->{$column} );
-				}
-				elsif ( defined( $row->{$column} ) && $column eq 'instance' && $ENV{Lilith_instance_color} ) {
+				} elsif ( defined( $row->{$column} ) && $column eq 'instance' && $ENV{Lilith_instance_color} ) {
 					my $color0 = color( $ENV{Lilith_instance_slug_color} );
 					my $color1 = color('reset');
 					my $color3 = color( $ENV{Lilith_instance_type_color} );
@@ -1276,18 +1296,16 @@ if ( $action eq 'search' ) {
 					$row->{$column} =~ s/\-(ids|pie|lae)$/-$color3$1$color1/;
 					$row->{$column} =~ s/\-([A-Za-z0-9\-]+)\-/-$color4$1$color1/;
 					push( @new_line, $row->{$column} );
-				}
-				elsif ( defined( $row->{$column} ) ) {
+				} elsif ( defined( $row->{$column} ) ) {
 					push( @new_line, $row->{$column} );
-				}
-				else {
+				} else {
 					push( @new_line, '' );
 				}
 
-			}
+			} ## end foreach my $column (@columns_array)
 
 			push( @td, \@new_line );
-		}
+		} ## end foreach my $row ( @{$returned} )
 
 		#
 		# print the table
@@ -1295,11 +1313,11 @@ if ( $action eq 'search' ) {
 		$tb->add_rows( \@td );
 		print $tb->draw;
 		exit 0;
-	}
+	} ## end elsif ( $search_output eq 'table' )
 
 	# bad selection via --output
 	die('No applicable output found');
-}
+} ## end if ( $action eq 'search' )
 
 #
 # gets a event
@@ -1308,6 +1326,10 @@ if ( $action eq 'search' ) {
 if ( $action eq 'event' ) {
 	if ( defined($id) && defined($event_id) ) {
 		die('Can not search via both --id and --event for fetching a event');
+	}
+
+	if ( !defined($id) && !defined($event_id) ) {
+		die('Either --id and --event for fetching a event');
 	}
 
 	my $returned = $lilith->search(
@@ -1324,7 +1346,7 @@ if ( $action eq 'event' ) {
 		exit 42;
 	}
 
-	if (   $decode_raw
+	if (   !$decode_raw
 		&& defined( $returned->[0] )
 		&& defined( $returned->[0]{raw} ) )
 	{
@@ -1341,8 +1363,55 @@ if ( $action eq 'event' ) {
 	if ( !$pretty ) {
 		print "\n";
 	}
+
+	if ($pcap) {
+		if ( $table ne 'suricata' ) {
+			die '--pcap is only supported for Suricata';
+		}
+
+		print "\n";
+
+		if ( !defined $returned->[0] ) {
+			die('No such event, unable to fetch PCAP');
+		}
+
+		my $remote_arg = $virani;
+		if ( !defined($virani) ) {
+			$remote_arg = $returned->[0]{instance};
+		}
+
+		my $filter = 'host ' . $returned->[0]{src_ip} . ' and host ' . $returned->[0]{dest_ip};
+		if (   defined( $returned->[0]{src_port} )
+			&& defined( $returned->[0]{dest_port} )
+			&& $returned->[0]{dest_port} =~ /^\d+$/
+			&& $returned->[0]{src_port}  =~ /^\d+$/ )
+		{
+			$filter
+				= $filter . ' and ( port ' . $returned->[0]{src_port} . ' or port ' . $returned->[0]{dest_port} . ' ) ';
+		}
+
+		my $start_obj;
+		eval { $start_obj = Time::Piece::Guess->guess_to_object( $returned->[0]{flow_start}, 1 ); };
+		if ( $@ || !defined($start_obj) ) {
+			die( 'Failed to parse the start stamp,"' . $returned->[0]{flow_start} . '",' );
+		}
+		$start_obj = $start_obj - $buffer;
+
+		my $end_obj;
+		eval { $end_obj = Time::Piece::Guess->guess_to_object( $returned->[0]{timestamp}, 1 ); };
+		if ( $@ || !defined($end_obj) ) {
+			die( 'Failed to parse the timestamp,"' . $returned->[0]{timestamp} . '",' );
+		}
+		$end_obj = $end_obj + $buffer;
+
+		system(
+			'virani',          '-r', $remote_arg,     '-w', $pcap, '-s',
+			$start_obj->epoch, '-e', $end_obj->epoch, '-f', $filter
+		);
+	} ## end if ($pcap)
+
 	exit 0;
-}
+} ## end if ( $action eq 'event' )
 
 #
 # print the class_map
@@ -1370,7 +1439,7 @@ if ( $action eq 'class_map' ) {
 		$tb->set_column_style( $header_int, pad => $padding );
 
 		$header_int++;
-	}
+	} ## end foreach my $header (@columns)
 
 	$tb->columns( \@headers );
 
@@ -1390,7 +1459,7 @@ if ( $action eq 'class_map' ) {
 	print $tb->draw;
 
 	exit 0;
-}
+} ## end if ( $action eq 'class_map' )
 
 #
 # print short SNMP class names

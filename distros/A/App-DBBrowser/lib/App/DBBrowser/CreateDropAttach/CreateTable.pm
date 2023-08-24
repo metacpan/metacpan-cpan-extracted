@@ -383,7 +383,6 @@ sub __edit_column_names {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col_number = 0;
-    my $db = $sf->{d}{db};
     my $fields;
     if ( @$column_names ) {
         $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$column_names ];

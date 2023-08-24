@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use Tk;
 use base qw(Tk::Frame);
@@ -577,7 +577,8 @@ sub createForm {
 		}
 	}
 	$self->{OPTIONS} = \%options;
-	$self->after(10, ['validate', $self]);;
+	$self->after(10, ['validate', $self]);
+	return $notebook;
 }
 
 sub DefineTypes {

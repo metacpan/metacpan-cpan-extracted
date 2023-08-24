@@ -1,16 +1,17 @@
+a.html
 Changes
 lib/WWW/Mechanize/Chrome/DOMops.pm
 Makefile.PL
 MANIFEST			This list of files
+outfile.js
 README
 README.md
-t/00-load.t
-t/20-find.t
-t/30-zap.t
+t/000-load.t
+t/020-find.t
+t/030-zap.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/t-data/site1/content.html
-t/t-data/site1/url.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

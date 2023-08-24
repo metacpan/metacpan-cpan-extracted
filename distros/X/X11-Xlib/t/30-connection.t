@@ -33,7 +33,7 @@ ok( $pointer2 ne $pointer1, 'distinct pointer' );
 is( scalar X11::Xlib->_all_connections, 2, 'two registered connections' );
 
 X11::Xlib::XCloseDisplay($conn2);
-# Display* has been freed, so address could get re-used, so it must become un-registered.
+# Display* has been freed, so address could get re-used, so it must become unregistered.
 ok( $conn2, 'conn2 still defined' );
 is( $conn2->_pointer_value, undef, 'conn2 internal pointer is NULL' );
 is( scalar X11::Xlib->_all_connections, 1, 'one registered connection' );

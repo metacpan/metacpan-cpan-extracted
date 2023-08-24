@@ -51,6 +51,46 @@ and can be an ORed combination of:
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item base_height
+
+=item base_width
+
+=item flags
+
+=item height
+
+=item height_inc
+
+=item max_aspect_x
+
+=item max_aspect_y
+
+=item max_height
+
+=item max_width
+
+=item min_aspect_x
+
+=item min_aspect_y
+
+=item min_height
+
+=item min_width
+
+=item width
+
+=item width_inc
+
+=item win_gravity
+
+=item x
+
+=item y
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('1.0.4');
+our $VERSION = version->new('1.0.5');
 our $NAME    = 'list';
 our $OPTIONS = [ 'number|n=s', 'verbose|v+', ];
 sub details_sub { return ( $NAME, $OPTIONS ) }
@@ -42,7 +42,7 @@ App::VTide::Command::List - Create a list in a running App::VTide session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::List version 1.0.4
+This documentation refers to App::VTide::Command::List version 1.0.5
 
 =head1 SYNOPSIS
 

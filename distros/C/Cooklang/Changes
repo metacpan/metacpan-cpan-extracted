@@ -1,5 +1,9 @@
 Revision history for Cooklang
 
+0.12    2023-08-19 07:53:06 Europe/Berlin
+ - Only convert fractions to numbers if they are finite. Solves
+   https://rt.cpan.org/Ticket/Display.html?id=149421
+
 0.11    2023-06-17 10:58:38 Europe/Berlin
  - Minimum Perl version is 5.34.
  - Added pod

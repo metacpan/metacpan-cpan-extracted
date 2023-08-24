@@ -29,7 +29,7 @@ sub get_db_driver {
 
 sub env_variables {
     my ( $sf ) = @_;
-    return [ qw( DBI_DSN DBI_USER DBI_PASS ) ];
+    return [ qw( DBI_USER DBI_PASS ) ];
 }
 
 
@@ -61,11 +61,8 @@ sub get_db_handle {
 
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
-    my $dsn;
+    my $dsn = "dbi:$sf->{i}{driver}:$db";
     my $show_sofar = 'DB '. $db;
-    if ( ! $env_var_yes->{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
-        $dsn = "dbi:$sf->{i}{driver}:$db";
-    }
     my $user   = $cred->get_login( 'user', $show_sofar, $settings );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
     my $passwd = $cred->get_login( 'pass', $show_sofar, $settings );

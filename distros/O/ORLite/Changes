@@ -1,5 +1,9 @@
 Changes for Perl extension ORLite
 
+2.00      2023-08-19 22:24:38Z
+        - fix some test module renamings that were missed in 1.99
+        - Fix test failure with SQLite 3.37.0 (RT#140748)
+
 1.99      2023-08-13 21:09:06Z
         - fix test errors with DBD::SQLite >= 1.52 (RT#149134)
 

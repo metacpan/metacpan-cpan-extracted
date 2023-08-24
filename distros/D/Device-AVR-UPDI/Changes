@@ -1,10 +1,17 @@
 Revision history for Device-AVR-UPDI
 
+0.13    2023-08-24
+        [CHANGES]
+         * Rebuild with latest ATtiny ATDF files
+            + Adds support for ATtiny3224, ATtiny3226, ATtiny3227
+         * Use `Object::Pad::ClassAttr::Struct` instead of `Struct::Dumb`
+         * Updates for Object::Pad v0.73
+
 0.12    2022-10-04
         [CHANGES]
          * Have `verify` command calculate the actual offset byte where verify
            failed
-         * Updated for TEst::ExpectAndCheck::Future v0.04
+         * Updated for Test::ExpectAndCheck::Future v0.04
 
 0.11    2022-07-13
         [CHANGES]

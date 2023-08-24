@@ -35,6 +35,7 @@ Slick-0.001/META.json
 Slick-0.001/META.yml
 Slick-0.003.tar.gz
 Slick-0.005.tar.gz
+Slick-0.006.tar.gz
 t/01-basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

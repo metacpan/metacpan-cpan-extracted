@@ -142,11 +142,11 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 6.001 (); # use rather than require for dist zilla 
+  use Data::Dumper::Interp 6.003 (); # 6.003 fixed AUTOLOAD $@ corruption
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing DDI
     Data::Dumper::Interp->import::into($target,
-                                       qw/:DEFAULT rdvis rvis set_addrvis_digits/);
+                                       qw/:DEFAULT rdvis rvis addrvis_digits/);
     $Data::Dumper::Interp::Useqq = 'unicode'; # omit 'controlpic' to get \t etc.
   }
 

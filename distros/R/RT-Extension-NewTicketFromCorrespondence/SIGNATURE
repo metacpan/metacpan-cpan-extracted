@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5b21e877b5d7af10cfaba795d1202203a18ba8f1355188eedb62b86b1184a7d0 .perltidyrc
+SHA256 09ccc8a307bfe340331d7a02534ad21d0ed60d51e4757b222c398245a79a5fd8 Changes
+SHA256 b72116cd390087d5a687b7a5755e2c61b4dbdf379129b5dc209074c57b4d413a LICENSE
+SHA256 f0845330cee5e014932ccc25288f05ae449ab44b3ddae537d47302f8261093bf MANIFEST
+SHA256 f9cc62567b7d2afe83663342739df28029e049c61069848389885951576b4e54 META.yml
+SHA256 79dd382a60c9c35caf4cb9bb52cc4108a2791f020f2e45c1bafd4d1e7c8a53a8 Makefile.PL
+SHA256 e91fc6faf6d35632f6bd37d900295898af5c21034544dc82c67b8e7fdbab48c8 README
+SHA256 74eb156e6aa60cd02a9772097f7325a0f41cc835b9d9c643ddf7444815a89b2f README.md
+SHA256 eae80cedc77c86c03b9837ac525f1c058a776337206f5bd1e7be41395cd663ce html/Callbacks/NewTicketFromCorrespondence/Elements/ShowTransaction/Default
+SHA256 0983c2d33b9f9f60e88c55eaf1c07149ad7821826a43a4f4017cb41a72ffbeb3 html/Callbacks/NewTicketFromCorrespondence/Ticket/Create.html/FormStart
+SHA256 ef3f101309eff4440f3cec778b98a03ef14e436b3a505ab6e4d9363c5343cc51 html/Callbacks/NewTicketFromCorrespondence/Ticket/Create.html/Init
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 85027ee60a24da1901605b2d861e9f2cc71ff5068a6cb14c7c58ecda379aefb2 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 14d102d1c015dad3b644dbf2f7d7fcb43eb2cf48d5b2d84a7cf05c69e64d0b7a lib/RT/Extension/NewTicketFromCorrespondence.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEQme0+Q8meKESFpvWHR73WBtF6aAFAmTenuMACgkQHR73WBtF
+6aD4bgwAxsDzCcs771kWFAtTLmdAkmvnbTbLU/+Zxh3nmlcIGK489wsUNPmnIU9m
+UrexaParFhKeavO/AWOvZ2kClcWrB9qqAqz77jxS4xVfN9qHsyHmMBoy+taCY1rv
+AqSJQ2melUBOFQ4NPZNWF7THQ/C6MAEZMFZOcf4R+8SF9s4IVYkIsXJ/rsKKggFc
+90WcRQFaUQG15UYCdXXQnWH0WYHwxpnVFP215oIfobcbXW1dTzjyqGw6nfaVAi+k
+JmxKxboaUhcDK8xCoDg8pNm/LP/cOVJmx4y/RSMc7ymt8Yx89RchWzKUIxCqlz4p
+Jx1dItYi9XIkJoXPS7E+Jh2Nkr4Kz5OWqaNGY8uYGnS2l3NKdIylmy8VWuMtCMeV
+dq9RCKqLnzrAbBQ4AIxdu6dnZ+o+TbEOWbUu3xvUIVxZtzHKdG0bVhurmAwwZGWr
+jm6WckFeUYTBOxxgX9skJomGOfZaGIU83ldfSiKS47NovMr+NmtcQV9uBPSWg6zA
+jNvitUEl
+=QoHX
+-----END PGP SIGNATURE-----

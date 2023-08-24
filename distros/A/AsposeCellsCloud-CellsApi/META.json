@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "23.7"
+         "version" : "23.8"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -277,6 +277,9 @@
       },
       "AsposeCellsCloud::Object::PdfSecurityOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm"
+      },
+      "AsposeCellsCloud::Object::Protection" : {
+         "file" : "lib/AsposeCellsCloud/Object/Protection.pm"
       },
       "AsposeCellsCloud::Object::ProtectSheetParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm"
@@ -881,6 +884,9 @@
       "AsposeCellsCloud::Object::PivotTableFieldRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm"
       },
+      "AsposeCellsCloud::Object::ProtectWorkbookRequst" : {
+         "file" : "lib/AsposeCellsCloud/Object/ProtectWorkbookRequst.pm"
+      },
       "AsposeCellsCloud::Object::RangeCopyRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/RangeCopyRequest.pm"
       },
@@ -907,6 +913,15 @@
       },
       "AsposeCellsCloud::Object::WorksheetMovingRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm"
+      },
+      "AsposeCellsCloud::Object::ImageOrPrintOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImageOrPrintOptions.pm"
+      },
+      "AsposeCellsCloud::Object::RenderingFont" : {
+         "file" : "lib/AsposeCellsCloud/Object/RenderingFont.pm"
+      },
+      "AsposeCellsCloud::Object::RenderingWatermark" : {
+         "file" : "lib/AsposeCellsCloud/Object/RenderingWatermark.pm"
       },
       "AsposeCellsCloud::Object::PivotField" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotField.pm"
@@ -1079,6 +1094,9 @@
       "AsposeCellsCloud::Object::TilePicOption" : {
          "file" : "lib/AsposeCellsCloud/Object/TilePicOption.pm"
       },
+      "AsposeCellsCloud::Object::DigitalSignature" : {
+         "file" : "lib/AsposeCellsCloud/Object/DigitalSignature.pm"
+      },
       "AsposeCellsCloud::Object::Axis" : {
          "file" : "lib/AsposeCellsCloud/Object/Axis.pm"
       },
@@ -1231,9 +1249,6 @@
       },
       "AsposeCellsCloud::Request::PostBatchSplitRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm"
-      },
-      "AsposeCellsCloud::Request::GetExtractBarcodesRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm"
       },
       "AsposeCellsCloud::Request::PostClearContentsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm"
@@ -1537,6 +1552,9 @@
       },
       "AsposeCellsCloud::Request::PostUnlockRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostUnlockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostLockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostLockRequest.pm"
       },
       "AsposeCellsCloud::Request::PostProtectRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostProtectRequest.pm"
@@ -2143,6 +2161,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "23.7",
+   "version" : "23.8",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

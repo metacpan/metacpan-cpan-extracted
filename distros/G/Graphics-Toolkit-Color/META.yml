@@ -20,44 +20,47 @@ no_index:
 provides:
   Graphics::Toolkit::Color:
     file: lib/Graphics/Toolkit/Color.pm
-    version: '1.53'
-  Graphics::Toolkit::Color::Constant:
-    file: lib/Graphics/Toolkit/Color/Constant.pm
-    version: '1.53'
+    version: '1.54'
+  Graphics::Toolkit::Color::Name:
+    file: lib/Graphics/Toolkit/Color/Name.pm
+    version: '1.54'
+  Graphics::Toolkit::Color::Name::Constant:
+    file: lib/Graphics/Toolkit/Color/Name/Constant.pm
+    version: '1.54'
   Graphics::Toolkit::Color::Space:
     file: lib/Graphics/Toolkit/Color/Space.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::SpaceBasis:
     file: lib/Graphics/Toolkit/Color/SpaceBasis.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Util:
     file: lib/Graphics/Toolkit/Color/Util.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value:
     file: lib/Graphics/Toolkit/Color/Value.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value::CMY:
     file: lib/Graphics/Toolkit/Color/Value/CMY.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value::CMYK:
     file: lib/Graphics/Toolkit/Color/Value/CMYK.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value::HSL:
     file: lib/Graphics/Toolkit/Color/Value/HSL.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value::HSV:
     file: lib/Graphics/Toolkit/Color/Value/HSV.pm
-    version: '1.53'
+    version: '1.54'
   Graphics::Toolkit::Color::Value::RGB:
     file: lib/Graphics/Toolkit/Color/Value/RGB.pm
-    version: '1.53'
+    version: '1.54'
 requires:
   Carp: '1.35'
   Exporter: '5'
   perl: v5.12.0
 resources:
   repository: git://github.com/lichtkind/Graphics-Color-Toolkit.git
-version: '1.53'
+version: '1.54'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

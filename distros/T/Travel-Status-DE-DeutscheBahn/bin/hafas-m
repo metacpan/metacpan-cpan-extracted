@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '4.12';
+our $VERSION = '4.15';
 
 use utf8;
 use DateTime;
@@ -373,7 +373,7 @@ B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 4.12
+version 4.15
 
 =head1 DESCRIPTION
 
@@ -457,7 +457,7 @@ The non-default services (anything other than DB) are not well tested.
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

@@ -1,0 +1,27 @@
+<%doc>
+Extend the search builder to include criteria for selecting tickets with a
+pinned comment.
+</%doc>
+\
+<%ARGS>
+$Conditions => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $Conditions );
+return if ( not ref $Conditions );
+return if ( ref $Conditions ne 'ARRAY' );
+
+push @$Conditions,
+  {
+    'Field' => 'Pinned comment',
+    'Name'  => 'HasAttribute',
+    'Op'    => { Type => 'select', Options => [ '=' => loc('flag set') ], },
+    'Value' => {
+        'Type' => 'component',
+        'Path' => '/Elements/PickPinCommentSearchAttribute',
+    }
+  };
+
+return;
+</%INIT>

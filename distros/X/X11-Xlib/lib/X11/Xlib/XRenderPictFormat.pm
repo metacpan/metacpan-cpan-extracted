@@ -28,6 +28,34 @@ members inlined with an underscore.
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item colormap
+
+=item depth
+
+=item direct_alpha
+
+=item direct_alphaMask
+
+=item direct_blue
+
+=item direct_blueMask
+
+=item direct_green
+
+=item direct_greenMask
+
+=item direct_red
+
+=item direct_redMask
+
+=item id
+
+=item type
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

@@ -20,7 +20,7 @@ use Test::Exception;
     resource foo => sub { croak "Resource unimplemented" };
 }
 
-my $file = __FILE__;
+my $file = quotemeta __FILE__;
 my $line;
 throws_ok {
     my $inst = My::Project->new;

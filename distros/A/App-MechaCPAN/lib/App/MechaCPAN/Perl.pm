@@ -16,8 +16,7 @@ our @args = (
   'smart-tests!',
   'devel!',
   'shared-lib!',
-  'build-reusable!',
-  'source-only',
+  'source-only!',
 );
 
 my $perl5_ver_re = qr/v? 5 [.] (\d{1,2}) (?: [.] (\d{1,2}) )?/xms;
@@ -44,6 +43,10 @@ sub go
   my $dest_len = $#dest_dir;
   my $perl_dir = "$dest_dir/perl";
   my $pv_ver;    # Version in .perl-version file
+
+  # source-only currently defaults to true, downloading binaries currently
+  # will only happen if no-source-only is given
+  $opts->{'source-only'} //= 0;
 
   # Attempt to find the perl version if none was given
   if ( -f '.perl-version' )
@@ -107,25 +110,9 @@ sub go
 
   if ( defined $bin_tz && !$opts->{'source-only'} )
   {
-    my $src_dir = inflate_archive($bin_tz);
-
-    my @src_dirs = File::Spec->splitdir("$src_dir");
-    chdir $src_dir;
-
-    if ( -e -x File::Spec->catdir( @src_dirs, qw/bin perl/ ) )
-    {
-      local $@;
-      my $success
-        = eval { _install_binary( File::Spec->catdir(@src_dirs), $version ) };
-      my $error = $@;
-      if ($error)
-      {
-        logmsg "Binary in $bin_tz does not appear to be usable: $error";
-      }
-      return 0
-        if $success == 0;
-    }
-    logmsg "$bin_tz did not have a perl binary";
+    my $success = _handle_bin_tz( $bin_tz, $version );
+    return 0
+      if $success;
   }
 
   my $src_dir = inflate_archive($src_tz);
@@ -137,7 +124,8 @@ sub go
   {
     die "Binary archive provided, but source-only was requested"
       if $opts->{'source-only'};
-    return _install_binary( File::Spec->catdir(@src_dirs), $version );
+    my $success = _install_binary( File::Spec->catdir(@src_dirs), $version );
+    return $success ? 0 : 1;
   }
 
   if ( !-e 'Configure' )
@@ -288,6 +276,9 @@ sub slugline
   my $script = <<'EOD';
   use strict;
   use Config;
+  use File::Basename qw/basename/;
+  use ExtUtils::Liblist;
+
   my $version    = $ARGV[0] || $^V;
   my $usethreads = defined $ARGV[1] ? $ARGV[1] : 0;
   my $libcname   = 'unknown';
@@ -318,7 +309,61 @@ sub slugline
       }
     }
   }
-  print "perl-$version-$archname-$osname-$threads$libcname-$libcver";
+
+  # Add the name of each lib found with Liblist
+  my @short_libs;
+  my @libs;
+
+  my %rename = (
+
+    # c, m and dl are assumed to be part of libc, which we already handle
+    '-lc'       => '', '-lm'  => '',
+    '-ldl'      => '', '-lld' => '',
+    '-lpthread' => '',
+
+    # Commonly found libraries can be shortened
+    '-lsocket' => 's',  '-linet'  => 'i',
+    '-lnsl'    => 'n',  '-lcrypt' => 'y',
+    '-lutil'   => 'u',  '-lposix' => 'p',
+    '-lgdbm'   => 'gd', '-ldbm'   => 'd',
+  );
+
+  foreach my $libs ( sort split ' ', $Config{libs} )
+  {
+    my @ext = ExtUtils::Liblist->ext( "$libs", 0, 1 );
+    my $n   = $libs;
+
+    next
+      unless $ext[4]->[0];
+
+    my $ver = basename $ext[4]->[0];
+
+    # Static libraries (.a) don't matter
+    next
+      if $ver =~ m/[.]a$/xms;
+
+    $n   =~ s/^-l/lib/;
+    $ver =~ s/^.*$n([.]so[.]?)?//;
+    $ver =~ s/^(\d+([.]\d+)?)([.]\d+)?$/$1/;
+    $ver ||= '.';
+
+    if ( exists $rename{$libs} )
+    {
+      if ( $rename{$libs} )
+      {
+        push @short_libs, "$rename{$libs}$ver";
+      }
+      next;
+    }
+    push @libs, "$n$ver";
+  }
+
+  my $libsver = join('', @short_libs, @libs);
+  if ($libsver)
+  {
+    $libsver = "-$libsver";
+  }
+  print "perl-$version-$archname-$osname-$threads$libcname-$libcver$libsver";
 EOD
 
   my $script_file = humane_tmpfile;
@@ -463,6 +508,43 @@ sub build_reusable
   return 0;
 }
 
+sub _handle_bin_tz
+{
+  my $bin_tz  = shift;
+  my $version = shift;
+
+  info "Binary URL: $bin_tz";
+  local $@;
+  my $src_dir = eval { inflate_archive($bin_tz) };
+
+  if ( !$src_dir )
+  {
+    info "Could not find binary $version: $@";
+    return;
+  }
+
+  my @src_dirs = File::Spec->splitdir("$src_dir");
+  chdir $src_dir;
+
+  if ( -e -x File::Spec->catdir( @src_dirs, qw/bin perl/ ) )
+  {
+    local $@;
+    my $success
+      = eval { _install_binary( File::Spec->catdir(@src_dirs), $version ) };
+
+    my $error = $@;
+    if ($error)
+    {
+      info "Binary in $bin_tz does not appear to be usable: $error";
+    }
+
+    return $success;
+  }
+
+  logmsg "$bin_tz did not have a perl binary";
+  return 1;
+}
+
 sub _install_binary
 {
   my $src_dir  = shift;
@@ -501,7 +583,7 @@ sub _install_binary
 
   success "Installed binary $version";
 
-  return 0;
+  return 1;
 }
 
 our $source_mirror = 'https://www.cpan.org/src/5.0';
@@ -608,7 +690,7 @@ sub _get_targz
 
     return (
       [
-        _bin_url( $version, $minor ),
+        _bin_url( $version, $minor, $opts ),
         _dnld_url( $version, $minor, $opts ),
       ],
       "5.$version.$minor"
@@ -634,7 +716,7 @@ App::MechaCPAN::Perl - Mechanize the installation of Perl.
 
 =head1 DESCRIPTION
 
-The C<perl> command is used to install L<perl> into C<local/>. This removes the packages dependency on the operating system perl.
+The C<perl> command is used to install L<perl> into C<local/>. This removes the package's dependency on the operating system perl. It will do this by either downloading a binary archive or by building from a L<perl> source archive.
 
 =head2 Methods
 
@@ -646,23 +728,29 @@ C<$version> is either 0 or 1 parameter:
 
 =over
 
-=item If 0 parameters are given and there is a .perl-version file, it will try and use that as the version to install.
+=item * If 0 parameters are given and there is a .perl-version file, it will try and use that as the version to install.
 
-=item Otherwise, if 0 parameters are given, it will attempt to find and install the newest, stable version of perl.
+=item * Otherwise, if 0 parameters are given, it will attempt to find and install the newest, stable version of perl.
 
-=item If the parameter is a major version (5.XX), it will attempt to find and install the newest minor version of that major version.
+=item * If the parameter is a file, it will try to use that file as an archive to install perl.
 
-=item If the parameter is a minor version (5.XX.X), it will attempt to download and install that exact version.
+=item * If the parameter looks like a URL, it will fetch that URL and try to use it as an archive to install perl.
 
-=item If the parameter is a file, it will try to use that file as a perl source tarball.
+=item * If the parameter is a major version (5.XX), it will attempt to download and install the newest minor version of that major version.
 
-=item If the parameter is a file, and it contains an executable "bin/perl", it will try to install that file as a binary perl tarball.
-
-=item If the parameter looks like a URL, it will fetch that URL and try to use it as a perl source tarball.
+=item * If the parameter is a minor version (5.XX.X), it will attempt to download and install that exact version.
 
 =back
 
+In the cases where a version is given, and the C<--no-source-only> option is given, C<App::MechaCPAN::Perl> will attempt to download a binary archive prebuilt for the operating system. This guess is made by looking at how the currently executing L<perl> was built. Binary archives are fetched from https://dnld.mechacpan.us/dist. Source archives are fetched from https://www.cpan.org/src/5.0.
+
+After an archive is retrieved, it will be checked to see if it is a binary or source package. This is accomplished by checking for an executable C<bin/perl> file in the archive. Basic tests are ran to make sure the binary is usable, notably by running a script that includes L<POSIX>.
+
 =head2 Arguments
+
+=head3 source-only
+
+By default a source archive is attempted to be retreived and installed. If you want it to attempt to also retrieve a binary archive, you can use C<--no-source-only>. If you do not want C<App::MechaCPAN::Perl> to even attempt to use a binary archive, use this option. The default behavior of this option will change in a future version.
 
 =head3 threads
 
@@ -670,17 +758,11 @@ By default, perl is compiled without threads. If you'd like to enable threads, u
 
 =head3 shared-lib
 
-By default, perl will generate a libperl.a file.  If you need libperl.so, then use this argument.
-
-=head3 build-reusable
-
-Giving this options will change the mode of operation from installing L<perl> into C<local/> to generating a reusable, relocatable L<perl> archive. This uses the same parameters (i.e. L</devel> and L</threads>) to generate the binary, although do note that the C<lib/> directory is always included unless L</skip-lib> is provided. The archive name will generally reflect what systems it can run on. Because of the nature of how L<perl> builds binaries, it cannot guarantee that it will work on any given system, but if will have the best luck if you use it on the same version of a distribution.
-
-Once you have a reusable binary archive, C<App::MechaCPAN::Perl> can use that archive as a source file and install the binaries into the local directory. This can be handy if you are building a lot of identical systems and only want to build L<perl> once.
+By default, perl will not generate a libperl.a file.  If you need libperl.so, then use this argument.
 
 =head3 jobs
 
-How many make jobs to use when running make. The code must guess if make supports running multiple jobs, and as such, it may not work for all versions of make. Defaults to 2.
+How many make jobs to use when running make. The code will guess if C<make> supports running multiple jobs, and as such, it may not work for all versions of make. Defaults to 2.
 
 =head3 skip-tests
 
@@ -706,7 +788,7 @@ By default, perl will not compile a development version without -Dusedevel passe
 
 =head1 WIN32 LIMITATION
 
-Building perl from scratch on Win32 is nothing like building it on other platforms. At this point, the perl command does not work on Win32.
+Building perl from scratch on Win32 is nothing like building it on other platforms. At this point, the C<perl> command does not work on Win32.
 
 =head1 AUTHOR
 

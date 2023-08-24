@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Path::Tiny" => 0,
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "YAML::XS" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +44,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Module::Build" => "0.28",

@@ -32,7 +32,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000051
+version 0.000052
 
 =head1 SYNOPSIS
 

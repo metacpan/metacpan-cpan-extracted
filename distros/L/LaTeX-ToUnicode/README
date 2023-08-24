@@ -1,13 +1,13 @@
+This is the LaTeX::ToUnicode Perl package:
 
+  Convert LaTeX source fragments to Unicode plain text or simple html
 
-This archive contains the distribution LaTeX-ToUnicode,
-version 0.11:
+Dev sources, bug tracker: https://github.com/borisveytsman/bibtexperllibs
+Releases: https://ctan.org/pkg/bibtexperllibs
 
-  Convert LaTeX commands to Unicode
-
-This software is copyright (c) 2010-2020 by Gerhard Gossen, Boris Veytsman, and Karl Berry
+Copyright 2010-2022 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+the same terms as the Perl5 programming language system itself.
 
 

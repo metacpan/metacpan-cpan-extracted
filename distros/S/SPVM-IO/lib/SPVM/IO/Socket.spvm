@@ -143,6 +143,35 @@ class IO::Socket extends IO::Handle {
     return $recv_length;
   }
   
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    unless ($string) {
+      die "The \$string must be defined.";
+    }
+    
+    unless ($offset == 0) {
+      die "The \$offset must be equal to 0.";
+    }
+    
+    my $string_length = length $string;
+    
+    if ($length < 0) {
+      $length = $string_length - $offset;
+    }
+    
+    unless ($offset + $length <= $string_length) {
+      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
+    }
+    
+    my $fd = $self->{fd};
+    
+    my $flags = 0;
+    
+    my $recv_length = Sys::Socket->recv($fd, $string, $length, $flags);
+    
+    return $recv_length;
+  }
+  
   method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef) {
     my $fd = $self->{fd};
     
@@ -167,6 +196,35 @@ class IO::Socket extends IO::Handle {
     }
     
     $self->{peername} = $peername;
+    
+    return $send_length;
+  }
+  
+  method write : int ($string : string, $length : int = -1, $offset : int = 0) {
+    
+    unless ($string) {
+      die "The \$string must be defined.";
+    }
+    
+    unless ($offset == 0) {
+      die "The \$offset must be equal to 0.";
+    }
+    
+    my $string_length = length $string;
+    
+    if ($length < 0) {
+      $length = $string_length - $offset;
+    }
+    
+    unless ($offset + $length <= $string_length) {
+      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
+    }
+    
+    my $fd = $self->{fd};
+    
+    my $flags = 0;
+    
+    my $send_length = Sys::Socket->send($fd, $string, $length, $flags);
     
     return $send_length;
   }
@@ -339,4 +397,8 @@ class IO::Socket extends IO::Handle {
     
     return $client;
   }
+  
+  method peerport : int () { die "Not implemented."; }
+  
+  method peerhost : string () { die "Not implemented."; }
 }

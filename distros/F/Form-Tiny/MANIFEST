@@ -73,6 +73,7 @@ t/290-custom-field-defs.t
 t/300-value.t
 t/500-subforms/01-default.t
 t/500-subforms/02-message.t
+t/500-subforms/03-array-of-subforms.t
 t/800-inheritance/010-simple.t
 t/800-inheritance/020-plugins.t
 t/900-plugins/010-subroutine.t

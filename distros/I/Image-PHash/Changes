@@ -1,5 +1,10 @@
 Revision history for Image-PHash
 
+0.3     2023-08-24
+        - Support for loading image objects.
+        - Prefer Imager over ImageMagick.
+        - README.md
+
 0.2     2022-07-01
         - Faster subsequent diff calls.
         - Fix for log method.

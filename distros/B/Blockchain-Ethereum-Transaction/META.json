@@ -32,15 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Blockchain::Ethereum::RLP" : "0.006",
-            "Digest::Keccak" : "0.05",
+            "Blockchain::Ethereum::RLP" : "0.007",
+            "Crypt::Digest::Keccak256" : "0.078",
             "Object::Pad" : "0.79",
             "perl" : "5.026000"
          }
       },
       "test" : {
          "requires" : {
-            "Blockchain::Ethereum::Keystore::Key" : "0.002"
+            "Blockchain::Ethereum::Keystore" : "0.005"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/refeco/perl-ethereum-transaction"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

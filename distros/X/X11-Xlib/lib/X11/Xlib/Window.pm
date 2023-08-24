@@ -4,7 +4,7 @@ use warnings;
 use parent 'X11::Xlib::XID';
 
 # All modules in dist share a version
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -62,11 +62,11 @@ that stringifies as the property name but can be passed to functions that expect
   #   type => $atom,   # actual type of property
   #   count => 1,      # number of elements in multi-values property
   #   format => $n,    # 8/16/32 meaning 'char','short','long'
-  #   remaining => $n, # bytes un-read
+  #   remaining => $n, # bytes unread
   #   data => $bytes,  # payload, needs unpack()ed except for strings
   # }
 
-Return a hashref describing a property, or undef if the property doesn't exist.
+Return a hashref describing a property, or undef if the property does not exist.
 
 =cut
 
@@ -85,7 +85,7 @@ sub get_property {
     my $actual_type;
     if (0 == $self->display->XGetWindowProperty($self, $prop, $offset || 0, $max_length || 65536,
         0, $type, $actual_type, my $actual_format, my $n, my $remaining, my $data)
-        and $actual_type # actual_format=0 means property doesn't exist
+        and $actual_type # actual_format=0 means property does not exist
     ) {
         return {
             type => $self->display->atom($actual_type),
@@ -108,7 +108,7 @@ If the returned type is not known this throws an exception; you'll have to use C
 and decode it yourself.
 
 For strings, this returns a single scalar.  For decoded objects, this returns one object
-or an arrayref of ojects.  So, you always get one return value, or undef.
+or an arrayref of objects.  So, you always get one return value, or undef.
 
 For conveniently unrolling this into list context, use C<get_decoded_property_items>.
 
@@ -378,7 +378,7 @@ sub event_mask_exclude {
   $window->set_bounding_region($region, $x_ofs, $y_ofs);
 
 Set the L<region|X11::Xlib::XserverRegion> for the boundary of the window, optionally
-offset by an (x,y) coordinate.  C<$region> may be undef or 0 to un-set the region.
+offset by an (x,y) coordinate.  C<$region> may be undef or 0 to unset the region.
 
 =head2 set_input_region
 
@@ -386,7 +386,7 @@ offset by an (x,y) coordinate.  C<$region> may be undef or 0 to un-set the regio
   $window->set_input_region($region, $x_ofs, $y_ofs);
 
 Set the input "hit" L<region|X11::Xlib::XserverRegion> of the window, optionally
-offset by an (x,y) coordinate. C<$region> may be undef or 0 to un-set the region.
+offset by an (x,y) coordinate. C<$region> may be undef or 0 to unset the region.
 
 =cut
 

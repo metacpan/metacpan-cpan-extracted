@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "Object::Pad::ExtensionBuilder" : "0.57"
+            "Object::Pad::ExtensionBuilder" : "0.802"
          }
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.66"
+            "Object::Pad" : "0.802"
          }
       },
       "test" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Object::Pad::FieldAttr::LazyInit" : {
          "file" : "lib/Object/Pad/FieldAttr/LazyInit.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

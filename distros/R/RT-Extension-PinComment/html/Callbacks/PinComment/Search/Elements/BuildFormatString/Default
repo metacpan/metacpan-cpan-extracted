@@ -1,0 +1,15 @@
+<%doc>
+Extend the list of search results column formats to include the "pinned
+comment" item, which is implemented by the function defined in the
+/Callbacks/PinComment/Elements/RT__Ticket/ColumnMap/Once callback.
+</%doc>
+\
+<%ARGS>
+$Fields => undef
+</%ARGS>
+\
+<%INIT>
+push @$Fields, 'PinComment'
+  if ( defined $Fields && ref $Fields && ref $Fields eq 'ARRAY' );
+return;
+</%INIT>

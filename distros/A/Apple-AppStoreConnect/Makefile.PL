@@ -16,9 +16,11 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test2::V0'               => '0',
         'Test2::Tools::Exception' => '0',
+        'CryptX'                  => '0',
         'LWP::UserAgent'          => '0',
         'HTTP::Response'          => '0',
-        'JSON'                    => '0'
+        'JSON::XS'                => '4.0',
+        'JSON'                    => '4.0'
     },
     PREREQ_PM => {
         'Crypt::JWT'     => '0',

@@ -10,6 +10,7 @@ lib/Catmandu/Fix/Bind/pica_diff.pm
 lib/Catmandu/Fix/Bind/pica_each.pm
 lib/Catmandu/Fix/Condition/pica_match.pm
 lib/Catmandu/Fix/pica_add.pm
+lib/Catmandu/Fix/pica_append.pm
 lib/Catmandu/Fix/pica_keep.pm
 lib/Catmandu/Fix/pica_map.pm
 lib/Catmandu/Fix/pica_occurrence.pm
@@ -31,6 +32,7 @@ t/07-pica-each.t
 t/08-pica-add.t
 t/09-pica-update.t
 t/10-validator.t
+t/11-pica-append.t
 t/20-pica-diff.t
 t/30-modify.t
 t/Catmandu-Fix-pica_map.t

@@ -3,19 +3,14 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
 use t_TestCommon ':silent',
-                 qw/bug ok_with_lineno like_with_lineno
-                    rawstr showstr showcontrols displaystr 
-                    show_white show_empty_string
-                    fmt_codestring 
-                    timed_run
-                    mycheckeq_literal mycheck _mycheck_end
-                  /;
+                 qw/bug tmpcopy_if_writeable $debug/;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:DEFAULT :chars/;
+use ODF::lpOD_Helper;
 
-my $skel_path = "$Bin/../tlib/Skel.odt";
-my $doc = odf_get_document($skel_path);
+my $master_copy_path = "$Bin/../tlib/Skel.odt";
+my $input_path = tmpcopy_if_writeable($master_copy_path);
+my $doc = odf_get_document($input_path, read_only => 1);
 my $body = $doc->get_body;
 
 {

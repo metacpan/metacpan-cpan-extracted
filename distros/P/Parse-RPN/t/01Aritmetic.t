@@ -1,7 +1,3 @@
-#!/usr/bin/perl -w    
-
-# $Id:  Exp $
-
 use strict;
 use 5.006;
 use warnings;

@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::Transaction::EIP1559 0.005;
+package Blockchain::Ethereum::Transaction::EIP1559 0.008;
 class Blockchain::Ethereum::Transaction::EIP1559
     :does(Blockchain::Ethereum::Transaction);
 
@@ -73,6 +73,8 @@ method serialize() {
         $self->data,
         $self->access_list,
     );
+
+    @params = $self->_equalize_params(\@params)->@*;
 
     push(@params, $self->v, $self->r, $self->s)
         if $self->v && $self->r && $self->s;

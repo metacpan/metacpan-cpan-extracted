@@ -61,7 +61,9 @@ t/func-in-use.t
 t/func-in-var.t
 t/geo-ip.t
 t/hash-in-regex.t
+t/hash-key-expression.t
 t/hash-key.t
+t/hash-unquoted-key.t
 t/heredoc.t
 t/ignored-modules.t
 t/import-error.t
@@ -149,6 +151,8 @@ test-data/geo-ip.pl
 test-data/getopt-long.pl
 test-data/getopt.pl
 test-data/hash-in-regex.pl
+test-data/hash-key-expression.pl
+test-data/hash-unquoted-key.pl
 test-data/heredoc.pl
 test-data/http-status.pl
 test-data/ignore-modules-pattern.txt

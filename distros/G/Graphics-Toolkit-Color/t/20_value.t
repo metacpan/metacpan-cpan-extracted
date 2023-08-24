@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 69;
+use Test::More tests => 76;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -76,19 +76,28 @@ is( $f,              'RGB',   'short hex string was formatted in RGB');
 my($cmy, $for) = $deformat->({c => 0.1, m => 0.5, Y => 1});
 is( ref $cmy,      'ARRAY',   'got cmy key hash deformatted');
 is( int @$cmy,           3,   'deformatted CMY HASH into triplet');
-is( $cmy->[0],         0.1,   'deformatted red value from CMY key HASH');
-is( $cmy->[1],         0.5,   'deformatted green value from CMY key HASH');
-is( $cmy->[2],           1,   'deformatted blue (not trimmed) value from CMY key HASH');
+is( $cmy->[0],         0.1,   'cyan value correct');
+is( $cmy->[1],         0.5,   'magenta value correct');
+is( $cmy->[2],           1,   'yellow value is correct');
 is( $for,            'CMY',   'key hash was formatted in CMY');
 
 my($cmyk, $form) = $deformat->({c => -0.1, m => 0.5, Y => 2, k => 7});
 is( ref $cmyk,     'ARRAY',   'got cmyk key hash deformatted');
 is( int @$cmyk,          4,   'deformatted CMYK HASH into quadruel');
-is( $cmyk->[0],       -0.1,   'deformatted red value from CMY key HASH');
-is( $cmyk->[1],        0.5,   'deformatted green value from CMY key HASH');
-is( $cmyk->[2],          2,   'deformatted blue (not trimmed) value from CMY key HASH');
-is( $cmyk->[3],          7,   'deformatted blue (not trimmed) value from CMY key HASH');
+is( $cmyk->[0],       -0.1,   'cyan value correct');
+is( $cmyk->[1],        0.5,   'magenta value correct');
+is( $cmyk->[2],          2,   'yellow value is correct');
+is( $cmyk->[3],          7,   'key value got transported correctly');
 is( $form,          'CMYK',   'key hash was formatted in CMY');
+
+($cmyk, $form) = $deformat->([cmyk => -0.1, 0.5, 2, 7]);
+is( ref $cmyk,     'ARRAY',   'got cmyk named ARRAY deformatted');
+is( int @$cmyk,          4,   'deformatted CMYK ARRAY into quadruel');
+is( $cmyk->[0],       -0.1,   'cyan value correct');
+is( $cmyk->[1],        0.5,   'magenta value correct');
+is( $cmyk->[2],          2,   'yellow value is correct');
+is( $cmyk->[3],          7,   'key value got transported correctly');
+is( $form,          'CMYK',   'named array recognized as CMYK');
 
 
 ($rgb, $f) = $deformat->({c => 0.1, n => 0.5, Y => 1});

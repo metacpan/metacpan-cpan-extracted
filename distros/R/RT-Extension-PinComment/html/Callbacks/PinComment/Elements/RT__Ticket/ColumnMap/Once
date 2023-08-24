@@ -1,0 +1,71 @@
+<%doc>
+Adjust the ticket column map, for search result formatting, to include a
+"Pinned comment" column format which displays a ticket's pinned comment
+(limited to 1500 characters).
+
+See /Elements/PinCommentBeforeShowHistory for details of the logic used.
+
+The /Callbacks/PinComment/Search/Elements/BuildFormatString/Default callback
+extends the list of search result formats to allow this to be used.
+</%doc>
+\
+<%ARGS>
+$COLUMN_MAP => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $COLUMN_MAP );
+return if ( not ref $COLUMN_MAP );
+return if ( ref $COLUMN_MAP ne 'HASH' );
+
+$COLUMN_MAP->{'PinComment'} = {
+    attribute => 'PinComment',
+    title     => 'Pinned comment',    # loc
+    align     => 'left',
+    value     => sub {
+        my $Ticket = $_[0];
+
+        return '' if ( not $Ticket );
+        return '' if ( not ref $Ticket );
+
+	# Check which comment is pinned, if any.
+        my $CurrentlyPinnedComment = undef;
+        my $TicketPinnedCommentAttribute =
+          $Ticket->FirstAttribute('PinnedComment');
+        $CurrentlyPinnedComment = $TicketPinnedCommentAttribute->Content
+          if ( defined $TicketPinnedCommentAttribute
+            && ref $TicketPinnedCommentAttribute );
+        return '' if ( not $CurrentlyPinnedComment );
+
+	# Load the pinned transaction via a transactions list for this
+	# ticket.
+        my $TransactionsObj = RT::Transactions->new( $Ticket->CurrentUser );
+        $TransactionsObj->LimitToTicket( $Ticket->id );
+        $TransactionsObj->Limit(
+            FIELD           => 'id',
+            VALUE           => $CurrentlyPinnedComment,
+            ENTRYAGGREGATOR => 'AND'
+        );
+        my $PinnedTransactionObj = $TransactionsObj->Next;
+
+        return '' if ( not defined $PinnedTransactionObj );
+        return '' if ( not $PinnedTransactionObj->id );
+
+        # First, try to get the HTML of the pinned comment, then truncate it
+        # and scrub the result.
+        my $CommentValue =
+          $PinnedTransactionObj->Content( 'Type' => 'text/html' ) || '';
+        $CommentValue =~ s/^(.{1500}).+$/ScrubHTML($1).'...'/se;
+        return \$CommentValue if ( $CommentValue =~ /\S/ );
+
+        # If the HTML attempt produced nothing, use plain text instead.
+        $CommentValue =
+          $PinnedTransactionObj->Content( 'Type' => 'text/plain' ) || '';
+        $CommentValue =~ s/^(.{1500}).+$/$1.../s;
+        $CommentValue =~ s/^\s+//s;
+        return $CommentValue;
+    },
+};
+
+return;
+</%INIT>

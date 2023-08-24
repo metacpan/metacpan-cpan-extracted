@@ -1,5 +1,4 @@
 # Domain-PublicSuffix
-===================
 
 A perl module to parse a domain down to the root TLD utilizing the Mozilla
 PublicSuffix file.
@@ -15,6 +14,7 @@ to determine how far a cookie's security boundaries go.
 To install this module from Git, you will need Dist::Zilla. Once installed, run:
 ```
    dzil authordeps | cpanm
+   dzil listdeps | cpanm
    dzil install
 ```
 
@@ -41,7 +41,7 @@ This module requires these other modules and libraries:
 
 ## COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2021 by Nick Melnick
+Copyright (C) 2008-2023 by Nick Melnick
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

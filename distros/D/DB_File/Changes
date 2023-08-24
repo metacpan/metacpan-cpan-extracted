@@ -1,4 +1,11 @@
 
+1.859 21 August 2023
+
+   * silence clang compiler warnings
+     https://github.com/pmqs/DB_File/issues/13
+     Sun Aug 20 16:30:05 2023 +0100
+     6f8902efe7b2782ad418ea53ddaad08ed9bebf9b
+
 1.858 13 May 2022
 
    * Update to license wording

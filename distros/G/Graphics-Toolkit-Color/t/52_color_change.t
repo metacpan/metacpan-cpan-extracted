@@ -46,9 +46,10 @@ is( $red->blend( with => 'blue', in => 'CMYK')->name,      'purple',   "blending
 is( $red->blend( with => '#0000ff')->name,                   'lime',   "blending with hex def");
 is( $red->blend( with => [0,0,255])->name,                   'lime',   "blending with array ref color def");
 my $purple = $red->blend( with => {C => 1, M =>1, Y =>0}, in =>'CMY');
-is( $purple->values('RGB','red'),                               127,   "blending with RGB hash ref color def in CMY, red value");
-is( $purple->values('RGB','green'),                               0,   "blending with RGB hash ref color def in CMY, green value");
-is( $purple->values('RGB','blue'),                              127,   "blending with RGB hash ref color def in CMY, blue value");
+my @rgb = $purple->values('RGB');
+is( $rgb[0],                                                    127,   "blending with RGB hash ref color def in CMY, red value");
+is( $rgb[1],                                                      0,   "blending with RGB hash ref color def in CMY, green value");
+is( $rgb[2],                                                    127,   "blending with RGB hash ref color def in CMY, blue value");
 is( $red->blend( with => {H=> 240, S=> 100, L=>50}, in => 'RGB')->name,'purple',   "blending with HSL hash in RGB");
 
 #     'fuchsia'             => [ 255,   0, 255, 300, 100,  50 ],

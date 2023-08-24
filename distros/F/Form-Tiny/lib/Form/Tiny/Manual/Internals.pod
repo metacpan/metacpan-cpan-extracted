@@ -91,40 +91,7 @@ post-processing on a C<< $form->fields >> hashref compared to the full form
 definition, without the need to loop the form fields array and manually handle
 all the possibilities.
 
-To get the blueprint of a form, call:
-
-	# for dynamic forms or when
-	# it is not known whether the form in dynamic
-	$blueprint = $form_object->form_meta->blueprint($form_object, %options);
-
-	# for static forms - all calls are valid
-	$blueprint = $form_object->form_meta->blueprint(%options);
-	$blueprint = FormPackage->form_meta->blueprint(%options);
-
-For static forms without extra options, the blueprint will be cached and reused
-on the next call. Otherwise, it has to be generated each time, which will
-impose a performance hit if it is called frequently.
-
-Additionally, the C<blueprint> method can accept a hash of options. Currently
-supported options are:
-
-=over
-
-=item * recurse => Bool
-
-If passed C<0>, subforms will not be turned into their own blueprints, but will
-end up as a L<Form::Tiny::FieldDefinition> object instead. C<1> by default.
-
-=item * transform => sub ($field_definition, $default_handler)
-
-This option enables a way to specify a custom handler which will be used to
-turn C<$field_definition> into a blueprint value. This subroutine reference is
-expected to return a scalar value - a new blueprint value.
-
-In case you want to turn back into the default handler, call C<<
-$default_handler->($field_definition) >>.
-
-=back
+For arguments, see L<Form::Tiny::Meta/blueprint>.
 
 =head2 Finalizing the meta
 

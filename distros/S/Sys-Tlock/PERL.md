@@ -4,7 +4,7 @@ Sys::Tlock - Locking with timeouts.
 
 # VERSION
 
-1.10
+1.11
 
 # SYNOPSIS
 
@@ -29,7 +29,7 @@ Sys::Tlock - Locking with timeouts.
 
     print "tlock patience is ${patience}\n";
 
-    # Checking lock is alive.
+    # Checking that tlock is alive.
     my $t = $ARGV[0];
     die 'Tlock not taken.' if not tlock_alive('maint',$t);
 
@@ -37,17 +37,17 @@ Sys::Tlock - Locking with timeouts.
     tlock_renew('maint',600);
     do_fancy_log_rotation(547);
 
-    # Call another script that requires this lock.
+    # Call another script that requires this tlock.
     system( './clean-up.sh' , $t );
 
-    # Releasing the lock.
+    # Releasing the tlock.
     tlock_release('maint',$t);
 
 # DESCRIPTION
 
 This module is handling tlocks, advisory locks with timeouts.
 
-It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, tlocks are paired with a lock token.
+It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, each tlock is paired with a token.
 
 The tlocks are simply living in a lock directory in the filesystem. A distant predecessor to this module was written as a kludge to make locking work properly on a Windows server. But it turned out to be very handy to have tlocks in the filesystem, giving you an at-a-glance overview of them. And giving the non-scripting sysadmins easy access to view and manipulate them.
 
@@ -78,7 +78,7 @@ Configuration files must start with a "tlock 1" line. Empty lines are allowed an
 
 `owner` For the UID of the owner that will be set for tlock directories.
 
-`patience` For the time that a call will wait for a lock release.
+`patience` For the time that a call will wait for a tlock release.
 
     tlock 1
     # Example configuration file for tlock.
@@ -87,7 +87,7 @@ Configuration files must start with a "tlock 1" line. Empty lines are allowed an
 
 ## TOKENS
 
-Safe use of tlocks involve tokens, which are just timestamps of when the lock was taken.
+Safe use of tlocks involve tokens, which are just timestamps of when the tlock was taken.
 
 Without tokens, something like this could happen...
 
@@ -107,9 +107,9 @@ Each tlock is a subdirectory of the lock directory. Their names are "${marker}.$
 
 All the data for a tlock is in its directory. If it is removed from the lock directory, the tlock is released. If it is moved back in, it is alive again (unless it has timed out). If too much playing around has messed up the lock directory, running tlock\_zing on it cleans it up.
 
-The lock directory also contains shortlived directories named "${marker}\_.${label}". They are per label master locks that help to make changes to the normal locks atomic.
+The lock directory also contains shortlived directories named "${marker}\_.${label}". They are per label master locks that help to make changes to the tlocks atomic.
 
-# FUNCTIONS AND VARIABLES
+# SUBROUTINES AND VARIABLES
 
 Loaded by default:
 [tlock\_take](#tlock_take-label-timeout),
@@ -161,7 +161,7 @@ Loaded on demand:
 
 - tlock\_zing()
 
-    Cleans up locks in the lock directory. Takes care not to mess with any lock activity.
+    Cleans up tlocks in the lock directory. Takes care not to mess with any lock activity.
 
 - tlock\_tstart( $label )
 
@@ -207,11 +207,13 @@ Loaded on demand:
 
 - $patience
 
-    Patience is the time a call will try to take or change a tlock, before it gives up. For example when tlock\_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.
+    Patience is the number of seconds a call will try to take or change a tlock, before it gives up. For example when tlock\_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.
+
+    Patience can be set to any non-negative fractional number. If it is set to 0, a call only tries once before giving up.
 
     Dont confuse patience with timeout.
 
-    Default patience value is 2.5 seconds.
+    Default patience value is 0.
 
     Only loaded on demand.
 
@@ -242,15 +244,3 @@ flock
 Licensed under the Apache License, version 2.0
 
 https://www.apache.org/licenses/LICENSE-2.0.txt
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 737:
-
-    You forgot a '=back' before '=head2'
-
-- Around line 741:
-
-    &#x3d;back without =over

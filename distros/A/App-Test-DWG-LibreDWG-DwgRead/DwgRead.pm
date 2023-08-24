@@ -16,7 +16,7 @@ use Readonly;
 
 Readonly::Scalar our $DR => 'dwgread';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -37,15 +37,17 @@ sub run {
 	$self->{'_opts'} = {
 		'd' => undef,
 		'h' => 0,
+		'i' => 0,
 		'm' => undef,
 		'v' => 1,
 	};
-	if (! getopts('d:hm:v:', $self->{'_opts'}) || @ARGV < 1
+	if (! getopts('d:him:v:', $self->{'_opts'}) || @ARGV < 1
 		|| $self->{'_opts'}->{'h'}) {
 
-		print STDERR "Usage: $0 [-d test_dir] [-h] [-m match_string] [-v level] [--version] directory\n";
+		print STDERR "Usage: $0 [-d test_dir] [-h] [-i] [-m match_string] [-v level] [--version] directory\n";
 		print STDERR "\t-d test_dir\tTest directory (default is directory in system tmp).\n";
 		print STDERR "\t-h\t\tPrint help.\n";
+		print STDERR "\t-i\t\tIgnore errors.\n";
 		print STDERR "\t-m match_string\tMatch string (default is not defined).\n";
 		print STDERR "\t-v level\tVerbosity level (default 1, min 0, max 9).\n";
 		print STDERR "\t--version\tPrint version.\n";
@@ -110,8 +112,11 @@ sub _exec {
 			$log_prefix.'-stderr.log');
 		barf($stderr_file, $stderr);
 
-		if (my @num = ($stderr =~ m/ERROR/gms)) {
-			print STDERR "dwgread '$dwg_file' has ".scalar @num." ERRORs\n";
+		# Report errors.
+		if (! $self->{'_opts'}->{'i'}) {
+			if (my @num = ($stderr =~ m/ERROR/gms)) {
+				print STDERR "dwgread '$dwg_file' has ".scalar @num." ERRORs\n";
+			}
 		}
 
 		if (defined $self->{'_opts'}->{'m'}) {
@@ -243,6 +248,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

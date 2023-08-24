@@ -12,12 +12,12 @@ sub new {
     return unless ref $basis;
 
     # which formats the constructor will accept, that can be deconverted into list
-    my %deformats = (hash => sub { $basis->list_from_hash(@_) if $basis->is_hash(@_) } );
+    my %deformats = ( hash => sub { $basis->list_from_hash(@_) if $basis->is_hash(@_) },
+               named_array => sub { @{$_[0]}[1 .. $#{$_[0]}]   if $basis->is_named_array(@_) },
+    );
     # which formats we can output
     my %formats = (list => sub {@_}, hash => sub { $basis->key_hash_from_list(@_) },
                                 char_hash => sub { $basis->shortcut_hash_from_list(@_) },
-                   map( { $_ => eval 'sub {$_['.$basis->key_pos($_).']}' } $basis->keys ),
-                   map( { $_ => eval 'sub {$_['.$basis->shortcut_pos($_).']}' } $basis->shortcuts ),
     );
 
     bless { basis => $basis, format => \%formats, deformat => \%deformats, convert => {},

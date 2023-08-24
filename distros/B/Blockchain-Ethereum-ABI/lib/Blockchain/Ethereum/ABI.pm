@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::ABI 0.011;
+package Blockchain::Ethereum::ABI 0.012;
 class Blockchain::Ethereum::ABI;
 
 =head1 NAME

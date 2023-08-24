@@ -38,9 +38,7 @@ sub new {
 
 sub _groups {
     my $groups = [
-        { name => 'group_help',         text => "  HELP"         },
-        { name => 'group_path',         text => "  Path"         },
-        { name => 'group_plugins',      text => "- DB Plugins"   },
+        { name => 'group_plugins',      text => "- Plugins"   },
         { name => 'group_database',     text => "- DB Settings"  },
         { name => 'group_extensions',   text => "- Extensions"   },
         { name => 'group_sql_settings', text => "- SQL Settings" },
@@ -48,6 +46,8 @@ sub _groups {
         { name => 'group_import',       text => "- Import"       },
         { name => 'group_export',       text => "- Export"       },
         { name => 'group_misc',         text => "- Misc"         },
+        { name => 'group_help',         text => "  Help"         },
+        { name => 'group_path',         text => "  Path"         },
     ];
     return $groups;
 }
@@ -85,16 +85,16 @@ sub _options {
             { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
-            { name => 'trunc_fract_first',   text => "- Trunc fract first",   section => 'table' },
-            { name => 'progress_bar',        text => "- Progress bar",        section => 'table' },
-            { name => 'tab_width',           text => "- Tab width",           section => 'table' },
-            { name => '_color',              text => "- Color",               section => 'table' },
             { name => '_binary_filter',      text => "- Binary filter",       section => 'table' },
             { name => '_squash_spaces',      text => "- Squash spaces",       section => 'table' },
             { name => '_base_indent',        text => "- Indentation",         section => 'G'     },
             { name => '_set_string',         text => "- Undef string",        section => 'table' },
             { name => '_warningss',          text => "- Warnings",            section => 'G'     },
+            { name => 'progress_bar',        text => "- Progress bar",        section => 'table' },
+            { name => 'tab_width',           text => "- Tab width",           section => 'table' },
+            { name => '_color',              text => "- Color",               section => 'table' },
+            { name => 'trunc_fract_first',   text => "- Trunc fract first",   section => 'table' },
+            { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
         ],
         group_import => [
             { name => '_parse_file',        text => "- Parse tool",         section => 'insert' },
@@ -252,10 +252,10 @@ sub set_options {
             elsif ( $opt eq 'path' ) {
                 my $app_dir = $sf->{i}{app_dir};
                 eval { $app_dir = decode( 'locale', $app_dir ) };
-                my $info = 'db-browser:'                                  . "\n";
-                $info .= '  version  ' . $main::VERSION                   . "\n";
-                $info .= '  path     ' . catfile( $RealBin, $RealScript ) . "\n";
-                $info .= '  app-dir  ' . $app_dir;
+                my $info = 'db-browser'  . "\n\n";
+                $info .= 'version: ' . $main::VERSION . "\n\n";
+                $info .= 'path: ' . catfile( $RealBin, $RealScript ) . "\n\n";
+                $info .= 'app-dir: ' . $app_dir . "\n";
                 $tc->choose( [ '<<' ], { prompt => $info, color => 1 } );
             }
             elsif ( $opt eq 'plugins' ) {
@@ -336,7 +336,7 @@ sub set_options {
                 my $sub_menu = [
                     [ 'select_func_sq', "- Functions/Subqueries in SELECT",  [ $no, 'ASK' ] ],
                     [ 'join',           "- JOIN",                            [ 'AUTO', 'ASK' ] ],
-                    [ 'table',          "- Table",                           [ $no, 'AUTO' ] ],
+                    [ 'table',          "- Derived table",                   [ 'AUTO', 'ASK' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

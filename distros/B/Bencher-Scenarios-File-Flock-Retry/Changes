@@ -1,0 +1,9 @@
+0.002   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Bencher-Scenarios-{FileFlockRetry,File-Flock-Retry}.
+
+
+0.001   2017-07-01  Released-By: PERLANCAR
+
+        - First release.

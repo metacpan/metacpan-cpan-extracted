@@ -1,4 +1,3 @@
-requires 'ExtUtils::MakeMaker';
 requires 'Getopt::Long::Descriptive';
 requires 'Path::Tiny';
 requires 'JSON';

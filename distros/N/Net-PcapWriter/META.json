@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-PcapWriter",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Kwalitee" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -36,6 +35,11 @@
             "Socket6" : "0",
             "perl" : "5.008008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Kwalitee" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -44,5 +48,6 @@
          "url" : "https://github.com/noxxi/p5-net-pcapwriter"
       }
    },
-   "version" : "0.724"
+   "version" : "0.725",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

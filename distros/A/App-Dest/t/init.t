@@ -30,20 +30,18 @@ stderr_is( sub {
     try {
         App::Dest->init;
     }
-    catch {
-        my $e = $_ || $@;
+    catch ($e) {
         warn $e;
-    };
+    }
 }, "Project already initialized\n", 'init again fails' );
 
 stderr_is( sub {
     try {
         App::Dest->add('actions');
     }
-    catch {
-        my $e = $_ || $@;
+    catch ($e) {
         warn $e;
-    };
+    }
 }, "Directory actions already added\n", 'no re-add actions' );
 
 ok( lives { App::Dest->rm('actions') }, 'rm actions' ) or note $@;
@@ -54,10 +52,9 @@ stderr_is( sub {
     try {
         App::Dest->add('not_exists');
     }
-    catch {
-        my $e = $_ || $@;
+    catch ($e) {
         warn $e;
-    };
+    }
 }, "Directory specified does not exist\n", 'no add not exists' );
 
 stdout_is( sub { App::Dest->watches }, "actions\n", 'watches (results)' );

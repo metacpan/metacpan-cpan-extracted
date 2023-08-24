@@ -1,14 +1,26 @@
 use 5.018002;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
 WriteMakefile(
     NAME            => 'Text::DeLoreanIpsum',
-    VERSION_FROM    => 'lib/Text/DeLoreanIpsum.pm', # finds $VERSION
-    ABSTRACT_FROM   => 'lib/Text/DeLoreanIpsum.pm', # retrieve abstract from module
+    VERSION_FROM    => 'lib/Text/DeLoreanIpsum.pm',
+    ABSTRACT_FROM   => 'lib/Text/DeLoreanIpsum.pm',
     AUTHOR          => 'Mariano Spadaccini (marianos)',
     LICENSE         => 'perl',
     PREREQ_PM     => {
         'List::MoreUtils'   => 0,
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com/spadacciniweb/Text-DeLoreanIpsum.git',
+                web  => 'https://github.com/spadacciniweb/Text-DeLoreanIpsum',
+            },
+            bugtracker => {
+                web => 'https://github.com/spadacciniweb/Text-DeLoreanIpsum/issues'
+            },
+            homepage   => 'https://one2zero.it/',
+        },
     },
 );

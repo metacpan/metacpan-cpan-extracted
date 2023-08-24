@@ -32,6 +32,24 @@ The constants can be exported with
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item border_width
+
+=item height
+
+=item sibling
+
+=item stack_mode
+
+=item width
+
+=item x
+
+=item y
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

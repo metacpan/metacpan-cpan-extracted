@@ -4,7 +4,11 @@ Image::PHash - Fast perceptual image hashing (DCT-based pHash)
 
 INSTALLATION
 
-To install this module, run the following commands:
+You would normally install this Perl package via a CPAN package manager e.g.:
+
+    cpanm Image::PHash
+
+To install this module manually, run the following commands:
 
 	perl Makefile.PL
 	make
@@ -13,22 +17,16 @@ To install this module, run the following commands:
 
 SUPPORT AND DOCUMENTATION
 
+CPAN:
+    https://metacpan.org/release/Image-PHash
+
 After installing, you can find documentation for this module with the
-perldoc command.
+perldoc command:
 
     perldoc Image::PHash
 
-You can also look for information at:
-
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-PHash
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Image-PHash
-
-    Search CPAN
-        https://metacpan.org/release/Image-PHash
-
+Source code and issues on GitHub:
+    https://github.com/dkechag/Image-PHash
 
 LICENSE AND COPYRIGHT
 

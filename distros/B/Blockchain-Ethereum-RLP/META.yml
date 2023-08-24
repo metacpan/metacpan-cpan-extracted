@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  Object::PAD: '0.79'
+  Object::Pad: '0.79'
   perl: '5.026000'
 resources:
   repository: https://github.com/refeco/perl-RLP.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -40,5 +40,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/Lilith
-version: v0.3.0
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

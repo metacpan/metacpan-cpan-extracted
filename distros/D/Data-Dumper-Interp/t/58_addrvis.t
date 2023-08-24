@@ -11,7 +11,7 @@ use Scalar::Util qw(refaddr);
 use List::Util qw(shuffle);
 use Math::BigInt;
 
-use Data::Dumper::Interp qw/:all alvis set_addrvis_digits/;
+use Data::Dumper::Interp qw/:all alvis addrvis_digits addrvis_forget/;
 $Data::Dumper::Interp::Foldwidth = 0;  # no folding
 
 my $addrvis_re = qr/[A-Za-z][:\w]*\<\d+:[\da-fA-F]+\>/;
@@ -98,10 +98,10 @@ sub fmtra($) { $hexordec eq "dec" ? $_[0] : sprintf("0x%x",$_[0]) }
   check_addrvis();
   ok(1, "addrvis_forget()");
 
-  set_addrvis_digits(10);
+  addrvis_digits(10);
   $ndigits = 10;
   check_addrvis();
-  ok(1, "set_addrvis_digits()");
+  ok(1, "addrvis_digits()");
 }
 
 ##################################################
@@ -225,31 +225,34 @@ fail("Unexpected ndigits change") if reget_addrvis;
 note "avisr(\@\$aref)=",avisr(@$aref) if $debug;
 is (avisr(@$aref), "(100,101,102)", "avisr with non-ref ary elements");
 
-for ([$aref,"ARRAY"], [$href,"HASH"], [$sref,"SCALAR"], [$bigint,"Math::BigInt"]) {
+# avis & hvis introduce a different temporary [] or {} wrapper each time,
+# which might unexpectedly increase the number of addrvis digits.
+addrvis_forget();
+#addrvis_digits( addrvis_digits() + 2 );
+
+for ([$aref,"ARRAY"], [$href,"HASH"], [$sref,"SCALAR"], 
+     [$bigint,"Math::BigInt"]) {
   my ($theref, $type) = @$_;
   my $plain = vis($theref);
-  # avis & hvis might increase the number of addrvis digits even if all the
-  # arguments have already been seen by addrvis, so we must run it
-  # twice (to ensure it is internally consistent in number of digits)
-  # and then re-get the addrvis for components
-  #
-  # This is because avis & hvis put their args into a temp [] or {} for
-  # formatting which, with 'r'/Refaddr, will prepend an addrvis prefix
-  # to the temp container.   The prefix will be discarded and the [] or {}
-  # changed to () in the final result.
+  my $addrvis = addrvis($theref);
+  my $abbr_addr = refaddress_part($theref);
 
-  my $rvis_re = qr/\<\d+:[\dA-Fa-f]+\>\Q${plain}\E/a;
+  my $rvis_re = qr/\Q${abbr_addr}${plain}\E/a;
+
+  my $subsequent_rvis_re = 
+         $type eq "ARRAY"  ? qr/\Q${abbr_addr}[...]\E/ :
+         $type eq "HASH"   ? qr/\Q${abbr_addr}{...}\E/ :
+         $type eq "SCALAR" ? qr/\Q${abbr_addr}\E\\\Q...\E/ :
+                             qr/\Q$addrvis\E/;
 
   { my $got = avisr(42,$theref,44);
     my $exp_re = qr/^\(42,${rvis_re},44\)$/;
     like($got, $exp_re, "avisr with $type $plain [s,r,s]");
   }
-  { # Subsequent duplicate refs are shown just as <dec:hex>[...] etc.
-    my $got; for (1,2){ $got = visnew->avisr($theref,$theref,44); }
-    my $addrvis = addrvis($theref);
-    my $abbr_addr = refaddress_part($theref);
-    my $exp_re = qr/^\(${rvis_re},(?:\Q${addrvis}\E|\Q${abbr_addr}\E[\[\{]\.\.\..),44\)$/;
-    like($got, $exp_re, "avisr with $type $plain [r,r,s]");
+  { my $got = visnew->avisr($theref, $theref, 44);
+    my $exp_re = qr/^\(${rvis_re},${subsequent_rvis_re},44\)$/;
+    like($got, $exp_re, "avisr with $type $plain [r,r,s]",
+         dvis '$rvis_re $addrvis $abbr_addr');
   }
 }
 

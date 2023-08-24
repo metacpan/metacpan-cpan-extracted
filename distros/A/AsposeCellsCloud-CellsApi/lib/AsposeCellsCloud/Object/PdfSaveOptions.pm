@@ -36,6 +36,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::PdfSecurityOptions;
+use AsposeCellsCloud::Object::RenderingWatermark;
 use AsposeCellsCloud::Object::SaveOptions; 
 
 
@@ -126,6 +127,69 @@ __PACKAGE__->class_documentation({description => '',
 
 
 __PACKAGE__->method_documentation({
+     'display_doc_title' => {
+     	datatype => 'boolean',
+     	base_name => 'DisplayDocTitle',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_document_structure' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportDocumentStructure',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'emf_render_setting' => {
+     	datatype => 'string',
+     	base_name => 'EmfRenderSetting',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'custom_properties_export' => {
+     	datatype => 'string',
+     	base_name => 'CustomPropertiesExport',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'optimization_type' => {
+     	datatype => 'string',
+     	base_name => 'OptimizationType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'producer' => {
+     	datatype => 'string',
+     	base_name => 'Producer',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'pdf_compression' => {
+     	datatype => 'string',
+     	base_name => 'PdfCompression',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'font_encoding' => {
+     	datatype => 'string',
+     	base_name => 'FontEncoding',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'watermark' => {
+     	datatype => 'RenderingWatermark',
+     	base_name => 'Watermark',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'calculate_formula' => {
      	datatype => 'boolean',
      	base_name => 'CalculateFormula',
@@ -255,6 +319,15 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'display_doc_title' => 'boolean',
+    'export_document_structure' => 'boolean',
+    'emf_render_setting' => 'string',
+    'custom_properties_export' => 'string',
+    'optimization_type' => 'string',
+    'producer' => 'string',
+    'pdf_compression' => 'string',
+    'font_encoding' => 'string',
+    'watermark' => 'RenderingWatermark',
     'calculate_formula' => 'boolean',
     'check_font_compatibility' => 'boolean',
     'compliance' => 'string',
@@ -276,6 +349,15 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
+    'display_doc_title' => 'DisplayDocTitle',
+    'export_document_structure' => 'ExportDocumentStructure',
+    'emf_render_setting' => 'EmfRenderSetting',
+    'custom_properties_export' => 'CustomPropertiesExport',
+    'optimization_type' => 'OptimizationType',
+    'producer' => 'Producer',
+    'pdf_compression' => 'PdfCompression',
+    'font_encoding' => 'FontEncoding',
+    'watermark' => 'Watermark',
     'calculate_formula' => 'CalculateFormula',
     'check_font_compatibility' => 'CheckFontCompatibility',
     'compliance' => 'Compliance',

@@ -1,5 +1,9 @@
 Revision history for Method-Signatures-Simple-ParseKeyword
 
+1.13    2023-08-19  Rhesa Rozendaal <rhesa@cpan.org>
+        More descriptive syntax errors
+        shift $self off of @_
+
 1.12    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
         Allow for exporting into another package
 

@@ -3,7 +3,7 @@ package Test::Tk;
 
 use strict;
 use warnings;
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 use Config;
 use Test::More;
@@ -15,6 +15,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
 	$app
 	$delay
+	$quitdelay
 	$mwclass
 	@tests
 	$show
@@ -22,6 +23,7 @@ our @EXPORT = qw(
 	hashcompare
 	listcompare
 	starttesting
+	testaccessors
 );
 
 our $app;
@@ -29,6 +31,7 @@ our $mwclass = 'Tk::MainWindow';
 our @tests = ();
 our $show = 0;
 our $delay = 100;
+our $quitdelay = 200;
 
 my $arg = shift @ARGV;
 $show = 1 if (defined($arg) and ($arg eq 'show'));
@@ -52,13 +55,9 @@ sub dotests {
 		for (@tests) {
 			my ($call, $expected, $comment) = @$_;
 			my $result = &$call;
-			if (ref $expected =~ /^SCALAR/) {
-				ok(($expected eq $result), $comment)
-			} else {
-				cmp_deeply($expected, $result, $comment); 
-			}
+			cmp_deeply($result, $expected, $comment); 
 		}
-		$app->after(5, sub { $app->destroy }) unless $show
+		$app->after($quitdelay, sub { $app->destroy }) unless $show
 	}
 }
 
@@ -114,6 +113,22 @@ sub starttesting {
 		SKIP: {
 			skip 'No XServer running for this user', $size;
 		}
+	}
+}
+
+sub testaccessors {
+	my $obj = shift;
+	for (@_) {
+		my $method = $_;
+		push @tests, [sub {
+			my $default = $obj->$method;
+			$obj->$method('blieb');
+			my $res1 = $obj->$method;
+			$obj->$method('quep');
+			my $res2 = $obj->$method;
+			$obj->$method($default);
+			return (($res1 eq 'blieb') and ($res2 eq 'quep'));
+		}, 1, "Accessor $method"];
 	}
 }
 
@@ -187,6 +202,13 @@ all tests succeed but your test program still throws an error.
 Default value Tk::MainWindow.
 You can set it to a derived class.
 
+=item B<$quitdelays>
+
+Default value 200.
+This is the delay set between the termination of tests and the desctruction of the main widow.
+If your desktop goes bonkers while testing, you main want to increase this value. 
+But I think you're good.
+
 =item B<@tests>
 
 Each element of B<@tests > should contain a list of three elements.
@@ -195,7 +217,8 @@ Each element of B<@tests > should contain a list of three elements.
 
 =item B<A reference to a sub>
 
-The sub should return the expected value for the test to succeed.
+The sub should return the expected value for the test to succeed. It should
+always return something in scalar context.
 
 =item B<Expected value>
 
@@ -220,16 +243,26 @@ Places the object in B>$app>.
 
 =item B<hashcompare>I<(\%hash1, \%hash2)>
 
-Depricated 'hashcompare', use Test::Deep
+Depricated, use Test::Deep or Data::Compare.
 
 =item B<listcompare>I<(\@list1, \@list2)>
 
-Depricated 'hashcompare', use Test::Deep
+Depricated, use Test::Deep or Data::Compare.
 
 =item B<starttesting>
 
 Launches the main loop and sets a timer with delay B<$delay> to start
 the internal test routine.
+
+=item B<testaccessors>I<($obj, 'method1, 'method2', ...)>
+
+Quickly set up accessor tests. Just to be clear, an accessor is something like this.
+
+ sub Value {
+    my $self = shift;
+    $self->{VALUE} = shift if @_;
+    return $self->{VALUE}
+ }
 
 =back
 

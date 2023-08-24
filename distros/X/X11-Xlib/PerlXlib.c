@@ -83,7 +83,7 @@ static void PerlXlib_fields_add_dependent(struct PerlXlib_fields *fields, SV *de
     if (SvMAGICAL(deps))
         croak("bug");
     /* The list contains weak references, and every now and then we should clean up any
-     * that got un-set.  Do this every time the list reaches a multiple of 8. */
+     * that got unset.  Do this every time the list reaches a multiple of 8. */
     if (!(av_len(deps) & 7)) {
         for (i= av_len(deps); i >= 0; --i) {
             ent= av_fetch(deps, i, 0);
@@ -133,7 +133,7 @@ static void PerlXlib_fields_invalidate_dependents(struct PerlXlib_fields *fields
 
 /* Called automatically when the magic-bearing object is freed */
 static void PerlXlib_fields_free(struct PerlXlib_fields *fields) {
-    /* un-set the ->ptr, which by extension removes the containing object from the object cache */
+    /* unset the ->ptr, which by extension removes the containing object from the object cache */
     if (fields->ptr) {
         if (fields->xfree_cleanup)
             XFree(fields->ptr);
@@ -144,7 +144,7 @@ static void PerlXlib_fields_free(struct PerlXlib_fields *fields) {
         sv_2mortal(fields->display_sv);
         fields->display_sv= NULL;
     }
-    /* No need to tell the parent we're gone because the parent holds a weak-ref */
+    /* No need to tell the parent we are gone because the parent holds a weak-ref */
     fields->parent= NULL;
     /* tell dependent objects that they are no longer valid */
     PerlXlib_fields_invalidate_dependents(fields);
@@ -183,7 +183,7 @@ static MGVTBL PerlXlib_magic_vt= {
 
 /* Get existing magic fields or attach magic fields to the object.
  * The sv should be the inner SV/HV/AV of the object, not an RV pointing to it.
- * Use AUTOCREATE to attach magic if it wasn't present.
+ * Use AUTOCREATE to attach magic if it was not present.
  * Use NOTNULL for a built-in croak() if the return value would be NULL.
  */
 static struct PerlXlib_fields* PerlXlib_get_magic_fields(SV *sv, int create_flag) {
@@ -218,12 +218,12 @@ static struct PerlXlib_fields* PerlXlib_get_magic_fields(SV *sv, int create_flag
 /* This gets a cached object known to wrap the C-level pointer 'thing'.
  * If 'thing' is NULL, this always returns NULL regardless of create_flag.
  * If one does not exist and 'create' is requested, this will create a new wrapper
- * object of the given svtype blessed as thing_class, and optionally listing it as
- * a dependency of 'parent'.
+ * object of the given obj_svtype blessed as thing_class, and optionally listing
+ * it as a dependency of 'parent'.
  * Returns a mortal reference to the object.
  */
 extern SV * PerlXlib_get_objref(void *thing, int create_flag,
-    const char *thing_type, int svtype, const char *thing_class, void *parent
+    const char *thing_type, int obj_svtype, const char *thing_class, void *parent
 ) {
     HV *cache, *pkg;
     GV *build_method;
@@ -248,20 +248,20 @@ extern SV * PerlXlib_get_objref(void *thing, int create_flag,
     
     /* Doesn't exist.  Create a new one. */
     pkg= gv_stashpv(thing_class, GV_ADD);
-    if (svtype == SVt_PVMG) {
+    if (obj_svtype == SVt_PVMG) {
         /* return value is a new mortal RV pointing to a PV blessed as thing_class,
           * and the PV points to thing.
           */
         ret= sv_setref_pv(sv_newmortal(), thing_class, thing);
     }
-    else if (svtype == SVt_PVHV) {
+    else if (obj_svtype == SVt_PVHV) {
         /* return value is a new mortal RV pointing to a HV blessed as thing_class,
           * and with "dpy_innerptr" magic attached holding the pointer to thing.
           */
         ret= sv_2mortal(newRV_noinc((SV*) newHV()));
         sv_bless(ret, pkg);
     }
-    else if (svtype == SVt_PVAV) {
+    else if (obj_svtype == SVt_PVAV) {
         /* return value is a new mortal RV pointing to a AV blessed as thing_class,
           * and with "dpy_innerptr" magic attached holding the pointer to thing.
           */
@@ -269,7 +269,7 @@ extern SV * PerlXlib_get_objref(void *thing, int create_flag,
         sv_bless(ret, pkg);
     }
     else
-        croak("Unsupported svtype in PerlXlib_get_obj_for_ptr");
+        croak("Unsupported obj_svtype in PerlXlib_get_obj_for_ptr");
 
     f= PerlXlib_get_magic_fields(SvRV(ret), AUTOCREATE);
     PerlXlib_fields_set_ptr(f, thing, thing_type); /* adds weak-ref to cache */
@@ -606,7 +606,7 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
     }
     
     /* If uninitialized, initialize to a blessed struct object,
-     *  unless we're looking at \undef in which case just initialize to a string
+     *  unless we are looking at \undef in which case just initialize to a string
      */
     if (!SvOK(sv)) {
         if (!lvalue) croak("Can't coerce %sundef to %s rvalue", refsv? "\\" : "", pkg);
@@ -647,7 +647,7 @@ SV * PerlXlib_keysym_to_sv(KeySym sym, int symbolic) {
     const char *symname;
     if (sym == NoSymbol)
         return &PL_sv_undef;
-    /* Only convert to unicode character if reverse mapping matches forward mapping */
+    /* Only convert to Unicode character if reverse mapping matches forward mapping */
     if (symbolic >= 2
         && (sym_codepoint= PerlXlib_keysym_to_codepoint(sym)) >= 0
         && (PerlXlib_codepoint_to_keysym(sym_codepoint) == sym))
@@ -1929,6 +1929,55 @@ void PerlXlib_XRectangle_unpack_obj(XRectangle *s, HV *fields, SV *obj_ref) {
 }
 
 /* END GENERATED X11_Xlib_XRectangle */
+/*--------------------------------------------------------------------------*/
+/* BEGIN GENERATED X11_Xlib_XKeyboardState */
+
+void PerlXlib_XKeyboardState_pack(XKeyboardState *s, HV *fields, Bool consume) {
+    SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
+
+    fp= hv_fetch(fields, "auto_repeats", 12, 0);
+    if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(char)*32)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*32), (long)SvCUR(*fp)); memcpy(s->auto_repeats, SvPVX(*fp), sizeof(char)*32);} if (consume) hv_delete(fields, "auto_repeats", 12, G_DISCARD); }
+
+    fp= hv_fetch(fields, "bell_duration", 13, 0);
+    if (fp && *fp) { s->bell_duration= SvUV(*fp); if (consume) hv_delete(fields, "bell_duration", 13, G_DISCARD); }
+
+    fp= hv_fetch(fields, "bell_percent", 12, 0);
+    if (fp && *fp) { s->bell_percent= SvIV(*fp); if (consume) hv_delete(fields, "bell_percent", 12, G_DISCARD); }
+
+    fp= hv_fetch(fields, "bell_pitch", 10, 0);
+    if (fp && *fp) { s->bell_pitch= SvUV(*fp); if (consume) hv_delete(fields, "bell_pitch", 10, G_DISCARD); }
+
+    fp= hv_fetch(fields, "global_auto_repeat", 18, 0);
+    if (fp && *fp) { s->global_auto_repeat= SvIV(*fp); if (consume) hv_delete(fields, "global_auto_repeat", 18, G_DISCARD); }
+
+    fp= hv_fetch(fields, "key_click_percent", 17, 0);
+    if (fp && *fp) { s->key_click_percent= SvIV(*fp); if (consume) hv_delete(fields, "key_click_percent", 17, G_DISCARD); }
+
+    fp= hv_fetch(fields, "led_mask", 8, 0);
+    if (fp && *fp) { s->led_mask= SvUV(*fp); if (consume) hv_delete(fields, "led_mask", 8, G_DISCARD); }
+}
+
+void PerlXlib_XKeyboardState_unpack_obj(XKeyboardState *s, HV *fields, SV *obj_ref) {
+    /* hv_store may return NULL if there is an error, or if the hash is tied.
+     * If it does, we need to release the reference to the value we almost inserted,
+     * so track allocated SV in this var.
+     */
+    SV *sv= NULL;
+    if (!hv_store(fields, "auto_repeats", 12, (sv=newSVpvn((void*)s->auto_repeats, sizeof(char)*32)), 0)) goto store_fail;
+    if (!hv_store(fields, "bell_duration", 13, (sv=newSVuv(s->bell_duration)), 0)) goto store_fail;
+    if (!hv_store(fields, "bell_percent", 12, (sv=newSViv(s->bell_percent)), 0)) goto store_fail;
+    if (!hv_store(fields, "bell_pitch", 10, (sv=newSVuv(s->bell_pitch)), 0)) goto store_fail;
+    if (!hv_store(fields, "global_auto_repeat", 18, (sv=newSViv(s->global_auto_repeat)), 0)) goto store_fail;
+    if (!hv_store(fields, "key_click_percent", 17, (sv=newSViv(s->key_click_percent)), 0)) goto store_fail;
+    if (!hv_store(fields, "led_mask"  ,  8, (sv=newSVuv(s->led_mask)), 0)) goto store_fail;
+    return;
+    store_fail:
+        if (sv) sv_2mortal(sv);
+        croak("Can't store field in supplied hash (tied maybe?)");
+}
+
+/* END GENERATED X11_Xlib_XKeyboardState */
 /*--------------------------------------------------------------------------*/
 /* BEGIN GENERATED X11_Xlib_XRenderPictFormat */
 

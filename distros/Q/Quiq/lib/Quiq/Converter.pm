@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.211';
+our $VERSION = '1.212';
 
 use POSIX ();
 use Time::Local ();
@@ -322,11 +322,15 @@ sub umlautToAscii {
 
 =head2 Zahlen
 
-=head3 germanToProgramNumber() - Wandele deutsche Zahldarstellung in Zahl
+=head3 germanNumber() - Wandele deutsche Zahldarstellung in Zahl
 
 =head4 Synopsis
 
-  $x = $this->germanToProgramNumber($germanX);
+  $x = $this->germanNumber($germanX);
+
+=head4 Alias
+
+germanToProgramNumber()
 
 =head4 Description
 
@@ -338,13 +342,41 @@ und liefere das Resultat zurück.
 
 # -----------------------------------------------------------------------------
 
-sub germanToProgramNumber {
+sub germanNumber {
     my ($this,$x) = @_;
 
     $x =~ s/\.//;
     $x =~ s/,/./;
 
     return $x;
+}
+
+{
+    no warnings 'once';
+    *germanToProgramNumber = \&germanNumber;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 germanMoneyAmount() - Wandele deutschen Geldbetrag in Zahl
+
+=head4 Synopsis
+
+  $x = $this->germanMoneyAmount($germanMoneyAmount);
+
+=head4 Description
+
+Wandele deutschen Geldbetrag mit Punkt (.) als Stellen-Trenner und
+Komma (,) als Dezimaltrennzeichen in eine Zahl mit zwei Nachkommastellen
+der Programmiersprache und liefere das Resultat zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub germanMoneyAmount {
+    my ($this,$x) = @_;
+    return sprintf '%.2f',$this->germanNumber($x);
 }
 
 # -----------------------------------------------------------------------------
@@ -722,7 +754,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.211
+1.212
 
 =head1 AUTHOR
 

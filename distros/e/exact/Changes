@@ -1,5 +1,15 @@
 Revision history for exact
 
+1.22      2023-08-22 08:18:14-07:00 America/Los_Angeles
+        - Relocate no experimental warnings (order of operations)
+
+1.21      2023-08-21 17:53:58-07:00 America/Los_Angeles
+        - Support for exact::class by setting up cor/nocor feature keywords
+
+1.20      2023-08-18 15:29:54-07:00 America/Los_Angeles
+        - Update for Perl 5.38 and beyond
+        - Add PerlX::Maybe integration
+
 1.19      2022-03-28 16:24:14-07:00 America/Los_Angeles
         - Silence a test warning
 

@@ -1,0 +1,12 @@
+Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
+
+0.0002 -- Tue Aug 22 22:09:46 ADT 2023
+
+    - 564838e Use Dist::Zilla::Plugin::GitHub::CreateRelease to create github release
+    - fba27df Missing dependenties in the dist.ini
+    - 1ebc1c3 Fix homepage link
+    - 72056a7 (tag: 0.0001) v0.0001
+
+0.0001 -- Mon Aug 21 20:53:45 ADT 2023
+
+    - aa169bf Initial Version

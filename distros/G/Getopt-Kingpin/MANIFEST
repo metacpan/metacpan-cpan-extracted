@@ -13,6 +13,7 @@ lib/Getopt/Kingpin/Commands.pm
 lib/Getopt/Kingpin/Flag.pm
 lib/Getopt/Kingpin/Flags.pm
 lib/Getopt/Kingpin/Type/Bool.pm
+lib/Getopt/Kingpin/Type/Enum.pm
 lib/Getopt/Kingpin/Type/ExistingDir.pm
 lib/Getopt/Kingpin/Type/ExistingFile.pm
 lib/Getopt/Kingpin/Type/ExistingFileOrDir.pm

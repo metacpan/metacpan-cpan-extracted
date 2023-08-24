@@ -7,14 +7,8 @@ BEGIN {
 	$^W = 1;
 }
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 
 require_ok( 'ORLite' );
 use lib 't/lib';
 use_ok( 'LocalTest' );
-
-is(
-	$ORLite::VERSION,
-	$LocalTest::VERSION,
-	'$VERSION match'
-);

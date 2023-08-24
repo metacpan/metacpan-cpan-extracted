@@ -19,19 +19,19 @@ name: Dist-Zilla-PluginBundle-Author-PERLANCAR
 provides:
   Dist::Zilla::Plugin::PERLANCAR::BeforeBuild:
     file: lib/Dist/Zilla/Plugin/PERLANCAR/BeforeBuild.pm
-    version: '0.607'
+    version: '0.608'
   Dist::Zilla::PluginBundle::Author::PERLANCAR:
     file: lib/Dist/Zilla/PluginBundle/Author/PERLANCAR.pm
-    version: '0.607'
+    version: '0.608'
   Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN:
     file: lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/NonCPAN.pm
-    version: '0.607'
+    version: '0.608'
   Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task:
     file: lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/NonCPAN/Task.pm
-    version: '0.607'
+    version: '0.608'
   Dist::Zilla::PluginBundle::Author::PERLANCAR::Task:
     file: lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/Task.pm
-    version: '0.607'
+    version: '0.608'
 requires:
   Acme::CPANModulesBundle::PERLANCAR: '0'
   App::shcompgen: '0'
@@ -90,7 +90,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-PERLANCAR
   homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-PERLANCAR
   repository: git://github.com/perlancar/perl-Dist-Zilla-PluginBundle-Author-PERLANCAR.git
-version: '0.607'
+version: '0.608'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -170,7 +170,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.606'
+      version: '0.607'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

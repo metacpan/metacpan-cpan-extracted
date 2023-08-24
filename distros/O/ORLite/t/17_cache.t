@@ -15,7 +15,7 @@ use lib 't/lib';
 use LocalTest;
 
 # Where will the cache file be written to
-my $orlite_version = $t::lib::Test::VERSION;
+my $orlite_version = $LocalTest::VERSION;
 $orlite_version =~ s/[\._]/-/g;
 my $cached = catfile( 
 	"t",

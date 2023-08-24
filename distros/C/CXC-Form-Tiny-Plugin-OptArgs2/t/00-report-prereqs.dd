@@ -58,6 +58,7 @@ do { my $x = {
                                       'Test::CPAN::Meta::JSON' => '0.16',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
+                                      'Test::Fixme' => '0',
                                       'Test::More' => '0.88',
                                       'Test::NoBreakpoints' => '0.15',
                                       'Test::NoTabs' => '0',
@@ -78,7 +79,11 @@ do { my $x = {
                                       'OptArgs2' => '2.00',
                                       'Ref::Util' => '0',
                                       'Scalar::Util' => '0',
+                                      'Type::Params' => '0',
+                                      'Types::Common::String' => '0',
                                       'Types::Standard' => '2.00',
+                                      'experimental' => '0.027',
+                                      'namespace::clean' => '0',
                                       'perl' => '5.020'
                                     }
                     },
@@ -92,6 +97,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'List::Util' => '1.29',
+                                   'Package::Variant' => '0',
                                    'Ref::Util' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',

@@ -8,7 +8,7 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
@@ -75,9 +75,10 @@ my %_functions= (
     XCheckWindowEvent XEventsQueued XFlush XGetErrorDatabaseText XGetErrorText
     XNextEvent XPending XPutBackEvent XQLength XSelectInput XSendEvent XSync
     )],
-  fn_input => [qw( XAllowEvents XBell XGrabButton XGrabKey XGrabKeyboard
-    XGrabPointer XQueryKeymap XQueryPointer XSetInputFocus XUngrabButton
-    XUngrabKey XUngrabKeyboard XUngrabPointer XWarpPointer keyboard_leds )],
+  fn_input => [qw( XAllowEvents XBell XGetKeyboardControl XGrabButton XGrabKey
+    XGrabKeyboard XGrabPointer XQueryKeymap XQueryPointer XSetInputFocus
+    XUngrabButton XUngrabKey XUngrabKeyboard XUngrabPointer XWarpPointer
+    keyboard_leds )],
   fn_keymap => [qw( XDisplayKeycodes XGetKeyboardMapping XGetModifierMapping
     XKeysymToKeycode XLookupString XRefreshKeyboardMapping XSetModifierMapping
     load_keymap save_keymap )],
@@ -258,7 +259,7 @@ This includes access to some X11 extensions like the X11 test library (Xtst).
 If you import the Xlib functions directly, or call them as methods on an
 instance of X11::Xlib, you get a near-C experience where you are required to
 manage the lifespan of resources, XIDs are integers instead of objects, and the
-library doesn't make any attempt to keep you from passing bad data to Xlib.
+library does not make any attempt to keep you from passing bad data to Xlib.
 
 If you instead create a L<X11::Xlib::Display> object and call all your methods
 on that, you get a more friendly wrapper around Xlib that helps you manage
@@ -299,7 +300,7 @@ global error handlers are invoked.  On a fatal error, all error handlers are
 invoked.
 
 Setting a value for this attribute automatically installs the Xlib error
-handler, which isn't enabled by default.
+handler, which is not enabled by default.
 
 Note that this callback is called from XS context, so your exceptions will
 not travel up the stack.  Also note that on Xlib fatal errors, you cannot
@@ -370,7 +371,7 @@ The L<X11::Xlib::Display> object constructor is recommended instead.
 The C<$connection_string> variable specifies the display string to open.
 (C<"host:display.screen">, or often C<":0"> to connect to the only screen of
 the only display on C<localhost>)
-If unset, Xlib uses the C<$DISPLAY> environement variable.
+If unset, Xlib uses the C<$DISPLAY> environment variable.
 
 If the handle goes out of scope, its destructor calls C<XCloseDisplay>, unless
 you already called C<XCloseDisplay> or the X connection was lost.  (Be sure to
@@ -394,6 +395,18 @@ all further Xlib calls on the handle will die with an exception.
 Return the file descriptor (integer) of the socket connected to the server.
 This is useful for select/poll designs.
 (See also: L<X11::Xlib::Display/wait_event>)
+
+=head3 XServerVendor
+
+  $name= XServerVendor($display);
+
+Return the vendor string from the X Server.
+
+=head3 XVendorRelease
+
+  $version= XVendorRelease($display);
+
+Return the version number from the server (packed into a single integer)
 
 =head3 XSetCloseDownMode
 
@@ -423,7 +436,7 @@ atom value)
 
 Same as above, but look up multiple atoms at once, for round-trip efficiency.
 The returned array will always be the same length as C<@atom_names>, but will
-have 0 for any atom value that didn't exist if C<$only_existing> was true.
+have 0 for any atom value that did not exist if C<$only_existing> was true.
 
 =head3 XGetAtomName
 
@@ -439,7 +452,7 @@ protocol error (can be caught by C</on_error> handler) and returns undef.
 Same as above, but look up multiple atoms at once, for round-trip efficiency.
 If any atom does not exist, this generates a protocol error, but if you catch
 the error then this function will return an array the same length as
-C<@atom_values> with C<undef> for each atom that didn't exist.
+C<@atom_values> with C<undef> for each atom that did not exist.
 
 =head2 COMMUNICATION FUNCTIONS
 
@@ -497,7 +510,7 @@ event into C<$event_return> and returns true.  Else it returns false without
 blocking.
 
 (Xlib also has another variant that uses a callback to choose which message to
- extract, but I didn't implement that because it seemed like a pain and probably
+ extract, but I did not implement that because it seemed like a pain and probably
  nobody would use it.)
 
 =head3 XSendEvent
@@ -505,7 +518,7 @@ blocking.
   XSendEvent($display, $window, $propagate, $event_mask, $xevent)
     or die "Xlib hates us";
 
-Send an XEvent to the server, to be redispatched however appropriate.
+Send an XEvent to the server, to be re-dispatched however appropriate.
 
 =head3 XPutBackEvent
 
@@ -520,7 +533,7 @@ since it returns void.
   XFlush($display)
 
 Push any queued messages to the X11 server.  Some Xlib calls perform an
-implied flush of the queue, while others don't.  If you're wondering why
+implied flush of the queue, while others don't.  If you are wondering why
 nothing happened when you called an XTest function, this is why.
 
 =head3 XSync
@@ -585,6 +598,10 @@ went, drop the leading X and do a quick search on this page.
 
 Return number of configured L</Screen>s of this display.
 
+=head3 DefaultScreen
+
+Returns the default screen number of the display
+
 =head3 DisplayWidth
 
 =head3 DisplayHeight
@@ -594,7 +611,7 @@ Return number of configured L</Screen>s of this display.
   # use instead of WidthOfScreen, HeightOfScreen
 
 Return the width or height of screen number C<$screen>.  You can omit the
-C<$screen> paramter to use the default screen of your L<Display> connection.
+C<$screen> parameter to use the default screen of your L<Display> connection.
 
 =head3 DisplayWidthMM
 
@@ -630,6 +647,14 @@ This returns a L</Visual>, not a L</XVisualInfo>.
 
 Return bits-per-pixel of the root window of a screen.
 If you omit C<$screen> it uses the default screen.
+
+=head3 DefaultColormap
+
+Default color map of the display
+
+=head3 DefaultGC
+
+Default graphics context of the display
 
 =head2 VISUAL/COLORMAP FUNCTIONS
 
@@ -715,7 +740,7 @@ If anyone actually needs palette graphics anymore, send me a patch :-)
 
 The C<$drawable> parameter is just used to determine the screen.
 You probably want to pass either C<DefaultRootWindow($display)> or the window
-you're creating the pixmap for.
+you are creating the pixmap for.
 
 =head3 XFreePixmap
 
@@ -732,7 +757,7 @@ The C<$data> is a string of bytes.
 
 The C<$data> should technically be opaque, written by another X11 function
 after having rendering graphics to a pixmap or something, but since those
-aren't implemented here yet, you'll just have to know the format.
+are not implemented here yet, you'll just have to know the format.
 
 =head3 XCreatePixmapFromBitmapData
 
@@ -769,14 +794,14 @@ an attribute C<< ->visual >>).  In the second case, you should also pass
 C<< $visual_info->depth >> as the C<$depth> parameter, and create a matching
 L</Colormap> which you pass via the C<\%attrs> parameter.
 
-Since this function didn't have nearly enough parameters for the imaginations
+Since this function did not have nearly enough parameters for the imaginations
 of the Xlib creators, they added the full L<X11::Xlib::XSetWindowAttributes> structure
 as a final argument.  But to save you the trouble of setting all I<those>
 fields, they added an C<$attr_mask> to indicate which fields you are using.
 Simply OR together the constants listed in that struct.  If C<$attr_mask> is
 zero, then C<\%attrs> may be C<undef>.
 
-The window is initially un-mapped (i.e. hidden).  See L</XMapWindow>
+The window is initially unmapped (i.e. hidden).  See L</XMapWindow>
 
 =head3 XCreateSimpleWindow
 
@@ -799,7 +824,7 @@ Ask the X server to show a window.  This call is asynchronous and you should cal
 L</XFlush> if you want it to appear immediately.  The window will only appear if
 the parent window is also mapped.  The server sends back a MapNotify event if
 the Window event mask allows it, and if a variety of other conditions are met.
-It's really pretty complicated and you should read the offical docs.
+It's really pretty complicated and you should read the official docs.
 
 =head3 XUnmapWindow
 
@@ -809,9 +834,22 @@ Hide a window.
 
 =head3 XGetGeometry
 
-  my ($root, $x, $y, $width, $height, $border_width, $color_depth)
+  $bool= XGetGeometry($display, $drawable, my $root_out, my $x_out, my $y_out,
+        my $width_out, my $height_out, my $border_width_out, my $color_depth_out);
+  
+  # or more perl-ish
+  ($root, $x, $y, $width, $height, $border_width, $color_depth)
     = XGetGeometry($display, $drawable)
     or die "XGetGeometry failed";
+
+=head3 XTranslateCoordinates
+
+  $bool= XTranslateCoordinates($display, $src_win, $dst_win, $src_x, $src_y,
+      my $dst_x_out, my $dst_y_out, my $child_out);
+  
+  # or more perl-ish
+  ($x, $y, $child)= XTranslateCoordinates($display, $src_win, $dst_win, $src_x, $src_y)
+    or die;
 
 =head3 XGetWindowAttributes
 
@@ -976,7 +1014,7 @@ is a scalar that must be at least as long as C<$nitems> * C<$format> bits.
   XDeleteProperty($display, $window, $prop_atom);
 
 Deletes the property from the window if it exists.  No error is raised if it
-doesn't exist.
+does not exist.
 
 =head3 XGetWMProtocols
 
@@ -1005,7 +1043,7 @@ For example, to advertise support for standard "close" events:
 
 If a window has Window Manager Normal Hints defined on it, this function will
 store them into the C<$hints_out> variable (which will become a L<X11::Xlib::XSizeHints>
-if it wasn't already).  It will also set the bits of C<$supplied_fields_out> to
+if it was not already).  It will also set the bits of C<$supplied_fields_out> to
 indicate which fields the X11 server knows about.  This is different from the
 bits in C<< $hints_out->flags >> that indicate which individual fields are defined
 for this window.
@@ -1018,6 +1056,21 @@ Set window manager hints for the specified window.  C<$hints> is an instance of
 L<X11::Xlib::XSizeHints>, or a hashref of its fields.  Note that the C<< ->flags >>
 member of this struct will be initialized for you if you pass a hashref, according
 to what fields exist in the hashref.
+
+=head3 XGetWMSizeHints
+
+  XGetWMSizeHints($display, $window, $hints_out, $supplied_fields_out, $prop_atom);
+
+Request the attribute $prop_atom from the $window.  If it exists and is an
+XSizeHints type, the variable $hints_out will be filled with the struct fields,
+and $supplied_fields_out will be set to a bit mask of which fields were available.
+
+=head3 XSetWMSizeHints
+
+  XSetWMSizeHints($display, $window, $hints, $prop_atom);
+
+Write value of type XSizeHints to the named property of the window.  $hints should
+be a XSizeHints object, or packed buffer containing the fields of one.
 
 =head3 XDestroyWindow
 
@@ -1051,7 +1104,7 @@ before sending the event. The default is 10 milliseconds.
 Simulate an action on mouse button number C<$button>. C<$pressed> indicates whether
 the button should be pressed (true) or released (false). 
 
-The optional C<$EventSendDelay> parameter specifies the number of milliseconds ro wait
+The optional C<$EventSendDelay> parameter specifies the number of milliseconds to wait
 before sending the event. The default is 10 milliseconds.
 
 =head3 XTestFakeKeyEvent
@@ -1093,9 +1146,9 @@ C<XStringToKeysym> is the reverse of C<XKeysymToString>.
 
   my $keysym= codepoint_to_keysym(ord($char));
 
-Convert a Unicode codepoint to a KeySym value.  This isn't a true Xlib
-function, but fills a gap in the API since Xlib is pretty weak on unicode
-handling.  Every normal unicode codepoint has a keysym value, but if you
+Convert a Unicode codepoint to a KeySym value.  This is not a true Xlib
+function, but fills a gap in the API since Xlib is pretty weak on Unicode
+handling.  Every normal Unicode codepoint has a keysym value, but if you
 pass an invalid codepoint you will get C<undef>.
 
 =head3 keysym_to_codepoint
@@ -1103,14 +1156,14 @@ pass an invalid codepoint you will get C<undef>.
   my $cp= keysym_to_codepoint($keysym);
   my $char= defined $cp? chr($cp) : undef;
 
-Convert a KeySym to a unicode codepoint.  Many KeySyms (like F1, Control, etc)
+Convert a KeySym to a Unicode codepoint.  Many KeySyms (like F1, Control, etc)
 do not have any character associated with them, and will return C<undef>.
 Again, not actually part of Xlib, but provided here for convenience.
 
 =head3 char_to_keysym
 
 Like L</codepoint_to_keysym> example above, but takes a string from which it
-calls L<ord()> on the first character.  Returns undef if the string doesn't
+calls L<ord()> on the first character.  Returns undef if the string does not
 have a first character.
 
 =head3 keysym_to_char
@@ -1175,7 +1228,7 @@ C<$wnd_focus> can be None to discard all keyboard input until a new window is
 focused, or PointerRoot to actively track the root window of whatever screen
 the pointer moves to.
 
-Once the target window becomes un-viewable, the C<$revert_to> setting takes
+Once the target window becomes unviewable, the C<$revert_to> setting takes
 effect, and can be C<RevertToParent>, C<RevertToPointerRoot>, or C<RevertToNone>.
 
 =head3 XQueryKeymap
@@ -1188,7 +1241,7 @@ Return a list of the key codes currently pressed on the keyboard.
 
   $bool= XGrabKeyboard($display, $window, $owner_events, $pointer_mode, $keyboard_mode, $timestamp)
 
-Direct foxus to the specified window.  See X11 docs.
+Direct focus to the specified window.  See X11 docs.
 
 =head3 XUngrabKeyboard
 
@@ -1234,6 +1287,20 @@ Cancel a grab registered by L</XGrabKey>.
 
   XUngrabButton($display, $button, $modifiers, $window)
 
+=head3 XQueryPointer
+
+  XQueryPointer($display, $window,
+    my $root_out, my $child_out, my $root_x_out, my $root_y_out,
+    my $win_x_out, my $win_y_out, my $mask_out);
+  
+  # or more perl-like:
+  ($root, $child, $root_x, $root_y, $win_x, $win_y, $mask)
+     = XQueryPointer($display, $window);
+
+Return information about the current location of the pointer.  The native API returns the values
+into parameters, but this implementation offers them as a returned list, if you only pass the
+window argument.
+
 =head3 XWarpPointer
 
   XWarpPointer($display, $src_win, $dest_win, $src_x, $src_y, $src_width, $src_height, $dest_x, $dest_y)
@@ -1248,6 +1315,13 @@ the cursor is currently within that rectangle of that window.
 
 If grab modes used above are C<GrabModeSync> then further X11 input processing
 is halted until you call this function.  See X11 docs.
+
+=head3 XDisplayKeycodes
+
+  XDisplayKeycodes($display, my $min_code_out, my $max_code_out);
+
+Returns the minimum keycode and maximum keycode into the supplied scalars.  Minimum is never
+less than 8 and maximum is never greater than 255.
 
 =head3 XGetKeyboardMapping
 
@@ -1290,12 +1364,12 @@ access, see L<X11::Xlib::Keymap>.
   my $keymap= load_keymap($display); # all keys, symbolic=2
 
 This is a wrapper around L</XGetKeyboardMapping> which returns an arrayref
-of arrayrefs, and also translates KeySym values into KeySym names or unicode
+of arrayrefs, and also translates KeySym values into KeySym names or Unicode
 characters.  If C<$symbolic> is 0, the elements of the arrays are KeySym numbers.
 If C<$symbolic> is 1, the elements are the KeySym name (or integers, if a name
 is not available).
 If C<$symbolic> is 2, the elements are characters for every KeySym that can be
-un-ambiguously represented by a character, else KeySym names, else integers.
+unambiguously represented by a character, else KeySym names, else integers.
 
 The minimum KeyCode of an X server is never below 8.  If you omit C<$min_key>
 it defaults to 0, and so the returned array will always have at least 8 undef
@@ -1314,7 +1388,7 @@ in which case the array is assumed to start at 0 and you are requesting that
 only elements C<($min_key .. $max_key)> be sent to the X server.
 
 Each element of the inner array can be an integer KeySym, or a KeySym name
-recognized by L</XStringToKeysym>, or a single unicode character.
+recognized by L</XStringToKeysym>, or a single Unicode character.
 If the KeySym is an integer, it must be at least two integer digits, which
 all real KeySyms should be (other than C<NoSymbol> which has the value 0, and
 should be represented by C<undef>) to avoid ambiguity with the characters of
@@ -1372,6 +1446,18 @@ Return the key code corresponding to C<$keysym> in the current mapping.
 
 Make the X server emit a sound.
 
+=head2 XGetKeyboardControl
+
+  XGetKeyboardControl($display, my $state_out);
+
+Returns a L<XKeyboardState|X11::Xlib::XKeyboardState> record in $state_out.
+
+=head3 keyboard_leds
+
+  $led_mask= $display->keyboard_leds;
+
+Shortcut for reading the led_mask field of XKeyboardState of a call to XGetKeyboardControl.
+
 =head2 EXTENSION XCOMPOSITE
 
 This is an optional extension.  If you have Xcomposite available when this
@@ -1428,6 +1514,48 @@ None of these functions are exportable.
 
   $display->XCompositeReleaseOverlayWindow($window);
 
+=head2 EXTENSION XFIXES
+
+This is an optional extension.  If you have XFixes available when this module was installed,
+the following functions will be available:
+
+=head3 XFixesQueryExtension
+
+  ($event_base, $error_base)= $display->XFixesQueryExtension()
+    if $display->can('XFixesQueryExtension');
+
+=head3 XFixesQueryVersion
+
+  ($major, $minor)= $display->XFixesQueryVersion()
+    if $display->can('XFixesQueryVersion');
+
+=head3 XFixesVersion
+
+  $ver= X11::Xlib::XFixesVersion();
+
+The local client library version, independent of the server.
+
+=head3 XFixesCreateRegion
+
+  $region_xid= XFixesCreateRegion($display, \@rects);
+
+Given an arrayref of L<XRectangle|X11::Xlib::XRectangle>, returns the union of all those rects
+as an XserverRegion (server-side XID).  If you want an L<XserverRegion|X11::Xlib::XserverRegion>
+object, use the method of the Display object.
+
+=head3 XFixesDestroyRegion
+
+  XFixesDestroyRegion($display, $region);
+
+=head3 XFixesSetWindowShapeRegion
+
+  XFixesSetWindowShapeRegion($display, $window, $shape_kind, $x_ofs, $y_ofs, $region);
+
+Alter the shape of a window (either C<ShapeInput> or C<ShapeBounding>) to match the given
+region at an offset.  The shape is a copy of the region, and does not hold a reference to it.
+By setting the input shape to an empty region, and using a Visual with alpha channel, you can
+make a top-level transparent window that does not intercept input events.
+
 =head2 EXTENSION XRENDER
 
 This is an optional extension.  If you have Xrender available when this
@@ -1452,6 +1580,168 @@ None of these functions are exportable.
   my $pfmt= $display->XRenderFindVisualFormat( $visual );
 
 Takes a L<X11::Xlib::Visual>, and returns a L<X11::Xlib::XRenderPictFormat>.
+
+=head1 CONSTANTS
+
+XLib has a massive number of symbolic constants.  This module has an incomplete
+list, but you can export all of them with
+
+  use X11::Xlib ':constants';
+
+You can also export only the named groups that you require, like:
+
+  use X11::Xlib qw/ :const_event :const_visual /;
+
+=cut
+
+# BEGIN GENERATED XS CONSTANT POD
+=over
+
+=item C<:const_cmap>
+
+C<AllocAll> C<AllocNone>
+
+=for Pod::Coverage AllocAll AllocNone
+
+=item C<:const_error>
+
+C<BadAccess> C<BadAlloc> C<BadAtom> C<BadColor> C<BadCursor> C<BadDrawable>
+C<BadFont> C<BadGC> C<BadIDChoice> C<BadImplementation> C<BadLength>
+C<BadMatch> C<BadName> C<BadPixmap> C<BadRequest> C<BadValue> C<BadWindow>
+C<Success>
+
+=for Pod::Coverage BadAccess BadAlloc BadAtom BadColor BadCursor BadDrawable BadFont BadGC BadIDChoice BadImplementation BadLength BadMatch
+
+=for Pod::Coverage BadName BadPixmap BadRequest BadValue BadWindow Success
+
+=item C<:const_event>
+
+C<ButtonPress> C<ButtonRelease> C<CirculateNotify> C<ClientMessage>
+C<ColormapNotify> C<ConfigureNotify> C<CreateNotify> C<DestroyNotify>
+C<EnterNotify> C<Expose> C<FocusIn> C<FocusOut> C<GraphicsExpose>
+C<GravityNotify> C<KeyPress> C<KeyRelease> C<KeymapNotify> C<LeaveNotify>
+C<MapNotify> C<MapRequest> C<MappingNotify> C<MotionNotify> C<NoExpose>
+C<PropertyNotify> C<ReparentNotify> C<ResizeRequest> C<SelectionClear>
+C<SelectionNotify> C<SelectionRequest> C<UnmapNotify> C<VisibilityNotify>
+
+=for Pod::Coverage ButtonPress ButtonRelease CirculateNotify ClientMessage ColormapNotify ConfigureNotify CreateNotify DestroyNotify
+
+=for Pod::Coverage EnterNotify Expose FocusIn FocusOut GraphicsExpose GravityNotify KeyPress KeyRelease KeymapNotify LeaveNotify MapNotify
+
+=for Pod::Coverage MapRequest MappingNotify MotionNotify NoExpose PropertyNotify ReparentNotify ResizeRequest SelectionClear
+
+=for Pod::Coverage SelectionNotify SelectionRequest UnmapNotify VisibilityNotify
+
+=item C<:const_event_mask>
+
+C<Button1MotionMask> C<Button2MotionMask> C<Button3MotionMask>
+C<Button4MotionMask> C<Button5MotionMask> C<ButtonMotionMask>
+C<ButtonPressMask> C<ButtonReleaseMask> C<ColormapChangeMask>
+C<EnterWindowMask> C<ExposureMask> C<FocusChangeMask> C<KeyPressMask>
+C<KeyReleaseMask> C<KeymapStateMask> C<LeaveWindowMask> C<NoEventMask>
+C<OwnerGrabButtonMask> C<PointerMotionHintMask> C<PointerMotionMask>
+C<PropertyChangeMask> C<ResizeRedirectMask> C<StructureNotifyMask>
+C<SubstructureNotifyMask> C<SubstructureRedirectMask> C<VisibilityChangeMask>
+
+=for Pod::Coverage Button1MotionMask Button2MotionMask Button3MotionMask Button4MotionMask Button5MotionMask ButtonMotionMask
+
+=for Pod::Coverage ButtonPressMask ButtonReleaseMask ColormapChangeMask EnterWindowMask ExposureMask FocusChangeMask KeyPressMask
+
+=for Pod::Coverage KeyReleaseMask KeymapStateMask LeaveWindowMask NoEventMask OwnerGrabButtonMask PointerMotionHintMask PointerMotionMask
+
+=for Pod::Coverage PropertyChangeMask ResizeRedirectMask StructureNotifyMask SubstructureNotifyMask SubstructureRedirectMask
+
+=for Pod::Coverage VisibilityChangeMask
+
+=item C<:const_ext_composite>
+
+C<CompositeRedirectAutomatic> C<CompositeRedirectManual>
+
+=for Pod::Coverage CompositeRedirectAutomatic CompositeRedirectManual
+
+=item C<:const_ext_shape>
+
+C<ShapeBounding> C<ShapeClip> C<ShapeInput> C<ShapeIntersect> C<ShapeInvert>
+C<ShapeSet> C<ShapeSubtract> C<ShapeUnion>
+
+=for Pod::Coverage ShapeBounding ShapeClip ShapeInput ShapeIntersect ShapeInvert ShapeSet ShapeSubtract ShapeUnion
+
+=item C<:const_input>
+
+C<AnyKey> C<AnyModifier> C<AsyncBoth> C<AsyncKeyboard> C<AsyncPointer>
+C<Button1Mask> C<Button2Mask> C<Button3Mask> C<Button4Mask> C<Button5Mask>
+C<ControlMask> C<GrabModeAsync> C<GrabModeSync> C<LockMask> C<Mod1Mask>
+C<Mod2Mask> C<Mod3Mask> C<Mod4Mask> C<Mod5Mask> C<NoSymbol> C<PointerRoot>
+C<ReplayKeyboard> C<ReplayPointer> C<RevertToNone> C<RevertToParent>
+C<RevertToPointerRoot> C<ShiftMask> C<SyncBoth> C<SyncKeyboard> C<SyncPointer>
+C<XK_VoidSymbol>
+
+=for Pod::Coverage AnyKey AnyModifier AsyncBoth AsyncKeyboard AsyncPointer Button1Mask Button2Mask Button3Mask Button4Mask Button5Mask
+
+=for Pod::Coverage ControlMask GrabModeAsync GrabModeSync LockMask Mod1Mask Mod2Mask Mod3Mask Mod4Mask Mod5Mask NoSymbol PointerRoot
+
+=for Pod::Coverage ReplayKeyboard ReplayPointer RevertToNone RevertToParent RevertToPointerRoot ShiftMask SyncBoth SyncKeyboard
+
+=for Pod::Coverage SyncPointer XK_VoidSymbol
+
+=item C<:const_sizehint>
+
+C<PAspect> C<PBaseSize> C<PMaxSize> C<PMinSize> C<PPosition> C<PResizeInc>
+C<PSize> C<PWinGravity> C<USPosition> C<USSize>
+
+=for Pod::Coverage PAspect PBaseSize PMaxSize PMinSize PPosition PResizeInc PSize PWinGravity USPosition USSize
+
+=item C<:const_visual>
+
+C<VisualAllMask> C<VisualBitsPerRGBMask> C<VisualBlueMaskMask>
+C<VisualClassMask> C<VisualColormapSizeMask> C<VisualDepthMask>
+C<VisualGreenMaskMask> C<VisualIDMask> C<VisualRedMaskMask>
+C<VisualScreenMask>
+
+=for Pod::Coverage VisualAllMask VisualBitsPerRGBMask VisualBlueMaskMask VisualClassMask VisualColormapSizeMask VisualDepthMask
+
+=for Pod::Coverage VisualGreenMaskMask VisualIDMask VisualRedMaskMask VisualScreenMask
+
+=item C<:const_win>
+
+C<Above> C<AnyPropertyType> C<Below> C<BottomIf> C<CenterGravity>
+C<CopyFromParent> C<EastGravity> C<ForgetGravity> C<InputOnly> C<InputOutput>
+C<LowerHighest> C<NorthEastGravity> C<NorthGravity> C<NorthWestGravity>
+C<Opposite> C<PropModeAppend> C<PropModePrepend> C<PropModeReplace>
+C<RaiseLowest> C<SouthEastGravity> C<SouthGravity> C<SouthWestGravity>
+C<StaticGravity> C<TopIf> C<UnmapGravity> C<WestGravity>
+
+=for Pod::Coverage Above AnyPropertyType Below BottomIf CenterGravity CopyFromParent EastGravity ForgetGravity InputOnly InputOutput
+
+=for Pod::Coverage LowerHighest NorthEastGravity NorthGravity NorthWestGravity Opposite PropModeAppend PropModePrepend PropModeReplace
+
+=for Pod::Coverage RaiseLowest SouthEastGravity SouthGravity SouthWestGravity StaticGravity TopIf UnmapGravity WestGravity
+
+=item C<:const_winattr>
+
+C<CWBackPixel> C<CWBackPixmap> C<CWBackingPixel> C<CWBackingPlanes>
+C<CWBackingStore> C<CWBitGravity> C<CWBorderPixel> C<CWBorderPixmap>
+C<CWBorderWidth> C<CWColormap> C<CWCursor> C<CWDontPropagate> C<CWEventMask>
+C<CWHeight> C<CWOverrideRedirect> C<CWSaveUnder> C<CWSibling> C<CWStackMode>
+C<CWWidth> C<CWWinGravity> C<CWX> C<CWY>
+
+=for Pod::Coverage CWBackPixel CWBackPixmap CWBackingPixel CWBackingPlanes CWBackingStore CWBitGravity CWBorderPixel CWBorderPixmap
+
+=for Pod::Coverage CWBorderWidth CWColormap CWCursor CWDontPropagate CWEventMask CWHeight CWOverrideRedirect CWSaveUnder CWSibling
+
+=for Pod::Coverage CWStackMode CWWidth CWWinGravity CWX CWY
+
+=item C<:const_x>
+
+C<None>
+
+=for Pod::Coverage None
+
+=back
+
+=cut
+
+# END GENERATED XS CONSTANT POD
 
 =head1 STRUCTURES
 
@@ -1636,6 +1926,10 @@ Ethan Straffin <ethanstraffin@gmail.com>
 =item *
 
 Sergei Zhmylev <zhmylove@cpan.org>
+
+=item *
+
+H.Merijn Brand <hmbrand@cpan.org>
 
 =back
 

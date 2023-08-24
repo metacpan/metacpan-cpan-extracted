@@ -4,7 +4,7 @@ use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, etc.
 use t_TestCommon ':silent', qw/bug $debug t_ok t_is t_like/; # Test2::V0 etc.
 
-use Data::Dumper::Interp;
+use Data::Dumper::Interp qw/:DEFAULT/;
 $Data::Dumper::Interp::Debug = $debug if $debug;
 
 # Convert a literal "expected" string which contains qr/.../ismx sequences
@@ -24,6 +24,19 @@ sub expstr2re($) {
   $@ = $saved_dollarat;
   $re
 }
+
+# Check that AUTOLOAD does not change punctuation variables
+{ my @varnames = split / /, '@ ! ^E , / \\ ? ^W';
+  local ($@, $/, $\, $,, $!, $^E, $^W)
+    = ("fakeAt","fakeInRecSep","fakeOutRecSep","fakeCom",13,13,1); # $^W can only be 0 or 1
+  my %before = map{ do{no strict 'refs'; $_ => ${$_} } } @varnames;
+  () = (vis($@), dvis '$@', visnew->rivisq42('$@'));
+  my %after  = map{ do{no strict 'refs'; $_ => ${$_} } } @varnames;
+  foreach my $vn (@varnames) {
+    fail("\$$vn was corrupted") unless u($before{$vn}) eq u($after{$vn});
+  }
+}
+pass("AUTOLOAD preserves punctuation variables");
 
 $Data::Dumper::Interp::Foldwidth = 12;
 

@@ -1,0 +1,31 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-latest.yml
+.gitignore
+Changes
+HTTP_Tiny_Original.pm.txt
+lib/SPVM/HTTP/Minimal.pm
+lib/SPVM/HTTP/Minimal.spvm
+lib/SPVM/HTTP/Minimal/Headers.pm
+lib/SPVM/HTTP/Minimal/Headers.spvm
+lib/SPVM/HTTP/Minimal/Message.pm
+lib/SPVM/HTTP/Minimal/Message.spvm
+lib/SPVM/HTTP/Minimal/Message/Request.pm
+lib/SPVM/HTTP/Minimal/Message/Request.spvm
+lib/SPVM/HTTP/Minimal/Message/Response.pm
+lib/SPVM/HTTP/Minimal/Message/Response.spvm
+lib/SPVM/HTTP/Minimal/Socket.pm
+lib/SPVM/HTTP/Minimal/Socket.spvm
+lib/SPVM/HTTP/Minimal/URL.pm
+lib/SPVM/HTTP/Minimal/URL.spvm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/HTTP/Minimal.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

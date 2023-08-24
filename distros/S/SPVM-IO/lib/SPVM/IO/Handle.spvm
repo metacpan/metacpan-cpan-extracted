@@ -5,7 +5,6 @@ class IO::Handle {
   use Sys;
   use Sys::IO;
   use Sys::IO::Constant as IO;
-  use Sys::Ioctl;
   use Sys::Ioctl::Constant as IOCTL;
   use Sys::IO::Stat;
   use Fn;
@@ -95,10 +94,10 @@ class IO::Handle {
     return Sys::IO->ftruncate($fileno, $legnth);
   }
   
-  method ioctl : int ($request : int, $request_arg : object of Byte|Short|Int|Long|Float|Double|object = undef) {
+  method ioctl : int ($request : int, $request_arg : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef) {
     my $fileno = $self->fileno;
     
-    return Sys::Ioctl->ioctl($fileno, $request, $request_arg);
+    return Sys->ioctl($fileno, $request, $request_arg);
   }
 
   method sync : int () {
@@ -131,7 +130,7 @@ class IO::Handle {
     my $fileno = $self->fileno;
     
     if (Sys::OS->is_windows) {
-      my $flags = Int->new(!$blocking);
+      my $flags = [(int)!$blocking];
       $self->ioctl(IOCTL->FIONBIO, $flags);
     }
     else {
@@ -147,16 +146,8 @@ class IO::Handle {
       $self->fcntl(IO->F_SETFL, $newmode);
     }
   }
-
-  method write : int ($buffer : string, $length : int, $offset : int = 0) {
-    return $self->syswrite($buffer, $length, $offset);
-  }
   
-  method read : int ($buffer : mutable string, $length : int, $offset : int = 0) {
-    return $self->sysread($buffer, $length, $offset);
-  }
+  method write : int ($string : string, $length : int = -1, $offset : int = 0) { die "Not implemented"; }
   
-  method syswrite : int ($buffer : string, $length : int, $offset : int = 0) { die "Not implemented"; }
-  
-  method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0) { die "Not implemented"; }
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) { die "Not implemented"; }
 }

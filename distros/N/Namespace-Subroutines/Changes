@@ -1,0 +1,10 @@
+Revision history for Perl extension Namespace::Subroutines
+
+0.02 2023-08-19T14:15:01Z
+
+    - set perl min version to v5.18
+
+0.01 2023-08-19T13:47:30Z
+
+    - original version
+

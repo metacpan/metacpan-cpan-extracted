@@ -92,3 +92,5 @@
 
 # Avoid git flow
 /.github/workflows/
+
+\bMy.pm$

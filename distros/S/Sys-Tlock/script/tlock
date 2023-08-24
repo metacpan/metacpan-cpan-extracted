@@ -21,15 +21,17 @@ Locking with timeouts.
 
 Options:
 
--d <d>  Set the lock directory to <d>.
+-c <c>  Use configuration file <c>. The other command line options overrule the
+        settings in the configuration file.
+-d <d>  Set lock directory to <d>.
 -h      Show help text.
--m <m>  Set marker to <m>. Marker is the prefix tlock names will have in the
-        file system.
+-m <m>  Set marker to <m>. Marker is the prefix that tlock names will have in
+        the file system.
 -o <o>  Set owner of the tlocks. Is silently ignored if the script user does
         not have the necessary permissions.
 -p <p>  Set patience to <p>. Patience is the time that tlock will try to get a
         lock that is already taken.
--V      Show the version.
+-V      Show version.
 
 Commands:
 
@@ -37,7 +39,8 @@ tlock take <label> <timeout>
     Takes the specified tlock if possible. Prints the token value.
 
 tlock renew <label> <token> <timeout>
-    Renews the tlock.
+    Renews the tlock, so that it times out <timeout> seconds from the call of
+    this command.
 
 tlock release <label> <token>
     Releases the tlock.
@@ -58,7 +61,7 @@ tlock zing
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 my $opt = {};
-getopts('hVd:m:o:p:',$opt) or usage(1);
+getopts('hVc:d:m:o:p:',$opt) or usage(1);
 
 if ($opt->{h}) {
     usage(0);
@@ -72,6 +75,7 @@ usage(1) if scalar @ARGV == 0;
 my $cmd = shift @ARGV;
 
 my %tropt = ();
+$tropt{conf}     = $opt->{c} if exists $opt->{c};
 $tropt{dir}      = $opt->{d} if exists $opt->{d};
 $tropt{marker}   = $opt->{m} if exists $opt->{m};
 $tropt{owner}    = $opt->{o} if exists $opt->{o};

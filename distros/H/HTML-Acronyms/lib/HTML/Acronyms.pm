@@ -1,5 +1,5 @@
 package HTML::Acronyms;
-$HTML::Acronyms::VERSION = '0.0.3';
+$HTML::Acronyms::VERSION = '0.0.4';
 use strict;
 use warnings;
 use 5.014;
@@ -19,6 +19,10 @@ sub abbr
 
     my $key     = $args->{key};
     my $no_link = $args->{no_link};
+    if ( exists $args->{link} )
+    {
+        $no_link = ( !$args->{link} );
+    }
 
     my $rec = $self->dict->{$key};
 
@@ -47,7 +51,7 @@ HTML::Acronyms - Generate HTML5/etc. markup for acronyms
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 
@@ -82,8 +86,9 @@ version 0.0.3
 
 =head1 DESCRIPTION
 
-Acronyms and other abbreviations can be quite cryptic ("What do you mean by 'WDYM')
-and this module aims to help expanding them in HTML5/XHTML5 documents.
+Acronyms and other abbreviations can be quite cryptic ("What do you mean by
+'WDYM'?") and this module aims to help expanding them in HTML5/XHTML5
+documents.
 
 =head1 METHODS
 
@@ -91,7 +96,7 @@ and this module aims to help expanding them in HTML5/XHTML5 documents.
 
 Returns the hash ref that serves as the dictionary for the acronyms.
 
-=head2 $acro->abbr({ key => "SQL", no_link => 0,})
+=head2 $acro->abbr({ key => "SQL", link => 1, no_link => 0,})
 
 Returns a hash ref with an C<'html'> key.
 
@@ -116,27 +121,11 @@ L<https://metacpan.org/release/HTML-Acronyms>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Acronyms>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Acronyms>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Acronyms>
 
 =item *
 

@@ -1,0 +1,50 @@
+<%doc>
+Add the "Split Off" action to the actions list, if it is appropriate for
+this transaction.
+</%doc>
+\
+<%ARGS>
+$Transaction => undef
+$Actions => undef
+$Object => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $Transaction );
+return if ( not defined $Actions );
+return if ( not defined $Object );
+
+# Tickets only.
+return if ( not $Object->isa('RT::Ticket') );
+
+# Privileged users only.
+return if ( not $Object->CurrentUser->Privileged );
+
+# Inbound correspondence only.
+return if ( not $Transaction->IsInbound() );
+
+# Creation or correspondence transactions only.
+return if ( $Transaction->Type() !~ /^(Create|Correspond)$/ );
+
+# The current user must be allowed to modify this ticket.
+return if ( not $Object->CurrentUserHasRight('ModifyTicket') );
+
+# The ticket must be in a queue this user can create tickets in.
+return if ( not $Object->QueueObj );
+return if ( not $Object->QueueObj->CurrentUserHasRight('CreateTicket') );
+
+# Now add the action to the list.
+
+my $CreatePath = '/Ticket/Create.html';
+$CreatePath
+    .= '?Queue='
+    . $m->interp->apply_escapes( $Object->Queue, 'u' )
+    . '&NewTicketFromCorrespondenceTransaction='
+    . $m->interp->apply_escapes( $Transaction->id, 'u' )
+    . '&NewTicketFromCorrespondenceTicket='
+    . $m->interp->apply_escapes( $Object->id, 'u' )
+    . '&NewTicketFromCorrespondenceLoad=1';
+push @$Actions, { path => $CreatePath, title => loc('Split Off') };
+
+return;
+</%INIT>

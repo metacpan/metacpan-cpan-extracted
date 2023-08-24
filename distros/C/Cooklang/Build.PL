@@ -19,7 +19,7 @@ my %module_build_args = (
     "Kaare Rasmussen <kaare at cpan dot org>"
   ],
   "dist_name" => "Cooklang",
-  "dist_version" => "0.11",
+  "dist_version" => "0.12",
   "license" => "perl",
   "module_name" => "Cooklang",
   "recursive_test_files" => 1,
@@ -32,7 +32,6 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
-    "Data::Dumper" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Path::Tiny" => 0,
@@ -46,7 +45,6 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Module::Build" => "0.28",

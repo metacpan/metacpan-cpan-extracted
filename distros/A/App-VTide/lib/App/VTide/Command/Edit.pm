@@ -17,7 +17,7 @@ use App::VTide::Sessions;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('1.0.4');
+our $VERSION = version->new('1.0.5');
 our $NAME    = 'edit';
 our $OPTIONS =
   [ 'add|add-to-session|a', 'recurse|r!', 'test|T!', 'save|s=s', 'verbose|v+',
@@ -80,7 +80,7 @@ sub run {
 sub auto_complete {
     my ( $self, $auto ) = @_;
 
-    my $env   = $self->options->files->[-1];
+    my $env   = $self->options->files->[-1] // '';
     my @files = sort keys %{ $self->config->get->{editor}{files} };
 
     eval {
@@ -116,7 +116,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 1.0.4
+This documentation refers to App::VTide::Command::Edit version 1.0.5
 
 =head1 SYNOPSIS
 

@@ -10,10 +10,10 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A pure perl BibTeX parser",
-  "AUTHOR" => "Gerhard Gossen <gerhard.gossen\@googlemail.com> and Boris Veytsman <boris\@varphi.com>",
+  "AUTHOR" => 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com> and Karl Berry <karl@freefriends.org',
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.30"
+    "ExtUtils::MakeMaker" => "6.31"
   },
   "DISTNAME" => "BibTeX-Parser",
   "EXE_FILES" => [],
@@ -23,13 +23,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::File" => 0,
     "IO::String" => 0,
-    "LaTeX::ToUnicode" => "0.11",
-    "Test::More" => 0
+    "LaTeX::ToUnicode" => "0.52",
+    "Test::More" => "0.88"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.03",
+  'VERSION_FROM' => 'lib/BibTeX/Parser.pm',
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -4,10 +4,11 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 
-use Object::Pad 0.73 ':experimental(init_expr)';
+use Object::Pad 0.800;
 
-package App::sdview::Output::Man 0.09;
+package App::sdview::Output::Man 0.10;
 class App::sdview::Output::Man
    :does(App::sdview::Output)
    :strict(params);

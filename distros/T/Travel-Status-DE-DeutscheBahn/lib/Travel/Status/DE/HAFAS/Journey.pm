@@ -9,10 +9,11 @@ use 5.014;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
+use DateTime::Format::Strptime;
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.12';
+our $VERSION = '4.15';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -88,6 +89,12 @@ sub new {
 		}
 	}
 
+	my $date_ref     = ( split( qr{[|]}, $jid ) )[4];
+	my $datetime_ref = DateTime::Format::Strptime->new(
+		pattern   => '%d%m%Y',
+		time_zone => 'Europe/Berlin'
+	)->parse_datetime($date_ref);
+
 	my $class = $product->{cls};
 
 	my @stops;
@@ -114,7 +121,7 @@ sub new {
 				input    => $timestr,
 				date     => $date,
 				strp_obj => $hafas->{strptime_obj},
-				now      => $hafas->{now}
+				ref      => $datetime_ref
 			);
 
 		}
@@ -177,7 +184,6 @@ sub new {
 	}
 
 	my $ref = {
-		datetime_now           => $hafas->{now},
 		id                     => $jid,
 		name                   => $name,
 		number                 => $train_no,
@@ -232,7 +238,7 @@ sub new {
 				input    => $timestr,
 				date     => $date,
 				strp_obj => $hafas->{strptime_obj},
-				now      => $hafas->{now}
+				ref      => $datetime_ref,
 			);
 
 		}
@@ -282,7 +288,7 @@ sub handle_day_change {
 	if ( length($timestr) == 8 ) {
 
 		# arrival time includes a day offset
-		my $offset_date = $opt{now}->clone;
+		my $offset_date = $opt{ref}->clone;
 		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
 		$offset_date = $offset_date->strftime('%Y%m%d');
 		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
@@ -461,7 +467,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.12
+version 4.15
 
 =head1 DESCRIPTION
 
@@ -674,7 +680,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

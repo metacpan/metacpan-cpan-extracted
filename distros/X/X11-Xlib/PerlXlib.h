@@ -16,7 +16,7 @@ typedef int ScreenNumber; /* used by typemap to coerce X11::Xlib::Screen */
 
 /* lookup or create a wrapper around a pointer */
 extern SV * PerlXlib_get_objref(void *thing, int create_flag,
-    const char *thing_type, int svtype, const char *thing_class, void *parent);
+    const char *thing_type, int obj_svtype, const char *thing_class, void *parent);
 /* get the pointer wrapped by an object */
 extern void * PerlXlib_objref_get_pointer(SV *objref, const char *ptr_type, int fail_flag);
 /* set the pointer wrapped by an object */
@@ -26,7 +26,7 @@ extern void PerlXlib_objref_set_pointer(SV *objref, void *pointer, const char *p
 extern SV * PerlXlib_get_display_objref(Display *dpy, int create_flag);
 extern Display * PerlXlib_display_objref_get_pointer(SV *displayref, int fail_flag);
 
-/* un-pack an XID from a wrapped X11::Xlib::XID or subclass */
+/* unpack an XID from a wrapped X11::Xlib::XID or subclass */
 extern XID PerlXlib_sv_to_xid(SV *sv);
 
 /*---------------------------------------------------------
@@ -77,6 +77,9 @@ extern void PerlXlib_XWindowChanges_unpack_obj(XWindowChanges *s, HV *fields, SV
 extern void PerlXlib_XSizeHints_pack(XSizeHints *s, HV *fields, Bool consume);
 extern void PerlXlib_XSizeHints_unpack(XSizeHints *s, HV *fields);
 extern void PerlXlib_XSizeHints_unpack_obj(XSizeHints *s, HV *fields, SV *obj_ref);
+extern void PerlXlib_XKeyboardState_pack(XKeyboardState *s, HV *fields, Bool consume);
+extern void PerlXlib_XKeyboardState_unpack(XKeyboardState *s, HV *fields);
+extern void PerlXlib_XKeyboardState_unpack_obj(XKeyboardState *s, HV *fields, SV *obj_ref);
 extern void PerlXlib_XRectangle_pack(XRectangle *s, HV *fields, Bool consume);
 extern void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields);
 extern void PerlXlib_XRectangle_unpack_obj(XRectangle *s, HV *fields, SV *obj_ref);
@@ -109,7 +112,7 @@ extern void PerlXlib_XRenderPictFormat_pack(XRenderPictFormat *s, HV *fields, Bo
 extern void PerlXlib_XRenderPictFormat_unpack(XRenderPictFormat *s, HV *fields);
 extern void PerlXlib_XRenderPictFormat_unpack_obj(XRenderPictFormat *s, HV *fields, SV *obj_ref);
 
-/* Keysym/unicode utility functions */
+/* Keysym/Unicode utility functions */
 extern int PerlXlib_keysym_to_codepoint(KeySym keysym);
 extern KeySym PerlXlib_codepoint_to_keysym(int codepoint);
 extern SV * PerlXlib_keysym_to_sv(KeySym keysym, int symbolic);
@@ -122,7 +125,7 @@ extern Display * PerlXlib_get_magic_dpy(SV *sv, Bool not_null);
 extern SV * PerlXlib_set_magic_dpy(SV *sv, Display *dpy);
 extern SV * PerlXlib_obj_for_display(Display *dpy, int create);
 extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null);
-extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int svtype, bool create);
+extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int obj_svtype, bool create);
 extern void * PerlXlib_get_magic_dpy_innerptr(SV *sv, Bool not_null);
 extern SV * PerlXlib_set_magic_dpy_innerptr(SV *sv, void *innerptr);
 extern SV * PerlXlib_get_displayobj_of_opaque(void *thing);

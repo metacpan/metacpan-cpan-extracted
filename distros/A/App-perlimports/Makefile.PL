@@ -44,6 +44,7 @@ my %WriteMakefileArgs = (
     "Perl::Tidy" => 20220613,
     "Pod::Usage" => 0,
     "Ref::Util" => 0,
+    "Scalar::Util" => 0,
     "Sereal::Decoder" => 0,
     "Sereal::Encoder" => 0,
     "Sub::HandlesVia" => 0,
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.000051",
+  "VERSION" => "0.000052",
   "test" => {
     "TESTS" => "t/*.t t/ExportInspector/*.t t/cpan-modules/*.t"
   }
@@ -110,6 +111,7 @@ my %FallbackPrereqs = (
   "Perl::Tidy" => 20220613,
   "Pod::Usage" => 0,
   "Ref::Util" => 0,
+  "Scalar::Util" => 0,
   "Sereal::Decoder" => 0,
   "Sereal::Encoder" => 0,
   "Sub::Exporter" => 0,

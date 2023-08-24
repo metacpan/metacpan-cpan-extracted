@@ -14,14 +14,13 @@
 #     ABSTRACT_FROM => q[lib/Process/SubProcess.pm]
 #     AUTHOR => [q[Bodo (Hugo) Barwich <b.barwich@hotmail.com>]]
 #     BUILD_REQUIRES => {  }
-#     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker::CPANfile=>q[0.09] }
+#     CONFIGURE_REQUIRES => {  }
 #     LICENSE => q[perl]
-#     META_ADD => {  }
-#     META_MERGE => { dynamic_config=>q[0], meta-spec=>{ version=>q[2] }, prereqs=>{  }, resources=>{ bugtracker=>{ web=>q[https://github.com/bodo-hugo-barwich/Process/issues] }, repository=>{ type=>q[git], url=>q[https://github.com/bodo-hugo-barwich/Process.git], web=>q[https://github.com/bodo-hugo-barwich/Process] } } }
+#     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ bugtracker=>{ web=>q[https://github.com/bodo-hugo-barwich/Process/issues] }, repository=>{ type=>q[git], url=>q[https://github.com/bodo-hugo-barwich/Process.git], web=>q[https://github.com/bodo-hugo-barwich/Process] } } }
 #     MIN_PERL_VERSION => q[5.010]
 #     NAME => q[Process::SubProcess]
-#     PREREQ_PM => { Capture::Tiny=>q[0], Data::Dump=>q[0], ExtUtils::MakeMaker=>q[0], Getopt::Long::Descriptive=>q[0], JSON=>q[0], Path::Tiny=>q[0], Test::More=>q[0], YAML=>q[0] }
-#     TEST_REQUIRES => { Capture::Tiny=>q[0], Test::More=>q[0] }
+#     PREREQ_PM => { Data::Dump=>q[0], Getopt::Long::Descriptive=>q[0], JSON=>q[0], Path::Tiny=>q[0], YAML=>q[0] }
+#     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Process/SubProcess.pm]
 #     test => { TESTS=>q[t/*.t] }
 
@@ -62,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Process::SubProcess
 NAME_SYM = Process_SubProcess
-VERSION = 2.1.3
+VERSION = 2.1.4
 VERSION_MACRO = VERSION
-VERSION_SYM = 2_1_3
+VERSION_SYM = 2_1_4
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 2.1.3
+XS_VERSION = 2.1.4
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -265,7 +264,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Process-SubProcess
-DISTVNAME = Process-SubProcess-2.1.3
+DISTVNAME = Process-SubProcess-2.1.4
 
 
 # --- MakeMaker macro section:
@@ -496,12 +495,10 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  - '\''Bodo (Hugo) Barwich <b.barwich@hotmail.com>'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'build_requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Capture::Tiny: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker::CPANfile: '\''0.09'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'dynamic_config: 0' >> META_new.yml
+	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
 	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: perl' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
@@ -514,7 +511,6 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Data::Dump: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Getopt::Long::Descriptive: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  JSON: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Path::Tiny: '\''0'\''' >> META_new.yml
@@ -523,7 +519,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/bodo-hugo-barwich/Process/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/bodo-hugo-barwich/Process.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v2.1.3' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v2.1.4' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -532,7 +528,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   "author" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "Bodo (Hugo) Barwich <b.barwich@hotmail.com>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
-	$(NOECHO) $(ECHO) '   "dynamic_config" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
 	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "perl_5"' >> META_new.json
@@ -556,24 +552,17 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "configure" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker::CPANfile" : "0.09"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Data::Dump" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Getopt::Long::Descriptive" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "JSON" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Path::Tiny" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "YAML" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.010"' >> META_new.json
-	$(NOECHO) $(ECHO) '         }' >> META_new.json
-	$(NOECHO) $(ECHO) '      },' >> META_new.json
-	$(NOECHO) $(ECHO) '      "test" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Capture::Tiny" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Test::More" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
@@ -588,7 +577,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/bodo-hugo-barwich/Process"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v2.1.3",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v2.1.4",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.02"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -874,13 +863,12 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.3">' > Process-SubProcess.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.4">' > Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Library to manage Sub Processes as Objects</ABSTRACT>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Bodo (Hugo) Barwich &lt;b.barwich@hotmail.com&gt;</AUTHOR>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,010,0,0" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Data::Dump" />' >> Process-SubProcess.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="ExtUtils::MakeMaker" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Getopt::Long::Descriptive" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Path::Tiny" />' >> Process-SubProcess.ppd

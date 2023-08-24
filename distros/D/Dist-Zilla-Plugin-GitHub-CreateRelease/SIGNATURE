@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1b96fdaa8463128fc6a0c559e8358ccab545828ea6b7178fff054ec9d0e816df Changes
+SHA256 b6fcba17b176631d33113b4bcace9872c354c6267135c809964ed66b7dfa1b63 LICENSE
+SHA256 4ff12aa4b07cd8d2101519c941eaaf6bb0a4b27229a0ae76331a1bb70138c8b1 MANIFEST
+SHA256 f4cf8d8d98638aae9f75035f2f09664526fcbd91e15d4b0f48c595e3e7e7dc0f META.json
+SHA256 301bea33b9400f88616ea01866ade48cdeed5ac087a73d94eb300f05a74d201c META.yml
+SHA256 f9ad87d214e3562e3644270a06124dd125c818ffd3906f2589100b246a03083c Makefile.PL
+SHA256 52cecb2d26a03086e5a438e376ed26941adc6776fab70a1d453c4a64d4093cf5 README
+SHA256 89f6312fa141173dbc481fc88fee4736510f4aac818ca7d8dbf1879a7c34738f cpanfile
+SHA256 2646d4dde9e5e475c232e621a92381b1a45aca011db045b093c0c96835692f99 dist.ini
+SHA256 dd896783bb52fc2dd6b2ff39e11a9f0e6c8663662b3f8a5ec2e87d4df5e0c3e6 lib/Dist/Zilla/Plugin/GitHub/CreateRelease.pm
+SHA256 7b0063cac6b70d18840ed9b1374ae43cf0e26399e450d7327879794e6e514657 t/00-load.t
+SHA256 d58e5c4f2e2d61f37b23600a075825ae1c125754dd16408f827f415d4b35912a t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 3e02c06d278b0965fc9618d8e45a273eb2205b5cb73e3a2d3dfe1b5c733d89dd t/author-eol.t
+SHA256 375b0c5e2eccb79436c44653b3b3f77516bd547973cf1c8e047657732f5c435d t/author-no-tabs.t
+SHA256 b6b98c35caa1713f7b7d10283e033065eb578adc8ac59c71ee2ed97671cfecb1 t/author-pod-coverage.t
+SHA256 2a3e58946ef1c99c3891ed9b8145d1d85f10c3edd0100586b50d1d942f9791c7 t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 e9c0590dd612df3c272d9267485013c2efeb641e4c44c00eaecf41fc442bd8d2 t/release-trailing-space.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmTlXF0ACgkQ1fh7LgYG
+pfnyaA//QxfccPhvgZfW5w9n/8rUatDTLizngHFwC4FTMfcj9rFQgeW12lt9j31V
+AIjyJRGKp0bR2FWkQwjfFFaW+CltozUkUXPLATXo8FyQbTW4wBS0yfQgzTf8gm5M
+HMzlL/K+keAjr5FT/y5F91vUt12MCv8DVh6a+yZoUd2gwieKzv6E85ShIVortzD4
+YWutAYlJAqICL8gTIrq/GKOlOtOrKEDe2tPxdp08rNul9AJv7d4zXQCws0FMXcIJ
+auu5C5TqHHfnFQIiyUg/N47z3t7bOGkEb0LOLbOXaHD6ksAvRgOdquDouR7K7r7r
+k1RpisY+uDsH73LeMQcl9IBd5fUiVXv3r1536O9P7qqt61i/YNwP3fiFPMpumOwm
+s3HdYhd0UPFWaHB5RXYDW2jrkVpGhlVV7Ig4yA9GYIqo2IEAfdhhD3l2sZYNdWQ9
+BaPE0WqJ87XQNhT0DKgHpa8xCWZqd5kDk3bTcOZloGtAi387CSXD+ZpzIeMwf2Vv
+a7SFXCpEGTv7jexW14X3fUiWGrlyNrG+SilX1DILx+pQmLCWfxGFIubH665Hubdx
+V+QwSPS/lqpN4h0bm+MwMzQpIF+6KJhBlBy0eh60J9SLjFx3TgHJsP4vnOMmA66i
+mUe+lOqfX+YAx06SAHa8mZXM3dWI0XLfopHfz66MxW6YJlQAjOA=
+=rHuq
+-----END PGP SIGNATURE-----

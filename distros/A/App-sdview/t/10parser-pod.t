@@ -3,12 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use App::sdview::Parser::Pod;
 
 my $parser = App::sdview::Parser::Pod->new;
-isa_ok( $parser, "App::sdview::Parser::Pod", '$parser' );
+isa_ok( $parser, [ "App::sdview::Parser::Pod" ], '$parser' );
 
 ok( App::sdview::Parser::Pod->can_parse_file( "Example.pm" ),  'Parser can handle .pm file' );
 ok( App::sdview::Parser::Pod->can_parse_file( "Example.pod" ), 'Parser can handle .pod file' );
@@ -38,7 +38,7 @@ EOPOD
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is_deeply( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
 };
 
 subtest "Formatting" => sub {
@@ -66,9 +66,9 @@ EOPOD
    ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
 
    is( $p[3]->text, "link Module::Here", 'link text' );
-   is_deeply( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" },
+   is( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" },
       'link tag' );
-   is_deeply( $p[3]->text->get_tag_at( 5, "L" ), { target => "https://metacpan.org/pod/Module::Here" },
+   is( $p[3]->text->get_tag_at( 5, "L" ), { target => "https://metacpan.org/pod/Module::Here" },
       'link to metacpan' );
 };
 

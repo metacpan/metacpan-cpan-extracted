@@ -75,7 +75,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.15";
+our $VERSION = "0.19";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Texts;
@@ -581,7 +581,7 @@ sub _write_init_sh($)
     }
 
     # next to last build command:
-    push @todo, '', '# run command:', 'cd ' . $self->{dir};
+    push @todo, '', '# run command:', 'cd "' . $self->{dir} . '"';
     my @command = @{$self->{command}};
     @command > 0  or  @command = (SHELL);
     my $cmd = shift @command;

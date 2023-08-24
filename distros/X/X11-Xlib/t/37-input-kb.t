@@ -10,10 +10,10 @@ plan skip_all => "No X11 Server available"
     unless $ENV{DISPLAY};
 plan tests => 8;
 
-my $TEST_DESTRUTIVE= !!$ENV{TEST_DESTRUTIVE};
+my $TEST_DESTRUCTIVE= !!$ENV{TEST_DESTRUCTIVE};
 sub skip_destructive($) {
-    skip "TEST_DESTRUTIVE is false; skipping destrutive tests", shift
-        unless $TEST_DESTRUTIVE;
+    skip "TEST_DESTRUCTIVE is false; skipping destrutive tests", shift
+        unless $TEST_DESTRUCTIVE;
 }
 
 my $dpy= new_ok( 'X11::Xlib', [], 'connect to X11' );
@@ -34,9 +34,9 @@ sub save_temp {
 
 subtest keysym_mapping => sub {
     # These values should never change.  Just make sure character
-    # and non-character values work.  On my Xlib, unicode values often
+    # and non-character values work.  On my Xlib, Unicode values often
     # become the text "Uxxxx" but sometimes have a symbolic name, so
-    # probably bad to depend on the list of unicode symbolic names.
+    # probably bad to depend on the list of Unicode symbolic names.
     is( XKeysymToString(0xFF09), "Tab", 'XKeysymToString Tab' );
     is( XKeysymToString(0xFFBE), "F1",  'XKeysymToString F1' );
     is( XStringToKeysym("Tab"), 0xFF09, 'XStringToKeysym Tab' );
@@ -66,7 +66,7 @@ subtest keysym_mapping => sub {
             is( char_to_keysym(chr($codepoint)), $sym, "char_to_keysym: $desc" );
         }
     }
-    is( codepoint_to_keysym(-1), undef, 'Invalid unicode codepoint' );
+    is( codepoint_to_keysym(-1), undef, 'Invalid Unicode codepoint' );
     is( char_to_keysym(''),      undef, 'Char of empty string' );
     done_testing;
 };

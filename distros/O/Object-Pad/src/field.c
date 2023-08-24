@@ -515,9 +515,7 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
 
   extend_pad_vars(classmeta);
 
-  struct AccessorGenerationCtx ctx = { 0 };
-
-  ctx.padix = pad_add_name_sv(fieldmeta->name, 0, NULL, NULL);
+  PADOFFSET padix = pad_add_name_sv(fieldmeta->name, 0, NULL, NULL);
   intro_my();
 
   OP *ops = op_append_list(OP_LINESEQ, NULL,
@@ -555,7 +553,95 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   }
 
   ops = op_append_list(OP_LINESEQ, ops,
-    newFIELDPADOP(flags, ctx.padix, fieldmeta->fieldix));
+    newFIELDPADOP(flags, padix, fieldmeta->fieldix));
+
+  /* Generate the basic ops here so the ordering doesn't matter if other
+   * attributes want to modify these */
+
+  struct AccessorGenerationCtx ctx = {
+    .padix = padix,
+  };
+
+  switch(type) {
+    case ACCESSOR_READER:
+    {
+      OPCODE optype = 0;
+
+      switch(sigil) {
+        case '$': optype = OP_PADSV; break;
+        case '@': optype = OP_PADAV; break;
+        case '%': optype = OP_PADHV; break;
+      }
+
+      ctx.retop = newLISTOP(OP_RETURN, 0,
+        newOP(OP_PUSHMARK, 0),
+        newPADxVOP(optype, 0, padix));
+
+      break;
+    }
+
+    case ACCESSOR_WRITER:
+    {
+      switch(sigil) {
+        case '$':
+          ctx.bodyop = newBINOP(OP_SASSIGN, 0,
+            newOP(OP_SHIFT, 0),
+            newPADxVOP(OP_PADSV, 0, padix));
+          break;
+
+        case '@':
+          ctx.bodyop = newBINOP(OP_AASSIGN, 0,
+            force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
+            force_list_keeping_pushmark(newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, padix)));
+          break;
+
+        case '%':
+          ctx.bodyop = newBINOP(OP_AASSIGN, 0,
+            force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
+            force_list_keeping_pushmark(newPADxVOP(OP_PADHV, OPf_MOD|OPf_REF, padix)));
+          break;
+      }
+
+      ctx.retop = newLISTOP(OP_RETURN, 0,
+        newOP(OP_PUSHMARK, 0),
+        newPADxVOP(OP_PADSV, 0, PADIX_SELF));
+
+      break;
+    }
+
+    case ACCESSOR_LVALUE_MUTATOR:
+    {
+      assert(sigil == '$');
+
+      CvLVALUE_on(PL_compcv);
+
+      ctx.retop = newLISTOP(OP_RETURN, 0,
+        newOP(OP_PUSHMARK, 0),
+        newPADxVOP(OP_PADSV, 0, padix));
+
+      break;
+    }
+
+    case ACCESSOR_COMBINED:
+    {
+      assert(sigil == '$');
+
+      /* $field = shift if @_ */
+      ctx.bodyop = newLOGOP(OP_AND, 0,
+        /* scalar @_ */
+        op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
+        /* $field = shift */
+        newBINOP(OP_SASSIGN, 0,
+          newOP(OP_SHIFT, 0),
+          newPADxVOP(OP_PADSV, 0, padix)));
+
+      ctx.retop = newLISTOP(OP_RETURN, 0,
+        newOP(OP_PUSHMARK, 0),
+        newPADxVOP(OP_PADSV, 0, padix));
+
+      break;
+    }
+  }
 
   MOP_FIELD_RUN_HOOKS(fieldmeta, gen_accessor_ops, type, &ctx);
 
@@ -565,8 +651,6 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   if(ctx.post_bodyops)
     ops = op_append_list(OP_LINESEQ, ops, ctx.post_bodyops);
 
-  if(!ctx.retop)
-    croak("Require ctx.retop");
   ops = op_append_list(OP_LINESEQ, ops, ctx.retop);
 
   SvREFCNT_inc(PL_compcv);
@@ -591,29 +675,10 @@ static void fieldhook_reader_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void
   S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_READER);
 }
 
-static void fieldhook_gen_reader_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
-{
-  if(type != ACCESSOR_READER)
-    return;
-
-  OPCODE optype = 0;
-
-  switch(SvPVX(fieldmeta->name)[0]) {
-    case '$': optype = OP_PADSV; break;
-    case '@': optype = OP_PADAV; break;
-    case '%': optype = OP_PADHV; break;
-  }
-
-  ctx->retop = newLISTOP(OP_RETURN, 0,
-    newOP(OP_PUSHMARK, 0),
-    newPADxVOP(optype, 0, ctx->padix));
-}
-
 static struct FieldHookFuncs fieldhooks_reader = {
-  .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &fieldhook_reader_apply,
-  .seal             = &fieldhook_reader_seal,
-  .gen_accessor_ops = &fieldhook_gen_reader_ops,
+  .ver   = OBJECTPAD_ABIVERSION,
+  .apply = &fieldhook_reader_apply,
+  .seal  = &fieldhook_reader_seal,
 };
 
 /* :writer */
@@ -629,41 +694,10 @@ static void fieldhook_writer_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void
   S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_WRITER);
 }
 
-static void fieldhook_gen_writer_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
-{
-  if(type != ACCESSOR_WRITER)
-    return;
-
-  switch(SvPVX(fieldmeta->name)[0]) {
-    case '$':
-      ctx->bodyop = newBINOP(OP_SASSIGN, 0,
-        newOP(OP_SHIFT, 0),
-        newPADxVOP(OP_PADSV, 0, ctx->padix));
-      break;
-
-    case '@':
-      ctx->bodyop = newBINOP(OP_AASSIGN, 0,
-        force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
-        force_list_keeping_pushmark(newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, ctx->padix)));
-      break;
-
-    case '%':
-      ctx->bodyop = newBINOP(OP_AASSIGN, 0,
-        force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
-        force_list_keeping_pushmark(newPADxVOP(OP_PADHV, OPf_MOD|OPf_REF, ctx->padix)));
-      break;
-  }
-
-  ctx->retop = newLISTOP(OP_RETURN, 0,
-    newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, 0, PADIX_SELF));
-}
-
 static struct FieldHookFuncs fieldhooks_writer = {
-  .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &fieldhook_writer_apply,
-  .seal             = &fieldhook_writer_seal,
-  .gen_accessor_ops = &fieldhook_gen_writer_ops,
+  .ver   = OBJECTPAD_ABIVERSION,
+  .apply = &fieldhook_writer_apply,
+  .seal  = &fieldhook_writer_seal,
 };
 
 /* :mutator */
@@ -683,23 +717,10 @@ static void fieldhook_mutator_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, voi
   S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_LVALUE_MUTATOR);
 }
 
-static void fieldhook_gen_mutator_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
-{
-  if(type != ACCESSOR_LVALUE_MUTATOR)
-    return;
-
-  CvLVALUE_on(PL_compcv);
-
-  ctx->retop = newLISTOP(OP_RETURN, 0,
-    newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, 0, ctx->padix));
-}
-
 static struct FieldHookFuncs fieldhooks_mutator = {
-  .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &fieldhook_mutator_apply,
-  .seal             = &fieldhook_mutator_seal,
-  .gen_accessor_ops = &fieldhook_gen_mutator_ops,
+  .ver   = OBJECTPAD_ABIVERSION,
+  .apply = &fieldhook_mutator_apply,
+  .seal  = &fieldhook_mutator_seal,
 };
 
 /* :accessor */
@@ -709,30 +730,10 @@ static void fieldhook_accessor_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, vo
   S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_COMBINED);
 }
 
-static void fieldhook_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
-{
-  if(type != ACCESSOR_COMBINED)
-    return;
-
-  /* $field = shift if @_ */
-  ctx->bodyop = newLOGOP(OP_AND, 0,
-    /* scalar @_ */
-    op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
-    /* $field = shift */
-    newBINOP(OP_SASSIGN, 0,
-      newOP(OP_SHIFT, 0),
-      newPADxVOP(OP_PADSV, 0, ctx->padix)));
-
-  ctx->retop = newLISTOP(OP_RETURN, 0,
-    newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, 0, ctx->padix));
-}
-
 static struct FieldHookFuncs fieldhooks_accessor = {
-  .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &fieldhook_mutator_apply, /* generate method name the same as :mutator */
-  .seal             = &fieldhook_accessor_seal,
-  .gen_accessor_ops = &fieldhook_gen_accessor_ops,
+  .ver   = OBJECTPAD_ABIVERSION,
+  .apply = &fieldhook_mutator_apply, /* generate method name the same as :mutator */
+  .seal  = &fieldhook_accessor_seal,
 };
 
 void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata)

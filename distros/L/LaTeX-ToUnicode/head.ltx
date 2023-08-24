@@ -1,0 +1,28 @@
+% documentation for LaTeX::ToUnicode.
+% head.ltx file public domain.
+% 
+\documentclass[11pt]{article}
+\usepackage{fullpage,pdfpages}
+\usepackage[hidelinks]{hyperref}
+\let\printindex=\empty % index is not useful
+\sloppy \hbadness=3000 % not aiming for good typesetting
+
+% Silence useless font warning about braces in cmsy instead of cmtt:
+\makeatletter\def\@font@warning#1{}\makeatother
+
+% https://tex.stackexchange.com/questions/68272
+\newcommand\invisiblesection[1]{%
+  \refstepcounter{section}%
+  \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}%
+  \sectionmark{#1}%
+}
+
+\begin{document}
+\title{\texttt{LaTeX::ToUnicode} documentation}
+\author{Boris Veytsman\thanks{borisv@lk.net}}
+\maketitle
+\tableofcontents
+
+\invisiblesection{ltx2unitxt---convert \LaTeX\ source fragments}
+
+\includepdf[pages=-]{ltx2unitxt}

@@ -1,4 +1,11 @@
 Revision history for Blockchain-Ethereum-ABI
+0.012
+    [Bug fixes]
+    - Fix test for all supported perl versions
+    - Fix numeric check
+0.011
+    [Improvements]
+    - OP recommended file layout
 0.010
     [Improvements]
     - Major refactoring

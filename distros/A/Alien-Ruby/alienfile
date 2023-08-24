@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+#
+# This file is part of Alien-Ruby
+#
+# This software is copyright (c) 2023 by Auto-Parallel Technologies, Inc.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use alienfile;
+
+my $ruby_version = $ENV{ALIEN_RUBY_VERSION};
+
+# If the user requested a specific Ruby version via the ALIEN_RUBY_VERSION env var, then probe for that specific version
+plugin 'Probe::CommandLine' => (
+  command => 'ruby',
+  args    => [ '--version' ],
+  match   => $ruby_version ? qr/^ruby (\Q$ruby_version\E)/ : qr/^ruby/,
+  version => qr/ruby ([\d\.]+)/
+);
+
+share {
+    if ($ruby_version) {
+        my ($major_minor) = $ruby_version =~ /^(\d+\.\d+)/;
+        plugin Download => (
+            url => "https://cache.ruby-lang.org/pub/ruby/$major_minor/ruby-$ruby_version.tar.gz"
+        );
+    }
+    else { # download latest version
+        plugin Download => (
+            url => 'https://www.ruby-lang.org/en/downloads/',
+            version => qr/ruby-([\d\.]+)\.tar\.gz$/
+        );
+    }
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::Autoconf';
+    build [
+        '%{configure} --disable-shared --enable-load-relative',
+        '%{make}',
+        '%{make} install',
+    ];
+};

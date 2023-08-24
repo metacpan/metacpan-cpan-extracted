@@ -1,3 +1,12 @@
+0.19 2023-08-21T19:30:10+02:00
+ - Fix check_array_required(). It's required.
+ - Regen README file.
+
+0.18 2023-08-21T19:15:45+02:00
+ - Add check_array_required().
+ - Add missing check for key to check_array_object().
+ - Improve ERROR section in doc for better check_array_object().
+
 0.17 2023-07-09T12:51:58+02:00
  - Add check_regexp() function.
 

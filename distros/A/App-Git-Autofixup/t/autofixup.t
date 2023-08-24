@@ -13,7 +13,7 @@ if ($OSNAME eq 'MSWin32') {
 } elsif (!has_git()) {
     plan skip_all => 'git version 1.7.4+ required'
 } else {
-    plan tests => 40;
+    plan tests => 41;
 }
 
 require './git-autofixup';
@@ -22,6 +22,7 @@ $ENV{GIT_AUTHOR_NAME} = 'A U Thor';
 $ENV{GIT_AUTHOR_EMAIL} = 'author@example.com';
 $ENV{GIT_COMMITTER_NAME} = 'C O Mitter';
 $ENV{GIT_COMMITTER_EMAIL} = 'committer@example.com';
+$ENV{GIT_CONFIG_NOSYSTEM} = 'true';
 
 
 sub has_git {
@@ -96,6 +97,8 @@ sub test_autofixup {
     my $orig_dir = getcwd();
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     chdir $dir or die "$!";
+    $ENV{HOME} = $dir;
+    $ENV{XDG_CONFIG_HOME} = "$dir/.config";
     eval {
 
         init_repo();
@@ -175,7 +178,7 @@ sub test_autofixup {
 }
 
 sub init_repo {
-    run('git init');
+    run('git init --initial-branch=master');
     # git-autofixup needs a commit to exclude, since it uses the REVISION..
     # syntax. This is that commit.
     my $filename = 'README';
@@ -774,5 +777,23 @@ index c9c6af7..e6bfff5 100644
 @@ -1 +1 @@
 -b1
 +b2
+EOF
+});
+
+test_autofixup({
+    name => "filename with spaces",
+    topic_commits => [{"filename with spaces" => "a1\n"}],
+    unstaged => {"filename with spaces" => "a2\n"},
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
+
+diff --git a/filename with spaces b/filename with spaces
+index da0f8ed..c1827f0 100644
+--- a/filename with spaces	
++++ b/filename with spaces	
+@@ -1 +1 @@
+-a1
++a2
 EOF
 });

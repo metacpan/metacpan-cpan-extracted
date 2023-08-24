@@ -435,7 +435,7 @@ KEYWORDS
 
     Declares that the instances of the class or role have a member field of
     the given name. This member field will be accessible as a lexical
-    variable within any method declarations in the class.
+    variable within any method declarations and ADJUST blocks in the class.
 
     Array and hash members are permitted and behave as expected; you do not
     need to store references to anonymous arrays or hashes.
@@ -828,7 +828,8 @@ KEYWORDS
     An adjust block is not a subroutine and thus is not permitted to use
     subroutine attributes (except see below). Note that an ADJUST block is
     a named phaser block and not a method; it does not use the sub or
-    method keyword.
+    method keyword. But, like with method, the member fields are accessible
+    within the code body, as is the special $self lexical.
 
     Currently, an ADJUST block receives a reference to the hash containing
     the current constructor arguments, as per "ADJUSTPARAMS" (see below).

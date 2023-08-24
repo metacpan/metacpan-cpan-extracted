@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Getopt::Kingpin::Base -base;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 sub help_name {
     my $self = shift;

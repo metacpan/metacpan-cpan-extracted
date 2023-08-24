@@ -3,7 +3,7 @@ abstract: 'Edit and validate LcdProc configuration file'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model::Tester: '3.006'
+  Config::Model::Tester: '4.007'
   Module::Build: '0.34'
 configure_requires:
   Config::Model: '2.141'
@@ -12,7 +12,7 @@ configure_requires:
   Module::Build: '0.34'
   Path::Tiny: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-lcdproc/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-lcdproc.git
-version: '2.053'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '2.054'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: LGPL-2.1

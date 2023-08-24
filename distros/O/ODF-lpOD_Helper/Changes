@@ -1,0 +1,32 @@
+6.000 - A major overhaul with incompatible API changes.
+
+        "Character mode" is now the default and the old ':chars' import tag
+        is deprectated.  Now you only need to 
+          use ODF::lpOD; 
+          use ODF::lpOD_Helper;
+        A new import tag ':bytes' preserves the old ODF::lpOD
+        behavior where method args and results must be encoded binary.
+
+        Introduced methods Hget_text, Hoffset_into_vtext, Hinsert_element, 
+        Hsplit_element_at, Hdescendants, Hnext_elt, Hnormalize
+
+        A new concept is a "prune condition" when searching or collecting 
+        virtual text, to treat specified tags as opaque (i.e. their children 
+        are not visited).  This can be used to skip over nested paragraphs 
+        such as may exist inside Frames or Tables.
+
+        Results from multi-segment substitutions are now comprehensively
+        "normalized", eliminating consecutive or zero-length text:s segments
+        and ensuring that consecutive spaces are not stored in #PCDATA nodes.
+
+        New style spans are "hoisted" to the top level in a paragraph
+        to avoid creating nested spans (existing spans are cloned and
+        partitioned if necessary around hoisted new spans).
+        NOTE: Please let me know if you *do* want nested spans -- it should
+        be easy to make hoisting an option. 
+
+3.000 - Hsearch reworked with API change; many bug fixes; test improvements
+
+2.000 - First public release to CPAN
+
+1.xxx - internal use only beginning ca. 2012.  Moved from RCS.

@@ -30,9 +30,9 @@ my $info = pack("H*", '74657374206b6579');
 my $hash_name = 'SHA256';
 my $expand_message_func = \&expand_message_xmd;
 
-my ($skS, $pkS) = derive_key_pair($group_name, $seed, $info, $context_string, $hash_name, $expand_message_func);
+my $ec_key_r = derive_key_pair($group_name, $seed, $info, "DeriveKeyPair".$context_string, $hash_name, $expand_message_func);
 
 #my $skS_bn = $skS->get0_private_key();
-is($skS->to_hex(), '88A91851D93AB3E4F2636BABC60D6CE9D1AEE2B86DECE13FA8590D955A08D987', 'derive_key_pair');
+is($ec_key_r->{priv_bn}->to_hex(), '88A91851D93AB3E4F2636BABC60D6CE9D1AEE2B86DECE13FA8590D955A08D987', 'derive_key_pair');
 
 done_testing;

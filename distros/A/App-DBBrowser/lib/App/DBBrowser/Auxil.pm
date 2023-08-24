@@ -91,13 +91,13 @@ sub get_stmt {
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{group_by_stmt}, $indent2 ) if $sql->{group_by_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{having_stmt},   $indent2 ) if $sql->{having_stmt};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{order_by_stmt}, $indent2 ) if $sql->{order_by_stmt};
-        if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+        if ( $sql->{limit_stmt} =~ /^LIMIT\s/ ) {
+            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 );
             push @tmp, $sf->__stmt_fold( $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 ) if $sql->{limit_stmt};
         }
         else {
-            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 ) if $sql->{limit_stmt};
             push @tmp, $sf->__stmt_fold( $used_for, $sql->{offset_stmt}, $indent2 ) if $sql->{offset_stmt};
+            push @tmp, $sf->__stmt_fold( $used_for, $sql->{limit_stmt},  $indent2 ) if $sql->{limit_stmt};
         }
     }
     elsif ( $stmt_type eq 'Delete' ) {

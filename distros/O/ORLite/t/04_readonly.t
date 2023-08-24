@@ -48,7 +48,7 @@ use ORLite {
 END_PERL
 
 # Check standard methods exist
-is( Foo::Bar->orlite, $t::lib::Test::VERSION, '->orlite ok' );
+is( Foo::Bar->orlite, $LocalTest::VERSION, '->orlite ok' );
 ok( Foo::Bar->can('sqlite'), '->sqlite method exists' );
 ok( Foo::Bar::TableOne->can('load'),   '->load method exists' );
 ok( Foo::Bar::TableOne->can('select'), '->select method exists' );

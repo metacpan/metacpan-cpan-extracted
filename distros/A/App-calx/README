@@ -1,18 +1,14 @@
 NAME
-    App::calx - Display a calendar
+    App::calx - Display a calendar, with highlighted dates
 
 VERSION
-    This document describes version 0.007 of App::calx (from Perl
+    This document describes version 0.009 of App::calx (from Perl
     distribution App-calx), released on 2023-06-22.
 
 SYNOPSIS
      # See calx script provided in this distribution
 
 DESCRIPTION
-    This module provides the calx which, like the Unix utility cal, displays
-    calendar on the command-line. The difference is, calx can also show and
-    highlight dates from one or more Calendar::Dates modules.
-
 FUNCTIONS
   gen_calendar
     Usage:
@@ -126,6 +122,11 @@ HOMEPAGE
 
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-App-calx>.
+
+SEE ALSO
+    cal Unix utility.
+
+    Other cal variants: cal-idn (from App::cal::idn).
 
 AUTHOR
     perlancar <perlancar@cpan.org>

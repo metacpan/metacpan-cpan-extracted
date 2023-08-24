@@ -1,5 +1,8 @@
 Revision history for Net-ICAP-Client
 
+0.08   Thu Aug 24 06:33:00 2023
+        Transfer URI::icap and URI::icaps to URI module
+
 0.07   Sun Sep 25 17:49:00 2015
         Fixes to licensing terms
 

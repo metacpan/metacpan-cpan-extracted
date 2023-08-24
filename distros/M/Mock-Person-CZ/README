@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
      use Mock::Person::CZ qw(first_male first_female last_male last_female
-             middle_male middle_female name);
+             middle_male middle_female name name_female name_male);
 
      my $first_male = first_male();
      my $first_female = first_female();
@@ -12,6 +12,8 @@ SYNOPSIS
      my $middle_male = middle_male();
      my $middle_female = middle_female();
      my $name = name($sex);
+     my $name_female = name_female();
+     my $name_male = name_male();
 
 DESCRIPTION
     Data for this module was found on these pages:
@@ -67,11 +69,43 @@ SUBROUTINES
   "name"
      my $name = name($sex);
 
-    Recieves scalar with sex of the person ('male' or 'female').
+    Construct random person name. If a $sex variable is specified, name
+    could be male or female.
 
-    Default value of $sex variable is 'male'.
+    Number of names is 2 or 3. What is created is defined by
+    $STRICT_NUM_NAMES variable. See in "VARIABLES" section.
 
-    Returns scalar with generated name.
+    Returns string.
+
+  "name_female"
+     my $name_female = name_female();
+
+    Construct Czech random female name.
+
+    Number of names is 2 or 3. What is created is defined by
+    $STRICT_NUM_NAMES variable. See in "VARIABLES" section.
+
+    Returns string.
+
+  "name_male"
+     my $name_male = name_male();
+
+    Construct Czech random male name.
+
+    Number of names is 2 or 3. What is created is defined by
+    $STRICT_NUM_NAMES variable. See in "VARIABLES" section.
+
+    Returns string.
+
+VARIABLES
+    $STRICT_NUM_NAMES
+        Variable which control number of generated names.
+
+        Possible values:
+
+         0 - Random between 2 and 3 choice (default value).
+         2 - First and last name.
+         3 - First, middle and last name.
 
 EXAMPLE1
      use strict;
@@ -187,10 +221,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2013-2021
+    © 2013-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

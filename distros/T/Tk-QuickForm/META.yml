@@ -19,12 +19,12 @@ no_index:
     - inc
 requires:
   Scalar::Util::Numeric: '0'
-  Test::Tk: '0.03'
+  Test::Tk: '3.02'
   Tk: '804.033'
-  Tk::ColorEntry: '0.01'
+  Tk::ColorEntry: '0.05'
   Tk::FontDialog: '0'
   Tk::ListEntry: '0.01'
 resources:
   repository: git://github.com/haje61/Tk-QuickForm.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

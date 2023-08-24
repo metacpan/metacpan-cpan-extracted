@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::ABI::Encoder 0.011;
+package Blockchain::Ethereum::ABI::Encoder 0.012;
 class Blockchain::Ethereum::ABI::Encoder;
 
 =encoding utf8
@@ -32,7 +32,7 @@ Allows you to encode contract ABI arguments
 =cut
 
 use Carp;
-use Digest::Keccak qw(keccak_256_hex);
+use Crypt::Digest::Keccak256 qw(keccak256_hex);
 
 use Blockchain::Ethereum::ABI::Type;
 use Blockchain::Ethereum::ABI::Type::Tuple;
@@ -142,7 +142,7 @@ Returns the encoded string 0x prefixed
 
 method encode_function_signature ($signature = undef) {
 
-    return sprintf("0x%.8s", keccak_256_hex($signature // $self->generate_function_signature));
+    return sprintf("0x%.8s", keccak256_hex($signature // $self->generate_function_signature));
 }
 
 =head2 encode

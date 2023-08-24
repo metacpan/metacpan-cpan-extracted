@@ -37,7 +37,7 @@ use warnings 'once';
 use File::Path 'make_path';
 use Text::Diff;
 
-our $VERSION = "0.15";
+our $VERSION = "0.19";
 
 use App::LXC::Container::Texts;
 use App::LXC::Container::Data;

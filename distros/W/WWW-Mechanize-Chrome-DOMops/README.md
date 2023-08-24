@@ -1,116 +1,147 @@
 # NAME
 
-WWW::Mechanize::Chrome::DOMops - Operations on the DOM
+WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 # VERSION
 
-Version 0.01
+Version 0.04
 
 # SYNOPSIS
 
 This module provides a set of tools to operate on the DOM of the
-provided [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome). Currently,
-supported operations are: `find()` to find HTML elements
-and `zap()` to delete HTML elements.
+provided [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. Currently,
+supported operations are:
+
+- `find()` : finds HTML elements,
+- `zap()` : deletes HTML elements.
+
+Both `find()` and `zap()` return some information from each match and its descendents (like `tag`, `id` etc.).
+This information can be tweaked by the caller.
+`find()` and `zap()` optionally execute javascript code on each match and its descendents and can return back data.
 
 The selection of the HTML elements in the DOM
-can be done in various ways,
-e.g. by tag, id, name, class or by a CSS selector. There
-is more information in section ["ELEMENT SELECTORS"](#element-selectors).
+can be done in various ways:
+
+- by **CSS selector**,
+- by **tag**,
+- by **class**.
+- by **id**,
+- by **name**.
+
+There is more information about this in section ["ELEMENT SELECTORS"](#element-selectors).
 
 Here are some usage scenaria:
 
-    use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
+      use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
 
-    # increase verbosity: 0, 1, 2, 3
-    $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
+      # increase verbosity: 0, 1, 2, 3
+      $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
 
-    # First, create a mech object and load a URL on it
-    my $mechobj = WWW::Mechanize::Chrome->new();
-    $mechobj->get('https://www.xyz.com');
+      # First, create a mech object and load a URL on it
+      # Note: you need google-chrome binary installed in your system!
+      my $mechobj = WWW::Mechanize::Chrome->new();
+      $mechobj->get('https://www.bbbbbbbbb.com');
 
-    # find elements in the DOM, select by id, tag, name, or 
-    # by a CSS selector.
-    my $ret = find({
-       'mech-obj' => $mechobj,
-       # find elements whose class is in the provided
-       # scalar class name or array of class names
-       'element-class' => ['slanted-paragraph', 'class2', 'class3'],
-       # *OR* their tag is this:
-       'element-tag' => 'p',
-       # *OR* their name is this:
-       'element-name' => ['aname', 'name2'],
-       # *OR* their id is this:
-       'element-id' => ['id1', 'id2'],
-       # just provide a CSS selector and get done with it already
-       'element-cssselector' => 'a-css-selector',
-       # specifies that we should use the union of the above sets
-       # hence the *OR* in above comment
-       || => 1,
-       # this says to find all elements whose class
-       # is such-and-such AND element tag is such-and-such
-       # && => 1 means to calculate the INTERSECTION of all
-       # individual matches.
-       
-       # optionally run javascript code on all those elements matched
-       'find-cb-on-matched' => [
-         {
-           'code' =><<'EOJS',
-console.log("found this element "+htmlElement.tagName); return 1;
-EOJS
-           'name' => 'func1'
-         }, {...}
-       ],
-       # optionally run javascript code on all those elements
-       # matched AND THEIR CHILDREN too!
-       'find-cb-on-matched-and-their-children' => [
-         {
-           'code' =><<'EOJS',
-console.log("found this element "+htmlElement.tagName); return 1;
-EOJS
-           'name' => 'func2'
-         }
-       ],
-       # optionally ask it to create a valid id for any HTML
-       # element returned which does not have an id.
-       # The text provided will be postfixed with a unique
-       # incrementing counter value 
-       'insert-id-if-none' => '_prefix_id',
-       # or ask it to randomise that id a bit to avoid collisions
-       'insert-id-if-none-random' => '_prefix_id',
+      # find elements in the DOM, select by id, tag, name, or 
+      # by CSS selector.
+      my $ret = find({
+         'mech-obj' => $mechobj,
+         # find elements whose class is in the provided
+         # scalar class name or array of class names
+         'element-class' => ['slanted-paragraph', 'class2', 'class3'],
+         # *OR* their tag is this:
+         'element-tag' => 'p',
+         # *OR* their name is this:
+         'element-name' => ['aname', 'name2'],
+         # *OR* their id is this:
+         'element-id' => ['id1', 'id2'],
+         # *OR* just provide a CSS selector and get done with it already
+         # the best choice
+         'element-cssselector' => 'a-css-selector',
+         # specifies that we should use the union of the above sets
+         # hence the *OR* in above comment
+         '||' => 1,
+         # this says to find all elements whose class
+         # is such-and-such AND element tag is such-and-such
+         # '&&' => 1 means to calculate the INTERSECTION of all
+         # individual matches.
 
-       # optionally output the javascript code to a file for debugging
-       'js-outfile' => 'output.js',
-    });
+         # build the information sent back from each match
+         'element-information-from-matched' => <<'EOJ',
+  // begin JS code to extract information from each match and return it
+  // back as a hash
+  const r = htmlElement.hasAttribute("role")
+    ? htmlElement.getAttribute("role") : "<no role present>"
+  ;
+  return {"tag" : htmlElement.tagName, "id" : htmlElement.id, "role" : r};
+  EOJ
+         # optionally run javascript code on all those elements matched
+         'find-cb-on-matched' => [
+           {
+             'code' =><<'EOJS',
+    // the element to operate on is 'htmlElement'
+    console.log("operating on this element "+htmlElement.tagName);
+    // this is returned back in the results of find() under
+    // key "cb-results"->"find-cb-on-matched"
+    return 1;
+  EOJS
+             'name' => 'func1'
+           }, {...}
+         ],
+         # optionally run javascript code on all those elements
+         # matched AND THEIR CHILDREN too!
+         'find-cb-on-matched-and-their-children' => [
+           {
+             'code' =><<'EOJS',
+    // the element to operate on is 'htmlElement'
+    console.log("operating on this element "+htmlElement.tagName);
+    // this is returned back in the results of find() under
+    // key "cb-results"->"find-cb-on-matched" notice the complex data
+    return {"abc":"123",{"xyz":[1,2,3]}};
+  EOJS
+             'name' => 'func2'
+           }
+         ],
+         # optionally ask it to create a valid id for any HTML
+         # element returned which does not have an id.
+         # The text provided will be postfixed with a unique
+         # incrementing counter value 
+         'insert-id-if-none' => '_prefix_id',
+         # or ask it to randomise that id a bit to avoid collisions
+         'insert-id-if-none-random' => '_prefix_id',
+
+         # optionally, also output the javascript code to a file for debugging
+         'js-outfile' => 'output.js',
+      });
 
 
-    # Delete an element from the DOM
-    $ret = zap({
-       'mech-obj' => $mechobj,
-       'element-id' => 'paragraph-123'
-    });
+      # Delete an element from the DOM
+      $ret = zap({
+         'mech-obj' => $mechobj,
+         'element-id' => 'paragraph-123'
+      });
 
-    # Mass murder:
-    $ret = zap({
-       'mech-obj' => $mechobj,
-       'element-tag' => ['div', 'span', 'p'],
-       '||' => 1, # the union of all those matched with above criteria
-    });
+      # Mass murder:
+      $ret = zap({
+         'mech-obj' => $mechobj,
+         'element-tag' => ['div', 'span', 'p'],
+         '||' => 1, # the union of all those matched with above criteria
+      });
 
-    # error handling
-    if( $ret->{'status'} < 0 ){ die "error: ".$ret->{'message'} }
-    # status of -3 indicates parameter errors,
-    # -2 indicates that eval of javascript code inside the mech object
-    # has failed (syntax errors perhaps, which could have been introduced
-    # by user-specified callback
-    # -1 indicates that javascript code executed correctly but
-    # failed somewhere in its logic.
+      # error handling
+      if( $ret->{'status'} < 0 ){ die "error: ".$ret->{'message'} }
+      # status of -3 indicates parameter errors,
+      # -2 indicates that eval of javascript code inside the mech object
+      # has failed (syntax errors perhaps, which could have been introduced
+      # by user-specified callback
+      # -1 indicates that javascript code executed correctly but
+      # failed somewhere in its logic.
 
-    print "Found " . $ret->{'status'} . " matches which are: "
-    # ... results are in $ret->{'found'}->{'first-level'}
-    # ... and also in $ret->{'found'}->{'all-levels'}
-    # the latter contains a recursive list of those
-    # found AND ALL their children
+      print "Found " . $ret->{'status'} . " matches which are: "
+      # ... results are in $ret->{'found'}->{'first-level'}
+      # ... and also in $ret->{'found'}->{'all-levels'}
+      # the latter contains a recursive list of those
+      # found AND ALL their children
 
 # EXPORT
 
@@ -134,7 +165,27 @@ It finds HTML elements in the DOM currently loaded on the
 parameters-specified [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. The
 parameters are:
 
-- `mech-obj` : supply a [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome), required
+- `mech-obj` : user must supply a [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome), this is required. See section
+["CREATING THE MECH OBJECT"](#creating-the-mech-object) for an example of creating the mech object with some parameters
+(which work for me) and javascript console output propagated on to perl's output.
+- `element-information-from-matched` : optional javascript code to be run
+on each HTML element matched in order to construct the information data
+whih is returned back. If none
+specified the following default will be used, which returns tagname and id:
+
+        // the matched element is provided in htmlElement
+        return {"tag" : htmlElement.tagName, "id" : htmlElement.id};
+
+    Basically the code is expected to be the **body of a function** which
+    accepts one parameter: `htmlElement` (that is the element matched).
+    That means it **must not have**
+    the function preamble (function name, signature, etc.).
+    Neither it must have the postamble, which is the end-block curly bracket.
+    This piece of code **must return a HASH**. 
+    The code can thow exceptions which will be caught
+    (because the code is run within a try-catch block)
+    and the error message will be propagated to the perl code with status of -1.
+
 - `insert-id-if-none` : some HTML elements simply do not have
 an id (e.g. `<p`>). If any of these elements is matched,
 its tag and its id (empty string) will be returned.
@@ -161,13 +212,22 @@ code in the specified array. Each item of the array
 is a hash with keys `code` and `name`. The former
 contains the code to be run assuming that the
 html element to operate on is named `htmlElement`.
-The code must end with a `return` statement.
-Basically the code is the body of a function
-**without** the preamble (signature and function name etc.)
-and the postamble. Key `name` is just for
-making this process more descriptive and will
-be printed on log messages and returned back with
-the results. Here is an  example:
+The code must end with a `return` statement which
+will be recorded and returned back to perl code.
+The code can thow exceptions which will be caught
+(because the callback is run within a try-catch block)
+and the error message will be propagated to the perl code with status of -1.
+Basically the code is expected to be the **body of a function** which
+accepts one parameter: `htmlElement` (that is the element matched).
+That means it **must not have**
+the function preamble (function name, signature, etc.).
+Neither it must have the postamble, which is the end-block curly bracket.
+
+    Key `name` is just for
+    making this process more descriptive and will
+    be printed on log messages and returned back with
+    the results. `name` can contain any characters.
+    Here is an  example:
 
         'find-cb-on-matched' : [
           {
@@ -190,8 +250,9 @@ code (which is evaluated within the mech object) to a file.
 
 **JAVASCRIPT HELPERS**
 
-There is one javascript function which can be called from any of the
-callbacks as `getAllChildren(anHtmlElement)`. It returns
+There is one javascript function available to all user-specified callbacks:
+
+- `getAllChildren(anHtmlElement)` : it returns
 back an array of HTML elements which are the children (at any depth)
 of the given `anHtmlElement`.
 
@@ -203,13 +264,21 @@ denotes the number of matched HTML elements. Or it is -3, -2 or
 \-1 in case of errors:
 
 - `-3` : there is an error with the parameters passed to this sub.
-- `-2` : there is a syntax error with the javascript code to evaluate
-`eval()` inside the mech object. Most likely this syntax error is
-with user-specified callback code.
+- `-2` : there is a syntax error in the javascript code to be
+evaluated by the mech object with something like `$mech_obj-`eval()>.
+Most likely this syntax error is with user-specified callback code.
+Note that all the javascript code to be evaluated is dumped to stderr
+by increasing the verbosity. But also it can be saved to a local file
+for easier debugging by supplying the `js-outfile` parameter to
+`find()` or `zap()`.
 - `-1` : there is a logical error while running the javascript code.
 For example a division by zero etc. This can be both in the callback code
 as well as in the internal javascript code for edge cases not covered
-by tests. Please report these.
+by my tests. Please report these.
+Note that all the javascript code to be evaluated is dumped to stderr
+by increasing the verbosity. But also it can be saved to a local file
+for easier debugging by supplying the `js-outfile` parameter to
+`find()` or `zap()`.
 
 If `status` is not negative, then this is success and its value
 denotes the number of matched HTML elements. Which can be zero
@@ -312,6 +381,11 @@ in the first level (not their children) as:
 
 Return value is exactly the same as with ["find($params)"](#find-params)
 
+## $WWW::Mechanize::Chrome::DOMops::VERBOSE\_DOMops
+
+Set this upon loading the module to `0, 1, 2, 3`
+to increase verbosity. `0` implies no verbosity.
+
 # ELEMENT SELECTORS
 
 `Element selectors` are how one selects HTML elements from the DOM.
@@ -341,9 +415,87 @@ by every selector specified. This is the default.
 Meaning that an element will make it to the final list if it was matched
 by at least one of the selectors specified.
 
+# CREATING THE MECH OBJECT
+
+The mech ([WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)) object must be supplied
+to the functions in this module. It must be created by the caller.
+This is how I do it:
+
+    use WWW::Mechanize::Chrome;
+    use Log::Log4perl qw(:easy);
+    Log::Log4perl->easy_init($ERROR);
+
+    my %default_mech_params = (
+        headless => 1,
+    #   log => $mylogger,
+        launch_arg => [
+                '--window-size=600x800',
+                '--password-store=basic', # do not ask me for stupid chrome account password
+    #           '--remote-debugging-port=9223',
+    #           '--enable-logging', # see also log above
+                '--disable-gpu',
+                '--no-sandbox',
+                '--ignore-certificate-errors',
+                '--disable-background-networking',
+                '--disable-client-side-phishing-detection',
+                '--disable-component-update',
+                '--disable-hang-monitor',
+                '--disable-save-password-bubble',
+                '--disable-default-apps',
+                '--disable-infobars',
+                '--disable-popup-blocking',
+        ],
+    );
+
+    my $mech_obj = eval {
+        WWW::Mechanize::Chrome->new(%default_mech_params)
+    };
+    die $@ if $@;
+
+    # This transfers all javascript code's console.log(...)
+    # messages to perl's warn()
+    # we need to keep $console var in scope!
+    my $console = $mech_obj->add_listener('Runtime.consoleAPICalled', sub {
+          warn
+              "js console: "
+            . join ", ",
+              map { $_->{value} // $_->{description} }
+              @{ $_[0]->{params}->{args} };
+        })
+    ;
+
+    # and now fetch a page
+    my $URL = '...';
+    my $retmech = $mech_obj->get($URL);
+    die "failed to fetch $URL" unless defined $retmech;
+    $mech_obj->sleep(1); # let it settle
+    # now the mech object has loaded the URL and has a DOM hopefully.
+    # You can pass it on to find() or zap() to operate on the DOM.
+
+# DEPENDENCIES
+
+This module depends on [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) which, in turn,
+depends on the `google-chrome` executable be installed on the
+host computer. See [WWW::Mechanize::Chrome::Install](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3AInstall) on
+how to install the executable.
+
+Test scripts (which create there own mech object) will detect the absence
+of `google-chrome` binary and exit gracefully, meaning the test passes.
+But with a STDERR message to the user. Who will hopefully notice it and
+proceed to `google-chrome` installation. In any event, this module
+will be installed with or without `google-chrome`.
+
 # AUTHOR
 
 Andreas Hadjiprocopis, `<bliako at cpan.org>`
+
+# CODING CONDITIONS
+
+This code was written under extreme climate conditions of 44 Celsius.
+Keep packaging those
+vegs in kilos of plastic wrappers, keep obsolidating our perfectly good
+hardware, keep inventing new consumer needs and brainwash them
+down our throats, in short **Crack Deep the Roof Beam, Capitalism**.
 
 # BUGS
 
@@ -359,7 +511,6 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-- [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)
 - RT: CPAN's request tracker (report bugs here)
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Chrome-DOMops](https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Chrome-DOMops)
@@ -382,7 +533,8 @@ Almaz
 
 # ACKNOWLEDGEMENTS
 
-[CORION](https://metacpan.org/pod/CORION) for publishing  [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)
+[CORION](https://metacpan.org/pod/CORION) for publishing  [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) and all its
+contributors.
 
 # LICENSE AND COPYRIGHT
 

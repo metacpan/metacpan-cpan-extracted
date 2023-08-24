@@ -4,7 +4,7 @@ author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  GD: '0'
+  Imager: '0'
   Test2::Tools::Exception: '0'
   Test2::V0: '0'
   Test::More: '0'
@@ -26,5 +26,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/dkechag/Image-PHash.git
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

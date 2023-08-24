@@ -11,7 +11,7 @@ sub MY::libscan {
 }
 
 my %WriteMakefileArgs = (
-    INSTALL_BASE     => "$ENV{HOME}/usr",
+INSTALL_BASE => '/home/andreas/usr',
     NAME             => 'WWW::Mechanize::Chrome::DOMops',
     AUTHOR           => q{Andreas Hadjiprocopis <bliako@cpan.org>},
     VERSION_FROM     => 'lib/WWW/Mechanize/Chrome/DOMops.pm',
@@ -26,11 +26,13 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
 	'Test2::Plugin::UTF8' => '0',
 	'FindBin' => '0',
+	'File::Temp' => '0',
+	'File::Spec' => '0',
+	'Log::Log4perl' => '0',
 	'WWW::Mechanize::Chrome' => '0',
 	'Data::Roundtrip' => '0',
     },
     PREREQ_PM => {
-	'WWW::Mechanize::Chrome' => '0',
 	'Data::Roundtrip' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

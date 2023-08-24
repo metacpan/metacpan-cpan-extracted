@@ -15,7 +15,7 @@ use Tk::Toplevel;
 use Tk::LabEntry;
 use Cwd;
 
-our $VERSION = 0.71;
+our $VERSION = 1.29;
 our @EXPORT_OK = qw(glob_to_re);
 
 Construct Tk::Widget 'SimpleFileSelect';
@@ -285,7 +285,7 @@ __END__
 
 =head1 NAME
 
-  Tk::SimpleFileSelect - Easy to Use File Selection Widget
+  Tk::SimpleFileSelect - Easy-to-Use File Selection Widget
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ Text to appear in the entry box when the widget is opened.
 
 =head1 DESCRIPTION
 
-Tk::SimpleFileSelect is an easy to use file selection widget based on
+Tk::SimpleFileSelect is an easy-to-use file selection widget based on
 L<Tk::FileSelect>.  Unlike a L<Tk::FileSelect> widget, Tk::SimpleFileSelect
 does not attempt to verify that a file exists.  A Tk::SimpleFileSelect
 dialog returns the complete pathname of the selected file.  The
@@ -379,13 +379,11 @@ None.
 
 =head1 COPYRIGHT
 
-Release 0.69.
-
 Copyright © 2001-2020 Robert Kiesling, rkies@cpan.org.
 
 Alexander Becker has served as a co-maintainer since version 0.69.
 
-Licensed under the same terms as Perl. Refer to the file, "Artistic."
+Licensed under the same terms as Perl. Refer to the file "Artistic".
 
 =head1 SEE ALSO
 

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.76 ':experimental(adjust_params)';
 
-package Device::AVR::UPDI 0.12;
+package Device::AVR::UPDI 0.13;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;
@@ -19,28 +20,28 @@ use YAML ();
 
 my $SHAREDIR = module_dir( __PACKAGE__ );
 
-use Struct::Dumb qw( readonly_struct );
+use Object::Pad::ClassAttr::Struct 0.04;
 
 use constant DEBUG => $ENV{UPDI_DEBUG} // 0;
 
-readonly_struct PartInfo => [qw(
-   name
+class Device::AVR::UPDI::_PartInfo :Struct {
+   field $name;
 
-   signature
-   baseaddr_nvmctrl
-   baseaddr_fuse
-   baseaddr_sigrow
+   field $signature;
+   field $baseaddr_nvmctrl;
+   field $baseaddr_fuse;
+   field $baseaddr_sigrow;
 
-   baseaddr_flash
-   pagesize_flash
-   size_flash
+   field $baseaddr_flash;
+   field $pagesize_flash;
+   field $size_flash;
 
-   baseaddr_eeprom
-   pagesize_eeprom
-   size_eeprom
+   field $baseaddr_eeprom;
+   field $pagesize_eeprom;
+   field $size_eeprom;
 
-   fusenames
-)];
+   field $fusenames;
+}
 
 my %partinfos;
 {
@@ -52,7 +53,7 @@ my %partinfos;
       my $fuses = [ map { length $_ ? $_ : undef } split m/,/, pop @fields ];
       m/^0x/ and $_ = hex $_ for @fields;
 
-      my $partinfo = PartInfo( $name, $signature, @fields, $fuses );
+      my $partinfo = Device::AVR::UPDI::_PartInfo->new_values( $name, $signature, @fields, $fuses );
 
       $partinfos{lc $name} = $partinfo;
       $partinfos{"m$1"} = $partinfo if $name =~ m/^ATmega(.*)$/;
@@ -137,37 +138,36 @@ before any of the command methods are used.
 
 =cut
 
-has $_fh;
-has $_partinfo :reader;
+field $_fh;
+field $_partinfo :reader;
 
-has $_nvm_version :writer(_set_nvm_version);
+field $_nvm_version :writer(_set_nvm_version);
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   $_fh = delete $params->{fh} // do {
+ADJUST :params (
+   :$fh     = undef,
+   :$dev    = undef,
+   :$baud //= 115200,
+   :$part,
+) {
+   $_fh = $fh // do {
       require IO::Termios;
-      my $dev = delete $params->{dev};
       IO::Termios->open( $dev ) or
          die "Unable to open $dev - $!\n";
    };
 
    $_fh->cfmakeraw();
 
-   my $baud = delete $params->{baud} // 115200;
    # 8bits, Even parity, 2 stop
    $_fh->set_mode( "$baud,8,e,2" );
    $_fh->setflag_clocal( 1 );
 
    $_fh->autoflush;
 
-   my $part = delete $params->{part} or croak "Require 'part'";
    $_partinfo = $partinfos{lc $part} //
       croak "Unrecognised part name $part";
 }
 
-has $_reg_ctrla = 0;
+field $_reg_ctrla = 0;
 
 =head1 ACCESSORS
 
@@ -213,7 +213,7 @@ F<share/> directory for more details.
 
 =cut
 
-has $_fuseinfo;
+field $_fuseinfo;
 
 method fuseinfo
 {
@@ -732,7 +732,7 @@ async method enable_nvmprog
    die "Timed out waiting for NVMPROG key to be accepted\n" if !$timeout;
 }
 
-has $_nvmctrl;
+field $_nvmctrl;
 
 method nvmctrl
 {
@@ -857,8 +857,8 @@ role # hide from indexer
          NVMCTRL_STATUS_FBUSY => (1<<0),
    };
 
-   has $_updi     :reader :param;
-   has $_partinfo :reader;
+   field $_updi     :reader :param;
+   field $_partinfo :reader;
 
    ADJUST
    {
@@ -1129,6 +1129,9 @@ ATtiny214|1e9120|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,
 ATtiny3214|1e9520|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny3216|1e9521|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny3217|1e9522|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3224|1e9528|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3226|1e9527|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3227|1e9526|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny402|1e9227|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny404|1e9226|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny406|1e9225|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND

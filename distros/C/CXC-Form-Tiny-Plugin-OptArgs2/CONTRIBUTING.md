@@ -17,7 +17,7 @@ more welcome.
 The public repository for this code is managed with git and is hosted at GitLab.
 It is available via the web at:
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a merge request. Detailed
@@ -111,11 +111,11 @@ can submit an issue report
 
 at this website:
 
-  https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs
+  https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs2
 
 or via email to:
 
-  bug-cxc-form-tiny-plugin-optargs@rt.cpan.org
+  bug-cxc-form-tiny-plugin-optargs2@rt.cpan.org
 
 or via email to:
 
@@ -125,10 +125,10 @@ or via email to:
 Idiosyncracies
 --------------
 
-  * Some files are generated during the build and copied from the
-    release (see the [CopyFilesFromRelease] section in `dist.ini`]
+* Some files are generated during the build and copied from the
+  release (see the [CopyFilesFromRelease] section in `dist.ini`]
 
-  * Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
+* Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
 
 
 References

@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.802   2023-08-22
+        [CHANGES]
+         * Internal XS-level changes:
+            + Generate the basic accessor ops directly before invoking the
+              gen_accessor_ops chain, ensuring more reliable ordering
+            + Renamed the `post_initfields` field hook to `post_makefields` to
+              better reflect when it actually runs
+         * Removed the special-case warning about `method BUILD`
+         * Added docs to point out that `ADJUST` blocks see method-like field
+           lexicals
+
 0.801   2023-08-10
         [CHANGES]
          * Warn at compiletime if `ADJUST` blocks perform out-of-block control

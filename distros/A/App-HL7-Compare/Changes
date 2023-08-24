@@ -1,0 +1,8 @@
+Revision history for Perl extension App::HL7::Compare.
+
+0.002 Tue Aug 22 2023
+	- fix error when HL7 element had only empty subelements
+
+0.001 Sat Aug 19 2023
+	- first version
+

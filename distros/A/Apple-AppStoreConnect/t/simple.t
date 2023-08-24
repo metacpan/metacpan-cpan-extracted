@@ -84,12 +84,11 @@ my $mock = Test2::Mock->new(
     ],
 );
 
-my $jwt = $asc->jwt;
 my $expected_obj = array {
     item object {prop blessed => 'LWP::UserAgent'; etc};
     item "${base}apps";
     item 'Authorization';
-    item "Bearer $jwt";
+    item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
     end
 };
 
@@ -118,7 +117,7 @@ subtest 'get' => sub {
             item object {prop blessed => 'LWP::UserAgent'; etc};
             item "${base}apps?foo=bar";
             item 'Authorization';
-            item "Bearer $jwt";
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
             end
         },
         'get call correct with params'
@@ -143,7 +142,7 @@ subtest 'get_apps' => sub {
             item object {prop blessed => 'LWP::UserAgent'; etc};
             item "${base}apps/1";
             item 'Authorization';
-            item "Bearer $jwt";
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
             end
         },
         'get_apps call correct with id'
@@ -157,7 +156,7 @@ subtest 'get_apps' => sub {
             item object {prop blessed => 'LWP::UserAgent'; etc};
             item "${base}apps/builds";
             item 'Authorization';
-            item "Bearer $jwt";
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
             end
         },
         'get_apps call correct with path'
@@ -171,7 +170,7 @@ subtest 'get_apps' => sub {
             item object {prop blessed => 'LWP::UserAgent'; etc};
             item "${base}apps/1/builds";
             item 'Authorization';
-            item "Bearer $jwt";
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
             end
         },
         'get_apps call correct with id and path'
@@ -192,9 +191,8 @@ subtest 'Optional parameters' => sub {
         scope      => ["GET /v1/apps?filter[platform]=IOS"],
         ua         => $ua
     );
-    my $out = $asc->get(url => 'apps', raw => 1);
-    my $jwt = $asc->jwt;
 
+    my $out = $asc->get(url => 'apps', raw => 1);
     is($out, $json, 'Received JSON response');
     is(
         $mock->call_tracking->[7]->{args},
@@ -202,7 +200,7 @@ subtest 'Optional parameters' => sub {
             item $ua;
             item "${base}apps";
             item 'Authorization';
-            item "Bearer $jwt";
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
             end
         },
         'get call correct'

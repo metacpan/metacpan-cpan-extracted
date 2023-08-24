@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.16.3';
+my $VERSION = '3.17.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -232,7 +232,6 @@ my %opts =
      PERL_MALLOC_OK => 1,
      NEEDS_LINKING  => 1,
      NO_META        => 1,
-     NO_MYMETA      => 0,
      NORECURS       => 1,
      PM             => {
                         'Pg.pm' => '$(INST_LIBDIR)/Pg.pm',

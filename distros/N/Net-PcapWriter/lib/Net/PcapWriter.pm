@@ -6,7 +6,7 @@ use Net::PcapWriter::TCP;
 use Net::PcapWriter::UDP;
 use Net::PcapWriter::ICMP_Echo;
 
-our $VERSION = '0.724';
+our $VERSION = '0.725';
 
 sub new {
     my ($class,$file) = @_;
@@ -205,6 +205,12 @@ server, 1 the other way). Will write TCP handshake if not done yet.
 =item $tcpconn->ack($dir,[$timestamp])
 
 Will write an empty message with an ACK from direction C<$dir>.
+
+=item $tcpconn->keepalive_probe($dir,[$timestamp])
+
+Will write a TCP keep-alive probe from direction C<$dir>, i.e. a packet with
+no payload and a sequence number one less than expected. To reply to this
+probe the peer should just ack it.
 
 =item $tcpconn->shutdown($dir,[$timestamp])
 

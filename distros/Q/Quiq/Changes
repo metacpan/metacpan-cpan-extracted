@@ -1,3 +1,27 @@
+1.212 2023-08-18
+================
+
+[Quiq::Converter]
+* germonMoneyAmount(): Methode hinzugefügt
+
+[Quiq::Path]
+* Doku-Fehler korrigiert
+
+[Quiq::PhotoStorage]
+* addAllByTime(): Methode hinzugefügt
+
+1.211 2023-06-26
+================
+
+[Quiq::Imap::Client]
+* Klasse hinzugefügt
+
+[Quiq::Eog]
+* transferImages(): Fehlerbehandlung hinzugefügt
+
+[Quiq::PhotoStorage]
+* Klasse hinzugefügt
+
 1.210 2023-05-26
 ================
 

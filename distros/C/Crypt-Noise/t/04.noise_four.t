@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-use Smart::Comments;
+#use Smart::Comments;
 
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;

@@ -29,6 +29,7 @@ my @files = (
     't/export.t',
     't/extension.t',
     't/features.t',
+    't/maybe.t',
     't/no_dup_add_isa.t',
     't/release-kwalitee.t',
     't/try.t',

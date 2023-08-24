@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ name: Dist-Zilla-PluginBundle-MSCHOUT
 provides:
   Dist::Zilla::PluginBundle::MSCHOUT:
     file: lib/Dist/Zilla/PluginBundle/MSCHOUT.pm
-    version: '0.38'
+    version: '0.40'
   Pod::Weaver::PluginBundle::MSCHOUT:
     file: lib/Pod/Weaver/PluginBundle/MSCHOUT.pm
-    version: '0.38'
+    version: '0.40'
 requires:
   Dist::Zilla: '4.102341'
   Dist::Zilla::Plugin::AuthorSignatureTest: '0'
@@ -43,7 +43,6 @@ requires:
   Dist::Zilla::Plugin::RemovePrereqs: '0'
   Dist::Zilla::Plugin::Signature: '0'
   Dist::Zilla::Plugin::TaskWeaver: '0.093330'
-  Dist::Zilla::Plugin::TravisYML: '0'
   Dist::Zilla::Plugin::Twitter: '0'
   Dist::Zilla::PluginBundle::Classic: '0'
   Dist::Zilla::PluginBundle::Filter: '0'
@@ -65,5 +64,7 @@ resources:
   bugtracker: https://github.com/mschout/dist-zilla-pluginbundle-mschout/issues
   homepage: https://github.com/mschout/dist-zilla-pluginbundle-mschout
   repository: https://github.com/mschout/dist-zilla-pluginbundle-mschout.git
-version: '0.38'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.40'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -8,7 +8,7 @@ use Dist::Zilla::PluginBundle::Filter;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-07-07'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 sub configure {
     my $self = shift;
@@ -81,7 +81,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.607 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
+This document describes version 0.608 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
 
 =head1 SYNOPSIS
 

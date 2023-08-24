@@ -4,8 +4,9 @@ Unicode and ODF::lpOD (and XML::Twig)
 
 =head1 SYNOPSIS
 
+  use ODF::lpOD;
+  use ODF::lpOD_Helper;
   use feature 'unicode_strings';
-  use ODF::lpOD_Helper ':chars';  # or qw/:chars :DEFAULT/
 
 =head1 INTRODUCTION
 
@@ -16,8 +17,8 @@ That thinking came from low-level languages like C.
 Perl saved us but it took years before everyone believed.
 And more years before Perl's Unicode paradigm was widely understood.
 
-Meanwhile lots of pod and code was written which, in hindsight,
-was confused or misleading.
+Meanwhile lots of pod and code was written which in hindsight
+is confused or misleading.
 
 =head1 THE PERL UNICODE PARADIGM
   
@@ -35,31 +36,38 @@ See "Not always so tidy" below for more discussion.
 =head1 ODF::lpOD
 
 For historical reasons
-ODF::lpOD is incompatible with the above paradigm by default
-because every method encodes result strings (e.g. into UTF-8)
+ODF::lpOD by itself is incompatible with the above paradigm by default
+because every method encodes result strings into UTF-8
 before returning them to you, and attempts to decode strings you pass in before
-using them.  Therefore, by default,
-you must work with binary rather than character strings;
+using them.  Therefore you must work with binary rather than character strings;
 Regex match, substr(), length(), and comparison with string literals
 do not work with non-ASCII/latin1 characters.
 Also, you can't print such already-encoded binary to STDOUT if that
 file handle auto-encodes because the data will be encoded twice.
 
-B<< use ODF::lpOD_Helper ':chars'; >>
+B<< use ODF::lpOD_Helper >>
 fixes this by disabling ODF::lpOD's internal encoding and decoding.
-Then methods speak and listen in characters, not octets.
+Methods then speak and listen in characters, not octets.
 
 You should also B<< use feature 'unicode_strings'; >> to
 disable problematic aspects of legacy Perl behavior.
 
-It is possible to toggle between the old behavior and character-string
-mode:
-I<< lpod->Huse_octet_strings() >> will will re-enable implicit decoding/encoding of method arguments
-and I<< lpod->Huse_character_strings() >> will disable the old behavior
-and restore B<:chars> mode.
+=head1 IF LEGACY BEHAVIOR IS NEEDED
 
-Note: B<:chars> mode does not affect reading or writing ODF files, 
-which continue to be automatically decoded or encoded as expected.
+The import tag B<:bytes> will tell ODF::lpOD_Helper to not disable
+internal encoding & decoding, i.e. the original ODF::lpOD behavior
+will be retained.
+
+It is also possible to toggle between the old behavior and 
+character-string mode:
+I<< lpod->Huse_octet_strings() >> will will re-enable implicit 
+decoding/encoding of method arguments (using UTF-8 encoding by default)
+and I<< lpod->Huse_character_strings() >> will disable the old behavior
+and restore transparent Unicode support.
+
+Prior to version 6.000 character mode was not the default, but
+required a B<:chars> import tag.  This tag is now deprecated and
+produces a warning. 
 
 =head1 XML::Twig & XML::Parser
 
@@ -84,16 +92,17 @@ header to know how to decode the remainder of the file.
 =head2 Not always so tidy
 
 Perl's data model now has two kinds of strings: B<binary octets>,
-which might or might not represent Unicode characters in some fashion,
+which might or might not be some representation of Unicode characters,
 and B<abstract characters> which are opaque atoms.  
 In most cases these two kinds should never be combined, see C<man perlunifaq>.
 
 I<Decoding> means converting binary octets into abstract characters,
 and I<encoding> does the reverse.
 
-In reality Perl often stores abstract characters in memory
-using a variation of UTF-8, and so "decoding" or "encoding" between 
-Perl characters and UTf-8 octet streams can be infinitely fast. 
+Obviously Perl somehow represents abstract characters internally,
+and it often (not always) uses a variation of UTF-8; 
+as a result, "decoding" or "encoding" between abstract characters 
+and UTF-8 octet streams can be very fast.
 
 Non-Unicode-aware scripts usually "just work" as long as they never
 see characters outside the ASCII range.  This is because,
@@ -103,9 +112,11 @@ usually correct when they hold single-byte characters.
 
 =head3 The "wide character" warning
 
-If a non-ASCII/latin1 character does get into a Perl string,
-and that string is written to a non-encoding file handle,
-Perl will issue a warning "since that should not happen".
+If a non-ASCII/latin1 character does get into a Perl string
+which is written to a non-encoding file handle, Perl issues
+a warning because that should never happen.  It means
+the program is both Unicode-unaware and uses characters which
+require Unicode processing to always work correctly.
 See C<man perlunifaq>.
 
 Unicode-aware programs, if correctly written, 

@@ -250,56 +250,56 @@ fusemap:
         name: 8KCLK
         value: 176
 fuses:
-  - ACTIVE
-  - LVL
-  - SAMPFREQ
-  - SLEEP
-  - FREQSEL
-  - OSCLOCK
-  - CRCSRC
-  - EESAVE
-  - RSTPINCFG
-  - SUT
-  - CMPA
-  - CMPAEN
-  - CMPB
-  - CMPBEN
-  - CMPC
-  - CMPCEN
-  - CMPD
-  - CMPDEN
   - PERIOD
   - WINDOW
+  - SLEEP
+  - ACTIVE
+  - SAMPFREQ
+  - LVL
+  - FREQSEL
+  - OSCLOCK
+  - CMPA
+  - CMPB
+  - CMPC
+  - CMPD
+  - CMPAEN
+  - CMPBEN
+  - CMPCEN
+  - CMPDEN
+  - EESAVE
+  - RSTPINCFG
+  - CRCSRC
+  - SUT
 reginfos:
+  - default: 0
+    mask: 255
+    name: WDTCFG
+    offset: 4736
+  - default: 0
+    mask: 255
+    name: BODCFG
+    offset: 4737
+  - default: 126
+    mask: 131
+    name: OSCCFG
+    offset: 4738
+  - default: 0
+    mask: 255
+    name: TCD0CFG
+    offset: 4740
+  - default: 246
+    mask: 205
+    name: SYSCFG0
+    offset: 4741
+  - default: 255
+    mask: 7
+    name: SYSCFG1
+    offset: 4742
   - default: 0
     mask: 0
     name: APPEND
     offset: 4743
   - default: 0
-    mask: 255
-    name: BODCFG
-    offset: 4737
-  - default: 0
     mask: 0
     name: BOOTEND
     offset: 4744
-  - default: 2
-    mask: 131
-    name: OSCCFG
-    offset: 4738
-  - default: 196
-    mask: 205
-    name: SYSCFG0
-    offset: 4741
-  - default: 7
-    mask: 7
-    name: SYSCFG1
-    offset: 4742
-  - default: 0
-    mask: 255
-    name: TCD0CFG
-    offset: 4740
-  - default: 0
-    mask: 255
-    name: WDTCFG
-    offset: 4736

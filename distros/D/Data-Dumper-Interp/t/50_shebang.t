@@ -14,6 +14,7 @@ use lib $Bin;
 use t_Common ; # strict, warnings, Carp
 use t_TestCommon ':silent', # Test2::V0 etc.
                  qw/bug displaystr fmt_codestring timed_run 
+                    rawstr showstr showcontrols
                     mycheckeq_literal mycheck @quotes/;
 
 sub oops(@) {
@@ -175,7 +176,7 @@ foreach (
                           \$obj->$codestr ;   # discard dump result
                           \$obj->$confname()  # fetch effective setting
                         }";
-        confess("bug:@_ ") if $@;
+        confess("bug:$@ ") if $@;
         confess("\$Data::Dumper::Interp::$confname value is not preserved by $codestr\n",
             "(Set \$Data::Dumper::Interp::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n")
           unless (! defined($v) and ! defined($value))

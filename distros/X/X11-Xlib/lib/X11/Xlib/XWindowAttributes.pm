@@ -41,6 +41,56 @@ with L<XGetWindowAttributes|X11::Xlib/XGetWindowAttributes>.
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item all_event_masks
+
+=item backing_pixel
+
+=item backing_planes
+
+=item backing_store
+
+=item bit_gravity
+
+=item border_width
+
+=item class
+
+=item colormap
+
+=item depth
+
+=item do_not_propagate_mask
+
+=item height
+
+=item map_installed
+
+=item map_state
+
+=item override_redirect
+
+=item root
+
+=item save_under
+
+=item screen
+
+=item visual
+
+=item width
+
+=item win_gravity
+
+=item x
+
+=item y
+
+=item your_event_mask
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

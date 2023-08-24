@@ -1,6 +1,26 @@
 Revision history for App-DBBrowser
 
 
+2.339  2023-08-20
+        - Added ODBC plugin.
+        - Update alias derived tables.
+        - Rearrangements in the option menu.
+        - Bugfix: removed support for the environment variable DBI_DSN.
+        - Renamed function 'instr' to 'position'.
+
+2.338_03  2023-08-19
+        - Added ODBC-plugin.
+        - Bugfix: removed support for the environment variable DBI_DSN.
+        - Refactoring limit-offset and scalar functions.
+        - Renamed function 'instr' to 'position'.
+
+2.338_02  2023-08-16
+        - Rearrangements in the option menu.
+
+2.338_01  2023-08-16
+        - Some support for the ODBC driver.
+        - Update alias derived tables.
+
 2.338     2023-08-14
         - Fixed wrong module name in ScalarFunctions.pm.
 

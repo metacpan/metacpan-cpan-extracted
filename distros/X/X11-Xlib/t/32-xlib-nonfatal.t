@@ -49,7 +49,7 @@ $conn->on_error(sub {
 
 ok( $X11::Xlib::_error_nonfatal_installed,  'nonfatal handler installed' );
 
-# Cause a nonfatal error by un-mapping the root
+# Cause a nonfatal error by unmapping the root
 $conn->XQueryTree(0x1234567);
 $conn->XSync;
 

@@ -1,5 +1,5 @@
 package Form::Tiny::Form;
-$Form::Tiny::Form::VERSION = '2.19';
+$Form::Tiny::Form::VERSION = '2.21';
 use v5.10;
 use strict;
 use warnings;
@@ -57,9 +57,9 @@ sub _ft_clear_form
 
 sub _ft_mangle_field
 {
-	my ($self, $def, $path_value, $out_ref) = @_;
+	my ($self, $def, $out_ref) = @_;
 
-	my $current = $out_ref ? $path_value : $path_value->{value};
+	my $current = $$out_ref;
 
 	# We got the parameter, now we have to check if it is not empty
 	# Even if it is, it may still be handled if isn't hard-required
@@ -71,12 +71,7 @@ sub _ft_mangle_field
 			$current = $def->get_adjusted($self, $current);
 		}
 
-		if ($out_ref) {
-			$$out_ref = $current;
-		}
-		else {
-			$path_value->{value} = $current;
-		}
+		$$out_ref = $current;
 
 		return 1;
 	}
@@ -94,15 +89,12 @@ sub _ft_validate_flat
 		my $curr_f = $validator->name;
 
 		if (exists $fields->{$curr_f}) {
-			next if $self->_ft_mangle_field(
-				$validator,
-				(
-					$inline_hook
-					? $inline_hook->($self, $validator, $fields->{$curr_f})
-					: $fields->{$curr_f}
-				),
-				\$dirty->{$curr_f}
-			);
+			$dirty->{$curr_f} = $inline_hook
+				? $inline_hook->($self, $validator, $fields->{$curr_f})
+				: $fields->{$curr_f}
+				;
+
+			next if $self->_ft_mangle_field($validator, \$dirty->{$curr_f});
 		}
 
 		# for when it didn't pass the existence test
@@ -125,19 +117,17 @@ sub _ft_validate_nested
 		my $current_data = Form::Tiny::Utils::_find_field($fields, $validator);
 		if (defined $current_data) {
 			my $all_ok = 1;
-			my @to_assign;
 
 			# This may have multiple iterations only if there's an array
 			foreach my $path_value (@$current_data) {
-				unless ($path_value->{structure}) {
-					$path_value->{value} = ($inline_hook->($self, $validator, $path_value->{value}))
-						if $inline_hook;
-					$all_ok = $self->_ft_mangle_field($validator, $path_value) && $all_ok;
-				}
-				push @to_assign, $path_value;
+				next if $path_value->[2];
+
+				$path_value->[1] = ($inline_hook->($self, $validator, $path_value->[1]))
+					if $inline_hook;
+				$all_ok = $self->_ft_mangle_field($validator, \$path_value->[1]) && $all_ok;
 			}
 
-			Form::Tiny::Utils::_assign_field($dirty, $validator, \@to_assign);
+			Form::Tiny::Utils::_assign_field($dirty, $validator, $current_data);
 
 			# found and valid, go to the next field
 			next if $all_ok;
@@ -148,12 +138,7 @@ sub _ft_validate_nested
 			Form::Tiny::Utils::_assign_field(
 				$dirty,
 				$validator,
-				[
-					{
-						path => $validator->get_name_path->path,
-						value => $validator->get_default($self),
-					}
-				]
+				[[$validator->get_name_path->path, $validator->get_default($self)]]
 			);
 		}
 		elsif ($validator->required) {

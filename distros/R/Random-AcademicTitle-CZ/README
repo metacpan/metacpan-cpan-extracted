@@ -1,0 +1,85 @@
+NAME
+    Random::AcademicTitle::CZ - Class for random Czech academic title.
+
+SYNOPSIS
+     use Random::AcademicTitle::CZ;
+
+     my $obj = Random::AcademicTitle::CZ->new(%params);
+     my $title_after = $obj->random_title_after;
+     my $title_before = $obj->random_title_before;
+
+METHODS
+  "new"
+     my $obj = Random::AcademicTitle::CZ->new(%params);
+
+    Constructor.
+
+    *       "old"
+
+            Flag for set old titles.
+
+            Default value is 0.
+
+  "random_title_after"
+     my $dt = $obj->random_title_after;
+
+    Get random academic title after name.
+
+    Returns string.
+
+  "random_title_before"
+     my $dt = $obj->random_title_before;
+
+    Get random academic title before name.
+
+    Returns string.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Random::AcademicTitle::CZ;
+
+     # Object.
+     my $obj = Random::AcademicTitle::CZ->new;
+
+     # Get titles.
+     my $title_after = $obj->random_title_after;
+     my $title_before = $obj->random_title_before;
+
+     # Print out.
+     print "Title before: $title_before\n";
+     print "Title after: $title_after\n";
+
+     # Output like:
+     # Title before: JUDr.
+     # Title after: Th.D.
+
+DEPENDENCIES
+    Class::Utils, Readonly.
+
+SEE ALSO
+    Mock::Person::CZ
+        Generate random sets of Czech names.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Random-AcademicTitle-CZ>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

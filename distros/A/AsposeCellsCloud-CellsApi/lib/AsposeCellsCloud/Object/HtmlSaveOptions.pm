@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::ImageOrPrintOptions;
 use AsposeCellsCloud::Object::SaveOptions; 
 
 
@@ -125,6 +126,41 @@ __PACKAGE__->class_documentation({description => '',
 
 
 __PACKAGE__->method_documentation({
+     'export_page_headers' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportPageHeaders',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_page_footers' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportPageFooters',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'export_row_column_headings' => {
+     	datatype => 'boolean',
+     	base_name => 'ExportRowColumnHeadings',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'show_all_sheets' => {
+     	datatype => 'boolean',
+     	base_name => 'ShowAllSheets',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'image_options' => {
+     	datatype => 'ImageOrPrintOptions',
+     	base_name => 'ImageOptions',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_as_single_file' => {
      	datatype => 'boolean',
      	base_name => 'SaveAsSingleFile',
@@ -415,6 +451,11 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'export_page_headers' => 'boolean',
+    'export_page_footers' => 'boolean',
+    'export_row_column_headings' => 'boolean',
+    'show_all_sheets' => 'boolean',
+    'image_options' => 'ImageOrPrintOptions',
     'save_as_single_file' => 'boolean',
     'export_hidden_worksheet' => 'boolean',
     'export_grid_lines' => 'boolean',
@@ -459,6 +500,11 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
+    'export_page_headers' => 'ExportPageHeaders',
+    'export_page_footers' => 'ExportPageFooters',
+    'export_row_column_headings' => 'ExportRowColumnHeadings',
+    'show_all_sheets' => 'ShowAllSheets',
+    'image_options' => 'ImageOptions',
     'save_as_single_file' => 'SaveAsSingleFile',
     'export_hidden_worksheet' => 'ExportHiddenWorksheet',
     'export_grid_lines' => 'ExportGridLines',

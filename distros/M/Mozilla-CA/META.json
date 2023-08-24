@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Mozilla's CA cert bundle in PEM format",
    "author" : [
       "Gisle Aas <gisle@activestate.com>"
    ],
@@ -48,6 +48,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#lwp"
    },
-   "version" : "20230807",
+   "version" : "20230821",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

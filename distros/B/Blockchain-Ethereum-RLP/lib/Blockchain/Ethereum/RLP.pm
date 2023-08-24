@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::RLP 0.006;
+package Blockchain::Ethereum::RLP 0.007;
 class Blockchain::Ethereum::RLP;
 
 =encoding utf8

@@ -31,7 +31,7 @@
    "provides" : {
       "Sys::Tlock" : {
          "file" : "lib/Sys/Tlock.pm",
-         "version" : "1.1"
+         "version" : "1.11"
       },
       "Sys::Tlock::Config" : {
          "file" : "lib/Sys/Tlock/Config.pm"
@@ -49,6 +49,6 @@
          "url" : "https://github.com/spragl/Tlock"
       }
    },
-   "version" : "1.1",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

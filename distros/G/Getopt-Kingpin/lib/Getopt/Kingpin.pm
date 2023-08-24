@@ -10,7 +10,7 @@ use File::Basename;
 use Carp;
 use Scalar::Util qw(blessed);
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use overload (
     '""' => sub {$_[0]->name},

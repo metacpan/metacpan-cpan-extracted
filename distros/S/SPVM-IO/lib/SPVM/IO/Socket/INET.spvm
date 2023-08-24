@@ -148,9 +148,11 @@ class IO::Socket::INET extends IO::Socket {
     # Blocking option
     # Listen option
     $self->SUPER::init($new_options);
-
+    
     $options_h->delete("Domain");
     $options_h->delete("Type");
+    $options_h->delete("Blocking");
+    $options_h->delete("Timeout");
     for my $key (@{$options_h->keys}) {
       die "The \"$key\" option is not available";
     }

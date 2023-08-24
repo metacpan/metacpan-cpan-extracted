@@ -6,15 +6,18 @@ use Object::Simple -base;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 our $types;
 sub AUTOLOAD {
     my $self = shift;
+    my (@args) = @_;
     my $func = our $AUTOLOAD;
     $func =~ s/.*:://;
     my $type = _camelize($func);
 
     $self->_set_types($type);
+
+    $self->_set_options(@args);
 
     $self->type($type);
 
@@ -56,6 +59,13 @@ sub _set_types {
     }
 }
 
+sub _set_options {
+    my $self = shift;
+    my @options = @_;
+
+    $self->{_options} = \@options;
+}
+
 sub _camelize {
     my $c = shift;
     $c =~ s/(^|_)(.)/uc($2)/ge;
@@ -79,6 +89,7 @@ has _envar        => undef;
 has type          => "String";
 has _required     => 0;
 has index         => 0;
+has _options      => sub { [] };
 
 sub short {
     my $self = shift;

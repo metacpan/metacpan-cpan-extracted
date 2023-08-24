@@ -1,5 +1,25 @@
 Revision history for CXC-Form-Tiny-Plugin-OptArgs2
 
+0.08      2023-08-22 09:52:55-04:00 America/New_York
+
+  [ENHANCMENT]
+
+    * Add type map from Type::Tiny Any to Str
+    * clarify use of Plugins to set Plugin options for a form
+
+0.07      2023-08-18 23:22:30-04:00 America/New_York
+
+  [BUILD]
+
+    * Add more missing dependencies. ++BINGOS
+
+0.06      2023-08-18 14:18:45-04:00 America/New_York
+
+  [BUILD]
+
+    * Add missing test dependency on Package::Variant
+    * fix incorrect bug report and repo url/emails ++BRTASTIC
+
 0.05      2023-08-17 11:44:23-04:00 America/New_York
 
   [REPO FIX]

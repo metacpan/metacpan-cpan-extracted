@@ -3,17 +3,16 @@
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and 
 # related or neighboring rights to the content of this file.  
 # Attribution is requested but is not required.
+package Mydump;
+
+use ODF::lpOD_Helper;
+use t_Common qw/oops/; # strict, warnings, Carp, utf8 etc.
 use strict; use warnings  FATAL => 'all'; 
 use feature qw/say state current_sub/;
-
-package Mydump;
 
 require Exporter;
 use parent 'Exporter';
 our @EXPORT = qw/mydump/;
-
-use ODF::lpOD_Helper qw/:chars fmt_tree/;
-use t_Common qw/oops/; # strict, warnings, Carp, utf8 etc.
 
 sub mydump_old($;@) {
   my ($top, @args) = @_;
@@ -26,7 +25,7 @@ sub mydump_old($;@) {
     foreach my $seg ($para->descendants_or_self(
                        qr/^(#PCDATA|text:tab|text:line-break|text:s)$/)) {
       #local $_ = $seg->get_text();
-      local $_ = ODF::lpOD_Helper::__element2vtext($seg);
+      local $_ = ODF::lpOD_Helper::__leaf2vtext($seg);
       while (/\G[^\n]*\n/gsc || /\G[^\n]+/gsc) {
         my $len = length($&);
         my $s = $&;
@@ -46,7 +45,7 @@ sub mydump_old($;@) {
       $msg .= $pilcrow."[empty paragraph]\n";
     }
   }
-  "(old style)\n".$msg
+  $msg
 }
 sub mydump_new($;@) {
   my ($top, @args) = @_;
@@ -118,7 +117,7 @@ sub mydump_new($;@) {
   }
   $level_discount = $top->level;
   append($top, '');
-  "(new style)\n".$msg
+  $msg
 }
 sub mydump_twig_dump($;@) {
   my $top = shift;
@@ -151,7 +150,6 @@ sub mydump_twig_print($;@) {
 }
 sub mydump_fmt_tree($;@) {
   my $top = shift;
-  #"(fmt_tree)" .  fmt_tree($top);
   fmt_tree($top); # starts with characteristic "--------" separator
 }
 
@@ -164,25 +162,28 @@ sub mydump($;$@) {
   croak "opts must be a {hashref}" unless ref($opts) eq "HASH";
   croak "return_only is no longer an option" if $opts->{return_only};
   my $kind = $opts->{dump_kind} // $opts->{kind} // $DumpKind // oops;
-  $kind =~ s/^old.*/1/i;
-  $kind =~ s/^new.*/2/i;
-  $kind =~ s/^t\w*dump.*/3/i;  # e.g. twigdump
-  $kind =~ s/^t\w*print.*/5/i;
+  my $num = $kind;
+  $num =~ s/^old.*/1/i;
+  $num =~ s/^new.*/2/i;
+  $num =~ s/^t\w*dump.*/3/i;  # e.g. twigdump
+  $num =~ s/^t\w*print.*/5/i;
 
-  my $result;
-  if    ($kind eq 1) { $result = mydump_old(       $obj, @other_args) }
-  elsif ($kind eq 2) { $result = mydump_new(       $obj, @other_args) }
-  elsif ($kind eq 3) { $result = mydump_twig_dump( $obj, @other_args) }
-  elsif ($kind eq 4) { $result = mydump_twig_print($obj, @other_args) }
-  elsif ($kind eq 5) { $result = mydump_fmt_tree(  $obj, @other_args) }
-  else { 
-    die "mydump: Unknown kind '$kind'\n",
-        "  1 -> old hand-coded\n",
-        "  2 -> new hand-coded\n",
-        "  3 -> XML::Twig _dump\n",
-        "  4 -> XML::Twig sprint\n",
-        "  5 -> fmt_tree\n";
-  }
+  state $num2funcname = {
+    1 => "mydump_old",
+    2 => "mydump_new",
+    3 => "mydump_twig_dump",
+    4 => "mydump_twig_print",
+    5 => "mydump_fmt_tree",
+  };
+  my $funcname = $num2funcname->{$num} // do{
+    die "mydump: Unknown kind '${kind}'\n",
+        join("\n", map{ "  $_ -> ".$num2funcname->{$_} } 
+                   sort {$a <=> $b} keys %$num2funcname
+            ), "\n";
+  };
+
+  no strict 'refs';
+  my $result = "=== $funcname ===\n". &{$funcname}($obj, @other_args);
 
   $result;
 }

@@ -61,9 +61,11 @@ confess "unexpected" if $verbose or $debug;
   # in here; so include the caller's file/lno in the description.
   my ($file, $lno) = (caller(0))[1,2];
   $file = basename($file);
-  my $diag = $show_output ? "" : "OUT:<<$out>>\nERR:<<$err>>\n";
-  
-  is($wstat, ($exp_exit << 8), sprintf("(WSTAT=0x%x)",$wstat)." ${file}:$lno $desc", $diag);
+  my $diag = "COMMAND: ".qshlist($progpath, @extraargs, $in1, $in2)."\n"
+             .($show_output ? "" : "OUT:<<$out>>\nERR:<<$err>>\n");
+  is($wstat, 
+     ($exp_exit << 8), 
+     sprintf("(WSTAT=0x%x)",$wstat)." ${file}:$lno $desc", $diag);
 
   # Don't check STDERR if 'debug' is enabled, as it may be full of tracing
   if (!$debug) {

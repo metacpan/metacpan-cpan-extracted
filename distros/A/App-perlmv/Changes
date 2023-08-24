@@ -1,3 +1,9 @@
+0.607   2023-06-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Split scriptlet add_extension_according_to_mime_type to its own
+          distro to minimize dependencies.
+
+
 0.606   2022-06-24  Released-By: PERLANCAR; Urgency: medium
 
         - Add scriptlet: add-extension-according-to-mime-type.

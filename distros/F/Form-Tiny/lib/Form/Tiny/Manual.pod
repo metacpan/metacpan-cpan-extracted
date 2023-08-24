@@ -57,8 +57,6 @@ constraints you're already familiar with. The module does not ship with any
 field definitions on its own, instead it provides tools to reuse any type
 constraints from L<Type::Tiny> and other similar systems.
 
-=head2 Policy
-
 L<Form::Tiny> is designed to be a comprehensive data validation and filtering
 system based on existing validation solutions. Type::Tiny libraries cover most
 of the validation and coercion needs in models, and now with Form::Tiny they

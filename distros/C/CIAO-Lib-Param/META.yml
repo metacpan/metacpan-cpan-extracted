@@ -1,13 +1,58 @@
---- #YAML:1.0
-name:                CIAO-Lib-Param
-version:             0.08
-abstract:            an interface to the CIAO parameter library.
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'An interface to the CIAO parameter library.'
 author:
-    - Diab Jerius <dj@cfa.harvard.edu>
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  constant: '0'
+configure_requires:
+  Alien::CXC::param: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CIAO-Lib-Param
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  CIAO::Lib::Param:
+    file: lib/CIAO/Lib/Param.pm
+    version: '0.09'
+  CIAO::Lib::Param::Error:
+    file: lib/CIAO/Lib/Param.pm
+    version: '0.09'
+requires:
+  Alien::Base::Wrapper: '0'
+  Alien::CXC::param: '0.03'
+  Carp: '0'
+  Exporter: '0'
+  XSLoader: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CIAO-Lib-Param
+  repository: https://gitlab.com/djerius/ciao-lib-param.git
+version: '0.09'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

@@ -3,7 +3,7 @@ Tk::SimpleFileSelect.pm installation.
 System Requirements:
 
 1.  A Unix or derivative operating system.
-2.  Perl version 5.005 or greater.
+2.  Perl version 5.8.0 or greater.
 3.  Perl/Tk, version 800 or later.
 4.  GNU make.
 

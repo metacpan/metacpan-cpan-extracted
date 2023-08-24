@@ -2,7 +2,7 @@ package Crypt::OpenSSL::Hash2Curve;
 
 use strict;
 use warnings;
-use bignum;
+#use bignum;
 
 use Carp;
 
@@ -11,12 +11,12 @@ use AutoLoader;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::Base::Func;
-use Math::BigInt;
-use POSIX;
+#use Math::BigInt;
+use POSIX qw/ceil/;
 #use Data::Dump qw/dump/;
 #use Smart::Comments;
 
-our $VERSION = '0.031';
+our $VERSION = '0.033';
 
 our @ISA = qw(Exporter);
 
@@ -172,12 +172,11 @@ sub sn2k_m {
 sub hash_to_field {
   my ( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func ) = @_;
 
-  my $p_bin    = $p->to_bin();
-  my $p_bigint = Math::BigInt->from_bytes( $p_bin );
+  my $ctx = Crypt::OpenSSL::Bignum::CTX->new();
 
-  my $L = Math::BigInt->from_bytes( $p_bin );
-  $L = $L->blog( 2 )->bceil()->numify();
+  my $L = $p->num_bits;
   $L = ceil(($L + $k)/8);
+  ### $L
 
   my $len_in_bytes  = $count * $m * $L;
   ### len_in_bytes: $len_in_bytes
@@ -190,21 +189,13 @@ sub hash_to_field {
     for my $j ( 0 .. $m - 1 ) {
       my $elm_offset = $L * ( $j + $i * $m );
       my $tv         = substr( $uniform_bytes, $elm_offset, $L );
-      ### $elm_offset
-      ### $L
-      ### tv: unpack("H*", $tv)
-      my $tv_bn      = Math::BigInt->from_bytes( $tv );           # from hexadecimal
-      $tv_bn->bmod( $p_bigint );
 
-      #my $e_j = $tv_bn->to_hex();
-      my $e_j   = $tv_bn->to_bytes();
-      ### e_j: unpack("H*", $e_j)
-      my $e_j_u = Crypt::OpenSSL::Bignum->new_from_bin( $e_j );
-
-      ### e_j_u hex: $e_j_u->to_hex()
-      ### e_j_u decimal: $e_j_u->to_decimal()
+      my $tv_bn =  Crypt::OpenSSL::Bignum->new_from_bin( $tv );
+      my $reminder = $tv_bn->mod($p, $ctx);
+      ### reminder: $reminder->to_hex()
+      ### reminder: $reminder->to_decimal()
       
-      push @u, $e_j_u;
+      push @u, $reminder;
     }
     push @res, \@u;
   }
@@ -217,9 +208,15 @@ sub expand_message_xmd {
   #my $h_r = Crypt::OpenSSL::EVP::MD->new( $hash_name );
   my $h_r = EVP_get_digestbyname( $hash_name );
 
+  my $hash_size = EVP_MD_get_size( $h_r );
   #my $ell = ceil( $len_in_bytes / $h_r->size() );
-  my $ell = ceil( $len_in_bytes / EVP_MD_size( $h_r ) );
+  #my $ell = ceil( $len_in_bytes / $hash_size );
+  my $ell = ceil( $len_in_bytes / $hash_size );
   return if ( $ell > 255 );
+
+  ### len_in_bytes: $len_in_bytes
+  ### md get size : EVP_MD_get_size( $h_r )
+  ### ell: $ell
 
   my $DST_len     = length( $DST );
   my $DST_len_hex = pack( "C*", $DST_len );
@@ -229,8 +226,7 @@ sub expand_message_xmd {
   ### DST_len_hex: unpack("H*", $DST_len_hex)
   ### DST_prime: unpack("H*", $DST_prime)
   
-  #my $rn    = $h_r->block_size() * 2;
-  my $rn    = EVP_MD_block_size( $h_r ) * 2;
+  my $rn    = EVP_MD_get_block_size( $h_r ) * 2;
   my $Z_pad = pack( "H$rn", '00' );
 
   my $l_i_b_str = pack( "S>", $len_in_bytes );
@@ -243,7 +239,11 @@ sub expand_message_xmd {
   my $len       = pack( "C*", 1 );
   my $b0        = digest( $h_r, $msg_prime );
 
+
   my $b1 = digest( $h_r, $b0 . $len . $DST_prime );
+
+  ### b0: unpack("H*", $b0)
+  ### b1: unpack("H*", $b1)
 
   #my $b0  = $h_r->digest( $msg_prime );
   #my $b1  = $h_r->digest( $b0 . $len . $DST_prime );
@@ -253,11 +253,17 @@ sub expand_message_xmd {
   for my $i ( 2 .. $ell ) {
     my $tmp = ( $b0 ^ $b_prev ) . pack( "C*", $i ) . $DST_prime;
     my $bi  = digest( $h_r, $tmp );
+
+    ### bi: unpack("H*", $bi)
+
     $uniform_bytes .= $bi;
     $b_prev = $bi;
   }
 
+  ### uniform_bytes: unpack("H*", $uniform_bytes)
   my $res = substr( $uniform_bytes, 0, $len_in_bytes );
+  ### res: unpack("H*", $res)
+
   return $res;
 } ## end sub expand_message_xmd
 

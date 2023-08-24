@@ -17,8 +17,8 @@ no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.002'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-08-16'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-08-23'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
@@ -63,7 +63,7 @@ our @EXPORT    = qw( visnew
                      u quotekey qsh qshlist qshpath
                    );
 
-our @EXPORT_OK = qw(set_addrvis_digits
+our @EXPORT_OK = qw(addrvis_digits
 
                     $Debug $MaxStringwidth $Truncsuffix $Objects $Foldwidth
                     $Useqq $Quotekeys $Sortkeys
@@ -74,6 +74,30 @@ our %EXPORT_TAGS = (
 );
 
 sub _generate_sub($;$); # forward
+
+#---------------------------------------------------------------------------
+my $sane_cW = $^W;
+my $sane_cH = $^H;
+our @save_stack;
+sub _SaveAndResetPunct() {
+  # Save things which will later be restored
+  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
+  # Reset sane values
+  $,  = "";       # output field separator is null string
+  $/  = "\n";     # input record separator is newline
+  $\  = "";       # output record separator is null string
+  $?  = 0;        # child process exit status
+  $^W = $sane_cW; # our load-time warnings
+  #$^H = $sane_cH; # our load-time pragmas (strict etc.)
+}
+sub _RestorePunct_NoPop() {
+  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ $save_stack[-1] };
+}
+sub _RestorePunct() {
+  &_RestorePunct_NoPop;
+  pop @save_stack;
+}
+#---------------------------------------------------------------------------
 
 our $AUTOLOAD_debug;
 
@@ -137,11 +161,12 @@ sub import {
 
 sub AUTOLOAD {  # invoked on call to undefined *method*
   our $AUTOLOAD;
-  # TODO: oops un
+  _SaveAndResetPunct();
   our $Debug;
   local $Debug = $AUTOLOAD_debug;
   carp "AUTOLOAD $AUTOLOAD" if $Debug;
   _generate_sub($AUTOLOAD);
+  _RestorePunct();
   no strict 'refs';
   goto &$AUTOLOAD;
 }
@@ -150,7 +175,7 @@ sub AUTOLOAD {  # invoked on call to undefined *method*
 ############################################################################
 # Internal debug-message utilities
 
-sub oops(@) { @_=("\n".__PACKAGE__." oops:\n",@_,"\n"); goto &Carp::confess }
+sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
 sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
 sub btw(@) { unshift @_,0; goto &btwN }
 
@@ -328,12 +353,14 @@ sub addrvisl(_) {
   # Return bare "hex:dec" or "Typename hex:dec"
   &addrvis =~ s/^([^\<]*)\<(.*)\>$/ $1 ? "$1 $2" : $2 /er or oops
 }
-sub set_addrvis_digits($) {
+sub addrvis_digits(;$) {
+  return $addrvis_ndigits if ! defined $_[0];  # "get" request
   if ($_[0] <= $addrvis_ndigits) { 
-    return # can not decrease
+    return $addrvis_ndigits; # can not decrease
   }
   $addrvis_ndigits   = $_[0];
   %$addrvis_dec_abbrs = map{ (_abbr_dec($_) => undef) } keys %$addrvis_seen;
+  $addrvis_ndigits;
 }
 sub addrvis_forget() {
   $addrvis_seen      = {};
@@ -341,7 +368,7 @@ sub addrvis_forget() {
   $addrvis_ndigits = 3;
 }
 
-=for Pod::Coverage set_addrvis_digits addrvis_forget
+=for Pod::Coverage addrvis_digits addrvis_forget
 
 =cut
 
@@ -395,30 +422,6 @@ sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
 # Should this have been called 'aqsh' ?
 sub qshlist(@) { join " ", map{qsh} @_ }
 
-#---------------------------------------------------------------------------
-
-my $sane_cW = $^W;
-my $sane_cH = $^H;
-our @save_stack;
-sub _SaveAndResetPunct() {
-  # Save things which will later be restored
-  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
-  # Reset sane values
-  $,  = "";       # output field separator is null string
-  $/  = "\n";     # input record separator is newline
-  $\  = "";       # output record separator is null string
-  $?  = 0;        # child process exit status
-  $^W = $sane_cW; # our load-time warnings
-  #$^H = $sane_cH; # our load-time pragmas (strict etc.)
-}
-sub _RestorePunct_NoPop() {
-  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ $save_stack[-1] };
-}
-sub _RestorePunct() {
-  &_RestorePunct_NoPop;
-  pop @save_stack;
-}
-
 ########### Subs callable as either a Function or Method #############
 
 sub __getself { # Return $self if passed or else create a new object
@@ -448,7 +451,7 @@ sub _generate_sub($;$) {
   my ($arg, $proto_only) = @_;
   (my $methname = $arg) =~ s/.*:://;
   my sub error($) {
-    croak "Invalid sub/method name '$methname' (@_)\n"
+    confess "Invalid sub/method name '$methname' (@_)\n"
   }
 
   # Method names are ivis, dvis, vis, avis, or hvis with prepended
@@ -456,8 +459,8 @@ sub _generate_sub($;$) {
   # optional underscore separators.
   local $_ = $methname;
 
-  s/alvis/avisl/;  # Allow 'alvis' for backwards compat.
-  s/hlvis/hvisl/;  # Allow 'hlvis' for backwards compat.
+  s/alvis/avisl/;  # backwards compat.
+  s/hlvis/hvisl/;  # backwards compat.
 
   s/^[^diha]*\K(?:lvis|visl)/avisl/; # 'visl' same as 'avisl' for bw compat.
 
@@ -514,6 +517,7 @@ sub _generate_sub($;$) {
     $code .= "->Maxdepth($N)" if defined($N);
     $code .= '->Objects(0)'   if delete $mod{o};
     $code .= '->Useqq(0)'     if delete $mod{q};
+    $code .= '->Useqq("unicode:controlpics")' if delete $mod{c};
     $code .= '->Refaddr(1)'   if delete $mod{r};
 
     if ($basename =~ /^([id])vis/) {
@@ -582,14 +586,20 @@ sub _set_default_Foldwidth() {
   undef $Foldwidth1;
 }
 
-my $unique = substr(refaddr \&oops,-5);
-my $magic_noquotes_pfx   = "|NQMagic$unique|";
-my $magic_keepquotes_pfx = "|KQMagic$unique|";
-my $magic_refaddr        = "|RAMagic$unique|";
-my $magic_elide_next     = "|ENMagic$unique|";
+use constant _UNIQUE => substr(refaddr \&oops,-5);
+use constant {
+  _MAGIC_NOQUOTES_PFX   => "|NQMagic${\_UNIQUE}|",
+  _MAGIC_KEEPQUOTES_PFX => "|KQMagic${\_UNIQUE}|",
+  _MAGIC_REFADDR        => "|RAMagic${\_UNIQUE}|",
+  _MAGIC_ELIDE_NEXT     => "|ENMagic${\_UNIQUE}|",
+};
 
 #---------------------------------------------------------------------------
+my  $my_maxdepth;
+our $my_visit_depth = 0;
+
 my ($maxstringwidth, $truncsuffix, $objects, $opt_refaddr, $listform, $debug);
+my ($sortkeys);
 
 sub _Do {
   oops unless @_ == 1;
@@ -600,6 +610,7 @@ sub _Do {
 
   ($maxstringwidth, $truncsuffix, $objects, $opt_refaddr, $listform, $debug)
     = @$self{qw/MaxStringwidth Truncsuffix Objects Refaddr _Listform Debug/};
+  $sortkeys = $self->Sortkeys;
 
   $maxstringwidth = 0 if ($maxstringwidth //= 0) >= INT_MAX;
   $truncsuffix //= "...";
@@ -610,6 +621,11 @@ sub _Do {
   my $original = $orig_values[0];
   btw "##ORIGINAL=",u($original),"=",_dbvis($original) if $debug;
 
+  # Allow one extra level if we wrapped the user's args in __getself_[ah]
+  $my_maxdepth = $self->Maxdepth || INT_MAX;
+  ++$my_maxdepth if $listform && $my_maxdepth < INT_MAX;
+
+  oops unless $my_visit_depth == 0;
   my $modified = $self->visit($original); # see Data::Visitor
   btw "## DD input : ",_dbvis($modified) if $debug;
   $self->dd->Values([$modified]);
@@ -617,12 +633,17 @@ sub _Do {
   # Always call Data::Dumper with Indent(0) and Pad("") to get a single
   # maximally-compact string, and then manually fold the result to Foldwidth,
   # inserting the user's Pad before each line *except* the first.
+  #
+  # Also disable Maxdepth because we did it ourself (see visit_ref).
+  my $users_Maxdepth = $self->Maxdepth; # implemented by D::D
+  $self->Maxdepth(0);
   my $users_pad = $self->Pad();
   $self->Pad("");
 
   my ($dd_result, $our_result);
   my ($sAt, $sQ) = ($@, $?);
   { my $dd_warning = "";
+
     { local $SIG{__WARN__} = sub{ $dd_warning .= $_[0] };
       eval{ $dd_result = $self->dd->Dump };
     }
@@ -634,6 +655,7 @@ sub _Do {
   }
   ($@, $?) = ($sAt, $sQ);
   $self->Pad($users_pad);
+  $self->Maxdepth($users_Maxdepth);
 
   $our_result //= $self->_postprocess_DD_result($dd_result, $original);
 
@@ -679,7 +701,7 @@ btw '@@@repl overloaded ',"\'$class\'" if $debug;
           if $overload_depth++ > 10;
         # Stringify objects which have the stringification operator
         if (overload::Method($class,'""')) {
-          my $prefix = _show_as_number($item) ? $magic_noquotes_pfx : "";
+          my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX : "";
 btw '@@@repl prefix="',$prefix,'"' if $debug;
           $item = $item.""; # stringify;
           if ($item !~ /^${class}=REF/) {
@@ -725,7 +747,7 @@ btw '@@@repl (overload...)' if $debug;
         # No overloaded operator (that we care about);
         # substitute addrvis(obj)
 btw '@@@repl (no overload repl, not Regexp)' if $debug;
-        $item = ${magic_noquotes_pfx}.addrvis($item);
+        $item = _MAGIC_NOQUOTES_PFX.addrvis($item);
       }
     }
   }#CHECKObject
@@ -734,7 +756,7 @@ btw '@@@repl (no overload repl, not Regexp)' if $debug;
 
 sub visit_value {
   my $self = shift;
-  say "!V value ",_dbravis2(@_) if $debug;
+  say "!V value ",_dbravis2(@_)," depth:$my_visit_depth" if $debug;
   my $item = shift;
   # N.B. Not called for hash keys (short-circuited in visit_hash_key)
 
@@ -763,8 +785,8 @@ sub visit_value {
   #     to appear unquoted.
   #
   if (looks_like_number($item) && $item !~ /^0\d/) {
-    my $prefix = _show_as_number($item) ? $magic_noquotes_pfx
-                                        : $magic_keepquotes_pfx ;
+    my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX
+                                        : _MAGIC_KEEPQUOTES_PFX ;
     $item = $prefix.$item;
 btw '@@@repl prefixed item:',$item if $debug;
   }
@@ -780,11 +802,11 @@ btw '@@@repl truncating ',substr($item,0,10),"..." if $debug;
 
 sub visit_hash_key {
   my ($self, $item) = @_;
-  say "!V visit_hash_key ",_dbravis2($item) if $debug;
+  say "!V visit_hash_key ",_dbravis2($item)," depth:$my_visit_depth" if $debug;
   return $item; # don't truncate or otherwise munge
 }
 
-sub _prefix_refaddr($$) {
+sub _prefix_refaddr($;$) {
   my ($item, $original) = @_;
   # If enabled by Refaddr(true):
   #
@@ -796,23 +818,32 @@ sub _prefix_refaddr($$) {
   # which happens if an object does not stringify or provide another overload
   # replacement -- see _object_subst().
   return $item unless $opt_refaddr;
-  my $pfx = addrvis(refaddr($original));
-  return $item if index($item,$pfx) >= 0;
-  $item = [ $magic_refaddr.$pfx, $item, $magic_elide_next, ];
+  my $pfx = addrvis(refaddr($original//$item));
+  my $ix = index($item,$pfx);
+say "_prefix_refaddr: pfx=$pfx ix=$ix original=",_dbvis1($original)," item=$item" if $debug;
+  return $item if $ix >= 0;
+  $item = [ _MAGIC_REFADDR.$pfx, $item, _MAGIC_ELIDE_NEXT, ];
   btwN 1, '@@@addrvis-prefixed object:',_dbvis2($item) if $debug;
   $item
-}
+}#_prefix_refaddr
 
 sub visit_object {
   my $self = shift;
   my $item = shift;
-  say "!V object a=",addrvis(refaddr $item)," item=",_dbvis1($item) if $debug;
+  say "!V object a=",addrvis(refaddr $item)," depth:$my_visit_depth"," item=",_dbvis1($item) if $debug;
   my $original = $item;
+
+  local $my_visit_depth = $my_visit_depth + 1;
+  # FIXME: with Objects(0) we should visit object internals so $my_maxdepth
+  #  can be applied correctly.  Currently we just leave object refs as-is
+  #  for D::D to expand, and Maxdepth will be handled incorrectly if the
+  #  is underneath a magic_refaddr wrapper or avis/hvis top wrapper.
 
   # First register the ref (to detect duplicates);
   # this calls visit_seen() which usually substitutes something
-  $item = $self->SUPER::visit_object($item);
-  say "!       new item=",_dbrvis2($item) if $debug;
+  my $nitem = $self->SUPER::visit_object($item);
+  say "!       (obj) new: ",_dbvis1($item), " --> ",_dbrvis2($nitem) if $debug;
+  $item = $nitem;
 
   $item = _prefix_refaddr($item, $original);
   $item
@@ -821,25 +852,43 @@ sub visit_object {
 sub visit_ref {
   my ($self, $item) = @_;
   if (ref($item) eq 'ARRAY') {
-    say "!V ref  A=",addrvis(refaddr $item)," item=",_dbavis2(@$item) if $debug;
+    say "!V ref  A=",addrvis(refaddr $item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbavis2(@$item) if $debug;
   } else {
-    say "!V ref  a=",addrvis(refaddr $item)," item=",_dbvis1($item) if $debug;
+    say "!V ref  a=",addrvis(refaddr $item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbvis1($item) if $debug;
   }
   my $original = $item;
 
-  # First descend into the structure, probably returning a clone
-  $item = $self->SUPER::visit_ref($item);
-  say "!       new item=",_dbrvis2($item) if $debug;
+  # The Refaddr option introduces [...] wrappers in the tree and so
+  # Data::Dumper's Maxdepth() option will not work as we intend.
+  # Therefore we implement Maxdepth ourself
+  if ($my_visit_depth >= $my_maxdepth) {
+    oops unless $my_visit_depth == $my_maxdepth;
+    $item = _MAGIC_NOQUOTES_PFX.addrvis($item);
+    say "!       maxdepth reached, returning ",_dbvis2($item) if $debug;
+    return $item
+  }
 
-  # Prefix whatever the representation is now with the original address
+  # First descend into the structure, probably returning a clone
+  local $my_visit_depth = $my_visit_depth + 1;
+  my $nitem = $self->SUPER::visit_ref($item);
+  say "!       (ref) new: ",_dbvis2($item), " --> ",_dbvis2($nitem) if $debug;
+  $item = $nitem;
+
+  # Prepend the original address to whatever the representation is now
   $item = _prefix_refaddr($item, $original);
 
   $item
 }
+sub visit_hash_entries {
+  my ($self, $hash) = @_;
+  # Visit in sorted order
+  return map { $self->visit_hash_entry( $_, $hash->{$_}, $hash ) } 
+             (ref($sortkeys) ? @{ $sortkeys->($hash) } : (sort keys %$hash));
+}
 
 sub visit_glob {
   my ($self, $item) = @_;
-  say "!V glob ref()=",ref($item)," item=",_dbravis2($item) if $debug;
+  say "!V glob ref()=",ref($item)," depth:$my_visit_depth"," item=",_dbravis2($item) if $debug;
   # By default Data::Visitor will create a new anon glob in the output tree.
   # Instead, put the original into the output so the user can recognize
   # it e.g. "*main::STDOUT" instead of an anonymous from Symbol::gensym
@@ -848,22 +897,24 @@ sub visit_glob {
 
 sub visit_seen {
   my ($self, $data, $first_result) = @_;
-  say "!V seen orig=",_dbrvis2($data),"  1stres=",_dbrvis2($first_result)
+  say "!V seen orig=",_dbrvis2($data)," depth:$my_visit_depth","  1stres=",_dbrvis2($first_result)
     if $debug;
+
+  # $data is a ref which has been visited before, i.e. there is a circularity.
+  # Data::Dumper will display a $VAR->... expression.
+  # With the Refaddr option the $VAR index may be incorrect due to the
+  # temporary [...] wrappers inserted into the cloned tree.
+  #
+  # Therefore if Refaddr is in effect substitute an addrvis() string
+  # which the user will be able to match with other refs to the same thing.
   if ($opt_refaddr) {
-    # The $VAR->... expression generated by Data::Dumper will show a wrong
-    # subscript because D::D will see the temporary wrapper array
-    # inserted by _prefix_refaddr().  Instead, just show addrvis($data)
-    # which will include the refaddr of the first-seen copy.
-    #
     my $t = ref($data);
-    return $magic_noquotes_pfx.addrvis(refaddr $data)."[...]" if $t eq "ARRAY";
-    return $magic_noquotes_pfx.addrvis(refaddr $data)."{...}" if $t eq "HASH";
-    return $magic_noquotes_pfx.addrvis($data);
+    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."[...]" if $t eq "ARRAY";
+    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."{...}" if $t eq "HASH";
+    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."\\..." if $t eq "SCALAR";
+    return _MAGIC_NOQUOTES_PFX.addrvis($data);
   }
-  # else: D::D's $VAR expression will correctly reflect the user's
-  #       data structure.   Should we always use addrvis, which
-  #       might avoid an undeletable circular clone???
+
   $first_result
 }
 
@@ -1101,11 +1152,19 @@ my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 my $addrvis_re = qr/\<\d+:[\da-fA-F]+\>/;
 
 sub __unmagic_atom() {  # edits $_
-  s/(['"])([^'"]*?)
-    (?:\Q$magic_noquotes_pfx\E)
-    (.*?)(\1)/$2$3/xgs;
+##  # FIXME this probably could omit the ([^'"]*?) bc there is never anything
+##  # between the open quote and the _MAGIC_NOQUOTES_PFX
+##  s/(['"])([^'"]*?)
+##    (?:\Q${\_MAGIC_NOQUOTES_PFX}\E)
+##    (.*?)(\1)/$2$3/xgs;
+  
+  s/(['"])
+    (?:\Q${\_MAGIC_NOQUOTES_PFX}\E) (.*?)
+    (\1)/do{ local $_ = $2;
+             s!\\(.)!$1!g;  # undo double-quotish backslash escapes
+             $_ }/xegs;
 
-  s/\Q$magic_keepquotes_pfx\E//gs;
+  s/\Q${\_MAGIC_KEEPQUOTES_PFX}\E//gs;
 }
 
 sub __unesc_unicode() {  # edits $_
@@ -1204,7 +1263,7 @@ sub _postprocess_DD_result {
 
   if ($debug) {
     our $_dbmaxlen = INT_MAX;
-    btw "## pp_DD fw1=",u($foldwidth1)," fw=",u($foldwidth)," pad='${pad}' maxll=$maxlinelen maxlNl=$maxlineNlen\n   result=",_dbrawstr($_);
+    btw "## DD result: fw1=",u($foldwidth1)," fw=",u($foldwidth)," pad='${pad}' maxll=$maxlinelen maxlNl=$maxlineNlen\n   result=",_dbrawstr($_);
   }
 
   my $top = { tlen => 0, children => [] };
@@ -1484,12 +1543,12 @@ sub _postprocess_DD_result {
   # Remove the magic wrapper created by _prefix_refaddr().  The original $ref
   # was replaced by
   #
-  #    [ $magic_refaddr.addrvis($ref), $ref, $magic_elide_next, ];
+  #    [ _MAGIC_REFADDR.addrvis($ref), $ref, _MAGIC_ELIDE_NEXT, ];
   #
   # Data::Dumper formatted the magic* items as "quoted strings"
   #
-  s/\[\s*(["'])\Q$magic_refaddr\E(.*?)\1,\s*/$2/gs;
-  s/,\s*(["'])\Q$magic_elide_next\E\1,?\s*\]//gs
+  s/\[\s*(["'])\Q${\_MAGIC_REFADDR}\E(.*?)\1,\s*/$2/gs;
+  s/,\s*(["'])\Q${\_MAGIC_ELIDE_NEXT}\E\1,?\s*\]//gs
     && $debug && btw "Unwrapped addrvis:",_dbvis($_);
 
   while ((pos()//0) < length) {
@@ -2077,7 +2136,7 @@ is returned, e.g. I<< "E<lt>457:1c9E<gt>" >>.
 I<"undef"> is returned if the argument is undefined.  
 Croaks if the argument is defined but not a ref.
 
-C<set_addrvis_digits(NUMBER)> forces a minimum width 
+C<addrvis_digits(NUMBER)> forces a minimum width 
 and C<addrvis_forget()> discards past values and resets to 3 digits.
 
 =head2 addrvisl REF_or_NUMBER

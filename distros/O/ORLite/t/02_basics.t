@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use Test::More tests => 74;
+use Test::Deep;
 use File::Spec::Functions ':ALL';
 use lib 't/lib';
 use LocalTest;
@@ -58,14 +59,14 @@ is( Foo::Bar->pragma('user_version'), 0, '->user_version ok' );
 is( Foo::Bar::TableOne->base, 'Foo::Bar', '->base ok' );
 is( Foo::Bar::TableOne->table, 'table_one', '->table ok' );
 my $columns = Foo::Bar::TableOne->table_info;
-is_deeply( $columns, [
+cmp_deeply( $columns, [
 	{
 		cid        => 0,
 		dflt_value => undef,
 		name       => 'col1',
 		notnull    => 1,
 		pk         => 1,
-		type       => 'integer',
+		type       => re(qr/^integer$/i),
 	},
 	{
 		cid        => 1,

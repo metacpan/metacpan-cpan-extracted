@@ -10,7 +10,8 @@ README
 cpanfile
 dist.ini
 lib/Graphics/Toolkit/Color.pm
-lib/Graphics/Toolkit/Color/Constant.pm
+lib/Graphics/Toolkit/Color/Name.pm
+lib/Graphics/Toolkit/Color/Name/Constant.pm
 lib/Graphics/Toolkit/Color/Space.pm
 lib/Graphics/Toolkit/Color/SpaceBasis.pm
 lib/Graphics/Toolkit/Color/Util.pm
@@ -29,7 +30,7 @@ t/12_value_hsv.t
 t/13_value_cmyk.t
 t/14_value_cmy.t
 t/20_value.t
-t/40_constant.t
+t/41_name.t
 t/50_color_new_getter_io.t
 t/51_color_measure.t
 t/52_color_change.t

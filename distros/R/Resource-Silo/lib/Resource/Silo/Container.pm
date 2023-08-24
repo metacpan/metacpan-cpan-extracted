@@ -2,7 +2,7 @@ package Resource::Silo::Container;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -25,6 +25,7 @@ as well as a doorway into a fine-grained control interface.
 
 use Carp;
 use Scalar::Util qw( blessed refaddr reftype weaken );
+use Module::Load qw( load );
 
 my $ID_REX = qr/^[a-z][a-z_0-9]*$/i;
 
@@ -137,7 +138,7 @@ sub _instantiate_resource {
         if $self->{-cleanup};
     croak "Attempting to initialize resource '$name' in locked mode"
         if $self->{-locked}
-            and !$spec->{derivative}
+            and !$spec->{derived}
             and !$self->{-override}{$name};
 
     croak "Attempting to fetch unexpected dependency '$name'"
@@ -152,7 +153,12 @@ sub _instantiate_resource {
     };
     local $self->{-pending}{$key} = 1;
 
-    ($self->{-override}{$name} // $spec->{init})->($self, $name, $arg);
+    foreach my $mod (@{ $spec->{require} }) {
+        eval { load $mod; 1 }
+            or croak "resource '$name': failed to load '$mod': $@";
+    };
+    ($self->{-override}{$name} // $spec->{init})->($self, $name, $arg)
+        // croak "Fetching resource '$key' failed for no apparent reason";
 };
 
 # use instead of delete $self->{-cache}{$name}
@@ -303,7 +309,7 @@ sub override {
 Forbid initializing new resources.
 
 The cached ones instantiated so far, the ones that have been overridden,
-and the ones with the C<derivative> flag will still be returned.
+and the ones with the C<derived> flag will still be returned.
 
 =cut
 
@@ -332,14 +338,21 @@ Try loading all the resources that have C<preload> flag set.
 May be useful if e.g. a server-side application is starting and must
 check its database connection(s) before it starts handling any clients.
 
+In addition, self-check will be called and all declared C<require>'d
+modules will be loaded, even if they are not required by preloaded resources.
+
 =cut
 
 sub preload {
     my $self = shift;
     # TODO allow specifying resources to load
-    #      but first come up with a way of specifying arguments, too.
+    #      but first come up with a way to specify arguments, too.
 
-    my $list = $$self->{-spec}{preload};
+    my $meta = $$self->{-spec};
+
+    $meta->self_check;
+
+    my $list = $meta->{preload};
     for my $name (@$list) {
         my $unused = $$self->$name;
     };

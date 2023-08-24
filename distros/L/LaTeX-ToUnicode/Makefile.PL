@@ -10,17 +10,17 @@ use ExtUtils::MakeMaker 6.31;
 
 my %WriteMakefileArgs = (
   'ABSTRACT' => 'Convert LaTeX commands to Unicode',
-  'AUTHOR' => 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com>',
+  'AUTHOR' => 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com> and Karl Berry <karl@freefriends.com>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '6.31'
   },
   'DISTNAME' => 'LaTeX-ToUnicode',
-  'EXE_FILES' => [],
+  'EXE_FILES' => ['script/ltx2unitxt'],
   'LICENSE' => 'perl',
   'NAME' => 'LaTeX::ToUnicode',
   'PREREQ_PM' => {},
-  'VERSION' => '0.11',
+  'VERSION_FROM' => 'lib/LaTeX/ToUnicode.pm',
   'test' => {
     'TESTS' => 't/*.t'
   }

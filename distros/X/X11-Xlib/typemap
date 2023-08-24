@@ -7,6 +7,7 @@ Visual *              O_X11_Xlib_OpaqueDisplayMember
 VisualOrNull          O_X11_Xlib_OpaqueDisplayMemberOrNull
 GC                    O_X11_Xlib_OpaqueDisplayMember
 XEvent *              O_X11_Xlib_Struct
+XKeyboardState *      O_X11_Xlib_Struct
 XVisualInfo *         O_X11_Xlib_Struct
 XWindowChanges *      O_X11_Xlib_Struct
 XWindowAttributes *   O_X11_Xlib_Struct

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-24'; # DATE
+our $DATE = '2023-06-30'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 our $SCRIPTLET = {
     summary => q[Remove suffix that are common to all args, while preserving extension, e.g. (1-radiolab.mp3, 2-radiolab.mp3) -> (1.mp3, 2.mp3)],
@@ -48,7 +48,7 @@ App::perlmv::scriptlet::remove_common_suffix - Remove suffix that are common to 
 
 =head1 VERSION
 
-This document describes version 0.606 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2022-06-24.
+This document describes version 0.607 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2023-06-30.
 
 =head1 HOMEPAGE
 
@@ -79,13 +79,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

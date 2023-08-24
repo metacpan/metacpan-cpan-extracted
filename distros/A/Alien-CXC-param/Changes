@@ -1,0 +1,17 @@
+Revision history for Alien-CXC-param
+
+0.03      2023-08-19 21:02:08-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * update to build cxcparam 4.12.0.5
+
+0.02      2023-08-17 18:41:01-04:00 America/New_York
+
+  [BUG FIX]
+
+    * alienfile had incorrect version
+
+0.01      2023-08-17 18:30:22-04:00 America/New_York
+
+* First release upon an unsuspecting world.

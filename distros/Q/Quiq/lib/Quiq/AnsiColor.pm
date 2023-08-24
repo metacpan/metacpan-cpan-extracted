@@ -81,7 +81,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.211';
+our $VERSION = '1.212';
 
 use Term::ANSIColor ();
 
@@ -244,7 +244,7 @@ sub strLn {
 
 =head1 VERSION
 
-1.211
+1.212
 
 =head1 AUTHOR
 

@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::LazyInit 0.06;
+package Object::Pad::FieldAttr::LazyInit 0.07;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.66;
+use Object::Pad 0.802;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );

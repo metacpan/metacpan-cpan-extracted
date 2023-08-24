@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Namespace/Subroutines.pm
+minil.toml
+perlimports.toml
+precious.toml
+t/00_compile.t
+t/01_find.t
+t/02_ignores_imported_symbols.pl
+t/lib/ToDo/Controller/Home.pm
+META.yml
+MANIFEST

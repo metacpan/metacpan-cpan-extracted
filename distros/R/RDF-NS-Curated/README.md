@@ -4,11 +4,9 @@ RDF::NS::Curated - A curated set of RDF prefixes
 
 # SYNOPSIS
 
-```perl
-my $ns = RDF::NS::Curated->new;
-print $ns->uri('foaf'); # prints http://xmlns.com/foaf/0.1/
-print $ns->prefix('http://schema.org/'); # prints schema
-```
+    my $ns = RDF::NS::Curated->new;
+    print $ns->uri('foaf'); # prints http://xmlns.com/foaf/0.1/
+    print $ns->prefix('http://schema.org/'); # prints schema
 
 # DESCRIPTION
 
@@ -51,7 +49,7 @@ It is intended to be used with e.g. [URI::NamespaceMap](https://metacpan.org/pod
 # BUGS
 
 Please report any bugs to
-[https://github.com/kjetilk/p5-rdf-ns-curated/issues](https://github.com/kjetilk/p5-rdf-ns-curated/issues).
+[https://github.com/perlrdf/p5-rdf-ns-curated/issues](https://github.com/perlrdf/p5-rdf-ns-curated/issues).
 
 # SEE ALSO
 
@@ -63,7 +61,7 @@ Kjetil Kjernsmo <kjetilk@cpan.org>.
 
 # CONTRIBUTORS
 
-Harald Jörg
+Harald JÃ¶rg
 
 # COPYRIGHT AND LICENCE
 

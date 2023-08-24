@@ -20,6 +20,7 @@ for my $file (
     'lib/App/DBBrowser/DB/Informix.pm',
     'lib/App/DBBrowser/DB/MariaDB.pm',
     'lib/App/DBBrowser/DB/mysql.pm',
+    'lib/App/DBBrowser/DB/ODBC.pm',
     'lib/App/DBBrowser/DB/Oracle.pm',
     'lib/App/DBBrowser/DB/Pg.pm',
     'lib/App/DBBrowser/DB/SQLite.pm',

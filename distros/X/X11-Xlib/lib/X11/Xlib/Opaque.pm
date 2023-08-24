@@ -2,7 +2,7 @@ package X11::Xlib::Opaque;
 use X11::Xlib ();
 
 # All modules in dist share a version
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 @X11::Xlib::Visual::ISA= ( __PACKAGE__ );
 $X11::Xlib::Visual::VERSION= $VERSION;
@@ -29,7 +29,7 @@ tucked away in XS magic.
 Find the display associated with this object.  This may return undef if the
 opaque object was constructed from a source where the Display was unknown.
 (for example, accessing the L<X11::Xlib::XVisualInfo/visual> when that struct
-itself doesn't have a known Display.
+itself does not have a known Display.
 
 The storage for this attribute is contained in XS, and is a strong reference
 to the Display, which is released during the XS destructor for this object.

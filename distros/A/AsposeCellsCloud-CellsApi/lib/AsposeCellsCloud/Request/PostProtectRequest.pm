@@ -60,6 +60,7 @@ sub new {
 
 # Run Operation Request
 # PostProtectRequest.File : File to upload  ,
+# PostProtectRequest.protectWorkbookRequst :   ,
 # PostProtectRequest.password :    
 
 {
@@ -101,7 +102,7 @@ sub run_http_request {
         $query_params->{'password'} = $client->to_query_value($self->password);      
     } 
     my $_body_data;
- 
+
 
     if (defined $self->file) {   
         my $map_file = $self->file;
@@ -110,6 +111,11 @@ sub run_http_request {
         }
     } 
 
+    # body params
+    if (defined $self->protect_workbook_requst) {
+        #$_body_data = $self->protect_workbook_requst;
+         $_body_data = JSON->new->convert_blessed->encode( $self->protect_workbook_requst);
+    }
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -127,6 +133,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'protect_workbook_requst' => {
+     	datatype => 'ProtectWorkbookRequst',
+     	base_name => 'protectWorkbookRequst',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
@@ -139,6 +152,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'file' => 'File',
+    'protect_workbook_requst' => 'protectWorkbookRequst',
     'password' => 'password' 
 } );
 

@@ -5,13 +5,13 @@ use X11::Xlib; # need constants loaded
 use parent 'X11::Xlib::Struct';
 
 # All modules in dist share a version
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
 X11::Xlib::XEvent - Polymorphic class for XEvent structures
 
-=head1 DESCRiPTION
+=head1 DESCRIPTION
 
 This object wraps an XEvent.  XEvent is a union of many different C structs,
 though they all share a few common fields.  The storage space of an XEvent is
@@ -19,7 +19,7 @@ constant regardless of type, and so this class is backed by a simple scalar
 ref.
 
 The active struct of the union is determined by the L</type> field.  This object
-heirarchy attempts to help you make correct usage of the union with respect to
+hierarchy attempts to help you make correct usage of the union with respect to
 the current C<type>, so as you change the value of C<type> the object will
 automatically re-bless itself into the appropriate subclass, giving you access
 to new struct fields.
@@ -39,7 +39,7 @@ passed to the L<X11::Xlib> methods that expect an XEvent pointer.
   my $xevent= X11::Xlib::XEvent->new( \%fields );
 
 You can construct XEvent as an empty buffer, or initialize it with a hash or
-hashref of fields.  Initialization is performed via L</pack>.  Un-set fields
+hashref of fields.  Initialization is performed via L</pack>.  Unset fields
 are initialized to zero, and the L</bytes> is always padded to the length
 of an XEvent.
 
@@ -58,7 +58,7 @@ Alias for C< pack( \%fields, 1, 1 ) >
   $xevent->pack( \%fields, $consume, $warn );
 
 Assign a set of fields to the packed struct, optionally removing them from
-the hashref (C<$consume>) and warning about un-known names (C<$warn>).
+the hashref (C<$consume>) and warning about unknown names (C<$warn>).
 If you supply a new value for L</type>, the XEvent will get re-blessed to
 the appropriate type and all union-specific fields will be zeroed before
 applying the rest of the supplied fields.

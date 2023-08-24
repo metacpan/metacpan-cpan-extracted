@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all'; use 5.010;
 
-our $VERSION = '1.017'; # VERSION
-our $DATE = '2023-07-03'; # DATE
+our $VERSION = '1.018'; # VERSION
+our $DATE = '2023-08-23'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -110,22 +110,25 @@ sub _get_terminal_width() {  # returns undef if unknowable
     local *_; # Try to avoid clobbering special filehandle "_"
     # This does not actualy work; https://github.com/Perl/perl5/issues/19142
 
-    my $fh = -t STDERR ? *STDERR : 
+    my $fh = -t STDERR ? *STDERR :
              -t STDOUT ? *STDOUT :
              -t STDIN  ? *STDIN  :
         do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh} ;
-    my $wmsg = ""; # Suppress hard-coded "didn't work" from Term::ReadKey
-                   #  or "stty: standard input: Not a tty" etc.
+    my $wmsg = ""; # Suppress a "didn't work" warning from Term::ReadKey.
+                   # On some platforms (different libc?) "stty" directly
+                   # outputs "stdin is not a tty" which we can not trap.
+                   # Probably this is a Term::Readkey bug where it should
+                   # redirect such messages to /dev/null...
     my ($width, $height) = do {
       local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
-      $fh ? Term::ReadKey::GetTerminalSize($fh) : ()
+      $fh ? eval{ Term::ReadKey::GetTerminalSize($fh) } : ()
     };
-    return $width; # possibly undef
+    return( (defined($width) && $width > 0) ? $width : undef );
   }
 }
 
 # 0 or undef to not wrap long lines
-my $maxwidth = _get_terminal_width // 80;
+my $maxwidth = _get_terminal_width || 80;
 
 my %opts = (
   sort_rows       => 1,
@@ -1521,20 +1524,41 @@ escapes like "\t" or "\n" for human consumption.
 
 =head2 -m --method [native | diff | tkdiff | git]
 
-I<native> (the default) shows only the changed I<cells> in rows which
+I<-m native> (the default) shows only the changed I<cells> in rows which
 differ.   Corresponding columns are identified by title,
 and need not be in the same order 
 (see also C<--id-columns>).
 
-I<diff>, I<tkdiff>, or I<git> run an external tool on
+I<-m diff>, I<-m tkdiff>, or I<-m git> run an external tool on
 temporary text (CSV) files created from the inputs, in which ignored columns
 have been removed and non-graphic characters changed to escapes.
 
 Most diff(1) options are accepted and passed through, but are not
 documented here.
 
-I<git> uses C<git diff> to, by default, color-code changed words;
+I<-m git> uses C<git diff> to, by default, color-code changed words;
 most git(1) diff options are passed through.
+
+Following is an sample output using the *native* output format.  Note that
+only changed columns are shown except that columns named 
+with I<--id-columns> are always shown for context:
+
+ $ diff_spreadsheets --id-columns 'LAST NAME,FIRST NAME' File1.csv File2.csv
+ 
+ -------- ADDED row 5 ------------------------------
+   FIRST NAME: 'Frederick'
+    LAST NAME: 'Douglass'
+     Address1: 'Mount Hope Cemetary'
+     Address2: '1133 Mt Hope Ave'
+         CITY: 'Rochester'
+        STATE: 'NY'
+          ZIP: '14620'
+ 
+ -------- CHANGED row 3 -----------------------------
+   FIRST NAME: 'Lucretia' (unchanged)
+    LAST NAME: 'Mott' (unchanged)
+         CITY: '' →  'Philadelphia'
+ 
 
 =head2 --title-row [ROWNUMBER]
 

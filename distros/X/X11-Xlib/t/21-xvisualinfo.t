@@ -44,7 +44,7 @@ subtest associated_with_display => sub {
     is( $visuals[0]->visual->display, $conn, 'visual from visualinfo also related to display' );
     
     weaken($conn);
-    ok( $conn, 'un-ref connection, still alive' );
+    ok( $conn, 'unref connection, still alive' );
     undef @visuals;
     is( $conn, undef, 'visuals were holding last ref to conn' );
     

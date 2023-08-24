@@ -2,7 +2,7 @@ package Crypt::OpenSSL::Base::Func;
 
 use strict;
 use warnings;
-use bignum;
+#use bignum;
 
 use Carp;
 
@@ -10,10 +10,10 @@ require Exporter;
 use AutoLoader;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
-use Math::BigInt;
+#use Math::BigInt;
 use POSIX;
 
-our $VERSION = '0.035';
+our $VERSION = '0.037';
 
 our @ISA = qw(Exporter);
 
@@ -25,8 +25,8 @@ EC_POINT_get_affine_coordinates
 EC_POINT_hex2point
 EC_POINT_point2hex
 EC_POINT_set_affine_coordinates
-EVP_MD_block_size
-EVP_MD_size
+EVP_MD_get_block_size
+EVP_MD_get_size
 EVP_PKEY_assign_EC_KEY
 EVP_PKEY_get1_EC_KEY
 EVP_PKEY_new
@@ -141,6 +141,12 @@ sub generate_ec_key {
     my ( $group, $priv_bn, $point_compress_t, $ctx ) = @_;
     $point_compress_t //= 2;
 
+    #my %k;
+    #my $nid = EC_GROUP_get_curve_name($group);
+    #if(! $priv_bn ){
+    #}
+
+
     my $priv_key = Crypt::OpenSSL::EC::EC_KEY::new();
     $priv_key->set_group( $group );
 
@@ -160,6 +166,8 @@ sub generate_ec_key {
     my $pub_hex  = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $pub_point, $point_compress_t, $ctx );
     my $pub_bin  = pack( "H*", $pub_hex );
     my $pub_pkey = evp_pkey_from_point_hex( $group, $pub_hex, $ctx );
+
+    #EVP_PKEY_new_raw_public_key(int type, ENGINE *e, const unsigned char *key, size_t keylen);
 
     return {
         priv_pkey => $priv_pkey, priv_key => $priv_key, priv_bn => $priv_bn, 
@@ -189,10 +197,11 @@ sub get_ec_params {
     Crypt::OpenSSL::EC::EC_GROUP::get_cofactor($group, $cofactor, $ctx);
 
     return { 
-        nid => $nid, group =>$group, 
-        p => $p, a=> $a, b=>$b, 
-        degree => $degree, order=> $order, $cofactor=>$cofactor, 
-        ctx=> $ctx 
+        nid => $nid, 
+        name => $group_name, 
+        group =>$group, 
+        p => $p, a=> $a, b=>$b, degree => $degree, order=> $order, cofactor=>$cofactor, 
+        ctx=> $ctx,  
     };
 } 
 

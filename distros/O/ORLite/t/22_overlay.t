@@ -28,7 +28,7 @@ my $dbh  = create_ok(
 
 # Create the test package
 eval <<"END_PERL"; die $@ if $@;
-package t::lib;
+package MyDB;
 
 use strict;
 use ORLite {
@@ -46,30 +46,30 @@ END_PERL
 # Tests for the base package update methods
 
 isa_ok(
-	t::lib::TableOne->create(
+	MyDB::TableOne->create(
 		col1 => 1,
 		col2 => 'foo',
 	),
-	't::lib::TableOne',
+	'MyDB::TableOne',
 );
 
 isa_ok(
-	t::lib::TableOne->create(
+	MyDB::TableOne->create(
 		col1 => 2,
 		col2 => 'bar',
 	),
-	't::lib::TableOne',
+	'MyDB::TableOne',
 );
-is( t::lib::TableOne->count, 2, 'Found 2 rows' );
+is( MyDB::TableOne->count, 2, 'Found 2 rows' );
 
 is(
-	t::lib::TableOne->count,
+	MyDB::TableOne->count,
 	2,
 	'Count found 2 rows',
 );
 
 SCOPE: {
-	my $object = t::lib::TableOne->load(1);
-	isa_ok( $object, 't::lib::TableOne' );
+	my $object = MyDB::TableOne->load(1);
+	isa_ok( $object, 'MyDB::TableOne' );
 	is( $object->dummy, 2, '->dummy ok (overlay was loaded)' );
 }

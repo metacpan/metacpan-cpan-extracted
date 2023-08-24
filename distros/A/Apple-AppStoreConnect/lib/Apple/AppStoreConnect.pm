@@ -14,11 +14,11 @@ Apple::AppStoreConnect - Apple App Store Connect API client
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -216,8 +216,8 @@ sub new {
         $args{key} = do { local $/; <$fh> };
     }
     $self->{key}        = \$args{key};
-    $self->{timeout}    = $args{timeout}  || 30;
-    $self->{expiration} = $args{expiration}  || 900;
+    $self->{timeout}    = $args{timeout} || 30;
+    $self->{expiration} = $args{expiration} || 900;
     $self->{ua}         = $args{ua};
     $self->{curl}       = $args{curl};
     $self->{scope}      = $args{scope};
@@ -280,6 +280,13 @@ sub jwt {
     return $self->{jwt}
         if !$args{exp} && $self->{jwt_exp} && $self->{jwt_exp} >= time() + 300;
 
+    return $self->_new_jwt(%args);
+}
+
+sub _new_jwt {
+    my $self = shift;
+    my %args = @_;
+
     $args{iat} ||= time();
     $self->{jwt_exp} = $args{exp} || (time() + $self->{expiration});
 
@@ -291,8 +298,7 @@ sub jwt {
     };
 
     $data->{scope} = $self->{scope} if $self->{scope};
-
-    $self->{jwt} = encode_jwt(
+    $self->{jwt}   = encode_jwt(
         payload       => $data,
         alg           => 'ES256',
         key           => $self->{key},

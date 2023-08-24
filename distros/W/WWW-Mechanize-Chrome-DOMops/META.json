@@ -1,5 +1,5 @@
 {
-   "abstract" : "Operations on the DOM",
+   "abstract" : "Operations on the DOM loaded in Chrome",
    "author" : [
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
@@ -23,7 +23,10 @@
       "build" : {
          "requires" : {
             "Data::Roundtrip" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
             "FindBin" : "0",
+            "Log::Log4perl" : "0",
             "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
             "WWW::Mechanize::Chrome" : "0"
@@ -37,7 +40,6 @@
       "runtime" : {
          "requires" : {
             "Data::Roundtrip" : "0",
-            "WWW::Mechanize::Chrome" : "0",
             "perl" : "5.006"
          }
       }
@@ -54,6 +56,6 @@
          "web" : "https://github.com/hadjiprocopis/www-mechanize-chrome-domops"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

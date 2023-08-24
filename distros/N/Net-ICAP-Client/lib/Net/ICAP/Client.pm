@@ -11,7 +11,7 @@ use HTTP::Request();
 use HTTP::Response();
 use POSIX();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub _CHUNK_SIZE                { return 4096 }
 sub _FILE_READ_SIZE            { return 8192 }
@@ -729,7 +729,7 @@ Net::ICAP::Client - A client implementation of the ICAP (RFC 3507) protocol
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -775,27 +775,27 @@ $icap->agent() accepts an optional User Agent string and returns the current Use
 
 =head2 server_allows_204
 
-$icap->server_allows_204() returns true if the remote ICAP server can return a 204 (No modification needed) response.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->server_allows_204() returns true if the remote ICAP server can return a 204 (No modification needed) response.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 is_tag
 
-$icap->is_tag() returns the value of the remote ICAP server's L<ISTag|https://tools.ietf.org/html/rfc3507#section-4.7> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->is_tag() returns the value of the remote ICAP server's L<ISTag|https://tools.ietf.org/html/rfc3507#section-4.7> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 service
 
-$icap->service() returns the value of the remote ICAP server's L<Service|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->service() returns the value of the remote ICAP server's L<Service|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 ttl
 
-$icap->ttl() returns the value of the remote ICAP server's L<Options-TTL|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->ttl() returns the value of the remote ICAP server's L<Options-TTL|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 max_connections
 
-$icap->max_connections() returns the value of the remote ICAP server's L<Max-Connections|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->max_connections() returns the value of the remote ICAP server's L<Max-Connections|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 preview_size
 
-$icap->preview_size() returns the value of the remote ICAP server's L<Preview|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|"ttl"> seconds.
+$icap->preview_size() returns the value of the remote ICAP server's L<Preview|https://tools.ietf.org/html/rfc3507#section-4.10.2> header.  This method will issue an OPTIONS call to the remote server unless another OPTIONS call has been sent in the last L<ttl|/#ttl> seconds.
 
 =head2 uri
 
@@ -896,41 +896,7 @@ None reported
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to C<bug-net-icap-client at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-ICAP-Client>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Net::ICAP::Client
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-ICAP-Client>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-ICAP-Client>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Net-ICAP-Client>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Net-ICAP-Client/>
-
-=back
+To report a bug, or view the current list of bugs, please visit L<https://github.com/david-dick/net-icap-client/issues>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -62,71 +62,75 @@
    "provides" : {
       "Catmandu::Exporter::PICA" : {
          "file" : "lib/Catmandu/Exporter/PICA.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::Bind::pica_diff" : {
          "file" : "lib/Catmandu/Fix/Bind/pica_diff.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::Bind::pica_each" : {
          "file" : "lib/Catmandu/Fix/Bind/pica_each.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::Condition::pica_match" : {
          "file" : "lib/Catmandu/Fix/Condition/pica_match.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_add" : {
          "file" : "lib/Catmandu/Fix/pica_add.pm",
-         "version" : "1.16"
+         "version" : "1.17"
+      },
+      "Catmandu::Fix::pica_append" : {
+         "file" : "lib/Catmandu/Fix/pica_append.pm",
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_keep" : {
          "file" : "lib/Catmandu/Fix/pica_keep.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_map" : {
          "file" : "lib/Catmandu/Fix/pica_map.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_occurrence" : {
          "file" : "lib/Catmandu/Fix/pica_occurrence.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_remove" : {
          "file" : "lib/Catmandu/Fix/pica_remove.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_set" : {
          "file" : "lib/Catmandu/Fix/pica_set.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_tag" : {
          "file" : "lib/Catmandu/Fix/pica_tag.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Fix::pica_update" : {
          "file" : "lib/Catmandu/Fix/pica_update.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Importer::PICA" : {
          "file" : "lib/Catmandu/Importer/PICA.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Importer::SRU::Parser::picaxml" : {
          "file" : "lib/Catmandu/Importer/SRU/Parser/picaxml.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Importer::SRU::Parser::ppxml" : {
          "file" : "lib/Catmandu/Importer/SRU/Parser/ppxml.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::PICA" : {
          "file" : "lib/Catmandu/PICA.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Catmandu::Validator::PICA" : {
          "file" : "lib/Catmandu/Validator/PICA.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       }
    },
    "release_status" : "stable",
@@ -141,7 +145,7 @@
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_contributors" : [
       "Carsten Klee <klee@cpan.org>",
       "E. Choroba <choroba@matfyz.cz>",

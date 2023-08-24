@@ -3,12 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use App::sdview::Parser::Markdown;
 
 my $parser = App::sdview::Parser::Markdown->new;
-isa_ok( $parser, "App::sdview::Parser::Markdown", '$parser' );
+isa_ok( $parser, [ "App::sdview::Parser::Markdown" ], '$parser' );
 
 ok( App::sdview::Parser::Markdown->can_parse_file( "Example.md" ), 'Parser can handle .md file' );
 
@@ -36,7 +36,7 @@ EOMARKDOWN
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is_deeply( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
 };
 
 subtest "Alternate headings" => sub {
@@ -90,7 +90,7 @@ EOMARKDOWN
    ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
 
    is( $p[3]->text, "link", 'link text' );
-   is_deeply( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" }, 'link tag' );
+   is( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" }, 'link tag' );
 };
 
 subtest "Verbatim trimming" => sub {

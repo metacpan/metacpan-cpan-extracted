@@ -33,15 +33,15 @@ my %META = (
 );
 
 my %MM_ARGS = (
-    dist => {
-        TAR => '$(PERL) ./maint/make-tarball',
-        TARFLAGS => (
-            -e '.git'
-                ? '-cv --git-time -f'
-                : '-cv --mtime=' . (stat(__FILE__))[9] . ' -f',
-        ),
-        COMPRESS => 'gzip --no-name --best',
-    },
+  dist => {
+    TAR => '$(PERL) ./maint/make-tarball',
+    TARFLAGS => (
+      -e '.git'
+        ? '-cv --git-time -f'
+        : '-cv --mtime=' . (stat(__FILE__))[9] . ' -f',
+    ),
+    COMPRESS => 'gzip --no-name --best',
+  },
 );
 
 ## BOILERPLATE ###############################################################
@@ -54,6 +54,8 @@ my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
 
 ($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
 ($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
+$MM_ARGS{ABSTRACT_FROM} = $MM_ARGS{VERSION_FROM}
+  unless defined $MM_ARGS{ABSTRACT};
 $META{license} = [ $META{license} ]
   if $META{license} && !ref $META{license};
 $MM_ARGS{LICENSE} = $META{license}[0]

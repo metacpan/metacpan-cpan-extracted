@@ -1,10 +1,33 @@
 package CookLang;
-$CookLang::VERSION = '0.11';
+$CookLang::VERSION = '0.12';
 use Object::Pad qw( :experimental(init_expr) );
 use strict;
 use warnings;
 
 use Number::Fraction;
+
+class Cooking {
+use experimental qw(try);
+    field $qty: param ||= undef;
+    method finite {
+        my $den = shift;
+        return !! ( ! ( $den % 2 ) || ! ( $den % 5 ));
+    };
+    method qty {
+        if (! defined $qty ) {
+            return $self->isa( 'Cookware' ) ? '' : 1;
+        }
+        try {
+            my $fraction = Number::Fraction->new( $qty );
+            return $self->finite( $fraction->{den} ) ?
+                $fraction->to_num :
+                $fraction->to_string
+            ;
+        } catch ($e) {
+            return $qty;
+        }
+    };
+}
 
 class Step {
     field $line :param;
@@ -60,19 +83,10 @@ class Element {
     };
 }
 
-class Ingredient {
-use experimental qw(try);
+class Ingredient :isa( Cooking ) {
     field $name :param;
-    field $qty: param ||= 1;
     field $unit: param = '';
-    method qty {
-        try {
-            my $fraction = Number::Fraction->new( $qty );
-            return $fraction->to_num;
-        } catch ($e) {
-            return $qty;
-        }
-    };
+
     method ast {
         return {
             type => 'ingredient',
@@ -101,31 +115,20 @@ class Comment {
     };
 }
 
-class Cookware {
+class Cookware :isa( Cooking ) {
     field $name :param;
-    field $qty :param ||= '';
     method ast {
         return {
             type => 'cookware',
             name => $name,
-            quantity => $qty,
+            quantity => $self->qty,
         };
     };
 }
 
-class Timer {
-use experimental qw(try);
+class Timer :isa( Cooking ) {
     field $name :param;
-    field $qty :param ||= 1;
     field $unit: param = '';
-    method qty {
-        try {
-            my $fraction = Number::Fraction->new( $qty );
-            return $fraction->to_num;
-        } catch ($e) {
-            return $qty;
-        }
-    };
     method ast {
         return {
             type => 'timer',
@@ -226,7 +229,7 @@ CookLang - Perl Cooklang parser
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

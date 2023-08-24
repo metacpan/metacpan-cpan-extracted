@@ -9,7 +9,7 @@ BEGIN{ use_ok( 'LaTeX::ToUnicode', qw( convert ) ); }
 binmode( STDOUT, ':utf8' );
 my @tests = (
     [ '\LaTeX' => 'LaTeX' ],
-    [ '\$ \% \& \_ \{ \} \#' => '$ % & _ { } #' ],
+    [ '\$ \% \& \_ \#' => '$ % & _ #' ],
     [ '{\"{a}}' => 'ä' ],
     [ '{\"a}' => 'ä' ],
     [ '{\`{a}}' => 'à' ],

@@ -1,5 +1,8 @@
 Revision history for HTML-Acronyms
 
+0.0.4       2023-08-20
+    - Add the 'link' named argument.
+
 0.0.3       2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

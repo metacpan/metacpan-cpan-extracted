@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 46;
+use Test::More tests => 59;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -69,13 +69,32 @@ is( $rgb[1], 255,     'converted white (short form) from hex to RGB green is cor
 is( $rgb[2], 255,     'converted white (short form) from hex to RGB blue is correct');
 
 @rgb = Graphics::Toolkit::Color::Value::RGB::rgb_from_hex('#0a141e');
-is( $rgb[0],  10,     'converted random color (lower case) from hex to RGB red is correct');
-is( $rgb[1],  20,     'converted random color (lower case) from hex to RGB green is correct');
-is( $rgb[2],  30,     'converted random color (lower case) from hex to RGB blue is correct');
+is( $rgb[0],  10,     'deformatted random color (lower case) from hex to RGB red is correct');
+is( $rgb[1],  20,     'deformatted random color (lower case) from hex to RGB green is correct');
+is( $rgb[2],  30,     'deformatted random color (lower case) from hex to RGB blue is correct');
 
+@rgb = $def->deformat('#0A141e');
+is( $rgb[0],  10,     'OO deformat random color (upper case) from hex to RGB red is correct');
+is( $rgb[1],  20,     'OO deformat random color (upper case) from hex to RGB green is correct');
+is( $rgb[2],  30,     'OO deformat random color (upper case) from hex to RGB blue is correct');
 
-# OO API
+@rgb = $def->deformat([ 33, 44, 55]);
+is( $rgb[0],  33,     'OO deformat ARRAY to RGB red is correct');
+is( $rgb[1],  44,     'OO deformat ARRAY to RGB green is correct');
+is( $rgb[2],  55,     'OO deformat ARRAY to RGB blue is correct');
 
+@rgb = $def->deformat([rgb => 11, 22, 33]);
+is( $rgb[0],  11,     'OO deformat lc named ARRAY to RGB red is correct');
+is( $rgb[1],  22,     'OO deformat lc named ARRAY to RGB green is correct');
+is( $rgb[2],  33,     'OO deformat lc named ARRAY to RGB blue is correct');
+
+@rgb = $def->deformat(['RGB', 11, 22, 33]);
+is( $rgb[0],  11,     'OO deformat uc named ARRAY to RGB red is correct');
+is( $rgb[1],  22,     'OO deformat uc named ARRAY to RGB green is correct');
+is( $rgb[2],  33,     'OO deformat uc named ARRAY to RGB blue is correct');
+
+@rgb = $def->deformat(['CMY', 11, 22, 33]);
+is( $rgb[0],  undef,  'OO deformat reacts only to right name');
 
 
 exit 0;

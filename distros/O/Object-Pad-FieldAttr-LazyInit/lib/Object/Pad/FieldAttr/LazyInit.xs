@@ -100,19 +100,19 @@ static int magic_set(pTHX_ SV *sv, MAGIC *mg)
   return 1;
 }
 
-static bool lazyinit_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool lazyinit_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   mop_field_set_default_sv(fieldmeta, newRV_inc(unassigned_val));
 
   return TRUE;
 }
 
-static void lazyinit_post_initfield(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, SV *field)
+static void lazyinit_post_makefield(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, SV *field)
 {
   SV *weakself = newSVsv(PAD_SVl(PADIX_SELF));
   sv_rvweaken(weakself);
 
-  sv_magicext(field, weakself, PERL_MAGIC_ext, &vtbl, (char *)hookdata, HEf_SVKEY);
+  sv_magicext(field, weakself, PERL_MAGIC_ext, &vtbl, (char *)attrdata, HEf_SVKEY);
 
   SvREFCNT_dec(weakself);
 }
@@ -122,7 +122,7 @@ static const struct FieldHookFuncs lazyinit_hooks = {
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .permit_hintkey = "Object::Pad::FieldAttr::LazyInit/LazyInit",
   .apply          = &lazyinit_apply,
-  .post_initfield = &lazyinit_post_initfield,
+  .post_makefield = &lazyinit_post_makefield,
 };
 
 MODULE = Object::Pad::FieldAttr::LazyInit    PACKAGE = Object::Pad::FieldAttr::LazyInit

@@ -93,10 +93,32 @@ sub obj_keys_in_range($$$$)
        $text . "\t(" . $from . ' <= ' . $_ . ' <= ' . $to . ')');
 }
 
+sub patch_config($@)
+{
+    my $file = shift;
+    my $fh;
+    open $fh, '<', $file  or  die "can't open ", $file, ': ', $!;
+    my @content = <$fh>;
+    close $fh;
+    local $_;
+    while (@_)
+    {
+	if ($_[0] eq 'd')
+	{   delete $content[$_[1]];   }
+	else
+	{   die 'bad patch: ', join(',', @_);   }
+	shift @_;
+	shift @_;
+    }
+    open $fh, '>', $file  or  die "can't open ", $file, ': ', $!;
+    print $fh @content;
+    close $fh;
+}
+
 #########################################################################
 # identical parts of messages:
 my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/m;
-my $re_eval = qr{ at \(eval \d+\)(\[t/\d+-[a-z]+\.t:\d+\])? line 1\.$};
+my $re_eval = qr{ at \(eval \d+\)(\[t/\d+-[a-z]+\.t:\d+\])? line 1\.$}m;
 
 #########################################################################
 # failing tests:
@@ -211,6 +233,7 @@ like($@,
 _remove_file(LOCAL_ROOT_FS);
 _setup_file(LOCAL_ROOT_FS, CONF_ROOT);		# create tree below t/tmp/lxc
 
+my $os = App::LXC::Container::Data::_singleton()->{OS};
 SKIP:{
     if (-l '/lib')
     {
@@ -225,11 +248,13 @@ SKIP:{
 	_remove_dir(TMP_PATH . '/lxc/bad-paths/usr');
     }
     else
-    {
-	my $os = App::LXC::Container::Data::_singleton()->{OS};
-	skip "/lib not symbolic link on $os", 1;
-    }
+    {	skip "/lib not symbolic link on $os", 1;   }
 }
+
+#########################################################################
+# preparation for different distributions:
+-f '/etc/debian_version'
+    or  patch_config(CONF_PATH . '/40-MNT-default.mounts', 'd' => -1);
 
 #########################################################################
 # tests breaking internals:
@@ -248,17 +273,13 @@ $broken->{packages} = [ grep { ! m{^dash$} } @{$broken->{packages}}];
 $broken->_parse_mounts();
 $broken->_parse_filter();
 $broken->{filter}{'/var/log'} = 'copy';
-SKIP:{
-    -f '/etc/debian_version'  or
-	skip 'invalid copy directory filter test only works with Debian', 2;
-    stderr_like
-    {   eval '$broken->_write_lxc_configuration();';   }
-    qr{ may be inaccessible for LXC container's root account$re_eval},
+stderr_like
+{   eval '$broken->_write_lxc_configuration();';   }
+    qr{\A(?:.*may be inaccessible for LXC container's root account$re_eval\n)*\Z},
     'invalid copy directory filter causes correct error message';
-    like($@,
-	 qr{^INTERNAL ERROR .+: /var/log is directory in COPY$re_eval},
-	 'invalid copy directory filter fails');
-}
+like($@,
+     qr{^INTERNAL ERROR .+: /var/log is directory in COPY$re_eval},
+     'invalid copy directory filter fails');
 $broken->{filter}{'/var/opt'} = 'invalid_value';
 eval {   $broken->_write_lxc_configuration();   };
 like($@,
@@ -297,7 +318,7 @@ my $re_err1 =
 my $re_err2 = "/.*/usr/bin/missing doesn't exist!" . $re_msg_tail . "\n";
 my $re_err3 =
     "(/.* may be inaccessible for LXC container's root account" .
-    $re_msg_tail . "\n){1,2}";
+    $re_msg_tail . "\n){0,2}";
 my $re_err4 = "/.*/lib/somelink doesn't exist!" . $re_msg_tail . "\n";
 my $re_err5 = "cp:.*\ncan't copy '/home/some.file': 256" . $re_msg_tail . "\n";
 my $re_err_o1 = "(.*/lib/ld-linux.so.2 doesn't exist!" . $re_msg_tail . "\n)?";
@@ -305,7 +326,7 @@ $ENV{ALC_DEBUG} = 0;		# cover branch in App::LXC::Container::update
 output_like
 {   App::LXC::Container::update('update-test-bad');   }
     qr{^$},
-    qr{\A($re_err1){4}$re_err2($re_err3$re_err5|$re_err5$re_err3)}m,
+    qr{\A($re_err1){4}($re_err2)?($re_err3$re_err5|$re_err5$re_err3)}m,
     'reading bad configuration files update-test-bad print errors';
 
 _setup_file('/lxc/update-test-bad/home/some.file');
@@ -316,7 +337,7 @@ $ENV{ALC_DEBUG} = 'x';
 output_like
 {   App::LXC::Container::update('update-test-bad');   }
     qr{^$},
-    qr{\A($re_err1){4}$re_err2$re_err6$re_err3\Z}m,
+    qr{\A($re_err1){4}($re_err2)?$re_err6$re_err3\Z}m,
     'protected LXC directory prints error';
 _chmod(0755, '/lxc', '/lxc/update-test-bad', '/lxc/update-test-bad/home');
 delete $ENV{ALC_DEBUG};
@@ -485,9 +506,20 @@ $_->_parse_packages();
 is_deeply($_->{package_sources},
 	  ['30-PKG-default.packages', 'u1-PKG-update-test-1.packages'],
 	  'packages test 1 has correct source list');
-is_deeply($_->{packages},
-	  [qw(coreutils dash libc-bin util-linux chromium)],
-	  'packages test 1 has correct content');
+# some Smokers don't have a dash, so it's not part of the default package list:
+if (5 == @{$_->{packages}})
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils dash libc-bin util-linux chromium)],
+	      'packages test 1 has correct content');
+}
+else
+{
+    diag(join(' ', 'PACKAGES:', @{$_->{packages}}));
+    is_deeply($_->{packages},
+	      [qw(coreutils libc-bin util-linux chromium)],
+	      'packages test 1a has correct content');
+}
 is($_->{package_source}{chromium}, 'u1-PKG-update-test-1.packages',
    'packages test 1 chromium entry is correct');
 
@@ -530,10 +562,21 @@ is_deeply($_->{package_sources},
 	   'u2-PKG-update-test-2.packages',
 	   'u1-PKG-update-test-1.packages'],
 	  'packages test 4 has correct source list');
-is_deeply($_->{packages},
-	  [qw(coreutils dash libc-bin util-linux iproute2
-	      fontconfig-config pulseaudio-utils chromium evince)],
-	  'packages test 4 has correct content');
+if (9 == @{$_->{packages}})
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils dash libc-bin util-linux iproute2
+		  fontconfig-config pulseaudio-utils chromium evince)],
+	      'packages test 4 has correct content');
+}
+else
+{
+    diag(join(' ', 'PACKAGES:', @{$_->{packages}}));
+    is_deeply($_->{packages},
+	      [qw(coreutils libc-bin util-linux iproute2
+		  fontconfig-config pulseaudio-utils chromium evince)],
+	      'packages test 4a has correct content');
+}
 is($_->{package_source}{evince}, 'u2-PKG-update-test-2.packages',
    'packages test 4 evince entry is correct');
 is($_->{package_source}{'pulseaudio-utils'}, '70-PKG-audio.packages',
@@ -554,9 +597,9 @@ _setup_file('/lxc/conf/u2-MNT-update-test-2.mounts',
 
 $update_object = App::LXC::Container::Update->new('update-test-1');
 $update_object->_parse_mounts();
-obj_keys_in_range('mount_entry', 9, 12,
+obj_keys_in_range('mount_entry', 8, 12,
 		  'mounts test 1 has correct entry count');
-obj_keys_in_range('mount_source', 9, 12,
+obj_keys_in_range('mount_source', 8, 12,
 		  'mounts test 1 has correct source count');
 is($update_object->{mount_entry}{$path2something},
    $path2something . ' ' . substr($path2something, 1)
@@ -568,9 +611,9 @@ is($update_object->{mount_source}{$path2something}, 'u1-MNT-update-test-1.mounts
 $update_object = App::LXC::Container::Update->new('update-test-2');
 $update_object->_parse_master();		# now with X11 mounts!
 $update_object->_parse_mounts();
-obj_keys_in_range('mount_entry', 19, 22,
+obj_keys_in_range('mount_entry', 18, 22,
 		  'mounts test 2 has correct entry count');
-obj_keys_in_range('mount_source', 19, 22,
+obj_keys_in_range('mount_source', 18, 22,
 		  'mounts test 2 has correct source count');
 is($update_object->{mount_entry}{$path2something},
    $path2something . ' ' . substr($path2something, 1)
@@ -586,9 +629,9 @@ is($update_object->{mount_source}{'/usr/share/icons'}, '61-MNT-X11.mounts',
 
 $update_object = App::LXC::Container::Update->new('update-test-1', 'update-test-2');
 $update_object->_parse_mounts();
-obj_keys_in_range('mount_entry', 9, 12,
+obj_keys_in_range('mount_entry', 8, 12,
 		  'mounts test 3 has correct entry count');
-obj_keys_in_range('mount_source', 9, 12,
+obj_keys_in_range('mount_source', 8, 12,
 		  'mounts test 3 has correct source count');
 is($update_object->{mount_entry}{$path2something},
    $path2something . ' ' . substr($path2something, 1)
@@ -599,9 +642,9 @@ is($update_object->{mount_source}{$path2something}, 'u2-MNT-update-test-2.mounts
 
 $update_object = App::LXC::Container::Update->new('update-test-2', 'update-test-1');
 $update_object->_parse_mounts();
-obj_keys_in_range('mount_entry', 9, 12,
+obj_keys_in_range('mount_entry', 8, 12,
 		  'mounts test 4 has correct entry count');
-obj_keys_in_range('mount_source', 9, 12,
+obj_keys_in_range('mount_source', 8, 12,
 		  'mounts test 4 has correct source count');
 is($update_object->{mount_entry}{$path2something},
    $path2something . ' ' . substr($path2something, 1)
@@ -725,15 +768,16 @@ SKIP:{
 	 '#+ container users #+',
 	 '',
 	 '#+ 40-MNT-default\.mounts #+',
-	 'lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
+	 # distributions may have additional non-symlink directories here:
+	 '.*lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
 	 'lxc\.mount\.entry = /etc/login.defs etc/login.defs none create=file,ro,bind 0 0',
 	 'lxc\.mount\.entry = /etc/pam.d etc/pam.d none create=dir,ro,bind 0 0',
 	 'lxc\.mount\.entry = /etc/security etc/security none create=dir,ro,bind 0 0',
-	 'lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
-	 'lxc\.mount\.entry = /tmp tmp none create=dir,rw,bind 0 0',
+	 '.*lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
+	 '.*lxc\.mount\.entry = /tmp tmp none create=dir,rw,bind 0 0',
 	 'lxc\.mount\.entry = tmpfs var/tmp tmpfs create=dir,rw 0 0',
-	 'lxc\.mount\.entry = /etc/debian_version etc/debian_version none create=file,ro,bind 0 0',
-	 '',
+	 '(lxc\.mount\.entry = /etc/debian_version etc/debian_version none create=file,ro,bind 0 0',
+	 ')?',
 	 '#+ 41-MNT-network\.mounts #+',
 	 'lxc\.mount\.entry = /etc/ssl/certs etc/ssl/certs none create=dir,ro,bind 0 0',
 	 'lxc\.mount\.entry = /usr/lib/ssl usr/lib/ssl none create=dir,ro,bind 0 0',
@@ -786,7 +830,10 @@ SKIP:{
 
     foreach (qw(bin lib lib32 lib64 libx32 sbin))
     {
-	ok(-l CONF_ROOT . '/update-test-1/' . $_,  'got link: /' . $_);
+    SKIP:{
+	    -l '/' . $_  or  skip "/$_ not symbolic link on $os", 1;
+	    ok(-l CONF_ROOT . '/update-test-1/' . $_,  'got link: /' . $_);
+	}
     }
     my $tmp_sub = substr(TMP_PATH, 1);
     foreach (qw(root tmp var var/log),
@@ -856,8 +903,8 @@ SKIP:{
 	     'lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
 	     'lxc\.mount\.entry = /tmp tmp none create=dir,rw,bind 0 0',
 	     'lxc\.mount\.entry = tmpfs var/tmp tmpfs create=dir,rw 0 0',
-	     'lxc\.mount\.entry = /etc/debian_version etc/debian_version none create=file,ro,bind 0 0',
-	     '',
+	     '(lxc\.mount\.entry = /etc/debian_version etc/debian_version none create=file,ro,bind 0 0',
+	     ')?',
 	     '#+ 41-MNT-network\.mounts #+',
 	     'lxc\.mount\.entry = /etc/ssl/certs etc/ssl/certs none create=dir,ro,bind 0 0',
 	     'lxc\.mount\.entry = /usr/lib/ssl usr/lib/ssl none create=dir,ro,bind 0 0',

@@ -1,7 +1,7 @@
 package PICA::Data::Field;
 use v5.14.1;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 use Carp qw(croak);
 use Hash::MultiValue;
@@ -198,5 +198,9 @@ Check whether the field is equal to another field.
 =head2 clone
 
 Return a copy of this field.
+
+=head2 SEE ALSO
+
+Full records are processed as L<PICA::Data> objects.
 
 =cut

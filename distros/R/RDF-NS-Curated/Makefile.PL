@@ -30,22 +30,22 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => 1.004 },
+                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => 1.006 },
                         },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => { web => "https://github.com/kjetilk/p5-rdf-ns-curated/issues" },
+                          bugtracker   => { web => "https://github.com/perlrdf/p5-rdf-ns-curated/issues" },
                           homepage     => "https://metacpan.org/release/RDF-NS-Curated",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
                                             type => "git",
-                                            url  => "git://github.com/kjetilk/p5-rdf-ns-curated.git",
-                                            web  => "https://github.com/kjetilk/p5-rdf-ns-curated",
+                                            url  => "git://github.com/perlrdf/p5-rdf-ns-curated.git",
+                                            web  => "https://github.com/perlrdf/p5-rdf-ns-curated",
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 1.004,
+  "version"          => 1.006,
   "x_static_install" => 1,
 };
 
@@ -120,28 +120,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

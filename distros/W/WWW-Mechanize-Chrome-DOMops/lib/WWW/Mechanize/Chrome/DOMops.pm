@@ -13,11 +13,13 @@ our @EXPORT = qw(
 
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
  
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # caller can set this to 0,1,2,3
 our $VERBOSE_DOMops = 0;
 
+# Here are JS helpers. We use these in our own internal JS code.
+# They are visible to the user's JS callbacks.
 my $_aux_js_functions = <<'EOJ';
 const getAllChildren = (htmlElement) => {
 	if( (htmlElement === null) || (htmlElement === undefined) ){
@@ -122,14 +124,18 @@ sub find {
 	my %callbacks;
 	for my $acbname (@known_callbacks){
 		if( exists($params->{$acbname}) && defined($m=$params->{$acbname}) ){
+			# one or more callbacks must be contained in an ARRAY
 			if( ref($m) ne 'ARRAY' ){
-				my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'description' field. You supplied a '".ref($m)."'.";
+				my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field. You supplied a '".ref($m)."'.";
 				print STDERR $anerrmsg."\n";
 				return { 'status' => -3, 'message' => $anerrmsg }
 			}
 			for my $acbitem (@$m){
-				if( ! exists($acbitem->{'code'}) || ! exists($acbitem->{'name'}) ){
-					my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'description' field.";
+				# each callback must be a hash with a 'code' and 'name' key
+				if( ! exists($acbitem->{'code'})
+				 || ! exists($acbitem->{'name'})
+				){
+					my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field.";
 					print STDERR $anerrmsg."\n";
 					return { 'status' => -3, 'message' => $anerrmsg }
 				}
@@ -159,6 +165,21 @@ sub find {
 	#    https://www.perlmonks.org/index.pl?node_id=1232479
 	# Here we are preparing JS code to be eval'ed in the page
 
+	# do we have user-specified JS code for adjusting the return value of each match?
+	# this falls under the 'element-information-from-matched' input parameter
+	# if we don't have we use our own default so this JS function will be used always for extracting info from matched
+	# NOTE: a user-specified must make sure that it returns a HASH
+	my $element_information_from_matched_function = "const element_information_from_matched_function = (htmlElement) => {\n";
+	if( exists($params->{'element-information-from-matched'}) && defined($m=$params->{'element-information-from-matched'}) ){
+		$element_information_from_matched_function .= $m;
+	} else {
+		# there is no user-specified function for extracting info from each matched element, so use our own default:
+		$element_information_from_matched_function .= "\t" . 'return {"tag" : htmlElement.tagName, "id" : htmlElement.id};';
+	}
+	$element_information_from_matched_function .= "\n} // end element_information_from_matched_function\n";
+
+	# do we have user-specified JS code for callbacks?
+	# this falls under the 'find-cb-on-matched' and 'find-cb-on-matched-and-their-children' input parameters
 	my $cb_functions = "const cb_functions = {\n";
 	for my $acbname (@known_callbacks){
 		next unless exists $callbacks{$acbname};
@@ -166,7 +187,7 @@ sub find {
 		$cb_functions .= "  \"${acbname}\" : [\n";
 		for my $acb (@$m){
 			my $code = $acb->{'code'};
-			my $name = $acb->{'name'}; # something to identify it with
+			my $name = $acb->{'name'}; # something to identify it with, can contain any chars etc.
 			$cb_functions .= <<EOJ;
     {"code" : (htmlElement) => { ${code} }, "name" : "${name}"},
 EOJ
@@ -177,11 +198,15 @@ EOJ
 	$cb_functions =~ s/,\n*$//s;
 	$cb_functions .= "\n};";
 
+	# This is the JS code to execute, we restrict its scope
+	# TODO: don't accumulate JS code for repeated find() calls on the same mech obj
+	#       perhaps create a class which is overwritten on multiple calls?
 	my $jsexec = '{ /* our own scope */' # <<< run it inside its own scope because multiple mech->eval() accumulate and global vars are re-declared etc.
 	      . "\n\nconst VERBOSE_DOMops = ${WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops};\n\n"
 	      . $_aux_js_functions . "\n\n"
+	      . $element_information_from_matched_function . "\n\n"
 	      . $cb_functions . "\n\n"
-		# the semicolon must be exactly after 'EOJ'!
+		# and now here-doc an anonymous function which will be called to orchestrate the whole operation, avanti maestro!
 	      . <<'EOJ';
 // the return value of this anonymous function is what perl's eval will get back
 (function(){
@@ -343,7 +368,7 @@ EOJ
 	// now call the js callback function on those matched (not the children, if you want children then do it in the cb)
 	let cb_results = {};
 	for(let acbname of known_callbacks){
-		// this *shit* does not work: if( ! acbname in cb_functions ){ continue; }
+		// this *crap* does not work: if( ! acbname in cb_functions ){ continue; }
 		// and caused me a huge waste of time
 		if( ! cb_functions[acbname] ){ continue; }
 		if( VERBOSE_DOMops > 1 ){ console.log("found callback for '"+acbname+"' and processing its code blocks ..."); }
@@ -356,6 +381,7 @@ EOJ
 				if( VERBOSE_DOMops > 1 ){ console.log("executing callback of type '"+acbname+"' (name: '"+acb["name"]+"') on matched element tag '"+el.tagName+"' and id '"+el.id+"' ..."); }
 				let ares;
 				try {
+					// calling the callback ...
 					ares = acb["code"](el);
 				} catch(err) {
 					msg = "error, call to the user-specified callback of type '"+acbname+"' (name: '"+acb["name"]+"') has failed with exception : "+err.message;
@@ -370,15 +396,33 @@ EOJ
 		cb_results[acbname] = res1;
 	}
 
-	// returned will be an array of arrays : [tag, id] for each html element matched
+	// returned will be an array of hashes : [{"tag":tag, "id":id}, ...] for each html element matched
+	// the hash for each match is constructed with element_information_from_matched_function() which must return a hash
+	// and can be user-specified or use our own default
 	var returnedids = [], returnedids_of_children_too = [];
 	for(let i=allfound.length;i-->0;){
 		let el = allfound[i];
-		returnedids.push({"tag" : el.tagName, "id" : el.id});
+		let elinfo;
+		try {
+			elinfo = element_information_from_matched_function(el);
+		} catch(err){
+			msg = "error, call to the user-specified 'element-information-from-matched' has failed for directly matched element with exception : "+err.message;
+			console.log(msg);
+			return {"status":-1,"message":msg};			
+		}
+		returnedids.push(elinfo);
 	}
 	for(let i=allfound_including_children.length;i-->0;){
 		let el = allfound_including_children[i];
-		returnedids_of_children_too.push({"tag" : el.tagName, "id" : el.id});
+		let elinfo;
+		try {
+			elinfo = element_information_from_matched_function(el);
+		} catch(err){
+			msg = "error, call to the user-specified 'element-information-from-matched' has failed for directly matched (or one of its descendents) element with exception : "+err.message;
+			console.log(msg);
+			return {"status":-1,"message":msg};			
+		}
+		returnedids_of_children_too.push(elinfo);
 	}
 
 	let ret = {
@@ -395,7 +439,7 @@ EOJ
 
 	return ret;
 })(); // end of anonymous function and now execute it
-} // end our eval scope
+}; // end our eval scope
 EOJ
 	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent) : evaluating above javascript code.\n" }
 
@@ -494,23 +538,48 @@ sub zap {
 
 =head1 NAME
 
-WWW::Mechanize::Chrome::DOMops - Operations on the DOM
+WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
 This module provides a set of tools to operate on the DOM of the
-provided L<WWW::Mechanize::Chrome>. Currently,
-supported operations are: C<find()> to find HTML elements
-and C<zap()> to delete HTML elements.
+provided L<WWW::Mechanize::Chrome> object. Currently,
+supported operations are:
+
+=over 4
+
+=item * C<find()> : finds HTML elements,
+
+=item * C<zap()> : deletes HTML elements.
+
+=back
+
+Both C<find()> and C<zap()> return some information from each match and its descendents (like C<tag>, C<id> etc.).
+This information can be tweaked by the caller.
+C<find()> and C<zap()> optionally execute javascript code on each match and its descendents and can return back data.
 
 The selection of the HTML elements in the DOM
-can be done in various ways,
-e.g. by tag, id, name, class or by a CSS selector. There
-is more information in section L<ELEMENT SELECTORS>.
+can be done in various ways:
+
+=over 4
+
+=item * by B<CSS selector>,
+
+=item * by B<tag>,
+
+=item * by B<class>.
+
+=item * by B<id>,
+
+=item * by B<name>.
+
+=back
+
+There is more information about this in section L<ELEMENT SELECTORS>.
 
 Here are some usage scenaria:
 
@@ -520,11 +589,12 @@ Here are some usage scenaria:
     $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
 
     # First, create a mech object and load a URL on it
+    # Note: you need google-chrome binary installed in your system!
     my $mechobj = WWW::Mechanize::Chrome->new();
-    $mechobj->get('https://www.xyz.com');
+    $mechobj->get('https://www.bbbbbbbbb.com');
 
     # find elements in the DOM, select by id, tag, name, or 
-    # by a CSS selector.
+    # by CSS selector.
     my $ret = find({
        'mech-obj' => $mechobj,
        # find elements whose class is in the provided
@@ -536,21 +606,35 @@ Here are some usage scenaria:
        'element-name' => ['aname', 'name2'],
        # *OR* their id is this:
        'element-id' => ['id1', 'id2'],
-       # just provide a CSS selector and get done with it already
+       # *OR* just provide a CSS selector and get done with it already
+       # the best choice
        'element-cssselector' => 'a-css-selector',
        # specifies that we should use the union of the above sets
        # hence the *OR* in above comment
-       || => 1,
+       '||' => 1,
        # this says to find all elements whose class
        # is such-and-such AND element tag is such-and-such
-       # && => 1 means to calculate the INTERSECTION of all
+       # '&&' => 1 means to calculate the INTERSECTION of all
        # individual matches.
-       
+
+       # build the information sent back from each match
+       'element-information-from-matched' => <<'EOJ',
+// begin JS code to extract information from each match and return it
+// back as a hash
+const r = htmlElement.hasAttribute("role")
+  ? htmlElement.getAttribute("role") : "<no role present>"
+;
+return {"tag" : htmlElement.tagName, "id" : htmlElement.id, "role" : r};
+EOJ
        # optionally run javascript code on all those elements matched
        'find-cb-on-matched' => [
          {
            'code' =><<'EOJS',
-console.log("found this element "+htmlElement.tagName); return 1;
+  // the element to operate on is 'htmlElement'
+  console.log("operating on this element "+htmlElement.tagName);
+  // this is returned back in the results of find() under
+  // key "cb-results"->"find-cb-on-matched"
+  return 1;
 EOJS
            'name' => 'func1'
          }, {...}
@@ -560,7 +644,11 @@ EOJS
        'find-cb-on-matched-and-their-children' => [
          {
            'code' =><<'EOJS',
-console.log("found this element "+htmlElement.tagName); return 1;
+  // the element to operate on is 'htmlElement'
+  console.log("operating on this element "+htmlElement.tagName);
+  // this is returned back in the results of find() under
+  // key "cb-results"->"find-cb-on-matched" notice the complex data
+  return {"abc":"123",{"xyz":[1,2,3]}};
 EOJS
            'name' => 'func2'
          }
@@ -573,7 +661,7 @@ EOJS
        # or ask it to randomise that id a bit to avoid collisions
        'insert-id-if-none-random' => '_prefix_id',
 
-       # optionally output the javascript code to a file for debugging
+       # optionally, also output the javascript code to a file for debugging
        'js-outfile' => 'output.js',
     });
 
@@ -631,7 +719,27 @@ parameters are:
 
 =over 4
 
-=item * C<mech-obj> : supply a L<WWW::Mechanize::Chrome>, required
+=item * C<mech-obj> : user must supply a L<WWW::Mechanize::Chrome>, this is required. See section
+L<CREATING THE MECH OBJECT> for an example of creating the mech object with some parameters
+(which work for me) and javascript console output propagated on to perl's output.
+
+=item * C<element-information-from-matched> : optional javascript code to be run
+on each HTML element matched in order to construct the information data
+whih is returned back. If none
+specified the following default will be used, which returns tagname and id:
+
+   // the matched element is provided in htmlElement
+   return {"tag" : htmlElement.tagName, "id" : htmlElement.id};
+
+Basically the code is expected to be the B<body of a function> which
+accepts one parameter: C<htmlElement> (that is the element matched).
+That means it B<must not have>
+the function preamble (function name, signature, etc.).
+Neither it must have the postamble, which is the end-block curly bracket.
+This piece of code B<must return a HASH>. 
+The code can thow exceptions which will be caught
+(because the code is run within a try-catch block)
+and the error message will be propagated to the perl code with status of -1.
 
 =item * C<insert-id-if-none> : some HTML elements simply do not have
 an id (e.g. C<<p>>). If any of these elements is matched,
@@ -661,13 +769,22 @@ code in the specified array. Each item of the array
 is a hash with keys C<code> and C<name>. The former
 contains the code to be run assuming that the
 html element to operate on is named C<htmlElement>.
-The code must end with a C<return> statement.
-Basically the code is the body of a function
-B<without> the preamble (signature and function name etc.)
-and the postamble. Key C<name> is just for
+The code must end with a C<return> statement which
+will be recorded and returned back to perl code.
+The code can thow exceptions which will be caught
+(because the callback is run within a try-catch block)
+and the error message will be propagated to the perl code with status of -1.
+Basically the code is expected to be the B<body of a function> which
+accepts one parameter: C<htmlElement> (that is the element matched).
+That means it B<must not have>
+the function preamble (function name, signature, etc.).
+Neither it must have the postamble, which is the end-block curly bracket.
+
+Key C<name> is just for
 making this process more descriptive and will
 be printed on log messages and returned back with
-the results. Here is an  example:
+the results. C<name> can contain any characters.
+Here is an  example:
 
     'find-cb-on-matched' : [
       {
@@ -694,10 +811,15 @@ code (which is evaluated within the mech object) to a file.
 
 B<JAVASCRIPT HELPERS>
 
-There is one javascript function which can be called from any of the
-callbacks as C<getAllChildren(anHtmlElement)>. It returns
+There is one javascript function available to all user-specified callbacks:
+
+=over 2
+
+=item * C<getAllChildren(anHtmlElement)> : it returns
 back an array of HTML elements which are the children (at any depth)
 of the given C<anHtmlElement>.
+
+=back
 
 B<RETURN VALUE>:
 
@@ -708,16 +830,24 @@ denotes the number of matched HTML elements. Or it is -3, -2 or
 
 =over 4
 
-=item C<-3> : there is an error with the parameters passed to this sub.
+=item * C<-3> : there is an error with the parameters passed to this sub.
 
-=item C<-2> : there is a syntax error with the javascript code to evaluate
-C<eval()> inside the mech object. Most likely this syntax error is
-with user-specified callback code.
+=item * C<-2> : there is a syntax error in the javascript code to be
+evaluated by the mech object with something like C<$mech_obj->eval()>.
+Most likely this syntax error is with user-specified callback code.
+Note that all the javascript code to be evaluated is dumped to stderr
+by increasing the verbosity. But also it can be saved to a local file
+for easier debugging by supplying the C<js-outfile> parameter to
+C<find()> or C<zap()>.
 
-=item C<-1> : there is a logical error while running the javascript code.
+=item * C<-1> : there is a logical error while running the javascript code.
 For example a division by zero etc. This can be both in the callback code
 as well as in the internal javascript code for edge cases not covered
-by tests. Please report these.
+by my tests. Please report these.
+Note that all the javascript code to be evaluated is dumped to stderr
+by increasing the verbosity. But also it can be saved to a local file
+for easier debugging by supplying the C<js-outfile> parameter to
+C<find()> or C<zap()>.
 
 =back
 
@@ -823,6 +953,11 @@ B<RETURN VALUE>:
 
 Return value is exactly the same as with L</find($params)>
 
+=head2 $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops
+
+Set this upon loading the module to C<0, 1, 2, 3>
+to increase verbosity. C<0> implies no verbosity.
+
 =head1 ELEMENT SELECTORS
 
 C<Element selectors> are how one selects HTML elements from the DOM.
@@ -865,9 +1000,88 @@ by at least one of the selectors specified.
 
 =back
 
+=head1 CREATING THE MECH OBJECT
+
+The mech (L<WWW::Mechanize::Chrome>) object must be supplied
+to the functions in this module. It must be created by the caller.
+This is how I do it:
+
+    use WWW::Mechanize::Chrome;
+    use Log::Log4perl qw(:easy);
+    Log::Log4perl->easy_init($ERROR);
+
+    my %default_mech_params = (
+    	headless => 1,
+    #	log => $mylogger,
+    	launch_arg => [
+    		'--window-size=600x800',
+    		'--password-store=basic', # do not ask me for stupid chrome account password
+    #		'--remote-debugging-port=9223',
+    #		'--enable-logging', # see also log above
+    		'--disable-gpu',
+    		'--no-sandbox',
+    		'--ignore-certificate-errors',
+    		'--disable-background-networking',
+    		'--disable-client-side-phishing-detection',
+    		'--disable-component-update',
+    		'--disable-hang-monitor',
+    		'--disable-save-password-bubble',
+    		'--disable-default-apps',
+    		'--disable-infobars',
+    		'--disable-popup-blocking',
+    	],
+    );
+
+    my $mech_obj = eval {
+    	WWW::Mechanize::Chrome->new(%default_mech_params)
+    };
+    die $@ if $@;
+
+    # This transfers all javascript code's console.log(...)
+    # messages to perl's warn()
+    # we need to keep $console var in scope!
+    my $console = $mech_obj->add_listener('Runtime.consoleAPICalled', sub {
+    	  warn
+    	      "js console: "
+    	    . join ", ",
+    	      map { $_->{value} // $_->{description} }
+    	      @{ $_[0]->{params}->{args} };
+    	})
+    ;
+
+    # and now fetch a page
+    my $URL = '...';
+    my $retmech = $mech_obj->get($URL);
+    die "failed to fetch $URL" unless defined $retmech;
+    $mech_obj->sleep(1); # let it settle
+    # now the mech object has loaded the URL and has a DOM hopefully.
+    # You can pass it on to find() or zap() to operate on the DOM.
+
+
+=head1 DEPENDENCIES
+
+This module depends on L<WWW::Mechanize::Chrome> which, in turn,
+depends on the C<google-chrome> executable be installed on the
+host computer. See L<WWW::Mechanize::Chrome::Install> on
+how to install the executable.
+
+Test scripts (which create there own mech object) will detect the absence
+of C<google-chrome> binary and exit gracefully, meaning the test passes.
+But with a STDERR message to the user. Who will hopefully notice it and
+proceed to C<google-chrome> installation. In any event, this module
+will be installed with or without C<google-chrome>.
+
 =head1 AUTHOR
 
 Andreas Hadjiprocopis, C<< <bliako at cpan.org> >>
+
+=head1 CODING CONDITIONS
+
+This code was written under extreme climate conditions of 44 Celsius.
+Keep packaging those
+vegs in kilos of plastic wrappers, keep obsolidating our perfectly good
+hardware, keep inventing new consumer needs and brainwash them
+down our throats, in short B<Crack Deep the Roof Beam, Capitalism>.
 
 =head1 BUGS
 
@@ -885,8 +1099,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * L<WWW::Mechanize::Chrome>
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -913,7 +1125,8 @@ Almaz
 
 =head1 ACKNOWLEDGEMENTS
 
-L<CORION> for publishing  L<WWW::Mechanize::Chrome>
+L<CORION> for publishing  L<WWW::Mechanize::Chrome> and all its
+contributors.
 
 
 =head1 LICENSE AND COPYRIGHT

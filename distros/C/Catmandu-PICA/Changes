@@ -1,5 +1,8 @@
 Changelog for Catmandu-PICA
 
+1.17 2023-08-18T06:06:33Z
+  - Add Fix: pica_append (#82)
+
 1.16 2023-08-11T07:06:23Z
   - Add Fix: pica_update (#82)
 

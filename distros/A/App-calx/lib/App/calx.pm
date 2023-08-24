@@ -13,7 +13,7 @@ use Text::ANSI::Util qw(ta_length);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-06-22'; # DATE
 our $DIST = 'App-calx'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 # XXX use locale
 my $month_names = [qw(January February March April May June July August September October November December)];
@@ -23,7 +23,7 @@ our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'Display a calendar',
+    summary => 'Display a calendar, with highlighted dates',
 };
 
 sub _center {
@@ -307,7 +307,7 @@ sub gen_calendar {
 }
 
 1;
-# ABSTRACT: Display a calendar
+# ABSTRACT: Display a calendar, with highlighted dates
 
 __END__
 
@@ -317,21 +317,17 @@ __END__
 
 =head1 NAME
 
-App::calx - Display a calendar
+App::calx - Display a calendar, with highlighted dates
 
 =head1 VERSION
 
-This document describes version 0.007 of App::calx (from Perl distribution App-calx), released on 2023-06-22.
+This document describes version 0.009 of App::calx (from Perl distribution App-calx), released on 2023-06-22.
 
 =head1 SYNOPSIS
 
  # See calx script provided in this distribution
 
 =head1 DESCRIPTION
-
-This module provides the B<calx> which, like the Unix utility B<cal>, displays
-calendar on the command-line. The difference is, B<calx> can also show and
-highlight dates from one or more L<Calendar::Dates> modules.
 
 =head1 FUNCTIONS
 
@@ -460,6 +456,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-calx>.
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-calx>.
+
+=head1 SEE ALSO
+
+B<cal> Unix utility.
+
+Other B<cal> variants: L<cal-idn> (from L<App::cal::idn>).
 
 =head1 AUTHOR
 

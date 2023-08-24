@@ -3,7 +3,7 @@ NAME
     via JSON.
 
 SYNOPSIS
-     test-dwg-libredwg-json [-d test_dir] [-h] [-v level] [--version] dwg_file
+     test-dwg-libredwg-json [-d test_dir] [-h] [-i] [-v level] [--version] dwg_file
 
 DESCRIPTION
     This tool is used to test libredwg JSON conversions on DWG file.
@@ -20,6 +20,12 @@ ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-i"
+
+            Ignore errors.
+
+            Default value is error reporting.
 
     *       "-v level"
 
@@ -56,5 +62,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

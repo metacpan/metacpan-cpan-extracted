@@ -40,6 +40,8 @@ lib/URI/ftp.pm
 lib/URI/gopher.pm
 lib/URI/http.pm
 lib/URI/https.pm
+lib/URI/icap.pm
+lib/URI/icaps.pm
 lib/URI/ldap.pm
 lib/URI/ldapi.pm
 lib/URI/ldaps.pm
@@ -78,6 +80,7 @@ t/generic.t
 t/gopher.t
 t/heuristic.t
 t/http.t
+t/icap.t
 t/idna.t
 t/ipv6.t
 t/iri.t

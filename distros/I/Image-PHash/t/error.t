@@ -21,6 +21,14 @@ like(
     "Resize <= 5"
 );
 
+my $obj = {};
+bless $obj, 'Other::Type';
+like(
+    dies { Image::PHash->new($obj, 'test') },
+    qr/Object of unknown type/,
+    "Unknown object type"
+);
+
 like(
     dies { Image::PHash->new('test', 'test') },
     qr/Unknown image library/,

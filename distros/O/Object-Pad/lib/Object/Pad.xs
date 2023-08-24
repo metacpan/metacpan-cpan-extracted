@@ -1004,10 +1004,6 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
 
   switch(type) {
     case PHASER_NONE:
-      if(ctx->name && strEQ(SvPVX(ctx->name), "BUILD"))
-        croak("method BUILD is no longer supported; use a BUILD block instead");
-      break;
-
     case PHASER_BUILD:
     case PHASER_ADJUST:
       break;

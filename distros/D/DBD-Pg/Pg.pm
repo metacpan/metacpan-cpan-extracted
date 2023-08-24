@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.16.3');
+    use version; our $VERSION = qv('3.17.0');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -137,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.16.3');
+        my $realversion = qv('3.17.0');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -1609,6 +1609,7 @@ use 5.008001;
                 pg_protocol                    => undef,
                 pg_server_prepare              => undef,
                 pg_server_version              => undef,
+                pg_skip_deallocate             => undef,
                 pg_socket                      => undef,
                 pg_standard_conforming_strings => undef,
                 pg_switch_prepared             => undef,
@@ -1699,7 +1700,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.16.3 of the DBD::Pg module
+This documents version 3.17.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -1738,7 +1739,8 @@ The following connect statement shows almost all possible parameters:
                      );
 
 Parameters containing unusual characters such as spaces can be wrapped in single quotes 
-around the value e.g. "dbi:Pg:dbname='spacey name';host=$host"
+around the value, and single quotes and backslashes can be escaped with a backslash,
+e.g. C<dbi:Pg:dbname='\'spacey\' name';host=$host>.
 
 If a parameter is not given, the connect() method will first look for 
 specific environment variables, and then fall back to hard-coded defaults:
@@ -2796,7 +2798,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.16.3'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.17.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -3312,6 +3314,13 @@ possible to return the old behavior. The old behavior is useful when encoding
 the results of a call in JSON format and passing it to JavaScript for
 processing, where integer values have a precision of no more than 53 bits.
 
+=head3 B<pg_skip_deallocate> (integer)
+
+DBD::Pg specific attribute. By default this is false, and causes prepared statements
+created by us to be deallocated when no longer needed (i.e. when the handle is destroyed).
+By setting this to true, this deallocation is skipped entirely. This is useful when
+there is something else taking over responsibility for prepared statements.
+
 =head3 B<pg_errorlevel> (integer)
 
 DBD::Pg specific attribute. Sets the amount of information returned by the server's 
@@ -3518,6 +3527,9 @@ The current list of Postgres data types exported is:
  PG_UUID PG_UUIDARRAY PG_VARBIT PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY
  PG_VOID PG_XID PG_XID8 PG_XID8ARRAY PG_XIDARRAY PG_XML
  PG_XMLARRAY
+
+Be warned that PG_CHAR is probably not what you think it is. When in doubt, use PG_TEXT
+for anything storing a non-numeric string.
 
 Data types are "sticky," in that once a data type is set to a certain placeholder,
 it will remain for that placeholder, unless it is explicitly set to something

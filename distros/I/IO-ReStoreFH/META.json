@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -34,12 +34,12 @@
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
-            "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -76,8 +76,9 @@
             "Dist::Zilla::PluginBundle::Filter" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
-            "Pod::Weaver::Section::Support" : "0",
             "Pod::Wordlist" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -93,7 +94,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
+            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
@@ -106,7 +107,7 @@
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "if" : "0",
-            "perl" : "v5.10.0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -131,7 +132,7 @@
    "provides" : {
       "IO::ReStoreFH" : {
          "file" : "lib/IO/ReStoreFH.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -141,13 +142,14 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH"
       },
       "repository" : {
+         "type" : "git",
          "url" : "https://gitlab.com/djerius/io-restorefh.git",
          "web" : "https://gitlab.com/djerius/io-restorefh"
       }
    },
-   "version" : "0.10",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "0.11",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

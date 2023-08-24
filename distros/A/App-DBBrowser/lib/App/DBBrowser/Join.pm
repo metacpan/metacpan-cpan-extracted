@@ -96,8 +96,8 @@ sub join_tables {
         my $master_alias = $ax->alias( $join, 'join', $qt_master, $join->{default_alias} );
         push @{$join->{aliases}}, [ $master, $master_alias ];
         $join->{stmt} .= " " . $qt_master;
-        $join->{stmt} .= $sf->{i}{" AS "} . $ax->prepare_identifier( $master_alias );
-        $sf->{d}{col_names}{$master} //= $ax->column_names( $qt_master . $sf->{i}{" AS "} . $ax->prepare_identifier( $master_alias ) ); ##
+        $join->{stmt} .= " " . $ax->prepare_identifier( $master_alias );
+        $sf->{d}{col_names}{$master} //= $ax->column_names( $qt_master . " " . $ax->prepare_identifier( $master_alias ) ); ##
 
         my @bu;
 
@@ -230,9 +230,9 @@ sub __add_slave_with_join_condition {
         # Alias
         my $slave_alias = $ax->alias( $join, 'join', $qt_slave, ++$join->{default_alias} );
         $join->{stmt} .= " " . $qt_slave;
-        $join->{stmt} .= $sf->{i}{" AS "} . $ax->prepare_identifier( $slave_alias );
+        $join->{stmt} .= " " . $ax->prepare_identifier( $slave_alias );
         push @{$join->{aliases}}, [ $slave, $slave_alias ];
-        $sf->{d}{col_names}{$slave} //= $ax->column_names( $qt_slave . $sf->{i}{" AS "} . $ax->prepare_identifier( $slave_alias ) ); ##
+        $sf->{d}{col_names}{$slave} //= $ax->column_names( $qt_slave . " " . $ax->prepare_identifier( $slave_alias ) ); ##
         if ( $join_type ne 'CROSS JOIN' ) {
             my $ok = $sf->__add_join_condition( $join, $tables, $slave, $slave_alias );
             if ( ! $ok ) {

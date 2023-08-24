@@ -48,7 +48,7 @@ my $build = $class->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester' => '4.007',
     'Module::Build' => '0.34'
   },
   'configure_requires' => {

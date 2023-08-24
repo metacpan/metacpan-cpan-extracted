@@ -63,6 +63,6 @@
          "url" : "http://github.com/abbypan/Crypt-OpenSSL-Base-Func"
       }
    },
-   "version" : "0.035",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.037",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

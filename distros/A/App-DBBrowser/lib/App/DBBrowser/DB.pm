@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.338';
+our $VERSION = '2.339';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -23,6 +23,38 @@ sub new {
 sub get_db_driver {
     my ( $sf ) = @_;
     return $sf->{Plugin}->get_db_driver();
+}
+
+
+sub read_login_data {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'read_login_data' );
+    my $read_args = $sf->{Plugin}->read_login_data();
+    return $read_args // [];
+}
+
+
+sub env_variables {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'env_variables' );
+    my $env_variables = $sf->{Plugin}->env_variables();
+    return $env_variables // [];
+}
+
+
+sub read_attributes {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'read_attributes' );
+    my $read_attributes = $sf->{Plugin}->read_attributes();
+    return $read_attributes // [];
+}
+
+
+sub set_attributes {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'set_attributes' );
+    my $set_attributes = $sf->{Plugin}->set_attributes();
+    return $set_attributes // [];
 }
 
 
@@ -61,6 +93,13 @@ sub get_db_handle {
         );
     }
     return $dbh;
+}
+
+
+sub get_databases {
+    my ( $sf ) = @_;
+    my ( $user_db, $sys_db ) = $sf->{Plugin}->get_databases();
+    return $user_db // [], $sys_db // [];
 }
 
 
@@ -122,15 +161,21 @@ sub get_schemas {
             }
             my $regex_sys;
             if ( $driver eq 'Pg' ) {
-                $regex_sys = qr/^(?:pg_|information_schema$)/;
+                $regex_sys = qr/^(?:pg_|information_schema$)/i;
             }
             elsif ( $driver eq 'DB2' ) {
-                $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/;
+                $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/i;
             }
             elsif ( $driver eq 'Informix' ) {
                 $regex_sys = qr/^informix\z/i;
             }
-            my $sth = $dbh->table_info( undef, '%', '', '' );
+            my $sth;
+            if ( $driver eq 'ODBC' ) {
+                $sth = $dbh->table_info( undef, '%', undef, undef );
+            }
+            else {
+                $sth = $dbh->table_info( undef, '%', '', '' );
+            }
             my $info = $sth->fetchall_hashref( $table_schem );
             for my $schema ( sort keys %$info ) {
                 if ( defined $regex_sys && $schema =~ $regex_sys ) {
@@ -157,51 +202,6 @@ sub get_schemas {
         }
         return $user_schemas, $sys_schemas;
     }
-}
-
-
-sub read_login_data {
-    my ( $sf ) = @_;
-    return [] if ! $sf->{Plugin}->can( 'read_login_data' );
-    my $read_args = $sf->{Plugin}->read_login_data();
-    return [] if ! defined $read_args;
-    return $read_args;
-}
-
-
-sub env_variables {
-    my ( $sf ) = @_;
-    return [] if ! $sf->{Plugin}->can( 'env_variables' );
-    my $env_variables = $sf->{Plugin}->env_variables();
-    return [] if ! defined $env_variables;
-    return $env_variables;
-}
-
-
-sub read_attributes {
-    my ( $sf ) = @_;
-    return [] if ! $sf->{Plugin}->can( 'read_attributes' );
-    my $read_attributes = $sf->{Plugin}->read_attributes();
-    return [] if ! defined $read_attributes;
-    return $read_attributes;
-}
-
-
-sub set_attributes {
-    my ( $sf ) = @_;
-    return [] if ! $sf->{Plugin}->can( 'set_attributes' );
-    my $set_attributes = $sf->{Plugin}->set_attributes();
-    return [] if ! defined $set_attributes;
-    return $set_attributes;
-}
-
-
-sub get_databases {
-    my ( $sf ) = @_;
-    my ( $user_db, $sys_db ) = $sf->{Plugin}->get_databases();
-    $user_db = [] if ! defined $user_db;
-    $sys_db  = [] if ! defined $sys_db;
-    return $user_db, $sys_db;
 }
 
 
@@ -244,7 +244,7 @@ sub tables_info { # not documented
     }
     my @keys = ( $table_cat, $table_schem, $table_name, $table_type );
     my $sth;
-    if ( $driver eq 'Oracle' ) {
+    if ( $driver =~ /^(?:Oracle|ODBC)\z/ ) {
         $sth = $dbh->table_info( undef, $schema, '%', undef );
     }
     else {
@@ -254,7 +254,7 @@ sub tables_info { # not documented
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
     for my $info_table ( @$info_tables ) {
-        if ( $driver eq 'Informix' && $schema ne $info_table->{$table_schem} ) {
+        if ( $driver =~ /^(?:Informix|Sybase)\z/ && $schema ne $info_table->{$table_schem} ) {
             # Informix: `table_info` returns everything.
             next;
         }
@@ -324,7 +324,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.338
+Version 2.339
 
 =head1 DESCRIPTION
 
@@ -435,7 +435,7 @@ An example C<env_variables> method:
 
     sub env_variables {
         my ( $self ) = @_;
-        return [ qw( DBI_DSN DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
+        return [ qw( DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
     }
 
 See the option I<ENV Variables> in I<DB Settings>.
@@ -517,7 +517,6 @@ The result of the I<ENV Variables>* settings:
 
     $env_var_yes:
     {
-        DBI_DSN  => 0,
         DBI_HOST => 1,
         DBI_PORT => 1,
         DBI_USER => 0,
@@ -558,7 +557,7 @@ The result of the I<Attributes>* settings:
         my $dbh = DBI->connect( "DBI:Pg:dbname=$db", 'user', 'password', {
             RaiseError => 1,
             PrintError => 0,
-        }) or die $DBI::errstr;
+        });
         return $dbh;
     }
 

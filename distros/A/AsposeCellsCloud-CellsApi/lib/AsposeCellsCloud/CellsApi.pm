@@ -40891,12 +40891,49 @@ sub post_unlock{
 }
 
 #
-# PostProtectRequest
+# PostLockRequest
 #
 # 
 # 
 # @File  string (required)  File to upload  
 # @password  string (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostLockRequest',
+            description => 'PostLock Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_lock' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+    };
+}
+#
+# @return FilesResult
+#
+sub post_lock{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# PostProtectRequest
+#
+# Protect MS Excel and OpenDocument Spreadsheet by making them password protected.
+# 
+# @File  string (required)  File to upload  
+# @protectWorkbookRequst  ProtectWorkbookRequst (required)    
+# @password  string      
 #
 {
     my $params = {
@@ -40907,7 +40944,7 @@ sub post_unlock{
        }
     };
     __PACKAGE__->method_documentation->{ 'post_protect' } = { 
-    	summary => '',
+    	summary => 'Protect MS Excel and OpenDocument Spreadsheet by making them password protected.',
         params => $params,
         returns => 'FilesResult',
     };

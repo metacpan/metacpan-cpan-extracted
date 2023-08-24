@@ -5,7 +5,7 @@ use warnings;
 
 use App::Test::DWG::LibreDWG::JSON;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Run.
 exit App::Test::DWG::LibreDWG::JSON->new->run;
@@ -28,7 +28,7 @@ test-dwg-libredwg-json - Script to test DWG file by LibreDWG conversions via JSO
 
 =head1 SYNOPSIS
 
- test-dwg-libredwg-json [-d test_dir] [-h] [-v level] [--version] dwg_file
+ test-dwg-libredwg-json [-d test_dir] [-h] [-i] [-v level] [--version] dwg_file
 
 =head1 DESCRIPTION
 
@@ -49,6 +49,12 @@ Test directory. If doesn't exist, create dir in system tmp.
 =item * C<-h>
 
 Print help.
+
+=item * C<-i>
+
+Ignore errors.
+
+Default value is error reporting.
 
 =item * C<-v level>
 
@@ -98,6 +104,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::ABI::TypeRole 0.011;
+package Blockchain::Ethereum::ABI::TypeRole 0.012;
 role Blockchain::Ethereum::ABI::TypeRole;
 
 =head2 encode

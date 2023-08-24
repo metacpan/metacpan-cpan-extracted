@@ -23,7 +23,7 @@
       <li><a href="#IN-THE-FILESYSTEM">IN THE FILESYSTEM</a></li>
     </ul>
   </li>
-  <li><a href="#FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</a>
+  <li><a href="#SUBROUTINES-AND-VARIABLES">SUBROUTINES AND VARIABLES</a>
     <ul>
       <li><a href="#NAMED-PARAMETERS">NAMED PARAMETERS</a></li>
     </ul>
@@ -32,7 +32,6 @@
   <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
   <li><a href="#SEE-ALSO">SEE ALSO</a></li>
   <li><a href="#LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</a></li>
-  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
 
 <h1 id="NAME">NAME</h1>
@@ -41,7 +40,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>1.10</p>
+<p>1.11</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -66,7 +65,7 @@
 
     print &quot;tlock patience is ${patience}\n&quot;;
 
-    # Checking lock is alive.
+    # Checking that tlock is alive.
     my $t = $ARGV[0];
     die &#39;Tlock not taken.&#39; if not tlock_alive(&#39;maint&#39;,$t);
 
@@ -74,17 +73,17 @@
     tlock_renew(&#39;maint&#39;,600);
     do_fancy_log_rotation(547);
 
-    # Call another script that requires this lock.
+    # Call another script that requires this tlock.
     system( &#39;./clean-up.sh&#39; , $t );
 
-    # Releasing the lock.
+    # Releasing the tlock.
     tlock_release(&#39;maint&#39;,$t);</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
 <p>This module is handling tlocks, advisory locks with timeouts.</p>
 
-<p>It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, tlocks are paired with a lock token.</p>
+<p>It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, each tlock is paired with a token.</p>
 
 <p>The tlocks are simply living in a lock directory in the filesystem. A distant predecessor to this module was written as a kludge to make locking work properly on a Windows server. But it turned out to be very handy to have tlocks in the filesystem, giving you an at-a-glance overview of them. And giving the non-scripting sysadmins easy access to view and manipulate them.</p>
 
@@ -142,7 +141,7 @@
 
 <p><code>owner</code> For the UID of the owner that will be set for tlock directories.</p>
 
-<p><code>patience</code> For the time that a call will wait for a lock release.</p>
+<p><code>patience</code> For the time that a call will wait for a tlock release.</p>
 
 <pre><code>    tlock 1
     # Example configuration file for tlock.
@@ -151,7 +150,7 @@
 
 <h2 id="TOKENS">TOKENS</h2>
 
-<p>Safe use of tlocks involve tokens, which are just timestamps of when the lock was taken.</p>
+<p>Safe use of tlocks involve tokens, which are just timestamps of when the tlock was taken.</p>
 
 <p>Without tokens, something like this could happen...</p>
 
@@ -171,9 +170,9 @@
 
 <p>All the data for a tlock is in its directory. If it is removed from the lock directory, the tlock is released. If it is moved back in, it is alive again (unless it has timed out). If too much playing around has messed up the lock directory, running tlock_zing on it cleans it up.</p>
 
-<p>The lock directory also contains shortlived directories named &quot;${marker}_.${label}&quot;. They are per label master locks that help to make changes to the normal locks atomic.</p>
+<p>The lock directory also contains shortlived directories named &quot;${marker}_.${label}&quot;. They are per label master locks that help to make changes to the tlocks atomic.</p>
 
-<h1 id="FUNCTIONS-AND-VARIABLES">FUNCTIONS AND VARIABLES</h1>
+<h1 id="SUBROUTINES-AND-VARIABLES">SUBROUTINES AND VARIABLES</h1>
 
 <p>Loaded by default: <a href="#tlock_take-label-timeout">tlock_take</a>, <a href="#tlock_renew-label-token-timeout">tlock_renew</a>, <a href="#tlock_release-label-token">tlock_release</a>, <a href="#tlock_alive-label-token">tlock_alive</a>, <a href="#tlock_taken-label">tlock_taken</a>, <a href="#tlock_expiry-label">tlock_expiry</a>, <a href="#tlock_zing">tlock_zing</a></p>
 
@@ -226,7 +225,7 @@
 <dt id="tlock_zing">tlock_zing()</dt>
 <dd>
 
-<p>Cleans up locks in the lock directory. Takes care not to mess with any lock activity.</p>
+<p>Cleans up tlocks in the lock directory. Takes care not to mess with any lock activity.</p>
 
 </dd>
 <dt id="tlock_tstart-label">tlock_tstart( $label )</dt>
@@ -286,11 +285,13 @@
 <dt id="patience">$patience</dt>
 <dd>
 
-<p>Patience is the time a call will try to take or change a tlock, before it gives up. For example when tlock_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.</p>
+<p>Patience is the number of seconds a call will try to take or change a tlock, before it gives up. For example when tlock_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.</p>
+
+<p>Patience can be set to any non-negative fractional number. If it is set to 0, a call only tries once before giving up.</p>
 
 <p>Dont confuse patience with timeout.</p>
 
-<p>Default patience value is 2.5 seconds.</p>
+<p>Default patience value is 0.</p>
 
 <p>Only loaded on demand.</p>
 
@@ -324,26 +325,6 @@
 <p>Licensed under the Apache License, version 2.0</p>
 
 <p>https://www.apache.org/licenses/LICENSE-2.0.txt</p>
-
-<h1 id="POD-ERRORS">POD ERRORS</h1>
-
-<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
-
-<dl>
-
-<dt id="Around-line-737">Around line 737:</dt>
-<dd>
-
-<p>You forgot a &#39;=back&#39; before &#39;=head2&#39;</p>
-
-</dd>
-<dt id="Around-line-741">Around line 741:</dt>
-<dd>
-
-<p>=back without =over</p>
-
-</dd>
-</dl>
 
 
 </body>

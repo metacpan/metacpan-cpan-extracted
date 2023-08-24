@@ -31,8 +31,8 @@ SYNOPSIS
        }
     
        class Point {
-          field $x :param :reader :Checked(Numerical);
-          field $y :param :reader :Checked(Numerical);
+          field $x :param :reader :Checked('Numerical');
+          field $y :param :reader :Checked('Numerical');
        }
     
        ...
@@ -41,7 +41,7 @@ DESCRIPTION
 
     This module provides a third-party field attribute for
     Object::Pad-based classes, which declares that values assigned to the
-    field must conform to a given value constraint check.
+    field must conform to a given constraint check.
 
     WARNING The ability for Object::Pad to take third-party field
     attributes is still new and highly experimental, and subject to much
@@ -49,12 +49,12 @@ DESCRIPTION
     equally experimental.
 
     Additionally, the behaviour provided by this module should be
-    considered more of a work-in-progress stepping stone. Ideally, value
+    considered more of a work-in-progress stepping stone. Ideally,
     constraint syntax ought to be provided in a much more fundamental way
-    by native Perl syntax, allowing it to be used on my lexicals,
-    subroutine parameters, and other places as well as object fields. This
-    module is more of a placeholder to allow some part of that behaviour to
-    be specified for object fields, while not getting in the way of a more
+    by Perl itself, allowing it to be used on my lexicals, subroutine
+    parameters, and other places as well as object fields. This module is
+    more of a placeholder to allow some part of that behaviour to be
+    specified for object fields, while not getting in the way of a more
     general, more powerful system being added in future.
 
 FIELD ATTRIBUTES
@@ -63,25 +63,32 @@ FIELD ATTRIBUTES
 
        field $name :Checked(EXPRESSION) ...;
 
-    Declares that any value assigned to the field must conform to the
-    constraint checking object specified by the expression. Attempts to
-    assign a non-conforming value will throw an exception and the field
-    will not be modified.
+    Declares that any value assigned to the field during the constructor or
+    using an accessor method must conform to the constraint checking object
+    specified by the expression. Attempts to assign a non-conforming value
+    will throw an exception and the field will not be modified. Currently
+    only scalar fields are supported.
 
     At compiletime, the string given by EXPRESSION is eval()'ed in scalar
     context, and its result is stored as part of the field's definition.
-    The value of the expression must either be an object reference, or a
-    string containing the name of a package. In either case, a method
-    called check must exist on it.
+    The expression must yield either an object reference, or a string
+    containing the name of a package. In either case, a method called check
+    must exist on it.
 
-    At runtime, this constraint checking value is used every time an
-    attempt is made to assign a new value to the field, whether that is
-    from :param initialisation, invoking a :writer or :mutator accessor, or
-    direct assignment into the field variable by method code within the
-    class. The checker is used as the invocant for invoking a check method,
-    and the new value for the field is passed as an argument. If the method
-    returns true, the assignment is allowed. If false, it is rejected with
-    an exception and the field itself remains unmodified.
+    During the string eval() of the expression, the strict 'subs' pragma is
+    specifically disabled, allowing a bareword to be used as the name of a
+    package. This feature may be removed in future, so be sure to quote
+    package names if required.
+
+       field $x :Checked('CheckerPackage');
+
+    At runtime, this constraint checker is used every time an attempt is
+    made to assign a value to the field from outside the object class,
+    whether that is from :param initialisation, or invoking a :writer
+    accessor. The checker is used as the invocant for invoking a check
+    method, and the new value for the field is passed as an argument. If
+    the method returns true, the assignment is allowed. If false, it is
+    rejected with an exception and the field itself remains unmodified.
 
        $ok = $checker->check( $value );
 
@@ -93,11 +100,23 @@ FIELD ATTRIBUTES
        field $name :Checked(Str);
        field $age  :Checked(Num);
 
+    Note carefully that direct assignment into the field variable by code
+    within the class is not checked. This is partly because of design
+    considerations, and partly because any way to implement that would be
+    horribly slow, or flat-out impossible. Prior to version 0.04 this
+    module used to claim that even direct assignments would be checked. but
+    this gave a false sense of safety if deeply-nested containers were
+    involved and modified from within.
+
     (For performance reasons, the check method is actually resolved into a
     function at compiletime when the :Checked attribute is applied, and
-    this stored value is the one that is called at assignment time. If the
-    method itself is replaced later by globref assignment or other
-    trickery, this updated value will not be used.)
+    this stored function is the one that is called at assignment time. If
+    the method itself is replaced later by globref assignment or other
+    trickery, this updated function will not be used.)
+
+TODO
+
+      * Support :accessor and :mutator accessors as well as :writer.
 
 SEE ALSO
 

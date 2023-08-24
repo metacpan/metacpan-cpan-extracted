@@ -152,7 +152,7 @@ my %WriteMakefileArgs = (
     },
     # script to update all version numbers to match X11/Xlib.pm
     # Runs during "make dist"
-    PREOP => 'perl util/update_versions.pl',
+    dist => { PREOP => 'perl util/update_versions.pl' },
 
     $dep->get_makefile_vars,
 );

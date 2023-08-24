@@ -3,12 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use App::sdview::Parser::Man;
 
 my $parser = App::sdview::Parser::Man->new;
-isa_ok( $parser, "App::sdview::Parser::Man", '$parser' );
+isa_ok( $parser, [ "App::sdview::Parser::Man" ], '$parser' );
 
 ok( App::sdview::Parser::Man->can_parse_file( "Example.3" ),  'Parser can handle .3 file' );
 ok( App::sdview::Parser::Man->can_parse_file( "Example.3.gz" ), 'Parser can handle .3.gz file' );
@@ -34,7 +34,7 @@ EOMAN
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is_deeply( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
 };
 
 subtest "Formatting" => sub {

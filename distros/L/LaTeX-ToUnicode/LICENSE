@@ -1,4 +1,4 @@
-This software is copyright (c) 2010-2016 by Gerhard Gossen and Boris Veytsman
+Copyright 2010-2021 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -11,8 +11,6 @@ a) the GNU General Public License as published by the Free
 b) the "Artistic License"
 
 --- The GNU General Public License, Version 1, February 1989 ---
-
-This software is copyright (c) 2010-2016 by Gerhard Gossen and Boris Veytsman
 
 This is free software, licensed under:
 

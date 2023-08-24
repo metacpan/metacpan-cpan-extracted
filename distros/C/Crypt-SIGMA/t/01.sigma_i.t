@@ -7,8 +7,8 @@ use warnings;
 
 #use lib '../lib';
 
-use bignum;
-use Smart::Comments;
+#use bignum;
+#use Smart::Comments;
 
 use Test::More;
 use FindBin qw($Bin);

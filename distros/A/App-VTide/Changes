@@ -1,5 +1,10 @@
 Revision history for App-VTide
 
+1.0.5   2023-08-18
+        Updating for release of version 1.0.5
+        Fixing issue with env not set (Ivan Wills)
+        Fixing sessions command (Ivan Wills)
+
 1.0.4   2023-07-29
         Updating for release of version 1.0.4
         Fixing isse when no session present (Ivan Wills)

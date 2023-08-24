@@ -57,6 +57,7 @@ do { my $x = {
                                       'Perl::Tidy' => '20220613',
                                       'Pod::Usage' => '0',
                                       'Ref::Util' => '0',
+                                      'Scalar::Util' => '0',
                                       'Sereal::Decoder' => '0',
                                       'Sereal::Encoder' => '0',
                                       'Sub::HandlesVia' => '0',

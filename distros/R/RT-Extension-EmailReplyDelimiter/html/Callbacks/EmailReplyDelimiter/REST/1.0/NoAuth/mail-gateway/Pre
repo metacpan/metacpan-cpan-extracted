@@ -1,0 +1,35 @@
+<%doc>
+Override the RT::EmailParser::SmartParseMIMEEntityFromScalar function, so
+that this extension gets a chance to modify inbound emails before RT
+processes then.
+
+We have to do this here, and use a global variable to check whether we've
+done it already, because if we do it in the .pm on load, it doesn't work
+because our extension .pm can be loaded before RT::EmailParser.  Doing it
+this way guarantees that we insert the override after the function we're
+overriding has been loaded.
+</%doc>
+\
+<%INIT>
+return if ($RT::Extension::EmailReplyDelimiter::ParserOverridden);
+
+{
+    no warnings 'redefine';
+
+    package RT::EmailParser;
+
+    our $_EmailReplyDelimiter_OriginalParser = \&SmartParseMIMEEntityFromScalar;
+
+    *RT::EmailParser::SmartParseMIMEEntityFromScalar = sub {
+	my ($self, @args) = @_;
+	my @ParserResults = &$_EmailReplyDelimiter_OriginalParser($self, @args);
+	my $Entity = $self->Entity;
+        RT::Extension::EmailReplyDelimiter::ModifyMIMEEntity($Entity);
+        return @ParserResults;
+    };
+
+    $RT::Extension::EmailReplyDelimiter::ParserOverridden = 1;
+};
+
+return;
+</%INIT>

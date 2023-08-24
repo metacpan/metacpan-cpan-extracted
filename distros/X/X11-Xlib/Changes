@@ -1,5 +1,15 @@
 Revision history for Perl extension X11::Xlib.
 
+0.25 - 2023-08-21
+    - Resolve naming conflict with perl CORE (issue #8)
+    - Implement XGetKeyboardControl and struct XKeyboardState
+    - Allow C-style API for XTranslateCoordinates, XQueryPointer, and
+       XGetGeometry that return values into params, while also allowing
+       perl-style API that returns a list.
+    - Many documentation updates (full method coverage)
+    - Numerous tooling improvements and author tests
+    - Update to Devel::PPPort-3.71
+
 0.24 - 2023-08-16
     - Add function XWarpPointer, and Display->warp_pointer
 
@@ -35,7 +45,7 @@ Revision history for Perl extension X11::Xlib.
 
 0.17 - 2018-04-10
     - If Xrender.h is not available, fall back to local definitions
-      (allows XRenderPictFormat module even if header isn't installed)
+      (allows XRenderPictFormat module even if header is not installed)
     - Another tweak for window properties
     - Doc improvements
 

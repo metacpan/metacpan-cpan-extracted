@@ -4,7 +4,7 @@ package Crypt::Noise;
 use strict;
 use warnings;
 
-use bignum;
+#use bignum;
 
 require Exporter;
 
@@ -18,6 +18,8 @@ use Storable qw(dclone);
 use Digest::HMAC qw(hmac);
 use Crypt::KeyDerivation ':all';
 use Carp;
+
+our $VERSION = 0.011;
 
 #use Smart::Comments;
 

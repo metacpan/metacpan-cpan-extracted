@@ -41,7 +41,7 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
-EXAMPLE
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -64,6 +64,29 @@ EXAMPLE
      # Output like:
      # foo|bar
 
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Random::Set;
+
+     # Object.
+     my $obj = Random::Set->new(
+             'set' => [
+                     [0.1, 'foo'],
+                     [0.9, 'bar'],
+             ],
+     );
+
+     # Get random data.
+     my $random = $obj->get;
+
+     # Print out.
+     print $random."\n";
+
+     # Output like:
+     # foo (10%)|bar (90%)
+
 DEPENDENCIES
     Class::Utils, Error::Pure.
 
@@ -80,10 +103,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2013-2021
+    © Michal Josef Špaček 2013-2023
 
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

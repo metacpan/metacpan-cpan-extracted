@@ -85,7 +85,7 @@ our @EXPORT = qw/silent
                  string_to_tempfile
                  tmpcopy_if_writeable 
                 /;
-our @EXPORT_OK = qw/$debug $silent $verbose %dvs dprint dprintf/;
+our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 
 use Import::Into;
 use Data::Dumper;
@@ -106,16 +106,19 @@ sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 
 # Parse manual-testing args from @ARGV
 my @orig_ARGV = @ARGV;
-our ($debug, $verbose, $silent, $nonrandom, %dvs);
+our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom, %dvs);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure("pass_through");
 GetOptions(
   "d|debug"           => sub{ $debug=$verbose=1; $silent=0 },
   "s|silent"          => \$silent,
+  "savepath=s"        => \$savepath,
+  "nobail"            => \$nobail,
   "n|nonrandom"       => \$nonrandom,
   "v|verbose"         => \$verbose,
 ) or die "bad args";
 Getopt::Long::Configure("default");
+say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV) if $debug;
 
 $dvs{debug}   = $debug   if defined($debug);
 $dvs{verbose} = $verbose if defined($verbose);
@@ -167,13 +170,17 @@ sub import {
   #  (when using Spreadsheet::Edit).
   unless (delete $tags{":no-Test2"}) {
     require Test2::V0; # a huge collection of tools
-    require Test2::Plugin::BailOnFail;
     Test2::V0->import::into($target,
       -no_warnings => 1,
       (map{ "!$_" } "A".."AAZ")
     );
-    # Stop on the first error
-    Test2::Plugin::BailOnFail->import::into($target);
+    if ($nobail) {
+      say "> NOT requiring BailOnFail"
+    } else {
+      require Test2::Plugin::BailOnFail;
+      # Stop on the first error
+      Test2::Plugin::BailOnFail->import::into($target);
+    }
   }
   utf8->import::into($target);
 
@@ -291,6 +298,7 @@ my ($orig_stdOUT, $orig_stdERR, $orig_DIE_trap);
 my ($inmem_stdOUT, $inmem_stdERR) = ("", "");
 my $silent_mode;
 use Encode qw/decode FB_WARN FB_PERLQQ FB_CROAK LEAVE_SRC/;
+my $start_silent_loc = "";
 sub _finish_silent() {
   confess "not in silent mode" unless $silent_mode;
   close STDERR;
@@ -312,11 +320,16 @@ sub _finish_silent() {
     print STDERR decode("utf8", $inmem_stdERR, FB_PERLQQ|LEAVE_SRC);
     $errmsg = $errmsg ? "$errmsg and STDERR" : "Silence expected on STDERR";
   }
-  $errmsg
+  defined($errmsg) ? $errmsg." at $start_silent_loc\n" : undef;
 }
 sub _start_silent() {
   confess "nested silent treatments not supported" if $silent_mode;
   $silent_mode = 1;
+
+  for (my $N=0; ;++$N) {
+    my ($pkg, $file, $line) = caller($N);
+    $start_silent_loc = "$file line $line", last if $pkg ne __PACKAGE__;
+  }
 
   $orig_DIE_trap = $SIG{__DIE__};
   $SIG{__DIE__} = sub{
@@ -738,7 +751,8 @@ sub timed_run(&$@) {
 # of a temp copy.
 sub tmpcopy_if_writeable($) {
   my $path = shift;
-  if ( (stat($path))[2] & 0222 ) {
+  confess "$path : $!" unless stat($path);
+  if ( (stat(_))[2] & 0222 ) {
     my ($name, $suf) = (basename($path) =~ /^(.*?)((?:\.\w{1,4})?)$/);
     (undef, my $tpath) = 
       File::Temp::tempfile(SUFFIX => $suf, UNLINK => 1);

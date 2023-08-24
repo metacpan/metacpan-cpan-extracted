@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -20,11 +20,13 @@ See also L<Resource::Silo/meta>.
 =cut
 
 use Carp;
+use Module::Load qw( load );
 use Scalar::Util qw( looks_like_number reftype );
 use Sub::Quote qw( quote_sub );
 
 my $BARE_REX = '[a-z][a-z_0-9]*';
-my $ID_REX   = qr(^$BARE_REX$);
+my $ID_REX   = qr(^$BARE_REX$)i;
+my $MOD_REX  = qr(^$BARE_REX(?:::$BARE_REX)*$)i;
 
 # Define possible reftypes portably
 my $CODE   = reftype sub { };
@@ -55,13 +57,15 @@ my %known_args = (
     argument        => 1,
     class           => 1,
     dependencies    => 1,
-    derivative      => 1,
+    derived         => 1,
     cleanup         => 1,
     cleanup_order   => 1,
     fork_cleanup    => 1,
     ignore_cache    => 1,
     init            => 1,
+    literal         => 1,
     preload         => 1,
+    require         => 1,
 );
 sub add {
     my $self = shift;
@@ -83,6 +87,28 @@ sub add {
     my @extra = grep { !$known_args{$_} } keys %spec;
     croak "resource '$name': unknown arguments in specification: @extra"
         if @extra;
+
+    {
+        # validate 'require' before 'class'
+        if (!ref $spec{require}) {
+            $spec{require} = defined $spec{require} ? [ $spec{require} ] : [];
+        };
+        croak "resource '$name': 'require' must be a module name or a list thereof"
+            unless ref $spec{require} eq 'ARRAY';
+        my @bad = grep { $_ !~ $MOD_REX } @{ $spec{require} };
+        croak "resource '$name': 'require' doesn't look like module name(s): "
+            .join ", ", map { "'$_'" } @bad
+                if @bad;
+    };
+
+    if (defined (my $value = $spec{literal})) {
+        defined $spec{$_}
+            and croak "resource '$name': 'literal' is incompatible with '$_'"
+                for qw( init class argument );
+        $spec{init} = sub { $value };
+        $spec{dependencies} //= [];
+        $spec{derived}      //= 1;
+    };
 
     _make_init_class($self, $name, \%spec)
         if (defined $spec{class});
@@ -151,7 +177,7 @@ sub _make_init_class {
     $spec->{dependencies} //= {};
 
     croak "resource '$name': 'class' doesn't look like a package name: '$class'"
-        unless $class =~ /^$BARE_REX(?:::$BARE_REX)*$/i;
+        unless $class =~ $MOD_REX;
     defined $spec->{$_} and croak "resource '$name': 'class' is incompatible with '$_'"
         for qw(init argument);
     croak "resource '$name': 'class' requires 'dependencies' to be a hash"
@@ -159,9 +185,11 @@ sub _make_init_class {
 
     my %deps = %{ $spec->{dependencies} };
 
+    push @{ $spec->{require} }, $class;
+
     my %pass_args;
     my @realdeps;
-    my @body = ("my \$c = shift;", "require $class;", "$class->new(" );
+    my @body = ("my \$c = shift;", "$class->new(" );
 
     # format: constructor_arg => [ resource_name, resource_arg ]
     foreach my $key (keys %deps) {
@@ -225,6 +253,45 @@ sub list {
     my $self = shift;
     my @list = sort grep { !/^-/ } keys %{ $self->{resource} };
     return wantarray ? @list : \@list;
+};
+
+=head2 self_check()
+
+Check setup validity. Dies on errors, return C<$self> otherwise.
+
+The following checks are available so far:
+
+=over
+
+=item * dependencies must be defined;
+
+=item * required modules must be loadable.
+
+=back
+
+B<EXPERIMENTAL>. Interface & performed checks may change in the future.
+
+=cut
+
+sub self_check {
+    my $self = shift;
+
+    my $res = $self->{resource};
+    foreach my $name (sort keys %$res) {
+        my $entry = $res->{$name};
+
+        my @missing_deps = grep { !$res->{$_} } keys %{ $entry->{allowdeps} || {} };
+        croak "resource '$name': missing dependencies: ".
+            join ", ", map { "'$_'" } @missing_deps
+                if @missing_deps;
+
+        foreach my $mod ( @{ $entry->{require} } ) {
+            eval { load $mod; 1 }
+                or croak "resource '$name': failed to load '$mod': $@";
+        };
+    };
+
+    return $self;
 };
 
 =head1 COPYRIGHT AND LICENSE

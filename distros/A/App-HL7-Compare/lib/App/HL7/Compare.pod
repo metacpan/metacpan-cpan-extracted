@@ -1,0 +1,87 @@
+=head1 NAME
+
+App::HL7::Compare - compare two HL7 v2 messages against one another
+
+=head1 SYNOPSIS
+
+	use App::HL7::Compare;
+
+	my $stringified = App::HL7::Compare->new(
+		files => [
+			'filename.hl7',
+			\$file_content,
+		],
+	)->compare_stringify;
+
+	print $stringified;
+
+=head1 DESCRIPTION
+
+This module contains routines for parsing, comparing and generating output for
+HL7 v2 (pipe-separated) messages. Such comparison can be useful for determining
+what's missing from a message, which may not be immediately obvious (depending
+on message complexity).
+
+=head2 Output format
+
+MSH segments are automatically skipped and not included in the comparison. The
+output lines are as follows:
+
+	SEGM.1[1][2][3]: val1 => val2
+
+Where:
+
+=over
+
+=item * C<SEGM.1> is the same of the segment and its number. If there are more
+segments of this type the number will distinguish that.
+
+=item * C<[1][2][3]> is the path in the segment. The numbers are: field,
+component, subcomponent. The list may be shorter if there are no more
+subdivisions.
+
+=item * C<< val1 => val2 >> are the values present in the first and the second message.
+
+=back
+
+=head2 Options
+
+=head3 files
+
+The list of files to parse. Must consist of two files. Each can be either a
+plain string (a filename) or a reference to a string (a file's contents).
+
+=head3 exclude_matching
+
+Optional, boolean, true by default. If the value is the same, line is excluded
+from the comparison.
+
+=head2 Methods
+
+=head3 compare
+
+Returns the comparison in arrayref format.
+
+=head3 compare_stringify
+
+Returns the comparison in string format.
+
+=head1 TODO
+
+Decoding escaped HL7 characters in App::HL7::Compare::Parser::Subcomponent.
+
+=head1 SEE ALSO
+
+L<App::HL7::Dump>
+
+=head1 AUTHOR
+
+Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Bartosz Jarzyna
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

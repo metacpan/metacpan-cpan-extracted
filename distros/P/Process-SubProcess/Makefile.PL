@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker::CPANfile;
+use ExtUtils::MakeMaker;
  
 
 
@@ -11,6 +11,13 @@ WriteMakefile(
 #    VERSION     => '2.0.2',
     MIN_PERL_VERSION => '5.010',
     test             => {TESTS => 't/*.t'},
+	  PREREQ_PM => {
+	    'Getopt::Long::Descriptive' => '0',
+	    'Path::Tiny' => '0',
+	    'JSON' => '0',
+	    'YAML' => '0',
+	    'Data::Dump' => '0',
+	  },
     META_MERGE => {
         'meta-spec' => { version => 2 },
          resources => {

@@ -8,7 +8,7 @@ use File::Spec;
 use Env qw( @PATH );
 
 # ABSTRACT: Documentation and tools for using Platypus with the Rust programming language
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 sub native_type_map
@@ -47,7 +47,7 @@ FFI::Platypus::Lang::Rust - Documentation and tools for using Platypus with the 
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -417,12 +417,23 @@ L<Rust FFI Omnibus|http://jakegoulding.com/rust-ffi-omnibus/string_arguments/>)
 
 =head3 Perl Source
 
- #![crate_type = "cdylib"]
+ use FFI::CheckLib qw( find_lib_or_die );
+ use File::Basename qw( dirname );
+ use FFI::Platypus 1.00;
  
- #[no_mangle]
- pub extern "C" fn hello_rust() -> *const u8 {
-     "Hello, world!\0".as_ptr()
- }
+ my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust');
+ $ffi->lang('Rust');
+ $ffi->lib(
+     find_lib_or_die(
+         lib        => 'static',
+         libpath    => [dirname __FILE__],
+         systempath => [],
+     )
+ );
+ $ffi->lib('./libstring.so');
+ $ffi->attach(hello_rust => [] => 'string');
+ 
+ print hello_rust(), "\n";
 
 =head3 Execute
 
@@ -520,21 +531,23 @@ pass the closure into Rust.
 
 =head3 Perl Source
 
- #![crate_type = "cdylib"]
+ use FFI::Platypus 2.00;
+ use FFI::CheckLib qw( find_lib_or_die );
+ use File::Basename qw( dirname );
  
- use std::slice;
+ my $ffi = FFI::Platypus->new( api => 2, lang => 'Rust' );
+ $ffi->lib(
+     find_lib_or_die(
+         lib        => 'slice',
+         libpath    => [dirname __FILE__],
+         systempath => [],
+     )
+ );
  
- #[no_mangle]
- pub extern "C" fn sum_of_even(numbers: *const u32, len: usize) -> i64 {
-     if numbers.is_null() {
-         return -1;
-     }
+ $ffi->attach( sum_of_even => ['u32*', 'usize'] => 'i64' );
  
-     let numbers = unsafe { slice::from_raw_parts(numbers, len) };
- 
-     let sum: u32 = numbers.iter().filter(|&v| v % 2 == 0).sum();
-     sum as i64
- }
+ print sum_of_even(undef, 0), "\n";          # print -1
+ print sum_of_even([1,2,3,4,5,6], 6), "\n";  # print 12
 
 =head3 Execute
 

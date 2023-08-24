@@ -9,7 +9,7 @@ use Carp;
 use Config;
 use Math::DCT 'dct2d';
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -53,9 +53,9 @@ Image::PHash allows you to calculate the (DCT-based) perceptual hash (pHash) of 
 
 The constructor and general structure is based on L<Image::Hash> - keeping usage quite
 similar, but the pHash algorithm is rewritten from scratch as the L<Image::Hash>
-implementation was flawed (and slow). Apart from fixes/tweaks for GD, Imager, ImageMagick
-resizing, L<Image::Imlib2> support is added along with some unique features like
-reduced hashes for indexing, options to deal with image mirroring, alternative
+implementation was flawed (and slow). Apart from fixes/tweaks for L<GD>, L<Imager>, 
+L<ImageMagick> resizing, L<Image::Imlib2> support is added along with some unique features
+like reduced hashes for indexing, options to deal with image mirroring, alternative
 bitmap methods.
 
 A fast DCT XS module made specifically to serve this hashing module is used: L<Math::DCT>.
@@ -68,10 +68,11 @@ Depending on your setup, it should be 15x or so faster than pHash.org
   my $iph = Image::PHash->new($image_file , $library?, \%settings?);
   
 The first argument is an image filename when the Imlib2 library is used, but it
-can also by a variable with the image data for the other libraries.
+can also by a variable with the image data for the other libraries, or even an
+image object for the supported libraries.
 
 The second (optional) argument is the image library. Valid options are C<Imlib2>,
-C<GD>, C<ImageMagick>, C<Imager> and if not specified the module will try to load
+C<GD>, C<Imager>, C<ImageMagick> and if not specified the module will try to load
 them in that order. Using a different library (or even library version) will most
 likely result in different hashes being returned, so make sure you hash your entire
 image set using the same image library. Also, the module will probably not work with
@@ -96,12 +97,12 @@ if you want a different balance of speed/quality.
 
 =item * C<imager_qtype> : The C<qtype> parameter for L<Imager> which defines the
 quality of scaling performed. The type C<mixing> is used by default as it seems to
-behave for most cases while being about twice as fast as Imager's internal default
-qtype of C<normal>, but you can still manually specify that if you prefer.
+behave well for most cases while being about twice as fast as L<Imager>'s internal
+default qtype of C<normal>, but you can still manually specify that if you prefer.
 
 The constructor will C<croak> if there is an error loading an image library or an
-incorrect/missing argument. It will only C<carp> and return C<undef> if an image library
-returns after failing to load an image.
+incorrect/missing argument. It will only C<carp> and return C<undef> if an image
+library returns after failing to load an image.
 
 =back
 
@@ -305,7 +306,7 @@ be resized to 32x32 in the end, the fastest hashing performance would be if you 
 32x32 thumbnails. In that case, the performance of the libraries in the same order for
 the resized imageset were: 659 h/s, 664 h/s, 1883 h/s, 2296 h/s. It is clear that
 L<Image::Imlib2> should be preferred when hashing performance is desired, as it offers
-dramatically better performance (unless you are hashing 32x32 images in which case GD
+dramatically better performance (unless you are hashing 32x32 images in which case L<GD>
 also fast). It should be noted that the resulting hashes don't have exactly the same
 behaviour/metrics, due to the different resizing algorithms used, but the differences
 seem to be very small. You are encouraged to test on your own data set.
@@ -316,7 +317,7 @@ be compatible.
 Finally, if you are curious about the performance of this module compared to the
 C++ pHash.org implementation, pHash.org could achieve 33 h/s with the test setup as
 above, making L<Image::PHash> over 16x faster with Imlib2. With pre-sized 32x32
-images, pHash.org ran at 101 h/s.
+images, pHash.org ran at 101 h/s (~23x slower than L<Image::PHash>/Imlin2).
 
 =head2 Compatibility of hashes
 
@@ -408,9 +409,20 @@ sub new {
         Imager      => ['Imager', \&_reduce_Imager, \&_pixels_Imager, 1],
     );
 
-    my $file = -f $self->{image};
+    my $ref  = ref($self->{image});
+    my $file = $ref ? undef : -f $self->{image};
 
-    if ($self->{module}) {    # User specified image module
+    if ($ref) {    # Passed image object
+        $self->{module} = undef;
+        foreach (_lib_order()) {
+            my $type = $_ eq 'GD' ? 'GD::Image' : $libs{$_}->[0];
+            if ($type eq $ref) {
+                $self->{module} = $_;
+                last;
+            }
+        }
+        croak("Object of unknown type $ref.") unless $self->{module};
+    } elsif ($self->{module}) {    # User specified image module
         $libs{$libs{$_}->[0]} = $libs{$_} for keys %libs;    # Allow synonyms
         my $lib = $libs{$self->{module}}->[0];
 
@@ -423,8 +435,8 @@ sub new {
 
         $self->{module} = $lib; # Normalize
     } else {
-        # Try to load Imlib2, GD, ImageMagic or Imager in that order
-        foreach my $lib (qw/Imlib2 GD Magick Imager/) {
+        # Try to load Imlib2, GD, Imager, ImageMagick in that order
+        foreach my $lib (_lib_order()) {
             if (eval "require $libs{$lib}->[0]" && ($file || $libs{$lib}->[3])) {
                 $self->{module} = $lib;
                 last;
@@ -435,24 +447,28 @@ sub new {
         ) unless $self->{module};
     }
     croak("No file at $self->{image}")
-        unless $file || (length($self->{image}) > 255 && $libs{$self->{module}}->[3]);
+        unless $ref || $file || (length($self->{image}) > 255 && $libs{$self->{module}}->[3]);
 
     my $error = '';
     if ($libs{$self->{module}}->[0] eq 'Image::Imlib2') {
-        $self->{im} = Image::Imlib2->load($self->{image});
+        $self->{im} = $ref ? $self->{image} : Image::Imlib2->load($self->{image});
     } elsif ($libs{$self->{module}}->[0] eq 'GD') {
         GD::Image->trueColor(1);
-        $self->{im} = GD::Image->new($self->{image});
+        $self->{im} = $ref ? $self->{image} : GD::Image->new($self->{image});
     } elsif ($libs{$self->{module}}->[0] eq 'Image::Magick') {
-        $self->{im} = Image::Magick->new();
-        $error =
-            ($file)
-            ? $self->{im}->Read($self->{image})
-            : $self->{im}->BlobToImage($self->{image});
-        $self->{im} = undef if $error;
+        if ($ref) {
+            $self->{im} = $self->{image};
+        } else {
+            $self->{im} = Image::Magick->new();
+            $error =
+                ($file)
+                ? $self->{im}->Read($self->{image})
+                : $self->{im}->BlobToImage($self->{image});
+            $self->{im} = undef if $error;
+        }
     } else {
         my $type = $file ? 'file' : 'data';
-        $self->{im} = Imager->new($type => $self->{image});
+        $self->{im} = $ref ? $self->{image} : Imager->new($type => $self->{image});
         $error = Imager->errstr() || '';
     }
 
@@ -496,6 +512,8 @@ sub b2h {
     } while ($index > (-1 * $WIDTH));
     return $hex;
 }
+
+sub _lib_order {qw/Imlib2 GD Imager ImageMagick/}
 
 sub _is_64bit {
     $_64bit //= $Config{ivsize} >= 8;
@@ -869,8 +887,8 @@ sub _apply_median {
 
 =head1 ACKNOWLEDGEMENTS
 
-Initially based on L<Image::Hash>, so code to do with loading images, pixels etc
-has been kept.
+Initially based on L<Image::Hash>, so some code to do with loading images, pixels
+etc has been kept/adapted.
 
 =head1 AUTHOR
 

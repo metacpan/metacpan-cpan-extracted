@@ -1,0 +1,88 @@
+<%doc>
+Handle pin / unpin actions.
+</%doc>
+\
+<%ARGS>
+$TicketObj => undef
+$Actions => undef
+$ARGSRef => undef
+</%ARGS>
+\
+<%INIT>
+
+# Note that in this callback, "$TicketObj" is actually a reference to a
+# ticket object, so we have to access the ticket with ${$TicketObj}.
+
+# Do nothing if crucial fields are not present.
+return if ( not defined $TicketObj );
+return if ( not ref $TicketObj );
+return if ( not defined ${$TicketObj} );
+return if ( not ref ${$TicketObj} );
+return if ( not defined $ARGSRef );
+return if ( not ref $ARGSRef );
+return if ( ref $ARGSRef ne 'HASH' );
+
+# Do nothing if the PinComment and PinAction arguments are not both present.
+return if ( not defined $ARGSRef->{'PinComment'} );
+return if ( not defined $ARGSRef->{'PinAction'} );
+return if ( $ARGSRef->{'PinAction'} !~ /^(Remove|Add)$/ );
+my $PinAction  = $1;
+my $PinComment = $ARGSRef->{'PinComment'};
+
+# Complain, and otherwise do nothing, if the current user does not have the
+# ModifyTicket right on the ticket.
+my $UserCanModifyTicket = 0;
+$UserCanModifyTicket = 1
+  if ( ${$TicketObj}->CurrentUser->Privileged
+    && ${$TicketObj}->CurrentUserHasRight('ModifyTicket') );
+if ( not $UserCanModifyTicket ) {
+    push @$Actions, loc('Permission Denied')
+      if ( defined $Actions && ref $Actions && ref $Actions eq 'ARRAY' );
+    return;
+}
+
+# Check which comment is currently pinned, if any, for later comparison.
+my $TicketPinnedCommentAttribute =
+  ${$TicketObj}->FirstAttribute('PinnedComment');
+my $CurrentlyPinnedComment = $TicketPinnedCommentAttribute->Content
+  if ( defined $TicketPinnedCommentAttribute
+    && ref $TicketPinnedCommentAttribute );
+$CurrentlyPinnedComment = 0 if ( not defined $CurrentlyPinnedComment );
+
+# Perform the chosen action.
+if ( $PinAction eq 'Add' ) {
+
+    # "Pin" action.
+
+    # Do nothing if the comment chosen is the one already pinned.
+    return if ( $CurrentlyPinnedComment eq $PinComment );
+
+    # Set the ticket attribute.
+    ${$TicketObj}->SetAttribute(
+        Name        => 'PinnedComment',
+        Description => '',
+        Content     => $PinComment
+    );
+
+    # Report the action to the user.
+    push @$Actions, loc( 'Comment #[_1] pinned.', $PinComment )
+      if ( defined $Actions && ref $Actions && ref $Actions eq 'ARRAY' );
+
+}
+elsif ( $PinAction eq 'Remove' ) {
+
+    # "Unpin" action.
+
+    # Do nothing if the comment chosen is not the one pinned.
+    return if ( $CurrentlyPinnedComment ne $PinComment );
+
+    # Remove the attribute from the ticket.
+    ${$TicketObj}->DeleteAttribute('PinnedComment');
+
+    # Report the action to the user.
+    push @$Actions, loc('Comment unpinned.')
+      if ( defined $Actions && ref $Actions && ref $Actions eq 'ARRAY' );
+}
+
+return;
+</%INIT>

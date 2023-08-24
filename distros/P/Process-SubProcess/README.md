@@ -1,5 +1,5 @@
-![Automated Tests](https://github.com/bodo-hugo-barwich/Process/workflows/Automated%20Tests/badge.svg)
-[![Build Status](https://travis-ci.com/bodo-hugo-barwich/Process.svg?branch=master)](https://travis-ci.com/bodo-hugo-barwich/Process)
+[![Automated Tests](https://github.com/bodo-hugo-barwich/Process/actions/workflows/automated_testing.yml/badge.svg)](https://github.com/bodo-hugo-barwich/Process/actions/workflows/automated_testing.yml)
+[![Publish new Release](https://github.com/bodo-hugo-barwich/Process/actions/workflows/publish_release.yml/badge.svg)](https://github.com/bodo-hugo-barwich/Process/actions/workflows/publish_release.yml)
 
 # Process
 Process::SubProcess - Perl Module for Multiprocessing

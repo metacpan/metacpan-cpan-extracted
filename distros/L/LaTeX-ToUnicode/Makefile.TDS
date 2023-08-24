@@ -1,0 +1,44 @@
+#
+# This is Makefile for TDS-compliant TeX distributions
+# Written by Boris Veytsman, boris@varphi.com
+#
+# This file is in public domain
+#
+PREFIX = /usr/local
+
+LIBDIR = $(PREFIX)/scripts/bibtexperllibs
+
+DOCDIR = $(PREFIX)/doc/bibtex/bibtexperllibs
+
+all:  
+
+latex-tounicode.pdf: latex-tounicode.tex ltx2unitxt.pdf
+	texfot pdflatex $< || { rm -f $@; exit 1; }
+
+ToUnicode = lib/LaTeX/ToUnicode
+latex-tounicode.tex: $(ToUnicode).pm $(ToUnicode)/Tables.pm
+	pod2latex -modify -full -prefile head.ltx -out $@ $^
+latex-tounicode.tex: head.ltx 
+# unfortunately pod2latex doesn't recognize =encoding, so there
+# are two warnings of "Command encoding not recognised ...". Oh well.
+
+ltx2unitxt.1: script/ltx2unitxt
+# don't run --version since the --help message includes --version output.
+	help2man --no-info --version-string=" " \
+--name="convert LaTeX source fragment to plain (Unicode) text or simple html" \
+	  $< >$@ \
+	|| { rm -f $@; exit 1; }
+ltx2unitxt.pdf: ltx2unitxt.1
+	sed 's/^Releases:/\nReleases:/' $< | groff -man -t -rS11 - | ps2pdf - $@
+
+force:
+
+install:  
+	mkdir -p $(LIBDIR)
+	cp -r lib/* $(LIBDIR)
+	mkdir -p $(DOCDIR)
+	cp -r man/man3/* $(DOCDIR)
+
+clean:
+
+distclean: clean

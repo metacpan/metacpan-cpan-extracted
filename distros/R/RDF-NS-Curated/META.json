@@ -52,13 +52,13 @@
    "provides" : {
       "RDF::NS::Curated" : {
          "file" : "lib/RDF/NS/Curated.pm",
-         "version" : "1.004"
+         "version" : "1.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kjetilk/p5-rdf-ns-curated/issues"
+         "web" : "https://github.com/perlrdf/p5-rdf-ns-curated/issues"
       },
       "homepage" : "https://metacpan.org/release/RDF-NS-Curated",
       "license" : [
@@ -66,13 +66,13 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/kjetilk/p5-rdf-ns-curated.git",
-         "web" : "https://github.com/kjetilk/p5-rdf-ns-curated"
+         "url" : "git://github.com/perlrdf/p5-rdf-ns-curated.git",
+         "web" : "https://github.com/perlrdf/p5-rdf-ns-curated"
       },
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project"
    },
-   "version" : "1.004",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "1.006",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

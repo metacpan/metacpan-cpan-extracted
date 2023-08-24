@@ -4,13 +4,13 @@
       "David Dick <ddick@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-ICAP-Client",
    "no_index" : {
@@ -24,7 +24,10 @@
          "requires" : {
             "File::Temp" : "0",
             "HTTP::Headers" : "0",
-            "Test::More" : "0"
+            "Pod::Coverage" : "0.18",
+            "Test::CheckManifest" : "0.9",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "configure" : {
@@ -41,7 +44,7 @@
             "IO::Socket::INET" : "0",
             "IO::Socket::SSL" : "0",
             "POSIX" : "0",
-            "URI" : "0",
+            "URI" : "5.20",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -49,6 +52,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/david-dick/net-icap-client/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/david-dick/net-icap-client",
+         "web" : "https://github.com/david-dick/net-icap-client"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

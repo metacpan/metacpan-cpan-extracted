@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_update;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Moo;
 use Catmandu::Fix::Has;
@@ -21,25 +21,21 @@ has value => ( fix_arg => 1 );
 has all   => ( fix_opt => 1, default => sub { 1 } );
 has add   => ( fix_opt => 1, default => sub { 0 } );
 
+sub pica_parse_subfields {
+    my ( $pp, $s, @sf ) = ( $_[0], $_[0] );
+    while ( $s =~ s/^\$([A-Za-u0-9])([^\$]+|\$\$)+(.*)/$3/ ) {
+        push @sf, $1, $2;
+    }
+    die "invalid PICA field value: $pp\n" if $pp eq '' or $s ne "";
+    return \@sf;
+}
+
 sub BUILD {
     my ($self) = @_;
 
-    my $path  = $self->{path};
-    my $value = $self->{value};
-
     # Update full field, given in PICA Plain syntax
-    if ( !$path->{subfield} ) {
-        my @sf;
-        my $value = $self->{value};
-        while ( $value =~ s/^\$([A-Za-u0-9])([^\$]+|\$\$)+(.*)/$3/ ) {
-            push @sf, $1, $2;
-        }
-
-        die "invalid PICA field value: $self->{value}\n"
-          if $self->{value} eq '' or $value ne "";
-
-        $self->{value} = \@sf;
-    }
+    $self->{value} = pica_parse_subfields( $self->{value} )
+      unless $self->{path}{subfield};
 }
 
 sub fix {
@@ -139,5 +135,7 @@ Change or add value of PICA+ field(s) or subfields, specified by PICA Path expre
 
 See L<Catmandu::Fix::pica_set> and L<Catmandu::Fix::pica_add> for
 setting/adding PICA (sub)fields to values from other record fields.
+
+See L<Catmandu::Fix::pica_append> to add a full field to a record.
 
 =cut

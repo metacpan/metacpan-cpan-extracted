@@ -1,111 +1,146 @@
 #!/usr/bin/perl
-
-BEGIN {
-  unless (($ENV{PERL_PERTURB_KEYS}//"") eq "2") {
-    $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
-    $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
-    #$ENV{PERL_HASH_SEED_DEBUG} = "1";
-    exec $^X, $0, @ARGV; # for reproducible results
-  }
-}
-
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
 use t_TestCommon ':silent',
-                 qw/bug ok_with_lineno like_with_lineno
-                    rawstr showstr showcontrols displaystr 
-                    show_white show_empty_string
-                    fmt_codestring 
-                    timed_run
-                    mycheckeq_literal mycheck _mycheck_end
-                    $debug
-                  /;
+                 qw/bug tmpcopy_if_writeable $debug/;
 
-use Mydump qw/mydump/;
+use LpodhTestUtils qw/verif_normalized/;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:DEFAULT :chars fmt_node fmt_tree fmt_match/;
-
-use File::Copy ();
-use Guard qw/guard scope_guard/;
-
-my $master_copy_path = "$Bin/../tlib/Skel.odt";
-
-# Prevent any possibility of over-writing the input file
-my $input_path = "./_TMP_".basename($master_copy_path);
-my $input_path_remover = guard { unlink $input_path };
-File::Copy::copy($master_copy_path, $input_path) or die "File::Copy $!";
-
-my $doc = odf_get_document($input_path, read_only => 1);
-my $body = $doc->get_body;
- 
-$ODF::lpOD::Common::DEBUG = TRUE if $debug;
-
-{
-  my $count = 0;
-  my $initial_vtext = $body->Hsearch("Front Stuff")->{paragraph}->get_text;
-  my $prev_item = "Front Stuff";
-  foreach (
-           [["bold", 13], "NEW"],
-           [["bold", color => "red", size => "140%", "italic"], "NEW"],
-           ["NEW"], ["NEW"], 
-           ["\t"], ["NEW\t"], ["\tNEW"], ["NEW\t006"],
-           ["\n"], ["NEW\n"], ["\nNEW"], ["NEW\n009"],
-           [" "], ["NEW "], [" NEW"], ["NEW 009"],
-           ["  "], ["NEW  "], ["  NEW"], ["NEW  009"],
-           ["   "], ["NEW   "], ["   NEW"], ["NEW   009"],
-           ["NEW \t\t\n   \n\n  "],
-           [["italic"], "foobarNEWfoobar", " NEW foobar", [17], "17ptNEW", ["bold", 38], " 38ptNEW"],
-          ) 
-  { my $new_content = $_;
-    foreach (@$new_content) { 
-      s/NEW/sprintf("NEW%03d", $count++)/esg unless ref; 
-    }
-    my $m = $body->Hsearch($prev_item) // bug;
-    my $para = $m->{paragraph};
-    my $curr_vtext = $para->get_text;
-    oops unless $initial_vtext 
-      eq $curr_vtext =~ s/${prev_item}/Front Stuff/rs; # /r -> non-destructive
-  
-    note dvis 'BEFORE: $prev_item $new_content para:\n', fmt_tree($para)
-      if $debug;
-    
-    $para->Hreplace(qr/\Q${prev_item}\E/, $new_content, debug => $debug);
-  
-    note "AFTER :\n", fmt_tree($para) if $debug;
-  
-    my $n_item = join("", grep{! ref} @$new_content);
-
-    my $new_vtext = $para->get_text;
-    oops unless $initial_vtext 
-      eq $new_vtext =~ s/${n_item}/Front Stuff/rs; # /r -> non-destructive
-    
-    ok(1, "Hreplace ".vis($prev_item)." with ".vis($new_content));
-      
-    $prev_item = $n_item;
-  }
-
-  # Check replacing something with nothing
-  { my $m = $body->Hsearch("foobar") // oops;
-    my $para = $m->{paragraph};
-    my $before_vtext = $para->get_text;
-    oops unless $initial_vtext 
-      eq $before_vtext =~ s/${prev_item}/Front Stuff/rs; # /r -> non-destructive
-    $para->Hreplace("foobar", [], multi => 1); # I think multi is the default(?)
-    my $after_vtext = $para->get_text;
-    ok($after_vtext
-        eq $before_vtext =~ s/foobar//gsr, "multi replace with []");
-  }
-    
+use ODF::lpOD_Helper;
+BEGIN {
+  *_abbrev_addrvis = *ODF::lpOD_Helper::_abbrev_addrvis;
+  *TEXTLEAF_COND   = *ODF::lpOD_Helper::TEXTLEAF_COND;
+  *PARA_COND       = *ODF::lpOD_Helper::PARA_COND;
+  *__leaf2vtext    = *ODF::lpOD_Helper::__leaf2vtext;
 }
 
-# TODO: Write Hreplace tests covering all the corner cases in Hsearch.t
-# (Idea: discard and re-read the doc before each test, possibly using
-# an in-memory xml rep instead of re-reading from disk each time).
+my $master_copy_path = "$Bin/../tlib/Skel.odt";
+my $input_path = tmpcopy_if_writeable($master_copy_path);
+my $doc = odf_get_document($input_path, read_only => 1);
+my $body = $doc->get_body;
 
-#my $output_path = "./_OUTPUT_".basename($master_copy_path);
-#$doc->save(target => $output_path);
+my $pristine_bodytext = $body->Hget_text();
+say dvis '$pristine_bodytext' if $debug;
+
+$body->normalize; # just in case it isn't from LibreOffice
+verif_normalized($body);
+
+#FIXME: replace adjacent to PCTEXT or text:s to check normalization
+
+#my $torepl = "e";
+my $torepl = "here";
+for my $repl ([""], [["italic","small-caps"],""], []) {
+
+  my @repls = $body->Hreplace($torepl, $repl, multi => TRUE, debug => $debug);
+
+  my $new_bodytext = $body->Hget_text();
+  (my $exp = $pristine_bodytext) =~ s/\Q$torepl\E//g;
+  is ($new_bodytext, $exp, "multi replace '${torepl}' with ".vis($repl));
+  oops unless (scalar(@repls)*length($torepl))
+                == (length($pristine_bodytext)-length($new_bodytext));
+
+  verif_normalized($body);
+
+  # un-do the replacement
+  my %para2incr;
+  foreach my $r (@repls) {
+    my $para = $r->{para};
+    my $incr = $para2incr{$para}//=0;
+    $para->Hreplace("", [$torepl], offset => $incr + $r->{para_voffset});
+    $para2incr{$para} += length($torepl);
+    verif_normalized($para);
+  }
+  is($body->Hget_text(), $pristine_bodytext);
+}
+    
+my $count = 0;
+for my $start_text ("Front Stuff", "  :(3", "  ")
+{
+  # Replace $start_text with various things, each time replacing that thing
+  # with $start_text to restore the paragraph.   
+  # The paragraph is the the first one containing $start_text;
+  
+  my $m0 = $body->Hsearch($start_text) // bug;
+  my $para = $m0->{para};
+  my $pristine_paratext = $para->get_text;
+
+  my @repl_content;
+  if ($ENV{AUTHOR_TESTING}) {
+    @repl_content = (
+      [""],
+      [["bold", 13], "NEW"],
+      [["bold", color => "red", size => "140%", "italic"], "NEW"],
+      ["NEW"], ["NEW"], 
+      ["\t"], ["NEW\t"], ["\tNEW"], ["NEW\tzz6"],
+      ["\n"], ["NEW\n"], ["\nNEW"], ["NEW\nzz9"],
+      [" "], ["NEW "], [" NEW"], ["NEW zz12"],
+      ["  "], ["NEW  "], ["  NEW"], ["NEW  zz15"],
+      ["   "], ["NEW   "], ["   NEW"], ["NEW   zz18"],
+      ["NEW \t\t\n   \n\n  "],
+      [["italic"], "foobarNEWfoobar", " NEW foobar", [17], "17ptNEW", ["bold", 38], " 38ptNEW"],
+    );
+  } else {
+    @repl_content = (
+      [""],
+      [["bold", 13], "NEW"],
+      ["\t"], ["NEW\t"], ["\tNEW"], ["NEW\tzz6"],
+      ["\n"], [" "], ["  "], ["NEW  "], ["  NEW"], ["NEW  zz15"],
+      ["NEW   zz18"],
+      ["NEW \t\t\n   \n\n  "],
+    );
+    SKIP: {
+      skip "Some author-only test cases";
+      ok(0, "Never happens");
+    }
+  }
+  foreach (@repl_content) {
+    my $new_content = $_;
+    foreach (@$new_content) { #make unique
+      s/NEW/sprintf("NEW%03d", $count++)/esg unless ref; 
+    }
+    my $testname = "Hreplace ".vis($start_text)." with ".vis($new_content);
+
+    my $content_vtext = join("", grep{! ref} @$new_content);
+    
+    my ($replinfo, @extra) = $body->Hreplace(qr/\Q${start_text}\E/s, 
+                                             $new_content, 
+                                             debug => $debug);
+    oops unless $replinfo && !@extra;
+    note "AFTER :\n", fmt_tree($para) if $debug;
+
+    my $new_paratext = $para->get_text;
+
+    my $para_exp = $pristine_paratext;
+    substr($para_exp, $m0->{para_voffset}, length($start_text))=$content_vtext;
+
+    is($new_paratext, $para_exp, $testname." (para check)",
+       dvis '\n  $pristine_paratext\n  $new_content  $content_vtext'
+           .'\n  $new_paratext\n  $para_exp\n  $pristine_paratext'
+           .'\n  $m0\n  $replinfo'
+    );
+    verif_normalized($para);
+      
+    my $body_exp = $pristine_bodytext;
+    substr($body_exp, $m0->{voffset}, length($start_text)) = $content_vtext;
+
+    my $body_got = $body->Hget_text();
+    is ($body_got, $body_exp,
+        $testname." (full body check)",
+        fmt_tree($body)
+    );
+
+    # Undo the substitution. FIXME: This should clean up empty spans!?!
+    $para->Hreplace($content_vtext, [$start_text], 
+                    offset => $$replinfo{para_voffset}, debug => $debug);
+    fail("undo did not work")
+      unless $para->get_text() eq $pristine_paratext;
+    verif_normalized($para);
+  }
+  note "Final body vtext = ",vis($body->Hget_text())
+    if $debug;
+
+}
 
 done_testing();
-

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,18 +18,18 @@ name: Device-AVR-UPDI
 provides:
   Device::AVR::UPDI:
     file: lib/Device/AVR/UPDI.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Commandable: '0.08'
   File::ShareDir: '1.00'
   Future::AsyncAwait: '0'
   Future::IO: '0.03'
   IO::Termios: '0'
-  Object::Pad: '0.57'
-  Struct::Dumb: '0'
+  Object::Pad: '0.76'
+  Object::Pad::ClassAttr::Struct: '0.04'
   YAML: '0'
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

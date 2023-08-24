@@ -3,9 +3,11 @@ abstract: 'Apple App Store Connect API client'
 author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
+  CryptX: '0'
   ExtUtils::MakeMaker: '0'
   HTTP::Response: '0'
-  JSON: '0'
+  JSON: '4.0'
+  JSON::XS: '4.0'
   LWP::UserAgent: '0'
   Test2::Tools::Exception: '0'
   Test2::V0: '0'
@@ -29,5 +31,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/dkechag/Apple-AppStoreConnect.git
-version: '0.1'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

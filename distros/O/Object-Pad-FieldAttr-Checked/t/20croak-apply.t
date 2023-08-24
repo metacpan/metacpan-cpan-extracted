@@ -17,7 +17,7 @@ use Object::Pad::FieldAttr::Checked;
 }
 
 like( eval( 'class T2 { field $x :Checked(NotAPackage); }' ) ? undef : $@,
-   qr/^Expected the checker expression to yield an object reference or package name at /,
+   qr/^Expected the checker expression to yield an object reference or package name; got NotAPackage instead at /,
    'Failure from invalid package name' );
 
 package NotAChecker { sub foo {} }

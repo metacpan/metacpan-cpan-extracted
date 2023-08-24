@@ -14,8 +14,8 @@ my $build = Module::Build->new(
       'Future::AsyncAwait' => 0,
       'Future::IO' => '0.03',
       'IO::Termios' => 0,
-      'Object::Pad' => '0.57',
-      'Struct::Dumb' => 0,
+      'Object::Pad' => '0.76',
+      'Object::Pad::ClassAttr::Struct' => '0.04',
       'YAML' => 0,
 
       'perl' => '5.020',

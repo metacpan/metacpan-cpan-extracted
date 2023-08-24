@@ -33,11 +33,16 @@ sub is_array {
     my ($self, $value_array) = @_;
     (ref $value_array eq 'ARRAY' and @$value_array == $self->{'count'}) ? 1 : 0;
 }
+sub is_named_array {
+    my ($self, $value_array) = @_;
+    (ref $value_array eq 'ARRAY' and @$value_array == ($self->{'count'}+1)
+                                 and uc $value_array->[0] eq uc $self->name) ? 1 : 0;
+}
 sub is_hash {
     my ($self, $value_hash) = @_;
     return 0 unless ref $value_hash eq 'HASH' and CORE::keys %$value_hash == $self->{'count'};
     for (CORE::keys %$value_hash) {
-        return 0 unless $self->is_key_or_shortcut( $_);
+        return 0 unless $self->is_key_or_shortcut($_);
     }
     return 1;
 }
@@ -47,7 +52,7 @@ sub is_partial_hash {
     my $key_count = CORE::keys %$value_hash;
     return 0 unless $key_count and $key_count <= $self->{'count'};
     for (CORE::keys %$value_hash) {
-        return 0 unless $self->is_key_or_shortcut( $_);
+        return 0 unless $self->is_key_or_shortcut($_);
     }
     return 1;
 }

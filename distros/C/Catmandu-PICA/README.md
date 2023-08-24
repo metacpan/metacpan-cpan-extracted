@@ -18,23 +18,32 @@ structure.
 See [Catmandu::Introduction](https://metacpan.org/pod/Catmandu%3A%3AIntroduction) and [http://librecat.org/Catmandu](http://librecat.org/Catmandu) for an
 introduction into Catmandu.
 
-# CATMANDU MODULES
+# MODULES
+
+## Read/write PICA
 
 - [Catmandu::Exporter::PICA](https://metacpan.org/pod/Catmandu%3A%3AExporter%3A%3APICA)
-- [Catmandu::Fix::pica\_map](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_map)
-- [Catmandu::Fix::pica\_remove](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_remove)
-- [Catmandu::Fix::pica\_keep](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_keep)
-- [Catmandu::Fix::pica\_tag](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_tag)
-- [Catmandu::Fix::pica\_occurrence](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_occurrence)
-- [Catmandu::Fix::Bind::pica\_each](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_each)
-- [Catmandu::Fix::Bind::pica\_diff](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_diff)
-- [Catmandu::Fix::Condition::pica\_match](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ACondition%3A%3Apica_match)
-- [Catmandu::Fix::pica\_update](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_update)
-- [Catmandu::Fix::pica\_add](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_add)
-- [Catmandu::Fix::pica\_set](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_set)
 - [Catmandu::Importer::PICA](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3APICA)
 - [Catmandu::Importer::SRU::Parser::picaxml](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3ASRU%3A%3AParser%3A%3Apicaxml)
 - [Catmandu::Importer::SRU::Parser::ppxml](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3ASRU%3A%3AParser%3A%3Appxml)
+
+## Fix functions
+
+- [Catmandu::Fix::pica\_map](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_map) copy from PICA values
+- [Catmandu::Fix::pica\_keep](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_keep) reduce record to selected fields
+- [Catmandu::Fix::pica\_remove](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_remove) delete (sub)fields
+- [Catmandu::Fix::pica\_update](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_update) change/add PICA values to fixed strings
+- [Catmandu::Fix::pica\_append](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_append) parse and append full PICA fields
+- [Catmandu::Fix::pica\_set](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_set) set PICA values from other fields
+- [Catmandu::Fix::pica\_add](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_add) add PICA values from other fields
+- [Catmandu::Fix::pica\_tag](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_tag) set field tag
+- [Catmandu::Fix::pica\_occurrence](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_occurrence) set field occurrence
+- [Catmandu::Fix::Bind::pica\_each](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_each) process selected fields
+- [Catmandu::Fix::Bind::pica\_diff](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_diff) track changes
+- [Catmandu::Fix::Condition::pica\_match](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ACondition%3A%3Apica_match) check whether PICA values match a regular expression
+
+## Validation
+
 - [Catmandu::Validator::PICA](https://metacpan.org/pod/Catmandu%3A%3AValidator%3A%3APICA)
 
 # CONTRIBUTORS

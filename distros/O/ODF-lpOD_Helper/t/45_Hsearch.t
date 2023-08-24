@@ -3,146 +3,206 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
 use t_TestCommon ':silent',
-                 qw/bug ok_with_lineno like_with_lineno
-                    rawstr showstr showcontrols displaystr 
-                    show_white show_empty_string
-                    fmt_codestring 
-                    timed_run
-                    mycheckeq_literal mycheck _mycheck_end
-                  /;
+                 qw/bug tmpcopy_if_writeable $debug/;
 
-use Mydump qw/mydump/;
+#use Mydump qw/mydump/;
+# TO SEE OFFSETS, ETC. run t/dumpskel.pl 1 or 2 or 5
+#   or call  say mydump($body,{kind => 1})
+#   or call  say fmt_tree($body)
 
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:DEFAULT :chars fmt_node fmt_tree fmt_match/;
+use ODF::lpOD_Helper qw/:DEFAULT PARA_COND/;
 
-sub _check_match($$$) {
-  my ($m, $test_label, $exp) = @_;
-  my $err;
-  if (!$m) {
-    $err = "match FAILED (undef result)\n"
-  } else {
-    {
-      $err = "Key 'segments is' undef or missing in match result:\n", last
-        unless defined $m->{segments};
-      foreach my $key (keys %$exp) {
-        confess "test bug" unless defined $exp->{$key};
-        if ($key eq "num_segs") {
-          $err = "Expecting $exp->{num_segs} segments in match result:\n", last
-            unless @{ $m->{segments} } == $exp->{num_segs};
-        }
-        else {
-          $err = "Key '$key' undef or missing in match result:\n", last
-            unless defined($m->{$key});
-          $err = "Expecting $key = ".showstr($exp->{$key})."\n"
-                .sprintf("%*s", 10+length($key)+3, "Not:").showstr($m->{$key})." in match result:\n", last
-            unless $m->{$key} eq $exp->{$key};
-        }
-      }
-    }
-    if ($err) {
-      $err .= fmt_match($m)."\n";
-      #$err .= "\nparagraph:\n".fmt_tree($m->{paragraph}) if $m->{paragraph};
-    }
-  } 
-  $err
-}
-sub _check_nomatch($$) {
-  my ($m, $test_label) = @_;
-  my $err = 0;
-  if ($m) {
-    $err = "Expected no-match, but got:\n".fmt_match($m);
-  }
-  $err
-}
-sub check_match($$$;$) {
-  my (undef, $test_label, undef, $ok_only_if_failed) = @_;
-  @_ = ( &_check_match, $test_label, $ok_only_if_failed );
-  goto &_mycheck_end;
-}
-sub check_nomatch($$;$) {
-  my (undef, $test_label, $ok_only_if_failed) = @_;
-  @_ = ( &_check_nomatch, $test_label, $ok_only_if_failed );
-  goto &_mycheck_end;
-}
-
-
-my $input_path = "$Bin/../tlib/Skel.odt";
-my $doc = odf_get_document($input_path);
+my $master_copy_path = "$Bin/../tlib/Skel.odt";
+my $input_path = tmpcopy_if_writeable($master_copy_path);
+my $doc = odf_get_document($input_path, read_only => 1);
 my $body = $doc->get_body;
- 
-check_match( $body->Hsearch(qr/Front/s),
-             "Hsearch match start of first paragraph (regex)",
-             { num_segs=>1, offset=>0, end=>5, voffset=>0, vend=>5 } );
-      
-check_match( $body->Hsearch(qr/^Front/s),
-             "Hsearch ^anchored match start of first paragraph",
-             { num_segs=>1, offset=>0, end=>5, voffset=>0, vend=>5 } );
-      
-check_nomatch( $body->Hsearch(qr/^Stuff/s),
-             "Hsearch ^anchored match middle of first seg fails");
 
-check_match( my $m1 = $body->Hsearch('Stuff'),
-             "Hsearch match middle of of first segment (string)",
-             { num_segs=>1, offset=>6, end=>11, voffset=>6, vend=>11 } );
+my $para0 = $body->next_elt($body, qr/^text:[ph]$/) // oops;
+my $leaf0 = $body->next_elt($body, '#TEXT') // oops;
 
-check_match( $body->Hsearch(qr/Front Stuff /s),
-             "Hsearch match entire first segment",
-             { num_segs=>1, offset=>0, end=>12, voffset=>0, vend=>12 } );
+my $alltext = $body->Hget_text();
+my @all_paras = $body->descendants(qr/^text:[ph]$/);
+my @para_text_lengths = map{ my $t = $_->get_text(); 
+                             defined($t) ? length($t) : undef } @all_paras;
+my @paras_with_text = @all_paras[ grep{defined $para_text_lengths[$_]}
+                                  0..$#all_paras ];
+
+say "body=",fmt_tree($body) if $debug;
+
+# The first segment of the first paragraph contains "Front Stuff "
+foreach ([$body,"body"], [$para0,"para0"], [$leaf0,"leaf0"]) {
+  my ($context, $context_desc) = @$_;
+  foreach ([qr/Front/s, "regex"],
+           [qr/^Front/s, "^anchored regex"],
+           [qr/\AFront/s, "\\Aanchored regex"],
+           ['Front', "plain string"],
+          ) {
+    my ($expr, $expr_desc) = @$_;
+    is( $context->Hsearch($expr),
+      hash {
+        field segments => array{ item 1 => DNE };
+        field offset  => 0;
+        field end     => 5;
+        field voffset => 0;
+        field vend    => 5;
+        etc();
+      }, 
+      "${context_desc}->Hsearch($expr_desc) matches start"
+    );
+  }
+  foreach ([qr/Stuff/s, "regex", 1],
+           [qr/^Stuff/s, "^anchored regex", 0],
+           [qr/\AStuff/s, "\\Aanchored regex", 0],
+           ['Stuff', "plain string", 1],
+          ) {
+    my ($expr, $expr_desc, $should_succeed) = @$_;
+    if ($should_succeed) {
+      is($context->Hsearch($expr),
+          hash {
+            field segments => array{ item 1 => DNE };
+            field offset  => 6; field end  => 11;
+            field voffset => 6; field vend => 11;
+            etc();
+          }, 
+          "${context_desc}->Hsearch($expr_desc) matches middle"
+      );
+    } else {
+      is( $context->Hsearch($expr), undef,
+          "${context_desc}->Hsearch($expr_desc) for middle fails as expected" );
+    }
+  }
+}
+
+is( $body->Hsearch(qr/Front Stuff /s),
+    hash {
+      field segments => array{ item 1 => DNE };
+      field offset  => 0; field end  => 12;
+      field voffset => 0; field vend => 12;
+      etc();
+    }, 
+    "Hsearch match entire first segment"
+);
       
-check_match( $body->Hsearch(qr/Front Stuff o/s),
-             "Hsearch match first segment + start of second",
-             { num_segs=>2, offset=>0, end=>1, voffset=>0, vend=>13 } );
+is( $body->Hsearch(qr/Front Stuff o/s, debug => 0),
+    hash {
+      field segments => array{ item 2 => DNE };
+      field offset  => 0; field end  => 1;
+      field voffset => 0; field vend => 13;
+      etc();
+    }, 
+    "Hsearch match first segment + start of second"
+);
+
+is( $body->Hsearch(qr/utside/s),
+    hash {
+      field segments => array{ item 1 => DNE };
+      field offset  => 1;  field end  => 7;
+      field voffset => 13; field vend => 19;
+      etc();
+    }, 
+    "Hsearch match middle of second segment"
+);
       
-check_match( $body->Hsearch(qr/utside/s),
-             "Hsearch match middle of second segment",
-             { num_segs=>1, offset=>1, end=>7, voffset=>13, vend=>19 } );
+is( $body->Hsearch(qr/outside the 2-column Section/s),
+    hash {
+      field segments => array{ item 1 => DNE };
+      field offset  => 0;  field end  => 28;
+      field voffset => 12; field vend => 40;
+      etc();
+    }, 
+    "Hsearch match entire second segment",
+);
       
-check_match( $body->Hsearch(qr/outside the 2-column Section/s),
-             "Hsearch match entire second segment",
-             { num_segs=>1, offset=>0, end=>28, voffset=>12, vend=>40 } );
+is( $body->Hsearch(qr/^outside/s, debug => 0), undef,
+    "Hsearch ^anchored match start of second seg fails");
       
-check_nomatch( $body->Hsearch(qr/^outside/s, debug => 0),
-             "Hsearch ^anchored match start of second seg fails");
+is( $body->Hsearch('o'),
+    hash {
+      field segments => array{ item 1 => DNE };
+      field offset  => 2; field end  => 3;
+      field voffset => 2; field vend => 3;
+      etc();
+    }, 
+    "Hsearch first 'o' (string)",
+);
+
+is( $body->Hsearch(qr/o/),
+    hash {
+      field segments => array{ item 1 => DNE };
+      field offset  => 2; field end  => 3;
+      field voffset => 2; field vend => 3;
+      etc();
+    }, 
+    "Hsearch first 'o' (regex)",
+);
       
-check_match( $body->Hsearch('o'),
-             "Hsearch first 'o' (string)",
-             { num_segs=>1, offset=>2, end=>3, voffset=>2, vend=>3 } );
-check_match( $body->Hsearch(qr/o/),
-             "Hsearch first 'o' (regex)",
-             { num_segs=>1, offset=>2, end=>3, voffset=>2, vend=>3 } );
+is( $body->Hsearch(qr/o.*o/),
+    hash {
+      field segments => array{ item 2 => DNE };
+      field offset  => 2; field end  => 27;
+      field voffset => 2; field vend => 39;
+      etc();
+    }, 
+    "Hsearch longest match across mult segs ('o.*o')",
+);
       
-check_match( $body->Hsearch(qr/o.*o/),
-             "Hsearch longest match across mult segs ('o.*o')",
-             { num_segs=>2, offset=>2, end=>27, voffset=>2, vend=>39 } );
+is( $body->Hsearch(qr/^Lorem.*another/s, debug => 0),
+    hash {
+      field segments => array{ item 11 => DNE };
+      field offset  => 0;  field end  => 7;
+      field voffset => 76; field vend => 168;
+      etc();
+    }, 
+    "Hsearch match past one newline",
+);
       
-check_match( $body->Hsearch(qr/^Lorem.*another/s, debug => 0),
-             "Hsearch match past one newline",
-             { num_segs=>11, offset=>0, end=>7, voffset=>76, vend=>168 } );
-      
-check_match( $body->Hsearch(qr/^Lorem.*laborum\./s),
-             "Hsearch match past multiple newlines",
-             { num_segs=>33, offset=>0, end=>305, voffset=>76, vend=>708 } );
+is( $body->Hsearch(qr/^Lorem.*laborum\./s),
+    hash {
+      field segments => array{ item 33 => DNE };
+      field offset  => 0;  field end  => 305;
+      field voffset => 76; field vend => 708;
+      etc();
+    }, 
+    "Hsearch match past multiple newlines",
+);
       
 
 #####################
 
-check_match( $body->Hsearch(qr/5 consecutive-spaces:/),
-             "Hsearch until just b4 space b4 multi-space",
-             { num_segs=>2, offset=>0, end=>19, voffset=>91, vend=>112 } );
-check_match( $body->Hsearch(qr/5 consecutive-spaces: /),
-             "Hsearch until just b4 multi-space",
-             { num_segs=>2, offset=>0, end=>20, voffset=>91, vend=>113 } );
+is( $body->Hsearch(qr/5 consecutive-spaces:/),
+    hash {
+      field segments => array{ item 2 => DNE };
+      field offset  => 0;  field end  => 19;
+      field voffset => 91; field vend => 112;
+      etc();
+    }, 
+    "Hsearch until just b4 space b4 multi-space",
+);
+is( $body->Hsearch(qr/5 consecutive-spaces: /),
+    hash {
+      field segments => array{ item 2 => DNE };
+      field offset  => 0;  field end  => 20;
+      field voffset => 91; field vend => 113;
+      etc();
+    }, 
+    "Hsearch until just b4 multi-space",
+);
 for my $n (1..6) {
   my $regex_src = '5 consecutive-spaces: '.(" " x $n);
   if ($n < 5) {
-    check_match( $body->Hsearch(qr/$regex_src/),
-                 "Hsearch including $n of multi-space",
-                 { num_segs=>3, offset=>0, end=>$n, voffset=>91, vend=>113+$n } 
-               );
+    is( $body->Hsearch(qr/$regex_src/, debug => 0),
+        hash {
+          field segments => array{ item 3 => DNE };
+          field offset  => 0;  field end  => $n;
+          field voffset => 91; field vend => 113+$n;
+          etc();
+        }, 
+        "Hsearch including $n of multi-space",
+    );
   } else {
-    check_nomatch( $body->Hsearch(qr/$regex_src/),
-                   "Hsearch beyond end of multi-space ($n total)" );
+    is( $body->Hsearch(qr/$regex_src/, debug => 0), undef,
+        "Hsearch beyond end of multi-space ($n total)" );
   }
 }
 
@@ -150,161 +210,177 @@ for my $n (1..6) {
 
 {
   my $tab_match;
-  check_match( $tab_match = $body->Hsearch(qr/\t/),
-               "Hsearch for tab alone",
-               { match => "\t", offset=>0, end=>1 } );
+  is( $tab_match = $body->Hsearch(qr/\t/),
+      hash {
+        field match => "\t"; field offset=>0; field end=>1;
+        etc();
+      }, 
+      "Hsearch for tab alone",
+  );
+  is( $body->Hsearch(qr/tab here:\t/),
+      hash{ 
+        field match => "tab here:\t";
+        field offset=>0; field end=>1;
+        field voffset => $tab_match->{voffset}-9;
+        field vend    => $tab_match->{voffset}+1;
+        etc;
+      },
+      "Hsearch for stuff+tab"
+  );
 
-  check_match( $body->Hsearch(qr/tab here:\t/),
-               "Hsearch for stuff+tab",
-               { match => "tab here:\t", offset=>0, end=>1,
-                 voffset => $tab_match->{voffset}-9,
-                 vend    => $tab_match->{voffset}+1,
-               } );
+  is( $body->Hsearch(qr/tab here:\t:there/),
+      hash{ 
+        field match => "tab here:\t:there";
+        field offset=>0; field end=>6;
+        field voffset => $tab_match->{voffset}-9;
+        field vend    => $tab_match->{voffset}+1+6;
+        etc;
+      },
+      "Hsearch for stuff+tab+stuff"
+  );
 
-  check_match( $body->Hsearch(qr/tab here:\t:there/),
-               "Hsearch for stuff+tab+stuff",
-               { match => "tab here:\t:there", offset=>0, end=>6,
-                 voffset => $tab_match->{voffset}-9,
-                 vend    => $tab_match->{voffset}+1+6,
-               } );
-
-  check_match( $body->Hsearch(qr/\t:there/),
-               "Hsearch for tab+stuff",
-               { match => "\t:there", offset=>0, end=>6,
-                 voffset => $tab_match->{voffset},
-                 vend    => $tab_match->{voffset}+1+6,
-               } );
+  is( $body->Hsearch(qr/\t:there/),
+      hash{ 
+        field match => "\t:there";
+        field offset=>0; field end=>6;
+        field voffset => $tab_match->{voffset};
+        field vend    => $tab_match->{voffset}+1+6;
+        etc;
+      },
+      "Hsearch for tab+stuff"
+  );
 }
 
 #####################
 
-check_match( $body->Hsearch(qr/.*Unicode .*/s),
-             "Hsearch match variety para",
-             { offset=>0, 
-               voffset=>758,
-               match => "This «Paragraph» has ☺Unicode and bold\t<tabthere and     multi-space and italic and underlined and larger text."
-             } );
+is( $body->Hsearch(qr/.*Unicode .*/s),
+    hash{ 
+      field offset=>0; field voffset=>758;
+      field match => "This «Paragraph» has ☺Unicode and bold\t<tabthere and     multi-space and italic and underlined and larger text.";
+      etc;
+    },
+    "Hsearch match variety para"
+);
       
 #####################
-{ my sub smashwhite($) {
-    local $_ = shift;
-    s/[ \t\n\N{NO-BREAK SPACE}]+/ /gs;
-    $_
-  }
 
-  (my $input_txt = $input_path) =~ s/\.o..$/.txt/ or bug;
-  #note "> Reading $input_txt ...";
-  my $itxt;
-  { open my $fh, "<:encoding(UTF-8)", $input_txt or die "$! ";
-    local $/; # slurp
-    $itxt = <$fh>;
-    close $fh or die "Error reading txt:$!";
+{ # Null matches
+  my @matches = $para0->Hsearch(qr//, multi => TRUE, debug => 0);
+  my $t = join("", map{$_->{match}} @matches);
+  is ($t, "", "Hsearch(qr//) produces only null matches", dvis '@matches');
+  my $off = 0;
+  foreach my $m (@matches) {
+    fail("Unexpected voffset") unless $m->{voffset} == $off;
+    fail("Unexpected vend")    unless $m->{vend}    == $off;
+    $off++
   }
-  my $sitxt = smashwhite($itxt);
+}
+{ # Maximal matches
+  my @matches = $body->Hsearch(qr/.*/s, multi => TRUE, debug => 0);
+  my $t = join("", map{$_->{match}} @matches);
+  is ($t, $alltext, "Hsearch(qr/.*/s) matches body->Hget_text",
+      dvis '@matches');
+  fail("Unexpected number of matches\n".do{
+    my $s = scalar(@matches)." matches, ".scalar(@paras_with_text)." neparas.\n";
+    $s .= "MATCHES:\n".join("\n", map{"    ".vis $_->{match}} @matches)."\n";
+    $s .= "PARAS:\n".join("\n", map{"    ".fmt_node_brief($_,wrapindent=>4)} @paras_with_text)."\n";
+    $s
+  })
+    unless @matches == @paras_with_text;
+}
 
-  for my $maxlen (1..1000) {
+# Ground truth check that correct content is being retrieved
+# The Skel.txt file is the result of "save as text" which inserts
+# \n between paragraphs.
+{ my sub smashwhite($) { $_[0] =~ s/[ \t\n\N{NO-BREAK SPACE}]+/ /gsr }
+  (my $input_txt = $master_copy_path) =~ s/\.o..$/.txt/ or bug;
+  my $Skeldottxt = path($input_txt)->slurp_utf8;
+
+  # Insert newline after each paragraph sub-text to match Skel.txt
+  # FIXME: Why doesnt this get "use of uninitialized value... in join" ???
+  my @paras = $body->descendants(qr/^text:[ph]$/);
+  my $text2 = join("\n", map{$_->Hget_text(prune_cond => PARA_COND)}
+                         @paras_with_text)."\n";
+  is(smashwhite($text2), smashwhite($Skeldottxt), "corresponds to ".basename($input_txt));
+}
+
+# Check various offsets
+
+{
+  my $max_para_textlen = max(map{ $_//0 } @para_text_lengths);
+  note dvis '$max_para_textlen';
+  for my $maxlen (1..$max_para_textlen+2) {
     my $text = "";
-    my $nchunks = 0;
-    my @paragraphs = $body->descendants_or_self(qr/text:(p|h)/);
-    for my $px (0..$#paragraphs) {
-      my $para = $paragraphs[$px];
+    for my $para (@all_paras) {
       my $offset = 0;
-      #say "[$px] para=$para";
       while (my $m = $para->Hsearch(qr/.{1,${maxlen}}/s, offset => $offset, debug=>0)) {
         $text .= $m->{match};
         $offset = $m->{vend};
         #say "GOT MATCH:", fmt_match($m);
-        bug unless $m->{paragraph} == $para;
-        $nchunks++;
+        bug unless $m->{para} == $para;
       }
-      $text .= "\n"; # inter-paragraph separator
     }
-    my $stext = smashwhite($text);
-    my $ok = ($sitxt eq $stext);
-    if (! $ok) {
-      note "> doc contains ", length($text), " virtual characters";
-      note "           and ", length($stext), " of smashed text";
-      note "> $input_txt contains ", length($sitxt), " of smashed text";
-  
-      foreach ([$stext, "smashed text from ODF", "/tmp/j.stext"],
-               [$sitxt, "smashed text from ".basename($input_txt), "/tmp/j.sitxt"],
-              ) {
-        my ($data, $title, $path) = @$_;
-        note "> Dumping $title > $path";
-        open my $fh, ">:encoding(UTF-8)", $path or die "$path : $!";
-        print $fh $data;
-        print $fh "\n";
-        close $fh or die "Error writing $path";
-      }
-      bug "Match of Total text FAILED: ($nchunks chunks of max $maxlen chars)";
-    }
-    last if length($text) < $maxlen;
+    fail("Hsearch for $maxlen-char chunks") unless $text eq $alltext;
   }
-  ok_with_lineno(1, "Total text matches ".basename($input_txt)." after smashing (variations)");
+  ok(1, "Total text matches with many match lengths");
 }
 #####################
 
-check_match( $body->Hsearch(qr//s),
-             "Hsearch with qr//s", { offset=>0, end=>0, voffset=>0, vend=>0 } );
-
-check_match( $body->Hsearch(qr//),
-             "Hsearch with qr//", { offset=>0, end=>0, voffset=>0, vend=>0 } );
-
-for (my $offset=4; $offset < 50; $offset++) {
-  check_match( $body->Hsearch(qr//s, offset => $offset, debug => 0),
-               "Hsearch with qr//s, offset => $offset", 
-               { voffset=>$offset, vend=>$offset },
-               1 
-             ); #ok_only_if_failed
-
-  check_match( $body->Hsearch(qr//, offset => $offset, debug => 0),
-               "Hsearch with qr//, offset => $offset", 
-               { voffset=>$offset, vend=>$offset },
-               1 
-             ); #ok_only_if_failed
-}
-ok_with_lineno(1, "Hsearch with qr//s or qr// and many offsets");
+is( $body->Hsearch(qr//s),
+    hash {
+      field offset=>0; field end=>0; field voffset=>0; field vend=>0; etc();
+    }, 
+    "Hsearch with qr//s"
+);
+is( $body->Hsearch(qr//),
+    hash {
+      field offset=>0; field end=>0; field voffset=>0; field vend=>0; etc();
+    }, 
+    "Hsearch with qr//"
+);
 
 #
-# NOTE: To fix offsets, examine output of "t/dumpskel.pl 2"
+# NOTE: To determine offsets, examine output of "t/dumpskel.pl 2"
 #
 
-#####################
-{ #Multi-match ADDR{1,2,3} in different table cells 
-  my @m = $body->Hsearch(qr/ADDR./, multi => 1, debug => 0);
-  check_match($m[0], "multi-match finding ADDR1",
-              { voffset=>925, match => 'ADDR1' });
-  check_match($m[1], "multi-match finding ADDR2",
-              { voffset=>934, match => 'ADDR2' });
-  check_match($m[2], "multi-match finding ADDR3",
-              { voffset=>943, match => 'ADDR3' });
-  ok_with_lineno(@m==3, "No extraneous matches");
-}
+######################
+
+is( [ $body->Hsearch(qr/ADDR./, multi => 1, debug => 0) ],
+    array{
+      item hash{ field voffset=>925; field match => 'ADDR1'; etc; };
+      item hash{ field voffset=>934; field match => 'ADDR2'; etc; };
+      item hash{ field voffset=>943; field match => 'ADDR3'; etc; };
+      end;
+    },
+    "Multi-match ADDR{1,2,3} in different table cells"
+);
+
 { #Multi-match in same paragraph
-  # Using offset to start with the last table cell containing **ADDR3**
-  my $off = 941;
+  my $off = 941; # -> "**ADDR3**" in the last cell (nothing follows)
   my @m = $body->Hsearch(qr/(?:AD|R3|.)/s, multi => 1, offset => $off);
-  
-  my $ix = 0;
-  foreach my $exp (qw/* * AD D R3 * */) {
-    my $m = $m[$ix++] // die "Too few matches";
-    check_match($m, "multi-match in same para ($exp at $off)",
-                { match => $exp, 
-                  voffset => $off, vend => $off+length($exp),
-                });
-    $off += length($exp);
-  }
-  ok_with_lineno(@m==7, "correct number of matches"); # no extras
+  is( [ @m ],
+      array {
+        item hash{ field match => '*';
+                   field voffset=>$off+0 ; field vend => $off+0+1; etc; };
+        item hash{ field match => '*';
+                   field voffset=>$off+1 ; field vend => $off+1+1; etc; };
+        item hash{ field match => 'AD';
+                   field voffset=>$off+2 ; field vend => $off+2+2; etc; };
+        item hash{ field match => 'D';
+                   field voffset=>$off+4 ; field vend => $off+4+1; etc; };
+        item hash{ field match => 'R3';
+                   field voffset=>$off+5 ; field vend => $off+5+2; etc; };
+        item hash{ field match => '*';
+                   field voffset=>$off+7 ; field vend => $off+7+1; etc; };
+        item hash{ field match => '*';
+                   field voffset=>$off+8 ; field vend => $off+8+1; etc; };
+        end;
+      },
+      "Multi-match in same paragraph"
+  );
   my $totstr = reduce { $a . $b } (map{ $_->{match} } @m);
-  bug unless defined $totstr;
-  like_with_lineno($totstr, qr/^\*\*ADDR3\*\*$/, "Multi-match in same para");
+  like($totstr, qr/^\*\*ADDR3\*\*$/, "Multi-match in same para");
 }
 #####################
-
-#{ my $m = $body->Hsearch("Front Stuff");
-#  say fmt_match($m);
-#  say fmt_tree($m->{paragraph});
-#  die "tex"
-#}
 
 done_testing();

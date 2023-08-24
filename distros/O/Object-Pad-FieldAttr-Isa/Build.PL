@@ -18,14 +18,14 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::FieldAttr::Isa',
    requires => {
-      'Object::Pad' => '0.66',
+      'Object::Pad' => '0.802',
    },
    test_requires => {
       'Test2::V0' => '0.000147',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'Object::Pad::ExtensionBuilder' => '0.57',
+      'Object::Pad::ExtensionBuilder' => '0.802',
    },
    license => 'perl',
    create_license => 1,

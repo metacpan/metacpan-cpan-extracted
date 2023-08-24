@@ -207,3 +207,55 @@ int aead_decrypt_raw(
         return -1;
     }
 }
+
+/*unsigned char* hex2bin(const char *hexstr) {*/
+
+    /*size_t hexstrLen = strlen(hexstr);*/
+    /*size_t bytesLen = hexstrLen / 2;*/
+    /*unsigned char* binstr = (unsigned char*) malloc(bytesLen);*/
+
+    /*BIGNUM *a = BN_new();*/
+    /*BN_hex2bn(&a, hexstr);*/
+    /*BN_bn2bin(a, binstr);*/
+
+    /*return binstr;*/
+/*}*/
+
+unsigned char* hex2bin(const char* hexstr, size_t* size)
+{
+    size_t hexstrLen = strlen(hexstr);
+    size_t bytesLen = hexstrLen / 2;
+
+    unsigned char* bytes = (unsigned char*) malloc(bytesLen);
+
+    int count = 0;
+    const char* pos = hexstr;
+
+    for(count = 0; count < bytesLen; count++) {
+        sscanf(pos, "%2hhx", &bytes[count]);
+        pos += 2;
+    }
+
+    if( size != NULL )
+        *size = bytesLen;
+
+    return bytes;
+}
+
+char *bin2hex(const unsigned char *bin, size_t len)
+{
+	char   *out;
+	size_t  i;
+
+	if (bin == NULL || len == 0)
+		return NULL;
+
+	out = malloc(len*2+1);
+	for (i=0; i<len; i++) {
+		out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+		out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+	}
+	out[len*2] = '\0';
+
+	return out;
+}

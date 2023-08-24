@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::ABI::Type::Int 0.011;
+package Blockchain::Ethereum::ABI::Type::Int 0.012;
 class Blockchain::Ethereum::ABI::Type::Int
     :isa(Blockchain::Ethereum::ABI::Type)
     :does(Blockchain::Ethereum::ABI::TypeRole);
@@ -36,7 +36,8 @@ In most cases you don't want to use this directly, use instead:
 =cut
 
 use Carp;
-use Math::BigInt;
+use Math::BigInt try => 'GMP';
+use Scalar::Util qw(looks_like_number);
 
 use constant DEFAULT_INT_SIZE => 256;
 
@@ -61,6 +62,8 @@ ABI encoded hex string
 method encode {
 
     return $self->_encoded if $self->_encoded;
+
+    croak "Invalid numeric data @{[$self->data]}" unless looks_like_number($self->data);
 
     my $bdata = Math::BigInt->new($self->data);
 

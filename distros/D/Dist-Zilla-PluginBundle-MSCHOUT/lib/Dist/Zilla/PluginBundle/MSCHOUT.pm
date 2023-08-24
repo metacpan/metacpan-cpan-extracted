@@ -1,14 +1,14 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-MSCHOUT
 #
-# This software is copyright (c) 2018 by Michael Schout.
+# This software is copyright (c) 2023 by Michael Schout.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.38';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.40';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
@@ -38,7 +38,6 @@ use Dist::Zilla::Plugin::Prereqs::AuthorDeps;
 use Dist::Zilla::Plugin::RemovePrereqs;
 use Dist::Zilla::Plugin::Signature;
 use Dist::Zilla::Plugin::TaskWeaver 0.093330;
-use Dist::Zilla::Plugin::TravisYML;
 use Dist::Zilla::Plugin::Twitter;
 
 use Pod::Elemental::Transformer::List;
@@ -54,10 +53,6 @@ has is_task => (is => 'lazy', isa => 'Bool');
 has release_branch => (is => 'lazy', isa => 'Str');
 
 has upload => (is => 'lazy', isa => 'Bool');
-
-has use_travis => (is => 'lazy', isa => 'Bool');
-
-has use_twitter => (is => 'lazy', isa => 'Bool');
 
 sub configure {
     my $self = shift;
@@ -112,16 +107,8 @@ sub configure {
         );
     }
 
-    # we must add Travis before Git::CommitBuild because CommitBuild needs to
-    # include the .travis.yml file
-    if ($self->use_travis) {
-        $self->add_plugins(
-            [ 'TravisYML' => { build_branch => $self->release_branch } ]
-        );
-    }
-
     $self->add_plugins(
-        [ 'Git::Check' => { allow_dirty => [qw(.travis.yml)] } ],
+        [ 'Git::Check' ],
         'Git::Commit',
         [ 'Git::CommitBuild' => { release_branch => $self->release_branch } ],
         [ 'Git::Tag'         => { branch => $self->release_branch } ],
@@ -140,12 +127,6 @@ sub configure {
     $self->add_plugins(
         [ RemovePrereqs => { remove => 'Module::Signature' } ]
     );
-
-    if ($self->use_twitter and $self->upload) {
-        $self->add_plugins(
-            [ Twitter => { hash_tags => '#perl' } ]
-        );
-    }
 }
 
 sub _option {
@@ -183,18 +164,6 @@ sub _build_upload {
     ! $self->_option('no_upload', 0);
 }
 
-sub _build_use_travis {
-    my $self = shift;
-
-    $self->_option('use_travis', 0);
-}
-
-sub _build_use_twitter {
-    my $self = shift;
-
-    $self->_option('use_twitter', 0);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -209,7 +178,7 @@ Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -237,7 +206,6 @@ It's equivalent to:
     issues = 1
 
  [Git::Check]
- allow_dirty = .travis.yml
  [Git::Commit]
  [Git::NextVersion]
     first_version = 0.01
@@ -277,18 +245,6 @@ Disables C<UploadToCPAN> and C<ConfirmRelease>.  Adds C<FakeRelease>.
 release_branch
 
 Sets the release branch name.  Default is C<build/releases>.
-
-=item *
-
-use_travis
-
-Enables the L<TravisYML|Dist::Zilla::Plugin::TravisYML> Dist Zilla plugin.
-
-=item *
-
-use_twitter
-
-Enables the L<Twitter|Dist::Zilla::Plugin::Twitter> Dist Zilla plugin.  If
 C<no_upload> is set, this plugin is skipped.
 
 =back
@@ -308,7 +264,7 @@ This PluginBundle also supports C<PluginRemover>, so removing a plugin is as sim
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/dist-zilla-pluginbundle-mschout>
+The development version is on github at L<https://https://github.com/mschout/dist-zilla-pluginbundle-mschout>
 and may be cloned from L<git://https://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
 
 =head1 BUGS
@@ -326,7 +282,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Schout.
+This software is copyright (c) 2023 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

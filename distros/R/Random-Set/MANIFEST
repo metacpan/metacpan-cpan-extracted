@@ -1,5 +1,6 @@
 Changes
-examples/ex1.pl
+examples/random_fifty_fifty.pl
+examples/random_ten_ninty.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

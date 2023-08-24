@@ -7,7 +7,7 @@ use Role::Tiny ();
 use Scalar::Util ();
 use Class::Method::Modifiers ();
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 my $store;
 
@@ -27,6 +27,7 @@ sub import {
     eval qq{
         package $caller {
             use Class::Method::Modifiers;
+            no feature 'class';
         };
     };
 
@@ -277,7 +278,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)

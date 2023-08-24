@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Method::Signatures::Simple::ParseKeyword;
-use Test::More tests => 2;
+use Test::More;
 
 {
     my $uniq = 0;
@@ -18,10 +18,8 @@ method prefix() {
 
 my $o = bless {prefix => "foo_" }, main::;
 is $o->fresh_name, 'foo_0';
+is $o->prefix, "foo_";
+is __LINE__, 22;
 
-TODO: {
-    local $TODO = 'do not know how to handle the scope change in line 7';
-    is __LINE__, 24;
-}
-
+done_testing;
 __END__

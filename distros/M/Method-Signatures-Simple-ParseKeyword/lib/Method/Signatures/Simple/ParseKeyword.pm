@@ -1,5 +1,5 @@
 package Method::Signatures::Simple::ParseKeyword;
-$Method::Signatures::Simple::ParseKeyword::VERSION = '1.12';
+$Method::Signatures::Simple::ParseKeyword::VERSION = '1.13';
 use warnings;
 use strict;
 
@@ -15,6 +15,7 @@ use Sub::Name 'subname';
 use Parse::Keyword {};
 our @EXPORT;
 our %MAP;
+$Carp::Internal{ (__PACKAGE__) }++;
 
 sub import {
     my $caller = caller;
@@ -127,7 +128,7 @@ sub parse_signature {
     my ($invocant) = @_;
     lex_read_space;
 
-    my @vars = $invocant ? ({ index => 0, name => $invocant }) : ();
+    my @vars = $invocant ? ({ index => 0, name => $invocant, is_inv => 1 }) : ();
     return \@vars unless lex_peek eq '(';
 
     my @attr = ();
@@ -143,9 +144,9 @@ sub parse_signature {
     my $seen_slurpy;
     while ((my $sigil = lex_peek) ne ')') {
         my $var = {};
-        die "syntax error"
+        croak qq{syntax error: expected sigil instead of "$sigil"}
             unless $sigil eq '$' || $sigil eq '@' || $sigil eq '%';
-        die "Can't declare parameters after a slurpy parameter"
+        croak "Can't declare parameters after a slurpy parameter"
             if $seen_slurpy;
 
         $seen_slurpy = 1 if $sigil eq '@' || $sigil eq '%';
@@ -174,7 +175,7 @@ sub parse_signature {
 
         push @vars, $var;
 
-        die "syntax error"
+        croak qq{syntax error: expected ')' or ',' instead of "} . lex_peek . q{"}
             unless lex_peek eq ')' || lex_peek eq ',';
 
         if (lex_peek eq ',') {
@@ -268,6 +269,12 @@ sub parse_body {
             my $preamble = '{';
 
             # arguments / query params
+            #
+            # if this is a method, unshift the invocant from @_
+            if (@$sigs && $sigs->[0]{is_inv}) {
+                $preamble .= "my $sigs->[0]{name} = shift;";
+                shift @$sigs;
+            }
             my @names = map { $_->{name} } @$sigs;
             $preamble .= 'my (' . join(', ', @names) . ') = @_;';
 

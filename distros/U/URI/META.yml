@@ -28,136 +28,142 @@ no_index:
 provides:
   URI:
     file: lib/URI.pm
-    version: '5.19'
+    version: '5.21'
   URI::Escape:
     file: lib/URI/Escape.pm
-    version: '5.19'
+    version: '5.21'
   URI::Heuristic:
     file: lib/URI/Heuristic.pm
-    version: '5.19'
+    version: '5.21'
   URI::IRI:
     file: lib/URI/IRI.pm
-    version: '5.19'
+    version: '5.21'
   URI::QueryParam:
     file: lib/URI/QueryParam.pm
-    version: '5.19'
+    version: '5.21'
   URI::Split:
     file: lib/URI/Split.pm
-    version: '5.19'
+    version: '5.21'
   URI::URL:
     file: lib/URI/URL.pm
-    version: '5.19'
+    version: '5.21'
   URI::WithBase:
     file: lib/URI/WithBase.pm
-    version: '5.19'
+    version: '5.21'
   URI::data:
     file: lib/URI/data.pm
-    version: '5.19'
+    version: '5.21'
   URI::file:
     file: lib/URI/file.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::Base:
     file: lib/URI/file/Base.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::FAT:
     file: lib/URI/file/FAT.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::Mac:
     file: lib/URI/file/Mac.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::OS2:
     file: lib/URI/file/OS2.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::QNX:
     file: lib/URI/file/QNX.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::Unix:
     file: lib/URI/file/Unix.pm
-    version: '5.19'
+    version: '5.21'
   URI::file::Win32:
     file: lib/URI/file/Win32.pm
-    version: '5.19'
+    version: '5.21'
   URI::ftp:
     file: lib/URI/ftp.pm
-    version: '5.19'
+    version: '5.21'
   URI::gopher:
     file: lib/URI/gopher.pm
-    version: '5.19'
+    version: '5.21'
   URI::http:
     file: lib/URI/http.pm
-    version: '5.19'
+    version: '5.21'
   URI::https:
     file: lib/URI/https.pm
-    version: '5.19'
+    version: '5.21'
+  URI::icap:
+    file: lib/URI/icap.pm
+    version: '5.21'
+  URI::icaps:
+    file: lib/URI/icaps.pm
+    version: '5.21'
   URI::ldap:
     file: lib/URI/ldap.pm
-    version: '5.19'
+    version: '5.21'
   URI::ldapi:
     file: lib/URI/ldapi.pm
-    version: '5.19'
+    version: '5.21'
   URI::ldaps:
     file: lib/URI/ldaps.pm
-    version: '5.19'
+    version: '5.21'
   URI::mailto:
     file: lib/URI/mailto.pm
-    version: '5.19'
+    version: '5.21'
   URI::mms:
     file: lib/URI/mms.pm
-    version: '5.19'
+    version: '5.21'
   URI::news:
     file: lib/URI/news.pm
-    version: '5.19'
+    version: '5.21'
   URI::nntp:
     file: lib/URI/nntp.pm
-    version: '5.19'
+    version: '5.21'
   URI::nntps:
     file: lib/URI/nntps.pm
-    version: '5.19'
+    version: '5.21'
   URI::pop:
     file: lib/URI/pop.pm
-    version: '5.19'
+    version: '5.21'
   URI::rlogin:
     file: lib/URI/rlogin.pm
-    version: '5.19'
+    version: '5.21'
   URI::rsync:
     file: lib/URI/rsync.pm
-    version: '5.19'
+    version: '5.21'
   URI::rtsp:
     file: lib/URI/rtsp.pm
-    version: '5.19'
+    version: '5.21'
   URI::rtspu:
     file: lib/URI/rtspu.pm
-    version: '5.19'
+    version: '5.21'
   URI::sftp:
     file: lib/URI/sftp.pm
-    version: '5.19'
+    version: '5.21'
   URI::sip:
     file: lib/URI/sip.pm
-    version: '5.19'
+    version: '5.21'
   URI::sips:
     file: lib/URI/sips.pm
-    version: '5.19'
+    version: '5.21'
   URI::snews:
     file: lib/URI/snews.pm
-    version: '5.19'
+    version: '5.21'
   URI::ssh:
     file: lib/URI/ssh.pm
-    version: '5.19'
+    version: '5.21'
   URI::telnet:
     file: lib/URI/telnet.pm
-    version: '5.19'
+    version: '5.21'
   URI::tn3270:
     file: lib/URI/tn3270.pm
-    version: '5.19'
+    version: '5.21'
   URI::urn:
     file: lib/URI/urn.pm
-    version: '5.19'
+    version: '5.21'
   URI::urn::isbn:
     file: lib/URI/urn/isbn.pm
-    version: '5.19'
+    version: '5.21'
   URI::urn::oid:
     file: lib/URI/urn/oid.pm
-    version: '5.19'
+    version: '5.21'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -181,10 +187,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/URI/issues
   homepage: https://github.com/libwww-perl/URI
   repository: https://github.com/libwww-perl/URI.git
-version: '5.19'
+version: '5.21'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.036000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -229,7 +235,7 @@ x_Dist_Zilla:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '0'
           inherit_version: '0'
-          meta_noindex: '1'
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -255,7 +261,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.34.1
+          git_version: 2.42.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -345,7 +351,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Substitute
       name: Substitute
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
@@ -409,7 +415,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
       name: Git::Check
       version: '2.048'
@@ -417,7 +423,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
       name: Git::CheckFor::MergeConflicts
       version: '0.014'
@@ -425,7 +431,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -490,7 +496,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: '%N-%v%t%n%n%c'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -499,7 +505,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -512,11 +518,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.19
+          tag: v5.21
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -543,7 +549,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'increment $VERSION after %v release'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -553,7 +559,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -567,7 +573,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.42.0
           repo_root: .
       name: Git::Push
       version: '2.048'
@@ -622,14 +628,14 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.030'
 x_contributors:
   - 'Gisle Aas <gisle@aas.no>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-  - 'Julien Fiegehenn <simbabque@cpan.org>'
   - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Julien Fiegehenn <simbabque@cpan.org>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Graham Knop <haarg@haarg.org>'
@@ -643,6 +649,7 @@ x_contributors:
   - 'Alex Kapranoff <kapranoff@gmail.com>'
   - 'Brendan Byrd <Perl@ResonatorSoft.org>'
   - 'brian d foy <brian.d.foy@gmail.com>'
+  - 'David Dick <ddick@cpan.org>'
   - 'David Schmidt <davewood@gmx.at>'
   - 'Dorian Taylor <dorian.taylor.lists@gmail.com>'
   - 'gerard <gerard@tty.nl>'
@@ -664,6 +671,6 @@ x_contributors:
   - 'Sebastian Willing <sewi@cpan.org>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Torsten Förtsch <torsten.foertsch@gmx.net>'
-x_generated_by_perl: v5.28.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

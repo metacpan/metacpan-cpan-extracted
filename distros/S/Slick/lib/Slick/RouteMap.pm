@@ -84,14 +84,23 @@ sub get {
             next;
         }
 
+        # Path parameters {foo}
         my $param;
         my $part = $_;
         for ( keys %{ $m->{children} } ) {
             ($param) = /^\{([\w_]+)\}$/x;
-            $param // next;
-            $params->{$param} = $part;
-            $m = $m->{children}->{"{$param}"};
-            last;
+
+            if ($param) {
+                $params->{$param} = $part;
+                $m = $m->{children}->{"{$param}"};
+                last;
+            }
+        }
+
+        # Catch all route: *
+        if ( exists $m->{children}->{'*'} ) {
+            $m = $m->{children}->{'*'};
+            next;
         }
 
         return undef unless defined $param;

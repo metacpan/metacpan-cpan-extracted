@@ -1,0 +1,21 @@
+Revision history for Dispatch::Fu. 
+
+0.8  Wed Aug 23 10:05:09 2023
+     - TRIAL
+     - released initial version of Dispatch::Fu on to the
+     unsuspecting echo chambers of the Perl-verse
+
+0.9  Wed Aug 23 11:05:09 2023
+     - TRIAL
+     - added POD
+
+0.10 Wed Aug 23 12:05:09 2023
+     - intended to be a TRIAL, but got released without
+     - tweaked POD
+
+0.11 Wed Aug 23 13:05:09 2023
+     - tweaked POD
+
+0.91 Wed Aug 23 14:05:09 2023
+     - fixing version number for proper CPAN indexing
+     - no functional changes

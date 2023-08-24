@@ -96,9 +96,8 @@ $slick->get(
     }
 );
 
-$slick->get( '/redirect', sub { $_[1]->body( $_[1]->redirect('/bob') ) } );
-$slick->get( '/redirect_other',
-    sub { $_[1]->body( $_[1]->redirect( '/bob', 301 ) ) } );
+$slick->get( '/redirect',       sub { $_[1]->redirect('/bob') } );
+$slick->get( '/redirect_other', sub { $_[1]->redirect( '/bob', 301 ) } );
 
 $slick->get(
     '/dies',
@@ -109,6 +108,8 @@ $slick->get(
     { before_dispatch => [ sub { die 'test die' } ] }
 );
 
+$slick->get( '/goop/*', sub { $_[1]->text('123'); } );
+
 my $router = Slick::Router->new( base => '/foo' );
 $router->get( '/bob' => sub { return $_[1]->json( { foo => 'bar' } ); } );
 $slick->register($router);
@@ -118,6 +119,8 @@ ok $slick->handlers->_map->{'/'}->{children}->{'foo'}->{children}->{'bob'}
 ok $slick->handlers->_map->{'/'}->{children}->{'foo'}->{methods}->{post};
 ok $slick->handlers->_map->{'/'}->{children}->{'foo'}->{methods}->{get};
 ok $slick->handlers->_map->{'/'}->{children}->{'foobar'}->{methods}->{get};
+ok $slick->handlers->_map->{'/'}->{children}->{goop}->{children}->{'*'}
+  ->{methods}->{get};
 my $f = $slick->handlers->_map->{'/'}->{children}->{'foo'}->{methods}->{get};
 isa_ok $f, 'Slick::Route';
 $f = $slick->handlers->_map->{'/'}->{children}->{'foo'}->{methods}->{post};
@@ -294,5 +297,37 @@ $e = Slick::Error->new($slick);
 isa_ok( $e, 'Slick::Error' );
 is( Slick::Error->new($e)->error,      $slick );
 is( Slick::Error->new($e)->error_type, 'Slick' );
+
+$t = {
+    QUERY_STRING    => '',
+    REMOTE_ADDR     => "127.0.0.1",
+    REMOTE_PORT     => 46604,
+    REQUEST_METHOD  => "GET",
+    REQUEST_URI     => "/goop/bob",
+    SCRIPT_NAME     => "",
+    SERVER_NAME     => "127.0.0.1",
+    SERVER_PORT     => 8000,
+    SERVER_PROTOCOL => "HTTP/1.1"
+};
+
+$response = $slick->_dispatch($t);
+is( $response->[0],      '200' );
+is( $response->[2]->[0], '123' );
+
+$t = {
+    QUERY_STRING    => '',
+    REMOTE_ADDR     => "127.0.0.1",
+    REMOTE_PORT     => 46604,
+    REQUEST_METHOD  => "GET",
+    REQUEST_URI     => "/goop/smob",
+    SCRIPT_NAME     => "",
+    SERVER_NAME     => "127.0.0.1",
+    SERVER_PORT     => 8000,
+    SERVER_PROTOCOL => "HTTP/1.1"
+};
+
+$response = $slick->_dispatch($t);
+is( $response->[0],      '200' );
+is( $response->[2]->[0], '123' );
 
 done_testing;

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::PAD" : "0.79",
+            "Object::Pad" : "0.79",
             "perl" : "5.026000"
          }
       },
@@ -48,6 +48,6 @@
          "web" : "https://github.com/refeco/perl-RLP"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

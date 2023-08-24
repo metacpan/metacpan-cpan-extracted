@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '7.70',
     },
     TEST_REQUIRES => {},
-    PREREQ_PM     => {'Object::PAD' => '0.79'},
+    PREREQ_PM     => {'Object::Pad' => '0.79'},
     dist          => {
         COMPRESS => 'gzip -9f',
         SUFFIX   => 'gz',

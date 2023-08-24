@@ -13,13 +13,14 @@ Ethereum transaction abstraction for signing and generating raw transactions
 # Usage
 
 ```perl
+    # parameters can be hexadecimal strings or Math::BigInt instances
     my $transaction = Blockchain::Ethereum::Transaction::EIP1559->new(
         nonce                    => '0x0',
         max_fee_per_gas          => '0x9',
         max_priority_fee_per_gas => '0x0',
         gas_limit                => '0x1DE2B9',
         to                       => '0x3535353535353535353535353535353535353535'
-        value                    => '0xDE0B6B3A7640000',
+        value                    => Math::BigInt->new('1000000000000000000'),
         data                     => '0x',
         chain_id                 => '0x539'
     );

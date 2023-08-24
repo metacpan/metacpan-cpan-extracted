@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 use parent 'Form::Tiny::Plugin';
 
@@ -60,7 +60,7 @@ CXC::Form::Tiny::Plugin::OptArgs2 - A Plugin to interface Form::Tiny with OptArg
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -341,27 +341,38 @@ L</inherit_optargs> defaults to I<false> so this behavior is the default.
 =head2 L</optargs_opts> v.s. a Plugin.
 
 As an alternative to specifying L</optargs_opts> at the top of the form
-definition.  A L<Form::Tiny> plugin can be used:
+definition,  a L<Form::Tiny> plugin can be used:
 
- package My::Form::Plugin;
- use parent 'Form::Tiny::Plugin';
+  package My::Form::Plugin;
+  use parent 'Form::Tiny::Plugin';
 
- sub plugin ( $self, $caller, $context ) {
+  sub plugin ( $self, $caller, $context ) {
     return {
-        meta_roles  => [ 'My::Form::Plugin::Meta', ],
+      meta_roles  => [ 'My::Form::Plugin::Meta', ],
     };
- }
+  }
 
- package My::Form::Plugin::Meta {
-   use Moo::Role;
-   around inherit_optargs => sub {
-      return !!0;
-   };
- }
+  package My::Form::Plugin::Meta {
+    use Moo::Role;
+    around inherit_optargs => sub { return !!0 };
+  }
 
- package My::Form;
-    use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2','+My::Form::Plugin'];
- ...
+  package My::Form;
+  use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2','+My::Form::Plugin'];
+  ...
+
+Because this plugin wraps the attribute accessor, a form using this
+plugin cannot override the value via the L</optargs_opts> keyword.
+
+To change an attribute's default value, wrap its builder, rather than its accessor, e.g.
+
+  package My::Form::Plugin::Meta {
+    use Moo::Role;
+    around _build_inherit_required => sub { return !!0 };
+  }
+
+This allows a form to use the L</optargs_opts> keyword and override
+the plugin's L</inherit_required> default.
 
 =head1 KEYWORDS
 
@@ -503,17 +514,17 @@ or argument's value is set to false, otherwise it is set to true.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs>
+Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs2@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs2>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs.git
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2.git
 
 =head1 AUTHOR
 

@@ -213,6 +213,7 @@ sub _generic_write
          my $offset = 0;
          $offset++ while substr( $readback, $offset, 1 ) eq substr( $chunk, $offset, 1 );
 
+         printf STDERR "\n";
          printf STDERR "Read: %v02X\n", $readback;
          printf STDERR "Exp : %v02X\n", $chunk;
          die sprintf "Verify failed at addr=0x%04X\n", $addr + $offset;

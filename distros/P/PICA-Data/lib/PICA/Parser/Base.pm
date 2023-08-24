@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 use PICA::Data::Field;
 use Carp         qw(croak);
@@ -79,6 +79,17 @@ sub next {
     return;
 }
 
+sub all {
+    my ($self) = @_;
+    my @records;
+
+    while (my $record = $self->next) {
+        push @records, $record;
+    }
+
+    return \@records;
+}
+
 1;
 __END__
 
@@ -103,6 +114,8 @@ PICA::Parser::Base - abstract base class of PICA parsers
     my $parser = PICA::Parser::XML->new( $filename, start => 1 );
     ...
 
+    my $records = $parser->all;
+
 =head1 DESCRIPTION
 
 This abstract base class of PICA+ parsers should not be instantiated directly.
@@ -115,6 +128,8 @@ Use one of the following subclasses instead:
 =item L<PICA::Parser::Plus>
 
 =item L<PICA::Parser::Binary>
+
+=item L<PICA::Parser::Import>
 
 =item L<PICA::Parser::XML>
 
@@ -149,12 +164,16 @@ reference to a Unicode string. L<PICA::Parser::XML> also detects plain XML strin
 
 =head2 next
 
-Reads the next PICA+ record. Returns a L<PICA::Data> object (that is a blessed
+Read the next PICA+ record and return a L<PICA::Data> object (that is a blessed
 hash with keys C<record> and optional C<_id>).
 
 =head2 count
 
 Get the number of records read so far.
+
+=head2 all
+
+Read all records and return as array reference.
 
 =head1 SEE ALSO
 

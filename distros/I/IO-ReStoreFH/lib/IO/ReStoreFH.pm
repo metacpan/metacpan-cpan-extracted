@@ -7,7 +7,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # In Perl 5.10.1 a use or require of FileHandle or something in the
 # FileHandle hierarchy (like FileHandle::Fmode, below) will cause the
@@ -24,7 +24,7 @@ our $VERSION = '0.10';
 
 # So, we explicitly load FileHandle on 5.10.x to avoid these action
 # at a distance problems.
-use if $^V ge v5.10.0 && $^V lt v5.11.0, 'FileHandle';
+use if $^V >= v5.10.0 && $^V <= v5.11.0, 'FileHandle';
 
 use FileHandle::Fmode ();
 use POSIX             ();
@@ -75,7 +75,7 @@ sub store {
         $mode .= '>' if FileHandle::Fmode::is_A( $fh );
 
         # dup the filehandle
-        open my $dup, $mode . '&', $fh
+        open my $dup, $mode . q{&}, $fh
           or _croak( "error fdopening \$fh: $!\n" );
 
         push @{ $self->{dups} }, { fh => $fh, mode => $mode, dup => $dup };
@@ -94,9 +94,7 @@ sub store {
     }
 
     else {
-        _croak(
-            "\$fh must be opened Perl filehandle or object or integer file descriptor\n"
-        );
+        _croak( '$fh must be opened Perl filehandle or object or integer file descriptor', );
     }
 
     return;
@@ -106,7 +104,6 @@ sub restore {
     my $self = shift;
 
     my $dups = $self->{dups};
-    ## no critic (ProhibitAccessOfPrivateData)
     while ( my $dup = pop @{$dups} ) {
 
         if ( exists $dup->{fd} ) {
@@ -116,9 +113,9 @@ sub restore {
         }
 
         else {
-            open( $dup->{fh}, $dup->{mode} . '&', $dup->{dup} )
-              or _croak( "error restoring file handle $dup->{fh}: $!\n" );
-            close( $dup->{dup} );
+            open( $dup->{fh}, $dup->{mode} . q{&}, $dup->{dup} )
+              or _croak( "error restoring file handle $dup->{fh}: $!" );
+            close( $dup->{dup} ) or _croak( q{error closing dup'ed filehandle} );
         }
     }
     return;
@@ -155,7 +152,7 @@ IO::ReStoreFH - store/restore file handles
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -193,6 +190,8 @@ descriptors.
 
 File handles and descriptors are restored in the reverse order that
 they are stored.
+
+=head1 INTERNALS
 
 =head1 INTERFACE
 
@@ -271,7 +270,7 @@ Attempting to restore the Perl file handle failed for the specified reason.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-io-restorefh@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH
+Please report any bugs or feature requests to bug-io-restorefh@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH>
 
 =head2 Source
 

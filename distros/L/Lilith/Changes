@@ -1,9 +1,13 @@
 Revision history for Lilith
 
-
+0.4.0	2023-08-18/00:45
+		 -Now die for event fetching if --id or --event is not specified.
+		 -PCAP fetching support for Suricata via Virani
+		 -Hunchback the 26th
 
 0.3.0	2023-03-30/21:00
-		- Add more checks for with Baphomet
+		 -Add more checks for with Baphomet
+
 
 0.2.1	 2023-01-16/20:15
 		 -Baphomet YAML fix.

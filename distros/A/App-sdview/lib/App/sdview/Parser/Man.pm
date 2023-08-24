@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use utf8;
 
-use Object::Pad 0.66;
+use Object::Pad 0.800;
 
-package App::sdview::Parser::Man 0.09;
+package App::sdview::Parser::Man 0.10;
 class App::sdview::Parser::Man
    :does(App::sdview::Parser)
    :strict(params);

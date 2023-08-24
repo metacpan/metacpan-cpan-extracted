@@ -1,0 +1,49 @@
+NAME
+    RT::Extension::EmailReplyDelimiter - Strip text from emails after a
+    delimiter
+
+DESCRIPTION
+    This extension alters email while it is being received by Request
+    Tracker <https://bestpractical.com/request-tracker>, removing text and
+    any associated image attachments appearing after a reply delimiter such
+    as "*##- Please type your reply above this line -##*".
+
+RT VERSION
+    Known to work with RT 4.2.16, 4.4.4, and 5.0.1.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add these lines:
+
+            Set(@EmailReplyDelimiters, '##- Please type your reply above this line -##');
+            Plugin('RT::Extension::EmailReplyDelimiter');
+
+    Restart your web server
+
+CONFIGURATION
+    In RT_SiteConfig.pm, adjust *@EmailReplyDelimiters* so it contains a
+    list of all of the email reply delimiters you will be using. Restart the
+    service after making changes to this configuration item.
+
+    Then adjust the relevant RT templates to include a reply delimiter, on a
+    line by itself, in the appropriate place.
+
+ISSUES AND CONTRIBUTIONS
+    The project is held on Codeberg <https://codeberg.org>; its issue
+    tracker is at
+    <https://codeberg.org/a-j-wood/rt-extension-emailreplydelimiter/issues>.
+
+LICENSE AND COPYRIGHT
+    Copyright 2023 Andrew Wood.
+
+    License GPLv3+: GNU GPL version 3 or later:
+    https://gnu.org/licenses/gpl.html
+
+    This is free software: you are free to change and redistribute it. There
+    is NO WARRANTY, to the extent permitted by law.
+

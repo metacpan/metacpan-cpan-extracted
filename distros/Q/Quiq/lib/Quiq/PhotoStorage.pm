@@ -52,7 +52,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.211';
+our $VERSION = '1.212';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -116,7 +116,7 @@ sub new {
 
 =head4 Synopsis
 
-  $name = $pst->add($file);
+  $path = $pst->add($file);
 
 =head4 Description
 
@@ -173,9 +173,41 @@ sub add {
 
 # -----------------------------------------------------------------------------
 
+=head3 addAllByTime() - Füge Fotodateien zum Speicher hinzu
+
+=head4 Synopsis
+
+  @paths = $pst->addAllByTime(@files);
+
+=head4 Description
+
+Füge die Fotodateien @files in der Reihenfolge ihrer mtime
+zum Speicher hinzu und liefere die Pfade der Dateien
+im Speicher zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub addAllByTime {
+    my ($self,@files) = @_;
+
+    my $p = Quiq::Path->new;
+    @files = sort {$p->mtime($a) <=> $p->mtime($b)} @files;
+
+    my @paths;
+    for my $file (@files) {
+        push @paths,$self->add($file);
+    }
+
+    return @paths;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.211
+1.212
 
 =head1 AUTHOR
 

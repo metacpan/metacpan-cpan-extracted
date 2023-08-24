@@ -1,0 +1,52 @@
+{
+   "abstract" : "compare two HL7 v2 messages against one another",
+   "author" : [
+      "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-HL7-Compare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.000000",
+            "Mooish::AttributeBuilder" : "1.001",
+            "Type::Tiny" : "2",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bbrtj/perl-app-hl7-compare/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bbrtj/perl-app-hl7-compare.git",
+         "web" : "https://github.com/bbrtj/perl-app-hl7-compare"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

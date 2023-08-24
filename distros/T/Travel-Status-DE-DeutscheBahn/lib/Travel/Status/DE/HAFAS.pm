@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.12';
+our $VERSION = '4.15';
 
 # {{{ Endpoint Definition
 
@@ -442,7 +442,7 @@ sub new_p {
 				$self->parse_board;
 			}
 			if ( $self->errstr ) {
-				$promise->reject( $self->errstr );
+				$promise->reject( $self->errstr, $self );
 			}
 			else {
 				$promise->resolve($self);
@@ -512,7 +512,6 @@ sub post_with_cache {
 		say '  cache miss';
 	}
 
-	my $ua    = $self->{user_agent};
 	my $reply = $self->{ua}->post(
 		$url,
 		'Content-Type' => 'application/json',
@@ -773,10 +772,11 @@ sub similar_stops_p {
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
 		$opt{user_agent} //= $self->{ua};
+		$opt{promise}    //= $self->{promise};
 		return Travel::Status::DE::HAFAS::StopFinder->new_p(
 			url            => $hafas_instance{$service}{stopfinder},
 			input          => $self->{station},
-			ua             => $opt{user_agent},
+			user_agent     => $opt{user_agent},
 			developer_mode => $self->{developer_mode},
 			promise        => $opt{promise},
 		);
@@ -903,7 +903,7 @@ monitors
 
 =head1 VERSION
 
-version 4.12
+version 4.15
 
 =head1 DESCRIPTION
 
@@ -1015,10 +1015,13 @@ Request a polyline (series of geo-coordinates) indicating the train's route.
 
 =item my $status_p = Travel::Status::DE::HAFAS->new_p(I<%opt>)
 
-Return a promise that resolves into a Travel::Status::DE::HAFAS instance
-($status) on success and rejects with an error message ($status->errstr) on
-failure. In addition to the arguments of B<new>, the following mandatory
-arguments must be set.
+Returns a promise that resolves into a Travel::Status::DE::HAFAS instance
+($status) on success and rejects with an error message on failure. If the
+failure occured after receiving a response from the HAFAS backend, the rejected
+promise contains a Travel::Status::DE::HAFAS instance as a second argument.
+This instance can be used e.g. to call similar_stops_p in case of an ambiguous
+location specifier. In addition to the arguments of B<new>, the following
+mandatory arguments must be set.
 
 =over
 
@@ -1090,11 +1093,26 @@ Not available in journey mode.
 Returns a list of hashrefs describing stops whose name is similar to the one
 requested in the constructor's B<station> parameter. Returns nothing if
 the active service does not support this feature.
-This is most useful if B<errcode> returns 'H730', which means that the
+This is most useful if B<errcode> returns 'LOCATION', which means that the
 HAFAS backend could not identify the stop.
 
 See Travel::Status::DE::HAFAS::StopFinder(3pm)'s B<results> method for details
 on the return value.
+
+=item $status->similar_stops_p(I<%opt>)
+
+Returns a promise resolving to a list of hashrefs describing stops whose name
+is similar to the one requested in the constructor's B<station> parameter.
+Returns nothing if the active service does not support this feature.  This is
+most useful if B<errcode> returns 'LOCATION', which means that the HAFAS
+backend could not identify the stop.
+
+See Travel::Status::DE::HAFAS::StopFinder(3pm)'s B<results> method for details
+on the resolved values.
+
+If $status has been created using B<new_p>, this function does not require
+arguments. Otherwise, the caller must specify B<promise> and B<user_agent>
+(see B<new_p> above).
 
 =item $status->get_active_service
 
@@ -1146,7 +1164,7 @@ Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

@@ -13,7 +13,7 @@ use Crypt::OpenSSL::Base::Func;
 use Crypt::OPRF;
 use Crypt::OPAQUE;
 
-use Smart::Comments;
+#use Smart::Comments;
 
 #create envelope: random_pwd, server_public_key, idU, idS, Nh, auth_key, export_key, masking_key, seed, client_public_key, pk_bytes, cleartext_creds, auth_key, envelope_nonce
 #ccd32affb94efac1f2bbd7c8632e44a7609178354745dbbeb21540bc05b8696a

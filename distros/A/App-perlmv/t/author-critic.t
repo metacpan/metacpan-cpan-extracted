@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/perlmv.pm','lib/App/perlmv/scriptlet/add_extension_according_to_mime_type.pm','lib/App/perlmv/scriptlet/remove_common_prefix.pm','lib/App/perlmv/scriptlet/remove_common_suffix.pm','lib/App/perlmv/scriptlets/std.pm','lib/Complete/App/perlmv.pm','script/perlcp','script/perlln','script/perlln_s','script/perlmv','script/perlrename'];
+my $filenames = ['lib/App/perlmv.pm','lib/App/perlmv/scriptlet/remove_common_prefix.pm','lib/App/perlmv/scriptlet/remove_common_suffix.pm','lib/App/perlmv/scriptlets/std.pm','lib/Complete/App/perlmv.pm','script/perlcp','script/perlln','script/perlln_s','script/perlmv','script/perlrename'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

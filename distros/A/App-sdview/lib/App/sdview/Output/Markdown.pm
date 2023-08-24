@@ -4,10 +4,11 @@
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
-package App::sdview::Output::Markdown 0.09;
+package App::sdview::Output::Markdown 0.10;
 class App::sdview::Output::Markdown
    :does(App::sdview::Output)
    :strict(params);

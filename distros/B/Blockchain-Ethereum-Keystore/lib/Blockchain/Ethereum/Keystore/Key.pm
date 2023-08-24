@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Key 0.002;
+package Blockchain::Ethereum::Keystore::Key 0.005;
 class Blockchain::Ethereum::Keystore::Key;
 
 =encoding utf8
@@ -14,9 +14,11 @@ Blockchain::Ethereum::Keystore::Key - Private key abstraction
 
 Private key abstraction
 
-If instantiated without a private key it generate a new random key, this module uses L<Crypt::PRNG> for the random key generation
+If instantiated without a private key, this module uses L<Crypt::PRNG> for the random key generation
 
-    my $Blockchain::Ethereum::Keystore::Key->new(private_key => $private_key_bytes);
+    my $key = Blockchain::Ethereum::Key->new;
+    $key->sign_transaction($transaction);
+    ...
 
 =cut
 
@@ -24,10 +26,10 @@ use Carp;
 use Crypt::PK::ECC;
 use Crypt::Perl::ECDSA::Parse;
 use Crypt::Perl::ECDSA::Utils;
-use Digest::Keccak qw(keccak_256);
-use Crypt::PRNG    qw(random_bytes);
+use Crypt::Digest::Keccak256 qw(keccak256);
+use Crypt::PRNG              qw(random_bytes);
 
-use Blockchain::Ethereum::Keystore::Key::PrivateKey;
+use Blockchain::Ethereum::Keystore::Key::PKUtil;
 use Blockchain::Ethereum::Keystore::Address;
 
 field $private_key :reader :writer :param //= undef;
@@ -42,7 +44,8 @@ ADJUST {
 
     # Crypt::PK::ECC does not provide support for deterministic keys
     $self->set_ecc_handler(bless Crypt::Perl::ECDSA::Parse::private($importer->export_key_der('private')),
-        'Blockchain::Ethereum::Keystore::Key::PrivateKey');
+        'Blockchain::Ethereum::Keystore::Key::PKUtil');
+
 }
 
 =head2 sign_transaction
@@ -65,12 +68,10 @@ self
 
 method sign_transaction ($transaction) {
 
-    require Blockchain::Ethereum::Transaction;
-
     croak "transaction must be a reference from Blockchain::Ethereum::Transaction"
         unless ref($transaction) =~ /^\QBlockchain::Ethereum::Transaction/;
 
-    # _sign is overriden by Blockchain::ethereum::Keystore::Key::PrivateKey
+    # _sign is overriden by Blockchain::ethereum::Keystore::Key::PKUtil
     # to include the y_parity as part of the response
     my ($r, $s, $y_parity) = $self->_ecc_handler->_sign($transaction->hash);
 
@@ -102,7 +103,7 @@ method address {
     my ($x, $y) = Crypt::Perl::ECDSA::Utils::split_G_or_public($self->_ecc_handler->_decompress_public_point);
 
     # address is the hash of the concatenated value of x and y
-    my $address     = substr(keccak_256($x . $y), -20);
+    my $address     = substr(keccak256($x . $y), -20);
     my $hex_address = unpack("H*", $address);
 
     return Blockchain::Ethereum::Keystore::Address->new(address => "0x$hex_address");

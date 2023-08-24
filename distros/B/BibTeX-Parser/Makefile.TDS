@@ -1,0 +1,33 @@
+# This is Makefile for TDS-compliant TeX distributions
+# Written by Boris Veytsman, boris@varphi.com
+#
+# This file is in public domain
+#
+PREFIX = /usr/local
+
+LIBDIR = $(PREFIX)/scripts/bibtexperllibs
+
+DOCDIR = $(PREFIX)/doc/bibtex/bibtexperllibs
+
+all:  
+
+install:  
+	mkdir -p $(LIBDIR)
+	cp -r lib/* $(LIBDIR)
+	mkdir -p $(DOCDIR)
+	cp -r man/man3/* $(DOCDIR)
+
+check test: Makefile
+# need bash pipefail so exit status is from the make, not the tr.
+# the -f Makefile is because of possible GNUmakefile -> Makefile.TDS symlink.
+	bash -c "set -o pipefail; \
+	  env PERL5LIB=../LaTeX-ToUnicode/lib \
+	  make -f Makefile test | tr '\r' '\n'"
+
+Makefile MYMETA.json MYMeta.yml: Makefile.PL force
+	perl Makefile.PL || rm -f $@
+
+clean distclean:
+	rm -rf Makefile MYMETA.* blib pm_to_blib
+
+force:

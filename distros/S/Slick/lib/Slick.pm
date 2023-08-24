@@ -23,7 +23,7 @@ use experimental qw(try);
 
 no warnings qw(experimental::try);
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 with 'Slick::EventHandler';
 with 'Slick::RouteManager';
@@ -148,12 +148,6 @@ sub _dispatch {
     $context->body = [] if $method eq 'head';
 
     return $context->to_psgi;
-}
-
-sub BUILD {
-    my $self = shift;
-
-    return $self;
 }
 
 sub helper {

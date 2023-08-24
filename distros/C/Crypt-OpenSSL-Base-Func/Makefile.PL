@@ -23,6 +23,7 @@ WriteMakefile(
         'Carp' => 0.01,
         'Test::More' => 0.01,
         'Test' => 0.01,
+        'Crypt::OpenSSL::Guess' => 0.12,
     }, 
     'LIBS'   => [openssl_lib_paths() . ' -lssl -lcrypto'],
     DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',

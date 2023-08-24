@@ -72,7 +72,13 @@ struct FieldHookFuncs {
           enum AccessorType type, struct AccessorGenerationCtx *ctx);
 
   /* called by constructor */
-  void (*post_initfield)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
+  union {
+    void (*post_makefield)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
+
+    // This used to be called post_initfield but was badly named because it 
+    // actually ran *before* initfields
+    void (*post_initfield)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
+  };
   void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
 };
 

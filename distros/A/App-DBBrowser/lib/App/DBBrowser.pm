@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.338';
+our $VERSION = '2.339';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -180,8 +180,6 @@ sub run {
             next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last PLUGIN;
         }
-        # Oracle: key word "AS" not supported in Table aliases (Union, Join, Derived tables)
-        $sf->{i}{" AS "} = $driver eq 'Oracle' ? " " : " AS ";
 
         # DATABASES
 
@@ -576,9 +574,9 @@ sub __derived_table {
     if ( ! defined $qt_table ) {
         return;
     }
-    if ( $sf->{o}{alias}{table} || $sf->{i}{driver} =~ /^(?:mysql|MariaDB|Pg)\z/ ) {
-        $qt_table .= $sf->{i}{" AS "} . $ax->prepare_identifier( 't1' );
-    }
+    # Oracle: key word "AS" not supported in Table aliases (Union, Join, Derived tables)
+    my $alias = $ax->alias( $tmp, 'table', $qt_table, 't1' );
+    $qt_table .= " " . $ax->prepare_identifier( $alias );
     $tmp->{table} = $qt_table;
     my $columns = $ax->column_names( $qt_table );
     my $qt_columns = $ax->quote_cols( $columns );
@@ -606,7 +604,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.338
+Version 2.339
 
 =head1 DESCRIPTION
 

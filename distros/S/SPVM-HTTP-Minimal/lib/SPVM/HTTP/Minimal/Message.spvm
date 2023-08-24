@@ -1,0 +1,8 @@
+# Copyright (c) 2023 [--user-name]
+# MIT License
+
+class HTTP::Minimal::Message {
+  use HTTP::Minimal::Headers;
+  
+  has headers : ro HTTP::Minimal::Headers;
+}

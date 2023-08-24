@@ -3,15 +3,10 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
 use t_TestCommon ':silent',
-                 qw/bug ok_with_lineno like_with_lineno
-                    rawstr showstr showcontrols displaystr 
-                    show_white show_empty_string
-                    fmt_codestring 
-                    timed_run
-                    mycheckeq_literal mycheck _mycheck_end
-                  /;
+                 qw/bug tmpcopy_if_writeable $debug/;
+
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:chars :DEFAULT fmt_node fmt_match fmt_tree/;
+use ODF::lpOD_Helper;
 
 #####################################################################
 #

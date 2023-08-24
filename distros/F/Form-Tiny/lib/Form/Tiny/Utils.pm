@@ -1,5 +1,5 @@
 package Form::Tiny::Utils;
-$Form::Tiny::Utils::VERSION = '2.19';
+$Form::Tiny::Utils::VERSION = '2.21';
 use v5.10;
 use strict;
 use warnings;
@@ -129,12 +129,14 @@ sub set_form_meta_class
 
 # internal use functions (not exported)
 
+# returns arrayref of subarraysrefs, each in format:
+# [path_aref, $value, $is_structure]
 sub _find_field
 {
 	my ($fields, $field_def) = @_;
 
 	my @path = @{$field_def->get_name_path->path};
-	my @arrays = map { $_ eq 'ARRAY' } @{$field_def->get_name_path->meta};
+	my $arrays = $field_def->get_name_path->meta_arrays;
 
 	# the result goes here
 	my @found;
@@ -142,74 +144,68 @@ sub _find_field
 	$traverser = sub {
 		my ($curr_path, $index, $value) = @_;
 
-		if ($index == @path) {
-
-			# we reached the end of the tree
-			push @found, [$curr_path, $value];
-		}
-		else {
-			my $is_array = $arrays[$index];
+		while ($index < @path) {
 			my $current_ref = ref $value;
 
-			# make sure the actual ref type does not mismatch the spec
-			return unless $is_array eq ($current_ref eq 'ARRAY');
+			if ($arrays->[$index]) {
 
-			# it's not the leaf of the tree yet, so we require an array or a hash
-			return if !$is_array && $current_ref ne 'HASH';
+				# It's an array, make sure the actual ref type does not mismatch the spec
+				return 0 unless $current_ref eq 'ARRAY';
 
-			if ($is_array) {
 				if (@$value == 0) {
 
 					# we wanted to have a deeper structure, but its not there, so clearly an error
-					return unless $index == $#path;
+					return 0 unless $index == $#path;
 
 					# we had aref here, so we want it back in resulting hash
 					push @found, [$curr_path, [], 1];
 				}
 				else {
 					for my $ind (0 .. $#$value) {
-						return    # may be an error, exit early
+						return 0    # may be an error, exit early
 							unless $traverser->([@$curr_path, $ind], $index + 1, $value->[$ind]);
 					}
 				}
+
+				return 1;    # exit early, looping continued in recursive calls
 			}
 
 			else {
+				# it's not the leaf of the tree yet, so we require a hash
 				my $next = $path[$index];
-				return unless exists $value->{$next};
-				return $traverser->([@$curr_path, $next], $index + 1, $value->{$next});
+				return 0 unless $current_ref eq 'HASH' && exists $value->{$next};
+
+				$index += 1;
+				$value = $value->{$next};
+				push @$curr_path, $next;
 			}
 		}
 
+		push @found, [$curr_path, $value];
 		return 1;    # all ok
 	};
 
-	if ($traverser->([], 0, $fields)) {
-		return [
-			map {
-				{
-					path => $_->[0],
-					value => $_->[1],
-					structure => $_->[2]
-				}
-			} @found
-		];
-	}
+	# manually free traverser after it's done (memory leak)
+	my $result = $traverser->([], 0, $fields);
+	$traverser = undef;
+
+	return \@found if $result;
 	return;
 }
 
+# takes the same format as _find_field returns (in $path_values), and fills it
+# into $fields according to $field_def
 sub _assign_field
 {
 	my ($fields, $field_def, $path_values) = @_;
 
-	my @arrays = map { $_ eq 'ARRAY' } @{$field_def->get_name_path->meta};
+	my $arrays = $field_def->get_name_path->meta_arrays;
 	for my $path_value (@$path_values) {
-		my @parts = @{$path_value->{path}};
+		my @parts = @{$path_value->[0]};
 		my $current = \$fields;
-		for my $i (0 .. $#parts) {
 
-			# array_path will contain array indexes for each array marker
-			if ($arrays[$i]) {
+		for my $i (0 .. $#parts) {
+			if ($arrays->[$i]) {
 				$current = \${$current}->[$parts[$i]];
 			}
 			else {
@@ -217,7 +213,7 @@ sub _assign_field
 			}
 		}
 
-		$$current = $path_value->{value};
+		$$current = $path_value->[1];
 	}
 }
 

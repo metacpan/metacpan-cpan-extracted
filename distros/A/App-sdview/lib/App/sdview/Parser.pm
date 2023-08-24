@@ -1,46 +1,61 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use utf8;
 
-use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
+use Object::Pad::FieldAttr::Checked;
 
-package App::sdview::Parser 0.09;
+package App::sdview::Parser 0.10;
 role App::sdview::Parser;
 
 use String::Tagged;
+use Types::Standard;
+
+my $ListType;
+BEGIN {
+   $ListType = Types::Standard::Enum[qw( bullet number text )];
+}
 
 # This package is empty but provides a bunch of helper classes
 
 class App::sdview::Para::Heading :strict(params) {
-   field $level :param :reader;
-   field $text  :param :reader;
+   use Types::Standard qw( InstanceOf Num );
+
+   field $level :param :reader :Checked(Num);
+   field $text  :param :reader :Checked(InstanceOf['String::Tagged']);
 
    method type { "head" . $level }
 }
 
 class App::sdview::Para::Plain :strict(params) {
-   field $text   :param :reader;
-   field $indent :param :reader = 0;
+   use Types::Standard qw( InstanceOf Num );
+
+   field $text   :param :reader :Checked(InstanceOf['String::Tagged']);
+   field $indent :param :reader :Checked(Num) = 0;
 
    method type { "plain" }
 }
 
 class App::sdview::Para::Verbatim :strict(params) {
-   field $text   :param :reader;
-   field $indent :param :reader = 0;
+   use Types::Standard qw( InstanceOf Num );
+
+   field $text   :param :reader :Checked(InstanceOf['String::Tagged']);
+   field $indent :param :reader :Checked(Num) = 0;
 
    method type { "verbatim" }
 }
 
 class App::sdview::Para::List :strict(params) {
-   # "bullet" | "number" | "text"
-   field $listtype :param :reader;
-   field $indent   :param :reader;
-   field $initial  :param :reader = 1;  # for number lists
+   use Types::Standard qw( Num );
+
+   field $listtype :param :reader :Checked($ListType);
+   field $indent   :param :reader :Checked(Num);
+   field $initial  :param :reader :Checked(Num) = 1;  # for number lists
 
    field @items           :reader;
 
@@ -50,9 +65,11 @@ class App::sdview::Para::List :strict(params) {
 }
 
 class App::sdview::Para::ListItem :strict(params) {
-   field $listtype :param :reader;
-   field $term     :param :reader = undef;
-   field $text     :param :reader;
+   use Types::Standard qw( InstanceOf Maybe );
+
+   field $listtype :param :reader :Checked($ListType);
+   field $term     :param :reader :Checked(Maybe[InstanceOf['String::Tagged']]) = undef;
+   field $text     :param :reader :Checked(InstanceOf['String::Tagged']);
 
    method type { "item" }
 }
@@ -68,7 +85,9 @@ class App::sdview::Para::Table :strict(params) {
 }
 
 class App::sdview::Para::TableCell :isa(App::sdview::Para::Plain) :strict(params) {
-   field $align :param :reader;
+   use Types::Standard qw( Enum );
+
+   field $align :param :reader :Checked(Enum[qw( left centre right )]);
 
    method type { "table-cell" }
 }

@@ -10,20 +10,19 @@ use URI::Query;
 use URL::Encode;
 use JSON::Tiny qw(encode_json decode_json);
 use YAML::Tiny;
-
-# STATIC
-sub REDIRECT { return 'R'; }
-sub STANDARD { return 'S'; }
+use Time::HiRes;
 
 has id => (
     is      => 'ro',
     isa     => Str,
+    lazy    => 1,
     default => sub { return Slick::Util->four_digit_number; }
 );
 
 has stash => (
     is      => 'rw',
     isa     => HashRef,
+    lazy    => 1,
     default => sub { return { 'slick.errors' => [] }; }
 );
 
@@ -47,51 +46,57 @@ has response => (
 has queries => (
     is      => 'ro',
     isa     => HashRef,
+    lazy    => 1,
     default => sub { return {}; }
 );
 
 has params => (
     is      => 'ro',
     isa     => HashRef,
+    lazy    => 1,
     default => sub { return {}; }
+);
+
+has known_types => (
+    is      => 'rw',
+    isa     => HashRef,
+    default => sub {
+        return +{
+            'application/json' => sub { return decode_json(shift); },
+            'text/json'        => sub { return decode_json(shift); },
+            'application/json; encoding=utf8' =>
+              sub { return decode_json(shift); },
+            'application/yaml' =>
+              sub { return YAML::Tiny->read_string(shift); },
+            'text/yaml' => sub { return YAML::Tiny->read_string(shift); },
+            'application/x-yaml' =>
+              sub { return YAML::Tiny->read_string(shift); },
+            'application/x-www-form-urlencoded' =>
+              sub { return url_decode_utf8(shift); }
+        };
+    }
 );
 
 has _initiated_time => (
     is      => 'ro',
-    default => sub { require_module('Time::HiRes'); return time; }
+    default => sub { return time; }
 );
 
 sub _decode_content {
     my $self = shift;
 
-    state $known_types = {
-        'application/json'                => sub { return decode_json(shift); },
-        'text/json'                       => sub { return decode_json(shift); },
-        'application/json; encoding=utf8' => sub { return decode_json(shift); },
-        'application/yaml'   => sub { return YAML::Tiny->read_string(shift); },
-        'text/yaml'          => sub { return YAML::Tiny->read_string(shift); },
-        'application/x-yaml' => sub { return YAML::Tiny->read_string(shift); },
-        'application/x-www-form-urlencoded' =>
-          sub { return url_decode_utf8(shift); }
-    };
-
-    return $known_types->{ $self->request->content_type }
+    return $self->known_types->{ $self->request->content_type }
       ->( $self->request->content )
-      if exists $known_types->{ $self->request->content_type };
+      if exists $self->known_types->{ $self->request->content_type };
 
-    if ( rindex( $self->request->content_type, 'application/json', 0 ) == 0 ) {
+    if ( $self->request->content_type =~ 'json' ) {
         return decode_json( $self->request->content );
     }
-    elsif (
-        rindex( $self->request->content_type,
-            'application/x-www-form-urlencoded' ) == 0
-      )
-    {
+    elsif ( $self->request->content_type =~ 'x-www-form-urlencoded' ) {
         return url_decode_utf8( $self->request->content );
     }
-    elsif (rindex( $self->request->content_type, 'application/yaml', 0 ) == 0
-        || rindex( $self->request->content_type, 'application/x-yaml', 0 ) ==
-        0 )
+    elsif (( $self->request->content_type =~ 'yaml' )
+        || ( $self->request->content_type =~ 'application/x-yaml' ) )
     {
         return YAML::Tiny->read_string( $self->request->content );
     }
@@ -219,11 +224,7 @@ sub body {
 }
 
 sub content {
-    my $self = shift;
-
-    state $val = $self->_decode_content;
-
-    return $val;
+    return state $val = shift->_decode_content;
 }
 
 1;

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Display a calendar",
+   "abstract" : "Display a calendar, with highlighted dates",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "App::calx" : {
          "file" : "lib/App/calx.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-App-calx"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -5,7 +5,7 @@ SYNOPSIS
         use Graphics::Toolkit::Color qw/color/;
 
         my $red = Graphics::Toolkit::Color->new('red'); # create color object
-        say $red->add('blue')->name;                    # mix in RGB: 'magenta'
+        say $red->add( 'blue' => 256 )->name;           # mix in HSL: 'fuchsia'
         color( 0, 0, 255)->values('HSL');               # 240, 100, 50 = blue
                                                         # mix blue with a little grey in HSL
         $blue->blend( with => {H=> 0, S=> 0, L=> 80}, pos => 0.1);
@@ -17,7 +17,7 @@ DESCRIPTION
     2.0.
 
     Graphics::Toolkit::Color, for short GTC, is the top level API of this
-    module. It is designed to get a fast access to a set of related colors,
+    module. It is designed to get fast access to a set of related colors,
     that serve your need. While it can understand and output many color
     formats, its primary (internal) format is RGB, because this it is about
     colors that can be shown on the screen.
@@ -33,21 +33,21 @@ DESCRIPTION
     create related color objects via methods listed under *METHODS*.
 
 CONSTRUCTOR
-    An GTC object There are many options to create a color objects. In short
-    you can either use the name of a predefined constant or provide values
-    in RGB or HSL color space.
+    There are many options to create a color objects. In short you can
+    either use the name of a predefined constant or provide values in
+    several "COLOR-SPACES" in Graphics::Toolkit::Color::Value
 
-  new( 'name' )
+  new('name')
     Get a color by providing a name from the X11, HTML (CSS) or SVG standard
     or a Pantone report. UPPER or CamelCase will be normalized to lower case
     and inserted underscore letters ('_') will be ignored as perl does in
     numbers (1_000 == 1000). All available names are listed under "NAMES" in
-    Graphics::Toolkit::Color::Constant. (See also: "name")
+    Graphics::Toolkit::Color::Name::Constant. (See also: "name")
 
         my $color = Graphics::Toolkit::Color->new('Emerald');
-        my @names = Graphics::Toolkit::Color::Constant::all_names(); # select from these
+        my @names = Graphics::Toolkit::Color::Name::all(); # select from these
 
-  new( 'scheme:color' )
+  new('scheme:color')
     Get a color by name from a specific scheme or standard as provided by an
     external module Graphics::ColorNames::* , which has to be installed
     separately. * is a placeholder for the pallet name, which might be:
@@ -72,7 +72,12 @@ CONSTRUCTOR
     range values will be corrected to the closest value in range.
 
         my $red = Graphics::Toolkit::Color->new( 255, 0, 0 );
-        my $red = Graphics::Toolkit::Color->new([255, 0, 0]); # does the same
+        my $red = Graphics::Toolkit::Color->new([255, 0, 0]);        # does the same
+        my $red = Graphics::Toolkit::Color->new('RGB' => 255, 0, 0);  # named tuple syntax
+        my $red = Graphics::Toolkit::Color->new(['RGB' => 255, 0, 0]); # named ARRAY
+
+    The named array syntax of the last example works for nany supported
+    space.
 
   new( {r => $r, g => $g, b => $b} )
     Hash with the keys 'r', 'g' and 'b' does the same as shown in previous

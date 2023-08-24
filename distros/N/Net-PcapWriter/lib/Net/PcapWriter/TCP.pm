@@ -71,6 +71,10 @@ sub write_with_flags {
 	$sn = ($sn-1) % 2**32;
     }
 
+    if (defined $flags->{_seq}) {
+	$sn = ($sn + $flags->{_seq}) % 2**32; # seq=-1 for keep-alive
+    }
+
     my $tcp = pack("nnNNCCnnna*",
 	$flow->[2],$flow->[3],       # sport,dport
 	$sn,                         # sn
@@ -98,6 +102,12 @@ sub write {
     my ($self,$dir,$data,$timestamp) = @_;
     _connect($self,$timestamp) if ! $self->{connected};
     write_with_flags($self,$dir,$data,undef,$timestamp);
+}
+
+sub keepalive_probe {
+    my ($self,$dir,$timestamp) = @_;
+    die "not connected" if ! $self->{connected};
+    write_with_flags($self,$dir,'',{ _seq => -1 },$timestamp);
 }
 
 sub _connect {

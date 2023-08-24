@@ -53,6 +53,7 @@ sub new_entry {
 done_testing;
 
 __DATA__
+\#	#
 \&	&
 {\`a}	à
 {\^a}	â

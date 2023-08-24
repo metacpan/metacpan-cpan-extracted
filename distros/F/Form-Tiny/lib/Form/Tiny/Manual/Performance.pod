@@ -21,19 +21,24 @@ has to re-create its metamodel object everytime form constructor is called.
 Creating a dedicated package for a form will ensure that metamodel object will
 only be created one time in script runtime.
 
-=head2 Strict mode
+=head2 Dynamic fields
 
-Strict mode is a nice addition that causes the module to identify any extra
-data in the input (not mentioned in the form definition) as an error. It is
-enabled with an import flag:
+Dynamic fields are fields which are built at runtime. They are created anew for
+every form validation. This allows almost unlimited flexibility, but comes at a
+price of performance.
 
-	use Form::Tiny -strict;
+=head2 Optional features
 
-While it may come useful, it is often unnecessary. The module already does not
-copy any extra data from input to output fields, so you don't have to worry
-about it at all - it will simply get ignored. Benchmarking has shown that
-enabling strict mode reduces the performance of the module by up to 30% (more
-for simple forms).
+Form::Tiny offers a large set of optional features. There are strict mode,
+filters, coercions, adjustments, extra validators, hooks and many more. The
+more features you use, the worse performance will get - that shouldn't be a
+surprise to anyone. It shouldn't stop anybody from using them though.
+
+Take strict mode as an example - while it may come useful, it is often
+unnecessary. The module already does not copy any extra data from input to
+output fields, so you don't have to worry about it at all - it will simply get
+ignored. Benchmarking has shown that enabling strict mode reduces the
+performance of the module by up to 30% (more for simple forms).
 
 =head1 THINGS THAT SPEED THE MODULE UP
 

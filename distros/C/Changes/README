@@ -31,7 +31,7 @@ SYMOPSIS
         $c->write || die( $c->error );
 
 VERSION
-        v0.2.2
+        v0.3.2
 
 DESCRIPTION
     This module is designed to read and update "Changes" files that are
@@ -260,6 +260,14 @@ METHODS
     Sets or gets the text of the preamble. A preamble is a chunk of text,
     possibly multi line, that appears at the top of the Changes file before
     any release information.
+
+  preset
+    Provided with a preset name, and this will set all its defaults.
+
+    Currently, the only preset supported is "standard"
+
+    Returns the current object upon success, or sets an error object and
+    return "undef" or empty list, depending on the context, otherwise.
 
   releases
     Read only. This returns an array object containing all the release

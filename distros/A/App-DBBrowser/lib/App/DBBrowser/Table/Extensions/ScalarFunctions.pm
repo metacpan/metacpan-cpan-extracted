@@ -164,7 +164,7 @@ sub __enable_extended_arguments {
 sub col_function {
     my ( $sf, $sql, $clause, $qt_cols, $r_data ) = @_;
     if ( ! defined $r_data->{nested_func} ) {
-        # reset recusrion data other than nested_func
+        # reset recursion data other than nested_func
         # at the first call of col_function
         $r_data = { nested_func => [] };
     }
@@ -185,13 +185,13 @@ sub col_function {
     my $epoch_to_d   = 'EPOCH_TO_DATE';
     my $epoch_to_dt  = 'EPOCH_TO_DATETIME';
     my $extract      = 'EXTRACT';
-    my $instr        = 'INSTR';
 #    my $left         = 'LEFT';
     my $lower        = 'LOWER';
     my $lpad         = 'LPAD';
     my $ltrim        = 'LTRIM';
     my $now          = 'NOW';
     my $octet_length = 'OCTET_LENGTH';
+    my $position     = 'POSITION';
     my $replace      = 'REPLACE';
 #    my $right        = 'RIGHT';
     my $round        = 'ROUND';
@@ -204,7 +204,7 @@ sub col_function {
 
     my @only_func = ( $now );
     my @one_col_func = ( $trim, $ltrim, $rtrim, $upper, $lower, $octet_length, $char_length );
-    my @one_col_one_arg_func = ( $cast, $extract, $instr, $round, $truncate );  # , $left, $right
+    my @one_col_one_arg_func = ( $cast, $extract, $position, $round, $truncate );  # , $left, $right
     my @one_col_two_arg_func = ( $lpad, $replace, $rpad, $substr );
     my @multi_col_func = ( $coalesce, $concat );
     my @epoch_dt_func = ( $epoch_to_d, $epoch_to_dt );
@@ -311,7 +311,7 @@ sub col_function {
                 elsif ( $func =~ /^(?:$round|$truncate)\z/i ) {
                     $prompt = 'Decimal places: ';
                 }
-                elsif ( $func =~ /^(?:$instr)\z/i ) {
+                elsif ( $func =~ /^(?:$position)\z/i ) {
                     $prompt = 'Substr: ';
                     $history = [];
                 }

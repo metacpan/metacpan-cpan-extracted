@@ -1,5 +1,5 @@
 package Form::Tiny::Inline;
-$Form::Tiny::Inline::VERSION = '2.19';
+$Form::Tiny::Inline::VERSION = '2.21';
 use v5.10;
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ sub new
 {
 
 	package Form::Tiny::Inline::Form;
-$Form::Tiny::Inline::Form::VERSION = '2.19';
+$Form::Tiny::Inline::Form::VERSION = '2.21';
 use v5.10;
 	use strict;
 	use warnings;
@@ -64,7 +64,7 @@ use v5.10;
 {
 
 	package Form::Tiny::Inline::Builder;
-$Form::Tiny::Inline::Builder::VERSION = '2.19';
+$Form::Tiny::Inline::Builder::VERSION = '2.21';
 use v5.10;
 	use strict;
 	use warnings;

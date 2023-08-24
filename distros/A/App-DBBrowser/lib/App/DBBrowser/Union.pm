@@ -114,7 +114,7 @@ sub union_tables {
                 next TABLE;
             }
             my $alias = 'p' . ( @$used_tables + 1 );
-            $qt_table = $table . $sf->{i}{" AS "} . $ax->prepare_identifier( $alias );
+            $qt_table = $table . " " . $ax->prepare_identifier( $alias );
         }
         else {
             $table =~ s/^-\s//;
@@ -140,9 +140,8 @@ sub union_tables {
     my $union_stmt = $ax->get_stmt( $sql, 'Union', 'prepare' );
     my $union_derived_table = $union_stmt =~ s/^\s*SELECT\s\*\sFROM\s+//r;
     $union_derived_table =~ s/\n\z//;
-    if ( $sf->{o}{alias}{table} || $sf->{i}{driver} =~ /^(?:mysql|MariaDB|Pg)\z/ ) {
-        $union_derived_table .= $sf->{i}{" AS "} . $ax->prepare_identifier( 't1' );
-    }
+    my $alias = $ax->alias( $sql, 'table', $union_derived_table, 't1' );
+    $union_derived_table .= " " . $ax->prepare_identifier( $alias );
     # column names in the result-set of a UNION are taken from the first query.
     my $columns = $ax->column_names( $union_derived_table );
     my $qt_columns = $ax->quote_cols( $columns );

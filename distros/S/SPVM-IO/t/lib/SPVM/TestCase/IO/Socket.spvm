@@ -63,6 +63,39 @@ class TestCase::IO::Socket {
     return 1;
   }
 
+  static method blocking : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    $socket->blocking(0);
+    $socket->blocking(1);
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
 
   static method basic_interface : int () {
 

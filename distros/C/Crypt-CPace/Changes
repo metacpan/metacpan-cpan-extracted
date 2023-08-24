@@ -1,0 +1,5 @@
+Revision history for Perl extension Crypt::CPace.
+
+0.012  2022/04/03   
+    - use Crypt::OpenSSL::Base::Func.
+

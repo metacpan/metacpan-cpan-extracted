@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "ORLite",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "ORLite",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => "0.80",
     "File::Spec::Functions" => 0,
+    "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Script" => 0,
     "lib" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.99",
+  "VERSION" => "2.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "Params::Util" => "1.00",
+  "Test::Deep" => 0,
   "Test::More" => 0,
   "Test::Script" => 0,
   "lib" => 0,

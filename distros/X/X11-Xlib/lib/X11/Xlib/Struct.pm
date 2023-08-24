@@ -4,7 +4,7 @@ use warnings;
 use X11::Xlib ();
 use Carp ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -43,7 +43,7 @@ destructor)
   my $struct= X11::Xlib::....->new( %optional_fields );
 
 The constructor sets all fields to their initial value (i.e. zero)
-and then applies the list of key/value pairs.  Warns on un-known
+and then applies the list of key/value pairs.  Warns on unknown
 field names.
 
 =cut
@@ -75,7 +75,7 @@ Pack field values into the bytes of the struct.  Only C<%fields> is required.
 
 If C<$consume> is true, then remove any key of C<%fields> that was processed.
 
-If C<$warn> is true, then emit a warning if any un-recognized field was given.
+If C<$warn> is true, then emit a warning if any unrecognized field was given.
 
 =cut
 
@@ -83,7 +83,7 @@ sub pack {
     my ($self, $fields, $consume, $warn)= @_;
     $fields= { %$fields } unless $consume;
     $self->_pack($fields, 1);
-    Carp::carp("Un-used parameters passed to pack: ".join(',', keys %$fields))
+    Carp::carp("Unused parameters passed to pack: ".join(',', keys %$fields))
         if $warn && keys %$fields;
     return $self;
 }
@@ -132,10 +132,12 @@ sub unpack {
 
 Access the scalar holding the bytes of the struct.
 
+=for Pod::Coverage buffer
+
 =cut
 
 sub bytes { ${$_[0]} }
-*buffer= *bytes;
+*buffer= *bytes; # back-compat alias, not official API anymore
 
 # The struct code is all in XS, so all we need to do is declare the package
 # inheritence.  Except for XEvent, which is complicated.
@@ -155,6 +157,8 @@ $X11::Xlib::XSizeHints::VERSION= $VERSION;
 $X11::Xlib::XRectangle::VERSION= $VERSION;
 @X11::Xlib::XRenderPictFormat::ISA= ( __PACKAGE__ );
 $X11::Xlib::XRenderPictFormat::VERSION= $VERSION;
+@X11::Xlib::XKeyboardState::ISA= ( __PACKAGE__ );
+$X11::Xlib::XKeyboardState::VERSION= $VERSION;
 
 1;
 

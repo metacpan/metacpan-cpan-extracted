@@ -35,8 +35,8 @@ L<https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/>
     my $blindedElement;
     ( $blind, $blindedElement ) = blind( $input, $blind, $DSI, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
 
-    my $params_ref = get_hash2curve_params( $group_name, $type );
-    my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
+    my $params_ref = get_ec_params( $group_name );
+    my ( $group, $order, $ctx ) = @{$params_ref}{qw/group order ctx/};
 
     my $bn = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $blindedElement, 2, $ctx );
     print "$bn\n";
@@ -46,8 +46,6 @@ L<https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/>
     my $bn_ev             = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $evaluationElement, 2, $ctx );
     print "$bn_ev\n";
 
-    my $order = Crypt::OpenSSL::Bignum->new();
-    Crypt::OpenSSL::EC::EC_GROUP::get_order( $group, $order, $ctx );
     my $dgst = finalize( $group, $order, $input, $blind, $evaluationElement, $hash_name, $ctx );
     print unpack( "H*", $dgst ), "\n";
 
@@ -59,7 +57,8 @@ L<https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/>
 
 =head2 derive_key_pair
 
-    my ($skS, $pkS) = derive_key_pair($group_name, $seed, $info, $context_string, $hash_name, $expand_message_func);
+    my $DST = "DeriveKeyPair".$context_string;
+    my $ec_key_r = derive_key_pair($group_name, $seed, $info, $DST, $hash_name, $expand_message_func);
 
 =head2  blind
 

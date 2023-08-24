@@ -22,6 +22,9 @@
 \.rej$
 \..*\.sw.?$
 
+# IntelliJ
+\.idea
+
 # Avoid OS-specific files/dirs
 # Mac OSX metadata
 \B\.DS_Store
@@ -35,4 +38,3 @@
 ^MYMETA\.
 
 dist.ini
-.travis.yml

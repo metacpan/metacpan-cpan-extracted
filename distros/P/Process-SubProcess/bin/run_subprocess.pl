@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # @author Bodo (Hugo) Barwich
-# @version 2023-07-06
+# @version 2023-08-20
 # @package Process::SubProcess
 # @subpackage bin/run_subprocess.pl
 

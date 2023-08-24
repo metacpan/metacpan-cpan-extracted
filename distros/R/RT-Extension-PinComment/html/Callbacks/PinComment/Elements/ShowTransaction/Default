@@ -1,0 +1,96 @@
+<%doc>
+If this is a transaction on a ticket, then highlight it if it is pinned (by
+adding to its classes), and if the current user has the ModifyTicket right
+on the ticket, add "Pin" or "Unpin" actions to the action list as
+appropriate.
+</%doc>
+\
+<%ARGS>
+$Transaction => undef
+$Object => undef
+$Classes => undef
+$Actions => undef
+$Description => undef
+</%ARGS>
+\
+<%INIT>
+# Flag UTF8 since we're using Unicode symbols for pin/unpin.
+use utf8;
+
+# Do nothing if key fields are not provided.
+return if ( not defined $Transaction );
+return if ( not defined $Object );
+return if ( not ref $Transaction );
+return if ( not ref $Object );
+return if ( not $Object->isa('RT::Ticket') );
+
+# Do nothing if this is an email record transaction.
+return if ( $Transaction->Type =~ /emailrecord/i );
+
+# Check whether this is a pinned comment.  We use $m->notes() to record this
+# object's pinned comment so that we aren't looking up the attribute for
+# every transaction when showing the history.
+my $TicketId               = $Object->id;
+my $TransactionId          = $Transaction->id;
+my $CurrentlyPinnedComment = $m->notes( 'PinComment-Transaction-' . $TicketId );
+if ( not defined $CurrentlyPinnedComment ) {
+    my $TicketPinnedCommentAttribute = $Object->FirstAttribute('PinnedComment');
+    $CurrentlyPinnedComment = $TicketPinnedCommentAttribute->Content
+      if ( defined $TicketPinnedCommentAttribute
+        && ref $TicketPinnedCommentAttribute );
+    $CurrentlyPinnedComment = 0 if ( not defined $CurrentlyPinnedComment );
+    $m->notes( 'PinComment-Transaction-' . $TicketId, $CurrentlyPinnedComment );
+}
+my $CommentIsPinned = 0;
+$CommentIsPinned = 1 if ( $CurrentlyPinnedComment eq $TransactionId );
+
+# If this comment is pinned, add the "PinCommentPinned" class to the
+# transaction.
+push @$Classes, 'PinCommentPinned'
+  if ( $CommentIsPinned && defined $Classes && ref $Classes eq 'ARRAY' );
+
+# If this comment is pinned, add a "(Pinned comment)" suffix to the
+# transaction's description.
+${$Description} .= ' (' . loc('Pinned comment') . ')'
+  if ( $CommentIsPinned
+    && defined $Description
+    && ref $Description eq 'SCALAR'
+    && defined ${$Description} );
+
+# Return early if the $Actions list is not available.
+return if ( not defined $Actions );
+return if ( not ref $Actions );
+return if ( ref $Actions ne 'ARRAY' );
+
+# Check whether the current user can modify this ticket, caching the lookup
+# in $m->notes() as above.
+my $UserCanModifyTicket = $m->notes( 'PinComment-CanModify-' . $TicketId );
+if ( not defined $UserCanModifyTicket ) {
+    $UserCanModifyTicket = 0;
+    $UserCanModifyTicket = 1
+      if ( $Object->CurrentUser->Privileged
+        && $Object->CurrentUserHasRight('ModifyTicket') );
+    $m->notes( 'PinComment-CanModify-' . $TicketId, $UserCanModifyTicket );
+}
+
+# Early return if the current user can't modify this ticket.
+return if ( not $UserCanModifyTicket );
+
+# Add the pin or unpin action to the list of actions.
+my $DisplayPath = 'Display.html';
+push @$Actions,
+  {
+    'class' => $CommentIsPinned ? 'PinCommentRemovePin' : 'PinCommentAddPin',
+    'title' => $CommentIsPinned
+    ? chr(0x1F4CD) . ' ' . loc('Unpin')
+    : chr(0x1F4CC) . ' ' . loc('Pin'),
+    'path' => $DisplayPath . '?id='
+      . $m->interp->apply_escapes( $TicketId, 'u' )
+      . '&PinComment='
+      . $m->interp->apply_escapes( $TransactionId, 'u' )
+      . '&PinAction='
+      . ( $CommentIsPinned ? 'Remove' : 'Add' )
+  };
+
+return;
+</%INIT>

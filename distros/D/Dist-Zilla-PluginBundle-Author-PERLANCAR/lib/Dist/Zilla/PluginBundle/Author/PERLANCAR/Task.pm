@@ -7,7 +7,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-07-07'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -16,7 +16,7 @@ sub configure {
 
     $self->add_bundle(Filter => {
         -bundle => '@Author::PERLANCAR',
-        -remove => [qw/PodCoverageTests PodSyntaxTests PodWeaver EnsureSQLSchemaVersionedTest/],
+        -remove => [qw/PodCoverageTests PodSyntaxTests PodWeaver EnsureSQLSchemaVersionedTest Prereqs::CheckCircular/],
     });
 
     $self->add_plugins(
@@ -41,7 +41,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::Task - Dist::Zilla like PERLANCAR 
 
 =head1 VERSION
 
-This document describes version 0.607 of Dist::Zilla::PluginBundle::Author::PERLANCAR::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
+This document describes version 0.608 of Dist::Zilla::PluginBundle::Author::PERLANCAR::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
 
 =head1 SYNOPSIS
 

@@ -32,8 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Digest::Keccak" : "0.05",
+            "Crypt::Digest::Keccak256" : "0.078",
+            "Math::BigInt" : "1.999811",
+            "Module::Load" : "0.36",
             "Object::Pad" : "0.79",
+            "Scalar::Util" : "1.63",
             "perl" : "5.026000"
          }
       },
@@ -51,6 +54,6 @@
          "web" : "https://github.com/refeco/perl-ABI"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

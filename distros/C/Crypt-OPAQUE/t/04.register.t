@@ -13,10 +13,10 @@ use Crypt::OpenSSL::Base::Func;
 use Crypt::OPRF;
 use Crypt::OPAQUE;
 
-use Smart::Comments;
+#use Smart::Comments;
 use CBOR::XS;
 
-use bignum;
+#use bignum;
 use FindBin qw($Bin);
 use Crypt::SIGMA;
 use Crypt::KeyDerivation ':all';

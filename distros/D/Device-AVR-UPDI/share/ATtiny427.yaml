@@ -179,6 +179,10 @@ fusemap:
       - caption: 64 ms
         name: 64MS
         value: 7
+  TOUTDIS:
+    mask: 16
+    name: TOUTDIS
+    reg: SYSCFG0
   WINDOW:
     mask: 240
     name: WINDOW
@@ -221,44 +225,45 @@ fusemap:
         name: 8KCLK
         value: 176
 fuses:
-  - ACTIVE
-  - LVL
-  - SAMPFREQ
-  - SLEEP
-  - FREQSEL
-  - OSCLOCK
-  - CRCSRC
-  - EESAVE
-  - RSTPINCFG
-  - SUT
   - PERIOD
   - WINDOW
+  - SLEEP
+  - ACTIVE
+  - SAMPFREQ
+  - LVL
+  - FREQSEL
+  - OSCLOCK
+  - EESAVE
+  - RSTPINCFG
+  - TOUTDIS
+  - CRCSRC
+  - SUT
 reginfos:
+  - default: 0
+    mask: 255
+    name: WDTCFG
+    offset: 4736
+  - default: 0
+    mask: 255
+    name: BODCFG
+    offset: 4737
+  - default: 126
+    mask: 131
+    name: OSCCFG
+    offset: 4738
+  - default: 246
+    mask: 221
+    name: SYSCFG0
+    offset: 4741
+  - default: 255
+    mask: 7
+    name: SYSCFG1
+    offset: 4742
   - default: 0
     mask: 0
     name: APPEND
     offset: 4743
   - default: 0
-    mask: 255
-    name: BODCFG
-    offset: 4737
-  - default: 0
     mask: 0
     name: BOOTEND
     offset: 4744
-  - default: 2
-    mask: 131
-    name: OSCCFG
-    offset: 4738
-  - default: 196
-    mask: 205
-    name: SYSCFG0
-    offset: 4741
-  - default: 7
-    mask: 7
-    name: SYSCFG1
-    offset: 4742
-  - default: 0
-    mask: 255
-    name: WDTCFG
-    offset: 4736

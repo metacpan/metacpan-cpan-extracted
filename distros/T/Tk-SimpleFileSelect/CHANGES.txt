@@ -1,3 +1,8 @@
+1.29    2022-08-23
+  - no code change, only minor changed to documentation
+  - raised documented minimum Perl version to 5.8 because of example script syntax
+  - increased version to at least 1.29 above that of the ec distro to show up on metacpan
+
 0.71    2020-10-13
   - fix RT #133524: undeclared dependency on Tk in Makefile.PL
 

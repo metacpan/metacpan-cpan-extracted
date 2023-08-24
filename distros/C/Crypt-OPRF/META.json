@@ -4,7 +4,7 @@
       "Pan Lanlan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -21,10 +21,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::OpenSSL::Base::Func" : "0.031",
+            "Crypt::OpenSSL::Base::Func" : "0.036",
             "Crypt::OpenSSL::Bignum" : "0.09",
             "Crypt::OpenSSL::EC" : "1.31",
-            "Crypt::OpenSSL::Hash2Curve" : "0.03",
+            "Crypt::OpenSSL::Hash2Curve" : "0.032",
             "bignum" : "0.52"
          }
       }
@@ -37,9 +37,9 @@
          "web" : "https://github.com/abbypan/Crypt-OPRF"
       }
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "0.011",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "MPL-2.0"
 }
 

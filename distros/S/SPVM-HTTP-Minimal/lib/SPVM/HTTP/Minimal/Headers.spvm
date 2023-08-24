@@ -1,0 +1,128 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Minimal::Headers {
+  allow HTTP::Minimal::Socket;
+  
+  use StringList;
+  use Hash;
+  use Sort;
+  use Regex;
+  use StringBuffer;
+  
+  # Fields
+  has data : Hash;
+  
+  # Class Methods
+  static method new : HTTP::Minimal::Headers () {
+    my $self = new HTTP::Minimal::Headers;
+    
+    $self->{data} = Hash->new;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method add : void ($name : string, $value : string) {
+    
+    unless ($name) {
+      die "The \$name must be defined";
+    }
+    
+    unless ($value) {
+      die "The \$value must be defined";
+    }
+    
+    if (Regex->new("[\x0d\x0a]")->match($name)) {
+      die "Invalid characters in the $name header";
+    }
+    
+    if (Regex->new("[\x0d\x0a]")->match($value)) {
+      die "Invalid characters in the value of the $name header";
+    }
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{data}->get($name_lc);
+    
+    unless ($values_list) {
+      $values_list = StringList->new;
+    }
+    
+    $values_list->push($value);
+    
+    $self->{data}->set($name_lc, $values_list);
+  }
+  
+  method remove : void ($name : string) {
+    
+    unless ($name) {
+      die "The \$name must be defined";
+    }
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{data}->get($name_lc);
+    
+    if ($values_list) {
+      $self->{data}->set($name_lc, undef);
+    }
+  }
+  
+  method get : string[] ($name : string) {
+    
+    unless ($name) {
+      die "The \$name must be defined";
+    }
+    
+    my $headers = $self->{data};
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{data}->get($name_lc);
+    
+    my $values = (string[])undef;
+    if ($values_list) {
+      $values = $values_list->to_array;
+    }
+    
+    return $values;
+  }
+  
+  method get_as_string : string ($name : string) {
+    
+    my $header_values = $self->get($name);
+    
+    my $header_string = (string)undef;
+    if ($header_values) {
+      $header_string = Fn->join(",", $header_values);
+    }
+    
+    return $header_string;
+  }
+  
+  method names : string[] () {
+    my $names = $self->{data}->keys;
+    
+    Sort->sort_string_asc($names);
+    
+    return $names;
+  }
+  
+  method to_string : string () {
+    
+    my $names = $self->names;
+    
+    my $buffer = StringBuffer->new;
+    for my $name (@$names) {
+      my $header_string = $self->get_as_string($name);
+      $buffer->push("$name:");
+      $buffer->push($header_string);
+      $buffer->push("\r\n");
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+}

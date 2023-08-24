@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::ABI::Type 0.011;
+package Blockchain::Ethereum::ABI::Type 0.012;
 class Blockchain::Ethereum::ABI::Type;
 
 =encoding utf8
@@ -44,31 +44,31 @@ field $_dynamic :reader(_dynamic)                            = [];
 field $_instances :reader(_instances) :writer(set_instances) = [];
 
 ADJUST {
-    return unless $self->signature;
+    if ($self->signature) {
+        my $module;
+        if ($self->signature =~ /\[(\d+)?\]$/gm) {
+            $module = "Array";
+        } elsif ($self->signature =~ /^\(.*\)/) {
+            $module = "Tuple";
+        } elsif ($self->signature =~ /^address$/) {
+            $module = "Address";
+        } elsif ($self->signature =~ /^(u)?(int|bool)(\d+)?$/) {
+            $module = "Int";
+        } elsif ($self->signature =~ /^(?:bytes)(\d+)?$/) {
+            $module = "Bytes";
+        } elsif ($self->signature =~ /^string$/) {
+            $module = "String";
+        } else {
+            croak "Module not found for the given parameter signature $signature";
+        }
 
-    my $module;
-    if ($self->signature =~ /\[(\d+)?\]$/gm) {
-        $module = "Array";
-    } elsif ($self->signature =~ /^\(.*\)/) {
-        $module = "Tuple";
-    } elsif ($self->signature =~ /^address$/) {
-        $module = "Address";
-    } elsif ($self->signature =~ /^(u)?(int|bool)(\d+)?$/) {
-        $module = "Int";
-    } elsif ($self->signature =~ /^(?:bytes)(\d+)?$/) {
-        $module = "Bytes";
-    } elsif ($self->signature =~ /^string$/) {
-        $module = "String";
-    } else {
-        croak "Module not found for the given parameter signature $signature";
+        # this is just to avoid `use module` for every new type included
+        my $package = "Blockchain::Ethereum::ABI::Type::$module";
+        load $package;
+
+        $self = bless $self, $package;
+        $self->_configure;
     }
-
-    # this is just to avoid `use module` for every new type included
-    my $package = "Blockchain::Ethereum::ABI::Type::$module";
-    load $package;
-
-    $self = bless $self, $package;
-    $self->_configure;
 }
 
 method _push_static ($data) {

@@ -1,7 +1,10 @@
-Revision history for BibTeX-Parser
+Revision history for BibTeX::Parser
 
-1.03    2021-02-08T10:10:09-08:00
-	Fixed a test according to the changes in LaTeX::ToUnicode
+1.04    2023-08-20  New release
+
+1.03    2022-11-06
+	Avoid extra spaces with von part. (Author.pm)
+	Add ' to re_namechar. (Parser.pm)
 
 1.02    2018-04-29 03:19:56 +0000
 	Corrected the bug when Jr is not accompanied by von.  

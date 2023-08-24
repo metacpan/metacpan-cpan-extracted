@@ -1,5 +1,11 @@
 Revision history for App-MechaCPAN
 
+0.30  2023-08-22 22:29:58 EDT
+  - Document the new prebuilt binary feature
+  - Make the binary download feature not the default for the time being
+  - Improve the binary download process not to throw an error when not found
+  - Move --build-reusable to a global option --build-reusable-perl
+
 0.29  2023-04-18 23:32:58 EDT
   - Add support to install from a cpanfile without using Deploy
   - Add feature to download prebuilt binries for popular linux distros

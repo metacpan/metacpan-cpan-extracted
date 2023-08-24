@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.07
+    Version 0.08
 
 SYNOPSIS
 
@@ -220,35 +220,8 @@ INCOMPATIBILITIES
 
 BUGS AND LIMITATIONS
 
-    Please report any bugs or feature requests to bug-net-icap-client at
-    rt.cpan.org, or through the web interface at
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-ICAP-Client. I will
-    be notified, and then you'll automatically be notified of progress on
-    your bug as I make changes.
-
-SUPPORT
-
-    You can find documentation for this module with the perldoc command.
-
-        perldoc Net::ICAP::Client
-
-    You can also look for information at:
-
-      * RT: CPAN's request tracker (report bugs here)
-
-      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-ICAP-Client
-
-      * AnnoCPAN: Annotated CPAN documentation
-
-      http://annocpan.org/dist/Net-ICAP-Client
-
-      * CPAN Ratings
-
-      http://cpanratings.perl.org/d/Net-ICAP-Client
-
-      * Search CPAN
-
-      http://search.cpan.org/dist/Net-ICAP-Client/
+    To report a bug, or view the current list of bugs, please visit
+    https://github.com/david-dick/net-icap-client/issues
 
 LICENSE AND COPYRIGHT
 

@@ -4,7 +4,7 @@
 
 use Test::More;
 use Crypt::OpenSSL::Base::Func;
-use Smart::Comments;
+#use Smart::Comments;
 
 my $cipher_name = 'aes-256-gcm';
 

@@ -35,6 +35,12 @@ EVP_PKEY* EVP_PKEY_new()
 
 char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form, BN_CTX *ctx)
 
+EVP_PKEY *EVP_PKEY_new_raw_public_key(int type, ENGINE *e, const unsigned char *key, size_t keylen);
+
+EVP_PKEY *EVP_PKEY_new_raw_private_key(int type, ENGINE *e, const unsigned char *key, size_t keylen);
+
+
+
 const BIGNUM *EC_GROUP_get0_cofactor(const EC_GROUP *group)
 
 const BIGNUM *EC_KEY_get0_private_key(const EC_KEY *key)
@@ -49,15 +55,17 @@ int EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p, BI
 
 int EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p, const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
 
-int EVP_MD_block_size(const EVP_MD *md)
+int EVP_MD_get_block_size(const EVP_MD *md)
 
-int EVP_MD_size(const EVP_MD *md)
+int EVP_MD_get_size(const EVP_MD *md)
 
 int EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
 
 int OBJ_sn2nid (const char *s)
 
+unsigned char* hex2bin(const char* hexstr, size_t* size)
 
+char *bin2hex(const unsigned char *bin, size_t len)
 
 EVP_PKEY* evp_pkey_from_point_hex(EC_GROUP* group, char* point_hex, BN_CTX* ctx)
 
@@ -201,7 +209,7 @@ digest(self, bin_SV)
   CODE:
   {
     bin = (unsigned char*) SvPV( bin_SV, bin_length );
-    dgst = malloc(EVP_MD_size(self));
+    dgst = malloc(EVP_MD_get_size(self));
     EVP_Digest(bin, bin_length, dgst, &dgst_length, self, NULL);
     res = newSVpv(dgst, dgst_length);
     RETVAL = res;
@@ -278,7 +286,7 @@ aes_cmac(key_SV, msg_SV, cipher_name)
     msg = (unsigned char*) SvPV( msg_SV, msglen );
 
      const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_name);
-     size_t block_size = EVP_CIPHER_block_size(cipher);
+     size_t block_size = EVP_CIPHER_get_block_size(cipher);
 
      mac = OPENSSL_malloc(block_size); 
       CMAC_CTX *ctx = CMAC_CTX_new();

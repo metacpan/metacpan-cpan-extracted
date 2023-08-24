@@ -1,6 +1,6 @@
 package Catmandu::PICA;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 1;
 __END__
@@ -31,39 +31,55 @@ structure.
 See L<Catmandu::Introduction> and L<http://librecat.org/Catmandu> for an
 introduction into Catmandu.
 
-=head1 CATMANDU MODULES
+=head1 MODULES
+
+=head2 Read/write PICA
 
 =over
 
 =item * L<Catmandu::Exporter::PICA>
-
-=item * L<Catmandu::Fix::pica_map>
-
-=item * L<Catmandu::Fix::pica_remove>
-
-=item * L<Catmandu::Fix::pica_keep>
-
-=item * L<Catmandu::Fix::pica_tag>
-
-=item * L<Catmandu::Fix::pica_occurrence>
-
-=item * L<Catmandu::Fix::Bind::pica_each>
-
-=item * L<Catmandu::Fix::Bind::pica_diff>
-
-=item * L<Catmandu::Fix::Condition::pica_match>
-
-=item * L<Catmandu::Fix::pica_update>
-
-=item * L<Catmandu::Fix::pica_add>
-
-=item * L<Catmandu::Fix::pica_set>
 
 =item * L<Catmandu::Importer::PICA>
 
 =item * L<Catmandu::Importer::SRU::Parser::picaxml>
 
 =item * L<Catmandu::Importer::SRU::Parser::ppxml>
+
+=back
+
+=head2 Fix functions
+
+=over
+
+=item * L<Catmandu::Fix::pica_map> copy from PICA values
+
+=item * L<Catmandu::Fix::pica_keep> reduce record to selected fields
+
+=item * L<Catmandu::Fix::pica_remove> delete (sub)fields
+
+=item * L<Catmandu::Fix::pica_update> change/add PICA values to fixed strings
+
+=item * L<Catmandu::Fix::pica_append> parse and append full PICA fields
+
+=item * L<Catmandu::Fix::pica_set> set PICA values from other fields
+
+=item * L<Catmandu::Fix::pica_add> add PICA values from other fields
+
+=item * L<Catmandu::Fix::pica_tag> set field tag
+
+=item * L<Catmandu::Fix::pica_occurrence> set field occurrence
+
+=item * L<Catmandu::Fix::Bind::pica_each> process selected fields
+
+=item * L<Catmandu::Fix::Bind::pica_diff> track changes
+
+=item * L<Catmandu::Fix::Condition::pica_match> check whether PICA values match a regular expression
+
+=back
+
+=head2 Validation
+
+=over
 
 =item * L<Catmandu::Validator::PICA>
 

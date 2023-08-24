@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Version.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/01
-## Modified 2022/12/01
+## Modified 2023/08/20
 ## All rights reserved
 ## 
 ## 
@@ -46,6 +46,35 @@ BEGIN
             )
         )
         |
+        (?<dotted>
+            (?<dotted_numified>
+                (?<dotted_numified_under>
+                    (?<ver>
+                        (?<release>
+                            (?<major>[0-9]+)
+                            (?<minor_patch>
+                                \.
+                                (?<minor>[0-9]{3})
+                                (?:_(?<patch>[0-9]{3}))
+                            )
+                        )
+                    )
+                )
+                |
+                (?<ver>
+                    (?<release>
+                        (?<major>[0-9]+)
+                        (?<minor_patch>
+                            \.
+                            (?<minor>0[0-9]{2})
+                            (?<patch>0[0-9]{2})
+                        )
+                    )
+                    (?:_(?<alpha>[0-9]+))?
+                )
+            )
+        )
+        |
         # Lax decimal version number. Just like the strict one except for allowing an 
         # alpha suffix or allowing a leading or trailing decimal-point
         (?<decimal>
@@ -58,7 +87,7 @@ BEGIN
     use overload (
         '""'    => \&as_string,
         # '='		=> \&clone,
-        '0+'    => \&numify,
+        '0+'    => sub{ $_[0]->numify->as_string },
         '<=>'   => \&_compare,
         'cmp'   => \&_compare,
         'bool'  => \&_bool,
@@ -77,7 +106,7 @@ BEGIN
         'abs'   => \&_noop,
         'nomethod' => \&_noop,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -98,6 +127,7 @@ sub init
     $self->{original} = undef;
     $self->{padded} = 1;
     $self->{patch}  = undef;
+    $self->{pattern} = undef;
     $self->{pretty} = 0;
     $self->{qv}     = 0;
     # Release candidate used by non-perl open source softwares
@@ -160,17 +190,41 @@ sub as_string
     }
     else
     {
-        $str = $self->numify( raw => 1 );
-        if( !$self->padded && index( $str, '_' ) == -1 )
+        my $minor = $self->minor;
+        my $patch = $self->patch;
+        my $fmt = $self->pattern;
+        if( defined( $fmt ) && length( $fmt ) )
         {
-            return( $str * 1 );
+            $str = $self->format( $fmt );
         }
-        
-        if( $self->pretty && index( $str, '_' ) == -1 && !( length( [split( /\./, $str )]->[1] ) % 3 ) )
+        else
         {
-            # $str = join( '_', grep{ $_ ne ''} split( /(...)/, $str ) );
-            # Credit: <https://stackoverflow.com/questions/33442240/perl-printf-to-use-commas-as-thousands-separator>
-            while( $str =~ s/(\d+)(\d{3})/$1\_$2/ ){};
+            if( defined( $minor ) && 
+                (
+                    index( $minor, '_' ) != -1 || 
+                    ( length( $minor ) == 3 && substr( $minor, 0, 1 ) eq '0' ) ||
+                    length( $patch // '' ||
+                    $self->padded )
+                ) )
+            {
+                $str = $self->numify( raw => 1 );
+                if( !$self->padded && index( $str, '_' ) == -1 )
+                {
+                    return( $str * 1 );
+                }
+                
+                if( $self->pretty && index( $str, '_' ) == -1 && !( length( [split( /\./, $str )]->[1] ) % 3 ) )
+                {
+                    # $str = join( '_', grep{ $_ ne ''} split( /(...)/, $str ) );
+                    # Credit: <https://stackoverflow.com/questions/33442240/perl-printf-to-use-commas-as-thousands-separator>
+                    while( $str =~ s/(\d+)(\d{3})/$1\_$2/ ){};
+                }
+            }
+            else
+            {
+                my $alpha = $self->alpha;
+                $str = $self->major . ( defined( $minor ) ? ".${minor}" : '' ) . ( defined( $alpha ) ? "_${alpha}" : '' );
+            }
         }
     }
     $self->{_cache_value} = $str;
@@ -205,6 +259,132 @@ sub dec_patch { return( shift->_inc_dec( 'dec' => 'patch', @_ ) ); }
 sub default_frag { return( shift->_set_get_scalar_as_object( 'default_frag', @_ ) ); }
 
 sub extra { return( shift->_set_get_array_as_object( 'extra', @_ ) ); }
+
+sub format
+{
+    my $self = shift( @_ );
+    my $fmt  = shift( @_ ) ||
+        return( $self->error( "No pattern was provided to format this version." ) );
+    my $numify = sub
+    {
+        my $sep = shift( @_ ) || '';
+        my $minor = $self->minor;
+        my $patch = $self->patch;
+        if( defined( $minor ) && length( $minor ) )
+        {
+            if( defined( $patch ) && length( $patch ) )
+            {
+                return( sprintf( "%03d${sep}%03d", ( $minor + 0 ), ( $patch + 0 ) ) );
+            }
+            else
+            {
+                return( sprintf( "%03d${sep}%03d", ( $minor + 0 ), 0 ) );
+            }
+        }
+        elsif( defined( $patch ) && length( $patch ) )
+        {
+            return( sprintf( "%03d${sep}%03d", 0, ( $patch + 0 ) ) );
+        }
+        return( '' );
+    };
+
+    my $dotted = sub
+    {
+        my $comp = $self->new_array;
+        if( !$self->extra->is_empty )
+        {
+            $comp->push( $self->extra->list );
+        }
+        for( qw( patch minor ) )
+        {
+            $comp->unshift( $self->$_ // 0 );
+        }
+        return( $comp->is_empty ? '' : $comp->map(sub{ 0 + $_ })->join( '.' )->scalar );
+    };
+
+    my $map =
+    {
+        # alpha
+        'A' => sub{ return( $self->alpha // '' ); },
+        # alpha with leading underscore
+        'a' => sub
+        {
+            my $a = $self->alpha // '';
+            return( length( $a ) ? "_${a}" : '' );
+        },
+        # dotted versions like 1.2.3.4.5
+        'D' => sub
+        {
+            my $dots = $dotted->();
+            return( length( $dots ) ? $dots : '' );
+        },
+        # dotted versions with leading dot like .1.2.3.4.5
+        'd' => sub
+        {
+            my $dots = $dotted->();
+            return( length( $dots ) ? ( '.' . $dots ) : '' );
+        },
+        # minor
+        'M' => sub{ return( $self->minor // '' ); },
+        # numified without underscore. e.g.: 5.006001 -> 006001
+        'N' => sub{ return( $numify->( '_' ) ); },
+        # numified without underscore and with leading dot: 5.006001 -> .006001
+        'n' => sub
+        {
+            my $num = $numify->( '' );
+            return( length( $num ) ? ( '.' . $num ) : '' );
+        },
+        # patch
+        'P' => sub{ return( $self->patch // '' ); },
+        # major; R for release
+        'R' => sub{ return( $self->major // '' ); },
+        # numified with underscore. e.g.: 5.006_001 -> 006_001
+        'U' => sub{ return( $numify->( '_' ) ); },
+        # numified with underscore. e.g.: 5.006_001 -> .006_001
+        'u' => sub
+        {
+            my $num = $numify->( '_' );
+            return( length( $num ) ? ( '.' . $num ) : '' );
+        },
+    };
+    my $str;
+    if( $self->_is_array( $fmt ) )
+    {
+        foreach my $this ( @$fmt )
+        {
+            $this = substr( $this, 1 ) if( substr( $this, 0, 1 ) eq '%' );
+            if( !exists( $map->{ $this } ) )
+            {
+                warn( "Unknown formatter '$this'" ) if( $self->_is_warnings_enabled );
+                next;
+            }
+            $str .= $map->{ $this }->();
+        }
+    }
+    elsif( !ref( $fmt ) || ( ref( $fmt ) && overload::Method( $fmt, '""' ) ) )
+    {
+        ( $str = "$fmt" ) =~ s
+        {
+            \%([a-zA-Z])
+        }
+        {
+            my $this = $1;
+            if( exists( $map->{ $this } ) )
+            {
+                $map->{ $this }->();
+            }
+            else
+            {
+                "\%${this}";
+            }
+        }gexs;
+    }
+    else
+    {
+        return( $self->error( "Format must be a string or an array reference of pattern components." ) );
+    }
+    return( $str );
+}
 
 sub inc { return( shift->_inc_dec( 'inc', @_ ) ); }
 
@@ -300,10 +480,25 @@ sub parse
     my $self = shift( @_ );
     my $str  = shift( @_ );
     return( $self->error( "No version string was provided." ) ) if( !defined( $str ) || !length( "$str" ) );
+    if( $] >= 5.008_001 && ref( \$str ) eq 'VSTRING' )
+    {
+        my $def = { original => $str };
+        $def->{type} = 'dotted';
+        $def->{qv} = 1;
+        my @frags = map{ ord( $_ ) } split( //, $str );
+        @$def{qw( major minor patch )} = splice( @frags, 0, 3 );
+        $def->{extra} = \@frags;
+        $def->{pattern} = '%R%d';
+        my $new = $self->new( %$def );
+        $new->{_version} = version->parse( $str );
+        return( $new );
+    }
+
     if( $str =~ /^$VERSION_LAX_REGEX$/ )
     {
         my $re = { %+ };
         my $def = { original => $str };
+        my $fmt = [];
         if( defined( $re->{dotted} ) && length( $re->{dotted} ) )
         {
             $def->{type} = 'dotted';
@@ -319,18 +514,61 @@ sub parse
         my $v;
         $def->{qv}    = 1 if( defined( $re->{has_v} ) && length( $re->{has_v} ) );
         $def->{major} = $re->{major};
+        $def->{minor} = $re->{minor} if( defined( $re->{minor} ) && length( $re->{minor} ) );
         $def->{alpha} = $re->{alpha} if( defined( $re->{alpha} ) && length( $re->{alpha} ) );
         if( $def->{type} eq 'dotted' )
         {
-            if( defined( $re->{minor_patch} ) )
+            push( @$fmt, '%R' );
+            if( defined( $re->{dotted_numified} ) )
             {
-                my @frags = split( /\./, $re->{minor_patch} );
-                shift( @frags );
-                $def->{minor} = shift( @frags );
-                $def->{patch} = shift( @frags );
-                $def->{extra} = \@frags;
+                $def->{type} = 'decimal';
+                $v = version->parse( $re->{release} );
+                # e.g.: 5.006_001
+                if( defined( $re->{dotted_numified_under} ) )
+                {
+                    push( @$fmt, '%u' );
+                }
+                else
+                {
+                    push( @$fmt, '%n' );
+                    push( @$fmt, '%a' ) if( defined( $re->{alpha} ) );
+                }
+                my $vstr = $v->normal;
+                if( $vstr =~ /^$VERSION_LAX_REGEX$/ )
+                {
+                    my $re2 = { %+ };
+                    if( defined( $re2->{dotted} ) && length( $re2->{dotted} ) )
+                    {
+                        if( defined( $re2->{minor_patch} ) )
+                        {
+                            # delete( $def->{alpha} );
+                            $def->{major} = $re2->{major};
+                            my @frags = split( /\./, $re2->{minor_patch} );
+                            shift( @frags );
+                            $def->{minor} = shift( @frags );
+                            $def->{patch} = shift( @frags );
+                            $def->{extra} = \@frags;
+                        }
+                    }
+                }
             }
-            $v = version->parse( $re->{dotted} );
+            else
+            {
+                $v = version->parse( $re->{dotted} );
+                # Same as %M%P%E -> 5.3.4.5.6.7.8
+                push( @$fmt, '%d' );
+                push( @$fmt, '%a' ) if( defined( $def->{alpha} ) && length( $def->{alpha} ) );
+                if( defined( $re->{minor_patch} ) )
+                {
+                    my @frags = split( /\./, $re->{minor_patch} );
+                    # throw away the empty data because of the leading dot
+                    shift( @frags );
+                    $def->{minor} = shift( @frags );
+                    $def->{patch} = shift( @frags );
+                    $def->{extra} = \@frags;
+                }
+            }
+            $def->{pattern} = join( '', @$fmt );
         }
         elsif( $def->{type} eq 'decimal' )
         {
@@ -340,6 +578,9 @@ sub parse
             # 5.006_002 which would be equivalent v5.6.2 and in this case, "_002" is not an alpha information; and
             # 1.002_03 where 03 is the alpha version and should be converted to 1.2_03, but instead becomes v1.2.30
             # If compatibility with 'compat' is enabled, then we use the classic albeit erroneous way of converting the decimal version
+            push( @$fmt, '%R' );
+            push( @$fmt, '%M' ) if( defined( $def->{minor} ) && length( $def->{minor} ) );
+            $def->{pattern} = join( '', @$fmt );
             if( defined( $def->{alpha} ) && 
                 length( $def->{alpha} ) < 3 && 
                 !$self->compat )
@@ -350,23 +591,36 @@ sub parse
             {
                 $v = version->parse( "$str" );
             }
-            my $vstr = $v->normal;
-            if( $vstr =~ /^$VERSION_LAX_REGEX$/ )
-            {
-                my $re2 = { %+ };
-                if( defined( $re2->{dotted} ) && length( $re2->{dotted} ) )
-                {
-                    if( defined( $re2->{minor_patch} ) )
-                    {
-                        $def->{major} = $re2->{major};
-                        my @frags = split( /\./, $re2->{minor_patch} );
-                        shift( @frags );
-                        $def->{minor} = shift( @frags );
-                        $def->{patch} = shift( @frags );
-                        $def->{extra} = \@frags;
-                    }
-                }
-            }
+
+            # if( (
+            #       defined( $def->{alpha} ) && 
+            #       ( $self->compat || length( $def->{alpha} ) == 3 )
+            #     )
+            #     || 
+            #     ( defined( $def->{minor} ) && 
+            #       length( $def->{minor} ) >= 3 && 
+            #       substr( $def->{minor}, 0, 1 ) eq '0'
+            #     ) )
+            # {
+            #     my $vstr = $v->normal;
+            #     if( $vstr =~ /^$VERSION_LAX_REGEX$/ )
+            #     {
+            #         my $re2 = { %+ };
+            #         if( defined( $re2->{dotted} ) && length( $re2->{dotted} ) )
+            #         {
+            #             if( defined( $re2->{minor_patch} ) )
+            #             {
+            #                 # delete( $def->{alpha} );
+            #                 $def->{major} = $re2->{major};
+            #                 my @frags = split( /\./, $re2->{minor_patch} );
+            #                 shift( @frags );
+            #                 $def->{minor} = shift( @frags );
+            #                 $def->{patch} = shift( @frags );
+            #                 $def->{extra} = \@frags;
+            #             }
+            #         }
+            #     }
+            # }
         }
         my $new = $self->new( %$def );
         $new->{_version} = $v if( defined( $v ) );
@@ -381,6 +635,8 @@ sub parse
 }
 
 sub patch { return( shift->reset(@_)->_set_get_number( { field => 'patch', undef_ok => 1 }, @_ ) ); }
+
+sub pattern { return( shift->_set_get_scalar( 'pattern', @_ ) ); }
 
 sub pretty { return( shift->reset(@_)->_set_get_boolean( 'pretty', @_ ) ); }
 
@@ -415,6 +671,51 @@ sub reset
     return( $self );
 }
 
+# Credit: Data::VString
+sub satisfy
+{
+    my $this = shift( @_ );
+    my $self = ( __PACKAGE__->_is_object( $this ) && $this->isa( 'Changes::Version' ) ) ? $this : $this->parse( shift( @_ ) );
+    my $predicate = shift( @_ );
+    # spaces are irrelevant
+    $predicate =~ s/[[:blank:]\h\v]+//g;
+    my $vers = $self->_version;
+    my @p = split( ',', $predicate );
+    my $cmp = 
+    {
+        '==' => sub{ $_[0] == $_[1] },
+        '!=' => sub{ $_[0] != $_[1] },
+        '<=' => sub{ $_[0] <= $_[1] },
+        '>=' => sub{ $_[0] >= $_[1] },
+        '<'  => sub{ $_[0] < $_[1] },
+        '>'  => sub{ $_[0] > $_[1] },
+    };
+    for( @p )
+    {
+        if( /^(\d+([._]\d+)*)$/ )
+        {
+            next if( $vers == version->parse( $1 ) );
+            return(0);
+        }
+        if( /^([=!<>]=|[<>])(\d+([._]\d+)*)$/ )
+        {
+            next if( $cmp->{ $1 }->( $vers, version->parse( $2 ) ) );
+            return(0);
+        }
+        if( /^(\d+([._]\d+)*)\.\.(\d+([._]\d+)*)$/ )
+        {
+            if( ( version->parse( $1 ) <= $vers ) &&
+                ( $vers <= version->parse( $3 ) ) )
+            {
+                next;
+            }
+            return(0);
+        }
+        return( $self->error( "Bad predicate '$_'" ) );
+    }
+    return(1);
+}
+
 sub target { return( shift->_set_get_scalar_as_object( 'target', @_ ) ); }
 
 sub type { return( shift->reset(@_)->_set_get_scalar_as_object({
@@ -444,6 +745,114 @@ sub _bool
     return( $self->_compare( $self, "0", 1 ) );
 }
 
+sub _bubble
+{
+    my $self = shift( @_ );
+    my $frag = shift( @_ );
+    my $val  = shift( @_ );
+    # We die, because this is an internal method and those cases should not happen unless this were a design bug
+    if( !defined( $frag ) || !length( $frag ) )
+    {
+        die( "No fragment was provided to cascade" );
+    }
+    elsif( $frag !~ /^(major|minor|patch|alpha|\d+)$/ )
+    {
+        die( "Unsupported version fragment '$frag'. Only use 'major', 'minor', 'patch' or 'alpha' or a number starting from 1 (1 = major, 2 = minor, etc)." );
+    }
+    # Not for us. We bubble only when a value is negative resulting from a cascading decrease
+    # e.g. 3.12.-1 -> 3.11.0, or 3.0.-1 -> 2.9.0, or 2.-1 -> 1.0
+    elsif( $val >= 0 )
+    {
+        return;
+    }
+    my $type = $self->type;
+    my $extra = $self->extra;
+    my $frag_is_int = ( $frag =~ /^\d+$/ ? 1 : 0 );
+    my $frag2num =
+    {
+        major => 1,
+        minor => 2,
+        patch => 3,
+    };
+    my $num2frag =
+    {
+        1 => 'major',
+        2 => 'minor',
+        3 => 'patch',
+    };
+
+    if( $frag eq 'alpha' )
+    {
+        $self->alpha( undef );
+        return;
+    }
+    die( "Fragment provided '$frag' cannot be 0." ) if( $frag_is_int && $frag == 0 );
+    my $level = $frag_is_int ? $frag : $frag2num->{ $frag };
+
+    # Should not be happening
+    if( $type eq 'decimal' && $level > 2 )
+    {
+        $self->patch( undef );
+        $self->alpha( undef );
+        @$extra = ();
+        return;
+    }
+
+    for( my $i = $level; $level >= 1; $i-- )
+    {
+        if( $val < 0 )
+        {
+            my $new_val = 0;
+            unless( $i == 1 )
+            {
+                my $up_val;
+                my $j = $i - 1;
+                if( exists( $num2frag->{ $j } ) )
+                {
+                    my $coderef = $self->can( $num2frag->{ $j } ) ||
+                        die( "Cannot find reference for method ", $num2frag->{ $j } );
+                    $up_val = $coderef->( $self );
+                }
+                else
+                {
+                    $up_val = $extra->[ $j - 4 ];
+                }
+                # Set value for next iteration
+                $val = ( $up_val // 0 ) - 1;
+                $new_val = ( $up_val > 0 ) ? 9 : 0;
+            }
+
+            if( exists( $num2frag->{ $i } ) )
+            {
+                # my $coderef = $self->can( $num2frag->{ $i } ) ||
+                #     die( "Cannot find reference for method ", $num2frag->{ $i } );
+                # $coderef->( $self, 0 );
+                $self->{ $num2frag->{ $i } } = $new_val;
+            }
+            else
+            {
+                $extra->[ $i - 4 ] = $new_val;
+            }
+        }
+        else
+        {
+            if( exists( $num2frag->{ $i } ) )
+            {
+                # my $coderef = $self->can( $num2frag->{ $i } ) ||
+                #     die( "Cannot find reference for method ", $num2frag->{ $i } );
+                # $coderef->( $self, 0 );
+                $self->{ $num2frag->{ $i } } = $val;
+            }
+            else
+            {
+                $extra->[ $i - 4 ] = $val;
+            }
+            last;
+        }
+    }
+    $self->_cascade( $level );
+}
+
 sub _cascade
 {
     my $self = shift( @_ );
@@ -457,18 +866,21 @@ sub _cascade
     {
         die( "Unsupported version fragment '$frag'. Only use 'major', 'minor', 'patch' or 'alpha' or a number starting from 1 (1 = major, 2 = minor, etc)." );
     }
+    my $type = $self->type;
     my $extra = $self->extra;
     my $frag_is_int = ( $frag =~ /^\d+$/ ? 1 : 0 );
     if( $frag eq 'major' || ( $frag_is_int && $frag == 1 ) )
     {
         $self->alpha( undef );
         $self->patch(0);
+        # $self->patch( $type eq 'decimal' ? undef : 0 );
         $self->minor(0);
     }
     elsif( $frag eq 'minor' || ( $frag_is_int && $frag == 2 ) )
     {
         $self->alpha( undef );
         $self->patch(0);
+        # $self->patch( $type eq 'decimal' ? undef : 0 );
     }
     elsif( $frag eq 'patch' || ( $frag_is_int && $frag == 3 ) )
     {
@@ -478,7 +890,7 @@ sub _cascade
     {
         # Nothing to do
     }
-    elsif( $frag_is_int )
+    elsif( $type eq 'dotted' && $frag_is_int )
     {
         my $offset = ( $frag - 4 );
         my $len = $extra->length;
@@ -581,7 +993,7 @@ sub _compute
     }
     my $n = $val->scalar;
     my $eval;
-    if( $opts->{op} eq '++' || $opts->{op} eq '--' )
+    if( $op eq '++' || $op eq '--' )
     {
         $eval = "\$n${op}";
     }
@@ -617,15 +1029,23 @@ sub _compute
             $new_val = int( $rv );
         }
         
-        if( defined( $coderef ) )
+        if( $new_val < 0 )
         {
-            $coderef->( $new, $new_val );
+            $new->_bubble( $frag, $new_val );
         }
         else
         {
-            $extra->[( $frag - 4 )] = $new_val;
+            if( defined( $coderef ) )
+            {
+                $coderef->( $new, $new_val );
+            }
+            else
+            {
+                $extra->[( $frag - 4 )] = $new_val;
+            }
+            $new->_cascade( $frag );
         }
-        $new->_cascade( $frag );
+        $new->reset(1);
         return( $new );
     }
 }
@@ -691,6 +1111,7 @@ sub _inc_dec
         $extra->[( $frag - 4 )] = $n;
     }
     $self->_cascade( $frag );
+    $self->reset(1);
     return( $self );
 }
 
@@ -723,6 +1144,11 @@ sub _stringify
         $def->{minor} = 0 if( ( !defined( $def->{minor} ) || !length( "$def->{minor}" ) ) && defined( $def->{alpha} ) && length( "$def->{alpha}" ) );
     }
     my $ok = 0;
+    if( !$self->extra->is_empty )
+    {
+        $ok++;
+        $comp->push( $self->extra->list );
+    }
     for( qw( patch minor major ) )
     {
         next if( !length( $def->{ $_ } ) && !$ok );
@@ -738,9 +1164,6 @@ sub _stringify
 sub _verify
 {
     my $self = shift( @_ );
-    if( defined( $self ) )
-    {
-    }
     if( defined( $self ) &&
         Module::Generic->_is_a( $self => 'Changes::Version' ) &&
         eval{ exists( $self->{_version} ) } &&
@@ -828,10 +1251,12 @@ Changes::Version - Version string object class
     say $v->numify; # returns new Changes::Version object
     say $v->normal; # returns new Changes::Version object
     say $v->as_string; # same as say "$v";
+    # 5.0.6_2
+    say $v->format( "%R%d%A" );
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1160,6 +1585,19 @@ You should not be accessing this directly.
 
 Returns an L<array object|Module::Generic::Array>
 
+=head2 format
+
+    my $v = Changes::Version->parse( "5.0.6_2" );
+    say $v->format( "%R%d" ); # 5.0.6
+
+This formats the version string. It takes a string representing a pattern, or an array reference of pattern elements and returns a regular string.
+
+If an error occurred, it sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+See also L</pattern> to get or set a pattern used by L</as_string>
+
+See also below the L<possible patterns|/"PATTERNS">
+
 =head2 inc
 
 Same as L</dec>, but increasing instead of decreasing.
@@ -1286,6 +1724,12 @@ Sets or gets the C<patch> fragment of the version string.
 
 Returns a L<number object|Module::Generic::Number>
 
+=head2 pattern
+
+Sets or gets a format pattern. This returns a regular string, or C<undef> if no pattern has been set.
+
+See also the L<list of patterns|/"PATTERNS">
+
 =head2 pretty
 
 Boolean. When enabled, this will render version number for decimal type a bit cleaner by separating blocks of 3 digits by an underscore (C<_>). This does not work on dotted decimal version numbers such as C<v1.2.3> or on version that have an C<alpha> set up.
@@ -1322,6 +1766,38 @@ Sets or gets the release candidate value. This is currently unused and reserved 
 Returns a L<scalar object|Module::Generic::Scalar>
 
 =for Pod::Coverage reset
+
+=head2 satisfy
+
+    $v->satisfy( $predicate );
+
+    $v = Changes::Version->parse( '0.1.1' );
+    $v->satisfy( '0.1.1' ); # true
+    $v->satisfy( '0.1.1', '> 0, < 0.2, != 0.1.0' ); # true
+    $v = Changes::Version->parse( '0.2.4' );
+    $v->satisfy( '0.2.5..0.3.4' ); # false
+    # or, using it as a class function:
+    Changes::Version->satisfy( '0.1.1', '0.1.1' ); # true
+    Changes::Version->satisfy( '0.1.1', '> 0, < 0.2, != 0.1.0' ); # true
+    Changes::Version->satisfy( '0.2.4', '0.2.5..0.3.4' ); # false
+
+Determines if a v-string satisfy a predicate. The predicate is a list of simple predicates, each one must be satisfied (that is, an I<and>). Simple predicates takes one of three forms:
+
+    '0.1.2'       - exact match 
+    '>= 3.14.15'  - (relational operator) (v-string)
+    '5.6 .. 10.8' - meaning '>= 5.6, <= 10.8'
+
+A grammar for predicates in L<Parse::RecDescent>-like syntax is:
+
+    <p> : <p0> (',' <p>)*
+
+    <p0>: <v-string>                # the same as '==' <v-string>
+      | <op> <v-string> 
+      | <v-string> '..' <v-string>  # the same as ">= <v-string1>, <= <v-string2>"
+
+    <op>: '==' | '!=' | '<=' | '>=' | '<' | '>'
+
+Spaces are irrelevant in predicates.
 
 =head2 stringify
 
@@ -1413,6 +1889,111 @@ When using those operations, it updates the current object directly and returns 
 
 =back
 
+=head1 PATTERNS
+
+The following patterns can be used to format the version string.
+
+=over 4
+
+=item * C<%A>
+
+    my $v = Changes::Version->parse( "5.0.6_2" );
+    say $v->format( '%A' ); # _2
+
+This will return the alpha version, if any, prepended with an underscore.
+
+If there is no alpha version, it returns an empty string.
+
+=item * C<%a>
+
+    my $v = Changes::Version->parse( "5.0.6_2" );
+    say $v->format( '%a' ); # 2
+
+This will return the C<alpha> fragment value, if any.
+
+If there is no C<alpha> fragment value, it returns an empty string.
+
+=item * C<%D>
+
+    my $v = Changes::Version->parse( "5.0.6.1.2.3.4_2" );
+    say $v->format( '%D' ); # 0.6.1.2.3.4
+    my $v = Changes::Version->parse( "5.0.6" );
+    say $v->format( '%D' ); # 0.6
+
+This will return the C<minor>, C<patch>, and any extra fragments.
+
+This is designed for dotted-decimal types, and C<minor>, and C<patch> will always return a number, possibly C<0>
+
+=item * C<%d>
+
+    my $v = Changes::Version->parse( "5.0.6.1.2.3.4_2" );
+    say $v->format( '%D' ); # .0.6.1.2.3.4
+    my $v = Changes::Version->parse( "5.0.6" );
+    say $v->format( '%D' ); # .0.6
+
+This is similar to C<%D>, but will prepend a dot if the value is not null.
+
+This is designed so you can write:
+
+    my $v = Changes::Version->parse( "5.0.6.1.2.3.4_2" );
+    say $v->format( '%R%d%A' ); # 5.0.6.1.2.3.4_2
+    my $v = Changes::Version->parse( "5" );
+    say $v->format( '%R%d%A' ); # 5.0.0
+
+=item * C<%M>
+
+    my $v = Changes::Version->parse( "5.0.6.1.2.3.4_2" );
+    say $v->format( '%M' ); # 0
+
+This returns the C<minor> part of the version.
+
+If there is no C<minor> fragment value, it returns an empty string.
+
+=item * C<%N>
+
+    my $v = Changes::Version->parse( "5.2.6" ):
+    say $v->format( '%R.%N' ); # 5.002006
+
+This returns the C<minor> and C<patch> value of a dotted-decimal version as numified version.
+
+=item * C<%n>
+
+    my $v = Changes::Version->parse( "5.2.6" ):
+    say $v->format( '%R%n' ); # 5.002006
+    say $v->format( '%n' ); # .002006
+
+This is similar to C<%N>, but will prepend a dot if the value is not null.
+
+=item * C<%P>
+
+This returns the C<patch> fragment value of the version, if any.
+
+If there is no C<patch> fragment value, it returns an empty string.
+
+=item * C<%R>
+
+This returns the C<major> fragment value of the version, if any.
+
+If there is no C<major> fragment value, it returns an empty string.
+
+=item * C<%U>
+
+    my $v = Changes::Version->parse( "5.2.6" ):
+    say $v->format( '%R.%U' ); # 5.002_006
+    say $v->format( '%U' ); # 002_006
+
+This returns the C<minor> and C<patch> value of a dotted-decimal version as numified version using the underscore to separate the C<minor> and the C<patch> fragments.
+
+=item * C<%u>
+
+    my $v = Changes::Version->parse( "5.2.6" ):
+    say $v->format( '%R%u' ); # 5.002_006
+    say $v->format( '%u' ); # .002_006
+
+This is similar to C<%U>, but will prepend a dot if the value is not null.
+
+=back
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
@@ -1421,7 +2002,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 L<Changes>, L<Changes::Release>, L<Changes::Group>, L<Changes::Change> and L<Changes::NewLine>
 
-L<version>, L<Perl::Version>
+L<version>, L<Perl::Version>, L<version::Internals>, L<Data::VString>, L<perldata/"Version Strings">
 
 L<CPAN::Meta::Spec/"Version Formats">
 

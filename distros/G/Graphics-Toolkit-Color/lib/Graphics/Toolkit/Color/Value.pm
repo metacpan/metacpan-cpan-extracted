@@ -6,10 +6,11 @@ use warnings;
 package Graphics::Toolkit::Color::Value;
 use Carp;
 my $base_package = 'RGB';
-my @space_packages = qw/RGB HSL HSV CMY CMYK/; # TODO: LAB HCL HWB
+my @space_packages = ($base_package, qw/HSL HSV CMY CMYK/); # TODO: LAB HCL HWB
 my %space_obj = map { $_ => require "Graphics/Toolkit/Color/Value/$_.pm" } @space_packages;
 
-sub space { $space_obj{ uc $_[0] } if exists $space_obj{ uc $_[0] } }
+sub space    { $space_obj{ uc $_[0] } if exists $space_obj{ uc $_[0] } }
+sub is_space  { (defined $_[0] and ref space($_[0])) ? 1 : 0 }
 sub base_space { $space_obj{$base_package} }
 sub space_names { @space_packages }
 

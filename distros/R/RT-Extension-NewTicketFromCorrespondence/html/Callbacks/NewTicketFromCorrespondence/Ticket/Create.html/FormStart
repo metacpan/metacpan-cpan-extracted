@@ -1,0 +1,34 @@
+<%doc>
+If the argument "NewTicketFromCorrespondenceTicket" is present, indicating
+that the "Split Off" action is in progress, add the argument to the form as
+a hidden field so it persists across form submissions, and show a note with
+a link back to the original ticket.
+</%doc>
+\
+<%ARGS>
+$QueueObj => undef
+$ARGSRef => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $ARGSRef );
+return if ( not $ARGSRef->{'NewTicketFromCorrespondenceTicket'} );
+
+# Load the original ticket.
+#
+my $OldTicket = RT::Ticket->new( $session{'CurrentUser'} );
+$OldTicket->Load( $ARGSRef->{'NewTicketFromCorrespondenceTicket'} ) || return;
+</%INIT>
+\
+<input type="hidden" name="NewTicketFromCorrespondenceTicket" value="<% $ARGSRef->{'NewTicketFromCorrespondenceTicket'} %>" />
+<input type="hidden" name="NewTicketFromCorrespondenceTransaction" value="<% $ARGSRef->{'NewTicketFromCorrespondenceTransaction'} %>" />
+<div class="results">
+<p>
+<&|/l&>This will create a new ticket based on a transaction from:</&>
+<a href="Display.html?id=<% $ARGSRef->{'NewTicketFromCorrespondenceTicket'} |u%>\
+#txn-<% $ARGSRef->{'NewTicketFromCorrespondenceTransaction'} |u%>\
+">\
+#<% $OldTicket->id %>: <% $OldTicket->Subject %>\
+</a>
+</p>
+</div>

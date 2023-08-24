@@ -9,10 +9,11 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0.80'
   File::Spec::Functions: '0'
+  Test::Deep: '0'
   Test::More: '0'
   Test::Script: '0'
   lib: '0'
-  perl: '5.014'
+  perl: '5.008'
   utf8: '0'
   vars: '0'
   warnings: '0'
@@ -33,7 +34,7 @@ no_index:
 provides:
   ORLite:
     file: lib/ORLite.pm
-    version: '1.99'
+    version: '2.00'
 requires:
   Carp: '0'
   DBD::SQLite: '1.27'
@@ -44,13 +45,13 @@ requires:
   File::Spec: '0.80'
   File::Temp: '0'
   Params::Util: '1.00'
-  perl: '5.014'
+  perl: '5.008'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ORLite
   homepage: https://github.com/karenetheridge/ORLite
   repository: https://github.com/karenetheridge/ORLite.git
-version: '1.99'
+version: '2.00'
 x_Dist_Zilla:
   perl:
     version: '5.039001'
@@ -84,7 +85,11 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - CONTRIBUTING
+            - INSTALL
+            - LICENSE
+            - README.pod
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -159,33 +164,6 @@ x_Dist_Zilla:
       name: '@Author::ETHER/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::NoTabs
-      config:
-        Dist::Zilla::Plugin::Test::NoTabs:
-          filename: xt/author/no-tabs.t
-          finder:
-            - ':InstallModules'
-            - ':ExecFiles'
-            - '@Author::ETHER/Examples'
-            - ':TestFiles'
-            - ':ExtraTestFiles'
-      name: '@Author::ETHER/Test::NoTabs'
-      version: '0.15'
-    -
-      class: Dist::Zilla::Plugin::Test::EOL
-      config:
-        Dist::Zilla::Plugin::Test::EOL:
-          filename: xt/author/eol.t
-          finder:
-            - ':ExecFiles'
-            - ':ExtraTestFiles'
-            - ':InstallModules'
-            - ':TestFiles'
-            - '@Author::ETHER/Examples'
-          trailing_whitespace: 1
-      name: '@Author::ETHER/Test::EOL'
-      version: '0.19'
-    -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@Author::ETHER/MetaTests'
       version: '6.030'
@@ -204,33 +182,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: '5.006'
+          max_target_perl: '5.008'
       name: '@Author::ETHER/Test::MinimumVersion'
       version: '2.000010'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
       version: '6.030'
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Author::ETHER/PodCoverageTests'
-      version: '6.030'
-    -
-      class: Dist::Zilla::Plugin::Test::PodSpelling
-      config:
-        Dist::Zilla::Plugin::Test::PodSpelling:
-          directories:
-            - examples
-            - lib
-            - script
-            - t
-            - xt
-          spell_cmd: ''
-          stopwords:
-            - irc
-          wordlist: Pod::Wordlist
-      name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::Test::Pod::No404s
       name: '@Author::ETHER/Test::Pod::No404s'
@@ -342,7 +300,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 9
+          default_jobs: '1'
       name: '@Author::ETHER/MakeMaker'
       version: '6.030'
     -
@@ -364,6 +322,13 @@ x_Dist_Zilla:
           mode: auto
       name: '@Author::ETHER/StaticInstall'
       version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 9
+      name: '@Author::ETHER/RunExtraTests'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
       config:
@@ -463,6 +428,10 @@ x_Dist_Zilla:
       name: '@Author::ETHER/CheckPrereqsIndexed'
       version: '0.022'
     -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::ETHER/TestRelease'
+      version: '6.030'
+    -
       class: Dist::Zilla::Plugin::Git::Check
       config:
         Dist::Zilla::Plugin::Git::Check:
@@ -548,7 +517,11 @@ x_Dist_Zilla:
           signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CONTRIBUTING
             - Changes
+            - INSTALL
+            - LICENSE
+            - README.pod
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
@@ -565,7 +538,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.99
+          tag: v2.00
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -674,6 +647,10 @@ x_Dist_Zilla:
       name: '@Author::ETHER/prereqs for @Author::ETHER'
       version: '6.030'
     -
+      class: Dist::Zilla::Plugin::FileFinder::Filter
+      name: no_sql_files
+      version: '6.030'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.030'
@@ -725,11 +702,12 @@ x_Dist_Zilla:
 x_authority: cpan:ADAMK
 x_contributors:
   - 'Adam Kennedy <adam@ali.as>'
-  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
   - 'Mirko Westermeier <mirko.westermeier@uni-muenster.de>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'gregor herrmann <gregoa@debian.org>'
   - 'Michael Lang <michel@langmic.de>'
 x_generated_by_perl: v5.39.1
 x_serialization_backend: 'YAML::Tiny version 1.74'

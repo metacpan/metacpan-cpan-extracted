@@ -25,16 +25,16 @@ optional_features: {}
 provides:
   RDF::NS::Curated:
     file: lib/RDF/NS/Curated.pm
-    version: '1.004'
+    version: '1.006'
 requires:
   perl: '5.006000'
 resources:
   IRC: irc://irc.perl.org/#perlrdf
   Identifier: http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project
-  bugtracker: https://github.com/kjetilk/p5-rdf-ns-curated/issues
+  bugtracker: https://github.com/perlrdf/p5-rdf-ns-curated/issues
   homepage: https://metacpan.org/release/RDF-NS-Curated
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/kjetilk/p5-rdf-ns-curated.git
-version: '1.004'
+  repository: git://github.com/perlrdf/p5-rdf-ns-curated.git
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

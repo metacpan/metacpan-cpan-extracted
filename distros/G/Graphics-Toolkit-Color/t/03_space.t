@@ -17,8 +17,8 @@ my $space = Graphics::Toolkit::Color::Space->new(qw/AAA BBB CCC DDD/);
 is( ref $space, $module, 'could create a space object');
 is( $space->name,  'ABCD', 'space has right name');
 is( $space->dimensions, 4, 'space has four dimension');
-is( $space->has_format('bbb'), 1, 'vector name is a format');
-is( $space->has_format('c'),   1, 'vector sigil is a format');
+is( $space->has_format('bbb'), 0, 'vector name is not a format');
+is( $space->has_format('c'),   0, 'vector sigil is not  a format');
 is( $space->has_format('list'),1, 'list is a format');
 is( $space->has_format('hash'),1, 'hash is a format');
 is( $space->has_format('char_hash'),1, 'char_hash is a format');
@@ -26,10 +26,10 @@ is( $space->has_format('char_hash'),1, 'char_hash is a format');
 is( ref $space->format([1,2,3,4], 'hash'), 'HASH', 'formatted values into a hash');
 is( int($space->format([1,2,3,4], 'list')),     4, 'got long enough list of values');
 
-is( $space->format([1,2,3,4], 'bbb'),           2, 'got right value by key name');
-is( $space->format([1,2,3,4], 'AAA'),           1, 'got right value by uc key name');
-is( $space->format([1,2,3,4], 'c'),             3, 'got right value by shortcut name');
-is( $space->format([1,2,3,4], 'D'),             4, 'got right value by uc shortcut name');
+is( $space->format([1,2,3,4], 'bbb'),           0, 'got no value by key name');
+is( $space->format([1,2,3,4], 'AAA'),           0, 'got no value by uc key name');
+is( $space->format([1,2,3,4], 'c'),             0, 'got no value by shortcut name');
+is( $space->format([1,2,3,4], 'D'),             0, 'got no value by uc shortcut name');
 
 is( $space->has_format('str'),   0, 'formatter not yet inserted');
 my $c = $space->add_formatter('str', sub { $_[0] . $_[1] . $_[2] . $_[3]});

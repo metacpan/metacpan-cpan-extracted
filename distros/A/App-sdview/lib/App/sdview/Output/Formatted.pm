@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use utf8;
 
-use Object::Pad 0.66;
+use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.09;
+package App::sdview::Output::Formatted 0.10;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on

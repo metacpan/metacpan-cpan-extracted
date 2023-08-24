@@ -21,6 +21,7 @@ use 5.012;
 use strict;
 use warnings;
 use Data::Dumper;
+use Filter::Simple;
 use Term::ReadLine;
 use Term::ANSIColor qw( colored );
 use PadWalker       qw( peek_my  peek_our );
@@ -30,8 +31,9 @@ use feature         qw( say state );
 use parent          qw( Exporter );
 use subs            qw( p uniq );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our @EXPORT  = qw( run p );
+our $FILTER  = 1;
 
 =head1 NAME
 
@@ -195,6 +197,41 @@ You can make global variables though if:
 
 # Initialize
 
+=head2 import
+
+Updates the import list to disable source filtering if needed.
+
+It appears that a source filter cannot process a one-liner :(
+
+=cut
+
+sub import {
+    my ( $class, @args_raw ) = @_;
+    my @args;
+
+    # Source filters do not seem to work with one-liners.
+    # Should manually invoke "eval run".
+    if ( $0 eq "-e" ) {
+        $FILTER = 0;
+    }
+
+    for my $arg ( @args_raw ) {
+        if ( $arg eq "-nofilter" ) {
+            $FILTER = 0;
+            next;
+        }
+        push @args, $arg;
+    }
+
+    $class->export_to_level( 1, $class, @args );
+}
+
+FILTER {
+    if ( $FILTER ) {
+        $_ = run() . $_;
+    }
+};
+
 =head2 run
 
 Runs the REPL (dont forget eval!)
@@ -209,11 +246,15 @@ sub run {
     <<'CODE';
     use strict;
     use warnings;
+    use feature qw(say);
     my $repl = Runtime::Debugger->_init;
-    while ( 1 ) {
-        eval $repl->_step;
-        $repl->_show_error($@) if $@;
-    }
+    eval {
+        while ( 1 ) {
+            eval $repl->_step;
+            $repl->_show_error($@) if $@;
+        }
+    };
+    $repl->_show_error($@) if $@;
 CODE
 }
 

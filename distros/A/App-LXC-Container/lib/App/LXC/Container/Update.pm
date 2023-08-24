@@ -40,7 +40,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.15";
+our $VERSION = "0.19";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Mounts;

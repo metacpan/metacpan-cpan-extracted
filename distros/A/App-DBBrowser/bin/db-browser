@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.338';
+our $VERSION = '2.339';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.338
+Version 2.339
 
 =head1 SYNOPSIS
 
@@ -755,6 +755,8 @@ Extended arguments for scalar functions can be temporarily enabled by selecting 
 of the scalar function menu.
 
 Function C<EXTRACT>: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the predefined fields.
+
+Non ANSI SQL scalar functions may not work with the C<ODBC> plugin.
 
 =item Window functions
 

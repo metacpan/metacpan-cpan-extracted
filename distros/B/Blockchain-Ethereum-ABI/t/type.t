@@ -12,7 +12,7 @@ subtest "Int" => sub {
         signature => 'uint256',
         data      => $data
     );
-    is $type->isa('Blockchain::Ethereum::ABI::Type::Int'), 1;
+    is ref $type, 'Blockchain::Ethereum::ABI::Type::Int', "correct type for int";
 };
 
 done_testing;

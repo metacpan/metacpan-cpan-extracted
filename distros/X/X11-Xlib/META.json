@@ -57,6 +57,6 @@
          "url" : "https://github.com/nanardon/X11-Xlib.git"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,5 +1,24 @@
 Revision history for WWW-Mechanize-Chrome-DOMops
 
-0.01    Date/time
+0.01    12-08-2023/00:21
         First version, released on an unsuspecting world.
 
+0.02	22-08-2023/13:30
+	Tests now exit gracefully (pass) if the google-chrome executable is not installed.
+	Minor POD changes.
+
+0.03	22-08-2023/17:00
+	Removed the 'INSTALL_BASE' from Makefile.PL
+	Added Log::Log4perl as a dependency for the testing phase.
+	Minor POD changes.
+
+0.04	23-08-2023/14:30
+	Fixed the error message when checking for correct parameters, replaced 'description' with 'name'.
+	Added feature: user can specify javascript code to create the information hash
+	to be returned for each matched element. Before the return was a hash of "tag" and "id".
+	Now the user can optionally specify the javascript code to create this information hash.
+	The fallback behaves as in previous version, there should be no breaks.
+	POD extended.
+	Two more module dependencies added (required for testing).
+	All user-specified javascript code can throw exception which we will catch and propagate
+	to perl code. This has now its own test case.

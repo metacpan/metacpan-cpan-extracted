@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 55;
+plan tests => 57;
 
 my @module_files = (
     'URI.pm',
@@ -40,6 +40,8 @@ my @module_files = (
     'URI/gopher.pm',
     'URI/http.pm',
     'URI/https.pm',
+    'URI/icap.pm',
+    'URI/icaps.pm',
     'URI/ldap.pm',
     'URI/ldapi.pm',
     'URI/ldaps.pm',

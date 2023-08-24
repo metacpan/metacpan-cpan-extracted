@@ -9,6 +9,20 @@ Form::Tiny::Manual::Compatibility - backward compatibility notice
 This documentation page is listing all non-backward compatible changes in usage
 of Form::Tiny, together with recipes on how to fix them.
 
+=head2 Compatibility policy
+
+Starting from version I<2.00>, any backward incompatible changes will only be
+introduced to the module after a 3 month deprecation period. This does not
+cover bug fixes and changes to internal methods not meant to be used or
+depended on.
+
+Usually, if the given package / method is documented and the documentation does
+not state that it is internal, it will not be changed without any notice unless
+a bug is detected or the change corrects some non-logical behavior.
+
+If a change was made which breaks this policy you are welcome to open an issue
+in the bugtracker.
+
 =head1 CHANGES
 
 =head2 Subform adjustment no longer requires an explicit call to subform's C<fields>
@@ -278,11 +292,6 @@ moving declarations out from class methods to DSL keywords. Refer to
 L<Form::Tiny/"Form domain-specific language"> for details.
 
 =head1 FUTURE COMPATIBILITY
-
-Starting from version I<2.00>, any backward incompatible changes will only be
-introduced to the module after a 3 month deprecation period. This does not
-cover bug fixes and changes to internal methods not meant to be used or
-depended on.
 
 =head2 Current deprecations
 

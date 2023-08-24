@@ -3,17 +3,17 @@
 use Data::Dumper;
 
 use Getopt::Std;
-$ENV{TZ}='EST';
+$ENV{ TZ } = 'EST';
 
-my $history_file = glob('~/.RPN.history');
+my $history_file = glob( '~/.RPN.history' );
 my %option;
-getopts( "vhdi:o:r:f:SI:pT:H:", \%option );
+getopts( "vhdi:o:r:f:SI:pT:H:C", \%option );
 
 my $DEBUG = $option{ d };
 
 my $sep_in = ',';
 
-my %S      = (
+my %S = (
     bytesin  => 100,
     bytesout => 222,
     name     => 'eth0',
@@ -28,31 +28,34 @@ my %S      = (
 
 my $s1 = 'extra';
 
-my @T = qw( test1 test2 Test3 TEST4 ); 
+my @T = qw( test1 test2 Test3 TEST4 );
 
 my $scal = 1.23456789;
 
-sub Test {
-   my $a  = shift;
-   my $b = shift;
-   my $c = $a/$b;
-   
-   return $c;
+sub Test
+{
+    my $a = shift;
+    my $b = shift;
+    my $c = $a / $b;
+
+    return $c;
 }
 
-sub Test1 {
-   my $a  = shift;
-   return scalar reverse $a;
+sub Test1
+{
+    my $a = shift;
+    return scalar reverse $a;
 }
 
-sub Test2 {
-   
-   return "default_value";
+sub Test2
+{
+
+    return "default_value";
 }
 
 my $s = \%S;
 
-if ( !defined $option{ r } && !defined $option{ v } && !defined $option{ f } && !defined $option{ S } )
+if ( !defined $option{ r } && !defined $option{ v } && !defined $option{ f } && !defined $option{ S } && !defined $option{ C } )
 {
     $option{ h } = 1;
 }
@@ -71,6 +74,7 @@ if ( $option{ h } )
     print "\t -r rpn \t use rpn as string for the RPN test\n";
     print "\t -f file \t use this file for the RPN test\n";
     print "\t -S \t\t shell mode\n";
+    print "\t -C \t\t calc mode (use newline as in separator. An empty line start the evaluation\n";
     print "\t -I path \t path to RPN.pm to use\n";
     print "\t -T tz \t set a specific timezone\n";
     print "\t -H hist \t use this history file in Term mode (default=$history_file)\n";
@@ -79,16 +83,16 @@ if ( $option{ h } )
 }
 
 if ( $option{ I } )
-{    
-    require $option{ I }."/RPN.pm" ;
-  
-    
-}else
+{
+    require $option{ I } . "/RPN.pm";
+
+}
+else
 {
     require Parse::RPN;
 }
 
-$ENV{TZ}= $option{ T } if (  $option{ T } );
+$ENV{ TZ } = $option{ T } if ( $option{ T } );
 
 import Parse::RPN;
 #use Module::Reload;
@@ -134,11 +138,66 @@ else
         }
         $ret = rpn( $data );
     }
+    elsif ( $option{ C } )
+    {
+        if ( eval { require Term::ReadLine; 1; } ne 1 )
+        {
+            # if module can't load
+            die "!!! No module Term::ReadLine Mandatory for Calc mode (-C)\n\n";
+
+#            print "Shell mode\n";
+#            print "IN separator=" . $option{ i } . "\n"  if ( exists $option{ i } );
+#            print "OUT separator=" . $option{ o } . "\n" if ( exists $option{ o } );
+#            local $/ = "\n";
+#            my @buf;
+#            while ( my $ret = <> )
+#            {
+#                chomp $ret;
+#                print "=" x 50 . "\n";
+#                print "\n";
+#                if ( $option{ p } )
+#                {
+#                    $ret = partial_rpn( $ret );
+#
+#                    print "$ret\n";
+#                    print "\n";
+#                    print "-" x 50 . "\n";
+#                }
+#                $ret = rpn( $ret );
+#
+#                print "$ret\n\n";
+#                print "#" x 50 . "\n";
+#            }
+        }
+        else
+        {
+            my $term    = new Term::ReadLine 'RPN.pl';
+            my $attribs = $term->Attribs();
+            $term->using_history();
+            $term->read_history( $history_file );
+            $term->clear_signals();
+            my $line;
+            print "RPN to evaluate\n";
+            while ( defined( $line = $term->readline( '' ) ) )
+            {
+                chomp $line;
+                push @buf, $line;
+                if ( $line =~ /^$/ )
+                {
+                    my $rpn_in = join rpn_separator_in(), @buf;
+                    my $res = rpn( $rpn_in );
+                    print "\033[1A". $res, "\n" unless $@;
+                    @buf = ();
+                }
+            }
+        }
+
+    }
     elsif ( $option{ S } )
     {
         if ( eval { require Term::ReadLine; 1; } ne 1 )
         {
-# if module can't load
+            # if module can't load
             print "!!! No module Term::ReadLine fall back to perl readline diamond operator\n\n";
 
             print "Shell mode\n";
@@ -166,16 +225,17 @@ else
         }
         else
         {
-            my $term = new Term::ReadLine 'RPN.pl';
+            my $term    = new Term::ReadLine 'RPN.pl';
             my $attribs = $term->Attribs();
             $term->using_history();
-            $term->read_history($history_file);
+            $term->read_history( $history_file );
             $term->clear_signals();
             my $line;
             while ( defined( $line = $term->readline( 'RPN to evaluate>' ) ) )
-            { 
-	       
-	        reload() ;
+            {
+                #print "IN while \n";
+                $mode_c = 0;
+                reload();
                 if ( $line =~ /^\\c\s+(\w)(\s*)(.*)$/ )
                 {
                     my $cmd = $1;
@@ -191,32 +251,38 @@ else
                     }
                     elsif ( $cmd =~ /i/ )
                     {
+                        $mode_c = 0;
                         rpn_separator_in( $arg );
+                    }
+                    elsif ( $cmd =~ /C/ )
+                    {
+                        $mode_c = 1;
+                        rpn_separator_in( "\n" );
                     }
                     elsif ( $cmd =~ /d/ )
                     {
                         $DEBUG ^= 1;
                     }
-		    elsif ( $cmd =~ /r/ )
-                    {  
-                        reload(1) ;
+                    elsif ( $cmd =~ /r/ )
+                    {
+                        reload( 1 );
                     }
-		    elsif ( $cmd =~ /H/ )
-                    {  
-                        $history_file =  glob($arg);
+                    elsif ( $cmd =~ /H/ )
+                    {
+                        $history_file = glob( $arg );
                     }
                     elsif ( $cmd =~ /h/ )
                     {
                         print "IN sep=[" . rpn_separator_in() . "]\n";
                         print "OUT sep=[" . rpn_separator_out() . "]\n";
                         print "DEBUG =[$DEBUG]\n";
-			print "TZ=[". $ENV{TZ}."]\n";
-			print "HIST=[". $history_file."]\n";
-	            }
-		    elsif ( $cmd =~ /t/i )
-                    { 
-		        print "<$arg>\n";
-                        $ENV{TZ} = $arg;
+                        print "TZ=[" . $ENV{ TZ } . "]\n";
+                        print "HIST=[" . $history_file . "]\n";
+                    }
+                    elsif ( $cmd =~ /t/i )
+                    {
+                        print "<$arg>\n";
+                        $ENV{ TZ } = $arg;
                     }
                     else
                     {
@@ -225,19 +291,19 @@ else
                         print "\\c i X \t set input separator to X\n";
                         print "\\c h \t display current separators\n";
                         print "\\c d \t toggle debug mode\n";
-			print "\\c r \t force reload of module RPN.pm\n";
-			print "\\c t X \t set the time zone (TZ) to X\n";
+                        print "\\c r \t force reload of module RPN.pm\n";
+                        print "\\c t X \t set the time zone (TZ) to X\n";
                         print "\\c q \t quit the program\n";
-			print "\\c H X \t set the histoty file to X\n";
+                        print "\\c H X \t set the histoty file to X\n";
                         print "\\c X \t any other argument display this help\n";
                     }
                 }
-		else
-		{
-		    $term->write_history($history_file);
+                else
+                {
+                    $term->write_history( $history_file );
                     my $res = rpn( $line );
                     print $res, "\n" unless $@;
-		}
+                }
             }
 
         }
@@ -297,7 +363,7 @@ sub partial_rpn
 sub substit
 {
     my $var = shift;
-#print "in substit with <$var>\n";
+    #print "in substit with <$var>\n";
     return $S{ $var };
 
 }
@@ -313,27 +379,31 @@ sub substit2
 
 }
 
-sub reload {
-    my $force=shift;
-    my $c=0;
-    while (my($key,$file) = each %INC) {
+sub reload
+{
+    my $force = shift;
+    my $c     = 0;
+    while ( my ( $key, $file ) = each %INC )
+    {
         next unless ( $key =~ /RPN\.pm/ );
         local $^W = 0;
-        my $mtime = (stat $file)[9];
-        $Stat{$file} = $^T
-            unless defined $Stat{$file};
-        if ($force || $mtime > $Stat{$file}) {
-            delete $INC{$key};
-            eval { 
-                local $SIG{__WARN__} = \&warn;
+        my $mtime = ( stat $file )[9];
+        $Stat{ $file } = $^T
+          unless defined $Stat{ $file };
+        if ( $force || $mtime > $Stat{ $file } )
+        {
+            delete $INC{ $key };
+            eval {
+                local $SIG{ __WARN__ } = \&warn;
                 require $key;
             };
-            if ($@) {
-                warn "Reload: error during reload of '$key': $@\n"
+            if ( $@ )
+            {
+                warn "Reload: error during reload of '$key': $@\n";
             }
             ++$c;
         }
-        $Stat{$file} = $mtime;
+        $Stat{ $file } = $mtime;
     }
     $c;
 }

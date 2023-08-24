@@ -1,4 +1,4 @@
-package ORLite; # git description: 6868f8c
+package ORLite; # git description: v1.99-6-gde873f7
 
 # See POD at end of file for documentation
 
@@ -12,7 +12,7 @@ use Params::Util 1.00 ();
 use DBI         1.607 ();
 use DBD::SQLite  1.27 ();
 
-our $VERSION = '1.99';
+our $VERSION = '2.00';
 
 # Support for the 'prune' option
 my @PRUNE = ();

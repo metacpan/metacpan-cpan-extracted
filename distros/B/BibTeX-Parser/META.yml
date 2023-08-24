@@ -1,13 +1,13 @@
 ---
 abstract: 'A pure perl BibTeX parser'
 author:
-  - 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com>'
+  - 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com> and Karl Berry <karl@freefriends.org'
 build_requires:
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '6.31'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ requires:
   File::Spec: '0'
   IO::File: '0'
   IO::String: '0'
-  LaTeX::ToUnicode: '0.11'
-  Test::More: '0'
-version: '1.03'
+  LaTeX::ToUnicode: '0.52'
+  Test::More: '0.88'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

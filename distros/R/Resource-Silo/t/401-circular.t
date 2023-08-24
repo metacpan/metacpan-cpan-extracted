@@ -20,7 +20,7 @@ use Test::Exception;
 }
 
 subtest 'throws like it should' => sub {
-    my $file = __FILE__;
+    my $file = quotemeta __FILE__;
     my $line;
 
     throws_ok {
@@ -30,7 +30,7 @@ subtest 'throws like it should' => sub {
         $line = __LINE__; $inst->foo;
     } qr/[Cc]ircular dependency/, 'circularity detected';
 
-    like $@, qr(\Q$file\E line $line), 'error attributed correctly';
+    like $@, qr($file line $line), 'error attributed correctly';
 
     note $@;
 };

@@ -13,6 +13,8 @@ use Crypt::OpenSSL::Base::Func;
 
 #use Smart::Comments;
 
+our $VERSION=0.013;
+
 our @ISA    = qw(Exporter);
 our @EXPORT = qw/
   lexiographically_larger
@@ -94,7 +96,7 @@ sub prepend_len {
 sub calculate_generator {
   my ( $DSI, $PRS, $CI, $sid, $group_name, $type, $hash_name, $expand_message_xmd_func, $clear_cofactor_flag ) = @_;
   my $h_r     = EVP_get_digestbyname( $hash_name );
-  my $gen_str = generator_string( $DSI, $PRS, $CI, $sid, EVP_MD_block_size( $h_r ) );
+  my $gen_str = generator_string( $DSI, $PRS, $CI, $sid, EVP_MD_get_block_size( $h_r ) );
 
   #$DSI= 'QUUX-V01-CS02-with-P256_XMD:SHA-256_SSWU_NU_';
   my ( $G, $params_ref ) =

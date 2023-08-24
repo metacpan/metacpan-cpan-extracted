@@ -62,7 +62,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Path::Tiny" : "0",
@@ -77,7 +76,7 @@
    "provides" : {
       "CookLang" : {
          "file" : "lib/CookLang.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -88,10 +87,10 @@
          "web" : "https://gitlab.com/perl5182717/CookLang/"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.036000"
+         "version" : "5.034000"
       },
       "plugins" : [
          {
@@ -108,7 +107,7 @@
                   "version_regexp" : "(?^u:^release-(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                }
             },
@@ -471,12 +470,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-0.11",
+                  "tag" : "release-0.12",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -501,7 +500,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                }
             },
@@ -525,7 +524,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -542,12 +541,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.11",
+                  "tag" : "v0.12",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -567,7 +566,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.35.3",
                   "repo_root" : "."
                }
             },
@@ -638,8 +637,8 @@
          "version" : "6.030"
       }
    },
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

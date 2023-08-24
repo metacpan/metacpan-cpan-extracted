@@ -1,0 +1,67 @@
+<%doc>
+Load the transaction being quoted into the page arguments as if they had
+been submitted there, if the argument "NewTicketFromCorrespondenceLoad" is
+true (indicating that the "Split Off" action link has just been followed).
+</%doc>
+\
+<%ARGS>
+$ARGSRef => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $ARGSRef );
+return if ( not $ARGSRef->{'NewTicketFromCorrespondenceLoad'} );
+return if ( not $ARGSRef->{'NewTicketFromCorrespondenceTransaction'} );
+return if ( not $ARGSRef->{'NewTicketFromCorrespondenceTicket'} );
+
+# Remove "NewTicketFromCorrespondenceLoad" from the arguments so they won't
+# get included in the form.
+
+delete $ARGSRef->{'NewTicketFromCorrespondenceLoad'};
+
+# Load the transaction's content, of the appropriate type, into the
+# "Content" argument as if it had been entered into the message box.
+
+my $Transaction = RT::Transaction->new( $session{'CurrentUser'} );
+$Transaction->Load( $ARGSRef->{'NewTicketFromCorrespondenceTransaction'} );
+
+my $ContentType
+    = RT->Config->Get( 'MessageBoxRichText', $session{'CurrentUser'} )
+    ? 'text/html'
+    : 'text/plain';
+$ARGSRef->{'Content'}
+    = $Transaction->Content( Quote => 0, Type => $ContentType );
+
+# Load the original ticket.
+#
+my $OldTicket = RT::Ticket->new( $session{'CurrentUser'} );
+$OldTicket->Load( $ARGSRef->{'NewTicketFromCorrespondenceTicket'} ) || return;
+
+# Set the subject based on either the transaction subject or the ticket
+# subject, whichever is available.
+
+$ARGSRef->{'Subject'} = $Transaction->Subject || 'Re: ' . $OldTicket->Subject;
+
+# Set a "referred to by" link to the original ticket.
+
+$ARGSRef->{'RefersTo-new'} = $OldTicket->id;
+
+# Set the requestors to either the "From" addresses of the first attachment
+# in the transaction, or the requestors of the original ticket.
+
+my $OldRequestors = $Transaction->Attachments->First->Addresses->{'From'};
+if ( not scalar @{$OldRequestors} ) {
+    $OldRequestors = [ split( /,/, $OldTicket->RequestorAddresses ) ];
+}
+$ARGSRef->{'Requestors'} = join( ',', @$OldRequestors );
+
+# Set the Cc, AdminCc, InitialPriority, and FinalPriority based on the
+# original ticket.
+
+$ARGSRef->{'Cc'}              = join( ',', $OldTicket->CcAddresses );
+$ARGSRef->{'AdminCc'}         = join( ',', $OldTicket->AdminCcAddresses );
+$ARGSRef->{'InitialPriority'} = $OldTicket->Priority;
+$ARGSRef->{'FinalPriority'}   = $OldTicket->FinalPriority;
+
+return;
+</%INIT>

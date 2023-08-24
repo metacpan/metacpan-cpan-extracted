@@ -23,7 +23,7 @@ User-Agents, and much more.
 - [ ] CLI
 - [x] Caching via Redis (optional)
 - [x] Caching via Memcached (optional)
-- [ ] Sub-routine based caching for routes (optional)
+- [x] Sub-routine based caching for routes (optional)
 - [ ] RabbitMQ built-ins (optional)
 - [ ] AWS S3 support (optional)
 - [ ] User-Agents, including Client API exports
@@ -261,6 +261,17 @@ $s->get(
         my $value = $app->cache('my_redis')->get('something');  # Use your cache
         return $context->text($value);
     }
+);
+
+# Use your cache to cache a route
+$s->get(
+    '/foobar' => cacheable(
+        'my_redis',
+        sub {
+            my ( $app, $context ) = @_;
+            return $context->json( { foo => 'bar' } );
+        }
+    )
 );
 
 $s->run;

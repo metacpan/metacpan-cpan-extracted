@@ -4,36 +4,38 @@
 # related or neighboring rights to the content of this file.
 # Attribution is requested but is not required.
 
+# NO use strict; use warnings here to avoid conflict with t_Common which sets them
+
 # t_TestCommon -- setup and tools specifically for tests.
 #
-#   Everything not specifically test-related is in the separate
-#   module t_Common (which is not necessairly just for tests).
+#   This file is intended to be identical in all my module distributions.
 #
 #   Loads Test2::V0 (except with ":no-Test2"), which sets UTF-8 enc/dec
-#   for test-harnes streams (but *not* STD* or new filehandles).
-#
-#   Imports 'utf8' so scripts can be written in UTF-8 encoding
+#   for test-harness streams (but *not* STD* or new filehandles).
 #
 #   Makes STDIN, STDOUT & STDERR UTF-8 auto de/encode
+#
+#   Imports 'utf8' so scripts can be written in UTF-8 encoding
 #
 #   warnings are *not* imported, to avoid clobbering 'no warnings ...'
 #   settings done beforehand (e.g. via t_Common).
 #
 #   If @ARGV contains -d etc. those options are removed from @ARGV
 #   and the corresponding globals are set: $debug, $verbose, $silent
-#   (the globals are not exported by default).
+#   (the globals are not exported by default).  In addition, the
+#   hash %dvs is initialized with those values.
 #
 #   ':silent' captures stdout & stderr and dies at exit if anything was
 #      written (Test::More output and output via 'note'/'diag' excepted).
 #      Note: Currently incompatible with Capture::Tiny !
 #
 #   Exports various utilites & wrappers for ok() and like()
-
-# This file is intended to be identical in all my module distributions.
+#
+#   Everything not specifically test-related is in the separate
+#   module t_Common (which is not necessairly just for tests).
 
 package t_TestCommon;
 
-# NO use strict/warnings here to avoid conflict with t_Common which sets them
 use t_Common qw/oops mytempfile mytempdir/;
 
 use v5.16; # must have PerlIO for in-memory files for ':silent';
@@ -81,31 +83,46 @@ our @EXPORT = qw/silent
                  run_perlscript
                  @quotes
                  string_to_tempfile
+                 tmpcopy_if_writeable 
                 /;
-our @EXPORT_OK = qw/$debug $silent $verbose dprint dprintf/;
+our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 
 use Import::Into;
 use Data::Dumper;
-# Do *not* load Data::Dumper::Interp (because we might be testing it...)
+
+unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
+  # unless we are testing DDI
+  #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
+  $Data::Dumper::Interp::Useqq = "controlpics:unicode";
+}
+
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
+use Config;
 
 sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 
 # Parse manual-testing args from @ARGV
 my @orig_ARGV = @ARGV;
-our ($debug, $verbose, $silent, $nonrandom);
+our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom, %dvs);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure("pass_through");
 GetOptions(
   "d|debug"           => sub{ $debug=$verbose=1; $silent=0 },
   "s|silent"          => \$silent,
+  "savepath=s"        => \$savepath,
+  "nobail"            => \$nobail,
   "n|nonrandom"       => \$nonrandom,
   "v|verbose"         => \$verbose,
 ) or die "bad args";
 Getopt::Long::Configure("default");
+say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV) if $debug;
+
+$dvs{debug}   = $debug   if defined($debug);
+$dvs{verbose} = $verbose if defined($verbose);
+$dvs{silent}  = $silent  if defined($silent);
 
 if ($nonrandom) {
   # This must run before Test::More or Test2::V0 is loaded!!
@@ -124,7 +141,8 @@ if ($nonrandom) {
     $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
     #$ENV{PERL_HASH_SEED_DEBUG} = "1";
     @PERL5LIB = @INC; # cf 'use Env' above
-    exec $^X, $0, @orig_ARGV; # for reproducible results
+    # https://web.archive.org/web/20160308025634/http://wiki.cpantesters.org/wiki/cpanauthornotes
+    exec $Config{perlpath}, $0, @orig_ARGV; # for reproducible results
   }
 }
 
@@ -152,13 +170,17 @@ sub import {
   #  (when using Spreadsheet::Edit).
   unless (delete $tags{":no-Test2"}) {
     require Test2::V0; # a huge collection of tools
-    require Test2::Plugin::BailOnFail;
     Test2::V0->import::into($target,
       -no_warnings => 1,
       (map{ "!$_" } "A".."AAZ")
     );
-    # Stop on the first error
-    Test2::Plugin::BailOnFail->import::into($target);
+    if ($nobail) {
+      say "> NOT requiring BailOnFail"
+    } else {
+      require Test2::Plugin::BailOnFail;
+      # Stop on the first error
+      Test2::Plugin::BailOnFail->import::into($target);
+    }
   }
   utf8->import::into($target);
 
@@ -276,6 +298,7 @@ my ($orig_stdOUT, $orig_stdERR, $orig_DIE_trap);
 my ($inmem_stdOUT, $inmem_stdERR) = ("", "");
 my $silent_mode;
 use Encode qw/decode FB_WARN FB_PERLQQ FB_CROAK LEAVE_SRC/;
+my $start_silent_loc = "";
 sub _finish_silent() {
   confess "not in silent mode" unless $silent_mode;
   close STDERR;
@@ -297,11 +320,16 @@ sub _finish_silent() {
     print STDERR decode("utf8", $inmem_stdERR, FB_PERLQQ|LEAVE_SRC);
     $errmsg = $errmsg ? "$errmsg and STDERR" : "Silence expected on STDERR";
   }
-  $errmsg
+  defined($errmsg) ? $errmsg." at $start_silent_loc\n" : undef;
 }
 sub _start_silent() {
   confess "nested silent treatments not supported" if $silent_mode;
   $silent_mode = 1;
+
+  for (my $N=0; ;++$N) {
+    my ($pkg, $file, $line) = caller($N);
+    $start_silent_loc = "$file line $line", last if $pkg ne __PACKAGE__;
+  }
 
   $orig_DIE_trap = $SIG{__DIE__};
   $SIG{__DIE__} = sub{
@@ -476,6 +504,11 @@ sub fmt_codestring($;$) { # returns list of lines
   $prefix //= "line ";
   my $i; map{ sprintf "%s%2d: %s\n", $prefix,++$i,$_ } (split /\n/,$_[0]);
 }
+
+# These wrappers add the caller's line number to the test description
+# so they show when successful tests log their name.
+# This is only visible with using "perl -Ilib t/xxx.t"
+# not with 'prove -l' and so mostly pointless!
 
 sub t_ok($;$) {
   my ($isok, $test_label) = @_;
@@ -711,6 +744,22 @@ sub timed_run(&$@) {
   confess "TOOK TOO LONG ($cpusecs CPU seconds vs. limit of $maxcpusecs)\n"
     if $cpusecs > $maxcpusecs;
   if (wantarray) {return @result} else {return $result};
+}
+
+# Copy a file if needed to prevent any possibilty of it being modified.
+# Returns the original path if the file is read-only, otherwise the path
+# of a temp copy.
+sub tmpcopy_if_writeable($) {
+  my $path = shift;
+  confess "$path : $!" unless stat($path);
+  if ( (stat(_))[2] & 0222 ) {
+    my ($name, $suf) = (basename($path) =~ /^(.*?)((?:\.\w{1,4})?)$/);
+    (undef, my $tpath) = 
+      File::Temp::tempfile(SUFFIX => $suf, UNLINK => 1);
+    File::Copy::copy($path, $tpath) or die "File::Copy $!";
+    return $tpath;
+  }
+  $path
 }
 
 1;

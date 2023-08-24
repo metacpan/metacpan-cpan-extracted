@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_remove;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Moo;
 use Catmandu::Fix::Has;

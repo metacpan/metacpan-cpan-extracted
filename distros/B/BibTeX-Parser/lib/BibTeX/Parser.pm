@@ -1,6 +1,6 @@
 package BibTeX::Parser;
 {
-  $BibTeX::Parser::VERSION = '1.03';
+  $BibTeX::Parser::VERSION = '1.04';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
@@ -9,7 +9,7 @@ use strict;
 use BibTeX::Parser::Entry;
 
 
-my $re_namechar = qr/[a-zA-Z0-9\!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|]/o;
+my $re_namechar = qr/[a-zA-Z0-9\!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|\']/o;
 my $re_name     = qr/$re_namechar+/o;
 
 
@@ -50,6 +50,7 @@ sub _parse_next {
         until (/@/m) {
             my $line = $self->{fh}->getline;
             return 0 unless defined $line;
+            $line =~ s/^%.*$//;
             $_ .= $line;
         }
 
@@ -345,17 +346,18 @@ L<BibTeX::Parser::Author>
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 
 =head1 AUTHOR
 
 Gerhard Gossen <gerhard.gossen@googlemail.com> and
-Boris Veytsman <boris@varphi.com>
+Boris Veytsman <boris@varphi.com> and
+Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2016 by Gerhard Gossen and Boris Veytsman
+This software is copyright (c) 2013-2023 by Gerhard Gossen and Boris Veytsman and Karl Berry.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

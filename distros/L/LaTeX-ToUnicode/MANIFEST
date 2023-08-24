@@ -1,17 +1,20 @@
-Changes
 LICENSE
+Changes
 MANIFEST
-META.yml
-Makefile.PL
-README
-dist.ini
-lib/LaTeX/ToUnicode.pm
-lib/LaTeX/ToUnicode/Tables.pm
-script/UnicodeData.txt
-script/convert.pl
-t/convert.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+t/convert.t
 t/release-synopsis.t
+README
+script/ltx2unitxt
+script/convert.pl
+script/UnicodeData.txt
+lib/LaTeX/ToUnicode/Tables.pm
+lib/LaTeX/ToUnicode.pm
+Makefile.PL
+head.ltx
+Makefile.TDS
 weaver.ini
+dist.ini
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

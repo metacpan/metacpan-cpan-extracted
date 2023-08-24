@@ -3,7 +3,6 @@ use warnings;
 use Text::DeLoreanIpsum;
 use vars qw/$opt_v $opt_c $opt_l $opt_w $opt_s $opt_p/;
 use Getopt::Std;
-use Data::Dumper;
 
 getopts("vlc:w:s:p:");
 

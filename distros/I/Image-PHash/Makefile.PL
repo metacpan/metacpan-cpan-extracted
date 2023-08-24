@@ -10,12 +10,12 @@ my $extra_test =
   : 'recommends';
 
 my %WriteMakefileArgs = (
-    NAME             => 'Image::PHash',
-    AUTHOR           => q{Dimitrios Kechagias <dkechag@cpan.org>},
-    VERSION_FROM     => 'lib/Image/PHash.pm',
-    ABSTRACT_FROM    => 'lib/Image/PHash.pm',
-    LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.008',
+    NAME               => 'Image::PHash',
+    AUTHOR             => q{Dimitrios Kechagias <dkechag@cpan.org>},
+    VERSION_FROM       => 'lib/Image/PHash.pm',
+    ABSTRACT_FROM      => 'lib/Image/PHash.pm',
+    LICENSE            => 'perl_5',
+    MIN_PERL_VERSION   => '5.008',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -23,19 +23,19 @@ my %WriteMakefileArgs = (
         'Test2::V0'               => '0',
         'Test2::Tools::Exception' => '0',
         'Test::More'              => '0',
-        'GD'                      => '0'    # Any library would do actually...
+        'Imager'                  => '0'
     },
     PREREQ_PM => {
         'Math::DCT' => '0'
     },
-    META_MERGE        => {
+    META_MERGE => {
         "meta-spec" => { version => 2 },
         prereqs => {
             test => {
                 $extra_test => {
                     'Image::Magick' => '0',
                     'Image::Imlib2' => '0',
-                    'Imager'        => '0'
+                    'GD'            => '0'
                 }
             },
             runtime => {
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Image-PHash-*' },
+    clean => { FILES    => 'Image-PHash-*' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

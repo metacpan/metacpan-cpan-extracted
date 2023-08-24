@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/09
-## Modified 2023/07/30
+## Modified 2023/08/20
 ## All rights reserved
 ## 
 ## 
@@ -49,7 +49,7 @@ BEGIN
     (?<r_tz_space>[[:blank:]\h]+)
     (?<r_tz>\S+)
     /x;
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -983,7 +983,7 @@ Changes - Changes file management
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 
@@ -1204,6 +1204,8 @@ Read only. This returns an L<array object|Module::Generic::Array> containing all
 =head2 remove_release
 
 This is an alias for L</delete_release>
+
+=for Pod::Coverage reset
 
 =head2 serialise
 

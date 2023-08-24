@@ -38,7 +38,7 @@ struct ClassMeta {
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly (MERGED) */
   AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a AdjustBlock* (MERGED) */
 
-  AV *fieldhooks_initfield; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_initfield exist (MERGED) */
+  AV *fieldhooks_makefield; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_makefield exist (MERGED) */
   AV *fieldhooks_construct; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_construct exist (MERGED) */
 
   COP *tmpcop;         /* a COP to use during generated constructor */

@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::pica_match;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Catmandu::Sane;
 use Catmandu::Fix::pica_map;
@@ -48,7 +48,7 @@ Catmandu::Fix::Condition::pica_match - Conditionals on PICA fields
    
    # pica_match(PICA_PATH,REGEX)
    
-   if pica_match('021A$a','My funny title')
+   if pica_match('021A$a','^My funny title$')
    	add_field('my.funny.title','true')
    end
 

@@ -1,0 +1,21 @@
+class TestCase::HTTP::Minimal {
+  use HTTP::Minimal;
+  use Fn;
+  
+  static method test : int () {
+    
+    my $url = "http://google.com";
+    
+    my $http = HTTP::Minimal->new;
+    
+    my $res = $http->get($url);
+    
+    my $content = $res->content;
+    
+    unless (Fn->contains($content, "www.google.com")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

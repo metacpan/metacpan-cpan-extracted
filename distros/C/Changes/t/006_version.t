@@ -219,7 +219,17 @@ foreach my $type ( sort( keys( %$tests_dict ) ) )
     };
 }
 
+subtest "satisfy" => sub
+{
+    ok( Changes::Version->satisfy( '0', '0' ), "'0' satisfies '0'" );
+    ok( !Changes::Version->satisfy( '2.03', '2.3' ), "'2.03' does not satisfy '2.3'" );
+    ok( !Changes::Version->satisfy( '1', '0' ), "'1' does not satisfy '0'" );
+    ok( Changes::Version->satisfy( '1', '> 0' ), "'1' satisfies '> 0'" );
+    ok( Changes::Version->satisfy( '0.1.2', '0.1.0..0.2.0' ), "'0.1.2' satisfies '0.1.0..0.2.0'" );
 
+    ok( Changes::Version->satisfy( '1', '> 0, < 2' ), "'1' satisfies '> 0, < 2'" );
+    ok( Changes::Version->satisfy( '1.02.30', '1.01.27 .. 1.02.31, != 1.02.29' ), "'1.02.30' satisfies '1.01.27 .. 1.02.31, != 1.02.29'" );
+};
 
 done_testing();
 

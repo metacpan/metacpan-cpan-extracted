@@ -7,8 +7,8 @@ use warnings;
 
 #use lib '../lib';
 
-use bignum;
-use Smart::Comments;
+#use bignum;
+#use Smart::Comments;
 
 use Test::More;
 use FindBin qw($Bin);
@@ -30,10 +30,10 @@ use Crypt::OpenSSL::ECDSA;
 use Crypt::OPRF;
 use Crypt::OPAQUE;
 
-use Smart::Comments;
+#use Smart::Comments;
 use CBOR::XS;
 
-use bignum;
+#use bignum;
 use FindBin qw($Bin);
 
 my $prefix = "VOPRF09-";

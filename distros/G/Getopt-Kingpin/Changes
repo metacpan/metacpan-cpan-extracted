@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-Kingpin
 
+0.11 2023-08-18T04:19:57Z
+
+    - Add support for `Type Enum`
+
 0.10 2020-11-06T13:08:51Z
 
     - Add support for `Type Num`

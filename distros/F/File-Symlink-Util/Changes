@@ -1,3 +1,14 @@
+0.003   2023-06-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add Rinci function metadata for check_symlink() so we can create
+          CLI easily.
+
+
+0.002   2023-06-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: check_symlink().
+
+
 0.001   2021-12-02  Released-By: PERLANCAR
 
         - First release.

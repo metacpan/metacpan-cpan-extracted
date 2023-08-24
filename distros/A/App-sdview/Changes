@@ -1,5 +1,12 @@
 Revision history for App-sdview
 
+0.10    2023-08-24
+        [CHANGES]
+         * Updated to Object::Pad v0.800
+         * Swapped all unit tests from `Test::More` to `Test2::V0`
+         * Apply `Object::Pad::FieldAttr::Checked` constraints to fields of
+           the helper structures in Parser.pm
+
 0.09    2022-12-05
         [CHANGES]
          * Updated for Object::Pad v0.73:

@@ -14,8 +14,7 @@ use experimental 'signatures', 'postderef';
 
 ##no critic (Modules::ProhibitMultiplePackages)
 
-package    # no CPAN index
-  My::SubForm0 {
+package My::SubForm0 {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
 
@@ -29,8 +28,7 @@ package    # no CPAN index
     );
 }
 
-package    # no CPAN index
-  My::SubForm1 {
+package My::SubForm1 {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
     use Types::Standard qw( Any );
@@ -45,8 +43,7 @@ package    # no CPAN index
     );
 }
 
-package    # no CPAN index
-  My::Form0 {
+package My::Form0 {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
     use Types::Standard 'Any';
@@ -60,8 +57,7 @@ package    # no CPAN index
     form_field 'nested0' => ( type => My::SubForm1->new );
 }
 
-package    # no CPAN index
-  My::Form1 {
+package My::Form1 {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
     use Types::Standard 'Any';
@@ -79,8 +75,7 @@ package    # no CPAN index
 
 }
 
-package    # no CPAN index
-  My::Form2 {
+package My::Form2 {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
     use Types::Standard 'Any';
@@ -98,8 +93,7 @@ package    # no CPAN index
 
 }
 
-package    #
-  My::Variant {
+package My::Variant {
 
     use Package::Variant
       importing => [ 'Form::Tiny', [ plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'] ] ],

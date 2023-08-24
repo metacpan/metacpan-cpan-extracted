@@ -99,6 +99,22 @@ subtest geometry => sub {
     ok( $h > 0, '$wnd->get_w_h; h > 0' );
 };
 
+subtest XTranslateCoordinates => sub {
+    my $root= $dpy->RootWindow;
+    my @ret= XTranslateCoordinates($dpy, $root, $root, 0, 0);
+    is( scalar @ret, 3, 'called with 5 args returns 3-arg list' );
+    @ret= XTranslateCoordinates($dpy, $root, $root, 0, 0, my $x_out);
+    is( scalar @ret, 1, 'called with 6 args returns single value' );
+    @ret= XTranslateCoordinates($dpy, $root, $root, 5, 5, $x_out, my $y_out, my $child_out);
+    is( scalar @ret, 1, 'called with 8 args returns single value' );
+    ok( $ret[0], 'returned true' );
+    is( $x_out, 5, 'x = 5' );
+    is( $y_out, 5, 'y = 5' );
+    # there might not be a child, but this was called as a function so it shoud get the
+    # integer value of "None" rather than undef.
+    ok( defined $child_out, 'child_out is defined' );
+};
+
 my $attrs;
 is( err{ XGetWindowAttributes($dpy, $win_id, $attrs) }, '', 'XGetWindowAttributes' );
 is( $attrs->root, RootWindow($dpy), 'wndattr->root' );

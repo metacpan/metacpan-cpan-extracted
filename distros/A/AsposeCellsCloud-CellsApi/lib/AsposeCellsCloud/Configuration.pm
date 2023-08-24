@@ -32,7 +32,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '23.5';
+use constant VERSION => '23.8';
 
 =head1 Name
 
@@ -111,7 +111,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Apose.Cells.Cloud.SDK/23.5/perl';
+	$p{http_user_agent} //= 'Apose.Cells.Cloud.SDK/23.8/perl';
 
 	# authentication setting
 	$p{api_key} //= {};

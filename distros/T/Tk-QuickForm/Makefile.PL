@@ -5,9 +5,9 @@ WriteMakefile(
 	VERSION_FROM			=> 'lib/Tk/QuickForm.pm',
 	PREREQ_PM				=> {
 		'Scalar::Util::Numeric' => 0,
-		'Test::Tk'			=> '0.03',
-		'Tk'					=> '804.033',
-		'Tk::ColorEntry'	=> '0.01',
+		'Test::Tk'		=> '3.02',
+		'Tk'			=> '804.033',
+		'Tk::ColorEntry'	=> '0.05',
 		'Tk::FontDialog'	=> 0,
 		'Tk::ListEntry'	=> '0.01',
 	},

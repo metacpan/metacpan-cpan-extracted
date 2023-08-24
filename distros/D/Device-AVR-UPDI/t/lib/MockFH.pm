@@ -1,6 +1,6 @@
 package MockFH;
 
-use strict;
+use v5.20;
 use warnings;
 
 sub new { bless [], shift }

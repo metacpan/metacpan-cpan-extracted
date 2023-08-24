@@ -5,7 +5,7 @@ use Carp;
 use parent 'X11::Xlib::XID';
 
 # All modules in dist share a version
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 sub width  { croak "read-only" if @_ > 1; $_[0]{width} }
 sub height { croak "read-only" if @_ > 1; $_[0]{height} }
@@ -31,7 +31,7 @@ X11::Xlib::Pixmap - XID wrapper for Pixmap
 
 Object representing a Pixmap remote X11 resource.
 
-There doesn't seem to be any way to query the attributes of a pixmap,
+There does not seem to be any way to query the attributes of a pixmap,
 so this object's attributes must be passed to the constructor.
 
 =head1 ATTRIBUTES
@@ -56,7 +56,7 @@ Color depth, in bits.
 
   my ($w, $h)= $pixmap->get_w_h
 
-Reutrn the width and height of the pixmap as a list
+Return the width and height of the pixmap as a list
 
 =head1 AUTHOR
 

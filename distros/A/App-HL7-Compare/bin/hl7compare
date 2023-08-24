@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use App::HL7::Compare;
+
+my $help = !!0;
+my $matching = !!0;
+
+GetOptions(
+	'help|h' => \$help,
+	'matching|m' => \$matching,
+);
+
+my $file1 = shift;
+my $file2 = shift;
+
+if ($help || !($file1 && $file2)) {
+	pod2usage(1);
+}
+
+my $comparer = App::HL7::Compare->new(
+	files => [$file1, $file2],
+	exclude_matching => !$matching,
+);
+
+print $comparer->compare_stringify;
+print "\n";
+
+__END__
+
+=head1 NAME
+
+hl7compare - Compare two HL7 v2 messages
+
+=head1 SYNOPSIS
+
+	hl7compare [OPTIONS] file1 file2
+
+=head1 OPTIONS
+
+=over
+
+=item -m, --matching
+
+Include parts which are matching.
+
+=item -h, --help
+
+Show this help message.
+
+=back
+
+=head1 DESCRIPTION
+
+Reads two HL7 v2 messages from given files and prints out comparison of each
+message part existing in either message.
+
+See L<App::HL7::Compare> for details.
+

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
         'Test::Exception'       => 0.29,
     },
     PREREQ_PM => {
+        'Module::Load'          => 0.32,
         'Scalar::Util'          => 1.23,
         'Sub::Quote'            => 2,
     },

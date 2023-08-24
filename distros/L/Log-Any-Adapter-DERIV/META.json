@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -100,7 +100,7 @@
    "provides" : {
       "Log::Any::Adapter::DERIV" : {
          "file" : "lib/Log/Any/Adapter/DERIV.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -115,11 +115,12 @@
          "web" : "https://github.com/binary-com/perl-Log-Any-Adapter-DERIV"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "chylli-binary <chylli@binary.com>",
+      "aisha-deriv <aisha@deriv.com>",
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "chylli-deriv <chylli@binary.com>",
       "Tom Molesworth <tom@deriv.com>",
       "sasikala-binary <76985137+sasikala-binary@users.noreply.github.com>"
    ],

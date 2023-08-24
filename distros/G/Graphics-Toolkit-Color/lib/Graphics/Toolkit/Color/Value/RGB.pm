@@ -11,7 +11,7 @@ use Graphics::Toolkit::Color::Space;
 my $rgb_def = Graphics::Toolkit::Color::Space->new(qw/red green blue/);
    $rgb_def->add_formatter(   'hex',   \&hex_from_rgb );
    $rgb_def->add_deformatter( 'hex',   sub { rgb_from_hex(@_) if is_hex(@_) } );
-   $rgb_def->add_deformatter( 'array', sub { @{$_[0]} if $rgb_def->is_array($_[0]) } );
+   $rgb_def->add_deformatter( 'array', sub { @{$_[0]} if $rgb_def->is_array($_[0]) and $_[0][0] =~ /\d/} );
    $rgb_def->change_trim_routine( \&trim );
 
 ########################################################################

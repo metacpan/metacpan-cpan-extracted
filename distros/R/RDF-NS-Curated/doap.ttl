@@ -13,7 +13,7 @@
 <http://dev.perl.org/licenses/>
 	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
 
-<http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>
+<http://git2prov.org/git2prov?giturl=https://github.com/perlrdf/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>
 	foaf:name            "Harald Jörg".
 
 <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project>
@@ -22,21 +22,21 @@
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.43"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006000"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
-	doap:bug-database    <https://github.com/kjetilk/p5-rdf-ns-curated/issues>;
+	doap:bug-database    <https://github.com/perlrdf/p5-rdf-ns-curated/issues>;
 	doap:created         "2015-07-27"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:download-page   <https://metacpan.org/release/RDF-NS-Curated>;
-	doap:helper          <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>;
+	doap:helper          <http://git2prov.org/git2prov?giturl=https://github.com/perlrdf/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>;
 	doap:homepage        <https://metacpan.org/release/RDF-NS-Curated>;
 	doap:license         <http://dev.perl.org/licenses/>;
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "RDF-NS-Curated";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-006>;
 	doap:repository      [
 		a doap:GitRepository;
-		doap:browse <https://github.com/kjetilk/p5-rdf-ns-curated>;
-		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#>;
+		doap:browse <https://github.com/perlrdf/p5-rdf-ns-curated>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/perlrdf/p5-rdf-ns-curated&serialization=PROV-O#>;
 	];
 	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:shortdesc       "A curated set of RDF prefixes";
@@ -93,6 +93,9 @@
 	dc:issued            "2018-02-05"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix a typo bug in dc11 URI."@en;
+		], [
 			a doap-changeset:Addition;
 			rdfs:label "Added csvw prefix."@en;
 		], [
@@ -104,9 +107,6 @@
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "Add author test to check the RDFa Initial Context."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix a typo bug in dc11 URI."@en;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
@@ -169,15 +169,40 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.004.tar.gz>;
 	doap:revision        "1.004"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-006>
+	a                    doap:Version;
+	dc:identifier        "RDF-NS-Curated-1.006"^^xsd:string;
+	dc:issued            "2023-08-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add JSON-LD namespace."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/zmughal>;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Add Github devops."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/zmughal>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.006.tar.gz>;
+	doap:revision        "1.006"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	foaf:nick            "KJETILK", "KjetilK";
 	foaf:page            <https://metacpan.org/author/KJETILK>;
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/perlrdf/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
+
+<http://purl.org/NET/cpan-uri/person/zmughal>
+	a                    foaf:Person;
+	foaf:name            "Zakariyya Mughal";
+	foaf:nick            "ZMUGHAL";
+	foaf:page            <https://metacpan.org/author/ZMUGHAL>.
 
 <http://www.kjetil.kjernsmo.net/foaf#me>
 	a                    foaf:Person;

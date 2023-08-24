@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.19';
+$Form::Tiny::FieldDefinition::VERSION = '2.21';
 use v5.10;
 use strict;
 use warnings;
@@ -110,7 +110,7 @@ sub BUILD
 	if ($self->has_default) {
 
 		croak 'default value for an array field is unsupported'
-			if scalar grep { $_ eq 'ARRAY' } @{$self->get_name_path->meta};
+			if scalar grep { $_ } @{$self->get_name_path->meta_arrays};
 	}
 }
 
@@ -153,15 +153,14 @@ sub get_coerced
 
 sub get_adjusted
 {
-	my $self = shift;
-	my $value = pop;
+	my ($self, $form, $value) = @_;
 
-	if ($self->is_subform) {
-		$value = $self->type->fields;
-	}
+	# NOTE: subform must be already validated at this stage
+	$value = $self->type->fields
+		if $self->is_subform;
 
 	return $value unless $self->is_adjusted;
-	return $self->adjust->(@_, $value);
+	return $self->adjust->($form, $value);
 }
 
 sub get_default
@@ -214,25 +213,24 @@ sub validate
 	for my $error (@errors) {
 		if (ref $error eq 'ARRAY' && $self->is_subform) {
 			foreach my $exception (@$error) {
+				my $class = 'Form::Tiny::Error::DoesNotValidate';
 				if (defined blessed $exception && $exception->isa('Form::Tiny::Error')) {
+					$class = 'Form::Tiny::Error::NestedFormError';
+
 					my $path = $self->get_name_path;
-					$path = $path->clone->append(HASH => $exception->field)
-						if defined $exception->field;
+					$path = $path->clone->append_path(
+						$self->type->_ft_find_field($exception->field)->get_name_path
+					) if defined $exception->field;
 
 					$exception->set_field($path->join);
-					$exception = Form::Tiny::Error::NestedFormError->new(
-						field => $self->name,
-						error => $exception,
-					);
-				}
-				else {
-					$exception = Form::Tiny::Error::DoesNotValidate->new(
-						field => $self->name,
-						error => $exception,
-					);
 				}
 
-				$form->add_error($exception);
+				$form->add_error(
+					$class->new(
+						field => $self->name,
+						error => $exception,
+					)
+				);
 			}
 		}
 		else {

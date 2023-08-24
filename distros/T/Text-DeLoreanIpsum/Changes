@@ -1,6 +1,7 @@
 Revision history for Perl extension Text::DeLoreanIpsum.
 
 0.01  Fri Sep  2 17:37:06 2016
-	- original version; created by h2xs 1.23 with options
-		-AX Text::DeLoreanIpsum
-
+    - original version; created by h2xs 1.23 with options
+        -AX Text::DeLoreanIpsum
+0.02  Thu Aug 18 11:03:25 2023
+    - fix of some bugs

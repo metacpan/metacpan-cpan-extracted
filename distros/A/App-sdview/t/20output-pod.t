@@ -4,7 +4,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
 
 use App::sdview::Parser::Pod;
 use App::sdview::Output::Pod;

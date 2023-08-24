@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -111,7 +111,9 @@ Returns value from set.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
+
+=for comment filename=random_fifty_fifty.pl
 
  use strict;
  use warnings;
@@ -134,6 +136,32 @@ Returns value from set.
 
  # Output like:
  # foo|bar
+
+=head1 EXAMPLE2
+
+=for comment filename=random_ten_ninty.pl
+
+ use strict;
+ use warnings;
+
+ use Random::Set;
+
+ # Object.
+ my $obj = Random::Set->new(
+         'set' => [
+                 [0.1, 'foo'],
+                 [0.9, 'bar'],
+         ],
+ );
+
+ # Get random data.
+ my $random = $obj->get;
+
+ # Print out.
+ print $random."\n";
+
+ # Output like:
+ # foo (10%)|bar (90%)
 
 =head1 DEPENDENCIES
 
@@ -162,12 +190,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2021
+© Michal Josef Špaček 2013-2023
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

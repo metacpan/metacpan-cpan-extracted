@@ -40,6 +40,30 @@ making lots of method calls.
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item bits_per_rgb
+
+=item blue_mask
+
+=item class
+
+=item colormap_size
+
+=item depth
+
+=item green_mask
+
+=item red_mask
+
+=item screen
+
+=item visual
+
+=item visualid
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

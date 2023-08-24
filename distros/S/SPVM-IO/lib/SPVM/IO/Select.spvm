@@ -6,6 +6,7 @@ class IO::Select {
   use Math;
   use Sys::Time::Timeval;
   use Sys::Select;
+  use Sys;
   
   has handles : IntList;
   
@@ -106,7 +107,7 @@ class IO::Select {
     }
     
     # select
-    my $success_count = Sys::Select->select($max_handle + 1, $fds, undef, undef, $tv);
+    my $success_count = Sys->select($max_handle + 1, $fds, undef, undef, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];
@@ -148,7 +149,7 @@ class IO::Select {
     }
     
     # select
-    my $success_count = Sys::Select->select($max_handle + 1, undef, $fds, undef, $tv);
+    my $success_count = Sys->select($max_handle + 1, undef, $fds, undef, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];
@@ -190,7 +191,7 @@ class IO::Select {
     }
     
     # select
-    my $success_count = Sys::Select->select($max_handle + 1, undef, undef, $fds, $tv);
+    my $success_count = Sys->select($max_handle + 1, undef, undef, $fds, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];

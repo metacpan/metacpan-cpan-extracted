@@ -1,6 +1,6 @@
 package BibTeX::Parser::Author;
 {
-  $BibTeX::Parser::Author::VERSION = '1.03';
+  $BibTeX::Parser::Author::VERSION = '1.04';
 }
 
 use warnings;
@@ -258,15 +258,31 @@ sub _get_single_author_from_tokens {
 
 
 
-
+# The goal is to return a name in form
+# von Last, Jr, First
+# where any of the parts except Last may be empty.
+# 
 sub to_string {
 	my $self = shift;
 
-	if ($self->jr) {
-		return ($self->von ? $self->von . " " : '') . " " . $self->last . ", " . $self->jr . ", " . $self->first;
-	} else {
-		return ($self->von ? $self->von . " " : '') . $self->last . ($self->first ? ", " . $self->first : '');
-	}
+        my $last = $self->last; # assume always present
+	my $first = $self->first ? (", " . $self->first) : ''; # ", first"
+	my $von = $self->von ? ($self->von . " ") : '';        # "von "
+	my $jr = $self->jr ? (", " . $self->jr ) : '';         # ", jr"
+	#
+        my $ret = "${von}${last}${jr}${first}";
+	#warn "returning name: $ret\n";
+	return $ret;
+
+# original code, which introduced a spurious space with a von part.
+# https://github.com/borisveytsman/crossrefware/issues/11
+# 
+# if ($self->jr) {
+#  return () . " " . $self->last . ", " . $self->jr . ", " . $self->first;
+# } else {
+#  return ($self->von ? $self->von . " " : '') . $self->last . ($self->first ? ", " . $self->first : '');
+# }
+#
 }
 
 
@@ -393,17 +409,18 @@ the following token is not: C<{von}>
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 
 =head1 AUTHOR
 
 Gerhard Gossen <gerhard.gossen@googlemail.com> and
-Boris Veytsman <boris@varphi.com>
+Boris Veytsman <boris@varphi.com> and
+Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013--2016 by Gerhard Gossen and Boris Veytsman.
+This software is copyright (c) 2013--2023 by Gerhard Gossen and Boris Veytsman and Karl Berry.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,7 +14,7 @@ use IPC::Run 'run';
 use Path::Tiny 'path';
 use Text::Diff ();
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -34,10 +34,9 @@ sub init {
             try {
                 $self->add($watch);
             }
-            catch {
-                my $e = $_ || $@;
+            catch ($e) {
                 push( @errors, $watch . ': ' . $e );
-            };
+            }
         }
 
         warn
@@ -155,9 +154,9 @@ sub make {
             print $file "\n";
         }
     }
-    catch {
+    catch ($e) {
         die "Failed to fully make $path; check permissions or existing files\n";
-    };
+    }
 
     $self->expand($path);
 
@@ -443,9 +442,9 @@ sub _rel2root {
     try {
         $path = $path->realpath;
     }
-    catch {
+    catch ($e) {
         $path = $path->absolute;
-    };
+    }
 
     return $path->relative( $self->{root_dir} )->stringify;
 }
@@ -580,13 +579,12 @@ sub _status_data {
                 },
             )
         }
-        catch {
-            my $e = $_ || $@;
+        catch ($e) {
             $data->{state} = '?' if ( $e =~ /Not a directory/ );
         }
         finally {
             $data->{state} = 'ok' unless $printed_path;
-        };
+        }
 
         $data->{path} = $path;
         push( @paths, $data );
@@ -708,9 +706,9 @@ sub _execute_action {
                 \undef, \$out, \$err,
             ) or $died = 1;
         }
-        catch {
-            $err = $_ || $@;
-        };
+        catch ($e) {
+            $err = $e;
+        }
 
         if ($err) {
             ( my $err_str = $err ) =~ s/\s*at\s+.*$//;
@@ -763,7 +761,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)

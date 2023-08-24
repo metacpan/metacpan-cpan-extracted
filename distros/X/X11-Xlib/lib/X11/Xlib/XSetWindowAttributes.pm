@@ -46,6 +46,40 @@ which fields are use can be exported with
 
 See parent class L<X11::Xlib::Struct>
 
+=over 2
+
+=item background_pixel
+
+=item background_pixmap
+
+=item backing_pixel
+
+=item backing_planes
+
+=item backing_store
+
+=item bit_gravity
+
+=item border_pixel
+
+=item border_pixmap
+
+=item colormap
+
+=item cursor
+
+=item do_not_propagate_mask
+
+=item event_mask
+
+=item override_redirect
+
+=item save_under
+
+=item win_gravity
+
+=back
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>

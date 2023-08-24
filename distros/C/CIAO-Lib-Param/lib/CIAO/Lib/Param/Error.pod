@@ -1,41 +1,28 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2006 Smithsonian Astrophysical Observatory
-#
-# This file is part of CIAO-Lib-Param
-#
-# CIAO-Lib-Param is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# CIAO-Lib-Param is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the 
-#       Free Software Foundation, Inc. 
-#       51 Franklin Street, Fifth Floor
-#       Boston, MA  02110-1301, USA
-#
-# -->8-->8-->8-->8--
+# PODNAME: CIAO/Lib/Param/Error.pm
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory cxcparam errmsg errstr
 
 =head1 NAME
 
-CIAO::Lib::Param::Error - package error information for CIAO::Lib::Param
+CIAO/Lib/Param/Error.pm
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
-  eval { 
+  eval {
     ... calls to CIAO::Lib::Param ...
   };
   if ( my $e = $@ )
   {
      .. manipulations of $e ..
   }
-
 
 =head1 DESCRIPTION
 
@@ -97,20 +84,50 @@ application should attempt to recover from an error.
 
 =back
 
+=head1 INTERNALS
+
+=head1 NAME
+
+CIAO::Lib::Param::Error - package error information for CIAO::Lib::Param
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-ciao-lib-param@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CIAO-Lib-Param>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/ciao-lib-param
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ciao-lib-param.git
+
 =head1 SEE ALSO
 
-CIAO::Lib::Param
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<CIAO::Lib::Param|CIAO::Lib::Param>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius, E<lt>djerius@cpanE<gt>
+Diab Jerius <djerius@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by the Smithsonian Astrophysical Observatory
+This software is Copyright (c) 2005 by Smithsonian Astrophysical Observatory.
 
-This code is released under the GNU General Public License.  You may
-find a copy at <http://www.fsf.org/copyleft/gpl.html>.
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-

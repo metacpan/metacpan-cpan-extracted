@@ -2,8 +2,41 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 BEGIN { use_ok('Test::Tk') };
+
+package AccessorTest;
+
+sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+	my $self = {
+		AA => 'Butterfly',
+		BB => 'Ideal',
+		CC => 'Curtain',
+	};
+	bless ($self, $class);
+}
+
+sub AA {
+	my $self = shift;
+	$self->{AA} = shift if @_;
+	return $self->{AA}
+}
+
+sub BB {
+	my $self = shift;
+	$self->{BB} = shift if @_;
+	return $self->{BB}
+}
+
+sub CC {
+	my $self = shift;
+	$self->{CC} = shift if @_;
+	return $self->{CC}
+}
+
+package main;
 
 createapp(
 );
@@ -36,8 +69,10 @@ my %chash2 = (%hash1,
 my @clist1 = (@list1, [@list2], \%hash1);
 my @clist2 = (@list1, [@list2], \%hash1);
 
+my $cctst = AccessorTest->new;
+testaccessors($cctst, 'AA', 'BB', 'CC');
 
-@tests = (
+push @tests, (
 	[sub { return 'one' }, 'one', 'scalar testing'],
 	[sub { return \%hash1 }, \%hash2, 'hash testing'],
 	[sub { return \@list1 }, \@list2, 'list testing'],

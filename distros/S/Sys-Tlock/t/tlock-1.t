@@ -14,31 +14,35 @@ BEGIN {
     };
 
 use lib $dir;
-use Sys::Tlock dir => $tdir.'/tlock-1.d/' , conf => $tdir.'/tlock.conf';
+use Sys::Tlock dir => $tdir.'/' , conf => $tdir.'/test-1.conf';
 
 ok (not tlock_taken 'test-1');
 ok (not defined tlock_expiry 'test-1');
-ok (not glob($tdir.'/tlock-1.d/*'));
+ok (not -d $tdir.'/tlock.test-1');
 
 my $token = tlock_take 'test-1' , 600;
 
 ok (tlock_alive 'test-1' , $token);
 ok (tlock_taken 'test-1');
 ok ((tlock_expiry 'test-1') == ($token + 600));
-ok (glob($tdir.'/tlock-1.d/*'));
+ok (-d $tdir.'/tlock.test-1');
+
+ok (not tlock_take 'test-1' , 600);
 
 ok (tlock_renew 'test-1' , $token , 600);
 
 ok (tlock_alive 'test-1' , $token);
 ok (tlock_taken 'test-1');
 ok ((tlock_expiry 'test-1') >= ($token + 600));
-ok (glob($tdir.'/tlock-1.d/*'));
+ok (-d $tdir.'/tlock.test-1');
+
+ok (not tlock_take 'test-1' , 600);
 
 ok (tlock_release 'test-1' , $token);
 
 ok (not tlock_alive 'test-1' , $token);
 ok (not tlock_taken 'test-1');
 ok (not defined tlock_expiry 'test-1');
-ok (not glob($tdir.'/tlock-1.d/*'));
+ok (not -d $tdir.'/tlock.test-1');
 
 __END__

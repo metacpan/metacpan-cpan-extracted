@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,8 +26,8 @@
             "Future::AsyncAwait" : "0",
             "Future::IO" : "0.03",
             "IO::Termios" : "0",
-            "Object::Pad" : "0.57",
-            "Struct::Dumb" : "0",
+            "Object::Pad" : "0.76",
+            "Object::Pad::ClassAttr::Struct" : "0.04",
             "YAML" : "0",
             "perl" : "5.020"
          }
@@ -43,7 +43,7 @@
    "provides" : {
       "Device::AVR::UPDI" : {
          "file" : "lib/Device/AVR/UPDI.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

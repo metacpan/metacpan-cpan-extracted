@@ -1,12 +1,12 @@
 use Test2::V0;
-use exact -noautoclean;
+use exact;
 
 ok(
     lives {
         try {
             1;
         }
-        catch {
+        catch ($e) {
             1;
         };
     },

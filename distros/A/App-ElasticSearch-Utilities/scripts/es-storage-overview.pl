@@ -166,7 +166,7 @@ es-storage-overview.pl - Index Storage Overview by Index Name without Dates
 
 =head1 VERSION
 
-version 8.6
+version 8.7
 
 =head1 SYNOPSIS
 
@@ -202,7 +202,6 @@ From App::ElasticSearch::Utilities:
     --index         Index to run commands against
     --base          For daily indexes, reference only those starting with "logstash"
                      (same as --pattern logstash-* or logstash-DATE)
-    --datesep       Date separator, default '.' also (--date-separator)
     --pattern       Use a pattern to operate on the indexes
     --days          If using a pattern or base, how many days back to go, default: 1
 

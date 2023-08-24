@@ -50,16 +50,16 @@ Declaring a resource:
     use Resource::Silo;
 
     resource config => sub {
-      require YAML::XS;
-      YAML::XS::LoadFile( "/etc/myapp.yaml" );
+        require YAML::XS;
+        YAML::XS::LoadFile( "/etc/myapp.yaml" );
     };
     resource dbh    => sub {
-      require DBI;
-      my $self = shift;
-      my $conf = $self->config->{database};
-      DBI->connect(
-        $conf->{dbi}, $conf->{username}, $conf->{password}, { RaiseError => 1 }
-      );
+        require DBI;
+        my $self = shift;
+        my $conf = $self->config->{database};
+        DBI->connect(
+            $conf->{dbi}, $conf->{username}, $conf->{password}, { RaiseError => 1 }
+        );
     };
     resource user_agent => sub {
         require LWP::UserAgent;
@@ -72,16 +72,16 @@ Resources with more options:
 
 ```perl
     resource logger =>
-      cleanup_order     => 9e9,     # destroy as late as possible
-      init              => sub { ... };
+        cleanup_order     => 9e9,     # destroy as late as possible
+        init              => sub { ... };
 
     resource schema =>
-      derivative        => 1,        # merely a frontend to its dependencies
-      init              => sub {
-        my $self = shift;
-        require My::App::Schema;
-        return My::App::Schema->connect( sub { $self->dbh } );
-      };
+        derived           => 1,        # merely a frontend to its dependencies
+        init              => sub {
+            my $self = shift;
+            require My::App::Schema;
+            return My::App::Schema->connect( sub { $self->dbh } );
+        };
 ```
 
 Declaring a parametric resource:
@@ -94,9 +94,9 @@ Declaring a parametric resource:
     use Redis::Namespace;
 
     my %known_namespaces = (
-      lock    => 1,
-      session => 1,
-      user    => 1,
+        lock    => 1,
+        session => 1,
+        user    => 1,
     );
 
     resource redis =>
@@ -126,9 +126,9 @@ Using it elsewhere:
     use My::App qw(silo);
 
     sub load_foo {
-      my $id = shift;
-      my $sql = q{SELECT * FROM foo WHERE foo_id = ?};
-      silo->dbh->fetchrow_hashred( $sql, $id );
+        my $id = shift;
+        my $sql = q{SELECT * FROM foo WHERE foo_id = ?};
+        silo->dbh->fetchrow_hashred( $sql, $id );
     };
 ```
 

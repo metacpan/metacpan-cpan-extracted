@@ -1,12 +1,9 @@
-#!/usr/bin/perl -w    
-
-# $Id: $
-
 use strict;
 use 5.006;
 use warnings;
 
 use Test::More tests => 21;
+use Test::Number::Delta;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Parse::RPN;
@@ -45,7 +42,7 @@ foreach ( @tests )
 {
     my ( $test, $result, $type ) = @{ $_ };
     my $ret = rpn( $test );
-    ok( $ret eq $result, " \t" . t_format( $type ) . "\t=>\t" . t_format( $test ) . "\t=\t" . ( $ret ) );
+    delta_within( $ret , $result, 1e-15 ," \t" . t_format( $type ) . "\t=>\t" . t_format( $test ) . "\t=\t" . t_format( $ret ) ."\t".t_format("(within 1e-15)")) ;
 }
 
 sub t_format

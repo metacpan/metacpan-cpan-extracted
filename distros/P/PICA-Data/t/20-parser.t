@@ -17,6 +17,10 @@ is $first->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
 is_deeply $first->{record}->[11],
     ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'], 'sub field with $';
 
+my $all = pica_parser(plain => 't/files/pica.plain')->all;
+is_deeply $all->[0], $first, 'read all';
+is @$all, 2, 'read all';
+
 foreach my $type (qw(Plain Plus JSON Binary XML PPXML PIXML Import)) {
     my $module = "PICA::Parser::$type";
     my $file   = 't/files/pica.' . lc($type);

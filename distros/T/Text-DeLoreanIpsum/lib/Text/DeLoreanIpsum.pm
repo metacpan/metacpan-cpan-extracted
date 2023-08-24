@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use List::MoreUtils qw(uniq);
 use Text::DeLoreanIpsumData qw/ getData /;
+
 use vars qw($VERSION);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 my $deLoreanIpsum;
 
@@ -21,6 +22,7 @@ sub generate_characterlist {
     my $self = shift;
     my $all = shift;
     my $getData = getData();
+
     return $all
         ? [ map { keys %$_ } @$getData ]
         : [ uniq sort map { keys %$_ } @$getData ];
@@ -29,6 +31,7 @@ sub generate_characterlist {
 sub characterlist {
     my $self = shift;
     my $all = shift;
+
     $self->{ characterlist } ||= $self->generate_characterlist($all);
 }
 
@@ -45,6 +48,7 @@ sub get_character {
 sub characters {
     my $self = shift;
     my $all = shift || 0;
+
     my @characters;
     return join(' / ', @{$self->characterlist($all)});
 }
@@ -53,9 +57,10 @@ sub generate_wordlist {
     my $self = shift;
     my $character = shift;
     my $getData = getData();
+
     my @words;
-    foreach my $line ( @$getData ) {
-        next unless ( $character eq shift [keys %$line]);
+    foreach my $line (@$getData) {
+        next unless $line->{$character};
         push @words, map { s/\W//; lc($_) } map { split /\s/, $_ } values %$line;
     }
     return \@words;
@@ -83,31 +88,35 @@ sub words {
     my $self = shift;
     my $num  = shift || 1;
     my $character = shift || $self->get_character();
-    my @words;
-    push @words, $self->get_word($character) for (1..$num);
-    return join(' ', @words);
+
+    return join ' ', map { $self->get_word($character) }
+                       (0..$num-1);
 }
 
 sub get_sentence {
     my $self = shift;
     my $character = shift || $self->get_character();
+
     my $words = $self->words( 4 + int( rand( 6 ) ), $character);
-    sprintf '%s: %s', $character, ucfirst( $words );
+
+    return sprintf '%s: %s', $character, ucfirst( $words );
 }
 
 sub sentences {
     my $self = shift;
-    my $num = shift || 1 ;
+    my $num = shift || 1;
     my $character = shift;
-    my @sentences;
-    push @sentences, $self->get_sentence($character) for (1..$num);
-    join( '. ', @sentences ) . '.';
+
+    my @sentences = map { $self->get_sentence($character) }
+                      0..$num-1;
+
+    return join( '. ', @sentences ) . '.';
 }
 
 sub get_paragraph {
     my $self = shift;
     my $character = shift;
-    my $sentences = $self->sentences(3 + int( rand( 4 ) ), $character );
+    return $self->sentences(3 + int( rand( 4 ) ), $character );
 }
 
 sub paragraphs {
@@ -116,7 +125,7 @@ sub paragraphs {
     my $character = shift;
     my @paragraphs;
     push @paragraphs, $self->get_paragraph($character) for (1..$num);
-    join "\n\n", @paragraphs;
+    return join "\n\n", @paragraphs;
 }
 
 1;
@@ -164,15 +173,15 @@ The default constructor, C<new()> takes no arguments and returns a Text::DeLorea
 
 =item C<words( INTEGER )>
 
-Returns INTEGER fake TBBT words.
+Returns INTEGER words from fake BTTF text.
 
 =item C<sentences( INTEGER )>
 
-Returns INTEGER sentences in fake TBBT.
+Returns INTEGER sentences from fake BTTF text.
 
 =item C<paragraphs( INTEGER )>
 
-Returns INTEGER paragraphs of fake TBBT text.
+Returns INTEGER paragraphs from fake BTTF text.
 
 =back
 
@@ -186,7 +195,7 @@ Mariano Spadaccini (MARIANOS)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Mariano Spadaccini
+Copyright (C) 2016, 2023 by Mariano Spadaccini
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,
 at your option, any later version of Perl 5 you may have available.

@@ -10,7 +10,7 @@ my $s = Slick->new;
 # Create a Redis instance
 $s->cache(
     my_redis => type => 'redis',    # Slick Arguments
-    server   => '127.0.0.1:6379'    # Cache::Memcached arguments
+    server   => '127.0.0.1:6379'    # Redis arguments
 );
 
 # Create a Memcached instance

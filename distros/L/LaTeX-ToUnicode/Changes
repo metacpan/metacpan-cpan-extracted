@@ -1,5 +1,11 @@
 Changes for LaTeX::ToUnicode
 
+0.53    2023-08-20 Tests fixed, new release
+
+0.52	2022-11-07  Support many more control sequences, \kern removal,
+        \<newline>, etc. Add ltxunitxt script to access functionality
+        from command line.
+
 0.11    2020-12-12  Updates and cleaing
 
 0.05    2016-11-23 02:28:35+00:00

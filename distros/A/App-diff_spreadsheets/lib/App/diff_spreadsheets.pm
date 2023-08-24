@@ -6,8 +6,8 @@
 
 package App::diff_spreadsheets;
 
-our $DATE = '2023-07-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2023-08-23'; # DATE
+our $VERSION = '1.018'; # VERSION
 
 1;
 

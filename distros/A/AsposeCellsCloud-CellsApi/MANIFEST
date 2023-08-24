@@ -752,6 +752,7 @@ lib/AsposeCellsCloud/Object/PageSection.pm
 lib/AsposeCellsCloud/Object/PageSetup.pm
 lib/AsposeCellsCloud/Object/PasteOptions.pm
 lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm
+lib/AsposeCellsCloud/Object/Protection.pm
 lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm
 lib/AsposeCellsCloud/Object/Range.pm
 lib/AsposeCellsCloud/Object/Ranges.pm
@@ -953,6 +954,7 @@ lib/AsposeCellsCloud/Object/ImportXMLRequest.pm
 lib/AsposeCellsCloud/Object/MatchConditionRequest.pm
 lib/AsposeCellsCloud/Object/PasswordRequest.pm
 lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm
+lib/AsposeCellsCloud/Object/ProtectWorkbookRequst.pm
 lib/AsposeCellsCloud/Object/RangeCopyRequest.pm
 lib/AsposeCellsCloud/Object/RangeSetOutlineBorderRequest.pm
 lib/AsposeCellsCloud/Object/RangeSetStyleRequest.pm
@@ -962,6 +964,9 @@ lib/AsposeCellsCloud/Object/TotalRequest.pm
 lib/AsposeCellsCloud/Object/WorkbookEncryptionRequest.pm
 lib/AsposeCellsCloud/Object/WorkbookProtectionRequest.pm
 lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm
+lib/AsposeCellsCloud/Object/ImageOrPrintOptions.pm
+lib/AsposeCellsCloud/Object/RenderingFont.pm
+lib/AsposeCellsCloud/Object/RenderingWatermark.pm
 lib/AsposeCellsCloud/Object/PivotField.pm
 lib/AsposeCellsCloud/Object/PivotFilter.pm
 lib/AsposeCellsCloud/Object/PivotItem.pm
@@ -1019,6 +1024,7 @@ lib/AsposeCellsCloud/Object/Spinner.pm
 lib/AsposeCellsCloud/Object/TextBox.pm
 lib/AsposeCellsCloud/Object/TextureFill.pm
 lib/AsposeCellsCloud/Object/TilePicOption.pm
+lib/AsposeCellsCloud/Object/DigitalSignature.pm
 lib/AsposeCellsCloud/Object/Axis.pm
 lib/AsposeCellsCloud/Object/Chart.pm
 lib/AsposeCellsCloud/Object/ChartArea.pm
@@ -1070,7 +1076,6 @@ lib/AsposeCellsCloud/Request/PostBatchProtectRequest.pm
 lib/AsposeCellsCloud/Request/PostBatchLockRequest.pm
 lib/AsposeCellsCloud/Request/PostBatchUnlockRequest.pm
 lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm
-lib/AsposeCellsCloud/Request/GetExtractBarcodesRequest.pm
 lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm
 lib/AsposeCellsCloud/Request/PostClearFormatsRequest.pm
 lib/AsposeCellsCloud/Request/PostUpdateWorksheetRangeStyleRequest.pm
@@ -1172,6 +1177,7 @@ lib/AsposeCellsCloud/Request/PostCompressRequest.pm
 lib/AsposeCellsCloud/Request/PostExportRequest.pm
 lib/AsposeCellsCloud/Request/PostMergeRequest.pm
 lib/AsposeCellsCloud/Request/PostUnlockRequest.pm
+lib/AsposeCellsCloud/Request/PostLockRequest.pm
 lib/AsposeCellsCloud/Request/PostProtectRequest.pm
 lib/AsposeCellsCloud/Request/PostSplitRequest.pm
 lib/AsposeCellsCloud/Request/PostSearchRequest.pm

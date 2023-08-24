@@ -1,0 +1,17 @@
+<%doc>
+Show a selection element to choose the pinned comment search attribute in
+the search builder.
+</%doc>
+\
+<%ARGS>
+$Name => undef
+</%ARGS>
+\
+<%INIT>
+return if (not defined $Name);
+</%INIT>
+\
+<select name="<% $Name %>">\
+<option value="">-</option>\
+<option value="PinnedComment"><&|/l&>Has a pinned comment</&></option>\
+</select>

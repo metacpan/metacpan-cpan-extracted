@@ -1,3 +1,8 @@
+0.007  TBD
+  - Alpha release #7
+  - Fix bug with Slick::Database
+  - Various POD fixes
+
 0.006  2023-08-03
   - Alpha release #6
   - Add Slick::Annotation

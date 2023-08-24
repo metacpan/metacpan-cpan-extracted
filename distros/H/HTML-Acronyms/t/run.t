@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test2::V0;
 
-plan tests => 3;
+plan tests => 5;
 
 use HTML::Acronyms ();
 
@@ -41,5 +41,19 @@ use HTML::Acronyms ();
         scalar( $acro->abbr( { key => 'SQL', no_link => 0 } )->{html} ),
 qq#<a href="https://en.wikipedia.org/wiki/SQL"><abbr title="Structured Query Language">SQL</abbr></a>#,
         "no_link test",
+    );
+
+    # TEST
+    is(
+        scalar( $acro->abbr( { key => 'WDYM', link => 0 } )->{html} ),
+        qq#<abbr title="what do you mean">WDYM</abbr>#,
+        "false link test",
+    );
+
+    # TEST
+    is(
+        scalar( $acro->abbr( { key => 'SQL', link => 1 } )->{html} ),
+qq#<a href="https://en.wikipedia.org/wiki/SQL"><abbr title="Structured Query Language">SQL</abbr></a>#,
+        "link test",
     );
 }

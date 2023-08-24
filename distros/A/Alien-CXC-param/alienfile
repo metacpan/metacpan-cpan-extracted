@@ -1,0 +1,35 @@
+#! perl
+
+use v5.012;
+use strict;
+use warnings;
+
+use alienfile;
+use Path::Tiny;
+
+our $VERSION = '0.03';
+
+my $pkg_name = 'cxcparam';
+
+plugin 'Gather::IsolateDynamic';
+
+plugin PkgConfig => ( pkg_name => $pkg_name, );
+
+probe ["pkg-config --exists $pkg_name"];
+
+share {
+    start_url 'inc/cxcparam-4.12.0.5.tar.gz';
+
+    plugin 'Download';
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::Autoconf' => ( with_pic => 1 );
+    build [ '%{configure}', '%{make}', '%{make} install', ];
+};
+
+gather [
+    [ "pkg-config --modversion $pkg_name", \'%{.runtime.version}' ],
+    [ "pkg-config --cflags     $pkg_name", \'%{.runtime.cflags}' ],
+    [ "pkg-config --libs       $pkg_name", \'%{.runtime.libs}' ],
+];

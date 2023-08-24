@@ -1,3 +1,49 @@
+0.204003 2023-08-22
+  [Changes]
+    * Type comments of the ioctl method in the IO::Handle are changed.
+      -  method ioctl : int ($request : int, $request_arg : object = undef of Byte|Short|Int|Long|Float|Double|object);
+      +  static method ioctl : int ($fd : int, $request : int, $request_arg_ref : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef);
+  [Bug Fix]
+    * A bug is fixed: The blocking method in the IO::Handle has not work well in Windows.
+0.204002 2023-08-22
+  [Bug Fix]
+    * A bug is fixed. FIONBIO has not been defined.
+    
+0.204001 2023-08-22
+  [Prerequirement Changes]
+    * SPVM::Sys 0.482 is required.
+0.204  2023-08-18
+  [New Features]
+  
+    The following methods are added to IO::Socket.
+      +  method write : int ($string : string, $length : int = -1, $offset : int = 0);
+      
+      +  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
+      
+  [Incompatibe Changes]
+    The following methods are removed from IO::File and IO::Handle.
+    
+      method syswrite : int ($buffer : string, $length : int, $offset : int = 0);
+      
+      method sysread : int ($buffer : mutable string, $length : int, $offset : int = 0);
+  [Changes]
+  
+    The following methods in IO::File and IO::Handle are changed.
+      
+      -  method write : int ($buffer : string, $length : int, $offset : int = 0);
+      +  method write : int ($string : string, $length : int = -1, $offset : int = 0);
+      
+      -  method read : int ($buffer : mutable string, $length : int, $offset : int = 0);
+      +  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
+      
+0.203  2023-08-15
+  [New Features]
+    The following method is added to IO::Socket.
+    
+      method peerport : int ();
+      
+      method peerhost : string ();
+    
 0.202001  2023-05-29
   [Prerequirement Changes]
     * SPVM 0.986+ is required.

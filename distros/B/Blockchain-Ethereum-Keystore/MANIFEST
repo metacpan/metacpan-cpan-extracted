@@ -6,9 +6,10 @@ cpanfile
 lib/Blockchain/Ethereum/Keystore.pm
 lib/Blockchain/Ethereum/Keystore/Address.pm
 lib/Blockchain/Ethereum/Keystore/Key.pm
-lib/Blockchain/Ethereum/Keystore/Key/PrivateKey.pm
+lib/Blockchain/Ethereum/Keystore/Key/PKUtil.pm
 lib/Blockchain/Ethereum/Keystore/Keyfile.pm
 lib/Blockchain/Ethereum/Keystore/Keyfile/KDF.pm
+lib/Blockchain/Ethereum/Keystore/Seed.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -19,6 +20,7 @@ t/key.t
 t/keyfile.t
 t/resources/pbkdf2_v3.json
 t/resources/scrypt_v3.json
+t/seed.t
 xt/manifest.t
 xt/perl-critic.t
 xt/perl-pod.t

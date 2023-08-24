@@ -1,0 +1,114 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Minimal {
+  version "0.001";
+  
+  use Fn;
+  use Regex;
+  use Hash;
+  use Sys;
+  use Format;
+  use Sys::Time::Tm;
+  use HTTP::Minimal::Socket;
+  use HTTP::Minimal::Message::Request;
+  use HTTP::Minimal::Message::Response;
+  use HTTP::Minimal::Headers;
+  use HTTP::Minimal::URL;
+  
+  # Fields
+  has agent : ro string;
+  
+  has timeout : ro int;
+  
+  # Class Methods
+  static method new : HTTP::Minimal ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $self = new HTTP::Minimal;
+    
+    # timeout
+    my $timeout = $options_h->delete_or_default_int("timeout", 60);
+    $self->{timeout} = $timeout;
+    unless ($timeout >= 0) {
+      die "The timeout option must be greater than or equal to 0";
+    }
+    
+    # agent
+    my $default_agent = $self->create_default_agent;
+    my $agent = $options_h->delete_or_default_string("agent", $default_agent);
+    $self->{agent} = $agent;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method get : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef) {
+    
+    unless ($url) {
+      die "The \$url must be defined.";
+    }
+    
+    my $response = $self->request("GET", $url, $options);
+    
+    return $response;
+  }
+  
+  method create_default_agent : string () {
+    
+    my $default_agent = "SPVM/HTTP::Minimal";
+    
+    my $version = Fn->get_version_string("HTTP::Minimal");
+    
+    $default_agent .= "/$version";
+    
+    return $default_agent;
+  }
+  
+  private method request : HTTP::Minimal::Message::Response ($method : string, $url_string : string, $options : object[])  {
+    
+    my $options_h = Hash->new($options);
+    
+    my $data_callback = $options_h->delete_or_default("data_callback", undef);
+    
+    my $headers = (HTTP::Minimal::Headers)$options_h->delete_or_default("headers", undef);
+    
+    my $timeout = $options_h->delete_or_default_int("timeout", $self->{timeout});
+    
+    for my $name (@{$options_h->keys}) {
+      die "The \$name option is not available.";
+    }
+    
+    unless ($headers) {
+      $headers = HTTP::Minimal::Headers->new;
+    }
+    
+    unless ($headers->get("user-agent")) {
+      my $agent = $self->{agent};
+      $headers->add("user-agent" => $agent);
+    }
+    
+    my $url = HTTP::Minimal::URL->parse($url_string);
+    
+    my $request = HTTP::Minimal::Message::Request->new({
+      method    => $method,
+      url => $url,
+      headers   => $headers,
+    });
+    
+    my $socket  = HTTP::Minimal::Socket->new({
+      timeout => $timeout,
+      data_callback => $data_callback,
+    });
+    
+    $socket->connect($request);
+    
+    $socket->write_request($request);
+    
+    my $response = $socket->read_response;
+    
+    return $response;
+  }
+  
+}

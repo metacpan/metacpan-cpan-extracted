@@ -73,9 +73,27 @@ foreach my $lib (keys %libs) {
             hash_check($p)
         };
     }
+
     subtest "Testing $lib with 32x32 img" => sub {
         my $p = $ipht->pHash();
         is($p, 'D39F36E74DFB6D9F', 'Same hash expected for fixed image');
+    };
+
+    subtest "Loading $lib object" => sub {
+        my $obj;
+        if ($lib eq 'Image::Imlib2') {
+            $obj = Image::Imlib2->load('images/M31_s.jpg');
+        } elsif ($lib eq 'GD') {
+            GD::Image->trueColor(1);
+            $obj = GD::Image->new('images/M31_s.jpg');
+        } elsif ($lib eq 'Image::Magick') {
+            $obj = Image::Magick->new();
+            $obj->Read('images/M31_s.jpg');
+        } else {
+            $obj = Imager->new('file' => 'images/M31_s.jpg');
+        }
+        my $iph = Image::PHash->new($obj);
+        is($iph->{im}, $obj, 'object loaded');
     };
 }
 

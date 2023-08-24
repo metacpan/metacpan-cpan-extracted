@@ -6,7 +6,7 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 use Hash::Fold ();
 
@@ -83,7 +83,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Class - Class role for OptArgs2
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 DESCRIPTION
 
@@ -123,17 +123,17 @@ information.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs>
+Please report any bugs or feature requests to bug-cxc-form-tiny-plugin-optargs2@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Form-Tiny-Plugin-OptArgs2>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs.git
+  https://gitlab.com/djerius/cxc-form-tiny-plugin-optargs2.git
 
 =head1 SEE ALSO
 

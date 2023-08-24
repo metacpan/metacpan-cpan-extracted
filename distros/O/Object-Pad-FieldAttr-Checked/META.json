@@ -22,7 +22,13 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "Object::Pad::ExtensionBuilder" : "0.57"
+            "Object::Pad::ExtensionBuilder" : "0.802"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.802",
+            "perl" : "5.022"
          }
       },
       "test" : {
@@ -34,7 +40,7 @@
    "provides" : {
       "Object::Pad::FieldAttr::Checked" : {
          "file" : "lib/Object/Pad/FieldAttr/Checked.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -43,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

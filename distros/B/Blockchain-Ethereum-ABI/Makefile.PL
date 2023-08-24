@@ -27,8 +27,11 @@ my %WriteMakefileArgs = (
         'Test::Fatal' => '0.016',
     },
     PREREQ_PM => {
-        'Object::Pad'    => '0.79',
-        'Digest::Keccak' => '0.05',
+        'Object::Pad'              => '0.79',
+        'Crypt::Digest::Keccak256' => '0.078',
+        'Math::BigInt'             => '1.999811',
+        'Scalar::Util'             => '1.63',
+        'Module::Load'             => '0.36',
     },
     dist => {
         COMPRESS => 'gzip -9f',

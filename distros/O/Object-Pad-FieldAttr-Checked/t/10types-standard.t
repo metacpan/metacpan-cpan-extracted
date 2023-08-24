@@ -8,14 +8,14 @@ use Test2::V0;
 BEGIN {
    eval { require Types::Standard } or
       plan skip_all => "Types::Standard is not available";
-
-   Types::Standard->import(qw( Num Maybe ));
 }
 
 use Object::Pad;
 use Object::Pad::FieldAttr::Checked;
 
 class Point {
+   use Types::Standard qw( Num );
+
    field $x :Checked(Num) :param :reader :writer;
    field $y :Checked(Num) :param :reader :writer;
 }
@@ -34,6 +34,8 @@ class Point {
 }
 
 class MaybePoint {
+   use Types::Standard qw( Maybe Num );
+
    field $x :Checked(Maybe[Num]) :param :reader :writer;
 }
 

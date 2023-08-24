@@ -5,7 +5,7 @@ use warnings;
 
 use App::Test::DWG::LibreDWG::DwgRead;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::Test::DWG::LibreDWG::DwgRead->new->run;
@@ -28,7 +28,7 @@ test-dwg-libredwg-dwgread - Script to test DWG files by LibreDWG dwgread command
 
 =head1 SYNOPSIS
 
- test-dwg-libredwg-dwgread [-d test_dir] [-h] [-m match_string] [-v level] [--version] directory
+ test-dwg-libredwg-dwgread [-d test_dir] [-h] [-i] [-m match_string] [-v level] [--version] directory
 
 =head1 DESCRIPTION
 
@@ -49,6 +49,12 @@ Test directory. If doesn't exist, create dir in system tmp.
 =item * C<-h>
 
 Print help.
+
+=item * C<-i>
+
+Ignore errors.
+
+Default value is error reporting.
 
 =item * C<-m match_string>
 
@@ -104,6 +110,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

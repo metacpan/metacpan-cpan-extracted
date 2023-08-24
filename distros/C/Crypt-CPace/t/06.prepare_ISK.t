@@ -25,7 +25,7 @@ my $hash_name = 'SHA256';
 
 # a, b calculate_generator G
 my ($G, $params_ref) = calculate_generator($DSI, $PRS, $CI, $sid, $group_name, $type, $hash_name, \&expand_message_xmd, 1);
-my ($group, $c1, $c2, $p, $a, $b, $z, $ctx) = @$params_ref;
+my ($group, $ctx) = @{$params_ref}{qw/group ctx/};
 my $G_hex = Crypt::OpenSSL::EC::EC_POINT::point2hex($group, $G, 4, $ctx);
 print "G=", $G_hex, "\n\n";
 

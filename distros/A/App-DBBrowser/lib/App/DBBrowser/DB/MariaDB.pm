@@ -29,7 +29,7 @@ sub get_db_driver {
 
 sub env_variables {
     my ( $sf ) = @_;
-    return [ qw( DBI_DSN DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
+    return [ qw( DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
 }
 
 
@@ -63,20 +63,17 @@ sub get_db_handle {
 
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
-    my $dsn;
+    my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
     my $show_sofar = 'DB '. $db;
-    if ( ! $env_var_yes->{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
-        $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
-        my $host = $cred->get_login( 'host', $show_sofar, $settings );
-        if ( defined $host ) {
-            $show_sofar .= "\n" . 'Host: ' . $host;
-            $dsn .= ";host=$host" if length $host;
-        }
-        my $port = $cred->get_login( 'port', $show_sofar, $settings );
-        if ( defined $port ) {
-            $show_sofar .= "\n" . 'Port: ' . $port;
-            $dsn .= ";port=$port" if length $port;
-        }
+    my $host = $cred->get_login( 'host', $show_sofar, $settings );
+    if ( defined $host ) {
+        $show_sofar .= "\n" . 'Host: ' . $host;
+        $dsn .= ";host=$host" if length $host;
+    }
+    my $port = $cred->get_login( 'port', $show_sofar, $settings );
+    if ( defined $port ) {
+        $show_sofar .= "\n" . 'Port: ' . $port;
+        $dsn .= ";port=$port" if length $port;
     }
     my $user   = $cred->get_login( 'user', $show_sofar, $settings );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;

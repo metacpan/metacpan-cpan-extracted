@@ -1,5 +1,5 @@
 package Form::Tiny;
-$Form::Tiny::VERSION = '2.19';
+$Form::Tiny::VERSION = '2.21';
 use v5.10;
 use strict;
 use warnings;
@@ -190,6 +190,8 @@ Domain-Specific Language (DSL).
 
 =item * L<Form::Tiny::Plugin> - How to write your own plugin?
 
+=item * L<Form::Tiny::Meta> - Form metamodel documentation
+
 =back
 
 =head1 IMPORTING
@@ -341,8 +343,6 @@ calling L<Form::Tiny::Utils::trim> on them.
 =head1 TODO
 
 =over
-
-=item * Document and test meta classes
 
 =item * More tests for form inheritance
 

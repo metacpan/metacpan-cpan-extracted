@@ -20,6 +20,7 @@ extends 'Business::GoCardless::Resource';
 
     created_at
     consent_parameters
+    funds_settlement
     id
     links
     metadata
@@ -35,6 +36,7 @@ extends 'Business::GoCardless::Resource';
 has [ qw/
     created_at
     consent_parameters
+    funds_settlement
     id
     links
     metadata
@@ -100,6 +102,16 @@ sub active                    { return shift->status eq 'active' }
 sub failed                    { return shift->status eq 'failed' }
 sub cancelled                 { return shift->status eq 'cancelled' }
 sub expired                   { return shift->status eq 'expired' }
+
+=head1 Funds settlement checks on a mandate
+
+    is_managed
+    is_direct
+
+=cut
+
+sub is_managed { return shift->funds_settlement eq 'managed' }
+sub is_direct  { return shift->funds_settlement eq 'direct' }
 
 =head1 AUTHOR
 

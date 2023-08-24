@@ -79,7 +79,7 @@ sub cc
 
 @EXPORT = qw(rpn rpn_error rpn_separator_out  rpn_separator_in);
 
-$VERSION = '2.85';
+$VERSION = '2.86';
 
 my %dict;
 my %pub_dict;
@@ -189,6 +189,20 @@ $dict{'**'} = sub {
     return \@ret, 2, 0;
 };
 
+=head2 a SRQRT
+
+      return the square root of a
+        
+=cut
+
+$dict{'SQRT'} = sub {
+    my $work1 = shift;
+    my $a     = pop @{ $work1 };
+ 
+    my @ret;
+    push @ret, $a**.5;
+    return \@ret, 1, 0;
+};
 =head2 a 1+
 
       return the result of 'a' +1 
@@ -398,6 +412,41 @@ $dict{LN} = sub {
     }
     return \@ret, 1, 0;
 };
+
+
+=head2 a LOGB
+
+      return the result of log 'a'  in base 'b'
+      if = 0 return '' (to prevent exception raise)
+        
+=cut
+
+$dict{LOGB} = sub {
+    my $work1 = shift;
+    my $a     = pop @{ $work1 };
+    my $b     = pop @{ $work1 };
+    my @ret;
+    my @ret;
+    my $c;
+    my $d;
+    eval { 
+           ( $c = log( $a ) );
+           ( $d = log( $b ) );
+    };
+    if ( $@ )
+    {
+        chomp $@;
+        $DEBUG = $@;
+        @ret   = ();
+    }
+    else
+    {
+        push @ret, $d/$c;
+    }
+    return \@ret, 2, 0;
+};
+
+
 
 =head2 a EXP
 
@@ -5182,6 +5231,7 @@ __END__
             TAN                 ([a])                   ([TAN a])       Unit in radian
             CTAN                ([a])                   ([CTAN a])      Unit in radian
             LN                  ([a])                   ([LOG a])
+            LOGB                ([a][b])                ([LOG base b of a]) 
             EXP                 ([a])                   ([EXP a])
             PI                                          ([3.14159265358979])    
             

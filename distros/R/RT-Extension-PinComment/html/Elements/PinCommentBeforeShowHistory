@@ -1,0 +1,80 @@
+<%doc>
+If this ticket has a pinned comment, show it, in its own section.
+
+Expects an RT::Ticket object referring to a ticket, for the current user.
+
+This element is called by the BeforeShowHistory callback of
+/Ticket/Display.html and /SelfService/Display.html.
+</%doc>
+\
+<%ARGS>
+$Ticket => undef
+</%ARGS>
+\
+<%INIT>
+# Do nothing if a ticket was not supplied.
+return if ( not defined $Ticket );
+return if ( not ref $Ticket );
+
+# Check which comment is pinned, if any.
+my $CurrentlyPinnedComment = undef;
+my $TicketPinnedCommentAttribute = $Ticket->FirstAttribute('PinnedComment');
+$CurrentlyPinnedComment = $TicketPinnedCommentAttribute->Content
+  if ( defined $TicketPinnedCommentAttribute
+    && ref $TicketPinnedCommentAttribute );
+
+# Do nothing if there was is pinned comment.
+return if ( not $CurrentlyPinnedComment );
+
+# Load a transactions list for this ticket, restricted to just the pinned
+# comment, so that we can be sure the pinned comment is really for this
+# ticket and the user is allowed to see it.
+my $TransactionsObj = RT::Transactions->new( $Ticket->CurrentUser );
+$TransactionsObj->LimitToTicket( $Ticket->id );
+$TransactionsObj->Limit(
+    FIELD           => 'id',
+    VALUE           => $CurrentlyPinnedComment,
+    ENTRYAGGREGATOR => 'AND'
+);
+my $PinnedTransactionObj = $TransactionsObj->Next;
+
+# Do nothing if we didn't end up with a transaction to show.
+return if ( not defined $PinnedTransactionObj );
+return if ( not $PinnedTransactionObj->id );
+
+# Do nothing if the transaction has no attachments, since that means it's
+# empty so there is nothing to show.
+my $PinnedTransactionAttachments = $PinnedTransactionObj->Attachments;
+return if ( not $PinnedTransactionAttachments );
+my @PinnedTransactionAttachmentItems =
+  @{ $PinnedTransactionAttachments->ItemsArrayRef() };
+
+# Load the pinned transaction's attachments for /Elements/ShowTransaction.
+# Based on RT5 /Elements/ShowHistoryPage.
+my $trans_content     = {};
+my $trans_attachments = {};
+foreach my $Attachment (@PinnedTransactionAttachmentItems) {
+    $trans_content->{ $Attachment->TransactionId }->{ $Attachment->id } = $_;
+    my $tmp = $trans_attachments->{ $Attachment->TransactionId } ||= {};
+    push @{ $tmp->{ $Attachment->Parent || 0 } ||= [] }, $Attachment;
+}
+</%INIT>
+\
+<div class="PinCommentSticky history ticket">
+<&| /Widgets/TitleBox, title => loc('Pinned comment') &>
+<div class="history-container">
+<& /Elements/ShowTransaction,
+   Object => $Ticket,
+   Transaction => $PinnedTransactionObj,
+   ShowHeaders => 0,
+   ShowBody => 1,
+   RowNum => 1,
+   Attachments => $trans_attachments->{$CurrentlyPinnedComment} || {},
+   AttachmentContent => $trans_content,
+   DownloadableHeaders => 0,
+   HasTxnCFs => 0
+&>
+</div>
+</&>
+</div>
+<br />

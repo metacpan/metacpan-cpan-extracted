@@ -10,7 +10,7 @@ use experimental qw(signatures);
 use strict;
 # use Exporter qw(import);
 
-our $VERSION = 1.10;
+our $VERSION = 1.11;
 
 use File::Basename qw(basename dirname);
 use Time::HiRes qw(gettimeofday sleep);
@@ -79,7 +79,6 @@ my sub owner_check( $o ) {
 my sub patience_check( $p ) {
     return undef if not defined $p;
     if ($p !~ m/^\d+(\.\d+)?$/n) { warn 'Patience set to bad value "'.$p.'".'; return undef; };
-    if ($p == 0) { warn 'Patience set to bad value "0".'; return undef; };
     return $p;
     };
 
@@ -510,7 +509,7 @@ Sys::Tlock - Locking with timeouts.
 
 =head1 VERSION
 
-1.10
+1.11
 
 =head1 SYNOPSIS
 
@@ -535,7 +534,7 @@ Sys::Tlock - Locking with timeouts.
 
     print "tlock patience is ${patience}\n";
 
-    # Checking lock is alive.
+    # Checking that tlock is alive.
     my $t = $ARGV[0];
     die 'Tlock not taken.' if not tlock_alive('maint',$t);
 
@@ -543,17 +542,17 @@ Sys::Tlock - Locking with timeouts.
     tlock_renew('maint',600);
     do_fancy_log_rotation(547);
 
-    # Call another script that requires this lock.
+    # Call another script that requires this tlock.
     system( './clean-up.sh' , $t );
 
-    # Releasing the lock.
+    # Releasing the tlock.
     tlock_release('maint',$t);
 
 =head1 DESCRIPTION
 
 This module is handling tlocks, advisory locks with timeouts.
 
-It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, tlocks are paired with a lock token.
+It is designed to allow separate programs to use the same tlocks between them. Even programs written in different languages. To do this safely, each tlock is paired with a token.
 
 The tlocks are simply living in a lock directory in the filesystem. A distant predecessor to this module was written as a kludge to make locking work properly on a Windows server. But it turned out to be very handy to have tlocks in the filesystem, giving you an at-a-glance overview of them. And giving the non-scripting sysadmins easy access to view and manipulate them.
 
@@ -595,7 +594,7 @@ C<marker> For the marker (prefix) that all tlock directory names will get.
 
 C<owner> For the UID of the owner that will be set for tlock directories.
 
-C<patience> For the time that a call will wait for a lock release.
+C<patience> For the time that a call will wait for a tlock release.
 
     tlock 1
     # Example configuration file for tlock.
@@ -604,7 +603,7 @@ C<patience> For the time that a call will wait for a lock release.
 
 =head2 TOKENS
 
-Safe use of tlocks involve tokens, which are just timestamps of when the lock was taken.
+Safe use of tlocks involve tokens, which are just timestamps of when the tlock was taken.
 
 Without tokens, something like this could happen...
 
@@ -624,9 +623,9 @@ Each tlock is a subdirectory of the lock directory. Their names are "${marker}.$
 
 All the data for a tlock is in its directory. If it is removed from the lock directory, the tlock is released. If it is moved back in, it is alive again (unless it has timed out). If too much playing around has messed up the lock directory, running tlock_zing on it cleans it up.
 
-The lock directory also contains shortlived directories named "${marker}_.${label}". They are per label master locks that help to make changes to the normal locks atomic.
+The lock directory also contains shortlived directories named "${marker}_.${label}". They are per label master locks that help to make changes to the tlocks atomic.
 
-=head1 FUNCTIONS AND VARIABLES
+=head1 SUBROUTINES AND VARIABLES
 
 Loaded by default:
 L<tlock_take|/tlock_take( $label , $timeout )>,
@@ -680,7 +679,7 @@ Returns the time when the current tlock with the given label will expire. It is 
 
 =item tlock_zing()
 
-Cleans up locks in the lock directory. Takes care not to mess with any lock activity.
+Cleans up tlocks in the lock directory. Takes care not to mess with any lock activity.
 
 =item tlock_tstart( $label )
 
@@ -726,19 +725,21 @@ Only loaded on demand.
 
 =item $patience
 
-Patience is the time a call will try to take or change a tlock, before it gives up. For example when tlock_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.
+Patience is the number of seconds a call will try to take or change a tlock, before it gives up. For example when tlock_take tries to take a tlock that is already taken, it is the number of seconds it should wait for that tlock to be released before giving up.
+
+Patience can be set to any non-negative fractional number. If it is set to 0, a call only tries once before giving up.
 
 Dont confuse patience with timeout.
 
-Default patience value is 2.5 seconds.
+Default patience value is 0.
 
 Only loaded on demand.
+
+=back
 
 =head2 NAMED PARAMETERS
 
 All the tlock subroutines can be given optional named parameters. They must be written after the mandatory parameters. The names can be "conf", "dir", "marker", "owner" and "patience". See the L<CONFIGURATION|/CONFIGURATION> chapter for more details.
-
-=back
 
 =head1 DEPENDENCIES
 

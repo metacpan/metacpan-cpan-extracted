@@ -1109,14 +1109,14 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     }
   }
 
-  if(rolemeta->fieldhooks_initfield) {
-    if(!classmeta->fieldhooks_initfield)
-      classmeta->fieldhooks_initfield = newAV();
+  if(rolemeta->fieldhooks_makefield) {
+    if(!classmeta->fieldhooks_makefield)
+      classmeta->fieldhooks_makefield = newAV();
 
     U32 i;
-    for(i = 0; i < av_count(rolemeta->fieldhooks_initfield); i++) {
-      struct FieldHook *roleh = (struct FieldHook *)AvARRAY(rolemeta->fieldhooks_initfield)[i];
-      av_push(classmeta->fieldhooks_initfield, (SV *)embed_fieldhook(roleh, embedding->offset));
+    for(i = 0; i < av_count(rolemeta->fieldhooks_makefield); i++) {
+      struct FieldHook *roleh = (struct FieldHook *)AvARRAY(rolemeta->fieldhooks_makefield)[i];
+      av_push(classmeta->fieldhooks_makefield, (SV *)embed_fieldhook(roleh, embedding->offset));
     }
   }
 
@@ -1358,9 +1358,9 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {
         struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];
 
-        if(*h->funcs->post_initfield) {
-          if(!meta->fieldhooks_initfield)
-            meta->fieldhooks_initfield = newAV();
+        if(*h->funcs->post_makefield) {
+          if(!meta->fieldhooks_makefield)
+            meta->fieldhooks_makefield = newAV();
 
           struct FieldHook *fasth;
           Newx(fasth, 1, struct FieldHook);
@@ -1373,7 +1373,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
             .attrdata  = h->attrdata,
           };
 
-          av_push(meta->fieldhooks_initfield, (SV *)fasth);
+          av_push(meta->fieldhooks_makefield, (SV *)fasth);
         }
 
         if(*h->funcs->post_construct) {
@@ -1594,7 +1594,7 @@ XS_INTERNAL(injected_constructor)
 
   SV **fieldsvs = AvARRAY(backingav);
 
-  if(meta->fieldhooks_initfield || meta->fieldhooks_construct) {
+  if(meta->fieldhooks_makefield || meta->fieldhooks_construct) {
     /* We need to set up a fake pad so these hooks can still get PADIX_SELF / PADIX_SLOTS */
 
     /* This MVP is just sufficient enough to let PAD_SVl(PADIX_SELF) work */
@@ -1606,17 +1606,17 @@ XS_INTERNAL(injected_constructor)
     PAD_SVl(PADIX_SLOTS) = (SV *)backingav;
   }
 
-  if(meta->fieldhooks_initfield) {
+  if(meta->fieldhooks_makefield) {
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
-    AV *fieldhooks = meta->fieldhooks_initfield;
+    AV *fieldhooks = meta->fieldhooks_makefield;
 
     U32 i;
     for(i = 0; i < av_count(fieldhooks); i++) {
       struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldhooks)[i];
       FIELDOFFSET fieldix = h->fieldix;
 
-      (*h->funcs->post_initfield)(aTHX_ h->fieldmeta, h->attrdata, h->funcdata, fieldsvs[fieldix]);
+      (*h->funcs->post_makefield)(aTHX_ h->fieldmeta, h->attrdata, h->funcdata, fieldsvs[fieldix]);
     }
   }
 
@@ -2023,11 +2023,11 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
       av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
     }
 
-    if(supermeta->fieldhooks_initfield) {
-      if(!meta->fieldhooks_initfield)
-        meta->fieldhooks_initfield = newAV();
+    if(supermeta->fieldhooks_makefield) {
+      if(!meta->fieldhooks_makefield)
+        meta->fieldhooks_makefield = newAV();
 
-      av_push_from_av_noinc(meta->fieldhooks_initfield, supermeta->fieldhooks_initfield);
+      av_push_from_av_noinc(meta->fieldhooks_makefield, supermeta->fieldhooks_makefield);
     }
 
     if(supermeta->fieldhooks_construct) {

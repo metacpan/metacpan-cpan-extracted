@@ -24,6 +24,7 @@ Ceccarelli
 Chase
 Costa
 David
+Dick
 Dorian
 Dubois
 Escape
@@ -128,6 +129,7 @@ capoeirab
 carnil
 data
 davewood
+ddick
 dorian
 ether
 etype
@@ -145,6 +147,8 @@ happy
 hiratara
 http
 https
+icap
+icaps
 isbn
 ishigaki
 jand

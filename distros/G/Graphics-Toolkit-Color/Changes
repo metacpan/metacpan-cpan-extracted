@@ -1,4 +1,12 @@
 
+1.54     2023-08-21    lichtkind
+-------
+    * = API development
+    * + added named ARRAY syntax for constructor like [CMYK => 0,0,1,1]
+    * - removed option to get single values from values method
+    * & splittet GTC::Constant package into ::Name and ::Name::Constant
+    * ? rewrote lot of documentation
+
 1.53     2023-08-11    lichtkind
 -------
     * = maintenance

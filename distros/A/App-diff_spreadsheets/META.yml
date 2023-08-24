@@ -6,6 +6,7 @@ build_requires:
   Capture::Tiny: '0'
   Cwd: '0'
   Data::Dumper: '0'
+  Data::Dumper::Interp: '6.003'
   English: '0'
   Env: '0'
   Exporter: '0'
@@ -36,7 +37,7 @@ name: App-diff_spreadsheets
 requires:
   Algorithm::Diff: '0'
   Carp: '0'
-  Data::Dumper::Interp: '5.025'
+  Data::Dumper::Interp: '6.003'
   Encode: '3.00'
   File::Basename: '0'
   File::Copy: '0'
@@ -65,7 +66,7 @@ resources:
   bugtracker: https://github.com/jimav/App-diff_spreadsheets/issues
   homepage: https://github.com/jimav/App-diff_spreadsheets
   repository: https://github.com/jimav/App-diff_spreadsheets.git
-version: '1.017'
-x_generated_by_perl: v5.34.0
+version: '1.018'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

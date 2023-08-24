@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION    => 'v5.26.1',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'Changesc-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

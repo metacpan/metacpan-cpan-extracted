@@ -1,7 +1,7 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Transaction::Legacy 0.005;
+package Blockchain::Ethereum::Transaction::Legacy 0.008;
 class Blockchain::Ethereum::Transaction::Legacy
     :does(Blockchain::Ethereum::Transaction);
 
@@ -63,6 +63,8 @@ method serialize {
         $self->value,
         $self->data,
     );
+
+    @params = $self->_equalize_params(\@params)->@*;
 
     if ($self->v && $self->r && $self->s) {
         push(@params, $self->v, $self->r, $self->s);

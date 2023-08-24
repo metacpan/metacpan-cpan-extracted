@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.29';
+our $VERSION   = '0.30';
 
 sub _DEFAULT_STATE { return 'VIC' }
 
@@ -906,7 +906,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2020 => { day => 23, month => 9 },    # Technically "Thank you" day.
         2021 => { day => 24, month => 8 },
         2022 => { day => 23, month => 8 },
-        2023 => { day => 22, month => 8 },
+        2023 => { day => 29, month => 8 },
     );
     if ( $year < 2015 ) {
         return ();
@@ -1279,7 +1279,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 

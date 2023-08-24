@@ -1,68 +1,56 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2006 Smithsonian Astrophysical Observatory
-#
-# This file is part of CIAO-Lib-Param
-#
-# CIAO-Lib-Param is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# CIAO-Lib-Param is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the 
-#       Free Software Foundation, Inc. 
-#       51 Franklin Street, Fifth Floor
-#       Boston, MA  02110-1301, USA
-#
-# -->8-->8-->8-->8--
-
 package CIAO::Lib::Param;
 
+# ABSTRACT: An interface to the CIAO parameter library.
 
-use 5.008002;
-use Carp;
+use 5.012;
 
 use strict;
 use warnings;
 
 require Exporter;
 
-our @ISA = qw/Exporter/;
+use parent 'Exporter';
 our @CARP_NOT = qw/ CIAO::Lib::Param::Croak /;
 
-our %EXPORT_TAGS = ( 'all' => [ qw(
-        pget
-	pquery
-	pset
-	pfind
-) ] );
+sub _croak {
+    require Carp;
+    goto \&Carp::croak;
+}
+
+our %EXPORT_TAGS = (
+    'all' => [ qw(
+          pget
+          pquery
+          pset
+          pfind
+        ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
-XSLoader::load('CIAO::Lib::Param', $VERSION);
+XSLoader::load( 'CIAO::Lib::Param', $VERSION );
 
+## no critic (Modules::ProhibitMultiplePackages)
 # very simple exception class.  don't use Exception::Class to avoid
 # too many dependencies for users.
 {
-  package CIAO::Lib::Param::Error;
+    package CIAO::Lib::Param::Error;
 
-  use overload '""' => \&error;
+    use overload
+      '""'     => \&error,
+      bool     => sub { 1 },
+      eq       => sub { die },
+      '.'      => sub { $_[0]->errstr . $_[1] },
+      fallback => !!0;
 
-  sub new { my $class = shift; bless { @_ }, $class; }
+    sub new { my $class = shift; bless {@_}, $class; }
 
-  sub error   { $_[0]->{error} }
-  sub errno   { $_[0]->{errno} }
-  sub errstr  { $_[0]->{errstr} }
-  sub errmsg  { $_[0]->{errmsg} }
+    sub error  { $_[0]->{error} }
+    sub errno  { $_[0]->{errno} }
+    sub errstr { $_[0]->{errstr} }
+    sub errmsg { $_[0]->{errmsg} }
 }
 
 
@@ -70,110 +58,119 @@ XSLoader::load('CIAO::Lib::Param', $VERSION);
 # simple wrapper around open to get croakability. note
 # that the object is blessed into CIAO::Lib::ParamPtr
 # by open.
-sub new
-{
-  my $class = shift;
+sub new {
+    #my $class =
+    shift;
 
-  my $self;
-  my $file = shift;
-  my $mode  = shift || "r";
+    my $self;
+    my $file = shift;
+    my $mode = shift || 'r';
 
-  my @arglist = @_;
+    my @arglist = @_;
 
-  my $filename;
+    my $filename;
 
-  if ( 'ARRAY' eq ref $file )
-  {
-    $filename = $file->[0];
-    unshift @arglist, $file->[1];
-  }
+    if ( 'ARRAY' eq ref $file ) {
+        $filename = $file->[0];
+        unshift @arglist, $file->[1];
+    }
 
-  else
-  {
-    unshift @arglist, $file;
-    $filename = undef;
-  }
+    else {
+        unshift @arglist, $file;
+        $filename = undef;
+    }
 
-  $self = CIAO::Lib::Param::open( $filename, $mode, @arglist );
+    $self = CIAO::Lib::Param::open( $filename, $mode, @arglist );
 
 
-  $self;
+    $self;
 }
 
-sub _pread
-{
-  my $pfile = shift;
-  my $mode  = shift;
+sub _pread {
+    my $pfile = shift;
+    my $mode  = shift;
 
 
-  my $argv = 'ARRAY' eq ref $_[0] ? shift : undef;
-  my $wantarray = wantarray();
+    my $argv      = 'ARRAY' eq ref $_[0] ? shift : undef;
+    my $wantarray = wantarray();                            ## no critic (Community::Wantarray)
 
-  my $pf = CIAO::Lib::Param->new( $pfile, $mode, defined $argv ? @$argv : () );
+    my $pf = CIAO::Lib::Param->new( $pfile, $mode, defined $argv ? @$argv : () );
 
-  if ( @_ )
-  {
-    my @bogus = grep { ! $pf->access( $_ ) } @_;
-    croak( "unknown parameters: ", join( ', ', @bogus ), "\n") 
-      if @bogus;
-    return $wantarray ? map { $pf->get( $_ ) } @_ : $pf->get($_[0]);
-  }
+    if ( @_ ) {
+        my @bogus = grep { !$pf->access( $_ ) } @_;
+        _croak( 'unknown parameters: ', join( ', ', @bogus ), "\n" )
+          if @bogus;
+        return $wantarray ? map { $pf->get( $_ ) } @_ : $pf->get( $_[0] );
+    }
 
-  else
-  {
-    my $pm = $pf->match( '*' );
+    else {
+        my $pm = $pf->match( q{*} );
 
-    my @params;
-    push @params, $_ while $_ = $pm->next;
+        my @params;
+        push @params, $_ while $_ = $pm->next;
 
-    return map { ( $_ => $pf->get( $_ ) ) } @params;
-  }
+        return map { ( $_ => $pf->get( $_ ) ) } @params;
+    }
 
-  die( "impossible!\n" );
+    die( "impossible!\n" );
 }
 
 # class get method to perform a one shot read of parameters
 # never query
-sub pget
-{
-  my $pfile = shift;
+sub pget {
+    my $pfile = shift;
 
-  unshift @_, $pfile, "rH";
-  # act like we were never here
-  goto &_pread;
+    unshift @_, $pfile, 'rH';
+    # act like we were never here
+    goto &_pread;
 }
 
 # class get method to perform a one shot read of parameters
-sub pquery
-{
-  my $pfile = shift;
+sub pquery {
+    my $pfile = shift;
 
-  unshift @_, $pfile, "r";
-  # act like we were never here
-  goto &_pread;
+    unshift @_, $pfile, 'r';
+    # act like we were never here
+    goto &_pread;
 }
 
-sub pset
-{
-  my ( $pfile, %params ) = @_;
+sub pset {
+    my ( $pfile, %params ) = @_;
 
-  return unless keys %params;
+    return unless keys %params;
 
-  my $pf = CIAO::Lib::Param->new( $pfile, "w" );
+    my $pf = CIAO::Lib::Param->new( $pfile, 'w' );
 
-  while( my ( $param, $value ) = each %params )
-  {
-    $pf->set( $param, $value );
-  }
+    $pf->set( $_, $params{$_} ) for keys %params;
 }
 
 1;
+
+#
+# This file is part of CIAO-Lib-Param
+#
+# This software is Copyright (c) 2005 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory IRAF cxcparam eg getb
+getd getf geti getpath getstr pfind pget pquery pset putb putd puti putstr
+setb setd seti setstr
 
 =head1 NAME
 
-CIAO::Lib::Param - an interface to the CIAO parameter library.
+CIAO::Lib::Param - An interface to the CIAO parameter library.
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -184,12 +181,11 @@ CIAO::Lib::Param - an interface to the CIAO parameter library.
   my $value = $pf->get( 'var1' );
   $pf->set( 'var1', $newvalue);
 
-
 =head1 DESCRIPTION
 
 CIAO::Lib::Param is a Perl interface to the parameter library
 (cxcparam) shipped with the Chandra Interactive Analysis of
-Observations (CIAO) software package.  It implements an interace to
+Observations (CIAO) software package.  It implements an interface to
 IRAF (Image Reduction and Analysis Facility) style parameter files.
 
 This document does not fully discuss the format and usage of parameter
@@ -208,13 +204,15 @@ terminate.
 
 For more complicated handling, one can use the exception (which is a
 CIAO::Lib::Param::Error object) to determine more information about
-what happenend.
+what happened.
 
 =over
 
 =back
 
+=head1 INTERNALS
 
+=for Pod::Coverage open
 
 =head1 PROCEDURAL INTERFACE
 
@@ -276,7 +274,6 @@ Set the named parameters to the given values.
    use CIAO::Lib::Param qw/ pfind /;
    $pfile = pfind( $name, $mode, $extn, $path )
 
-
 Find a parameter file. The C<extn> and C<path> arguments are lists of
 allowable extension and directories to attempt to search for parameter
 files.  For example, the default search used in the class constructor
@@ -285,11 +282,10 @@ is
         extn = ".par .rdb $PFEXTN"
         path = "$PDIRS $PFILES $UPARM"
 
-Identifiers prefixed with C<$> are recursivly expanded in the run time
-environment.  For comaptiblity with IRAF $UPARM should be set to a
+Identifiers prefixed with C<$> are recursively expanded in the run time
+environment.  For compatibility with IRAF $UPARM should be set to a
 single directory name with a trailing C</>.  C<$PFILES> may be set to
 a space or C<,> separated list of directories.
-
 
 =back
 
@@ -312,7 +308,7 @@ path to the file is determined.
 
 B<$mode> indicates the IRAF mode with which the file should be opened
 (it defaults to C<rw> if not specified).  It should be one of the
-"IRAF-compatible" paramater-interface access modes (eg C<r>, C<rw>,
+"IRAF-compatible" parameter-interface access modes (eg C<r>, C<rw>,
 C<rH>, etc).  C<@arglist> is a list of parameter settings that will
 override those given in the parameter file.  They are strings of the
 form of C<par=value>.
@@ -334,8 +330,6 @@ B<new> throws an exception via B<croak> if there is an error.
 The parameter file is closed (and optionally updated) upon object
 destruction.
 
-
-
 =back
 
 =head2 Miscellaneous Parameter methods
@@ -351,13 +345,12 @@ This returns true if the named parameter exists.
 =item info
 
    ( $mode, $type, $value, $min, $max, $prompt ) =
- 			$pf->info( $pname );
+                        $pf->info( $pname );
 
 Return various bits of information about the named parameter.  It
 throws an exception via B<die> if the parameter is not found.
 
 =back
-
 
 =head2 Retrieving Parameter Values
 
@@ -367,7 +360,7 @@ values, and it automatically converts between the two as needed.
 
 To retrieve a parameter value, in most cases one simply calls B<get>.
 
-To ease recoding older code into Perl, the other type specific
+To ease re-coding older code into Perl, the other type specific
 routines (C<getX>) have been incorporated into the Perl interface,
 even though they should rarely be used.  One effect of these routines is
 that the value is first converted into the specified type (e.g. short)
@@ -512,37 +505,48 @@ or a string where the following characters have special meanings:
 
 =over
 
-=item  ?
+=item Z<>?
 
 match any one character
 
-=item  *
+=item Z<>*
 
 match anything, or nothing
 
-=item [<c>...]
+=item Z<>[<c>...]
 
 match an inclusive set
 
-
 =back
 
 =back
 
+=head1 SUPPORT
 
-=head1 SEE ALSO
+=head2 Bugs
 
-CIAO::Lib::Param::Match, CIAO::Lib::Param::Error.
+Please report any bugs or feature requests to bug-ciao-lib-param@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CIAO-Lib-Param>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/ciao-lib-param
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ciao-lib-param.git
 
 =head1 AUTHOR
 
-Diab Jerius, E<lt>djerius@cpanE<gt>
+Diab Jerius <djerius@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006 by the Smithsonian Astrophysical Observatory
+This software is Copyright (c) 2005 by Smithsonian Astrophysical Observatory.
 
-This code is released under the GNU General Public License.  You may
-find a copy at <http://www.fsf.org/copyleft/gpl.html>.
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut

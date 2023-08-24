@@ -1,3 +1,4 @@
+v1.017 - Add example of 'native' output to the documentation; test tweaks.
 v1.015 - Update import required version of Spreadsheet::Edit to 1000.001
 v1.011 - Add required versions for some imports
 v1.010 - Integrate with Windows support from Spreadsheet::Edit
