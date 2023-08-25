@@ -55,11 +55,6 @@ share/phrasebook/unix/csh/sdf/pb
 share/phrasebook/unix/qnap/pb
 share/phrasebook/zyxel/pb
 t/10_construct.t
-t/author-10_route_server.t
-t/author-11_ssh_unknown_host.t
-t/author-12_ssh_no_route.t
-t/author-13_ssh_timeout.t
-t/author-20_sdf_shell.t
 t/phrasebook/cisco/pixos/pixos7/blah/pb
 t/phrasebook/testing/phrases
 t/release-20_connect.t
@@ -67,5 +62,6 @@ t/release-30_phrasebook.t
 t/release-31_actionset.t
 t/release-32_action.t
 t/release-40_transport.t
+t/release-41-transport_middle_of_line_prompt_match.t
 t/release-50_cmd.t
 t/release-60_prompt.t

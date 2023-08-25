@@ -1,0 +1,18 @@
+use alienfile;
+
+share {
+
+  plugin 'Download::GitHub' => (
+    github_user => 'gs1',
+    github_repo => 'gs1-syntax-engine',
+    version     => qr/^(\d{4}-\d{2}-\d{2})$/smx,
+  );
+  plugin Extract => 'tar.gz';
+
+  build [
+    'cd src/c-lib',
+    '%{make}',
+    '%{make} DESTDIR=%{.install.prefix} install',
+  ];
+
+};

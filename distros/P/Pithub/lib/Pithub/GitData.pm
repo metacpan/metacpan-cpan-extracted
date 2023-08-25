@@ -1,40 +1,40 @@
 package Pithub::GitData;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Git Data API
 
 use Moo;
-use Carp ();
-use Pithub::GitData::Blobs;
-use Pithub::GitData::Commits;
-use Pithub::GitData::References;
-use Pithub::GitData::Tags;
-use Pithub::GitData::Trees;
+use Pithub::GitData::Blobs      ();
+use Pithub::GitData::Commits    ();
+use Pithub::GitData::References ();
+use Pithub::GitData::Tags       ();
+use Pithub::GitData::Trees      ();
 extends 'Pithub::Base';
 
 
 sub blobs {
-    return shift->_create_instance('Pithub::GitData::Blobs', @_);
+    return shift->_create_instance( Pithub::GitData::Blobs::, @_ );
 }
 
 
 sub commits {
-    return shift->_create_instance('Pithub::GitData::Commits', @_);
+    return shift->_create_instance( Pithub::GitData::Commits::, @_ );
 }
 
 
 sub references {
-    return shift->_create_instance('Pithub::GitData::References', @_);
+    return shift->_create_instance( Pithub::GitData::References::, @_ );
 }
 
 
 sub tags {
-    return shift->_create_instance('Pithub::GitData::Tags', @_);
+    return shift->_create_instance( Pithub::GitData::Tags::, @_ );
 }
 
 
 sub trees {
-    return shift->_create_instance('Pithub::GitData::Trees', @_);
+    return shift->_create_instance( Pithub::GitData::Trees::, @_ );
 }
 
 1;
@@ -51,7 +51,7 @@ Pithub::GitData - Github v3 Git Data API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

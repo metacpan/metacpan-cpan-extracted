@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
 
 use Pithub::Repos::Actions::Workflows ();
 
@@ -30,7 +30,7 @@ Pithub::Repos::Actions - Github v3 Repo Actions API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 DESCRIPTION
 

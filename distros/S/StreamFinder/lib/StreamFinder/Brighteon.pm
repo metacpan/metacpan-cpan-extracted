@@ -486,6 +486,14 @@ sub new
 	}
 
 	$html =~ s/\\\"/\&quot\;/gs;
+	if ($html =~ s#\<a\s+href\=\"([^\"]*)\"\s+title\=\"[^\"]*\"\s+class\=\"author\_\_name\"\>([^\<]+)\<##s) {
+		my $one = $1;
+		($self->{'artist'} = $2) =~ s/\s+$//;
+		$self->{'albumartist'} = 'https://www.brighteon.com' . $one  if ($one);
+	} elsif ($html =~ m#\"shortUrl\"\:\"([^\"]+)\"\,\"name\"\:\"([^\"]+)\"#) {
+		$self->{'artist'} = $2;
+		$self->{'albumartist'} = "http://www.brighteon.com/channels/$1"  if ($1);
+	}
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
 		my $videotag = $1;
 		my $streams = '';
@@ -499,6 +507,16 @@ sub new
 			my $stindex = 0;
 			my $savestreams = $streams;
 			my %havestreams = ();
+
+			if (defined $self->{'formats_by_channel'} && $self->{'albumartist'}) {
+				my %formats_by_url = %{$self->{'formats_by_channel'}};
+				foreach my $i (keys %formats_by_url) {
+					if ($self->{'albumartist'} =~ m#$i#i) {
+						@okStreams = split(/\,\s*/, $formats_by_url{$i});
+					}
+				}
+			}
+print STDERR "--Brighteon: okStreams=".join('|',@okStreams)."= channel=".$self->{'albumartist'}."=\n";
 			foreach my $streamtype (@okStreams) {
 				$streams = $savestreams;
 				if ($streamtype =~ /^stream$/i) {
@@ -549,14 +567,6 @@ sub new
 			}
 			$self->{'cnt'} = scalar @{$self->{'streams'}};
 		}
-	}
-	if ($html =~ s#\<a\s+href\=\"([^\"]*)\"\s+title\=\"[^\"]*\"\s+class\=\"author\_\_name\"\>([^\<]+)\<##s) {
-		my $one = $1;
-		($self->{'artist'} = $2) =~ s/\s+$//;
-		$self->{'albumartist'} = 'https://www.brighteon.com' . $one  if ($one);
-	} elsif ($html =~ m#\"shortUrl\"\:\"([^\"]+)\"\,\"name\"\:\"([^\"]+)\"#) {
-		$self->{'artist'} = $2;
-		$self->{'albumartist'} = "http://www.brighteon.com/channels/$1"  if ($1);
 	}
 	my $id = $self->{'id'};
 	$self->{'title'} = ($html =~ m#\<div\s+class\=\"main\-video\-title\"\>([^\<]+)\<#s) ? $1 : '';

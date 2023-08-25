@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Phrasebook;
-{ $Net::CLI::Interact::Phrasebook::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Phrasebook::VERSION = '2.400000' }
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf Str Any HashRef);

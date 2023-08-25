@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Transport::Role::StripControlChars;
-{ $Net::CLI::Interact::Transport::Role::StripControlChars::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Transport::Role::StripControlChars::VERSION = '2.400000' }
 
 use strict;
 use warnings FATAL => 'all';

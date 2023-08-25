@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Role::Prompt;
-{ $Net::CLI::Interact::Role::Prompt::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Role::Prompt::VERSION = '2.400000' }
 
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Str RegexpRef);
@@ -95,7 +95,7 @@ sub find_prompt {
         my $started_pumping = time;
         PUMPING: while (1) {
             $self->transport->pump;
-            $self->logger->log('dump', 'debug', "SEEN:\n". $self->transport->buffer);
+            $self->logger->log('dump', 'debug', "SEEN:\n'". $self->transport->buffer. "'");
             foreach my $prompt ($self->phrasebook->prompt_names) {
                 # prompts consist of only one match action
                 if ($self->find_match(

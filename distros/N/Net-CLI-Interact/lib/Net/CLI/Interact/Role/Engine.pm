@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Role::Engine;
-{ $Net::CLI::Interact::Role::Engine::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Role::Engine::VERSION = '2.400000' }
 
 {
     package # hide from pause

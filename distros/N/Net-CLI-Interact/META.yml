@@ -4,11 +4,12 @@ author:
   - 'Oliver Gorwits <oliver@cpan.org>'
 build_requires:
   ExtUtils::CBuilder: '0'
+  Test::File::ShareDir: '1.001002'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,70 +18,70 @@ name: Net-CLI-Interact
 provides:
   Net::CLI::Interact:
     file: lib/Net/CLI/Interact.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Action:
     file: lib/Net/CLI/Interact/Action.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::ActionSet:
     file: lib/Net/CLI/Interact/ActionSet.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Logger:
     file: lib/Net/CLI/Interact/Logger.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Phrasebook:
     file: lib/Net/CLI/Interact/Phrasebook.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Role::Engine:
     file: lib/Net/CLI/Interact/Role/Engine.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Role::FindMatch:
     file: lib/Net/CLI/Interact/Role/FindMatch.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Role::Iterator:
     file: lib/Net/CLI/Interact/Role/Iterator.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Role::Prompt:
     file: lib/Net/CLI/Interact/Role/Prompt.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Base:
     file: lib/Net/CLI/Interact/Transport/Base.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Loopback:
     file: lib/Net/CLI/Interact/Transport/Loopback.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Net_OpenSSH:
     file: lib/Net/CLI/Interact/Transport/Net_OpenSSH.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Platform::Unix:
     file: lib/Net/CLI/Interact/Transport/Platform/Unix.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Platform::Win32:
     file: lib/Net/CLI/Interact/Transport/Platform/Win32.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Role::ConnectCore:
     file: lib/Net/CLI/Interact/Transport/Role/ConnectCore.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Role::StripControlChars:
     file: lib/Net/CLI/Interact/Transport/Role/StripControlChars.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::SSH:
     file: lib/Net/CLI/Interact/Transport/SSH.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Serial:
     file: lib/Net/CLI/Interact/Transport/Serial.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Telnet:
     file: lib/Net/CLI/Interact/Transport/Telnet.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Wrapper::Base:
     file: lib/Net/CLI/Interact/Transport/Wrapper/Base.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Wrapper::IPC_Run:
     file: lib/Net/CLI/Interact/Transport/Wrapper/IPC_Run.pm
-    version: '2.300005'
+    version: '2.400000'
   Net::CLI::Interact::Transport::Wrapper::Net_Telnet:
     file: lib/Net/CLI/Interact/Transport/Wrapper/Net_Telnet.pm
-    version: '2.300005'
+    version: '2.400000'
 requires:
   Class::Load: '0'
   Class::Mix: '0'
@@ -105,5 +106,5 @@ resources:
   bugtracker: https://github.com/ollyg/Net-CLI-Interact/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ollyg/Net-CLI-Interact
-version: '2.300005'
+version: '2.400000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,7 @@
 package Pithub::PullRequests::Reviewers;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Pull Request Review Requests API
 
 use Moo;
@@ -10,11 +11,15 @@ extends 'Pithub::Base';
 
 sub delete {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: pull_request_id' unless $args{pull_request_id};
+    croak 'Missing key in parameters: pull_request_id'
+        unless $args{pull_request_id};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user}, delete $args{repo}, delete $args{pull_request_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user},
+            delete $args{repo}, delete $args{pull_request_id}
+        ),
         %args,
     );
 }
@@ -22,11 +27,15 @@ sub delete {
 
 sub list {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: pull_request_id' unless $args{pull_request_id};
+    croak 'Missing key in parameters: pull_request_id'
+        unless $args{pull_request_id};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user}, delete $args{repo}, delete $args{pull_request_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user},
+            delete $args{repo}, delete $args{pull_request_id}
+        ),
         %args,
     );
 }
@@ -34,12 +43,17 @@ sub list {
 
 sub update {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: pull_request_id' unless $args{pull_request_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: pull_request_id'
+        unless $args{pull_request_id};
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user}, delete $args{repo}, delete $args{pull_request_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/pulls/%s/requested_reviewers', delete $args{user},
+            delete $args{repo}, delete $args{pull_request_id}
+        ),
         %args,
     );
 }
@@ -58,7 +72,7 @@ Pithub::PullRequests::Reviewers - Github v3 Pull Request Review Requests API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

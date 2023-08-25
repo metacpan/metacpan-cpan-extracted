@@ -1,6 +1,7 @@
 package Pithub::Repos::Contents;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Repo Contents API
 
 use Moo;
@@ -10,12 +11,17 @@ extends 'Pithub::Base';
 
 sub archive {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: archive_format' unless $args{archive_format};
-    croak 'Invalid archive_format. Valid formats: tarball, zipball' unless grep $args{archive_format} eq $_, qw(tarball zipball);
+    croak 'Missing key in parameters: archive_format'
+        unless $args{archive_format};
+    croak 'Invalid archive_format. Valid formats: tarball, zipball'
+        unless grep $args{archive_format} eq $_, qw(tarball zipball);
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/%s/%s', delete $args{user}, delete $args{repo}, delete $args{archive_format}, delete $args{ref} || q{} ),
+        path   => sprintf(
+            '/repos/%s/%s/%s/%s', delete $args{user}, delete $args{repo},
+            delete $args{archive_format}, delete $args{ref} || q{}
+        ),
         %args,
     );
 }
@@ -27,13 +33,18 @@ sub get {
     if ( my $path = delete $args{path} ) {
         return $self->request(
             method => 'GET',
-            path   => sprintf( '/repos/%s/%s/contents/%s', delete $args{user}, delete $args{repo}, $path ),
+            path   => sprintf(
+                '/repos/%s/%s/contents/%s', delete $args{user},
+                delete $args{repo},         $path
+            ),
             %args,
         );
     }
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/contents', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/contents', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -44,7 +55,9 @@ sub readme {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/readme', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/readme', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -63,7 +76,7 @@ Pithub::Repos::Contents - Github v3 Repo Contents API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

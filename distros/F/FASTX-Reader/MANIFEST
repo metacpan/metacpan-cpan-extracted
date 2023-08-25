@@ -101,10 +101,13 @@ t/53_Seq_asfastx.t
 t/53_with_fastxseq.t
 t/54_Seq_asfastx_bad.t
 t/54_Seq_isfastx.t
+t/54_copy.t
 t/54_invalid_seq.t
 t/55_Seq_slice.t
 t/55_next.t
 t/55_nextobj.t
+t/56_Seq_flags.t
+t/57_Seq_Trans.t
 t/61_seq_qual.t
 t/62_seq_qualities.t
 t/docker.sh
@@ -113,6 +116,7 @@ t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t
 t/release-05-changes.t
 t/release-check-version.t
+t/test.py
 test.py
 xt/author/bench.pl
 xt/release/02-perl-min.pl

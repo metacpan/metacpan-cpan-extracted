@@ -1,6 +1,7 @@
 package Pithub::Events;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Events API
 
 use Moo;
@@ -13,7 +14,10 @@ sub issue {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/issues/events', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/issues/events', delete $args{user},
+            delete $args{repo}
+        ),
         %args,
     );
 }
@@ -24,7 +28,9 @@ sub network {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/networks/%s/%s/events', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/networks/%s/%s/events', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -47,7 +53,9 @@ sub org_for_user {
     croak 'Missing key in parameters: user' unless $args{user};
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/users/%s/events/orgs/%s', delete $args{user}, delete $args{org} ),
+        path   => sprintf(
+            '/users/%s/events/orgs/%s', delete $args{user}, delete $args{org}
+        ),
         %args,
     );
 }
@@ -68,7 +76,9 @@ sub repos {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/events', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/events', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -117,7 +127,7 @@ Pithub::Events - Github v3 Events API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

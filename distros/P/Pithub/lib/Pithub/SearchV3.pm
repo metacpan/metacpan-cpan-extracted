@@ -1,6 +1,7 @@
 package Pithub::SearchV3;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Search API
 
 use Moo;
@@ -10,25 +11,25 @@ extends 'Pithub::Base';
 
 sub issues {
     my $self = shift;
-    return $self->_search('issues', @_);
+    return $self->_search( 'issues', @_ );
 }
 
 
 sub repos {
     my $self = shift;
-    return $self->_search('repositories', @_);
+    return $self->_search( 'repositories', @_ );
 }
 
 
 sub users {
     my $self = shift;
-    return $self->_search('users', @_);
+    return $self->_search( 'users', @_ );
 }
 
 
 sub code {
     my $self = shift;
-    return $self->_search('code', @_);
+    return $self->_search( 'code', @_ );
 }
 
 sub _search {
@@ -37,10 +38,10 @@ sub _search {
     return $self->request(
         method => 'GET',
         path   => '/search/' . $thing_to_search,
-        query => {
+        query  => {
             q => delete $args{q},
-            (exists $args{sort}  ? (sort  => delete $args{sort})  : ()),
-            (exists $args{order} ? (order => delete $args{order}) : ()),
+            ( exists $args{sort}  ? ( sort  => delete $args{sort} )  : () ),
+            ( exists $args{order} ? ( order => delete $args{order} ) : () ),
         },
         %args,
     );
@@ -60,7 +61,7 @@ Pithub::SearchV3 - Github v3 Search API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

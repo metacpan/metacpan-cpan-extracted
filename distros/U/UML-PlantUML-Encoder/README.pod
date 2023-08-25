@@ -1,3 +1,5 @@
+=for html <a href="https://travis-ci.com/ranwitter/perl5-UML-PlantUML-Encoder"><img src="https://travis-ci.com/ranwitter/perl5-UML-PlantUML-Encoder.svg?branch=master"></a>&nbsp;<a title="Artistic-2.0" href="https://opensource.org/licenses/Artistic-2.0"><img src="https://img.shields.io/badge/License-Perl-0298c3.svg"></a>
+
 =head1 NAME
 
 UML::PlantUML::Encoder - Provides PlantUML Language's Encoding in Perl
@@ -6,10 +8,7 @@ Encodes PlantUML Diagram Text using the PlantUML Encoding Standard described at 
 
 =head1 VERSION
 
-Version 0.02
-
-
-=cut
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -20,10 +19,16 @@ Version 0.02
        Bob --> Alice: Authentication Response
     });
 
-    print "http://www.plantuml.com/plantuml/uml/$encoded";
-    print "http://www.plantuml.com/plantuml/png/$encoded";
-    print "http://www.plantuml.com/plantuml/svg/$encoded";
-    print "http://www.plantuml.com/plantuml/txt/$encoded";
+    print "\nhttp://www.plantuml.com/plantuml/uml/$encoded";
+    print "\nhttp://www.plantuml.com/plantuml/png/$encoded";
+    print "\nhttp://www.plantuml.com/plantuml/svg/$encoded";
+    print "\nhttp://www.plantuml.com/plantuml/txt/$encoded";
+
+    # Output
+    http://www.plantuml.com/plantuml/uml/~169NZKe00nvpCv5G5NJi5f_maAmN7qfACrBoIpEJ4aipyF8MWrCBIrE8IBgXQe185NQ1Ii1uiYeiBylEAKy6g0HPp7700
+    http://www.plantuml.com/plantuml/png/~169NZKe00nvpCv5G5NJi5f_maAmN7qfACrBoIpEJ4aipyF8MWrCBIrE8IBgXQe185NQ1Ii1uiYeiBylEAKy6g0HPp7700
+    http://www.plantuml.com/plantuml/svg/~169NZKe00nvpCv5G5NJi5f_maAmN7qfACrBoIpEJ4aipyF8MWrCBIrE8IBgXQe185NQ1Ii1uiYeiBylEAKy6g0HPp7700
+    http://www.plantuml.com/plantuml/txt/~169NZKe00nvpCv5G5NJi5f_maAmN7qfACrBoIpEJ4aipyF8MWrCBIrE8IBgXQe185NQ1Ii1uiYeiBylEAKy6g0HPp7700
 
 =head1 EXPORT
 
@@ -35,43 +40,25 @@ The only Subroutine that this module exports is C<encode_p>
 
 Encoded in UTF-8
 
-
-=cut
-
 =head2 _compress_with_deflate
 
 Compressed using Deflate algorithm
-
-
-=cut
 
 =head2 encode6bit
 
 Transform to String of characters that contains only digits, letters, underscore and minus character
 
-
-=cut
-
 =head2 append3bytes
 
 Transform adjacent bytes
-
-
-=cut
 
 =head2 encode64
 
 Reencoded in ASCII using a transformation close to base64
 
-
-=cut
-
 =head2 encode_p
 
 Encodes diagram text descriptions 
-
-
-=cut
 
 =head1 AUTHOR
 
@@ -98,9 +85,9 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=UML-PlantUML-Encoder>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * GitHub Repository
 
-L<http://annocpan.org/dist/UML-PlantUML-Encoder>
+L<https://github.com/ranwitter/perl5-UML-PlantUML-Encoder>
 
 =item * CPAN Ratings
 
@@ -112,10 +99,6 @@ L<https://metacpan.org/release/UML-PlantUML-Encoder>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Rangana Sudesha Withanage.
@@ -123,7 +106,4 @@ This software is copyright (c) 2019 by Rangana Sudesha Withanage.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-
-
-=cut
 

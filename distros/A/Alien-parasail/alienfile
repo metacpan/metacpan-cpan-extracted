@@ -1,0 +1,27 @@
+use alienfile;
+ 
+plugin 'PkgConfig' => (
+  pkg_name => 'libparasail',
+);
+ 
+share {
+
+  start_url 'https://github.com/jeffdaily/parasail/archive/refs/heads/master.zip';
+  plugin Download => (
+    filter => qr/^libarchive-.*\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'zip';
+  plugin 'Build::CMake';
+  plugin 'Gather::IsolateDynamic';
+  build [
+    # this is the default build step, if you do not specify one.
+    [ '%{cmake}',
+        @{ meta->prop->{plugin_build_cmake}->{args} },
+        # ... put extra cmake args here ...
+        '.'
+    ],
+    '%{make}',
+    '%{make} install',
+
+  ];
+};

@@ -1,22 +1,24 @@
 package Pithub::Gists;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Gists API
 
 use Moo;
-use Carp qw( croak );
-use Pithub::Gists::Comments;
+use Carp                    qw( croak );
+use Pithub::Gists::Comments ();
 extends 'Pithub::Base';
 
 
 sub comments {
-    return shift->_create_instance('Pithub::Gists::Comments', @_);
+    return shift->_create_instance( Pithub::Gists::Comments::, @_ );
 }
 
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     return $self->request(
         method => 'POST',
         path   => '/gists',
@@ -125,7 +127,8 @@ sub unstar {
 sub update {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: gist_id' unless $args{gist_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     return $self->request(
         method => 'PATCH',
         path   => sprintf( '/gists/%s', delete $args{gist_id} ),
@@ -147,7 +150,7 @@ Pithub::Gists - Github v3 Gists API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

@@ -52,6 +52,7 @@ Keys
 Konboi
 LRU
 Labels
+Legge
 Marienborg
 Markdown
 Masashi
@@ -89,6 +90,7 @@ Stevan
 Tags
 Teams
 Thibault
+Timothy
 Trees
 Tux
 Unfollow
@@ -140,6 +142,7 @@ submodule
 teckl
 teckl1979
 thibault
+timlegge
 ua
 unfollow
 unstar

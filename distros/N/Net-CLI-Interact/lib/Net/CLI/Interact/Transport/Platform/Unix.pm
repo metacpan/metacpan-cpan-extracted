@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Transport::Platform::Unix;
-{ $Net::CLI::Interact::Transport::Platform::Unix::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Transport::Platform::Unix::VERSION = '2.400000' }
 
 use Moo;
 use Class::Load qw(try_load_class);

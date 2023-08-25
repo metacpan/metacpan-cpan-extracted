@@ -5,25 +5,25 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
 
-use Carp qw( croak );
-use Pithub::Issues;
-use Pithub::Markdown;
-use Pithub::PullRequests;
-use Pithub::Repos::Actions ();
-use Pithub::Repos::Collaborators;
-use Pithub::Repos::Commits;
-use Pithub::Repos::Contents;
-use Pithub::Repos::Downloads;
-use Pithub::Repos::Forks;
-use Pithub::Repos::Hooks;
-use Pithub::Repos::Keys;
-use Pithub::Repos::Releases;
-use Pithub::Repos::Starring;
-use Pithub::Repos::Stats;
-use Pithub::Repos::Statuses;
-use Pithub::Repos::Watching;
+use Carp                         qw( croak );
+use Pithub::Issues               ();
+use Pithub::Markdown             ();
+use Pithub::PullRequests         ();
+use Pithub::Repos::Actions       ();
+use Pithub::Repos::Collaborators ();
+use Pithub::Repos::Commits       ();
+use Pithub::Repos::Contents      ();
+use Pithub::Repos::Downloads     ();
+use Pithub::Repos::Forks         ();
+use Pithub::Repos::Hooks         ();
+use Pithub::Repos::Keys          ();
+use Pithub::Repos::Releases      ();
+use Pithub::Repos::Starring      ();
+use Pithub::Repos::Stats         ();
+use Pithub::Repos::Statuses      ();
+use Pithub::Repos::Watching      ();
 
 extends 'Pithub::Base';
 
@@ -35,14 +35,15 @@ sub actions {
 
 sub branch {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: branch (string)' unless defined $args{branch};
+    croak 'Missing key in parameters: branch (string)'
+        unless defined $args{branch};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
         path   => sprintf(
             '/repos/%s/%s/branches/%s', delete $args{user},
-                                        delete $args{repo},
-                                        delete $args{branch},
+            delete $args{repo},
+            delete $args{branch},
         ),
         %args,
     );
@@ -54,7 +55,9 @@ sub branches {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/branches', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/branches', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -63,11 +66,15 @@ sub branches {
 sub rename_branch {
     my ( $self, %args ) = @_;
     croak 'Missing parameters: branch' unless $args{branch};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/branches/%s/rename', delete $args{user}, delete $args{repo}, delete $args{branch} ),
+        path   => sprintf(
+            '/repos/%s/%s/branches/%s/rename', delete $args{user},
+            delete $args{repo},                delete $args{branch}
+        ),
         %args,
     );
 }
@@ -75,28 +82,31 @@ sub rename_branch {
 
 sub merge_branch {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/merges', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/merges', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
 
 
 sub collaborators {
-    return shift->_create_instance('Pithub::Repos::Collaborators', @_);
+    return shift->_create_instance( Pithub::Repos::Collaborators::, @_ );
 }
 
 
 sub commits {
-    return shift->_create_instance('Pithub::Repos::Commits', @_);
+    return shift->_create_instance( Pithub::Repos::Commits::, @_ );
 }
 
 
 sub contents {
-    return shift->_create_instance('Pithub::Repos::Contents', @_);
+    return shift->_create_instance( Pithub::Repos::Contents::, @_ );
 }
 
 
@@ -105,7 +115,10 @@ sub contributors {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/contributors', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/contributors', delete $args{user},
+            delete $args{repo}
+        ),
         %args,
     );
 }
@@ -113,7 +126,8 @@ sub contributors {
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     if ( my $org = delete $args{org} ) {
         return $self->request(
             method => 'POST',
@@ -132,23 +146,24 @@ sub create {
 
 
 sub delete {
-    my( $self, %args ) = @_;
+    my ( $self, %args ) = @_;
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   =>
+            sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
         %args,
     );
 }
 
 
 sub downloads {
-    return shift->_create_instance('Pithub::Repos::Downloads', @_);
+    return shift->_create_instance( Pithub::Repos::Downloads::, @_ );
 }
 
 
 sub forks {
-    return shift->_create_instance('Pithub::Repos::Forks', @_);
+    return shift->_create_instance( Pithub::Repos::Forks::, @_ );
 }
 
 
@@ -157,24 +172,25 @@ sub get {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   =>
+            sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
         %args,
     );
 }
 
 
 sub hooks {
-    return shift->_create_instance('Pithub::Repos::Hooks', @_);
+    return shift->_create_instance( Pithub::Repos::Hooks::, @_ );
 }
 
 
 sub issues {
-    return shift->_create_instance('Pithub::Issues', @_);
+    return shift->_create_instance( Pithub::Issues::, @_ );
 }
 
 
 sub keys {
-    return shift->_create_instance('Pithub::Repos::Keys', @_);
+    return shift->_create_instance( Pithub::Repos::Keys::, @_ );
 }
 
 
@@ -183,7 +199,9 @@ sub languages {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/languages', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/languages', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -217,34 +235,37 @@ sub list {
 
 sub markdown {
     my $self = shift;
-    return $self->_create_instance('Pithub::Markdown',
-        mode => 'gfm', context => sprintf( '%s/%s', $self->user, $self->repo ),
-        @_);
+    return $self->_create_instance(
+        Pithub::Markdown::,
+        mode    => 'gfm',
+        context => sprintf( '%s/%s', $self->user, $self->repo ),
+        @_
+    );
 }
 
 
 sub pull_requests {
-    return shift->_create_instance('Pithub::PullRequests', @_);
+    return shift->_create_instance( Pithub::PullRequests::, @_ );
 }
 
 
 sub releases {
-    return shift->_create_instance('Pithub::Repos::Releases', @_);
+    return shift->_create_instance( Pithub::Repos::Releases::, @_ );
 }
 
 
 sub starring {
-    return shift->_create_instance('Pithub::Repos::Starring', @_);
+    return shift->_create_instance( Pithub::Repos::Starring::, @_ );
 }
 
 
 sub stats {
-    return shift->_create_instance('Pithub::Repos::Stats', @_);
+    return shift->_create_instance( Pithub::Repos::Stats::, @_ );
 }
 
 
 sub statuses {
-    return shift->_create_instance('Pithub::Repos::Statuses', @_);
+    return shift->_create_instance( Pithub::Repos::Statuses::, @_ );
 }
 
 
@@ -253,7 +274,9 @@ sub tags {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/tags', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/tags', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -264,7 +287,9 @@ sub teams {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/teams', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/teams', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -272,18 +297,20 @@ sub teams {
 
 sub update {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'PATCH',
-        path   => sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   =>
+            sprintf( '/repos/%s/%s', delete $args{user}, delete $args{repo} ),
         %args,
     );
 }
 
 
 sub watching {
-    return shift->_create_instance('Pithub::Repos::Watching', @_);
+    return shift->_create_instance( Pithub::Repos::Watching::, @_ );
 }
 
 1;
@@ -300,7 +327,7 @@ Pithub::Repos - Github v3 Repos API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

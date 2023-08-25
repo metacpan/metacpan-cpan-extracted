@@ -535,3 +535,17 @@ Revision history for StreamFinder
         episodes due to slight changes in their site.
 2.15    2023/07/28
         - Added StreamFinder::LinkTV to fetch linktv.org video shows.
+2.16    2023/08/24
+        - Added StreamFinder::Zeno for zeno.fm radio stations & podcasts.
+        - StreamFinder::Brighteon - Add "formats_by_channel" option keyed by 
+        albumartist.  This needed b/c some video formats (ie. .m3u8) don't 
+        seem to work on some sites but are the only ones that work on others.
+        - StreamFinder::Podchaser - Add "-notrim" option to trim trailing 
+        garbage off stream URLs.
+        - StreamFinder::Podchaser - Fix sometimes fetching wrong stream on 
+        episode pages, and fix podcast pages not returning any episodes due to 
+        recent changes in their site (more stupid javascripting).
+        - StreamFinder::PodcastAddict - Mark DEPRECIATED since they recently 
+        javascripted & crapped up their podcast pages making it now impossible 
+        to fetch a playlist or first episode from them (correct episode pages 
+        still seem to work for now, if you get them from your browser first).

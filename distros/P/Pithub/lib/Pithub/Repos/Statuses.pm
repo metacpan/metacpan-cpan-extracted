@@ -1,6 +1,7 @@
 package Pithub::Repos::Statuses;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT:  Github v3 repos / statuses API
 
 use Moo;
@@ -10,12 +11,12 @@ extends 'Pithub::Base';
 
 
 sub list {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     $self->_validate_user_repo_args( \%args );
     my $req = {
         method => 'GET',
-        path => sprintf(
+        path   => sprintf(
             '/repos/%s/%s/statuses/%s',
             delete $args{user}, delete $args{repo}, delete $args{ref}
         ),
@@ -26,19 +27,22 @@ sub list {
 
 
 sub create {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
     $self->_validate_user_repo_args( \%args );
-    croak 'Missing state paramenter. Must be one of pending, success, error or failure'
+    croak
+        'Missing state paramenter. Must be one of pending, success, error or failure'
         unless $args{data}->{state};
 
-    unless ($args{data}->{state} =~ m/^(?:pending|success|error|failure)$/) {
-        croak 'state param must be one of pending, success, error, failure. Was ' .
-        $args{data}->{state};
+    unless ( $args{data}->{state} =~ m/^(?:pending|success|error|failure)$/ )
+    {
+        croak
+            'state param must be one of pending, success, error, failure. Was '
+            . $args{data}->{state};
     }
 
     my $req = {
         method => 'POST',
-        path => sprintf(
+        path   => sprintf(
             '/repos/%s/%s/statuses/%s',
             delete $args{user}, delete $args{repo}, delete $args{sha},
         ),
@@ -47,7 +51,6 @@ sub create {
 
     return $self->request(%$req);
 }
-
 
 1;
 
@@ -63,7 +66,7 @@ Pithub::Repos::Statuses - Github v3 repos / statuses API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

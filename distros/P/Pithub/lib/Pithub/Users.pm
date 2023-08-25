@@ -1,23 +1,24 @@
 package Pithub::Users;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Users API
 
 use Moo;
-use Carp qw( croak );
-use Pithub::Users::Emails;
-use Pithub::Users::Followers;
-use Pithub::Users::Keys;
+use Carp                     qw( croak );
+use Pithub::Users::Emails    ();
+use Pithub::Users::Followers ();
+use Pithub::Users::Keys      ();
 extends 'Pithub::Base';
 
 
 sub emails {
-    return shift->_create_instance('Pithub::Users::Emails', @_);
+    return shift->_create_instance( Pithub::Users::Emails::, @_ );
 }
 
 
 sub followers {
-    return shift->_create_instance('Pithub::Users::Followers', @_);
+    return shift->_create_instance( Pithub::Users::Followers::, @_ );
 }
 
 
@@ -39,13 +40,14 @@ sub get {
 
 
 sub keys {
-    return shift->_create_instance('Pithub::Users::Keys', @_);
+    return shift->_create_instance( Pithub::Users::Keys::, @_ );
 }
 
 
 sub update {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     return $self->request(
         method => 'PATCH',
         path   => '/user',
@@ -67,7 +69,7 @@ Pithub::Users - Github v3 Users API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

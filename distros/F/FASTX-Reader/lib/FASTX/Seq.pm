@@ -26,19 +26,19 @@ sub new {
         my %data = @_;
         # Try parsing
         for my $i (keys %data) {
-            if ($i =~ /^-(seq|sequence)/i) {
+            if ($i =~ /^-(seq|sequence)/) {
                 $seq = $data{$i};
-            } elsif ($i =~ /^-(name|id)/i) {
+            } elsif ($i =~ /^-(name|id)/) {
                 $name = $data{$i};
-            } elsif ($i =~ /^-(comment|desc|description)/i) {
+            } elsif ($i =~ /^-(comment|desc|description)/) {
                 $comment = $data{$i};
-            } elsif ($i =~ /^-(qual|quality)/i) {
+            } elsif ($i =~ /^-qual(ity)?/) {
                 $qual = $data{$i};
-            } elsif ($i =~ /^-offset/i) {
+            } elsif ($i =~ /^-offset/) {
                 $offset = $data{$i};
-            } elsif ($i =~ /^-line_len/i) {
+            } elsif ($i =~ /^-line_len/) {
                 $line_len = $data{$i};
-            } elsif ($i =~ /^-default_quality/i) {
+            } elsif ($i =~ /^-default_quality/) {
                 $default_quality = $data{$i};
             } else {
                 confess "ERROR FASTX::Seq: Unknown parameter $i\n";
@@ -46,6 +46,8 @@ sub new {
         }
     } elsif (not defined $seq) {
         # Positional instantiation
+        # check number of arguments
+        confess "ERROR FASTX::Seq: Wrong number of arguments\n" if (scalar(@_) < 1 || scalar(@_) > 4);
         ($seq, $name, $comment, $qual) = @_;
     }
  
@@ -82,8 +84,8 @@ sub copy {
     my ($self) = @_;
     my $copy = __PACKAGE__->new($self->seq, $self->name, $self->comment, $self->qual);
     $copy->{default_quality} = $self->default_quality;
-    $copy->line_len($self->line_len);
-    $copy->offset($self->offset);
+    $copy->line_len = $self->line_len;
+    $copy->offset = $self->offset;
     return $copy;
 }
 
@@ -287,6 +289,92 @@ sub trim_until  : lvalue {
     return $self;
 }
 
+sub _kmer2num {
+    my ($kmer) = @_;
+
+    my %baseVal = ('T' => 0, 'C' => 1, 'A' => 2, 'G' => 3, 'U' => 0);
+    my $klen = length($kmer);
+    my $num = 0;
+
+    for my $i (0..($klen - 1)) {
+        if (exists $baseVal{substr($kmer, $i, 1)}) {
+            my $p = 4 ** ($klen - 1 - $i);
+            $num += $p * $baseVal{substr($kmer, $i, 1)};
+        } else {
+            $num = -1;
+            last;
+        }
+    }
+
+    return $num;
+}
+
+
+sub translate {
+    my ($self, $code_number) = @_;
+
+    my $record = $self->copy();
+    # Default genetic code if not specified
+    $code_number //= 11;
+    
+    my @code_map = (
+     "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", #1 
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "", 
+     "",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", #11 Bact, Ar and Plant Plast
+     "FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", #15 
+     "FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "", "", "", "",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+     "FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CCGWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYY**CC*WLLLAPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYYYCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYEECC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+     "FFLLSSSSYYEECCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+    );
+    
+    my $code = $code_map[$code_number - 1];
+    # Check sequence is nucleotidic or RNA
+    confess "ERROR FASTX::Seq: Sequence must be nucleotidic" if ($self->{seq} !~ /^[ACGTU]+$/i);
+    my @nucleotides = split //, $self->seq;
+    my @translated_sequence;
+    
+    for (my $i = 0; $i < scalar(@nucleotides) - 2; $i += 3) {
+        my $codon = $nucleotides[$i] . $nucleotides[$i+1] . $nucleotides[$i+2];
+        my $num = _kmer2num($codon);  # You need to define this function
+        if ($num != -1) {
+            push @translated_sequence, substr($code, $num, 1);
+             
+        } else {
+            push @translated_sequence, '-';
+             
+        }
+    }
+    
+    my $translated_seq = join('', @translated_sequence);
+    
+    $record->seq($translated_seq);
+    # Remove qual if present
+    $record->qual(undef);
+    return $record;
+}
+
+
 sub string {
     # Update comment
     my ($self, @args) = @_;
@@ -402,7 +490,7 @@ FASTX::Seq - A class for representing a sequence for FASTX::Reader
 
 =head1 VERSION
 
-version 1.10.0
+version 1.11.0
 
 =head1 SYNOPSIS
 
@@ -604,6 +692,19 @@ Trim the record in place after the first base with a quality score lower or equa
 Trim the record B<in place up to the the first base with a quality score higher or equal than the provided integer>.
 
     $fastq->trim_until(20);
+
+=head2 translate([genetic_code])
+
+Return the sequence as translated protein sequence.
+Optional artument is the NCBI Genetic code:
+
+    my $seq = FASTX::Seq->new(
+        -seq => 'ATGATG',
+        -id => 'seq1',
+    );
+    my $orf = $seq->translate(11);
+
+    say $orf->seq();
 
 =head1 VALIDATION AND STRING GENERATION
 

@@ -1,6 +1,7 @@
 package Pithub::Gists::Comments;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Gist Comments API
 
 use Moo;
@@ -11,7 +12,8 @@ extends 'Pithub::Base';
 sub create {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: gist_id' unless $args{gist_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     return $self->request(
         method => 'POST',
         path   => sprintf( '/gists/%s/comments', delete $args{gist_id} ),
@@ -22,11 +24,14 @@ sub create {
 
 sub delete {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: gist_id' unless $args{gist_id};
+    croak 'Missing key in parameters: gist_id'    unless $args{gist_id};
     croak 'Missing key in parameters: comment_id' unless $args{comment_id};
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/gists/%s/comments/%s', delete $args{gist_id}, delete $args{comment_id} ),
+        path   => sprintf(
+            '/gists/%s/comments/%s', delete $args{gist_id},
+            delete $args{comment_id}
+        ),
         %args,
     );
 }
@@ -34,11 +39,14 @@ sub delete {
 
 sub get {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: gist_id' unless $args{gist_id};
+    croak 'Missing key in parameters: gist_id'    unless $args{gist_id};
     croak 'Missing key in parameters: comment_id' unless $args{comment_id};
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/gists/%s/comments/%s', delete $args{gist_id}, delete $args{comment_id} ),
+        path   => sprintf(
+            '/gists/%s/comments/%s', delete $args{gist_id},
+            delete $args{comment_id}
+        ),
         %args,
     );
 }
@@ -57,12 +65,16 @@ sub list {
 
 sub update {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: gist_id' unless $args{gist_id};
+    croak 'Missing key in parameters: gist_id'    unless $args{gist_id};
     croak 'Missing key in parameters: comment_id' unless $args{comment_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     return $self->request(
         method => 'PATCH',
-        path   => sprintf( '/gists/%s/comments/%s', delete $args{gist_id}, delete $args{comment_id} ),
+        path   => sprintf(
+            '/gists/%s/comments/%s', delete $args{gist_id},
+            delete $args{comment_id}
+        ),
         %args,
     );
 }
@@ -81,7 +93,7 @@ Pithub::Gists::Comments - Github v3 Gist Comments API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

@@ -36,6 +36,7 @@ Module::Build->new(
   },
   test_requires => {
     'Test::More' => '0.88',
+    'Test::File::ShareDir' => '1.001002',
   },
   share_dir => 'share',
   meta_merge => {

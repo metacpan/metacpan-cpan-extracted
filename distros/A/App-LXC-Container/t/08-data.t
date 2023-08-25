@@ -122,7 +122,7 @@ my $re1c = qr{$re__e\n};
 my $re2 = qr{unknown OS: Non-existing-distribution - .+$re__e};
 check_singleton('os-release-unknown', qr{^$re1a$re1b$re1c$re2$});
 
-# tests for distributions using unusual paths:
+# FIXME: remove when Smokers are OK: tests for distributions using unusual paths:
 diag($_, ' is ', App::LXC::Container::Data::find_executable($_))
     foreach qw(ldd ls sh su);
 
@@ -209,7 +209,14 @@ $_ = join("\n", @list);
 unlike($_, qr{su},
        'content_default_packages did not add mocked su');
 like($_, qr{^(#.*\n){5}coreutils\nlibc-bin$},
-       'content_default_packages did add only coreutils and libc-bin');
+     'content_default_packages did add only coreutils and libc-bin');
+# FIXME: remove when Smokers are OK:
+unless (m/^coreutils$/m)
+{
+    diag('OS release: "', $App::LXC::Container::Data::_os_release, '"');
+    diag('OS 1: "', $singleton->{OS}, '"');
+    diag('OS 2: "', App::LXC::Container::Data::common::new()->{OS}, '"');
+}
 
 $singleton->{SYSTEM_DEFAULT} = '/non-existing';
 eval {   App::LXC::Container::Data::content_network_default();   };

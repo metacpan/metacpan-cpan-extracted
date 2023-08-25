@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provides a reduction based approach to given/when or variable dispatch",
+  "ABSTRACT" => "Converts any complicated conditional dispatch situation into familiar static hash-key based dispatch",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.91",
+  "VERSION" => "0.95",
   "test" => {
     "TESTS" => "t/*.t"
   }

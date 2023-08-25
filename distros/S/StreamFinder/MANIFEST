@@ -27,6 +27,7 @@ lib/StreamFinder/Spreaker.pm
 lib/StreamFinder/Tunein.pm
 lib/StreamFinder/Vimeo.pm
 lib/StreamFinder/Youtube.pm
+lib/StreamFinder/Zeno.pm
 Makefile.PL
 MANIFEST			This list of files
 README

@@ -1,6 +1,7 @@
 package Pithub::Markdown;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Markdown API
 
 use Moo;
@@ -12,7 +13,8 @@ has [qw( mode context )] => ( is => 'rw' );
 
 sub render {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless defined $args{data};
+    croak 'Missing key in parameters: data (hashref)'
+        unless defined $args{data};
 
     for (qw( context mode )) {
         $args{data}{$_} = $self->$_ if !exists $args{data}{$_} and $self->$_;
@@ -39,7 +41,7 @@ Pithub::Markdown - Github v3 Markdown API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 ATTRIBUTES
 

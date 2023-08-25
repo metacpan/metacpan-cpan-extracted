@@ -1,6 +1,7 @@
 package Pithub::GitData::References;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Git Data References API
 
 use Moo;
@@ -10,11 +11,14 @@ extends 'Pithub::Base';
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/git/refs', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/git/refs', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -26,7 +30,10 @@ sub get {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/git/refs/%s', delete $args{user}, delete $args{repo}, delete $args{ref} ),
+        path   => sprintf(
+            '/repos/%s/%s/git/refs/%s', delete $args{user},
+            delete $args{repo},         delete $args{ref}
+        ),
         %args,
     );
 }
@@ -38,13 +45,18 @@ sub list {
     if ( my $ref = $args{ref} ) {
         return $self->request(
             method => 'GET',
-            path   => sprintf( '/repos/%s/%s/git/refs/%s', delete $args{user}, delete $args{repo}, delete $args{ref} ),
+            path   => sprintf(
+                '/repos/%s/%s/git/refs/%s', delete $args{user},
+                delete $args{repo},         delete $args{ref}
+            ),
             %args,
         );
     }
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/git/refs', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/git/refs', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -53,11 +65,15 @@ sub list {
 sub update {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: ref' unless $args{ref};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'PATCH',
-        path   => sprintf( '/repos/%s/%s/git/refs/%s', delete $args{user}, delete $args{repo}, delete $args{ref} ),
+        path   => sprintf(
+            '/repos/%s/%s/git/refs/%s', delete $args{user},
+            delete $args{repo},         delete $args{ref}
+        ),
         %args,
     );
 }
@@ -76,7 +92,7 @@ Pithub::GitData::References - Github v3 Git Data References API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

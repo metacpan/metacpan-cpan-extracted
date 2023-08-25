@@ -151,17 +151,25 @@ sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>),
 soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (non-paywalled) radio stations and podcasts 
-(L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
-(youtube.com, et. al and other sites that youtube-dl supports) 
-(L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
-webpage URL (not supported by any of the other submodules) for streams.  
+(L<StreamFinder::Tunein>), 
+youtube.com, et. al and other sites that youtube-dl supports 
+(L<StreamFinder::Youtube>), vimeo.com videos (L<StreamFinder::Vimeo>), 
+zeno.fm radio stations and podcasts (L<StreamFinder::Zeno>), 
+and L<StreamFinder::Anystream> - search any (other) webpage URL (not supported 
+by any of the other submodules) for streams.  
+
+NOTE:  StreamFinder::Podcastaddict is now considered depreciated and may be 
+removed in a later StreamFinder release as it now requires a specific valid 
+episode page to fetch streams from, as Podcastaddict.com has javascripted up 
+their podcast pages now to the point that it is no longer possible to obtain 
+a playlist or first episode from them via our scripts.  
 
 NOTE:  StreamFinder::Reciva and StreamFinder::Radionomy have been removed, as 
 those sites have now closed down.
 
 NOTE:  For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast, but 
-functions the same way.
+functions the same way.  For some others, it may be a podcast episode.
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the URL argument passed to it when 
@@ -172,7 +180,7 @@ Please see the POD. documentation for each subpackage for important additional
 information on options and features specific to each site / subpackage!
 
 One or more playable streams can be returned for each station / video / 
-podcast, along with at least a "title" (station name / video or podcast 
+podcast, along with at least a "title" (station name / video or podcast episode 
 title) and an icon image URL ("iconurl" - if found).  Additional information 
 that MAY be fetched is a (larger?) banner image ("imageurl"), a (longer?) 
 "description", an "artist" / author, a "genre", and / or a "year" (podcasts, 
@@ -529,7 +537,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 our $DEBUG = 0;
 
 require Exporter;
@@ -538,7 +546,7 @@ require Exporter;
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Goodpods 
 		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
-		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube LinkTV));
+		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube LinkTV Zeno));
 
 my %useit;
 
@@ -644,6 +652,9 @@ sub new
 	} elsif ($url =~ m#\blinktv\.# && $useit{'LinkTV'}) {
 		eval { require 'StreamFinder/LinkTV.pm'; $haveit = 1; };
 		return new StreamFinder::LinkTV($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bzeno\.# && $useit{'Zeno'}) {
+		eval { require 'StreamFinder/Zeno.pm'; $haveit = 1; };
+		return new StreamFinder::Zeno($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

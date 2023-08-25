@@ -1,0 +1,113 @@
+{
+   "abstract" : "Build and install libgs1encoders, a C-based GS1 barcode parser",
+   "author" : [
+      "hangy"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libgs1encoders",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.80",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Alien::Build::Plugin::Download::GitHub" : "0",
+            "Dist::Zilla::Plugin::AlienBase::Doc" : "0",
+            "Dist::Zilla::Plugin::AlienBuild" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "0.03",
+            "Software::License::Perl_5" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.80",
+            "FFI::CheckLib" : "0.31",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000121",
+            "Test::Alien" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hangy/Alien-libgs1encoders/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::libgs1encoders",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hangy/Alien-libgs1encoders.git",
+         "web" : "https://github.com/hangy/Alien-libgs1encoders"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.03",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}
+

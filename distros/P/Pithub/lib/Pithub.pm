@@ -1,10 +1,11 @@
 package Pithub;
 our $AUTHORITY = 'cpan:PLU';
+
 # ABSTRACT: Github v3 API
 
 use Moo;
 
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
 
 use Carp                 qw( croak );
 use Pithub::Events       ();
@@ -13,6 +14,7 @@ use Pithub::GitData      ();
 use Pithub::Issues       ();
 use Pithub::Orgs         ();
 use Pithub::PullRequests ();
+use Pithub::Markdown     ();
 use Pithub::Repos        ();
 use Pithub::Search       ();
 use Pithub::SearchV3     ();
@@ -24,18 +26,18 @@ extends 'Pithub::Base';
 sub _validate_search_api {
     my %search_apis = map { $_ => 1 } qw(legacy v3);
     croak "unknown search api '$_[0]'"
-        unless exists $search_apis{$_[0]};
+        unless exists $search_apis{ $_[0] };
 }
 
 
 has search_api => (
-    is  => 'ro',
-    isa => \&_validate_search_api,
+    is      => 'ro',
+    isa     => \&_validate_search_api,
     default => 'legacy',
 );
 
 sub _search_class {
-    my ($self, $search_api) = @_;
+    my ( $self, $search_api ) = @_;
 
     _validate_search_api($search_api);
 
@@ -46,58 +48,58 @@ sub _search_class {
 
 
 sub events {
-    return shift->_create_instance(Pithub::Events::, @_);
+    return shift->_create_instance( Pithub::Events::, @_ );
 }
 
 
 sub gists {
-    return shift->_create_instance(Pithub::Gists::, @_);
+    return shift->_create_instance( Pithub::Gists::, @_ );
 }
 
 
 sub git_data {
-    return shift->_create_instance(Pithub::GitData::, @_);
+    return shift->_create_instance( Pithub::GitData::, @_ );
 }
 
 
 sub issues {
-    return shift->_create_instance(Pithub::Issues::, @_);
+    return shift->_create_instance( Pithub::Issues::, @_ );
 }
 
 
 sub markdown {
-    return shift->_create_instance(Pithub::Markdown::, @_);
+    return shift->_create_instance( Pithub::Markdown::, @_ );
 }
 
 
 sub orgs {
-    return shift->_create_instance(Pithub::Orgs::, @_);
+    return shift->_create_instance( Pithub::Orgs::, @_ );
 }
 
 
 sub pull_requests {
-    return shift->_create_instance(Pithub::PullRequests::, @_);
+    return shift->_create_instance( Pithub::PullRequests::, @_ );
 }
 
 
 sub repos {
-    return shift->_create_instance(Pithub::Repos::, @_);
+    return shift->_create_instance( Pithub::Repos::, @_ );
 }
 
 
 sub search {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
     my $class = $self->_search_class(
         exists $args{search_api}
-            ? delete $args{search_api}
-            : $self->search_api,
+        ? delete $args{search_api}
+        : $self->search_api,
     );
-    return shift->_create_instance($class, @_);
+    return shift->_create_instance( $class, @_ );
 }
 
 
 sub users {
-    return shift->_create_instance(Pithub::Users::, @_);
+    return shift->_create_instance( Pithub::Users::, @_ );
 }
 
 
@@ -115,7 +117,7 @@ Pithub - Github v3 API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 SYNOPSIS
 
@@ -628,6 +630,9 @@ See also: L<http://developer.github.com/v3/repos/releases/>
     my $releases = Pithub->new->repos->releases;
     my $releases = Pithub::Repos->new->releases;
     my $releases = Pithub::Repos::Releases->new;
+
+Note that Pithub::Repos::Releases requires Boolean values for some calls.
+See Pithub::Repos::Releases for details.
 
 =over
 

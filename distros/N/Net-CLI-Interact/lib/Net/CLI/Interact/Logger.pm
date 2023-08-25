@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Logger;
-{ $Net::CLI::Interact::Logger::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Logger::VERSION = '2.400000' }
 
 use Moo;
 use Sub::Quote;

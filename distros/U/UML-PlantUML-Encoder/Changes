@@ -1,5 +1,8 @@
 Revision history for UML-PlantUML-Encoder
 
+0.03    August 24, 2013
+        Third version, fixes bug https://rt.cpan.org/Ticket/Display.html?id=148220 reported by Vladimir Alexiev. Thanks for reporting.
+
 0.02    June 15, 2019
         Second version, renamed to UML-PlantUML-Encoder as per suggestions on PrePAN.
 

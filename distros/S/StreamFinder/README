@@ -110,50 +110,61 @@ DESCRIPTION
     of media player software rather than using their web browser and
     accepting flash, ads, javascript, cookies, trackers, web-bugs, and other
     crapware associated with that method of play. The author created and
-    uses his own custom all-purpose media player called "Fauxdacious" media
-    player (his custom forked version of the open-source "Audacious" audio
-    player). "Fauxdacious" (<https://wildstar84.wordpress.com/fauxdacious/>)
-    incorporates this module to decode and play streams, along with their
-    titles / station names, and station / podcast / video icons, artists /
-    channel names, genres, and descriptions!
+    uses his own custom all-purpose media player called "Fauxdacious Media
+    Player" (his custom forked version of the open-source "Audacious Audio
+    Player). "Fauxdacious" (<https://wildstar84.wordpress.com/fauxdacious/>)
+    incorporates this module via a Perl helper-script to decode and play
+    streams, along with their titles / station names, and station / podcast
+    / video icons, artists / channel names, genres, and descriptions!
 
     Please NOTE: StreamFinder is a module, NOT a standalone application. It
     is designed to be used by other Perl applications. To create your own
-    very simple application just to fetch streams manually, simply grab the
-    code in the SYNOPSIS section above, save it to an executable text file,
-    ie. *StreamFinder.pl*, and run it from the command line with a supported
-    streaming site URL as the argument. You can then edit it to tailor it to
-    your needs.
+    very simple application just to fetch stream data manually, simply grab
+    the code in the SYNOPSIS section above, save it to an executable text
+    file, ie. *StreamFinder.pl*, and run it from the command line with a
+    supported streaming site URL as the argument. You can then edit it to
+    tailor it to your needs.
 
     The currently-supported websites are: podcasts.apple.com podcasts
     (StreamFinder::Apple), bitchute.com videos (StreamFinder::Bitchute),
     blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
     ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    podcasts.google.com podcasts (StreamFinder::Google), goodpods.com
-    podcasts (StreamFinder::Goodpods), iheartradio.com radio stations and
+    goodpods.com podcasts (StreamFinder::Goodpods), podcasts.google.com
+    podcasts (StreamFinder::Google), iheartradio.com radio stations and
     podcasts (StreamFinder::IHeartRadio), www.internetradio.com radio
-    stations (StreamFinder::InternetRadio), onlineradiobox.com radio
-    stations (StreamFinder::OnlineRadiobox), odysee.com videos
+    stations (StreamFinder::InternetRadio), www.linktv.org videos
+    (StreamFinder::LinkTV), onlineradiobox.com radio stations
+    (StreamFinder::OnlineRadiobox), odysee.com videos
     (StreamFinder::Odysee), podbean.com podcasts (StreamFinder::Podbean),
-    podcastaddict.com podcasts (StreamFinder::PodcastAddict), radio.net
-    radio stations (StreamFinder::RadioNet), rcast.net radio stations
+    podcastaddict.com podcasts (StreamFinder::PodcastAddict), podchaser.com
+    podcasts (StreamFinder::Podchaser), radio.net radio stations
+    (StreamFinder::RadioNet), rcast.net radio stations
     (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
     sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
     soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
     spreaker.com podcasts (StreamFinder::Spreaker), tunein.com
     (non-paywalled) radio stations and podcasts (StreamFinder::Tunein),
-    vimeo.com videos (StreamFinder::Vimeo), (youtube.com, et. al and other
-    sites that youtube-dl supports) (StreamFinder::Youtube), and
+    youtube.com, et. al and other sites that youtube-dl supports
+    (StreamFinder::Youtube), vimeo.com videos (StreamFinder::Vimeo), zeno.fm
+    radio stations and podcasts (StreamFinder::Zeno), and
     StreamFinder::Anystream - search any (other) webpage URL (not supported
     by any of the other submodules) for streams.
+
+    NOTE: StreamFinder::Podcastaddict is now considered depreciated and may
+    be removed in a later StreamFinder release as it now requires a specific
+    valid episode page to fetch streams from, as Podcastaddict.com has
+    javascripted up their podcast pages now to the point that it is no
+    longer possible to obtain a playlist or first episode from them via our
+    scripts.
 
     NOTE: StreamFinder::Reciva and StreamFinder::Radionomy have been
     removed, as those sites have now closed down.
 
     NOTE: For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
     Google, etc. the "station" object actually refers to a specific video or
-    podcast, but functions the same way.
+    podcast, but functions the same way. For some others, it may be a
+    podcast episode.
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
@@ -167,7 +178,7 @@ DESCRIPTION
 
     One or more playable streams can be returned for each station / video /
     podcast, along with at least a "title" (station name / video or podcast
-    title) and an icon image URL ("iconurl" - if found). Additional
+    episode title) and an icon image URL ("iconurl" - if found). Additional
     information that MAY be fetched is a (larger?) banner image
     ("imageurl"), a (longer?) "description", an "artist" / author, a
     "genre", and / or a "year" (podcasts, videos, etc.), an AlbumArtist /

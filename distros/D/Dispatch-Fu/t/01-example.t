@@ -2,47 +2,47 @@ use Dispatch::Fu;    # exports 'dispatch' and 'on', which are needed
 
 use Test::More tests => 1;
 
-my $input_ref = [qw/1 2 3 4 5/];
+my $CASES = [qw/1 2 3 4 5/];
 
-my $bucket = dispatch {
+my $case = dispatch {
 
     # here, give a reference $H of any kind,
     # you compute a static string that is added
     # via the 'on' keyword; result will be
-    # 'bucket' + some number in in 0-5
+    # 'case' + some number in in 0-5
 
-    my $baz = shift;
+    my $case = shift;
 
     # what gets returned here should be a static string
     # that is used as a key in the "on" entries below.
-    return ( scalar @$baz > 5 )
-      ? q{bucket5}
-      : sprintf qq{bucket%d}, scalar @$baz;
+    return ( scalar @$case > 5 )
+      ? q{case5}
+      : sprintf qq{case%d}, scalar @$case;
 }
-$input_ref,
-  on bucket0 => sub {
-    note qq{bucket 0};
+$CASES,
+  on case0 => sub {
+    note qq{case 0};
     0;
   },
-  on bucket1 => sub {
-    note qq{bucket 1};
+  on case1 => sub {
+    note qq{case 1};
     1;
   },
-  on bucket2 => sub {
-    note qq{bucket 2};
+  on case2 => sub {
+    note qq{case 2};
     2;
   },
-  on bucket3 => sub {
-    note qq{bucket 3};
+  on case3 => sub {
+    note qq{case 3};
     3;
   },
-  on bucket4 => sub {
-    note qq{bucket 4};
+  on case4 => sub {
+    note qq{case 4};
     4;
   },
-  on bucket5 => sub {
-    note qq{bucket 5};
+  on case5 => sub {
+    note qq{case 5};
     5;
   };
 
-is $bucket, 5, q{POD example works};
+is $case, 5, q{POD example works};

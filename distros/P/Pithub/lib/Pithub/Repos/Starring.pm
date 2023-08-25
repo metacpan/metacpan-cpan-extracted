@@ -1,10 +1,10 @@
 package Pithub::Repos::Starring;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Repo Starring API
 
 use Moo;
-use Carp ();
 extends 'Pithub::Base';
 
 
@@ -13,7 +13,9 @@ sub has_starred {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/user/starred/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/user/starred/%s/%s', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -24,7 +26,9 @@ sub list {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/stargazers', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/stargazers', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -52,7 +56,9 @@ sub star {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'PUT',
-        path   => sprintf( '/user/starred/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/user/starred/%s/%s', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -63,7 +69,9 @@ sub unstar {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/user/starred/%s/%s', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/user/starred/%s/%s', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -82,7 +90,7 @@ Pithub::Repos::Starring - Github v3 Repo Starring API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

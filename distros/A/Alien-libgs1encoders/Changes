@@ -1,0 +1,10 @@
+Revision history for Alien-libgs1encoders
+
+0.03      2023-08-24 16:27:05 +0000
+  - No changes since last trial
+
+0.02      2023-08-23 19:43:17 +0000 (TRIAL RELEASE)
+  - fix: Install built lib to `DESTDIR`
+
+0.01      2023-08-17 21:14:30 +0000 (TRIAL RELEASE)
+  - Initial version

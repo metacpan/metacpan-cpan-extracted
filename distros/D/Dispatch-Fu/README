@@ -1,7 +1,7 @@
 This archive contains the distribution Dispatch-Fu,
-version 0.91:
+version 0.95:
 
-  Provides a reduction based approach to given/when or variable dispatch
+  Converts any complicated conditional dispatch situation into familiar static hash-key based dispatch
 
 This software is copyright (c) 2023 by oodler577.
 

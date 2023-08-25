@@ -1,6 +1,7 @@
 package Pithub::Issues::Events;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Issue Events API
 
 use Moo;
@@ -14,7 +15,10 @@ sub get {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/issues/events/%s', delete $args{user}, delete $args{repo}, delete $args{event_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/issues/events/%s', delete $args{user},
+            delete $args{repo},              delete $args{event_id}
+        ),
         %args,
     );
 }
@@ -26,13 +30,19 @@ sub list {
     if ( my $issue_id = delete $args{issue_id} ) {
         return $self->request(
             method => 'GET',
-            path   => sprintf( '/repos/%s/%s/issues/%s/events', delete $args{user}, delete $args{repo}, $issue_id ),
+            path   => sprintf(
+                '/repos/%s/%s/issues/%s/events', delete $args{user},
+                delete $args{repo},              $issue_id
+            ),
             %args,
         );
     }
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/issues/events', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/issues/events', delete $args{user},
+            delete $args{repo}
+        ),
         %args,
     );
 }
@@ -51,7 +61,7 @@ Pithub::Issues::Events - Github v3 Issue Events API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

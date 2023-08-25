@@ -1,6 +1,7 @@
 package Pithub::Repos::Releases::Assets;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Repo Releases Assets API
 
 use Moo;
@@ -10,14 +11,18 @@ extends 'Pithub::Base';
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: name' unless $args{name};
+    croak 'Missing key in parameters: name'       unless $args{name};
     croak 'Missing key in parameters: release_id' unless $args{release_id};
-    croak 'Missing key in parameters: data' unless $args{data};
-    croak 'Missing key in parameters: content_type' unless $args{content_type};
+    croak 'Missing key in parameters: data'       unless $args{data};
+    croak 'Missing key in parameters: content_type'
+        unless $args{content_type};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
-        method  => 'POST',
-        path    => sprintf( '/repos/%s/%s/releases/%s/assets', delete $args{user}, delete $args{repo}, delete $args{release_id} ),
+        method => 'POST',
+        path   => sprintf(
+            '/repos/%s/%s/releases/%s/assets', delete $args{user},
+            delete $args{repo},                delete $args{release_id}
+        ),
         host    => 'uploads.github.com',
         query   => { name => delete $args{name} },
         headers => {
@@ -34,7 +39,10 @@ sub delete {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/repos/%s/%s/releases/assets/%s', delete $args{user}, delete $args{repo}, delete $args{asset_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/assets/%s', delete $args{user},
+            delete $args{repo},                delete $args{asset_id}
+        ),
         %args,
     );
 }
@@ -46,7 +54,10 @@ sub get {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/releases/assets/%s', delete $args{user}, delete $args{repo}, delete $args{asset_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/assets/%s', delete $args{user},
+            delete $args{repo},                delete $args{asset_id}
+        ),
         %args,
     );
 }
@@ -58,7 +69,10 @@ sub list {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/releases/%s/assets', delete $args{user}, delete $args{repo}, delete $args{release_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/%s/assets', delete $args{user},
+            delete $args{repo},                delete $args{release_id}
+        ),
         %args,
     );
 }
@@ -67,11 +81,15 @@ sub list {
 sub update {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: asset_id' unless $args{asset_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
-        method  => 'PATCH',
-        path    => sprintf( '/repos/%s/%s/releases/assets/%s', delete $args{user}, delete $args{repo}, delete $args{asset_id} ),
+        method => 'PATCH',
+        path   => sprintf(
+            '/repos/%s/%s/releases/assets/%s', delete $args{user},
+            delete $args{repo},                delete $args{asset_id}
+        ),
         %args,
     );
 }
@@ -90,7 +108,7 @@ Pithub::Repos::Releases::Assets - Github v3 Repo Releases Assets API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

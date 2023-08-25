@@ -1,6 +1,7 @@
 package Pithub::Issues::Milestones;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Issue Milestones API
 
 use Moo;
@@ -10,11 +11,14 @@ extends 'Pithub::Base';
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/milestones', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/milestones', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -22,11 +26,15 @@ sub create {
 
 sub delete {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: milestone_id' unless $args{milestone_id};
+    croak 'Missing key in parameters: milestone_id'
+        unless $args{milestone_id};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/repos/%s/%s/milestones/%s', delete $args{user}, delete $args{repo}, delete $args{milestone_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/milestones/%s', delete $args{user},
+            delete $args{repo},           delete $args{milestone_id}
+        ),
         %args,
     );
 }
@@ -34,11 +42,15 @@ sub delete {
 
 sub get {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: milestone_id' unless $args{milestone_id};
+    croak 'Missing key in parameters: milestone_id'
+        unless $args{milestone_id};
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/milestones/%s', delete $args{user}, delete $args{repo}, delete $args{milestone_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/milestones/%s', delete $args{user},
+            delete $args{repo},           delete $args{milestone_id}
+        ),
         %args
     );
 }
@@ -49,7 +61,9 @@ sub list {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/milestones', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/milestones', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -57,12 +71,17 @@ sub list {
 
 sub update {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: milestone_id' unless $args{milestone_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: milestone_id'
+        unless $args{milestone_id};
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'PATCH',
-        path   => sprintf( '/repos/%s/%s/milestones/%s', delete $args{user}, delete $args{repo}, delete $args{milestone_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/milestones/%s', delete $args{user},
+            delete $args{repo},           delete $args{milestone_id}
+        ),
         %args,
     );
 }
@@ -81,7 +100,7 @@ Pithub::Issues::Milestones - Github v3 Issue Milestones API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 

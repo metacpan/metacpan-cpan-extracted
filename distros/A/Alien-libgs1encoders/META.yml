@@ -1,0 +1,54 @@
+---
+abstract: 'Build and install libgs1encoders, a C-based GS1 barcode parser'
+author:
+  - hangy
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::V0: '0.000121'
+  Test::Alien: '0'
+  perl: '5.008001'
+configure_requires:
+  Alien::Build: '2.80'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::GitHub: '0.10'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libgs1encoders
+requires:
+  Alien::Base: '2.80'
+  FFI::CheckLib: '0.31'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/hangy/Alien-libgs1encoders/issues
+  homepage: https://metacpan.org/pod/Alien::libgs1encoders
+  repository: git://github.com/hangy/Alien-libgs1encoders.git
+version: '0.03'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

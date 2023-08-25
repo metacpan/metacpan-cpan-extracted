@@ -1,5 +1,5 @@
 package Net::CLI::Interact;
-{ $Net::CLI::Interact::VERSION = '2.300005' }
+{ $Net::CLI::Interact::VERSION = '2.400000' }
 
 use Moo;
 use Sub::Quote;

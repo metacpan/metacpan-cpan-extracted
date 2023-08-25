@@ -1,3 +1,16 @@
+2.400000 2023-08-25
+
+  * Fix Cisco privileged prompt discovery
+    when the last line of a received block ends in #, which makes it look
+    like a privileged prompt, but contains spaces
+  * Improve performance of ::Wrapper::Net_Telnet
+    by reading all blocks of available data instead of only the first one
+    per pump call.
+    This also reduces the possibility of incorrect prompt matching.
+  * Lower CPU utilization
+    by sleeping for 10 milliseconds between each pump iteration
+  * Improve debug output by wrapping the buffer data in single quotes
+
 2.300005 2023-07-20
 
   * [#40] Support all lowercase password prompt

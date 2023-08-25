@@ -1,16 +1,17 @@
 package Pithub::Repos::Releases;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01040';
+our $VERSION = '0.01041';
+
 # ABSTRACT: Github v3 Repo Releases API
 
 use Moo;
-use Carp qw( croak );
-use Pithub::Repos::Releases::Assets;
+use Carp                            qw( croak );
+use Pithub::Repos::Releases::Assets ();
 extends 'Pithub::Base';
 
 
 sub assets {
-    return shift->_create_instance('Pithub::Repos::Releases::Assets', @_);
+    return shift->_create_instance( Pithub::Repos::Releases::Assets::, @_ );
 }
 
 
@@ -19,7 +20,9 @@ sub list {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/releases', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -31,7 +34,10 @@ sub get {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/releases/%d', delete $args{user}, delete $args{repo}, delete $args{release_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/%d', delete $args{user},
+            delete $args{repo},         delete $args{release_id}
+        ),
         %args,
     );
 }
@@ -39,11 +45,14 @@ sub get {
 
 sub create {
     my ( $self, %args ) = @_;
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'POST',
-        path   => sprintf( '/repos/%s/%s/releases', delete $args{user}, delete $args{repo} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases', delete $args{user}, delete $args{repo}
+        ),
         %args,
     );
 }
@@ -52,11 +61,15 @@ sub create {
 sub update {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: release_id' unless $args{release_id};
-    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    croak 'Missing key in parameters: data (hashref)'
+        unless ref $args{data} eq 'HASH';
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'PATCH',
-        path   => sprintf( '/repos/%s/%s/releases/%d', delete $args{user}, delete $args{repo}, delete $args{release_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/%d', delete $args{user},
+            delete $args{repo},         delete $args{release_id}
+        ),
         %args,
     );
 }
@@ -68,7 +81,10 @@ sub delete {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'DELETE',
-        path   => sprintf( '/repos/%s/%s/releases/%d', delete $args{user}, delete $args{repo}, delete $args{release_id} ),
+        path   => sprintf(
+            '/repos/%s/%s/releases/%d', delete $args{user},
+            delete $args{repo},         delete $args{release_id}
+        ),
         %args,
     );
 }
@@ -87,7 +103,7 @@ Pithub::Repos::Releases - Github v3 Repo Releases API
 
 =head1 VERSION
 
-version 0.01040
+version 0.01041
 
 =head1 METHODS
 
@@ -157,10 +173,56 @@ Examples:
             target_commitish => 'master',
             name             => 'v1.0.0',
             body             => 'Description of the release',
-            draft            => 0,
-            prerelease       => 0,
+            draft            => JSON::MaybeXS::false(),           # or alternative below
+            prerelease       => JSON::MaybeXS::false(),           # or alternative below
+            generate_release_notes => JSON::MaybeXS::false(),     # or alternative below
         }
     );
+
+Booleans:
+
+Several of the attributes B<require> boolean values in the request that is sent
+to GitHub.  Zero (0) and one (1) are integers and will not be encoded correctly
+in the JSON encoded request.
+
+There are numerous options for your call to Pithub::Repos::Releases->create.
+
+=over
+
+=item JSON::MaybeXS
+
+Add the following to your code before the call to Pithub::Repos::Releases->create.
+
+    require JSON::MaybeXS;
+
+Then use the following values for the booleans:
+
+    JSON::MaybeXS::true()
+    JSON::MaybeXS::false()
+
+=item Cpanel::JSON::XS
+
+Add the following to your code before the call to Pithub::Repos::Releases->create.
+
+    require Cpanel::JSON::XS;
+
+Then use the following values for the booleans:
+
+    Cpanel::JSON::XS::true
+    Cpanel::JSON::XS::false
+
+=item JSON::PP
+
+Add the following to your code before the call to Pithub::Repos::Releases->create.
+
+    require JSON::PP;
+
+Then use the following values for the booleans:
+
+    $JSON::PP::true
+    $JSON::PP::false
+
+=back
 
 =back
 

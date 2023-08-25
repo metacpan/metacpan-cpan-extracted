@@ -1,9 +1,10 @@
 package Net::CLI::Interact::Transport::Wrapper::Base;
-{ $Net::CLI::Interact::Transport::Wrapper::Base::VERSION = '2.300005' }
+{ $Net::CLI::Interact::Transport::Wrapper::Base::VERSION = '2.400000' }
 
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(Int RegexpRef Str Object);
+use Time::HiRes qw( sleep );
 
 with 'Net::CLI::Interact::Role::FindMatch';
 
@@ -100,7 +101,7 @@ sub do_action {
         while ($self->pump) {
             # remove control characters
             (my $buffer = $self->buffer) =~ s/[\000-\010\013\014\016-\032\034-\037]//g;
-            $self->logger->log('dump', 'debug', "SEEN:\n". $buffer);
+            $self->logger->log('dump', 'debug', "SEEN:\n'". $buffer. "'");
 
             if ($buffer =~ m/^(.*$irs_re)(.*)/s) {
                 $self->stash($self->stash . $1);
@@ -126,6 +127,8 @@ sub do_action {
                     (ref $action->value eq ref [] ? (join '|', @{$action->value})
                                                 : $action->value));
             }
+
+            sleep(0.01);
         }
     }
     if ($action->type eq 'send') {

@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Data::Dumper;
-use Pithub::Repos::Releases;
+use Data::Dumper            qw( Dumper );
+use Pithub::Repos::Releases ();
 
 my $releases = Pithub::Repos::Releases->new(
     repo  => 'buhtip-repo',
@@ -10,11 +10,13 @@ my $releases = Pithub::Repos::Releases->new(
     user  => 'buhtip',
 );
 
+require JSON::MaybeXS;
 my $release = $releases->create(
     data => {
         name              => "v1.0.$$",
         tag_name          => "v1.0.$$",
         target_commitisih => 'master',
+        draft             => JSON::MaybeXS::false();
     }
 );
 

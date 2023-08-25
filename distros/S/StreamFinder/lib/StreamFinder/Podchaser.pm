@@ -111,7 +111,8 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-notrim> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]] 
+[, I<-debug> [ => 0|1|2 ]])
 
 Accepts a podchaser.com podcast-ID, episode-ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
@@ -127,6 +128,15 @@ Some other URL formats also seem to work well, such as:
 https://www.podchaser.com/creators/B<creator-id> and 
 https://www.podchaser.com/creators/B<creator-id>/appearances (both formats are 
 podcast pages (multiple episodes).
+
+The optional I<-notrim> argument can be either 0 or 1 (I<false> or I<true>).  
+If 0 (I<false>) then stream URLs are trimmed of excess "ad" parameters 
+(everything after the first "?" character, ie. "?ads.cust_params=premium" is 
+removed, including the "?".  Otherwise, the stream URLs are returned as-is.  
+
+DEFAULT I<-notrim> (if not given) is 0 (I<false>) and URLs are trimmed.  If 
+I<-notrim> is specified without argument, the default is 1 (I<true>).  Try 
+using I<-notrim> if stream will not play without the extra arguments.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
 If 1 then only secure ("https://") streams will be returned.
@@ -240,6 +250,9 @@ and the options are loaded into a hash used only by the specific
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
+
+Among options valid for Podchaser streams is the I<-notrim> described in the 
+B<new()> function.  
 
 =item ~/.config/StreamFinder/config
 
@@ -365,6 +378,16 @@ sub new
 
 	my $self = $class->SUPER::new('Podchaser', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
+	$self->{'notrim'} = 0;
+	while (@_) {
+		if ($_[0] =~ /^\-?notrim$/o) {
+			shift;
+			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
+		} else {
+			shift;
+		}
+	}
+
 	$self->{'id'} = '';
 	$self->{'_podcast_id'} = '';
 	(my $url2fetch = $url) =~ s#\/$##;
@@ -381,12 +404,14 @@ sub new
 
 TRYIT:
 	if ($url2fetch =~ m#^https?\:\/\/#) {
+		$url2fetch =~ s#\/episodes\/recent$##;  #"recent" IS SPECIAL CASE, TREAT AS PODCAST PAGE!:
 		if ($url2fetch =~ m#\/episodes?\/(.+)$#) {
 			$self->{'id'} = $1;
 			$isEpisode = 1;
 		} elsif ($url2fetch =~ m#\/([^\/]+)$#) {
 			$self->{'id'} = $1;
 			$isEpisode = 0;
+			$url2fetch .= '/episodes/recent';  #NOW REQUIRED TO GET ANYTHING FROM PODCAST PAGES:
 		}
 	} else {
 		$self->{'id'} = $url2fetch;
@@ -396,7 +421,7 @@ TRYIT:
 			$url2fetch = "https://www.podchaser.com/podcasts/${podcastID}/episodes/${episodeID}";
 			$self->{'id'} = $episodeID;
 		} else {
-			$url2fetch = "https://www.podchaser.com/podcasts/$$self{'id'}";
+			$url2fetch = "https://www.podchaser.com/podcasts/$$self{'id'}/episodes/recent";
 		}
 	}
 	return undef  unless ($self->{'id'});  #INVALID ID/URL!
@@ -456,14 +481,18 @@ TRYIT:
 
 		#NOW FETCH THE STREAM(S) (Podchaser.com PODCASTS NORMALLY ONLY HAVE ONE):
 		my $stream = '';
-		$stream = $1 	if ($html =~ m#\"audio_url\"\:\"([^\"]+)#s);
-		$stream ||= $1  if ($html =~ m#\>Download\s+Audio\s+File\<\/span\>\<span\s+(class\=\"[^\"]*\"\s+)?title\=\"([^\"]+)#s);
+		$stream = $1  if ($html =~ m#\>Download\s+Audio\s+File\<\/span\>\<span\s+(?:class\=\"[^\"]*\"\s+)?title\=\"([^\"]+)#s);
+		$stream =~ s/\.(mp3|m3u8|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
 		my $protocol = $self->{'secure'} ? '' : '?';
-		@{$self->{'streams'}} = ($stream)  if ($stream =~ m#^https${protocol}\:#);
+		
+		@{$self->{'streams'}} = ($stream)  if ($stream && $stream =~ m#^https${protocol}\:#);
 		#MIGHT AS WELL ANTICIPATE & TRY TO EXTRAPOLATE POSSIBLE VIDEO!:
 		$stream = ($html =~ m#\"video_url\"\:\"([^\"]+)#s) ? $1 : '';
 		$stream ||= $1  if ($html =~ m#\>Download\s+Video\s+File\<\/span\>\<span\s+(class\=\"[^\"]*\"\s+)?title\=\"([^\"]+)#s);
-		unshift(@{$self->{'streams'}}, $stream)  if ($stream);
+		if ($stream && $stream =~ m#^https${protocol}\:#) {
+			$stream =~ s/\.(mp3|m3u8|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
+			unshift(@{$self->{'streams'}}, $stream);
+		}
 	} else {   #PODCAST PAGE:
 		print STDERR "-----WE'RE A PODCAST PAGE: ID=".$self->{'id'}."!\n"  if ($DEBUG);
 
@@ -493,6 +522,7 @@ TRYIT:
 						my $streamURL = uri_unescape($1);
 						next  if ($self->{'secure'} && $streamURL !~ /^https/o);
 
+						$streamURL =~ s/\.(mp3|m3u8|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
 						push @streams, $streamURL;
 					}
 				}
@@ -531,6 +561,7 @@ TRYIT:
 					my $streamURL = uri_unescape($1);
 					next  if ($self->{'secure'} && $streamURL !~ /^https/o);
 
+					$streamURL =~ s/\.(mp3|m3u8|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
 					push @streams, $streamURL;
 				}
 			}
@@ -672,6 +703,7 @@ TRYIT:
 		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
 	}
 
+	print "---Playlist Count=".$self->{'playlist_cnt'}."=\n---Playlist=".$self->{'playlist'}."=\n"  if ($DEBUG); 
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
